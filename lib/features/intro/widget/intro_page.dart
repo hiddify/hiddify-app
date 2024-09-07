@@ -52,6 +52,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
               maxCrossAxisExtent: 368,
               child: MultiSliver(
                 children: [
+                  Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), child: Text(t.intro.banner)),
                   const LocalePrefTile(),
                   const SliverGap(4),
                   const RegionPrefTile(),
@@ -69,6 +70,34 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                             ..onTap = () async {
                               await UriUtils.tryLaunch(
                                 Uri.parse(Constants.termsAndConditionsUrl),
+                              );
+                            },
+                        ),
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 16, top: 24),
+                    child: Text.rich(
+                      t.intro.info(
+                        tap_source: (text) => TextSpan(
+                          text: text,
+                          style: const TextStyle(color: Colors.blue),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              await UriUtils.tryLaunch(
+                                Uri.parse(Constants.githubUrl),
+                              );
+                            },
+                        ),
+                        tap_license: (text) => TextSpan(
+                          text: text,
+                          style: const TextStyle(color: Colors.blue),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              await UriUtils.tryLaunch(
+                                Uri.parse(Constants.licenseUrl),
                               );
                             },
                         ),

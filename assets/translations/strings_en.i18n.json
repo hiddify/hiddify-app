@@ -26,7 +26,10 @@
   },
   "intro": {
     "termsAndPolicyCaution(rich)": "By Continuing You Agree With ${tap(@:about.termsAndConditions)}",
+    "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open Source)} (${tap_license(License)})",
+    "banner": "Hiddify: All you need for an unrestricted internet.",
     "start": "Start"
+
   },
   "home": {
     "pageTitle": "Home",
