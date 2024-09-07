@@ -9,6 +9,7 @@ import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/settings/notifier/platform_settings_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class AdvancedSettingTiles extends HookConsumerWidget {
   const AdvancedSettingTiles({super.key});
@@ -55,7 +56,7 @@ class AdvancedSettingTiles extends HookConsumerWidget {
             },
           ),
         ],
-        SwitchListTile(
+        SwitchListTile.adaptive(
           title: Text(t.settings.advanced.memoryLimit),
           subtitle: Text(t.settings.advanced.memoryLimitMsg),
           value: !disableMemoryLimit,
@@ -72,7 +73,7 @@ class AdvancedSettingTiles extends HookConsumerWidget {
               await ref.read(resetTunnelProvider.notifier).run();
             },
           ),
-        SwitchListTile(
+        SwitchListTile.adaptive(
           title: Text(t.settings.advanced.debugMode),
           value: debug,
           secondary: const Icon(FluentIcons.window_dev_tools_24_regular),
@@ -81,7 +82,7 @@ class AdvancedSettingTiles extends HookConsumerWidget {
               await showDialog<bool>(
                 context: context,
                 builder: (context) {
-                  return AlertDialog(
+                  return PlatformAlertDialog(
                     title: Text(t.settings.advanced.debugMode),
                     content: Text(t.settings.advanced.debugModeMsg),
                     actions: [

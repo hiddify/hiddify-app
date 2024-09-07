@@ -3,6 +3,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -75,7 +76,7 @@ class AddProfileModal extends HookConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      PlatformText(
                         t.profile.add.addingProfileMsg,
                         style: theme.textTheme.bodySmall,
                       ),
@@ -84,11 +85,11 @@ class AddProfileModal extends HookConsumerWidget {
                         backgroundColor: Colors.transparent,
                       ),
                       const Gap(8),
-                      TextButton(
+                      PlatformTextButton(
                         onPressed: () {
                           ref.invalidate(addProfileProvider);
                         },
-                        child: Text(
+                        child: PlatformText(
                           MaterialLocalizations.of(context).cancelButtonLabel,
                         ),
                       ),
@@ -325,7 +326,7 @@ class _Button extends StatelessWidget {
                 ),
                 const Gap(16),
                 Flexible(
-                  child: Text(
+                  child: PlatformText(
                     label,
                     style: theme.textTheme.labelLarge?.copyWith(color: color),
                     textAlign: TextAlign.center,

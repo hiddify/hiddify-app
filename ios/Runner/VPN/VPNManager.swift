@@ -107,7 +107,7 @@ class VPNManager: ObservableObject {
             try await newManager.loadFromPreferences()
             self.manager = newManager
         } catch {
-            print(error.localizedDescription)
+            print(error.localizedDescription)	
         }
     }
     

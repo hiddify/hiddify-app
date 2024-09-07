@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
@@ -42,7 +43,7 @@ class ConnectionButton extends HookConsumerWidget {
       },
     );
 
-    final buttonTheme = Theme.of(context).extension<ConnectionButtonTheme>()!;
+    final buttonTheme = ConnectionButtonTheme.light;
 
     Future<bool> showExperimentalNotice() async {
       final hasExperimental = ref.read(ConfigOptions.hasExperimentalFeatures);

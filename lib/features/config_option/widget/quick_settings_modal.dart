@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/router.dart';
@@ -46,14 +47,14 @@ class QuickSettingsModal extends HookConsumerWidget {
               onLongPress: () {
                 ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context);
               },
-              child: SwitchListTile(
+              child: SwitchListTile.adaptive(
                 value: ref.watch(ConfigOptions.enableWarp),
                 onChanged: ref.watch(ConfigOptions.enableWarp.notifier).update,
                 title: Text(t.config.enableWarp),
               ),
             )
           else
-            ListTile(
+            PlatformListTile(
               title: Text(t.config.setupWarp),
               trailing: const Icon(FluentIcons.chevron_right_24_regular),
               onTap: () => ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context),
@@ -62,21 +63,23 @@ class QuickSettingsModal extends HookConsumerWidget {
             onLongPress: () {
               ConfigOptionsRoute(section: ConfigOptionSection.fragment.name).go(context);
             },
-            child: SwitchListTile(
+            child: SwitchListTile.adaptive(
               value: ref.watch(ConfigOptions.enableTlsFragment),
               onChanged: ref.watch(ConfigOptions.enableTlsFragment.notifier).update,
               title: Text(t.config.enableTlsFragment),
             ),
           ),
-          // SwitchListTile(
+          // SwitchListTile.adaptive(
           //   value: ref.watch(ConfigOptions.enableMux),
           //   onChanged: ref.watch(ConfigOptions.enableMux.notifier).update,
           //   title: Text(t.config.enableMux),
           // ),
-          ListTile(
+          PlatformListTile(
             title: Text(t.config.allOptions),
             trailing: const Icon(FluentIcons.chevron_right_24_regular),
-            dense: true,
+            material: (context, platform) => MaterialListTileData(
+              dense: true,
+            ),
             onTap: () => const ConfigOptionsRoute().go(context),
           ),
           const Gap(16),

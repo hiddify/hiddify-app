@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -37,7 +38,7 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
     final t = ref.watch(translationsProvider);
     final theme = Theme.of(context);
 
-    return AlertDialog(
+    return PlatformAlertDialog(
       title: Text(t.appUpdate.dialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -79,9 +80,7 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
         if (canIgnore)
           TextButton(
             onPressed: () async {
-              await ref
-                  .read(appUpdateNotifierProvider.notifier)
-                  .ignoreRelease(newVersion);
+              await ref.read(appUpdateNotifierProvider.notifier).ignoreRelease(newVersion);
               if (context.mounted) context.pop();
             },
             child: Text(t.appUpdate.ignoreBtnTxt),

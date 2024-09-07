@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/utils/text_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -36,10 +37,8 @@ class CustomTextFormField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textController =
-        controller ?? useTextEditingController(text: initialValue);
-    final effectiveConstraints =
-        isDense ? const BoxConstraints(maxHeight: 56) : null;
+    final textController = controller ?? useTextEditingController(text: initialValue);
+    final effectiveConstraints = isDense ? const BoxConstraints(maxHeight: 56) : null;
     final effectiveBorder = isDense
         ? OutlineInputBorder(
             borderRadius: BorderRadius.circular(36),
@@ -47,31 +46,32 @@ class CustomTextFormField extends HookConsumerWidget {
           )
         : null;
 
-    return TextFormField(
+    return PlatformTextFormField(
       controller: textController,
       textCapitalization: TextCapitalization.sentences,
       maxLines: maxLines,
       onChanged: onChanged,
-      textDirection: textController.textDirection,
+      material: (context, platform) => MaterialTextFormFieldData(
+        textDirection: textController.textDirection,
+        decoration: InputDecoration(
+          isDense: true,
+          label: label != null ? Text(label!) : null,
+          hintText: hint,
+          hintStyle: Theme.of(context).textTheme.bodySmall,
+          constraints: effectiveConstraints,
+          suffixIcon: suffixIcon,
+          border: effectiveBorder,
+          enabledBorder: effectiveBorder,
+          errorBorder: effectiveBorder,
+          focusedBorder: effectiveBorder,
+          focusedErrorBorder: effectiveBorder,
+        ),
+      ),
       validator: validator,
       textInputAction: TextInputAction.next,
       inputFormatters: inputFormatters,
-      autovalidateMode:
-          autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
+      autovalidateMode: autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
       autocorrect: autoCorrect,
-      decoration: InputDecoration(
-        isDense: true,
-        label: label != null ? Text(label!) : null,
-        hintText: hint,
-        hintStyle: Theme.of(context).textTheme.bodySmall,
-        constraints: effectiveConstraints,
-        suffixIcon: suffixIcon,
-        border: effectiveBorder,
-        enabledBorder: effectiveBorder,
-        errorBorder: effectiveBorder,
-        focusedBorder: effectiveBorder,
-        focusedErrorBorder: effectiveBorder,
-      ),
     );
   }
 }

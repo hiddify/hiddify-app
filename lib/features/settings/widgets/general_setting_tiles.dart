@@ -12,6 +12,8 @@ import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+
 class GeneralSettingTiles extends HookConsumerWidget {
   const GeneralSettingTiles({super.key});
 
@@ -25,19 +27,19 @@ class GeneralSettingTiles extends HookConsumerWidget {
       children: [
         const LocalePrefTile(),
         ListTile(
-          title: Text(t.settings.general.themeMode),
-          subtitle: Text(themeMode.present(t)),
+          title: PlatformText(t.settings.general.themeMode),
+          subtitle: PlatformText(themeMode.present(t)),
           leading: const Icon(FluentIcons.weather_moon_20_regular),
           onTap: () async {
-            final selectedThemeMode = await showDialog<AppThemeMode>(
+            final selectedThemeMode = await showPlatformDialog<AppThemeMode>(
               context: context,
               builder: (context) {
                 return SimpleDialog(
-                  title: Text(t.settings.general.themeMode),
+                  title: PlatformText(t.settings.general.themeMode),
                   children: AppThemeMode.values
                       .map(
                         (e) => RadioListTile(
-                          title: Text(e.present(t)),
+                          title: PlatformText(e.present(t)),
                           value: e,
                           groupValue: themeMode,
                           onChanged: Navigator.of(context).maybePop,
@@ -53,31 +55,31 @@ class GeneralSettingTiles extends HookConsumerWidget {
           },
         ),
         const EnableAnalyticsPrefTile(),
-        SwitchListTile(
-          title: Text(t.settings.general.autoIpCheck),
+        SwitchListTile.adaptive(
+          title: PlatformText(t.settings.general.autoIpCheck),
           secondary: const Icon(FluentIcons.globe_search_24_regular),
           value: ref.watch(Preferences.autoCheckIp),
           onChanged: ref.read(Preferences.autoCheckIp.notifier).update,
         ),
         if (Platform.isAndroid) ...[
-          SwitchListTile(
-            title: Text(t.settings.general.dynamicNotification),
+          SwitchListTile.adaptive(
+            title: PlatformText(t.settings.general.dynamicNotification),
             secondary: const Icon(FluentIcons.top_speed_24_regular),
             value: ref.watch(Preferences.dynamicNotification),
             onChanged: (value) async {
               await ref.read(Preferences.dynamicNotification.notifier).update(value);
             },
           ),
-          SwitchListTile(
-            title: Text(t.settings.general.hapticFeedback),
+          SwitchListTile.adaptive(
+            title: PlatformText(t.settings.general.hapticFeedback),
             secondary: const Icon(FluentIcons.phone_vibrate_24_regular),
             value: ref.watch(hapticServiceProvider),
             onChanged: ref.read(hapticServiceProvider.notifier).updatePreference,
           ),
         ],
         if (PlatformUtils.isDesktop) ...[
-          SwitchListTile(
-            title: Text(t.settings.general.autoStart),
+          SwitchListTile.adaptive(
+            title: PlatformText(t.settings.general.autoStart),
             value: ref.watch(autoStartNotifierProvider).asData!.value,
             onChanged: (value) async {
               if (value) {
@@ -87,8 +89,8 @@ class GeneralSettingTiles extends HookConsumerWidget {
               }
             },
           ),
-          SwitchListTile(
-            title: Text(t.settings.general.silentStart),
+          SwitchListTile.adaptive(
+            title: PlatformText(t.settings.general.silentStart),
             value: ref.watch(Preferences.silentStart),
             onChanged: (value) async {
               await ref.read(Preferences.silentStart.notifier).update(value);

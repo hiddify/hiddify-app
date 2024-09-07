@@ -2,6 +2,7 @@ import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
@@ -42,9 +43,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
             }
             if (!searchQuery.value.isBlank) {
               result = result.filter(
-                (e) => e.name
-                    .toLowerCase()
-                    .contains(searchQuery.value.toLowerCase()),
+                (e) => e.name.toLowerCase().contains(searchQuery.value.toLowerCase()),
               );
             }
             return result.toList();
@@ -57,37 +56,42 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
     return Scaffold(
       appBar: isSearching.value
           ? AppBar(
-              title: TextFormField(
-                onChanged: (value) => searchQuery.value = value,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: "${localizations.searchFieldLabel}...",
-                  isDense: true,
-                  filled: false,
-                  border: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  errorBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                  disabledBorder: InputBorder.none,
-                ),
-              ),
-              leading: IconButton(
+              title: PlatformTextFormField(
+                  onChanged: (value) => searchQuery.value = value,
+                  autofocus: true,
+                  material: (context, platform) => MaterialTextFormFieldData(
+                        decoration: InputDecoration(
+                          hintText: "${localizations.searchFieldLabel}...",
+                          isDense: true,
+                          filled: false,
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                        ),
+                      )),
+              leading: PlatformIconButton(
                 onPressed: () {
                   searchQuery.value = "";
                   isSearching.value = false;
                 },
                 icon: const Icon(Icons.close),
-                tooltip: localizations.cancelButtonLabel,
+                material: (context, platform) => MaterialIconButtonData(
+                  tooltip: localizations.cancelButtonLabel,
+                ),
               ),
             )
           : AppBar(
               title: Text(t.settings.network.perAppProxyPageTitle),
               actions: [
-                IconButton(
+                PlatformIconButton(
                   icon: const Icon(FluentIcons.search_24_regular),
                   onPressed: () => isSearching.value = true,
-                  tooltip: localizations.searchFieldLabel,
+                  material: (context, platform) => MaterialIconButtonData(
+                    tooltip: localizations.searchFieldLabel,
+                  ),
                 ),
                 PopupMenuButton(
                   icon: Icon(AdaptiveIcon(context).more),
@@ -95,18 +99,13 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                     return [
                       PopupMenuItem(
                         child: Text(
-                          showSystemApps.value
-                              ? t.settings.network.hideSystemApps
-                              : t.settings.network.showSystemApps,
+                          showSystemApps.value ? t.settings.network.hideSystemApps : t.settings.network.showSystemApps,
                         ),
-                        onTap: () =>
-                            showSystemApps.value = !showSystemApps.value,
+                        onTap: () => showSystemApps.value = !showSystemApps.value,
                       ),
                       PopupMenuItem(
                         child: Text(t.settings.network.clearSelection),
-                        onTap: () => ref
-                            .read(perAppProxyListProvider.notifier)
-                            .update([]),
+                        onTap: () => ref.read(perAppProxyListProvider.notifier).update([]),
                       ),
                     ];
                   },
@@ -129,9 +128,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                       value: e,
                       groupValue: perAppProxyMode,
                       onChanged: (value) async {
-                        await ref
-                            .read(Preferences.perAppProxyMode.notifier)
-                            .update(e);
+                        await ref.read(Preferences.perAppProxyMode.notifier).update(e);
                         if (e == PerAppProxyMode.off && context.mounted) {
                           context.pop();
                         }
@@ -147,8 +144,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
             AsyncData(value: final packages) => SliverList.builder(
                 itemBuilder: (context, index) {
                   final package = packages[index];
-                  final selected =
-                      perAppProxyList.contains(package.packageName);
+                  final selected = perAppProxyList.contains(package.packageName);
                   return CheckboxListTile(
                     title: Text(
                       package.name,
@@ -162,28 +158,21 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                     onChanged: (value) async {
                       final List<String> newSelection;
                       if (selected) {
-                        newSelection = perAppProxyList
-                            .exceptElement(package.packageName)
-                            .toList();
+                        newSelection = perAppProxyList.exceptElement(package.packageName).toList();
                       } else {
                         newSelection = [
                           ...perAppProxyList,
                           package.packageName,
                         ];
                       }
-                      await ref
-                          .read(perAppProxyListProvider.notifier)
-                          .update(newSelection);
+                      await ref.read(perAppProxyListProvider.notifier).update(newSelection);
                     },
                     secondary: SizedBox(
                       width: 48,
                       height: 48,
-                      child: ref
-                          .watch(packageIconProvider(package.packageName))
-                          .when(
+                      child: ref.watch(packageIconProvider(package.packageName)).when(
                             data: (data) => Image(image: data),
-                            error: (error, _) =>
-                                const Icon(FluentIcons.error_circle_24_regular),
+                            error: (error, _) => const Icon(FluentIcons.error_circle_24_regular),
                             loading: () => const Center(
                               child: CircularProgressIndicator(),
                             ),
@@ -194,8 +183,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                 itemCount: packages.length,
               ),
             AsyncLoading() => const SliverLoadingBodyPlaceholder(),
-            AsyncError(:final error) =>
-              SliverErrorBodyPlaceholder(error.toString()),
+            AsyncError(:final error) => SliverErrorBodyPlaceholder(error.toString()),
             _ => const SliverToBoxAdapter(),
           },
         ],

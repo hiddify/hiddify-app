@@ -12,8 +12,7 @@ part 'app_router.g.dart';
 
 bool _debugMobileRouter = false;
 
-final useMobileRouter =
-    !PlatformUtils.isDesktop || (kDebugMode && _debugMobileRouter);
+final useMobileRouter = !PlatformUtils.isDesktop || (kDebugMode && _debugMobileRouter);
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 // TODO: test and improve handling of deep link
@@ -53,9 +52,10 @@ GoRouter router(RouterRef ref) {
 final tabLocations = [
   const HomeRoute().location,
   const ProxiesRoute().location,
-  const ConfigOptionsRoute().location,
-  const SettingsRoute().location,
   const LogsOverviewRoute().location,
+  // const ConfigOptionsRoute().location,
+  const QuickSettingsRoute().location,
+  // const SettingsRoute().location,
   const AboutRoute().location,
 ];
 
@@ -77,9 +77,7 @@ void switchTab(int index, BuildContext context) {
 }
 
 @riverpod
-class RouterListenable extends _$RouterListenable
-    with AppLogger
-    implements Listenable {
+class RouterListenable extends _$RouterListenable with AppLogger implements Listenable {
   VoidCallback? _routerListener;
   bool _introCompleted = false;
 

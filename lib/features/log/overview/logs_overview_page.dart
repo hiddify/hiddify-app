@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -65,25 +66,29 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                     title: Text(t.logs.pageTitle),
                     actions: [
                       if (state.paused)
-                        IconButton(
+                        PlatformIconButton(
                           onPressed: notifier.resume,
                           icon: const Icon(FluentIcons.play_20_regular),
-                          tooltip: t.logs.resumeTooltip,
-                          iconSize: 20,
+                          material: (context, platform) => MaterialIconButtonData(
+                            tooltip: t.logs.resumeTooltip,
+                            iconSize: 20,
+                          ),
                         )
                       else
-                        IconButton(
-                          onPressed: notifier.pause,
-                          icon: const Icon(FluentIcons.pause_20_regular),
-                          tooltip: t.logs.pauseTooltip,
-                          iconSize: 20,
-                        ),
-                      IconButton(
-                        onPressed: notifier.clear,
-                        icon: const Icon(FluentIcons.delete_lines_20_regular),
-                        tooltip: t.logs.clearTooltip,
-                        iconSize: 20,
-                      ),
+                        PlatformIconButton(
+                            onPressed: notifier.pause,
+                            icon: const Icon(FluentIcons.pause_20_regular),
+                            material: (context, platform) => MaterialIconButtonData(
+                                  tooltip: t.logs.pauseTooltip,
+                                  iconSize: 20,
+                                )),
+                      PlatformIconButton(
+                          onPressed: notifier.clear,
+                          icon: const Icon(FluentIcons.delete_lines_20_regular),
+                          material: (context, platform) => MaterialIconButtonData(
+                                tooltip: t.logs.clearTooltip,
+                                iconSize: 20,
+                              )),
                       if (popupButtons.isNotEmpty)
                         PopupMenuButton(
                           icon: Icon(AdaptiveIcon(context).more),
@@ -106,12 +111,14 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                         child: Row(
                           children: [
                             Flexible(
-                              child: TextFormField(
+                              child: PlatformTextFormField(
                                 controller: filterController,
                                 onChanged: notifier.filterMessage,
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  hintText: t.logs.filterHint,
+                                material: (context, platform) => MaterialTextFormFieldData(
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    hintText: t.logs.filterHint,
+                                  ),
                                 ),
                               ),
                             ),
@@ -122,8 +129,7 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                                 if (v == null) return;
                                 notifier.filterLevel(v.toNullable());
                               },
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
                               borderRadius: BorderRadius.circular(4),
                               items: [
                                 DropdownMenuItem(
@@ -173,31 +179,24 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                                 children: [
                                   if (log.level != null)
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
                                           log.level!.name.toUpperCase(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium
-                                              ?.copyWith(
+                                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
                                                 color: log.level!.color,
                                               ),
                                         ),
                                         if (log.time != null)
                                           Text(
                                             log.time!.toString(),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelSmall,
+                                            style: Theme.of(context).textTheme.labelSmall,
                                           ),
                                       ],
                                     ),
                                   Text(
                                     log.message,
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                 ],
                               ),

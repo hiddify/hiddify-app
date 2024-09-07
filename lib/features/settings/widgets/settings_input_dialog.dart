@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -39,9 +40,11 @@ class SettingsInputDialog<T> extends HookConsumerWidget with PresLogger {
 
     return FocusTraversalGroup(
       policy: OrderedTraversalPolicy(),
-      child: AlertDialog(
+      child: PlatformAlertDialog(
         title: Text(title),
-        icon: icon != null ? Icon(icon) : null,
+        material: (context, platform) => MaterialAlertDialogData(
+          icon: icon != null ? Icon(icon) : null,
+        ),
         content: FocusTraversalOrder(
           order: const NumericFocusOrder(1),
           child: Column(
@@ -52,10 +55,12 @@ class SettingsInputDialog<T> extends HookConsumerWidget with PresLogger {
                 TypeAheadField<String>(
                   controller: textController,
                   builder: (context, controller, focusNode) {
-                    return TextField(
+                    return PlatformTextField(
                       controller: controller,
                       focusNode: focusNode,
-                      textDirection: TextDirection.ltr,
+                      material: (context, platform) => MaterialTextFieldData(
+                        textDirection: TextDirection.ltr,
+                      ),
                       autofocus: true,
                       // decoration: InputDecoration(
                       //     // border: OutlineInputBorder(),
@@ -198,7 +203,7 @@ class SettingsPickerDialog<T> extends HookConsumerWidget with PresLogger {
   final VoidCallback? onReset;
 
   Future<T?> show(BuildContext context) async {
-    return showDialog(
+    return showPlatformDialog(
       context: context,
       useRootNavigator: true,
       builder: (context) => this,
@@ -210,7 +215,7 @@ class SettingsPickerDialog<T> extends HookConsumerWidget with PresLogger {
     final t = ref.watch(translationsProvider);
     final localizations = MaterialLocalizations.of(context);
 
-    return AlertDialog(
+    return PlatformAlertDialog(
       title: Text(title),
       content: Column(
         children: options
@@ -235,14 +240,14 @@ class SettingsPickerDialog<T> extends HookConsumerWidget with PresLogger {
             },
             child: Text(t.general.reset.toUpperCase()),
           ),
-        TextButton(
+        PlatformTextButton(
           onPressed: () async {
             await Navigator.of(context).maybePop();
           },
           child: Text(localizations.cancelButtonLabel.toUpperCase()),
         ),
       ],
-      scrollable: true,
+      // scrollable: true,
     );
   }
 }
@@ -282,7 +287,7 @@ class SettingsSliderDialog extends HookConsumerWidget with PresLogger {
 
     final sliderValue = useState(initialValue);
 
-    return AlertDialog(
+    return PlatformAlertDialog(
       title: Text(title),
       content: IntrinsicHeight(
         child: Slider(
@@ -296,14 +301,14 @@ class SettingsSliderDialog extends HookConsumerWidget with PresLogger {
       ),
       actions: [
         if (onReset != null)
-          TextButton(
+          PlatformTextButton(
             onPressed: () async {
               onReset!();
               await Navigator.of(context).maybePop(null);
             },
             child: Text(t.general.reset.toUpperCase()),
           ),
-        TextButton(
+        PlatformTextButton(
           onPressed: () async {
             await Navigator.of(context).maybePop();
           },

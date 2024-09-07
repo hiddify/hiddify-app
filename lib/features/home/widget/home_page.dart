@@ -1,10 +1,14 @@
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
 import 'package:hiddify/features/home/widget/empty_profiles_home_body.dart';
@@ -26,41 +30,73 @@ class HomePage extends HookConsumerWidget {
     final hasAnyProfile = ref.watch(hasAnyProfileProvider);
     final activeProfile = ref.watch(activeProfileProvider);
 
-    return Scaffold(
+    return PlatformScaffold(
+      iosContentPadding: true,
+      appBar: PlatformAppBar(
+        leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
+            ? DrawerButton(
+                onPressed: () {
+                  RootScaffold.stateKey.currentState?.openDrawer();
+                },
+              )
+            : (Navigator.of(context).canPop()
+                ? PlatformIconButton(
+                    icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
+                    padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Pops the current route off the navigator stack
+                    },
+                  )
+                : null),
+        title: Text.rich(
+          TextSpan(
+            children: [
+              TextSpan(text: t.general.appTitle),
+              const TextSpan(text: " "),
+              const WidgetSpan(
+                child: AppVersionLabel(),
+                alignment: PlaceholderAlignment.middle,
+              ),
+            ],
+          ),
+        ),
+        trailingActions: [
+          // PlatformIconButton(
+          //     onPressed: () => const QuickSettingsRoute().push(context),
+          //     icon: const Icon(FluentIcons.options_24_filled),
+          //     material: (context, platform) => MaterialIconButtonData(
+          //           tooltip: t.config.quickSettings,
+          //         )),
+          // PlatformIconButton(
+          //     onPressed: () => const AddProfileRoute().push(context),
+          //     icon: const Icon(FluentIcons.add_circle_24_filled),
+          //     material: (context, platform) => MaterialIconButtonData(
+          //           tooltip: t.profile.add.buttonText,
+          //         )),
+          PlatformTextButton(
+            material: (context, platform) => MaterialTextButtonData(
+              child: TextButton.icon(onPressed: () => const AddProfileRoute().push(context), label: Text(t.profile.add.buttonText)),
+            ),
+            cupertino: (context, platform) => CupertinoTextButtonData(
+              child: PlatformText(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle.copyWith(fontSize: 12)),
+
+              onPressed: () => const AddProfileRoute().push(context),
+              // icon: const Icon(FluentIcons.add_circle_24_filled),
+              //       material: (context, platform) => MaterialIconButtonData(
+              //             tooltip: t.profile.add.buttonText,
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         alignment: Alignment.bottomCenter,
         children: [
           CustomScrollView(
             slivers: [
-              NestedAppBar(
-                title: Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(text: t.general.appTitle),
-                      const TextSpan(text: " "),
-                      const WidgetSpan(
-                        child: AppVersionLabel(),
-                        alignment: PlaceholderAlignment.middle,
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  IconButton(
-                    onPressed: () => const QuickSettingsRoute().push(context),
-                    icon: const Icon(FluentIcons.options_24_filled),
-                    tooltip: t.config.quickSettings,
-                  ),
-                  IconButton(
-                    onPressed: () => const AddProfileRoute().push(context),
-                    icon: const Icon(FluentIcons.add_circle_24_filled),
-                    tooltip: t.profile.add.buttonText,
-                  ),
-                ],
-              ),
               switch (activeProfile) {
                 AsyncData(value: final profile?) => MultiSliver(
                     children: [
+                      // const Gap(100),
                       ProfileTile(profile: profile, isMain: true),
                       SliverFillRemaining(
                         hasScrollBody: false,

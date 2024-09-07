@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/localization/locale_extensions.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
@@ -20,19 +21,19 @@ class LocalePrefTile extends HookConsumerWidget {
     final locale = ref.watch(localePreferencesProvider);
 
     return ListTile(
-      title: Text(t.settings.general.locale),
-      subtitle: Text(locale.localeName),
+      title: PlatformText(t.settings.general.locale),
+      subtitle: PlatformText(locale.localeName),
       leading: const Icon(FluentIcons.local_language_24_regular),
       onTap: () async {
         final selectedLocale = await showDialog<AppLocale>(
           context: context,
           builder: (context) {
             return SimpleDialog(
-              title: Text(t.settings.general.locale),
+              title: PlatformText(t.settings.general.locale),
               children: AppLocale.values
                   .map(
                     (e) => RadioListTile(
-                      title: Text(e.localeName),
+                      title: PlatformText(e.localeName),
                       value: e,
                       groupValue: locale,
                       onChanged: Navigator.of(context).maybePop,
@@ -60,19 +61,22 @@ class RegionPrefTile extends HookConsumerWidget {
     final region = ref.watch(ConfigOptions.region);
 
     return ListTile(
-      title: Text(t.settings.general.region),
-      subtitle: Text(region.present(t)),
+      title: PlatformText(t.settings.general.region),
+      subtitle: PlatformText(
+        region.present(t),
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
       leading: const Icon(FluentIcons.globe_location_24_regular),
       onTap: () async {
         final selectedRegion = await showDialog<Region>(
           context: context,
           builder: (context) {
             return SimpleDialog(
-              title: Text(t.settings.general.region),
+              title: PlatformText(t.settings.general.region),
               children: Region.values
                   .map(
                     (e) => RadioListTile(
-                      title: Text(e.present(t)),
+                      title: PlatformText(e.present(t)),
                       value: e,
                       groupValue: region,
                       onChanged: Navigator.of(context).maybePop,
@@ -116,9 +120,9 @@ class EnableAnalyticsPrefTile extends HookConsumerWidget {
 
     final enabled = ref.watch(analyticsControllerProvider).requireValue;
 
-    return SwitchListTile(
-      title: Text(t.settings.general.enableAnalytics),
-      subtitle: Text(
+    return SwitchListTile.adaptive(
+      title: PlatformText(t.settings.general.enableAnalytics),
+      subtitle: PlatformText(
         t.settings.general.enableAnalyticsMsg,
         style: Theme.of(context).textTheme.bodySmall,
       ),

@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
@@ -26,8 +27,7 @@ class AdaptiveMenuItem<T> {
   final bool? isSelected;
   final List<AdaptiveMenuItem>? subItems;
 
-  (String, IconData?, T Function()?, bool?, List<AdaptiveMenuItem>?)
-      _equality() => (title, icon, onTap, isSelected, subItems);
+  (String, IconData?, T Function()?, bool?, List<AdaptiveMenuItem>?) _equality() => (title, icon, onTap, isSelected, subItems);
 
   @override
   bool operator ==(covariant AdaptiveMenuItem other) {
@@ -104,8 +104,7 @@ class AdaptiveMenu extends HookConsumerWidget {
       if (context.mounted) {
         Navigator.pop(context);
       }
-      Future.delayed(const Duration(milliseconds: 200))
-          .then((_) => pageIndexNotifier.value = 0);
+      Future.delayed(const Duration(milliseconds: 200)).then((_) => pageIndexNotifier.value = 0);
     }
 
     List<Widget> buildSheetItems(
@@ -118,11 +117,10 @@ class AdaptiveMenu extends HookConsumerWidget {
           final subItems = buildSheetItems(item.subItems!, index + 1);
           final subSheetIndex = ++pageIndex;
           sheetItems.add(
-            ListTile(
+            PlatformListTile(
               title: Text(item.title),
               leading: item.icon != null ? Icon(item.icon) : null,
-              trailing:
-                  const Icon(FluentIcons.chevron_right_20_regular, size: 20),
+              trailing: const Icon(FluentIcons.chevron_right_20_regular, size: 20),
               onTap: () {
                 pageIndexNotifier.value = subSheetIndex;
               },
@@ -140,7 +138,7 @@ class AdaptiveMenu extends HookConsumerWidget {
           );
         } else {
           sheetItems.add(
-            ListTile(
+            PlatformListTile(
               title: Text(item.title),
               leading: item.icon != null ? Icon(item.icon) : null,
               onTap: () async {

@@ -20,25 +20,20 @@ class ShortcutWrapper extends HookConsumerWidget {
 
         if (Platform.isLinux) ...{
           // quit app using Control+Q on Linux
-          const SingleActivator(LogicalKeyboardKey.keyQ, control: true):
-              QuitAppIntent(),
+          const SingleActivator(LogicalKeyboardKey.keyQ, control: true): QuitAppIntent(),
         },
 
         if (Platform.isMacOS) ...{
           // close window using Command+W on macOS
-          const SingleActivator(LogicalKeyboardKey.keyW, meta: true):
-              CloseWindowIntent(),
+          const SingleActivator(LogicalKeyboardKey.keyW, meta: true): CloseWindowIntent(),
 
           // open settings using Command+, on macOS
-          const SingleActivator(LogicalKeyboardKey.comma, meta: true):
-              OpenSettingsIntent(),
+          const SingleActivator(LogicalKeyboardKey.comma, meta: true): OpenSettingsIntent(),
         },
 
         // try adding profile using Command+V and Control+V
-        const SingleActivator(LogicalKeyboardKey.keyV, meta: true):
-            PasteIntent(),
-        const SingleActivator(LogicalKeyboardKey.keyV, control: true):
-            PasteIntent(),
+        const SingleActivator(LogicalKeyboardKey.keyV, meta: true): PasteIntent(),
+        const SingleActivator(LogicalKeyboardKey.keyV, control: true): PasteIntent(),
       },
       child: Actions(
         actions: {
@@ -57,7 +52,7 @@ class ShortcutWrapper extends HookConsumerWidget {
           OpenSettingsIntent: CallbackAction(
             onInvoke: (_) {
               if (rootNavigatorKey.currentContext != null) {
-                const SettingsRoute().go(rootNavigatorKey.currentContext!);
+                // const SettingsRoute().go(rootNavigatorKey.currentContext!);
               }
               return null;
             },
@@ -65,11 +60,8 @@ class ShortcutWrapper extends HookConsumerWidget {
           PasteIntent: CallbackAction(
             onInvoke: (_) async {
               if (rootNavigatorKey.currentContext != null) {
-                final captureResult =
-                    await Clipboard.getData(Clipboard.kTextPlain)
-                        .then((value) => value?.text ?? '');
-                AddProfileRoute(url: captureResult)
-                    .push(rootNavigatorKey.currentContext!);
+                final captureResult = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
+                AddProfileRoute(url: captureResult).push(rootNavigatorKey.currentContext!);
               }
               return null;
             },

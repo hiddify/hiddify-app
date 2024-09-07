@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/routes.dart';
@@ -9,8 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 bool _testExperimentalNotice = false;
 
-final disableExperimentalFeatureNoticeProvider =
-    PreferencesNotifier.createAutoDispose(
+final disableExperimentalFeatureNoticeProvider = PreferencesNotifier.createAutoDispose(
   "disable_experimental_feature_notice",
   false,
   overrideValue: _testExperimentalNotice && kDebugMode ? false : null,
@@ -31,7 +31,7 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
     final t = ref.watch(translationsProvider);
     final disableNotice = ref.watch(disableExperimentalFeatureNoticeProvider);
 
-    return AlertDialog(
+    return PlatformAlertDialog(
       title: Text(t.connection.experimentalNotice),
       content: SingleChildScrollView(
         child: SizedBox(
@@ -46,12 +46,10 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
                 value: disableNotice,
                 title: Text(t.connection.disableExperimentalNotice),
                 secondary: const Icon(FluentIcons.eye_off_24_regular),
-                onChanged: (value) async => ref
-                    .read(disableExperimentalFeatureNoticeProvider.notifier)
-                    .update(value ?? false),
+                onChanged: (value) async => ref.read(disableExperimentalFeatureNoticeProvider.notifier).update(value ?? false),
                 dense: true,
               ),
-              ListTile(
+              PlatformListTile(
                 title: Text(t.config.pageTitle),
                 leading: const Icon(FluentIcons.box_edit_24_regular),
                 trailing: const Icon(FluentIcons.chevron_right_20_regular),
@@ -61,7 +59,9 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
                     const ConfigOptionsRoute().push(context);
                   }
                 },
-                dense: true,
+                material: (context, platform) => MaterialListTileData(
+                  dense: true,
+                ),
               ),
             ],
           ),

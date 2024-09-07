@@ -336,7 +336,7 @@
     "serviceMode": "Service Mode",
     "quickSettings": "Quick Settings",
     "setupWarp": "Setup WARP",
-    "allOptions": "All Config Options",
+    "allOptions": "All Settings",
     "serviceModes": {
       "proxy": "Proxy Service Only",
       "systemProxy": "Set System Proxy",
@@ -366,7 +366,7 @@
     "generateWarpConfig": "Generate WARP Config",
     "missingWarpConfig": "Missing WARP Config",
     "warpConfigGenerated": "WARP Config is Generated",
-    "pageTitle": "Config Options",
+    "pageTitle": "Settings",
     "logLevel": "Log Level",
     "blockAds": "Block Advertisements",
     "resolveDestination": "Resolve Destination",

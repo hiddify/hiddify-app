@@ -11,6 +11,7 @@ import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dar
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/utils/placeholders.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ProfilesOverviewModal extends HookConsumerWidget {
   const ProfilesOverviewModal({
@@ -123,10 +124,9 @@ class ProfilesSortModal extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final sortNotifier =
-        ref.watch(profilesOverviewSortNotifierProvider.notifier);
+    final sortNotifier = ref.watch(profilesOverviewSortNotifierProvider.notifier);
 
-    return AlertDialog(
+    return PlatformAlertDialog(
       title: Text(t.general.sortBy),
       content: Consumer(
         builder: (context, ref, child) {
@@ -137,8 +137,7 @@ class ProfilesSortModal extends HookConsumerWidget {
                 ...ProfilesSort.values.map(
                   (e) {
                     final selected = sort.by == e;
-                    final double arrowTurn =
-                        sort.mode == SortMode.ascending ? 0 : 0.5;
+                    final double arrowTurn = sort.mode == SortMode.ascending ? 0 : 0.5;
 
                     return ListTile(
                       title: Text(e.present(t)),
@@ -152,7 +151,7 @@ class ProfilesSortModal extends HookConsumerWidget {
                       selected: selected,
                       leading: Icon(e.icon),
                       trailing: selected
-                          ? IconButton(
+                          ? PlatformIconButton(
                               onPressed: () {
                                 sortNotifier.toggleMode();
                               },

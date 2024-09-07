@@ -188,7 +188,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
 
   Future<void> updateProfile() async {
     if (state case AsyncData(:final value)) {
-      if (value.update?.isLoading ?? false || !value.isEditing) return;
+      // if (value.update?.isLoading ?? false || !value.isEditing) return;
       if (value.profile case LocalProfileEntity()) {
         loggy.warning("local profile can't be updated");
         return;

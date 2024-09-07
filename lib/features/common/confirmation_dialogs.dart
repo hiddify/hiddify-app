@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
 
 Future<bool> showConfirmationDialog(
@@ -11,8 +12,10 @@ Future<bool> showConfirmationDialog(
     context: context,
     builder: (context) {
       final localizations = MaterialLocalizations.of(context);
-      return AlertDialog(
-        icon: icon != null ? Icon(icon) : null,
+      return PlatformAlertDialog(
+        material: (context, platform) => MaterialAlertDialogData(
+          icon: icon != null ? Icon(icon) : null,
+        ),
         title: Text(title),
         content: Text(message),
         actions: [

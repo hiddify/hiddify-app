@@ -1,8 +1,10 @@
 import 'package:accessibility_tools/accessibility_tools.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/localization/locale_extensions.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -40,35 +42,76 @@ class App extends HookConsumerWidget with PresLogger {
       TrayWrapper(
         ShortcutWrapper(
           ConnectionWrapper(
-            DynamicColorBuilder(
-              builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
-                return MaterialApp.router(
-                  routerConfig: router,
-                  locale: locale.flutterLocale,
-                  supportedLocales: AppLocaleUtils.supportedLocales,
-                  localizationsDelegates: GlobalMaterialLocalizations.delegates,
-                  debugShowCheckedModeBanner: false,
-                  themeMode: themeMode.flutterThemeMode,
-                  theme: theme.lightTheme(lightColorScheme),
-                  darkTheme: theme.darkTheme(darkColorScheme),
-                  title: Constants.appName,
-                  builder: (context, child) {
-                    child = UpgradeAlert(
-                      upgrader: upgrader,
-                      navigatorKey: router.routerDelegate.navigatorKey,
-                      child: child ?? const SizedBox(),
-                    );
-                    if (kDebugMode && _debugAccessibility) {
-                      return AccessibilityTools(
-                        checkFontOverflows: true,
-                        child: child,
-                      );
-                    }
-                    return child;
-                  },
-                );
-              },
-            ),
+            PlatformProvider(
+                // initialPlatform: TargetPlatform.android,
+                settings: PlatformSettingsData(
+                  iosUsesMaterialWidgets: true,
+                  // iosUseZeroPaddingForAppbarPlatformIcon: true,
+                ),
+                builder: (context) => DynamicColorBuilder(
+                      builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
+                        return PlatformApp.router(
+                          routerConfig: router,
+
+                          locale: locale.flutterLocale,
+                          supportedLocales: AppLocaleUtils.supportedLocales,
+                          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                          debugShowCheckedModeBanner: false,
+                          material: (context, platform) => MaterialAppRouterData(
+                            theme: theme.lightTheme(lightColorScheme),
+                            darkTheme: theme.darkTheme(darkColorScheme),
+                            themeMode: themeMode.flutterThemeMode,
+                          ),
+                          cupertino: (context, platform) {
+                            var isDark = themeMode.flutterThemeMode == ThemeMode.dark;
+
+                            if (themeMode.flutterThemeMode == ThemeMode.system) {
+                              isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
+                            }
+
+                            final defaultCupertinoTheme = CupertinoThemeData(brightness: isDark ? Brightness.dark : Brightness.light);
+                            final defaultMaterialTheme = isDark ? theme.darkTheme(darkColorScheme) : theme.lightTheme(lightColorScheme);
+                            final cupertinoTheme = defaultCupertinoTheme;
+                            final a = MaterialBasedCupertinoThemeData(
+                              materialTheme: defaultMaterialTheme.copyWith(
+                                cupertinoOverrideTheme: CupertinoThemeData(
+                                  brightness: Brightness.dark,
+                                  barBackgroundColor: defaultCupertinoTheme.barBackgroundColor,
+                                  scaffoldBackgroundColor: defaultCupertinoTheme.scaffoldBackgroundColor,
+
+                                  //   textTheme: CupertinoTextThemeData(
+                                  //     // primaryColor: Colors.white,
+                                  //     navActionTextStyle: darkDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(
+                                  //         // color: const Color(0xF0F9F9F9),
+                                  //         ),
+                                  //     navLargeTitleTextStyle: darkDefaultCupertinoTheme.textTheme.navLargeTitleTextStyle.copyWith(color: const Color(0xF0F9F9F9)),
+                                ),
+                              ),
+                              // ),
+                            );
+                            return CupertinoAppRouterData(theme: cupertinoTheme);
+                          },
+                          // themeMode: themeMode.flutterThemeMode,
+                          // theme: theme.lightTheme(lightColorScheme),
+                          // darkTheme: theme.darkTheme(darkColorScheme),
+                          title: Constants.appName,
+                          builder: (context, child) {
+                            child = UpgradeAlert(
+                              upgrader: upgrader,
+                              navigatorKey: router.routerDelegate.navigatorKey,
+                              child: child ?? const SizedBox(),
+                            );
+                            if (kDebugMode && _debugAccessibility) {
+                              return AccessibilityTools(
+                                checkFontOverflows: true,
+                                child: child,
+                              );
+                            }
+                            return child;
+                          },
+                        );
+                      },
+                    )),
           ),
         ),
       ),

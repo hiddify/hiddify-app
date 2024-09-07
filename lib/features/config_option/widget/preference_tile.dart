@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/settings/widgets/widgets.dart';
 
@@ -31,7 +32,10 @@ class ValuePreferenceWidget<T> extends StatelessWidget {
     return ListTile(
       title: Text(title),
       subtitle: Text(presentValue?.call(value) ?? value.toString()),
+      // material: (context, platform) => MaterialListTileData(
       enabled: enabled,
+
+      // ),
       onTap: () async {
         final inputValue = await SettingsInputDialog(
           title: title,
@@ -75,10 +79,10 @@ class ChoicePreferenceWidget<T> extends StatelessWidget {
   final ValueChanged<T>? onChanged;
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      subtitle: Text(presentChoice(selected)),
-      enabled: enabled,
+    return PlatformListTile(
+      title: PlatformText(title),
+      subtitle: PlatformText(presentChoice(selected)),
+      // enabled: enabled,
       onTap: () async {
         final selection = await SettingsPickerDialog(
           title: title,

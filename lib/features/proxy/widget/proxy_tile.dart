@@ -3,6 +3,7 @@ import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ProxyTile extends HookConsumerWidget with PresLogger {
   const ProxyTile(
@@ -62,7 +63,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       onLongPress: () async {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (context) => PlatformAlertDialog(
             content: SelectionArea(child: Text(proxy.name)),
             actions: [
               TextButton(

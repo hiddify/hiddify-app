@@ -11,6 +11,7 @@ import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hiddify/utils/validators.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class WarpOptionsTiles extends HookConsumerWidget {
   const WarpOptionsTiles({super.key});
@@ -38,7 +39,7 @@ class WarpOptionsTiles extends HookConsumerWidget {
 
     return Column(
       children: [
-        SwitchListTile(
+        SwitchListTile.adaptive(
           title: Text(t.config.enableWarp),
           value: enableWarp,
           onChanged: (value) async {
@@ -56,7 +57,7 @@ class WarpOptionsTiles extends HookConsumerWidget {
             }
           },
         ),
-        ListTile(
+        PlatformListTile(
           title: Text(t.config.generateWarpConfig),
           subtitle: canChangeOptions
               ? switch (warpOptions.configGeneration) {
@@ -68,7 +69,9 @@ class WarpOptionsTiles extends HookConsumerWidget {
                   _ => null,
                 }
               : null,
-          enabled: canChangeOptions,
+          material: (context, platform) => MaterialListTileData(
+            enabled: canChangeOptions,
+          ),
           onTap: () async {
             await ref.read(warpOptionNotifierProvider.notifier).generateWarpConfig();
             await ref.read(warpOptionNotifierProvider.notifier).generateWarp2Config();
@@ -149,7 +152,7 @@ class WarpLicenseAgreementModal extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    return AlertDialog(
+    return PlatformAlertDialog(
       title: Text(t.config.warpConsent.title),
       content: Text.rich(
         t.config.warpConsent.description(
