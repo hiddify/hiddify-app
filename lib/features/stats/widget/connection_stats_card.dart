@@ -1,6 +1,7 @@
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
@@ -26,9 +27,7 @@ class ConnectionStatsCard extends HookConsumerWidget {
           AsyncData(value: final proxy) => (
               label: const Icon(FluentIcons.arrow_routing_20_regular),
               data: Text(
-                proxy.selectedName.isNotNullOrBlank
-                    ? proxy.selectedName!
-                    : proxy.name,
+                proxy.selectedName.isNotNullOrBlank ? proxy.selectedName! : proxy.name,
               ),
               semanticLabel: null,
             ),
@@ -40,9 +39,15 @@ class ConnectionStatsCard extends HookConsumerWidget {
         },
         switch (ipInfo) {
           AsyncData(value: final info) => (
-              label: IPCountryFlag(
-                countryCode: info.countryCode,
-                size: 16,
+              label: Row(
+                children: [
+                  IPCountryFlag(
+                    countryCode: info.countryCode,
+                    size: 16,
+                  ),
+                  const Gap(4),
+                  OrganisationFlag(organization: info.org ?? "", size: 16),
+                ],
               ),
               data: IPText(
                 ip: info.ip,

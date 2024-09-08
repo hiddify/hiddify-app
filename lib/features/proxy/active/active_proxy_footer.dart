@@ -37,9 +37,7 @@ class ActiveProxyFooter extends HookConsumerWidget {
                     children: [
                       _InfoProp(
                         icon: FluentIcons.arrow_routing_20_regular,
-                        text: proxy.selectedName.isNotNullOrBlank
-                            ? proxy.selectedName!
-                            : proxy.name,
+                        text: proxy.selectedName.isNotNullOrBlank ? proxy.selectedName! : proxy.name,
                         semanticLabel: t.proxies.activeProxySemanticLabel,
                       ),
                       const Gap(8),
@@ -47,15 +45,16 @@ class ActiveProxyFooter extends HookConsumerWidget {
                         AsyncData(value: final info) => Row(
                             children: [
                               IPCountryFlag(countryCode: info.countryCode),
-                              const Gap(8),
+                              const Gap(4),
+                              OrganisationFlag(organization: info.org ?? ""),
+                              const Gap(4),
                               IPText(
                                 ip: info.ip,
                                 onLongPress: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
+                                  ref.read(ipInfoNotifierProvider.notifier).refresh();
                                 },
                               ),
+                              // const Gap(8),
                             ],
                           ),
                         AsyncError(error: final UnknownIp _) => Row(
@@ -65,9 +64,7 @@ class ActiveProxyFooter extends HookConsumerWidget {
                               UnknownIPText(
                                 text: t.proxies.checkIp,
                                 onTap: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
+                                  ref.read(ipInfoNotifierProvider.notifier).refresh();
                                 },
                               ),
                             ],
@@ -79,9 +76,7 @@ class ActiveProxyFooter extends HookConsumerWidget {
                               UnknownIPText(
                                 text: t.proxies.unknownIp,
                                 onTap: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
+                                  ref.read(ipInfoNotifierProvider.notifier).refresh();
                                 },
                               ),
                             ],
@@ -121,8 +116,7 @@ class _StatsColumn extends HookConsumerWidget {
     final stats = ref.watch(statsNotifierProvider).value;
 
     return Directionality(
-      textDirection: TextDirection.values[
-          (Directionality.of(context).index + 1) % TextDirection.values.length],
+      textDirection: TextDirection.values[(Directionality.of(context).index + 1) % TextDirection.values.length],
       child: Flexible(
         child: Column(
           children: [
@@ -166,10 +160,7 @@ class _InfoProp extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(fontFamily: FontFamily.emoji),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(fontFamily: FontFamily.emoji),
               overflow: TextOverflow.ellipsis,
             ),
           ),

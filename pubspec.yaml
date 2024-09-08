@@ -99,6 +99,7 @@ dependencies:
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
   flutter_platform_widgets: ^7.0.1  
+  simple_icons: ^10.1.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

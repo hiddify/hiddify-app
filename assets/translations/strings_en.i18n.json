@@ -149,7 +149,8 @@
     },
     "ipInfoSemantics": {
       "address": "IP Address",
-      "country": "Country"
+      "country": "Country",
+      "organization": "Organization"
     }
   },
   "logs": {
