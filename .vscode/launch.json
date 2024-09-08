@@ -50,7 +50,7 @@
                 "--app-id",
                 "app.hiddify.com"
             ],
-            "deviceId": "designed-for-ipad",
+            "deviceId": "mac-designed-for-ipad",
         }
     ]
 }

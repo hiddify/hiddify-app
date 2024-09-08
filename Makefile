@@ -215,7 +215,7 @@ build-macos-libs:
 	make -C libcore -f Makefile macos-universal
 
 build-ios-libs: 
-	rf -rf $(IOS_OUT)/Libcore.xcframework 
+	rm -rf $(IOS_OUT)/Libcore.xcframework 
 	make -C libcore -f Makefile ios  
 	mv $(BINDIR)/Libcore.xcframework $(IOS_OUT)/Libcore.xcframework
 
