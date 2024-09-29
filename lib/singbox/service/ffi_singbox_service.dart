@@ -119,7 +119,7 @@ class FFISingboxService with InfraLogger implements SingboxService {
       () => CombineWorker().execute(
         () {
           final json = jsonEncode(options.toJson());
-          final err = _box.changeConfigOptions(json.toNativeUtf8().cast()).cast<Utf8>().toDartString();
+          final err = _box.changeHiddifyOptions(json.toNativeUtf8().cast()).cast<Utf8>().toDartString();
           if (err.isNotEmpty) {
             return left(err);
           }
