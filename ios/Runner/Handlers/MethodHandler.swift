@@ -49,7 +49,7 @@ public class MethodHandler: NSObject, FlutterPlugin {
                 return
             }
             result("")
-        case "change_config_options":
+        case "change_hiddify_options":
             guard let options = call.arguments as? String else {
                 result(FlutterError(code: "INVALID_ARGS", message: nil, details: nil))
                 return
@@ -58,6 +58,22 @@ public class MethodHandler: NSObject, FlutterPlugin {
             result(true)
         case "setup":
             Task {
+                guard
+                let args = call.arguments as? [String:Any?],
+                let path = args["path"] as? String,
+                let tempPath = args["tempPath"] as? String,
+                let debug = (args["debug"] as? NSNumber)?.boolValue
+            else {
+                result(FlutterError(code: "INVALID_ARGS", message: nil, details: nil))
+                return
+            }
+            var error: NSError?
+            MobileSetup(path, tempPath, debug, &error)
+            if let error {
+                result(FlutterError(code: String(error.code), message: error.description, details: nil))
+                return
+            }
+            result("")
                 do {
                     try await VPNManager.shared.setup()
                 } catch {
