@@ -1,7 +1,85 @@
 # Changelog
 
 
-## 2.3.0 (2024-09-02)
+## 2.5.6 (2024-09-29)
+
+#### Fix
+
+* Version bug. 
+
+* Version bug. 
+
+
+
+## v2.5.5 (2024-09-29)
+
+#### Other
+
+* Merge pull request #1368 from tarzst/main. 
+  _Update RU translations_
+
+* Chore: update translations with Fink 🐦 
+
+
+
+## v2.5.2 (2024-09-29)
+
+#### Fix
+
+* Typo. 
+
+
+
+## v2.5.1 (2024-09-29)
+
+#### Fix
+
+* Exception. 
+
+* Version. 
+
+
+
+## v2.5.0 (2024-09-28)
+
+#### Other
+
+* Merge pull request #1335 from laperuz92/patch-1. 
+  _Update russian translations_
+
+* Update russian translations. 
+
+* Merge pull request #1328 from yxiZo/main. 
+  _Update translations_
+
+* Chore: update translations with Fink 🐦 
+
+* Merge pull request #1322 from andythesilly/main. 
+  _set edgeToEdge ui mode_
+
+* Chore: update translations with Fink 🐦 
+
+* Set edgeToEdge ui mode. 
+
+
+
+## v2.3.1 (2024-09-07)
+
+#### Fix
+
+* Android. 
+
+#### Other
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-next. 
+
+* Change name to hiddifypackettunnel. 
+
+* Fix android build issue. 
+
+
+
+## v2.3.0 (2024-09-02)
 
 #### New
 

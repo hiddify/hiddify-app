@@ -74,7 +74,7 @@ class PlatformSingboxService with InfraLogger implements SingboxService {
       () async {
         loggy.debug("changing options");
         await methodChannel.invokeMethod(
-          "change_config_options",
+          "change_hiddify_options",
           jsonEncode(options.toJson()),
         );
         return right(unit);
