@@ -18,6 +18,7 @@ import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileTile extends HookConsumerWidget {
   const ProfileTile({
@@ -49,7 +50,60 @@ class ProfileTile extends HookConsumerWidget {
       RemoteProfileEntity(:final subInfo) => subInfo,
       _ => null,
     };
+    if (isMain) {
+      return Column(children: [
+        SizedBox(height: 20),
+        // ProfileActionButton(profile, !isMain),
 
+        Semantics(
+          button: true,
+          enabled: !ref.watch(updateProfileProvider(profile.id)).isLoading,
+          child: Tooltip(
+            message: t.profile.update.tooltip,
+            child: InkWell(
+              onTap: () {
+                if (ref.read(updateProfileProvider(profile.id)).isLoading) {
+                  return;
+                }
+                ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
+              },
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
+                const Icon(FluentIcons.arrow_sync_24_filled),
+                const Gap(8),
+                Text(
+                  profile.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontFamily: FontFamily.emoji,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  semanticsLabel: t.profile.activeProfileNameSemanticLabel(
+                    name: profile.name,
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        if (subInfo != null)
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
+            if (subInfo.webPageUrl == null) ...[
+              Expanded(child: NewTrafficSubscriptionInfo(subInfo)),
+              // const Gap(4),
+              // RemainingTrafficIndicator(subInfo.ratio),
+              // const Gap(4),
+
+              // const Gap(4),
+              Expanded(child: NewDaySubscriptionInfo(subInfo)),
+            ] else ...[
+              Expanded(child: NewDayTrafficSubscriptionInfo(subInfo)),
+              Expanded(child: NewSiteSubscriptionInfo(subInfo)),
+            ]
+          ])
+      ]);
+    }
     final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
     final double effectiveElevation = profile.active ? 12 : 4;
     final effectiveOutlineColor = profile.active ? theme.colorScheme.outlineVariant : Colors.transparent;
@@ -93,10 +147,14 @@ class ProfileTile extends HookConsumerWidget {
                       const ProfilesOverviewRoute().go(context);
                     } else {
                       if (selectActiveMutation.state.isInProgress) return;
-                      if (profile.active) return;
+                      // if (profile.active) return;
                       selectActiveMutation.setFuture(
                         ref.read(profilesOverviewNotifierProvider.notifier).selectActiveProfile(profile.id),
                       );
+                      if (context.canPop())
+                        context.pop();
+                      else
+                        const HomeRoute().go(context);
                     }
                   },
                   child: Padding(
@@ -388,6 +446,184 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
         ),
       ],
     );
+  }
+}
+
+// TODO add support url
+class NewTrafficSubscriptionInfo extends HookConsumerWidget {
+  const NewTrafficSubscriptionInfo(this.subInfo, {super.key});
+
+  final SubscriptionInfo subInfo;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider);
+    final theme = Theme.of(context);
+
+    return Column(children: [
+      Icon(FluentIcons.data_usage_24_filled, color: Colors.blue),
+      Text(t.profile.subscription.remaingTraffic),
+      const SizedBox(height: 4),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Text(
+              subInfo.total > 10 * 1099511627776 //10TB
+                  ? "∞ GiB"
+                  : subInfo.consumption.sizeOf(subInfo.total),
+              semanticsLabel: t.profile.subscription.remainingTrafficSemanticLabel(
+                consumed: subInfo.consumption.sizeGB(),
+                total: subInfo.total.sizeGB(),
+              ),
+              // style: theme.textTheme.body,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    ]);
+  }
+}
+
+// TODO add support url
+class NewDaySubscriptionInfo extends HookConsumerWidget {
+  const NewDaySubscriptionInfo(this.subInfo, {super.key});
+
+  final SubscriptionInfo subInfo;
+
+  (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
+    if (subInfo.isExpired) {
+      return (t.profile.subscription.expired, theme.colorScheme.error);
+    } else if (subInfo.ratio >= 1) {
+      return (t.profile.subscription.noTraffic, theme.colorScheme.error);
+    } else if (subInfo.remaining.inDays > 365) {
+      return (t.profile.subscription.remainingDurationNew(duration: "∞"), null);
+    } else {
+      return (
+        t.profile.subscription.remainingDurationNew(duration: subInfo.remaining.inDays),
+        null,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider);
+    final theme = Theme.of(context);
+
+    final remaining = remainingText(t, theme);
+    return Column(children: [
+      Icon(Icons.timer, color: Colors.blue),
+      Text(t.profile.subscription.remaingTime),
+      const SizedBox(height: 4),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              remaining.$1,
+              // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      )
+    ]);
+  }
+}
+
+// TODO add support url
+class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
+  const NewDayTrafficSubscriptionInfo(this.subInfo, {super.key});
+
+  final SubscriptionInfo subInfo;
+
+  (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
+    if (subInfo.isExpired) {
+      return (t.profile.subscription.expired, theme.colorScheme.error);
+    } else if (subInfo.ratio >= 1) {
+      return (t.profile.subscription.noTraffic, theme.colorScheme.error);
+    } else if (subInfo.remaining.inDays > 365) {
+      return (t.profile.subscription.remainingDurationNew(duration: "∞"), null);
+    } else {
+      return (
+        t.profile.subscription.remainingDurationNew(duration: subInfo.remaining.inDays),
+        null,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider);
+    final theme = Theme.of(context);
+
+    final remaining = remainingText(t, theme);
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      Icon(FluentIcons.data_usage_24_filled, color: Colors.blue),
+      Text(t.profile.subscription.remaingUsage),
+      const SizedBox(height: 4),
+      Text(
+        remaining.$1,
+        // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
+        overflow: TextOverflow.ellipsis,
+      ),
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Text(
+          subInfo.total > 10 * 1099511627776 //10TB
+              ? "∞ GiB"
+              : subInfo.consumption.sizeOf(subInfo.total),
+          semanticsLabel: t.profile.subscription.remainingTrafficSemanticLabel(
+            consumed: subInfo.consumption.sizeGB(),
+            total: subInfo.total.sizeGB(),
+          ),
+          // style: theme.textTheme.body,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    ]);
+  }
+}
+
+class NewSiteSubscriptionInfo extends HookConsumerWidget {
+  const NewSiteSubscriptionInfo(this.subInfo, {super.key});
+
+  final SubscriptionInfo subInfo;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider);
+    final theme = Theme.of(context);
+    var uri = Uri.parse(subInfo.webPageUrl ?? "");
+    var host = uri.host;
+    if (["telegram.me", "t.me"].contains(host)) {
+      host = "@" + uri.path.split("/").last;
+    }
+    return InkWell(
+        onTap: () => launchUrl(Uri.parse(subInfo.webPageUrl ?? "")),
+        child: Column(children: [
+          Icon(FluentIcons.globe_person_24_filled, size: 24, color: Colors.blue),
+          Text(t.profile.subscription.profileSite),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: Text(
+                  host,
+                  // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          )
+        ]));
   }
 }
 

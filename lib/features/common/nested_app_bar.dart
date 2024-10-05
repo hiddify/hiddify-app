@@ -8,11 +8,11 @@ import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/utils/utils.dart';
 
 bool showDrawerButton(BuildContext context) {
-  if (!useMobileRouter) return true;
+  // if (!useMobileRouter) return true;
   final String location = GoRouterState.of(context).uri.path;
   if (location == const HomeRoute().location || location == const ProfilesOverviewRoute().location) return true;
-  if (location.startsWith(const ProxiesRoute().location)) return true;
-  return false;
+  if (location.startsWith(const ProfilesOverviewRoute().location)) return true;
+  return true;
 }
 
 class NestedAppBar extends StatelessWidget {
@@ -44,10 +44,12 @@ class NestedAppBar extends StatelessWidget {
             )
           : (Navigator.of(context).canPop()
               ? PlatformIconButton(
-                  icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
-                  padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
+                  // icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back),
+
+                  // padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
                   onPressed: () {
-                    Navigator.of(context).pop(); // Pops the current route off the navigator stack
+                    if (Navigator.of(context).canPop()) Navigator.of(context).pop(); // Pops the current route off the navigator stack
                   },
                 )
               : null),

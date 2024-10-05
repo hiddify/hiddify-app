@@ -100,6 +100,8 @@ dependencies:
   flutter_typeahead: ^5.0.1
   flutter_platform_widgets: ^7.0.1  
   simple_icons: ^10.1.3
+  animated_notch_bottom_bar: ^1.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -136,6 +138,7 @@ flutter:
     - assets/images/tray_icon_disconnected.png
     - assets/images/connect_norouz.PNG
     - assets/images/disconnect_norouz.PNG
+    - assets/images/world_map.png
 
   fonts:
     - family: Shabnam

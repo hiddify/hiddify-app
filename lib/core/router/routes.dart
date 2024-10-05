@@ -3,6 +3,7 @@ import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/router/app_router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
+import 'package:hiddify/features/common/mobile_scaffold.dart';
 import 'package:hiddify/features/config_option/overview/config_options_page.dart';
 import 'package:hiddify/features/config_option/widget/quick_settings_modal.dart';
 
@@ -77,12 +78,16 @@ GlobalKey<NavigatorState>? _dynamicRootKey = useMobileRouter ? rootNavigatorKey 
           path: "about",
           name: AboutRoute.name,
         ),
+        TypedGoRoute<ProxiesRoute>(
+          path: "proxies",
+          name: ProxiesRoute.name,
+        ),
       ],
     ),
-    TypedGoRoute<ProxiesRoute>(
-      path: "/proxies",
-      name: ProxiesRoute.name,
-    ),
+    // TypedGoRoute<ProxiesRoute>(
+    //   path: "/proxies",
+    //   name: ProxiesRoute.name,
+    // ),
   ],
 )
 class MobileWrapperRoute extends ShellRouteData {
@@ -91,6 +96,7 @@ class MobileWrapperRoute extends ShellRouteData {
   @override
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
     return AdaptiveRootScaffold(navigator);
+    // return MobileAdaptiveRootScaffold();
   }
 }
 
@@ -120,11 +126,11 @@ class MobileWrapperRoute extends ShellRouteData {
           path: "quick-settings",
           name: QuickSettingsRoute.name,
         ),
+        TypedGoRoute<ProxiesRoute>(
+          path: "proxies",
+          name: ProxiesRoute.name,
+        ),
       ],
-    ),
-    TypedGoRoute<ProxiesRoute>(
-      path: "/proxies",
-      name: ProxiesRoute.name,
     ),
     TypedGoRoute<LogsOverviewRoute>(
       path: "/logs",
@@ -186,13 +192,20 @@ class HomeRoute extends GoRouteData {
 class ProxiesRoute extends GoRouteData {
   const ProxiesRoute();
   static const name = "Proxies";
+  static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return const NoTransitionPage(
+    return platformPage(
+      context: context,
+      // fullscreenDialog: true,
       name: name,
-      child: ProxiesOverviewPage(),
+      child: const ProxiesOverviewPage(),
     );
+    // return const NoTransitionPage(
+    //   name: name,
+    //   child: ProxiesOverviewPage(),
+    // );
   }
 }
 
@@ -226,10 +239,14 @@ class ProfilesOverviewRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return BottomSheetPage(
+    return const NoTransitionPage(
       name: name,
-      builder: (controller) => ProfilesOverviewModal(scrollController: controller),
+      child: ProfilesOverviewModal(),
     );
+    // return BottomSheetPage(
+    //   name: name,
+    //   builder: (controller) => ProfilesOverviewModal(scrollController: controller),
+    // );
   }
 }
 
@@ -370,13 +387,13 @@ class AboutRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    if (useMobileRouter) {
-      return platformPage(
-        context: context,
-        name: name,
-        child: const AboutPage(),
-      );
-    }
+    // if (useMobileRouter) {
+    //   return platformPage(
+    //     context: context,
+    //     name: name,
+    //     child: const AboutPage(),
+    //   );
+    // }
     return const NoTransitionPage(name: name, child: AboutPage());
   }
 }

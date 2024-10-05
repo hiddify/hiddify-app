@@ -34,7 +34,8 @@
   "home": {
     "pageTitle": "Home",
     "emptyProfilesMsg": "Begin by Adding a Subscription Profile",
-    "noActiveProfileMsg": "Choose a Profile"
+    "noActiveProfileMsg": "Choose a Profile",
+    "ok": "Ok"
   },
   "stats": {
     "traffic": "Traffic",
@@ -62,7 +63,16 @@
       "upload": "Upload",
       "download": "Download",
       "total": "Total Traffic",
-      "expireDate": "Expire Date"
+      "expireDate": "Expire Date",
+      "remaingTraffic":"Remaining Traffic",
+      "remaingTime":"Remaining Time",
+      "remaingUsage":"Remaining",
+      "remainingDurationNew": "${duration} Days",
+      "profileSite":"Provider"
+
+
+
+
     },
     "sortBy": {
       "lastUpdate": "Recently Updated",

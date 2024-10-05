@@ -112,10 +112,12 @@ class UnknownIPText extends HookConsumerWidget {
 }
 
 class IPCountryFlag extends HookConsumerWidget {
-  const IPCountryFlag({required this.countryCode, this.size = 24, super.key});
+  const IPCountryFlag({required this.countryCode, this.size = 24, super.key, this.padding = const EdgeInsets.all(2)});
 
   final String countryCode;
   final double size;
+
+  final EdgeInsets padding;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -126,7 +128,7 @@ class IPCountryFlag extends HookConsumerWidget {
       child: Container(
         width: size,
         height: size,
-        padding: const EdgeInsets.all(2),
+        padding: padding,
         child: Center(
           child: CircleFlag(countryCode.toLowerCase() == "ir" ? "ir-shir" : countryCode),
         ),

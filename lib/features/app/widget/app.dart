@@ -63,33 +63,9 @@ class App extends HookConsumerWidget with PresLogger {
                             themeMode: themeMode.flutterThemeMode,
                           ),
                           cupertino: (context, platform) {
-                            var isDark = themeMode.flutterThemeMode == ThemeMode.dark;
+                            final sysDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
 
-                            if (themeMode.flutterThemeMode == ThemeMode.system) {
-                              isDark = MediaQuery.of(context).platformBrightness == Brightness.dark;
-                            }
-
-                            final defaultCupertinoTheme = CupertinoThemeData(brightness: isDark ? Brightness.dark : Brightness.light);
-                            final defaultMaterialTheme = isDark ? theme.darkTheme(darkColorScheme) : theme.lightTheme(lightColorScheme);
-                            final cupertinoTheme = defaultCupertinoTheme;
-                            final a = MaterialBasedCupertinoThemeData(
-                              materialTheme: defaultMaterialTheme.copyWith(
-                                cupertinoOverrideTheme: CupertinoThemeData(
-                                  brightness: Brightness.dark,
-                                  barBackgroundColor: defaultCupertinoTheme.barBackgroundColor,
-                                  scaffoldBackgroundColor: defaultCupertinoTheme.scaffoldBackgroundColor,
-
-                                  //   textTheme: CupertinoTextThemeData(
-                                  //     // primaryColor: Colors.white,
-                                  //     navActionTextStyle: darkDefaultCupertinoTheme.textTheme.navActionTextStyle.copyWith(
-                                  //         // color: const Color(0xF0F9F9F9),
-                                  //         ),
-                                  //     navLargeTitleTextStyle: darkDefaultCupertinoTheme.textTheme.navLargeTitleTextStyle.copyWith(color: const Color(0xF0F9F9F9)),
-                                ),
-                              ),
-                              // ),
-                            );
-                            return CupertinoAppRouterData(theme: cupertinoTheme);
+                            return CupertinoAppRouterData(theme: theme.cupertinoThemeData(sysDark, lightColorScheme, darkColorScheme));
                           },
                           // themeMode: themeMode.flutterThemeMode,
                           // theme: theme.lightTheme(lightColorScheme),

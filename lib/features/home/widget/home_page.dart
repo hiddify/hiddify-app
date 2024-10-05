@@ -15,8 +15,9 @@ import 'package:hiddify/features/home/widget/empty_profiles_home_body.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_footer.dart';
+import 'package:hiddify/features/proxy/active/active_proxy_card.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -48,18 +49,22 @@ class HomePage extends HookConsumerWidget {
                     },
                   )
                 : null),
-        title: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(text: t.general.appTitle),
-              const TextSpan(text: " "),
-              const WidgetSpan(
-                child: AppVersionLabel(),
-                alignment: PlaceholderAlignment.middle,
-              ),
-            ],
-          ),
-        ),
+        title: Row(mainAxisSize: MainAxisSize.max, children: [
+          Assets.images.logo.svg(height: 24),
+          const Gap(8),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(text: t.general.appTitle),
+                const TextSpan(text: " "),
+                const WidgetSpan(
+                  child: AppVersionLabel(),
+                  alignment: PlaceholderAlignment.middle,
+                ),
+              ],
+            ),
+          )
+        ]),
         trailingActions: [
           // PlatformIconButton(
           //     onPressed: () => const QuickSettingsRoute().push(context),
@@ -73,62 +78,74 @@ class HomePage extends HookConsumerWidget {
           //     material: (context, platform) => MaterialIconButtonData(
           //           tooltip: t.profile.add.buttonText,
           //         )),
-          PlatformTextButton(
-            material: (context, platform) => MaterialTextButtonData(
-              child: TextButton.icon(onPressed: () => const AddProfileRoute().push(context), label: Text(t.profile.add.buttonText)),
-            ),
-            cupertino: (context, platform) => CupertinoTextButtonData(
-              child: PlatformText(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle.copyWith(fontSize: 12)),
-
-              onPressed: () => const AddProfileRoute().push(context),
-              // icon: const Icon(FluentIcons.add_circle_24_filled),
-              //       material: (context, platform) => MaterialIconButtonData(
-              //             tooltip: t.profile.add.buttonText,
-            ),
+          TextButton(
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle),
+              const Gap(8),
+              const Icon(Icons.add, size: 24),
+            ]),
+            onPressed: () => const AddProfileRoute().push(context),
           ),
         ],
       ),
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          CustomScrollView(
-            slivers: [
-              switch (activeProfile) {
-                AsyncData(value: final profile?) => MultiSliver(
-                    children: [
-                      // const Gap(100),
-                      ProfileTile(profile: profile, isMain: true),
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ConnectionButton(),
-                                  ActiveProxyDelayIndicator(),
-                                ],
-                              ),
-                            ),
-                            if (MediaQuery.sizeOf(context).width < 840) const ActiveProxyFooter(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                AsyncData() => switch (hasAnyProfile) {
-                    AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                    _ => const EmptyProfilesHomeBody(),
-                  },
-                AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
-                _ => const SliverToBoxAdapter(),
-              },
-            ],
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: const AssetImage('assets/images/world_map.png'), // Replace with your image path
+            fit: BoxFit.cover,
+            opacity: 0.12,
+            colorFilter: Theme.of(context).brightness == Brightness.dark
+                ? ColorFilter.mode(Colors.white.withOpacity(.5), BlendMode.srcIn) //
+                : ColorFilter.mode(Colors.grey.withOpacity(1), BlendMode.srcATop), // Apply white tint in dark mode
           ),
-        ],
+        ),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            CustomScrollView(
+              slivers: [
+                // switch (activeProfile) {
+                // AsyncData(value: final profile?) =>
+                MultiSliver(
+                  children: [
+                    // const Gap(100),
+                    switch (activeProfile) {
+                      AsyncData(value: final profile?) => ProfileTile(profile: profile, isMain: true),
+                      _ => const Text(""),
+                    },
+
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ConnectionButton(),
+                                ActiveProxyDelayIndicator(),
+                              ],
+                            ),
+                          ),
+                          if (MediaQuery.sizeOf(context).width < 840) const ActiveProxyFooter(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                // AsyncData() => switch (hasAnyProfile) {
+                //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
+                //     _ => const EmptyProfilesHomeBody(),
+                //   },
+                // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
+                // _ => const SliverToBoxAdapter(),
+                // },
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -71,6 +71,30 @@ class ConfigOptionsPage extends HookConsumerWidget {
         }
       },
     );
+    final theme = PlatformTheme.of(context);
+
+    Widget SwitchListTileAdaptive({
+      Key? key,
+      String? title,
+      String? subtitle,
+      bool value = false,
+      ValueChanged<bool>? onChanged,
+    }) {
+      return SwitchListTile.adaptive(
+        key: key,
+        title: PlatformText(
+          title ?? "",
+          // style: theme?.cupertinoDarkTheme?.textTheme.textStyle,
+        ),
+        subtitle: subtitle != null
+            ? PlatformText(
+                subtitle,
+              )
+            : null,
+        value: value,
+        onChanged: onChanged,
+      );
+    }
 
     String experimental(String txt) {
       return "$txt (${t.settings.experimental})";
@@ -171,18 +195,18 @@ class ConfigOptionsPage extends HookConsumerWidget {
                       presentChoice: (value) => value.present(t),
                       onChanged: (val) => ref.watch(ConfigOptions.directDnsAddress.notifier).reset(),
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(experimental(t.config.blockAds)),
+                    SwitchListTileAdaptive(
+                      title: experimental(t.config.blockAds),
                       value: ref.watch(ConfigOptions.blockAds),
                       onChanged: ref.watch(ConfigOptions.blockAds.notifier).update,
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(experimental(t.config.bypassLan)),
+                    SwitchListTileAdaptive(
+                      title: experimental(t.config.bypassLan),
                       value: ref.watch(ConfigOptions.bypassLan),
                       onChanged: ref.watch(ConfigOptions.bypassLan.notifier).update,
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(t.config.resolveDestination),
+                    SwitchListTileAdaptive(
+                      title: t.config.resolveDestination,
                       value: ref.watch(ConfigOptions.resolveDestination),
                       onChanged: ref.watch(ConfigOptions.resolveDestination.notifier).update,
                     ),
@@ -219,15 +243,15 @@ class ConfigOptionsPage extends HookConsumerWidget {
                       title: t.config.directDnsDomainStrategy,
                       presentChoice: (value) => value.displayName,
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(t.config.enableDnsRouting),
+                    SwitchListTileAdaptive(
+                      title: t.config.enableDnsRouting,
                       value: ref.watch(ConfigOptions.enableDnsRouting),
                       onChanged: ref.watch(ConfigOptions.enableDnsRouting.notifier).update,
                     ),
                     // const SettingsDivider(),
                     // SettingsSection(experimental(t.config.section.mux)),
-                    // SwitchListTile.adaptive(
-                    //   title: Text(t.config.enableMux),
+                    // SwitchListTileAdaptive(
+                    //   title: t.config.enableMux,
                     //   value: ref.watch(ConfigOptions.enableMux),
                     //   onChanged:
                     //       ref.watch(ConfigOptions.enableMux.notifier).update,
@@ -256,8 +280,8 @@ class ConfigOptionsPage extends HookConsumerWidget {
                       title: t.config.serviceMode,
                       presentChoice: (value) => value.present(t),
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(t.config.strictRoute),
+                    SwitchListTileAdaptive(
+                      title: t.config.strictRoute,
                       value: ref.watch(ConfigOptions.strictRoute),
                       onChanged: ref.watch(ConfigOptions.strictRoute.notifier).update,
                     ),
@@ -292,18 +316,16 @@ class ConfigOptionsPage extends HookConsumerWidget {
                       digitsOnly: true,
                       validateInput: isPort,
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(
-                        experimental(t.config.allowConnectionFromLan),
-                      ),
+                    SwitchListTileAdaptive(
+                      title: experimental(t.config.allowConnectionFromLan),
                       value: ref.watch(ConfigOptions.allowConnectionFromLan),
                       onChanged: ref.read(ConfigOptions.allowConnectionFromLan.notifier).update,
                     ),
                   ]),
                   PlatformListSection(sectionTitle: experimental(t.config.section.tlsTricks), items: [
-                    SwitchListTile.adaptive(
+                    SwitchListTileAdaptive(
                       key: ConfigOptionSection._fragmentKey,
-                      title: Text(t.config.enableTlsFragment),
+                      title: t.config.enableTlsFragment,
                       value: ref.watch(ConfigOptions.enableTlsFragment),
                       onChanged: ref.watch(ConfigOptions.enableTlsFragment.notifier).update,
                     ),
@@ -323,13 +345,13 @@ class ConfigOptionsPage extends HookConsumerWidget {
                       presentValue: (value) => value.present(t),
                       formatInputValue: (value) => value.format(),
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(t.config.enableTlsMixedSniCase),
+                    SwitchListTileAdaptive(
+                      title: t.config.enableTlsMixedSniCase,
                       value: ref.watch(ConfigOptions.enableTlsMixedSniCase),
                       onChanged: ref.watch(ConfigOptions.enableTlsMixedSniCase.notifier).update,
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(t.config.enableTlsPadding),
+                    SwitchListTileAdaptive(
+                      title: t.config.enableTlsPadding,
                       value: ref.watch(ConfigOptions.enableTlsPadding),
                       onChanged: ref.watch(ConfigOptions.enableTlsPadding.notifier).update,
                     ),
@@ -378,9 +400,9 @@ class ConfigOptionsPage extends HookConsumerWidget {
                       digitsOnly: true,
                       inputToValue: int.tryParse,
                     ),
-                    SwitchListTile.adaptive(
-                      title: Text(experimental(t.config.useXrayCoreWhenPossible.Label)),
-                      subtitle: Text(t.config.useXrayCoreWhenPossible.Description),
+                    SwitchListTileAdaptive(
+                      title: experimental(t.config.useXrayCoreWhenPossible.Label),
+                      subtitle: t.config.useXrayCoreWhenPossible.Description,
                       value: ref.watch(ConfigOptions.useXrayCoreWhenPossible),
                       onChanged: ref.watch(ConfigOptions.useXrayCoreWhenPossible.notifier).update,
                     ),

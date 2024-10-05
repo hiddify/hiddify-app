@@ -51,10 +51,11 @@ GoRouter router(RouterRef ref) {
 
 final tabLocations = [
   const HomeRoute().location,
-  const ProxiesRoute().location,
+  // const ProxiesRoute().location,
+  const ProfilesOverviewRoute().location,
   const LogsOverviewRoute().location,
-  // const ConfigOptionsRoute().location,
-  const QuickSettingsRoute().location,
+  const ConfigOptionsRoute().location,
+  //const QuickSettingsRoute().location,
   // const SettingsRoute().location,
   const AboutRoute().location,
 ];

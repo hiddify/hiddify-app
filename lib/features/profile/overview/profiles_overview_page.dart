@@ -5,6 +5,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dart';
@@ -44,74 +45,87 @@ class ProfilesOverviewModal extends HookConsumerWidget {
         }
       },
     );
-
-    return SafeArea(
-      child: Stack(
-        children: [
-          CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              switch (asyncProfiles) {
-                AsyncData(value: final profiles) => SliverList.builder(
-                    itemBuilder: (context, index) {
-                      final profile = profiles[index];
-                      return ProfileTile(profile: profile);
-                    },
-                    itemCount: profiles.length,
-                  ),
-                AsyncError(:final error) => SliverErrorBodyPlaceholder(
-                    t.presentShortError(error),
-                  ),
-                AsyncLoading() => const SliverLoadingBodyPlaceholder(),
-                _ => const SliverToBoxAdapter(),
-              },
-              const SliverGap(48),
-            ],
+    final appBar = NestedAppBar(
+      title: Text(t.profile.overviewPageTitle),
+      actions: [
+        IconButton(
+          onPressed: () => const AddProfileRoute().push(context),
+          icon: const Icon(FluentIcons.add_24_filled),
+          tooltip: t.profile.add.shortBtnTxt, // Tooltip for accessibility
+        ),
+        IconButton(
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) {
+              return const ProfilesSortModal();
+            },
           ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 8,
-                  children: [
-                    FilledButton.icon(
-                      onPressed: () {
-                        const AddProfileRoute().push(context);
-                      },
-                      icon: const Icon(FluentIcons.add_24_filled),
-                      label: Text(t.profile.add.shortBtnTxt),
-                    ),
-                    FilledButton.icon(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ProfilesSortModal();
-                          },
-                        );
-                      },
-                      icon: const Icon(FluentIcons.arrow_sort_24_filled),
-                      label: Text(t.general.sort),
-                    ),
-                    FilledButton.icon(
-                      onPressed: () async {
-                        await ref
-                            .read(
-                              foregroundProfilesUpdateNotifierProvider.notifier,
-                            )
-                            .trigger();
-                      },
-                      icon: const Icon(FluentIcons.arrow_sync_24_filled),
-                      label: Text(t.profile.update.updateSubscriptions),
-                    ),
-                  ],
-                ),
-              ),
+          icon: const Icon(FluentIcons.arrow_sort_24_filled),
+          tooltip: t.general.sort,
+        ),
+        IconButton(
+          onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
+          icon: const Icon(FluentIcons.arrow_sync_24_filled),
+          tooltip: t.profile.update.updateSubscriptions,
+        ),
+        PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == 'refresh') {
+              ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger();
+            } else if (value == 'sort') {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return const ProfilesSortModal();
+                },
+              );
+            }
+          },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'refresh',
+              child: Text(t.profile.update.updateSubscriptions),
             ),
-          ),
+            PopupMenuItem(
+              value: 'sort',
+              child: Text(t.general.sort),
+            ),
+          ],
+        ),
+      ],
+    );
+    return Scaffold(
+      body: CustomScrollView(
+        controller: scrollController,
+        slivers: [
+          appBar,
+          // SliverPadding(
+          //   // padding: const EdgeInsets.symmetric(vertical: 8),
+          //   sliver: SliverToBoxAdapter(
+          //     child: Wrap(
+          //       alignment: WrapAlignment.center,
+          //       spacing: 8,
+          //       children: [],
+          //     ),
+          //   ),
+          // ),
+          // const SliverGap(48),
+          SliverLayoutBuilder(builder: (context, constraints) {
+            return switch (asyncProfiles) {
+              AsyncData(value: final profiles) => SliverList.builder(
+                  itemBuilder: (context, index) {
+                    final profile = profiles[index];
+                    return ProfileTile(profile: profile);
+                  },
+                  itemCount: profiles.length,
+                ),
+              AsyncError(:final error) => SliverErrorBodyPlaceholder(
+                  t.presentShortError(error),
+                ),
+              AsyncLoading() => const SliverLoadingBodyPlaceholder(),
+              _ => const SliverToBoxAdapter(),
+            };
+          }),
         ],
       ),
     );
