@@ -11,7 +11,7 @@
 
 
 
-## v2.5.5 (2024-09-29)
+## hcore.5.5 (2024-09-29)
 
 #### Other
 
@@ -22,7 +22,7 @@
 
 
 
-## v2.5.2 (2024-09-29)
+## hcore.5.2 (2024-09-29)
 
 #### Fix
 
@@ -30,7 +30,7 @@
 
 
 
-## v2.5.1 (2024-09-29)
+## hcore.5.1 (2024-09-29)
 
 #### Fix
 
@@ -40,7 +40,7 @@
 
 
 
-## v2.5.0 (2024-09-28)
+## hcore.5.0 (2024-09-28)
 
 #### Other
 
@@ -63,7 +63,7 @@
 
 
 
-## v2.3.1 (2024-09-07)
+## hcore.3.1 (2024-09-07)
 
 #### Fix
 
@@ -79,7 +79,7 @@
 
 
 
-## v2.3.0 (2024-09-02)
+## hcore.3.0 (2024-09-02)
 
 #### New
 
@@ -120,7 +120,7 @@
 
 
 
-## v2.2.0 (2024-08-21)
+## hcore.2.0 (2024-08-21)
 
 #### New
 
@@ -172,7 +172,7 @@
 
 
 
-## v2.1.5 (2024-08-05)
+## hcore.1.5 (2024-08-05)
 
 #### Fix
 
@@ -196,7 +196,7 @@
 
 
 
-## v2.1.4 (2024-08-05)
+## hcore.1.4 (2024-08-05)
 
 #### New
 
@@ -251,7 +251,7 @@
 
 
 
-## v2.1.1 (2024-08-02)
+## hcore.1.1 (2024-08-02)
 
 #### New
 
@@ -263,7 +263,7 @@
 
 
 
-## v2.1.0 (2024-08-02)
+## hcore.1.0 (2024-08-02)
 
 #### New
 
@@ -293,7 +293,7 @@
 
 
 
-## v2.0.4 (2024-07-31)
+## hcore.0.4 (2024-07-31)
 
 #### New
 
@@ -301,7 +301,7 @@
 
 
 
-## v2.0.3 (2024-07-30)
+## hcore.0.3 (2024-07-30)
 
 #### Fix
 
@@ -309,7 +309,7 @@
 
 
 
-## v2.0.2 (2024-07-30)
+## hcore.0.2 (2024-07-30)
 
 #### Other
 
@@ -317,7 +317,7 @@
 
 
 
-## v2.0.1 (2024-07-30)
+## hcore.0.1 (2024-07-30)
 
 #### Fix
 
@@ -343,7 +343,7 @@
 
 
 
-## v2.0.0 (2024-07-30)
+## hcore.0.0 (2024-07-30)
 
 #### New
 
@@ -1607,7 +1607,7 @@
 
 * Potentioal fix for crash in some windows. 
 
-* Bump libcore. 
+* Bump hiddify-core. 
 
 * Excluding aab from building draft. 
 
@@ -2014,7 +2014,7 @@
 
 * Speed up ping. 
 
-* Update libcore. 
+* Update hiddify-core. 
 
 
 
@@ -2060,7 +2060,7 @@
 
 * Log handler base functionality. 
   _+ fix makefile ios-temp-prepare upgrading pub
-+ remove tvOS from libcore local spm
++ remove tvOS from hiddify-core local spm
 +_
 
 * Add mux options. 
@@ -2112,7 +2112,7 @@
 * Revert changes for swift package. 
 
 * Merge pull request #344 from amirsaam/main. 
-  _switch to local spm to load libcore_
+  _switch to local spm to load hiddify-core_
 
 * Merge branch 'main' of https://github.com/amirsaam/hiddify-next. 
 
@@ -2146,7 +2146,7 @@
 * Remove hiddify://import/ from export option. 
 
 * Merge pull request #342 from amirsaam/main. 
-  _getting libcore from spm, adding landscape mode_
+  _getting hiddify-core from spm, adding landscape mode_
 
 * Merge branch 'main' of https://github.com/amirsaam/hiddify-next. 
 
@@ -2155,7 +2155,7 @@
 * Revert some changers. 
   _This reverts some of commit dde7c2419a12e0f36976f4c0ff8e66d882ec62ac._
 
-* Update pod, getting libcore from spm, adding landscape mode. 
+* Update pod, getting hiddify-core from spm, adding landscape mode. 
 
 * Change profile options modal. 
 
@@ -2232,9 +2232,9 @@
 * Revert landscape mode. 
 
 * Merge pull request #328 from amirsaam/main. 
-  _remove unnecessary force unwrap, libcore linking add landscape mode_
+  _remove unnecessary force unwrap, hiddify-core linking add landscape mode_
 
-* Remove unnecessary force unwrap, libcore linking add landscape mode, 
+* Remove unnecessary force unwrap, hiddify-core linking add landscape mode, 
 
 * Change ios method error handling. 
 

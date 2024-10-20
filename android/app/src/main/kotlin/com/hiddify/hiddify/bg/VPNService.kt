@@ -10,7 +10,7 @@ import android.os.Build
 import android.os.IBinder
 import com.hiddify.hiddify.constant.PerAppProxyMode
 import com.hiddify.hiddify.ktx.toIpPrefix
-import io.nekohasekai.libbox.TunOptions
+import com.hiddify.core.libbox.TunOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext

@@ -16,7 +16,6 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
   Future<Directories> build() async {
     final Directories dirs;
     if (Platform.isIOS) {
-      
       final paths = await _methodChannel.invokeMethod<Map>("get_paths");
       loggy.debug("paths: $paths");
       dirs = (
@@ -26,8 +25,7 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
       );
     } else {
       final baseDir = await getApplicationSupportDirectory();
-      final workingDir =
-          Platform.isAndroid ? await getExternalStorageDirectory() : baseDir;
+      final workingDir = Platform.isAndroid ? await getExternalStorageDirectory() : baseDir;
       final tempDir = await getTemporaryDirectory();
       dirs = (
         baseDir: baseDir,

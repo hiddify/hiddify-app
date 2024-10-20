@@ -13,9 +13,7 @@ abstract interface class LogRepository {
   TaskEither<LogFailure, Unit> clearLogs();
 }
 
-class LogRepositoryImpl
-    with ExceptionHandler, InfraLogger
-    implements LogRepository {
+class LogRepositoryImpl with ExceptionHandler, InfraLogger implements LogRepository {
   LogRepositoryImpl({
     required this.singbox,
     required this.logPathResolver,
@@ -49,10 +47,7 @@ class LogRepositoryImpl
 
   @override
   Stream<Either<LogFailure, List<LogEntity>>> watchLogs() {
-    return singbox
-        .watchLogs(logPathResolver.coreFile().path)
-        .map((event) => event.map(LogParser.parseSingbox).toList())
-        .handleExceptions(
+    return singbox.watchLogs(logPathResolver.coreFile().path).map((event) => event.map(LogParser.parseLogProto).toList()).handleExceptions(
       (error, stackTrace) {
         loggy.warning("error watching logs", error, stackTrace);
         return LogFailure.unexpected(error, stackTrace);

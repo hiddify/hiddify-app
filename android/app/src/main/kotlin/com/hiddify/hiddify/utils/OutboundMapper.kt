@@ -1,8 +1,8 @@
 package com.hiddify.hiddify.utils
 
 import com.google.gson.annotations.SerializedName
-import io.nekohasekai.libbox.OutboundGroup
-import io.nekohasekai.libbox.OutboundGroupItem
+import com.hiddify.core.libbox.OutboundGroup
+import com.hiddify.core.libbox.OutboundGroupItem
 
 data class ParsedOutboundGroup(
     @SerializedName("tag") val tag: String,

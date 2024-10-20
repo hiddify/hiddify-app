@@ -9,7 +9,7 @@ class ProxyGroupEntity with _$ProxyGroupEntity {
 
   const factory ProxyGroupEntity({
     required String tag,
-    required ProxyType type,
+    required String type,
     required String selected,
     @Default([]) List<ProxyItemEntity> items,
   }) = _ProxyGroupEntity;
@@ -29,10 +29,9 @@ class ProxyItemEntity with _$ProxyItemEntity {
   }) = _ProxyItemEntity;
 
   String get name => _sanitizedTag(tag);
-  String? get selectedName =>
-      selectedTag == null ? null : _sanitizedTag(selectedTag!);
+  String? get selectedName => selectedTag == null ? null : _sanitizedTag(selectedTag!);
   bool get isVisible => !tag.contains("§hide§");
 }
 
-String _sanitizedTag(String tag) =>
-    tag.replaceFirst(RegExp(r"\§[^]*"), "").trimRight();
+String _sanitizedTag(String tag) => tag.replaceFirst(RegExp(r"\§[^]*"), "").trimRight();
+// bool get isVisible => !tag.contains("§hide§");

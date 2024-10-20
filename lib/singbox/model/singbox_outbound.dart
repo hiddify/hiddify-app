@@ -1,5 +1,6 @@
 import 'package:dartx/dartx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 
 part 'singbox_outbound.freezed.dart';
@@ -16,6 +17,8 @@ class SingboxOutboundGroup with _$SingboxOutboundGroup {
   }) = _SingboxOutboundGroup;
 
   factory SingboxOutboundGroup.fromJson(Map<String, dynamic> json) => _$SingboxOutboundGroupFromJson(json);
+
+  // factory SingboxOutboundGroup.fromGrpc(OutboundGroup og) => _$SingboxOutboundGroup(tag=og.tag, type=_keyMap[og.type]!, selected=og.selected, items=og.items.map((e) => SingboxOutboundGroupItem.fromGRPC(e)).toList());
 }
 
 @freezed

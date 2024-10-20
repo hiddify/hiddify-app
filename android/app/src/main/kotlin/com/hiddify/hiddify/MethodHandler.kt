@@ -2,12 +2,14 @@ package com.hiddify.hiddify
 
 import android.util.Log
 import com.hiddify.hiddify.bg.BoxService
+//import com.hiddify.hiddify.bg.BoxService.Companion.workingDir
 import com.hiddify.hiddify.constant.Status
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.mobile.Mobile
+
+import com.hiddify.core.libbox.Libbox
+import com.hiddify.core.mobile.Mobile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -25,16 +27,12 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
 
         enum class Trigger(val method: String) {
             Setup("setup"),
-            ParseConfig("parse_config"),
-            ChangeHiddifyOptions("change_hiddify_options"),
-            GenerateConfig("generate_config"),
             Start("start"),
             Stop("stop"),
             Restart("restart"),
-            SelectOutbound("select_outbound"),
-            UrlTest("url_test"),
-            ClearLogs("clear_logs"),
-            GenerateWarpConfig("generate_warp_config"),
+            AddGrpcClientPublicKey("add_grpc_client_public_key"),
+            GetGrpcServerPublicKey("get_grpc_server_public_key"),
+
         }
     }
 
@@ -52,64 +50,49 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            Trigger.AddGrpcClientPublicKey.method -> {
+                GlobalScope.launch {
+                    result.runCatching {
+                        val args = call.arguments as Map<*, *>
+                        val clientPub= args["clientPublicKey"] as ByteArray
+//                        Mobile.addGrpcClientPublicKey(clientPub)
+                        Settings.grpcFlutterPublicKey=clientPub
+                        success("")
+
+                    }
+                }
+            }
+            Trigger.GetGrpcServerPublicKey.method -> {
+                GlobalScope.launch {
+                    result.runCatching {
+                        result.success(Mobile.getServerPublicKey())
+                    }
+                }
+            }
             Trigger.Setup.method -> {
                 GlobalScope.launch {
                     result.runCatching {
-                           val baseDir = Application.application.filesDir                
-                            baseDir.mkdirs()
-                            val workingDir = Application.application.getExternalFilesDir(null)
-                            workingDir?.mkdirs()
-                            val tempDir = Application.application.cacheDir
-                            tempDir.mkdirs()
-                            Log.d(TAG, "base dir: ${baseDir.path}")
-                            Log.d(TAG, "working dir: ${workingDir?.path}")
-                            Log.d(TAG, "temp dir: ${tempDir.path}")
-                            
-                            Mobile.setup(baseDir.path, workingDir?.path, tempDir.path, false)
-                            Libbox.redirectStderr(File(workingDir, "stderr2.log").path)
+                        val args = call.arguments as Map<*, *>
+                        Settings.baseDir=args["baseDir"] as String
+                        Settings.workingDir=args["workingDir"] as String
+                        Settings.tempDir=args["tempDir"] as String
+                        val mode=args["mode"] as Int
+                        val grpcPort=args["grpcPort"] as Int
+                        runCatching {
+                            Mobile.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir,mode.toLong(),"127.0.0.1:"+grpcPort,"", false)
+//                            Libbox.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir, false)
+                            Libbox.redirectStderr(File(Settings.workingDir, "stderr2.log").path)
 
                             success("")
-                    }
-                }
-            }
-
-            Trigger.ParseConfig.method -> {
-                scope.launch(Dispatchers.IO) {
-                    result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        val path = args["path"] as String
-                        val tempPath = args["tempPath"] as String
-                        val debug = args["debug"] as Boolean
-                        val msg = BoxService.parseConfig(path, tempPath, debug)
-                        success(msg)
-                    }
-                }
-            }
-
-            Trigger.ChangeHiddifyOptions.method -> {
-                scope.launch {
-                    result.runCatching {
-                        val args = call.arguments as String
-                        Settings.configOptions = args
-                        success(true)
-                    }
-                }
-            }
-
-            Trigger.GenerateConfig.method -> {
-                scope.launch {
-                    result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        val path = args["path"] as String
-                        val options = Settings.configOptions
-                        if (options.isBlank() || path.isBlank()) {
-                            error("blank properties")
+                        }.onFailure {
+                            error(it)
                         }
-                        val config = BoxService.buildConfig(path, options)
-                        success(config)
+
                     }
                 }
             }
+
+
 
             Trigger.Start.method -> {
                 scope.launch {
@@ -117,6 +100,9 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         val args = call.arguments as Map<*, *>
                         Settings.activeConfigPath = args["path"] as String? ?: ""
                         Settings.activeProfileName = args["name"] as String? ?: ""
+
+                        Settings.grpcServiceModePort=args["grpcPort"] as Int
+
                         val mainActivity = MainActivity.instance
                         val started = mainActivity.serviceStatus.value == Status.Started
                         if (started) {
@@ -136,7 +122,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         val started = mainActivity.serviceStatus.value == Status.Started
                         if (!started) {
                             Log.w(TAG, "service is not running")
-                            return@launch success(true)
+                        //    return@launch success(true)
                         }
                         BoxService.stop()
                         success(true)
@@ -167,56 +153,6 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         }.onFailure {
                             error(it)
                         }
-                    }
-                }
-            }
-
-            Trigger.SelectOutbound.method -> {
-                scope.launch {
-                    result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        Libbox.newStandaloneCommandClient()
-                            .selectOutbound(
-                                args["groupTag"] as String,
-                                args["outboundTag"] as String
-                            )
-                        success(true)
-                    }
-                }
-            }
-
-            Trigger.UrlTest.method -> {
-                scope.launch {
-                    result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        Libbox.newStandaloneCommandClient()
-                            .urlTest(
-                                args["groupTag"] as String
-                            )
-                        success(true)
-                    }
-                }
-            }
-
-            Trigger.ClearLogs.method -> {
-                scope.launch {
-                    result.runCatching {
-                        MainActivity.instance.onServiceResetLogs(mutableListOf())
-                        success(true)
-                    }
-                }
-            }
-
-            Trigger.GenerateWarpConfig.method -> {
-                scope.launch(Dispatchers.IO) {
-                    result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        val warpConfig = Mobile.generateWarpConfig(
-                            args["license-key"] as String,
-                            args["previous-account-id"] as String,
-                            args["previous-access-token"] as String,
-                        )
-                        success(warpConfig)
                     }
                 }
             }

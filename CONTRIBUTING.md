@@ -50,7 +50,7 @@ We recommend using [Visual Studio Code](https://docs.flutter.dev/development/too
 #### Setting up the Environment
 
 We have extensive use of code generation in the form of [freezed](https://github.com/rrousselGit/freezed), [riverpod](https://github.com/rrousselGit/riverpod), etc. So it's generate these before running the code. Execute the following make commands in order:
-Assuming you have not built the `libcore` and want to use [existing releases](https://github.com/hiddify/hiddify-next-core/releases), you should run the following command (based on your target platform):
+Assuming you have not built the `hiddify-core` and want to use [existing releases](https://github.com/hiddify/hiddify-next-core/releases), you should run the following command (based on your target platform):
 
 
 - `make windows-prepare`
@@ -60,8 +60,8 @@ Assuming you have not built the `libcore` and want to use [existing releases](ht
 - `make android-prepare`
 
 
-##### build the `libcore` from source (Optional)
-If you want to build the `libcore` from source after `make prepare`, use:
+##### build the `hiddify-core` from source (Optional)
+If you want to build the `hiddify-core` from source after `make prepare`, use:
 - `make build-windows-libs`
 - `make build-linux-libs` 
 - `make build-macos-libs`

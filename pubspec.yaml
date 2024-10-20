@@ -32,7 +32,7 @@ dependencies:
   hooks_riverpod: ^2.4.10
   flutter_hooks: ^0.20.5
   riverpod_annotation: ^2.3.4
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   drift: ^2.16.0
   sqlite3_flutter_libs: ^0.5.24
   shared_preferences: ^2.2.2
@@ -94,12 +94,15 @@ dependencies:
   # circle_flags: ^4.0.2
   circle_flags:
     git: https://github.com/hiddify-com/flutter_circle_flags.git
-  protobuf: ^3.1.0
-  grpc: ^3.2.4
+  fixnum: ^1.1.0
+  grpc: ^3.2.2
+  
+  protobuf: ^3.0.0
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
   flutter_platform_widgets: ^7.0.1  
   simple_icons: ^10.1.3
+  basic_utils: 5.7.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -115,7 +118,7 @@ dev_dependencies:
   go_router_builder: ^2.4.1
   dependency_validator: ^3.2.3
   dart_mappable_builder: ^4.2.1
-
+  # google_protobuf: ^3.20.1;
 dependency_overrides:
   # drift & package_info_plus are not compatible
   web: ^1.0.0
@@ -162,12 +165,12 @@ flutter_native_splash:
     image: assets/images/source/ic_launcher_foreground.png
 
 ffigen:
-  name: "SingboxNativeLibrary"
-  description: "Bindings to Singbox"
-  output: "lib/gen/singbox_generated_bindings.dart"
+  name: "HiddifyCoreNativeLibrary"
+  description: "Bindings to Hiddify Core Library"
+  output: "lib/gen/hiddify_core_generated_bindings.dart"
   headers:
     entry-points:
-      - "libcore/bin/libcore.h"
+      - "hiddify-core/bin/desktop.h"
 
 sentry:
   upload_debug_symbols: true

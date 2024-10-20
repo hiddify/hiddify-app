@@ -122,5 +122,33 @@ object Settings {
         }
         return false
     }
+
+    var workingDir: String
+        get() = preferences.getString(SettingsKey.WORKING_DIR, "./")!!
+        set(value) = preferences.edit().putString(SettingsKey.WORKING_DIR, value).apply()
+    var tempDir: String
+        get() = preferences.getString(SettingsKey.TMP_DIR, "./")!!
+        set(value) = preferences.edit().putString(SettingsKey.TMP_DIR, value).apply()
+
+    var baseDir: String
+        get() = preferences.getString(SettingsKey.BASE_DIR, "./")!!
+        set(value) = preferences.edit().putString(SettingsKey.BASE_DIR, value).apply()
+
+
+
+    var grpcFlutterPublicKey: ByteArray
+        get() {
+            val encoded = preferences.getString(SettingsKey.GRPC_FLUTTER_PUBLIC_KEY, null)
+            return encoded?.let { Base64.decode(it, Base64.DEFAULT) } ?: ByteArray(0)
+        }
+        set(value) {
+            val encoded = Base64.encodeToString(value, Base64.DEFAULT)
+            preferences.edit().putString(SettingsKey.GRPC_FLUTTER_PUBLIC_KEY, encoded).apply()
+        }
+    var grpcServiceModePort: Int
+        get() = preferences.getInt(SettingsKey.GRPC_PORT, 17078)!!
+        set(value) = preferences.edit().putInt(SettingsKey.GRPC_PORT, value).apply()
+
+
 }
 

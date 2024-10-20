@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2.16.0 #issue with 2.13
+      - uses: subosito/flutter-action@hcore.16.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
@@ -114,7 +114,7 @@ jobs:
 
       
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2.16.0 #issue with 2.13
+        uses: subosito/flutter-action@hcore.16.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           # flutter-version-file: pubspec.yaml

@@ -68,7 +68,7 @@ public class MethodHandler: NSObject, FlutterPlugin {
             //     return
             // }
             // var error: NSError?
-            // MobileSetup(path, tempPath, debug, &error)
+            // MobileSetup(path, tempPath, 0, "","" debug, &error)
             // if let error {
             //     result(FlutterError(code: String(error.code), message: error.description, details: nil))
             //     return

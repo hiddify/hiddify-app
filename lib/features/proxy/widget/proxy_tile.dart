@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -13,7 +14,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     required this.onSelect,
   });
 
-  final ProxyItemEntity proxy;
+  final OutboundInfo proxy;
   final bool selected;
   final VoidCallback onSelect;
 
@@ -24,7 +25,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     return ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       title: Text(
-        proxy.name,
+        proxy.tagDisplay,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(fontFamily: FontFamily.emoji),
       ),
@@ -41,11 +42,11 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       ),
       subtitle: Text.rich(
         TextSpan(
-          text: proxy.type.label,
+          text: proxy.type,
           children: [
-            if (proxy.selectedName != null)
+            if (proxy.tagDisplay != null)
               TextSpan(
-                text: ' (${proxy.selectedName})',
+                text: ' (${proxy.tagDisplay})',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
           ],
@@ -64,7 +65,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
         showDialog(
           context: context,
           builder: (context) => PlatformAlertDialog(
-            content: SelectionArea(child: Text(proxy.name)),
+            content: SelectionArea(child: Text(proxy.tagDisplay)),
             actions: [
               TextButton(
                 onPressed: Navigator.of(context).pop,

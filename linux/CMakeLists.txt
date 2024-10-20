@@ -108,11 +108,11 @@ install(CODE "
 set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
 set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 
-install(FILES "../libcore/bin/lib/libcore.so" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+install(FILES "../hiddify-core/bin/lib/hiddify-core.so" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
 install(
-  FILES "../libcore/bin/HiddifyCli" 
+  FILES "../hiddify-core/bin/HiddifyCli" 
   DESTINATION "${CMAKE_INSTALL_PREFIX}"
   PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ
   COMPONENT Runtime
