@@ -46,7 +46,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
             e,
           );
     }).map((_) {
-      loggy.info("SingBox setup done");
+      loggy.info("Hiddify-core setup done");
     }).run();
   }
 
