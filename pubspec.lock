@@ -1629,6 +1629,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.2"
+  showcaseview:
+    dependency: "direct main"
+    description:
+      name: showcaseview
+      sha256: f236c1f44b286e1ba888f8701adca067af92c33e29ea937d0fe9b4a29d4cd41e
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   simple_icons:
     dependency: "direct main"
     description:

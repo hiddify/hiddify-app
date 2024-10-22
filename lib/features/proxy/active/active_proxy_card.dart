@@ -81,7 +81,7 @@ class ActiveProxyFooter extends HookConsumerWidget {
                               Semantics(
                                   label: t.proxies.activeProxySemanticLabel,
                                   child: Text(
-                                    proxy?.selectedName?.isNotNullOrBlank == true ? proxy!.selectedName! : proxy?.name ?? "",
+                                    proxy?.tagDisplay ?? "",
                                     style: theme?.textTheme?.bodyLarge?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
