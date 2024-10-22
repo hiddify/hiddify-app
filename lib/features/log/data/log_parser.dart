@@ -3,9 +3,27 @@
 import 'package:dartx/dartx.dart';
 import 'package:hiddify/features/log/model/log_entity.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart' as pb;
 import 'package:tint/tint.dart';
 
 abstract class LogParser {
+  static LogEntity parseLogProto(pb.LogMessage message) {
+    final level = switch (message.level) {
+      pb.LogLevel.DEBUG => LogLevel.debug,
+      pb.LogLevel.INFO => LogLevel.info,
+      pb.LogLevel.WARNING => LogLevel.warn,
+      pb.LogLevel.ERROR => LogLevel.error,
+      pb.LogLevel.FATAL => LogLevel.fatal,
+      _ => LogLevel.debug,
+    };
+
+    return LogEntity(
+      level: level,
+      time: message.time.toDateTime(),
+      message: message.message,
+    );
+  }
+
   static LogEntity parseSingbox(String log) {
     log = log.strip();
     DateTime? time;

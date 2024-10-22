@@ -20,13 +20,14 @@ import com.hiddify.hiddify.constant.Action
 import com.hiddify.hiddify.constant.Alert
 import com.hiddify.hiddify.constant.Status
 import go.Seq
-import io.nekohasekai.libbox.BoxService
-import io.nekohasekai.libbox.CommandServer
-import io.nekohasekai.libbox.CommandServerHandler
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.PlatformInterface
-import io.nekohasekai.libbox.SystemProxyStatus
-import io.nekohasekai.mobile.Mobile
+import com.hiddify.core.libbox.Libbox
+import com.hiddify.core.mobile.Mobile
+
+import com.hiddify.core.libbox.BoxService
+import com.hiddify.core.libbox.CommandServer
+import com.hiddify.core.libbox.CommandServerHandler
+import com.hiddify.core.libbox.PlatformInterface
+import com.hiddify.core.libbox.SystemProxyStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -46,9 +47,11 @@ class BoxService(
         private var initializeOnce = false
         private lateinit var workingDir: File
         private fun initialize() {
+            System.setProperty("GODEBUG", "efence=1,stacktraceback=2");
+            System.setProperty("GOGC", "off");
             if (initializeOnce) return
             val baseDir = Application.application.filesDir
-            
+
             baseDir.mkdirs()
             workingDir = Application.application.getExternalFilesDir(null) ?: return
             workingDir.mkdirs()
@@ -57,25 +60,14 @@ class BoxService(
             Log.d(TAG, "base dir: ${baseDir.path}")
             Log.d(TAG, "working dir: ${workingDir.path}")
             Log.d(TAG, "temp dir: ${tempDir.path}")
-            
-            Mobile.setup(baseDir.path, workingDir.path, tempDir.path, false)
-            Libbox.redirectStderr(File(workingDir, "stderr.log").path)
+
+//
+//            Mobile.setup(baseDir.path, workingDir.path, tempDir.path,  2L ,"127.0.0.1:{Setting}",false)
+            Libbox.setup(baseDir.path, workingDir.path, tempDir.path, false)
+
+            Libbox.redirectStderr(File(Settings.workingDir, "stderr.log").path)
             initializeOnce = true
             return
-        }
-
-        fun parseConfig(path: String, tempPath: String, debug: Boolean): String {
-            return try {
-                Mobile.parse(path, tempPath, debug)
-                ""
-            } catch (e: Exception) {
-                Log.w(TAG, e)
-                e.message ?: "invalid config"
-            }
-        }
-
-        fun buildConfig(path: String, options: String): String {
-            return Mobile.buildConfig(path, options)
         }
 
         fun start() {
@@ -155,24 +147,6 @@ class BoxService(
 
             activeProfileName = Settings.activeProfileName
 
-            val configOptions = Settings.configOptions
-            if (configOptions.isBlank()) {
-                stopAndAlert(Alert.EmptyConfiguration)
-                return
-            }
-
-            val content = try {
-                Mobile.buildConfig(selectedConfigPath, configOptions)
-            } catch (e: Exception) {
-                Log.w(TAG, e)
-                stopAndAlert(Alert.EmptyConfiguration)
-                return
-            }
-
-            if (Settings.debugMode) {
-                File(workingDir, "current-config.json").writeText(content)
-            }
-
             withContext(Dispatchers.Main) {
                 notification.show(activeProfileName, R.string.status_starting)
                 binder.broadcast {
@@ -184,8 +158,14 @@ class BoxService(
             Libbox.registerLocalDNSTransport(LocalResolver)
             Libbox.setMemoryLimit(!Settings.disableMemoryLimit)
 
+//            val content=Mobile.buildConfig(selectedConfigPath)
+//            File(selectedConfigPath).writeText(content)
+//            val content=File(selectedConfigPath).readText()
             val newService = try {
-                Libbox.newService(content, platformInterface)
+                Mobile.setup(Settings.baseDir,Settings.workingDir,Settings.tempDir,4L,"127.0.0.1:${Settings.grpcServiceModePort}","",false)
+
+//                Libbox.newService(content,platformInterface)
+                Mobile.start(selectedConfigPath,platformInterface)
             } catch (e: Exception) {
                 stopAndAlert(Alert.CreateService, e.message)
                 return
@@ -195,10 +175,10 @@ class BoxService(
                 delay(1000L)
             }
 
-            newService.start()
-            boxService = newService
-            commandServer?.setService(boxService)
-            status.postValue(Status.Started)
+//            newService.start()
+//            boxService = newService
+//            commandServer?.setService(boxService)
+//            status.postValue(Status.Started)
 
             withContext(Dispatchers.Main) {
                 notification.show(activeProfileName, R.string.status_started)
@@ -212,7 +192,8 @@ class BoxService(
 
     override fun serviceReload() {
         notification.close()
-        status.postValue(Status.Starting)
+//        status.postValue(Status.Starting)
+
         val pfd = fileDescriptor
         if (pfd != null) {
             pfd.close()
@@ -227,7 +208,8 @@ class BoxService(
             }
             Seq.destroyRef(refnum)
         }
-        boxService = null
+        Mobile.stop()
+//        boxService = null
         runBlocking {
             startService(true)
         }
@@ -256,7 +238,7 @@ class BoxService(
     }
 
     private fun stopService() {
-        if (status.value != Status.Started) return
+//        if (status.value != Status.Started) return
         status.value = Status.Stopping
         if (receiverRegistered) {
             service.unregisterReceiver(receiver)
@@ -269,24 +251,25 @@ class BoxService(
                 pfd.close()
                 fileDescriptor = null
             }
-            commandServer?.setService(null)
-            boxService?.apply {
-                runCatching {
-                    close()
-                }.onFailure {
-                    writeLog("service: error when closing: $it")
-                }
-                Seq.destroyRef(refnum)
-            }
-            boxService = null
+//            commandServer?.setService(null)
+//            boxService?.apply {
+//                runCatching {
+//                    close()
+//                }.onFailure {
+//                    writeLog("service: error when closing: $it")
+//                }
+//                Seq.destroyRef(refnum)
+//            }
+            Mobile.close(4L)
+//            boxService = null
             Libbox.registerLocalDNSTransport(null)
             DefaultNetworkMonitor.stop()
 
-            commandServer?.apply {
-                close()
-                Seq.destroyRef(refnum)
-            }
-            commandServer = null
+//            commandServer?.apply {
+//                close()
+//                Seq.destroyRef(refnum)
+//            }
+//            commandServer = null
             Settings.startedByUser = false
             withContext(Dispatchers.Main) {
                 status.value = Status.Stopped

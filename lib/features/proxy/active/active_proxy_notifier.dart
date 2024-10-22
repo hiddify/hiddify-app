@@ -6,9 +6,10 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/utils/throttler.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
-import 'package:hiddify/features/proxy/model/ip_info_entity.dart';
+import 'package:hiddify/features/proxy/model/ip_info_entity.dart' as oldipinfo;
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -18,7 +19,7 @@ part 'active_proxy_notifier.g.dart';
 @riverpod
 class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
   @override
-  Future<IpInfo> build() async {
+  Future<oldipinfo.IpInfo> build() async {
     ref.disposeDelay(const Duration(seconds: 20));
     final cancelToken = CancelToken();
     Timer? timer;
@@ -81,7 +82,7 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
 @Riverpod(keepAlive: true)
 class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
   @override
-  Stream<ProxyItemEntity> build() async* {
+  Stream<OutboundInfo> build() async* {
     // ref.disposeDelay(const Duration(seconds: 20));
 
     final serviceRunning = await ref.watch(serviceRunningProvider.future);

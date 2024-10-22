@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -770,8 +770,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
-					"@executable_path/../libcore/",
-					"@executable_path/libcore/",
+					"@executable_path/../hiddify-core/",
+					"@executable_path/hiddify-core/",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 2.5.6;
@@ -821,8 +821,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
-					"@executable_path/../libcore/",
-					"@executable_path/libcore/",
+					"@executable_path/../hiddify-core/",
+					"@executable_path/hiddify-core/",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 2.5.6;
@@ -870,8 +870,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
-					"@executable_path/../libcore/",
-					"@executable_path/libcore/",
+					"@executable_path/../hiddify-core/",
+					"@executable_path/hiddify-core/",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 2.5.6;
@@ -971,8 +971,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
-					"@executable_path/../libcore/",
-					"@executable_path/libcore/",
+					"@executable_path/../hiddify-core/",
+					"@executable_path/hiddify-core/",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CPLUSPLUSFLAGS = (
@@ -1191,8 +1191,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
-					"@executable_path/../libcore/",
-					"@executable_path/libcore/",
+					"@executable_path/../hiddify-core/",
+					"@executable_path/hiddify-core/",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
 					"-fcxx-modules",
@@ -1238,8 +1238,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
-					"@executable_path/../libcore/",
-					"@executable_path/libcore/",
+					"@executable_path/../hiddify-core/",
+					"@executable_path/hiddify-core/",
 				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CPLUSPLUSFLAGS = (

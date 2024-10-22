@@ -6,9 +6,12 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "cwd": "./libcore",
-            "program": "./libcore/cli/main.go",
-            "args": ["build","-c","a.txt","-d","b.txt","--full-config"] ,
+            "cwd": "./hiddify-core",
+            "program": "./hiddify-core/cmd/main",
+            // "args": ["build","-c","a.txt","-d","b.txt","--full-config"] ,
+            // "args": ["temp"] ,
+            // "args":["profile","https://raw.githubusercontent.com/hiddify/hiddify-next/refs/heads/main/test.configs/warp"],
+            "args": ["run","-c","https://raw.githubusercontent.com/hiddify/hiddify-next/refs/heads/main/test.configs/warp"],
             "buildFlags": "-tags with_clash_api,with_gvisor,with_quic,with_wireguard,with_grpc,with_ech,with_utls,with_reality_server"
         },
         {

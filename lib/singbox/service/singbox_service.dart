@@ -2,22 +2,25 @@ import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
 import 'package:hiddify/singbox/model/singbox_outbound.dart';
 import 'package:hiddify/singbox/model/singbox_stats.dart';
 import 'package:hiddify/singbox/model/singbox_status.dart';
 import 'package:hiddify/singbox/model/warp_account.dart';
-import 'package:hiddify/singbox/service/ffi_singbox_service.dart';
-import 'package:hiddify/singbox/service/platform_singbox_service.dart';
+import 'package:hiddify/singbox/service/hiddify_core_service.dart';
+// import 'package:hiddify/singbox/service/ffi_singbox_service.dart';
+// import 'package:hiddify/singbox/service/platform_singbox_service.dart';
 
 abstract interface class SingboxService {
   factory SingboxService() {
-    if (Platform.isAndroid || Platform.isIOS) {
-      return PlatformSingboxService();
-    } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-      return FFISingboxService();
-    }
-    throw Exception("unsupported platform");
+    return CoreSingboxService();
+    // if (Platform.isAndroid || Platform.isIOS) {
+    //   return PlatformSingboxService();
+    // } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    //   return FFISingboxService();
+    // }
+    // throw Exception("unsupported platform");
   }
 
   Future<void> init();
@@ -69,9 +72,9 @@ abstract interface class SingboxService {
 
   TaskEither<String, Unit> resetTunnel();
 
-  Stream<List<SingboxOutboundGroup>> watchGroups();
+  Stream<List<OutboundGroup>> watchGroups();
 
-  Stream<List<SingboxOutboundGroup>> watchActiveGroups();
+  Stream<List<OutboundGroup>> watchActiveGroups();
 
   TaskEither<String, Unit> selectOutbound(String groupTag, String outboundTag);
 
@@ -83,7 +86,7 @@ abstract interface class SingboxService {
   /// watch stats of sing-box service (uplink, downlink, etc.)
   Stream<SingboxStats> watchStats();
 
-  Stream<List<String>> watchLogs(String path);
+  Stream<List<LogMessage>> watchLogs(String path);
 
   TaskEither<String, Unit> clearLogs();
 

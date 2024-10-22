@@ -1,14 +1,14 @@
 package com.hiddify.hiddify.utils
 
 import go.Seq
-import io.nekohasekai.libbox.CommandClient
-import io.nekohasekai.libbox.CommandClientHandler
-import io.nekohasekai.libbox.CommandClientOptions
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.OutboundGroup
-import io.nekohasekai.libbox.OutboundGroupIterator
-import io.nekohasekai.libbox.StatusMessage
-import io.nekohasekai.libbox.StringIterator
+import com.hiddify.core.libbox.CommandClient
+import com.hiddify.core.libbox.CommandClientHandler
+import com.hiddify.core.libbox.CommandClientOptions
+import com.hiddify.core.libbox.Libbox
+import com.hiddify.core.libbox.OutboundGroup
+import com.hiddify.core.libbox.OutboundGroupIterator
+import com.hiddify.core.libbox.StatusMessage
+import com.hiddify.core.libbox.StringIterator
 import com.hiddify.hiddify.ktx.toList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

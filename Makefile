@@ -13,15 +13,15 @@ ifeq ($(OS),Windows_NT)
 endif
 
 
-BINDIR=libcore$(SEP)bin
+BINDIR=hiddify-core$(SEP)bin
 ANDROID_OUT=android$(SEP)app$(SEP)libs
 IOS_OUT=ios$(SEP)Frameworks
-DESKTOP_OUT=libcore$(SEP)bin
+DESKTOP_OUT=hiddify-core$(SEP)bin
 GEO_ASSETS_DIR=assets$(SEP)core
 
 CORE_PRODUCT_NAME=hiddify-core
 CORE_NAME=$(CORE_PRODUCT_NAME)
-LIB_NAME=libcore
+LIB_NAME=hiddify-core
 
 ifeq ($(CHANNEL),prod)
 	CORE_URL=https://github.com/hiddify/hiddify-next-core/releases/download/v$(core.version)
@@ -77,8 +77,15 @@ android-aab-prepare:android-prepare
 
 .PHONY: protos
 protos:
-	make -C libcore -f Makefile protos
-	protoc --dart_out=grpc:lib/singbox/generated --proto_path=libcore/protos libcore/protos/*.proto
+	make -C hiddify-core -f Makefile protos
+	mkdir -p lib/hiddifycore/generated
+	dart pub global activate protoc_plugin
+	# for f in $(shell find hiddify-core/ -name "*.proto"); do \
+	# 	protoc --dart_out=grpc:lib/hiddifycore/generated --proto_path=hiddify-core/  "$$f" 	google/protobuf/timestamp.proto ; \
+	# done
+	protoc --dart_out=grpc:lib/hiddifycore/generated --proto_path=hiddify-core/  $(shell find hiddify-core/v2 hiddify-core/extension -name "*.proto") 	google/protobuf/timestamp.proto ; \
+
+	
 
 macos-install-dependencies:
 	brew install create-dmg tree 
@@ -199,25 +206,25 @@ get-geo-assets:
 	# curl -L https://github.com/SagerNet/sing-geosite/releases/latest/download/geosite.db -o $(GEO_ASSETS_DIR)/geosite.db
 
 build-headers:
-	make -C libcore -f Makefile headers && mv $(BINDIR)/$(CORE_NAME)-headers.h $(BINDIR)/libcore.h
+	make -C hiddify-core -f Makefile headers && mv $(BINDIR)/$(CORE_NAME)-headers.h $(BINDIR)/hiddify-core.h
 
 build-android-libs:
-	make -C libcore -f Makefile android 
+	make -C hiddify-core -f Makefile android 
 	mv $(BINDIR)/$(LIB_NAME).aar $(ANDROID_OUT)/
 
 build-windows-libs:
-	make -C libcore -f Makefile windows-amd64
+	make -C hiddify-core -f Makefile windows-amd64
 
 build-linux-libs:
-	make -C libcore -f Makefile linux-amd64 
+	make -C hiddify-core -f Makefile linux-amd64 
 
 build-macos-libs:
-	make -C libcore -f Makefile macos-universal
+	make -C hiddify-core -f Makefile macos
 
 build-ios-libs: 
-	rm -rf $(IOS_OUT)/Libcore.xcframework 
-	make -C libcore -f Makefile ios  
-	mv $(BINDIR)/Libcore.xcframework $(IOS_OUT)/Libcore.xcframework
+	rm -rf $(IOS_OUT)/HiddifyCore.xcframework 
+	make -C hiddify-core -f Makefile ios  
+	mv $(BINDIR)/HiddifyCore.xcframework $(IOS_OUT)/Libcore.xcframework
 
 release: # Create a new tag for release.
 	@CORE_VERSION=$(core.version) bash -c ".github/change_version.sh "

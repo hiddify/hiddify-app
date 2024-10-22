@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/features/log/data/log_parser.dart';
@@ -13,9 +14,7 @@ abstract interface class LogRepository {
   TaskEither<LogFailure, Unit> clearLogs();
 }
 
-class LogRepositoryImpl
-    with ExceptionHandler, InfraLogger
-    implements LogRepository {
+class LogRepositoryImpl with ExceptionHandler, InfraLogger implements LogRepository {
   LogRepositoryImpl({
     required this.singbox,
     required this.logPathResolver,
@@ -28,18 +27,20 @@ class LogRepositoryImpl
   TaskEither<LogFailure, Unit> init() {
     return exceptionHandler(
       () async {
-        if (!await logPathResolver.directory.exists()) {
-          await logPathResolver.directory.create(recursive: true);
-        }
-        if (await logPathResolver.coreFile().exists()) {
-          await logPathResolver.coreFile().writeAsString("");
-        } else {
-          await logPathResolver.coreFile().create(recursive: true);
-        }
-        if (await logPathResolver.appFile().exists()) {
-          await logPathResolver.appFile().writeAsString("");
-        } else {
-          await logPathResolver.appFile().create(recursive: true);
+        if (!kIsWeb) {
+          if (!await logPathResolver.directory.exists()) {
+            await logPathResolver.directory.create(recursive: true);
+          }
+          if (await logPathResolver.coreFile().exists()) {
+            await logPathResolver.coreFile().writeAsString("");
+          } else {
+            await logPathResolver.coreFile().create(recursive: true);
+          }
+          if (await logPathResolver.appFile().exists()) {
+            await logPathResolver.appFile().writeAsString("");
+          } else {
+            await logPathResolver.appFile().create(recursive: true);
+          }
         }
         return right(unit);
       },
@@ -49,10 +50,7 @@ class LogRepositoryImpl
 
   @override
   Stream<Either<LogFailure, List<LogEntity>>> watchLogs() {
-    return singbox
-        .watchLogs(logPathResolver.coreFile().path)
-        .map((event) => event.map(LogParser.parseSingbox).toList())
-        .handleExceptions(
+    return singbox.watchLogs(logPathResolver.coreFile().path).map((event) => event.map(LogParser.parseLogProto).toList()).handleExceptions(
       (error, stackTrace) {
         loggy.warning("error watching logs", error, stackTrace);
         return LogFailure.unexpected(error, stackTrace);

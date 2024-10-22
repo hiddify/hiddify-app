@@ -6,7 +6,7 @@ import com.hiddify.hiddify.utils.CommandClient
 import com.hiddify.hiddify.utils.ParsedOutboundGroup
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
-import io.nekohasekai.libbox.OutboundGroup
+import com.hiddify.core.libbox.OutboundGroup
 import kotlinx.coroutines.CoroutineScope
 
 class GroupsChannel(private val scope: CoroutineScope) : FlutterPlugin, CommandClient.Handler {

@@ -16,6 +16,6 @@
         "editor.wordBasedSuggestions": "off"
 	},
 
-	"html.format.wrapLineLength": 250,
+    "html.format.wrapLineLength": 250
 	
 }

@@ -5,6 +5,7 @@ import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 part 'directories_provider.g.dart';
 
@@ -15,8 +16,10 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
   @override
   Future<Directories> build() async {
     final Directories dirs;
+    if (kIsWeb) {
+      return (baseDir: Directory("."), workingDir: Directory("."), tempDir: Directory("."));
+    }
     if (Platform.isIOS) {
-      
       final paths = await _methodChannel.invokeMethod<Map>("get_paths");
       loggy.debug("paths: $paths");
       dirs = (
@@ -26,8 +29,7 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
       );
     } else {
       final baseDir = await getApplicationSupportDirectory();
-      final workingDir =
-          Platform.isAndroid ? await getExternalStorageDirectory() : baseDir;
+      final workingDir = Platform.isAndroid ? await getExternalStorageDirectory() : baseDir;
       final tempDir = await getTemporaryDirectory();
       dirs = (
         baseDir: baseDir,
@@ -47,6 +49,9 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
   }
 
   static Future<Directory> getDatabaseDirectory() async {
+    if (kIsWeb) {
+      return Directory(".");
+    }
     if (Platform.isIOS || Platform.isMacOS) {
       return getLibraryDirectory();
     } else if (Platform.isWindows || Platform.isLinux) {

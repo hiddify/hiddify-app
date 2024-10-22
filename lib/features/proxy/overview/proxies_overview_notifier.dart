@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dartx/dartx.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -10,6 +11,7 @@ import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -55,7 +57,7 @@ class ProxiesSortNotifier extends _$ProxiesSortNotifier with AppLogger {
 @riverpod
 class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   @override
-  Stream<List<ProxyGroupEntity>> build() async* {
+  Stream<List<OutboundGroup>> build() async* {
     ref.disposeDelay(const Duration(seconds: 15));
     final serviceRunning = await ref.watch(serviceRunningProvider.future);
     if (!serviceRunning) {
@@ -81,24 +83,24 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
         .asyncMap((proxies) async => _sortOutbounds(proxies, sortBy));
   }
 
-  Future<List<ProxyGroupEntity>> _sortOutbounds(
-    List<ProxyGroupEntity> proxies,
+  Future<List<OutboundGroup>> _sortOutbounds(
+    List<OutboundGroup> proxies,
     ProxiesSort sortBy,
   ) async {
     final groupWithSelected = {
       for (final o in proxies) o.tag: o.selected,
     };
-    final sortedProxies = <ProxyGroupEntity>[];
+    final sortedProxies = <OutboundGroup>[];
     for (final group in proxies) {
       final sortedItems = switch (sortBy) {
         ProxiesSort.name => group.items.sortedWith((a, b) {
-            if (a.type.isGroup && !b.type.isGroup) return -1;
-            if (!a.type.isGroup && b.type.isGroup) return 1;
+            if (a.isGroup && !b.isGroup) return -1;
+            if (!a.isGroup && b.isGroup) return 1;
             return a.tag.compareTo(b.tag);
           }),
         ProxiesSort.delay => group.items.sortedWith((a, b) {
-            if (a.type.isGroup && !b.type.isGroup) return -1;
-            if (!a.type.isGroup && b.type.isGroup) return 1;
+            if (a.isGroup && !b.isGroup) return -1;
+            if (!a.isGroup && b.isGroup) return 1;
 
             final ai = a.urlTestDelay;
             final bi = b.urlTestDelay;
@@ -109,15 +111,17 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
           }),
         ProxiesSort.unsorted => group.items,
       };
-      final items = <ProxyItemEntity>[];
+      final items = <OutboundInfo>[];
       for (final item in sortedItems) {
-        if (groupWithSelected.keys.contains(item.tag)) {
-          items.add(item.copyWith(selectedTag: groupWithSelected[item.tag]));
-        } else {
-          items.add(item);
-        }
+        // if (groupWithSelected.keys.contains(item.tag)) {
+        //   items.add(item.copyWith(selectedTag: groupWithSelected[item.tag]));
+        // } else {
+        items.add(item);
+        // }
       }
-      sortedProxies.add(group.copyWith(items: items));
+      group.items.clear();
+      group.items.addAll(items);
+      sortedProxies.add(group);
     }
     return sortedProxies;
   }
@@ -132,12 +136,16 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
         loggy.warning("error selecting outbound", err);
         throw err;
       }).run();
+      final outboundg = outbounds.where((e) => e.tag == groupTag).firstOrNull;
+      if (outboundg != null) {
+        final newselected = outboundg.items.where((e) => e.tag == outboundTag).firstOrNull;
+        if (newselected != null) {
+          newselected.isSelected = true;
+          outboundg.selected = newselected;
+        }
+      }
       state = AsyncData(
-        [
-          ...outbounds.map(
-            (e) => e.tag == groupTag ? e.copyWith(selected: outboundTag) : e,
-          ),
-        ],
+        [...outbounds],
       ).copyWithPrevious(state);
     }
   }

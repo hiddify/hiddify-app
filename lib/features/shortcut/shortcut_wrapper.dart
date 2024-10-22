@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/core/router/router.dart';
@@ -17,20 +18,19 @@ class ShortcutWrapper extends HookConsumerWidget {
       shortcuts: {
         // Android TV D-pad select support
         LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
+        if (!kIsWeb) ...{
+          if (Platform.isLinux) ...{
+            // quit app using Control+Q on Linux
+            const SingleActivator(LogicalKeyboardKey.keyQ, control: true): QuitAppIntent(),
+          },
+          if (Platform.isMacOS) ...{
+            // close window using Command+W on macOS
+            const SingleActivator(LogicalKeyboardKey.keyW, meta: true): CloseWindowIntent(),
 
-        if (Platform.isLinux) ...{
-          // quit app using Control+Q on Linux
-          const SingleActivator(LogicalKeyboardKey.keyQ, control: true): QuitAppIntent(),
+            // open settings using Command+, on macOS
+            const SingleActivator(LogicalKeyboardKey.comma, meta: true): OpenSettingsIntent(),
+          },
         },
-
-        if (Platform.isMacOS) ...{
-          // close window using Command+W on macOS
-          const SingleActivator(LogicalKeyboardKey.keyW, meta: true): CloseWindowIntent(),
-
-          // open settings using Command+, on macOS
-          const SingleActivator(LogicalKeyboardKey.comma, meta: true): OpenSettingsIntent(),
-        },
-
         // try adding profile using Command+V and Control+V
         const SingleActivator(LogicalKeyboardKey.keyV, meta: true): PasteIntent(),
         const SingleActivator(LogicalKeyboardKey.keyV, control: true): PasteIntent(),
