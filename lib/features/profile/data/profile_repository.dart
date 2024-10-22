@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/database/app_database.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
@@ -86,9 +87,12 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   TaskEither<ProfileFailure, Unit> init() {
     return exceptionHandler(
       () async {
-        if (!await profilePathResolver.directory.exists()) {
-          await profilePathResolver.directory.create(recursive: true);
+        if (!kIsWeb) {
+          if (!await profilePathResolver.directory.exists()) {
+            await profilePathResolver.directory.create(recursive: true);
+          }
         }
+
         return right(unit);
       },
       ProfileUnexpectedFailure.new,

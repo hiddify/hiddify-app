@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/connection/data/connection_platform_source.dart';
+
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 
@@ -37,14 +37,13 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   ConnectionRepositoryImpl({
     required this.directories,
     required this.singbox,
-    required this.platformSource,
     required this.configOptionRepository,
     required this.profilePathResolver,
   });
 
   final Directories directories;
   final SingboxService singbox;
-  final ConnectionPlatformSource platformSource;
+
   final ConfigOptionRepository configOptionRepository;
   final ProfilePathResolver profilePathResolver;
 
@@ -156,13 +155,13 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
 
         await $(
           TaskEither(() async {
-            if (options.enableTun) {
-              final hasPrivilege = await platformSource.checkPrivilege();
-              if (!hasPrivilege) {
-                loggy.warning("missing privileges for tun mode");
-                return left(const MissingPrivilege());
-              }
-            }
+            // if (options.enableTun) {
+            //   final hasPrivilege = await platformSource.checkPrivilege();
+            //   if (!hasPrivilege) {
+            //     loggy.warning("missing privileges for tun mode");
+            //     return left(const MissingPrivilege());
+            //   }
+            // }
             return right(unit);
           }),
         );
@@ -189,13 +188,13 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
 
         await $(
           TaskEither(() async {
-            if (options.enableTun) {
-              final hasPrivilege = await platformSource.checkPrivilege();
-              if (!hasPrivilege) {
-                loggy.warning("missing privileges for tun mode");
-                return left(const MissingPrivilege());
-              }
-            }
+            // if (options.enableTun) {
+            //   final hasPrivilege = await platformSource.checkPrivilege();
+            //   if (!hasPrivilege) {
+            //     loggy.warning("missing privileges for tun mode");
+            //     return left(const MissingPrivilege());
+            //   }
+            // }
             return right(unit);
           }),
         );

@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 // ignore: depend_on_referenced_packages
-import 'package:drift_dev/api/migrations.dart';
+// import 'package:drift_dev/api/migrations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/database/connection/database_connection.dart';
 import 'package:hiddify/core/database/converters/duration_converter.dart';
@@ -59,7 +59,7 @@ class AppDatabase extends _$AppDatabase with InfraLogger {
       ),
       beforeOpen: (details) async {
         if (kDebugMode) {
-          await validateDatabaseSchema();
+          // await validateDatabaseSchema();
         }
       },
     );

@@ -1,14 +1,17 @@
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:hiddify/core/directories/directories_provider.dart';
-import 'package:path/path.dart' as p;
+import 'package:drift_flutter/drift_flutter.dart';
 
 LazyDatabase openConnection() {
   return LazyDatabase(() async {
-    final dbDir = await AppDirectories.getDatabaseDirectory();
-    final file = File(p.join(dbDir.path, 'db.sqlite'));
-    return NativeDatabase(file);
+    // final dbDir = await AppDirectories.getDatabaseDirectory();
+    // final file = File(p.join(dbDir.path, 'db.sqlite'));
+    return driftDatabase(
+        name: "db",
+        web: DriftWebOptions(
+          sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+          driftWorker: Uri.parse('drift_worker.js'),
+        ));
   });
 }
