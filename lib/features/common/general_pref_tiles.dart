@@ -154,19 +154,19 @@ class ThemeModePrefTile extends ConsumerWidget {
     final themeMode = ref.watch(themePreferencesProvider);
 
     return ListTile(
-      title: Text(t.settings.general.themeMode),
-      subtitle: Text(themeMode.present(t)),
+      title: PlatformText(t.settings.general.themeMode),
+      subtitle: PlatformText(themeMode.present(t)),
       leading: const Icon(FluentIcons.weather_moon_20_regular),
       onTap: () async {
-        final selectedThemeMode = await showDialog<AppThemeMode>(
+        final selectedThemeMode = await showPlatformDialog<AppThemeMode>(
           context: context,
           builder: (context) {
             return SimpleDialog(
-              title: Text(t.settings.general.themeMode),
+              title: PlatformText(t.settings.general.themeMode),
               children: AppThemeMode.values
                   .map(
                     (e) => RadioListTile(
-                      title: Text(e.present(t)),
+                      title: PlatformText(e.present(t)),
                       value: e,
                       groupValue: themeMode,
                       onChanged: Navigator.of(context).maybePop,
