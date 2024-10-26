@@ -137,14 +137,14 @@
     "emptyProxiesMsg": "无可用的代理",
     "delayTestTooltip": "测试延迟",
     "sortTooltip": "对代理进行排序",
-    "checkIp": "检测 IP 地址",
+    "checkIp": "检测 IP 位置",
     "unknownIp": "未知的 IP",
     "sortOptions": {
-      "unsorted": "默认",
-      "name": "按字母顺序",
-      "delay": "按延迟顺序"
+      "unsorted": "默认顺序",
+      "name": "按首字母排序",
+      "delay": "按延迟排序"
     },
-    "activeProxySemanticLabel": "激活的代理",
+    "activeProxySemanticLabel": "激活中的代理",
     "delaySemantics": {
       "result": "延迟: ${delay}ms",
       "timeout": "延迟测试超时",
@@ -163,7 +163,7 @@
     "shareAppLogs": "分享应用日志",
     "pauseTooltip": "暂停",
     "resumeTooltip": "恢复",
-    "clearTooltip": "清除"
+    "clearTooltip": "清空"
   },
   "settings": {
     "pageTitle": "设置",
@@ -173,26 +173,26 @@
     "exportOptions": "将匿名选项导出到剪贴板",
     "exportAllOptions": "将所有选项导出到剪贴板（用于调试）",
     "importOptions": "从剪贴板导入选项",
-    "importOptionsMsg": "这将使用提供的值重写所有配置选项。您确定吗？",
+    "importOptionsMsg": "这将使用提供的值覆盖所有配置选项。您确定吗？",
     "general": {
-      "sectionTitle": "一般选项",
+      "sectionTitle": "通用",
       "locale": "语言",
       "region": "地区",
       "regionMsg": "帮助设置默认选项以绕过国内地址",
       "regions": {
-        "ir": "伊朗 (ir)",
-        "cn": "中国 (cn)",
-        "ru": "俄罗斯 (ru)",
-        "af": "阿富汗 (af)",
-        "id": "印度尼西亚 (id)",
-        "tr": "火鸡（tr）🇹🇷",
+        "ir": "伊朗 (ir) 🇮🇷",
+        "cn": "中国 (cn) 🇨🇳",
+        "ru": "俄罗斯 (ru) 🇷🇺",
+        "af": "阿富汗 (af) 🇦🇫",
+        "id": "印度尼西亚 (id) 🇮🇩",
+        "tr": "土耳其（tr）🇹🇷",
         "br": "巴西 (br) 🇧🇷",
         "other": "其它"
       },
       "themeMode": "主题模式",
       "themeModes": {
-        "system": "遵循系统主题",
-        "dark": "暗色",
+        "system": "跟随系统主题",
+        "dark": "深色",
         "light": "浅色",
         "black": "黑色"
       },
@@ -205,14 +205,20 @@
       "ignoreBatteryOptimizationsMsg": "消除限制以获得最佳 VPN 性能",
       "dynamicNotification": "在通知中显示网络速度",
       "hapticFeedback": "触觉反馈",
-      "autoIpCheck": "自动检查连接的 IP"
+      "autoIpCheck": "自动检查连接的 IP",
+      "actionAtClosing": "关闭时动作",
+      "actionsAtClosing": {
+        "askEachTime": "每次都询问",
+        "hide": "隐藏",
+        "exit": "退出"
+      }
     },
     "advanced": {
       "sectionTitle": "高级选项",
       "debugMode": "调试模式",
       "debugModeMsg": "重新启动应用程序以应用此更改",
       "memoryLimit": "内存限制",
-      "memoryLimitMsg": "如果您遇到内存不足错误或频繁应用程序崩溃，请启用",
+      "memoryLimitMsg": "如果您遇到内存不足或频繁应用程序崩溃的问题，请启用",
       "resetTunnel": "重置 VPN 配置文件"
     },
     "network": {
@@ -312,7 +318,7 @@
     },
     "geoAssets": {
       "unexpected": "意外错误",
-      "notUpdate": "无可用更新",
+      "notUpdate": "暂无可用更新",
       "activeNotFound": "未找到激活的 GEO 资源文件"
     }
   },
@@ -322,14 +328,14 @@
     "full_description": "Hiddify 的主要目标是提供安全、用户友好且高效的隧道客户端。它使您能够利用 VPN 服务权限将所有流量或选定的应用程序流量路由到您选择的远程服务器。\n\n注：我们不提供任何服务器；用户需要使用自己托管的服务器或可信的服务器来确保您在线活动的私密性。\n \n我们支持以下类型的服务器：\n- 普通 V2ray/Xray 订阅链接\n- Clash 订阅链接\n- Sing-Box 订阅链接\n\n我们的特色是什么？\n\n- 用户友好\n- 优化和高速\n- 自动选择最低延迟\n- 显示用户使用信息\n- 通过一键链接轻松导入\n- 免费且无广告\n- 轻松切换线路\n- 等等\n\n支持：\n- Sing-Box 支持的所有协议\n- VLESS + XTLS Reality、Vision 协议\n- VMESS\n- Trojan\n- ShadowSocks\n- Reality\n- WireGuard\n- V2ray\n- Hystria2\n- TUIC\n- SSH\n- ShadowTLS\n\n\n源代码位于 https://github.com/hiddify/Hiddify-Next\n应用程序核心基于开源的 Sing-Box。\n\n权限说明：\n\n- VPN 服务：由于此应用程序的目标是提供安全、用户友好和高效的隧道客户端，我们需要此权限以能够通过隧道将流量路由到远程服务器。\n获取应用程序列表：此权限用于允许用户包括或排除特定应用程序以进行隧道传输。\n- 接收开机广播：可以从应用程序设置中启用或禁用此权限，以便在设备启动时激活此应用程序。\n- 发送通知：此权限是必需的，因为我们使用前台服务来确保 VPN 服务的持续运行。\n- 本应用程序没有广告。分析和崩溃数据仅在首次使用应用程序时经用户明确同意的情况下发生。"
   },
   "connection": {
-    "tapToConnect": "点击连接",
+    "tapToConnect": "开始连接",
     "connecting": "正在连接",
     "disconnecting": "正在断开连接",
     "connected": "已连接",
     "reconnect": "重新连接",
     "connectAnyWay": "连接",
     "experimentalNotice": "使用中的实验功能",
-    "experimentalNoticeMsg": "您启用了一些实验性功能，这些功能可能会影响连接质量并导致意外错误。您可以随时从“配置”页面更改或重置这些选项。",
+    "experimentalNoticeMsg": "您启用了一些实验性功能，这些功能可能会影响连接质量并导致一些意外错误。您可以随时从“配置选项”页面更改或重新设置这些选项。",
     "disableExperimentalNotice": "不再显示",
     "reconnectMsg": "重新连接以使更改生效"
   },
@@ -431,6 +437,7 @@
   "window": {
     "hide": "隐藏",
     "close": "关闭",
-    "alertMessage": "隐藏或退出应用程序？"
+    "alertMessage": "隐藏或退出应用程序？",
+    "remember": "记住我的选择"
   }
 }

@@ -2,6 +2,22 @@
 
 
 ## 2.7.0 (2024-09-29)
+## 2.5.7 (2024-10-03)
+
+#### Other
+
+* Merge pull request #1382 from TheLastFlame/main. 
+  _Remembering window closing action_
+
+* Feat: add action options for closing the application. 
+
+* Chore: update .gitignore to exclude /data directory. 
+
+* Refactor: replace HookConsumerWidget with ConsumerWidget and add ThemeModePrefTile. 
+
+
+
+## v2.5.6 (2024-10-02)
 
 #### Fix
 

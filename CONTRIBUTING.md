@@ -1,6 +1,6 @@
 # Contributing
 
-Every contribution to Hiddify is welcome, whether it is reporting a bug, submitting a fix, proposing new features, or just asking a question. To make contributing to Hiddify as easy as possible, you will find more details for the development flow in this documentation.
+Every contribution to HiddifyApp is welcome, whether it is reporting a bug, submitting a fix, proposing new features, or just asking a question. To make contributing to HiddifyApp as easy as possible, you will find more details for the development flow in this documentation. [Basic tutorial on how to contribute to HiddifyApp](https://hiddify.com/app/How-to-contribute-to-this-project/)
 
 Please note, we have a [Code of Conduct](https://github.com/hiddify/hiddify-next/blob/main/CODE_OF_CONDUCT.md), please follow it in all your interactions with the project.
 

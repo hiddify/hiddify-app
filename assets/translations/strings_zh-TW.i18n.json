@@ -422,5 +422,8 @@
     "warpNoiseSize": "噪音大小",
     "warpNoiseMode": "噪音模式",
     "warpNoiseDelay": "噪音延遲"
+  },
+  "window": {
+    "remember": "記住我的選擇"
   }
 }

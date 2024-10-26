@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/model/environment.dart';
+import 'package:hiddify/core/preferences/actions_at_closing.dart';
 // import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
@@ -60,6 +61,13 @@ abstract class Preferences {
   static final storeReviewedByUser = PreferencesNotifier.create<bool, bool>(
     "store_reviewed_by_user",
     false,
+  );
+
+  static final actionAtClose = PreferencesNotifier.create<ActionsAtClosing, String>(
+    "action_at_close",
+    ActionsAtClosing.ask,
+    mapFrom: ActionsAtClosing.values.byName,
+    mapTo: (value) => value.name,
   );
 }
 

@@ -205,7 +205,13 @@
       "ignoreBatteryOptimizationsMsg": "Отключение ограничений для оптимальной производительности VPN",
       "dynamicNotification": "Отображение скорости в уведомлении",
       "hapticFeedback": "Тактильная обратная связь",
-      "autoIpCheck": "Автоматически проверять IP-адрес соединения"
+      "autoIpCheck": "Автоматически проверять IP-адрес соединения",
+      "actionAtClosing": "Действие при закрытии",
+      "actionsAtClosing": {
+        "askEachTime": "Каждый раз спрашивать",
+        "hide": "Скрыть",
+        "exit": "Выйти"
+      }
     },
     "advanced": {
       "sectionTitle": "Расширенные",
@@ -431,6 +437,7 @@
   "window": {
     "hide": "Скрыть",
     "close": "Закрыть",
-    "alertMessage": "Скрыть или выйти из приложения?"
+    "alertMessage": "Скрыть приложение или выйти?",
+    "remember": "Запомнить выбор"
   }
 }
