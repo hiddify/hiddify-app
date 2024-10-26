@@ -24,8 +24,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final stats =
-        ref.watch(statsNotifierProvider).asData?.value ?? StatsEntity.empty();
+    final stats = ref.watch(statsNotifierProvider).asData?.value ?? StatsEntity.empty();
     final showAll = ref.watch(showAllSidebarStatsProvider);
 
     return Padding(
@@ -43,9 +42,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                   textStyle: Theme.of(context).textTheme.labelSmall,
                 ),
                 onPressed: () {
-                  ref
-                      .read(showAllSidebarStatsProvider.notifier)
-                      .update(!showAll);
+                  ref.read(showAllSidebarStatsProvider.notifier).update(!showAll);
                 },
                 icon: AnimatedRotation(
                   turns: showAll ? 1 : 0.5,
@@ -61,11 +58,10 @@ class SideBarStatsOverview extends HookConsumerWidget {
               ),
             ),
           ),
-          const ConnectionStatsCard(),
+          // const ConnectionStatsCard(),
           const Gap(8),
           AnimatedCrossFade(
-            crossFadeState:
-                showAll ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: showAll ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             duration: kAnimationDuration,
             firstChild: StatsCard(
               title: t.stats.traffic,

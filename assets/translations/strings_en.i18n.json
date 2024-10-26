@@ -33,7 +33,13 @@
   },
   "home": {
     "pageTitle": "Home",
-    "emptyProfilesMsg": "Begin by Adding a Subscription Profile",
+    "emptyProfilesMsg": {
+      "text": "Let's get started by adding a Connection Profile that includes your VPN connection details.\n\nDon’t have a VPN server yet? No worries—just follow the tutorial below to set one up quickly and for free.",
+      "buttonHelp": {
+        "label": "Show Me How",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
     "noActiveProfileMsg": "Choose a Profile",
     "ok": "Ok"
   },
@@ -68,7 +74,8 @@
       "remaingTime":"Remaining Time",
       "remaingUsage":"Remaining",
       "remainingDurationNew": "${duration} Days",
-      "profileSite":"Provider"
+      "profileSite":"Provider",
+      "profileSupport":"Support"
 
 
 
@@ -79,8 +86,8 @@
       "name": "Alphabetically"
     },
     "add": {
-      "buttonText": "New Profile",
-      "shortBtnTxt": "New Profile",
+      "buttonText": "New Connection Profile",
+      "shortBtnTxt": "New Connection Profile",
       "fromClipboard": "Add From Clipboard",
       "scanQr": "Scan QR Code",
       "qrScanner": {
@@ -99,7 +106,7 @@
     "update": {
       "buttonTxt": "Update",
       "tooltip": "Update Profile",
-      "updateSubscriptions": "Update Subscriptions",
+      "updateSubscriptions": "Update Connection Profiles",
       "failureMsg": "Failed to Update Profile",
       "successMsg": "Profile Updated Successfully",
       "namedFailureMsg": "Failed to Update \"${name}\"",
@@ -108,10 +115,10 @@
     "share": {
       "buttonText": "Share",
       "exportToClipboardSuccess": "Exported to Clipboard",
-      "exportSubLinkToClipboard": "Export Subscription Link to Clipboard",
-      "subLinkQrCode": "Subscription Link QR Code",
-      "exportConfigToClipboard": "Export Configuration to Clipboard",
-      "exportConfigToClipboardSuccess": "Configuration Copied to Clipboard"
+      "exportSubLinkToClipboard": "Export Connection Profile Link to Clipboard",
+      "subLinkQrCode": "Connection Profile Link QR Code",
+      "exportConfigToClipboard": "Export Connection Profile to Clipboard",
+      "exportConfigToClipboardSuccess": "Connection Profile Copied to Clipboard"
     },
     "edit": {
       "buttonTxt": "Edit",
@@ -327,7 +334,7 @@
   "play": {
     "title": "Hiddify (Preview)",
     "short_description": "Auto, SSH, VLESS, VMess, Trojan, Reality, Sing-Box, Clash, XRay, Shadowsocks",
-    "full_description": "The key goal of Hiddify is to provide a secure, user-friendly and efficient tunneling client. It enables you to route all traffic or selected app traffic to a remote server of your choose, utilizing VPN-Service permission.\n\nNote: We do not provide any server; users are required to ensure their online activities stay private by using use their own self-hosted server or trusted servers. \n \nWe Support Servers With:\n- Normal V2Ray/XRay Subscription Link\n- Clash Subscription Link\n- Sing-Box Subscription Link\n\nWhat is our unique features?\n - User Friendly\n - Optimized and Fast\n - Automatically select LowestPing \n - Show user usage information\n - Easily import sublink by one click using deeplinking \n - Free and No ADS\n - Easily switch user sublinks\n - More and more\n\nSupport:\n- All Protocols Supported by Sing-Box \n- VLESS + XTLS Reality, Vision\n- VMess\n- Trojan\n- ShadowSocks\n- Reality\n- WireGuard\n- V2Ray\n- Hysteria2\n- TUICv5\n- SSH\n- ShadowTLS\n\n\nThe source code exist in https://github.com/hiddify/Hiddify-Next\nThe application core is based on open-source Sing-Box.\n\nPermission Description:\n- VPN Service: As the goal of this application is to provide a secure, user-friendly and efficient tunneling client, we need this permission to be able to route the traffic via tunnel to the remote server. \n- QUERY ALL PACKAGES: This permission is used to allow users to include or exclude specific applications for tunneling.\n- RECEIVE BOOT COMPLETED: This permission can be enabled or disabled from app settings to activate this application upon device boot.\n- POST NOTIFICATIONS: This permission is essential as we employ a foreground service to ensure the continuous operation of the VPN service.\n- This application is free from advertisements. The analytics and crash data only occurs with the explicit consent of the user in the first use of application."
+    "full_description": "The key goal of Hiddify is to provide a secure, user-friendly and efficient tunneling client. It enables you to route all traffic or selected app traffic to a remote server of your choose, utilizing VPN-Service permission.\n\nNote: We do not provide any server; users are required to ensure their online activities stay private by using use their own self-hosted server or trusted servers. \n \nWe Support Servers With:\n- Normal V2Ray/XRay Connection Link\n- Clash Connection Link\n- Sing-Box Connection Profile\n\nWhat is our unique features?\n - User Friendly\n - Optimized and Fast\n - Automatically select LowestPing \n - Show user usage information\n - Easily import sublink by one click using deeplinking \n - Free and No ADS\n - Easily switch user sublinks\n - More and more\n\nSupport:\n- All Protocols Supported by Sing-Box \n- VLESS + XTLS Reality, Vision\n- VMess\n- Trojan\n- ShadowSocks\n- Reality\n- WireGuard\n- V2Ray\n- Hysteria2\n- TUICv5\n- SSH\n- ShadowTLS\n\n\nThe source code exist in https://github.com/hiddify/Hiddify-Next\nThe application core is based on open-source Sing-Box.\n\nPermission Description:\n- VPN Service: As the goal of this application is to provide a secure, user-friendly and efficient tunneling client, we need this permission to be able to route the traffic via tunnel to the remote server. \n- QUERY ALL PACKAGES: This permission is used to allow users to include or exclude specific applications for tunneling.\n- RECEIVE BOOT COMPLETED: This permission can be enabled or disabled from app settings to activate this application upon device boot.\n- POST NOTIFICATIONS: This permission is essential as we employ a foreground service to ensure the continuous operation of the VPN service.\n- This application is free from advertisements. The analytics and crash data only occurs with the explicit consent of the user in the first use of application."
   },
   "connection": {
     "tapToConnect": "Tap To Connect",
@@ -440,5 +447,9 @@
     "hide": "Hide",
     "close": "Exit",
     "alertMessage": "Hide or Exit the application?"
+  },
+  "help":{
+    "title": "Help"
   }
+
 }

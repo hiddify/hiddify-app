@@ -43,11 +43,11 @@ class App extends HookConsumerWidget with PresLogger {
         ShortcutWrapper(
           ConnectionWrapper(
             PlatformProvider(
-                // initialPlatform: TargetPlatform.android,
-                settings: PlatformSettingsData(
-                  iosUsesMaterialWidgets: true,
-                  // iosUseZeroPaddingForAppbarPlatformIcon: true,
-                ),
+                initialPlatform: TargetPlatform.android,
+                // settings: PlatformSettingsData(
+                //   iosUsesMaterialWidgets: true,
+                //   // iosUseZeroPaddingForAppbarPlatformIcon: true,
+                // ),
                 builder: (context) => DynamicColorBuilder(
                       builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
                         return PlatformApp.router(

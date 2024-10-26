@@ -30,7 +30,13 @@
   },
   "home": {
     "pageTitle": "Ana Sayfa",
-    "emptyProfilesMsg": "Aboneliği profili ekleyerek başlayın",
+    "emptyProfilesMsg": {
+      "text": "Bir Abonelik Profili ekleyerek başlayalım! Bu, VPN sunucunuzdan bağlantı bilgilerini almanızı sağlayacak.\n\nEğer henüz kendi VPN'inizi kurmadıysanız, endişelenmeyin—hızlı bir şekilde oluşturmak için aşağıdaki eğitimi takip edin.",
+      "buttonHelp": {
+        "label": "Bana nasıl yapılacağını göster",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
     "noActiveProfileMsg": "Profil seçin"
   },
   "stats": {

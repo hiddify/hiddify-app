@@ -30,7 +30,13 @@
   },
   "home": {
     "pageTitle": "Maison",
-    "emptyProfilesMsg": "Commencez par ajouter un profil d'abonnement",
+    "emptyProfilesMsg": {
+      "text": "Commençons par ajouter un Profil d’Abonnement ! Cela récupérera les informations de connexion depuis votre serveur VPN.\n\nSi vous n’avez pas encore votre propre VPN, ne vous inquiétez pas—suivez simplement le tutoriel ci-dessous pour en créer un rapidement.",
+      "buttonHelp": {
+        "label": "Montrez-moi comment",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
     "noActiveProfileMsg": "Choisissez un profil"
   },
   "stats": {

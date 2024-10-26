@@ -21,16 +21,24 @@
     "clipboardExportSuccessMsg": "به کلیپ‌بورد افزوده شد",
     "showMore": "نمایش بیشتر",
     "showLess": "نمایش کمتر",
-    "openAppSettings": "باز کردن تنظیمات برنامه",
+    "openAppSettings": "باز کردن تنظیمات برنامه", 
     "grantPermission": "اجازه دادن"
   },
   "intro": {
     "termsAndPolicyCaution(rich)": "در صورت ادامه با ${tap(@:about.termsAndConditions)} موافقت می‌کنید",
-    "start": "آغاز"
+    "start": "آغاز",
+    "banner": "تمام آنچه برای اینترنت آزاد نیاز دارید",
+    "info(rich)": "ساخته شده با ❤️ توسط هیدیفای - ${tap_source(منبع باز)} (${tap_license(مجوز)})"
   },
   "home": {
     "pageTitle": "خانه",
-    "emptyProfilesMsg": "با افزودن یک پروفایل اشتراک شروع کنید",
+    "emptyProfilesMsg": {
+      "text": "بیایید با اضافه کردن یک پروفایل اشتراک‌گذاری شروع کنیم! این کار اطلاعات اتصال VPN شما را از سرور VPN‌تان دریافت می‌کند.\n\nاگر هنوز VPN خود را ندارید، نگران نباشید—فقط آموزش زیر را دنبال کنید تا به سرعت یک VPN بسازید.",
+      "buttonHelp": {
+        "label": "آموزش ساخت سرور شخصی",
+        "url": "https://hiddify.com/fa/manager/"
+      }
+    },
     "noActiveProfileMsg": "یک پروفایل انتخاب کنید"
   },
   "stats": {
@@ -365,7 +373,7 @@
     "generateWarpConfig": "ایجاد پیکربندی WARP",
     "missingWarpConfig": "پیکربندی WARP موجود نیست",
     "warpConfigGenerated": "پیکربندی WARP ایجاد شد",
-    "pageTitle": "تنظیمات پیکربندی",
+    "pageTitle": "تنظیمات",
     "logLevel": "سطح گزارش",
     "blockAds": "مسدود سازی تبلیغات",
     "resolveDestination": "جایگذاری مقصد",
@@ -420,5 +428,8 @@
     "warpNoiseSize": "اندازه نویز",
     "warpNoiseMode": "حالت نویز",
     "warpNoiseDelay": "تأخیر نویز"
+  },
+  "help":{
+    "title": "راهنما"
   }
 }

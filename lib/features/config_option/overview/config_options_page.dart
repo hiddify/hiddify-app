@@ -3,7 +3,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/core/model/region.dart';
@@ -22,7 +21,6 @@ import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/settings/widgets/advanced_setting_tiles.dart';
 import 'package:hiddify/features/settings/widgets/general_setting_tiles.dart';
 import 'package:hiddify/features/settings/widgets/platform_settings_tiles.dart';
-import 'package:hiddify/features/settings/widgets/sections_widgets.dart';
 import 'package:hiddify/features/settings/widgets/settings_input_dialog.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -71,7 +69,12 @@ class ConfigOptionsPage extends HookConsumerWidget {
         }
       },
     );
-    final theme = PlatformTheme.of(context);
+    TextStyle? textTheme() {
+      if (PlatformTheme.of(context)?.isDark == true) {
+        return PlatformTheme.of(context)?.cupertinoDarkTheme?.textTheme.textStyle ?? PlatformTheme.of(context)?.materialDarkTheme?.textTheme.labelMedium;
+      }
+      return PlatformTheme.of(context)?.cupertinoLightTheme?.textTheme.textStyle ?? PlatformTheme.of(context)?.materialLightTheme?.textTheme.labelMedium;
+    }
 
     Widget SwitchListTileAdaptive({
       Key? key,
@@ -84,11 +87,12 @@ class ConfigOptionsPage extends HookConsumerWidget {
         key: key,
         title: PlatformText(
           title ?? "",
-          // style: theme?.cupertinoDarkTheme?.textTheme.textStyle,
+          style: textTheme(),
         ),
         subtitle: subtitle != null
             ? PlatformText(
                 subtitle,
+                style: textTheme(),
               )
             : null,
         value: value,

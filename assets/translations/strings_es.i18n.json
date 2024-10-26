@@ -30,7 +30,13 @@
   },
   "home": {
     "pageTitle": "Hogar",
-    "emptyProfilesMsg": "Comience agregando un perfil de suscripción",
+    "emptyProfilesMsg": {
+      "text": "¡Comencemos añadiendo un Perfil de Suscripción! Esto obtendrá la información de conexión de tu servidor VPN.\n\nSi aún no tienes tu propio VPN, no te preocupes—solo sigue el tutorial a continuación para crear uno rápidamente.",
+      "buttonHelp": {
+        "label": "Muéstrame cómo",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
     "noActiveProfileMsg": "Elige un perfil"
   },
   "stats": {

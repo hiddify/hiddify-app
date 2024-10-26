@@ -30,7 +30,13 @@
   },
   "home": {
     "pageTitle": "主页",
-    "emptyProfilesMsg": "从添加订阅配置文件开始",
+   "emptyProfilesMsg": {
+      "text": "让我们开始添加一个订阅配置文件！这将从您的 VPN 服务器获取连接信息。\n\n如果您还没有自己的 VPN，不用担心—只需按照下面的教程快速创建一个。",
+      "buttonHelp": {
+        "label": "教我如何做",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
     "noActiveProfileMsg": "选择配置文件"
   },
   "stats": {

@@ -20,7 +20,7 @@ import 'package:timezone_to_country/timezone_to_country.dart';
 class IntroPage extends HookConsumerWidget with PresLogger {
   IntroPage({super.key});
 
-  bool locationInfoLoaded = false;
+  static bool locationInfoLoaded = false;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
