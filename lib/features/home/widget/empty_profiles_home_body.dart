@@ -18,7 +18,7 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(t.home.emptyProfilesMsg),
+          Text(t.home.emptyProfilesMsg.text),
           const Gap(16),
           PlatformElevatedButton(
             onPressed: () => const AddProfileRoute().push(context),

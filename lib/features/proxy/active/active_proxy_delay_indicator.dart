@@ -1,16 +1,11 @@
-import 'dart:io';
-
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/animated_visibility.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
-import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tray_manager/tray_manager.dart';
 
 class ActiveProxyDelayIndicator extends HookConsumerWidget {
   const ActiveProxyDelayIndicator({super.key});

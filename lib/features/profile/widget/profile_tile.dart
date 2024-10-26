@@ -50,60 +50,7 @@ class ProfileTile extends HookConsumerWidget {
       RemoteProfileEntity(:final subInfo) => subInfo,
       _ => null,
     };
-    if (isMain) {
-      return Column(children: [
-        SizedBox(height: 20),
-        // ProfileActionButton(profile, !isMain),
 
-        Semantics(
-          button: true,
-          enabled: !ref.watch(updateProfileProvider(profile.id)).isLoading,
-          child: Tooltip(
-            message: t.profile.update.tooltip,
-            child: InkWell(
-              onTap: () {
-                if (ref.read(updateProfileProvider(profile.id)).isLoading) {
-                  return;
-                }
-                ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
-              },
-              child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
-                const Icon(FluentIcons.arrow_sync_24_filled),
-                const Gap(8),
-                Text(
-                  profile.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontFamily: FontFamily.emoji,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  semanticsLabel: t.profile.activeProfileNameSemanticLabel(
-                    name: profile.name,
-                  ),
-                ),
-              ]),
-            ),
-          ),
-        ),
-        SizedBox(height: 20),
-        if (subInfo != null)
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
-            if (subInfo.webPageUrl == null) ...[
-              Expanded(child: NewTrafficSubscriptionInfo(subInfo)),
-              // const Gap(4),
-              // RemainingTrafficIndicator(subInfo.ratio),
-              // const Gap(4),
-
-              // const Gap(4),
-              Expanded(child: NewDaySubscriptionInfo(subInfo)),
-            ] else ...[
-              Expanded(child: NewDayTrafficSubscriptionInfo(subInfo)),
-              Expanded(child: NewSiteSubscriptionInfo(subInfo)),
-            ]
-          ])
-      ]);
-    }
     final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
     final double effectiveElevation = profile.active ? 12 : 4;
     final effectiveOutlineColor = profile.active ? theme.colorScheme.outlineVariant : Colors.transparent;

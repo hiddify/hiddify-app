@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:dartx/dartx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -52,8 +54,10 @@ class SubscriptionInfo with _$SubscriptionInfo {
   bool get isExpired => expire <= DateTime.now();
 
   int get consumption => upload + download;
-
+  int get remainingBW => total - consumption;
+  double get remainingBWratio => (remainingBW / total).clamp(0, 1);
   double get ratio => (consumption / total).clamp(0, 1);
 
   Duration get remaining => expire.difference(DateTime.now());
+  double get remainingRatio => min(remaining.inDays, 30) / 30;
 }

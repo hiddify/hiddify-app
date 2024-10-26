@@ -30,7 +30,13 @@
   },
   "home": {
     "pageTitle": "Inicio",
-    "emptyProfilesMsg": "Comece adicionando um perfil de assinatura",
+    "emptyProfilesMsg": {
+      "text": "Vamos começar adicionando um Perfil de Assinatura! Isso irá obter as informações de conexão do seu servidor VPN.\n\nSe você ainda não tem seu próprio VPN, não se preocupe—basta seguir o tutorial abaixo para criar um rapidamente.",
+      "buttonHelp": {
+        "label": "Mostre-me como",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
     "noActiveProfileMsg": "Escolha um perfil"
   },
   "stats": {

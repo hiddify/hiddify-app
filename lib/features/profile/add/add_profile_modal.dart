@@ -150,42 +150,42 @@ class AddProfileModal extends HookConsumerWidget {
                     ),
                     child: Column(
                       children: [
-                        Semantics(
-                          button: true,
-                          child: SizedBox(
-                            height: 36,
-                            child: Material(
-                              key: const ValueKey("add_warp_button"),
-                              elevation: 8,
-                              color: theme.colorScheme.surface,
-                              surfaceTintColor: theme.colorScheme.surfaceTint,
-                              shadowColor: Colors.transparent,
-                              borderRadius: BorderRadius.circular(8),
-                              clipBehavior: Clip.antiAlias,
-                              child: InkWell(
-                                onTap: () async {
-                                  await addProfileModal(context, ref);
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      FluentIcons.add_24_regular,
-                                      color: theme.colorScheme.primary,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      t.profile.add.addWarp,
-                                      style: theme.textTheme.labelLarge?.copyWith(
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Semantics(
+                        //   button: true,
+                        //   child: SizedBox(
+                        //     height: 36,
+                        //     child: Material(
+                        //       key: const ValueKey("add_warp_button"),
+                        //       elevation: 8,
+                        //       color: theme.colorScheme.surface,
+                        //       surfaceTintColor: theme.colorScheme.surfaceTint,
+                        //       shadowColor: Colors.transparent,
+                        //       borderRadius: BorderRadius.circular(8),
+                        //       clipBehavior: Clip.antiAlias,
+                        //       child: InkWell(
+                        //         onTap: () async {
+                        //           await addProfileModal(context, ref);
+                        //         },
+                        //         child: Row(
+                        //           mainAxisAlignment: MainAxisAlignment.center,
+                        //           children: [
+                        //             Icon(
+                        //               FluentIcons.add_24_regular,
+                        //               color: theme.colorScheme.primary,
+                        //             ),
+                        //             // const SizedBox(width: 8),
+                        //             // Text(
+                        //             //   t.profile.add.addWarp,
+                        //             //   style: theme.textTheme.labelLarge?.copyWith(
+                        //             //     color: theme.colorScheme.primary,
+                        //             //   ),
+                        //             // ),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                         if (!PlatformUtils.isDesktop) const SizedBox(height: 16), // Spacing between the buttons
                         if (!PlatformUtils.isDesktop)
                           Semantics(
@@ -225,6 +225,66 @@ class AddProfileModal extends HookConsumerWidget {
                               ),
                             ),
                           ),
+
+                        const SizedBox(height: 16),
+                        Semantics(
+                          button: true,
+                          child: SizedBox(
+                            height: 36,
+                            child: Material(
+                              key: const ValueKey("help"),
+                              elevation: 8,
+                              color: theme.colorScheme.surface,
+                              surfaceTintColor: theme.colorScheme.surfaceTint,
+                              shadowColor: Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              clipBehavior: Clip.antiAlias,
+                              child: InkWell(
+                                onTap: () async {
+                                  await showDialog<bool>(
+                                    context: context,
+                                    builder: (context) => PlatformAlertDialog(
+                                      title: Text(t.home.noActiveProfileMsg),
+                                      content: Text(t.home.emptyProfilesMsg.text),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () async {
+                                            await UriUtils.tryLaunch(
+                                              Uri.parse(t.home.emptyProfilesMsg.buttonHelp.url),
+                                            );
+                                          },
+                                          child: Text(t.home.emptyProfilesMsg.buttonHelp.label),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop(false);
+                                          },
+                                          child: Text(t.home.ok),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.help_outline_sharp,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      t.help.title,
+                                      style: theme.textTheme.labelLarge?.copyWith(
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

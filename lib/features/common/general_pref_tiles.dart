@@ -6,12 +6,14 @@ import 'package:hiddify/core/localization/locale_extensions.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/region.dart';
+import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/theme/app_theme_mode.dart';
+import 'package:hiddify/core/theme/theme_preferences.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class LocalePrefTile extends HookConsumerWidget {
+class LocalePrefTile extends ConsumerWidget {
   const LocalePrefTile({super.key});
 
   @override
@@ -51,7 +53,7 @@ class LocalePrefTile extends HookConsumerWidget {
   }
 }
 
-class RegionPrefTile extends HookConsumerWidget {
+class RegionPrefTile extends ConsumerWidget {
   const RegionPrefTile({super.key});
 
   @override
@@ -106,7 +108,7 @@ class RegionPrefTile extends HookConsumerWidget {
   }
 }
 
-class EnableAnalyticsPrefTile extends HookConsumerWidget {
+class EnableAnalyticsPrefTile extends ConsumerWidget {
   const EnableAnalyticsPrefTile({
     super.key,
     this.onChanged,
@@ -136,6 +138,86 @@ class EnableAnalyticsPrefTile extends HookConsumerWidget {
           await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
         } else {
           await ref.read(analyticsControllerProvider.notifier).enableAnalytics();
+        }
+      },
+    );
+  }
+}
+
+class ThemeModePrefTile extends ConsumerWidget {
+  const ThemeModePrefTile({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider);
+
+    final themeMode = ref.watch(themePreferencesProvider);
+
+    return ListTile(
+      title: PlatformText(t.settings.general.themeMode),
+      subtitle: PlatformText(themeMode.present(t)),
+      leading: const Icon(FluentIcons.weather_moon_20_regular),
+      onTap: () async {
+        final selectedThemeMode = await showPlatformDialog<AppThemeMode>(
+          context: context,
+          builder: (context) {
+            return SimpleDialog(
+              title: PlatformText(t.settings.general.themeMode),
+              children: AppThemeMode.values
+                  .map(
+                    (e) => RadioListTile(
+                      title: PlatformText(e.present(t)),
+                      value: e,
+                      groupValue: themeMode,
+                      onChanged: Navigator.of(context).maybePop,
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+        );
+        if (selectedThemeMode != null) {
+          await ref.read(themePreferencesProvider.notifier).changeThemeMode(selectedThemeMode);
+        }
+      },
+    );
+  }
+}
+
+class ClosingPrefTile extends ConsumerWidget {
+  const ClosingPrefTile({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider);
+
+    final action = ref.watch(Preferences.actionAtClose);
+
+    return ListTile(
+      title: Text(t.settings.general.actionAtClosing),
+      subtitle: Text(action.present(t)),
+      leading: const Icon(FluentIcons.arrow_exit_20_regular),
+      onTap: () async {
+        final selectedAction = await showDialog<ActionsAtClosing>(
+          context: context,
+          builder: (context) {
+            return SimpleDialog(
+              title: Text(t.settings.general.actionAtClosing),
+              children: ActionsAtClosing.values
+                  .map(
+                    (e) => RadioListTile(
+                      title: Text(e.present(t)),
+                      value: e,
+                      groupValue: action,
+                      onChanged: Navigator.of(context).maybePop,
+                    ),
+                  )
+                  .toList(),
+            );
+          },
+        );
+        if (selectedAction != null) {
+          await ref.read(Preferences.actionAtClose.notifier).update(selectedAction);
         }
       },
     );

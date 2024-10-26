@@ -30,7 +30,13 @@
   },
   "home": {
     "pageTitle": "首頁",
-    "emptyProfilesMsg": "首先新增訂閱設定檔",
+    "emptyProfilesMsg": {
+      "text": "讓我們開始添加一個訂閱配置檔！這將從您的 VPN 伺服器獲取連線資訊。\n\n如果您還沒有自己的 VPN，別擔心—只需按照下面的教程快速創建一個。",
+      "buttonHelp": {
+        "label": "教我怎麼做",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
     "noActiveProfileMsg": "選擇設定檔"
   },
   "stats": {
@@ -416,5 +422,8 @@
     "warpNoiseSize": "噪音大小",
     "warpNoiseMode": "噪音模式",
     "warpNoiseDelay": "噪音延遲"
+  },
+  "window": {
+    "remember": "記住我的選擇"
   }
 }

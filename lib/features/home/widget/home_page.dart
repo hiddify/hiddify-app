@@ -1,22 +1,17 @@
 import 'package:dartx/dartx.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
-import 'package:hiddify/features/home/widget/empty_profiles_home_body.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_card.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -79,11 +74,18 @@ class HomePage extends HookConsumerWidget {
           //           tooltip: t.profile.add.buttonText,
           //         )),
           TextButton(
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle),
-              const Gap(8),
-              const Icon(Icons.add, size: 24),
-            ]),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Text(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle),
+                // const Gap(8),
+                Semantics(
+                  key: const ValueKey("profile_add_button"),
+                  label: t.profile.add.buttonText,
+                  child: const Icon(Icons.add, size: 24),
+                ),
+              ],
+            ),
             onPressed: () => const AddProfileRoute().push(context),
           ),
         ],
@@ -93,9 +95,9 @@ class HomePage extends HookConsumerWidget {
           image: DecorationImage(
             image: const AssetImage('assets/images/world_map.png'), // Replace with your image path
             fit: BoxFit.cover,
-            opacity: 0.12,
+            opacity: 0.09,
             colorFilter: Theme.of(context).brightness == Brightness.dark
-                ? ColorFilter.mode(Colors.white.withOpacity(.5), BlendMode.srcIn) //
+                ? ColorFilter.mode(Colors.white.withOpacity(.15), BlendMode.srcIn) //
                 : ColorFilter.mode(Colors.grey.withOpacity(1), BlendMode.srcATop), // Apply white tint in dark mode
           ),
         ),
@@ -129,7 +131,7 @@ class HomePage extends HookConsumerWidget {
                               ],
                             ),
                           ),
-                          if (MediaQuery.sizeOf(context).width < 840) const ActiveProxyFooter(),
+                          if (true || MediaQuery.sizeOf(context).width < 840) const ActiveProxyFooter(),
                         ],
                       ),
                     ),

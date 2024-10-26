@@ -30,7 +30,13 @@
   },
   "home": {
     "pageTitle": "Utama",
-    "emptyProfilesMsg": "Mulai menambahkan langganan profil",
+    "emptyProfilesMsg": {
+      "text": "Mari kita mulai dengan menambahkan Profil Langganan! Ini akan mendapatkan informasi koneksi dari server VPN Anda.\n\nJika Anda belum memiliki VPN sendiri, tidak perlu khawatir—ikuti tutorial di bawah ini untuk segera membuat satu.",
+      "buttonHelp": {
+        "label": "Tunjukkan cara",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
     "noActiveProfileMsg": "Pilih profil"
   },
   "stats": {

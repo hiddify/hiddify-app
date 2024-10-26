@@ -45,8 +45,8 @@ class AppTheme {
       AppThemeMode.dark => true,
       AppThemeMode.black => true,
     };
-    // final def = CupertinoThemeData(brightness: isDark ? Brightness.dark : Brightness.light);
-    final def = CupertinoThemeData(brightness: Brightness.dark);
+    final def = CupertinoThemeData(brightness: isDark ? Brightness.dark : Brightness.light);
+    // final def = CupertinoThemeData(brightness: Brightness.dark);
 
     // return def;
     final defaultMaterialTheme = isDark ? darkTheme(darkColorScheme) : lightTheme(lightColorScheme);
