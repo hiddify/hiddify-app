@@ -10,7 +10,7 @@ PODS:
   - FlutterMacOS (1.0.0)
   - in_app_review (0.2.0):
     - FlutterMacOS
-  - mobile_scanner (5.1.1):
+  - mobile_scanner (6.0.1):
     - FlutterMacOS
   - package_info_plus (0.0.1):
     - FlutterMacOS
@@ -21,11 +21,11 @@ PODS:
     - FlutterMacOS
   - screen_retriever (0.0.1):
     - FlutterMacOS
-  - Sentry/HybridSDK (8.25.0)
-  - sentry_flutter (7.20.2):
+  - Sentry/HybridSDK (8.36.0)
+  - sentry_flutter (8.9.0):
     - Flutter
     - FlutterMacOS
-    - Sentry/HybridSDK (= 8.25.0)
+    - Sentry/HybridSDK (= 8.36.0)
   - share_plus (0.0.1):
     - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
@@ -121,24 +121,24 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   cupertino_http: 1d506209e339211efa0764caa7b2de4bc55b6818
-  device_info_plus: 5401765fde0b8d062a2f8eb65510fb17e77cf07f
+  device_info_plus: 74e614483d05c89290d30a4c8feae15d555f7427
   dynamic_color: 2eaa27267de1ca20d879fbd6e01259773fb1670f
   flutter_timezone: 6b906d1740654acb16e50b639835628fea851037
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
   in_app_review: a850789fad746e89bce03d4aeee8078b45a53fd0
-  mobile_scanner: 1efac1e53c294b24e3bb55bcc7f4deee0233a86b
-  package_info_plus: 02d7a575e80f194102bef286361c6c326e4c29ce
+  mobile_scanner: 2cacea3b886af94329d18b01bfb5257641fa3a1f
+  package_info_plus: f5790acc797bf17c3e959e9d6cf162cc68ff7523
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   protocol_handler_macos: d10a6c01d6373389ffd2278013ab4c47ed6d6daa
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
-  Sentry: cd86fc55628f5b7c572cabe66cc8f95a9d2f165a
-  sentry_flutter: 0cf2507eb90ff7a6aa3304e900dd7f08edbbefdf
-  share_plus: 76dd39142738f7a68dd57b05093b5e8193f220f7
+  Sentry: f8374b5415bc38dfb5645941b3ae31230fbeae57
+  sentry_flutter: 0eb93e5279eb41e2392212afe1ccd2fecb4f8cbe
+  share_plus: fd717ef89a2801d3491e737630112b80c310640e
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   sqlite3: 292c3e1bfe89f64e51ea7fc7dab9182a017c8630
   sqlite3_flutter_libs: 5ca46c1a04eddfbeeb5b16566164aa7ad1616e7b
   tray_manager: 9064e219c56d75c476e46b9a21182087930baf90
-  url_launcher_macos: 5f437abeda8c85500ceb03f5c1938a8c5a705399
+  url_launcher_macos: c82c93949963e55b228a30115bd219499a6fe404
   window_manager: 3a1844359a6295ab1e47659b1a777e36773cd6e8
 
 PODFILE CHECKSUM: a18d1ba050af210055cfb0cee8d759913f9ff3e3
