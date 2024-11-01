@@ -274,7 +274,7 @@
     },
     "singbox": {
       "unexpected": "خطأ في الخدمة غير متوقع",
-      "serviceNotRunning": "الخدمة غير قيد التشغيل",
+      "serviceNotRunning": "الخدمة ليست قيد التشغيل",
       "missingPrivilege": "غياب الامتياز",
       "missingPrivilegeMsg": "وضع VPN يتطلب امتيازات المسؤول. أعد تشغيل التطبيق كمسؤول أو غيّر وضع الخدمة.",
       "missingGeoAssets": "أصول Geo مفقودة",
