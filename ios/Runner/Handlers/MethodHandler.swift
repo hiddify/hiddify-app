@@ -10,27 +10,27 @@ import Combine
 import Libcore
 
 public class MethodHandler: NSObject, FlutterPlugin {
-    
+
     private var cancelBag: Set<AnyCancellable> = []
-    
+
     public static let name = "\(Bundle.main.serviceIdentifier)/method"
-    
+
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: Self.name, binaryMessenger: registrar.messenger())
         let instance = MethodHandler()
         registrar.addMethodCallDelegate(instance, channel: channel)
         instance.channel = channel
     }
-    
+
     private var channel: FlutterMethodChannel?
-    
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         @Sendable func mainResult(_ res: Any?) async -> Void {
             await MainActor.run {
                 result(res)
             }
         }
-        
+
         switch call.method {
         case "parse_config":
             guard
@@ -49,7 +49,7 @@ public class MethodHandler: NSObject, FlutterPlugin {
                 return
             }
             result("")
-        case "change_config_options":
+        case "change_hiddify_options":
             guard let options = call.arguments as? String else {
                 result(FlutterError(code: "INVALID_ARGS", message: nil, details: nil))
                 return
@@ -186,7 +186,7 @@ public class MethodHandler: NSObject, FlutterPlugin {
             result(FlutterMethodNotImplemented)
         }
     }
-    
+
     private func waitForStop() -> Future<Void, Never> {
         return Future { promise in
             var cancellable: AnyCancellable? = nil
