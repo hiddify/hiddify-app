@@ -431,5 +431,28 @@
   },
   "help":{
     "title": "راهنما"
+  },
+  "outboundInfo":{
+    "tag": "برچسب:",
+    "type": "نوع:",
+    "url_test_time": "زمان آزمایش:",
+    "url_test_delay": "تاخیر آزمایش:",
+    "is_selected": "انتخاب شده:",
+    "is_group": "گروه:",
+    "is_secure": "ایمن:",
+    "is_visible": "قابل مشاهده:",
+    "port": "پورت:",
+    "host": "آدرس:",
+
+    "ip": "آی پی:",
+    "country_code": "کد کشور:",
+    "region": "منطقه:",
+    "city": "شهر:",
+    "asn": "شماره سازمان:",
+    "organization": "سازمان:",
+    "latitude": "عرض جغرافیایی:",
+    "longitude": "طول جغرافیایی:",
+    "postal_code": "کد پستی:"
   }
+
 }

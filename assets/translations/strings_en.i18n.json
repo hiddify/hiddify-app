@@ -457,6 +457,31 @@
   },
   "help":{
     "title": "Help"
+  },
+  "outboundInfo":{
+      "fullTag": "Full Tag:",
+      "type": "Type:",
+      "url_test_time": "Test Time:",
+      "url_test_delay": "Test Delay:",
+      "is_selected": "Is Selected:",
+      "is_group": "Is Group:",
+      "is_secure": "Is Secure:",
+      "is_visible": "Is Visible:",
+      "port": "Port:",
+      "host": "Host:",
+      "tag_display": "Tag Display:",
+      
+      "ip": "IP:",
+      "country_code": "Country Code:",
+      "region": "Region:",
+      "city": "City:",
+      "asn": "ASN:",
+      "organization": "Organization:",
+      "latitude": "Latitude:",
+      "longitude": "Longitude:",
+      "location": "Location:",
+      "postal_code": "Postal Code:"
+    
   }
 
 }
