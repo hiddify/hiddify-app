@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -94,7 +96,7 @@ class ProfilesOverviewModal extends HookConsumerWidget {
         ),
       ],
     );
-    return Scaffold(
+    return PlatformScaffold(
       body: CustomScrollView(
         controller: scrollController,
         slivers: [
@@ -109,23 +111,34 @@ class ProfilesOverviewModal extends HookConsumerWidget {
           //     ),
           //   ),
           // ),
-          // const SliverGap(48),
-          SliverLayoutBuilder(builder: (context, constraints) {
-            return switch (asyncProfiles) {
-              AsyncData(value: final profiles) => SliverList.builder(
-                  itemBuilder: (context, index) {
-                    final profile = profiles[index];
-                    return ProfileTile(profile: profile);
-                  },
-                  itemCount: profiles.length,
-                ),
-              AsyncError(:final error) => SliverErrorBodyPlaceholder(
-                  t.presentShortError(error),
-                ),
-              AsyncLoading() => const SliverLoadingBodyPlaceholder(),
-              _ => const SliverToBoxAdapter(),
-            };
-          }),
+          const SliverGap(10),
+          SliverLayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.crossAxisExtent;
+              final crossAxisCount = max(1, (width / 400).floor());
+              return switch (asyncProfiles) {
+                AsyncData(value: final profiles) => SliverGrid.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisExtent: 80,
+                    ),
+                    itemBuilder: (context, index) {
+                      // if (index >= profiles.length) {
+                      // return const Text("Test");
+                      // }
+                      final profile = profiles[index];
+                      return ProfileTile(profile: profile);
+                    },
+                    itemCount: profiles.length,
+                  ),
+                AsyncError(:final error) => SliverErrorBodyPlaceholder(
+                    t.presentShortError(error),
+                  ),
+                AsyncLoading() => const SliverLoadingBodyPlaceholder(),
+                _ => const SliverToBoxAdapter(),
+              };
+            },
+          ),
         ],
       ),
     );

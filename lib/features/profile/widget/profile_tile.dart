@@ -98,10 +98,11 @@ class ProfileTile extends HookConsumerWidget {
                       selectActiveMutation.setFuture(
                         ref.read(profilesOverviewNotifierProvider.notifier).selectActiveProfile(profile.id),
                       );
-                      if (context.canPop())
+                      if (context.canPop()) {
                         context.pop();
-                      else
+                      } else {
                         const HomeRoute().go(context);
+                      }
                     }
                   },
                   child: Padding(
@@ -128,7 +129,7 @@ class ProfileTile extends HookConsumerWidget {
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                       style: theme.textTheme.titleMedium?.copyWith(
-                                        fontFamily: FontFamily.emoji,
+                                        fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
                                       ),
                                       semanticsLabel: t.profile.activeProfileNameSemanticLabel(
                                         name: profile.name,
@@ -148,7 +149,9 @@ class ProfileTile extends HookConsumerWidget {
                             profile.name,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleMedium,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
+                            ),
                             semanticsLabel: profile.active
                                 ? t.profile.activeProfileNameSemanticLabel(
                                     name: profile.name,

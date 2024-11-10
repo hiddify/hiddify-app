@@ -17,11 +17,10 @@ sealed class ProfileFailure with _$ProfileFailure, Failure {
   const factory ProfileFailure.notFound() = ProfileNotFoundFailure;
 
   @With<ExpectedFailure>()
-  const factory ProfileFailure.invalidUrl() = ProfileInvalidUrlFailure;
+  const factory ProfileFailure.invalidUrl([String? message]) = ProfileInvalidUrlFailure;
 
   @With<ExpectedFailure>()
-  const factory ProfileFailure.invalidConfig([String? message]) =
-      ProfileInvalidConfigFailure;
+  const factory ProfileFailure.invalidConfig([String? message]) = ProfileInvalidConfigFailure;
 
   @override
   ({String type, String? message}) present(TranslationsEn t) {
@@ -30,18 +29,12 @@ sealed class ProfileFailure with _$ProfileFailure, Failure {
           type: t.failure.profiles.unexpected,
           message: null,
         ),
-      ProfileNotFoundFailure() => (
-          type: t.failure.profiles.notFound,
-          message: null
-        ),
-      ProfileInvalidUrlFailure() => (
+      ProfileNotFoundFailure() => (type: t.failure.profiles.notFound, message: null),
+      ProfileInvalidUrlFailure(:final message) => (
           type: t.failure.profiles.invalidUrl,
-          message: null,
+          message: message,
         ),
-      ProfileInvalidConfigFailure(:final message) => (
-          type: t.failure.profiles.invalidConfig,
-          message: message
-        ),
+      ProfileInvalidConfigFailure(:final message) => (type: t.failure.profiles.invalidConfig, message: message),
     };
   }
 }
