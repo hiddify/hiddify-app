@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -20,8 +22,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
     final sortBy = ref.watch(proxiesSortNotifierProvider);
 
     final selectActiveProxyMutation = useMutation(
-      initialOnFailure: (error) =>
-          CustomToast.error(t.presentShortError(error)).show(context),
+      initialOnFailure: (error) => CustomToast.error(t.presentShortError(error)).show(context),
     );
 
     final appBar = NestedAppBar(
@@ -75,6 +76,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
               SliverLayoutBuilder(
                 builder: (context, constraints) {
                   final width = constraints.crossAxisExtent;
+
                   if (!PlatformUtils.isDesktop && width < 648) {
                     return SliverPadding(
                       padding: const EdgeInsets.only(bottom: 86),
@@ -85,8 +87,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                             proxy,
                             selected: group.selected == proxy.tag,
                             onSelect: () async {
-                              if (selectActiveProxyMutation
-                                  .state.isInProgress) {
+                              if (selectActiveProxyMutation.state.isInProgress) {
                                 return;
                               }
                               selectActiveProxyMutation.setFuture(
@@ -99,17 +100,17 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                       ),
                     );
                   }
-
+                  final crossAxisCount = max(1, (width / 268).floor());
                   return SliverGrid.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: (width / 268).floor(),
+                      crossAxisCount: crossAxisCount,
                       mainAxisExtent: 68,
                     ),
                     itemBuilder: (context, index) {
                       final proxy = group.items[index];
                       return ProxyTile(
                         proxy,
-                        selected: group.selected == proxy.tag,
+                        selected: group.selected.tag == proxy.tag,
                         onSelect: () async {
                           if (selectActiveProxyMutation.state.isInProgress) {
                             return;

@@ -6,7 +6,7 @@ import 'package:hiddify/features/proxy/model/ip_info_entity.dart' as oldipinfo;
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
-import 'package:hiddify/singbox/service/singbox_service.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
 abstract interface class ProxyRepository {
@@ -26,7 +26,7 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
     required this.client,
   });
 
-  final SingboxService singbox;
+  final HiddifyCoreService singbox;
   final DioHttpClient client;
 
   @override
