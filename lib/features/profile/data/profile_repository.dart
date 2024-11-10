@@ -16,7 +16,7 @@ import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
-import 'package:hiddify/singbox/service/singbox_service.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/link_parsers.dart';
 import 'package:meta/meta.dart';
@@ -79,7 +79,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
   final ProfileDataSource profileDataSource;
   final ProfilePathResolver profilePathResolver;
-  final SingboxService singbox;
+  final HiddifyCoreService singbox;
   final ConfigOptionRepository configOptionRepository;
   final DioHttpClient httpClient;
 
@@ -401,7 +401,9 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
         try {
           final configs = await configOptionRepository.getConfigOptions();
-
+          if (url.startsWith("http://")) {
+            return left(const ProfileFailure.invalidUrl("HTTP is not supported. Please use HTTPS for secure connection."));
+          }
           final response = await httpClient.download(
             url.trim(),
             tempFile.path,
