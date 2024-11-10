@@ -37,10 +37,7 @@ GoRouter router(RouterRef ref) {
     navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
     debugLogDiagnostics: true,
-    routes: [
-      if (useMobileRouter) $mobileWrapperRoute else $desktopWrapperRoute,
-      $introRoute,
-    ],
+    routes: $appRoutes,
     refreshListenable: notifier,
     redirect: notifier.redirect,
     observers: [
@@ -49,33 +46,34 @@ GoRouter router(RouterRef ref) {
   );
 }
 
-final tabLocations = [
-  const HomeRoute().location,
-  // const ProxiesRoute().location,
-  const ProfilesOverviewRoute().location,
-  const LogsOverviewRoute().location,
-  const ConfigOptionsRoute().location,
-  //const QuickSettingsRoute().location,
-  // const SettingsRoute().location,
-  const AboutRoute().location,
-];
+// final tabLocations = [
+//   const HomeRoute().location,
+//   // const ProxiesRoute().location,
+//   const ProfilesOverviewRoute().location,
+//   const LogsOverviewRoute().location,
+//   const ConfigOptionsRoute().location,
+//   //const QuickSettingsRoute().location,
+//   // const SettingsRoute().location,
+//   const AboutRoute().location,
+// ];
 
-int getCurrentIndex(BuildContext context) {
-  final String location = GoRouterState.of(context).uri.path;
-  if (location == const HomeRoute().location) return 0;
-  var index = 0;
-  for (final tab in tabLocations.sublist(1)) {
-    index++;
-    if (location.startsWith(tab)) return index;
-  }
-  return 0;
-}
+// int getCurrentIndex(BuildContext context) {
+//   final String location = GoRouterState.of(context).uri.path;
 
-void switchTab(int index, BuildContext context) {
-  assert(index >= 0 && index < tabLocations.length);
-  final location = tabLocations[index];
-  return context.go(location);
-}
+//   if (location == const HomeRoute().location) return 0;
+//   var index = 0;
+//   for (final tab in tabLocations.sublist(1)) {
+//     index++;
+//     if (location.startsWith(tab)) return index;
+//   }
+//   return 0;
+// }
+
+// void switchTab(int index, BuildContext context) {
+//   assert(index >= 0 && index < tabLocations.length);
+//   final location = tabLocations[index];
+//   return context.go(location);
+// }
 
 @riverpod
 class RouterListenable extends _$RouterListenable with AppLogger implements Listenable {
