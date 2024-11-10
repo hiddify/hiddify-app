@@ -193,7 +193,7 @@ linux-libs:
 
 macos-libs:
 	mkdir -p  $(DESKTOP_OUT) 
-	curl -L $(CORE_URL)/$(CORE_NAME)-macos-universal.tar.gz | tar xz -C $(DESKTOP_OUT)
+	curl -L $(CORE_URL)/$(CORE_NAME)-macos.tar.gz | tar xz -C $(DESKTOP_OUT)
 
 ios-libs: #not tested
 	mkdir -p $(IOS_OUT)
