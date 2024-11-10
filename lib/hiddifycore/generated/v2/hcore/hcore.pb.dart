@@ -218,21 +218,42 @@ class StartRequest extends $pb.GeneratedMessage {
   void clearEnableRawConfig() => clearField(6);
 }
 
+/// Define the message equivalent of SetupParameters
 class SetupRequest extends $pb.GeneratedMessage {
   factory SetupRequest({
     $core.String? basePath,
-    $core.String? workingPath,
-    $core.String? tempPath,
+    $core.String? workingDir,
+    $core.String? tempDir,
+    $fixnum.Int64? flutterStatusPort,
+    $core.String? listen,
+    $core.String? secret,
+    $core.bool? debug,
+    SetupMode? mode,
   }) {
     final $result = create();
     if (basePath != null) {
       $result.basePath = basePath;
     }
-    if (workingPath != null) {
-      $result.workingPath = workingPath;
+    if (workingDir != null) {
+      $result.workingDir = workingDir;
     }
-    if (tempPath != null) {
-      $result.tempPath = tempPath;
+    if (tempDir != null) {
+      $result.tempDir = tempDir;
+    }
+    if (flutterStatusPort != null) {
+      $result.flutterStatusPort = flutterStatusPort;
+    }
+    if (listen != null) {
+      $result.listen = listen;
+    }
+    if (secret != null) {
+      $result.secret = secret;
+    }
+    if (debug != null) {
+      $result.debug = debug;
+    }
+    if (mode != null) {
+      $result.mode = mode;
     }
     return $result;
   }
@@ -242,8 +263,13 @@ class SetupRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SetupRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'basePath')
-    ..aOS(2, _omitFieldNames ? '' : 'workingPath')
-    ..aOS(3, _omitFieldNames ? '' : 'tempPath')
+    ..aOS(2, _omitFieldNames ? '' : 'workingDir')
+    ..aOS(3, _omitFieldNames ? '' : 'tempDir')
+    ..aInt64(4, _omitFieldNames ? '' : 'flutterStatusPort')
+    ..aOS(5, _omitFieldNames ? '' : 'listen')
+    ..aOS(6, _omitFieldNames ? '' : 'secret')
+    ..aOB(7, _omitFieldNames ? '' : 'debug')
+    ..e<SetupMode>(8, _omitFieldNames ? '' : 'mode', $pb.PbFieldType.OE, defaultOrMaker: SetupMode.OLD, valueOf: SetupMode.valueOf, enumValues: SetupMode.values)
     ..hasRequiredFields = false
   ;
 
@@ -278,22 +304,67 @@ class SetupRequest extends $pb.GeneratedMessage {
   void clearBasePath() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get workingPath => $_getSZ(1);
+  $core.String get workingDir => $_getSZ(1);
   @$pb.TagNumber(2)
-  set workingPath($core.String v) { $_setString(1, v); }
+  set workingDir($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasWorkingPath() => $_has(1);
+  $core.bool hasWorkingDir() => $_has(1);
   @$pb.TagNumber(2)
-  void clearWorkingPath() => clearField(2);
+  void clearWorkingDir() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get tempPath => $_getSZ(2);
+  $core.String get tempDir => $_getSZ(2);
   @$pb.TagNumber(3)
-  set tempPath($core.String v) { $_setString(2, v); }
+  set tempDir($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasTempPath() => $_has(2);
+  $core.bool hasTempDir() => $_has(2);
   @$pb.TagNumber(3)
-  void clearTempPath() => clearField(3);
+  void clearTempDir() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get flutterStatusPort => $_getI64(3);
+  @$pb.TagNumber(4)
+  set flutterStatusPort($fixnum.Int64 v) { $_setInt64(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasFlutterStatusPort() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearFlutterStatusPort() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.String get listen => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set listen($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasListen() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearListen() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get secret => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set secret($core.String v) { $_setString(5, v); }
+  @$pb.TagNumber(6)
+  $core.bool hasSecret() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearSecret() => clearField(6);
+
+  @$pb.TagNumber(7)
+  $core.bool get debug => $_getBF(6);
+  @$pb.TagNumber(7)
+  set debug($core.bool v) { $_setBool(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasDebug() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearDebug() => clearField(7);
+
+  @$pb.TagNumber(8)
+  SetupMode get mode => $_getN(7);
+  @$pb.TagNumber(8)
+  set mode(SetupMode v) { setField(8, v); }
+  @$pb.TagNumber(8)
+  $core.bool hasMode() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearMode() => clearField(8);
 }
 
 class SystemInfo extends $pb.GeneratedMessage {
@@ -472,6 +543,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.int? port,
     $core.String? host,
     $core.String? tagDisplay,
+    OutboundInfo? groupSelectedOutbound,
   }) {
     final $result = create();
     if (tag != null) {
@@ -510,6 +582,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (tagDisplay != null) {
       $result.tagDisplay = tagDisplay;
     }
+    if (groupSelectedOutbound != null) {
+      $result.groupSelectedOutbound = groupSelectedOutbound;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -529,6 +604,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..a<$core.int>(10, _omitFieldNames ? '' : 'port', $pb.PbFieldType.OU3)
     ..aOS(11, _omitFieldNames ? '' : 'host')
     ..aOS(12, _omitFieldNames ? '' : 'tagDisplay')
+    ..aOM<OutboundInfo>(13, _omitFieldNames ? '' : 'groupSelectedOutbound', subBuilder: OutboundInfo.create)
     ..hasRequiredFields = false
   ;
 
@@ -664,6 +740,17 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasTagDisplay() => $_has(11);
   @$pb.TagNumber(12)
   void clearTagDisplay() => clearField(12);
+
+  @$pb.TagNumber(13)
+  OutboundInfo get groupSelectedOutbound => $_getN(12);
+  @$pb.TagNumber(13)
+  set groupSelectedOutbound(OutboundInfo v) { setField(13, v); }
+  @$pb.TagNumber(13)
+  $core.bool hasGroupSelectedOutbound() => $_has(12);
+  @$pb.TagNumber(13)
+  void clearGroupSelectedOutbound() => clearField(13);
+  @$pb.TagNumber(13)
+  OutboundInfo ensureGroupSelectedOutbound() => $_ensure(12);
 }
 
 class IpInfo extends $pb.GeneratedMessage {

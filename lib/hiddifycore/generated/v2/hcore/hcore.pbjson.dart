@@ -61,6 +61,24 @@ final $typed_data.Uint8List messageTypeDescriptor = $convert.base64Decode(
     'lHEAsSGAoURVJST1JfUEFSU0lOR19DT05GSUcQDBIYChRFUlJPUl9SRUFESU5HX0NPTkZJRxAN'
     'EhMKD0VSUk9SX0VYVEVOU0lPThAO');
 
+@$core.Deprecated('Use setupModeDescriptor instead')
+const SetupMode$json = {
+  '1': 'SetupMode',
+  '2': [
+    {'1': 'OLD', '2': 0},
+    {'1': 'GRPC_NORMAL', '2': 1},
+    {'1': 'GRPC_BACKGROUND', '2': 2},
+    {'1': 'GRPC_NORMAL_INSECURE', '2': 3},
+    {'1': 'GRPC_BACKGROUND_INSECURE', '2': 4},
+  ],
+};
+
+/// Descriptor for `SetupMode`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List setupModeDescriptor = $convert.base64Decode(
+    'CglTZXR1cE1vZGUSBwoDT0xEEAASDwoLR1JQQ19OT1JNQUwQARITCg9HUlBDX0JBQ0tHUk9VTk'
+    'QQAhIYChRHUlBDX05PUk1BTF9JTlNFQ1VSRRADEhwKGEdSUENfQkFDS0dST1VORF9JTlNFQ1VS'
+    'RRAE');
+
 @$core.Deprecated('Use logLevelDescriptor instead')
 const LogLevel$json = {
   '1': 'LogLevel',
@@ -134,15 +152,23 @@ const SetupRequest$json = {
   '1': 'SetupRequest',
   '2': [
     {'1': 'base_path', '3': 1, '4': 1, '5': 9, '10': 'basePath'},
-    {'1': 'working_path', '3': 2, '4': 1, '5': 9, '10': 'workingPath'},
-    {'1': 'temp_path', '3': 3, '4': 1, '5': 9, '10': 'tempPath'},
+    {'1': 'working_dir', '3': 2, '4': 1, '5': 9, '10': 'workingDir'},
+    {'1': 'temp_dir', '3': 3, '4': 1, '5': 9, '10': 'tempDir'},
+    {'1': 'flutter_status_port', '3': 4, '4': 1, '5': 3, '10': 'flutterStatusPort'},
+    {'1': 'listen', '3': 5, '4': 1, '5': 9, '10': 'listen'},
+    {'1': 'secret', '3': 6, '4': 1, '5': 9, '10': 'secret'},
+    {'1': 'debug', '3': 7, '4': 1, '5': 8, '10': 'debug'},
+    {'1': 'mode', '3': 8, '4': 1, '5': 14, '6': '.hcore.SetupMode', '10': 'mode'},
   ],
 };
 
 /// Descriptor for `SetupRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List setupRequestDescriptor = $convert.base64Decode(
-    'CgxTZXR1cFJlcXVlc3QSGwoJYmFzZV9wYXRoGAEgASgJUghiYXNlUGF0aBIhCgx3b3JraW5nX3'
-    'BhdGgYAiABKAlSC3dvcmtpbmdQYXRoEhsKCXRlbXBfcGF0aBgDIAEoCVIIdGVtcFBhdGg=');
+    'CgxTZXR1cFJlcXVlc3QSGwoJYmFzZV9wYXRoGAEgASgJUghiYXNlUGF0aBIfCgt3b3JraW5nX2'
+    'RpchgCIAEoCVIKd29ya2luZ0RpchIZCgh0ZW1wX2RpchgDIAEoCVIHdGVtcERpchIuChNmbHV0'
+    'dGVyX3N0YXR1c19wb3J0GAQgASgDUhFmbHV0dGVyU3RhdHVzUG9ydBIWCgZsaXN0ZW4YBSABKA'
+    'lSBmxpc3RlbhIWCgZzZWNyZXQYBiABKAlSBnNlY3JldBIUCgVkZWJ1ZxgHIAEoCFIFZGVidWcS'
+    'JAoEbW9kZRgIIAEoDjIQLmhjb3JlLlNldHVwTW9kZVIEbW9kZQ==');
 
 @$core.Deprecated('Use systemInfoDescriptor instead')
 const SystemInfo$json = {
@@ -177,14 +203,19 @@ const OutboundInfo$json = {
     {'1': 'type', '3': 2, '4': 1, '5': 9, '10': 'type'},
     {'1': 'url_test_time', '3': 3, '4': 1, '5': 11, '6': '.google.protobuf.Timestamp', '10': 'urlTestTime'},
     {'1': 'url_test_delay', '3': 4, '4': 1, '5': 5, '10': 'urlTestDelay'},
-    {'1': 'ipinfo', '3': 5, '4': 1, '5': 11, '6': '.hcore.IpInfo', '10': 'ipinfo'},
+    {'1': 'ipinfo', '3': 5, '4': 1, '5': 11, '6': '.hcore.IpInfo', '9': 0, '10': 'ipinfo', '17': true},
     {'1': 'is_selected', '3': 6, '4': 1, '5': 8, '10': 'isSelected'},
     {'1': 'is_group', '3': 7, '4': 1, '5': 8, '10': 'isGroup'},
+    {'1': 'group_selected_outbound', '3': 13, '4': 1, '5': 11, '6': '.hcore.OutboundInfo', '9': 1, '10': 'groupSelectedOutbound', '17': true},
     {'1': 'is_secure', '3': 8, '4': 1, '5': 8, '10': 'isSecure'},
     {'1': 'is_visible', '3': 9, '4': 1, '5': 8, '10': 'isVisible'},
     {'1': 'port', '3': 10, '4': 1, '5': 13, '10': 'port'},
     {'1': 'host', '3': 11, '4': 1, '5': 9, '10': 'host'},
     {'1': 'tag_display', '3': 12, '4': 1, '5': 9, '10': 'tagDisplay'},
+  ],
+  '8': [
+    {'1': '_ipinfo'},
+    {'1': '_group_selected_outbound'},
   ],
 };
 
@@ -192,11 +223,14 @@ const OutboundInfo$json = {
 final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode(
     'CgxPdXRib3VuZEluZm8SEAoDdGFnGAEgASgJUgN0YWcSEgoEdHlwZRgCIAEoCVIEdHlwZRI+Cg'
     '11cmxfdGVzdF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFILdXJsVGVz'
-    'dFRpbWUSJAoOdXJsX3Rlc3RfZGVsYXkYBCABKAVSDHVybFRlc3REZWxheRIlCgZpcGluZm8YBS'
-    'ABKAsyDS5oY29yZS5JcEluZm9SBmlwaW5mbxIfCgtpc19zZWxlY3RlZBgGIAEoCFIKaXNTZWxl'
-    'Y3RlZBIZCghpc19ncm91cBgHIAEoCFIHaXNHcm91cBIbCglpc19zZWN1cmUYCCABKAhSCGlzU2'
-    'VjdXJlEh0KCmlzX3Zpc2libGUYCSABKAhSCWlzVmlzaWJsZRISCgRwb3J0GAogASgNUgRwb3J0'
-    'EhIKBGhvc3QYCyABKAlSBGhvc3QSHwoLdGFnX2Rpc3BsYXkYDCABKAlSCnRhZ0Rpc3BsYXk=');
+    'dFRpbWUSJAoOdXJsX3Rlc3RfZGVsYXkYBCABKAVSDHVybFRlc3REZWxheRIqCgZpcGluZm8YBS'
+    'ABKAsyDS5oY29yZS5JcEluZm9IAFIGaXBpbmZviAEBEh8KC2lzX3NlbGVjdGVkGAYgASgIUgpp'
+    'c1NlbGVjdGVkEhkKCGlzX2dyb3VwGAcgASgIUgdpc0dyb3VwElAKF2dyb3VwX3NlbGVjdGVkX2'
+    '91dGJvdW5kGA0gASgLMhMuaGNvcmUuT3V0Ym91bmRJbmZvSAFSFWdyb3VwU2VsZWN0ZWRPdXRi'
+    'b3VuZIgBARIbCglpc19zZWN1cmUYCCABKAhSCGlzU2VjdXJlEh0KCmlzX3Zpc2libGUYCSABKA'
+    'hSCWlzVmlzaWJsZRISCgRwb3J0GAogASgNUgRwb3J0EhIKBGhvc3QYCyABKAlSBGhvc3QSHwoL'
+    'dGFnX2Rpc3BsYXkYDCABKAlSCnRhZ0Rpc3BsYXlCCQoHX2lwaW5mb0IaChhfZ3JvdXBfc2VsZW'
+    'N0ZWRfb3V0Ym91bmQ=');
 
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = {

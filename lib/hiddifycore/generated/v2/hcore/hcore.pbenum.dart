@@ -73,6 +73,27 @@ class MessageType extends $pb.ProtobufEnum {
   const MessageType._($core.int v, $core.String n) : super(v, n);
 }
 
+class SetupMode extends $pb.ProtobufEnum {
+  static const SetupMode OLD = SetupMode._(0, _omitEnumNames ? '' : 'OLD');
+  static const SetupMode GRPC_NORMAL = SetupMode._(1, _omitEnumNames ? '' : 'GRPC_NORMAL');
+  static const SetupMode GRPC_BACKGROUND = SetupMode._(2, _omitEnumNames ? '' : 'GRPC_BACKGROUND');
+  static const SetupMode GRPC_NORMAL_INSECURE = SetupMode._(3, _omitEnumNames ? '' : 'GRPC_NORMAL_INSECURE');
+  static const SetupMode GRPC_BACKGROUND_INSECURE = SetupMode._(4, _omitEnumNames ? '' : 'GRPC_BACKGROUND_INSECURE');
+
+  static const $core.List<SetupMode> values = <SetupMode> [
+    OLD,
+    GRPC_NORMAL,
+    GRPC_BACKGROUND,
+    GRPC_NORMAL_INSECURE,
+    GRPC_BACKGROUND_INSECURE,
+  ];
+
+  static final $core.Map<$core.int, SetupMode> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static SetupMode? valueOf($core.int value) => _byValue[value];
+
+  const SetupMode._($core.int v, $core.String n) : super(v, n);
+}
+
 class LogLevel extends $pb.ProtobufEnum {
   static const LogLevel DEBUG = LogLevel._(0, _omitEnumNames ? '' : 'DEBUG');
   static const LogLevel INFO = LogLevel._(1, _omitEnumNames ? '' : 'INFO');
