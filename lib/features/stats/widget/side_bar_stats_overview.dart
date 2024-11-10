@@ -9,6 +9,7 @@ import 'package:hiddify/features/stats/model/stats_entity.dart';
 import 'package:hiddify/features/stats/notifier/stats_notifier.dart';
 import 'package:hiddify/features/stats/widget/connection_stats_card.dart';
 import 'package:hiddify/features/stats/widget/stats_card.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/number_formatters.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -24,7 +25,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final stats = ref.watch(statsNotifierProvider).asData?.value ?? StatsEntity.empty();
+    final stats = ref.watch(statsNotifierProvider).asData?.value ?? SystemInfo.create();
     final showAll = ref.watch(showAllSidebarStatsProvider);
 
     return Padding(
@@ -68,14 +69,14 @@ class SideBarStatsOverview extends HookConsumerWidget {
               stats: [
                 (
                   label: const Icon(FluentIcons.arrow_download_16_regular),
-                  data: Text(stats.downlink.speed()),
+                  data: Text(stats.downlink.toInt().speed()),
                   semanticLabel: t.stats.speed,
                 ),
                 (
                   label: const Icon(
                     FluentIcons.arrow_bidirectional_up_down_16_regular,
                   ),
-                  data: Text(stats.downlinkTotal.size()),
+                  data: Text(stats.downlinkTotal.toInt().size()),
                   semanticLabel: t.stats.totalTransferred,
                 ),
               ],
@@ -90,7 +91,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                         "↑",
                         style: TextStyle(color: Colors.green),
                       ),
-                      data: Text(stats.uplink.speed()),
+                      data: Text(stats.uplink.toInt().speed()),
                       semanticLabel: t.stats.uplink,
                     ),
                     (
@@ -100,7 +101,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                           color: Theme.of(context).colorScheme.error,
                         ),
                       ),
-                      data: Text(stats.downlink.speed()),
+                      data: Text(stats.downlink.toInt().speed()),
                       semanticLabel: t.stats.downlink,
                     ),
                   ],
@@ -114,7 +115,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                         "↑",
                         style: TextStyle(color: Colors.green),
                       ),
-                      data: Text(stats.uplinkTotal.size()),
+                      data: Text(stats.uplinkTotal.toInt().size()),
                       semanticLabel: t.stats.uplink,
                     ),
                     (
@@ -124,7 +125,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                           color: Theme.of(context).colorScheme.error,
                         ),
                       ),
-                      data: Text(stats.downlinkTotal.size()),
+                      data: Text(stats.downlinkTotal.toInt().size()),
                       semanticLabel: t.stats.downlink,
                     ),
                   ],

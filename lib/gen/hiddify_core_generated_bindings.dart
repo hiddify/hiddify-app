@@ -188,13 +188,13 @@ class HiddifyCoreNativeLibrary {
       _waitpidPtr.asFunction<int Function(int, ffi.Pointer<ffi.Int>, int)>();
 
   int waitid(
-    int arg0,
-    int arg1,
+    idtype_t arg0,
+    Dart__uint32_t arg1,
     ffi.Pointer<siginfo_t> arg2,
     int arg3,
   ) {
     return _waitid(
-      arg0,
+      arg0.value,
       arg1,
       arg2,
       arg3,
@@ -203,8 +203,8 @@ class HiddifyCoreNativeLibrary {
 
   late final _waitidPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int Function(
-              ffi.Int32, id_t, ffi.Pointer<siginfo_t>, ffi.Int)>>('waitid');
+          ffi.Int Function(ffi.UnsignedInt, id_t, ffi.Pointer<siginfo_t>,
+              ffi.Int)>>('waitid');
   late final _waitid = _waitidPtr
       .asFunction<int Function(int, int, ffi.Pointer<siginfo_t>, int)>();
 
@@ -2322,6 +2322,454 @@ class HiddifyCoreNativeLibrary {
 
   set suboptarg(ffi.Pointer<ffi.Char> value) => _suboptarg.value = value;
 
+  late final ffi.Pointer<ffi.Pointer<ffi.Pointer<ffi.Char>>> _sys_signame =
+      _lookup<ffi.Pointer<ffi.Pointer<ffi.Char>>>('sys_signame');
+
+  ffi.Pointer<ffi.Pointer<ffi.Char>> get sys_signame => _sys_signame.value;
+
+  set sys_signame(ffi.Pointer<ffi.Pointer<ffi.Char>> value) =>
+      _sys_signame.value = value;
+
+  late final ffi.Pointer<ffi.Pointer<ffi.Pointer<ffi.Char>>> _sys_siglist =
+      _lookup<ffi.Pointer<ffi.Pointer<ffi.Char>>>('sys_siglist');
+
+  ffi.Pointer<ffi.Pointer<ffi.Char>> get sys_siglist => _sys_siglist.value;
+
+  set sys_siglist(ffi.Pointer<ffi.Pointer<ffi.Char>> value) =>
+      _sys_siglist.value = value;
+
+  int raise(
+    int arg0,
+  ) {
+    return _raise(
+      arg0,
+    );
+  }
+
+  late final _raisePtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int)>>('raise');
+  late final _raise = _raisePtr.asFunction<int Function(int)>();
+
+  ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>> bsd_signal(
+    int arg0,
+    ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>> arg1,
+  ) {
+    return _bsd_signal(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _bsd_signalPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>> Function(
+              ffi.Int,
+              ffi.Pointer<
+                  ffi
+                  .NativeFunction<ffi.Void Function(ffi.Int)>>)>>('bsd_signal');
+  late final _bsd_signal = _bsd_signalPtr.asFunction<
+      ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>> Function(
+          int, ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>)>();
+
+  int kill(
+    int arg0,
+    int arg1,
+  ) {
+    return _kill(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _killPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(pid_t, ffi.Int)>>('kill');
+  late final _kill = _killPtr.asFunction<int Function(int, int)>();
+
+  int killpg(
+    int arg0,
+    int arg1,
+  ) {
+    return _killpg(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _killpgPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(pid_t, ffi.Int)>>('killpg');
+  late final _killpg = _killpgPtr.asFunction<int Function(int, int)>();
+
+  int pthread_kill(
+    pthread_t arg0,
+    int arg1,
+  ) {
+    return _pthread_kill(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _pthread_killPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(pthread_t, ffi.Int)>>(
+          'pthread_kill');
+  late final _pthread_kill =
+      _pthread_killPtr.asFunction<int Function(pthread_t, int)>();
+
+  int pthread_sigmask(
+    int arg0,
+    ffi.Pointer<sigset_t> arg1,
+    ffi.Pointer<sigset_t> arg2,
+  ) {
+    return _pthread_sigmask(
+      arg0,
+      arg1,
+      arg2,
+    );
+  }
+
+  late final _pthread_sigmaskPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(ffi.Int, ffi.Pointer<sigset_t>,
+              ffi.Pointer<sigset_t>)>>('pthread_sigmask');
+  late final _pthread_sigmask = _pthread_sigmaskPtr.asFunction<
+      int Function(int, ffi.Pointer<sigset_t>, ffi.Pointer<sigset_t>)>();
+
+  int sigaction1(
+    int arg0,
+    ffi.Pointer<sigaction> arg1,
+    ffi.Pointer<sigaction> arg2,
+  ) {
+    return _sigaction1(
+      arg0,
+      arg1,
+      arg2,
+    );
+  }
+
+  late final _sigaction1Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(ffi.Int, ffi.Pointer<sigaction>,
+              ffi.Pointer<sigaction>)>>('sigaction');
+  late final _sigaction1 = _sigaction1Ptr.asFunction<
+      int Function(int, ffi.Pointer<sigaction>, ffi.Pointer<sigaction>)>();
+
+  int sigaddset(
+    ffi.Pointer<sigset_t> arg0,
+    int arg1,
+  ) {
+    return _sigaddset(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _sigaddsetPtr = _lookup<
+          ffi.NativeFunction<ffi.Int Function(ffi.Pointer<sigset_t>, ffi.Int)>>(
+      'sigaddset');
+  late final _sigaddset =
+      _sigaddsetPtr.asFunction<int Function(ffi.Pointer<sigset_t>, int)>();
+
+  int sigaltstack(
+    ffi.Pointer<stack_t> arg0,
+    ffi.Pointer<stack_t> arg1,
+  ) {
+    return _sigaltstack(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _sigaltstackPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(
+              ffi.Pointer<stack_t>, ffi.Pointer<stack_t>)>>('sigaltstack');
+  late final _sigaltstack = _sigaltstackPtr
+      .asFunction<int Function(ffi.Pointer<stack_t>, ffi.Pointer<stack_t>)>();
+
+  int sigdelset(
+    ffi.Pointer<sigset_t> arg0,
+    int arg1,
+  ) {
+    return _sigdelset(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _sigdelsetPtr = _lookup<
+          ffi.NativeFunction<ffi.Int Function(ffi.Pointer<sigset_t>, ffi.Int)>>(
+      'sigdelset');
+  late final _sigdelset =
+      _sigdelsetPtr.asFunction<int Function(ffi.Pointer<sigset_t>, int)>();
+
+  int sigemptyset(
+    ffi.Pointer<sigset_t> arg0,
+  ) {
+    return _sigemptyset(
+      arg0,
+    );
+  }
+
+  late final _sigemptysetPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<sigset_t>)>>(
+          'sigemptyset');
+  late final _sigemptyset =
+      _sigemptysetPtr.asFunction<int Function(ffi.Pointer<sigset_t>)>();
+
+  int sigfillset(
+    ffi.Pointer<sigset_t> arg0,
+  ) {
+    return _sigfillset(
+      arg0,
+    );
+  }
+
+  late final _sigfillsetPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<sigset_t>)>>(
+          'sigfillset');
+  late final _sigfillset =
+      _sigfillsetPtr.asFunction<int Function(ffi.Pointer<sigset_t>)>();
+
+  int sighold(
+    int arg0,
+  ) {
+    return _sighold(
+      arg0,
+    );
+  }
+
+  late final _sigholdPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int)>>('sighold');
+  late final _sighold = _sigholdPtr.asFunction<int Function(int)>();
+
+  int sigignore(
+    int arg0,
+  ) {
+    return _sigignore(
+      arg0,
+    );
+  }
+
+  late final _sigignorePtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int)>>('sigignore');
+  late final _sigignore = _sigignorePtr.asFunction<int Function(int)>();
+
+  int siginterrupt(
+    int arg0,
+    int arg1,
+  ) {
+    return _siginterrupt(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _siginterruptPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int, ffi.Int)>>(
+          'siginterrupt');
+  late final _siginterrupt =
+      _siginterruptPtr.asFunction<int Function(int, int)>();
+
+  int sigismember(
+    ffi.Pointer<sigset_t> arg0,
+    int arg1,
+  ) {
+    return _sigismember(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _sigismemberPtr = _lookup<
+          ffi.NativeFunction<ffi.Int Function(ffi.Pointer<sigset_t>, ffi.Int)>>(
+      'sigismember');
+  late final _sigismember =
+      _sigismemberPtr.asFunction<int Function(ffi.Pointer<sigset_t>, int)>();
+
+  int sigpause(
+    int arg0,
+  ) {
+    return _sigpause(
+      arg0,
+    );
+  }
+
+  late final _sigpausePtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int)>>('sigpause');
+  late final _sigpause = _sigpausePtr.asFunction<int Function(int)>();
+
+  int sigpending(
+    ffi.Pointer<sigset_t> arg0,
+  ) {
+    return _sigpending(
+      arg0,
+    );
+  }
+
+  late final _sigpendingPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<sigset_t>)>>(
+          'sigpending');
+  late final _sigpending =
+      _sigpendingPtr.asFunction<int Function(ffi.Pointer<sigset_t>)>();
+
+  int sigprocmask(
+    int arg0,
+    ffi.Pointer<sigset_t> arg1,
+    ffi.Pointer<sigset_t> arg2,
+  ) {
+    return _sigprocmask(
+      arg0,
+      arg1,
+      arg2,
+    );
+  }
+
+  late final _sigprocmaskPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(ffi.Int, ffi.Pointer<sigset_t>,
+              ffi.Pointer<sigset_t>)>>('sigprocmask');
+  late final _sigprocmask = _sigprocmaskPtr.asFunction<
+      int Function(int, ffi.Pointer<sigset_t>, ffi.Pointer<sigset_t>)>();
+
+  int sigrelse(
+    int arg0,
+  ) {
+    return _sigrelse(
+      arg0,
+    );
+  }
+
+  late final _sigrelsePtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int)>>('sigrelse');
+  late final _sigrelse = _sigrelsePtr.asFunction<int Function(int)>();
+
+  ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>> sigset(
+    int arg0,
+    ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>> arg1,
+  ) {
+    return _sigset(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _sigsetPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>> Function(
+              ffi.Int,
+              ffi.Pointer<
+                  ffi.NativeFunction<ffi.Void Function(ffi.Int)>>)>>('sigset');
+  late final _sigset = _sigsetPtr.asFunction<
+      ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>> Function(
+          int, ffi.Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>)>();
+
+  int sigsuspend(
+    ffi.Pointer<sigset_t> arg0,
+  ) {
+    return _sigsuspend(
+      arg0,
+    );
+  }
+
+  late final _sigsuspendPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Pointer<sigset_t>)>>(
+          'sigsuspend');
+  late final _sigsuspend =
+      _sigsuspendPtr.asFunction<int Function(ffi.Pointer<sigset_t>)>();
+
+  int sigwait(
+    ffi.Pointer<sigset_t> arg0,
+    ffi.Pointer<ffi.Int> arg1,
+  ) {
+    return _sigwait(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _sigwaitPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(
+              ffi.Pointer<sigset_t>, ffi.Pointer<ffi.Int>)>>('sigwait');
+  late final _sigwait = _sigwaitPtr
+      .asFunction<int Function(ffi.Pointer<sigset_t>, ffi.Pointer<ffi.Int>)>();
+
+  void psignal(
+    int arg0,
+    ffi.Pointer<ffi.Char> arg1,
+  ) {
+    return _psignal(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _psignalPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int, ffi.Pointer<ffi.Char>)>>('psignal');
+  late final _psignal =
+      _psignalPtr.asFunction<void Function(int, ffi.Pointer<ffi.Char>)>();
+
+  int sigblock(
+    int arg0,
+  ) {
+    return _sigblock(
+      arg0,
+    );
+  }
+
+  late final _sigblockPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int)>>('sigblock');
+  late final _sigblock = _sigblockPtr.asFunction<int Function(int)>();
+
+  int sigsetmask(
+    int arg0,
+  ) {
+    return _sigsetmask(
+      arg0,
+    );
+  }
+
+  late final _sigsetmaskPtr =
+      _lookup<ffi.NativeFunction<ffi.Int Function(ffi.Int)>>('sigsetmask');
+  late final _sigsetmask = _sigsetmaskPtr.asFunction<int Function(int)>();
+
+  int sigvec1(
+    int arg0,
+    ffi.Pointer<sigvec> arg1,
+    ffi.Pointer<sigvec> arg2,
+  ) {
+    return _sigvec1(
+      arg0,
+      arg1,
+      arg2,
+    );
+  }
+
+  late final _sigvec1Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Int Function(
+              ffi.Int, ffi.Pointer<sigvec>, ffi.Pointer<sigvec>)>>('sigvec');
+  late final _sigvec1 = _sigvec1Ptr.asFunction<
+      int Function(int, ffi.Pointer<sigvec>, ffi.Pointer<sigvec>)>();
+
+  void init_signals() {
+    return _init_signals();
+  }
+
+  late final _init_signalsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function()>>('init_signals');
+  late final _init_signals = _init_signalsPtr.asFunction<void Function()>();
+
+  void cleanup_signals() {
+    return _cleanup_signals();
+  }
+
+  late final _cleanup_signalsPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function()>>('cleanup_signals');
+  late final _cleanup_signals =
+      _cleanup_signalsPtr.asFunction<void Function()>();
+
   ffi.Pointer<ffi.Char> parseCli(
     int argc,
     ffi.Pointer<ffi.Pointer<ffi.Char>> argv,
@@ -2339,6 +2787,14 @@ class HiddifyCoreNativeLibrary {
   late final _parseCli = _parseCliPtr.asFunction<
       ffi.Pointer<ffi.Char> Function(
           int, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+
+  void cleanup() {
+    return _cleanup();
+  }
+
+  late final _cleanupPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function()>>('cleanup');
+  late final _cleanup = _cleanupPtr.asFunction<void Function()>();
 
   ffi.Pointer<ffi.Char> setup(
     ffi.Pointer<ffi.Char> baseDir,
@@ -2384,6 +2840,20 @@ class HiddifyCoreNativeLibrary {
           int,
           int)>();
 
+  void freeString(
+    ffi.Pointer<ffi.Char> str,
+  ) {
+    return _freeString(
+      str,
+    );
+  }
+
+  late final _freeStringPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>)>>(
+          'freeString');
+  late final _freeString =
+      _freeStringPtr.asFunction<void Function(ffi.Pointer<ffi.Char>)>();
+
   ffi.Pointer<ffi.Char> start(
     ffi.Pointer<ffi.Char> configPath,
     int disableMemoryLimit,
@@ -2426,40 +2896,42 @@ class HiddifyCoreNativeLibrary {
   late final _restart = _restartPtr
       .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>, int)>();
 
-  GoSlice GetServerPublicKey() {
+  ffi.Pointer<ffi.Char> GetServerPublicKey() {
     return _GetServerPublicKey();
   }
 
   late final _GetServerPublicKeyPtr =
-      _lookup<ffi.NativeFunction<GoSlice Function()>>('GetServerPublicKey');
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function()>>(
+          'GetServerPublicKey');
   late final _GetServerPublicKey =
-      _GetServerPublicKeyPtr.asFunction<GoSlice Function()>();
+      _GetServerPublicKeyPtr.asFunction<ffi.Pointer<ffi.Char> Function()>();
 
-  GoInterface AddGrpcClientPublicKey(
-    GoSlice clientPublicKey,
+  ffi.Pointer<ffi.Char> AddGrpcClientPublicKey(
+    ffi.Pointer<ffi.Char> clientPublicKey,
   ) {
     return _AddGrpcClientPublicKey(
       clientPublicKey,
     );
   }
 
-  late final _AddGrpcClientPublicKeyPtr =
-      _lookup<ffi.NativeFunction<GoInterface Function(GoSlice)>>(
-          'AddGrpcClientPublicKey');
-  late final _AddGrpcClientPublicKey =
-      _AddGrpcClientPublicKeyPtr.asFunction<GoInterface Function(GoSlice)>();
+  late final _AddGrpcClientPublicKeyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Char> Function(
+              ffi.Pointer<ffi.Char>)>>('AddGrpcClientPublicKey');
+  late final _AddGrpcClientPublicKey = _AddGrpcClientPublicKeyPtr.asFunction<
+      ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Char>)>();
 
-  void close(
+  void closeGrpc(
     int mode,
   ) {
-    return _close(
+    return _closeGrpc(
       mode,
     );
   }
 
-  late final _closePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>('close');
-  late final _close = _closePtr.asFunction<void Function(int)>();
+  late final _closeGrpcPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int)>>('closeGrpc');
+  late final _closeGrpc = _closeGrpcPtr.asFunction<void Function(int)>();
 
   ffi.Pointer<ffi.Char> StartCoreGrpcServer(
     ffi.Pointer<ffi.Char> listenAddress,
@@ -2578,11 +3050,22 @@ final class _GoString_ extends ffi.Struct {
 
 typedef ptrdiff_t = __darwin_ptrdiff_t;
 typedef __darwin_ptrdiff_t = ffi.Long;
+typedef Dart__darwin_ptrdiff_t = int;
 
-abstract class idtype_t {
-  static const int P_ALL = 0;
-  static const int P_PID = 1;
-  static const int P_PGID = 2;
+enum idtype_t {
+  P_ALL(0),
+  P_PID(1),
+  P_PGID(2);
+
+  final int value;
+  const idtype_t(this.value);
+
+  static idtype_t fromValue(int value) => switch (value) {
+        0 => P_ALL,
+        1 => P_PID,
+        2 => P_PGID,
+        _ => throw ArgumentError("Unknown value for idtype_t: $value"),
+      };
 }
 
 final class __darwin_arm_exception_state extends ffi.Struct {
@@ -2597,6 +3080,7 @@ final class __darwin_arm_exception_state extends ffi.Struct {
 }
 
 typedef __uint32_t = ffi.UnsignedInt;
+typedef Dart__uint32_t = int;
 
 final class __darwin_arm_exception_state64 extends ffi.Struct {
   @__uint64_t()
@@ -2610,6 +3094,7 @@ final class __darwin_arm_exception_state64 extends ffi.Struct {
 }
 
 typedef __uint64_t = ffi.UnsignedLongLong;
+typedef Dart__uint64_t = int;
 
 final class __darwin_arm_thread_state extends ffi.Struct {
   @ffi.Array.multi([13])
@@ -2742,6 +3227,7 @@ final class __darwin_sigaltstack extends ffi.Struct {
 }
 
 typedef __darwin_size_t = ffi.UnsignedLong;
+typedef Dart__darwin_size_t = int;
 
 final class __darwin_ucontext extends ffi.Struct {
   @ffi.Int()
@@ -2820,6 +3306,7 @@ final class __siginfo extends ffi.Struct {
 typedef pid_t = __darwin_pid_t;
 typedef __darwin_pid_t = __int32_t;
 typedef __int32_t = ffi.Int;
+typedef Dart__int32_t = int;
 typedef uid_t = __darwin_uid_t;
 typedef __darwin_uid_t = __uint32_t;
 
@@ -2889,6 +3376,7 @@ final class timeval extends ffi.Struct {
 }
 
 typedef __darwin_time_t = ffi.Long;
+typedef Dart__darwin_time_t = int;
 typedef __darwin_suseconds_t = __int32_t;
 
 final class rusage extends ffi.Struct {
@@ -3601,6 +4089,7 @@ final class lldiv_t extends ffi.Struct {
 }
 
 typedef malloc_type_id_t = ffi.UnsignedLongLong;
+typedef Dartmalloc_type_id_t = int;
 
 final class _malloc_zone_t extends ffi.Opaque {}
 
@@ -3610,6 +4099,10 @@ typedef __darwin_dev_t = __int32_t;
 typedef mode_t = __darwin_mode_t;
 typedef __darwin_mode_t = __uint16_t;
 typedef __uint16_t = ffi.UnsignedShort;
+typedef Dart__uint16_t = int;
+typedef pthread_t = __darwin_pthread_t;
+typedef __darwin_pthread_t = ffi.Pointer<_opaque_pthread_t>;
+typedef stack_t = __darwin_sigaltstack;
 
 final class GoInterface extends ffi.Struct {
   external ffi.Pointer<ffi.Void> t;
@@ -3629,7 +4122,9 @@ final class GoSlice extends ffi.Struct {
 
 typedef GoInt = GoInt64;
 typedef GoInt64 = ffi.LongLong;
+typedef DartGoInt64 = int;
 typedef GoUint8 = ffi.UnsignedChar;
+typedef DartGoUint8 = int;
 
 const int __has_safe_buffers = 1;
 

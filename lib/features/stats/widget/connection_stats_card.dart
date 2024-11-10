@@ -45,8 +45,8 @@ class ConnectionStatsCard extends HookConsumerWidget {
                     countryCode: proxy.ipinfo.countryCode,
                     size: 16,
                   ),
-                  const Gap(4),
-                  OrganisationFlag(organization: proxy.ipinfo.org, size: 16),
+                  // const Gap(4),
+                  // OrganisationFlag(organization: proxy.ipinfo.org, size: 16),
                 ],
               ),
               data: IPText(

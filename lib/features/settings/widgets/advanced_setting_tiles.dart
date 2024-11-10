@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/core/router/routes.dart';
+import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/settings/notifier/platform_settings_notifier.dart';
@@ -44,7 +46,7 @@ class AdvancedSettingTiles extends HookConsumerWidget {
                 final newMode = perAppProxy ? PerAppProxyMode.off : PerAppProxyMode.exclude;
                 await ref.read(Preferences.perAppProxyMode.notifier).update(newMode);
                 if (!perAppProxy && context.mounted) {
-                  await const PerAppProxyRoute().push(context);
+                  const PerAppProxyRoute().go(context);
                 }
               },
             ),
@@ -52,7 +54,7 @@ class AdvancedSettingTiles extends HookConsumerWidget {
               if (!perAppProxy) {
                 await ref.read(Preferences.perAppProxyMode.notifier).update(PerAppProxyMode.exclude);
               }
-              if (context.mounted) await const PerAppProxyRoute().push(context);
+              // if (context.mounted) await const PerAppProxyRoute().push(context);
             },
           ),
         ],
