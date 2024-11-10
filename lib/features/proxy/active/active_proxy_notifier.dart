@@ -90,13 +90,13 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
       throw const ServiceNotRunning();
     }
 
-    yield* ref.watch(proxyRepositoryProvider).watchActiveProxies().map((event) => event.getOrElse((l) => throw l)).map((event) => event.firstOrNull!.items.first);
+    yield* ref.watch(proxyRepositoryProvider).watchActiveProxies().map((event) => event.getOrElse((l) => List<OutboundGroup>.empty())).map((event) => event.firstOrNull?.items.first ?? OutboundInfo());
   }
 
   final _urlTestThrottler = Throttler(const Duration(seconds: 2));
 
-  Future<void> urlTest(String groupTag_) async {
-    var groupTag = groupTag_;
+  Future<void> urlTest(String? groupTag_) async {
+    var groupTag = groupTag_ ?? "auto";
     _urlTestThrottler(
       () async {
         if (state case AsyncData()) {

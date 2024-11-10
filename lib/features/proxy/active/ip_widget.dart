@@ -1,4 +1,5 @@
 import 'package:circle_flags/circle_flags.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -112,28 +113,54 @@ class UnknownIPText extends HookConsumerWidget {
 }
 
 class IPCountryFlag extends HookConsumerWidget {
-  const IPCountryFlag({required this.countryCode, this.size = 24, super.key, this.padding = const EdgeInsets.all(2)});
+  const IPCountryFlag({required this.countryCode, this.organization, this.size = 16, super.key, this.padding = EdgeInsets.zero});
 
-  final String countryCode;
+  final String? countryCode;
   final double size;
 
   final EdgeInsets padding;
 
+  final String? organization;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-
+    if (countryCode?.isEmpty ?? true) {
+      return Icon(FluentIcons.question_circle_20_regular, size: size);
+    }
     return Semantics(
-      label: t.proxies.ipInfoSemantics.country,
-      child: Container(
-        width: size,
-        height: size,
-        padding: padding,
-        child: Center(
-          child: CircleFlag(countryCode.toLowerCase() == "ir" ? "ir-shir" : countryCode),
-        ),
-      ),
-    );
+        label: t.proxies.ipInfoSemantics.country,
+        child: SizedBox(
+          width: size + 4,
+          height: size + 4,
+          child: Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              Container(
+                width: size,
+                height: size,
+                padding: const EdgeInsets.all(3),
+                child: CircleFlag(
+                  // key: ValueKey(countryCode),
+                  countryCode!.toLowerCase() == "ir" ? "ir-shir" : countryCode!,
+                  size: size,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8), // Rounded effect
+                  ),
+                ),
+              ),
+              if (organization != null)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: OrganisationFlag(
+                    organization: organization!,
+                    size: 16,
+                  ),
+                ),
+            ],
+          ),
+        ));
   }
 }
 
@@ -171,16 +198,20 @@ class OrganisationFlag extends HookConsumerWidget {
     required String organization,
     required double size,
     required String label,
+    required Color color,
   }) {
     return Semantics(
       label: "$label $organization",
       child: Container(
         width: size,
         height: size,
-        padding: const EdgeInsets.only(right: 4),
-        child: Center(
-          child: widget,
+
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
         ),
+        // padding: const ,
+        child: widget,
       ),
     );
   }
@@ -193,9 +224,10 @@ class OrganisationFlag extends HookConsumerWidget {
         return getFlagWidget(
           widget: Icon(
             entry.value.icon,
-            color: entry.value.color,
-            size: size - 4,
+            color: Colors.white,
+            size: size - 6,
           ),
+          color: entry.value.color,
           organization: organization,
           size: size,
           label: t.proxies.ipInfoSemantics.organization,

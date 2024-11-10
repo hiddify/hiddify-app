@@ -16,65 +16,59 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
     final theme = Theme.of(context);
     final activeProxy = ref.watch(activeProxyNotifierProvider);
 
-    return AnimatedVisibility(
-      axis: Axis.vertical,
-      visible: activeProxy is AsyncData,
-      child: () {
-        switch (activeProxy) {
-          case AsyncData(value: final proxy):
-            final delay = proxy.urlTestDelay;
-            final timeout = delay > 65000;
+    if (activeProxy is! AsyncData) {
+      return const SizedBox(); // Avoid building widget if data is not available
+    }
 
-            return Center(
-              child: InkWell(
-                onTap: () async {
-                  await ref.read(activeProxyNotifierProvider.notifier).urlTest(proxy.tag);
-                },
-                borderRadius: BorderRadius.circular(24),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+    final proxy = activeProxy.value!;
+    final delay = proxy.urlTestDelay;
+    final timeout = delay > 65000;
+
+    return Center(
+      child: InkWell(
+        onTap: () async {
+          await ref.read(activeProxyNotifierProvider.notifier).urlTest(proxy.tag);
+        },
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(FluentIcons.wifi_1_24_regular),
+              const Gap(8),
+              if (delay > 0)
+                Text.rich(
+                  semanticsLabel: timeout ? t.proxies.delaySemantics.timeout : t.proxies.delaySemantics.result(delay: delay),
+                  TextSpan(
                     children: [
-                      const Icon(FluentIcons.wifi_1_24_regular),
-                      const Gap(8),
-                      if (delay > 0)
-                        Text.rich(
-                          semanticsLabel: timeout ? t.proxies.delaySemantics.timeout : t.proxies.delaySemantics.result(delay: delay),
-                          TextSpan(
-                            children: [
-                              if (timeout)
-                                TextSpan(
-                                  text: t.general.timeout,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.error,
-                                  ),
-                                )
-                              else ...[
-                                TextSpan(
-                                  text: delay.toString(),
-                                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                const TextSpan(text: " ms"),
-                              ],
-                            ],
+                      if (timeout)
+                        TextSpan(
+                          text: t.general.timeout,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.error,
                           ),
                         )
-                      else
-                        Semantics(
-                          label: t.proxies.delaySemantics.testing,
-                          child: const ShimmerSkeleton(width: 48, height: 18),
+                      else ...[
+                        TextSpan(
+                          text: delay.toString(),
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
+                        const TextSpan(text: " ms"),
+                      ],
                     ],
                   ),
+                )
+              else
+                Semantics(
+                  label: t.proxies.delaySemantics.testing,
+                  child: const ShimmerSkeleton(width: 48, height: 18),
                 ),
-              ),
-            );
-          default:
-            return const SizedBox();
-        }
-      }(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
