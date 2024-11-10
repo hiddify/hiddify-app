@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/bootstrap.dart';
 import 'package:hiddify/core/model/environment.dart';
 
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // debugPaintSizeEnabled = true;
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(

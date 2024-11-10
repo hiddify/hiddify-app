@@ -23,7 +23,7 @@ import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
-import 'package:hiddify/singbox/service/singbox_service_provider.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -126,7 +126,7 @@ Future<void> lazyBootstrap(
   );
   await _init(
     "sing-box",
-    () => container.read(singboxServiceProvider).init(),
+    () => container.read(hiddifyCoreServiceProvider).init(),
   );
   if (!kIsWeb) {
     await _safeInit(

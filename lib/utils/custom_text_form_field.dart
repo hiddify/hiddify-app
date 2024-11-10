@@ -46,26 +46,24 @@ class CustomTextFormField extends HookConsumerWidget {
           )
         : null;
 
-    return PlatformTextFormField(
+    return TextFormField(
       controller: textController,
       textCapitalization: TextCapitalization.sentences,
       maxLines: maxLines,
       onChanged: onChanged,
-      material: (context, platform) => MaterialTextFormFieldData(
-        textDirection: textController.textDirection,
-        decoration: InputDecoration(
-          isDense: true,
-          label: label != null ? Text(label!) : null,
-          hintText: hint,
-          hintStyle: Theme.of(context).textTheme.bodySmall,
-          constraints: effectiveConstraints,
-          suffixIcon: suffixIcon,
-          border: effectiveBorder,
-          enabledBorder: effectiveBorder,
-          errorBorder: effectiveBorder,
-          focusedBorder: effectiveBorder,
-          focusedErrorBorder: effectiveBorder,
-        ),
+      textDirection: textController.textDirection,
+      decoration: InputDecoration(
+        isDense: true,
+        label: label != null ? Text(label!) : null,
+        hintText: hint,
+        hintStyle: Theme.of(context).textTheme.bodySmall,
+        constraints: effectiveConstraints,
+        suffixIcon: suffixIcon,
+        border: effectiveBorder,
+        enabledBorder: effectiveBorder,
+        errorBorder: effectiveBorder,
+        focusedBorder: effectiveBorder,
+        focusedErrorBorder: effectiveBorder,
       ),
       validator: validator,
       textInputAction: TextInputAction.next,

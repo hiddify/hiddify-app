@@ -72,7 +72,7 @@ dependencies:
   percent_indicator: ^4.2.3
   sliver_tools: ^0.2.12
   flutter_adaptive_scaffold: ^0.3.1
-
+  font_awesome_flutter: ^10.7.0
   upgrader: ^11.3.0
   toastification: ^2.3.0
   version: ^3.0.2
@@ -98,7 +98,7 @@ dependencies:
     git: https://github.com/hiddify-com/flutter_circle_flags.git
   fixnum: ^1.1.0
   grpc: ^4.0.1
-  
+  bottom_navy_bar: ^6.1.0
   protobuf: ^3.0.0
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
@@ -107,6 +107,9 @@ dependencies:
   animated_notch_bottom_bar: ^1.0.0
   basic_utils: 5.7.0
   showcaseview: 3.0.0
+  
+  
+
 dev_dependencies:
   # flutter_test:
   #   sdk: flutter
