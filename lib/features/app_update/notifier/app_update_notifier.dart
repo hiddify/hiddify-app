@@ -27,8 +27,8 @@ Upgrader upgrader(UpgraderRef ref) => Upgrader(
         onMacOS: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
         onWeb: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
       ),
-      debugLogging: _debugUpgrader && kDebugMode,
-      durationUntilAlertAgain: const Duration(hours: 12),
+      debugLogging: false && _debugUpgrader && kDebugMode,
+      // durationUntilAlertAgain: const Duration(hours: 12),
       messages: UpgraderMessages(
         code: ref.watch(localePreferencesProvider).languageCode,
       ),

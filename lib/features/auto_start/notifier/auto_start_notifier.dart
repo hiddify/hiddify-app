@@ -12,12 +12,8 @@ class AutoStartNotifier extends _$AutoStartNotifier with InfraLogger {
   @override
   Future<bool> build() async {
     if (!PlatformUtils.isDesktop) return false;
-
     final appInfo = ref.watch(appInfoProvider).requireValue;
-    launchAtStartup.setup(
-      appName: appInfo.name,
-      appPath: Platform.resolvedExecutable,
-    );
+    launchAtStartup.setup(appName: appInfo.name, appPath: Platform.resolvedExecutable, packageName: "Hiddify.HiddifyNext");
     final isEnabled = await launchAtStartup.isEnabled();
     loggy.info("auto start is [${isEnabled ? "Enabled" : "Disabled"}]");
     return isEnabled;

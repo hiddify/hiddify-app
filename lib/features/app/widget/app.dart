@@ -21,7 +21,7 @@ import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart'
 import 'package:hiddify/features/shortcut/shortcut_wrapper.dart';
 import 'package:hiddify/features/system_tray/widget/system_tray_wrapper.dart';
 import 'package:hiddify/features/window/widget/window_wrapper.dart';
-import 'package:hiddify/singbox/service/singbox_service_provider.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:upgrader/upgrader.dart';
@@ -38,8 +38,9 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   void onPause(WidgetRef ref) {}
 
   void onResume(WidgetRef ref) {
+    // if (PlatformUtils.isDesktop) return;
     final dirs = ref.read(appDirectoriesProvider).requireValue;
-    final singbox = ref.read(singboxServiceProvider);
+    final singbox = ref.read(hiddifyCoreServiceProvider);
     singbox.setup(dirs, false).mapLeft((e) {
       loggy.error(e);
       ref.read(inAppNotificationControllerProvider).showSuccessToast(
