@@ -35,15 +35,7 @@ class HomePage extends HookConsumerWidget {
                   RootScaffold.stateKey.currentState?.openDrawer();
                 },
               )
-            : (Navigator.of(context).canPop()
-                ? PlatformIconButton(
-                    icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
-                    padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Pops the current route off the navigator stack
-                    },
-                  )
-                : null),
+            : null,
         title: Row(mainAxisSize: MainAxisSize.max, children: [
           Assets.images.logo.svg(height: 24),
           const Gap(8),
@@ -102,50 +94,56 @@ class HomePage extends HookConsumerWidget {
           ),
         ),
         child: Stack(
-          alignment: Alignment.bottomCenter,
+          alignment: Alignment.center,
           children: [
-            CustomScrollView(
-              slivers: [
-                // switch (activeProfile) {
-                // AsyncData(value: final profile?) =>
-                MultiSliver(
-                  children: [
-                    // const Gap(100),
-                    switch (activeProfile) {
-                      AsyncData(value: final profile?) => ProfileTile(profile: profile, isMain: true),
-                      _ => const Text(""),
-                    },
+            Center(
+                child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: 600, // Set the maximum width here
+              ),
+              child: CustomScrollView(
+                slivers: [
+                  // switch (activeProfile) {
+                  // AsyncData(value: final profile?) =>
+                  MultiSliver(
+                    children: [
+                      // const Gap(100),
+                      switch (activeProfile) {
+                        AsyncData(value: final profile?) => ProfileTile(profile: profile, isMain: true),
+                        _ => const Text(""),
+                      },
 
-                    SliverFillRemaining(
-                      hasScrollBody: false,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ConnectionButton(),
-                                ActiveProxyDelayIndicator(),
-                              ],
+                      const SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Expanded(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ConnectionButton(),
+                                  ActiveProxyDelayIndicator(),
+                                ],
+                              ),
                             ),
-                          ),
-                          if (true || MediaQuery.sizeOf(context).width < 840) const ActiveProxyFooter(),
-                        ],
+                            ActiveProxyFooter(),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                // AsyncData() => switch (hasAnyProfile) {
-                //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                //     _ => const EmptyProfilesHomeBody(),
-                //   },
-                // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
-                // _ => const SliverToBoxAdapter(),
-                // },
-              ],
-            ),
+                    ],
+                  ),
+                  // AsyncData() => switch (hasAnyProfile) {
+                  //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
+                  //     _ => const EmptyProfilesHomeBody(),
+                  //   },
+                  // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
+                  // _ => const SliverToBoxAdapter(),
+                  // },
+                ],
+              ),
+            ))
           ],
         ),
       ),

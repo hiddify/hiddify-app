@@ -7,9 +7,9 @@ import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
 import 'package:hiddify/singbox/model/singbox_status.dart';
-import 'package:hiddify/singbox/service/singbox_service.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:meta/meta.dart';
 
@@ -42,7 +42,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   });
 
   final Directories directories;
-  final SingboxService singbox;
+  final HiddifyCoreService singbox;
 
   final ConfigOptionRepository configOptionRepository;
   final ProfilePathResolver profilePathResolver;

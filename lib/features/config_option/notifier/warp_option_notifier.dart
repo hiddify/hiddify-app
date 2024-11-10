@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/model/config_option_failure.dart';
-import 'package:hiddify/singbox/service/singbox_service_provider.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,7 +44,7 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
 
     final result = await AsyncValue.guard(() async {
       final warp = await ref
-          .read(singboxServiceProvider)
+          .read(hiddifyCoreServiceProvider)
           .generateWarpConfig(
             licenseKey: ref.read(ConfigOptions.warpLicenseKey),
             previousAccountId: ref.read(ConfigOptions.warpAccountId),
@@ -68,7 +68,7 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
 
     final result = await AsyncValue.guard(() async {
       final warp = await ref
-          .read(singboxServiceProvider)
+          .read(hiddifyCoreServiceProvider)
           .generateWarpConfig(
             licenseKey: ref.read(ConfigOptions.warpLicenseKey),
             previousAccountId: ref.read(ConfigOptions.warp2AccountId),

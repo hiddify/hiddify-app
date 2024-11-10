@@ -136,8 +136,8 @@ class AddProfileModal extends HookConsumerWidget {
                             icon: FluentIcons.add_24_regular,
                             size: buttonWidth,
                             onTap: () async {
-                              context.pop();
                               await const NewProfileRoute().push(context);
+                              if (context.mounted) context.pop();
                             },
                           ),
                       ],
@@ -150,42 +150,46 @@ class AddProfileModal extends HookConsumerWidget {
                     ),
                     child: Column(
                       children: [
-                        // Semantics(
-                        //   button: true,
-                        //   child: SizedBox(
-                        //     height: 36,
-                        //     child: Material(
-                        //       key: const ValueKey("add_warp_button"),
-                        //       elevation: 8,
-                        //       color: theme.colorScheme.surface,
-                        //       surfaceTintColor: theme.colorScheme.surfaceTint,
-                        //       shadowColor: Colors.transparent,
-                        //       borderRadius: BorderRadius.circular(8),
-                        //       clipBehavior: Clip.antiAlias,
-                        //       child: InkWell(
-                        //         onTap: () async {
-                        //           await addProfileModal(context, ref);
-                        //         },
-                        //         child: Row(
-                        //           mainAxisAlignment: MainAxisAlignment.center,
-                        //           children: [
-                        //             Icon(
-                        //               FluentIcons.add_24_regular,
-                        //               color: theme.colorScheme.primary,
-                        //             ),
-                        //             // const SizedBox(width: 8),
-                        //             // Text(
-                        //             //   t.profile.add.addWarp,
-                        //             //   style: theme.textTheme.labelLarge?.copyWith(
-                        //             //     color: theme.colorScheme.primary,
-                        //             //   ),
-                        //             // ),
-                        //           ],
-                        //         ),
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                        if (!PlatformUtils.isInAppStore)
+                          Semantics(
+                            button: true,
+                            child: SizedBox(
+                              height: 36,
+                              child: Material(
+                                key: const ValueKey("add_warp_button"),
+                                elevation: 8,
+                                color: theme.colorScheme.surface,
+                                surfaceTintColor: theme.colorScheme.surfaceTint,
+                                shadowColor: Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                                clipBehavior: Clip.antiAlias,
+                                child: InkWell(
+                                  onTap: () async {
+                                    await addProfileModal(context, ref);
+                                    if (context.mounted) {
+                                      context.pop();
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        FluentIcons.add_24_regular,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        t.profile.add.addWarp,
+                                        style: theme.textTheme.labelLarge?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         if (!PlatformUtils.isDesktop) const SizedBox(height: 16), // Spacing between the buttons
                         if (!PlatformUtils.isDesktop)
                           Semantics(
@@ -306,7 +310,6 @@ class AddProfileModal extends HookConsumerWidget {
     final _profile = ref.read(addProfileProvider.notifier);
     final consent = (_prefs.getBool(warpConsentGiven) ?? false);
     final region = ref.read(ConfigOptions.region.notifier).raw();
-    context.pop();
 
     final t = ref.read(translationsProvider);
     final notification = ref.read(inAppNotificationControllerProvider);

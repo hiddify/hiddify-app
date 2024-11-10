@@ -1,12 +1,14 @@
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/router/routes.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/tip_card.dart';
 import 'package:hiddify/features/common/confirmation_dialogs.dart';
@@ -167,11 +169,18 @@ class ConfigOptionsPage extends HookConsumerWidget {
                   PlatformListSection(
                     sectionTitle: t.settings.general.sectionTitle,
                     items: [
-                      ListTile(
-                        leading: const Icon(FluentIcons.info_20_filled),
-                        title: Text(t.about.pageTitle),
-                        onTap: () => Navigator.of(context).push(platformPageRoute(context: context, builder: (_) => const AboutPage())),
-                      ),
+                      if (Breakpoints.small.isActive(context)) ...[
+                        ListTile(
+                          leading: const Icon(FluentIcons.info_20_filled),
+                          title: Text(t.about.pageTitle),
+                          onTap: () => const AboutRoute().push(context),
+                        ),
+                        ListTile(
+                          leading: const Icon(FluentIcons.document_text_20_filled),
+                          title: Text(t.logs.pageTitle),
+                          onTap: () => const LogsOverviewRoute().push(context),
+                        ),
+                      ],
                       const GeneralSettingTiles(),
                       const PlatformSettingsTiles(),
                     ],
