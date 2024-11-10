@@ -7,8 +7,8 @@ on:
   release:
     types: [released]   # Run the action when a GitHub release is published
 
-  schedule:
-    - cron:  '0 */6 * * *'  # Run the action every 6 hours
+  # schedule:
+  #   - cron:  '0 */6 * * *'  # Run the action every 6 hours
 
   workflow_dispatch:    # Manually run the action
 
