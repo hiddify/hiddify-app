@@ -1,12 +1,16 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
+import 'package:hiddify/features/config_option/overview/PlatformListSection.dart';
 import 'package:hiddify/features/config_option/overview/config_options_page.dart';
+import 'package:hiddify/features/config_option/overview/tlsfragment_widgets.dart';
+import 'package:hiddify/features/config_option/overview/warp_options_widgets.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -42,46 +46,63 @@ class QuickSettingsModal extends HookConsumerWidget {
             ),
           ),
           const Gap(8),
-          if (warpPrefaceCompleted)
-            GestureDetector(
-              onLongPress: () {
-                ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context);
-              },
-              child: SwitchListTile.adaptive(
-                value: ref.watch(ConfigOptions.enableWarp),
-                onChanged: ref.watch(ConfigOptions.enableWarp.notifier).update,
-                title: Text(t.config.enableWarp),
-              ),
-            )
-          else
-            PlatformListTile(
-              title: Text(t.config.setupWarp),
-              trailing: const Icon(FluentIcons.chevron_right_24_regular),
-              onTap: () => ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context),
-            ),
-          GestureDetector(
-            onLongPress: () {
-              ConfigOptionsRoute(section: ConfigOptionSection.fragment.name).go(context);
-            },
-            child: SwitchListTile.adaptive(
-              value: ref.watch(ConfigOptions.enableTlsFragment),
-              onChanged: ref.watch(ConfigOptions.enableTlsFragment.notifier).update,
-              title: Text(t.config.enableTlsFragment),
-            ),
+
+          PlatformListSection(
+            sectionIcon: const Icon(FontAwesomeIcons.cloudflare),
+            sectionTitle: t.config.section.warp,
+            title: warpPrefaceCompleted
+                ? SwitchListTile.adaptive(
+                    value: ref.watch(ConfigOptions.enableWarp),
+                    onChanged: ref.watch(ConfigOptions.enableWarp.notifier).update,
+                    title: Text(t.config.enableWarp),
+                  )
+                : null,
+            items: const [
+              WarpOptionsTiles(),
+            ],
           ),
+          PlatformListSection(
+            sectionIcon: const Icon(FontAwesomeIcons.expeditedssl),
+            sectionTitle: t.config.section.tlsTricks,
+            title: warpPrefaceCompleted
+                ? SwitchListTile.adaptive(
+                    value: ref.watch(ConfigOptions.enableTlsFragment),
+                    onChanged: ref.watch(ConfigOptions.enableTlsFragment.notifier).update,
+                    title: Text(t.config.enableTlsFragment),
+                  )
+                : null,
+            items: const [
+              TlsfragmentTiles(),
+            ],
+          ),
+          // const AboutPage()
+
+          // GestureDetector(
+          //   onLongPress: () {
+          //     ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context);
+          //   },
+          //   child:
+          // )
+          // else
+          //   PlatformListTile(
+          //     title: Text(t.config.setupWarp),
+          //     trailing: const Icon(FluentIcons.chevron_right_24_regular),
+          //     onTap: () => ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context),
+          //   ),
+
           // SwitchListTile.adaptive(
           //   value: ref.watch(ConfigOptions.enableMux),
           //   onChanged: ref.watch(ConfigOptions.enableMux.notifier).update,
           //   title: Text(t.config.enableMux),
           // ),
-          PlatformListTile(
-            title: Text(t.config.allOptions),
-            trailing: const Icon(FluentIcons.chevron_right_24_regular),
-            material: (context, platform) => MaterialListTileData(
-              dense: true,
-            ),
-            onTap: () => const ConfigOptionsRoute().go(context),
-          ),
+          // PlatformListSection(
+          //   sectionIcon: const Icon(FluentIcons.settings_20_filled),
+          //   sectionTitle: t.config.allOptions,
+          //   items: [
+          //     ConfigOptionsPage(),
+          //   ],
+          // ),
+
           const Gap(16),
         ],
       ),

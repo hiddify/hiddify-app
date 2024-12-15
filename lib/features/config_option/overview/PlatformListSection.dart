@@ -1,38 +1,59 @@
-import 'package:flutter/cupertino.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class PlatformListSection extends StatelessWidget {
-  final String sectionTitle;
-  final List<Widget> items;
+  Widget sectionTitle;
+  final List<Widget>? items;
+  final Widget? page;
+  final Widget sectionIcon;
+  final bool showAppBar;
+  final bool openOnLoad;
+  final Widget? title;
 
-  PlatformListSection({required this.sectionTitle, required this.items});
+  PlatformListSection({
+    required this.sectionIcon,
+    required String sectionTitle,
+    this.items,
+    this.page,
+    this.showAppBar = true,
+    this.openOnLoad = false,
+    this.title,
+  }) : sectionTitle = Text(sectionTitle);
+
+  void _navigateToDetailsPage(BuildContext context) {
+    Navigator.of(context).push(PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => PlatformWidget(
+        material: (_, __) => Scaffold(
+          appBar: showAppBar ? AppBar(title: sectionTitle) : null,
+          body: page ?? (items == null ? Container() : ListView(children: items!)),
+        ),
+        cupertino: (_, __) => CupertinoPageScaffold(
+          navigationBar: CupertinoNavigationBar(middle: sectionTitle),
+          child: page ?? (items == null ? Container() : ListView(children: items!)),
+        ),
+      ),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0); // Start from the right
+        const end = Offset.zero; // End at the center
+        const curve = Curves.easeInOut;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: PlatformWidget(
-        material: (_, __) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                sectionTitle,
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-            ),
-            Card(
-              elevation: 4.0,
-              child: Column(children: items),
-            ),
-          ],
-        ),
-        cupertino: (_, __) => CupertinoListSection.insetGrouped(
-            header: Text(sectionTitle), // Only show header here for Cupertino
-            children: items),
-      ),
+    return ListTile(
+      leading: sectionIcon,
+      title: title ?? sectionTitle,
+      onTap: () => _navigateToDetailsPage(context),
+      trailing: const Icon(FluentIcons.chevron_right_20_regular),
     );
   }
 }
