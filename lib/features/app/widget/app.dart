@@ -43,9 +43,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     final singbox = ref.read(hiddifyCoreServiceProvider);
     singbox.setup(dirs, false).mapLeft((e) {
       loggy.error(e);
-      ref.read(inAppNotificationControllerProvider).showSuccessToast(
-            e,
-          );
+      ref.read(inAppNotificationControllerProvider).showErrorToast(e);
     }).map((_) {
       loggy.info("Hiddify-core setup done");
     }).run();
