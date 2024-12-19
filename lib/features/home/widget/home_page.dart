@@ -1,4 +1,5 @@
 import 'package:dartx/dartx.dart';
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
@@ -65,6 +66,21 @@ class HomePage extends HookConsumerWidget {
           //     material: (context, platform) => MaterialIconButtonData(
           //           tooltip: t.profile.add.buttonText,
           //         )),
+          TextButton(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Text(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle),
+                // const Gap(8),
+                Semantics(
+                  key: const ValueKey("profile_quick_settings"),
+                  label: t.config.quickSettings,
+                  child: const Icon(FluentIcons.options_24_filled, size: 24),
+                ),
+              ],
+            ),
+            onPressed: () => const QuickSettingsRoute().push(context),
+          ),
           TextButton(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

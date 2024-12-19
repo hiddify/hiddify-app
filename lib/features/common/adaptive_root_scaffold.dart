@@ -44,6 +44,7 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
         icon: Icons.switch_account_rounded,
         title: t.profile.overviewPageTitle,
         page: const ProfilesOverviewRoute(),
+        showOnMobile: false,
       ),
       // NavigationItem(
       //   icon: Icons.extension,

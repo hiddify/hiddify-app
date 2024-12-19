@@ -408,7 +408,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
             url.trim(),
             tempFile.path,
             cancelToken: cancelToken,
-            userAgent: configs.useXrayCoreWhenPossible ? "v2rayNG/1.8.23" : null,
+            userAgent: configs.useXrayCoreWhenPossible ? httpClient.userAgent.replaceAll("HiddifyNext", "HiddifyNextX") : null,
           );
           final headers = await _populateHeaders(response.headers.map, tempFile.path);
           return await validateConfig(file.path, tempFile.path, false)

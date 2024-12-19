@@ -121,6 +121,10 @@ class ConnectionButton extends HookConsumerWidget {
     // }
     return _ConnectionButton(
       onTap: switch (connectionStatus) {
+        AsyncData(value: Connected()) when requiresReconnect == true => () async {
+            final activeProfile = await ref.read(activeProfileProvider.future);
+            return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
+          },
         AsyncData(value: Disconnected()) || AsyncError() => () async {
             if (ref.read(activeProfileProvider).value == null) {
               await showDialog<bool>(
@@ -142,7 +146,7 @@ class ConnectionButton extends HookConsumerWidget {
                         Navigator.of(context).pop(false);
                       },
                       child: Text(t.home.ok),
-                    )
+                    ),
                   ],
                 ),
               );

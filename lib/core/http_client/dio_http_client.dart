@@ -11,7 +11,7 @@ class DioHttpClient with InfraLogger {
   final Map<String, Dio> _dio = {};
   DioHttpClient({
     required Duration timeout,
-    required String userAgent,
+    required this.userAgent,
     required bool debug,
   }) {
     for (var mode in ["proxy", "direct", "both"]) {
@@ -59,6 +59,8 @@ class DioHttpClient with InfraLogger {
   }
 
   int port = 0;
+
+  String userAgent;
   // bool isPortOpen(String host, int port, {Duration timeout = const Duration(milliseconds: 200)}) async{
   //   try {
   //     Socket.connect(host, port, timeout: timeout).then((socket) {

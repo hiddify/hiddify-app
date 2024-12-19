@@ -32,6 +32,7 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
       routes: [
         TypedGoRoute<ProxiesRoute>(path: "proxies", name: ProxiesRoute.name),
         TypedGoRoute<QuickSettingsRoute>(path: "quick-settings", name: QuickSettingsRoute.name),
+        TypedGoRoute<ProfilesOverviewBottomSheetRoute>(path: "bottomsheet", name: ProfilesOverviewBottomSheetRoute.name)
       ],
     ),
     TypedGoRoute<ProfilesOverviewRoute>(path: "/profiles", name: ProfilesOverviewRoute.name, routes: [
@@ -48,7 +49,7 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
     ),
     TypedGoRoute<PerAppProxyRoute>(path: "/per-app-proxy", name: PerAppProxyRoute.name),
     TypedGoRoute<AboutRoute>(path: "/about", name: AboutRoute.name),
-    TypedGoRoute<IntroRoute>(path: "/intro", name: IntroRoute.name)
+    TypedGoRoute<IntroRoute>(path: "/intro", name: IntroRoute.name),
   ],
 )
 class DesktopWrapperRoute extends ShellRouteData {
@@ -99,7 +100,7 @@ class HomeRoute extends HRouteData {
     return platformPage(
       context: context,
       name: name,
-      child: HomePage(),
+      child: const HomePage(),
     );
   }
 
@@ -172,7 +173,7 @@ class ProfilesOverviewRoute extends HRouteData {
     return platformPage(
       context: context,
       name: name,
-      child: ProfilesOverviewModal(),
+      child: const ProfilesOverviewModal(),
     );
     // return BottomSheetPage(
     //   name: name,
@@ -182,6 +183,28 @@ class ProfilesOverviewRoute extends HRouteData {
 
   @override
   String getName() => ProfilesOverviewRoute.name;
+  @override
+  String getLocation() => location;
+}
+
+class ProfilesOverviewBottomSheetRoute extends HRouteData {
+  const ProfilesOverviewBottomSheetRoute();
+  static const name = "ProfilesBottom";
+
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return BottomSheetPage(
+      fixed: true,
+      name: name,
+      builder: (controller) => const ProfilesOverviewModal(),
+    );
+  }
+
+  @override
+  String getName() => ProfilesOverviewBottomSheetRoute.name;
+
   @override
   String getLocation() => location;
 }

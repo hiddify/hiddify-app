@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/localization/translations.dart';
 
 typedef PresentableError = ({String type, String? message});
@@ -22,6 +23,7 @@ mixin ExpectedFailure {}
 
 extension ErrorPresenter on TranslationsEn {
   PresentableError errorToPair(Object error) => switch (error) {
+        GrpcError(message: final nestedErr?) => errorToPair(nestedErr),
         UnexpectedFailure(error: final nestedErr?) => errorToPair(nestedErr),
         Failure() => error.present(this),
         DioException() => error.present(this),
@@ -52,10 +54,7 @@ extension ErrorPresenter on TranslationsEn {
 
 extension DioExceptionPresenter on DioException {
   PresentableError present(TranslationsEn t) => switch (type) {
-        DioExceptionType.connectionTimeout ||
-        DioExceptionType.sendTimeout ||
-        DioExceptionType.receiveTimeout =>
-          (type: t.failure.connection.timeout, message: null),
+        DioExceptionType.connectionTimeout || DioExceptionType.sendTimeout || DioExceptionType.receiveTimeout => (type: t.failure.connection.timeout, message: null),
         DioExceptionType.badCertificate => (
             type: t.failure.connection.badCertificate,
             message: message,

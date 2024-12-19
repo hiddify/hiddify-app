@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -91,7 +92,11 @@ class ProfileTile extends HookConsumerWidget {
                 child: InkWell(
                   onTap: () {
                     if (isMain) {
-                      const ProfilesOverviewRoute().go(context);
+                      if (Breakpoints.small.isActive(context)) {
+                        const ProfilesOverviewBottomSheetRoute().push(context);
+                      } else {
+                        const ProfilesOverviewRoute().go(context);
+                      }
                     } else {
                       if (selectActiveMutation.state.isInProgress) return;
                       // if (profile.active) return;

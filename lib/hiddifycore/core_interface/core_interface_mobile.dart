@@ -12,6 +12,7 @@ import 'package:hiddify/hiddifycore/generated/v2/hello/hello_service.pbgrpc.dart
 
 import 'package:hiddify/utils/utils.dart';
 import 'package:loggy/loggy.dart';
+import 'package:posix/posix.dart';
 
 final _logger = Loggy('FFIHiddifyCoreService');
 
@@ -85,11 +86,14 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 
   @override
   Future<bool> restart(String path, String name) async {
-    await methodChannel.invokeMethod(
-      "restart",
-      {"path": path, "name": name},
-    );
-    return true;
+    await stop();
+
+    // await methodChannel.invokeMethod(
+    //   "restart",
+    //   {"path": path, "name": name},
+    // );
+    sleep(1);
+    return await start(path, name);
   }
 
   @override
