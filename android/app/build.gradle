@@ -38,7 +38,7 @@ android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
     compileSdkVersion 35
-    ndkVersion "26.1.10909125"
+    ndkVersion "26.2.11394342"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -119,7 +119,8 @@ flutter {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
+
 }
