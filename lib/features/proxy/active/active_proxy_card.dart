@@ -7,6 +7,7 @@ import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ActiveProxyFooter extends ConsumerWidget {
@@ -90,7 +91,7 @@ class ActiveProxyFooter extends ConsumerWidget {
                   Semantics(
                     label: t.proxies.activeProxySemanticLabel,
                     child: Text(
-                      activeProxy.tagDisplay,
+                      getRealOutboundTag(activeProxy),
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -125,6 +126,14 @@ class ActiveProxyFooter extends ConsumerWidget {
       ),
     );
   }
+}
+
+String getRealOutboundTag(OutboundInfo group) {
+  var tag = group.tagDisplay;
+  if (group.groupSelectedOutbound.tagDisplay != "") {
+    tag = "$tag → ${getRealOutboundTag(group.groupSelectedOutbound)}";
+  }
+  return tag;
 }
 
 // class _StatsColumn extends HookConsumerWidget {
