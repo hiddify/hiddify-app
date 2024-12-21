@@ -8,9 +8,10 @@ import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ActiveProxyFooter extends ConsumerWidget {
+class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
   const ActiveProxyFooter({super.key});
 
   @override
@@ -29,8 +30,13 @@ class ActiveProxyFooter extends ConsumerWidget {
 
     // Handle URL test in a way that won't trigger during build
     Future<void> handleUrlTest() async {
-      if (!context.mounted) return;
-      await ref.read(activeProxyNotifierProvider.notifier).urlTest(activeProxy.tag);
+      try {
+        if (!context.mounted) return;
+        await ref.read(activeProxyNotifierProvider.notifier).urlTest(activeProxy.tag);
+      } catch (e) {
+        // Handle error here
+        loggy.error("Error during URL test: $e");
+      }
     }
 
     // Handle showing proxy info

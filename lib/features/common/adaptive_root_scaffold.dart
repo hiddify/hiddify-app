@@ -31,8 +31,8 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-
+    final t = ref.watch(translationsProvider).valueOrNull;
+    if (t == null) return const SizedBox.shrink();
     // final selectedIndex = getCurrentIndex(context);
     var allnavigationItems = [
       NavigationItem(

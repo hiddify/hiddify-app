@@ -80,12 +80,13 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
           await haptic.lightImpact();
           await ref.read(Preferences.startedByUser.notifier).update(true);
           await _connect();
-        case Connected():
+        // case Connected():
+        default:
           await haptic.mediumImpact();
           await ref.read(Preferences.startedByUser.notifier).update(false);
           await _disconnect();
-        default:
-          loggy.warning("switching status, debounce");
+        // default:
+        //   loggy.warning("switching status, debounce");
       }
     }
   }

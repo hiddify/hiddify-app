@@ -125,8 +125,8 @@ class ConnectionButton extends HookConsumerWidget {
             final activeProfile = await ref.read(activeProfileProvider.future);
             return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
           },
-        AsyncData(value: Disconnected()) || AsyncError() => () async {
-            if (ref.read(activeProfileProvider).value == null) {
+        AsyncData(value: Disconnected()) || AsyncData(value: Connecting()) || AsyncError() => () async {
+            if (ref.read(activeProfileProvider).valueOrNull == null) {
               await showDialog<bool>(
                 context: context,
                 builder: (context) => PlatformAlertDialog(

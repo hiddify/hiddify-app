@@ -167,6 +167,7 @@ Future<void> lazyBootstrap(
   if (!kIsWeb) {
     FlutterNativeSplash.remove();
   }
+  SentryFlutter.setAppStartEnd(DateTime.now().toUtc());
 }
 
 Future<T> _init<T>(
