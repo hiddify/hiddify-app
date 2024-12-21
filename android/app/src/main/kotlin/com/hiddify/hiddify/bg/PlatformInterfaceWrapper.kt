@@ -1,5 +1,6 @@
 package com.hiddify.hiddify.bg
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
@@ -98,7 +99,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     override fun underNetworkExtension(): Boolean {
         return false
     }
-    
+
     override fun includeAllNetworks(): Boolean {
         return false
     }
@@ -130,6 +131,9 @@ interface PlatformInterfaceWrapper : PlatformInterface {
                         element.interfaceAddresses.mapTo(mutableListOf()) { it.toPrefix() }
                             .iterator()
                     )
+                runCatching {
+                    flags = element.flags
+                }
             }
         }
 
@@ -140,9 +144,20 @@ interface PlatformInterfaceWrapper : PlatformInterface {
                 "${address.hostAddress}/${networkPrefixLength}"
             }
         }
+        private val NetworkInterface.flags: Int
+            @SuppressLint("SoonBlockedPrivateApi")
+            get() {
+                val getFlagsMethod = NetworkInterface::class.java.getDeclaredMethod("getFlags")
+                return getFlagsMethod.invoke(this) as Int
+            }
     }
 
     private class StringArray(private val iterator: Iterator<String>) : StringIterator {
+
+        override fun len(): Int {
+            // not used by core
+            return 0
+        }
 
         override fun hasNext(): Boolean {
             return iterator.hasNext()

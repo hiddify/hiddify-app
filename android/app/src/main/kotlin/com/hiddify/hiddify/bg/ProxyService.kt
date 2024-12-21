@@ -2,6 +2,7 @@ package com.hiddify.hiddify.bg
 
 import android.app.Service
 import android.content.Intent
+import com.hiddify.core.libbox.Notification
 
 class ProxyService : Service(), PlatformInterfaceWrapper {
 
@@ -14,4 +15,8 @@ class ProxyService : Service(), PlatformInterfaceWrapper {
     override fun onDestroy() = service.onDestroy()
 
     override fun writeLog(message: String) = service.writeLog(message)
+
+    override fun sendNotification(notification: Notification) {
+//        service.sendNotification(notification)
+    }
 }

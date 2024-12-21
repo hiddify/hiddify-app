@@ -178,10 +178,11 @@ class BoxService(
 //            newService.start()
 //            boxService = newService
 //            commandServer?.setService(boxService)
-//            status.postValue(Status.Started)
+            status.postValue(Status.Started)
 
             withContext(Dispatchers.Main) {
                 notification.show(activeProfileName, R.string.status_started)
+
             }
             notification.start()
         } catch (e: Exception) {
@@ -192,7 +193,7 @@ class BoxService(
 
     override fun serviceReload() {
         notification.close()
-//        status.postValue(Status.Starting)
+        status.postValue(Status.Starting)
 
         val pfd = fileDescriptor
         if (pfd != null) {
@@ -275,6 +276,7 @@ class BoxService(
                 status.value = Status.Stopped
                 service.stopSelf()
             }
+            notification.close()
         }
     }
     override fun postServiceClose() {

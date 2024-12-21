@@ -8,6 +8,7 @@ import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
+import com.hiddify.core.libbox.Notification
 import com.hiddify.hiddify.constant.PerAppProxyMode
 import com.hiddify.hiddify.ktx.toIpPrefix
 import com.hiddify.core.libbox.TunOptions
@@ -196,4 +197,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
     override fun writeLog(message: String) = service.writeLog(message)
 
+    override fun sendNotification(notification: Notification) {
+//        service.sendNotification(notification)
+    }
 }

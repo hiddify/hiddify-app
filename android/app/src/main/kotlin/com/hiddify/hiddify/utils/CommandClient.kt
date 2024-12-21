@@ -1,15 +1,16 @@
 package com.hiddify.hiddify.utils
 
-import go.Seq
 import com.hiddify.core.libbox.CommandClient
 import com.hiddify.core.libbox.CommandClientHandler
 import com.hiddify.core.libbox.CommandClientOptions
+import com.hiddify.core.libbox.Connections
 import com.hiddify.core.libbox.Libbox
 import com.hiddify.core.libbox.OutboundGroup
 import com.hiddify.core.libbox.OutboundGroupIterator
 import com.hiddify.core.libbox.StatusMessage
 import com.hiddify.core.libbox.StringIterator
 import com.hiddify.hiddify.ktx.toList
+import go.Seq
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -108,15 +109,20 @@ open class CommandClient(
             handler.updateGroups(groups)
         }
 
-        override fun clearLog() {
+        override fun clearLogs() {
             handler.clearLog()
         }
+        override fun writeLogs(messageList: StringIterator?) {
 
-        override fun writeLog(message: String?) {
-            if (message == null) {
+            if (messageList == null) {
                 return
             }
-            handler.appendLog(message)
+
+            
+            while (messageList.hasNext()) {
+                handler.appendLog(messageList.next())
+            }
+            
         }
 
         override fun writeStatus(message: StatusMessage?) {
@@ -132,6 +138,11 @@ open class CommandClient(
 
         override fun updateClashMode(newMode: String) {
             handler.updateClashMode(newMode)
+        }
+
+
+
+        override fun writeConnections(message: Connections?) {
         }
 
     }
