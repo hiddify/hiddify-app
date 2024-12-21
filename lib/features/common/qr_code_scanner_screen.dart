@@ -188,7 +188,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
 
   @override
   Widget build(BuildContext context) {
-    final Translations t = ref.watch(translationsProvider);
+    final Translations t = ref.watch(translationsProvider).requireValue;
 
     return FutureBuilder(
       future: FlutterEasyPermission.has(

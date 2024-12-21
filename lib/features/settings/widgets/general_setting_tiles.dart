@@ -16,7 +16,7 @@ class GeneralSettingTiles extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     return Column(
       children: [

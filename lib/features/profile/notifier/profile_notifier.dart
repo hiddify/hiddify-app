@@ -35,7 +35,7 @@ class AddProfile extends _$AddProfile with AppLogger {
     });
     ref.listenSelf(
       (previous, next) {
-        final t = ref.read(translationsProvider);
+        final t = ref.read(translationsProvider).requireValue;
         final notification = ref.read(inAppNotificationControllerProvider);
         switch (next) {
           case AsyncData(value: final _?):
@@ -116,7 +116,7 @@ class AddProfile extends _$AddProfile with AppLogger {
 
         final consent = false && (_prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false);
 
-        final t = ref.read(translationsProvider);
+        final t = ref.read(translationsProvider).requireValue;
         final notification = ref.read(inAppNotificationControllerProvider);
 
         if (!consent) {
@@ -158,7 +158,7 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
     ref.disposeDelay(const Duration(minutes: 1));
     ref.listenSelf(
       (previous, next) {
-        final t = ref.read(translationsProvider);
+        final t = ref.read(translationsProvider).requireValue;
         final notification = ref.read(inAppNotificationControllerProvider);
         switch (next) {
           case AsyncData(value: final _?):

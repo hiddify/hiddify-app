@@ -33,7 +33,7 @@ class IPText extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final isVisible = ref.watch(_showIp);
     final textTheme = Theme.of(context).textTheme;
     final ipStyle = (constrained ? textTheme.labelMedium : textTheme.labelLarge)?.copyWith(
@@ -90,7 +90,7 @@ class UnknownIPText extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final textTheme = Theme.of(context).textTheme;
     final style = constrained ? textTheme.bodySmall : textTheme.labelMedium;
 
@@ -124,7 +124,7 @@ class IPCountryFlag extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     if (countryCode?.isEmpty ?? true) {
       return Icon(FluentIcons.question_circle_20_regular, size: size);
     }
@@ -218,7 +218,7 @@ class OrganisationFlag extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     for (var entry in organizationData.entries) {
       if (organization.toLowerCase().contains(entry.key)) {
         return getFlagWidget(

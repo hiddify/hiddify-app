@@ -69,7 +69,7 @@ dependencies:
   flutter_animate: ^4.5.0
   flutter_svg: ^2.0.10+1
   gap: ^3.0.1
-  percent_indicator: ^4.2.3
+  percent_indicator_premium: ^0.0.2
   sliver_tools: ^0.2.12
   flutter_adaptive_scaffold: ^0.3.1
   font_awesome_flutter: ^10.7.0
@@ -91,7 +91,7 @@ dependencies:
   # permission_handler: ^11.3.0 # is not compatible with windows
   #flutter_easy_permission: ^1.1.2
   flutter_easy_permission: 
-     git: https://github.com/unger1984/flutter_easy_permission.git
+     git: https://github.com/MichaelStH/flutter_easy_permission.git
   in_app_review: ^2.0.9
   # circle_flags: ^4.0.2
   circle_flags:

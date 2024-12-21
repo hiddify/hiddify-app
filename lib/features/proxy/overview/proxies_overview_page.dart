@@ -15,7 +15,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final asyncProxies = ref.watch(proxiesOverviewNotifierProvider);
     final notifier = ref.watch(proxiesOverviewNotifierProvider.notifier);

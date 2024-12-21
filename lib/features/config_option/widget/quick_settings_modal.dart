@@ -19,7 +19,7 @@ class QuickSettingsModal extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final warpPrefaceCompleted = ref.watch(warpOptionNotifierProvider).consentGiven;
 

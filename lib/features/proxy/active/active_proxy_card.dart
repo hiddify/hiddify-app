@@ -17,7 +17,7 @@ class ActiveProxyFooter extends ConsumerWidget {
     final connectionState = ref.watch(connectionNotifierProvider.select((value) => value.valueOrNull ?? const Disconnected()));
 
     final activeProxy = ref.watch(activeProxyNotifierProvider.select((value) => value.valueOrNull));
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     // Early return if required data is not available
     if (connectionState != const Connected() || activeProxy == null) {
@@ -127,15 +127,12 @@ class ActiveProxyFooter extends ConsumerWidget {
   }
 }
 
-
-
-
 // class _StatsColumn extends HookConsumerWidget {
 //   const _StatsColumn();
 
 //   @override
 //   Widget build(BuildContext context, WidgetRef ref) {
-//     final t = ref.watch(translationsProvider);
+//     final t = ref.watch(translationsProvider).requireValue;
 //     final stats = ref.watch(statsNotifierProvider).value;
 
 //     return Directionality(

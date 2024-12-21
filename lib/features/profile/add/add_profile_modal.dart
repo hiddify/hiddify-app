@@ -31,7 +31,7 @@ class AddProfileModal extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final addProfileState = ref.watch(addProfileProvider);
 
     ref.listen(
@@ -311,7 +311,7 @@ class AddProfileModal extends HookConsumerWidget {
     final consent = (_prefs.getBool(warpConsentGiven) ?? false);
     final region = ref.read(ConfigOptions.region.notifier).raw();
 
-    final t = ref.read(translationsProvider);
+    final t = ref.read(translationsProvider).requireValue;
     final notification = ref.read(inAppNotificationControllerProvider);
 
     if (!consent) {

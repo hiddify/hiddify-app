@@ -26,14 +26,14 @@ class ProfilesOverviewModal extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final asyncProfiles = ref.watch(profilesOverviewNotifierProvider);
 
     ref.listen(
       foregroundProfilesUpdateNotifierProvider,
       (_, next) {
         if (next case AsyncData(:final value?)) {
-          final t = ref.read(translationsProvider);
+          final t = ref.read(translationsProvider).requireValue;
           final notification = ref.read(inAppNotificationControllerProvider);
           if (value.success) {
             notification.showSuccessToast(
@@ -150,7 +150,7 @@ class ProfilesSortModal extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final sortNotifier = ref.watch(profilesOverviewSortNotifierProvider.notifier);
 
     return PlatformAlertDialog(

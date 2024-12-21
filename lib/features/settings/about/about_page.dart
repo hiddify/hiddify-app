@@ -21,7 +21,7 @@ class AboutPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final appInfo = ref.watch(appInfoProvider).requireValue;
     final appUpdate = ref.watch(appUpdateNotifierProvider);
 
@@ -30,8 +30,7 @@ class AboutPage extends HookConsumerWidget {
       (_, next) async {
         if (!context.mounted) return;
         switch (next) {
-          case AppUpdateStateAvailable(:final versionInfo) ||
-                AppUpdateStateIgnored(:final versionInfo):
+          case AppUpdateStateAvailable(:final versionInfo) || AppUpdateStateIgnored(:final versionInfo):
             return NewVersionDialog(
               appInfo.presentVersion,
               versionInfo,
@@ -40,8 +39,7 @@ class AboutPage extends HookConsumerWidget {
           case AppUpdateStateError(:final error):
             return CustomToast.error(t.presentShortError(error)).show(context);
           case AppUpdateStateNotAvailable():
-            return CustomToast.success(t.appUpdate.notAvailableMsg)
-                .show(context);
+            return CustomToast.success(t.appUpdate.notAvailableMsg).show(context);
         }
       },
     );
@@ -67,8 +65,7 @@ class AboutPage extends HookConsumerWidget {
           title: Text(t.settings.general.openWorkingDir),
           trailing: const Icon(FluentIcons.open_folder_24_regular),
           onTap: () async {
-            final path =
-                ref.watch(appDirectoriesProvider).requireValue.workingDir.uri;
+            final path = ref.watch(appDirectoriesProvider).requireValue.workingDir.uri;
             await UriUtils.tryLaunch(path);
           },
         ),

@@ -18,7 +18,7 @@ class LocalePrefTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final locale = ref.watch(localePreferencesProvider);
 
@@ -58,7 +58,7 @@ class RegionPrefTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final region = ref.watch(ConfigOptions.region);
 
@@ -118,7 +118,7 @@ class EnableAnalyticsPrefTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final enabled = ref.watch(analyticsControllerProvider).requireValue;
 
@@ -149,7 +149,7 @@ class ThemeModePrefTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final themeMode = ref.watch(themePreferencesProvider);
 
@@ -189,7 +189,7 @@ class ClosingPrefTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final action = ref.watch(Preferences.actionAtClose);
 

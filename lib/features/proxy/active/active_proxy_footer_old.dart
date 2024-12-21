@@ -19,7 +19,7 @@
 //   @override
 //   Widget build(BuildContext context, WidgetRef ref) {
 //     return Column();
-//     final t = ref.watch(translationsProvider);
+//     final t = ref.watch(translationsProvider).requireValue;
 //     final activeProxy = ref.watch(activeProxyNotifierProvider);
 //     // final ipInfo = ref.watch(ipInfoNotifierProvider);
 
@@ -142,7 +142,7 @@
 
 //   @override
 //   Widget build(BuildContext context, WidgetRef ref) {
-//     final t = ref.watch(translationsProvider);
+//     final t = ref.watch(translationsProvider).requireValue;
 //     final stats = ref.watch(statsNotifierProvider).value;
 
 //     return Directionality(

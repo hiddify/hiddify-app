@@ -15,7 +15,7 @@ class ConnectionStatsCard extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final activeProxy = ref.watch(activeProxyNotifierProvider);
     // final ipInfo = ref.watch(ipInfoNotifierProvider);

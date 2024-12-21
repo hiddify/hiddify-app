@@ -7,5 +7,6 @@ export 'package:hiddify/gen/translations.g.dart';
 part 'translations.g.dart';
 
 @Riverpod(keepAlive: true)
-TranslationsEn translations(TranslationsRef ref) =>
-    ref.watch(localePreferencesProvider).build();
+Future<Translations> translations(TranslationsRef ref) async {
+  return await ref.watch(localePreferencesProvider).build();
+}

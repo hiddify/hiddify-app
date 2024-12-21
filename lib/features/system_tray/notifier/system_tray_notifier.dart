@@ -36,7 +36,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
       connection = const ConnectionStatus.disconnected();
     }
 
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     var tooltip = Constants.appName;
     final serviceMode = ref.watch(ConfigOptions.serviceMode);

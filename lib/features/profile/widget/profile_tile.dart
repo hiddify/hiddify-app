@@ -18,7 +18,8 @@ import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dar
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+// import 'package:percent_indicator/percent_indicator.dart';
+import 'package:percent_indicator_premium/percent_indicator_premium.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileTile extends HookConsumerWidget {
@@ -35,7 +36,7 @@ class ProfileTile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
 
     final selectActiveMutation = useMutation(
@@ -55,7 +56,6 @@ class ProfileTile extends HookConsumerWidget {
     final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
     final double effectiveElevation = profile.active ? 12 : 4;
     final effectiveOutlineColor = profile.active ? theme.colorScheme.outlineVariant : Colors.transparent;
-
     return Card(
       margin: effectiveMargin,
       elevation: effectiveElevation,
@@ -193,7 +193,7 @@ class ProfileActionButton extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     if (profile case RemoteProfileEntity() when !showAllActions) {
       return Semantics(
@@ -240,7 +240,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final exportConfigMutation = useMutation(
       initialOnFailure: (err) {
@@ -369,7 +369,7 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
 
     final remaining = remainingText(t, theme);
@@ -412,7 +412,7 @@ class NewTrafficSubscriptionInfo extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
 
     return Column(children: [
@@ -466,7 +466,7 @@ class NewDaySubscriptionInfo extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
 
     final remaining = remainingText(t, theme);
@@ -514,7 +514,7 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
 
     final remaining = remainingText(t, theme);
@@ -552,7 +552,7 @@ class NewSiteSubscriptionInfo extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
     var uri = Uri.parse(subInfo.webPageUrl ?? "");
     var host = uri.host;
@@ -600,16 +600,24 @@ class RemainingTrafficIndicator extends StatelessWidget {
         : ratio < 0.65
             ? const Color.fromRGBO(98, 115, 32, 1.0)
             : const Color.fromRGBO(139, 30, 36, 1.0);
+    return HorizontalPercentIndicator(
+      height: 6,
 
-    return LinearPercentIndicator(
-      percent: ratio,
-      animation: true,
-      padding: EdgeInsets.zero,
-      lineHeight: 6,
-      barRadius: const Radius.circular(16),
-      linearGradient: LinearGradient(
-        colors: [startColor, endColor],
-      ),
+      borderRadius: 16,
+      loadingPercent: ratio,
+      // inactiveTrackColor: Color.fromRGBO(r, g, b, opacity),
+
+      activeTrackColor: [startColor, endColor],
     );
+    // return LinearPercentIndicator(
+    //     // percent: ratio,
+    //     // animation: false,
+    //     // padding: EdgeInsets.zero,
+    //     // lineHeight: 6,
+    //     // barRadius: const Radius.circular(16),
+    //     // linearGradient: LinearGradient(
+    //     //   colors: [startColor, endColor],
+    //     // ),
+    //     );
   }
 }

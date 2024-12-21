@@ -23,7 +23,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     final stats = ref.watch(statsNotifierProvider).asData?.value ?? SystemInfo.create();
     final showAll = ref.watch(showAllSidebarStatsProvider);

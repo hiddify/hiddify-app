@@ -17,7 +17,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
 
     return AlertDialog(
       title: Text(t.window.alertMessage),
