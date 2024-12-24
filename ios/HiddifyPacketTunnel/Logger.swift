@@ -26,10 +26,12 @@ class Logger {
     private var lock = NSLock()
     
     init(path: URL) {
+        NSLog("H?G1")
         url = path
     }
     
     func write(_ message: String) {
+        NSLog("H?G2")
         Logger.queue.async { [message, unowned self] () in
             lock.lock()
             defer { lock.unlock() }

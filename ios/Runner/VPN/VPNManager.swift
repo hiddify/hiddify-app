@@ -192,15 +192,18 @@ class VPNManager: ObservableObject {
         }
     }
     
-    func connect(with config: String, disableMemoryLimit: Bool = false) async throws {
+    func connect(with config: String, grpcServiceModePort:Int, disableMemoryLimit: Bool = false) async throws {
+    
         await set(upload: 0, download: 0)
-        guard state == .disconnected else { return }
+//        guard state == .disconnected else { return }
         do {
             try await enableVPNManager()
             try manager.connection.startVPNTunnel(options: [
                 "Config": config as NSString,
+//                "GrpcServiceModePort":NSNumber(value: grpcServiceModePort),
                 "DisableMemoryLimit": (disableMemoryLimit ? "YES" : "NO") as NSString,
             ])
+            
         } catch {
             print(error.localizedDescription)
         }
@@ -208,7 +211,7 @@ class VPNManager: ObservableObject {
     }
     
     func disconnect() {
-        guard state == .connected else { return }
+//        guard state == .connected else { return }
         manager.connection.stopVPNTunnel()
     }
 }

@@ -29,4 +29,8 @@ class CoreInterface {
     return true;
     // return fgClient == bgClient;
   }
+
+  Future<bool> resetTunnel() async {
+    return false;
+  }
 }

@@ -1,6 +1,6 @@
 import UIKit
 import Flutter
-import Libcore
+import HiddifyCore
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {

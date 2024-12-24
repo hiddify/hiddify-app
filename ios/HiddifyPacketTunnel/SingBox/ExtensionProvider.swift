@@ -6,33 +6,37 @@
 //
 
 import Foundation
-import Libcore
+import HiddifyCore
 import NetworkExtension
 
 open class ExtensionProvider: NEPacketTunnelProvider {
     public static let errorFile = FilePath.workingDirectory.appendingPathComponent("network_extension_error")
 
-    private var commandServer: LibboxCommandServer!
-    private var boxService: LibboxBoxService!
+//    private var commandServer: LibboxCommandServer!
+//    private var boxService: LibboxBoxService!
     private var systemProxyAvailable = false
     private var systemProxyEnabled = false
     private var platformInterface: ExtensionPlatformInterface!
     private var config: String!
     
     override open func startTunnel(options: [String: NSObject]?) async throws {
+        NSLog("H?1")
+        writeFatalError("(packet-tunnel) starting")
+
         try? FileManager.default.removeItem(at: ExtensionProvider.errorFile)
         try? FileManager.default.removeItem(at: FilePath.workingDirectory.appendingPathComponent("TestLog"))
         
         let disableMemoryLimit = (options?["DisableMemoryLimit"] as? NSString as? String ?? "NO") == "YES"
-        
+//        let grpcServiceModePort = (options?["GrpcServiceModePort"] as? NSNumber)?.intValue ?? 17079
+        let grpcServiceModePort = 17079
         guard let config = options?["Config"] as? NSString as? String else {
             writeFatalError("(packet-tunnel) error: config not provided")
             return
         }
-        guard let config = SingBox.setupConfig(config: config) else {
-            writeFatalError("(packet-tunnel) error: config is invalid")
-            return
-        }
+//        guard let config = SingBox.setupConfig(config: config) else {
+//            writeFatalError("(packet-tunnel) error: config is invalid")
+//            return
+//        }
         self.config = config
 
         do {
@@ -41,15 +45,18 @@ open class ExtensionProvider: NEPacketTunnelProvider {
             writeFatalError("(packet-tunnel) error: create working directory: \(error.localizedDescription)")
             return
         }
-
-        LibboxSetup(
+        var error: NSError?
+        MobileSetup(
             FilePath.sharedDirectory.relativePath,
             FilePath.workingDirectory.relativePath,
             FilePath.cacheDirectory.relativePath,
-            false
+            4,
+            "127.0.0.1:\(grpcServiceModePort)",
+            "",
+            false,
+            &error
         )
 
-        var error: NSError?
         LibboxRedirectStderr(FilePath.cacheDirectory.appendingPathComponent("stderr.log").relativePath, &error)
         if let error {
             writeError("(packet-tunnel) redirect stderr error: \(error.localizedDescription)")
@@ -60,23 +67,23 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         if platformInterface == nil {
             platformInterface = ExtensionPlatformInterface(self)
         }
-        commandServer = LibboxNewCommandServer(platformInterface, Int32(30))
-        do {
-            try commandServer.start()
-        } catch {
-            writeFatalError("(packet-tunnel): log server start error: \(error.localizedDescription)")
-            return
-        }
+//        commandServer = LibboxNewCommandServer(platformInterface, Int32(30))
+//        do {
+//            try commandServer.start()
+//        } catch {
+//            writeFatalError("(packet-tunnel): log server start error: \(error.localizedDescription)")
+//            return
+//        }
         writeMessage("(packet-tunnel) log server started")
         await startService()
     }
 
     func writeMessage(_ message: String) {
-        if let commandServer {
-            commandServer.writeMessage(message)
-        } else {
-            NSLog(message)
-        }
+//        if let commandServer {
+//            commandServer.writeMessage(message)
+//        } else {
+//            NSLog(message)
+//        }
     }
 
     func writeError(_ message: String) {
@@ -88,47 +95,53 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         #if DEBUG
             NSLog(message)
         #endif
+        NSLog(message)
         writeError(message)
         cancelTunnelWithError(NSError(domain: message, code: 0))
     }
 
     private func startService() async {
+        NSLog("H?2")
         let configContent = config
         var error: NSError?
-        let service = LibboxNewService(configContent, platformInterface, &error)
+        
+        let service = MobileStart(configContent, platformInterface, &error)
         if let error {
             writeError("(packet-tunnel) error: create service: \(error.localizedDescription)")
             return
         }
-        guard let service else {
-            return
-        }
-        do {
-            try service.start()
-        } catch {
-            writeError("(packet-tunnel) error: start service: \(error.localizedDescription)")
-            return
-        }
-        boxService = service
-        commandServer.setService(service)
+//        guard let service else {
+//            return
+//        }
+//        do {
+//            try service.start()
+//        } catch {
+//            writeError("(packet-tunnel) error: start service: \(error.localizedDescription)")
+//            return
+//        }
+//        boxService = service
+//        commandServer.setService(service)
     }
 
     private func stopService() {
-        if let service = boxService {
-            do {
-                try service.close()
-            } catch {
-                writeError("(packet-tunnel) error: stop service: \(error.localizedDescription)")
-            }
-            boxService = nil
-            commandServer.setService(nil)
-        }
+        NSLog("H?3")
+//        if let service = boxService {
+//            do {
+//                try service.close()
+//            } catch {
+//                writeError("(packet-tunnel) error: stop service: \(error.localizedDescription)")
+//            }
+//            boxService = nil
+//            commandServer.setService(nil)
+//        }
+        MobileClose(4)
         if let platformInterface {
             platformInterface.reset()
         }
     }
 
     func reloadService() async {
+        NSLog("H?4")
         writeMessage("(packet-tunnel) reloading service")
         reasserting = true
         defer {
@@ -140,13 +153,14 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     
 
     override open func stopTunnel(with reason: NEProviderStopReason) async {
+        NSLog("H?5")
         writeMessage("(packet-tunnel) stopping, reason: \(reason)")
         stopService()
-        if let server = commandServer {
-            try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
-            try? server.close()
-            commandServer = nil
-        }
+//        if let server = commandServer {
+//            try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
+//            try? server.close()
+//            commandServer = nil
+//        }
     }
 
     override open func handleAppMessage(_ messageData: Data) async -> Data? {
@@ -154,14 +168,16 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     }
 
     override open func sleep() async {
-        if let boxService {
-            boxService.pause()
-        }
+        NSLog("H?6")
+//        if let boxService {
+//            boxService.pause()
+//        }
     }
 
     override open func wake() {
-        if let boxService {
-            boxService.wake()
-        }
+        NSLog("H?7")
+//        if let boxService {
+//            boxService.wake()
+//        }
     }
 }

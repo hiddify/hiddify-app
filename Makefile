@@ -197,7 +197,7 @@ macos-libs:
 
 ios-libs: #not tested
 	mkdir -p $(IOS_OUT)
-	rm -rf $(IOS_OUT)/Libcore.xcframework
+	rm -rf $(IOS_OUT)/HiddifyCore.xcframework
 	curl -L $(CORE_URL)/$(CORE_NAME)-ios.tar.gz | tar xz -C "$(IOS_OUT)"
 
 get-geo-assets:
@@ -224,7 +224,7 @@ build-macos-libs:
 build-ios-libs: 
 	rm -rf $(IOS_OUT)/HiddifyCore.xcframework 
 	make -C hiddify-core -f Makefile ios  
-	mv $(BINDIR)/HiddifyCore.xcframework $(IOS_OUT)/Libcore.xcframework
+	mv $(BINDIR)/HiddifyCore.xcframework $(IOS_OUT)/HiddifyCore.xcframework
 
 release: # Create a new tag for release.
 	@CORE_VERSION=$(core.version) bash -c ".github/change_version.sh "

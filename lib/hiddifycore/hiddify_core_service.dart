@@ -15,6 +15,7 @@ import 'package:hiddify/singbox/model/warp_account.dart';
 
 import 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper_stub.dart' if (dart.library.io) 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
+import 'package:hiddify/utils/platform_utils.dart';
 import 'package:loggy/loggy.dart' as loggyl;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -180,17 +181,18 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(
       () async {
         // only available on iOS (and macOS later)
-        // if (!Platform.isIOS) {
-        throw UnimplementedError(
-          "reset tunnel function unavailable on platform",
-        );
-        // }
+        if (!PlatformUtils.isIOS) {
+          throw UnimplementedError(
+            "reset tunnel function unavailable on platform",
+          );
+        }
 
         // loggy.debug("resetting tunnel");
-        // final res = await core.bgClient.resetTunnel();
-        // if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
-
-        // return right(unit);
+        final res = await core.resetTunnel();
+        if (res) {
+          return right(unit);
+        }
+        return left("failed to reset tunnel");
       },
     );
   }

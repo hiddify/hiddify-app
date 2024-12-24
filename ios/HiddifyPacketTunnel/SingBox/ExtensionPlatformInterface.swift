@@ -6,10 +6,17 @@
 //
 
 import Foundation
-import Libcore
+import HiddifyCore
 import NetworkExtension
 
 public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtocol, LibboxCommandServerHandlerProtocol {
+    public func writeLog(_ message: String?) {
+
+    }
+    
+    public func send(_ notification: LibboxNotification?) throws {
+    }
+    
     public func readWIFIState() -> LibboxWIFIState? {
         return nil;
     }
@@ -22,12 +29,14 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
     }
 
     public func openTun(_ options: LibboxTunOptionsProtocol?, ret0_: UnsafeMutablePointer<Int32>?) throws {
+        NSLog("H?A1")
         try runBlocking { [self] in
             try await openTun0(options, ret0_)
         }
     }
 
     private func openTun0(_ options: LibboxTunOptionsProtocol?, _ ret0_: UnsafeMutablePointer<Int32>?) async throws {
+        NSLog("H?A2")
         guard let options else {
             throw NSError(domain: "nil options", code: 0)
         }
@@ -140,11 +149,11 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
         false
     }
 
-    public func writeLog(_ message: String?) {
-        guard let message else {
-            return
-        }
-        tunnel.writeMessage(message)
+    func writeLogs(_ messageList: (any LibboxStringIteratorProtocol)?) {
+//        guard let message else {
+//            return
+//        }
+//        tunnel.writeMessage(message)
     }
 
     public func usePlatformDefaultInterfaceMonitor() -> Bool {
@@ -230,10 +239,12 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
     }
 
     public func postServiceClose() {
+        NSLog("H?A3")
         // TODO
     }
 
     func reset() {
+        NSLog("H?A4")
         networkSettings = nil
     }
 

@@ -41,7 +41,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
         "mode": mode,
       },
     );
-    serverPublicKey = await methodChannel.invokeMethod<Uint8List>("get_grpc_server_public_key") ?? Uint8List.fromList([]);
+    // serverPublicKey = await methodChannel.invokeMethod<Uint8List>("get_grpc_server_public_key") ?? Uint8List.fromList([]);
     await methodChannel.invokeMethod(
       "add_grpc_client_public_key",
       {
@@ -108,5 +108,11 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   @override
   Future<bool> isBgClientAvailable() async {
     return _isBgClientAvailable;
+  }
+
+  @override
+  Future<bool> resetTunnel() async {
+    await methodChannel.invokeMethod("reset");
+    return true;
   }
 }

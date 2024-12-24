@@ -1,5 +1,5 @@
 import Foundation
-import Libcore
+import HiddifyCore
 
 public class CommandClient: ObservableObject {
     public enum ConnectionType {
@@ -82,6 +82,8 @@ public class CommandClient: ObservableObject {
     }
     
     private class clientHandler: NSObject, LibboxCommandClientHandlerProtocol {
+        
+        
         private let commandClient: CommandClient
         
         init(_ commandClient: CommandClient) {
@@ -103,22 +105,22 @@ public class CommandClient: ObservableObject {
             }
         }
         
-        func clearLog() {
+        func clearLogs() {
             DispatchQueue.main.async { [self] in
                 commandClient.logList.removeAll()
             }
         }
         
-        func writeLog(_ message: String?) {
-            guard let message else {
-                return
-            }
-            DispatchQueue.main.async { [self] in
-                if commandClient.logList.count > commandClient.logMaxLines {
-                    commandClient.logList.removeFirst()
-                }
-                commandClient.logList.append(message)
-            }
+        func writeLogs(_ messageList: (any LibboxStringIteratorProtocol)?) {
+//            guard let message else {
+//                return
+//            }
+//            DispatchQueue.main.async { [self] in
+//                if commandClient.logList.count > commandClient.logMaxLines {
+//                    commandClient.logList.removeFirst()
+//                }
+//                commandClient.logList.append(message)
+//            }
         }
         
         func writeStatus(_ message: LibboxStatusMessage?) {
@@ -162,5 +164,8 @@ public class CommandClient: ObservableObject {
         
         func updateClashMode(_ newMode: String?) {
         }
+        func write(_ message: LibboxConnections?) {
+        }
+        
     }
 }
