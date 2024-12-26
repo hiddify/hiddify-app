@@ -165,7 +165,7 @@ class BoxService(
                 Mobile.setup(Settings.baseDir,Settings.workingDir,Settings.tempDir,4L,"127.0.0.1:${Settings.grpcServiceModePort}","",false)
 
 //                Libbox.newService(content,platformInterface)
-                Mobile.start(selectedConfigPath,platformInterface)
+                Mobile.start(selectedConfigPath,"",platformInterface)
             } catch (e: Exception) {
                 stopAndAlert(Alert.CreateService, e.message)
                 return
