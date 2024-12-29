@@ -162,15 +162,16 @@ class BoxService(
 //            File(selectedConfigPath).writeText(content)
 //            val content=File(selectedConfigPath).readText()
             val newService = try {
-                Mobile.setup(Settings.baseDir,Settings.workingDir,Settings.tempDir,4L,"127.0.0.1:${Settings.grpcServiceModePort}","",false)
+                Mobile.setup(Settings.baseDir,Settings.workingDir,Settings.tempDir,4L,"127.0.0.1:${Settings.grpcServiceModePort}","",false,platformInterface)
 
 //                Libbox.newService(content,platformInterface)
-                Mobile.start(selectedConfigPath,"",platformInterface)
+
             } catch (e: Exception) {
                 stopAndAlert(Alert.CreateService, e.message)
                 return
             }
-
+            if (Settings.startCoreAfterStartingService)
+                Mobile.start("","")
             if (delayStart) {
                 delay(1000L)
             }
@@ -316,12 +317,12 @@ class BoxService(
         GlobalScope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
             initialize()
-            try {
-                startCommandServer()
-            } catch (e: Exception) {
-                stopAndAlert(Alert.StartCommandServer, e.message)
-                return@launch
-            }
+//            try {
+//                startCommandServer()
+//            } catch (e: Exception) {
+//                stopAndAlert(Alert.StartCommandServer, e.message)
+//                return@launch
+//            }
             startService()
         }
         return Service.START_NOT_STICKY

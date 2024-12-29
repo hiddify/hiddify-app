@@ -79,7 +79,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         val mode=args["mode"] as Int
                         val grpcPort=args["grpcPort"] as Int
                         runCatching {
-                            Mobile.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir,mode.toLong(),"127.0.0.1:"+grpcPort,"", false)
+                            Mobile.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir,mode.toLong(),"127.0.0.1:"+grpcPort,"", false, null)
 //                            Libbox.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir, false)
                             Libbox.redirectStderr(File(Settings.workingDir, "stderr2.log").path)
 
@@ -109,6 +109,8 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                             Log.w(TAG, "service is already running")
                             return@launch success(true)
                         }
+                        Settings.startCoreAfterStartingService=false
+
                         mainActivity.startService()
                         success(true)
                     }
@@ -130,32 +132,32 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                 }
             }
 
-            Trigger.Restart.method -> {
-                scope.launch(Dispatchers.IO) {
-                    result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        Settings.activeConfigPath = args["path"] as String? ?: ""
-                        Settings.activeProfileName = args["name"] as String? ?: ""
-                        val mainActivity = MainActivity.instance
-                        val started = mainActivity.serviceStatus.value == Status.Started
-                        if (!started) return@launch success(true)
-                        val restart = Settings.rebuildServiceMode()
-                        if (restart) {
-                            mainActivity.reconnect()
-                            BoxService.stop()
-                            delay(1000L)
-                            mainActivity.startService()
-                            return@launch success(true)
-                        }
-                        runCatching {
-                            Libbox.newStandaloneCommandClient().serviceReload()
-                            success(true)
-                        }.onFailure {
-                            error(it)
-                        }
-                    }
-                }
-            }
+//            Trigger.Restart.method -> {
+//                scope.launch(Dispatchers.IO) {
+//                    result.runCatching {
+//                        val args = call.arguments as Map<*, *>
+//                        Settings.activeConfigPath = args["path"] as String? ?: ""
+//                        Settings.activeProfileName = args["name"] as String? ?: ""
+//                        val mainActivity = MainActivity.instance
+//                        val started = mainActivity.serviceStatus.value == Status.Started
+//                        if (!started) return@launch success(true)
+//                        val restart = Settings.rebuildServiceMode()
+//                        if (restart) {
+//                            mainActivity.reconnect()
+//                            BoxService.stop()
+//                            delay(1000L)
+//                            mainActivity.startService()
+//                            return@launch success(true)
+//                        }
+//                        runCatching {
+//                            Libbox.newStandaloneCommandClient().serviceReload()
+//                            success(true)
+//                        }.onFailure {
+//                            error(it)
+//                        }
+//                    }
+//                }
+//            }
 
             else -> result.notImplemented()
         }

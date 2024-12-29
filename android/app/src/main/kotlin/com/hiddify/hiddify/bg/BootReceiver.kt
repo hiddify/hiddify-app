@@ -3,6 +3,7 @@ package com.hiddify.hiddify.bg
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.hiddify.hiddify.MainActivity
 import com.hiddify.hiddify.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -21,7 +22,8 @@ class BootReceiver : BroadcastReceiver() {
         GlobalScope.launch(Dispatchers.IO) {
             if (Settings.startedByUser) {
                 withContext(Dispatchers.Main) {
-                    BoxService.start()
+                    Settings.startCoreAfterStartingService=true
+                    MainActivity.instance.startService()
                 }
             }
         }

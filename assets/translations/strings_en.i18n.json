@@ -99,6 +99,7 @@
       },
       "manually": "Manual Entry",
       "addWarp": "Add WARP",
+      "addFragment": "Add Fragment",
       "addingWarpMsg": "Please wait while we register WARP.",
       "addingProfileMsg": "Adding Profile",
       "failureMsg": "Failed to Add Profile"
@@ -352,7 +353,8 @@
     "experimentalNotice": "Experimental Features In Use",
     "experimentalNoticeMsg": "You've enabled some experimental features which might affect connection quality and cause unexpected errors. You can always change or reset these options from Config options page.",
     "disableExperimentalNotice": "Don't Show Again",
-    "reconnectMsg": "Reconnecting for taking into account the changes..."
+    "reconnectMsg": "Reconnecting for taking into account the changes...",
+    "secure":"Secure by WARP"
   },
   "config": {
     "useXrayCoreWhenPossible": {
@@ -434,10 +436,12 @@
     "muxProtocol": "Mux Protocol",
     "muxMaxStreams": "Max Concurrent Streams",
     "enableWarp": "Enable WARP",
+    "enableWarpSecure": "Extra Security by WARP",
+    "enableWarpForProxy": "Unblock Proxies by WARP",
     "warpDetourMode": "Detour Mode",
     "warpDetourModes": {
-      "proxyOverWarp": "Detour Proxies Through WARP",
-      "warpOverProxy": "Detour WARP Through Proxies",
+      "proxyOverWarp": "Detour Proxies Through WARP (To unblock Proxies)",
+      "warpOverProxy": "Detour WARP Through Proxies (For Extra Security)",
       "inbound": "Detour WARP Through Proxies",
       "outbound": "Detour Proxies Through WARP"
     },

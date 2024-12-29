@@ -4,6 +4,7 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import com.hiddify.hiddify.MainActivity
+import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Status
 
 @RequiresApi(24)
@@ -41,6 +42,7 @@ class TileService : TileService(), ServiceConnection.Callback {
         when (connection.status) {
             Status.Stopped -> {
                 val mainActivity = MainActivity.instance
+                Settings.startCoreAfterStartingService=true
                 mainActivity.startService()
                 qsTile?.apply {
                     state = Tile.STATE_ACTIVE
