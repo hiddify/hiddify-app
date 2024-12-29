@@ -21,7 +21,6 @@
 		03B5167B2AE79DB400EA47E2 /* FileMethodHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B5167A2AE79DB400EA47E2 /* FileMethodHandler.swift */; };
 		03B5167D2AE7AC6200EA47E2 /* GroupsEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B5167C2AE7AC6200EA47E2 /* GroupsEventHandler.swift */; };
 		03E392BB2ADDA00F000ADF15 /* PacketTunnelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E392BA2ADDA00F000ADF15 /* PacketTunnelProvider.swift */; };
-		03E392C02ADDA00F000ADF15 /* HiddifyPacketTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 03E392B62ADDA00E000ADF15 /* HiddifyPacketTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		03E392CC2ADDE078000ADF15 /* ExtensionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E392CB2ADDE078000ADF15 /* ExtensionProvider.swift */; };
 		03E392CF2ADDEFC8000ADF15 /* FilePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E392CE2ADDEFC8000ADF15 /* FilePath.swift */; };
 		03E392D02ADDF1BD000ADF15 /* FilePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E392CE2ADDEFC8000ADF15 /* FilePath.swift */; };
@@ -34,8 +33,8 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
-		4110F9E22D1AEDAB0085FD09 /* HiddifyPacketTunnel.entitlements in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 03E392BD2ADDA00F000ADF15 /* HiddifyPacketTunnel.entitlements */; };
-		4132706C2C8A9C44003A1E9B /* HiddifyCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 413270682C8A9BA2003A1E9B /* HiddifyCore.xcframework */; };
+		41E9FF922D1C0CC3003780C1 /* HiddifyPacketTunnel.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 03E392B62ADDA00E000ADF15 /* HiddifyPacketTunnel.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		41E9FF962D1C82BA003780C1 /* HiddifyCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 413270682C8A9BA2003A1E9B /* HiddifyCore.xcframework */; };
 		59E8864FB99B37076B22F32B /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30560DB3EFDF5E86AAD00AB8 /* Pods_RunnerTests.framework */; };
 		68885DD72B4EF33400D214BA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 03E392B72ADDA00E000ADF15 /* NetworkExtension.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
@@ -71,8 +70,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				4110F9E22D1AEDAB0085FD09 /* HiddifyPacketTunnel.entitlements in Embed Foundation Extensions */,
-				03E392C02ADDA00F000ADF15 /* HiddifyPacketTunnel.appex in Embed Foundation Extensions */,
+				41E9FF922D1C0CC3003780C1 /* HiddifyPacketTunnel.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -172,7 +170,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4132706C2C8A9C44003A1E9B /* HiddifyCore.xcframework in Frameworks */,
+				41E9FF962D1C82BA003780C1 /* HiddifyCore.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,7 +480,6 @@
 					};
 					331C8080294A63A400263BE5 = {
 						CreatedOnToolsVersion = 14.0;
-						DevelopmentTeam = 3JFTY5BP58;
 						DevelopmentTeamName = "Mark Pashmfouroush";
 						ProvisioningStyle = Automatic;
 						TestTargetID = 97C146ED1CF9000F007C117D;
@@ -1004,6 +1001,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hiddify.ios.RunnerTests;
@@ -1022,6 +1020,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hiddify.ios.RunnerTests;
@@ -1038,6 +1037,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hiddify.ios.RunnerTests;
