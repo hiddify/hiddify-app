@@ -180,6 +180,7 @@
         "af": "Afeganistão (af)",
         "id": "Indonesia (id)",
         "tr": "Turquia (tr) 🇹🇷",
+        "br": "Brazil (br) 🇧🇷",
         "other": "Outro"
       },
       "themeMode": "Modo de Tema",
@@ -198,7 +199,13 @@
       "ignoreBatteryOptimizationsMsg": "Remova as restrições para obter o desempenho ideal da VPN",
       "dynamicNotification": "Exibir velocidade na notificação",
       "hapticFeedback": "Feedback tátil",
-      "autoIpCheck": "Verifique automaticamente o IP da conexão"
+      "autoIpCheck": "Verifique automaticamente o IP da conexão",
+      "actionAtClosing": "Ação ao fechar",
+      "actionsAtClosing": {
+        "askEachTime": "Pergunte sempre",
+        "hide": "Ocultar",
+        "exit": "Sair"
+      }
     },
     "advanced": {
       "sectionTitle": "Avançado",
@@ -327,6 +334,10 @@
     "reconnectMsg": "Reconectando por levar em conta as mudanças..."
   },
   "config": {
+    "useXrayCoreWhenPossible": {
+      "Label": "Use Xray-core quando possível",
+      "Description": "Use Xray-core durante a análise de sublinks. Você precisa reimportar o sublink para habilitar esta opção."
+    },
     "resetBtn": "Redefinir opções",
     "serviceMode": "Modo de serviço",
     "quickSettings": "Configurações rápidas",
@@ -416,5 +427,11 @@
     "warpNoiseSize": "Tamanho do ruído",
     "warpNoiseMode": "Modo de ruído",
     "warpNoiseDelay": "Atraso de ruído"
+  },
+  "window": {
+    "hide": "Ocultar",
+    "close": "Sair",
+    "alertMessage": "Ocultar ou sair do aplicativo?",
+    "remember": "Lembre-se da minha escolha"
   }
 }
