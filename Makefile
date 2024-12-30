@@ -133,7 +133,7 @@ linux-install-dependencies:
 	PATH="$$PATH":"$$HOME/.pub-cache/bin"
 	echo 'export PATH="$$PATH:$$HOME/.pub-cache/bin"' >>~/.bashrc
 	sudo apt-get update
-	sudo apt install -y clang ninja-build pkg-config cmake libgtk-3-dev locate ninja-build pkg-config libglib2.0-dev libgio2.0-cil-dev libayatana-appindicator3-dev fuse rpm patchelf file appstream 
+	sudo apt install -y clang ninja-build libcurl4-openssl-dev pkg-config cmake libgtk-3-dev locate ninja-build pkg-config libglib2.0-dev libgio2.0-cil-dev libayatana-appindicator3-dev fuse rpm patchelf file appstream 
 	
 	
 	sudo modprobe fuse
