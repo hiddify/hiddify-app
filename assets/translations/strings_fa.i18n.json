@@ -332,7 +332,8 @@
     "experimentalNotice": "ویژگی‌های آزمایشی در حال استفاده",
     "experimentalNoticeMsg": "شما برخی از ویژگی‌های آزمایشی را فعال کرده‌اید که ممکن است بر کیفیت اتصال تأثیر گذاشته و باعث بروز خطاهای غیرمنتظره شود. شما همیشه می‌توانید این گزینه‌ها را از صفحه‌ی تنظیمات پیکربندی تغییر دهید یا بازنشانی کنید.",
     "disableExperimentalNotice": "دیگر نشان نده",
-    "reconnectMsg": "در حال اتصال مجدد برای اعمال تغییرات..."
+    "reconnectMsg": "در حال اتصال مجدد برای اعمال تغییرات...",
+    "secure":"ایمن با WARP"
   },
   "config": {
     "useXrayCoreWhenPossible": {
@@ -414,10 +415,12 @@
     "muxProtocol": "پروتکل Mux",
     "muxMaxStreams": "حداکثر جریان‌های هم‌زمان",
     "enableWarp": "فعال‌سازی WARP",
+    "enableWarpSecure": "امنیت بیشتر با WARP",
+    "enableWarpForProxy": "رفع انسداد پروکسی‌ها با WARP",
     "warpDetourMode": "حالت وارپ",
     "warpDetourModes": {
-      "proxyOverWarp": "عبور پروکسی‌ها از طریق WARP",
-      "warpOverProxy": "عبور WARP از طریق پروکسی‌ها",
+      "proxyOverWarp": "عبور پروکسی‌ها از طریق WARP (رفع فیلتر کانفیگ‌ها)",
+      "warpOverProxy": "عبور WARP از طریق پروکسی‌ها(امنیت بیشتر)",
       "inbound": "عبور WARP از طریق پروکسی‌ها",
       "outbound": "عبور پروکسی‌ها از طریق WARP"
     },

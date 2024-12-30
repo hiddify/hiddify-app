@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:gap/gap.dart';
+
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/routes.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
-import 'package:hiddify/core/widget/animated_text.dart';
+
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
@@ -17,14 +15,12 @@ import 'package:hiddify/features/home/widget/new_con_button.dart';
 // import 'package:hiddify/features/home/widget/new_connection_button.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/gen/assets.gen.dart';
+
 import 'package:hiddify/utils/alerts.dart';
 import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loggy/loggy.dart';
 
 class ConnectionButton extends ConsumerStatefulWidget {
   const ConnectionButton({Key? key}) : super(key: key);

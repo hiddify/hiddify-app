@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/routes.dart';
@@ -8,6 +9,7 @@ import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
+import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/connection/widget/experimental_feature_notice.dart';
@@ -15,6 +17,7 @@ import 'package:hiddify/features/connection/widget/experimental_feature_notice.d
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -119,6 +122,11 @@ class ConnectionButton extends HookConsumerWidget {
     //   //   animationValue: animationValue,
     //   // );
     // }
+    final configOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
+    var secureLabel = (configOptions != null && configOptions.warp.enable && configOptions.warp.mode == WarpDetourMode.warpOverProxy) ? t.connection.secure : "";
+    if (delay <= 0 || delay > 65000 || connectionStatus.value != const Connected()) {
+      secureLabel = "";
+    }
     return _ConnectionButton(
       onTap: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => () async {
@@ -205,6 +213,7 @@ class ConnectionButton extends HookConsumerWidget {
         _ => false,
       },
       useImage: today.day >= 19 && today.day <= 23 && today.month == 3,
+      secureLabel: secureLabel,
     );
   }
 }
@@ -219,6 +228,7 @@ class _ConnectionButton extends StatelessWidget {
     required this.useImage,
     required this.newButtonColor,
     required this.animated,
+    required this.secureLabel,
   });
 
   final VoidCallback onTap;
@@ -227,6 +237,7 @@ class _ConnectionButton extends StatelessWidget {
   final Color buttonColor;
   final AssetGenImage image;
   final bool useImage;
+  final String secureLabel;
 
   final Color newButtonColor;
 
@@ -286,11 +297,28 @@ class _ConnectionButton extends StatelessWidget {
         ),
         const Gap(16),
         ExcludeSemantics(
-          child: AnimatedText(
-            label,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedText(
+              label,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            if (secureLabel.isNotEmpty) ...[
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                // const Gap(8),
+                Icon(FontAwesomeIcons.shieldHalved, size: 16, color: Theme.of(context).colorScheme.secondary),
+                const Gap(4),
+                Text(
+                  secureLabel,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
+                ),
+              ]),
+            ],
+          ],
+        )),
       ],
     );
   }

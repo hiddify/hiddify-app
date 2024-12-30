@@ -1,16 +1,13 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
 import 'package:hiddify/features/config_option/overview/PlatformListSection.dart';
-import 'package:hiddify/features/config_option/overview/config_options_page.dart';
 import 'package:hiddify/features/config_option/overview/tlsfragment_widgets.dart';
 import 'package:hiddify/features/config_option/overview/warp_options_widgets.dart';
+import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -22,6 +19,8 @@ class QuickSettingsModal extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
 
     final warpPrefaceCompleted = ref.watch(warpOptionNotifierProvider).consentGiven;
+    final configOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
+    var warpLabel = (configOptions != null && configOptions.warp.mode == WarpDetourMode.warpOverProxy) ? t.config.enableWarpSecure : t.config.enableWarpForProxy;
 
     return SingleChildScrollView(
       child: Column(
@@ -49,12 +48,12 @@ class QuickSettingsModal extends HookConsumerWidget {
 
           PlatformListSection(
             sectionIcon: const Icon(FontAwesomeIcons.cloudflare),
-            sectionTitle: t.config.section.warp,
+            sectionTitle: warpLabel,
             title: warpPrefaceCompleted
                 ? SwitchListTile.adaptive(
                     value: ref.watch(ConfigOptions.enableWarp),
                     onChanged: ref.watch(ConfigOptions.enableWarp.notifier).update,
-                    title: Text(t.config.enableWarp),
+                    title: Text(warpLabel),
                   )
                 : null,
             items: const [
