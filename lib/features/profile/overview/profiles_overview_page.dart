@@ -114,14 +114,14 @@ class ProfilesOverviewModal extends HookConsumerWidget {
           const SliverGap(10),
           SliverLayoutBuilder(
             builder: (context, constraints) {
-              final width = constraints.crossAxisExtent;
-              final crossAxisCount = max(1, (width / 400).floor());
+              // final width = constraints.crossAxisExtent;
+              // final crossAxisCount = max(1, (width / 400).floor());
               return switch (asyncProfiles) {
-                AsyncData(value: final profiles) => SliverGrid.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      mainAxisExtent: 80,
-                    ),
+                AsyncData(value: final profiles) => SliverList.builder(
+                    // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    //   crossAxisCount: crossAxisCount,
+                    //   mainAxisExtent: 80,
+                    // ),
                     itemBuilder: (context, index) {
                       // if (index >= profiles.length) {
                       // return const Text("Test");
