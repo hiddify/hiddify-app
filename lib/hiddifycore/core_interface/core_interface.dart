@@ -26,8 +26,8 @@ class CoreInterface {
   }
 
   bool isSingleChannel() {
-    return true;
-    // return fgClient == bgClient;
+    // return true;
+    return fgClient == bgClient;
   }
 
   Future<bool> resetTunnel() async {

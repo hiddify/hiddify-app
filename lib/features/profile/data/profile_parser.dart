@@ -13,10 +13,11 @@ import 'package:uuid/uuid.dart';
 /// - url fragment (example: `https://example.com/config#user`) -> name=`user`
 /// - url filename extension (example: `https://example.com/config.json`) -> name=`config`
 /// - if none of these methods return a non-blank string, fallback to `Remote Profile`
+
 abstract class ProfileParser {
   static const infiniteTrafficThreshold = 92233720368;
   static const infiniteTimeThreshold = 92233720368;
-
+  static const allowedOverrideConfigs = ['connection-test-url', 'direct-dns-address', 'remote-dns-address'];
   static RemoteProfileEntity parse(
     String url,
     Map<String, List<String>> headers,
@@ -50,10 +51,12 @@ abstract class ProfileParser {
       final updateInterval = Duration(hours: int.parse(updateIntervalStr));
       options = ProfileOptions(updateInterval: updateInterval);
     }
-    String? testUrl;
-    if (headers['test-url'] case [final testUrl_] when isUrl(testUrl_)) {
-      testUrl = testUrl_;
-    }
+    final headerconfigs = headers.keys.where((element) => allowedOverrideConfigs.contains(element) && headers[element]?.isNotEmpty == true);
+
+    final testUrl = jsonEncode({for (final key in headerconfigs) key: headers[key]!.first});
+    // if (headers['test-url'] case [final testUrl_] when isUrl(testUrl_)) {
+    //   testUrl = testUrl_;
+    // }
     SubscriptionInfo? subInfo;
     if (headers['subscription-userinfo'] case [final subInfoStr]) {
       subInfo = parseSubscriptionInfo(subInfoStr);

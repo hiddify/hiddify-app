@@ -40,7 +40,8 @@ void main() {
           final headers = <String, List<String>>{
             "profile-title": ["base64:ZXhhbXBsZVRpdGxl"],
             "profile-update-interval": ["1"],
-            "test-url": [validBaseUrl],
+            "connection-test-url": [validBaseUrl],
+            "remote-dns-address": [validBaseUrl],
             "subscription-userinfo": [
               "upload=0;download=1024;total=10240.5;expire=1704054600.55",
             ],

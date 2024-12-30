@@ -1,4 +1,3 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +17,6 @@ import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/settings/overview/settings_overview_page.dart';
 import 'package:hiddify/utils/utils.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 part 'routes.g.dart';
 
@@ -32,7 +30,7 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
       routes: [
         TypedGoRoute<ProxiesRoute>(path: "proxies", name: ProxiesRoute.name),
         TypedGoRoute<QuickSettingsRoute>(path: "quick-settings", name: QuickSettingsRoute.name),
-        TypedGoRoute<ProfilesOverviewBottomSheetRoute>(path: "bottomsheet", name: ProfilesOverviewBottomSheetRoute.name)
+        TypedGoRoute<ProfilesOverviewBottomSheetRoute>(path: "bottomsheet", name: ProfilesOverviewBottomSheetRoute.name),
       ],
     ),
     TypedGoRoute<ProfilesOverviewRoute>(path: "/profiles", name: ProfilesOverviewRoute.name, routes: [
@@ -369,7 +367,7 @@ class PerAppProxyRoute extends GoRouteData {
 
   // @override
   String getName() => PerAppProxyRoute.name;
-  @override
+  // @override
   String getLocation() => location;
 }
 

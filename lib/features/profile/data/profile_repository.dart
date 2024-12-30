@@ -385,7 +385,6 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
     'profile-update-interval',
     'support-url',
     'profile-web-page-url',
-    'test-url',
   ];
 
   @visibleForTesting
@@ -462,7 +461,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         if (index == -1) continue;
         final key = line.substring(0, index).replaceFirst(RegExp("^#|//"), "").trim().toLowerCase();
         final value = line.substring(index + 1).trim();
-        if (!headers.keys.contains(key) && _subInfoHeaders.contains(key) && value.isNotEmpty) {
+        if (!headers.keys.contains(key) && (_subInfoHeaders.contains(key) || ProfileParser.allowedOverrideConfigs.contains(key)) && value.isNotEmpty) {
           headers[key] = [value];
         }
       }

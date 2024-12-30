@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +13,6 @@ import 'package:hiddify/hiddifycore/generated/v2/hello/hello_service.pbgrpc.dart
 
 import 'package:hiddify/utils/utils.dart';
 import 'package:loggy/loggy.dart';
-import 'package:posix/posix.dart';
 
 final _logger = Loggy('FFIHiddifyCoreService');
 
@@ -59,48 +59,69 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
           )
         : const ChannelCredentials.insecure();
 
-    helloClient = HelloClient(ClientChannel('localhost', port: portFront, options: ChannelOptions(credentials: channelOption)));
+    helloClient = HelloClient(ClientChannel('127.0.0.1', port: portFront, options: ChannelOptions(credentials: channelOption)));
     final res = await helloClient.sayHello(HelloRequest(name: "test"));
 
     loggy.info(res.toString());
-    fgClient = CoreClient(ClientChannel('localhost', port: portFront, options: ChannelOptions(credentials: channelOption)));
+    fgClient = CoreClient(ClientChannel('127.0.0.1', port: portFront, options: ChannelOptions(credentials: channelOption)));
 
-    bgClient = CoreClient(ClientChannel('localhost', port: portBack, options: ChannelOptions(credentials: channelOption)));
+    bgClient = CoreClient(ClientChannel('127.0.0.1', port: portBack, options: ChannelOptions(credentials: channelOption)));
     // await start("/sdcard/Android/data/app.hiddify.com/files/configs/cdc633e9-8cfc-4a67-948d-009f779a5c91.json", "hiddify");
     return "";
   }
 
   @override
   Future<bool> start(String path, String name) async {
+    await stop();
+    if (!await waitUntilPort(portBack, false)) return false;
+
     await methodChannel.invokeMethod(
       "start",
       {
         "path": path,
         "name": name,
         "grpcPort": portBack,
+        "startBg": true,
       },
     );
+    if (!await waitUntilPort(portBack, true)) return false;
     _isBgClientAvailable = true;
     return true;
   }
 
-  @override
-  Future<bool> restart(String path, String name) async {
-    await stop();
-
-    // await methodChannel.invokeMethod(
-    //   "restart",
-    //   {"path": path, "name": name},
-    // );
-    sleep(1);
-    return await start(path, name);
+  Future<bool> waitUntilPort(int portNumber, bool isOpen) async {
+    for (var i = 0; i < 100; i++) {
+      if (await isPortOpen("127.0.0.1", portNumber) == isOpen) {
+        return true;
+      }
+      // Non-blocking pause for 100 milliseconds
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    return false;
   }
+  // @override
+  // Future<bool> restart(String path, String name) async {
+  //   await stop();
+
+  //   // await methodChannel.invokeMethod(
+  //   //   "restart",
+  //   //   {"path": path, "name": name},
+  //   // );
+  //   sleep(1);
+  //   return await start(path, name);
+  // }
 
   @override
   Future<bool> stop() async {
     await methodChannel.invokeMethod(
       "stop",
     );
+    if (!await waitUntilPort(portBack, false)) {
+      await methodChannel.invokeMethod(
+        "stop",
+      );
+      return false;
+    }
     _isBgClientAvailable = false;
     return true;
   }
@@ -114,5 +135,17 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   Future<bool> resetTunnel() async {
     await methodChannel.invokeMethod("reset");
     return true;
+  }
+}
+
+Future<bool> isPortOpen(String host, int port, {Duration timeout = const Duration(seconds: 5)}) async {
+  try {
+    final socket = await Socket.connect(host, port, timeout: timeout);
+    await socket.close();
+    return true;
+  } on SocketException catch (_) {
+    return false;
+  } catch (_) {
+    return false;
   }
 }

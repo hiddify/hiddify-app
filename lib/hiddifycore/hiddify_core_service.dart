@@ -9,7 +9,6 @@ import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
-import 'package:hiddify/singbox/model/singbox_stats.dart';
 import 'package:hiddify/singbox/model/singbox_status.dart';
 import 'package:hiddify/singbox/model/warp_account.dart';
 
@@ -92,6 +91,7 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(
       () async {
         loggy.debug("changing options");
+        // latestOptions = options;
         try {
           final res = await core.fgClient.changeHiddifySettings(
             ChangeHiddifySettingsRequest(
@@ -122,20 +122,30 @@ class HiddifyCoreService with InfraLogger {
       () async {
         statusController.add(currentState = const SingboxStatus.starting());
         loggy.debug("starting");
+
+        if (!await core.start(path, name)) {}
         if (!core.isSingleChannel()) {
           await startListeningLogs("bg", core.bgClient);
           await startListeningStatus("bg", core.bgClient);
         }
-        if (!await core.start(path, name)) {
-          final res = await core.bgClient.start(
-            StartRequest(
-              configPath: path,
-              disableMemoryLimit: disableMemoryLimit,
-            ),
-          );
+        // if (latestOptions != null) {
+        //   await core.bgClient.changeHiddifySettings(
+        //     ChangeHiddifySettingsRequest(
+        //       hiddifySettingsJson: jsonEncode(latestOptions!.toJson()),
+        //     ),
+        //   );
+        // }
+        // final content = await File(path).readAsString();
+        // loggy.debug("starting with content: $content");
+        final res = await core.bgClient.start(
+          StartRequest(
+            configPath: path,
+            // configContent: content,
+            disableMemoryLimit: disableMemoryLimit,
+          ),
+        );
 
-          if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
-        }
+        if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
 
         return right(unit);
       },
@@ -146,10 +156,14 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(
       () async {
         loggy.debug("stopping");
-        if (!await core.stop()) {
+        try {
           final res = await core.bgClient.stop(Empty());
-          if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
+        } on GrpcError catch (e) {
+          loggy.error("failed to stop bg core: $e");
         }
+        if (!await core.stop()) {}
+        statusController.add(currentState = const SingboxStatus.stopped());
+
         return right(unit);
       },
     );
@@ -159,15 +173,15 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(
       () async {
         loggy.debug("restarting");
-        if (!await core.restart(path, name)) {
-          final res = await core.bgClient.restart(
-            StartRequest(
-              configPath: path,
-              disableMemoryLimit: disableMemoryLimit,
-            ),
-          );
-          if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
-        }
+        // if (!await core.restart(path, name)) {
+        final res = await core.bgClient.restart(
+          StartRequest(
+            configPath: path,
+            disableMemoryLimit: disableMemoryLimit,
+          ),
+        );
+        if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
+        // }
         if (!core.isSingleChannel()) {
           await startListeningStatus("bg", core.bgClient);
           await startListeningLogs("bg", core.bgClient);
@@ -253,6 +267,8 @@ class HiddifyCoreService with InfraLogger {
   }
 
   List<LogMessage> logBuffer = [];
+
+  // SingboxConfigOption? latestOptions;
 
   Stream<List<LogMessage>> watchLogs(String path) async* {
     yield* logController.stream;

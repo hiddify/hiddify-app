@@ -1,6 +1,4 @@
-import 'package:dartx/dartx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 
 part 'singbox_outbound.freezed.dart';

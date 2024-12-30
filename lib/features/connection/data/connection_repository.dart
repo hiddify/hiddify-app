@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
@@ -107,10 +109,15 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     return exceptionHandler(
       () {
         _configOptionsSnapshot = options;
-        var newOptions = options;
-        if (testUrl != null) {
-          newOptions = options.copyWith(connectionTestUrl: testUrl);
+        final newOptionsJson = options.toJson();
+        if (testUrl != null && testUrl.contains("{")) {
+          final dic = jsonDecode(testUrl) as Map<String, dynamic>;
+
+          for (final key in dic.keys) {
+            newOptionsJson[key] = dic[key];
+          }
         }
+        final newOptions = SingboxConfigOption.fromJson(newOptionsJson);
         return singbox.changeOptions(newOptions).mapLeft(InvalidConfigOption.new).run();
       },
       UnexpectedConnectionFailure.new,

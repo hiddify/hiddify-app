@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
-import 'package:flutter_loggy_dio/flutter_loggy_dio.dart';
+
 import 'package:hiddify/utils/custom_loggers.dart';
 
 class DioHttpClient with InfraLogger {
@@ -31,7 +31,7 @@ class DioHttpClient with InfraLogger {
                 if (mode != "proxy") ...[
                   const Duration(seconds: 2),
                   const Duration(seconds: 3),
-                ]
+                ],
               ],
             ),
           );

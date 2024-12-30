@@ -1,22 +1,12 @@
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
-import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/router.dart';
-import 'package:hiddify/features/config_option/overview/config_options_page.dart';
-import 'package:hiddify/features/home/widget/home_page.dart';
-import 'package:hiddify/features/log/overview/logs_overview_page.dart';
-import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
-import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:humanizer/humanizer.dart';
 
 abstract interface class RootScaffold {
   static final stateKey = GlobalKey<ScaffoldState>();
