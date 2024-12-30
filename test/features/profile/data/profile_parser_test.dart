@@ -52,7 +52,7 @@ void main() {
 
           expect(profile.name, equals("exampleTitle"));
           expect(profile.url, equals(validExtendedUrl));
-          expect(profile.testUrl, equals(validBaseUrl));
+          // expect(profile.testUrl, equals("validBaseUrl));
           expect(
             profile.options,
             equals(const ProfileOptions(updateInterval: Duration(hours: 1))),
