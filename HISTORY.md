@@ -1,8 +1,140 @@
 # Changelog
 
 
-## 2.7.0 (2024-09-29)
-## 2.5.7 (2024-10-03)
+## 3.0.0 (2024-12-30)
+
+#### New
+
+* Add extra security mode. 
+
+* Add fragment button. 
+
+* Add remote config support. 
+
+* Add better platform management. 
+
+* Update the ios interface. 
+
+* Add some more checks. 
+
+* Add real active tag. 
+
+* Upgrade flutter and libs. 
+
+* Add quick setting, organize settings, fix reconnect bug, remove profile tab in mobile, use hiddifynextx forfetch profile in xray mode, update flutter. 
+
+* Refactor configs to better visualisation. 
+
+* Update ci. 
+
+* Upgrade dependencies. 
+
+* Redesign core interface. 
+
+* Add detailed  ipinfo. 
+
+* Redisgn ip panel. 
+
+* Add auto start for mac. 
+
+* Add support for auto start in macos. 
+
+* Add org flag. 
+
+#### Changes
+
+* Disable HTTP subscribe link as they create great issue. 
+
+* Some refactor. 
+
+#### Fix
+
+* Bug. 
+
+* Interface change and warp crash. 
+
+* Quicktile bug and update to singbox 10.3. 
+
+* Bug? 
+
+* Macos. 
+
+* Macos build. 
+
+* Emoji in profile and proxies. 
+
+* No commit message. 
+
+* Ios. 
+
+* Ios interface. 
+
+* Name changing. 
+
+* Typos for ios. 
+
+#### Other
+
+* Handle profile size. 
+
+* Support correctly ios. 
+
+* Update android libs. 
+
+* Update packages. 
+
+* Show error incase of fail. 
+
+* Upgrade flutter. 
+
+* Some refactor. 
+
+* Refactor router. 
+
+* Refactor: routes. 
+
+* Update. 
+
+* Merge branch 'ios' into new-design-v2. 
+
+* Update dialog to platform dialog. 
+
+* Merge remote-tracking branch 'origin/main' into ios. 
+
+* Update CONTRIBUTING.md. 
+
+* Update README.md. 
+
+* Merge pull request #1403 from ldm0206/main. 
+  _Update translations zh-CN_
+
+* Chore: update translations with Fink 🐦 
+
+* Update. 
+
+* Update. 
+
+* Merge branch 'fix-latest' into new-design. 
+
+* Update packages and fix web issues. 
+
+* V3. 
+
+* New UI design. 
+
+* Merge remote-tracking branch 'origin/main' into ios-pv. 
+
+* Add make with love in intro. 
+
+* Improve ios UI and integrate it with os. 
+
+* Update. 
+
+* Update ios. 
+
+
+
+## v2.5.7 (2024-10-03)
 
 #### Other
 
@@ -27,7 +159,7 @@
 
 
 
-## hcore.5.5 (2024-09-29)
+## v2.5.5 (2024-09-29)
 
 #### Other
 
@@ -38,7 +170,7 @@
 
 
 
-## hcore.5.2 (2024-09-29)
+## v2.5.2 (2024-09-29)
 
 #### Fix
 
@@ -46,7 +178,7 @@
 
 
 
-## hcore.5.1 (2024-09-29)
+## v2.5.1 (2024-09-29)
 
 #### Fix
 
@@ -56,7 +188,7 @@
 
 
 
-## hcore.5.0 (2024-09-28)
+## v2.5.0 (2024-09-28)
 
 #### Other
 
@@ -79,7 +211,7 @@
 
 
 
-## hcore.3.1 (2024-09-07)
+## v2.3.1 (2024-09-07)
 
 #### Fix
 
@@ -95,7 +227,7 @@
 
 
 
-## hcore.3.0 (2024-09-02)
+## v2.3.0 (2024-09-02)
 
 #### New
 
@@ -136,7 +268,7 @@
 
 
 
-## hcore.2.0 (2024-08-21)
+## v2.2.0 (2024-08-21)
 
 #### New
 
@@ -188,7 +320,7 @@
 
 
 
-## hcore.1.5 (2024-08-05)
+## v2.1.5 (2024-08-05)
 
 #### Fix
 
@@ -212,7 +344,7 @@
 
 
 
-## hcore.1.4 (2024-08-05)
+## v2.1.4 (2024-08-05)
 
 #### New
 
@@ -267,7 +399,7 @@
 
 
 
-## hcore.1.1 (2024-08-02)
+## v2.1.1 (2024-08-02)
 
 #### New
 
@@ -279,7 +411,7 @@
 
 
 
-## hcore.1.0 (2024-08-02)
+## v2.1.0 (2024-08-02)
 
 #### New
 
@@ -309,7 +441,7 @@
 
 
 
-## hcore.0.4 (2024-07-31)
+## v2.0.4 (2024-07-31)
 
 #### New
 
@@ -317,7 +449,7 @@
 
 
 
-## hcore.0.3 (2024-07-30)
+## v2.0.3 (2024-07-30)
 
 #### Fix
 
@@ -325,7 +457,7 @@
 
 
 
-## hcore.0.2 (2024-07-30)
+## v2.0.2 (2024-07-30)
 
 #### Other
 
@@ -333,7 +465,7 @@
 
 
 
-## hcore.0.1 (2024-07-30)
+## v2.0.1 (2024-07-30)
 
 #### Fix
 
@@ -359,7 +491,7 @@
 
 
 
-## hcore.0.0 (2024-07-30)
+## v2.0.0 (2024-07-30)
 
 #### New
 
@@ -1623,7 +1755,7 @@
 
 * Potentioal fix for crash in some windows. 
 
-* Bump hiddify-core. 
+* Bump libcore. 
 
 * Excluding aab from building draft. 
 
@@ -2030,7 +2162,7 @@
 
 * Speed up ping. 
 
-* Update hiddify-core. 
+* Update libcore. 
 
 
 
@@ -2076,7 +2208,7 @@
 
 * Log handler base functionality. 
   _+ fix makefile ios-temp-prepare upgrading pub
-+ remove tvOS from hiddify-core local spm
++ remove tvOS from libcore local spm
 +_
 
 * Add mux options. 
@@ -2128,7 +2260,7 @@
 * Revert changes for swift package. 
 
 * Merge pull request #344 from amirsaam/main. 
-  _switch to local spm to load hiddify-core_
+  _switch to local spm to load libcore_
 
 * Merge branch 'main' of https://github.com/amirsaam/hiddify-next. 
 
@@ -2162,7 +2294,7 @@
 * Remove hiddify://import/ from export option. 
 
 * Merge pull request #342 from amirsaam/main. 
-  _getting hiddify-core from spm, adding landscape mode_
+  _getting libcore from spm, adding landscape mode_
 
 * Merge branch 'main' of https://github.com/amirsaam/hiddify-next. 
 
@@ -2171,7 +2303,7 @@
 * Revert some changers. 
   _This reverts some of commit dde7c2419a12e0f36976f4c0ff8e66d882ec62ac._
 
-* Update pod, getting hiddify-core from spm, adding landscape mode. 
+* Update pod, getting libcore from spm, adding landscape mode. 
 
 * Change profile options modal. 
 
@@ -2248,9 +2380,9 @@
 * Revert landscape mode. 
 
 * Merge pull request #328 from amirsaam/main. 
-  _remove unnecessary force unwrap, hiddify-core linking add landscape mode_
+  _remove unnecessary force unwrap, libcore linking add landscape mode_
 
-* Remove unnecessary force unwrap, hiddify-core linking add landscape mode, 
+* Remove unnecessary force unwrap, libcore linking add landscape mode, 
 
 * Change ios method error handling. 
 
