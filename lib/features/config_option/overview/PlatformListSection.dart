@@ -24,15 +24,9 @@ class PlatformListSection extends StatelessWidget {
 
   void _navigateToDetailsPage(BuildContext context) {
     Navigator.of(context).push(PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => PlatformWidget(
-        material: (_, __) => Scaffold(
-          appBar: showAppBar ? AppBar(title: sectionTitle) : null,
-          body: page ?? (items == null ? Container() : ListView(children: items!)),
-        ),
-        cupertino: (_, __) => CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(middle: sectionTitle),
-          child: page ?? (items == null ? Container() : ListView(children: items!)),
-        ),
+      pageBuilder: (context, animation, secondaryAnimation) => Scaffold(
+        appBar: showAppBar ? AppBar(title: sectionTitle) : null,
+        body: page ?? (items == null ? Container() : ListView(children: items!)),
       ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(1.0, 0.0); // Start from the right
@@ -49,11 +43,12 @@ class PlatformListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return Material(
+        child: ListTile(
       leading: sectionIcon,
       title: title ?? sectionTitle,
       onTap: () => _navigateToDetailsPage(context),
       trailing: const Icon(FluentIcons.chevron_right_20_regular),
-    );
+    ));
   }
 }
