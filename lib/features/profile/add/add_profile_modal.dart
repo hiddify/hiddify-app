@@ -150,7 +150,7 @@ class AddProfileModal extends HookConsumerWidget {
                     ),
                     child: Column(
                       children: [
-                        if (!PlatformUtils.isInAppStore)
+                        if (!PlatformUtils.isInAppStore) ...[
                           Semantics(
                             button: true,
                             child: SizedBox(
@@ -190,6 +190,49 @@ class AddProfileModal extends HookConsumerWidget {
                               ),
                             ),
                           ),
+                          const SizedBox(height: 16),
+                        ],
+                        Semantics(
+                          button: true,
+                          child: SizedBox(
+                            height: 36,
+                            child: Material(
+                              key: const ValueKey("add_fragment_button"),
+                              elevation: 8,
+                              color: theme.colorScheme.surface,
+                              surfaceTintColor: theme.colorScheme.surfaceTint,
+                              shadowColor: Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                              clipBehavior: Clip.antiAlias,
+                              child: InkWell(
+                                onTap: () async {
+                                  final _profile = ref.read(addProfileProvider.notifier);
+                                  await _profile.add("https://raw.githubusercontent.com/hiddify/hiddify-next/main/test.configs/fragment"); //
+                                  if (context.mounted) {
+                                    context.pop();
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      FluentIcons.add_24_regular,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      t.profile.add.addFragment,
+                                      style: theme.textTheme.labelLarge?.copyWith(
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
                         if (!PlatformUtils.isDesktop) const SizedBox(height: 16), // Spacing between the buttons
                         if (!PlatformUtils.isDesktop)
                           Semantics(
