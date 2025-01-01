@@ -19,7 +19,7 @@ class TlsfragmentTiles extends HookConsumerWidget {
           context,
           title: t.config.enableTlsFragment,
           value: ref.watch(ConfigOptions.enableTlsFragment),
-          onChanged: ref.watch(ConfigOptions.enableTlsFragment.notifier).update,
+          onChanged: ref.read(ConfigOptions.enableTlsFragment.notifier).update,
         ),
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.tlsFragmentSize),
@@ -41,13 +41,13 @@ class TlsfragmentTiles extends HookConsumerWidget {
           context,
           title: t.config.enableTlsMixedSniCase,
           value: ref.watch(ConfigOptions.enableTlsMixedSniCase),
-          onChanged: ref.watch(ConfigOptions.enableTlsMixedSniCase.notifier).update,
+          onChanged: ref.read(ConfigOptions.enableTlsMixedSniCase.notifier).update,
         ),
         switchListTileAdaptive(
           context,
           title: t.config.enableTlsPadding,
           value: ref.watch(ConfigOptions.enableTlsPadding),
-          onChanged: ref.watch(ConfigOptions.enableTlsPadding.notifier).update,
+          onChanged: ref.read(ConfigOptions.enableTlsPadding.notifier).update,
         ),
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.tlsPaddingSize),

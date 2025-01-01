@@ -3,7 +3,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/optional_range.dart';
@@ -18,6 +17,9 @@ import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
 import 'package:hiddify/features/config_option/overview/PlatformListSection.dart';
+import 'package:hiddify/features/config_option/overview/dns_options_widgets.dart';
+import 'package:hiddify/features/config_option/overview/inbound_options_widgets.dart';
+import 'package:hiddify/features/config_option/overview/route_options_widgets.dart';
 import 'package:hiddify/features/config_option/overview/tlsfragment_widgets.dart';
 import 'package:hiddify/features/config_option/overview/warp_options_widgets.dart';
 import 'package:hiddify/features/config_option/widget/preference_tile.dart';
@@ -25,6 +27,7 @@ import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/log/overview/logs_overview_page.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/settings/about/about_page.dart';
+import 'package:hiddify/features/settings/notifier/platform_settings_notifier.dart';
 import 'package:hiddify/features/settings/widgets/advanced_setting_tiles.dart';
 import 'package:hiddify/features/settings/widgets/general_setting_tiles.dart';
 import 'package:hiddify/features/settings/widgets/platform_settings_tiles.dart';
@@ -77,23 +80,12 @@ class ConfigOptionsPage extends HookConsumerWidget {
     //     }
     //   },
     // );
-    Widget SwitchListTileAdaptive({
-      Key? key,
-      String? title,
-      String? subtitle,
-      bool value = false,
-      ValueChanged<bool>? onChanged,
-    }) {
-      return switchListTileAdaptive(context, key: key, title: title, subtitle: subtitle, value: value, onChanged: onChanged);
-    }
 
     String experimental(String txt) {
       return "$txt (${t.settings.experimental})";
     }
 
-    final perAppProxy = ref.watch(Preferences.perAppProxyMode).enabled;
-
-    return PlatformScaffold(
+    return Scaffold(
       body: CustomScrollView(
         // controller: scrollController,
         shrinkWrap: true,
@@ -101,50 +93,52 @@ class ConfigOptionsPage extends HookConsumerWidget {
           NestedAppBar(
             title: Text(t.config.pageTitle),
             actions: [
-              PlatformPopupMenu(
+              PopupMenuButton(
                 icon: Icon(AdaptiveIcon(context).more),
-                options: [
-                  PopupMenuOption(
-                    onTap: (option) async => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard().then((success) {
-                      if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
-                              t.general.clipboardExportSuccessMsg,
-                            );
-                      }
-                    }),
-                    label: t.settings.exportOptions,
-                  ),
-                  // if (ref.watch(debugModeNotifierProvider))
-                  PopupMenuOption(
-                    onTap: (option) async => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard(excludePrivate: false).then((success) {
-                      if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
-                              t.general.clipboardExportSuccessMsg,
-                            );
-                      }
-                    }),
-                    label: t.settings.exportAllOptions,
-                  ),
-                  PopupMenuOption(
-                    onTap: (option) async {
-                      final shouldImport = await showConfirmationDialog(
-                        context,
-                        title: t.settings.importOptions,
-                        message: t.settings.importOptionsMsg,
-                      );
-                      if (shouldImport) {
-                        await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
-                      }
-                    },
-                    label: t.settings.importOptions,
-                  ),
-                  PopupMenuOption(
-                    label: t.config.resetBtn,
-                    onTap: (option) async {
-                      await ref.read(configOptionNotifierProvider.notifier).resetOption();
-                    },
-                  ),
-                ],
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem(
+                      onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard().then((success) {
+                        if (success) {
+                          ref.read(inAppNotificationControllerProvider).showSuccessToast(
+                                t.general.clipboardExportSuccessMsg,
+                              );
+                        }
+                      }),
+                      child: Text(t.settings.exportOptions),
+                    ),
+                    // if (ref.watch(debugModeNotifierProvider))
+                    PopupMenuItem(
+                      onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard(excludePrivate: false).then((success) {
+                        if (success) {
+                          ref.read(inAppNotificationControllerProvider).showSuccessToast(
+                                t.general.clipboardExportSuccessMsg,
+                              );
+                        }
+                      }),
+                      child: Text(t.settings.exportAllOptions),
+                    ),
+                    PopupMenuItem(
+                      onTap: () async {
+                        final shouldImport = await showConfirmationDialog(
+                          context,
+                          title: t.settings.importOptions,
+                          message: t.settings.importOptionsMsg,
+                        );
+                        if (shouldImport) {
+                          await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
+                        }
+                      },
+                      child: Text(t.settings.importOptions),
+                    ),
+                    PopupMenuItem(
+                      child: Text(t.config.resetBtn),
+                      onTap: () async {
+                        await ref.read(configOptionNotifierProvider.notifier).resetOption();
+                      },
+                    ),
+                  ];
+                },
               )
             ],
           ),
@@ -176,226 +170,29 @@ class ConfigOptionsPage extends HookConsumerWidget {
                   PlatformListSection(
                     sectionIcon: const Icon(FontAwesomeIcons.layerGroup),
                     sectionTitle: t.settings.general.sectionTitle,
-                    items: [
-                      const GeneralSettingTiles(),
-                      const PlatformSettingsTiles(),
-                      const AdvancedSettingTiles(),
-                      ChoicePreferenceWidget(
-                        selected: ref.watch(ConfigOptions.logLevel),
-                        preferences: ref.watch(ConfigOptions.logLevel.notifier),
-                        choices: LogLevel.choices,
-                        title: t.config.logLevel,
-                        presentChoice: (value) => value.name.toUpperCase(),
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.connectionTestUrl),
-                        preferences: ref.watch(ConfigOptions.connectionTestUrl.notifier),
-                        title: t.config.connectionTestUrl,
-                      ),
-                      PlatformListTile(
-                        title: Text(t.config.urlTestInterval),
-                        subtitle: Text(
-                          ref.watch(ConfigOptions.urlTestInterval).toApproximateTime(isRelativeToNow: false),
-                        ),
-                        onTap: () async {
-                          final urlTestInterval = await SettingsSliderDialog(
-                            title: t.config.urlTestInterval,
-                            initialValue: ref.watch(ConfigOptions.urlTestInterval).inMinutes.coerceIn(0, 60).toDouble(),
-                            onReset: ref.read(ConfigOptions.urlTestInterval.notifier).reset,
-                            min: 1,
-                            max: 60,
-                            divisions: 60,
-                            labelGen: (value) => Duration(minutes: value.toInt()).toApproximateTime(isRelativeToNow: false),
-                          ).show(context);
-                          if (urlTestInterval == null) return;
-                          await ref.read(ConfigOptions.urlTestInterval.notifier).update(Duration(minutes: urlTestInterval.toInt()));
-                        },
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.clashApiPort),
-                        preferences: ref.watch(ConfigOptions.clashApiPort.notifier),
-                        title: t.config.clashApiPort,
-                        validateInput: isPort,
-                        digitsOnly: true,
-                        inputToValue: int.tryParse,
-                      ),
-                      SwitchListTileAdaptive(
-                        title: experimental(t.config.useXrayCoreWhenPossible.Label),
-                        subtitle: t.config.useXrayCoreWhenPossible.Description,
-                        value: ref.watch(ConfigOptions.useXrayCoreWhenPossible),
-                        onChanged: ref.watch(ConfigOptions.useXrayCoreWhenPossible.notifier).update,
-                      ),
+                    items: const [
+                      GeneralSettingTiles(),
+                      PlatformSettingsTiles(),
+                      AdvancedSettingTiles(),
                     ],
                   ),
 
                   PlatformListSection(
                     sectionIcon: const Icon(FontAwesomeIcons.route),
                     sectionTitle: t.config.section.route,
-                    items: [
-                      if (PlatformUtils.isAndroid)
-                        ListTile(
-                          title: Text(t.settings.network.perAppProxyPageTitle),
-                          leading: const Icon(FluentIcons.apps_list_detail_24_regular),
-                          trailing: Switch(
-                            value: perAppProxy,
-                            onChanged: (value) async {
-                              final newMode = perAppProxy ? PerAppProxyMode.off : PerAppProxyMode.exclude;
-                              await ref.read(Preferences.perAppProxyMode.notifier).update(newMode);
-                              if (!perAppProxy && context.mounted) {
-                                const PerAppProxyRoute().go(context);
-                              }
-                            },
-                          ),
-                          onTap: () async {
-                            if (!perAppProxy) {
-                              await ref.read(Preferences.perAppProxyMode.notifier).update(PerAppProxyMode.exclude);
-                            }
-                            // if (context.mounted) await const PerAppProxyRoute().push(context);
-                          },
-                        ),
-                      ChoicePreferenceWidget(
-                        selected: ref.watch(ConfigOptions.region),
-                        preferences: ref.watch(ConfigOptions.region.notifier),
-                        choices: Region.values,
-                        title: t.settings.general.region,
-                        presentChoice: (value) => value.present(t),
-                        onChanged: (val) => ref.watch(ConfigOptions.directDnsAddress.notifier).reset(),
-                      ),
-                      SwitchListTileAdaptive(
-                        title: experimental(t.config.blockAds),
-                        value: ref.watch(ConfigOptions.blockAds),
-                        onChanged: ref.watch(ConfigOptions.blockAds.notifier).update,
-                      ),
-                      SwitchListTileAdaptive(
-                        title: experimental(t.config.bypassLan),
-                        value: ref.watch(ConfigOptions.bypassLan),
-                        onChanged: ref.watch(ConfigOptions.bypassLan.notifier).update,
-                      ),
-                      SwitchListTileAdaptive(
-                        title: t.config.resolveDestination,
-                        value: ref.watch(ConfigOptions.resolveDestination),
-                        onChanged: ref.watch(ConfigOptions.resolveDestination.notifier).update,
-                      ),
-                      ChoicePreferenceWidget(
-                        selected: ref.watch(ConfigOptions.ipv6Mode),
-                        preferences: ref.watch(ConfigOptions.ipv6Mode.notifier),
-                        choices: IPv6Mode.values,
-                        title: t.config.ipv6Mode,
-                        presentChoice: (value) => value.present(t),
-                      ),
+                    items: const [
+                      RouteOptionsTiles(),
                     ],
                   ),
                   PlatformListSection(
                     sectionIcon: const Icon(FontAwesomeIcons.globe),
                     sectionTitle: t.config.section.dns,
-                    items: [
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.remoteDnsAddress),
-                        preferences: ref.watch(ConfigOptions.remoteDnsAddress.notifier),
-                        title: t.config.remoteDnsAddress,
-                      ),
-                      ChoicePreferenceWidget(
-                        selected: ref.watch(ConfigOptions.remoteDnsDomainStrategy),
-                        preferences: ref.watch(ConfigOptions.remoteDnsDomainStrategy.notifier),
-                        choices: DomainStrategy.values,
-                        title: t.config.remoteDnsDomainStrategy,
-                        presentChoice: (value) => value.displayName,
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.directDnsAddress),
-                        preferences: ref.watch(ConfigOptions.directDnsAddress.notifier),
-                        title: t.config.directDnsAddress,
-                      ),
-                      ChoicePreferenceWidget(
-                        selected: ref.watch(ConfigOptions.directDnsDomainStrategy),
-                        preferences: ref.watch(ConfigOptions.directDnsDomainStrategy.notifier),
-                        choices: DomainStrategy.values,
-                        title: t.config.directDnsDomainStrategy,
-                        presentChoice: (value) => value.displayName,
-                      ),
-                      SwitchListTileAdaptive(
-                        title: t.config.enableDnsRouting,
-                        value: ref.watch(ConfigOptions.enableDnsRouting),
-                        onChanged: ref.watch(ConfigOptions.enableDnsRouting.notifier).update,
-                      ),
-                      // const SettingsDivider(),
-                      // SettingsSection(experimental(t.config.section.mux)),
-                      // SwitchListTileAdaptive(
-                      //   title: t.config.enableMux,
-                      //   value: ref.watch(ConfigOptions.enableMux),
-                      //   onChanged:
-                      //       ref.watch(ConfigOptions.enableMux.notifier).update,
-                      // ),
-                      // ChoicePreferenceWidget(
-                      //   selected: ref.watch(ConfigOptions.muxProtocol),
-                      //   preferences: ref.watch(ConfigOptions.muxProtocol.notifier),
-                      //   choices: MuxProtocol.values,
-                      //   title: t.config.muxProtocol,
-                      //   presentChoice: (value) => value.name,
-                      // ),
-                      // ValuePreferenceWidget(
-                      //   value: ref.watch(ConfigOptions.muxMaxStreams),
-                      //   preferences:
-                      //       ref.watch(ConfigOptions.muxMaxStreams.notifier),
-                      //   title: t.config.muxMaxStreams,
-                      //   inputToValue: int.tryParse,
-                      //   digitsOnly: true,
-                      // ),
-                    ],
+                    items: const [DnsOptionsTiles()],
                   ),
                   PlatformListSection(
                     sectionIcon: const Icon(FontAwesomeIcons.rightToBracket),
                     sectionTitle: t.config.section.inbound,
-                    items: [
-                      ChoicePreferenceWidget(
-                        selected: ref.watch(ConfigOptions.serviceMode),
-                        preferences: ref.watch(ConfigOptions.serviceMode.notifier),
-                        choices: ServiceMode.choices,
-                        title: t.config.serviceMode,
-                        presentChoice: (value) => value.present(t),
-                      ),
-                      SwitchListTileAdaptive(
-                        title: t.config.strictRoute,
-                        value: ref.watch(ConfigOptions.strictRoute),
-                        onChanged: ref.watch(ConfigOptions.strictRoute.notifier).update,
-                      ),
-                      ChoicePreferenceWidget(
-                        selected: ref.watch(ConfigOptions.tunImplementation),
-                        preferences: ref.watch(ConfigOptions.tunImplementation.notifier),
-                        choices: TunImplementation.values,
-                        title: t.config.tunImplementation,
-                        presentChoice: (value) => value.name,
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.mixedPort),
-                        preferences: ref.watch(ConfigOptions.mixedPort.notifier),
-                        title: t.config.mixedPort,
-                        inputToValue: int.tryParse,
-                        digitsOnly: true,
-                        validateInput: isPort,
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.tproxyPort),
-                        preferences: ref.watch(ConfigOptions.tproxyPort.notifier),
-                        title: t.config.tproxyPort,
-                        inputToValue: int.tryParse,
-                        digitsOnly: true,
-                        validateInput: isPort,
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.localDnsPort),
-                        preferences: ref.watch(ConfigOptions.localDnsPort.notifier),
-                        title: t.config.localDnsPort,
-                        inputToValue: int.tryParse,
-                        digitsOnly: true,
-                        validateInput: isPort,
-                      ),
-                      SwitchListTileAdaptive(
-                        title: experimental(t.config.allowConnectionFromLan),
-                        value: ref.watch(ConfigOptions.allowConnectionFromLan),
-                        onChanged: ref.read(ConfigOptions.allowConnectionFromLan.notifier).update,
-                      ),
-                    ],
+                    items: const [InboundOptionsTiles()],
                   ),
                   PlatformListSection(
                     sectionIcon: const Icon(FontAwesomeIcons.expeditedssl),
@@ -410,7 +207,16 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     ],
                     openOnLoad: section == ConfigOptionSection.warp,
                   ),
-
+                  if (PlatformUtils.isIOS)
+                    Material(
+                      child: ListTile(
+                        title: Text(t.settings.advanced.resetTunnel),
+                        leading: const Icon(FluentIcons.arrow_reset_24_regular),
+                        onTap: () async {
+                          await ref.read(resetTunnelProvider.notifier).run();
+                        },
+                      ),
+                    ),
                   // const AboutPage()
                 ],
               ),
@@ -423,10 +229,11 @@ class ConfigOptionsPage extends HookConsumerWidget {
 }
 
 TextStyle? textTheme(BuildContext context) {
-  if (PlatformTheme.of(context)?.isDark == true) {
-    return PlatformTheme.of(context)?.cupertinoDarkTheme?.textTheme.textStyle ?? PlatformTheme.of(context)?.materialDarkTheme?.textTheme.labelMedium;
-  }
-  return PlatformTheme.of(context)?.cupertinoLightTheme?.textTheme.textStyle ?? PlatformTheme.of(context)?.materialLightTheme?.textTheme.labelMedium;
+  return null;
+  // if (Theme.of(context)?.isDark == true) {
+  //   return PlatformTheme.of(context)?.cupertinoDarkTheme?.textTheme.textStyle ?? PlatformTheme.of(context)?.materialDarkTheme?.textTheme.labelMedium;
+  // }
+  // return PlatformTheme.of(context)?.cupertinoLightTheme?.textTheme.textStyle ?? PlatformTheme.of(context)?.materialLightTheme?.textTheme.labelMedium;
 }
 
 Widget switchListTileAdaptive(
@@ -439,12 +246,12 @@ Widget switchListTileAdaptive(
 }) {
   return SwitchListTile.adaptive(
     key: key,
-    title: PlatformText(
+    title: Text(
       title ?? "",
       style: textTheme(context),
     ),
     subtitle: subtitle != null
-        ? PlatformText(
+        ? Text(
             subtitle,
             style: textTheme(context),
           )

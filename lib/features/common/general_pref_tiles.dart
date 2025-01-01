@@ -1,6 +1,5 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/localization/locale_extensions.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
@@ -11,6 +10,7 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/theme/app_theme_mode.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/widgets/settings_input_dialog.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class LocalePrefTile extends ConsumerWidget {
@@ -21,30 +21,18 @@ class LocalePrefTile extends ConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
 
     final locale = ref.watch(localePreferencesProvider);
-
     return ListTile(
-      title: PlatformText(t.settings.general.locale),
-      subtitle: PlatformText(locale.localeName),
+      title: Text(t.settings.general.locale),
+      subtitle: Text(locale.localeName),
       leading: const Icon(FluentIcons.local_language_24_regular),
       onTap: () async {
-        final selectedLocale = await showDialog<AppLocale>(
-          context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: PlatformText(t.settings.general.locale),
-              children: AppLocale.values
-                  .map(
-                    (e) => RadioListTile(
-                      title: PlatformText(e.localeName),
-                      value: e,
-                      groupValue: locale,
-                      onChanged: Navigator.of(context).maybePop,
-                    ),
-                  )
-                  .toList(),
-            );
-          },
-        );
+        final selectedLocale = await SettingsPickerDialog<AppLocale>(
+          title: t.settings.general.locale,
+          selected: locale,
+          onReset: () => ref.read(localePreferencesProvider.notifier).changeLocale(AppLocale.en),
+          options: AppLocale.values,
+          getTitle: (e) => e.localeName,
+        ).show(context);
         if (selectedLocale != null) {
           await ref.read(localePreferencesProvider.notifier).changeLocale(selectedLocale);
         }
@@ -63,8 +51,8 @@ class RegionPrefTile extends ConsumerWidget {
     final region = ref.watch(ConfigOptions.region);
 
     return ListTile(
-      title: PlatformText(t.settings.general.region),
-      subtitle: PlatformText(
+      title: Text(t.settings.general.region),
+      subtitle: Text(
         region.present(t),
         style: Theme.of(context).textTheme.bodySmall,
       ),
@@ -74,11 +62,11 @@ class RegionPrefTile extends ConsumerWidget {
           context: context,
           builder: (context) {
             return SimpleDialog(
-              title: PlatformText(t.settings.general.region),
+              title: Text(t.settings.general.region),
               children: Region.values
                   .map(
                     (e) => RadioListTile(
-                      title: PlatformText(e.present(t)),
+                      title: Text(e.present(t)),
                       value: e,
                       groupValue: region,
                       onChanged: Navigator.of(context).maybePop,
@@ -123,8 +111,8 @@ class EnableAnalyticsPrefTile extends ConsumerWidget {
     final enabled = ref.watch(analyticsControllerProvider).requireValue;
 
     return SwitchListTile.adaptive(
-      title: PlatformText(t.settings.general.enableAnalytics),
-      subtitle: PlatformText(
+      title: Text(t.settings.general.enableAnalytics),
+      subtitle: Text(
         t.settings.general.enableAnalyticsMsg,
         style: Theme.of(context).textTheme.bodySmall,
       ),
@@ -154,28 +142,17 @@ class ThemeModePrefTile extends ConsumerWidget {
     final themeMode = ref.watch(themePreferencesProvider);
 
     return ListTile(
-      title: PlatformText(t.settings.general.themeMode),
-      subtitle: PlatformText(themeMode.present(t)),
+      title: Text(t.settings.general.themeMode),
+      subtitle: Text(themeMode.present(t)),
       leading: const Icon(FluentIcons.weather_moon_20_regular),
       onTap: () async {
-        final selectedThemeMode = await showPlatformDialog<AppThemeMode>(
-          context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: PlatformText(t.settings.general.themeMode),
-              children: AppThemeMode.values
-                  .map(
-                    (e) => RadioListTile(
-                      title: PlatformText(e.present(t)),
-                      value: e,
-                      groupValue: themeMode,
-                      onChanged: Navigator.of(context).maybePop,
-                    ),
-                  )
-                  .toList(),
-            );
-          },
-        );
+        final selectedThemeMode = await SettingsPickerDialog<AppThemeMode>(
+          title: t.settings.general.themeMode,
+          selected: themeMode,
+          onReset: () => ref.read(themePreferencesProvider.notifier).changeThemeMode(AppThemeMode.system),
+          options: AppThemeMode.values,
+          getTitle: (e) => e.present(t),
+        ).show(context);
         if (selectedThemeMode != null) {
           await ref.read(themePreferencesProvider.notifier).changeThemeMode(selectedThemeMode);
         }

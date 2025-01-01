@@ -1,7 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
+import 'package:hiddify/utils/bottom_sheet_page.dart';
 
 class PlatformListSection extends StatelessWidget {
   Widget sectionTitle;
@@ -11,6 +11,7 @@ class PlatformListSection extends StatelessWidget {
   final bool showAppBar;
   final bool openOnLoad;
   final Widget? title;
+  final bool bottomSheet;
 
   PlatformListSection({
     required this.sectionIcon,
@@ -20,25 +21,36 @@ class PlatformListSection extends StatelessWidget {
     this.showAppBar = true,
     this.openOnLoad = false,
     this.title,
+    this.bottomSheet = false,
   }) : sectionTitle = Text(sectionTitle);
 
   void _navigateToDetailsPage(BuildContext context) {
-    Navigator.of(context).push(PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => Scaffold(
-        appBar: showAppBar ? AppBar(title: sectionTitle) : null,
-        body: page ?? (items == null ? Container() : ListView(children: items!)),
-      ),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0); // Start from the right
-        const end = Offset.zero; // End at the center
-        const curve = Curves.easeInOut;
+    if (bottomSheet) {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => Scaffold(
+          appBar: showAppBar ? AppBar(title: sectionTitle) : null,
+          body: page ?? (items == null ? Container() : ListView(children: items!)),
+        ),
+      );
+    } else {
+      Navigator.of(context).push(PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => Scaffold(
+          appBar: showAppBar ? AppBar(title: sectionTitle) : null,
+          body: page ?? (items == null ? Container() : ListView(children: items!)),
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0); // Start from the right
+          const end = Offset.zero; // End at the center
+          const curve = Curves.easeInOut;
 
-        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-        var offsetAnimation = animation.drive(tween);
+          final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          final offsetAnimation = animation.drive(tween);
 
-        return SlideTransition(position: offsetAnimation, child: child);
-      },
-    ));
+          return SlideTransition(position: offsetAnimation, child: child);
+        },
+      ));
+    }
   }
 
   @override
