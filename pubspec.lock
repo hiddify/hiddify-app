@@ -691,10 +691,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_timezone
-      sha256: "6e6a0a9d0dfc049b209e01e1dee3efd5ff2ddf2375e9de86589761b244eb5a5f"
+      sha256: "06b35132c98fa188db3c4b654b7e1af7ccd01dfe12a004d58be423357605fb24"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.0"
+    version: "1.0.8"
   flutter_typeahead:
     dependency: "direct main"
     description:
@@ -1886,18 +1886,18 @@ packages:
     dependency: transitive
     description:
       name: timezone
-      sha256: ffc9d5f4d1193534ef051f9254063fa53d588609418c84299956c3db9383587d
+      sha256: "2236ec079a174ce07434e89fcd3fcda430025eb7692244139a9cf54fdcf1fc7d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.0"
+    version: "0.9.4"
   timezone_to_country:
     dependency: "direct main"
     description:
       name: timezone_to_country
-      sha256: c96ffcfbd92f56c1727c18166a73bc6973e47d0516a6989148f219414682948e
+      sha256: "7fcf3ed595405a67d6e1fd8091028be359f4455940f01f12ea628952325e95c9"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "2.2.1"
   timing:
     dependency: transitive
     description:

@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
-  flutter_timezone
   screen_retriever_linux
   sentry_flutter
   sqlite3_flutter_libs
