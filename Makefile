@@ -144,7 +144,9 @@ linux-install-dependencies:
 	dart pub global activate --source git  https://github.com/hiddify/flutter_distributor --git-path packages/flutter_distributor
 
 windows-install-dependencies:
-	dart pub global activate flutter_distributor
+	dart pub global activate flutter_distributor 
+	choco install icu4c
+	setx ICU_ROOT C:\Program Files\ICU
 
 gen_translations: #generating missing translations using google translate
 	cd .github && bash sync_translate.sh

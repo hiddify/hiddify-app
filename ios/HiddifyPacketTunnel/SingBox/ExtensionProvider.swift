@@ -25,14 +25,14 @@ open class ExtensionProvider: NEPacketTunnelProvider {
             let disableMemoryLimit = (options?["DisableMemoryLimit"] as? NSString as? String ?? "NO") == "YES"
             let grpcServiceModePort = (options?["GrpcServiceModePort"] as? NSNumber)?.intValue ?? 17079
             
-            guard let config2 = options?["Config"] as? NSString as? String else {
+            guard let config = options?["Config"] as? NSString as? String else {
                 throw NSError(domain: "ExtensionProvider", code: 1, userInfo: [NSLocalizedDescriptionKey: "Config not provided"])
             }
             
-            guard let config = SingBox.setupConfig(config: config2) else {
-                        writeFatalError("(packet-tunnel) error: config is invalid")
-                        return
-            }
+            // guard let config = SingBox.setupConfig(config: config2) else {
+            //             writeFatalError("(packet-tunnel) error: config is invalid")
+            //             return
+            // }
             self.config = config
 
             do {

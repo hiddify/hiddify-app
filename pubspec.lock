@@ -451,10 +451,10 @@ packages:
     dependency: "direct main"
     description:
       name: drift_flutter
-      sha256: "9fd9b479c6187d6b3bbdfd2703df98010470a6c65c2a8c8c5a1034c620bd0a0e"
+      sha256: "0cadbf3b8733409a6cf61d18ba2e94e149df81df7de26f48ae0695b48fd71922"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.3"
+    version: "0.2.4"
   dynamic_color:
     dependency: "direct main"
     description:
@@ -2126,10 +2126,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: "8b338d4486ab3fbc0ba0db9f9b4f5239b6697fcee427939a40e720cbb9ee0a69"
+      sha256: "154360849a56b7b67331c21f09a386562d88903f90a1099c5987afc1912e1f29"
       url: "https://pub.dev"
     source: hosted
-    version: "5.9.0"
+    version: "5.10.0"
   win32_registry:
     dependency: transitive
     description:

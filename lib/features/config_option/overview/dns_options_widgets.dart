@@ -31,56 +31,60 @@ class DnsOptionsTiles extends HookConsumerWidget {
 
     return Column(
       children: [
+        ValuePreferenceWidget(
+          value: ref.watch(ConfigOptions.remoteDnsAddress),
+          preferences: ref.watch(ConfigOptions.remoteDnsAddress.notifier),
+          title: t.config.remoteDnsAddress,
+        ),
         ChoicePreferenceWidget(
-          selected: ref.watch(ConfigOptions.serviceMode),
-          preferences: ref.watch(ConfigOptions.serviceMode.notifier),
-          choices: ServiceMode.choices,
-          title: t.config.serviceMode,
-          presentChoice: (value) => value.present(t),
+          selected: ref.watch(ConfigOptions.remoteDnsDomainStrategy),
+          preferences: ref.watch(ConfigOptions.remoteDnsDomainStrategy.notifier),
+          choices: DomainStrategy.values,
+          title: t.config.remoteDnsDomainStrategy,
+          presentChoice: (value) => value.displayName,
+        ),
+        ValuePreferenceWidget(
+          value: ref.watch(ConfigOptions.directDnsAddress),
+          preferences: ref.watch(ConfigOptions.directDnsAddress.notifier),
+          title: t.config.directDnsAddress,
+        ),
+        ChoicePreferenceWidget(
+          selected: ref.watch(ConfigOptions.directDnsDomainStrategy),
+          preferences: ref.watch(ConfigOptions.directDnsDomainStrategy.notifier),
+          choices: DomainStrategy.values,
+          title: t.config.directDnsDomainStrategy,
+          presentChoice: (value) => value.displayName,
         ),
         switchListTileAdaptive(
           context,
-          title: t.config.strictRoute,
-          value: ref.watch(ConfigOptions.strictRoute),
-          onChanged: ref.read(ConfigOptions.strictRoute.notifier).update,
+          title: t.config.enableDnsRouting,
+          value: ref.watch(ConfigOptions.enableDnsRouting),
+          onChanged: ref.read(ConfigOptions.enableDnsRouting.notifier).update,
         ),
-        ChoicePreferenceWidget(
-          selected: ref.watch(ConfigOptions.tunImplementation),
-          preferences: ref.watch(ConfigOptions.tunImplementation.notifier),
-          choices: TunImplementation.values,
-          title: t.config.tunImplementation,
-          presentChoice: (value) => value.name,
-        ),
-        ValuePreferenceWidget(
-          value: ref.watch(ConfigOptions.mixedPort),
-          preferences: ref.watch(ConfigOptions.mixedPort.notifier),
-          title: t.config.mixedPort,
-          inputToValue: int.tryParse,
-          digitsOnly: true,
-          validateInput: isPort,
-        ),
-        ValuePreferenceWidget(
-          value: ref.watch(ConfigOptions.tproxyPort),
-          preferences: ref.watch(ConfigOptions.tproxyPort.notifier),
-          title: t.config.tproxyPort,
-          inputToValue: int.tryParse,
-          digitsOnly: true,
-          validateInput: isPort,
-        ),
-        ValuePreferenceWidget(
-          value: ref.watch(ConfigOptions.localDnsPort),
-          preferences: ref.watch(ConfigOptions.localDnsPort.notifier),
-          title: t.config.localDnsPort,
-          inputToValue: int.tryParse,
-          digitsOnly: true,
-          validateInput: isPort,
-        ),
-        switchListTileAdaptive(
-          context,
-          title: experimental(t.config.allowConnectionFromLan),
-          value: ref.watch(ConfigOptions.allowConnectionFromLan),
-          onChanged: ref.read(ConfigOptions.allowConnectionFromLan.notifier).update,
-        ),
+        // const SettingsDivider(),
+        // SettingsSection(experimental(t.config.section.mux)),
+        // switchListTileAdaptive(
+        // context,
+        //   title: t.config.enableMux,
+        //   value: ref.watch(ConfigOptions.enableMux),
+        //   onChanged:
+        //       ref.watch(ConfigOptions.enableMux.notifier).update,
+        // ),
+        // ChoicePreferenceWidget(
+        //   selected: ref.watch(ConfigOptions.muxProtocol),
+        //   preferences: ref.watch(ConfigOptions.muxProtocol.notifier),
+        //   choices: MuxProtocol.values,
+        //   title: t.config.muxProtocol,
+        //   presentChoice: (value) => value.name,
+        // ),
+        // ValuePreferenceWidget(
+        //   value: ref.watch(ConfigOptions.muxMaxStreams),
+        //   preferences:
+        //       ref.watch(ConfigOptions.muxMaxStreams.notifier),
+        //   title: t.config.muxMaxStreams,
+        //   inputToValue: int.tryParse,
+        //   digitsOnly: true,
+        // ),
       ],
     );
   }
