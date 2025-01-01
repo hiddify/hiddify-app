@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
 import 'package:hiddify/features/config_option/overview/PlatformListSection.dart';
@@ -19,8 +20,8 @@ class QuickSettingsModal extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
 
     final warpPrefaceCompleted = ref.watch(warpOptionNotifierProvider).consentGiven;
-    final configOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
-    var warpLabel = (configOptions != null && configOptions.warp.mode == WarpDetourMode.warpOverProxy) ? t.config.enableWarpSecure : t.config.enableWarpForProxy;
+
+    final warpLabel = (ref.watch(ConfigOptions.warpDetourMode) == WarpDetourMode.warpOverProxy) ? t.config.enableWarpSecure : t.config.enableWarpForProxy;
 
     return SingleChildScrollView(
       child: Column(
@@ -59,6 +60,7 @@ class QuickSettingsModal extends HookConsumerWidget {
             items: const [
               WarpOptionsTiles(),
             ],
+            bottomSheet: true,
           ),
           PlatformListSection(
             sectionIcon: const Icon(FontAwesomeIcons.expeditedssl),
@@ -73,6 +75,7 @@ class QuickSettingsModal extends HookConsumerWidget {
             items: const [
               TlsfragmentTiles(),
             ],
+            bottomSheet: true,
           ),
           // const AboutPage()
 
@@ -83,7 +86,7 @@ class QuickSettingsModal extends HookConsumerWidget {
           //   child:
           // )
           // else
-          //   PlatformListTile(
+          //   ListTile(
           //     title: Text(t.config.setupWarp),
           //     trailing: const Icon(FluentIcons.chevron_right_24_regular),
           //     onTap: () => ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context),
