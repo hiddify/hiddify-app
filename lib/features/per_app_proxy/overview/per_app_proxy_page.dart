@@ -2,7 +2,6 @@ import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
@@ -56,42 +55,37 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
     return Scaffold(
       appBar: isSearching.value
           ? AppBar(
-              title: PlatformTextFormField(
-                  onChanged: (value) => searchQuery.value = value,
-                  autofocus: true,
-                  material: (context, platform) => MaterialTextFormFieldData(
-                        decoration: InputDecoration(
-                          hintText: "${localizations.searchFieldLabel}...",
-                          isDense: true,
-                          filled: false,
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          focusedErrorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                        ),
-                      )),
-              leading: PlatformIconButton(
+              title: TextFormField(
+                onChanged: (value) => searchQuery.value = value,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: "${localizations.searchFieldLabel}...",
+                  isDense: true,
+                  filled: false,
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                ),
+              ),
+              leading: IconButton(
                 onPressed: () {
                   searchQuery.value = "";
                   isSearching.value = false;
                 },
                 icon: const Icon(Icons.close),
-                material: (context, platform) => MaterialIconButtonData(
-                  tooltip: localizations.cancelButtonLabel,
-                ),
+                tooltip: localizations.cancelButtonLabel,
               ),
             )
           : AppBar(
               title: Text(t.settings.network.perAppProxyPageTitle),
               actions: [
-                PlatformIconButton(
+                IconButton(
                   icon: const Icon(FluentIcons.search_24_regular),
                   onPressed: () => isSearching.value = true,
-                  material: (context, platform) => MaterialIconButtonData(
-                    tooltip: localizations.searchFieldLabel,
-                  ),
+                  tooltip: localizations.searchFieldLabel,
                 ),
                 PopupMenuButton(
                   icon: Icon(AdaptiveIcon(context).more),

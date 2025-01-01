@@ -3,7 +3,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -76,7 +75,7 @@ class AddProfileModal extends HookConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      PlatformText(
+                      Text(
                         t.profile.add.addingProfileMsg,
                         style: theme.textTheme.bodySmall,
                       ),
@@ -85,11 +84,11 @@ class AddProfileModal extends HookConsumerWidget {
                         backgroundColor: Colors.transparent,
                       ),
                       const Gap(8),
-                      PlatformTextButton(
+                      TextButton(
                         onPressed: () {
                           ref.invalidate(addProfileProvider);
                         },
-                        child: PlatformText(
+                        child: Text(
                           MaterialLocalizations.of(context).cancelButtonLabel,
                         ),
                       ),
@@ -290,7 +289,7 @@ class AddProfileModal extends HookConsumerWidget {
                                 onTap: () async {
                                   await showDialog<bool>(
                                     context: context,
-                                    builder: (context) => PlatformAlertDialog(
+                                    builder: (context) => AlertDialog(
                                       title: Text(t.home.noActiveProfileMsg),
                                       content: Text(t.home.emptyProfilesMsg.text),
                                       actions: [
@@ -432,7 +431,7 @@ class _Button extends StatelessWidget {
                 ),
                 const Gap(16),
                 Flexible(
-                  child: PlatformText(
+                  child: Text(
                     label,
                     style: theme.textTheme.labelLarge?.copyWith(color: color),
                     textAlign: TextAlign.center,

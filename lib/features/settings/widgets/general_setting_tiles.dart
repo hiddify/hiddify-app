@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
@@ -24,14 +23,14 @@ class GeneralSettingTiles extends HookConsumerWidget {
         const ThemeModePrefTile(),
         const EnableAnalyticsPrefTile(),
         SwitchListTile.adaptive(
-          title: PlatformText(t.settings.general.autoIpCheck),
+          title: Text(t.settings.general.autoIpCheck),
           secondary: const Icon(FluentIcons.globe_search_24_regular),
           value: ref.watch(Preferences.autoCheckIp),
           onChanged: ref.read(Preferences.autoCheckIp.notifier).update,
         ),
         if (Platform.isAndroid) ...[
           SwitchListTile.adaptive(
-            title: PlatformText(t.settings.general.dynamicNotification),
+            title: Text(t.settings.general.dynamicNotification),
             secondary: const Icon(FluentIcons.top_speed_24_regular),
             value: ref.watch(Preferences.dynamicNotification),
             onChanged: (value) async {
@@ -39,7 +38,7 @@ class GeneralSettingTiles extends HookConsumerWidget {
             },
           ),
           SwitchListTile.adaptive(
-            title: PlatformText(t.settings.general.hapticFeedback),
+            title: Text(t.settings.general.hapticFeedback),
             secondary: const Icon(FluentIcons.phone_vibrate_24_regular),
             value: ref.watch(hapticServiceProvider),
             onChanged: ref.read(hapticServiceProvider.notifier).updatePreference,
@@ -59,7 +58,7 @@ class GeneralSettingTiles extends HookConsumerWidget {
             },
           ),
           SwitchListTile.adaptive(
-            title: PlatformText(t.settings.general.silentStart),
+            title: Text(t.settings.general.silentStart),
             value: ref.watch(Preferences.silentStart),
             onChanged: (value) async {
               await ref.read(Preferences.silentStart.notifier).update(value);

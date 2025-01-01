@@ -1,7 +1,6 @@
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -14,7 +13,6 @@ import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_card.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
 import 'package:hiddify/gen/assets.gen.dart';
-import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -27,9 +25,8 @@ class HomePage extends HookConsumerWidget {
     final hasAnyProfile = ref.watch(hasAnyProfileProvider);
     final activeProfile = ref.watch(activeProfileProvider);
 
-    return PlatformScaffold(
-      iosContentPadding: true,
-      appBar: PlatformAppBar(
+    return Scaffold(
+      appBar: AppBar(
         leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
             ? DrawerButton(
                 onPressed: () {
@@ -37,30 +34,32 @@ class HomePage extends HookConsumerWidget {
                 },
               )
             : null,
-        title: Row(mainAxisSize: MainAxisSize.max, children: [
-          Assets.images.logo.svg(height: 24),
-          const Gap(8),
-          Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(text: t.general.appTitle),
-                const TextSpan(text: " "),
-                const WidgetSpan(
-                  child: AppVersionLabel(),
-                  alignment: PlaceholderAlignment.middle,
-                ),
-              ],
+        title: Row(
+          children: [
+            Assets.images.logo.svg(height: 24),
+            const Gap(8),
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: t.general.appTitle),
+                  const TextSpan(text: " "),
+                  const WidgetSpan(
+                    child: AppVersionLabel(),
+                    alignment: PlaceholderAlignment.middle,
+                  ),
+                ],
+              ),
             ),
-          )
-        ]),
-        trailingActions: [
-          // PlatformIconButton(
+          ],
+        ),
+        actions: [
+          // IconButton(
           //     onPressed: () => const QuickSettingsRoute().push(context),
           //     icon: const Icon(FluentIcons.options_24_filled),
           //     material: (context, platform) => MaterialIconButtonData(
           //           tooltip: t.config.quickSettings,
           //         )),
-          // PlatformIconButton(
+          // IconButton(
           //     onPressed: () => const AddProfileRoute().push(context),
           //     icon: const Icon(FluentIcons.add_circle_24_filled),
           //     material: (context, platform) => MaterialIconButtonData(
@@ -134,7 +133,7 @@ class HomePage extends HookConsumerWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/router/app_router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/config_option/overview/config_options_page.dart';
@@ -95,10 +95,10 @@ class HomeRoute extends HRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return platformPage(
-      context: context,
+    return const MaterialPage(
+      // context: context,
       name: name,
-      child: const HomePage(),
+      child: HomePage(),
     );
   }
 
@@ -115,11 +115,10 @@ class ProxiesRoute extends HRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return platformPage(
-      context: context,
+    return const MaterialPage(
       // fullscreenDialog: true,
       name: name,
-      child: const ProxiesOverviewPage(),
+      child: ProxiesOverviewPage(),
     );
     // return platformPage(context:context,
     //   name: name,
@@ -168,8 +167,7 @@ class ProfilesOverviewRoute extends HRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return platformPage(
-      context: context,
+    return MaterialPage(
       name: name,
       child: const ProfilesOverviewModal(),
     );
@@ -215,8 +213,7 @@ class NewProfileRoute extends HRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return platformPage(
-      context: context,
+    return MaterialPage(
       fullscreenDialog: true,
       name: name,
       child: ProfileDetailsPage("new"),
@@ -238,8 +235,7 @@ class ProfileDetailsRoute extends HRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return platformPage(
-      context: context,
+    return MaterialPage(
       fullscreenDialog: true,
       name: name,
       child: ProfileDetailsPage(id),
@@ -267,7 +263,7 @@ class LogsOverviewRoute extends HRouteData {
     //     child: const LogsOverviewPage(),
     //   );
     // }
-    return platformPage(context: context, name: name, child: const LogsOverviewPage());
+    return const MaterialPage(name: name, child: LogsOverviewPage());
   }
 
   @override
@@ -306,13 +302,12 @@ class SettingsRoute extends HRouteData {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     if (useMobileRouter) {
-      return platformPage(
-        context: context,
+      return const MaterialPage(
         name: name,
-        child: const SettingsOverviewPage(),
+        child: SettingsOverviewPage(),
       );
     }
-    return platformPage(context: context, name: name, child: SettingsOverviewPage());
+    return const MaterialPage(name: name, child: SettingsOverviewPage());
   }
 
   @override
@@ -357,8 +352,7 @@ class PerAppProxyRoute extends GoRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return platformPage(
-      context: context,
+    return MaterialPage(
       // fullscreenDialog: true,
       name: name,
       child: const PerAppProxyPage(),
@@ -386,7 +380,7 @@ class AboutRoute extends HRouteData {
     //     child: const AboutPage(),
     //   );
     // }
-    return platformPage(context: context, name: name, child: AboutPage());
+    return const MaterialPage(name: name, child: AboutPage());
   }
 
   @override

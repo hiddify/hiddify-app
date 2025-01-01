@@ -4,7 +4,6 @@ import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easy_permission/easy_permissions.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -19,8 +18,7 @@ class QRCodeScannerScreen extends StatefulHookConsumerWidget {
 
   Future<String?> open(BuildContext context) async {
     return Navigator.of(context, rootNavigator: true).push(
-      platformPageRoute(
-        context: context,
+      MaterialPageRoute(
         fullscreenDialog: true,
         builder: (context) => const QRCodeScannerScreen(),
       ),
@@ -221,14 +219,12 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
               size: 32,
             ),
         actions: [
-          PlatformIconButton(
+          IconButton(
             icon: const Icon(FluentIcons.flash_24_regular),
-            material: (context, platform) => MaterialIconButtonData(
-              tooltip: t.profile.add.qrScanner.torchSemanticLabel,
-            ),
+            tooltip: t.profile.add.qrScanner.torchSemanticLabel,
             onPressed: () => controller.toggleTorch(),
           ),
-          // PlatformIconButton(
+          // IconButton(
           //   icon: ValueListenableBuilder(
           //     valueListenable: controller.torchState,
           //     builder: (context, state, child) {
@@ -249,11 +245,9 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
           //   tooltip: t.profile.add.qrScanner.torchSemanticLabel,
           //   onPressed: () => controller.toggleTorch(),
           // ),
-          PlatformIconButton(
+          IconButton(
             icon: const Icon(FluentIcons.camera_switch_24_regular),
-            material: (context, platform) => MaterialIconButtonData(
-              tooltip: t.profile.add.qrScanner.facingSemanticLabel,
-            ),
+            tooltip: t.profile.add.qrScanner.facingSemanticLabel,
             onPressed: () => controller.switchCamera(),
           ),
         ],

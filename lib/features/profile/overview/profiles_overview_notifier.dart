@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
+import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
@@ -45,6 +46,7 @@ class ProfilesOverviewNotifier extends _$ProfilesOverviewNotifier with AppLogger
 
   Future<void> deleteProfile(ProfileEntity profile) async {
     loggy.debug('deleting profile: ${profile.name}');
+
     await _profilesRepo.deleteById(profile.id).match(
       (err) {
         loggy.warning('failed to delete profile', err);

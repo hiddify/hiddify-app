@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -38,7 +37,7 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
 
-    return PlatformAlertDialog(
+    return AlertDialog(
       title: Text(t.appUpdate.dialogTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,

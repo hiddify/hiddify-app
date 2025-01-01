@@ -10,7 +10,6 @@ import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class WindowWrapper extends StatefulHookConsumerWidget {
   const WindowWrapper(this.child, {super.key});
@@ -22,7 +21,7 @@ class WindowWrapper extends StatefulHookConsumerWidget {
 }
 
 class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListener, AppLogger {
-  late PlatformAlertDialog closeDialog;
+  late AlertDialog closeDialog;
 
   bool isWindowClosingDialogOpened = false;
 

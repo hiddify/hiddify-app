@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  cupertino_icons: ^1.0.6
+  # cupertino_icons: ^1.0.6
   intl: ^0.19.0
   # humanizer: ^2.2.0
   # intl: ^0.19.0
@@ -103,7 +103,7 @@ dependencies:
   protobuf: ^3.0.0
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
-  flutter_platform_widgets: ^7.0.1  
+  # flutter_platform_widgets: ^7.0.1  
   simple_icons: ^10.1.3
   animated_notch_bottom_bar: ^1.0.0
   basic_utils: 5.7.0

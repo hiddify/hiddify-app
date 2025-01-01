@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/model/failures.dart';
 
 class CustomAlertDialog extends StatelessWidget {
@@ -29,7 +28,7 @@ class CustomAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizations = MaterialLocalizations.of(context);
 
-    return PlatformAlertDialog(
+    return AlertDialog(
       title: title != null ? Text(title!) : null,
       content: SingleChildScrollView(
         child: SizedBox(

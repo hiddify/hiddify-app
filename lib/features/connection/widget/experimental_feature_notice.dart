@@ -1,7 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/routes.dart';
@@ -31,7 +30,7 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final disableNotice = ref.watch(disableExperimentalFeatureNoticeProvider);
 
-    return PlatformAlertDialog(
+    return AlertDialog(
       title: Text(t.connection.experimentalNotice),
       content: SingleChildScrollView(
         child: SizedBox(
@@ -49,7 +48,7 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
                 onChanged: (value) async => ref.read(disableExperimentalFeatureNoticeProvider.notifier).update(value ?? false),
                 dense: true,
               ),
-              PlatformListTile(
+              ListTile(
                 title: Text(t.config.pageTitle),
                 leading: const Icon(FluentIcons.box_edit_24_regular),
                 trailing: const Icon(FluentIcons.chevron_right_20_regular),
@@ -59,9 +58,7 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
                     const ConfigOptionsRoute().push(context);
                   }
                 },
-                material: (context, platform) => MaterialListTileData(
-                  dense: true,
-                ),
+                dense: true,
               ),
             ],
           ),

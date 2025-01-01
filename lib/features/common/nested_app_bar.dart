@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
@@ -33,7 +32,7 @@ class NestedAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     RootScaffold.canShowDrawer(context);
 
-    return PlatformSliverAppBar(
+    return SliverAppBar(
       leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
           ? DrawerButton(
               onPressed: () {
@@ -52,22 +51,22 @@ class NestedAppBar extends StatelessWidget {
                 )
               : null),
       title: title,
-      // title: PlatformText("", style: Theme.of(context).textTheme.labelSmall),
-      material: (context, platform) => MaterialSliverAppBarData(
-        actions: actions,
-        pinned: pinned,
-        forceElevated: forceElevated,
-        bottom: bottom,
-      ),
-      cupertino: (_, __) => CupertinoSliverAppBarData(
-        // middle: title,
-        trailing: actions != null && actions!.isNotEmpty
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: actions!,
-              )
-            : null,
-      ),
+      // title: Text("", style: Theme.of(context).textTheme.labelSmall),
+
+      actions: actions,
+      pinned: pinned,
+      forceElevated: forceElevated,
+      bottom: bottom,
+      // ),
+      // cupertino: (_, __) => CupertinoSliverAppBarData(
+      //   // middle: title,
+      //   trailing: actions != null && actions!.isNotEmpty
+      //       ? Row(
+      //           mainAxisSize: MainAxisSize.min,
+      //           children: actions!,
+      //         )
+      //       : null,
+      // ),
     );
   }
 }

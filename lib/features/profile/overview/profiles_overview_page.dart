@@ -14,7 +14,6 @@ import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dar
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/utils/placeholders.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 class ProfilesOverviewModal extends HookConsumerWidget {
   const ProfilesOverviewModal({
@@ -96,7 +95,7 @@ class ProfilesOverviewModal extends HookConsumerWidget {
         ),
       ],
     );
-    return PlatformScaffold(
+    return Scaffold(
       body: CustomScrollView(
         controller: scrollController,
         slivers: [
@@ -153,7 +152,7 @@ class ProfilesSortModal extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final sortNotifier = ref.watch(profilesOverviewSortNotifierProvider.notifier);
 
-    return PlatformAlertDialog(
+    return AlertDialog(
       title: Text(t.general.sortBy),
       content: Consumer(
         builder: (context, ref, child) {
@@ -178,7 +177,7 @@ class ProfilesSortModal extends HookConsumerWidget {
                       selected: selected,
                       leading: Icon(e.icon),
                       trailing: selected
-                          ? PlatformIconButton(
+                          ? IconButton(
                               onPressed: () {
                                 sortNotifier.toggleMode();
                               },

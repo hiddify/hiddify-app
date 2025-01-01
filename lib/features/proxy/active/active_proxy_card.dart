@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/routes.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
+import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
@@ -44,7 +44,7 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
       if (!context.mounted) return;
       await showDialog(
         context: context,
-        builder: (context) => PlatformAlertDialog(
+        builder: (context) => AlertDialog(
           title: SelectionArea(child: Text(activeProxy.tagDisplay)),
           content: OutboundInfoWidget(outboundInfo: activeProxy),
           actions: [
@@ -72,7 +72,10 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
         ],
       ),
       child: InkWell(
-        onTap: () => ProxiesRoute().go(context),
+        onTap: () {
+          // showBottomSheet(context: context, builder: (builder)=>ProxiesOverviewPage());
+          const ProxiesRoute().go(context);
+        },
         child: Row(
           children: [
             InkWell(

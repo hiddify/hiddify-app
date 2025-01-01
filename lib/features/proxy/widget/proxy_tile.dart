@@ -7,7 +7,6 @@ import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -68,7 +67,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       onLongPress: () async {
         showDialog(
           context: context,
-          builder: (context) => PlatformAlertDialog(
+          builder: (context) => AlertDialog(
             title: SelectionArea(child: Text(proxy.tagDisplay)),
             content: OutboundInfoWidget(outboundInfo: proxy),
             actions: [

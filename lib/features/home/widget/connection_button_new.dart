@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
@@ -95,7 +94,7 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
             if (ref.read(activeProfileProvider).value == null) {
               await showDialog<bool>(
                 context: context,
-                builder: (context) => PlatformAlertDialog(
+                builder: (context) => AlertDialog(
                   title: Text(t.home.noActiveProfileMsg),
                   content: Text(t.home.emptyProfilesMsg.text),
                   actions: [
