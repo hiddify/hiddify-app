@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
+import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/data/connection_repository.dart';
+import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -80,13 +83,13 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
           await haptic.lightImpact();
           await ref.read(Preferences.startedByUser.notifier).update(true);
           await _connect();
-        // case Connected():
-        default:
+        case Connected():
+          // default:
           await haptic.mediumImpact();
           await ref.read(Preferences.startedByUser.notifier).update(false);
           await _disconnect();
-        // default:
-        //   loggy.warning("switching status, debounce");
+        default:
+          loggy.warning("switching status, debounce");
       }
     }
   }
@@ -137,9 +140,11 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       ref.read(Preferences.disableMemoryLimit),
       activeProfile.testUrl,
     )
-        .mapLeft((err) async {
+        .mapLeft((ConnectionFailure err) async {
       loggy.warning("error connecting", err);
       //Go err is not normal object to see the go errors are string and need to be dumped
+      final notification = ref.read(inAppNotificationControllerProvider);
+      await notification.showErrorDialog(err.present(ref.read(translationsProvider).requireValue));
       loggy.warning(err);
       if (err.toString().contains("panic")) {
         await Sentry.captureException(Exception(err.toString()));

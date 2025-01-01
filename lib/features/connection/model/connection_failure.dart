@@ -15,8 +15,7 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
   ]) = UnexpectedConnectionFailure;
 
   @With<ExpectedMeasuredFailure>()
-  const factory ConnectionFailure.missingVpnPermission([String? message]) =
-      MissingVpnPermission;
+  const factory ConnectionFailure.missingVpnPermission([String? message]) = MissingVpnPermission;
 
   @With<ExpectedMeasuredFailure>()
   const factory ConnectionFailure.missingNotificationPermission([
@@ -39,21 +38,24 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
     String? message,
   ]) = InvalidConfig;
 
+  @With<ExpectedMeasuredFailure>()
+  const factory ConnectionFailure.backgroundCoreNotAvailable([
+    String? message,
+  ]) = BackgroundCoreNotAvailable;
+
   @override
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
+      UnexpectedConnectionFailure(:final error) when error != null => (
+          type: t.failure.connectivity.unexpected,
+          message: error.toString(),
+        ),
       UnexpectedConnectionFailure() => (
           type: t.failure.connectivity.unexpected,
           message: null,
         ),
-      MissingVpnPermission(:final message) => (
-          type: t.failure.connectivity.missingVpnPermission,
-          message: message
-        ),
-      MissingNotificationPermission(:final message) => (
-          type: t.failure.connectivity.missingNotificationPermission,
-          message: message
-        ),
+      MissingVpnPermission(:final message) => (type: t.failure.connectivity.missingVpnPermission, message: message),
+      MissingNotificationPermission(:final message) => (type: t.failure.connectivity.missingNotificationPermission, message: message),
       MissingPrivilege() => (
           type: t.failure.singbox.missingPrivilege,
           message: t.failure.singbox.missingPrivilegeMsg,
@@ -68,6 +70,10 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
         ),
       InvalidConfig(:final message) => (
           type: t.failure.singbox.invalidConfig,
+          message: message,
+        ),
+      BackgroundCoreNotAvailable(:final message) => (
+          type: t.failure.connectivity.core,
           message: message,
         ),
     };

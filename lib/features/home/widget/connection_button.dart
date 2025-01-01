@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -122,8 +121,7 @@ class ConnectionButton extends HookConsumerWidget {
     //   //   animationValue: animationValue,
     //   // );
     // }
-    final configOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
-    var secureLabel = (configOptions != null && configOptions.warp.enable && configOptions.warp.mode == WarpDetourMode.warpOverProxy) ? t.connection.secure : "";
+    var secureLabel = (ref.watch(ConfigOptions.warpDetourMode) == WarpDetourMode.warpOverProxy) ? t.connection.secure : "";
     if (delay <= 0 || delay > 65000 || connectionStatus.value != const Connected()) {
       secureLabel = "";
     }
@@ -133,11 +131,11 @@ class ConnectionButton extends HookConsumerWidget {
             final activeProfile = await ref.read(activeProfileProvider.future);
             return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
           },
-        AsyncData(value: Disconnected()) || AsyncData(value: Connecting()) || AsyncError() => () async {
+        AsyncData(value: Disconnected()) || AsyncError() => () async {
             if (ref.read(activeProfileProvider).valueOrNull == null) {
               await showDialog<bool>(
                 context: context,
-                builder: (context) => PlatformAlertDialog(
+                builder: (context) => AlertDialog(
                   title: Text(t.home.noActiveProfileMsg),
                   content: Text(t.home.emptyProfilesMsg.text),
                   actions: [

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -137,15 +139,28 @@ class HiddifyCoreService with InfraLogger {
         // }
         // final content = await File(path).readAsString();
         // loggy.debug("starting with content: $content");
-        final res = await core.bgClient.start(
-          StartRequest(
-            configPath: path,
-            // configContent: content,
-            disableMemoryLimit: disableMemoryLimit,
-          ),
-        );
+        try {
+          final res = await core.bgClient.start(
+            StartRequest(
+              configPath: path,
+              // configContent: content,
+              disableMemoryLimit: disableMemoryLimit,
+            ),
+          );
+          if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
+        } on GrpcError catch (e) {
+          loggy.error("failed to start bg core: $e");
+          if (e.code == StatusCode.unavailable) {
+            return left("background core is not started yet!");
+          }
+          // throw InvalidConfig(e.message);
+          // throw DioException.connectionError(requestOptions: RequestOptions(), reason: e.codeName, error: e);
 
-        if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
+          // throw DioException(requestOptions: RequestOptions(), error: e);
+          return left("${e.message}");
+        }
+
+        // if (res.messageType != MessageType.EMPTY) return left(res);
 
         return right(unit);
       },
@@ -159,6 +174,8 @@ class HiddifyCoreService with InfraLogger {
         try {
           final res = await core.bgClient.stop(Empty());
         } on GrpcError catch (e) {
+          loggy.error("failed to stop bg core: $e");
+        } catch (e) {
           loggy.error("failed to stop bg core: $e");
         }
         if (!await core.stop()) {}
