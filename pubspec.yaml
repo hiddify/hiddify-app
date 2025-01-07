@@ -100,7 +100,11 @@ dependencies:
   fixnum: ^1.1.0
   grpc: ^4.0.1
   bottom_navy_bar: ^6.1.0
-  protobuf: ^3.0.0
+  # for using protobuf install protoc from this link -> https://github.com/protocolbuffers/protobuf/releases
+  # then add path to "environment variable" e.g. -> C:\src\protoc-28.3-win64\bin
+  # then active "protoc_plugin" by running this command -> dart pub global activate protoc_plugin
+  # then add path to "environment variable" e.g. -> C:\Users\%USERPROFILE%\AppData\Local\Pub\Cache\global_packages\protoc_plugin\bin
+  protobuf: ^3.1.0
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
   # flutter_platform_widgets: ^7.0.1  
@@ -128,6 +132,7 @@ dev_dependencies:
   go_router_builder: ^2.4.1
   dependency_validator: ^4.1.1
   dart_mappable_builder: ^4.2.1
+  protoc_builder: ^0.4.1
   # google_protobuf: ^3.20.1;
 
 flutter:
