@@ -6,9 +6,9 @@ SEP :=/
 
 ifeq ($(OS),Windows_NT)
     ifeq ($(IS_GITHUB_ACTIONS),)
-		MKDIR := -mkdir
+		# MKDIR := -mkdir
 		RM := rmdir /s /q
-		SEP:=\\
+		# SEP:=\\
 	endif
 endif
 
@@ -174,7 +174,7 @@ ios-release: #not tested
 	flutter_distributor package --platform ios --targets ipa --build-export-options-plist  ios/exportOptions.plist $(DISTRIBUTOR_ARGS)
 
 android-libs:
-	@$(MKDIR) $(ANDROID_OUT) || echo Folder already exists. Skipping...
+	$(MKDIR) $(ANDROID_OUT) || echo Folder already exists. Skipping...
 	curl -L $(CORE_URL)/$(CORE_NAME)-android.tar.gz | tar xz -C $(ANDROID_OUT)/
 
 android-apk-libs: android-libs
@@ -182,8 +182,8 @@ android-aab-libs: android-libs
 
 windows-libs:
 	$(MKDIR) $(DESKTOP_OUT) || echo Folder already exists. Skipping...
-	curl -L $(CORE_URL)/$(CORE_NAME)-windows-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)$(SEP)
-	ls $(DESKTOP_OUT) || dir $(DESKTOP_OUT)$(SEP)
+	curl -L $(CORE_URL)/$(CORE_NAME)-windows-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)/
+	ls $(DESKTOP_OUT) || dir $(DESKTOP_OUT)/
 	
 
 linux-libs:
