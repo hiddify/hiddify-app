@@ -58,10 +58,10 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: "6199c74e3db4fbfbd04f66d739e72fe11c8a8957d5f219f1f4482dbde6420b5a"
+      sha256: cb6a278ef2dbb298455e1a713bda08524a175630ec643a242c399c932a0a1f7d
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.2"
+    version: "3.6.1"
   args:
     dependency: transitive
     description:
@@ -905,10 +905,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "8346ad4b5173924b5ddddab782fc7d8a6300178c8b1dc427775405a01701c4a6"
+      sha256: f31d52537dc417fdcde36088fdf11d191026fd5e4fae742491ebd40e5a8bea7d
       url: "https://pub.dev"
     source: hosted
-    version: "4.5.2"
+    version: "4.3.0"
   image_size_getter:
     dependency: transitive
     description:
@@ -1357,6 +1357,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
+  protoc_builder:
+    dependency: "direct dev"
+    description:
+      name: protoc_builder
+      sha256: "3a1ae025203e99934f33bec2b4fe95f3b27cb1647a17692bf4fc7f174d1f8d75"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.4.1"
   protocol_handler:
     dependency: "direct main"
     description:
