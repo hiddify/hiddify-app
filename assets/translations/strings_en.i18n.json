@@ -29,7 +29,6 @@
     "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open Source)} (${tap_license(License)})",
     "banner": "Hiddify: All you need for an unrestricted internet.",
     "start": "Start"
-
   },
   "home": {
     "pageTitle": "Home",
@@ -70,16 +69,12 @@
       "download": "Download",
       "total": "Total Traffic",
       "expireDate": "Expire Date",
-      "remaingTraffic":"Remaining Traffic",
-      "remaingTime":"Remaining Time",
-      "remaingUsage":"Remaining",
+      "remaingTraffic": "Remaining Traffic",
+      "remaingTime": "Remaining Time",
+      "remaingUsage": "Remaining",
       "remainingDurationNew": "${duration} Days",
-      "profileSite":"Provider",
-      "profileSupport":"Support"
-
-
-
-
+      "profileSite": "Provider",
+      "profileSupport": "Support"
     },
     "sortBy": {
       "lastUpdate": "Recently Updated",
@@ -88,8 +83,8 @@
     "add": {
       "buttonText": "New Connection Profile",
       "shortBtnTxt": "New Connection Profile",
-      "fromClipboard": "Add From Clipboard",
-      "scanQr": "Scan QR Code",
+      "fromClipboard": "Clipboard",
+      "scanQr": "Scan",
       "qrScanner": {
         "permissionDeniedError": "Permission Denied",
         "unexpectedError": "Something Went Wrong",
@@ -97,9 +92,16 @@
         "facingSemanticLabel": "Camera Facing",
         "permissionRequest": "Permission to camera to scan QR Code"
       },
-      "manually": "Manual Entry",
-      "addWarp": "Add WARP",
-      "addFragment": "Add Fragment",
+      "manually": "Manual",
+      "free": "FREE",
+      "fialed_to_load": "Failed to Load",
+      "no_free_subscription_found": "No free subscription found",
+      "help": "Help",
+      "ok": "Ok",
+      "continue": "Continue",
+      "cancel": "Cancel",
+      "addWarp": "WARP",
+      "addFragment": "Fragment",
       "addingWarpMsg": "Please wait while we register WARP.",
       "addingProfileMsg": "Adding Profile",
       "failureMsg": "Failed to Add Profile"
@@ -354,7 +356,7 @@
     "experimentalNoticeMsg": "You've enabled some experimental features which might affect connection quality and cause unexpected errors. You can always change or reset these options from Config options page.",
     "disableExperimentalNotice": "Don't Show Again",
     "reconnectMsg": "Reconnecting for taking into account the changes...",
-    "secure":"Secure by WARP"
+    "secure": "Secure by WARP"
   },
   "config": {
     "useXrayCoreWhenPossible": {
@@ -457,35 +459,32 @@
     "hide": "Hide",
     "close": "Exit",
     "alertMessage": "Hide or Exit the application?",
-     "remember": "Remember my choice"
+    "remember": "Remember my choice"
   },
-  "help":{
+  "help": {
     "title": "Help"
   },
-  "outboundInfo":{
-      "fullTag": "Full Tag:",
-      "type": "Type:",
-      "url_test_time": "Test Time:",
-      "url_test_delay": "Test Delay:",
-      "is_selected": "Is Selected:",
-      "is_group": "Is Group:",
-      "is_secure": "Is Secure:",
-      "is_visible": "Is Visible:",
-      "port": "Port:",
-      "host": "Host:",
-      "tag_display": "Tag Display:",
-      
-      "ip": "IP:",
-      "country_code": "Country Code:",
-      "region": "Region:",
-      "city": "City:",
-      "asn": "ASN:",
-      "organization": "Organization:",
-      "latitude": "Latitude:",
-      "longitude": "Longitude:",
-      "location": "Location:",
-      "postal_code": "Postal Code:"
-    
+  "outboundInfo": {
+    "fullTag": "Full Tag:",
+    "type": "Type:",
+    "url_test_time": "Test Time:",
+    "url_test_delay": "Test Delay:",
+    "is_selected": "Is Selected:",
+    "is_group": "Is Group:",
+    "is_secure": "Is Secure:",
+    "is_visible": "Is Visible:",
+    "port": "Port:",
+    "host": "Host:",
+    "tag_display": "Tag Display:",
+    "ip": "IP:",
+    "country_code": "Country Code:",
+    "region": "Region:",
+    "city": "City:",
+    "asn": "ASN:",
+    "organization": "Organization:",
+    "latitude": "Latitude:",
+    "longitude": "Longitude:",
+    "location": "Location:",
+    "postal_code": "Postal Code:"
   }
-
 }

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 abstract class Constants {
   static const appName = "Hiddify";
   static const githubUrl = "https://github.com/hiddify/hiddify-next";
@@ -13,3 +15,25 @@ abstract class Constants {
 }
 
 const kAnimationDuration = Duration(milliseconds: 250);
+
+abstract class AddProfileModalConst {
+  static const fixBtnsGap = 16.0;
+  static const fixBtnsGapCount = 4;
+  static const fixBtnsItemCount = 3;
+  static const navBarGap = 16.0;
+  static const navBarBottomGap = 12.0;
+  //switch default height
+  static const navBarcontentHeight = 32.0;
+  static const navBarHeight = navBarGap + navBarBottomGap + navBarcontentHeight;
+}
+
+abstract class AlertDialogConst {
+  static const minWidth = 280.0;
+  static const maxWidth = 560.0;
+  static const boxConstraints = BoxConstraints(minWidth: minWidth, maxWidth: maxWidth);
+}
+
+abstract class BottomSheetConst {
+  static const maxWidth = 456.0;
+  static const boxConstraints = BoxConstraints(maxWidth: maxWidth);
+}

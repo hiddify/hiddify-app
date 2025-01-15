@@ -1,18 +1,22 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
+import 'package:hiddify/core/http_client/http_client_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
+import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
 import 'package:hiddify/features/config_option/overview/warp_options_widgets.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/profile/add/model/free_profiles_model.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
@@ -33,7 +37,7 @@ class AddProfile extends _$AddProfile with AppLogger {
       loggy.debug("disposing");
       _cancelToken?.cancel();
     });
-    ref.listenSelf(
+    listenSelf(
       (previous, next) {
         final t = ref.read(translationsProvider).requireValue;
         final notification = ref.read(inAppNotificationControllerProvider);
@@ -156,7 +160,7 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
   @override
   AsyncValue<Unit?> build(String id) {
     ref.disposeDelay(const Duration(minutes: 1));
-    ref.listenSelf(
+    listenSelf(
       (previous, next) {
         final t = ref.read(translationsProvider).requireValue;
         final notification = ref.read(inAppNotificationControllerProvider);
@@ -201,5 +205,30 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
         ).run();
       },
     );
+  }
+}
+
+@riverpod
+class FreeSwitch extends _$FreeSwitch {
+  @override
+  bool build() {
+    return false;
+  }
+
+  Future<void> onChange(bool value) async => state = value;
+}
+
+@riverpod
+class FreeProfiles extends _$FreeProfiles {
+  @override
+  Future<List<FreeProfile>> build() async {
+    final httpCielt = ref.watch(httpClientProvider);
+    final region = ref.watch(ConfigOptions.region);
+    final res = await httpCielt.get('https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs');
+    if (res.statusCode == 200) {
+      final m = FreeProfilesModel.fromJson(jsonDecode(res.data.toString()) as Map<String, dynamic>);
+      return m.profiles.where((e) => e.region.contains(region.name)).toList();
+    }
+    return <FreeProfile>[];
   }
 }
