@@ -86,7 +86,6 @@ dependencies:
   wolt_modal_sheet: ^0.10.0
   dart_mappable: ^4.2.1
   fluentui_system_icons: ^1.1.229
-  http: ^1.2.0
   timezone_to_country: ^2.2.1
   json_path: ^0.7.1
   # permission_handler: ^11.3.0 # is not compatible with windows
@@ -112,6 +111,8 @@ dependencies:
   animated_notch_bottom_bar: ^1.0.0
   basic_utils: 5.7.0
   showcaseview: 3.0.0
+  text_scroll: ^0.2.0
+  flutter_markdown: ^0.7.5
   
   
 

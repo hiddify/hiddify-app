@@ -1,13 +1,16 @@
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
+import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_card.dart';
@@ -93,7 +96,14 @@ class HomePage extends HookConsumerWidget {
                 ),
               ],
             ),
-            onPressed: () => const AddProfileRoute().push(context),
+            onPressed: () => showModalBottomSheet(
+              useRootNavigator: true,
+              useSafeArea: true,
+              constraints: BottomSheetConst.boxConstraints,
+              isScrollControlled: true,
+              context: context,
+              builder: (context) => const AddProfileModal(),
+            ),
           ),
         ],
       ),
