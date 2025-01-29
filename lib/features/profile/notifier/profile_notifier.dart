@@ -227,7 +227,7 @@ class FreeProfiles extends _$FreeProfiles {
     final res = await httpCielt.get('https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs');
     if (res.statusCode == 200) {
       final m = FreeProfilesModel.fromJson(jsonDecode(res.data.toString()) as Map<String, dynamic>);
-      return m.profiles.where((e) => e.region.contains(region.name)).toList();
+      return m.profiles.where((e) => e.region.contains(region.name) || e.region.isEmpty).toList();
     }
     return <FreeProfile>[];
   }
