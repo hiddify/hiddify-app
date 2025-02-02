@@ -44,7 +44,7 @@ class FreeBtns extends ConsumerWidget {
                 padding: const EdgeInsets.all(16).copyWith(bottom: 0),
                 itemCount: freeProfiles.value!.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: MediaQuery.of(context).size.width <= BottomSheetConst.maxWidth ? 1 : 2,
+                  crossAxisCount: MediaQuery.of(context).size.width <= BottomSheetConst.maxWidth || freeProfiles.value!.length < 2 ? 1 : 2,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                   mainAxisExtent: 72,
