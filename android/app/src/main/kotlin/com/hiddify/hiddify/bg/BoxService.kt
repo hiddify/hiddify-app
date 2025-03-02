@@ -19,6 +19,8 @@ import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Action
 import com.hiddify.hiddify.constant.Alert
 import com.hiddify.hiddify.constant.Status
+
+
 import go.Seq
 import com.hiddify.core.libbox.Libbox
 import com.hiddify.core.mobile.Mobile
@@ -27,6 +29,7 @@ import com.hiddify.core.libbox.BoxService
 import com.hiddify.core.libbox.CommandServer
 import com.hiddify.core.libbox.CommandServerHandler
 import com.hiddify.core.libbox.PlatformInterface
+import com.hiddify.core.libbox.SetupOptions
 import com.hiddify.core.libbox.SystemProxyStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -62,9 +65,15 @@ class BoxService(
             Log.d(TAG, "temp dir: ${tempDir.path}")
 
 //
-//            Mobile.setup(baseDir.path, workingDir.path, tempDir.path,  2L ,"127.0.0.1:{Setting}",false)
-            Libbox.setup(baseDir.path, workingDir.path, tempDir.path, false)
-
+            //Mobile.setup(baseDir.path, workingDir.path, tempDir.path,  2L ,"127.0.0.1:{Setting}","",false,this)
+//            Libbox.setup(baseDir.path, workingDir.path, tempDir.path, false)
+            Libbox.setup(SetupOptions().also {
+                it.basePath = baseDir.path
+                it.workingPath = workingDir.path
+                it.tempPath = tempDir.path
+//                it.fixAndroidStack = Bugs.fixAndroidStack
+                it.fixAndroidStack=false
+            })
             Libbox.redirectStderr(File(Settings.workingDir, "stderr.log").path)
             initializeOnce = true
             return
