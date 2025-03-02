@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: route_rule/route_rule.proto
+//  source: v2/config/route_rule.proto
 //
 // @dart = 2.12
 

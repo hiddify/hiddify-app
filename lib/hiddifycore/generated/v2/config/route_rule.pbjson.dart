@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: route_rule/route_rule.proto
+//  source: v2/config/route_rule.proto
 //
 // @dart = 2.12
 
@@ -65,13 +65,13 @@ final $typed_data.Uint8List protocolDescriptor = $convert.base64Decode(
 const RouteRule$json = {
   '1': 'RouteRule',
   '2': [
-    {'1': 'rules', '3': 1, '4': 3, '5': 11, '6': '.Rule', '10': 'rules'},
+    {'1': 'rules', '3': 1, '4': 3, '5': 11, '6': '.config.Rule', '10': 'rules'},
   ],
 };
 
 /// Descriptor for `RouteRule`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List routeRuleDescriptor = $convert.base64Decode(
-    'CglSb3V0ZVJ1bGUSGwoFcnVsZXMYASADKAsyBS5SdWxlUgVydWxlcw==');
+    'CglSb3V0ZVJ1bGUSIgoFcnVsZXMYASADKAsyDC5jb25maWcuUnVsZVIFcnVsZXM=');
 
 @$core.Deprecated('Use ruleDescriptor instead')
 const Rule$json = {
@@ -80,15 +80,15 @@ const Rule$json = {
     {'1': 'list_order', '3': 1, '4': 1, '5': 13, '10': 'list_order'},
     {'1': 'enabled', '3': 2, '4': 1, '5': 8, '10': 'enabled'},
     {'1': 'name', '3': 3, '4': 1, '5': 9, '10': 'name'},
-    {'1': 'outbound', '3': 4, '4': 1, '5': 14, '6': '.Outbound', '10': 'outbound'},
+    {'1': 'outbound', '3': 4, '4': 1, '5': 14, '6': '.config.Outbound', '10': 'outbound'},
     {'1': 'rule_sets', '3': 5, '4': 3, '5': 9, '10': 'rule_set'},
     {'1': 'package_names', '3': 6, '4': 3, '5': 9, '10': 'package_name'},
     {'1': 'process_names', '3': 7, '4': 3, '5': 9, '10': 'process_name'},
     {'1': 'process_paths', '3': 8, '4': 3, '5': 9, '10': 'process_path'},
-    {'1': 'network', '3': 9, '4': 1, '5': 14, '6': '.Network', '10': 'network'},
+    {'1': 'network', '3': 9, '4': 1, '5': 14, '6': '.config.Network', '10': 'network'},
     {'1': 'port_ranges', '3': 10, '4': 3, '5': 9, '10': 'port_range'},
     {'1': 'source_port_ranges', '3': 11, '4': 3, '5': 9, '10': 'source_port_range'},
-    {'1': 'protocols', '3': 12, '4': 3, '5': 14, '6': '.Protocol', '10': 'protocol'},
+    {'1': 'protocols', '3': 12, '4': 3, '5': 14, '6': '.config.Protocol', '10': 'protocol'},
     {'1': 'ip_cidrs', '3': 13, '4': 3, '5': 9, '10': 'ip_cidr'},
     {'1': 'source_ip_cidrs', '3': 14, '4': 3, '5': 9, '10': 'source_ip_cidr'},
     {'1': 'domains', '3': 15, '4': 3, '5': 9, '10': 'domain'},
@@ -101,15 +101,15 @@ const Rule$json = {
 /// Descriptor for `Rule`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List ruleDescriptor = $convert.base64Decode(
     'CgRSdWxlEh4KCmxpc3Rfb3JkZXIYASABKA1SCmxpc3Rfb3JkZXISGAoHZW5hYmxlZBgCIAEoCF'
-    'IHZW5hYmxlZBISCgRuYW1lGAMgASgJUgRuYW1lEiUKCG91dGJvdW5kGAQgASgOMgkuT3V0Ym91'
-    'bmRSCG91dGJvdW5kEhsKCXJ1bGVfc2V0cxgFIAMoCVIIcnVsZV9zZXQSIwoNcGFja2FnZV9uYW'
-    '1lcxgGIAMoCVIMcGFja2FnZV9uYW1lEiMKDXByb2Nlc3NfbmFtZXMYByADKAlSDHByb2Nlc3Nf'
-    'bmFtZRIjCg1wcm9jZXNzX3BhdGhzGAggAygJUgxwcm9jZXNzX3BhdGgSIgoHbmV0d29yaxgJIA'
-    'EoDjIILk5ldHdvcmtSB25ldHdvcmsSHwoLcG9ydF9yYW5nZXMYCiADKAlSCnBvcnRfcmFuZ2US'
-    'LQoSc291cmNlX3BvcnRfcmFuZ2VzGAsgAygJUhFzb3VyY2VfcG9ydF9yYW5nZRImCglwcm90b2'
-    'NvbHMYDCADKA4yCS5Qcm90b2NvbFIIcHJvdG9jb2wSGQoIaXBfY2lkcnMYDSADKAlSB2lwX2Np'
-    'ZHISJwoPc291cmNlX2lwX2NpZHJzGA4gAygJUg5zb3VyY2VfaXBfY2lkchIXCgdkb21haW5zGA'
-    '8gAygJUgZkb21haW4SJgoPZG9tYWluX3N1ZmZpeGVzGBAgAygJUg1kb21haW5fc3VmZml4EicK'
-    'D2RvbWFpbl9rZXl3b3JkcxgRIAMoCVIOZG9tYWluX2tleXdvcmQSJAoOZG9tYWluX3JlZ2V4ZX'
-    'MYEiADKAlSDGRvbWFpbl9yZWdleA==');
+    'IHZW5hYmxlZBISCgRuYW1lGAMgASgJUgRuYW1lEiwKCG91dGJvdW5kGAQgASgOMhAuY29uZmln'
+    'Lk91dGJvdW5kUghvdXRib3VuZBIbCglydWxlX3NldHMYBSADKAlSCHJ1bGVfc2V0EiMKDXBhY2'
+    'thZ2VfbmFtZXMYBiADKAlSDHBhY2thZ2VfbmFtZRIjCg1wcm9jZXNzX25hbWVzGAcgAygJUgxw'
+    'cm9jZXNzX25hbWUSIwoNcHJvY2Vzc19wYXRocxgIIAMoCVIMcHJvY2Vzc19wYXRoEikKB25ldH'
+    'dvcmsYCSABKA4yDy5jb25maWcuTmV0d29ya1IHbmV0d29yaxIfCgtwb3J0X3JhbmdlcxgKIAMo'
+    'CVIKcG9ydF9yYW5nZRItChJzb3VyY2VfcG9ydF9yYW5nZXMYCyADKAlSEXNvdXJjZV9wb3J0X3'
+    'JhbmdlEi0KCXByb3RvY29scxgMIAMoDjIQLmNvbmZpZy5Qcm90b2NvbFIIcHJvdG9jb2wSGQoI'
+    'aXBfY2lkcnMYDSADKAlSB2lwX2NpZHISJwoPc291cmNlX2lwX2NpZHJzGA4gAygJUg5zb3VyY2'
+    'VfaXBfY2lkchIXCgdkb21haW5zGA8gAygJUgZkb21haW4SJgoPZG9tYWluX3N1ZmZpeGVzGBAg'
+    'AygJUg1kb21haW5fc3VmZml4EicKD2RvbWFpbl9rZXl3b3JkcxgRIAMoCVIOZG9tYWluX2tleX'
+    'dvcmQSJAoOZG9tYWluX3JlZ2V4ZXMYEiADKAlSDGRvbWFpbl9yZWdleA==');
 

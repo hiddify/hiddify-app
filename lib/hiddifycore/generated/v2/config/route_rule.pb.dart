@@ -1,6 +1,6 @@
 //
 //  Generated code. Do not modify.
-//  source: route_rule/route_rule.proto
+//  source: v2/config/route_rule.proto
 //
 // @dart = 2.12
 
@@ -31,7 +31,7 @@ class RouteRule extends $pb.GeneratedMessage {
   factory RouteRule.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory RouteRule.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RouteRule', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RouteRule', package: const $pb.PackageName(_omitMessageNames ? '' : 'config'), createEmptyInstance: create)
     ..pc<Rule>(1, _omitFieldNames ? '' : 'rules', $pb.PbFieldType.PM, subBuilder: Rule.create)
     ..hasRequiredFields = false
   ;
@@ -143,7 +143,7 @@ class Rule extends $pb.GeneratedMessage {
   factory Rule.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory Rule.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Rule', createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Rule', package: const $pb.PackageName(_omitMessageNames ? '' : 'config'), createEmptyInstance: create)
     ..a<$core.int>(1, _omitFieldNames ? '' : 'list_order', $pb.PbFieldType.OU3)
     ..aOB(2, _omitFieldNames ? '' : 'enabled')
     ..aOS(3, _omitFieldNames ? '' : 'name')

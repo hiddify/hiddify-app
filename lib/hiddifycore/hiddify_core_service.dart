@@ -78,6 +78,10 @@ class HiddifyCoreService with InfraLogger {
           }
           await startListeningLogs("fg", core.fgClient);
           await startListeningStatus("fg", core.fgClient);
+          if (!core.isSingleChannel()) {
+            await startListeningLogs("bg", core.bgClient);
+            await startListeningStatus("bg", core.bgClient);
+          }
 
           return right(unit);
         } catch (e) {
