@@ -19,6 +19,7 @@
     "hidden": "Hidden",
     "timeout": "Timeout",
     "clipboardExportSuccessMsg": "Added To Clipboard",
+    "jsonFileExportSuccessMsg": "Json File Created",
     "showMore": "Show More",
     "showLess": "Show Less",
     "openAppSettings": "Open App Settings",
@@ -191,6 +192,9 @@
     "exportOptions": "Copy Anonymous Options to Clipboard",
     "exportAllOptions": "Copy All Options to Clipboard",
     "importOptions": "Import Options From Clipboard",
+    "exportOptionsFile": "Export Anonymous Options to File",
+    "exportAllOptionsFile": "Export All Options to File",
+    "importOptionsFile": "Import Options From File",
     "importOptionsMsg": "This will rewrite all config options with provided values. Are you sure?",
     "general": {
       "sectionTitle": "General",

@@ -1,20 +1,13 @@
-import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/optional_range.dart';
-import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
-import 'package:hiddify/core/preferences/general_preferences.dart';
-import 'package:hiddify/core/router/routes.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/tip_card.dart';
 import 'package:hiddify/features/common/confirmation_dialogs.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
 import 'package:hiddify/features/config_option/overview/PlatformListSection.dart';
 import 'package:hiddify/features/config_option/overview/dns_options_widgets.dart';
@@ -22,20 +15,15 @@ import 'package:hiddify/features/config_option/overview/inbound_options_widgets.
 import 'package:hiddify/features/config_option/overview/route_options_widgets.dart';
 import 'package:hiddify/features/config_option/overview/tlsfragment_widgets.dart';
 import 'package:hiddify/features/config_option/overview/warp_options_widgets.dart';
-import 'package:hiddify/features/config_option/widget/preference_tile.dart';
-import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/log/overview/logs_overview_page.dart';
-import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/route_rules/overview/rules_page.dart';
 import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/settings/notifier/platform_settings_notifier.dart';
 import 'package:hiddify/features/settings/widgets/advanced_setting_tiles.dart';
 import 'package:hiddify/features/settings/widgets/general_setting_tiles.dart';
 import 'package:hiddify/features/settings/widgets/platform_settings_tiles.dart';
-import 'package:hiddify/features/settings/widgets/settings_input_dialog.dart';
-import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:humanizer/humanizer.dart';
 
 enum ConfigOptionSection {
   warp,
@@ -93,52 +81,85 @@ class ConfigOptionsPage extends HookConsumerWidget {
           NestedAppBar(
             title: Text(t.config.pageTitle),
             actions: [
-              PopupMenuButton(
+              PopupMenuButton<dynamic>(
                 icon: Icon(AdaptiveIcon(context).more),
-                itemBuilder: (context) {
-                  return [
-                    PopupMenuItem(
-                      onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard().then((success) {
-                        if (success) {
-                          ref.read(inAppNotificationControllerProvider).showSuccessToast(
-                                t.general.clipboardExportSuccessMsg,
-                              );
-                        }
-                      }),
-                      child: Text(t.settings.exportOptions),
-                    ),
-                    // if (ref.watch(debugModeNotifierProvider))
-                    PopupMenuItem(
-                      onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard(excludePrivate: false).then((success) {
-                        if (success) {
-                          ref.read(inAppNotificationControllerProvider).showSuccessToast(
-                                t.general.clipboardExportSuccessMsg,
-                              );
-                        }
-                      }),
-                      child: Text(t.settings.exportAllOptions),
-                    ),
-                    PopupMenuItem(
-                      onTap: () async {
-                        final shouldImport = await showConfirmationDialog(
-                          context,
-                          title: t.settings.importOptions,
-                          message: t.settings.importOptionsMsg,
-                        );
-                        if (shouldImport) {
-                          await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
-                        }
-                      },
-                      child: Text(t.settings.importOptions),
-                    ),
-                    PopupMenuItem(
-                      child: Text(t.config.resetBtn),
-                      onTap: () async {
-                        await ref.read(configOptionNotifierProvider.notifier).resetOption();
-                      },
-                    ),
-                  ];
-                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard().then((success) {
+                      if (success) {
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
+                              t.general.clipboardExportSuccessMsg,
+                            );
+                      }
+                    }),
+                    child: Text(t.settings.exportOptions),
+                  ),
+                  // if (ref.watch(debugModeNotifierProvider))
+                  PopupMenuItem(
+                    onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false).then((success) {
+                      if (success) {
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
+                              t.general.clipboardExportSuccessMsg,
+                            );
+                      }
+                    }),
+                    child: Text(t.settings.exportAllOptions),
+                  ),
+                  PopupMenuItem(
+                    onTap: () async {
+                      final shouldImport = await showConfirmationDialog(
+                        context,
+                        title: t.settings.importOptions,
+                        message: t.settings.importOptionsMsg,
+                      );
+                      if (shouldImport) {
+                        await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
+                      }
+                    },
+                    child: Text(t.settings.importOptions),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonFile().then((success) {
+                      if (success) {
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
+                              t.general.jsonFileExportSuccessMsg,
+                            );
+                      }
+                    }),
+                    child: Text(t.settings.exportOptionsFile),
+                  ),
+                  PopupMenuItem(
+                    onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false).then((success) {
+                      if (success) {
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
+                              t.general.jsonFileExportSuccessMsg,
+                            );
+                      }
+                    }),
+                    child: Text(t.settings.exportAllOptionsFile),
+                  ),
+                  PopupMenuItem(
+                    onTap: () async {
+                      final shouldImport = await showConfirmationDialog(
+                        context,
+                        title: t.settings.importOptions,
+                        message: t.settings.importOptionsMsg,
+                      );
+                      if (shouldImport) {
+                        await ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
+                      }
+                    },
+                    child: Text(t.settings.importOptionsFile),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    child: Text(t.config.resetBtn),
+                    onTap: () async {
+                      await ref.read(configOptionNotifierProvider.notifier).resetOption();
+                    },
+                  ),
+                ],
               )
             ],
           ),
@@ -176,7 +197,12 @@ class ConfigOptionsPage extends HookConsumerWidget {
                       AdvancedSettingTiles(),
                     ],
                   ),
-
+                  PlatformListSection(
+                    sectionIcon: const Icon(FontAwesomeIcons.shuffle),
+                    sectionTitle: 'Route Rules',
+                    showAppBar: false,
+                    page: const RulesPage(),
+                  ),
                   PlatformListSection(
                     sectionIcon: const Icon(FontAwesomeIcons.route),
                     sectionTitle: t.config.section.route,
