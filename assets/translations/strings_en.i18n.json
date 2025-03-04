@@ -1,6 +1,12 @@
 {
   "general": {
     "appTitle": "Hiddify",
+    "ok": "Ok",
+    "cancel": "Cancel",
+    "discard": "Discard",
+    "empty": "Empty",
+    "search": "Search",
+    "done": "Done",
     "reset": "Reset",
     "toggle": {
       "enabled": "Enabled",
@@ -19,6 +25,7 @@
     "hidden": "Hidden",
     "timeout": "Timeout",
     "clipboardExportSuccessMsg": "Added To Clipboard",
+    "jsonFileExportSuccessMsg": "Json File Created",
     "showMore": "Show More",
     "showLess": "Show Less",
     "openAppSettings": "Open App Settings",
@@ -191,6 +198,9 @@
     "exportOptions": "Copy Anonymous Options to Clipboard",
     "exportAllOptions": "Copy All Options to Clipboard",
     "importOptions": "Import Options From Clipboard",
+    "exportOptionsFile": "Export Anonymous Options to File",
+    "exportAllOptionsFile": "Export All Options to File",
+    "importOptionsFile": "Import Options From File",
     "importOptionsMsg": "This will rewrite all config options with provided values. Are you sure?",
     "general": {
       "sectionTitle": "General",
@@ -252,6 +262,93 @@
       "showSystemApps": "Show System Apps",
       "hideSystemApps": "Hide System Apps",
       "clearSelection": "Clear Selection"
+    },
+    "routeRule": {
+      "pageTitle": "Route Rules",
+      "importClipboard": "Import Rules From Clipboard",
+      "exportClipboard": "Copy Rules To Clipboard",
+      "importJsonFile": "Import Rules From File",
+      "exportJsonFile": "Save Rules to File",
+      "reset": "Reset Rules",
+      "createRule": "Create New Rule",
+      "deleteRule": "Delete Rule",
+      "deleteRuleMsg": "Are you sure you want to delete the \"$ruleName\" rule?",
+      "rule": {
+        "pageTitle": "Rule",
+        "ruleChanged": "Rule changed",
+        "ruleChangedMsg": "Do you want to save your edits?",
+        "save": "Save",
+        "discard": "Discard",
+        "onlyTunMode": "Available only in TUN Mode",
+        "notAvailabeInThisPlatform": "Not available in this platform",
+        "canNotBeEmpty": "Can not be empty",
+        "validUrlEx": "https://example.com",
+        "validUrl": "Valid \"URL\" like\n@:settings.routeRule.rule.validUrlEx",
+        "validProcessNameEx": "chrome.exe or Google Chrome or chrome",
+        "validProcessName": "Valid \"Process Name\" like\n@:settings.routeRule.rule.validProcessNameEx",
+        "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+        "validProcessPath": "Valid \"Process Path\" like\n@:settings.routeRule.rule.validProcessPathEx",
+        "validPortRangeEx": "80 or 1-65000",
+        "validPortRange": "Valid \"Port\" or \"Port Range\" like\n@:settings.routeRule.rule.validPortRangeEx",
+        "validIpCidrEx": "8.8.8.8 or 10.0.0.0/24",
+        "validIpCidr": "Valid IP CIDR like\n@:settings.routeRule.rule.validIpCidrEx",
+        "validDomainEx": "google.com or dl.google.com",
+        "validDomain": "Valid \"Domain\" like\n@:settings.routeRule.rule.validDomainEx",
+        "validDomainSuffixEx": ".com or .ir",
+        "validDomainSuffix": "Valid \"Domain Suffix\" like\n@:settings.routeRule.rule.validDomainSuffixEx",
+        "tileTitle(map)": {
+          "name": "Name",
+          "outbound": "Outbound If Match",
+          "rule_set": "Rule Set URL",
+          "package_name": "Package Names",
+          "process_name": "Process Names",
+          "process_path": "Process Paths",
+          "network": "Networks",
+          "port_range": "Destination Ports",
+          "source_port_range": "Source Ports",
+          "protocol": "Protocol",
+          "ip_cidr": "Destination IP CIDR",
+          "source_ip_cidr": "Source IP CIDR",
+          "domain": "Domain",
+          "domain_suffixe": "Domain Suffix",
+          "domain_keyword": "Domain Keyword",
+          "domain_regex": "Domain Regex"
+        },
+        "outbound(map)": {
+          "proxy": "Proxy",
+          "direct": "Direct",
+          "direct_with_fragment": "Direct With Fragment",
+          "block": "Block"
+        },
+        "network(map)": {
+          "all": "All",
+          "tcp": "TCP",
+          "udp": "UDP"
+        },
+        "protocol(map)": {
+          "": "All",
+          "tls": "TLS",
+          "http": "HTTP",
+          "quic": "QUIC",
+          "stun": "STUN",
+          "dns": "DNS",
+          "bittorrent": "BitTorrent"
+        }
+      },
+      "genericList": {
+        "addNew": "Add New Value",
+        "update": "Update Value",
+        "clearList": "Clear List",
+        "clearListMsg": "All items are deleted"
+      },
+      "androidApps": {
+        "pageTitle": "Android Apps",
+        "showSystemApps": "Show System Apps",
+        "hideSystemApps": "Hide System Apps",
+        "clearSelection": "Clear Selection",
+        "search": "Search",
+        "uninstalled": "Uninstalled"
+      }
     },
     "geoAssets": {
       "pageTitle": "Routing Assets",

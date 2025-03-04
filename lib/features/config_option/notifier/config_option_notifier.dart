@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dartx/dartx_io.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
+import 'package:hiddify/utils/platform_utils.dart';
 import 'package:json_path/json_path.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -34,7 +38,7 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
 
   DateTime? _lastUpdate;
 
-  Future<bool> exportJsonToClipboard({bool excludePrivate = true}) async {
+  Future<String?> _exportJson(bool excludePrivate) async {
     try {
       final options = await ref.read(ConfigOptions.singboxConfigOptions.future);
       Map map = options.toJson();
@@ -47,9 +51,18 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
           }
         }
       }
-
       const encoder = JsonEncoder.withIndent('  ');
-      final json = encoder.convert(map);
+      return encoder.convert(map);
+    } catch (e, st) {
+      loggy.warning("error creating config options json", e, st);
+      return null;
+    }
+  }
+
+  Future<bool> exportJsonClipboard({bool excludePrivate = true}) async {
+    try {
+      final json = await _exportJson(excludePrivate);
+      if (json == null) return false;
       await Clipboard.setData(ClipboardData(text: json));
       return true;
     } catch (e, st) {
@@ -58,10 +71,33 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
     }
   }
 
-  Future<bool> importFromClipboard() async {
+  Future<bool> exportJsonFile({bool excludePrivate = true}) async {
     try {
-      final input = await Clipboard.getData("text/plain").then((value) => value?.text);
-      if (input == null) return false;
+      final json = await _exportJson(excludePrivate);
+      if (json == null) return false;
+      final bytes = utf8.encode(json);
+      final outputFile = await FilePicker.platform.saveFile(
+        fileName: 'options.json',
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        bytes: bytes,
+      );
+      if (outputFile == null) return false;
+      if (PlatformUtils.isDesktop) {
+        final file = File(outputFile);
+        if (file.extension != '.json') return false;
+        if (!await file.exists()) await file.parent.create(recursive: true);
+        await file.writeAsBytes(bytes);
+      }
+      return true;
+    } catch (e, st) {
+      loggy.warning("error exporting config options to json file", e, st);
+      return false;
+    }
+  }
+
+  Future<bool> _importJson(String input) async {
+    try {
       if (jsonDecode(input) case final Map<String, dynamic> map) {
         for (final option in ConfigOptions.preferences.entries) {
           final query = option.key.split('.').map((e) => '["$e"]').join();
@@ -77,7 +113,32 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
       }
       return true;
     } catch (e, st) {
-      loggy.warning("error importing config options to clipboard", e, st);
+      loggy.warning("error importing config options from input", e, st);
+      return false;
+    }
+  }
+
+  Future<bool> importFromClipboard() async {
+    try {
+      final input = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text);
+      if (input == null) return false;
+      return await _importJson(input);
+    } catch (e, st) {
+      loggy.warning("error importing config options from clipboard", e, st);
+      return false;
+    }
+  }
+
+  Future<bool> importFromJsonFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['json']);
+      if (result == null) return false;
+      final file = File(result.files.single.path!);
+      if (!await file.exists()) return false;
+      final bytes = await file.readAsBytes();
+      return await _importJson(utf8.decode(bytes));
+    } catch (e, st) {
+      loggy.warning("error importing config options from json file", e, st);
       return false;
     }
   }

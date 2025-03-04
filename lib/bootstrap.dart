@@ -24,6 +24,7 @@ import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
+import 'package:hiddify/riverpod_observer.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -158,6 +159,9 @@ Future<void> lazyBootstrap(
   runApp(
     ProviderScope(
       parent: container,
+      observers: [
+        RiverpodObserver(),
+      ],
       child: SentryUserInteractionWidget(
         child: const App(),
       ),

@@ -54,7 +54,7 @@ dependencies:
   sentry_flutter: ^8.12.0
   sentry_dart_plugin: ^2.1.0
   sqlite3_flutter_libs: ^0.5.28
-  
+
   combine: ^0.5.7
   path: ^1.9.0
   loggy: ^2.0.3
@@ -90,8 +90,8 @@ dependencies:
   json_path: ^0.7.1
   # permission_handler: ^11.3.0 # is not compatible with windows
   #flutter_easy_permission: ^1.1.2
-  flutter_easy_permission: 
-     git: https://github.com/MichaelStH/flutter_easy_permission.git
+  flutter_easy_permission:
+    git: https://github.com/MichaelStH/flutter_easy_permission.git
   in_app_review: ^2.0.9
   # circle_flags: ^4.0.2
   circle_flags:
@@ -106,15 +106,21 @@ dependencies:
   # protobuf: ^3.1.0
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
-  # flutter_platform_widgets: ^7.0.1  
+  # flutter_platform_widgets: ^7.0.1
   simple_icons: ^10.1.3
   animated_notch_bottom_bar: ^1.0.0
   basic_utils: 5.7.0
   showcaseview: 3.0.0
   text_scroll: ^0.2.0
   flutter_markdown: ^0.7.5
-  
-  
+  # platform-specific  settings
+  # https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup
+  file_picker: ^8.1.7
+  installed_apps: ^1.5.2
+  # change case of text
+  # for example camelCase to snake_case
+  # helloWorld -> hello_worlds
+  recase: ^4.1.0
 
 dev_dependencies:
   # flutter_test:
