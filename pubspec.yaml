@@ -139,7 +139,7 @@ dev_dependencies:
   go_router_builder: ^2.4.1
   dependency_validator: ^4.1.1
   dart_mappable_builder: ^4.2.1
-  protoc_builder: ^0.4.1
+  # protoc_builder: ^0.4.1
   # google_protobuf: ^3.20.1;
 
 flutter:
