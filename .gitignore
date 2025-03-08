@@ -3,6 +3,7 @@
 *.log
 *.pyc
 *.swp
+.sentry-native
 .DS_Store
 .atom/
 .build/
