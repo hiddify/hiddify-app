@@ -5,7 +5,7 @@ import 'package:hiddify/features/common/confirmation_dialogs.dart';
 import 'package:hiddify/features/route_rules/notifier/rules_notifier.dart';
 import 'package:hiddify/features/route_rules/overview/rule_page.dart';
 import 'package:hiddify/features/route_rules/widget/setting_detail_chips.dart';
-import 'package:hiddify/gen/proto/route_rule/route_rule.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/config/route_rule.pb.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
