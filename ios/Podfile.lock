@@ -78,11 +78,11 @@ PODS:
   - PromisesObjC (2.4.0)
   - protocol_handler_ios (0.0.1):
     - Flutter
-  - Sentry/HybridSDK (8.42.0)
-  - sentry_flutter (8.12.0):
+  - Sentry/HybridSDK (8.44.0)
+  - sentry_flutter (8.13.2):
     - Flutter
     - FlutterMacOS
-    - Sentry/HybridSDK (= 8.42.0)
+    - Sentry/HybridSDK (= 8.44.0)
   - share_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
@@ -216,8 +216,8 @@ SPEC CHECKSUMS:
   pointer_interceptor_ios: 508241697ff0947f853c061945a8b822463947c1
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   protocol_handler_ios: a5db8abc38526ee326988b808be621e5fd568990
-  Sentry: 38ed8bf38eab5812787274bf591e528074c19e02
-  sentry_flutter: 7d1f1df30f3768c411603ed449519bbb90a7d87b
+  Sentry: 0f9bc9adfc0b960e7f3bb5ec67e9a3d8193f3bdb
+  sentry_flutter: 64a43fb39ab4c7f67d8a4cad52b49e22439e58b7
   share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
   sqlite3: 7559e33dae4c78538df563795af3a86fc887ee71
