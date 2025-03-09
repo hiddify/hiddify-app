@@ -10,7 +10,7 @@ import 'package:hiddify/features/route_rules/widget/setting_divider.dart';
 import 'package:hiddify/features/route_rules/widget/setting_generic_list.dart';
 import 'package:hiddify/features/route_rules/widget/setting_radio.dart';
 import 'package:hiddify/features/route_rules/widget/setting_text.dart';
-import 'package:hiddify/gen/proto/route_rule/route_rule.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/config/route_rule.pb.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:protobuf/protobuf.dart';

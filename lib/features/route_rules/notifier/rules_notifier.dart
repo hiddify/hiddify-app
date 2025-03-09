@@ -5,7 +5,7 @@ import 'package:dartx/dartx_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
-import 'package:hiddify/gen/proto/route_rule/route_rule.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/config/route_rule.pb.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

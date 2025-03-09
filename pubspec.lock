@@ -1397,14 +1397,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
-  protoc_builder:
-    dependency: "direct dev"
-    description:
-      name: protoc_builder
-      sha256: "3a1ae025203e99934f33bec2b4fe95f3b27cb1647a17692bf4fc7f174d1f8d75"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.1"
   protocol_handler:
     dependency: "direct main"
     description:
