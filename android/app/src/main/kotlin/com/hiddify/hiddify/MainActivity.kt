@@ -107,7 +107,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         if (logList.size > 300) {
             logList.removeFirst()
         }
-        logList.addLast(message)
+        logList.addLast(message?:"")
         logCallback?.invoke(false)
     }
 

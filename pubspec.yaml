@@ -5,7 +5,7 @@ version: 3.0.0+30000
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
-  flutter: "^3.24.4"
+  flutter: "^3.29.1"
 
 dependencies:
   flutter:
@@ -35,7 +35,8 @@ dependencies:
   rxdart: ^0.28.0
   drift: ^2.21.0
   drift_flutter: ^0.2.1
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.5.2
+  shared_preferences_android: ^2.4.8
   dio: ^5.4.1
   ffi: ^2.1.2
   path_provider: ^2.1.1
@@ -86,13 +87,13 @@ dependencies:
   wolt_modal_sheet: ^0.10.0
   dart_mappable: ^4.2.1
   fluentui_system_icons: ^1.1.229
-  timezone_to_country: ^2.2.1
+  timezone_to_country: ^3.0.0
   json_path: ^0.7.1
   # permission_handler: ^11.3.0 # is not compatible with windows
   #flutter_easy_permission: ^1.1.2
-  flutter_easy_permission:
-    git: https://github.com/MichaelStH/flutter_easy_permission.git
-  in_app_review: ^2.0.9
+  # flutter_easy_permission:
+  #   git: https://github.com/MichaelStH/flutter_easy_permission.git
+  in_app_review: ^2.0.10
   # circle_flags: ^4.0.2
   circle_flags:
     git: https://github.com/hiddify-com/flutter_circle_flags.git
@@ -116,7 +117,9 @@ dependencies:
   # platform-specific  settings
   # https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup
   file_picker: ^8.1.7
-  installed_apps: ^1.5.2
+  installed_apps: # ^1.5.2
+      git: https://github.com/VB10/installed_apps
+
   # change case of text
   # for example camelCase to snake_case
   # helloWorld -> hello_worlds

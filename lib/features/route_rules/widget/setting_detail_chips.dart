@@ -180,7 +180,7 @@ class AndroidAppInfo extends HookConsumerWidget {
     }
   }
 
-  Future<AppInfo?> getAppInfo() async => await InstalledApps.getAppInfo(packageName);
+  Future<AppInfo?> getAppInfo() async => await InstalledApps.getAppInfo(packageName, BuiltWith.flutter);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
