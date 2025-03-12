@@ -6,8 +6,8 @@
     "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/warp",
     "tags": { "en": ["Warp"], "fa": ["وارپ"] },
     "contest": {
-      "en": "Cloudflare WARP is a Free WireGuard VPN Provider. By enabling this option you are agreeing to the Cloudflare WARP's [Term of service](https://www.cloudflare.com/application/terms/) and [Privacy Policy](https://www.cloudflare.com/application/privacypolicy/).",
-      "fa": "وارپ کلودفلر یک ارائه دهنده رایگان وایرگارد است. با فعال کردن این گزینه، با [شرایط خدمات] (https://www.cloudflare.com/application/terms/) و [خط‌مشی رازداری] (https://www.cloudflare.com/application/) کلودفلر موافقت می‌کنید."
+      "en": "Cloudflare WARP is a free WireGuard VPN provider. By enabling this option, you are agreeing to Cloudflare WARP's [Terms of Service](https://www.cloudflare.com/application/terms/) and [Privacy Policy](https://www.cloudflare.com/application/privacypolicy/).",
+      "fa": "وارپ کلادفلر یک ارائه‌دهنده رایگان وایرگارد است. با فعال کردن این گزینه، با [شرایط خدمات](https://www.cloudflare.com/application/terms/) و [خط‌مشی رازداری](https://www.cloudflare.com/application/) کلادفلر موافقت می‌کنید."
     }
   },
   {
@@ -16,8 +16,8 @@
     "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/fragment",
     "tags": { "en": ["Fragment"], "fa": ["فرگمنت"] },
     "contest": {
-      "en": "This configuration is free and has no guarantee of connection and is only recommended in emergencies. It is better to use trusted configurations.",
-      "fa": "این کانفیگ رایگان هست و هیچ ضمانتی برای اتصال ندارد و صرفا در مواقع اضطراری پیشنهاد میشود. بهتر است از کانفیگ های معتبر استفاده کنید."
+      "en": "This configuration is free but has no connection guarantee. It is only recommended for emergency use. It's better to use trusted configurations.",
+      "fa": "این کانفیگ رایگان است و هیچ ضمانتی برای اتصال ندارد و صرفاً در مواقع اضطراری پیشنهاد می‌شود. بهتر است از کانفیگ‌های معتبر استفاده کنید."
     }
   },
   {
@@ -26,19 +26,19 @@
     "sublink": "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/splitted/mixed",
     "tags": { "en": ["mix"], "fa": ["عمومی"] },
     "contest": {
-      "en": "This profile collects public and published configurations with the consent of their owners, and tests and verifies them to help the free flow of information.\nTo enhance security, Hidify applies a Warp-based security layer to these configurations to prevent the risk of unauthorized access to information.\nThere is no guarantee that this configuration will function properly and it is recommended to use it only in emergency situations.",
-      "fa": "این پروفایل کانفیگ‌های عمومی و منتشر شده را با رضایت صاحبان آن‌ها جمع آوری می‌کند و تست و بررسی می‌کند تا به گردش آزاد اطلاعات کمک کند.\nبرای بالا بردن امنیت، هیدیفای یک لایه امنیتی مبتنی بر وارپ بر روی این کانفیگها اعمال میکند تا از خطر دسترسی غیرمجاز به اطلاعات جلوگیری کند.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ وجود ندارد و پیشنهاد میشود صرفا در مواقع اضطراری از آن استفاده کنید"
+      "en": "This profile provides a collection of publicly shared configurations, gathered with their owners' consent, for easier user access, which are reviewed and examined to support the free flow of information.\nTo enhance user security, Hiddify implements a WARP-based protective layer on these configurations to prevent unauthorized access to data.\nSince the performance and security of these configurations depend on their creators, their stability and operational integrity cannot be guaranteed, and it is recommended to use them only in necessary situations.",
+      "fa": "این پروفایل جهت سهولت دسترسی کاربران، مجموعه‌ای از کانفیگ‌های منتشر شده در فضای عمومی را با هماهنگی صاحبان آن‌ها گردآوری، ارزیابی و بازبینی می‌کند تا در راستای جریان آزاد اطلاعات گام بردارد.\nهیدیفای برای افزایش سطح امنیت کاربران، یک لایه حفاظتی مبتنی بر وارپ را روی این کانفیگ‌ها اعمال می‌کند تا از دسترسی‌های غیرمجاز به داده‌ها پیشگیری کند.\nاز آنجا که عملکرد و امنیت این کانفیگ‌ها به سازندگان آن‌ها وابسته است، پایداری و صحت عملکرد آن‌ها تضمین نمی‌شود و توصیه می‌شود تنها در شرایط ضروری از آن‌ها استفاده نمایید."
     },
     "needed_features": ["warp_over_proxies"]
   },
   {
     "region": ["ir"],
-    "title": {"en": "Anonymous 𝕏", "fa": "انونیموس 𝕏"},
+    "title": {"en": "Anonymous 𝕏", "fa": "انانیموس 𝕏"},
     "sublink": "https://raw.githubusercontent.com/4n0nymou3/multi-proxy-config-fetcher/refs/heads/main/configs/proxy_configs.txt",
     "tags": { "en": ["mix"], "fa": ["عمومی"] },
     "contest": {
-      "en": "This profile collects public and published configurations with the consent of their owners, and tests and verifies them to help the free flow of information.\nTo enhance security, Hidify applies a Warp-based security layer to these configurations to prevent the risk of unauthorized access to information.\nThere is no guarantee that this configuration will function properly and it is recommended to use it only in emergency situations.",
-      "fa": "این پروفایل کانفیگ‌های عمومی و منتشر شده را با رضایت صاحبان آن‌ها جمع آوری می‌کند و تست و بررسی می‌کند تا به گردش آزاد اطلاعات کمک کند.\nبرای بالا بردن امنیت، هیدیفای یک لایه امنیتی مبتنی بر وارپ بر روی این کانفیگها اعمال میکند تا از خطر دسترسی غیرمجاز به اطلاعات جلوگیری کند.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ وجود ندارد و پیشنهاد میشود صرفا در مواقع اضطراری از آن استفاده کنید"
+      "en": "This profile provides a collection of publicly shared configurations, gathered with their owners' consent, for easier user access, which are reviewed and examined to support the free flow of information.\nTo enhance user security, Hiddify implements a WARP-based protective layer on these configurations to prevent unauthorized access to data.\nSince the performance and security of these configurations depend on their creators, their stability and operational integrity cannot be guaranteed, and it is recommended to use them only in necessary situations.",
+      "fa": "این پروفایل جهت سهولت دسترسی کاربران، مجموعه‌ای از کانفیگ‌های منتشر شده در فضای عمومی را با هماهنگی صاحبان آن‌ها گردآوری، ارزیابی و بازبینی می‌کند تا در راستای جریان آزاد اطلاعات گام بردارد.\nهیدیفای برای افزایش سطح امنیت کاربران، یک لایه حفاظتی مبتنی بر وارپ را روی این کانفیگ‌ها اعمال می‌کند تا از دسترسی‌های غیرمجاز به داده‌ها پیشگیری کند.\nاز آنجا که عملکرد و امنیت این کانفیگ‌ها به سازندگان آن‌ها وابسته است، پایداری و صحت عملکرد آن‌ها تضمین نمی‌شود و توصیه می‌شود تنها در شرایط ضروری از آن‌ها استفاده نمایید."
     },
     "needed_features": ["warp_over_proxies"]
   }
