@@ -25,21 +25,21 @@ struct VPNManagerAlert {
 
 class VPNManager: ObservableObject {
     private var cancelBag: Set<AnyCancellable> = []
-    
+
     private var observer: NSObjectProtocol?
     private var manager = NEVPNManager.shared()
     private var loaded: Bool = false
     private var timer: Timer?
-            
+
     static let shared: VPNManager = VPNManager()
-        
+
     @Published private(set) var state: NEVPNStatus = .invalid
     @Published private(set) var alert: VPNManagerAlert = .init(alert: nil, message: nil)
-    
+
     @Published private(set) var upload: Int64 = 0
     @Published private(set) var download: Int64 = 0
     @Published private(set) var elapsedTime: TimeInterval = 0
-    
+
     private var _connectTime: Date?
     private var connectTime: Date? {
         set {
@@ -57,29 +57,29 @@ class VPNManager: ObservableObject {
         }
     }
     private var readingWS: Bool = false
-    
+
     @Published var isConnectedToAnyVPN: Bool = false
-    
+
     init() {
         observer = NotificationCenter.default.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] notification in
             guard let connection = notification.object as? NEVPNConnection else { return }
             self?.state = connection.status
         }
-        
+
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             guard let self else { return }
             updateStats()
             elapsedTime = -1 * (connectTime?.timeIntervalSinceNow ?? 0)
         }
     }
-                
+
     deinit {
         if let observer {
             NotificationCenter.default.removeObserver(observer)
         }
         timer?.invalidate()
     }
-    
+
     func setup() async throws {
         // guard !loaded else { return }
         loaded = true
@@ -89,7 +89,7 @@ class VPNManager: ObservableObject {
             print(error.localizedDescription)
         }
     }
-    
+
     private func loadVPNPreference() async throws {
         do {
             let managers = try await NETunnelProviderManager.loadAllFromPreferences()
@@ -99,7 +99,7 @@ class VPNManager: ObservableObject {
             }
             let newManager = NETunnelProviderManager()
             let `protocol` = NETunnelProviderProtocol()
-            `protocol`.providerBundleIdentifier = Bundle.main.baseBundleIdentifier + ".SingBoxPacketTunnel"
+            `protocol`.providerBundleIdentifier = Bundle.main.baseBundleIdentifier + ".HiddifyPacketTunnel"
             `protocol`.serverAddress = "localhost"
             newManager.protocolConfiguration = `protocol`
             newManager.localizedDescription = "Hiddify"
@@ -110,7 +110,7 @@ class VPNManager: ObservableObject {
             print(error.localizedDescription)
         }
     }
-    
+
     private func enableVPNManager() async throws {
         manager.isEnabled = true
         do {
@@ -120,12 +120,12 @@ class VPNManager: ObservableObject {
             print(error.localizedDescription)
         }
     }
-    
+
     @MainActor private func set(upload: Int64, download: Int64) {
         self.upload = upload
         self.download = download
     }
-    
+
     var isAnyVPNConnected: Bool {
         guard let cfDict = CFNetworkCopySystemProxySettings() else { return false }
         let nsDict = cfDict.takeRetainedValue() as NSDictionary
@@ -141,7 +141,7 @@ class VPNManager: ObservableObject {
         }
         return false
     }
-    
+
     func reset() {
         loaded = false
         if state != .disconnected && state != .invalid {
@@ -161,9 +161,9 @@ class VPNManager: ObservableObject {
                 }
             }
         }.store(in: &cancelBag)
-        
+
     }
-    
+
     private func updateStats() {
         let isAnyVPNConnected = self.isAnyVPNConnected
         if isConnectedToAnyVPN != isAnyVPNConnected {
@@ -191,7 +191,7 @@ class VPNManager: ObservableObject {
             print(error.localizedDescription)
         }
     }
-    
+
     func connect(with config: String, disableMemoryLimit: Bool = false) async throws {
         await set(upload: 0, download: 0)
         guard state == .disconnected else { return }
@@ -206,7 +206,7 @@ class VPNManager: ObservableObject {
         }
         connectTime = .now
     }
-    
+
     func disconnect() {
         guard state == .connected else { return }
         manager.connection.stopVPNTunnel()
