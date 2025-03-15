@@ -343,6 +343,7 @@ class BoxService(
 
     fun onDestroy() {
         binder.close()
+        fileDescriptor?.close()
     }
 
     fun onRevoke() {

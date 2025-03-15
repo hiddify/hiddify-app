@@ -8,6 +8,7 @@ import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
+import android.os.ParcelFileDescriptor
 import com.hiddify.core.libbox.Notification
 import com.hiddify.hiddify.constant.PerAppProxyMode
 import com.hiddify.hiddify.ktx.toIpPrefix

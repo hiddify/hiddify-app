@@ -137,11 +137,11 @@ jobs:
           add-to-path: true
           link-to-sdk: true
 
-      - name: Setup Gradle 7.6.1
+      - name: Setup Gradle 8.7
         if: startsWith(matrix.platform,'android')
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 7.6.1
+          gradle-version: 8.7
       - name: Setup dependencies
         run: |
           make ${{ matrix.platform }}-install-dependencies

@@ -197,6 +197,7 @@ class HiddifyCoreService with InfraLogger {
           StartRequest(
             configPath: path,
             disableMemoryLimit: disableMemoryLimit,
+            delayStart: true,
           ),
         );
         if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
