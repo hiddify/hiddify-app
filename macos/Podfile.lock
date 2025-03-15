@@ -21,26 +21,26 @@ PODS:
     - FlutterMacOS
   - screen_retriever (0.0.1):
     - FlutterMacOS
-  - Sentry/HybridSDK (8.25.0)
-  - sentry_flutter (7.20.2):
+  - Sentry/HybridSDK (8.44.0)
+  - sentry_flutter (8.13.0):
     - Flutter
     - FlutterMacOS
-    - Sentry/HybridSDK (= 8.25.0)
+    - Sentry/HybridSDK (= 8.44.0)
   - share_plus (0.0.1):
     - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - "sqlite3 (3.46.0+1)":
-    - "sqlite3/common (= 3.46.0+1)"
-  - "sqlite3/common (3.46.0+1)"
-  - "sqlite3/dbstatvtab (3.46.0+1)":
+  - "sqlite3 (3.46.1+1)":
+    - "sqlite3/common (= 3.46.1+1)"
+  - "sqlite3/common (3.46.1+1)"
+  - "sqlite3/dbstatvtab (3.46.1+1)":
     - sqlite3/common
-  - "sqlite3/fts5 (3.46.0+1)":
+  - "sqlite3/fts5 (3.46.1+1)":
     - sqlite3/common
-  - "sqlite3/perf-threadsafe (3.46.0+1)":
+  - "sqlite3/perf-threadsafe (3.46.1+1)":
     - sqlite3/common
-  - "sqlite3/rtree (3.46.0+1)":
+  - "sqlite3/rtree (3.46.1+1)":
     - sqlite3/common
   - sqlite3_flutter_libs (0.0.1):
     - FlutterMacOS
@@ -131,11 +131,11 @@ SPEC CHECKSUMS:
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   protocol_handler_macos: d10a6c01d6373389ffd2278013ab4c47ed6d6daa
   screen_retriever: 59634572a57080243dd1bf715e55b6c54f241a38
-  Sentry: cd86fc55628f5b7c572cabe66cc8f95a9d2f165a
-  sentry_flutter: 0cf2507eb90ff7a6aa3304e900dd7f08edbbefdf
+  Sentry: 0f9bc9adfc0b960e7f3bb5ec67e9a3d8193f3bdb
+  sentry_flutter: c4c3e7feec83e061daf829f6f9359efefab00d87
   share_plus: 76dd39142738f7a68dd57b05093b5e8193f220f7
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
-  sqlite3: 292c3e1bfe89f64e51ea7fc7dab9182a017c8630
+  sqlite3: 0bb0e6389d824e40296f531b858a2a0b71c0d2fb
   sqlite3_flutter_libs: 5ca46c1a04eddfbeeb5b16566164aa7ad1616e7b
   tray_manager: 9064e219c56d75c476e46b9a21182087930baf90
   url_launcher_macos: 5f437abeda8c85500ceb03f5c1938a8c5a705399

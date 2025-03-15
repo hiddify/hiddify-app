@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>app.hiddify.com.daemon</string>
+	<key>MachServices</key>
+	<dict>
+		<key>app.hiddify.com.daemon.xpc</key>
+		<true/>
+	</dict>
+	<key>BundleProgram</key>
+	<string>Contents/Resources/PrivilegedHelper</string>
+	<key>KeepAlive</key>
+	<true/>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>ProcessType</key>
+	<string>Interactive</string>
+	<key>StandardErrorPath</key>
+	<string>/var/log/hiddify-helper.log</string>
+	<key>StandardOutPath</key>
+	<string>/var/log/hiddify-helper.log</string>
+	<key>UserName</key>
+	<string>root</string>
+	<key>GroupName</key>
+	<string>wheel</string>
+</dict>
+</plist>
