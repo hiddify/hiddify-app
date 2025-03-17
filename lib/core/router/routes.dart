@@ -27,6 +27,7 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
       path: "/",
       name: HomeRoute.name,
       routes: [
+        TypedGoRoute<ConfigOptionsRoute>(path: "/config-options", name: ConfigOptionsRoute.name),
         TypedGoRoute<ProxiesRoute>(path: "proxies", name: ProxiesRoute.name),
         // TypedGoRoute<QuickSettingsRoute>(path: "quick-settings", name: QuickSettingsRoute.name),
         // TypedGoRoute<ProfilesOverviewBottomSheetRoute>(path: "bottomsheet", name: ProfilesOverviewBottomSheetRoute.name),
@@ -36,7 +37,6 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
       // TypedGoRoute<NewProfileRoute>(path: "profiles/new", name: NewProfileRoute.name),
       TypedGoRoute<ProfileDetailsRoute>(path: "profiles/:id", name: ProfileDetailsRoute.name),
     ]),
-    TypedGoRoute<ConfigOptionsRoute>(path: "/config-options", name: ConfigOptionsRoute.name),
     TypedGoRoute<LogsOverviewRoute>(path: "/logs", name: LogsOverviewRoute.name),
     TypedGoRoute<SettingsRoute>(
       path: "/settings",
