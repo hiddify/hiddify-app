@@ -108,14 +108,17 @@ class AddManualProfileModal extends HookConsumerWidget {
                         ),
                       ),
                       const Gap(4),
-                      Slider(
-                        value: updateInterval.value,
-                        max: 96,
-                        divisions: 96,
-                        label: updateInterval.value.round().toString(),
-                        onChanged: (double value) {
-                          updateInterval.value = value;
-                        },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Slider(
+                          value: updateInterval.value,
+                          max: 96,
+                          divisions: 96,
+                          label: updateInterval.value.round().toString(),
+                          onChanged: (double value) {
+                            updateInterval.value = value;
+                          },
+                        ),
                       ),
                       const Gap(8),
                       Padding(
