@@ -12,6 +12,7 @@ class TlsfragmentTiles extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final canChangeOption = ref.watch(ConfigOptions.enableTlsFragment);
 
     return Column(
       children: [
@@ -28,6 +29,7 @@ class TlsfragmentTiles extends HookConsumerWidget {
           inputToValue: OptionalRange.tryParse,
           presentValue: (value) => value.present(t),
           formatInputValue: (value) => value.format(),
+          enabled: canChangeOption,
         ),
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.tlsFragmentSleep),
@@ -36,18 +38,20 @@ class TlsfragmentTiles extends HookConsumerWidget {
           inputToValue: OptionalRange.tryParse,
           presentValue: (value) => value.present(t),
           formatInputValue: (value) => value.format(),
+          enabled: canChangeOption,
         ),
         switchListTileAdaptive(
           context,
           title: t.config.enableTlsMixedSniCase,
           value: ref.watch(ConfigOptions.enableTlsMixedSniCase),
-          onChanged: ref.read(ConfigOptions.enableTlsMixedSniCase.notifier).update,
+          // onChanged: ref.read(ConfigOptions.enableTlsMixedSniCase.notifier).update,
+          onChanged: canChangeOption ? ref.read(ConfigOptions.enableTlsMixedSniCase.notifier).update : null,
         ),
         switchListTileAdaptive(
           context,
           title: t.config.enableTlsPadding,
           value: ref.watch(ConfigOptions.enableTlsPadding),
-          onChanged: ref.read(ConfigOptions.enableTlsPadding.notifier).update,
+          onChanged: canChangeOption ? ref.read(ConfigOptions.enableTlsPadding.notifier).update : null,
         ),
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.tlsPaddingSize),
@@ -56,6 +60,7 @@ class TlsfragmentTiles extends HookConsumerWidget {
           inputToValue: OptionalRange.tryParse,
           presentValue: (value) => value.format(),
           formatInputValue: (value) => value.format(),
+          enabled: canChangeOption,
         ),
       ],
     );
