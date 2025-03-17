@@ -14,3 +14,5 @@ key.properties
 
 /app/libs/*
 !/app/libs/.gitkeep
+
+/app/.cxx

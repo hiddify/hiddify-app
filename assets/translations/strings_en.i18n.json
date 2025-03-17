@@ -1,6 +1,9 @@
 {
   "general": {
     "appTitle": "Hiddify",
+    "add": "Add",
+    "help": "Help",
+    "continue": "Continue",
     "ok": "Ok",
     "cancel": "Cancel",
     "discard": "Discard",
@@ -46,8 +49,7 @@
         "url": "https://hiddify.com/manager/"
       }
     },
-    "noActiveProfileMsg": "Choose a Profile",
-    "ok": "Ok"
+    "noActiveProfileMsg": "Choose a Profile"
   },
   "stats": {
     "traffic": "Traffic",
@@ -65,6 +67,18 @@
     "activeProfileNameSemanticLabel": "Active Profile Name: \"${name}\".",
     "activeProfileBtnSemanticLabel": "View All Profiles",
     "nonActiveProfileBtnSemanticLabel": "Select \"${name}\" as Active Profile",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n Day",
+        "other": "$n Days"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n Hour",
+        "other": "$n Hours"
+      }
+    },
     "subscription": {
       "traffic": "Traffic",
       "updatedTimeAgo": "Updated ${timeago}",
@@ -88,10 +102,10 @@
       "name": "Alphabetically"
     },
     "add": {
-      "buttonText": "New Connection Profile",
-      "shortBtnTxt": "New Connection Profile",
+      "buttonText": "Add New Profile",
+      "shortBtnTxt": "New Profile",
       "fromClipboard": "Clipboard",
-      "scanQr": "Scan",
+      "scanQr": "Scan QR",
       "qrScanner": {
         "permissionDeniedError": "Permission Denied",
         "unexpectedError": "Something Went Wrong",
@@ -101,12 +115,8 @@
       },
       "manually": "Manual",
       "free": "FREE",
-      "fialed_to_load": "Failed to Load",
-      "no_free_subscription_found": "No free subscription found",
-      "help": "Help",
-      "ok": "Ok",
-      "continue": "Continue",
-      "cancel": "Cancel",
+      "failedToLoad": "Failed to Load",
+      "noFreeSubscriptionFound": "No free subscription found",
       "addWarp": "WARP",
       "addFragment": "Fragment",
       "addingWarpMsg": "Please wait while we register WARP.",
@@ -125,9 +135,9 @@
     "share": {
       "buttonText": "Share",
       "exportToClipboardSuccess": "Exported to Clipboard",
-      "exportSubLinkToClipboard": "Export Connection Profile Link to Clipboard",
-      "subLinkQrCode": "Connection Profile Link QR Code",
-      "exportConfigToClipboard": "Export Connection Profile to Clipboard",
+      "exportSubLinkToClipboard": "URL to Clipboard",
+      "subLinkQrCode": "Show URL QR",
+      "exportConfigToClipboard": "JSON to Clipboard",
       "exportConfigToClipboardSuccess": "Connection Profile Copied to Clipboard"
     },
     "edit": {
@@ -198,10 +208,10 @@
     "exportOptions": "Copy Anonymous Options to Clipboard",
     "exportAllOptions": "Copy All Options to Clipboard",
     "importOptions": "Import Options From Clipboard",
+    "importOptionsMsg": "This will rewrite all config options with provided values. Are you sure?",
     "exportOptionsFile": "Export Anonymous Options to File",
     "exportAllOptionsFile": "Export All Options to File",
     "importOptionsFile": "Import Options From File",
-    "importOptionsMsg": "This will rewrite all config options with provided values. Are you sure?",
     "general": {
       "sectionTitle": "General",
       "locale": "Language",

@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
-
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/core/router/routes.dart';
-import 'package:hiddify/core/theme/theme_extensions.dart';
-
+import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/connection/widget/experimental_feature_notice.dart';
 import 'package:hiddify/features/home/widget/new_con_button.dart';
-// import 'package:hiddify/features/home/widget/new_connection_button.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-
 import 'package:hiddify/utils/alerts.dart';
 import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 class ConnectionButton extends ConsumerStatefulWidget {
-  const ConnectionButton({Key? key}) : super(key: key);
+  const ConnectionButton({super.key});
 
   @override
   _ConnectionButtonState createState() => _ConnectionButtonState();
@@ -57,7 +50,7 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
     final delay = activeProxy.valueOrNull?.urlTestDelay ?? 0;
 
     final requiresReconnect = ref.watch(configOptionNotifierProvider).valueOrNull;
-    final today = DateTime.now();
+    // final today = DateTime.now();
 
     ref.listen(
       connectionNotifierProvider,
@@ -71,7 +64,7 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
       },
     );
 
-    final buttonTheme = ConnectionButtonTheme.light;
+    // final buttonTheme = ConnectionButtonTheme.light;
 
     Future<bool> showExperimentalNotice() async {
       final hasExperimental = ref.read(ConfigOptions.hasExperimentalFeatures);
@@ -110,14 +103,13 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
                       onPressed: () {
                         Navigator.of(context).pop(false);
                       },
-                      child: Text(t.home.ok),
-                    )
+                      child: Text(t.general.ok),
+                    ),
                   ],
                 ),
               );
-              return await AddProfileRoute().push(context);
+              ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile();
             }
-            ;
             // return await showNewConnectionButton(context, ref);
             switch (connectionStatus) {
               case AsyncData(value: Disconnected()) || AsyncError():
@@ -142,7 +134,7 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
           },
           color: switch (connectionStatus) {
             AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
-            AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => Color.fromARGB(255, 157, 139, 1),
+            AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => const Color.fromARGB(255, 157, 139, 1),
             AsyncData(value: Connected()) => Colors.green.shade900,
             AsyncData(value: _) => Colors.indigo.shade700, // Color(0xFF3446A5), //buttonTheme.idleColor!,
             _ => Colors.red,

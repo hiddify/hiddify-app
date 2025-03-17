@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -25,8 +23,8 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
   Future<void> build() async {
     if (!PlatformUtils.isDesktop) return;
 
-    final activeProxy = await ref.watch(activeProxyNotifierProvider);
-    final delay = activeProxy.value?.urlTestDelay ?? 0;
+    final activeProxy = await ref.watch(activeProxyNotifierProvider.future);
+    final delay = activeProxy.urlTestDelay;
     final newConnectionStatus = delay > 0 && delay < 65000;
     ConnectionStatus connection;
     try {
@@ -36,11 +34,11 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
       connection = const ConnectionStatus.disconnected();
     }
 
-    final t = ref.watch(translationsProvider).requireValue;
+    final t = await ref.watch(translationsProvider.future);
 
     var tooltip = Constants.appName;
     final serviceMode = ref.watch(ConfigOptions.serviceMode);
-    if (connection == Disconnected()) {
+    if (connection is Disconnected) {
       setIcon(connection);
     } else if (newConnectionStatus) {
       setIcon(const Connected());
@@ -61,13 +59,13 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
     }
     if (!Platform.isLinux) await trayManager.setToolTip(tooltip);
 
-    final destinations = <(String label, String location)>[
-      (t.home.pageTitle, const HomeRoute().location),
-      (t.proxies.pageTitle, const ProfilesOverviewRoute().location),
-      (t.logs.pageTitle, const LogsOverviewRoute().location),
-      // (t.settings.pageTitle, const SettingsRoute().location),
-      (t.about.pageTitle, const AboutRoute().location),
-    ];
+    // final destinations = <(String label, String location)>[
+    //   (t.home.pageTitle, const HomeRoute().location),
+    //   (t.proxies.pageTitle, const ProfilesOverviewRoute().location),
+    //   (t.logs.pageTitle, const LogsOverviewRoute().location),
+    //   // (t.settings.pageTitle, const SettingsRoute().location),
+    //   (t.about.pageTitle, const AboutRoute().location),
+    // ];
 
     // loggy.debug('updating system tray');
 
@@ -172,7 +170,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
           }
       }
     }
-    final isDarkMode = false;
+    // const isDarkMode = false;
     switch (status) {
       case Connected():
         return Assets.images.trayIconConnectedPng.path;
@@ -181,11 +179,12 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
       case Disconnecting():
         return Assets.images.trayIconDisconnectedPng.path;
       case Disconnected():
-        if (isDarkMode) {
-          return Assets.images.trayIconDarkPng.path;
-        } else {
-          return Assets.images.trayIconPng.path;
-        }
+        // if (isDarkMode) {
+        //   return Assets.images.trayIconDarkPng.path;
+        // } else {
+        //   return Assets.images.trayIconPng.path;
+        // }
+        return Assets.images.trayIconPng.path;
     }
     // return Assets.images.trayIconPng.path;
   }

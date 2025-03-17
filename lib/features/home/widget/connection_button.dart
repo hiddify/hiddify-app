@@ -3,12 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/router/routes.dart';
+import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
-import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/connection/widget/experimental_feature_notice.dart';
@@ -19,9 +18,6 @@ import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // TODO: rewrite
 class ConnectionButton extends HookConsumerWidget {
@@ -66,7 +62,7 @@ class ConnectionButton extends HookConsumerWidget {
     //   //   },
     //   // );
 
-    final buttonTheme = ConnectionButtonTheme.light;
+    const buttonTheme = ConnectionButtonTheme.light;
 
     Future<bool> showExperimentalNotice() async {
       final hasExperimental = ref.read(ConfigOptions.hasExperimentalFeatures);
@@ -151,12 +147,12 @@ class ConnectionButton extends HookConsumerWidget {
                       onPressed: () {
                         Navigator.of(context).pop(false);
                       },
-                      child: Text(t.home.ok),
+                      child: Text(t.general.ok),
                     ),
                   ],
                 ),
               );
-              return await AddProfileRoute().push(context);
+              ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile();
             }
             if (await showExperimentalNotice()) {
               return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
@@ -182,7 +178,7 @@ class ConnectionButton extends HookConsumerWidget {
       },
       buttonColor: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
-        AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => Color.fromARGB(255, 185, 176, 103),
+        AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => const Color.fromARGB(255, 185, 176, 103),
         AsyncData(value: Connected()) => buttonTheme.connectedColor!,
         AsyncData(value: _) => buttonTheme.idleColor!,
         _ => Colors.red,
@@ -198,7 +194,7 @@ class ConnectionButton extends HookConsumerWidget {
       },
       newButtonColor: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
-        AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => Color.fromARGB(255, 185, 176, 103),
+        AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => const Color.fromARGB(255, 185, 176, 103),
         AsyncData(value: Connected()) => buttonTheme.connectedColor!,
         AsyncData(value: _) => buttonTheme.idleColor!,
         _ => Colors.red,
@@ -258,7 +254,7 @@ class _ConnectionButton extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   blurRadius: 16,
-                  color: buttonColor.withOpacity(0.5),
+                  color: buttonColor.withValues(alpha: .5),
                 ),
               ],
             ),
@@ -277,7 +273,7 @@ class _ConnectionButton extends StatelessWidget {
                     duration: const Duration(milliseconds: 250),
                     builder: (context, value, child) {
                       if (useImage) {
-                        return image.image(filterQuality: FilterQuality.medium);
+                        return image.image();
                       } else {
                         return Assets.images.logo.svg(
                           colorFilter: ColorFilter.mode(

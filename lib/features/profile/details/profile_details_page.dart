@@ -22,7 +22,7 @@ import 'package:humanizer/humanizer.dart';
 // import 'package:json_editor_flutter/json_editor_flutter.dart';
 
 class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
-  const ProfileDetailsPage(this.id, {super.key});
+  const ProfileDetailsPage({super.key, required this.id});
 
   final String id;
 
@@ -279,7 +279,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                 expandedObjects: const ["outbounds"],
                                 onChanged: (value) {
                                   if (value == null) return;
-                                  const encoder = const JsonEncoder.withIndent('  ');
+                                  const encoder = JsonEncoder.withIndent('  ');
 
                                   notifier.setField(configContent: encoder.convert(value));
                                 },
