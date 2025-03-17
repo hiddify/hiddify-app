@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/router/app_router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/config_option/overview/config_options_page.dart';
-import 'package:hiddify/features/config_option/widget/quick_settings_modal.dart';
 
 import 'package:hiddify/features/home/widget/home_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
@@ -15,7 +14,6 @@ import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/settings/overview/settings_overview_page.dart';
-import 'package:hiddify/utils/utils.dart';
 
 part 'routes.g.dart';
 
@@ -27,16 +25,26 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
       path: "/",
       name: HomeRoute.name,
       routes: [
-        TypedGoRoute<ConfigOptionsRoute>(path: "/config-options", name: ConfigOptionsRoute.name),
-        TypedGoRoute<ProxiesRoute>(path: "proxies", name: ProxiesRoute.name),
+        TypedGoRoute<ConfigOptionsRoute>(
+          path: "/config-options",
+          name: ConfigOptionsRoute.name,
+        ),
+        TypedGoRoute<ProxiesRoute>(
+          path: "proxies",
+          name: ProxiesRoute.name,
+        ),
+        TypedGoRoute<ProfilesOverviewRoute>(
+          path: "/profiles",
+          name: ProfilesOverviewRoute.name,
+          routes: [
+            TypedGoRoute<ProfileDetailsRoute>(path: "profiles/:id", name: ProfileDetailsRoute.name),
+            // TypedGoRoute<NewProfileRoute>(path: "profiles/new", name: NewProfileRoute.name),
+          ],
+        ),
         // TypedGoRoute<QuickSettingsRoute>(path: "quick-settings", name: QuickSettingsRoute.name),
         // TypedGoRoute<ProfilesOverviewBottomSheetRoute>(path: "bottomsheet", name: ProfilesOverviewBottomSheetRoute.name),
       ],
     ),
-    TypedGoRoute<ProfilesOverviewRoute>(path: "/profiles", name: ProfilesOverviewRoute.name, routes: [
-      // TypedGoRoute<NewProfileRoute>(path: "profiles/new", name: NewProfileRoute.name),
-      TypedGoRoute<ProfileDetailsRoute>(path: "profiles/:id", name: ProfileDetailsRoute.name),
-    ]),
     TypedGoRoute<LogsOverviewRoute>(path: "/logs", name: LogsOverviewRoute.name),
     TypedGoRoute<SettingsRoute>(
       path: "/settings",
