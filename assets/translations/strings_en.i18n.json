@@ -463,7 +463,7 @@
     "experimentalNoticeMsg": "You've enabled some experimental features which might affect connection quality and cause unexpected errors. You can always change or reset these options from Config options page.",
     "disableExperimentalNotice": "Don't Show Again",
     "reconnectMsg": "Reconnecting for taking into account the changes...",
-    "secure": "Secure by WARP"
+    "secure": "Secured by WARP"
   },
   "config": {
     "useXrayCoreWhenPossible": {
