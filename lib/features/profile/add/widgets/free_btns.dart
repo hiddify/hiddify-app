@@ -15,7 +15,7 @@ class FreeBtns extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue.profile.add;
+    final t = ref.watch(translationsProvider).requireValue;
     final freeProfiles = ref.watch(freeProfilesProvider);
     final theme = Theme.of(context);
     final locale = ref.watch(localePreferencesProvider);
@@ -32,7 +32,7 @@ class FreeBtns extends ConsumerWidget {
         ),
       AsyncError() => Center(
           child: Text(
-            t.fialed_to_load,
+            t.profile.add.failedToLoad,
             style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface),
           ),
         ),
@@ -62,16 +62,17 @@ class FreeBtns extends ConsumerWidget {
                             constraints: AlertDialogConst.boxConstraints,
                             child: MarkdownBody(
                               data: isFa ? profile.contest.fa : profile.contest.en,
+                              styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.spaceBetween),
                               onTapLink: (text, href, title) => UriUtils.tryLaunch(Uri.parse(href!)),
                             ),
                           ),
                           actions: [
                             TextButton(
-                              child: Text(t.cancel),
+                              child: Text(t.general.cancel),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                             TextButton(
-                              child: Text(t.kContinue),
+                              child: Text(t.general.kContinue),
                               onPressed: () => Navigator.of(context).pop(true),
                             ),
                           ],
@@ -85,7 +86,7 @@ class FreeBtns extends ConsumerWidget {
             )
           : Center(
               child: Text(
-                t.no_free_subscription_found,
+                t.profile.add.noFreeSubscriptionFound,
                 style: theme.textTheme.bodySmall!.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),

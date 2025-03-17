@@ -69,7 +69,7 @@ class NavBar extends ConsumerWidget {
                       onPressed: () {
                         Navigator.of(context).pop(false);
                       },
-                      child: Text(t.profile.add.ok),
+                      child: Text(t.general.ok),
                     ),
                   ],
                 ),

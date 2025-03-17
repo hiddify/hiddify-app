@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EmptyProfilesHomeBody extends HookConsumerWidget {
@@ -19,10 +22,8 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
           Text(t.home.emptyProfilesMsg.text),
           const Gap(16),
           ElevatedButton(
-            onPressed: () => const AddProfileRoute().push(context),
-
+            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
             // icon: const Icon(FluentIcons.add_24_regular),
-
             child: Text(t.profile.add.buttonText),
           ),
         ],

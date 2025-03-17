@@ -11,34 +11,32 @@ class Loading extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
-    return Expanded(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 64),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                t.profile.add.addingProfileMsg,
-                style: theme.textTheme.bodyMedium!.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 64),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              t.profile.add.addingProfileMsg,
+              style: theme.textTheme.bodyMedium!.copyWith(
+                color: theme.colorScheme.onSurface,
               ),
-              const Gap(20),
-              const LinearProgressIndicator(
-                backgroundColor: Colors.transparent,
+            ),
+            const Gap(20),
+            const LinearProgressIndicator(
+              backgroundColor: Colors.transparent,
+            ),
+            const Gap(8),
+            TextButton(
+              onPressed: () {
+                ref.invalidate(addProfileProvider);
+              },
+              child: Text(
+                MaterialLocalizations.of(context).cancelButtonLabel,
               ),
-              const Gap(8),
-              TextButton(
-                onPressed: () {
-                  ref.invalidate(addProfileProvider);
-                },
-                child: Text(
-                  MaterialLocalizations.of(context).cancelButtonLabel,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

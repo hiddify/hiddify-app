@@ -10,7 +10,6 @@ import 'package:hiddify/features/home/widget/home_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
 import 'package:hiddify/features/log/overview/logs_overview_page.dart';
 import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_page.dart';
-import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/details/profile_details_page.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
@@ -29,13 +28,12 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
       name: HomeRoute.name,
       routes: [
         TypedGoRoute<ProxiesRoute>(path: "proxies", name: ProxiesRoute.name),
-        TypedGoRoute<QuickSettingsRoute>(path: "quick-settings", name: QuickSettingsRoute.name),
-        TypedGoRoute<ProfilesOverviewBottomSheetRoute>(path: "bottomsheet", name: ProfilesOverviewBottomSheetRoute.name),
+        // TypedGoRoute<QuickSettingsRoute>(path: "quick-settings", name: QuickSettingsRoute.name),
+        // TypedGoRoute<ProfilesOverviewBottomSheetRoute>(path: "bottomsheet", name: ProfilesOverviewBottomSheetRoute.name),
       ],
     ),
     TypedGoRoute<ProfilesOverviewRoute>(path: "/profiles", name: ProfilesOverviewRoute.name, routes: [
-      TypedGoRoute<AddProfileRoute>(path: "profiles/add", name: AddProfileRoute.name),
-      TypedGoRoute<NewProfileRoute>(path: "profiles/new", name: NewProfileRoute.name),
+      // TypedGoRoute<NewProfileRoute>(path: "profiles/new", name: NewProfileRoute.name),
       TypedGoRoute<ProfileDetailsRoute>(path: "profiles/:id", name: ProfileDetailsRoute.name),
     ]),
     TypedGoRoute<ConfigOptionsRoute>(path: "/config-options", name: ConfigOptionsRoute.name),
@@ -90,15 +88,17 @@ class IntroRoute extends HRouteData {
 }
 
 class HomeRoute extends HRouteData {
-  const HomeRoute();
+  const HomeRoute({this.url});
   static const name = "Home";
+
+  final String? url;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return const MaterialPage(
+    return MaterialPage(
       // context: context,
       name: name,
-      child: HomePage(),
+      child: HomePage(url: url),
     );
   }
 
@@ -132,33 +132,6 @@ class ProxiesRoute extends HRouteData {
   String getLocation() => location;
 }
 
-class AddProfileRoute extends HRouteData {
-  const AddProfileRoute({this.url});
-
-  final String? url;
-
-  static const name = "Add Profile";
-
-  static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
-
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return BottomSheetPage(
-      fixed: true,
-      name: name,
-      builder: (controller) => AddProfileModal(
-        url: url,
-        scrollController: controller,
-      ),
-    );
-  }
-
-  @override
-  String getName() => AddProfileRoute.name;
-  @override
-  String getLocation() => location;
-}
-
 class ProfilesOverviewRoute extends HRouteData {
   const ProfilesOverviewRoute();
   static const name = "Profiles";
@@ -167,9 +140,9 @@ class ProfilesOverviewRoute extends HRouteData {
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return MaterialPage(
+    return const MaterialPage(
       name: name,
-      child: const ProfilesOverviewModal(),
+      child: ProfilesOverviewPage(),
     );
     // return BottomSheetPage(
     //   name: name,
@@ -183,48 +156,48 @@ class ProfilesOverviewRoute extends HRouteData {
   String getLocation() => location;
 }
 
-class ProfilesOverviewBottomSheetRoute extends HRouteData {
-  const ProfilesOverviewBottomSheetRoute();
-  static const name = "ProfilesBottom";
+// class ProfilesOverviewBottomSheetRoute extends HRouteData {
+//   const ProfilesOverviewBottomSheetRoute();
+//   static const name = "ProfilesBottom";
 
-  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
+//   static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
 
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return BottomSheetPage(
-      fixed: true,
-      name: name,
-      builder: (controller) => const ProfilesOverviewModal(),
-    );
-  }
+//   @override
+//   Page<void> buildPage(BuildContext context, GoRouterState state) {
+//     return BottomSheetPage(
+//       fixed: true,
+//       name: name,
+//       builder: (controller) => const ProfilesOverviewModal(),
+//     );
+//   }
 
-  @override
-  String getName() => ProfilesOverviewBottomSheetRoute.name;
+//   @override
+//   String getName() => ProfilesOverviewBottomSheetRoute.name;
 
-  @override
-  String getLocation() => location;
-}
+//   @override
+//   String getLocation() => location;
+// }
 
-class NewProfileRoute extends HRouteData {
-  const NewProfileRoute();
-  static const name = "New Profile";
+// class NewProfileRoute extends HRouteData {
+//   const NewProfileRoute();
+//   static const name = "New Profile";
 
-  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
+//   static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
 
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return MaterialPage(
-      fullscreenDialog: true,
-      name: name,
-      child: ProfileDetailsPage("new"),
-    );
-  }
+//   @override
+//   Page<void> buildPage(BuildContext context, GoRouterState state) {
+//     return const MaterialPage(
+//       fullscreenDialog: true,
+//       name: name,
+//       child: ProfileDetailsPage("new"),
+//     );
+//   }
 
-  @override
-  String getName() => NewProfileRoute.name;
-  @override
-  String getLocation() => location;
-}
+//   @override
+//   String getName() => NewProfileRoute.name;
+//   @override
+//   String getLocation() => location;
+// }
 
 class ProfileDetailsRoute extends HRouteData {
   const ProfileDetailsRoute(this.id);
@@ -238,7 +211,7 @@ class ProfileDetailsRoute extends HRouteData {
     return MaterialPage(
       fullscreenDialog: true,
       name: name,
-      child: ProfileDetailsPage(id),
+      child: ProfileDetailsPage(id: id),
     );
   }
 
@@ -272,26 +245,26 @@ class LogsOverviewRoute extends HRouteData {
   String getLocation() => location;
 }
 
-class QuickSettingsRoute extends HRouteData {
-  const QuickSettingsRoute();
-  static const name = "Quick Settings";
+// class QuickSettingsRoute extends HRouteData {
+//   const QuickSettingsRoute();
+//   static const name = "Quick Settings";
 
-  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
+//   static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
 
-  @override
-  Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return BottomSheetPage(
-      fixed: true,
-      name: name,
-      builder: (controller) => const QuickSettingsModal(),
-    );
-  }
+//   @override
+//   Page<void> buildPage(BuildContext context, GoRouterState state) {
+//     return BottomSheetPage(
+//       fixed: true,
+//       name: name,
+//       builder: (controller) => const QuickSettingsModal(),
+//     );
+//   }
 
-  @override
-  String getName() => QuickSettingsRoute.name;
-  @override
-  String getLocation() => location;
-}
+//   @override
+//   String getName() => QuickSettingsRoute.name;
+//   @override
+//   String getLocation() => location;
+// }
 
 class SettingsRoute extends HRouteData {
   const SettingsRoute();
@@ -348,14 +321,14 @@ class PerAppProxyRoute extends GoRouteData {
   const PerAppProxyRoute();
   static const name = "Per-app Proxy";
 
-  static final GlobalKey<NavigatorState>? $parentNavigatorKey = null;
+  static const GlobalKey<NavigatorState>? $parentNavigatorKey = null;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return MaterialPage(
+    return const MaterialPage(
       // fullscreenDialog: true,
       name: name,
-      child: const PerAppProxyPage(),
+      child: PerAppProxyPage(),
     );
   }
 

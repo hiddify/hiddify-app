@@ -1,16 +1,15 @@
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
-import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_card.dart';
@@ -20,13 +19,22 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 class HomePage extends HookConsumerWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.url});
+
+  final String? url;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final hasAnyProfile = ref.watch(hasAnyProfileProvider);
+    // final hasAnyProfile = ref.watch(hasAnyProfileProvider);
     final activeProfile = ref.watch(activeProfileProvider);
+
+    useEffect(() {
+      if (url != null) {
+        ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(url: url);
+      }
+      return null;
+    }, [url]);
 
     return Scaffold(
       appBar: AppBar(
@@ -81,7 +89,8 @@ class HomePage extends HookConsumerWidget {
                 ),
               ],
             ),
-            onPressed: () => const QuickSettingsRoute().push(context),
+            // onPressed: () => const QuickSettingsRoute().push(context),
+            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showQuickSettings(),
           ),
           TextButton(
             child: Row(
@@ -96,14 +105,7 @@ class HomePage extends HookConsumerWidget {
                 ),
               ],
             ),
-            onPressed: () => showModalBottomSheet(
-              useRootNavigator: true,
-              useSafeArea: true,
-              constraints: BottomSheetConst.boxConstraints,
-              isScrollControlled: true,
-              context: context,
-              builder: (context) => const AddProfileModal(),
-            ),
+            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
           ),
         ],
       ),
@@ -114,61 +116,66 @@ class HomePage extends HookConsumerWidget {
             fit: BoxFit.cover,
             opacity: 0.09,
             colorFilter: Theme.of(context).brightness == Brightness.dark
-                ? ColorFilter.mode(Colors.white.withOpacity(.15), BlendMode.srcIn) //
-                : ColorFilter.mode(Colors.grey.withOpacity(1), BlendMode.srcATop), // Apply white tint in dark mode
+                ? ColorFilter.mode(Colors.white.withValues(alpha: .15), BlendMode.srcIn) //
+                : ColorFilter.mode(Colors.grey.withValues(alpha: 1), BlendMode.srcATop), // Apply white tint in dark mode
           ),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
             Center(
-                child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 600, // Set the maximum width here
-              ),
-              child: CustomScrollView(
-                slivers: [
-                  // switch (activeProfile) {
-                  // AsyncData(value: final profile?) =>
-                  MultiSliver(
-                    children: [
-                      // const Gap(100),
-                      switch (activeProfile) {
-                        AsyncData(value: final profile?) => ProfileTile(profile: profile, isMain: true),
-                        _ => const Text(""),
-                      },
-
-                      const SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ConnectionButton(),
-                                  ActiveProxyDelayIndicator(),
-                                ],
-                              ),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 600, // Set the maximum width here
+                ),
+                child: CustomScrollView(
+                  slivers: [
+                    // switch (activeProfile) {
+                    // AsyncData(value: final profile?) =>
+                    MultiSliver(
+                      children: [
+                        // const Gap(100),
+                        switch (activeProfile) {
+                          AsyncData(value: final profile?) => ProfileTile(
+                              profile: profile,
+                              isMain: true,
+                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              color: Theme.of(context).colorScheme.surfaceContainer,
                             ),
-                            ActiveProxyFooter(),
-                          ],
+                          _ => const Text(""),
+                        },
+                        const SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    ConnectionButton(),
+                                    ActiveProxyDelayIndicator(),
+                                  ],
+                                ),
+                              ),
+                              ActiveProxyFooter(),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  // AsyncData() => switch (hasAnyProfile) {
-                  //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                  //     _ => const EmptyProfilesHomeBody(),
-                  //   },
-                  // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
-                  // _ => const SliverToBoxAdapter(),
-                  // },
-                ],
+                      ],
+                    ),
+                    // AsyncData() => switch (hasAnyProfile) {
+                    //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
+                    //     _ => const EmptyProfilesHomeBody(),
+                    //   },
+                    // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
+                    // _ => const SliverToBoxAdapter(),
+                    // },
+                  ],
+                ),
               ),
-            ))
+            ),
           ],
         ),
       ),

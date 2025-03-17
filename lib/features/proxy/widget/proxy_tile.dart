@@ -64,7 +64,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       selected: selected,
       selectedTileColor: theme.colorScheme.primaryContainer,
       onTap: onSelect,
-      onLongPress: () async {
+      onLongPress: () {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -94,7 +94,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
 class OutboundInfoWidget extends HookConsumerWidget {
   final OutboundInfo outboundInfo;
 
-  OutboundInfoWidget({required this.outboundInfo});
+  const OutboundInfoWidget({super.key, required this.outboundInfo});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

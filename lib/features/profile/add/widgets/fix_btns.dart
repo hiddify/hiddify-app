@@ -4,8 +4,8 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/core/router/routes.dart';
-import 'package:hiddify/features/common/qr_code_scanner_screen.dart';
+import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/add/widgets/widgets.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -31,7 +31,7 @@ class FixBtns extends ConsumerWidget {
             title: t.scanQr,
             icon: Icons.qr_code_scanner,
             onTap: () async {
-              final cr = await const QRCodeScannerScreen().open(context);
+              final cr = await ref.read(dialogNotifierProvider.notifier).showQrScanner<String>();
               if (cr == null) return;
               if (addProfileState.isLoading) return;
               ref.read(addProfileProvider.notifier).add(cr);
@@ -56,9 +56,9 @@ class FixBtns extends ConsumerWidget {
           height: height,
           title: t.manually,
           icon: Icons.add,
-          onTap: () async {
-            await const NewProfileRoute().push(context);
-            if (context.mounted) context.pop();
+          onTap: () {
+            context.pop();
+            ref.read(buttomSheetsNotifierProvider.notifier).showAddManualProfile();
           },
         ),
         const Gap(AddProfileModalConst.fixBtnsGap),

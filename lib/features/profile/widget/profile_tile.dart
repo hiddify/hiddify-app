@@ -6,7 +6,9 @@ import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
@@ -27,12 +29,16 @@ class ProfileTile extends HookConsumerWidget {
     super.key,
     required this.profile,
     this.isMain = false,
+    this.margin = EdgeInsets.zero,
+    this.color,
   });
 
   final ProfileEntity profile;
 
   /// home screen active profile card
   final bool isMain;
+  final EdgeInsets margin;
+  final Color? color;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,132 +59,145 @@ class ProfileTile extends HookConsumerWidget {
       _ => null,
     };
 
-    final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
-    final double effectiveElevation = profile.active ? 12 : 4;
-    final effectiveOutlineColor = profile.active ? theme.colorScheme.outlineVariant : Colors.transparent;
+    // final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
+    // final double effectiveElevation = profile.active ? 12 : 4;
+    // final effectiveOutlineColor = profile.active ? theme.colorScheme.outline : Colors.transparent;
     return Card(
-      margin: effectiveMargin,
-      elevation: effectiveElevation,
+      // margin: effectiveMargin,
+      // elevation: effectiveElevation,
+      margin: margin,
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: effectiveOutlineColor),
-        borderRadius: BorderRadius.circular(16),
+        side: profile.active ? BorderSide(color: theme.colorScheme.outline) : BorderSide.none,
+        borderRadius: ProfileTileConst.cardBorderRadius,
       ),
-      shadowColor: Colors.transparent,
+      // color: color ?? theme.colorScheme.secondaryContainer,
+      elevation: profile.active ? 0 : 1,
+
+      // shadowColor: Colors.transparent,
       child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (profile is RemoteProfileEntity || !isMain) ...[
-              SizedBox(
-                width: 48,
-                child: Semantics(
-                  sortKey: const OrdinalSortKey(1),
-                  child: ProfileActionButton(profile, !isMain),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 48),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (profile is RemoteProfileEntity || !isMain) ...[
+                SizedBox(
+                  width: 48,
+                  child: Semantics(
+                    sortKey: const OrdinalSortKey(1),
+                    child: ProfileActionButton(profile, !isMain),
+                  ),
                 ),
-              ),
-              VerticalDivider(
-                width: 1,
-                color: effectiveOutlineColor,
-              ),
-            ],
-            Expanded(
-              child: Semantics(
-                button: true,
-                sortKey: isMain ? const OrdinalSortKey(0) : null,
-                focused: isMain,
-                liveRegion: isMain,
-                namesRoute: isMain,
-                label: isMain ? t.profile.activeProfileBtnSemanticLabel : null,
-                child: InkWell(
-                  onTap: () {
-                    if (isMain) {
-                      if (Breakpoints.small.isActive(context)) {
-                        const ProfilesOverviewBottomSheetRoute().push(context);
+                if (profile.active)
+                  VerticalDivider(
+                    width: 1,
+                    color: theme.colorScheme.outline,
+                  )
+                else
+                  const Gap(1),
+              ],
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  sortKey: isMain ? const OrdinalSortKey(0) : null,
+                  focused: isMain,
+                  liveRegion: isMain,
+                  namesRoute: isMain,
+                  label: isMain ? t.profile.activeProfileBtnSemanticLabel : null,
+                  child: InkWell(
+                    borderRadius: ProfileTileConst.endBorderRadius(Directionality.of(context)),
+                    onTap: () {
+                      if (isMain) {
+                        if (Breakpoints.small.isActive(context)) {
+                          ref.read(buttomSheetsNotifierProvider.notifier).showProfilesOverview();
+                        } else {
+                          const ProfilesOverviewRoute().go(context);
+                        }
                       } else {
-                        const ProfilesOverviewRoute().go(context);
+                        if (selectActiveMutation.state.isInProgress) return;
+                        // if (profile.active) return;
+                        selectActiveMutation.setFuture(
+                          ref.read(profilesOverviewNotifierProvider.notifier).selectActiveProfile(profile.id),
+                        );
+                        if (context.canPop()) {
+                          context.pop();
+                        } else {
+                          const HomeRoute().go(context);
+                        }
                       }
-                    } else {
-                      if (selectActiveMutation.state.isInProgress) return;
-                      // if (profile.active) return;
-                      selectActiveMutation.setFuture(
-                        ref.read(profilesOverviewNotifierProvider.notifier).selectActiveProfile(profile.id),
-                      );
-                      if (context.canPop()) {
-                        context.pop();
-                      } else {
-                        const HomeRoute().go(context);
-                      }
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (isMain)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Material(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.transparent,
-                              clipBehavior: Clip.antiAlias,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      profile.name,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
-                                      ),
-                                      semanticsLabel: t.profile.activeProfileNameSemanticLabel(
-                                        name: profile.name,
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      child: Column(
+                        // mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (isMain)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Material(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.transparent,
+                                clipBehavior: Clip.antiAlias,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        profile.name,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
+                                        ),
+                                        semanticsLabel: t.profile.activeProfileNameSemanticLabel(
+                                          name: profile.name,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const Icon(
-                                    FluentIcons.caret_down_16_filled,
-                                    size: 16,
-                                  ),
-                                ],
+                                    const Icon(
+                                      FluentIcons.caret_down_16_filled,
+                                      size: 16,
+                                    ),
+                                  ],
+                                ),
                               ),
+                            )
+                          else
+                            Text(
+                              profile.name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
+                              ),
+                              semanticsLabel: profile.active
+                                  ? t.profile.activeProfileNameSemanticLabel(
+                                      name: profile.name,
+                                    )
+                                  : t.profile.nonActiveProfileBtnSemanticLabel(
+                                      name: profile.name,
+                                    ),
                             ),
-                          )
-                        else
-                          Text(
-                            profile.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
-                            ),
-                            semanticsLabel: profile.active
-                                ? t.profile.activeProfileNameSemanticLabel(
-                                    name: profile.name,
-                                  )
-                                : t.profile.nonActiveProfileBtnSemanticLabel(
-                                    name: profile.name,
-                                  ),
-                          ),
-                        if (subInfo != null) ...[
-                          const Gap(4),
-                          RemainingTrafficIndicator(subInfo.ratio),
-                          const Gap(4),
-                          ProfileSubscriptionInfo(subInfo),
-                          const Gap(4),
+                          if (subInfo != null) ...[
+                            const Gap(4),
+                            RemainingTrafficIndicator(subInfo.ratio),
+                            const Gap(4),
+                            ProfileSubscriptionInfo(subInfo),
+                            const Gap(4),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -202,6 +221,7 @@ class ProfileActionButton extends HookConsumerWidget {
         child: Tooltip(
           message: t.profile.update.tooltip,
           child: InkWell(
+            borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
             onTap: () {
               if (ref.read(updateProfileProvider(profile.id)).isLoading) {
                 return;
@@ -221,6 +241,7 @@ class ProfileActionButton extends HookConsumerWidget {
           child: Tooltip(
             message: MaterialLocalizations.of(context).showMenuTooltip,
             child: InkWell(
+              borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
               onTap: toggleVisibility,
               child: Icon(AdaptiveIcon(context).more),
             ),
@@ -298,7 +319,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
           ],
           AdaptiveMenuItem(
             title: t.profile.share.exportConfigToClipboard,
-            onTap: () async {
+            onTap: () {
               if (exportConfigMutation.state.isInProgress) {
                 return;
               }
@@ -414,10 +435,9 @@ class NewTrafficSubscriptionInfo extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final theme = Theme.of(context);
 
     return Column(children: [
-      Icon(FluentIcons.data_usage_24_filled, color: Colors.blue),
+      const Icon(FluentIcons.data_usage_24_filled, color: Colors.blue),
       Text(t.profile.subscription.remaingTraffic),
       const SizedBox(height: 4),
       Row(
@@ -472,7 +492,7 @@ class NewDaySubscriptionInfo extends HookConsumerWidget {
 
     final remaining = remainingText(t, theme);
     return Column(children: [
-      Icon(Icons.timer, color: Colors.blue),
+      const Icon(Icons.timer, color: Colors.blue),
       Text(t.profile.subscription.remaingTime),
       const SizedBox(height: 4),
       Row(
@@ -520,7 +540,7 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
 
     final remaining = remainingText(t, theme);
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      Icon(FluentIcons.data_usage_24_filled, color: Colors.blue),
+      const Icon(FluentIcons.data_usage_24_filled, color: Colors.blue),
       Text(t.profile.subscription.remaingUsage),
       const SizedBox(height: 4),
       Text(
@@ -554,16 +574,15 @@ class NewSiteSubscriptionInfo extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final theme = Theme.of(context);
-    var uri = Uri.parse(subInfo.webPageUrl ?? "");
+    final uri = Uri.parse(subInfo.webPageUrl ?? "");
     var host = uri.host;
     if (["telegram.me", "t.me"].contains(host)) {
-      host = "@" + uri.path.split("/").last;
+      host = "@${uri.path.split("/").last}";
     }
     return InkWell(
         onTap: () => launchUrl(Uri.parse(subInfo.webPageUrl ?? "")),
         child: Column(children: [
-          Icon(FluentIcons.globe_person_24_filled, size: 24, color: Colors.blue),
+          const Icon(FluentIcons.globe_person_24_filled, size: 24, color: Colors.blue),
           Text(t.profile.subscription.profileSite),
           const SizedBox(height: 4),
           Row(

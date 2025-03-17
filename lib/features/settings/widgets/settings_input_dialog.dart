@@ -216,20 +216,22 @@ class SettingsPickerDialog<T> extends HookConsumerWidget with PresLogger {
 
     return AlertDialog(
       title: Text(title),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: options
-            .map(
-              (e) => RadioListTile(
-                title: Text(getTitle(e)),
-                value: e,
-                groupValue: selected,
-                onChanged: (value) async {
-                  await Navigator.of(context).maybePop(e);
-                },
-              ),
-            )
-            .toList(),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: options
+              .map(
+                (e) => RadioListTile(
+                  title: Text(getTitle(e)),
+                  value: e,
+                  groupValue: selected,
+                  onChanged: (value) async {
+                    await Navigator.of(context).maybePop(e);
+                  },
+                ),
+              )
+              .toList(),
+        ),
       ),
       actions: [
         if (onReset != null)

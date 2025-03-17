@@ -23,14 +23,14 @@ GoRouter router(RouterRef ref) {
     deepLinkNotifierProvider,
     (_, next) async {
       if (next case AsyncData(value: final link?)) {
-        await ref.state.push(AddProfileRoute(url: link.url).location);
+        await ref.state.push(HomeRoute(url: link.url).location);
       }
     },
   );
   final initialLink = deepLink.read();
   String initialLocation = const HomeRoute().location;
   if (initialLink case AsyncData(value: final link?)) {
-    initialLocation = AddProfileRoute(url: link.url).location;
+    initialLocation = HomeRoute(url: link.url).location;
   }
 
   return GoRouter(

@@ -84,7 +84,6 @@ dependencies:
   flutter_loggy_dio: ^3.1.0
   dio_smart_retry: ^7.0.1
   cupertino_http: ^2.0.1
-  wolt_modal_sheet: ^0.10.0
   dart_mappable: ^4.2.1
   fluentui_system_icons: ^1.1.229
   timezone_to_country: ^3.0.0
@@ -113,12 +112,12 @@ dependencies:
   basic_utils: 5.7.0
   showcaseview: 3.0.0
   text_scroll: ^0.2.0
-  flutter_markdown: ^0.7.5
+  flutter_markdown: ^0.7.6+2
   # platform-specific  settings
   # https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup
   file_picker: ^8.1.7
   installed_apps: # ^1.5.2
-      git: https://github.com/VB10/installed_apps
+    git: https://github.com/VB10/installed_apps
 
   # change case of text
   # for example camelCase to snake_case

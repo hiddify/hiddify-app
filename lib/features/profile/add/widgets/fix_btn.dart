@@ -25,38 +25,35 @@ class FixBtn extends ConsumerWidget {
     final borderRadius = BorderRadius.circular(18);
 
     return Expanded(
-      child: Material(
+      child: InkWell(
+        onTap: onTap,
         borderRadius: borderRadius,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: borderRadius,
-          child: Container(
-            alignment: Alignment.center,
-            height: height,
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-            decoration: BoxDecoration(
-              borderRadius: borderRadius,
-              border: Border.all(
-                color: theme.colorScheme.outlineVariant,
+        child: Container(
+          alignment: Alignment.center,
+          height: height,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: isSmallBreakpoint ? 32 : 40,
+                color: color,
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  icon,
-                  size: isSmallBreakpoint ? 32 : 40,
-                  color: color,
-                ),
-                Gap(isSmallBreakpoint ? 4 : 8),
-                Text(
-                  title,
-                  style: isSmallBreakpoint ? theme.textTheme.titleSmall!.copyWith(color: color) : theme.textTheme.titleMedium!.copyWith(color: color),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ],
-            ),
+              Gap(isSmallBreakpoint ? 4 : 8),
+              Text(
+                title,
+                style: isSmallBreakpoint ? theme.textTheme.titleSmall!.copyWith(color: color) : theme.textTheme.titleMedium!.copyWith(color: color),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ],
           ),
         ),
       ),

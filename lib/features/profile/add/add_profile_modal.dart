@@ -13,11 +13,9 @@ class AddProfileModal extends HookConsumerWidget {
   const AddProfileModal({
     super.key,
     this.url,
-    this.scrollController,
   });
   static const warpConsentGiven = "warp_consent_given";
   final String? url;
-  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

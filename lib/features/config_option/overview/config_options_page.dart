@@ -16,7 +16,6 @@ import 'package:hiddify/features/config_option/overview/route_options_widgets.da
 import 'package:hiddify/features/config_option/overview/tlsfragment_widgets.dart';
 import 'package:hiddify/features/config_option/overview/warp_options_widgets.dart';
 import 'package:hiddify/features/log/overview/logs_overview_page.dart';
-import 'package:hiddify/features/route_rules/overview/rules_page.dart';
 import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/settings/notifier/platform_settings_notifier.dart';
 import 'package:hiddify/features/settings/widgets/advanced_setting_tiles.dart';
@@ -197,12 +196,12 @@ class ConfigOptionsPage extends HookConsumerWidget {
                       AdvancedSettingTiles(),
                     ],
                   ),
-                  PlatformListSection(
-                    sectionIcon: const Icon(FontAwesomeIcons.shuffle),
-                    sectionTitle: 'Route Rules',
-                    showAppBar: false,
-                    page: const RulesPage(),
-                  ),
+                  // PlatformListSection(
+                  //   sectionIcon: const Icon(FontAwesomeIcons.shuffle),
+                  //   sectionTitle: 'Route Rules',
+                  //   showAppBar: false,
+                  //   page: const RulesPage(),
+                  // ),
                   PlatformListSection(
                     sectionIcon: const Icon(FontAwesomeIcons.route),
                     sectionTitle: t.config.section.route,
