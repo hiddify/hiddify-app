@@ -19,4 +19,5 @@ class ProxyService : Service(), PlatformInterfaceWrapper {
     override fun sendNotification(notification: Notification) {
 //        service.sendNotification(notification)
     }
+
 }

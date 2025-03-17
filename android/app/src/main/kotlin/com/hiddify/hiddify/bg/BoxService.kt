@@ -31,6 +31,7 @@ import com.hiddify.core.libbox.CommandServerHandler
 import com.hiddify.core.libbox.PlatformInterface
 import com.hiddify.core.libbox.SetupOptions
 import com.hiddify.core.libbox.SystemProxyStatus
+import com.hiddify.hiddify.constant.Bugs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -71,8 +72,8 @@ class BoxService(
                 it.basePath = baseDir.path
                 it.workingPath = workingDir.path
                 it.tempPath = tempDir.path
-//                it.fixAndroidStack = Bugs.fixAndroidStack
-                it.fixAndroidStack=false
+                it.fixAndroidStack = Bugs.fixAndroidStack
+
             })
             Libbox.redirectStderr(File(Settings.workingDir, "stderr.log").path)
             initializeOnce = true
@@ -96,13 +97,7 @@ class BoxService(
             )
         }
 
-        fun reload() {
-            Application.application.sendBroadcast(
-                    Intent(Action.SERVICE_RELOAD).setPackage(
-                            Application.application.packageName
-                    )
-            )
-        }
+
     }
 
     var fileDescriptor: ParcelFileDescriptor? = null
@@ -118,10 +113,6 @@ class BoxService(
             when (intent.action) {
                 Action.SERVICE_CLOSE -> {
                     stopService()
-                }
-
-                Action.SERVICE_RELOAD -> {
-                    serviceReload()
                 }
 
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
@@ -141,7 +132,7 @@ class BoxService(
     }
 
     private var activeProfileName = ""
-    private suspend fun startService(delayStart: Boolean = false) {
+    private suspend fun startService() {
         try {
             Log.d(TAG, "starting service")
             withContext(Dispatchers.Main) {
@@ -181,9 +172,9 @@ class BoxService(
             }
             if (Settings.startCoreAfterStartingService)
                 Mobile.start("","")
-            if (delayStart) {
-                delay(1000L)
-            }
+//            if (delayStart) {
+//                delay(1000L)
+//            }
 
 //            newService.start()
 //            boxService = newService
@@ -222,7 +213,7 @@ class BoxService(
         Mobile.stop()
 //        boxService = null
         runBlocking {
-            startService(true)
+            startService()
         }
     }
 
@@ -315,7 +306,6 @@ class BoxService(
         if (!receiverRegistered) {
             ContextCompat.registerReceiver(service, receiver, IntentFilter().apply {
                 addAction(Action.SERVICE_CLOSE)
-                addAction(Action.SERVICE_RELOAD)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
                 }
@@ -343,7 +333,6 @@ class BoxService(
 
     fun onDestroy() {
         binder.close()
-        fileDescriptor?.close()
     }
 
     fun onRevoke() {

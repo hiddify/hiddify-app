@@ -4,7 +4,12 @@ import android.net.Network
 import android.os.Build
 import com.hiddify.hiddify.Application
 import com.hiddify.core.libbox.InterfaceUpdateListener
+import com.hiddify.hiddify.constant.Bugs
 
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.NetworkInterface
 
 object DefaultNetworkMonitor {
@@ -56,13 +61,23 @@ object DefaultNetworkMonitor {
                     Thread.sleep(100)
                     continue
                 }
-                listener.updateDefaultInterface(interfaceName, interfaceIndex)
-                break
+                if (Bugs.fixAndroidStack) {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        listener.updateDefaultInterface(interfaceName, interfaceIndex)
+                    }
+                } else {
+                    listener.updateDefaultInterface(interfaceName, interfaceIndex)
+                }
             }
         } else {
-            listener.updateDefaultInterface("", -1)
+            if (Bugs.fixAndroidStack) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    listener.updateDefaultInterface("", -1)
+                }
+            } else {
+                listener.updateDefaultInterface("", -1)
+            }
         }
     }
-
 
 }
