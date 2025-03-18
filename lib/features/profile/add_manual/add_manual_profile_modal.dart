@@ -120,9 +120,9 @@ class AddManualProfileModal extends HookConsumerWidget {
                           },
                         ),
                       ),
-                      const Gap(8),
+                      // const Gap(8),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 4),
                         child: FilledButton(
                           onPressed: () async {
                             if (formKey.currentState!.validate()) {
@@ -149,7 +149,7 @@ class AddManualProfileModal extends HookConsumerWidget {
                           child: Text(t.general.add),
                         ),
                       ),
-                      const Gap(16),
+                      // const Gap(16),
                     ],
                   ),
                 ),
