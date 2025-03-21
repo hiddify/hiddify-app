@@ -31,11 +31,18 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
   }
 
   Future<void> open({bool focus = true}) async {
-    await windowManager.show();
-    if (focus) await windowManager.focus();
-    if (Platform.isMacOS) {
-      await windowManager.setSkipTaskbar(false);
-    }
+    final WindowOptions windowOptions=WindowOptions(
+      center: true,
+      skipTaskbar: !Platform.isMacOS,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+    // if (focus) await windowManager.focus();
+    // if (Platform.isMacOS) {
+    //   await windowManager.setSkipTaskbar(false);
+    // }
   }
 
   // TODO add option to quit or minimize to tray
