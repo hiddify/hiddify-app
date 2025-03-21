@@ -19,7 +19,7 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 // TODO: test and improve handling of deep link
 @riverpod
 GoRouter router(Ref ref) {
-  final notifier = ref.read(routerListenableProvider.notifier);
+  final notifier = ref.watch(routerListenableProvider.notifier);
   // final deepLink = ref.listen(
   //   deepLinkNotifierProvider,
   //   (_, next) async {
