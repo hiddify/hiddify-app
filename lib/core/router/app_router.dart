@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/routes.dart';
-import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
+// import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -19,23 +19,23 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 @riverpod
 GoRouter router(RouterRef ref) {
   final notifier = ref.watch(routerListenableProvider.notifier);
-  final deepLink = ref.listen(
-    deepLinkNotifierProvider,
-    (_, next) async {
-      if (next case AsyncData(value: final link?)) {
-        await ref.state.push(HomeRoute(url: link.url).location);
-      }
-    },
-  );
-  final initialLink = deepLink.read();
-  String initialLocation = const HomeRoute().location;
-  if (initialLink case AsyncData(value: final link?)) {
-    initialLocation = HomeRoute(url: link.url).location;
-  }
+  // final deepLink = ref.listen(
+  //   deepLinkNotifierProvider,
+  //   (_, next) async {
+  //     if (next case AsyncData(value: final link?)) {
+  //       await ref.state.push(HomeRoute(url: link.url).location);
+  //     }
+  //   },
+  // );
+  // final initialLink = deepLink.read();
+  // String initialLocation = const HomeRoute().location;
+  // if (initialLink case AsyncData(value: final link?)) {
+  //   initialLocation = HomeRoute(url: link.url).location;
+  // }
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: initialLocation,
+    // initialLocation: initialLocation,
     debugLogDiagnostics: true,
     routes: $appRoutes,
     refreshListenable: notifier,
