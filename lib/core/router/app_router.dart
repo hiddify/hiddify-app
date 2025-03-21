@@ -5,6 +5,7 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/routes.dart';
 // import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -17,8 +18,8 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 // TODO: test and improve handling of deep link
 @riverpod
-GoRouter router(RouterRef ref) {
-  final notifier = ref.watch(routerListenableProvider.notifier);
+GoRouter router(Ref ref) {
+  final notifier = ref.read(routerListenableProvider.notifier);
   // final deepLink = ref.listen(
   //   deepLinkNotifierProvider,
   //   (_, next) async {
@@ -95,12 +96,17 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
   String? redirect(BuildContext context, GoRouterState state) {
     // if (this.state.isLoading || this.state.hasError) return null;
 
+    final introCompleted = ref.read(Preferences.introCompleted);
     final isIntro = state.uri.path == const IntroRoute().location;
 
-    if (!_introCompleted) {
-      return const IntroRoute().location;
+    if (!introCompleted) {
+      final url = state.uri.queryParameters['url'];
+      final introLocation = url != null ? '${const IntroRoute().location}?url=$url' : const IntroRoute().location;
+      return introLocation;
     } else if (isIntro) {
-      return const HomeRoute().location;
+      final url = state.uri.queryParameters['url'];
+      final homeLocation = url != null ? '${const HomeRoute().location}?url=$url' : const HomeRoute().location;
+      return homeLocation;
     }
 
     return null;

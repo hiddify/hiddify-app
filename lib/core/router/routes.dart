@@ -14,6 +14,7 @@ import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/settings/overview/settings_overview_page.dart';
+// import 'package:hiddify/utils/utils.dart';
 
 part 'routes.g.dart';
 
@@ -30,7 +31,7 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
           name: ConfigOptionsRoute.name,
         ),
         TypedGoRoute<ProxiesRoute>(
-          path: "proxies",
+          path: "/proxies",
           name: ProxiesRoute.name,
         ),
         TypedGoRoute<ProfilesOverviewRoute>(
@@ -97,16 +98,16 @@ class IntroRoute extends HRouteData {
 
 class HomeRoute extends HRouteData {
   const HomeRoute({this.url});
-  static const name = "Home";
-
   final String? url;
+  static const name = "Home";
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
+    final urlParam = state.uri.queryParameters['url'];
     return MaterialPage(
       // context: context,
       name: name,
-      child: HomePage(url: url),
+      child: HomePage(url: urlParam ?? url),
     );
   }
 
