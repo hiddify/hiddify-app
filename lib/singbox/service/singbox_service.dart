@@ -8,13 +8,23 @@ import 'package:hiddify/singbox/model/singbox_stats.dart';
 import 'package:hiddify/singbox/model/singbox_status.dart';
 import 'package:hiddify/singbox/model/warp_account.dart';
 import 'package:hiddify/singbox/service/ffi_singbox_service.dart';
+import 'package:hiddify/singbox/service/macos13_singbox_service.dart';
 import 'package:hiddify/singbox/service/platform_singbox_service.dart';
 
 abstract interface class SingboxService {
   factory SingboxService() {
     if (Platform.isAndroid || Platform.isIOS) {
       return PlatformSingboxService();
-    } else if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
+    } else if (Platform.isLinux || Platform.isWindows) {
+      return FFISingboxService();
+    } else if (Platform.isMacOS) {
+      final versionPart = Platform.operatingSystemVersion.split(".")[0].split(" ")[1];
+      final majorVersion = int.parse(versionPart);
+
+      if (majorVersion >= 13) {
+        return MacOS13SingboxService();
+      }
+
       return FFISingboxService();
     }
     throw Exception("unsupported platform");

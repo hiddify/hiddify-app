@@ -12,9 +12,7 @@ abstract interface class ConnectionPlatformSource {
   Future<bool> checkPrivilege();
 }
 
-class ConnectionPlatformSourceImpl
-    with InfraLogger
-    implements ConnectionPlatformSource {
+class ConnectionPlatformSourceImpl with InfraLogger implements ConnectionPlatformSource {
   @override
   Future<bool> checkPrivilege() async {
     try {
@@ -22,8 +20,7 @@ class ConnectionPlatformSourceImpl
         bool isElevated = false;
         withMemory<void, Uint32>(sizeOf<Uint32>(), (phToken) {
           withMemory<void, Uint32>(sizeOf<Uint32>(), (pReturnedSize) {
-            withMemory<void, _TokenElevation>(sizeOf<_TokenElevation>(),
-                (pElevation) {
+            withMemory<void, _TokenElevation>(sizeOf<_TokenElevation>(), (pElevation) {
               if (OpenProcessToken(
                     GetCurrentProcess(),
                     TOKEN_QUERY,
@@ -48,7 +45,17 @@ class ConnectionPlatformSourceImpl
           });
         });
         return isElevated;
-      } else if (Platform.isLinux || Platform.isMacOS) {
+      } else if (Platform.isLinux) {
+        final euid = geteuid();
+        return euid == 0;
+      } else if (Platform.isMacOS) {
+        final versionPart = Platform.operatingSystemVersion.split(".")[0].split(" ")[1];
+        final majorVersion = int.parse(versionPart);
+
+        if (majorVersion >= 13) {
+          return true;
+        }
+
         final euid = geteuid();
         return euid == 0;
       } else {
