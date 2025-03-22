@@ -17,7 +17,7 @@
     "decline": "拒絕",
     "unknown": "不明",
     "hidden": "隱藏",
-    "timeout": "超時",
+    "timeout": "逾時",
     "clipboardExportSuccessMsg": "已匯出至剪貼簿",
     "showMore": "顯示更多",
     "showLess": "顯示較少",
@@ -46,9 +46,9 @@
   "profile": {
     "overviewPageTitle": "設定檔",
     "detailsPageTitle": "設定檔",
-    "activeProfileNameSemanticLabel": "活動設定檔名稱：“${name}”。",
+    "activeProfileNameSemanticLabel": "生效中的設定檔名稱：“${name}”。",
     "activeProfileBtnSemanticLabel": "查看所有設定檔",
-    "nonActiveProfileBtnSemanticLabel": "選擇“${name}”作為活動設定檔。",
+    "nonActiveProfileBtnSemanticLabel": "選擇“${name}”作為生效的設定檔。",
     "subscription": {
       "traffic": "流量",
       "updatedTimeAgo": "更新於 ${timeago}",
@@ -75,12 +75,12 @@
         "unexpectedError": "出了點問題",
         "torchSemanticLabel": "手電筒",
         "facingSemanticLabel": "相機朝向",
-        "permissionRequest": "授予相機權限已允許掃描 QR code"
+        "permissionRequest": "授予相機權限以允許掃描 QR code"
       },
       "manually": "手動輸入",
-      "addWarp": "添加 WARP",
+      "addWarp": "新增 WARP",
       "addingWarpMsg": "我們正在註冊 WARP，請稍候。",
-      "addingProfileMsg": "新增設定檔",
+      "addingProfileMsg": "正在新增設定檔",
       "failureMsg": "新增設定檔失敗"
     },
     "update": {
@@ -102,7 +102,7 @@
     },
     "edit": {
       "buttonTxt": "編輯",
-      "selectActiveTxt": "選擇活動設定檔"
+      "selectActiveTxt": "選擇生效設定檔"
     },
     "delete": {
       "buttonTxt": "刪除",
@@ -313,7 +313,7 @@
     "geoAssets": {
       "unexpected": "意外錯誤",
       "notUpdate": "暫無可用更新",
-      "activeNotFound": "未找到活動 GEO 資源文件"
+      "activeNotFound": "未找到生效中的 GEO 資源文件"
     }
   },
   "play": {
