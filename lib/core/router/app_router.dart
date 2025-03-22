@@ -98,15 +98,22 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
 
     final introCompleted = ref.read(Preferences.introCompleted);
     final isIntro = state.uri.path == const IntroRoute().location;
+    // fix path-parameters for deep link
+    String? url;
+    if (state.uri.scheme == 'hiddify' && state.uri.host == 'import') {
+      url = state.uri.toString().substring(17);
+    } else if (state.uri.queryParameters['url'] != null) {
+      url = state.uri.queryParameters['url'];
+    }
 
     if (!introCompleted) {
-      final url = state.uri.queryParameters['url'];
       final introLocation = url != null ? '${const IntroRoute().location}?url=$url' : const IntroRoute().location;
       return introLocation;
     } else if (isIntro) {
-      final url = state.uri.queryParameters['url'];
       final homeLocation = url != null ? '${const HomeRoute().location}?url=$url' : const HomeRoute().location;
       return homeLocation;
+    } else if (url != null) {
+      return '${const HomeRoute().location}?url=$url';
     }
 
     return null;
