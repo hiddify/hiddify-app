@@ -8,7 +8,6 @@
 
 #include <dynamic_color/dynamic_color_plugin_c_api.h>
 #include <flutter_timezone/flutter_timezone_plugin_c_api.h>
-#include <protocol_handler_windows/protocol_handler_windows_plugin_c_api.h>
 #include <screen_retriever_windows/screen_retriever_windows_plugin_c_api.h>
 #include <sentry_flutter/sentry_flutter_plugin.h>
 #include <share_plus/share_plus_windows_plugin_c_api.h>
@@ -23,8 +22,6 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("DynamicColorPluginCApi"));
   FlutterTimezonePluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterTimezonePluginCApi"));
-  ProtocolHandlerWindowsPluginCApiRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("ProtocolHandlerWindowsPluginCApi"));
   ScreenRetrieverWindowsPluginCApiRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("ScreenRetrieverWindowsPluginCApi"));
   SentryFlutterPluginRegisterWithRegistrar(

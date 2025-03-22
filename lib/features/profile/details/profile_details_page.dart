@@ -121,20 +121,21 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                       await notifier.updateProfile();
                                     },
                                   ),
-                                PopupMenuItem(
-                                  child: Text(t.profile.delete.buttonTxt),
-                                  onTap: () async {
-                                    final deleteConfirmed = await showConfirmationDialog(
-                                      context,
-                                      title: t.profile.delete.buttonTxt,
-                                      message: t.profile.delete.confirmationMsg,
-                                      icon: FluentIcons.delete_24_regular,
-                                    );
-                                    if (deleteConfirmed) {
-                                      await notifier.delete();
-                                    }
-                                  },
-                                ),
+                                if (!state.profile.active)
+                                  PopupMenuItem(
+                                    child: Text(t.profile.delete.buttonTxt),
+                                    onTap: () async {
+                                      final deleteConfirmed = await showConfirmationDialog(
+                                        context,
+                                        title: t.profile.delete.buttonTxt,
+                                        message: t.profile.delete.confirmationMsg,
+                                        icon: FluentIcons.delete_24_regular,
+                                      );
+                                      if (deleteConfirmed) {
+                                        await notifier.delete();
+                                      }
+                                    },
+                                  ),
                               ];
                             },
                           ),

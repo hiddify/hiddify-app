@@ -108,18 +108,21 @@ class AddManualProfileModal extends HookConsumerWidget {
                         ),
                       ),
                       const Gap(4),
-                      Slider(
-                        value: updateInterval.value,
-                        max: 96,
-                        divisions: 96,
-                        label: updateInterval.value.round().toString(),
-                        onChanged: (double value) {
-                          updateInterval.value = value;
-                        },
-                      ),
-                      const Gap(8),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Slider(
+                          value: updateInterval.value,
+                          max: 96,
+                          divisions: 96,
+                          label: updateInterval.value.round().toString(),
+                          onChanged: (double value) {
+                            updateInterval.value = value;
+                          },
+                        ),
+                      ),
+                      // const Gap(8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 4),
                         child: FilledButton(
                           onPressed: () async {
                             if (formKey.currentState!.validate()) {
@@ -146,7 +149,7 @@ class AddManualProfileModal extends HookConsumerWidget {
                           child: Text(t.general.add),
                         ),
                       ),
-                      const Gap(16),
+                      // const Gap(16),
                     ],
                   ),
                 ),

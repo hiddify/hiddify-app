@@ -19,6 +19,7 @@ class NestedAppBar extends StatelessWidget {
     this.actions,
     this.pinned = true,
     this.forceElevated = false,
+    this.hideLeading = false,
     this.bottom,
   });
 
@@ -26,6 +27,7 @@ class NestedAppBar extends StatelessWidget {
   final List<Widget>? actions;
   final bool pinned;
   final bool forceElevated;
+  final bool hideLeading;
   final PreferredSizeWidget? bottom;
 
   @override
@@ -33,23 +35,26 @@ class NestedAppBar extends StatelessWidget {
     RootScaffold.canShowDrawer(context);
 
     return SliverAppBar(
-      leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
-          ? DrawerButton(
-              onPressed: () {
-                RootScaffold.stateKey.currentState?.openDrawer();
-              },
-            )
-          : (Navigator.of(context).canPop()
-              ? IconButton(
-                  // icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
-                  icon: Icon(Icons.arrow_back),
-
-                  // padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
+      automaticallyImplyLeading: !hideLeading,
+      leading: hideLeading
+          ? null
+          : (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
+              ? DrawerButton(
                   onPressed: () {
-                    if (Navigator.of(context).canPop()) Navigator.of(context).pop(); // Pops the current route off the navigator stack
+                    RootScaffold.stateKey.currentState?.openDrawer();
                   },
                 )
-              : null),
+              : (Navigator.of(context).canPop()
+                  ? IconButton(
+                      // icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
+                      icon: Icon(Icons.arrow_back),
+
+                      // padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
+                      onPressed: () {
+                        if (Navigator.of(context).canPop()) Navigator.of(context).pop(); // Pops the current route off the navigator stack
+                      },
+                    )
+                  : null),
       title: title,
       // title: Text("", style: Theme.of(context).textTheme.labelSmall),
 

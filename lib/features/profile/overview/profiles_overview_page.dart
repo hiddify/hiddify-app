@@ -120,7 +120,7 @@ class ProfilesOverviewModal extends ConsumerWidget {
               children: [
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.all(12).copyWith(bottom: 0),
+                    padding: const EdgeInsets.all(12),
                     separatorBuilder: (context, index) => const Gap(12),
                     // shrinkWrap: true,
                     controller: scrollController,
@@ -129,7 +129,7 @@ class ProfilesOverviewModal extends ConsumerWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.symmetric(horizontal: 4).copyWith(bottom: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [

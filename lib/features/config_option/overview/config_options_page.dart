@@ -78,6 +78,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
         shrinkWrap: true,
         slivers: [
           NestedAppBar(
+            hideLeading: true,
             title: Text(t.config.pageTitle),
             actions: [
               PopupMenuButton<dynamic>(

@@ -21,7 +21,7 @@ abstract class AddProfileModalConst {
   static const fixBtnsGapCount = 4;
   static const fixBtnsItemCount = 3;
   static const navBarGap = 16.0;
-  static const navBarBottomGap = 12.0;
+  static const navBarBottomGap = 4.0;
   //switch default height
   static const navBarcontentHeight = 32.0;
   static const navBarHeight = navBarGap + navBarBottomGap + navBarcontentHeight;
