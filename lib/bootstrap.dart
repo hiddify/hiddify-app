@@ -16,7 +16,7 @@ import 'package:hiddify/core/preferences/preferences_migration.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/app/widget/app.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
-import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
+// import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
 
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
@@ -130,11 +130,11 @@ Future<void> lazyBootstrap(
     () => container.read(hiddifyCoreServiceProvider).init(),
   );
   if (!kIsWeb) {
-    await _safeInit(
-      "deep link service",
-      () => container.read(deepLinkNotifierProvider.future),
-      timeout: 1000,
-    );
+    // await _safeInit(
+    //   "deep link service",
+    //   () => container.read(deepLinkNotifierProvider.future),
+    //   timeout: 1000,
+    // );
 
     if (PlatformUtils.isDesktop) {
       await _safeInit(

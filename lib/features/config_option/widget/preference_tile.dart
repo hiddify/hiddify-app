@@ -81,7 +81,7 @@ class ChoicePreferenceWidget<T> extends StatelessWidget {
     return ListTile(
       title: Text(title),
       subtitle: Text(presentChoice(selected)),
-      // enabled: enabled,
+      enabled: enabled,
       onTap: () async {
         final selection = await SettingsPickerDialog(
           title: title,

@@ -1389,54 +1389,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
-  protocol_handler:
-    dependency: "direct main"
-    description:
-      name: protocol_handler
-      sha256: dc2e2dcb1e0e313c3f43827ec3fa6d98adee6e17edc0c3923ac67efee87479a9
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
-  protocol_handler_android:
-    dependency: transitive
-    description:
-      name: protocol_handler_android
-      sha256: "82eb860ca42149e400328f54b85140329a1766d982e94705b68271f6ca73895c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
-  protocol_handler_ios:
-    dependency: transitive
-    description:
-      name: protocol_handler_ios
-      sha256: "0d3a56b8c1926002cb1e32b46b56874759f4dcc8183d389b670864ac041b6ec2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
-  protocol_handler_macos:
-    dependency: transitive
-    description:
-      name: protocol_handler_macos
-      sha256: "6eb8687a84e7da3afbc5660ce046f29d7ecf7976db45a9dadeae6c87147dd710"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
-  protocol_handler_platform_interface:
-    dependency: transitive
-    description:
-      name: protocol_handler_platform_interface
-      sha256: "53776b10526fdc25efdf1abcf68baf57fdfdb75342f4101051db521c9e3f3e5b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
-  protocol_handler_windows:
-    dependency: transitive
-    description:
-      name: protocol_handler_windows
-      sha256: d8f3a58938386aca2c76292757392f4d059d09f11439d6d896d876ebe997f2c4
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.0"
   pub_semver:
     dependency: transitive
     description:

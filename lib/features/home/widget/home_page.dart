@@ -6,7 +6,6 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
@@ -31,7 +30,11 @@ class HomePage extends HookConsumerWidget {
 
     useEffect(() {
       if (url != null) {
-        ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(url: url);
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) {
+            ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(url: url);
+          },
+        );
       }
       return null;
     }, [url]);
