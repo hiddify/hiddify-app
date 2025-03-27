@@ -1,6 +1,6 @@
 // import 'dart:convert';
 
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:fpdart/fpdart.dart';
 // import 'package:hiddify/features/per_app_proxy/model/installed_package_info.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -9,7 +9,7 @@ import 'package:installed_apps/installed_apps.dart';
 
 abstract interface class PerAppProxyRepository {
   TaskEither<String, List<AppInfo>> getInstalledPackages(bool excludeSystem);
-  TaskEither<String, Uint8List> getPackageIcon(String packageName);
+  // TaskEither<String, Uint8List> getPackageIcon(String packageName);
 }
 
 class PerAppProxyRepositoryImpl with InfraLogger implements PerAppProxyRepository {
@@ -27,7 +27,7 @@ class PerAppProxyRepositoryImpl with InfraLogger implements PerAppProxyRepositor
         //     return InstalledPackageInfo.fromJson(e as Map<String, dynamic>);
         //   }).toList(),
         // );
-        final result = await InstalledApps.getInstalledApps(excludeSystem);
+        final result = await InstalledApps.getInstalledApps(excludeSystem, true);
 
         if (result.isEmpty) return left("empty response");
         return right(result);
@@ -35,27 +35,27 @@ class PerAppProxyRepositoryImpl with InfraLogger implements PerAppProxyRepositor
     );
   }
 
-  @override
-  TaskEither<String, Uint8List> getPackageIcon(String packageName) {
-    return TaskEither(
-      () async {
-        loggy.debug("getting package [$packageName] icon");
-        // final result = await _methodChannel.invokeMethod<String>(
-        //   "get_package_icon",
-        //   {"packageName": packageName},
-        // );
-        // if (result == null) return left("null response");
-        // final Uint8List decoded;
-        // try {
-        //   decoded = base64.decode(result);
-        // } catch (e) {
-        //   return left("error parsing base64 response");
-        // }
-        // return right(decoded);
-        final icon = (await InstalledApps.getAppInfo(packageName, BuiltWith.flutter))?.icon;
-        if (icon == null) return left("null response");
-        return right(icon);
-      },
-    );
-  }
+  // @override
+  // TaskEither<String, Uint8List> getPackageIcon(String packageName) {
+  //   return TaskEither(
+  //     () async {
+  //       loggy.debug("getting package [$packageName] icon");
+  //       // final result = await _methodChannel.invokeMethod<String>(
+  //       //   "get_package_icon",
+  //       //   {"packageName": packageName},
+  //       // );
+  //       // if (result == null) return left("null response");
+  //       // final Uint8List decoded;
+  //       // try {
+  //       //   decoded = base64.decode(result);
+  //       // } catch (e) {
+  //       //   return left("error parsing base64 response");
+  //       // }
+  //       // return right(decoded);
+  //       final icon = (await InstalledApps.getAppInfo(packageName, BuiltWith.flutter))?.icon;
+  //       if (icon == null) return left("null response");
+  //       return right(icon);
+  //     },
+  //   );
+  // }
 }
