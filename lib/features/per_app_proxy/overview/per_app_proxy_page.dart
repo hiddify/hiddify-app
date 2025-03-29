@@ -147,52 +147,52 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
               ),
             ),
           ),
-          switch (filteredPackages) {
-            AsyncData(value: final packages) => SliverList.builder(
-                itemBuilder: (context, index) {
-                  final package = packages[index];
-                  final selected = perAppProxyList.contains(package.packageName);
-                  return CheckboxListTile(
-                    title: Text(
-                      package.name,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      package.packageName,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    value: selected,
-                    onChanged: (value) async {
-                      final List<String> newSelection;
-                      if (selected) {
-                        newSelection = perAppProxyList.exceptElement(package.packageName).toList();
-                      } else {
-                        newSelection = [
-                          ...perAppProxyList,
-                          package.packageName,
-                        ];
-                      }
-                      await ref.read(perAppProxyListProvider.notifier).update(newSelection);
-                    },
-                    secondary: SizedBox(
-                      width: 48,
-                      height: 48,
-                      child: ref.watch(packageIconProvider(package.packageName)).when(
-                            data: (data) => Image(image: data),
-                            error: (error, _) => const Icon(FluentIcons.error_circle_24_regular),
-                            loading: () => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                    ),
-                  );
-                },
-                itemCount: packages.length,
-              ),
-            AsyncLoading() => const SliverLoadingBodyPlaceholder(),
-            AsyncError(:final error) => SliverErrorBodyPlaceholder(error.toString()),
-            _ => const SliverToBoxAdapter(),
-          },
+          filteredPackages.when(
+            data: (packages) => SliverList.builder(
+              itemBuilder: (context, index) {
+                final package = packages[index];
+                final selected = perAppProxyList.contains(package.packageName);
+                return CheckboxListTile(
+                  title: Text(
+                    package.name,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(
+                    package.packageName,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  value: selected,
+                  onChanged: (value) async {
+                    final List<String> newSelection;
+                    if (selected) {
+                      newSelection = perAppProxyList.exceptElement(package.packageName).toList();
+                    } else {
+                      newSelection = [
+                        ...perAppProxyList,
+                        package.packageName,
+                      ];
+                    }
+                    await ref.read(perAppProxyListProvider.notifier).update(newSelection);
+                  },
+                  secondary: package.icon == null ? null : Image.memory(package.icon!, width: 48, height: 48, cacheWidth: 48, cacheHeight: 48),
+                  // secondary: SizedBox(
+                  //   width: 48,
+                  //   height: 48,
+                  //   child: ref.watch(packageIconProvider(package.packageName)).when(
+                  //         data: (data) => Image(image: data),
+                  //         error: (error, _) => const Icon(FluentIcons.error_circle_24_regular),
+                  //         loading: () => const Center(
+                  //           child: CircularProgressIndicator(),
+                  //         ),
+                  //       ),
+                  // ),
+                );
+              },
+              itemCount: packages.length,
+            ),
+            error: (error, _) => SliverErrorBodyPlaceholder(error.toString()),
+            loading: () => const SliverLoadingBodyPlaceholder(),
+          ),
         ],
       ),
     );

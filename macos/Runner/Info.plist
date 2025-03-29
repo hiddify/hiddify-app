@@ -26,7 +26,7 @@
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
-	<key>CFBundleURLTypes</key>
+	<!-- <key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleTypeRole</key>
@@ -41,7 +41,7 @@
 				<string>hiddify</string>
 			</array>
 		</dict>
-	</array>
+	</array> -->
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 </dict>
