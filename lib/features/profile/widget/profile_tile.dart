@@ -21,7 +21,7 @@ import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:percent_indicator/percent_indicator.dart';
-import 'package:percent_indicator_premium/percent_indicator_premium.dart';
+// import 'package:percent_indicator_premium/percent_indicator_premium.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileTile extends HookConsumerWidget {
@@ -610,25 +610,30 @@ class RemainingTrafficIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final startColor = ratio < 0.25
-        ? const Color.fromRGBO(93, 205, 251, 1.0)
-        : ratio < 0.65
-            ? const Color.fromRGBO(205, 199, 64, 1.0)
-            : const Color.fromRGBO(241, 82, 81, 1.0);
-    final endColor = ratio < 0.25
-        ? const Color.fromRGBO(49, 146, 248, 1.0)
-        : ratio < 0.65
-            ? const Color.fromRGBO(98, 115, 32, 1.0)
-            : const Color.fromRGBO(139, 30, 36, 1.0);
-    return HorizontalPercentIndicator(
-      height: 6,
-
-      borderRadius: 16,
-      loadingPercent: ratio,
-      // inactiveTrackColor: Color.fromRGBO(r, g, b, opacity),
-
-      activeTrackColor: [startColor, endColor],
+    // final startColor = ratio < 0.25
+    //     ? const Color.fromRGBO(93, 205, 251, 1.0)
+    //     : ratio < 0.65
+    //         ? const Color.fromRGBO(205, 199, 64, 1.0)
+    //         : const Color.fromRGBO(241, 82, 81, 1.0);
+    // final endColor = ratio < 0.25
+    //     ? const Color.fromRGBO(49, 146, 248, 1.0)
+    //     : ratio < 0.65
+    //         ? const Color.fromRGBO(98, 115, 32, 1.0)
+    //         : const Color.fromRGBO(139, 30, 36, 1.0);
+    return LinearProgressIndicator(
+      value: ratio,
+      borderRadius: BorderRadius.circular(16),
+      minHeight: 6,
     );
+    // return HorizontalPercentIndicator(
+    //   height: 6,
+
+    //   borderRadius: 16,
+    //   loadingPercent: ratio,
+    //   // inactiveTrackColor: Color.fromRGBO(r, g, b, opacity),
+
+    //   activeTrackColor: [startColor, endColor],
+    // );
     // return LinearPercentIndicator(
     //     // percent: ratio,
     //     // animation: false,
