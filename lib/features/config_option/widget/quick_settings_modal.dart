@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/features/common/custom_text_scroll.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
 import 'package:hiddify/features/config_option/overview/PlatformListSection.dart';
@@ -32,9 +33,11 @@ class QuickSettingsModal extends HookConsumerWidget {
                     .map(
                       (e) => ButtonSegment(
                         value: e,
-                        label: Text(
-                          e.presentShort(t),
-                          overflow: TextOverflow.ellipsis,
+                        label: Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: CustomTextScroll(
+                            e.presentShort(t),
+                          ),
                         ),
                         tooltip: e.isExperimental ? t.settings.experimental : null,
                       ),

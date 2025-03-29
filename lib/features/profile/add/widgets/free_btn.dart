@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/features/common/custom_text_scroll.dart';
 import 'package:hiddify/features/profile/add/model/free_profiles_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:text_scroll/text_scroll.dart';
 
 class FreeBtn extends ConsumerWidget {
   const FreeBtn({super.key, required this.freeProfile, required this.onTap});
@@ -70,12 +70,8 @@ class FreeBtn extends ConsumerWidget {
                   ],
                 ),
               ),
-              TextScroll(
+              CustomTextScroll(
                 isFa ? freeProfile.tags.fa.join(' · ') : freeProfile.tags.en.join(' · '),
-                mode: TextScrollMode.bouncing,
-                velocity: const Velocity(pixelsPerSecond: Offset(30, 0)),
-                pauseOnBounce: const Duration(seconds: 2),
-                pauseBetween: const Duration(seconds: 2),
                 style: theme.textTheme.labelMedium!.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
