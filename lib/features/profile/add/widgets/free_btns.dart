@@ -62,7 +62,7 @@ class FreeBtns extends ConsumerWidget {
                             constraints: AlertDialogConst.boxConstraints,
                             child: MarkdownBody(
                               data: isFa ? profile.contest.fa : profile.contest.en,
-                              styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.spaceBetween),
+                              // styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.spaceBetween),
                               onTapLink: (text, href, title) => UriUtils.tryLaunch(Uri.parse(href!)),
                             ),
                           ),

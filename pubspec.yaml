@@ -71,7 +71,7 @@ dependencies:
   flutter_animate: ^4.5.0
   flutter_svg: ^2.0.10+1
   gap: ^3.0.1
-  percent_indicator_premium: ^0.0.2
+  # percent_indicator_premium: ^0.0.2
   sliver_tools: ^0.2.12
   flutter_adaptive_scaffold: ^0.3.1
   font_awesome_flutter: ^10.7.0
