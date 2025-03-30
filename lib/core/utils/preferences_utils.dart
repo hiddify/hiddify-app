@@ -32,7 +32,8 @@ class PreferencesEntry<T, P> with InfraLogger {
           value = mapFrom!(persisted);
         }
       } else if (T == List<String>) {
-        value = preferences.getStringList(key) as T? ?? defaultValue;
+        final storedValue = preferences.getString(key);
+        value = storedValue == null ? defaultValue : storedValue.split(";") as T;
       } else {
         value = preferences.get(key) as T? ?? defaultValue;
       }
@@ -62,7 +63,7 @@ class PreferencesEntry<T, P> with InfraLogger {
         final bool value => await preferences.setBool(key, value),
         final int value => await preferences.setInt(key, value),
         final double value => await preferences.setDouble(key, value),
-        final List<String> value => await preferences.setStringList(key, value),
+        final List<String> value => await preferences.setString(key, value.join(";")),
         _ => throw const FormatException("Invalid Type"),
       };
     } catch (e, stackTrace) {

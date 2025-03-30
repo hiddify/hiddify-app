@@ -36,7 +36,7 @@ dependencies:
   drift: ^2.21.0
   drift_flutter: ^0.2.1
   shared_preferences: ^2.5.2
-  shared_preferences_android: ^2.4.8
+  # shared_preferences_android: ^2.4.8
   dio: ^5.4.1
   ffi: ^2.1.2
   path_provider: ^2.1.1

@@ -42,12 +42,12 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
       },
     );
     // serverPublicKey = await methodChannel.invokeMethod<Uint8List>("get_grpc_server_public_key") ?? Uint8List.fromList([]);
-    await methodChannel.invokeMethod(
-      "add_grpc_client_public_key",
-      {
-        "clientPublicKey": ascii.encode(CryptoUtils.encodeEcPublicKeyToPem(cert.publicKey as ECPublicKey)),
-      },
-    );
+    // await methodChannel.invokeMethod(
+    //   "add_grpc_client_public_key",
+    //   {
+    //     "clientPublicKey": ascii.encode(CryptoUtils.encodeEcPublicKeyToPem(cert.publicKey as ECPublicKey)),
+    //   },
+    // );
     // serverPublicKey = X509Utils.x509CertificateFromPem(String.fromCharCodes(serverPublicKey));
     // var chanelOption = ChannelOptions(
     //   credentials: MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientPrivateKey: cert.privateKey as ECPrivateKey),

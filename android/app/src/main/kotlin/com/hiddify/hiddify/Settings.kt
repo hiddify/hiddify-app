@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.ObjectInputStream
 
+
 object Settings {
 
     private val preferences by lazy {
@@ -36,9 +37,13 @@ object Settings {
                 preferences.getString(SettingsKey.PER_APP_PROXY_EXCLUDE_LIST, "")!!
             }
             if (!stringValue.startsWith(LIST_IDENTIFIER)) {
-                return emptyList()
+                return stringValue.split(";")
             }
-            return decodeListString(stringValue.substring(LIST_IDENTIFIER.length))
+            return try {
+                decodeListString(stringValue.substring(LIST_IDENTIFIER.length))
+            } catch (e: java.lang.Exception) {
+                emptyList()
+            }
         }
 
     private fun decodeListString(listString: String): List<String> {
