@@ -3,7 +3,9 @@ import 'dart:convert';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:grpc/grpc.dart';
+import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -15,6 +17,7 @@ import 'package:hiddify/singbox/model/warp_account.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper_stub.dart' if (dart.library.io) 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:loggy/loggy.dart' as loggyl;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -29,8 +32,16 @@ class HiddifyCoreService with InfraLogger {
   final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 2000));
   final Map<String, StreamSubscription?> subscriptions = {};
 
-  Future<void> init() async {
+  Future<void> init({ProviderContainer? ref}) async {
     statusController.add(currentState);
+    if (ref == null) return;
+    final dirs = ref.read(appDirectoriesProvider).requireValue;
+    setup(dirs, false).mapLeft((e) {
+      loggy.error(e);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(e);
+    }).map((_) {
+      loggy.info("Hiddify-core setup done");
+    }).run();
   }
 
   /// validates config by path and save it

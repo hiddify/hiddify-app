@@ -127,7 +127,7 @@ Future<void> lazyBootstrap(
   );
   await _init(
     "sing-box",
-    () => container.read(hiddifyCoreServiceProvider).init(),
+    () => container.read(hiddifyCoreServiceProvider).init(ref: container),
   );
   if (!kIsWeb) {
     // await _safeInit(
