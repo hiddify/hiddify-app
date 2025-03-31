@@ -44,7 +44,9 @@ jobs:
           cache: true
           
       - name: Prepare
-        run: make linux-prepare
+        run: |
+          make linux-prepare
+          sudo apt update && sudo apt install libsqlite3-dev -y
       - name: Test
         run: flutter test
 
