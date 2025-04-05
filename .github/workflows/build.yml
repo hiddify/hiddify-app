@@ -328,6 +328,19 @@ jobs:
           tag_name: 'draft'
           body_path: './release.md'
           prerelease: true
+
+      - name: Create or Update Draft Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: hiddify/hiddify-app
+        with:
+          files: ./out/*
+          name: 'draft'
+          tag_name: 'draft'
+          body_path: './release.md'
+          prerelease: true
+
   upload-release:
     permissions: write-all
     if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
