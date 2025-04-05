@@ -64,9 +64,9 @@ jobs:
             os: ubuntu-latest
             targets: apk
 
-          - platform: android-aab
-            os: ubuntu-latest
-            targets: aab
+          # - platform: android-aab
+          #   os: ubuntu-latest
+          #   targets: aab
 
           - platform: windows
             os: windows-latest
@@ -340,6 +340,7 @@ jobs:
           tag_name: 'draft'
           body_path: './release.md'
           prerelease: true
+          repository: hiddify/hiddify-app
 
   upload-release:
     permissions: write-all
