@@ -23,7 +23,7 @@
   {
     "region": ["ir"],
     "title": {"en": "ainita.net", "fa": "آی نیتا"},
-    "sublink": "https://raw.githubusercontent.com/4n0nymou3/ss-config-updater/refs/heads/main/configs.txt",
+    "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/ainita",
     "tags": { "en": ["mix"], "fa": ["عمومی"] },
     "contest": {
       "en": "Project Ainita is a project for online anonymity, security and freedom. Our mission is to fight online censorship in countries with repressive regimes with a special focus on Iran, to provide a secure and reliable communication channel to people to access free flow of information, fair and balanced sources of news, social media, and helping preserve the right to read and freedom of speech online.\nAinita, in the ancient Avestan language, means resistant, someone who does not surrender to force, free and independent.\nTo enhance security, Hidify applies a Warp-based security layer to these configurations to prevent the risk of unauthorized access to information.\nThere is no guarantee that this configuration will function properly and it is recommended to use it only in emergency situations.",
