@@ -3,14 +3,15 @@ import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/features/proxy/model/ip_info_entity.dart' as oldipinfo;
-import 'package:hiddify/features/proxy/model/proxy_entity.dart';
+// import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
 abstract interface class ProxyRepository {
-  Stream<Either<ProxyFailure, List<OutboundGroup>>> watchProxies();
+  // Stream<Either<ProxyFailure, List<OutboundGroup>>> watchProxies();
+  Stream<Either<ProxyFailure, OutboundGroup?>> watchProxies();
   Stream<Either<ProxyFailure, List<OutboundGroup>>> watchActiveProxies();
   TaskEither<ProxyFailure, oldipinfo.IpInfo> getCurrentIpInfo(CancelToken cancelToken);
   TaskEither<ProxyFailure, Unit> selectProxy(
@@ -29,34 +30,44 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
   final HiddifyCoreService singbox;
   final DioHttpClient client;
 
-  @override
-  Stream<Either<ProxyFailure, List<OutboundGroup>>> watchProxies() {
-    return singbox.watchGroups().map((event) {
-      // final groupWithSelected = {
-      //   for (final group in event) group.tag: group.selected,
-      // };
+  // @override
+  // Stream<Either<ProxyFailure, List<OutboundGroup>>> watchProxies() {
+  //   return singbox.watchGroups().map((event) {
+  //     // final groupWithSelected = {
+  //     //   for (final group in event) group.tag: group.selected,
+  //     // };
 
-      return event;
-      // .map(
-      //   (e) => ProxyGroupEntity(
-      //     tag: e.tag,
-      //     type: e.type,
-      //     selected: e.selected,
-      //     items: e.items
-      //         .map(
-      //           (e) => ProxyItemEntity(
-      //             tag: e.tag,
-      //             type: e.type,
-      //             urlTestDelay: e.urlTestDelay,
-      //             selectedTag: groupWithSelected[e.tag],
-      //           ),
-      //         )
-      //         .filter((t) => t.isVisible)
-      //         .toList(),
-      //   ),
-      // )
-      // .toList();
-    }).handleExceptions(
+  //     return event;
+  //     // .map(
+  //     //   (e) => ProxyGroupEntity(
+  //     //     tag: e.tag,
+  //     //     type: e.type,
+  //     //     selected: e.selected,
+  //     //     items: e.items
+  //     //         .map(
+  //     //           (e) => ProxyItemEntity(
+  //     //             tag: e.tag,
+  //     //             type: e.type,
+  //     //             urlTestDelay: e.urlTestDelay,
+  //     //             selectedTag: groupWithSelected[e.tag],
+  //     //           ),
+  //     //         )
+  //     //         .filter((t) => t.isVisible)
+  //     //         .toList(),
+  //     //   ),
+  //     // )
+  //     // .toList();
+  //   }).handleExceptions(
+  //     (error, stackTrace) {
+  //       loggy.error("error watching proxies", error, stackTrace);
+  //       return ProxyUnexpectedFailure(error, stackTrace);
+  //     },
+  //   );
+  // }
+
+  @override
+  Stream<Either<ProxyFailure, OutboundGroup?>> watchProxies() {
+    return singbox.watchGroup().handleExceptions(
       (error, stackTrace) {
         loggy.error("error watching proxies", error, stackTrace);
         return ProxyUnexpectedFailure(error, stackTrace);

@@ -113,54 +113,54 @@ class UnknownIPText extends HookConsumerWidget {
 }
 
 class IPCountryFlag extends HookConsumerWidget {
-  const IPCountryFlag({required this.countryCode, this.organization, this.size = 16, super.key, this.padding = EdgeInsets.zero});
+  const IPCountryFlag({required this.countryCode, this.organization, this.size = 16, this.padding = EdgeInsets.zero, super.key});
 
   final String? countryCode;
   final double size;
 
-  final EdgeInsets padding;
+  final EdgeInsetsGeometry padding;
 
   final String? organization;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    if (countryCode?.isEmpty ?? true) {
-      return Icon(FluentIcons.question_circle_20_regular, size: size);
-    }
     return Semantics(
-        label: t.proxies.ipInfoSemantics.country,
-        child: SizedBox(
-          width: size + 4,
-          height: size + 4,
-          child: Stack(
-            alignment: Alignment.bottomRight,
-            children: [
-              Container(
+      label: t.proxies.ipInfoSemantics.country,
+      child: Padding(
+        padding: padding,
+        child: (countryCode?.isEmpty ?? true)
+            ? Icon(FluentIcons.question_circle_20_regular, size: size)
+            : SizedBox(
                 width: size,
                 height: size,
-                padding: const EdgeInsets.all(3),
-                child: CircleFlag(
-                  // key: ValueKey(countryCode),
-                  countryCode!.toLowerCase() == "ir" ? "ir-shir" : countryCode!,
-                  size: size,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8), // Rounded effect
-                  ),
+                child: Stack(
+                  textDirection: Directionality.of(context),
+                  alignment: Alignment.center,
+                  children: [
+                    CircleFlag(
+                      // key: ValueKey(countryCode),
+                      countryCode!.toLowerCase() == "ir" ? "ir-shir" : countryCode!,
+                      size: size - 8,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8), // Rounded effect
+                      ),
+                    ),
+                    if (organization != null)
+                      Positioned.directional(
+                        textDirection: Directionality.of(context),
+                        bottom: 0,
+                        end: 0,
+                        child: OrganisationFlag(
+                          organization: organization!,
+                          size: size / 2.5,
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              if (organization != null)
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: OrganisationFlag(
-                    organization: organization!,
-                    size: 16,
-                  ),
-                ),
-            ],
-          ),
-        ));
+      ),
+    );
   }
 }
 
@@ -208,7 +208,7 @@ class OrganisationFlag extends HookConsumerWidget {
 
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(100),
         ),
         // padding: const ,
         child: widget,
@@ -219,7 +219,7 @@ class OrganisationFlag extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    for (var entry in organizationData.entries) {
+    for (final entry in organizationData.entries) {
       if (organization.toLowerCase().contains(entry.key)) {
         return getFlagWidget(
           widget: Icon(
