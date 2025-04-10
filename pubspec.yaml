@@ -123,6 +123,12 @@ dependencies:
   # for example camelCase to snake_case
   # helloWorld -> hello_worlds
   recase: ^4.1.0
+  # Used for managing deep links on desktop platforms
+  # platform-specific settings
+  # https://github.com/llfbandit/app_links/tree/master/doc
+  app_links: ^6.4.0
+  # Used for registering custom schemes in the Windows registry
+  win32: ^5.12.0
 
 dev_dependencies:
   # flutter_test:
