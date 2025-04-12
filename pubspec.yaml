@@ -45,7 +45,7 @@ dependencies:
   flutter_native_splash: ^2.3.10
   share_plus: ^10.1.0
   window_manager: ^0.4.2
-  tray_manager: ^0.3.1
+  tray_manager: ^0.4.0
 
   package_info_plus: ^8.1.0
 

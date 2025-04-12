@@ -136,13 +136,13 @@ Future<void> lazyBootstrap(
     //   timeout: 1000,
     // );
 
-    if (PlatformUtils.isDesktop) {
-      await _safeInit(
-        "system tray",
-        () => container.read(systemTrayNotifierProvider.future),
-        timeout: 1000,
-      );
-    }
+    // if (PlatformUtils.isDesktop) {
+    //   await _safeInit(
+    //     "system tray",
+    //     () => container.read(systemTrayNotifierProvider.future),
+    //     timeout: 1000,
+    //   );
+    // }
 
     if (Platform.isAndroid) {
       await _safeInit(
