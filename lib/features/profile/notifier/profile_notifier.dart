@@ -24,6 +24,7 @@ import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'profile_notifier.g.dart';
@@ -223,12 +224,18 @@ class FreeProfiles extends _$FreeProfiles {
   @override
   Future<List<FreeProfile>> build() async {
     final httpCielt = ref.watch(httpClientProvider);
-    final region = ref.watch(ConfigOptions.region);
     final res = await httpCielt.get('https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs');
     if (res.statusCode == 200) {
-      final m = FreeProfilesModel.fromJson(jsonDecode(res.data.toString()) as Map<String, dynamic>);
-      return m.profiles.where((e) => e.region.contains(region.name) || e.region.isEmpty).toList();
+      return FreeProfilesModel.fromJson(jsonDecode(res.data.toString()) as Map<String, dynamic>).profiles;
     }
     return <FreeProfile>[];
   }
+}
+
+@riverpod
+Future<List<FreeProfile>> freeProfilesFilteredByRegion(Ref ref) async {
+  final freeProfiles = await ref.watch(freeProfilesProvider.future);
+  // if (!freeProfiles.hasValue) return <FreeProfile>[];
+  final region = ref.watch(ConfigOptions.region);
+  return freeProfiles.where((e) => e.region.contains(region.name) || e.region.isEmpty).toList();
 }

@@ -37,6 +37,14 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
     }
   }
 
+  Future<void> hideOrShow() async {
+    if (await windowManager.isVisible()) {
+      await windowManager.hide();
+    } else {
+      await windowManager.show();
+    }
+  }
+
   // TODO add option to quit or minimize to tray
   Future<void> close() async {
     await windowManager.hide();

@@ -22,6 +22,7 @@ class AddProfileModal extends HookConsumerWidget {
     final addProfileState = ref.watch(addProfileProvider);
     final freeSwitch = ref.watch(freeSwitchProvider);
     final isDesktop = PlatformUtils.isDesktop;
+    final loadingProfile = addProfileState.isLoading;
 
     ref.listen(
       addProfileProvider,
@@ -39,19 +40,18 @@ class AddProfileModal extends HookConsumerWidget {
     useMemoized(() async {
       await Future.delayed(const Duration(milliseconds: 200));
       if (url != null && context.mounted) {
-        if (addProfileState.isLoading) return;
+        if (loadingProfile) return;
         ref.read(addProfileProvider.notifier).add(url!);
       }
     });
-
     return SafeArea(
       child: LayoutBuilder(
         builder: (context, constraints) {
           final fixBtnsHeight = (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * AddProfileModalConst.fixBtnsGapCount) / AddProfileModalConst.fixBtnsItemCount;
           final fullHeight = fixBtnsHeight + AddProfileModalConst.navBarHeight + 32;
-          final initial = !freeSwitch || addProfileState.isLoading ? fullHeight : fullHeight + 180;
-          var min = !freeSwitch || addProfileState.isLoading ? fullHeight : fullHeight + 100;
-          var max = !freeSwitch || addProfileState.isLoading ? fullHeight / constraints.maxHeight : 0.85;
+          final initial = !freeSwitch || loadingProfile ? fullHeight : fullHeight + 180;
+          var min = !freeSwitch || loadingProfile ? fullHeight : fullHeight + 100;
+          var max = !freeSwitch || loadingProfile ? fullHeight / constraints.maxHeight : 0.85;
           if (isDesktop) {
             min = initial;
             max = initial / constraints.maxHeight;
@@ -62,7 +62,7 @@ class AddProfileModal extends HookConsumerWidget {
             maxChildSize: max,
             expand: false,
             builder: (context, scrollController) {
-              return addProfileState.isLoading
+              return loadingProfile
                   ? const Loading()
                   : Column(
                       children: [

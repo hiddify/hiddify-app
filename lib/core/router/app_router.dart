@@ -1,8 +1,10 @@
+import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/routes.dart';
+import 'package:hiddify/core/router/url_protocol/api.dart';
 // import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -79,11 +81,18 @@ GoRouter router(Ref ref) {
 @riverpod
 class RouterListenable extends _$RouterListenable with AppLogger implements Listenable {
   VoidCallback? _routerListener;
-  bool _introCompleted = false;
+  bool _newUrlFromAppLink = false;
+  // bool _introCompleted = false;
 
   @override
   Future<void> build() async {
-    _introCompleted = ref.watch(Preferences.introCompleted);
+    // _introCompleted = ref.watch(Preferences.introCompleted);
+    ref.watch(Preferences.introCompleted);
+    if (PlatformUtils.isDesktop) {
+      ref
+        ..watch(myAppLinksProvider)
+        ..listen(myAppLinksProvider, (previous, next) => _newUrlFromAppLink = true);
+    }
 
     ref.listenSelf((_, __) {
       if (state.isLoading) return;
@@ -102,6 +111,9 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
     String? url;
     if (state.uri.scheme == 'hiddify' && state.uri.host == 'import') {
       url = state.uri.toString().substring(17);
+    } else if (PlatformUtils.isDesktop && _newUrlFromAppLink) {
+      url = ref.read(myAppLinksProvider).value;
+      _newUrlFromAppLink = false;
     } else if (state.uri.queryParameters['url'] != null) {
       url = state.uri.queryParameters['url'];
     }
@@ -128,4 +140,10 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
   void removeListener(VoidCallback listener) {
     _routerListener = null;
   }
+}
+
+@riverpod
+Stream<String> myAppLinks(Ref ref) async* {
+  if (PlatformUtils.isWindows) registerProtocolHandler('hiddify');
+  yield* AppLinks().uriLinkStream.map((event) => event.toString().substring(17));
 }

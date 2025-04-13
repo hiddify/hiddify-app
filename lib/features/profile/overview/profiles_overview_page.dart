@@ -64,6 +64,7 @@ class ProfilesOverviewPage extends HookConsumerWidget {
           ),
           const Gap(8),
         ],
+        automaticallyImplyLeading: false,
       ),
       body: asyncProfiles.when(
         data: (data) => ListView.separated(

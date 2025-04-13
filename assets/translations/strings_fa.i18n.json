@@ -115,6 +115,7 @@
       "free": "رایگان",
       "failedToLoad": "برگذاری ناموفق بود",
       "noFreeSubscriptionFound": "اشتراک رایگان یافت نشد",
+      "noFreeSubscriptionFoundForRegion": "اشتراک رایگان برای این منطقه \"${region}\" یافت نشد.",
       "addWarp": "افزودن WARP",
       "addFragment": "افزودن Fragment",
       "addingWarpMsg": "لطفا صبر کنید تا وارپ ثبت شود",

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
-import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
@@ -15,12 +14,12 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     this.proxy, {
     super.key,
     required this.selected,
-    required this.onSelect,
+    required this.onTap,
   });
 
   final OutboundInfo proxy;
   final bool selected;
-  final VoidCallback onSelect;
+  final GestureTapCallback? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,15 +32,12 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
         overflow: TextOverflow.ellipsis,
         style: PlatformUtils.isWindows ? const TextStyle(fontFamily: FontFamily.emoji) : null,
       ),
-      leading: Padding(
-        padding: const EdgeInsets.only(right: 8.0),
-        child: IPCountryFlag(
-          countryCode: proxy.ipinfo.countryCode,
-          organization: proxy.ipinfo.org,
-          size: 36,
-        ),
+      leading: IPCountryFlag(
+        countryCode: proxy.ipinfo.countryCode,
+        organization: proxy.ipinfo.org,
+        size: 40,
+        padding: const EdgeInsetsDirectional.only(end: 8),
       ),
-
       subtitle: Text.rich(
         TextSpan(
           text: proxy.type,
@@ -63,7 +59,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
           : null,
       selected: selected,
       selectedTileColor: theme.colorScheme.primaryContainer,
-      onTap: onSelect,
+      onTap: onTap,
       onLongPress: () {
         showDialog(
           context: context,
@@ -100,23 +96,25 @@ class OutboundInfoWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // SizedBox(height: 16.0),
-        _buildInfoRow(t.outboundInfo.fullTag, outboundInfo.tag),
-        _buildInfoRow(t.outboundInfo.type, outboundInfo.type),
-        _buildInfoRow(t.outboundInfo.url_test_time, DateFormat('yyyy-MM-dd HH:mm:ss').format(outboundInfo.urlTestTime.toDateTime().toLocal())),
-        _buildInfoRow(t.outboundInfo.url_test_delay, '${outboundInfo.urlTestDelay} ms'),
-        _buildIpInfo(outboundInfo.ipinfo, ref),
-        _buildInfoRow(t.outboundInfo.is_selected, outboundInfo.isSelected ? '✅' : '❌'),
-        _buildInfoRow(t.outboundInfo.is_group, outboundInfo.isGroup ? '✅' : '❌'),
-        _buildInfoRow(t.outboundInfo.is_secure, outboundInfo.isSecure ? '✅' : '❌'),
-        // _buildInfoRow('Is Visible:', outboundInfo.isVisible ? '✅' : '❌'),
-        _buildInfoRow(t.outboundInfo.port, outboundInfo.port.toString()),
-        _buildInfoRow(t.outboundInfo.host, outboundInfo.host),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // SizedBox(height: 16.0),
+          _buildInfoRow(t.outboundInfo.fullTag, outboundInfo.tag),
+          _buildInfoRow(t.outboundInfo.type, outboundInfo.type),
+          _buildInfoRow(t.outboundInfo.url_test_time, DateFormat('yyyy-MM-dd HH:mm:ss').format(outboundInfo.urlTestTime.toDateTime().toLocal())),
+          _buildInfoRow(t.outboundInfo.url_test_delay, '${outboundInfo.urlTestDelay} ms'),
+          _buildIpInfo(outboundInfo.ipinfo, ref),
+          _buildInfoRow(t.outboundInfo.is_selected, outboundInfo.isSelected ? '✅' : '❌'),
+          _buildInfoRow(t.outboundInfo.is_group, outboundInfo.isGroup ? '✅' : '❌'),
+          _buildInfoRow(t.outboundInfo.is_secure, outboundInfo.isSecure ? '✅' : '❌'),
+          // _buildInfoRow('Is Visible:', outboundInfo.isVisible ? '✅' : '❌'),
+          _buildInfoRow(t.outboundInfo.port, outboundInfo.port.toString()),
+          _buildInfoRow(t.outboundInfo.host, outboundInfo.host),
+        ],
+      ),
     );
   }
 
