@@ -1,6 +1,5 @@
 import 'package:accessibility_tools/accessibility_tools.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -18,7 +17,7 @@ import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/shortcut/shortcut_wrapper.dart';
-import 'package:hiddify/features/system_tray/widget/system_tray_wrapper.dart';
+import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
 import 'package:hiddify/features/window/widget/window_wrapper.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -59,40 +58,39 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     final upgrader = ref.watch(upgraderProvider);
 
     ref.listen(foregroundProfilesUpdateNotifierProvider, (_, __) {});
+    if (PlatformUtils.isDesktop) ref.listen(systemTrayNotifierProvider, (_, __) {});
 
     return WindowWrapper(
-      TrayWrapper(
-        ShortcutWrapper(
-          ConnectionWrapper(
-            DynamicColorBuilder(
-              builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
-                return MaterialApp.router(
-                  routerConfig: router,
-                  locale: locale.flutterLocale,
-                  supportedLocales: AppLocaleUtils.supportedLocales,
-                  localizationsDelegates: GlobalMaterialLocalizations.delegates,
-                  debugShowCheckedModeBanner: false,
-                  themeMode: themeMode.flutterThemeMode,
-                  theme: theme.lightTheme(lightColorScheme),
-                  darkTheme: theme.darkTheme(darkColorScheme),
-                  title: Constants.appName,
-                  builder: (context, child) {
-                    child = UpgradeAlert(
-                      upgrader: upgrader,
-                      navigatorKey: router.routerDelegate.navigatorKey,
-                      child: child ?? const SizedBox(),
+      ShortcutWrapper(
+        ConnectionWrapper(
+          DynamicColorBuilder(
+            builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
+              return MaterialApp.router(
+                routerConfig: router,
+                locale: locale.flutterLocale,
+                supportedLocales: AppLocaleUtils.supportedLocales,
+                localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                debugShowCheckedModeBanner: false,
+                themeMode: themeMode.flutterThemeMode,
+                theme: theme.lightTheme(lightColorScheme),
+                darkTheme: theme.darkTheme(darkColorScheme),
+                title: Constants.appName,
+                builder: (context, child) {
+                  child = UpgradeAlert(
+                    upgrader: upgrader,
+                    navigatorKey: router.routerDelegate.navigatorKey,
+                    child: child ?? const SizedBox(),
+                  );
+                  if (kDebugMode && _debugAccessibility) {
+                    return AccessibilityTools(
+                      checkFontOverflows: true,
+                      child: child,
                     );
-                    if (kDebugMode && _debugAccessibility) {
-                      return AccessibilityTools(
-                        checkFontOverflows: true,
-                        child: child,
-                      );
-                    }
-                    return child;
-                  },
-                );
-              },
-            ),
+                  }
+                  return child;
+                },
+              );
+            },
           ),
         ),
       ),

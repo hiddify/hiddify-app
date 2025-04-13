@@ -31,3 +31,6 @@ categories:
   - Network
 
 startup_notify: true
+
+supported_mime_type:
+  - x-scheme-handler/hiddify

@@ -242,10 +242,18 @@ class HiddifyCoreService with InfraLogger {
     );
   }
 
-  Stream<List<OutboundGroup>> watchGroups() async* {
-    loggy.debug("watching groups");
-    yield* core.bgClient.outboundsInfo(Empty()).map((event) => event.items);
-    // res?.cancel();
+  // Stream<List<OutboundGroup>> watchGroups() async* {
+  //   loggy.debug("watching groups");
+  //   yield* core.bgClient.outboundsInfo(Empty()).map((event) => event.items);
+  //   // res?.cancel();
+  // }
+
+  Stream<OutboundGroup?> watchGroup() async* {
+    loggy.debug("watching group");
+    //emitting first event immediately
+    yield* core.bgClient.outboundsInfo(Empty()).take(1).map((event) => event.items.isEmpty ? null : event.items.first);
+    //emitting other event after every 4 seconds(latest event)
+    yield* core.bgClient.outboundsInfo(Empty()).throttleTime(const Duration(seconds: 4), leading: false, trailing: true).map((event) => event.items.isEmpty ? null : event.items.first);
   }
 
   @riverpod

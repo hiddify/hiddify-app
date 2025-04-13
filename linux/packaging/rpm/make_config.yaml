@@ -26,3 +26,6 @@ generic_name: Hiddify
 group: Applications/Internet
 
 startup_notify: true
+
+supported_mime_type:
+  - x-scheme-handler/hiddify

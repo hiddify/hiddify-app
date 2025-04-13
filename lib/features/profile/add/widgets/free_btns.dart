@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/profile/add/widgets/free_btn.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/utils/uri_utils.dart';
@@ -17,26 +18,12 @@ class FreeBtns extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final freeProfiles = ref.watch(freeProfilesProvider);
+    final freeProfilesFilteredByRegion = ref.watch(freeProfilesFilteredByRegionProvider);
     final theme = Theme.of(context);
     final locale = ref.watch(localePreferencesProvider);
     final isFa = locale.name == AppLocale.fa.name;
-
-    return switch (freeProfiles) {
-      AsyncLoading() => const Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 64),
-            child: LinearProgressIndicator(
-              backgroundColor: Colors.transparent,
-            ),
-          ),
-        ),
-      AsyncError() => Center(
-          child: Text(
-            t.profile.add.failedToLoad,
-            style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface),
-          ),
-        ),
-      AsyncValue() => freeProfiles.value!.isNotEmpty
+    return freeProfilesFilteredByRegion.when(
+      data: (data) => data.isNotEmpty
           ? ScrollConfiguration(
               behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
               child: GridView.builder(
@@ -57,26 +44,25 @@ class FreeBtns extends ConsumerWidget {
                       final result = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: Text(isFa ? profile.title.fa : profile.title.en),
-                          content: ConstrainedBox(
-                            constraints: AlertDialogConst.boxConstraints,
-                            child: MarkdownBody(
-                              data: isFa ? profile.contest.fa : profile.contest.en,
-                              // styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.spaceBetween),
-                              onTapLink: (text, href, title) => UriUtils.tryLaunch(Uri.parse(href!)),
+                            title: Text(isFa ? profile.title.fa : profile.title.en),
+                            content: ConstrainedBox(
+                              constraints: AlertDialogConst.boxConstraints,
+                              child: MarkdownBody(
+                                data: isFa ? profile.contest.fa : profile.contest.en,
+                                // styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.spaceBetween),
+                                onTapLink: (text, href, title) => UriUtils.tryLaunch(Uri.parse(href!)),
+                              ),
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              child: Text(t.general.cancel),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                            TextButton(
-                              child: Text(t.general.kContinue),
-                              onPressed: () => Navigator.of(context).pop(true),
-                            ),
-                          ],
-                        ),
+                            actions: [
+                              TextButton(
+                                child: Text(t.general.cancel),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                              TextButton(
+                                child: Text(t.general.kContinue),
+                                onPressed: () => Navigator.of(context).pop(true),
+                              ),
+                            ]),
                       );
                       if (result == true) ref.read(addProfileProvider.notifier).add(profile.sublink);
                     },
@@ -86,12 +72,21 @@ class FreeBtns extends ConsumerWidget {
             )
           : Center(
               child: Text(
-                t.profile.add.noFreeSubscriptionFound,
+                (freeProfiles.value?.isEmpty ?? true) ? t.profile.add.noFreeSubscriptionFound : t.profile.add.noFreeSubscriptionFoundForRegion(region: ref.watch(ConfigOptions.region).name),
                 style: theme.textTheme.bodySmall!.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),
               ),
             ),
-    };
+      error: (error, stackTrace) => Center(
+        child: Text(
+          t.profile.add.failedToLoad,
+          style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface),
+        ),
+      ),
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
   }
 }
