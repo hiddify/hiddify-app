@@ -76,6 +76,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
     override fun openTun(options: TunOptions): Int {
         if (prepare(this) != null) error("android: missing vpn permission")
+        service.fileDescriptor?.close()
 
         val builder = Builder()
             .setSession("sing-box")
@@ -152,12 +153,12 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                     appList.forEach {
                         addIncludePackage(builder,it)
                     }
-                    addIncludePackage(builder,packageName)
+//                    addIncludePackage(builder,packageName)
                 } else {
                     appList.forEach {
                         addExcludePackage(builder,it)
                     }
-                    //addExcludePackage(builder,packageName)
+                    addExcludePackage(builder,packageName)
                 }
             } else {
                 val includePackage = options.includePackage
@@ -165,14 +166,17 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                     while (includePackage.hasNext()) {
                         addIncludePackage(builder,includePackage.next())
                     }
-                }
-                val excludePackage = options.excludePackage
-                if (excludePackage.hasNext()) {
-                    while (excludePackage.hasNext()) {
-                        addExcludePackage(builder,excludePackage.next())
+                    //                    addIncludePackage(builder,packageName)
+                }else {
+                    val excludePackage = options.excludePackage
+                    if (excludePackage.hasNext()) {
+                        while (excludePackage.hasNext()) {
+                            addExcludePackage(builder, excludePackage.next())
+                        }
                     }
+
+                    addExcludePackage(builder, packageName)
                 }
-                //addExcludePackage(builder,packageName)
                 
             }
         }
