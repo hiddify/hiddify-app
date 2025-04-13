@@ -40,7 +40,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     final connection = await ref.watch(connectionNotifierProvider.future).catchError((e) {
       loggy.warning("error getting connection status", e);
       return const ConnectionStatus.disconnected();
-    }).then((connection) async => await _modifyConnectionStatus(connection, urlTestDelay));
+    }).then((connection) => _modifyConnectionStatus(connection, urlTestDelay));
     final serviceMode = ref.watch(ConfigOptions.serviceMode);
 
     await trayManager.setIcon(_trayIconPath(connection), isTemplate: PlatformUtils.isMacOS);
@@ -121,7 +121,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     }
   }
 
-  Future<ConnectionStatus> _modifyConnectionStatus(ConnectionStatus connection, int urlTestDelay) async {
+  ConnectionStatus _modifyConnectionStatus(ConnectionStatus connection, int urlTestDelay) {
     if (connection is Connected) {
       return urlTestDelay > 0 && urlTestDelay < 65000 ? const Connected() : const Connecting();
     } else {
