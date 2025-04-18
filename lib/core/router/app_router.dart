@@ -144,6 +144,10 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
 
 @riverpod
 Stream<String> myAppLinks(Ref ref) async* {
-  if (PlatformUtils.isWindows) registerProtocolHandler('hiddify');
+  if (PlatformUtils.isWindows) {
+    for (final protocol in LinkParser.protocols) {
+      registerProtocolHandler(protocol);
+    }
+  }
   yield* AppLinks().uriLinkStream.map((event) => event.toString().substring(17));
 }

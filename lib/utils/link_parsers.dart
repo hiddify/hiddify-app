@@ -25,7 +25,7 @@ abstract class LinkParser {
   }
 
   // protocols schemas
-  static const protocols = {'clash', 'clashmeta', 'sing-box', 'hiddify'};
+  static const protocols = ['hiddify', 'v2ray', 'v2rayn', 'v2rayng', 'clash', 'clashmeta', 'sing-box'];
 
   static ProfileLink? parse(String link) {
     return simple(link) ?? deep(link);
