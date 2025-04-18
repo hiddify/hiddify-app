@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
@@ -41,6 +42,16 @@ class ProfilesOverviewPage extends HookConsumerWidget {
         }
       },
     );
+
+    ref.listen(
+      profilesOverviewNotifierProvider,
+      (_, next) {
+        if (next.hasValue && next.value!.isEmpty) {
+          const HomeRoute().go(context);
+        }
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(t.profile.overviewPageTitle),
@@ -106,6 +117,16 @@ class ProfilesOverviewModal extends ConsumerWidget {
         }
       },
     );
+
+    ref.listen(
+      profilesOverviewNotifierProvider,
+      (_, next) {
+        if (next.hasValue && next.value!.isEmpty) {
+          if (context.canPop()) context.pop();
+        }
+      },
+    );
+
     final initialSize = PlatformUtils.isDesktop ? .60 : .35;
     return SafeArea(
       child: asyncProfiles.when(
@@ -176,44 +197,44 @@ class SortProfilesDialog extends HookConsumerWidget {
       content: ConstrainedBox(
         constraints: AlertDialogConst.boxConstraints,
         child: SingleChildScrollView(
-            child: Column(
-              children: [
-                ...ProfilesSort.values.map(
-                  (e) {
-                    final selected = sort.by == e;
-                    final double arrowTurn = sort.mode == SortMode.ascending ? 0 : 0.5;
+          child: Column(
+            children: [
+              ...ProfilesSort.values.map(
+                (e) {
+                  final selected = sort.by == e;
+                  final double arrowTurn = sort.mode == SortMode.ascending ? 0 : 0.5;
 
-                    return ListTile(
-                      title: Text(e.present(t)),
-                      onTap: () {
-                        if (selected) {
+                  return ListTile(
+                    title: Text(e.present(t)),
+                    onTap: () {
+                      if (selected) {
                         ref.read(profilesOverviewSortNotifierProvider.notifier).toggleMode();
-                        } else {
+                      } else {
                         ref.read(profilesOverviewSortNotifierProvider.notifier).changeSort(e);
-                        }
-                      },
-                      selected: selected,
-                      leading: Icon(e.icon),
-                      trailing: selected
-                          ? IconButton(
-                              onPressed: () {
+                      }
+                    },
+                    selected: selected,
+                    leading: Icon(e.icon),
+                    trailing: selected
+                        ? IconButton(
+                            onPressed: () {
                               ref.read(profilesOverviewSortNotifierProvider.notifier).toggleMode();
-                              },
-                              icon: AnimatedRotation(
-                                turns: arrowTurn,
-                                duration: const Duration(milliseconds: 100),
-                                child: Icon(
-                                  FluentIcons.arrow_sort_up_24_regular,
-                                  semanticLabel: sort.mode.name,
-                                ),
+                            },
+                            icon: AnimatedRotation(
+                              turns: arrowTurn,
+                              duration: const Duration(milliseconds: 100),
+                              child: Icon(
+                                FluentIcons.arrow_sort_up_24_regular,
+                                semanticLabel: sort.mode.name,
                               ),
-                            )
-                          : null,
-                    );
-                  },
-                ),
-              ],
-            ),
+                            ),
+                          )
+                        : null,
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

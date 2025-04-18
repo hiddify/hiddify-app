@@ -337,17 +337,17 @@ class ProfileActionsMenu extends HookConsumerWidget {
           await ProfileDetailsRoute(profile.id).push(context);
         },
       ),
-      if (!profile.active)
-        AdaptiveMenuItem(
-          icon: FluentIcons.delete_24_regular,
-          title: t.profile.delete.buttonTxt,
-          onTap: () async {
+      // if (!profile.active)
+      AdaptiveMenuItem(
+        icon: FluentIcons.delete_24_regular,
+        title: t.profile.delete.buttonTxt,
+        onTap: () async {
           if (deleteProfileMutation.state.isInProgress) return;
           await showConfirmationDialog(
-              context,
-              title: t.profile.delete.buttonTxt,
-              message: t.profile.delete.confirmationMsg,
-              icon: FluentIcons.delete_24_regular,
+            context,
+            title: t.profile.delete.buttonTxt,
+            message: t.profile.delete.confirmationMsg,
+            icon: FluentIcons.delete_24_regular,
           ).then(
             (deleteConfirmed) {
               if (!deleteConfirmed) return;
@@ -356,8 +356,8 @@ class ProfileActionsMenu extends HookConsumerWidget {
               );
             },
           );
-          },
-        ),
+        },
+      ),
     ];
 
     return AdaptiveMenu(

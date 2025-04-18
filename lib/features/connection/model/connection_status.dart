@@ -17,6 +17,8 @@ sealed class ConnectionStatus with _$ConnectionStatus {
 
   bool get isConnected => switch (this) { Connected() => true, _ => false };
 
+  bool get isDisconnected => switch (this) { Disconnected() => true, _ => false };
+
   bool get isSwitching => switch (this) {
         Connecting() => true,
         Disconnecting() => true,
@@ -24,9 +26,7 @@ sealed class ConnectionStatus with _$ConnectionStatus {
       };
 
   String format() => switch (this) {
-        Disconnected(:final connectionFailure) => connectionFailure != null
-            ? "CONNECTION FAILURE: $connectionFailure"
-            : "DISCONNECTED",
+        Disconnected(:final connectionFailure) => connectionFailure != null ? "CONNECTION FAILURE: $connectionFailure" : "DISCONNECTED",
         Connecting() => "CONNECTING",
         Connected() => "CONNECTED",
         Disconnecting() => "DISCONNECTING",

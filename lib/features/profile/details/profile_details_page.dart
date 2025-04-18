@@ -7,8 +7,6 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/core/widget/adaptive_icon.dart';
-import 'package:hiddify/features/common/confirmation_dialogs.dart';
 import 'package:hiddify/features/profile/details/json_editor.dart';
 import 'package:hiddify/features/profile/details/profile_details_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
@@ -31,7 +29,6 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
     final t = ref.watch(translationsProvider).requireValue;
 
     final provider = profileDetailsNotifierProvider(id);
-    final notifier = ref.watch(provider.notifier);
 
     ref.listen(
       provider.selectAsync((data) => data.save),
@@ -56,34 +53,34 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
       },
     );
 
-    ref.listen(
-      provider.selectAsync((data) => data.update),
-      (_, next) async {
-        switch (await next) {
-          case AsyncData():
-            CustomToast.success(t.profile.update.successMsg).show(context);
-          case AsyncError(:final error):
-            CustomAlertDialog.fromErr(t.presentError(error)).show(context);
-        }
-      },
-    );
+    // ref.listen(
+    //   provider.selectAsync((data) => data.update),
+    //   (_, next) async {
+    //     switch (await next) {
+    //       case AsyncData():
+    //         CustomToast.success(t.profile.update.successMsg).show(context);
+    //       case AsyncError(:final error):
+    //         CustomAlertDialog.fromErr(t.presentError(error)).show(context);
+    //     }
+    //   },
+    // );
 
-    ref.listen(
-      provider.selectAsync((data) => data.delete),
-      (_, next) async {
-        switch (await next) {
-          case AsyncData():
-            CustomToast.success(t.profile.delete.successMsg).show(context);
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) {
-                if (context.mounted) context.pop();
-              },
-            );
-          case AsyncError(:final error):
-            CustomToast.error(t.presentShortError(error)).show(context);
-        }
-      },
-    );
+    // ref.listen(
+    //   provider.selectAsync((data) => data.delete),
+    //   (_, next) async {
+    //     switch (await next) {
+    //       case AsyncData():
+    //         CustomToast.success(t.profile.delete.successMsg).show(context);
+    //         WidgetsBinding.instance.addPostFrameCallback(
+    //           (_) {
+    //             if (context.mounted) context.pop();
+    //           },
+    //         );
+    //       case AsyncError(:final error):
+    //         CustomToast.error(t.presentShortError(error)).show(context);
+    //     }
+    //   },
+    // );
 
     switch (ref.watch(provider)) {
       case AsyncData(value: final state):
@@ -105,40 +102,42 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                         //     MaterialLocalizations.of(context).cancelButtonLabel,
                         //   ),
                         // ),
-                        MenuItemButton(
-                          onPressed: notifier.save,
-                          child: Text(t.profile.save.buttonText),
+                        TextButton.icon(
+                          onPressed: ref.read(provider.notifier).save,
+                          icon: const Icon(Icons.check),
+                          label: Text(t.profile.save.buttonText),
                         ),
-                        if (state.isEditing)
-                          PopupMenuButton(
-                            icon: Icon(AdaptiveIcon(context).more),
-                            itemBuilder: (context) {
-                              return [
-                                if (state.profile case RemoteProfileEntity())
-                                  PopupMenuItem(
-                                    child: Text(t.profile.update.buttonTxt),
-                                    onTap: () async {
-                                      await notifier.updateProfile();
-                                    },
-                                  ),
-                                if (!state.profile.active)
-                                  PopupMenuItem(
-                                    child: Text(t.profile.delete.buttonTxt),
-                                    onTap: () async {
-                                      final deleteConfirmed = await showConfirmationDialog(
-                                        context,
-                                        title: t.profile.delete.buttonTxt,
-                                        message: t.profile.delete.confirmationMsg,
-                                        icon: FluentIcons.delete_24_regular,
-                                      );
-                                      if (deleteConfirmed) {
-                                        await notifier.delete();
-                                      }
-                                    },
-                                  ),
-                              ];
-                            },
-                          ),
+                        const Gap(12),
+                        // if (state.isEditing)
+                        //   PopupMenuButton(
+                        //     icon: Icon(AdaptiveIcon(context).more),
+                        //     itemBuilder: (context) {
+                        //       return [
+                        //         if (state.profile case RemoteProfileEntity())
+                        //           PopupMenuItem(
+                        //             child: Text(t.profile.update.buttonTxt),
+                        //             onTap: () async {
+                        //               await ref.read(provider.notifier).updateProfile();
+                        //             },
+                        //           ),
+                        //         // if (!state.profile.active)
+                        //         PopupMenuItem(
+                        //           child: Text(t.profile.delete.buttonTxt),
+                        //           onTap: () async {
+                        //             final deleteConfirmed = await showConfirmationDialog(
+                        //               context,
+                        //               title: t.profile.delete.buttonTxt,
+                        //               message: t.profile.delete.confirmationMsg,
+                        //               icon: FluentIcons.delete_24_regular,
+                        //             );
+                        //             if (deleteConfirmed) {
+                        //               await ref.read(provider.notifier).delete();
+                        //             }
+                        //           },
+                        //         ),
+                        //       ];
+                        //     },
+                        //   ),
                       ],
                     ),
                     Form(
@@ -152,7 +151,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                             ),
                             child: CustomTextFormField(
                               initialValue: state.profile.name,
-                              onChanged: (value) => notifier.setField(name: value),
+                              onChanged: (value) => ref.read(provider.notifier).setField(name: value),
                               validator: (value) => (value?.isEmpty ?? true) ? t.profile.detailsForm.emptyNameMsg : null,
                               label: t.profile.detailsForm.nameLabel,
                               hint: t.profile.detailsForm.nameHint,
@@ -166,7 +165,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                               ),
                               child: CustomTextFormField(
                                 initialValue: url,
-                                onChanged: (value) => notifier.setField(url: value),
+                                onChanged: (value) => ref.read(provider.notifier).setField(url: value),
                                 validator: (value) => (value != null && !isUrl(value)) ? t.profile.detailsForm.invalidUrlMsg : null,
                                 label: t.profile.detailsForm.urlLabel,
                                 hint: t.profile.detailsForm.urlHint,
@@ -187,7 +186,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                   initialValue: options?.updateInterval.inHours,
                                   optionalAction: (
                                     t.general.state.disable,
-                                    () => notifier.setField(
+                                    () => ref.read(provider.notifier).setField(
                                           updateInterval: none(),
                                         ),
                                   ),
@@ -196,9 +195,9 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                   digitsOnly: true,
                                 ).show(context);
                                 if (intervalInHours == null) return;
-                                notifier.setField(
-                                  updateInterval: optionOf(intervalInHours),
-                                );
+                                ref.read(provider.notifier).setField(
+                                      updateInterval: optionOf(intervalInHours),
+                                    );
                               },
                             ),
                           ],
@@ -282,7 +281,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                   if (value == null) return;
                                   const encoder = JsonEncoder.withIndent('  ');
 
-                                  notifier.setField(configContent: encoder.convert(value));
+                                  ref.read(provider.notifier).setField(configContent: encoder.convert(value));
                                 },
                                 enableHorizontalScroll: true,
                                 json: state.configContent,

@@ -186,47 +186,47 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
     }
   }
 
-  Future<void> updateProfile() async {
-    if (state case AsyncData(:final value)) {
-      // if (value.update?.isLoading ?? false || !value.isEditing) return;
-      if (value.profile case LocalProfileEntity()) {
-        loggy.warning("local profile can't be updated");
-        return;
-      }
+  // Future<void> updateProfile() async {
+  //   if (state case AsyncData(:final value)) {
+  //     // if (value.update?.isLoading ?? false || !value.isEditing) return;
+  //     if (value.profile case LocalProfileEntity()) {
+  //       loggy.warning("local profile can't be updated");
+  //       return;
+  //     }
 
-      final profile = value.profile;
-      state = AsyncData(value.copyWith(update: const AsyncLoading()));
+  //     final profile = value.profile;
+  //     state = AsyncData(value.copyWith(update: const AsyncLoading()));
 
-      final failureOrUpdatedProfile = await _profilesRepo.updateSubscription(profile as RemoteProfileEntity).flatMap((_) => _profilesRepo.getById(id)).run();
+  //     final failureOrUpdatedProfile = await _profilesRepo.updateSubscription(profile as RemoteProfileEntity).flatMap((_) => _profilesRepo.getById(id)).run();
 
-      state = AsyncData(
-        value.copyWith(
-          update: failureOrUpdatedProfile.match(
-            (l) => AsyncError(l, StackTrace.current),
-            (_) => const AsyncData(null),
-          ),
-          profile: failureOrUpdatedProfile.match(
-            (_) => profile,
-            (updatedProfile) => updatedProfile ?? profile,
-          ),
-        ),
-      );
-    }
-  }
+  //     state = AsyncData(
+  //       value.copyWith(
+  //         update: failureOrUpdatedProfile.match(
+  //           (l) => AsyncError(l, StackTrace.current),
+  //           (_) => const AsyncData(null),
+  //         ),
+  //         profile: failureOrUpdatedProfile.match(
+  //           (_) => profile,
+  //           (updatedProfile) => updatedProfile ?? profile,
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
 
-  Future<void> delete() async {
-    if (state case AsyncData(:final value)) {
-      if (value.delete case AsyncLoading()) return;
-      final profile = value.profile;
-      state = AsyncData(value.copyWith(delete: const AsyncLoading()));
+  // Future<void> delete() async {
+  //   if (state case AsyncData(:final value)) {
+  //     if (value.delete case AsyncLoading()) return;
+  //     final profile = value.profile;
+  //     state = AsyncData(value.copyWith(delete: const AsyncLoading()));
 
-      state = AsyncData(
-        value.copyWith(
-          delete: await AsyncValue.guard(() async {
-            await _profilesRepo.deleteById(profile.id).getOrElse((l) => throw l).run();
-          }),
-        ),
-      );
-    }
-  }
+  //     state = AsyncData(
+  //       value.copyWith(
+  //         delete: await AsyncValue.guard(() async {
+  //           await _profilesRepo.deleteById(profile.id).getOrElse((l) => throw l).run();
+  //         }),
+  //       ),
+  //     );
+  //   }
+  // }
 }
