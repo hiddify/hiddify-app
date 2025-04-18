@@ -342,20 +342,20 @@ class ProfileActionsMenu extends HookConsumerWidget {
           icon: FluentIcons.delete_24_regular,
           title: t.profile.delete.buttonTxt,
           onTap: () async {
-            if (deleteProfileMutation.state.isInProgress) {
-              return;
-            }
-            final deleteConfirmed = await showConfirmationDialog(
+          if (deleteProfileMutation.state.isInProgress) return;
+          await showConfirmationDialog(
               context,
               title: t.profile.delete.buttonTxt,
               message: t.profile.delete.confirmationMsg,
               icon: FluentIcons.delete_24_regular,
-            );
-            if (deleteConfirmed) {
+          ).then(
+            (deleteConfirmed) {
+              if (!deleteConfirmed) return;
               deleteProfileMutation.setFuture(
                 ref.read(profilesOverviewNotifierProvider.notifier).deleteProfile(profile),
               );
-            }
+            },
+          );
           },
         ),
     ];

@@ -2,9 +2,12 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dart';
@@ -48,12 +51,7 @@ class ProfilesOverviewPage extends HookConsumerWidget {
             tooltip: t.profile.add.shortBtnTxt, // Tooltip for accessibility
           ),
           IconButton(
-            onPressed: () => showDialog(
-              context: context,
-              builder: (context) {
-                return const ProfilesSortModal();
-              },
-            ),
+            onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
             icon: const Icon(FluentIcons.arrow_sort_24_filled),
             tooltip: t.general.sort,
           ),
@@ -140,12 +138,7 @@ class ProfilesOverviewModal extends ConsumerWidget {
                         tooltip: t.profile.add.shortBtnTxt, // Tooltip for accessibility
                       ),
                       IconButton(
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (context) {
-                            return const ProfilesSortModal();
-                          },
-                        ),
+                        onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
                         icon: const Icon(FluentIcons.arrow_sort_24_filled),
                         tooltip: t.general.sort,
                       ),
@@ -170,20 +163,19 @@ class ProfilesOverviewModal extends ConsumerWidget {
   }
 }
 
-class ProfilesSortModal extends HookConsumerWidget {
-  const ProfilesSortModal({super.key});
+class SortProfilesDialog extends HookConsumerWidget {
+  const SortProfilesDialog({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final sortNotifier = ref.watch(profilesOverviewSortNotifierProvider.notifier);
+    final sort = ref.watch(profilesOverviewSortNotifierProvider);
 
     return AlertDialog(
       title: Text(t.general.sortBy),
-      content: Consumer(
-        builder: (context, ref, child) {
-          final sort = ref.watch(profilesOverviewSortNotifierProvider);
-          return SingleChildScrollView(
+      content: ConstrainedBox(
+        constraints: AlertDialogConst.boxConstraints,
+        child: SingleChildScrollView(
             child: Column(
               children: [
                 ...ProfilesSort.values.map(
@@ -195,9 +187,9 @@ class ProfilesSortModal extends HookConsumerWidget {
                       title: Text(e.present(t)),
                       onTap: () {
                         if (selected) {
-                          sortNotifier.toggleMode();
+                        ref.read(profilesOverviewSortNotifierProvider.notifier).toggleMode();
                         } else {
-                          sortNotifier.changeSort(e);
+                        ref.read(profilesOverviewSortNotifierProvider.notifier).changeSort(e);
                         }
                       },
                       selected: selected,
@@ -205,7 +197,7 @@ class ProfilesSortModal extends HookConsumerWidget {
                       trailing: selected
                           ? IconButton(
                               onPressed: () {
-                                sortNotifier.toggleMode();
+                              ref.read(profilesOverviewSortNotifierProvider.notifier).toggleMode();
                               },
                               icon: AnimatedRotation(
                                 turns: arrowTurn,
@@ -222,8 +214,7 @@ class ProfilesSortModal extends HookConsumerWidget {
                 ),
               ],
             ),
-          );
-        },
+        ),
       ),
     );
   }
