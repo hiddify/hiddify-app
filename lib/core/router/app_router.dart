@@ -91,7 +91,7 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
     if (PlatformUtils.isDesktop) {
       ref
         ..watch(myAppLinksProvider)
-        ..listen(myAppLinksProvider, (previous, next) => _newUrlFromAppLink = true);
+        ..listen(myAppLinksProvider, (_, __) => _newUrlFromAppLink = true);
     }
 
     ref.listenSelf((_, __) {
@@ -109,8 +109,8 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
     final isIntro = state.uri.path == const IntroRoute().location;
     // fix path-parameters for deep link
     String? url;
-    if (state.uri.scheme == 'hiddify' && state.uri.host == 'import') {
-      url = state.uri.toString().substring(17);
+    if (LinkParser.protocols.contains(state.uri.scheme)) {
+      url = state.uri.toString();
     } else if (PlatformUtils.isDesktop && _newUrlFromAppLink) {
       url = ref.read(myAppLinksProvider).value;
       _newUrlFromAppLink = false;
@@ -149,5 +149,5 @@ Stream<String> myAppLinks(Ref ref) async* {
       registerProtocolHandler(protocol);
     }
   }
-  yield* AppLinks().uriLinkStream.map((event) => event.toString().substring(17));
+  yield* AppLinks().uriLinkStream.map((event) => event.toString());
 }
