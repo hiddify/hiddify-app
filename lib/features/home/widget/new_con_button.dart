@@ -39,7 +39,7 @@ class CircleDesignWidget extends StatelessWidget {
           label: label,
           child: Container(
             clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               // boxShadow: [
               //   BoxShadow(

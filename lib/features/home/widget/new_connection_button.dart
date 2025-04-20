@@ -89,8 +89,8 @@ class CirclePainter extends CustomPainter {
 
     Color baseColor;
     var innerCircleColor = [
-      Color(0xFF455FE9),
-      Color(0xFF3446A5),
+      const Color(0xFF455FE9),
+      const Color(0xFF3446A5),
     ];
     if (currentState == ConnectionStateStatus.connected) {
       baseColor = Colors.green.shade900;
@@ -98,7 +98,7 @@ class CirclePainter extends CustomPainter {
       baseColor = Colors.red.shade900;
     } else {
       // baseColor = const Color(0xFFB8C7F4);
-      baseColor = Color(0xFF3446A5);
+      baseColor = const Color(0xFF3446A5);
     }
     innerCircleColor = [
       baseColor.withAlpha(230),
