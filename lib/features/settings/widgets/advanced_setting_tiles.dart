@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -9,7 +8,6 @@ import 'package:hiddify/features/config_option/data/config_option_repository.dar
 import 'package:hiddify/features/config_option/overview/config_options_page.dart';
 import 'package:hiddify/features/config_option/widget/preference_tile.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
-import 'package:hiddify/features/settings/notifier/platform_settings_notifier.dart';
 import 'package:hiddify/features/settings/widgets/settings_input_dialog.dart';
 import 'package:hiddify/utils/validators.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

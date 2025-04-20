@@ -1,6 +1,5 @@
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/stats/data/stats_data_providers.dart';
-import 'package:hiddify/features/stats/model/stats_entity.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
