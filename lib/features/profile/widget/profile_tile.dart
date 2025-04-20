@@ -20,8 +20,7 @@ import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dar
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-// import 'package:percent_indicator/percent_indicator.dart';
-// import 'package:percent_indicator_premium/percent_indicator_premium.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileTile extends HookConsumerWidget {

@@ -14,10 +14,6 @@ import 'package:hiddify/features/settings/widgets/widgets.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:humanizer/humanizer.dart';
-// import 'package:lucy_editor/lucy_editor.dart';
-// import 'package:re_highlight/languages/json.dart';
-// import 'package:re_highlight/styles/atom-one-light.dart';
-// import 'package:json_editor_flutter/json_editor_flutter.dart';
 
 class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
   const ProfileDetailsPage({super.key, required this.id});
