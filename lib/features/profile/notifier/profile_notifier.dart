@@ -81,7 +81,7 @@ class AddProfile extends _$AddProfile with AppLogger {
         } else if (LinkParser.protocol(rawInput) case (final parsed)?) {
           loggy.debug("adding profile, content");
           var name = parsed.name;
-          var oldItem = await _profilesRepo.getByName(name);
+          final oldItem = await _profilesRepo.getByName(name);
           if (name == "Hiddify WARP" && oldItem != null) {
             _profilesRepo.deleteById(oldItem.id).run();
           }

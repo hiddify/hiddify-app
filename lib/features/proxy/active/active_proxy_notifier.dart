@@ -95,7 +95,7 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
   final _urlTestThrottler = Throttler(const Duration(seconds: 2));
 
   Future<void> urlTest(String? groupTag_) async {
-    var groupTag = groupTag_ ?? "auto";
+    final groupTag = groupTag_ ?? "auto";
     _urlTestThrottler(
       () async {
         if (state case AsyncData()) {
