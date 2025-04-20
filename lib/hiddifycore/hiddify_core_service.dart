@@ -398,10 +398,10 @@ class HiddifyCoreService with InfraLogger {
           logBuffer.removeAt(0);
         }
         logController.add(logBuffer);
-        event.message.split('\n').forEach((line) {
-          loggy.log(getLogLevel(event.level), line);
-        });
-
+        loggy.log(getLogLevel(event.level), event.message);
+        // event.message.split('\n').forEach((line) {
+        //   loggy.log(getLogLevel(event.level), line);
+        // });
         return event;
       }),
     );
