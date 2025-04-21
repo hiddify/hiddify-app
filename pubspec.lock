@@ -122,10 +122,10 @@ packages:
     dependency: transitive
     description:
       name: bazel_worker
-      sha256: "57035594b87d9f5af99f1a80e1edf5411dadbdf5acfc4f90403e3849f57dd0f0"
+      sha256: "500584fdb80bcb70a2990a5838338a757cc24bbf27d88bf791cbe9461c57cd5a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.0.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -1406,13 +1406,21 @@ packages:
     source: hosted
     version: "2.1.1"
   protobuf:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: protobuf
-      sha256: "68645b24e0716782e58948f8467fd42a880f255096a821f9e7d0ec625b00c84d"
+      sha256: "01dd9bd0fa02548bf2ceee13545d4a0ec6046459d847b6b061d8a27237108a08"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "2.1.0"
+  protoc_plugin:
+    dependency: "direct dev"
+    description:
+      name: protoc_plugin
+      sha256: e2be5014ba145dc0f8de20ac425afa2a513aff64fe350d338e481d40de0573df
+      url: "https://pub.dev"
+    source: hosted
+    version: "20.0.1"
   pub_semver:
     dependency: transitive
     description:
@@ -2196,4 +2204,4 @@ packages:
     version: "2.2.2"
 sdks:
   dart: ">=3.7.0 <3.8.0-z"
-  flutter: ">=3.29.1"
+  flutter: ">=3.29.3"

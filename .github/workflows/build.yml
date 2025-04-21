@@ -339,6 +339,7 @@ jobs:
           name: 'draft'
           tag_name: 'draft'
           body_path: './release.md'
+          target_commitish: '530bf77839a74d4f13847ba244a20734ac7ab119'
           prerelease: true
           repository: hiddify/hiddify-app
 

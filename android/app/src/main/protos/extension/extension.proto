@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+import "v2/hcommon/common.proto";
+
+package extension;
+
+option go_package = "github.com/hiddify/hiddify-core/extension";
+option java_package = "com.hiddify.core.api.extension";
+message ExtensionActionResult {
+  string extension_id = 1;
+  hcommon.ResponseCode code = 2;
+  string message = 3;
+}
+
+message ExtensionList {
+  repeated ExtensionMsg extensions = 1;
+}
+
+message EditExtensionRequest {
+  string extension_id = 1;
+  bool enable = 2;
+}
+
+message ExtensionMsg {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  bool enable = 4;
+}
+
+message ExtensionRequest {
+  string extension_id = 1;
+  map<string, string> data = 2;
+}
+
+message SendExtensionDataRequest {
+  string extension_id = 1;
+  string button=2;
+  map<string, string> data = 3;
+}
+
+message ExtensionResponse {
+  ExtensionResponseType type = 1;
+  string extension_id = 2;
+  string json_ui = 3;
+}
+
+
+enum ExtensionResponseType {
+  NOTHING = 0;
+  UPDATE_UI = 1;
+  SHOW_DIALOG = 2;
+  END=3;
+}
+
+

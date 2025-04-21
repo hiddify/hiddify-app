@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package profile;
+option go_package = "github.com/hiddify/hiddify-core/v2/profile";
+option java_package = "com.hiddify.core.api.v2.profile";
+import "v2/hiddifyoptions/hiddify_options.proto";
+
+// ProfileEntity defines a profile entity.
+message ProfileEntity {
+  string id = 1; // Unique identifier for the profile.
+  // bool active = 2; // Indicates if the profile is active.
+  string name = 3; // Name of the profile.
+  string url = 4; // URL associated with the profile.
+  int64 last_update = 5; // Last update time in milliseconds of the profile.
+  ProfileOptions options = 6; // Options associated with the profile.
+  SubscriptionInfo sub_info = 7; // Subscription-related information.
+  hiddifyoptions.HiddifyOptions override_hiddify_options = 8; // Override Hiddify options.
+}
+
+// ProfileOptions defines options for a profile.
+message ProfileOptions {
+  int64 update_interval = 1; // Update interval in milliseconds.
+}
+
+// SubscriptionInfo defines subscription-related information.
+message SubscriptionInfo {
+  int64 upload = 1; // Upload speed in bytes.
+  int64 download = 2; // Download speed in bytes.
+  int64 total = 3; // Total data in bytes.
+  int64 expire = 4; // Expiration time in milliseconds of the subscription.
+  string web_page_url = 5; // URL for the web page.
+  string support_url = 6; // URL for support.
+}

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package hello;
+option go_package = "github.com/hiddify/hiddify-core/v2/hello";
+option java_package = "com.hiddify.core.api.v2.hello";
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloResponse {
+  string message = 1;
+}

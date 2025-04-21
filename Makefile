@@ -13,6 +13,14 @@ ifeq ($(OS),Windows_NT)
 endif
 
 
+# Define sed command based on the OS
+ifeq ($(shell uname),Darwin) # macOS
+    SED :=sed -i ''
+else # Linux
+    SED :=sed -i
+endif
+
+
 BINDIR=hiddify-core$(SEP)bin
 ANDROID_OUT=android$(SEP)app$(SEP)libs
 IOS_OUT=ios$(SEP)Frameworks
@@ -74,17 +82,37 @@ android-prepare: get-geo-assets get gen translate android-libs
 android-apk-prepare:android-prepare
 android-aab-prepare:android-prepare
 
-
-.PHONY: protos
-protos:
-	make -C hiddify-core -f Makefile protos
-	mkdir -p lib/hiddifycore/generated
-	dart pub global activate protoc_plugin
-	# for f in $(shell find hiddify-core/ -name "*.proto"); do \
-	# 	protoc --dart_out=grpc:lib/hiddifycore/generated --proto_path=hiddify-core/  "$$f" 	google/protobuf/timestamp.proto ; \
+.PHONY: generate_kotlin_protos
+generate_kotlin_protos: 
+	# Run protoc to generate Kotlin files
+	# protoc \
+	# 	--proto_path=hiddify-core/ \
+	# 	--java_out=./android/app/src/main/java/ \
+	# 	--grpc-java_out=./android/app/src/main/java/ \
+	# 	$(shell find hiddify-core/v2 hiddify-core/extension -name "*.proto")
+	rsync -av --delete \
+		--include='*/' \
+		--include='*.proto' \
+		--exclude='*' \
+		hiddify-core/{v2,extension} ./android/app/src/main/protos/
+	# # Find .proto files and update package declarations
+	# find "./android/app/src/main/java/com/hiddify/hiddify/protos" -type f -name "*.java" | while read -r proto_file; do \
+	#     if grep -q "^package " "$$proto_file"; then \
+	#         $(SED) 's/^package \([\w\.]*\)/package com.hiddify.hiddify.protos.\1/g' "$$proto_file"; \
+	#     fi \
 	# done
+
+generate_go_protoc:
+	make -C hiddify-core -f Makefile protos
+	echo "SED: $(SED)"
+generate_dart_protoc:
+	mkdir -p lib/hiddifycore/generated
 	protoc --dart_out=grpc:lib/hiddifycore/generated --proto_path=hiddify-core/  $(shell find hiddify-core/v2 hiddify-core/extension -name "*.proto") 	google/protobuf/timestamp.proto ; \
 
+.PHONY: protos
+protos: generate_go_protoc generate_kotlin_protos generate_dart_protoc
+	
+	
 	
 
 macos-install-dependencies:

@@ -5,7 +5,7 @@ version: 3.0.0+30000
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
-  flutter: "^3.29.1"
+  flutter: "^3.29.3"
 
 dependencies:
   flutter:
@@ -103,7 +103,7 @@ dependencies:
   # # then add path to "environment variable" e.g. -> C:\src\protoc-28.3-win64\bin
   # # then active "protoc_plugin" by running this command -> dart pub global activate protoc_plugin
   # # then add path to "environment variable" e.g. -> C:\Users\%USERPROFILE%\AppData\Local\Pub\Cache\global_packages\protoc_plugin\bin
-  # protobuf: ^3.1.0
+  protobuf: ^2.0.0
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
   # flutter_platform_widgets: ^7.0.1
@@ -135,7 +135,7 @@ dev_dependencies:
   #   sdk: flutter
   lint: ^2.3.0
   build_web_compilers: ^4.0.11
-
+  protoc_plugin: ^20.0.1
   build_runner: ^2.4.13
   json_serializable: ^6.7.1
   freezed: ^2.4.7
