@@ -131,7 +131,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
     }
 
     fun updateStatus(status: SystemInfo) {
-        val content = "${status.current_outbound}:\t\n ${Libbox.formatBytes(status.uplink)}/s ↑\t${Libbox.formatBytes(status.downlink)}/s ↓"
+        val content = "${Libbox.formatBytes(status.uplink)}/s ↑\t${Libbox.formatBytes(status.downlink)}/s ↓ \n${status.current_outbound}"
         val title = "${status.current_profile}"
         Application.notificationManager.notify(
                 notificationId,

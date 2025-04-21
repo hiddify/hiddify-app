@@ -208,6 +208,7 @@ class HiddifyCoreService with InfraLogger {
         final res = await core.bgClient.restart(
           StartRequest(
             configPath: path,
+            configName: name,
             disableMemoryLimit: disableMemoryLimit,
             delayStart: true,
           ),

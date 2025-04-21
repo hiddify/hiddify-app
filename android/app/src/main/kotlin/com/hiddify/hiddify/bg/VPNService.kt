@@ -194,8 +194,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
             systemProxyEnabled = false
         }
 
-        val pfd =
-            builder.establish() ?: error("android: the application is not prepared or is revoked")
+        val pfd = builder.establish() ?: error("android: the application is not prepared or is revoked")
         service.fileDescriptor = pfd
         return pfd.fd
     }
