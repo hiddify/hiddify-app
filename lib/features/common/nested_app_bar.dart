@@ -47,7 +47,7 @@ class NestedAppBar extends StatelessWidget {
               : (Navigator.of(context).canPop()
                   ? IconButton(
                       // icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
-                      icon: Icon(Icons.arrow_back),
+                      icon: const Icon(Icons.arrow_back),
 
                       // padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
                       onPressed: () {

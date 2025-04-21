@@ -1,11 +1,3 @@
-// import 'package:hiddify/core/localization/translations.dart';
-// import 'package:hiddify/features/connection/model/connection_status.dart';
-// import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
-// import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
-// import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-// import 'package:hooks_riverpod/hooks_riverpod.dart';
-// import 'package:quick_settings/quick_settings.dart';
-
 // void setTileLable(Tile tile, WidgetRef ref) {
 //   final t = ref.watch(translationsProvider).requireValue;
 //   final connectionStatus = ref.watch(connectionNotifierProvider);

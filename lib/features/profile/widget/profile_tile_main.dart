@@ -47,10 +47,10 @@ class ProfileTileMain extends HookConsumerWidget {
     final shouldLaunch = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Row(
+        title: const Row(
           children: [
             Icon(FluentIcons.warning_24_filled, color: Colors.orange),
-            const Gap(8),
+            Gap(8),
             Text('External Link Warning'),
           ],
         ),
@@ -58,24 +58,24 @@ class ProfileTileMain extends HookConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('You are about to visit:'),
+            const Text('You are about to visit:'),
             const Gap(8),
             Text(
               url,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const Gap(16),
-            Text('This website is not in our trusted list. Please proceed with caution.'),
+            const Text('This website is not in our trusted list. Please proceed with caution.'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Continue'),
+            child: const Text('Continue'),
           ),
         ],
       ),
@@ -96,7 +96,7 @@ class ProfileTileMain extends HookConsumerWidget {
       _ => null,
     };
 
-    if (!isMain) return Card();
+    if (!isMain) return const Card();
 
     return Material(
       color: Colors.transparent,

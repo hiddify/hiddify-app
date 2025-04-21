@@ -89,8 +89,8 @@ class CirclePainter extends CustomPainter {
 
     Color baseColor;
     var innerCircleColor = [
-      Color(0xFF455FE9),
-      Color(0xFF3446A5),
+      const Color(0xFF455FE9),
+      const Color(0xFF3446A5),
     ];
     if (currentState == ConnectionStateStatus.connected) {
       baseColor = Colors.green.shade900;
@@ -98,7 +98,7 @@ class CirclePainter extends CustomPainter {
       baseColor = Colors.red.shade900;
     } else {
       // baseColor = const Color(0xFFB8C7F4);
-      baseColor = Color(0xFF3446A5);
+      baseColor = const Color(0xFF3446A5);
     }
     innerCircleColor = [
       baseColor.withAlpha(230),
@@ -108,38 +108,38 @@ class CirclePainter extends CustomPainter {
     ];
 
     // Outer circle (pulsing animation for connecting state)
-    Paint outerCirclePaint = Paint()
+    final Paint outerCirclePaint = Paint()
       ..color = baseColor.withOpacity(0.15)
       ..style = PaintingStyle.fill;
     // double outerRadius = (size.width / 2) * (currentState == ConnectionStateStatus.connecting ? animationValue : 1);
-    double outerRadius = 84 * ([ConnectionStateStatus.connecting, ConnectionStateStatus.connected].contains(currentState) ? animationValue : 1);
+    final double outerRadius = 84 * ([ConnectionStateStatus.connecting, ConnectionStateStatus.connected].contains(currentState) ? animationValue : 1);
 
     canvas.drawCircle(Offset(cx, cy), outerRadius, outerCirclePaint);
 
     // Middle circle
-    Paint middleCirclePaint = Paint()
+    final Paint middleCirclePaint = Paint()
       ..color = baseColor.withOpacity(.3)
       ..style = PaintingStyle.fill;
-    double middleRadius = 60 * ([ConnectionStateStatus.connecting, ConnectionStateStatus.connected].contains(currentState) ? animationValue + (1 - animationValue) / 3 : 1);
+    final double middleRadius = 60 * ([ConnectionStateStatus.connecting, ConnectionStateStatus.connected].contains(currentState) ? animationValue + (1 - animationValue) / 3 : 1);
     canvas.drawCircle(Offset(cx, cy), middleRadius, middleCirclePaint);
 
     // Inner circle with gradient
-    Paint innerCirclePaint = Paint()
+    final Paint innerCirclePaint = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: innerCircleColor,
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 36));
-    double innerRadius = 36; //* (currentState == ConnectionStateStatus.connecting ? animationValue : 1);
+    final double innerRadius = 36; //* (currentState == ConnectionStateStatus.connecting ? animationValue : 1);
     canvas.drawCircle(Offset(cx, cy), innerRadius, innerCirclePaint);
-    Paint pathPaint = Paint()
+    final Paint pathPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.80952
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    Path curvePath = Path()
+    final Path curvePath = Path()
       ..moveTo(92.4867, 75.52)
       ..cubicTo(
         94.1645,
@@ -207,7 +207,7 @@ class CirclePainter extends CustomPainter {
       );
     canvas.drawPath(curvePath, pathPaint);
     // Vertical line
-    Path linePath = Path()
+    final Path linePath = Path()
       ..moveTo(84.0066, 72)
       ..lineTo(84.0066, 82.6667);
 

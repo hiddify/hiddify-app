@@ -1,13 +1,11 @@
 import 'package:drift/drift.dart';
-// ignore: depend_on_referenced_packages
-// import 'package:drift_dev/api/migrations.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/database/connection/database_connection.dart';
 import 'package:hiddify/core/database/converters/duration_converter.dart';
 import 'package:hiddify/core/database/schema_versions.dart';
 import 'package:hiddify/core/database/tables/database_tables.dart';
-// import 'package:hiddify/features/geo_asset/data/geo_asset_data_mapper.dart';
-// import 'package:hiddify/features/geo_asset/model/default_geo_assets.dart';
+
 import 'package:hiddify/features/geo_asset/model/geo_asset_entity.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/utils/custom_loggers.dart';

@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
@@ -11,7 +12,7 @@ import 'package:hiddify/features/config_option/notifier/config_option_notifier.d
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/connection/widget/experimental_feature_notice.dart';
-// import 'package:hiddify/features/home/widget/new_connection_button.dart';
+
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
@@ -133,7 +134,10 @@ class ConnectionButton extends HookConsumerWidget {
                 context: context,
                 builder: (context) => AlertDialog(
                   title: Text(t.home.noActiveProfileMsg),
-                  content: Text(t.home.emptyProfilesMsg.text),
+                  content: ConstrainedBox(
+                    constraints: AlertDialogConst.boxConstraints,
+                    child: Text(t.home.emptyProfilesMsg.text),
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () async {

@@ -54,7 +54,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
         if (configContent.isNotEmpty) {
           try {
             final jsonObject = jsonDecode(configContent);
-            List<Map<String, dynamic>> res = [];
+            final List<Map<String, dynamic>> res = [];
             if (jsonObject is Map<String, dynamic> && jsonObject['outbounds'] is List) {
               for (var outbound in jsonObject['outbounds'] as List<dynamic>) {
                 if (outbound is Map<String, dynamic> && outbound['type'] != null && !['selector', 'urltest', 'dns', 'block'].contains(outbound['type']) && !['direct', 'bypass', 'direct-fragment'].contains(outbound['tag'])) {
@@ -186,47 +186,47 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
     }
   }
 
-  Future<void> updateProfile() async {
-    if (state case AsyncData(:final value)) {
-      // if (value.update?.isLoading ?? false || !value.isEditing) return;
-      if (value.profile case LocalProfileEntity()) {
-        loggy.warning("local profile can't be updated");
-        return;
-      }
+  // Future<void> updateProfile() async {
+  //   if (state case AsyncData(:final value)) {
+  //     // if (value.update?.isLoading ?? false || !value.isEditing) return;
+  //     if (value.profile case LocalProfileEntity()) {
+  //       loggy.warning("local profile can't be updated");
+  //       return;
+  //     }
 
-      final profile = value.profile;
-      state = AsyncData(value.copyWith(update: const AsyncLoading()));
+  //     final profile = value.profile;
+  //     state = AsyncData(value.copyWith(update: const AsyncLoading()));
 
-      final failureOrUpdatedProfile = await _profilesRepo.updateSubscription(profile as RemoteProfileEntity).flatMap((_) => _profilesRepo.getById(id)).run();
+  //     final failureOrUpdatedProfile = await _profilesRepo.updateSubscription(profile as RemoteProfileEntity).flatMap((_) => _profilesRepo.getById(id)).run();
 
-      state = AsyncData(
-        value.copyWith(
-          update: failureOrUpdatedProfile.match(
-            (l) => AsyncError(l, StackTrace.current),
-            (_) => const AsyncData(null),
-          ),
-          profile: failureOrUpdatedProfile.match(
-            (_) => profile,
-            (updatedProfile) => updatedProfile ?? profile,
-          ),
-        ),
-      );
-    }
-  }
+  //     state = AsyncData(
+  //       value.copyWith(
+  //         update: failureOrUpdatedProfile.match(
+  //           (l) => AsyncError(l, StackTrace.current),
+  //           (_) => const AsyncData(null),
+  //         ),
+  //         profile: failureOrUpdatedProfile.match(
+  //           (_) => profile,
+  //           (updatedProfile) => updatedProfile ?? profile,
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
 
-  Future<void> delete() async {
-    if (state case AsyncData(:final value)) {
-      if (value.delete case AsyncLoading()) return;
-      final profile = value.profile;
-      state = AsyncData(value.copyWith(delete: const AsyncLoading()));
+  // Future<void> delete() async {
+  //   if (state case AsyncData(:final value)) {
+  //     if (value.delete case AsyncLoading()) return;
+  //     final profile = value.profile;
+  //     state = AsyncData(value.copyWith(delete: const AsyncLoading()));
 
-      state = AsyncData(
-        value.copyWith(
-          delete: await AsyncValue.guard(() async {
-            await _profilesRepo.deleteById(profile.id).getOrElse((l) => throw l).run();
-          }),
-        ),
-      );
-    }
-  }
+  //     state = AsyncData(
+  //       value.copyWith(
+  //         delete: await AsyncValue.guard(() async {
+  //           await _profilesRepo.deleteById(profile.id).getOrElse((l) => throw l).run();
+  //         }),
+  //       ),
+  //     );
+  //   }
+  // }
 }

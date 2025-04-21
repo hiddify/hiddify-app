@@ -1,24 +1,15 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/routes.dart';
-import 'package:hiddify/core/widget/custom_alert_dialog.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
 import 'package:hiddify/features/config_option/overview/config_options_page.dart';
 import 'package:hiddify/features/config_option/widget/preference_tile.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
-import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_page.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/platform_utils.dart';
-import 'package:hiddify/utils/uri_utils.dart';
-import 'package:hiddify/utils/validators.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class RouteOptionsTiles extends HookConsumerWidget {

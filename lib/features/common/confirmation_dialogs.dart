@@ -9,7 +9,7 @@ Future<bool> showConfirmationDialog(
   IconData? icon,
   String? okText,
 }) async {
-  return showDialog<bool>(
+  return await showDialog<bool>(
     context: context,
     builder: (context) {
       final localizations = MaterialLocalizations.of(context);

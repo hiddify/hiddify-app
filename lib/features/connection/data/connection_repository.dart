@@ -155,7 +155,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   ) {
     return TaskEither<ConnectionFailure, Unit>.Do(
       ($) async {
-        var options = await $(getConfigOption());
+        final options = await $(getConfigOption());
         loggy.info(
           "config options: ${options.format()}\nMemory Limit: ${!disableMemoryLimit}",
         );
@@ -221,7 +221,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   ) {
     return TaskEither<ConnectionFailure, Unit>.Do(
       ($) async {
-        var options = await $(getConfigOption());
+        final options = await $(getConfigOption());
         loggy.info(
           "config options: ${options.format()}\nMemory Limit: ${!disableMemoryLimit}",
         );

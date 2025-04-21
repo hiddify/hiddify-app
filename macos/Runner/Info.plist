@@ -35,10 +35,13 @@
 			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<!-- <string>clash</string>
-				<string>clashmeta</string>
-				<string>sing-box</string> -->
 				<string>hiddify</string>
+				<string>v2ray</string>
+				<string>v2rayn</string>
+				<string>v2rayng</string>
+				<string>clash</string>
+				<string>clashmeta</string>
+				<string>sing-box</string>
 			</array>
 		</dict>
 	</array>
