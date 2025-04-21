@@ -1,19 +1,27 @@
-//
+///
 //  Generated code. Do not modify.
 //  source: v2/hcore/tunnelservice/tunnel.proto
 //
 // @dart = 2.12
-
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class TunnelStartRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TunnelStartRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'tunnelservice'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ipv6')
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serverPort', $pb.PbFieldType.O3)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serverUsername')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serverPassword')
+    ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'strictRoute')
+    ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'endpointIndependentNat')
+    ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'stack')
+    ..hasRequiredFields = false
+  ;
+
+  TunnelStartRequest._() : super();
   factory TunnelStartRequest({
     $core.bool? ipv6,
     $core.int? serverPort,
@@ -23,45 +31,32 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
     $core.bool? endpointIndependentNat,
     $core.String? stack,
   }) {
-    final $result = create();
+    final _result = create();
     if (ipv6 != null) {
-      $result.ipv6 = ipv6;
+      _result.ipv6 = ipv6;
     }
     if (serverPort != null) {
-      $result.serverPort = serverPort;
+      _result.serverPort = serverPort;
     }
     if (serverUsername != null) {
-      $result.serverUsername = serverUsername;
+      _result.serverUsername = serverUsername;
     }
     if (serverPassword != null) {
-      $result.serverPassword = serverPassword;
+      _result.serverPassword = serverPassword;
     }
     if (strictRoute != null) {
-      $result.strictRoute = strictRoute;
+      _result.strictRoute = strictRoute;
     }
     if (endpointIndependentNat != null) {
-      $result.endpointIndependentNat = endpointIndependentNat;
+      _result.endpointIndependentNat = endpointIndependentNat;
     }
     if (stack != null) {
-      $result.stack = stack;
+      _result.stack = stack;
     }
-    return $result;
+    return _result;
   }
-  TunnelStartRequest._() : super();
   factory TunnelStartRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory TunnelStartRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TunnelStartRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'tunnelservice'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'ipv6')
-    ..a<$core.int>(2, _omitFieldNames ? '' : 'serverPort', $pb.PbFieldType.O3)
-    ..aOS(3, _omitFieldNames ? '' : 'serverUsername')
-    ..aOS(4, _omitFieldNames ? '' : 'serverPassword')
-    ..aOB(5, _omitFieldNames ? '' : 'strictRoute')
-    ..aOB(6, _omitFieldNames ? '' : 'endpointIndependentNat')
-    ..aOS(7, _omitFieldNames ? '' : 'stack')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -71,10 +66,8 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  TunnelStartRequest copyWith(void Function(TunnelStartRequest) updates) => super.copyWith((message) => updates(message as TunnelStartRequest)) as TunnelStartRequest;
-
+  TunnelStartRequest copyWith(void Function(TunnelStartRequest) updates) => super.copyWith((message) => updates(message as TunnelStartRequest)) as TunnelStartRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static TunnelStartRequest create() => TunnelStartRequest._();
   TunnelStartRequest createEmptyInstance() => create();
@@ -148,24 +141,23 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
 }
 
 class TunnelResponse extends $pb.GeneratedMessage {
-  factory TunnelResponse({
-    $core.String? message,
-  }) {
-    final $result = create();
-    if (message != null) {
-      $result.message = message;
-    }
-    return $result;
-  }
-  TunnelResponse._() : super();
-  factory TunnelResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory TunnelResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TunnelResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'tunnelservice'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'message')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TunnelResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'tunnelservice'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
     ..hasRequiredFields = false
   ;
 
+  TunnelResponse._() : super();
+  factory TunnelResponse({
+    $core.String? message,
+  }) {
+    final _result = create();
+    if (message != null) {
+      _result.message = message;
+    }
+    return _result;
+  }
+  factory TunnelResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TunnelResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -175,10 +167,8 @@ class TunnelResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  TunnelResponse copyWith(void Function(TunnelResponse) updates) => super.copyWith((message) => updates(message as TunnelResponse)) as TunnelResponse;
-
+  TunnelResponse copyWith(void Function(TunnelResponse) updates) => super.copyWith((message) => updates(message as TunnelResponse)) as TunnelResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static TunnelResponse create() => TunnelResponse._();
   TunnelResponse createEmptyInstance() => create();
@@ -197,6 +187,3 @@ class TunnelResponse extends $pb.GeneratedMessage {
   void clearMessage() => clearField(1);
 }
 
-
-const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

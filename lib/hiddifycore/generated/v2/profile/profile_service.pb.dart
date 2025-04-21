@@ -1,53 +1,46 @@
-//
+///
 //  Generated code. Do not modify.
 //  source: v2/profile/profile_service.proto
 //
 // @dart = 2.12
-
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../hcommon/common.pbenum.dart' as $1;
 import 'profile.pb.dart' as $4;
 
-/// *
-///  ProfileRequest is the request message for fetching or identifying
-///  a profile by ID, name, or URL.
+import '../hcommon/common.pbenum.dart' as $1;
+
 class ProfileRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ProfileRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'profile'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'url')
+    ..hasRequiredFields = false
+  ;
+
+  ProfileRequest._() : super();
   factory ProfileRequest({
     $core.String? id,
     $core.String? name,
     $core.String? url,
   }) {
-    final $result = create();
+    final _result = create();
     if (id != null) {
-      $result.id = id;
+      _result.id = id;
     }
     if (name != null) {
-      $result.name = name;
+      _result.name = name;
     }
     if (url != null) {
-      $result.url = url;
+      _result.url = url;
     }
-    return $result;
+    return _result;
   }
-  ProfileRequest._() : super();
   factory ProfileRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory ProfileRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'profile'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'id')
-    ..aOS(2, _omitFieldNames ? '' : 'name')
-    ..aOS(3, _omitFieldNames ? '' : 'url')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -57,10 +50,8 @@ class ProfileRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ProfileRequest copyWith(void Function(ProfileRequest) updates) => super.copyWith((message) => updates(message as ProfileRequest)) as ProfileRequest;
-
+  ProfileRequest copyWith(void Function(ProfileRequest) updates) => super.copyWith((message) => updates(message as ProfileRequest)) as ProfileRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ProfileRequest create() => ProfileRequest._();
   ProfileRequest createEmptyInstance() => create();
@@ -97,43 +88,39 @@ class ProfileRequest extends $pb.GeneratedMessage {
   void clearUrl() => clearField(3);
 }
 
-/// *
-///  AddProfileRequest is the request message for adding a profile
-///  via URL or content.
 class AddProfileRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'AddProfileRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'profile'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'url')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'markAsActive')
+    ..hasRequiredFields = false
+  ;
+
+  AddProfileRequest._() : super();
   factory AddProfileRequest({
     $core.String? url,
     $core.String? content,
     $core.String? name,
     $core.bool? markAsActive,
   }) {
-    final $result = create();
+    final _result = create();
     if (url != null) {
-      $result.url = url;
+      _result.url = url;
     }
     if (content != null) {
-      $result.content = content;
+      _result.content = content;
     }
     if (name != null) {
-      $result.name = name;
+      _result.name = name;
     }
     if (markAsActive != null) {
-      $result.markAsActive = markAsActive;
+      _result.markAsActive = markAsActive;
     }
-    return $result;
+    return _result;
   }
-  AddProfileRequest._() : super();
   factory AddProfileRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory AddProfileRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AddProfileRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'profile'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'url')
-    ..aOS(2, _omitFieldNames ? '' : 'content')
-    ..aOS(3, _omitFieldNames ? '' : 'name')
-    ..aOB(4, _omitFieldNames ? '' : 'markAsActive')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -143,10 +130,8 @@ class AddProfileRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  AddProfileRequest copyWith(void Function(AddProfileRequest) updates) => super.copyWith((message) => updates(message as AddProfileRequest)) as AddProfileRequest;
-
+  AddProfileRequest copyWith(void Function(AddProfileRequest) updates) => super.copyWith((message) => updates(message as AddProfileRequest)) as AddProfileRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static AddProfileRequest create() => AddProfileRequest._();
   AddProfileRequest createEmptyInstance() => create();
@@ -192,37 +177,34 @@ class AddProfileRequest extends $pb.GeneratedMessage {
   void clearMarkAsActive() => clearField(4);
 }
 
-/// *
-///  ProfileResponse is the response message for profile service operations.
 class ProfileResponse extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ProfileResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'profile'), createEmptyInstance: create)
+    ..aOM<$4.ProfileEntity>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'profile', subBuilder: $4.ProfileEntity.create)
+    ..e<$1.ResponseCode>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'responseCode', $pb.PbFieldType.OE, defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
+    ..hasRequiredFields = false
+  ;
+
+  ProfileResponse._() : super();
   factory ProfileResponse({
     $4.ProfileEntity? profile,
     $1.ResponseCode? responseCode,
     $core.String? message,
   }) {
-    final $result = create();
+    final _result = create();
     if (profile != null) {
-      $result.profile = profile;
+      _result.profile = profile;
     }
     if (responseCode != null) {
-      $result.responseCode = responseCode;
+      _result.responseCode = responseCode;
     }
     if (message != null) {
-      $result.message = message;
+      _result.message = message;
     }
-    return $result;
+    return _result;
   }
-  ProfileResponse._() : super();
   factory ProfileResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory ProfileResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'profile'), createEmptyInstance: create)
-    ..aOM<$4.ProfileEntity>(1, _omitFieldNames ? '' : 'profile', subBuilder: $4.ProfileEntity.create)
-    ..e<$1.ResponseCode>(2, _omitFieldNames ? '' : 'responseCode', $pb.PbFieldType.OE, defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
-    ..aOS(3, _omitFieldNames ? '' : 'message')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -232,10 +214,8 @@ class ProfileResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ProfileResponse copyWith(void Function(ProfileResponse) updates) => super.copyWith((message) => updates(message as ProfileResponse)) as ProfileResponse;
-
+  ProfileResponse copyWith(void Function(ProfileResponse) updates) => super.copyWith((message) => updates(message as ProfileResponse)) as ProfileResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ProfileResponse create() => ProfileResponse._();
   ProfileResponse createEmptyInstance() => create();
@@ -274,37 +254,34 @@ class ProfileResponse extends $pb.GeneratedMessage {
   void clearMessage() => clearField(3);
 }
 
-/// *
-///  MultiProfilesResponse is the response message for fetching multi profiles.
 class MultiProfilesResponse extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'MultiProfilesResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'profile'), createEmptyInstance: create)
+    ..pc<$4.ProfileEntity>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'profiles', $pb.PbFieldType.PM, subBuilder: $4.ProfileEntity.create)
+    ..e<$1.ResponseCode>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'responseCode', $pb.PbFieldType.OE, defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
+    ..hasRequiredFields = false
+  ;
+
+  MultiProfilesResponse._() : super();
   factory MultiProfilesResponse({
     $core.Iterable<$4.ProfileEntity>? profiles,
     $1.ResponseCode? responseCode,
     $core.String? message,
   }) {
-    final $result = create();
+    final _result = create();
     if (profiles != null) {
-      $result.profiles.addAll(profiles);
+      _result.profiles.addAll(profiles);
     }
     if (responseCode != null) {
-      $result.responseCode = responseCode;
+      _result.responseCode = responseCode;
     }
     if (message != null) {
-      $result.message = message;
+      _result.message = message;
     }
-    return $result;
+    return _result;
   }
-  MultiProfilesResponse._() : super();
   factory MultiProfilesResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory MultiProfilesResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MultiProfilesResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'profile'), createEmptyInstance: create)
-    ..pc<$4.ProfileEntity>(1, _omitFieldNames ? '' : 'profiles', $pb.PbFieldType.PM, subBuilder: $4.ProfileEntity.create)
-    ..e<$1.ResponseCode>(2, _omitFieldNames ? '' : 'responseCode', $pb.PbFieldType.OE, defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
-    ..aOS(3, _omitFieldNames ? '' : 'message')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -314,10 +291,8 @@ class MultiProfilesResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  MultiProfilesResponse copyWith(void Function(MultiProfilesResponse) updates) => super.copyWith((message) => updates(message as MultiProfilesResponse)) as MultiProfilesResponse;
-
+  MultiProfilesResponse copyWith(void Function(MultiProfilesResponse) updates) => super.copyWith((message) => updates(message as MultiProfilesResponse)) as MultiProfilesResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static MultiProfilesResponse create() => MultiProfilesResponse._();
   MultiProfilesResponse createEmptyInstance() => create();
@@ -348,6 +323,3 @@ class MultiProfilesResponse extends $pb.GeneratedMessage {
   void clearMessage() => clearField(3);
 }
 
-
-const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

@@ -1,13 +1,9 @@
-//
+///
 //  Generated code. Do not modify.
 //  source: v2/profile/profile.proto
 //
 // @dart = 2.12
-
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
@@ -16,8 +12,19 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 import '../hiddifyoptions/hiddify_options.pb.dart' as $8;
 
-/// ProfileEntity defines a profile entity.
 class ProfileEntity extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ProfileEntity', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'profile'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'url')
+    ..aInt64(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'lastUpdate')
+    ..aOM<ProfileOptions>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'options', subBuilder: ProfileOptions.create)
+    ..aOM<SubscriptionInfo>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'subInfo', subBuilder: SubscriptionInfo.create)
+    ..aOM<$8.HiddifyOptions>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'overrideHiddifyOptions', subBuilder: $8.HiddifyOptions.create)
+    ..hasRequiredFields = false
+  ;
+
+  ProfileEntity._() : super();
   factory ProfileEntity({
     $core.String? id,
     $core.String? name,
@@ -27,45 +34,32 @@ class ProfileEntity extends $pb.GeneratedMessage {
     SubscriptionInfo? subInfo,
     $8.HiddifyOptions? overrideHiddifyOptions,
   }) {
-    final $result = create();
+    final _result = create();
     if (id != null) {
-      $result.id = id;
+      _result.id = id;
     }
     if (name != null) {
-      $result.name = name;
+      _result.name = name;
     }
     if (url != null) {
-      $result.url = url;
+      _result.url = url;
     }
     if (lastUpdate != null) {
-      $result.lastUpdate = lastUpdate;
+      _result.lastUpdate = lastUpdate;
     }
     if (options != null) {
-      $result.options = options;
+      _result.options = options;
     }
     if (subInfo != null) {
-      $result.subInfo = subInfo;
+      _result.subInfo = subInfo;
     }
     if (overrideHiddifyOptions != null) {
-      $result.overrideHiddifyOptions = overrideHiddifyOptions;
+      _result.overrideHiddifyOptions = overrideHiddifyOptions;
     }
-    return $result;
+    return _result;
   }
-  ProfileEntity._() : super();
   factory ProfileEntity.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory ProfileEntity.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileEntity', package: const $pb.PackageName(_omitMessageNames ? '' : 'profile'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'id')
-    ..aOS(3, _omitFieldNames ? '' : 'name')
-    ..aOS(4, _omitFieldNames ? '' : 'url')
-    ..aInt64(5, _omitFieldNames ? '' : 'lastUpdate')
-    ..aOM<ProfileOptions>(6, _omitFieldNames ? '' : 'options', subBuilder: ProfileOptions.create)
-    ..aOM<SubscriptionInfo>(7, _omitFieldNames ? '' : 'subInfo', subBuilder: SubscriptionInfo.create)
-    ..aOM<$8.HiddifyOptions>(8, _omitFieldNames ? '' : 'overrideHiddifyOptions', subBuilder: $8.HiddifyOptions.create)
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -75,10 +69,8 @@ class ProfileEntity extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ProfileEntity copyWith(void Function(ProfileEntity) updates) => super.copyWith((message) => updates(message as ProfileEntity)) as ProfileEntity;
-
+  ProfileEntity copyWith(void Function(ProfileEntity) updates) => super.copyWith((message) => updates(message as ProfileEntity)) as ProfileEntity; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ProfileEntity create() => ProfileEntity._();
   ProfileEntity createEmptyInstance() => create();
@@ -96,7 +88,6 @@ class ProfileEntity extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearId() => clearField(1);
 
-  /// bool active = 2; // Indicates if the profile is active.
   @$pb.TagNumber(3)
   $core.String get name => $_getSZ(1);
   @$pb.TagNumber(3)
@@ -158,26 +149,24 @@ class ProfileEntity extends $pb.GeneratedMessage {
   $8.HiddifyOptions ensureOverrideHiddifyOptions() => $_ensure(6);
 }
 
-/// ProfileOptions defines options for a profile.
 class ProfileOptions extends $pb.GeneratedMessage {
-  factory ProfileOptions({
-    $fixnum.Int64? updateInterval,
-  }) {
-    final $result = create();
-    if (updateInterval != null) {
-      $result.updateInterval = updateInterval;
-    }
-    return $result;
-  }
-  ProfileOptions._() : super();
-  factory ProfileOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ProfileOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProfileOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'profile'), createEmptyInstance: create)
-    ..aInt64(1, _omitFieldNames ? '' : 'updateInterval')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ProfileOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'profile'), createEmptyInstance: create)
+    ..aInt64(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'updateInterval')
     ..hasRequiredFields = false
   ;
 
+  ProfileOptions._() : super();
+  factory ProfileOptions({
+    $fixnum.Int64? updateInterval,
+  }) {
+    final _result = create();
+    if (updateInterval != null) {
+      _result.updateInterval = updateInterval;
+    }
+    return _result;
+  }
+  factory ProfileOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ProfileOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -187,10 +176,8 @@ class ProfileOptions extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ProfileOptions copyWith(void Function(ProfileOptions) updates) => super.copyWith((message) => updates(message as ProfileOptions)) as ProfileOptions;
-
+  ProfileOptions copyWith(void Function(ProfileOptions) updates) => super.copyWith((message) => updates(message as ProfileOptions)) as ProfileOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ProfileOptions create() => ProfileOptions._();
   ProfileOptions createEmptyInstance() => create();
@@ -209,8 +196,18 @@ class ProfileOptions extends $pb.GeneratedMessage {
   void clearUpdateInterval() => clearField(1);
 }
 
-/// SubscriptionInfo defines subscription-related information.
 class SubscriptionInfo extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SubscriptionInfo', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'profile'), createEmptyInstance: create)
+    ..aInt64(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'upload')
+    ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'download')
+    ..aInt64(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'total')
+    ..aInt64(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'expire')
+    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'webPageUrl')
+    ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'supportUrl')
+    ..hasRequiredFields = false
+  ;
+
+  SubscriptionInfo._() : super();
   factory SubscriptionInfo({
     $fixnum.Int64? upload,
     $fixnum.Int64? download,
@@ -219,41 +216,29 @@ class SubscriptionInfo extends $pb.GeneratedMessage {
     $core.String? webPageUrl,
     $core.String? supportUrl,
   }) {
-    final $result = create();
+    final _result = create();
     if (upload != null) {
-      $result.upload = upload;
+      _result.upload = upload;
     }
     if (download != null) {
-      $result.download = download;
+      _result.download = download;
     }
     if (total != null) {
-      $result.total = total;
+      _result.total = total;
     }
     if (expire != null) {
-      $result.expire = expire;
+      _result.expire = expire;
     }
     if (webPageUrl != null) {
-      $result.webPageUrl = webPageUrl;
+      _result.webPageUrl = webPageUrl;
     }
     if (supportUrl != null) {
-      $result.supportUrl = supportUrl;
+      _result.supportUrl = supportUrl;
     }
-    return $result;
+    return _result;
   }
-  SubscriptionInfo._() : super();
   factory SubscriptionInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory SubscriptionInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SubscriptionInfo', package: const $pb.PackageName(_omitMessageNames ? '' : 'profile'), createEmptyInstance: create)
-    ..aInt64(1, _omitFieldNames ? '' : 'upload')
-    ..aInt64(2, _omitFieldNames ? '' : 'download')
-    ..aInt64(3, _omitFieldNames ? '' : 'total')
-    ..aInt64(4, _omitFieldNames ? '' : 'expire')
-    ..aOS(5, _omitFieldNames ? '' : 'webPageUrl')
-    ..aOS(6, _omitFieldNames ? '' : 'supportUrl')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -263,10 +248,8 @@ class SubscriptionInfo extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  SubscriptionInfo copyWith(void Function(SubscriptionInfo) updates) => super.copyWith((message) => updates(message as SubscriptionInfo)) as SubscriptionInfo;
-
+  SubscriptionInfo copyWith(void Function(SubscriptionInfo) updates) => super.copyWith((message) => updates(message as SubscriptionInfo)) as SubscriptionInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static SubscriptionInfo create() => SubscriptionInfo._();
   SubscriptionInfo createEmptyInstance() => create();
@@ -330,6 +313,3 @@ class SubscriptionInfo extends $pb.GeneratedMessage {
   void clearSupportUrl() => clearField(6);
 }
 
-
-const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

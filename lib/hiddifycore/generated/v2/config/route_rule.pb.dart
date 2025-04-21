@@ -1,13 +1,9 @@
-//
+///
 //  Generated code. Do not modify.
 //  source: v2/config/route_rule.proto
 //
 // @dart = 2.12
-
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
@@ -18,24 +14,23 @@ import 'route_rule.pbenum.dart';
 export 'route_rule.pbenum.dart';
 
 class RouteRule extends $pb.GeneratedMessage {
-  factory RouteRule({
-    $core.Iterable<Rule>? rules,
-  }) {
-    final $result = create();
-    if (rules != null) {
-      $result.rules.addAll(rules);
-    }
-    return $result;
-  }
-  RouteRule._() : super();
-  factory RouteRule.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory RouteRule.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RouteRule', package: const $pb.PackageName(_omitMessageNames ? '' : 'config'), createEmptyInstance: create)
-    ..pc<Rule>(1, _omitFieldNames ? '' : 'rules', $pb.PbFieldType.PM, subBuilder: Rule.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RouteRule', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'config'), createEmptyInstance: create)
+    ..pc<Rule>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rules', $pb.PbFieldType.PM, subBuilder: Rule.create)
     ..hasRequiredFields = false
   ;
 
+  RouteRule._() : super();
+  factory RouteRule({
+    $core.Iterable<Rule>? rules,
+  }) {
+    final _result = create();
+    if (rules != null) {
+      _result.rules.addAll(rules);
+    }
+    return _result;
+  }
+  factory RouteRule.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory RouteRule.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -45,10 +40,8 @@ class RouteRule extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  RouteRule copyWith(void Function(RouteRule) updates) => super.copyWith((message) => updates(message as RouteRule)) as RouteRule;
-
+  RouteRule copyWith(void Function(RouteRule) updates) => super.copyWith((message) => updates(message as RouteRule)) as RouteRule; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static RouteRule create() => RouteRule._();
   RouteRule createEmptyInstance() => create();
@@ -62,6 +55,29 @@ class RouteRule extends $pb.GeneratedMessage {
 }
 
 class Rule extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Rule', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'config'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'list_order', $pb.PbFieldType.OU3)
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enabled')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..e<Outbound>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'outbound', $pb.PbFieldType.OE, defaultOrMaker: Outbound.proxy, valueOf: Outbound.valueOf, enumValues: Outbound.values)
+    ..pPS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rule_set', protoName: 'rule_sets')
+    ..pPS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'package_name', protoName: 'package_names')
+    ..pPS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'process_name', protoName: 'process_names')
+    ..pPS(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'process_path', protoName: 'process_paths')
+    ..e<Network>(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'network', $pb.PbFieldType.OE, defaultOrMaker: Network.all, valueOf: Network.valueOf, enumValues: Network.values)
+    ..pPS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'port_range', protoName: 'port_ranges')
+    ..pPS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'source_port_range', protoName: 'source_port_ranges')
+    ..pc<Protocol>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'protocol', $pb.PbFieldType.KE, protoName: 'protocols', valueOf: Protocol.valueOf, enumValues: Protocol.values, defaultEnumValue: Protocol.tls)
+    ..pPS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ip_cidr', protoName: 'ip_cidrs')
+    ..pPS(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'source_ip_cidr', protoName: 'source_ip_cidrs')
+    ..pPS(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'domain', protoName: 'domains')
+    ..pPS(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'domain_suffix', protoName: 'domain_suffixes')
+    ..pPS(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'domain_keyword', protoName: 'domain_keywords')
+    ..pPS(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'domain_regex', protoName: 'domain_regexes')
+    ..hasRequiredFields = false
+  ;
+
+  Rule._() : super();
   factory Rule({
     $core.int? listOrder,
     $core.bool? enabled,
@@ -82,89 +98,65 @@ class Rule extends $pb.GeneratedMessage {
     $core.Iterable<$core.String>? domainKeywords,
     $core.Iterable<$core.String>? domainRegexes,
   }) {
-    final $result = create();
+    final _result = create();
     if (listOrder != null) {
-      $result.listOrder = listOrder;
+      _result.listOrder = listOrder;
     }
     if (enabled != null) {
-      $result.enabled = enabled;
+      _result.enabled = enabled;
     }
     if (name != null) {
-      $result.name = name;
+      _result.name = name;
     }
     if (outbound != null) {
-      $result.outbound = outbound;
+      _result.outbound = outbound;
     }
     if (ruleSets != null) {
-      $result.ruleSets.addAll(ruleSets);
+      _result.ruleSets.addAll(ruleSets);
     }
     if (packageNames != null) {
-      $result.packageNames.addAll(packageNames);
+      _result.packageNames.addAll(packageNames);
     }
     if (processNames != null) {
-      $result.processNames.addAll(processNames);
+      _result.processNames.addAll(processNames);
     }
     if (processPaths != null) {
-      $result.processPaths.addAll(processPaths);
+      _result.processPaths.addAll(processPaths);
     }
     if (network != null) {
-      $result.network = network;
+      _result.network = network;
     }
     if (portRanges != null) {
-      $result.portRanges.addAll(portRanges);
+      _result.portRanges.addAll(portRanges);
     }
     if (sourcePortRanges != null) {
-      $result.sourcePortRanges.addAll(sourcePortRanges);
+      _result.sourcePortRanges.addAll(sourcePortRanges);
     }
     if (protocols != null) {
-      $result.protocols.addAll(protocols);
+      _result.protocols.addAll(protocols);
     }
     if (ipCidrs != null) {
-      $result.ipCidrs.addAll(ipCidrs);
+      _result.ipCidrs.addAll(ipCidrs);
     }
     if (sourceIpCidrs != null) {
-      $result.sourceIpCidrs.addAll(sourceIpCidrs);
+      _result.sourceIpCidrs.addAll(sourceIpCidrs);
     }
     if (domains != null) {
-      $result.domains.addAll(domains);
+      _result.domains.addAll(domains);
     }
     if (domainSuffixes != null) {
-      $result.domainSuffixes.addAll(domainSuffixes);
+      _result.domainSuffixes.addAll(domainSuffixes);
     }
     if (domainKeywords != null) {
-      $result.domainKeywords.addAll(domainKeywords);
+      _result.domainKeywords.addAll(domainKeywords);
     }
     if (domainRegexes != null) {
-      $result.domainRegexes.addAll(domainRegexes);
+      _result.domainRegexes.addAll(domainRegexes);
     }
-    return $result;
+    return _result;
   }
-  Rule._() : super();
   factory Rule.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory Rule.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Rule', package: const $pb.PackageName(_omitMessageNames ? '' : 'config'), createEmptyInstance: create)
-    ..a<$core.int>(1, _omitFieldNames ? '' : 'list_order', $pb.PbFieldType.OU3)
-    ..aOB(2, _omitFieldNames ? '' : 'enabled')
-    ..aOS(3, _omitFieldNames ? '' : 'name')
-    ..e<Outbound>(4, _omitFieldNames ? '' : 'outbound', $pb.PbFieldType.OE, defaultOrMaker: Outbound.proxy, valueOf: Outbound.valueOf, enumValues: Outbound.values)
-    ..pPS(5, _omitFieldNames ? '' : 'rule_set', protoName: 'rule_sets')
-    ..pPS(6, _omitFieldNames ? '' : 'package_name', protoName: 'package_names')
-    ..pPS(7, _omitFieldNames ? '' : 'process_name', protoName: 'process_names')
-    ..pPS(8, _omitFieldNames ? '' : 'process_path', protoName: 'process_paths')
-    ..e<Network>(9, _omitFieldNames ? '' : 'network', $pb.PbFieldType.OE, defaultOrMaker: Network.all, valueOf: Network.valueOf, enumValues: Network.values)
-    ..pPS(10, _omitFieldNames ? '' : 'port_range', protoName: 'port_ranges')
-    ..pPS(11, _omitFieldNames ? '' : 'source_port_range', protoName: 'source_port_ranges')
-    ..pc<Protocol>(12, _omitFieldNames ? '' : 'protocol', $pb.PbFieldType.KE, protoName: 'protocols', valueOf: Protocol.valueOf, enumValues: Protocol.values, defaultEnumValue: Protocol.tls)
-    ..pPS(13, _omitFieldNames ? '' : 'ip_cidr', protoName: 'ip_cidrs')
-    ..pPS(14, _omitFieldNames ? '' : 'source_ip_cidr', protoName: 'source_ip_cidrs')
-    ..pPS(15, _omitFieldNames ? '' : 'domain', protoName: 'domains')
-    ..pPS(16, _omitFieldNames ? '' : 'domain_suffix', protoName: 'domain_suffixes')
-    ..pPS(17, _omitFieldNames ? '' : 'domain_keyword', protoName: 'domain_keywords')
-    ..pPS(18, _omitFieldNames ? '' : 'domain_regex', protoName: 'domain_regexes')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -174,10 +166,8 @@ class Rule extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  Rule copyWith(void Function(Rule) updates) => super.copyWith((message) => updates(message as Rule)) as Rule;
-
+  Rule copyWith(void Function(Rule) updates) => super.copyWith((message) => updates(message as Rule)) as Rule; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static Rule create() => Rule._();
   Rule createEmptyInstance() => create();
@@ -271,6 +261,3 @@ class Rule extends $pb.GeneratedMessage {
   $core.List<$core.String> get domainRegexes => $_getList(17);
 }
 
-
-const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

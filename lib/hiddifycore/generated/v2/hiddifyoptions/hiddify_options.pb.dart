@@ -1,13 +1,9 @@
-//
+///
 //  Generated code. Do not modify.
 //  source: v2/hiddifyoptions/hiddify_options.proto
 //
 // @dart = 2.12
-
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
@@ -18,9 +14,30 @@ import 'hiddify_options.pbenum.dart';
 
 export 'hiddify_options.pbenum.dart';
 
-/// *
-///  HiddifyOptions defines the configuration options for the Hiddify application.
 class HiddifyOptions extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'HiddifyOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableFullConfig')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'logLevel')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'logFile')
+    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableClashApi')
+    ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'clashApiPort', $pb.PbFieldType.OU3)
+    ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'webSecret')
+    ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'region')
+    ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'blockAds')
+    ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'useXrayCoreWhenPossible')
+    ..pc<Rule>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rules', $pb.PbFieldType.PM, subBuilder: Rule.create)
+    ..aOM<WarpOptions>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'warp', subBuilder: WarpOptions.create)
+    ..aOM<WarpOptions>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'warp2', subBuilder: WarpOptions.create)
+    ..aOM<MuxOptions>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mux', subBuilder: MuxOptions.create)
+    ..aOM<TLSTricks>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tlsTricks', subBuilder: TLSTricks.create)
+    ..aOM<DNSOptions>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dnsOptions', subBuilder: DNSOptions.create)
+    ..aOM<InboundOptions>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'inboundOptions', subBuilder: InboundOptions.create)
+    ..aOM<URLTestOptions>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestOptions', subBuilder: URLTestOptions.create)
+    ..aOM<RouteOptions>(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'routeOptions', subBuilder: RouteOptions.create)
+    ..hasRequiredFields = false
+  ;
+
+  HiddifyOptions._() : super();
   factory HiddifyOptions({
     $core.bool? enableFullConfig,
     $core.String? logLevel,
@@ -41,89 +58,65 @@ class HiddifyOptions extends $pb.GeneratedMessage {
     URLTestOptions? urlTestOptions,
     RouteOptions? routeOptions,
   }) {
-    final $result = create();
+    final _result = create();
     if (enableFullConfig != null) {
-      $result.enableFullConfig = enableFullConfig;
+      _result.enableFullConfig = enableFullConfig;
     }
     if (logLevel != null) {
-      $result.logLevel = logLevel;
+      _result.logLevel = logLevel;
     }
     if (logFile != null) {
-      $result.logFile = logFile;
+      _result.logFile = logFile;
     }
     if (enableClashApi != null) {
-      $result.enableClashApi = enableClashApi;
+      _result.enableClashApi = enableClashApi;
     }
     if (clashApiPort != null) {
-      $result.clashApiPort = clashApiPort;
+      _result.clashApiPort = clashApiPort;
     }
     if (webSecret != null) {
-      $result.webSecret = webSecret;
+      _result.webSecret = webSecret;
     }
     if (region != null) {
-      $result.region = region;
+      _result.region = region;
     }
     if (blockAds != null) {
-      $result.blockAds = blockAds;
+      _result.blockAds = blockAds;
     }
     if (useXrayCoreWhenPossible != null) {
-      $result.useXrayCoreWhenPossible = useXrayCoreWhenPossible;
+      _result.useXrayCoreWhenPossible = useXrayCoreWhenPossible;
     }
     if (rules != null) {
-      $result.rules.addAll(rules);
+      _result.rules.addAll(rules);
     }
     if (warp != null) {
-      $result.warp = warp;
+      _result.warp = warp;
     }
     if (warp2 != null) {
-      $result.warp2 = warp2;
+      _result.warp2 = warp2;
     }
     if (mux != null) {
-      $result.mux = mux;
+      _result.mux = mux;
     }
     if (tlsTricks != null) {
-      $result.tlsTricks = tlsTricks;
+      _result.tlsTricks = tlsTricks;
     }
     if (dnsOptions != null) {
-      $result.dnsOptions = dnsOptions;
+      _result.dnsOptions = dnsOptions;
     }
     if (inboundOptions != null) {
-      $result.inboundOptions = inboundOptions;
+      _result.inboundOptions = inboundOptions;
     }
     if (urlTestOptions != null) {
-      $result.urlTestOptions = urlTestOptions;
+      _result.urlTestOptions = urlTestOptions;
     }
     if (routeOptions != null) {
-      $result.routeOptions = routeOptions;
+      _result.routeOptions = routeOptions;
     }
-    return $result;
+    return _result;
   }
-  HiddifyOptions._() : super();
   factory HiddifyOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory HiddifyOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'HiddifyOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'enableFullConfig')
-    ..aOS(2, _omitFieldNames ? '' : 'logLevel')
-    ..aOS(3, _omitFieldNames ? '' : 'logFile')
-    ..aOB(4, _omitFieldNames ? '' : 'enableClashApi')
-    ..a<$core.int>(5, _omitFieldNames ? '' : 'clashApiPort', $pb.PbFieldType.OU3)
-    ..aOS(6, _omitFieldNames ? '' : 'webSecret')
-    ..aOS(7, _omitFieldNames ? '' : 'region')
-    ..aOB(8, _omitFieldNames ? '' : 'blockAds')
-    ..aOB(9, _omitFieldNames ? '' : 'useXrayCoreWhenPossible')
-    ..pc<Rule>(10, _omitFieldNames ? '' : 'rules', $pb.PbFieldType.PM, subBuilder: Rule.create)
-    ..aOM<WarpOptions>(11, _omitFieldNames ? '' : 'warp', subBuilder: WarpOptions.create)
-    ..aOM<WarpOptions>(12, _omitFieldNames ? '' : 'warp2', subBuilder: WarpOptions.create)
-    ..aOM<MuxOptions>(13, _omitFieldNames ? '' : 'mux', subBuilder: MuxOptions.create)
-    ..aOM<TLSTricks>(14, _omitFieldNames ? '' : 'tlsTricks', subBuilder: TLSTricks.create)
-    ..aOM<DNSOptions>(15, _omitFieldNames ? '' : 'dnsOptions', subBuilder: DNSOptions.create)
-    ..aOM<InboundOptions>(16, _omitFieldNames ? '' : 'inboundOptions', subBuilder: InboundOptions.create)
-    ..aOM<URLTestOptions>(17, _omitFieldNames ? '' : 'urlTestOptions', subBuilder: URLTestOptions.create)
-    ..aOM<RouteOptions>(18, _omitFieldNames ? '' : 'routeOptions', subBuilder: RouteOptions.create)
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -133,10 +126,8 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  HiddifyOptions copyWith(void Function(HiddifyOptions) updates) => super.copyWith((message) => updates(message as HiddifyOptions)) as HiddifyOptions;
-
+  HiddifyOptions copyWith(void Function(HiddifyOptions) updates) => super.copyWith((message) => updates(message as HiddifyOptions)) as HiddifyOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static HiddifyOptions create() => HiddifyOptions._();
   HiddifyOptions createEmptyInstance() => create();
@@ -318,33 +309,29 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   RouteOptions ensureRouteOptions() => $_ensure(17);
 }
 
-/// *
-///  IntRange defines a range of integers for various configurations.
-///  It includes the starting and ending values of the range.
 class IntRange extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'IntRange', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'from', $pb.PbFieldType.O3)
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'to', $pb.PbFieldType.O3)
+    ..hasRequiredFields = false
+  ;
+
+  IntRange._() : super();
   factory IntRange({
     $core.int? from,
     $core.int? to,
   }) {
-    final $result = create();
+    final _result = create();
     if (from != null) {
-      $result.from = from;
+      _result.from = from;
     }
     if (to != null) {
-      $result.to = to;
+      _result.to = to;
     }
-    return $result;
+    return _result;
   }
-  IntRange._() : super();
   factory IntRange.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory IntRange.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'IntRange', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..a<$core.int>(1, _omitFieldNames ? '' : 'from', $pb.PbFieldType.O3)
-    ..a<$core.int>(2, _omitFieldNames ? '' : 'to', $pb.PbFieldType.O3)
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -354,10 +341,8 @@ class IntRange extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  IntRange copyWith(void Function(IntRange) updates) => super.copyWith((message) => updates(message as IntRange)) as IntRange;
-
+  IntRange copyWith(void Function(IntRange) updates) => super.copyWith((message) => updates(message as IntRange)) as IntRange; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static IntRange create() => IntRange._();
   IntRange createEmptyInstance() => create();
@@ -385,9 +370,19 @@ class IntRange extends $pb.GeneratedMessage {
   void clearTo() => clearField(2);
 }
 
-/// *
-///  DNSOptions defines DNS-related configuration options.
 class DNSOptions extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DNSOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'remoteDnsAddress')
+    ..e<DomainStrategy>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'remoteDnsDomainStrategy', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'directDnsAddress')
+    ..e<DomainStrategy>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'directDnsDomainStrategy', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
+    ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'independentDnsCache')
+    ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableFakeDns')
+    ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableDnsRouting')
+    ..hasRequiredFields = false
+  ;
+
+  DNSOptions._() : super();
   factory DNSOptions({
     $core.String? remoteDnsAddress,
     DomainStrategy? remoteDnsDomainStrategy,
@@ -397,45 +392,32 @@ class DNSOptions extends $pb.GeneratedMessage {
     $core.bool? enableFakeDns,
     $core.bool? enableDnsRouting,
   }) {
-    final $result = create();
+    final _result = create();
     if (remoteDnsAddress != null) {
-      $result.remoteDnsAddress = remoteDnsAddress;
+      _result.remoteDnsAddress = remoteDnsAddress;
     }
     if (remoteDnsDomainStrategy != null) {
-      $result.remoteDnsDomainStrategy = remoteDnsDomainStrategy;
+      _result.remoteDnsDomainStrategy = remoteDnsDomainStrategy;
     }
     if (directDnsAddress != null) {
-      $result.directDnsAddress = directDnsAddress;
+      _result.directDnsAddress = directDnsAddress;
     }
     if (directDnsDomainStrategy != null) {
-      $result.directDnsDomainStrategy = directDnsDomainStrategy;
+      _result.directDnsDomainStrategy = directDnsDomainStrategy;
     }
     if (independentDnsCache != null) {
-      $result.independentDnsCache = independentDnsCache;
+      _result.independentDnsCache = independentDnsCache;
     }
     if (enableFakeDns != null) {
-      $result.enableFakeDns = enableFakeDns;
+      _result.enableFakeDns = enableFakeDns;
     }
     if (enableDnsRouting != null) {
-      $result.enableDnsRouting = enableDnsRouting;
+      _result.enableDnsRouting = enableDnsRouting;
     }
-    return $result;
+    return _result;
   }
-  DNSOptions._() : super();
   factory DNSOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory DNSOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'DNSOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'remoteDnsAddress')
-    ..e<DomainStrategy>(2, _omitFieldNames ? '' : 'remoteDnsDomainStrategy', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
-    ..aOS(3, _omitFieldNames ? '' : 'directDnsAddress')
-    ..e<DomainStrategy>(4, _omitFieldNames ? '' : 'directDnsDomainStrategy', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
-    ..aOB(5, _omitFieldNames ? '' : 'independentDnsCache')
-    ..aOB(6, _omitFieldNames ? '' : 'enableFakeDns')
-    ..aOB(7, _omitFieldNames ? '' : 'enableDnsRouting')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -445,10 +427,8 @@ class DNSOptions extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  DNSOptions copyWith(void Function(DNSOptions) updates) => super.copyWith((message) => updates(message as DNSOptions)) as DNSOptions;
-
+  DNSOptions copyWith(void Function(DNSOptions) updates) => super.copyWith((message) => updates(message as DNSOptions)) as DNSOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static DNSOptions create() => DNSOptions._();
   DNSOptions createEmptyInstance() => create();
@@ -521,9 +501,21 @@ class DNSOptions extends $pb.GeneratedMessage {
   void clearEnableDnsRouting() => clearField(7);
 }
 
-/// *
-///  InboundOptions defines the configuration options for inbound connections.
 class InboundOptions extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'InboundOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableTun')
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableTunService')
+    ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'setSystemProxy')
+    ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mixedPort', $pb.PbFieldType.OU3)
+    ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tproxyPort', $pb.PbFieldType.OU3)
+    ..a<$core.int>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'localDnsPort', $pb.PbFieldType.OU3)
+    ..a<$core.int>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mtu', $pb.PbFieldType.OU3)
+    ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'strictRoute')
+    ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tunStack')
+    ..hasRequiredFields = false
+  ;
+
+  InboundOptions._() : super();
   factory InboundOptions({
     $core.bool? enableTun,
     $core.bool? enableTunService,
@@ -535,53 +527,38 @@ class InboundOptions extends $pb.GeneratedMessage {
     $core.bool? strictRoute,
     $core.String? tunStack,
   }) {
-    final $result = create();
+    final _result = create();
     if (enableTun != null) {
-      $result.enableTun = enableTun;
+      _result.enableTun = enableTun;
     }
     if (enableTunService != null) {
-      $result.enableTunService = enableTunService;
+      _result.enableTunService = enableTunService;
     }
     if (setSystemProxy != null) {
-      $result.setSystemProxy = setSystemProxy;
+      _result.setSystemProxy = setSystemProxy;
     }
     if (mixedPort != null) {
-      $result.mixedPort = mixedPort;
+      _result.mixedPort = mixedPort;
     }
     if (tproxyPort != null) {
-      $result.tproxyPort = tproxyPort;
+      _result.tproxyPort = tproxyPort;
     }
     if (localDnsPort != null) {
-      $result.localDnsPort = localDnsPort;
+      _result.localDnsPort = localDnsPort;
     }
     if (mtu != null) {
-      $result.mtu = mtu;
+      _result.mtu = mtu;
     }
     if (strictRoute != null) {
-      $result.strictRoute = strictRoute;
+      _result.strictRoute = strictRoute;
     }
     if (tunStack != null) {
-      $result.tunStack = tunStack;
+      _result.tunStack = tunStack;
     }
-    return $result;
+    return _result;
   }
-  InboundOptions._() : super();
   factory InboundOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory InboundOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'InboundOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'enableTun')
-    ..aOB(2, _omitFieldNames ? '' : 'enableTunService')
-    ..aOB(3, _omitFieldNames ? '' : 'setSystemProxy')
-    ..a<$core.int>(4, _omitFieldNames ? '' : 'mixedPort', $pb.PbFieldType.OU3)
-    ..a<$core.int>(5, _omitFieldNames ? '' : 'tproxyPort', $pb.PbFieldType.OU3)
-    ..a<$core.int>(6, _omitFieldNames ? '' : 'localDnsPort', $pb.PbFieldType.OU3)
-    ..a<$core.int>(7, _omitFieldNames ? '' : 'mtu', $pb.PbFieldType.OU3)
-    ..aOB(8, _omitFieldNames ? '' : 'strictRoute')
-    ..aOS(9, _omitFieldNames ? '' : 'tunStack')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -591,10 +568,8 @@ class InboundOptions extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  InboundOptions copyWith(void Function(InboundOptions) updates) => super.copyWith((message) => updates(message as InboundOptions)) as InboundOptions;
-
+  InboundOptions copyWith(void Function(InboundOptions) updates) => super.copyWith((message) => updates(message as InboundOptions)) as InboundOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static InboundOptions create() => InboundOptions._();
   InboundOptions createEmptyInstance() => create();
@@ -685,32 +660,29 @@ class InboundOptions extends $pb.GeneratedMessage {
   void clearTunStack() => clearField(9);
 }
 
-/// *
-///  URLTestOptions defines the configuration options for URL testing.
 class URLTestOptions extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'URLTestOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'connectionTestUrl')
+    ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestInterval')
+    ..hasRequiredFields = false
+  ;
+
+  URLTestOptions._() : super();
   factory URLTestOptions({
     $core.String? connectionTestUrl,
     $fixnum.Int64? urlTestInterval,
   }) {
-    final $result = create();
+    final _result = create();
     if (connectionTestUrl != null) {
-      $result.connectionTestUrl = connectionTestUrl;
+      _result.connectionTestUrl = connectionTestUrl;
     }
     if (urlTestInterval != null) {
-      $result.urlTestInterval = urlTestInterval;
+      _result.urlTestInterval = urlTestInterval;
     }
-    return $result;
+    return _result;
   }
-  URLTestOptions._() : super();
   factory URLTestOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory URLTestOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'URLTestOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'connectionTestUrl')
-    ..aInt64(2, _omitFieldNames ? '' : 'urlTestInterval')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -720,10 +692,8 @@ class URLTestOptions extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  URLTestOptions copyWith(void Function(URLTestOptions) updates) => super.copyWith((message) => updates(message as URLTestOptions)) as URLTestOptions;
-
+  URLTestOptions copyWith(void Function(URLTestOptions) updates) => super.copyWith((message) => updates(message as URLTestOptions)) as URLTestOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static URLTestOptions create() => URLTestOptions._();
   URLTestOptions createEmptyInstance() => create();
@@ -751,42 +721,39 @@ class URLTestOptions extends $pb.GeneratedMessage {
   void clearUrlTestInterval() => clearField(2);
 }
 
-/// *
-///  RouteOptions defines options related to traffic routing.
 class RouteOptions extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RouteOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'resolveDestination')
+    ..e<DomainStrategy>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ipv6Mode', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
+    ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'bypassLan')
+    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'allowConnectionFromLan')
+    ..hasRequiredFields = false
+  ;
+
+  RouteOptions._() : super();
   factory RouteOptions({
     $core.bool? resolveDestination,
     DomainStrategy? ipv6Mode,
     $core.bool? bypassLan,
     $core.bool? allowConnectionFromLan,
   }) {
-    final $result = create();
+    final _result = create();
     if (resolveDestination != null) {
-      $result.resolveDestination = resolveDestination;
+      _result.resolveDestination = resolveDestination;
     }
     if (ipv6Mode != null) {
-      $result.ipv6Mode = ipv6Mode;
+      _result.ipv6Mode = ipv6Mode;
     }
     if (bypassLan != null) {
-      $result.bypassLan = bypassLan;
+      _result.bypassLan = bypassLan;
     }
     if (allowConnectionFromLan != null) {
-      $result.allowConnectionFromLan = allowConnectionFromLan;
+      _result.allowConnectionFromLan = allowConnectionFromLan;
     }
-    return $result;
+    return _result;
   }
-  RouteOptions._() : super();
   factory RouteOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory RouteOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'RouteOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'resolveDestination')
-    ..e<DomainStrategy>(2, _omitFieldNames ? '' : 'ipv6Mode', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
-    ..aOB(3, _omitFieldNames ? '' : 'bypassLan')
-    ..aOB(4, _omitFieldNames ? '' : 'allowConnectionFromLan')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -796,10 +763,8 @@ class RouteOptions extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  RouteOptions copyWith(void Function(RouteOptions) updates) => super.copyWith((message) => updates(message as RouteOptions)) as RouteOptions;
-
+  RouteOptions copyWith(void Function(RouteOptions) updates) => super.copyWith((message) => updates(message as RouteOptions)) as RouteOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static RouteOptions create() => RouteOptions._();
   RouteOptions createEmptyInstance() => create();
@@ -845,9 +810,18 @@ class RouteOptions extends $pb.GeneratedMessage {
   void clearAllowConnectionFromLan() => clearField(4);
 }
 
-/// *
-///  TLSTricks defines options for TLS tricks to obfuscate traffic.
 class TLSTricks extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TLSTricks', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableFragment')
+    ..aOM<IntRange>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fragmentSize', subBuilder: IntRange.create)
+    ..aOM<IntRange>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fragmentSleep', subBuilder: IntRange.create)
+    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mixedSniCase')
+    ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enablePadding')
+    ..aOM<IntRange>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'paddingSize', subBuilder: IntRange.create)
+    ..hasRequiredFields = false
+  ;
+
+  TLSTricks._() : super();
   factory TLSTricks({
     $core.bool? enableFragment,
     IntRange? fragmentSize,
@@ -856,41 +830,29 @@ class TLSTricks extends $pb.GeneratedMessage {
     $core.bool? enablePadding,
     IntRange? paddingSize,
   }) {
-    final $result = create();
+    final _result = create();
     if (enableFragment != null) {
-      $result.enableFragment = enableFragment;
+      _result.enableFragment = enableFragment;
     }
     if (fragmentSize != null) {
-      $result.fragmentSize = fragmentSize;
+      _result.fragmentSize = fragmentSize;
     }
     if (fragmentSleep != null) {
-      $result.fragmentSleep = fragmentSleep;
+      _result.fragmentSleep = fragmentSleep;
     }
     if (mixedSniCase != null) {
-      $result.mixedSniCase = mixedSniCase;
+      _result.mixedSniCase = mixedSniCase;
     }
     if (enablePadding != null) {
-      $result.enablePadding = enablePadding;
+      _result.enablePadding = enablePadding;
     }
     if (paddingSize != null) {
-      $result.paddingSize = paddingSize;
+      _result.paddingSize = paddingSize;
     }
-    return $result;
+    return _result;
   }
-  TLSTricks._() : super();
   factory TLSTricks.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory TLSTricks.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TLSTricks', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'enableFragment')
-    ..aOM<IntRange>(2, _omitFieldNames ? '' : 'fragmentSize', subBuilder: IntRange.create)
-    ..aOM<IntRange>(3, _omitFieldNames ? '' : 'fragmentSleep', subBuilder: IntRange.create)
-    ..aOB(4, _omitFieldNames ? '' : 'mixedSniCase')
-    ..aOB(5, _omitFieldNames ? '' : 'enablePadding')
-    ..aOM<IntRange>(6, _omitFieldNames ? '' : 'paddingSize', subBuilder: IntRange.create)
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -900,10 +862,8 @@ class TLSTricks extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  TLSTricks copyWith(void Function(TLSTricks) updates) => super.copyWith((message) => updates(message as TLSTricks)) as TLSTricks;
-
+  TLSTricks copyWith(void Function(TLSTricks) updates) => super.copyWith((message) => updates(message as TLSTricks)) as TLSTricks; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static TLSTricks create() => TLSTricks._();
   TLSTricks createEmptyInstance() => create();
@@ -973,42 +933,39 @@ class TLSTricks extends $pb.GeneratedMessage {
   IntRange ensurePaddingSize() => $_ensure(5);
 }
 
-/// *
-///  MuxOptions defines options for multiplexing connections.
 class MuxOptions extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'MuxOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enable')
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'padding')
+    ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'maxStreams', $pb.PbFieldType.O3)
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'protocol')
+    ..hasRequiredFields = false
+  ;
+
+  MuxOptions._() : super();
   factory MuxOptions({
     $core.bool? enable,
     $core.bool? padding,
     $core.int? maxStreams,
     $core.String? protocol,
   }) {
-    final $result = create();
+    final _result = create();
     if (enable != null) {
-      $result.enable = enable;
+      _result.enable = enable;
     }
     if (padding != null) {
-      $result.padding = padding;
+      _result.padding = padding;
     }
     if (maxStreams != null) {
-      $result.maxStreams = maxStreams;
+      _result.maxStreams = maxStreams;
     }
     if (protocol != null) {
-      $result.protocol = protocol;
+      _result.protocol = protocol;
     }
-    return $result;
+    return _result;
   }
-  MuxOptions._() : super();
   factory MuxOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory MuxOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'MuxOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOB(1, _omitFieldNames ? '' : 'enable')
-    ..aOB(2, _omitFieldNames ? '' : 'padding')
-    ..a<$core.int>(3, _omitFieldNames ? '' : 'maxStreams', $pb.PbFieldType.O3)
-    ..aOS(4, _omitFieldNames ? '' : 'protocol')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -1018,10 +975,8 @@ class MuxOptions extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  MuxOptions copyWith(void Function(MuxOptions) updates) => super.copyWith((message) => updates(message as MuxOptions)) as MuxOptions;
-
+  MuxOptions copyWith(void Function(MuxOptions) updates) => super.copyWith((message) => updates(message as MuxOptions)) as MuxOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static MuxOptions create() => MuxOptions._();
   MuxOptions createEmptyInstance() => create();
@@ -1067,9 +1022,23 @@ class MuxOptions extends $pb.GeneratedMessage {
   void clearProtocol() => clearField(4);
 }
 
-/// *
-///  WarpOptions defines configuration options for Warp.
 class WarpOptions extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableWarp')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mode')
+    ..aOM<WarpWireguardConfig>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'wireguardConfig', subBuilder: WarpWireguardConfig.create)
+    ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePackets')
+    ..aOM<IntRange>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePacketSize', subBuilder: IntRange.create)
+    ..aOM<IntRange>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePacketDelay', subBuilder: IntRange.create)
+    ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePacketMode')
+    ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cleanIp')
+    ..a<$core.int>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cleanPort', $pb.PbFieldType.OU3)
+    ..aOM<WarpAccount>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'account', subBuilder: WarpAccount.create)
+    ..hasRequiredFields = false
+  ;
+
+  WarpOptions._() : super();
   factory WarpOptions({
     $core.String? id,
     $core.bool? enableWarp,
@@ -1083,61 +1052,44 @@ class WarpOptions extends $pb.GeneratedMessage {
     $core.int? cleanPort,
     WarpAccount? account,
   }) {
-    final $result = create();
+    final _result = create();
     if (id != null) {
-      $result.id = id;
+      _result.id = id;
     }
     if (enableWarp != null) {
-      $result.enableWarp = enableWarp;
+      _result.enableWarp = enableWarp;
     }
     if (mode != null) {
-      $result.mode = mode;
+      _result.mode = mode;
     }
     if (wireguardConfig != null) {
-      $result.wireguardConfig = wireguardConfig;
+      _result.wireguardConfig = wireguardConfig;
     }
     if (fakePackets != null) {
-      $result.fakePackets = fakePackets;
+      _result.fakePackets = fakePackets;
     }
     if (fakePacketSize != null) {
-      $result.fakePacketSize = fakePacketSize;
+      _result.fakePacketSize = fakePacketSize;
     }
     if (fakePacketDelay != null) {
-      $result.fakePacketDelay = fakePacketDelay;
+      _result.fakePacketDelay = fakePacketDelay;
     }
     if (fakePacketMode != null) {
-      $result.fakePacketMode = fakePacketMode;
+      _result.fakePacketMode = fakePacketMode;
     }
     if (cleanIp != null) {
-      $result.cleanIp = cleanIp;
+      _result.cleanIp = cleanIp;
     }
     if (cleanPort != null) {
-      $result.cleanPort = cleanPort;
+      _result.cleanPort = cleanPort;
     }
     if (account != null) {
-      $result.account = account;
+      _result.account = account;
     }
-    return $result;
+    return _result;
   }
-  WarpOptions._() : super();
   factory WarpOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory WarpOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'WarpOptions', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'id')
-    ..aOB(2, _omitFieldNames ? '' : 'enableWarp')
-    ..aOS(3, _omitFieldNames ? '' : 'mode')
-    ..aOM<WarpWireguardConfig>(5, _omitFieldNames ? '' : 'wireguardConfig', subBuilder: WarpWireguardConfig.create)
-    ..aOS(6, _omitFieldNames ? '' : 'fakePackets')
-    ..aOM<IntRange>(7, _omitFieldNames ? '' : 'fakePacketSize', subBuilder: IntRange.create)
-    ..aOM<IntRange>(8, _omitFieldNames ? '' : 'fakePacketDelay', subBuilder: IntRange.create)
-    ..aOS(9, _omitFieldNames ? '' : 'fakePacketMode')
-    ..aOS(10, _omitFieldNames ? '' : 'cleanIp')
-    ..a<$core.int>(11, _omitFieldNames ? '' : 'cleanPort', $pb.PbFieldType.OU3)
-    ..aOM<WarpAccount>(12, _omitFieldNames ? '' : 'account', subBuilder: WarpAccount.create)
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -1147,10 +1099,8 @@ class WarpOptions extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  WarpOptions copyWith(void Function(WarpOptions) updates) => super.copyWith((message) => updates(message as WarpOptions)) as WarpOptions;
-
+  WarpOptions copyWith(void Function(WarpOptions) updates) => super.copyWith((message) => updates(message as WarpOptions)) as WarpOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static WarpOptions create() => WarpOptions._();
   WarpOptions createEmptyInstance() => create();
@@ -1267,32 +1217,29 @@ class WarpOptions extends $pb.GeneratedMessage {
   WarpAccount ensureAccount() => $_ensure(10);
 }
 
-/// *
-///  WarpAccount defines account details for Warp.
 class WarpAccount extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpAccount', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accessToken')
+    ..hasRequiredFields = false
+  ;
+
+  WarpAccount._() : super();
   factory WarpAccount({
     $core.String? accountId,
     $core.String? accessToken,
   }) {
-    final $result = create();
+    final _result = create();
     if (accountId != null) {
-      $result.accountId = accountId;
+      _result.accountId = accountId;
     }
     if (accessToken != null) {
-      $result.accessToken = accessToken;
+      _result.accessToken = accessToken;
     }
-    return $result;
+    return _result;
   }
-  WarpAccount._() : super();
   factory WarpAccount.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory WarpAccount.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'WarpAccount', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'accountId')
-    ..aOS(2, _omitFieldNames ? '' : 'accessToken')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -1302,10 +1249,8 @@ class WarpAccount extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  WarpAccount copyWith(void Function(WarpAccount) updates) => super.copyWith((message) => updates(message as WarpAccount)) as WarpAccount;
-
+  WarpAccount copyWith(void Function(WarpAccount) updates) => super.copyWith((message) => updates(message as WarpAccount)) as WarpAccount; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static WarpAccount create() => WarpAccount._();
   WarpAccount createEmptyInstance() => create();
@@ -1333,9 +1278,17 @@ class WarpAccount extends $pb.GeneratedMessage {
   void clearAccessToken() => clearField(2);
 }
 
-/// *
-///  WarpWireguardConfig defines the configuration details for WireGuard.
 class WarpWireguardConfig extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpWireguardConfig', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'privateKey')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'localAddressIpv4')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'localAddressIpv6')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'peerPublicKey')
+    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'clientId')
+    ..hasRequiredFields = false
+  ;
+
+  WarpWireguardConfig._() : super();
   factory WarpWireguardConfig({
     $core.String? privateKey,
     $core.String? localAddressIpv4,
@@ -1343,37 +1296,26 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
     $core.String? peerPublicKey,
     $core.String? clientId,
   }) {
-    final $result = create();
+    final _result = create();
     if (privateKey != null) {
-      $result.privateKey = privateKey;
+      _result.privateKey = privateKey;
     }
     if (localAddressIpv4 != null) {
-      $result.localAddressIpv4 = localAddressIpv4;
+      _result.localAddressIpv4 = localAddressIpv4;
     }
     if (localAddressIpv6 != null) {
-      $result.localAddressIpv6 = localAddressIpv6;
+      _result.localAddressIpv6 = localAddressIpv6;
     }
     if (peerPublicKey != null) {
-      $result.peerPublicKey = peerPublicKey;
+      _result.peerPublicKey = peerPublicKey;
     }
     if (clientId != null) {
-      $result.clientId = clientId;
+      _result.clientId = clientId;
     }
-    return $result;
+    return _result;
   }
-  WarpWireguardConfig._() : super();
   factory WarpWireguardConfig.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory WarpWireguardConfig.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'WarpWireguardConfig', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'privateKey')
-    ..aOS(2, _omitFieldNames ? '' : 'localAddressIpv4')
-    ..aOS(3, _omitFieldNames ? '' : 'localAddressIpv6')
-    ..aOS(4, _omitFieldNames ? '' : 'peerPublicKey')
-    ..aOS(5, _omitFieldNames ? '' : 'clientId')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -1383,10 +1325,8 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  WarpWireguardConfig copyWith(void Function(WarpWireguardConfig) updates) => super.copyWith((message) => updates(message as WarpWireguardConfig)) as WarpWireguardConfig;
-
+  WarpWireguardConfig copyWith(void Function(WarpWireguardConfig) updates) => super.copyWith((message) => updates(message as WarpWireguardConfig)) as WarpWireguardConfig; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static WarpWireguardConfig create() => WarpWireguardConfig._();
   WarpWireguardConfig createEmptyInstance() => create();
@@ -1441,9 +1381,19 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   void clearClientId() => clearField(5);
 }
 
-/// *
-///  Rule defines routing rules for managing traffic.
 class Rule extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Rule', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ruleSetUrl')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'domains')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ip')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'port')
+    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'network')
+    ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'protocol')
+    ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'outbound')
+    ..hasRequiredFields = false
+  ;
+
+  Rule._() : super();
   factory Rule({
     $core.String? ruleSetUrl,
     $core.String? domains,
@@ -1453,45 +1403,32 @@ class Rule extends $pb.GeneratedMessage {
     $core.String? protocol,
     $core.String? outbound,
   }) {
-    final $result = create();
+    final _result = create();
     if (ruleSetUrl != null) {
-      $result.ruleSetUrl = ruleSetUrl;
+      _result.ruleSetUrl = ruleSetUrl;
     }
     if (domains != null) {
-      $result.domains = domains;
+      _result.domains = domains;
     }
     if (ip != null) {
-      $result.ip = ip;
+      _result.ip = ip;
     }
     if (port != null) {
-      $result.port = port;
+      _result.port = port;
     }
     if (network != null) {
-      $result.network = network;
+      _result.network = network;
     }
     if (protocol != null) {
-      $result.protocol = protocol;
+      _result.protocol = protocol;
     }
     if (outbound != null) {
-      $result.outbound = outbound;
+      _result.outbound = outbound;
     }
-    return $result;
+    return _result;
   }
-  Rule._() : super();
   factory Rule.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory Rule.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Rule', package: const $pb.PackageName(_omitMessageNames ? '' : 'hiddifyoptions'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'ruleSetUrl')
-    ..aOS(2, _omitFieldNames ? '' : 'domains')
-    ..aOS(3, _omitFieldNames ? '' : 'ip')
-    ..aOS(4, _omitFieldNames ? '' : 'port')
-    ..aOS(5, _omitFieldNames ? '' : 'network')
-    ..aOS(6, _omitFieldNames ? '' : 'protocol')
-    ..aOS(7, _omitFieldNames ? '' : 'outbound')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -1501,10 +1438,8 @@ class Rule extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  Rule copyWith(void Function(Rule) updates) => super.copyWith((message) => updates(message as Rule)) as Rule;
-
+  Rule copyWith(void Function(Rule) updates) => super.copyWith((message) => updates(message as Rule)) as Rule; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static Rule create() => Rule._();
   Rule createEmptyInstance() => create();
@@ -1577,6 +1512,3 @@ class Rule extends $pb.GeneratedMessage {
   void clearOutbound() => clearField(7);
 }
 
-
-const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

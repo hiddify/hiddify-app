@@ -1,4 +1,6 @@
 PODS:
+  - app_links (0.0.2):
+    - Flutter
   - cupertino_http (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -143,6 +145,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - app_links (from `.symlinks/plugins/app_links/ios`)
   - cupertino_http (from `.symlinks/plugins/cupertino_http/darwin`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - EasyPermissionX/Camera
@@ -185,6 +188,8 @@ SPEC REPOS:
     - SwiftyGif
 
 EXTERNAL SOURCES:
+  app_links:
+    :path: ".symlinks/plugins/app_links/ios"
   cupertino_http:
     :path: ".symlinks/plugins/cupertino_http/darwin"
   device_info_plus:
@@ -223,6 +228,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
+  app_links: f3e17e4ee5e357b39d8b95290a9b2c299fca71c6
   cupertino_http: 947a233f40cfea55167a49f2facc18434ea117ba
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   DKImagePickerController: 946cec48c7873164274ecc4624d19e3da4c1ef3c

@@ -1,23 +1,19 @@
-//
+///
 //  Generated code. Do not modify.
 //  source: v2/hcore/hcore.proto
 //
 // @dart = 2.12
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
-
+// ignore_for_file: UNDEFINED_SHOWN_NAME
 import 'dart:core' as $core;
-
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class CoreStates extends $pb.ProtobufEnum {
-  static const CoreStates STOPPED = CoreStates._(0, _omitEnumNames ? '' : 'STOPPED');
-  static const CoreStates STARTING = CoreStates._(1, _omitEnumNames ? '' : 'STARTING');
-  static const CoreStates STARTED = CoreStates._(2, _omitEnumNames ? '' : 'STARTED');
-  static const CoreStates STOPPING = CoreStates._(3, _omitEnumNames ? '' : 'STOPPING');
+  static const CoreStates STOPPED = CoreStates._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'STOPPED');
+  static const CoreStates STARTING = CoreStates._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'STARTING');
+  static const CoreStates STARTED = CoreStates._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'STARTED');
+  static const CoreStates STOPPING = CoreStates._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'STOPPING');
 
   static const $core.List<CoreStates> values = <CoreStates> [
     STOPPED,
@@ -33,21 +29,21 @@ class CoreStates extends $pb.ProtobufEnum {
 }
 
 class MessageType extends $pb.ProtobufEnum {
-  static const MessageType EMPTY = MessageType._(0, _omitEnumNames ? '' : 'EMPTY');
-  static const MessageType EMPTY_CONFIGURATION = MessageType._(1, _omitEnumNames ? '' : 'EMPTY_CONFIGURATION');
-  static const MessageType START_COMMAND_SERVER = MessageType._(2, _omitEnumNames ? '' : 'START_COMMAND_SERVER');
-  static const MessageType CREATE_SERVICE = MessageType._(3, _omitEnumNames ? '' : 'CREATE_SERVICE');
-  static const MessageType START_SERVICE = MessageType._(4, _omitEnumNames ? '' : 'START_SERVICE');
-  static const MessageType UNEXPECTED_ERROR = MessageType._(5, _omitEnumNames ? '' : 'UNEXPECTED_ERROR');
-  static const MessageType ALREADY_STARTED = MessageType._(6, _omitEnumNames ? '' : 'ALREADY_STARTED');
-  static const MessageType ALREADY_STOPPED = MessageType._(7, _omitEnumNames ? '' : 'ALREADY_STOPPED');
-  static const MessageType INSTANCE_NOT_FOUND = MessageType._(8, _omitEnumNames ? '' : 'INSTANCE_NOT_FOUND');
-  static const MessageType INSTANCE_NOT_STOPPED = MessageType._(9, _omitEnumNames ? '' : 'INSTANCE_NOT_STOPPED');
-  static const MessageType INSTANCE_NOT_STARTED = MessageType._(10, _omitEnumNames ? '' : 'INSTANCE_NOT_STARTED');
-  static const MessageType ERROR_BUILDING_CONFIG = MessageType._(11, _omitEnumNames ? '' : 'ERROR_BUILDING_CONFIG');
-  static const MessageType ERROR_PARSING_CONFIG = MessageType._(12, _omitEnumNames ? '' : 'ERROR_PARSING_CONFIG');
-  static const MessageType ERROR_READING_CONFIG = MessageType._(13, _omitEnumNames ? '' : 'ERROR_READING_CONFIG');
-  static const MessageType ERROR_EXTENSION = MessageType._(14, _omitEnumNames ? '' : 'ERROR_EXTENSION');
+  static const MessageType EMPTY = MessageType._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'EMPTY');
+  static const MessageType EMPTY_CONFIGURATION = MessageType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'EMPTY_CONFIGURATION');
+  static const MessageType START_COMMAND_SERVER = MessageType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'START_COMMAND_SERVER');
+  static const MessageType CREATE_SERVICE = MessageType._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'CREATE_SERVICE');
+  static const MessageType START_SERVICE = MessageType._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'START_SERVICE');
+  static const MessageType UNEXPECTED_ERROR = MessageType._(5, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'UNEXPECTED_ERROR');
+  static const MessageType ALREADY_STARTED = MessageType._(6, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ALREADY_STARTED');
+  static const MessageType ALREADY_STOPPED = MessageType._(7, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ALREADY_STOPPED');
+  static const MessageType INSTANCE_NOT_FOUND = MessageType._(8, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'INSTANCE_NOT_FOUND');
+  static const MessageType INSTANCE_NOT_STOPPED = MessageType._(9, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'INSTANCE_NOT_STOPPED');
+  static const MessageType INSTANCE_NOT_STARTED = MessageType._(10, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'INSTANCE_NOT_STARTED');
+  static const MessageType ERROR_BUILDING_CONFIG = MessageType._(11, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ERROR_BUILDING_CONFIG');
+  static const MessageType ERROR_PARSING_CONFIG = MessageType._(12, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ERROR_PARSING_CONFIG');
+  static const MessageType ERROR_READING_CONFIG = MessageType._(13, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ERROR_READING_CONFIG');
+  static const MessageType ERROR_EXTENSION = MessageType._(14, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ERROR_EXTENSION');
 
   static const $core.List<MessageType> values = <MessageType> [
     EMPTY,
@@ -74,11 +70,11 @@ class MessageType extends $pb.ProtobufEnum {
 }
 
 class SetupMode extends $pb.ProtobufEnum {
-  static const SetupMode OLD = SetupMode._(0, _omitEnumNames ? '' : 'OLD');
-  static const SetupMode GRPC_NORMAL = SetupMode._(1, _omitEnumNames ? '' : 'GRPC_NORMAL');
-  static const SetupMode GRPC_BACKGROUND = SetupMode._(2, _omitEnumNames ? '' : 'GRPC_BACKGROUND');
-  static const SetupMode GRPC_NORMAL_INSECURE = SetupMode._(3, _omitEnumNames ? '' : 'GRPC_NORMAL_INSECURE');
-  static const SetupMode GRPC_BACKGROUND_INSECURE = SetupMode._(4, _omitEnumNames ? '' : 'GRPC_BACKGROUND_INSECURE');
+  static const SetupMode OLD = SetupMode._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OLD');
+  static const SetupMode GRPC_NORMAL = SetupMode._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'GRPC_NORMAL');
+  static const SetupMode GRPC_BACKGROUND = SetupMode._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'GRPC_BACKGROUND');
+  static const SetupMode GRPC_NORMAL_INSECURE = SetupMode._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'GRPC_NORMAL_INSECURE');
+  static const SetupMode GRPC_BACKGROUND_INSECURE = SetupMode._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'GRPC_BACKGROUND_INSECURE');
 
   static const $core.List<SetupMode> values = <SetupMode> [
     OLD,
@@ -95,11 +91,11 @@ class SetupMode extends $pb.ProtobufEnum {
 }
 
 class LogLevel extends $pb.ProtobufEnum {
-  static const LogLevel DEBUG = LogLevel._(0, _omitEnumNames ? '' : 'DEBUG');
-  static const LogLevel INFO = LogLevel._(1, _omitEnumNames ? '' : 'INFO');
-  static const LogLevel WARNING = LogLevel._(2, _omitEnumNames ? '' : 'WARNING');
-  static const LogLevel ERROR = LogLevel._(3, _omitEnumNames ? '' : 'ERROR');
-  static const LogLevel FATAL = LogLevel._(4, _omitEnumNames ? '' : 'FATAL');
+  static const LogLevel DEBUG = LogLevel._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'DEBUG');
+  static const LogLevel INFO = LogLevel._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'INFO');
+  static const LogLevel WARNING = LogLevel._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'WARNING');
+  static const LogLevel ERROR = LogLevel._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ERROR');
+  static const LogLevel FATAL = LogLevel._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'FATAL');
 
   static const $core.List<LogLevel> values = <LogLevel> [
     DEBUG,
@@ -116,9 +112,9 @@ class LogLevel extends $pb.ProtobufEnum {
 }
 
 class LogType extends $pb.ProtobufEnum {
-  static const LogType CORE = LogType._(0, _omitEnumNames ? '' : 'CORE');
-  static const LogType SERVICE = LogType._(1, _omitEnumNames ? '' : 'SERVICE');
-  static const LogType CONFIG = LogType._(2, _omitEnumNames ? '' : 'CONFIG');
+  static const LogType CORE = LogType._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'CORE');
+  static const LogType SERVICE = LogType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'SERVICE');
+  static const LogType CONFIG = LogType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'CONFIG');
 
   static const $core.List<LogType> values = <LogType> [
     CORE,
@@ -132,5 +128,3 @@ class LogType extends $pb.ProtobufEnum {
   const LogType._($core.int v, $core.String n) : super(v, n);
 }
 
-
-const _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');

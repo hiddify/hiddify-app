@@ -1,13 +1,9 @@
-//
+///
 //  Generated code. Do not modify.
 //  source: extension/extension.proto
 //
 // @dart = 2.12
-
-// ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
@@ -19,34 +15,33 @@ import 'extension.pbenum.dart';
 export 'extension.pbenum.dart';
 
 class ExtensionActionResult extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ExtensionActionResult', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'extension'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'extensionId')
+    ..e<$1.ResponseCode>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'code', $pb.PbFieldType.OE, defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
+    ..hasRequiredFields = false
+  ;
+
+  ExtensionActionResult._() : super();
   factory ExtensionActionResult({
     $core.String? extensionId,
     $1.ResponseCode? code,
     $core.String? message,
   }) {
-    final $result = create();
+    final _result = create();
     if (extensionId != null) {
-      $result.extensionId = extensionId;
+      _result.extensionId = extensionId;
     }
     if (code != null) {
-      $result.code = code;
+      _result.code = code;
     }
     if (message != null) {
-      $result.message = message;
+      _result.message = message;
     }
-    return $result;
+    return _result;
   }
-  ExtensionActionResult._() : super();
   factory ExtensionActionResult.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory ExtensionActionResult.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExtensionActionResult', package: const $pb.PackageName(_omitMessageNames ? '' : 'extension'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'extensionId')
-    ..e<$1.ResponseCode>(2, _omitFieldNames ? '' : 'code', $pb.PbFieldType.OE, defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
-    ..aOS(3, _omitFieldNames ? '' : 'message')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -56,10 +51,8 @@ class ExtensionActionResult extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ExtensionActionResult copyWith(void Function(ExtensionActionResult) updates) => super.copyWith((message) => updates(message as ExtensionActionResult)) as ExtensionActionResult;
-
+  ExtensionActionResult copyWith(void Function(ExtensionActionResult) updates) => super.copyWith((message) => updates(message as ExtensionActionResult)) as ExtensionActionResult; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ExtensionActionResult create() => ExtensionActionResult._();
   ExtensionActionResult createEmptyInstance() => create();
@@ -97,24 +90,23 @@ class ExtensionActionResult extends $pb.GeneratedMessage {
 }
 
 class ExtensionList extends $pb.GeneratedMessage {
-  factory ExtensionList({
-    $core.Iterable<ExtensionMsg>? extensions,
-  }) {
-    final $result = create();
-    if (extensions != null) {
-      $result.extensions.addAll(extensions);
-    }
-    return $result;
-  }
-  ExtensionList._() : super();
-  factory ExtensionList.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ExtensionList.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExtensionList', package: const $pb.PackageName(_omitMessageNames ? '' : 'extension'), createEmptyInstance: create)
-    ..pc<ExtensionMsg>(1, _omitFieldNames ? '' : 'extensions', $pb.PbFieldType.PM, subBuilder: ExtensionMsg.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ExtensionList', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'extension'), createEmptyInstance: create)
+    ..pc<ExtensionMsg>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'extensions', $pb.PbFieldType.PM, subBuilder: ExtensionMsg.create)
     ..hasRequiredFields = false
   ;
 
+  ExtensionList._() : super();
+  factory ExtensionList({
+    $core.Iterable<ExtensionMsg>? extensions,
+  }) {
+    final _result = create();
+    if (extensions != null) {
+      _result.extensions.addAll(extensions);
+    }
+    return _result;
+  }
+  factory ExtensionList.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ExtensionList.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -124,10 +116,8 @@ class ExtensionList extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ExtensionList copyWith(void Function(ExtensionList) updates) => super.copyWith((message) => updates(message as ExtensionList)) as ExtensionList;
-
+  ExtensionList copyWith(void Function(ExtensionList) updates) => super.copyWith((message) => updates(message as ExtensionList)) as ExtensionList; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ExtensionList create() => ExtensionList._();
   ExtensionList createEmptyInstance() => create();
@@ -141,29 +131,28 @@ class ExtensionList extends $pb.GeneratedMessage {
 }
 
 class EditExtensionRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'EditExtensionRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'extension'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'extensionId')
+    ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enable')
+    ..hasRequiredFields = false
+  ;
+
+  EditExtensionRequest._() : super();
   factory EditExtensionRequest({
     $core.String? extensionId,
     $core.bool? enable,
   }) {
-    final $result = create();
+    final _result = create();
     if (extensionId != null) {
-      $result.extensionId = extensionId;
+      _result.extensionId = extensionId;
     }
     if (enable != null) {
-      $result.enable = enable;
+      _result.enable = enable;
     }
-    return $result;
+    return _result;
   }
-  EditExtensionRequest._() : super();
   factory EditExtensionRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory EditExtensionRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'EditExtensionRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'extension'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'extensionId')
-    ..aOB(2, _omitFieldNames ? '' : 'enable')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -173,10 +162,8 @@ class EditExtensionRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  EditExtensionRequest copyWith(void Function(EditExtensionRequest) updates) => super.copyWith((message) => updates(message as EditExtensionRequest)) as EditExtensionRequest;
-
+  EditExtensionRequest copyWith(void Function(EditExtensionRequest) updates) => super.copyWith((message) => updates(message as EditExtensionRequest)) as EditExtensionRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static EditExtensionRequest create() => EditExtensionRequest._();
   EditExtensionRequest createEmptyInstance() => create();
@@ -205,39 +192,38 @@ class EditExtensionRequest extends $pb.GeneratedMessage {
 }
 
 class ExtensionMsg extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ExtensionMsg', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'extension'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'title')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'description')
+    ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enable')
+    ..hasRequiredFields = false
+  ;
+
+  ExtensionMsg._() : super();
   factory ExtensionMsg({
     $core.String? id,
     $core.String? title,
     $core.String? description,
     $core.bool? enable,
   }) {
-    final $result = create();
+    final _result = create();
     if (id != null) {
-      $result.id = id;
+      _result.id = id;
     }
     if (title != null) {
-      $result.title = title;
+      _result.title = title;
     }
     if (description != null) {
-      $result.description = description;
+      _result.description = description;
     }
     if (enable != null) {
-      $result.enable = enable;
+      _result.enable = enable;
     }
-    return $result;
+    return _result;
   }
-  ExtensionMsg._() : super();
   factory ExtensionMsg.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory ExtensionMsg.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExtensionMsg', package: const $pb.PackageName(_omitMessageNames ? '' : 'extension'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'id')
-    ..aOS(2, _omitFieldNames ? '' : 'title')
-    ..aOS(3, _omitFieldNames ? '' : 'description')
-    ..aOB(4, _omitFieldNames ? '' : 'enable')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -247,10 +233,8 @@ class ExtensionMsg extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ExtensionMsg copyWith(void Function(ExtensionMsg) updates) => super.copyWith((message) => updates(message as ExtensionMsg)) as ExtensionMsg;
-
+  ExtensionMsg copyWith(void Function(ExtensionMsg) updates) => super.copyWith((message) => updates(message as ExtensionMsg)) as ExtensionMsg; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ExtensionMsg create() => ExtensionMsg._();
   ExtensionMsg createEmptyInstance() => create();
@@ -297,29 +281,28 @@ class ExtensionMsg extends $pb.GeneratedMessage {
 }
 
 class ExtensionRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ExtensionRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'extension'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'extensionId')
+    ..m<$core.String, $core.String>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'data', entryClassName: 'ExtensionRequest.DataEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('extension'))
+    ..hasRequiredFields = false
+  ;
+
+  ExtensionRequest._() : super();
   factory ExtensionRequest({
     $core.String? extensionId,
     $core.Map<$core.String, $core.String>? data,
   }) {
-    final $result = create();
+    final _result = create();
     if (extensionId != null) {
-      $result.extensionId = extensionId;
+      _result.extensionId = extensionId;
     }
     if (data != null) {
-      $result.data.addAll(data);
+      _result.data.addAll(data);
     }
-    return $result;
+    return _result;
   }
-  ExtensionRequest._() : super();
   factory ExtensionRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory ExtensionRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExtensionRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'extension'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'extensionId')
-    ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'data', entryClassName: 'ExtensionRequest.DataEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('extension'))
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -329,10 +312,8 @@ class ExtensionRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ExtensionRequest copyWith(void Function(ExtensionRequest) updates) => super.copyWith((message) => updates(message as ExtensionRequest)) as ExtensionRequest;
-
+  ExtensionRequest copyWith(void Function(ExtensionRequest) updates) => super.copyWith((message) => updates(message as ExtensionRequest)) as ExtensionRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ExtensionRequest create() => ExtensionRequest._();
   ExtensionRequest createEmptyInstance() => create();
@@ -355,34 +336,33 @@ class ExtensionRequest extends $pb.GeneratedMessage {
 }
 
 class SendExtensionDataRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SendExtensionDataRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'extension'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'extensionId')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'button')
+    ..m<$core.String, $core.String>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'data', entryClassName: 'SendExtensionDataRequest.DataEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('extension'))
+    ..hasRequiredFields = false
+  ;
+
+  SendExtensionDataRequest._() : super();
   factory SendExtensionDataRequest({
     $core.String? extensionId,
     $core.String? button,
     $core.Map<$core.String, $core.String>? data,
   }) {
-    final $result = create();
+    final _result = create();
     if (extensionId != null) {
-      $result.extensionId = extensionId;
+      _result.extensionId = extensionId;
     }
     if (button != null) {
-      $result.button = button;
+      _result.button = button;
     }
     if (data != null) {
-      $result.data.addAll(data);
+      _result.data.addAll(data);
     }
-    return $result;
+    return _result;
   }
-  SendExtensionDataRequest._() : super();
   factory SendExtensionDataRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory SendExtensionDataRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SendExtensionDataRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'extension'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'extensionId')
-    ..aOS(2, _omitFieldNames ? '' : 'button')
-    ..m<$core.String, $core.String>(3, _omitFieldNames ? '' : 'data', entryClassName: 'SendExtensionDataRequest.DataEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('extension'))
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -392,10 +372,8 @@ class SendExtensionDataRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  SendExtensionDataRequest copyWith(void Function(SendExtensionDataRequest) updates) => super.copyWith((message) => updates(message as SendExtensionDataRequest)) as SendExtensionDataRequest;
-
+  SendExtensionDataRequest copyWith(void Function(SendExtensionDataRequest) updates) => super.copyWith((message) => updates(message as SendExtensionDataRequest)) as SendExtensionDataRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static SendExtensionDataRequest create() => SendExtensionDataRequest._();
   SendExtensionDataRequest createEmptyInstance() => create();
@@ -427,34 +405,33 @@ class SendExtensionDataRequest extends $pb.GeneratedMessage {
 }
 
 class ExtensionResponse extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ExtensionResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'extension'), createEmptyInstance: create)
+    ..e<ExtensionResponseType>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExtensionResponseType.NOTHING, valueOf: ExtensionResponseType.valueOf, enumValues: ExtensionResponseType.values)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'extensionId')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'jsonUi')
+    ..hasRequiredFields = false
+  ;
+
+  ExtensionResponse._() : super();
   factory ExtensionResponse({
     ExtensionResponseType? type,
     $core.String? extensionId,
     $core.String? jsonUi,
   }) {
-    final $result = create();
+    final _result = create();
     if (type != null) {
-      $result.type = type;
+      _result.type = type;
     }
     if (extensionId != null) {
-      $result.extensionId = extensionId;
+      _result.extensionId = extensionId;
     }
     if (jsonUi != null) {
-      $result.jsonUi = jsonUi;
+      _result.jsonUi = jsonUi;
     }
-    return $result;
+    return _result;
   }
-  ExtensionResponse._() : super();
   factory ExtensionResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
   factory ExtensionResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ExtensionResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'extension'), createEmptyInstance: create)
-    ..e<ExtensionResponseType>(1, _omitFieldNames ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExtensionResponseType.NOTHING, valueOf: ExtensionResponseType.valueOf, enumValues: ExtensionResponseType.values)
-    ..aOS(2, _omitFieldNames ? '' : 'extensionId')
-    ..aOS(3, _omitFieldNames ? '' : 'jsonUi')
-    ..hasRequiredFields = false
-  ;
-
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
@@ -464,10 +441,8 @@ class ExtensionResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ExtensionResponse copyWith(void Function(ExtensionResponse) updates) => super.copyWith((message) => updates(message as ExtensionResponse)) as ExtensionResponse;
-
+  ExtensionResponse copyWith(void Function(ExtensionResponse) updates) => super.copyWith((message) => updates(message as ExtensionResponse)) as ExtensionResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
-
   @$core.pragma('dart2js:noInline')
   static ExtensionResponse create() => ExtensionResponse._();
   ExtensionResponse createEmptyInstance() => create();
@@ -504,6 +479,3 @@ class ExtensionResponse extends $pb.GeneratedMessage {
   void clearJsonUi() => clearField(3);
 }
 
-
-const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
-const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
