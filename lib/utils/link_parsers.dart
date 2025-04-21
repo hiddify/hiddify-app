@@ -25,7 +25,7 @@ abstract class LinkParser {
   }
 
   // protocols schemas
-  static const protocols = {'clash', 'clashmeta', 'sing-box', 'hiddify'};
+  static const protocols = ['hiddify', 'v2ray', 'v2rayn', 'v2rayng', 'clash', 'clashmeta', 'sing-box'];
 
   static ProfileLink? parse(String link) {
     return simple(link) ?? deep(link);
@@ -78,19 +78,14 @@ abstract class LinkParser {
     if (uri == null || !uri.hasScheme || !uri.hasAuthority) return null;
     final queryParams = uri.queryParameters;
     switch (uri.scheme) {
-      case 'clash' || 'clashmeta' when uri.authority == 'install-config':
-        if (uri.authority != 'install-config' || !queryParams.containsKey('url')) return null;
-        return (url: queryParams['url']!, name: queryParams['name'] ?? '');
-      case 'sing-box':
-        if (uri.authority != 'import-remote-profile' || !queryParams.containsKey('url')) return null;
-        return (url: queryParams['url']!, name: queryParams['name'] ?? '');
       case 'hiddify':
-        if (uri.authority == "import") {
+        if (queryParams.containsKey('url')) {
+          return (url: queryParams['url']!, name: queryParams['name'] ?? '');
+        } else {
           return (url: uri.path.substring(1) + (uri.hasQuery ? "?${uri.query}" : ""), name: uri.fragment);
         }
-        //for backward compatibility
-        if ((uri.authority != 'install-config' && uri.authority != 'install-sub') || !queryParams.containsKey('url')) return null;
-        return (url: queryParams['url']!, name: queryParams['name'] ?? '');
+      case 'v2ray' || 'v2rayn' || 'v2rayng' || 'clash' || 'clashmeta' || 'sing-box':
+        return queryParams.containsKey('url') ? (url: queryParams['url']!, name: queryParams['name'] ?? '') : null;
       default:
         return null;
     }

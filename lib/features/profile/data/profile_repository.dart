@@ -19,7 +19,6 @@ import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/link_parsers.dart';
-import 'package:meta/meta.dart';
 import 'package:uuid/uuid.dart';
 
 abstract interface class ProfileRepository {
@@ -254,7 +253,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   }) {
     return exceptionHandler(
       () async {
-        return fetch(baseProfile.url, baseProfile.id, cancelToken: cancelToken)
+        return await fetch(baseProfile.url, baseProfile.id, cancelToken: cancelToken)
             .flatMap(
               (remoteProfile) => TaskEither(() async {
                 await profileDataSource.insert(
@@ -305,7 +304,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         loggy.debug(
           "updating profile [${baseProfile.name} (${baseProfile.id})]",
         );
-        return fetch(baseProfile.url, baseProfile.id, cancelToken: cancelToken)
+        return await fetch(baseProfile.url, baseProfile.id, cancelToken: cancelToken)
             .flatMap(
               (remoteProfile) => TaskEither(
                 () async {
@@ -385,6 +384,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
     'profile-update-interval',
     'support-url',
     'profile-web-page-url',
+    'enable-warp',
   ];
 
   @visibleForTesting

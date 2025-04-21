@@ -5,7 +5,6 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:dartx/dartx.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -460,7 +459,7 @@ class _JsonEditorState extends State<JsonEditor> {
 
   void copyData() async {
     await Clipboard.setData(
-      ClipboardData(text: JsonEncoder.withIndent(' ').convert(_data)),
+      ClipboardData(text: const JsonEncoder.withIndent(' ').convert(_data)),
     );
   }
 
@@ -1282,7 +1281,7 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
             child: DropdownButton<String>(
               hint: Text('Select ${widget.keyPath.replaceAll("config.outbounds", "")}'),
               value: _text,
-              icon: Icon(Icons.arrow_downward),
+              icon: const Icon(Icons.arrow_downward),
               iconSize: 24,
               elevation: 16,
               underline: Container(
@@ -1402,14 +1401,14 @@ class _Options<T> extends StatelessWidget {
               for (final String key in protocolSchemaValues.keys) ...{
                 PopupMenuItem<_OptionItems>(
                   height: _popupMenuHeight,
-                  padding: EdgeInsets.only(left: _popupMenuItemPadding),
+                  padding: const EdgeInsets.only(left: _popupMenuItemPadding),
                   value: key,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.data_object),
-                      SizedBox(width: 10),
-                      Text(key, style: TextStyle(fontSize: 14)),
+                      const Icon(Icons.data_object),
+                      const SizedBox(width: 10),
+                      Text(key, style: const TextStyle(fontSize: 14)),
                     ],
                   ),
                 ),
@@ -1422,14 +1421,14 @@ class _Options<T> extends StatelessWidget {
                   for (final String key2 in exampleSchemaValues[key]!.keys) ...{
                     PopupMenuItem<_OptionItems>(
                       height: _popupMenuHeight,
-                      padding: EdgeInsets.only(left: _popupMenuItemPadding),
+                      padding: const EdgeInsets.only(left: _popupMenuItemPadding),
                       value: key + "___" + key2,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.data_object),
-                          SizedBox(width: 10),
-                          Text(key2, style: TextStyle(fontSize: 14)),
+                          const Icon(Icons.data_object),
+                          const SizedBox(width: 10),
+                          Text(key2, style: const TextStyle(fontSize: 14)),
                         ],
                       ),
                     ),
@@ -1575,12 +1574,12 @@ class _SearchField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: "Search",
               hintStyle: Theme.of(context).textTheme.bodySmall,
-              constraints: BoxConstraints(maxWidth: 100),
+              constraints: const BoxConstraints(maxWidth: 100),
               border: InputBorder.none,
               // fillColor: Colors.transparent,
               // filled: true,
               isDense: true,
-              contentPadding: EdgeInsets.all(3),
+              contentPadding: const EdgeInsets.all(3),
               focusedBorder: InputBorder.none,
               // hoverColor: Colors.transparent,
             ),

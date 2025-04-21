@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
-import 'package:hiddify/gen/assets.gen.dart';
 
 class CircleDesignWidget extends StatelessWidget {
   final double animationValue;
@@ -40,7 +39,7 @@ class CircleDesignWidget extends StatelessWidget {
           label: label,
           child: Container(
             clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               // boxShadow: [
               //   BoxShadow(
@@ -108,45 +107,45 @@ class CirclePainter extends CustomPainter {
     final double cx = size.width / 2;
     final double cy = size.height / 2;
 
-    var innerCircleColor = [
+    final innerCircleColor = [
       baseColor.withAlpha(230),
       baseColor,
     ];
 
     // Outer circle (pulsing animation for connecting state)
-    Paint outerCirclePaint = Paint()
+    final Paint outerCirclePaint = Paint()
       ..color = baseColor.withOpacity(0.15)
       ..style = PaintingStyle.fill;
-    double outerRadius = 84 * animationValue;
+    final double outerRadius = 84 * animationValue;
 
     canvas.drawCircle(Offset(cx, cy), outerRadius, outerCirclePaint);
 
     // Middle circle
-    Paint middleCirclePaint = Paint()
+    final Paint middleCirclePaint = Paint()
       ..color = baseColor.withOpacity(.3)
       ..style = PaintingStyle.fill;
-    double middleRadius = 60 * animationValue + (1 - animationValue) / 3;
+    final double middleRadius = 60 * animationValue + (1 - animationValue) / 3;
     canvas.drawCircle(Offset(cx, cy), middleRadius, middleCirclePaint);
 
     // Inner circle with gradient
-    Paint innerCirclePaint = Paint()
+    final Paint innerCirclePaint = Paint()
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: innerCircleColor,
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 36));
-    double innerRadius = 36;
+    final double innerRadius = 36;
     canvas.drawCircle(Offset(cx, cy), innerRadius, innerCirclePaint);
 
     // Draw path and vertical line (same as original)
-    Paint pathPaint = Paint()
+    final Paint pathPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.80952
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    Path curvePath = Path()
+    final Path curvePath = Path()
       ..moveTo(92.4867, 75.52)
       ..cubicTo(
         94.1645,
@@ -214,7 +213,7 @@ class CirclePainter extends CustomPainter {
       );
     canvas.drawPath(curvePath, pathPaint);
 
-    Path linePath = Path()
+    final Path linePath = Path()
       ..moveTo(84.0066, 72)
       ..lineTo(84.0066, 82.6667);
 

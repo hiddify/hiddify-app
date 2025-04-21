@@ -17,7 +17,7 @@ import 'package:uuid/uuid.dart';
 abstract class ProfileParser {
   static const infiniteTrafficThreshold = 92233720368;
   static const infiniteTimeThreshold = 92233720368;
-  static const allowedOverrideConfigs = ['connection-test-url', 'direct-dns-address', 'remote-dns-address'];
+  static const allowedOverrideConfigs = ['connection-test-url', 'direct-dns-address', 'remote-dns-address', 'warp-detour-mode'];
   static RemoteProfileEntity parse(
     String url,
     Map<String, List<String>> headers,
@@ -45,6 +45,10 @@ abstract class ProfileParser {
       name = part.replaceFirst(pattern, "");
     }
     if (name.isBlank) name = "Remote Profile";
+
+    if (headers['enable-warp'] case [final enableWarp] when enableWarp == 'true') {
+      headers['warp-detour-mode'] = ['warp_over_proxy'];
+    }
 
     ProfileOptions? options;
     if (headers['profile-update-interval'] case [final updateIntervalStr]) {
@@ -88,7 +92,7 @@ abstract class ProfileParser {
     final map = {
       for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt(),
     };
-    if (map case {"upload": final upload?, "download": final download?, "total": var total, "expire": var expire}) {
+    if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
       final total1 = (total == null || total == 0) ? infiniteTrafficThreshold : total;
       expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
       return SubscriptionInfo(

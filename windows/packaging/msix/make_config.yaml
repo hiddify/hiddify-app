@@ -5,7 +5,7 @@ msix_version: 3.0.0.0
 logo_path: windows\runner\resources\app_icon.ico
 capabilities: internetClient, internetClientServer, privateNetworkClientServer
 languages: en-us, zh-cn, zh-tw, tr-tr,fa-ir,ru-ru,pt-br,es-es
-protocol_activation: hiddify
+protocol_activation: hiddify, v2ray, v2rayn, v2rayng, clash, clashmeta, sing-box
 execution_alias: hiddify
 certificate_path: windows\sign.pfx
 certificate_password:

@@ -50,13 +50,13 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
 
   Menu _trayMenu(ConnectionStatus connection, ServiceMode serviceMode, Translations t) => Menu(
         items: [
-          if (PlatformUtils.isMacOS) ...[
-            MenuItem(
-              key: 'dashboard',
-              label: t.tray.dashboard,
-            ),
-            MenuItem.separator(),
-          ],
+          // if (PlatformUtils.isMacOS) ...[
+          //   MenuItem(
+          //     key: 'dashboard',
+          //     label: t.tray.dashboard,
+          //   ),
+          //   MenuItem.separator(),
+          // ],
           MenuItem(
             key: 'connection',
             label: switch (connection) {
@@ -131,9 +131,10 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
 
   @override
   Future<void> onTrayMenuItemClick(MenuItem menuItem) async {
-    if (menuItem.key == 'dashboard') {
-      await ref.read(windowNotifierProvider.notifier).open();
-    } else if (menuItem.key == 'connection') {
+    // if (menuItem.key == 'dashboard') {
+    //   await ref.read(windowNotifierProvider.notifier).open();
+    // }
+    if (menuItem.key == 'connection') {
       await ref.read(connectionNotifierProvider.notifier).toggleConnection();
     } else if (menuItem.key == 'quit') {
       await ref.read(windowNotifierProvider.notifier).quit();
@@ -146,11 +147,12 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
 
   @override
   Future<void> onTrayIconMouseDown() async {
-    if (Platform.isMacOS) {
-      await trayManager.popUpContextMenu();
-    } else {
-      await ref.read(windowNotifierProvider.notifier).hideOrShow();
-    }
+    // if (Platform.isMacOS) {
+    //   await trayManager.popUpContextMenu();
+    // } else {
+    //   await ref.read(windowNotifierProvider.notifier).hideOrShow();
+    // }
+    await ref.read(windowNotifierProvider.notifier).hideOrShow();
   }
 
   @override

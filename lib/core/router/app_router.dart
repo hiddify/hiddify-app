@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/routes.dart';
 import 'package:hiddify/core/router/url_protocol/api.dart';
-// import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
+
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -91,7 +91,7 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
     if (PlatformUtils.isDesktop) {
       ref
         ..watch(myAppLinksProvider)
-        ..listen(myAppLinksProvider, (previous, next) => _newUrlFromAppLink = true);
+        ..listen(myAppLinksProvider, (_, __) => _newUrlFromAppLink = true);
     }
 
     ref.listenSelf((_, __) {
@@ -109,8 +109,8 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
     final isIntro = state.uri.path == const IntroRoute().location;
     // fix path-parameters for deep link
     String? url;
-    if (state.uri.scheme == 'hiddify' && state.uri.host == 'import') {
-      url = state.uri.toString().substring(17);
+    if (LinkParser.protocols.contains(state.uri.scheme)) {
+      url = state.uri.toString();
     } else if (PlatformUtils.isDesktop && _newUrlFromAppLink) {
       url = ref.read(myAppLinksProvider).value;
       _newUrlFromAppLink = false;
@@ -144,6 +144,10 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
 
 @riverpod
 Stream<String> myAppLinks(Ref ref) async* {
-  if (PlatformUtils.isWindows) registerProtocolHandler('hiddify');
-  yield* AppLinks().uriLinkStream.map((event) => event.toString().substring(17));
+  if (PlatformUtils.isWindows) {
+    for (final protocol in LinkParser.protocols) {
+      registerProtocolHandler(protocol);
+    }
+  }
+  yield* AppLinks().uriLinkStream.map((event) => event.toString());
 }

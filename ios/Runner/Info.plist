@@ -30,6 +30,12 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>hiddify</string>
+				<string>v2ray</string>
+				<string>v2rayn</string>
+				<string>v2rayng</string>
+				<string>clash</string>
+				<string>clashmeta</string>
+				<string>sing-box</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>

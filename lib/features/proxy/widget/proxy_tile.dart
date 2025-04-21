@@ -127,13 +127,13 @@ class OutboundInfoWidget extends HookConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 8.0),
           Flexible(
               child: onTap != null
                   ? GestureDetector(
                       onTap: onTap,
-                      child: SelectableText(value, textAlign: TextAlign.right, style: TextStyle(decoration: TextDecoration.underline)),
+                      child: SelectableText(value, textAlign: TextAlign.right, style: const TextStyle(decoration: TextDecoration.underline)),
                     )
                   : SelectableText(value, textAlign: TextAlign.right)),
         ],

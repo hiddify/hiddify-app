@@ -20,8 +20,7 @@ import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dar
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-// import 'package:percent_indicator/percent_indicator.dart';
-// import 'package:percent_indicator_premium/percent_indicator_premium.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileTile extends HookConsumerWidget {
@@ -337,27 +336,27 @@ class ProfileActionsMenu extends HookConsumerWidget {
           await ProfileDetailsRoute(profile.id).push(context);
         },
       ),
-      if (!profile.active)
-        AdaptiveMenuItem(
-          icon: FluentIcons.delete_24_regular,
-          title: t.profile.delete.buttonTxt,
-          onTap: () async {
-            if (deleteProfileMutation.state.isInProgress) {
-              return;
-            }
-            final deleteConfirmed = await showConfirmationDialog(
-              context,
-              title: t.profile.delete.buttonTxt,
-              message: t.profile.delete.confirmationMsg,
-              icon: FluentIcons.delete_24_regular,
-            );
-            if (deleteConfirmed) {
+      // if (!profile.active)
+      AdaptiveMenuItem(
+        icon: FluentIcons.delete_24_regular,
+        title: t.profile.delete.buttonTxt,
+        onTap: () async {
+          if (deleteProfileMutation.state.isInProgress) return;
+          await showConfirmationDialog(
+            context,
+            title: t.profile.delete.buttonTxt,
+            message: t.profile.delete.confirmationMsg,
+            icon: FluentIcons.delete_24_regular,
+          ).then(
+            (deleteConfirmed) {
+              if (!deleteConfirmed) return;
               deleteProfileMutation.setFuture(
                 ref.read(profilesOverviewNotifierProvider.notifier).deleteProfile(profile),
               );
-            }
-          },
-        ),
+            },
+          );
+        },
+      ),
     ];
 
     return AdaptiveMenu(

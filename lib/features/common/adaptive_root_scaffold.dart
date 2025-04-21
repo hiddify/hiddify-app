@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,7 +16,7 @@ abstract interface class RootScaffold {
 }
 
 class AdaptiveRootScaffold extends HookConsumerWidget {
-  AdaptiveRootScaffold(this.navigator, {super.key});
+  const AdaptiveRootScaffold(this.navigator, {super.key});
 
   final Widget navigator;
 
@@ -24,7 +25,7 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).valueOrNull;
     if (t == null) return const SizedBox.shrink();
     // final selectedIndex = getCurrentIndex(context);
-    var allnavigationItems = [
+    final allnavigationItems = [
       NavigationItem(
         icon: FluentIcons.power_20_filled,
         title: t.home.pageTitle,
@@ -35,6 +36,7 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
         title: t.profile.overviewPageTitle,
         page: const ProfilesOverviewRoute(),
         showOnMobile: false,
+        showOnDesktop: ref.watch(activeProfileProvider).value != null,
       ),
       // NavigationItem(
       //   icon: Icons.extension,
