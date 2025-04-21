@@ -1,9 +1,12 @@
 allprojects {
     repositories {
-        google()
         mavenCentral()
+
+        google()
     }
+
 }
+
 
 rootProject.buildDir = '../build'
 subprojects {
@@ -18,3 +21,16 @@ tasks.register("clean", Delete) {
 }
 
 ext.kotlin_version = '2.1.0'
+
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.9.1'
+
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0"
+    }
+}
