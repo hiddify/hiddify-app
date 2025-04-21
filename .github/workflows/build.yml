@@ -310,13 +310,14 @@ jobs:
           deleteOnlyFromDrafts: false
           
       - name: prepare_release_message
+        continue-on-error: true
         run: |
-          # pip install gitchangelog pystache mustache markdown
-          # prelease=$(curl --silent "https://api.github.com/repos/hiddify/hiddify-next/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-          # current="${{ github.ref_name }}"
-          # sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md > release.md
+          set +e 
+          sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md > release.md
+          pip install gitchangelog pystache mustache markdown
+          prelease=$(curl --silent "https://api.github.com/repos/hiddify/hiddify-app/releases/latest" | grep -Po '"tag_name": "\K([^"]*)') 
           echo -e "\n\n<details markdown=1><summary>All changes from $current to the latest commit:</summary>\n\n">>release.md
-          # gitchangelog "${prelease}.." >> release.md  2>&1 || echo "Error in gitchangelog"
+          gitchangelog "${prelease}.." >> release.md  2>&1 || echo "Error in gitchangelog"
           echo -e "\n\n</details>">>release.md
       - name: Create or Update Draft Release
         uses: softprops/action-gh-release@v1
