@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:hiddify/core/database/app_database.dart';
 import 'package:hiddify/core/database/tables/database_tables.dart';
+import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 
@@ -53,10 +56,25 @@ class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin, I
 
   @override
   Stream<ProfileEntry?> watchActiveProfile() {
+    // return (profileEntries.select()
+    //       ..where((tbl) => tbl.active.equals(true))
+    //       ..limit(1))
+    //     .watchSingleOrNull();
     return (profileEntries.select()
           ..where((tbl) => tbl.active.equals(true))
           ..limit(1))
-        .watchSingleOrNull();
+        .watchSingleOrNull()
+        .map(
+      (event) {
+        if (event == null) return event;
+        final config = event.testUrl;
+        if (config == null) return event;
+        loggy.debug('remove override form testUrl');
+        final json = jsonDecode(config) as Map<String, dynamic>;
+        json.removeWhere((key, value) => key == ProfileLocalOverride.key);
+        return event.copyWith(testUrl: Value(jsonEncode(json)));
+      },
+    );
   }
 
   @override

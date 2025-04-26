@@ -21,7 +21,7 @@ class FreeProfile with _$FreeProfile {
     required StringByLocale title,
     required String sublink,
     required ListOfStringByLocale tags,
-    required StringByLocale contest,
+    required StringByLocale content,
     @JsonKey(name: 'needed_features') List<String>? neededFeatures,
   }) = _FreeProfile;
 

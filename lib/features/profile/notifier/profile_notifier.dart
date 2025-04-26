@@ -21,6 +21,7 @@ import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
+import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -62,7 +63,7 @@ class AddProfile extends _$AddProfile with AppLogger {
   ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
   CancelToken? _cancelToken;
 
-  Future<void> add(String rawInput) async {
+  Future<void> add(String rawInput, {ProfileLocalOverride? localOverride}) async {
     if (state.isLoading) return;
     state = const AsyncLoading();
     // await check4Warp(rawInput);
@@ -77,6 +78,7 @@ class AddProfile extends _$AddProfile with AppLogger {
             link.url,
             markAsActive: markAsActive,
             cancelToken: _cancelToken = CancelToken(),
+            localOverride: localOverride,
           );
         } else if (LinkParser.protocol(rawInput) case (final parsed)?) {
           loggy.debug("adding profile, content");

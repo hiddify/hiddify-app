@@ -55,7 +55,7 @@ class FreeBtn extends ConsumerWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (freeProfile.neededFeatures!.contains('warp_over_proxies'))
+                          if (freeProfile.neededFeatures!.contains('warp'))
                             Feature(
                               title: t.profile.add.addWarp,
                               icon: Icons.add_moderator,
