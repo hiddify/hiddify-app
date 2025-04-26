@@ -225,8 +225,8 @@ class FreeSwitch extends _$FreeSwitch {
 class FreeProfiles extends _$FreeProfiles {
   @override
   Future<List<FreeProfile>> build() async {
-    final httpCielt = ref.watch(httpClientProvider);
-    final res = await httpCielt.get('https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs');
+    final httpClient = ref.watch(httpClientProvider);
+    final res = await httpClient.get('https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs');
     if (res.statusCode == 200) {
       return FreeProfilesModel.fromJson(jsonDecode(res.data.toString()) as Map<String, dynamic>).profiles;
     }

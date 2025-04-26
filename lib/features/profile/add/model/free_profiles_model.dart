@@ -1,6 +1,6 @@
 // This file is "main.dart"
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'free_profiles_model.freezed.dart';
 part 'free_profiles_model.g.dart';
@@ -21,7 +21,7 @@ class FreeProfile with _$FreeProfile {
     required StringByLocale title,
     required String sublink,
     required ListOfStringByLocale tags,
-    required StringByLocale content,
+    required StringByLocale concent,
     @JsonKey(name: 'needed_features') List<String>? neededFeatures,
   }) = _FreeProfile;
 
