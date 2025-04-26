@@ -70,7 +70,7 @@ class FreeBtns extends ConsumerWidget {
                       if (result == true) {
                         final localOverride = ProfileLocalOverride(
                           name: title,
-                          enableWarp: profile.neededFeatures?.contains('warp'),
+                          enableWarp: profile.neededFeatures?.contains('warp_over_proxies'),
                           enableFragment: profile.neededFeatures?.contains('fragment'),
                         );
                         ref.read(addProfileProvider.notifier).add(profile.sublink, localOverride: localOverride);
