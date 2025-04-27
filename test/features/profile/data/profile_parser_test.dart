@@ -48,7 +48,8 @@ void main() {
             "profile-web-page-url": [validBaseUrl],
             "support-url": [validSupportUrl],
           };
-          final profile = ProfileParser.parse(validExtendedUrl, headers);
+          final allHeaders = ProfileParser.populateHeaders(content: '', requestHeaders: headers);
+          final profile = ProfileParser.parse(validExtendedUrl, allHeaders);
 
           expect(profile.name, equals("exampleTitle"));
           expect(profile.url, equals(validExtendedUrl));
@@ -85,7 +86,8 @@ void main() {
             "profile-web-page-url": [validBaseUrl],
             "support-url": [validSupportUrl],
           };
-          final profile = ProfileParser.parse(validExtendedUrl, headers);
+          final allHeaders = ProfileParser.populateHeaders(content: '', requestHeaders: headers);
+          final profile = ProfileParser.parse(validExtendedUrl, allHeaders);
 
           expect(profile.subInfo, isNotNull);
           expect(

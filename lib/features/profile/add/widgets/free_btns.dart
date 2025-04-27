@@ -43,7 +43,7 @@ class FreeBtns extends ConsumerWidget {
                     freeProfile: profile,
                     onTap: () async {
                       final title = isFa ? profile.title.fa : profile.title.en;
-                      final concest = isFa ? profile.concent.fa : profile.concent.en;
+                      final consent = isFa ? profile.consent.fa : profile.consent.en;
                       final result = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
@@ -51,7 +51,7 @@ class FreeBtns extends ConsumerWidget {
                             content: ConstrainedBox(
                               constraints: AlertDialogConst.boxConstraints,
                               child: MarkdownBody(
-                                data: concest,
+                                data: consent,
                                 // styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.spaceBetween),
                                 onTapLink: (text, href, title) => UriUtils.tryLaunch(Uri.parse(href!)),
                               ),
