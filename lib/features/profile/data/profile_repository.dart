@@ -15,10 +15,10 @@ import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
+import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
-import 'package:hiddify/utils/link_parsers.dart';
 import 'package:uuid/uuid.dart';
 
 abstract interface class ProfileRepository {
@@ -37,6 +37,7 @@ abstract interface class ProfileRepository {
     String url, {
     bool markAsActive = false,
     CancelToken? cancelToken,
+    ProfileLocalOverride? localOverride,
   });
   TaskEither<ProfileFailure, Unit> updateContent(
     String profileId,
@@ -139,6 +140,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
     String url, {
     bool markAsActive = false,
     CancelToken? cancelToken,
+    ProfileLocalOverride? localOverride,
   }) {
     return exceptionHandler(
       () async {
@@ -153,7 +155,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         }
 
         final profileId = const Uuid().v4();
-        return fetch(url, profileId, cancelToken: cancelToken)
+        return fetch(url, profileId, cancelToken: cancelToken, localOverride: localOverride)
             .flatMap(
               (profile) => TaskEither(
                 () async {
@@ -304,7 +306,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         loggy.debug(
           "updating profile [${baseProfile.name} (${baseProfile.id})]",
         );
-        return await fetch(baseProfile.url, baseProfile.id, cancelToken: cancelToken)
+        return await fetch(baseProfile.url, baseProfile.id, cancelToken: cancelToken, localOverride: ProfileParser.getLocalOverride(baseProfile.testUrl))
             .flatMap(
               (remoteProfile) => TaskEither(
                 () async {
@@ -377,21 +379,12 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
     );
   }
 
-  static final _subInfoHeaders = [
-    'profile-title',
-    'content-disposition',
-    'subscription-userinfo',
-    'profile-update-interval',
-    'support-url',
-    'profile-web-page-url',
-    'enable-warp',
-  ];
-
   @visibleForTesting
   TaskEither<ProfileFailure, RemoteProfileEntity> fetch(
     String url,
     String fileName, {
     CancelToken? cancelToken,
+    ProfileLocalOverride? localOverride,
   }) {
     return TaskEither(
       () async {
@@ -409,11 +402,14 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
             cancelToken: cancelToken,
             userAgent: configs.useXrayCoreWhenPossible ? httpClient.userAgent.replaceAll("HiddifyNext", "HiddifyNextX") : null,
           );
-          final headers = await _populateHeaders(response.headers.map, tempFile.path);
+          final headers = ProfileParser.populateHeaders(
+            content: await File(tempFile.path).readAsString(),
+            requestHeaders: response.headers.map,
+          );
           return await validateConfig(file.path, tempFile.path, false)
               .andThen(
                 () => TaskEither(() async {
-                  final profile = ProfileParser.parse(url, headers);
+                  final profile = ProfileParser.parse(url, headers, localOverride);
                   return right(profile);
                 }),
               )
@@ -423,49 +419,5 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         }
       },
     );
-  }
-
-  Future<Map<String, List<String>>> _populateHeaders(
-    Map<String, List<String>> headers,
-    String path,
-  ) async {
-    var headersFound = 0;
-    for (final key in _subInfoHeaders) {
-      if (headers.containsKey(key)) headersFound++;
-    }
-    if (headersFound >= 4) return headers;
-
-    loggy.debug(
-      "only [$headersFound] headers found, checking file content for possible information",
-    );
-    final content = await File(path).readAsString();
-    final contentHeaders = parseHeadersFromContent(content);
-    for (final entry in contentHeaders.entries) {
-      if (!headers.keys.contains(entry.key) && entry.value.isNotEmpty) {
-        headers[entry.key] = entry.value;
-      }
-    }
-
-    return headers;
-  }
-
-  static Map<String, List<String>> parseHeadersFromContent(String content) {
-    final headers = <String, List<String>>{};
-    final content_ = safeDecodeBase64(content);
-    final lines = content_.split("\n");
-    final linesToProcess = lines.length < 10 ? lines.length : 10;
-    for (int i = 0; i < linesToProcess; i++) {
-      final line = lines[i];
-      if (line.startsWith("#") || line.startsWith("//")) {
-        final index = line.indexOf(':');
-        if (index == -1) continue;
-        final key = line.substring(0, index).replaceFirst(RegExp("^#|//"), "").trim().toLowerCase();
-        final value = line.substring(index + 1).trim();
-        if (!headers.keys.contains(key) && (_subInfoHeaders.contains(key) || ProfileParser.allowedOverrideConfigs.contains(key)) && value.isNotEmpty) {
-          headers[key] = [value];
-        }
-      }
-    }
-    return headers;
   }
 }

@@ -7,6 +7,7 @@ import 'package:hiddify/features/config_option/data/config_option_repository.dar
 
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
+import 'package:hiddify/features/profile/data/profile_parser.dart';
 
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
@@ -103,21 +104,18 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
 
   @visibleForTesting
   TaskEither<ConnectionFailure, Unit> applyConfigOption(
-    SingboxConfigOption options,
-    String? testUrl,
+    SingboxConfigOption main,
+    String? override,
   ) {
     return exceptionHandler(
       () {
-        _configOptionsSnapshot = options;
-        final newOptionsJson = options.toJson();
-        if (testUrl != null && testUrl.contains("{")) {
-          final dic = jsonDecode(testUrl) as Map<String, dynamic>;
-
-          for (final key in dic.keys) {
-            newOptionsJson[key] = dic[key];
-          }
+        _configOptionsSnapshot = main;
+        var mainJson = main.toJson();
+        if (override != null && override.contains("{")) {
+          final overrideJson = jsonDecode(override) as Map<String, dynamic>;
+          mainJson = ProfileParser.mergeJson(mainJson, overrideJson);
         }
-        final newOptions = SingboxConfigOption.fromJson(newOptionsJson);
+        final newOptions = SingboxConfigOption.fromJson(mainJson);
         return singbox.changeOptions(newOptions).mapLeft(InvalidConfigOption.new).run();
       },
       UnexpectedConnectionFailure.new,

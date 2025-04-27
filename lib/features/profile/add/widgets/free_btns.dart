@@ -5,6 +5,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/profile/add/widgets/free_btn.dart';
+import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,14 +42,16 @@ class FreeBtns extends ConsumerWidget {
                   return FreeBtn(
                     freeProfile: profile,
                     onTap: () async {
+                      final title = isFa ? profile.title.fa : profile.title.en;
+                      final concest = isFa ? profile.concent.fa : profile.concent.en;
                       final result = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                            title: Text(isFa ? profile.title.fa : profile.title.en),
+                            title: Text(title),
                             content: ConstrainedBox(
                               constraints: AlertDialogConst.boxConstraints,
                               child: MarkdownBody(
-                                data: isFa ? profile.contest.fa : profile.contest.en,
+                                data: concest,
                                 // styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.spaceBetween),
                                 onTapLink: (text, href, title) => UriUtils.tryLaunch(Uri.parse(href!)),
                               ),
@@ -64,7 +67,14 @@ class FreeBtns extends ConsumerWidget {
                               ),
                             ]),
                       );
-                      if (result == true) ref.read(addProfileProvider.notifier).add(profile.sublink);
+                      if (result == true) {
+                        final localOverride = ProfileLocalOverride(
+                          name: title,
+                          enableWarp: profile.neededFeatures?.contains('warp_over_proxies'),
+                          enableFragment: profile.neededFeatures?.contains('fragment'),
+                        );
+                        ref.read(addProfileProvider.notifier).add(profile.sublink, localOverride: localOverride);
+                      }
                     },
                   );
                 },

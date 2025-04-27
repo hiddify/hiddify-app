@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dartx/dartx.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
-import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/validators.dart';
 
@@ -63,7 +62,7 @@ abstract class LinkParser {
         _ => null,
       };
     }
-    final headers = ProfileRepositoryImpl.parseHeadersFromContent(content);
+    final headers = ProfileParser.populateHeaders(content: content);
     final subinfo = ProfileParser.parse("", headers);
 
     if (subinfo.name.isNotNullOrEmpty && subinfo.name != "Remote Profile") {
