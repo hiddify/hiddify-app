@@ -85,79 +85,67 @@ class ConfigOptionsPage extends HookConsumerWidget {
                 icon: Icon(AdaptiveIcon(context).more),
                 itemBuilder: (context) => [
                   PopupMenuItem(
-                    onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard().then((success) {
+                    onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard().then((success) {
                       if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
-                              t.general.clipboardExportSuccessMsg,
-                            );
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
                       }
                     }),
                     child: Text(t.settings.exportOptions),
                   ),
                   // if (ref.watch(debugModeNotifierProvider))
                   PopupMenuItem(
-                    onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false).then((success) {
+                    onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false).then((success) {
                       if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
-                              t.general.clipboardExportSuccessMsg,
-                            );
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
                       }
                     }),
                     child: Text(t.settings.exportAllOptions),
                   ),
                   PopupMenuItem(
-                    onTap: () async {
-                      final shouldImport = await showConfirmationDialog(
-                        context,
-                        title: t.settings.importOptions,
-                        message: t.settings.importOptionsMsg,
-                      );
+                    onTap: () => showConfirmationDialog(
+                      context,
+                      title: t.settings.importOptions,
+                      message: t.settings.importOptionsMsg,
+                    ).then((shouldImport) {
                       if (shouldImport) {
-                        await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
+                        ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
                       }
-                    },
+                    }),
                     child: Text(t.settings.importOptions),
                   ),
                   const PopupMenuDivider(),
                   PopupMenuItem(
-                    onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonFile().then((success) {
+                    onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonFile().then((success) {
                       if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
-                              t.general.jsonFileExportSuccessMsg,
-                            );
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
                       }
                     }),
                     child: Text(t.settings.exportOptionsFile),
                   ),
                   PopupMenuItem(
-                    onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false).then((success) {
+                    onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false).then((success) {
                       if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(
-                              t.general.jsonFileExportSuccessMsg,
-                            );
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
                       }
                     }),
                     child: Text(t.settings.exportAllOptionsFile),
                   ),
                   PopupMenuItem(
-                    onTap: () async {
-                      final shouldImport = await showConfirmationDialog(
-                        context,
-                        title: t.settings.importOptions,
-                        message: t.settings.importOptionsMsg,
-                      );
+                    onTap: () => showConfirmationDialog(
+                      context,
+                      title: t.settings.importOptions,
+                      message: t.settings.importOptionsMsg,
+                    ).then((shouldImport) {
                       if (shouldImport) {
-                        await ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
+                        ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
                       }
-                    },
+                    }),
                     child: Text(t.settings.importOptionsFile),
                   ),
                   const PopupMenuDivider(),
                   PopupMenuItem(
                     child: Text(t.config.resetBtn),
-                    onTap: () async {
-                      await ref.read(configOptionNotifierProvider.notifier).resetOption();
-                    },
+                    onTap: () => ref.read(configOptionNotifierProvider.notifier).resetOption(),
                   ),
                 ],
               )
