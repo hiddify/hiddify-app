@@ -3,7 +3,6 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/app_router.dart';
 import 'package:hiddify/features/config_option/widget/quick_settings_modal.dart';
 import 'package:hiddify/features/profile/add/add_profile_modal.dart';
-import 'package:hiddify/features/profile/add_manual/add_manual_profile_modal.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -32,23 +31,6 @@ class ButtomSheetsNotifier extends _$ButtomSheetsNotifier {
         borderRadius: BottomSheetConst.borderRadius,
         child: Material(
           child: AddProfileModal(url: url),
-        ),
-      ),
-    );
-  }
-
-  void showAddManualProfile() {
-    final context = rootNavigatorKey.currentContext;
-    if (context == null) return;
-    showModalBottomSheet(
-      isScrollControlled: true,
-      useSafeArea: true,
-      constraints: BottomSheetConst.boxConstraints,
-      context: context,
-      builder: (context) => const ClipRRect(
-        borderRadius: BottomSheetConst.borderRadius,
-        child: Material(
-          child: AddManualProfileModal(),
         ),
       ),
     );

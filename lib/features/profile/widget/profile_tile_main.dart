@@ -105,7 +105,7 @@ class ProfileTileMain extends HookConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: InkWell(
-              onTap: () => ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity),
+              onTap: () => ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity),
               borderRadius: BorderRadius.circular(12),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

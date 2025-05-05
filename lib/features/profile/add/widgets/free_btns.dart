@@ -18,7 +18,7 @@ class FreeBtns extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final freeProfiles = ref.watch(freeProfilesProvider);
+    final freeProfiles = ref.watch(freeProfilesNotifierProvider);
     final freeProfilesFilteredByRegion = ref.watch(freeProfilesFilteredByRegionProvider);
     final theme = Theme.of(context);
     final locale = ref.watch(localePreferencesProvider);
@@ -73,7 +73,7 @@ class FreeBtns extends ConsumerWidget {
                           enableWarp: profile.neededFeatures?.contains('warp_over_proxies'),
                           enableFragment: profile.neededFeatures?.contains('fragment'),
                         );
-                        ref.read(addProfileProvider.notifier).add(profile.sublink, localOverride: localOverride);
+                        ref.read(addProfileNotifierProvider.notifier).add(profile.sublink, localOverride: localOverride);
                       }
                     },
                   );

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/add/widgets/widgets.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
@@ -18,7 +16,6 @@ class FixBtns extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue.profile.add;
-    final addProfileState = ref.watch(addProfileProvider);
 
     final isDesktop = PlatformUtils.isDesktop;
     return Row(
@@ -33,8 +30,7 @@ class FixBtns extends ConsumerWidget {
             onTap: () async {
               final cr = await ref.read(dialogNotifierProvider.notifier).showQrScanner<String>();
               if (cr == null) return;
-              if (addProfileState.isLoading) return;
-              ref.read(addProfileProvider.notifier).add(cr);
+              ref.read(addProfileNotifierProvider.notifier).add(cr);
             },
           ),
         ],
@@ -46,8 +42,7 @@ class FixBtns extends ConsumerWidget {
           icon: Icons.content_paste,
           onTap: () async {
             final captureResult = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
-            if (addProfileState.isLoading) return;
-            ref.read(addProfileProvider.notifier).add(captureResult);
+            ref.read(addProfileNotifierProvider.notifier).add(captureResult);
           },
         ),
         const Gap(AddProfileModalConst.fixBtnsGap),
@@ -57,8 +52,7 @@ class FixBtns extends ConsumerWidget {
           title: t.manually,
           icon: Icons.add,
           onTap: () {
-            context.pop();
-            ref.read(buttomSheetsNotifierProvider.notifier).showAddManualProfile();
+            ref.read(addProfilePageNotifierProvider.notifier).goManual();
           },
         ),
         const Gap(AddProfileModalConst.fixBtnsGap),

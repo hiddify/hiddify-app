@@ -22,11 +22,12 @@ import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'profile_notifier.g.dart';
 
 @riverpod
-class AddProfile extends _$AddProfile with AppLogger {
+class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
   @override
   AsyncValue<Unit?> build() {
     ref.disposeDelay(const Duration(minutes: 1));
@@ -110,6 +111,39 @@ class AddProfile extends _$AddProfile with AppLogger {
     );
   }
 
+  Future<void> addManual(String name, String url, double updateInterval) async {
+    if (state.isLoading) return;
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () async {
+        final task = await _profilesRepo
+            .add(
+              RemoteProfileEntity(
+                id: const Uuid().v4(),
+                active: true,
+                name: name.trim(),
+                url: url.trim(),
+                options: updateInterval.toInt() == 0 ? null : ProfileOptions(updateInterval: Duration(hours: updateInterval.toInt())),
+                lastUpdate: DateTime.now(),
+              ),
+            )
+            .run();
+        return task.match(
+          (err) {
+            loggy.warning("failed to add profile", err);
+            throw err;
+          },
+          (r) {
+            loggy.info(
+              "successfully added profile, mark as active? [true]",
+            );
+            return r;
+          },
+        );
+      },
+    );
+  }
+
   // Future<void> check4Warp(String rawInput) async {
   //   for (final line in rawInput.split("\n")) {
   //     if (line.toLowerCase().startsWith("warp://")) {
@@ -154,7 +188,7 @@ class AddProfile extends _$AddProfile with AppLogger {
 }
 
 @riverpod
-class UpdateProfile extends _$UpdateProfile with AppLogger {
+class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
   @override
   AsyncValue<Unit?> build(String id) {
     ref.disposeDelay(const Duration(minutes: 1));
@@ -207,7 +241,7 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
 }
 
 @riverpod
-class FreeSwitch extends _$FreeSwitch {
+class FreeSwitchNotifier extends _$FreeSwitchNotifier {
   @override
   bool build() {
     return false;
@@ -217,7 +251,21 @@ class FreeSwitch extends _$FreeSwitch {
 }
 
 @riverpod
-class FreeProfiles extends _$FreeProfiles {
+class AddProfilePageNotifier extends _$AddProfilePageNotifier {
+  @override
+  AddProfilePages build() => AddProfilePages.options;
+
+  void goOptions() => state = AddProfilePages.options;
+  void goManual() => state = AddProfilePages.manual;
+}
+
+enum AddProfilePages {
+  options,
+  manual,
+}
+
+@riverpod
+class FreeProfilesNotifier extends _$FreeProfilesNotifier {
   @override
   Future<List<FreeProfile>> build() async {
     final httpClient = ref.watch(httpClientProvider);
@@ -231,7 +279,7 @@ class FreeProfiles extends _$FreeProfiles {
 
 @riverpod
 Future<List<FreeProfile>> freeProfilesFilteredByRegion(Ref ref) async {
-  final freeProfiles = await ref.watch(freeProfilesProvider.future);
+  final freeProfiles = await ref.watch(freeProfilesNotifierProvider.future);
   // if (!freeProfiles.hasValue) return <FreeProfile>[];
   final region = ref.watch(ConfigOptions.region);
   return freeProfiles.where((e) => e.region.contains(region.name) || e.region.isEmpty).toList();

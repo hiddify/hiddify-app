@@ -13,7 +13,7 @@ class NavBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final t = ref.watch(translationsProvider).requireValue;
-    final freeSwitch = ref.watch(freeSwitchProvider);
+    final freeSwitch = ref.watch(freeSwitchNotifierProvider);
 
     final textColor = theme.colorScheme.onSurface;
     return Padding(
@@ -30,7 +30,7 @@ class NavBar extends ConsumerWidget {
               const Gap(8),
               Switch(
                 value: freeSwitch,
-                onChanged: ref.read(freeSwitchProvider.notifier).onChange,
+                onChanged: ref.read(freeSwitchNotifierProvider.notifier).onChange,
               ),
             ],
           ),

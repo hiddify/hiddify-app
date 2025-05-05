@@ -216,16 +216,16 @@ class ProfileActionButton extends HookConsumerWidget {
     if (profile case RemoteProfileEntity() when !showAllActions) {
       return Semantics(
         button: true,
-        enabled: !ref.watch(updateProfileProvider(profile.id)).isLoading,
+        enabled: !ref.watch(updateProfileNotifierProvider(profile.id)).isLoading,
         child: Tooltip(
           message: t.profile.update.tooltip,
           child: InkWell(
             borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
             onTap: () {
-              if (ref.read(updateProfileProvider(profile.id)).isLoading) {
+              if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
                 return;
               }
-              ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
+              ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
             },
             child: const Icon(FluentIcons.arrow_sync_24_filled),
           ),
@@ -280,10 +280,10 @@ class ProfileActionsMenu extends HookConsumerWidget {
           title: t.profile.update.buttonTxt,
           icon: FluentIcons.arrow_sync_24_regular,
           onTap: () {
-            if (ref.read(updateProfileProvider(profile.id)).isLoading) {
+            if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
               return;
             }
-            ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
+            ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
           },
         ),
       AdaptiveMenuItem(
