@@ -17,7 +17,7 @@ import 'package:hiddify/features/settings/overview/settings_overview_page.dart';
 
 part 'routes.g.dart';
 
-GlobalKey<NavigatorState>? _dynamicRootKey = null;
+late GlobalKey<NavigatorState>? _dynamicRootKey;
 
 @TypedShellRoute<DesktopWrapperRoute>(
   routes: [
@@ -49,7 +49,6 @@ GlobalKey<NavigatorState>? _dynamicRootKey = null;
     TypedGoRoute<SettingsRoute>(
       path: "/settings",
       name: SettingsRoute.name,
-      routes: [],
     ),
     TypedGoRoute<PerAppProxyRoute>(path: "/per-app-proxy", name: PerAppProxyRoute.name),
     TypedGoRoute<AboutRoute>(path: "/about", name: AboutRoute.name),
@@ -65,6 +64,7 @@ class DesktopWrapperRoute extends ShellRouteData {
     // navigationItems.clear();
     // ProviderScope.containerOf(context).read(provider).watch();
     // navigationItems.addAll
+    if (GoRouterState.of(context).uri.path == const IntroRoute().location) return navigator;
     return AdaptiveRootScaffold(navigator);
   }
 }
