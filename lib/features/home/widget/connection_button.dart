@@ -269,6 +269,7 @@ class _ConnectionButton extends StatelessWidget {
               shape: const CircleBorder(),
               color: Colors.white,
               child: InkWell(
+                focusColor: Colors.grey,
                 onTap: onTap,
                 child: Padding(
                   padding: const EdgeInsets.all(36),
