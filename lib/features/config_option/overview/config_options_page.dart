@@ -85,7 +85,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
                 icon: Icon(AdaptiveIcon(context).more),
                 itemBuilder: (context) => [
                   PopupMenuItem(
-                    onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard().then((success) {
+                    onTap: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard().then((success) {
                       if (success) {
                         ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
                       }
@@ -94,7 +94,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
                   ),
                   // if (ref.watch(debugModeNotifierProvider))
                   PopupMenuItem(
-                    onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false).then((success) {
+                    onTap: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false).then((success) {
                       if (success) {
                         ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
                       }
@@ -102,20 +102,20 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     child: Text(t.settings.exportAllOptions),
                   ),
                   PopupMenuItem(
-                    onTap: () => showConfirmationDialog(
+                    onTap: () async => await showConfirmationDialog(
                       context,
                       title: t.settings.importOptions,
                       message: t.settings.importOptionsMsg,
-                    ).then((shouldImport) {
+                    ).then((shouldImport) async {
                       if (shouldImport) {
-                        ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
+                        await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
                       }
                     }),
                     child: Text(t.settings.importOptions),
                   ),
                   const PopupMenuDivider(),
                   PopupMenuItem(
-                    onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonFile().then((success) {
+                    onTap: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile().then((success) {
                       if (success) {
                         ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
                       }
@@ -123,7 +123,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     child: Text(t.settings.exportOptionsFile),
                   ),
                   PopupMenuItem(
-                    onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false).then((success) {
+                    onTap: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false).then((success) {
                       if (success) {
                         ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
                       }
@@ -131,13 +131,13 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     child: Text(t.settings.exportAllOptionsFile),
                   ),
                   PopupMenuItem(
-                    onTap: () => showConfirmationDialog(
+                    onTap: () async => await showConfirmationDialog(
                       context,
                       title: t.settings.importOptions,
                       message: t.settings.importOptionsMsg,
-                    ).then((shouldImport) {
+                    ).then((shouldImport) async {
                       if (shouldImport) {
-                        ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
+                        await ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
                       }
                     }),
                     child: Text(t.settings.importOptionsFile),
@@ -145,7 +145,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
                   const PopupMenuDivider(),
                   PopupMenuItem(
                     child: Text(t.config.resetBtn),
-                    onTap: () => ref.read(configOptionNotifierProvider.notifier).resetOption(),
+                    onTap: () async => await ref.read(configOptionNotifierProvider.notifier).resetOption(),
                   ),
                 ],
               )
