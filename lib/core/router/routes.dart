@@ -17,7 +17,7 @@ import 'package:hiddify/features/settings/overview/settings_overview_page.dart';
 
 part 'routes.g.dart';
 
-late GlobalKey<NavigatorState>? _dynamicRootKey;
+// late GlobalKey<NavigatorState>? _dynamicRootKey;
 
 @TypedShellRoute<DesktopWrapperRoute>(
   routes: [
@@ -144,7 +144,7 @@ class ProfilesOverviewRoute extends HRouteData {
   const ProfilesOverviewRoute();
   static const name = "Profiles";
 
-  static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
+  // static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -233,7 +233,7 @@ class LogsOverviewRoute extends HRouteData {
   const LogsOverviewRoute();
   static const name = "Logs";
 
-  static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
+  // static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -278,7 +278,7 @@ class SettingsRoute extends HRouteData {
   const SettingsRoute();
   static const name = "Settings";
 
-  static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
+  // static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
@@ -302,7 +302,7 @@ class ConfigOptionsRoute extends HRouteData {
   final String? section;
   static const name = "Config Options";
 
-  static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
+  // static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {

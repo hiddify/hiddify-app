@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
@@ -14,7 +17,6 @@ import 'package:hiddify/features/config_option/data/config_option_repository.dar
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:sliver_tools/sliver_tools.dart';
 import 'package:timezone_to_country/timezone_to_country.dart';
 
 class IntroPage extends HookConsumerWidget with PresLogger {
@@ -22,9 +24,24 @@ class IntroPage extends HookConsumerWidget with PresLogger {
 
   static bool locationInfoLoaded = false;
 
+  // for focus management
+  KeyEventResult _handleKeyEvent(KeyEvent event, bool terms, bool github, bool license) {
+    if (KeyboardConst.select.contains(event.logicalKey) && event is KeyUpEvent) {
+      final url = terms
+          ? Constants.termsAndConditionsUrl
+          : github
+              ? Constants.githubUrl
+              : Constants.licenseUrl;
+      UriUtils.tryLaunch(Uri.parse(url));
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
 
     final isStarting = useState(false);
 
@@ -33,113 +50,134 @@ class IntroPage extends HookConsumerWidget with PresLogger {
       locationInfoLoaded = true;
     }
 
-    return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          shrinkWrap: true,
-          slivers: [
-            SliverToBoxAdapter(
-              child: SizedBox(
-                width: 224,
-                height: 224,
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Assets.images.logo.svg(),
+    // for focus management
+    final termsNodeIsFocused = useState<bool>(false);
+    final githubNodeIsFocused = useState<bool>(false);
+    final licenseNodeIsFocused = useState<bool>(false);
+    final termsNode = useFocusNode();
+    final githubNode = useFocusNode();
+    final licenseNode = useFocusNode();
+    useEffect(
+      () {
+        termsNode.addListener(() => termsNodeIsFocused.value = termsNode.hasPrimaryFocus);
+        githubNode.addListener(() => githubNodeIsFocused.value = githubNode.hasPrimaryFocus);
+        licenseNode.addListener(() => licenseNodeIsFocused.value = licenseNode.hasPrimaryFocus);
+        return null;
+      },
+      [],
+    );
+
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 620),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final width = constraints.maxWidth > IntroPageConst.maxwidth ? IntroPageConst.maxwidth : constraints.maxWidth;
+                        final size = width * 0.4;
+                        return Assets.images.logo.svg(width: size, height: size);
+                      },
+                    ),
+                    const Gap(16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(t.intro.banner, style: theme.textTheme.bodyLarge, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    ),
+                    const Gap(24),
+                    const LocalePrefTile(),
+                    const RegionPrefTile(),
+                    const EnableAnalyticsPrefTile(),
+                    const Gap(24),
+                    Focus(
+                      focusNode: termsNode,
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, termsNodeIsFocused.value, githubNodeIsFocused.value, licenseNodeIsFocused.value),
+                      child: Text.rich(
+                        t.intro.termsAndPolicyCaution(
+                          tap: (text) => TextSpan(
+                            text: text,
+                            style: TextStyle(color: termsNodeIsFocused.value ? Colors.green : Colors.blue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                await UriUtils.tryLaunch(
+                                  Uri.parse(Constants.termsAndConditionsUrl),
+                                );
+                              },
+                          ),
+                        ),
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ),
+                    const Gap(8),
+                    Focus(
+                      focusNode: githubNode,
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, termsNodeIsFocused.value, githubNodeIsFocused.value, licenseNodeIsFocused.value),
+                      child: Text.rich(
+                        t.intro.info(
+                          tap_source: (text) => TextSpan(
+                            text: text,
+                            style: TextStyle(color: githubNodeIsFocused.value ? Colors.green : Colors.blue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                await UriUtils.tryLaunch(
+                                  Uri.parse(Constants.githubUrl),
+                                );
+                              },
+                          ),
+                          tap_license: (text) => TextSpan(
+                            text: text,
+                            style: TextStyle(color: licenseNodeIsFocused.value ? Colors.green : Colors.blue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                await UriUtils.tryLaunch(
+                                  Uri.parse(Constants.licenseUrl),
+                                );
+                              },
+                          ),
+                        ),
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ),
+                    // only for managing license node focus
+                    Focus(
+                      focusNode: licenseNode,
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, termsNodeIsFocused.value, githubNodeIsFocused.value, licenseNodeIsFocused.value),
+                      child: const Gap(88),
+                    ),
+                  ],
                 ),
               ),
             ),
-            SliverCrossAxisConstrained(
-              maxCrossAxisExtent: 368,
-              child: MultiSliver(
-                children: [
-                  Padding(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), child: Text(t.intro.banner)),
-                  const LocalePrefTile(),
-                  const SliverGap(4),
-                  const RegionPrefTile(),
-                  const SliverGap(4),
-                  const EnableAnalyticsPrefTile(),
-                  const SliverGap(4),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text.rich(
-                      t.intro.termsAndPolicyCaution(
-                        tap: (text) => TextSpan(
-                          text: text,
-                          style: const TextStyle(color: Colors.blue),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await UriUtils.tryLaunch(
-                                Uri.parse(Constants.termsAndConditionsUrl),
-                              );
-                            },
-                        ),
-                      ),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 16, top: 24),
-                    child: Text.rich(
-                      t.intro.info(
-                        tap_source: (text) => TextSpan(
-                          text: text,
-                          style: const TextStyle(color: Colors.blue),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await UriUtils.tryLaunch(
-                                Uri.parse(Constants.githubUrl),
-                              );
-                            },
-                        ),
-                        tap_license: (text) => TextSpan(
-                          text: text,
-                          style: const TextStyle(color: Colors.blue),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await UriUtils.tryLaunch(
-                                Uri.parse(Constants.licenseUrl),
-                              );
-                            },
-                        ),
-                      ),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 24,
-                    ),
-                    child: FilledButton(
-                      onPressed: () async {
-                        if (isStarting.value) return;
-                        isStarting.value = true;
-                        if (!ref.read(analyticsControllerProvider).requireValue) {
-                          loggy.info("disabling analytics per user request");
-                          try {
-                            await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
-                          } catch (error, stackTrace) {
-                            loggy.error(
-                              "could not disable analytics",
-                              error,
-                              stackTrace,
-                            );
-                          }
-                        }
-                        await ref.read(Preferences.introCompleted.notifier).update(true);
-                      },
-                      child: isStarting.value
-                          ? LinearProgressIndicator(
-                              backgroundColor: Colors.transparent,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            )
-                          : Text(t.intro.start),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          icon: isStarting.value ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator()) : const Icon(Icons.rocket_launch),
+          label: Text(
+            t.intro.start,
+            style: theme.textTheme.titleMedium,
+          ),
+          onPressed: () async {
+            isStarting.value = true;
+            if (!ref.read(analyticsControllerProvider).requireValue) {
+              loggy.info("disabling analytics per user request");
+              try {
+                await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
+              } catch (error, stackTrace) {
+                loggy.error(
+                  "could not disable analytics",
+                  error,
+                  stackTrace,
+                );
+              }
+            }
+            await ref.read(Preferences.introCompleted.notifier).update(true);
+          },
         ),
       ),
     );

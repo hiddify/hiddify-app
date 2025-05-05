@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 abstract class Constants {
   static const appName = "Hiddify";
@@ -46,4 +47,8 @@ abstract class ProfileTileConst {
   static const borderRadiusLeft = BorderRadius.horizontal(left: radius);
   static BorderRadius startBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusLeft : borderRadiusRight;
   static BorderRadius endBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusRight : borderRadiusLeft;
+}
+
+abstract class IntroPageConst {
+  static const maxwidth = 620;
 }
