@@ -24,6 +24,7 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final t = ref.watch(translationsProvider).requireValue;
     // final hasAnyProfile = ref.watch(hasAnyProfileProvider);
     final activeProfile = ref.watch(activeProfileProvider);
@@ -79,37 +80,24 @@ class HomePage extends HookConsumerWidget {
           //     material: (context, platform) => MaterialIconButtonData(
           //           tooltip: t.profile.add.buttonText,
           //         )),
-          TextButton(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Text(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle),
-                // const Gap(8),
-                Semantics(
-                  key: const ValueKey("profile_quick_settings"),
-                  label: t.config.quickSettings,
-                  child: const Icon(FluentIcons.options_24_filled, size: 24),
-                ),
-              ],
+          Semantics(
+            key: const ValueKey("profile_quick_settings"),
+            label: t.config.quickSettings,
+            child: IconButton(
+              icon: Icon(FluentIcons.options_24_filled, color: theme.colorScheme.primary),
+              onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showQuickSettings(),
             ),
-            // onPressed: () => const QuickSettingsRoute().push(context),
-            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showQuickSettings(),
           ),
-          TextButton(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Text(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle),
-                // const Gap(8),
-                Semantics(
-                  key: const ValueKey("profile_add_button"),
-                  label: t.profile.add.buttonText,
-                  child: const Icon(Icons.add, size: 24),
-                ),
-              ],
+          const Gap(8),
+          Semantics(
+            key: const ValueKey("profile_add_button"),
+            label: t.profile.add.buttonText,
+            child: IconButton(
+              icon: Icon(FluentIcons.add_24_filled, color: theme.colorScheme.primary),
+              onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
             ),
-            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
           ),
+          const Gap(8),
         ],
       ),
       body: Container(
@@ -118,7 +106,7 @@ class HomePage extends HookConsumerWidget {
             image: const AssetImage('assets/images/world_map.png'), // Replace with your image path
             fit: BoxFit.cover,
             opacity: 0.09,
-            colorFilter: Theme.of(context).brightness == Brightness.dark
+            colorFilter: theme.brightness == Brightness.dark
                 ? ColorFilter.mode(Colors.white.withValues(alpha: .15), BlendMode.srcIn) //
                 : ColorFilter.mode(Colors.grey.withValues(alpha: 1), BlendMode.srcATop), // Apply white tint in dark mode
           ),
