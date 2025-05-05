@@ -1,9 +1,12 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
@@ -71,7 +74,7 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
     // final pageController = useMemoized(() => PageController());
 
     // final notchController = useNotchBottomBarController();
-    final theme = Theme.of(context);
+    // final theme = Theme.of(context);
 
     return _CustomAdaptiveScaffold(
       // pageController: pageController,
@@ -97,7 +100,7 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
 }
 
 class _CustomAdaptiveScaffold extends HookConsumerWidget {
-  _CustomAdaptiveScaffold({
+  const _CustomAdaptiveScaffold({
     // required this.pageController,
     // required this.tabController,
     // required this.notchController,
@@ -144,36 +147,52 @@ class _CustomAdaptiveScaffold extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentIndex = getCurrentIndex(context);
-
-    final theme = Theme.of(context);
-
-    return Scaffold(
+    final primaryFocusHash = useState<int?>(null);
+    final navScopeNode = useFocusScopeNode();
+    final bodyScopeNode = useFocusScopeNode();
+    useEffect(() {
+      HardwareKeyboard.instance.addHandler(
+        (event) {
+          final arrows = Breakpoints.small.isActive(context) ? KeyboardConst.verticalArrows : KeyboardConst.horizontalArrows;
+          if (!arrows.contains(event.logicalKey)) return false;
+          if (event is KeyDownEvent) {
+            primaryFocusHash.value = FocusManager.instance.primaryFocus.hashCode;
+          } else {
+            // focus node does not change => true.
+            if (primaryFocusHash.value == FocusManager.instance.primaryFocus.hashCode) {
+              if (bodyScopeNode.hasFocus) {
+                navScopeNode.requestFocus();
+              } else {
+                bodyScopeNode.requestFocus();
+              }
+            }
+          }
+          return true;
+        },
+      );
+      return null;
+    }, []);
+    return Material(
+      child: AdaptiveLayout(
         key: RootScaffold.stateKey,
-        // drawer: Breakpoints.small.isActive(context) && destinationsSlice(drawerDestinationRange).isNotEmpty
-        //     ? Drawer(
-        //         width: (MediaQuery.sizeOf(context).width * 0.88).clamp(1, 304),
-        //         child: NavigationRail(
-        //           extended: true,
-        //           selectedIndex: selectedWithOffset(drawerDestinationRange),
-        //           destinations: destinationsSlice(drawerDestinationRange).map((dest) => AdaptiveScaffold.toRailDestination(dest)).toList(),
-        //           onDestinationSelected: (index) => selectWithOffset(index, drawerDestinationRange),
-        //         ),
-        //       )
-        //     : null,
-        body: AdaptiveLayout(
-          primaryNavigation: SlotLayout(
-            config: <Breakpoint, SlotLayoutConfig>{
-              Breakpoints.medium: SlotLayout.from(
-                key: const Key('primaryNavigation'),
-                builder: (_) => AdaptiveScaffold.standardNavigationRail(
+        primaryNavigation: SlotLayout(
+          config: <Breakpoint, SlotLayoutConfig>{
+            Breakpoints.medium: SlotLayout.from(
+              key: const Key('primaryNavigation'),
+              builder: (_) => FocusScope(
+                node: navScopeNode,
+                child: AdaptiveScaffold.standardNavigationRail(
                   selectedIndex: currentIndex,
                   destinations: destinations.map((item) => NavigationRailDestination(icon: Icon(item.icon), label: Text(item.title))).toList(),
                   onDestinationSelected: onPageChanged,
                 ),
               ),
-              Breakpoints.mediumLargeAndUp: SlotLayout.from(
-                key: const Key('primaryNavigation1'),
-                builder: (_) => AdaptiveScaffold.standardNavigationRail(
+            ),
+            Breakpoints.mediumLargeAndUp: SlotLayout.from(
+              key: const Key('primaryNavigation1'),
+              builder: (_) => FocusScope(
+                node: navScopeNode,
+                child: AdaptiveScaffold.standardNavigationRail(
                   extended: true,
                   selectedIndex: currentIndex,
                   destinations: destinations.map((item) => NavigationRailDestination(icon: Icon(item.icon), label: Text(item.title))).toList(),
@@ -181,106 +200,175 @@ class _CustomAdaptiveScaffold extends HookConsumerWidget {
                   trailing: sidebarTrailing,
                 ),
               ),
-            },
-          ),
-          // body: SlotLayout(
-          //   config: <Breakpoint, SlotLayoutConfig?>{
-          //     Breakpoints.standard: SlotLayout.from(
-          //       key: const Key('body'),
-          //       inAnimation: AdaptiveScaffold.fadeIn,
-          //       outAnimation: AdaptiveScaffold.fadeOut,
-          //       builder: (context) => PageView(
-          //         controller: pageController,
-          //         // physics: const NeverScrollableScrollPhysics(),
-          //         onPageChanged: onPageChanged,
-          //         children: destinations.values.map((dest) => dest.page.build(context, GoRouterState.of(context))).toList(),
-          //       ),
-          //     ),
-          //   },
-          body: SlotLayout(
-            config: <Breakpoint, SlotLayoutConfig?>{
-              Breakpoints.standard: SlotLayout.from(
-                key: const Key('body'),
-                inAnimation: AdaptiveScaffold.fadeIn,
-                outAnimation: AdaptiveScaffold.fadeOut,
-                builder: (context) => body,
-              ),
-            },
-          ),
+            ),
+          },
         ),
-        bottomNavigationBar: Breakpoints.small.isActive(context)
-            ?
-            // BottomNavyBar(
-            //     selectedIndex: currentIndex.value,
-            //     // showElevation: true, // use this to remove appBar's elevation
-            //     onItemSelected: onPageChanged,
-            //     items: destinations.map((item) => BottomNavyBarItem(icon: Icon(item.icon), title: Text(item.title))).toList(),
-            //     backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
-            //   )
-            NavigationBar(
-                animationDuration: const Duration(milliseconds: 300),
-                selectedIndex: currentIndex,
-                destinations: destinations.map((item) => NavigationDestination(icon: Icon(item.icon), label: item.title)).toList(),
-                onDestinationSelected: onPageChanged,
-              )
-            : null
-        // ? PersistentTabView(
-        //     context,
-        //     controller: tabController,
-        //     screens: destinations.map((dest) => dest.page).toList(),
-        //     items: destinations.map((item) => PersistentBottomNavBarItem(icon: Icon(item.icon), title: item.title)).toList(),
-        //     navBarStyle: NavBarStyle.style6,
-        //     animationSettings: const NavBarAnimationSettings(
-        //       navBarItemAnimation: ItemAnimationSettings(
-        //         // duration: Duration(milliseconds: 300),
-        //         curve: Curves.linear,
-        //       ),
-        //       screenTransitionAnimation: ScreenTransitionAnimationSettings(
-        //         animateTabTransition: true,
-        //         curve: Curves.linear,
-        //         // duration: const Duration(milliseconds: 300),
-        //       ),
-        //     ),
-        //   )
-        // : null
-        // AnimatedNotchBottomBar(
-        //   kBottomRadius: 0,
-        //   // removeMargins: true,
-        //   kIconSize: 24,
-        //   notchBottomBarController: notchController,
-        //   // color: Colors.white,
-        //   color: theme.colorScheme.secondaryContainer,
-        //   notchColor: theme.colorScheme.secondaryContainer,
-        //   // removeMargins: false,
-        //   // showTopRadius: false,
-        //   // bottomBarWidth: 500,
-        //   // durationInMilliSeconds: 600,
-        //   bottomBarItems: destinations
-        //       .map((dest) => BottomBarItem(
-        //             inActiveItem: Icon(dest.icon, color: theme.colorScheme.secondary),
-        //             activeItem: Icon(dest.icon, color: theme.colorScheme.primary),
-        //             itemLabel: dest.title,
-        //           ))
-        //       .toList(),
-        //   onTap: (index) {
-        //     isBottomBarTap.value = true;
-        //     pageController.jumpToPage(
-        //       index,
-        //       // duration: const Duration(milliseconds: 300),
-        //       // curve: Curves.easeInOut,
-        //     );
+        bottomNavigation: SlotLayout(
+          config: <Breakpoint, SlotLayoutConfig?>{
+            Breakpoints.small: SlotLayout.from(
+              key: const Key('bottomNavigation'),
+              builder: (_) => FocusScope(
+                node: navScopeNode,
+                child: NavigationBar(
+                  animationDuration: const Duration(milliseconds: 300),
+                  selectedIndex: currentIndex,
+                  destinations: destinations.map((item) => NavigationDestination(icon: Icon(item.icon), label: item.title)).toList(),
+                  onDestinationSelected: onPageChanged,
+                ),
+              ),
+            ),
+          },
+        ),
+        body: SlotLayout(
+          config: <Breakpoint, SlotLayoutConfig?>{
+            Breakpoints.standard: SlotLayout.from(
+              key: const Key('body'),
+              inAnimation: AdaptiveScaffold.fadeIn,
+              outAnimation: AdaptiveScaffold.fadeOut,
+              builder: (context) => FocusScope(
+                node: bodyScopeNode,
+                child: body,
+              ),
+            ),
+          },
+        ),
+      ),
+    );
+    // final theme = Theme.of(context);
+    // return Scaffold(
+    //     key: RootScaffold.stateKey,
+    //     // drawer: Breakpoints.small.isActive(context) && destinationsSlice(drawerDestinationRange).isNotEmpty
+    //     //     ? Drawer(
+    //     //         width: (MediaQuery.sizeOf(context).width * 0.88).clamp(1, 304),
+    //     //         child: NavigationRail(
+    //     //           extended: true,
+    //     //           selectedIndex: selectedWithOffset(drawerDestinationRange),
+    //     //           destinations: destinationsSlice(drawerDestinationRange).map((dest) => AdaptiveScaffold.toRailDestination(dest)).toList(),
+    //     //           onDestinationSelected: (index) => selectWithOffset(index, drawerDestinationRange),
+    //     //         ),
+    //     //       )
+    //     //     : null,
+    //     body: AdaptiveLayout(
+    //       primaryNavigation: SlotLayout(
+    //         config: <Breakpoint, SlotLayoutConfig>{
+    //           Breakpoints.medium: SlotLayout.from(
+    //             key: const Key('primaryNavigation'),
+    //             builder: (_) => AdaptiveScaffold.standardNavigationRail(
+    //               selectedIndex: currentIndex,
+    //               destinations: destinations.map((item) => NavigationRailDestination(icon: Icon(item.icon), label: Text(item.title))).toList(),
+    //               onDestinationSelected: onPageChanged,
+    //             ),
+    //           ),
+    //           Breakpoints.mediumLargeAndUp: SlotLayout.from(
+    //             key: const Key('primaryNavigation1'),
+    //             builder: (_) => AdaptiveScaffold.standardNavigationRail(
+    //               extended: true,
+    //               selectedIndex: currentIndex,
+    //               destinations: destinations.map((item) => NavigationRailDestination(icon: Icon(item.icon), label: Text(item.title))).toList(),
+    //               onDestinationSelected: onPageChanged,
+    //               trailing: sidebarTrailing,
+    //             ),
+    //           ),
+    //         },
+    //       ),
+    //       // body: SlotLayout(
+    //       //   config: <Breakpoint, SlotLayoutConfig?>{
+    //       //     Breakpoints.standard: SlotLayout.from(
+    //       //       key: const Key('body'),
+    //       //       inAnimation: AdaptiveScaffold.fadeIn,
+    //       //       outAnimation: AdaptiveScaffold.fadeOut,
+    //       //       builder: (context) => PageView(
+    //       //         controller: pageController,
+    //       //         // physics: const NeverScrollableScrollPhysics(),
+    //       //         onPageChanged: onPageChanged,
+    //       //         children: destinations.values.map((dest) => dest.page.build(context, GoRouterState.of(context))).toList(),
+    //       //       ),
+    //       //     ),
+    //       //   },
+    //       body: SlotLayout(
+    //         config: <Breakpoint, SlotLayoutConfig?>{
+    //           Breakpoints.standard: SlotLayout.from(
+    //             key: const Key('body'),
+    //             inAnimation: AdaptiveScaffold.fadeIn,
+    //             outAnimation: AdaptiveScaffold.fadeOut,
+    //             builder: (context) => body,
+    //           ),
+    //         },
+    //       ),
+    //     ),
+    //     bottomNavigationBar: Breakpoints.small.isActive(context)
+    //         ?
+    //         // BottomNavyBar(
+    //         //     selectedIndex: currentIndex.value,
+    //         //     // showElevation: true, // use this to remove appBar's elevation
+    //         //     onItemSelected: onPageChanged,
+    //         //     items: destinations.map((item) => BottomNavyBarItem(icon: Icon(item.icon), title: Text(item.title))).toList(),
+    //         //     backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+    //         //   )
+    //         NavigationBar(
+    //             animationDuration: const Duration(milliseconds: 300),
+    //             selectedIndex: currentIndex,
+    //             destinations: destinations.map((item) => NavigationDestination(icon: Icon(item.icon), label: item.title)).toList(),
+    //             onDestinationSelected: onPageChanged,
+    //           )
+    //         : null
+    //     // ? PersistentTabView(
+    //     //     context,
+    //     //     controller: tabController,
+    //     //     screens: destinations.map((dest) => dest.page).toList(),
+    //     //     items: destinations.map((item) => PersistentBottomNavBarItem(icon: Icon(item.icon), title: item.title)).toList(),
+    //     //     navBarStyle: NavBarStyle.style6,
+    //     //     animationSettings: const NavBarAnimationSettings(
+    //     //       navBarItemAnimation: ItemAnimationSettings(
+    //     //         // duration: Duration(milliseconds: 300),
+    //     //         curve: Curves.linear,
+    //     //       ),
+    //     //       screenTransitionAnimation: ScreenTransitionAnimationSettings(
+    //     //         animateTabTransition: true,
+    //     //         curve: Curves.linear,
+    //     //         // duration: const Duration(milliseconds: 300),
+    //     //       ),
+    //     //     ),
+    //     //   )
+    //     // : null
+    //     // AnimatedNotchBottomBar(
+    //     //   kBottomRadius: 0,
+    //     //   // removeMargins: true,
+    //     //   kIconSize: 24,
+    //     //   notchBottomBarController: notchController,
+    //     //   // color: Colors.white,
+    //     //   color: theme.colorScheme.secondaryContainer,
+    //     //   notchColor: theme.colorScheme.secondaryContainer,
+    //     //   // removeMargins: false,
+    //     //   // showTopRadius: false,
+    //     //   // bottomBarWidth: 500,
+    //     //   // durationInMilliSeconds: 600,
+    //     //   bottomBarItems: destinations
+    //     //       .map((dest) => BottomBarItem(
+    //     //             inActiveItem: Icon(dest.icon, color: theme.colorScheme.secondary),
+    //     //             activeItem: Icon(dest.icon, color: theme.colorScheme.primary),
+    //     //             itemLabel: dest.title,
+    //     //           ))
+    //     //       .toList(),
+    //     //   onTap: (index) {
+    //     //     isBottomBarTap.value = true;
+    //     //     pageController.jumpToPage(
+    //     //       index,
+    //     //       // duration: const Duration(milliseconds: 300),
+    //     //       // curve: Curves.easeInOut,
+    //     //     );
 
-        //     Future.delayed(Duration(milliseconds: 600), () {
-        //       isBottomBarTap.value = false;
-        //     });
-        //   },
+    //     //     Future.delayed(Duration(milliseconds: 600), () {
+    //     //       isBottomBarTap.value = false;
+    //     //     });
+    //     //   },
 
-        //   // shadowElevation: 1
-        //   // ,
-        //   showBottomRadius: false,
-        //   showBlurBottomBar: true,
-        // )
-        // : null,
-        );
+    //     //   // shadowElevation: 1
+    //     //   // ,
+    //     //   showBottomRadius: false,
+    //     //   showBlurBottomBar: true,
+    //     // )
+    //     // : null,
+    //     );
   }
 }
