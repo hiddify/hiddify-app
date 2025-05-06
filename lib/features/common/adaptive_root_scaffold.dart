@@ -162,7 +162,7 @@ class _CustomAdaptiveScaffold extends HookConsumerWidget {
             if (primaryFocusHash.value == FocusManager.instance.primaryFocus.hashCode) {
               if (bodyScopeNode.hasFocus) {
                 navScopeNode.requestFocus();
-              } else {
+              } else if (navScopeNode.hasFocus) {
                 bodyScopeNode.requestFocus();
               }
             }
