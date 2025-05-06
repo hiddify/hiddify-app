@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -275,9 +276,8 @@ class SettingsSliderDialog extends HookConsumerWidget with PresLogger {
   final String Function(double value)? labelGen;
 
   Future<double?> show(BuildContext context) async {
-    return showDialog(
+    return await showDialog(
       context: context,
-      useRootNavigator: true,
       builder: (context) => this,
     );
   }
@@ -288,11 +288,23 @@ class SettingsSliderDialog extends HookConsumerWidget with PresLogger {
     final localizations = MaterialLocalizations.of(context);
 
     final sliderValue = useState(initialValue);
+    final sliderFocusNode = useFocusNode(
+      onKeyEvent: (node, event) {
+        if (KeyboardConst.verticalArrows.contains(event.logicalKey) && event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+            node.nextFocus();
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+    );
 
     return AlertDialog(
       title: Text(title),
       content: IntrinsicHeight(
         child: Slider(
+          focusNode: sliderFocusNode,
           value: sliderValue.value,
           min: min,
           max: max,
@@ -306,7 +318,7 @@ class SettingsSliderDialog extends HookConsumerWidget with PresLogger {
           TextButton(
             onPressed: () async {
               onReset!();
-              await Navigator.of(context).maybePop(null);
+              await Navigator.of(context).maybePop();
             },
             child: Text(t.general.reset.toUpperCase()),
           ),
