@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
@@ -148,7 +149,8 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     onTap: () async => await ref.read(configOptionNotifierProvider.notifier).resetOption(),
                   ),
                 ],
-              )
+              ),
+              const Gap(8),
             ],
           ),
           SliverToBoxAdapter(
