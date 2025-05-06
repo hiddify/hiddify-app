@@ -36,125 +36,117 @@ class SettingsInputDialog<T> extends HookConsumerWidget with PresLogger {
     final textController = useTextEditingController(
       text: valueFormatter?.call(initialValue) ?? initialValue.toString(),
     );
+    // focus management
+    final okBtnFocusNode = useFocusNode();
+    KeyEventResult handleKeyEvent(FocusNode node, KeyEvent event) {
+      if (KeyboardConst.select.contains(event.logicalKey) && event is KeyDownEvent) {
+        okBtnFocusNode.requestFocus();
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    }
 
-    return FocusTraversalGroup(
-      policy: OrderedTraversalPolicy(),
-      child: AlertDialog(
-        title: Text(title),
-        icon: icon != null ? Icon(icon) : null,
-        // material: (context, platform) => MaterialAlertDialogData(
-        //   icon: icon != null ? Icon(icon) : null,
-        // ),
-        content: FocusTraversalOrder(
-          order: const NumericFocusOrder(1),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (possibleValues != null)
-                // AutocompleteField(initialValue: initialValue.toString(), options: possibleValues!.map((e) => e.toString()).toList())
-                TypeAheadField<String>(
-                  controller: textController,
-                  builder: (context, controller, focusNode) {
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-
-                      textDirection: TextDirection.ltr,
-                      autofocus: true,
-                      // decoration: InputDecoration(
-                      //     // border: OutlineInputBorder(),
-                      //     // labelText: 'City',
-                      //     )
-                    );
-                  },
-                  // Callback to fetch suggestions based on user input
-                  suggestionsCallback: (pattern) {
-                    final items = possibleValues!.map((p) => p.toString());
-                    var res = items.where((suggestion) => suggestion.toLowerCase().contains(pattern.toLowerCase())).toList();
-                    if (res.length <= 1) res = [pattern, ...items.where((s) => s != pattern)];
-                    return res;
-                  },
-                  // Widget to build each suggestion in the list
-                  itemBuilder: (context, suggestion) {
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10), // Minimize ListTile padding
-                      minTileHeight: 0,
-                      title: Text(
-                        suggestion,
-                        textDirection: TextDirection.ltr,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    );
-                  },
-                  // Callback when a suggestion is selected
-                  onSelected: (suggestion) {
-                    // Handle the selected suggestion
-                    // print('Selected: $suggestion');
-                    textController.text = suggestion;
-                  },
-                )
-              else
-                CustomTextFormField(
-                  controller: textController,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.singleLineFormatter,
-                    if (digitsOnly) FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  autoCorrect: true,
-                  hint: title,
-                ),
-            ],
-          ),
-        ),
-        actions: [
-          if (optionalAction != null)
-            FocusTraversalOrder(
-              order: const NumericFocusOrder(5),
-              child: TextButton(
-                onPressed: () async {
-                  optionalAction!.$2();
-                  await Navigator.of(context).maybePop(T == String ? textController.value.text : null);
-                },
-                child: Text(optionalAction!.$1.toUpperCase()),
-              ),
-            ),
-          if (onReset != null)
-            FocusTraversalOrder(
-              order: const NumericFocusOrder(4),
-              child: TextButton(
-                onPressed: () async {
-                  onReset!();
-                  await Navigator.of(context).maybePop();
-                },
-                child: Text(t.general.reset.toUpperCase()),
-              ),
-            ),
-          FocusTraversalOrder(
-            order: const NumericFocusOrder(3),
-            child: TextButton(
-              onPressed: () async {
-                await Navigator.of(context).maybePop();
+    return AlertDialog(
+      title: Text(title),
+      icon: icon != null ? Icon(icon) : null,
+      // material: (context, platform) => MaterialAlertDialogData(
+      //   icon: icon != null ? Icon(icon) : null,
+      // ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (possibleValues != null)
+            // AutocompleteField(initialValue: initialValue.toString(), options: possibleValues!.map((e) => e.toString()).toList())
+            TypeAheadField<String>(
+              controller: textController,
+              builder: (context, controller, focusNode) {
+                focusNode.onKeyEvent = handleKeyEvent;
+                return TextField(
+                  controller: controller,
+                  focusNode: focusNode,
+                  textDirection: TextDirection.ltr,
+                  autofocus: true,
+                  // decoration: InputDecoration(
+                  //     // border: OutlineInputBorder(),
+                  //     // labelText: 'City',
+                  //     )
+                );
               },
-              child: Text(localizations.cancelButtonLabel.toUpperCase()),
-            ),
-          ),
-          FocusTraversalOrder(
-            order: const NumericFocusOrder(2),
-            child: TextButton(
-              onPressed: () async {
-                if (validator?.call(textController.value.text) == false) {
-                  await Navigator.of(context).maybePop();
-                } else if (mapTo != null) {
-                  await Navigator.of(context).maybePop(mapTo!.call(textController.value.text));
-                } else {
-                  await Navigator.of(context).maybePop(T == String ? textController.value.text : null);
-                }
+              // Callback to fetch suggestions based on user input
+              suggestionsCallback: (pattern) {
+                final items = possibleValues!.map((p) => p.toString());
+                var res = items.where((suggestion) => suggestion.toLowerCase().contains(pattern.toLowerCase())).toList();
+                if (res.length <= 1) res = [pattern, ...items.where((s) => s != pattern)];
+                return res;
               },
-              child: Text(localizations.okButtonLabel.toUpperCase()),
+              // Widget to build each suggestion in the list
+              itemBuilder: (context, suggestion) {
+                return ListTile(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10), // Minimize ListTile padding
+                  minTileHeight: 0,
+                  title: Text(
+                    suggestion,
+                    textDirection: TextDirection.ltr,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                );
+              },
+              // Callback when a suggestion is selected
+              onSelected: (suggestion) {
+                // Handle the selected suggestion
+                // print('Selected: $suggestion');
+                textController.text = suggestion;
+              },
+            )
+          else
+            CustomTextFormField(
+              controller: textController,
+              inputFormatters: [
+                FilteringTextInputFormatter.singleLineFormatter,
+                if (digitsOnly) FilteringTextInputFormatter.digitsOnly,
+              ],
+              autoCorrect: true,
+              hint: title,
             ),
-          ),
         ],
       ),
+      actions: [
+        if (optionalAction != null)
+          TextButton(
+            onPressed: () async {
+              optionalAction!.$2();
+              await Navigator.of(context).maybePop(T == String ? textController.value.text : null);
+            },
+            child: Text(optionalAction!.$1.toUpperCase()),
+          ),
+        if (onReset != null)
+          TextButton(
+            onPressed: () async {
+              onReset!();
+              await Navigator.of(context).maybePop();
+            },
+            child: Text(t.general.reset.toUpperCase()),
+          ),
+        TextButton(
+          onPressed: () async {
+            await Navigator.of(context).maybePop();
+          },
+          child: Text(localizations.cancelButtonLabel.toUpperCase()),
+        ),
+        TextButton(
+          focusNode: okBtnFocusNode,
+          onPressed: () async {
+            if (validator?.call(textController.value.text) == false) {
+              await Navigator.of(context).maybePop();
+            } else if (mapTo != null) {
+              await Navigator.of(context).maybePop(mapTo!.call(textController.value.text));
+            } else {
+              await Navigator.of(context).maybePop(T == String ? textController.value.text : null);
+            }
+          },
+          child: Text(localizations.okButtonLabel.toUpperCase()),
+        ),
+      ],
     );
   }
 }
