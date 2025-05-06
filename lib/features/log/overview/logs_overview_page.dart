@@ -91,6 +91,7 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                             return popupButtons;
                           },
                         ),
+                      const Gap(8),
                     ],
                   ),
                   SliverPinnedHeader(

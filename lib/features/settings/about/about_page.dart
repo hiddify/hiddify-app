@@ -92,6 +92,7 @@ class AboutPage extends HookConsumerWidget {
                   ];
                 },
               ),
+              const Gap(8),
             ],
           ),
           SliverToBoxAdapter(
