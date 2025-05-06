@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
@@ -113,6 +114,19 @@ class AddProfileManual extends HookConsumerWidget {
     final nameTextController = useTextEditingController();
     final urlTextController = useTextEditingController();
     final updateInterval = useState(.0);
+    final sliderFocusNode = useFocusNode(
+      onKeyEvent: (node, event) {
+        if (KeyboardConst.verticalArrows.contains(event.logicalKey) && event is KeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+            node.previousFocus();
+          } else {
+            node.nextFocus();
+          }
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+    );
     return Form(
       key: formKey,
       child: Column(
@@ -178,6 +192,7 @@ class AddProfileManual extends HookConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Slider(
+              focusNode: sliderFocusNode,
               value: updateInterval.value,
               max: 96,
               divisions: 96,
