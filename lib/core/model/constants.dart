@@ -51,6 +51,14 @@ abstract class ProfileTileConst {
 
 abstract class IntroPageConst {
   static const maxwidth = 620;
+  static const termsAndConditionsKey = 'terms-and-conditions';
+  static const githubKey = 'github';
+  static const licenseKey = 'license';
+  static const url = <String, String>{
+    IntroPageConst.termsAndConditionsKey: Constants.termsAndConditionsUrl,
+    IntroPageConst.githubKey: Constants.githubUrl,
+    IntroPageConst.licenseKey: Constants.licenseUrl,
+  };
 }
 
 abstract class KeyboardConst {

@@ -25,14 +25,9 @@ class IntroPage extends HookConsumerWidget with PresLogger {
   static bool locationInfoLoaded = false;
 
   // for focus management
-  KeyEventResult _handleKeyEvent(KeyEvent event, bool terms, bool github, bool license) {
+  KeyEventResult _handleKeyEvent(KeyEvent event, String key) {
     if (KeyboardConst.select.contains(event.logicalKey) && event is KeyUpEvent) {
-      final url = terms
-          ? Constants.termsAndConditionsUrl
-          : github
-              ? Constants.githubUrl
-              : Constants.licenseUrl;
-      UriUtils.tryLaunch(Uri.parse(url));
+      UriUtils.tryLaunch(Uri.parse(IntroPageConst.url[key]!));
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -51,17 +46,21 @@ class IntroPage extends HookConsumerWidget with PresLogger {
     }
 
     // for focus management
-    final termsNodeIsFocused = useState<bool>(false);
-    final githubNodeIsFocused = useState<bool>(false);
-    final licenseNodeIsFocused = useState<bool>(false);
-    final termsNode = useFocusNode();
-    final githubNode = useFocusNode();
-    final licenseNode = useFocusNode();
+    final focusStates = <String, ValueNotifier<bool>>{
+      IntroPageConst.termsAndConditionsKey: useState<bool>(false),
+      IntroPageConst.githubKey: useState<bool>(false),
+      IntroPageConst.licenseKey: useState<bool>(false),
+    };
+    final focusNodes = <String, FocusNode>{
+      IntroPageConst.termsAndConditionsKey: useFocusNode(),
+      IntroPageConst.githubKey: useFocusNode(),
+      IntroPageConst.licenseKey: useFocusNode(),
+    };
     useEffect(
       () {
-        termsNode.addListener(() => termsNodeIsFocused.value = termsNode.hasPrimaryFocus);
-        githubNode.addListener(() => githubNodeIsFocused.value = githubNode.hasPrimaryFocus);
-        licenseNode.addListener(() => licenseNodeIsFocused.value = licenseNode.hasPrimaryFocus);
+        for (final entry in focusNodes.entries) {
+          entry.value.addListener(() => focusStates[entry.key]!.value = entry.value.hasPrimaryFocus);
+        }
         return null;
       },
       [],
@@ -96,13 +95,13 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     const EnableAnalyticsPrefTile(),
                     const Gap(24),
                     Focus(
-                      focusNode: termsNode,
-                      onKeyEvent: (node, event) => _handleKeyEvent(event, termsNodeIsFocused.value, githubNodeIsFocused.value, licenseNodeIsFocused.value),
+                      focusNode: focusNodes[IntroPageConst.termsAndConditionsKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroPageConst.termsAndConditionsKey),
                       child: Text.rich(
                         t.intro.termsAndPolicyCaution(
                           tap: (text) => TextSpan(
                             text: text,
-                            style: TextStyle(color: termsNodeIsFocused.value ? Colors.green : Colors.blue),
+                            style: TextStyle(color: focusStates[IntroPageConst.termsAndConditionsKey]!.value ? Colors.green : Colors.blue),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () async {
                                 await UriUtils.tryLaunch(
@@ -116,13 +115,13 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     ),
                     const Gap(8),
                     Focus(
-                      focusNode: githubNode,
-                      onKeyEvent: (node, event) => _handleKeyEvent(event, termsNodeIsFocused.value, githubNodeIsFocused.value, licenseNodeIsFocused.value),
+                      focusNode: focusNodes[IntroPageConst.githubKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroPageConst.githubKey),
                       child: Text.rich(
                         t.intro.info(
                           tap_source: (text) => TextSpan(
                             text: text,
-                            style: TextStyle(color: githubNodeIsFocused.value ? Colors.green : Colors.blue),
+                            style: TextStyle(color: focusStates[IntroPageConst.githubKey]!.value ? Colors.green : Colors.blue),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () async {
                                 await UriUtils.tryLaunch(
@@ -132,7 +131,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                           ),
                           tap_license: (text) => TextSpan(
                             text: text,
-                            style: TextStyle(color: licenseNodeIsFocused.value ? Colors.green : Colors.blue),
+                            style: TextStyle(color: focusStates[IntroPageConst.githubKey]!.value ? Colors.green : Colors.blue),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () async {
                                 await UriUtils.tryLaunch(
@@ -146,8 +145,8 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     ),
                     // only for managing license node focus
                     Focus(
-                      focusNode: licenseNode,
-                      onKeyEvent: (node, event) => _handleKeyEvent(event, termsNodeIsFocused.value, githubNodeIsFocused.value, licenseNodeIsFocused.value),
+                      focusNode: focusNodes[IntroPageConst.licenseKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroPageConst.licenseKey),
                       child: const Gap(88),
                     ),
                   ],
