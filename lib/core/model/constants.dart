@@ -49,15 +49,24 @@ abstract class ProfileTileConst {
   static BorderRadius endBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusRight : borderRadiusLeft;
 }
 
-abstract class IntroPageConst {
+abstract class IntroConst {
   static const maxwidth = 620;
   static const termsAndConditionsKey = 'terms-and-conditions';
   static const githubKey = 'github';
   static const licenseKey = 'license';
   static const url = <String, String>{
-    IntroPageConst.termsAndConditionsKey: Constants.termsAndConditionsUrl,
-    IntroPageConst.githubKey: Constants.githubUrl,
-    IntroPageConst.licenseKey: Constants.licenseUrl,
+    IntroConst.termsAndConditionsKey: Constants.termsAndConditionsUrl,
+    IntroConst.githubKey: Constants.githubUrl,
+    IntroConst.licenseKey: Constants.licenseUrl,
+  };
+}
+
+abstract class WarpLicenseAgreementConst {
+  static const warpTermsOfServiceKey = 'warp-terms-of-service';
+  static const warpPrivacyPolicyKey = 'warp-privacy-policy';
+  static const url = <String, String>{
+    WarpLicenseAgreementConst.warpTermsOfServiceKey: Constants.cfWarpTermsOfService,
+    WarpLicenseAgreementConst.warpPrivacyPolicyKey: Constants.cfWarpPrivacyPolicy,
   };
 }
 

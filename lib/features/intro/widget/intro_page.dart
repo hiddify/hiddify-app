@@ -27,7 +27,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
   // for focus management
   KeyEventResult _handleKeyEvent(KeyEvent event, String key) {
     if (KeyboardConst.select.contains(event.logicalKey) && event is KeyUpEvent) {
-      UriUtils.tryLaunch(Uri.parse(IntroPageConst.url[key]!));
+      UriUtils.tryLaunch(Uri.parse(IntroConst.url[key]!));
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -47,14 +47,14 @@ class IntroPage extends HookConsumerWidget with PresLogger {
 
     // for focus management
     final focusStates = <String, ValueNotifier<bool>>{
-      IntroPageConst.termsAndConditionsKey: useState<bool>(false),
-      IntroPageConst.githubKey: useState<bool>(false),
-      IntroPageConst.licenseKey: useState<bool>(false),
+      IntroConst.termsAndConditionsKey: useState<bool>(false),
+      IntroConst.githubKey: useState<bool>(false),
+      IntroConst.licenseKey: useState<bool>(false),
     };
     final focusNodes = <String, FocusNode>{
-      IntroPageConst.termsAndConditionsKey: useFocusNode(),
-      IntroPageConst.githubKey: useFocusNode(),
-      IntroPageConst.licenseKey: useFocusNode(),
+      IntroConst.termsAndConditionsKey: useFocusNode(),
+      IntroConst.githubKey: useFocusNode(),
+      IntroConst.licenseKey: useFocusNode(),
     };
     useEffect(
       () {
@@ -79,7 +79,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                   children: [
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        final width = constraints.maxWidth > IntroPageConst.maxwidth ? IntroPageConst.maxwidth : constraints.maxWidth;
+                        final width = constraints.maxWidth > IntroConst.maxwidth ? IntroConst.maxwidth : constraints.maxWidth;
                         final size = width * 0.4;
                         return Assets.images.logo.svg(width: size, height: size);
                       },
@@ -95,13 +95,13 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     const EnableAnalyticsPrefTile(),
                     const Gap(24),
                     Focus(
-                      focusNode: focusNodes[IntroPageConst.termsAndConditionsKey],
-                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroPageConst.termsAndConditionsKey),
+                      focusNode: focusNodes[IntroConst.termsAndConditionsKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.termsAndConditionsKey),
                       child: Text.rich(
                         t.intro.termsAndPolicyCaution(
                           tap: (text) => TextSpan(
                             text: text,
-                            style: TextStyle(color: focusStates[IntroPageConst.termsAndConditionsKey]!.value ? Colors.green : Colors.blue),
+                            style: TextStyle(color: focusStates[IntroConst.termsAndConditionsKey]!.value ? Colors.green : Colors.blue),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () async {
                                 await UriUtils.tryLaunch(
@@ -115,13 +115,13 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     ),
                     const Gap(8),
                     Focus(
-                      focusNode: focusNodes[IntroPageConst.githubKey],
-                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroPageConst.githubKey),
+                      focusNode: focusNodes[IntroConst.githubKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.githubKey),
                       child: Text.rich(
                         t.intro.info(
                           tap_source: (text) => TextSpan(
                             text: text,
-                            style: TextStyle(color: focusStates[IntroPageConst.githubKey]!.value ? Colors.green : Colors.blue),
+                            style: TextStyle(color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () async {
                                 await UriUtils.tryLaunch(
@@ -131,7 +131,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                           ),
                           tap_license: (text) => TextSpan(
                             text: text,
-                            style: TextStyle(color: focusStates[IntroPageConst.githubKey]!.value ? Colors.green : Colors.blue),
+                            style: TextStyle(color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () async {
                                 await UriUtils.tryLaunch(
@@ -145,8 +145,8 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     ),
                     // only for managing license node focus
                     Focus(
-                      focusNode: focusNodes[IntroPageConst.licenseKey],
-                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroPageConst.licenseKey),
+                      focusNode: focusNodes[IntroConst.licenseKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.licenseKey),
                       child: const Gap(88),
                     ),
                   ],
