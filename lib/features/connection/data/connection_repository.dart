@@ -149,7 +149,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     String fileName,
     String profileName,
     bool disableMemoryLimit,
-    String? testUrl,
+    String? override,
   ) {
     return TaskEither<ConnectionFailure, Unit>.Do(
       ($) async {
@@ -171,7 +171,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
           }),
         );
         await $(setup());
-        await $(applyConfigOption(options, testUrl));
+        await $(applyConfigOption(options, override));
         return await $(
           singbox
               .start(
