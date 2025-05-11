@@ -11,6 +11,7 @@ import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -28,7 +29,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       }).run();
     }
 
-    ref.listenSelf(
+    listenSelf(
       (previous, next) async {
         if (previous == next) return;
         if (previous case AsyncData(:final value) when !value.isConnected) {
@@ -163,7 +164,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
 }
 
 @Riverpod(keepAlive: true)
-Future<bool> serviceRunning(ServiceRunningRef ref) => ref
+Future<bool> serviceRunning(Ref ref) => ref
     .watch(
       connectionNotifierProvider.selectAsync((data) => data.isConnected),
     )

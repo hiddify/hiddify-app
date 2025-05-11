@@ -25,14 +25,14 @@ abstract interface class ConnectionRepository {
     String fileName,
     String profileName,
     bool disableMemoryLimit,
-    String? testUrl,
+    String? override,
   );
   TaskEither<ConnectionFailure, Unit> disconnect();
   TaskEither<ConnectionFailure, Unit> reconnect(
     String fileName,
     String profileName,
     bool disableMemoryLimit,
-    String? testUrl,
+    String? override,
   );
 }
 
@@ -215,7 +215,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     String fileName,
     String profileName,
     bool disableMemoryLimit,
-    String? testUrl,
+    String? override,
   ) {
     return TaskEither<ConnectionFailure, Unit>.Do(
       ($) async {
@@ -224,7 +224,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
           "config options: ${options.format()}\nMemory Limit: ${!disableMemoryLimit}",
         );
 
-        await $(applyConfigOption(options, testUrl));
+        await $(applyConfigOption(options, override));
         return await $(
           singbox
               .restart(

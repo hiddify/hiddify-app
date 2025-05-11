@@ -94,7 +94,7 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
         ..listen(myAppLinksProvider, (_, __) => _newUrlFromAppLink = true);
     }
 
-    ref.listenSelf((_, __) {
+    listenSelf((_, __) {
       if (state.isLoading) return;
       loggy.debug("triggering listener");
       _routerListener?.call();
