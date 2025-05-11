@@ -446,6 +446,10 @@
       "unexpected": "Unexpected Error",
       "notUpdate": "No Update Available",
       "activeNotFound": "Active Geo Asset Not Found"
+    },
+    "warp": {
+      "missingLicense": "WARP license",
+      "missingLicenseMsg": "The selected profile uses the WARP feature; to use this feature, the WARP license must be agreed to."
     }
   },
   "play": {
