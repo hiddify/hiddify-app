@@ -58,6 +58,8 @@ class ProfileTile extends HookConsumerWidget {
       _ => null,
     };
 
+    final showActionButton = profile is RemoteProfileEntity || !isMain;
+
     // final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
     // final double effectiveElevation = profile.active ? 12 : 4;
     // final effectiveOutlineColor = profile.active ? theme.colorScheme.outline : Colors.transparent;
@@ -79,7 +81,7 @@ class ProfileTile extends HookConsumerWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (profile is RemoteProfileEntity || !isMain) ...[
+              if (showActionButton) ...[
                 SizedBox(
                   width: 48,
                   child: Semantics(
@@ -104,7 +106,7 @@ class ProfileTile extends HookConsumerWidget {
                   namesRoute: isMain,
                   label: isMain ? t.profile.activeProfileBtnSemanticLabel : null,
                   child: InkWell(
-                    borderRadius: ProfileTileConst.endBorderRadius(Directionality.of(context)),
+                    borderRadius: showActionButton ? ProfileTileConst.endBorderRadius(Directionality.of(context)) : ProfileTileConst.cardBorderRadius,
                     onTap: () {
                       if (isMain) {
                         if (Breakpoints.small.isActive(context)) {
