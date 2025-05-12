@@ -84,7 +84,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
             _profilesRepo.deleteById(oldItem.id).run();
           }
           while (await _profilesRepo.getByName('$name') != null) {
-            name.writeln('${randomInt(0, 9).run()}');
+            name.write('${randomInt(0, 9).run()}');
           }
           task = _profilesRepo.addByContent(
             parsed.content,

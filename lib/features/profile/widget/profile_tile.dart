@@ -9,11 +9,11 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
 import 'package:hiddify/features/common/confirmation_dialogs.dart';
-import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dart';
@@ -310,10 +310,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
               onTap: () async {
                 final link = LinkParser.generateSubShareLink(url, name);
                 if (link.isNotEmpty) {
-                  await QrCodeDialog(
-                    link,
-                    message: name,
-                  ).show(context);
+                  await ref.read(dialogNotifierProvider.notifier).showQrCode(link, message: name);
                 }
               },
             ),

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/overview/config_options_page.dart';
 import 'package:hiddify/features/config_option/widget/preference_tile.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/validators.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 
 class InboundOptionsTiles extends HookConsumerWidget {
   const InboundOptionsTiles({super.key});
@@ -67,7 +69,17 @@ class InboundOptionsTiles extends HookConsumerWidget {
           context,
           title: experimental(t.config.allowConnectionFromLan),
           value: ref.watch(ConfigOptions.allowConnectionFromLan),
-          onChanged: ref.read(ConfigOptions.allowConnectionFromLan.notifier).update,
+          onChanged: (bool value) async {
+            await ref.read(ConfigOptions.allowConnectionFromLan.notifier).update(value);
+            if (value == true) {
+              final ip = await NetworkInfo().getWifiIP();
+              if (ip == null) return;
+              final port = ref.read(ConfigOptions.mixedPort);
+              final link = '#profile-title: LAN only\nsocks://$ip:$port#LAN only';
+              final message = 'socks://$ip:$port';
+              await ref.read(dialogNotifierProvider.notifier).showQrCode(link, message: message);
+            }
+          },
         ),
       ],
     );
