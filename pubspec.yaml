@@ -130,6 +130,8 @@ dependencies:
   # Used for registering custom schemes in the Windows registry
   win32: ^5.12.0
   # Working with Wifi(get LAN IP address)
+  # Web platform not supported
+  # platform-specific settings
   network_info_plus: ^6.1.4
 
 dev_dependencies:
