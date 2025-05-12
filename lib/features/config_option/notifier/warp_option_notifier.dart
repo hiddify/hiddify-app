@@ -1,5 +1,6 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/model/config_option_failure.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
@@ -7,40 +8,40 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-part 'warp_option_notifier.freezed.dart';
 part 'warp_option_notifier.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
+  SharedPreferences get _prefs => ref.read(sharedPreferencesProvider).requireValue;
+
   @override
-  WarpOptions build() {
-    final consent = _prefs.getBool(warpConsentGiven) ?? false;
+  AsyncValue<String> build() {
     bool hasWarpConfig = false;
     try {
-      final accountId = _prefs.getString("warp-account-id");
-      final accessToken = _prefs.getString("warp-access-token");
+      final accountId = _prefs.getString(WarpConst.warpAccountId);
+      final accessToken = _prefs.getString(WarpConst.warpAccessToken);
       hasWarpConfig = accountId != null && accessToken != null;
     } catch (e) {
       loggy.warning(e);
     }
 
-    return WarpOptions(
-      consentGiven: consent,
-      configGeneration: hasWarpConfig ? const AsyncValue.data("") : AsyncError(const MissingWarpConfigFailure(), StackTrace.current),
-    );
+    return hasWarpConfig ? const AsyncValue.data("") : AsyncError(const MissingWarpConfigFailure(), StackTrace.current);
   }
 
-  SharedPreferences get _prefs => ref.read(sharedPreferencesProvider).requireValue;
-
-  Future<void> agree() async {
-    await ref.read(sharedPreferencesProvider).requireValue.setBool(warpConsentGiven, true);
-    state = state.copyWith(consentGiven: true);
-    await generateWarpConfig();
+  Future<void> genWarps({bool showDialog = true}) async {
+    final warpLog = await _genWarpConfig();
+    await _genWarp2Config();
+    if (warpLog != null) {
+      if (showDialog) ref.read(dialogNotifierProvider.notifier).showWarpConfig(warpLog);
+      state = AsyncValue.data(warpLog);
+    } else {
+      state = AsyncError(const MissingWarpConfigFailure(), StackTrace.current);
+    }
   }
 
-  Future<void> generateWarpConfig() async {
-    if (state.configGeneration.isLoading) return;
-    state = state.copyWith(configGeneration: const AsyncLoading());
+  Future<String?> _genWarpConfig() async {
+    if (state is AsyncLoading) return null;
+    state = const AsyncLoading();
 
     final result = await AsyncValue.guard(() async {
       final warp = await ref
@@ -59,12 +60,13 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
       return warp.log;
     });
 
-    state = state.copyWith(configGeneration: result);
+    state = result;
+    return result.value;
   }
 
-  Future<void> generateWarp2Config() async {
-    if (state.configGeneration.isLoading) return;
-    state = state.copyWith(configGeneration: const AsyncLoading());
+  Future<String?> _genWarp2Config() async {
+    if (state is AsyncLoading) return null;
+    state = const AsyncLoading();
 
     final result = await AsyncValue.guard(() async {
       final warp = await ref
@@ -83,16 +85,23 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
       return warp.log;
     });
 
-    state = state.copyWith(configGeneration: result);
+    return result.value;
   }
-
-  static const warpConsentGiven = "warp_consent_given";
 }
 
-@freezed
-class WarpOptions with _$WarpOptions {
-  const factory WarpOptions({
-    required bool consentGiven,
-    required AsyncValue<String> configGeneration,
-  }) = _WarpOptions;
+@riverpod
+class WarpLicenseNotifier extends _$WarpLicenseNotifier with AppLogger {
+  SharedPreferences get _prefs => ref.read(sharedPreferencesProvider).requireValue;
+
+  @override
+  bool build() {
+    final consent = _prefs.getBool(WarpConst.warpConsentGiven) ?? false;
+    return consent;
+  }
+
+  Future<void> agree() async {
+    await ref.read(sharedPreferencesProvider).requireValue.setBool(WarpConst.warpConsentGiven, true);
+    await ref.read(warpOptionNotifierProvider.notifier).genWarps(showDialog: false);
+    state = true;
+  }
 }

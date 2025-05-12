@@ -6,7 +6,6 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/optional_range.dart';
-import 'package:hiddify/core/widget/custom_alert_dialog.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
 import 'package:hiddify/features/config_option/widget/preference_tile.dart';
@@ -21,66 +20,40 @@ class WarpOptionsTiles extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-
+    final theme = Theme.of(context);
     final warpOptions = ref.watch(warpOptionNotifierProvider);
-    final warpPrefaceCompleted = warpOptions.consentGiven;
-    final enableWarp = ref.watch(ConfigOptions.enableWarp);
-    final canChangeOptions = warpPrefaceCompleted && enableWarp;
-
-    ref.listen(
-      warpOptionNotifierProvider.select((value) => value.configGeneration),
-      (previous, next) async {
-        if (next case AsyncData(value: final log) when log.isNotEmpty) {
-          await CustomAlertDialog(
-            title: t.config.warpConfigGenerated,
-            message: log,
-          ).show(context);
-        }
-      },
-    );
-
+    final isWarpEnabled = ref.watch(ConfigOptions.enableWarp);
     return Column(
       children: [
         SwitchListTile.adaptive(
           title: Text(t.config.enableWarp),
-          value: enableWarp,
+          value: isWarpEnabled,
           onChanged: (value) async {
-            if (!warpPrefaceCompleted) {
-              final agreed = await showDialog<bool>(
-                context: context,
-                builder: (context) => const WarpLicenseAgreementModal(),
-              );
-              if (agreed ?? false) {
-                await ref.read(warpOptionNotifierProvider.notifier).agree();
-                await ref.read(ConfigOptions.enableWarp.notifier).update(value);
-              }
-            } else {
-              await ref.read(ConfigOptions.enableWarp.notifier).update(value);
-            }
+            await ref.read(ConfigOptions.enableWarp.notifier).update(value);
+            await ref.read(warpOptionNotifierProvider.notifier).genWarps();
           },
         ),
         ListTile(
           title: Text(t.config.generateWarpConfig),
-          subtitle: canChangeOptions
-              ? switch (warpOptions.configGeneration) {
-                  AsyncLoading() => const LinearProgressIndicator(),
-                  AsyncError() => Text(
-                      t.config.missingWarpConfig,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
-                    ),
-                  _ => null,
-                }
-              : null,
-          enabled: canChangeOptions,
+          subtitle: !isWarpEnabled
+              ? null
+              : warpOptions.when(
+                  data: (_) => null,
+                  error: (_, __) => Text(
+                    t.config.missingWarpConfig,
+                    style: TextStyle(color: theme.colorScheme.error),
+                  ),
+                  loading: () => const LinearProgressIndicator(),
+                ),
+          enabled: isWarpEnabled,
           onTap: () async {
-            await ref.read(warpOptionNotifierProvider.notifier).generateWarpConfig();
-            await ref.read(warpOptionNotifierProvider.notifier).generateWarp2Config();
+            await ref.read(warpOptionNotifierProvider.notifier).genWarps();
           },
         ),
         ChoicePreferenceWidget(
           selected: ref.watch(ConfigOptions.warpDetourMode),
           preferences: ref.watch(ConfigOptions.warpDetourMode.notifier),
-          enabled: canChangeOptions,
+          enabled: isWarpEnabled,
           choices: WarpDetourMode.values,
           title: t.config.warpDetourMode,
           presentChoice: (value) => value.present(t),
@@ -88,20 +61,20 @@ class WarpOptionsTiles extends HookConsumerWidget {
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.warpLicenseKey),
           preferences: ref.watch(ConfigOptions.warpLicenseKey.notifier),
-          enabled: canChangeOptions,
+          enabled: isWarpEnabled,
           title: t.config.warpLicenseKey,
           presentValue: (value) => value.isEmpty ? t.general.notSet : value,
         ),
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.warpCleanIp),
           preferences: ref.watch(ConfigOptions.warpCleanIp.notifier),
-          enabled: canChangeOptions,
+          enabled: isWarpEnabled,
           title: t.config.warpCleanIp,
         ),
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.warpPort),
           preferences: ref.watch(ConfigOptions.warpPort.notifier),
-          enabled: canChangeOptions,
+          enabled: isWarpEnabled,
           title: t.config.warpPort,
           inputToValue: int.tryParse,
           validateInput: isPort,
@@ -110,7 +83,7 @@ class WarpOptionsTiles extends HookConsumerWidget {
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.warpNoise),
           preferences: ref.watch(ConfigOptions.warpNoise.notifier),
-          enabled: canChangeOptions,
+          enabled: isWarpEnabled,
           title: t.config.warpNoise,
           inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
           presentValue: (value) => value.present(t),
@@ -119,13 +92,13 @@ class WarpOptionsTiles extends HookConsumerWidget {
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.warpNoiseMode),
           preferences: ref.watch(ConfigOptions.warpNoiseMode.notifier),
-          enabled: canChangeOptions,
+          enabled: isWarpEnabled,
           title: t.config.warpNoiseMode,
         ),
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.warpNoiseSize),
           preferences: ref.watch(ConfigOptions.warpNoiseSize.notifier),
-          enabled: canChangeOptions,
+          enabled: isWarpEnabled,
           title: t.config.warpNoiseSize,
           inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
           presentValue: (value) => value.present(t),
@@ -134,7 +107,7 @@ class WarpOptionsTiles extends HookConsumerWidget {
         ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.warpNoiseDelay),
           preferences: ref.watch(ConfigOptions.warpNoiseDelay.notifier),
-          enabled: canChangeOptions,
+          enabled: isWarpEnabled,
           title: t.config.warpNoiseDelay,
           inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
           presentValue: (value) => value.present(t),
@@ -145,13 +118,13 @@ class WarpOptionsTiles extends HookConsumerWidget {
   }
 }
 
-class WarpLicenseAgreementModal extends HookConsumerWidget {
-  const WarpLicenseAgreementModal({super.key});
+class WarpLicenseDialog extends HookConsumerWidget {
+  const WarpLicenseDialog({super.key});
 
   // for focus management
   KeyEventResult _handleKeyEvent(KeyEvent event, String key) {
     if (KeyboardConst.select.contains(event.logicalKey) && event is KeyUpEvent) {
-      UriUtils.tryLaunch(Uri.parse(WarpLicenseAgreementConst.url[key]!));
+      UriUtils.tryLaunch(Uri.parse(WarpConst.url[key]!));
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -162,12 +135,12 @@ class WarpLicenseAgreementModal extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     // for focus management
     final focusStates = <String, ValueNotifier<bool>>{
-      WarpLicenseAgreementConst.warpTermsOfServiceKey: useState<bool>(false),
-      WarpLicenseAgreementConst.warpPrivacyPolicyKey: useState<bool>(false),
+      WarpConst.warpTermsOfServiceKey: useState<bool>(false),
+      WarpConst.warpPrivacyPolicyKey: useState<bool>(false),
     };
     final focusNodes = <String, FocusNode>{
-      WarpLicenseAgreementConst.warpTermsOfServiceKey: useFocusNode(),
-      WarpLicenseAgreementConst.warpPrivacyPolicyKey: useFocusNode(),
+      WarpConst.warpTermsOfServiceKey: useFocusNode(),
+      WarpConst.warpPrivacyPolicyKey: useFocusNode(),
     };
     useEffect(() {
       for (final entry in focusNodes.entries) {
@@ -182,13 +155,13 @@ class WarpLicenseAgreementModal extends HookConsumerWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Focus(focusNode: focusNodes[WarpLicenseAgreementConst.warpTermsOfServiceKey], onKeyEvent: (node, event) => _handleKeyEvent(event, WarpLicenseAgreementConst.warpTermsOfServiceKey), child: const Gap(0.1)),
-              Focus(focusNode: focusNodes[WarpLicenseAgreementConst.warpPrivacyPolicyKey], onKeyEvent: (node, event) => _handleKeyEvent(event, WarpLicenseAgreementConst.warpPrivacyPolicyKey), child: const Gap(0.1)),
+              Focus(focusNode: focusNodes[WarpConst.warpTermsOfServiceKey], onKeyEvent: (node, event) => _handleKeyEvent(event, WarpConst.warpTermsOfServiceKey), child: const Gap(0.1)),
+              Focus(focusNode: focusNodes[WarpConst.warpPrivacyPolicyKey], onKeyEvent: (node, event) => _handleKeyEvent(event, WarpConst.warpPrivacyPolicyKey), child: const Gap(0.1)),
               Text.rich(
                 t.config.warpConsent.description(
                   tos: (text) => TextSpan(
                     text: text,
-                    style: TextStyle(color: focusStates[WarpLicenseAgreementConst.warpTermsOfServiceKey]!.value ? Colors.green : Colors.blue),
+                    style: TextStyle(color: focusStates[WarpConst.warpTermsOfServiceKey]!.value ? Colors.green : Colors.blue),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () async {
                         await UriUtils.tryLaunch(
@@ -198,7 +171,7 @@ class WarpLicenseAgreementModal extends HookConsumerWidget {
                   ),
                   privacy: (text) => TextSpan(
                     text: text,
-                    style: TextStyle(color: focusStates[WarpLicenseAgreementConst.warpPrivacyPolicyKey]!.value ? Colors.green : Colors.blue),
+                    style: TextStyle(color: focusStates[WarpConst.warpPrivacyPolicyKey]!.value ? Colors.green : Colors.blue),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () async {
                         await UriUtils.tryLaunch(
@@ -207,7 +180,7 @@ class WarpLicenseAgreementModal extends HookConsumerWidget {
                       },
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -226,6 +199,22 @@ class WarpLicenseAgreementModal extends HookConsumerWidget {
           child: Text(t.general.agree),
         ),
       ],
+    );
+  }
+}
+
+class WarpConfigDialog extends HookConsumerWidget {
+  const WarpConfigDialog({super.key, required this.content});
+  final String content;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    return ConstrainedBox(
+      constraints: AlertDialogConst.boxConstraints,
+      child: AlertDialog(
+        title: Text(t.config.warpConfigGenerated),
+        content: Text(content),
+      ),
     );
   }
 }

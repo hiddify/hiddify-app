@@ -4,7 +4,6 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/common/custom_text_scroll.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
 import 'package:hiddify/features/config_option/overview/PlatformListSection.dart';
 import 'package:hiddify/features/config_option/overview/tlsfragment_widgets.dart';
 import 'package:hiddify/features/config_option/overview/warp_options_widgets.dart';
@@ -17,8 +16,6 @@ class QuickSettingsModal extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-
-    final warpPrefaceCompleted = ref.watch(warpOptionNotifierProvider).consentGiven;
 
     final warpLabel = (ref.watch(ConfigOptions.warpDetourMode) == WarpDetourMode.warpOverProxy) ? t.config.enableWarpSecure : t.config.enableWarpForProxy;
 
@@ -51,13 +48,11 @@ class QuickSettingsModal extends HookConsumerWidget {
             PlatformListSection(
               sectionIcon: const Icon(FontAwesomeIcons.cloudflare),
               sectionTitle: warpLabel,
-              title: warpPrefaceCompleted
-                  ? SwitchListTile.adaptive(
-                      value: ref.watch(ConfigOptions.enableWarp),
-                      onChanged: ref.watch(ConfigOptions.enableWarp.notifier).update,
-                      title: Text(warpLabel),
-                    )
-                  : null,
+              title: SwitchListTile.adaptive(
+                value: ref.watch(ConfigOptions.enableWarp),
+                onChanged: ref.watch(ConfigOptions.enableWarp.notifier).update,
+                title: Text(warpLabel),
+              ),
               items: const [
                 WarpOptionsTiles(),
               ],
@@ -66,13 +61,11 @@ class QuickSettingsModal extends HookConsumerWidget {
             PlatformListSection(
               sectionIcon: const Icon(FontAwesomeIcons.expeditedssl),
               sectionTitle: t.config.section.tlsTricks,
-              title: warpPrefaceCompleted
-                  ? SwitchListTile.adaptive(
-                      value: ref.watch(ConfigOptions.enableTlsFragment),
-                      onChanged: ref.watch(ConfigOptions.enableTlsFragment.notifier).update,
-                      title: Text(t.config.enableTlsFragment),
-                    )
-                  : null,
+              title: SwitchListTile.adaptive(
+                value: ref.watch(ConfigOptions.enableTlsFragment),
+                onChanged: ref.watch(ConfigOptions.enableTlsFragment.notifier).update,
+                title: Text(t.config.enableTlsFragment),
+              ),
               items: const [
                 TlsfragmentTiles(),
               ],

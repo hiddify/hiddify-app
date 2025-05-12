@@ -61,12 +61,15 @@ abstract class IntroConst {
   };
 }
 
-abstract class WarpLicenseAgreementConst {
+abstract class WarpConst {
+  static const warpAccountId = 'warp-account-id';
+  static const warpAccessToken = "warp-access-token";
+  static const warpConsentGiven = "warp-consent-given";
   static const warpTermsOfServiceKey = 'warp-terms-of-service';
   static const warpPrivacyPolicyKey = 'warp-privacy-policy';
   static const url = <String, String>{
-    WarpLicenseAgreementConst.warpTermsOfServiceKey: Constants.cfWarpTermsOfService,
-    WarpLicenseAgreementConst.warpPrivacyPolicyKey: Constants.cfWarpPrivacyPolicy,
+    WarpConst.warpTermsOfServiceKey: Constants.cfWarpTermsOfService,
+    WarpConst.warpPrivacyPolicyKey: Constants.cfWarpPrivacyPolicy,
   };
 }
 
