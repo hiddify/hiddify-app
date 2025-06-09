@@ -71,7 +71,7 @@ jobs:
           - platform: windows
             os: windows-2019
             aarch: amd64
-            targets: exe,msix
+            targets: exe
 
           - platform: linux
             os: ubuntu-22.04
@@ -156,11 +156,6 @@ jobs:
           echo "keyPassword=${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}" >> android/key.properties
 
-      - name: Setup Windows Signing Properties
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
-        run: |
-            [IO.File]::WriteAllBytes("windows\sign.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_SIGNING_KEY }}"))
-            (Get-Content "windows\packaging\msix\make_config.yaml") -replace '^certificate_password:.*$', 'certificate_password: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}' | Set-Content "windows\packaging\msix\make_config.yaml"
         
       # - name: Temporary disable Permission Handler for windows due to its issue in permission
       #   if: ${{ startsWith(matrix.platform,'windows') }}
@@ -183,17 +178,6 @@ jobs:
         run: |
           make ${{ matrix.platform }}-release
 
-      - name: Code Sign
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
-        uses: hiddify/signtool-code-sign-sha256@main
-        with:
-          certificate: '${{ secrets.WINDOWS_SIGNING_KEY }}'
-          cert-password: '${{ secrets.WINDOWS_SIGNING_PASSWORD }}'
-          cert-sha1: '${{ secrets.WINDOWS_SIGNING_SHA1 }}'
-          folder: 'dist'
-          timestamp-server: 'http://timestamp.digicert.com'
-          recursive: true
-          description: 'Hiddify'
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows'

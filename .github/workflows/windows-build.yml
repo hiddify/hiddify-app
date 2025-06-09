@@ -1,0 +1,32 @@
+name: Build Windows Executable
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.1'
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Windows EXE
+        run: flutter build windows
+
+      - name: Upload EXE build
+        uses: actions/upload-artifact@v4
+        with:
+          name: xvpn-portable
+          path: build/windows/runner/Release/

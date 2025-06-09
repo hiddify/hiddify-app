@@ -155,7 +155,7 @@ android-aab-release:
 	ls -R build/app/outputs
 
 windows-release:
-	flutter_distributor package --flutter-build-args=verbose --platform windows --targets exe,msix $(DISTRIBUTOR_ARGS)
+        flutter_distributor package --flutter-build-args=verbose --platform windows --targets exe $(DISTRIBUTOR_ARGS)
 
 linux-release: 
 	flutter_distributor package --flutter-build-args=verbose --platform linux --targets deb,rpm,appimage $(DISTRIBUTOR_ARGS)
