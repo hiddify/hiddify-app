@@ -133,6 +133,9 @@ dependencies:
   # Web platform not supported
   # platform-specific settings
   network_info_plus: ^6.1.4
+  # prevent closing app on back button
+  # platform-specific settings
+  back_button_interceptor: ^8.0.4
 
 dev_dependencies:
   # flutter_test:
