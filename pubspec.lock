@@ -568,10 +568,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_adaptive_scaffold
-      sha256: "7279d74da2f2531a16d21c2ec327308778c3aedd672dfe4eaf3bf416463501f8"
+      sha256: "5eb1d1d174304a4e67c4bb402ed38cb4a5ebdac95ce54099e91460accb33d295"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.2"
+    version: "0.3.3+1"
   flutter_animate:
     dependency: "direct main"
     description:
@@ -823,18 +823,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: f02fd7d2a4dc512fec615529824fdd217fecb3a3d3de68360293a551f21634b3
+      sha256: "0b1e06223bee260dee31a171fb1153e306907563a0b0225e8c1733211911429a"
       url: "https://pub.dev"
     source: hosted
-    version: "14.8.1"
-  go_router_builder:
-    dependency: "direct dev"
-    description:
-      name: go_router_builder
-      sha256: a79845a602f9ce3d837408c408915ea034eb2957fe0b527cfa3fc50e2e9bcb93
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.8.2"
+    version: "15.1.2"
   google_identity_services_web:
     dependency: transitive
     description:

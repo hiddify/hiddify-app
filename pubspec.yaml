@@ -67,13 +67,13 @@ dependencies:
   accessibility_tools: ^2.2.3
   neat_periodic_task: ^2.0.1
   watcher: ^1.1.0
-  go_router: ^14.3.0
+  go_router: ^15.1.2
   flutter_animate: ^4.5.0
   flutter_svg: ^2.0.10+1
   gap: ^3.0.1
   # percent_indicator_premium: ^0.0.2
   sliver_tools: ^0.2.12
-  flutter_adaptive_scaffold: ^0.3.1
+  flutter_adaptive_scaffold: ^0.3.3
   font_awesome_flutter: ^10.7.0
   upgrader: ^11.3.0
   toastification: ^2.3.0
@@ -148,7 +148,6 @@ dev_dependencies:
   ffigen: ^16.0.0
   slang_build_runner: ^4.4.0
   flutter_gen_runner: ^5.4.0
-  go_router_builder: ^2.4.1
   dependency_validator: ^4.1.1
   dart_mappable_builder: ^4.2.1
   # protoc_builder: ^0.4.1
