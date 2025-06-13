@@ -2,9 +2,11 @@
   "general": {
     "appTitle": "Hiddify",
     "add": "Add",
+    "save": "Save",
     "help": "Help",
     "continue": "Continue",
     "ok": "Ok",
+    "close": "Close",
     "cancel": "Cancel",
     "discard": "Discard",
     "empty": "Empty",
@@ -33,6 +35,11 @@
     "showLess": "Show Less",
     "openAppSettings": "Open App Settings",
     "grantPermission": "Grant Permission"
+  },
+  "unknownDomains": {
+    "title": "External Link Warning",
+    "youAreAboutToVisit": "You are about to visit:",
+    "thisWebsiteIsNotInOurTrustedList": "This website is not in our trusted list. Please proceed with caution."
   },
   "intro": {
     "termsAndPolicyCaution(rich)": "By Continuing You Agree With ${tap(@:about.termsAndConditions)}",
@@ -288,8 +295,6 @@
         "pageTitle": "Rule",
         "ruleChanged": "Rule changed",
         "ruleChangedMsg": "Do you want to save your edits?",
-        "save": "Save",
-        "discard": "Discard",
         "onlyTunMode": "Available only in TUN Mode",
         "notAvailabeInThisPlatform": "Not available in this platform",
         "canNotBeEmpty": "Can not be empty",

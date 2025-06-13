@@ -2,9 +2,11 @@
   "general": {
     "appTitle": "هیدیفای",
     "add": "افزودن",
+    "save": "ذخیره",
     "help": "راهنما",
     "continue": "ادامه",
     "ok": "تأیید",
+    "close": "بستن",
     "cancel": "لغو",
     "discard": "صرف‌نظر",
     "empty": "خالی",
@@ -33,6 +35,11 @@
     "showLess": "نمایش کمتر",
     "openAppSettings": "باز کردن تنظیمات برنامه",
     "grantPermission": "اجازه دادن"
+  },
+  "unknownDomains": {
+    "title": "هشدار لینک خارجی",
+    "youAreAboutToVisit": "شما در شرف بازدید هستید:",
+    "thisWebsiteIsNotInOurTrustedList": "نشانی وب اینترنتی در لیست مورد اعتماد ما قرار ندارد. لطفاً با احتیاط ادامه دهید."
   },
   "intro": {
     "termsAndPolicyCaution(rich)": "در صورت ادامه با ${tap(@:about.termsAndConditions)} موافقت می‌کنید",
