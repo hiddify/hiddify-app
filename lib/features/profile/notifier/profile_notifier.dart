@@ -9,7 +9,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/add/model/free_profiles_model.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
@@ -18,6 +18,7 @@ import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -46,9 +47,9 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
             if (error case ProfileInvalidUrlFailure()) {
               notification.showErrorToast(t.failure.profiles.invalidUrl);
             } else {
-              notification.showErrorDialog(
-                t.presentError(error, action: t.profile.add.failureMsg),
-              );
+              ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(
+                    t.presentError(error, action: t.profile.add.failureMsg),
+                  );
             }
         }
       },
@@ -200,9 +201,9 @@ class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
           case AsyncData(value: final _?):
             notification.showSuccessToast(t.profile.update.successMsg);
           case AsyncError(:final error):
-            notification.showErrorDialog(
-              t.presentError(error, action: t.profile.update.failureMsg),
-            );
+            ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(
+                  t.presentError(error, action: t.profile.update.failureMsg),
+                );
         }
       },
     );
