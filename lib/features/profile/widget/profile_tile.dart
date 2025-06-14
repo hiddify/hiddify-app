@@ -10,10 +10,8 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
-import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
-import 'package:hiddify/features/common/confirmation_dialogs.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dart';
@@ -110,9 +108,9 @@ class ProfileTile extends HookConsumerWidget {
                     onTap: () {
                       if (isMain) {
                         if (Breakpoints.small.isActive(context)) {
-                          ref.read(buttomSheetsNotifierProvider.notifier).showProfilesOverview();
+                          ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
                         } else {
-                          const ProfilesOverviewRoute().go(context);
+                          context.goNamed('profiles');
                         }
                       } else {
                         if (selectActiveMutation.state.isInProgress) return;
@@ -123,7 +121,7 @@ class ProfileTile extends HookConsumerWidget {
                         if (context.canPop()) {
                           context.pop();
                         } else {
-                          const HomeRoute().go(context);
+                          context.goNamed('home');
                         }
                       }
                     },
@@ -272,7 +270,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
     );
     final deleteProfileMutation = useMutation(
       initialOnFailure: (err) {
-        CustomAlertDialog.fromErr(t.presentError(err)).show(context);
+        ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(err));
       },
     );
 
@@ -331,8 +329,13 @@ class ProfileActionsMenu extends HookConsumerWidget {
       AdaptiveMenuItem(
         icon: FluentIcons.edit_24_regular,
         title: t.profile.edit.buttonTxt,
-        onTap: () async {
-          await ProfileDetailsRoute(profile.id).push(context);
+        onTap: () {
+          context.goNamed(
+            'profileDetails',
+            pathParameters: {
+              'id': profile.id,
+            },
+          );
         },
       ),
       // if (!profile.active)
@@ -341,12 +344,14 @@ class ProfileActionsMenu extends HookConsumerWidget {
         title: t.profile.delete.buttonTxt,
         onTap: () async {
           if (deleteProfileMutation.state.isInProgress) return;
-          await showConfirmationDialog(
-            context,
-            title: t.profile.delete.buttonTxt,
-            message: t.profile.delete.confirmationMsg,
-            icon: FluentIcons.delete_24_regular,
-          ).then(
+          await ref
+              .read(dialogNotifierProvider.notifier)
+              .showConfirmation(
+                title: t.profile.delete.buttonTxt,
+                message: t.profile.delete.confirmationMsg,
+                icon: FluentIcons.delete_24_regular,
+              )
+              .then(
             (deleteConfirmed) {
               if (!deleteConfirmed) return;
               deleteProfileMutation.setFuture(
