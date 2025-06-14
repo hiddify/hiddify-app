@@ -7,7 +7,6 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
-import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
@@ -15,8 +14,8 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-class LogsOverviewPage extends HookConsumerWidget with PresLogger {
-  const LogsOverviewPage({super.key});
+class LogsPage extends HookConsumerWidget with PresLogger {
+  const LogsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,6 +52,39 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
         : [];
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(t.logs.pageTitle),
+        actions: [
+          if (state.paused)
+            IconButton(
+              onPressed: notifier.resume,
+              icon: const Icon(FluentIcons.play_20_regular),
+              tooltip: t.logs.resumeTooltip,
+              iconSize: 20,
+            )
+          else
+            IconButton(
+              onPressed: notifier.pause,
+              icon: const Icon(FluentIcons.pause_20_regular),
+              tooltip: t.logs.pauseTooltip,
+              iconSize: 20,
+            ),
+          IconButton(
+            onPressed: notifier.clear,
+            icon: const Icon(FluentIcons.delete_lines_20_regular),
+            tooltip: t.logs.clearTooltip,
+            iconSize: 20,
+          ),
+          if (popupButtons.isNotEmpty)
+            PopupMenuButton(
+              icon: Icon(AdaptiveIcon(context).more),
+              itemBuilder: (context) {
+                return popupButtons;
+              },
+            ),
+          const Gap(8),
+        ],
+      ),
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return <Widget>[
@@ -60,40 +92,9 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
               handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
               sliver: MultiSliver(
                 children: [
-                  NestedAppBar(
-                    forceElevated: innerBoxIsScrolled,
-                    title: Text(t.logs.pageTitle),
-                    actions: [
-                      if (state.paused)
-                        IconButton(
-                          onPressed: notifier.resume,
-                          icon: const Icon(FluentIcons.play_20_regular),
-                          tooltip: t.logs.resumeTooltip,
-                          iconSize: 20,
-                        )
-                      else
-                        IconButton(
-                          onPressed: notifier.pause,
-                          icon: const Icon(FluentIcons.pause_20_regular),
-                          tooltip: t.logs.pauseTooltip,
-                          iconSize: 20,
-                        ),
-                      IconButton(
-                        onPressed: notifier.clear,
-                        icon: const Icon(FluentIcons.delete_lines_20_regular),
-                        tooltip: t.logs.clearTooltip,
-                        iconSize: 20,
-                      ),
-                      if (popupButtons.isNotEmpty)
-                        PopupMenuButton(
-                          icon: Icon(AdaptiveIcon(context).more),
-                          itemBuilder: (context) {
-                            return popupButtons;
-                          },
-                        ),
-                      const Gap(8),
-                    ],
-                  ),
+                  // NestedAppBar(
+                  //   forceElevated: innerBoxIsScrolled,
+                  // ),
                   SliverPinnedHeader(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
