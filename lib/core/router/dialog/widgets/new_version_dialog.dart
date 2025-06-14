@@ -11,26 +11,13 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
   NewVersionDialog(
     this.currentVersion,
     this.newVersion, {
+    super.key,
     this.canIgnore = true,
-  }) : super(key: _dialogKey);
+  });
 
   final String currentVersion;
   final RemoteVersionEntity newVersion;
   final bool canIgnore;
-
-  static final _dialogKey = GlobalKey(debugLabel: 'new version dialog');
-
-  Future<void> show(BuildContext context) async {
-    if (_dialogKey.currentContext == null) {
-      return showDialog(
-        context: context,
-        useRootNavigator: true,
-        builder: (context) => this,
-      );
-    } else {
-      loggy.warning("new version dialog is already open");
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
