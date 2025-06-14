@@ -8,7 +8,6 @@ import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
-import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dart';
@@ -16,8 +15,8 @@ import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ProfilesOverviewPage extends HookConsumerWidget {
-  const ProfilesOverviewPage({super.key});
+class ProfilesPage extends HookConsumerWidget {
+  const ProfilesPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,7 +46,7 @@ class ProfilesOverviewPage extends HookConsumerWidget {
       profilesOverviewNotifierProvider,
       (_, next) {
         if (next.hasValue && next.value!.isEmpty) {
-          const HomeRoute().go(context);
+          context.goNamed('home');
         }
       },
     );
@@ -57,7 +56,7 @@ class ProfilesOverviewPage extends HookConsumerWidget {
         title: Text(t.profile.overviewPageTitle),
         actions: [
           IconButton(
-            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
+            onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
             icon: const Icon(FluentIcons.add_24_filled),
             tooltip: t.profile.add.shortBtnTxt, // Tooltip for accessibility
           ),
@@ -73,7 +72,6 @@ class ProfilesOverviewPage extends HookConsumerWidget {
           ),
           const Gap(8),
         ],
-        automaticallyImplyLeading: false,
       ),
       body: asyncProfiles.when(
         data: (data) => ListView.separated(
@@ -154,7 +152,7 @@ class ProfilesOverviewModal extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       IconButton(
-                        onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
+                        onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
                         icon: const Icon(FluentIcons.add_24_filled),
                         tooltip: t.profile.add.shortBtnTxt, // Tooltip for accessibility
                       ),
