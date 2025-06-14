@@ -28,7 +28,7 @@ class FixBtns extends ConsumerWidget {
             title: t.scanQr,
             icon: Icons.qr_code_scanner,
             onTap: () async {
-              final cr = await ref.read(dialogNotifierProvider.notifier).showQrScanner<String>();
+              final cr = await ref.read(dialogNotifierProvider.notifier).showQrScanner();
               if (cr == null) return;
               ref.read(addProfileNotifierProvider.notifier).add(cr);
             },
