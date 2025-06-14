@@ -1,13 +1,9 @@
 import 'package:dartx/dartx.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
-import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
@@ -18,9 +14,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 class HomePage extends HookConsumerWidget {
-  const HomePage({super.key, this.url});
-
-  final String? url;
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,26 +23,15 @@ class HomePage extends HookConsumerWidget {
     // final hasAnyProfile = ref.watch(hasAnyProfileProvider);
     final activeProfile = ref.watch(activeProfileProvider);
 
-    useEffect(() {
-      if (url != null) {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) {
-            ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(url: url);
-          },
-        );
-      }
-      return null;
-    }, [url]);
-
     return Scaffold(
       appBar: AppBar(
-        leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
-            ? DrawerButton(
-                onPressed: () {
-                  RootScaffold.stateKey.currentState?.openDrawer();
-                },
-              )
-            : null,
+        // leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
+        //     ? DrawerButton(
+        //         onPressed: () {
+        //           RootScaffold.stateKey.currentState?.openDrawer();
+        //         },
+        //       )
+        //     : null,
         title: Row(
           children: [
             Assets.images.logo.svg(height: 24),
@@ -84,8 +67,8 @@ class HomePage extends HookConsumerWidget {
             key: const ValueKey("profile_quick_settings"),
             label: t.config.quickSettings,
             child: IconButton(
-              icon: Icon(FluentIcons.options_24_filled, color: theme.colorScheme.primary),
-              onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showQuickSettings(),
+              icon: Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
+              onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
             ),
           ),
           const Gap(8),
@@ -93,8 +76,11 @@ class HomePage extends HookConsumerWidget {
             key: const ValueKey("profile_add_button"),
             label: t.profile.add.buttonText,
             child: IconButton(
-              icon: Icon(FluentIcons.add_24_filled, color: theme.colorScheme.primary),
-              onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
+              icon: Icon(
+                Icons.add_rounded,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
             ),
           ),
           const Gap(8),
