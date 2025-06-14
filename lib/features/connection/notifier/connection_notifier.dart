@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/data/connection_repository.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
@@ -144,8 +144,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
         .mapLeft((ConnectionFailure err) async {
       loggy.warning("error connecting", err);
       //Go err is not normal object to see the go errors are string and need to be dumped
-      final notification = ref.read(inAppNotificationControllerProvider);
-      await notification.showErrorDialog(err.present(ref.read(translationsProvider).requireValue));
+      await ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
       loggy.warning(err);
       if (err.toString().contains("panic")) {
         await Sentry.captureException(Exception(err.toString()));
