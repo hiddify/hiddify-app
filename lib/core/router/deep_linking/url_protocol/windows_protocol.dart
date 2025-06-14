@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
-import 'package:hiddify/core/router/url_protocol/protocol.dart';
+import 'package:hiddify/core/router/deep_linking/url_protocol/protocol.dart';
 import 'package:win32/win32.dart';
 
 const _hive = HKEY_CURRENT_USER;

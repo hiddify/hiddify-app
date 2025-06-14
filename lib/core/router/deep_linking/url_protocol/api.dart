@@ -1,4 +1,4 @@
-import 'package:hiddify/core/router/url_protocol/windows_protocol.dart' if (dart.library.js_interop) 'web_url_protocol.dart';
+import 'package:hiddify/core/router/deep_linking/url_protocol/windows_protocol.dart' if (dart.library.js_interop) 'web_url_protocol.dart';
 
 /// Registers a protocol by [scheme] to allow for links in the form `<scheme>://...`
 /// to be processed by this application. By default, opening a link will open
