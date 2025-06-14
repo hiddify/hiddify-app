@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
-import 'package:hiddify/features/connection/widget/experimental_feature_notice.dart';
 import 'package:hiddify/features/home/widget/new_con_button.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/utils/alerts.dart';
-import 'package:hiddify/utils/uri_utils.dart';
+import 'package:hiddify/features/settings/notifier/config_option_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ConnectionButton extends ConsumerStatefulWidget {
@@ -56,24 +53,13 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
       connectionNotifierProvider,
       (_, next) {
         if (next case AsyncError(:final error)) {
-          CustomAlertDialog.fromErr(t.presentError(error)).show(context);
+          ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(error));
         }
         if (next case AsyncData(value: Disconnected(:final connectionFailure?))) {
-          CustomAlertDialog.fromErr(t.presentError(connectionFailure)).show(context);
+          ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(connectionFailure));
         }
       },
     );
-
-    // final buttonTheme = ConnectionButtonTheme.light;
-
-    Future<bool> showExperimentalNotice() async {
-      final hasExperimental = ref.read(ConfigOptions.hasExperimentalFeatures);
-      final canShowNotice = !ref.read(disableExperimentalFeatureNoticeProvider);
-      if (hasExperimental && canShowNotice && context.mounted) {
-        return await const ExperimentalFeatureNoticeDialog().show(context) ?? false;
-      }
-      return true;
-    }
 
     return AnimatedBuilder(
       animation: _animation,
@@ -85,42 +71,20 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
           },
           onTap: () async {
             if (ref.read(activeProfileProvider).value == null) {
-              await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(t.home.noActiveProfileMsg),
-                  content: Text(t.home.emptyProfilesMsg.text),
-                  actions: [
-                    TextButton(
-                      onPressed: () async {
-                        await UriUtils.tryLaunch(
-                          Uri.parse(t.home.emptyProfilesMsg.buttonHelp.url),
-                        );
-                      },
-                      child: Text(t.home.emptyProfilesMsg.buttonHelp.label),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      },
-                      child: Text(t.general.ok),
-                    ),
-                  ],
-                ),
-              );
-              ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile();
+              await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile();
+              ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
             }
             // return await showNewConnectionButton(context, ref);
             switch (connectionStatus) {
               case AsyncData(value: Disconnected()) || AsyncError():
                 {
-                  if (await showExperimentalNotice()) {
+                  if (await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
                     return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
                   }
                 }
               case AsyncData(value: Connected()):
                 {
-                  if (requiresReconnect == true && await showExperimentalNotice()) {
+                  if (requiresReconnect == true && await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
                     return await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
                   }
                   return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
