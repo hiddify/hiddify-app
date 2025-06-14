@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/add/widgets/free_btn.dart';
 import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
-import 'package:hiddify/utils/uri_utils.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FreeBtns extends ConsumerWidget {
@@ -44,29 +43,7 @@ class FreeBtns extends ConsumerWidget {
                     onTap: () async {
                       final title = isFa ? profile.title.fa : profile.title.en;
                       final consent = isFa ? profile.consent.fa : profile.consent.en;
-                      final result = await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                            title: Text(title),
-                            content: ConstrainedBox(
-                              constraints: AlertDialogConst.boxConstraints,
-                              child: MarkdownBody(
-                                data: consent,
-                                // styleSheet: MarkdownStyleSheet(textAlign: WrapAlignment.spaceBetween),
-                                onTapLink: (text, href, title) => UriUtils.tryLaunch(Uri.parse(href!)),
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                child: Text(t.general.cancel),
-                                onPressed: () => Navigator.of(context).pop(),
-                              ),
-                              TextButton(
-                                child: Text(t.general.kContinue),
-                                onPressed: () => Navigator.of(context).pop(true),
-                              ),
-                            ]),
-                      );
+                      final result = await ref.read(dialogNotifierProvider.notifier).showFreeProfileConsent(title: title, consent: consent);
                       if (result == true) {
                         final localOverride = ProfileLocalOverride(
                           name: title,
