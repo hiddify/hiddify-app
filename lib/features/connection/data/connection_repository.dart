@@ -2,8 +2,8 @@ import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/notifier/warp_option_notifier.dart';
 
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
@@ -115,7 +115,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
         final isWarpLicenseAgreed = ref.read(warpLicenseNotifierProvider);
         final isWarpEnabled = (mainJson['warp'] as Map)['enable'] == true;
         if (!isWarpLicenseAgreed && isWarpEnabled) {
-          final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense<bool>();
+          final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense();
           if (isAgreed == true) {
             await ref.read(warpLicenseNotifierProvider.notifier).agree();
             final options = await $(getConfigOption());
