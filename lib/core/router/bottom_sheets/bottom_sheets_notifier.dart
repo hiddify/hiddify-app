@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/router/bottom_sheets/widgets/quick_settings_modal.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
 import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
-import 'package:hiddify/features/settings/widget/quick_settings_modal.dart';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'bottom_sheets_notifier.g.dart';
