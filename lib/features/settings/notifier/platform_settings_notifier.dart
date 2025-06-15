@@ -1,4 +1,4 @@
-import 'package:hiddify/features/settings/data/settings_data_providers.dart';
+import 'package:hiddify/features/settings/data/battery_optimization.dart/battery_optimization_provider.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -9,12 +9,13 @@ part 'platform_settings_notifier.g.dart';
 class IgnoreBatteryOptimizations extends _$IgnoreBatteryOptimizations {
   @override
   Future<bool> build() async {
-    return ref.watch(settingsRepositoryProvider).isIgnoringBatteryOptimizations().getOrElse((l) => false).run();
+    return await ref.read(batteryOptimizationRepositoryProvider).isIgnoringBatteryOptimizations() ?? false;
   }
 
   Future<void> request() async {
-    await ref.read(settingsRepositoryProvider).requestIgnoreBatteryOptimizations().run();
-    await Future.delayed(const Duration(seconds: 1));
+    state = const AsyncLoading();
+    await ref.read(batteryOptimizationRepositoryProvider).requestIgnoreBatteryOptimizations();
+    Future.delayed(const Duration(seconds: 1));
     ref.invalidateSelf();
   }
 }
