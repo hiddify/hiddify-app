@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -52,7 +52,7 @@ class ShortcutWrapper extends HookConsumerWidget {
           ),
           OpenSettingsIntent: CallbackAction(
             onInvoke: (_) {
-              if (rootNavigatorKey.currentContext != null) {
+              if (rootNavKey.currentContext != null) {
                 // const SettingsRoute().go(rootNavigatorKey.currentContext!);
               }
               return null;
@@ -60,9 +60,9 @@ class ShortcutWrapper extends HookConsumerWidget {
           ),
           PasteIntent: CallbackAction(
             onInvoke: (_) async {
-              if (rootNavigatorKey.currentContext != null) {
+              if (rootNavKey.currentContext != null) {
                 final captureResult = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
-                ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(url: captureResult);
+                ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: captureResult);
               }
               return null;
             },
