@@ -97,10 +97,10 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                         selectedIndex: navigationShell.currentIndex,
                         destinations: _navRailDests(_actions(t, showProfilesAction, isSmallActive)),
                         onDestinationSelected: (index) => _onTap(context, index),
-                        trailing: Expanded(
+                        trailing: const Expanded(
                           child: Align(
                             alignment: Alignment.bottomCenter,
-                            child: SideBarStatsOverview(disabled: popupIsShowing),
+                            child: SideBarStatsOverview(),
                           ),
                         ),
                       ),
