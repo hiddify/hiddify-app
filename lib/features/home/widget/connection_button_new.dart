@@ -8,7 +8,7 @@ import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/home/widget/new_con_button.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/features/settings/notifier/config_option_notifier.dart';
+import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ConnectionButton extends ConsumerStatefulWidget {
