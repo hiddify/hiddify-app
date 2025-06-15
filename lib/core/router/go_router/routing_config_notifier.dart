@@ -7,7 +7,7 @@ import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/custom_transition.dart';
 import 'package:hiddify/core/router/go_router/helper/is_small_active.dart';
 import 'package:hiddify/core/router/go_router/helper/prevent_closing_branch.dart';
-import 'package:hiddify/core/router/go_router/riverpod_listenable.dart';
+import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/features/about/widget/about_page.dart';
 import 'package:hiddify/features/home/widget/home_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';

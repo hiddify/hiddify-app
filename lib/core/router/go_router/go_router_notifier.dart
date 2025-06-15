@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hiddify/core/router/go_router/riverpod_listenable.dart';
+import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
