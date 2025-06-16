@@ -21,6 +21,7 @@ import 'package:hiddify/core/router/dialog/widgets/setting_text_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/unknown_domains_warning_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/warp_license_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/window_closing_dialog.dart';
+import 'package:hiddify/core/router/go_router/helper/popup_count_notifier.dart';
 import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
 import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 import 'package:hiddify/features/common/qr_code_dialog.dart';
@@ -241,14 +242,4 @@ class DialogNotifier extends _$DialogNotifier {
   Future<void> showCustomAlertFromErr(({String type, String? message}) err) async {
     return await _show<void>(CustomAlertDialog.fromErr(err));
   }
-}
-
-@Riverpod(keepAlive: true)
-class PopupCountNotifier extends _$PopupCountNotifier {
-  @override
-  int build() => 0;
-
-  void increase() => state += 1;
-
-  void decrease() => state -= 1;
 }
