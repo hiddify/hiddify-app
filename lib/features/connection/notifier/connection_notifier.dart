@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/data/connection_repository.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
@@ -11,6 +11,7 @@ import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -28,7 +29,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       }).run();
     }
 
-    ref.listenSelf(
+    listenSelf(
       (previous, next) async {
         if (previous == next) return;
         if (previous case AsyncData(:final value) when !value.isConnected) {
@@ -143,8 +144,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
         .mapLeft((ConnectionFailure err) async {
       loggy.warning("error connecting", err);
       //Go err is not normal object to see the go errors are string and need to be dumped
-      final notification = ref.read(inAppNotificationControllerProvider);
-      await notification.showErrorDialog(err.present(ref.read(translationsProvider).requireValue));
+      await ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
       loggy.warning(err);
       if (err.toString().contains("panic")) {
         await Sentry.captureException(Exception(err.toString()));
@@ -163,7 +163,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
 }
 
 @Riverpod(keepAlive: true)
-Future<bool> serviceRunning(ServiceRunningRef ref) => ref
+Future<bool> serviceRunning(Ref ref) => ref
     .watch(
       connectionNotifierProvider.selectAsync((data) => data.isConnected),
     )

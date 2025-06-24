@@ -7,10 +7,10 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/details/json_editor.dart';
 import 'package:hiddify/features/profile/details/profile_details_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
-import 'package:hiddify/features/settings/widgets/widgets.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:humanizer/humanizer.dart';
@@ -44,7 +44,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
             } else {
               action = t.profile.add.failureMsg;
             }
-            CustomAlertDialog.fromErr(t.presentError(error, action: action)).show(context);
+            ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(error, action: action));
         }
       },
     );
@@ -177,19 +177,19 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                               ),
                               leading: const Icon(FluentIcons.arrow_sync_24_regular),
                               onTap: () async {
-                                final intervalInHours = await SettingsInputDialog(
-                                  title: t.profile.detailsForm.updateIntervalDialogTitle,
-                                  initialValue: options?.updateInterval.inHours,
-                                  optionalAction: (
-                                    t.general.state.disable,
-                                    () => ref.read(provider.notifier).setField(
-                                          updateInterval: none(),
-                                        ),
-                                  ),
-                                  validator: isPort,
-                                  mapTo: int.tryParse,
-                                  digitsOnly: true,
-                                ).show(context);
+                                final intervalInHours = await ref.read(dialogNotifierProvider.notifier).showSettingInput(
+                                      title: t.profile.detailsForm.updateIntervalDialogTitle,
+                                      initialValue: options?.updateInterval.inHours,
+                                      optionalAction: (
+                                        t.general.state.disable,
+                                        () => ref.read(provider.notifier).setField(
+                                              updateInterval: none(),
+                                            ),
+                                      ),
+                                      validator: isPort,
+                                      mapTo: int.tryParse,
+                                      digitsOnly: true,
+                                    );
                                 if (intervalInHours == null) return;
                                 ref.read(provider.notifier).setField(
                                       updateInterval: optionOf(intervalInHours),

@@ -43,6 +43,9 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
     String? message,
   ]) = BackgroundCoreNotAvailable;
 
+  @With<ExpectedMeasuredFailure>()
+  const factory ConnectionFailure.missiingWarpLicense() = MissingWarpLicense;
+
   @override
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
@@ -75,6 +78,10 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
       BackgroundCoreNotAvailable(:final message) => (
           type: t.failure.connectivity.core,
           message: message,
+        ),
+      MissingWarpLicense() => (
+          type: t.failure.warp.missingLicense,
+          message: t.failure.warp.missingLicenseMsg,
         ),
     };
   }

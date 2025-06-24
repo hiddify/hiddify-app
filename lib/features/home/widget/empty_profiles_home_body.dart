@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/core/router/router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class EmptyProfilesHomeBody extends HookConsumerWidget {
@@ -20,7 +19,7 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
           Text(t.home.emptyProfilesMsg.text),
           const Gap(16),
           ElevatedButton(
-            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
+            onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
             // icon: const Icon(FluentIcons.add_24_regular),
             child: Text(t.profile.add.buttonText),
           ),
@@ -30,26 +29,26 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
   }
 }
 
-class EmptyActiveProfileHomeBody extends HookConsumerWidget {
-  const EmptyActiveProfileHomeBody({super.key});
+// class EmptyActiveProfileHomeBody extends HookConsumerWidget {
+//   const EmptyActiveProfileHomeBody({super.key});
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final t = ref.watch(translationsProvider).requireValue;
 
-    return SliverFillRemaining(
-      hasScrollBody: false,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(t.home.noActiveProfileMsg),
-          const Gap(16),
-          OutlinedButton(
-            onPressed: () => const ProfilesOverviewRoute().push(context),
-            child: Text(t.profile.overviewPageTitle),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//     return SliverFillRemaining(
+//       hasScrollBody: false,
+//       child: Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         children: [
+//           Text(t.home.noActiveProfileMsg),
+//           const Gap(16),
+//           OutlinedButton(
+//             onPressed: () => const ProfilesOverviewRoute().push(context),
+//             child: Text(t.profile.overviewPageTitle),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

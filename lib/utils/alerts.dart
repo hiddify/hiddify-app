@@ -2,53 +2,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:toastification/toastification.dart';
 
-class CustomAlertDialog extends StatelessWidget {
-  const CustomAlertDialog({
-    super.key,
-    this.title,
-    required this.message,
-  });
-
-  final String? title;
-  final String message;
-
-  factory CustomAlertDialog.fromErr(({String type, String? message}) err) => CustomAlertDialog(
-        title: err.message == null ? null : err.type,
-        message: err.message ?? err.type,
-      );
-
-  Future<void> show(BuildContext context) async {
-    await showDialog(
-      context: context,
-      useRootNavigator: true,
-      builder: (context) => this,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final localizations = MaterialLocalizations.of(context);
-
-    return AlertDialog(
-      title: title != null ? Text(title!) : null,
-      content: SingleChildScrollView(
-        child: SizedBox(
-          width: 468,
-          child: Text(message),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text(localizations.okButtonLabel),
-        ),
-      ],
-    );
-  }
-}
-
 enum AlertType {
   info,
   error,

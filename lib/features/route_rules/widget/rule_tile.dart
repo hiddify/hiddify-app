@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/features/common/confirmation_dialogs.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/route_rules/notifier/rules_notifier.dart';
 import 'package:hiddify/features/route_rules/overview/rule_page.dart';
 import 'package:hiddify/features/route_rules/widget/setting_detail_chips.dart';
@@ -38,12 +38,11 @@ class RuleTile extends HookConsumerWidget {
 
   Future handleDelete(BuildContext context, WidgetRef ref) async {
     final tRouteRule = ref.watch(translationsProvider).requireValue.settings.routeRule;
-    final result = await showConfirmationDialog(
-      context,
-      title: tRouteRule.deleteRule,
-      message: tRouteRule.deleteRule,
-      okText: tRouteRule.deleteRule,
-    );
+    final result = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
+          title: tRouteRule.deleteRule,
+          message: tRouteRule.deleteRule,
+          okText: tRouteRule.deleteRule,
+        );
     if (result == true) {
       await ref.read(rulesNotifierProvider.notifier).deleteRule(rule.listOrder);
     }

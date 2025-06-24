@@ -1,13 +1,9 @@
 import 'package:dartx/dartx.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
-import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
@@ -18,36 +14,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 class HomePage extends HookConsumerWidget {
-  const HomePage({super.key, this.url});
-
-  final String? url;
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final t = ref.watch(translationsProvider).requireValue;
     // final hasAnyProfile = ref.watch(hasAnyProfileProvider);
     final activeProfile = ref.watch(activeProfileProvider);
 
-    useEffect(() {
-      if (url != null) {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) {
-            ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(url: url);
-          },
-        );
-      }
-      return null;
-    }, [url]);
-
     return Scaffold(
       appBar: AppBar(
-        leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
-            ? DrawerButton(
-                onPressed: () {
-                  RootScaffold.stateKey.currentState?.openDrawer();
-                },
-              )
-            : null,
+        // leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
+        //     ? DrawerButton(
+        //         onPressed: () {
+        //           RootScaffold.stateKey.currentState?.openDrawer();
+        //         },
+        //       )
+        //     : null,
         title: Row(
           children: [
             Assets.images.logo.svg(height: 24),
@@ -79,37 +63,27 @@ class HomePage extends HookConsumerWidget {
           //     material: (context, platform) => MaterialIconButtonData(
           //           tooltip: t.profile.add.buttonText,
           //         )),
-          TextButton(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Text(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle),
-                // const Gap(8),
-                Semantics(
-                  key: const ValueKey("profile_quick_settings"),
-                  label: t.config.quickSettings,
-                  child: const Icon(FluentIcons.options_24_filled, size: 24),
-                ),
-              ],
+          Semantics(
+            key: const ValueKey("profile_quick_settings"),
+            label: t.config.quickSettings,
+            child: IconButton(
+              icon: Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
+              onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
             ),
-            // onPressed: () => const QuickSettingsRoute().push(context),
-            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showQuickSettings(),
           ),
-          TextButton(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Text(t.profile.add.buttonText, style: CupertinoTheme.of(context).textTheme.navActionTextStyle),
-                // const Gap(8),
-                Semantics(
-                  key: const ValueKey("profile_add_button"),
-                  label: t.profile.add.buttonText,
-                  child: const Icon(Icons.add, size: 24),
-                ),
-              ],
+          const Gap(8),
+          Semantics(
+            key: const ValueKey("profile_add_button"),
+            label: t.profile.add.buttonText,
+            child: IconButton(
+              icon: Icon(
+                Icons.add_rounded,
+                color: theme.colorScheme.primary,
+              ),
+              onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
             ),
-            onPressed: () => ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile(),
           ),
+          const Gap(8),
         ],
       ),
       body: Container(
@@ -118,7 +92,7 @@ class HomePage extends HookConsumerWidget {
             image: const AssetImage('assets/images/world_map.png'), // Replace with your image path
             fit: BoxFit.cover,
             opacity: 0.09,
-            colorFilter: Theme.of(context).brightness == Brightness.dark
+            colorFilter: theme.brightness == Brightness.dark
                 ? ColorFilter.mode(Colors.white.withValues(alpha: .15), BlendMode.srcIn) //
                 : ColorFilter.mode(Colors.grey.withValues(alpha: 1), BlendMode.srcATop), // Apply white tint in dark mode
           ),

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/http_client/http_client_provider.dart';
@@ -10,11 +9,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
-import 'package:hiddify/core/preferences/preferences_provider.dart';
-import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/config_option/notifier/warp_option_notifier.dart';
-import 'package:hiddify/features/config_option/overview/warp_options_widgets.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/add/model/free_profiles_model.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
@@ -23,15 +18,17 @@ import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'profile_notifier.g.dart';
 
 @riverpod
-class AddProfile extends _$AddProfile with AppLogger {
+class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
   @override
   AsyncValue<Unit?> build() {
     ref.disposeDelay(const Duration(minutes: 1));
@@ -50,9 +47,9 @@ class AddProfile extends _$AddProfile with AppLogger {
             if (error case ProfileInvalidUrlFailure()) {
               notification.showErrorToast(t.failure.profiles.invalidUrl);
             } else {
-              notification.showErrorDialog(
-                t.presentError(error, action: t.profile.add.failureMsg),
-              );
+              ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(
+                    t.presentError(error, action: t.profile.add.failureMsg),
+                  );
             }
         }
       },
@@ -82,17 +79,17 @@ class AddProfile extends _$AddProfile with AppLogger {
           );
         } else if (LinkParser.protocol(rawInput) case (final parsed)?) {
           loggy.debug("adding profile, content");
-          var name = parsed.name;
-          final oldItem = await _profilesRepo.getByName(name);
-          if (name == "Hiddify WARP" && oldItem != null) {
+          final name = StringBuffer(parsed.name);
+          final oldItem = await _profilesRepo.getByName('$name');
+          if ('$name' == "Hiddify WARP" && oldItem != null) {
             _profilesRepo.deleteById(oldItem.id).run();
           }
-          while (await _profilesRepo.getByName(name) != null) {
-            name += '${randomInt(0, 9).run()}';
+          while (await _profilesRepo.getByName('$name') != null) {
+            name.write('${randomInt(0, 9).run()}');
           }
           task = _profilesRepo.addByContent(
             parsed.content,
-            name: name,
+            name: '$name',
             markAsActive: markAsActive,
           );
         } else {
@@ -115,51 +112,84 @@ class AddProfile extends _$AddProfile with AppLogger {
     );
   }
 
-  Future<void> check4Warp(String rawInput) async {
-    for (final line in rawInput.split("\n")) {
-      if (line.toLowerCase().startsWith("warp://")) {
-        final _prefs = ref.read(sharedPreferencesProvider).requireValue;
-        final _warp = ref.read(warpOptionNotifierProvider.notifier);
-
-        final consent = false && (_prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false);
-
-        final t = ref.read(translationsProvider).requireValue;
-        final notification = ref.read(inAppNotificationControllerProvider);
-
-        if (!consent) {
-          final agreed = await showDialog<bool>(
-            context: RootScaffold.stateKey.currentContext!,
-            builder: (context) => const WarpLicenseAgreementModal(),
-          );
-
-          if (agreed ?? false) {
-            await _prefs.setBool(WarpOptionNotifier.warpConsentGiven, true);
-            final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
-            toast?.pause();
-            await _warp.generateWarpConfig();
-            toast?.start();
-          } else {
-            return;
-          }
-        }
-
-        final accountId = _prefs.getString("warp2-account-id");
-        final accessToken = _prefs.getString("warp2-access-token");
-        final hasWarp2Config = accountId != null && accessToken != null;
-
-        if (!hasWarp2Config || true) {
-          final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
-          toast?.pause();
-          await _warp.generateWarp2Config();
-          toast?.start();
-        }
-      }
-    }
+  Future<void> addManual(String name, String url, double updateInterval) async {
+    if (state.isLoading) return;
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () async {
+        final task = await _profilesRepo
+            .add(
+              RemoteProfileEntity(
+                id: const Uuid().v4(),
+                active: true,
+                name: name.trim(),
+                url: url.trim(),
+                options: updateInterval.toInt() == 0 ? null : ProfileOptions(updateInterval: Duration(hours: updateInterval.toInt())),
+                lastUpdate: DateTime.now(),
+              ),
+            )
+            .run();
+        return task.match(
+          (err) {
+            loggy.warning("failed to add profile", err);
+            throw err;
+          },
+          (r) {
+            loggy.info(
+              "successfully added profile, mark as active? [true]",
+            );
+            return r;
+          },
+        );
+      },
+    );
   }
+
+  // Future<void> check4Warp(String rawInput) async {
+  //   for (final line in rawInput.split("\n")) {
+  //     if (line.toLowerCase().startsWith("warp://")) {
+  //       final _prefs = ref.read(sharedPreferencesProvider).requireValue;
+  //       final _warp = ref.read(warpOptionNotifierProvider.notifier);
+
+  //       final consent = false && (_prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false);
+
+  //       final t = ref.read(translationsProvider).requireValue;
+  //       final notification = ref.read(inAppNotificationControllerProvider);
+
+  //       if (!consent) {
+  //         final agreed = await showDialog<bool>(
+  //           context: RootScaffold.stateKey.currentContext!,
+  //           builder: (context) => const WarpLicenseAgreementModal(),
+  //         );
+
+  //         if (agreed ?? false) {
+  //           await _prefs.setBool(WarpOptionNotifier.warpConsentGiven, true);
+  //           final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
+  //           toast?.pause();
+  //           await _warp.generateWarpConfig();
+  //           toast?.start();
+  //         } else {
+  //           return;
+  //         }
+  //       }
+
+  //       final accountId = _prefs.getString("warp2-account-id");
+  //       final accessToken = _prefs.getString("warp2-access-token");
+  //       final hasWarp2Config = accountId != null && accessToken != null;
+
+  //       if (!hasWarp2Config || true) {
+  //         final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
+  //         toast?.pause();
+  //         await _warp.generateWarp2Config();
+  //         toast?.start();
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 @riverpod
-class UpdateProfile extends _$UpdateProfile with AppLogger {
+class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
   @override
   AsyncValue<Unit?> build(String id) {
     ref.disposeDelay(const Duration(minutes: 1));
@@ -171,9 +201,9 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
           case AsyncData(value: final _?):
             notification.showSuccessToast(t.profile.update.successMsg);
           case AsyncError(:final error):
-            notification.showErrorDialog(
-              t.presentError(error, action: t.profile.update.failureMsg),
-            );
+            ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(
+                  t.presentError(error, action: t.profile.update.failureMsg),
+                );
         }
       },
     );
@@ -212,7 +242,7 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
 }
 
 @riverpod
-class FreeSwitch extends _$FreeSwitch {
+class FreeSwitchNotifier extends _$FreeSwitchNotifier {
   @override
   bool build() {
     return false;
@@ -222,7 +252,21 @@ class FreeSwitch extends _$FreeSwitch {
 }
 
 @riverpod
-class FreeProfiles extends _$FreeProfiles {
+class AddProfilePageNotifier extends _$AddProfilePageNotifier {
+  @override
+  AddProfilePages build() => AddProfilePages.options;
+
+  void goOptions() => state = AddProfilePages.options;
+  void goManual() => state = AddProfilePages.manual;
+}
+
+enum AddProfilePages {
+  options,
+  manual,
+}
+
+@riverpod
+class FreeProfilesNotifier extends _$FreeProfilesNotifier {
   @override
   Future<List<FreeProfile>> build() async {
     final httpClient = ref.watch(httpClientProvider);
@@ -236,7 +280,7 @@ class FreeProfiles extends _$FreeProfiles {
 
 @riverpod
 Future<List<FreeProfile>> freeProfilesFilteredByRegion(Ref ref) async {
-  final freeProfiles = await ref.watch(freeProfilesProvider.future);
+  final freeProfiles = await ref.watch(freeProfilesNotifierProvider.future);
   // if (!freeProfiles.hasValue) return <FreeProfile>[];
   final region = ref.watch(ConfigOptions.region);
   return freeProfiles.where((e) => e.region.contains(region.name) || e.region.isEmpty).toList();

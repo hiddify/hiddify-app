@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/app_update/data/app_update_data_providers.dart';
@@ -9,6 +10,7 @@ import 'package:hiddify/features/app_update/model/app_update_failure.dart';
 import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_state.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:upgrader/upgrader.dart';
 import 'package:version/version.dart';
@@ -18,7 +20,7 @@ part 'app_update_notifier.g.dart';
 const _debugUpgrader = true;
 
 @riverpod
-Upgrader upgrader(UpgraderRef ref) => Upgrader(
+Upgrader upgrader(Ref ref) => Upgrader(
       storeController: UpgraderStoreController(
         onAndroid: () => ref.read(appInfoProvider).requireValue.release.allowCustomUpdateChecker ? UpgraderAppcastStore(appcastURL: Constants.appCastUrl) : UpgraderPlayStore(),
         oniOS: () => UpgraderAppStore(),

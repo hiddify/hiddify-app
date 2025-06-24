@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -60,21 +61,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       selected: selected,
       selectedTileColor: theme.colorScheme.primaryContainer,
       onTap: onTap,
-      onLongPress: () {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: SelectionArea(child: Text(proxy.tagDisplay)),
-            content: OutboundInfoWidget(outboundInfo: proxy),
-            actions: [
-              TextButton(
-                onPressed: Navigator.of(context).pop,
-                child: Text(MaterialLocalizations.of(context).closeButtonLabel),
-              ),
-            ],
-          ),
-        );
-      },
+      onLongPress: () async => await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: proxy),
       horizontalTitleGap: 4,
     );
   }

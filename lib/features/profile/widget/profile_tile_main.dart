@@ -1,14 +1,14 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:gap/gap.dart';
 
 class ProfileTileMain extends HookConsumerWidget {
   const ProfileTileMain({
@@ -34,7 +34,7 @@ class ProfileTileMain extends HookConsumerWidget {
     'https://x.com/hiddify_com',
     'https://facebook.com/hiddify',
   ];
-  Future<void> _launchUrlWithCheck(BuildContext context, String url) async {
+  Future<void> _launchUrlWithCheck(BuildContext context, WidgetRef ref, String url) async {
     final uri = Uri.parse(url);
     final host = uri.host.toLowerCase();
 
@@ -44,43 +44,7 @@ class ProfileTileMain extends HookConsumerWidget {
     }
 
     // Show warning dialog for unknown domains
-    final shouldLaunch = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(FluentIcons.warning_24_filled, color: Colors.orange),
-            Gap(8),
-            Text('External Link Warning'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('You are about to visit:'),
-            const Gap(8),
-            Text(
-              url,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Gap(16),
-            const Text('This website is not in our trusted list. Please proceed with caution.'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Continue'),
-          ),
-        ],
-      ),
-    );
-
+    final shouldLaunch = await ref.read(dialogNotifierProvider.notifier).showUnknownDomainsWarning(url: url);
     if (shouldLaunch == true) {
       await launchUrl(uri);
     }
@@ -106,7 +70,7 @@ class ProfileTileMain extends HookConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: InkWell(
-              onTap: () => ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity),
+              onTap: () => ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity),
               borderRadius: BorderRadius.circular(12),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -174,7 +138,7 @@ class ProfileTileMain extends HookConsumerWidget {
                         if (subInfo.webPageUrl != null)
                           Expanded(
                             child: InkWell(
-                              onTap: () => _launchUrlWithCheck(context, subInfo.webPageUrl!),
+                              onTap: () => _launchUrlWithCheck(context, ref, subInfo.webPageUrl!),
                               borderRadius: BorderRadius.circular(8),
                               child: _InfoItem(
                                 icon: _getLinkIcon(subInfo.webPageUrl!, FluentIcons.building_shop_24_regular),
@@ -187,7 +151,7 @@ class ProfileTileMain extends HookConsumerWidget {
                           const Gap(12),
                           Expanded(
                             child: InkWell(
-                              onTap: () => _launchUrlWithCheck(context, subInfo.supportUrl!),
+                              onTap: () => _launchUrlWithCheck(context, ref, subInfo.supportUrl!),
                               borderRadius: BorderRadius.circular(8),
                               child: _InfoItem(
                                 icon: _getLinkIcon(subInfo.supportUrl!, FontAwesomeIcons.headset),

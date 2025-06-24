@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/router/routes.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
-import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -38,24 +38,6 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
       }
     }
 
-    // Handle showing proxy info
-    Future<void> handleProxyInfo() async {
-      if (!context.mounted) return;
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: SelectionArea(child: Text(activeProxy.tagDisplay)),
-          content: OutboundInfoWidget(outboundInfo: activeProxy),
-          actions: [
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: Text(MaterialLocalizations.of(context).closeButtonLabel),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -72,15 +54,14 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
       ),
       child: InkWell(
         onTap: () {
-          // showBottomSheet(context: context, builder: (builder)=>ProxiesOverviewPage());
-          const ProxiesRoute().go(context);
+          context.goNamed('proxies');
         },
         child: Row(
           children: [
             InkWell(
               onTap: () async {
                 await handleUrlTest();
-                await handleProxyInfo();
+                await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: activeProxy);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),

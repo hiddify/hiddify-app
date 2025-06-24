@@ -9,11 +9,9 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
-import 'package:hiddify/features/common/confirmation_dialogs.dart';
-import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dart';
@@ -58,6 +56,8 @@ class ProfileTile extends HookConsumerWidget {
       _ => null,
     };
 
+    final showActionButton = profile is RemoteProfileEntity || !isMain;
+
     // final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
     // final double effectiveElevation = profile.active ? 12 : 4;
     // final effectiveOutlineColor = profile.active ? theme.colorScheme.outline : Colors.transparent;
@@ -79,7 +79,7 @@ class ProfileTile extends HookConsumerWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (profile is RemoteProfileEntity || !isMain) ...[
+              if (showActionButton) ...[
                 SizedBox(
                   width: 48,
                   child: Semantics(
@@ -104,13 +104,13 @@ class ProfileTile extends HookConsumerWidget {
                   namesRoute: isMain,
                   label: isMain ? t.profile.activeProfileBtnSemanticLabel : null,
                   child: InkWell(
-                    borderRadius: ProfileTileConst.endBorderRadius(Directionality.of(context)),
+                    borderRadius: showActionButton ? ProfileTileConst.endBorderRadius(Directionality.of(context)) : ProfileTileConst.cardBorderRadius,
                     onTap: () {
                       if (isMain) {
                         if (Breakpoints.small.isActive(context)) {
-                          ref.read(buttomSheetsNotifierProvider.notifier).showProfilesOverview();
+                          ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
                         } else {
-                          const ProfilesOverviewRoute().go(context);
+                          context.goNamed('profiles');
                         }
                       } else {
                         if (selectActiveMutation.state.isInProgress) return;
@@ -121,7 +121,7 @@ class ProfileTile extends HookConsumerWidget {
                         if (context.canPop()) {
                           context.pop();
                         } else {
-                          const HomeRoute().go(context);
+                          context.goNamed('home');
                         }
                       }
                     },
@@ -216,16 +216,16 @@ class ProfileActionButton extends HookConsumerWidget {
     if (profile case RemoteProfileEntity() when !showAllActions) {
       return Semantics(
         button: true,
-        enabled: !ref.watch(updateProfileProvider(profile.id)).isLoading,
+        enabled: !ref.watch(updateProfileNotifierProvider(profile.id)).isLoading,
         child: Tooltip(
           message: t.profile.update.tooltip,
           child: InkWell(
             borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
             onTap: () {
-              if (ref.read(updateProfileProvider(profile.id)).isLoading) {
+              if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
                 return;
               }
-              ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
+              ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
             },
             child: const Icon(FluentIcons.arrow_sync_24_filled),
           ),
@@ -270,7 +270,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
     );
     final deleteProfileMutation = useMutation(
       initialOnFailure: (err) {
-        CustomAlertDialog.fromErr(t.presentError(err)).show(context);
+        ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(err));
       },
     );
 
@@ -280,10 +280,10 @@ class ProfileActionsMenu extends HookConsumerWidget {
           title: t.profile.update.buttonTxt,
           icon: FluentIcons.arrow_sync_24_regular,
           onTap: () {
-            if (ref.read(updateProfileProvider(profile.id)).isLoading) {
+            if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
               return;
             }
-            ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
+            ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
           },
         ),
       AdaptiveMenuItem(
@@ -308,10 +308,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
               onTap: () async {
                 final link = LinkParser.generateSubShareLink(url, name);
                 if (link.isNotEmpty) {
-                  await QrCodeDialog(
-                    link,
-                    message: name,
-                  ).show(context);
+                  await ref.read(dialogNotifierProvider.notifier).showQrCode(link, message: name);
                 }
               },
             ),
@@ -332,8 +329,13 @@ class ProfileActionsMenu extends HookConsumerWidget {
       AdaptiveMenuItem(
         icon: FluentIcons.edit_24_regular,
         title: t.profile.edit.buttonTxt,
-        onTap: () async {
-          await ProfileDetailsRoute(profile.id).push(context);
+        onTap: () {
+          context.goNamed(
+            'profileDetails',
+            pathParameters: {
+              'id': profile.id,
+            },
+          );
         },
       ),
       // if (!profile.active)
@@ -342,12 +344,14 @@ class ProfileActionsMenu extends HookConsumerWidget {
         title: t.profile.delete.buttonTxt,
         onTap: () async {
           if (deleteProfileMutation.state.isInProgress) return;
-          await showConfirmationDialog(
-            context,
-            title: t.profile.delete.buttonTxt,
-            message: t.profile.delete.confirmationMsg,
-            icon: FluentIcons.delete_24_regular,
-          ).then(
+          await ref
+              .read(dialogNotifierProvider.notifier)
+              .showConfirmation(
+                title: t.profile.delete.buttonTxt,
+                message: t.profile.delete.confirmationMsg,
+                icon: FluentIcons.delete_24_regular,
+              )
+              .then(
             (deleteConfirmed) {
               if (!deleteConfirmed) return;
               deleteProfileMutation.setFuture(

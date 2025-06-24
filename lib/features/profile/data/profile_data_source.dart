@@ -69,7 +69,7 @@ class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin, I
         if (event == null) return event;
         final config = event.testUrl;
         if (config == null) return event;
-        loggy.debug('remove override form testUrl');
+        loggy.debug('remove local-override form testUrl');
         final json = jsonDecode(config) as Map<String, dynamic>;
         json.removeWhere((key, value) => key == ProfileLocalOverride.key);
         return event.copyWith(testUrl: Value(jsonEncode(json)));

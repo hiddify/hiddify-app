@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/features/common/confirmation_dialogs.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/route_rules/notifier/generic_list_notifier.dart';
 import 'package:hiddify/features/route_rules/notifier/rule_notifier.dart';
-import 'package:hiddify/features/route_rules/widget/setting_text.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:recase/recase.dart';
 import 'package:text_scroll/text_scroll.dart';
@@ -25,10 +24,10 @@ class GenericListPage extends HookConsumerWidget {
     final provider = genericListNotifierProvider(ruleListOrder, ruleEnum);
     final list = ref.watch(provider);
 
-    Future<void> addNewValue() => showDialog(
-          context: context,
-          builder: (context) => SettingTextDialog(lable: tGenericList.addNew, validator: validator),
-        ).then((value) => ref.read(provider.notifier).add(value));
+    Future<void> addNewValue() async {
+      final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(lable: tGenericList.addNew, validator: validator);
+      if (result is String) ref.read(provider.notifier).add(result);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -38,11 +37,10 @@ class GenericListPage extends HookConsumerWidget {
             onPressed: list.isEmpty
                 ? null
                 : () async {
-                    final result = await showConfirmationDialog(
-                      context,
-                      title: tGenericList.clearList,
-                      message: tGenericList.clearListMsg,
-                    );
+                    final result = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
+                          title: tGenericList.clearList,
+                          message: tGenericList.clearListMsg,
+                        );
                     if (result == true) ref.read(provider.notifier).reset();
                   },
             icon: const Icon(Icons.clear_all),
@@ -64,14 +62,14 @@ class GenericListPage extends HookConsumerWidget {
         itemBuilder: (context, index) => GenericListTile(
           value: list[index],
           onRemove: () => ref.read(provider.notifier).remove(index),
-          onUpdate: () => showDialog(
-            context: context,
-            builder: (context) => SettingTextDialog(
-              lable: tGenericList.update,
-              value: '${list[index]}',
-              validator: validator,
-            ),
-          ).then((value) => ref.read(provider.notifier).update(index, value)),
+          onUpdate: () async {
+            final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(
+                  lable: tGenericList.update,
+                  value: '${list[index]}',
+                  validator: validator,
+                );
+            if (result is String) ref.read(provider.notifier).update(index, result);
+          },
         ),
         itemCount: list.length,
       ),
