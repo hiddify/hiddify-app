@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
-import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
-import 'package:hiddify/features/window/widget/window_closing_dialog.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -51,7 +51,7 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
 
   @override
   Future<void> onWindowClose() async {
-    if (RootScaffold.stateKey.currentContext == null) {
+    if (branchNavKey.currentContext == null) {
       await ref.read(windowNotifierProvider.notifier).close();
       return;
     }
@@ -60,10 +60,7 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
       case ActionsAtClosing.ask:
         if (isWindowClosingDialogOpened) return;
         isWindowClosingDialogOpened = true;
-        await showDialog(
-          context: RootScaffold.stateKey.currentContext!,
-          builder: (BuildContext context) => const WindowClosingDialog(),
-        );
+        await ref.read(dialogNotifierProvider.notifier).showWindowClosing();
         isWindowClosingDialogOpened = false;
 
       case ActionsAtClosing.hide:

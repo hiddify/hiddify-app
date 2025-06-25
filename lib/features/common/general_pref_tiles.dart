@@ -1,16 +1,13 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/localization/locale_extensions.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/region.dart';
-import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/app_theme_mode.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/settings/widgets/settings_input_dialog.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class LocalePrefTile extends ConsumerWidget {
@@ -24,15 +21,15 @@ class LocalePrefTile extends ConsumerWidget {
     return ListTile(
       title: Text(t.settings.general.locale),
       subtitle: Text(locale.localeName),
-      leading: const Icon(FluentIcons.local_language_24_regular),
+      leading: const Icon(Icons.translate_rounded),
       onTap: () async {
-        final selectedLocale = await SettingsPickerDialog<AppLocale>(
-          title: t.settings.general.locale,
-          selected: locale,
-          onReset: () => ref.read(localePreferencesProvider.notifier).changeLocale(AppLocale.en),
-          options: AppLocale.values,
-          getTitle: (e) => e.localeName,
-        ).show(context);
+        final selectedLocale = await ref.read(dialogNotifierProvider.notifier).showSettingPicker<AppLocale>(
+              title: t.settings.general.locale,
+              selected: locale,
+              onReset: () => ref.read(localePreferencesProvider.notifier).changeLocale(AppLocale.en),
+              options: AppLocale.values,
+              getTitle: (e) => e.localeName,
+            );
         if (selectedLocale != null) {
           await ref.read(localePreferencesProvider.notifier).changeLocale(selectedLocale);
         }
@@ -56,26 +53,9 @@ class RegionPrefTile extends ConsumerWidget {
         region.present(t),
         style: Theme.of(context).textTheme.bodySmall,
       ),
-      leading: const Icon(FluentIcons.globe_location_24_regular),
+      leading: const Icon(Icons.place_rounded),
       onTap: () async {
-        final selectedRegion = await showDialog<Region>(
-          context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: Text(t.settings.general.region),
-              children: Region.values
-                  .map(
-                    (e) => RadioListTile(
-                      title: Text(e.present(t)),
-                      value: e,
-                      groupValue: region,
-                      onChanged: Navigator.of(context).maybePop,
-                    ),
-                  )
-                  .toList(),
-            );
-          },
-        );
+        final selectedRegion = await ref.read(dialogNotifierProvider.notifier).showRegion(selected: region);
         if (selectedRegion != null) {
           // await ref.read(Preferences.region.notifier).update(selectedRegion);
 
@@ -116,7 +96,7 @@ class EnableAnalyticsPrefTile extends ConsumerWidget {
         t.settings.general.enableAnalyticsMsg,
         style: Theme.of(context).textTheme.bodySmall,
       ),
-      secondary: const Icon(FluentIcons.bug_24_regular),
+      secondary: const Icon(Icons.analytics_rounded),
       value: enabled,
       onChanged: (value) async {
         if (onChanged != null) {
@@ -144,15 +124,22 @@ class ThemeModePrefTile extends ConsumerWidget {
     return ListTile(
       title: Text(t.settings.general.themeMode),
       subtitle: Text(themeMode.present(t)),
-      leading: const Icon(FluentIcons.weather_moon_20_regular),
+      leading: Icon(
+        switch (ref.watch(themePreferencesProvider)) {
+          AppThemeMode.system => Icons.auto_awesome_rounded,
+          AppThemeMode.light => Icons.light_mode_rounded,
+          AppThemeMode.dark => Icons.dark_mode_rounded,
+          AppThemeMode.black => Icons.contrast_rounded,
+        },
+      ),
       onTap: () async {
-        final selectedThemeMode = await SettingsPickerDialog<AppThemeMode>(
-          title: t.settings.general.themeMode,
-          selected: themeMode,
-          onReset: () => ref.read(themePreferencesProvider.notifier).changeThemeMode(AppThemeMode.system),
-          options: AppThemeMode.values,
-          getTitle: (e) => e.present(t),
-        ).show(context);
+        final selectedThemeMode = await ref.read(dialogNotifierProvider.notifier).showSettingPicker<AppThemeMode>(
+              title: t.settings.general.themeMode,
+              selected: themeMode,
+              onReset: () => ref.read(themePreferencesProvider.notifier).changeThemeMode(AppThemeMode.system),
+              options: AppThemeMode.values,
+              getTitle: (e) => e.present(t),
+            );
         if (selectedThemeMode != null) {
           await ref.read(themePreferencesProvider.notifier).changeThemeMode(selectedThemeMode);
         }
@@ -173,26 +160,9 @@ class ClosingPrefTile extends ConsumerWidget {
     return ListTile(
       title: Text(t.settings.general.actionAtClosing),
       subtitle: Text(action.present(t)),
-      leading: const Icon(FluentIcons.arrow_exit_20_regular),
+      leading: const Icon(Icons.logout_rounded),
       onTap: () async {
-        final selectedAction = await showDialog<ActionsAtClosing>(
-          context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: Text(t.settings.general.actionAtClosing),
-              children: ActionsAtClosing.values
-                  .map(
-                    (e) => RadioListTile(
-                      title: Text(e.present(t)),
-                      value: e,
-                      groupValue: action,
-                      onChanged: Navigator.of(context).maybePop,
-                    ),
-                  )
-                  .toList(),
-            );
-          },
-        );
+        final selectedAction = await ref.read(dialogNotifierProvider.notifier).showActionAtClosing(selected: action);
         if (selectedAction != null) {
           await ref.read(Preferences.actionAtClose.notifier).update(selectedAction);
         }

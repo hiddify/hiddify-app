@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 abstract class Constants {
   static const appName = "Hiddify";
@@ -46,4 +47,50 @@ abstract class ProfileTileConst {
   static const borderRadiusLeft = BorderRadius.horizontal(left: radius);
   static BorderRadius startBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusLeft : borderRadiusRight;
   static BorderRadius endBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusRight : borderRadiusLeft;
+}
+
+abstract class IntroConst {
+  static const maxwidth = 620;
+  static const termsAndConditionsKey = 'terms-and-conditions';
+  static const githubKey = 'github';
+  static const licenseKey = 'license';
+  static const url = <String, String>{
+    IntroConst.termsAndConditionsKey: Constants.termsAndConditionsUrl,
+    IntroConst.githubKey: Constants.githubUrl,
+    IntroConst.licenseKey: Constants.licenseUrl,
+  };
+}
+
+abstract class WarpConst {
+  static const warpAccountId = 'warp-account-id';
+  static const warpAccessToken = "warp-access-token";
+  static const warpConsentGiven = "warp-consent-given";
+  static const warpTermsOfServiceKey = 'warp-terms-of-service';
+  static const warpPrivacyPolicyKey = 'warp-privacy-policy';
+  static const url = <String, String>{
+    WarpConst.warpTermsOfServiceKey: Constants.cfWarpTermsOfService,
+    WarpConst.warpPrivacyPolicyKey: Constants.cfWarpPrivacyPolicy,
+  };
+}
+
+abstract class KeyboardConst {
+  static final allArrows = {
+    LogicalKeyboardKey.arrowUp,
+    LogicalKeyboardKey.arrowDown,
+    LogicalKeyboardKey.arrowLeft,
+    LogicalKeyboardKey.arrowRight,
+  };
+  static final horizontalArrows = {
+    LogicalKeyboardKey.arrowLeft,
+    LogicalKeyboardKey.arrowRight,
+  };
+  static final verticalArrows = {
+    LogicalKeyboardKey.arrowUp,
+    LogicalKeyboardKey.arrowDown,
+  };
+  static final select = {
+    LogicalKeyboardKey.select,
+    LogicalKeyboardKey.enter,
+    LogicalKeyboardKey.tab,
+  };
 }

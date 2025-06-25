@@ -1,0 +1,79 @@
+import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/features/common/custom_text_scroll.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/notifier/warp_option/warp_option_notifier.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class QuickSettingsModal extends HookConsumerWidget {
+  const QuickSettingsModal({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+
+    final warpLabel = (ref.watch(ConfigOptions.warpDetourMode) == WarpDetourMode.warpOverProxy) ? t.config.enableWarpSecure : t.config.enableWarpForProxy;
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
+              child: SegmentedButton(
+                segments: ServiceMode.choices
+                    .map(
+                      (e) => ButtonSegment(
+                        value: e,
+                        label: Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: CustomTextScroll(
+                            e.presentShort(t),
+                          ),
+                        ),
+                        tooltip: e.isExperimental ? t.settings.experimental : null,
+                      ),
+                    )
+                    .toList(),
+                selected: {ref.watch(ConfigOptions.serviceMode)},
+                onSelectionChanged: (newSet) => ref.read(ConfigOptions.serviceMode.notifier).update(newSet.first),
+              ),
+            ),
+            const Gap(12),
+            ListTile(
+              leading: const Icon(Icons.cloud_rounded),
+              title: Text(warpLabel),
+              onTap: () {
+                context.pop();
+                context.goNamed('warpOptions');
+              },
+              trailing: Switch.adaptive(
+                value: ref.watch(ConfigOptions.enableWarp),
+                onChanged: (value) async {
+                  await ref.read(ConfigOptions.enableWarp.notifier).update(value);
+                  await ref.read(warpOptionNotifierProvider.notifier).genWarps();
+                },
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.content_cut_rounded),
+              title: Text(t.config.section.tlsTricks),
+              onTap: () {
+                context.pop();
+                context.goNamed('tlsTricks');
+              },
+              trailing: Switch.adaptive(
+                value: ref.watch(ConfigOptions.enableTlsFragment),
+                onChanged: ref.read(ConfigOptions.enableTlsFragment.notifier).update,
+              ),
+            ),
+            const Gap(16),
+          ],
+        ),
+      ),
+    );
+  }
+}

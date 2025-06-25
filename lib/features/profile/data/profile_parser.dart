@@ -167,11 +167,21 @@ abstract class ProfileParser {
     });
   }
 
-  static Map<String, dynamic> mergeJson(Map<String, dynamic> main, Map<String, dynamic> override) {
+  static Map<String, dynamic> applyOverride(Map<String, dynamic> main, String? override) {
+    if (override == null) return main;
+    if (override.contains("{")) {
+      final overrideMap = jsonDecode(override) as Map<String, dynamic>;
+      return _mergeJson(main, overrideMap);
+    } else {
+      return main;
+    }
+  }
+
+  static Map<String, dynamic> _mergeJson(Map<String, dynamic> main, Map<String, dynamic> override) {
     override.forEach((key, value) {
       if (main.containsKey(key)) {
         if (main[key] is Map<String, dynamic> && value is Map<String, dynamic>) {
-          main[key] = mergeJson(main[key] as Map<String, dynamic>, value);
+          main[key] = _mergeJson(main[key] as Map<String, dynamic>, value);
         } else {
           main[key] = value;
         }

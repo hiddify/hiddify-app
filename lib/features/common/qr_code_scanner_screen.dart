@@ -425,16 +425,18 @@ class QrCodeScannerDialog extends ConsumerWidget {
             ),
             onDetect: (barcodes) {
               final rawData = barcodes.barcodes.first.rawValue;
+              if (rawData != null) context.pop(rawData);
               // loggy.debug('captured raw: [$rawData]');
-              if (rawData != null) {
-                final uri = Uri.tryParse(rawData);
-                if (context.mounted && uri != null) {
-                  // loggy.debug('captured url: [$uri]');
-                  context.pop(uri.toString());
-                }
-              } else {
-                // loggy.warning("unable to capture");
-              }
+              // if (rawData != null) {
+              //   context.pop(rawData);
+              //   final uri = Uri.tryParse(rawData);
+              //   if (context.mounted && uri != null) {
+              //     // loggy.debug('captured url: [$uri]');
+              //     context.pop(uri.toString());
+              //   }
+              // } else {
+              //   // loggy.warning("unable to capture");
+              // }
             },
           ),
           Align(

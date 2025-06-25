@@ -3,21 +3,18 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
-import 'package:hiddify/features/connection/widget/experimental_feature_notice.dart';
-
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
-import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // TODO: rewrite
@@ -64,15 +61,6 @@ class ConnectionButton extends HookConsumerWidget {
     //   // );
 
     const buttonTheme = ConnectionButtonTheme.light;
-
-    Future<bool> showExperimentalNotice() async {
-      final hasExperimental = ref.read(ConfigOptions.hasExperimentalFeatures);
-      final canShowNotice = !ref.read(disableExperimentalFeatureNoticeProvider);
-      if (hasExperimental && canShowNotice && context.mounted) {
-        return await const ExperimentalFeatureNoticeDialog().show(context) ?? false;
-      }
-      return true;
-    }
 
     //   // return CircleDesignWidget(
     //   //   onTap: switch (connectionStatus) {
@@ -130,40 +118,15 @@ class ConnectionButton extends HookConsumerWidget {
           },
         AsyncData(value: Disconnected()) || AsyncError() => () async {
             if (ref.read(activeProfileProvider).valueOrNull == null) {
-              await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(t.home.noActiveProfileMsg),
-                  content: ConstrainedBox(
-                    constraints: AlertDialogConst.boxConstraints,
-                    child: Text(t.home.emptyProfilesMsg.text),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () async {
-                        await UriUtils.tryLaunch(
-                          Uri.parse(t.home.emptyProfilesMsg.buttonHelp.url),
-                        );
-                      },
-                      child: Text(t.home.emptyProfilesMsg.buttonHelp.label),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      },
-                      child: Text(t.general.ok),
-                    ),
-                  ],
-                ),
-              );
-              ref.read(buttomSheetsNotifierProvider.notifier).showAddProfile();
+              await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile();
+              ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
             }
-            if (await showExperimentalNotice()) {
+            if (await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
               return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
             }
           },
         AsyncData(value: Connected()) => () async {
-            if (requiresReconnect == true && await showExperimentalNotice()) {
+            if (requiresReconnect == true && await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
               return await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
             }
             return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
@@ -269,6 +232,7 @@ class _ConnectionButton extends StatelessWidget {
               shape: const CircleBorder(),
               color: Colors.white,
               child: InkWell(
+                focusColor: Colors.grey,
                 onTap: onTap,
                 child: Padding(
                   padding: const EdgeInsets.all(36),

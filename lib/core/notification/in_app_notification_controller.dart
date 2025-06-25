@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
+import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:toastification/toastification.dart';
 
 part 'in_app_notification_controller.g.dart';
 
 @Riverpod(keepAlive: true)
-InAppNotificationController inAppNotificationController(
-  InAppNotificationControllerRef ref,
-) {
+InAppNotificationController inAppNotificationController(Ref ref) {
   return InAppNotificationController();
 }
 
@@ -44,7 +42,7 @@ class InAppNotificationController with AppLogger {
   }
 
   ToastificationItem? showErrorToast(String message) {
-    final context = RootScaffold.stateKey.currentContext;
+    final context = rootNavKey.currentContext;
     if (context == null) {
       loggy.warning("context is null");
       return null;
@@ -58,7 +56,7 @@ class InAppNotificationController with AppLogger {
   }
 
   ToastificationItem? showSuccessToast(String message) {
-    final context = RootScaffold.stateKey.currentContext;
+    final context = rootNavKey.currentContext;
     if (context == null) {
       loggy.warning("context is null");
       return null;
@@ -71,21 +69,12 @@ class InAppNotificationController with AppLogger {
   }
 
   ToastificationItem? showInfoToast(String message, {Duration duration = const Duration(seconds: 3)}) {
-    final context = RootScaffold.stateKey.currentContext;
+    final context = rootNavKey.currentContext;
     if (context == null) {
       loggy.warning("context is null");
       return null;
     }
     return showToast(context, message, duration: duration);
-  }
-
-  Future<void> showErrorDialog(PresentableError error) async {
-    final context = RootScaffold.stateKey.currentContext;
-    if (context == null) {
-      loggy.warning("context is null");
-      return;
-    }
-    CustomAlertDialog.fromErr(error).show(context);
   }
 
   void showActionToast(
@@ -94,7 +83,7 @@ class InAppNotificationController with AppLogger {
     required VoidCallback callback,
     Duration duration = const Duration(seconds: 5),
   }) {
-    final context = RootScaffold.stateKey.currentContext;
+    final context = rootNavKey.currentContext;
     if (context == null) return;
     toastification.dismissAll();
 

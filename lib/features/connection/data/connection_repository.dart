@@ -1,19 +1,18 @@
-import 'dart:convert';
-
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
-
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/notifier/warp_option/warp_option_notifier.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
 import 'package:hiddify/singbox/model/singbox_status.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meta/meta.dart';
 
 abstract interface class ConnectionRepository {
@@ -25,24 +24,27 @@ abstract interface class ConnectionRepository {
     String fileName,
     String profileName,
     bool disableMemoryLimit,
-    String? testUrl,
+    String? override,
   );
   TaskEither<ConnectionFailure, Unit> disconnect();
   TaskEither<ConnectionFailure, Unit> reconnect(
     String fileName,
     String profileName,
     bool disableMemoryLimit,
-    String? testUrl,
+    String? override,
   );
 }
 
 class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements ConnectionRepository {
   ConnectionRepositoryImpl({
+    required this.ref,
     required this.directories,
     required this.singbox,
     required this.configOptionRepository,
     required this.profilePathResolver,
   });
+
+  final Ref ref;
 
   final Directories directories;
   final HiddifyCoreService singbox;
@@ -103,23 +105,26 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   }
 
   @visibleForTesting
-  TaskEither<ConnectionFailure, Unit> applyConfigOption(
-    SingboxConfigOption main,
-    String? override,
-  ) {
-    return exceptionHandler(
-      () {
+  TaskEither<ConnectionFailure, Unit> applyConfigOption(SingboxConfigOption main, String? override) {
+    return TaskEither<ConnectionFailure, Unit>.Do(
+      ($) async {
         _configOptionsSnapshot = main;
-        var mainJson = main.toJson();
-        if (override != null && override.contains("{")) {
-          final overrideJson = jsonDecode(override) as Map<String, dynamic>;
-          mainJson = ProfileParser.mergeJson(mainJson, overrideJson);
+        final mainJson = ProfileParser.applyOverride(main.toJson(), override);
+        final isWarpLicenseAgreed = ref.read(warpLicenseNotifierProvider);
+        final isWarpEnabled = (mainJson['warp'] as Map)['enable'] == true;
+        if (!isWarpLicenseAgreed && isWarpEnabled) {
+          final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense();
+          if (isAgreed == true) {
+            await ref.read(warpLicenseNotifierProvider.notifier).agree();
+            final options = await $(getConfigOption());
+            return await $(applyConfigOption(options, override));
+          } else {
+            throw const MissingWarpLicense();
+          }
         }
-        final newOptions = SingboxConfigOption.fromJson(mainJson);
-        return singbox.changeOptions(newOptions).mapLeft(InvalidConfigOption.new).run();
+        return $(singbox.changeOptions(SingboxConfigOption.fromJson(mainJson)).mapLeft(InvalidConfigOption.new));
       },
-      UnexpectedConnectionFailure.new,
-    );
+    ).handleExceptions((e, s) => e is MissingWarpLicense ? e : UnexpectedConnectionFailure(e, s));
   }
 
   @override
@@ -149,7 +154,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     String fileName,
     String profileName,
     bool disableMemoryLimit,
-    String? testUrl,
+    String? override,
   ) {
     return TaskEither<ConnectionFailure, Unit>.Do(
       ($) async {
@@ -171,7 +176,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
           }),
         );
         await $(setup());
-        await $(applyConfigOption(options, testUrl));
+        await $(applyConfigOption(options, override));
         return await $(
           singbox
               .start(
@@ -189,7 +194,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   TaskEither<ConnectionFailure, Unit> disconnect() {
     return TaskEither<ConnectionFailure, Unit>.Do(
       ($) async {
-        final options = await $(getConfigOption());
+        // final options = await $(getConfigOption());
 
         await $(
           TaskEither(() async {
@@ -215,7 +220,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     String fileName,
     String profileName,
     bool disableMemoryLimit,
-    String? testUrl,
+    String? override,
   ) {
     return TaskEither<ConnectionFailure, Unit>.Do(
       ($) async {
@@ -224,7 +229,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
           "config options: ${options.format()}\nMemory Limit: ${!disableMemoryLimit}",
         );
 
-        await $(applyConfigOption(options, testUrl));
+        await $(applyConfigOption(options, override));
         return await $(
           singbox
               .restart(

@@ -15,10 +15,6 @@ class QrCodeDialog extends StatelessWidget {
   final double width;
   final Color backgroundColor;
 
-  Future<void> show(BuildContext context) async {
-    await showDialog(context: context, builder: (context) => this);
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -39,7 +35,7 @@ class QrCodeDialog extends StatelessWidget {
             SizedBox(
               width: width,
               child: Material(
-                color: theme.colorScheme.background,
+                color: theme.colorScheme.surface,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -47,7 +43,7 @@ class QrCodeDialog extends StatelessWidget {
                       child: Text(
                         message!,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: theme.colorScheme.onBackground),
+                        style: TextStyle(color: theme.colorScheme.onSurface),
                       ),
                     ),
                   ],

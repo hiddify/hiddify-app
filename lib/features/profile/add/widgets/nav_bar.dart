@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
-import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NavBar extends ConsumerWidget {
@@ -13,7 +13,7 @@ class NavBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final t = ref.watch(translationsProvider).requireValue;
-    final freeSwitch = ref.watch(freeSwitchProvider);
+    final freeSwitch = ref.watch(freeSwitchNotifierProvider);
 
     final textColor = theme.colorScheme.onSurface;
     return Padding(
@@ -30,7 +30,7 @@ class NavBar extends ConsumerWidget {
               const Gap(8),
               Switch(
                 value: freeSwitch,
-                onChanged: ref.read(freeSwitchProvider.notifier).onChange,
+                onChanged: ref.read(freeSwitchNotifierProvider.notifier).onChange,
               ),
             ],
           ),
@@ -47,34 +47,7 @@ class NavBar extends ConsumerWidget {
               Icons.help_outline,
               color: theme.colorScheme.onSurfaceVariant,
             ),
-            onPressed: () async {
-              await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(t.home.noActiveProfileMsg),
-                  content: ConstrainedBox(
-                    constraints: AlertDialogConst.boxConstraints,
-                    child: Text(t.home.emptyProfilesMsg.text),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () async {
-                        await UriUtils.tryLaunch(
-                          Uri.parse(t.home.emptyProfilesMsg.buttonHelp.url),
-                        );
-                      },
-                      child: Text(t.home.emptyProfilesMsg.buttonHelp.label),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                      },
-                      child: Text(t.general.ok),
-                    ),
-                  ],
-                ),
-              );
-            },
+            onPressed: () async => await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile(),
           ),
         ],
       ),

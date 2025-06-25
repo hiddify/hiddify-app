@@ -31,7 +31,7 @@
         android:label="Hiddify"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:networkSecurityConfig="@xml/network_security_config"
-
+        android:enableOnBackInvokedCallback="false"
         tools:targetApi="31">
 
         <meta-data

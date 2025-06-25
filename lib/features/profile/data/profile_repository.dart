@@ -7,7 +7,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/database/app_database.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/data/profile_data_source.dart';

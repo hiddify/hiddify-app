@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/route_rules/notifier/rule_notifier.dart';
 import 'package:hiddify/features/route_rules/overview/android_apps_page.dart';
 import 'package:hiddify/features/route_rules/overview/generic_list_page.dart';
@@ -29,32 +29,16 @@ class RulePage extends HookConsumerWidget {
     final tRule = t.settings.routeRule.rule;
     final tTileTitle = tRule.tileTitle;
     final isRuleEdited = ref.watch(IsRuleEditedProvider(ruleListOrder));
-
+    // TODO(): PopScope logic must be transferred to onExit method of go_router
     return PopScope(
       canPop: !isRuleEdited,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         if (isRuleEdited) {
-          final shouldSave = await showDialog<bool>(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text(tRule.ruleChanged),
-              content: ConstrainedBox(
-                constraints: AlertDialogConst.boxConstraints,
-                child: Text(tRule.ruleChangedMsg),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(tRule.discard),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(tRule.save),
-                ),
-              ],
-            ),
-          );
+          final shouldSave = await ref.read(dialogNotifierProvider.notifier).showSave(
+                title: tRule.ruleChanged,
+                description: tRule.ruleChangedMsg,
+              );
           if (shouldSave == null) return;
           if (shouldSave == true) {
             ref.read(ruleNotifierProvider(ruleListOrder).notifier).save();
