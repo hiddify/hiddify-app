@@ -13,13 +13,13 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   # cupertino_icons: ^1.0.6
-  intl: ^0.19.0
+  intl: ^0.20.2
   # humanizer: ^2.2.0
   # intl: ^0.19.0
-  humanizer:
-    git:
-      url: https://github.com/alex-relov/humanizer
-      ref: up-version
+  humanizer: ^ 3.0.1
+    # git:
+    #   url: https://github.com/alex-relov/humanizer
+    #   ref: up-version
   # lucy_editor: ^1.0.5
   # re_highlight: ^0.0.3
   # json_editor_flutter: ^1.4.2
