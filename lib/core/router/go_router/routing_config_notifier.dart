@@ -91,7 +91,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
   @override
   RoutingConfig build() {
     final isSmallActive = ref.watch(isSmallActiveProvider);
-    final showProfilesAction = ref.watch(activeProfileProvider).value != null;
+    final showProfilesAction = ref.watch(hasAnyProfileProvider).value ?? false;
     if (isSmallActive == null) return loadingConfig;
     return RoutingConfig(
       redirect: (context, state) {
