@@ -24,6 +24,7 @@ import 'package:hiddify/features/window/widget/window_wrapper.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:toastification/toastification.dart';
 import 'package:upgrader/upgrader.dart';
 
 bool _debugAccessibility = false;
@@ -74,35 +75,37 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
 
     return WindowWrapper(
       ShortcutWrapper(
-        ConnectionWrapper(
-          DynamicColorBuilder(
-            builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
-              return MaterialApp.router(
-                routerConfig: router,
-                locale: locale.flutterLocale,
-                supportedLocales: AppLocaleUtils.supportedLocales,
-                localizationsDelegates: GlobalMaterialLocalizations.delegates,
-                debugShowCheckedModeBanner: false,
-                themeMode: themeMode.flutterThemeMode,
-                theme: theme.lightTheme(lightColorScheme),
-                darkTheme: theme.darkTheme(darkColorScheme),
-                title: Constants.appName,
-                builder: (context, child) {
-                  child = UpgradeAlert(
-                    upgrader: upgrader,
-                    navigatorKey: router.routerDelegate.navigatorKey,
-                    child: child ?? const SizedBox(),
-                  );
-                  if (kDebugMode && _debugAccessibility) {
-                    return AccessibilityTools(
-                      checkFontOverflows: true,
-                      child: child,
+        ToastificationWrapper(
+          child: ConnectionWrapper(
+            DynamicColorBuilder(
+              builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
+                return MaterialApp.router(
+                  routerConfig: router,
+                  locale: locale.flutterLocale,
+                  supportedLocales: AppLocaleUtils.supportedLocales,
+                  localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                  debugShowCheckedModeBanner: false,
+                  themeMode: themeMode.flutterThemeMode,
+                  theme: theme.lightTheme(lightColorScheme),
+                  darkTheme: theme.darkTheme(darkColorScheme),
+                  title: Constants.appName,
+                  builder: (context, child) {
+                    child = UpgradeAlert(
+                      upgrader: upgrader,
+                      navigatorKey: router.routerDelegate.navigatorKey,
+                      child: child ?? const SizedBox(),
                     );
-                  }
-                  return child;
-                },
-              );
-            },
+                    if (kDebugMode && _debugAccessibility) {
+                      return AccessibilityTools(
+                        checkFontOverflows: true,
+                        child: child,
+                      );
+                    }
+                    return child;
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),
