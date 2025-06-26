@@ -15,7 +15,7 @@ import 'package:hiddify/features/log/overview/logs_page.dart';
 import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_page.dart';
 import 'package:hiddify/features/profile/details/profile_details_page.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
-import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
+import 'package:hiddify/features/profile/overview/profiles_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/settings/overview/sections/dns_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/general_page.dart';

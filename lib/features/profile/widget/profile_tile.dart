@@ -14,7 +14,7 @@ import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
-import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dart';
+import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -116,7 +116,7 @@ class ProfileTile extends HookConsumerWidget {
                         if (selectActiveMutation.state.isInProgress) return;
                         // if (profile.active) return;
                         selectActiveMutation.setFuture(
-                          ref.read(profilesOverviewNotifierProvider.notifier).selectActiveProfile(profile.id),
+                          ref.read(profilesNotifierProvider.notifier).selectActiveProfile(profile.id),
                         );
                         if (context.canPop()) {
                           context.pop();
@@ -320,7 +320,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
                 return;
               }
               exportConfigMutation.setFuture(
-                ref.read(profilesOverviewNotifierProvider.notifier).exportConfigToClipboard(profile),
+                ref.read(profilesNotifierProvider.notifier).exportConfigToClipboard(profile),
               );
             },
           ),
@@ -355,7 +355,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
             (deleteConfirmed) {
               if (!deleteConfirmed) return;
               deleteProfileMutation.setFuture(
-                ref.read(profilesOverviewNotifierProvider.notifier).deleteProfile(profile),
+                ref.read(profilesNotifierProvider.notifier).deleteProfile(profile),
               );
             },
           );
