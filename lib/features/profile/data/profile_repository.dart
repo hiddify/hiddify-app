@@ -7,7 +7,6 @@ import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/database/app_database.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/data/profile_data_source.dart';
@@ -17,6 +16,7 @@ import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:uuid/uuid.dart';
@@ -124,7 +124,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
   @override
   Stream<Either<ProfileFailure, bool>> watchHasAnyProfile() {
-    return profileDataSource.watchProfilesCount().map((event) => event != 0).handleExceptions(ProfileUnexpectedFailure.new);
+    return profileDataSource.watchProfilesCount().distinct().map((event) => event != 0).handleExceptions(ProfileUnexpectedFailure.new);
   }
 
   @override

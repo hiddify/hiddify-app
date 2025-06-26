@@ -4,7 +4,7 @@ import 'package:hiddify/core/router/bottom_sheets/widgets/quick_settings_modal.d
 import 'package:hiddify/core/router/go_router/helper/popup_count_notifier.dart';
 import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
 import 'package:hiddify/features/profile/add/add_profile_modal.dart';
-import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
+import 'package:hiddify/features/profile/overview/profiles_modal.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -47,7 +47,7 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
 
   Future<void> showProfilesOverview() async => await _show(
         isScrollControlled: true,
-        child: const ProfilesOverviewModal(),
+        child: const ProfilesModal(),
       );
 
   Future<void> showQuickSettings() async => await _show(

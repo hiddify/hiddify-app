@@ -115,9 +115,7 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                   Breakpoints.small: SlotLayout.from(
                     key: const Key('bottomNavigation'),
                     inAnimation: AdaptiveScaffold.bottomToTop,
-                    outAnimation: outAnimation,
                     inDuration: inDuration,
-                    outDuration: outDuration,
                     builder: (_) => FocusScope(
                       node: navScopeNode,
                       child: AdaptiveScaffold.standardBottomNavigationBar(
