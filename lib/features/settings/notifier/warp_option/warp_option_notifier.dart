@@ -32,24 +32,24 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
 
   Future<void> genWarps({bool showToast = true}) async {
     if (state is AsyncLoading) return;
+    state = const AsyncLoading();
+    final t = ref.read(translationsProvider).requireValue.config;
     final warpLog = await _genWarpConfig();
     final warpLog2 = await _genWarp2Config();
     if (warpLog != null && warpLog2 != null) {
       loggy.log(LogLevel.info, 'generated warp log : $warpLog');
       loggy.log(LogLevel.info, 'generated warp2 log : $warpLog2');
       if (showToast) {
-        ref.read(inAppNotificationControllerProvider).showInfoToast(ref.read(translationsProvider).requireValue.config.warpConfigGenerated);
+        ref.read(inAppNotificationControllerProvider).showSuccessToast('${t.warpConfigGenerated} $warpLog');
       }
       state = AsyncValue.data(warpLog);
     } else {
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.missingWarpConfig);
       state = AsyncError(const MissingWarpConfigFailure(), StackTrace.current);
     }
   }
 
   Future<String?> _genWarpConfig() async {
-    if (state is AsyncLoading) return null;
-    state = const AsyncLoading();
-
     final result = await AsyncValue.guard(() async {
       final warp = await ref
           .read(hiddifyCoreServiceProvider)
@@ -72,9 +72,6 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
   }
 
   Future<String?> _genWarp2Config() async {
-    if (state is AsyncLoading) return null;
-    state = const AsyncLoading();
-
     final result = await AsyncValue.guard(() async {
       final warp = await ref
           .read(hiddifyCoreServiceProvider)
