@@ -11,10 +11,10 @@ import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'profiles_overview_notifier.g.dart';
+part 'profiles_notifier.g.dart';
 
 @riverpod
-class ProfilesOverviewSortNotifier extends _$ProfilesOverviewSortNotifier with AppLogger {
+class ProfilesSortNotifier extends _$ProfilesSortNotifier with AppLogger {
   @override
   ({ProfilesSort by, SortMode mode}) build() {
     return (by: ProfilesSort.lastUpdate, mode: SortMode.descending);
@@ -26,10 +26,10 @@ class ProfilesOverviewSortNotifier extends _$ProfilesOverviewSortNotifier with A
 }
 
 @riverpod
-class ProfilesOverviewNotifier extends _$ProfilesOverviewNotifier with AppLogger {
+class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
   @override
   Stream<List<ProfileEntity>> build() {
-    final sort = ref.watch(profilesOverviewSortNotifierProvider);
+    final sort = ref.watch(profilesSortNotifierProvider);
     return _profilesRepo.watchAll(sort: sort.by, sortMode: sort.mode).map((event) => event.getOrElse((l) => throw l));
   }
 
