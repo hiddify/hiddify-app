@@ -4,7 +4,6 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
@@ -20,25 +19,6 @@ class ProfilesModal extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final asyncProfiles = ref.watch(profilesNotifierProvider);
-
-    ref.listen(
-      foregroundProfilesUpdateNotifierProvider,
-      (_, next) {
-        if (next case AsyncData(:final value?)) {
-          final t = ref.read(translationsProvider).requireValue;
-          final notification = ref.read(inAppNotificationControllerProvider);
-          if (value.success) {
-            notification.showSuccessToast(
-              t.profile.update.namedSuccessMsg(name: value.name),
-            );
-          } else {
-            notification.showErrorToast(
-              t.profile.update.namedFailureMsg(name: value.name),
-            );
-          }
-        }
-      },
-    );
 
     ref.listen(
       profilesNotifierProvider,
