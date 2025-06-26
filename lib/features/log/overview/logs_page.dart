@@ -190,7 +190,7 @@ class LogsPage extends HookConsumerWidget with PresLogger {
                                       ],
                                     ),
                                   Text(
-                                    log.message,
+                                    extractMessage(log.message),
                                     style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                 ],
@@ -223,4 +223,9 @@ class LogsPage extends HookConsumerWidget with PresLogger {
       ),
     );
   }
+}
+
+String extractMessage(String message) {
+  final parts = message.split(' ');
+  return parts.length <= 2 ? parts.last : parts.sublist(2).join(' ');
 }

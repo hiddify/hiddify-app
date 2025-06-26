@@ -5,7 +5,7 @@ version: 3.0.0+30000
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
-  flutter: "^3.29.3"
+  flutter: "^3.32.4"
 
 dependencies:
   flutter:
