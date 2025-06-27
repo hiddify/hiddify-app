@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/features/common/custom_text_scroll.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/notifier/warp_option/warp_option_notifier.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -24,14 +23,16 @@ class QuickSettingsModal extends HookConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 16),
               child: SegmentedButton(
+                showSelectedIcon: false,
                 segments: ServiceMode.choices
                     .map(
                       (e) => ButtonSegment(
                         value: e,
                         label: Padding(
-                          padding: const EdgeInsets.only(bottom: 4),
-                          child: CustomTextScroll(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
                             e.presentShort(t),
+                            textAlign: TextAlign.center,
                           ),
                         ),
                         tooltip: e.isExperimental ? t.settings.experimental : null,
