@@ -27,7 +27,10 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
         builder: (context) => ClipRRect(
           borderRadius: BottomSheetConst.borderRadius,
           child: Material(
-            child: child,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: child,
+            ),
           ),
         ),
       ),
