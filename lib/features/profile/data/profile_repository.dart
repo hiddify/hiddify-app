@@ -310,8 +310,11 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
             .flatMap(
               (remoteProfile) => TaskEither(
                 () async {
-                  final profilePatch = remoteProfile.subInfoPatch().copyWith(lastUpdate: Value(DateTime.now()), active: Value(baseProfile.active));
-
+                  final currentStatus = await getById(baseProfile.id).getOrElse((l) => null).run();
+                  if (currentStatus == null) {
+                    loggy.info('profile with id [${baseProfile.id}] deleted');
+                  }
+                  final profilePatch = remoteProfile.subInfoPatch().copyWith(lastUpdate: Value(DateTime.now()), active: Value(currentStatus!.active));
                   await profileDataSource.edit(
                     baseProfile.id,
                     patchBaseProfile
