@@ -26,9 +26,9 @@ class MyAdaptiveLayout extends HookConsumerWidget {
     // animations management
     final isLTR = Directionality.of(context) == TextDirection.ltr;
     final navInAnimation = isLTR ? AdaptiveScaffold.leftOutIn : AdaptiveScaffold.rightOutIn;
-    const outAnimation = AdaptiveScaffold.fadeOut;
+    // const outAnimation = AdaptiveScaffold.fadeOut;
     const inDuration = Duration(milliseconds: 200);
-    const outDuration = Duration(milliseconds: 100);
+    // const outDuration = Duration(milliseconds: 100);
     // focus switch management
     final primaryFocusHash = useState<int?>(null);
     final navScopeNode = useFocusScopeNode();
@@ -70,9 +70,7 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                   Breakpoints.medium: SlotLayout.from(
                     key: const Key('primaryNavigation'),
                     inAnimation: navInAnimation,
-                    outAnimation: outAnimation,
                     inDuration: inDuration,
-                    outDuration: outDuration,
                     builder: (_) => FocusScope(
                       node: navScopeNode,
                       child: AdaptiveScaffold.standardNavigationRail(
@@ -86,9 +84,7 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                   Breakpoints.mediumLargeAndUp: SlotLayout.from(
                     key: const Key('primaryNavigationExtended'),
                     inAnimation: navInAnimation,
-                    outAnimation: outAnimation,
                     inDuration: inDuration,
-                    outDuration: outDuration,
                     builder: (_) => FocusScope(
                       node: navScopeNode,
                       child: AdaptiveScaffold.standardNavigationRail(
