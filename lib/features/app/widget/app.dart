@@ -2,6 +2,7 @@ import 'package:accessibility_tools/accessibility_tools.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -72,7 +73,6 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
       },
       [isSmallActive],
     );
-
     return WindowWrapper(
       ShortcutWrapper(
         ToastificationWrapper(
@@ -90,6 +90,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                   darkTheme: theme.darkTheme(darkColorScheme),
                   title: Constants.appName,
                   builder: (context, child) {
+                    final theme = Theme.of(context);
                     child = UpgradeAlert(
                       upgrader: upgrader,
                       navigatorKey: router.routerDelegate.navigatorKey,
@@ -101,7 +102,14 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                         child: child,
                       );
                     }
-                    return child;
+                    return AnnotatedRegion<SystemUiOverlayStyle>(
+                      value: SystemUiOverlayStyle(
+                        statusBarColor: theme.scaffoldBackgroundColor,
+                        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+                        systemNavigationBarIconBrightness: theme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                      ),
+                      child: child,
+                    );
                   },
                 );
               },
