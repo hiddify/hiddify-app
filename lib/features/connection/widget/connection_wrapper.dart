@@ -24,7 +24,7 @@ class _ConnectionWrapperState extends ConsumerState<ConnectionWrapper> with AppL
     ref.listen(configOptionNotifierProvider, (previous, next) async {
       if (next case AsyncData(value: true)) {
         final t = ref.read(translationsProvider).requireValue;
-        ref.watch(inAppNotificationControllerProvider).showInfoToast(
+        ref.read(inAppNotificationControllerProvider).showInfoToast(
               t.connection.reconnectMsg,
               // actionText: t.connection.reconnect,
               // callback: () async {
