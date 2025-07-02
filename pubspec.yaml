@@ -66,7 +66,6 @@ dependencies:
   gap: ^3.0.1
   # percent_indicator_premium: ^0.0.2
   sliver_tools: ^0.2.12
-  flutter_adaptive_scaffold: ^0.3.3
   font_awesome_flutter: ^10.7.0
   upgrader: ^11.3.0
   toastification: ^2.3.0
