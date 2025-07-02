@@ -106,10 +106,10 @@ packages:
     dependency: transitive
     description:
       name: async
-      sha256: d2872f9c19731c2e5f10444b14686eb7cc85c76274bd6c16e1816bff9a3bab63
+      sha256: "758e6d74e971c3e5aceb4110bfd6698efc7f501675bcfe0c775459a8140750eb"
       url: "https://pub.dev"
     source: hosted
-    version: "2.12.0"
+    version: "2.13.0"
   back_button_interceptor:
     dependency: "direct main"
     description:
@@ -178,10 +178,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: "349f492c6cf66d32d24b71368908df23426440bf9ee4642fdb79978adb82a877"
+      sha256: b4f8d74125ab53869e63d488b8df2a036a7136d3b6d1759d3247e4d8d2e8f379
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.12"
+    version: "5.0.15"
   build_resolvers:
     dependency: transitive
     description:
@@ -210,10 +210,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_web_compilers
-      sha256: "062de601d0e64e7f7fcdae00661081a489813039240e843ef238abb75e09ac2f"
+      sha256: "7c82235c82657efa0e6e877ef813757c7fd9e0e0406106f32ab30a874c939c63"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.2"
+    version: "4.2.0"
   built_collection:
     dependency: transitive
     description:
@@ -419,10 +419,10 @@ packages:
     dependency: transitive
     description:
       name: decimal
-      sha256: "24a261d5d5c87e86c7651c417a5dbdf8bcd7080dd592533910e8d0505a279f21"
+      sha256: fc706a5618b81e5b367b01dd62621def37abc096f2b46a9bd9068b64c1fa36d0
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.3"
+    version: "3.2.4"
   dependency_validator:
     dependency: "direct dev"
     description:
@@ -515,10 +515,10 @@ packages:
     dependency: transitive
     description:
       name: fake_async
-      sha256: "6a95e56b2449df2273fd8c45a662d6947ce1ebb7aafe80e550a3f68297f3cacc"
+      sha256: "5368f224a74523e8d2e7399ea1638b37aecfca824a3cc4dfdf77bf1fa905ac44"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.2"
+    version: "1.3.3"
   ffi:
     dependency: "direct main"
     description:
@@ -942,12 +942,11 @@ packages:
   humanizer:
     dependency: "direct main"
     description:
-      path: "."
-      ref: up-version
-      resolved-ref: "8ae61d68357fae197be7ee71d67ccb9498b9d5c7"
-      url: "https://github.com/alex-relov/humanizer"
-    source: git
-    version: "2.3.0"
+      name: humanizer
+      sha256: c2402d0a27d62a4452e7b58df41b09e8933a0d05eac9dc84eae446128277ab6e
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
   iconsax_flutter:
     dependency: transitive
     description:
@@ -1009,10 +1008,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
+      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
       url: "https://pub.dev"
     source: hosted
-    version: "0.19.0"
+    version: "0.20.2"
   io:
     dependency: transitive
     description:
@@ -1081,10 +1080,10 @@ packages:
     dependency: transitive
     description:
       name: leak_tracker
-      sha256: c35baad643ba394b40aac41080300150a4f08fd0fd6a10378f8f7c6bc161acec
+      sha256: "6bb818ecbdffe216e81182c2f0714a2e62b593f4a4f13098713ff1685dfb6ab0"
       url: "https://pub.dev"
     source: hosted
-    version: "10.0.8"
+    version: "10.0.9"
   leak_tracker_flutter_testing:
     dependency: transitive
     description:
@@ -2142,10 +2141,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: "0968250880a6c5fe7edc067ed0a13d4bae1577fe2771dcf3010d52c4a9d3ca14"
+      sha256: ddfa8d30d89985b96407efce8acbdd124701f96741f2d981ca860662f1c0dc02
       url: "https://pub.dev"
     source: hosted
-    version: "14.3.1"
+    version: "15.0.0"
   watcher:
     dependency: "direct main"
     description:
@@ -2235,5 +2234,5 @@ packages:
     source: hosted
     version: "2.2.2"
 sdks:
-  dart: ">=3.7.0 <3.8.0-z"
-  flutter: ">=3.29.3"
+  dart: ">=3.7.0 <3.10.0-z"
+  flutter: ">=3.32.5"

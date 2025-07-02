@@ -5,21 +5,14 @@ version: 3.0.0+30000
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
-  flutter: "^3.29.3"
+  flutter: "^3.32.5"
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  # cupertino_icons: ^1.0.6
-  intl: ^0.19.0
-  # humanizer: ^2.2.0
-  # intl: ^0.19.0
-  humanizer:
-    git:
-      url: https://github.com/alex-relov/humanizer
-      ref: up-version
+  intl: ^0.20.2
   # lucy_editor: ^1.0.5
   # re_highlight: ^0.0.3
   # json_editor_flutter: ^1.4.2
@@ -136,6 +129,7 @@ dependencies:
   # prevent closing app on back button
   # platform-specific settings
   back_button_interceptor: ^8.0.4
+  humanizer: ^3.0.1
 
 dev_dependencies:
   # flutter_test:
