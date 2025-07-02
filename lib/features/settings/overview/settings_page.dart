@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/tip_card.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
@@ -181,7 +181,7 @@ class SettingsPage extends HookConsumerWidget {
                 },
               ),
             ),
-          if (Breakpoints.small.isActive(context)) ...[
+          if (Breakpoint(context).isMobile()) ...[
             SettingsSection(
               title: t.logs.pageTitle,
               icon: Icons.description_rounded,
