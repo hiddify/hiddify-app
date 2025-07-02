@@ -22,8 +22,7 @@ import 'package:hiddify/core/router/dialog/widgets/sort_profiles_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/unknown_domains_warning_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/warp_license_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/window_closing_dialog.dart';
-import 'package:hiddify/core/router/go_router/helper/popup_count_notifier.dart';
-import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
+import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/common/qr_code_scanner_screen.dart';
@@ -40,9 +39,9 @@ class DialogNotifier extends _$DialogNotifier {
   void build() {}
 
   Future<T?> _show<T>(Widget child) async {
-    final context = branchNavKey.currentContext;
+    final context = rootNavKey.currentContext;
     if (context == null) return null;
-    ref.read(popupCountNotifierProvider.notifier).increase();
+    // ref.read(popupCountNotifierProvider.notifier).increase();
     return await Navigator.of(context)
         .push<T>(
       DialogRoute(
@@ -52,7 +51,7 @@ class DialogNotifier extends _$DialogNotifier {
     )
         .then(
       (value) {
-        ref.read(popupCountNotifierProvider.notifier).decrease();
+        // ref.read(popupCountNotifierProvider.notifier).decrease();
         return value;
       },
     );
