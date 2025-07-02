@@ -3,7 +3,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
@@ -13,7 +12,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
-import 'package:hiddify/core/router/go_router/helper/is_small_active.dart';
+import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/theme/app_theme.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
@@ -59,19 +58,20 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     final themeMode = ref.watch(themePreferencesProvider);
     final theme = AppTheme(themeMode, locale.preferredFontFamily);
     final upgrader = ref.watch(upgraderProvider);
-    final isSmallActive = Breakpoints.small.isActive(context);
+    final activeBreakpoint = Breakpoint(context).activeBreakpoint;
 
     ref.listen(foregroundProfilesUpdateNotifierProvider, (_, __) {});
     if (PlatformUtils.isDesktop) ref.listen(systemTrayNotifierProvider, (_, __) {});
-    // updating isSmallActive notifier provider
+
+    // updating ActiveBreakpointNotifier value
     useEffect(
       () {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          ref.read(isSmallActiveProvider.notifier).isActive(isSmallActive);
+          ref.read(activeBreakpointNotifierProvider.notifier).update(activeBreakpoint);
         });
         return null;
       },
-      [isSmallActive],
+      [activeBreakpoint],
     );
     return WindowWrapper(
       ShortcutWrapper(
