@@ -124,7 +124,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
   @override
   Stream<Either<ProfileFailure, bool>> watchHasAnyProfile() {
-    return profileDataSource.watchProfilesCount().distinct().map((event) => event != 0).handleExceptions(ProfileUnexpectedFailure.new);
+    return profileDataSource.watchProfilesCount().map((event) => event != 0).handleExceptions(ProfileUnexpectedFailure.new);
   }
 
   @override
