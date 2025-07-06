@@ -21,7 +21,7 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
     final serviceRunning = await ref.watch(serviceRunningProvider.future);
     final serviceSingboxOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
     ref.listen(
-      ConfigOptions.singboxConfigOptions.future,
+      ConfigOptions.singboxConfigOptions,
       (previous, next) {
         if (!serviceRunning || serviceSingboxOptions == null) return;
         if (next case AsyncData(:final value) when next != previous) {
@@ -40,7 +40,7 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
 
   Future<String?> _exportJson(bool excludePrivate) async {
     try {
-      final options = await ref.read(ConfigOptions.singboxConfigOptions.future);
+      final options = ref.read(ConfigOptions.singboxConfigOptions);
       Map map = options.toJson();
       if (excludePrivate) {
         for (final key in ConfigOptions.privatePreferencesKeys) {

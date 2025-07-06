@@ -416,8 +416,8 @@ abstract class ConfigOptions {
     "warp2.wireguard-config": warp2WireguardConfig,
   };
 
-  static final singboxConfigOptions = FutureProvider<SingboxConfigOption>(
-    (ref) async {
+  static final singboxConfigOptions = Provider<SingboxConfigOption>(
+    (ref) {
       // final region = ref.watch(Preferences.region);
       final rules = <SingboxRule>[];
       // final rules = switch (region) {
@@ -555,12 +555,12 @@ class ConfigOptionRepository with ExceptionHandler, InfraLogger {
   });
 
   final SharedPreferences preferences;
-  final Future<SingboxConfigOption> Function() getConfigOptions;
+  final SingboxConfigOption Function() getConfigOptions;
 
   TaskEither<ConfigOptionFailure, SingboxConfigOption> getFullSingboxConfigOption() {
     return exceptionHandler(
       () async {
-        return right(await getConfigOptions());
+        return right(getConfigOptions());
       },
       ConfigOptionUnexpectedFailure.new,
     );

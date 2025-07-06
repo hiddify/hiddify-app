@@ -182,8 +182,8 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
     bool debug,
   ) {
     return exceptionHandler(
-      () async {
-        singbox.changeOptions(await configOptionRepository.getConfigOptions()).run();
+      () {
+        singbox.changeOptions(configOptionRepository.getConfigOptions()).run();
 
         return singbox.validateConfigByPath(path, tempPath, debug).mapLeft(ProfileFailure.invalidConfig).run();
       },
@@ -284,7 +284,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
       ($) async {
         final configFile = profilePathResolver.file(id);
 
-        final options = await configOptionRepository.getConfigOptions();
+        final options = configOptionRepository.getConfigOptions();
 
         singbox.changeOptions(options).mapLeft(InvalidConfigOption.new).run();
 
@@ -395,7 +395,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         final tempFile = profilePathResolver.tempFile(fileName);
 
         try {
-          final configs = await configOptionRepository.getConfigOptions();
+          final configs = configOptionRepository.getConfigOptions();
           if (url.startsWith("http://")) {
             return left(const ProfileFailure.invalidUrl("HTTP is not supported. Please use HTTPS for secure connection."));
           }
