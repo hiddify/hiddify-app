@@ -35,7 +35,7 @@ class QuickSettingsModal extends HookConsumerWidget {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        tooltip: e.isExperimental ? t.settings.experimental : null,
+                        // tooltip: e.isExperimental ? t.settings.experimental : null,
                       ),
                     )
                     .toList(),

@@ -334,13 +334,13 @@ abstract class ConfigOptions {
 
   static final hasExperimentalFeatures = Provider.autoDispose<bool>(
     (ref) {
-      final mode = ref.watch(serviceMode);
-      if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
-        return true;
-      }
-      if (ref.watch(enableTlsFragment) || ref.watch(enableTlsMixedSniCase) || ref.watch(enableTlsPadding) || ref.watch(enableMux) || ref.watch(enableWarp) || ref.watch(bypassLan) || ref.watch(allowConnectionFromLan)) {
-        return true;
-      }
+      // final mode = ref.watch(serviceMode);
+      // if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
+      //   return true;
+      // }
+      // if (ref.watch(enableTlsFragment) || ref.watch(enableTlsMixedSniCase) || ref.watch(enableTlsPadding) || ref.watch(enableMux) || ref.watch(enableWarp) || ref.watch(bypassLan) || ref.watch(allowConnectionFromLan)) {
+      //   return true;
+      // }
 
       return false;
     },

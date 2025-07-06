@@ -18,9 +18,6 @@ class GeneralPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    String experimental(String txt) {
-      return "$txt (${t.settings.experimental})";
-    }
 
     return Scaffold(
       appBar: AppBar(title: Text(t.settings.general.sectionTitle)),
@@ -129,7 +126,7 @@ class GeneralPage extends HookConsumerWidget {
             inputToValue: int.tryParse,
           ),
           SwitchListTile.adaptive(
-            title: Text(experimental(t.config.useXrayCoreWhenPossible.Label)),
+            title: Text(t.config.useXrayCoreWhenPossible.Label),
             subtitle: Text(t.config.useXrayCoreWhenPossible.Description),
             secondary: const Icon(Icons.extension_rounded),
             value: ref.watch(ConfigOptions.useXrayCoreWhenPossible),
