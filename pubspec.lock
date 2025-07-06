@@ -1973,10 +1973,10 @@ packages:
     dependency: "direct main"
     description:
       name: tray_manager
-      sha256: c2da0f0f1ddb455e721cf68d05d1281fec75cf5df0a1d3cb67b6ca0bdfd5709d
+      sha256: ad18c4cd73003097d182884bacb0578ad2865f3ab842a0ad00f6d043ed49eaf0
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.5.0"
   type_plus:
     dependency: transitive
     description:
@@ -2189,10 +2189,10 @@ packages:
     dependency: "direct main"
     description:
       name: window_manager
-      sha256: "732896e1416297c63c9e3fb95aea72d0355f61390263982a47fd519169dc5059"
+      sha256: "51d50168ab267d344b975b15390426b1243600d436770d3f13de67e55b05ec16"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.3"
+    version: "0.5.0"
   xdg_directories:
     dependency: transitive
     description:
