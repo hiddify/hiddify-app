@@ -29,7 +29,7 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
     await windowManager.setSize(defaultWindowSize);
   }
 
-  Future<void> open({bool focus = true}) async {
+  Future<void> show({bool focus = true}) async {
     await windowManager.show();
     if (focus) await windowManager.focus();
     if (Platform.isMacOS) {
@@ -37,23 +37,22 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
     }
   }
 
-  Future<void> hideOrShow() async {
-    if (await windowManager.isVisible()) {
-      await windowManager.hide();
-    } else {
-      await windowManager.show();
-    }
-  }
-
-  // TODO add option to quit or minimize to tray
-  Future<void> close() async {
+  Future<void> hide() async {
     await windowManager.hide();
     if (Platform.isMacOS) {
       await windowManager.setSkipTaskbar(true);
     }
   }
 
-  Future<void> quit() async {
+  Future<void> showOrHide() async {
+    if (await windowManager.isVisible()) {
+      await hide();
+    } else {
+      await show();
+    }
+  }
+
+  Future<void> exit() async {
     await ref.read(connectionNotifierProvider.notifier).abortConnection().timeout(const Duration(seconds: 2)).catchError(
       (e) {
         loggy.warning("error aborting connection on quit", e);

@@ -52,7 +52,7 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
   @override
   Future<void> onWindowClose() async {
     if (rootNavKey.currentContext == null) {
-      await ref.read(windowNotifierProvider.notifier).close();
+      await ref.read(windowNotifierProvider.notifier).hide();
       return;
     }
 
@@ -64,10 +64,10 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
         isWindowClosingDialogOpened = false;
 
       case ActionsAtClosing.hide:
-        await ref.read(windowNotifierProvider.notifier).close();
+        await ref.read(windowNotifierProvider.notifier).hide();
 
       case ActionsAtClosing.exit:
-        await ref.read(windowNotifierProvider.notifier).quit();
+        await ref.read(windowNotifierProvider.notifier).exit();
     }
   }
 
