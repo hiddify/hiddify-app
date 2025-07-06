@@ -87,7 +87,12 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
   @override
   RoutingConfig build() {
     final isMobileBreakpoint = ref.watch(isMobileBreakpointProvider);
-    final showProfilesAction = ref.watch(hasAnyProfileProvider).value ?? false;
+    final bool showProfilesAction;
+    if (isMobileBreakpoint == true) {
+      showProfilesAction = false;
+    } else {
+      showProfilesAction = ref.watch(hasAnyProfileProvider).value ?? false;
+    }
     if (isMobileBreakpoint == null) return loadingConfig;
     return RoutingConfig(
       redirect: (context, state) {
@@ -149,7 +154,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                 ),
               ],
             ),
-            if (!isMobileBreakpoint && showProfilesAction)
+            if (showProfilesAction)
               StatefulShellBranch(
                 navigatorKey: navigatorKeys['profiles'],
                 routes: <GoRoute>[
