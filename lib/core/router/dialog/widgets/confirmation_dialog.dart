@@ -5,11 +5,11 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ConfirmationDialog extends HookConsumerWidget {
-  const ConfirmationDialog({super.key, required this.title, required this.message, this.icon, this.okText});
+  const ConfirmationDialog({super.key, required this.title, required this.message, this.icon, this.positiveBtnTxt});
   final String title;
   final String message;
   final IconData? icon;
-  final String? okText;
+  final String? positiveBtnTxt;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,7 +24,7 @@ class ConfirmationDialog extends HookConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => context.pop(true),
-          child: Text(okText ?? t.general.ok),
+          child: Text(positiveBtnTxt ?? t.general.ok),
         ),
         TextButton(
           onPressed: () => context.pop(false),
