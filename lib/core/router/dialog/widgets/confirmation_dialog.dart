@@ -23,12 +23,12 @@ class ConfirmationDialog extends HookConsumerWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => context.pop(true),
-          child: Text(positiveBtnTxt ?? t.general.ok),
-        ),
-        TextButton(
           onPressed: () => context.pop(false),
           child: Text(t.general.cancel),
+        ),
+        TextButton(
+          onPressed: () => context.pop(true),
+          child: Text(positiveBtnTxt ?? t.general.ok),
         ),
       ],
     );
