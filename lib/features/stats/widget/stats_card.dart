@@ -24,18 +24,9 @@ class StatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveTitleStyle =
-        titleStyle ?? Theme.of(context).textTheme.bodySmall;
-    final effectiveLabelStyle = labelStyle ??
-        Theme.of(context)
-            .textTheme
-            .bodySmall
-            ?.copyWith(fontWeight: FontWeight.w300);
-    final effectiveDataStyle = dataStyle ??
-        Theme.of(context)
-            .textTheme
-            .bodySmall
-            ?.copyWith(fontWeight: FontWeight.w300);
+    final effectiveTitleStyle = titleStyle ?? Theme.of(context).textTheme.bodySmall;
+    final effectiveLabelStyle = labelStyle ?? Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w300);
+    final effectiveDataStyle = dataStyle ?? Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w300);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -43,6 +34,7 @@ class StatsCard extends StatelessWidget {
       child: Padding(
         padding: padding,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (title != null) ...[
@@ -78,7 +70,7 @@ class StatsCard extends StatelessWidget {
                         DefaultTextStyle(
                           style: effectiveDataStyle!,
                           overflow: TextOverflow.ellipsis,
-                          child: Flexible(child: stat.data),
+                          child: stat.data,
                         ),
                       ],
                     );

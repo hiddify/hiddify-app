@@ -13,9 +13,6 @@ class InboundOptionsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    String experimental(String txt) {
-      return "$txt (${t.settings.experimental})";
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -73,7 +70,7 @@ class InboundOptionsPage extends HookConsumerWidget {
             validateInput: isPort,
           ),
           SwitchListTile.adaptive(
-            title: Text(experimental(t.config.allowConnectionFromLan)),
+            title: Text(t.config.allowConnectionFromLan),
             secondary: const Icon(Icons.share_rounded),
             value: ref.watch(ConfigOptions.allowConnectionFromLan),
             onChanged: (bool value) async {

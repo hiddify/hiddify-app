@@ -178,10 +178,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: b1fc29a603669b25a5d95cc9610ed649e9f00e6075e5b6b721aa1a095cff13de
+      sha256: b4f8d74125ab53869e63d488b8df2a036a7136d3b6d1759d3247e4d8d2e8f379
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.13"
+    version: "5.0.15"
   build_resolvers:
     dependency: transitive
     description:
@@ -210,10 +210,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_web_compilers
-      sha256: f9b8e84dbfa7688221c2376e6f68ffd796597785a0a5b1e8cd2516a92fdc0a3c
+      sha256: "7c82235c82657efa0e6e877ef813757c7fd9e0e0406106f32ab30a874c939c63"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.5"
+    version: "4.2.0"
   built_collection:
     dependency: transitive
     description:
@@ -419,10 +419,10 @@ packages:
     dependency: transitive
     description:
       name: decimal
-      sha256: "5a6577b30ec74f5e3f482f31c238de26bd1983594419d2799fcb3e76a4a85252"
+      sha256: fc706a5618b81e5b367b01dd62621def37abc096f2b46a9bd9068b64c1fa36d0
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.3"
+    version: "3.2.4"
   dependency_validator:
     dependency: "direct dev"
     description:
@@ -572,14 +572,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_adaptive_scaffold:
-    dependency: "direct main"
-    description:
-      name: flutter_adaptive_scaffold
-      sha256: "5eb1d1d174304a4e67c4bb402ed38cb4a5ebdac95ce54099e91460accb33d295"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.3+1"
   flutter_animate:
     dependency: "direct main"
     description:
@@ -1981,10 +1973,10 @@ packages:
     dependency: "direct main"
     description:
       name: tray_manager
-      sha256: c2da0f0f1ddb455e721cf68d05d1281fec75cf5df0a1d3cb67b6ca0bdfd5709d
+      sha256: ad18c4cd73003097d182884bacb0578ad2865f3ab842a0ad00f6d043ed49eaf0
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "0.5.0"
   type_plus:
     dependency: transitive
     description:
@@ -2197,10 +2189,10 @@ packages:
     dependency: "direct main"
     description:
       name: window_manager
-      sha256: "732896e1416297c63c9e3fb95aea72d0355f61390263982a47fd519169dc5059"
+      sha256: "51d50168ab267d344b975b15390426b1243600d436770d3f13de67e55b05ec16"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.3"
+    version: "0.5.0"
   xdg_directories:
     dependency: transitive
     description:
@@ -2234,5 +2226,5 @@ packages:
     source: hosted
     version: "2.2.2"
 sdks:
-  dart: ">=3.7.0 <3.9.0-z"
-  flutter: ">=3.32.4"
+  dart: ">=3.7.0 <3.10.0-z"
+  flutter: ">=3.32.5"

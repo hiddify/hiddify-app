@@ -40,13 +40,13 @@ class ShortcutWrapper extends HookConsumerWidget {
         actions: {
           CloseWindowIntent: CallbackAction(
             onInvoke: (_) async {
-              await ref.read(windowNotifierProvider.notifier).close();
+              await ref.read(windowNotifierProvider.notifier).hide();
               return null;
             },
           ),
           QuitAppIntent: CallbackAction(
             onInvoke: (_) async {
-              await ref.read(windowNotifierProvider.notifier).quit();
+              await ref.read(windowNotifierProvider.notifier).exit();
               return null;
             },
           ),

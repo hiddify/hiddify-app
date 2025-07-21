@@ -64,6 +64,7 @@ class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin, I
           ..where((tbl) => tbl.active.equals(true))
           ..limit(1))
         .watchSingleOrNull()
+        .distinct()
         .map(
       (event) {
         if (event == null) return event;
@@ -80,7 +81,7 @@ class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin, I
   @override
   Stream<int> watchProfilesCount() {
     final count = profileEntries.id.count();
-    return (profileEntries.selectOnly()..addColumns([count])).map((exp) => exp.read(count)!).watchSingle();
+    return (profileEntries.selectOnly()..addColumns([count])).map((exp) => exp.read(count)!).watchSingle().distinct();
   }
 
   @override

@@ -3,9 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/adaptive_layout/my_adaptive_layout.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
-import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
+import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/custom_transition.dart';
-import 'package:hiddify/core/router/go_router/helper/is_small_active.dart';
 import 'package:hiddify/core/router/go_router/helper/prevent_closing_branch.dart';
 import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/features/about/widget/about_page.dart';
@@ -19,7 +18,7 @@ import 'package:hiddify/features/profile/overview/profiles_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/settings/overview/sections/dns_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/general_page.dart';
-import 'package:hiddify/features/settings/overview/sections/inbound_options.dart';
+import 'package:hiddify/features/settings/overview/sections/inbound_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/route_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/tls_tricks_page.dart';
 import 'package:hiddify/features/settings/overview/sections/warp_options_page.dart';
@@ -47,9 +46,6 @@ final navigatorKeys = <String, GlobalKey<NavigatorState>>{
   'about': GlobalKey(),
 };
 
-// used for showing dialog, updating in MyAdaptiveLayout build method
-GlobalKey<NavigatorState> branchNavKey = rootNavKey;
-
 // when the routing config is not yet initialized, this config is used
 final loadingConfig = RoutingConfig(
   routes: <RouteBase>[
@@ -60,7 +56,7 @@ final loadingConfig = RoutingConfig(
   ],
 );
 
-String getNameOfBranch(bool isSmallActive, bool showProfilesAction, int index) => isSmallActive
+String getNameOfBranch(bool isMobileBreakpoint, bool showProfilesAction, int index) => isMobileBreakpoint
     ? [
         'home',
         'settings',
@@ -73,7 +69,7 @@ String getNameOfBranch(bool isSmallActive, bool showProfilesAction, int index) =
         'about',
       ][index];
 
-int getIndexOfBranch(bool isSmallActive, bool showProfilesAction, String name) => isSmallActive
+int getIndexOfBranch(bool isMobileBreakpoint, bool showProfilesAction, String name) => isMobileBreakpoint
     ? [
         'home',
         'settings',
@@ -90,9 +86,14 @@ int getIndexOfBranch(bool isSmallActive, bool showProfilesAction, String name) =
 class RoutingConfigNotifier extends _$RoutingConfigNotifier {
   @override
   RoutingConfig build() {
-    final isSmallActive = ref.watch(isSmallActiveProvider);
-    final showProfilesAction = ref.watch(hasAnyProfileProvider).value ?? false;
-    if (isSmallActive == null) return loadingConfig;
+    final isMobileBreakpoint = ref.watch(isMobileBreakpointProvider);
+    final bool showProfilesAction;
+    if (isMobileBreakpoint == true) {
+      showProfilesAction = false;
+    } else {
+      showProfilesAction = ref.watch(hasAnyProfileProvider).value ?? false;
+    }
+    if (isMobileBreakpoint == null) return loadingConfig;
     return RoutingConfig(
       redirect: (context, state) {
         final introCompleted = ref.read(Preferences.introCompleted);
@@ -123,7 +124,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
         StatefulShellRoute.indexedStack(
           builder: (_, __, navigationShell) => MyAdaptiveLayout(
             navigationShell: navigationShell,
-            isSmallActive: isSmallActive,
+            isMobileBreakpoint: isMobileBreakpoint,
             showProfilesAction: showProfilesAction,
           ),
           branches: <StatefulShellBranch>[
@@ -143,7 +144,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                       path: '/proxies',
                       pageBuilder: (_, state) => customTransition(TransitionType.fade, state.pageKey, const ProxiesOverviewPage()),
                     ),
-                    if (isSmallActive)
+                    if (isMobileBreakpoint)
                       GoRoute(
                         name: 'profileDetails',
                         path: '/profile-details/:id',
@@ -153,7 +154,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                 ),
               ],
             ),
-            if (!isSmallActive && showProfilesAction)
+            if (showProfilesAction)
               StatefulShellBranch(
                 navigatorKey: navigatorKeys['profiles'],
                 routes: <GoRoute>[
@@ -222,7 +223,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                       path: '/warp-options',
                       pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const WarpOptionsPage()),
                     ),
-                    if (isSmallActive) ...[
+                    if (isMobileBreakpoint) ...[
                       GoRoute(
                         name: 'logs',
                         path: '/logs',
@@ -238,7 +239,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                 ),
               ],
             ),
-            if (!isSmallActive) ...[
+            if (!isMobileBreakpoint) ...[
               StatefulShellBranch(
                 navigatorKey: navigatorKeys['logs'],
                 routes: <GoRoute>[

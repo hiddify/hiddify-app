@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/bottom_sheets/widgets/quick_settings_modal.dart';
-import 'package:hiddify/core/router/go_router/helper/popup_count_notifier.dart';
-import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
+import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/overview/profiles_modal.dart';
 
@@ -16,9 +15,9 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
   void build() {}
 
   Future<T?> _show<T>({required Widget child, required bool isScrollControlled}) async {
-    final context = branchNavKey.currentContext;
+    final context = rootNavKey.currentContext;
     if (context == null) return null;
-    ref.read(popupCountNotifierProvider.notifier).increase();
+    // ref.read(popupCountNotifierProvider.notifier).increase();
     return await Navigator.of(context)
         .push<T>(
       ModalBottomSheetRoute(
@@ -27,14 +26,17 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
         builder: (context) => ClipRRect(
           borderRadius: BottomSheetConst.borderRadius,
           child: Material(
-            child: child,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: child,
+            ),
           ),
         ),
       ),
     )
         .then(
       (value) {
-        ref.read(popupCountNotifierProvider.notifier).decrease();
+        // ref.read(popupCountNotifierProvider.notifier).decrease();
         return value;
       },
     );

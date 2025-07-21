@@ -2,7 +2,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -10,6 +9,7 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
@@ -107,7 +107,7 @@ class ProfileTile extends HookConsumerWidget {
                     borderRadius: showActionButton ? ProfileTileConst.endBorderRadius(Directionality.of(context)) : ProfileTileConst.cardBorderRadius,
                     onTap: () {
                       if (isMain) {
-                        if (Breakpoints.small.isActive(context)) {
+                        if (Breakpoint(context).isMobile()) {
                           ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
                         } else {
                           context.goNamed('profiles');

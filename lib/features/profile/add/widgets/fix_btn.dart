@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:gap/gap.dart';
+import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FixBtn extends ConsumerWidget {
@@ -20,7 +20,7 @@ class FixBtn extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final isSmallBreakpoint = Breakpoints.small.isActive(context);
+    final isMobile = Breakpoint(context).isMobile();
     final color = theme.colorScheme.primary;
     final borderRadius = BorderRadius.circular(18);
 
@@ -43,13 +43,13 @@ class FixBtn extends ConsumerWidget {
             children: [
               Icon(
                 icon,
-                size: isSmallBreakpoint ? 32 : 40,
+                size: isMobile ? 32 : 40,
                 color: color,
               ),
-              Gap(isSmallBreakpoint ? 4 : 8),
+              Gap(isMobile ? 4 : 8),
               Text(
                 title,
-                style: isSmallBreakpoint ? theme.textTheme.titleSmall!.copyWith(color: color) : theme.textTheme.titleMedium!.copyWith(color: color),
+                style: isMobile ? theme.textTheme.titleSmall!.copyWith(color: color) : theme.textTheme.titleMedium!.copyWith(color: color),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),

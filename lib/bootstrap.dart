@@ -96,7 +96,7 @@ Future<void> lazyBootstrap(
     final silentStart = container.read(Preferences.silentStart);
     Logger.bootstrap.debug("silent start [${silentStart ? "Enabled" : "Disabled"}]");
     if (!silentStart) {
-      await container.read(windowNotifierProvider.notifier).open(focus: false);
+      await container.read(windowNotifierProvider.notifier).show(focus: false);
     } else {
       Logger.bootstrap.debug("silent start, remain hidden accessible via tray");
     }

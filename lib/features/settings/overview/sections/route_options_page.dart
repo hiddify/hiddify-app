@@ -15,10 +15,6 @@ class RouteOptionsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    String experimental(String txt) {
-      return "$txt (${t.settings.experimental})";
-    }
-
     final perAppProxy = ref.watch(Preferences.perAppProxyMode).enabled;
     return Scaffold(
       appBar: AppBar(
@@ -55,13 +51,13 @@ class RouteOptionsPage extends HookConsumerWidget {
             onChanged: (val) => ref.read(ConfigOptions.directDnsAddress.notifier).reset(),
           ),
           SwitchListTile.adaptive(
-            title: Text(experimental(t.config.blockAds)),
+            title: Text(t.config.blockAds),
             secondary: const Icon(Icons.block_rounded),
             value: ref.watch(ConfigOptions.blockAds),
             onChanged: ref.read(ConfigOptions.blockAds.notifier).update,
           ),
           SwitchListTile.adaptive(
-            title: Text(experimental(t.config.bypassLan)),
+            title: Text(t.config.bypassLan),
             secondary: const Icon(Icons.call_split_rounded),
             value: ref.watch(ConfigOptions.bypassLan),
             onChanged: ref.read(ConfigOptions.bypassLan.notifier).update,

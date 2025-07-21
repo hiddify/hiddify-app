@@ -1,12 +1,12 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 
+import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -137,7 +137,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     if (menuItem.key == 'connection') {
       await ref.read(connectionNotifierProvider.notifier).toggleConnection();
     } else if (menuItem.key == 'quit') {
-      await ref.read(windowNotifierProvider.notifier).quit();
+      await ref.read(windowNotifierProvider.notifier).exit();
     } else {
       final newMode = ServiceMode.values.byName(menuItem.key!);
       loggy.debug("switching service mode: [$newMode]");
@@ -152,7 +152,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     // } else {
     //   await ref.read(windowNotifierProvider.notifier).hideOrShow();
     // }
-    await ref.read(windowNotifierProvider.notifier).hideOrShow();
+    await ref.read(windowNotifierProvider.notifier).showOrHide();
   }
 
   @override
