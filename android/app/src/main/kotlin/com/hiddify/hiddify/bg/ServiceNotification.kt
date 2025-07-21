@@ -142,11 +142,11 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_SCREEN_ON -> {
-startListenSystemInfo()
+                startListenSystemInfo()
             }
 
             Intent.ACTION_SCREEN_OFF -> {
-            stopListenSystemInfo()
+                stopListenSystemInfo()
             }
         }
     }
@@ -160,35 +160,37 @@ startListenSystemInfo()
         }
     }
 
+    private var streamingJob: Job? = null
+
     fun startListenSystemInfo() {
-        streamingCoroutineScope.launch {
+        // Cancel any previous stream if still running
+        streamingJob?.cancel()
+
+        streamingJob = streamingCoroutineScope.launch {
             try {
+                val coreClient = GrpcClientProvider.grpcClient.create(CoreClient::class)
 
-            coreClient?.Stop()
-            val sendCommandChannel: SendChannel<Empty>
-            val receiveUpdateChannel: ReceiveChannel<SystemInfo>
-            coreClient = GrpcClientProvider.grpcClient.create(CoreClient::class)
+                val (sendCommandChannel, receiveUpdateChannel) = coreClient.GetSystemInfo().executeIn(this)
 
-            coreClient!!.GetSystemInfo().executeIn(this).let { (sendChannel, receiveChannel) ->
-                sendCommandChannel = sendChannel
-                receiveUpdateChannel = receiveChannel
-            }
-            sendCommandChannel.send(Empty())
+                // Send initial command
+                sendCommandChannel.send(Empty())
 
-
+                // Consume incoming updates
                 for (update in receiveUpdateChannel) {
                     updateStatus(update)
                 }
+
+                // When the stream ends normally, cancel notification
+                notification.cancel(notificationId)
+
             } catch (e: Exception) {
-                Log.d("notification", "Exception ${e}")            }
+                Log.d("notification", "Exception: $e")
+            }
         }
-
-
-
     }
     fun stopListenSystemInfo(){
         try {
-            coreClient?.Stop()
+            streamingJob?.cancel()
         }catch (e: Exception){
             Log.d("notification", "Exception ${e}")
         }
