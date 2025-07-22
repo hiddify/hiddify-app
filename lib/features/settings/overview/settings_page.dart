@@ -5,7 +5,6 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
-import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/features/settings/notifier/reset_tunnel/reset_tunnel_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -59,76 +58,95 @@ class SettingsPage extends HookConsumerWidget {
       appBar: AppBar(
         title: Text(t.config.pageTitle),
         actions: [
-          PopupMenuButton<dynamic>(
-            icon: Icon(AdaptiveIcon(context).more),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                onTap: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard().then((success) {
-                  if (success) {
-                    ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
-                  }
-                }),
-                child: Text(t.settings.exportOptions),
+          MenuAnchor(
+            menuChildren: <Widget>[
+              SubmenuButton(
+                menuChildren: <Widget>[
+                  MenuItemButton(
+                    onPressed: () async => await ref
+                        .read(dialogNotifierProvider.notifier)
+                        .showConfirmation(
+                          title: t.settings.importOptions,
+                          message: t.settings.importOptionsMsg,
+                        )
+                        .then((shouldImport) async {
+                      if (shouldImport) {
+                        await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
+                      }
+                    }),
+                    child: Text(t.settings.importOptions),
+                  ),
+                  MenuItemButton(
+                    onPressed: () async => await ref
+                        .read(dialogNotifierProvider.notifier)
+                        .showConfirmation(
+                          title: t.settings.importOptions,
+                          message: t.settings.importOptionsMsg,
+                        )
+                        .then((shouldImport) async {
+                      if (shouldImport) {
+                        await ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
+                      }
+                    }),
+                    child: Text(t.settings.importOptionsFile),
+                  ),
+                ],
+                child: Text(t.general.import),
               ),
-              PopupMenuItem(
-                onTap: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false).then((success) {
-                  if (success) {
-                    ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
-                  }
-                }),
-                child: Text(t.settings.exportAllOptions),
-              ),
-              PopupMenuItem(
-                onTap: () async => await ref
-                    .read(dialogNotifierProvider.notifier)
-                    .showConfirmation(
-                      title: t.settings.importOptions,
-                      message: t.settings.importOptionsMsg,
-                    )
-                    .then((shouldImport) async {
-                  if (shouldImport) {
-                    await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
-                  }
-                }),
-                child: Text(t.settings.importOptions),
+              SubmenuButton(
+                menuChildren: <Widget>[
+                  MenuItemButton(
+                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard().then((success) {
+                      if (success) {
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
+                      }
+                    }),
+                    child: Text(t.settings.exportOptions),
+                  ),
+                  MenuItemButton(
+                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile().then((success) {
+                      if (success) {
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
+                      }
+                    }),
+                    child: Text(t.settings.exportOptionsFile),
+                  ),
+                  const PopupMenuDivider(),
+                  MenuItemButton(
+                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false).then((success) {
+                      if (success) {
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
+                      }
+                    }),
+                    child: Text(t.settings.exportAllOptions),
+                  ),
+                  MenuItemButton(
+                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false).then((success) {
+                      if (success) {
+                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
+                      }
+                    }),
+                    child: Text(t.settings.exportAllOptionsFile),
+                  ),
+                ],
+                child: Text(t.general.export),
               ),
               const PopupMenuDivider(),
-              PopupMenuItem(
-                onTap: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile().then((success) {
-                  if (success) {
-                    ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
-                  }
-                }),
-                child: Text(t.settings.exportOptionsFile),
-              ),
-              PopupMenuItem(
-                onTap: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false).then((success) {
-                  if (success) {
-                    ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
-                  }
-                }),
-                child: Text(t.settings.exportAllOptionsFile),
-              ),
-              PopupMenuItem(
-                onTap: () async => await ref
-                    .read(dialogNotifierProvider.notifier)
-                    .showConfirmation(
-                      title: t.settings.importOptions,
-                      message: t.settings.importOptionsMsg,
-                    )
-                    .then((shouldImport) async {
-                  if (shouldImport) {
-                    await ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
-                  }
-                }),
-                child: Text(t.settings.importOptionsFile),
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem(
+              MenuItemButton(
                 child: Text(t.config.resetBtn),
-                onTap: () async => await ref.read(configOptionNotifierProvider.notifier).resetOption(),
+                onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).resetOption(),
               ),
             ],
+            builder: (context, controller, child) => IconButton(
+              onPressed: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+              icon: const Icon(Icons.more_vert_rounded),
+            ),
           ),
           const Gap(8),
         ],
