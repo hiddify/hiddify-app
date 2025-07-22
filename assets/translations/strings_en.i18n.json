@@ -34,7 +34,10 @@
     "showMore": "Show More",
     "showLess": "Show Less",
     "openAppSettings": "Open App Settings",
-    "grantPermission": "Grant Permission"
+    "grantPermission": "Grant Permission",
+    "import": "Import",
+    "export": "Export",
+    "share": "Share"
   },
   "unknownDomains": {
     "title": "External Link Warning",
@@ -279,7 +282,31 @@
       },
       "showSystemApps": "Show System Apps",
       "hideSystemApps": "Hide System Apps",
-      "clearSelection": "Clear Selection"
+      "clearSelection": "Clear Selection",
+      "autoSelection": {
+        "title": "Auto Selection",
+        "dialogTitle": "Auto selection apps(proxy/bypass)",
+        "msg": "Based on the selected region \"${region}\", the list of selected apps will be updated",
+        "success": "Auto selection completed successfully",
+        "failure": "Auto selection failed",
+        "regionNotFound": "Auto selection not found, region \"${region}\""
+      },
+      "share": {
+        "emptyList": "Selected items already in the list"
+      },
+      "import": {
+        "Clipboard": "Import from Clipboard",
+        "JsonFile": "Import from JSON File",
+        "success": "Import successful",
+        "failure": "Import failured"
+      },
+      "export": {
+        "Clipboard": "Copy to Clipboard",
+        "JsonFile": "Save to JSON File",
+        "success": "Export successful",
+        "failure": "Export failured",
+        "contentTooLarge": "Content too large. Use Export File instead"
+      }
     },
     "routeRule": {
       "pageTitle": "Route Rules",
