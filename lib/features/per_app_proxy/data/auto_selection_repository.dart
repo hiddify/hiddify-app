@@ -6,7 +6,6 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/utils/utils.dart';
-import 'package:loggy/loggy.dart';
 
 enum AutoSelectionResult {
   success,
@@ -72,8 +71,8 @@ class AutoSelectionRepositoryImpl with AppLogger implements AutoSelectionReposit
         return (null, AutoSelectionResult.failure);
       }
     } catch (e, st) {
-      loggy.log(LogLevel.error, e.toString(), e, st);
-      rethrow;
+      loggy.error("Failed to fetch auto selection with unexpected error", e, st);
+      return (null, AutoSelectionResult.failure);
     }
   }
 
