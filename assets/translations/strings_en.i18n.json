@@ -292,7 +292,10 @@
         "regionNotFound": "Auto selection not found, region \"${region}\""
       },
       "share": {
-        "emptyList": "Selected items already in the list"
+        "title": "Share To All",
+        "emptyList": "Selected items already in the list",
+        "dialogTitle": "Improving auto selection",
+        "msg": "By sharing selected apps, you help complete the \"Auto Selection\" list"
       },
       "import": {
         "Clipboard": "Import from Clipboard",
