@@ -8,6 +8,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/per_app_proxy/data/auto_selection_data_provider.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
@@ -53,6 +54,11 @@ class SelectedAppsFilteredByMode extends _$SelectedAppsFilteredByMode with AppLo
 
   Future<bool> share() async {
     final t = ref.watch(translationsProvider).requireValue;
+    final agree = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
+          title: t.settings.network.share.dialogTitle,
+          message: t.settings.network.share.msg,
+        );
+    if (agree != true) return false;
     final rs = await ref.watch(autoSelectionRepoProvider).getByPerAppProxyMode();
     if (rs.$2.isSuccess()) {
       final selectedApps = state;
