@@ -6,13 +6,13 @@ version: 3.0.0+30000
 environment:
   sdk: ">=3.3.0 <4.0.0"
   flutter: "^3.32.5"
-
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2
+
   # lucy_editor: ^1.0.5
   # re_highlight: ^0.0.3
   # json_editor_flutter: ^1.4.2
