@@ -138,7 +138,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                     ),
                     if (ref.watch(ConfigOptions.region) != Region.other) ...[
                       MenuItemButton(
-                        child: Text(t.general.share),
+                        child: Text(t.settings.network.share.title),
                         onPressed: () async => await ref.read(selectedAppsFilteredByModeProvider.notifier).share(),
                       ),
                       const PopupMenuDivider(),
