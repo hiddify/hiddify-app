@@ -8,7 +8,28 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'rule_notifier.g.dart';
 
-enum RuleEnum { listOrder, enabled, name, outbound, ruleSet, packageName, processName, processPath, network, portRange, sourcePortRange, protocol, ipCidr, sourceIpCidr, domain, domainSuffix, domainKeyword, domainRegex }
+enum RuleEnum {
+  listOrder,
+  enabled,
+  name,
+  outbound,
+  ruleSet,
+  packageName,
+  processName,
+  processPath,
+  network,
+  portRange,
+  sourcePortRange,
+  protocol,
+  ipCidr,
+  sourceIpCidr,
+  domain,
+  domainSuffix,
+  domainKeyword,
+  domainRegex;
+
+  int getIndex() => index + 1;
+}
 
 @riverpod
 class RuleNotifier extends _$RuleNotifier {
@@ -30,7 +51,7 @@ class RuleNotifier extends _$RuleNotifier {
 
   void update<T>(RuleEnum key, T value) {
     final map = state.writeToJsonMap();
-    map['${key.index + 1}'] = value is ProtobufEnum
+    map['${key.getIndex()}'] = value is ProtobufEnum
         ? '${value.value}'
         : value is List<ProtobufEnum>
             ? value.map((e) => '${e.value}').toList()

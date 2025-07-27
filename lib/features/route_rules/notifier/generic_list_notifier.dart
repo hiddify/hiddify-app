@@ -13,7 +13,7 @@ class GenericListNotifier extends _$GenericListNotifier {
   List<dynamic> build(int? ruleListOrder, RuleEnum ruleEnum) {
     _ruleListOrder = ruleListOrder;
     _ruleEnum = ruleEnum;
-    final value = ref.read(ruleNotifierProvider(ruleListOrder)).writeToJsonMap()['${ruleEnum.index + 1}'];
+    final value = ref.read(ruleNotifierProvider(ruleListOrder)).writeToJsonMap()['${ruleEnum.getIndex()}'];
     if (value is List) return value;
     return [];
   }
