@@ -57,6 +57,7 @@ class SelectedAppsFilteredByMode extends _$SelectedAppsFilteredByMode with AppLo
     final agree = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
           title: t.settings.network.share.dialogTitle,
           message: t.settings.network.share.msg,
+          positiveBtnTxt: t.general.kContinue,
         );
     if (agree != true) return false;
     final rs = await ref.watch(autoSelectionRepoProvider).getByPerAppProxyMode();

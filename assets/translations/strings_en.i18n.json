@@ -285,7 +285,7 @@
       "clearSelection": "Clear Selection",
       "autoSelection": {
         "title": "Auto Selection",
-        "dialogTitle": "Auto selection apps(proxy/bypass)",
+        "dialogTitle": "Auto selection apps \"proxy/bypass\"",
         "msg": "Based on the selected region \"${region}\", the list of selected apps will be updated",
         "success": "Auto selection completed successfully",
         "failure": "Auto selection failed",
