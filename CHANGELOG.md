@@ -4,6 +4,15 @@
 
 ### New Features and Improvements
 
+- **Stabilized Experimental Features**: The following features have been moved from experimental to stable status:
+  - TLS Tricks (TLS Fragment, TLS Mixed SNI Case, TLS Padding)
+  - Mux (Multiplexing)
+  - Cloudflare WARP
+  - Bypass LAN
+  - Allow Connection from LAN
+  - Block Ads
+  - These features are now fully supported and no longer require experimental feature warnings
+
 - Changed App name to **Hiddify**
 - Changed App icon
 - **Stabilized Experimental Features**: Mux, Cloudflare WARP, TLS Tricks, Bypass LAN, Connection from LAN, and VPN Service modes are now stable and no longer marked as experimental

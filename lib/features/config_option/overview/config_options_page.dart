@@ -65,8 +65,6 @@ class ConfigOptionsPage extends HookConsumerWidget {
       },
     );
 
-    
-
     return Scaffold(
       body: CustomScrollView(
         controller: scrollController,
