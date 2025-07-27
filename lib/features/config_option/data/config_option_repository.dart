@@ -337,14 +337,12 @@ abstract class ConfigOptions {
 
   static final hasExperimentalFeatures = Provider.autoDispose<bool>(
     (ref) {
+      // All previously experimental features have been stabilized
+      // Only VPN Service on desktop with TUN mode remains experimental
       final mode = ref.watch(serviceMode);
       if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
         return true;
       }
-      if (ref.watch(enableTlsFragment) || ref.watch(enableTlsMixedSniCase) || ref.watch(enableTlsPadding) || ref.watch(enableMux) || ref.watch(enableWarp) || ref.watch(bypassLan) || ref.watch(allowConnectionFromLan)) {
-        return true;
-      }
-
       return false;
     },
   );
