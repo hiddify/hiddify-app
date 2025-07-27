@@ -335,17 +335,7 @@ abstract class ConfigOptions {
     "",
   );
 
-  static final hasExperimentalFeatures = Provider.autoDispose<bool>(
-    (ref) {
-      // All previously experimental features have been stabilized
-      // Only VPN Service on desktop with TUN mode remains experimental
-      final mode = ref.watch(serviceMode);
-      if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
-        return true;
-      }
-      return false;
-    },
-  );
+
 
   /// preferences to exclude from share and export
   static final privatePreferencesKeys = {

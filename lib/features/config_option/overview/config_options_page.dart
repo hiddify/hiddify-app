@@ -65,8 +65,6 @@ class ConfigOptionsPage extends HookConsumerWidget {
       },
     );
 
-
-
     return Scaffold(
       body: CustomScrollView(
         controller: scrollController,
@@ -128,7 +126,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  TipCard(message: t.settings.experimentalMsg),
+
                   ChoicePreferenceWidget(
                     selected: ref.watch(ConfigOptions.logLevel),
                     preferences: ref.watch(ConfigOptions.logLevel.notifier),

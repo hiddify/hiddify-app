@@ -27,6 +27,7 @@ import 'package:hiddify/singbox/service/singbox_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:hiddify/core/services/memory_leak_detection_service.dart';
 
 Future<void> lazyBootstrap(
   WidgetsBinding widgetsBinding,
@@ -51,6 +52,11 @@ Future<void> lazyBootstrap(
     () => container.read(appDirectoriesProvider.future),
   );
   LoggerController.init(container.read(logPathResolverProvider).appFile().path);
+  
+  // Initialize memory leak detection in debug mode
+  if (kDebugMode) {
+    MemoryLeakDetectionService().startMonitoring();
+  }
 
   final appInfo = await _init(
     "app info",

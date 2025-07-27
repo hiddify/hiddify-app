@@ -15,12 +15,13 @@
 
 - Changed App name to **Hiddify**
 - Changed App icon
+- **Stabilized Experimental Features**: Mux, Cloudflare WARP, TLS Tricks, Bypass LAN, Connection from LAN, and VPN Service modes are now stable and no longer marked as experimental
 - Added Mux
 - Added Cloudflare WARP
 - Added connection info
   - when connected, name of the active node, speed and IP address are shown on home page
   - delay indicator below connection button shows active node's ping
-- Added VPN Service (Windows & Linux) (**Experimental**)
+- Added VPN Service (Windows & Linux)
   - VPN Service circumvents need for administrator permission while using TUN
 - Changed in-app icons (using [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons))
 - Redesigned navigation flow, separating config options
@@ -129,8 +130,7 @@
 
 ### New Features and Improvements
 
-- Added experimental feature flag in settings
-- Added notice dialog when connecting with experimental features
+- Removed experimental feature flag and notice dialog (features are now stable)
 
 ### Bug Fixes
 

@@ -13,6 +13,7 @@ import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:hiddify/utils/memory_leak_prevention.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 class LogsOverviewPage extends HookConsumerWidget with PresLogger {
@@ -28,6 +29,7 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
     final pathResolver = ref.watch(logPathResolverProvider);
 
     final filterController = useTextEditingController(text: state.filter);
+    MemoryLeakPrevention.trackResource('TextEditingController', filterController);
 
     final List<PopupMenuEntry> popupButtons = debug || PlatformUtils.isDesktop
         ? [

@@ -29,19 +29,13 @@ enum ServiceMode {
     return [proxy, tun];
   }
 
-  bool get isExperimental => switch (this) {
-        tun => PlatformUtils.isDesktop,
-        tunService => PlatformUtils.isDesktop,
-        _ => false,
-      };
+  bool get isExperimental => false;
 
   String present(TranslationsEn t) => switch (this) {
         proxy => t.config.serviceModes.proxy,
         systemProxy => t.config.serviceModes.systemProxy,
-        tun =>
-          "${t.config.serviceModes.tun}${isExperimental ? " (${t.settings.experimental})" : ""}",
-        tunService =>
-          "${t.config.serviceModes.tunService}${isExperimental ? " (${t.settings.experimental})" : ""}",
+        tun => t.config.serviceModes.tun,
+        tunService => t.config.serviceModes.tunService,
       };
 
   String presentShort(TranslationsEn t) => switch (this) {

@@ -9,6 +9,7 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hiddify/utils/memory_leak_prevention.dart';
 
 const _space = 18.0;
 const _textStyle = TextStyle(fontSize: 16);
@@ -396,7 +397,7 @@ class JsonEditor extends StatefulWidget {
   State<JsonEditor> createState() => _JsonEditorState();
 }
 
-class _JsonEditorState extends State<JsonEditor> {
+class _JsonEditorState extends State<JsonEditor> with MemoryLeakPreventionMixin {
   Timer? _timer;
   Timer? _searchTimer;
   late dynamic _data;
@@ -437,6 +438,7 @@ class _JsonEditorState extends State<JsonEditor> {
     _timer = Timer(widget.duration, () {
       widget.onChanged(jsonDecode(jsonEncode(_data)));
     });
+    addDisposableTimer(_timer!);
   }
 
   void parseData(String value) {
@@ -455,6 +457,7 @@ class _JsonEditorState extends State<JsonEditor> {
         });
       }
     });
+    addDisposableTimer(_timer!);
   }
 
   void copyData() async {
@@ -524,6 +527,7 @@ class _JsonEditorState extends State<JsonEditor> {
         }
       }
     });
+    addDisposableTimer(_searchTimer!);
   }
 
   int getOffset(List toFind) {
@@ -635,12 +639,16 @@ class _JsonEditorState extends State<JsonEditor> {
     _enableMoreOptions = widget.enableMoreOptions;
     _enableKeyEdit = widget.enableKeyEdit;
     _enableValueEdit = widget.enableValueEdit;
+    
+    // Add controllers to memory leak prevention
+    addDisposableTextController(_controller);
+    addDisposableScrollController(_scrollController);
   }
 
   @override
   void dispose() {
     _timer?.cancel();
-    _controller.dispose();
+    _searchTimer?.cancel();
     super.dispose();
   }
 
@@ -1201,7 +1209,7 @@ class _ReplaceTextWithField extends StatefulWidget {
   State<_ReplaceTextWithField> createState() => _ReplaceTextWithFieldState();
 }
 
-class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
+class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> with MemoryLeakPreventionMixin {
   late final _focusNode = FocusNode();
   bool _isFocused = false;
   bool _value = false;
@@ -1259,12 +1267,12 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
     }
 
     _focusNode.addListener(handleChange);
+    addDisposableFocusNode(_focusNode);
   }
 
   @override
   void dispose() {
     _focusNode.removeListener(handleChange);
-    _focusNode.dispose();
     super.dispose();
   }
 

@@ -9,7 +9,7 @@ import 'package:hiddify/features/config_option/data/config_option_repository.dar
 import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
-import 'package:hiddify/features/connection/widget/experimental_feature_notice.dart';
+
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
@@ -44,24 +44,15 @@ class ConnectionButton extends HookConsumerWidget {
 
     final buttonTheme = Theme.of(context).extension<ConnectionButtonTheme>()!;
 
-    Future<bool> showExperimentalNotice() async {
-      final hasExperimental = ref.read(ConfigOptions.hasExperimentalFeatures);
-      final canShowNotice = !ref.read(disableExperimentalFeatureNoticeProvider);
-      if (hasExperimental && canShowNotice && context.mounted) {
-        return await const ExperimentalFeatureNoticeDialog().show(context) ?? false;
-      }
-      return true;
-    }
+
 
     return _ConnectionButton(
       onTap: switch (connectionStatus) {
         AsyncData(value: Disconnected()) || AsyncError() => () async {
-            if (await showExperimentalNotice()) {
-              return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-            }
+            return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
           },
         AsyncData(value: Connected()) => () async {
-            if (requiresReconnect == true && await showExperimentalNotice()) {
+            if (requiresReconnect == true) {
               return await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
             }
             return await ref.read(connectionNotifierProvider.notifier).toggleConnection();

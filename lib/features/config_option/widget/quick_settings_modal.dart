@@ -32,7 +32,7 @@ class QuickSettingsModal extends HookConsumerWidget {
                         e.presentShort(t),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      tooltip: e.isExperimental ? t.settings.experimental : null,
+                      tooltip: null,
                     ),
                   )
                   .toList(),
@@ -68,11 +68,11 @@ class QuickSettingsModal extends HookConsumerWidget {
               title: Text(t.config.enableTlsFragment),
             ),
           ),
-          // SwitchListTile(
-          //   value: ref.watch(ConfigOptions.enableMux),
-          //   onChanged: ref.watch(ConfigOptions.enableMux.notifier).update,
-          //   title: Text(t.config.enableMux),
-          // ),
+          SwitchListTile(
+            value: ref.watch(ConfigOptions.enableMux),
+            onChanged: ref.watch(ConfigOptions.enableMux.notifier).update,
+            title: Text(t.config.enableMux),
+          ),
           ListTile(
             title: Text(t.config.allOptions),
             trailing: const Icon(FluentIcons.chevron_right_24_regular),
