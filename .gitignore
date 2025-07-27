@@ -32,6 +32,10 @@ migrate_working_dir/
 .pub/
 /build/
 
+# Flutter SDK files
+flutter/
+flutter_linux_*.tar.xz
+
 # generated files
 **/*.g.dart
 **/*.freezed.dart
