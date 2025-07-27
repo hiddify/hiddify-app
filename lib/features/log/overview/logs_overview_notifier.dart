@@ -22,6 +22,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
         loggy.debug("disposing");
         _listener?.cancel();
         _listener = null;
+        _debouncer.dispose();
       },
     );
     ref.onCancel(
