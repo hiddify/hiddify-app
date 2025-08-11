@@ -282,18 +282,21 @@
       },
       "showSystemApps": "Show System Apps",
       "hideSystemApps": "Hide System Apps",
-      "clearSelection": "Clear Selection",
+      "clearSelection": "Clear All Selections",
       "autoSelection": {
         "title": "Auto Selection",
-        "dialogTitle": "Auto selection apps \"proxy/bypass\"",
-        "msg": "Based on the selected region \"${region}\", the list of selected apps will be updated",
-        "success": "Auto selection completed successfully",
+        "dialogTitle": "Auto apps selection",
+        "msg": "The Auto-Selection feature for Per-App Proxy was disabled due to the region change to \"${region}\"",
+        "success": "Auto apps selection completed successfully",
         "failure": "Auto selection failed",
-        "regionNotFound": "Auto selection not found, region \"${region}\""
+        "regionNotFound": "Auto selection not found, region \"${region}\"",
+        "performNow": "Perform Now",
+        "resetToDefault": "Reset To Default"
       },
       "share": {
         "title": "Share To All",
-        "emptyList": "Selected items already in the list",
+        "emptyList": "Your selections is empty",
+        "alreadyInAuto": "Your selections is already in the auto-list",
         "dialogTitle": "Improving auto selection",
         "msg": "By sharing selected apps, you help complete the \"Auto Selection\" list"
       },
