@@ -52,19 +52,14 @@ class RouteOptionsPage extends HookConsumerWidget {
             presentChoice: (value) => value.present(t),
             onChanged: (val) async {
               await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
-              if (ref.watch(Preferences.autoSelectionAppsRegion) != val && val != Region.other && ref.watch(Preferences.perAppProxyMode) != PerAppProxyMode.off && PlatformUtils.isAndroid) {
-                await ref
-                    .read(dialogNotifierProvider.notifier)
-                    .showConfirmation(
-                      title: t.settings.network.autoSelection.dialogTitle,
-                      message: t.settings.network.autoSelection.msg(region: val.name),
-                      positiveBtnTxt: t.general.kContinue,
-                    )
-                    .then(
-                  (value) async {
-                    if (value) await ref.read(selectedAppsFilteredByModeProvider.notifier).autoSelection();
-                  },
-                );
+              final autoRegion = ref.read(Preferences.autoAppsSelectionRegion);
+              final mode = ref.read(Preferences.perAppProxyMode).toAppProxy();
+              if (autoRegion != val && autoRegion != null && val != Region.other && mode != null && PlatformUtils.isAndroid) {
+                await ref.read(dialogNotifierProvider.notifier).showOk(
+                      t.settings.network.autoSelection.dialogTitle,
+                      t.settings.network.autoSelection.msg(region: val.name),
+                    );
+                await ref.read(PerAppProxyProvider(mode).notifier).clearAutoSelected();
               }
             },
           ),
