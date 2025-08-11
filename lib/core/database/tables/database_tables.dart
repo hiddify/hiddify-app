@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:hiddify/core/database/converters/duration_converter.dart';
 import 'package:hiddify/features/geo_asset/model/geo_asset_entity.dart';
+import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 
 @DataClassName('ProfileEntry')
@@ -18,6 +19,7 @@ class ProfileEntries extends Table {
   DateTimeColumn get expire => dateTime().nullable()();
   TextColumn get webPageUrl => text().nullable()();
   TextColumn get supportUrl => text().nullable()();
+  // TextColumn get localOverride => text().nullable()(); //temporary use it as json config
   TextColumn get testUrl => text().nullable()(); //temporary use it as json config
 
   @override
@@ -41,4 +43,14 @@ class GeoAssetEntries extends Table {
   List<Set<Column>> get uniqueKeys => [
         {name, providerName},
       ];
+}
+
+@DataClassName('AppProxyEntry')
+class AppProxyEntries extends Table {
+  TextColumn get mode => textEnum<AppProxyMode>()();
+  TextColumn get pkgName => text()();
+  IntColumn get flags => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column> get primaryKey => {mode, pkgName};
 }
