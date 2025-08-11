@@ -17,6 +17,7 @@ import 'package:hiddify/core/theme/app_theme.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
+import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_service_notifier.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/shortcut/shortcut_wrapper.dart';
 import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
@@ -28,6 +29,7 @@ import 'package:toastification/toastification.dart';
 import 'package:upgrader/upgrader.dart';
 
 bool _debugAccessibility = false;
+bool isOnPauseCalled = false;
 
 class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   const App({super.key});
@@ -36,7 +38,9 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     onPause(ref);
   }
 
-  void onPause(WidgetRef ref) {}
+  void onPause(WidgetRef ref) {
+    isOnPauseCalled = true;
+  }
 
   void onResume(WidgetRef ref) {
     // if (PlatformUtils.isDesktop) return;
@@ -48,6 +52,10 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     }).map((_) {
       loggy.info("Hiddify-core setup done");
     }).run();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (isOnPauseCalled && PlatformUtils.isAndroid) ref.invalidate(perAppProxyServiceProvider);
+      isOnPauseCalled = false;
+    });
   }
 
   @override
@@ -61,6 +69,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     final activeBreakpoint = Breakpoint(context).activeBreakpoint;
 
     ref.listen(foregroundProfilesUpdateNotifierProvider, (_, __) {});
+    if (PlatformUtils.isAndroid) ref.listen(perAppProxyServiceProvider, (_, __) {});
     if (PlatformUtils.isDesktop) ref.listen(systemTrayNotifierProvider, (_, __) {});
 
     // updating ActiveBreakpointNotifier value
