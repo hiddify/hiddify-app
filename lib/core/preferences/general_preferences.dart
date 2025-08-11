@@ -22,11 +22,33 @@ abstract class Preferences {
   );
 
   // Null means that auto selection has not been performed yet.
-  static final autoSelectionAppsRegion = PreferencesNotifier.create<Region?, String?>(
-    "auto_selection_apps_region",
+  static final autoAppsSelectionRegion = PreferencesNotifier.create<Region?, String?>(
+    "auto_apps_selection_region",
     null,
     mapFrom: (value) => value == null || value.isEmpty ? null : Region.values.byName(value),
     mapTo: (value) => value == null ? '' : value.name,
+  );
+
+  static final autoAppsSelectionUpdateInterval = PreferencesNotifier.create<double, double>(
+    "auto_apps_selection_update_interval",
+    1.0,
+  );
+
+  static final autoAppsSelectionLastUpdate = PreferencesNotifier.create<DateTime?, String?>(
+    "auto_apps_selection_last_update",
+    null,
+    mapFrom: (value) => value == null ? null : DateTime.tryParse(value),
+    mapTo: (value) => value?.toIso8601String(),
+  );
+
+  static final includeApps = PreferencesNotifier.create<List<String>, List<String>>(
+    "per_app_proxy_include_list",
+    <String>[],
+  );
+
+  static final excludeApps = PreferencesNotifier.create<List<String>, List<String>>(
+    "per_app_proxy_exclude_list",
+    <String>[],
   );
 
   static final silentStart = PreferencesNotifier.create<bool, bool>(
