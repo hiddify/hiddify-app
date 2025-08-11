@@ -95,7 +95,7 @@ class AddProfileOptions extends HookConsumerWidget {
 class AddProfileManual extends HookConsumerWidget {
   const AddProfileManual({super.key});
 
-  String genSliderText(Translations t, int sliderValue) {
+  String _genSliderText(Translations t, int sliderValue) {
     if (sliderValue == 0) {
       return t.general.state.disable;
     } else if (sliderValue < 24) {
@@ -180,7 +180,7 @@ class AddProfileManual extends HookConsumerWidget {
                   ),
                 ),
                 Text(
-                  genSliderText(t, updateInterval.value.round()),
+                  _genSliderText(t, updateInterval.value.round()),
                   style: theme.textTheme.labelSmall!.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -205,13 +205,19 @@ class AddProfileManual extends HookConsumerWidget {
           // const Gap(8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
-            child: FilledButton.tonal(
-              child: Text(t.general.add),
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  await ref.read(addProfileNotifierProvider.notifier).addManual(nameTextController.text, urlTextController.text, updateInterval.value);
-                }
-              },
+            child: Row(
+              children: [
+                Expanded(
+                  child: FilledButton(
+                    child: Text(t.general.add),
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        await ref.read(addProfileNotifierProvider.notifier).addManual(nameTextController.text, urlTextController.text, updateInterval.value);
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           // const Gap(16),
