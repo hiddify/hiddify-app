@@ -1,10 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/database/app_database.steps.dart';
 import 'package:hiddify/core/database/converters/duration_converter.dart';
 import 'package:hiddify/core/database/tables/database_tables.dart';
 import 'package:hiddify/features/geo_asset/model/geo_asset_entity.dart';
+import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
