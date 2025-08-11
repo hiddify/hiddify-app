@@ -1,11 +1,12 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
-import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/http_client/http_client_provider.dart';
 import 'package:hiddify/core/model/region.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum AutoSelectionResult {
   success,
@@ -18,45 +19,30 @@ enum AutoSelectionResult {
 }
 
 abstract interface class AutoSelectionRepository {
-  Future<(List<String>?, AutoSelectionResult)> getByPerAppProxyMode({PerAppProxyMode? mode, Region? region});
-  Future<(List<String>?, AutoSelectionResult)> getInclude({Region? region});
-  Future<(List<String>?, AutoSelectionResult)> getExclude({Region? region});
-  Future share(Translations t, List<String> apps);
+  Future<(Set<String>?, AutoSelectionResult)> getByAppProxyMode({AppProxyMode? mode, Region? region});
+  Future<(Set<String>?, AutoSelectionResult)> getInclude({Region? region});
+  Future<(Set<String>?, AutoSelectionResult)> getExclude({Region? region});
 }
 
 class AutoSelectionRepositoryImpl with AppLogger implements AutoSelectionRepository {
   AutoSelectionRepositoryImpl({
-    required PerAppProxyMode mode,
-    required Region region,
-    required DioHttpClient httpClient,
-  })  : _mode = mode,
-        _region = region,
-        _httpClient = httpClient;
-  final PerAppProxyMode _mode;
-  final Region _region;
-  final DioHttpClient _httpClient;
+    required Ref ref,
+  }) : _ref = ref;
+  final Ref _ref;
   static const _baseUrl = 'https://raw.githubusercontent.com/hiddify/Android-GFW-Apps/refs/heads/master/';
 
   @override
-  Future<(List<String>?, AutoSelectionResult)> getByPerAppProxyMode({PerAppProxyMode? mode, Region? region}) async => await _makeRequest(mode: mode ?? _mode, region: region ?? _region);
+  Future<(Set<String>?, AutoSelectionResult)> getByAppProxyMode({AppProxyMode? mode, Region? region}) async => await _makeRequest(mode: mode ?? _getMode(), region: region ?? _getRegion());
 
   @override
-  Future<(List<String>?, AutoSelectionResult)> getExclude({Region? region}) async => await _makeRequest(mode: PerAppProxyMode.exclude, region: region ?? _region);
+  Future<(Set<String>?, AutoSelectionResult)> getExclude({Region? region}) async => await _makeRequest(mode: AppProxyMode.exclude, region: region ?? _getRegion());
 
   @override
-  Future<(List<String>?, AutoSelectionResult)> getInclude({Region? region}) async => await _makeRequest(mode: PerAppProxyMode.include, region: region ?? _region);
+  Future<(Set<String>?, AutoSelectionResult)> getInclude({Region? region}) async => await _makeRequest(mode: AppProxyMode.include, region: region ?? _getRegion());
 
-  @override
-  Future share(Translations t, List<String> apps) async {
-    final title = '${_region.name} | ${_mode.present(t).title}';
-    var body = const JsonEncoder.withIndent('  ').convert({'packages': apps});
-    body = '```\n$body\n```';
-    UriUtils.tryLaunch(Uri.parse('https://github.com/hiddify/Android-GFW-Apps/issues/new?title=$title&body=$body'));
-  }
-
-  Future<(List<String>?, AutoSelectionResult)> _makeRequest({required PerAppProxyMode mode, Region? region}) async {
+  Future<(Set<String>?, AutoSelectionResult)> _makeRequest({required AppProxyMode mode, Region? region}) async {
     try {
-      final rs = await _httpClient.get(_genUrl(mode, region ?? _region));
+      final rs = await _getHttp().get(_genUrl(mode, region ?? _getRegion()));
       if (rs.statusCode == 200) {
         return (_parseToListOfString(rs.data), AutoSelectionResult.success);
       }
@@ -64,7 +50,7 @@ class AutoSelectionRepositoryImpl with AppLogger implements AutoSelectionReposit
       return (null, AutoSelectionResult.failure);
     } on DioException catch (e, st) {
       if (e.response?.statusCode == 404) {
-        loggy.error("Auto selection region not found. region : ${region?.name ?? _region.name}", e, st);
+        loggy.error("Auto selection region not found. region : ${region?.name ?? _getRegion().name}", e, st);
         return (null, AutoSelectionResult.notFound);
       } else {
         loggy.error("Failed to fetch auto selection", e, st);
@@ -76,11 +62,16 @@ class AutoSelectionRepositoryImpl with AppLogger implements AutoSelectionReposit
     }
   }
 
-  String _genUrl(PerAppProxyMode mode, Region region) => switch (mode) {
-        PerAppProxyMode.off => throw Exception('Auto selection is not possible with PerAppProxyMode.off'),
-        PerAppProxyMode.include => '${_baseUrl}proxy_${region.name}',
-        PerAppProxyMode.exclude => '${_baseUrl}direct_${region.name}',
+  String _genUrl(AppProxyMode mode, Region region) => switch (mode) {
+        AppProxyMode.include => '${_baseUrl}proxy_${region.name}',
+        AppProxyMode.exclude => '${_baseUrl}direct_${region.name}',
       };
 
-  List<String> _parseToListOfString(dynamic data) => data.toString().split('\n').map((e) => e.trim()).where((element) => element.isNotEmpty).toList();
+  Set<String> _parseToListOfString(dynamic data) => data.toString().split('\n').map((e) => e.trim()).where((element) => element.isNotEmpty).toSet();
+
+  AppProxyMode _getMode() => _ref.read(Preferences.perAppProxyMode).toAppProxy()!;
+
+  Region _getRegion() => _ref.read(ConfigOptions.region);
+
+  DioHttpClient _getHttp() => _ref.read(httpClientProvider);
 }
