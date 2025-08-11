@@ -7,7 +7,11 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/features/per_app_proxy/model/app_package_info.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/per_app_proxy/model/pkg_flag.dart';
+import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_loading_notifier.dart';
 import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -17,61 +21,108 @@ import 'package:installed_apps/index.dart';
 class PerAppProxyPage extends HookConsumerWidget with PresLogger {
   const PerAppProxyPage({super.key});
 
+  int _getPriority(AppPackageInfo app, Map<String, int> selected) {
+    final flag = selected[app.packageName];
+    if (flag == null) return 4;
+    if (PkgFlag.userSelection.check(flag)) {
+      return 1;
+    } else if (PkgFlag.autoSelection.check(flag) && !PkgFlag.forceDeselection.check(flag)) {
+      return 2;
+    } else {
+      return 3;
+    }
+  }
+
+  Future<Set<AppPackageInfo>> getApps(bool hideSystem) async {
+    if (!PlatformUtils.isAndroid) return {};
+    return (await InstalledApps.getInstalledApps(hideSystem, true)).map((e) => AppPackageInfo(packageName: e.packageName, name: e.name, icon: e.icon)).toSet();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final t = ref.watch(translationsProvider).requireValue;
     final localizations = MaterialLocalizations.of(context);
 
-    final apps = ref.watch(appsProvider);
-    final appsHideSystem = ref.watch(appsHideSystemProvider);
-
-    final selectedApps = ref.watch(selectedAppsFilteredByModeProvider);
-    final mode = ref.watch(Preferences.perAppProxyMode);
+    final mode = ref.watch(Preferences.perAppProxyMode).toAppProxy();
+    final selectedApps = ref.watch(PerAppProxyProvider(mode));
 
     final hideSystemApps = useState(false);
     final isSearching = useState(false);
     final searchQuery = useState("");
+    final sortListener = useState(false);
 
-    final filteredPackages = useMemoized<AsyncValue<List<AppInfo>>>(
+    final asyncApps = useFuture(
+      useMemoized(() => getApps(false)),
+    );
+    final asyncAppsHideSys = useFuture(
+      useMemoized(
+        () => getApps(true),
+      ),
+    );
+
+    final asyncFilteredApps = hideSystemApps.value ? asyncAppsHideSys : asyncApps;
+
+    final displayedApps = useMemoized<AsyncValue<List<AppPackageInfo>>>(
       () {
-        final appsFilteredByHideSystem = hideSystemApps.value ? appsHideSystem : apps;
+        if (!(selectedApps.hasValue && selectedApps is AsyncData && asyncFilteredApps.hasData && asyncFilteredApps.connectionState == ConnectionState.done)) return const AsyncValue.loading();
+        final appsList = asyncFilteredApps.requireData.toList();
         if (searchQuery.value.isBlank) {
-          return appsFilteredByHideSystem.whenData(
-            (value) {
-              value.sort(
-                (a, b) {
-                  final aInSelected = selectedApps.contains(a.packageName);
-                  final bInSelected = selectedApps.contains(b.packageName);
-                  if (aInSelected && !bInSelected) return -1;
-                  if (!aInSelected && bInSelected) return 1;
-                  return 0;
-                },
-              );
-              return value;
+          appsList.sort(
+            (a, b) {
+              final priorityA = _getPriority(a, selectedApps.requireValue);
+              final priorityB = _getPriority(b, selectedApps.requireValue);
+              return priorityA.compareTo(priorityB);
             },
           );
+          return AsyncValue.data(appsList);
         }
-        return appsFilteredByHideSystem.whenData(
-          (value) {
-            Iterable<AppInfo> result = value;
-            if (!searchQuery.value.isBlank) {
-              result = result.filter(
-                (e) => e.name.toLowerCase().contains(searchQuery.value.toLowerCase()),
-              );
-            }
-            return result.toList();
-          },
-        );
+        final filteredAppsList = appsList
+            .filter(
+              (e) => e.name.toLowerCase().contains(searchQuery.value.toLowerCase()),
+            )
+            .toList();
+        return AsyncValue.data(filteredAppsList);
       },
       [
-        apps,
-        appsHideSystem,
+        asyncFilteredApps.connectionState == ConnectionState.done,
         hideSystemApps.value,
+        selectedApps.hasValue,
         searchQuery.value,
-        mode,
+        sortListener.value,
       ],
     );
+
+    if (mode != null) {
+      ref.listen(
+        PerAppProxyProvider(mode),
+        (previous, next) {
+          if (previous != null) {
+            if ((previous, next) case (AsyncData(value: final prevData), AsyncData(value: final nextData))) {
+              if (nextData.isNotEmpty) {
+                if ((nextData.length - prevData.length).abs() > 1) sortListener.value = !sortListener.value;
+              }
+            }
+          }
+        },
+      );
+    }
+
+    final scrollController = useScrollController();
+    const double scrollThreshold = 300.0;
+    final showScrollToTop = useState<bool>(false);
+    useEffect(() {
+      void listener() {
+        showScrollToTop.value = scrollController.offset > scrollThreshold;
+      }
+
+      scrollController.addListener(listener);
+      return () => scrollController.removeListener(listener);
+    }, []);
+    useEffect(() {
+      showScrollToTop.value = false;
+      return null;
+    }, [displayedApps]);
 
     return Scaffold(
       appBar: isSearching.value
@@ -114,11 +165,11 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                       menuChildren: <Widget>[
                         MenuItemButton(
                           child: Text(t.settings.network.import.Clipboard),
-                          onPressed: () async => await ref.read(selectedAppsFilteredByModeProvider.notifier).importFromClipboard(),
+                          onPressed: () async => await ref.read(PerAppProxyProvider(mode).notifier).importClipboard(),
                         ),
                         MenuItemButton(
                           child: Text(t.settings.network.import.JsonFile),
-                          onPressed: () async => await ref.read(selectedAppsFilteredByModeProvider.notifier).importFromJsonFile(),
+                          onPressed: () async => await ref.read(PerAppProxyProvider(mode).notifier).importFile(),
                         ),
                       ],
                       child: Text(t.general.import),
@@ -127,40 +178,43 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                       menuChildren: <Widget>[
                         MenuItemButton(
                           child: Text(t.settings.network.export.Clipboard),
-                          onPressed: () async => await ref.read(selectedAppsFilteredByModeProvider.notifier).exportJsonClipboard(),
+                          onPressed: () async => await ref.read(PerAppProxyProvider(mode).notifier).exportClipboard(),
                         ),
                         MenuItemButton(
                           child: Text(t.settings.network.export.JsonFile),
-                          onPressed: () async => await ref.read(selectedAppsFilteredByModeProvider.notifier).exportJsonFile(),
+                          onPressed: () async => await ref.read(PerAppProxyProvider(mode).notifier).exportFile(),
                         ),
                       ],
                       child: Text(t.general.export),
                     ),
-                    if (ref.watch(ConfigOptions.region) != Region.other) ...[
+                    if (ref.watch(ConfigOptions.region) != Region.other)
                       MenuItemButton(
                         child: Text(t.settings.network.share.title),
-                        onPressed: () async => await ref.read(selectedAppsFilteredByModeProvider.notifier).share(),
+                        onPressed: () async => await ref.read(appProxyLoadingProvider.notifier).doAsync(ref.read(PerAppProxyProvider(mode).notifier).shareOnGithub),
                       ),
-                      const PopupMenuDivider(),
-                      MenuItemButton(
-                        child: Text(t.settings.network.autoSelection.title),
-                        onPressed: () async => await ref.read(selectedAppsFilteredByModeProvider.notifier).autoSelection(),
-                      ),
-                    ],
+                    const PopupMenuDivider(),
                     MenuItemButton(
                       child: Text(t.settings.network.clearSelection),
-                      onPressed: () => ref.read(selectedAppsFilteredByModeProvider.notifier).clearSelection(),
+                      onPressed: () => ref.read(PerAppProxyProvider(mode).notifier).clearAll(),
                     ),
                   ],
-                  builder: (context, controller, child) => IconButton(
-                    onPressed: () {
-                      if (controller.isOpen) {
-                        controller.close();
-                      } else {
-                        controller.open();
-                      }
-                    },
-                    icon: const Icon(Icons.more_vert_rounded),
+                  builder: (context, controller, child) => AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: ref.watch(appProxyLoadingProvider)
+                        ? const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: SizedBox(width: 32, height: 32, child: CircularProgressIndicator()),
+                          )
+                        : IconButton(
+                            onPressed: () {
+                              if (controller.isOpen) {
+                                controller.close();
+                              } else {
+                                controller.open();
+                              }
+                            },
+                            icon: const Icon(Icons.more_vert_rounded),
+                          ),
                   ),
                 ),
               ],
@@ -174,13 +228,12 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                       PopupMenuButton(
                         borderRadius: BorderRadius.circular(8),
                         position: PopupMenuPosition.under,
-                        tooltip: mode.present(t).message,
-                        initialValue: mode,
+                        tooltip: (mode?.toPerAppProxy() ?? PerAppProxyMode.off).present(t).message,
+                        initialValue: mode?.toPerAppProxy() ?? PerAppProxyMode.off,
                         onSelected: (e) async {
+                          if (ref.read(Preferences.autoAppsSelectionRegion) != null) await ref.read(PerAppProxyProvider(mode).notifier).clearAutoSelected();
+                          if (e == PerAppProxyMode.off && context.mounted) context.pop();
                           await ref.read(Preferences.perAppProxyMode.notifier).update(e);
-                          if (e == PerAppProxyMode.off && context.mounted) {
-                            context.pop();
-                          }
                         },
                         itemBuilder: (context) => PerAppProxyMode.values
                             .map(
@@ -200,7 +253,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                           child: Row(
                             children: [
                               const Gap(16),
-                              Text(mode.present(t).title),
+                              Text(mode?.present(t).title ?? ''),
                               const Gap(4),
                               Icon(
                                 Icons.arrow_drop_down_rounded,
@@ -222,33 +275,44 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                 ),
               ),
             ),
-      body: filteredPackages.when(
+      floatingActionButton: showScrollToTop.value
+          ? FloatingActionButton(
+              onPressed: () => scrollController.animateTo(
+                0.0,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOut,
+              ),
+              child: const Icon(Icons.keyboard_arrow_up_rounded),
+            )
+          : (ref.watch(ConfigOptions.region) != Region.other)
+              ? FloatingActionButton.extended(
+                  onPressed: () async => await ref.read(bottomSheetsNotifierProvider.notifier).showAutoAppsSelection(mode: mode!),
+                  label: Text(t.settings.network.autoSelection.title),
+                  icon: Icon(ref.watch(Preferences.autoAppsSelectionRegion) == null ? Icons.toggle_off_outlined : Icons.toggle_on_rounded),
+                )
+              : null,
+      body: displayedApps.when(
         data: (packages) => ListView.builder(
+          padding: const EdgeInsets.only(bottom: 88),
+          controller: scrollController,
           itemBuilder: (context, index) {
             final package = packages[index];
-            final selected = selectedApps.contains(package.packageName);
+            final flag = selectedApps.requireValue[package.packageName];
             return CheckboxListTile(
               title: Text(
                 package.name,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: Text(
                 package.packageName,
                 style: Theme.of(context).textTheme.bodySmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              value: selected,
-              onChanged: (value) async {
-                final List<String> newSelection;
-                if (selected) {
-                  newSelection = selectedApps.exceptElement(package.packageName).toList();
-                } else {
-                  newSelection = [
-                    ...selectedApps,
-                    package.packageName,
-                  ];
-                }
-                await ref.read(selectedAppsFilteredByModeProvider.notifier).update(newSelection);
-              },
+              value: flag == null ? false : PkgFlag.checkboxValue(flag),
+              tristate: true,
+              onChanged: (_) => ref.read(PerAppProxyProvider(mode).notifier).updatePkg(package.packageName),
               secondary: package.icon == null
                   ? null
                   : Image.memory(
