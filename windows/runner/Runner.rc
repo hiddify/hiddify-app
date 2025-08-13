@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Hiddify" "\0"
-            VALUE "FileDescription", "Hiddify" "\0"
+            VALUE "CompanyName", "Merimok" "\0"
+            VALUE "FileDescription", "xvpn" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "hiddify" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 Hiddify.com. All rights reserved." "\0"
-            VALUE "OriginalFilename", "Hiddify.exe" "\0"
-            VALUE "ProductName", "hiddify" "\0"
+            VALUE "InternalName", "xvpn" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 Merimok. All rights reserved." "\0"
+            VALUE "OriginalFilename", "xvpn.exe" "\0"
+            VALUE "ProductName", "xvpn" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
@@ -104,6 +104,7 @@ BEGIN
         VALUE "Translation", 0x409, 1252
     END
 END
+
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
