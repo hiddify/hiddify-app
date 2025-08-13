@@ -1,21 +1,12 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        google()
-    }
-    dependencies {
-        classpath("com.android.application:com.android.application.gradle.plugin:8.9.1")
-        classpath("com.squareup.wire:wire-gradle-plugin")
-    }
+
+plugins { 
+    id "com.android.application" 
+    id "org.jetbrains.kotlin.android" 
+    id "dev.flutter.flutter-gradle-plugin" 
+    id "com.google.protobuf" version "0.9.4" 
+    id "com.squareup.wire" version "5.3.1"
 }
 
-plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
-    id "com.google.protobuf" version "0.9.4"
-    id 'com.squareup.wire' version '5.3.1'
-}
 wire {
     kotlin {
         android = true
@@ -63,7 +54,7 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '
 android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion "26.3.11579264"
 
     compileOptions {
@@ -82,7 +73,7 @@ android {
     defaultConfig {
         applicationId "app.hiddify.com"
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
