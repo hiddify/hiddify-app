@@ -298,11 +298,28 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
           itemBuilder: (context, index) {
             final package = packages[index];
             final flag = selectedApps.requireValue[package.packageName];
-            return CheckboxListTile(
-              title: Text(
-                package.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            return CheckboxListTile.adaptive(
+              title: Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      package.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (flag != null && PkgFlag.forceDeselection.check(flag)) ...[
+                    const Gap(6),
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.error,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ],
+                ],
               ),
               subtitle: Text(
                 package.packageName,
