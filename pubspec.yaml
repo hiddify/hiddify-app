@@ -1,12 +1,10 @@
 name: xvpn
-description: Cross Platform Multi Protocol Proxy Frontend.
+description: Simple VPN client based on Hiddify, preloaded with subscription.
 publish_to: "none"
 version: 2.5.7+20507
-
 environment:
   sdk: ">=3.3.0 <4.0.0"
   flutter: ">=3.24.0 <=3.24.3"
-
 dependencies:
   flutter:
     sdk: flutter
@@ -63,7 +61,6 @@ dependencies:
   # core singbox wrapper
   hiddify_core:
     path: "./libcore"
-
   # ui
   go_router: ^14.0.2
   nested: ^1.0.0
@@ -72,7 +69,6 @@ dependencies:
   animations: ^2.0.11
   fluttertoast: ^8.2.4
   bot_toast: ^4.1.3
-
   # utils
   recase: ^4.1.0
   watcher: ^1.1.0
@@ -99,14 +95,12 @@ dev_dependencies:
   slang_build_runner: ^3.30.0
   msix: ^3.16.6
   flutter_distributor: ^0.12.3
-
 flutter:
   uses-material-design: true
   generate: true
   assets:
     - assets/images/
     - assets/config/
-
 flutter_native_splash:
   color: "#FFFBFE"
   color_dark: "#1C1B1F"
@@ -117,7 +111,6 @@ flutter_native_splash:
     color_dark: "#1C1B1F"
     image: assets/images/logo.png
     image_dark: assets/images/logo_dark.png
-
 msix:
   display_name: xvpn
   publisher_display_name: Merimok
