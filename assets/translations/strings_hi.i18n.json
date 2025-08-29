@@ -3,6 +3,7 @@
     "appTitle": "Hiddify",
     "reset": "रीसेट करें",
     "toggle": {
+      "enabled": "सक्रिय",
       "disabled": "अक्षम"
     },
     "state": {
@@ -61,9 +62,41 @@
       "expireDate": "समाप्त होने की तिथि"
     },
     "sortBy": {
-      "lastUpdate": "हाल ही में अपडेट किया गया"
+      "lastUpdate": "हाल ही में अपडेट किया गया",
+      "name": "वर्णक्रम"
+    },
+    "add": {
+      "buttonText": "नई प्रोफ़ाइल",
+      "shortBtnTxt": "नई प्रोफ़ाइल",
+      "fromClipboard": "क्लिपबोर्ड से जोड़ें",
+      "scanQr": "स्कैन क्यू आर कोड",
+      "qrScanner": {
+        "permissionDeniedError": "अनुमति नहीं मिली",
+        "unexpectedError": "कुछ गलत हो गया",
+        "torchSemanticLabel": "फ्लैश लाइट",
+        "facingSemanticLabel": "कैमरा फेसिंग",
+        "permissionRequest": "कैमरे को QR कोड स्कैन करने की अनुमति"
+      },
+      "manually": "मैनुअल प्रविष्टि",
+      "addWarp": "WARP जोड़ें",
+      "addingWarpMsg": "कृपया प्रतीक्षा करें जब तक हम WARP का पंजीकरण नहीं कर लेते।",
+      "addingProfileMsg": "प्रोफ़ाइल जोड़ना",
+      "failureMsg": "प्रोफ़ाइल जोड़ने में विफल"
+    },
+    "update": {
+      "buttonTxt": "अद्यतन",
+      "tooltip": "प्रोफ़ाइल अपडेट करें",
+      "updateSubscriptions": "सदस्यताएँ अपडेट करें",
+      "failureMsg": "प्रोफ़ाइल अपडेट करने में विफल",
+      "successMsg": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+      "namedFailureMsg": "\"${name}\" अपडेट करने में विफल",
+      "namedSuccessMsg": "\"${name}\" सफलतापूर्वक अपडेट किया गया"
     },
     "share": {
+      "buttonText": "शेयर करना",
+      "exportToClipboardSuccess": "क्लिपबोर्ड पर निर्यात किया गया",
+      "exportSubLinkToClipboard": "सदस्यता लिंक को क्लिपबोर्ड पर निर्यात करें",
+      "subLinkQrCode": "सदस्यता लिंक QR कोड",
       "exportConfigToClipboard": "कॉन्फ़िगरेशन को क्लिपबोर्ड पर निर्यात करें",
       "exportConfigToClipboardSuccess": "कॉन्फ़िगरेशन क्लिपबोर्ड पर कॉपी किया गया"
     },
@@ -290,6 +323,10 @@
   },
   "connection": {
     "tapToConnect": "कनेक्ट करने के लिए टैप करें",
+    "connecting": "कनेक्ट",
+    "disconnecting": "डिस्कनेक्ट कर रहा है",
+    "connected": "जुड़े हुए",
+    "reconnect": "रिकनेक्ट",
     "connectAnyWay": "जोड़ना",
     "experimentalNotice": "प्रयोग में प्रायोगिक सुविधाएँ",
     "experimentalNoticeMsg": "आपने कुछ प्रायोगिक सुविधाएँ सक्षम की हैं जो कनेक्शन की गुणवत्ता को प्रभावित कर सकती हैं और अप्रत्याशित त्रुटियाँ उत्पन्न कर सकती हैं। आप कॉन्फ़िगरेशन विकल्प पृष्ठ से इन विकल्पों को कभी भी बदल या रीसेट कर सकते हैं।",
@@ -303,6 +340,38 @@
     },
     "resetBtn": "रीसेट विकल्प",
     "serviceMode": "सेवा मोड",
+    "quickSettings": "त्वरित सेटिंग",
+    "setupWarp": "WARP सेटअप करें",
+    "allOptions": "सभी कॉन्फ़िगरेशन विकल्प",
+    "serviceModes": {
+      "proxy": "केवल प्रॉक्सी सेवा",
+      "systemProxy": "सिस्टम प्रॉक्सी सेट करें",
+      "tun": "वीपीएन",
+      "tunService": "वीपीएन सेवा"
+    },
+    "shortServiceModes": {
+      "proxy": "प्रतिनिधि",
+      "systemProxy": "सिस्टम प्रॉक्सी",
+      "tun": "वीपीएन",
+      "tunService": "वीपीएन सेवा"
+    },
+    "section": {
+      "route": "मार्ग विकल्प",
+      "dns": "DNS विकल्प",
+      "inbound": "इनबाउंड विकल्प",
+      "mux": "बहुसंकेतक",
+      "outbound": "आउटबाउंड विकल्प",
+      "tlsTricks": "टीएलएस ट्रिक्स",
+      "warp": "WARP विकल्प",
+      "misc": "विविध विकल्प"
+    },
+    "warpConsent": {
+      "title": "क्लाउडफ्लेयर WARP सहमति",
+      "description(rich)": "क्लाउडफ्लेयर WARP एक निःशुल्क वायरगार्ड वीपीएन प्रदाता है। इस विकल्प को सक्षम करके, आप क्लाउडफ्लेयर WARP की सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।"
+    },
+    "generateWarpConfig": "WARP कॉन्फ़िगरेशन उत्पन्न करें",
+    "missingWarpConfig": "WARP कॉन्फ़िगरेशन अनुपलब्ध",
+    "warpConfigGenerated": "WARP कॉन्फ़िगरेशन उत्पन्न हो गया है",
     "pageTitle": "कॉन्फ़िगरेशन विकल्प",
     "logLevel": "लॉग स्तर",
     "blockAds": "विज्ञापन ब्लॉक करें",
