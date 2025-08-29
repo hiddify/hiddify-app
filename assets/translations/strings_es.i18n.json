@@ -180,6 +180,7 @@
         "af": "Afganistán (af)",
         "id": "Indonesia (id)",
         "tr": "Turquía (tr) 🇹🇷",
+        "br": "Brasil (br) 🇧🇷",
         "other": "Otro"
       },
       "themeMode": "Modo temático",
@@ -198,7 +199,13 @@
       "ignoreBatteryOptimizationsMsg": "Elimine las restricciones para un rendimiento VPN óptimo",
       "dynamicNotification": "Mostrar velocidad en la notificación",
       "hapticFeedback": "Respuesta háptica",
-      "autoIpCheck": "Comprobación automática de la IP de conexión"
+      "autoIpCheck": "Comprobación automática de la IP de conexión",
+      "actionAtClosing": "Acción al cierre",
+      "actionsAtClosing": {
+        "askEachTime": "Pregunta cada vez",
+        "hide": "Esconder",
+        "exit": "Salida"
+      }
     },
     "advanced": {
       "sectionTitle": "Avanzado",
@@ -327,6 +334,10 @@
     "reconnectMsg": "Reconectar para tener en cuenta los cambios..."
   },
   "config": {
+    "useXrayCoreWhenPossible": {
+      "Label": "Utilice núcleos de rayos X cuando sea posible",
+      "Description": "Use Xray-core al analizar subenlaces. Debe reimportar el subenlace para habilitar esta opción."
+    },
     "resetBtn": "Restablecer opciones",
     "serviceMode": "Modo de servicio",
     "quickSettings": "Ajustes rápidos",
@@ -416,5 +427,11 @@
     "warpNoiseSize": "Tamaño de ruido",
     "warpNoiseMode": "Modo Ruido",
     "warpNoiseDelay": "Retraso por ruido"
+  },
+  "window": {
+    "hide": "Esconder",
+    "close": "Salida",
+    "alertMessage": "¿Ocultar o salir de la aplicación?",
+    "remember": "Recuerda mi elección"
   }
 }
