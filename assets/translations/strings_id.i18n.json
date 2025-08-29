@@ -180,6 +180,7 @@
         "af": "Afghanistan (af)",
         "id": "Indonesia (id)",
         "tr": "Turki (tr) 🇹🇷",
+        "br": "Brasil (br) 🇧🇷",
         "other": "Lainnya"
       },
       "themeMode": "Jenis Tema",
@@ -198,7 +199,13 @@
       "ignoreBatteryOptimizationsMsg": "Hapus batasan untuk performa VPN yang optimal",
       "dynamicNotification": "Tampilkan Kecepatan di notifikasi",
       "hapticFeedback": "Umpan Balik Haptik",
-      "autoIpCheck": "Secara Otomatis Memeriksa IP Koneksi"
+      "autoIpCheck": "Secara Otomatis Memeriksa IP Koneksi",
+      "actionAtClosing": "Aksi pada saat penutupan",
+      "actionsAtClosing": {
+        "askEachTime": "Tanyakan setiap waktu",
+        "hide": "Bersembunyi",
+        "exit": "KELUAR"
+      }
     },
     "advanced": {
       "sectionTitle": "Mode Lanjut",
@@ -327,6 +334,10 @@
     "reconnectMsg": "Menghubungkan kembali untuk memperhitungkan perubahan..."
   },
   "config": {
+    "useXrayCoreWhenPossible": {
+      "Label": "Gunakan Xray-core Bila Memungkinkan",
+      "Description": "Gunakan Xray-core saat mengurai sub-tautan. Anda perlu mengimpor ulang sub-tautan untuk mengaktifkan opsi ini."
+    },
     "resetBtn": "Set Ulang Opsi",
     "serviceMode": "Sambung ulang agar perubahan diterapkan",
     "quickSettings": "Pengaturan Cepat",
@@ -416,5 +427,11 @@
     "warpNoiseSize": "Ukuran Kebisingan",
     "warpNoiseMode": "Modus Kebisingan",
     "warpNoiseDelay": "Penundaan Kebisingan"
+  },
+  "window": {
+    "hide": "Bersembunyi",
+    "close": "KELUAR",
+    "alertMessage": "Sembunyikan atau Keluar dari aplikasi?",
+    "remember": "Ingat pilihanku"
   }
 }
