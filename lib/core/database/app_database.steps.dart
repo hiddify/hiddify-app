@@ -301,7 +301,7 @@ final class Schema5 extends i0.VersionedSchema {
     geoAssetEntries,
     appProxyEntries,
   ];
-  late final Shape2 profileEntries = Shape2(
+  late final Shape3 profileEntries = Shape3(
       source: i0.VersionedTable(
         entityName: 'profile_entries',
         withoutRowId: false,
@@ -323,7 +323,9 @@ final class Schema5 extends i0.VersionedSchema {
           _column_10,
           _column_11,
           _column_12,
-          _column_16,
+          _column_17,
+          _column_18,
+          _column_19,
         ],
         attachedDatabase: database,
       ),
@@ -349,7 +351,7 @@ final class Schema5 extends i0.VersionedSchema {
         attachedDatabase: database,
       ),
       alias: null);
-  late final Shape3 appProxyEntries = Shape3(
+  late final Shape4 appProxyEntries = Shape4(
       source: i0.VersionedTable(
         entityName: 'app_proxy_entries',
         withoutRowId: false,
@@ -358,9 +360,9 @@ final class Schema5 extends i0.VersionedSchema {
           'PRIMARY KEY(mode, pkg_name)',
         ],
         columns: [
-          _column_17,
-          _column_18,
-          _column_19,
+          _column_20,
+          _column_21,
+          _column_22,
         ],
         attachedDatabase: database,
       ),
@@ -369,6 +371,52 @@ final class Schema5 extends i0.VersionedSchema {
 
 class Shape3 extends i0.VersionedTable {
   Shape3({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get type =>
+      columnsByName['type']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<bool> get active =>
+      columnsByName['active']! as i1.GeneratedColumn<bool>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get url =>
+      columnsByName['url']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<DateTime> get lastUpdate =>
+      columnsByName['last_update']! as i1.GeneratedColumn<DateTime>;
+  i1.GeneratedColumn<int> get updateInterval =>
+      columnsByName['update_interval']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get upload =>
+      columnsByName['upload']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get download =>
+      columnsByName['download']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get total =>
+      columnsByName['total']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<DateTime> get expire =>
+      columnsByName['expire']! as i1.GeneratedColumn<DateTime>;
+  i1.GeneratedColumn<String> get webPageUrl =>
+      columnsByName['web_page_url']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get supportUrl =>
+      columnsByName['support_url']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get populatedHeaders =>
+      columnsByName['populated_headers']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get profileOverride =>
+      columnsByName['profile_override']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get userOverride =>
+      columnsByName['user_override']! as i1.GeneratedColumn<String>;
+}
+
+i1.GeneratedColumn<String> _column_17(String aliasedName) =>
+    i1.GeneratedColumn<String>('populated_headers', aliasedName, true,
+        type: i1.DriftSqlType.string);
+i1.GeneratedColumn<String> _column_18(String aliasedName) =>
+    i1.GeneratedColumn<String>('profile_override', aliasedName, true,
+        type: i1.DriftSqlType.string);
+i1.GeneratedColumn<String> _column_19(String aliasedName) =>
+    i1.GeneratedColumn<String>('user_override', aliasedName, true,
+        type: i1.DriftSqlType.string);
+
+class Shape4 extends i0.VersionedTable {
+  Shape4({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get mode =>
       columnsByName['mode']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<String> get pkgName =>
@@ -377,13 +425,13 @@ class Shape3 extends i0.VersionedTable {
       columnsByName['flags']! as i1.GeneratedColumn<int>;
 }
 
-i1.GeneratedColumn<String> _column_17(String aliasedName) =>
+i1.GeneratedColumn<String> _column_20(String aliasedName) =>
     i1.GeneratedColumn<String>('mode', aliasedName, false,
         type: i1.DriftSqlType.string);
-i1.GeneratedColumn<String> _column_18(String aliasedName) =>
+i1.GeneratedColumn<String> _column_21(String aliasedName) =>
     i1.GeneratedColumn<String>('pkg_name', aliasedName, false,
         type: i1.DriftSqlType.string);
-i1.GeneratedColumn<int> _column_19(String aliasedName) =>
+i1.GeneratedColumn<int> _column_22(String aliasedName) =>
     i1.GeneratedColumn<int>('flags', aliasedName, false,
         type: i1.DriftSqlType.int, defaultValue: const CustomExpression('0'));
 i0.MigrationStepWithVersion migrationSteps({

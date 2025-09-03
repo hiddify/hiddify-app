@@ -19,8 +19,9 @@ class ProfileEntries extends Table {
   DateTimeColumn get expire => dateTime().nullable()();
   TextColumn get webPageUrl => text().nullable()();
   TextColumn get supportUrl => text().nullable()();
-  // TextColumn get localOverride => text().nullable()(); //temporary use it as json config
-  TextColumn get testUrl => text().nullable()(); //temporary use it as json config
+  TextColumn get populatedHeaders => text().nullable()();
+  TextColumn get profileOverride => text().nullable()();
+  TextColumn get userOverride => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

@@ -58,11 +58,13 @@ class AppDatabase extends _$AppDatabase with InfraLogger {
           await m.addColumn(schema.profileEntries, schema.profileEntries.testUrl);
         },
         from4To5: (m, schema) async {
-          // await m.renameColumn(
-          //   schema.profileEntries,
-          //   'test_url',
-          //   schema.profileEntries.localOverride,
-          // );
+          await m.renameColumn(
+            schema.profileEntries,
+            'test_url',
+            schema.profileEntries.profileOverride,
+          );
+          await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
+          await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
           await m.createTable(schema.appProxyEntries);
         },
       ),
