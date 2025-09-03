@@ -1,6 +1,7 @@
 {
   "general": {
     "appTitle": "Hiddify",
+    "auto": "Auto",
     "add": "Add",
     "save": "Save",
     "help": "Help",
@@ -124,6 +125,7 @@
         "permissionRequest": "Permission to camera to scan QR Code"
       },
       "manually": "Manual",
+      "disableAutoUpdate": "Disable Auto Update",
       "free": "FREE",
       "failedToLoad": "Failed to Load",
       "noFreeSubscriptionFound": "No free subscription was found",
@@ -173,7 +175,7 @@
       "emptyNameMsg": "Name Is Required",
       "invalidUrlMsg": "Invalid URL",
       "lastUpdate": "Last Update",
-      "updateInterval": "Auto Update",
+      "updateInterval": "Auto Update Interval",
       "updateIntervalDialogTitle": "Auto Update Interval (in Hours)"
     }
   },
@@ -471,7 +473,8 @@
       "unexpected": "Unexpected Error",
       "notFound": "Profile Not Found",
       "invalidConfig": "Invalid Configs",
-      "invalidUrl": "Invalid URL"
+      "invalidUrl": "Invalid URL",
+      "canceledByUser": "Canceled By User"
     },
     "connection": {
       "unexpected": "Unexpected Connection Error",

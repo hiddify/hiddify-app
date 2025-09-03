@@ -1,6 +1,7 @@
 {
   "general": {
     "appTitle": "هیدیفای",
+    "auto": "خودکار",
     "add": "افزودن",
     "save": "ذخیره",
     "help": "راهنما",
@@ -122,6 +123,7 @@
         "permissionRequest": "دسترسی به دوربین برای اسکن کد QR"
       },
       "manually": "دستی",
+      "disableAutoUpdate": "غیرفعال کردن آپدیت خودکار",
       "free": "رایگان",
       "failedToLoad": "برگذاری ناموفق بود",
       "noFreeSubscriptionFound": "اشتراک رایگان یافت نشد",
@@ -171,7 +173,7 @@
       "emptyNameMsg": "نام نمی‌تواند خالی باشد",
       "invalidUrlMsg": "لینک نامعتبر است",
       "lastUpdate": "آخرین به‌روزرسانی",
-      "updateInterval": "به‌روزرسانی خودکار",
+      "updateInterval": "فاصله‌ی زمانی به‌روزرسانی خودکار",
       "updateIntervalDialogTitle": "فاصله‌ی زمانی به‌روزرسانی خودکار (ساعت)"
     }
   },
@@ -384,7 +386,8 @@
       "unexpected": "خطای غیرمنتظره",
       "notFound": "پروفایل یافت نشد",
       "invalidConfig": "پیکربندی‌ها نامعتبر هستند",
-      "invalidUrl": "لینک نامعتبر است"
+      "invalidUrl": "لینک نامعتبر است",
+      "canceledByUser": "توسط کاربر لغو شد"
     },
     "connection": {
       "unexpected": " خطای غیرمنتظره در اتصال",
