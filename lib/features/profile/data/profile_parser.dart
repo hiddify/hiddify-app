@@ -1,130 +1,204 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dartx/dartx.dart';
+import 'package:dio/dio.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:hiddify/core/database/app_database.dart';
+import 'package:hiddify/core/http_client/dio_http_client.dart';
+import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
-import 'package:hiddify/features/profile/model/profile_local_override.dart';
+import 'package:hiddify/features/profile/model/profile_failure.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/utils.dart';
-import 'package:uuid/uuid.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// parse profile subscription url and headers for data
 ///
 /// ***name parser hierarchy:***
+/// - UserOverride.name
 /// - `profile-title` header
 /// - `content-disposition` header
 /// - url fragment (example: `https://example.com/config#user`) -> name=`user`
 /// - url filename extension (example: `https://example.com/config.json`) -> name=`config`
-/// - if none of these methods return a non-blank string, fallback to `Remote Profile`
+/// - if none of these methods return a non-blank string, switch(profileType)
+/// - remote:  fallback to `Remote Profile`
+/// - local: fallback to protocol, extracted from content by protocol()
 
-abstract class ProfileParser {
+class ProfileParser {
   static const infiniteTrafficThreshold = 92233720368;
   static const infiniteTimeThreshold = 92233720368;
   static const allowedOverrideConfigs = ['connection-test-url', 'direct-dns-address', 'remote-dns-address', 'warp', 'warp2', 'tls-tricks'];
   static const allowedProfileHeaders = ['profile-title', 'content-disposition', 'subscription-userinfo', 'profile-update-interval', 'support-url', 'profile-web-page-url', 'enable-warp', 'enable-fragment'];
 
-  static RemoteProfileEntity parse(String url, Map<String, dynamic> headers, [ProfileLocalOverride? override]) {
-    var name = '';
-    if (override?.name case final String oName when oName.isNotEmpty) {
-      name = oName;
-    }
+  final Ref _ref;
+  final DioHttpClient _httpClient;
 
-    if (headers['profile-title'] case final String titleHeader when name.isEmpty) {
-      if (titleHeader.startsWith("base64:")) {
-        name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
-      } else {
-        name = titleHeader.trim();
-      }
-    }
-    if (headers['content-disposition'] case final String contentDispositionHeader when name.isEmpty) {
-      final regExp = RegExp('filename="([^"]*)"');
-      final match = regExp.firstMatch(contentDispositionHeader);
-      if (match != null && match.groupCount >= 1) {
-        name = match.group(1) ?? '';
-      }
-    }
-    if (Uri.parse(url).fragment case final fragment when name.isEmpty) {
-      name = fragment;
-    }
-    if (url.split("/").lastOrNull case final part? when name.isEmpty) {
-      final pattern = RegExp(r"\.(json|yaml|yml|txt)[\s\S]*");
-      name = part.replaceFirst(pattern, "");
-    }
-    if (name.isBlank) name = "Remote Profile";
+  ProfileParser({
+    required Ref ref,
+    required DioHttpClient httpClient,
+  })  : _ref = ref,
+        _httpClient = httpClient;
 
-    if (headers['enable-warp'].toString() == 'true' || override?.enableWarp == true) {
-      final value = {
-        'enable': true,
-        'mode': 'warp_over_proxy',
-      };
-      headers['warp'] = value;
-      headers['warp2'] = value;
-    }
-
-    if (headers['enable-fragment'].toString() == 'true' || override?.enableFragment == true) {
-      headers['tls-tricks'] = {
-        'enable-fragment': true,
-      };
-    }
-
-    ProfileOptions? options;
-    if (headers['profile-update-interval'] case final String updateIntervalStr) {
-      final updateInterval = Duration(hours: int.parse(updateIntervalStr));
-      options = ProfileOptions(updateInterval: updateInterval);
-    }
-
-    SubscriptionInfo? subInfo;
-    if (headers['subscription-userinfo'] case final String subInfoStr) {
-      subInfo = parseSubscriptionInfo(subInfoStr);
-    }
-
-    if (subInfo != null) {
-      if (headers['profile-web-page-url'] case final String profileWebPageUrl when isUrl(profileWebPageUrl)) {
-        subInfo = subInfo.copyWith(webPageUrl: profileWebPageUrl);
-      }
-      if (headers['support-url'] case final String profileSupportUrl when isUrl(profileSupportUrl)) {
-        subInfo = subInfo.copyWith(supportUrl: profileSupportUrl);
-      }
-    }
-
-    headers.removeWhere((key, value) => !allowedOverrideConfigs.contains(key) || value == null || value.toString().isEmpty);
-
-    if (override != null) {
-      headers[ProfileLocalOverride.key] = jsonEncode(override.toJson());
-    }
-    final testUrl = jsonEncode({for (final key in headers.keys) key: headers[key]});
-
-    return RemoteProfileEntity(
-      id: const Uuid().v4(),
-      active: false,
-      name: name,
-      url: url,
-      lastUpdate: DateTime.now(),
-      options: options,
-      subInfo: subInfo,
-      testUrl: testUrl,
-    );
-  }
-
-  static SubscriptionInfo? parseSubscriptionInfo(String subInfoStr) {
-    final values = subInfoStr.split(';');
-    final map = {
-      for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt(),
-    };
-    if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
-      final total1 = (total == null || total == 0) ? infiniteTrafficThreshold : total;
-      expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
-      return SubscriptionInfo(
-        upload: upload,
-        download: download,
-        total: total1,
-        expire: DateTime.fromMillisecondsSinceEpoch(expire * 1000),
+  Either<ProfileFailure, ProfileEntriesCompanion> addLocal({
+    required String id,
+    required String content,
+    required String tempFilePath,
+    required UserOverride? userOverride,
+  }) =>
+      populateHeaders(content: content).flatMap(
+        (populatedHeaders) => _parse(
+          tempFilePath: tempFilePath,
+          profile: ProfileEntity.local(
+            id: id,
+            active: true,
+            name: '',
+            lastUpdate: DateTime.now(),
+            userOverride: userOverride,
+            populatedHeaders: populatedHeaders,
+          ),
+        ).flatMap(
+          (profEntity) => Either.tryCatch(() => profEntity.toInsertEntry(), ProfileFailure.unexpected),
+        ),
       );
-    }
-    return null;
-  }
 
-  static Map<String, dynamic> populateHeaders({required String content, Map<String, dynamic> requestHeaders = const {}}) {
-    final contentHeaders = _parseHeadersFromContent(content);
-    return _mergeAndValidateHeaders(contentHeaders, requestHeaders: _fixRequestHeaders(requestHeaders));
+  TaskEither<ProfileFailure, ProfileEntriesCompanion> addRemote({
+    required String id,
+    required String url,
+    required String tempFilePath,
+    required UserOverride? userOverride,
+    CancelToken? cancelToken,
+  }) =>
+      _downloadProfile(url, tempFilePath, cancelToken).flatMap(
+        (remoteHeaders) => TaskEither.fromEither(
+          populateHeaders(
+            content: File(tempFilePath).readAsStringSync(),
+            remoteHeaders: remoteHeaders,
+          ),
+        ).flatMap(
+          (populatedHeaders) => TaskEither.fromEither(
+            _parse(
+              tempFilePath: tempFilePath,
+              profile: ProfileEntity.remote(
+                id: id,
+                active: true,
+                name: '',
+                url: url,
+                lastUpdate: DateTime.now(),
+                userOverride: userOverride,
+                populatedHeaders: populatedHeaders,
+              ),
+            ).flatMap(
+              (profEntity) => Either.tryCatch(
+                () => profEntity.toInsertEntry(),
+                ProfileFailure.unexpected,
+              ),
+            ),
+          ),
+        ),
+      );
+
+  TaskEither<ProfileFailure, ProfileEntriesCompanion> updateRemote({
+    required RemoteProfileEntity rp,
+    required String tempFilePath,
+    CancelToken? cancelToken,
+  }) =>
+      _downloadProfile(rp.url, tempFilePath, cancelToken).flatMap(
+        (remoteHeaders) => TaskEither.fromEither(
+          populateHeaders(
+            content: File(tempFilePath).readAsStringSync(),
+            remoteHeaders: remoteHeaders,
+          ),
+        ).flatMap(
+          (populatedHeaders) => TaskEither.fromEither(
+            _parse(
+              tempFilePath: tempFilePath,
+              profile: rp.copyWith(populatedHeaders: populatedHeaders),
+            ).flatMap(
+              (profEntity) => Either.tryCatch(
+                () => profEntity.toUpdateEntry(),
+                ProfileFailure.unexpected,
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Either<ProfileFailure, ProfileEntriesCompanion> offlineUpdate({
+    required ProfileEntity profile,
+    required String tempFilePath,
+  }) =>
+      profile
+          .map(
+            remote: (rp) => _parse(
+              profile: rp,
+              tempFilePath: tempFilePath,
+            ),
+            local: (lp) => _parse(
+              tempFilePath: tempFilePath,
+              profile: lp,
+            ),
+          )
+          .flatMap(
+            (profEntity) => Either.tryCatch(
+              () => profEntity.toUpdateEntry(),
+              ProfileFailure.unexpected,
+            ),
+          );
+
+  TaskEither<ProfileFailure, Map<String, dynamic>> _downloadProfile(
+    String url,
+    String tempFilePath,
+    CancelToken? cancelToken,
+  ) =>
+      TaskEither.tryCatch(
+        () async {
+          if (url.startsWith("http://")) throw const ProfileFailure.invalidUrl('HTTP is not supported. Please use HTTPS for secure connection.');
+
+          final rs = await _httpClient
+              .download(
+            url.trim(),
+            tempFilePath,
+            cancelToken: cancelToken,
+            userAgent: _ref.read(ConfigOptions.useXrayCoreWhenPossible) ? _httpClient.userAgent.replaceAll("HiddifyNext", "HiddifyNextX") : null,
+          )
+              .catchError((err) {
+            if (CancelToken.isCancel(err as DioException)) {
+              throw const ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
+            }
+            throw err;
+          });
+          // fixing headers before return
+          return rs.headers.map.map((key, value) {
+            if (value.length == 1) return MapEntry(key, value.first);
+            return MapEntry(key, value);
+          });
+        },
+        (err, st) => err is ProfileFailure ? err : ProfileFailure.unexpected(err, st),
+      );
+
+  static Either<ProfileFailure, Map<String, dynamic>> populateHeaders({required String content, Map<String, dynamic>? remoteHeaders}) => Either.tryCatch(
+        () {
+          final contentHeaders = _parseHeadersFromContent(content);
+          return _mergeAndValidateHeaders(contentHeaders, remoteHeaders ?? {});
+        },
+        ProfileFailure.unexpected,
+      );
+
+  static Map<String, dynamic> _mergeAndValidateHeaders(Map<String, dynamic> contentHeaders, Map<String, dynamic> remoteHeaders) {
+    for (final entry in contentHeaders.entries) {
+      if (!remoteHeaders.keys.contains(entry.key)) {
+        remoteHeaders[entry.key] = entry.value;
+      }
+    }
+    final headers = <String, dynamic>{};
+    for (final entry in remoteHeaders.entries) {
+      if (allowedProfileHeaders.contains(entry.key) && entry.value != null && entry.value.toString().isNotEmpty) {
+        headers[entry.key] = entry.value;
+      }
+    }
+    return headers;
   }
 
   static Map<String, dynamic> _parseHeadersFromContent(String content) {
@@ -145,33 +219,160 @@ abstract class ProfileParser {
     return headers;
   }
 
-  static Map<String, dynamic> _mergeAndValidateHeaders(Map<String, dynamic> contentHeaders, {Map<String, dynamic> requestHeaders = const {}}) {
-    for (final entry in contentHeaders.entries) {
-      if (!requestHeaders.keys.contains(entry.key)) {
-        requestHeaders[entry.key] = entry.value;
-      }
+  static SubscriptionInfo? _parseSubscriptionInfo(String subInfoStr) {
+    final values = subInfoStr.split(';');
+    final map = {
+      for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt(),
+    };
+    if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
+      final total1 = (total == null || total == 0) ? infiniteTrafficThreshold : total;
+      expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
+      return SubscriptionInfo(
+        upload: upload,
+        download: download,
+        total: total1,
+        expire: DateTime.fromMillisecondsSinceEpoch(expire * 1000),
+      );
     }
-    final headers = <String, dynamic>{};
-    for (final entry in requestHeaders.entries) {
-      if (allowedProfileHeaders.contains(entry.key) && entry.value != null && entry.value.toString().isNotEmpty) {
-        headers[entry.key] = entry.value;
-      }
-    }
-    return headers;
+    return null;
   }
 
-  static Map<String, dynamic> _fixRequestHeaders(Map<String, dynamic> requestHeaders) {
-    return requestHeaders.map((key, value) {
-      if (value is List && value.length == 1) return MapEntry(key, value.first);
-      return MapEntry(key, value);
-    });
+  static Either<ProfileFailure, ProfileEntity> _parse({
+    required String tempFilePath,
+    required ProfileEntity profile,
+  }) =>
+      Either.tryCatch(
+        () {
+          final headers = Map<String, dynamic>.from(profile.populatedHeaders!);
+          var name = '';
+          if (profile.userOverride?.name case final String oName when oName.isNotEmpty) {
+            name = oName;
+          }
+
+          if (headers['profile-title'] case final String titleHeader when name.isEmpty) {
+            if (titleHeader.startsWith("base64:")) {
+              name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            } else {
+              name = titleHeader.trim();
+            }
+          }
+          if (headers['content-disposition'] case final String contentDispositionHeader when name.isEmpty) {
+            final regExp = RegExp('filename="([^"]*)"');
+            final match = regExp.firstMatch(contentDispositionHeader);
+            if (match != null && match.groupCount >= 1) {
+              name = match.group(1) ?? '';
+            }
+          }
+          if (profile case RemoteProfileEntity(:final url)) {
+            if (Uri.parse(url).fragment case final fragment when name.isEmpty) {
+              name = fragment;
+            }
+            if (url.split("/").lastOrNull case final part? when name.isEmpty) {
+              final pattern = RegExp(r"\.(json|yaml|yml|txt)[\s\S]*");
+              name = part.replaceFirst(pattern, "");
+            }
+          }
+          if (name.isBlank) {
+            switch (profile) {
+              case RemoteProfileEntity():
+                name = "Remote Profile";
+
+              case LocalProfileEntity():
+                name = protocol(File(tempFilePath).readAsStringSync());
+            }
+          }
+
+          if (headers['enable-warp'].toString() == 'true' || profile.userOverride?.enableWarp == true) {
+            final value = {
+              'enable': true,
+              'mode': 'warp_over_proxy',
+            };
+            headers['warp'] = value;
+            headers['warp2'] = value;
+          }
+
+          if (headers['enable-fragment'].toString() == 'true' || profile.userOverride?.enableFragment == true) {
+            headers['tls-tricks'] = {
+              'enable-fragment': true,
+            };
+          }
+
+          final isAutoUpdateDisable = profile.userOverride?.isAutoUpdateDisable ?? false;
+          ProfileOptions? options;
+          if (profile.userOverride?.updateInterval case final int updateInterval when updateInterval > 0 && !isAutoUpdateDisable) {
+            options = ProfileOptions(updateInterval: Duration(hours: updateInterval));
+          }
+          if (headers['profile-update-interval'] case final String updateIntervalStr when options == null && !isAutoUpdateDisable) {
+            final updateInterval = Duration(hours: int.parse(updateIntervalStr));
+            options = ProfileOptions(updateInterval: updateInterval);
+          }
+
+          SubscriptionInfo? subInfo;
+          if (headers['subscription-userinfo'] case final String subInfoStr) {
+            subInfo = _parseSubscriptionInfo(subInfoStr);
+          }
+
+          if (subInfo != null) {
+            if (headers['profile-web-page-url'] case final String profileWebPageUrl when isUrl(profileWebPageUrl)) {
+              subInfo = subInfo.copyWith(webPageUrl: profileWebPageUrl);
+            }
+            if (headers['support-url'] case final String profileSupportUrl when isUrl(profileSupportUrl)) {
+              subInfo = subInfo.copyWith(supportUrl: profileSupportUrl);
+            }
+          }
+
+          headers.removeWhere((key, value) => !allowedOverrideConfigs.contains(key) || value == null || value.toString().isEmpty);
+
+          final profileOverrideStr = jsonEncode({for (final key in headers.keys) key: headers[key]});
+
+          return profile.map(
+            remote: (rp) => rp.copyWith(
+              name: name,
+              lastUpdate: DateTime.now(),
+              options: options,
+              subInfo: subInfo,
+              profileOverride: profileOverrideStr,
+            ),
+            local: (lp) => lp.copyWith(
+              name: name,
+              lastUpdate: DateTime.now(),
+              profileOverride: profileOverrideStr,
+            ),
+          );
+        },
+        ProfileFailure.unexpected,
+      );
+
+  static String protocol(String content) {
+    final lines = content.split('\n');
+    String? name;
+    for (final line in lines) {
+      final uri = Uri.tryParse(line);
+      if (uri == null) continue;
+      final fragment = uri.hasFragment ? Uri.decodeComponent(uri.fragment.split("&&detour")[0]) : null;
+      name ??= switch (uri.scheme) {
+        'ss' => fragment ?? ProxyType.shadowsocks.label,
+        'ssconf' => fragment ?? ProxyType.shadowsocks.label,
+        'vmess' => ProxyType.vmess.label,
+        'vless' => fragment ?? ProxyType.vless.label,
+        'trojan' => fragment ?? ProxyType.trojan.label,
+        'tuic' => fragment ?? ProxyType.tuic.label,
+        'hy2' || 'hysteria2' => fragment ?? ProxyType.hysteria2.label,
+        'hy' || 'hysteria' => fragment ?? ProxyType.hysteria.label,
+        'ssh' => fragment ?? ProxyType.ssh.label,
+        'wg' => fragment ?? ProxyType.wireguard.label,
+        'warp' => fragment ?? ProxyType.warp.label,
+        _ => null,
+      };
+    }
+    return name ?? ProxyType.unknown.label;
   }
 
-  static Map<String, dynamic> applyOverride(Map<String, dynamic> main, String? override) {
-    if (override == null) return main;
-    if (override.contains("{")) {
-      final overrideMap = jsonDecode(override) as Map<String, dynamic>;
-      return _mergeJson(main, overrideMap);
+  static Map<String, dynamic> applyProfileOverride(Map<String, dynamic> main, String? profileOverride) {
+    if (profileOverride == null) return main;
+    if (profileOverride.contains("{")) {
+      final profileOverrideMap = jsonDecode(profileOverride) as Map<String, dynamic>;
+      return _mergeJson(main, profileOverrideMap);
     } else {
       return main;
     }
@@ -190,18 +391,5 @@ abstract class ProfileParser {
       }
     });
     return main;
-  }
-
-  static ProfileLocalOverride? getLocalOverride(String? overrideStr) {
-    ProfileLocalOverride? override;
-    if (overrideStr != null) {
-      final testUrlJson = jsonDecode(overrideStr) as Map<String, dynamic>;
-      if (testUrlJson.containsKey(ProfileLocalOverride.key) && testUrlJson[ProfileLocalOverride.key] != null) {
-        final overrideValue = testUrlJson[ProfileLocalOverride.key] as String;
-        final overrideJson = jsonDecode(overrideValue) as Map<String, dynamic>;
-        override = ProfileLocalOverride.fromJson(overrideJson);
-      }
-    }
-    return override;
   }
 }
