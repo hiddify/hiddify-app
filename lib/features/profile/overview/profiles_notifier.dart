@@ -47,17 +47,8 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
   Future<void> deleteProfile(ProfileEntity profile) async {
     loggy.debug('deleting profile: ${profile.name}');
 
-    if (profile.active) {
-      final connectionStatus = await ref.read(connectionNotifierProvider.future);
-      if (!connectionStatus.isDisconnected) await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-      final profiles = state.value;
-      if (profiles == null) return;
-      if (profiles.length > 1) {
-        final id = profiles.where((prof) => !prof.active).reduce((a, b) => a.lastUpdate.isAfter(b.lastUpdate) ? a : b).id;
-        await selectActiveProfile(id);
-      }
-    }
-    await _profilesRepo.deleteById(profile.id).match(
+    if (profile.active) await ref.read(connectionNotifierProvider.notifier).abortConnection();
+    await _profilesRepo.deleteById(profile.id, profile.active).match(
       (err) {
         loggy.warning('failed to delete profile', err);
         throw err;
