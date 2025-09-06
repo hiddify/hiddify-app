@@ -1562,7 +1562,7 @@ class _SearchField extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(width: 2),
-          const Icon(CupertinoIcons.search, size: 20),
+          const Icon(Icons.search, size: 20),
           const SizedBox(width: 5),
           TextField(
             onChanged: onChanged,
@@ -1592,7 +1592,7 @@ class _SearchField extends StatelessWidget {
             child: const Tooltip(
               message: 'Next',
               child: Icon(
-                CupertinoIcons.arrowtriangle_down_fill,
+                Icons.keyboard_arrow_down_rounded,
                 size: 20,
               ),
             ),
@@ -1605,7 +1605,7 @@ class _SearchField extends StatelessWidget {
             child: const Tooltip(
               message: 'Previous',
               child: Icon(
-                CupertinoIcons.arrowtriangle_up_fill,
+                Icons.keyboard_arrow_up_rounded,
                 size: 20,
               ),
             ),
