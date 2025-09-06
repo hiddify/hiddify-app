@@ -1,4 +1,3 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
@@ -34,17 +33,17 @@ class ProfilesPage extends HookConsumerWidget {
         actions: [
           IconButton(
             onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
-            icon: const Icon(FluentIcons.add_24_filled),
+            icon: const Icon(Icons.add_rounded),
             tooltip: t.profile.add.shortBtnTxt, // Tooltip for accessibility
           ),
           IconButton(
             onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
-            icon: const Icon(FluentIcons.arrow_sort_24_filled),
+            icon: const Icon(Icons.sort_rounded),
             tooltip: t.general.sort,
           ),
           IconButton(
             onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
-            icon: const Icon(FluentIcons.arrow_sync_24_filled),
+            icon: const Icon(Icons.update_rounded),
             tooltip: t.profile.update.updateSubscriptions,
           ),
           const Gap(8),
