@@ -33,7 +33,6 @@ abstract interface class ProfileRepository {
     UserOverride? userOverride,
     CancelToken? cancelToken,
   });
-
   TaskEither<ProfileFailure, Unit> addLocal(
     String content, {
     UserOverride? userOverride,
@@ -260,7 +259,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         },
       );
 
-  @visibleForTesting
+  @override
   TaskEither<ProfileFailure, Unit> validateConfig(String path, String tempPath, String? profileOverride, bool debug) => TaskEither.fromEither(
         _configOptionRepo.fullOptionsOverrided(profileOverride),
       ).mapLeft((configOptionFailure) => ProfileFailure.invalidConfig(null, configOptionFailure)).flatMap(
