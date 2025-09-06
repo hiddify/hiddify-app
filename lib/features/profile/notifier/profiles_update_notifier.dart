@@ -92,7 +92,7 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
         final updateInterval = profile.options?.updateInterval;
         if (force || updateInterval != null && updateInterval <= DateTime.now().difference(profile.lastUpdate)) {
           final t = ref.read(translationsProvider).requireValue.profile.update;
-          await ref.read(profileRepositoryProvider).requireValue.updateSubscription(profile).mapLeft(
+          await ref.read(profileRepositoryProvider).requireValue.upsertRemote(profile.url).mapLeft(
             (l) {
               loggy.debug("error updating profile [${profile.id}]", l);
               ref.read(inAppNotificationControllerProvider).showErrorToast(t.namedFailureMsg(name: profile.name));
