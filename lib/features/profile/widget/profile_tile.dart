@@ -158,10 +158,7 @@ class ProfileTile extends HookConsumerWidget {
                                         ),
                                       ),
                                     ),
-                                    const Icon(
-                                      FluentIcons.caret_down_16_filled,
-                                      size: 16,
-                                    ),
+                                    const Icon(Icons.arrow_drop_down_rounded),
                                   ],
                                 ),
                               ),
@@ -227,7 +224,7 @@ class ProfileActionButton extends HookConsumerWidget {
               }
               ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
             },
-            child: const Icon(FluentIcons.arrow_sync_24_filled),
+            child: const Icon(Icons.update_rounded),
           ),
         ),
       );
@@ -278,7 +275,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
       if (profile case RemoteProfileEntity())
         AdaptiveMenuItem(
           title: t.profile.update.buttonTxt,
-          icon: FluentIcons.arrow_sync_24_regular,
+          icon: Icons.update_rounded,
           onTap: () {
             if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
               return;
@@ -327,9 +324,10 @@ class ProfileActionsMenu extends HookConsumerWidget {
         ],
       ),
       AdaptiveMenuItem(
-        icon: FluentIcons.edit_24_regular,
+        icon: Icons.edit_rounded,
         title: t.profile.edit.buttonTxt,
         onTap: () {
+          if (Breakpoint(context).isMobile()) context.pop();
           context.goNamed(
             'profileDetails',
             pathParameters: {
@@ -340,7 +338,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
       ),
       // if (!profile.active)
       AdaptiveMenuItem(
-        icon: FluentIcons.delete_24_regular,
+        icon: Icons.delete_outline_rounded,
         title: t.profile.delete.buttonTxt,
         onTap: () async {
           if (deleteProfileMutation.state.isInProgress) return;
@@ -349,7 +347,6 @@ class ProfileActionsMenu extends HookConsumerWidget {
               .showConfirmation(
                 title: t.profile.delete.buttonTxt,
                 message: t.profile.delete.confirmationMsg,
-                icon: FluentIcons.delete_24_regular,
               )
               .then(
             (deleteConfirmed) {
@@ -440,7 +437,7 @@ class NewTrafficSubscriptionInfo extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
 
     return Column(children: [
-      const Icon(FluentIcons.data_usage_24_filled, color: Colors.blue),
+      const Icon(Icons.assessment_rounded, color: Colors.blue),
       Text(t.profile.subscription.remaingTraffic),
       const SizedBox(height: 4),
       Row(
@@ -543,7 +540,7 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
 
     final remaining = remainingText(t, theme);
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      const Icon(FluentIcons.data_usage_24_filled, color: Colors.blue),
+      const Icon(Icons.assessment_rounded, color: Colors.blue),
       Text(t.profile.subscription.remaingUsage),
       const SizedBox(height: 4),
       Text(
