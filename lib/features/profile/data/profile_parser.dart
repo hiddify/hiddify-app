@@ -13,6 +13,7 @@ import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:meta/meta.dart';
 
 /// parse profile subscription url and headers for data
 ///
@@ -48,7 +49,7 @@ class ProfileParser {
     required UserOverride? userOverride,
   }) =>
       populateHeaders(content: content).flatMap(
-        (populatedHeaders) => _parse(
+        (populatedHeaders) => parse(
           tempFilePath: tempFilePath,
           profile: ProfileEntity.local(
             id: id,
@@ -78,7 +79,7 @@ class ProfileParser {
           ),
         ).flatMap(
           (populatedHeaders) => TaskEither.fromEither(
-            _parse(
+            parse(
               tempFilePath: tempFilePath,
               profile: ProfileEntity.remote(
                 id: id,
@@ -112,7 +113,7 @@ class ProfileParser {
           ),
         ).flatMap(
           (populatedHeaders) => TaskEither.fromEither(
-            _parse(
+            parse(
               tempFilePath: tempFilePath,
               profile: rp.copyWith(populatedHeaders: populatedHeaders),
             ).flatMap(
@@ -131,11 +132,11 @@ class ProfileParser {
   }) =>
       profile
           .map(
-            remote: (rp) => _parse(
+            remote: (rp) => parse(
               profile: rp,
               tempFilePath: tempFilePath,
             ),
-            local: (lp) => _parse(
+            local: (lp) => parse(
               tempFilePath: tempFilePath,
               profile: lp,
             ),
@@ -237,13 +238,14 @@ class ProfileParser {
     return null;
   }
 
-  static Either<ProfileFailure, ProfileEntity> _parse({
+  @visibleForTesting
+  static Either<ProfileFailure, ProfileEntity> parse({
     required String tempFilePath,
     required ProfileEntity profile,
   }) =>
       Either.tryCatch(
         () {
-          final headers = Map<String, dynamic>.from(profile.populatedHeaders!);
+          final headers = Map<String, dynamic>.from(profile.populatedHeaders ?? {});
           var name = '';
           if (profile.userOverride?.name case final String oName when oName.isNotEmpty) {
             name = oName;
