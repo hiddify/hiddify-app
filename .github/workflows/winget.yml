@@ -1,0 +1,17 @@
+name: Publish to WinGet
+on:
+  release:
+    types: [released]
+
+env:
+    IDENTIFIER: ${{ endsWith(github.event.release.tag_name, 'dev') && 'Hiddify.Next.Beta' || 'Hiddify.Next' }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: vedantmgoyal9/winget-releaser@2
+        with:
+          identifier: ${{ env.IDENTIFIER }}
+          version: ${{ github.event.release.tag_name }}
+          token: ${{ secrets.WINGET_TOKEN }}

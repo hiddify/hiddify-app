@@ -1,0 +1,22 @@
+{
+	"dart.lineLength": 250,
+	"[dart]": {
+		"editor.defaultFormatter": "Dart-Code.dart-code",
+        "editor.formatOnSave": true,
+        "editor.formatOnType": true,
+        "editor.tabSize": 2,
+        "editor.rulers": [
+            250
+        ],
+        "editor.detectIndentation": false,
+        "editor.selectionHighlight": false,
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.suggestSelection": "first",
+        "editor.tabCompletion": "onlySnippets",
+        "editor.wordBasedSuggestions": "off"
+	},
+
+    "html.format.wrapLineLength": 250,
+    "cmake.sourceDirectory": "C:/Users/arshi/OneDrive/Desktop/hiddify-app-main/linux",
+	
+}

@@ -1,0 +1,22 @@
+//profile-title: base64:8J+UpSBXQVJQIPCflKU=
+//profile-update-interval: 24
+//subscription-userinfo: upload=0; download=0; total=10737418240000000; expire=2546249531
+//support-url: https://t.me/hiddify
+//profile-web-page-url: https://hiddify.com
+
+#attention! do not use p1 and p2 in more than two configs otherwise confilicts may occure
+#ifpm is about mode we have currently 6 modes. 
+
+warp://p1@auto/?ifp=1-3&ifpm=m1#m1
+warp://p2@auto/?ifp=1-3&ifpm=m2#m2
+warp://p1@auto/?ifp=1-3&ifpm=m3#m3
+warp://p2@auto/?ifp=1-3&ifpm=m4#m4
+
+warp://p1@auto/?ifp=1-3&ifpm=m5#m5
+warp://p2@auto/?ifp=1-3&ifpm=m6#m6
+
+#For g and h mode, you can use hex bytes between each _, with each part ranging from 00 to FF. You can also select more hex bytes to randomly choose between them.
+#In the next line, this means that the fake packet uses 0x30 as the first byte in the noise.
+warp://p2@auto/?ifp=1-3&ifpm=h_30#h_30     
+#In the following line, g indicates that the fake packet randomly uses one of the values 0x10, 0x20, or 0x30 as the initial byte in the noise after the WireGuard reserved key. This should not be effective.
+warp://p1@auto/?ifp=1-3&ifpm=g_10_20_30#g_10_20_30

@@ -1,0 +1,116 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+.github/help
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/flutter_export_environment.sh
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Flutter SDK files
+flutter/
+flutter_linux_*.tar.xz
+
+# generated files
+**/*.g.dart
+**/*.freezed.dart
+**/*.mapper.dart
+**/*.gen.dart
+**/*.dll
+**/*.dylib
+**/*.xcframework
+/dist/
+
+/assets/core/*
+!/assets/core/.gitkeep
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Build optimization cache (preserve these for faster builds)
+.dart_tool/build_cache/
+build/debug-info/
+flutter_build_config.json
+
+# Core binaries
+libcore/bin/*.exe
+libcore/bin/*.dll
+libcore/bin/*.so
+libcore/bin/*.dylib
+libcore/bin/webui/
+
+# Platform specific
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Build artifacts to ignore but keep cache
+build/**/*.exp
+build/**/*.lib  
+build/**/*.pdb
+build/**/*.obj
+
+/data
+
+# Additional ignores for repository hygiene
+# Large local toolchains (not required for building the Flutter app)
+go/
+go-tools/
+
+# Local installers/archives
+go-installer.msi
+go-portable.zip
+
+# Crash reports and Sentry temp
+.sentry-native/
+
+# iOS CocoaPods
+ios/Pods/
+
+# Gradle caches and local config
+**/.gradle/
+**/local.properties
+
+# Code signing keys (never commit)
+**/*.pfx
+windows/sign.pfx
+
+# Misc logs and artifacts
+LOG.txt

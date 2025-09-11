@@ -1,0 +1,17 @@
+#output_engine = mustache("markdown")
+output_engine = mustache(".release_notes.tpl")
+
+
+tag_filter_regexp = r'^v?[0-9]+\.[0-9]+(\.[0-9]+)?$'
+
+ignore_regexps = [
+    r'@minor', r'!minor',
+    r'@cosmetic', r'!cosmetic',
+    r'@refactor', r'!refactor',
+    r'@wip', r'!wip',
+    r'^([cC]hg|[fF]ix|[nN]ew)\s*:\s*[p|P]kg:',
+    r'^([cC]hg|[fF]ix|[nN]ew)\s*:\s*[d|D]ev:',
+    r'^(.{3,3}\s*:)?\s*[fF]irst commit.?\s*$',
+    r'^$',  ## ignore commits with empty messages
+    r'release: *',
+]

@@ -1,0 +1,10 @@
+{
+    "overrides": [
+        {
+            "files": ".github/**",
+            "options": {
+                "singleQuote": true
+            }
+        }
+    ]
+}

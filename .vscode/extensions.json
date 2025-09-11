@@ -1,0 +1,11 @@
+{
+	"recommendations": [
+		"dart-code.dart-code",
+		"dart-code.flutter",
+		"github.vscode-github-actions",
+		"golang.go",
+		"redhat.vscode-yaml",
+		"codeium.codeium",
+		"kangping.protobuf"
+	]
+}

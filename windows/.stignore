@@ -1,0 +1,9 @@
+/flutter/ephemeral/
+
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+/x64/
+/x86/

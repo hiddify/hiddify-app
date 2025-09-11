@@ -1,0 +1,296 @@
+{
+    "_meta": {
+        "description": "This file contains a serialized version of schema entities for drift.",
+        "version": "1.1.0"
+    },
+    "options": {
+        "store_date_time_values_as_text": true
+    },
+    "entities": [
+        {
+            "id": 0,
+            "references": [],
+            "type": "table",
+            "data": {
+                "name": "profile_entries",
+                "was_declared_in_moor": false,
+                "columns": [
+                    {
+                        "name": "id",
+                        "getter_name": "id",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "type",
+                        "getter_name": "type",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": [],
+                        "type_converter": {
+                            "dart_expr": "const EnumNameConverter<ProfileType>(ProfileType.values)",
+                            "dart_type_name": "ProfileType"
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "getter_name": "active",
+                        "moor_type": "bool",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "defaultConstraints": "CHECK (\"active\" IN (0, 1))",
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "name",
+                        "getter_name": "name",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": [
+                            {
+                                "allowed-lengths": {
+                                    "min": 1,
+                                    "max": null
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "url",
+                        "getter_name": "url",
+                        "moor_type": "string",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "last_update",
+                        "getter_name": "lastUpdate",
+                        "moor_type": "dateTime",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "update_interval",
+                        "getter_name": "updateInterval",
+                        "moor_type": "int",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": [],
+                        "type_converter": {
+                            "dart_expr": "DurationTypeConverter()",
+                            "dart_type_name": "Duration"
+                        }
+                    },
+                    {
+                        "name": "upload",
+                        "getter_name": "upload",
+                        "moor_type": "int",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "download",
+                        "getter_name": "download",
+                        "moor_type": "int",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "total",
+                        "getter_name": "total",
+                        "moor_type": "int",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "expire",
+                        "getter_name": "expire",
+                        "moor_type": "dateTime",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "web_page_url",
+                        "getter_name": "webPageUrl",
+                        "moor_type": "string",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "support_url",
+                        "getter_name": "supportUrl",
+                        "moor_type": "string",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "test_url",
+                        "getter_name": "testUrl",
+                        "moor_type": "string",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    }
+                ],
+                "is_virtual": false,
+                "without_rowid": false,
+                "constraints": [],
+                "explicit_pk": [
+                    "id"
+                ]
+            }
+        },
+        {
+            "id": 1,
+            "references": [],
+            "type": "table",
+            "data": {
+                "name": "geo_asset_entries",
+                "was_declared_in_moor": false,
+                "columns": [
+                    {
+                        "name": "id",
+                        "getter_name": "id",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "type",
+                        "getter_name": "type",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": [],
+                        "type_converter": {
+                            "dart_expr": "const EnumNameConverter<GeoAssetType>(GeoAssetType.values)",
+                            "dart_type_name": "GeoAssetType"
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "getter_name": "active",
+                        "moor_type": "bool",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "defaultConstraints": "CHECK (\"active\" IN (0, 1))",
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "name",
+                        "getter_name": "name",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": [
+                            {
+                                "allowed-lengths": {
+                                    "min": 1,
+                                    "max": null
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "provider_name",
+                        "getter_name": "providerName",
+                        "moor_type": "string",
+                        "nullable": false,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": [
+                            {
+                                "allowed-lengths": {
+                                    "min": 1,
+                                    "max": null
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "version",
+                        "getter_name": "version",
+                        "moor_type": "string",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    },
+                    {
+                        "name": "last_check",
+                        "getter_name": "lastCheck",
+                        "moor_type": "dateTime",
+                        "nullable": true,
+                        "customConstraints": null,
+                        "default_dart": null,
+                        "default_client_dart": null,
+                        "dsl_features": []
+                    }
+                ],
+                "is_virtual": false,
+                "without_rowid": false,
+                "constraints": [],
+                "explicit_pk": [
+                    "id"
+                ],
+                "unique_keys": [
+                    [
+                        "name",
+                        "provider_name"
+                    ]
+                ]
+            }
+        }
+    ]
+}

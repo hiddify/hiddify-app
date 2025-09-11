@@ -1,0 +1,22 @@
+output: dist/
+releases:
+  - name: prod
+    jobs:
+      - name: release-windows-exe
+        package:
+          platform: windows
+          target: exe
+
+      - name: release-android-apk
+        package:
+          platform: android
+          target: apk
+          build_args:
+            target-platform: android-arm,android-arm64,android-x64
+
+      - name: release-android-bundle
+        package:
+          platform: android
+          target: aab
+          build_args:
+            target-platform: android-arm,android-arm64,android-x64

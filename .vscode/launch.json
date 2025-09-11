@@ -1,0 +1,56 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "go Package",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "cwd": "./libcore",
+            "program": "./libcore/cli/main.go",
+            "args": ["build","-c","a.txt","-d","b.txt","--full-config"] ,
+            "buildFlags": "-tags with_clash_api,with_gvisor,with_quic,with_wireguard,with_grpc,with_ech,with_utls,with_reality_server"
+        },
+        {
+            "name": "Hiddify Dev",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "program": "lib/main.dart",
+            // "args": ["-d","192.168.1.35:36463"]
+            
+        },
+        {
+            "name": "Hiddify Dev Release",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main.dart",
+        },
+        {
+            "name": "Hiddify Dev Profile",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "program": "lib/main.dart",
+        },
+        {
+            "name": "Hiddify Prod",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main_prod.dart",
+        },
+        {
+            "name": "Attach: Design for iPad",
+            "request": "attach",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "args": [
+                "--app-id",
+                "app.hiddify.com"
+            ],
+            "deviceId": "designed-for-ipad",
+        }
+    ]
+}

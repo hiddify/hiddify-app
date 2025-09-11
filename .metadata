@@ -1,0 +1,42 @@
+# This file tracks properties of this Flutter project.
+# Used by Flutter tool to assess capabilities and perform upgrades etc.
+#
+# This file should be version controlled and should not be manually edited.
+
+version:
+  revision: "ef1af02aead6fe2414f3aafa5a61087b610e1332"
+  channel: "stable"
+
+project_type: app
+
+# Tracks metadata for the flutter migrate command
+migration:
+  platforms:
+    - platform: root
+      create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+      base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+    - platform: android
+      create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+      base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+    - platform: ios
+      create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+      base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+    - platform: linux
+      create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+      base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+    - platform: macos
+      create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+      base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+    - platform: windows
+      create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+      base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+
+  # User provided section
+
+  # List of Local paths (relative to this file) that should be
+  # ignored by the migrate tool.
+  #
+  # Files that are not part of the templates will be ignored by default.
+  unmanaged_files:
+    - 'lib/main.dart'
+    - 'ios/Runner.xcodeproj/project.pbxproj'

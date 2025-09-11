@@ -1,0 +1,118 @@
+name: hiddify
+# Auto-generated pubspec.yaml after corruption recovery.
+description: Regenerated pubspec with all required packages upgraded to the latest available versions.
+# Prevent accidental publishing
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.32.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: any
+  flutter_localizations:
+    sdk: flutter
+  accessibility_tools: any
+  circle_flags: any
+  crypto: any
+  dart_mappable: any
+  device_info_plus: any
+  dio: any
+  dio_smart_retry: any
+  drift: any
+  dynamic_color: any
+  flame: any
+  fluentui_system_icons: any
+  flutter_animate: any
+  flutter_displaymode: any
+  flutter_hooks: any
+  flutter_native_splash: any
+  flutter_typeahead: any
+  fpdart: any
+  freezed_annotation: any
+  gap: any
+  go_router: any
+  grpc: any
+  hooks_riverpod: ^2.5.1
+  humanizer: any
+  in_app_review: any
+  intl: any
+  json_path: any
+  launch_at_startup: any
+  lottie: any
+  mobile_scanner: any
+  neat_periodic_task: any
+  path: any
+  path_provider: any
+  percent_indicator: any
+  permission_handler: any
+  protobuf: any
+  protocol_handler: any
+  qr_flutter: any
+  rxdart: any
+  sentry_flutter: any
+  share_plus: any
+  shared_preferences: any
+  sliver_tools: any
+  tint: any
+  toastification: any
+  tray_manager: any
+  timezone_to_country: any
+  upgrader: any
+  url_launcher: any
+  version: any
+  watcher: any
+  window_manager: any
+  wolt_modal_sheet: any
+  ffi: any
+  riverpod_annotation: ^2.3.5
+  dartx: any
+  loggy: any
+  ansicolor: any
+  json_annotation: ^4.9.0
+  slang_flutter: any
+  package_info_plus: any
+  vector_math: any
+  flutter_shaders: any
+  posix: any
+  win32: any
+  uuid: any
+  meta: any
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: any
+  dart_mappable_builder: any
+  drift_dev: any
+  riverpod_generator: ^2.3.5
+  go_router_builder: any
+  flutter_gen_runner: any
+  freezed: any
+  slang: ^4.8.1
+  slang_build_runner: ^4.8.0
+  json_serializable: any
+  lint: any
+  custom_lint: any
+  riverpod_lint: ^2.3.5
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+  fonts:
+    - family: emoji
+      fonts:
+        - asset: assets/fonts/Emoji.ttf
+    - family: shabnam
+      fonts:
+        - asset: assets/fonts/Shabnam.ttf
+
+flutter_gen:
+  output: lib/gen/
+  integrations:
+    flutter_svg: true

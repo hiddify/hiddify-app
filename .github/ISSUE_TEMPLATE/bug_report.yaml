@@ -1,0 +1,113 @@
+---
+name: Bug Report
+description: Report a bug encountered while using Hiddify
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Only English
+        For access to our user forums, please join [our Telegram group](https://t.me/hiddify_board).
+
+        Please make sure to provide a descriptive, deterministic, and reproducible report. It saves time for both the developers and users who are looking for solutions. Providing as much information as possible, including screenshots and logs, is highly appreciated. This will help us to better understand the issue and respond more effectively.
+
+        Please DO NOT use this template to ask questions. You can join [our Telegram group](https://t.me/hiddify_board) or [our Website](https://hiddify.com/app) to ask questions. This template is strictly for reporting bugs.
+  - type: checkboxes
+    id: confirm-search
+    attributes:
+      label: Search first
+      description: Please search [existing issues](https://github.com/hiddify/hiddify-next/issues) before reporting.
+      options:
+        - label: I searched and no similar issues were found
+          required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform/OS
+      description: What platform are you seeing the problem on?
+      multiple: true
+      options:
+        - Android
+        - Windows
+        - macOS
+        - Linux
+        - Android TV
+        - iOS
+        - HiddifyCli (Core)
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: "OS version"
+      description: "Please provide the operating system version. (Example: Windows 10)"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Hiddify Version
+      description: "What version of Hiddify are you using?"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What Happened?
+      description: |
+        Please provide as much info as possible. Not doing so may result in your bug not being addressed in a timely manner.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal Reproducible Example (MRE)
+      description: |
+        Please tell us the steps to reproduce the bug. A [Minimal Reproducible Example (MRE)](https://stackoverflow.com/help/minimal-reproducible-example) is needed.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: |
+        Please tell us what's the behavior you expect.
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: |
+        If applicable, add screenshots, screen recordings or additional context to help explain your problem.
+    validations:
+      required: false
+  - type: textarea
+    id: configs
+    attributes:
+      label: Application Config Options
+      description: Please copy and paste Application config.
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code.
+    validations:
+      required: false
+  - type: checkboxes
+    id: ask-pr
+    attributes:
+      label: Are you willing to submit a PR? If you know how to fix the bug.
+      description: |
+        If you are not familiar with programming, you can skip this step.
+        If you are a developer and know how to fix the bug, you can submit a PR to fix it.
+        Your contributions are greatly appreciated and play a vital role in helping to improve the project!
+      options:
+        - label: I'm willing to submit a PR (Thank you!)

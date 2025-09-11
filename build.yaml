@@ -1,0 +1,19 @@
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          explicit_to_json: true
+      drift_dev:
+        options:
+          store_date_time_values_as_text: true
+      slang_build_runner:
+        options:
+          base_locale: en
+          fallback_strategy: base_locale
+          input_directory: assets/translations
+          input_file_pattern: .i18n.json
+          output_directory: lib/gen
+          output_file_name: translations.g.dart
+          translation_class_visibility: public
+          locale_handling: false

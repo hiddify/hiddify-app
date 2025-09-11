@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Release</title>
+        <item>
+            <title>Version 0.13.6</title>
+            <pubDate>Sun, 7 Jan 2024 22:00:00 +0000</pubDate>
+            <enclosure
+                url="https://play.google.com/store/apps/details?id=app.hiddify.com"
+                sparkle:version="0.13.6" sparkle:os="android" />
+        </item>
+        <item>
+            <title>Version 0.13.6</title>
+            <pubDate>Sun, 7 Jan 2024 22:00:00 +0000</pubDate>
+            <enclosure
+                url="https://github.com/hiddify/hiddify-next/releases/download/v0.13.6/hiddify-windows-x64-setup.zip"
+                sparkle:version="0.13.6" sparkle:os="windows" />
+        </item>
+        <item>
+            <title>Version 0.13.6</title>
+            <pubDate>Sun, 7 Jan 2024 22:00:00 +0000</pubDate>
+            <enclosure
+                url="https://github.com/hiddify/hiddify-next/releases/download/v0.13.6/hiddify-macos-universal.zip"
+                sparkle:version="0.13.6" sparkle:os="macos" />
+        </item>
+        <item>
+            <title>Version 0.13.6</title>
+            <pubDate>Sun, 7 Jan 2024 22:00:00 +0000</pubDate>
+            <enclosure
+                url="https://github.com/hiddify/hiddify-next/releases/download/v0.13.6/hiddify-linux-x64.zip"
+                sparkle:version="0.13.6" sparkle:os="linux" />
+        </item>
+    </channel>
+</rss>

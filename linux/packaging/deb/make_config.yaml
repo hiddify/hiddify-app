@@ -1,0 +1,33 @@
+display_name: Hiddify
+package_name: hiddify
+maintainer:
+  name: hiddify
+  email: linux@hiddify.com
+
+priority: optional
+section: x11
+installed_size: 6604
+essential: false
+icon: ./assets/images/source/ic_launcher_border.png
+
+postinstall_scripts:
+  - echo "Installed Hiddify"
+postuninstall_scripts:
+  - echo "Surprised Why?"
+
+keywords:
+  - Hiddify
+  - Proxy
+  - VPN
+  - V2ray
+  - Nekoray
+  - Xray
+  - Psiphon
+  - OpenVPN
+
+generic_name: Hiddify
+
+categories:
+  - Network
+
+startup_notify: true

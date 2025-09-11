@@ -1,0 +1,17 @@
+app_id: 6L903538-42B1-4596-G479-BJ779F21A65D
+publisher: Hiddify
+publisher_url: https://github.com/hiddify/hiddify-next
+display_name: Hiddify
+executable_name: Hiddify.exe
+output_base_file_name: Hiddify.exe
+create_desktop_icon: true
+install_dir_name: "{autopf64}\\Hiddify"
+setup_icon_file: ..\..\windows\runner\resources\app_icon.ico
+locales:
+  - ar
+  - en
+  - fa
+  - ru
+  - pt
+  - tr
+script_template: inno_setup.sas

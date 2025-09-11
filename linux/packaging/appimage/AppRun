@@ -1,0 +1,52 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+export LD_LIBRARY_PATH=usr/lib
+
+# Usage info
+show_help() {
+cat << EOF
+Usage: ${0##*/} ...
+start Hiddify or HiddifyCli, when no parameter is given, Hiddify is executed.
+    -v              show version
+EOF
+}
+show_version() {
+    printf "Hiddify version "
+    jq .version <./data/flutter_assets/version.json
+}
+# Initialize variables:
+service=0 #declare -i service
+OPTIND=1
+
+# Resetting OPTIND is necessary if getopts was used previously in the script.
+# It is a good idea to make OPTIND local if you process options in a function.
+
+# if no arg is provided, execute hiddify app
+if [[ $# == 0 ]];then 
+    exec ./hiddify
+else
+
+# processing arguments
+
+    case $1 in
+        HiddifyCli)  
+            exec ./HiddifyCli ${@:3}
+            exit 0
+            ;;
+        h)
+            show_help
+            exit 0
+            ;;
+        v)  show_version
+            exit 0
+            ;;
+        *)
+            show_help >&2
+            exit 1
+            ;;
+    esac
+
+
+
+fi

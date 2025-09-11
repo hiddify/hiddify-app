@@ -1,0 +1,28 @@
+display_name: Hiddify
+url: https://github.com/hiddify/hiddify-next/
+license: Other
+
+packager: hiddify
+packagerEmail: linux@hiddify.com
+
+priority: optional
+section: x11
+installed_size: 6604
+essential: false
+icon: ./assets/images/source/ic_launcher_border.png
+
+keywords:
+  - Hiddify
+  - Proxy
+  - VPN
+  - V2ray
+  - Nekoray
+  - Xray
+  - Psiphon
+  - OpenVPN
+
+generic_name: Hiddify
+
+group: Applications/Internet
+
+startup_notify: true

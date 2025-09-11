@@ -1,0 +1,10 @@
+//
+//  Base.xcconfig
+//  Runner
+//
+//  Created by GFWFighter on 7/24/1402 AP.
+//
+
+BASE_BUNDLE_IDENTIFIER=app.hiddify.com
+SERVICE_IDENTIFIER=com.hiddify.app
+DEVELOPMENT_TEAM=3JFTY5BP58

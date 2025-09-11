@@ -1,0 +1,31 @@
+#include /.stignore
+#include /android/.stignore
+#include /ios/.stignore
+#include /linux/.stignore
+#include /windows/.stignore
+#include /macos/.stignore
+
+.git
+
+.DS_Store
+.idea
+.dart_tool
+
+.flutter-plugins
+.flutter-plugins-dependencies
+
+.packages
+.pub-cache
+.pub
+build
+
+*.log
+*.iml
+*.ipr
+*.iws
+
+**/ios/Flutter/.last_build_id
+
+/android/app/debug
+/android/app/profile
+/android/app/release

@@ -1,0 +1,25 @@
+name: Upload store MSIX to release
+
+permissions:
+  contents: write
+
+on:
+  release:
+    types: [released]   # Run the action when a GitHub release is published
+
+  schedule:
+    - cron:  '0 */6 * * *'  # Run the action every 6 hours
+
+  workflow_dispatch:    # Manually run the action
+
+jobs:
+  upload-store-msix-to-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Upload store MSIX to release
+      uses: hiddify/Upload-Microsoft-Store-MSIX-Package-to-GitHub-Release@develop
+      with:
+        store-id: 9pdfnl3qv2s5
+        token: ${{ secrets.GITHUB_TOKEN }}
+        asset-name-pattern: Hiddify-Windows-Setup-x64		# Optional
