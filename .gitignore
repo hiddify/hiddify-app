@@ -70,6 +70,7 @@ libcore/bin/*.exe
 libcore/bin/*.dll
 libcore/bin/*.so
 libcore/bin/*.dylib
+libcore/bin/*.backup
 libcore/bin/webui/
 
 # Platform specific

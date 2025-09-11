@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -25,46 +24,39 @@ class ConnectionButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
     final connectionStatus = ref.watch(connectionNotifierProvider);
-    final delayInt = ref.watch(
-      activeProxyNotifierProvider.select((v) => v.valueOrNull?.urlTestDelayInt),
-    );
+    final delayInt = ref.watch(activeProxyNotifierProvider.select((v) => v.valueOrNull?.urlTestDelayInt));
 
-    final requiresReconnect = ref.watch(
-      configOptionNotifierProvider.select((v) => v.valueOrNull),
-    );
+    final requiresReconnect = ref.watch(configOptionNotifierProvider.select((v) => v.valueOrNull));
     final today = DateTime.now();
 
-    ref.listen(
-      connectionNotifierProvider,
-      (_, next) {
-        if (next case AsyncError(:final error)) {
-          CustomAlertDialog.fromErr(t.presentError(error)).show(context);
-        }
-        if (next case AsyncData(value: Disconnected(:final connectionFailure?))) {
-          CustomAlertDialog.fromErr(t.presentError(connectionFailure)).show(context);
-        }
-      },
-    );
+    ref.listen(connectionNotifierProvider, (_, next) {
+      if (next case AsyncError(:final error)) {
+        CustomAlertDialog.fromErr(t.presentError(error)).show(context);
+      }
+      if (next case AsyncData(value: Disconnected(:final connectionFailure?))) {
+        CustomAlertDialog.fromErr(t.presentError(connectionFailure)).show(context);
+      }
+    });
 
     final buttonTheme = Theme.of(context).extension<ConnectionButtonTheme>()!;
 
     return _ConnectionButton(
       onTap: switch (connectionStatus) {
         AsyncData(value: Disconnected()) || AsyncError() => () async {
-            await PerfMonitor.instance.measure('toggleConnection(disconnected)', () async {
-              await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-            });
-          },
+          await PerfMonitor.instance.measure('toggleConnection(disconnected)', () async {
+            await ref.read(connectionNotifierProvider.notifier).toggleConnection();
+          });
+        },
         AsyncData(value: Connected()) => () async {
-            if (requiresReconnect == true) {
-              await PerfMonitor.instance.measure('reconnect', () async {
-                await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
-              });
-            }
-            await PerfMonitor.instance.measure('toggleConnection(connected)', () async {
-              await ref.read(connectionNotifierProvider.notifier).toggleConnection();
+          if (requiresReconnect == true) {
+            await PerfMonitor.instance.measure('reconnect', () async {
+              await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
             });
-          },
+          }
+          await PerfMonitor.instance.measure('toggleConnection(connected)', () async {
+            await ref.read(connectionNotifierProvider.notifier).toggleConnection();
+          });
+        },
         _ => () async {},
       },
       enabled: switch (connectionStatus) {
@@ -97,14 +89,7 @@ class ConnectionButton extends HookConsumerWidget {
 }
 
 class _ConnectionButton extends StatelessWidget {
-  const _ConnectionButton({
-    required this.onTap,
-    required this.enabled,
-    required this.label,
-    required this.buttonColor,
-    required this.image,
-    required this.useImage,
-  });
+  const _ConnectionButton({required this.onTap, required this.enabled, required this.label, required this.buttonColor, required this.image, required this.useImage});
 
   final Future<void> Function() onTap;
   final bool enabled;
@@ -116,70 +101,56 @@ class _ConnectionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Semantics(
-          button: true,
-          enabled: enabled,
-          label: label,
-          child: Container(
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 16,
-                  color: buttonColor.withOpacity(0.5),
-                ),
-              ],
-            ),
-            width: 148,
-            height: 148,
-            child: Material(
-              key: const ValueKey("home_connection_button"),
-              shape: const CircleBorder(),
-              color: Colors.white,
-              child: InkWell(
-                onTap: () {
-                  // Let current frame render, then run async and schedule a repaint after completion
-                  WidgetsBinding.instance.addPostFrameCallback((_) async {
-                    await onTap();
-                    SchedulerBinding.instance.scheduleFrame();
-                  });
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(36),
-                  child: TweenAnimationBuilder<Color?>(
-                    tween: ColorTween(end: buttonColor),
-                    duration: const Duration(milliseconds: 250),
-                    builder: (context, value, child) {
-                      final color = value ?? buttonColor;
-                      if (useImage) {
-                        return image.image();
-                      } else {
-                        return Assets.images.logo.svg(
-                          colorFilter: ColorFilter.mode(
-                            color,
-                            BlendMode.srcIn,
-                          ),
-                        );
-                      }
-                    },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Semantics(
+            button: true,
+            enabled: enabled,
+            label: label,
+            child: Container(
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(blurRadius: 16, color: buttonColor.withOpacity(0.5))],
+              ),
+              width: 148,
+              height: 148,
+              child: Material(
+                key: const ValueKey("home_connection_button"),
+                shape: const CircleBorder(),
+                color: Colors.white,
+                child: InkWell(
+                  onTap: () {
+                    // Let current frame render, then run async and schedule a repaint after completion
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      await onTap();
+                      SchedulerBinding.instance.scheduleFrame();
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(36),
+                    child: TweenAnimationBuilder<Color?>(
+                      tween: ColorTween(end: buttonColor),
+                      duration: const Duration(milliseconds: 250),
+                      builder: (context, value, child) {
+                        final color = value ?? buttonColor;
+                        if (useImage) {
+                          return image.image();
+                        } else {
+                          return Assets.images.logo.svg(colorFilter: ColorFilter.mode(color, BlendMode.srcIn));
+                        }
+                      },
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-        const Gap(16),
-        ExcludeSemantics(
-          child: AnimatedText(
-            label,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
-      ],
-    ));
+          const Gap(16),
+          ExcludeSemantics(child: AnimatedText(label, style: Theme.of(context).textTheme.titleMedium)),
+        ],
+      ),
+    );
   }
 }
