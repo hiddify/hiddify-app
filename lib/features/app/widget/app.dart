@@ -17,6 +17,7 @@ import 'package:hiddify/features/shortcut/shortcut_wrapper.dart';
 import 'package:hiddify/features/system_tray/widget/system_tray_wrapper.dart';
 import 'package:hiddify/features/window/widget/window_wrapper.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hiddify/utils/perf_monitor.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:upgrader/upgrader.dart';
 
@@ -27,6 +28,8 @@ class App extends HookConsumerWidget with PresLogger {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // initialize lightweight perf monitor (logs slow frames/ops in release too)
+    PerfMonitor.instance.init();
     final router = ref.watch(routerProvider);
     final locale = ref.watch(localePreferencesProvider);
     final themeMode = ref.watch(themePreferencesProvider);
@@ -46,7 +49,11 @@ class App extends HookConsumerWidget with PresLogger {
                   routerConfig: router,
                   locale: locale.flutterLocale,
                   supportedLocales: AppLocaleUtils.supportedLocales,
-                  localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                  localizationsDelegates: const [
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
                   debugShowCheckedModeBanner: false,
                   themeMode: themeMode.flutterThemeMode,
                   theme: theme.lightTheme(lightColorScheme),
@@ -58,13 +65,21 @@ class App extends HookConsumerWidget with PresLogger {
                       navigatorKey: router.routerDelegate.navigatorKey,
                       child: child ?? const SizedBox(),
                     );
+                    // Toggle overlay by setting _debugAccessibility = true if needed
+                    // return Stack(children: [child, const PerfOverlay()]);
                     if (kDebugMode && _debugAccessibility) {
                       return AccessibilityTools(
                         checkFontOverflows: true,
                         child: child,
                       );
                     }
-                    return child;
+                    // Reduce white flashes: isolate subtree paints and ensure a solid background
+                    return RepaintBoundary(
+                      child: ColoredBox(
+                        color: Theme.of(context).colorScheme.background,
+                        child: child,
+                      ),
+                    );
                   },
                 );
               },

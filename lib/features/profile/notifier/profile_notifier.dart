@@ -76,7 +76,7 @@ class AddProfile extends _$AddProfile with AppLogger {
         } else if (LinkParser.protocol(rawInput) case (final parsed)?) {
           loggy.debug("adding profile, content");
           var name = parsed.name;
-          var oldItem = await _profilesRepo.getByName(name);
+          final oldItem = await _profilesRepo.getByName(name);
           if (name == "Hiddify WARP" && oldItem != null) {
             _profilesRepo.deleteById(oldItem.id).run();
           }
@@ -111,39 +111,45 @@ class AddProfile extends _$AddProfile with AppLogger {
   Future<void> check4Warp(String rawInput) async {
     for (final line in rawInput.split("\n")) {
       if (line.toLowerCase().startsWith("warp://")) {
-        final _prefs = ref.read(sharedPreferencesProvider).requireValue;
-        final _warp = ref.read(warpOptionNotifierProvider.notifier);
+        final prefs = ref.read(sharedPreferencesProvider).requireValue;
+        final warp = ref.read(warpOptionNotifierProvider.notifier);
 
-        final consent = false && (_prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false);
+        final consent = prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false;
 
         final t = ref.read(translationsProvider);
         final notification = ref.read(inAppNotificationControllerProvider);
 
         if (!consent) {
+          final scaffoldContext = RootScaffold.stateKey.currentContext;
+          if (scaffoldContext == null || !scaffoldContext.mounted) {
+            loggy.warning("No valid context available for consent dialog");
+            return;
+          }
+
           final agreed = await showDialog<bool>(
-            context: RootScaffold.stateKey.currentContext!,
+            context: scaffoldContext,
             builder: (context) => const WarpLicenseAgreementModal(),
           );
 
           if (agreed ?? false) {
-            await _prefs.setBool(WarpOptionNotifier.warpConsentGiven, true);
+            await prefs.setBool(WarpOptionNotifier.warpConsentGiven, true);
             final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
             toast?.pause();
-            await _warp.generateWarpConfig();
+            await warp.generateWarpConfig();
             toast?.start();
           } else {
             return;
           }
         }
 
-        final accountId = _prefs.getString("warp2-account-id");
-        final accessToken = _prefs.getString("warp2-access-token");
+        final accountId = prefs.getString("warp2-account-id");
+        final accessToken = prefs.getString("warp2-access-token");
         final hasWarp2Config = accountId != null && accessToken != null;
 
         if (!hasWarp2Config || true) {
           final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
           toast?.pause();
-          await _warp.generateWarp2Config();
+          await warp.generateWarp2Config();
           toast?.start();
         }
       }

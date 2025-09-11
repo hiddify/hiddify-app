@@ -27,19 +27,16 @@ Map<SortMode, OrderingMode> orderMap = {
 };
 
 @DriftAccessor(tables: [ProfileEntries])
-class ProfileDao extends DatabaseAccessor<AppDatabase>
-    with _$ProfileDaoMixin, InfraLogger
-    implements ProfileDataSource {
+class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin, InfraLogger implements ProfileDataSource {
   ProfileDao(super.db);
 
   @override
-  Future<ProfileEntry?> getById(String id) async {
-    return (profileEntries.select()..where((tbl) => tbl.id.equals(id)))
-        .getSingleOrNull();
+  Future<ProfileEntry?> getById(String id) {
+    return (profileEntries.select()..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
   }
 
   @override
-  Future<ProfileEntry?> getByUrl(String url) async {
+  Future<ProfileEntry?> getByUrl(String url) {
     return (select(profileEntries)
           ..where((tbl) => tbl.url.like('%$url%'))
           ..limit(1))
@@ -47,11 +44,8 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<ProfileEntry?> getByName(String name) async {
-    return (select(profileEntries)
-          ..where((tbl) => tbl.name.equals(name))
-          ..limit(1))
-        .getSingleOrNull();
+  Future<ProfileEntry?> getByName(String name) {
+    return (select(profileEntries)..where((tbl) => tbl.name.equals(name))).getSingleOrNull();
   }
 
   @override
@@ -65,9 +59,7 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
   @override
   Stream<int> watchProfilesCount() {
     final count = profileEntries.id.count();
-    return (profileEntries.selectOnly()..addColumns([count]))
-        .map((exp) => exp.read(count)!)
-        .watchSingle();
+    return (profileEntries.selectOnly()..addColumns([count])).map((exp) => exp.read(count)!).watchSingle();
   }
 
   @override
@@ -84,12 +76,9 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
                   ),
               (tbl) {
                 final trafficRatio = (tbl.download + tbl.upload) / tbl.total;
-                final isExpired =
-                    tbl.expire.isSmallerOrEqualValue(DateTime.now());
+                final isExpired = tbl.expire.isSmallerOrEqualValue(DateTime.now());
                 return OrderingTerm(
-                  expression: (trafficRatio.isNull() |
-                          trafficRatio.isSmallerThanValue(1)) &
-                      (isExpired.isNull() | isExpired.equals(false)),
+                  expression: (trafficRatio.isNull() | trafficRatio.isSmallerThanValue(1)) & (isExpired.isNull() | isExpired.equals(false)),
                   mode: OrderingMode.desc,
                 );
               },
@@ -113,8 +102,7 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
     await transaction(
       () async {
         if (entry.active.present && entry.active.value) {
-          await update(profileEntries)
-              .write(const ProfileEntriesCompanion(active: Value(false)));
+          await update(profileEntries).write(const ProfileEntriesCompanion(active: Value(false)));
         }
         await into(profileEntries).insert(entry);
       },
@@ -125,13 +113,10 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
   Future<void> edit(String id, ProfileEntriesCompanion entry) async {
     await transaction(
       () async {
-        
         if (entry.active.present && entry.active.value) {
-          await update(profileEntries)
-              .write(const ProfileEntriesCompanion(active: Value(false)));
+          await update(profileEntries).write(const ProfileEntriesCompanion(active: Value(false)));
         }
-        await (update(profileEntries)..where((tbl) => tbl.id.equals(id)))
-            .write(entry.copyWith(lastUpdate: Value(DateTime.now())));
+        await (update(profileEntries)..where((tbl) => tbl.id.equals(id))).write(entry.copyWith(lastUpdate: Value(DateTime.now())));
       },
     );
   }

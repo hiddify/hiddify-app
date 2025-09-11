@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
+import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -25,122 +23,70 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
   Future<void> build() async {
     if (!PlatformUtils.isDesktop) return;
 
-    final activeProxy = await ref.watch(activeProxyNotifierProvider);
-    final delay = activeProxy.value?.urlTestDelay ?? 0;
-    final newConnectionStatus = delay > 0 && delay < 65000;
-    ConnectionStatus connection;
     try {
-      connection = await ref.watch(connectionNotifierProvider.future);
-    } catch (e) {
-      loggy.warning("error getting connection status", e);
-      connection = const ConnectionStatus.disconnected();
-    }
-
-    final t = ref.watch(translationsProvider);
-
-    var tooltip = Constants.appName;
-    final serviceMode = ref.watch(ConfigOptions.serviceMode);
-    if (connection == Disconnected()) {
-      setIcon(connection);
-    } else if (newConnectionStatus) {
-      setIcon(const Connected());
-      tooltip = "$tooltip - ${connection.present(t)}";
-      if (newConnectionStatus) {
-        tooltip = "$tooltip : ${delay}ms";
-      } else {
-        tooltip = "$tooltip : -";
+      final activeProxy = ref.watch(activeProxyNotifierProvider);
+      final delay = activeProxy.value?.urlTestDelayInt ?? 0; // Use Int version
+      final newConnectionStatus = delay > 0 && delay < 65000;
+      
+      ConnectionStatus connection;
+      try {
+        connection = await ref.watch(connectionNotifierProvider.future);
+      } catch (e) {
+        loggy.warning("error getting connection status", e);
+        connection = const ConnectionStatus.disconnected();
       }
-      // else if (delay>1000)
-      //   SystemTrayNotifier.setIcon(timeout ? Disconnecting() : Connecting());
-    } else {
-      setIcon(const Disconnecting());
-      tooltip = "$tooltip - ${connection.present(t)}";
+
+      // Safe translation access with timeout and fallback
+      Translations t;
+      try {
+        // Use a timeout to prevent hanging
+        final translationsFuture = Future.value(ref.read(translationsProvider));
+        t = await translationsFuture.timeout(const Duration(milliseconds: 500));
+      } catch (e) {
+        loggy.warning("Translation provider failed, using English fallback", e);
+        // Use English fallback directly
+        t = AppLocale.en.buildSync();
+      }
+
+      var tooltip = Constants.appName;
+      ref.watch(ConfigOptions.serviceMode);
+      
+      if (connection == const Disconnected()) {
+        setIcon(connection);
+      } else if (newConnectionStatus) {
+        setIcon(const Connected());
+        tooltip = "$tooltip - ${connection.present(t)}";
+        if (newConnectionStatus) {
+          tooltip = "$tooltip : ${delay}ms";
+        } else {
+          tooltip = "$tooltip : -";
+        }
+      } else {
+        setIcon(const Disconnecting());
+        tooltip = "$tooltip - ${connection.present(t)}";
+      }
+      
+      if (Platform.isMacOS) {
+        try {
+          windowManager.setBadgeLabel("${delay}ms");
+        } catch (e) {
+          loggy.warning("Failed to set badge label", e);
+        }
+      }
+      
+      if (!Platform.isLinux) {
+        try {
+          await trayManager.setToolTip(tooltip);
+        } catch (e) {
+          loggy.warning("Failed to set tooltip", e);
+        }
+      }
+
+      await _buildMenu();
+    } catch (e) {
+      loggy.error("System tray initialization failed", e);
+      // Don't rethrow - let the system continue without tray
     }
-    if (Platform.isMacOS) {
-      windowManager.setBadgeLabel("${delay}ms");
-    }
-    if (!Platform.isLinux) await trayManager.setToolTip(tooltip);
-
-    final destinations = <(String label, String location)>[
-      (t.home.pageTitle, const HomeRoute().location),
-      (t.proxies.pageTitle, const ProxiesRoute().location),
-      (t.logs.pageTitle, const LogsOverviewRoute().location),
-      (t.settings.pageTitle, const SettingsRoute().location),
-      (t.about.pageTitle, const AboutRoute().location),
-    ];
-
-    // loggy.debug('updating system tray');
-
-    final menu = Menu(
-      items: [
-        MenuItem(
-          label: t.tray.dashboard,
-          onClick: (_) async {
-            await ref.read(windowNotifierProvider.notifier).open();
-          },
-        ),
-        MenuItem.separator(),
-        MenuItem.checkbox(
-          label: switch (connection) {
-            Disconnected() => t.tray.status.connect,
-            Connecting() => t.tray.status.connecting,
-            Connected() => t.tray.status.disconnect,
-            Disconnecting() => t.tray.status.disconnecting,
-          },
-          // checked: connection.isConnected,
-          checked: false,
-          disabled: connection.isSwitching,
-          onClick: (_) async {
-            await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-          },
-        ),
-        MenuItem.separator(),
-        MenuItem(
-          label: t.config.serviceMode,
-          icon: Assets.images.trayIconIco,
-          disabled: true,
-        ),
-
-        ...ServiceMode.values.map(
-          (e) => MenuItem.checkbox(
-            checked: e == serviceMode,
-            key: e.name,
-            label: e.present(t),
-            onClick: (menuItem) async {
-              final newMode = ServiceMode.values.byName(menuItem.key!);
-              loggy.debug("switching service mode: [$newMode]");
-              await ref.read(ConfigOptions.serviceMode.notifier).update(newMode);
-            },
-          ),
-        ),
-
-        // MenuItem.submenu(
-        //   label: t.tray.open,
-        //   submenu: Menu(
-        //     items: [
-        //       ...destinations.map(
-        //         (e) => MenuItem(
-        //           label: e.$1,
-        //           onClick: (_) async {
-        //             await ref.read(windowNotifierProvider.notifier).open();
-        //             ref.read(routerProvider).go(e.$2);
-        //           },
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        MenuItem.separator(),
-        MenuItem(
-          label: t.tray.quit,
-          onClick: (_) async {
-            return ref.read(windowNotifierProvider.notifier).quit();
-          },
-        ),
-      ],
-    );
-
-    await trayManager.setContextMenu(menu);
   }
 
   static void setIcon(ConnectionStatus status) {
@@ -172,7 +118,6 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
           }
       }
     }
-    final isDarkMode = false;
     switch (status) {
       case Connected():
         return Assets.images.trayIconConnectedPng.path;
@@ -181,12 +126,66 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
       case Disconnecting():
         return Assets.images.trayIconDisconnectedPng.path;
       case Disconnected():
-        if (isDarkMode) {
-          return Assets.images.trayIconDarkPng.path;
-        } else {
-          return Assets.images.trayIconPng.path;
-        }
+        return Assets.images.trayIconPng.path;
     }
     // return Assets.images.trayIconPng.path;
+  }
+
+  // Remove unused variables and add proper app exit
+  Future<void> _buildMenu() async {
+    final t = ref.read(translationsProvider);
+    final connection = ref.read(connectionNotifierProvider).asData?.value ?? const Disconnected();
+    final serviceMode = ref.watch(ConfigOptions.serviceMode);
+
+    final menu = Menu(
+      items: [
+        MenuItem(
+          label: t.tray.dashboard,
+          onClick: (_) async {
+            await ref.read(windowNotifierProvider.notifier).open();
+          },
+        ),
+        MenuItem.separator(),
+        MenuItem.checkbox(
+          label: switch (connection) {
+            Disconnected() => t.tray.status.connect,
+            Connecting() => t.tray.status.connecting,
+            Connected() => t.tray.status.disconnect,
+            Disconnecting() => t.tray.status.disconnecting,
+          },
+          checked: connection.isConnected,
+          disabled: connection.isSwitching,
+          onClick: (_) async {
+            await ref.read(connectionNotifierProvider.notifier).toggleConnection();
+          },
+        ),
+        MenuItem.separator(),
+        MenuItem(
+          label: t.config.serviceMode,
+          icon: Assets.images.trayIconIco,
+          disabled: true,
+        ),
+        ...ServiceMode.values.map(
+          (e) => MenuItem.checkbox(
+            checked: e == serviceMode,
+            key: e.name,
+            label: e.present(t),
+            onClick: (menuItem) async {
+              final newMode = ServiceMode.values.byName(menuItem.key!);
+              loggy.debug("switching service mode: [$newMode]");
+              await ref.read(ConfigOptions.serviceMode.notifier).update(newMode);
+            },
+          ),
+        ),
+        MenuItem.separator(),
+        MenuItem(
+          label: t.tray.quit,
+          onClick: (_) async {
+            return ref.read(windowNotifierProvider.notifier).quit();
+          },
+        ),
+      ],
+    );
+    await trayManager.setContextMenu(menu);
   }
 }

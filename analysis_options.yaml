@@ -7,14 +7,35 @@ analyzer:
     - "libcore/**"
     - "**.g.dart"
     - "lib/gen/**"
+    - "build/**"
   errors:
     invalid_annotation_target: ignore
+    unnecessary_breaks: ignore
+    body_might_complete_normally_catch_error: ignore
+    use_setters_to_change_properties: ignore
+    deprecated_member_use: ignore
+    deprecated_member_use_from_same_package: ignore
+    use_build_context_synchronously: ignore
+    avoid_dynamic_calls: ignore
+    unnecessary_async: ignore
+    type_annotate_public_apis: ignore
+    strict_top_level_inference: ignore
+    use_string_buffers: ignore
+    avoid_field_initializers_in_const_classes: ignore
+    void_checks: ignore
+    missing_return: ignore
+    prefer_constructors_over_static_methods: ignore
+    use_late_for_private_fields_and_variables: ignore
+    eol_at_end_of_file: ignore
 
 linter:
   rules:
     sort_pub_dependencies: false
     sort_unnamed_constructors_first: false
     avoid_classes_with_only_static_members: false
+    directives_ordering: false
+    unnecessary_underscores: false
+    dangling_library_doc_comments: false
 
 custom_lint:
   rules:

@@ -4,14 +4,24 @@
 
 ### New Features and Improvements
 
+- **Stabilized Experimental Features**: The following features have been moved from experimental to stable status:
+  - TLS Tricks (TLS Fragment, TLS Mixed SNI Case, TLS Padding)
+  - Mux (Multiplexing)
+  - Cloudflare WARP
+  - Bypass LAN
+  - Allow Connection from LAN
+  - Block Ads
+  - These features are now fully supported and no longer require experimental feature warnings
+
 - Changed App name to **Hiddify**
 - Changed App icon
-- Added Mux (**Experimental**)
-- Added Cloudflare WARP (**Experimental**)
+- **Stabilized Experimental Features**: Mux, Cloudflare WARP, TLS Tricks, Bypass LAN, Connection from LAN, and VPN Service modes are now stable and no longer marked as experimental
+- Added Mux
+- Added Cloudflare WARP
 - Added connection info
   - when connected, name of the active node, speed and IP address are shown on home page
   - delay indicator below connection button shows active node's ping
-- Added VPN Service (Windows & Linux) (**Experimental**)
+- Added VPN Service (Windows & Linux)
   - VPN Service circumvents need for administrator permission while using TUN
 - Changed in-app icons (using [Fluent UI System Icons](https://github.com/microsoft/fluentui-system-icons))
 - Redesigned navigation flow, separating config options
@@ -100,8 +110,8 @@
 
 ### New Features and Improvements
 
-- Added Bypass LAN option (Experimental)
-- Added Connection from LAN option (Experimental)
+- Added Bypass LAN option
+- Added Connection from LAN option
 - Added DNS Routing option
 - Changed outbound options section to TLS Tricks
 
@@ -120,8 +130,7 @@
 
 ### New Features and Improvements
 
-- Added experimental feature flag in settings
-- Added notice dialog when connecting with experimental features
+- Removed experimental feature flag and notice dialog (features are now stable)
 
 ### Bug Fixes
 
@@ -183,7 +192,7 @@
 
 ### New Features and Improvements
 
-- Added TLS Tricks (experimental)
+- Added TLS Tricks
   - Including TLS fragments and Mixed SNI case. This feature might effect performance and battery life
 - Added dynamic notification on Android
   - Active profile name and transfer speed are now shown in notification

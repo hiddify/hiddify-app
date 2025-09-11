@@ -22,7 +22,7 @@ sealed class GeoAssetFailure with _$GeoAssetFailure, Failure {
       GeoAssetActiveAssetNotFound;
 
   @override
-  ({String type, String? message}) present(TranslationsEn t) {
+  ({String type, String? message}) present(Translations t) {
     return switch (this) {
       GeoAssetUnexpectedFailure() => (
           type: t.failure.geoAssets.unexpected,

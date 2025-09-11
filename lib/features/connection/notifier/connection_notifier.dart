@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/data/connection_repository.dart';
+import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -140,6 +143,11 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       loggy.warning("error connecting", err);
       //Go err is not normal object to see the go errors are string and need to be dumped
       loggy.warning(err);
+      // If error is missing privilege, fallback to systemProxy automatically
+      if (err is MissingPrivilege) {
+        loggy.info("missing admin privilege detected, switching service mode to systemProxy");
+        await ref.read(ConfigOptions.serviceMode.notifier).update(ServiceMode.systemProxy);
+      }
       if (err.toString().contains("panic")) {
         await Sentry.captureException(Exception(err.toString()));
       }

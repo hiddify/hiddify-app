@@ -48,6 +48,8 @@ endfunction()
 # Flutter library and tool build rules.
 set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 add_subdirectory(${FLUTTER_MANAGED_DIR})
+# Provide local NuGet executable path to all subprojects to avoid download.
+set(NUGET "${CMAKE_CURRENT_SOURCE_DIR}/nuget.exe" CACHE FILEPATH "NuGet executable")
 
 # Application build; see runner/CMakeLists.txt.
 add_subdirectory("runner")

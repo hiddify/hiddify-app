@@ -3,8 +3,8 @@ import 'package:hiddify/core/model/environment.dart';
 
 part 'remote_version_entity.freezed.dart';
 
-@Freezed()
-class RemoteVersionEntity with _$RemoteVersionEntity {
+@freezed
+sealed class RemoteVersionEntity with _$RemoteVersionEntity {
   const RemoteVersionEntity._();
 
   const factory RemoteVersionEntity({
@@ -17,6 +17,5 @@ class RemoteVersionEntity with _$RemoteVersionEntity {
     required Environment flavor,
   }) = _RemoteVersionEntity;
 
-  String get presentVersion =>
-      flavor == Environment.prod ? version : "$version ${flavor.name}";
+  String get presentVersion => flavor == Environment.prod ? version : "$version ${flavor.name}";
 }

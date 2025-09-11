@@ -1,3 +1,4 @@
+// @dart=3.0
 //
 //  Generated code. Do not modify.
 //  source: core.proto
@@ -39,18 +40,15 @@ class ParseConfigRequest extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'tempPath', protoName: 'tempPath')
     ..aOS(2, _omitFieldNames ? '' : 'path')
     ..aOB(3, _omitFieldNames ? '' : 'debug')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   ParseConfigRequest clone() => ParseConfigRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
   ParseConfigRequest copyWith(void Function(ParseConfigRequest) updates) => super.copyWith((message) => updates(message as ParseConfigRequest)) as ParseConfigRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -66,7 +64,10 @@ class ParseConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get tempPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set tempPath($core.String v) { $_setString(0, v); }
+  set tempPath($core.String v) {
+    $_setString(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasTempPath() => $_has(0);
   @$pb.TagNumber(1)
@@ -75,7 +76,10 @@ class ParseConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get path => $_getSZ(1);
   @$pb.TagNumber(2)
-  set path($core.String v) { $_setString(1, v); }
+  set path($core.String v) {
+    $_setString(1, v);
+  }
+
   @$pb.TagNumber(2)
   $core.bool hasPath() => $_has(1);
   @$pb.TagNumber(2)
@@ -84,7 +88,10 @@ class ParseConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool get debug => $_getBF(2);
   @$pb.TagNumber(3)
-  set debug($core.bool v) { $_setBool(2, v); }
+  set debug($core.bool v) {
+    $_setBool(2, v);
+  }
+
   @$pb.TagNumber(3)
   $core.bool hasDebug() => $_has(2);
   @$pb.TagNumber(3)
@@ -107,18 +114,15 @@ class ParseConfigResponse extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ParseConfigResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'ConfigOptions'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'error')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   ParseConfigResponse clone() => ParseConfigResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
   ParseConfigResponse copyWith(void Function(ParseConfigResponse) updates) => super.copyWith((message) => updates(message as ParseConfigResponse)) as ParseConfigResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -134,7 +138,10 @@ class ParseConfigResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get error => $_getSZ(0);
   @$pb.TagNumber(1)
-  set error($core.String v) { $_setString(0, v); }
+  set error($core.String v) {
+    $_setString(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasError() => $_has(0);
   @$pb.TagNumber(1)
@@ -162,18 +169,15 @@ class GenerateConfigRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GenerateConfigRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'ConfigOptions'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'path')
     ..aOB(2, _omitFieldNames ? '' : 'debug')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   GenerateConfigRequest clone() => GenerateConfigRequest()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
   GenerateConfigRequest copyWith(void Function(GenerateConfigRequest) updates) => super.copyWith((message) => updates(message as GenerateConfigRequest)) as GenerateConfigRequest;
 
   $pb.BuilderInfo get info_ => _i;
@@ -189,7 +193,10 @@ class GenerateConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get path => $_getSZ(0);
   @$pb.TagNumber(1)
-  set path($core.String v) { $_setString(0, v); }
+  set path($core.String v) {
+    $_setString(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasPath() => $_has(0);
   @$pb.TagNumber(1)
@@ -198,7 +205,10 @@ class GenerateConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool get debug => $_getBF(1);
   @$pb.TagNumber(2)
-  set debug($core.bool v) { $_setBool(1, v); }
+  set debug($core.bool v) {
+    $_setBool(1, v);
+  }
+
   @$pb.TagNumber(2)
   $core.bool hasDebug() => $_has(1);
   @$pb.TagNumber(2)
@@ -226,18 +236,15 @@ class GenerateConfigResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GenerateConfigResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'ConfigOptions'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'config')
     ..aOS(2, _omitFieldNames ? '' : 'error')
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   GenerateConfigResponse clone() => GenerateConfigResponse()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
   GenerateConfigResponse copyWith(void Function(GenerateConfigResponse) updates) => super.copyWith((message) => updates(message as GenerateConfigResponse)) as GenerateConfigResponse;
 
   $pb.BuilderInfo get info_ => _i;
@@ -253,7 +260,10 @@ class GenerateConfigResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get config => $_getSZ(0);
   @$pb.TagNumber(1)
-  set config($core.String v) { $_setString(0, v); }
+  set config($core.String v) {
+    $_setString(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasConfig() => $_has(0);
   @$pb.TagNumber(1)
@@ -262,13 +272,15 @@ class GenerateConfigResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get error => $_getSZ(1);
   @$pb.TagNumber(2)
-  set error($core.String v) { $_setString(1, v); }
+  set error($core.String v) {
+    $_setString(1, v);
+  }
+
   @$pb.TagNumber(2)
   $core.bool hasError() => $_has(1);
   @$pb.TagNumber(2)
   void clearError() => clearField(2);
 }
-
 
 const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');

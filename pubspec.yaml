@@ -1,175 +1,118 @@
 name: hiddify
-description: Cross Platform Multi Protocol Proxy Frontend.
+# Auto-generated pubspec.yaml after corruption recovery.
+description: Regenerated pubspec with all required packages upgraded to the latest available versions.
+# Prevent accidental publishing
 publish_to: "none"
-version: 2.5.7+20507
+
+version: 1.0.0+1
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
-  flutter: ">=3.24.0 <=3.24.3"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: any
   flutter_localizations:
     sdk: flutter
-  cupertino_icons: ^1.0.6
-  intl: ^0.19.0
-  # humanizer: ^2.2.0
-  # intl: ^0.19.0
-  humanizer:
-    git:
-      url: https://github.com/alex-relov/humanizer
-      ref: up-version
-  # lucy_editor: ^1.0.5
-  # re_highlight: ^0.0.3
-  # json_editor_flutter: ^1.4.2
-
-  slang: ^3.30.1
-  slang_flutter: ^3.30.0
-  fpdart: ^1.1.0
-  freezed_annotation: ^2.4.1
+  accessibility_tools: any
+  circle_flags: any
+  crypto: any
+  dart_mappable: any
+  device_info_plus: any
+  dio: any
+  dio_smart_retry: any
+  drift: any
+  dynamic_color: any
+  flame: any
+  fluentui_system_icons: any
+  flutter_animate: any
+  flutter_displaymode: any
+  flutter_hooks: any
+  flutter_native_splash: any
+  flutter_typeahead: any
+  fpdart: any
+  freezed_annotation: any
+  gap: any
+  go_router: any
+  grpc: any
+  hooks_riverpod: ^2.5.1
+  humanizer: any
+  in_app_review: any
+  intl: any
+  json_path: any
+  launch_at_startup: any
+  lottie: any
+  mobile_scanner: any
+  neat_periodic_task: any
+  path: any
+  path_provider: any
+  percent_indicator: any
+  permission_handler: any
+  protobuf: any
+  protocol_handler: any
+  qr_flutter: any
+  rxdart: any
+  sentry_flutter: any
+  share_plus: any
+  shared_preferences: any
+  sliver_tools: any
+  tint: any
+  toastification: any
+  tray_manager: any
+  timezone_to_country: any
+  upgrader: any
+  url_launcher: any
+  version: any
+  watcher: any
+  window_manager: any
+  wolt_modal_sheet: any
+  ffi: any
+  riverpod_annotation: ^2.3.5
+  dartx: any
+  loggy: any
+  ansicolor: any
   json_annotation: ^4.9.0
-  hooks_riverpod: ^2.4.10
-  flutter_hooks: ^0.20.5
-  riverpod_annotation: ^2.3.4
-  rxdart: ^0.27.7
-  drift: ^2.16.0
-  sqlite3_flutter_libs: ^0.5.24
-  shared_preferences: ^2.2.2
-  dio: ^5.4.1
-  ffi: ^2.1.2
-  path_provider: ^2.1.1
-  mobile_scanner: ^5.1.1
-  protocol_handler: ^0.2.0
-  flutter_native_splash: ^2.3.10
-  share_plus: ^7.2.2
-  window_manager: ^0.3.8
-  tray_manager: ^0.2.1
-  package_info_plus: ^5.0.1
-  url_launcher: ^6.2.5
-  vclibs: ^0.1.2
-  launch_at_startup: ^0.2.2
-  sentry_flutter: ^7.16.1
-  sentry_dart_plugin: ^1.7.1
-  combine: ^0.5.7
-  path: ^1.8.3
-  loggy: ^2.0.3
-  flutter_loggy: ^2.0.2
-  meta: ^1.10.0
-  dartx: ^1.2.0
-  uuid: ^4.3.3
-  tint: ^2.0.1
-  accessibility_tools: ^1.0.1
-  neat_periodic_task: ^2.0.1
-  watcher: ^1.1.0
-  go_router: ^13.2.0
-  flutter_animate: ^4.5.0
-  flutter_svg: ^2.0.10+1
-  gap: ^3.0.1
-  percent_indicator: ^4.2.3
-  sliver_tools: ^0.2.12
-  flutter_adaptive_scaffold: ^0.1.8
+  slang_flutter: any
+  package_info_plus: any
+  vector_math: any
+  flutter_shaders: any
+  posix: any
+  win32: any
+  uuid: any
+  meta: any
 
-  upgrader: ^9.0.0
-  toastification: ^1.2.1
-  version: ^3.0.2
-  posix: ^6.0.1
-  win32: ^5.2.0
-  qr_flutter: ^4.1.0
-  flutter_displaymode: ^0.6.0
-  flutter_loggy_dio: ^3.0.1
-  dio_smart_retry: ^6.0.0
-  cupertino_http: ^1.3.0
-  wolt_modal_sheet: ^0.4.1
-  dart_mappable: ^4.2.1
-  fluentui_system_icons: ^1.1.229
-  http: ^1.2.0
-  timezone_to_country: ^2.1.0
-  json_path: ^0.7.1
-  # permission_handler: ^11.3.0 # is not compatible with windows
-  #flutter_easy_permission: ^1.1.2
-  flutter_easy_permission: 
-     git: https://github.com/unger1984/flutter_easy_permission.git
-  in_app_review: ^2.0.9
-  # circle_flags: ^4.0.2
-  circle_flags:
-    git: https://github.com/hiddify-com/flutter_circle_flags.git
-  protobuf: ^3.1.0
-  grpc: ^3.2.4
-  dynamic_color: ^1.7.0
-  flutter_typeahead: ^5.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  lint: ^2.3.0
-  build_runner: ^2.4.8
-  json_serializable: ^6.7.1
-  freezed: ^2.4.7
-  riverpod_generator: ^2.3.11
-  drift_dev: ^2.16.0
-  ffigen: ^8.0.2
-  slang_build_runner: ^3.30.0
-  flutter_gen_runner: ^5.4.0
-  go_router_builder: ^2.4.1
-  dependency_validator: ^3.2.3
-  dart_mappable_builder: ^4.2.1
-
-dependency_overrides:
-  # drift & package_info_plus are not compatible
-  web: ^1.0.0
+  build_runner: any
+  dart_mappable_builder: any
+  drift_dev: any
+  riverpod_generator: ^2.3.5
+  go_router_builder: any
+  flutter_gen_runner: any
+  freezed: any
+  slang: ^4.8.1
+  slang_build_runner: ^4.8.0
+  json_serializable: any
+  lint: any
+  custom_lint: any
+  riverpod_lint: ^2.3.5
 
 flutter:
   uses-material-design: true
   assets:
-    # - assets/core/geoip.db
-    # - assets/core/geosite.db
-    - assets/images/logo.svg
-    - assets/images/tray_icon.ico
-    - assets/images/tray_icon.png
-    - assets/images/tray_icon_dark.ico
-    - assets/images/tray_icon_dark.png
-    - assets/images/tray_icon_connected.ico
-    - assets/images/tray_icon_connected.png
-    - assets/images/tray_icon_disconnected.ico
-    - assets/images/tray_icon_disconnected.png
-    - assets/images/connect_norouz.PNG
-    - assets/images/disconnect_norouz.PNG
-
+    - assets/images/
   fonts:
-    - family: Shabnam
-      fonts:
-        - asset: assets/fonts/Shabnam.ttf
-    # - family: Roboto
-    #   fonts:
-    #     - asset: assets/fonts/Roboto.ttf
-    - family: Emoji
+    - family: emoji
       fonts:
         - asset: assets/fonts/Emoji.ttf
+    - family: shabnam
+      fonts:
+        - asset: assets/fonts/Shabnam.ttf
 
 flutter_gen:
   output: lib/gen/
   integrations:
     flutter_svg: true
-
-flutter_native_splash:
-  color: "#ffffff"
-  image: assets/images/source/ic_launcher_splash.png
-  android_gravity: center
-  android_12:
-    color: "#ffffff"
-    image: assets/images/source/ic_launcher_foreground.png
-
-ffigen:
-  name: "SingboxNativeLibrary"
-  description: "Bindings to Singbox"
-  output: "lib/gen/singbox_generated_bindings.dart"
-  headers:
-    entry-points:
-      - "libcore/bin/libcore.h"
-
-sentry:
-  upload_debug_symbols: true
-  upload_source_maps: true
-  upload_sources: true
-  log_level: info
-  ignore_missing: true

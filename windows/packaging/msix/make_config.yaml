@@ -1,6 +1,6 @@
 display_name: Hiddify
 publisher_display_name: Hiddify
-identity_name: Hiddify.HiddifyNext
+identity_name: Hiddify.Hiddify
 msix_version: 2.5.7.0
 logo_path: windows\runner\resources\app_icon.ico
 capabilities: internetClient, internetClientServer, privateNetworkClientServer

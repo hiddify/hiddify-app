@@ -16,23 +16,16 @@ class AnimatedVisibility extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final replacement = axis == Axis.vertical
-        ? const SizedBox(width: double.infinity)
-        : const SizedBox.shrink();
+    // Use a conservative cross-fade to avoid layout glitches inside Slivers/Rows
+    const replacement = SizedBox.shrink();
 
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      transitionBuilder: (child, animation) => SizeTransition(
-        sizeFactor: animation,
-        child: FadeTransition(opacity: animation, child: child),
-      ),
-      child: visible
-          ? AnimatedPadding(
-              padding: padding,
-              duration: const Duration(milliseconds: 200),
-              child: child,
-            )
-          : replacement,
+    return AnimatedCrossFade(
+      duration: const Duration(milliseconds: 180),
+      firstChild: Padding(padding: padding, child: child),
+      secondChild: replacement,
+      crossFadeState:
+          visible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+      sizeCurve: Curves.easeInOut,
     );
   }
 }

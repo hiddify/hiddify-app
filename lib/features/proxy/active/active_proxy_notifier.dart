@@ -35,12 +35,12 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
 
     final autoCheck = ref.watch(Preferences.autoCheckIp);
     final serviceRunning = await ref.watch(serviceRunningProvider.future);
-    // loggy.debug(
-    //   "idle? [$_idle], forced? [$_forceCheck], connected? [$serviceRunning]",
-    // );
-    if (!_forceCheck && !serviceRunning) {
+    // Avoid proxy-only requests when service is not running (fails fast without UI stall)
+    if (!serviceRunning) {
       throw const ServiceNotRunning();
-    } else if ((_idle && !_forceCheck) || (!_forceCheck && serviceRunning && !autoCheck)) {
+    }
+    // Respect idle/auto-check settings unless user explicitly forced refresh
+    if (!_forceCheck && (_idle || (serviceRunning && !autoCheck))) {
       throw const UnknownIp();
     }
 
@@ -95,7 +95,7 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
   final _urlTestThrottler = Throttler(const Duration(seconds: 2));
 
   Future<void> urlTest(String groupTag_) async {
-    var groupTag = groupTag_;
+    final groupTag = groupTag_;
     _urlTestThrottler(
       () async {
         if (state case AsyncData()) {

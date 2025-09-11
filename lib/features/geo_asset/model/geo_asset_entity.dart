@@ -7,7 +7,7 @@ enum GeoAssetType { geoip, geosite }
 typedef GeoAssetWithFileSize = (GeoAssetEntity geoAsset, int? size);
 
 @freezed
-class GeoAssetEntity with _$GeoAssetEntity {
+sealed class GeoAssetEntity with _$GeoAssetEntity {
   const GeoAssetEntity._();
 
   const factory GeoAssetEntity({
@@ -22,6 +22,5 @@ class GeoAssetEntity with _$GeoAssetEntity {
 
   String get fileName => name;
 
-  String get repositoryUrl =>
-      "https://api.github.com/repos/$providerName/releases/latest";
+  String get repositoryUrl => "https://api.github.com/repos/$providerName/releases/latest";
 }

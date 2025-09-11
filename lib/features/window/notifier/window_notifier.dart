@@ -2,11 +2,9 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 part 'window_notifier.g.dart';
@@ -31,6 +29,7 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
   }
 
   Future<void> open({bool focus = true}) async {
+    await windowManager.waitUntilReadyToShow();
     await windowManager.show();
     if (focus) await windowManager.focus();
     if (Platform.isMacOS) {
@@ -46,13 +45,32 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
     }
   }
 
+  // Enhanced quit method with proper cleanup and timeout handling
   Future<void> quit() async {
-    await ref.read(connectionNotifierProvider.notifier).abortConnection().timeout(const Duration(seconds: 2)).catchError(
-      (e) {
-        loggy.warning("error aborting connection on quit", e);
-      },
-    );
-    await trayManager.destroy();
-    await windowManager.destroy();
+    loggy.info("Initiating safe quit...");
+
+    try {
+      // Set a shorter timeout for connection cleanup
+      await ref.read(connectionNotifierProvider.notifier).abortConnection().timeout(const Duration(milliseconds: 1500), // Reduced from 2 seconds
+          onTimeout: () {
+        loggy.warning("Connection abort timed out, forcing quit");
+      });
+
+      // Ensure window is properly hidden first
+      await windowManager.hide();
+
+      // Force close any remaining resources
+      loggy.info("Forcing application exit...");
+
+      // Use exit(0) to ensure the process terminates completely
+      await windowManager.destroy();
+
+      // As a last resort, force exit the process
+      exit(0);
+    } catch (e) {
+      loggy.error("Error during quit sequence: $e");
+      // Emergency exit if normal quit fails
+      exit(1);
+    }
   }
 }

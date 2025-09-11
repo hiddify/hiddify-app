@@ -19,7 +19,13 @@ const _debugUpgrader = true;
 
 @riverpod
 Upgrader upgrader(UpgraderRef ref) => Upgrader(
-      appcastConfig: AppcastConfiguration(url: Constants.appCastUrl),
+      storeController: UpgraderStoreController(
+        onAndroid: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
+        oniOS: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
+        onLinux: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
+        onMacOS: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
+        onWindows: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
+      ),
       debugLogging: _debugUpgrader && kDebugMode,
       durationUntilAlertAgain: const Duration(hours: 12),
       messages: UpgraderMessages(

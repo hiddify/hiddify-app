@@ -7,7 +7,7 @@ enum PerAppProxyMode {
 
   bool get enabled => this != off;
 
-  ({String title, String message}) present(TranslationsEn t) => switch (this) {
+  ({String title, String message}) present(Translations t) => switch (this) {
         off => (
             title: t.settings.network.perAppProxyModes.off,
             message: t.settings.network.perAppProxyModes.offMsg,

@@ -54,9 +54,9 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
         if (configContent.isNotEmpty) {
           try {
             final jsonObject = jsonDecode(configContent);
-            List<Map<String, dynamic>> res = [];
+            final List<Map<String, dynamic>> res = [];
             if (jsonObject is Map<String, dynamic> && jsonObject['outbounds'] is List) {
-              for (var outbound in jsonObject['outbounds'] as List<dynamic>) {
+              for (final outbound in jsonObject['outbounds'] as List<dynamic>) {
                 if (outbound is Map<String, dynamic> && outbound['type'] != null && !['selector', 'urltest', 'dns', 'block'].contains(outbound['type']) && !['direct', 'bypass', 'direct-fragment'].contains(outbound['tag'])) {
                   res.add(outbound);
                 }

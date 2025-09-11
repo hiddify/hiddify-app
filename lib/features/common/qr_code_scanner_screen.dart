@@ -1,23 +1,18 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easy_permission/easy_permissions.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-// import 'package:permission_handler/permission_handler.dart';
-
-const permissions = [Permissions.CAMERA];
-const permissionGroup = [PermissionGroup.Camera];
+import 'package:permission_handler/permission_handler.dart';
 
 class QRCodeScannerScreen extends StatefulHookConsumerWidget {
   const QRCodeScannerScreen({super.key});
 
-  Future<String?> open(BuildContext context) async {
+  Future<String?> open(BuildContext context) {
     return Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         fullscreenDialog: true,
@@ -37,64 +32,27 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   );
   bool started = false;
 
-  // late FlutterEasyPermission _easyPermission;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initializeScanner();
-
-    // _easyPermission = FlutterEasyPermission()
-    //   ..addPermissionCallback(onGranted: (requestCode, androidPerms, iosPerm) {
-    //     debugPrint("android:$androidPerms");
-    //     debugPrint("iOS:$iosPerm");
-    //     startQrScannerIfPermissionGranted();
-    //   }, onDenied: (requestCode, androidPerms, iosPerm, isPermanent) {
-    //     if (isPermanent) {
-    //       FlutterEasyPermission.showAppSettingsDialog(title: "Camera");
-    //     } else {
-    //       debugPrint("android:$androidPerms");
-    //       debugPrint("iOS:$iosPerm");
-    //     }
-    //   }, onSettingsReturned: () {
-    //     startQrScannerIfPermissionGranted();
-    //   });
   }
 
   Future<bool> _requestCameraPermission() async {
-    final hasPermission = await FlutterEasyPermission.has(
-      perms: permissions,
-      permsGroup: permissionGroup,
-    );
+    final status = await Permission.camera.status;
 
-    if (hasPermission) return true;
-
-    final completer = Completer<bool>();
-
-    void permissionCallback(int requestCode, List<Permissions>? perms, PermissionGroup? perm) {
-      if (!completer.isCompleted) {
-        completer.complete(true);
-      }
+    if (status == PermissionStatus.granted) {
+      return true;
     }
 
-    void permissionDeniedCallback(int requestCode, List<Permissions>? perms, PermissionGroup? perm, bool isPermanent) {
-      if (!completer.isCompleted) {
-        completer.complete(false);
-      }
+    if (status == PermissionStatus.denied) {
+      final result = await Permission.camera.request();
+      return result == PermissionStatus.granted;
     }
 
-    FlutterEasyPermission().addPermissionCallback(
-      onGranted: permissionCallback,
-      onDenied: permissionDeniedCallback,
-    );
-
-    FlutterEasyPermission.request(
-      perms: permissions,
-      permsGroup: permissionGroup,
-      rationale: "Camera permission is required to scan QR codes.",
-    );
-
-    return completer.future;
+    // Permission permanently denied
+    return false;
   }
 
   Future<void> _initializeScanner() async {
@@ -109,8 +67,6 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   @override
   void dispose() {
     controller.dispose();
-    // _easyPermission.dispose();
-    FlutterEasyPermission().dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -124,14 +80,13 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   }
 
   Future<void> _checkPermissionAndStartScanner() async {
-    final hasPermission = await FlutterEasyPermission.has(
-      perms: permissions,
-      permsGroup: permissionGroup,
-    );
+    final hasPermission = await _requestCameraPermission();
     if (hasPermission) {
       _startScanner();
     } else {
-      setState(() {}); // Trigger rebuild to show permission denied UI
+      if (mounted) {
+        setState(() {}); // Trigger rebuild to show permission denied UI
+      }
     }
   }
 
@@ -139,48 +94,36 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
     loggy.info("Starting scanner");
     await controller.stop();
     await controller.start().whenComplete(() {
-      setState(() {
-        started = true;
-      });
+      if (mounted) {
+        setState(() {
+          started = true;
+        });
+      }
     }).catchError((error) {
       loggy.warning("Error starting scanner: $error");
     });
   }
 
-  Future<void> startQrScannerIfPermissionIsGranted() async {
-    final hasPermission = await FlutterEasyPermission.has(
-      perms: permissions,
-      permsGroup: permissionGroup,
-    );
-    if (hasPermission) {
-      _startScanner();
-      // } else {
-      //   _showPermissionDialog();
-    }
-  }
-
-  // void startQrScannerIfPermissionGranted() {
-  //   FlutterEasyPermission.has(perms: permissions, permsGroup: permissionGroup).then((value) {
-  //     if (value) {
-  //       controller.start().then((result) {
-  //         if (result != null) {
-  //           setState(() {
-  //             started = true;
-  //           });
-  //         }
-  //       }).catchError((error) {
-  //         loggy.warning("Error starting scanner: $error");
-  //       });
-  //     } else {}
-  //   });
-  // }
-
   void _showPermissionDialog() {
-    FlutterEasyPermission.showAppSettingsDialog(
-      title: "Camera Access Required",
-      rationale: "Permission to camera to scan QR Code",
-      positiveButtonText: "Settings",
-      negativeButtonText: "Cancel",
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Camera Access Required"),
+        content: const Text("Permission to camera to scan QR Code"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              openAppSettings();
+            },
+            child: const Text("Settings"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -188,11 +131,8 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   Widget build(BuildContext context) {
     final Translations t = ref.watch(translationsProvider);
 
-    return FutureBuilder(
-      future: FlutterEasyPermission.has(
-        perms: permissions,
-        permsGroup: permissionGroup,
-      ),
+    return FutureBuilder<bool>(
+      future: _requestCameraPermission(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -201,6 +141,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
         if (snapshot.data == true) {
           return _buildScannerUI(context, t);
         } else {
+          // Return permission denied UI instead of just calling setState
           return _buildPermissionDeniedUI(context, t);
         }
       },
@@ -210,7 +151,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   Widget _buildScannerUI(BuildContext context, Translations t) {
     final size = MediaQuery.sizeOf(context);
     final overlaySize = (size.shortestSide - 12).coerceAtMost(248);
-    // _startScanner();
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -225,27 +166,6 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
             tooltip: t.profile.add.qrScanner.torchSemanticLabel,
             onPressed: () => controller.toggleTorch(),
           ),
-          // IconButton(
-          //   icon: ValueListenableBuilder(
-          //     valueListenable: controller.torchState,
-          //     builder: (context, state, child) {
-          //       switch (state) {
-          //         case TorchState.off:
-          //           return const Icon(
-          //             FluentIcons.flash_off_24_regular,
-          //             color: Colors.grey,
-          //           );
-          //         case TorchState.on:
-          //           return const Icon(
-          //             FluentIcons.flash_24_regular,
-          //             color: Colors.yellow,
-          //           );
-          //       }
-          //     },
-          //   ),
-          //   tooltip: t.profile.add.qrScanner.torchSemanticLabel,
-          //   onPressed: () => controller.toggleTorch(),
-          // ),
           IconButton(
             icon: const Icon(FluentIcons.camera_switch_24_regular),
             tooltip: t.profile.add.qrScanner.facingSemanticLabel,
@@ -270,7 +190,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
                 loggy.warning("unable to capture");
               }
             },
-            errorBuilder: (_, error, __) {
+            errorBuilder: (_, error) {
               final message = switch (error.errorCode) {
                 MobileScannerErrorCode.permissionDenied => t.profile.add.qrScanner.permissionDeniedError,
                 _ => t.profile.add.qrScanner.unexpectedError,
@@ -325,7 +245,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
             Text(t.profile.add.qrScanner.permissionDeniedError),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _showPermissionDialog,
+              onPressed: () => openAppSettings(),
               child: const Text("Settings"),
             ),
           ],
@@ -356,7 +276,7 @@ class ScannerOverlay extends CustomPainter {
       );
 
     final backgroundPaint = Paint()
-      ..color = Colors.black.withOpacity(0.5)
+      ..color = Colors.black.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill
       ..blendMode = BlendMode.dstOut;
 

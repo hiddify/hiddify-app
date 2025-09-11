@@ -59,7 +59,7 @@ prepare:
 	@echo    make macos-prepare
 	@echo    make ios-prepare
 
-windows-prepare: get gen translate windows-libs
+windows-prepare: get gen translate windows-libs windows-setup-nuget
 	
 ios-prepare: get-geo-assets get gen translate ios-libs 
 	cd ios; pod repo update; pod install;echo "done ios prepare"
@@ -138,6 +138,10 @@ linux-install-dependencies:
 
 windows-install-dependencies:
 	dart pub global activate flutter_distributor
+
+windows-setup-nuget:
+	@echo "Setting up NuGet for Windows..."
+	@powershell -ExecutionPolicy Bypass -File "scripts/install_nuget.ps1"
 
 gen_translations: #generating missing translations using google translate
 	cd .github && bash sync_translate.sh

@@ -30,14 +30,14 @@ sealed class ProfileEntity with _$ProfileEntity {
 }
 
 @freezed
-class ProfileOptions with _$ProfileOptions {
+sealed class ProfileOptions with _$ProfileOptions {
   const factory ProfileOptions({
     required Duration updateInterval,
   }) = _ProfileOptions;
 }
 
 @freezed
-class SubscriptionInfo with _$SubscriptionInfo {
+sealed class SubscriptionInfo with _$SubscriptionInfo {
   const SubscriptionInfo._();
 
   const factory SubscriptionInfo({

@@ -6,8 +6,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'async_mutation.freezed.dart';
 
-// TODO: test and improve
-
 @freezed
 class AsyncMutation with _$AsyncMutation {
   const AsyncMutation._();
@@ -31,8 +29,7 @@ class AsyncMutation with _$AsyncMutation {
 }) {
   final mutationUpdate = useState<Future<T>?>(null);
   final mutationState = useFuture(mutationUpdate.value);
-  final failureCallBack =
-      useValueNotifier<void Function(Object error)?>(initialOnFailure);
+  final failureCallBack = useValueNotifier<void Function(Object error)?>(initialOnFailure);
   final successCallBack = useValueNotifier<void Function()?>(initialOnSuccess);
 
   final mapped = useMemoized(
@@ -40,9 +37,7 @@ class AsyncMutation with _$AsyncMutation {
       return switch (mutationState.connectionState) {
         ConnectionState.none => const Idle(),
         ConnectionState.waiting => const InProgress(),
-        _ => mutationState.hasError
-            ? Fail(mutationState.error!, mutationState.stackTrace!)
-            : const Success(),
+        _ => mutationState.hasError ? Fail(mutationState.error!, mutationState.stackTrace!) : const Success(),
       };
     },
     [mutationState],
@@ -65,6 +60,13 @@ class AsyncMutation with _$AsyncMutation {
     },
     [mapped, failureCallBack.value, successCallBack.value],
   );
+
+  useEffect(() {
+    return () {
+      failureCallBack.dispose();
+      successCallBack.dispose();
+    };
+  }, []);
 
   return (
     state: mapped,

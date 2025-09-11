@@ -39,7 +39,6 @@ class InAppNotificationController with AppLogger {
       showProgressBar: false,
       dragToClose: true,
       closeOnClick: true,
-      closeButtonShowType: CloseButtonShowType.onHover,
     );
   }
 

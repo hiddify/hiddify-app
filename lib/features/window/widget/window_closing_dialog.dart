@@ -1,3 +1,5 @@
+import 'package:hiddify/utils/custom_loggers.dart';
+
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
@@ -12,7 +14,7 @@ class WindowClosingDialog extends ConsumerStatefulWidget {
   ConsumerState<WindowClosingDialog> createState() => _WindowClosingDialogState();
 }
 
-class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
+class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> with PresLogger {
   bool remember = false;
 
   @override
@@ -22,9 +24,13 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
     return AlertDialog(
       title: Text(t.window.alertMessage),
       content: GestureDetector(
-        onTap: () => setState(() {
-          remember = !remember;
-        }),
+        onTap: () {
+          if (mounted) {
+            setState(() {
+              remember = !remember;
+            });
+          }
+        },
         behavior: HitTestBehavior.translucent,
         child: Row(
           children: [
@@ -32,7 +38,9 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
               value: remember,
               onChanged: (v) {
                 remember = v ?? remember;
-                setState(() {});
+                if (mounted) {
+                  setState(() {});
+                }
               },
             ),
             const SizedBox(width: 16),
@@ -45,21 +53,47 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            if (remember) {
-              ref.read(Preferences.actionAtClose.notifier).update(ActionsAtClosing.exit);
+          onPressed: () async {
+            try {
+              if (remember) {
+                await ref.read(Preferences.actionAtClose.notifier).update(ActionsAtClosing.exit);
+              }
+
+              // Close dialog first
+              if (mounted && Navigator.canPop(context)) {
+                Navigator.of(context).pop();
+              }
+
+              // Then quit with timeout
+              await ref.read(windowNotifierProvider.notifier).quit().timeout(const Duration(seconds: 2)).catchError((e) {
+                // If quit fails, force exit
+                loggy.warning('Quit failed, forcing exit: $e');
+              });
+            } catch (e) {
+              loggy.error('Error in quit action: $e');
             }
-            ref.read(windowNotifierProvider.notifier).quit();
           },
           child: Text(t.window.close),
         ),
         FilledButton(
           onPressed: () async {
-            if (remember) {
-              ref.read(Preferences.actionAtClose.notifier).update(ActionsAtClosing.hide);
+            try {
+              if (remember) {
+                await ref.read(Preferences.actionAtClose.notifier).update(ActionsAtClosing.hide);
+              }
+
+              // Close dialog first
+              if (mounted && Navigator.canPop(context)) {
+                Navigator.of(context).pop();
+              }
+
+              // Then hide window with timeout
+              await ref.read(windowNotifierProvider.notifier).close().timeout(const Duration(seconds: 1)).catchError((e) {
+                loggy.warning('Hide failed: $e');
+              });
+            } catch (e) {
+              loggy.error('Error in hide action: $e');
             }
-            Navigator.of(context).maybePop(false);
-            await ref.read(windowNotifierProvider.notifier).close();
           },
           child: Text(t.window.hide),
         ),

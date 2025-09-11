@@ -6,7 +6,7 @@ enum ProfilesSort {
   lastUpdate,
   name;
 
-  String present(TranslationsEn t) {
+  String present(Translations t) {
     return switch (this) {
       lastUpdate => t.profile.sortBy.lastUpdate,
       name => t.profile.sortBy.name,

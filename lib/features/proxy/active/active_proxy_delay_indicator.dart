@@ -1,16 +1,12 @@
-import 'dart:io';
-
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/animated_visibility.dart';
-import 'package:hiddify/core/widget/shimmer_skeleton.dart';
-import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
+import 'package:hiddify/utils/perf_monitor.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tray_manager/tray_manager.dart';
 
 class ActiveProxyDelayIndicator extends HookConsumerWidget {
   const ActiveProxyDelayIndicator({super.key});
@@ -18,22 +14,28 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final theme = Theme.of(context);
     final activeProxy = ref.watch(activeProxyNotifierProvider);
 
-    return AnimatedVisibility(
+    return RepaintBoundary(
+        child: AnimatedVisibility(
       axis: Axis.vertical,
       visible: activeProxy is AsyncData,
       child: () {
         switch (activeProxy) {
           case AsyncData(value: final proxy):
-            final delay = proxy.urlTestDelay;
+            final delay = proxy.urlTestDelayInt; // Use Int version
             final timeout = delay > 65000;
 
             return Center(
               child: InkWell(
-                onTap: () async {
-                  await ref.read(activeProxyNotifierProvider.notifier).urlTest(proxy.tag);
+                onTap: () {
+                  WidgetsBinding.instance.addPostFrameCallback((_) async {
+                    await PerfMonitor.instance.measure('urlTest(${proxy.tag})', () async {
+                      await ref.read(activeProxyNotifierProvider.notifier).urlTest(proxy.tag);
+                    });
+                    // Force repaint after url test completes
+                    SchedulerBinding.instance.scheduleFrame();
+                  });
                 },
                 borderRadius: BorderRadius.circular(24),
                 child: Padding(
@@ -47,30 +49,12 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
                         Text.rich(
                           semanticsLabel: timeout ? t.proxies.delaySemantics.timeout : t.proxies.delaySemantics.result(delay: delay),
                           TextSpan(
-                            children: [
-                              if (timeout)
-                                TextSpan(
-                                  text: t.general.timeout,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: theme.colorScheme.error,
-                                  ),
-                                )
-                              else ...[
-                                TextSpan(
-                                  text: delay.toString(),
-                                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                const TextSpan(text: " ms"),
-                              ],
-                            ],
+                            text: timeout ? "∞" : "${delay}ms",
+                            style: TextStyle(
+                              color: timeout ? Theme.of(context).colorScheme.error : null,
+                            ),
                           ),
                         )
-                      else
-                        Semantics(
-                          label: t.proxies.delaySemantics.testing,
-                          child: const ShimmerSkeleton(width: 48, height: 18),
-                        ),
                     ],
                   ),
                 ),
@@ -80,6 +64,6 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
             return const SizedBox();
         }
       }(),
-    );
+    ));
   }
 }

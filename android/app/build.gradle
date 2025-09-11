@@ -12,41 +12,28 @@ if (localPropertiesFile.exists()) {
     }
 }
 
-boolean hasKeyStore = false
-
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-    hasKeyStore = true
-} else {
-    println "+++"
-    println "No keystore defined. The app will not be signed."
-    println "Create a android/key.properties file with the following properties:"
-    println "storePassword"
-    println "keyPassword"
-    println "keyAlias"
-    println "storeFile"
-    println "+++"
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')?: '1'
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
 
 android {
-    namespace 'com.hiddify.hiddify'
-    testNamespace "test.com.hiddify.hiddify"
-    compileSdkVersion 34
-    ndkVersion "26.1.10909125"
+    namespace "com.hiddify.hiddify"
+    compileSdk 34
+    ndkVersion "27.0.11718014"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '1.8'
     }
 
     sourceSets {
@@ -54,61 +41,62 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.hiddify.com"
+        applicationId "com.hiddify.hiddify"
         minSdkVersion 21
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
-    }
-
-    splits {
-        abi {
-            enable true
-            reset()
-            //noinspection ChromeOsAbiSupport
-            include "x86_64", "armeabi-v7a", "arm64-v8a"
-
-            universalApk true
-        }
-    }
-
-    if (hasKeyStore) {
-        signingConfigs {
-            release {
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
-                storeFile file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-            }
+        
+        // Enable advanced graphics features
+        renderscriptTargetApi 21
+        renderscriptSupportModeEnabled true
+        
+        ndk {
+            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
         }
     }
 
     buildTypes {
         release {
-            if (hasKeyStore) {
-                signingConfig signingConfigs.release
-            } else {
-                signingConfig signingConfigs.debug
-            }
-            ndk {
-                //noinspection ChromeOsAbiSupport
-                abiFilters "x86_64", "armeabi-v7a", "arm64-v8a"
-                debugSymbolLevel 'FULL'
-            }
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            // Optimize for performance
+            zipAlignEnabled true
+            debuggable false
+            jniDebuggable false
+            renderscriptOptimLevel 3
+            
+            // signingConfig signingConfigs.release
+        }
+        
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+            minifyEnabled false
+            shrinkResources false
         }
     }
 
+    // Enable advanced build features
     buildFeatures {
-        viewBinding true
-        aidl true
+        buildConfig true
     }
 
-}
+    // Optimize APK
+    packagingOptions {
+        merge '**/libc++_shared.so'
+        merge '**/libjsc.so'
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libjsc.so'
+    }
 
-android.applicationVariants.all { variant ->
-    variant.outputs.each { output ->
-        output.versionCodeOverride = android.defaultConfig.versionCode
+    // Advanced lint options
+    lintOptions {
+        disable 'InvalidPackage'
+        checkReleaseBuilds false
     }
 }
 
@@ -117,9 +105,14 @@ flutter {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0"
+    implementation 'androidx.multidex:multidex:2.0.1'
+    
+    // Advanced graphics support
     implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation 'androidx.activity:activity-compose:1.8.2'
+    
+    // Performance optimizations
+    implementation 'androidx.profileinstaller:profileinstaller:1.3.1'
 }

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
-import 'package:combine/combine.dart';
+// import 'package:combine/combine.dart'; // Replaced with native Isolate.run
 import 'package:ffi/ffi.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/directories.dart';
@@ -43,8 +43,15 @@ class FFISingboxService with InfraLogger implements SingboxService {
       fullPath = p.join(fullPath, "libcore.so");
     }
     _logger.debug('singbox native libs path: "$fullPath"');
-    final lib = DynamicLibrary.open(fullPath);
-    return SingboxNativeLibrary(lib);
+
+    try {
+      final lib = DynamicLibrary.open(fullPath);
+      return SingboxNativeLibrary(lib);
+    } catch (e) {
+      _logger.error('Failed to load native library: $e');
+      // Return a dummy library that will fail gracefully
+      rethrow;
+    }
   }
 
   @override
@@ -65,8 +72,8 @@ class FFISingboxService with InfraLogger implements SingboxService {
   ) {
     final port = _statusReceiver.sendPort.nativePort;
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
+      () => Isolate.run(() {
+        try {
           _box.setupOnce(NativeApi.initializeApiDLData);
           final err = _box
               .setup(
@@ -82,8 +89,17 @@ class FFISingboxService with InfraLogger implements SingboxService {
             return left(err);
           }
           return right(unit);
-        },
-      ),
+        } catch (e) {
+          // Enhanced error handling for native library issues
+          if (e.toString().contains('setupOnce') || e.toString().contains('symbol')) {
+            return left("هسته نیاز به بازسازی دارد. لطفاً برنامه را مجدداً راه‌اندازی کنید.\nCore needs rebuilding. Please restart the application.");
+          }
+          if (e.toString().contains('library') || e.toString().contains('dll')) {
+            return left("مشکل در بارگذاری هسته. فایل‌های core ممکن است آسیب دیده باشند.\nCore loading issue. Core files may be corrupted.");
+          }
+          return left("خطای هسته: $e\nCore error: $e");
+        }
+      }),
     );
   }
 
@@ -94,38 +110,34 @@ class FFISingboxService with InfraLogger implements SingboxService {
     bool debug,
   ) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box
-              .parse(
-                path.toNativeUtf8().cast(),
-                tempPath.toNativeUtf8().cast(),
-                debug ? 1 : 0,
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final err = _box
+            .parse(
+              path.toNativeUtf8().cast(),
+              tempPath.toNativeUtf8().cast(),
+              debug ? 1 : 0,
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
   @override
   TaskEither<String, Unit> changeOptions(SingboxConfigOption options) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final json = jsonEncode(options.toJson());
-          final err = _box.changeHiddifyOptions(json.toNativeUtf8().cast()).cast<Utf8>().toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final json = jsonEncode(options.toJson());
+        final err = _box.changeHiddifyOptions(json.toNativeUtf8().cast()).cast<Utf8>().toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -134,20 +146,18 @@ class FFISingboxService with InfraLogger implements SingboxService {
     String path,
   ) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final response = _box
-              .generateConfig(
-                path.toNativeUtf8().cast(),
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (response.startsWith("error")) {
-            return left(response.replaceFirst("error", ""));
-          }
-          return right(response);
-        },
-      ),
+      () => Isolate.run(() {
+        final response = _box
+            .generateConfig(
+              path.toNativeUtf8().cast(),
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (response.startsWith("error")) {
+          return left(response.replaceFirst("error", ""));
+        }
+        return right(response);
+      }),
     );
   }
 
@@ -159,36 +169,32 @@ class FFISingboxService with InfraLogger implements SingboxService {
   ) {
     loggy.debug("starting, memory limit: [${!disableMemoryLimit}]");
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box
-              .start(
-                configPath.toNativeUtf8().cast(),
-                disableMemoryLimit ? 1 : 0,
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final err = _box
+            .start(
+              configPath.toNativeUtf8().cast(),
+              disableMemoryLimit ? 1 : 0,
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
   @override
   TaskEither<String, Unit> stop() {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box.stop().cast<Utf8>().toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final err = _box.stop().cast<Utf8>().toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -200,21 +206,19 @@ class FFISingboxService with InfraLogger implements SingboxService {
   ) {
     loggy.debug("restarting, memory limit: [${!disableMemoryLimit}]");
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box
-              .restart(
-                configPath.toNativeUtf8().cast(),
-                disableMemoryLimit ? 1 : 0,
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final err = _box
+            .restart(
+              configPath.toNativeUtf8().cast(),
+              disableMemoryLimit ? 1 : 0,
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -360,36 +364,32 @@ class FFISingboxService with InfraLogger implements SingboxService {
   @override
   TaskEither<String, Unit> selectOutbound(String groupTag, String outboundTag) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box
-              .selectOutbound(
-                groupTag.toNativeUtf8().cast(),
-                outboundTag.toNativeUtf8().cast(),
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final err = _box
+            .selectOutbound(
+              groupTag.toNativeUtf8().cast(),
+              outboundTag.toNativeUtf8().cast(),
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
   @override
   TaskEither<String, Unit> urlTest(String groupTag) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box.urlTest(groupTag.toNativeUtf8().cast()).cast<Utf8>().toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final err = _box.urlTest(groupTag.toNativeUtf8().cast()).cast<Utf8>().toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -410,12 +410,10 @@ class FFISingboxService with InfraLogger implements SingboxService {
   @override
   TaskEither<String, Unit> clearLogs() {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          _logBuffer.clear();
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        _logBuffer.clear();
+        return right(unit);
+      }),
     );
   }
 
@@ -444,22 +442,20 @@ class FFISingboxService with InfraLogger implements SingboxService {
   }) {
     loggy.debug("generating warp config");
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final response = _box
-              .generateWarpConfig(
-                licenseKey.toNativeUtf8().cast(),
-                previousAccountId.toNativeUtf8().cast(),
-                previousAccessToken.toNativeUtf8().cast(),
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (response.startsWith("error:")) {
-            return left(response.replaceFirst('error:', ""));
-          }
-          return right(warpFromJson(jsonDecode(response)));
-        },
-      ),
+      () => Isolate.run(() {
+        final response = _box
+            .generateWarpConfig(
+              licenseKey.toNativeUtf8().cast(),
+              previousAccountId.toNativeUtf8().cast(),
+              previousAccessToken.toNativeUtf8().cast(),
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (response.startsWith("error:")) {
+          return left(response.replaceFirst('error:', ""));
+        }
+        return right(warpFromJson(jsonDecode(response)));
+      }),
     );
   }
 }

@@ -2,7 +2,6 @@ import 'package:dartx/dartx.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/core/model/region.dart';
-import 'package:hiddify/core/preferences/general_preferences.dart';
 
 import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/core/utils/json_converters.dart';
@@ -335,20 +334,6 @@ abstract class ConfigOptions {
     "",
   );
 
-  static final hasExperimentalFeatures = Provider.autoDispose<bool>(
-    (ref) {
-      final mode = ref.watch(serviceMode);
-      if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
-        return true;
-      }
-      if (ref.watch(enableTlsFragment) || ref.watch(enableTlsMixedSniCase) || ref.watch(enableTlsPadding) || ref.watch(enableMux) || ref.watch(enableWarp) || ref.watch(bypassLan) || ref.watch(allowConnectionFromLan)) {
-        return true;
-      }
-
-      return false;
-    },
-  );
-
   /// preferences to exclude from share and export
   static final privatePreferencesKeys = {
     "warp.license-key",
@@ -420,7 +405,7 @@ abstract class ConfigOptions {
   };
 
   static final singboxConfigOptions = FutureProvider<SingboxConfigOption>(
-    (ref) async {
+    (ref) {
       // final region = ref.watch(Preferences.region);
       final rules = <SingboxRule>[];
       // final rules = switch (region) {
@@ -488,7 +473,6 @@ abstract class ConfigOptions {
         enableClashApi: ref.watch(enableClashApi),
         clashApiPort: ref.watch(clashApiPort),
         enableTun: mode == ServiceMode.tun,
-        enableTunService: mode == ServiceMode.tunService,
         setSystemProxy: mode == ServiceMode.systemProxy,
         bypassLan: ref.watch(bypassLan),
         allowConnectionFromLan: ref.watch(allowConnectionFromLan),

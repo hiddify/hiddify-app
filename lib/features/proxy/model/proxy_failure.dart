@@ -27,7 +27,7 @@ sealed class ProxyFailure with _$ProxyFailure, Failure {
   ]) = UnableToRetrieveIp;
 
   @override
-  ({String type, String? message}) present(TranslationsEn t) {
+  ({String type, String? message}) present(Translations t) {
     return switch (this) {
       ProxyUnexpectedFailure() => (
           type: t.failure.unexpected,

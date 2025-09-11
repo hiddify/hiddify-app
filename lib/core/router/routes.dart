@@ -125,7 +125,6 @@ class MobileWrapperRoute extends ShellRouteData {
     TypedGoRoute<SettingsRoute>(
       path: "/settings",
       name: SettingsRoute.name,
-      routes: [],
     ),
     TypedGoRoute<LogsOverviewRoute>(
       path: "/logs",
@@ -147,13 +146,13 @@ class DesktopWrapperRoute extends ShellRouteData {
 }
 
 @TypedGoRoute<IntroRoute>(path: "/intro", name: IntroRoute.name)
-class IntroRoute extends GoRouteData {
+class IntroRoute extends GoRouteData with _$IntroRoute {
   const IntroRoute();
   static const name = "Intro";
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return MaterialPage(
+    return const MaterialPage(
       fullscreenDialog: true,
       name: name,
       child: IntroPage(),
@@ -161,7 +160,7 @@ class IntroRoute extends GoRouteData {
   }
 }
 
-class HomeRoute extends GoRouteData {
+class HomeRoute extends GoRouteData with _$HomeRoute {
   const HomeRoute();
   static const name = "Home";
 
@@ -174,7 +173,7 @@ class HomeRoute extends GoRouteData {
   }
 }
 
-class ProxiesRoute extends GoRouteData {
+class ProxiesRoute extends GoRouteData with _$ProxiesRoute {
   const ProxiesRoute();
   static const name = "Proxies";
 
@@ -187,7 +186,7 @@ class ProxiesRoute extends GoRouteData {
   }
 }
 
-class AddProfileRoute extends GoRouteData {
+class AddProfileRoute extends GoRouteData with _$AddProfileRoute {
   const AddProfileRoute({this.url});
 
   final String? url;
@@ -209,7 +208,7 @@ class AddProfileRoute extends GoRouteData {
   }
 }
 
-class ProfilesOverviewRoute extends GoRouteData {
+class ProfilesOverviewRoute extends GoRouteData with _$ProfilesOverviewRoute {
   const ProfilesOverviewRoute();
   static const name = "Profiles";
 
@@ -224,7 +223,7 @@ class ProfilesOverviewRoute extends GoRouteData {
   }
 }
 
-class NewProfileRoute extends GoRouteData {
+class NewProfileRoute extends GoRouteData with _$NewProfileRoute {
   const NewProfileRoute();
   static const name = "New Profile";
 
@@ -240,7 +239,7 @@ class NewProfileRoute extends GoRouteData {
   }
 }
 
-class ProfileDetailsRoute extends GoRouteData {
+class ProfileDetailsRoute extends GoRouteData with _$ProfileDetailsRoute {
   const ProfileDetailsRoute(this.id);
   final String id;
   static const name = "Profile Details";
@@ -257,7 +256,7 @@ class ProfileDetailsRoute extends GoRouteData {
   }
 }
 
-class LogsOverviewRoute extends GoRouteData {
+class LogsOverviewRoute extends GoRouteData with _$LogsOverviewRoute {
   const LogsOverviewRoute();
   static const name = "Logs";
 
@@ -275,7 +274,7 @@ class LogsOverviewRoute extends GoRouteData {
   }
 }
 
-class QuickSettingsRoute extends GoRouteData {
+class QuickSettingsRoute extends GoRouteData with _$QuickSettingsRoute {
   const QuickSettingsRoute();
   static const name = "Quick Settings";
 
@@ -291,7 +290,7 @@ class QuickSettingsRoute extends GoRouteData {
   }
 }
 
-class SettingsRoute extends GoRouteData {
+class SettingsRoute extends GoRouteData with _$SettingsRoute {
   const SettingsRoute();
   static const name = "Settings";
 
@@ -309,7 +308,7 @@ class SettingsRoute extends GoRouteData {
   }
 }
 
-class ConfigOptionsRoute extends GoRouteData {
+class ConfigOptionsRoute extends GoRouteData with _$ConfigOptionsRoute {
   const ConfigOptionsRoute({this.section});
   final String? section;
   static const name = "Config Options";
@@ -331,7 +330,7 @@ class ConfigOptionsRoute extends GoRouteData {
   }
 }
 
-class PerAppProxyRoute extends GoRouteData {
+class PerAppProxyRoute extends GoRouteData with _$PerAppProxyRoute {
   const PerAppProxyRoute();
   static const name = "Per-app Proxy";
 
@@ -347,7 +346,7 @@ class PerAppProxyRoute extends GoRouteData {
   }
 }
 
-class AboutRoute extends GoRouteData {
+class AboutRoute extends GoRouteData with _$AboutRoute {
   const AboutRoute();
   static const name = "About";
 
