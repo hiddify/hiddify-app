@@ -18,5 +18,6 @@
 
     "html.format.wrapLineLength": 250,
     "cmake.sourceDirectory": "C:/Users/arshi/OneDrive/Desktop/hiddify-app-main/linux",
+    "java.configuration.updateBuildConfiguration": "interactive",
 	
 }

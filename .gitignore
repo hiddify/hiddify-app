@@ -95,6 +95,9 @@ build/**/*.obj
 go/
 go-tools/
 
+# Local checkout of core repo (do not commit)
+hiddify-core-main/
+
 # Local installers/archives
 go-installer.msi
 go-portable.zip
