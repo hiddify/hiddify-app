@@ -1,0 +1,14 @@
+#include <iostream>
+#include <vector>
+#include <numeric>   // std::accumulate
+#include <execution> // 并行执行策略（C++17）
+
+int main() {
+    std::vector<int> data(1000000, 1);
+
+    // 使用并行累加，充分利用多核 CPU
+    long long sum = std::reduce(std::execution::par, data.begin(), data.end(), 0LL);
+
+    std::cout << "Sum: " << sum << std::endl;
+    return 0;
+}
