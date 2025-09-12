@@ -8,11 +8,19 @@ class AppTheme {
   final String fontFamily;
 
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
-    final ColorScheme scheme = lightColorScheme ??
-        ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0));
+    final ColorScheme scheme = lightColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0));
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
+      scaffoldBackgroundColor: scheme.surface,
+      cardTheme: CardThemeData(
+        color: scheme.surfaceVariant,
+        elevation: 0,
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
       fontFamily: fontFamily,
       extensions: const <ThemeExtension<dynamic>>{
         ConnectionButtonTheme.light,
@@ -29,11 +37,18 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      scaffoldBackgroundColor:
-          mode.trueBlack ? Colors.black : scheme.background,
+      scaffoldBackgroundColor: mode.trueBlack ? Colors.black : scheme.surface,
+      cardTheme: CardThemeData(
+        color: scheme.surfaceVariant,
+        elevation: 0,
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
       fontFamily: fontFamily,
-      extensions: const <ThemeExtension<dynamic>>{
-        ConnectionButtonTheme.light,
+      extensions: <ThemeExtension<dynamic>>{
+        if (mode.trueBlack) ConnectionButtonTheme.black else ConnectionButtonTheme.dark,
       },
     );
   }

@@ -189,11 +189,9 @@ jobs:
         with:
           certificate: '${{ secrets.WINDOWS_SIGNING_KEY }}'
           cert-password: '${{ secrets.WINDOWS_SIGNING_PASSWORD }}'
-          cert-sha1: '${{ secrets.WINDOWS_SIGNING_SHA1 }}'
           folder: 'dist'
           timestamp-server: 'http://timestamp.digicert.com'
           recursive: true
-          description: 'Hiddify'
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows'

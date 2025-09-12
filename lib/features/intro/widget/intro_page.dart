@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
@@ -9,6 +10,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/router/routes.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/gen/assets.gen.dart';
@@ -18,9 +20,9 @@ import 'package:sliver_tools/sliver_tools.dart';
 import 'package:timezone_to_country/timezone_to_country.dart';
 
 class IntroPage extends HookConsumerWidget with PresLogger {
-  IntroPage({super.key});
+  final bool locationInfoLoaded;
 
-  bool locationInfoLoaded = false;
+  const IntroPage({super.key, this.locationInfoLoaded = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,7 +32,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
 
     if (!locationInfoLoaded) {
       autoSelectRegion(ref).then((value) => loggy.debug("Auto Region selection finished!"));
-      locationInfoLoaded = true;
+      // locationInfoLoaded = true; // This line is removed as locationInfoLoaded is now final
     }
 
     return Scaffold(
@@ -98,6 +100,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                           }
                         }
                         await ref.read(Preferences.introCompleted.notifier).update(true);
+                        context.go(const HomeRoute().location);
                       },
                       child: isStarting.value
                           ? LinearProgressIndicator(

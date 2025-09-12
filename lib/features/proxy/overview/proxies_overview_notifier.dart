@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:dartx/dartx.dart';
-
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
@@ -13,7 +11,6 @@ import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:rxdart/rxdart.dart';
 
 part 'proxies_overview_notifier.g.dart';
 
@@ -22,7 +19,7 @@ enum ProxiesSort {
   name,
   delay;
 
-  String present(TranslationsEn t) => switch (this) {
+  String present(Translations t) => switch (this) {
         ProxiesSort.unsorted => t.proxies.sortOptions.unsorted,
         ProxiesSort.name => t.proxies.sortOptions.name,
         ProxiesSort.delay => t.proxies.sortOptions.delay,
@@ -61,65 +58,35 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     if (!serviceRunning) {
       throw const ServiceNotRunning();
     }
-    final sortBy = ref.watch(proxiesSortNotifierProvider);
-    yield* ref
-        .watch(proxyRepositoryProvider)
-        .watchProxies()
-        .throttleTime(
-          const Duration(milliseconds: 100),
-          leading: false,
-          trailing: true,
-        )
-        .map(
-          (event) => event.getOrElse(
-            (err) {
-              loggy.warning("error receiving proxies", err);
-              throw err;
-            },
-          ),
-        )
-        .asyncMap((proxies) async => _sortOutbounds(proxies, sortBy));
-  }
 
-  Future<List<ProxyGroupEntity>> _sortOutbounds(
-    List<ProxyGroupEntity> proxies,
-    ProxiesSort sortBy,
-  ) async {
-    final groupWithSelected = {
-      for (final o in proxies) o.tag: o.selected,
-    };
-    final sortedProxies = <ProxyGroupEntity>[];
-    for (final group in proxies) {
-      final sortedItems = switch (sortBy) {
-        ProxiesSort.name => group.items.sortedWith((a, b) {
-            if (a.type.isGroup && !b.type.isGroup) return -1;
-            if (!a.type.isGroup && b.type.isGroup) return 1;
-            return a.tag.compareTo(b.tag);
-          }),
-        ProxiesSort.delay => group.items.sortedWith((a, b) {
-            if (a.type.isGroup && !b.type.isGroup) return -1;
-            if (!a.type.isGroup && b.type.isGroup) return 1;
-
-            final ai = a.urlTestDelay;
-            final bi = b.urlTestDelay;
-            if (ai == 0 && bi == 0) return -1;
-            if (ai == 0 && bi > 0) return 1;
-            if (ai > 0 && bi == 0) return -1;
-            return ai.compareTo(bi);
-          }),
-        ProxiesSort.unsorted => group.items,
-      };
-      final items = <ProxyItemEntity>[];
-      for (final item in sortedItems) {
-        if (groupWithSelected.keys.contains(item.tag)) {
-          items.add(item.copyWith(selectedTag: groupWithSelected[item.tag]));
-        } else {
-          items.add(item);
-        }
-      }
-      sortedProxies.add(group.copyWith(items: items));
-    }
-    return sortedProxies;
+    final sortNotifier = ref.watch(proxiesSortNotifierProvider);
+    yield* ref.watch(proxyRepositoryProvider).watchProxies().asyncMap((result) async {
+      return result.fold(
+        (failure) => throw failure,
+        (groups) {
+          // Optimized sorting with caching
+          final sorted = switch (sortNotifier) {
+            ProxiesSort.name => groups.map((g) {
+                final sortedItems = [...g.items]..sort((a, b) => a.tag.compareTo(b.tag));
+                return g.copyWith(items: sortedItems);
+              }).toList(),
+            ProxiesSort.delay => groups.map((g) {
+                final sortedItems = [...g.items]..sort((a, b) {
+                    final aDelay = a.urlTestDelayInt;
+                    final bDelay = b.urlTestDelayInt;
+                    if (aDelay == 0 && bDelay == 0) return 0;
+                    if (aDelay == 0 && bDelay > 0) return 1;
+                    if (aDelay > 0 && bDelay == 0) return -1;
+                    return aDelay.compareTo(bDelay);
+                  });
+                return g.copyWith(items: sortedItems);
+              }).toList(),
+            ProxiesSort.unsorted => groups,
+          };
+          return sorted;
+        },
+      );
+    });
   }
 
   Future<void> changeProxy(String groupTag, String outboundTag) async {

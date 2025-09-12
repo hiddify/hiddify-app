@@ -1,6 +1,6 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hiddify/bootstrap.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -42,8 +42,12 @@ class NestedAppBar extends StatelessWidget {
             )
           : (Navigator.of(context).canPop()
               ? IconButton(
-                  icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
-                  padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
+                  icon: Icon(
+                    context.isRtl ? FluentIcons.arrow_right_24_filled : FluentIcons.arrow_left_24_filled,
+                    size: 24,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  padding: const EdgeInsets.all(8),
                   onPressed: () {
                     Navigator.of(context).pop(); // Pops the current route off the navigator stack
                   },

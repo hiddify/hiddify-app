@@ -11,6 +11,7 @@ import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
+import 'package:hiddify/utils/memory_leak_prevention.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -28,6 +29,7 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
     final pathResolver = ref.watch(logPathResolverProvider);
 
     final filterController = useTextEditingController(text: state.filter);
+    MemoryLeakPrevention.trackResource('TextEditingController', filterController);
 
     final List<PopupMenuEntry> popupButtons = debug || PlatformUtils.isDesktop
         ? [
@@ -96,7 +98,7 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                   SliverPinnedHeader(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.background,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -116,27 +118,44 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                               ),
                             ),
                             const Gap(16),
-                            DropdownButton<Option<LogLevel>>(
-                              value: optionOf(state.levelFilter),
-                              onChanged: (v) {
-                                if (v == null) return;
-                                notifier.filterLevel(v.toNullable());
-                              },
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              borderRadius: BorderRadius.circular(4),
-                              items: [
-                                DropdownMenuItem(
-                                  value: none(),
-                                  child: Text(t.logs.allLevelsFilter),
+                            Container(
+                              alignment: context.isRtl ? Alignment.centerLeft : Alignment.centerRight,
+                              child: DropdownButton<Option<LogLevel>>(
+                                value: optionOf(state.levelFilter),
+                                onChanged: (v) {
+                                  if (v == null) return;
+                                  notifier.filterLevel(v.toNullable());
+                                },
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.isRtl ? 12 : 8,
                                 ),
-                                ...LogLevel.choices.map(
-                                  (e) => DropdownMenuItem(
-                                    value: some(e),
-                                    child: Text(e.name),
+                                borderRadius: BorderRadius.circular(4),
+                                alignment: context.isRtl ? AlignmentDirectional.centerStart : AlignmentDirectional.centerEnd,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: none(),
+                                    alignment: context.isRtl ? AlignmentDirectional.centerStart : AlignmentDirectional.centerEnd,
+                                    child: Text(
+                                      t.logs.allLevelsFilter,
+                                      textDirection: context.isRtl ? TextDirection.rtl : TextDirection.ltr,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                  ...LogLevel.choices.map(
+                                    (e) => DropdownMenuItem(
+                                      value: some(e),
+                                      alignment: context.isRtl ? AlignmentDirectional.centerStart : AlignmentDirectional.centerEnd,
+                                      child: Text(
+                                        e.name.toUpperCase(),
+                                        textDirection: context.isRtl ? TextDirection.rtl : TextDirection.ltr,
+                                        style: TextStyle(
+                                          color: e.color,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -171,33 +190,24 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  if (log.level != null)
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          log.level!.name.toUpperCase(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelMedium
-                                              ?.copyWith(
-                                                color: log.level!.color,
-                                              ),
-                                        ),
-                                        if (log.time != null)
-                                          Text(
-                                            log.time!.toString(),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelSmall,
-                                          ),
-                                      ],
-                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        log.level.name.toUpperCase(),
+                                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                              color: log.level.color,
+                                            ),
+                                      ),
+                                      Text(
+                                        log.time.toString(),
+                                        style: Theme.of(context).textTheme.labelSmall,
+                                      ),
+                                    ],
+                                  ),
                                   Text(
                                     log.message,
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
+                                    style: Theme.of(context).textTheme.bodySmall,
                                   ),
                                 ],
                               ),

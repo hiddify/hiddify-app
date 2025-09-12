@@ -1,4 +1,3 @@
-import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -26,9 +25,7 @@ class ConnectionStatsCard extends HookConsumerWidget {
           AsyncData(value: final proxy) => (
               label: const Icon(FluentIcons.arrow_routing_20_regular),
               data: Text(
-                proxy.selectedName.isNotNullOrBlank
-                    ? proxy.selectedName!
-                    : proxy.name,
+                proxy.selectedTag ?? proxy.tag,
               ),
               semanticLabel: null,
             ),

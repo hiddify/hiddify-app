@@ -40,7 +40,7 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
   ]) = InvalidConfig;
 
   @override
-  ({String type, String? message}) present(TranslationsEn t) {
+  ({String type, String? message}) present(Translations t) {
     return switch (this) {
       UnexpectedConnectionFailure() => (
           type: t.failure.connectivity.unexpected,

@@ -286,7 +286,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
           ],
           AdaptiveMenuItem(
             title: t.profile.share.exportConfigToClipboard,
-            onTap: () async {
+            onTap: () {
               if (exportConfigMutation.state.isInProgress) {
                 return;
               }
@@ -340,7 +340,7 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
 
   final SubscriptionInfo subInfo;
 
-  (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
+  (String, Color?) remainingText(Translations t, ThemeData theme) {
     if (subInfo.isExpired) {
       return (t.profile.subscription.expired, theme.colorScheme.error);
     } else if (subInfo.ratio >= 1) {

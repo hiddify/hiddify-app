@@ -9,11 +9,8 @@ part 'per_app_proxy_notifier.g.dart';
 @riverpod
 Future<List<InstalledPackageInfo>> installedPackagesInfo(
   InstalledPackagesInfoRef ref,
-) async {
-  return ref
-      .watch(perAppProxyRepositoryProvider)
-      .getInstalledPackages()
-      .getOrElse((err) {
+) {
+  return ref.watch(perAppProxyRepositoryProvider).getInstalledPackages().getOrElse((err) {
     // _logger.error("error getting installed packages", err);
     throw err;
   }).run();
@@ -25,10 +22,7 @@ Future<ImageProvider> packageIcon(
   String packageName,
 ) async {
   ref.disposeDelay(const Duration(seconds: 10));
-  final bytes = await ref
-      .watch(perAppProxyRepositoryProvider)
-      .getPackageIcon(packageName)
-      .getOrElse((err) {
+  final bytes = await ref.watch(perAppProxyRepositoryProvider).getPackageIcon(packageName).getOrElse((err) {
     // _logger.warning("error getting package icon", err);
     throw err;
   }).run();

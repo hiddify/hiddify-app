@@ -8,47 +8,39 @@ import 'package:hiddify/utils/platform_utils.dart';
 enum ServiceMode {
   proxy("proxy"),
   systemProxy("system-proxy"),
-  tun("vpn"),
-  tunService("vpn-service");
+  tun("vpn");
 
   const ServiceMode(this.key);
 
   final String key;
 
-  static ServiceMode get defaultMode =>
-      PlatformUtils.isDesktop ? systemProxy : tun;
+  static ServiceMode get defaultMode => PlatformUtils.isDesktop ? systemProxy : tun;
 
   /// supported service mode based on platform, use this instead of [values] in UI
   static List<ServiceMode> get choices {
     if (Platform.isWindows || Platform.isLinux) {
+      // All modes supported on Windows/Linux
       return values;
     } else if (Platform.isMacOS) {
-      return [proxy, systemProxy, tun];
+      // macOS supports all modes
+      return values;
     }
-    // mobile
+    // mobile - only proxy and tun
     return [proxy, tun];
   }
 
-  bool get isExperimental => switch (this) {
-        tun => PlatformUtils.isDesktop,
-        tunService => PlatformUtils.isDesktop,
-        _ => false,
-      };
+  bool get isExperimental => false;
 
-  String present(TranslationsEn t) => switch (this) {
+  String present(Translations t) => switch (this) {
         proxy => t.config.serviceModes.proxy,
         systemProxy => t.config.serviceModes.systemProxy,
-        tun =>
-          "${t.config.serviceModes.tun}${isExperimental ? " (${t.settings.experimental})" : ""}",
-        tunService =>
-          "${t.config.serviceModes.tunService}${isExperimental ? " (${t.settings.experimental})" : ""}",
+        tun => t.config.serviceModes.tun,
       };
 
-  String presentShort(TranslationsEn t) => switch (this) {
+  String presentShort(Translations t) => switch (this) {
         proxy => t.config.shortServiceModes.proxy,
         systemProxy => t.config.shortServiceModes.systemProxy,
         tun => t.config.shortServiceModes.tun,
-        tunService => t.config.shortServiceModes.tunService,
       };
 }
 
@@ -63,7 +55,7 @@ enum IPv6Mode {
 
   final String key;
 
-  String present(TranslationsEn t) => switch (this) {
+  String present(Translations t) => switch (this) {
         disable => t.config.ipv6Modes.disable,
         enable => t.config.ipv6Modes.enable,
         prefer => t.config.ipv6Modes.prefer,
@@ -110,7 +102,7 @@ enum WarpDetourMode {
 
   final String key;
 
-  String present(TranslationsEn t) => switch (this) {
+  String present(Translations t) => switch (this) {
         proxyOverWarp => t.config.warpDetourModes.proxyOverWarp,
         warpOverProxy => t.config.warpDetourModes.warpOverProxy,
       };

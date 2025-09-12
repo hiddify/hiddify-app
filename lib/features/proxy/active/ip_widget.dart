@@ -43,7 +43,10 @@ class IPText extends HookConsumerWidget {
       label: t.proxies.ipInfoSemantics.address,
       child: InkWell(
         onTap: () {
-          ref.read(_showIp.notifier).state = !isVisible;
+          // Avoid layout jitter: toggle after current frame
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(_showIp.notifier).state = !isVisible;
+          });
         },
         onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(12),
@@ -100,7 +103,9 @@ class UnknownIPText extends HookConsumerWidget {
     return Semantics(
       label: t.proxies.ipInfoSemantics.address,
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          WidgetsBinding.instance.addPostFrameCallback((_) => onTap());
+        },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),

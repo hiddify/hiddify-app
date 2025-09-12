@@ -7,7 +7,7 @@ enum AppThemeMode {
   dark,
   black;
 
-  String present(TranslationsEn t) => switch (this) {
+  String present(Translations t) => switch (this) {
         system => t.settings.general.themeModes.system,
         light => t.settings.general.themeModes.light,
         dark => t.settings.general.themeModes.dark,

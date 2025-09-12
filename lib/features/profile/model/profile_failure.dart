@@ -24,7 +24,7 @@ sealed class ProfileFailure with _$ProfileFailure, Failure {
       ProfileInvalidConfigFailure;
 
   @override
-  ({String type, String? message}) present(TranslationsEn t) {
+  ({String type, String? message}) present(Translations t) {
     return switch (this) {
       ProfileUnexpectedFailure() => (
           type: t.failure.profiles.unexpected,

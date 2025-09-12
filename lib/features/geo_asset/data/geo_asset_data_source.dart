@@ -14,9 +14,7 @@ abstract interface class GeoAssetDataSource {
 }
 
 @DriftAccessor(tables: [GeoAssetEntries])
-class GeoAssetsDao extends DatabaseAccessor<AppDatabase>
-    with _$GeoAssetsDaoMixin, InfraLogger
-    implements GeoAssetDataSource {
+class GeoAssetsDao extends DatabaseAccessor<AppDatabase> with _$GeoAssetsDaoMixin, InfraLogger implements GeoAssetDataSource {
   GeoAssetsDao(super.db);
 
   @override
@@ -25,7 +23,7 @@ class GeoAssetsDao extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<GeoAssetEntry?> getActiveAssetByType(GeoAssetType type) async {
+  Future<GeoAssetEntry?> getActiveAssetByType(GeoAssetType type) {
     return (geoAssetEntries.select()
           ..where((tbl) => tbl.active.equals(true))
           ..where((tbl) => tbl.type.equalsValue(type))
@@ -43,16 +41,13 @@ class GeoAssetsDao extends DatabaseAccessor<AppDatabase>
     await transaction(
       () async {
         if (entry.active.present && entry.active.value) {
-          final baseEntry = await (select(geoAssetEntries)
-                ..where((tbl) => tbl.id.equals(id)))
-              .getSingle();
+          final baseEntry = await (select(geoAssetEntries)..where((tbl) => tbl.id.equals(id))).getSingle();
           await (update(geoAssetEntries)
                 ..where((tbl) => tbl.active.equals(true))
                 ..where((tbl) => tbl.type.equalsValue(baseEntry.type)))
               .write(const GeoAssetEntriesCompanion(active: Value(false)));
         }
-        await (update(geoAssetEntries)..where((tbl) => tbl.id.equals(id)))
-            .write(entry);
+        await (update(geoAssetEntries)..where((tbl) => tbl.id.equals(id))).write(entry);
       },
     );
   }

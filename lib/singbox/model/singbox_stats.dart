@@ -4,7 +4,7 @@ part 'singbox_stats.freezed.dart';
 part 'singbox_stats.g.dart';
 
 @freezed
-class SingboxStats with _$SingboxStats {
+sealed class SingboxStats with _$SingboxStats {
   const SingboxStats._();
 
   @JsonSerializable(fieldRename: FieldRename.kebab)
@@ -17,6 +17,5 @@ class SingboxStats with _$SingboxStats {
     required int downlinkTotal,
   }) = _SingboxStats;
 
-  factory SingboxStats.fromJson(Map<String, dynamic> json) =>
-      _$SingboxStatsFromJson(json);
+  factory SingboxStats.fromJson(Map<String, dynamic> json) => _$SingboxStatsFromJson(json);
 }

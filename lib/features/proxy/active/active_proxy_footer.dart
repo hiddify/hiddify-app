@@ -1,4 +1,3 @@
-import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -37,9 +36,7 @@ class ActiveProxyFooter extends HookConsumerWidget {
                     children: [
                       _InfoProp(
                         icon: FluentIcons.arrow_routing_20_regular,
-                        text: proxy.selectedName.isNotNullOrBlank
-                            ? proxy.selectedName!
-                            : proxy.name,
+                        text: proxy.selectedTag ?? proxy.tag,
                         semanticLabel: t.proxies.activeProxySemanticLabel,
                       ),
                       const Gap(8),
@@ -51,9 +48,7 @@ class ActiveProxyFooter extends HookConsumerWidget {
                               IPText(
                                 ip: info.ip,
                                 onLongPress: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
+                                  ref.read(ipInfoNotifierProvider.notifier).refresh();
                                 },
                               ),
                             ],
@@ -65,9 +60,7 @@ class ActiveProxyFooter extends HookConsumerWidget {
                               UnknownIPText(
                                 text: t.proxies.checkIp,
                                 onTap: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
+                                  ref.read(ipInfoNotifierProvider.notifier).refresh();
                                 },
                               ),
                             ],
@@ -79,9 +72,7 @@ class ActiveProxyFooter extends HookConsumerWidget {
                               UnknownIPText(
                                 text: t.proxies.unknownIp,
                                 onTap: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
+                                  ref.read(ipInfoNotifierProvider.notifier).refresh();
                                 },
                               ),
                             ],
@@ -118,23 +109,27 @@ class _StatsColumn extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final stats = ref.watch(statsNotifierProvider).value;
+    final totalDown = ref.watch(
+      statsNotifierProvider.select((v) => v.value?.downlinkTotal ?? 0),
+    );
+    final downSpeed = ref.watch(
+      statsNotifierProvider.select((v) => v.value?.downlink ?? 0),
+    );
 
     return Directionality(
-      textDirection: TextDirection.values[
-          (Directionality.of(context).index + 1) % TextDirection.values.length],
+      textDirection: TextDirection.values[(Directionality.of(context).index + 1) % TextDirection.values.length],
       child: Flexible(
         child: Column(
           children: [
             _InfoProp(
               icon: FluentIcons.arrow_bidirectional_up_down_20_regular,
-              text: (stats?.downlinkTotal ?? 0).size(),
+              text: totalDown.size(),
               semanticLabel: t.stats.totalTransferred,
             ),
             const Gap(8),
             _InfoProp(
               icon: FluentIcons.arrow_download_20_regular,
-              text: (stats?.downlink ?? 0).speed(),
+              text: downSpeed.speed(),
               semanticLabel: t.stats.speed,
             ),
           ],
@@ -166,10 +161,7 @@ class _InfoProp extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(fontFamily: FontFamily.emoji),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(fontFamily: FontFamily.emoji),
               overflow: TextOverflow.ellipsis,
             ),
           ),

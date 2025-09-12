@@ -11,7 +11,7 @@ part 'singbox_config_option.freezed.dart';
 part 'singbox_config_option.g.dart';
 
 @freezed
-class SingboxConfigOption with _$SingboxConfigOption {
+sealed class SingboxConfigOption with _$SingboxConfigOption {
   const SingboxConfigOption._();
 
   @JsonSerializable(fieldRename: FieldRename.kebab)
@@ -38,7 +38,6 @@ class SingboxConfigOption with _$SingboxConfigOption {
     required bool enableClashApi,
     required int clashApiPort,
     required bool enableTun,
-    required bool enableTunService,
     required bool setSystemProxy,
     required bool bypassLan,
     required bool allowConnectionFromLan,
@@ -63,7 +62,7 @@ class SingboxConfigOption with _$SingboxConfigOption {
 }
 
 @freezed
-class SingboxWarpOption with _$SingboxWarpOption {
+sealed class SingboxWarpOption with _$SingboxWarpOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory SingboxWarpOption({
     required bool enable,
@@ -84,7 +83,7 @@ class SingboxWarpOption with _$SingboxWarpOption {
 }
 
 @freezed
-class SingboxMuxOption with _$SingboxMuxOption {
+sealed class SingboxMuxOption with _$SingboxMuxOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory SingboxMuxOption({
     required bool enable,
@@ -97,7 +96,7 @@ class SingboxMuxOption with _$SingboxMuxOption {
 }
 
 @freezed
-class SingboxTlsTricks with _$SingboxTlsTricks {
+sealed class SingboxTlsTricks with _$SingboxTlsTricks {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory SingboxTlsTricks({
     required bool enableFragment,

@@ -10,7 +10,7 @@ enum Region {
   br,
   other;
 
-  String present(TranslationsEn t) => switch (this) {
+  String present(Translations t) => switch (this) {
         ir => t.settings.general.regions.ir,
         cn => t.settings.general.regions.cn,
         ru => t.settings.general.regions.ru,

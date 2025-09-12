@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
-import 'package:flutter_loggy_dio/flutter_loggy_dio.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
 class DioHttpClient with InfraLogger {
@@ -14,9 +13,10 @@ class DioHttpClient with InfraLogger {
     required String userAgent,
     required bool debug,
   }) {
-    for (var mode in ["proxy", "direct", "both"]) {
+    for (final mode in ["proxy", "direct", "both"]) {
       _dio[mode] = Dio(
         BaseOptions(
+          // Keep sensible default timeouts, but we will use per-request tighter timeouts for UI-sensitive ops
           connectTimeout: timeout,
           sendTimeout: timeout,
           receiveTimeout: timeout,
@@ -94,6 +94,7 @@ class DioHttpClient with InfraLogger {
     String? userAgent,
     ({String username, String password})? credentials,
     bool proxyOnly = false,
+    Duration? perRequestTimeout,
   }) async {
     final mode = proxyOnly
         ? "proxy"
@@ -102,11 +103,15 @@ class DioHttpClient with InfraLogger {
             : "direct";
     final dio = _dio[mode]!;
 
-    return dio.get<T>(
+    final response = dio.get<T>(
       url,
       cancelToken: cancelToken,
       options: _options(url, userAgent: userAgent, credentials: credentials),
     );
+    if (perRequestTimeout != null) {
+      return response.timeout(perRequestTimeout);
+    }
+    return response;
   }
 
   Future<Response> download(
@@ -116,6 +121,7 @@ class DioHttpClient with InfraLogger {
     String? userAgent,
     ({String username, String password})? credentials,
     bool proxyOnly = false,
+    Duration? perRequestTimeout,
   }) async {
     final mode = proxyOnly
         ? "proxy"
@@ -123,7 +129,7 @@ class DioHttpClient with InfraLogger {
             ? "both"
             : "direct";
     final dio = _dio[mode]!;
-    return dio.download(
+    final response = dio.download(
       url,
       path,
       cancelToken: cancelToken,
@@ -133,6 +139,10 @@ class DioHttpClient with InfraLogger {
         credentials: credentials,
       ),
     );
+    if (perRequestTimeout != null) {
+      return response.timeout(perRequestTimeout);
+    }
+    return response;
   }
 
   Options _options(

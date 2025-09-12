@@ -10,19 +10,51 @@
       "disable": "Disable"
     },
     "sort": "Sort",
-    "sortBy": "Sort by",
-    "addToClipboard": "Add To Clipboard",
+    "sortBy": "Sort By",
+    "addToClipboard": "Copy to Clipboard",
     "notSet": "Not Set",
     "agree": "Agree",
     "decline": "Decline",
     "unknown": "Unknown",
     "hidden": "Hidden",
     "timeout": "Timeout",
-    "clipboardExportSuccessMsg": "Added To Clipboard",
+    "clipboardExportSuccessMsg": "Copied to Clipboard",
     "showMore": "Show More",
     "showLess": "Show Less",
     "openAppSettings": "Open App Settings",
     "grantPermission": "Grant Permission"
+  },
+  "help": {
+    "connection": {
+      "title": "Connect to Server",
+      "description": "To use free internet, click the connect button. The app will automatically select the best server for you."
+    },
+    "profiles": {
+      "title": "Profiles (Servers)",
+      "description": "Profiles are your free internet servers. To add a new server, click + and enter the server link."
+    },
+    "proxies": {
+      "title": "Server List",
+      "description": "Here you can see all servers in your active profile. The server with the lowest delay (ping) is the best choice."
+    },
+    "settings": {
+      "serviceMode": "Connection method - determines how the app works. VPN for all apps, Proxy only for browser",
+      "region": "Your geographical region - helps the app identify local websites",
+      "language": "App interface language",
+      "theme": "App appearance - dark, light or system",
+      "autoStart": "Automatically start the app when the computer boots",
+      "logLevel": "Detail level of reports - useful for troubleshooting issues"
+    },
+    "config": {
+      "dns": "DNS settings - server that converts website names to IP addresses",
+      "blockAds": "Block ads - prevent ads from showing on websites",
+      "ipv6": "Next generation internet protocol - usually keep disabled",
+      "mtu": "Internet packet size - reduce if you have connection issues"
+    },
+    "logs": {
+      "title": "App Reports",
+      "description": "All app activities are logged here. If you encounter problems, these reports are useful for troubleshooting."
+    }
   },
   "intro": {
     "termsAndPolicyCaution(rich)": "By Continuing You Agree With ${tap(@:about.termsAndConditions)}",
@@ -163,7 +195,7 @@
     "pageTitle": "Settings",
     "requiresRestartMsg": "For this to take effect restart the app",
     "experimental": "Experimental",
-    "experimentalMsg": "Features with Experimental flag are still in development and might cause issues.",
+    "experimentalMsg": "Most features have been stabilized. Only VPN Service on desktop with TUN mode remains experimental.",
     "exportOptions": "Copy Anonymous Options to Clipboard",
     "exportAllOptions": "Copy All Options to Clipboard",
     "importOptions": "Import Options From Clipboard",
@@ -328,8 +360,8 @@
     "connected": "Connected",
     "reconnect": "Reconnect",
     "connectAnyWay": "Connect",
-    "experimentalNotice": "Experimental Features In Use",
-    "experimentalNoticeMsg": "You've enabled some experimental features which might affect connection quality and cause unexpected errors. You can always change or reset these options from Config options page.",
+    "experimentalNotice": "VPN Service (Experimental)",
+    "experimentalNoticeMsg": "VPN Service on desktop with TUN mode is still in development and may cause issues. This feature is required for system-wide VPN functionality without administrator permissions.",
     "disableExperimentalNotice": "Don't Show Again",
     "reconnectMsg": "Reconnecting for taking into account the changes..."
   },

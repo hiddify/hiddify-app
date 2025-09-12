@@ -25,7 +25,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       title: Text(
         proxy.name,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(fontFamily: FontFamily.emoji),
+        style: const TextStyle(fontFamily: FontFamily.emoji),
       ),
       leading: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -38,23 +38,15 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
           ),
         ),
       ),
-      subtitle: Text.rich(
-        TextSpan(
-          text: proxy.type.label,
-          children: [
-            if (proxy.selectedName != null)
-              TextSpan(
-                text: ' (${proxy.selectedName})',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-          ],
-        ),
+      subtitle: Text(
+        proxy.type, // Direct use instead of proxy.type.label
+        style: Theme.of(context).textTheme.bodySmall,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: proxy.urlTestDelay != 0
+      trailing: proxy.urlTestDelayInt > 0
           ? Text(
-              proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
-              style: TextStyle(color: delayColor(context, proxy.urlTestDelay)),
+              proxy.urlTestDelayInt > 65000 ? "×" : proxy.urlTestDelayInt.toString(),
+              style: TextStyle(color: delayColor(context, proxy.urlTestDelayInt)),
             )
           : null,
       selected: selected,

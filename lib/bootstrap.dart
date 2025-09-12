@@ -8,6 +8,8 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
+import 'package:hiddify/core/localization/locale_preferences.dart';
+import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/logger/logger_controller.dart';
 import 'package:hiddify/core/model/environment.dart';
@@ -17,7 +19,6 @@ import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/app/widget/app.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
-
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -25,8 +26,10 @@ import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart'
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/singbox/service/singbox_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
+// sentry_riverpod_observer is re-exported from utils.dart; explicit import not needed
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:window_manager/window_manager.dart';
 
 Future<void> lazyBootstrap(
   WidgetsBinding widgetsBinding,
@@ -46,11 +49,45 @@ Future<void> lazyBootstrap(
     ],
   );
 
+  // Mount the app ASAP to avoid initial freeze; continue boot in background.
+  runApp(
+    ProviderScope(
+      observers: [SentryRiverpodObserver()],
+      parent: container,
+      child: SentryUserInteractionWidget(
+        child: const App(),
+      ),
+    ),
+  );
+
   await _init(
     "directories",
     () => container.read(appDirectoriesProvider.future),
   );
   LoggerController.init(container.read(logPathResolverProvider).appFile().path);
+
+  // Initialize locale and translations EARLY with enhanced loading
+  // Initialize locale and translations deterministically to avoid UI flicker
+  await _init(
+    "locale preferences",
+    () async {
+      final locale = container.read(localePreferencesProvider);
+      Logger.bootstrap.debug("Setting up locale: ${locale.name}");
+
+      // Build EN fallback once to ensure immediate strings
+      AppLocale.en.buildSync();
+
+      // Prime translations cache for selected locale; async will refresh provider
+      try {
+        container.read(translationsProvider);
+        container.invalidate(translationsProvider);
+        container.read(translationsProvider);
+        Logger.bootstrap.debug("Translations primed for ${locale.name}");
+      } catch (e) {
+        Logger.bootstrap.warning("Translation prime failed: $e");
+      }
+    },
+  );
 
   final appInfo = await _init(
     "app info",
@@ -95,10 +132,21 @@ Future<void> lazyBootstrap(
 
     final silentStart = container.read(Preferences.silentStart);
     Logger.bootstrap.debug("silent start [${silentStart ? "Enabled" : "Disabled"}]");
-    if (!silentStart) {
-      await container.read(windowNotifierProvider.notifier).open(focus: false);
-    } else {
-      Logger.bootstrap.debug("silent start, remain hidden accessible via tray");
+
+    try {
+      await container.read(windowNotifierProvider.notifier).open(focus: !silentStart);
+      Logger.bootstrap.debug("Main window opened");
+    } catch (e, st) {
+      Logger.bootstrap.error("Window open failed", e, st);
+      try {
+        if (PlatformUtils.isDesktop) {
+          await windowManager.waitUntilReadyToShow();
+          await windowManager.show();
+          await windowManager.focus();
+        }
+      } catch (fallbackError) {
+        Logger.bootstrap.error("Fallback window show also failed", fallbackError);
+      }
     }
     await _init(
       "auto start service",
@@ -136,7 +184,7 @@ Future<void> lazyBootstrap(
     await _safeInit(
       "system tray",
       () => container.read(systemTrayNotifierProvider.future),
-      timeout: 1000,
+      timeout: 10000, // 10 seconds timeout for all platforms
     );
   }
 
@@ -151,15 +199,6 @@ Future<void> lazyBootstrap(
 
   Logger.bootstrap.info("bootstrap took [${stopWatch.elapsedMilliseconds}ms]");
   stopWatch.stop();
-
-  runApp(
-    ProviderScope(
-      parent: container,
-      child: SentryUserInteractionWidget(
-        child: const App(),
-      ),
-    ),
-  );
 
   FlutterNativeSplash.remove();
 }
@@ -176,11 +215,9 @@ Future<T> _init<T>(
     final result = await func();
     Logger.bootstrap.debug("[$name] initialized in ${stopWatch.elapsedMilliseconds}ms");
     return result;
-  } catch (e, stackTrace) {
-    Logger.bootstrap.error("[$name] error initializing", e, stackTrace);
+  } catch (error, stackTrace) {
+    Logger.bootstrap.error("error initializing [$name]", error, stackTrace);
     rethrow;
-  } finally {
-    stopWatch.stop();
   }
 }
 
@@ -191,7 +228,12 @@ Future<T?> _safeInit<T>(
 }) async {
   try {
     return await _init(name, initializer, timeout: timeout);
-  } catch (e) {
+  } catch (error, stackTrace) {
+    if (error is TimeoutException) {
+      Logger.bootstrap.warning("timeout initializing [$name]", error);
+    } else {
+      Logger.bootstrap.error("error initializing [$name]", error, stackTrace);
+    }
     return null;
   }
 }

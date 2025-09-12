@@ -26,8 +26,7 @@ class AdaptiveMenuItem<T> {
   final bool? isSelected;
   final List<AdaptiveMenuItem>? subItems;
 
-  (String, IconData?, T Function()?, bool?, List<AdaptiveMenuItem>?)
-      _equality() => (title, icon, onTap, isSelected, subItems);
+  (String, IconData?, T Function()?, bool?, List<AdaptiveMenuItem>?) _equality() => (title, icon, onTap, isSelected, subItems);
 
   @override
   bool operator ==(covariant AdaptiveMenuItem other) {
@@ -104,8 +103,7 @@ class AdaptiveMenu extends HookConsumerWidget {
       if (context.mounted) {
         Navigator.pop(context);
       }
-      Future.delayed(const Duration(milliseconds: 200))
-          .then((_) => pageIndexNotifier.value = 0);
+      Future.delayed(const Duration(milliseconds: 200)).then((_) => pageIndexNotifier.value = 0);
     }
 
     List<Widget> buildSheetItems(
@@ -121,8 +119,7 @@ class AdaptiveMenu extends HookConsumerWidget {
             ListTile(
               title: Text(item.title),
               leading: item.icon != null ? Icon(item.icon) : null,
-              trailing:
-                  const Icon(FluentIcons.chevron_right_20_regular, size: 20),
+              trailing: const Icon(FluentIcons.chevron_right_20_regular, size: 20),
               onTap: () {
                 pageIndexNotifier.value = subSheetIndex;
               },
@@ -133,7 +130,7 @@ class AdaptiveMenu extends HookConsumerWidget {
               hasTopBarLayer: false,
               isTopBarLayerAlwaysVisible: true,
               topBarTitle: Text(item.title),
-              mainContentSlivers: [
+              mainContentSliversBuilder: (context) => [
                 SliverList.list(children: subItems),
               ],
             ),
@@ -167,7 +164,7 @@ class AdaptiveMenu extends HookConsumerWidget {
           pageListBuilder: (context) => [
             SliverWoltModalSheetPage(
               hasTopBarLayer: false,
-              mainContentSlivers: [
+              mainContentSliversBuilder: (context) => [
                 SliverList.list(children: buildSheetItems(items, 0)),
               ],
             ),

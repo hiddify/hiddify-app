@@ -1,18 +1,31 @@
+ 
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/bootstrap.dart';
 import 'package:hiddify/core/model/environment.dart';
+import 'package:hiddify/core/logger/logger.dart';
+import 'package:hiddify/core/logger/logger_controller.dart';
 
-void main() async {
-  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  try {
+    LoggerController.preInit();
+    Logger.bootstrap.info('Starting Hiddify app...');
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      systemNavigationBarColor: Colors.transparent,
-    ),
-  );
+    final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  return lazyBootstrap(widgetsBinding, Environment.dev);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+      ),
+    );
+
+    Logger.bootstrap.debug('Calling lazyBootstrap...');
+    lazyBootstrap(widgetsBinding, Environment.dev);
+  } catch (e, stackTrace) {
+    Logger.bootstrap.error('Error in main', e, stackTrace);
+    rethrow;
+  }
 }

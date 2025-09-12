@@ -24,9 +24,10 @@ abstract class LogParser {
         return false;
       },
     );
+    // Provide default values for nullable parameters
     return LogEntity(
-      level: level,
-      time: time,
+      level: level ?? LogLevel.info, // Already fixed!
+      time: time ?? DateTime.now(), // Already fixed!
       message: log.trim(),
     );
   }

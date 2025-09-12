@@ -6,7 +6,7 @@ Future<bool> showConfirmationDialog(
   required String title,
   required String message,
   IconData? icon,
-}) async {
+}) {
   return showDialog<bool>(
     context: context,
     builder: (context) {

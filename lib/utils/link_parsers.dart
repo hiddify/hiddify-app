@@ -8,7 +8,6 @@ import 'package:hiddify/utils/validators.dart';
 
 typedef ProfileLink = ({String url, String name});
 
-// TODO: test and improve
 abstract class LinkParser {
   static String generateSubShareLink(String url, [String? name]) {
     final uri = Uri.tryParse(url);
@@ -28,6 +27,7 @@ abstract class LinkParser {
   static const protocols = {'clash', 'clashmeta', 'sing-box', 'hiddify'};
 
   static ProfileLink? parse(String link) {
+    if (link.trim().isEmpty) return null;
     return simple(link) ?? deep(link);
   }
 

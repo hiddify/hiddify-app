@@ -11,8 +11,7 @@ class CustomAlertDialog extends StatelessWidget {
   final String? title;
   final String message;
 
-  factory CustomAlertDialog.fromError(PresentableError error) =>
-      CustomAlertDialog(
+  factory CustomAlertDialog.fromError(PresentableError error) => CustomAlertDialog(
         title: error.message == null ? null : error.type,
         message: error.message ?? error.type,
       );
@@ -20,7 +19,6 @@ class CustomAlertDialog extends StatelessWidget {
   Future<void> show(BuildContext context) async {
     await showDialog(
       context: context,
-      useRootNavigator: true,
       builder: (context) => this,
     );
   }

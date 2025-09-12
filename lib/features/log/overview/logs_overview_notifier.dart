@@ -22,6 +22,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
         loggy.debug("disposing");
         _listener?.cancel();
         _listener = null;
+        _debouncer.dispose();
       },
     );
     ref.onCancel(
@@ -88,10 +89,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
   Future<List<LogEntity>> _computeLogs() async {
     if (_levelFilter == null && _filter.isEmpty) return _logs.toList();
     return _logs.where((e) {
-      return (_filter.isEmpty || e.message.contains(_filter)) &&
-          (_levelFilter == null ||
-              e.level == null ||
-              e.level!.index >= _levelFilter!.index);
+      return (_filter.isEmpty || e.message.contains(_filter)) && (_levelFilter == null || e.level.index >= _levelFilter!.index);
     }).toList();
   }
 

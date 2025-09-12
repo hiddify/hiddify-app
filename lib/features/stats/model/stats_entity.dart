@@ -3,9 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'stats_entity.freezed.dart';
 
 @freezed
-class StatsEntity with _$StatsEntity {
-  const StatsEntity._();
-
+sealed class StatsEntity with _$StatsEntity {
   const factory StatsEntity({
     required int uplink,
     required int downlink,

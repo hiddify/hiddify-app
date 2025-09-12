@@ -1,4 +1,4 @@
-import 'package:hiddify/utils/sentry_utils.dart';
+import 'package:hiddify/core/analytics/analytics_filter.dart';
 import 'package:loggy/loggy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -40,14 +40,12 @@ class SentryLoggyIntegration extends LoggyPrinter
       await _hub.captureEvent(
         record.toEvent(),
         stackTrace: record.stackTrace,
-        hint: Hint.withMap({TypeCheckHint.record: record}),
       );
     }
 
     if (_shouldLog(record.level, _minBreadcrumbLevel)) {
       await _hub.addBreadcrumb(
         record.toBreadcrumb(),
-        hint: Hint.withMap({TypeCheckHint.record: record}),
       );
     }
   }

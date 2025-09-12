@@ -1,7 +1,6 @@
-// ignore_for_file: avoid_print
-
 import 'dart:io';
 
+import 'package:ansicolor/ansicolor.dart';
 import 'package:loggy/loggy.dart';
 
 class ConsolePrinter extends LoggyPrinter {
@@ -11,12 +10,11 @@ class ConsolePrinter extends LoggyPrinter {
 
   final bool showColors;
 
-  static final _levelColors = {
-    LogLevel.debug:
-        AnsiColor(foregroundColor: AnsiColor.grey(0.5), italic: true),
-    LogLevel.info: AnsiColor(foregroundColor: 35),
-    LogLevel.warning: AnsiColor(foregroundColor: 214),
-    LogLevel.error: AnsiColor(foregroundColor: 196),
+  static final _levelPens = {
+    LogLevel.debug: (AnsiPen()..xterm(244)), // gray-ish
+    LogLevel.info: (AnsiPen()..xterm(35)),
+    LogLevel.warning: (AnsiPen()..xterm(214)),
+    LogLevel.error: (AnsiPen()..xterm(196)),
   };
 
   @override
@@ -34,22 +32,25 @@ class ConsolePrinter extends LoggyPrinter {
       logLevel = "[${record.level.name.toUpperCase()}]".padRight(10);
     }
 
-    final color =
-        showColors ? levelColor(record.level) ?? AnsiColor() : AnsiColor();
+    final pen = colorize ? levelPen(record.level) ?? AnsiPen() : AnsiPen();
 
-    print(
-      color(
+    stdout.writeln(
+      pen(
         '$time $logLevel [${record.loggerName}]$callerFrame${record.message}',
       ),
     );
 
+    if (record.error != null) {
+      stdout.writeln(record.error);
+    }
+
     if (record.stackTrace != null) {
-      print(record.stackTrace);
+      stdout.writeln(record.stackTrace);
     }
   }
 
-  AnsiColor? levelColor(LogLevel level) {
-    return _levelColors[level];
+  AnsiPen? levelPen(LogLevel level) {
+    return _levelPens[level];
   }
 }
 
@@ -60,14 +61,16 @@ class FileLogPrinter extends LoggyPrinter {
   }) : _logFile = File(filePath);
 
   final File _logFile;
-  final LogLevel minLevel;
+  LogLevel minLevel;
 
   late final _sink = _logFile.openWrite(
-    mode: FileMode.writeOnly,
+    mode: FileMode.append,
   );
 
   @override
   void onLog(LogRecord record) {
+    // Skip logs below the configured minimum level
+    if (record.level.priority < minLevel.priority) return;
     final time = record.time.toIso8601String().split('T')[1];
     _sink.writeln("$time - $record");
     if (record.error != null) {

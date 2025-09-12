@@ -1,14 +1,11 @@
-library json_editor_flutter;
-
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
-import 'dart:ui';
 
-import 'package:dartx/dartx.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hiddify/utils/memory_leak_prevention.dart';
 
 const _space = 18.0;
 const _textStyle = TextStyle(fontSize: 16);
@@ -396,7 +393,7 @@ class JsonEditor extends StatefulWidget {
   State<JsonEditor> createState() => _JsonEditorState();
 }
 
-class _JsonEditorState extends State<JsonEditor> {
+class _JsonEditorState extends State<JsonEditor> with MemoryLeakPreventionMixin {
   Timer? _timer;
   Timer? _searchTimer;
   late dynamic _data;
@@ -417,7 +414,7 @@ class _JsonEditorState extends State<JsonEditor> {
 
   Map<String, bool> getExpandedParents() {
     final map = <String, bool>{};
-    for (var key in widget.expandedObjects) {
+    for (final key in widget.expandedObjects) {
       if (key is List) {
         final newExpandList = ["config", ...key];
         for (int i = newExpandList.length - 1; i > 0; i--) {
@@ -437,6 +434,7 @@ class _JsonEditorState extends State<JsonEditor> {
     _timer = Timer(widget.duration, () {
       widget.onChanged(jsonDecode(jsonEncode(_data)));
     });
+    addDisposableTimer(_timer!);
   }
 
   void parseData(String value) {
@@ -455,11 +453,12 @@ class _JsonEditorState extends State<JsonEditor> {
         });
       }
     });
+    addDisposableTimer(_timer!);
   }
 
-  void copyData() async {
+  Future<void> copyData() async {
     await Clipboard.setData(
-      ClipboardData(text: JsonEncoder.withIndent(' ').convert(_data)),
+      ClipboardData(text: const JsonEncoder.withIndent(' ').convert(_data)),
     );
   }
 
@@ -478,7 +477,7 @@ class _JsonEditorState extends State<JsonEditor> {
   void findMatchingKeys(data, String text, List nestedParents) {
     if (data is Map) {
       final keys = data.keys.toList();
-      for (var key in keys) {
+      for (final key in keys) {
         final keyName = key.toString();
         if (keyName.toLowerCase().contains(text) || (data[key] is String && data[key].toString().toLowerCase().contains(text))) {
           _results = _results! + 1;
@@ -524,6 +523,7 @@ class _JsonEditorState extends State<JsonEditor> {
         }
       }
     });
+    addDisposableTimer(_searchTimer!);
   }
 
   int getOffset(List toFind) {
@@ -533,7 +533,7 @@ class _JsonEditorState extends State<JsonEditor> {
     void calculateOffset(data, List parents, List toFind) {
       if (keyFound) return;
       if (data is Map) {
-        for (var entry in data.entries) {
+        for (final entry in data.entries) {
           if (keyFound) return;
           offset++;
           final newList = [...parents, entry.key];
@@ -600,7 +600,7 @@ class _JsonEditorState extends State<JsonEditor> {
 
   void expandAllObjects(data, List expandedList) {
     if (data is Map) {
-      for (var entry in data.entries) {
+      for (final entry in data.entries) {
         if (entry.value is Map || entry.value is List) {
           final newList = [...expandedList, entry.key];
           _expandedObjects[newList.toString()] = true;
@@ -635,12 +635,17 @@ class _JsonEditorState extends State<JsonEditor> {
     _enableMoreOptions = widget.enableMoreOptions;
     _enableKeyEdit = widget.enableKeyEdit;
     _enableValueEdit = widget.enableValueEdit;
+
+    // Add controllers to memory leak prevention
+    addDisposableTextController(_controller);
+    addDisposableScrollController(_scrollController);
   }
 
   @override
   void dispose() {
     _timer?.cancel();
-    _controller.dispose();
+    _searchTimer?.cancel();
+    disposeMemoryLeakPrevention();
     super.dispose();
   }
 
@@ -802,7 +807,6 @@ class _JsonEditorState extends State<JsonEditor> {
                   controller: _controller,
                   onChanged: parseData,
                   maxLines: null,
-                  minLines: null,
                   expands: true,
                   textAlignVertical: TextAlignVertical.top,
                   decoration: const InputDecoration(
@@ -853,7 +857,7 @@ class _Holder extends StatefulWidget {
     //     ? '.${parentObject['type']}'
     //     : '';
 
-    return '$basePath';
+    return basePath;
   }
 
   @override
@@ -885,9 +889,9 @@ class _HolderState extends State<_Holder> {
       widget.setState(() {});
     } else if (selectedItem == "map") {
       if (widget.data is Map) {
-        widget.data[_newKey] = Map<String, dynamic>();
+        widget.data[_newKey] = <String, dynamic>{};
       } else {
-        widget.data.add(Map<String, dynamic>());
+        widget.data.add(<String, dynamic>{});
       }
 
       setState(() {});
@@ -951,7 +955,7 @@ class _HolderState extends State<_Holder> {
     var res = "{";
     if (data is Map<String, dynamic>) {
       if (widget.expandedObjects[widget.allParents.toString()] ?? false) return "";
-      final content = data as Map<String, dynamic>;
+      final content = data;
       //res += "${data.length}";
       if (content["type"] != null) {
         res += "${content["type"]}";
@@ -963,10 +967,10 @@ class _HolderState extends State<_Holder> {
         res += " [${d.substring(0, min(20, d.length))}...]";
       }
     } else if (data is List) {
-      final content = data as List;
+      final content = data;
       res += "${content.length}";
     }
-    return res + "}";
+    return "$res}";
   }
 
   @override
@@ -975,7 +979,7 @@ class _HolderState extends State<_Holder> {
       final mapWidget = <Widget>[];
       final widgetData = widget.data as Map<String, dynamic>;
       final List<String> keys = widgetData.keys.toList();
-      for (var key in keys) {
+      for (final key in keys) {
         mapWidget.add(_Holder(
           key: Key(key),
           data: widget.data[key],
@@ -1201,7 +1205,7 @@ class _ReplaceTextWithField extends StatefulWidget {
   State<_ReplaceTextWithField> createState() => _ReplaceTextWithFieldState();
 }
 
-class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
+class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> with MemoryLeakPreventionMixin {
   late final _focusNode = FocusNode();
   bool _isFocused = false;
   bool _value = false;
@@ -1259,12 +1263,12 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
     }
 
     _focusNode.addListener(handleChange);
+    addDisposableFocusNode(_focusNode);
   }
 
   @override
   void dispose() {
     _focusNode.removeListener(handleChange);
-    _focusNode.dispose();
     super.dispose();
   }
 
@@ -1280,8 +1284,7 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
             child: DropdownButton<String>(
               hint: Text('Select ${widget.keyPath.replaceAll("config.outbounds", "")}'),
               value: _text,
-              icon: Icon(Icons.arrow_downward),
-              iconSize: 24,
+              icon: const Icon(Icons.arrow_downward),
               elevation: 16,
               underline: Container(
                 height: 2,
@@ -1400,14 +1403,14 @@ class _Options<T> extends StatelessWidget {
               for (final String key in protocolSchemaValues.keys) ...{
                 PopupMenuItem<_OptionItems>(
                   height: _popupMenuHeight,
-                  padding: EdgeInsets.only(left: _popupMenuItemPadding),
+                  padding: const EdgeInsets.only(left: _popupMenuItemPadding),
                   value: key,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.data_object),
-                      SizedBox(width: 10),
-                      Text(key, style: TextStyle(fontSize: 14)),
+                      const Icon(Icons.data_object),
+                      const SizedBox(width: 10),
+                      Text(key, style: const TextStyle(fontSize: 14)),
                     ],
                   ),
                 ),
@@ -1420,14 +1423,14 @@ class _Options<T> extends StatelessWidget {
                   for (final String key2 in exampleSchemaValues[key]!.keys) ...{
                     PopupMenuItem<_OptionItems>(
                       height: _popupMenuHeight,
-                      padding: EdgeInsets.only(left: _popupMenuItemPadding),
-                      value: key + "___" + key2,
+                      padding: const EdgeInsets.only(left: _popupMenuItemPadding),
+                      value: "${key}___$key2",
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.data_object),
-                          SizedBox(width: 10),
-                          Text(key2, style: TextStyle(fontSize: 14)),
+                          const Icon(Icons.data_object),
+                          const SizedBox(width: 10),
+                          Text(key2, style: const TextStyle(fontSize: 14)),
                         ],
                       ),
                     ),
@@ -1573,12 +1576,12 @@ class _SearchField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: "Search",
               hintStyle: Theme.of(context).textTheme.bodySmall,
-              constraints: BoxConstraints(maxWidth: 100),
+              constraints: const BoxConstraints(maxWidth: 100),
               border: InputBorder.none,
               // fillColor: Colors.transparent,
               // filled: true,
               isDense: true,
-              contentPadding: EdgeInsets.all(3),
+              contentPadding: const EdgeInsets.all(3),
               focusedBorder: InputBorder.none,
               // hoverColor: Colors.transparent,
             ),

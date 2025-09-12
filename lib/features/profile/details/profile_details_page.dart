@@ -87,7 +87,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
 
     switch (ref.watch(provider)) {
       case AsyncData(value: final state):
-        final showLoadingOverlay = state.isBusy || state.save is MutationSuccess || state.delete is MutationSuccess;
+        final showLoadingOverlay = state.isBusy || (state.save?.hasValue ?? false) || (state.delete?.hasValue ?? false);
 
         return Stack(
           children: [
@@ -279,7 +279,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                 expandedObjects: const ["outbounds"],
                                 onChanged: (value) {
                                   if (value == null) return;
-                                  const encoder = const JsonEncoder.withIndent('  ');
+                                  const encoder = JsonEncoder.withIndent('  ');
 
                                   notifier.setField(configContent: encoder.convert(value));
                                 },
@@ -297,16 +297,24 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
             ),
             if (showLoadingOverlay)
               Positioned.fill(
-                child: Container(
+                child: Material(
                   color: Colors.black54,
-                  padding: const EdgeInsets.symmetric(horizontal: 36),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      LinearProgressIndicator(
-                        backgroundColor: Colors.transparent,
-                      ),
-                    ],
+                  child: Container(
+                    constraints: const BoxConstraints.expand(),
+                    padding: const EdgeInsets.symmetric(horizontal: 36),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          color: Colors.white,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Loading...',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

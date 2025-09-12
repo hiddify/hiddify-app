@@ -22,9 +22,13 @@ GoRouter router(RouterRef ref) {
   final notifier = ref.watch(routerListenableProvider.notifier);
   final deepLink = ref.listen(
     deepLinkNotifierProvider,
-    (_, next) async {
+    (_, next) {
       if (next case AsyncData(value: final link?)) {
-        await ref.state.push(AddProfileRoute(url: link.url).location);
+        final path = AddProfileRoute(url: link.url).location;
+        final ctx = rootNavigatorKey.currentContext;
+        if (ctx != null) {
+          ctx.push(path);
+        }
       }
     },
   );
@@ -37,7 +41,7 @@ GoRouter router(RouterRef ref) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: kDebugMode,
     routes: [
       if (useMobileRouter) $mobileWrapperRoute else $desktopWrapperRoute,
       $introRoute,

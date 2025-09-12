@@ -15,7 +15,7 @@ sealed class SettingsFailure with _$SettingsFailure, Failure {
   ]) = SettingsUnexpectedFailure;
 
   @override
-  ({String type, String? message}) present(TranslationsEn t) {
+  ({String type, String? message}) present(Translations t) {
     return switch (this) {
       SettingsUnexpectedFailure() => (
           type: t.failure.unexpected,

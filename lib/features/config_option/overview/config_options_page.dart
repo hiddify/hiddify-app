@@ -7,7 +7,6 @@ import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
-import 'package:hiddify/core/widget/tip_card.dart';
 import 'package:hiddify/features/common/confirmation_dialogs.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
@@ -65,10 +64,6 @@ class ConfigOptionsPage extends HookConsumerWidget {
       },
     );
 
-    String experimental(String txt) {
-      return "$txt (${t.settings.experimental})";
-    }
-
     return Scaffold(
       body: CustomScrollView(
         controller: scrollController,
@@ -82,7 +77,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
                 itemBuilder: (context) {
                   return [
                     PopupMenuItem(
-                      onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard().then((success) {
+                      onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard().then((success) {
                         if (success) {
                           ref.read(inAppNotificationControllerProvider).showSuccessToast(
                                 t.general.clipboardExportSuccessMsg,
@@ -93,7 +88,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     ),
                     // if (ref.watch(debugModeNotifierProvider))
                     PopupMenuItem(
-                      onTap: () async => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard(excludePrivate: false).then((success) {
+                      onTap: () => ref.read(configOptionNotifierProvider.notifier).exportJsonToClipboard(excludePrivate: false).then((success) {
                         if (success) {
                           ref.read(inAppNotificationControllerProvider).showSuccessToast(
                                 t.general.clipboardExportSuccessMsg,
@@ -130,7 +125,6 @@ class ConfigOptionsPage extends HookConsumerWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  TipCard(message: t.settings.experimentalMsg),
                   ChoicePreferenceWidget(
                     selected: ref.watch(ConfigOptions.logLevel),
                     preferences: ref.watch(ConfigOptions.logLevel.notifier),
@@ -138,7 +132,6 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     title: t.config.logLevel,
                     presentChoice: (value) => value.name.toUpperCase(),
                   ),
-
                   const SettingsDivider(),
                   SettingsSection(t.config.section.route),
                   ChoicePreferenceWidget(
@@ -150,12 +143,12 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     onChanged: (val) => ref.watch(ConfigOptions.directDnsAddress.notifier).reset(),
                   ),
                   SwitchListTile(
-                    title: Text(experimental(t.config.blockAds)),
+                    title: Text(t.config.blockAds),
                     value: ref.watch(ConfigOptions.blockAds),
                     onChanged: ref.watch(ConfigOptions.blockAds.notifier).update,
                   ),
                   SwitchListTile(
-                    title: Text(experimental(t.config.bypassLan)),
+                    title: Text(t.config.bypassLan),
                     value: ref.watch(ConfigOptions.bypassLan),
                     onChanged: ref.watch(ConfigOptions.bypassLan.notifier).update,
                   ),
@@ -202,29 +195,27 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     value: ref.watch(ConfigOptions.enableDnsRouting),
                     onChanged: ref.watch(ConfigOptions.enableDnsRouting.notifier).update,
                   ),
-                  // const SettingsDivider(),
-                  // SettingsSection(experimental(t.config.section.mux)),
-                  // SwitchListTile(
-                  //   title: Text(t.config.enableMux),
-                  //   value: ref.watch(ConfigOptions.enableMux),
-                  //   onChanged:
-                  //       ref.watch(ConfigOptions.enableMux.notifier).update,
-                  // ),
-                  // ChoicePreferenceWidget(
-                  //   selected: ref.watch(ConfigOptions.muxProtocol),
-                  //   preferences: ref.watch(ConfigOptions.muxProtocol.notifier),
-                  //   choices: MuxProtocol.values,
-                  //   title: t.config.muxProtocol,
-                  //   presentChoice: (value) => value.name,
-                  // ),
-                  // ValuePreferenceWidget(
-                  //   value: ref.watch(ConfigOptions.muxMaxStreams),
-                  //   preferences:
-                  //       ref.watch(ConfigOptions.muxMaxStreams.notifier),
-                  //   title: t.config.muxMaxStreams,
-                  //   inputToValue: int.tryParse,
-                  //   digitsOnly: true,
-                  // ),
+                  const SettingsDivider(),
+                  SettingsSection(t.config.section.mux),
+                  SwitchListTile(
+                    title: Text(t.config.enableMux),
+                    value: ref.watch(ConfigOptions.enableMux),
+                    onChanged: ref.watch(ConfigOptions.enableMux.notifier).update,
+                  ),
+                  ChoicePreferenceWidget(
+                    selected: ref.watch(ConfigOptions.muxProtocol),
+                    preferences: ref.watch(ConfigOptions.muxProtocol.notifier),
+                    choices: MuxProtocol.values,
+                    title: t.config.muxProtocol,
+                    presentChoice: (value) => value.name,
+                  ),
+                  ValuePreferenceWidget(
+                    value: ref.watch(ConfigOptions.muxMaxStreams),
+                    preferences: ref.watch(ConfigOptions.muxMaxStreams.notifier),
+                    title: t.config.muxMaxStreams,
+                    inputToValue: int.tryParse,
+                    digitsOnly: true,
+                  ),
                   const SettingsDivider(),
                   SettingsSection(t.config.section.inbound),
                   ChoicePreferenceWidget(
@@ -271,15 +262,13 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     validateInput: isPort,
                   ),
                   SwitchListTile(
-                    title: Text(
-                      experimental(t.config.allowConnectionFromLan),
-                    ),
+                    title: Text(t.config.allowConnectionFromLan),
                     value: ref.watch(ConfigOptions.allowConnectionFromLan),
                     onChanged: ref.read(ConfigOptions.allowConnectionFromLan.notifier).update,
                   ),
                   const SettingsDivider(),
                   SettingsSection(
-                    experimental(t.config.section.tlsTricks),
+                    t.config.section.tlsTricks,
                     key: ConfigOptionSection._fragmentKey,
                   ),
                   SwitchListTile(
@@ -322,7 +311,7 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     formatInputValue: (value) => value.format(),
                   ),
                   const SettingsDivider(),
-                  SettingsSection(experimental(t.config.section.warp)),
+                  SettingsSection(t.config.section.warp),
                   WarpOptionsTiles(key: ConfigOptionSection._warpKey),
                   const SettingsDivider(),
                   SettingsSection(t.config.section.misc),
@@ -358,9 +347,8 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     digitsOnly: true,
                     inputToValue: int.tryParse,
                   ),
-
                   SwitchListTile(
-                    title: Text(experimental(t.config.useXrayCoreWhenPossible.Label)),
+                    title: Text(t.config.useXrayCoreWhenPossible.Label),
                     subtitle: Text(t.config.useXrayCoreWhenPossible.Description),
                     value: ref.watch(ConfigOptions.useXrayCoreWhenPossible),
                     onChanged: ref.watch(ConfigOptions.useXrayCoreWhenPossible.notifier).update,

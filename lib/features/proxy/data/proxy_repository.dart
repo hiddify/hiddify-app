@@ -31,35 +31,31 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
   @override
   Stream<Either<ProxyFailure, List<ProxyGroupEntity>>> watchProxies() {
     return singbox.watchGroups().map((event) {
-      final groupWithSelected = {
-        for (final group in event) group.tag: group.selected,
-      };
+      // Pre-calculate selected mapping for better performance
+      final groupWithSelected = Map<String, String>.fromEntries(event.map((group) => MapEntry(group.tag, group.selected)));
+
+      // Process groups with optimized filtering
       return event
-          .map(
-            (e) => ProxyGroupEntity(
-              tag: e.tag,
-              type: e.type,
-              selected: e.selected,
-              items: e.items
-                  .map(
-                    (e) => ProxyItemEntity(
-                      tag: e.tag,
-                      type: e.type,
-                      urlTestDelay: e.urlTestDelay,
-                      selectedTag: groupWithSelected[e.tag],
-                    ),
-                  )
-                  .filter((t) => t.isVisible)
-                  .toList(),
-            ),
-          )
+          .map((e) => ProxyGroupEntity(
+                tag: e.tag,
+                type: e.type.toString(),
+                selected: e.selected,
+                items: e.items
+                    .where((item) => item.tag.isNotEmpty && !item.tag.contains("§hide§"))
+                    .map((item) => ProxyItemEntity(
+                          tag: item.tag,
+                          type: item.type.toString(),
+                          urlTestDelay: item.urlTestDelay.toString(),
+                          selectedTag: groupWithSelected[item.tag],
+                        ))
+                    .toList(),
+              ))
+          .where((group) => group.items.isNotEmpty) // Only include non-empty groups
           .toList();
-    }).handleExceptions(
-      (error, stackTrace) {
-        loggy.error("error watching proxies", error, stackTrace);
-        return ProxyUnexpectedFailure(error, stackTrace);
-      },
-    );
+    }).handleExceptions((error, stackTrace) {
+      loggy.error("error watching proxies", error, stackTrace);
+      return ProxyUnexpectedFailure(error, stackTrace);
+    });
   }
 
   @override
@@ -72,14 +68,14 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
           .map(
             (e) => ProxyGroupEntity(
               tag: e.tag,
-              type: e.type,
+              type: e.type.toString(),
               selected: e.selected,
               items: e.items
                   .map(
                     (e) => ProxyItemEntity(
                       tag: e.tag,
-                      type: e.type,
-                      urlTestDelay: e.urlTestDelay,
+                      type: e.type.toString(),
+                      urlTestDelay: e.urlTestDelay.toString(),
                       selectedTag: groupWithSelected[e.tag],
                     ),
                   )
@@ -141,6 +137,8 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
               source.key,
               cancelToken: cancelToken,
               proxyOnly: true,
+              // Fail fast to avoid UI stalls when proxy endpoint is unreachable
+              perRequestTimeout: const Duration(seconds: 3),
             );
             if (response.statusCode == 200 && response.data != null) {
               return source.value(response.data!);
