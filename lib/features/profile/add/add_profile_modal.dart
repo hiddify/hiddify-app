@@ -7,6 +7,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/features/profile/add/widgets/free_btns.dart';
 import 'package:hiddify/features/profile/add/widgets/widgets.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,7 +42,7 @@ class AddProfileModal extends HookConsumerWidget {
       await Future.delayed(const Duration(milliseconds: 200));
       if (url != null && context.mounted) {
         if (isLoading) return;
-        ref.read(addProfileNotifierProvider.notifier).add(url!);
+        ref.read(addProfileNotifierProvider.notifier).addClipboard(url!);
       }
     });
     return SafeArea(
@@ -95,9 +96,9 @@ class AddProfileOptions extends HookConsumerWidget {
 class AddProfileManual extends HookConsumerWidget {
   const AddProfileManual({super.key});
 
-  String genSliderText(Translations t, int sliderValue) {
+  String _genSliderText(Translations t, int sliderValue) {
     if (sliderValue == 0) {
-      return t.general.state.disable;
+      return t.general.auto;
     } else if (sliderValue < 24) {
       return t.profile.interval.hour(n: sliderValue);
     }
@@ -113,6 +114,7 @@ class AddProfileManual extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final nameTextController = useTextEditingController();
     final urlTextController = useTextEditingController();
+    final isAutoUpdateDisable = useState<bool>(false);
     final updateInterval = useState(.0);
     final sliderFocusNode = useFocusNode(
       onKeyEvent: (node, event) {
@@ -130,7 +132,6 @@ class AddProfileManual extends HookConsumerWidget {
     return Form(
       key: formKey,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
@@ -166,52 +167,88 @@ class AddProfileManual extends HookConsumerWidget {
               hint: t.profile.detailsForm.urlHint,
             ),
           ),
-          const Gap(16),
+          const Gap(12),
+          SwitchListTile.adaptive(
+            title: Text(
+              t.profile.add.disableAutoUpdate,
+              style: theme.textTheme.titleSmall!.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            value: isAutoUpdateDisable.value,
+            onChanged: (value) => isAutoUpdateDisable.value = value,
+          ),
+          AnimatedSize(
+            alignment: Alignment.topCenter,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: !isAutoUpdateDisable.value
+                ? Column(
+                    children: [
+                      const Divider(indent: 16, endIndent: 16),
+                      const Gap(12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                t.profile.detailsForm.updateInterval,
+                                style: theme.textTheme.titleSmall!.copyWith(
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              _genSliderText(t, updateInterval.value.round()),
+                              style: theme.textTheme.labelSmall!.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Gap(4),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Slider(
+                          focusNode: sliderFocusNode,
+                          value: updateInterval.value,
+                          max: 96,
+                          divisions: 96,
+                          label: updateInterval.value.round().toString(),
+                          onChanged: (double value) => updateInterval.value = value,
+                        ),
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink(),
+          ),
+
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    t.profile.detailsForm.updateInterval,
-                    style: theme.textTheme.titleSmall!.copyWith(
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                ),
-                Text(
-                  genSliderText(t, updateInterval.value.round()),
-                  style: theme.textTheme.labelSmall!.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  child: FilledButton(
+                    child: Text(t.general.add),
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        final i = updateInterval.value.toInt();
+                        final interval = i > 0 ? i : null;
+                        await ref.read(addProfileNotifierProvider.notifier).addManual(
+                              url: urlTextController.text.trim(),
+                              userOverride: UserOverride(
+                                name: nameTextController.text.trim(),
+                                isAutoUpdateDisable: isAutoUpdateDisable.value,
+                                updateInterval: interval,
+                              ),
+                            );
+                      }
+                    },
                   ),
                 ),
               ],
-            ),
-          ),
-          const Gap(4),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Slider(
-              focusNode: sliderFocusNode,
-              value: updateInterval.value,
-              max: 96,
-              divisions: 96,
-              label: updateInterval.value.round().toString(),
-              onChanged: (double value) {
-                updateInterval.value = value;
-              },
-            ),
-          ),
-          // const Gap(8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
-            child: FilledButton.tonal(
-              child: Text(t.general.add),
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  await ref.read(addProfileNotifierProvider.notifier).addManual(nameTextController.text, urlTextController.text, updateInterval.value);
-                }
-              },
             ),
           ),
           // const Gap(16),

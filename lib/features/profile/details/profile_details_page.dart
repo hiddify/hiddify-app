@@ -2,224 +2,199 @@ import 'dart:convert';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:fpdart/fpdart.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/details/json_editor.dart';
 import 'package:hiddify/features/profile/details/profile_details_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:humanizer/humanizer.dart';
 
 class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
   const ProfileDetailsPage({super.key, required this.id});
 
   final String id;
 
+  String _genSliderText(Translations t, int sliderValue) {
+    if (sliderValue == 0) {
+      return t.general.auto;
+    } else if (sliderValue < 24) {
+      return t.profile.interval.hour(n: sliderValue);
+    }
+    final day = t.profile.interval.day(n: sliderValue ~/ 24);
+    final hour = t.profile.interval.hour(n: sliderValue % 24);
+    return '$day $hour';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
     final t = ref.watch(translationsProvider).requireValue;
-
+    final formKey = useMemoized(() => GlobalKey<FormState>());
     final provider = profileDetailsNotifierProvider(id);
 
-    ref.listen(
-      provider.selectAsync((data) => data.save),
-      (_, next) async {
-        switch (await next) {
-          case AsyncData():
-            CustomToast.success(t.profile.save.successMsg).show(context);
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) {
-                if (context.mounted) context.pop();
+    return ref.watch(ProfileDetailsNotifierProvider(id)).when(
+          data: (data) {
+            final isLoading = data.loadingState is AsyncLoading;
+            final userOverride = data.profile.userOverride ?? const UserOverride();
+            final sliderFocusNode = useFocusNode(
+              onKeyEvent: (node, event) {
+                if (KeyboardConst.verticalArrows.contains(event.logicalKey) && event is KeyDownEvent) {
+                  if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                    node.previousFocus();
+                  } else {
+                    node.nextFocus();
+                  }
+                  return KeyEventResult.handled;
+                }
+                return KeyEventResult.ignored;
               },
             );
-          case AsyncError(:final error):
-            final String action;
-            if (ref.read(provider) case AsyncData(value: final data) when data.isEditing) {
-              action = t.profile.save.failureMsg;
-            } else {
-              action = t.profile.add.failureMsg;
-            }
-            ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(error, action: action));
-        }
-      },
-    );
-
-    // ref.listen(
-    //   provider.selectAsync((data) => data.update),
-    //   (_, next) async {
-    //     switch (await next) {
-    //       case AsyncData():
-    //         CustomToast.success(t.profile.update.successMsg).show(context);
-    //       case AsyncError(:final error):
-    //         CustomAlertDialog.fromErr(t.presentError(error)).show(context);
-    //     }
-    //   },
-    // );
-
-    // ref.listen(
-    //   provider.selectAsync((data) => data.delete),
-    //   (_, next) async {
-    //     switch (await next) {
-    //       case AsyncData():
-    //         CustomToast.success(t.profile.delete.successMsg).show(context);
-    //         WidgetsBinding.instance.addPostFrameCallback(
-    //           (_) {
-    //             if (context.mounted) context.pop();
-    //           },
-    //         );
-    //       case AsyncError(:final error):
-    //         CustomToast.error(t.presentShortError(error)).show(context);
-    //     }
-    //   },
-    // );
-
-    switch (ref.watch(provider)) {
-      case AsyncData(value: final state):
-        final showLoadingOverlay = state.isBusy || state.save is MutationSuccess || state.delete is MutationSuccess;
-
-        return Stack(
-          children: [
-            Scaffold(
-              body: SafeArea(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverAppBar(
-                      title: Text(t.profile.detailsPageTitle),
-                      pinned: true,
-                      actions: [
-                        // MenuItemButton(
-                        //   onPressed: context.pop,
-                        //   child: Text(
-                        //     MaterialLocalizations.of(context).cancelButtonLabel,
-                        //   ),
-                        // ),
-                        TextButton.icon(
-                          onPressed: ref.read(provider.notifier).save,
-                          icon: const Icon(Icons.check),
-                          label: Text(t.profile.save.buttonText),
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(t.profile.detailsPageTitle),
+                actions: [
+                  TextButton.icon(
+                    onPressed: isLoading || !data.isDetailsChanged
+                        ? null
+                        : () async {
+                            if (formKey.currentState!.validate()) {
+                              await ref.read(provider.notifier).save().then(
+                                (success) {
+                                  if (success && context.mounted) context.pop();
+                                },
+                              );
+                            }
+                          },
+                    icon: const Icon(Icons.check),
+                    label: Text(t.profile.save.buttonText),
+                  ),
+                  const Gap(8),
+                ],
+              ),
+              body: ListView(
+                children: [
+                  Form(
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: CustomTextFormField(
+                            maxLines: 1,
+                            initialValue: userOverride.name ?? data.profile.name,
+                            validator: (value) => (value?.isEmpty ?? true) ? t.profile.detailsForm.emptyNameMsg : null,
+                            onChanged: (value) => ref.read(ProfileDetailsNotifierProvider(id).notifier).setUserOverride(userOverride.copyWith(name: value)),
+                            label: t.profile.detailsForm.nameLabel,
+                            hint: t.profile.detailsForm.nameHint,
+                          ),
                         ),
-                        const Gap(12),
-                        // if (state.isEditing)
-                        //   PopupMenuButton(
-                        //     icon: Icon(AdaptiveIcon(context).more),
-                        //     itemBuilder: (context) {
-                        //       return [
-                        //         if (state.profile case RemoteProfileEntity())
-                        //           PopupMenuItem(
-                        //             child: Text(t.profile.update.buttonTxt),
-                        //             onTap: () async {
-                        //               await ref.read(provider.notifier).updateProfile();
-                        //             },
-                        //           ),
-                        //         // if (!state.profile.active)
-                        //         PopupMenuItem(
-                        //           child: Text(t.profile.delete.buttonTxt),
-                        //           onTap: () async {
-                        //             final deleteConfirmed = await showConfirmationDialog(
-                        //               context,
-                        //               title: t.profile.delete.buttonTxt,
-                        //               message: t.profile.delete.confirmationMsg,
-                        //               icon: FluentIcons.delete_24_regular,
-                        //             );
-                        //             if (deleteConfirmed) {
-                        //               await ref.read(provider.notifier).delete();
-                        //             }
-                        //           },
-                        //         ),
-                        //       ];
-                        //     },
-                        //   ),
-                      ],
-                    ),
-                    Form(
-                      autovalidateMode: state.showErrorMessages ? AutovalidateMode.always : AutovalidateMode.disabled,
-                      child: SliverList.list(
-                        children: [
+                        if (data.profile case RemoteProfileEntity(:final url))
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 8,
                             ),
-                            child: CustomTextFormField(
-                              initialValue: state.profile.name,
-                              onChanged: (value) => ref.read(provider.notifier).setField(name: value),
-                              validator: (value) => (value?.isEmpty ?? true) ? t.profile.detailsForm.emptyNameMsg : null,
-                              label: t.profile.detailsForm.nameLabel,
-                              hint: t.profile.detailsForm.nameHint,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  t.profile.detailsForm.urlLabel,
+                                  style: theme.textTheme.labelMedium!.copyWith(
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const Gap(4),
+                                SelectableText(
+                                  url,
+                                  style: theme.textTheme.bodySmall!.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          if (state.profile case RemoteProfileEntity(:final url, :final options)) ...[
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              child: CustomTextFormField(
-                                initialValue: url,
-                                onChanged: (value) => ref.read(provider.notifier).setField(url: value),
-                                validator: (value) => (value != null && !isUrl(value)) ? t.profile.detailsForm.invalidUrlMsg : null,
-                                label: t.profile.detailsForm.urlLabel,
-                                hint: t.profile.detailsForm.urlHint,
+                        const Divider(indent: 16, endIndent: 16),
+                        if (data.profile case RemoteProfileEntity(:final options)) ...[
+                          SwitchListTile.adaptive(
+                            title: Text(
+                              t.profile.add.disableAutoUpdate,
+                              style: theme.textTheme.titleSmall!.copyWith(
+                                color: theme.colorScheme.onSurface,
                               ),
                             ),
-                            ListTile(
-                              title: Text(t.profile.detailsForm.updateInterval),
-                              subtitle: Text(
-                                options?.updateInterval.toApproximateTime(
-                                      isRelativeToNow: false,
-                                    ) ??
-                                    t.general.toggle.disabled,
-                              ),
-                              leading: const Icon(FluentIcons.arrow_sync_24_regular),
-                              onTap: () async {
-                                final intervalInHours = await ref.read(dialogNotifierProvider.notifier).showSettingInput(
-                                      title: t.profile.detailsForm.updateIntervalDialogTitle,
-                                      initialValue: options?.updateInterval.inHours,
-                                      optionalAction: (
-                                        t.general.state.disable,
-                                        () => ref.read(provider.notifier).setField(
-                                              updateInterval: none(),
+                            value: userOverride.isAutoUpdateDisable,
+                            onChanged: (value) => ref.read(ProfileDetailsNotifierProvider(id).notifier).setUserOverride(userOverride.copyWith(isAutoUpdateDisable: value)),
+                          ),
+                          AnimatedSize(
+                            alignment: Alignment.topCenter,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            child: !userOverride.isAutoUpdateDisable
+                                ? Column(
+                                    children: [
+                                      const Divider(indent: 16, endIndent: 16),
+                                      const Gap(12),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                t.profile.detailsForm.updateInterval,
+                                                style: theme.textTheme.titleSmall!.copyWith(
+                                                  color: theme.colorScheme.onSurface,
+                                                ),
+                                              ),
                                             ),
+                                            Text(
+                                              _genSliderText(t, userOverride.updateInterval ?? 0),
+                                              style: theme.textTheme.labelSmall!.copyWith(
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                      validator: isPort,
-                                      mapTo: int.tryParse,
-                                      digitsOnly: true,
-                                    );
-                                if (intervalInHours == null) return;
-                                ref.read(provider.notifier).setField(
-                                      updateInterval: optionOf(intervalInHours),
-                                    );
-                              },
-                            ),
-                          ],
-                          // Padding(
-                          //   padding: const EdgeInsets.symmetric(
-                          //     horizontal: 16,
-                          //     vertical: 8,
-                          //   ),
-                          // child: CustomTextFormField(
-                          //   initialValue: state.configContent,
-                          //   // onChanged: (value) => notifier.setField(name: value),
-                          //   maxLines: 7,
-                          //   label: t.profile.detailsForm.configContentLabel,
-                          //   hint: t.profile.detailsForm.configContentHint,
-                          // ),
-                          // ),
-                          if (state.isEditing) ...[
-                            ListTile(
-                              title: Text(t.profile.detailsForm.lastUpdate),
-                              leading: const Icon(FluentIcons.history_24_regular),
-                              subtitle: Text(state.profile.lastUpdate.format()),
-                              dense: true,
-                            ),
-                          ],
-                          if (state.profile case RemoteProfileEntity(:final subInfo?)) ...[
-                            Padding(
+                                      const Gap(4),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        child: Slider(
+                                          focusNode: sliderFocusNode,
+                                          value: userOverride.updateInterval?.toDouble() ?? options?.updateInterval.inHours.toDouble() ?? 0.0,
+                                          max: 96,
+                                          divisions: 96,
+                                          label: (userOverride.updateInterval ?? 0).toString(),
+                                          onChanged: (double value) => ref.read(ProfileDetailsNotifierProvider(id).notifier).setUserOverride(userOverride.copyWith(updateInterval: value.toInt())),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox.shrink(),
+                          ),
+                          const Divider(indent: 16, endIndent: 16),
+                        ],
+                        ListTile(
+                          title: Text(t.profile.detailsForm.lastUpdate),
+                          leading: const Icon(FluentIcons.history_24_regular),
+                          subtitle: Text(data.profile.lastUpdate.format()),
+                          dense: true,
+                        ),
+                        if (data.profile case RemoteProfileEntity(:final subInfo?)) ...[
+                          const Divider(indent: 16, endIndent: 16),
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 18,
                                 vertical: 8,
@@ -267,64 +242,42 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                 ],
                               ),
                             ),
-                          ],
-                          if (state.isEditing) ...[
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.9,
-                              child: JsonEditor(
-                                expandedObjects: const ["outbounds"],
-                                onChanged: (value) {
-                                  if (value == null) return;
-                                  const encoder = JsonEncoder.withIndent('  ');
-
-                                  ref.read(provider.notifier).setField(configContent: encoder.convert(value));
-                                },
-                                enableHorizontalScroll: true,
-                                json: state.configContent,
-                              ),
-                            ),
-                          ],
+                          ),
                         ],
-                      ),
+                        const Divider(),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            ),
-            if (showLoadingOverlay)
-              Positioned.fill(
-                child: Container(
-                  color: Colors.black54,
-                  padding: const EdgeInsets.symmetric(horizontal: 36),
-                  child: const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      LinearProgressIndicator(
-                        backgroundColor: Colors.transparent,
-                      ),
-                    ],
                   ),
-                ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.7,
+                    child: JsonEditor(
+                      expandedObjects: const ["outbounds"],
+                      onChanged: (value) {
+                        if (value == null) return;
+                        const encoder = JsonEncoder.withIndent('  ');
+                        ref.read(provider.notifier).setContent(encoder.convert(value));
+                      },
+                      enableHorizontalScroll: true,
+                      json: data.configContent,
+                    ),
+                  ),
+                ],
               ),
-          ],
-        );
-
-      case AsyncError(:final error):
-        return Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                title: Text(t.profile.detailsPageTitle),
-                pinned: true,
-              ),
-              SliverErrorBodyPlaceholder(t.presentShortError(error)),
-            ],
+            );
+          },
+          error: (error, stackTrace) => Scaffold(
+            appBar: AppBar(
+              title: Text(t.profile.detailsPageTitle),
+            ),
+            body: SliverErrorBodyPlaceholder(t.presentShortError(error)),
+          ),
+          loading: () => Scaffold(
+            appBar: AppBar(
+              title: Text(t.profile.detailsPageTitle),
+            ),
+            body: const Center(child: CircularProgressIndicator()),
           ),
         );
-
-      default:
-        return const Scaffold();
-    }
   }
 
   InlineSpan _buildSubProp(IconData icon, String text, String semanticLabel) {

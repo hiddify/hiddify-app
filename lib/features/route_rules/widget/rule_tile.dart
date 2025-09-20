@@ -41,7 +41,7 @@ class RuleTile extends HookConsumerWidget {
     final result = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
           title: tRouteRule.deleteRule,
           message: tRouteRule.deleteRule,
-          okText: tRouteRule.deleteRule,
+          positiveBtnTxt: tRouteRule.deleteRule,
         );
     if (result == true) {
       await ref.read(rulesNotifierProvider.notifier).deleteRule(rule.listOrder);

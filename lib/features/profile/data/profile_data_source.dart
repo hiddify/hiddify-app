@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:drift/drift.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/database/app_database.dart';
 import 'package:hiddify/core/database/tables/database_tables.dart';
-import 'package:hiddify/features/profile/model/profile_local_override.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:loggy/loggy.dart';
 
 part 'profile_data_source.g.dart';
 
@@ -21,7 +20,7 @@ abstract interface class ProfileDataSource {
   });
   Future<void> insert(ProfileEntriesCompanion entry);
   Future<void> edit(String id, ProfileEntriesCompanion entry);
-  Future<void> deleteById(String id);
+  Future<void> deleteById(String id, bool isActive);
 }
 
 Map<SortMode, OrderingMode> orderMap = {
@@ -56,26 +55,11 @@ class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin, I
 
   @override
   Stream<ProfileEntry?> watchActiveProfile() {
-    // return (profileEntries.select()
-    //       ..where((tbl) => tbl.active.equals(true))
-    //       ..limit(1))
-    //     .watchSingleOrNull();
     return (profileEntries.select()
           ..where((tbl) => tbl.active.equals(true))
           ..limit(1))
         .watchSingleOrNull()
-        .distinct()
-        .map(
-      (event) {
-        if (event == null) return event;
-        final config = event.testUrl;
-        if (config == null) return event;
-        loggy.debug('remove local-override form testUrl');
-        final json = jsonDecode(config) as Map<String, dynamic>;
-        json.removeWhere((key, value) => key == ProfileLocalOverride.key);
-        return event.copyWith(testUrl: Value(jsonEncode(json)));
-      },
-    );
+        .distinct();
   }
 
   @override
@@ -126,7 +110,11 @@ class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin, I
         if (entry.active.present && entry.active.value) {
           await update(profileEntries).write(const ProfileEntriesCompanion(active: Value(false)));
         }
-        await into(profileEntries).insert(entry);
+        final name = StringBuffer(entry.name.value);
+        while (await getByName(name.toString()) != null) {
+          name.write('${randomInt(0, 9).run()}');
+        }
+        await into(profileEntries).insert(entry.copyWith(name: Value(name.toString())));
       },
     );
   }
@@ -135,19 +123,39 @@ class ProfileDao extends DatabaseAccessor<AppDatabase> with _$ProfileDaoMixin, I
   Future<void> edit(String id, ProfileEntriesCompanion entry) async {
     await transaction(
       () async {
+        final profile = await (profileEntries.select()..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+        if (profile == null) {
+          loggy.log(LogLevel.info, 'profile with id : [$id] deleted');
+          return;
+        }
         if (entry.active.present && entry.active.value) {
           await update(profileEntries).write(const ProfileEntriesCompanion(active: Value(false)));
         }
-        await (update(profileEntries)..where((tbl) => tbl.id.equals(id))).write(entry.copyWith(lastUpdate: Value(DateTime.now())));
+        await (update(profileEntries)..where((tbl) => tbl.id.equals(id))).write(entry);
       },
     );
   }
 
   @override
-  Future<void> deleteById(String id) async {
+  Future<void> deleteById(String id, bool isActive) async {
     await transaction(
       () async {
         await (delete(profileEntries)..where((tbl) => tbl.id.equals(id))).go();
+
+        if (isActive) {
+          final profiles = await (profileEntries.select()
+                ..where(
+                  (tbl) => tbl.id.equals(id).not(),
+                ))
+              .get();
+          if (profiles.isEmpty) return;
+          final prof = profiles.first;
+          await (update(profileEntries)
+                ..where(
+                  (tbl) => tbl.id.equals(prof.id),
+                ))
+              .write(const ProfileEntriesCompanion(active: Value(true)));
+        }
       },
     );
   }

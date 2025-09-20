@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/model/environment.dart';
+import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
 
 import 'package:hiddify/core/preferences/preferences_provider.dart';
@@ -18,6 +19,36 @@ abstract class Preferences {
     "intro_completed",
     false,
     overrideValue: _debugIntroPage && kDebugMode ? false : null,
+  );
+
+  // Null means that auto selection has not been performed yet.
+  static final autoAppsSelectionRegion = PreferencesNotifier.create<Region?, String?>(
+    "auto_apps_selection_region",
+    null,
+    mapFrom: (value) => value == null || value.isEmpty ? null : Region.values.byName(value),
+    mapTo: (value) => value == null ? '' : value.name,
+  );
+
+  static final autoAppsSelectionUpdateInterval = PreferencesNotifier.create<double, double>(
+    "auto_apps_selection_update_interval",
+    1.0,
+  );
+
+  static final autoAppsSelectionLastUpdate = PreferencesNotifier.create<DateTime?, String?>(
+    "auto_apps_selection_last_update",
+    null,
+    mapFrom: (value) => value == null ? null : DateTime.tryParse(value),
+    mapTo: (value) => value?.toIso8601String(),
+  );
+
+  static final includeApps = PreferencesNotifier.create<List<String>, List<String>>(
+    "per_app_proxy_include_list",
+    <String>[],
+  );
+
+  static final excludeApps = PreferencesNotifier.create<List<String>, List<String>>(
+    "per_app_proxy_exclude_list",
+    <String>[],
   );
 
   static final silentStart = PreferencesNotifier.create<bool, bool>(
@@ -85,31 +116,5 @@ class DebugModeNotifier extends _$DebugModeNotifier {
   Future<void> update(bool value) {
     state = value;
     return _pref.write(value);
-  }
-}
-
-@Riverpod(keepAlive: true)
-class PerAppProxyList extends _$PerAppProxyList {
-  late final _include = PreferencesEntry(
-    preferences: ref.watch(sharedPreferencesProvider).requireValue,
-    key: "per_app_proxy_include_list",
-    defaultValue: <String>[],
-  );
-
-  late final _exclude = PreferencesEntry(
-    preferences: ref.watch(sharedPreferencesProvider).requireValue,
-    key: "per_app_proxy_exclude_list",
-    defaultValue: <String>[],
-  );
-
-  @override
-  List<String> build() => ref.watch(Preferences.perAppProxyMode) == PerAppProxyMode.include ? _include.read() : _exclude.read();
-
-  Future<void> update(List<String> value) {
-    state = value;
-    if (ref.read(Preferences.perAppProxyMode) == PerAppProxyMode.include) {
-      return _include.write(value);
-    }
-    return _exclude.write(value);
   }
 }

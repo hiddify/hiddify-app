@@ -101,7 +101,7 @@ class SelectedPackagesNotifier extends _$SelectedPackagesNotifier {
   @override
   List<String> build(int? ruleListOrder) {
     _ruleListOrder = ruleListOrder;
-    final value = ref.read(ruleNotifierProvider(ruleListOrder)).writeToJsonMap()['${_ruleEnum.index + 1}'];
+    final value = ref.read(ruleNotifierProvider(ruleListOrder)).writeToJsonMap()['${_ruleEnum.getIndex()}'];
     if (value is List) return value.cast<String>();
     return [];
   }
