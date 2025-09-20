@@ -30,7 +30,7 @@ class FixBtns extends ConsumerWidget {
             onTap: () async {
               final cr = await ref.read(dialogNotifierProvider.notifier).showQrScanner();
               if (cr == null) return;
-              ref.read(addProfileNotifierProvider.notifier).add(cr);
+              ref.read(addProfileNotifierProvider.notifier).addClipboard(cr);
             },
           ),
         ],
@@ -41,8 +41,8 @@ class FixBtns extends ConsumerWidget {
           title: t.fromClipboard,
           icon: Icons.content_paste,
           onTap: () async {
-            final captureResult = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
-            ref.read(addProfileNotifierProvider.notifier).add(captureResult);
+            final cr = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
+            ref.read(addProfileNotifierProvider.notifier).addClipboard(cr);
           },
         ),
         const Gap(AddProfileModalConst.fixBtnsGap),

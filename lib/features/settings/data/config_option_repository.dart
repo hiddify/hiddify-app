@@ -6,6 +6,7 @@ import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/core/utils/json_converters.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
+import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/settings/model/config_option_failure.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
@@ -551,18 +552,22 @@ abstract class ConfigOptions {
 class ConfigOptionRepository with ExceptionHandler, InfraLogger {
   ConfigOptionRepository({
     required this.preferences,
-    required this.getConfigOptions,
-  });
+    required SingboxConfigOption Function() getConfigOptions,
+  }) : _getConfigOptions = getConfigOptions;
 
   final SharedPreferences preferences;
-  final SingboxConfigOption Function() getConfigOptions;
+  final SingboxConfigOption Function() _getConfigOptions;
 
-  TaskEither<ConfigOptionFailure, SingboxConfigOption> getFullSingboxConfigOption() {
-    return exceptionHandler(
-      () async {
-        return right(getConfigOptions());
-      },
-      ConfigOptionUnexpectedFailure.new,
-    );
-  }
+  Either<ConfigOptionFailure, SingboxConfigOption> fullOptions() => Either.tryCatch(
+        () => _getConfigOptions(),
+        ConfigOptionFailure.unexpected,
+      );
+
+  Either<ConfigOptionFailure, SingboxConfigOption> fullOptionsOverrided(String? profileOverride) => Either.tryCatch(
+        () => _getConfigOptions(),
+        ConfigOptionFailure.unexpected,
+      ).flatMap((options) => Either.tryCatch(() {
+            final json = ProfileParser.applyProfileOverride(options.toJson(), profileOverride);
+            return SingboxConfigOption.fromJson(json);
+          }, ConfigOptionFailure.unexpected));
 }

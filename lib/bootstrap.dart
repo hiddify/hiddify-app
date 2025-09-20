@@ -8,6 +8,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
+import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/logger/logger_controller.dart';
 import 'package:hiddify/core/model/environment.dart';
@@ -116,6 +117,11 @@ Future<void> lazyBootstrap(
   await _init(
     "profile repository",
     () => container.read(profileRepositoryProvider.future),
+  );
+
+  await _init(
+    "translations",
+    () => container.read(translationsProvider.future),
   );
 
   await _safeInit(

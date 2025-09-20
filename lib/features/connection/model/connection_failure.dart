@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/features/settings/model/config_option_failure.dart';
 
 part 'connection_failure.freezed.dart';
 
@@ -31,6 +32,7 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
   @With<ExpectedMeasuredFailure>()
   const factory ConnectionFailure.invalidConfigOption([
     String? message,
+    ConfigOptionFailure? configOptionFailure,
   ]) = InvalidConfigOption;
 
   @With<ExpectedMeasuredFailure>()
@@ -67,10 +69,11 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
           type: t.failure.singbox.missingGeoAssets,
           message: t.failure.singbox.missingGeoAssetsMsg,
         ),
-      InvalidConfigOption(:final message) => (
-          type: t.failure.singbox.invalidConfigOptions,
-          message: message,
-        ),
+      InvalidConfigOption(:final message, :final configOptionFailure) => configOptionFailure?.present(t) ??
+          (
+            type: t.failure.singbox.invalidConfigOptions,
+            message: message,
+          ),
       InvalidConfig(:final message) => (
           type: t.failure.singbox.invalidConfig,
           message: message,

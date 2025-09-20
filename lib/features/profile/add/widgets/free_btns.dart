@@ -4,7 +4,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/add/widgets/free_btn.dart';
-import 'package:hiddify/features/profile/model/profile_local_override.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -45,12 +45,15 @@ class FreeBtns extends ConsumerWidget {
                       final consent = isFa ? profile.consent.fa : profile.consent.en;
                       final result = await ref.read(dialogNotifierProvider.notifier).showFreeProfileConsent(title: title, consent: consent);
                       if (result == true) {
-                        final localOverride = ProfileLocalOverride(
-                          name: title,
-                          enableWarp: profile.neededFeatures?.contains('warp_over_proxies'),
-                          enableFragment: profile.neededFeatures?.contains('fragment'),
-                        );
-                        ref.read(addProfileNotifierProvider.notifier).add(profile.sublink, localOverride: localOverride);
+                        await ref.read(addProfileNotifierProvider.notifier).addManual(
+                              url: profile.sublink,
+                              userOverride: UserOverride(
+                                name: title,
+                                updateInterval: 12,
+                                enableWarp: profile.neededFeatures?.contains('warp_over_proxies'),
+                                enableFragment: profile.neededFeatures?.contains('fragment'),
+                              ),
+                            );
                       }
                     },
                   );

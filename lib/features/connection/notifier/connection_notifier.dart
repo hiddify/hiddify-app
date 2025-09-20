@@ -105,10 +105,8 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       await ref.read(Preferences.startedByUser.notifier).update(true);
       await _connectionRepo
           .reconnect(
-        profile.id,
-        profile.name,
+        profile,
         ref.read(Preferences.disableMemoryLimit),
-        profile.testUrl,
       )
           .mapLeft((err) {
         loggy.warning("error reconnecting", err);
@@ -136,10 +134,8 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     }
     await _connectionRepo
         .connect(
-      activeProfile.id,
-      activeProfile.name,
+      activeProfile,
       ref.read(Preferences.disableMemoryLimit),
-      activeProfile.testUrl,
     )
         .mapLeft((ConnectionFailure err) async {
       loggy.warning("error connecting", err);

@@ -6,6 +6,9 @@ targets:
           explicit_to_json: true
       drift_dev:
         options:
+          databases:
+            app_database: "lib/core/database/app_database.dart"
+          schema_dir: "lib/core/database/schemas"
           store_date_time_values_as_text: true
       slang_build_runner:
         options:

@@ -2,6 +2,7 @@ import 'package:hiddify/core/database/database_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/http_client/http_client_provider.dart';
 import 'package:hiddify/features/profile/data/profile_data_source.dart';
+import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/settings/data/config_option_data_providers.dart';
@@ -18,7 +19,7 @@ Future<ProfileRepository> profileRepository(Ref ref) async {
     profilePathResolver: ref.watch(profilePathResolverProvider),
     singbox: ref.watch(hiddifyCoreServiceProvider),
     configOptionRepository: ref.watch(configOptionRepositoryProvider),
-    httpClient: ref.watch(httpClientProvider),
+    profileParser: ref.watch(profileParserProvider),
   );
   await repo.init().getOrElse((l) => throw l).run();
   return repo;
@@ -33,5 +34,13 @@ ProfileDataSource profileDataSource(Ref ref) {
 ProfilePathResolver profilePathResolver(Ref ref) {
   return ProfilePathResolver(
     ref.watch(appDirectoriesProvider).requireValue.workingDir,
+  );
+}
+
+@Riverpod(keepAlive: true)
+ProfileParser profileParser(Ref ref) {
+  return ProfileParser(
+    ref: ref,
+    httpClient: ref.watch(httpClientProvider),
   );
 }

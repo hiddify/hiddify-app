@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-import 'package:dartx/dartx.dart';
-import 'package:hiddify/features/profile/data/profile_parser.dart';
-import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/validators.dart';
 
 typedef ProfileLink = ({String url, String name});
@@ -37,39 +34,6 @@ abstract class LinkParser {
       url: uri.toString(),
       name: uri.queryParameters['name'] ?? '',
     );
-  }
-
-  static ({String content, String name})? protocol(String content) {
-    final normalContent = safeDecodeBase64(content);
-    final lines = normalContent.split('\n');
-    String? name;
-    for (final line in lines) {
-      final uri = Uri.tryParse(line);
-      if (uri == null) continue;
-      final fragment = uri.hasFragment ? Uri.decodeComponent(uri.fragment.split("&&detour")[0]) : null;
-      name ??= switch (uri.scheme) {
-        'ss' => fragment ?? ProxyType.shadowsocks.label,
-        'ssconf' => fragment ?? ProxyType.shadowsocks.label,
-        'vmess' => ProxyType.vmess.label,
-        'vless' => fragment ?? ProxyType.vless.label,
-        'trojan' => fragment ?? ProxyType.trojan.label,
-        'tuic' => fragment ?? ProxyType.tuic.label,
-        'hy2' || 'hysteria2' => fragment ?? ProxyType.hysteria2.label,
-        'hy' || 'hysteria' => fragment ?? ProxyType.hysteria.label,
-        'ssh' => fragment ?? ProxyType.ssh.label,
-        'wg' => fragment ?? ProxyType.wireguard.label,
-        'warp' => fragment ?? ProxyType.warp.label,
-        _ => null,
-      };
-    }
-    final headers = ProfileParser.populateHeaders(content: content);
-    final subinfo = ProfileParser.parse("", headers);
-
-    if (subinfo.name.isNotNullOrEmpty && subinfo.name != "Remote Profile") {
-      name = subinfo.name;
-    }
-
-    return (content: normalContent, name: name ?? ProxyType.unknown.label);
   }
 
   static ProfileLink? deep(String link) {

@@ -1,10 +1,8 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
@@ -51,24 +49,28 @@ class ProfilesModal extends HookConsumerWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4).copyWith(bottom: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      IconButton(
-                        onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
-                        icon: const Icon(FluentIcons.add_24_filled),
-                        tooltip: t.profile.add.shortBtnTxt, // Tooltip for accessibility
-                      ),
-                      IconButton(
+                      FilledButton.icon(
+                        label: Text(
+                          t.general.sort,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        icon: const Icon(Icons.sort_rounded),
                         onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
-                        icon: const Icon(FluentIcons.arrow_sort_24_filled),
-                        tooltip: t.general.sort,
                       ),
-                      IconButton(
+                      const Gap(8),
+                      FilledButton.icon(
+                        label: Text(
+                          t.profile.update.updateSubscriptions,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        icon: const Icon(Icons.update_rounded),
                         onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
-                        icon: const Icon(FluentIcons.arrow_sync_24_filled),
-                        tooltip: t.profile.update.updateSubscriptions,
                       ),
                     ],
                   ),

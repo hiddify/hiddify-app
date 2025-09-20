@@ -1,6 +1,7 @@
 {
   "general": {
     "appTitle": "Hiddify",
+    "auto": "Auto",
     "add": "Add",
     "save": "Save",
     "help": "Help",
@@ -34,7 +35,10 @@
     "showMore": "Show More",
     "showLess": "Show Less",
     "openAppSettings": "Open App Settings",
-    "grantPermission": "Grant Permission"
+    "grantPermission": "Grant Permission",
+    "import": "Import",
+    "export": "Export",
+    "share": "Share"
   },
   "unknownDomains": {
     "title": "External Link Warning",
@@ -121,6 +125,7 @@
         "permissionRequest": "Permission to camera to scan QR Code"
       },
       "manually": "Manual",
+      "disableAutoUpdate": "Disable Auto Update",
       "free": "FREE",
       "failedToLoad": "Failed to Load",
       "noFreeSubscriptionFound": "No free subscription was found",
@@ -170,7 +175,7 @@
       "emptyNameMsg": "Name Is Required",
       "invalidUrlMsg": "Invalid URL",
       "lastUpdate": "Last Update",
-      "updateInterval": "Auto Update",
+      "updateInterval": "Auto Update Interval",
       "updateIntervalDialogTitle": "Auto Update Interval (in Hours)"
     }
   },
@@ -279,7 +284,37 @@
       },
       "showSystemApps": "Show System Apps",
       "hideSystemApps": "Hide System Apps",
-      "clearSelection": "Clear Selection"
+      "clearSelection": "Clear All Selections",
+      "autoSelection": {
+        "title": "Auto Selection",
+        "dialogTitle": "Auto apps selection",
+        "msg": "The Auto-Selection feature for Per-App Proxy was disabled due to the region change to \"${region}\"",
+        "success": "Auto apps selection completed successfully",
+        "failure": "Auto selection failed",
+        "regionNotFound": "Auto selection not found, region \"${region}\"",
+        "performNow": "Perform Now",
+        "resetToDefault": "Reset To Default"
+      },
+      "share": {
+        "title": "Share To All",
+        "emptyList": "Your selections is empty",
+        "alreadyInAuto": "Your selections is already in the auto-list",
+        "dialogTitle": "Improving auto selection",
+        "msg": "By sharing selected apps, you help complete the \"Auto Selection\" list"
+      },
+      "import": {
+        "Clipboard": "Import from Clipboard",
+        "JsonFile": "Import from JSON File",
+        "success": "Import successful",
+        "failure": "Import failured"
+      },
+      "export": {
+        "Clipboard": "Copy to Clipboard",
+        "JsonFile": "Save to JSON File",
+        "success": "Export successful",
+        "failure": "Export failured",
+        "contentTooLarge": "Content too large. Use Export File instead"
+      }
     },
     "routeRule": {
       "pageTitle": "Route Rules",
@@ -438,7 +473,8 @@
       "unexpected": "Unexpected Error",
       "notFound": "Profile Not Found",
       "invalidConfig": "Invalid Configs",
-      "invalidUrl": "Invalid URL"
+      "invalidUrl": "Invalid URL",
+      "canceledByUser": "Canceled By User"
     },
     "connection": {
       "unexpected": "Unexpected Connection Error",

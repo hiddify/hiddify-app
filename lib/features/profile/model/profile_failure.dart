@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/features/settings/model/config_option_failure.dart';
 
 part 'profile_failure.freezed.dart';
 
@@ -20,7 +21,10 @@ sealed class ProfileFailure with _$ProfileFailure, Failure {
   const factory ProfileFailure.invalidUrl([String? message]) = ProfileInvalidUrlFailure;
 
   @With<ExpectedFailure>()
-  const factory ProfileFailure.invalidConfig([String? message]) = ProfileInvalidConfigFailure;
+  const factory ProfileFailure.invalidConfig([String? message, ConfigOptionFailure? configOptionFailure]) = ProfileInvalidConfigFailure;
+
+  @With<ExpectedFailure>()
+  const factory ProfileFailure.cancelByUser([String? message]) = ProfileCancelByUserFailure;
 
   @override
   ({String type, String? message}) present(TranslationsEn t) {
@@ -34,7 +38,8 @@ sealed class ProfileFailure with _$ProfileFailure, Failure {
           type: t.failure.profiles.invalidUrl,
           message: message,
         ),
-      ProfileInvalidConfigFailure(:final message) => (type: t.failure.profiles.invalidConfig, message: message),
+      ProfileInvalidConfigFailure(:final message, :final configOptionFailure) => configOptionFailure?.present(t) ?? (type: t.failure.profiles.invalidConfig, message: message),
+      ProfileCancelByUserFailure(:final message) => (type: t.failure.profiles.canceledByUser, message: message),
     };
   }
 }

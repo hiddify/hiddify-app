@@ -117,9 +117,9 @@ class DialogNotifier extends _$DialogNotifier {
     required String title,
     required String message,
     IconData? icon,
-    String? okText,
+    String? positiveBtnTxt,
   }) async {
-    return await _show<bool>(ConfirmationDialog(title: title, message: message, icon: icon, okText: okText)) ?? false;
+    return await _show<bool>(ConfirmationDialog(title: title, message: message, icon: icon, positiveBtnTxt: positiveBtnTxt)) ?? false;
   }
 
   Future<Region?> showRegion({required Region selected}) async {
