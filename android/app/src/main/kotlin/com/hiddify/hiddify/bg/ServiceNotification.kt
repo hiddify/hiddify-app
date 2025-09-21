@@ -26,11 +26,13 @@ import com.hiddify.hiddify.constant.Action
 import com.hiddify.hiddify.constant.Status
 import com.hiddify.hiddify.utils.CommandClient
 import com.hiddify.core.libbox.Libbox
+import com.hiddify.hiddify.Application.Companion.notification
 import com.hiddify.hiddify.utils.GrpcClientProvider
 import com.squareup.wire.GrpcClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
