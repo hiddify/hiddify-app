@@ -98,6 +98,8 @@ PODS:
     - nanopb/encode (= 3.30910.0)
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
+  - network_info_plus (0.0.1):
+    - Flutter
   - objective_c (0.0.1):
     - Flutter
   - package_info_plus (0.4.5):
@@ -156,6 +158,7 @@ DEPENDENCIES:
   - flutter_timezone (from `.symlinks/plugins/flutter_timezone/ios`)
   - in_app_review (from `.symlinks/plugins/in_app_review/ios`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/ios`)
+  - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
   - objective_c (from `.symlinks/plugins/objective_c/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -208,6 +211,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/in_app_review/ios"
   mobile_scanner:
     :path: ".symlinks/plugins/mobile_scanner/ios"
+  network_info_plus:
+    :path: ".symlinks/plugins/network_info_plus/ios"
   objective_c:
     :path: ".symlinks/plugins/objective_c/ios"
   package_info_plus:
@@ -251,6 +256,7 @@ SPEC CHECKSUMS:
   MLKitVision: 45e79d68845a2de77e2dd4d7f07947f0ed157b0e
   mobile_scanner: fd0054c52ede661e80bf5a4dea477a2467356bee
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
+  network_info_plus: 6613d9d7cdeb0e6f366ed4dbe4b3c51c52d567a9
   objective_c: 77e887b5ba1827970907e10e832eec1683f3431d
   package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
