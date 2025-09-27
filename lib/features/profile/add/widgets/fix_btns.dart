@@ -15,7 +15,7 @@ class FixBtns extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue.profile.add;
+    final t = ref.watch(translationsProvider).requireValue;
 
     final isDesktop = PlatformUtils.isDesktop;
     return Row(
@@ -25,7 +25,7 @@ class FixBtns extends ConsumerWidget {
           FixBtn(
             key: const ValueKey('add_by_qr_code_button'),
             height: height,
-            title: t.scanQr,
+            title: t.common.scanQr,
             icon: Icons.qr_code_scanner,
             onTap: () async {
               final cr = await ref.read(dialogNotifierProvider.notifier).showQrScanner();
@@ -38,7 +38,7 @@ class FixBtns extends ConsumerWidget {
         FixBtn(
           key: const ValueKey('add_from_clipboard_button'),
           height: height,
-          title: t.fromClipboard,
+          title: t.common.clipboard,
           icon: Icons.content_paste,
           onTap: () async {
             final cr = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
@@ -49,7 +49,7 @@ class FixBtns extends ConsumerWidget {
         FixBtn(
           key: const ValueKey('add_manually_button'),
           height: height,
-          title: t.manually,
+          title: t.common.manually,
           icon: Icons.add,
           onTap: () {
             ref.read(addProfilePageNotifierProvider.notifier).goManual();

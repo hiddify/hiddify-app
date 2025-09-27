@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:dartx/dartx_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
@@ -60,18 +62,25 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
   }
 
   Future<bool> exportJsonClipboard({bool excludePrivate = true}) async {
+    final t = ref.read(translationsProvider).requireValue;
     try {
       final json = await _exportJson(excludePrivate);
       if (json == null) return false;
       await Clipboard.setData(ClipboardData(text: json));
+      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
       return true;
+    } on PlatformException {
+      ref.read(inAppNotificationControllerProvider).showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
+      return false;
     } catch (e, st) {
       loggy.warning("error exporting config options to clipboard", e, st);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.common.msg.export.clipboard.failure);
       return false;
     }
   }
 
   Future<bool> exportJsonFile({bool excludePrivate = true}) async {
+    final t = ref.read(translationsProvider).requireValue;
     try {
       final json = await _exportJson(excludePrivate);
       if (json == null) return false;
@@ -89,56 +98,60 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
         if (!await file.exists()) await file.parent.create(recursive: true);
         await file.writeAsBytes(bytes);
       }
+      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.file.success);
       return true;
     } catch (e, st) {
       loggy.warning("error exporting config options to json file", e, st);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.common.msg.export.file.failure);
       return false;
     }
   }
 
-  Future<bool> _importJson(String input) async {
-    try {
-      if (jsonDecode(input) case final Map<String, dynamic> map) {
-        for (final option in ConfigOptions.preferences.entries) {
-          final query = option.key.split('.').map((e) => '["$e"]').join();
-          final res = JsonPath('\$$query').read(map).firstOrNull;
-          if (res?.value case final value?) {
-            try {
-              await ref.read(option.value.notifier).updateRaw(value);
-            } catch (e) {
-              loggy.debug("error updating [${option.key}]: $e", e);
-            }
+  Future<void> _importJson(String input) async {
+    if (jsonDecode(input) case final Map<String, dynamic> map) {
+      for (final option in ConfigOptions.preferences.entries) {
+        final query = option.key.split('.').map((e) => '["$e"]').join();
+        final res = JsonPath('\$$query').read(map).firstOrNull;
+        if (res?.value case final value?) {
+          try {
+            await ref.read(option.value.notifier).updateRaw(value);
+          } catch (e) {
+            loggy.debug("error updating [${option.key}]: $e", e);
           }
         }
       }
-      return true;
-    } catch (e, st) {
-      loggy.warning("error importing config options from input", e, st);
-      return false;
     }
   }
 
   Future<bool> importFromClipboard() async {
+    final t = ref.read(translationsProvider).requireValue;
     try {
       final input = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text);
       if (input == null) return false;
-      return await _importJson(input);
+      await _importJson(input);
+      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.import.success);
+      return true;
     } catch (e, st) {
       loggy.warning("error importing config options from clipboard", e, st);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.common.msg.import.failure);
       return false;
     }
   }
 
   Future<bool> importFromJsonFile() async {
+    final t = ref.read(translationsProvider).requireValue;
     try {
       final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['json']);
       if (result == null) return false;
       final file = File(result.files.single.path!);
       if (!await file.exists()) return false;
       final bytes = await file.readAsBytes();
-      return await _importJson(utf8.decode(bytes));
+      await _importJson(utf8.decode(bytes));
+      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.import.success);
+      return true;
     } catch (e, st) {
       loggy.warning("error importing config options from json file", e, st);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.common.msg.import.failure);
       return false;
     }
   }

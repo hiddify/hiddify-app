@@ -62,7 +62,7 @@ class FreeBtns extends ConsumerWidget {
             )
           : Center(
               child: Text(
-                (freeProfiles.value?.isEmpty ?? true) ? t.profile.add.noFreeSubscriptionFound : t.profile.add.noFreeSubscriptionFoundForRegion(region: ref.watch(ConfigOptions.region).name),
+                (freeProfiles.value?.isEmpty ?? true) ? t.pages.profiles.freeSubNotFound : t.pages.profiles.freeSubNotFoundForRegion(region: ref.watch(ConfigOptions.region).name),
                 style: theme.textTheme.bodySmall!.copyWith(
                   color: theme.colorScheme.onSurface,
                 ),
@@ -70,7 +70,7 @@ class FreeBtns extends ConsumerWidget {
             ),
       error: (error, stackTrace) => Center(
         child: Text(
-          t.profile.add.failedToLoad,
+          t.pages.profiles.failedToLoad,
           style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface),
         ),
       ),

@@ -18,7 +18,7 @@ sealed class LogFailure with _$LogFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       LogUnexpectedFailure() => (
-          type: t.failure.unexpected,
+          type: t.errors.unexpected,
           message: null,
         ),
     };

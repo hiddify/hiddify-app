@@ -8,10 +8,10 @@ enum AppThemeMode {
   black;
 
   String present(TranslationsEn t) => switch (this) {
-        system => t.settings.general.themeModes.system,
-        light => t.settings.general.themeModes.light,
-        dark => t.settings.general.themeModes.dark,
-        black => t.settings.general.themeModes.black,
+        system => t.pages.settings.general.themeModes.system,
+        light => t.pages.settings.general.themeModes.light,
+        dark => t.pages.settings.general.themeModes.dark,
+        black => t.pages.settings.general.themeModes.black,
       };
 
   ThemeMode get flutterThemeMode => switch (this) {

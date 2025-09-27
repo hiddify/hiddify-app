@@ -39,7 +39,7 @@ class HomePage extends HookConsumerWidget {
             Text.rich(
               TextSpan(
                 children: [
-                  TextSpan(text: t.general.appTitle),
+                  TextSpan(text: t.common.appTitle),
                   const TextSpan(text: " "),
                   const WidgetSpan(
                     child: AppVersionLabel(),
@@ -65,7 +65,7 @@ class HomePage extends HookConsumerWidget {
           //         )),
           Semantics(
             key: const ValueKey("profile_quick_settings"),
-            label: t.config.quickSettings,
+            label: t.pages.home.quickSettings,
             child: IconButton(
               icon: Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
               onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
@@ -74,7 +74,7 @@ class HomePage extends HookConsumerWidget {
           const Gap(8),
           Semantics(
             key: const ValueKey("profile_add_button"),
-            label: t.profile.add.buttonText,
+            label: t.pages.profiles.add,
             child: IconButton(
               icon: Icon(
                 Icons.add_rounded,
@@ -172,7 +172,7 @@ class AppVersionLabel extends HookConsumerWidget {
     if (version.isBlank) return const SizedBox();
 
     return Semantics(
-      label: t.about.version,
+      label: t.common.version,
       button: false,
       child: Container(
         decoration: BoxDecoration(

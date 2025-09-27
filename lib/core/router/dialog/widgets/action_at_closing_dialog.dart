@@ -11,7 +11,7 @@ class ActionsAtClosingDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     return SimpleDialog(
-      title: Text(t.settings.general.actionAtClosing),
+      title: Text(t.pages.settings.general.actionAtClosing),
       children: ActionsAtClosing.values
           .map(
             (e) => RadioListTile(

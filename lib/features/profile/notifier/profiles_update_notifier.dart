@@ -91,17 +91,17 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
       await for (final profile in Stream.fromIterable(remoteProfiles)) {
         final updateInterval = profile.options?.updateInterval;
         if (force || updateInterval != null && updateInterval <= DateTime.now().difference(profile.lastUpdate)) {
-          final t = ref.read(translationsProvider).requireValue.profile.update;
+          final t = ref.read(translationsProvider).requireValue;
           await ref.read(profileRepositoryProvider).requireValue.upsertRemote(profile.url).mapLeft(
             (l) {
               loggy.debug("error updating profile [${profile.id}]", l);
-              ref.read(inAppNotificationControllerProvider).showErrorToast(t.namedFailureMsg(name: profile.name));
+              ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.profiles.msg.update.failureNamed(name: profile.name));
               state = AsyncData((name: profile.name, success: false));
             },
           ).map(
             (_) {
               loggy.debug("profile [${profile.id}] updated successfully");
-              ref.read(inAppNotificationControllerProvider).showSuccessToast(t.namedSuccessMsg(name: profile.name));
+              ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.update.successNamed(name: profile.name));
               state = AsyncData((name: profile.name, success: true));
             },
           ).run();

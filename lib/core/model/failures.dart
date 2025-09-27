@@ -27,7 +27,7 @@ extension ErrorPresenter on TranslationsEn {
         UnexpectedFailure(error: final nestedErr?) => errorToPair(nestedErr),
         Failure() => error.present(this),
         DioException() => error.present(this),
-        _ => (type: failure.unexpected, message: error.toString()),
+        _ => (type: errors.unexpected, message: error.toString()),
       };
 
   PresentableError presentError(
@@ -54,19 +54,19 @@ extension ErrorPresenter on TranslationsEn {
 
 extension DioExceptionPresenter on DioException {
   PresentableError present(TranslationsEn t) => switch (type) {
-        DioExceptionType.connectionTimeout || DioExceptionType.sendTimeout || DioExceptionType.receiveTimeout => (type: t.failure.connection.timeout, message: null),
+        DioExceptionType.connectionTimeout || DioExceptionType.sendTimeout || DioExceptionType.receiveTimeout => (type: t.errors.connection.timeout, message: null),
         DioExceptionType.badCertificate => (
-            type: t.failure.connection.badCertificate,
+            type: t.errors.connection.badCertificate,
             message: message,
           ),
         DioExceptionType.badResponse => (
-            type: t.failure.connection.badResponse,
+            type: t.errors.connection.badResponse,
             message: message,
           ),
         DioExceptionType.connectionError => (
-            type: t.failure.connection.connectionError,
+            type: t.errors.connection.connectionError,
             message: message,
           ),
-        _ => (type: t.failure.connection.unexpected, message: message),
+        _ => (type: t.errors.connection.unexpected, message: message),
       };
 }

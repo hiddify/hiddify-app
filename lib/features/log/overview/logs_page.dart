@@ -31,7 +31,7 @@ class LogsPage extends HookConsumerWidget with PresLogger {
     final List<PopupMenuEntry> popupButtons = debug || PlatformUtils.isDesktop
         ? [
             PopupMenuItem(
-              child: Text(t.logs.shareCoreLogs),
+              child: Text(t.pages.logs.shareCoreLogs),
               onTap: () async {
                 await UriUtils.tryShareOrLaunchFile(
                   Uri.parse(pathResolver.coreFile().path),
@@ -40,7 +40,7 @@ class LogsPage extends HookConsumerWidget with PresLogger {
               },
             ),
             PopupMenuItem(
-              child: Text(t.logs.shareAppLogs),
+              child: Text(t.pages.logs.shareAppLogs),
               onTap: () async {
                 await UriUtils.tryShareOrLaunchFile(
                   Uri.parse(pathResolver.appFile().path),
@@ -53,26 +53,26 @@ class LogsPage extends HookConsumerWidget with PresLogger {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.logs.pageTitle),
+        title: Text(t.pages.logs.title),
         actions: [
           if (state.paused)
             IconButton(
               onPressed: notifier.resume,
               icon: const Icon(FluentIcons.play_20_regular),
-              tooltip: t.logs.resumeTooltip,
+              tooltip: t.common.resume,
               iconSize: 20,
             )
           else
             IconButton(
               onPressed: notifier.pause,
               icon: const Icon(FluentIcons.pause_20_regular),
-              tooltip: t.logs.pauseTooltip,
+              tooltip: t.common.pause,
               iconSize: 20,
             ),
           IconButton(
             onPressed: notifier.clear,
             icon: const Icon(FluentIcons.delete_lines_20_regular),
-            tooltip: t.logs.clearTooltip,
+            tooltip: t.common.clear,
             iconSize: 20,
           ),
           if (popupButtons.isNotEmpty)
@@ -98,7 +98,7 @@ class LogsPage extends HookConsumerWidget with PresLogger {
                   SliverPinnedHeader(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.background,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -113,7 +113,7 @@ class LogsPage extends HookConsumerWidget with PresLogger {
                                 onChanged: notifier.filterMessage,
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  hintText: t.logs.filterHint,
+                                  hintText: t.common.filter,
                                 ),
                               ),
                             ),
@@ -129,7 +129,7 @@ class LogsPage extends HookConsumerWidget with PresLogger {
                               items: [
                                 DropdownMenuItem(
                                   value: none(),
-                                  child: Text(t.logs.allLevelsFilter),
+                                  child: Text(t.common.all),
                                 ),
                                 ...LogLevel.choices.map(
                                   (e) => DropdownMenuItem(

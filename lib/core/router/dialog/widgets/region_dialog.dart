@@ -12,7 +12,7 @@ class RegionDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     return SimpleDialog(
-      title: Text(t.settings.general.region),
+      title: Text(t.pages.settings.routing.region),
       children: Region.values
           .map(
             (e) => RadioListTile(

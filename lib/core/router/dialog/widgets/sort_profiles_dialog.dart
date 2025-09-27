@@ -15,7 +15,7 @@ class SortProfilesDialog extends HookConsumerWidget {
     final sort = ref.watch(profilesSortNotifierProvider);
 
     return AlertDialog(
-      title: Text(t.general.sortBy),
+      title: Text(t.dialogs.sortProfiles.title),
       content: ConstrainedBox(
         constraints: AlertDialogConst.boxConstraints,
         child: SingleChildScrollView(

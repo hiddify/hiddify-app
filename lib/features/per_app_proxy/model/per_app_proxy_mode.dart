@@ -9,16 +9,16 @@ enum PerAppProxyMode {
 
   ({String title, String message}) present(TranslationsEn t) => switch (this) {
         off => (
-            title: t.settings.network.perAppProxyModes.off,
-            message: t.settings.network.perAppProxyModes.offMsg,
+            title: t.pages.settings.routing.perAppProxy.modes.all,
+            message: t.pages.settings.routing.perAppProxy.modes.allMsg,
           ),
         include => (
-            title: t.settings.network.perAppProxyModes.include,
-            message: t.settings.network.perAppProxyModes.includeMsg,
+            title: t.pages.settings.routing.perAppProxy.modes.proxy,
+            message: t.pages.settings.routing.perAppProxy.modes.proxyMsg,
           ),
         exclude => (
-            title: t.settings.network.perAppProxyModes.exclude,
-            message: t.settings.network.perAppProxyModes.excludeMsg,
+            title: t.pages.settings.routing.perAppProxy.modes.bypass,
+            message: t.pages.settings.routing.perAppProxy.modes.bypassMsg,
           ),
       };
 
@@ -40,12 +40,12 @@ enum AppProxyMode {
 
   ({String title, String message}) present(Translations t) => switch (this) {
         include => (
-            title: t.settings.network.perAppProxyModes.include,
-            message: t.settings.network.perAppProxyModes.includeMsg,
+            title: t.pages.settings.routing.perAppProxy.modes.proxy,
+            message: t.pages.settings.routing.perAppProxy.modes.proxyMsg,
           ),
         exclude => (
-            title: t.settings.network.perAppProxyModes.exclude,
-            message: t.settings.network.perAppProxyModes.excludeMsg,
+            title: t.pages.settings.routing.perAppProxy.modes.bypass,
+            message: t.pages.settings.routing.perAppProxy.modes.bypassMsg,
           ),
       };
 }

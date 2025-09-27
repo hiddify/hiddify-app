@@ -55,7 +55,7 @@ class ProfilesModal extends HookConsumerWidget {
                     children: [
                       FilledButton.icon(
                         label: Text(
-                          t.general.sort,
+                          t.common.sort,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -65,7 +65,7 @@ class ProfilesModal extends HookConsumerWidget {
                       const Gap(8),
                       FilledButton.icon(
                         label: Text(
-                          t.profile.update.updateSubscriptions,
+                          t.pages.profiles.updateSub,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

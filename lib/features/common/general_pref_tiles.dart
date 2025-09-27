@@ -19,12 +19,12 @@ class LocalePrefTile extends ConsumerWidget {
 
     final locale = ref.watch(localePreferencesProvider);
     return ListTile(
-      title: Text(t.settings.general.locale),
+      title: Text(t.pages.settings.general.locale),
       subtitle: Text(locale.localeName),
       leading: const Icon(Icons.translate_rounded),
       onTap: () async {
         final selectedLocale = await ref.read(dialogNotifierProvider.notifier).showSettingPicker<AppLocale>(
-              title: t.settings.general.locale,
+              title: t.pages.settings.general.locale,
               selected: locale,
               onReset: () => ref.read(localePreferencesProvider.notifier).changeLocale(AppLocale.en),
               options: AppLocale.values,
@@ -48,7 +48,7 @@ class RegionPrefTile extends ConsumerWidget {
     final region = ref.watch(ConfigOptions.region);
 
     return ListTile(
-      title: Text(t.settings.general.region),
+      title: Text(t.pages.settings.routing.region),
       subtitle: Text(
         region.present(t),
         style: Theme.of(context).textTheme.bodySmall,
@@ -91,9 +91,9 @@ class EnableAnalyticsPrefTile extends ConsumerWidget {
     final enabled = ref.watch(analyticsControllerProvider).requireValue;
 
     return SwitchListTile.adaptive(
-      title: Text(t.settings.general.enableAnalytics),
+      title: Text(t.pages.settings.general.enableAnalytics),
       subtitle: Text(
-        t.settings.general.enableAnalyticsMsg,
+        t.pages.settings.general.enableAnalyticsMsg,
         style: Theme.of(context).textTheme.bodySmall,
       ),
       secondary: const Icon(Icons.analytics_rounded),
@@ -122,7 +122,7 @@ class ThemeModePrefTile extends ConsumerWidget {
     final themeMode = ref.watch(themePreferencesProvider);
 
     return ListTile(
-      title: Text(t.settings.general.themeMode),
+      title: Text(t.pages.settings.general.themeMode),
       subtitle: Text(themeMode.present(t)),
       leading: Icon(
         switch (ref.watch(themePreferencesProvider)) {
@@ -134,7 +134,7 @@ class ThemeModePrefTile extends ConsumerWidget {
       ),
       onTap: () async {
         final selectedThemeMode = await ref.read(dialogNotifierProvider.notifier).showSettingPicker<AppThemeMode>(
-              title: t.settings.general.themeMode,
+              title: t.pages.settings.general.themeMode,
               selected: themeMode,
               onReset: () => ref.read(themePreferencesProvider.notifier).changeThemeMode(AppThemeMode.system),
               options: AppThemeMode.values,
@@ -158,7 +158,7 @@ class ClosingPrefTile extends ConsumerWidget {
     final action = ref.watch(Preferences.actionAtClose);
 
     return ListTile(
-      title: Text(t.settings.general.actionAtClosing),
+      title: Text(t.pages.settings.general.actionAtClosing),
       subtitle: Text(action.present(t)),
       leading: const Icon(Icons.logout_rounded),
       onTap: () async {

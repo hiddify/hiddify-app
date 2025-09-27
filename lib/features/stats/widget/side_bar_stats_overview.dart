@@ -50,7 +50,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                 ),
               ),
               label: AnimatedText(
-                showAll ? t.general.showLess : t.general.showMore,
+                showAll ? t.common.showLess : t.common.showMore,
               ),
             ),
           ),
@@ -60,19 +60,19 @@ class SideBarStatsOverview extends HookConsumerWidget {
             crossFadeState: showAll ? CrossFadeState.showSecond : CrossFadeState.showFirst,
             duration: kAnimationDuration,
             firstChild: StatsCard(
-              title: t.stats.traffic,
+              title: t.components.stats.traffic,
               stats: [
                 (
                   label: const Icon(FluentIcons.arrow_download_16_regular),
                   data: Text(stats.downlink.toInt().speed()),
-                  semanticLabel: t.stats.speed,
+                  semanticLabel: t.components.stats.speed,
                 ),
                 (
                   label: const Icon(
                     FluentIcons.arrow_bidirectional_up_down_16_regular,
                   ),
                   data: Text(stats.downlinkTotal.toInt().size()),
-                  semanticLabel: t.stats.totalTransferred,
+                  semanticLabel: t.components.stats.totalTransferred,
                 ),
               ],
             ),
@@ -80,7 +80,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 StatsCard(
-                  title: t.stats.trafficLive,
+                  title: t.components.stats.trafficLive,
                   stats: [
                     (
                       label: const Text(
@@ -88,7 +88,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                         style: TextStyle(color: Colors.green),
                       ),
                       data: Text(stats.uplink.toInt().speed()),
-                      semanticLabel: t.stats.uplink,
+                      semanticLabel: t.components.stats.uplink,
                     ),
                     (
                       label: Text(
@@ -98,13 +98,13 @@ class SideBarStatsOverview extends HookConsumerWidget {
                         ),
                       ),
                       data: Text(stats.downlink.toInt().speed()),
-                      semanticLabel: t.stats.downlink,
+                      semanticLabel: t.components.stats.downlink,
                     ),
                   ],
                 ),
                 const Gap(8),
                 StatsCard(
-                  title: t.stats.trafficTotal,
+                  title: t.components.stats.trafficTotal,
                   stats: [
                     (
                       label: const Text(
@@ -112,7 +112,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                         style: TextStyle(color: Colors.green),
                       ),
                       data: Text(stats.uplinkTotal.toInt().size()),
-                      semanticLabel: t.stats.uplink,
+                      semanticLabel: t.components.stats.uplink,
                     ),
                     (
                       label: Text(
@@ -122,7 +122,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                         ),
                       ),
                       data: Text(stats.downlinkTotal.toInt().size()),
-                      semanticLabel: t.stats.downlink,
+                      semanticLabel: t.components.stats.downlink,
                     ),
                   ],
                 ),

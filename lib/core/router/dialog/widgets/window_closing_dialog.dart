@@ -21,7 +21,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
     final t = ref.watch(translationsProvider).requireValue;
 
     return AlertDialog(
-      title: Text(t.window.alertMessage),
+      title: Text(t.dialogs.windowClosing.alertMessage),
       content: GestureDetector(
         onTap: () => setState(() {
           remember = !remember;
@@ -38,7 +38,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
             ),
             const SizedBox(width: 16),
             Text(
-              t.window.remember,
+              t.dialogs.windowClosing.remember,
               style: const TextStyle(fontSize: 16),
             ),
           ],
@@ -52,7 +52,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
             }
             ref.read(windowNotifierProvider.notifier).exit();
           },
-          child: Text(t.window.close),
+          child: Text(t.common.close),
         ),
         FilledButton(
           onPressed: () async {
@@ -62,7 +62,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
             context.pop(false);
             await ref.read(windowNotifierProvider.notifier).hide();
           },
-          child: Text(t.window.hide),
+          child: Text(t.common.hide),
         ),
       ],
     );

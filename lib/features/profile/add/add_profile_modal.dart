@@ -98,12 +98,12 @@ class AddProfileManual extends HookConsumerWidget {
 
   String _genSliderText(Translations t, int sliderValue) {
     if (sliderValue == 0) {
-      return t.general.auto;
+      return t.common.auto;
     } else if (sliderValue < 24) {
-      return t.profile.interval.hour(n: sliderValue);
+      return t.common.interval.hour(n: sliderValue);
     }
-    final day = t.profile.interval.day(n: sliderValue ~/ 24);
-    final hour = t.profile.interval.hour(n: sliderValue % 24);
+    final day = t.common.interval.day(n: sliderValue ~/ 24);
+    final hour = t.common.interval.hour(n: sliderValue % 24);
     return '$day $hour';
   }
 
@@ -138,7 +138,7 @@ class AddProfileManual extends HookConsumerWidget {
             padding: const EdgeInsetsDirectional.fromSTEB(16, 8, 8, 12),
             child: Row(
               children: [
-                Expanded(child: Text(t.profile.add.manually, style: theme.textTheme.headlineMedium)),
+                Expanded(child: Text(t.common.manually, style: theme.textTheme.headlineMedium)),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => ref.read(addProfilePageNotifierProvider.notifier).goOptions(),
@@ -151,9 +151,9 @@ class AddProfileManual extends HookConsumerWidget {
             child: CustomTextFormField(
               maxLines: 1,
               controller: nameTextController,
-              validator: (value) => (value?.isEmpty ?? true) ? t.profile.detailsForm.emptyNameMsg : null,
-              label: t.profile.detailsForm.nameLabel,
-              hint: t.profile.detailsForm.nameHint,
+              validator: (value) => (value?.isEmpty ?? true) ? t.pages.profileDetails.form.emptyName : null,
+              label: t.common.name,
+              hint: t.pages.profileDetails.form.nameHint,
             ),
           ),
           const Gap(16),
@@ -162,15 +162,15 @@ class AddProfileManual extends HookConsumerWidget {
             child: CustomTextFormField(
               maxLines: 1,
               controller: urlTextController,
-              validator: (value) => (value != null && !isUrl(value)) ? t.profile.detailsForm.invalidUrlMsg : null,
-              label: t.profile.detailsForm.urlLabel,
-              hint: t.profile.detailsForm.urlHint,
+              validator: (value) => (value != null && !isUrl(value)) ? t.pages.profileDetails.form.invalidUrl : null,
+              label: t.common.url,
+              hint: t.pages.profileDetails.form.urlHint,
             ),
           ),
           const Gap(12),
           SwitchListTile.adaptive(
             title: Text(
-              t.profile.add.disableAutoUpdate,
+              t.pages.profileDetails.form.disableAutoUpdate,
               style: theme.textTheme.titleSmall!.copyWith(
                 color: theme.colorScheme.onSurface,
               ),
@@ -193,7 +193,7 @@ class AddProfileManual extends HookConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                t.profile.detailsForm.updateInterval,
+                                t.pages.profileDetails.form.autoUpdateInterval,
                                 style: theme.textTheme.titleSmall!.copyWith(
                                   color: theme.colorScheme.onSurface,
                                 ),
@@ -231,7 +231,7 @@ class AddProfileManual extends HookConsumerWidget {
               children: [
                 Expanded(
                   child: FilledButton(
-                    child: Text(t.general.add),
+                    child: Text(t.common.add),
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
                         final i = updateInterval.value.toInt();

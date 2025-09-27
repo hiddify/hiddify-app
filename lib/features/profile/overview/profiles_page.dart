@@ -29,22 +29,22 @@ class ProfilesPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.profile.overviewPageTitle),
+        title: Text(t.pages.profiles.title),
         actions: [
           IconButton(
             onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
             icon: const Icon(Icons.add_rounded),
-            tooltip: t.profile.add.shortBtnTxt, // Tooltip for accessibility
+            tooltip: t.pages.profiles.add, // Tooltip for accessibility
           ),
           IconButton(
             onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
             icon: const Icon(Icons.sort_rounded),
-            tooltip: t.general.sort,
+            tooltip: t.common.sort,
           ),
           IconButton(
             onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
             icon: const Icon(Icons.update_rounded),
-            tooltip: t.profile.update.updateSubscriptions,
+            tooltip: t.pages.profiles.updateSub,
           ),
           const Gap(8),
         ],

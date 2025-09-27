@@ -421,7 +421,7 @@ class QrCodeScannerDialog extends ConsumerWidget {
                   )),
             ),
             errorBuilder: (p0, p1, p2) => Center(
-              child: Text(t.profile.add.qrScanner.permissionDeniedError),
+              child: Text(t.common.msg.permission.denied),
             ),
             onDetect: (barcodes) {
               final rawData = barcodes.barcodes.first.rawValue;

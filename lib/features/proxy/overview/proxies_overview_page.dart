@@ -26,13 +26,13 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.proxies.pageTitle),
+        title: Text(t.pages.proxies.title),
         actions: [
           PopupMenuButton<ProxiesSort>(
             initialValue: sortBy,
             onSelected: ref.read(proxiesSortNotifierProvider.notifier).update,
             icon: const Icon(FluentIcons.arrow_sort_24_regular),
-            tooltip: t.proxies.sortTooltip,
+            tooltip: t.pages.proxies.sort,
             itemBuilder: (context) {
               return [
                 ...ProxiesSort.values.map(
@@ -50,7 +50,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
       floatingActionButton: proxies.value != null
           ? FloatingActionButton(
               onPressed: () async => await ref.watch(proxiesOverviewNotifierProvider.notifier).urlTest(proxies.value!.tag),
-              tooltip: t.proxies.delayTestTooltip,
+              tooltip: t.pages.proxies.testDelay,
               child: const Icon(FluentIcons.flash_24_filled),
             )
           : null,
@@ -79,7 +79,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                   },
                 );
               })
-            : Center(child: Text(t.proxies.emptyProxiesMsg)),
+            : Center(child: Text(t.pages.proxies.empty)),
         error: (error, stackTrace) => Center(
           child: Text(
             t.presentShortError(error),

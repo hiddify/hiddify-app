@@ -35,17 +35,17 @@ enum ServiceMode {
   //     };
 
   String present(TranslationsEn t) => switch (this) {
-        proxy => t.config.serviceModes.proxy,
-        systemProxy => t.config.serviceModes.systemProxy,
-        tun => t.config.serviceModes.tun,
-        tunService => t.config.serviceModes.tunService,
+        proxy => t.pages.settings.inbound.serviceModes.proxy,
+        systemProxy => t.pages.settings.inbound.serviceModes.systemProxy,
+        tun => t.pages.settings.inbound.serviceModes.tun,
+        tunService => t.pages.settings.inbound.serviceModes.tunService,
       };
 
   String presentShort(TranslationsEn t) => switch (this) {
-        proxy => t.config.shortServiceModes.proxy,
-        systemProxy => t.config.shortServiceModes.systemProxy,
-        tun => t.config.shortServiceModes.tun,
-        tunService => t.config.shortServiceModes.tunService,
+        proxy => t.pages.settings.inbound.shortServiceModes.proxy,
+        systemProxy => t.pages.settings.inbound.shortServiceModes.systemProxy,
+        tun => t.pages.settings.inbound.shortServiceModes.tun,
+        tunService => t.pages.settings.inbound.shortServiceModes.tunService,
       };
 }
 
@@ -61,10 +61,10 @@ enum IPv6Mode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        disable => t.config.ipv6Modes.disable,
-        enable => t.config.ipv6Modes.enable,
-        prefer => t.config.ipv6Modes.prefer,
-        only => t.config.ipv6Modes.only,
+        disable => t.pages.settings.routing.ipv6Modes.disable,
+        enable => t.pages.settings.routing.ipv6Modes.enable,
+        prefer => t.pages.settings.routing.ipv6Modes.prefer,
+        only => t.pages.settings.routing.ipv6Modes.only,
       };
 }
 
@@ -80,9 +80,12 @@ enum DomainStrategy {
 
   final String key;
 
-  String get displayName => switch (this) {
-        auto => "auto",
-        _ => key,
+  String present(TranslationsEn t) => switch (this) {
+        auto => t.pages.settings.dns.domainStrategy.auto,
+        preferIpv6 => t.pages.settings.dns.domainStrategy.preferIpv6,
+        preferIpv4 => t.pages.settings.dns.domainStrategy.preferIpv4,
+        ipv4Only => t.pages.settings.dns.domainStrategy.ipv4Only,
+        ipv6Only => t.pages.settings.dns.domainStrategy.ipv6Only,
       };
 }
 
@@ -90,6 +93,12 @@ enum TunImplementation {
   mixed,
   system,
   gvisor;
+
+  String present(TranslationsEn t) => switch (this) {
+        mixed => t.pages.settings.inbound.tunImplementations.mixed,
+        system => t.pages.settings.inbound.tunImplementations.system,
+        gvisor => t.pages.settings.inbound.tunImplementations.gvisor,
+      };
 }
 
 enum MuxProtocol {
@@ -108,7 +117,12 @@ enum WarpDetourMode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        proxyOverWarp => t.config.warpDetourModes.proxyOverWarp,
-        warpOverProxy => t.config.warpDetourModes.warpOverProxy,
+        proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarp,
+        warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxy,
+      };
+
+  String presentExplain(TranslationsEn t) => switch (this) {
+        proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarpExplain,
+        warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxyExplain,
       };
 }

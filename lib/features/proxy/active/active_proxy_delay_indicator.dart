@@ -38,12 +38,12 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
               const Gap(8),
               if (delay > 0)
                 Text.rich(
-                  semanticsLabel: timeout ? t.proxies.delaySemantics.timeout : t.proxies.delaySemantics.result(delay: delay),
+                  semanticsLabel: timeout ? t.pages.proxies.delay.timeout : t.pages.proxies.delay.result(delay: delay),
                   TextSpan(
                     children: [
                       if (timeout)
                         TextSpan(
-                          text: t.general.timeout,
+                          text: t.common.timeout,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.error,
@@ -61,7 +61,7 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
                 )
               else
                 Semantics(
-                  label: t.proxies.delaySemantics.testing,
+                  label: t.pages.proxies.delay.testing,
                   child: const ShimmerSkeleton(width: 48, height: 18),
                 ),
             ],

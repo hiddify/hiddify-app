@@ -10,20 +10,20 @@ class NoActiveProfileDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     return AlertDialog(
-      title: Text(t.home.noActiveProfileMsg),
-      content: Text(t.home.emptyProfilesMsg.text),
+      title: Text(t.dialogs.noActiveProfile.title),
+      content: Text(t.dialogs.noActiveProfile.msg),
       actions: [
         TextButton(
           onPressed: () async {
             await UriUtils.tryLaunch(
-              Uri.parse(t.home.emptyProfilesMsg.buttonHelp.url),
+              Uri.parse(t.dialogs.noActiveProfile.helpBtn.url),
             );
           },
-          child: Text(t.home.emptyProfilesMsg.buttonHelp.label),
+          child: Text(t.dialogs.noActiveProfile.helpBtn.label),
         ),
         TextButton(
           onPressed: () => context.pop(),
-          child: Text(t.general.ok),
+          child: Text(t.common.ok),
         ),
       ],
     );

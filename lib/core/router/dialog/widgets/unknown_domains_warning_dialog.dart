@@ -17,31 +17,31 @@ class UnknownDomainsWarningDialog extends HookConsumerWidget {
         children: [
           const Icon(Icons.warning_rounded, color: Colors.orange),
           const Gap(8),
-          Text(t.unknownDomains.title),
+          Text(t.dialogs.unknownDomainsWarning.title),
         ],
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(t.unknownDomains.youAreAboutToVisit),
+          Text(t.dialogs.unknownDomainsWarning.youAreAboutToVisit),
           const Gap(8),
           Text(
             url,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           const Gap(16),
-          Text(t.unknownDomains.thisWebsiteIsNotInOurTrustedList),
+          Text(t.dialogs.unknownDomainsWarning.thisWebsiteIsNotInOurTrustedList),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () => context.pop(false),
-          child: Text(t.general.cancel),
+          child: Text(t.common.cancel),
         ),
         FilledButton(
           onPressed: () => context.pop(true),
-          child: Text(t.general.kContinue),
+          child: Text(t.common.kContinue),
         ),
       ],
     );

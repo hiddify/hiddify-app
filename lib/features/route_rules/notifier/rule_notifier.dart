@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/route_rules/notifier/rules_notifier.dart';
 import 'package:hiddify/hiddifycore/generated/v2/config/route_rule.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,6 +30,27 @@ enum RuleEnum {
   domainRegex;
 
   int getIndex() => index + 1;
+
+  String present(Translations t) => switch (this) {
+        listOrder => this.name,
+        enabled => this.name,
+        name => t.pages.settings.routing.routeRule.rule.tileTitle['name']!,
+        outbound => t.pages.settings.routing.routeRule.rule.tileTitle['outbound']!,
+        ruleSet => t.pages.settings.routing.routeRule.rule.tileTitle['rule_set']!,
+        packageName => t.pages.settings.routing.routeRule.rule.tileTitle['package_name']!,
+        processName => t.pages.settings.routing.routeRule.rule.tileTitle['process_name']!,
+        processPath => t.pages.settings.routing.routeRule.rule.tileTitle['process_path']!,
+        network => t.pages.settings.routing.routeRule.rule.tileTitle['network']!,
+        portRange => t.pages.settings.routing.routeRule.rule.tileTitle['port_range']!,
+        sourcePortRange => t.pages.settings.routing.routeRule.rule.tileTitle['source_port_range']!,
+        protocol => t.pages.settings.routing.routeRule.rule.tileTitle['protocol']!,
+        ipCidr => t.pages.settings.routing.routeRule.rule.tileTitle['ip_cidr']!,
+        sourceIpCidr => t.pages.settings.routing.routeRule.rule.tileTitle['source_ip_cidr']!,
+        domain => t.pages.settings.routing.routeRule.rule.tileTitle['domain']!,
+        domainSuffix => t.pages.settings.routing.routeRule.rule.tileTitle['domain_suffixe']!,
+        domainKeyword => t.pages.settings.routing.routeRule.rule.tileTitle['domain_keyword']!,
+        domainRegex => t.pages.settings.routing.routeRule.rule.tileTitle['domain_regex']!,
+      };
 }
 
 @riverpod

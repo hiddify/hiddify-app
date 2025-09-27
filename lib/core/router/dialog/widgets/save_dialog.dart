@@ -20,11 +20,11 @@ class SaveDialog extends HookConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => context.pop(false),
-          child: Text(t.general.discard),
+          child: Text(t.common.discard),
         ),
         TextButton(
           onPressed: () => context.pop(true),
-          child: Text(t.general.save),
+          child: Text(t.common.save),
         ),
       ],
     );

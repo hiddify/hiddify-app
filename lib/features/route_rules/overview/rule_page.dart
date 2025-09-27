@@ -26,8 +26,6 @@ class RulePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final tRule = t.settings.routeRule.rule;
-    final tTileTitle = tRule.tileTitle;
     final isRuleEdited = ref.watch(IsRuleEditedProvider(ruleListOrder));
     // TODO(): PopScope logic must be transferred to onExit method of go_router
     return PopScope(
@@ -36,8 +34,8 @@ class RulePage extends HookConsumerWidget {
         if (didPop) return;
         if (isRuleEdited) {
           final shouldSave = await ref.read(dialogNotifierProvider.notifier).showSave(
-                title: tRule.ruleChanged,
-                description: tRule.ruleChangedMsg,
+                title: t.pages.settings.routing.routeRule.rule.ruleChanged,
+                description: t.pages.settings.routing.routeRule.rule.ruleChangedMsg,
               );
           if (shouldSave == null) return;
           if (shouldSave == true) {
@@ -50,7 +48,7 @@ class RulePage extends HookConsumerWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(t.settings.routeRule.rule.pageTitle),
+          title: Text(t.pages.settings.routing.routeRule.rule.title),
           actions: [
             IconButton(
               onPressed: isRuleEdited
@@ -68,21 +66,21 @@ class RulePage extends HookConsumerWidget {
           child: Column(
             children: [
               SettingText(
-                title: getTitle(tTileTitle, RuleEnum.name),
+                title: RuleEnum.name.present(t),
                 value: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.name)),
                 setValue: (value) => ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<String>(RuleEnum.name, value),
               ),
               SettingRadio<Outbound>(
-                title: getTitle(tTileTitle, RuleEnum.outbound),
+                title: RuleEnum.outbound.present(t),
                 values: Outbound.values,
                 value: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.outbound)),
                 setValue: (value) => ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<Outbound>(RuleEnum.outbound, value),
                 defaultValue: Outbound.direct,
-                t: tRule.outbound,
+                t: t.pages.settings.routing.routeRule.rule.outbound,
               ),
               const SettingDivider(),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.ruleSet),
+                title: RuleEnum.ruleSet.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.ruleSets)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -91,7 +89,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.ruleSet,
                       validator: (value) {
                         if (isUrl('$value')) return null;
-                        return tRule.validUrl;
+                        return t.pages.settings.routing.routeRule.rule.validUrl;
                       },
                     ),
                     fullscreenDialog: true,
@@ -99,9 +97,9 @@ class RulePage extends HookConsumerWidget {
                 ),
                 useEllipsis: true,
               ),
-              SettingDivider(title: tRule.onlyTunMode),
+              SettingDivider(title: t.pages.settings.routing.routeRule.rule.onlyTunMode),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.packageName),
+                title: RuleEnum.packageName.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.packageNames)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -113,7 +111,7 @@ class RulePage extends HookConsumerWidget {
                 showPlatformWarning: !PlatformUtils.isAndroid,
               ),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.processName),
+                title: RuleEnum.processName.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.processNames)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -122,7 +120,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.processName,
                       validator: (value) {
                         if (isProcessName('$value')) return null;
-                        return tRule.validProcessName;
+                        return t.pages.settings.routing.routeRule.rule.validProcessName;
                       },
                     ),
                     fullscreenDialog: true,
@@ -131,7 +129,7 @@ class RulePage extends HookConsumerWidget {
                 showPlatformWarning: !PlatformUtils.isDesktop,
               ),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.processPath),
+                title: RuleEnum.processPath.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.processPaths)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -140,7 +138,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.processPath,
                       validator: (value) {
                         if (isProcessPath('$value')) return null;
-                        return tRule.validProcessPath;
+                        return t.pages.settings.routing.routeRule.rule.validProcessPath;
                       },
                     ),
                     fullscreenDialog: true,
@@ -150,15 +148,15 @@ class RulePage extends HookConsumerWidget {
               ),
               const SettingDivider(),
               SettingRadio<Network>(
-                title: getTitle(tTileTitle, RuleEnum.network),
+                title: RuleEnum.network.present(t),
                 values: Network.values,
                 value: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.network)),
                 setValue: (value) => ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<Network>(RuleEnum.network, value),
                 defaultValue: Network.all,
-                t: tRule.network,
+                t: t.pages.settings.routing.routeRule.rule.network,
               ),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.portRange),
+                title: RuleEnum.portRange.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.portRanges)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -167,7 +165,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.portRange,
                       validator: (value) {
                         if (isPortOrPortRange('$value')) return null;
-                        return tRule.validPortRange;
+                        return t.pages.settings.routing.routeRule.rule.validPortRange;
                       },
                     ),
                     fullscreenDialog: true,
@@ -175,7 +173,7 @@ class RulePage extends HookConsumerWidget {
                 ),
               ),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.sourcePortRange),
+                title: RuleEnum.sourcePortRange.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.sourcePortRanges)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -184,7 +182,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.sourcePortRange,
                       validator: (value) {
                         if (isPortOrPortRange('$value')) return null;
-                        return tRule.validPortRange;
+                        return t.pages.settings.routing.routeRule.rule.validPortRange;
                       },
                     ),
                     fullscreenDialog: true,
@@ -192,15 +190,15 @@ class RulePage extends HookConsumerWidget {
                 ),
               ),
               SettingCheckbox(
-                title: getTitle(tTileTitle, RuleEnum.protocol),
+                title: RuleEnum.protocol.present(t),
                 values: Protocol.values,
                 selectedValues: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.protocols)),
                 setValue: (value) => ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<List<ProtobufEnum>>(RuleEnum.protocol, value),
-                t: tRule.protocol,
+                t: t.pages.settings.routing.routeRule.rule.protocol,
               ),
               const SettingDivider(),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.ipCidr),
+                title: RuleEnum.ipCidr.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.ipCidrs)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -209,7 +207,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.ipCidr,
                       validator: (value) {
                         if (isIpCidr('$value')) return null;
-                        return tRule.validIpCidr;
+                        return t.pages.settings.routing.routeRule.rule.validIpCidr;
                       },
                     ),
                     fullscreenDialog: true,
@@ -217,7 +215,7 @@ class RulePage extends HookConsumerWidget {
                 ),
               ),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.sourceIpCidr),
+                title: RuleEnum.sourceIpCidr.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.sourceIpCidrs)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -226,7 +224,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.sourceIpCidr,
                       validator: (value) {
                         if (isIpCidr('$value')) return null;
-                        return tRule.validIpCidr;
+                        return t.pages.settings.routing.routeRule.rule.validIpCidr;
                       },
                     ),
                     fullscreenDialog: true,
@@ -235,7 +233,7 @@ class RulePage extends HookConsumerWidget {
               ),
               const SettingDivider(),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.domain),
+                title: RuleEnum.domain.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.domains)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -244,7 +242,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.domain,
                       validator: (value) {
                         if (isDomain('$value')) return null;
-                        return tRule.validDomain;
+                        return t.pages.settings.routing.routeRule.rule.validDomain;
                       },
                     ),
                     fullscreenDialog: true,
@@ -252,7 +250,7 @@ class RulePage extends HookConsumerWidget {
                 ),
               ),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.domainSuffix),
+                title: RuleEnum.domainSuffix.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.domainSuffixes)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -261,7 +259,7 @@ class RulePage extends HookConsumerWidget {
                       ruleEnum: RuleEnum.domainSuffix,
                       validator: (value) {
                         if (isDomainSuffix('$value')) return null;
-                        return tRule.validDomainSuffix;
+                        return t.pages.settings.routing.routeRule.rule.validDomainSuffix;
                       },
                     ),
                     fullscreenDialog: true,
@@ -269,7 +267,7 @@ class RulePage extends HookConsumerWidget {
                 ),
               ),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.domainKeyword),
+                title: RuleEnum.domainKeyword.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.domainKeywords)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -279,7 +277,7 @@ class RulePage extends HookConsumerWidget {
                 ),
               ),
               SettingGenericList<String>(
-                title: getTitle(tTileTitle, RuleEnum.domainRegex),
+                title: RuleEnum.domainRegex.present(t),
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.domainRegexes)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(

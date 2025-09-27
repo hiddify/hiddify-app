@@ -38,7 +38,7 @@ class AboutPage extends HookConsumerWidget {
           case AppUpdateStateError(:final error):
             return CustomToast.error(t.presentShortError(error)).show(context);
           case AppUpdateStateNotAvailable():
-            return CustomToast.success(t.appUpdate.notAvailableMsg).show(context);
+            return CustomToast.success(t.pages.about.notAvailableMsg).show(context);
         }
       },
     );
@@ -46,7 +46,7 @@ class AboutPage extends HookConsumerWidget {
     final conditionalTiles = [
       if (appInfo.release.allowCustomUpdateChecker)
         ListTile(
-          title: Text(t.about.checkForUpdate),
+          title: Text(t.pages.about.checkForUpdate),
           trailing: switch (appUpdate) {
             AppUpdateStateChecking() => const SizedBox(
                 width: 24,
@@ -61,7 +61,7 @@ class AboutPage extends HookConsumerWidget {
         ),
       if (PlatformUtils.isDesktop)
         ListTile(
-          title: Text(t.settings.general.openWorkingDir),
+          title: Text(t.pages.about.openWorkingDir),
           trailing: const Icon(FluentIcons.open_folder_24_regular),
           onTap: () async {
             final path = ref.watch(appDirectoriesProvider).requireValue.workingDir.uri;
@@ -72,14 +72,14 @@ class AboutPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.about.pageTitle),
+        title: Text(t.pages.about.title),
         actions: [
           PopupMenuButton(
             icon: Icon(AdaptiveIcon(context).more),
             itemBuilder: (context) {
               return [
                 PopupMenuItem(
-                  child: Text(t.general.addToClipboard),
+                  child: Text(t.common.addToClipboard),
                   onTap: () {
                     Clipboard.setData(
                       ClipboardData(text: appInfo.format()),
@@ -106,12 +106,12 @@ class AboutPage extends HookConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        t.general.appTitle,
+                        t.common.appTitle,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const Gap(4),
                       Text(
-                        "${t.about.version} ${appInfo.presentVersion}",
+                        "${t.common.version} ${appInfo.presentVersion}",
                       ),
                     ],
                   ),
@@ -125,7 +125,7 @@ class AboutPage extends HookConsumerWidget {
                 ...conditionalTiles,
                 if (conditionalTiles.isNotEmpty) const Divider(),
                 ListTile(
-                  title: Text(t.about.sourceCode),
+                  title: Text(t.pages.about.sourceCode),
                   trailing: const Icon(FluentIcons.open_24_regular),
                   onTap: () async {
                     await UriUtils.tryLaunch(
@@ -134,7 +134,7 @@ class AboutPage extends HookConsumerWidget {
                   },
                 ),
                 ListTile(
-                  title: Text(t.about.telegramChannel),
+                  title: Text(t.pages.about.telegramChannel),
                   trailing: const Icon(FluentIcons.open_24_regular),
                   onTap: () async {
                     await UriUtils.tryLaunch(
@@ -143,7 +143,7 @@ class AboutPage extends HookConsumerWidget {
                   },
                 ),
                 ListTile(
-                  title: Text(t.about.termsAndConditions),
+                  title: Text(t.pages.about.termsAndConditions),
                   trailing: const Icon(FluentIcons.open_24_regular),
                   onTap: () async {
                     await UriUtils.tryLaunch(
@@ -152,7 +152,7 @@ class AboutPage extends HookConsumerWidget {
                   },
                 ),
                 ListTile(
-                  title: Text(t.about.privacyPolicy),
+                  title: Text(t.pages.about.privacyPolicy),
                   trailing: const Icon(FluentIcons.open_24_regular),
                   onTap: () async {
                     await UriUtils.tryLaunch(

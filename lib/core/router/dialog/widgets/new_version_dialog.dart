@@ -25,18 +25,18 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      title: Text(t.appUpdate.dialogTitle),
+      title: Text(t.dialogs.newVersion.title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(t.appUpdate.updateMsg),
+          Text(t.dialogs.newVersion.msg),
           const Gap(8),
           Text.rich(
             TextSpan(
               children: [
                 TextSpan(
-                  text: "${t.appUpdate.currentVersionLbl}: ",
+                  text: t.dialogs.newVersion.currentVersion,
                   style: theme.textTheme.bodySmall,
                 ),
                 TextSpan(
@@ -50,7 +50,7 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
             TextSpan(
               children: [
                 TextSpan(
-                  text: "${t.appUpdate.newVersionLbl}: ",
+                  text: t.dialogs.newVersion.newVersion,
                   style: theme.textTheme.bodySmall,
                 ),
                 TextSpan(
@@ -69,17 +69,17 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
               await ref.read(appUpdateNotifierProvider.notifier).ignoreRelease(newVersion);
               if (context.mounted) context.pop();
             },
-            child: Text(t.appUpdate.ignoreBtnTxt),
+            child: Text(t.common.ignore),
           ),
         TextButton(
           onPressed: context.pop,
-          child: Text(t.appUpdate.laterBtnTxt),
+          child: Text(t.common.later),
         ),
         TextButton(
           onPressed: () async {
             await UriUtils.tryLaunch(Uri.parse(newVersion.url));
           },
-          child: Text(t.appUpdate.updateNowBtnTxt),
+          child: Text(t.dialogs.newVersion.updateNow),
         ),
       ],
     );

@@ -33,18 +33,18 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
   Future<void> genWarps({bool showToast = true}) async {
     if (state is AsyncLoading) return;
     state = const AsyncLoading();
-    final t = ref.read(translationsProvider).requireValue.config;
+    final t = ref.read(translationsProvider).requireValue;
     final warpLog = await _genWarpConfig();
     final warpLog2 = await _genWarp2Config();
     if (warpLog != null && warpLog2 != null) {
       loggy.log(LogLevel.info, 'generated warp log : $warpLog');
       loggy.log(LogLevel.info, 'generated warp2 log : $warpLog2');
       if (showToast) {
-        ref.read(inAppNotificationControllerProvider).showSuccessToast('${t.warpConfigGenerated} $warpLog');
+        ref.read(inAppNotificationControllerProvider).showSuccessToast('${t.pages.settings.warp.configGenerated} $warpLog');
       }
       state = AsyncValue.data(warpLog);
     } else {
-      ref.read(inAppNotificationControllerProvider).showErrorToast(t.missingWarpConfig);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.settings.warp.missingConfig);
       state = AsyncError(const MissingWarpConfigFailure(), StackTrace.current);
     }
   }

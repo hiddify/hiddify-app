@@ -18,12 +18,12 @@ class WarpOptionsPage extends HookConsumerWidget {
     final isWarpEnabled = ref.watch(ConfigOptions.enableWarp);
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.config.section.warp),
+        title: Text(t.pages.settings.warp.title),
       ),
       body: ListView(
         children: [
           SwitchListTile.adaptive(
-            title: Text(t.config.enableWarp),
+            title: Text(t.pages.settings.warp.enable),
             value: isWarpEnabled,
             onChanged: (value) async {
               await ref.read(ConfigOptions.enableWarp.notifier).update(value);
@@ -31,14 +31,14 @@ class WarpOptionsPage extends HookConsumerWidget {
             },
           ),
           ListTile(
-            title: Text(t.config.generateWarpConfig),
+            title: Text(t.pages.settings.warp.generateConfig),
             subtitle: !isWarpEnabled
                 ? null
                 : warpOptions.when(
                     loading: () => null,
                     data: (_) => null,
                     error: (_, __) => Text(
-                      t.config.missingWarpConfig,
+                      t.pages.settings.warp.missingConfig,
                       style: TextStyle(color: theme.colorScheme.error),
                     ),
                   ),
@@ -56,7 +56,7 @@ class WarpOptionsPage extends HookConsumerWidget {
             preferences: ref.watch(ConfigOptions.warpDetourMode.notifier),
             enabled: isWarpEnabled,
             choices: WarpDetourMode.values,
-            title: t.config.warpDetourMode,
+            title: t.pages.settings.warp.detourMode,
             icon: Icons.alt_route_rounded,
             presentChoice: (value) => value.present(t),
           ),
@@ -64,22 +64,22 @@ class WarpOptionsPage extends HookConsumerWidget {
             value: ref.watch(ConfigOptions.warpLicenseKey),
             preferences: ref.watch(ConfigOptions.warpLicenseKey.notifier),
             enabled: isWarpEnabled,
-            title: t.config.warpLicenseKey,
+            title: t.pages.settings.warp.licenseKey,
             icon: Icons.key_rounded,
-            presentValue: (value) => value.isEmpty ? t.general.notSet : value,
+            presentValue: (value) => value.isEmpty ? t.common.notSet : value,
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.warpCleanIp),
             preferences: ref.watch(ConfigOptions.warpCleanIp.notifier),
             enabled: isWarpEnabled,
-            title: t.config.warpCleanIp,
+            title: t.pages.settings.warp.cleanIp,
             icon: Icons.auto_awesome_rounded,
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.warpPort),
             preferences: ref.watch(ConfigOptions.warpPort.notifier),
             enabled: isWarpEnabled,
-            title: t.config.warpPort,
+            title: t.pages.settings.warp.port,
             icon: Icons.device_hub_rounded,
             inputToValue: int.tryParse,
             validateInput: isPort,
@@ -89,7 +89,7 @@ class WarpOptionsPage extends HookConsumerWidget {
             value: ref.watch(ConfigOptions.warpNoise),
             preferences: ref.watch(ConfigOptions.warpNoise.notifier),
             enabled: isWarpEnabled,
-            title: t.config.warpNoise,
+            title: t.pages.settings.warp.noise.count,
             icon: Icons.web_stories_rounded,
             inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
             presentValue: (value) => value.present(t),
@@ -99,14 +99,14 @@ class WarpOptionsPage extends HookConsumerWidget {
             value: ref.watch(ConfigOptions.warpNoiseMode),
             preferences: ref.watch(ConfigOptions.warpNoiseMode.notifier),
             enabled: isWarpEnabled,
-            title: t.config.warpNoiseMode,
+            title: t.pages.settings.warp.noise.mode,
             icon: Icons.mode_standby_rounded,
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.warpNoiseSize),
             preferences: ref.watch(ConfigOptions.warpNoiseSize.notifier),
             enabled: isWarpEnabled,
-            title: t.config.warpNoiseSize,
+            title: t.pages.settings.warp.noise.size,
             icon: Icons.settings_ethernet_rounded,
             inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
             presentValue: (value) => value.present(t),
@@ -116,7 +116,7 @@ class WarpOptionsPage extends HookConsumerWidget {
             value: ref.watch(ConfigOptions.warpNoiseDelay),
             preferences: ref.watch(ConfigOptions.warpNoiseDelay.notifier),
             enabled: isWarpEnabled,
-            title: t.config.warpNoiseDelay,
+            title: t.pages.settings.warp.noise.delay,
             icon: Icons.schedule_rounded,
             inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
             presentValue: (value) => value.present(t),

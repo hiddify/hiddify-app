@@ -17,7 +17,7 @@ class SettingText extends ConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     return ListTile(
       title: Text(title),
-      subtitle: Text(value.isEmpty ? t.general.empty : value),
+      subtitle: Text(value.isEmpty ? t.common.empty : value),
       onTap: () async {
         final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(
               lable: title,

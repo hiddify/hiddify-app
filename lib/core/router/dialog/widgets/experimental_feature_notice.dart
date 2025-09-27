@@ -24,7 +24,7 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
     final disableNotice = ref.watch(disableExperimentalFeatureNoticeProvider);
 
     return AlertDialog(
-      title: Text(t.connection.experimentalNotice),
+      title: Text(t.dialogs.experimentalNotice.title),
       content: SingleChildScrollView(
         child: SizedBox(
           width: 468,
@@ -32,17 +32,17 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t.connection.experimentalNoticeMsg),
+              Text(t.dialogs.experimentalNotice.msg),
               const Gap(8),
               CheckboxListTile(
                 value: disableNotice,
-                title: Text(t.connection.disableExperimentalNotice),
+                title: Text(t.dialogs.experimentalNotice.disable),
                 secondary: const Icon(FluentIcons.eye_off_24_regular),
                 onChanged: (value) async => await ref.read(disableExperimentalFeatureNoticeProvider.notifier).update(value ?? false),
                 dense: true,
               ),
               ListTile(
-                title: Text(t.config.pageTitle),
+                title: Text(t.pages.settings.title),
                 leading: const Icon(FluentIcons.box_edit_24_regular),
                 trailing: const Icon(FluentIcons.chevron_right_20_regular),
                 onTap: () {
@@ -64,7 +64,7 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
         ),
         TextButton(
           onPressed: () => context.pop(true),
-          child: Text(t.connection.connectAnyWay.toUpperCase()),
+          child: Text(t.connection.connect),
         ),
       ],
     );

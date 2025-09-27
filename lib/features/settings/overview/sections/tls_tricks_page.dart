@@ -13,19 +13,19 @@ class TlsTricksPage extends HookConsumerWidget {
     final canChangeOption = ref.watch(ConfigOptions.enableTlsFragment);
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.config.section.tlsTricks),
+        title: Text(t.pages.settings.tlsTricks.title),
       ),
       body: ListView(
         children: [
           SwitchListTile.adaptive(
-            title: Text(t.config.enableTlsFragment),
+            title: Text(t.pages.settings.tlsTricks.enable),
             value: ref.watch(ConfigOptions.enableTlsFragment),
             onChanged: ref.read(ConfigOptions.enableTlsFragment.notifier).update,
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.tlsFragmentSize),
             preferences: ref.watch(ConfigOptions.tlsFragmentSize.notifier),
-            title: t.config.tlsFragmentSize,
+            title: t.pages.settings.tlsTricks.size,
             icon: Icons.straighten_rounded,
             inputToValue: OptionalRange.tryParse,
             presentValue: (value) => value.present(t),
@@ -35,7 +35,7 @@ class TlsTricksPage extends HookConsumerWidget {
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.tlsFragmentSleep),
             preferences: ref.watch(ConfigOptions.tlsFragmentSleep.notifier),
-            title: t.config.tlsFragmentSleep,
+            title: t.pages.settings.tlsTricks.sleep,
             icon: Icons.snooze_rounded,
             inputToValue: OptionalRange.tryParse,
             presentValue: (value) => value.present(t),
@@ -43,20 +43,20 @@ class TlsTricksPage extends HookConsumerWidget {
             enabled: canChangeOption,
           ),
           SwitchListTile.adaptive(
-            title: Text(t.config.enableTlsMixedSniCase),
+            title: Text(t.pages.settings.tlsTricks.mixedSniCase.enable),
             value: ref.watch(ConfigOptions.enableTlsMixedSniCase),
             secondary: const Icon(Icons.text_fields_rounded),
             onChanged: canChangeOption ? ref.read(ConfigOptions.enableTlsMixedSniCase.notifier).update : null,
           ),
           SwitchListTile.adaptive(
-            title: Text(t.config.enableTlsPadding),
+            title: Text(t.pages.settings.tlsTricks.padding.enable),
             value: ref.watch(ConfigOptions.enableTlsPadding),
             onChanged: canChangeOption ? ref.read(ConfigOptions.enableTlsPadding.notifier).update : null,
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.tlsPaddingSize),
             preferences: ref.watch(ConfigOptions.tlsPaddingSize.notifier),
-            title: t.config.tlsPaddingSize,
+            title: t.pages.settings.tlsTricks.padding.size,
             icon: Icons.expand_rounded,
             inputToValue: OptionalRange.tryParse,
             presentValue: (value) => value.format(),

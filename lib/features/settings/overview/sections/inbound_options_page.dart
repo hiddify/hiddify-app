@@ -16,7 +16,7 @@ class InboundOptionsPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.config.section.inbound),
+        title: Text(t.pages.settings.inbound.title),
       ),
       body: ListView(
         children: [
@@ -24,12 +24,12 @@ class InboundOptionsPage extends HookConsumerWidget {
             selected: ref.watch(ConfigOptions.serviceMode),
             preferences: ref.watch(ConfigOptions.serviceMode.notifier),
             choices: ServiceMode.choices,
-            title: t.config.serviceMode,
+            title: t.pages.settings.inbound.serviceMode,
             icon: Icons.tune_rounded,
             presentChoice: (value) => value.present(t),
           ),
           SwitchListTile.adaptive(
-            title: Text(t.config.strictRoute),
+            title: Text(t.pages.settings.inbound.strictRoute),
             secondary: const Icon(Icons.merge_rounded),
             value: ref.watch(ConfigOptions.strictRoute),
             onChanged: ref.read(ConfigOptions.strictRoute.notifier).update,
@@ -38,14 +38,14 @@ class InboundOptionsPage extends HookConsumerWidget {
             selected: ref.watch(ConfigOptions.tunImplementation),
             preferences: ref.watch(ConfigOptions.tunImplementation.notifier),
             choices: TunImplementation.values,
-            title: t.config.tunImplementation,
+            title: t.pages.settings.inbound.tunImplementation,
             icon: Icons.trip_origin_rounded,
             presentChoice: (value) => value.name,
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.mixedPort),
             preferences: ref.watch(ConfigOptions.mixedPort.notifier),
-            title: t.config.mixedPort,
+            title: t.pages.settings.inbound.mixedPort,
             icon: Icons.device_hub_rounded,
             inputToValue: int.tryParse,
             digitsOnly: true,
@@ -54,7 +54,7 @@ class InboundOptionsPage extends HookConsumerWidget {
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.tproxyPort),
             preferences: ref.watch(ConfigOptions.tproxyPort.notifier),
-            title: t.config.tproxyPort,
+            title: t.pages.settings.inbound.tproxyPort,
             icon: Icons.device_hub_rounded,
             inputToValue: int.tryParse,
             digitsOnly: true,
@@ -63,14 +63,14 @@ class InboundOptionsPage extends HookConsumerWidget {
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.localDnsPort),
             preferences: ref.watch(ConfigOptions.localDnsPort.notifier),
-            title: t.config.localDnsPort,
+            title: t.pages.settings.inbound.localDnsPort,
             icon: Icons.device_hub_rounded,
             inputToValue: int.tryParse,
             digitsOnly: true,
             validateInput: isPort,
           ),
           SwitchListTile.adaptive(
-            title: Text(t.config.allowConnectionFromLan),
+            title: Text(t.pages.settings.inbound.allowConnectionFromLan),
             secondary: const Icon(Icons.share_rounded),
             value: ref.watch(ConfigOptions.allowConnectionFromLan),
             onChanged: (bool value) async {

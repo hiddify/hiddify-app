@@ -60,16 +60,16 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
           MenuItem(
             key: 'connection',
             label: switch (connection) {
-              Disconnected() => t.tray.status.connect,
-              Connecting() => t.tray.status.connecting,
-              Connected() => t.tray.status.disconnect,
-              Disconnecting() => t.tray.status.disconnecting,
+              Disconnected() => t.connection.connect,
+              Connecting() => t.connection.connecting,
+              Connected() => t.connection.disconnect,
+              Disconnecting() => t.connection.disconnecting,
             },
             disabled: connection.isSwitching,
           ),
           MenuItem.separator(),
           MenuItem.submenu(
-            label: t.config.serviceMode,
+            label: t.pages.settings.inbound.serviceMode,
             icon: Assets.images.trayIconIco,
             submenu: Menu(items: [
               ...ServiceMode.values.map(
@@ -84,7 +84,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
           MenuItem.separator(),
           MenuItem(
             key: 'quit',
-            label: t.tray.quit,
+            label: t.common.quit,
           ),
         ],
       );
@@ -206,7 +206,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
 //     // final destinations = <(String label, String location)>[
 //     //   (t.home.pageTitle, const HomeRoute().location),
 //     //   (t.proxies.pageTitle, const ProfilesOverviewRoute().location),
-//     //   (t.logs.pageTitle, const LogsOverviewRoute().location),
+//     //   (t.logs.title, const LogsOverviewRoute().location),
 //     //   // (t.settings.pageTitle, const SettingsRoute().location),
 //     //   (t.about.pageTitle, const AboutRoute().location),
 //     // ];
