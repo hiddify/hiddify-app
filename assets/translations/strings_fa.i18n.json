@@ -22,7 +22,8 @@
     "showMore": "نمایش بیشتر",
     "showLess": "نمایش کمتر",
     "openAppSettings": "باز کردن تنظیمات برنامه",
-    "grantPermission": "اجازه دادن"
+    "grantPermission": "اجازه دادن",
+    "rules": "قانون"
   },
   "intro": {
     "termsAndPolicyCaution(rich)": "در صورت ادامه با ${tap(@:about.termsAndConditions)} موافقت می‌کنید",
@@ -426,7 +427,26 @@
     "warpNoise": "تعداد نویز",
     "warpNoiseSize": "اندازه نویز",
     "warpNoiseMode": "حالت نویز",
-    "warpNoiseDelay": "تأخیر نویز"
+    "warpNoiseDelay": "تأخیر نویز",
+    "customRoutingRules": "قوانین مسیریابی سفارشی",
+    "addCustomRule": "افزودن قانون سفارشی",
+    "editCustomRule": "ویرایش قانون سفارشی",
+    "noCustomRules": "هیچ قانون سفارشی تعریف نشده است",
+    "addCustomRuleHint": "برای افزودن قانون جدید، روی دکمه + کلیک کنید",
+    "domains": "دامنه‌ها",
+    "domainsHint": "مثال: example.com, *.google.com, geosite:ir",
+    "ip": "آی‌پی",
+    "ipHint": "مثال: 192.168.1.1, geoip:ir",
+    "port": "پورت",
+    "portHint": "مثال: 80, 443, 8080",
+    "protocol": "پروتکل",
+    "protocolHint": "مثال: http, https, tcp, udp",
+    "outbound": "خروجی",
+    "network": "شبکه",
+    "proxy": "پروکسی",
+    "direct": "مستقیم",
+    "block": "مسدود",
+    "customRule": "قانون سفارشی"
   },
   "window": {
     "hide": "مخفی کردن",

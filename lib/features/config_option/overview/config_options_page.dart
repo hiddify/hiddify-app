@@ -2,10 +2,12 @@ import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/router/routes.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/tip_card.dart';
 import 'package:hiddify/features/common/confirmation_dialogs.dart';
@@ -163,6 +165,14 @@ class ConfigOptionsPage extends HookConsumerWidget {
                     title: Text(t.config.resolveDestination),
                     value: ref.watch(ConfigOptions.resolveDestination),
                     onChanged: ref.watch(ConfigOptions.resolveDestination.notifier).update,
+                  ),
+                  ListTile(
+                    title: Text(t.config.customRoutingRules),
+                    subtitle: Text('${ref.watch(ConfigOptions.customRoutingRules).length} ${t.general.rules}'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      const RoutingRulesRoute().go(context);
+                    },
                   ),
                   ChoicePreferenceWidget(
                     selected: ref.watch(ConfigOptions.ipv6Mode),
