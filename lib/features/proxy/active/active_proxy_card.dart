@@ -78,7 +78,7 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Semantics(
-                    label: t.proxies.activeProxySemanticLabel,
+                    label: t.pages.proxies.activeProxy,
                     child: Text(
                       getRealOutboundTag(activeProxy),
                       style: theme.textTheme.bodyLarge?.copyWith(
@@ -97,7 +97,7 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                     )
                   else
                     UnknownIPText(
-                      text: t.proxies.unknownIp,
+                      text: t.pages.proxies.unknownIp,
                       onTap: handleUrlTest,
                     ),
                 ],

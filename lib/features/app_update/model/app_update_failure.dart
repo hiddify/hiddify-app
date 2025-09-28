@@ -18,7 +18,7 @@ sealed class AppUpdateFailure with _$AppUpdateFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       AppUpdateUnexpectedFailure() => (
-          type: t.failure.unexpected,
+          type: t.errors.unexpected,
           message: null,
         ),
     };

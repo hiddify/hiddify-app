@@ -15,7 +15,7 @@ class OkDialog extends HookConsumerWidget {
       content: Text(description),
       actions: [
         TextButton(
-          child: Text(t.general.ok),
+          child: Text(t.common.ok),
           onPressed: () => context.pop(),
         ),
       ],

@@ -18,7 +18,7 @@ class ConnectionStatsCard extends HookConsumerWidget {
     // final ipInfo = ref.watch(ipInfoNotifierProvider);
 
     return StatsCard(
-      title: t.stats.connection,
+      title: t.components.stats.connection,
       stats: [
         switch (activeProxy) {
           AsyncData(value: final proxy) => (

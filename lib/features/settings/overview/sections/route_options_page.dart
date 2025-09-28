@@ -20,13 +20,13 @@ class RouteOptionsPage extends HookConsumerWidget {
     final perAppProxy = ref.watch(Preferences.perAppProxyMode).enabled;
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.config.section.route),
+        title: Text(t.pages.settings.routing.title),
       ),
       body: ListView(
         children: [
           if (PlatformUtils.isAndroid)
             ListTile(
-              title: Text(t.settings.network.perAppProxyPageTitle),
+              title: Text(t.pages.settings.routing.perAppProxy.title),
               leading: const Icon(Icons.apps_rounded),
               trailing: Switch(
                 value: perAppProxy,
@@ -47,7 +47,7 @@ class RouteOptionsPage extends HookConsumerWidget {
             selected: ref.watch(ConfigOptions.region),
             preferences: ref.watch(ConfigOptions.region.notifier),
             choices: Region.values,
-            title: t.settings.general.region,
+            title: t.pages.settings.routing.region,
             icon: Icons.place_rounded,
             presentChoice: (value) => value.present(t),
             onChanged: (val) async {
@@ -56,27 +56,27 @@ class RouteOptionsPage extends HookConsumerWidget {
               final mode = ref.read(Preferences.perAppProxyMode).toAppProxy();
               if (autoRegion != val && autoRegion != null && val != Region.other && mode != null && PlatformUtils.isAndroid) {
                 await ref.read(dialogNotifierProvider.notifier).showOk(
-                      t.settings.network.autoSelection.dialogTitle,
-                      t.settings.network.autoSelection.msg(region: val.name),
+                      t.pages.settings.routing.perAppProxy.autoSelection.dialog.title,
+                      t.pages.settings.routing.perAppProxy.autoSelection.dialog.msg(region: val.name),
                     );
                 await ref.read(PerAppProxyProvider(mode).notifier).clearAutoSelected();
               }
             },
           ),
           SwitchListTile.adaptive(
-            title: Text(t.config.blockAds),
+            title: Text(t.pages.settings.routing.blockAds),
             secondary: const Icon(Icons.block_rounded),
             value: ref.watch(ConfigOptions.blockAds),
             onChanged: ref.read(ConfigOptions.blockAds.notifier).update,
           ),
           SwitchListTile.adaptive(
-            title: Text(t.config.bypassLan),
+            title: Text(t.pages.settings.routing.bypassLan),
             secondary: const Icon(Icons.call_split_rounded),
             value: ref.watch(ConfigOptions.bypassLan),
             onChanged: ref.read(ConfigOptions.bypassLan.notifier).update,
           ),
           SwitchListTile.adaptive(
-            title: Text(t.config.resolveDestination),
+            title: Text(t.pages.settings.routing.resolveDestination),
             secondary: const Icon(Icons.security_rounded),
             value: ref.watch(ConfigOptions.resolveDestination),
             onChanged: ref.read(ConfigOptions.resolveDestination.notifier).update,
@@ -85,7 +85,7 @@ class RouteOptionsPage extends HookConsumerWidget {
             selected: ref.watch(ConfigOptions.ipv6Mode),
             preferences: ref.watch(ConfigOptions.ipv6Mode.notifier),
             choices: IPv6Mode.values,
-            title: t.config.ipv6Mode,
+            title: t.pages.settings.routing.ipv6Route,
             icon: Icons.looks_6_rounded,
             presentChoice: (value) => value.present(t),
           ),

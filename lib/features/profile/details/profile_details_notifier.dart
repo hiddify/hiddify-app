@@ -103,11 +103,11 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
               final t = await ref.read(translationsProvider.future);
               return (await _profilesRepo.offlineUpdate(value.profile, value.configContent).run()).match(
                 (l) async {
-                  await ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(l, action: t.profile.update.failureMsg));
+                  await ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(l, action: t.pages.profiles.msg.update.failure));
                   return false;
                 },
                 (r) {
-                  ref.read(inAppNotificationControllerProvider).showSuccessToast(t.profile.update.successMsg);
+                  ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.update.success);
                   return true;
                 },
               );

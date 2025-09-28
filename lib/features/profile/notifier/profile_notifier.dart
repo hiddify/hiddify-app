@@ -39,15 +39,15 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
         final notification = ref.read(inAppNotificationControllerProvider);
         switch (next) {
           case AsyncData(value: final _?):
-            notification.showSuccessToast(t.profile.save.successMsg);
+            notification.showSuccessToast(t.pages.profiles.msg.save.success);
           case AsyncError(:final error):
             if (error case ProfileInvalidUrlFailure()) {
-              notification.showErrorToast(t.failure.profiles.invalidUrl);
+              notification.showErrorToast(t.pages.profiles.msg.invalidUrl);
             } else if (error case ProfileCancelByUserFailure()) {
               return;
             } else {
               ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(
-                    t.presentError(error, action: t.profile.add.failureMsg),
+                    t.presentError(error, action: t.pages.profiles.msg.add.failure),
                   );
             }
         }
@@ -129,10 +129,10 @@ class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
         final notification = ref.read(inAppNotificationControllerProvider);
         switch (next) {
           case AsyncData(value: final _?):
-            notification.showSuccessToast(t.profile.update.successMsg);
+            notification.showSuccessToast(t.pages.profiles.msg.update.success);
           case AsyncError(:final error):
             ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(
-                  t.presentError(error, action: t.profile.update.failureMsg),
+                  t.presentError(error, action: t.pages.profiles.msg.update.failure),
                 );
         }
       },

@@ -21,11 +21,11 @@ sealed class ConfigOptionFailure with _$ConfigOptionFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       ConfigOptionUnexpectedFailure() => (
-          type: t.failure.unexpected,
+          type: t.errors.unexpected,
           message: null,
         ),
       MissingWarpConfigFailure() => (
-          type: t.config.missingWarpConfig,
+          type: t.pages.settings.warp.missingConfig,
           message: null,
         ),
     };

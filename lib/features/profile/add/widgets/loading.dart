@@ -17,7 +17,7 @@ class ProfileLoading extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            t.profile.add.addingProfileMsg,
+            t.pages.profileDetails.form.loading,
             style: theme.textTheme.bodyMedium!.copyWith(
               color: theme.colorScheme.onSurface,
             ),

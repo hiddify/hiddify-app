@@ -5,7 +5,6 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/route_rules/notifier/generic_list_notifier.dart';
 import 'package:hiddify/features/route_rules/notifier/rule_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:recase/recase.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 class GenericListPage extends HookConsumerWidget {
@@ -15,31 +14,28 @@ class GenericListPage extends HookConsumerWidget {
   final RuleEnum ruleEnum;
   final FormFieldValidator<String>? validator;
 
-  String getTitle(Map<String, String> t, RuleEnum key) => t[key.name.snakeCase] ?? key.name;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final tGenericList = t.settings.routeRule.genericList;
     final provider = genericListNotifierProvider(ruleListOrder, ruleEnum);
     final list = ref.watch(provider);
 
     Future<void> addNewValue() async {
-      final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(lable: tGenericList.addNew, validator: validator);
+      final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(lable: t.pages.settings.routing.routeRule.genericList.addNew, validator: validator);
       if (result is String) ref.read(provider.notifier).add(result);
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(getTitle(t.settings.routeRule.rule.tileTitle, ruleEnum)),
+        title: Text(ruleEnum.present(t)),
         actions: [
           IconButton(
             onPressed: list.isEmpty
                 ? null
                 : () async {
                     final result = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
-                          title: tGenericList.clearList,
-                          message: tGenericList.clearListMsg,
+                          title: t.pages.settings.routing.routeRule.genericList.clearList,
+                          message: t.pages.settings.routing.routeRule.genericList.clearListMsg,
                         );
                     if (result == true) ref.read(provider.notifier).reset();
                   },
@@ -55,7 +51,7 @@ class GenericListPage extends HookConsumerWidget {
             )
           : FloatingActionButton.extended(
               onPressed: addNewValue,
-              label: Text(tGenericList.addNew),
+              label: Text(t.pages.settings.routing.routeRule.genericList.addNew),
               icon: const Icon(Icons.add_rounded),
             ),
       body: ListView.builder(
@@ -64,7 +60,7 @@ class GenericListPage extends HookConsumerWidget {
           onRemove: () => ref.read(provider.notifier).remove(index),
           onUpdate: () async {
             final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(
-                  lable: tGenericList.update,
+                  lable: t.pages.settings.routing.routeRule.genericList.update,
                   value: '${list[index]}',
                   validator: validator,
                 );

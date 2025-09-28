@@ -44,11 +44,11 @@ class SettingRadioDialog<T> extends ConsumerWidget {
       actions: [
         if (defaultValue != null)
           TextButton(
-            child: Text(t.general.reset),
+            child: Text(t.common.reset),
             onPressed: () => context.pop(defaultValue),
           ),
         TextButton(
-          child: Text(t.general.cancel),
+          child: Text(t.common.cancel),
           onPressed: () => context.pop(),
         ),
       ],

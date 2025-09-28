@@ -142,7 +142,7 @@ class ProfileTileMain extends HookConsumerWidget {
                               borderRadius: BorderRadius.circular(8),
                               child: _InfoItem(
                                 icon: _getLinkIcon(subInfo.webPageUrl!, FluentIcons.building_shop_24_regular),
-                                label: t.profile.subscription.profileSite,
+                                label: t.components.subscriptionInfo.profileSite,
                                 value: _formatSupportLink(subInfo.webPageUrl!),
                               ),
                             ),
@@ -155,7 +155,7 @@ class ProfileTileMain extends HookConsumerWidget {
                               borderRadius: BorderRadius.circular(8),
                               child: _InfoItem(
                                 icon: _getLinkIcon(subInfo.supportUrl!, FontAwesomeIcons.headset),
-                                label: t.profile.subscription.profileSupport,
+                                label: t.components.subscriptionInfo.profileSupport,
                                 value: _formatSupportLink(subInfo.supportUrl!),
                               ),
                             ),

@@ -25,11 +25,11 @@ class FreeProfileConsentDialog extends HookConsumerWidget {
         ),
         actions: [
           TextButton(
-            child: Text(t.general.cancel),
+            child: Text(t.common.cancel),
             onPressed: () => context.pop(false),
           ),
           TextButton(
-            child: Text(t.general.kContinue),
+            child: Text(t.common.kContinue),
             onPressed: () => context.pop(true),
           ),
         ]);

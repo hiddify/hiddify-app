@@ -13,7 +13,7 @@ class AndroidAppsPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tAndroidApps = ref.watch(translationsProvider).requireValue.settings.routeRule.androidApps;
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
     final searchController = useTextEditingController();
     ref.listen(searchQueryNotifierProvider, (_, next) => searchController.text = next);
@@ -27,22 +27,22 @@ class AndroidAppsPage extends HookConsumerWidget {
       if (ref.watch(hideSystemNotifierProvider))
         PopupMenuItem(
           onTap: ref.read(hideSystemNotifierProvider.notifier).show,
-          child: Text(tAndroidApps.showSystemApps),
+          child: Text(t.pages.settings.routing.routeRule.androidApps.showSystemApps),
         )
       else
         PopupMenuItem(
           onTap: ref.read(hideSystemNotifierProvider.notifier).hide,
-          child: Text(tAndroidApps.hideSystemApps),
+          child: Text(t.pages.settings.routing.routeRule.androidApps.hideSystemApps),
         ),
       PopupMenuItem(
         onTap: ref.read(selectedNotifier.notifier).clearSelection,
-        child: Text(tAndroidApps.clearSelection),
+        child: Text(t.pages.settings.routing.routeRule.androidApps.clearSelection),
       ),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(tAndroidApps.pageTitle),
+        title: Text(t.pages.settings.routing.routeRule.androidApps.pageTitle),
         actions: [
           PopupMenuButton(
             icon: const Icon(Icons.more_vert_rounded),
@@ -56,7 +56,7 @@ class AndroidAppsPage extends HookConsumerWidget {
             controller: searchController,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              label: Text(tAndroidApps.search),
+              label: Text(t.common.search),
               suffixIcon: searchController.text.isNotEmpty
                   ? IconButton(
                       onPressed: () {
@@ -127,7 +127,7 @@ class AndroidAppsPage extends HookConsumerWidget {
                         ),
                         const Gap(4),
                         Text(
-                          tAndroidApps.uninstalled,
+                          t.pages.settings.routing.routeRule.androidApps.uninstalled,
                           style: theme.textTheme.bodyLarge,
                           overflow: TextOverflow.ellipsis,
                         ),

@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/features/profile/details/json_editor.dart';
 import 'package:hiddify/features/profile/details/profile_details_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
@@ -22,12 +23,12 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
 
   String _genSliderText(Translations t, int sliderValue) {
     if (sliderValue == 0) {
-      return t.general.auto;
+      return t.common.auto;
     } else if (sliderValue < 24) {
-      return t.profile.interval.hour(n: sliderValue);
+      return t.common.interval.hour(n: sliderValue);
     }
-    final day = t.profile.interval.day(n: sliderValue ~/ 24);
-    final hour = t.profile.interval.hour(n: sliderValue % 24);
+    final day = t.common.interval.day(n: sliderValue ~/ 24);
+    final hour = t.common.interval.hour(n: sliderValue % 24);
     return '$day $hour';
   }
 
@@ -57,7 +58,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
             );
             return Scaffold(
               appBar: AppBar(
-                title: Text(t.profile.detailsPageTitle),
+                title: Text(t.pages.profileDetails.title),
                 actions: [
                   TextButton.icon(
                     onPressed: isLoading || !data.isDetailsChanged
@@ -66,13 +67,14 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                             if (formKey.currentState!.validate()) {
                               await ref.read(provider.notifier).save().then(
                                 (success) {
+                                  ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.save.success);
                                   if (success && context.mounted) context.pop();
                                 },
                               );
                             }
                           },
                     icon: const Icon(Icons.check),
-                    label: Text(t.profile.save.buttonText),
+                    label: Text(t.common.save),
                   ),
                   const Gap(8),
                 ],
@@ -91,10 +93,10 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                           child: CustomTextFormField(
                             maxLines: 1,
                             initialValue: userOverride.name ?? data.profile.name,
-                            validator: (value) => (value?.isEmpty ?? true) ? t.profile.detailsForm.emptyNameMsg : null,
+                            validator: (value) => (value?.isEmpty ?? true) ? t.pages.profileDetails.form.emptyName : null,
                             onChanged: (value) => ref.read(ProfileDetailsNotifierProvider(id).notifier).setUserOverride(userOverride.copyWith(name: value)),
-                            label: t.profile.detailsForm.nameLabel,
-                            hint: t.profile.detailsForm.nameHint,
+                            label: t.common.name,
+                            hint: t.pages.profileDetails.form.nameHint,
                           ),
                         ),
                         if (data.profile case RemoteProfileEntity(:final url))
@@ -107,7 +109,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  t.profile.detailsForm.urlLabel,
+                                  t.common.url,
                                   style: theme.textTheme.labelMedium!.copyWith(
                                     color: theme.colorScheme.onSurface,
                                   ),
@@ -128,7 +130,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                         if (data.profile case RemoteProfileEntity(:final options)) ...[
                           SwitchListTile.adaptive(
                             title: Text(
-                              t.profile.add.disableAutoUpdate,
+                              t.pages.profileDetails.form.disableAutoUpdate,
                               style: theme.textTheme.titleSmall!.copyWith(
                                 color: theme.colorScheme.onSurface,
                               ),
@@ -151,7 +153,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                           children: [
                                             Expanded(
                                               child: Text(
-                                                t.profile.detailsForm.updateInterval,
+                                                t.pages.profileDetails.form.autoUpdateInterval,
                                                 style: theme.textTheme.titleSmall!.copyWith(
                                                   color: theme.colorScheme.onSurface,
                                                 ),
@@ -185,7 +187,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                           const Divider(indent: 16, endIndent: 16),
                         ],
                         ListTile(
-                          title: Text(t.profile.detailsForm.lastUpdate),
+                          title: Text(t.pages.profileDetails.lastUpdate),
                           leading: const Icon(FluentIcons.history_24_regular),
                           subtitle: Text(data.profile.lastUpdate.format()),
                           dense: true,
@@ -209,19 +211,19 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                         _buildSubProp(
                                           FluentIcons.arrow_upload_16_regular,
                                           subInfo.upload.size(),
-                                          t.profile.subscription.upload,
+                                          t.components.subscriptionInfo.upload,
                                         ),
                                         const TextSpan(text: "     "),
                                         _buildSubProp(
                                           FluentIcons.arrow_download_16_regular,
                                           subInfo.download.size(),
-                                          t.profile.subscription.download,
+                                          t.components.subscriptionInfo.download,
                                         ),
                                         const TextSpan(text: "     "),
                                         _buildSubProp(
                                           FluentIcons.arrow_bidirectional_up_down_16_regular,
                                           subInfo.total.size(),
-                                          t.profile.subscription.total,
+                                          t.components.subscriptionInfo.total,
                                         ),
                                       ],
                                     ),
@@ -234,7 +236,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                         _buildSubProp(
                                           FluentIcons.clock_dismiss_20_regular,
                                           subInfo.expire.format(),
-                                          t.profile.subscription.expireDate,
+                                          t.components.subscriptionInfo.expireDate,
                                         ),
                                       ],
                                     ),
@@ -267,13 +269,13 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
           },
           error: (error, stackTrace) => Scaffold(
             appBar: AppBar(
-              title: Text(t.profile.detailsPageTitle),
+              title: Text(t.pages.profileDetails.title),
             ),
             body: SliverErrorBodyPlaceholder(t.presentShortError(error)),
           ),
           loading: () => Scaffold(
             appBar: AppBar(
-              title: Text(t.profile.detailsPageTitle),
+              title: Text(t.pages.profileDetails.title),
             ),
             body: const Center(child: CircularProgressIndicator()),
           ),

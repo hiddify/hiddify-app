@@ -20,27 +20,27 @@ class GeneralPage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
 
     return Scaffold(
-      appBar: AppBar(title: Text(t.settings.general.sectionTitle)),
+      appBar: AppBar(title: Text(t.pages.settings.general.title)),
       body: ListView(
         children: [
           const LocalePrefTile(),
           const ThemeModePrefTile(),
           const EnableAnalyticsPrefTile(),
           SwitchListTile.adaptive(
-            title: Text(t.settings.general.autoIpCheck),
+            title: Text(t.pages.settings.general.autoIpCheck),
             value: ref.watch(Preferences.autoCheckIp),
             secondary: const Icon(Icons.flag_rounded),
             onChanged: ref.read(Preferences.autoCheckIp.notifier).update,
           ),
           if (PlatformUtils.isAndroid) ...[
             SwitchListTile.adaptive(
-              title: Text(t.settings.general.dynamicNotification),
+              title: Text(t.pages.settings.general.dynamicNotification),
               secondary: const Icon(Icons.speed_rounded),
               value: ref.watch(Preferences.dynamicNotification),
               onChanged: ref.read(Preferences.dynamicNotification.notifier).update,
             ),
             SwitchListTile.adaptive(
-              title: Text(t.settings.general.hapticFeedback),
+              title: Text(t.pages.settings.general.hapticFeedback),
               secondary: const Icon(Icons.vibration_rounded),
               value: ref.watch(hapticServiceProvider),
               onChanged: ref.read(hapticServiceProvider.notifier).updatePreference,
@@ -49,13 +49,13 @@ class GeneralPage extends HookConsumerWidget {
           if (PlatformUtils.isDesktop) ...[
             const ClosingPrefTile(),
             SwitchListTile.adaptive(
-              title: Text(t.settings.general.autoStart),
+              title: Text(t.pages.settings.general.autoStart),
               secondary: const Icon(Icons.auto_mode_rounded),
               value: ref.watch(autoStartNotifierProvider).asData!.value,
               onChanged: (value) async => value ? await ref.read(autoStartNotifierProvider.notifier).enable() : await ref.read(autoStartNotifierProvider.notifier).disable(),
             ),
             SwitchListTile.adaptive(
-              title: Text(t.settings.general.silentStart),
+              title: Text(t.pages.settings.general.silentStart),
               secondary: const Icon(Icons.visibility_off_rounded),
               value: ref.watch(Preferences.silentStart),
               onChanged: ref.read(Preferences.silentStart.notifier).update,
@@ -63,18 +63,18 @@ class GeneralPage extends HookConsumerWidget {
           ],
           if (PlatformUtils.isAndroid) const BatteryOptimizationWidget(),
           SwitchListTile.adaptive(
-            title: Text(t.settings.advanced.memoryLimit),
-            subtitle: Text(t.settings.advanced.memoryLimitMsg),
+            title: Text(t.pages.settings.general.memoryLimit),
+            subtitle: Text(t.pages.settings.general.memoryLimitMsg),
             secondary: const Icon(Icons.memory_rounded),
             value: !ref.watch(Preferences.disableMemoryLimit),
             onChanged: (value) async => await ref.read(Preferences.disableMemoryLimit.notifier).update(!value),
           ),
           SwitchListTile.adaptive(
-            title: Text(t.settings.advanced.debugMode),
+            title: Text(t.pages.settings.general.debugMode),
             secondary: const Icon(Icons.bug_report_rounded),
             value: ref.watch(debugModeNotifierProvider),
             onChanged: (value) async {
-              if (value) await ref.read(dialogNotifierProvider.notifier).showOk(t.settings.advanced.debugMode, t.settings.advanced.debugModeMsg);
+              if (value) await ref.read(dialogNotifierProvider.notifier).showOk(t.pages.settings.general.debugMode, t.pages.settings.general.debugModeMsg);
               await ref.read(debugModeNotifierProvider.notifier).update(value);
             },
           ),
@@ -82,18 +82,18 @@ class GeneralPage extends HookConsumerWidget {
             selected: ref.watch(ConfigOptions.logLevel),
             preferences: ref.watch(ConfigOptions.logLevel.notifier),
             choices: LogLevel.choices,
-            title: t.config.logLevel,
+            title: t.pages.settings.general.logLevel,
             icon: Icons.description_rounded,
             presentChoice: (value) => value.name.toUpperCase(),
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.connectionTestUrl),
             preferences: ref.watch(ConfigOptions.connectionTestUrl.notifier),
-            title: t.config.connectionTestUrl,
+            title: t.pages.settings.general.connectionTestUrl,
             icon: Icons.link_rounded,
           ),
           ListTile(
-            title: Text(t.config.urlTestInterval),
+            title: Text(t.pages.settings.general.urlTestInterval),
             subtitle: Text(
               ref.watch(ConfigOptions.urlTestInterval).toApproximateTime(isRelativeToNow: false),
             ),
@@ -101,7 +101,7 @@ class GeneralPage extends HookConsumerWidget {
             onTap: () async => await ref
                 .read(dialogNotifierProvider.notifier)
                 .showSettingSlider(
-                  title: t.config.urlTestInterval,
+                  title: t.pages.settings.general.urlTestInterval,
                   initialValue: ref.watch(ConfigOptions.urlTestInterval).inMinutes.coerceIn(0, 60).toDouble(),
                   onReset: ref.read(ConfigOptions.urlTestInterval.notifier).reset,
                   min: 1,
@@ -119,15 +119,15 @@ class GeneralPage extends HookConsumerWidget {
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.clashApiPort),
             preferences: ref.watch(ConfigOptions.clashApiPort.notifier),
-            title: t.config.clashApiPort,
+            title: t.pages.settings.general.clashApiPort,
             icon: Icons.api_rounded,
             validateInput: isPort,
             digitsOnly: true,
             inputToValue: int.tryParse,
           ),
           SwitchListTile.adaptive(
-            title: Text(t.config.useXrayCoreWhenPossible.Label),
-            subtitle: Text(t.config.useXrayCoreWhenPossible.Description),
+            title: Text(t.pages.settings.general.useXrayCoreWhenPossible),
+            subtitle: Text(t.pages.settings.general.useXrayCoreWhenPossibleMsg),
             secondary: const Icon(Icons.extension_rounded),
             value: ref.watch(ConfigOptions.useXrayCoreWhenPossible),
             onChanged: ref.read(ConfigOptions.useXrayCoreWhenPossible.notifier).update,

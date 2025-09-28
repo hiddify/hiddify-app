@@ -157,7 +157,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
       floatingActionButton: FloatingActionButton.extended(
         icon: isStarting.value ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator()) : const Icon(Icons.rocket_launch),
         label: Text(
-          t.intro.start,
+          t.common.start,
           style: theme.textTheme.titleMedium,
         ),
         onPressed: () async {

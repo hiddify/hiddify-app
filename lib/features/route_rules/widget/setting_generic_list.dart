@@ -38,7 +38,7 @@ class SettingGenericList<T extends Object> extends ConsumerWidget {
                             ),
                             const Gap(2),
                             Text(
-                              t.settings.routeRule.rule.notAvailabeInThisPlatform,
+                              t.pages.settings.routing.routeRule.rule.notAvailabeInThisPlatform,
                               style: theme.textTheme.labelSmall!.copyWith(color: theme.colorScheme.onSurfaceVariant),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,

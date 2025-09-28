@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/features/route_rules/notifier/rules_notifier.dart';
 import 'package:hiddify/features/route_rules/overview/rule_page.dart';
 import 'package:hiddify/features/route_rules/widget/rule_tile.dart';
@@ -13,40 +12,35 @@ class RulesPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final tRouteRule = t.settings.routeRule;
     final rules = ref.watch(rulesNotifierProvider);
     final menuItems = <PopupMenuEntry>[
       PopupMenuItem(
         onTap: ref.read(rulesNotifierProvider.notifier).importRulesFromClipboard,
-        child: Text(tRouteRule.importClipboard),
+        child: Text(t.pages.settings.routing.routeRule.options.import.clipboard),
       ),
       PopupMenuItem(
         onTap: ref.read(rulesNotifierProvider.notifier).importRulesFromJsonFile,
-        child: Text(tRouteRule.importJsonFile),
+        child: Text(t.pages.settings.routing.routeRule.options.import.file),
       ),
       const PopupMenuDivider(),
       PopupMenuItem(
-        onTap: () async => await ref.read(rulesNotifierProvider.notifier).exportJsonToClipboard().then((success) {
-          if (success) ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
-        }),
-        child: Text(tRouteRule.exportClipboard),
+        onTap: () async => await ref.read(rulesNotifierProvider.notifier).exportJsonToClipboard(),
+        child: Text(t.pages.settings.routing.routeRule.options.export.clipboard),
       ),
       PopupMenuItem(
-        onTap: () async => await ref.read(rulesNotifierProvider.notifier).saveRulesAsJsonFile().then((success) {
-          if (success) ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
-        }),
-        child: Text(tRouteRule.exportJsonFile),
+        onTap: () async => await ref.read(rulesNotifierProvider.notifier).saveRulesAsJsonFile(),
+        child: Text(t.pages.settings.routing.routeRule.options.export.file),
       ),
       const PopupMenuDivider(),
       PopupMenuItem(
         onTap: ref.read(rulesNotifierProvider.notifier).resetRules,
-        child: Text(tRouteRule.reset),
+        child: Text(t.pages.settings.routing.routeRule.options.reset),
       ),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(tRouteRule.pageTitle),
+        title: Text(t.pages.settings.routing.routeRule.title),
         actions: [
           PopupMenuButton(
             icon: const Icon(Icons.more_vert_rounded),
@@ -62,7 +56,7 @@ class RulesPage extends HookConsumerWidget {
             )
           : FloatingActionButton.extended(
               onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const RulePage())),
-              label: Text(tRouteRule.createRule),
+              label: Text(t.pages.settings.routing.routeRule.createRule),
               icon: const Icon(Icons.add_rounded),
             ),
       body: ReorderableListView.builder(

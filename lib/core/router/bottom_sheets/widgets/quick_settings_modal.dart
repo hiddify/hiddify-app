@@ -14,8 +14,6 @@ class QuickSettingsModal extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
 
-    final warpLabel = (ref.watch(ConfigOptions.warpDetourMode) == WarpDetourMode.warpOverProxy) ? t.config.enableWarpSecure : t.config.enableWarpForProxy;
-
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -46,7 +44,7 @@ class QuickSettingsModal extends HookConsumerWidget {
             const Gap(12),
             ListTile(
               leading: const Icon(Icons.cloud_rounded),
-              title: Text(warpLabel),
+              title: Text(ref.watch(ConfigOptions.warpDetourMode).presentExplain(t)),
               onTap: () {
                 context.pop();
                 context.goNamed('warpOptions');
@@ -61,7 +59,7 @@ class QuickSettingsModal extends HookConsumerWidget {
             ),
             ListTile(
               leading: const Icon(Icons.content_cut_rounded),
-              title: Text(t.config.section.tlsTricks),
+              title: Text(t.pages.settings.tlsTricks.title),
               onTap: () {
                 context.pop();
                 context.goNamed('tlsTricks');

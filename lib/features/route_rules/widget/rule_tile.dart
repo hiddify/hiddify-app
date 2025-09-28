@@ -37,11 +37,11 @@ class RuleTile extends HookConsumerWidget {
   }
 
   Future handleDelete(BuildContext context, WidgetRef ref) async {
-    final tRouteRule = ref.watch(translationsProvider).requireValue.settings.routeRule;
+    final t = ref.watch(translationsProvider).requireValue;
     final result = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
-          title: tRouteRule.deleteRule,
-          message: tRouteRule.deleteRule,
-          positiveBtnTxt: tRouteRule.deleteRule,
+          title: t.dialogs.confirmation.routeRule.delete.title,
+          message: t.dialogs.confirmation.routeRule.delete.msg(rulename: rule.name),
+          positiveBtnTxt: t.common.delete,
         );
     if (result == true) {
       await ref.read(rulesNotifierProvider.notifier).deleteRule(rule.listOrder);
@@ -51,7 +51,6 @@ class RuleTile extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final tRule = t.settings.routeRule.rule;
     final scrollController = useScrollController();
     ref.listen(
       rulesNotifierProvider,
@@ -71,7 +70,7 @@ class RuleTile extends HookConsumerWidget {
                   position: RelativeRect.fromLTRB(offset.dx, offset.dy, offset.dx, offset.dy),
                   items: [
                     PopupMenuItem(
-                      child: Text(t.settings.routeRule.deleteRule),
+                      child: Text(t.pages.settings.routing.routeRule.deleteRule),
                       onTap: () async => await handleDelete(context, ref),
                     ),
                   ],
@@ -83,7 +82,7 @@ class RuleTile extends HookConsumerWidget {
           children: [
             ListTile(
               title: Text(
-                tRule.outbound[rule.outbound.name] ?? rule.outbound.name,
+                t.pages.settings.routing.routeRule.rule.outbound[rule.outbound.name] ?? rule.outbound.name,
                 style: Theme.of(context).textTheme.labelMedium,
               ),
               subtitle: Text(
@@ -104,9 +103,9 @@ class RuleTile extends HookConsumerWidget {
               scrollController: scrollController,
               t: mergeTranslation(
                 [
-                  tRule.tileTitle,
-                  tRule.network,
-                  tRule.outbound,
+                  t.pages.settings.routing.routeRule.rule.tileTitle,
+                  t.pages.settings.routing.routeRule.rule.network,
+                  t.pages.settings.routing.routeRule.rule.outbound,
                 ],
               ),
             ),

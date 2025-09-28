@@ -5,6 +5,8 @@ import 'package:dartx/dartx_io.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
+import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/hiddifycore/generated/v2/config/route_rule.pb.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -68,33 +70,43 @@ class RulesNotifier extends _$RulesNotifier with AppLogger {
 
   //export Clipboard
   Future<bool> exportJsonToClipboard() async {
+    final t = ref.read(translationsProvider).requireValue;
     try {
       final routeRules = RouteRule(rules: state);
       await Clipboard.setData(ClipboardData(text: jsonEncode(routeRules.writeToJson())));
+      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
       return true;
+    } on PlatformException {
+      ref.read(inAppNotificationControllerProvider).showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
+      return false;
     } catch (e, st) {
       loggy.warning("error exporting route rules to clipboard", e, st);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.common.msg.export.clipboard.failure);
       return false;
     }
   }
 
   //import Clipboard
   Future<bool> importRulesFromClipboard() async {
+    final t = ref.read(translationsProvider).requireValue;
     try {
       final input = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text);
       if (input == null) return false;
       final routeRules = RouteRule.fromJson(jsonDecode(input) as String);
       state = routeRules.rules;
       await _updateFile();
+      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.import.success);
       return true;
     } catch (e, st) {
       loggy.warning("error importing route rules from clipboard", e, st);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.common.msg.import.failure);
       return false;
     }
   }
 
   //export JSON
   Future<bool> saveRulesAsJsonFile() async {
+    final t = ref.read(translationsProvider).requireValue;
     try {
       final bytes = utf8.encode(RouteRule(rules: state).writeToJson());
       final outputFile = await FilePicker.platform.saveFile(
@@ -110,15 +122,18 @@ class RulesNotifier extends _$RulesNotifier with AppLogger {
         if (!await file.exists()) await file.parent.create(recursive: true);
         await file.writeAsBytes(bytes);
       }
+      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.file.success);
       return true;
     } catch (e, st) {
       loggy.warning("error exporting route rules to json file", e, st);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.common.msg.export.file.failure);
       return false;
     }
   }
 
   //import JSON
   Future<bool> importRulesFromJsonFile() async {
+    final t = ref.read(translationsProvider).requireValue;
     try {
       final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['json']);
       if (result == null) return false;
@@ -128,9 +143,11 @@ class RulesNotifier extends _$RulesNotifier with AppLogger {
       final routeRules = RouteRule.fromJson(utf8.decode(bytes));
       state = routeRules.rules;
       await _updateFile();
+      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.import.success);
       return true;
     } catch (e, st) {
       loggy.warning("error importing route rules from json file", e, st);
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.common.msg.import.failure);
       return false;
     }
   }

@@ -41,7 +41,7 @@ class IPText extends HookConsumerWidget {
     );
 
     return Semantics(
-      label: t.proxies.ipInfoSemantics.address,
+      label: t.pages.proxies.ipInfo.address,
       child: InkWell(
         onTap: () {
           ref.read(_showIp.notifier).state = !isVisible;
@@ -61,7 +61,7 @@ class IPText extends HookConsumerWidget {
               padding: constrained ? EdgeInsets.zero : const EdgeInsetsDirectional.only(end: 48),
               child: Text(
                 obscureIp(ip),
-                semanticsLabel: t.general.hidden,
+                semanticsLabel: t.common.hidden,
                 style: ipStyle,
                 textDirection: TextDirection.ltr,
                 overflow: TextOverflow.ellipsis,
@@ -95,7 +95,7 @@ class UnknownIPText extends HookConsumerWidget {
     final style = constrained ? textTheme.bodySmall : textTheme.labelMedium;
 
     return Semantics(
-      label: t.proxies.ipInfoSemantics.address,
+      label: t.pages.proxies.ipInfo.address,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -126,7 +126,7 @@ class IPCountryFlag extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     return Semantics(
-      label: t.proxies.ipInfoSemantics.country,
+      label: t.pages.proxies.ipInfo.country,
       child: Padding(
         padding: padding,
         child: (countryCode?.isEmpty ?? true)
@@ -230,7 +230,7 @@ class OrganisationFlag extends HookConsumerWidget {
           color: entry.value.color,
           organization: organization,
           size: size,
-          label: t.proxies.ipInfoSemantics.organization,
+          label: t.pages.proxies.ipInfo.organization,
         );
       }
     }

@@ -18,7 +18,7 @@ class SettingCheckbox extends ConsumerWidget {
     if (t == null) {
       return e.map((e) => '$e').toList().join(', ');
     } else {
-      if (e.isEmpty) return t![''] ?? ref.watch(translationsProvider).requireValue.general.empty;
+      if (e.isEmpty) return t![''] ?? ref.watch(translationsProvider).requireValue.common.empty;
       return e.map((e) => t!['$e'] ?? '$e').toList().join(', ');
     }
   }

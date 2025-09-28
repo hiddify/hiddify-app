@@ -121,8 +121,8 @@ class BatteryOptimizationWidget extends HookConsumerWidget {
       data: (isIgnored) => isIgnored
           ? const SizedBox()
           : ListTile(
-              title: Text(t.settings.general.ignoreBatteryOptimizations),
-              subtitle: Text(t.settings.general.ignoreBatteryOptimizationsMsg),
+              title: Text(t.pages.settings.general.ignoreBatteryOptimizations),
+              subtitle: Text(t.pages.settings.general.ignoreBatteryOptimizationsMsg),
               leading: const Icon(Icons.battery_saver_rounded),
               onTap: () async {
                 await ref.read(batteryOptimizationNotifierProvider.notifier).requestToIgnore();

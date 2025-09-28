@@ -34,7 +34,7 @@ class CustomAlertDialog extends HookConsumerWidget {
           onPressed: () {
             context.pop();
           },
-          child: Text(t.general.ok),
+          child: Text(t.common.ok),
         ),
       ],
     );

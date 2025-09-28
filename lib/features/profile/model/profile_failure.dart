@@ -30,16 +30,16 @@ sealed class ProfileFailure with _$ProfileFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       ProfileUnexpectedFailure() => (
-          type: t.failure.profiles.unexpected,
+          type: t.errors.profiles.unexpected,
           message: null,
         ),
-      ProfileNotFoundFailure() => (type: t.failure.profiles.notFound, message: null),
+      ProfileNotFoundFailure() => (type: t.errors.profiles.notFound, message: null),
       ProfileInvalidUrlFailure(:final message) => (
-          type: t.failure.profiles.invalidUrl,
+          type: t.errors.profiles.invalidUrl,
           message: message,
         ),
-      ProfileInvalidConfigFailure(:final message, :final configOptionFailure) => configOptionFailure?.present(t) ?? (type: t.failure.profiles.invalidConfig, message: message),
-      ProfileCancelByUserFailure(:final message) => (type: t.failure.profiles.canceledByUser, message: message),
+      ProfileInvalidConfigFailure(:final message, :final configOptionFailure) => configOptionFailure?.present(t) ?? (type: t.errors.profiles.invalidConfig, message: message),
+      ProfileCancelByUserFailure(:final message) => (type: t.errors.profiles.canceledByUser, message: message),
     };
   }
 }

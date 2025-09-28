@@ -57,12 +57,12 @@ class FreeBtn extends ConsumerWidget {
                         children: [
                           if (freeProfile.neededFeatures!.contains('warp_over_proxies'))
                             Feature(
-                              title: t.profile.add.addWarp,
+                              title: t.common.warp,
                               icon: Icons.add_moderator,
                             ),
                           if (freeProfile.neededFeatures!.contains('fragment'))
                             Feature(
-                              title: t.profile.add.addFragment,
+                              title: t.common.fragment,
                               icon: Icons.content_cut,
                             ),
                         ],

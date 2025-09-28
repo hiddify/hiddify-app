@@ -18,7 +18,7 @@ sealed class StatsFailure with _$StatsFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       StatsUnexpectedFailure() => (
-          type: t.failure.unexpected,
+          type: t.errors.unexpected,
           message: null,
         ),
     };

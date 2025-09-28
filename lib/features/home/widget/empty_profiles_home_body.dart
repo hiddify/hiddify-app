@@ -16,12 +16,12 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(t.home.emptyProfilesMsg.text),
+          Text(t.dialogs.noActiveProfile.msg),
           const Gap(16),
           ElevatedButton(
             onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
             // icon: const Icon(FluentIcons.add_24_regular),
-            child: Text(t.profile.add.buttonText),
+            child: Text(t.pages.profiles.add),
           ),
         ],
       ),

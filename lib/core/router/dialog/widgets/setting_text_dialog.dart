@@ -29,7 +29,7 @@ class SettingTextDialog extends HookConsumerWidget {
             ),
             controller: tController,
             validator: (value) {
-              if (value == null || value.isEmpty) return t.settings.routeRule.rule.canNotBeEmpty;
+              if (value == null || value.isEmpty) return t.pages.settings.routing.routeRule.rule.canNotBeEmpty;
               if (validator == null) return null;
               return validator!.call(value);
             },
@@ -40,15 +40,15 @@ class SettingTextDialog extends HookConsumerWidget {
       actions: [
         if (defaultValue != null)
           TextButton(
-            child: Text(t.general.reset),
+            child: Text(t.common.reset),
             onPressed: () => context.pop(defaultValue),
           ),
         TextButton(
-          child: Text(t.general.cancel),
+          child: Text(t.common.cancel),
           onPressed: () => context.pop(),
         ),
         TextButton(
-          child: Text(t.general.ok),
+          child: Text(t.common.ok),
           onPressed: () {
             if (formKey.currentState!.validate()) {
               context.pop(tController.text.trim());

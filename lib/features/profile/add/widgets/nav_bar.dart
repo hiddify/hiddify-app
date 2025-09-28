@@ -24,7 +24,7 @@ class NavBar extends ConsumerWidget {
             key: const ValueKey('free'),
             children: [
               Text(
-                t.profile.add.free,
+                t.common.free,
                 style: theme.textTheme.titleMedium!.copyWith(color: textColor),
               ),
               const Gap(8),
@@ -38,7 +38,7 @@ class NavBar extends ConsumerWidget {
           ActionChip(
             key: const ValueKey("help"),
             label: Text(
-              t.help.title,
+              t.common.help,
               style: theme.textTheme.labelLarge!.copyWith(
                 color: textColor,
               ),

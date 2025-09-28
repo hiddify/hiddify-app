@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
+import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
@@ -57,6 +59,8 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
         loggy.info(
           'successfully deleted profile, was active? [${profile.active}]',
         );
+        final t = ref.read(translationsProvider).requireValue;
+        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.delete.success);
         return unit;
       },
     ).run();
@@ -70,6 +74,8 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
       },
       (configJson) async {
         await Clipboard.setData(ClipboardData(text: configJson));
+        final t = ref.read(translationsProvider).requireValue;
+        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
       },
     ).run();
   }

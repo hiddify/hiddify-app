@@ -22,9 +22,9 @@ enum ProxiesSort {
   delay;
 
   String present(TranslationsEn t) => switch (this) {
-        ProxiesSort.unsorted => t.proxies.sortOptions.unsorted,
-        ProxiesSort.name => t.proxies.sortOptions.name,
-        ProxiesSort.delay => t.proxies.sortOptions.delay,
+        ProxiesSort.unsorted => t.pages.proxies.sortOptions.unsorted,
+        ProxiesSort.name => t.pages.proxies.sortOptions.name,
+        ProxiesSort.delay => t.pages.proxies.sortOptions.delay,
       };
 }
 

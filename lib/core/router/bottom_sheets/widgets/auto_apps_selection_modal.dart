@@ -17,7 +17,7 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
   final AppProxyMode mode;
 
   String _genSliderText(Translations t, int sliderValue) {
-    final day = t.profile.interval.day(n: sliderValue);
+    final day = t.common.interval.day(n: sliderValue);
     return day;
   }
 
@@ -56,7 +56,7 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
         child: Column(
           children: [
             ListTile(
-              title: Text(t.settings.network.autoSelection.title),
+              title: Text(t.pages.settings.routing.perAppProxy.autoSelection.title),
               trailing: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: loading
@@ -96,7 +96,7 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
                             children: [
                               Expanded(
                                 child: Text(
-                                  t.profile.detailsForm.updateInterval,
+                                  t.pages.settings.routing.perAppProxy.autoSelection.autoUpdateInterval,
                                   style: theme.textTheme.titleSmall!.copyWith(
                                     color: theme.colorScheme.onSurface,
                                   ),
@@ -137,7 +137,7 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
                                       : () async {
                                           await ref.read(appProxyLoadingProvider.notifier).doAsync(ref.read(PerAppProxyProvider(mode).notifier).applyAutoSelection);
                                         },
-                                  child: Text(t.settings.network.autoSelection.performNow),
+                                  child: Text(t.pages.settings.routing.perAppProxy.autoSelection.performNow),
                                 ),
                               ),
                               const Gap(8),
@@ -147,7 +147,7 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
                                     : () async {
                                         await ref.read(appProxyLoadingProvider.notifier).doAsync(ref.read(PerAppProxyProvider(mode).notifier).revertForceDeselection);
                                       },
-                                child: Text(t.settings.network.autoSelection.resetToDefault),
+                                child: Text(t.pages.settings.routing.perAppProxy.autoSelection.resetToDefault),
                               ),
                             ],
                           ),

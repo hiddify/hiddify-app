@@ -52,39 +52,39 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       UnexpectedConnectionFailure(:final error) when error != null => (
-          type: t.failure.connectivity.unexpected,
+          type: t.errors.connectivity.unexpected,
           message: error.toString(),
         ),
       UnexpectedConnectionFailure() => (
-          type: t.failure.connectivity.unexpected,
+          type: t.errors.connectivity.unexpected,
           message: null,
         ),
-      MissingVpnPermission(:final message) => (type: t.failure.connectivity.missingVpnPermission, message: message),
-      MissingNotificationPermission(:final message) => (type: t.failure.connectivity.missingNotificationPermission, message: message),
+      MissingVpnPermission(:final message) => (type: t.errors.connectivity.missingVpnPermission, message: message),
+      MissingNotificationPermission(:final message) => (type: t.errors.connectivity.missingNotificationPermission, message: message),
       MissingPrivilege() => (
-          type: t.failure.singbox.missingPrivilege,
-          message: t.failure.singbox.missingPrivilegeMsg,
+          type: t.errors.singbox.missingPrivilege,
+          message: t.errors.singbox.missingPrivilegeMsg,
         ),
       MissingGeoAssets() => (
-          type: t.failure.singbox.missingGeoAssets,
-          message: t.failure.singbox.missingGeoAssetsMsg,
+          type: t.errors.singbox.missingGeoAssets,
+          message: t.errors.singbox.missingGeoAssetsMsg,
         ),
       InvalidConfigOption(:final message, :final configOptionFailure) => configOptionFailure?.present(t) ??
           (
-            type: t.failure.singbox.invalidConfigOptions,
+            type: t.errors.singbox.invalidConfigOptions,
             message: message,
           ),
       InvalidConfig(:final message) => (
-          type: t.failure.singbox.invalidConfig,
+          type: t.errors.singbox.invalidConfig,
           message: message,
         ),
       BackgroundCoreNotAvailable(:final message) => (
-          type: t.failure.connectivity.core,
+          type: t.errors.connectivity.core,
           message: message,
         ),
       MissingWarpLicense() => (
-          type: t.failure.warp.missingLicense,
-          message: t.failure.warp.missingLicenseMsg,
+          type: t.errors.warp.missingLicense,
+          message: t.errors.warp.missingLicenseMsg,
         ),
     };
   }

@@ -8,6 +8,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/per_app_proxy/model/app_package_info.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/per_app_proxy/model/pkg_flag.dart';
@@ -152,7 +153,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
               ),
             )
           : AppBar(
-              title: Text(t.settings.network.perAppProxyPageTitle),
+              title: Text(t.pages.settings.routing.perAppProxy.title),
               actions: [
                 IconButton(
                   icon: const Icon(FluentIcons.search_24_regular),
@@ -164,37 +165,53 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                     SubmenuButton(
                       menuChildren: <Widget>[
                         MenuItemButton(
-                          child: Text(t.settings.network.import.Clipboard),
-                          onPressed: () async => await ref.read(PerAppProxyProvider(mode).notifier).importClipboard(),
+                          child: Text(t.pages.settings.routing.perAppProxy.options.import.clipboard),
+                          onPressed: () async => await ref
+                              .read(dialogNotifierProvider.notifier)
+                              .showConfirmation(
+                                title: t.common.msg.import.confirm,
+                                message: t.dialogs.confirmation.perAppProxy.import.msg,
+                              )
+                              .then((shouldImport) async {
+                            if (shouldImport) await ref.read(PerAppProxyProvider(mode).notifier).importClipboard();
+                          }),
                         ),
                         MenuItemButton(
-                          child: Text(t.settings.network.import.JsonFile),
-                          onPressed: () async => await ref.read(PerAppProxyProvider(mode).notifier).importFile(),
+                          child: Text(t.pages.settings.routing.perAppProxy.options.import.file),
+                          onPressed: () async => await ref
+                              .read(dialogNotifierProvider.notifier)
+                              .showConfirmation(
+                                title: t.pages.settings.routing.perAppProxy.options.import.file,
+                                message: t.pages.settings.routing.perAppProxy.options.import.msg,
+                              )
+                              .then((shouldImport) async {
+                            if (shouldImport) await ref.read(PerAppProxyProvider(mode).notifier).importFile();
+                          }),
                         ),
                       ],
-                      child: Text(t.general.import),
+                      child: Text(t.common.import),
                     ),
                     SubmenuButton(
                       menuChildren: <Widget>[
                         MenuItemButton(
-                          child: Text(t.settings.network.export.Clipboard),
+                          child: Text(t.pages.settings.routing.perAppProxy.options.export.clipboard),
                           onPressed: () async => await ref.read(PerAppProxyProvider(mode).notifier).exportClipboard(),
                         ),
                         MenuItemButton(
-                          child: Text(t.settings.network.export.JsonFile),
+                          child: Text(t.pages.settings.routing.perAppProxy.options.export.file),
                           onPressed: () async => await ref.read(PerAppProxyProvider(mode).notifier).exportFile(),
                         ),
                       ],
-                      child: Text(t.general.export),
+                      child: Text(t.common.export),
                     ),
                     if (ref.watch(ConfigOptions.region) != Region.other)
                       MenuItemButton(
-                        child: Text(t.settings.network.share.title),
+                        child: Text(t.pages.settings.routing.perAppProxy.options.shareToAll),
                         onPressed: () async => await ref.read(appProxyLoadingProvider.notifier).doAsync(ref.read(PerAppProxyProvider(mode).notifier).shareOnGithub),
                       ),
                     const PopupMenuDivider(),
                     MenuItemButton(
-                      child: Text(t.settings.network.clearSelection),
+                      child: Text(t.pages.settings.routing.perAppProxy.options.clearAllSelections),
                       onPressed: () => ref.read(PerAppProxyProvider(mode).notifier).clearAll(),
                     ),
                   ],
@@ -266,7 +283,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                       ),
                       const Gap(8),
                       ChoiceChip(
-                        label: Text(t.settings.network.hideSystemApps),
+                        label: Text(t.pages.settings.routing.perAppProxy.hideSysApps),
                         selected: hideSystemApps.value,
                         onSelected: (value) => hideSystemApps.value = value,
                       ),
@@ -287,7 +304,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
           : (ref.watch(ConfigOptions.region) != Region.other)
               ? FloatingActionButton.extended(
                   onPressed: () async => await ref.read(bottomSheetsNotifierProvider.notifier).showAutoAppsSelection(mode: mode!),
-                  label: Text(t.settings.network.autoSelection.title),
+                  label: Text(t.pages.settings.routing.perAppProxy.autoSelection.title),
                   icon: Icon(ref.watch(Preferences.autoAppsSelectionRegion) == null ? Icons.toggle_off_outlined : Icons.toggle_on_rounded),
                 )
               : null,

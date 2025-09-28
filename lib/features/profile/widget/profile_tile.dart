@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
@@ -102,7 +103,7 @@ class ProfileTile extends HookConsumerWidget {
                   focused: isMain,
                   liveRegion: isMain,
                   namesRoute: isMain,
-                  label: isMain ? t.profile.activeProfileBtnSemanticLabel : null,
+                  label: isMain ? t.pages.profiles.viewAllProfiles : null,
                   child: InkWell(
                     borderRadius: showActionButton ? ProfileTileConst.endBorderRadius(Directionality.of(context)) : ProfileTileConst.cardBorderRadius,
                     onTap: () {
@@ -153,7 +154,7 @@ class ProfileTile extends HookConsumerWidget {
                                         style: theme.textTheme.titleMedium?.copyWith(
                                           fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
                                         ),
-                                        semanticsLabel: t.profile.activeProfileNameSemanticLabel(
+                                        semanticsLabel: t.pages.profiles.activeProfileName(
                                           name: profile.name,
                                         ),
                                       ),
@@ -172,10 +173,10 @@ class ProfileTile extends HookConsumerWidget {
                                 fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
                               ),
                               semanticsLabel: profile.active
-                                  ? t.profile.activeProfileNameSemanticLabel(
+                                  ? t.pages.profiles.activeProfileName(
                                       name: profile.name,
                                     )
-                                  : t.profile.nonActiveProfileBtnSemanticLabel(
+                                  : t.pages.profiles.nonActiveProfileName(
                                       name: profile.name,
                                     ),
                             ),
@@ -215,7 +216,7 @@ class ProfileActionButton extends HookConsumerWidget {
         button: true,
         enabled: !ref.watch(updateProfileNotifierProvider(profile.id)).isLoading,
         child: Tooltip(
-          message: t.profile.update.tooltip,
+          message: t.pages.profiles.update,
           child: InkWell(
             borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
             onTap: () {
@@ -259,22 +260,10 @@ class ProfileActionsMenu extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
 
-    final exportConfigMutation = useMutation(
-      initialOnFailure: (err) {
-        CustomToast.error(t.presentShortError(err)).show(context);
-      },
-      initialOnSuccess: () => CustomToast.success(t.profile.share.exportConfigToClipboardSuccess).show(context),
-    );
-    final deleteProfileMutation = useMutation(
-      initialOnFailure: (err) {
-        ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(err));
-      },
-    );
-
     final menuItems = [
       if (profile case RemoteProfileEntity())
         AdaptiveMenuItem(
-          title: t.profile.update.buttonTxt,
+          title: t.common.update,
           icon: Icons.update_rounded,
           onTap: () {
             if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
@@ -284,24 +273,24 @@ class ProfileActionsMenu extends HookConsumerWidget {
           },
         ),
       AdaptiveMenuItem(
-        title: t.profile.share.buttonText,
+        title: t.common.share,
         icon: AdaptiveIcon(context).share,
         subItems: [
           if (profile case RemoteProfileEntity(:final url, :final name)) ...[
             AdaptiveMenuItem(
-              title: t.profile.share.exportSubLinkToClipboard,
+              title: t.pages.profiles.share.urlToClipboard,
               onTap: () async {
                 final link = LinkParser.generateSubShareLink(url, name);
                 if (link.isNotEmpty) {
                   await Clipboard.setData(ClipboardData(text: link));
                   if (context.mounted) {
-                    CustomToast(t.profile.share.exportToClipboardSuccess).show(context);
+                    ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
                   }
                 }
               },
             ),
             AdaptiveMenuItem(
-              title: t.profile.share.subLinkQrCode,
+              title: t.pages.profiles.share.showUrlQr,
               onTap: () async {
                 final link = LinkParser.generateSubShareLink(url, name);
                 if (link.isNotEmpty) {
@@ -311,21 +300,14 @@ class ProfileActionsMenu extends HookConsumerWidget {
             ),
           ],
           AdaptiveMenuItem(
-            title: t.profile.share.exportConfigToClipboard,
-            onTap: () {
-              if (exportConfigMutation.state.isInProgress) {
-                return;
-              }
-              exportConfigMutation.setFuture(
-                ref.read(profilesNotifierProvider.notifier).exportConfigToClipboard(profile),
-              );
-            },
+            title: t.pages.profiles.share.jsonToClipboard,
+            onTap: () async => await ref.read(profilesNotifierProvider.notifier).exportConfigToClipboard(profile),
           ),
         ],
       ),
       AdaptiveMenuItem(
         icon: Icons.edit_rounded,
-        title: t.profile.edit.buttonTxt,
+        title: t.common.edit,
         onTap: () {
           if (Breakpoint(context).isMobile()) context.pop();
           context.goNamed(
@@ -339,24 +321,19 @@ class ProfileActionsMenu extends HookConsumerWidget {
       // if (!profile.active)
       AdaptiveMenuItem(
         icon: Icons.delete_outline_rounded,
-        title: t.profile.delete.buttonTxt,
-        onTap: () async {
-          if (deleteProfileMutation.state.isInProgress) return;
-          await ref
-              .read(dialogNotifierProvider.notifier)
-              .showConfirmation(
-                title: t.profile.delete.buttonTxt,
-                message: t.profile.delete.confirmationMsg,
-              )
-              .then(
-            (deleteConfirmed) {
-              if (!deleteConfirmed) return;
-              deleteProfileMutation.setFuture(
-                ref.read(profilesNotifierProvider.notifier).deleteProfile(profile),
-              );
-            },
-          );
-        },
+        title: t.common.delete,
+        onTap: () async => await ref
+            .read(dialogNotifierProvider.notifier)
+            .showConfirmation(
+              title: t.dialogs.confirmation.profile.delete.title,
+              message: t.dialogs.confirmation.profile.delete.msg,
+            )
+            .then(
+          (deleteConfirmed) async {
+            if (!deleteConfirmed) return;
+            await ref.read(profilesNotifierProvider.notifier).deleteProfile(profile);
+          },
+        ),
       ),
     ];
 
@@ -376,14 +353,14 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
 
   (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
     if (subInfo.isExpired) {
-      return (t.profile.subscription.expired, theme.colorScheme.error);
+      return (t.components.subscriptionInfo.expired, theme.colorScheme.error);
     } else if (subInfo.ratio >= 1) {
-      return (t.profile.subscription.noTraffic, theme.colorScheme.error);
+      return (t.components.subscriptionInfo.noTraffic, theme.colorScheme.error);
     } else if (subInfo.remaining.inDays > 365) {
-      return (t.profile.subscription.remainingDuration(duration: "∞"), null);
+      return (t.components.subscriptionInfo.remainingDuration(duration: "∞"), null);
     } else {
       return (
-        t.profile.subscription.remainingDuration(duration: subInfo.remaining.inDays),
+        t.components.subscriptionInfo.remainingDuration(duration: subInfo.remaining.inDays),
         null,
       );
     }
@@ -405,7 +382,7 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
               subInfo.total > 10 * 1099511627776 //10TB
                   ? "∞ GiB"
                   : subInfo.consumption.sizeOf(subInfo.total),
-              semanticsLabel: t.profile.subscription.remainingTrafficSemanticLabel(
+              semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
                 consumed: subInfo.consumption.sizeGB(),
                 total: subInfo.total.sizeGB(),
               ),
@@ -438,7 +415,7 @@ class NewTrafficSubscriptionInfo extends HookConsumerWidget {
 
     return Column(children: [
       const Icon(Icons.assessment_rounded, color: Colors.blue),
-      Text(t.profile.subscription.remaingTraffic),
+      Text(t.components.subscriptionInfo.remainingTraffic),
       const SizedBox(height: 4),
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -450,7 +427,7 @@ class NewTrafficSubscriptionInfo extends HookConsumerWidget {
               subInfo.total > 10 * 1099511627776 //10TB
                   ? "∞ GiB"
                   : subInfo.consumption.sizeOf(subInfo.total),
-              semanticsLabel: t.profile.subscription.remainingTrafficSemanticLabel(
+              semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
                 consumed: subInfo.consumption.sizeGB(),
                 total: subInfo.total.sizeGB(),
               ),
@@ -472,14 +449,14 @@ class NewDaySubscriptionInfo extends HookConsumerWidget {
 
   (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
     if (subInfo.isExpired) {
-      return (t.profile.subscription.expired, theme.colorScheme.error);
+      return (t.components.subscriptionInfo.expired, theme.colorScheme.error);
     } else if (subInfo.ratio >= 1) {
-      return (t.profile.subscription.noTraffic, theme.colorScheme.error);
+      return (t.components.subscriptionInfo.noTraffic, theme.colorScheme.error);
     } else if (subInfo.remaining.inDays > 365) {
-      return (t.profile.subscription.remainingDurationNew(duration: "∞"), null);
+      return (t.components.subscriptionInfo.remainingDurationNew(duration: "∞"), null);
     } else {
       return (
-        t.profile.subscription.remainingDurationNew(duration: subInfo.remaining.inDays),
+        t.components.subscriptionInfo.remainingDurationNew(duration: subInfo.remaining.inDays),
         null,
       );
     }
@@ -493,7 +470,7 @@ class NewDaySubscriptionInfo extends HookConsumerWidget {
     final remaining = remainingText(t, theme);
     return Column(children: [
       const Icon(Icons.timer, color: Colors.blue),
-      Text(t.profile.subscription.remaingTime),
+      Text(t.components.subscriptionInfo.remainingTime),
       const SizedBox(height: 4),
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -520,14 +497,14 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
 
   (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
     if (subInfo.isExpired) {
-      return (t.profile.subscription.expired, theme.colorScheme.error);
+      return (t.components.subscriptionInfo.expired, theme.colorScheme.error);
     } else if (subInfo.ratio >= 1) {
-      return (t.profile.subscription.noTraffic, theme.colorScheme.error);
+      return (t.components.subscriptionInfo.noTraffic, theme.colorScheme.error);
     } else if (subInfo.remaining.inDays > 365) {
-      return (t.profile.subscription.remainingDurationNew(duration: "∞"), null);
+      return (t.components.subscriptionInfo.remainingDurationNew(duration: "∞"), null);
     } else {
       return (
-        t.profile.subscription.remainingDurationNew(duration: subInfo.remaining.inDays),
+        t.components.subscriptionInfo.remainingDurationNew(duration: subInfo.remaining.inDays),
         null,
       );
     }
@@ -541,7 +518,7 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
     final remaining = remainingText(t, theme);
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
       const Icon(Icons.assessment_rounded, color: Colors.blue),
-      Text(t.profile.subscription.remaingUsage),
+      Text(t.components.subscriptionInfo.remainingUsage),
       const SizedBox(height: 4),
       Text(
         remaining.$1,
@@ -554,7 +531,7 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
           subInfo.total > 10 * 1099511627776 //10TB
               ? "∞ GiB"
               : subInfo.consumption.sizeOf(subInfo.total),
-          semanticsLabel: t.profile.subscription.remainingTrafficSemanticLabel(
+          semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
             consumed: subInfo.consumption.sizeGB(),
             total: subInfo.total.sizeGB(),
           ),
@@ -583,7 +560,7 @@ class NewSiteSubscriptionInfo extends HookConsumerWidget {
         onTap: () => launchUrl(Uri.parse(subInfo.webPageUrl ?? "")),
         child: Column(children: [
           const Icon(FluentIcons.globe_person_24_filled, size: 24, color: Colors.blue),
-          Text(t.profile.subscription.profileSite),
+          Text(t.components.subscriptionInfo.profileSite),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

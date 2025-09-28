@@ -40,7 +40,7 @@ class WarpLicenseDialog extends HookConsumerWidget {
       return null;
     }, []);
     return AlertDialog(
-      title: Text(t.config.warpConsent.title),
+      title: Text(t.dialogs.warpLicense.title),
       content: ConstrainedBox(
         constraints: AlertDialogConst.boxConstraints,
         child: SingleChildScrollView(
@@ -49,7 +49,7 @@ class WarpLicenseDialog extends HookConsumerWidget {
               Focus(focusNode: focusNodes[WarpConst.warpTermsOfServiceKey], onKeyEvent: (node, event) => _handleKeyEvent(event, WarpConst.warpTermsOfServiceKey), child: const Gap(0.1)),
               Focus(focusNode: focusNodes[WarpConst.warpPrivacyPolicyKey], onKeyEvent: (node, event) => _handleKeyEvent(event, WarpConst.warpPrivacyPolicyKey), child: const Gap(0.1)),
               Text.rich(
-                t.config.warpConsent.description(
+                t.dialogs.warpLicense.description(
                   tos: (text) => TextSpan(
                     text: text,
                     style: TextStyle(color: focusStates[WarpConst.warpTermsOfServiceKey]!.value ? Colors.green : Colors.blue),
@@ -81,13 +81,13 @@ class WarpLicenseDialog extends HookConsumerWidget {
           onPressed: () {
             context.pop(false);
           },
-          child: Text(t.general.decline),
+          child: Text(t.common.decline),
         ),
         TextButton(
           onPressed: () {
             context.pop(true);
           },
-          child: Text(t.general.agree),
+          child: Text(t.common.agree),
         ),
       ],
     );

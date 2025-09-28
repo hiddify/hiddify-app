@@ -18,22 +18,18 @@ sealed class GeoAssetFailure with _$GeoAssetFailure, Failure {
   const factory GeoAssetFailure.noUpdateAvailable() = GeoAssetNoUpdateAvailable;
 
   @With<ExpectedMeasuredFailure>()
-  const factory GeoAssetFailure.activeAssetNotFound() =
-      GeoAssetActiveAssetNotFound;
+  const factory GeoAssetFailure.activeAssetNotFound() = GeoAssetActiveAssetNotFound;
 
   @override
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       GeoAssetUnexpectedFailure() => (
-          type: t.failure.geoAssets.unexpected,
+          type: t.errors.geoAssets.unexpected,
           message: null,
         ),
-      GeoAssetNoUpdateAvailable() => (
-          type: t.failure.geoAssets.notUpdate,
-          message: null
-        ),
+      GeoAssetNoUpdateAvailable() => (type: t.errors.geoAssets.notUpdate, message: null),
       GeoAssetActiveAssetNotFound() => (
-          type: t.failure.geoAssets.activeNotFound,
+          type: t.errors.geoAssets.activeNotFound,
           message: null,
         ),
     };

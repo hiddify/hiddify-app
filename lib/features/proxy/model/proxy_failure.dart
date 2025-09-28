@@ -30,16 +30,16 @@ sealed class ProxyFailure with _$ProxyFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       ProxyUnexpectedFailure() => (
-          type: t.failure.unexpected,
+          type: t.errors.unexpected,
           message: null,
         ),
       ServiceNotRunning() => (
-          type: t.failure.singbox.serviceNotRunning,
+          type: t.errors.singbox.serviceNotRunning,
           message: null,
         ),
-      UnknownIp() => (type: t.general.unknown, message: null),
+      UnknownIp() => (type: t.common.unknown, message: null),
       UnableToRetrieveIp() => (
-          type: t.failure.unexpected,
+          type: t.errors.unexpected,
           message: null,
         ),
     };

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
@@ -56,7 +55,7 @@ class SettingsPage extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.config.pageTitle),
+        title: Text(t.pages.settings.title),
         actions: [
           MenuAnchor(
             menuChildren: <Widget>[
@@ -66,74 +65,58 @@ class SettingsPage extends HookConsumerWidget {
                     onPressed: () async => await ref
                         .read(dialogNotifierProvider.notifier)
                         .showConfirmation(
-                          title: t.settings.importOptions,
-                          message: t.settings.importOptionsMsg,
+                          title: t.common.msg.import.confirm,
+                          message: t.dialogs.confirmation.settings.import.msg,
                         )
                         .then((shouldImport) async {
                       if (shouldImport) {
                         await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
                       }
                     }),
-                    child: Text(t.settings.importOptions),
+                    child: Text(t.pages.settings.options.import.clipboard),
                   ),
                   MenuItemButton(
                     onPressed: () async => await ref
                         .read(dialogNotifierProvider.notifier)
                         .showConfirmation(
-                          title: t.settings.importOptions,
-                          message: t.settings.importOptionsMsg,
+                          title: t.common.msg.import.confirm,
+                          message: t.dialogs.confirmation.settings.import.msg,
                         )
                         .then((shouldImport) async {
                       if (shouldImport) {
                         await ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
                       }
                     }),
-                    child: Text(t.settings.importOptionsFile),
+                    child: Text(t.pages.settings.options.import.file),
                   ),
                 ],
-                child: Text(t.general.import),
+                child: Text(t.common.import),
               ),
               SubmenuButton(
                 menuChildren: <Widget>[
                   MenuItemButton(
-                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard().then((success) {
-                      if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
-                      }
-                    }),
-                    child: Text(t.settings.exportOptions),
+                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(),
+                    child: Text(t.pages.settings.options.export.anonymousToClipboard),
                   ),
                   MenuItemButton(
-                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile().then((success) {
-                      if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
-                      }
-                    }),
-                    child: Text(t.settings.exportOptionsFile),
+                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile(),
+                    child: Text(t.pages.settings.options.export.anonymousToFile),
                   ),
                   const PopupMenuDivider(),
                   MenuItemButton(
-                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false).then((success) {
-                      if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.clipboardExportSuccessMsg);
-                      }
-                    }),
-                    child: Text(t.settings.exportAllOptions),
+                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false),
+                    child: Text(t.pages.settings.options.export.allToClipboard),
                   ),
                   MenuItemButton(
-                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false).then((success) {
-                      if (success) {
-                        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.general.jsonFileExportSuccessMsg);
-                      }
-                    }),
-                    child: Text(t.settings.exportAllOptionsFile),
+                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false),
+                    child: Text(t.pages.settings.options.export.allToFile),
                   ),
                 ],
-                child: Text(t.general.export),
+                child: Text(t.common.export),
               ),
               const PopupMenuDivider(),
               MenuItemButton(
-                child: Text(t.config.resetBtn),
+                child: Text(t.pages.settings.options.reset),
                 onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).resetOption(),
               ),
             ],
@@ -155,39 +138,39 @@ class SettingsPage extends HookConsumerWidget {
         children: [
           // TipCard(message: t.settings.experimentalMsg),
           SettingsSection(
-            title: t.settings.general.sectionTitle,
+            title: t.pages.settings.general.title,
             icon: Icons.layers_rounded,
             namedLocation: context.namedLocation('general'),
           ),
           SettingsSection(
-            title: t.config.section.route,
+            title: t.pages.settings.routing.title,
             icon: Icons.route_rounded,
             namedLocation: context.namedLocation('routeOptions'),
           ),
           SettingsSection(
-            title: t.config.section.dns,
+            title: t.pages.settings.dns.title,
             icon: Icons.dns_rounded,
             namedLocation: context.namedLocation('dnsOptions'),
           ),
           SettingsSection(
-            title: t.config.section.inbound,
+            title: t.pages.settings.inbound.title,
             icon: Icons.input_rounded,
             namedLocation: context.namedLocation('inboundOptions'),
           ),
           SettingsSection(
-            title: t.config.section.tlsTricks,
+            title: t.pages.settings.tlsTricks.title,
             icon: Icons.content_cut_rounded,
             namedLocation: context.namedLocation('tlsTricks'),
           ),
           SettingsSection(
-            title: t.config.section.warp,
+            title: t.pages.settings.warp.title,
             icon: Icons.cloud_rounded,
             namedLocation: context.namedLocation('warpOptions'),
           ),
           if (PlatformUtils.isIOS)
             Material(
               child: ListTile(
-                title: Text(t.settings.advanced.resetTunnel),
+                title: Text(t.pages.settings.resetTunnel),
                 leading: const Icon(Icons.autorenew_rounded),
                 onTap: () async {
                   await ref.read(resetTunnelNotifierProvider.notifier).run();
@@ -196,12 +179,12 @@ class SettingsPage extends HookConsumerWidget {
             ),
           if (Breakpoint(context).isMobile()) ...[
             SettingsSection(
-              title: t.logs.pageTitle,
+              title: t.pages.logs.title,
               icon: Icons.description_rounded,
               namedLocation: context.namedLocation('logs'),
             ),
             SettingsSection(
-              title: t.about.pageTitle,
+              title: t.pages.about.title,
               icon: Icons.info_rounded,
               namedLocation: context.namedLocation('about'),
             ),

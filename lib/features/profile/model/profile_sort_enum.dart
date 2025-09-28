@@ -8,8 +8,8 @@ enum ProfilesSort {
 
   String present(TranslationsEn t) {
     return switch (this) {
-      lastUpdate => t.profile.sortBy.lastUpdate,
-      name => t.profile.sortBy.name,
+      lastUpdate => t.dialogs.sortProfiles.sort.name,
+      name => t.dialogs.sortProfiles.sort.lastUpdate,
     };
   }
 
