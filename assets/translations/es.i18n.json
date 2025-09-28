@@ -127,7 +127,7 @@
       "freeSubNotFound": "No se encontró ninguna suscripción gratuita",
       "freeSubNotFoundForRegion": "No se encontró ninguna suscripción gratuita para la región \"${region}\"",
       "failedToLoad": "Error al cargar",
-      "updateSub": "Actualizar perfiles de conexión",
+      "updateSubscriptions": "Actualizar suscripciones",
       "share": {
         "urlToClipboard": "URL al portapapeles",
         "showUrlQr": "Mostrar QR de la URL",

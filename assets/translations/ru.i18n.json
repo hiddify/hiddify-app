@@ -131,7 +131,7 @@
       "freeSubNotFound": "Бесплатная подписка не найдена",
       "freeSubNotFoundForRegion": "Бесплатная подписка для региона \"${region}\" не найдена",
       "failedToLoad": "Не удалось загрузить",
-      "updateSub": "Обновить профили подключения",
+      "updateSubscriptions": "Обновить подписки",
       "share": {
         "urlToClipboard": "URL в буфер обмена",
         "showUrlQr": "Показать QR-код URL",

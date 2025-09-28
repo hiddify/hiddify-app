@@ -127,7 +127,7 @@
       "freeSubNotFound": "Ücretsiz abonelik bulunamadı",
       "freeSubNotFoundForRegion": "\"${region}\" bölgesi için ücretsiz abonelik bulunamadı",
       "failedToLoad": "Yüklenemedi",
-      "updateSub": "Bağlantı profillerini güncelle",
+      "updateSubscriptions": "Abonelikleri güncelle",
       "share": {
         "urlToClipboard": "URL'yi panoya kopyala",
         "showUrlQr": "URL QR kodunu göster",

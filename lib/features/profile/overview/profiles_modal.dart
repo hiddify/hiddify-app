@@ -50,8 +50,11 @@ class ProfilesModal extends HookConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       FilledButton.icon(
                         label: Text(
@@ -62,10 +65,9 @@ class ProfilesModal extends HookConsumerWidget {
                         icon: const Icon(Icons.sort_rounded),
                         onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
                       ),
-                      const Gap(8),
                       FilledButton.icon(
                         label: Text(
-                          t.pages.profiles.updateSub,
+                          t.pages.profiles.updateSubscriptions,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

@@ -127,7 +127,7 @@
       "freeSubNotFound": "اشتراک رایگان یافت نشد",
       "freeSubNotFoundForRegion": "اشتراک رایگان برای منطقه «${region}» یافت نشد",
       "failedToLoad": "بارگذاری ناموفق بود",
-      "updateSub": "به‌روزرسانی پروفایل‌های اتصال",
+      "updateSubscriptions": "به‌روزرسانی اشتراک‌ها",
       "share": {
         "urlToClipboard": "URL به کلیپ‌بورد",
         "showUrlQr": "نمایش QR کد URL",

@@ -127,7 +127,7 @@
       "freeSubNotFound": "Tidak ada langganan gratis yang ditemukan",
       "freeSubNotFoundForRegion": "Tidak ada langganan gratis yang ditemukan untuk wilayah \"${region}\"",
       "failedToLoad": "Gagal memuat",
-      "updateSub": "Perbarui profil koneksi",
+      "updateSubscriptions": "Perbarui langganan",
       "share": {
         "urlToClipboard": "URL ke papan klip",
         "showUrlQr": "Tampilkan QR URL",

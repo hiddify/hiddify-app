@@ -127,7 +127,7 @@
       "freeSubNotFound": "未找到免费订阅",
       "freeSubNotFoundForRegion": "未找到 \"${region}\" 地区的免费订阅",
       "failedToLoad": "加载失败",
-      "updateSub": "更新连接配置文件",
+      "updateSubscriptions": "更新订阅",
       "share": {
         "urlToClipboard": "URL 到剪贴板",
         "showUrlQr": "显示 URL 二维码",

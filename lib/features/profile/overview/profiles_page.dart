@@ -44,7 +44,7 @@ class ProfilesPage extends HookConsumerWidget {
           IconButton(
             onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
             icon: const Icon(Icons.update_rounded),
-            tooltip: t.pages.profiles.updateSub,
+            tooltip: t.pages.profiles.updateSubscriptions,
           ),
           const Gap(8),
         ],

@@ -127,7 +127,7 @@
       "freeSubNotFound": "未找到免費訂閱",
       "freeSubNotFoundForRegion": "未找到「${region}」地區的免費訂閱",
       "failedToLoad": "載入失敗",
-      "updateSub": "更新連線設定檔",
+      "updateSubscriptions": "更新訂閱",
       "share": {
         "urlToClipboard": "URL 到剪貼簿",
         "showUrlQr": "顯示 URL QR Code",

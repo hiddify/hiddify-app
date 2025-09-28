@@ -133,7 +133,7 @@
       "freeSubNotFound": "لم يتم العثور على اشتراك مجاني",
       "freeSubNotFoundForRegion": "لم يتم العثور على اشتراك مجاني لمنطقة \"${region}\"",
       "failedToLoad": "فشل التحميل",
-      "updateSub": "تحديث ملفات الاتصال",
+      "updateSubscriptions": "تحديث الاشتراكات",
       "share": {
         "urlToClipboard": "رابط URL إلى الحافظة",
         "showUrlQr": "عرض رمز QR للرابط",
