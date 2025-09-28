@@ -4,8 +4,7 @@ publish_to: "none"
 version: 3.0.0+30000
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
-  flutter: "^3.32.5"
+  sdk: ^3.9.2
 dependencies:
   flutter:
     sdk: flutter
@@ -129,22 +128,21 @@ dependencies:
   # platform-specific settings
   back_button_interceptor: ^8.0.4
   humanizer: ^3.0.1
+  dependency_validator: ^5.0.2
 
 dev_dependencies:
   # flutter_test:
   #   sdk: flutter
   lint: ^2.3.0
   build_web_compilers: ^4.0.11
-  protoc_plugin: ^20.0.1
   build_runner: ^2.4.13
   json_serializable: ^6.7.1
   freezed: ^2.4.7
   riverpod_generator: ^2.4.3
   drift_dev: ^2.21.0
-  ffigen: ^16.0.0
+  ffigen: ^19.1.0
   slang_build_runner: ^4.4.0
   flutter_gen_runner: ^5.4.0
-  dependency_validator: ^4.1.1
   dart_mappable_builder: ^4.2.1
   # protoc_builder: ^0.4.1
   # google_protobuf: ^3.20.1;
