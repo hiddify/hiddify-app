@@ -59,7 +59,7 @@ dependencies:
   accessibility_tools: ^2.2.3
   neat_periodic_task: ^2.0.1
   watcher: ^1.1.0
-  go_router: ^15.1.2
+  go_router: ^16.2.4
   flutter_animate: ^4.5.0
   flutter_svg: ^2.0.10+1
   gap: ^3.0.1
@@ -124,9 +124,6 @@ dependencies:
   # Web platform not supported
   # platform-specific settings
   network_info_plus: ^6.1.4
-  # prevent closing app on back button
-  # platform-specific settings
-  back_button_interceptor: ^8.0.4
   humanizer: ^3.0.1
   dependency_validator: ^5.0.2
 
