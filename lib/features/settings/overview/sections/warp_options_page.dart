@@ -25,6 +25,7 @@ class WarpOptionsPage extends HookConsumerWidget {
           SwitchListTile.adaptive(
             title: Text(t.pages.settings.warp.enable),
             value: isWarpEnabled,
+            secondary: const Icon(Icons.cloud_rounded),
             onChanged: (value) async {
               await ref.read(ConfigOptions.enableWarp.notifier).update(value);
               if (value) await ref.read(warpOptionNotifierProvider.notifier).genWarps();
