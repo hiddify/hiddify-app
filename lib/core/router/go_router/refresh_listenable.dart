@@ -8,16 +8,13 @@ String newUrlFromAppLink = '';
 
 class RefreshListenable extends ChangeNotifier {
   RefreshListenable(this.ref) {
-    ref.listen(
-      myAppLinksProvider,
-      (_, next) {
-        if (next.value != null) {
-          newUrlFromAppLink = next.value!;
-          notifyListeners();
-        }
-      },
-    );
-    ref.listen(Preferences.introCompleted, (_, __) => notifyListeners());
+    ref.listen(myAppLinksProvider, (_, next) {
+      if (next.value != null) {
+        newUrlFromAppLink = next.value!;
+        notifyListeners();
+      }
+    });
+    ref.listen(Preferences.introCompleted, (_, _) => notifyListeners());
   }
   final Ref ref;
 }
