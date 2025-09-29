@@ -30,9 +30,6 @@ part 'routing_config_notifier.g.dart';
 // each branch in go router has its own focus scope
 final branchesScope = <String, FocusScopeNode>{'home': FocusScopeNode(), 'profiles': FocusScopeNode(), 'settings': FocusScopeNode(), 'logs': FocusScopeNode(), 'about': FocusScopeNode()};
 
-// each branch in go router has its own navigator key
-final navigatorKeys = <String, GlobalKey<NavigatorState>>{'home': GlobalKey(), 'profiles': GlobalKey(), 'settings': GlobalKey(), 'logs': GlobalKey(), 'about': GlobalKey()};
-
 // when the routing config is not yet initialized, this config is used
 final loadingConfig = RoutingConfig(
   routes: <RouteBase>[GoRoute(path: '/home', builder: (context, state) => const Material())],
@@ -85,7 +82,6 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
           builder: (_, _, navigationShell) => MyAdaptiveLayout(navigationShell: navigationShell, isMobileBreakpoint: isMobileBreakpoint, showProfilesAction: showProfilesAction),
           branches: <StatefulShellBranch>[
             StatefulShellBranch(
-              navigatorKey: navigatorKeys['home'],
               routes: <GoRoute>[
                 GoRoute(
                   name: 'home',
@@ -105,7 +101,6 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
             ),
             if (showProfilesAction)
               StatefulShellBranch(
-                navigatorKey: navigatorKeys['profiles'],
                 routes: <GoRoute>[
                   GoRoute(
                     name: 'profiles',
@@ -122,7 +117,6 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                 ],
               ),
             StatefulShellBranch(
-              navigatorKey: navigatorKeys['settings'],
               routes: <GoRoute>[
                 GoRoute(
                   name: 'settings',
@@ -153,7 +147,6 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
             ),
             if (!isMobileBreakpoint) ...[
               StatefulShellBranch(
-                navigatorKey: navigatorKeys['logs'],
                 routes: <GoRoute>[
                   GoRoute(
                     name: 'logs',
@@ -163,7 +156,6 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                 ],
               ),
               StatefulShellBranch(
-                navigatorKey: navigatorKeys['about'],
                 routes: <GoRoute>[
                   GoRoute(
                     name: 'about',
