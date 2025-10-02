@@ -28,10 +28,7 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-Future<void> lazyBootstrap(
-  WidgetsBinding widgetsBinding,
-  Environment env,
-) async {
+Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   LoggerController.preInit();
@@ -40,135 +37,78 @@ Future<void> lazyBootstrap(
 
   final stopWatch = Stopwatch()..start();
 
-  final container = ProviderContainer(
-    overrides: [
-      environmentProvider.overrideWithValue(env),
-    ],
-  );
+  final container = ProviderContainer(overrides: [environmentProvider.overrideWith((ref) => env)]);
 
-  await _init(
-    "directories",
-    () => container.read(appDirectoriesProvider.future),
-  );
+  await _init("directories", () => container.read(appDirectoriesProvider.future));
   LoggerController.init(container.read(logPathResolverProvider).appFile().path);
 
-  final appInfo = await _init(
-    "app info",
-    () => container.read(appInfoProvider.future),
-  );
-  await _init(
-    "preferences",
-    () => container.read(sharedPreferencesProvider.future),
-  );
+  final appInfo = await _init("app info", () => container.read(appInfoProvider.future));
+  await _init("preferences", () => container.read(sharedPreferencesProvider.future));
 
   final enableAnalytics = await container.read(analyticsControllerProvider.future);
   if (enableAnalytics) {
-    await _init(
-      "analytics",
-      () => container.read(analyticsControllerProvider.notifier).enableAnalytics(),
-    );
+    await _init("analytics", () => container.read(analyticsControllerProvider.notifier).enableAnalytics());
   }
 
-  await _init(
-    "preferences migration",
-    () async {
-      try {
-        await PreferencesMigration(
-          sharedPreferences: container.read(sharedPreferencesProvider).requireValue,
-        ).migrate();
-      } catch (e, stackTrace) {
-        Logger.bootstrap.error("preferences migration failed", e, stackTrace);
-        if (env == Environment.dev) rethrow;
-        Logger.bootstrap.info("clearing preferences");
-        await container.read(sharedPreferencesProvider).requireValue.clear();
-      }
-    },
-  );
+  await _init("preferences migration", () async {
+    try {
+      await PreferencesMigration(sharedPreferences: container.read(sharedPreferencesProvider).requireValue).migrate();
+    } catch (e, stackTrace) {
+      Logger.bootstrap.error("preferences migration failed", e, stackTrace);
+      if (env == Environment.dev) rethrow;
+      Logger.bootstrap.info("clearing preferences");
+      await container.read(sharedPreferencesProvider).requireValue.clear();
+    }
+  });
 
-  final debug = container.read(debugModeNotifierProvider) || kDebugMode;
+  final debug = container.read(debugModeProvider) || kDebugMode;
 
   if (PlatformUtils.isDesktop) {
-    await _init(
-      "window controller",
-      () => container.read(windowNotifierProvider.future),
-    );
+    await _init("window controller", () => container.read(windowProvider.future));
 
-    final silentStart = container.read(Preferences.silentStart);
+    final bool silentStart = container.read(Preferences.silentStart) ?? false;
     Logger.bootstrap.debug("silent start [${silentStart ? "Enabled" : "Disabled"}]");
     if (!silentStart) {
-      await container.read(windowNotifierProvider.notifier).open(focus: false);
+      await container.read(windowProvider.notifier).open(focus: false);
     } else {
       Logger.bootstrap.debug("silent start, remain hidden accessible via tray");
     }
-    await _init(
-      "auto start service",
-      () => container.read(autoStartNotifierProvider.future),
-    );
+    await _init("auto start service", () => container.read(autoStartProvider.future));
   }
-  await _init(
-    "logs repository",
-    () => container.read(logRepositoryProvider.future),
-  );
+  await _init("logs repository", () => container.read(logRepositoryProvider.future));
   await _init("logger controller", () => LoggerController.postInit(debug));
 
   Logger.bootstrap.info(appInfo.format());
 
-  await _init(
-    "profile repository",
-    () => container.read(profileRepositoryProvider.future),
-  );
+  await _init("profile repository", () => container.read(profileRepositoryProvider.future));
 
-  await _safeInit(
-    "active profile",
-    () => container.read(activeProfileProvider.future),
-    timeout: 1000,
-  );
-  await _safeInit(
-    "deep link service",
-    () => container.read(deepLinkNotifierProvider.future),
-    timeout: 1000,
-  );
-  await _init(
-    "sing-box",
-    () => container.read(singboxServiceProvider).init(),
-  );
+  await _safeInit("active profile", () => container.read(activeProfileProvider.future), timeout: 1000);
+  await _safeInit("deep link service", () => container.read(deepLinkProvider.future), timeout: 1000);
+  await _init("sing-box", () => container.read(singboxServiceProvider).init());
   if (PlatformUtils.isDesktop) {
-    await _safeInit(
-      "system tray",
-      () => container.read(systemTrayNotifierProvider.future),
-      timeout: 1000,
-    );
+    await _safeInit("system tray", () => container.read(systemTrayProvider.future), timeout: 1000);
   }
 
   if (Platform.isAndroid) {
-    await _safeInit(
-      "android display mode",
-      () async {
-        await FlutterDisplayMode.setHighRefreshRate();
-      },
-    );
+    await _safeInit("android display mode", () async {
+      await FlutterDisplayMode.setHighRefreshRate();
+    });
   }
 
   Logger.bootstrap.info("bootstrap took [${stopWatch.elapsedMilliseconds}ms]");
   stopWatch.stop();
 
   runApp(
-    ProviderScope(
-      parent: container,
-      child: SentryUserInteractionWidget(
-        child: const App(),
-      ),
+    UncontrolledProviderScope(
+      container: container,
+      child: SentryUserInteractionWidget(child: const App()),
     ),
   );
 
   FlutterNativeSplash.remove();
 }
 
-Future<T> _init<T>(
-  String name,
-  Future<T> Function() initializer, {
-  int? timeout,
-}) async {
+Future<T> _init<T>(String name, Future<T> Function() initializer, {int? timeout}) async {
   final stopWatch = Stopwatch()..start();
   Logger.bootstrap.info("initializing [$name]");
   Future<T> func() => timeout != null ? initializer().timeout(Duration(milliseconds: timeout)) : initializer();
@@ -184,11 +124,7 @@ Future<T> _init<T>(
   }
 }
 
-Future<T?> _safeInit<T>(
-  String name,
-  Future<T> Function() initializer, {
-  int? timeout,
-}) async {
+Future<T?> _safeInit<T>(String name, Future<T> Function() initializer, {int? timeout}) async {
   try {
     return await _init(name, initializer, timeout: timeout);
   } catch (e) {

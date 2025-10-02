@@ -25,7 +25,7 @@ class GeoAssetsDao extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<GeoAssetEntry?> getActiveAssetByType(GeoAssetType type) async {
+  Future<GeoAssetEntry?> getActiveAssetByType(GeoAssetType type) {
     return (geoAssetEntries.select()
           ..where((tbl) => tbl.active.equals(true))
           ..where((tbl) => tbl.type.equalsValue(type))

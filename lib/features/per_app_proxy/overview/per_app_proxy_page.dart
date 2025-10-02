@@ -22,7 +22,7 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
     final localizations = MaterialLocalizations.of(context);
 
     final asyncPackages = ref.watch(installedPackagesInfoProvider);
-    final perAppProxyMode = ref.watch(Preferences.perAppProxyMode);
+    final PerAppProxyMode currentMode = ref.watch(Preferences.perAppProxyMode);
     final perAppProxyList = ref.watch(perAppProxyListProvider);
 
     final showSystemApps = useState(true);
@@ -127,12 +127,11 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                       title: Text(e.present(t).message),
                       dense: true,
                       value: e,
-                      groupValue: perAppProxyMode,
-                      onChanged: (value) async {
-                        await ref
-                            .read(Preferences.perAppProxyMode.notifier)
-                            .update(e);
-                        if (e == PerAppProxyMode.off && context.mounted) {
+                      groupValue: currentMode, // ignore: deprecated_member_use
+                      onChanged: (value) async { // ignore: deprecated_member_use
+                        if (value == null) return;
+                        await ref.read(Preferences.perAppProxyMode.notifier).update(value);
+                        if (value == PerAppProxyMode.off && context.mounted) {
                           context.pop();
                         }
                       },
@@ -196,7 +195,6 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
             AsyncLoading() => const SliverLoadingBodyPlaceholder(),
             AsyncError(:final error) =>
               SliverErrorBodyPlaceholder(error.toString()),
-            _ => const SliverToBoxAdapter(),
           },
         ],
       ),

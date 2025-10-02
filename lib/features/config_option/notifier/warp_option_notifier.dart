@@ -90,7 +90,7 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
 }
 
 @freezed
-class WarpOptions with _$WarpOptions {
+abstract class WarpOptions with _$WarpOptions {
   const factory WarpOptions({
     required bool consentGiven,
     required AsyncValue<String> configGeneration,

@@ -49,7 +49,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
             if (remember) {
               ref.read(Preferences.actionAtClose.notifier).update(ActionsAtClosing.exit);
             }
-            ref.read(windowNotifierProvider.notifier).quit();
+            ref.read(windowProvider.notifier).quit();
           },
           child: Text(t.window.close),
         ),
@@ -59,7 +59,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
               ref.read(Preferences.actionAtClose.notifier).update(ActionsAtClosing.hide);
             }
             Navigator.of(context).maybePop(false);
-            await ref.read(windowNotifierProvider.notifier).close();
+            await ref.read(windowProvider.notifier).close();
           },
           child: Text(t.window.hide),
         ),

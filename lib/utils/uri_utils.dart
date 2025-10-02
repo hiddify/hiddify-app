@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 abstract class UriUtils {
   static final loggy = Loggy<InfraLogger>("UriUtils");
 
-  static Future<bool> tryShareOrLaunchFile(Uri uri, {Uri? fileOrDir}) async {
+  static Future<bool> tryShareOrLaunchFile(Uri uri, {Uri? fileOrDir}) {
     if (Platform.isWindows || Platform.isLinux) {
       return tryLaunch(fileOrDir ?? uri);
     }
@@ -33,7 +33,7 @@ abstract class UriUtils {
     try {
       loggy.debug("sharing [$uri]");
       final file = XFile(uri.path, mimeType: mimeType);
-      final result = await Share.shareXFiles([file]);
+      final result = await Share.shareXFiles([file]); // ignore: deprecated_member_use
       loggy.debug("share result: ${result.raw}");
       return result.status == ShareResultStatus.success;
     } catch (e, stackTrace) {

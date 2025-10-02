@@ -16,20 +16,10 @@ part 'profile_details_notifier.g.dart';
 @riverpod
 class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
   @override
-  Future<ProfileDetailsState> build(
-    String id, {
-    String? url,
-    String? profileName,
-  }) async {
+  Future<ProfileDetailsState> build(String id, {String? url, String? profileName}) async {
     if (id == 'new') {
       return ProfileDetailsState(
-        profile: RemoteProfileEntity(
-          id: const Uuid().v4(),
-          active: true,
-          name: profileName ?? "",
-          url: url ?? "",
-          lastUpdate: DateTime.now(),
-        ),
+        profile: RemoteProfileEntity(id: const Uuid().v4(), active: true, name: profileName ?? "", url: url ?? "", lastUpdate: DateTime.now()),
       );
     }
     final failureOrProfile = await _profilesRepo.getById(id).run();
@@ -47,16 +37,13 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
         _originalProfile = profile;
         final result = await _profilesRepo.generateConfig(id).run();
 
-        var configContent = result.fold(
-          (failure) => throw Exception('Failed to generate config: $failure'),
-          (config) => config,
-        );
+        var configContent = result.fold((failure) => throw Exception('Failed to generate config: $failure'), (config) => config);
         if (configContent.isNotEmpty) {
           try {
             final jsonObject = jsonDecode(configContent);
-            List<Map<String, dynamic>> res = [];
+            final List<Map<String, dynamic>> res = [];
             if (jsonObject is Map<String, dynamic> && jsonObject['outbounds'] is List) {
-              for (var outbound in jsonObject['outbounds'] as List<dynamic>) {
+              for (final outbound in jsonObject['outbounds'] as List<dynamic>) {
                 if (outbound is Map<String, dynamic> && outbound['type'] != null && !['selector', 'urltest', 'dns', 'block'].contains(outbound['type']) && !['direct', 'bypass', 'direct-fragment'].contains(outbound['tag'])) {
                   res.add(outbound);
                 }
@@ -79,12 +66,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
   ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
   ProfileEntity? _originalProfile;
 
-  void setField({
-    String? name,
-    String? url,
-    Option<int>? updateInterval,
-    String? configContent,
-  }) {
+  void setField({String? name, String? url, Option<int>? updateInterval, String? configContent}) {
     if (state case AsyncData(:final value)) {
       final configContentChanged = value.configContentChanged || value.configContent != configContent;
       // if (!configContentChanged) {
@@ -96,14 +78,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
             remote: (rp) => rp.copyWith(
               name: name ?? rp.name,
               url: url ?? rp.url,
-              options: updateInterval == null
-                  ? rp.options
-                  : updateInterval.fold(
-                      () => null,
-                      (t) => ProfileOptions(
-                        updateInterval: Duration(hours: t),
-                      ),
-                    ),
+              options: updateInterval == null ? rp.options : updateInterval.fold(() => null, (t) => ProfileOptions(updateInterval: Duration(hours: t))),
             ),
             local: (lp) => lp.copyWith(name: name ?? lp.name),
           ),
@@ -124,9 +99,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
 
       switch (profile) {
         case RemoteProfileEntity():
-          loggy.debug(
-            'saving profile, url: [${profile.url}], name: [${profile.name}]',
-          );
+          loggy.debug('saving profile, url: [${profile.url}], name: [${profile.name}]');
           if (profile.name.isBlank || profile.url.isBlank) {
             loggy.debug('save: invalid arguments');
           } else if (value.isEditing) {
@@ -134,23 +107,13 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
               loggy.debug('editing profile');
               failureOrSuccess = await _profilesRepo.patch(profile).run();
               if (failureOrSuccess.isRight()) {
-                failureOrSuccess = await _profilesRepo
-                    .updateContent(
-                      profile.id,
-                      value.configContent,
-                    )
-                    .run();
+                failureOrSuccess = await _profilesRepo.updateContent(profile.id, value.configContent).run();
               }
             } else {
               loggy.debug('updating profile');
               failureOrSuccess = await _profilesRepo.updateSubscription(profile, patchBaseProfile: true).run();
               if (failureOrSuccess.isRight()) {
-                failureOrSuccess = await _profilesRepo
-                    .updateContent(
-                      profile.id,
-                      value.configContent,
-                    )
-                    .run();
+                failureOrSuccess = await _profilesRepo.updateContent(profile.id, value.configContent).run();
               }
             }
           } else {
@@ -162,27 +125,13 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
           loggy.debug('editing profile');
           failureOrSuccess = await _profilesRepo.patch(profile).run();
           if (failureOrSuccess.isRight()) {
-            failureOrSuccess = await _profilesRepo
-                .updateContent(
-                  profile.id,
-                  value.configContent,
-                )
-                .run();
+            failureOrSuccess = await _profilesRepo.updateContent(profile.id, value.configContent).run();
           }
         default:
           loggy.warning("local profile can't be added manually");
       }
 
-      state = AsyncData(
-        value.copyWith(
-          save: failureOrSuccess?.fold(
-                (l) => AsyncError(l, StackTrace.current),
-                (_) => const AsyncData(null),
-              ) ??
-              value.save,
-          showErrorMessages: true,
-        ),
-      );
+      state = AsyncData(value.copyWith(save: failureOrSuccess?.fold((l) => AsyncError(l, StackTrace.current), (_) => const AsyncData(null)) ?? value.save, showErrorMessages: true));
     }
   }
 
@@ -200,16 +149,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
       final failureOrUpdatedProfile = await _profilesRepo.updateSubscription(profile as RemoteProfileEntity).flatMap((_) => _profilesRepo.getById(id)).run();
 
       state = AsyncData(
-        value.copyWith(
-          update: failureOrUpdatedProfile.match(
-            (l) => AsyncError(l, StackTrace.current),
-            (_) => const AsyncData(null),
-          ),
-          profile: failureOrUpdatedProfile.match(
-            (_) => profile,
-            (updatedProfile) => updatedProfile ?? profile,
-          ),
-        ),
+        value.copyWith(update: failureOrUpdatedProfile.match((l) => AsyncError(l, StackTrace.current), (_) => const AsyncData(null)), profile: failureOrUpdatedProfile.match((_) => profile, (updatedProfile) => updatedProfile ?? profile)),
       );
     }
   }

@@ -25,7 +25,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       }).run();
     }
 
-    ref.listenSelf(
+    ref.listen(connectionProvider,
       (previous, next) async {
         if (previous == next) return;
         if (previous case AsyncData(:final value) when !value.isConnected) {
@@ -43,16 +43,15 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       },
     );
 
-    ref.listen(
-      activeProfileProvider.select((value) => value.asData?.value),
-      (previous, next) async {
-        if (previous == null) return;
-        final shouldReconnect = next == null || previous.id != next.id;
-        if (shouldReconnect) {
-          await reconnect(next);
-        }
-      },
-    );
+    ref.listen(activeProfileProvider, (previous, next) async {
+      final prevProfile = previous?.asData?.value;
+      final nextProfile = next.asData?.value;
+      if (prevProfile == null) return;
+      final shouldReconnect = nextProfile == null || prevProfile.id != nextProfile.id;
+      if (shouldReconnect) {
+        await reconnect(nextProfile);
+      }
+    });
     yield* _connectionRepo.watchConnectionStatus().doOnData((event) {
       if (event case Disconnected(connectionFailure: final _?) when PlatformUtils.isDesktop) {
         ref.read(Preferences.startedByUser.notifier).update(false);
@@ -157,8 +156,8 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
 }
 
 @Riverpod(keepAlive: true)
-Future<bool> serviceRunning(ServiceRunningRef ref) => ref
+Future<bool> serviceRunning(Ref ref) => ref
     .watch(
-      connectionNotifierProvider.selectAsync((data) => data.isConnected),
+      connectionProvider.selectAsync((data) => data.isConnected),
     )
     .onError((error, stackTrace) => false);

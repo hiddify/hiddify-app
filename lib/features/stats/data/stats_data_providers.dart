@@ -5,6 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'stats_data_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-StatsRepository statsRepository(StatsRepositoryRef ref) {
+StatsRepository statsRepository(Ref ref) {
   return StatsRepositoryImpl(singbox: ref.watch(singboxServiceProvider));
 }

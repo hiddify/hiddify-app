@@ -17,3 +17,7 @@ targets:
           output_file_name: translations.g.dart
           translation_class_visibility: public
           locale_handling: false
+      dart_mappable_builder:
+        generate_for:
+          - lib/features/log/model/log_level.dart
+          - lib/features/proxy/model/ip_info_entity.dart

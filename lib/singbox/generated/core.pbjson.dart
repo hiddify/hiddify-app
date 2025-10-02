@@ -24,8 +24,7 @@ const ParseConfigRequest$json = {
 };
 
 /// Descriptor for `ParseConfigRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List parseConfigRequestDescriptor = $convert.base64Decode(
-    'ChJQYXJzZUNvbmZpZ1JlcXVlc3QSGgoIdGVtcFBhdGgYASABKAlSCHRlbXBQYXRoEhIKBHBhdG'
+final $typed_data.Uint8List parseConfigRequestDescriptor = $convert.base64Decode('ChJQYXJzZUNvbmZpZ1JlcXVlc3QSGgoIdGVtcFBhdGgYASABKAlSCHRlbXBQYXRoEhIKBHBhdG'
     'gYAiABKAlSBHBhdGgSFAoFZGVidWcYAyABKAhSBWRlYnVn');
 
 @$core.Deprecated('Use parseConfigResponseDescriptor instead')
@@ -40,8 +39,7 @@ const ParseConfigResponse$json = {
 };
 
 /// Descriptor for `ParseConfigResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List parseConfigResponseDescriptor = $convert.base64Decode(
-    'ChNQYXJzZUNvbmZpZ1Jlc3BvbnNlEhkKBWVycm9yGAEgASgJSABSBWVycm9yiAEBQggKBl9lcn'
+final $typed_data.Uint8List parseConfigResponseDescriptor = $convert.base64Decode('ChNQYXJzZUNvbmZpZ1Jlc3BvbnNlEhkKBWVycm9yGAEgASgJSABSBWVycm9yiAEBQggKBl9lcn'
     'Jvcg==');
 
 @$core.Deprecated('Use generateConfigRequestDescriptor instead')
@@ -54,8 +52,7 @@ const GenerateConfigRequest$json = {
 };
 
 /// Descriptor for `GenerateConfigRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List generateConfigRequestDescriptor = $convert.base64Decode(
-    'ChVHZW5lcmF0ZUNvbmZpZ1JlcXVlc3QSEgoEcGF0aBgBIAEoCVIEcGF0aBIUCgVkZWJ1ZxgCIA'
+final $typed_data.Uint8List generateConfigRequestDescriptor = $convert.base64Decode('ChVHZW5lcmF0ZUNvbmZpZ1JlcXVlc3QSEgoEcGF0aBgBIAEoCVIEcGF0aBIUCgVkZWJ1ZxgCIA'
     'EoCFIFZGVidWc=');
 
 @$core.Deprecated('Use generateConfigResponseDescriptor instead')
@@ -71,7 +68,5 @@ const GenerateConfigResponse$json = {
 };
 
 /// Descriptor for `GenerateConfigResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List generateConfigResponseDescriptor = $convert.base64Decode(
-    'ChZHZW5lcmF0ZUNvbmZpZ1Jlc3BvbnNlEhYKBmNvbmZpZxgBIAEoCVIGY29uZmlnEhkKBWVycm'
+final $typed_data.Uint8List generateConfigResponseDescriptor = $convert.base64Decode('ChZHZW5lcmF0ZUNvbmZpZ1Jlc3BvbnNlEhYKBmNvbmZpZxgBIAEoCVIGY29uZmlnEhkKBWVycm'
     '9yGAIgASgJSABSBWVycm9yiAEBQggKBl9lcnJvcg==');
-

@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
@@ -16,100 +19,105 @@ import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/utils/alerts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-// TODO: rewrite
+typedef AsyncCallback = Future<void> Function();
+
 class ConnectionButton extends HookConsumerWidget {
   const ConnectionButton({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final connectionStatus = ref.watch(connectionNotifierProvider);
-    final activeProxy = ref.watch(activeProxyNotifierProvider);
-    final delay = activeProxy.valueOrNull?.urlTestDelay ?? 0;
 
-    final requiresReconnect = ref.watch(configOptionNotifierProvider).valueOrNull;
-    final today = DateTime.now();
-
-    ref.listen(
-      connectionNotifierProvider,
-      (_, next) {
-        if (next case AsyncError(:final error)) {
-          CustomAlertDialog.fromErr(t.presentError(error)).show(context);
-        }
-        if (next case AsyncData(value: Disconnected(:final connectionFailure?))) {
-          CustomAlertDialog.fromErr(t.presentError(connectionFailure)).show(context);
-        }
-      },
+    // ----- Providers -----
+    final connectionStatus = ref.watch(connectionProvider);
+    final delay = ref.watch(
+      activeProxyProvider.select((value) => value.asData?.value.urlTestDelay ?? 0),
+    );
+    final requiresReconnect = ref.watch(
+      configOptionProvider.select((value) => value.asData?.value ?? false),
     );
 
-    final buttonTheme = Theme.of(context).extension<ConnectionButtonTheme>()!;
+    // ----- Error / failure pop-ups -----
+    ref.listen(connectionProvider, (_, next) {
+      switch (next) {
+        case AsyncError(:final error):
+          CustomAlertDialog.fromErr(t.presentError(error)).show(context);
+        case AsyncData(value: Disconnected(:final connectionFailure?)):
+          CustomAlertDialog.fromErr(t.presentError(connectionFailure)).show(context);
+        default:
+      }
+    });
+
+    // ----- Helpers -----
+    final btnTheme = Theme.of(context).extension<ConnectionButtonTheme>()!;
+    final today = DateTime.now();
 
     Future<bool> showExperimentalNotice() async {
       final hasExperimental = ref.read(ConfigOptions.hasExperimentalFeatures);
       final canShowNotice = !ref.read(disableExperimentalFeatureNoticeProvider);
-      if (hasExperimental && canShowNotice && context.mounted) {
-        return await const ExperimentalFeatureNoticeDialog().show(context) ?? false;
+      if (hasExperimental && canShowNotice) {
+        return (await const ExperimentalFeatureNoticeDialog().show(context)) ?? false;
       }
       return true;
     }
 
-    return _ConnectionButton(
-      onTap: switch (connectionStatus) {
-        AsyncData(value: Disconnected()) || AsyncError() => () async {
-            if (await showExperimentalNotice()) {
-              return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-            }
-          },
-        AsyncData(value: Connected()) => () async {
-            if (requiresReconnect == true && await showExperimentalNotice()) {
-              return await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
-            }
-            return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-          },
-        _ => () {},
-      },
-      enabled: switch (connectionStatus) {
-        AsyncData(value: Connected()) || AsyncData(value: Disconnected()) || AsyncError() => true,
-        _ => false,
-      },
-      label: switch (connectionStatus) {
-        AsyncData(value: Connected()) when requiresReconnect == true => t.connection.reconnect,
-        AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => t.connection.connecting,
-        AsyncData(value: final status) => status.present(t),
-        _ => "",
-      },
-      buttonColor: switch (connectionStatus) {
-        AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
-        AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => Color.fromARGB(255, 185, 176, 103),
-        AsyncData(value: Connected()) => buttonTheme.connectedColor!,
-        AsyncData(value: _) => buttonTheme.idleColor!,
-        _ => Colors.red,
-      },
-      image: switch (connectionStatus) {
-        AsyncData(value: Connected()) when requiresReconnect == true => Assets.images.disconnectNorouz,
-        AsyncData(value: Connected()) => Assets.images.connectNorouz,
-        AsyncData(value: _) => Assets.images.disconnectNorouz,
-        _ => Assets.images.disconnectNorouz,
-        AsyncData(value: Disconnected()) || AsyncError() => Assets.images.disconnectNorouz,
-        AsyncData(value: Connected()) => Assets.images.connectNorouz,
-        _ => Assets.images.disconnectNorouz,
-      },
-      useImage: today.day >= 19 && today.day <= 23 && today.month == 3,
-    );
+    // ----- Determine state-specific values -----
+    final (AsyncCallback? onTap, bool enabled) = switch (connectionStatus) {
+      AsyncData(value: Disconnected()) || AsyncError() => (
+        () async {
+          if (await showExperimentalNotice()) {
+            await ref.read(connectionProvider.notifier).toggleConnection();
+          }
+        },
+        true,
+      ),
+      AsyncData(value: Connected()) => (
+        () async {
+          if (requiresReconnect && await showExperimentalNotice()) {
+            await ref.read(connectionProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
+          } else {
+            await ref.read(connectionProvider.notifier).toggleConnection();
+          }
+        },
+        true,
+      ),
+      _ => (null, false),
+    };
+
+    final String label = switch (connectionStatus) {
+      AsyncData(value: Connected()) when requiresReconnect => t.connection.reconnect,
+      AsyncData(value: Connected()) when delay <= 0 || delay >= 65 * 1000 => t.connection.connecting,
+      AsyncData(value: final status) => status.present(t),
+      _ => '',
+    };
+
+    final Color btnColor = switch (connectionStatus) {
+      AsyncData(value: Connected()) when requiresReconnect => Colors.teal,
+      AsyncData(value: Connected()) when delay <= 0 || delay >= 65 * 1000 => const Color(0xFFB9B067),
+      AsyncData(value: Connected()) => btnTheme.connectedColor!,
+      AsyncError() => Colors.red,
+      _ => btnTheme.idleColor!,
+    };
+
+    final AssetGenImage iconImg = switch (connectionStatus) {
+      AsyncData(value: Connected()) => Assets.images.connectNorouz,
+      _ => Assets.images.disconnectNorouz,
+    };
+
+    final bool showNowruz = today.month == 3 && today.day >= 19 && today.day <= 23;
+
+    // ----- UI -----
+    return _ConnectionButton(enabled: enabled, onTap: onTap, label: label, buttonColor: btnColor, image: iconImg, useImage: showNowruz);
   }
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+//                           Internal presentation widget
+// ──────────────────────────────────────────────────────────────────────────────
 class _ConnectionButton extends StatelessWidget {
-  const _ConnectionButton({
-    required this.onTap,
-    required this.enabled,
-    required this.label,
-    required this.buttonColor,
-    required this.image,
-    required this.useImage,
-  });
+  const _ConnectionButton({required this.onTap, required this.enabled, required this.label, required this.buttonColor, required this.image, required this.useImage});
 
-  final VoidCallback onTap;
+  final AsyncCallback? onTap;
   final bool enabled;
   final String label;
   final Color buttonColor;
@@ -125,41 +133,36 @@ class _ConnectionButton extends StatelessWidget {
           button: true,
           enabled: enabled,
           label: label,
+          value: label,
           child: Container(
+            width: 148,
+            height: 148,
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(
-                  blurRadius: 16,
-                  color: buttonColor.withOpacity(0.5),
-                ),
+                // withOpacity() → withAlpha() to avoid deprecation warning
+                BoxShadow(blurRadius: 16, color: buttonColor.withAlpha((0.5 * 255).round())),
               ],
             ),
-            width: 148,
-            height: 148,
             child: Material(
-              key: const ValueKey("home_connection_button"),
+              key: const ValueKey('home_connection_button'),
               shape: const CircleBorder(),
               color: Colors.white,
               child: InkWell(
-                onTap: onTap,
+                onTap: enabled
+                    ? () {
+                        // ignore the returned Future
+                        unawaited(onTap?.call());
+                      }
+                    : null,
                 child: Padding(
                   padding: const EdgeInsets.all(36),
-                  child: TweenAnimationBuilder(
+                  child: TweenAnimationBuilder<Color?>(
                     tween: ColorTween(end: buttonColor),
                     duration: const Duration(milliseconds: 250),
-                    builder: (context, value, child) {
-                      if (useImage) {
-                        return image.image(filterQuality: FilterQuality.medium);
-                      } else {
-                        return Assets.images.logo.svg(
-                          colorFilter: ColorFilter.mode(
-                            value!,
-                            BlendMode.srcIn,
-                          ),
-                        );
-                      }
+                    builder: (_, value, _) {
+                      return useImage ? image.image() : Assets.images.logo.svg(colorFilter: ColorFilter.mode(value ?? buttonColor, BlendMode.srcIn));
                     },
                   ),
                 ),
@@ -168,12 +171,7 @@ class _ConnectionButton extends StatelessWidget {
           ).animate(target: enabled ? 0 : 1).scaleXY(end: .88, curve: Curves.easeIn),
         ),
         const Gap(16),
-        ExcludeSemantics(
-          child: AnimatedText(
-            label,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-        ),
+        ExcludeSemantics(child: AnimatedText(label, style: Theme.of(context).textTheme.titleMedium)),
       ],
     );
   }

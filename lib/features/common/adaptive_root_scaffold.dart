@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
@@ -14,9 +15,10 @@ abstract interface class RootScaffold {
 }
 
 class AdaptiveRootScaffold extends HookConsumerWidget {
-  const AdaptiveRootScaffold(this.navigator, {super.key});
+  const AdaptiveRootScaffold(this.navigator, {super.key, this.navigationShell});
 
   final Widget navigator;
+  final StatefulNavigationShell? navigationShell;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -55,7 +57,12 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
       selectedIndex: selectedIndex,
       onSelectedIndexChange: (index) {
         RootScaffold.stateKey.currentState?.closeDrawer();
-        switchTab(index, context);
+        final shell = navigationShell;
+        if (shell != null) {
+          shell.goBranch(index);
+        } else {
+          switchTab(index, context);
+        }
       },
       destinations: destinations,
       drawerDestinationRange: useMobileRouter ? (2, null) : (0, null),
@@ -113,14 +120,18 @@ class _CustomAdaptiveScaffold extends HookConsumerWidget {
       drawer: Breakpoints.small.isActive(context)
           ? Drawer(
               width: (MediaQuery.sizeOf(context).width * 0.88).clamp(1, 304),
-              child: NavigationRail(
-                extended: true,
+              child: NavigationDrawer(
                 selectedIndex: selectedWithOffset(drawerDestinationRange),
-                destinations: destinationsSlice(drawerDestinationRange)
-                    .map((dest) => AdaptiveScaffold.toRailDestination(dest))
-                    .toList(),
                 onDestinationSelected: (index) =>
                     selectWithOffset(index, drawerDestinationRange),
+                children: destinationsSlice(drawerDestinationRange)
+                    .map(
+                      (dest) => NavigationDrawerDestination(
+                        icon: dest.icon,
+                        label: Text(dest.label),
+                      ),
+                    )
+                    .toList(),
               ),
             )
           : null,

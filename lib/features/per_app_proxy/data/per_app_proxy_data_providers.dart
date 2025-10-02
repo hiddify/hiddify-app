@@ -4,6 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'per_app_proxy_data_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-PerAppProxyRepository perAppProxyRepository(PerAppProxyRepositoryRef ref) {
+PerAppProxyRepository perAppProxyRepository(Ref ref) {
   return PerAppProxyRepositoryImpl();
 }

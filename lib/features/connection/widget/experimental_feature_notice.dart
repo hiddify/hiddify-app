@@ -9,21 +9,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 bool _testExperimentalNotice = false;
 
-final disableExperimentalFeatureNoticeProvider =
-    PreferencesNotifier.createAutoDispose(
-  "disable_experimental_feature_notice",
-  false,
-  overrideValue: _testExperimentalNotice && kDebugMode ? false : null,
-);
+final disableExperimentalFeatureNoticeProvider = PreferencesNotifier.create("disable_experimental_feature_notice", false, overrideValue: _testExperimentalNotice && kDebugMode ? false : null);
 
 class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
   const ExperimentalFeatureNoticeDialog({super.key});
 
-  Future<bool?> show(BuildContext context) async {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => this,
-    );
+  Future<bool?> show(BuildContext context) {
+    return showDialog<bool>(context: context, builder: (context) => this);
   }
 
   @override
@@ -46,17 +38,15 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
                 value: disableNotice,
                 title: Text(t.connection.disableExperimentalNotice),
                 secondary: const Icon(FluentIcons.eye_off_24_regular),
-                onChanged: (value) async => ref
-                    .read(disableExperimentalFeatureNoticeProvider.notifier)
-                    .update(value ?? false),
+                onChanged: (value) => ref.read(disableExperimentalFeatureNoticeProvider.notifier).update(value ?? false),
                 dense: true,
               ),
               ListTile(
                 title: Text(t.config.pageTitle),
                 leading: const Icon(FluentIcons.box_edit_24_regular),
                 trailing: const Icon(FluentIcons.chevron_right_20_regular),
-                onTap: () async {
-                  await Navigator.of(context).maybePop(false);
+                onTap: () {
+                  Navigator.of(context).maybePop(false);
                   if (context.mounted) {
                     const ConfigOptionsRoute().push(context);
                   }
@@ -68,16 +58,8 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).maybePop(false),
-          child: Text(
-            MaterialLocalizations.of(context).cancelButtonLabel.toUpperCase(),
-          ),
-        ),
-        TextButton(
-          onPressed: () => Navigator.of(context).maybePop(true),
-          child: Text(t.connection.connectAnyWay.toUpperCase()),
-        ),
+        TextButton(onPressed: () => Navigator.of(context).maybePop(false), child: Text(MaterialLocalizations.of(context).cancelButtonLabel.toUpperCase())),
+        TextButton(onPressed: () => Navigator.of(context).maybePop(true), child: Text(t.connection.connectAnyWay.toUpperCase())),
       ],
     );
   }

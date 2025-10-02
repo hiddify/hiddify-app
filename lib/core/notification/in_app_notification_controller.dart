@@ -9,25 +9,14 @@ import 'package:toastification/toastification.dart';
 part 'in_app_notification_controller.g.dart';
 
 @Riverpod(keepAlive: true)
-InAppNotificationController inAppNotificationController(
-  InAppNotificationControllerRef ref,
-) {
+InAppNotificationController inAppNotificationController(Ref ref) {
   return InAppNotificationController();
 }
 
-enum NotificationType {
-  info,
-  error,
-  success,
-}
+enum NotificationType { info, error, success }
 
 class InAppNotificationController with AppLogger {
-  ToastificationItem showToast(
-    BuildContext context,
-    String message, {
-    NotificationType type = NotificationType.info,
-    Duration duration = const Duration(seconds: 3),
-  }) {
+  ToastificationItem showToast(BuildContext context, String message, {NotificationType type = NotificationType.info, Duration duration = const Duration(seconds: 3)}) {
     return toastification.show(
       context: context,
       title: Text(message),
@@ -39,7 +28,7 @@ class InAppNotificationController with AppLogger {
       showProgressBar: false,
       dragToClose: true,
       closeOnClick: true,
-      closeButtonShowType: CloseButtonShowType.onHover,
+      closeButton: const ToastCloseButton(showType: CloseButtonShowType.onHover),
     );
   }
 
@@ -49,12 +38,7 @@ class InAppNotificationController with AppLogger {
       loggy.warning("context is null");
       return null;
     }
-    return showToast(
-      context,
-      message,
-      type: NotificationType.error,
-      duration: const Duration(seconds: 5),
-    );
+    return showToast(context, message, type: NotificationType.error, duration: const Duration(seconds: 5));
   }
 
   ToastificationItem? showSuccessToast(String message) {
@@ -63,11 +47,7 @@ class InAppNotificationController with AppLogger {
       loggy.warning("context is null");
       return null;
     }
-    return showToast(
-      context,
-      message,
-      type: NotificationType.success,
-    );
+    return showToast(context, message, type: NotificationType.success);
   }
 
   ToastificationItem? showInfoToast(String message, {Duration duration = const Duration(seconds: 3)}) {
@@ -88,12 +68,7 @@ class InAppNotificationController with AppLogger {
     CustomAlertDialog.fromErr(error).show(context);
   }
 
-  void showActionToast(
-    String message, {
-    required String actionText,
-    required VoidCallback callback,
-    Duration duration = const Duration(seconds: 5),
-  }) {
+  void showActionToast(String message, {required String actionText, required VoidCallback callback, Duration duration = const Duration(seconds: 5)}) {
     final context = RootScaffold.stateKey.currentContext;
     if (context == null) return;
     toastification.dismissAll();
@@ -136,8 +111,8 @@ class InAppNotificationController with AppLogger {
 
 extension NotificationTypeX on NotificationType {
   ToastificationType get _toastificationType => switch (this) {
-        NotificationType.success => ToastificationType.success,
-        NotificationType.error => ToastificationType.error,
-        NotificationType.info => ToastificationType.info,
-      };
+    NotificationType.success => ToastificationType.success,
+    NotificationType.error => ToastificationType.error,
+    NotificationType.info => ToastificationType.info,
+  };
 }

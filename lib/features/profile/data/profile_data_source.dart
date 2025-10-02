@@ -33,13 +33,13 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
   ProfileDao(super.db);
 
   @override
-  Future<ProfileEntry?> getById(String id) async {
+  Future<ProfileEntry?> getById(String id) {
     return (profileEntries.select()..where((tbl) => tbl.id.equals(id)))
         .getSingleOrNull();
   }
 
   @override
-  Future<ProfileEntry?> getByUrl(String url) async {
+  Future<ProfileEntry?> getByUrl(String url) {
     return (select(profileEntries)
           ..where((tbl) => tbl.url.like('%$url%'))
           ..limit(1))
@@ -47,7 +47,7 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<ProfileEntry?> getByName(String name) async {
+  Future<ProfileEntry?> getByName(String name) {
     return (select(profileEntries)
           ..where((tbl) => tbl.name.equals(name))
           ..limit(1))

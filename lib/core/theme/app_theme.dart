@@ -8,33 +8,18 @@ class AppTheme {
   final String fontFamily;
 
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
-    final ColorScheme scheme = lightColorScheme ??
-        ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0));
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: scheme,
-      fontFamily: fontFamily,
-      extensions: const <ThemeExtension<dynamic>>{
-        ConnectionButtonTheme.light,
-      },
-    );
+    final ColorScheme scheme = lightColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0));
+    return ThemeData(useMaterial3: true, colorScheme: scheme, fontFamily: fontFamily, extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.light, JsonEditorTheme.standard});
   }
 
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
-    final ColorScheme scheme = darkColorScheme ??
-        ColorScheme.fromSeed(
-          seedColor: const Color(0xFF293CA0),
-          brightness: Brightness.dark,
-        );
+    final ColorScheme scheme = darkColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0), brightness: Brightness.dark);
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
-      scaffoldBackgroundColor:
-          mode.trueBlack ? Colors.black : scheme.background,
+      scaffoldBackgroundColor: mode.trueBlack ? Colors.black : scheme.surface,
       fontFamily: fontFamily,
-      extensions: const <ThemeExtension<dynamic>>{
-        ConnectionButtonTheme.light,
-      },
+      extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.dark, JsonEditorTheme.standard},
     );
   }
 }

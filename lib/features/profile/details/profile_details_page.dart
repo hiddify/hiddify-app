@@ -30,60 +30,62 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final provider = profileDetailsNotifierProvider(id);
+    final provider = profileDetailsProvider(id);
     final notifier = ref.watch(provider.notifier);
 
     ref.listen(
-      provider.selectAsync((data) => data.save),
-      (_, next) async {
-        switch (await next) {
+      provider,
+      (_, next) {
+      if (next case AsyncData(value: final state)) {
+        switch (state.save) {
           case AsyncData():
             CustomToast.success(t.profile.save.successMsg).show(context);
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) {
-                if (context.mounted) context.pop();
-              },
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) context.pop();
+            });
           case AsyncError(:final error):
             final String action;
-            if (ref.read(provider) case AsyncData(value: final data) when data.isEditing) {
+            if (state.isEditing) {
               action = t.profile.save.failureMsg;
             } else {
               action = t.profile.add.failureMsg;
             }
             CustomAlertDialog.fromErr(t.presentError(error, action: action)).show(context);
+          default:
         }
-      },
-    );
+      }
+    });
 
     ref.listen(
-      provider.selectAsync((data) => data.update),
-      (_, next) async {
-        switch (await next) {
+      provider,
+      (_, next) {
+      if (next case AsyncData(value: final state)) {
+        switch (state.update) {
           case AsyncData():
             CustomToast.success(t.profile.update.successMsg).show(context);
           case AsyncError(:final error):
             CustomAlertDialog.fromErr(t.presentError(error)).show(context);
+          default:
         }
-      },
-    );
+      }
+    });
 
     ref.listen(
-      provider.selectAsync((data) => data.delete),
-      (_, next) async {
-        switch (await next) {
+      provider,
+      (_, next) {
+      if (next case AsyncData(value: final state)) {
+        switch (state.delete) {
           case AsyncData():
             CustomToast.success(t.profile.delete.successMsg).show(context);
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) {
-                if (context.mounted) context.pop();
-              },
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) context.pop();
+            });
           case AsyncError(:final error):
             CustomToast.error(t.presentShortError(error)).show(context);
+          default:
         }
-      },
-    );
+      }
+    });
 
     switch (ref.watch(provider)) {
       case AsyncData(value: final state):
@@ -105,10 +107,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                         //     MaterialLocalizations.of(context).cancelButtonLabel,
                         //   ),
                         // ),
-                        MenuItemButton(
-                          onPressed: notifier.save,
-                          child: Text(t.profile.save.buttonText),
-                        ),
+                        MenuItemButton(onPressed: () => notifier.save(), child: Text(t.profile.save.buttonText)),
                         if (state.isEditing)
                           PopupMenuButton(
                             icon: Icon(AdaptiveIcon(context).more),
@@ -124,12 +123,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                 PopupMenuItem(
                                   child: Text(t.profile.delete.buttonTxt),
                                   onTap: () async {
-                                    final deleteConfirmed = await showConfirmationDialog(
-                                      context,
-                                      title: t.profile.delete.buttonTxt,
-                                      message: t.profile.delete.confirmationMsg,
-                                      icon: FluentIcons.delete_24_regular,
-                                    );
+                                    final deleteConfirmed = await showConfirmationDialog(context, title: t.profile.delete.buttonTxt, message: t.profile.delete.confirmationMsg, icon: FluentIcons.delete_24_regular);
                                     if (deleteConfirmed) {
                                       await notifier.delete();
                                     }
@@ -145,10 +139,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                       child: SliverList.list(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: CustomTextFormField(
                               initialValue: state.profile.name,
                               onChanged: (value) => notifier.setField(name: value),
@@ -159,10 +150,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                           ),
                           if (state.profile case RemoteProfileEntity(:final url, :final options)) ...[
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: CustomTextFormField(
                                 initialValue: url,
                                 onChanged: (value) => notifier.setField(url: value),
@@ -173,31 +161,19 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                             ),
                             ListTile(
                               title: Text(t.profile.detailsForm.updateInterval),
-                              subtitle: Text(
-                                options?.updateInterval.toApproximateTime(
-                                      isRelativeToNow: false,
-                                    ) ??
-                                    t.general.toggle.disabled,
-                              ),
+                              subtitle: Text(options?.updateInterval.toApproximateTime(isRelativeToNow: false) ?? t.general.toggle.disabled),
                               leading: const Icon(FluentIcons.arrow_sync_24_regular),
                               onTap: () async {
                                 final intervalInHours = await SettingsInputDialog(
                                   title: t.profile.detailsForm.updateIntervalDialogTitle,
                                   initialValue: options?.updateInterval.inHours,
-                                  optionalAction: (
-                                    t.general.state.disable,
-                                    () => notifier.setField(
-                                          updateInterval: none(),
-                                        ),
-                                  ),
+                                  optionalAction: (t.general.state.disable, () => notifier.setField(updateInterval: none())),
                                   validator: isPort,
                                   mapTo: int.tryParse,
                                   digitsOnly: true,
                                 ).show(context);
                                 if (intervalInHours == null) return;
-                                notifier.setField(
-                                  updateInterval: optionOf(intervalInHours),
-                                );
+                                notifier.setField(updateInterval: optionOf(intervalInHours));
                               },
                             ),
                           ],
@@ -214,20 +190,10 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                           //   hint: t.profile.detailsForm.configContentHint,
                           // ),
                           // ),
-                          if (state.isEditing) ...[
-                            ListTile(
-                              title: Text(t.profile.detailsForm.lastUpdate),
-                              leading: const Icon(FluentIcons.history_24_regular),
-                              subtitle: Text(state.profile.lastUpdate.format()),
-                              dense: true,
-                            ),
-                          ],
+                          if (state.isEditing) ...[ListTile(title: Text(t.profile.detailsForm.lastUpdate), leading: const Icon(FluentIcons.history_24_regular), subtitle: Text(state.profile.lastUpdate.format()), dense: true)],
                           if (state.profile case RemoteProfileEntity(:final subInfo?)) ...[
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 8,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -235,39 +201,16 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                     style: Theme.of(context).textTheme.bodySmall,
                                     TextSpan(
                                       children: [
-                                        _buildSubProp(
-                                          FluentIcons.arrow_upload_16_regular,
-                                          subInfo.upload.size(),
-                                          t.profile.subscription.upload,
-                                        ),
+                                        _buildSubProp(FluentIcons.arrow_upload_16_regular, subInfo.upload.size(), t.profile.subscription.upload),
                                         const TextSpan(text: "     "),
-                                        _buildSubProp(
-                                          FluentIcons.arrow_download_16_regular,
-                                          subInfo.download.size(),
-                                          t.profile.subscription.download,
-                                        ),
+                                        _buildSubProp(FluentIcons.arrow_download_16_regular, subInfo.download.size(), t.profile.subscription.download),
                                         const TextSpan(text: "     "),
-                                        _buildSubProp(
-                                          FluentIcons.arrow_bidirectional_up_down_16_regular,
-                                          subInfo.total.size(),
-                                          t.profile.subscription.total,
-                                        ),
+                                        _buildSubProp(FluentIcons.arrow_bidirectional_up_down_16_regular, subInfo.total.size(), t.profile.subscription.total),
                                       ],
                                     ),
                                   ),
                                   const Gap(12),
-                                  Text.rich(
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                    TextSpan(
-                                      children: [
-                                        _buildSubProp(
-                                          FluentIcons.clock_dismiss_20_regular,
-                                          subInfo.expire.format(),
-                                          t.profile.subscription.expireDate,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                  Text.rich(style: Theme.of(context).textTheme.bodySmall, TextSpan(children: [_buildSubProp(FluentIcons.clock_dismiss_20_regular, subInfo.expire.format(), t.profile.subscription.expireDate)])),
                                 ],
                               ),
                             ),
@@ -279,7 +222,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                 expandedObjects: const ["outbounds"],
                                 onChanged: (value) {
                                   if (value == null) return;
-                                  const encoder = const JsonEncoder.withIndent('  ');
+                                  const encoder = JsonEncoder.withIndent('  ');
 
                                   notifier.setField(configContent: encoder.convert(value));
                                 },
@@ -302,11 +245,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                   padding: const EdgeInsets.symmetric(horizontal: 36),
                   child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      LinearProgressIndicator(
-                        backgroundColor: Colors.transparent,
-                      ),
-                    ],
+                    children: [LinearProgressIndicator(backgroundColor: Colors.transparent)],
                   ),
                 ),
               ),
@@ -317,10 +256,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
         return Scaffold(
           body: CustomScrollView(
             slivers: [
-              SliverAppBar(
-                title: Text(t.profile.detailsPageTitle),
-                pinned: true,
-              ),
+              SliverAppBar(title: Text(t.profile.detailsPageTitle), pinned: true),
               SliverErrorBodyPlaceholder(t.presentShortError(error)),
             ],
           ),

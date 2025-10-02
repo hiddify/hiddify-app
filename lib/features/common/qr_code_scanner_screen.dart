@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
@@ -17,13 +16,8 @@ const permissionGroup = [PermissionGroup.Camera];
 class QRCodeScannerScreen extends StatefulHookConsumerWidget {
   const QRCodeScannerScreen({super.key});
 
-  Future<String?> open(BuildContext context) async {
-    return Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (context) => const QRCodeScannerScreen(),
-      ),
-    );
+  Future<String?> open(BuildContext context) {
+    return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(fullscreenDialog: true, builder: (context) => const QRCodeScannerScreen()));
   }
 
   @override
@@ -31,10 +25,7 @@ class QRCodeScannerScreen extends StatefulHookConsumerWidget {
 }
 
 class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with WidgetsBindingObserver, PresLogger {
-  final MobileScannerController controller = MobileScannerController(
-    detectionTimeoutMs: 500,
-    autoStart: false,
-  );
+  final MobileScannerController controller = MobileScannerController(detectionTimeoutMs: 500, autoStart: false);
   bool started = false;
 
   // late FlutterEasyPermission _easyPermission;
@@ -62,10 +53,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   }
 
   Future<bool> _requestCameraPermission() async {
-    final hasPermission = await FlutterEasyPermission.has(
-      perms: permissions,
-      permsGroup: permissionGroup,
-    );
+    final hasPermission = await FlutterEasyPermission.has(perms: permissions, permsGroup: permissionGroup);
 
     if (hasPermission) return true;
 
@@ -83,16 +71,9 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
       }
     }
 
-    FlutterEasyPermission().addPermissionCallback(
-      onGranted: permissionCallback,
-      onDenied: permissionDeniedCallback,
-    );
+    FlutterEasyPermission().addPermissionCallback(onGranted: permissionCallback, onDenied: permissionDeniedCallback);
 
-    FlutterEasyPermission.request(
-      perms: permissions,
-      permsGroup: permissionGroup,
-      rationale: "Camera permission is required to scan QR codes.",
-    );
+    FlutterEasyPermission.request(perms: permissions, permsGroup: permissionGroup, rationale: "Camera permission is required to scan QR codes.");
 
     return completer.future;
   }
@@ -124,10 +105,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   }
 
   Future<void> _checkPermissionAndStartScanner() async {
-    final hasPermission = await FlutterEasyPermission.has(
-      perms: permissions,
-      permsGroup: permissionGroup,
-    );
+    final hasPermission = await FlutterEasyPermission.has(perms: permissions, permsGroup: permissionGroup);
     if (hasPermission) {
       _startScanner();
     } else {
@@ -138,20 +116,20 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   Future<void> _startScanner() async {
     loggy.info("Starting scanner");
     await controller.stop();
-    await controller.start().whenComplete(() {
-      setState(() {
-        started = true;
-      });
-    }).catchError((error) {
-      loggy.warning("Error starting scanner: $error");
-    });
+    await controller
+        .start()
+        .whenComplete(() {
+          setState(() {
+            started = true;
+          });
+        })
+        .catchError((error) {
+          loggy.warning("Error starting scanner: $error");
+        });
   }
 
   Future<void> startQrScannerIfPermissionIsGranted() async {
-    final hasPermission = await FlutterEasyPermission.has(
-      perms: permissions,
-      permsGroup: permissionGroup,
-    );
+    final hasPermission = await FlutterEasyPermission.has(perms: permissions, permsGroup: permissionGroup);
     if (hasPermission) {
       _startScanner();
       // } else {
@@ -176,12 +154,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
   // }
 
   void _showPermissionDialog() {
-    FlutterEasyPermission.showAppSettingsDialog(
-      title: "Camera Access Required",
-      rationale: "Permission to camera to scan QR Code",
-      positiveButtonText: "Settings",
-      negativeButtonText: "Cancel",
-    );
+    FlutterEasyPermission.showAppSettingsDialog(title: "Camera Access Required", rationale: "Permission to camera to scan QR Code", positiveButtonText: "Settings", negativeButtonText: "Cancel");
   }
 
   @override
@@ -189,10 +162,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
     final Translations t = ref.watch(translationsProvider);
 
     return FutureBuilder(
-      future: FlutterEasyPermission.has(
-        perms: permissions,
-        permsGroup: permissionGroup,
-      ),
+      future: FlutterEasyPermission.has(perms: permissions, permsGroup: permissionGroup),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -215,16 +185,9 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: Theme.of(context).iconTheme.copyWith(
-              color: Colors.white,
-              size: 32,
-            ),
+        iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.white, size: 32),
         actions: [
-          IconButton(
-            icon: const Icon(FluentIcons.flash_24_regular),
-            tooltip: t.profile.add.qrScanner.torchSemanticLabel,
-            onPressed: () => controller.toggleTorch(),
-          ),
+          IconButton(icon: const Icon(FluentIcons.flash_24_regular), tooltip: t.profile.add.qrScanner.torchSemanticLabel, onPressed: () => controller.toggleTorch()),
           // IconButton(
           //   icon: ValueListenableBuilder(
           //     valueListenable: controller.torchState,
@@ -246,11 +209,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
           //   tooltip: t.profile.add.qrScanner.torchSemanticLabel,
           //   onPressed: () => controller.toggleTorch(),
           // ),
-          IconButton(
-            icon: const Icon(FluentIcons.camera_switch_24_regular),
-            tooltip: t.profile.add.qrScanner.facingSemanticLabel,
-            onPressed: () => controller.switchCamera(),
-          ),
+          IconButton(icon: const Icon(FluentIcons.camera_switch_24_regular), tooltip: t.profile.add.qrScanner.facingSemanticLabel, onPressed: () => controller.switchCamera()),
         ],
       ),
       body: Stack(
@@ -270,7 +229,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
                 loggy.warning("unable to capture");
               }
             },
-            errorBuilder: (_, error, __) {
+            errorBuilder: (_, error) {
               final message = switch (error.errorCode) {
                 MobileScannerErrorCode.permissionDenied => t.profile.add.qrScanner.permissionDeniedError,
                 _ => t.profile.add.qrScanner.unexpectedError,
@@ -282,10 +241,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(bottom: 8),
-                      child: Icon(
-                        FluentIcons.error_circle_24_regular,
-                        color: Colors.white,
-                      ),
+                      child: Icon(FluentIcons.error_circle_24_regular, color: Colors.white),
                     ),
                     Text(message),
                     Text(error.errorDetails?.message ?? ''),
@@ -296,13 +252,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
           ),
           if (started)
             CustomPaint(
-              painter: ScannerOverlay(
-                Rect.fromCenter(
-                  center: size.center(Offset.zero),
-                  width: overlaySize,
-                  height: overlaySize,
-                ),
-              ),
+              painter: ScannerOverlay(Rect.fromCenter(center: size.center(Offset.zero), width: overlaySize, height: overlaySize)),
             ),
         ],
       ),
@@ -313,10 +263,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: Theme.of(context).iconTheme.copyWith(
-              color: Colors.white,
-              size: 32,
-            ),
+        iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.white, size: 32),
       ),
       body: Center(
         child: Column(
@@ -324,10 +271,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
           children: [
             Text(t.profile.add.qrScanner.permissionDeniedError),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _showPermissionDialog,
-              child: const Text("Settings"),
-            ),
+            ElevatedButton(onPressed: _showPermissionDialog, child: const Text("Settings")),
           ],
         ),
       ),
@@ -344,40 +288,21 @@ class ScannerOverlay extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final backgroundPath = Path()..addRect(Rect.largest);
-    final cutoutPath = Path()
-      ..addRRect(
-        RRect.fromRectAndCorners(
-          scanWindow,
-          topLeft: Radius.circular(borderRadius),
-          topRight: Radius.circular(borderRadius),
-          bottomLeft: Radius.circular(borderRadius),
-          bottomRight: Radius.circular(borderRadius),
-        ),
-      );
+    final cutoutPath = Path()..addRRect(RRect.fromRectAndCorners(scanWindow, topLeft: Radius.circular(borderRadius), topRight: Radius.circular(borderRadius), bottomLeft: Radius.circular(borderRadius), bottomRight: Radius.circular(borderRadius)));
 
     final backgroundPaint = Paint()
-      ..color = Colors.black.withOpacity(0.5)
+      ..color = Colors.black.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill
       ..blendMode = BlendMode.dstOut;
 
-    final backgroundWithCutout = Path.combine(
-      PathOperation.difference,
-      backgroundPath,
-      cutoutPath,
-    );
+    final backgroundWithCutout = Path.combine(PathOperation.difference, backgroundPath, cutoutPath);
 
     final borderPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
 
-    final borderRect = RRect.fromRectAndCorners(
-      scanWindow,
-      topLeft: Radius.circular(borderRadius),
-      topRight: Radius.circular(borderRadius),
-      bottomLeft: Radius.circular(borderRadius),
-      bottomRight: Radius.circular(borderRadius),
-    );
+    final borderRect = RRect.fromRectAndCorners(scanWindow, topLeft: Radius.circular(borderRadius), topRight: Radius.circular(borderRadius), bottomLeft: Radius.circular(borderRadius), bottomRight: Radius.circular(borderRadius));
 
     canvas.drawPath(backgroundWithCutout, backgroundPaint);
     canvas.drawRRect(borderRect, borderPaint);

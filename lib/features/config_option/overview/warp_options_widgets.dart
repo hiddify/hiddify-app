@@ -19,13 +19,13 @@ class WarpOptionsTiles extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final warpOptions = ref.watch(warpOptionNotifierProvider);
+    final warpOptions = ref.watch(warpOptionProvider);
     final warpPrefaceCompleted = warpOptions.consentGiven;
     final enableWarp = ref.watch(ConfigOptions.enableWarp);
     final canChangeOptions = warpPrefaceCompleted && enableWarp;
 
     ref.listen(
-      warpOptionNotifierProvider.select((value) => value.configGeneration),
+      warpOptionProvider.select((value) => value.configGeneration),
       (previous, next) async {
         if (next case AsyncData(value: final log) when log.isNotEmpty) {
           await CustomAlertDialog(
@@ -48,7 +48,7 @@ class WarpOptionsTiles extends HookConsumerWidget {
                 builder: (context) => const WarpLicenseAgreementModal(),
               );
               if (agreed ?? false) {
-                await ref.read(warpOptionNotifierProvider.notifier).agree();
+                await ref.read(warpOptionProvider.notifier).agree();
                 await ref.read(ConfigOptions.enableWarp.notifier).update(value);
               }
             } else {
@@ -70,8 +70,8 @@ class WarpOptionsTiles extends HookConsumerWidget {
               : null,
           enabled: canChangeOptions,
           onTap: () async {
-            await ref.read(warpOptionNotifierProvider.notifier).generateWarpConfig();
-            await ref.read(warpOptionNotifierProvider.notifier).generateWarp2Config();
+            await ref.read(warpOptionProvider.notifier).generateWarpConfig();
+            await ref.read(warpOptionProvider.notifier).generateWarp2Config();
           },
         ),
         ChoicePreferenceWidget(

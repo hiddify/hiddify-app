@@ -12,7 +12,6 @@ import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_footer.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -38,55 +37,37 @@ class HomePage extends HookConsumerWidget {
                     children: [
                       TextSpan(text: t.general.appTitle),
                       const TextSpan(text: " "),
-                      const WidgetSpan(
-                        child: AppVersionLabel(),
-                        alignment: PlaceholderAlignment.middle,
-                      ),
+                      const WidgetSpan(child: AppVersionLabel(), alignment: PlaceholderAlignment.middle),
                     ],
                   ),
                 ),
                 actions: [
-                  IconButton(
-                    onPressed: () => const QuickSettingsRoute().push(context),
-                    icon: const Icon(FluentIcons.options_24_filled),
-                    tooltip: t.config.quickSettings,
-                  ),
-                  IconButton(
-                    onPressed: () => const AddProfileRoute().push(context),
-                    icon: const Icon(FluentIcons.add_circle_24_filled),
-                    tooltip: t.profile.add.buttonText,
-                  ),
+                  IconButton(onPressed: () => const QuickSettingsRoute().push(context), icon: const Icon(FluentIcons.options_24_filled), tooltip: t.config.quickSettings),
+                  IconButton(onPressed: () => const AddProfileRoute().push(context), icon: const Icon(FluentIcons.add_circle_24_filled), tooltip: t.profile.add.buttonText),
                 ],
               ),
               switch (activeProfile) {
                 AsyncData(value: final profile?) => MultiSliver(
-                    children: [
-                      ProfileTile(profile: profile, isMain: true),
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ConnectionButton(),
-                                  ActiveProxyDelayIndicator(),
-                                ],
-                              ),
-                            ),
-                            if (MediaQuery.sizeOf(context).width < 840) const ActiveProxyFooter(),
-                          ],
-                        ),
+                  children: [
+                    ProfileTile(profile: profile, isMain: true),
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Expanded(
+                            child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [ConnectionButton(), ActiveProxyDelayIndicator()]),
+                          ),
+                          if (MediaQuery.sizeOf(context).width < 840) const ActiveProxyFooter(),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
                 AsyncData() => switch (hasAnyProfile) {
-                    AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                    _ => const EmptyProfilesHomeBody(),
-                  },
+                  AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
+                  _ => const EmptyProfilesHomeBody(),
+                },
                 AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
                 _ => const SliverToBoxAdapter(),
               },
@@ -113,20 +94,12 @@ class AppVersionLabel extends HookConsumerWidget {
       label: t.about.version,
       button: false,
       child: Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 4,
-          vertical: 1,
-        ),
+        decoration: BoxDecoration(color: theme.colorScheme.secondaryContainer, borderRadius: BorderRadius.circular(4)),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
         child: Text(
           version,
           textDirection: TextDirection.ltr,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSecondaryContainer,
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSecondaryContainer),
         ),
       ),
     );

@@ -26,7 +26,9 @@ class GeneralSettingTiles extends HookConsumerWidget {
           title: Text(t.settings.general.autoIpCheck),
           secondary: const Icon(FluentIcons.globe_search_24_regular),
           value: ref.watch(Preferences.autoCheckIp),
-          onChanged: ref.read(Preferences.autoCheckIp.notifier).update,
+          onChanged: (value) async {
+            await ref.read(Preferences.autoCheckIp.notifier).update(value);
+          },
         ),
         if (Platform.isAndroid) ...[
           SwitchListTile(
@@ -37,23 +39,18 @@ class GeneralSettingTiles extends HookConsumerWidget {
               await ref.read(Preferences.dynamicNotification.notifier).update(value);
             },
           ),
-          SwitchListTile(
-            title: Text(t.settings.general.hapticFeedback),
-            secondary: const Icon(FluentIcons.phone_vibrate_24_regular),
-            value: ref.watch(hapticServiceProvider),
-            onChanged: ref.read(hapticServiceProvider.notifier).updatePreference,
-          ),
+          SwitchListTile(title: Text(t.settings.general.hapticFeedback), secondary: const Icon(FluentIcons.phone_vibrate_24_regular), value: ref.watch(hapticServiceProvider), onChanged: ref.read(hapticServiceProvider.notifier).updatePreference),
         ],
         if (PlatformUtils.isDesktop) ...[
           const ClosingPrefTile(),
           SwitchListTile(
             title: Text(t.settings.general.autoStart),
-            value: ref.watch(autoStartNotifierProvider).asData!.value,
+            value: ref.watch(autoStartProvider).asData!.value,
             onChanged: (value) async {
               if (value) {
-                await ref.read(autoStartNotifierProvider.notifier).enable();
+                await ref.read(autoStartProvider.notifier).enable();
               } else {
-                await ref.read(autoStartNotifierProvider.notifier).disable();
+                await ref.read(autoStartProvider.notifier).disable();
               }
             },
           ),

@@ -5,8 +5,9 @@ analyzer:
     - custom_lint
   exclude:
     - "libcore/**"
-    - "**.g.dart"
     - "lib/gen/**"
+    - "lib/singbox/generated/**"
+    - "lib/singbox/model/*.g.dart"
   errors:
     invalid_annotation_target: ignore
 

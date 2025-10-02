@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hiddify/bootstrap.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -14,14 +13,7 @@ bool showDrawerButton(BuildContext context) {
 }
 
 class NestedAppBar extends StatelessWidget {
-  const NestedAppBar({
-    super.key,
-    this.title,
-    this.actions,
-    this.pinned = true,
-    this.forceElevated = false,
-    this.bottom,
-  });
+  const NestedAppBar({super.key, this.title, this.actions, this.pinned = true, this.forceElevated = false, this.bottom});
 
   final Widget? title;
   final List<Widget>? actions;
@@ -41,14 +33,14 @@ class NestedAppBar extends StatelessWidget {
               },
             )
           : (Navigator.of(context).canPop()
-              ? IconButton(
-                  icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
-                  padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Pops the current route off the navigator stack
-                  },
-                )
-              : null),
+                ? IconButton(
+                    icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
+                    padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
+                    onPressed: () {
+                      context.pop(); // Pops the current route off the navigator stack
+                    },
+                  )
+                : null),
       title: title,
       actions: actions,
       pinned: pinned,

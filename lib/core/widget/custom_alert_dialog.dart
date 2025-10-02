@@ -2,27 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:hiddify/core/model/failures.dart';
 
 class CustomAlertDialog extends StatelessWidget {
-  const CustomAlertDialog({
-    super.key,
-    this.title,
-    required this.message,
-  });
+  const CustomAlertDialog({super.key, this.title, required this.message});
 
   final String? title;
   final String message;
 
-  factory CustomAlertDialog.fromError(PresentableError error) =>
-      CustomAlertDialog(
-        title: error.message == null ? null : error.type,
-        message: error.message ?? error.type,
-      );
+  factory CustomAlertDialog.fromError(PresentableError error) => CustomAlertDialog(title: error.message == null ? null : error.type, message: error.message ?? error.type);
 
   Future<void> show(BuildContext context) async {
-    await showDialog(
-      context: context,
-      useRootNavigator: true,
-      builder: (context) => this,
-    );
+    await showDialog(context: context, builder: (context) => this);
   }
 
   @override
@@ -31,12 +19,7 @@ class CustomAlertDialog extends StatelessWidget {
 
     return AlertDialog(
       title: title != null ? Text(title!) : null,
-      content: SingleChildScrollView(
-        child: SizedBox(
-          width: 468,
-          child: Text(message),
-        ),
-      ),
+      content: SingleChildScrollView(child: SizedBox(width: 468, child: Text(message))),
       actions: [
         TextButton(
           onPressed: () {

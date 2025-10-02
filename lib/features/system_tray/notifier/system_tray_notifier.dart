@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -25,12 +24,15 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
   Future<void> build() async {
     if (!PlatformUtils.isDesktop) return;
 
-    final activeProxy = await ref.watch(activeProxyNotifierProvider);
-    final delay = activeProxy.value?.urlTestDelay ?? 0;
+    final activeProxy = ref.watch(activeProxyProvider);
+    final delay = switch (activeProxy) {
+      AsyncData(value: final proxy) => proxy.urlTestDelay,
+      _ => 0,
+    };
     final newConnectionStatus = delay > 0 && delay < 65000;
     ConnectionStatus connection;
     try {
-      connection = await ref.watch(connectionNotifierProvider.future);
+      connection = await ref.watch(connectionProvider.future);
     } catch (e) {
       loggy.warning("error getting connection status", e);
       connection = const ConnectionStatus.disconnected();
@@ -40,7 +42,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
 
     var tooltip = Constants.appName;
     final serviceMode = ref.watch(ConfigOptions.serviceMode);
-    if (connection == Disconnected()) {
+    if (connection == const Disconnected()) {
       setIcon(connection);
     } else if (newConnectionStatus) {
       setIcon(const Connected());
@@ -61,14 +63,6 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
     }
     if (!Platform.isLinux) await trayManager.setToolTip(tooltip);
 
-    final destinations = <(String label, String location)>[
-      (t.home.pageTitle, const HomeRoute().location),
-      (t.proxies.pageTitle, const ProxiesRoute().location),
-      (t.logs.pageTitle, const LogsOverviewRoute().location),
-      (t.settings.pageTitle, const SettingsRoute().location),
-      (t.about.pageTitle, const AboutRoute().location),
-    ];
-
     // loggy.debug('updating system tray');
 
     final menu = Menu(
@@ -76,7 +70,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
         MenuItem(
           label: t.tray.dashboard,
           onClick: (_) async {
-            await ref.read(windowNotifierProvider.notifier).open();
+            await ref.read(windowProvider.notifier).open();
           },
         ),
         MenuItem.separator(),
@@ -91,15 +85,11 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
           checked: false,
           disabled: connection.isSwitching,
           onClick: (_) async {
-            await ref.read(connectionNotifierProvider.notifier).toggleConnection();
+            await ref.read(connectionProvider.notifier).toggleConnection();
           },
         ),
         MenuItem.separator(),
-        MenuItem(
-          label: t.config.serviceMode,
-          icon: Assets.images.trayIconIco,
-          disabled: true,
-        ),
+        MenuItem(label: t.config.serviceMode, icon: Assets.images.trayIconIco, disabled: true),
 
         ...ServiceMode.values.map(
           (e) => MenuItem.checkbox(
@@ -134,7 +124,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
         MenuItem(
           label: t.tray.quit,
           onClick: (_) async {
-            return ref.read(windowNotifierProvider.notifier).quit();
+            await ref.read(windowProvider.notifier).quit();
           },
         ),
       ],
@@ -145,12 +135,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
 
   static void setIcon(ConnectionStatus status) {
     if (!PlatformUtils.isDesktop) return;
-    trayManager
-        .setIcon(
-          _trayIconPath(status),
-          isTemplate: Platform.isMacOS,
-        )
-        .asStream();
+    trayManager.setIcon(_trayIconPath(status), isTemplate: Platform.isMacOS).asStream();
   }
 
   static String _trayIconPath(ConnectionStatus status) {
@@ -172,7 +157,6 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
           }
       }
     }
-    final isDarkMode = false;
     switch (status) {
       case Connected():
         return Assets.images.trayIconConnectedPng.path;
@@ -181,12 +165,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
       case Disconnecting():
         return Assets.images.trayIconDisconnectedPng.path;
       case Disconnected():
-        if (isDarkMode) {
-          return Assets.images.trayIconDarkPng.path;
-        } else {
-          return Assets.images.trayIconPng.path;
-        }
+        return Assets.images.trayIconPng.path;
     }
-    // return Assets.images.trayIconPng.path;
   }
 }

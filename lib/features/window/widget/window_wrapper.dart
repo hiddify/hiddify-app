@@ -27,7 +27,7 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(windowNotifierProvider);
+    ref.watch(windowProvider);
 
     return widget.child;
   }
@@ -52,7 +52,7 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
   @override
   Future<void> onWindowClose() async {
     if (RootScaffold.stateKey.currentContext == null) {
-      await ref.read(windowNotifierProvider.notifier).close();
+      await ref.read(windowProvider.notifier).close();
       return;
     }
 
@@ -67,10 +67,10 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
         isWindowClosingDialogOpened = false;
 
       case ActionsAtClosing.hide:
-        await ref.read(windowNotifierProvider.notifier).close();
+        await ref.read(windowProvider.notifier).close();
 
       case ActionsAtClosing.exit:
-        await ref.read(windowNotifierProvider.notifier).quit();
+        await ref.read(windowProvider.notifier).quit();
     }
   }
 

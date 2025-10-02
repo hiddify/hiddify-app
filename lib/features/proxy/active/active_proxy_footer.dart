@@ -19,95 +19,89 @@ class ActiveProxyFooter extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final activeProxy = ref.watch(activeProxyNotifierProvider);
-    final ipInfo = ref.watch(ipInfoNotifierProvider);
+    final hasActiveProxy = ref.watch(activeProxyProvider.select((value) => value is AsyncData));
+    final activeProxyName = ref.watch(
+      activeProxyProvider.select((value) {
+        final data = value.asData?.value;
+        if (data == null) return null;
+        return data.selectedName.isNotNullOrBlank ? data.selectedName! : data.name;
+      }),
+    );
+    final ipInfo = ref.watch(ipInfoProvider);
 
     return AnimatedVisibility(
       axis: Axis.vertical,
-      visible: activeProxy is AsyncData,
-      child: switch (activeProxy) {
-        AsyncData(value: final proxy) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _InfoProp(
-                        icon: FluentIcons.arrow_routing_20_regular,
-                        text: proxy.selectedName.isNotNullOrBlank
-                            ? proxy.selectedName!
-                            : proxy.name,
-                        semanticLabel: t.proxies.activeProxySemanticLabel,
-                      ),
-                      const Gap(8),
-                      switch (ipInfo) {
-                        AsyncData(value: final info) => Row(
-                            children: [
-                              IPCountryFlag(countryCode: info.countryCode),
-                              const Gap(8),
-                              IPText(
-                                ip: info.ip,
-                                onLongPress: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
-                                },
-                              ),
-                            ],
-                          ),
-                        AsyncError(error: final UnknownIp _) => Row(
-                            children: [
-                              const Icon(FluentIcons.arrow_sync_20_regular),
-                              const Gap(8),
-                              UnknownIPText(
-                                text: t.proxies.checkIp,
-                                onTap: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
-                                },
-                              ),
-                            ],
-                          ),
-                        AsyncError() => Row(
-                            children: [
-                              const Icon(FluentIcons.error_circle_20_regular),
-                              const Gap(8),
-                              UnknownIPText(
-                                text: t.proxies.unknownIp,
-                                onTap: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
-                                },
-                              ),
-                            ],
-                          ),
-                        _ => const Row(
-                            children: [
-                              Icon(FluentIcons.question_circle_20_regular),
-                              Gap(8),
-                              Flexible(
-                                child: ShimmerSkeleton(
-                                  height: 16,
-                                  widthFactor: 1,
+      visible: hasActiveProxy,
+      child: hasActiveProxy
+          ? Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _InfoProp(icon: FluentIcons.arrow_routing_20_regular, text: activeProxyName ?? "...", semanticLabel: t.proxies.activeProxySemanticLabel),
+                        const Gap(8),
+                        switch (ipInfo) {
+                          AsyncData(value: final info) => Row(
+                              children: [
+                                IPCountryFlag(countryCode: info.countryCode),
+                                const Gap(8),
+                                IPText(
+                                  ip: info.ip,
+                                  onLongPress: () {
+                                    ref.read(ipInfoProvider.notifier).refresh();
+                                  },
                                 ),
-                              ),
-                            ],
-                          ),
-                      },
+                              ],
+                            ),
+                          AsyncError(error: final UnknownIp _) => Row(
+                              children: [
+                                const Icon(FluentIcons.arrow_sync_20_regular),
+                                const Gap(8),
+                                UnknownIPText(
+                                  text: t.proxies.checkIp,
+                                  onTap: () {
+                                    ref.read(ipInfoProvider.notifier).refresh();
+                                  },
+                                ),
+                              ],
+                            ),
+                          AsyncError() => Row(
+                              children: [
+                                const Icon(FluentIcons.error_circle_20_regular),
+                                const Gap(8),
+                                UnknownIPText(
+                                  text: t.proxies.unknownIp,
+                                  onTap: () {
+                                    ref.read(ipInfoProvider.notifier).refresh();
+                                  },
+                                ),
+                              ],
+                            ),
+                          _ => const Row(
+                              children: [
+                                Icon(FluentIcons.question_circle_20_regular),
+                                Gap(8),
+                                Flexible(
+                                  child: ShimmerSkeleton(
+                                    height: 16,
+                                    widthFactor: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                        },
                     ],
                   ),
                 ),
                 const _StatsColumn(),
               ],
             ),
-          ),
-        _ => const SizedBox(),
-      },
+          )
+        : const SizedBox(),
     );
   }
 }
@@ -118,7 +112,7 @@ class _StatsColumn extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final stats = ref.watch(statsNotifierProvider).value;
+    final stats = ref.watch(statsProvider).value;
 
     return Directionality(
       textDirection: TextDirection.values[

@@ -33,24 +33,26 @@ class AddProfile extends _$AddProfile with AppLogger {
       loggy.debug("disposing");
       _cancelToken?.cancel();
     });
-    ref.listenSelf(
-      (previous, next) {
-        final t = ref.read(translationsProvider);
-        final notification = ref.read(inAppNotificationControllerProvider);
-        switch (next) {
-          case AsyncData(value: final _?):
+    ref.listen(addProfileProvider, (previous, next) {
+      final t = ref.read(translationsProvider);
+      final notification = ref.read(inAppNotificationControllerProvider);
+      switch (next) {
+        case AsyncData(:final value):
+          if (value != null) {
             notification.showSuccessToast(t.profile.save.successMsg);
-          case AsyncError(:final error):
-            if (error case ProfileInvalidUrlFailure()) {
-              notification.showErrorToast(t.failure.profiles.invalidUrl);
-            } else {
-              notification.showErrorDialog(
-                t.presentError(error, action: t.profile.add.failureMsg),
-              );
-            }
-        }
-      },
-    );
+          } else {
+            notification.showErrorToast(t.profile.save.failureMsg);
+          }
+        case AsyncError(error: final error):
+          if (error is ProfileInvalidUrlFailure) {
+            notification.showErrorToast(t.failure.profiles.invalidUrl);
+          } else {
+            notification.showErrorDialog(t.presentError(error, action: t.profile.add.failureMsg));
+          }
+        case AsyncLoading():
+          // Loading state, no action needed
+      }
+    });
     return const AsyncData(null);
   }
 
@@ -61,89 +63,79 @@ class AddProfile extends _$AddProfile with AppLogger {
     if (state.isLoading) return;
     state = const AsyncLoading();
     // await check4Warp(rawInput);
-    state = await AsyncValue.guard(
-      () async {
-        final activeProfile = await ref.read(activeProfileProvider.future);
-        final markAsActive = activeProfile == null || ref.read(Preferences.markNewProfileActive);
-        final TaskEither<ProfileFailure, Unit> task;
-        if (LinkParser.parse(rawInput) case (final link)?) {
-          loggy.debug("adding profile, url: [${link.url}]");
-          task = _profilesRepo.addByUrl(
-            link.url,
-            markAsActive: markAsActive,
-            cancelToken: _cancelToken = CancelToken(),
-          );
-        } else if (LinkParser.protocol(rawInput) case (final parsed)?) {
-          loggy.debug("adding profile, content");
-          var name = parsed.name;
-          var oldItem = await _profilesRepo.getByName(name);
-          if (name == "Hiddify WARP" && oldItem != null) {
-            _profilesRepo.deleteById(oldItem.id).run();
-          }
-          while (await _profilesRepo.getByName(name) != null) {
-            name += '${randomInt(0, 9).run()}';
-          }
-          task = _profilesRepo.addByContent(
-            parsed.content,
-            name: name,
-            markAsActive: markAsActive,
-          );
-        } else {
-          loggy.debug("invalid content");
-          throw const ProfileInvalidUrlFailure();
+    state = await AsyncValue.guard(() async {
+      final activeProfile = await ref.read(activeProfileProvider.future);
+      final markAsActive = activeProfile == null || ref.read(Preferences.markNewProfileActive);
+      final TaskEither<ProfileFailure, Unit> task;
+      if (LinkParser.parse(rawInput) case (final link)?) {
+        loggy.debug("adding profile, url: [${link.url}]");
+        task = _profilesRepo.addByUrl(link.url, markAsActive: markAsActive, cancelToken: _cancelToken = CancelToken());
+      } else if (LinkParser.protocol(rawInput) case (final parsed)?) {
+        loggy.debug("adding profile, content");
+        var name = parsed.name;
+        final oldItem = await _profilesRepo.getByName(name);
+        if (name == "Hiddify WARP" && oldItem != null) {
+          _profilesRepo.deleteById(oldItem.id).run();
         }
-        return task.match(
-          (err) {
-            loggy.warning("failed to add profile", err);
-            throw err;
-          },
-          (_) {
-            loggy.info(
-              "successfully added profile, mark as active? [$markAsActive]",
-            );
-            return unit;
-          },
-        ).run();
-      },
-    );
+        var candidate = name;
+        while (await _profilesRepo.getByName(candidate) != null) {
+          final sb = StringBuffer(candidate)..write(randomInt(0, 9).run());
+          candidate = sb.toString();
+        }
+        name = candidate;
+        task = _profilesRepo.addByContent(parsed.content, name: name, markAsActive: markAsActive);
+      } else {
+        loggy.debug("invalid content");
+        throw const ProfileInvalidUrlFailure();
+      }
+      return task
+          .match(
+            (err) {
+              loggy.warning("failed to add profile", err);
+              throw err;
+            },
+            (_) {
+              loggy.info("successfully added profile, mark as active? [$markAsActive]");
+              return unit;
+            },
+          )
+          .run();
+    });
   }
 
   Future<void> check4Warp(String rawInput) async {
     for (final line in rawInput.split("\n")) {
       if (line.toLowerCase().startsWith("warp://")) {
-        final _prefs = ref.read(sharedPreferencesProvider).requireValue;
-        final _warp = ref.read(warpOptionNotifierProvider.notifier);
+        final prefs = ref.read(sharedPreferencesProvider).requireValue;
+        final warp = ref.read(warpOptionProvider.notifier);
 
-        final consent = false && (_prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false);
+        final consent = prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false;
 
         final t = ref.read(translationsProvider);
         final notification = ref.read(inAppNotificationControllerProvider);
 
         if (!consent) {
-          final agreed = await showDialog<bool>(
-            context: RootScaffold.stateKey.currentContext!,
-            builder: (context) => const WarpLicenseAgreementModal(),
-          );
+          final agreed = await showDialog<bool>(context: RootScaffold.stateKey.currentContext!, builder: (context) => const WarpLicenseAgreementModal());
 
           if (agreed ?? false) {
-            await _prefs.setBool(WarpOptionNotifier.warpConsentGiven, true);
+            await prefs.setBool(WarpOptionNotifier.warpConsentGiven, true);
             final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
             toast?.pause();
-            await _warp.generateWarpConfig();
+            await warp.generateWarpConfig();
             toast?.start();
           } else {
             return;
           }
         }
 
-        final accountId = _prefs.getString("warp2-account-id");
-        final accessToken = _prefs.getString("warp2-access-token");
+        final accountId = prefs.getString("warp2-account-id");
+        final accessToken = prefs.getString("warp2-access-token");
         final hasWarp2Config = accountId != null && accessToken != null;
 
-        if (!hasWarp2Config || true) {
+        if (!hasWarp2Config) {
           final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
           toast?.pause();
-          await _warp.generateWarp2Config();
+          await warp.generateWarp2Config();
           toast?.start();
         }
       }
@@ -156,20 +148,22 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
   @override
   AsyncValue<Unit?> build(String id) {
     ref.disposeDelay(const Duration(minutes: 1));
-    ref.listenSelf(
-      (previous, next) {
-        final t = ref.read(translationsProvider);
-        final notification = ref.read(inAppNotificationControllerProvider);
-        switch (next) {
-          case AsyncData(value: final _?):
+    ref.listen(updateProfileProvider(id), (previous, next) {
+      final t = ref.read(translationsProvider);
+      final notification = ref.read(inAppNotificationControllerProvider);
+      switch (next) {
+        case AsyncData(:final value):
+          if (value != null) {
             notification.showSuccessToast(t.profile.update.successMsg);
-          case AsyncError(:final error):
-            notification.showErrorDialog(
-              t.presentError(error, action: t.profile.update.failureMsg),
-            );
-        }
-      },
-    );
+          } else {
+            notification.showErrorToast(t.profile.update.failureMsg);
+          }
+        case AsyncError(error: final error):
+          notification.showErrorDialog(t.presentError(error, action: t.profile.update.failureMsg));
+        case AsyncLoading():
+          // Loading state, no action needed
+      }
+    });
     return const AsyncData(null);
   }
 
@@ -179,27 +173,26 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
     if (state.isLoading) return;
     state = const AsyncLoading();
     await ref.read(hapticServiceProvider.notifier).lightImpact();
-    state = await AsyncValue.guard(
-      () async {
-        return await _profilesRepo.updateSubscription(profile).match(
-          (err) {
-            loggy.warning("failed to update profile", err);
-            throw err;
-          },
-          (_) async {
-            loggy.info(
-              'successfully updated profile, was active? [${profile.active}]',
-            );
+    state = await AsyncValue.guard(() async {
+      return await _profilesRepo
+          .updateSubscription(profile)
+          .match(
+            (err) {
+              loggy.warning("failed to update profile", err);
+              throw err;
+            },
+            (_) async {
+              loggy.info('successfully updated profile, was active? [${profile.active}]');
 
-            await ref.read(activeProfileProvider.future).then((active) async {
-              if (active != null && active.id == profile.id) {
-                await ref.read(connectionNotifierProvider.notifier).reconnect(profile);
-              }
-            });
-            return unit;
-          },
-        ).run();
-      },
-    );
+              await ref.read(activeProfileProvider.future).then((active) async {
+                if (active != null && active.id == profile.id) {
+                  await ref.read(connectionProvider.notifier).reconnect(profile);
+                }
+              });
+              return unit;
+            },
+          )
+          .run();
+    });
   }
 }

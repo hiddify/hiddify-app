@@ -18,8 +18,7 @@ class LocalePrefTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-
-    final locale = ref.watch(localePreferencesProvider);
+    final AppLocale locale = ref.watch(localePreferencesProvider);
 
     return ListTile(
       title: Text(t.settings.general.locale),
@@ -31,16 +30,16 @@ class LocalePrefTile extends ConsumerWidget {
           builder: (context) {
             return SimpleDialog(
               title: Text(t.settings.general.locale),
-              children: AppLocale.values
-                  .map(
-                    (e) => RadioListTile(
-                      title: Text(e.localeName),
-                      value: e,
-                      groupValue: locale,
-                      onChanged: Navigator.of(context).maybePop,
-                    ),
-                  )
-                  .toList(),
+              children: [
+                RadioGroup<AppLocale>(
+                  groupValue: locale,
+                  onChanged: Navigator.of(context).maybePop,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [for (final e in AppLocale.values) RadioListTile<AppLocale>(value: e, title: Text(e.localeName))],
+                  ),
+                ),
+              ],
             );
           },
         );
@@ -58,8 +57,7 @@ class RegionPrefTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-
-    final region = ref.watch(ConfigOptions.region);
+    final Region region = ref.watch(ConfigOptions.region);
 
     return ListTile(
       title: Text(t.settings.general.region),
@@ -71,25 +69,25 @@ class RegionPrefTile extends ConsumerWidget {
           builder: (context) {
             return SimpleDialog(
               title: Text(t.settings.general.region),
-              children: Region.values
-                  .map(
-                    (e) => RadioListTile(
-                      title: Text(e.present(t)),
-                      value: e,
-                      groupValue: region,
-                      onChanged: Navigator.of(context).maybePop,
-                    ),
-                  )
-                  .toList(),
+              children: [
+                RadioGroup<Region>(
+                  groupValue: region,
+                  onChanged: Navigator.of(context).maybePop,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [for (final e in Region.values) RadioListTile<Region>(value: e, title: Text(e.present(t)))],
+                  ),
+                ),
+              ],
             );
           },
         );
         if (selectedRegion != null) {
           // await ref.read(Preferences.region.notifier).update(selectedRegion);
 
-          await ref.watch(ConfigOptions.region.notifier).update(selectedRegion);
+          await ref.read(ConfigOptions.region.notifier).update(selectedRegion);
 
-          await ref.watch(ConfigOptions.directDnsAddress.notifier).reset();
+          await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
 
           // await ref.read(configOptionNotifierProvider.notifier).build();
           // await ref.watch(ConfigOptions.resolveDestination.notifier).update(!ref.watch(ConfigOptions.resolveDestination.notifier).raw());
@@ -105,25 +103,18 @@ class RegionPrefTile extends ConsumerWidget {
 }
 
 class EnableAnalyticsPrefTile extends ConsumerWidget {
-  const EnableAnalyticsPrefTile({
-    super.key,
-    this.onChanged,
-  });
+  const EnableAnalyticsPrefTile({super.key, this.onChanged});
 
   final ValueChanged<bool>? onChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-
     final enabled = ref.watch(analyticsControllerProvider).requireValue;
 
     return SwitchListTile(
       title: Text(t.settings.general.enableAnalytics),
-      subtitle: Text(
-        t.settings.general.enableAnalyticsMsg,
-        style: Theme.of(context).textTheme.bodySmall,
-      ),
+      subtitle: Text(t.settings.general.enableAnalyticsMsg, style: Theme.of(context).textTheme.bodySmall),
       secondary: const Icon(FluentIcons.bug_24_regular),
       value: enabled,
       onChanged: (value) async {
@@ -146,7 +137,6 @@ class ThemeModePrefTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-
     final themeMode = ref.watch(themePreferencesProvider);
 
     return ListTile(
@@ -159,16 +149,16 @@ class ThemeModePrefTile extends ConsumerWidget {
           builder: (context) {
             return SimpleDialog(
               title: Text(t.settings.general.themeMode),
-              children: AppThemeMode.values
-                  .map(
-                    (e) => RadioListTile(
-                      title: Text(e.present(t)),
-                      value: e,
-                      groupValue: themeMode,
-                      onChanged: Navigator.of(context).maybePop,
-                    ),
-                  )
-                  .toList(),
+              children: [
+                RadioGroup<AppThemeMode>(
+                  groupValue: themeMode,
+                  onChanged: Navigator.of(context).maybePop,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [for (final e in AppThemeMode.values) RadioListTile<AppThemeMode>(value: e, title: Text(e.present(t)))],
+                  ),
+                ),
+              ],
             );
           },
         );
@@ -186,8 +176,7 @@ class ClosingPrefTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-
-    final action = ref.watch(Preferences.actionAtClose);
+    final ActionsAtClosing action = ref.watch(Preferences.actionAtClose);
 
     return ListTile(
       title: Text(t.settings.general.actionAtClosing),
@@ -199,16 +188,16 @@ class ClosingPrefTile extends ConsumerWidget {
           builder: (context) {
             return SimpleDialog(
               title: Text(t.settings.general.actionAtClosing),
-              children: ActionsAtClosing.values
-                  .map(
-                    (e) => RadioListTile(
-                      title: Text(e.present(t)),
-                      value: e,
-                      groupValue: action,
-                      onChanged: Navigator.of(context).maybePop,
-                    ),
-                  )
-                  .toList(),
+              children: [
+                RadioGroup<ActionsAtClosing>(
+                  groupValue: action,
+                  onChanged: Navigator.of(context).maybePop,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [for (final e in ActionsAtClosing.values) RadioListTile<ActionsAtClosing>(value: e, title: Text(e.present(t)))],
+                  ),
+                ),
+              ],
             );
           },
         );

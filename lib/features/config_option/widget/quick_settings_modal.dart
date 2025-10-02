@@ -16,7 +16,7 @@ class QuickSettingsModal extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final warpPrefaceCompleted = ref.watch(warpOptionNotifierProvider).consentGiven;
+    final warpPrefaceCompleted = ref.watch(warpOptionProvider).consentGiven;
 
     return SingleChildScrollView(
       child: Column(

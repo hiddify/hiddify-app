@@ -23,10 +23,10 @@ class ProfilesOverviewModal extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final asyncProfiles = ref.watch(profilesOverviewNotifierProvider);
+    final asyncProfiles = ref.watch(profilesOverviewProvider);
 
     ref.listen(
-      foregroundProfilesUpdateNotifierProvider,
+      foregroundProfilesUpdateProvider,
       (_, next) {
         if (next case AsyncData(:final value?)) {
           final t = ref.read(translationsProvider);
@@ -62,7 +62,6 @@ class ProfilesOverviewModal extends HookConsumerWidget {
                     t.presentShortError(error),
                   ),
                 AsyncLoading() => const SliverLoadingBodyPlaceholder(),
-                _ => const SliverToBoxAdapter(),
               },
               const SliverGap(48),
             ],
@@ -99,7 +98,7 @@ class ProfilesOverviewModal extends HookConsumerWidget {
                       onPressed: () async {
                         await ref
                             .read(
-                              foregroundProfilesUpdateNotifierProvider.notifier,
+                              foregroundProfilesUpdateProvider.notifier,
                             )
                             .trigger();
                       },
@@ -124,13 +123,13 @@ class ProfilesSortModal extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
     final sortNotifier =
-        ref.watch(profilesOverviewSortNotifierProvider.notifier);
+        ref.watch(profilesOverviewSortProvider.notifier);
 
     return AlertDialog(
       title: Text(t.general.sortBy),
       content: Consumer(
         builder: (context, ref, child) {
-          final sort = ref.watch(profilesOverviewSortNotifierProvider);
+          final sort = ref.watch(profilesOverviewSortProvider);
           return SingleChildScrollView(
             child: Column(
               children: [

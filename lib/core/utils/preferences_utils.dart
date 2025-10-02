@@ -1,17 +1,10 @@
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod/riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesEntry<T, P> with InfraLogger {
-  PreferencesEntry({
-    required this.preferences,
-    required this.key,
-    required this.defaultValue,
-    this.mapFrom,
-    this.mapTo,
-    this.validator,
-  });
+  PreferencesEntry({required this.preferences, required this.key, required this.defaultValue, this.mapFrom, this.mapTo, this.validator});
 
   final SharedPreferences preferences;
   final String key;
@@ -91,77 +84,64 @@ class PreferencesEntry<T, P> with InfraLogger {
   }
 }
 
-class PreferencesNotifier<T, P> extends StateNotifier<T> {
-  PreferencesNotifier._({
-    required Ref ref,
-    required this.entry,
-    this.overrideValue,
-    this.possibleValues,
-  })  : _ref = ref,
-        super(overrideValue ?? entry.read());
+class PreferencesNotifier<T, P> extends Notifier<T> {
+  PreferencesNotifier({required this.key, required this.defaultValue, this.defaultValueFunction, this.mapFrom, this.mapTo, this.validator, this.overrideValue, this.possibleValues});
 
-  final Ref _ref;
-  final PreferencesEntry<T, P> entry;
+  final String key;
+  final T defaultValue;
+  final T Function(Ref ref)? defaultValueFunction;
+  final T Function(P value)? mapFrom;
+  final P Function(T value)? mapTo;
+  final bool Function(T value)? validator;
   final T? overrideValue;
   final List<T>? possibleValues;
 
-  static StateNotifierProvider<PreferencesNotifier<T, P>, T> create<T, P>(String key, T defaultValue,
-          {T Function(Ref ref)? defaultValueFunction, T Function(P value)? mapFrom, P Function(T value)? mapTo, bool Function(T value)? validator, T? overrideValue, List<T>? possibleValues}) =>
-      StateNotifierProvider(
-        (ref) => PreferencesNotifier._(
-            ref: ref,
-            entry: PreferencesEntry<T, P>(
-              preferences: ref.read(sharedPreferencesProvider).requireValue,
-              key: key,
-              defaultValue: defaultValueFunction?.call(ref) ?? defaultValue,
-              mapFrom: mapFrom,
-              mapTo: mapTo,
-              validator: validator,
-            ),
-            overrideValue: overrideValue,
-            possibleValues: possibleValues),
-      );
+  late PreferencesEntry<T, P> _entry;
 
-  static AutoDisposeStateNotifierProvider<PreferencesNotifier<T, P>, T> createAutoDispose<T, P>(
-    String key,
-    T defaultValue, {
-    T Function(P value)? mapFrom,
-    P Function(T value)? mapTo,
-    bool Function(T value)? validator,
-    T? overrideValue,
-  }) =>
-      StateNotifierProvider.autoDispose(
-        (ref) => PreferencesNotifier._(
-          ref: ref,
-          entry: PreferencesEntry<T, P>(
-            preferences: ref.read(sharedPreferencesProvider).requireValue,
-            key: key,
-            defaultValue: defaultValue,
-            mapFrom: mapFrom,
-            mapTo: mapTo,
-            validator: validator,
-          ),
-          overrideValue: overrideValue,
-        ),
-      );
+  @override
+  T build() {
+    final prefs = ref.read(sharedPreferencesProvider).requireValue;
+    final def = defaultValueFunction?.call(ref) ?? defaultValue;
+    _entry = PreferencesEntry<T, P>(preferences: prefs, key: key, defaultValue: def, mapFrom: mapFrom, mapTo: mapTo, validator: validator);
+    return overrideValue ?? _entry.read();
+  }
 
   P raw() {
     final value = overrideValue ?? state;
-    if (entry.mapTo != null) return entry.mapTo!(value);
+    if (_entry.mapTo != null) return _entry.mapTo!(value);
     return value as P;
   }
 
   Future<void> updateRaw(P input) async {
-    final value = await entry.writeRaw(input);
+    final value = await _entry.writeRaw(input);
     if (value != null) state = value;
   }
 
   Future<void> update(T value) async {
-    if (await entry.write(value)) state = value;
+    if (await _entry.write(value)) state = value;
   }
 
   Future<void> reset() async {
-    await entry.remove();
-    _ref.invalidateSelf();
+    await _entry.remove();
+    ref.invalidateSelf();
+  }
+
+  static NotifierProvider<PreferencesNotifier<T, P>, T> create<T, P>(
+    String key,
+    T defaultValue, {
+    T Function(Ref ref)? defaultValueFunction,
+    T Function(P value)? mapFrom,
+    P Function(T value)? mapTo,
+    bool Function(T value)? validator,
+    T? overrideValue,
+    List<T>? possibleValues,
+  }) {
+    return NotifierProvider<PreferencesNotifier<T, P>, T>(
+      () => PreferencesNotifier<T, P>(key: key, defaultValue: defaultValue, defaultValueFunction: defaultValueFunction, mapFrom: mapFrom, mapTo: mapTo, validator: validator, overrideValue: overrideValue, possibleValues: possibleValues),
+    );
+  }
+
+  static NotifierProvider<PreferencesNotifier<T, P>, T> createAutoDispose<T, P>(String key, T defaultValue, {T Function(P value)? mapFrom, P Function(T value)? mapTo, bool Function(T value)? validator, T? overrideValue}) {
+    return NotifierProvider.autoDispose<PreferencesNotifier<T, P>, T>(() => PreferencesNotifier<T, P>(key: key, defaultValue: defaultValue, mapFrom: mapFrom, mapTo: mapTo, validator: validator, overrideValue: overrideValue));
   }
 }

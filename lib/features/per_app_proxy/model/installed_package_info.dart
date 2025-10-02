@@ -4,7 +4,7 @@ part 'installed_package_info.freezed.dart';
 part 'installed_package_info.g.dart';
 
 @freezed
-class InstalledPackageInfo with _$InstalledPackageInfo {
+abstract class InstalledPackageInfo with _$InstalledPackageInfo {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory InstalledPackageInfo({
     required String packageName,

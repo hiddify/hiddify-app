@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,7 +13,7 @@ part 'window_notifier.g.dart';
 const minimumWindowSize = Size(368, 568);
 const defaultWindowSize = Size(868, 668);
 
-@Riverpod(keepAlive: true)
+@riverpod
 class WindowNotifier extends _$WindowNotifier with AppLogger {
   @override
   Future<void> build() async {
@@ -47,7 +46,7 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
   }
 
   Future<void> quit() async {
-    await ref.read(connectionNotifierProvider.notifier).abortConnection().timeout(const Duration(seconds: 2)).catchError(
+    await ref.read(connectionProvider.notifier).abortConnection().timeout(const Duration(seconds: 2)).catchError(
       (e) {
         loggy.warning("error aborting connection on quit", e);
       },

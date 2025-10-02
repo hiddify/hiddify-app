@@ -3,8 +3,8 @@ import 'package:hiddify/core/model/environment.dart';
 
 part 'remote_version_entity.freezed.dart';
 
-@Freezed()
-class RemoteVersionEntity with _$RemoteVersionEntity {
+@freezed
+abstract class RemoteVersionEntity with _$RemoteVersionEntity {
   const RemoteVersionEntity._();
 
   const factory RemoteVersionEntity({

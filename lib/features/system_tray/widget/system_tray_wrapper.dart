@@ -13,14 +13,14 @@ class TrayWrapper extends StatefulHookConsumerWidget {
   final Widget child;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _TrayWrapperState();
+  ConsumerState<TrayWrapper> createState() => _TrayWrapperState();
 }
 
 class _TrayWrapperState extends ConsumerState<TrayWrapper>
     with TrayListener, AppLogger {
   @override
   Widget build(BuildContext context) {
-    ref.listen(systemTrayNotifierProvider, (_, __) {});
+    ref.listen(systemTrayProvider, (_, _) {});
 
     return widget.child;
   }
@@ -42,7 +42,7 @@ class _TrayWrapperState extends ConsumerState<TrayWrapper>
     if (Platform.isMacOS) {
       await trayManager.popUpContextMenu();
     } else {
-      await ref.read(windowNotifierProvider.notifier).open();
+      await ref.read(windowProvider.notifier).open();
     }
   }
 

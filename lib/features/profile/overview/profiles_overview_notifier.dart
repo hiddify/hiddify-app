@@ -28,7 +28,7 @@ class ProfilesOverviewSortNotifier extends _$ProfilesOverviewSortNotifier with A
 class ProfilesOverviewNotifier extends _$ProfilesOverviewNotifier with AppLogger {
   @override
   Stream<List<ProfileEntity>> build() {
-    final sort = ref.watch(profilesOverviewSortNotifierProvider);
+    final sort = ref.watch(profilesOverviewSortProvider);
     return _profilesRepo.watchAll(sort: sort.by, sortMode: sort.mode).map((event) => event.getOrElse((l) => throw l));
   }
 

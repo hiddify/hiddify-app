@@ -10,9 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'connection_data_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-ConnectionRepository connectionRepository(
-  ConnectionRepositoryRef ref,
-) {
+ConnectionRepository connectionRepository(Ref ref) {
   return ConnectionRepositoryImpl(
     directories: ref.watch(appDirectoriesProvider).requireValue,
     configOptionRepository: ref.watch(configOptionRepositoryProvider),

@@ -133,7 +133,7 @@ class AdaptiveMenu extends HookConsumerWidget {
               hasTopBarLayer: false,
               isTopBarLayerAlwaysVisible: true,
               topBarTitle: Text(item.title),
-              mainContentSlivers: [
+              mainContentSliversBuilder: (context) => [
                 SliverList.list(children: subItems),
               ],
             ),
@@ -143,10 +143,12 @@ class AdaptiveMenu extends HookConsumerWidget {
             ListTile(
               title: Text(item.title),
               leading: item.icon != null ? Icon(item.icon) : null,
-              onTap: () async {
-                popSheets();
-                await item.onTap!();
-              },
+              onTap: item.onTap == null
+                  ? null
+                  : () async {
+                      popSheets();
+                      await item.onTap!();
+                    },
             ),
           );
         }
@@ -167,7 +169,7 @@ class AdaptiveMenu extends HookConsumerWidget {
           pageListBuilder: (context) => [
             SliverWoltModalSheetPage(
               hasTopBarLayer: false,
-              mainContentSlivers: [
+              mainContentSliversBuilder: (context) => [
                 SliverList.list(children: buildSheetItems(items, 0)),
               ],
             ),

@@ -15,9 +15,9 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final asyncProxies = ref.watch(proxiesOverviewNotifierProvider);
-    final notifier = ref.watch(proxiesOverviewNotifierProvider.notifier);
-    final sortBy = ref.watch(proxiesSortNotifierProvider);
+    final asyncProxies = ref.watch(proxiesOverviewProvider);
+    final notifier = ref.watch(proxiesOverviewProvider.notifier);
+    final sortBy = ref.watch(proxiesSortProvider);
 
     final selectActiveProxyMutation = useMutation(
       initialOnFailure: (error) =>
@@ -29,7 +29,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
       actions: [
         PopupMenuButton<ProxiesSort>(
           initialValue: sortBy,
-          onSelected: ref.read(proxiesSortNotifierProvider.notifier).update,
+          onSelected: ref.read(proxiesSortProvider.notifier).update,
           icon: const Icon(FluentIcons.arrow_sort_24_regular),
           tooltip: t.proxies.sortTooltip,
           itemBuilder: (context) {
@@ -83,8 +83,9 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                           final proxy = group.items[index];
                           return ProxyTile(
                             proxy,
+                            key: ValueKey(proxy.tag),
                             selected: group.selected == proxy.tag,
-                            onSelect: () async {
+                            onSelect: () {
                               if (selectActiveProxyMutation
                                   .state.isInProgress) {
                                 return;
@@ -109,8 +110,9 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                       final proxy = group.items[index];
                       return ProxyTile(
                         proxy,
+                        key: ValueKey(proxy.tag),
                         selected: group.selected == proxy.tag,
-                        onSelect: () async {
+                        onSelect: () {
                           if (selectActiveProxyMutation.state.isInProgress) {
                             return;
                           }
@@ -130,7 +132,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
             ],
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () async => notifier.urlTest(group.tag),
+            onPressed: () => notifier.urlTest(group.tag),
             tooltip: t.proxies.delayTestTooltip,
             child: const Icon(FluentIcons.flash_24_filled),
           ),
@@ -158,10 +160,6 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
             ],
           ),
         );
-
-      // TODO: remove
-      default:
-        return const Scaffold();
     }
   }
 }

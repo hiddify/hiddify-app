@@ -48,10 +48,10 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
 
   static Future<Directory> getDatabaseDirectory() async {
     if (Platform.isIOS || Platform.isMacOS) {
-      return getLibraryDirectory();
+      return await getLibraryDirectory();
     } else if (Platform.isWindows || Platform.isLinux) {
-      return getApplicationSupportDirectory();
+      return await getApplicationSupportDirectory();
     }
-    return getApplicationDocumentsDirectory();
+    return await getApplicationDocumentsDirectory();
   }
 }

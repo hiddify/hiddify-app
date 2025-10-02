@@ -20,11 +20,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class ProfileTile extends HookConsumerWidget {
-  const ProfileTile({
-    super.key,
-    required this.profile,
-    this.isMain = false,
-  });
+  const ProfileTile({super.key, required this.profile, this.isMain = false});
 
   final ProfileEntity profile;
 
@@ -70,15 +66,9 @@ class ProfileTile extends HookConsumerWidget {
             if (profile is RemoteProfileEntity || !isMain) ...[
               SizedBox(
                 width: 48,
-                child: Semantics(
-                  sortKey: const OrdinalSortKey(1),
-                  child: ProfileActionButton(profile, !isMain),
-                ),
+                child: Semantics(sortKey: const OrdinalSortKey(1), child: ProfileActionButton(profile, !isMain)),
               ),
-              VerticalDivider(
-                width: 1,
-                color: effectiveOutlineColor,
-              ),
+              VerticalDivider(width: 1, color: effectiveOutlineColor),
             ],
             Expanded(
               child: Semantics(
@@ -95,16 +85,11 @@ class ProfileTile extends HookConsumerWidget {
                     } else {
                       if (selectActiveMutation.state.isInProgress) return;
                       if (profile.active) return;
-                      selectActiveMutation.setFuture(
-                        ref.read(profilesOverviewNotifierProvider.notifier).selectActiveProfile(profile.id),
-                      );
+                      selectActiveMutation.setFuture(ref.read(profilesOverviewProvider.notifier).selectActiveProfile(profile.id));
                     }
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -123,18 +108,11 @@ class ProfileTile extends HookConsumerWidget {
                                       profile.name,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontFamily: FontFamily.emoji,
-                                      ),
-                                      semanticsLabel: t.profile.activeProfileNameSemanticLabel(
-                                        name: profile.name,
-                                      ),
+                                      style: theme.textTheme.titleMedium?.copyWith(fontFamily: FontFamily.emoji),
+                                      semanticsLabel: t.profile.activeProfileNameSemanticLabel(name: profile.name),
                                     ),
                                   ),
-                                  const Icon(
-                                    FluentIcons.caret_down_16_filled,
-                                    size: 16,
-                                  ),
+                                  const Icon(FluentIcons.caret_down_16_filled, size: 16),
                                 ],
                               ),
                             ),
@@ -145,21 +123,9 @@ class ProfileTile extends HookConsumerWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.titleMedium,
-                            semanticsLabel: profile.active
-                                ? t.profile.activeProfileNameSemanticLabel(
-                                    name: profile.name,
-                                  )
-                                : t.profile.nonActiveProfileBtnSemanticLabel(
-                                    name: profile.name,
-                                  ),
+                            semanticsLabel: profile.active ? t.profile.activeProfileNameSemanticLabel(name: profile.name) : t.profile.nonActiveProfileBtnSemanticLabel(name: profile.name),
                           ),
-                        if (subInfo != null) ...[
-                          const Gap(4),
-                          RemainingTrafficIndicator(subInfo.ratio),
-                          const Gap(4),
-                          ProfileSubscriptionInfo(subInfo),
-                          const Gap(4),
-                        ],
+                        if (subInfo != null) ...[const Gap(4), RemainingTrafficIndicator(subInfo.ratio), const Gap(4), ProfileSubscriptionInfo(subInfo), const Gap(4)],
                       ],
                     ),
                   ),
@@ -201,21 +167,15 @@ class ProfileActionButton extends HookConsumerWidget {
         ),
       );
     }
-    return ProfileActionsMenu(
-      profile,
-      (context, toggleVisibility, _) {
-        return Semantics(
-          button: true,
-          child: Tooltip(
-            message: MaterialLocalizations.of(context).showMenuTooltip,
-            child: InkWell(
-              onTap: toggleVisibility,
-              child: Icon(AdaptiveIcon(context).more),
-            ),
-          ),
-        );
-      },
-    );
+    return ProfileActionsMenu(profile, (context, toggleVisibility, _) {
+      return Semantics(
+        button: true,
+        child: Tooltip(
+          message: MaterialLocalizations.of(context).showMenuTooltip,
+          child: InkWell(onTap: toggleVisibility, child: Icon(AdaptiveIcon(context).more)),
+        ),
+      );
+    });
   }
 }
 
@@ -276,23 +236,18 @@ class ProfileActionsMenu extends HookConsumerWidget {
               onTap: () async {
                 final link = LinkParser.generateSubShareLink(url, name);
                 if (link.isNotEmpty) {
-                  await QrCodeDialog(
-                    link,
-                    message: name,
-                  ).show(context);
+                  await QrCodeDialog(link, message: name).show(context);
                 }
               },
             ),
           ],
           AdaptiveMenuItem(
             title: t.profile.share.exportConfigToClipboard,
-            onTap: () async {
+            onTap: () {
               if (exportConfigMutation.state.isInProgress) {
                 return;
               }
-              exportConfigMutation.setFuture(
-                ref.read(profilesOverviewNotifierProvider.notifier).exportConfigToClipboard(profile),
-              );
+              exportConfigMutation.setFuture(ref.read(profilesOverviewProvider.notifier).exportConfigToClipboard(profile));
             },
           ),
         ],
@@ -311,26 +266,15 @@ class ProfileActionsMenu extends HookConsumerWidget {
           if (deleteProfileMutation.state.isInProgress) {
             return;
           }
-          final deleteConfirmed = await showConfirmationDialog(
-            context,
-            title: t.profile.delete.buttonTxt,
-            message: t.profile.delete.confirmationMsg,
-            icon: FluentIcons.delete_24_regular,
-          );
+          final deleteConfirmed = await showConfirmationDialog(context, title: t.profile.delete.buttonTxt, message: t.profile.delete.confirmationMsg, icon: FluentIcons.delete_24_regular);
           if (deleteConfirmed) {
-            deleteProfileMutation.setFuture(
-              ref.read(profilesOverviewNotifierProvider.notifier).deleteProfile(profile),
-            );
+            deleteProfileMutation.setFuture(ref.read(profilesOverviewProvider.notifier).deleteProfile(profile));
           }
         },
       ),
     ];
 
-    return AdaptiveMenu(
-      builder: builder,
-      items: menuItems,
-      child: child,
-    );
+    return AdaptiveMenu(builder: builder, items: menuItems, child: child);
   }
 }
 
@@ -348,10 +292,7 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
     } else if (subInfo.remaining.inDays > 365) {
       return (t.profile.subscription.remainingDuration(duration: "∞"), null);
     } else {
-      return (
-        t.profile.subscription.remainingDuration(duration: subInfo.remaining.inDays),
-        null,
-      );
+      return (t.profile.subscription.remainingDuration(duration: subInfo.remaining.inDays), null);
     }
   }
 
@@ -368,13 +309,12 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
           textDirection: TextDirection.ltr,
           child: Flexible(
             child: Text(
-              subInfo.total > 10 * 1099511627776 //10TB
+              subInfo.total >
+                      10 *
+                          1099511627776 //10TB
                   ? "∞ GiB"
                   : subInfo.consumption.sizeOf(subInfo.total),
-              semanticsLabel: t.profile.subscription.remainingTrafficSemanticLabel(
-                consumed: subInfo.consumption.sizeGB(),
-                total: subInfo.total.sizeGB(),
-              ),
+              semanticsLabel: t.profile.subscription.remainingTrafficSemanticLabel(consumed: subInfo.consumption.sizeGB(), total: subInfo.total.sizeGB()),
               style: theme.textTheme.bodySmall,
               overflow: TextOverflow.ellipsis,
             ),
@@ -403,13 +343,13 @@ class RemainingTrafficIndicator extends StatelessWidget {
     final startColor = ratio < 0.25
         ? const Color.fromRGBO(93, 205, 251, 1.0)
         : ratio < 0.65
-            ? const Color.fromRGBO(205, 199, 64, 1.0)
-            : const Color.fromRGBO(241, 82, 81, 1.0);
+        ? const Color.fromRGBO(205, 199, 64, 1.0)
+        : const Color.fromRGBO(241, 82, 81, 1.0);
     final endColor = ratio < 0.25
         ? const Color.fromRGBO(49, 146, 248, 1.0)
         : ratio < 0.65
-            ? const Color.fromRGBO(98, 115, 32, 1.0)
-            : const Color.fromRGBO(139, 30, 36, 1.0);
+        ? const Color.fromRGBO(98, 115, 32, 1.0)
+        : const Color.fromRGBO(139, 30, 36, 1.0);
 
     return LinearPercentIndicator(
       percent: ratio,
@@ -417,9 +357,7 @@ class RemainingTrafficIndicator extends StatelessWidget {
       padding: EdgeInsets.zero,
       lineHeight: 6,
       barRadius: const Radius.circular(16),
-      linearGradient: LinearGradient(
-        colors: [startColor, endColor],
-      ),
+      linearGradient: LinearGradient(colors: [startColor, endColor]),
     );
   }
 }

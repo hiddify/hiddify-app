@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/router.dart';
-import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/settings/notifier/platform_settings_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -17,7 +16,7 @@ class AdvancedSettingTiles extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final debug = ref.watch(debugModeNotifierProvider);
+    final debug = ref.watch(debugModeProvider);
     final perAppProxy = ref.watch(Preferences.perAppProxyMode).enabled;
     final disableMemoryLimit = ref.watch(Preferences.disableMemoryLimit);
 
@@ -84,19 +83,12 @@ class AdvancedSettingTiles extends HookConsumerWidget {
                   return AlertDialog(
                     title: Text(t.settings.advanced.debugMode),
                     content: Text(t.settings.advanced.debugModeMsg),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).maybePop(true),
-                        child: Text(
-                          MaterialLocalizations.of(context).okButtonLabel,
-                        ),
-                      ),
-                    ],
+                    actions: [TextButton(onPressed: () => Navigator.of(context).maybePop(true), child: Text(MaterialLocalizations.of(context).okButtonLabel))],
                   );
                 },
               );
             }
-            await ref.read(debugModeNotifierProvider.notifier).update(value);
+            await ref.read(debugModeProvider.notifier).update(value);
           },
         ),
       ],

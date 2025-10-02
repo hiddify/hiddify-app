@@ -23,43 +23,30 @@ class AboutPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
     final appInfo = ref.watch(appInfoProvider).requireValue;
-    final appUpdate = ref.watch(appUpdateNotifierProvider);
+    final appUpdate = ref.watch(appUpdateProvider);
 
-    ref.listen(
-      appUpdateNotifierProvider,
-      (_, next) async {
-        if (!context.mounted) return;
-        switch (next) {
-          case AppUpdateStateAvailable(:final versionInfo) ||
-                AppUpdateStateIgnored(:final versionInfo):
-            return NewVersionDialog(
-              appInfo.presentVersion,
-              versionInfo,
-              canIgnore: false,
-            ).show(context);
-          case AppUpdateStateError(:final error):
-            return CustomToast.error(t.presentShortError(error)).show(context);
-          case AppUpdateStateNotAvailable():
-            return CustomToast.success(t.appUpdate.notAvailableMsg)
-                .show(context);
-        }
-      },
-    );
+    ref.listen(appUpdateProvider, (_, next) {
+      if (!context.mounted) return;
+      switch (next) {
+        case AppUpdateStateAvailable(:final versionInfo) || AppUpdateStateIgnored(:final versionInfo):
+          NewVersionDialog(appInfo.presentVersion, versionInfo, canIgnore: false).show(context);
+        case AppUpdateStateError(:final error):
+          CustomToast.error(t.presentShortError(error)).show(context);
+        case AppUpdateStateNotAvailable():
+          CustomToast.success(t.appUpdate.notAvailableMsg).show(context);
+      }
+    });
 
     final conditionalTiles = [
       if (appInfo.release.allowCustomUpdateChecker)
         ListTile(
           title: Text(t.about.checkForUpdate),
           trailing: switch (appUpdate) {
-            AppUpdateStateChecking() => const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(),
-              ),
+            AppUpdateStateChecking() => const SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
             _ => const Icon(FluentIcons.arrow_sync_24_regular),
           },
           onTap: () async {
-            await ref.read(appUpdateNotifierProvider.notifier).check();
+            await ref.read(appUpdateProvider.notifier).check();
           },
         ),
       if (PlatformUtils.isDesktop)
@@ -67,8 +54,7 @@ class AboutPage extends HookConsumerWidget {
           title: Text(t.settings.general.openWorkingDir),
           trailing: const Icon(FluentIcons.open_folder_24_regular),
           onTap: () async {
-            final path =
-                ref.watch(appDirectoriesProvider).requireValue.workingDir.uri;
+            final path = ref.watch(appDirectoriesProvider).requireValue.workingDir.uri;
             await UriUtils.tryLaunch(path);
           },
         ),
@@ -87,9 +73,7 @@ class AboutPage extends HookConsumerWidget {
                     PopupMenuItem(
                       child: Text(t.general.addToClipboard),
                       onTap: () {
-                        Clipboard.setData(
-                          ClipboardData(text: appInfo.format()),
-                        );
+                        Clipboard.setData(ClipboardData(text: appInfo.format()));
                       },
                     ),
                   ];
@@ -108,14 +92,9 @@ class AboutPage extends HookConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        t.general.appTitle,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
+                      Text(t.general.appTitle, style: Theme.of(context).textTheme.titleLarge),
                       const Gap(4),
-                      Text(
-                        "${t.about.version} ${appInfo.presentVersion}",
-                      ),
+                      Text("${t.about.version} ${appInfo.presentVersion}"),
                     ],
                   ),
                 ],
@@ -123,48 +102,38 @@ class AboutPage extends HookConsumerWidget {
             ),
           ),
           SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                ...conditionalTiles,
-                if (conditionalTiles.isNotEmpty) const Divider(),
-                ListTile(
-                  title: Text(t.about.sourceCode),
-                  trailing: const Icon(FluentIcons.open_24_regular),
-                  onTap: () async {
-                    await UriUtils.tryLaunch(
-                      Uri.parse(Constants.githubUrl),
-                    );
-                  },
-                ),
-                ListTile(
-                  title: Text(t.about.telegramChannel),
-                  trailing: const Icon(FluentIcons.open_24_regular),
-                  onTap: () async {
-                    await UriUtils.tryLaunch(
-                      Uri.parse(Constants.telegramChannelUrl),
-                    );
-                  },
-                ),
-                ListTile(
-                  title: Text(t.about.termsAndConditions),
-                  trailing: const Icon(FluentIcons.open_24_regular),
-                  onTap: () async {
-                    await UriUtils.tryLaunch(
-                      Uri.parse(Constants.termsAndConditionsUrl),
-                    );
-                  },
-                ),
-                ListTile(
-                  title: Text(t.about.privacyPolicy),
-                  trailing: const Icon(FluentIcons.open_24_regular),
-                  onTap: () async {
-                    await UriUtils.tryLaunch(
-                      Uri.parse(Constants.privacyPolicyUrl),
-                    );
-                  },
-                ),
-              ],
-            ),
+            delegate: SliverChildListDelegate([
+              ...conditionalTiles,
+              if (conditionalTiles.isNotEmpty) const Divider(),
+              ListTile(
+                title: Text(t.about.sourceCode),
+                trailing: const Icon(FluentIcons.open_24_regular),
+                onTap: () async {
+                  await UriUtils.tryLaunch(Uri.parse(Constants.githubUrl));
+                },
+              ),
+              ListTile(
+                title: Text(t.about.telegramChannel),
+                trailing: const Icon(FluentIcons.open_24_regular),
+                onTap: () async {
+                  await UriUtils.tryLaunch(Uri.parse(Constants.telegramChannelUrl));
+                },
+              ),
+              ListTile(
+                title: Text(t.about.termsAndConditions),
+                trailing: const Icon(FluentIcons.open_24_regular),
+                onTap: () async {
+                  await UriUtils.tryLaunch(Uri.parse(Constants.termsAndConditionsUrl));
+                },
+              ),
+              ListTile(
+                title: Text(t.about.privacyPolicy),
+                trailing: const Icon(FluentIcons.open_24_regular),
+                onTap: () async {
+                  await UriUtils.tryLaunch(Uri.parse(Constants.privacyPolicyUrl));
+                },
+              ),
+            ]),
           ),
         ],
       ),

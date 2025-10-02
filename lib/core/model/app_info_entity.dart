@@ -4,7 +4,7 @@ import 'package:hiddify/core/model/environment.dart';
 part 'app_info_entity.freezed.dart';
 
 @freezed
-class AppInfoEntity with _$AppInfoEntity {
+abstract class AppInfoEntity with _$AppInfoEntity {
   const AppInfoEntity._();
 
   const factory AppInfoEntity({

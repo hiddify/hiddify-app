@@ -7,7 +7,7 @@ enum GeoAssetType { geoip, geosite }
 typedef GeoAssetWithFileSize = (GeoAssetEntity geoAsset, int? size);
 
 @freezed
-class GeoAssetEntity with _$GeoAssetEntity {
+abstract class GeoAssetEntity with _$GeoAssetEntity {
   const GeoAssetEntity._();
 
   const factory GeoAssetEntity({

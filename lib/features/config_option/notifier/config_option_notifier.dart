@@ -18,7 +18,7 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
     final serviceSingboxOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
     ref.listen(
       ConfigOptions.singboxConfigOptions,
-      (previous, next) async {
+      (previous, next) {
         if (!serviceRunning || serviceSingboxOptions == null) return;
         if (next case AsyncData(:final value) when next != previous) {
           if (_lastUpdate == null || DateTime.now().difference(_lastUpdate!) > const Duration(milliseconds: 100)) {

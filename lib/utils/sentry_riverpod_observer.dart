@@ -1,7 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-class SentryRiverpodObserver extends ProviderObserver {
+base class SentryRiverpodObserver extends ProviderObserver {
   void addBreadcrumb(String message, {Map<String, dynamic>? data}) {
     Sentry.addBreadcrumb(
       Breadcrumb(
@@ -14,27 +14,25 @@ class SentryRiverpodObserver extends ProviderObserver {
 
   @override
   void didAddProvider(
-    ProviderBase<Object?> provider,
+    ProviderObserverContext context,
     Object? value,
-    ProviderContainer container,
   ) {
-    super.didAddProvider(provider, value, container);
+    super.didAddProvider(context, value);
     addBreadcrumb(
-      'Provider [${provider.name ?? provider.runtimeType}] was ADDED',
+      'Provider [${context.provider.name ?? context.provider.runtimeType}] was ADDED',
       data: value != null ? {"initial-value": value} : null,
     );
   }
 
   @override
   void didUpdateProvider(
-    ProviderBase<Object?> provider,
+    ProviderObserverContext context,
     Object? previousValue,
     Object? newValue,
-    ProviderContainer container,
   ) {
-    super.didUpdateProvider(provider, previousValue, newValue, container);
+    super.didUpdateProvider(context, previousValue, newValue);
     addBreadcrumb(
-      'Provider [${provider.name ?? provider.runtimeType}] was UPDATED',
+      'Provider [${context.provider.name ?? context.provider.runtimeType}] was UPDATED',
       data: {
         "new-value": newValue,
         "old-value": previousValue,

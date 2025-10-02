@@ -34,7 +34,7 @@ class App extends HookConsumerWidget with PresLogger {
 
     final upgrader = ref.watch(upgraderProvider);
 
-    ref.listen(foregroundProfilesUpdateNotifierProvider, (_, __) {});
+    ref.listen(foregroundProfilesUpdateProvider, (_, _) {});
 
     return WindowWrapper(
       TrayWrapper(

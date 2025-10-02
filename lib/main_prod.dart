@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hiddify/bootstrap.dart';
 import 'package:hiddify/core/model/environment.dart';
 
-void main() async {
+void main() {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -14,5 +14,5 @@ void main() async {
     ),
   );
 
-  return lazyBootstrap(widgetsBinding, Environment.prod);
+  lazyBootstrap(widgetsBinding, Environment.prod);
 }

@@ -4,7 +4,7 @@ part 'singbox_stats.freezed.dart';
 part 'singbox_stats.g.dart';
 
 @freezed
-class SingboxStats with _$SingboxStats {
+abstract class SingboxStats with _$SingboxStats {
   const SingboxStats._();
 
   @JsonSerializable(fieldRename: FieldRename.kebab)

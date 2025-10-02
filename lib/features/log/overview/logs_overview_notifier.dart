@@ -54,11 +54,6 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
         .read(logRepositoryProvider)
         .requireValue
         .watchLogs()
-        .throttle(
-          (_) => Stream.value(_listener?.isPaused ?? false),
-          leading: false,
-          trailing: true,
-        )
         .throttleTime(
           const Duration(milliseconds: 250),
           leading: false,
