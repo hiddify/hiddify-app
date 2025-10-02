@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.PowerManager
+import android.os.StrictMode
 import androidx.core.content.getSystemService
 import com.hiddify.hiddify.bg.AppChangeReceiver
 import go.Seq
@@ -24,6 +25,21 @@ class Application : Application() {
         super.onCreate()
 
         Seq.setContext(this)
+
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build()
+            )
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .build()
+            )
+        }
 
         registerReceiver(AppChangeReceiver(), IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)

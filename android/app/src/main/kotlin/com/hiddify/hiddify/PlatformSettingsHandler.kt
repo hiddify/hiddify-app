@@ -123,12 +123,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             Trigger.GetInstalledPackages.method -> {
                 GlobalScope.launch {
                     result.runCatching {
-                        val flag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES
-                        } else {
-                            @Suppress("DEPRECATION")
-                            PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
-                        }
+                        val flag = PackageManager.GET_PERMISSIONS
                         val installedPackages =
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 packageManager.getInstalledPackages(

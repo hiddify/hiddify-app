@@ -13,7 +13,7 @@ part 'window_notifier.g.dart';
 const minimumWindowSize = Size(368, 568);
 const defaultWindowSize = Size(868, 668);
 
-@riverpod
+@Riverpod(keepAlive: true)
 class WindowNotifier extends _$WindowNotifier with AppLogger {
   @override
   Future<void> build() async {

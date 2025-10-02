@@ -1,19 +1,19 @@
 {
   "$schema": "https://inlang.com/schema/project-settings",
-  "sourceLanguageTag": "en",
-  "languageTags": [
+  "baseLocale": "en",
+  "locales": [
     "en",
     "ar",
-    "ckb-KUR",
+    "ckb_KUR",
     "es",
     "fa",
     "fr",
     "id",
-    "pt-BR",
+    "pt_BR",
     "ru",
     "tr",
-    "zh-CN",
-    "zh-TW",
+    "zh_CN",
+    "zh_TW",
     "hi"
   ],
   "modules": [
@@ -25,7 +25,7 @@
     "https://cdn.jsdelivr.net/npm/@inlang/message-lint-rule-missing-translation@latest/dist/index.js"
   ],
   "plugin.inlang.i18next": {
-    "pathPattern": "./assets/translations/strings_{languageTag}.i18n.json",
+    "pathPattern": "./assets/translations/{languageTag}.i18n.json",
     "variableReferencePattern": [
       "@:"
     ]

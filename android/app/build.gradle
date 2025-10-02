@@ -1,6 +1,6 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -37,7 +37,7 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '
 android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
-    compileSdkVersion 34
+    compileSdkVersion 36
     ndkVersion "26.1.10909125"
 
     compileOptions {
@@ -55,8 +55,8 @@ android {
 
     defaultConfig {
         applicationId "app.hiddify.com"
-        minSdkVersion 21
-        targetSdkVersion 34
+        minSdkVersion 24
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -91,6 +91,9 @@ android {
             } else {
                 signingConfig signingConfigs.debug
             }
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             ndk {
                 //noinspection ChromeOsAbiSupport
                 abiFilters "x86_64", "armeabi-v7a", "arm64-v8a"
@@ -104,13 +107,13 @@ android {
         aidl true
     }
 
+    lint {
+        checkReleaseBuilds true
+        abortOnError true
+    }
+
 }
 
-android.applicationVariants.all { variant ->
-    variant.outputs.each { output ->
-        output.versionCodeOverride = android.defaultConfig.versionCode
-    }
-}
 
 flutter {
     source '../..'
@@ -118,8 +121,8 @@ flutter {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'androidx.core:core-ktx:1.17.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
 }

@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: core.proto
 //
-// @dart = 2.12
+// @dart = 3.0
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes

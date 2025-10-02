@@ -1,6 +1,6 @@
 // GENERATED CODE, DO NOT EDIT BY HAND.
 // ignore_for_file: type=lint
-//@dart=2.12
+//@dart=3.0
 import 'package:drift/drift.dart';
 import 'package:drift/internal/migrations.dart';
 import 'schema_v1.dart' as v1;

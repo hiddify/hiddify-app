@@ -3,8 +3,8 @@ import 'dart:io';
 
 void main(List<String> args) async {
   final translationsDir = Directory('assets/translations');
-  final enPath = File('${translationsDir.path}/strings_en.i18n.json');
-  final faPath = File('${translationsDir.path}/strings_fa.i18n.json');
+  final enPath = File('${translationsDir.path}/en.i18n.json');
+  final faPath = File('${translationsDir.path}/fa.i18n.json');
   final placeholdersEmpty = args.contains('--empty');
 
   if (!await enPath.exists()) {
@@ -22,14 +22,14 @@ void main(List<String> args) async {
   final faJson = jsonDecode(await faPath.readAsString());
 
   // Create a simple backup before writing changes
-  final backupFile = File('${translationsDir.path}/strings_fa.i18n.json.bak');
+  final backupFile = File('${translationsDir.path}/fa.i18n.json.bak');
   await backupFile.writeAsString(await faPath.readAsString());
 
   final merged = _merge(enJson, faJson, placeholdersEmpty: placeholdersEmpty);
 
   const encoder = JsonEncoder.withIndent('  ');
   await faPath.writeAsString('${encoder.convert(merged)}\n');
-  stdout.writeln('✅ strings_fa.i18n.json synced. Backup: ${backupFile.path}. Placeholder mode: ${placeholdersEmpty ? 'empty' : 'english'}');
+  stdout.writeln('✅ fa.i18n.json synced. Backup: ${backupFile.path}. Placeholder mode: ${placeholdersEmpty ? 'empty' : 'english'}');
 }
 
 /// Recursively merges [en] into [fa], preserving existing FA values and

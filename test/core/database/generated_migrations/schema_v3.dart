@@ -1,6 +1,6 @@
 // GENERATED CODE, DO NOT EDIT BY HAND.
 // ignore_for_file: type=lint
-//@dart=2.12
+//@dart=3.0
 import 'package:drift/drift.dart';
 
 class ProfileEntries extends Table with TableInfo {

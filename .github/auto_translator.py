@@ -7,7 +7,10 @@ import os
 
 def get_path(lang):
     base_dir = os.path.abspath('../assets/translations')
-    lang_file = f'strings_{lang}.i18n.json'
+    file_lang = lang.replace('-', '_')
+    if file_lang == 'zh':
+        file_lang = 'zh_CN'
+    lang_file = f'{file_lang}.i18n.json'
     path = os.path.join(base_dir, lang_file)
     if path.startswith(base_dir):
         return path
@@ -44,7 +47,8 @@ if __name__ == "__main__":
     src_pofile = read_translate(src)
     dst_pofile = read_translate(dst)
 
-    translator = GoogleTranslator(source=src, target=dst if dst != 'zh' else "zh-CN")
+    target_lang = dst.replace('_', '-') if dst != 'zh' else "zh-CN"
+    translator = GoogleTranslator(source=src, target=target_lang)
     recursive_translate(src_pofile, dst_pofile, translator)
 
     with open(os.path.abspath(get_path(dst)), 'w') as df:

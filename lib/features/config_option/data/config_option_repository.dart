@@ -59,11 +59,11 @@ abstract class ConfigOptions {
 
   static final connectionTestUrl = PreferencesNotifier.create<String, String>(
     "connection-test-url",
-    "http://cp.cloudflare.com",
+    "https://www.gstatic.com/generate_204",
     possibleValues: List.of([
+      "https://www.gstatic.com/generate_204",
       "http://connectivitycheck.gstatic.com/generate_204",
       "http://www.gstatic.com/generate_204",
-      "https://www.gstatic.com/generate_204",
       "http://cp.cloudflare.com",
       "http://kernel.org",
       "http://detectportal.firefox.com",

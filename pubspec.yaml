@@ -4,8 +4,8 @@ publish_to: "none"
 version: 2.5.7+20507
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"
-  flutter: ">=3.24.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.0 <4.0.0"
 
 dependencies:
   flutter:
@@ -40,7 +40,6 @@ dependencies:
   path_provider: ^2.1.1
   mobile_scanner: ^7.1.2
   protocol_handler: ^0.2.0
-  flutter_native_splash: ^2.4.6
   share_plus: ^12.0.0
   window_manager: ^0.5.1
   tray_manager: ^0.5.1
@@ -49,7 +48,6 @@ dependencies:
   vclibs: ^0.1.2
   launch_at_startup: ^0.3.1
   sentry_flutter: ^9.6.0
-  sentry_dart_plugin: ^3.1.1
   combine: ^0.5.8
   path: ^1.8.3
   loggy: ^2.0.3
@@ -71,6 +69,7 @@ dependencies:
 
   upgrader: ^12.1.0
   toastification: ^3.0.3
+  flutter_native_splash: ^2.4.6
   version: ^3.0.2
   posix: ^6.0.1
   win32: ^5.2.0
@@ -114,6 +113,9 @@ dev_dependencies:
   go_router_builder: ^4.1.0
   dependency_validator: ^5.0.2
   dart_mappable_builder: ^4.6.0
+  custom_lint: ^0.8.0
+  riverpod_lint: ^3.0.0
+  sentry_dart_plugin: ^3.1.1
 
 dependency_overrides:
   # drift & package_info_plus are not compatible
