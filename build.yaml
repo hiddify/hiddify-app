@@ -7,8 +7,9 @@ targets:
       drift_dev:
         options:
           databases:
-            app_database: "lib/core/database/app_database.dart"
-          schema_dir: "lib/core/database/schemas"
+            db_v1: "lib/core/db/v1/db_v1.dart"
+            db_v2: "lib/core/db/v2/db_v2.dart"
+          schema_dir: "lib/core/db/schemas"
           store_date_time_values_as_text: true
       slang_build_runner:
         options:
