@@ -18,47 +18,30 @@ class ProfilesPage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final asyncProfiles = ref.watch(profilesNotifierProvider);
 
-    ref.listen(
-      profilesNotifierProvider,
-      (_, next) {
-        if (next.hasValue && next.value!.isEmpty) {
-          context.goNamed('home');
-        }
-      },
-    );
+    ref.listen(profilesNotifierProvider, (_, next) {
+      if (next.hasValue && next.value!.isEmpty) {
+        context.goNamed('home');
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
         title: Text(t.pages.profiles.title),
         actions: [
-          IconButton(
-            onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
-            icon: const Icon(Icons.add_rounded),
-            tooltip: t.pages.profiles.add, // Tooltip for accessibility
-          ),
-          IconButton(
-            onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
-            icon: const Icon(Icons.sort_rounded),
-            tooltip: t.common.sort,
-          ),
-          IconButton(
-            onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
-            icon: const Icon(Icons.update_rounded),
-            tooltip: t.pages.profiles.updateSubscriptions,
-          ),
+          IconButton(onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(), icon: const Icon(Icons.update_rounded), tooltip: t.pages.profiles.updateSubscriptions),
+          IconButton(onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(), icon: const Icon(Icons.sort_rounded), tooltip: t.common.sort),
           const Gap(8),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(onPressed: () async => await ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(), label: Text(t.pages.profiles.add), icon: const Icon(Icons.add_rounded)),
       body: asyncProfiles.when(
         data: (data) => ListView.separated(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(12).copyWith(bottom: 84),
           separatorBuilder: (context, index) => const Gap(12),
           itemBuilder: (context, index) => ProfileTile(profile: data[index]),
           itemCount: data.length,
         ),
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Text(t.presentShortError(error)),
       ),
     );
