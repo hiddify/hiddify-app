@@ -616,15 +616,8 @@
       "serviceNotRunning": "Servis çalışmıyor",
       "missingPrivilege": "Eksik yetki",
       "missingPrivilegeMsg": "VPN modu yönetici yetkisi gerektirir. Lütfen uygulamayı yönetici olarak yeniden başlatın veya servis modunu değiştirin.",
-      "missingGeoAssets": "Geo varlıkları eksik",
-      "missingGeoAssetsMsg": "Geo varlıkları eksik. Lütfen aktif varlığı değiştirin veya ayarlardan seçili olanı indirin.",
       "invalidConfigOptions": "Geçersiz yapılandırma seçenekleri",
       "invalidConfig": "Geçersiz yapılandırma"
-    },
-    "geoAssets": {
-      "unexpected": "Beklenmeyen hata",
-      "notUpdate": "Güncelleme mevcut değil",
-      "activeNotFound": "Aktif geo varlığı bulunamadı"
     },
     "warp": {
       "missingLicense": "WARP lisansı eksik",

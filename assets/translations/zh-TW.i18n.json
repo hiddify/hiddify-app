@@ -616,15 +616,8 @@
       "serviceNotRunning": "服務未運行",
       "missingPrivilege": "缺少權限",
       "missingPrivilegeMsg": "VPN 模式需要管理員權限。請以管理員身份重新啟動應用，或更改服務模式。",
-      "missingGeoAssets": "Geo 資產缺失",
-      "missingGeoAssetsMsg": "Geo 資產檔案缺失。請考慮更改目前資產或在設定中下載所選資產。",
       "invalidConfigOptions": "設定選項無效",
       "invalidConfig": "設定無效"
-    },
-    "geoAssets": {
-      "unexpected": "意外錯誤",
-      "notUpdate": "無可用更新",
-      "activeNotFound": "未找到活動的 Geo 資產"
     },
     "warp": {
       "missingLicense": "WARP 授權缺失",

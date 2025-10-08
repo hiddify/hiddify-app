@@ -616,15 +616,8 @@
       "serviceNotRunning": "Service is not running",
       "missingPrivilege": "Missing privilege",
       "missingPrivilegeMsg": "VPN mode requires administrator privileges. Either relaunch the app as administrator or change service mode.",
-      "missingGeoAssets": "Missing geo assets",
-      "missingGeoAssetsMsg": "Geo assets are missing. Consider changing active asset or download selected one in the settings.",
       "invalidConfigOptions": "Invalid configuration options",
       "invalidConfig": "Invalid configuration"
-    },
-    "geoAssets": {
-      "unexpected": "Unexpected error",
-      "notUpdate": "No update available",
-      "activeNotFound": "Active geo asset not found"
     },
     "warp": {
       "missingLicense": "Warp license",
