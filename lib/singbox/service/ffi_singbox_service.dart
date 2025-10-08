@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
-import 'package:combine/combine.dart';
 import 'package:ffi/ffi.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/directories.dart';
@@ -23,7 +22,6 @@ import 'package:watcher/watcher.dart';
 final _logger = Loggy('FFISingboxService');
 
 class FFISingboxService with InfraLogger implements SingboxService {
-  static final SingboxNativeLibrary _box = _gen();
 
   late final ValueStream<SingboxStatus> _status;
   late final ReceivePort _statusReceiver;
@@ -64,26 +62,28 @@ class FFISingboxService with InfraLogger implements SingboxService {
     bool debug,
   ) {
     final port = _statusReceiver.sendPort.nativePort;
+    final baseDirPath = directories.baseDir.path;
+    final workingDirPath = directories.workingDir.path;
+    final tempDirPath = directories.tempDir.path;
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          _box.setupOnce(NativeApi.initializeApiDLData);
-          final err = _box
-              .setup(
-                directories.baseDir.path.toNativeUtf8().cast(),
-                directories.workingDir.path.toNativeUtf8().cast(),
-                directories.tempDir.path.toNativeUtf8().cast(),
-                port,
-                debug ? 1 : 0,
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        box.setupOnce(NativeApi.initializeApiDLData);
+        final err = box
+            .setup(
+              baseDirPath.toNativeUtf8().cast(),
+              workingDirPath.toNativeUtf8().cast(),
+              tempDirPath.toNativeUtf8().cast(),
+              port,
+              debug ? 1 : 0,
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -94,38 +94,36 @@ class FFISingboxService with InfraLogger implements SingboxService {
     bool debug,
   ) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box
-              .parse(
-                path.toNativeUtf8().cast(),
-                tempPath.toNativeUtf8().cast(),
-                debug ? 1 : 0,
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final err = box
+            .parse(
+              path.toNativeUtf8().cast(),
+              tempPath.toNativeUtf8().cast(),
+              debug ? 1 : 0,
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
   @override
   TaskEither<String, Unit> changeOptions(SingboxConfigOption options) {
+    final jsonStr = jsonEncode(options.toJson());
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final json = jsonEncode(options.toJson());
-          final err = _box.changeHiddifyOptions(json.toNativeUtf8().cast()).cast<Utf8>().toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final err = box.changeHiddifyOptions(jsonStr.toNativeUtf8().cast()).cast<Utf8>().toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -134,20 +132,19 @@ class FFISingboxService with InfraLogger implements SingboxService {
     String path,
   ) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final response = _box
-              .generateConfig(
-                path.toNativeUtf8().cast(),
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (response.startsWith("error")) {
-            return left(response.replaceFirst("error", ""));
-          }
-          return right(response);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final response = box
+            .generateConfig(
+              path.toNativeUtf8().cast(),
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (response.startsWith("error")) {
+          return left(response.replaceFirst("error", ""));
+        }
+        return right(response);
+      }),
     );
   }
 
@@ -159,36 +156,34 @@ class FFISingboxService with InfraLogger implements SingboxService {
   ) {
     loggy.debug("starting, memory limit: [${!disableMemoryLimit}]");
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box
-              .start(
-                configPath.toNativeUtf8().cast(),
-                disableMemoryLimit ? 1 : 0,
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final err = box
+            .start(
+              configPath.toNativeUtf8().cast(),
+              disableMemoryLimit ? 1 : 0,
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
   @override
   TaskEither<String, Unit> stop() {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box.stop().cast<Utf8>().toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final err = box.stop().cast<Utf8>().toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -200,21 +195,20 @@ class FFISingboxService with InfraLogger implements SingboxService {
   ) {
     loggy.debug("restarting, memory limit: [${!disableMemoryLimit}]");
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box
-              .restart(
-                configPath.toNativeUtf8().cast(),
-                disableMemoryLimit ? 1 : 0,
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final err = box
+            .restart(
+              configPath.toNativeUtf8().cast(),
+              disableMemoryLimit ? 1 : 0,
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -230,12 +224,13 @@ class FFISingboxService with InfraLogger implements SingboxService {
 
   @override
   Stream<SingboxStats> watchStats() {
+    final box = _gen();
     if (_serviceStatsStream != null) return _serviceStatsStream!;
     final receiver = ReceivePort('stats');
     final statusStream = receiver.asBroadcastStream(
       onCancel: (_) {
         _logger.debug("stopping stats command client");
-        final err = _box.stopCommandClient(1).cast<Utf8>().toDartString();
+        final err = box.stopCommandClient(1).cast<Utf8>().toDartString();
         if (err.isNotEmpty) {
           _logger.error("error stopping stats client");
         }
@@ -258,7 +253,7 @@ class FFISingboxService with InfraLogger implements SingboxService {
       },
     );
 
-    final err = _box.startCommandClient(1, receiver.sendPort.nativePort).cast<Utf8>().toDartString();
+    final err = box.startCommandClient(1, receiver.sendPort.nativePort).cast<Utf8>().toDartString();
     if (err.isNotEmpty) {
       loggy.error("error starting status command: $err");
       throw err;
@@ -277,7 +272,8 @@ class FFISingboxService with InfraLogger implements SingboxService {
         logger.debug("stopping");
         receiver.close();
         _outboundsStream = null;
-        final err = _box.stopCommandClient(5).cast<Utf8>().toDartString();
+        final box = _gen();
+        final err = box.stopCommandClient(5).cast<Utf8>().toDartString();
         if (err.isNotEmpty) {
           _logger.error("error stopping group client");
         }
@@ -300,7 +296,8 @@ class FFISingboxService with InfraLogger implements SingboxService {
     );
 
     try {
-      final err = _box.startCommandClient(5, receiver.sendPort.nativePort).cast<Utf8>().toDartString();
+      final box = _gen();
+      final err = box.startCommandClient(5, receiver.sendPort.nativePort).cast<Utf8>().toDartString();
       if (err.isNotEmpty) {
         logger.error("error starting group command: $err");
         throw err;
@@ -321,7 +318,8 @@ class FFISingboxService with InfraLogger implements SingboxService {
       onCancel: (_) {
         logger.debug("stopping");
         receiver.close();
-        final err = _box.stopCommandClient(13).cast<Utf8>().toDartString();
+        final box = _gen();
+        final err = box.stopCommandClient(13).cast<Utf8>().toDartString();
         if (err.isNotEmpty) {
           logger.error("failed stopping: $err");
         }
@@ -344,7 +342,8 @@ class FFISingboxService with InfraLogger implements SingboxService {
     );
 
     try {
-      final err = _box.startCommandClient(13, receiver.sendPort.nativePort).cast<Utf8>().toDartString();
+      final box = _gen();
+      final err = box.startCommandClient(13, receiver.sendPort.nativePort).cast<Utf8>().toDartString();
       if (err.isNotEmpty) {
         logger.error("error starting: $err");
         throw err;
@@ -360,36 +359,34 @@ class FFISingboxService with InfraLogger implements SingboxService {
   @override
   TaskEither<String, Unit> selectOutbound(String groupTag, String outboundTag) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box
-              .selectOutbound(
-                groupTag.toNativeUtf8().cast(),
-                outboundTag.toNativeUtf8().cast(),
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final err = box
+            .selectOutbound(
+              groupTag.toNativeUtf8().cast(),
+              outboundTag.toNativeUtf8().cast(),
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
   @override
   TaskEither<String, Unit> urlTest(String groupTag) {
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final err = _box.urlTest(groupTag.toNativeUtf8().cast()).cast<Utf8>().toDartString();
-          if (err.isNotEmpty) {
-            return left(err);
-          }
-          return right(unit);
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final err = box.urlTest(groupTag.toNativeUtf8().cast()).cast<Utf8>().toDartString();
+        if (err.isNotEmpty) {
+          return left(err);
+        }
+        return right(unit);
+      }),
     );
   }
 
@@ -409,14 +406,10 @@ class FFISingboxService with InfraLogger implements SingboxService {
 
   @override
   TaskEither<String, Unit> clearLogs() {
-    return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          _logBuffer.clear();
-          return right(unit);
-        },
-      ),
-    );
+    return TaskEither(() async {
+      _logBuffer.clear();
+      return right(unit);
+    });
   }
 
   Future<List<String>> _readLogFile(File file) async {
@@ -444,22 +437,21 @@ class FFISingboxService with InfraLogger implements SingboxService {
   }) {
     loggy.debug("generating warp config");
     return TaskEither(
-      () => CombineWorker().execute(
-        () {
-          final response = _box
-              .generateWarpConfig(
-                licenseKey.toNativeUtf8().cast(),
-                previousAccountId.toNativeUtf8().cast(),
-                previousAccessToken.toNativeUtf8().cast(),
-              )
-              .cast<Utf8>()
-              .toDartString();
-          if (response.startsWith("error:")) {
-            return left(response.replaceFirst('error:', ""));
-          }
-          return right(warpFromJson(jsonDecode(response)));
-        },
-      ),
+      () => Isolate.run(() {
+        final box = _gen();
+        final response = box
+            .generateWarpConfig(
+              licenseKey.toNativeUtf8().cast(),
+              previousAccountId.toNativeUtf8().cast(),
+              previousAccessToken.toNativeUtf8().cast(),
+            )
+            .cast<Utf8>()
+            .toDartString();
+        if (response.startsWith("error:")) {
+          return left(response.replaceFirst('error:', ""));
+        }
+        return right(warpFromJson(jsonDecode(response)));
+      }),
     );
   }
 }

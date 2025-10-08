@@ -8,6 +8,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
+import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/logger/logger_controller.dart';
 import 'package:hiddify/core/model/environment.dart';
@@ -17,7 +18,6 @@ import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/app/widget/app.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
-
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -58,6 +58,18 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
       if (env == Environment.dev) rethrow;
       Logger.bootstrap.info("clearing preferences");
       await container.read(sharedPreferencesProvider).requireValue.clear();
+    }
+  });
+
+  // Preload selected locale's deferred library so that buildSync() works safely
+  await _init("locale preload", () async {
+    final locale = container.read(localePreferencesProvider);
+    try {
+      await locale.build();
+      Logger.bootstrap.debug("preloaded locale: ${locale.name}");
+    } catch (e, stackTrace) {
+      Logger.bootstrap.error("failed to preload locale [${locale.name}]", e, stackTrace);
+      // continue without rethrow; fallback to EN will be available
     }
   });
 

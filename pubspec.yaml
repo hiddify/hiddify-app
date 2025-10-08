@@ -19,21 +19,22 @@ dependencies:
   # re_highlight: ^0.0.3
   # json_editor_flutter: ^1.4.2
 
-  slang: ^4.8.1
-  slang_flutter: ^4.8.0
+
+  slang: ^4.9.0
+  slang_flutter: ^4.9.0
   fpdart: ^1.1.0
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
-  hooks_riverpod: ^3.0.0
+  hooks_riverpod: ^3.0.2
   flutter_hooks: ^0.21.3+1
-  riverpod: ^3.0.0
-  riverpod_annotation: ^3.0.0
+  riverpod: ^3.0.2
+  riverpod_annotation: ^3.0.2
 
-  flutter_riverpod: ^3.0.0
+  flutter_riverpod: ^3.0.2
   state_notifier: ^1.0.0
   rxdart: ^0.28.0
   drift: ^2.16.0
-  sqlite3_flutter_libs: ^0.5.24
+  sqlite3_flutter_libs: ^0.5.40
   shared_preferences: ^2.2.2
   dio: ^5.4.1
   ffi: ^2.1.2
@@ -47,12 +48,12 @@ dependencies:
   url_launcher: ^6.2.5
   vclibs: ^0.1.2
   launch_at_startup: ^0.3.1
-  sentry_flutter: ^9.6.0
-  combine: ^0.5.8
+  sentry_flutter: ^9.7.0
+  vector_graphics: ^1.1.19
   path: ^1.8.3
   loggy: ^2.0.3
   flutter_loggy: ^2.0.2
-  meta: ^1.16.0
+  meta: ^1.16.0  # Added to satisfy linter for direct imports
   dartx: ^1.2.0
   uuid: ^4.3.3
   tint: ^2.0.1
@@ -65,19 +66,18 @@ dependencies:
   gap: ^3.0.1
   percent_indicator: ^4.2.3
   sliver_tools: ^0.2.12
-  flutter_adaptive_scaffold: ^0.3.3+1
+  flutter_adaptive_scaffold: ^0.3.3+1  # Discontinued (Feb 2025) - Migrate to Material 3 adaptive features or community fork
 
   upgrader: ^12.1.0
   toastification: ^3.0.3
   flutter_native_splash: ^2.4.6
   version: ^3.0.2
   posix: ^6.0.1
-  win32: ^5.2.0
+  win32: ^5.15.0
   qr_flutter: ^4.1.0
   flutter_displaymode: ^0.7.0
   flutter_loggy_dio: ^3.0.1
   dio_smart_retry: ^7.0.1
-  cupertino_http: ^2.3.0
   wolt_modal_sheet: ^0.11.0
   dart_mappable: ^4.2.1
   fluentui_system_icons: ^1.1.229
@@ -86,9 +86,7 @@ dependencies:
   json_path: ^0.8.0
   # permission_handler: ^11.3.0 # is not compatible with windows
   #flutter_easy_permission: ^1.1.2
-  flutter_easy_permission:
-    git:
-      url: https://github.com/unger1984/flutter_easy_permission.git
+  permission_handler: ^12.0.1
   in_app_review: ^2.0.9
   # circle_flags: ^4.0.2
   circle_flags:
@@ -98,6 +96,7 @@ dependencies:
   grpc: ^4.1.0
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -105,21 +104,21 @@ dev_dependencies:
   build_runner: ^2.7.1
   json_serializable: ^6.11.1
   freezed: ^3.2.3
-  riverpod_generator: ^3.0.0
-  drift_dev: ^2.28.3
+  riverpod_generator: ^3.0.2
   ffigen: ^19.1.0
-  slang_build_runner: ^4.8.1
+  slang_build_runner: ^4.9.0
   flutter_gen_runner: ^5.12.0
   go_router_builder: ^4.1.0
   dependency_validator: ^5.0.2
-  dart_mappable_builder: ^4.6.0
-  custom_lint: ^0.8.0
-  riverpod_lint: ^3.0.0
+  dart_mappable_builder: ^4.6.0  # Downgraded to resolve analyzer conflict with dependency_validator
+  custom_lint: ^0.8.0  # Downgraded to resolve analyzer conflict with dependency_validator
+  riverpod_lint: ^3.0.2
   sentry_dart_plugin: ^3.1.1
+  drift_dev: ^2.28.3
 
 dependency_overrides:
   # drift & package_info_plus are not compatible
-  web: ^1.0.0
+  web: ^1.1.1
 
 flutter:
   uses-material-design: true

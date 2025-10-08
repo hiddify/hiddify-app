@@ -18,7 +18,6 @@ import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/singbox/service/singbox_service.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/link_parsers.dart';
-import 'package:meta/meta.dart';
 import 'package:uuid/uuid.dart';
 
 abstract interface class ProfileRepository {
@@ -121,7 +120,6 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
     );
   }
 
-  @visibleForTesting
   TaskEither<ProfileFailure, Unit> validateConfig(String path, String tempPath, bool debug) {
     return exceptionHandler(() async {
       singbox.changeOptions(await configOptionRepository.getConfigOptions()).run();
@@ -268,7 +266,6 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
   static final _subInfoHeaders = ['profile-title', 'content-disposition', 'subscription-userinfo', 'profile-update-interval', 'support-url', 'profile-web-page-url', 'test-url'];
 
-  @visibleForTesting
   TaskEither<ProfileFailure, RemoteProfileEntity> fetch(String url, String fileName, {CancelToken? cancelToken}) {
     return TaskEither(() async {
       final file = profilePathResolver.file(fileName);

@@ -11,7 +11,7 @@ import 'package:hiddify/singbox/model/singbox_config_option.dart';
 import 'package:hiddify/singbox/model/singbox_status.dart';
 import 'package:hiddify/singbox/service/singbox_service.dart';
 import 'package:hiddify/utils/utils.dart';
-import 'package:meta/meta.dart';
+ 
 
 abstract interface class ConnectionRepository {
   SingboxConfigOption? get configOptionsSnapshot;
@@ -56,7 +56,6 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     );
   }
 
-  @visibleForTesting
   TaskEither<ConnectionFailure, SingboxConfigOption> getConfigOption() {
     return TaskEither<ConnectionFailure, SingboxConfigOption>.Do(($) async {
       final options = await $(configOptionRepository.getFullSingboxConfigOption().mapLeft((l) => const InvalidConfigOption()));
@@ -76,7 +75,6 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     }).handleExceptions(UnexpectedConnectionFailure.new);
   }
 
-  @visibleForTesting
   TaskEither<ConnectionFailure, Unit> applyConfigOption(SingboxConfigOption options, String? testUrl) {
     return exceptionHandler(() {
       _configOptionsSnapshot = options;
