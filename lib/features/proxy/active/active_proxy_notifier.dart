@@ -23,7 +23,6 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
     final cancelToken = CancelToken();
     Timer? timer;
     ref.onDispose(() {
-      loggy.debug("disposing");
       cancelToken.cancel();
       timer?.cancel();
     });
@@ -31,12 +30,13 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
     ref.listen(serviceRunningProvider, (_, next) => _idle = false);
 
     final autoCheck = ref.watch(Preferences.autoCheckIp);
-    final serviceRunning = await ref.watch(serviceRunningProvider.future);
+    final serviceRunning = ref.watch(serviceRunningProvider).asData?.value ?? false;
     // loggy.debug(
     //   "idle? [$_idle], forced? [$_forceCheck], connected? [$serviceRunning]",
     // );
     if (!_forceCheck && !serviceRunning) {
-      throw const ServiceNotRunning();
+      // before connect, don't show error UI; show "Check IP" action
+      throw const UnknownIp();
     } else if ((_idle && !_forceCheck) || (!_forceCheck && serviceRunning && !autoCheck)) {
       throw const UnknownIp();
     }
@@ -74,9 +74,7 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
 class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
   @override
   Stream<ProxyItemEntity> build() async* {
-    // ref.disposeDelay(const Duration(seconds: 20));
-
-    final serviceRunning = await ref.watch(serviceRunningProvider.future);
+    final serviceRunning = ref.watch(serviceRunningProvider).asData?.value ?? false;
     if (!serviceRunning) {
       throw const ServiceNotRunning();
     }

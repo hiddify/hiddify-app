@@ -36,13 +36,26 @@ class SideBarStatsOverview extends HookConsumerWidget {
             padding: const EdgeInsets.all(2.0),
             child: SizedBox(
               height: 18,
-              child: TextButton.icon(
+              child: TextButton(
                 style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), textStyle: Theme.of(context).textTheme.labelSmall),
                 onPressed: () {
                   ref.read(showAllSidebarStatsProvider.notifier).update(!showAll);
                 },
-                icon: AnimatedRotation(turns: showAll ? 1 : 0.5, duration: kAnimationDuration, child: const Icon(FluentIcons.chevron_down_16_regular, size: 16)),
-                label: AnimatedText(showAll ? t.general.showLess : t.general.showMore),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    AnimatedRotation(turns: showAll ? 1 : 0.5, duration: kAnimationDuration, child: const Icon(FluentIcons.chevron_down_16_regular, size: 16)),
+                    const Gap(6),
+                    Flexible(
+                      child: DefaultTextStyle(
+                        style: Theme.of(context).textTheme.labelSmall!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        child: AnimatedText(showAll ? t.general.showLess : t.general.showMore, style: Theme.of(context).textTheme.labelSmall),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

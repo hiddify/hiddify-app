@@ -40,6 +40,8 @@ class HomePage extends HookConsumerWidget {
                       const WidgetSpan(child: AppVersionLabel(), alignment: PlaceholderAlignment.middle),
                     ],
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 actions: [
                   IconButton(onPressed: () => const QuickSettingsRoute().push(context), icon: const Icon(FluentIcons.options_24_filled), tooltip: t.config.quickSettings),

@@ -14,6 +14,7 @@ import go.Seq
 import com.hiddify.hiddify.Application as BoxApplication
 
 class Application : Application() {
+    private var appChangeReceiver: AppChangeReceiver? = null
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
@@ -41,10 +42,19 @@ class Application : Application() {
             )
         }
 
-        registerReceiver(AppChangeReceiver(), IntentFilter().apply {
+        appChangeReceiver = AppChangeReceiver()
+        registerReceiver(appChangeReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)
             addDataScheme("package")
         })
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        appChangeReceiver?.let {
+            runCatching { unregisterReceiver(it) }
+        }
+        appChangeReceiver = null
     }
 
     companion object {

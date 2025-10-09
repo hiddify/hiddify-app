@@ -37,7 +37,7 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '
 android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
-    compileSdkVersion 36
+    compileSdk 36
     ndkVersion "28.2.13676358"
 
     compileOptions {
@@ -124,5 +124,5 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'androidx.core:core-ktx:1.17.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.9.4'
 }

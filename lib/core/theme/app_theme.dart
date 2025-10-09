@@ -7,9 +7,23 @@ class AppTheme {
   final AppThemeMode mode;
   final String fontFamily;
 
+  static const _desktopNoTransitions = PageTransitionsTheme(
+    builders: <TargetPlatform, PageTransitionsBuilder>{
+      TargetPlatform.windows: _NoTransitionsBuilder(),
+      TargetPlatform.linux: _NoTransitionsBuilder(),
+      TargetPlatform.macOS: _NoTransitionsBuilder(),
+    },
+  );
+
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
     final ColorScheme scheme = lightColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0));
-    return ThemeData(useMaterial3: true, colorScheme: scheme, fontFamily: fontFamily, extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.light, JsonEditorTheme.standard});
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      fontFamily: fontFamily,
+      pageTransitionsTheme: _desktopNoTransitions,
+      extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.light, JsonEditorTheme.standard},
+    );
   }
 
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
@@ -19,7 +33,16 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: mode.trueBlack ? Colors.black : scheme.surface,
       fontFamily: fontFamily,
+      pageTransitionsTheme: _desktopNoTransitions,
       extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.dark, JsonEditorTheme.standard},
     );
+  }
+}
+
+class _NoTransitionsBuilder extends PageTransitionsBuilder {
+  const _NoTransitionsBuilder();
+  @override
+  Widget buildTransitions<T>(PageRoute<T> route, BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    return child;
   }
 }

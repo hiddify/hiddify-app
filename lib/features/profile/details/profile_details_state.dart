@@ -6,8 +6,6 @@ part 'profile_details_state.freezed.dart';
 
 @freezed
 abstract class ProfileDetailsState with _$ProfileDetailsState {
-  const ProfileDetailsState._();
-
   const factory ProfileDetailsState({
     required ProfileEntity profile,
     @Default(false) bool isEditing,
@@ -18,6 +16,8 @@ abstract class ProfileDetailsState with _$ProfileDetailsState {
     @Default("") String configContent,
     @Default(false) bool configContentChanged,
   }) = _ProfileDetailsState;
+
+  const ProfileDetailsState._();
 
   bool get isBusy => save is AsyncLoading || delete is AsyncLoading || update is AsyncLoading;
 }

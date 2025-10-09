@@ -4,14 +4,14 @@ part 'stats_entity.freezed.dart';
 
 @freezed
 abstract class StatsEntity with _$StatsEntity {
-  const StatsEntity._();
-
   const factory StatsEntity({
     required int uplink,
     required int downlink,
     required int uplinkTotal,
     required int downlinkTotal,
   }) = _StatsEntity;
+
+  const StatsEntity._();
 
   factory StatsEntity.empty() => const StatsEntity(
         uplink: 0,

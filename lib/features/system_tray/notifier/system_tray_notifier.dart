@@ -30,13 +30,9 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
       _ => 0,
     };
     final newConnectionStatus = delay > 0 && delay < 65000;
-    ConnectionStatus connection;
-    try {
-      connection = await ref.watch(connectionProvider.future);
-    } catch (e) {
-      loggy.warning("error getting connection status", e);
-      connection = const ConnectionStatus.disconnected();
-    }
+    final connectionAsync = ref.watch(connectionProvider);
+    final ConnectionStatus connection =
+        connectionAsync.asData?.value ?? const ConnectionStatus.disconnected();
 
     final t = ref.watch(translationsProvider);
 

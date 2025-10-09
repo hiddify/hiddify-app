@@ -30,4 +30,27 @@ abstract class LogParser {
       message: log.trim(),
     );
   }
+
+  static LogEntity parseApp(String log) {
+    log = log.strip();
+    const sep = ' - ';
+    final i = log.indexOf(sep);
+    if (i > 0) {
+      log = log.substring(i + sep.length);
+    }
+    final level = LogLevel.values.firstOrNullWhere(
+      (e) {
+        final tag = '[${e.name.toUpperCase()}]';
+        if (log.startsWith(tag)) {
+          log = log.removePrefix(tag).trimLeft();
+          return true;
+        }
+        return false;
+      },
+    );
+    return LogEntity(
+      level: level,
+      message: log.trim(),
+    );
+  }
 }

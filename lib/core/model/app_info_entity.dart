@@ -5,8 +5,6 @@ part 'app_info_entity.freezed.dart';
 
 @freezed
 abstract class AppInfoEntity with _$AppInfoEntity {
-  const AppInfoEntity._();
-
   const factory AppInfoEntity({
     required String name,
     required String version,
@@ -16,6 +14,8 @@ abstract class AppInfoEntity with _$AppInfoEntity {
     required String operatingSystemVersion,
     required Environment environment,
   }) = _AppInfoEntity;
+
+  const AppInfoEntity._();
 
   String get userAgent =>
       "HiddifyNext/$version ($operatingSystem) like ClashMeta v2ray sing-box";

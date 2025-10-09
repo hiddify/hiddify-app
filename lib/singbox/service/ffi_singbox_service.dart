@@ -22,13 +22,18 @@ import 'package:watcher/watcher.dart';
 final _logger = Loggy('FFISingboxService');
 
 class FFISingboxService with InfraLogger implements SingboxService {
+  // Cache native library handles to avoid repeated DynamicLibrary.open calls
+  static SingboxNativeLibrary? _cachedLib;
+  static DynamicLibrary? _cachedDynamicLib;
 
   late final ValueStream<SingboxStatus> _status;
   late final ReceivePort _statusReceiver;
   Stream<SingboxStats>? _serviceStatsStream;
   Stream<List<SingboxOutboundGroup>>? _outboundsStream;
+  Stream<List<SingboxOutboundGroup>>? _activeOutboundsStream;
 
   static SingboxNativeLibrary _gen() {
+    if (_cachedLib != null) return _cachedLib!;
     String fullPath = "";
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
       fullPath = "libcore";
@@ -41,26 +46,28 @@ class FFISingboxService with InfraLogger implements SingboxService {
       fullPath = p.join(fullPath, "libcore.so");
     }
     _logger.debug('singbox native libs path: "$fullPath"');
-    final lib = DynamicLibrary.open(fullPath);
-    return SingboxNativeLibrary(lib);
+    final lib = _cachedDynamicLib ??= DynamicLibrary.open(fullPath);
+    return _cachedLib = SingboxNativeLibrary(lib);
   }
 
   @override
   Future<void> init() async {
     loggy.debug("initializing");
+
     _statusReceiver = ReceivePort('service status receiver');
     final source = _statusReceiver.asBroadcastStream().map((event) => jsonDecode(event as String)).map(SingboxStatus.fromEvent);
-    _status = ValueConnectableStream.seeded(
-      source,
-      const SingboxStopped(),
-    ).autoConnect();
+    _status = ValueConnectableStream.seeded(source, const SingboxStopped()).autoConnect();
+  }
+
+  // Optional manual disposer for shutting down the status stream
+  void dispose() {
+    try {
+      _statusReceiver.close();
+    } catch (_) {}
   }
 
   @override
-  TaskEither<String, Unit> setup(
-    Directories directories,
-    bool debug,
-  ) {
+  TaskEither<String, Unit> setup(Directories directories, bool debug) {
     final port = _statusReceiver.sendPort.nativePort;
     final baseDirPath = directories.baseDir.path;
     final workingDirPath = directories.workingDir.path;
@@ -69,16 +76,7 @@ class FFISingboxService with InfraLogger implements SingboxService {
       () => Isolate.run(() {
         final box = _gen();
         box.setupOnce(NativeApi.initializeApiDLData);
-        final err = box
-            .setup(
-              baseDirPath.toNativeUtf8().cast(),
-              workingDirPath.toNativeUtf8().cast(),
-              tempDirPath.toNativeUtf8().cast(),
-              port,
-              debug ? 1 : 0,
-            )
-            .cast<Utf8>()
-            .toDartString();
+        final err = box.setup(baseDirPath.toNativeUtf8().cast(), workingDirPath.toNativeUtf8().cast(), tempDirPath.toNativeUtf8().cast(), port, debug ? 1 : 0).cast<Utf8>().toDartString();
         if (err.isNotEmpty) {
           return left(err);
         }
@@ -88,22 +86,11 @@ class FFISingboxService with InfraLogger implements SingboxService {
   }
 
   @override
-  TaskEither<String, Unit> validateConfigByPath(
-    String path,
-    String tempPath,
-    bool debug,
-  ) {
+  TaskEither<String, Unit> validateConfigByPath(String path, String tempPath, bool debug) {
     return TaskEither(
       () => Isolate.run(() {
         final box = _gen();
-        final err = box
-            .parse(
-              path.toNativeUtf8().cast(),
-              tempPath.toNativeUtf8().cast(),
-              debug ? 1 : 0,
-            )
-            .cast<Utf8>()
-            .toDartString();
+        final err = box.parse(path.toNativeUtf8().cast(), tempPath.toNativeUtf8().cast(), debug ? 1 : 0).cast<Utf8>().toDartString();
         if (err.isNotEmpty) {
           return left(err);
         }
@@ -128,18 +115,11 @@ class FFISingboxService with InfraLogger implements SingboxService {
   }
 
   @override
-  TaskEither<String, String> generateFullConfigByPath(
-    String path,
-  ) {
+  TaskEither<String, String> generateFullConfigByPath(String path) {
     return TaskEither(
       () => Isolate.run(() {
         final box = _gen();
-        final response = box
-            .generateConfig(
-              path.toNativeUtf8().cast(),
-            )
-            .cast<Utf8>()
-            .toDartString();
+        final response = box.generateConfig(path.toNativeUtf8().cast()).cast<Utf8>().toDartString();
         if (response.startsWith("error")) {
           return left(response.replaceFirst("error", ""));
         }
@@ -149,22 +129,12 @@ class FFISingboxService with InfraLogger implements SingboxService {
   }
 
   @override
-  TaskEither<String, Unit> start(
-    String configPath,
-    String name,
-    bool disableMemoryLimit,
-  ) {
+  TaskEither<String, Unit> start(String configPath, String name, bool disableMemoryLimit) {
     loggy.debug("starting, memory limit: [${!disableMemoryLimit}]");
     return TaskEither(
       () => Isolate.run(() {
         final box = _gen();
-        final err = box
-            .start(
-              configPath.toNativeUtf8().cast(),
-              disableMemoryLimit ? 1 : 0,
-            )
-            .cast<Utf8>()
-            .toDartString();
+        final err = box.start(configPath.toNativeUtf8().cast(), disableMemoryLimit ? 1 : 0).cast<Utf8>().toDartString();
         if (err.isNotEmpty) {
           return left(err);
         }
@@ -188,22 +158,12 @@ class FFISingboxService with InfraLogger implements SingboxService {
   }
 
   @override
-  TaskEither<String, Unit> restart(
-    String configPath,
-    String name,
-    bool disableMemoryLimit,
-  ) {
+  TaskEither<String, Unit> restart(String configPath, String name, bool disableMemoryLimit) {
     loggy.debug("restarting, memory limit: [${!disableMemoryLimit}]");
     return TaskEither(
       () => Isolate.run(() {
         final box = _gen();
-        final err = box
-            .restart(
-              configPath.toNativeUtf8().cast(),
-              disableMemoryLimit ? 1 : 0,
-            )
-            .cast<Utf8>()
-            .toDartString();
+        final err = box.restart(configPath.toNativeUtf8().cast(), disableMemoryLimit ? 1 : 0).cast<Utf8>().toDartString();
         if (err.isNotEmpty) {
           return left(err);
         }
@@ -214,9 +174,7 @@ class FFISingboxService with InfraLogger implements SingboxService {
 
   @override
   TaskEither<String, Unit> resetTunnel() {
-    throw UnimplementedError(
-      "reset tunnel function unavailable on platform",
-    );
+    throw UnimplementedError("reset tunnel function unavailable on platform");
   }
 
   @override
@@ -227,31 +185,29 @@ class FFISingboxService with InfraLogger implements SingboxService {
     final box = _gen();
     if (_serviceStatsStream != null) return _serviceStatsStream!;
     final receiver = ReceivePort('stats');
-    final statusStream = receiver.asBroadcastStream(
-      onCancel: (_) {
-        _logger.debug("stopping stats command client");
-        final err = box.stopCommandClient(1).cast<Utf8>().toDartString();
-        if (err.isNotEmpty) {
-          _logger.error("error stopping stats client");
-        }
-        receiver.close();
-        _serviceStatsStream = null;
-      },
-    ).map(
-      (event) {
-        if (event case String _) {
-          if (event.startsWith('error:')) {
-            loggy.error("[service stats client] error received: $event");
-            throw event.replaceFirst('error:', "");
+    final statusStream = receiver
+        .asBroadcastStream(
+          onCancel: (_) {
+            _logger.debug("stopping stats command client");
+            final err = box.stopCommandClient(1).cast<Utf8>().toDartString();
+            if (err.isNotEmpty) {
+              _logger.error("error stopping stats client");
+            }
+            receiver.close();
+            _serviceStatsStream = null;
+          },
+        )
+        .map((event) {
+          if (event case String _) {
+            if (event.startsWith('error:')) {
+              loggy.error("[service stats client] error received: $event");
+              throw event.replaceFirst('error:', "");
+            }
+            return SingboxStats.fromJson(jsonDecode(event) as Map<String, dynamic>);
           }
-          return SingboxStats.fromJson(
-            jsonDecode(event) as Map<String, dynamic>,
-          );
-        }
-        loggy.error("[service status client] unexpected type, msg: $event");
-        throw "invalid type";
-      },
-    );
+          loggy.error("[service status client] unexpected type, msg: $event");
+          throw "invalid type";
+        });
 
     final err = box.startCommandClient(1, receiver.sendPort.nativePort).cast<Utf8>().toDartString();
     if (err.isNotEmpty) {
@@ -267,33 +223,33 @@ class FFISingboxService with InfraLogger implements SingboxService {
     final logger = newLoggy("watchGroups");
     if (_outboundsStream != null) return _outboundsStream!;
     final receiver = ReceivePort('groups');
-    final outboundsStream = receiver.asBroadcastStream(
-      onCancel: (_) {
-        logger.debug("stopping");
-        receiver.close();
-        _outboundsStream = null;
-        final box = _gen();
-        final err = box.stopCommandClient(5).cast<Utf8>().toDartString();
-        if (err.isNotEmpty) {
-          _logger.error("error stopping group client");
-        }
-      },
-    ).map(
-      (event) {
-        if (event case String _) {
-          if (event.startsWith('error:')) {
-            logger.error("error received: $event");
-            throw event.replaceFirst('error:', "");
-          }
+    final outboundsStream = receiver
+        .asBroadcastStream(
+          onCancel: (_) {
+            logger.debug("stopping");
+            receiver.close();
+            _outboundsStream = null;
+            final box = _gen();
+            final err = box.stopCommandClient(5).cast<Utf8>().toDartString();
+            if (err.isNotEmpty) {
+              _logger.error("error stopping group client");
+            }
+          },
+        )
+        .map((event) {
+          if (event case String _) {
+            if (event.startsWith('error:')) {
+              logger.error("error received: $event");
+              throw event.replaceFirst('error:', "");
+            }
 
-          return (jsonDecode(event) as List).map((e) {
-            return SingboxOutboundGroup.fromJson(e as Map<String, dynamic>);
-          }).toList();
-        }
-        logger.error("unexpected type, msg: $event");
-        throw "invalid type";
-      },
-    );
+            return (jsonDecode(event) as List).map((e) {
+              return SingboxOutboundGroup.fromJson(e as Map<String, dynamic>);
+            }).toList();
+          }
+          logger.error("unexpected type, msg: $event");
+          throw "invalid type";
+        });
 
     try {
       final box = _gen();
@@ -313,33 +269,35 @@ class FFISingboxService with InfraLogger implements SingboxService {
   @override
   Stream<List<SingboxOutboundGroup>> watchActiveGroups() {
     final logger = newLoggy("[ActiveGroupsClient]");
+    if (_activeOutboundsStream != null) return _activeOutboundsStream!;
     final receiver = ReceivePort('active groups');
-    final outboundsStream = receiver.asBroadcastStream(
-      onCancel: (_) {
-        logger.debug("stopping");
-        receiver.close();
-        final box = _gen();
-        final err = box.stopCommandClient(13).cast<Utf8>().toDartString();
-        if (err.isNotEmpty) {
-          logger.error("failed stopping: $err");
-        }
-      },
-    ).map(
-      (event) {
-        if (event case String _) {
-          if (event.startsWith('error:')) {
-            logger.error(event);
-            throw event.replaceFirst('error:', "");
-          }
+    final outboundsStream = receiver
+        .asBroadcastStream(
+          onCancel: (_) {
+            logger.debug("stopping");
+            receiver.close();
+            final box = _gen();
+            final err = box.stopCommandClient(13).cast<Utf8>().toDartString();
+            if (err.isNotEmpty) {
+              logger.error("failed stopping: $err");
+            }
+            _activeOutboundsStream = null;
+          },
+        )
+        .map((event) {
+          if (event case String _) {
+            if (event.startsWith('error:')) {
+              logger.error(event);
+              throw event.replaceFirst('error:', "");
+            }
 
-          return (jsonDecode(event) as List).map((e) {
-            return SingboxOutboundGroup.fromJson(e as Map<String, dynamic>);
-          }).toList();
-        }
-        logger.error("unexpected type, msg: $event");
-        throw "invalid type";
-      },
-    );
+            return (jsonDecode(event) as List).map((e) {
+              return SingboxOutboundGroup.fromJson(e as Map<String, dynamic>);
+            }).toList();
+          }
+          logger.error("unexpected type, msg: $event");
+          throw "invalid type";
+        });
 
     try {
       final box = _gen();
@@ -353,7 +311,7 @@ class FFISingboxService with InfraLogger implements SingboxService {
       rethrow;
     }
 
-    return outboundsStream;
+    return _activeOutboundsStream = outboundsStream;
   }
 
   @override
@@ -361,13 +319,7 @@ class FFISingboxService with InfraLogger implements SingboxService {
     return TaskEither(
       () => Isolate.run(() {
         final box = _gen();
-        final err = box
-            .selectOutbound(
-              groupTag.toNativeUtf8().cast(),
-              outboundTag.toNativeUtf8().cast(),
-            )
-            .cast<Utf8>()
-            .toDartString();
+        final err = box.selectOutbound(groupTag.toNativeUtf8().cast(), outboundTag.toNativeUtf8().cast()).cast<Utf8>().toDartString();
         if (err.isNotEmpty) {
           return left(err);
         }
@@ -430,23 +382,12 @@ class FFISingboxService with InfraLogger implements SingboxService {
   }
 
   @override
-  TaskEither<String, WarpResponse> generateWarpConfig({
-    required String licenseKey,
-    required String previousAccountId,
-    required String previousAccessToken,
-  }) {
+  TaskEither<String, WarpResponse> generateWarpConfig({required String licenseKey, required String previousAccountId, required String previousAccessToken}) {
     loggy.debug("generating warp config");
     return TaskEither(
       () => Isolate.run(() {
         final box = _gen();
-        final response = box
-            .generateWarpConfig(
-              licenseKey.toNativeUtf8().cast(),
-              previousAccountId.toNativeUtf8().cast(),
-              previousAccessToken.toNativeUtf8().cast(),
-            )
-            .cast<Utf8>()
-            .toDartString();
+        final response = box.generateWarpConfig(licenseKey.toNativeUtf8().cast(), previousAccountId.toNativeUtf8().cast(), previousAccessToken.toNativeUtf8().cast()).cast<Utf8>().toDartString();
         if (response.startsWith("error:")) {
           return left(response.replaceFirst('error:', ""));
         }

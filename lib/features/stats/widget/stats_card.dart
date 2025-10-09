@@ -75,10 +75,15 @@ class StatsCard extends StatelessWidget {
                       children: [
                         label,
                         const Gap(2),
-                        DefaultTextStyle(
-                          style: effectiveDataStyle!,
-                          overflow: TextOverflow.ellipsis,
-                          child: Flexible(child: stat.data),
+                        Expanded(
+                          child: DefaultTextStyle(
+                            style: effectiveDataStyle!,
+                            overflow: TextOverflow.ellipsis,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: stat.data,
+                            ),
+                          ),
                         ),
                       ],
                     );

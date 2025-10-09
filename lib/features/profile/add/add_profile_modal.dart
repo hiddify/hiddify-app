@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/router/router.dart';
@@ -25,14 +26,24 @@ class AddProfileModal extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final TranslationsEn t = ref.watch(translationsProvider);
     final addProfileState = ref.watch(addProfileProvider);
 
     ref.listen(addProfileProvider, (previous, next) {
-      if (next case AsyncData(value: final _?)) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (context.mounted && context.canPop()) context.pop();
-        });
+      final notification = ref.read(inAppNotificationControllerProvider);
+      switch (next) {
+        case AsyncData(:final value):
+          if (value != null) {
+            notification.showSuccessToast(t.profile.save.successMsg);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted && context.canPop()) context.pop();
+            });
+          } else {
+            notification.showErrorToast(t.profile.save.failureMsg);
+          }
+        case AsyncError(error: final error):
+          notification.showErrorDialog(t.presentError(error, action: t.profile.add.failureMsg));
+        case AsyncLoading():
       }
     });
 

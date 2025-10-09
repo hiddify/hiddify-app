@@ -17,11 +17,13 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
   LogsOverviewState build() {
     ref.disposeDelay(const Duration(seconds: 20));
     state = const LogsOverviewState();
+    _paused = false;
     ref.onDispose(
       () {
         loggy.debug("disposing");
         _listener?.cancel();
         _listener = null;
+        _debouncer.dispose();
       },
     );
     ref.onCancel(
@@ -34,7 +36,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
     );
     ref.onResume(
       () {
-        if (!state.paused && (_listener?.isPaused ?? false)) {
+        if (!_paused && (_listener?.isPaused ?? false)) {
           loggy.debug("resuming");
           _listener?.resume();
         }
@@ -46,6 +48,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
   }
 
   StreamSubscription? _listener;
+  bool _paused = false;
 
   Future<void> _addListeners() async {
     loggy.debug("adding listeners");
@@ -93,12 +96,14 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
   void pause() {
     loggy.debug("pausing");
     _listener?.pause();
+    _paused = true;
     state = state.copyWith(paused: true);
   }
 
   void resume() {
     loggy.debug("resuming");
     _listener?.resume();
+    _paused = false;
     state = state.copyWith(paused: false);
   }
 

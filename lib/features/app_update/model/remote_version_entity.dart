@@ -5,8 +5,6 @@ part 'remote_version_entity.freezed.dart';
 
 @freezed
 abstract class RemoteVersionEntity with _$RemoteVersionEntity {
-  const RemoteVersionEntity._();
-
   const factory RemoteVersionEntity({
     required String version,
     required String buildNumber,
@@ -16,6 +14,8 @@ abstract class RemoteVersionEntity with _$RemoteVersionEntity {
     required DateTime publishedAt,
     required Environment flavor,
   }) = _RemoteVersionEntity;
+
+  const RemoteVersionEntity._();
 
   String get presentVersion =>
       flavor == Environment.prod ? version : "$version ${flavor.name}";

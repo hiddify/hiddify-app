@@ -51,6 +51,9 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
             }
             ref.read(windowProvider.notifier).quit();
           },
+          onLongPress: () {
+            ref.read(windowProvider.notifier).quit(fast: true);
+          },
           child: Text(t.window.close),
         ),
         FilledButton(

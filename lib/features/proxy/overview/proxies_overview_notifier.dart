@@ -9,7 +9,6 @@ import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
-import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -57,11 +56,12 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   @override
   Stream<List<ProxyGroupEntity>> build() async* {
     ref.disposeDelay(const Duration(seconds: 15));
-    final serviceRunning = await ref.watch(serviceRunningProvider.future);
-    if (!serviceRunning) {
-      throw const ServiceNotRunning();
-    }
+    final serviceRunning = ref.watch(serviceRunningProvider).asData?.value ?? false;
     final sortBy = ref.watch(proxiesSortProvider);
+    if (!serviceRunning) {
+      yield* Stream.value(<ProxyGroupEntity>[]);
+      return;
+    }
     yield* ref
         .watch(proxyRepositoryProvider)
         .watchProxies()

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
@@ -32,26 +31,6 @@ class AddProfile extends _$AddProfile with AppLogger {
     ref.onDispose(() {
       loggy.debug("disposing");
       _cancelToken?.cancel();
-    });
-    ref.listen(addProfileProvider, (previous, next) {
-      final t = ref.read(translationsProvider);
-      final notification = ref.read(inAppNotificationControllerProvider);
-      switch (next) {
-        case AsyncData(:final value):
-          if (value != null) {
-            notification.showSuccessToast(t.profile.save.successMsg);
-          } else {
-            notification.showErrorToast(t.profile.save.failureMsg);
-          }
-        case AsyncError(error: final error):
-          if (error is ProfileInvalidUrlFailure) {
-            notification.showErrorToast(t.failure.profiles.invalidUrl);
-          } else {
-            notification.showErrorDialog(t.presentError(error, action: t.profile.add.failureMsg));
-          }
-        case AsyncLoading():
-          // Loading state, no action needed
-      }
     });
     return const AsyncData(null);
   }
@@ -148,22 +127,6 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
   @override
   AsyncValue<Unit?> build(String id) {
     ref.disposeDelay(const Duration(minutes: 1));
-    ref.listen(updateProfileProvider(id), (previous, next) {
-      final t = ref.read(translationsProvider);
-      final notification = ref.read(inAppNotificationControllerProvider);
-      switch (next) {
-        case AsyncData(:final value):
-          if (value != null) {
-            notification.showSuccessToast(t.profile.update.successMsg);
-          } else {
-            notification.showErrorToast(t.profile.update.failureMsg);
-          }
-        case AsyncError(error: final error):
-          notification.showErrorDialog(t.presentError(error, action: t.profile.update.failureMsg));
-        case AsyncLoading():
-          // Loading state, no action needed
-      }
-    });
     return const AsyncData(null);
   }
 

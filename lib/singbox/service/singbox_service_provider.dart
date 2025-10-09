@@ -6,7 +6,7 @@ part 'singbox_service_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 SingboxService singboxService(Ref ref) {
-  const disableCore = bool.fromEnvironment('DISABLE_CORE', defaultValue: true);
+  const disableCore = bool.fromEnvironment('DISABLE_CORE');
   if (disableCore) {
     return NoopSingboxService();
   }

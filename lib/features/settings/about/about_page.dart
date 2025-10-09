@@ -89,13 +89,23 @@ class AboutPage extends HookConsumerWidget {
                 children: [
                   Assets.images.logo.svg(width: 64, height: 64),
                   const Gap(16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(t.general.appTitle, style: Theme.of(context).textTheme.titleLarge),
-                      const Gap(4),
-                      Text("${t.about.version} ${appInfo.presentVersion}"),
-                    ],
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          t.general.appTitle,
+                          style: Theme.of(context).textTheme.titleLarge,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const Gap(4),
+                        Text(
+                          "${t.about.version} ${appInfo.presentVersion}",
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

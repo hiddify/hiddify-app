@@ -32,8 +32,6 @@ class App extends HookConsumerWidget with PresLogger {
     final themeMode = ref.watch(themePreferencesProvider);
     final theme = AppTheme(themeMode, locale.preferredFontFamily);
 
-    final upgrader = ref.watch(upgraderProvider);
-
     ref.listen(foregroundProfilesUpdateProvider, (_, _) {});
 
     return WindowWrapper(
@@ -53,11 +51,16 @@ class App extends HookConsumerWidget with PresLogger {
                   darkTheme: theme.darkTheme(darkColorScheme),
                   title: Constants.appName,
                   builder: (context, child) {
-                    child = UpgradeAlert(
-                      upgrader: upgrader,
-                      navigatorKey: router.routerDelegate.navigatorKey,
-                      child: child ?? const SizedBox(),
-                    );
+                    if (!PlatformUtils.isDesktop) {
+                      final upgrader = ref.watch(upgraderProvider);
+                      child = UpgradeAlert(
+                        upgrader: upgrader,
+                        navigatorKey: router.routerDelegate.navigatorKey,
+                        child: child ?? const SizedBox(),
+                      );
+                    } else {
+                      child = child ?? const SizedBox();
+                    }
                     if (kDebugMode && _debugAccessibility) {
                       return AccessibilityTools(
                         checkFontOverflows: true,

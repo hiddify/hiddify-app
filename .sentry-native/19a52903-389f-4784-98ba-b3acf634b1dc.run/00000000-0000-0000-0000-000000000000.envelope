@@ -1,0 +1,3 @@
+{}
+{"type":"session","length":212}
+{"init":true,"sid":"e6842608-b8df-44ec-a81b-a7c9c5cdf57f","status":"crashed","errors":1,"started":"2025-10-08T14:36:42.074108Z","duration":326.135185,"attrs":{"release":"hiddify@2.5.7+20507","environment":"dev"}}

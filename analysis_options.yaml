@@ -13,9 +13,9 @@ analyzer:
 
 linter:
   rules:
-    sort_pub_dependencies: false
-    sort_unnamed_constructors_first: false
     avoid_classes_with_only_static_members: false
+    sort_unnamed_constructors_first: false
+    sort_pub_dependencies: false
 
 custom_lint:
   rules:

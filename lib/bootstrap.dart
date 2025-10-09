@@ -26,7 +26,6 @@ import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/singbox/service/singbox_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -94,7 +93,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
 
   await _init("profile repository", () => container.read(profileRepositoryProvider.future));
 
-  await _safeInit("active profile", () => container.read(activeProfileProvider.future), timeout: 1000);
+  await _safeInit("active profile", () => container.read(activeProfileProvider.future), timeout: 3000);
   await _safeInit("deep link service", () => container.read(deepLinkProvider.future), timeout: 1000);
   await _init("sing-box", () => container.read(singboxServiceProvider).init());
   if (PlatformUtils.isDesktop) {
@@ -113,7 +112,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   runApp(
     UncontrolledProviderScope(
       container: container,
-      child: SentryUserInteractionWidget(child: const App()),
+      child: const App(),
     ),
   );
 
@@ -137,9 +136,17 @@ Future<T> _init<T>(String name, Future<T> Function() initializer, {int? timeout}
 }
 
 Future<T?> _safeInit<T>(String name, Future<T> Function() initializer, {int? timeout}) async {
+  final stopWatch = Stopwatch()..start();
+  Logger.bootstrap.info("initializing [$name]");
+  Future<T> func() => timeout != null ? initializer().timeout(Duration(milliseconds: timeout)) : initializer();
   try {
-    return await _init(name, initializer, timeout: timeout);
-  } catch (e) {
+    final result = await func();
+    Logger.bootstrap.debug("[$name] initialized in ${stopWatch.elapsedMilliseconds}ms");
+    return result;
+  } catch (e, stackTrace) {
+    Logger.bootstrap.warning("[$name] initialization skipped (non-critical)", e, stackTrace);
     return null;
+  } finally {
+    stopWatch.stop();
   }
 }

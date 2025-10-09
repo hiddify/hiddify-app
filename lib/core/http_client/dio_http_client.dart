@@ -8,6 +8,7 @@ import 'package:hiddify/utils/custom_loggers.dart';
 
 class DioHttpClient with InfraLogger {
   final Map<String, Dio> _dio = {};
+  final Map<String, HttpClient> _httpClients = {};
   DioHttpClient({required Duration timeout, required String userAgent, required bool debug}) {
     for (final mode in ["proxy", "direct", "both"]) {
       _dio[mode] = Dio(BaseOptions(connectTimeout: timeout, sendTimeout: timeout, receiveTimeout: timeout, headers: {"User-Agent": userAgent}));
@@ -23,6 +24,8 @@ class DioHttpClient with InfraLogger {
 
       _dio[mode]!.httpClientAdapter = IOHttpClientAdapter(
         createHttpClient: () {
+          final existing = _httpClients[mode];
+          if (existing != null) return existing;
           final client = HttpClient();
           client.findProxy = (url) {
             if (mode == "proxy") {
@@ -33,6 +36,7 @@ class DioHttpClient with InfraLogger {
               return "PROXY localhost:$port; DIRECT";
             }
           };
+          _httpClients[mode] = client;
           return client;
         },
       );
@@ -126,5 +130,15 @@ class DioHttpClient with InfraLogger {
         // "Content-Type": "application/json",
       },
     );
+  }
+
+  /// Closes created HttpClient instances. Safe to call multiple times.
+  void close() {
+    for (final client in _httpClients.values) {
+      try {
+        client.close(force: true);
+      } catch (_) {}
+    }
+    _httpClients.clear();
   }
 }
