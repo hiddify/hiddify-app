@@ -115,14 +115,14 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     await methodChannel.invokeMethod(
       "stop",
     );
-    if (!await waitUntilPort(portBack, false)) {
-      await methodChannel.invokeMethod(
-        "stop",
-      );
-      return false;
-    }
+    // if (!await waitUntilPort(portBack, false)) {
+    await methodChannel.invokeMethod(
+      "stop",
+    );
     _isBgClientAvailable = false;
     return true;
+    // return false;
+    // }
   }
 
   @override

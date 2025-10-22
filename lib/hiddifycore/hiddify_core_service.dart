@@ -187,8 +187,6 @@ class HiddifyCoreService with InfraLogger {
         loggy.debug("stopping");
         try {
           final res = await core.bgClient.stop(Empty());
-        } on GrpcError catch (e) {
-          loggy.error("failed to stop bg core: $e");
         } catch (e) {
           loggy.error("failed to stop bg core: $e");
         }
@@ -214,11 +212,13 @@ class HiddifyCoreService with InfraLogger {
           ),
         );
         if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
+        await stop().run();
+        await start(path, name, disableMemoryLimit).run();
         // }
-        if (!core.isSingleChannel()) {
-          await startListeningStatus("bg", core.bgClient);
-          await startListeningLogs("bg", core.bgClient);
-        }
+        // if (!core.isSingleChannel()) {
+        //   await startListeningStatus("bg", core.bgClient);
+        //   await startListeningLogs("bg", core.bgClient);
+        // }
         return right(unit);
       },
     );
