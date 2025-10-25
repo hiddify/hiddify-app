@@ -616,15 +616,8 @@
       "serviceNotRunning": "سرویس در حال اجرا نیست",
       "missingPrivilege": "دسترسی وجود ندارد",
       "missingPrivilegeMsg": "حالت VPN به دسترسی ادمین نیاز دارد. یا برنامه را به عنوان ادمین مجدداً راه‌اندازی کنید یا حالت سرویس را تغییر دهید.",
-      "missingGeoAssets": "فایل‌های Geo یافت نشد",
-      "missingGeoAssetsMsg": "فایل‌های Geo یافت نشدند. فایل فعال را تغییر داده یا فایل انتخاب‌شده را از تنظیمات دانلود کنید.",
       "invalidConfigOptions": "گزینه‌های پیکربندی نامعتبر",
       "invalidConfig": "پیکربندی نامعتبر"
-    },
-    "geoAssets": {
-      "unexpected": "خطای غیرمنتظره",
-      "notUpdate": "به‌روزرسانی جدیدی موجود نیست",
-      "activeNotFound": "فایل geo فعال یافت نشد"
     },
     "warp": {
       "missingLicense": "لایسنس Warp",

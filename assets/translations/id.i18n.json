@@ -616,15 +616,8 @@
       "serviceNotRunning": "Layanan tidak berjalan",
       "missingPrivilege": "Izin hilang",
       "missingPrivilegeMsg": "Mode VPN memerlukan izin administrator. Harap mulai ulang aplikasi sebagai administrator atau ubah mode layanan.",
-      "missingGeoAssets": "Aset Geo hilang",
-      "missingGeoAssetsMsg": "File aset Geo hilang. Harap ubah aset aktif atau unduh yang dipilih di pengaturan.",
       "invalidConfigOptions": "Opsi konfigurasi tidak valid",
       "invalidConfig": "Konfigurasi tidak valid"
-    },
-    "geoAssets": {
-      "unexpected": "Kesalahan tak terduga",
-      "notUpdate": "Tidak ada pembaruan yang tersedia",
-      "activeNotFound": "Aset Geo aktif tidak ditemukan"
     },
     "warp": {
       "missingLicense": "Lisensi WARP hilang",

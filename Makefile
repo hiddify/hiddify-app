@@ -69,16 +69,16 @@ prepare:
 
 windows-prepare: get gen translate windows-libs
 	
-ios-prepare: get-geo-assets get gen translate ios-libs 
+ios-prepare: get gen translate ios-libs 
 	cd ios; pod repo update; pod install;echo "done ios prepare"
 	
-macos-prepare: get-geo-assets get gen translate macos-libs
-linux-prepare: get-geo-assets get gen translate linux-libs
+macos-prepare: get gen translate macos-libs
+linux-prepare: get gen translate linux-libs
 linux-appimage-prepare:linux-prepare
 linux-rpm-prepare:linux-prepare
 linux-deb-prepare:linux-prepare
 
-android-prepare: get-geo-assets get gen translate android-libs	
+android-prepare: get gen translate android-libs	
 android-apk-prepare:android-prepare
 android-aab-prepare:android-prepare
 
@@ -227,11 +227,6 @@ ios-libs: #not tested
 	mkdir -p $(IOS_OUT)
 	rm -rf $(IOS_OUT)/HiddifyCore.xcframework
 	curl -L $(CORE_URL)/$(CORE_NAME)-ios.tar.gz | tar xz -C "$(IOS_OUT)"
-
-get-geo-assets:
-	echo ""
-	# curl -L https://github.com/SagerNet/sing-geoip/releases/latest/download/geoip.db -o $(GEO_ASSETS_DIR)/geoip.db
-	# curl -L https://github.com/SagerNet/sing-geosite/releases/latest/download/geosite.db -o $(GEO_ASSETS_DIR)/geosite.db
 
 build-headers:
 	make -C hiddify-core -f Makefile headers && mv $(BINDIR)/$(CORE_NAME)-headers.h $(BINDIR)/hiddify-core.h

@@ -616,15 +616,8 @@
       "serviceNotRunning": "El servicio no se está ejecutando",
       "missingPrivilege": "Falta privilegio",
       "missingPrivilegeMsg": "El modo VPN requiere privilegios de administrador. Reinicia la aplicación como administrador o cambia el modo de servicio.",
-      "missingGeoAssets": "Faltan recursos Geo",
-      "missingGeoAssetsMsg": "Faltan los archivos de recursos Geo. Cambia el recurso activo o descarga el seleccionado en los ajustes.",
       "invalidConfigOptions": "Opciones de configuración no válidas",
       "invalidConfig": "Configuración no válida"
-    },
-    "geoAssets": {
-      "unexpected": "Error inesperado",
-      "notUpdate": "No hay actualización disponible",
-      "activeNotFound": "Recurso Geo activo no encontrado"
     },
     "warp": {
       "missingLicense": "Falta la licencia de WARP",

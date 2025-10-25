@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:hiddify/core/db/converters/duration_converter.dart';
 import 'package:hiddify/core/db/v1/db_v1.steps.dart';
-import 'package:hiddify/features/geo_asset/model/geo_asset_entity.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
@@ -84,3 +83,5 @@ class GeoAssetEntries extends Table {
     {name, providerName},
   ];
 }
+
+enum GeoAssetType { geoip, geosite }

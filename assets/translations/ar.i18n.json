@@ -622,15 +622,8 @@
       "serviceNotRunning": "الخدمة لا تعمل",
       "missingPrivilege": "صلاحيات مطلوبة",
       "missingPrivilegeMsg": "وضع الـ VPN يتطلب صلاحيات المسؤول. يرجى إعادة تشغيل التطبيق كمسؤول أو تغيير وضع الخدمة.",
-      "missingGeoAssets": "ملفات Geo مفقودة",
-      "missingGeoAssetsMsg": "ملفات Geo مفقودة. يرجى تغيير الملف النشط أو تنزيل الملف المحدد من الإعدادات.",
       "invalidConfigOptions": "خيارات تكوين غير صالحة",
       "invalidConfig": "تكوين غير صالح"
-    },
-    "geoAssets": {
-      "unexpected": "خطأ غير متوقع",
-      "notUpdate": "لا يوجد تحديث متاح",
-      "activeNotFound": "ملف Geo النشط غير موجود"
     },
     "warp": {
       "missingLicense": "رخصة WARP مفقودة",
