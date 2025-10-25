@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:hiddify/core/database/app_database.dart';
-import 'package:hiddify/core/database/tables/database_tables.dart';
+import 'package:hiddify/core/db/v2/db_v2.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_backup.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/per_app_proxy/model/pkg_flag.dart';
@@ -22,26 +21,16 @@ abstract interface class AppProxyDataSource {
 }
 
 @DriftAccessor(tables: [AppProxyEntries])
-class AppProxyDao extends DatabaseAccessor<AppDatabase> with _$AppProxyDaoMixin, InfraLogger implements AppProxyDataSource {
+class AppProxyDao extends DatabaseAccessor<DbV2> with _$AppProxyDaoMixin, InfraLogger implements AppProxyDataSource {
   AppProxyDao(super.db);
 
   @override
   Future<void> updatePkg({required String pkg, required AppProxyMode mode}) {
     return transaction(() async {
-      final entry = await (select(appProxyEntries)
-            ..where(
-              (tbl) => tbl.mode.equalsValue(mode) & tbl.pkgName.equals(pkg),
-            ))
-          .getSingleOrNull();
+      final entry = await (select(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode) & tbl.pkgName.equals(pkg))).getSingleOrNull();
 
       if (entry == null) {
-        await into(appProxyEntries).insert(
-          AppProxyEntriesCompanion.insert(
-            mode: mode,
-            pkgName: pkg,
-            flags: Value(PkgFlag.userSelection.add(0)),
-          ),
-        );
+        await into(appProxyEntries).insert(AppProxyEntriesCompanion.insert(mode: mode, pkgName: pkg, flags: Value(PkgFlag.userSelection.add(0))));
         return;
       }
 
@@ -49,11 +38,7 @@ class AppProxyDao extends DatabaseAccessor<AppDatabase> with _$AppProxyDaoMixin,
       final isAutoSelection = PkgFlag.autoSelection.check(flag);
 
       if (!isAutoSelection) {
-        await (delete(appProxyEntries)
-              ..where(
-                (tbl) => tbl.mode.equalsValue(mode) & tbl.pkgName.equals(pkg),
-              ))
-            .go();
+        await (delete(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode) & tbl.pkgName.equals(pkg))).go();
         return;
       }
 
@@ -66,11 +51,7 @@ class AppProxyDao extends DatabaseAccessor<AppDatabase> with _$AppProxyDaoMixin,
         newFlag = PkgFlag.userSelection.add(flag);
       }
 
-      await (update(appProxyEntries)
-            ..where(
-              (tbl) => tbl.mode.equalsValue(mode) & tbl.pkgName.equals(pkg),
-            ))
-          .write(AppProxyEntriesCompanion(flags: Value(newFlag)));
+      await (update(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode) & tbl.pkgName.equals(pkg))).write(AppProxyEntriesCompanion(flags: Value(newFlag)));
     });
   }
 
@@ -84,14 +65,11 @@ class AppProxyDao extends DatabaseAccessor<AppDatabase> with _$AppProxyDaoMixin,
   Stream<List<AppProxyEntry>> watchFilterForDisplay({required Set<String> phonePkgs, required AppProxyMode mode}) {
     if (phonePkgs.isEmpty) return Stream.value([]);
 
-    return (select(appProxyEntries)
-          ..where(
-            (tbl) {
-              final modeFilter = tbl.mode.equalsValue(mode);
-              final packageFilter = tbl.pkgName.isIn(phonePkgs);
-              return modeFilter & packageFilter;
-            },
-          ))
+    return (select(appProxyEntries)..where((tbl) {
+          final modeFilter = tbl.mode.equalsValue(mode);
+          final packageFilter = tbl.pkgName.isIn(phonePkgs);
+          return modeFilter & packageFilter;
+        }))
         .watch();
   }
 
@@ -129,145 +107,80 @@ class AppProxyDao extends DatabaseAccessor<AppDatabase> with _$AppProxyDaoMixin,
     return transaction(() async {
       await (delete(appProxyEntries)..where((tbl) => tbl.flags.equals(0))).go();
 
-      await db.batch(
-        (b) {
-          b
-            ..update(
-              appProxyEntries,
-              AppProxyEntriesCompanion.custom(
-                flags: appProxyEntries.flags
-                  ..bitwiseAnd(Constant(~PkgFlag.userSelection.value))
-                  ..bitwiseAnd(Constant(~PkgFlag.forceDeselection.value)),
-              ),
-            )
-            ..deleteWhere(
-              appProxyEntries,
-              (tbl) => tbl.flags.equals(0),
-            )
-            ..insertAll(
-              db.appProxyEntries,
-              <AppProxyEntriesCompanion>[
-                ...backup.include.selected.map(
-                  (pkg) => AppProxyEntriesCompanion.insert(
-                    mode: AppProxyMode.include,
-                    pkgName: pkg,
-                    flags: Value(PkgFlag.userSelection.add(0)),
-                  ),
-                ),
-                ...backup.include.deselected.map(
-                  (pkg) => AppProxyEntriesCompanion.insert(
-                    mode: AppProxyMode.include,
-                    pkgName: pkg,
-                    flags: Value(PkgFlag.forceDeselection.add(0)),
-                  ),
-                ),
-                ...backup.exclude.selected.map(
-                  (pkg) => AppProxyEntriesCompanion.insert(
-                    mode: AppProxyMode.exclude,
-                    pkgName: pkg,
-                    flags: Value(PkgFlag.userSelection.add(0)),
-                  ),
-                ),
-                ...backup.exclude.deselected.map(
-                  (pkg) => AppProxyEntriesCompanion.insert(
-                    mode: AppProxyMode.exclude,
-                    pkgName: pkg,
-                    flags: Value(PkgFlag.forceDeselection.add(0)),
-                  ),
-                ),
-              ],
-              onConflict: DoUpdate.withExcluded(
-                (AppProxyEntries old, AppProxyEntries e) {
-                  return AppProxyEntriesCompanion.custom(
-                    flags: old.flags.bitwiseOr(e.flags),
-                  );
-                },
-              ),
-            );
-        },
-      );
+      await db.batch((b) {
+        b
+          ..update(
+            appProxyEntries,
+            AppProxyEntriesCompanion.custom(
+              flags: appProxyEntries.flags
+                ..bitwiseAnd(Constant(~PkgFlag.userSelection.value))
+                ..bitwiseAnd(Constant(~PkgFlag.forceDeselection.value)),
+            ),
+          )
+          ..deleteWhere(appProxyEntries, (tbl) => tbl.flags.equals(0))
+          ..insertAll(
+            db.appProxyEntries,
+            <AppProxyEntriesCompanion>[
+              ...backup.include.selected.map((pkg) => AppProxyEntriesCompanion.insert(mode: AppProxyMode.include, pkgName: pkg, flags: Value(PkgFlag.userSelection.add(0)))),
+              ...backup.include.deselected.map((pkg) => AppProxyEntriesCompanion.insert(mode: AppProxyMode.include, pkgName: pkg, flags: Value(PkgFlag.forceDeselection.add(0)))),
+              ...backup.exclude.selected.map((pkg) => AppProxyEntriesCompanion.insert(mode: AppProxyMode.exclude, pkgName: pkg, flags: Value(PkgFlag.userSelection.add(0)))),
+              ...backup.exclude.deselected.map((pkg) => AppProxyEntriesCompanion.insert(mode: AppProxyMode.exclude, pkgName: pkg, flags: Value(PkgFlag.forceDeselection.add(0)))),
+            ],
+            onConflict: DoUpdate.withExcluded((AppProxyEntries old, AppProxyEntries e) {
+              return AppProxyEntriesCompanion.custom(flags: old.flags.bitwiseOr(e.flags));
+            }),
+          );
+      });
     });
   }
 
   @override
   Future<void> applyAutoSelection({required Set<String> autoList, required AppProxyMode mode}) {
-    return transaction(
-      () async {
-        // removing all items that have only auto selection
-        await (delete(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode) & tbl.flags.equals(PkgFlag.autoSelection.value))).go();
-        // removing auto selection flag from items
-        final entriesToUpdate = await (db.select(db.appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode))).get();
-        if (entriesToUpdate.isNotEmpty) {
-          final updatedCompanions = entriesToUpdate.map(
-            (entry) {
-              return entry.copyWith(flags: PkgFlag.autoSelection.remove(entry.flags)).toCompanion(false);
-            },
-          ).toList();
-          await db.batch(
-            (b) {
-              b.replaceAll(db.appProxyEntries, updatedCompanions);
-            },
+    return transaction(() async {
+      // removing all items that have only auto selection
+      await (delete(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode) & tbl.flags.equals(PkgFlag.autoSelection.value))).go();
+      // removing auto selection flag from items
+      final entriesToUpdate = await (db.select(db.appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode))).get();
+      if (entriesToUpdate.isNotEmpty) {
+        final updatedCompanions = entriesToUpdate.map((entry) {
+          return entry.copyWith(flags: PkgFlag.autoSelection.remove(entry.flags)).toCompanion(false);
+        }).toList();
+        await db.batch((b) {
+          b.replaceAll(db.appProxyEntries, updatedCompanions);
+        });
+      }
+      // adding auto selected
+      if (autoList.isNotEmpty) {
+        await db.batch((b) {
+          b.insertAll(
+            db.appProxyEntries,
+            autoList.map((pkg) => AppProxyEntriesCompanion.insert(mode: mode, pkgName: pkg, flags: Value(PkgFlag.autoSelection.add(0)))),
+            onConflict: DoUpdate((AppProxyEntries old) {
+              return AppProxyEntriesCompanion.custom(flags: old.flags.bitwiseOr(Constant(PkgFlag.autoSelection.value)));
+            }),
           );
-        }
-        // adding auto selected
-        if (autoList.isNotEmpty) {
-          await db.batch(
-            (b) {
-              b.insertAll(
-                db.appProxyEntries,
-                autoList.map(
-                  (pkg) => AppProxyEntriesCompanion.insert(
-                    mode: mode,
-                    pkgName: pkg,
-                    flags: Value(PkgFlag.autoSelection.add(0)),
-                  ),
-                ),
-                onConflict: DoUpdate(
-                  (AppProxyEntries old) {
-                    return AppProxyEntriesCompanion.custom(
-                      flags: old.flags.bitwiseOr(Constant(PkgFlag.autoSelection.value)),
-                    );
-                  },
-                ),
-              );
-            },
-          );
-        }
-      },
-    );
+        });
+      }
+    });
   }
 
   @override
   Future<void> clearAutoSelected({required AppProxyMode mode}) {
-    return transaction(
-      () async {
-        // removing all items that have only auto selection
-        await (delete(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode) & (appProxyEntries.flags.equals(PkgFlag.autoSelection.value)))).go();
-        // removing auto selection flag from items
-        await (update(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode))).write(
-          AppProxyEntriesCompanion.custom(
-            flags: appProxyEntries.flags.bitwiseAnd(Constant(~PkgFlag.autoSelection.value)),
-          ),
-        );
-      },
-    );
+    return transaction(() async {
+      // removing all items that have only auto selection
+      await (delete(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode) & (appProxyEntries.flags.equals(PkgFlag.autoSelection.value)))).go();
+      // removing auto selection flag from items
+      await (update(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode))).write(AppProxyEntriesCompanion.custom(flags: appProxyEntries.flags.bitwiseAnd(Constant(~PkgFlag.autoSelection.value))));
+    });
   }
 
   @override
   Future<void> revertForceDeselection({required AppProxyMode mode}) {
     return transaction(() async {
       // remove forceDeselection flag from flags
-      await (update(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode))).write(
-        AppProxyEntriesCompanion.custom(
-          flags: appProxyEntries.flags.bitwiseAnd(Constant(~PkgFlag.forceDeselection.value)),
-        ),
-      );
+      await (update(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode))).write(AppProxyEntriesCompanion.custom(flags: appProxyEntries.flags.bitwiseAnd(Constant(~PkgFlag.forceDeselection.value))));
       // romve extra items
-      await (delete(appProxyEntries)
-            ..where(
-              (tbl) => tbl.mode.equalsValue(mode) & tbl.flags.equals(0),
-            ))
-          .go();
+      await (delete(appProxyEntries)..where((tbl) => tbl.mode.equalsValue(mode) & tbl.flags.equals(0))).go();
     });
   }
 

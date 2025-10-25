@@ -10,67 +10,124 @@ class ProfileEntries extends Table
   final String? _alias;
   ProfileEntries(this.attachedDatabase, [this._alias]);
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   late final GeneratedColumn<String> type = GeneratedColumn<String>(
-      'type', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   late final GeneratedColumn<bool> active = GeneratedColumn<bool>(
-      'active', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("active" IN (0, 1))'));
-  late final GeneratedColumn<String> name =
-      GeneratedColumn<String>('name', aliasedName, false,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 1,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: true);
+    'active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("active" IN (0, 1))',
+    ),
+  );
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 1),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   late final GeneratedColumn<String> url = GeneratedColumn<String>(
-      'url', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   late final GeneratedColumn<DateTime> lastUpdate = GeneratedColumn<DateTime>(
-      'last_update', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'last_update',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   late final GeneratedColumn<int> updateInterval = GeneratedColumn<int>(
-      'update_interval', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'update_interval',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   late final GeneratedColumn<int> upload = GeneratedColumn<int>(
-      'upload', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'upload',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   late final GeneratedColumn<int> download = GeneratedColumn<int>(
-      'download', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'download',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   late final GeneratedColumn<int> total = GeneratedColumn<int>(
-      'total', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'total',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   late final GeneratedColumn<DateTime> expire = GeneratedColumn<DateTime>(
-      'expire', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+    'expire',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   late final GeneratedColumn<String> webPageUrl = GeneratedColumn<String>(
-      'web_page_url', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'web_page_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   late final GeneratedColumn<String> supportUrl = GeneratedColumn<String>(
-      'support_url', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'support_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  late final GeneratedColumn<String> testUrl = GeneratedColumn<String>(
+    'test_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        id,
-        type,
-        active,
-        name,
-        url,
-        lastUpdate,
-        updateInterval,
-        upload,
-        download,
-        total,
-        expire,
-        webPageUrl,
-        supportUrl
-      ];
+    id,
+    type,
+    active,
+    name,
+    url,
+    lastUpdate,
+    updateInterval,
+    upload,
+    download,
+    total,
+    expire,
+    webPageUrl,
+    supportUrl,
+    testUrl,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -82,32 +139,62 @@ class ProfileEntries extends Table
   ProfileEntriesData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ProfileEntriesData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      type: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
-      active: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}active'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      url: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}url']),
-      lastUpdate: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}last_update'])!,
-      updateInterval: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}update_interval']),
-      upload: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}upload']),
-      download: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}download']),
-      total: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}total']),
-      expire: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}expire']),
-      webPageUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}web_page_url']),
-      supportUrl: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}support_url']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      active: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}active'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      url: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}url'],
+      ),
+      lastUpdate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_update'],
+      )!,
+      updateInterval: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}update_interval'],
+      ),
+      upload: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}upload'],
+      ),
+      download: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}download'],
+      ),
+      total: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total'],
+      ),
+      expire: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}expire'],
+      ),
+      webPageUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}web_page_url'],
+      ),
+      supportUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}support_url'],
+      ),
+      testUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}test_url'],
+      ),
     );
   }
 
@@ -132,20 +219,23 @@ class ProfileEntriesData extends DataClass
   final DateTime? expire;
   final String? webPageUrl;
   final String? supportUrl;
-  const ProfileEntriesData(
-      {required this.id,
-      required this.type,
-      required this.active,
-      required this.name,
-      this.url,
-      required this.lastUpdate,
-      this.updateInterval,
-      this.upload,
-      this.download,
-      this.total,
-      this.expire,
-      this.webPageUrl,
-      this.supportUrl});
+  final String? testUrl;
+  const ProfileEntriesData({
+    required this.id,
+    required this.type,
+    required this.active,
+    required this.name,
+    this.url,
+    required this.lastUpdate,
+    this.updateInterval,
+    this.upload,
+    this.download,
+    this.total,
+    this.expire,
+    this.webPageUrl,
+    this.supportUrl,
+    this.testUrl,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -178,6 +268,9 @@ class ProfileEntriesData extends DataClass
     if (!nullToAbsent || supportUrl != null) {
       map['support_url'] = Variable<String>(supportUrl);
     }
+    if (!nullToAbsent || testUrl != null) {
+      map['test_url'] = Variable<String>(testUrl);
+    }
     return map;
   }
 
@@ -192,26 +285,34 @@ class ProfileEntriesData extends DataClass
       updateInterval: updateInterval == null && nullToAbsent
           ? const Value.absent()
           : Value(updateInterval),
-      upload:
-          upload == null && nullToAbsent ? const Value.absent() : Value(upload),
+      upload: upload == null && nullToAbsent
+          ? const Value.absent()
+          : Value(upload),
       download: download == null && nullToAbsent
           ? const Value.absent()
           : Value(download),
-      total:
-          total == null && nullToAbsent ? const Value.absent() : Value(total),
-      expire:
-          expire == null && nullToAbsent ? const Value.absent() : Value(expire),
+      total: total == null && nullToAbsent
+          ? const Value.absent()
+          : Value(total),
+      expire: expire == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expire),
       webPageUrl: webPageUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(webPageUrl),
       supportUrl: supportUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(supportUrl),
+      testUrl: testUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(testUrl),
     );
   }
 
-  factory ProfileEntriesData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory ProfileEntriesData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ProfileEntriesData(
       id: serializer.fromJson<String>(json['id']),
@@ -227,6 +328,7 @@ class ProfileEntriesData extends DataClass
       expire: serializer.fromJson<DateTime?>(json['expire']),
       webPageUrl: serializer.fromJson<String?>(json['webPageUrl']),
       supportUrl: serializer.fromJson<String?>(json['supportUrl']),
+      testUrl: serializer.fromJson<String?>(json['testUrl']),
     );
   }
   @override
@@ -246,39 +348,43 @@ class ProfileEntriesData extends DataClass
       'expire': serializer.toJson<DateTime?>(expire),
       'webPageUrl': serializer.toJson<String?>(webPageUrl),
       'supportUrl': serializer.toJson<String?>(supportUrl),
+      'testUrl': serializer.toJson<String?>(testUrl),
     };
   }
 
-  ProfileEntriesData copyWith(
-          {String? id,
-          String? type,
-          bool? active,
-          String? name,
-          Value<String?> url = const Value.absent(),
-          DateTime? lastUpdate,
-          Value<int?> updateInterval = const Value.absent(),
-          Value<int?> upload = const Value.absent(),
-          Value<int?> download = const Value.absent(),
-          Value<int?> total = const Value.absent(),
-          Value<DateTime?> expire = const Value.absent(),
-          Value<String?> webPageUrl = const Value.absent(),
-          Value<String?> supportUrl = const Value.absent()}) =>
-      ProfileEntriesData(
-        id: id ?? this.id,
-        type: type ?? this.type,
-        active: active ?? this.active,
-        name: name ?? this.name,
-        url: url.present ? url.value : this.url,
-        lastUpdate: lastUpdate ?? this.lastUpdate,
-        updateInterval:
-            updateInterval.present ? updateInterval.value : this.updateInterval,
-        upload: upload.present ? upload.value : this.upload,
-        download: download.present ? download.value : this.download,
-        total: total.present ? total.value : this.total,
-        expire: expire.present ? expire.value : this.expire,
-        webPageUrl: webPageUrl.present ? webPageUrl.value : this.webPageUrl,
-        supportUrl: supportUrl.present ? supportUrl.value : this.supportUrl,
-      );
+  ProfileEntriesData copyWith({
+    String? id,
+    String? type,
+    bool? active,
+    String? name,
+    Value<String?> url = const Value.absent(),
+    DateTime? lastUpdate,
+    Value<int?> updateInterval = const Value.absent(),
+    Value<int?> upload = const Value.absent(),
+    Value<int?> download = const Value.absent(),
+    Value<int?> total = const Value.absent(),
+    Value<DateTime?> expire = const Value.absent(),
+    Value<String?> webPageUrl = const Value.absent(),
+    Value<String?> supportUrl = const Value.absent(),
+    Value<String?> testUrl = const Value.absent(),
+  }) => ProfileEntriesData(
+    id: id ?? this.id,
+    type: type ?? this.type,
+    active: active ?? this.active,
+    name: name ?? this.name,
+    url: url.present ? url.value : this.url,
+    lastUpdate: lastUpdate ?? this.lastUpdate,
+    updateInterval: updateInterval.present
+        ? updateInterval.value
+        : this.updateInterval,
+    upload: upload.present ? upload.value : this.upload,
+    download: download.present ? download.value : this.download,
+    total: total.present ? total.value : this.total,
+    expire: expire.present ? expire.value : this.expire,
+    webPageUrl: webPageUrl.present ? webPageUrl.value : this.webPageUrl,
+    supportUrl: supportUrl.present ? supportUrl.value : this.supportUrl,
+    testUrl: testUrl.present ? testUrl.value : this.testUrl,
+  );
   ProfileEntriesData copyWithCompanion(ProfileEntriesCompanion data) {
     return ProfileEntriesData(
       id: data.id.present ? data.id.value : this.id,
@@ -286,8 +392,9 @@ class ProfileEntriesData extends DataClass
       active: data.active.present ? data.active.value : this.active,
       name: data.name.present ? data.name.value : this.name,
       url: data.url.present ? data.url.value : this.url,
-      lastUpdate:
-          data.lastUpdate.present ? data.lastUpdate.value : this.lastUpdate,
+      lastUpdate: data.lastUpdate.present
+          ? data.lastUpdate.value
+          : this.lastUpdate,
       updateInterval: data.updateInterval.present
           ? data.updateInterval.value
           : this.updateInterval,
@@ -295,10 +402,13 @@ class ProfileEntriesData extends DataClass
       download: data.download.present ? data.download.value : this.download,
       total: data.total.present ? data.total.value : this.total,
       expire: data.expire.present ? data.expire.value : this.expire,
-      webPageUrl:
-          data.webPageUrl.present ? data.webPageUrl.value : this.webPageUrl,
-      supportUrl:
-          data.supportUrl.present ? data.supportUrl.value : this.supportUrl,
+      webPageUrl: data.webPageUrl.present
+          ? data.webPageUrl.value
+          : this.webPageUrl,
+      supportUrl: data.supportUrl.present
+          ? data.supportUrl.value
+          : this.supportUrl,
+      testUrl: data.testUrl.present ? data.testUrl.value : this.testUrl,
     );
   }
 
@@ -317,14 +427,29 @@ class ProfileEntriesData extends DataClass
           ..write('total: $total, ')
           ..write('expire: $expire, ')
           ..write('webPageUrl: $webPageUrl, ')
-          ..write('supportUrl: $supportUrl')
+          ..write('supportUrl: $supportUrl, ')
+          ..write('testUrl: $testUrl')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, type, active, name, url, lastUpdate,
-      updateInterval, upload, download, total, expire, webPageUrl, supportUrl);
+  int get hashCode => Object.hash(
+    id,
+    type,
+    active,
+    name,
+    url,
+    lastUpdate,
+    updateInterval,
+    upload,
+    download,
+    total,
+    expire,
+    webPageUrl,
+    supportUrl,
+    testUrl,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -341,7 +466,8 @@ class ProfileEntriesData extends DataClass
           other.total == this.total &&
           other.expire == this.expire &&
           other.webPageUrl == this.webPageUrl &&
-          other.supportUrl == this.supportUrl);
+          other.supportUrl == this.supportUrl &&
+          other.testUrl == this.testUrl);
 }
 
 class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
@@ -358,6 +484,7 @@ class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
   final Value<DateTime?> expire;
   final Value<String?> webPageUrl;
   final Value<String?> supportUrl;
+  final Value<String?> testUrl;
   final Value<int> rowid;
   const ProfileEntriesCompanion({
     this.id = const Value.absent(),
@@ -373,6 +500,7 @@ class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
     this.expire = const Value.absent(),
     this.webPageUrl = const Value.absent(),
     this.supportUrl = const Value.absent(),
+    this.testUrl = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProfileEntriesCompanion.insert({
@@ -389,12 +517,13 @@ class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
     this.expire = const Value.absent(),
     this.webPageUrl = const Value.absent(),
     this.supportUrl = const Value.absent(),
+    this.testUrl = const Value.absent(),
     this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        type = Value(type),
-        active = Value(active),
-        name = Value(name),
-        lastUpdate = Value(lastUpdate);
+  }) : id = Value(id),
+       type = Value(type),
+       active = Value(active),
+       name = Value(name),
+       lastUpdate = Value(lastUpdate);
   static Insertable<ProfileEntriesData> custom({
     Expression<String>? id,
     Expression<String>? type,
@@ -409,6 +538,7 @@ class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
     Expression<DateTime>? expire,
     Expression<String>? webPageUrl,
     Expression<String>? supportUrl,
+    Expression<String>? testUrl,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -425,25 +555,28 @@ class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
       if (expire != null) 'expire': expire,
       if (webPageUrl != null) 'web_page_url': webPageUrl,
       if (supportUrl != null) 'support_url': supportUrl,
+      if (testUrl != null) 'test_url': testUrl,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
-  ProfileEntriesCompanion copyWith(
-      {Value<String>? id,
-      Value<String>? type,
-      Value<bool>? active,
-      Value<String>? name,
-      Value<String?>? url,
-      Value<DateTime>? lastUpdate,
-      Value<int?>? updateInterval,
-      Value<int?>? upload,
-      Value<int?>? download,
-      Value<int?>? total,
-      Value<DateTime?>? expire,
-      Value<String?>? webPageUrl,
-      Value<String?>? supportUrl,
-      Value<int>? rowid}) {
+  ProfileEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? type,
+    Value<bool>? active,
+    Value<String>? name,
+    Value<String?>? url,
+    Value<DateTime>? lastUpdate,
+    Value<int?>? updateInterval,
+    Value<int?>? upload,
+    Value<int?>? download,
+    Value<int?>? total,
+    Value<DateTime?>? expire,
+    Value<String?>? webPageUrl,
+    Value<String?>? supportUrl,
+    Value<String?>? testUrl,
+    Value<int>? rowid,
+  }) {
     return ProfileEntriesCompanion(
       id: id ?? this.id,
       type: type ?? this.type,
@@ -458,6 +591,7 @@ class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
       expire: expire ?? this.expire,
       webPageUrl: webPageUrl ?? this.webPageUrl,
       supportUrl: supportUrl ?? this.supportUrl,
+      testUrl: testUrl ?? this.testUrl,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -504,6 +638,9 @@ class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
     if (supportUrl.present) {
       map['support_url'] = Variable<String>(supportUrl.value);
     }
+    if (testUrl.present) {
+      map['test_url'] = Variable<String>(testUrl.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -526,6 +663,7 @@ class ProfileEntriesCompanion extends UpdateCompanion<ProfileEntriesData> {
           ..write('expire: $expire, ')
           ..write('webPageUrl: $webPageUrl, ')
           ..write('supportUrl: $supportUrl, ')
+          ..write('testUrl: $testUrl, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -539,40 +677,69 @@ class GeoAssetEntries extends Table
   final String? _alias;
   GeoAssetEntries(this.attachedDatabase, [this._alias]);
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   late final GeneratedColumn<String> type = GeneratedColumn<String>(
-      'type', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   late final GeneratedColumn<bool> active = GeneratedColumn<bool>(
-      'active', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("active" IN (0, 1))'));
-  late final GeneratedColumn<String> name =
-      GeneratedColumn<String>('name', aliasedName, false,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 1,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: true);
-  late final GeneratedColumn<String> providerName =
-      GeneratedColumn<String>('provider_name', aliasedName, false,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 1,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: true);
+    'active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("active" IN (0, 1))',
+    ),
+  );
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 1),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  late final GeneratedColumn<String> providerName = GeneratedColumn<String>(
+    'provider_name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(minTextLength: 1),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   late final GeneratedColumn<String> version = GeneratedColumn<String>(
-      'version', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+    'version',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   late final GeneratedColumn<DateTime> lastCheck = GeneratedColumn<DateTime>(
-      'last_check', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+    'last_check',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, type, active, name, providerName, version, lastCheck];
+  List<GeneratedColumn> get $columns => [
+    id,
+    type,
+    active,
+    name,
+    providerName,
+    version,
+    lastCheck,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -582,26 +749,40 @@ class GeoAssetEntries extends Table
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-        {name, providerName},
-      ];
+    {name, providerName},
+  ];
   @override
   GeoAssetEntriesData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return GeoAssetEntriesData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      type: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}type'])!,
-      active: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}active'])!,
-      name: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
-      providerName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}provider_name'])!,
-      version: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}version']),
-      lastCheck: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}last_check']),
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      active: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}active'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      providerName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}provider_name'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}version'],
+      ),
+      lastCheck: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_check'],
+      ),
     );
   }
 
@@ -620,14 +801,15 @@ class GeoAssetEntriesData extends DataClass
   final String providerName;
   final String? version;
   final DateTime? lastCheck;
-  const GeoAssetEntriesData(
-      {required this.id,
-      required this.type,
-      required this.active,
-      required this.name,
-      required this.providerName,
-      this.version,
-      this.lastCheck});
+  const GeoAssetEntriesData({
+    required this.id,
+    required this.type,
+    required this.active,
+    required this.name,
+    required this.providerName,
+    this.version,
+    this.lastCheck,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -661,8 +843,10 @@ class GeoAssetEntriesData extends DataClass
     );
   }
 
-  factory GeoAssetEntriesData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory GeoAssetEntriesData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return GeoAssetEntriesData(
       id: serializer.fromJson<String>(json['id']),
@@ -688,23 +872,23 @@ class GeoAssetEntriesData extends DataClass
     };
   }
 
-  GeoAssetEntriesData copyWith(
-          {String? id,
-          String? type,
-          bool? active,
-          String? name,
-          String? providerName,
-          Value<String?> version = const Value.absent(),
-          Value<DateTime?> lastCheck = const Value.absent()}) =>
-      GeoAssetEntriesData(
-        id: id ?? this.id,
-        type: type ?? this.type,
-        active: active ?? this.active,
-        name: name ?? this.name,
-        providerName: providerName ?? this.providerName,
-        version: version.present ? version.value : this.version,
-        lastCheck: lastCheck.present ? lastCheck.value : this.lastCheck,
-      );
+  GeoAssetEntriesData copyWith({
+    String? id,
+    String? type,
+    bool? active,
+    String? name,
+    String? providerName,
+    Value<String?> version = const Value.absent(),
+    Value<DateTime?> lastCheck = const Value.absent(),
+  }) => GeoAssetEntriesData(
+    id: id ?? this.id,
+    type: type ?? this.type,
+    active: active ?? this.active,
+    name: name ?? this.name,
+    providerName: providerName ?? this.providerName,
+    version: version.present ? version.value : this.version,
+    lastCheck: lastCheck.present ? lastCheck.value : this.lastCheck,
+  );
   GeoAssetEntriesData copyWithCompanion(GeoAssetEntriesCompanion data) {
     return GeoAssetEntriesData(
       id: data.id.present ? data.id.value : this.id,
@@ -777,11 +961,11 @@ class GeoAssetEntriesCompanion extends UpdateCompanion<GeoAssetEntriesData> {
     this.version = const Value.absent(),
     this.lastCheck = const Value.absent(),
     this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        type = Value(type),
-        active = Value(active),
-        name = Value(name),
-        providerName = Value(providerName);
+  }) : id = Value(id),
+       type = Value(type),
+       active = Value(active),
+       name = Value(name),
+       providerName = Value(providerName);
   static Insertable<GeoAssetEntriesData> custom({
     Expression<String>? id,
     Expression<String>? type,
@@ -804,15 +988,16 @@ class GeoAssetEntriesCompanion extends UpdateCompanion<GeoAssetEntriesData> {
     });
   }
 
-  GeoAssetEntriesCompanion copyWith(
-      {Value<String>? id,
-      Value<String>? type,
-      Value<bool>? active,
-      Value<String>? name,
-      Value<String>? providerName,
-      Value<String?>? version,
-      Value<DateTime?>? lastCheck,
-      Value<int>? rowid}) {
+  GeoAssetEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? type,
+    Value<bool>? active,
+    Value<String>? name,
+    Value<String>? providerName,
+    Value<String?>? version,
+    Value<DateTime?>? lastCheck,
+    Value<int>? rowid,
+  }) {
     return GeoAssetEntriesCompanion(
       id: id ?? this.id,
       type: type ?? this.type,
@@ -871,18 +1056,20 @@ class GeoAssetEntriesCompanion extends UpdateCompanion<GeoAssetEntriesData> {
   }
 }
 
-class DatabaseAtV3 extends GeneratedDatabase {
-  DatabaseAtV3(QueryExecutor e) : super(e);
+class DatabaseAtV4 extends GeneratedDatabase {
+  DatabaseAtV4(QueryExecutor e) : super(e);
   late final ProfileEntries profileEntries = ProfileEntries(this);
   late final GeoAssetEntries geoAssetEntries = GeoAssetEntries(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [profileEntries, geoAssetEntries];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    profileEntries,
+    geoAssetEntries,
+  ];
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
   @override
   DriftDatabaseOptions get options =>
       const DriftDatabaseOptions(storeDateTimeAsText: true);

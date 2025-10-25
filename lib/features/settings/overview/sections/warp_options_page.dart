@@ -17,14 +17,13 @@ class WarpOptionsPage extends HookConsumerWidget {
     final warpOptions = ref.watch(warpOptionNotifierProvider);
     final isWarpEnabled = ref.watch(ConfigOptions.enableWarp);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.settings.warp.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.settings.warp.title)),
       body: ListView(
         children: [
           SwitchListTile.adaptive(
             title: Text(t.pages.settings.warp.enable),
             value: isWarpEnabled,
+            secondary: const Icon(Icons.cloud_rounded),
             onChanged: (value) async {
               await ref.read(ConfigOptions.enableWarp.notifier).update(value);
               if (value) await ref.read(warpOptionNotifierProvider.notifier).genWarps();
@@ -37,10 +36,7 @@ class WarpOptionsPage extends HookConsumerWidget {
                 : warpOptions.when(
                     loading: () => null,
                     data: (_) => null,
-                    error: (_, __) => Text(
-                      t.pages.settings.warp.missingConfig,
-                      style: TextStyle(color: theme.colorScheme.error),
-                    ),
+                    error: (_, _) => Text(t.pages.settings.warp.missingConfig, style: TextStyle(color: theme.colorScheme.error)),
                   ),
             trailing: warpOptions.isLoading ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator()) : null,
             leading: const Icon(Icons.build_rounded),
@@ -68,13 +64,7 @@ class WarpOptionsPage extends HookConsumerWidget {
             icon: Icons.key_rounded,
             presentValue: (value) => value.isEmpty ? t.common.notSet : value,
           ),
-          ValuePreferenceWidget(
-            value: ref.watch(ConfigOptions.warpCleanIp),
-            preferences: ref.watch(ConfigOptions.warpCleanIp.notifier),
-            enabled: isWarpEnabled,
-            title: t.pages.settings.warp.cleanIp,
-            icon: Icons.auto_awesome_rounded,
-          ),
+          ValuePreferenceWidget(value: ref.watch(ConfigOptions.warpCleanIp), preferences: ref.watch(ConfigOptions.warpCleanIp.notifier), enabled: isWarpEnabled, title: t.pages.settings.warp.cleanIp, icon: Icons.auto_awesome_rounded),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.warpPort),
             preferences: ref.watch(ConfigOptions.warpPort.notifier),
@@ -95,13 +85,7 @@ class WarpOptionsPage extends HookConsumerWidget {
             presentValue: (value) => value.present(t),
             formatInputValue: (value) => value.format(),
           ),
-          ValuePreferenceWidget(
-            value: ref.watch(ConfigOptions.warpNoiseMode),
-            preferences: ref.watch(ConfigOptions.warpNoiseMode.notifier),
-            enabled: isWarpEnabled,
-            title: t.pages.settings.warp.noise.mode,
-            icon: Icons.mode_standby_rounded,
-          ),
+          ValuePreferenceWidget(value: ref.watch(ConfigOptions.warpNoiseMode), preferences: ref.watch(ConfigOptions.warpNoiseMode.notifier), enabled: isWarpEnabled, title: t.pages.settings.warp.noise.mode, icon: Icons.mode_standby_rounded),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.warpNoiseSize),
             preferences: ref.watch(ConfigOptions.warpNoiseSize.notifier),

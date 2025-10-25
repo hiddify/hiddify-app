@@ -20,6 +20,7 @@ class TlsTricksPage extends HookConsumerWidget {
           SwitchListTile.adaptive(
             title: Text(t.pages.settings.tlsTricks.enable),
             value: ref.watch(ConfigOptions.enableTlsFragment),
+            secondary: const Icon(Icons.content_cut_rounded),
             onChanged: ref.read(ConfigOptions.enableTlsFragment.notifier).update,
           ),
           ValuePreferenceWidget(
@@ -51,13 +52,14 @@ class TlsTricksPage extends HookConsumerWidget {
           SwitchListTile.adaptive(
             title: Text(t.pages.settings.tlsTricks.padding.enable),
             value: ref.watch(ConfigOptions.enableTlsPadding),
+            secondary: const Icon(Icons.expand_rounded),
             onChanged: canChangeOption ? ref.read(ConfigOptions.enableTlsPadding.notifier).update : null,
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.tlsPaddingSize),
             preferences: ref.watch(ConfigOptions.tlsPaddingSize.notifier),
             title: t.pages.settings.tlsTricks.padding.size,
-            icon: Icons.expand_rounded,
+            icon: Icons.straighten_rounded,
             inputToValue: OptionalRange.tryParse,
             presentValue: (value) => value.format(),
             formatInputValue: (value) => value.format(),

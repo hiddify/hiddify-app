@@ -46,12 +46,16 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     // if (PlatformUtils.isDesktop) return;
     final dirs = ref.read(appDirectoriesProvider).requireValue;
     final singbox = ref.read(hiddifyCoreServiceProvider);
-    singbox.setup(dirs, false).mapLeft((e) {
-      loggy.error(e);
-      ref.read(inAppNotificationControllerProvider).showErrorToast(e);
-    }).map((_) {
-      loggy.info("Hiddify-core setup done");
-    }).run();
+    singbox
+        .setup(dirs, false)
+        .mapLeft((e) {
+          loggy.error(e);
+          ref.read(inAppNotificationControllerProvider).showErrorToast(e);
+        })
+        .map((_) {
+          loggy.info("Hiddify-core setup done");
+        })
+        .run();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isOnPauseCalled && PlatformUtils.isAndroid) ref.invalidate(perAppProxyServiceProvider);
       isOnPauseCalled = false;
@@ -68,20 +72,17 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     final upgrader = ref.watch(upgraderProvider);
     final activeBreakpoint = Breakpoint(context).activeBreakpoint;
 
-    ref.listen(foregroundProfilesUpdateNotifierProvider, (_, __) {});
-    if (PlatformUtils.isAndroid) ref.listen(perAppProxyServiceProvider, (_, __) {});
-    if (PlatformUtils.isDesktop) ref.listen(systemTrayNotifierProvider, (_, __) {});
+    ref.listen(foregroundProfilesUpdateNotifierProvider, (_, _) {});
+    if (PlatformUtils.isAndroid) ref.listen(perAppProxyServiceProvider, (_, _) {});
+    if (PlatformUtils.isDesktop) ref.listen(systemTrayNotifierProvider, (_, _) {});
 
     // updating ActiveBreakpointNotifier value
-    useEffect(
-      () {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ref.read(activeBreakpointNotifierProvider.notifier).update(activeBreakpoint);
-        });
-        return null;
-      },
-      [activeBreakpoint],
-    );
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(activeBreakpointNotifierProvider.notifier).update(activeBreakpoint);
+      });
+      return null;
+    }, [activeBreakpoint]);
     return WindowWrapper(
       ShortcutWrapper(
         ToastificationWrapper(
@@ -100,16 +101,9 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                   title: Constants.appName,
                   builder: (context, child) {
                     final theme = Theme.of(context);
-                    child = UpgradeAlert(
-                      upgrader: upgrader,
-                      navigatorKey: router.routerDelegate.navigatorKey,
-                      child: child ?? const SizedBox(),
-                    );
+                    child = UpgradeAlert(upgrader: upgrader, navigatorKey: router.routerDelegate.navigatorKey, child: child ?? const SizedBox());
                     if (kDebugMode && _debugAccessibility) {
-                      return AccessibilityTools(
-                        checkFontOverflows: true,
-                        child: child,
-                      );
+                      return AccessibilityTools(checkFontOverflows: true, child: child);
                     }
                     return AnnotatedRegion<SystemUiOverlayStyle>(
                       value: SystemUiOverlayStyle(

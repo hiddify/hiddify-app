@@ -2,7 +2,7 @@
 // ignore_for_file: unused_local_variable, unused_import
 import 'package:drift/drift.dart';
 import 'package:drift_dev/api/migrations_native.dart';
-import 'package:hiddify/core/database/app_database.dart';
+import 'package:hiddify/core/db/v1/db_v1.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'generated/schema.dart';
 
@@ -27,7 +27,7 @@ void main() {
         for (final toVersion in versions.skip(i + 1)) {
           test('to $toVersion', () async {
             final schema = await verifier.schemaAt(fromVersion);
-            final db = AppDatabase(schema.newConnection());
+            final db = DbV1(schema.newConnection());
             await verifier.migrateAndValidate(db, toVersion);
             await db.close();
           });
@@ -56,12 +56,15 @@ void main() {
       newVersion: 2,
       createOld: v1.DatabaseAtV1.new,
       createNew: v2.DatabaseAtV2.new,
-      openTestedDatabase: AppDatabase.new,
+      openTestedDatabase: DbV1.new,
       createItems: (batch, oldDb) {
         batch.insertAll(oldDb.profileEntries, oldProfileEntriesData);
       },
       validateItems: (newDb) async {
-        expect(expectedNewProfileEntriesData, await newDb.select(newDb.profileEntries).get());
+        expect(
+          expectedNewProfileEntriesData,
+          await newDb.select(newDb.profileEntries).get(),
+        );
       },
     );
   });
