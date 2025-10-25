@@ -254,14 +254,14 @@ class BoxService(
                 fileDescriptor = null
             }
 //            commandServer?.setService(null)
-//            boxService?.apply {
-//                runCatching {
-//                    close()
-//                }.onFailure {
-//                    writeLog("service: error when closing: $it")
-//                }
-//                Seq.destroyRef(refnum)
-//            }
+            boxService?.apply {
+                runCatching {
+                    close()
+                }.onFailure {
+                    writeLog("service: error when closing: $it")
+                }
+                Seq.destroyRef(refnum)
+            }
             Mobile.close(4L)
 //            boxService = null
             Libbox.registerLocalDNSTransport(null)

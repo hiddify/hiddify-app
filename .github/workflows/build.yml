@@ -106,6 +106,7 @@ jobs:
            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
            echo "${{secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
            ls ~/Library/MobileDevice/Provisioning\ Profiles
+           security find-identity -v -p codesigning
         #   ls ~/Library/MobileDevice/Provisioning\ Profiles
         #   echo "${{secrets.NEW_APPLE_MOBILE_PROVISIONING_PROFILES_TARXZ_BASE64}}"|base64 --decode | tar xJ -C ~/Library/MobileDevice/Provisioning\ Profiles
         #   # echo "${{secrets.NEW_APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64_2}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
@@ -333,7 +334,7 @@ jobs:
       - name: Create or Update Draft Release
         uses: softprops/action-gh-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_FOR_HIDDIFY_APP_REPO }}
           GITHUB_REPOSITORY: hiddify/hiddify-app
         with:
           files: ./out/*

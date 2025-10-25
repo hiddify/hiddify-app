@@ -1,5 +1,5 @@
 display_name: Hiddify
-url: https://github.com/hiddify/hiddify-next/
+url: https://github.com/hiddify/hiddify-app/
 license: Other
 
 packager: hiddify
@@ -35,3 +35,5 @@ supported_mime_type:
   - x-scheme-handler/clash
   - x-scheme-handler/clashmeta
   - x-scheme-handler/sing-box
+
+metainfo: linux/packaging/app.hiddify.com.appdata.xml

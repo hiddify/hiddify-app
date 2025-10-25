@@ -13,21 +13,28 @@
             <title>Version 0.13.6</title>
             <pubDate>Sun, 7 Jan 2024 22:00:00 +0000</pubDate>
             <enclosure
-                url="https://github.com/hiddify/hiddify-next/releases/download/v0.13.6/hiddify-windows-x64-setup.zip"
+                url="hhttps://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532"
+                sparkle:version="0.13.6" sparkle:os="ios" />
+        </item>
+        <item>
+            <title>Version 0.13.6</title>
+            <pubDate>Sun, 7 Jan 2024 22:00:00 +0000</pubDate>
+            <enclosure
+                url="https://github.com/hiddify/hiddify-app/releases/download/v0.13.6/hiddify-windows-x64-setup.zip"
                 sparkle:version="0.13.6" sparkle:os="windows" />
         </item>
         <item>
             <title>Version 0.13.6</title>
             <pubDate>Sun, 7 Jan 2024 22:00:00 +0000</pubDate>
             <enclosure
-                url="https://github.com/hiddify/hiddify-next/releases/download/v0.13.6/hiddify-macos-universal.zip"
+                url="https://github.com/hiddify/hiddify-app/releases/download/v0.13.6/hiddify-macos-universal.zip"
                 sparkle:version="0.13.6" sparkle:os="macos" />
         </item>
         <item>
             <title>Version 0.13.6</title>
             <pubDate>Sun, 7 Jan 2024 22:00:00 +0000</pubDate>
             <enclosure
-                url="https://github.com/hiddify/hiddify-next/releases/download/v0.13.6/hiddify-linux-x64.zip"
+                url="https://github.com/hiddify/hiddify-app/releases/download/v0.13.6/hiddify-linux-x64.zip"
                 sparkle:version="0.13.6" sparkle:os="linux" />
         </item>
     </channel>

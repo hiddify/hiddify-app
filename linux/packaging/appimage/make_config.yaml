@@ -41,3 +41,5 @@ app_run_file: AppRun
 # include:
 #   - libcurl.so.4
 include: []
+
+metainfo: linux/packaging/app.hiddify.com.appdata.xml
