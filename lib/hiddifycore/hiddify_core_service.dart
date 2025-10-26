@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:grpc/grpc.dart';
@@ -79,11 +78,11 @@ class HiddifyCoreService with InfraLogger {
           return left(setupResponse);
         }
         await startListeningLogs("fg", core.fgClient);
-        await startListeningStatus("fg", core.fgClient);
+        // await startListeningStatus("fg", core.fgClient);
         if (!core.isSingleChannel()) {
           await startListeningLogs("bg", core.bgClient);
-          await startListeningStatus("bg", core.bgClient);
         }
+        await startListeningStatus("bg", core.bgClient);
 
         return right(unit);
       } catch (e) {
@@ -341,6 +340,18 @@ class HiddifyCoreService with InfraLogger {
     );
   }
 
+  Future<void> stopListenSingle(String key) async {
+    // Collect keys to remove first
+    final keysToRemove = subscriptions.entries.where((entry) => entry.key.startsWith(key)).map((entry) => entry.key).toList();
+
+    // Cancel and remove
+    for (final k in keysToRemove) {
+      final sub = subscriptions[k];
+      await sub?.cancel(); // cancel the subscription
+      subscriptions.remove(k);
+    }
+  }
+
   Future<StreamSubscription<T>?> listenSingle<T>(String key, Stream<T> Function() stream) async {
     if (subscriptions.containsKey(key)) {
       return subscriptions[key] as StreamSubscription<T>?;
@@ -367,5 +378,17 @@ class HiddifyCoreService with InfraLogger {
       LogLevel.FATAL => loggyl.LogLevel.error,
       _ => loggyl.LogLevel.info, // Default case
     };
+  }
+
+  Future<void> pause() async {
+    if (!core.isSingleChannel()) {
+      await stopListenSingle("fg");
+      try {
+        await core.fgClient.pause(PauseRequest(mode: SetupMode.GRPC_NORMAL_INSECURE));
+      } catch (e) {}
+      try {
+        await core.fgClient.pause(PauseRequest(mode: SetupMode.GRPC_NORMAL));
+      } catch (e) {}
+    }
   }
 }

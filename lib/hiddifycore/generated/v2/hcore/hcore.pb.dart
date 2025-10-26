@@ -223,6 +223,53 @@ class StartRequest extends $pb.GeneratedMessage {
   void clearConfigName() => clearField(7);
 }
 
+class PauseRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PauseRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..e<SetupMode>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mode', $pb.PbFieldType.OE, defaultOrMaker: SetupMode.OLD, valueOf: SetupMode.valueOf, enumValues: SetupMode.values)
+    ..hasRequiredFields = false
+  ;
+
+  PauseRequest._() : super();
+  factory PauseRequest({
+    SetupMode? mode,
+  }) {
+    final _result = create();
+    if (mode != null) {
+      _result.mode = mode;
+    }
+    return _result;
+  }
+  factory PauseRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory PauseRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  PauseRequest clone() => PauseRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  PauseRequest copyWith(void Function(PauseRequest) updates) => super.copyWith((message) => updates(message as PauseRequest)) as PauseRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static PauseRequest create() => PauseRequest._();
+  PauseRequest createEmptyInstance() => create();
+  static $pb.PbList<PauseRequest> createRepeated() => $pb.PbList<PauseRequest>();
+  @$core.pragma('dart2js:noInline')
+  static PauseRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PauseRequest>(create);
+  static PauseRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  SetupMode get mode => $_getN(0);
+  @$pb.TagNumber(1)
+  set mode(SetupMode v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasMode() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMode() => clearField(1);
+}
+
 class SetupRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SetupRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'basePath')

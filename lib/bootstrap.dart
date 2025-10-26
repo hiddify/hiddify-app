@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -121,12 +120,13 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     //   );
     // }
 
-    if (Platform.isAndroid) {
+    if (PlatformUtils.isAndroid) {
       await _safeInit("android display mode", () async {
         await FlutterDisplayMode.setHighRefreshRate();
       });
     }
   }
+
   Logger.bootstrap.info("bootstrap took [${stopWatch.elapsedMilliseconds}ms]");
   stopWatch.stop();
 

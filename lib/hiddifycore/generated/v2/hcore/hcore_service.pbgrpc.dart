@@ -103,6 +103,10 @@ class CoreClient extends $grpc.Client {
       '/hcore.Core/LogListener',
       ($1.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.LogMessage.fromBuffer(value));
+  static final _$pause = $grpc.ClientMethod<$0.PauseRequest, $1.Empty>(
+      '/hcore.Core/Pause',
+      ($0.PauseRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.Empty.fromBuffer(value));
 
   CoreClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -208,6 +212,11 @@ class CoreClient extends $grpc.Client {
     return $createStreamingCall(
         _$logListener, $async.Stream.fromIterable([request]),
         options: options);
+  }
+
+  $grpc.ResponseFuture<$1.Empty> pause($0.PauseRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$pause, request, options: options);
   }
 }
 
@@ -341,6 +350,13 @@ abstract class CoreServiceBase extends $grpc.Service {
         true,
         ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
         ($0.LogMessage value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.PauseRequest, $1.Empty>(
+        'Pause',
+        pause_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.PauseRequest.fromBuffer(value),
+        ($1.Empty value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.CoreInfoResponse> start_Pre(
@@ -430,6 +446,11 @@ abstract class CoreServiceBase extends $grpc.Service {
     yield* logListener(call, await request);
   }
 
+  $async.Future<$1.Empty> pause_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.PauseRequest> request) async {
+    return pause(call, await request);
+  }
+
   $async.Future<$0.CoreInfoResponse> start(
       $grpc.ServiceCall call, $0.StartRequest request);
   $async.Stream<$0.CoreInfoResponse> coreInfoListener(
@@ -464,4 +485,6 @@ abstract class CoreServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $0.SetSystemProxyEnabledRequest request);
   $async.Stream<$0.LogMessage> logListener(
       $grpc.ServiceCall call, $1.Empty request);
+  $async.Future<$1.Empty> pause(
+      $grpc.ServiceCall call, $0.PauseRequest request);
 }

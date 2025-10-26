@@ -25,6 +25,7 @@ service Core {
   rpc GetSystemProxyStatus (hcommon.Empty) returns (SystemProxyStatus);
   rpc SetSystemProxyEnabled (SetSystemProxyEnabledRequest) returns (hcommon.Response);
   rpc LogListener (hcommon.Empty) returns (stream LogMessage); 
+  rpc Pause (PauseRequest) returns (hcommon.Empty); 
 }
 
 
