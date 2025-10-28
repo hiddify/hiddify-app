@@ -1526,7 +1526,7 @@ fun startService() {
 
 **توجیه تغییر:**
 - جلوگیری از kill شدن سرویس توسط Android در حالت Doze
-- بهبود قابل توجه stability در دستگاه‌های با battery optimization تهاوتمند
+- بهبود قابل توجه stability در دستگاه‌های با battery optimization تهاجمی
 
 ##### ه) Diagnostic Logging
 
@@ -2090,9 +2090,10 @@ override fun onServiceDisconnected(name: ComponentName?) {
 2. `connection_notifier.dart` - یکپارچه‌سازی retry و event tracking
 
 #### 8.9.2 خطوط کد تغییر یافته
-- مجموع خطوط افزوده شده: ~600 خط
-- مجموع خطوط حذف شده: ~80 خط
-- خالص افزایش: ~520 خط
+- مجموع خطوط افزوده شده: ~1248 خط (شامل 827 خط گزارش در debug-dev.md)
+- مجموع خطوط حذف شده: ~42 خط
+- خالص افزایش: ~1206 خط
+- خطوط کد واقعی (بدون documentation): ~421 خط
 - فایل‌های تغییر یافته: 8 فایل
 - فایل‌های جدید: 1 فایل
 
