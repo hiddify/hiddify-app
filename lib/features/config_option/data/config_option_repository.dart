@@ -421,46 +421,55 @@ abstract class ConfigOptions {
 
   static final singboxConfigOptions = FutureProvider<SingboxConfigOption>(
     (ref) async {
-      // final region = ref.watch(Preferences.region);
-      final rules = <SingboxRule>[];
-      // final rules = switch (region) {
-      //   Region.ir => [
-      //       const SingboxRule(
-      //         domains: "domain:.ir,geosite:ir",
-      //         ip: "geoip:ir",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.cn => [
-      //       const SingboxRule(
-      //         domains: "domain:.cn,geosite:cn",
-      //         ip: "geoip:cn",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.ru => [
-      //       const SingboxRule(
-      //         domains: "domain:.ru",
-      //         ip: "geoip:ru",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.af => [
-      //       const SingboxRule(
-      //         domains: "domain:.af,geosite:af",
-      //         ip: "geoip:af",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.id => [
-      //       const SingboxRule(
-      //         domains: "domain:.id,geosite:id",
-      //         ip: "geoip:id",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   _ => <SingboxRule>[],
-      // };
+      final region = ref.watch(Preferences.region);
+      final rules = switch (region) {
+        Region.ir => [
+            // Updated to use latest Chocolate4U/Iran-sing-box-rules
+            // Using rule-set format for sing-box v1.8.0+
+            const SingboxRule(
+              ruleSetUrl: "https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geosite-ir.srs",
+              outbound: RuleOutbound.bypass,
+            ),
+            const SingboxRule(
+              ruleSetUrl: "https://raw.githubusercontent.com/Chocolate4U/Iran-sing-box-rules/rule-set/geoip-ir.srs",
+              outbound: RuleOutbound.bypass,
+            ),
+            // Fallback for domain-based routing
+            const SingboxRule(
+              domains: "domain:.ir",
+              outbound: RuleOutbound.bypass,
+            ),
+          ],
+        Region.cn => [
+            const SingboxRule(
+              domains: "domain:.cn,geosite:cn",
+              ip: "geoip:cn",
+              outbound: RuleOutbound.bypass,
+            ),
+          ],
+        Region.ru => [
+            const SingboxRule(
+              domains: "domain:.ru",
+              ip: "geoip:ru",
+              outbound: RuleOutbound.bypass,
+            ),
+          ],
+        Region.af => [
+            const SingboxRule(
+              domains: "domain:.af,geosite:af",
+              ip: "geoip:af",
+              outbound: RuleOutbound.bypass,
+            ),
+          ],
+        Region.id => [
+            const SingboxRule(
+              domains: "domain:.id,geosite:id",
+              ip: "geoip:id",
+              outbound: RuleOutbound.bypass,
+            ),
+          ],
+        _ => <SingboxRule>[],
+      };
 
       final mode = ref.watch(serviceMode);
       // final reg = ref.watch(Preferences.region.notifier).raw();
