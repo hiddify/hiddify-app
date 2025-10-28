@@ -31,6 +31,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
 
         const val VPN_PERMISSION_REQUEST_CODE = 1001
         const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1010
+        const val BATTERY_OPTIMIZATION_REQUEST_CODE = 1011
     }
 
     private val connection = ServiceConnection(this, this)
@@ -62,6 +63,10 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
             grantNotificationPermission()
             return
         }
+        
+        // درخواست exemption از battery optimization
+        requestBatteryOptimizationExemption()
+        
         lifecycleScope.launch(Dispatchers.IO) {
             if (Settings.rebuildServiceMode()) {
                 reconnect()
@@ -132,6 +137,29 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
             )
         }
     }
+    
+    @SuppressLint("BatteryLife")
+    private fun requestBatteryOptimizationExemption() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = Application.powerManager
+            val packageName = packageName
+            
+            // بررسی اینکه آیا قبلاً exemption داده شده است
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                try {
+                    Log.d(TAG, "Requesting battery optimization exemption")
+                    val intent = Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    intent.data = android.net.Uri.parse("package:$packageName")
+                    startActivityForResult(intent, BATTERY_OPTIMIZATION_REQUEST_CODE)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Failed to request battery optimization exemption", e)
+                    // در صورت خطا، به کاربر اطلاع نمی‌دهیم زیرا critical نیست
+                }
+            } else {
+                Log.d(TAG, "Battery optimization already disabled for this app")
+            }
+        }
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -154,6 +182,13 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         } else if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
             if (resultCode == RESULT_OK) startService()
             else onServiceAlert(Alert.RequestNotificationPermission, null)
+        } else if (requestCode == BATTERY_OPTIMIZATION_REQUEST_CODE) {
+            // نتیجه battery optimization exemption
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val isIgnoring = Application.powerManager.isIgnoringBatteryOptimizations(packageName)
+                Log.d(TAG, "Battery optimization exemption result: $isIgnoring")
+            }
+            // به هر حال ادامه می‌دهیم، این optional است
         }
     }
 }

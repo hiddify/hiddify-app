@@ -1,5 +1,6 @@
 package com.hiddify.hiddify.utils
 
+import android.util.Log
 import go.Seq
 import io.nekohasekai.libbox.CommandClient
 import io.nekohasekai.libbox.CommandClientHandler
@@ -21,6 +22,10 @@ open class CommandClient(
     private val connectionType: ConnectionType,
     private val handler: Handler
 ) {
+
+    companion object {
+        private const val TAG = "CommandClient"
+    }
 
     enum class ConnectionType {
         Status, Groups, Log, ClashMode, GroupOnly
@@ -55,11 +60,15 @@ open class CommandClient(
         options.statusInterval = 2 * 1000 * 1000 * 1000
         val commandClient = CommandClient(clientHandler, options)
         scope.launch(Dispatchers.IO) {
+            var lastException: Exception? = null
             for (i in 1..10) {
                 delay(100 + i.toLong() * 50)
                 try {
                     commandClient.connect()
-                } catch (ignored: Exception) {
+                    Log.d(TAG, "CommandClient connected successfully for $connectionType")
+                } catch (e: Exception) {
+                    lastException = e
+                    Log.w(TAG, "CommandClient connection attempt $i/10 failed for $connectionType: ${e.message}", e)
                     continue
                 }
                 if (!isActive) {
@@ -71,6 +80,10 @@ open class CommandClient(
                 this@CommandClient.commandClient = commandClient
                 return@launch
             }
+            
+            // اگر همه تلاش‌ها شکست خوردند
+            Log.e(TAG, "All 10 connection attempts failed for $connectionType. Last error: ${lastException?.message}", lastException)
+            handler.onDisconnected()
             runCatching {
                 commandClient.disconnect()
             }
