@@ -138,6 +138,12 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         }
     }
     
+    // SuppressLint("BatteryLife") justification:
+    // This method requests exemption from battery optimizations because the app provides a persistent VPN service,
+    // which must remain active in the background to function correctly. Without this exemption, the system may
+    // terminate the VPN service, disrupting connectivity. This request is only made if the exemption has not
+    // already been granted, and the user is explicitly prompted for consent. This approach is necessary for
+    // the core functionality of the app and is safe in this context as it follows Android's recommended practices.
     @SuppressLint("BatteryLife")
     private fun requestBatteryOptimizationExemption() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
