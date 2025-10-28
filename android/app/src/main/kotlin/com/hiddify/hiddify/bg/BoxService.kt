@@ -42,16 +42,26 @@ class BoxService(
 
     companion object {
         private const val TAG = "A/BoxService"
+        private const val COMMAND_SERVER_TIMEOUT = 3600 // افزایش timeout به 1 ساعت
 
         private var initializeOnce = false
         private lateinit var workingDir: File
+        private var serviceStartTime: Long = 0
+        
         private fun initialize() {
             if (initializeOnce) return
             val baseDir = Application.application.filesDir
             
             baseDir.mkdirs()
-            workingDir = Application.application.getExternalFilesDir(null) ?: return
-            workingDir.mkdirs()
+            val externalFilesDir = Application.application.getExternalFilesDir(null)
+            if (externalFilesDir == null) {
+                Log.e(TAG, "External storage is unavailable. Using internal storage as fallback.")
+                workingDir = File(baseDir, "working")
+                workingDir.mkdirs()
+            } else {
+                workingDir = externalFilesDir
+                workingDir.mkdirs()
+            }
             val tempDir = Application.application.cacheDir
             tempDir.mkdirs()
             Log.d(TAG, "base dir: ${baseDir.path}")
@@ -134,14 +144,24 @@ class BoxService(
 
     private fun startCommandServer() {
         val commandServer =
-                CommandServer(this, 300)
+                CommandServer(this, COMMAND_SERVER_TIMEOUT)
         commandServer.start()
         this.commandServer = commandServer
+        Log.d(TAG, "CommandServer started with timeout: $COMMAND_SERVER_TIMEOUT seconds")
     }
 
     private var activeProfileName = ""
     private suspend fun startService(delayStart: Boolean = false) {
         try {
+            serviceStartTime = System.currentTimeMillis()
+            Log.d(TAG, "=== SERVICE START DIAGNOSTICS ===")
+            Log.d(TAG, "Time: $serviceStartTime")
+            Log.d(TAG, "Battery: ${getBatteryLevel()}%")
+            Log.d(TAG, "Network: ${getNetworkType()}")
+            Log.d(TAG, "Doze: ${isDozeMode()}")
+            Log.d(TAG, "Available Memory: ${getAvailableMemoryMB()}MB")
+            Log.d(TAG, "===================================")
+            
             Log.d(TAG, "starting service")
             withContext(Dispatchers.Main) {
                 notification.show(activeProfileName, R.string.status_starting)
@@ -198,38 +218,64 @@ class BoxService(
             newService.start()
             boxService = newService
             commandServer?.setService(boxService)
+            
+            // تنظیم listener برای network monitoring
+            DefaultNetworkMonitor.setListener(newService)
+            
             status.postValue(Status.Started)
 
             withContext(Dispatchers.Main) {
                 notification.show(activeProfileName, R.string.status_started)
             }
             notification.start()
+            Log.d(TAG, "Service started successfully")
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to start service", e)
             stopAndAlert(Alert.StartService, e.message)
             return
         }
     }
 
     override fun serviceReload() {
+        Log.d(TAG, "Service reload requested")
         notification.close()
         status.postValue(Status.Starting)
-        val pfd = fileDescriptor
-        if (pfd != null) {
-            pfd.close()
-            fileDescriptor = null
-        }
-        commandServer?.setService(null)
-        boxService?.apply {
-            runCatching {
-                close()
-            }.onFailure {
-                writeLog("service: error when closing: $it")
+        
+        // استفاده از coroutine به جای runBlocking برای جلوگیری از ANR
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                // Close existing file descriptor
+                val pfd = fileDescriptor
+                if (pfd != null) {
+                    pfd.close()
+                    fileDescriptor = null
+                }
+                
+                // Detach command server
+                commandServer?.setService(null)
+                
+                // Close and cleanup box service
+                boxService?.apply {
+                    runCatching {
+                        close()
+                    }.onFailure {
+                        writeLog("service: error when closing: $it")
+                        Log.e(TAG, "Error closing box service", it)
+                    }
+                    Seq.destroyRef(refnum)
+                }
+                boxService = null
+                
+                // Wait a bit before restart to ensure cleanup
+                delay(1000)
+                
+                Log.d(TAG, "Starting service after reload")
+                // Restart service
+                startService(delayStart = true)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error during service reload", e)
+                stopAndAlert(Alert.StartService, "Reload failed: ${e.message}")
             }
-            Seq.destroyRef(refnum)
-        }
-        boxService = null
-        runBlocking {
-            startService(true)
         }
     }
 
@@ -248,10 +294,56 @@ class BoxService(
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun serviceUpdateIdleMode() {
-        if (Application.powerManager.isDeviceIdleMode) {
-            boxService?.pause()
-        } else {
-            boxService?.wake()
+        val isIdle = Application.powerManager.isDeviceIdleMode
+        Log.d(TAG, "Device idle mode changed: $isIdle")
+        
+        try {
+            if (isIdle) {
+                Log.d(TAG, "Device entering idle mode, pausing service")
+                boxService?.pause()
+            } else {
+                Log.d(TAG, "Device exiting idle mode, waking service")
+                boxService?.wake()
+                
+                // Verification: check if connection is working after wake
+                GlobalScope.launch(Dispatchers.IO) {
+                    delay(2000) // Wait 2 seconds for wake to complete
+                    
+                    if (!verifyConnectionHealth()) {
+                        Log.w(TAG, "Connection verification failed after wake, reloading service")
+                        serviceReload()
+                    } else {
+                        Log.d(TAG, "Connection verified successfully after wake")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error handling idle mode change", e)
+            // Attempt service reload if wake/pause fails
+            serviceReload()
+        }
+    }
+    
+    private suspend fun verifyConnectionHealth(): Boolean {
+        return try {
+            // بررسی اینکه service هنوز زنده است
+            val service = boxService
+            if (service == null) {
+                Log.w(TAG, "Box service is null during health check")
+                return false
+            }
+            
+            // بررسی اینکه status هنوز Started است
+            if (status.value != Status.Started) {
+                Log.w(TAG, "Service status is not Started: ${status.value}")
+                return false
+            }
+            
+            // می‌توانیم اینجا چک‌های بیشتری اضافه کنیم
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Error verifying connection health", e)
+            false
         }
     }
 
@@ -357,6 +449,60 @@ class BoxService(
     fun writeLog(message: String) {
         binder.broadcast {
             it.onServiceWriteLog(message)
+        }
+    }
+    
+    // Helper methods for diagnostics
+    private fun getBatteryLevel(): Int {
+        return try {
+            val batteryManager = Application.application.getSystemService(Context.BATTERY_SERVICE) as android.os.BatteryManager
+            batteryManager.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        } catch (e: Exception) {
+            -1
+        }
+    }
+    
+    private fun getNetworkType(): String {
+        return try {
+            val network = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                Application.connectivity.activeNetwork
+            } else {
+                return "Unknown"
+            }
+            
+            if (network == null) {
+                return "No Network"
+            }
+            
+            val capabilities = Application.connectivity.getNetworkCapabilities(network)
+            when {
+                capabilities == null -> "Unknown"
+                capabilities.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) -> "WiFi"
+                capabilities.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) -> "Mobile"
+                capabilities.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET) -> "Ethernet"
+                else -> "Other"
+            }
+        } catch (e: Exception) {
+            "Error"
+        }
+    }
+    
+    private fun isDozeMode(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Application.powerManager.isDeviceIdleMode
+        } else {
+            false
+        }
+    }
+    
+    private fun getAvailableMemoryMB(): Long {
+        return try {
+            val activityManager = Application.application.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+            val memInfo = android.app.ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memInfo)
+            memInfo.availMem / (1024 * 1024) // Convert to MB
+        } catch (e: Exception) {
+            -1
         }
     }
 

@@ -78,6 +78,9 @@ class ServiceConnection(
             service?.unregisterCallback(callback)
         } catch (e: RemoteException) {
             Log.e(TAG, "cleanup service connection", e)
+        } finally {
+            // رفع memory leak با null کردن reference
+            service = null
         }
     }
 
