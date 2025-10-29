@@ -88,17 +88,17 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
       applyConfigOption(activeProfile).flatMap((_) => singbox.restart(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit).mapLeft(UnexpectedConnectionFailure.new));
 
   @visibleForTesting
-  TaskEither<ConnectionFailure, Unit> applyConfigOption(ProfileEntity prof) => TaskEither.fromEither(configOptionRepository.fullOptionsOverrided(prof.profileOverride))
+  TaskEither<ConnectionFailure, Unit> applyConfigOption(ProfileEntity prof, {bool? agreed}) => TaskEither.fromEither(configOptionRepository.fullOptionsOverrided(prof.profileOverride))
       .mapLeft((l) => ConnectionFailure.invalidConfigOption(null, l))
       .flatMap(
         (overridedOptions) => TaskEither.tryCatch(() async {
-          final isWarpLicenseAgreed = ref.read(warpLicenseNotifierProvider);
+          final isWarpLicenseAgreed = agreed ?? ref.read(warpLicenseNotifierProvider);
           final isWarpEnabled = overridedOptions.warp.enable || overridedOptions.warp2.enable;
-          if (!isWarpLicenseAgreed && isWarpEnabled) {
+          if (!isWarpLicenseAgreed! && isWarpEnabled) {
             final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense();
             if (isAgreed == true) {
               await ref.read(warpLicenseNotifierProvider.notifier).agree();
-              return (await applyConfigOption(prof).run()).match((l) => throw l, (_) => unit);
+              return (await applyConfigOption(prof, agreed: true).run()).match((l) => throw l, (_) => unit);
             } else {
               throw const MissingWarpLicense();
             }
