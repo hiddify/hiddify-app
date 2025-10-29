@@ -53,11 +53,7 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
     final result = await AsyncValue.guard(() async {
       final warp = await ref
           .read(hiddifyCoreServiceProvider)
-          .generateWarpConfig(
-            licenseKey: ref.read(ConfigOptions.warpLicenseKey),
-            previousAccountId: ref.read(ConfigOptions.warpAccountId),
-            previousAccessToken: ref.read(ConfigOptions.warpAccessToken),
-          )
+          .generateWarpConfig(licenseKey: ref.read(ConfigOptions.warpLicenseKey), previousAccountId: ref.read(ConfigOptions.warpAccountId), previousAccessToken: ref.read(ConfigOptions.warpAccessToken))
           .getOrElse((l) => throw l)
           .run();
 
@@ -75,11 +71,7 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
     final result = await AsyncValue.guard(() async {
       final warp = await ref
           .read(hiddifyCoreServiceProvider)
-          .generateWarpConfig(
-            licenseKey: ref.read(ConfigOptions.warpLicenseKey),
-            previousAccountId: ref.read(ConfigOptions.warp2AccountId),
-            previousAccessToken: ref.read(ConfigOptions.warp2AccessToken),
-          )
+          .generateWarpConfig(licenseKey: ref.read(ConfigOptions.warpLicenseKey), previousAccountId: ref.read(ConfigOptions.warp2AccountId), previousAccessToken: ref.read(ConfigOptions.warp2AccessToken))
           .getOrElse((l) => throw l)
           .run();
 

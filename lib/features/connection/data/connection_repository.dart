@@ -26,13 +26,7 @@ abstract interface class ConnectionRepository {
 }
 
 class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements ConnectionRepository {
-  ConnectionRepositoryImpl({
-    required this.ref,
-    required this.directories,
-    required this.singbox,
-    required this.configOptionRepository,
-    required this.profilePathResolver,
-  });
+  ConnectionRepositoryImpl({required this.ref, required this.directories, required this.singbox, required this.configOptionRepository, required this.profilePathResolver});
 
   final Ref ref;
 
@@ -51,95 +45,65 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   @override
   TaskEither<ConnectionFailure, Unit> setup() {
     if (_initialized) return TaskEither.of(unit);
-    return exceptionHandler(
-      () {
-        loggy.debug("setting up singbox");
-        return singbox
-            .setup(
-              directories,
-              false,
-            )
-            .map((r) {
-              _initialized = true;
-              return r;
-            })
-            .mapLeft(UnexpectedConnectionFailure.new)
-            .run();
-      },
-      UnexpectedConnectionFailure.new,
-    );
+    return exceptionHandler(() {
+      loggy.debug("setting up singbox");
+      return singbox
+          .setup(directories, false)
+          .map((r) {
+            _initialized = true;
+            return r;
+          })
+          .mapLeft(UnexpectedConnectionFailure.new)
+          .run();
+    }, UnexpectedConnectionFailure.new);
   }
 
   @override
   Stream<ConnectionStatus> watchConnectionStatus() {
     return singbox.watchStatus().map(
-          (event) => switch (event) {
-            SingboxStopped(:final alert?, :final message) => Disconnected(
-                switch (alert) {
-                  SingboxAlert.emptyConfiguration => ConnectionFailure.invalidConfig(message),
-                  SingboxAlert.requestNotificationPermission => ConnectionFailure.missingNotificationPermission(message),
-                  SingboxAlert.requestVPNPermission => ConnectionFailure.missingVpnPermission(message),
-                  SingboxAlert.startCommandServer || SingboxAlert.createService || SingboxAlert.startService => ConnectionFailure.unexpected(message),
-                },
-              ),
-            SingboxStopped() => const Disconnected(),
-            SingboxStarting() => const Connecting(),
-            SingboxStarted() => const Connected(),
-            SingboxStopping() => const Disconnecting(),
-          },
-        );
+      (event) => switch (event) {
+        SingboxStopped(:final alert?, :final message) => Disconnected(switch (alert) {
+          SingboxAlert.emptyConfiguration => ConnectionFailure.invalidConfig(message),
+          SingboxAlert.requestNotificationPermission => ConnectionFailure.missingNotificationPermission(message),
+          SingboxAlert.requestVPNPermission => ConnectionFailure.missingVpnPermission(message),
+          SingboxAlert.startCommandServer || SingboxAlert.createService || SingboxAlert.startService => ConnectionFailure.unexpected(message),
+        }),
+        SingboxStopped() => const Disconnected(),
+        SingboxStarting() => const Connecting(),
+        SingboxStarted() => const Connected(),
+        SingboxStopping() => const Disconnecting(),
+      },
+    );
   }
 
   @override
-  TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit) => setup().flatMap(
-        (_) => applyConfigOption(activeProfile).flatMap(
-          (_) => singbox
-              .start(
-                profilePathResolver.file(activeProfile.id).path,
-                activeProfile.name,
-                disableMemoryLimit,
-              )
-              .mapLeft(UnexpectedConnectionFailure.new),
-        ),
-      );
+  TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit) =>
+      setup().flatMap((_) => applyConfigOption(activeProfile).flatMap((_) => singbox.start(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit).mapLeft(UnexpectedConnectionFailure.new)));
 
   @override
   TaskEither<ConnectionFailure, Unit> disconnect() => singbox.stop().mapLeft(UnexpectedConnectionFailure.new);
 
   @override
-  TaskEither<ConnectionFailure, Unit> reconnect(ProfileEntity activeProfile, bool disableMemoryLimit) => applyConfigOption(activeProfile).flatMap(
-        (_) => singbox
-            .restart(
-              profilePathResolver.file(activeProfile.id).path,
-              activeProfile.name,
-              disableMemoryLimit,
-            )
-            .mapLeft(UnexpectedConnectionFailure.new),
-      );
+  TaskEither<ConnectionFailure, Unit> reconnect(ProfileEntity activeProfile, bool disableMemoryLimit) =>
+      applyConfigOption(activeProfile).flatMap((_) => singbox.restart(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit).mapLeft(UnexpectedConnectionFailure.new));
 
   @visibleForTesting
-  TaskEither<ConnectionFailure, Unit> applyConfigOption(ProfileEntity prof) => TaskEither.fromEither(
-        configOptionRepository.fullOptionsOverrided(prof.profileOverride),
-      ).mapLeft((l) => ConnectionFailure.invalidConfigOption(null, l)).flatMap(
-            (overridedOptions) => TaskEither.tryCatch(
-              () async {
-                final isWarpLicenseAgreed = ref.read(warpLicenseNotifierProvider);
-                final isWarpEnabled = overridedOptions.warp.enable || overridedOptions.warp2.enable;
-                if (!isWarpLicenseAgreed && isWarpEnabled) {
-                  final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense();
-                  if (isAgreed == true) {
-                    await ref.read(warpLicenseNotifierProvider.notifier).agree();
-                    return (await applyConfigOption(prof).run()).match(
-                      (l) => throw l,
-                      (_) => unit,
-                    );
-                  } else {
-                    throw const MissingWarpLicense();
-                  }
-                }
-                return unit;
-              },
-              (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st),
-            ),
-          );
+  TaskEither<ConnectionFailure, Unit> applyConfigOption(ProfileEntity prof) => TaskEither.fromEither(configOptionRepository.fullOptionsOverrided(prof.profileOverride))
+      .mapLeft((l) => ConnectionFailure.invalidConfigOption(null, l))
+      .flatMap(
+        (overridedOptions) => TaskEither.tryCatch(() async {
+          final isWarpLicenseAgreed = ref.read(warpLicenseNotifierProvider);
+          final isWarpEnabled = overridedOptions.warp.enable || overridedOptions.warp2.enable;
+          if (!isWarpLicenseAgreed && isWarpEnabled) {
+            final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense();
+            if (isAgreed == true) {
+              await ref.read(warpLicenseNotifierProvider.notifier).agree();
+              return (await applyConfigOption(prof).run()).match((l) => throw l, (_) => unit);
+            } else {
+              throw const MissingWarpLicense();
+            }
+          }
+          return unit;
+        }, (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st)),
+      );
 }
