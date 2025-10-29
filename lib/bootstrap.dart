@@ -7,8 +7,6 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
-import 'package:hiddify/core/db/migration/db_v1_helper.dart';
-import 'package:hiddify/core/db/migration/db_v2_helper.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/logger/logger.dart';
@@ -61,23 +59,6 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
       if (env == Environment.dev) rethrow;
       Logger.bootstrap.info("clearing preferences");
       await container.read(sharedPreferencesProvider).requireValue.clear();
-    }
-  });
-
-  await _init("db migration from v1 to v2", () async {
-    final pref = await container.read(sharedPreferencesProvider.future);
-    try {
-      if (!(pref.getBool('db_migration_v1_to_v2') ?? false)) {
-        final db1Helper = container.read(dbV1HelperProvider);
-        final db2Helper = container.read(dbV2HelperProvider);
-        final list = await db1Helper.getAllProfiles();
-        if (list.isNotEmpty) await db2Helper.insert(list);
-        pref.setBool('db_migration_v1_to_v2', true);
-      }
-    } catch (e, stackTrace) {
-      pref.setBool('db_migration_v1_to_v2', true);
-      Logger.bootstrap.error("db migration from v1 to v2 failed", e, stackTrace);
-      if (env == Environment.dev) rethrow;
     }
   });
 
