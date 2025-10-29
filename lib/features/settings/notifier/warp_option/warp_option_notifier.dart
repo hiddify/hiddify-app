@@ -96,7 +96,7 @@ class WarpLicenseNotifier extends _$WarpLicenseNotifier with AppLogger {
   }
 
   Future<void> agree() async {
-    await ref.read(sharedPreferencesProvider).requireValue.setBool(WarpConst.warpConsentGiven, true);
+    await _prefs.setBool(WarpConst.warpConsentGiven, true);
     await ref.read(warpOptionNotifierProvider.notifier).genWarps(showToast: false);
     state = true;
   }
