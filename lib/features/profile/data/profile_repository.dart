@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:hiddify/core/db/v2/db_v2.dart';
+import 'package:hiddify/core/db/db.dart';
 
 import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';

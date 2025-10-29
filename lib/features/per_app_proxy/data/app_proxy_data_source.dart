@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:hiddify/core/db/v2/db_v2.dart';
+import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_backup.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/per_app_proxy/model/pkg_flag.dart';
@@ -21,7 +21,7 @@ abstract interface class AppProxyDataSource {
 }
 
 @DriftAccessor(tables: [AppProxyEntries])
-class AppProxyDao extends DatabaseAccessor<DbV2> with _$AppProxyDaoMixin, InfraLogger implements AppProxyDataSource {
+class AppProxyDao extends DatabaseAccessor<Db> with _$AppProxyDaoMixin, InfraLogger implements AppProxyDataSource {
   AppProxyDao(super.db);
 
   @override

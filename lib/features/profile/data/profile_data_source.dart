@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:hiddify/core/db/v2/db_v2.dart';
+import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:loggy/loggy.dart';
@@ -22,7 +22,7 @@ abstract interface class ProfileDataSource {
 Map<SortMode, OrderingMode> orderMap = {SortMode.ascending: OrderingMode.asc, SortMode.descending: OrderingMode.desc};
 
 @DriftAccessor(tables: [ProfileEntries])
-class ProfileDao extends DatabaseAccessor<DbV2> with _$ProfileDaoMixin, InfraLogger implements ProfileDataSource {
+class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogger implements ProfileDataSource {
   ProfileDao(super.db);
 
   @override
