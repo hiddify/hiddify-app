@@ -180,6 +180,16 @@ abstract class ConfigOptions {
     validator: (value) => isPort(value.toString()),
   );
 
+  static final clashApiSecret = PreferencesNotifier.create<String, String>(
+    "clash-api-secret",
+    "",
+  );
+
+  static final clashApiHost = PreferencesNotifier.create<String, String>(
+    "clash-api-host",
+    "127.0.0.1",
+  );
+
   static final bypassLan = PreferencesNotifier.create<bool, bool>(
     "bypass-lan",
     false,
@@ -472,6 +482,8 @@ Future<SingboxConfigOption> singboxConfigOption(Ref ref) async {
     urlTestInterval: ref.watch(ConfigOptions.urlTestInterval),
     enableClashApi: ref.watch(ConfigOptions.enableClashApi),
     clashApiPort: ref.watch(ConfigOptions.clashApiPort),
+    clashApiSecret: ref.watch(ConfigOptions.clashApiSecret),
+    clashApiHost: ref.watch(ConfigOptions.clashApiHost),
     enableTun: mode == ServiceMode.tun,
     enableTunService: mode == ServiceMode.tunService,
     setSystemProxy: mode == ServiceMode.systemProxy,
