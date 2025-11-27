@@ -53,22 +53,22 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             Trigger.Setup.method -> {
-                GlobalScope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                           val baseDir = Application.application.filesDir                
-                            baseDir.mkdirs()
-                            val workingDir = Application.application.getExternalFilesDir(null)
-                            workingDir?.mkdirs()
-                            val tempDir = Application.application.cacheDir
-                            tempDir.mkdirs()
-                            Log.d(TAG, "base dir: ${baseDir.path}")
-                            Log.d(TAG, "working dir: ${workingDir?.path}")
-                            Log.d(TAG, "temp dir: ${tempDir.path}")
-                            
-                            Mobile.setup(baseDir.path, workingDir?.path, tempDir.path, false)
-                            Libbox.redirectStderr(File(workingDir, "stderr2.log").path)
+                        val baseDir = Application.application.filesDir
+                        baseDir.mkdirs()
+                        val workingDir = File(Application.application.filesDir, "working")
+                        workingDir.mkdirs()
+                        val tempDir = Application.application.cacheDir
+                        tempDir.mkdirs()
+                        Log.d(TAG, "base dir: ${baseDir.path}")
+                        Log.d(TAG, "working dir: ${workingDir.path}")
+                        Log.d(TAG, "temp dir: ${tempDir.path}")
 
-                            success("")
+                        Mobile.setup(baseDir.path, workingDir.path, tempDir.path, false)
+                        Libbox.redirectStderr(File(workingDir, "stderr2.log").path)
+
+                        success("")
                     }
                 }
             }
@@ -76,10 +76,9 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Trigger.ParseConfig.method -> {
                 scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        val path = args["path"] as String
-                        val tempPath = args["tempPath"] as String
-                        val debug = args["debug"] as Boolean
+                        val path = call.argument<String>("path") ?: ""
+                        val tempPath = call.argument<String>("tempPath") ?: ""
+                        val debug = call.argument<Boolean>("debug") ?: false
                         val msg = BoxService.parseConfig(path, tempPath, debug)
                         success(msg)
                     }
@@ -87,9 +86,9 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             }
 
             Trigger.changeHiddifyOptions.method -> {
-                scope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val args = call.arguments as String
+                        val args = call.arguments as? String ?: ""
                         Settings.configOptions = args
                         success(true)
                     }
@@ -97,13 +96,12 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             }
 
             Trigger.GenerateConfig.method -> {
-                scope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        val path = args["path"] as String
+                        val path = call.argument<String>("path") ?: ""
                         val options = Settings.configOptions
                         if (options.isBlank() || path.isBlank()) {
-                            error("blank properties")
+                            if (path.isBlank()) error("blank path")
                         }
                         val config = BoxService.buildConfig(path, options)
                         success(config)
@@ -112,16 +110,17 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             }
 
             Trigger.Start.method -> {
-                scope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        Settings.activeConfigPath = args["path"] as String? ?: ""
-                        Settings.activeProfileName = args["name"] as String? ?: ""
+                        val path = call.argument<String>("path") ?: ""
+                        val name = call.argument<String>("name") ?: ""
+                        Settings.activeConfigPath = path
+                        Settings.activeProfileName = name
                         val mainActivity = MainActivity.instance
                         val started = mainActivity.serviceStatus.value == Status.Started
                         if (started) {
                             Log.w(TAG, "service is already running")
-                            return@launch success(true)
+                            return@runCatching success(true)
                         }
                         mainActivity.startService()
                         success(true)
@@ -130,13 +129,13 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             }
 
             Trigger.Stop.method -> {
-                scope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
                         val mainActivity = MainActivity.instance
                         val started = mainActivity.serviceStatus.value == Status.Started
                         if (!started) {
                             Log.w(TAG, "service is not running")
-                            return@launch success(true)
+                            return@runCatching success(true)
                         }
                         BoxService.stop()
                         success(true)
@@ -147,19 +146,20 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Trigger.Restart.method -> {
                 scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        Settings.activeConfigPath = args["path"] as String? ?: ""
-                        Settings.activeProfileName = args["name"] as String? ?: ""
+                        val path = call.argument<String>("path") ?: ""
+                        val name = call.argument<String>("name") ?: ""
+                        Settings.activeConfigPath = path
+                        Settings.activeProfileName = name
                         val mainActivity = MainActivity.instance
                         val started = mainActivity.serviceStatus.value == Status.Started
-                        if (!started) return@launch success(true)
+                        if (!started) return@runCatching success(true)
                         val restart = Settings.rebuildServiceMode()
                         if (restart) {
                             mainActivity.reconnect()
                             BoxService.stop()
                             delay(1000L)
                             mainActivity.startService()
-                            return@launch success(true)
+                            return@runCatching success(true)
                         }
                         runCatching {
                             Libbox.newStandaloneCommandClient().serviceReload()
@@ -172,13 +172,14 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             }
 
             Trigger.SelectOutbound.method -> {
-                scope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val args = call.arguments as Map<*, *>
+                        val groupTag = call.argument<String>("groupTag") ?: ""
+                        val outboundTag = call.argument<String>("outboundTag") ?: ""
                         Libbox.newStandaloneCommandClient()
                             .selectOutbound(
-                                args["groupTag"] as String,
-                                args["outboundTag"] as String
+                                groupTag,
+                                outboundTag
                             )
                         success(true)
                     }
@@ -186,12 +187,12 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             }
 
             Trigger.UrlTest.method -> {
-                scope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val args = call.arguments as Map<*, *>
+                        val groupTag = call.argument<String>("groupTag") ?: ""
                         Libbox.newStandaloneCommandClient()
                             .urlTest(
-                                args["groupTag"] as String
+                                groupTag
                             )
                         success(true)
                     }
@@ -199,7 +200,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             }
 
             Trigger.ClearLogs.method -> {
-                scope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
                         MainActivity.instance.onServiceResetLogs(mutableListOf())
                         success(true)
@@ -210,11 +211,13 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Trigger.GenerateWarpConfig.method -> {
                 scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val args = call.arguments as Map<*, *>
+                        val licenseKey = call.argument<String>("license-key") ?: ""
+                        val previousAccountId = call.argument<String>("previous-account-id") ?: ""
+                        val previousAccessToken = call.argument<String>("previous-access-token") ?: ""
                         val warpConfig = Mobile.generateWarpConfig(
-                            args["license-key"] as String,
-                            args["previous-account-id"] as String,
-                            args["previous-access-token"] as String,
+                            licenseKey,
+                            previousAccountId,
+                            previousAccessToken,
                         )
                         success(warpConfig)
                     }

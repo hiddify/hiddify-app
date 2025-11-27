@@ -5,10 +5,7 @@ import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:loggy/loggy.dart';
 
 class LoggerController extends LoggyPrinter with InfraLogger {
-  LoggerController(
-    this.consolePrinter,
-    this.otherPrinters,
-  );
+  LoggerController(this.consolePrinter, this.otherPrinters);
 
   final LoggyPrinter consolePrinter;
   final Map<String, LoggyPrinter> otherPrinters;
@@ -22,10 +19,9 @@ class LoggerController extends LoggyPrinter with InfraLogger {
   }
 
   static void init(String appLogPath) {
-    _instance = LoggerController(
-      const ConsolePrinter(),
-      {"app": FileLogPrinter(appLogPath)},
-    );
+    _instance = LoggerController(const ConsolePrinter(), {
+      "app": FileLogPrinter(appLogPath),
+    });
     Loggy.initLoggy(logPrinter: _instance);
   }
 
@@ -35,10 +31,7 @@ class LoggerController extends LoggyPrinter with InfraLogger {
 
     if (!logToFile) _instance.removePrinter("app");
 
-    Loggy.initLoggy(
-      logPrinter: _instance,
-      logOptions: LogOptions(logLevel),
-    );
+    Loggy.initLoggy(logPrinter: _instance, logOptions: LogOptions(logLevel));
   }
 
   void addPrinter(String name, LoggyPrinter printer) {

@@ -35,7 +35,8 @@ class AddProfile extends _$AddProfile with AppLogger {
     return const AsyncData(null);
   }
 
-  ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
+  ProfileRepository get _profilesRepo =>
+      ref.read(profileRepositoryProvider).requireValue;
   CancelToken? _cancelToken;
 
   Future<void> add(String rawInput) async {
@@ -44,11 +45,16 @@ class AddProfile extends _$AddProfile with AppLogger {
     // await check4Warp(rawInput);
     state = await AsyncValue.guard(() async {
       final activeProfile = await ref.read(activeProfileProvider.future);
-      final markAsActive = activeProfile == null || ref.read(Preferences.markNewProfileActive);
+      final markAsActive =
+          activeProfile == null || ref.read(Preferences.markNewProfileActive);
       final TaskEither<ProfileFailure, Unit> task;
       if (LinkParser.parse(rawInput) case (final link)?) {
         loggy.debug("adding profile, url: [${link.url}]");
-        task = _profilesRepo.addByUrl(link.url, markAsActive: markAsActive, cancelToken: _cancelToken = CancelToken());
+        task = _profilesRepo.addByUrl(
+          link.url,
+          markAsActive: markAsActive,
+          cancelToken: _cancelToken = CancelToken(),
+        );
       } else if (LinkParser.protocol(rawInput) case (final parsed)?) {
         loggy.debug("adding profile, content");
         var name = parsed.name;
@@ -62,7 +68,11 @@ class AddProfile extends _$AddProfile with AppLogger {
           candidate = sb.toString();
         }
         name = candidate;
-        task = _profilesRepo.addByContent(parsed.content, name: name, markAsActive: markAsActive);
+        task = _profilesRepo.addByContent(
+          parsed.content,
+          name: name,
+          markAsActive: markAsActive,
+        );
       } else {
         loggy.debug("invalid content");
         throw const ProfileInvalidUrlFailure();
@@ -74,7 +84,9 @@ class AddProfile extends _$AddProfile with AppLogger {
               throw err;
             },
             (_) {
-              loggy.info("successfully added profile, mark as active? [$markAsActive]");
+              loggy.info(
+                "successfully added profile, mark as active? [$markAsActive]",
+              );
               return unit;
             },
           )
@@ -88,17 +100,24 @@ class AddProfile extends _$AddProfile with AppLogger {
         final prefs = ref.read(sharedPreferencesProvider).requireValue;
         final warp = ref.read(warpOptionProvider.notifier);
 
-        final consent = prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false;
+        final consent =
+            prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false;
 
         final t = ref.read(translationsProvider);
         final notification = ref.read(inAppNotificationControllerProvider);
 
         if (!consent) {
-          final agreed = await showDialog<bool>(context: RootScaffold.stateKey.currentContext!, builder: (context) => const WarpLicenseAgreementModal());
+          final agreed = await showDialog<bool>(
+            context: RootScaffold.stateKey.currentContext!,
+            builder: (context) => const WarpLicenseAgreementModal(),
+          );
 
           if (agreed ?? false) {
             await prefs.setBool(WarpOptionNotifier.warpConsentGiven, true);
-            final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
+            final toast = notification.showInfoToast(
+              t.profile.add.addingWarpMsg,
+              duration: const Duration(milliseconds: 100),
+            );
             toast?.pause();
             await warp.generateWarpConfig();
             toast?.start();
@@ -112,7 +131,10 @@ class AddProfile extends _$AddProfile with AppLogger {
         final hasWarp2Config = accountId != null && accessToken != null;
 
         if (!hasWarp2Config) {
-          final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
+          final toast = notification.showInfoToast(
+            t.profile.add.addingWarpMsg,
+            duration: const Duration(milliseconds: 100),
+          );
           toast?.pause();
           await warp.generateWarp2Config();
           toast?.start();
@@ -130,7 +152,8 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
     return const AsyncData(null);
   }
 
-  ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
+  ProfileRepository get _profilesRepo =>
+      ref.read(profileRepositoryProvider).requireValue;
 
   Future<void> updateProfile(RemoteProfileEntity profile) async {
     if (state.isLoading) return;
@@ -145,11 +168,15 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
               throw err;
             },
             (_) async {
-              loggy.info('successfully updated profile, was active? [${profile.active}]');
+              loggy.info(
+                'successfully updated profile, was active? [${profile.active}]',
+              );
 
               await ref.read(activeProfileProvider.future).then((active) async {
                 if (active != null && active.id == profile.id) {
-                  await ref.read(connectionProvider.notifier).reconnect(profile);
+                  await ref
+                      .read(connectionProvider.notifier)
+                      .reconnect(profile);
                 }
               });
               return unit;

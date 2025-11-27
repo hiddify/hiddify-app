@@ -8,12 +8,17 @@ part 'log_data_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 Future<LogRepository> logRepository(Ref ref) async {
-  final repo = LogRepositoryImpl(singbox: ref.watch(singboxServiceProvider), logPathResolver: ref.watch(logPathResolverProvider));
+  final repo = LogRepositoryImpl(
+    singbox: ref.watch(singboxServiceProvider),
+    logPathResolver: ref.watch(logPathResolverProvider),
+  );
   await repo.init().getOrElse((l) => throw l).run();
   return repo;
 }
 
 @Riverpod(keepAlive: true)
 LogPathResolver logPathResolver(Ref ref) {
-  return LogPathResolver(ref.watch(appDirectoriesProvider).requireValue.workingDir);
+  return LogPathResolver(
+    ref.watch(appDirectoriesProvider).requireValue.workingDir,
+  );
 }

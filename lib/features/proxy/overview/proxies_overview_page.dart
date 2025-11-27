@@ -35,10 +35,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
           itemBuilder: (context) {
             return [
               ...ProxiesSort.values.map(
-                (e) => PopupMenuItem(
-                  value: e,
-                  child: Text(e.present(t)),
-                ),
+                (e) => PopupMenuItem(value: e, child: Text(e.present(t))),
               ),
             ];
           },
@@ -53,12 +50,13 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
             body: CustomScrollView(
               slivers: [
                 appBar,
-                SliverFillRemaining(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(t.proxies.emptyProxiesMsg),
-                    ],
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 300,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [Text(t.proxies.emptyProxiesMsg)],
+                    ),
                   ),
                 ),
               ],
@@ -87,7 +85,8 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                             selected: group.selected == proxy.tag,
                             onSelect: () {
                               if (selectActiveProxyMutation
-                                  .state.isInProgress) {
+                                  .state
+                                  .isInProgress) {
                                 return;
                               }
                               selectActiveProxyMutation.setFuture(
@@ -117,10 +116,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                             return;
                           }
                           selectActiveProxyMutation.setFuture(
-                            notifier.changeProxy(
-                              group.tag,
-                              proxy.tag,
-                            ),
+                            notifier.changeProxy(group.tag, proxy.tag),
                           );
                         },
                       );
@@ -154,10 +150,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
       case AsyncLoading():
         return Scaffold(
           body: CustomScrollView(
-            slivers: [
-              appBar,
-              const SliverLoadingBodyPlaceholder(),
-            ],
+            slivers: [appBar, const SliverLoadingBodyPlaceholder()],
           ),
         );
     }

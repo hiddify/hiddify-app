@@ -27,8 +27,10 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.PlatformInterface
 import io.nekohasekai.libbox.SystemProxyStatus
 import io.nekohasekai.mobile.Mobile
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -50,7 +52,7 @@ class BoxService(
             val baseDir = Application.application.filesDir
             
             baseDir.mkdirs()
-            workingDir = Application.application.getExternalFilesDir(null) ?: return
+            workingDir = File(Application.application.filesDir, "working")
             workingDir.mkdirs()
             val tempDir = Application.application.cacheDir
             tempDir.mkdirs()
@@ -69,7 +71,7 @@ class BoxService(
                 Mobile.parse(path, tempPath, debug)
                 ""
             } catch (e: Exception) {
-                Log.w(TAG, e)
+                Log.w(TAG, "parse config failed")
                 e.message ?: "invalid config"
             }
         }
@@ -106,9 +108,10 @@ class BoxService(
 
     var fileDescriptor: ParcelFileDescriptor? = null
 
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val status = MutableLiveData(Status.Stopped)
-    private val binder = ServiceBinder(status)
-    private val notification = ServiceNotification(status, service)
+    private val binder = ServiceBinder(status, scope)
+    private val notification = ServiceNotification(status, service, scope)
     private var boxService: BoxService? = null
     private var commandServer: CommandServer? = null
     private var receiverRegistered = false
@@ -164,7 +167,7 @@ class BoxService(
             val content = try {
                 Mobile.buildConfig(selectedConfigPath, configOptions)
             } catch (e: Exception) {
-                Log.w(TAG, e)
+                Log.w(TAG, "build config failed")
                 stopAndAlert(Alert.EmptyConfiguration)
                 return
             }
@@ -187,6 +190,7 @@ class BoxService(
             val newService = try {
                 Libbox.newService(content, platformInterface)
             } catch (e: Exception) {
+                Log.w(TAG, "create service failed")
                 stopAndAlert(Alert.CreateService, e.message)
                 return
             }
@@ -263,7 +267,7 @@ class BoxService(
             receiverRegistered = false
         }
         notification.close()
-        GlobalScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             val pfd = fileDescriptor
             if (pfd != null) {
                 pfd.close()
@@ -317,6 +321,9 @@ class BoxService(
         if (status.value != Status.Stopped) return Service.START_NOT_STICKY
         status.value = Status.Starting
 
+        // Start foreground immediately to satisfy Android requirements
+        notification.show("", R.string.status_starting)
+
         if (!receiverRegistered) {
             ContextCompat.registerReceiver(service, receiver, IntentFilter().apply {
                 addAction(Action.SERVICE_CLOSE)
@@ -328,7 +335,7 @@ class BoxService(
             receiverRegistered = true
         }
 
-        GlobalScope.launch(Dispatchers.IO) {
+        scope.launch(Dispatchers.IO) {
             Settings.startedByUser = true
             initialize()
             try {
@@ -348,10 +355,17 @@ class BoxService(
 
     fun onDestroy() {
         binder.close()
+        scope.cancel()
     }
 
     fun onRevoke() {
         stopService()
+    }
+
+    fun onTrimMemory(level: Int) {
+        if (level >= android.content.ComponentCallbacks2.TRIM_MEMORY_MODERATE) {
+            Libbox.setMemoryLimit(true)
+        }
     }
 
     fun writeLog(message: String) {

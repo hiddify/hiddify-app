@@ -4,27 +4,37 @@
 
 #include "flutter_window.h"
 #include "utils.h"
-#include <protocol_handler_windows/protocol_handler_windows_plugin_c_api.h>
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
   HANDLE hMutexInstance = CreateMutex(NULL, TRUE, L"HiddifyMutex");
-  HWND handle = FindWindowA(NULL, "Hiddify");
-
   if (GetLastError() == ERROR_ALREADY_EXISTS) {
     flutter::DartProject project(L"data");
     std::vector<std::string> command_line_arguments = GetCommandLineArguments();
     project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
     FlutterWindow window(project);
     if (window.SendAppLinkToInstance(L"Hiddify")) {
-      return false;
+      if (hMutexInstance) {
+        ReleaseMutex(hMutexInstance);
+        CloseHandle(hMutexInstance);
+      }
+      return EXIT_SUCCESS;
     }
 
-    WINDOWPLACEMENT place = {sizeof(WINDOWPLACEMENT)};
-    GetWindowPlacement(handle, &place);
-    ShowWindow(handle, SW_NORMAL);
-    return 0;
+    // Fallback: try to bring any existing window with the title to front.
+    HWND hwnd = ::FindWindowW(nullptr, L"Hiddify");
+    if (hwnd) {
+      WINDOWPLACEMENT place = {sizeof(WINDOWPLACEMENT)};
+      GetWindowPlacement(hwnd, &place);
+      ShowWindow(hwnd, SW_NORMAL);
+      SetForegroundWindow(hwnd);
+    }
+    if (hMutexInstance) {
+      ReleaseMutex(hMutexInstance);
+      CloseHandle(hMutexInstance);
+    }
+    return EXIT_SUCCESS;
   }
 
   // Attach to console when present (e.g., 'flutter run') or create a
@@ -59,6 +69,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   }
 
   ::CoUninitialize();
-  ReleaseMutex(hMutexInstance);
+  if (hMutexInstance) {
+    ReleaseMutex(hMutexInstance);
+    CloseHandle(hMutexInstance);
+  }
   return EXIT_SUCCESS;
 }

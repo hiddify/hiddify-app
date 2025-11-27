@@ -20,7 +20,8 @@ class WindowWrapper extends StatefulHookConsumerWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _WindowWrapperState();
 }
 
-class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListener, AppLogger {
+class _WindowWrapperState extends ConsumerState<WindowWrapper>
+    with WindowListener, AppLogger {
   late AlertDialog closeDialog;
 
   bool isWindowClosingDialogOpened = false;

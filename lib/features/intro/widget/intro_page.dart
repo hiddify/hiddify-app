@@ -25,11 +25,22 @@ class IntroPage extends HookConsumerWidget with PresLogger {
     final t = ref.watch(translationsProvider);
 
     final isStarting = useState(false);
+    final termsTapRecognizer = useMemoized(TapGestureRecognizer.new);
 
     useEffect(() {
-      autoSelectRegion(ref).then((value) => loggy.debug("Auto Region selection finished!"));
+      return termsTapRecognizer.dispose;
+    }, [termsTapRecognizer]);
+
+    useEffect(() {
+      autoSelectRegion(
+        ref,
+      ).then((value) => loggy.debug("Auto Region selection finished!"));
       return null;
     }, []);
+
+    termsTapRecognizer.onTap = () async {
+      await UriUtils.tryLaunch(Uri.parse(Constants.termsAndConditionsUrl));
+    };
 
     return Scaffold(
       body: SafeArea(
@@ -63,12 +74,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                         tap: (text) => TextSpan(
                           text: text,
                           style: const TextStyle(color: Colors.blue),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await UriUtils.tryLaunch(
-                                Uri.parse(Constants.termsAndConditionsUrl),
-                              );
-                            },
+                          recognizer: termsTapRecognizer,
                         ),
                       ),
                       style: Theme.of(context).textTheme.bodySmall,
@@ -83,19 +89,29 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                       onPressed: () async {
                         if (isStarting.value) return;
                         isStarting.value = true;
-                        if (!ref.read(analyticsControllerProvider).requireValue) {
-                          loggy.info("disabling analytics per user request");
-                          try {
-                            await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
-                          } catch (error, stackTrace) {
-                            loggy.error(
-                              "could not disable analytics",
-                              error,
-                              stackTrace,
-                            );
+                        try {
+                          if (!ref
+                              .read(analyticsControllerProvider)
+                              .requireValue) {
+                            loggy.info("disabling analytics per user request");
+                            try {
+                              await ref
+                                  .read(analyticsControllerProvider.notifier)
+                                  .disableAnalytics();
+                            } catch (error, stackTrace) {
+                              loggy.error(
+                                "could not disable analytics",
+                                error,
+                                stackTrace,
+                              );
+                            }
                           }
+                          await ref
+                              .read(Preferences.introCompleted.notifier)
+                              .update(true);
+                        } finally {
+                          isStarting.value = false;
                         }
-                        await ref.read(Preferences.introCompleted.notifier).update(true);
                       },
                       child: isStarting.value
                           ? LinearProgressIndicator(
@@ -122,38 +138,57 @@ class IntroPage extends HookConsumerWidget with PresLogger {
         'Timezone Region: ${regionLocale.region} Locale: ${regionLocale.locale}',
       );
       await ref.read(ConfigOptions.region.notifier).update(regionLocale.region);
-      await ref.watch(ConfigOptions.directDnsAddress.notifier).reset();
-      await ref.read(localePreferencesProvider.notifier).changeLocale(regionLocale.locale);
+      await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
+      await ref
+          .read(localePreferencesProvider.notifier)
+          .changeLocale(regionLocale.locale);
       return;
-    } catch (e) {
+    } catch (e, stackTrace) {
       loggy.warning(
         'Could not get the local country code based on timezone',
         e,
+        stackTrace,
       );
     }
 
+    DioHttpClient? client;
     try {
-      final DioHttpClient client = DioHttpClient(
+      client = DioHttpClient(
         timeout: const Duration(seconds: 2),
-        userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
+        userAgent:
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0",
         debug: true,
       );
-      final response = await client.get<Map<String, dynamic>>('https://api.ip.sb/geoip/');
+      final response = await client.get<Map<String, dynamic>>(
+        'https://api.ip.sb/geoip/',
+      );
 
       if (response.statusCode == 200) {
         final jsonData = response.data!;
-        final regionLocale = _getRegionLocale(jsonData['country_code']?.toString() ?? "");
+        final regionLocale = _getRegionLocale(
+          jsonData['country_code']?.toString() ?? "",
+        );
 
         loggy.debug(
           'Region: ${regionLocale.region} Locale: ${regionLocale.locale}',
         );
-        await ref.read(ConfigOptions.region.notifier).update(regionLocale.region);
-        await ref.read(localePreferencesProvider.notifier).changeLocale(regionLocale.locale);
+        await ref
+            .read(ConfigOptions.region.notifier)
+            .update(regionLocale.region);
+        await ref
+            .read(localePreferencesProvider.notifier)
+            .changeLocale(regionLocale.locale);
       } else {
         loggy.warning('Request failed with status: ${response.statusCode}');
       }
-    } catch (e) {
-      loggy.warning('Could not get the local country code from ip');
+    } catch (e, stackTrace) {
+      loggy.warning(
+        'Could not get the local country code from ip',
+        e,
+        stackTrace,
+      );
+    } finally {
+      client?.close();
     }
   }
 

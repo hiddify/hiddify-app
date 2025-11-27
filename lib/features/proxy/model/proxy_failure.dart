@@ -29,19 +29,13 @@ sealed class ProxyFailure with _$ProxyFailure, Failure {
   @override
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
-      ProxyUnexpectedFailure() => (
-          type: t.failure.unexpected,
-          message: null,
-        ),
+      ProxyUnexpectedFailure() => (type: t.failure.unexpected, message: null),
       ServiceNotRunning() => (
-          type: t.failure.singbox.serviceNotRunning,
-          message: null,
-        ),
+        type: t.failure.singbox.serviceNotRunning,
+        message: null,
+      ),
       UnknownIp() => (type: t.general.unknown, message: null),
-      UnableToRetrieveIp() => (
-          type: t.failure.unexpected,
-          message: null,
-        ),
+      UnableToRetrieveIp() => (type: t.failure.unexpected, message: null),
     };
   }
 }

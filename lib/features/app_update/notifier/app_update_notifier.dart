@@ -20,7 +20,9 @@ const _debugUpgrader = true;
 Upgrader upgrader(Ref ref) => Upgrader(
   debugLogging: _debugUpgrader && kDebugMode,
   durationUntilAlertAgain: const Duration(hours: 12),
-  messages: UpgraderMessages(code: ref.watch(localePreferencesProvider).languageCode),
+  messages: UpgraderMessages(
+    code: ref.watch(localePreferencesProvider).languageCode,
+  ),
 );
 
 @Riverpod(keepAlive: true)
@@ -28,14 +30,20 @@ class AppUpdateNotifier extends _$AppUpdateNotifier with AppLogger {
   @override
   AppUpdateState build() => const AppUpdateState.initial();
 
-  PreferencesEntry<String?, dynamic> get _ignoreReleasePref => PreferencesEntry(preferences: ref.read(sharedPreferencesProvider).requireValue, key: 'ignored_release_version', defaultValue: null);
+  PreferencesEntry<String?, dynamic> get _ignoreReleasePref => PreferencesEntry(
+    preferences: ref.read(sharedPreferencesProvider).requireValue,
+    key: 'ignored_release_version',
+    defaultValue: null,
+  );
 
   Future<AppUpdateState> check() async {
     loggy.debug("checking for update");
     state = const AppUpdateState.checking();
     final appInfo = ref.watch(appInfoProvider).requireValue;
     if (!appInfo.release.allowCustomUpdateChecker) {
-      loggy.debug("custom update checkers are not allowed for [${appInfo.release.name}] release");
+      loggy.debug(
+        "custom update checkers are not allowed for [${appInfo.release.name}] release",
+      );
       return state = const AppUpdateState.disabled();
     }
     return ref
@@ -58,11 +66,15 @@ class AppUpdateNotifier extends _$AppUpdateNotifier with AppLogger {
                 loggy.debug("new version available: $remote");
                 return state = AppUpdateState.available(remote);
               }
-              loggy.info("already using latest version[$currentVersion], remote: [${remote.version}]");
+              loggy.info(
+                "already using latest version[$currentVersion], remote: [${remote.version}]",
+              );
               return state = const AppUpdateState.notAvailable();
             } catch (error, stackTrace) {
               loggy.warning("error parsing versions", error, stackTrace);
-              return state = AppUpdateState.error(AppUpdateFailure.unexpected(error, stackTrace));
+              return state = AppUpdateState.error(
+                AppUpdateFailure.unexpected(error, stackTrace),
+              );
             }
           },
         )

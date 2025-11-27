@@ -23,10 +23,7 @@ abstract interface class SingboxService {
   Future<void> init();
 
   /// setup directories and other initial platform services
-  TaskEither<String, Unit> setup(
-    Directories directories,
-    bool debug,
-  );
+  TaskEither<String, Unit> setup(Directories directories, bool debug);
 
   /// validates config by path and save it
   ///

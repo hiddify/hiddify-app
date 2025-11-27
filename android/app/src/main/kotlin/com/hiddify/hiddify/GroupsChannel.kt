@@ -6,53 +6,60 @@ import com.hiddify.hiddify.utils.CommandClient
 import com.hiddify.hiddify.utils.ParsedOutboundGroup
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.JSONMethodCodec
 import io.nekohasekai.libbox.OutboundGroup
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class GroupsChannel(private val scope: CoroutineScope) : FlutterPlugin, CommandClient.Handler {
     companion object {
         const val TAG = "A/GroupsChannel"
-        const val CHANNEL = "com.hiddify.app/groups"
-        val gson = Gson()
+        const val GROUPS_CHANNEL = "com.hiddify.app/groups"
     }
 
-    private val client =
+    private val commandClient =
         CommandClient(scope, CommandClient.ConnectionType.Groups, this)
 
-    private var channel: EventChannel? = null
-    private var event: EventChannel.EventSink? = null
+    private var groupsChannel: EventChannel? = null
+    private var groupsEvent: EventChannel.EventSink? = null
+    private val groupsScope = CoroutineScope(Dispatchers.Default)
 
     override fun updateGroups(groups: List<OutboundGroup>) {
-        MainActivity.instance.runOnUiThread {
+        groupsScope.launch {
             val parsedGroups = groups.map { group -> ParsedOutboundGroup.fromOutbound(group) }
-            event?.success(gson.toJson(parsedGroups))
+            withContext(Dispatchers.Main) {
+                groupsEvent?.success(parsedGroups)
+            }
         }
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        channel = EventChannel(
+        groupsChannel = EventChannel(
             flutterPluginBinding.binaryMessenger,
-            CHANNEL
+            GROUPS_CHANNEL,
+            JSONMethodCodec.INSTANCE
         )
 
-        channel!!.setStreamHandler(object : EventChannel.StreamHandler {
+        groupsChannel!!.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                event = events
+                groupsEvent = events
                 Log.d(TAG, "connecting groups command client")
-                client.connect()
+                commandClient.connect()
             }
 
             override fun onCancel(arguments: Any?) {
-                event = null
+                groupsEvent = null
                 Log.d(TAG, "disconnecting groups command client")
-                client.disconnect()
+                commandClient.disconnect()
+                groupsScope.cancel()
             }
         })
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        event = null
-        client.disconnect()
-        channel?.setStreamHandler(null)
+        groupsEvent = null
+        commandClient.disconnect()
+        groupsChannel?.setStreamHandler(null)
+        groupsScope.cancel()
     }
 }

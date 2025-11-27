@@ -1,40 +1,35 @@
-import 'package:dart_mappable/dart_mappable.dart';
 import 'package:dartx/dartx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/core/localization/translations.dart';
 
-part 'optional_range.mapper.dart';
+part 'optional_range.freezed.dart';
+part 'optional_range.g.dart';
 
-@MappableClass()
-class OptionalRange with OptionalRangeMappable {
-  const OptionalRange({this.min, this.max});
+@freezed
+abstract class OptionalRange with _$OptionalRange {
+  const OptionalRange._();
+  const factory OptionalRange({int? min, int? max}) = _OptionalRange;
 
-  final int? min;
-  final int? max;
+  factory OptionalRange.fromJson(Map<String, dynamic> json) =>
+      _$OptionalRangeFromJson(json);
 
   String format() => [min, max].whereNotNull().join("-");
   String present(TranslationsEn t) =>
       format().isEmpty ? t.general.notSet : format();
 
-  factory OptionalRange.parse(
-    String input, {
-    bool allowEmpty = false,
-  }) =>
+  factory OptionalRange.parse(String input, {bool allowEmpty = false}) =>
       switch (input.split("-")) {
         [final String val] when val.isEmpty && allowEmpty =>
           const OptionalRange(),
         [final String min] => OptionalRange(min: int.parse(min)),
         [final String min, final String max] => OptionalRange(
-            min: int.parse(min),
-            max: int.parse(max),
-          ),
+          min: int.parse(min),
+          max: int.parse(max),
+        ),
         _ => throw Exception("Invalid range: $input"),
       };
 
-  static OptionalRange? tryParse(
-    String input, {
-    bool allowEmpty = false,
-  }) {
+  static OptionalRange? tryParse(String input, {bool allowEmpty = false}) {
     try {
       return OptionalRange.parse(input, allowEmpty: allowEmpty);
     } catch (_) {

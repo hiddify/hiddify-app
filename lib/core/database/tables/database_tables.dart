@@ -11,7 +11,8 @@ class ProfileEntries extends Table {
   TextColumn get name => text().withLength(min: 1)();
   TextColumn get url => text().nullable()();
   DateTimeColumn get lastUpdate => dateTime()();
-  IntColumn get updateInterval => integer().nullable().map(DurationTypeConverter())();
+  IntColumn get updateInterval =>
+      integer().nullable().map(DurationTypeConverter())();
   IntColumn get upload => integer().nullable()();
   IntColumn get download => integer().nullable()();
   IntColumn get total => integer().nullable()();
@@ -39,6 +40,6 @@ class GeoAssetEntries extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {name, providerName},
-      ];
+    {name, providerName},
+  ];
 }

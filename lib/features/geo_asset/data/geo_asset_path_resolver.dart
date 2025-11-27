@@ -12,10 +12,7 @@ class GeoAssetPathResolver {
   File file(String providerName, String fileName) {
     final prefix = providerName.replaceAll("/", "-").toLowerCase().trim();
     return File(
-      p.join(
-        directory.path,
-        "$prefix${prefix.isEmpty ? "" : "-"}$fileName",
-      ),
+      p.join(directory.path, "$prefix${prefix.isEmpty ? "" : "-"}$fileName"),
     );
   }
 

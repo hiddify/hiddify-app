@@ -8,16 +8,39 @@ analyzer:
     - "lib/gen/**"
     - "lib/singbox/generated/**"
     - "lib/singbox/model/*.g.dart"
+    - "lib/**/*.mapper.dart"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
   errors:
     invalid_annotation_target: ignore
 
 linter:
   rules:
+    # Disabled rules (project-specific exceptions)
     avoid_classes_with_only_static_members: false
     sort_unnamed_constructors_first: false
     sort_pub_dependencies: false
+    
+    # Enabled rules for better code quality
+    always_declare_return_types: true
+    cancel_subscriptions: true
+    close_sinks: true
+    combinators_ordering: true
+    directives_ordering: true
+    eol_at_end_of_file: true
+    lines_longer_than_80_chars: false
+    noop_primitive_operations: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    unawaited_futures: false
+    unnecessary_breaks: true
+    unnecessary_null_checks: true
+    unnecessary_parenthesis: true
+    use_colored_box: true
+    use_decorated_box: true
+    use_enums: true
+    use_super_parameters: true
 
 custom_lint:
   rules:
-    # Enable one rule
     - provider_parameters

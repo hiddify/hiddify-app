@@ -5,13 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import com.hiddify.hiddify.IService
 import com.hiddify.hiddify.IServiceCallback
 import com.hiddify.hiddify.constant.Status
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class ServiceBinder(private val status: MutableLiveData<Status>) : IService.Stub() {
+class ServiceBinder(
+    private val status: MutableLiveData<Status>,
+    private val scope: CoroutineScope
+) : IService.Stub() {
     private val callbacks = RemoteCallbackList<IServiceCallback>()
     private val broadcastLock = Mutex()
 
@@ -24,7 +27,7 @@ class ServiceBinder(private val status: MutableLiveData<Status>) : IService.Stub
     }
 
     fun broadcast(work: (IServiceCallback) -> Unit) {
-        GlobalScope.launch(Dispatchers.Main) {
+        scope.launch(Dispatchers.Main) {
             broadcastLock.withLock {
                 val count = callbacks.beginBroadcast()
                 try {

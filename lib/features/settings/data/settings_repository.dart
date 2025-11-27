@@ -16,29 +16,25 @@ class SettingsRepositoryImpl
 
   @override
   TaskEither<SettingsFailure, bool> isIgnoringBatteryOptimizations() {
-    return exceptionHandler(
-      () async {
-        loggy.debug("checking battery optimization status");
-        final result = await _methodChannel
-            .invokeMethod<bool>("is_ignoring_battery_optimizations");
-        loggy.debug("is ignoring battery optimizations? [$result]");
-        return right(result!);
-      },
-      SettingsUnexpectedFailure.new,
-    );
+    return exceptionHandler(() async {
+      loggy.debug("checking battery optimization status");
+      final result = await _methodChannel.invokeMethod<bool>(
+        "is_ignoring_battery_optimizations",
+      );
+      loggy.debug("is ignoring battery optimizations? [$result]");
+      return right(result!);
+    }, SettingsUnexpectedFailure.new);
   }
 
   @override
   TaskEither<SettingsFailure, bool> requestIgnoreBatteryOptimizations() {
-    return exceptionHandler(
-      () async {
-        loggy.debug("requesting ignore battery optimization");
-        final result = await _methodChannel
-            .invokeMethod<bool>("request_ignore_battery_optimizations");
-        loggy.debug("ignore battery optimization result: [$result]");
-        return right(result!);
-      },
-      SettingsUnexpectedFailure.new,
-    );
+    return exceptionHandler(() async {
+      loggy.debug("requesting ignore battery optimization");
+      final result = await _methodChannel.invokeMethod<bool>(
+        "request_ignore_battery_optimizations",
+      );
+      loggy.debug("ignore battery optimization result: [$result]");
+      return right(result!);
+    }, SettingsUnexpectedFailure.new);
   }
 }

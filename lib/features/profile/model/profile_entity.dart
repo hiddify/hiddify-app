@@ -31,9 +31,8 @@ sealed class ProfileEntity with _$ProfileEntity {
 
 @freezed
 abstract class ProfileOptions with _$ProfileOptions {
-  const factory ProfileOptions({
-    required Duration updateInterval,
-  }) = _ProfileOptions;
+  const factory ProfileOptions({required Duration updateInterval}) =
+      _ProfileOptions;
 }
 
 @freezed

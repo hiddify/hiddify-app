@@ -11,8 +11,10 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'app_router.g.dart';
 
-bool _debugMobileRouter = false;
-final useMobileRouter = !PlatformUtils.isDesktop || (kDebugMode && _debugMobileRouter);
+bool _debugMobileRouter =
+    true; // Temporarily use mobile router to avoid NavigationRail rendering bug
+final useMobileRouter =
+    !PlatformUtils.isDesktop || (kDebugMode && _debugMobileRouter);
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 // TODO: test and improve handling of deep link
@@ -35,14 +37,27 @@ GoRouter router(Ref ref) {
     navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
     debugLogDiagnostics: kDebugMode,
-    routes: [if (useMobileRouter) _buildMobileStatefulShell() else $desktopWrapperRoute, $introRoute],
+    routes: [
+      if (useMobileRouter)
+        _buildMobileStatefulShell()
+      else
+        $desktopWrapperRoute,
+      $introRoute,
+    ],
     refreshListenable: notifier,
     redirect: notifier.redirect,
     observers: [SentryNavigatorObserver()],
   );
 }
 
-final tabLocations = [const HomeRoute().location, const ProxiesRoute().location, const ConfigOptionsRoute().location, const SettingsRoute().location, const LogsOverviewRoute().location, const AboutRoute().location];
+final tabLocations = [
+  const HomeRoute().location,
+  const ProxiesRoute().location,
+  const ConfigOptionsRoute().location,
+  const SettingsRoute().location,
+  const LogsOverviewRoute().location,
+  const AboutRoute().location,
+];
 
 int getCurrentIndex(BuildContext context) {
   final String location = GoRouterState.of(context).uri.path;
@@ -62,7 +77,9 @@ void switchTab(int index, BuildContext context) {
 }
 
 @riverpod
-class RouterListenable extends _$RouterListenable with AppLogger implements Listenable {
+class RouterListenable extends _$RouterListenable
+    with AppLogger
+    implements Listenable {
   VoidCallback? _routerListener;
   bool _introCompleted = false;
 
@@ -105,7 +122,8 @@ class RouterListenable extends _$RouterListenable with AppLogger implements List
 
 RouteBase _buildMobileStatefulShell() {
   return StatefulShellRoute.indexedStack(
-    builder: (context, state, navigationShell) => AdaptiveRootScaffold(navigationShell, navigationShell: navigationShell),
+    builder: (context, state, navigationShell) =>
+        AdaptiveRootScaffold(navigationShell, navigationShell: navigationShell),
     branches: [
       // Home branch
       StatefulShellBranch(
@@ -113,37 +131,45 @@ RouteBase _buildMobileStatefulShell() {
           GoRoute(
             path: const HomeRoute().location, // '/'
             name: HomeRoute.name,
-            pageBuilder: (context, state) => const HomeRoute().buildPage(context, state),
+            pageBuilder: (context, state) =>
+                const HomeRoute().buildPage(context, state),
             routes: [
               GoRoute(
                 path: 'add',
                 name: AddProfileRoute.name,
                 parentNavigatorKey: AddProfileRoute.$parentNavigatorKey,
-                pageBuilder: (context, state) => AddProfileRoute(url: state.uri.queryParameters['url']).buildPage(context, state),
+                pageBuilder: (context, state) => AddProfileRoute(
+                  url: state.uri.queryParameters['url'],
+                ).buildPage(context, state),
               ),
               GoRoute(
                 path: 'profiles',
                 name: ProfilesOverviewRoute.name,
                 parentNavigatorKey: ProfilesOverviewRoute.$parentNavigatorKey,
-                pageBuilder: (context, state) => const ProfilesOverviewRoute().buildPage(context, state),
+                pageBuilder: (context, state) =>
+                    const ProfilesOverviewRoute().buildPage(context, state),
               ),
               GoRoute(
                 path: 'profiles/new',
                 name: NewProfileRoute.name,
                 parentNavigatorKey: NewProfileRoute.$parentNavigatorKey,
-                pageBuilder: (context, state) => const NewProfileRoute().buildPage(context, state),
+                pageBuilder: (context, state) =>
+                    const NewProfileRoute().buildPage(context, state),
               ),
               GoRoute(
                 path: 'profiles/:id',
                 name: ProfileDetailsRoute.name,
                 parentNavigatorKey: ProfileDetailsRoute.$parentNavigatorKey,
-                pageBuilder: (context, state) => ProfileDetailsRoute(state.pathParameters['id']!).buildPage(context, state),
+                pageBuilder: (context, state) => ProfileDetailsRoute(
+                  state.pathParameters['id']!,
+                ).buildPage(context, state),
               ),
               GoRoute(
                 path: 'quick-settings',
                 name: QuickSettingsRoute.name,
                 parentNavigatorKey: QuickSettingsRoute.$parentNavigatorKey,
-                pageBuilder: (context, state) => const QuickSettingsRoute().buildPage(context, state),
+                pageBuilder: (context, state) =>
+                    const QuickSettingsRoute().buildPage(context, state),
               ),
             ],
           ),
@@ -156,7 +182,8 @@ RouteBase _buildMobileStatefulShell() {
           GoRoute(
             path: const ProxiesRoute().location, // '/proxies'
             name: ProxiesRoute.name,
-            pageBuilder: (context, state) => const ProxiesRoute().buildPage(context, state),
+            pageBuilder: (context, state) =>
+                const ProxiesRoute().buildPage(context, state),
           ),
         ],
       ),
@@ -168,7 +195,9 @@ RouteBase _buildMobileStatefulShell() {
             path: const ConfigOptionsRoute().location, // '/config-options'
             name: ConfigOptionsRoute.name,
             // Keep on branch navigator (do not pass parentNavigatorKey)
-            pageBuilder: (context, state) => ConfigOptionsRoute(section: state.uri.queryParameters['section']).buildPage(context, state),
+            pageBuilder: (context, state) => ConfigOptionsRoute(
+              section: state.uri.queryParameters['section'],
+            ).buildPage(context, state),
           ),
         ],
       ),
@@ -180,13 +209,15 @@ RouteBase _buildMobileStatefulShell() {
             path: const SettingsRoute().location, // '/settings'
             name: SettingsRoute.name,
             // Keep on branch navigator (do not pass parentNavigatorKey)
-            pageBuilder: (context, state) => const SettingsRoute().buildPage(context, state),
+            pageBuilder: (context, state) =>
+                const SettingsRoute().buildPage(context, state),
             routes: [
               GoRoute(
                 path: 'per-app-proxy',
                 name: PerAppProxyRoute.name,
                 parentNavigatorKey: PerAppProxyRoute.$parentNavigatorKey,
-                pageBuilder: (context, state) => const PerAppProxyRoute().buildPage(context, state),
+                pageBuilder: (context, state) =>
+                    const PerAppProxyRoute().buildPage(context, state),
               ),
             ],
           ),
@@ -200,7 +231,8 @@ RouteBase _buildMobileStatefulShell() {
             path: const LogsOverviewRoute().location, // '/logs'
             name: LogsOverviewRoute.name,
             // Keep on branch navigator (do not pass parentNavigatorKey)
-            pageBuilder: (context, state) => const LogsOverviewRoute().buildPage(context, state),
+            pageBuilder: (context, state) =>
+                const LogsOverviewRoute().buildPage(context, state),
           ),
         ],
       ),
@@ -212,7 +244,8 @@ RouteBase _buildMobileStatefulShell() {
             path: const AboutRoute().location, // '/about'
             name: AboutRoute.name,
             // Keep on branch navigator (do not pass parentNavigatorKey)
-            pageBuilder: (context, state) => const AboutRoute().buildPage(context, state),
+            pageBuilder: (context, state) =>
+                const AboutRoute().buildPage(context, state),
           ),
         ],
       ),

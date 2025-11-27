@@ -28,8 +28,13 @@ class AboutPage extends HookConsumerWidget {
     ref.listen(appUpdateProvider, (_, next) {
       if (!context.mounted) return;
       switch (next) {
-        case AppUpdateStateAvailable(:final versionInfo) || AppUpdateStateIgnored(:final versionInfo):
-          NewVersionDialog(appInfo.presentVersion, versionInfo, canIgnore: false).show(context);
+        case AppUpdateStateAvailable(:final versionInfo) ||
+            AppUpdateStateIgnored(:final versionInfo):
+          NewVersionDialog(
+            appInfo.presentVersion,
+            versionInfo,
+            canIgnore: false,
+          ).show(context);
         case AppUpdateStateError(:final error):
           CustomToast.error(t.presentShortError(error)).show(context);
         case AppUpdateStateNotAvailable():
@@ -42,7 +47,11 @@ class AboutPage extends HookConsumerWidget {
         ListTile(
           title: Text(t.about.checkForUpdate),
           trailing: switch (appUpdate) {
-            AppUpdateStateChecking() => const SizedBox(width: 24, height: 24, child: CircularProgressIndicator()),
+            AppUpdateStateChecking() => const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(),
+            ),
             _ => const Icon(FluentIcons.arrow_sync_24_regular),
           },
           onTap: () async {
@@ -54,7 +63,11 @@ class AboutPage extends HookConsumerWidget {
           title: Text(t.settings.general.openWorkingDir),
           trailing: const Icon(FluentIcons.open_folder_24_regular),
           onTap: () async {
-            final path = ref.watch(appDirectoriesProvider).requireValue.workingDir.uri;
+            final path = ref
+                .watch(appDirectoriesProvider)
+                .requireValue
+                .workingDir
+                .uri;
             await UriUtils.tryLaunch(path);
           },
         ),
@@ -73,7 +86,9 @@ class AboutPage extends HookConsumerWidget {
                     PopupMenuItem(
                       child: Text(t.general.addToClipboard),
                       onTap: () {
-                        Clipboard.setData(ClipboardData(text: appInfo.format()));
+                        Clipboard.setData(
+                          ClipboardData(text: appInfo.format()),
+                        );
                       },
                     ),
                   ];
@@ -126,21 +141,27 @@ class AboutPage extends HookConsumerWidget {
                 title: Text(t.about.telegramChannel),
                 trailing: const Icon(FluentIcons.open_24_regular),
                 onTap: () async {
-                  await UriUtils.tryLaunch(Uri.parse(Constants.telegramChannelUrl));
+                  await UriUtils.tryLaunch(
+                    Uri.parse(Constants.telegramChannelUrl),
+                  );
                 },
               ),
               ListTile(
                 title: Text(t.about.termsAndConditions),
                 trailing: const Icon(FluentIcons.open_24_regular),
                 onTap: () async {
-                  await UriUtils.tryLaunch(Uri.parse(Constants.termsAndConditionsUrl));
+                  await UriUtils.tryLaunch(
+                    Uri.parse(Constants.termsAndConditionsUrl),
+                  );
                 },
               ),
               ListTile(
                 title: Text(t.about.privacyPolicy),
                 trailing: const Icon(FluentIcons.open_24_regular),
                 onTap: () async {
-                  await UriUtils.tryLaunch(Uri.parse(Constants.privacyPolicyUrl));
+                  await UriUtils.tryLaunch(
+                    Uri.parse(Constants.privacyPolicyUrl),
+                  );
                 },
               ),
             ]),

@@ -19,12 +19,16 @@ class ActiveProxyFooter extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final hasActiveProxy = ref.watch(activeProxyProvider.select((value) => value is AsyncData));
+    final hasActiveProxy = ref.watch(
+      activeProxyProvider.select((value) => value is AsyncData),
+    );
     final activeProxyName = ref.watch(
       activeProxyProvider.select((value) {
         final data = value.asData?.value;
         if (data == null) return null;
-        return data.selectedName.isNotNullOrBlank ? data.selectedName! : data.name;
+        return data.selectedName.isNotNullOrBlank
+            ? data.selectedName!
+            : data.name;
       }),
     );
     final ipInfo = ref.watch(ipInfoProvider);
@@ -42,66 +46,70 @@ class ActiveProxyFooter extends HookConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _InfoProp(icon: FluentIcons.arrow_routing_20_regular, text: activeProxyName ?? "...", semanticLabel: t.proxies.activeProxySemanticLabel),
+                        _InfoProp(
+                          icon: FluentIcons.arrow_routing_20_regular,
+                          text: activeProxyName ?? "...",
+                          semanticLabel: t.proxies.activeProxySemanticLabel,
+                        ),
                         const Gap(8),
                         switch (ipInfo) {
                           AsyncData(value: final info) => Row(
-                              children: [
-                                IPCountryFlag(countryCode: info.countryCode),
-                                const Gap(8),
-                                IPText(
-                                  ip: info.ip,
-                                  onLongPress: () {
-                                    ref.read(ipInfoProvider.notifier).refresh();
-                                  },
-                                ),
-                              ],
-                            ),
+                            children: [
+                              IPCountryFlag(countryCode: info.countryCode),
+                              const Gap(8),
+                              IPText(
+                                ip: info.ip,
+                                onLongPress: () {
+                                  ref.read(ipInfoProvider.notifier).refresh();
+                                },
+                              ),
+                            ],
+                          ),
                           AsyncError(error: final UnknownIp _) => Row(
-                              children: [
-                                const Icon(FluentIcons.arrow_sync_20_regular),
-                                const Gap(8),
-                                UnknownIPText(
-                                  text: t.proxies.checkIp,
-                                  onTap: () {
-                                    ref.read(ipInfoProvider.notifier).refresh();
-                                  },
-                                ),
-                              ],
-                            ),
+                            children: [
+                              const Icon(FluentIcons.arrow_sync_20_regular),
+                              const Gap(8),
+                              UnknownIPText(
+                                text: t.proxies.checkIp,
+                                onTap: () {
+                                  ref.read(ipInfoProvider.notifier).refresh();
+                                },
+                              ),
+                            ],
+                          ),
                           AsyncError() => Row(
-                              children: [
-                                const Icon(FluentIcons.error_circle_20_regular),
-                                const Gap(8),
-                                UnknownIPText(
-                                  text: t.proxies.unknownIp,
-                                  onTap: () {
-                                    ref.read(ipInfoProvider.notifier).refresh();
-                                  },
-                                ),
-                              ],
-                            ),
+                            children: [
+                              const Icon(FluentIcons.error_circle_20_regular),
+                              const Gap(8),
+                              UnknownIPText(
+                                text: t.proxies.unknownIp,
+                                onTap: () {
+                                  ref.read(ipInfoProvider.notifier).refresh();
+                                },
+                              ),
+                            ],
+                          ),
                           _ => const Row(
-                              children: [
-                                Icon(FluentIcons.question_circle_20_regular),
-                                Gap(8),
-                                Flexible(
-                                  child: ShimmerSkeleton(
-                                    height: 16,
-                                    widthFactor: 1,
-                                  ),
+                            children: [
+                              Icon(FluentIcons.question_circle_20_regular),
+                              Gap(8),
+                              Flexible(
+                                child: ShimmerSkeleton(
+                                  height: 16,
+                                  widthFactor: 1,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
+                          ),
                         },
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const _StatsColumn(),
-              ],
-            ),
-          )
-        : const SizedBox(),
+                  const _StatsColumn(),
+                ],
+              ),
+            )
+          : const SizedBox(),
     );
   }
 }
@@ -115,8 +123,9 @@ class _StatsColumn extends HookConsumerWidget {
     final stats = ref.watch(statsProvider).value;
 
     return Directionality(
-      textDirection: TextDirection.values[
-          (Directionality.of(context).index + 1) % TextDirection.values.length],
+      textDirection:
+          TextDirection.values[(Directionality.of(context).index + 1) %
+              TextDirection.values.length],
       child: Flexible(
         child: Column(
           children: [
@@ -139,11 +148,7 @@ class _StatsColumn extends HookConsumerWidget {
 }
 
 class _InfoProp extends StatelessWidget {
-  const _InfoProp({
-    required this.icon,
-    required this.text,
-    this.semanticLabel,
-  });
+  const _InfoProp({required this.icon, required this.text, this.semanticLabel});
 
   final IconData icon;
   final String text;
@@ -160,10 +165,9 @@ class _InfoProp extends StatelessWidget {
           Flexible(
             child: Text(
               text,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(fontFamily: FontFamily.emoji),
+              style: Theme.of(
+                context,
+              ).textTheme.labelMedium?.copyWith(fontFamily: FontFamily.emoji),
               overflow: TextOverflow.ellipsis,
             ),
           ),

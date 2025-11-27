@@ -34,7 +34,15 @@ class AppDatabase extends _$AppDatabase with InfraLogger {
         // add type column to profile entries table
         // make url column nullable
         from1To2: (m, schema) async {
-          await m.alterTable(TableMigration(schema.profileEntries, columnTransformer: {schema.profileEntries.type: const Constant<String>("remote")}, newColumns: [schema.profileEntries.type]));
+          await m.alterTable(
+            TableMigration(
+              schema.profileEntries,
+              columnTransformer: {
+                schema.profileEntries.type: const Constant<String>("remote"),
+              },
+              newColumns: [schema.profileEntries.type],
+            ),
+          );
         },
         from2To3: (m, schema) async {
           await m.createTable(schema.geoAssetEntries);

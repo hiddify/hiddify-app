@@ -1,22 +1,44 @@
 {
-	"dart.lineLength": 250,
-	"[dart]": {
-		"editor.defaultFormatter": "Dart-Code.dart-code",
+    // Dart settings
+    "dart.lineLength": 120,
+    "dart.previewFlutterUiGuides": true,
+    "dart.previewFlutterUiGuidesCustomTracking": true,
+    "dart.runPubGetOnPubspecChanges": "prompt",
+    "[dart]": {
+        "editor.defaultFormatter": "Dart-Code.dart-code",
         "editor.formatOnSave": true,
         "editor.formatOnType": true,
         "editor.tabSize": 2,
         "editor.rulers": [
-            250
+            80,
+            120
         ],
         "editor.detectIndentation": false,
         "editor.selectionHighlight": false,
         "editor.suggest.snippetsPreventQuickSuggestions": false,
         "editor.suggestSelection": "first",
         "editor.tabCompletion": "onlySnippets",
-        "editor.wordBasedSuggestions": "off"
-	},
-
-    "html.format.wrapLineLength": 250,
-    "codium.codeCompletion.enable": false,
-	
+        "editor.wordBasedSuggestions": "off",
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        }
+    },
+    // File associations
+    "files.associations": {
+        "*.arb": "json"
+    },
+    // Exclude generated files from search
+    "search.exclude": {
+        "**/*.g.dart": true,
+        "**/*.freezed.dart": true,
+        "**/*.mapper.dart": true,
+        "**/lib/gen/**": true
+    },
+    // Other settings
+    "html.format.wrapLineLength": 120,
+    "java.configuration.updateBuildConfiguration": "automatic",
+    // Editor
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": true
 }

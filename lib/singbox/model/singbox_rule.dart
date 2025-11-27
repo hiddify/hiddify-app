@@ -18,7 +18,8 @@ abstract class SingboxRule with _$SingboxRule {
     @Default(RuleOutbound.proxy) RuleOutbound outbound,
   }) = _SingboxRule;
 
-  factory SingboxRule.fromJson(Map<String, dynamic> json) => _$SingboxRuleFromJson(json);
+  factory SingboxRule.fromJson(Map<String, dynamic> json) =>
+      _$SingboxRuleFromJson(json);
 }
 
 enum RuleOutbound { proxy, bypass, block }

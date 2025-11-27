@@ -4,12 +4,8 @@
 #include <flutter_windows.h>
 
 #include "resource.h"
-#include <protocol_handler_windows/protocol_handler_windows_plugin_c_api.h>
-
 
 namespace {
-
-/// Window attribute that enables dark mode window decorations.
 ///
 /// Redefined in case the developer's machine has a Windows SDK older than
 /// version 10.0.22000.0.
@@ -159,7 +155,7 @@ bool Win32Window::Create(const std::wstring& title,
 }
 
 bool Win32Window::Show() {
-  return ShowWindow(window_handle_, SW_SHOWNORMAL);
+  return ShowWindow(window_handle_, SW_SHOWNORMAL) != 0;
 }
 
 
@@ -170,8 +166,8 @@ bool Win32Window::SendAppLinkToInstance(const std::wstring &title)
 
   if (hwnd)
   {
-    // Dispatch new link to current window
-    DispatchToProtocolHandler(hwnd);
+    // Previously, protocol_handler_windows dispatched app links here.
+    // Plugin removed; simply bring the existing window to foreground.
 
     // (Optional) Restore our window to front in same state
     WINDOWPLACEMENT place = {sizeof(WINDOWPLACEMENT)};
@@ -190,7 +186,7 @@ bool Win32Window::SendAppLinkToInstance(const std::wstring &title)
       break;
     }
 
-    SetWindowPos(0, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+    SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
     SetForegroundWindow(hwnd);
 
     // Window has been found, don't create another one.
@@ -261,6 +257,12 @@ Win32Window::MessageHandler(HWND hwnd,
       return 0;
 
     case WM_DWMCOLORIZATIONCOLORCHANGED:
+      UpdateTheme(hwnd);
+      return 0;
+    case WM_THEMECHANGED:
+      UpdateTheme(hwnd);
+      return 0;
+    case WM_SETTINGCHANGE:
       UpdateTheme(hwnd);
       return 0;
   }

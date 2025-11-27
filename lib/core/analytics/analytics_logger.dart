@@ -8,8 +8,8 @@ class SentryLoggyIntegration extends LoggyPrinter
   SentryLoggyIntegration({
     LogLevel minBreadcrumbLevel = LogLevel.info,
     LogLevel minEventLevel = LogLevel.error,
-  })  : _minBreadcrumbLevel = minBreadcrumbLevel,
-        _minEventLevel = minEventLevel;
+  }) : _minBreadcrumbLevel = minBreadcrumbLevel,
+       _minEventLevel = minEventLevel;
 
   final LogLevel _minBreadcrumbLevel;
   final LogLevel _minEventLevel;
@@ -89,10 +89,10 @@ extension LogRecordX on LogRecord {
 
 extension LogLevelX on LogLevel {
   SentryLevel? toSentryLevel() => switch (this) {
-        LogLevel.all || LogLevel.debug => SentryLevel.debug,
-        LogLevel.info => SentryLevel.info,
-        LogLevel.warning => SentryLevel.warning,
-        LogLevel.error => SentryLevel.error,
-        _ => null,
-      };
+    LogLevel.all || LogLevel.debug => SentryLevel.debug,
+    LogLevel.info => SentryLevel.info,
+    LogLevel.warning => SentryLevel.warning,
+    LogLevel.error => SentryLevel.error,
+    _ => null,
+  };
 }

@@ -15,7 +15,9 @@ extension TextAlignX on BuildContext {
 
 extension StringX on String {
   TextDirection get textDirection {
-    return intl.Bidi.detectRtlDirectionality(this) ? TextDirection.rtl : TextDirection.ltr;
+    return intl.Bidi.detectRtlDirectionality(this)
+        ? TextDirection.rtl
+        : TextDirection.ltr;
   }
 }
 

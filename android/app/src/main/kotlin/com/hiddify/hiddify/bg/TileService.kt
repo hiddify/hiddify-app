@@ -34,10 +34,14 @@ class TileService : TileService(), ServiceConnection.Callback {
     override fun onClick() {
         when (connection.status) {
             Status.Stopped -> {
+                qsTile?.state = Tile.STATE_UNAVAILABLE
+                qsTile?.updateTile()
                 BoxService.start()
             }
 
             Status.Started -> {
+                qsTile?.state = Tile.STATE_UNAVAILABLE
+                qsTile?.updateTile()
                 BoxService.stop()
             }
 

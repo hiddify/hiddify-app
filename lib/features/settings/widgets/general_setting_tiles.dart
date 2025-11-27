@@ -36,10 +36,19 @@ class GeneralSettingTiles extends HookConsumerWidget {
             secondary: const Icon(FluentIcons.top_speed_24_regular),
             value: ref.watch(Preferences.dynamicNotification),
             onChanged: (value) async {
-              await ref.read(Preferences.dynamicNotification.notifier).update(value);
+              await ref
+                  .read(Preferences.dynamicNotification.notifier)
+                  .update(value);
             },
           ),
-          SwitchListTile(title: Text(t.settings.general.hapticFeedback), secondary: const Icon(FluentIcons.phone_vibrate_24_regular), value: ref.watch(hapticServiceProvider), onChanged: ref.read(hapticServiceProvider.notifier).updatePreference),
+          SwitchListTile(
+            title: Text(t.settings.general.hapticFeedback),
+            secondary: const Icon(FluentIcons.phone_vibrate_24_regular),
+            value: ref.watch(hapticServiceProvider),
+            onChanged: ref
+                .read(hapticServiceProvider.notifier)
+                .updatePreference,
+          ),
         ],
         if (PlatformUtils.isDesktop) ...[
           const ClosingPrefTile(),

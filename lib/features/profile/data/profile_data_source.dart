@@ -66,7 +66,7 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
   Stream<int> watchProfilesCount() {
     final count = profileEntries.id.count();
     return (profileEntries.selectOnly()..addColumns([count]))
-        .map((exp) => exp.read(count)!)
+        .map((exp) => exp.read(count) ?? 0)
         .watchSingle();
   }
 
@@ -75,73 +75,63 @@ class ProfileDao extends DatabaseAccessor<AppDatabase>
     required ProfilesSort sort,
     required SortMode sortMode,
   }) {
-    return (profileEntries.select()
-          ..orderBy(
-            [
-              (tbl) => OrderingTerm(
-                    expression: tbl.active,
-                    mode: OrderingMode.desc,
-                  ),
-              (tbl) {
-                final trafficRatio = (tbl.download + tbl.upload) / tbl.total;
-                final isExpired =
-                    tbl.expire.isSmallerOrEqualValue(DateTime.now());
-                return OrderingTerm(
-                  expression: (trafficRatio.isNull() |
-                          trafficRatio.isSmallerThanValue(1)) &
-                      (isExpired.isNull() | isExpired.equals(false)),
-                  mode: OrderingMode.desc,
-                );
-              },
-              switch (sort) {
-                ProfilesSort.name => (tbl) => OrderingTerm(
-                      expression: tbl.name,
-                      mode: orderMap[sortMode]!,
-                    ),
-                ProfilesSort.lastUpdate => (tbl) => OrderingTerm(
-                      expression: tbl.lastUpdate,
-                      mode: orderMap[sortMode]!,
-                    ),
-              },
-            ],
-          ))
+    return (profileEntries.select()..orderBy([
+          (tbl) =>
+              OrderingTerm(expression: tbl.active, mode: OrderingMode.desc),
+          (tbl) {
+            final trafficRatio = (tbl.download + tbl.upload) / tbl.total;
+            final isExpired = tbl.expire.isSmallerOrEqualValue(DateTime.now());
+            return OrderingTerm(
+              expression:
+                  (trafficRatio.isNull() | trafficRatio.isSmallerThanValue(1)) &
+                  (isExpired.isNull() | isExpired.equals(false)),
+              mode: OrderingMode.desc,
+            );
+          },
+          switch (sort) {
+            ProfilesSort.name => (tbl) => OrderingTerm(
+              expression: tbl.name,
+              mode: orderMap[sortMode]!,
+            ),
+            ProfilesSort.lastUpdate => (tbl) => OrderingTerm(
+              expression: tbl.lastUpdate,
+              mode: orderMap[sortMode]!,
+            ),
+          },
+        ]))
         .watch();
   }
 
   @override
   Future<void> insert(ProfileEntriesCompanion entry) async {
-    await transaction(
-      () async {
-        if (entry.active.present && entry.active.value) {
-          await update(profileEntries)
-              .write(const ProfileEntriesCompanion(active: Value(false)));
-        }
-        await into(profileEntries).insert(entry);
-      },
-    );
+    await transaction(() async {
+      if (entry.active.present && entry.active.value) {
+        await update(
+          profileEntries,
+        ).write(const ProfileEntriesCompanion(active: Value(false)));
+      }
+      await into(profileEntries).insert(entry);
+    });
   }
 
   @override
   Future<void> edit(String id, ProfileEntriesCompanion entry) async {
-    await transaction(
-      () async {
-        
-        if (entry.active.present && entry.active.value) {
-          await update(profileEntries)
-              .write(const ProfileEntriesCompanion(active: Value(false)));
-        }
-        await (update(profileEntries)..where((tbl) => tbl.id.equals(id)))
-            .write(entry.copyWith(lastUpdate: Value(DateTime.now())));
-      },
-    );
+    await transaction(() async {
+      if (entry.active.present && entry.active.value) {
+        await update(
+          profileEntries,
+        ).write(const ProfileEntriesCompanion(active: Value(false)));
+      }
+      await (update(profileEntries)..where((tbl) => tbl.id.equals(id))).write(
+        entry.copyWith(lastUpdate: Value(DateTime.now())),
+      );
+    });
   }
 
   @override
   Future<void> deleteById(String id) async {
-    await transaction(
-      () async {
-        await (delete(profileEntries)..where((tbl) => tbl.id.equals(id))).go();
-      },
-    );
+    await transaction(() async {
+      await (delete(profileEntries)..where((tbl) => tbl.id.equals(id))).go();
+    });
   }
 }

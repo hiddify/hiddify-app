@@ -13,5 +13,10 @@ class ProxyService : Service(), PlatformInterfaceWrapper {
     override fun onBind(intent: Intent) = service.onBind(intent)
     override fun onDestroy() = service.onDestroy()
 
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        service.onTrimMemory(level)
+    }
+
     override fun writeLog(message: String) = service.writeLog(message)
 }

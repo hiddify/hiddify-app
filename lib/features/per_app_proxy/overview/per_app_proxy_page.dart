@@ -29,30 +29,24 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
     final isSearching = useState(false);
     final searchQuery = useState("");
 
-    final filteredPackages = useMemoized(
-      () {
-        if (showSystemApps.value && searchQuery.value.isBlank) {
-          return asyncPackages;
+    final filteredPackages = useMemoized(() {
+      if (showSystemApps.value && searchQuery.value.isBlank) {
+        return asyncPackages;
+      }
+      return asyncPackages.whenData((value) {
+        Iterable<InstalledPackageInfo> result = value;
+        if (!showSystemApps.value) {
+          result = result.filter((e) => !e.isSystemApp);
         }
-        return asyncPackages.whenData(
-          (value) {
-            Iterable<InstalledPackageInfo> result = value;
-            if (!showSystemApps.value) {
-              result = result.filter((e) => !e.isSystemApp);
-            }
-            if (!searchQuery.value.isBlank) {
-              result = result.filter(
-                (e) => e.name
-                    .toLowerCase()
-                    .contains(searchQuery.value.toLowerCase()),
-              );
-            }
-            return result.toList();
-          },
-        );
-      },
-      [asyncPackages, showSystemApps.value, searchQuery.value],
-    );
+        if (!searchQuery.value.isBlank) {
+          result = result.filter(
+            (e) =>
+                e.name.toLowerCase().contains(searchQuery.value.toLowerCase()),
+          );
+        }
+        return result.toList();
+      });
+    }, [asyncPackages, showSystemApps.value, searchQuery.value]);
 
     return Scaffold(
       appBar: isSearching.value
@@ -128,9 +122,12 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                       dense: true,
                       value: e,
                       groupValue: currentMode, // ignore: deprecated_member_use
-                      onChanged: (value) async { // ignore: deprecated_member_use
+                      onChanged: (value) async {
+                        // ignore: deprecated_member_use
                         if (value == null) return;
-                        await ref.read(Preferences.perAppProxyMode.notifier).update(value);
+                        await ref
+                            .read(Preferences.perAppProxyMode.notifier)
+                            .update(value);
                         if (value == PerAppProxyMode.off && context.mounted) {
                           context.pop();
                         }
@@ -144,57 +141,50 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
           ),
           switch (filteredPackages) {
             AsyncData(value: final packages) => SliverList.builder(
-                itemBuilder: (context, index) {
-                  final package = packages[index];
-                  final selected =
-                      perAppProxyList.contains(package.packageName);
-                  return CheckboxListTile(
-                    title: Text(
-                      package.name,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      package.packageName,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    value: selected,
-                    onChanged: (value) async {
-                      final List<String> newSelection;
-                      if (selected) {
-                        newSelection = perAppProxyList
-                            .exceptElement(package.packageName)
-                            .toList();
-                      } else {
-                        newSelection = [
-                          ...perAppProxyList,
-                          package.packageName,
-                        ];
-                      }
-                      await ref
-                          .read(perAppProxyListProvider.notifier)
-                          .update(newSelection);
-                    },
-                    secondary: SizedBox(
-                      width: 48,
-                      height: 48,
-                      child: ref
-                          .watch(packageIconProvider(package.packageName))
-                          .when(
-                            data: (data) => Image(image: data),
-                            error: (error, _) =>
-                                const Icon(FluentIcons.error_circle_24_regular),
-                            loading: () => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          ),
-                    ),
-                  );
-                },
-                itemCount: packages.length,
-              ),
+              itemBuilder: (context, index) {
+                final package = packages[index];
+                final selected = perAppProxyList.contains(package.packageName);
+                return CheckboxListTile(
+                  title: Text(package.name, overflow: TextOverflow.ellipsis),
+                  subtitle: Text(
+                    package.packageName,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  value: selected,
+                  onChanged: (value) async {
+                    final List<String> newSelection;
+                    if (selected) {
+                      newSelection = perAppProxyList
+                          .exceptElement(package.packageName)
+                          .toList();
+                    } else {
+                      newSelection = [...perAppProxyList, package.packageName];
+                    }
+                    await ref
+                        .read(perAppProxyListProvider.notifier)
+                        .update(newSelection);
+                  },
+                  secondary: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: ref
+                        .watch(packageIconProvider(package.packageName))
+                        .when(
+                          data: (data) => Image(image: data),
+                          error: (error, _) =>
+                              const Icon(FluentIcons.error_circle_24_regular),
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                        ),
+                  ),
+                );
+              },
+              itemCount: packages.length,
+            ),
             AsyncLoading() => const SliverLoadingBodyPlaceholder(),
-            AsyncError(:final error) =>
-              SliverErrorBodyPlaceholder(error.toString()),
+            AsyncError(:final error) => SliverErrorBodyPlaceholder(
+              error.toString(),
+            ),
           },
         ],
       ),

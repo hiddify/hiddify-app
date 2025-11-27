@@ -22,10 +22,10 @@ enum ProxiesSort {
   delay;
 
   String present(TranslationsEn t) => switch (this) {
-        ProxiesSort.unsorted => t.proxies.sortOptions.unsorted,
-        ProxiesSort.name => t.proxies.sortOptions.name,
-        ProxiesSort.delay => t.proxies.sortOptions.delay,
-      };
+    ProxiesSort.unsorted => t.proxies.sortOptions.unsorted,
+    ProxiesSort.name => t.proxies.sortOptions.name,
+    ProxiesSort.delay => t.proxies.sortOptions.delay,
+  };
 }
 
 @Riverpod(keepAlive: true)
@@ -56,7 +56,8 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   @override
   Stream<List<ProxyGroupEntity>> build() async* {
     ref.disposeDelay(const Duration(seconds: 15));
-    final serviceRunning = ref.watch(serviceRunningProvider).asData?.value ?? false;
+    final serviceRunning =
+        ref.watch(serviceRunningProvider).asData?.value ?? false;
     final sortBy = ref.watch(proxiesSortProvider);
     if (!serviceRunning) {
       yield* Stream.value(<ProxyGroupEntity>[]);
@@ -71,12 +72,10 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
           trailing: true,
         )
         .map(
-          (event) => event.getOrElse(
-            (err) {
-              loggy.warning("error receiving proxies", err);
-              throw err;
-            },
-          ),
+          (event) => event.getOrElse((err) {
+            loggy.warning("error receiving proxies", err);
+            throw err;
+          }),
         )
         .map((proxies) => _sortOutbounds(proxies, sortBy));
   }
@@ -85,28 +84,26 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     List<ProxyGroupEntity> proxies,
     ProxiesSort sortBy,
   ) {
-    final groupWithSelected = {
-      for (final o in proxies) o.tag: o.selected,
-    };
+    final groupWithSelected = {for (final o in proxies) o.tag: o.selected};
     final sortedProxies = <ProxyGroupEntity>[];
     for (final group in proxies) {
       final sortedItems = switch (sortBy) {
         ProxiesSort.name => group.items.sortedWith((a, b) {
-            if (a.type.isGroup && !b.type.isGroup) return -1;
-            if (!a.type.isGroup && b.type.isGroup) return 1;
-            return a.tag.compareTo(b.tag);
-          }),
+          if (a.type.isGroup && !b.type.isGroup) return -1;
+          if (!a.type.isGroup && b.type.isGroup) return 1;
+          return a.tag.compareTo(b.tag);
+        }),
         ProxiesSort.delay => group.items.sortedWith((a, b) {
-            if (a.type.isGroup && !b.type.isGroup) return -1;
-            if (!a.type.isGroup && b.type.isGroup) return 1;
+          if (a.type.isGroup && !b.type.isGroup) return -1;
+          if (!a.type.isGroup && b.type.isGroup) return 1;
 
-            final ai = a.urlTestDelay;
-            final bi = b.urlTestDelay;
-            if (ai == 0 && bi == 0) return -1;
-            if (ai == 0 && bi > 0) return 1;
-            if (ai > 0 && bi == 0) return -1;
-            return ai.compareTo(bi);
-          }),
+          final ai = a.urlTestDelay;
+          final bi = b.urlTestDelay;
+          if (ai == 0 && bi == 0) return -1;
+          if (ai == 0 && bi > 0) return 1;
+          if (ai > 0 && bi == 0) return -1;
+          return ai.compareTo(bi);
+        }),
         ProxiesSort.unsorted => group.items,
       };
       final items = <ProxyItemEntity>[];
@@ -128,17 +125,19 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     );
     if (state case AsyncData(value: final outbounds)) {
       await ref.read(hapticServiceProvider.notifier).lightImpact();
-      await ref.read(proxyRepositoryProvider).selectProxy(groupTag, outboundTag).getOrElse((err) {
-        loggy.warning("error selecting outbound", err);
-        throw err;
-      }).run();
-      state = AsyncData(
-        [
-          ...outbounds.map(
-            (e) => e.tag == groupTag ? e.copyWith(selected: outboundTag) : e,
-          ),
-        ],
-      );
+      await ref
+          .read(proxyRepositoryProvider)
+          .selectProxy(groupTag, outboundTag)
+          .getOrElse((err) {
+            loggy.warning("error selecting outbound", err);
+            throw err;
+          })
+          .run();
+      state = AsyncData([
+        ...outbounds.map(
+          (e) => e.tag == groupTag ? e.copyWith(selected: outboundTag) : e,
+        ),
+      ]);
     }
   }
 
@@ -146,7 +145,9 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     loggy.debug("testing group: [$groupTag]");
     if (state case AsyncData()) {
       await ref.read(hapticServiceProvider.notifier).lightImpact();
-      await ref.read(proxyRepositoryProvider).urlTest(groupTag).getOrElse((err) {
+      await ref.read(proxyRepositoryProvider).urlTest(groupTag).getOrElse((
+        err,
+      ) {
         loggy.error("error testing group", err);
         throw err;
       }).run();

@@ -52,6 +52,8 @@ abstract class SingboxConfigOption with _$SingboxConfigOption {
     required SingboxTlsTricks tlsTricks,
     required SingboxWarpOption warp,
     required SingboxWarpOption warp2,
+    required SingboxMasqueOption masque,
+    required String geoRulesBaseUrl,
   }) = _SingboxConfigOption;
 
   String format() {
@@ -59,7 +61,24 @@ abstract class SingboxConfigOption with _$SingboxConfigOption {
     return encoder.convert(toJson());
   }
 
-  factory SingboxConfigOption.fromJson(Map<String, dynamic> json) => _$SingboxConfigOptionFromJson(json);
+  factory SingboxConfigOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxConfigOptionFromJson(json);
+}
+
+@freezed
+abstract class SingboxMasqueOption with _$SingboxMasqueOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxMasqueOption({
+    required bool enable,
+    required String server,
+    required int port,
+    required String serverName,
+    required String auth,
+    required List<String> alpn,
+  }) = _SingboxMasqueOption;
+
+  factory SingboxMasqueOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxMasqueOptionFromJson(json);
 }
 
 @freezed
@@ -80,7 +99,8 @@ abstract class SingboxWarpOption with _$SingboxWarpOption {
     @OptionalRangeJsonConverter() required String noiseMode,
   }) = _SingboxWarpOption;
 
-  factory SingboxWarpOption.fromJson(Map<String, dynamic> json) => _$SingboxWarpOptionFromJson(json);
+  factory SingboxWarpOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxWarpOptionFromJson(json);
 }
 
 @freezed
@@ -93,7 +113,8 @@ abstract class SingboxMuxOption with _$SingboxMuxOption {
     required MuxProtocol protocol,
   }) = _SingboxMuxOption;
 
-  factory SingboxMuxOption.fromJson(Map<String, dynamic> json) => _$SingboxMuxOptionFromJson(json);
+  factory SingboxMuxOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxMuxOptionFromJson(json);
 }
 
 @freezed
@@ -106,7 +127,14 @@ abstract class SingboxTlsTricks with _$SingboxTlsTricks {
     required bool mixedSniCase,
     required bool enablePadding,
     @OptionalRangeJsonConverter() required OptionalRange paddingSize,
+    required bool enableEch,
+    required String echConfig,
+    required String echConfigPath,
+    required bool enableReality,
+    required String realityPublicKey,
+    required String realityShortId,
   }) = _SingboxTlsTricks;
 
-  factory SingboxTlsTricks.fromJson(Map<String, dynamic> json) => _$SingboxTlsTricksFromJson(json);
+  factory SingboxTlsTricks.fromJson(Map<String, dynamic> json) =>
+      _$SingboxTlsTricksFromJson(json);
 }

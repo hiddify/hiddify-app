@@ -20,10 +20,7 @@ class AnimatedText extends Text {
     return AnimatedSwitcher(
       duration: duration,
       transitionBuilder: (child, animation) {
-        child = FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        child = FadeTransition(opacity: animation, child: child);
         if (size) {
           child = SizeTransition(
             axis: Axis.horizontal,
@@ -43,11 +40,7 @@ class AnimatedText extends Text {
         }
         return child;
       },
-      child: Text(
-        data!,
-        key: ValueKey<String>(data!),
-        style: style,
-      ),
+      child: Text(data!, key: ValueKey<String>(data!), style: style),
     );
   }
 }

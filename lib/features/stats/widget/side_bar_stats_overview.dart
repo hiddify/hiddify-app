@@ -24,7 +24,8 @@ class SideBarStatsOverview extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final StatsEntity stats = ref.watch(statsProvider).asData?.value ?? StatsEntity.empty();
+    final StatsEntity stats =
+        ref.watch(statsProvider).asData?.value ?? StatsEntity.empty();
     final bool showAll = ref.watch(showAllSidebarStatsProvider);
 
     return Padding(
@@ -37,21 +38,36 @@ class SideBarStatsOverview extends HookConsumerWidget {
             child: SizedBox(
               height: 18,
               child: TextButton(
-                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8), textStyle: Theme.of(context).textTheme.labelSmall),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  textStyle: Theme.of(context).textTheme.labelSmall,
+                ),
                 onPressed: () {
-                  ref.read(showAllSidebarStatsProvider.notifier).update(!showAll);
+                  ref
+                      .read(showAllSidebarStatsProvider.notifier)
+                      .update(!showAll);
                 },
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    AnimatedRotation(turns: showAll ? 1 : 0.5, duration: kAnimationDuration, child: const Icon(FluentIcons.chevron_down_16_regular, size: 16)),
+                    AnimatedRotation(
+                      turns: showAll ? 1 : 0.5,
+                      duration: kAnimationDuration,
+                      child: const Icon(
+                        FluentIcons.chevron_down_16_regular,
+                        size: 16,
+                      ),
+                    ),
                     const Gap(6),
                     Flexible(
                       child: DefaultTextStyle(
                         style: Theme.of(context).textTheme.labelSmall!,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        child: AnimatedText(showAll ? t.general.showLess : t.general.showMore, style: Theme.of(context).textTheme.labelSmall),
+                        child: AnimatedText(
+                          showAll ? t.general.showLess : t.general.showMore,
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
                       ),
                     ),
                   ],
@@ -62,13 +78,25 @@ class SideBarStatsOverview extends HookConsumerWidget {
           const ConnectionStatsCard(),
           const Gap(8),
           AnimatedCrossFade(
-            crossFadeState: showAll ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+            crossFadeState: showAll
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
             duration: kAnimationDuration,
             firstChild: StatsCard(
               title: t.stats.traffic,
               stats: [
-                (label: const Icon(FluentIcons.arrow_download_16_regular), data: Text(stats.downlink.speed()), semanticLabel: t.stats.speed),
-                (label: const Icon(FluentIcons.arrow_bidirectional_up_down_16_regular), data: Text(stats.downlinkTotal.size()), semanticLabel: t.stats.totalTransferred),
+                (
+                  label: const Icon(FluentIcons.arrow_download_16_regular),
+                  data: Text(stats.downlink.speed()),
+                  semanticLabel: t.stats.speed,
+                ),
+                (
+                  label: const Icon(
+                    FluentIcons.arrow_bidirectional_up_down_16_regular,
+                  ),
+                  data: Text(stats.downlinkTotal.size()),
+                  semanticLabel: t.stats.totalTransferred,
+                ),
               ],
             ),
             secondChild: Column(
@@ -76,16 +104,48 @@ class SideBarStatsOverview extends HookConsumerWidget {
                 StatsCard(
                   title: t.stats.trafficLive,
                   stats: [
-                    (label: const Text("↑", style: TextStyle(color: Colors.green)), data: Text(stats.uplink.speed()), semanticLabel: t.stats.uplink),
-                    (label: Text("↓", style: TextStyle(color: Theme.of(context).colorScheme.error)), data: Text(stats.downlink.speed()), semanticLabel: t.stats.downlink),
+                    (
+                      label: const Text(
+                        "↑",
+                        style: TextStyle(color: Colors.green),
+                      ),
+                      data: Text(stats.uplink.speed()),
+                      semanticLabel: t.stats.uplink,
+                    ),
+                    (
+                      label: Text(
+                        "↓",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      data: Text(stats.downlink.speed()),
+                      semanticLabel: t.stats.downlink,
+                    ),
                   ],
                 ),
                 const Gap(8),
                 StatsCard(
                   title: t.stats.trafficTotal,
                   stats: [
-                    (label: const Text("↑", style: TextStyle(color: Colors.green)), data: Text(stats.uplinkTotal.size()), semanticLabel: t.stats.uplink),
-                    (label: Text("↓", style: TextStyle(color: Theme.of(context).colorScheme.error)), data: Text(stats.downlinkTotal.size()), semanticLabel: t.stats.downlink),
+                    (
+                      label: const Text(
+                        "↑",
+                        style: TextStyle(color: Colors.green),
+                      ),
+                      data: Text(stats.uplinkTotal.size()),
+                      semanticLabel: t.stats.uplink,
+                    ),
+                    (
+                      label: Text(
+                        "↓",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                      data: Text(stats.downlinkTotal.size()),
+                      semanticLabel: t.stats.downlink,
+                    ),
                   ],
                 ),
               ],

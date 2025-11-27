@@ -13,10 +13,7 @@ import 'package:hiddify/utils/placeholders.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProfilesOverviewModal extends HookConsumerWidget {
-  const ProfilesOverviewModal({
-    super.key,
-    this.scrollController,
-  });
+  const ProfilesOverviewModal({super.key, this.scrollController});
 
   final ScrollController? scrollController;
 
@@ -25,24 +22,21 @@ class ProfilesOverviewModal extends HookConsumerWidget {
     final t = ref.watch(translationsProvider);
     final asyncProfiles = ref.watch(profilesOverviewProvider);
 
-    ref.listen(
-      foregroundProfilesUpdateProvider,
-      (_, next) {
-        if (next case AsyncData(:final value?)) {
-          final t = ref.read(translationsProvider);
-          final notification = ref.read(inAppNotificationControllerProvider);
-          if (value.success) {
-            notification.showSuccessToast(
-              t.profile.update.namedSuccessMsg(name: value.name),
-            );
-          } else {
-            notification.showErrorToast(
-              t.profile.update.namedFailureMsg(name: value.name),
-            );
-          }
+    ref.listen(foregroundProfilesUpdateProvider, (_, next) {
+      if (next case AsyncData(:final value?)) {
+        final t = ref.read(translationsProvider);
+        final notification = ref.read(inAppNotificationControllerProvider);
+        if (value.success) {
+          notification.showSuccessToast(
+            t.profile.update.namedSuccessMsg(name: value.name),
+          );
+        } else {
+          notification.showErrorToast(
+            t.profile.update.namedFailureMsg(name: value.name),
+          );
         }
-      },
-    );
+      }
+    });
 
     return SafeArea(
       child: Stack(
@@ -52,15 +46,15 @@ class ProfilesOverviewModal extends HookConsumerWidget {
             slivers: [
               switch (asyncProfiles) {
                 AsyncData(value: final profiles) => SliverList.builder(
-                    itemBuilder: (context, index) {
-                      final profile = profiles[index];
-                      return ProfileTile(profile: profile);
-                    },
-                    itemCount: profiles.length,
-                  ),
+                  itemBuilder: (context, index) {
+                    final profile = profiles[index];
+                    return ProfileTile(profile: profile);
+                  },
+                  itemCount: profiles.length,
+                ),
                 AsyncError(:final error) => SliverErrorBodyPlaceholder(
-                    t.presentShortError(error),
-                  ),
+                  t.presentShortError(error),
+                ),
                 AsyncLoading() => const SliverLoadingBodyPlaceholder(),
               },
               const SliverGap(48),
@@ -97,9 +91,7 @@ class ProfilesOverviewModal extends HookConsumerWidget {
                     FilledButton.icon(
                       onPressed: () async {
                         await ref
-                            .read(
-                              foregroundProfilesUpdateProvider.notifier,
-                            )
+                            .read(foregroundProfilesUpdateProvider.notifier)
                             .trigger();
                       },
                       icon: const Icon(FluentIcons.arrow_sync_24_filled),
@@ -122,8 +114,7 @@ class ProfilesSortModal extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final sortNotifier =
-        ref.watch(profilesOverviewSortProvider.notifier);
+    final sortNotifier = ref.watch(profilesOverviewSortProvider.notifier);
 
     return AlertDialog(
       title: Text(t.general.sortBy),
@@ -133,41 +124,40 @@ class ProfilesSortModal extends HookConsumerWidget {
           return SingleChildScrollView(
             child: Column(
               children: [
-                ...ProfilesSort.values.map(
-                  (e) {
-                    final selected = sort.by == e;
-                    final double arrowTurn =
-                        sort.mode == SortMode.ascending ? 0 : 0.5;
+                ...ProfilesSort.values.map((e) {
+                  final selected = sort.by == e;
+                  final double arrowTurn = sort.mode == SortMode.ascending
+                      ? 0
+                      : 0.5;
 
-                    return ListTile(
-                      title: Text(e.present(t)),
-                      onTap: () {
-                        if (selected) {
-                          sortNotifier.toggleMode();
-                        } else {
-                          sortNotifier.changeSort(e);
-                        }
-                      },
-                      selected: selected,
-                      leading: Icon(e.icon),
-                      trailing: selected
-                          ? IconButton(
-                              onPressed: () {
-                                sortNotifier.toggleMode();
-                              },
-                              icon: AnimatedRotation(
-                                turns: arrowTurn,
-                                duration: const Duration(milliseconds: 100),
-                                child: Icon(
-                                  FluentIcons.arrow_sort_up_24_regular,
-                                  semanticLabel: sort.mode.name,
-                                ),
+                  return ListTile(
+                    title: Text(e.present(t)),
+                    onTap: () {
+                      if (selected) {
+                        sortNotifier.toggleMode();
+                      } else {
+                        sortNotifier.changeSort(e);
+                      }
+                    },
+                    selected: selected,
+                    leading: Icon(e.icon),
+                    trailing: selected
+                        ? IconButton(
+                            onPressed: () {
+                              sortNotifier.toggleMode();
+                            },
+                            icon: AnimatedRotation(
+                              turns: arrowTurn,
+                              duration: const Duration(milliseconds: 100),
+                              child: Icon(
+                                FluentIcons.arrow_sort_up_24_regular,
+                                semanticLabel: sort.mode.name,
                               ),
-                            )
-                          : null,
-                    );
-                  },
-                ),
+                            ),
+                          )
+                        : null,
+                  );
+                }),
               ],
             ),
           );

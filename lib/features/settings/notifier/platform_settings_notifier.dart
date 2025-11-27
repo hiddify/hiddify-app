@@ -13,12 +13,19 @@ class IgnoreBatteryOptimizations extends _$IgnoreBatteryOptimizations {
     if (!Platform.isAndroid) {
       return Future.value(true);
     }
-    return ref.watch(settingsRepositoryProvider).isIgnoringBatteryOptimizations().getOrElse((l) => false).run();
+    return ref
+        .watch(settingsRepositoryProvider)
+        .isIgnoringBatteryOptimizations()
+        .getOrElse((l) => false)
+        .run();
   }
 
   Future<void> request() async {
     if (Platform.isAndroid) {
-      await ref.read(settingsRepositoryProvider).requestIgnoreBatteryOptimizations().run();
+      await ref
+          .read(settingsRepositoryProvider)
+          .requestIgnoreBatteryOptimizations()
+          .run();
       await Future.delayed(const Duration(seconds: 1));
       ref.invalidateSelf();
     }

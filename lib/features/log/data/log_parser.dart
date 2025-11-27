@@ -15,20 +15,14 @@ abstract class LogParser {
     if (time != null) {
       log = log.substring(26);
     }
-    final level = LogLevel.values.firstOrNullWhere(
-      (e) {
-        if (log.startsWith(e.name.toUpperCase())) {
-          log = log.removePrefix(e.name.toUpperCase());
-          return true;
-        }
-        return false;
-      },
-    );
-    return LogEntity(
-      level: level,
-      time: time,
-      message: log.trim(),
-    );
+    final level = LogLevel.values.firstOrNullWhere((e) {
+      if (log.startsWith(e.name.toUpperCase())) {
+        log = log.removePrefix(e.name.toUpperCase());
+        return true;
+      }
+      return false;
+    });
+    return LogEntity(level: level, time: time, message: log.trim());
   }
 
   static LogEntity parseApp(String log) {
@@ -38,19 +32,14 @@ abstract class LogParser {
     if (i > 0) {
       log = log.substring(i + sep.length);
     }
-    final level = LogLevel.values.firstOrNullWhere(
-      (e) {
-        final tag = '[${e.name.toUpperCase()}]';
-        if (log.startsWith(tag)) {
-          log = log.removePrefix(tag).trimLeft();
-          return true;
-        }
-        return false;
-      },
-    );
-    return LogEntity(
-      level: level,
-      message: log.trim(),
-    );
+    final level = LogLevel.values.firstOrNullWhere((e) {
+      final tag = '[${e.name.toUpperCase()}]';
+      if (log.startsWith(tag)) {
+        log = log.removePrefix(tag).trimLeft();
+        return true;
+      }
+      return false;
+    });
+    return LogEntity(level: level, message: log.trim());
   }
 }

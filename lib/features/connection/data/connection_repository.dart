@@ -11,20 +11,37 @@ import 'package:hiddify/singbox/model/singbox_config_option.dart';
 import 'package:hiddify/singbox/model/singbox_status.dart';
 import 'package:hiddify/singbox/service/singbox_service.dart';
 import 'package:hiddify/utils/utils.dart';
- 
 
 abstract interface class ConnectionRepository {
   SingboxConfigOption? get configOptionsSnapshot;
 
   TaskEither<ConnectionFailure, Unit> setup();
   Stream<ConnectionStatus> watchConnectionStatus();
-  TaskEither<ConnectionFailure, Unit> connect(String fileName, String profileName, bool disableMemoryLimit, String? testUrl);
+  TaskEither<ConnectionFailure, Unit> connect(
+    String fileName,
+    String profileName,
+    bool disableMemoryLimit,
+    String? testUrl,
+  );
   TaskEither<ConnectionFailure, Unit> disconnect();
-  TaskEither<ConnectionFailure, Unit> reconnect(String fileName, String profileName, bool disableMemoryLimit, String? testUrl);
+  TaskEither<ConnectionFailure, Unit> reconnect(
+    String fileName,
+    String profileName,
+    bool disableMemoryLimit,
+    String? testUrl,
+  );
 }
 
-class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements ConnectionRepository {
-  ConnectionRepositoryImpl({required this.directories, required this.singbox, required this.platformSource, required this.configOptionRepository, required this.profilePathResolver});
+class ConnectionRepositoryImpl
+    with ExceptionHandler, InfraLogger
+    implements ConnectionRepository {
+  ConnectionRepositoryImpl({
+    required this.directories,
+    required this.singbox,
+    required this.platformSource,
+    required this.configOptionRepository,
+    required this.profilePathResolver,
+  });
 
   final Directories directories;
   final SingboxService singbox;
@@ -42,12 +59,20 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   Stream<ConnectionStatus> watchConnectionStatus() {
     return singbox.watchStatus().map(
       (event) => switch (event) {
-        SingboxStopped(:final alert?, :final message) => Disconnected(switch (alert) {
-          SingboxAlert.emptyConfiguration => ConnectionFailure.invalidConfig(message),
-          SingboxAlert.requestNotificationPermission => ConnectionFailure.missingNotificationPermission(message),
-          SingboxAlert.requestVPNPermission => ConnectionFailure.missingVpnPermission(message),
-          SingboxAlert.startCommandServer || SingboxAlert.createService || SingboxAlert.startService => ConnectionFailure.unexpected(message),
-        }),
+        SingboxStopped(:final alert?, :final message) => Disconnected(
+          switch (alert) {
+            SingboxAlert.emptyConfiguration => ConnectionFailure.invalidConfig(
+              message,
+            ),
+            SingboxAlert.requestNotificationPermission =>
+              ConnectionFailure.missingNotificationPermission(message),
+            SingboxAlert.requestVPNPermission =>
+              ConnectionFailure.missingVpnPermission(message),
+            SingboxAlert.startCommandServer ||
+            SingboxAlert.createService ||
+            SingboxAlert.startService => ConnectionFailure.unexpected(message),
+          },
+        ),
         SingboxStopped() => const Disconnected(),
         SingboxStarting() => const Connecting(),
         SingboxStarted() => const Connected(),
@@ -58,7 +83,11 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
 
   TaskEither<ConnectionFailure, SingboxConfigOption> getConfigOption() {
     return TaskEither<ConnectionFailure, SingboxConfigOption>.Do(($) async {
-      final options = await $(configOptionRepository.getFullSingboxConfigOption().mapLeft((l) => const InvalidConfigOption()));
+      final options = await $(
+        configOptionRepository.getFullSingboxConfigOption().mapLeft(
+          (l) => const InvalidConfigOption(),
+        ),
+      );
 
       return $(
         TaskEither(() async {
@@ -75,14 +104,20 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     }).handleExceptions(UnexpectedConnectionFailure.new);
   }
 
-  TaskEither<ConnectionFailure, Unit> applyConfigOption(SingboxConfigOption options, String? testUrl) {
+  TaskEither<ConnectionFailure, Unit> applyConfigOption(
+    SingboxConfigOption options,
+    String? testUrl,
+  ) {
     return exceptionHandler(() {
       _configOptionsSnapshot = options;
       var newOptions = options;
       if (testUrl != null) {
         newOptions = options.copyWith(connectionTestUrl: testUrl);
       }
-      return singbox.changeOptions(newOptions).mapLeft(InvalidConfigOption.new).run();
+      return singbox
+          .changeOptions(newOptions)
+          .mapLeft(InvalidConfigOption.new)
+          .run();
     }, UnexpectedConnectionFailure.new);
   }
 
@@ -103,10 +138,17 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   }
 
   @override
-  TaskEither<ConnectionFailure, Unit> connect(String fileName, String profileName, bool disableMemoryLimit, String? testUrl) {
+  TaskEither<ConnectionFailure, Unit> connect(
+    String fileName,
+    String profileName,
+    bool disableMemoryLimit,
+    String? testUrl,
+  ) {
     return TaskEither<ConnectionFailure, Unit>.Do(($) async {
       final options = await $(getConfigOption());
-      loggy.info("config options: ${options.format()}\nMemory Limit: ${!disableMemoryLimit}");
+      loggy.info(
+        "config options: ${options.format()}\nMemory Limit: ${!disableMemoryLimit}",
+      );
 
       await $(
         TaskEither(() async {
@@ -122,7 +164,15 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
       );
       await $(setup());
       await $(applyConfigOption(options, testUrl));
-      return await $(singbox.start(profilePathResolver.file(fileName).path, profileName, disableMemoryLimit).mapLeft(UnexpectedConnectionFailure.new));
+      return await $(
+        singbox
+            .start(
+              profilePathResolver.file(fileName).path,
+              profileName,
+              disableMemoryLimit,
+            )
+            .mapLeft(UnexpectedConnectionFailure.new),
+      );
     }).handleExceptions(UnexpectedConnectionFailure.new);
   }
 
@@ -148,13 +198,28 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   }
 
   @override
-  TaskEither<ConnectionFailure, Unit> reconnect(String fileName, String profileName, bool disableMemoryLimit, String? testUrl) {
+  TaskEither<ConnectionFailure, Unit> reconnect(
+    String fileName,
+    String profileName,
+    bool disableMemoryLimit,
+    String? testUrl,
+  ) {
     return TaskEither<ConnectionFailure, Unit>.Do(($) async {
       final options = await $(getConfigOption());
-      loggy.info("config options: ${options.format()}\nMemory Limit: ${!disableMemoryLimit}");
+      loggy.info(
+        "config options: ${options.format()}\nMemory Limit: ${!disableMemoryLimit}",
+      );
 
       await $(applyConfigOption(options, testUrl));
-      return await $(singbox.restart(profilePathResolver.file(fileName).path, profileName, disableMemoryLimit).mapLeft(UnexpectedConnectionFailure.new));
+      return await $(
+        singbox
+            .restart(
+              profilePathResolver.file(fileName).path,
+              profileName,
+              disableMemoryLimit,
+            )
+            .mapLeft(UnexpectedConnectionFailure.new),
+      );
     }).handleExceptions(UnexpectedConnectionFailure.new);
   }
 }

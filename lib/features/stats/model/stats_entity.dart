@@ -14,9 +14,9 @@ abstract class StatsEntity with _$StatsEntity {
   const StatsEntity._();
 
   factory StatsEntity.empty() => const StatsEntity(
-        uplink: 0,
-        downlink: 0,
-        uplinkTotal: 0,
-        downlinkTotal: 0,
-      );
+    uplink: 0,
+    downlink: 0,
+    uplinkTotal: 0,
+    downlinkTotal: 0,
+  );
 }

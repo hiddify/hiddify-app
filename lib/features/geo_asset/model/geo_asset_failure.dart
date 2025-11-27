@@ -25,17 +25,17 @@ sealed class GeoAssetFailure with _$GeoAssetFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       GeoAssetUnexpectedFailure() => (
-          type: t.failure.geoAssets.unexpected,
-          message: null,
-        ),
+        type: t.failure.geoAssets.unexpected,
+        message: null,
+      ),
       GeoAssetNoUpdateAvailable() => (
-          type: t.failure.geoAssets.notUpdate,
-          message: null
-        ),
+        type: t.failure.geoAssets.notUpdate,
+        message: null,
+      ),
       GeoAssetActiveAssetNotFound() => (
-          type: t.failure.geoAssets.activeNotFound,
-          message: null,
-        ),
+        type: t.failure.geoAssets.activeNotFound,
+        message: null,
+      ),
     };
   }
 }

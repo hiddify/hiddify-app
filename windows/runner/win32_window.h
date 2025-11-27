@@ -6,7 +6,6 @@
 #include <functional>
 #include <memory>
 #include <string>
-#include <protocol_handler_windows/protocol_handler_windows_plugin_c_api.h>
 // A class abstraction for a high DPI-aware Win32 Window. Intended to be
 // inherited from by classes that wish to specialize with custom
 // rendering and input handling

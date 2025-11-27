@@ -15,20 +15,20 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
   @override
   Future<bool> build() async {
     final serviceRunning = await ref.watch(serviceRunningProvider.future);
-    final serviceSingboxOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
-    ref.listen(
-      ConfigOptions.singboxConfigOptions,
-      (previous, next) {
-        if (!serviceRunning || serviceSingboxOptions == null) return;
-        if (next case AsyncData(:final value) when next != previous) {
-          if (_lastUpdate == null || DateTime.now().difference(_lastUpdate!) > const Duration(milliseconds: 100)) {
-            _lastUpdate = DateTime.now();
-            state = AsyncData(value != serviceSingboxOptions);
-          }
+    final serviceSingboxOptions = ref
+        .read(connectionRepositoryProvider)
+        .configOptionsSnapshot;
+    ref.listen(singboxConfigOptionProvider, (previous, next) {
+      if (!serviceRunning || serviceSingboxOptions == null) return;
+      if (next case AsyncData(:final value) when next != previous) {
+        if (_lastUpdate == null ||
+            DateTime.now().difference(_lastUpdate!) >
+                const Duration(milliseconds: 100)) {
+          _lastUpdate = DateTime.now();
+          state = AsyncData(value != serviceSingboxOptions);
         }
-      },
-      fireImmediately: true,
-    );
+      }
+    }, fireImmediately: true);
     return false;
   }
 
@@ -36,7 +36,7 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
 
   Future<bool> exportJsonToClipboard({bool excludePrivate = true}) async {
     try {
-      final options = await ref.read(ConfigOptions.singboxConfigOptions.future);
+      final options = await ref.read(singboxConfigOptionProvider.future);
       Map map = options.toJson();
       if (excludePrivate) {
         for (final key in ConfigOptions.privatePreferencesKeys) {
@@ -60,7 +60,9 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
 
   Future<bool> importFromClipboard() async {
     try {
-      final input = await Clipboard.getData("text/plain").then((value) => value?.text);
+      final input = await Clipboard.getData(
+        "text/plain",
+      ).then((value) => value?.text);
       if (input == null) return false;
       if (jsonDecode(input) case final Map<String, dynamic> map) {
         for (final option in ConfigOptions.preferences.entries) {

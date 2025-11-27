@@ -30,23 +30,29 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
     ref.listen(serviceRunningProvider, (_, next) => _idle = false);
 
     final autoCheck = ref.watch(Preferences.autoCheckIp);
-    final serviceRunning = ref.watch(serviceRunningProvider).asData?.value ?? false;
+    final serviceRunning =
+        ref.watch(serviceRunningProvider).asData?.value ?? false;
     // loggy.debug(
     //   "idle? [$_idle], forced? [$_forceCheck], connected? [$serviceRunning]",
     // );
     if (!_forceCheck && !serviceRunning) {
       // before connect, don't show error UI; show "Check IP" action
       throw const UnknownIp();
-    } else if ((_idle && !_forceCheck) || (!_forceCheck && serviceRunning && !autoCheck)) {
+    } else if ((_idle && !_forceCheck) ||
+        (!_forceCheck && serviceRunning && !autoCheck)) {
       throw const UnknownIp();
     }
 
     _forceCheck = false;
-    final info = await ref.watch(proxyRepositoryProvider).getCurrentIpInfo(cancelToken).getOrElse((err) {
-      loggy.warning("error getting proxy ip info", err, StackTrace.current);
-      // throw err; //hiddify: remove exception to be logged
-      throw const UnknownIp();
-    }).run();
+    final info = await ref
+        .watch(proxyRepositoryProvider)
+        .getCurrentIpInfo(cancelToken)
+        .getOrElse((err) {
+          loggy.warning("error getting proxy ip info", err, StackTrace.current);
+          // throw err; //hiddify: remove exception to be logged
+          throw const UnknownIp();
+        })
+        .run();
 
     timer = Timer(const Duration(seconds: 10), () {
       loggy.debug("entering idle mode");
@@ -74,12 +80,17 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
 class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
   @override
   Stream<ProxyItemEntity> build() async* {
-    final serviceRunning = ref.watch(serviceRunningProvider).asData?.value ?? false;
+    final serviceRunning =
+        ref.watch(serviceRunningProvider).asData?.value ?? false;
     if (!serviceRunning) {
       throw const ServiceNotRunning();
     }
 
-    yield* ref.watch(proxyRepositoryProvider).watchActiveProxies().map((event) => event.getOrElse((l) => throw l)).map((event) => event.firstOrNull!.items.first);
+    yield* ref
+        .watch(proxyRepositoryProvider)
+        .watchActiveProxies()
+        .map((event) => event.getOrElse((l) => throw l))
+        .map((event) => event.firstOrNull!.items.first);
   }
 
   final _urlTestThrottler = Throttler(const Duration(seconds: 2));
@@ -89,7 +100,9 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
     _urlTestThrottler(() async {
       if (state case AsyncData()) {
         await ref.read(hapticServiceProvider.notifier).lightImpact();
-        await ref.read(proxyRepositoryProvider).urlTest(groupTag).getOrElse((err) {
+        await ref.read(proxyRepositoryProvider).urlTest(groupTag).getOrElse((
+          err,
+        ) {
           loggy.warning("error testing group", err);
           throw err;
         }).run();

@@ -36,7 +36,13 @@ class LocalePrefTile extends ConsumerWidget {
                   onChanged: Navigator.of(context).maybePop,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [for (final e in AppLocale.values) RadioListTile<AppLocale>(value: e, title: Text(e.localeName))],
+                    children: [
+                      for (final e in AppLocale.values)
+                        RadioListTile<AppLocale>(
+                          value: e,
+                          title: Text(e.localeName),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -44,7 +50,9 @@ class LocalePrefTile extends ConsumerWidget {
           },
         );
         if (selectedLocale != null) {
-          await ref.read(localePreferencesProvider.notifier).changeLocale(selectedLocale);
+          await ref
+              .read(localePreferencesProvider.notifier)
+              .changeLocale(selectedLocale);
         }
       },
     );
@@ -75,7 +83,13 @@ class RegionPrefTile extends ConsumerWidget {
                   onChanged: Navigator.of(context).maybePop,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [for (final e in Region.values) RadioListTile<Region>(value: e, title: Text(e.present(t)))],
+                    children: [
+                      for (final e in Region.values)
+                        RadioListTile<Region>(
+                          value: e,
+                          title: Text(e.present(t)),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -114,7 +128,10 @@ class EnableAnalyticsPrefTile extends ConsumerWidget {
 
     return SwitchListTile(
       title: Text(t.settings.general.enableAnalytics),
-      subtitle: Text(t.settings.general.enableAnalyticsMsg, style: Theme.of(context).textTheme.bodySmall),
+      subtitle: Text(
+        t.settings.general.enableAnalyticsMsg,
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
       secondary: const Icon(FluentIcons.bug_24_regular),
       value: enabled,
       onChanged: (value) async {
@@ -122,9 +139,13 @@ class EnableAnalyticsPrefTile extends ConsumerWidget {
           return onChanged!(value);
         }
         if (enabled) {
-          await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
+          await ref
+              .read(analyticsControllerProvider.notifier)
+              .disableAnalytics();
         } else {
-          await ref.read(analyticsControllerProvider.notifier).enableAnalytics();
+          await ref
+              .read(analyticsControllerProvider.notifier)
+              .enableAnalytics();
         }
       },
     );
@@ -155,7 +176,13 @@ class ThemeModePrefTile extends ConsumerWidget {
                   onChanged: Navigator.of(context).maybePop,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [for (final e in AppThemeMode.values) RadioListTile<AppThemeMode>(value: e, title: Text(e.present(t)))],
+                    children: [
+                      for (final e in AppThemeMode.values)
+                        RadioListTile<AppThemeMode>(
+                          value: e,
+                          title: Text(e.present(t)),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -163,7 +190,9 @@ class ThemeModePrefTile extends ConsumerWidget {
           },
         );
         if (selectedThemeMode != null) {
-          await ref.read(themePreferencesProvider.notifier).changeThemeMode(selectedThemeMode);
+          await ref
+              .read(themePreferencesProvider.notifier)
+              .changeThemeMode(selectedThemeMode);
         }
       },
     );
@@ -194,7 +223,13 @@ class ClosingPrefTile extends ConsumerWidget {
                   onChanged: Navigator.of(context).maybePop,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    children: [for (final e in ActionsAtClosing.values) RadioListTile<ActionsAtClosing>(value: e, title: Text(e.present(t)))],
+                    children: [
+                      for (final e in ActionsAtClosing.values)
+                        RadioListTile<ActionsAtClosing>(
+                          value: e,
+                          title: Text(e.present(t)),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -202,7 +237,9 @@ class ClosingPrefTile extends ConsumerWidget {
           },
         );
         if (selectedAction != null) {
-          await ref.read(Preferences.actionAtClose.notifier).update(selectedAction);
+          await ref
+              .read(Preferences.actionAtClose.notifier)
+              .update(selectedAction);
         }
       },
     );

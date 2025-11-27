@@ -1,0 +1,57 @@
+{
+"profiles":[
+  {
+    "region": ["ir", "cn"],
+    "title": {"en": "Warp", "fa": "وارپ"},
+    "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/warp",
+    "tags": { "en": ["Warp"], "fa": ["وارپ"] },
+    "consent": {
+        "en": "Cloudflare WARP is a Free WireGuard VPN Provider. By enabling this option you are agreeing to the Cloudflare WARP's [Term of service](https://www.cloudflare.com/application/terms/) and [Privacy Policy](https://www.cloudflare.com/application/privacypolicy/).",
+        "fa": "وارپ کلودفلر یک ارائه دهنده رایگان وایرگارد است. با فعال کردن این گزینه، با [شرایط خدمات] (https://www.cloudflare.com/application/terms/) و [خط‌مشی رازداری] (https://www.cloudflare.com/application/) کلودفلر موافقت می‌کنید."
+    }
+  },
+  {
+    "region": ["ir"],
+    "title": {"en": "Insta-Youtube only", "fa": "فقط اینستا و یوتیوب"},
+    "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/fragment",
+    "tags": { "en": ["Fragment"], "fa": ["فرگمنت"] },
+    "consent": {
+      "en": "This configuration is free and has no guarantee of connection and is only recommended in emergencies. It is better to use trusted configurations.",
+      "fa": "این کانفیگ رایگان هست و هیچ ضمانتی برای اتصال ندارد و صرفا در مواقع اضطراری پیشنهاد میشود. بهتر است از کانفیگ های معتبر استفاده کنید."
+    }
+  },
+  {
+    "region": ["ir"],
+    "title": {"en": "Ainita.net", "fa": "آی نیتا"},
+    "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/ainita",
+    "tags": { "en": ["mix"], "fa": ["عمومی"] },
+    "consent": {
+      "en": "Project Ainita is a project for online anonymity, security and freedom. Our mission is to fight online censorship in countries with repressive regimes with a special focus on Iran, to provide a secure and reliable communication channel to people to access free flow of information, fair and balanced sources of news, social media, and helping preserve the right to read and freedom of speech online.\nTo enhance security, Hidify applies a Warp-based security layer to these configurations to prevent the risk of unauthorized access to information.\nThere is no guarantee that this configuration will function properly and it is recommended to use it only in emergency situations.",
+      "fa": "پروژه آی نیتا، پروژه ای است برای ناشناس ماندن، امنیت و آزادی در فضای مجازی. هدف ما مبارزه با سانسور فضای مجازی در کشور هایی با رژیم های محدود کننده آزادی بیان و خصوصا با توجه ویژه به ایران است. ارائه کانال ارتباطی امن و قابل اطمینان به منظور درسترسی به جریان آزاد اطلاعات، اخبار بیطرف و رسانه های اجتماعی که در اینگونه کشور ها قابل دسترسی نیستند و حق مطالعه و آزادی بیان برای مردم ایران.\nآی نیتا، به زبان باستانی اوستایی به معنی مقاوم، کسی که زیر بار زور نرفته، آزاده و مستقل است.\nبرای بالا بردن امنیت، هیدیفای یک لایه امنیتی مبتنی بر وارپ بر روی این کانفیگها اعمال میکند تا از خطر دسترسی غیرمجاز به اطلاعات جلوگیری کند.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ وجود ندارد و پیشنهاد میشود صرفا در مواقع اضطراری از آن استفاده کنید"
+    },
+    "needed_features": ["warp_over_proxies"]
+  },
+  {
+    "region": ["ir"],
+    "title": {"en": "Anonymous 𝕏", "fa": "انونیموس 𝕏"},
+    "sublink": "https://raw.githubusercontent.com/4n0nymou3/multi-proxy-config-fetcher/refs/heads/main/configs/proxy_configs.txt",
+    "tags": { "en": ["mix"], "fa": ["عمومی"] },
+    "consent": {
+      "en": "This profile collects public and published configurations with the consent of their owners, and tests and verifies them to help the free flow of information.\nTo enhance security, Hidify applies a Warp-based security layer to these configurations to prevent the risk of unauthorized access to information.\nThere is no guarantee that this configuration will function properly and it is recommended to use it only in emergency situations.",
+      "fa": "این پروفایل کانفیگ‌های عمومی و منتشر شده را با رضایت صاحبان آن‌ها جمع آوری می‌کند و تست و بررسی می‌کند تا به گردش آزاد اطلاعات کمک کند.\nبرای بالا بردن امنیت، هیدیفای یک لایه امنیتی مبتنی بر وارپ بر روی این کانفیگها اعمال میکند تا از خطر دسترسی غیرمجاز به اطلاعات جلوگیری کند.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ وجود ندارد و پیشنهاد میشود صرفا در مواقع اضطراری از آن استفاده کنید"
+    },
+    "needed_features": ["warp_over_proxies"]
+  },
+{
+    "region": ["ir"],
+    "title": {"en": "soroushmirzaei (Heavy)", "fa": "سروش میرزایی (سنگین)"},
+    "sublink": "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/splitted/mixed",
+    "tags": { "en": ["mix"], "fa": ["عمومی"] },
+    "consent": {
+      "en": "This profile collects public and published configurations with the consent of their owners, and tests and verifies them to help the free flow of information.\nTo enhance security, Hidify applies a Warp-based security layer to these configurations to prevent the risk of unauthorized access to information.\nThere is no guarantee that this configuration will function properly and it is recommended to use it only in emergency situations.",
+      "fa": "این پروفایل کانفیگ‌های عمومی و منتشر شده را با رضایت صاحبان آن‌ها جمع آوری می‌کند و تست و بررسی می‌کند تا به گردش آزاد اطلاعات کمک کند.\nبرای بالا بردن امنیت، هیدیفای یک لایه امنیتی مبتنی بر وارپ بر روی این کانفیگها اعمال میکند تا از خطر دسترسی غیرمجاز به اطلاعات جلوگیری کند.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ وجود ندارد و پیشنهاد میشود صرفا در مواقع اضطراری از آن استفاده کنید"
+    },
+    "needed_features": ["warp_over_proxies"]
+  }
+]
+}

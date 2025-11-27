@@ -10,6 +10,13 @@
 .svn/
 migrate_working_dir/
 .github/help
+
+# Build/Debug outputs
+analyze_output.txt
+deps.txt
+gradle_release_log.txt
+custom_lint.log
+
 # IntelliJ related
 *.iml
 *.ipr

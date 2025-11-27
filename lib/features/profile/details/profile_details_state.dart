@@ -19,5 +19,6 @@ abstract class ProfileDetailsState with _$ProfileDetailsState {
 
   const ProfileDetailsState._();
 
-  bool get isBusy => save is AsyncLoading || delete is AsyncLoading || update is AsyncLoading;
+  bool get isBusy =>
+      save is AsyncLoading || delete is AsyncLoading || update is AsyncLoading;
 }

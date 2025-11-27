@@ -22,11 +22,15 @@ import com.hiddify.hiddify.constant.Status
 import com.hiddify.hiddify.utils.CommandClient
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.StatusMessage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
 
-class ServiceNotification(private val status: MutableLiveData<Status>, private val service: Service) : BroadcastReceiver(), CommandClient.Handler {
+class ServiceNotification(
+    private val status: MutableLiveData<Status>,
+    private val service: Service,
+    private val scope: CoroutineScope
+) : BroadcastReceiver(), CommandClient.Handler {
     companion object {
         private const val notificationId = 1
         private const val notificationChannel = "service"
@@ -43,9 +47,18 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
 
 
     private val commandClient =
-            CommandClient(GlobalScope, CommandClient.ConnectionType.Status, this)
+            CommandClient(scope, CommandClient.ConnectionType.Status, this)
     private var receiverRegistered = false
 
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Hiddify Service"
+            val channel = NotificationChannel(notificationChannel, name, NotificationManager.IMPORTANCE_LOW)
+            channel.description = "Hiddify Connection Service"
+            Application.notification.createNotificationChannel(channel)
+        }
+    }
 
     private val notificationBuilder by lazy {
         NotificationCompat.Builder(service, notificationChannel)
@@ -66,7 +79,11 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
                                 flags
                         )
                 )
-                .setPriority(NotificationCompat.PRIORITY_LOW).apply {
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .apply {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        setForegroundServiceBehavior(android.app.Notification.FOREGROUND_SERVICE_IMMEDIATE)
+                    }
                     addAction(
                             NotificationCompat.Action.Builder(
                                     0, service.getText(R.string.stop), PendingIntent.getBroadcast(
@@ -81,13 +98,6 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
     }
 
     fun show(profileName: String, @StringRes contentTextId: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Application.notification.createNotificationChannel(
-                NotificationChannel(
-                    notificationChannel, "hiddify service", NotificationManager.IMPORTANCE_LOW
-                )
-            )
-        }
         service.startForeground(
             notificationId, notificationBuilder
                 .setContentTitle(profileName.takeIf { it.isNotBlank() } ?: "Hiddify")

@@ -25,7 +25,8 @@ abstract class AppInfoEntity with _$AppInfoEntity {
       : "$version ${environment.name}";
 
   /// formats app info for sharing
-  String format() => '''
+  String format() =>
+      '''
 $name v$version ($buildNumber) [${environment.name}]
 ${release.name} release
 $operatingSystem [$operatingSystemVersion]''';

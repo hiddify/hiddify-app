@@ -31,7 +31,9 @@ class ConnectionButton extends HookConsumerWidget {
     // ----- Providers -----
     final connectionStatus = ref.watch(connectionProvider);
     final delay = ref.watch(
-      activeProxyProvider.select((value) => value.asData?.value.urlTestDelay ?? 0),
+      activeProxyProvider.select(
+        (value) => value.asData?.value.urlTestDelay ?? 0,
+      ),
     );
     final requiresReconnect = ref.watch(
       configOptionProvider.select((value) => value.asData?.value ?? false),
@@ -43,7 +45,9 @@ class ConnectionButton extends HookConsumerWidget {
         case AsyncError(:final error):
           CustomAlertDialog.fromErr(t.presentError(error)).show(context);
         case AsyncData(value: Disconnected(:final connectionFailure?)):
-          CustomAlertDialog.fromErr(t.presentError(connectionFailure)).show(context);
+          CustomAlertDialog.fromErr(
+            t.presentError(connectionFailure),
+          ).show(context);
         default:
       }
     });
@@ -53,10 +57,11 @@ class ConnectionButton extends HookConsumerWidget {
     final today = DateTime.now();
 
     Future<bool> showExperimentalNotice() async {
-      final hasExperimental = ref.read(ConfigOptions.hasExperimentalFeatures);
+      final hasExperimental = ref.read(hasExperimentalFeaturesProvider);
       final canShowNotice = !ref.read(disableExperimentalFeatureNoticeProvider);
       if (hasExperimental && canShowNotice) {
-        return (await const ExperimentalFeatureNoticeDialog().show(context)) ?? false;
+        return (await const ExperimentalFeatureNoticeDialog().show(context)) ??
+            false;
       }
       return true;
     }
@@ -74,7 +79,9 @@ class ConnectionButton extends HookConsumerWidget {
       AsyncData(value: Connected()) => (
         () async {
           if (requiresReconnect && await showExperimentalNotice()) {
-            await ref.read(connectionProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
+            await ref
+                .read(connectionProvider.notifier)
+                .reconnect(await ref.read(activeProfileProvider.future));
           } else {
             await ref.read(connectionProvider.notifier).toggleConnection();
           }
@@ -85,15 +92,18 @@ class ConnectionButton extends HookConsumerWidget {
     };
 
     final String label = switch (connectionStatus) {
-      AsyncData(value: Connected()) when requiresReconnect => t.connection.reconnect,
-      AsyncData(value: Connected()) when delay <= 0 || delay >= 65 * 1000 => t.connection.connecting,
+      AsyncData(value: Connected()) when requiresReconnect =>
+        t.connection.reconnect,
+      AsyncData(value: Connected()) when delay <= 0 || delay >= 65 * 1000 =>
+        t.connection.connecting,
       AsyncData(value: final status) => status.present(t),
       _ => '',
     };
 
     final Color btnColor = switch (connectionStatus) {
       AsyncData(value: Connected()) when requiresReconnect => Colors.teal,
-      AsyncData(value: Connected()) when delay <= 0 || delay >= 65 * 1000 => const Color(0xFFB9B067),
+      AsyncData(value: Connected()) when delay <= 0 || delay >= 65 * 1000 =>
+        const Color(0xFFB9B067),
       AsyncData(value: Connected()) => btnTheme.connectedColor!,
       AsyncError() => Colors.red,
       _ => btnTheme.idleColor!,
@@ -104,10 +114,18 @@ class ConnectionButton extends HookConsumerWidget {
       _ => Assets.images.disconnectNorouz,
     };
 
-    final bool showNowruz = today.month == 3 && today.day >= 19 && today.day <= 23;
+    final bool showNowruz =
+        today.month == 3 && today.day >= 19 && today.day <= 23;
 
     // ----- UI -----
-    return _ConnectionButton(enabled: enabled, onTap: onTap, label: label, buttonColor: btnColor, image: iconImg, useImage: showNowruz);
+    return _ConnectionButton(
+      enabled: enabled,
+      onTap: onTap,
+      label: label,
+      buttonColor: btnColor,
+      image: iconImg,
+      useImage: showNowruz,
+    );
   }
 }
 
@@ -115,7 +133,14 @@ class ConnectionButton extends HookConsumerWidget {
 //                           Internal presentation widget
 // ──────────────────────────────────────────────────────────────────────────────
 class _ConnectionButton extends StatelessWidget {
-  const _ConnectionButton({required this.onTap, required this.enabled, required this.label, required this.buttonColor, required this.image, required this.useImage});
+  const _ConnectionButton({
+    required this.onTap,
+    required this.enabled,
+    required this.label,
+    required this.buttonColor,
+    required this.image,
+    required this.useImage,
+  });
 
   final AsyncCallback? onTap;
   final bool enabled;
@@ -134,44 +159,62 @@ class _ConnectionButton extends StatelessWidget {
           enabled: enabled,
           label: label,
           value: label,
-          child: Container(
-            width: 148,
-            height: 148,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                // withOpacity() → withAlpha() to avoid deprecation warning
-                BoxShadow(blurRadius: 16, color: buttonColor.withAlpha((0.5 * 255).round())),
-              ],
-            ),
-            child: Material(
-              key: const ValueKey('home_connection_button'),
-              shape: const CircleBorder(),
-              color: Colors.white,
-              child: InkWell(
-                onTap: enabled
-                    ? () {
-                        // ignore the returned Future
-                        unawaited(onTap?.call());
-                      }
-                    : null,
-                child: Padding(
-                  padding: const EdgeInsets.all(36),
-                  child: TweenAnimationBuilder<Color?>(
-                    tween: ColorTween(end: buttonColor),
-                    duration: const Duration(milliseconds: 250),
-                    builder: (_, value, _) {
-                      return useImage ? image.image() : Assets.images.logo.svg(colorFilter: ColorFilter.mode(value ?? buttonColor, BlendMode.srcIn));
-                    },
-                  ),
-                ),
-              ),
-            ).animate(target: enabled ? 0 : 1).blurXY(end: 1),
-          ).animate(target: enabled ? 0 : 1).scaleXY(end: .88, curve: Curves.easeIn),
+          child:
+              Container(
+                    width: 148,
+                    height: 148,
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        // withOpacity() → withAlpha() to avoid deprecation warning
+                        BoxShadow(
+                          blurRadius: 16,
+                          color: buttonColor.withAlpha((0.5 * 255).round()),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      key: const ValueKey('home_connection_button'),
+                      shape: const CircleBorder(),
+                      color: Colors.white,
+                      child: InkWell(
+                        onTap: enabled
+                            ? () {
+                                // ignore the returned Future
+                                unawaited(onTap?.call());
+                              }
+                            : null,
+                        child: Padding(
+                          padding: const EdgeInsets.all(36),
+                          child: TweenAnimationBuilder<Color?>(
+                            tween: ColorTween(end: buttonColor),
+                            duration: const Duration(milliseconds: 250),
+                            builder: (_, value, _) {
+                              return useImage
+                                  ? image.image()
+                                  : Assets.images.logo.svg(
+                                      colorFilter: ColorFilter.mode(
+                                        value ?? buttonColor,
+                                        BlendMode.srcIn,
+                                      ),
+                                    );
+                            },
+                          ),
+                        ),
+                      ),
+                    ).animate(target: enabled ? 0 : 1).blurXY(end: 1),
+                  )
+                  .animate(target: enabled ? 0 : 1)
+                  .scaleXY(end: .88, curve: Curves.easeIn),
         ),
         const Gap(16),
-        ExcludeSemantics(child: AnimatedText(label, style: Theme.of(context).textTheme.titleMedium)),
+        ExcludeSemantics(
+          child: AnimatedText(
+            label,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ),
       ],
     );
   }

@@ -18,30 +18,24 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
     ref.disposeDelay(const Duration(seconds: 20));
     state = const LogsOverviewState();
     _paused = false;
-    ref.onDispose(
-      () {
-        loggy.debug("disposing");
-        _listener?.cancel();
-        _listener = null;
-        _debouncer.dispose();
-      },
-    );
-    ref.onCancel(
-      () {
-        if (_listener?.isPaused != true) {
-          loggy.debug("pausing");
-          _listener?.pause();
-        }
-      },
-    );
-    ref.onResume(
-      () {
-        if (!_paused && (_listener?.isPaused ?? false)) {
-          loggy.debug("resuming");
-          _listener?.resume();
-        }
-      },
-    );
+    ref.onDispose(() {
+      loggy.debug("disposing");
+      _listener?.cancel();
+      _listener = null;
+      _debouncer.dispose();
+    });
+    ref.onCancel(() {
+      if (_listener?.isPaused != true) {
+        loggy.debug("pausing");
+        _listener?.pause();
+      }
+    });
+    ref.onResume(() {
+      if (!_paused && (_listener?.isPaused ?? false)) {
+        loggy.debug("resuming");
+        _listener?.resume();
+      }
+    });
 
     _addListeners();
     return const LogsOverviewState();
@@ -62,20 +56,19 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
           leading: false,
           trailing: true,
         )
-        .asyncMap(
-      (event) async {
-        await event.fold(
-          (f) {
-            _logs = [];
-            state = state.copyWith(logs: AsyncError(f, StackTrace.current));
-          },
-          (a) async {
-            _logs = a.reversed;
-            state = state.copyWith(logs: AsyncData(await _computeLogs()));
-          },
-        );
-      },
-    ).listen((event) {});
+        .asyncMap((event) async {
+          await event.fold(
+            (f) {
+              _logs = [];
+              state = state.copyWith(logs: AsyncError(f, StackTrace.current));
+            },
+            (a) async {
+              _logs = a.reversed;
+              state = state.copyWith(logs: AsyncData(await _computeLogs()));
+            },
+          );
+        })
+        .listen((event) {});
   }
 
   Iterable<LogEntity> _logs = [];
@@ -109,29 +102,32 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
 
   Future<void> clear() async {
     loggy.debug("clearing");
-    await ref.read(logRepositoryProvider).requireValue.clearLogs().match(
-      (l) {
-        loggy.warning("error clearing logs", l);
-      },
-      (_) {
-        _logs = [];
-        state = state.copyWith(logs: const AsyncData([]));
-      },
-    ).run();
+    await ref
+        .read(logRepositoryProvider)
+        .requireValue
+        .clearLogs()
+        .match(
+          (l) {
+            loggy.warning("error clearing logs", l);
+          },
+          (_) {
+            _logs = [];
+            state = state.copyWith(logs: const AsyncData([]));
+          },
+        )
+        .run();
   }
 
   void filterMessage(String? filter) {
     _filter = filter ?? '';
-    _debouncer(
-      () async {
-        if (state.logs case AsyncData()) {
-          state = state.copyWith(
-            filter: _filter,
-            logs: AsyncData(await _computeLogs()),
-          );
-        }
-      },
-    );
+    _debouncer(() async {
+      if (state.logs case AsyncData()) {
+        state = state.copyWith(
+          filter: _filter,
+          logs: AsyncData(await _computeLogs()),
+        );
+      }
+    });
   }
 
   Future<void> filterLevel(LogLevel? level) async {

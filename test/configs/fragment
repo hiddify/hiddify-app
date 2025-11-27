@@ -1,0 +1,14 @@
+#profile-title: base64:8J+UpSBGcmFnbWVudCDwn5Sl
+#profile-update-interval: 24
+#subscription-userinfo: upload=0; download=0; total=10737418240000000; expire=2546249531
+#support-url: https://t.me/hiddify
+#profile-web-page-url: https://hiddify.com
+#connection-test-url: https://instagram.com
+#remote-dns-address: https://sky.rethinkdns.com/dns-query
+
+direct://?fragment=tlshello,10-100,100-200#Fragment1
+direct://?fragment=tlshello,1-2,1-3#Fragment2
+xdirect://?fragment=tlshello,10-100,100-200#XFragment1
+xdirect://?fragment=tlshello,1-2,1-3#XFragment2
+
+

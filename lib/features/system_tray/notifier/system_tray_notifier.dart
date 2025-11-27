@@ -85,7 +85,11 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
           },
         ),
         MenuItem.separator(),
-        MenuItem(label: t.config.serviceMode, icon: Assets.images.trayIconIco, disabled: true),
+        MenuItem(
+          label: t.config.serviceMode,
+          icon: Assets.images.trayIconIco,
+          disabled: true,
+        ),
 
         ...ServiceMode.values.map(
           (e) => MenuItem.checkbox(
@@ -95,7 +99,9 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
             onClick: (menuItem) async {
               final newMode = ServiceMode.values.byName(menuItem.key!);
               loggy.debug("switching service mode: [$newMode]");
-              await ref.read(ConfigOptions.serviceMode.notifier).update(newMode);
+              await ref
+                  .read(ConfigOptions.serviceMode.notifier)
+                  .update(newMode);
             },
           ),
         ),
@@ -131,12 +137,15 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
 
   static void setIcon(ConnectionStatus status) {
     if (!PlatformUtils.isDesktop) return;
-    trayManager.setIcon(_trayIconPath(status), isTemplate: Platform.isMacOS).asStream();
+    trayManager
+        .setIcon(_trayIconPath(status), isTemplate: Platform.isMacOS)
+        .asStream();
   }
 
   static String _trayIconPath(ConnectionStatus status) {
     if (Platform.isWindows) {
-      final Brightness brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
+      final Brightness brightness =
+          WidgetsBinding.instance.platformDispatcher.platformBrightness;
       final isDarkMode = brightness == Brightness.dark;
       switch (status) {
         case Connected():

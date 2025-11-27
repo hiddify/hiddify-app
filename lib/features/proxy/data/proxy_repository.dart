@@ -19,80 +19,81 @@ abstract interface class ProxyRepository {
   TaskEither<ProxyFailure, Unit> urlTest(String groupTag);
 }
 
-class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRepository {
-  ProxyRepositoryImpl({
-    required this.singbox,
-    required this.client,
-  });
+class ProxyRepositoryImpl
+    with ExceptionHandler, InfraLogger
+    implements ProxyRepository {
+  ProxyRepositoryImpl({required this.singbox, required this.client});
 
   final SingboxService singbox;
   final DioHttpClient client;
 
   @override
   Stream<Either<ProxyFailure, List<ProxyGroupEntity>>> watchProxies() {
-    return singbox.watchGroups().map((event) {
-      final groupWithSelected = {
-        for (final group in event) group.tag: group.selected,
-      };
-      return event
-          .map(
-            (e) => ProxyGroupEntity(
-              tag: e.tag,
-              type: e.type,
-              selected: e.selected,
-              items: e.items
-                  .map(
-                    (e) => ProxyItemEntity(
-                      tag: e.tag,
-                      type: e.type,
-                      urlTestDelay: e.urlTestDelay,
-                      selectedTag: groupWithSelected[e.tag],
-                    ),
-                  )
-                  .filter((t) => t.isVisible)
-                  .toList(),
-            ),
-          )
-          .toList();
-    }).handleExceptions(
-      (error, stackTrace) {
-        loggy.error("error watching proxies", error, stackTrace);
-        return ProxyUnexpectedFailure(error, stackTrace);
-      },
-    );
+    return singbox
+        .watchGroups()
+        .map((event) {
+          final groupWithSelected = {
+            for (final group in event) group.tag: group.selected,
+          };
+          return event
+              .map(
+                (e) => ProxyGroupEntity(
+                  tag: e.tag,
+                  type: e.type,
+                  selected: e.selected,
+                  items: e.items
+                      .map(
+                        (e) => ProxyItemEntity(
+                          tag: e.tag,
+                          type: e.type,
+                          urlTestDelay: e.urlTestDelay,
+                          selectedTag: groupWithSelected[e.tag],
+                        ),
+                      )
+                      .filter((t) => t.isVisible)
+                      .toList(),
+                ),
+              )
+              .toList();
+        })
+        .handleExceptions((error, stackTrace) {
+          loggy.error("error watching proxies", error, stackTrace);
+          return ProxyUnexpectedFailure(error, stackTrace);
+        });
   }
 
   @override
   Stream<Either<ProxyFailure, List<ProxyGroupEntity>>> watchActiveProxies() {
-    return singbox.watchActiveGroups().map((event) {
-      final groupWithSelected = {
-        for (final group in event) group.tag: group.selected,
-      };
-      return event
-          .map(
-            (e) => ProxyGroupEntity(
-              tag: e.tag,
-              type: e.type,
-              selected: e.selected,
-              items: e.items
-                  .map(
-                    (e) => ProxyItemEntity(
-                      tag: e.tag,
-                      type: e.type,
-                      urlTestDelay: e.urlTestDelay,
-                      selectedTag: groupWithSelected[e.tag],
-                    ),
-                  )
-                  .toList(),
-            ),
-          )
-          .toList();
-    }).handleExceptions(
-      (error, stackTrace) {
-        loggy.error("error watching active proxies", error, stackTrace);
-        return ProxyUnexpectedFailure(error, stackTrace);
-      },
-    );
+    return singbox
+        .watchActiveGroups()
+        .map((event) {
+          final groupWithSelected = {
+            for (final group in event) group.tag: group.selected,
+          };
+          return event
+              .map(
+                (e) => ProxyGroupEntity(
+                  tag: e.tag,
+                  type: e.type,
+                  selected: e.selected,
+                  items: e.items
+                      .map(
+                        (e) => ProxyItemEntity(
+                          tag: e.tag,
+                          type: e.type,
+                          urlTestDelay: e.urlTestDelay,
+                          selectedTag: groupWithSelected[e.tag],
+                        ),
+                      )
+                      .toList(),
+                ),
+              )
+              .toList();
+        })
+        .handleExceptions((error, stackTrace) {
+          loggy.error("error watching active proxies", error, stackTrace);
+          return ProxyUnexpectedFailure(error, stackTrace);
+        });
   }
 
   @override
@@ -101,7 +102,10 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
     String outboundTag,
   ) {
     return exceptionHandler(
-      () => singbox.selectOutbound(groupTag, outboundTag).mapLeft(ProxyUnexpectedFailure.new).run(),
+      () => singbox
+          .selectOutbound(groupTag, outboundTag)
+          .mapLeft(ProxyUnexpectedFailure.new)
+          .run(),
       ProxyUnexpectedFailure.new,
     );
   }
@@ -111,7 +115,9 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
     var groupTag = groupTag_;
     loggy.debug("testing group: [$groupTag]");
     if (!["auto"].contains(groupTag)) {
-      loggy.warning("only auto proxy group can do url test. Please change go code if you want");
+      loggy.warning(
+        "only auto proxy group can do url test. Please change go code if you want",
+      );
     }
     groupTag = "auto";
 
@@ -121,7 +127,8 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
     );
   }
 
-  static final Map<String, IpInfo Function(Map<String, dynamic> response)> _ipInfoSources = {
+  static final Map<String, IpInfo Function(Map<String, dynamic> response)>
+  _ipInfoSources = {
     // "https://geolocation-db.com/json/": IpInfo.fromGeolocationDbComJson, //bug response is not json
     "https://ipwho.is/": IpInfo.fromIpwhoIsJson,
     "https://api.ip.sb/geoip/": IpInfo.fromIpSbJson,
@@ -131,29 +138,26 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
 
   @override
   TaskEither<ProxyFailure, IpInfo> getCurrentIpInfo(CancelToken cancelToken) {
-    return TaskEither.tryCatch(
-      () async {
-        Object? error;
-        for (final source in _ipInfoSources.entries) {
-          try {
-            loggy.debug("getting current ip info using [${source.key}]");
-            final response = await client.get<Map<String, dynamic>>(
-              source.key,
-              cancelToken: cancelToken,
-              proxyOnly: true,
-            );
-            if (response.statusCode == 200 && response.data != null) {
-              return source.value(response.data!);
-            }
-          } catch (e, s) {
-            loggy.debug("failed getting ip info using [${source.key}]", e, s);
-            error = e;
-            continue;
+    return TaskEither.tryCatch(() async {
+      Object? error;
+      for (final source in _ipInfoSources.entries) {
+        try {
+          loggy.debug("getting current ip info using [${source.key}]");
+          final response = await client.get<Map<String, dynamic>>(
+            source.key,
+            cancelToken: cancelToken,
+            proxyOnly: true,
+          );
+          if (response.statusCode == 200 && response.data != null) {
+            return source.value(response.data!);
           }
+        } catch (e, s) {
+          loggy.debug("failed getting ip info using [${source.key}]", e, s);
+          error = e;
+          continue;
         }
-        throw UnableToRetrieveIp(error, StackTrace.current);
-      },
-      ProxyUnexpectedFailure.new,
-    );
+      }
+      throw UnableToRetrieveIp(error, StackTrace.current);
+    }, ProxyUnexpectedFailure.new);
   }
 }

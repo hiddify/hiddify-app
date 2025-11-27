@@ -8,17 +8,17 @@ enum PerAppProxyMode {
   bool get enabled => this != off;
 
   ({String title, String message}) present(TranslationsEn t) => switch (this) {
-        off => (
-            title: t.settings.network.perAppProxyModes.off,
-            message: t.settings.network.perAppProxyModes.offMsg,
-          ),
-        include => (
-            title: t.settings.network.perAppProxyModes.include,
-            message: t.settings.network.perAppProxyModes.includeMsg,
-          ),
-        exclude => (
-            title: t.settings.network.perAppProxyModes.exclude,
-            message: t.settings.network.perAppProxyModes.excludeMsg,
-          ),
-      };
+    off => (
+      title: t.settings.network.perAppProxyModes.off,
+      message: t.settings.network.perAppProxyModes.offMsg,
+    ),
+    include => (
+      title: t.settings.network.perAppProxyModes.include,
+      message: t.settings.network.perAppProxyModes.includeMsg,
+    ),
+    exclude => (
+      title: t.settings.network.perAppProxyModes.exclude,
+      message: t.settings.network.perAppProxyModes.excludeMsg,
+    ),
+  };
 }

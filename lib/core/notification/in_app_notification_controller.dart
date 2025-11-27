@@ -16,7 +16,20 @@ InAppNotificationController inAppNotificationController(Ref ref) {
 enum NotificationType { info, error, success }
 
 class InAppNotificationController with AppLogger {
-  ToastificationItem showToast(BuildContext context, String message, {NotificationType type = NotificationType.info, Duration duration = const Duration(seconds: 3)}) {
+  ToastificationItem? showToast(
+    BuildContext context,
+    String message, {
+    NotificationType type = NotificationType.info,
+    Duration duration = const Duration(seconds: 3),
+  }) {
+    // Desktop workaround: toastification overlays with hover/drag interactions
+    // can trigger RenderViewport/MouseTracker hitTest crashes on Windows.
+    // Skip showing toasts on desktop for now to keep the app stable.
+    if (PlatformUtils.isDesktop) {
+      loggy.debug("skip toast on desktop: $message");
+      return null;
+    }
+
     return toastification.show(
       context: context,
       title: Text(message),
@@ -28,7 +41,9 @@ class InAppNotificationController with AppLogger {
       showProgressBar: false,
       dragToClose: true,
       closeOnClick: true,
-      closeButton: const ToastCloseButton(showType: CloseButtonShowType.onHover),
+      closeButton: const ToastCloseButton(
+        showType: CloseButtonShowType.onHover,
+      ),
     );
   }
 
@@ -38,7 +53,12 @@ class InAppNotificationController with AppLogger {
       loggy.warning("context is null");
       return null;
     }
-    return showToast(context, message, type: NotificationType.error, duration: const Duration(seconds: 5));
+    return showToast(
+      context,
+      message,
+      type: NotificationType.error,
+      duration: const Duration(seconds: 5),
+    );
   }
 
   ToastificationItem? showSuccessToast(String message) {
@@ -50,7 +70,10 @@ class InAppNotificationController with AppLogger {
     return showToast(context, message, type: NotificationType.success);
   }
 
-  ToastificationItem? showInfoToast(String message, {Duration duration = const Duration(seconds: 3)}) {
+  ToastificationItem? showInfoToast(
+    String message, {
+    Duration duration = const Duration(seconds: 3),
+  }) {
     final context = RootScaffold.stateKey.currentContext;
     if (context == null) {
       loggy.warning("context is null");
@@ -68,9 +91,20 @@ class InAppNotificationController with AppLogger {
     CustomAlertDialog.fromErr(error).show(context);
   }
 
-  void showActionToast(String message, {required String actionText, required VoidCallback callback, Duration duration = const Duration(seconds: 5)}) {
+  void showActionToast(
+    String message, {
+    required String actionText,
+    required VoidCallback callback,
+    Duration duration = const Duration(seconds: 5),
+  }) {
     final context = RootScaffold.stateKey.currentContext;
     if (context == null) return;
+
+    // Desktop workaround: avoid interactive toast overlays entirely.
+    if (PlatformUtils.isDesktop) {
+      loggy.debug("skip action toast on desktop: $message");
+      return;
+    }
     toastification.dismissAll();
 
     toastification.showCustom(

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:hiddify/utils/utils.dart';
-import 'package:protocol_handler/protocol_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'deep_link_notifier.g.dart';
@@ -9,21 +8,22 @@ part 'deep_link_notifier.g.dart';
 typedef NewProfileLink = ({String? url, String? name});
 
 @Riverpod(keepAlive: true)
-class DeepLinkNotifier extends _$DeepLinkNotifier
-    with ProtocolListener, InfraLogger {
+class DeepLinkNotifier extends _$DeepLinkNotifier with InfraLogger {
   @override
   Future<NewProfileLink?> build() async {
     if (Platform.isLinux) return null;
 
-    for (final protocol in LinkParser.protocols) {
-      await protocolHandler.register(protocol);
-    }
-    protocolHandler.addListener(this);
-    ref.onDispose(() {
-      protocolHandler.removeListener(this);
-    });
-
-    final initialPayload = await protocolHandler.getInitialUrl();
+    // Desktop: read initial deep link from process arguments if present
+    String? initialPayload;
+    try {
+      final args = Platform.executableArguments;
+      // Heuristic: first arg that looks like our custom scheme
+      initialPayload = args.firstWhere(
+        (a) => LinkParser.protocols.any((p) => a.startsWith('$p://')),
+        orElse: () => '',
+      );
+      if (initialPayload.isEmpty) initialPayload = null;
+    } catch (_) {}
     if (initialPayload != null) {
       loggy.debug('initial payload: [$initialPayload]');
       final link = LinkParser.deep(initialPayload);
@@ -32,15 +32,5 @@ class DeepLinkNotifier extends _$DeepLinkNotifier
     return null;
   }
 
-  @override
-  void onProtocolUrlReceived(String url) {
-    super.onProtocolUrlReceived(url);
-    loggy.debug("url received: [$url]");
-    final link = LinkParser.deep(url);
-    if (link == null) {
-      loggy.debug("link was not valid");
-      return;
-    }
-    update((_) => link);
-  }
+  // Runtime updates from OS association are not supported without a plugin.
 }

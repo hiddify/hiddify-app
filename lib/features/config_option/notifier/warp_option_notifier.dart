@@ -5,7 +5,6 @@ import 'package:hiddify/features/config_option/model/config_option_failure.dart'
 import 'package:hiddify/singbox/service/singbox_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'warp_option_notifier.freezed.dart';
 part 'warp_option_notifier.g.dart';
@@ -14,11 +13,12 @@ part 'warp_option_notifier.g.dart';
 class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
   @override
   WarpOptions build() {
-    final consent = _prefs.getBool(warpConsentGiven) ?? false;
+    final prefs = ref.watch(sharedPreferencesProvider).requireValue;
+    final consent = prefs.getBool(warpConsentGiven) ?? false;
     bool hasWarpConfig = false;
     try {
-      final accountId = _prefs.getString("warp-account-id");
-      final accessToken = _prefs.getString("warp-access-token");
+      final accountId = prefs.getString("warp-account-id");
+      final accessToken = prefs.getString("warp-access-token");
       hasWarpConfig = accountId != null && accessToken != null;
     } catch (e) {
       loggy.warning(e);
@@ -26,14 +26,17 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
 
     return WarpOptions(
       consentGiven: consent,
-      configGeneration: hasWarpConfig ? const AsyncValue.data("") : AsyncError(const MissingWarpConfigFailure(), StackTrace.current),
+      configGeneration: hasWarpConfig
+          ? const AsyncValue.data("")
+          : AsyncError(const MissingWarpConfigFailure(), StackTrace.current),
     );
   }
 
-  SharedPreferences get _prefs => ref.read(sharedPreferencesProvider).requireValue;
-
   Future<void> agree() async {
-    await ref.read(sharedPreferencesProvider).requireValue.setBool(warpConsentGiven, true);
+    await ref
+        .read(sharedPreferencesProvider)
+        .requireValue
+        .setBool(warpConsentGiven, true);
     state = state.copyWith(consentGiven: true);
     await generateWarpConfig();
   }
@@ -53,9 +56,15 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
           .getOrElse((l) => throw l)
           .run();
 
-      await ref.read(ConfigOptions.warpAccountId.notifier).update(warp.accountId);
-      await ref.read(ConfigOptions.warpAccessToken.notifier).update(warp.accessToken);
-      await ref.read(ConfigOptions.warpWireguardConfig.notifier).update(warp.wireguardConfig);
+      await ref
+          .read(ConfigOptions.warpAccountId.notifier)
+          .update(warp.accountId);
+      await ref
+          .read(ConfigOptions.warpAccessToken.notifier)
+          .update(warp.accessToken);
+      await ref
+          .read(ConfigOptions.warpWireguardConfig.notifier)
+          .update(warp.wireguardConfig);
       return warp.log;
     });
 
@@ -77,9 +86,15 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
           .getOrElse((l) => throw l)
           .run();
 
-      await ref.read(ConfigOptions.warp2AccountId.notifier).update(warp.accountId);
-      await ref.read(ConfigOptions.warp2AccessToken.notifier).update(warp.accessToken);
-      await ref.read(ConfigOptions.warp2WireguardConfig.notifier).update(warp.wireguardConfig);
+      await ref
+          .read(ConfigOptions.warp2AccountId.notifier)
+          .update(warp.accountId);
+      await ref
+          .read(ConfigOptions.warp2AccessToken.notifier)
+          .update(warp.accessToken);
+      await ref
+          .read(ConfigOptions.warp2WireguardConfig.notifier)
+          .update(warp.wireguardConfig);
       return warp.log;
     });
 

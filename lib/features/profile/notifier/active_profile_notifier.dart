@@ -20,9 +20,7 @@ class ActiveProfile extends _$ActiveProfile with AppLogger {
 
 // TODO: move to specific feature
 @Riverpod(keepAlive: true)
-Stream<bool> hasAnyProfile(
-  Ref ref,
-) {
+Stream<bool> hasAnyProfile(Ref ref) {
   return ref
       .watch(profileRepositoryProvider)
       .requireValue

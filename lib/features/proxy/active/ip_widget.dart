@@ -27,7 +27,12 @@ class ShowIp extends Notifier<bool> {
 final _showIp = NotifierProvider.autoDispose<ShowIp, bool>(() => ShowIp());
 
 class IPText extends HookConsumerWidget {
-  const IPText({required this.ip, required this.onLongPress, this.constrained = false, super.key});
+  const IPText({
+    required this.ip,
+    required this.onLongPress,
+    this.constrained = false,
+    super.key,
+  });
 
   final String ip;
   final VoidCallback onLongPress;
@@ -38,7 +43,8 @@ class IPText extends HookConsumerWidget {
     final t = ref.watch(translationsProvider);
     final bool isVisible = ref.watch(_showIp);
     final textTheme = Theme.of(context).textTheme;
-    final ipStyle = (constrained ? textTheme.labelMedium : textTheme.labelLarge)?.copyWith(fontFamily: FontFamily.emoji);
+    final ipStyle = (constrained ? textTheme.labelMedium : textTheme.labelLarge)
+        ?.copyWith(fontFamily: FontFamily.emoji);
 
     return Semantics(
       label: t.proxies.ipInfoSemantics.address,
@@ -54,12 +60,27 @@ class IPText extends HookConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
           child: AnimatedCrossFade(
-            firstChild: Text(ip, style: ipStyle, textDirection: TextDirection.ltr, overflow: TextOverflow.ellipsis),
-            secondChild: Padding(
-              padding: constrained ? EdgeInsets.zero : const EdgeInsetsDirectional.only(end: 48),
-              child: Text(obscureIp(ip), semanticsLabel: t.general.hidden, style: ipStyle, textDirection: TextDirection.ltr, overflow: TextOverflow.ellipsis),
+            firstChild: Text(
+              ip,
+              style: ipStyle,
+              textDirection: TextDirection.ltr,
+              overflow: TextOverflow.ellipsis,
             ),
-            crossFadeState: isVisible ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+            secondChild: Padding(
+              padding: constrained
+                  ? EdgeInsets.zero
+                  : const EdgeInsetsDirectional.only(end: 48),
+              child: Text(
+                obscureIp(ip),
+                semanticsLabel: t.general.hidden,
+                style: ipStyle,
+                textDirection: TextDirection.ltr,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            crossFadeState: isVisible
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
             duration: const Duration(milliseconds: 200),
           ),
         ),
@@ -69,7 +90,12 @@ class IPText extends HookConsumerWidget {
 }
 
 class UnknownIPText extends HookConsumerWidget {
-  const UnknownIPText({required this.text, required this.onTap, this.constrained = false, super.key});
+  const UnknownIPText({
+    required this.text,
+    required this.onTap,
+    this.constrained = false,
+    super.key,
+  });
 
   final String text;
   final VoidCallback onTap;
@@ -111,7 +137,13 @@ class IPCountryFlag extends HookConsumerWidget {
         width: size,
         height: size,
         padding: const EdgeInsets.all(2),
-        child: Center(child: CircleFlag(countryCode.toLowerCase() == "ir" ? "ir-shir" : countryCode.toLowerCase())),
+        child: Center(
+          child: CircleFlag(
+            countryCode.toLowerCase() == "ir"
+                ? "ir-shir"
+                : countryCode.toLowerCase(),
+          ),
+        ),
       ),
     );
   }

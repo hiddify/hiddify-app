@@ -8,7 +8,11 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NewVersionDialog extends HookConsumerWidget with PresLogger {
-  NewVersionDialog(this.currentVersion, this.newVersion, {this.canIgnore = true}) : super(key: _dialogKey);
+  NewVersionDialog(
+    this.currentVersion,
+    this.newVersion, {
+    this.canIgnore = true,
+  }) : super(key: _dialogKey);
 
   final String currentVersion;
   final RemoteVersionEntity newVersion;
@@ -40,16 +44,28 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
           Text.rich(
             TextSpan(
               children: [
-                TextSpan(text: "${t.appUpdate.currentVersionLbl}: ", style: theme.textTheme.bodySmall),
-                TextSpan(text: currentVersion, style: theme.textTheme.labelMedium),
+                TextSpan(
+                  text: "${t.appUpdate.currentVersionLbl}: ",
+                  style: theme.textTheme.bodySmall,
+                ),
+                TextSpan(
+                  text: currentVersion,
+                  style: theme.textTheme.labelMedium,
+                ),
               ],
             ),
           ),
           Text.rich(
             TextSpan(
               children: [
-                TextSpan(text: "${t.appUpdate.newVersionLbl}: ", style: theme.textTheme.bodySmall),
-                TextSpan(text: newVersion.presentVersion, style: theme.textTheme.labelMedium),
+                TextSpan(
+                  text: "${t.appUpdate.newVersionLbl}: ",
+                  style: theme.textTheme.bodySmall,
+                ),
+                TextSpan(
+                  text: newVersion.presentVersion,
+                  style: theme.textTheme.labelMedium,
+                ),
               ],
             ),
           ),
@@ -59,12 +75,17 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
         if (canIgnore)
           TextButton(
             onPressed: () async {
-              await ref.read(appUpdateProvider.notifier).ignoreRelease(newVersion);
+              await ref
+                  .read(appUpdateProvider.notifier)
+                  .ignoreRelease(newVersion);
               if (context.mounted) context.pop();
             },
             child: Text(t.appUpdate.ignoreBtnTxt),
           ),
-        TextButton(onPressed: context.pop, child: Text(t.appUpdate.laterBtnTxt)),
+        TextButton(
+          onPressed: context.pop,
+          child: Text(t.appUpdate.laterBtnTxt),
+        ),
         TextButton(
           onPressed: () async {
             await UriUtils.tryLaunch(Uri.parse(newVersion.url));

@@ -30,26 +30,26 @@ enum ServiceMode {
   }
 
   bool get isExperimental => switch (this) {
-        tun => PlatformUtils.isDesktop,
-        tunService => PlatformUtils.isDesktop,
-        _ => false,
-      };
+    tun => PlatformUtils.isDesktop,
+    tunService => PlatformUtils.isDesktop,
+    _ => false,
+  };
 
   String present(TranslationsEn t) => switch (this) {
-        proxy => t.config.serviceModes.proxy,
-        systemProxy => t.config.serviceModes.systemProxy,
-        tun =>
-          "${t.config.serviceModes.tun}${isExperimental ? " (${t.settings.experimental})" : ""}",
-        tunService =>
-          "${t.config.serviceModes.tunService}${isExperimental ? " (${t.settings.experimental})" : ""}",
-      };
+    proxy => t.config.serviceModes.proxy,
+    systemProxy => t.config.serviceModes.systemProxy,
+    tun =>
+      "${t.config.serviceModes.tun}${isExperimental ? " (${t.settings.experimental})" : ""}",
+    tunService =>
+      "${t.config.serviceModes.tunService}${isExperimental ? " (${t.settings.experimental})" : ""}",
+  };
 
   String presentShort(TranslationsEn t) => switch (this) {
-        proxy => t.config.shortServiceModes.proxy,
-        systemProxy => t.config.shortServiceModes.systemProxy,
-        tun => t.config.shortServiceModes.tun,
-        tunService => t.config.shortServiceModes.tunService,
-      };
+    proxy => t.config.shortServiceModes.proxy,
+    systemProxy => t.config.shortServiceModes.systemProxy,
+    tun => t.config.shortServiceModes.tun,
+    tunService => t.config.shortServiceModes.tunService,
+  };
 }
 
 @JsonEnum(valueField: 'key')
@@ -64,11 +64,11 @@ enum IPv6Mode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        disable => t.config.ipv6Modes.disable,
-        enable => t.config.ipv6Modes.enable,
-        prefer => t.config.ipv6Modes.prefer,
-        only => t.config.ipv6Modes.only,
-      };
+    disable => t.config.ipv6Modes.disable,
+    enable => t.config.ipv6Modes.enable,
+    prefer => t.config.ipv6Modes.prefer,
+    only => t.config.ipv6Modes.only,
+  };
 }
 
 @JsonEnum(valueField: 'key')
@@ -84,22 +84,14 @@ enum DomainStrategy {
   final String key;
 
   String get displayName => switch (this) {
-        auto => "auto",
-        _ => key,
-      };
+    auto => "auto",
+    _ => key,
+  };
 }
 
-enum TunImplementation {
-  mixed,
-  system,
-  gvisor;
-}
+enum TunImplementation { mixed, system, gvisor }
 
-enum MuxProtocol {
-  h2mux,
-  smux,
-  yamux;
-}
+enum MuxProtocol { h2mux, smux, yamux }
 
 @JsonEnum(valueField: 'key')
 enum WarpDetourMode {
@@ -111,7 +103,7 @@ enum WarpDetourMode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        proxyOverWarp => t.config.warpDetourModes.proxyOverWarp,
-        warpOverProxy => t.config.warpDetourModes.warpOverProxy,
-      };
+    proxyOverWarp => t.config.warpDetourModes.proxyOverWarp,
+    warpOverProxy => t.config.warpDetourModes.warpOverProxy,
+  };
 }

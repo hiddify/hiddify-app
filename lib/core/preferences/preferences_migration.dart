@@ -11,9 +11,7 @@ class PreferencesMigration with InfraLogger {
   Future<void> migrate() async {
     final currentVersion = sharedPreferences.getInt(versionKey) ?? 0;
 
-    final migrationSteps = [
-      PreferencesVersion1Migration(sharedPreferences),
-    ];
+    final migrationSteps = [PreferencesVersion1Migration(sharedPreferences)];
 
     if (currentVersion == migrationSteps.length) {
       loggy.debug("already using the latest version (v$currentVersion)");
@@ -56,9 +54,7 @@ class PreferencesVersion1Migration extends PreferencesMigrationStep
         "tun" => "vpn",
         _ => PlatformUtils.isDesktop ? "system-proxy" : "vpn",
       };
-      loggy.debug(
-        "changing service-mode from [$serviceMode] to [$newMode]",
-      );
+      loggy.debug("changing service-mode from [$serviceMode] to [$newMode]");
       await sharedPreferences.setString("service-mode", newMode);
     }
 
@@ -107,29 +103,21 @@ class PreferencesVersion1Migration extends PreferencesMigrationStep
   }
 
   String _ipv6Mapper(String persisted) => switch (persisted) {
-        "ipv4_only" ||
-        "prefer_ipv4" ||
-        "prefer_ipv4" ||
-        "ipv6_only" =>
-          persisted,
-        "disable" => "ipv4_only",
-        "enable" => "prefer_ipv4",
-        "prefer" => "prefer_ipv6",
-        "only" => "ipv6_only",
-        _ => "ipv4_only",
-      };
+    "ipv4_only" || "prefer_ipv4" || "prefer_ipv4" || "ipv6_only" => persisted,
+    "disable" => "ipv4_only",
+    "enable" => "prefer_ipv4",
+    "prefer" => "prefer_ipv6",
+    "only" => "ipv6_only",
+    _ => "ipv4_only",
+  };
 
   String _domainStrategyMapper(String persisted) => switch (persisted) {
-        "ipv4_only" ||
-        "prefer_ipv4" ||
-        "prefer_ipv4" ||
-        "ipv6_only" =>
-          persisted,
-        "auto" => "",
-        "preferIpv6" => "prefer_ipv6",
-        "preferIpv4" => "prefer_ipv4",
-        "ipv4Only" => "ipv4_only",
-        "ipv6Only" => "ipv6_only",
-        _ => "",
-      };
+    "ipv4_only" || "prefer_ipv4" || "prefer_ipv4" || "ipv6_only" => persisted,
+    "auto" => "",
+    "preferIpv6" => "prefer_ipv6",
+    "preferIpv4" => "prefer_ipv4",
+    "ipv4Only" => "ipv4_only",
+    "ipv6Only" => "ipv6_only",
+    _ => "",
+  };
 }

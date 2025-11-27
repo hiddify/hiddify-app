@@ -24,6 +24,6 @@ bool canSendEvent(dynamic throwable) {
 }
 
 bool canLogEvent(dynamic throwable) => switch (throwable) {
-      ExpectedMeasuredFailure _ => true,
-      _ => canSendEvent(throwable),
-    };
+  ExpectedMeasuredFailure _ => true,
+  _ => canSendEvent(throwable),
+};

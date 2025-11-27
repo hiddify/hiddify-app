@@ -39,38 +39,43 @@ class App extends HookConsumerWidget with PresLogger {
         ShortcutWrapper(
           ConnectionWrapper(
             DynamicColorBuilder(
-              builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
-                return MaterialApp.router(
-                  routerConfig: router,
-                  locale: locale.flutterLocale,
-                  supportedLocales: AppLocaleUtils.supportedLocales,
-                  localizationsDelegates: GlobalMaterialLocalizations.delegates,
-                  debugShowCheckedModeBanner: false,
-                  themeMode: themeMode.flutterThemeMode,
-                  theme: theme.lightTheme(lightColorScheme),
-                  darkTheme: theme.darkTheme(darkColorScheme),
-                  title: Constants.appName,
-                  builder: (context, child) {
-                    if (!PlatformUtils.isDesktop) {
-                      final upgrader = ref.watch(upgraderProvider);
-                      child = UpgradeAlert(
-                        upgrader: upgrader,
-                        navigatorKey: router.routerDelegate.navigatorKey,
-                        child: child ?? const SizedBox(),
-                      );
-                    } else {
-                      child = child ?? const SizedBox();
-                    }
-                    if (kDebugMode && _debugAccessibility) {
-                      return AccessibilityTools(
-                        checkFontOverflows: true,
-                        child: child,
-                      );
-                    }
-                    return child;
+              builder:
+                  (
+                    ColorScheme? lightColorScheme,
+                    ColorScheme? darkColorScheme,
+                  ) {
+                    return MaterialApp.router(
+                      routerConfig: router,
+                      locale: locale.flutterLocale,
+                      supportedLocales: AppLocaleUtils.supportedLocales,
+                      localizationsDelegates:
+                          GlobalMaterialLocalizations.delegates,
+                      debugShowCheckedModeBanner: false,
+                      themeMode: themeMode.flutterThemeMode,
+                      theme: theme.lightTheme(lightColorScheme),
+                      darkTheme: theme.darkTheme(darkColorScheme),
+                      title: Constants.appName,
+                      builder: (context, child) {
+                        if (!PlatformUtils.isDesktop) {
+                          final upgrader = ref.watch(upgraderProvider);
+                          child = UpgradeAlert(
+                            upgrader: upgrader,
+                            navigatorKey: router.routerDelegate.navigatorKey,
+                            child: child ?? const SizedBox(),
+                          );
+                        } else {
+                          child = child ?? const SizedBox();
+                        }
+                        if (kDebugMode && _debugAccessibility) {
+                          return AccessibilityTools(
+                            checkFontOverflows: true,
+                            child: child,
+                          );
+                        }
+                        return child;
+                      },
+                    );
                   },
-                );
-              },
             ),
           ),
         ),

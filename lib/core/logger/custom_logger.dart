@@ -5,15 +5,15 @@ import 'dart:io';
 import 'package:loggy/loggy.dart';
 
 class ConsolePrinter extends LoggyPrinter {
-  const ConsolePrinter({
-    this.showColors = false,
-  });
+  const ConsolePrinter({this.showColors = false});
 
   final bool showColors;
 
   static final _levelColors = {
-    LogLevel.debug:
-        AnsiColor(foregroundColor: AnsiColor.grey(0.5), italic: true),
+    LogLevel.debug: AnsiColor(
+      foregroundColor: AnsiColor.grey(0.5),
+      italic: true,
+    ),
     LogLevel.info: AnsiColor(foregroundColor: 35),
     LogLevel.warning: AnsiColor(foregroundColor: 214),
     LogLevel.error: AnsiColor(foregroundColor: 196),
@@ -34,8 +34,9 @@ class ConsolePrinter extends LoggyPrinter {
       logLevel = "[${record.level.name.toUpperCase()}]".padRight(10);
     }
 
-    final color =
-        showColors ? levelColor(record.level) ?? AnsiColor() : AnsiColor();
+    final color = showColors
+        ? levelColor(record.level) ?? AnsiColor()
+        : AnsiColor();
 
     print(
       color(
@@ -54,17 +55,13 @@ class ConsolePrinter extends LoggyPrinter {
 }
 
 class FileLogPrinter extends LoggyPrinter {
-  FileLogPrinter(
-    String filePath, {
-    this.minLevel = LogLevel.debug,
-  }) : _logFile = File(filePath);
+  FileLogPrinter(String filePath, {this.minLevel = LogLevel.debug})
+    : _logFile = File(filePath);
 
   final File _logFile;
   final LogLevel minLevel;
 
-  late final _sink = _logFile.openWrite(
-    mode: FileMode.writeOnly,
-  );
+  late final _sink = _logFile.openWrite(mode: FileMode.writeOnly);
 
   @override
   void onLog(LogRecord record) {

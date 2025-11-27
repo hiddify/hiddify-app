@@ -17,10 +17,7 @@ sealed class StatsFailure with _$StatsFailure, Failure {
   @override
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
-      StatsUnexpectedFailure() => (
-          type: t.failure.unexpected,
-          message: null,
-        ),
+      StatsUnexpectedFailure() => (type: t.failure.unexpected, message: null),
     };
   }
 }

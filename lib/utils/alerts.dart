@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:hiddify/utils/utils.dart';
 import 'package:toastification/toastification.dart';
 
 class CustomAlertDialog extends StatelessWidget {
@@ -8,7 +9,11 @@ class CustomAlertDialog extends StatelessWidget {
   final String? title;
   final String message;
 
-  factory CustomAlertDialog.fromErr(({String type, String? message}) err) => CustomAlertDialog(title: err.message == null ? null : err.type, message: err.message ?? err.type);
+  factory CustomAlertDialog.fromErr(({String type, String? message}) err) =>
+      CustomAlertDialog(
+        title: err.message == null ? null : err.type,
+        message: err.message ?? err.type,
+      );
 
   Future<void> show(BuildContext context) async {
     await showDialog(context: context, builder: (context) => this);
@@ -20,7 +25,9 @@ class CustomAlertDialog extends StatelessWidget {
 
     return AlertDialog(
       title: title != null ? Text(title!) : null,
-      content: SingleChildScrollView(child: SizedBox(width: 468, child: Text(message))),
+      content: SingleChildScrollView(
+        child: SizedBox(width: 468, child: Text(message)),
+      ),
       actions: [
         TextButton(
           onPressed: () {
@@ -46,11 +53,24 @@ enum AlertType {
 }
 
 class CustomToast extends StatelessWidget {
-  const CustomToast(this.message, {this.type = AlertType.info, this.icon, this.duration = const Duration(seconds: 3)});
+  const CustomToast(
+    this.message, {
+    this.type = AlertType.info,
+    this.icon,
+    this.duration = const Duration(seconds: 3),
+  });
 
-  const CustomToast.error(this.message, {this.duration = const Duration(seconds: 5)}) : type = AlertType.error, icon = FluentIcons.error_circle_24_regular;
+  const CustomToast.error(
+    this.message, {
+    this.duration = const Duration(seconds: 5),
+  }) : type = AlertType.error,
+       icon = FluentIcons.error_circle_24_regular;
 
-  const CustomToast.success(this.message, {this.duration = const Duration(seconds: 3)}) : type = AlertType.success, icon = FluentIcons.checkmark_24_regular;
+  const CustomToast.success(
+    this.message, {
+    this.duration = const Duration(seconds: 3),
+  }) : type = AlertType.success,
+       icon = FluentIcons.checkmark_24_regular;
 
   final String message;
   final AlertType type;
@@ -67,12 +87,18 @@ class CustomToast extends StatelessWidget {
     };
 
     return Container(
-      decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(4)), color: Theme.of(context).colorScheme.surface),
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
+        color: Theme.of(context).colorScheme.surface,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[Icon(icon, color: color), const SizedBox(width: 8)],
+          if (icon != null) ...[
+            Icon(icon, color: color),
+            const SizedBox(width: 8),
+          ],
           Flexible(child: Text(message)),
         ],
       ),
@@ -80,6 +106,11 @@ class CustomToast extends StatelessWidget {
   }
 
   void show(BuildContext context) {
+    if (PlatformUtils.isDesktop) {
+      // Desktop workaround: disable toast overlays to avoid hitTest crashes.
+      return;
+    }
+
     toastification.show(
       context: context,
       title: Text(message),

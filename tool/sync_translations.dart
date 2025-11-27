@@ -29,7 +29,9 @@ void main(List<String> args) async {
 
   const encoder = JsonEncoder.withIndent('  ');
   await faPath.writeAsString('${encoder.convert(merged)}\n');
-  stdout.writeln('✅ fa.i18n.json synced. Backup: ${backupFile.path}. Placeholder mode: ${placeholdersEmpty ? 'empty' : 'english'}');
+  stdout.writeln(
+    '✅ fa.i18n.json synced. Backup: ${backupFile.path}. Placeholder mode: ${placeholdersEmpty ? 'empty' : 'english'}',
+  );
 }
 
 /// Recursively merges [en] into [fa], preserving existing FA values and
@@ -42,7 +44,11 @@ dynamic _merge(dynamic en, dynamic fa, {required bool placeholdersEmpty}) {
       final enVal = en[key];
       final hasFa = fa.containsKey(key);
       final faVal = hasFa ? fa[key] : null;
-      result[key] = _merge(enVal, hasFa ? faVal : enVal, placeholdersEmpty: placeholdersEmpty);
+      result[key] = _merge(
+        enVal,
+        hasFa ? faVal : enVal,
+        placeholdersEmpty: placeholdersEmpty,
+      );
     }
     // Preserve extra FA-only keys if any exist
     for (final String key in fa.keys) {
@@ -52,7 +58,14 @@ dynamic _merge(dynamic en, dynamic fa, {required bool placeholdersEmpty}) {
   }
   if (en is List && fa is List) {
     final length = en.length > fa.length ? en.length : fa.length;
-    return List.generate(length, (i) => _merge(i < en.length ? en[i] : null, i < fa.length ? fa[i] : null, placeholdersEmpty: placeholdersEmpty));
+    return List.generate(
+      length,
+      (i) => _merge(
+        i < en.length ? en[i] : null,
+        i < fa.length ? fa[i] : null,
+        placeholdersEmpty: placeholdersEmpty,
+      ),
+    );
   }
   // For primitives or mismatched structures: prefer FA when present; otherwise use EN.
   if (fa != null) return fa;

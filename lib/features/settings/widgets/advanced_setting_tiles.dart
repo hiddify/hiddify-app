@@ -39,8 +39,12 @@ class AdvancedSettingTiles extends HookConsumerWidget {
             trailing: Switch(
               value: perAppProxy,
               onChanged: (value) async {
-                final newMode = perAppProxy ? PerAppProxyMode.off : PerAppProxyMode.exclude;
-                await ref.read(Preferences.perAppProxyMode.notifier).update(newMode);
+                final newMode = perAppProxy
+                    ? PerAppProxyMode.off
+                    : PerAppProxyMode.exclude;
+                await ref
+                    .read(Preferences.perAppProxyMode.notifier)
+                    .update(newMode);
                 if (!perAppProxy && context.mounted) {
                   await const PerAppProxyRoute().push(context);
                 }
@@ -48,7 +52,9 @@ class AdvancedSettingTiles extends HookConsumerWidget {
             ),
             onTap: () async {
               if (!perAppProxy) {
-                await ref.read(Preferences.perAppProxyMode.notifier).update(PerAppProxyMode.exclude);
+                await ref
+                    .read(Preferences.perAppProxyMode.notifier)
+                    .update(PerAppProxyMode.exclude);
               }
               if (context.mounted) await const PerAppProxyRoute().push(context);
             },
@@ -60,7 +66,9 @@ class AdvancedSettingTiles extends HookConsumerWidget {
           value: !disableMemoryLimit,
           secondary: const Icon(FluentIcons.developer_board_24_regular),
           onChanged: (value) async {
-            await ref.read(Preferences.disableMemoryLimit.notifier).update(!value);
+            await ref
+                .read(Preferences.disableMemoryLimit.notifier)
+                .update(!value);
           },
         ),
         if (Platform.isIOS)
@@ -83,7 +91,14 @@ class AdvancedSettingTiles extends HookConsumerWidget {
                   return AlertDialog(
                     title: Text(t.settings.advanced.debugMode),
                     content: Text(t.settings.advanced.debugModeMsg),
-                    actions: [TextButton(onPressed: () => Navigator.of(context).maybePop(true), child: Text(MaterialLocalizations.of(context).okButtonLabel))],
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).maybePop(true),
+                        child: Text(
+                          MaterialLocalizations.of(context).okButtonLabel,
+                        ),
+                      ),
+                    ],
                   );
                 },
               );

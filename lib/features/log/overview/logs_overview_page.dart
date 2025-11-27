@@ -34,13 +34,19 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
             PopupMenuItem(
               child: Text(t.logs.shareCoreLogs),
               onTap: () async {
-                await UriUtils.tryShareOrLaunchFile(Uri.parse(pathResolver.coreFile().path), fileOrDir: pathResolver.directory.uri);
+                await UriUtils.tryShareOrLaunchFile(
+                  Uri.parse(pathResolver.coreFile().path),
+                  fileOrDir: pathResolver.directory.uri,
+                );
               },
             ),
             PopupMenuItem(
               child: Text(t.logs.shareAppLogs),
               onTap: () async {
-                await UriUtils.tryShareOrLaunchFile(Uri.parse(pathResolver.appFile().path), fileOrDir: pathResolver.directory.uri);
+                await UriUtils.tryShareOrLaunchFile(
+                  Uri.parse(pathResolver.appFile().path),
+                  fileOrDir: pathResolver.directory.uri,
+                );
               },
             ),
           ]
@@ -59,10 +65,25 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                     title: Text(t.logs.pageTitle),
                     actions: [
                       if (state.paused)
-                        IconButton(onPressed: notifier.resume, icon: const Icon(FluentIcons.play_20_regular), tooltip: t.logs.resumeTooltip, iconSize: 20)
+                        IconButton(
+                          onPressed: notifier.resume,
+                          icon: const Icon(FluentIcons.play_20_regular),
+                          tooltip: t.logs.resumeTooltip,
+                          iconSize: 20,
+                        )
                       else
-                        IconButton(onPressed: notifier.pause, icon: const Icon(FluentIcons.pause_20_regular), tooltip: t.logs.pauseTooltip, iconSize: 20),
-                      IconButton(onPressed: notifier.clear, icon: const Icon(FluentIcons.delete_lines_20_regular), tooltip: t.logs.clearTooltip, iconSize: 20),
+                        IconButton(
+                          onPressed: notifier.pause,
+                          icon: const Icon(FluentIcons.pause_20_regular),
+                          tooltip: t.logs.pauseTooltip,
+                          iconSize: 20,
+                        ),
+                      IconButton(
+                        onPressed: notifier.clear,
+                        icon: const Icon(FluentIcons.delete_lines_20_regular),
+                        tooltip: t.logs.clearTooltip,
+                        iconSize: 20,
+                      ),
                       if (popupButtons.isNotEmpty)
                         PopupMenuButton(
                           icon: Icon(AdaptiveIcon(context).more),
@@ -74,16 +95,24 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                   ),
                   SliverPinnedHeader(
                     child: DecoratedBox(
-                      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: Row(
                           children: [
                             Flexible(
                               child: TextFormField(
                                 controller: filterController,
                                 onChanged: notifier.filterMessage,
-                                decoration: InputDecoration(isDense: true, hintText: t.logs.filterHint),
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  hintText: t.logs.filterHint,
+                                ),
                               ),
                             ),
                             const Gap(16),
@@ -93,11 +122,21 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                                 if (v == null) return;
                                 notifier.filterLevel(v.toNullable());
                               },
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                               borderRadius: BorderRadius.circular(4),
                               items: [
-                                DropdownMenuItem(value: none(), child: Text(t.logs.allLevelsFilter)),
-                                ...LogLevel.choices.map((e) => DropdownMenuItem(value: some(e), child: Text(e.name))),
+                                DropdownMenuItem(
+                                  value: none(),
+                                  child: Text(t.logs.allLevelsFilter),
+                                ),
+                                ...LogLevel.choices.map(
+                                  (e) => DropdownMenuItem(
+                                    value: some(e),
+                                    child: Text(e.name),
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -126,31 +165,57 @@ class LogsOverviewPage extends HookConsumerWidget with PresLogger {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (log.level != null)
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(log.level!.name.toUpperCase(), style: Theme.of(context).textTheme.labelMedium?.copyWith(color: log.level!.color)),
-                                      if (log.time != null) Text(log.time!.toString(), style: Theme.of(context).textTheme.labelSmall),
+                                      Text(
+                                        log.level!.name.toUpperCase(),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium
+                                            ?.copyWith(color: log.level!.color),
+                                      ),
+                                      if (log.time != null)
+                                        Text(
+                                          log.time!.toString(),
+                                          style: Theme.of(
+                                            context,
+                                          ).textTheme.labelSmall,
+                                        ),
                                     ],
                                   ),
-                                Text(log.message, style: Theme.of(context).textTheme.bodySmall),
+                                Text(
+                                  log.message,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
                               ],
                             ),
                           ),
-                          if (index != 0) const Divider(indent: 16, endIndent: 16, height: 4),
+                          if (index != 0)
+                            const Divider(indent: 16, endIndent: 16, height: 4),
                         ],
                       );
                     },
                   ),
-                  AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
+                  AsyncError(:final error) => SliverErrorBodyPlaceholder(
+                    t.presentShortError(error),
+                  ),
                   _ => const SliverLoadingBodyPlaceholder(),
                 },
-                SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
+                SliverOverlapInjector(
+                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                    context,
+                  ),
+                ),
               ],
             );
           },

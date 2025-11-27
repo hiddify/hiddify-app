@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.activity.result.contract.ActivityResultContracts
 import com.hiddify.hiddify.bg.ServiceConnection
 import com.hiddify.hiddify.bg.ServiceNotification
 import com.hiddify.hiddify.constant.Alert
@@ -35,8 +36,24 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
 
     private val connection = ServiceConnection(this, this)
 
+    private val vpnPermissionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            startService()
+        } else {
+            onServiceAlert(Alert.RequestVPNPermission, null)
+        }
+    }
+
+    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            startService()
+        } else {
+            onServiceAlert(Alert.RequestNotificationPermission, null)
+        }
+    }
+
     val logList = LinkedList<String>()
-    var logCallback: ((Boolean) -> Unit)? = null
+    var logCallback: ((String) -> Unit)? = null
     val serviceStatus = MutableLiveData(Status.Stopped)
     val serviceAlerts = MutableLiveData<ServiceEvent?>(null)
 
@@ -84,7 +101,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         try {
             val intent = VpnService.prepare(this@MainActivity)
             if (intent != null) {
-                startActivityForResult(intent, VPN_PERMISSION_REQUEST_CODE)
+                vpnPermissionLauncher.launch(intent)
                 true
             } else {
                 false
@@ -104,17 +121,19 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     }
 
     override fun onServiceWriteLog(message: String?) {
+        if (message == null) return
         if (logList.size > 300) {
             logList.removeFirst()
         }
         logList.addLast(message)
-        logCallback?.invoke(false)
+        logCallback?.invoke(message)
     }
 
     override fun onServiceResetLogs(messages: MutableList<String>) {
         logList.clear()
         logList.addAll(messages)
-        logCallback?.invoke(true)
+        // We might want to notify that logs were reset, but single string callback isn't enough.
+        // For now, listeners usually reload the full list on reset anyway.
     }
 
     override fun onDestroy() {
@@ -125,35 +144,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     @SuppressLint("NewApi")
     private fun grantNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                NOTIFICATION_PERMISSION_REQUEST_CODE
-            )
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startService()
-            } else onServiceAlert(Alert.RequestNotificationPermission, null)
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == VPN_PERMISSION_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) startService()
-            else onServiceAlert(Alert.RequestVPNPermission, null)
-        } else if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) startService()
-            else onServiceAlert(Alert.RequestNotificationPermission, null)
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 }

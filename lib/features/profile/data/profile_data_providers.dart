@@ -30,5 +30,7 @@ ProfileDataSource profileDataSource(Ref ref) {
 
 @Riverpod(keepAlive: true)
 ProfilePathResolver profilePathResolver(Ref ref) {
-  return ProfilePathResolver(ref.watch(appDirectoriesProvider).requireValue.workingDir);
+  return ProfilePathResolver(
+    ref.watch(appDirectoriesProvider).requireValue.workingDir,
+  );
 }

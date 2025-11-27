@@ -29,9 +29,17 @@ class ConnectionStatsCard extends HookConsumerWidget {
       title: t.stats.connection,
       stats: [
         if (proxyDisplayName != null)
-          (label: const Icon(FluentIcons.arrow_routing_20_regular), data: Text(proxyDisplayName), semanticLabel: null)
+          (
+            label: const Icon(FluentIcons.arrow_routing_20_regular),
+            data: Text(proxyDisplayName),
+            semanticLabel: null,
+          )
         else
-          (label: const Icon(FluentIcons.arrow_routing_20_regular), data: const Text("..."), semanticLabel: null),
+          (
+            label: const Icon(FluentIcons.arrow_routing_20_regular),
+            data: const Text("..."),
+            semanticLabel: null,
+          ),
         switch (ipInfo) {
           AsyncData(value: final info) => (
             label: IPCountryFlag(countryCode: info.countryCode, size: 16),
@@ -44,7 +52,11 @@ class ConnectionStatsCard extends HookConsumerWidget {
             ),
             semanticLabel: null,
           ),
-          AsyncLoading() => (label: const Icon(FluentIcons.question_circle_20_regular), data: const ShimmerSkeleton(widthFactor: .85, height: 14), semanticLabel: null),
+          AsyncLoading() => (
+            label: const Icon(FluentIcons.question_circle_20_regular),
+            data: const ShimmerSkeleton(widthFactor: .85, height: 14),
+            semanticLabel: null,
+          ),
           AsyncError(error: final UnknownIp _) => (
             label: const Icon(FluentIcons.arrow_sync_20_regular),
             data: UnknownIPText(

@@ -12,7 +12,8 @@ class StatsNotifier extends _$StatsNotifier with AppLogger {
   @override
   Stream<StatsEntity> build() async* {
     ref.disposeDelay(const Duration(seconds: 10));
-    final serviceRunning = ref.watch(serviceRunningProvider).asData?.value ?? false;
+    final serviceRunning =
+        ref.watch(serviceRunningProvider).asData?.value ?? false;
     if (!serviceRunning) {
       yield* Stream.value(StatsEntity.empty());
       return;

@@ -1,0 +1,14 @@
+#profile-title: base64:QWluaXRhLm5ldA==
+#profile-update-interval: 24
+#subscription-userinfo: upload=0; download=0; total=10737418240000000; expire=2546249531
+#support-url: https://t.me/ainita
+#profile-web-page-url: https://ainita.net
+
+ssconf://ainita.s3.eu-north-1.amazonaws.com/AinitaServer-1.csv
+
+ssconf://ainita.s3.eu-north-1.amazonaws.com/AinitaServer-2.csv
+
+ssconf://ainita.s3.eu-north-1.amazonaws.com/AinitaServer-3.csv
+
+ssconf://ainita.s3.eu-north-1.amazonaws.com/AinitaServer-4.csv
+

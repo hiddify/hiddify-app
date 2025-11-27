@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/optional_range.dart';
@@ -24,17 +25,17 @@ class WarpOptionsTiles extends HookConsumerWidget {
     final enableWarp = ref.watch(ConfigOptions.enableWarp);
     final canChangeOptions = warpPrefaceCompleted && enableWarp;
 
-    ref.listen(
-      warpOptionProvider.select((value) => value.configGeneration),
-      (previous, next) async {
-        if (next case AsyncData(value: final log) when log.isNotEmpty) {
-          await CustomAlertDialog(
-            title: t.config.warpConfigGenerated,
-            message: log,
-          ).show(context);
-        }
-      },
-    );
+    ref.listen(warpOptionProvider.select((value) => value.configGeneration), (
+      previous,
+      next,
+    ) async {
+      if (next case AsyncData(value: final log) when log.isNotEmpty) {
+        await CustomAlertDialog(
+          title: t.config.warpConfigGenerated,
+          message: log,
+        ).show(context);
+      }
+    });
 
     return Column(
       children: [
@@ -62,9 +63,11 @@ class WarpOptionsTiles extends HookConsumerWidget {
               ? switch (warpOptions.configGeneration) {
                   AsyncLoading() => const LinearProgressIndicator(),
                   AsyncError() => Text(
-                      t.config.missingWarpConfig,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    t.config.missingWarpConfig,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
                     ),
+                  ),
                   _ => null,
                 }
               : null,
@@ -109,7 +112,8 @@ class WarpOptionsTiles extends HookConsumerWidget {
           preferences: ref.watch(ConfigOptions.warpNoise.notifier),
           enabled: canChangeOptions,
           title: t.config.warpNoise,
-          inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
+          inputToValue: (input) =>
+              OptionalRange.tryParse(input, allowEmpty: true),
           presentValue: (value) => value.present(t),
           formatInputValue: (value) => value.format(),
         ),
@@ -124,7 +128,8 @@ class WarpOptionsTiles extends HookConsumerWidget {
           preferences: ref.watch(ConfigOptions.warpNoiseSize.notifier),
           enabled: canChangeOptions,
           title: t.config.warpNoiseSize,
-          inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
+          inputToValue: (input) =>
+              OptionalRange.tryParse(input, allowEmpty: true),
           presentValue: (value) => value.present(t),
           formatInputValue: (value) => value.format(),
         ),
@@ -133,7 +138,8 @@ class WarpOptionsTiles extends HookConsumerWidget {
           preferences: ref.watch(ConfigOptions.warpNoiseDelay.notifier),
           enabled: canChangeOptions,
           title: t.config.warpNoiseDelay,
-          inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
+          inputToValue: (input) =>
+              OptionalRange.tryParse(input, allowEmpty: true),
           presentValue: (value) => value.present(t),
           formatInputValue: (value) => value.format(),
         ),
@@ -148,6 +154,23 @@ class WarpLicenseAgreementModal extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
+    final tosTapRecognizer = useMemoized(TapGestureRecognizer.new);
+    final privacyTapRecognizer = useMemoized(TapGestureRecognizer.new);
+
+    useEffect(() {
+      return () {
+        tosTapRecognizer.dispose();
+        privacyTapRecognizer.dispose();
+      };
+    }, [tosTapRecognizer, privacyTapRecognizer]);
+
+    tosTapRecognizer.onTap = () async {
+      await UriUtils.tryLaunch(Uri.parse(Constants.cfWarpTermsOfService));
+    };
+
+    privacyTapRecognizer.onTap = () async {
+      await UriUtils.tryLaunch(Uri.parse(Constants.cfWarpPrivacyPolicy));
+    };
 
     return AlertDialog(
       title: Text(t.config.warpConsent.title),
@@ -156,22 +179,12 @@ class WarpLicenseAgreementModal extends HookConsumerWidget {
           tos: (text) => TextSpan(
             text: text,
             style: const TextStyle(color: Colors.blue),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () async {
-                await UriUtils.tryLaunch(
-                  Uri.parse(Constants.cfWarpTermsOfService),
-                );
-              },
+            recognizer: tosTapRecognizer,
           ),
           privacy: (text) => TextSpan(
             text: text,
             style: const TextStyle(color: Colors.blue),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () async {
-                await UriUtils.tryLaunch(
-                  Uri.parse(Constants.cfWarpPrivacyPolicy),
-                );
-              },
+            recognizer: privacyTapRecognizer,
           ),
         ),
       ),

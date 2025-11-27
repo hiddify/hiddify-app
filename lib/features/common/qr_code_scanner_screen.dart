@@ -14,15 +14,25 @@ class QRCodeScannerScreen extends StatefulHookConsumerWidget {
   const QRCodeScannerScreen({super.key});
 
   Future<String?> open(BuildContext context) {
-    return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(fullscreenDialog: true, builder: (context) => const QRCodeScannerScreen()));
+    return Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => const QRCodeScannerScreen(),
+      ),
+    );
   }
 
   @override
-  ConsumerState<QRCodeScannerScreen> createState() => _QRCodeScannerScreenState();
+  ConsumerState<QRCodeScannerScreen> createState() =>
+      _QRCodeScannerScreenState();
 }
 
-class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with WidgetsBindingObserver, PresLogger {
-  final MobileScannerController controller = MobileScannerController(detectionTimeoutMs: 500, autoStart: false);
+class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen>
+    with WidgetsBindingObserver, PresLogger {
+  final MobileScannerController controller = MobileScannerController(
+    detectionTimeoutMs: 500,
+    autoStart: false,
+  );
   bool started = false;
 
   // late FlutterEasyPermission _easyPermission;
@@ -138,7 +148,10 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
           title: const Text("Camera Access Required"),
           content: const Text("Permission to camera to scan QR Code"),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text("Cancel")),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancel"),
+            ),
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
@@ -180,9 +193,15 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.white, size: 32),
+        iconTheme: Theme.of(
+          context,
+        ).iconTheme.copyWith(color: Colors.white, size: 32),
         actions: [
-          IconButton(icon: const Icon(FluentIcons.flash_24_regular), tooltip: t.profile.add.qrScanner.torchSemanticLabel, onPressed: () => controller.toggleTorch()),
+          IconButton(
+            icon: const Icon(FluentIcons.flash_24_regular),
+            tooltip: t.profile.add.qrScanner.torchSemanticLabel,
+            onPressed: () => controller.toggleTorch(),
+          ),
           // IconButton(
           //   icon: ValueListenableBuilder(
           //     valueListenable: controller.torchState,
@@ -204,7 +223,11 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
           //   tooltip: t.profile.add.qrScanner.torchSemanticLabel,
           //   onPressed: () => controller.toggleTorch(),
           // ),
-          IconButton(icon: const Icon(FluentIcons.camera_switch_24_regular), tooltip: t.profile.add.qrScanner.facingSemanticLabel, onPressed: () => controller.switchCamera()),
+          IconButton(
+            icon: const Icon(FluentIcons.camera_switch_24_regular),
+            tooltip: t.profile.add.qrScanner.facingSemanticLabel,
+            onPressed: () => controller.switchCamera(),
+          ),
         ],
       ),
       body: Stack(
@@ -218,7 +241,10 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
                 final uri = Uri.tryParse(rawData);
                 if (context.mounted && uri != null) {
                   loggy.debug('captured url: [$uri]');
-                  Navigator.of(context, rootNavigator: true).pop(uri.toString());
+                  Navigator.of(
+                    context,
+                    rootNavigator: true,
+                  ).pop(uri.toString());
                 }
               } else {
                 loggy.warning("unable to capture");
@@ -226,7 +252,8 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
             },
             errorBuilder: (_, error) {
               final message = switch (error.errorCode) {
-                MobileScannerErrorCode.permissionDenied => t.profile.add.qrScanner.permissionDeniedError,
+                MobileScannerErrorCode.permissionDenied =>
+                  t.profile.add.qrScanner.permissionDeniedError,
                 _ => t.profile.add.qrScanner.unexpectedError,
               };
 
@@ -236,7 +263,10 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(bottom: 8),
-                      child: Icon(FluentIcons.error_circle_24_regular, color: Colors.white),
+                      child: Icon(
+                        FluentIcons.error_circle_24_regular,
+                        color: Colors.white,
+                      ),
                     ),
                     Text(message),
                     Text(error.errorDetails?.message ?? ''),
@@ -247,7 +277,13 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
           ),
           if (started)
             CustomPaint(
-              painter: ScannerOverlay(Rect.fromCenter(center: size.center(Offset.zero), width: overlaySize, height: overlaySize)),
+              painter: ScannerOverlay(
+                Rect.fromCenter(
+                  center: size.center(Offset.zero),
+                  width: overlaySize,
+                  height: overlaySize,
+                ),
+              ),
             ),
         ],
       ),
@@ -258,7 +294,9 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.white, size: 32),
+        iconTheme: Theme.of(
+          context,
+        ).iconTheme.copyWith(color: Colors.white, size: 32),
       ),
       body: Center(
         child: Column(
@@ -266,7 +304,10 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen> with 
           children: [
             Text(t.profile.add.qrScanner.permissionDeniedError),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: _showPermissionDialog, child: const Text("Settings")),
+            ElevatedButton(
+              onPressed: _showPermissionDialog,
+              child: const Text("Settings"),
+            ),
           ],
         ),
       ),
@@ -283,21 +324,40 @@ class ScannerOverlay extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final backgroundPath = Path()..addRect(Rect.largest);
-    final cutoutPath = Path()..addRRect(RRect.fromRectAndCorners(scanWindow, topLeft: Radius.circular(borderRadius), topRight: Radius.circular(borderRadius), bottomLeft: Radius.circular(borderRadius), bottomRight: Radius.circular(borderRadius)));
+    final cutoutPath = Path()
+      ..addRRect(
+        RRect.fromRectAndCorners(
+          scanWindow,
+          topLeft: Radius.circular(borderRadius),
+          topRight: Radius.circular(borderRadius),
+          bottomLeft: Radius.circular(borderRadius),
+          bottomRight: Radius.circular(borderRadius),
+        ),
+      );
 
     final backgroundPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill
       ..blendMode = BlendMode.dstOut;
 
-    final backgroundWithCutout = Path.combine(PathOperation.difference, backgroundPath, cutoutPath);
+    final backgroundWithCutout = Path.combine(
+      PathOperation.difference,
+      backgroundPath,
+      cutoutPath,
+    );
 
     final borderPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
 
-    final borderRect = RRect.fromRectAndCorners(scanWindow, topLeft: Radius.circular(borderRadius), topRight: Radius.circular(borderRadius), bottomLeft: Radius.circular(borderRadius), bottomRight: Radius.circular(borderRadius));
+    final borderRect = RRect.fromRectAndCorners(
+      scanWindow,
+      topLeft: Radius.circular(borderRadius),
+      topRight: Radius.circular(borderRadius),
+      bottomLeft: Radius.circular(borderRadius),
+      bottomRight: Radius.circular(borderRadius),
+    );
 
     canvas.drawPath(backgroundWithCutout, backgroundPaint);
     canvas.drawRRect(borderRect, borderPaint);

@@ -32,12 +32,13 @@ abstract class Preferences {
     PlatformUtils.isDesktop,
   );
 
-  static final perAppProxyMode = PreferencesNotifier.create<PerAppProxyMode, String>(
-    "per_app_proxy_mode",
-    PerAppProxyMode.off,
-    mapFrom: PerAppProxyMode.values.byName,
-    mapTo: (value) => value.name,
-  );
+  static final perAppProxyMode =
+      PreferencesNotifier.create<PerAppProxyMode, String>(
+        "per_app_proxy_mode",
+        PerAppProxyMode.off,
+        mapFrom: PerAppProxyMode.values.byName,
+        mapTo: (value) => value.name,
+      );
 
   static final markNewProfileActive = PreferencesNotifier.create<bool, bool>(
     "mark_new_profile_active",
@@ -64,12 +65,13 @@ abstract class Preferences {
     false,
   );
 
-  static final actionAtClose = PreferencesNotifier.create<ActionsAtClosing, String>(
-    "action_at_close",
-    ActionsAtClosing.ask,
-    mapFrom: ActionsAtClosing.values.byName,
-    mapTo: (value) => value.name,
-  );
+  static final actionAtClose =
+      PreferencesNotifier.create<ActionsAtClosing, String>(
+        "action_at_close",
+        ActionsAtClosing.ask,
+        mapFrom: ActionsAtClosing.values.byName,
+        mapTo: (value) => value.name,
+      );
 }
 
 @Riverpod(keepAlive: true)
@@ -104,7 +106,10 @@ class PerAppProxyList extends _$PerAppProxyList {
   );
 
   @override
-  List<String> build() => ref.watch(Preferences.perAppProxyMode) == PerAppProxyMode.include ? _include.read() : _exclude.read();
+  List<String> build() =>
+      ref.watch(Preferences.perAppProxyMode) == PerAppProxyMode.include
+      ? _include.read()
+      : _exclude.read();
 
   Future<void> update(List<String> value) {
     state = value;

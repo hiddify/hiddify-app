@@ -15,27 +15,31 @@ sealed class ConnectionStatus with _$ConnectionStatus {
   const factory ConnectionStatus.connected() = Connected;
   const factory ConnectionStatus.disconnecting() = Disconnecting;
 
-  bool get isConnected => switch (this) { Connected() => true, _ => false };
+  bool get isConnected => switch (this) {
+    Connected() => true,
+    _ => false,
+  };
 
   bool get isSwitching => switch (this) {
-        Connecting() => true,
-        Disconnecting() => true,
-        _ => false,
-      };
+    Connecting() => true,
+    Disconnecting() => true,
+    _ => false,
+  };
 
   String format() => switch (this) {
-        Disconnected(:final connectionFailure) => connectionFailure != null
-            ? "CONNECTION FAILURE: $connectionFailure"
-            : "DISCONNECTED",
-        Connecting() => "CONNECTING",
-        Connected() => "CONNECTED",
-        Disconnecting() => "DISCONNECTING",
-      };
+    Disconnected(:final connectionFailure) =>
+      connectionFailure != null
+          ? "CONNECTION FAILURE: $connectionFailure"
+          : "DISCONNECTED",
+    Connecting() => "CONNECTING",
+    Connected() => "CONNECTED",
+    Disconnecting() => "DISCONNECTING",
+  };
 
   String present(TranslationsEn t) => switch (this) {
-        Disconnected() => t.connection.tapToConnect,
-        Connecting() => t.connection.connecting,
-        Connected() => t.connection.connected,
-        Disconnecting() => t.connection.disconnecting,
-      };
+    Disconnected() => t.connection.tapToConnect,
+    Connecting() => t.connection.connecting,
+    Connected() => t.connection.connected,
+    Disconnecting() => t.connection.disconnecting,
+  };
 }

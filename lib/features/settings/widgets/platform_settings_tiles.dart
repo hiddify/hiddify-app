@@ -13,27 +13,27 @@ class PlatformSettingsTiles extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
 
-    final isIgnoringBatteryOptimizations =
-        ref.watch(ignoreBatteryOptimizationsProvider);
+    final isIgnoringBatteryOptimizations = ref.watch(
+      ignoreBatteryOptimizationsProvider,
+    );
 
     ListTile buildIgnoreTile(bool enabled) => ListTile(
-          title: Text(t.settings.general.ignoreBatteryOptimizations),
-          subtitle: Text(t.settings.general.ignoreBatteryOptimizationsMsg),
-          leading: const Icon(FluentIcons.battery_saver_24_regular),
-          enabled: enabled,
-          onTap: () async {
-            await ref
-                .read(ignoreBatteryOptimizationsProvider.notifier)
-                .request();
-          },
-        );
+      title: Text(t.settings.general.ignoreBatteryOptimizations),
+      subtitle: Text(t.settings.general.ignoreBatteryOptimizationsMsg),
+      leading: const Icon(FluentIcons.battery_saver_24_regular),
+      enabled: enabled,
+      onTap: () async {
+        await ref.read(ignoreBatteryOptimizationsProvider.notifier).request();
+      },
+    );
 
     return Column(
       children: [
         if (Platform.isAndroid)
           switch (isIgnoringBatteryOptimizations) {
-            AsyncData(:final value) when value == false =>
-              buildIgnoreTile(true),
+            AsyncData(:final value) when value == false => buildIgnoreTile(
+              true,
+            ),
             AsyncData(:final value) when value == true => const SizedBox(),
             _ => buildIgnoreTile(false),
           },

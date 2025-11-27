@@ -32,19 +32,25 @@ class QuickSettingsModal extends HookConsumerWidget {
                         e.presentShort(t),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      tooltip: e.isExperimental ? t.settings.experimental : null,
+                      tooltip: e.isExperimental
+                          ? t.settings.experimental
+                          : null,
                     ),
                   )
                   .toList(),
               selected: {ref.watch(ConfigOptions.serviceMode)},
-              onSelectionChanged: (newSet) => ref.read(ConfigOptions.serviceMode.notifier).update(newSet.first),
+              onSelectionChanged: (newSet) => ref
+                  .read(ConfigOptions.serviceMode.notifier)
+                  .update(newSet.first),
             ),
           ),
           const Gap(8),
           if (warpPrefaceCompleted)
             GestureDetector(
               onLongPress: () {
-                ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context);
+                ConfigOptionsRoute(
+                  section: ConfigOptionSection.warp.name,
+                ).go(context);
               },
               child: SwitchListTile(
                 value: ref.watch(ConfigOptions.enableWarp),
@@ -56,15 +62,21 @@ class QuickSettingsModal extends HookConsumerWidget {
             ListTile(
               title: Text(t.config.setupWarp),
               trailing: const Icon(FluentIcons.chevron_right_24_regular),
-              onTap: () => ConfigOptionsRoute(section: ConfigOptionSection.warp.name).go(context),
+              onTap: () => ConfigOptionsRoute(
+                section: ConfigOptionSection.warp.name,
+              ).go(context),
             ),
           GestureDetector(
             onLongPress: () {
-              ConfigOptionsRoute(section: ConfigOptionSection.fragment.name).go(context);
+              ConfigOptionsRoute(
+                section: ConfigOptionSection.fragment.name,
+              ).go(context);
             },
             child: SwitchListTile(
               value: ref.watch(ConfigOptions.enableTlsFragment),
-              onChanged: ref.watch(ConfigOptions.enableTlsFragment.notifier).update,
+              onChanged: ref
+                  .watch(ConfigOptions.enableTlsFragment.notifier)
+                  .update,
               title: Text(t.config.enableTlsFragment),
             ),
           ),

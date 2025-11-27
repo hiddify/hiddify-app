@@ -46,6 +46,11 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
         }
     }
 
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        service.onTrimMemory(level)
+    }
+
     override fun autoDetectInterfaceControl(fd: Int) {
         protect(fd)
     }

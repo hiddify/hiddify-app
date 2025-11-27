@@ -27,21 +27,21 @@ sealed class ProfileFailure with _$ProfileFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       ProfileUnexpectedFailure() => (
-          type: t.failure.profiles.unexpected,
-          message: null,
-        ),
+        type: t.failure.profiles.unexpected,
+        message: null,
+      ),
       ProfileNotFoundFailure() => (
-          type: t.failure.profiles.notFound,
-          message: null
-        ),
+        type: t.failure.profiles.notFound,
+        message: null,
+      ),
       ProfileInvalidUrlFailure() => (
-          type: t.failure.profiles.invalidUrl,
-          message: null,
-        ),
+        type: t.failure.profiles.invalidUrl,
+        message: null,
+      ),
       ProfileInvalidConfigFailure(:final message) => (
-          type: t.failure.profiles.invalidConfig,
-          message: message
-        ),
+        type: t.failure.profiles.invalidConfig,
+        message: message,
+      ),
     };
   }
 }

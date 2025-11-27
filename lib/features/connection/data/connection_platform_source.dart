@@ -12,7 +12,9 @@ abstract interface class ConnectionPlatformSource {
   Future<bool> checkPrivilege();
 }
 
-class ConnectionPlatformSourceImpl with InfraLogger implements ConnectionPlatformSource {
+class ConnectionPlatformSourceImpl
+    with InfraLogger
+    implements ConnectionPlatformSource {
   @override
   Future<bool> checkPrivilege() async {
     try {
@@ -20,9 +22,23 @@ class ConnectionPlatformSourceImpl with InfraLogger implements ConnectionPlatfor
         bool isElevated = false;
         withMemory<void, Uint32>(sizeOf<Uint32>(), (phToken) {
           withMemory<void, Uint32>(sizeOf<Uint32>(), (pReturnedSize) {
-            withMemory<void, _TokenElevation>(sizeOf<_TokenElevation>(), (pElevation) {
-              if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, phToken.cast()) == 1) {
-                if (GetTokenInformation(phToken.value, TokenElevation, pElevation, sizeOf<_TokenElevation>(), pReturnedSize) == 1) {
+            withMemory<void, _TokenElevation>(sizeOf<_TokenElevation>(), (
+              pElevation,
+            ) {
+              if (OpenProcessToken(
+                    GetCurrentProcess(),
+                    TOKEN_QUERY,
+                    phToken.cast(),
+                  ) ==
+                  1) {
+                if (GetTokenInformation(
+                      phToken.value,
+                      TokenElevation,
+                      pElevation,
+                      sizeOf<_TokenElevation>(),
+                      pReturnedSize,
+                    ) ==
+                    1) {
                   isElevated = pElevation.ref.tokenIsElevated != 0;
                 }
               }

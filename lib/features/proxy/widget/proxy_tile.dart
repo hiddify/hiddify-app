@@ -6,7 +6,12 @@ import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProxyTile extends HookConsumerWidget with PresLogger {
-  const ProxyTile(this.proxy, {super.key, required this.selected, required this.onSelect});
+  const ProxyTile(
+    this.proxy, {
+    super.key,
+    required this.selected,
+    required this.onSelect,
+  });
 
   final ProxyItemEntity proxy;
   final bool selected;
@@ -29,13 +34,22 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
         child: Container(
           width: 6,
           height: double.maxFinite,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: selected ? theme.colorScheme.primary : Colors.transparent),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: selected ? theme.colorScheme.primary : Colors.transparent,
+          ),
         ),
       ),
       subtitle: Text.rich(
         TextSpan(
           text: proxy.type.label,
-          children: [if (proxy.selectedName != null) TextSpan(text: ' (${proxy.selectedName})', style: Theme.of(context).textTheme.bodySmall)],
+          children: [
+            if (proxy.selectedName != null)
+              TextSpan(
+                text: ' (${proxy.selectedName})',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+          ],
         ),
         overflow: TextOverflow.ellipsis,
       ),
@@ -46,8 +60,12 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
                   : t.proxies.delaySemantics.result(delay: proxy.urlTestDelay),
               child: ExcludeSemantics(
                 child: Text(
-                  proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
-                  style: TextStyle(color: delayColor(context, proxy.urlTestDelay)),
+                  proxy.urlTestDelay > 65000
+                      ? "×"
+                      : proxy.urlTestDelay.toString(),
+                  style: TextStyle(
+                    color: delayColor(context, proxy.urlTestDelay),
+                  ),
                 ),
               ),
             )
@@ -59,7 +77,12 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
           context: context,
           builder: (context) => AlertDialog(
             content: SelectionArea(child: Text(proxy.name)),
-            actions: [TextButton(onPressed: Navigator.of(context).pop, child: Text(MaterialLocalizations.of(context).closeButtonLabel))],
+            actions: [
+              TextButton(
+                onPressed: Navigator.of(context).pop,
+                child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+              ),
+            ],
           ),
         );
       },

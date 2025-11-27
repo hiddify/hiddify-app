@@ -14,9 +14,9 @@ enum ProfilesSort {
   }
 
   IconData get icon => switch (this) {
-        lastUpdate => FluentIcons.history_24_regular,
-        name => FluentIcons.text_sort_ascending_24_regular,
-      };
+    lastUpdate => FluentIcons.history_24_regular,
+    name => FluentIcons.text_sort_ascending_24_regular,
+  };
 }
 
 enum SortMode { ascending, descending }

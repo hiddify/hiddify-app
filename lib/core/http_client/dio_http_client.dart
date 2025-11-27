@@ -9,15 +9,29 @@ import 'package:hiddify/utils/custom_loggers.dart';
 class DioHttpClient with InfraLogger {
   final Map<String, Dio> _dio = {};
   final Map<String, HttpClient> _httpClients = {};
-  DioHttpClient({required Duration timeout, required String userAgent, required bool debug}) {
+  DioHttpClient({
+    required Duration timeout,
+    required String userAgent,
+    required bool debug,
+  }) {
     for (final mode in ["proxy", "direct", "both"]) {
-      _dio[mode] = Dio(BaseOptions(connectTimeout: timeout, sendTimeout: timeout, receiveTimeout: timeout, headers: {"User-Agent": userAgent}));
+      _dio[mode] = Dio(
+        BaseOptions(
+          connectTimeout: timeout,
+          sendTimeout: timeout,
+          receiveTimeout: timeout,
+          headers: {"User-Agent": userAgent},
+        ),
+      );
       _dio[mode]!.interceptors.add(
         RetryInterceptor(
           dio: _dio[mode]!,
           retryDelays: [
             const Duration(seconds: 1),
-            if (mode != "proxy") ...[const Duration(seconds: 2), const Duration(seconds: 3)],
+            if (mode != "proxy") ...[
+              const Duration(seconds: 2),
+              const Duration(seconds: 3),
+            ],
           ],
         ),
       );
@@ -60,7 +74,11 @@ class DioHttpClient with InfraLogger {
   //     return false;
   //   }
   // }
-  Future<bool> isPortOpen(String host, int port, {Duration timeout = const Duration(seconds: 5)}) async {
+  Future<bool> isPortOpen(
+    String host,
+    int port, {
+    Duration timeout = const Duration(seconds: 5),
+  }) async {
     try {
       final socket = await Socket.connect(host, port, timeout: timeout);
       await socket.close();
@@ -77,7 +95,13 @@ class DioHttpClient with InfraLogger {
     loggy.debug("setting proxy port: [$port]");
   }
 
-  Future<Response<T>> get<T>(String url, {CancelToken? cancelToken, String? userAgent, ({String username, String password})? credentials, bool proxyOnly = false}) async {
+  Future<Response<T>> get<T>(
+    String url, {
+    CancelToken? cancelToken,
+    String? userAgent,
+    ({String username, String password})? credentials,
+    bool proxyOnly = false,
+  }) async {
     final mode = proxyOnly
         ? "proxy"
         : await isPortOpen("127.0.0.1", port)
@@ -92,7 +116,14 @@ class DioHttpClient with InfraLogger {
     );
   }
 
-  Future<Response> download(String url, String path, {CancelToken? cancelToken, String? userAgent, ({String username, String password})? credentials, bool proxyOnly = false}) async {
+  Future<Response> download(
+    String url,
+    String path, {
+    CancelToken? cancelToken,
+    String? userAgent,
+    ({String username, String password})? credentials,
+    bool proxyOnly = false,
+  }) async {
     final mode = proxyOnly
         ? "proxy"
         : await isPortOpen("127.0.0.1", port)
@@ -107,7 +138,11 @@ class DioHttpClient with InfraLogger {
     );
   }
 
-  Options _options(String url, {String? userAgent, ({String username, String password})? credentials}) {
+  Options _options(
+    String url, {
+    String? userAgent,
+    ({String username, String password})? credentials,
+  }) {
     final uri = Uri.parse(url);
 
     String? userInfo;

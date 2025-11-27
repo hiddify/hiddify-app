@@ -15,9 +15,7 @@ class SettingsOverviewPage extends HookConsumerWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          NestedAppBar(
-            title: Text(t.settings.pageTitle),
-          ),
+          NestedAppBar(title: Text(t.settings.pageTitle)),
           SliverList.list(
             children: [
               SettingsSection(t.settings.general.sectionTitle),

@@ -40,20 +40,19 @@ class GeoAssetsDao extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<void> patch(String id, GeoAssetEntriesCompanion entry) async {
-    await transaction(
-      () async {
-        if (entry.active.present && entry.active.value) {
-          final baseEntry = await (select(geoAssetEntries)
-                ..where((tbl) => tbl.id.equals(id)))
-              .getSingle();
-          await (update(geoAssetEntries)
-                ..where((tbl) => tbl.active.equals(true))
-                ..where((tbl) => tbl.type.equalsValue(baseEntry.type)))
-              .write(const GeoAssetEntriesCompanion(active: Value(false)));
-        }
-        await (update(geoAssetEntries)..where((tbl) => tbl.id.equals(id)))
-            .write(entry);
-      },
-    );
+    await transaction(() async {
+      if (entry.active.present && entry.active.value) {
+        final baseEntry = await (select(
+          geoAssetEntries,
+        )..where((tbl) => tbl.id.equals(id))).getSingle();
+        await (update(geoAssetEntries)
+              ..where((tbl) => tbl.active.equals(true))
+              ..where((tbl) => tbl.type.equalsValue(baseEntry.type)))
+            .write(const GeoAssetEntriesCompanion(active: Value(false)));
+      }
+      await (update(
+        geoAssetEntries,
+      )..where((tbl) => tbl.id.equals(id))).write(entry);
+    });
   }
 }

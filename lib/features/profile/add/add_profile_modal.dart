@@ -42,7 +42,9 @@ class AddProfileModal extends HookConsumerWidget {
             notification.showErrorToast(t.profile.save.failureMsg);
           }
         case AsyncError(error: final error):
-          notification.showErrorDialog(t.presentError(error, action: t.profile.add.failureMsg));
+          notification.showErrorDialog(
+            t.presentError(error, action: t.profile.add.failureMsg),
+          );
         case AsyncLoading():
       }
     });
@@ -66,7 +68,8 @@ class AddProfileModal extends HookConsumerWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             // temporary solution, aspect ratio widget relies on height and in a row there no height!
-            final buttonWidth = constraints.maxWidth / 2 - (buttonsPadding + (buttonsGap / 2));
+            final buttonWidth =
+                constraints.maxWidth / 2 - (buttonsPadding + (buttonsGap / 2));
 
             return AnimatedCrossFade(
               firstChild: SizedBox(
@@ -76,15 +79,22 @@ class AddProfileModal extends HookConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(t.profile.add.addingProfileMsg, style: theme.textTheme.bodySmall),
+                      Text(
+                        t.profile.add.addingProfileMsg,
+                        style: theme.textTheme.bodySmall,
+                      ),
                       const Gap(8),
-                      const LinearProgressIndicator(backgroundColor: Colors.transparent),
+                      const LinearProgressIndicator(
+                        backgroundColor: Colors.transparent,
+                      ),
                       const Gap(8),
                       TextButton(
                         onPressed: () {
                           ref.invalidate(addProfileProvider);
                         },
-                        child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+                        child: Text(
+                          MaterialLocalizations.of(context).cancelButtonLabel,
+                        ),
                       ),
                     ],
                   ),
@@ -93,7 +103,9 @@ class AddProfileModal extends HookConsumerWidget {
               secondChild: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: buttonsPadding),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: buttonsPadding,
+                    ),
                     child: Row(
                       children: [
                         _Button(
@@ -102,9 +114,13 @@ class AddProfileModal extends HookConsumerWidget {
                           icon: FluentIcons.clipboard_paste_24_regular,
                           size: buttonWidth,
                           onTap: () async {
-                            final captureResult = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
+                            final captureResult = await Clipboard.getData(
+                              Clipboard.kTextPlain,
+                            ).then((value) => value?.text ?? '');
                             if (addProfileState.isLoading) return;
-                            ref.read(addProfileProvider.notifier).add(captureResult);
+                            ref
+                                .read(addProfileProvider.notifier)
+                                .add(captureResult);
                           },
                         ),
                         const Gap(buttonsGap),
@@ -115,7 +131,9 @@ class AddProfileModal extends HookConsumerWidget {
                             icon: FluentIcons.qr_code_24_regular,
                             size: buttonWidth,
                             onTap: () async {
-                              final cr = await const QRCodeScannerScreen().open(context);
+                              final cr = await const QRCodeScannerScreen().open(
+                                context,
+                              );
 
                               if (cr == null) return;
                               if (addProfileState.isLoading) return;
@@ -137,7 +155,10 @@ class AddProfileModal extends HookConsumerWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: buttonsPadding, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: buttonsPadding,
+                      vertical: 16,
+                    ),
                     child: Column(
                       children: [
                         Semantics(
@@ -159,16 +180,28 @@ class AddProfileModal extends HookConsumerWidget {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(FluentIcons.add_24_regular, color: theme.colorScheme.primary),
+                                    Icon(
+                                      FluentIcons.add_24_regular,
+                                      color: theme.colorScheme.primary,
+                                    ),
                                     const SizedBox(width: 8),
-                                    Text(t.profile.add.addWarp, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
+                                    Text(
+                                      t.profile.add.addWarp,
+                                      style: theme.textTheme.labelLarge
+                                          ?.copyWith(
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        if (!PlatformUtils.isDesktop) const SizedBox(height: 16), // Spacing between the buttons
+                        if (!PlatformUtils.isDesktop)
+                          const SizedBox(
+                            height: 16,
+                          ), // Spacing between the buttons
                         if (!PlatformUtils.isDesktop)
                           Semantics(
                             button: true,
@@ -190,9 +223,18 @@ class AddProfileModal extends HookConsumerWidget {
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(FluentIcons.add_24_regular, color: theme.colorScheme.primary),
+                                      Icon(
+                                        FluentIcons.add_24_regular,
+                                        color: theme.colorScheme.primary,
+                                      ),
                                       const SizedBox(width: 8),
-                                      Text(t.profile.add.manually, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.primary)),
+                                      Text(
+                                        t.profile.add.manually,
+                                        style: theme.textTheme.labelLarge
+                                            ?.copyWith(
+                                              color: theme.colorScheme.primary,
+                                            ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -205,7 +247,9 @@ class AddProfileModal extends HookConsumerWidget {
                   const Gap(24),
                 ],
               ),
-              crossFadeState: addProfileState.isLoading ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+              crossFadeState: addProfileState.isLoading
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
               duration: const Duration(milliseconds: 250),
             );
           },
@@ -226,12 +270,18 @@ class AddProfileModal extends HookConsumerWidget {
     final notification = ref.read(inAppNotificationControllerProvider);
 
     if (!consent) {
-      final agreed = await showDialog<bool>(context: context, builder: (context) => const WarpLicenseAgreementModal());
+      final agreed = await showDialog<bool>(
+        context: context,
+        builder: (context) => const WarpLicenseAgreementModal(),
+      );
 
       if (agreed != true) return;
     }
     await prefs.setBool(warpConsentGiven, true);
-    var toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
+    var toast = notification.showInfoToast(
+      t.profile.add.addingWarpMsg,
+      duration: const Duration(milliseconds: 100),
+    );
     toast?.pause();
     await warp.generateWarpConfig();
     toast?.start();
@@ -241,21 +291,34 @@ class AddProfileModal extends HookConsumerWidget {
     // final hasWarp2Config = accountId != null && accessToken != null;
 
     // if (!hasWarp2Config || true) {
-    toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
+    toast = notification.showInfoToast(
+      t.profile.add.addingWarpMsg,
+      duration: const Duration(milliseconds: 100),
+    );
     toast?.pause();
     await warp.generateWarp2Config();
     toast?.start();
     // }
     if (region == "cn") {
-      await profile.add("#profile-title: Hiddify WARP\nwarp://p1@auto#National&&detour=warp://p2@auto#WoW"); //
+      await profile.add(
+        "#profile-title: Hiddify WARP\nwarp://p1@auto#National&&detour=warp://p2@auto#WoW",
+      ); //
     } else {
-      await profile.add("https://raw.githubusercontent.com/hiddify/hiddify-next/main/test.configs/warp"); //
+      await profile.add(
+        "https://raw.githubusercontent.com/hiddify/hiddify-next/main/test.configs/warp",
+      ); //
     }
   }
 }
 
 class _Button extends StatelessWidget {
-  const _Button({super.key, required this.label, required this.icon, required this.size, required this.onTap});
+  const _Button({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.size,
+    required this.onTap,
+  });
 
   final String label;
   final IconData icon;

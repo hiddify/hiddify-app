@@ -13,7 +13,8 @@ typedef ProfileUpdateStatus = ({String name, bool success});
 
 @Riverpod(keepAlive: true)
 class ForegroundProfilesUpdateNotifier
-    extends _$ForegroundProfilesUpdateNotifier with AppLogger {
+    extends _$ForegroundProfilesUpdateNotifier
+    with AppLogger {
   static const prefKey = "profiles_update_check";
   static const interval = Duration(minutes: 15);
 
@@ -98,17 +99,15 @@ class ForegroundProfilesUpdateNotifier
               .read(profileRepositoryProvider)
               .requireValue
               .updateSubscription(profile)
-              .mapLeft(
-            (l) {
-              loggy.debug("error updating profile [${profile.id}]", l);
-              state = AsyncData((name: profile.name, success: false));
-            },
-          ).map(
-            (_) {
-              loggy.debug("profile [${profile.id}] updated successfully");
-              state = AsyncData((name: profile.name, success: true));
-            },
-          ).run();
+              .mapLeft((l) {
+                loggy.debug("error updating profile [${profile.id}]", l);
+                state = AsyncData((name: profile.name, success: false));
+              })
+              .map((_) {
+                loggy.debug("profile [${profile.id}] updated successfully");
+                state = AsyncData((name: profile.name, success: true));
+              })
+              .run();
         } else {
           loggy.debug(
             "skipping profile [${profile.id}] update. last successful update: [${profile.lastUpdate}] - interval: [${profile.options?.updateInterval}]",

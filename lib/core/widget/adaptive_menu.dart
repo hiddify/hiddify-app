@@ -5,11 +5,12 @@ import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
-typedef AdaptiveMenuBuilder = Widget Function(
-  BuildContext context,
-  void Function() toggleVisibility,
-  Widget? child,
-);
+typedef AdaptiveMenuBuilder =
+    Widget Function(
+      BuildContext context,
+      void Function() toggleVisibility,
+      Widget? child,
+    );
 
 class AdaptiveMenuItem<T> {
   AdaptiveMenuItem({
@@ -27,7 +28,7 @@ class AdaptiveMenuItem<T> {
   final List<AdaptiveMenuItem>? subItems;
 
   (String, IconData?, T Function()?, bool?, List<AdaptiveMenuItem>?)
-      _equality() => (title, icon, onTap, isSelected, subItems);
+  _equality() => (title, icon, onTap, isSelected, subItems);
 
   @override
   bool operator ==(covariant AdaptiveMenuItem other) {
@@ -80,17 +81,13 @@ class AdaptiveMenu extends HookConsumerWidget {
       }
 
       return MenuAnchor(
-        builder: (context, controller, child) => builder(
-          context,
-          () {
-            if (controller.isOpen) {
-              controller.close();
-            } else {
-              controller.open();
-            }
-          },
-          child,
-        ),
+        builder: (context, controller, child) => builder(context, () {
+          if (controller.isOpen) {
+            controller.close();
+          } else {
+            controller.open();
+          }
+        }, child),
         menuChildren: buildMenuItems(items),
         child: child,
       );
@@ -104,8 +101,9 @@ class AdaptiveMenu extends HookConsumerWidget {
       if (context.mounted) {
         Navigator.pop(context);
       }
-      Future.delayed(const Duration(milliseconds: 200))
-          .then((_) => pageIndexNotifier.value = 0);
+      Future.delayed(
+        const Duration(milliseconds: 200),
+      ).then((_) => pageIndexNotifier.value = 0);
     }
 
     List<Widget> buildSheetItems(
@@ -121,8 +119,10 @@ class AdaptiveMenu extends HookConsumerWidget {
             ListTile(
               title: Text(item.title),
               leading: item.icon != null ? Icon(item.icon) : null,
-              trailing:
-                  const Icon(FluentIcons.chevron_right_20_regular, size: 20),
+              trailing: const Icon(
+                FluentIcons.chevron_right_20_regular,
+                size: 20,
+              ),
               onTap: () {
                 pageIndexNotifier.value = subSheetIndex;
               },
@@ -156,28 +156,24 @@ class AdaptiveMenu extends HookConsumerWidget {
       return sheetItems;
     }
 
-    return builder(
-      context,
-      () async {
-        await WoltModalSheet.show(
-          context: context,
-          pageIndexNotifier: pageIndexNotifier,
-          onModalDismissedWithDrag: popSheets,
-          onModalDismissedWithBarrierTap: popSheets,
-          useSafeArea: true,
-          showDragHandle: false,
-          pageListBuilder: (context) => [
-            SliverWoltModalSheetPage(
-              hasTopBarLayer: false,
-              mainContentSliversBuilder: (context) => [
-                SliverList.list(children: buildSheetItems(items, 0)),
-              ],
-            ),
-            ...nestedSheets,
-          ],
-        );
-      },
-      child,
-    );
+    return builder(context, () async {
+      await WoltModalSheet.show(
+        context: context,
+        pageIndexNotifier: pageIndexNotifier,
+        onModalDismissedWithDrag: popSheets,
+        onModalDismissedWithBarrierTap: popSheets,
+        useSafeArea: true,
+        showDragHandle: false,
+        pageListBuilder: (context) => [
+          SliverWoltModalSheetPage(
+            hasTopBarLayer: false,
+            mainContentSliversBuilder: (context) => [
+              SliverList.list(children: buildSheetItems(items, 0)),
+            ],
+          ),
+          ...nestedSheets,
+        ],
+      );
+    }, child);
   }
 }

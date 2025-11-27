@@ -27,31 +27,57 @@ import 'package:hiddify/singbox/service/singbox_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async {
+Future<void> lazyBootstrap(
+  WidgetsBinding widgetsBinding,
+  Environment env,
+) async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   LoggerController.preInit();
   FlutterError.onError = Logger.logFlutterError;
-  WidgetsBinding.instance.platformDispatcher.onError = Logger.logPlatformDispatcherError;
+  WidgetsBinding.instance.platformDispatcher.onError =
+      Logger.logPlatformDispatcherError;
 
   final stopWatch = Stopwatch()..start();
 
-  final container = ProviderContainer(overrides: [environmentProvider.overrideWith((ref) => env)]);
+  final container = ProviderContainer(
+    overrides: [environmentProvider.overrideWith((ref) => env)],
+  );
 
-  await _init("directories", () => container.read(appDirectoriesProvider.future));
+  await _init(
+    "directories",
+    () => container.read(appDirectoriesProvider.future),
+  );
   LoggerController.init(container.read(logPathResolverProvider).appFile().path);
 
-  final appInfo = await _init("app info", () => container.read(appInfoProvider.future));
-  await _init("preferences", () => container.read(sharedPreferencesProvider.future));
+  final appInfo = await _init(
+    "app info",
+    () => container.read(appInfoProvider.future),
+  );
+  await _init(
+    "preferences",
+    () => container.read(sharedPreferencesProvider.future),
+  );
 
-  final enableAnalytics = await container.read(analyticsControllerProvider.future);
+  final enableAnalytics = await container.read(
+    analyticsControllerProvider.future,
+  );
   if (enableAnalytics) {
-    await _init("analytics", () => container.read(analyticsControllerProvider.notifier).enableAnalytics());
+    await _init(
+      "analytics",
+      () => container
+          .read(analyticsControllerProvider.notifier)
+          .enableAnalytics(),
+    );
   }
 
   await _init("preferences migration", () async {
     try {
-      await PreferencesMigration(sharedPreferences: container.read(sharedPreferencesProvider).requireValue).migrate();
+      await PreferencesMigration(
+        sharedPreferences: container
+            .read(sharedPreferencesProvider)
+            .requireValue,
+      ).migrate();
     } catch (e, stackTrace) {
       Logger.bootstrap.error("preferences migration failed", e, stackTrace);
       if (env == Environment.dev) rethrow;
@@ -67,7 +93,11 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
       await locale.build();
       Logger.bootstrap.debug("preloaded locale: ${locale.name}");
     } catch (e, stackTrace) {
-      Logger.bootstrap.error("failed to preload locale [${locale.name}]", e, stackTrace);
+      Logger.bootstrap.error(
+        "failed to preload locale [${locale.name}]",
+        e,
+        stackTrace,
+      );
       // continue without rethrow; fallback to EN will be available
     }
   });
@@ -75,29 +105,55 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   final debug = container.read(debugModeProvider) || kDebugMode;
 
   if (PlatformUtils.isDesktop) {
-    await _init("window controller", () => container.read(windowProvider.future));
+    await _init(
+      "window controller",
+      () => container.read(windowProvider.future),
+    );
 
     final bool silentStart = container.read(Preferences.silentStart) ?? false;
-    Logger.bootstrap.debug("silent start [${silentStart ? "Enabled" : "Disabled"}]");
+    Logger.bootstrap.debug(
+      "silent start [${silentStart ? "Enabled" : "Disabled"}]",
+    );
     if (!silentStart) {
       await container.read(windowProvider.notifier).open(focus: false);
     } else {
       Logger.bootstrap.debug("silent start, remain hidden accessible via tray");
     }
-    await _init("auto start service", () => container.read(autoStartProvider.future));
+    await _init(
+      "auto start service",
+      () => container.read(autoStartProvider.future),
+    );
   }
-  await _init("logs repository", () => container.read(logRepositoryProvider.future));
+  await _init(
+    "logs repository",
+    () => container.read(logRepositoryProvider.future),
+  );
   await _init("logger controller", () => LoggerController.postInit(debug));
 
   Logger.bootstrap.info(appInfo.format());
 
-  await _init("profile repository", () => container.read(profileRepositoryProvider.future));
+  await _init(
+    "profile repository",
+    () => container.read(profileRepositoryProvider.future),
+  );
 
-  await _safeInit("active profile", () => container.read(activeProfileProvider.future), timeout: 3000);
-  await _safeInit("deep link service", () => container.read(deepLinkProvider.future), timeout: 1000);
+  await _safeInit(
+    "active profile",
+    () => container.read(activeProfileProvider.future),
+    timeout: 1000,
+  );
+  await _safeInit(
+    "deep link service",
+    () => container.read(deepLinkProvider.future),
+    timeout: 1000,
+  );
   await _init("sing-box", () => container.read(singboxServiceProvider).init());
   if (PlatformUtils.isDesktop) {
-    await _safeInit("system tray", () => container.read(systemTrayProvider.future), timeout: 1000);
+    await _safeInit(
+      "system tray",
+      () => container.read(systemTrayProvider.future),
+      timeout: 1000,
+    );
   }
 
   if (Platform.isAndroid) {
@@ -109,23 +165,26 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   Logger.bootstrap.info("bootstrap took [${stopWatch.elapsedMilliseconds}ms]");
   stopWatch.stop();
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const App(),
-    ),
-  );
+  runApp(UncontrolledProviderScope(container: container, child: const App()));
 
   FlutterNativeSplash.remove();
 }
 
-Future<T> _init<T>(String name, Future<T> Function() initializer, {int? timeout}) async {
+Future<T> _init<T>(
+  String name,
+  Future<T> Function() initializer, {
+  int? timeout,
+}) async {
   final stopWatch = Stopwatch()..start();
   Logger.bootstrap.info("initializing [$name]");
-  Future<T> func() => timeout != null ? initializer().timeout(Duration(milliseconds: timeout)) : initializer();
+  Future<T> func() => timeout != null
+      ? initializer().timeout(Duration(milliseconds: timeout))
+      : initializer();
   try {
     final result = await func();
-    Logger.bootstrap.debug("[$name] initialized in ${stopWatch.elapsedMilliseconds}ms");
+    Logger.bootstrap.debug(
+      "[$name] initialized in ${stopWatch.elapsedMilliseconds}ms",
+    );
     return result;
   } catch (e, stackTrace) {
     Logger.bootstrap.error("[$name] error initializing", e, stackTrace);
@@ -135,16 +194,28 @@ Future<T> _init<T>(String name, Future<T> Function() initializer, {int? timeout}
   }
 }
 
-Future<T?> _safeInit<T>(String name, Future<T> Function() initializer, {int? timeout}) async {
+Future<T?> _safeInit<T>(
+  String name,
+  Future<T> Function() initializer, {
+  int? timeout,
+}) async {
   final stopWatch = Stopwatch()..start();
   Logger.bootstrap.info("initializing [$name]");
-  Future<T> func() => timeout != null ? initializer().timeout(Duration(milliseconds: timeout)) : initializer();
+  Future<T> func() => timeout != null
+      ? initializer().timeout(Duration(milliseconds: timeout))
+      : initializer();
   try {
     final result = await func();
-    Logger.bootstrap.debug("[$name] initialized in ${stopWatch.elapsedMilliseconds}ms");
+    Logger.bootstrap.debug(
+      "[$name] initialized in ${stopWatch.elapsedMilliseconds}ms",
+    );
     return result;
   } catch (e, stackTrace) {
-    Logger.bootstrap.warning("[$name] initialization skipped (non-critical)", e, stackTrace);
+    Logger.bootstrap.warning(
+      "[$name] initialization skipped (non-critical)",
+      e,
+      stackTrace,
+    );
     return null;
   } finally {
     stopWatch.stop();

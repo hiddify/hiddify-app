@@ -18,9 +18,9 @@ sealed class SettingsFailure with _$SettingsFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       SettingsUnexpectedFailure() => (
-          type: t.failure.unexpected,
-          message: null,
-        ),
+        type: t.failure.unexpected,
+        message: null,
+      ),
     };
   }
 }

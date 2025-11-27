@@ -9,7 +9,8 @@ class WindowClosingDialog extends ConsumerStatefulWidget {
   const WindowClosingDialog({super.key});
 
   @override
-  ConsumerState<WindowClosingDialog> createState() => _WindowClosingDialogState();
+  ConsumerState<WindowClosingDialog> createState() =>
+      _WindowClosingDialogState();
 }
 
 class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
@@ -36,10 +37,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
               },
             ),
             const SizedBox(width: 16),
-            Text(
-              t.window.remember,
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text(t.window.remember, style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),
@@ -47,7 +45,9 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
         TextButton(
           onPressed: () {
             if (remember) {
-              ref.read(Preferences.actionAtClose.notifier).update(ActionsAtClosing.exit);
+              ref
+                  .read(Preferences.actionAtClose.notifier)
+                  .update(ActionsAtClosing.exit);
             }
             ref.read(windowProvider.notifier).quit();
           },
@@ -59,7 +59,9 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
         FilledButton(
           onPressed: () async {
             if (remember) {
-              ref.read(Preferences.actionAtClose.notifier).update(ActionsAtClosing.hide);
+              ref
+                  .read(Preferences.actionAtClose.notifier)
+                  .update(ActionsAtClosing.hide);
             }
             Navigator.of(context).maybePop(false);
             await ref.read(windowProvider.notifier).close();

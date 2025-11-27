@@ -14,9 +14,17 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
     final theme = Theme.of(context);
-    final hasData = ref.watch(activeProxyProvider.select((value) => value is AsyncData));
-    final delay = ref.watch(activeProxyProvider.select((value) => value.asData?.value.urlTestDelay ?? 0));
-    final tag = ref.watch(activeProxyProvider.select((value) => value.asData?.value.tag));
+    final hasData = ref.watch(
+      activeProxyProvider.select((value) => value is AsyncData),
+    );
+    final delay = ref.watch(
+      activeProxyProvider.select(
+        (value) => value.asData?.value.urlTestDelay ?? 0,
+      ),
+    );
+    final tag = ref.watch(
+      activeProxyProvider.select((value) => value.asData?.value.tag),
+    );
 
     return AnimatedVisibility(
       axis: Axis.vertical,
@@ -42,18 +50,25 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
                   const Gap(8),
                   if (delay > 0)
                     Text.rich(
-                      semanticsLabel: timeout ? t.proxies.delaySemantics.timeout : t.proxies.delaySemantics.result(delay: delay),
+                      semanticsLabel: timeout
+                          ? t.proxies.delaySemantics.timeout
+                          : t.proxies.delaySemantics.result(delay: delay),
                       TextSpan(
                         children: [
                           if (timeout)
                             TextSpan(
                               text: t.general.timeout,
-                              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.error),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.error,
+                              ),
                             )
                           else ...[
                             TextSpan(
                               text: delay.toString(),
-                              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const TextSpan(text: " ms"),
                           ],
@@ -61,7 +76,10 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
                       ),
                     )
                   else
-                    Semantics(label: t.proxies.delaySemantics.testing, child: const ShimmerSkeleton(width: 48, height: 18)),
+                    Semantics(
+                      label: t.proxies.delaySemantics.testing,
+                      child: const ShimmerSkeleton(width: 48, height: 18),
+                    ),
                 ],
               ),
             ),
