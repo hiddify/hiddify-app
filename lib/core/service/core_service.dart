@@ -9,7 +9,7 @@ typedef Start = Pointer<Utf8> Function(Pointer<Utf8> configJson);
 typedef StopFunc = Void Function();
 typedef Stop = void Function();
 
-class VWarpService {
+class CoreService {
   late DynamicLibrary _lib;
   late Start _start;
   late Stop _stop;

@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/router/app_router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/features/home/widget/home_page.dart';
-import 'package:hiddify/features/settings/widget/core_settings_page.dart';
 
 part 'routes.g.dart';
 
@@ -30,12 +31,6 @@ class MobileWrapperRoute extends ShellRouteData {
     TypedGoRoute<HomeRoute>(
       path: "/",
       name: HomeRoute.name,
-      routes: [
-         TypedGoRoute<CoreSettingsRoute>(
-          path: "settings",
-          name: CoreSettingsRoute.name,
-        ),
-      ]
     ),
   ],
 )
@@ -46,16 +41,6 @@ class DesktopWrapperRoute extends ShellRouteData {
   Widget builder(BuildContext context, GoRouterState state, Widget navigator) {
     return AdaptiveRootScaffold(navigator);
   }
-}
-
-class CoreSettingsRoute extends GoRouteData {
-   const CoreSettingsRoute();
-   static const name = "CoreSettings";
-   
-   @override
-   Page<void> buildPage(BuildContext context, GoRouterState state) {
-     return const MaterialPage<void>(name: name, child: CoreSettingsPage());
-   }
 }
 
 class HomeRoute extends GoRouteData with $HomeRoute {

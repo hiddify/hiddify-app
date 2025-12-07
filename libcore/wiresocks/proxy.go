@@ -3,13 +3,14 @@ package wiresocks
 import (
 	"context"
 	"errors"
-	"github.com/sagernet/sing/common/buf"
 	"io"
 	"log/slog"
 	"net"
 	"net/netip"
 	"syscall"
 	"time"
+
+	"github.com/sagernet/sing/common/buf"
 
 	"github.com/bepass-org/vwarp/proxy/pkg/mixed"
 	"github.com/bepass-org/vwarp/proxy/pkg/statute"
