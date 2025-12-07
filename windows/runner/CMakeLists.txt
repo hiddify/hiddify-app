@@ -38,3 +38,11 @@ target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}")
 
 # Run the Flutter tool portions of the build. This must not be removed.
 add_dependencies(${BINARY_NAME} flutter_assemble)
+
+# Copy libcore.dll to the output directory
+add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  "${CMAKE_CURRENT_SOURCE_DIR}/libcore.dll"
+  "$<TARGET_FILE_DIR:${BINARY_NAME}>"
+  VERBATIM
+)

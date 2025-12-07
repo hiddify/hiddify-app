@@ -3,7 +3,6 @@ description: Cross Platform Multi Protocol Proxy Frontend.
 publish_to: "none"
 version: 2.5.7+20507
 
-# Repository and issue tracker
 homepage: https://github.com/hiddify/hiddify-app
 repository: https://github.com/hiddify/hiddify-app
 issue_tracker: https://github.com/hiddify/hiddify-app/issues
@@ -13,180 +12,105 @@ environment:
   flutter: ">=3.35.0 <4.0.0"
 
 dependencies:
-  # ══════════════════════════════════════════════════════════════
-  # Flutter SDK
-  # ══════════════════════════════════════════════════════════════
+  # Core Framework
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
 
-  # ══════════════════════════════════════════════════════════════
-  # State Management - Riverpod (Latest 3.x with code generation)
-  # ══════════════════════════════════════════════════════════════
+  # State Management
   flutter_riverpod: ^3.0.3
   hooks_riverpod: ^3.0.3
   riverpod: ^3.0.3
   riverpod_annotation: ^3.0.3
   flutter_hooks: ^0.21.3+1
 
-  # ══════════════════════════════════════════════════════════════
-  # Navigation - Go Router (Official Flutter team package)
-  # ══════════════════════════════════════════════════════════════
+  # Navigation
   go_router: ^17.0.0
 
-  # ══════════════════════════════════════════════════════════════
-  # Database - Drift (SQLite ORM)
-  # ══════════════════════════════════════════════════════════════
-  drift: ^2.29.0
-  sqlite3_flutter_libs: ^0.5.40
-
-  # ══════════════════════════════════════════════════════════════
   # Networking
-  # ══════════════════════════════════════════════════════════════
   dio: ^5.9.0
   dio_smart_retry: ^7.0.1
-  grpc: ^5.0.0
-  protobuf: ^5.1.0
 
-  # ══════════════════════════════════════════════════════════════
-  # Serialization & Data Classes
-  # ══════════════════════════════════════════════════════════════
+  # Data & Serialization
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
   json_path: ^0.8.0
 
-  # ══════════════════════════════════════════════════════════════
-  # Localization - Slang (Type-safe i18n)
-  # ══════════════════════════════════════════════════════════════
+  # Localization
   slang: ^4.10.0
   slang_flutter: ^4.10.0
   intl: ^0.20.2
 
-  # ══════════════════════════════════════════════════════════════
-  # UI Components & Styling
-  # ══════════════════════════════════════════════════════════════
+  # UI Components
   cupertino_icons: ^1.0.6
   fluentui_system_icons: ^1.1.273
-  flutter_animate: ^4.5.2
   flutter_svg: ^2.2.2
   vector_graphics: ^1.1.19
   gap: ^3.0.1
-  percent_indicator: ^4.2.5
-  sliver_tools: ^0.2.12
-  wolt_modal_sheet: ^0.11.0
-  toastification: ^3.0.3
-  dynamic_color: ^1.8.1  # Material You support
+  dynamic_color: ^1.8.1
 
-  # ══════════════════════════════════════════════════════════════
-  # Forms & Input
-  # ══════════════════════════════════════════════════════════════
-  flutter_typeahead: ^5.2.0
-  mobile_scanner: ^7.1.3
-  qr_flutter: ^4.1.0
-
-  # ══════════════════════════════════════════════════════════════
-  # Platform Integration
-  # ══════════════════════════════════════════════════════════════
+  # Platform & System
   path_provider: ^2.1.5
   shared_preferences: ^2.5.3
   url_launcher: ^6.3.2
-  share_plus: ^12.0.1
-  permission_handler: ^12.0.1
   package_info_plus: ^9.0.0
+  permission_handler: ^12.0.1
+  share_plus: ^12.0.1
   in_app_review: ^2.0.11
 
-  # ══════════════════════════════════════════════════════════════
-  # Desktop Platform Specific
-  # ══════════════════════════════════════════════════════════════
+  # Desktop Specific
   window_manager: ^0.5.1
   tray_manager: ^0.5.2
   launch_at_startup: ^0.5.1
   win32: ^5.15.0
-  vclibs: ^0.1.2
 
-  # ══════════════════════════════════════════════════════════════
-  # Android Platform Specific
-  # ══════════════════════════════════════════════════════════════
+  # Android Specific
   flutter_displaymode: ^0.7.0
 
-  # ══════════════════════════════════════════════════════════════
   # Utilities
-  # ══════════════════════════════════════════════════════════════
   dartx: ^1.2.0
   fpdart: ^1.2.0
   rxdart: ^0.28.0
   uuid: ^4.5.2
   path: ^1.9.1
   version: ^3.0.2
-  watcher: ^1.1.4
-  humanizer: ^3.0.1
-  neat_periodic_task: ^2.0.1
-  timezone_to_country: ^3.1.0
-  tint: ^2.0.1
-  meta: ^1.16.0
-
-  # ══════════════════════════════════════════════════════════════
-  # Logging & Analytics
-  # ══════════════════════════════════════════════════════════════
+  
+  # Logging & Crash Reporting
   loggy: ^2.0.3
   flutter_loggy: ^2.0.3+1
   flutter_loggy_dio: ^3.1.0
   sentry_flutter: ^9.8.0
 
-  # ══════════════════════════════════════════════════════════════
-  # App Update & Splash
-  # ══════════════════════════════════════════════════════════════
+  # App Features
   upgrader: ^12.3.0
   flutter_native_splash: ^2.4.7
-
-  # ══════════════════════════════════════════════════════════════
-  # Accessibility & Dev Tools
-  # ══════════════════════════════════════════════════════════════
   accessibility_tools: ^2.7.1
-
-  # ══════════════════════════════════════════════════════════════
-  # Custom/Forked Packages
-  # ══════════════════════════════════════════════════════════════
-  circle_flags:
-    git:
-      url: https://github.com/hiddify-com/flutter_circle_flags.git
+  
+  # Native Interop
   ffi: ^2.1.4
 
-# ════════════════════════════════════════════════════════════════
-# Development Dependencies
-# ════════════════════════════════════════════════════════════════
 dev_dependencies:
-  # Testing
   flutter_test:
     sdk: flutter
 
-  # Code Generation
   build_runner: ^2.4.0
   freezed: ^3.2.3
   json_serializable: ^6.11.1
   riverpod_generator: ^3.0.3
   go_router_builder: ^4.1.1
   slang_build_runner: ^4.10.0
-  drift_dev: ^2.29.0
   flutter_gen_runner: ^5.12.0
   ffigen: ^20.0.0
-
-  # Linting & Analysis
+  
   lint: ^2.8.0
   custom_lint: ^0.8.0
   riverpod_lint: ^3.0.3
-  dependency_validator: ^5.0.3
-
-  # Sentry Source Maps
   sentry_dart_plugin: ^3.2.0
-
 
 flutter:
   uses-material-design: true
   assets:
-    # - assets/core/geoip.db
-    # - assets/core/geosite.db
     - assets/images/logo.svg
     - assets/images/tray_icon.ico
     - assets/images/tray_icon.png
@@ -203,9 +127,6 @@ flutter:
     - family: Shabnam
       fonts:
         - asset: assets/fonts/Shabnam.ttf
-    # - family: Roboto
-    #   fonts:
-    #     - asset: assets/fonts/Roboto.ttf
     - family: Emoji
       fonts:
         - asset: assets/fonts/Emoji.ttf
@@ -229,7 +150,7 @@ ffigen:
   output: "lib/gen/singbox_generated_bindings.dart"
   headers:
     entry-points:
-      - "libcore/bin/libcore.h"
+      - "windows/runner/libcore.h"
   llvm-path:
     - "C:/Program Files/LLVM/bin"
 
@@ -237,4 +158,3 @@ sentry:
   upload_debug_symbols: true
   upload_source_maps: true
   upload_sources: true
-
