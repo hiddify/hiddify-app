@@ -90,9 +90,9 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
                 }
             }
 
-            val intent = Intent(Application.application, Settings.serviceClass())
+            val intent = Intent(HiddifyApp.instance, Settings.serviceClass())
             withContext(Dispatchers.Main) {
-                ContextCompat.startForegroundService(Application.application, intent)
+                ContextCompat.startForegroundService(HiddifyApp.instance, intent)
             }
         }
     }
@@ -132,8 +132,6 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     override fun onServiceResetLogs(messages: MutableList<String>) {
         logList.clear()
         logList.addAll(messages)
-        // We might want to notify that logs were reset, but single string callback isn't enough.
-        // For now, listeners usually reload the full list on reset anyway.
     }
 
     override fun onDestroy() {
@@ -141,7 +139,6 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         super.onDestroy()
     }
 
-    @SuppressLint("NewApi")
     private fun grantNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)

@@ -2,6 +2,8 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 
+import 'app_colors.dart';
+
 class ConnectionButtonTheme extends ThemeExtension<ConnectionButtonTheme> {
   const ConnectionButtonTheme({this.idleColor, this.connectedColor});
 
@@ -9,12 +11,12 @@ class ConnectionButtonTheme extends ThemeExtension<ConnectionButtonTheme> {
   final Color? connectedColor;
 
   static const ConnectionButtonTheme light = ConnectionButtonTheme(
-    idleColor: Color(0xFF4a4d8b),
-    connectedColor: Color(0xFF44a334),
+    idleColor: Color(0xFF4a4d8b), // Custom idle color
+    connectedColor: AppColors.connected,
   );
   static const ConnectionButtonTheme dark = ConnectionButtonTheme(
     idleColor: Color(0xFF4a4d8b),
-    connectedColor: Color(0xFF44a334),
+    connectedColor: AppColors.connected,
   );
 
   @override

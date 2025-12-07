@@ -13,7 +13,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
-import com.hiddify.hiddify.Application
+import com.hiddify.hiddify.HiddifyApp
 import com.hiddify.hiddify.R
 import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Action
@@ -49,12 +49,12 @@ class BoxService(
         private lateinit var workingDir: File
         private fun initialize() {
             if (initializeOnce) return
-            val baseDir = Application.application.filesDir
+            val baseDir = HiddifyApp.instance.filesDir
             
             baseDir.mkdirs()
-            workingDir = File(Application.application.filesDir, "working")
+            workingDir = File(HiddifyApp.instance.filesDir, "working")
             workingDir.mkdirs()
-            val tempDir = Application.application.cacheDir
+            val tempDir = HiddifyApp.instance.cacheDir
             tempDir.mkdirs()
             Log.d(TAG, "base dir: ${baseDir.path}")
             Log.d(TAG, "working dir: ${workingDir.path}")
@@ -83,24 +83,24 @@ class BoxService(
         fun start() {
             val intent = runBlocking {
                 withContext(Dispatchers.IO) {
-                    Intent(Application.application, Settings.serviceClass())
+                    Intent(HiddifyApp.instance, Settings.serviceClass())
                 }
             }
-            ContextCompat.startForegroundService(Application.application, intent)
+            ContextCompat.startForegroundService(HiddifyApp.instance, intent)
         }
 
         fun stop() {
-            Application.application.sendBroadcast(
+            HiddifyApp.instance.sendBroadcast(
                     Intent(Action.SERVICE_CLOSE).setPackage(
-                            Application.application.packageName
+                            HiddifyApp.instance.packageName
                     )
             )
         }
 
         fun reload() {
-            Application.application.sendBroadcast(
+            HiddifyApp.instance.sendBroadcast(
                     Intent(Action.SERVICE_RELOAD).setPackage(
-                            Application.application.packageName
+                            HiddifyApp.instance.packageName
                     )
             )
         }
@@ -252,7 +252,7 @@ class BoxService(
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun serviceUpdateIdleMode() {
-        if (Application.powerManager.isDeviceIdleMode) {
+        if (HiddifyApp.powerManager.isDeviceIdleMode) {
             boxService?.pause()
         } else {
             boxService?.wake()

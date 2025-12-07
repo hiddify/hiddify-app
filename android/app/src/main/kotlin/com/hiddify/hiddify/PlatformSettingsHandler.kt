@@ -13,7 +13,7 @@ import android.os.Build
 import android.util.Base64
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.hiddify.hiddify.Application.Companion.packageManager
+import com.hiddify.hiddify.HiddifyApp.Companion.packageManager
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -68,7 +68,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                 result.runCatching {
                     success(
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)
+                            HiddifyApp.powerManager.isIgnoringBatteryOptimizations(HiddifyApp.instance.packageName)
                         } else {
                             true
                         }
@@ -82,7 +82,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                 }
                 val intent = Intent(
                     android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                    Uri.parse("package:${Application.application.packageName}")
+                    Uri.parse("package:${HiddifyApp.instance.packageName}")
                 )
                 ignoreRequestResult = result
                 activity?.startActivityForResult(intent, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
@@ -105,7 +105,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                             }
                         val list = mutableListOf<AppItem>()
                         installedPackages.forEach {
-                            if (it.packageName != Application.application.packageName &&
+                            if (it.packageName != HiddifyApp.instance.packageName &&
                                 (it.requestedPermissions?.contains(Manifest.permission.INTERNET) == true
                                         || it.packageName == "android")
                             ) {

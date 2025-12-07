@@ -13,7 +13,7 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.MutableLiveData
-import com.hiddify.hiddify.Application
+import com.hiddify.hiddify.HiddifyApp
 import com.hiddify.hiddify.MainActivity
 import com.hiddify.hiddify.R
 import com.hiddify.hiddify.Settings
@@ -41,7 +41,7 @@ class ServiceNotification(
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                 return true
             }
-            return Application.notification.areNotificationsEnabled()
+            return HiddifyApp.notification.areNotificationsEnabled()
         }
     }
 
@@ -56,7 +56,7 @@ class ServiceNotification(
             val name = "Hiddify Service"
             val channel = NotificationChannel(notificationChannel, name, NotificationManager.IMPORTANCE_LOW)
             channel.description = "Hiddify Connection Service"
-            Application.notification.createNotificationChannel(channel)
+            HiddifyApp.notification.createNotificationChannel(channel)
         }
     }
 
@@ -126,7 +126,7 @@ class ServiceNotification(
     override fun updateStatus(status: StatusMessage) {
         val content =
                 Libbox.formatBytes(status.uplink) + "/s ↑\t" + Libbox.formatBytes(status.downlink) + "/s ↓"
-        Application.notificationManager.notify(
+        HiddifyApp.notificationManager.notify(
                 notificationId,
                 notificationBuilder.setContentText(content).build()
         )

@@ -2,7 +2,7 @@ package com.hiddify.hiddify.bg
 
 import android.net.Network
 import android.os.Build
-import com.hiddify.hiddify.Application
+import com.hiddify.hiddify.HiddifyApp
 import io.nekohasekai.libbox.InterfaceUpdateListener
 
 import java.net.NetworkInterface
@@ -18,7 +18,7 @@ object DefaultNetworkMonitor {
             checkDefaultInterfaceUpdate(it)
         }
         defaultNetwork = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Application.connectivity.activeNetwork
+            HiddifyApp.connectivity.activeNetwork
         } else {
             DefaultNetworkListener.get()
         }
@@ -47,7 +47,7 @@ object DefaultNetworkMonitor {
         val listener = listener ?: return
         if (newNetwork != null) {
             val interfaceName =
-                (Application.connectivity.getLinkProperties(newNetwork) ?: return).interfaceName
+                (HiddifyApp.connectivity.getLinkProperties(newNetwork) ?: return).interfaceName
             for (times in 0 until 10) {
                 var interfaceIndex: Int
                 try {

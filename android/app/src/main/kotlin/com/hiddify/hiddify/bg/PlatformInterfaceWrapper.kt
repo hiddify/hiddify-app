@@ -4,7 +4,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
 import androidx.annotation.RequiresApi
-import com.hiddify.hiddify.Application
+import com.hiddify.hiddify.HiddifyApp
 import io.nekohasekai.libbox.InterfaceUpdateListener
 import io.nekohasekai.libbox.NetworkInterfaceIterator
 import io.nekohasekai.libbox.PlatformInterface
@@ -43,7 +43,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         destinationAddress: String,
         destinationPort: Int
     ): Int {
-        val uid = Application.connectivity.getConnectionOwnerUid(
+        val uid = HiddifyApp.connectivity.getConnectionOwnerUid(
             ipProtocol,
             InetSocketAddress(sourceAddress, sourcePort),
             InetSocketAddress(destinationAddress, destinationPort)
@@ -53,7 +53,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     }
 
     override fun packageNameByUid(uid: Int): String {
-        val packages = Application.packageManager.getPackagesForUid(uid)
+        val packages = HiddifyApp.packageManager.getPackagesForUid(uid)
         if (packages.isNullOrEmpty()) error("android: package not found")
         return packages[0]
     }
@@ -62,13 +62,13 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     override fun uidByPackageName(packageName: String): Int {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Application.packageManager.getPackageUid(
+                HiddifyApp.packageManager.getPackageUid(
                     packageName, PackageManager.PackageInfoFlags.of(0)
                 )
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                Application.packageManager.getPackageUid(packageName, 0)
+                HiddifyApp.packageManager.getPackageUid(packageName, 0)
             } else {
-                Application.packageManager.getApplicationInfo(packageName, 0).uid
+                HiddifyApp.packageManager.getApplicationInfo(packageName, 0).uid
             }
         } catch (e: PackageManager.NameNotFoundException) {
             error("android: package not found")

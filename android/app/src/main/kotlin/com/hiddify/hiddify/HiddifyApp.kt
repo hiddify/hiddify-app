@@ -11,15 +11,13 @@ import android.os.StrictMode
 import androidx.core.content.getSystemService
 import com.hiddify.hiddify.bg.AppChangeReceiver
 import go.Seq
-import com.hiddify.hiddify.Application as BoxApplication
-
-class Application : Application() {
+class HiddifyApp : Application() {
     private var appChangeReceiver: AppChangeReceiver? = null
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
 
-        application = this
+        instance = this
     }
 
     override fun onCreate() {
@@ -58,12 +56,12 @@ class Application : Application() {
     }
 
     companion object {
-        lateinit var application: BoxApplication
-        val notification by lazy { application.getSystemService<NotificationManager>()!! }
-        val connectivity by lazy { application.getSystemService<ConnectivityManager>()!! }
-        val packageManager by lazy { application.packageManager }
-        val powerManager by lazy { application.getSystemService<PowerManager>()!! }
-        val notificationManager by lazy { application.getSystemService<NotificationManager>()!! }
+        lateinit var instance: HiddifyApp
+        val notification by lazy { instance.getSystemService<NotificationManager>()!! }
+        val connectivity by lazy { instance.getSystemService<ConnectivityManager>()!! }
+        val packageManager by lazy { instance.packageManager }
+        val powerManager by lazy { instance.getSystemService<PowerManager>()!! }
+        val notificationManager by lazy { instance.getSystemService<NotificationManager>()!! }
     }
 
 }
