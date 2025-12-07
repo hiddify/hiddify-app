@@ -31,59 +31,69 @@ class HomePage extends HookConsumerWidget {
             const SizedBox(height: 20),
             FilledButton.icon(
               icon: const Icon(Icons.play_arrow),
-              label: const Text('Start Core'),
+              label: const Text('Start Xray'),
               onPressed: () async {
                 try {
                   final service = CoreService();
                   
                   // Load preferences
-                  final bind = ref.read(CorePreferences.bindAddress);
-                  final verbose = ref.read(CorePreferences.verboseLogging);
-                  final endpoint = ref.read(CorePreferences.endpoint);
-                  final license = ref.read(CorePreferences.licenseKey);
-                  final dns = ref.read(CorePreferences.dns);
-                  final gool = ref.read(CorePreferences.goolMode);
-                  final masque = ref.read(CorePreferences.masqueMode);
-                  final fallback = ref.read(CorePreferences.masqueAutoFallback);
-                  final preferred = ref.read(CorePreferences.masquePreferred);
-                  final noise = ref.read(CorePreferences.masqueNoise);
-                  final preset = ref.read(CorePreferences.masqueNoisePreset);
-                  final psiphon = ref.read(CorePreferences.psiphonEnabled);
-                  final country = ref.read(CorePreferences.psiphonCountry);
-                  final proxy = ref.read(CorePreferences.proxyAddress);
-                  final scan = ref.read(CorePreferences.scanEnabled);
-                  final rtt = ref.read(CorePreferences.scanRtt);
+                  final configContent = ref.read(CorePreferences.configContent);
+                  final assetPath = ref.read(CorePreferences.assetPath);
 
-                  final supportDir = await getApplicationSupportDirectory();
-                  final cacheDir = "${supportDir.path}/cache";
-                  await Directory(cacheDir).create(recursive: true);
+                  // Setup environment variables for assets if needed
+                  if (assetPath.isNotEmpty) {
+                    // Dart's Platform.environment is read-only. We set it in Go via os.Setenv technically,
+                    // but since we are calling Go, we should pass it or Go should default.
+                    // For now, let's assume assets are in place or config handles absolute paths.
+                    // Mobile wrapper typically sets XRAY_LOCATION_ASSET in Go `init()` or pass it.
+                    // But our Start() only takes one string.
+                    // We will rely on simple config for now.
+                  }
 
-                  final config = {
-                    "bind": bind,
-                    "verbose": verbose,
-                    "endpoint": endpoint,
-                    "license": license,
-                    "dns_addr": dns,
-                    "gool": gool,
-                    "masque": masque,
-                    "masque_auto_fallback": fallback,
-                    "masque_preferred": preferred,
-                    "masque_noize": noise,
-                    "masque_noize_preset": preset,
-                    "psiphon_country": psiphon ? country : "",
-                    "proxy_address": proxy,
-                    "cache_dir": cacheDir,
-                    "scan": scan,
-                    "rtt": rtt,
-                  };
+                  // config map to json string? No, configContent IS json string.
+                  final config = configContent;
                   
-                  print("Starting Core with config: $config");
-                  final error = service.start(config);
-                  if (error != null) {
-                    print("Error starting core: $error");
+                  print("Starting Xray Core...");
+                  final error = service.start({'config_is_string': true}); // The service expects map?
+                  // Wait, CoreService.start logic:
+                  // final jsonStr = jsonEncode(config);
+                  // It encodes the map to json.
+                  // But Xray expects the "config file content" (JSON).
+                  
+                  // If we pass a Map, jsonEncode will produce JSON string.
+                  // If we pass a String (configContent), jsonEncode will produce escaped string "{\"log...\"}".
+                  // That is NOT what we want.
+                  
+                  // We need to update CoreService to accept String directly or handle Map -> String correctly.
+                  // Xray Bridge expects `configStr` which IS the JSON config.
+                  
+                  // Let's modify CoreService to accept String? 
+                  // Or we cheat: pass Map, but maybe we can't easily map the unstructured JSON text to Map without decoding first.
+                  
+                  // Better: Decode the user's JSON string to Map, then pass it to service.start, which re-encodes it.
+                  // This validates JSON too.
+                  
+                  import 'dart:convert';
+                  
+                  Map<String, dynamic> configMap;
+                  try {
+                    configMap = jsonDecode(configContent);
+                  } catch (e) {
+                      if(context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Invalid JSON: $e'), backgroundColor: Colors.red),
+                      );
+                    }
+                    return;
+                  }
+
+                  final errorResult = service.start(configMap);
+                  
+                  if (errorResult != null) {
+                    print("Error starting core: $errorResult");
                     if(context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $error'), backgroundColor: Colors.red),
+                        SnackBar(content: Text('Error: $errorResult'), backgroundColor: Colors.red),
                       );
                     }
                   } else {
