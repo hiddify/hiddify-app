@@ -11,9 +11,6 @@ import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/core/theme/app_theme.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
-import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
-import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
-import 'package:hiddify/features/shortcut/shortcut_wrapper.dart';
 import 'package:hiddify/features/system_tray/widget/system_tray_wrapper.dart';
 import 'package:hiddify/features/window/widget/window_wrapper.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -32,53 +29,49 @@ class App extends HookConsumerWidget with PresLogger {
     final themeMode = ref.watch(themePreferencesProvider);
     final theme = AppTheme(themeMode, locale.preferredFontFamily);
 
-    ref.listen(foregroundProfilesUpdateProvider, (_, _) {});
+    // Removed foreground profiles update listener
 
     return WindowWrapper(
       TrayWrapper(
-        ShortcutWrapper(
-          ConnectionWrapper(
-            DynamicColorBuilder(
-              builder:
-                  (
-                    ColorScheme? lightColorScheme,
-                    ColorScheme? darkColorScheme,
-                  ) {
-                    return MaterialApp.router(
-                      routerConfig: router,
-                      locale: locale.flutterLocale,
-                      supportedLocales: AppLocaleUtils.supportedLocales,
-                      localizationsDelegates:
-                          GlobalMaterialLocalizations.delegates,
-                      debugShowCheckedModeBanner: false,
-                      themeMode: themeMode.flutterThemeMode,
-                      theme: theme.lightTheme(lightColorScheme),
-                      darkTheme: theme.darkTheme(darkColorScheme),
-                      title: Constants.appName,
-                      builder: (context, child) {
-                        if (!PlatformUtils.isDesktop) {
-                          final upgrader = ref.watch(upgraderProvider);
-                          child = UpgradeAlert(
-                            upgrader: upgrader,
-                            navigatorKey: router.routerDelegate.navigatorKey,
-                            child: child ?? const SizedBox(),
-                          );
-                        } else {
-                          child = child ?? const SizedBox();
-                        }
-                        if (kDebugMode && _debugAccessibility) {
-                          return AccessibilityTools(
-                            checkFontOverflows: true,
-                            child: child,
-                          );
-                        }
-                        return child;
-                      },
-                    );
-                  },
-            ),
+          DynamicColorBuilder(
+            builder:
+                (
+                  ColorScheme? lightColorScheme,
+                  ColorScheme? darkColorScheme,
+                ) {
+                  return MaterialApp.router(
+                    routerConfig: router,
+                    locale: locale.flutterLocale,
+                    supportedLocales: AppLocaleUtils.supportedLocales,
+                    localizationsDelegates:
+                        GlobalMaterialLocalizations.delegates,
+                    debugShowCheckedModeBanner: false,
+                    themeMode: themeMode.flutterThemeMode,
+                    theme: theme.lightTheme(lightColorScheme),
+                    darkTheme: theme.darkTheme(darkColorScheme),
+                    title: Constants.appName,
+                    builder: (context, child) {
+                      if (!PlatformUtils.isDesktop) {
+                        final upgrader = ref.watch(upgraderProvider);
+                        child = UpgradeAlert(
+                          upgrader: upgrader,
+                          navigatorKey: router.routerDelegate.navigatorKey,
+                          child: child ?? const SizedBox(),
+                        );
+                      } else {
+                        child = child ?? const SizedBox();
+                      }
+                      if (kDebugMode && _debugAccessibility) {
+                        return AccessibilityTools(
+                          checkFontOverflows: true,
+                          child: child,
+                        );
+                      }
+                      return child;
+                    },
+                  );
+                },
           ),
-        ),
       ),
     );
   }

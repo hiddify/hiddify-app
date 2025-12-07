@@ -1,6 +1,6 @@
-tree 7501f77c64329e4dee66b80ba014501768609bd5
-parent b61768e049bab2592d5368459ab8702681346aab
-author problematicconsumer <problematicconsumer@protonmail.com> 1699891121 +0330
-committer problematicconsumer <problematicconsumer@protonmail.com> 1699891121 +0330
+tree 4238415db8fc5f02f190811ccac1db8c8e5dcece
+parent e13b4b269a7760a1fa445d8504e44ec6531278bd
+author Hiddify <hiddify@gmail.com> 1706691722 +0100
+committer Hiddify <hiddify@gmail.com> 1706691722 +0100
 
-Update appcast
+new: make activated profile always in top
