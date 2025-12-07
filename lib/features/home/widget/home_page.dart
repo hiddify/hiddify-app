@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hiddify/core/service/vwarp_service.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hiddify/core/router/routes.dart';
+import 'package:hiddify/features/settings/notifier/core_settings_notifier.dart';
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(coreSettingsNotifierProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Hiddify Core'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => const CoreSettingsRoute().push(context),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -21,12 +32,27 @@ class HomePage extends HookConsumerWidget {
               onPressed: () {
                 try {
                   final service = VWarpService();
-                  // Example config - in real app this comes from UI/Settings
+                  // Map CoreSettings to JSON config
                   final config = {
-                    "bind": "127.0.0.1:8086",
-                    "verbose": true,
-                    // "masque": true, // Uncomment to test other modes
+                    "bind": settings.bindAddress,
+                    "dns_addr": settings.dnsAddress,
+                    "verbose": settings.verbose,
+                    "gool": settings.enableGool,
+                    "masque": settings.enableMasque,
+                    "masque_auto_fallback": settings.masqueAutoFallback,
+                    "masque_preferred": settings.masquePreferred,
+                    "masque_noize": settings.enableMasqueNoize,
+                    "masque_noize_preset": settings.masqueNoizePreset,
+                    "endpoint": settings.customEndpoint, // or logic for default
+                    "license": settings.licenseKey,
+                    "proxy_address": settings.proxyAddress,
+                    "scan": settings.enableScan,
+                    "rtt": settings.scanRtt,
                   };
+
+                  if (settings.enablePsiphon) {
+                     config["psiphon_country"] = settings.psiphonCountry;
+                  }
                   
                   print("Starting Core with config: $config");
                   final error = service.start(config);
