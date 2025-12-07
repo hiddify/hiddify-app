@@ -5,20 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/logger/logger_controller.dart';
 import 'package:hiddify/core/model/environment.dart';
-import 'package:hiddify/core/preferences/general_preferences.dart';
-import 'package:hiddify/core/preferences/preferences_migration.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/app/widget/app.dart';
-import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
-import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
-import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -43,14 +37,9 @@ Future<void> lazyBootstrap(
     "directories",
     () => container.read(appDirectoriesProvider.future),
   );
-  // Log path resolver might depend on deleted files? No, directories_provider should be safe.
-  // Actually logPathResolverProvider was in features/log, which I deleted.
-  // I must remove LoggerController.init argument if it depends on deleted provider.
-  // Or just pass a default path.
-  // container.read(appDirectoriesProvider).requireValue.appSupportDir
-  LoggerController.init(
-      File(container.read(appDirectoriesProvider).requireValue.appSupportDir.path + "/app.log").path
-  );
+  
+  final dirs = container.read(appDirectoriesProvider).requireValue;
+  LoggerController.init(File("${dirs.appSupportDir.path}/app.log").path);
 
   final appInfo = await _init(
     "app info",
@@ -61,34 +50,6 @@ Future<void> lazyBootstrap(
     () => container.read(sharedPreferencesProvider.future),
   );
 
-  final enableAnalytics = await container.read(
-    analyticsControllerProvider.future,
-  );
-  if (enableAnalytics) {
-    await _init(
-      "analytics",
-      () => container
-          .read(analyticsControllerProvider.notifier)
-          .enableAnalytics(),
-    );
-  }
-
-  await _init("preferences migration", () async {
-    try {
-      await PreferencesMigration(
-        sharedPreferences: container
-            .read(sharedPreferencesProvider)
-            .requireValue,
-      ).migrate();
-    } catch (e, stackTrace) {
-      Logger.bootstrap.error("preferences migration failed", e, stackTrace);
-      if (env == Environment.dev) rethrow;
-      Logger.bootstrap.info("clearing preferences");
-      await container.read(sharedPreferencesProvider).requireValue.clear();
-    }
-  });
-
-  // Preload selected locale's deferred library so that buildSync() works safely
   await _init("locale preload", () async {
     final locale = container.read(localePreferencesProvider);
     try {
@@ -100,48 +61,13 @@ Future<void> lazyBootstrap(
         e,
         stackTrace,
       );
-      // continue without rethrow; fallback to EN will be available
     }
   });
 
-  final debug = container.read(debugModeProvider) || kDebugMode;
-
-  if (PlatformUtils.isDesktop) {
-    await _init(
-      "window controller",
-      () => container.read(windowProvider.future),
-    );
-
-    final bool silentStart = container.read(Preferences.silentStart) ?? false;
-    Logger.bootstrap.debug(
-      "silent start [${silentStart ? "Enabled" : "Disabled"}]",
-    );
-    if (!silentStart) {
-      await container.read(windowProvider.notifier).open(focus: false);
-    } else {
-      Logger.bootstrap.debug("silent start, remain hidden accessible via tray");
-    }
-    await _init(
-      "auto start service",
-      () => container.read(autoStartProvider.future),
-    );
-  }
-  
-  // Removed log repository init
-  // Removed logger controller post init if it depends on generic logger
+  final debug = kDebugMode;
   await _init("logger controller", () => LoggerController.postInit(debug));
 
   Logger.bootstrap.info(appInfo.format());
-
-  // Removed profile repository, active profile, deep link, sing-box init
-
-  if (PlatformUtils.isDesktop) {
-    await _safeInit(
-      "system tray",
-      () => container.read(systemTrayProvider.future),
-      timeout: 1000,
-    );
-  }
 
   if (Platform.isAndroid) {
     await _safeInit("android display mode", () async {
