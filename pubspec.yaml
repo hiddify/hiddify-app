@@ -151,6 +151,7 @@ dependencies:
   circle_flags:
     git:
       url: https://github.com/hiddify-com/flutter_circle_flags.git
+  ffi: ^2.1.4
 
 # ════════════════════════════════════════════════════════════════
 # Development Dependencies

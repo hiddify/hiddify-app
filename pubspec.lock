@@ -1287,7 +1287,7 @@ packages:
     source: hosted
     version: "1.5.2"
   posix:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: posix
       sha256: "6323a5b0fa688b6a010df4905a56b00181479e6d10534cecfecede2aa55add61"
