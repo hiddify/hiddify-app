@@ -1,0 +1,51 @@
+name: Auto Update Core
+
+on:
+  schedule:
+    - cron: '0 */4 * * *' # Check every 4 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-core:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+
+      - name: Update Vwarp Core
+        run: |
+          git remote add upstream https://github.com/voidr3aper-anon/Vwarp.git
+          git fetch upstream
+          git checkout main || git checkout -b main
+          # Merge Vwarp core, keeping local history but accepting upstream changes
+          git merge upstream/main --allow-unrelated-histories --strategy-option=theirs -m "Auto-update Vwarp core"
+
+      - name: Update Xray Core
+        run: |
+          git remote add xray https://github.com/GFW-knocker/Xray-core.git
+          git fetch xray
+          # Force the xray-core directory to match the upstream xray/main branch
+          # This acts as a one-way sync, replacing local xray-core files with the latest upstream
+          rm -rf xray-core
+          git read-tree --prefix=xray-core -u xray/main
+          
+          # Check if there are changes to commit
+          if [[ -n $(git status --porcelain) ]]; then
+            git add .
+            git commit -m "Auto-update Xray core"
+          else
+            echo "No changes to Xray core"
+          fi
+
+      - name: Push Changes
+        run: git push origin main

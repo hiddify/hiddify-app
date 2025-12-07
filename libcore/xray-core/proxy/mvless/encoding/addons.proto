@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package xray.proxy.mvless.encoding;
+option csharp_namespace = "Xray.Proxy.Mvless.Encoding";
+option go_package = "github.com/GFW-knocker/Xray-core/proxy/mvless/encoding";
+option java_package = "com.xray.proxy.mvless.encoding";
+option java_multiple_files = true;
+
+message Addons {
+  string Flow = 1;
+  bytes Seed = 2;
+}

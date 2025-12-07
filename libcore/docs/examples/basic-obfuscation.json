@@ -1,0 +1,18 @@
+{
+  "_comment": "Basic MASQUE Noize configuration - low overhead, suitable for most firewalls",
+  "Jc": 2,
+  "Jmin": 32,
+  "Jmax": 64,
+  "JcBeforeHS": 2,
+  "JcDuringHS": 0,
+  "JcAfterHS": 0,
+  "JunkInterval": "10ms",
+  "JunkRandom": false,
+  "MimicProtocol": "quic",
+  "HandshakeDelay": "20ms",
+  "FragmentInitial": false,
+  "FragmentSize": 0,
+  "PaddingMin": 0,
+  "PaddingMax": 0,
+  "RandomPadding": false
+}

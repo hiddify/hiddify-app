@@ -1,0 +1,19 @@
+{
+  "_comment": "Moderate MASQUE Noize configuration - balanced performance and obfuscation",
+  "Jc": 3,
+  "Jmin": 40,
+  "Jmax": 80,
+  "JcBeforeHS": 2,
+  "JcDuringHS": 1,
+  "JcAfterHS": 0,
+  "JunkInterval": "15ms",
+  "JunkRandom": false,
+  "MimicProtocol": "https",
+  "HandshakeDelay": "25ms",
+  "FragmentInitial": false,
+  "FragmentSize": 0,
+  "PaddingMin": 8,
+  "PaddingMax": 32,
+  "RandomPadding": true,
+  "RandomDelay": false
+}

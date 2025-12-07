@@ -1,0 +1,57 @@
+name: Container Image
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    tags:
+      - v**
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-publish:
+    name: Build and publish container image
+    runs-on: ubuntu-latest
+    env:
+      CGO_ENABLED: 0
+      PLATFORMS: linux/arm/v7,linux/arm64,linux/amd64
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.24'
+          check-latest: true
+
+      - name: Setup `ko`
+        # The latest (@v0.6) version of this workflow has bug if there are uppercase letters in repo name
+        uses: ko-build/setup-ko@main
+
+      - name: Extract metadata
+        uses: docker/metadata-action@v5
+        id: meta
+        with:
+          # The images doesn't required, as only tags needed for the ko build step.
+          images: ""
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+            type=sha,format=long
+
+      - name: Build and push image
+        env:
+          TAGS: ${{ steps.meta.outputs.tags }}
+          GOFLAGS: "-ldflags=-checklinkname=0"
+        run: ko build ./cmd/vwarp --platform "${PLATFORMS}" --bare --tags $(echo $TAGS | tr ' ' ',')

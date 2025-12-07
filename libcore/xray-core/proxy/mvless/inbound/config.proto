@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package xray.proxy.mvless.inbound;
+option csharp_namespace = "Xray.Proxy.Mvless.Inbound";
+option go_package = "github.com/GFW-knocker/Xray-core/proxy/mvless/inbound";
+option java_package = "com.xray.proxy.mvless.inbound";
+option java_multiple_files = true;
+
+import "common/protocol/user.proto";
+
+message Fallback {
+  string name = 1;
+  string alpn = 2;
+  string path = 3;
+  string type = 4;
+  string dest = 5;
+  uint64 xver = 6;
+}
+
+message Config {
+  repeated xray.common.protocol.User clients = 1;
+  // Decryption settings. Only applies to server side, and only accepts "none"
+  // for now.
+  string decryption = 2;
+  repeated Fallback fallbacks = 3;
+}

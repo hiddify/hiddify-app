@@ -1,0 +1,13 @@
+/vwarp
+/vwarp.exe
+/warp-scan
+/warp-scan.exe
+.idea
+stuff/
+.DS_Store
+*.exe
+*.log
+*.tmp
+*.bak
+*.swp
+*.out
