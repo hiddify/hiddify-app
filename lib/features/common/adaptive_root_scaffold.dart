@@ -9,7 +9,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // Breakpoints and layout tokens aligned with Material 3 guidance
 const double _smallBreakpoint = 600;
-const double _largeBreakpoint = 1200;
 
 /// Abstract interface for root scaffold utilities.
 /// Provides static methods and keys for scaffold management.

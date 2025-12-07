@@ -31,10 +31,6 @@ abstract class ConfigOptions {
     mapFrom: Region.values.byName,
     mapTo: (value) => value.name,
   );
-  static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>(
-    "use-xray-core-when-possible",
-    false,
-  );
   static final blockAds = PreferencesNotifier.create<bool, bool>(
     "block-ads",
     false,
@@ -254,6 +250,36 @@ abstract class ConfigOptions {
         mapTo: const OptionalRangeJsonConverter().toJson,
       );
 
+  static final enableTlsEch = PreferencesNotifier.create<bool, bool>(
+    "enable-tls-ech",
+    false,
+  );
+
+  static final tlsEchConfig = PreferencesNotifier.create<String, String>(
+    "tls-ech-config",
+    "",
+  );
+
+  static final tlsEchConfigPath = PreferencesNotifier.create<String, String>(
+    "tls-ech-config-path",
+    "",
+  );
+
+  static final enableTlsReality = PreferencesNotifier.create<bool, bool>(
+    "enable-tls-reality",
+    false,
+  );
+
+  static final tlsRealityPublicKey = PreferencesNotifier.create<String, String>(
+    "tls-reality-public-key",
+    "",
+  );
+
+  static final tlsRealityShortId = PreferencesNotifier.create<String, String>(
+    "tls-reality-short-id",
+    "",
+  );
+
   static final enableMux = PreferencesNotifier.create<bool, bool>(
     "enable-mux",
     false,
@@ -361,6 +387,28 @@ abstract class ConfigOptions {
   static final warp2WireguardConfig =
       PreferencesNotifier.create<String, String>("warp2-wireguard-config", "");
 
+  static final enableMasque = PreferencesNotifier.create<bool, bool>(
+    "masque.enable",
+    false,
+  );
+  static final masqueServer = PreferencesNotifier.create<String, String>(
+    "masque.server",
+    "",
+  );
+  static final masquePort = PreferencesNotifier.create<int, int>(
+    "masque.port",
+    443,
+    validator: (value) => isPort(value.toString()),
+  );
+  static final masqueServerName = PreferencesNotifier.create<String, String>(
+    "masque.server-name",
+    "",
+  );
+  static final masqueAuth = PreferencesNotifier.create<String, String>(
+    "masque.auth",
+    "",
+  );
+
   /// preferences to exclude from share and export
   static final privatePreferencesKeys = {
     "warp.license-key",
@@ -371,6 +419,7 @@ abstract class ConfigOptions {
     "warp2.access-token",
     "warp2.account-id",
     "warp2.wireguard-config",
+    "masque.auth",
   };
 
   static final Map<
@@ -380,7 +429,6 @@ abstract class ConfigOptions {
   preferences = {
     "region": region,
     "block-ads": blockAds,
-    "use-xray-core-when-possible": useXrayCoreWhenPossible,
     "service-mode": serviceMode,
     "log-level": logLevel,
     "resolve-destination": resolveDestination,
@@ -415,6 +463,12 @@ abstract class ConfigOptions {
     "tls-tricks.mixed-sni-case": enableTlsMixedSniCase,
     "tls-tricks.enable-padding": enableTlsPadding,
     "tls-tricks.padding-size": tlsPaddingSize,
+    "tls-tricks.enable-ech": enableTlsEch,
+    "tls-tricks.ech-config": tlsEchConfig,
+    "tls-tricks.ech-config-path": tlsEchConfigPath,
+    "tls-tricks.enable-reality": enableTlsReality,
+    "tls-tricks.reality-public-key": tlsRealityPublicKey,
+    "tls-tricks.reality-short-id": tlsRealityShortId,
 
     // warp
     "warp.enable": enableWarp,
@@ -433,25 +487,17 @@ abstract class ConfigOptions {
     "warp2.account-id": warp2AccountId,
     "warp2.access-token": warp2AccessToken,
     "warp2.wireguard-config": warp2WireguardConfig,
+    // masque
+    "masque.enable": enableMasque,
+    "masque.server": masqueServer,
+    "masque.port": masquePort,
+    "masque.server-name": masqueServerName,
+    "masque.auth": masqueAuth,
   };
 }
 
 @riverpod
 bool hasExperimentalFeatures(Ref ref) {
-  final mode = ref.watch(ConfigOptions.serviceMode);
-  if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
-    return true;
-  }
-  if (ref.watch(ConfigOptions.enableTlsFragment) ||
-      ref.watch(ConfigOptions.enableTlsMixedSniCase) ||
-      ref.watch(ConfigOptions.enableTlsPadding) ||
-      ref.watch(ConfigOptions.enableMux) ||
-      ref.watch(ConfigOptions.enableWarp) ||
-      ref.watch(ConfigOptions.bypassLan) ||
-      ref.watch(ConfigOptions.allowConnectionFromLan)) {
-    return true;
-  }
-
   return false;
 }
 
@@ -463,7 +509,6 @@ Future<SingboxConfigOption> singboxConfigOption(Ref ref) async {
   return SingboxConfigOption(
     region: ref.watch(ConfigOptions.region).name,
     blockAds: ref.watch(ConfigOptions.blockAds),
-    useXrayCoreWhenPossible: ref.watch(ConfigOptions.useXrayCoreWhenPossible),
     executeConfigAsIs: false,
     logLevel: ref.watch(ConfigOptions.logLevel),
     resolveDestination: ref.watch(ConfigOptions.resolveDestination),
@@ -505,12 +550,12 @@ Future<SingboxConfigOption> singboxConfigOption(Ref ref) async {
       mixedSniCase: ref.watch(ConfigOptions.enableTlsMixedSniCase),
       enablePadding: ref.watch(ConfigOptions.enableTlsPadding),
       paddingSize: ref.watch(ConfigOptions.tlsPaddingSize),
-      enableEch: false,
-      echConfig: "",
-      echConfigPath: "",
-      enableReality: false,
-      realityPublicKey: "",
-      realityShortId: "",
+      enableEch: ref.watch(ConfigOptions.enableTlsEch),
+      echConfig: ref.watch(ConfigOptions.tlsEchConfig),
+      echConfigPath: ref.watch(ConfigOptions.tlsEchConfigPath),
+      enableReality: ref.watch(ConfigOptions.enableTlsReality),
+      realityPublicKey: ref.watch(ConfigOptions.tlsRealityPublicKey),
+      realityShortId: ref.watch(ConfigOptions.tlsRealityShortId),
     ),
     warp: SingboxWarpOption(
       enable: ref.watch(ConfigOptions.enableWarp),
@@ -540,13 +585,13 @@ Future<SingboxConfigOption> singboxConfigOption(Ref ref) async {
       noiseSize: ref.watch(ConfigOptions.warpNoiseSize),
       noiseDelay: ref.watch(ConfigOptions.warpNoiseDelay),
     ),
-    masque: const SingboxMasqueOption(
-      enable: false,
-      server: "",
-      port: 0,
-      serverName: "",
-      auth: "",
-      alpn: [],
+    masque: SingboxMasqueOption(
+      enable: ref.watch(ConfigOptions.enableMasque),
+      server: ref.watch(ConfigOptions.masqueServer),
+      port: ref.watch(ConfigOptions.masquePort),
+      serverName: ref.watch(ConfigOptions.masqueServerName),
+      auth: ref.watch(ConfigOptions.masqueAuth),
+      alpn: const ["h3"],
     ),
     geoRulesBaseUrl: "https://raw.githubusercontent.com/hiddify/hiddify-geo",
     rules: rules,

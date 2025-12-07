@@ -170,7 +170,7 @@ class _ConnectionButton extends StatelessWidget {
                         // withOpacity() → withAlpha() to avoid deprecation warning
                         BoxShadow(
                           blurRadius: 16,
-                          color: buttonColor.withAlpha((0.5 * 255).round()),
+                          color: buttonColor.withValues(alpha: 0.5),
                         ),
                       ],
                     ),

@@ -1,3 +1,6 @@
+/// Settings widgets barrel file.
+/// 
+/// Re-exports all settings-related widget components.
 export 'advanced_setting_tiles.dart';
 export 'general_setting_tiles.dart';
 export 'platform_settings_tiles.dart';

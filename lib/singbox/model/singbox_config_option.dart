@@ -18,7 +18,6 @@ abstract class SingboxConfigOption with _$SingboxConfigOption {
   const factory SingboxConfigOption({
     required String region,
     required bool blockAds,
-    required bool useXrayCoreWhenPossible,
     required bool executeConfigAsIs,
     required LogLevel logLevel,
     required bool resolveDestination,

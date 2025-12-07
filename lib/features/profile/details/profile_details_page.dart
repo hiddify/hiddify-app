@@ -94,60 +94,60 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
           children: [
             Scaffold(
               body: SafeArea(
-                child: CustomScrollView(
-                  slivers: [
-                    SliverAppBar(
-                      title: Text(t.profile.detailsPageTitle),
-                      pinned: true,
-                      actions: [
-                        // MenuItemButton(
-                        //   onPressed: context.pop,
-                        //   child: Text(
-                        //     MaterialLocalizations.of(context).cancelButtonLabel,
-                        //   ),
-                        // ),
-                        MenuItemButton(
-                          onPressed: () => notifier.save(),
-                          child: Text(t.profile.save.buttonText),
-                        ),
-                        if (state.isEditing)
-                          PopupMenuButton(
-                            icon: Icon(AdaptiveIcon(context).more),
-                            itemBuilder: (context) {
-                              return [
-                                if (state.profile case RemoteProfileEntity())
+                child: Form(
+                  autovalidateMode: state.showErrorMessages
+                      ? AutovalidateMode.always
+                      : AutovalidateMode.disabled,
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverAppBar(
+                        title: Text(t.profile.detailsPageTitle),
+                        pinned: true,
+                        actions: [
+                          // MenuItemButton(
+                          //   onPressed: context.pop,
+                          //   child: Text(
+                          //     MaterialLocalizations.of(context).cancelButtonLabel,
+                          //   ),
+                          // ),
+                          MenuItemButton(
+                            onPressed: () => notifier.save(),
+                            child: Text(t.profile.save.buttonText),
+                          ),
+                          if (state.isEditing)
+                            PopupMenuButton(
+                              icon: Icon(AdaptiveIcon(context).more),
+                              itemBuilder: (context) {
+                                return [
+                                  if (state.profile case RemoteProfileEntity())
+                                    PopupMenuItem(
+                                      child: Text(t.profile.update.buttonTxt),
+                                      onTap: () async {
+                                        await notifier.updateProfile();
+                                      },
+                                    ),
                                   PopupMenuItem(
-                                    child: Text(t.profile.update.buttonTxt),
+                                    child: Text(t.profile.delete.buttonTxt),
                                     onTap: () async {
-                                      await notifier.updateProfile();
+                                      final deleteConfirmed =
+                                          await showConfirmationDialog(
+                                            context,
+                                            title: t.profile.delete.buttonTxt,
+                                            message:
+                                                t.profile.delete.confirmationMsg,
+                                            icon: FluentIcons.delete_24_regular,
+                                          );
+                                      if (deleteConfirmed) {
+                                        await notifier.delete();
+                                      }
                                     },
                                   ),
-                                PopupMenuItem(
-                                  child: Text(t.profile.delete.buttonTxt),
-                                  onTap: () async {
-                                    final deleteConfirmed =
-                                        await showConfirmationDialog(
-                                          context,
-                                          title: t.profile.delete.buttonTxt,
-                                          message:
-                                              t.profile.delete.confirmationMsg,
-                                          icon: FluentIcons.delete_24_regular,
-                                        );
-                                    if (deleteConfirmed) {
-                                      await notifier.delete();
-                                    }
-                                  },
-                                ),
-                              ];
-                            },
-                          ),
-                      ],
-                    ),
-                    Form(
-                      autovalidateMode: state.showErrorMessages
-                          ? AutovalidateMode.always
-                          : AutovalidateMode.disabled,
-                      child: SliverList.list(
+                                ];
+                              },
+                            ),
+                        ],
+                      ),
+                      SliverList.list(
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -323,8 +323,8 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                           ],
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

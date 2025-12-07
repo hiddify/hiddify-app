@@ -230,7 +230,8 @@ class ProfileRepositoryImpl
       () async {
         final profileId = const Uuid().v4();
 
-        return await updateContent(profileId, content)
+        final decodedContent = safeDecodeBase64(content);
+        return await updateContent(profileId, decodedContent)
             .andThen(
               () => TaskEither(() async {
                 final profile = LocalProfileEntity(
@@ -405,7 +406,7 @@ class ProfileRepositoryImpl
           url.trim(),
           tempFile.path,
           cancelToken: cancelToken,
-          userAgent: configs.useXrayCoreWhenPossible ? "v2rayNG/1.8.23" : null,
+          userAgent: "Hiddify/2.5.7 (Windows) v2rayNG/1.8.23",
         );
         final headers = await _populateHeaders(
           response.headers.map,

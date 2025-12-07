@@ -57,13 +57,11 @@ class HomePage extends HookConsumerWidget {
             ],
           ),
           switch (activeProfile) {
-            AsyncData(value: final profile?) => MultiSliver(
-              children: [
-                SliverToBoxAdapter(
-                  child: ProfileTile(profile: profile, isMain: true),
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
+            AsyncData(value: final profile?) => SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  ProfileTile(profile: profile, isMain: true),
+                  SizedBox(
                     height: MediaQuery.sizeOf(context).height * 0.5,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -83,8 +81,8 @@ class HomePage extends HookConsumerWidget {
                       ],
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             AsyncData() => switch (hasAnyProfile) {
               AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
@@ -115,7 +113,7 @@ class AppVersionLabel extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final version = ref.watch(appInfoProvider).requireValue.presentVersion;
-    if (version.isBlank) return const SizedBox();
+    if (version.isBlank) return const SizedBox.shrink();
 
     return Semantics(
       label: t.about.version,

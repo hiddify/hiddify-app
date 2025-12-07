@@ -29,6 +29,11 @@ set(CMAKE_SHARED_LINKER_FLAGS_PROFILE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
 set(CMAKE_C_FLAGS_PROFILE "${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 
+# Configure Nuget path for dependencies
+set(NUGET_EXE "${CMAKE_CURRENT_SOURCE_DIR}/../tools/nuget.exe" CACHE FILEPATH "Path to nuget.exe" FORCE)
+set(NUGET_TOOL "${CMAKE_CURRENT_SOURCE_DIR}/../tools/nuget.exe" CACHE FILEPATH "Path to nuget.exe" FORCE)
+set(NUGET_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/../tools/nuget.exe" CACHE FILEPATH "Path to nuget.exe" FORCE)
+
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
 
@@ -39,7 +44,7 @@ add_definitions(-DUNICODE -D_UNICODE)
 # of modifying this function.
 function(APPLY_STANDARD_SETTINGS TARGET)
   target_compile_features(${TARGET} PUBLIC cxx_std_20)
-  target_compile_options(${TARGET} PRIVATE /W4 /WX /wd"4100")
+  target_compile_options(${TARGET} PRIVATE /W4 /wd"4100" /permissive)
   target_compile_options(${TARGET} PRIVATE /EHsc)
   target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
   target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")

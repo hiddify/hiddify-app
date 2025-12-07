@@ -42,23 +42,33 @@ abstract class LinkParser {
     final lines = normalContent.split('\n');
     String? name;
     for (final line in lines) {
-      final uri = Uri.tryParse(line);
+      final uri = Uri.tryParse(line.trim());
       if (uri == null) continue;
-      final fragment = uri.hasFragment
-          ? Uri.decodeComponent(uri.fragment.split("&&detour")[0])
-          : null;
+
+      String? extractedName;
+      if (uri.hasFragment) {
+        try {
+          // Handle URL encoded fragments like #Channel%20id...
+          extractedName = Uri.decodeComponent(uri.fragment.split("&&detour")[0]);
+        } catch (_) {
+          extractedName = uri.fragment;
+        }
+      }
+
       name ??= switch (uri.scheme) {
-        'ss' => fragment ?? ProxyType.shadowsocks.label,
-        'ssconf' => fragment ?? ProxyType.shadowsocks.label,
-        'vmess' => ProxyType.vmess.label,
-        'vless' => fragment ?? ProxyType.vless.label,
-        'trojan' => fragment ?? ProxyType.trojan.label,
-        'tuic' => fragment ?? ProxyType.tuic.label,
-        'hy2' || 'hysteria2' => fragment ?? ProxyType.hysteria2.label,
-        'hy' || 'hysteria' => fragment ?? ProxyType.hysteria.label,
-        'ssh' => fragment ?? ProxyType.ssh.label,
-        'wg' => fragment ?? ProxyType.wireguard.label,
-        'warp' => fragment ?? ProxyType.warp.label,
+        'ss' => extractedName ?? ProxyType.shadowsocks.label,
+        'ssconf' => extractedName ?? ProxyType.shadowsocks.label,
+        'vmess' => extractedName ?? ProxyType.vmess.label,
+        'vless' => extractedName ?? ProxyType.vless.label,
+        'trojan' => extractedName ?? ProxyType.trojan.label,
+        'tuic' => extractedName ?? ProxyType.tuic.label,
+        'hy2' || 'hysteria2' => extractedName ?? ProxyType.hysteria2.label,
+        'hy' || 'hysteria' => extractedName ?? ProxyType.hysteria.label,
+        'ssh' => extractedName ?? ProxyType.ssh.label,
+        'wg' => extractedName ?? ProxyType.wireguard.label,
+        'warp' => extractedName ?? ProxyType.warp.label,
+        'naive' || 'naiveproxy' => extractedName ?? ProxyType.naive.label,
+        'juicity' => extractedName ?? "Juicity",
         _ => null,
       };
     }

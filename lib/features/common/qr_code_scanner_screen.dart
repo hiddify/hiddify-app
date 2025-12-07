@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dartx/dartx.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,22 +42,6 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initializeScanner();
-
-    // _easyPermission = FlutterEasyPermission()
-    //   ..addPermissionCallback(onGranted: (requestCode, androidPerms, iosPerm) {
-    //     debugPrint("android:$androidPerms");
-    //     debugPrint("iOS:$iosPerm");
-    //     startQrScannerIfPermissionGranted();
-    //   }, onDenied: (requestCode, androidPerms, iosPerm, isPermanent) {
-    //     if (isPermanent) {
-    //       FlutterEasyPermission.showAppSettingsDialog(title: "Camera");
-    //     } else {
-    //       debugPrint("android:$androidPerms");
-    //       debugPrint("iOS:$iosPerm");
-    //     }
-    //   }, onSettingsReturned: () {
-    //     startQrScannerIfPermissionGranted();
-    //   });
   }
 
   Future<bool> _requestCameraPermission() async {
@@ -124,40 +109,28 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen>
     }
   }
 
-  // void startQrScannerIfPermissionGranted() {
-  //   FlutterEasyPermission.has(perms: permissions, permsGroup: permissionGroup).then((value) {
-  //     if (value) {
-  //       controller.start().then((result) {
-  //         if (result != null) {
-  //           setState(() {
-  //             started = true;
-  //           });
-  //         }
-  //       }).catchError((error) {
-  //         loggy.warning("Error starting scanner: $error");
-  //       });
-  //     } else {}
-  //   });
-  // }
+
 
   void _showPermissionDialog() {
+    final t = ref.read(translationsProvider);
+    final localizations = MaterialLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Camera Access Required"),
-          content: const Text("Permission to camera to scan QR Code"),
+          title: Text(t.profile.add.qrScanner.permissionDeniedError),
+          content: Text(t.profile.add.qrScanner.permissionRequest),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
+              child: Text(localizations.cancelButtonLabel),
             ),
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
                 await openAppSettings();
               },
-              child: const Text("Settings"),
+              child: Text(localizations.openAppDrawerTooltip),
             ),
           ],
         );
@@ -291,6 +264,7 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen>
   }
 
   Widget _buildPermissionDeniedUI(BuildContext context, Translations t) {
+    final localizations = MaterialLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -303,10 +277,10 @@ class _QRCodeScannerScreenState extends ConsumerState<QRCodeScannerScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(t.profile.add.qrScanner.permissionDeniedError),
-            const SizedBox(height: 16),
+            const Gap(16),
             ElevatedButton(
               onPressed: _showPermissionDialog,
-              child: const Text("Settings"),
+              child: Text(localizations.openAppDrawerTooltip),
             ),
           ],
         ),
@@ -337,8 +311,7 @@ class ScannerOverlay extends CustomPainter {
 
     final backgroundPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.5)
-      ..style = PaintingStyle.fill
-      ..blendMode = BlendMode.dstOut;
+      ..style = PaintingStyle.fill;
 
     final backgroundWithCutout = Path.combine(
       PathOperation.difference,

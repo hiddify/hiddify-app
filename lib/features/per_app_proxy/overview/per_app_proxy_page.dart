@@ -121,9 +121,9 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
                       title: Text(e.present(t).message),
                       dense: true,
                       value: e,
-                      groupValue: currentMode, // ignore: deprecated_member_use
+                      groupValue: currentMode,
+                      // ignore: deprecated_member_use
                       onChanged: (value) async {
-                        // ignore: deprecated_member_use
                         if (value == null) return;
                         await ref
                             .read(Preferences.perAppProxyMode.notifier)

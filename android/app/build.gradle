@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -37,16 +37,17 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '
 android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
-    compileSdk 35
+    compileSdk 36
     ndkVersion "27.0.12077973"
+    buildToolsVersion "36.0.0"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_25
+        targetCompatibility JavaVersion.VERSION_25
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '25'
     }
 
     sourceSets {
@@ -55,8 +56,8 @@ android {
 
     defaultConfig {
         applicationId "app.hiddify.com"
-        minSdkVersion 24
-        targetSdkVersion 35
+        minSdkVersion 26
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

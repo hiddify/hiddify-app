@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/model/environment.dart';
@@ -71,6 +73,29 @@ abstract class Preferences {
         ActionsAtClosing.ask,
         mapFrom: ActionsAtClosing.values.byName,
         mapTo: (value) => value.name,
+      );
+
+  static final windowSize = PreferencesNotifier.create<Size, List<String>>(
+    "window_size",
+    const Size(868, 668),
+    mapFrom: (value) => Size(double.parse(value[0]), double.parse(value[1])),
+    mapTo: (value) => [value.width.toString(), value.height.toString()],
+  );
+
+  static final windowPosition =
+      PreferencesNotifier.create<Offset?, List<String>?>(
+        "window_position",
+        null,
+        mapFrom:
+            (value) =>
+                value == null
+                    ? null
+                    : Offset(double.parse(value[0]), double.parse(value[1])),
+        mapTo:
+            (value) =>
+                value == null
+                    ? null
+                    : [value.dx.toString(), value.dy.toString()],
       );
 }
 

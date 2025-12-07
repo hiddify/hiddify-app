@@ -61,64 +61,70 @@ class IntroPage extends HookConsumerWidget with PresLogger {
               maxCrossAxisExtent: 368,
               child: MultiSliver(
                 children: [
-                  const LocalePrefTile(),
+                  const SliverToBoxAdapter(child: LocalePrefTile()),
                   const SliverGap(4),
-                  const RegionPrefTile(),
+                  const SliverToBoxAdapter(child: RegionPrefTile()),
                   const SliverGap(4),
-                  const EnableAnalyticsPrefTile(),
+                  const SliverToBoxAdapter(child: EnableAnalyticsPrefTile()),
                   const SliverGap(4),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text.rich(
-                      t.intro.termsAndPolicyCaution(
-                        tap: (text) => TextSpan(
-                          text: text,
-                          style: const TextStyle(color: Colors.blue),
-                          recognizer: termsTapRecognizer,
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text.rich(
+                        t.intro.termsAndPolicyCaution(
+                          tap: (text) => TextSpan(
+                            text: text,
+                            style: const TextStyle(color: Colors.blue),
+                            recognizer: termsTapRecognizer,
+                          ),
                         ),
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
-                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 24,
-                    ),
-                    child: FilledButton(
-                      onPressed: () async {
-                        if (isStarting.value) return;
-                        isStarting.value = true;
-                        try {
-                          if (!ref
-                              .read(analyticsControllerProvider)
-                              .requireValue) {
-                            loggy.info("disabling analytics per user request");
-                            try {
-                              await ref
-                                  .read(analyticsControllerProvider.notifier)
-                                  .disableAnalytics();
-                            } catch (error, stackTrace) {
-                              loggy.error(
-                                "could not disable analytics",
-                                error,
-                                stackTrace,
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 24,
+                      ),
+                      child: FilledButton(
+                        onPressed: () async {
+                          if (isStarting.value) return;
+                          isStarting.value = true;
+                          try {
+                            if (!ref
+                                .read(analyticsControllerProvider)
+                                .requireValue) {
+                              loggy.info(
+                                "disabling analytics per user request",
                               );
+                              try {
+                                await ref
+                                    .read(analyticsControllerProvider.notifier)
+                                    .disableAnalytics();
+                              } catch (error, stackTrace) {
+                                loggy.error(
+                                  "could not disable analytics",
+                                  error,
+                                  stackTrace,
+                                );
+                              }
                             }
+                            await ref
+                                .read(Preferences.introCompleted.notifier)
+                                .update(true);
+                          } finally {
+                            isStarting.value = false;
                           }
-                          await ref
-                              .read(Preferences.introCompleted.notifier)
-                              .update(true);
-                        } finally {
-                          isStarting.value = false;
-                        }
-                      },
-                      child: isStarting.value
-                          ? LinearProgressIndicator(
-                              backgroundColor: Colors.transparent,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            )
-                          : Text(t.intro.start),
+                        },
+                        child: isStarting.value
+                            ? LinearProgressIndicator(
+                                backgroundColor: Colors.transparent,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              )
+                            : Text(t.intro.start),
+                      ),
                     ),
                   ),
                 ],

@@ -63,113 +63,119 @@ class ProfileTile extends HookConsumerWidget {
       ),
       clipBehavior: Clip.antiAlias,
       shadowColor: Colors.transparent,
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (profile is RemoteProfileEntity || !isMain) ...[
-              SizedBox(
-                width: 48,
-                child: Semantics(
-                  sortKey: const OrdinalSortKey(1),
-                  child: ProfileActionButton(profile, !isMain),
-                ),
-              ),
-              VerticalDivider(width: 1, color: effectiveOutlineColor),
-            ],
-            Expanded(
-              child: Semantics(
-                button: true,
-                sortKey: isMain ? const OrdinalSortKey(0) : null,
-                focused: isMain,
-                liveRegion: isMain,
-                namesRoute: isMain,
-                label: isMain ? t.profile.activeProfileBtnSemanticLabel : null,
-                child: InkWell(
-                  onTap: () {
-                    if (isMain) {
-                      const ProfilesOverviewRoute().go(context);
-                    } else {
-                      if (selectActiveMutation.state.isInProgress) return;
-                      if (profile.active) return;
-                      selectActiveMutation.setFuture(
-                        ref
-                            .read(profilesOverviewProvider.notifier)
-                            .selectActiveProfile(profile.id),
-                      );
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (isMain)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Material(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.transparent,
-                              clipBehavior: Clip.antiAlias,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      profile.name,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontFamily: FontFamily.emoji,
-                                          ),
-                                      semanticsLabel: t.profile
-                                          .activeProfileNameSemanticLabel(
-                                            name: profile.name,
-                                          ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              left: (profile is RemoteProfileEntity || !isMain) ? 49 : 0,
+            ),
+            child: Semantics(
+              button: true,
+              sortKey: isMain ? const OrdinalSortKey(0) : null,
+              focused: isMain,
+              liveRegion: isMain,
+              namesRoute: isMain,
+              label: isMain ? t.profile.activeProfileBtnSemanticLabel : null,
+              child: InkWell(
+                onTap: () {
+                  if (isMain) {
+                    const ProfilesOverviewRoute().go(context);
+                  } else {
+                    if (selectActiveMutation.state.isInProgress) return;
+                    if (profile.active) return;
+                    selectActiveMutation.setFuture(
+                      ref
+                          .read(profilesOverviewProvider.notifier)
+                          .selectActiveProfile(profile.id),
+                    );
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (isMain)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Material(
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.transparent,
+                            clipBehavior: Clip.antiAlias,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    profile.name,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      fontFamily: FontFamily.emoji,
                                     ),
+                                    semanticsLabel: t.profile
+                                        .activeProfileNameSemanticLabel(
+                                          name: profile.name,
+                                        ),
                                   ),
-                                  const Icon(
-                                    FluentIcons.caret_down_16_filled,
-                                    size: 16,
-                                  ),
-                                ],
-                              ),
+                                ),
+                                const Icon(
+                                  FluentIcons.caret_down_16_filled,
+                                  size: 16,
+                                ),
+                              ],
                             ),
-                          )
-                        else
-                          Text(
-                            profile.name,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.titleMedium,
-                            semanticsLabel: profile.active
-                                ? t.profile.activeProfileNameSemanticLabel(
-                                    name: profile.name,
-                                  )
-                                : t.profile.nonActiveProfileBtnSemanticLabel(
-                                    name: profile.name,
-                                  ),
                           ),
-                        if (subInfo != null) ...[
-                          const Gap(4),
-                          RemainingTrafficIndicator(subInfo.ratio),
-                          const Gap(4),
-                          ProfileSubscriptionInfo(subInfo),
-                          const Gap(4),
-                        ],
+                        )
+                      else
+                        Text(
+                          profile.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleMedium,
+                          semanticsLabel: profile.active
+                              ? t.profile.activeProfileNameSemanticLabel(
+                                  name: profile.name,
+                                )
+                              : t.profile.nonActiveProfileBtnSemanticLabel(
+                                  name: profile.name,
+                                ),
+                        ),
+                      if (subInfo != null) ...[
+                        const Gap(4),
+                        RemainingTrafficIndicator(subInfo.ratio),
+                        const Gap(4),
+                        ProfileSubscriptionInfo(subInfo),
+                        const Gap(4),
                       ],
-                    ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          if (profile is RemoteProfileEntity || !isMain)
+            Positioned(
+              top: 0,
+              bottom: 0,
+              left: 0,
+              width: 49,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(width: 1, color: effectiveOutlineColor),
+                  ),
+                ),
+                child: Semantics(
+                  sortKey: const OrdinalSortKey(1),
+                  child: Center(child: ProfileActionButton(profile, !isMain)),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

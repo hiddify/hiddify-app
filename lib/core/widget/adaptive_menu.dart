@@ -94,67 +94,75 @@ class AdaptiveMenu extends HookConsumerWidget {
     }
 
     final pageIndexNotifier = useValueNotifier(0);
-    final nestedSheets = <SliverWoltModalSheetPage>[];
-    int pageIndex = 0;
 
     void popSheets() {
       if (context.mounted) {
         Navigator.pop(context);
       }
-      Future.delayed(
-        const Duration(milliseconds: 200),
-      ).then((_) => pageIndexNotifier.value = 0);
+      // Use WidgetsBinding for safer callback after animation completes
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted) {
+          pageIndexNotifier.value = 0;
+        }
+      });
     }
 
-    List<Widget> buildSheetItems(
-      Iterable<AdaptiveMenuItem> menuItems,
-      int index,
-    ) {
-      final sheetItems = <Widget>[];
-      for (final item in menuItems) {
-        if (item.subItems != null) {
-          final subItems = buildSheetItems(item.subItems!, index + 1);
-          final subSheetIndex = ++pageIndex;
-          sheetItems.add(
-            ListTile(
-              title: Text(item.title),
-              leading: item.icon != null ? Icon(item.icon) : null,
-              trailing: const Icon(
-                FluentIcons.chevron_right_20_regular,
-                size: 20,
+    final (mainSheetItems, nestedSheets) = useMemoized(() {
+      final nestedSheets = <SliverWoltModalSheetPage>[];
+      int pageIndex = 0;
+
+      List<Widget> buildSheetItems(
+        Iterable<AdaptiveMenuItem> menuItems,
+        int index,
+      ) {
+        final sheetItems = <Widget>[];
+        for (final item in menuItems) {
+          if (item.subItems != null) {
+            final subItems = buildSheetItems(item.subItems!, index + 1);
+            final subSheetIndex = ++pageIndex;
+            sheetItems.add(
+              ListTile(
+                title: Text(item.title),
+                leading: item.icon != null ? Icon(item.icon) : null,
+                trailing: const Icon(
+                  FluentIcons.chevron_right_20_regular,
+                  size: 20,
+                ),
+                onTap: () {
+                  pageIndexNotifier.value = subSheetIndex;
+                },
               ),
-              onTap: () {
-                pageIndexNotifier.value = subSheetIndex;
-              },
-            ),
-          );
-          nestedSheets.add(
-            SliverWoltModalSheetPage(
-              hasTopBarLayer: false,
-              isTopBarLayerAlwaysVisible: true,
-              topBarTitle: Text(item.title),
-              mainContentSliversBuilder: (context) => [
-                SliverList.list(children: subItems),
-              ],
-            ),
-          );
-        } else {
-          sheetItems.add(
-            ListTile(
-              title: Text(item.title),
-              leading: item.icon != null ? Icon(item.icon) : null,
-              onTap: item.onTap == null
-                  ? null
-                  : () async {
-                      popSheets();
-                      await item.onTap!();
-                    },
-            ),
-          );
+            );
+            nestedSheets.add(
+              SliverWoltModalSheetPage(
+                hasTopBarLayer: false,
+                isTopBarLayerAlwaysVisible: true,
+                topBarTitle: Text(item.title),
+                mainContentSliversBuilder: (context) => [
+                  SliverList.list(children: subItems),
+                ],
+              ),
+            );
+          } else {
+            sheetItems.add(
+              ListTile(
+                title: Text(item.title),
+                leading: item.icon != null ? Icon(item.icon) : null,
+                onTap: item.onTap == null
+                    ? null
+                    : () async {
+                        popSheets();
+                        await item.onTap!();
+                      },
+              ),
+            );
+          }
         }
+        return sheetItems;
       }
-      return sheetItems;
-    }
+
+      return (buildSheetItems(items, 0), nestedSheets);
+    }, [items]);
 
     return builder(context, () async {
       await WoltModalSheet.show(
@@ -168,7 +176,7 @@ class AdaptiveMenu extends HookConsumerWidget {
           SliverWoltModalSheetPage(
             hasTopBarLayer: false,
             mainContentSliversBuilder: (context) => [
-              SliverList.list(children: buildSheetItems(items, 0)),
+              SliverList.list(children: mainSheetItems),
             ],
           ),
           ...nestedSheets,

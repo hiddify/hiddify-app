@@ -24,9 +24,19 @@ class InAppNotificationController with AppLogger {
   }) {
     // Desktop workaround: toastification overlays with hover/drag interactions
     // can trigger RenderViewport/MouseTracker hitTest crashes on Windows.
-    // Skip showing toasts on desktop for now to keep the app stable.
+    // Use ScaffoldMessenger as a fallback.
     if (PlatformUtils.isDesktop) {
-      loggy.debug("skip toast on desktop: $message");
+      final context = RootScaffold.stateKey.currentContext;
+      if (context != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            behavior: SnackBarBehavior.floating,
+            width: 400,
+            backgroundColor: type == NotificationType.error ? Colors.red : null,
+          ),
+        );
+      }
       return null;
     }
 

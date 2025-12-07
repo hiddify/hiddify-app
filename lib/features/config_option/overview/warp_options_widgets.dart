@@ -93,6 +93,13 @@ class WarpOptionsTiles extends HookConsumerWidget {
           presentValue: (value) => value.isEmpty ? t.general.notSet : value,
         ),
         ValuePreferenceWidget(
+          value: ref.watch(ConfigOptions.warp2LicenseKey),
+          preferences: ref.watch(ConfigOptions.warp2LicenseKey.notifier),
+          enabled: canChangeOptions,
+          title: "${t.config.warpLicenseKey} 2",
+          presentValue: (value) => value.isEmpty ? t.general.notSet : value,
+        ),
+        ValuePreferenceWidget(
           value: ref.watch(ConfigOptions.warpCleanIp),
           preferences: ref.watch(ConfigOptions.warpCleanIp.notifier),
           enabled: canChangeOptions,

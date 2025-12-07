@@ -161,47 +161,6 @@ class AddProfileModal extends HookConsumerWidget {
                     ),
                     child: Column(
                       children: [
-                        Semantics(
-                          button: true,
-                          child: SizedBox(
-                            height: 36,
-                            child: Material(
-                              key: const ValueKey("add_warp_button"),
-                              elevation: 8,
-                              color: theme.colorScheme.surface,
-                              surfaceTintColor: theme.colorScheme.surfaceTint,
-                              shadowColor: Colors.transparent,
-                              borderRadius: BorderRadius.circular(8),
-                              clipBehavior: Clip.antiAlias,
-                              child: InkWell(
-                                onTap: () async {
-                                  await addProfileModal(context, ref);
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      FluentIcons.add_24_regular,
-                                      color: theme.colorScheme.primary,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      t.profile.add.addWarp,
-                                      style: theme.textTheme.labelLarge
-                                          ?.copyWith(
-                                            color: theme.colorScheme.primary,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (!PlatformUtils.isDesktop)
-                          const SizedBox(
-                            height: 16,
-                          ), // Spacing between the buttons
                         if (!PlatformUtils.isDesktop)
                           Semantics(
                             button: true,
@@ -227,7 +186,7 @@ class AddProfileModal extends HookConsumerWidget {
                                         FluentIcons.add_24_regular,
                                         color: theme.colorScheme.primary,
                                       ),
-                                      const SizedBox(width: 8),
+                                      const Gap(8),
                                       Text(
                                         t.profile.add.manually,
                                         style: theme.textTheme.labelLarge
@@ -256,58 +215,6 @@ class AddProfileModal extends HookConsumerWidget {
         ),
       ),
     );
-  }
-
-  Future<void> addProfileModal(BuildContext context, WidgetRef ref) async {
-    final prefs = ref.read(sharedPreferencesProvider).requireValue;
-    final warp = ref.read(warpOptionProvider.notifier);
-    final profile = ref.read(addProfileProvider.notifier);
-    final consent = prefs.getBool(warpConsentGiven) ?? false;
-    final region = ref.read(ConfigOptions.region.notifier).raw();
-    context.pop();
-
-    final t = ref.read(translationsProvider);
-    final notification = ref.read(inAppNotificationControllerProvider);
-
-    if (!consent) {
-      final agreed = await showDialog<bool>(
-        context: context,
-        builder: (context) => const WarpLicenseAgreementModal(),
-      );
-
-      if (agreed != true) return;
-    }
-    await prefs.setBool(warpConsentGiven, true);
-    var toast = notification.showInfoToast(
-      t.profile.add.addingWarpMsg,
-      duration: const Duration(milliseconds: 100),
-    );
-    toast?.pause();
-    await warp.generateWarpConfig();
-    toast?.start();
-
-    // final accountId = _prefs.getString("warp2-account-id");
-    // final accessToken = _prefs.getString("warp2-access-token");
-    // final hasWarp2Config = accountId != null && accessToken != null;
-
-    // if (!hasWarp2Config || true) {
-    toast = notification.showInfoToast(
-      t.profile.add.addingWarpMsg,
-      duration: const Duration(milliseconds: 100),
-    );
-    toast?.pause();
-    await warp.generateWarp2Config();
-    toast?.start();
-    // }
-    if (region == "cn") {
-      await profile.add(
-        "#profile-title: Hiddify WARP\nwarp://p1@auto#National&&detour=warp://p2@auto#WoW",
-      ); //
-    } else {
-      await profile.add(
-        "https://raw.githubusercontent.com/hiddify/hiddify-next/main/test.configs/warp",
-      ); //
-    }
   }
 }
 

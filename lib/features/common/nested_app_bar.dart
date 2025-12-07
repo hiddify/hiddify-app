@@ -32,36 +32,36 @@ class NestedAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    RootScaffold.canShowDrawer(context);
-
     return SliverAppBar(
-      leading:
-          (RootScaffold.stateKey.currentState?.hasDrawer ?? false) &&
-              showDrawerButton(context)
-          ? IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                final scaffold = RootScaffold.stateKey.currentState;
-                if (scaffold == null) return;
-                scaffold.openDrawer();
-              },
-            )
-          : (Navigator.of(context).canPop()
-                ? IconButton(
-                    icon: Icon(
-                      context.isRtl ? Icons.arrow_forward : Icons.arrow_back,
-                    ),
-                    onPressed: () {
-                      context
-                          .pop(); // Pops the current route off the navigator stack
-                    },
-                  )
-                : null),
+      leading: _buildLeading(context),
       title: title,
       actions: actions,
       pinned: pinned,
       forceElevated: forceElevated,
       bottom: bottom,
     );
+  }
+
+  Widget? _buildLeading(BuildContext context) {
+    final scaffold = RootScaffold.stateKey.currentState;
+    final hasDrawer = scaffold?.hasDrawer ?? false;
+
+    if (hasDrawer && showDrawerButton(context)) {
+      return IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () => scaffold?.openDrawer(),
+      );
+    }
+
+    if (Navigator.of(context).canPop()) {
+      return IconButton(
+        icon: Icon(
+          context.isRtl ? Icons.arrow_forward : Icons.arrow_back,
+        ),
+        onPressed: context.pop,
+      );
+    }
+
+    return null;
   }
 }

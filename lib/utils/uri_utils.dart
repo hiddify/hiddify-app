@@ -33,9 +33,10 @@ abstract class UriUtils {
     try {
       loggy.debug("sharing [$uri]");
       final file = XFile(uri.path, mimeType: mimeType);
+      // ignore: deprecated_member_use
       final result = await Share.shareXFiles([
         file,
-      ]); // ignore: deprecated_member_use
+      ]);
       loggy.debug("share result: ${result.raw}");
       return result.status == ShareResultStatus.success;
     } catch (e, stackTrace) {

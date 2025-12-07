@@ -32,9 +32,6 @@ class QuickSettingsModal extends HookConsumerWidget {
                         e.presentShort(t),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      tooltip: e.isExperimental
-                          ? t.settings.experimental
-                          : null,
                     ),
                   )
                   .toList(),

@@ -2,7 +2,9 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/utils/callback_debouncer.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:tray_manager/tray_manager.dart';
@@ -14,7 +16,9 @@ const minimumWindowSize = Size(368, 568);
 const defaultWindowSize = Size(868, 668);
 
 @Riverpod(keepAlive: true)
-class WindowNotifier extends _$WindowNotifier with AppLogger {
+class WindowNotifier extends _$WindowNotifier with AppLogger, WindowListener {
+  final _debouncer = CallbackDebouncer(const Duration(milliseconds: 500));
+
   @override
   Future<void> build() async {
     if (!PlatformUtils.isDesktop) return;
@@ -25,8 +29,36 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
     // }
 
     await windowManager.ensureInitialized();
+    windowManager.addListener(this);
+    ref.onDispose(() => windowManager.removeListener(this));
+
     await windowManager.setMinimumSize(minimumWindowSize);
-    await windowManager.setSize(defaultWindowSize);
+
+    final size = ref.read(Preferences.windowSize);
+    final position = ref.read(Preferences.windowPosition);
+
+    await windowManager.setSize(size);
+    if (position != null) {
+      await windowManager.setPosition(position);
+    } else {
+      await windowManager.center();
+    }
+  }
+
+  @override
+  void onWindowResize() {
+    _debouncer.call(() async {
+      final size = await windowManager.getSize();
+      await ref.read(Preferences.windowSize.notifier).update(size);
+    });
+  }
+
+  @override
+  void onWindowMove() {
+    _debouncer.call(() async {
+      final pos = await windowManager.getPosition();
+      await ref.read(Preferences.windowPosition.notifier).update(pos);
+    });
   }
 
   Future<void> open({bool focus = true}) async {

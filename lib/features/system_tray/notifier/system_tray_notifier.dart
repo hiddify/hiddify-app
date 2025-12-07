@@ -19,48 +19,40 @@ import 'package:window_manager/window_manager.dart';
 part 'system_tray_notifier.g.dart';
 
 @Riverpod(keepAlive: true)
-class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
+class SystemTrayNotifier extends _$SystemTrayNotifier
+    with AppLogger, TrayListener {
   @override
   Future<void> build() async {
     if (!PlatformUtils.isDesktop) return;
 
-    final activeProxy = ref.watch(activeProxyProvider);
+    trayManager.addListener(this);
+    ref.onDispose(() => trayManager.removeListener(this));
+
+    // Watch dependencies for MENU only
+    final connectionAsync = ref.watch(connectionProvider);
+    final connection =
+        connectionAsync.asData?.value ?? const ConnectionStatus.disconnected();
+    final serviceMode = ref.watch(ConfigOptions.serviceMode);
+    final t = ref.watch(translationsProvider);
+
+    // Listen to activeProxy for Tooltip/Icon updates without rebuilding the menu
+    ref.listen(activeProxyProvider, (previous, next) {
+      final delay = switch (next) {
+        AsyncData(value: final proxy) => proxy.urlTestDelay,
+        _ => 0,
+      };
+      _updateTrayIconAndTooltip(connection, delay, t);
+    });
+
+    // Initial update for icon/tooltip
+    final activeProxy = ref.read(activeProxyProvider);
     final delay = switch (activeProxy) {
       AsyncData(value: final proxy) => proxy.urlTestDelay,
       _ => 0,
     };
-    final newConnectionStatus = delay > 0 && delay < 65000;
-    final connectionAsync = ref.watch(connectionProvider);
-    final ConnectionStatus connection =
-        connectionAsync.asData?.value ?? const ConnectionStatus.disconnected();
+    _updateTrayIconAndTooltip(connection, delay, t);
 
-    final t = ref.watch(translationsProvider);
-
-    var tooltip = Constants.appName;
-    final serviceMode = ref.watch(ConfigOptions.serviceMode);
-    if (connection == const Disconnected()) {
-      setIcon(connection);
-    } else if (newConnectionStatus) {
-      setIcon(const Connected());
-      tooltip = "$tooltip - ${connection.present(t)}";
-      if (newConnectionStatus) {
-        tooltip = "$tooltip : ${delay}ms";
-      } else {
-        tooltip = "$tooltip : -";
-      }
-      // else if (delay>1000)
-      //   SystemTrayNotifier.setIcon(timeout ? Disconnecting() : Connecting());
-    } else {
-      setIcon(const Disconnecting());
-      tooltip = "$tooltip - ${connection.present(t)}";
-    }
-    if (Platform.isMacOS) {
-      windowManager.setBadgeLabel("${delay}ms");
-    }
-    if (!Platform.isLinux) await trayManager.setToolTip(tooltip);
-
-    // loggy.debug('updating system tray');
-
+    // Build Menu
     final menu = Menu(
       items: [
         MenuItem(
@@ -77,7 +69,6 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
             Connected() => t.tray.status.disconnect,
             Disconnecting() => t.tray.status.disconnecting,
           },
-          // checked: connection.isConnected,
           checked: false,
           disabled: connection.isSwitching,
           onClick: (_) async {
@@ -105,23 +96,6 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
             },
           ),
         ),
-
-        // MenuItem.submenu(
-        //   label: t.tray.open,
-        //   submenu: Menu(
-        //     items: [
-        //       ...destinations.map(
-        //         (e) => MenuItem(
-        //           label: e.$1,
-        //           onClick: (_) async {
-        //             await ref.read(windowNotifierProvider.notifier).open();
-        //             ref.read(routerProvider).go(e.$2);
-        //           },
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
         MenuItem.separator(),
         MenuItem(
           label: t.tray.quit,
@@ -133,6 +107,35 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
     );
 
     await trayManager.setContextMenu(menu);
+  }
+
+  Future<void> _updateTrayIconAndTooltip(
+    ConnectionStatus connection,
+    int delay,
+    TranslationsEn t,
+  ) async {
+    final newConnectionStatus = delay > 0 && delay < 65000;
+    var tooltip = Constants.appName;
+
+    if (connection == const Disconnected()) {
+      setIcon(connection);
+    } else if (connection == const Connected()) {
+      setIcon(const Connected());
+      tooltip = "$tooltip - ${connection.present(t)}";
+      if (newConnectionStatus) {
+        tooltip = "$tooltip : ${delay}ms";
+      } else {
+        tooltip = "$tooltip : -";
+      }
+    } else {
+      setIcon(const Disconnecting()); // Use Disconnecting icon for intermediate states
+      tooltip = "$tooltip - ${connection.present(t)}";
+    }
+
+    if (Platform.isMacOS) {
+      windowManager.setBadgeLabel("${delay}ms");
+    }
+    if (!Platform.isLinux) await trayManager.setToolTip(tooltip);
   }
 
   static void setIcon(ConnectionStatus status) {
@@ -172,5 +175,15 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with AppLogger {
       case Disconnected():
         return Assets.images.trayIconPng.path;
     }
+  }
+
+  @override
+  void onTrayIconMouseDown() {
+    ref.read(windowProvider.notifier).open();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() {
+    trayManager.popUpContextMenu();
   }
 }

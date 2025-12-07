@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gap/gap.dart';
 
 const _space = 18.0;
 const _textStyle = TextStyle(fontSize: 16);
@@ -13,7 +14,7 @@ const _expandIconWidth = 10.0;
 const _rowHeight = 30.0;
 const _popupMenuHeight = 30.0;
 const _popupMenuItemPadding = 20.0;
-const _textSpacer = SizedBox(width: 5);
+const _textSpacer = Gap(5);
 const _newKey = "new_key_added";
 const _downArrow = SizedBox(
   width: _expandIconWidth,
@@ -37,16 +38,6 @@ enum _SearchActions { next, prev }
 enum Editors { tree, text }
 
 const Map<String, Map<String, dynamic>> protocolSchemaValues = {
-  "xray": {
-    "type": "xray",
-    "tag": "xray-out",
-    "xray_outbound_raw": {},
-    "xray_fragment": {
-      "packets": "tlshello",
-      "interval": "1-10",
-      "length": "1-10",
-    },
-  },
   "warp": {
     "type": "custom",
     "key": "",
@@ -349,7 +340,6 @@ const Map<String, List<String>> possibleValues = {
     "vless",
     "vmess",
     "trojan",
-    "xray",
     "shadowsocks",
     "wireguard",
     "hysteria",

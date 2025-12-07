@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +59,20 @@ class AddProfile extends _$AddProfile with AppLogger {
       } else if (LinkParser.protocol(rawInput) case (final parsed)?) {
         loggy.debug("adding profile, content");
         var name = parsed.name;
+        var content = parsed.content;
+
+        // If content is not JSON (config file) and seems to be a list of links,
+        // Base64 encode it so it's treated as a valid subscription by the core.
+        if (!content.trim().startsWith('{')) {
+          try {
+            // Check if it's already base64
+            base64Decode(content);
+          } catch (_) {
+            // Not base64, so encode it
+            content = base64Encode(utf8.encode(content));
+          }
+        }
+
         final oldItem = await _profilesRepo.getByName(name);
         if (name == "Hiddify WARP" && oldItem != null) {
           _profilesRepo.deleteById(oldItem.id).run();
@@ -69,7 +84,7 @@ class AddProfile extends _$AddProfile with AppLogger {
         }
         name = candidate;
         task = _profilesRepo.addByContent(
-          parsed.content,
+          content,
           name: name,
           markAsActive: markAsActive,
         );

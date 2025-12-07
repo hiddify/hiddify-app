@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
@@ -36,7 +37,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
                 setState(() {});
               },
             ),
-            const SizedBox(width: 16),
+            const Gap(16),
             Text(t.window.remember, style: const TextStyle(fontSize: 16)),
           ],
         ),

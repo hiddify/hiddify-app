@@ -18,36 +18,19 @@ class LocalePrefTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final AppLocale locale = ref.watch(localePreferencesProvider);
+    final locale = ref.watch(localePreferencesProvider);
 
     return ListTile(
       title: Text(t.settings.general.locale),
       subtitle: Text(locale.localeName),
       leading: const Icon(FluentIcons.local_language_24_regular),
       onTap: () async {
-        final selectedLocale = await showDialog<AppLocale>(
+        final selectedLocale = await _showSelectionDialog(
           context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: Text(t.settings.general.locale),
-              children: [
-                RadioGroup<AppLocale>(
-                  groupValue: locale,
-                  onChanged: Navigator.of(context).maybePop,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (final e in AppLocale.values)
-                        RadioListTile<AppLocale>(
-                          value: e,
-                          title: Text(e.localeName),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+          title: t.settings.general.locale,
+          groupValue: locale,
+          values: AppLocale.values,
+          titleBuilder: (e) => e.localeName,
         );
         if (selectedLocale != null) {
           await ref
@@ -65,51 +48,23 @@ class RegionPrefTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final Region region = ref.watch(ConfigOptions.region);
+    final region = ref.watch(ConfigOptions.region);
 
     return ListTile(
       title: Text(t.settings.general.region),
       subtitle: Text(region.present(t)),
       leading: const Icon(FluentIcons.globe_location_24_regular),
       onTap: () async {
-        final selectedRegion = await showDialog<Region>(
+        final selectedRegion = await _showSelectionDialog(
           context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: Text(t.settings.general.region),
-              children: [
-                RadioGroup<Region>(
-                  groupValue: region,
-                  onChanged: Navigator.of(context).maybePop,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (final e in Region.values)
-                        RadioListTile<Region>(
-                          value: e,
-                          title: Text(e.present(t)),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+          title: t.settings.general.region,
+          groupValue: region,
+          values: Region.values,
+          titleBuilder: (e) => e.present(t),
         );
         if (selectedRegion != null) {
-          // await ref.read(Preferences.region.notifier).update(selectedRegion);
-
           await ref.read(ConfigOptions.region.notifier).update(selectedRegion);
-
           await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
-
-          // await ref.read(configOptionNotifierProvider.notifier).build();
-          // await ref.watch(ConfigOptions.resolveDestination.notifier).update(!ref.watch(ConfigOptions.resolveDestination.notifier).raw());
-          //for reload config
-          // final tmp = ref.watch(ConfigOptions.resolveDestination.notifier).raw();
-          // await ref.watch(ConfigOptions.resolveDestination.notifier).update(!tmp);
-          // await ref.watch(ConfigOptions.resolveDestination.notifier).update(tmp);
-          //TODO: fix it
         }
       },
     );
@@ -136,7 +91,8 @@ class EnableAnalyticsPrefTile extends ConsumerWidget {
       value: enabled,
       onChanged: (value) async {
         if (onChanged != null) {
-          return onChanged!(value);
+          onChanged!(value);
+          return;
         }
         if (enabled) {
           await ref
@@ -165,29 +121,12 @@ class ThemeModePrefTile extends ConsumerWidget {
       subtitle: Text(themeMode.present(t)),
       leading: const Icon(FluentIcons.weather_moon_20_regular),
       onTap: () async {
-        final selectedThemeMode = await showDialog<AppThemeMode>(
+        final selectedThemeMode = await _showSelectionDialog(
           context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: Text(t.settings.general.themeMode),
-              children: [
-                RadioGroup<AppThemeMode>(
-                  groupValue: themeMode,
-                  onChanged: Navigator.of(context).maybePop,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (final e in AppThemeMode.values)
-                        RadioListTile<AppThemeMode>(
-                          value: e,
-                          title: Text(e.present(t)),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+          title: t.settings.general.themeMode,
+          groupValue: themeMode,
+          values: AppThemeMode.values,
+          titleBuilder: (e) => e.present(t),
         );
         if (selectedThemeMode != null) {
           await ref
@@ -205,36 +144,19 @@ class ClosingPrefTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
-    final ActionsAtClosing action = ref.watch(Preferences.actionAtClose);
+    final action = ref.watch(Preferences.actionAtClose);
 
     return ListTile(
       title: Text(t.settings.general.actionAtClosing),
       subtitle: Text(action.present(t)),
       leading: const Icon(FluentIcons.arrow_exit_20_regular),
       onTap: () async {
-        final selectedAction = await showDialog<ActionsAtClosing>(
+        final selectedAction = await _showSelectionDialog(
           context: context,
-          builder: (context) {
-            return SimpleDialog(
-              title: Text(t.settings.general.actionAtClosing),
-              children: [
-                RadioGroup<ActionsAtClosing>(
-                  groupValue: action,
-                  onChanged: Navigator.of(context).maybePop,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (final e in ActionsAtClosing.values)
-                        RadioListTile<ActionsAtClosing>(
-                          value: e,
-                          title: Text(e.present(t)),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+          title: t.settings.general.actionAtClosing,
+          groupValue: action,
+          values: ActionsAtClosing.values,
+          titleBuilder: (e) => e.present(t),
         );
         if (selectedAction != null) {
           await ref
@@ -244,4 +166,31 @@ class ClosingPrefTile extends ConsumerWidget {
       },
     );
   }
+}
+
+Future<T?> _showSelectionDialog<T>({
+  required BuildContext context,
+  required String title,
+  required T groupValue,
+  required List<T> values,
+  required String Function(T) titleBuilder,
+}) async {
+  return showDialog<T>(
+    context: context,
+    builder: (context) {
+      return SimpleDialog(
+        title: Text(title),
+        children: values
+            .map(
+              (value) => RadioListTile<T>(
+                value: value,
+                groupValue: groupValue,
+                title: Text(titleBuilder(value)),
+                onChanged: (v) => Navigator.of(context).pop(v),
+              ),
+            )
+            .toList(),
+      );
+    },
+  );
 }
