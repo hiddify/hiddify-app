@@ -1,7 +1,7 @@
 name: hiddify
 description: Cross Platform Multi Protocol Proxy Frontend.
 publish_to: "none"
-version: 2.5.7+20507
+version: 3.0.0-preview.1
 
 homepage: https://github.com/hiddify/hiddify-app
 repository: https://github.com/hiddify/hiddify-app
@@ -44,6 +44,7 @@ dependencies:
 
   # UI Components
   cupertino_icons: ^1.0.6
+  google_fonts: ^6.2.1
   fluentui_system_icons: ^1.1.273
   flutter_svg: ^2.2.2
   vector_graphics: ^1.1.19
@@ -58,6 +59,7 @@ dependencies:
   permission_handler: ^12.0.1
   share_plus: ^12.0.1
   in_app_review: ^2.0.11
+  flutter_background_service: ^5.0.0
 
   # Desktop Specific
   window_manager: ^0.5.1
@@ -85,10 +87,18 @@ dependencies:
   # App Features
   upgrader: ^12.3.0
   flutter_native_splash: ^2.4.7
+  toastification: ^2.3.0
   accessibility_tools: ^2.7.1
   
   # Native Interop
   ffi: ^2.1.4
+
+  # QR & Image
+  mobile_scanner: ^6.0.4
+  image_picker: ^1.1.2
+  wolt_modal_sheet: ^0.11.0
+  flutter_animate: ^4.5.2
+  archive: ^4.0.7
 
 dev_dependencies:
   flutter_test:

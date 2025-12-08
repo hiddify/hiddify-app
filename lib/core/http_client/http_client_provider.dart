@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'http_client_provider.g.dart';
@@ -14,7 +14,7 @@ DioHttpClient httpClient(Ref ref) {
     debug: kDebugMode,
   );
 
-  ref.listen<int>(ConfigOptions.mixedPort, (_, int next) {
+  ref.listen<int>(Preferences.mixedPort, (_, int next) {
     client.setProxyPort(next);
   }, fireImmediately: true);
   return client;

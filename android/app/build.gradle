@@ -39,15 +39,14 @@ android {
     testNamespace "test.com.hiddify.hiddify"
     compileSdk 36
     ndkVersion "27.0.12077973"
-    buildToolsVersion "36.0.0"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_25
-        targetCompatibility JavaVersion.VERSION_25
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = '25'
+        jvmTarget = '21'
     }
 
     sourceSets {

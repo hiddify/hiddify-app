@@ -40,8 +40,9 @@ class AppTheme {
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
     final ColorScheme scheme = darkColorScheme ??
         ColorScheme.fromSeed(
-          seedColor: AppColors.brandColor,
+          seedColor: mode.trueBlack ? Colors.white : AppColors.brandColor, // Monochrome if black mode
           brightness: Brightness.dark,
+          dynamicSchemeVariant: mode.trueBlack ? DynamicSchemeVariant.monochrome : DynamicSchemeVariant.tonalSpot,
         );
         
     // Adjust logic for True Black mode if enabled

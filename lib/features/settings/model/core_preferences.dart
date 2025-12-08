@@ -31,4 +31,24 @@ abstract class CorePreferences {
     "core_asset_path",
     "",
   );
+
+  static final coreMode = PreferencesNotifier.create<String, String>(
+    "core_mode",
+    "proxy", // vpn, proxy
+  );
+
+  static final routingRule = PreferencesNotifier.create<String, String>(
+    "routing_rule",
+    "global", // global, geo_iran, bypass_lan
+  );
+
+  static final enableLogging = PreferencesNotifier.create<bool, bool>(
+    "enable_logging",
+    false,
+  );
+
+  static final logLevel = PreferencesNotifier.create<String, String>(
+    "log_level",
+    "warning", // none, error, warning, info, debug
+  );
 }

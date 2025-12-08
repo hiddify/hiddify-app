@@ -1,141 +1,182 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:hiddify/features/settings/model/core_preferences.dart';
-import 'package:hiddify/features/settings/widget/settings_page.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hiddify/core/service/core_service.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:hiddify/features/settings/widget/settings_page.dart';
+import '../../connection/logic/connection_notifier.dart';
+import '../../config/data/config_repository.dart';
+import '../../config/widget/add_config_sheet.dart';
+
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final connectionState = ref.watch(connectionProvider);
+    final configsAsync = ref.watch(configRepositoryProvider);
+    
+    // We need real-time updates of configs list, but ConfigRepository is FutureProvider initially?
+    // It should be a Stream or we should force refresh. 
+    // Ideally ConfigRepository provides a Stream<List<Config>> or we use a StateNotifier for config list.
+    // For now, let's assume we can re-read it or improvements later.
+    // Actually, create a configListProvider?
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hiddify Core'),
+        title: const Text('Hiddify v3 Preview'),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-               Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
-            },
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsPage())),
           )
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Hiddify Core Integration'),
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              icon: const Icon(Icons.play_arrow),
-              label: const Text('Start Xray'),
-              onPressed: () async {
-                try {
-                  final service = CoreService();
-                  
-                  // Load preferences
-                  final configContent = ref.read(CorePreferences.configContent);
-                  final assetPath = ref.read(CorePreferences.assetPath);
-
-                  // Setup environment variables for assets if needed
-                  if (assetPath.isNotEmpty) {
-                    // Dart's Platform.environment is read-only. We set it in Go via os.Setenv technically,
-                    // but since we are calling Go, we should pass it or Go should default.
-                    // For now, let's assume assets are in place or config handles absolute paths.
-                    // Mobile wrapper typically sets XRAY_LOCATION_ASSET in Go `init()` or pass it.
-                    // But our Start() only takes one string.
-                    // We will rely on simple config for now.
-                  }
-
-                  // config map to json string? No, configContent IS json string.
-                  final config = configContent;
-                  
-                  print("Starting Xray Core...");
-                  final error = service.start({'config_is_string': true}); // The service expects map?
-                  // Wait, CoreService.start logic:
-                  // final jsonStr = jsonEncode(config);
-                  // It encodes the map to json.
-                  // But Xray expects the "config file content" (JSON).
-                  
-                  // If we pass a Map, jsonEncode will produce JSON string.
-                  // If we pass a String (configContent), jsonEncode will produce escaped string "{\"log...\"}".
-                  // That is NOT what we want.
-                  
-                  // We need to update CoreService to accept String directly or handle Map -> String correctly.
-                  // Xray Bridge expects `configStr` which IS the JSON config.
-                  
-                  // Let's modify CoreService to accept String? 
-                  // Or we cheat: pass Map, but maybe we can't easily map the unstructured JSON text to Map without decoding first.
-                  
-                  // Better: Decode the user's JSON string to Map, then pass it to service.start, which re-encodes it.
-                  // This validates JSON too.
-                  
-                  import 'dart:convert';
-                  
-                  Map<String, dynamic> configMap;
-                  try {
-                    configMap = jsonDecode(configContent);
-                  } catch (e) {
-                      if(context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Invalid JSON: $e'), backgroundColor: Colors.red),
+      body: Stack(
+        children: [
+          // Background?
+          
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Config Selector
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: FutureBuilder<ConfigRepository>(
+                  future: ref.read(configRepositoryProvider.future),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) return const SizedBox();
+                    final repo = snapshot.data!;
+                    final configs = repo.getConfigs();
+                    
+                    if (configs.isEmpty) {
+                      return const Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text('No configs added. Add one to connect.'),
+                        ),
                       );
                     }
-                    return;
+                    
+                    // Simple selector for now, ideally a modal or dropdown
+                    // Just showing first or selected.
+                    // Need a provider for "Selected Config".
+                    // Let's pick the first one temporarily or manage selection in Notifier.
+                    final currentConfig = configs.first; 
+                    
+                    return Card(
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      child: ListTile(
+                        leading: const Icon(Icons.shield),
+                        title: Text(currentConfig.name),
+                        subtitle: Text('${currentConfig.type} - ${currentConfig.ping}ms'),
+                        trailing: const Icon(Icons.arrow_drop_down),
+                        onTap: () {
+                          // TODO: Show config selector sheet
+                        },
+                      ),
+                    );
                   }
-
-                  final errorResult = service.start(configMap);
-                  
-                  if (errorResult != null) {
-                    print("Error starting core: $errorResult");
-                    if(context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $errorResult'), backgroundColor: Colors.red),
-                      );
-                    }
-                  } else {
-                    print("Core started successfully!");
-                     if(context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Core started successfully!'), backgroundColor: Colors.green),
-                      );
-                    }
-                  }
-                } catch (e) {
-                  print("Exception: $e");
-                   if(context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Exception: $e')),
-                      );
-                   }
-                }
-              },
-            ),
-            const SizedBox(height: 10),
-             FilledButton.icon(
-              icon: const Icon(Icons.stop),
-              label: const Text('Stop Core'),
-              onPressed: () {
-                 try {
-                  final service = CoreService();
-                  service.stop();
-                   if(context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Core stopped')),
-                      );
-                   }
-                 } catch(e) {
-                    print("Exception stopping: $e");
-                 }
-              },
-               style: FilledButton.styleFrom(backgroundColor: Colors.red),
-             )
-          ],
-        ),
+                ),
+              ),
+              
+              const Spacer(),
+              
+              // Big Connect Button
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    // Get selected config
+                     ref.read(configRepositoryProvider.future).then((repo) {
+                       final configs = repo.getConfigs();
+                       if (configs.isNotEmpty) {
+                         // Decide action based on state
+                         final notifier = ref.read(connectionProvider.notifier);
+                         if (connectionState == ConnectionStatus.disconnected || connectionState == ConnectionStatus.error) {
+                           notifier.connect(configs.first); // Connect to first for now
+                         } else if (connectionState == ConnectionStatus.connected || connectionState == ConnectionStatus.connecting) {
+                           notifier.disconnect();
+                         }
+                       } else {
+                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please add a config first')));
+                       }
+                     });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _getButtonColor(connectionState),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _getButtonColor(connectionState).withValues(alpha: 0.4),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        )
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.power_settings_new, 
+                          size: 80, 
+                          color: Colors.white
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _getStatusText(connectionState),
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              
+              const Spacer(),
+              
+              // Add Config Bar
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: FloatingActionButton.extended(
+                  onPressed: () {
+                     showModalBottomSheet(
+                       context: context, 
+                       isScrollControlled: true,
+                       builder: (_) => const AddConfigSheet()
+                     );
+                  }, 
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Config'),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  Color _getButtonColor(ConnectionStatus status) {
+    switch (status) {
+      case ConnectionStatus.connected: return Colors.green;
+      case ConnectionStatus.connecting: return Colors.orange;
+      case ConnectionStatus.error: return Colors.red;
+      case ConnectionStatus.disconnected: return Colors.grey;
+    }
+  }
+
+  String _getStatusText(ConnectionStatus status) {
+    switch (status) {
+      case ConnectionStatus.connected: return 'CONNECTED';
+      case ConnectionStatus.connecting: return 'CONNECTING...';
+      case ConnectionStatus.error: return 'ERROR';
+      case ConnectionStatus.disconnected: return 'TAP TO CONNECT';
+    }
   }
 }

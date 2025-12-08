@@ -15,9 +15,9 @@ class LocalePreferences extends _$LocalePreferences with AppLogger {
         .getString("locale");
     if (persisted == null) return AppLocaleUtils.findDeviceLocale();
     // keep backward compatibility with chinese after changing zh to zh_CN
-    if (persisted == "zh") {
-      return AppLocale.zhCn;
-    }
+    // if (persisted == "zh") {
+    //   return AppLocale.zhCn;
+    // }
     try {
       return AppLocale.values.byName(persisted);
     } catch (e) {

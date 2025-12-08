@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
+  file_selector_linux
   screen_retriever_linux
   sentry_flutter
   tray_manager

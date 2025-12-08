@@ -39,7 +39,7 @@ Future<void> lazyBootstrap(
   );
   
   final dirs = container.read(appDirectoriesProvider).requireValue;
-  LoggerController.init(File("${dirs.appSupportDir.path}/app.log").path);
+  LoggerController.init(File("${dirs.baseDir.path}/app.log").path);
 
   final appInfo = await _init(
     "app info",

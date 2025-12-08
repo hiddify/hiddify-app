@@ -67,6 +67,11 @@ abstract class Preferences {
     false,
   );
 
+  static final mixedPort = PreferencesNotifier.create<int, int>(
+    "mixed_port",
+    2334,
+  );
+
   static final actionAtClose =
       PreferencesNotifier.create<ActionsAtClosing, String>(
         "action_at_close",
