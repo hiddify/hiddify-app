@@ -81,21 +81,4 @@ targets:
           param_case: camel
           string_interpolation: dart
       flutter_gen_runner:
-        enabled: false
-        options:
-          output: lib/gen/
-          line_length: 120
-          assets:
-            enabled: true
-            package_parameter_enabled: false
-            style: snake-case
-            exclude:
-              - "**/.*"
-          fonts:
-            enabled: true
-          colors:
-            enabled: false
-          integrations:
-            flutter_svg: true
-            rive: false
-            lottie: false
+        enabled: true

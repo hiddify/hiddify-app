@@ -103,10 +103,10 @@ flutter:
     - family: Emoji
       fonts:
         - asset: assets/fonts/Emoji.ttf
-# flutter_gen:
-#   output: lib/gen/
-#   # integrations:
-#   #   flutter_svg: true
+flutter_gen:
+  output: lib/gen/
+  integrations:
+    flutter_svg: true
 flutter_native_splash:
   color: "#ffffff"
   image: assets/images/source/ic_launcher_splash.png
