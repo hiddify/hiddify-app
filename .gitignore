@@ -78,3 +78,7 @@ app.*.map.json
 /assets/core/
 
 /data
+
+# Local Makefile overrides
+Makefile.local
+.env.mk

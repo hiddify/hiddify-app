@@ -1,25 +1,17 @@
 import 'package:flutter/material.dart';
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hiddify/features/settings/widget/settings_page.dart';
 import '../../connection/logic/connection_notifier.dart';
-import '../../config/data/config_repository.dart';
+import '../../config/controller/config_controller.dart';
 import '../../config/widget/add_config_sheet.dart';
-
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final connectionState = ref.watch(connectionProvider);
-    final configsAsync = ref.watch(configRepositoryProvider);
-    
-    // We need real-time updates of configs list, but ConfigRepository is FutureProvider initially?
-    // It should be a Stream or we should force refresh. 
-    // Ideally ConfigRepository provides a Stream<List<Config>> or we use a StateNotifier for config list.
-    // For now, let's assume we can re-read it or improvements later.
-    // Actually, create a configListProvider?
+    final connectionState = ref.watch(connectionNotifierProvider);
+    final configsAsync = ref.watch(configControllerProvider);
     
     return Scaffold(
       appBar: AppBar(
@@ -34,21 +26,14 @@ class HomePage extends HookConsumerWidget {
       ),
       body: Stack(
         children: [
-          // Background?
-          
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Config Selector
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: FutureBuilder<ConfigRepository>(
-                  future: ref.read(configRepositoryProvider.future),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) return const SizedBox();
-                    final repo = snapshot.data!;
-                    final configs = repo.getConfigs();
-                    
+                child: configsAsync.when(
+                  data: (configs) {
                     if (configs.isEmpty) {
                       return const Card(
                         child: Padding(
@@ -58,10 +43,6 @@ class HomePage extends HookConsumerWidget {
                       );
                     }
                     
-                    // Simple selector for now, ideally a modal or dropdown
-                    // Just showing first or selected.
-                    // Need a provider for "Selected Config".
-                    // Let's pick the first one temporarily or manage selection in Notifier.
                     final currentConfig = configs.first; 
                     
                     return Card(
@@ -73,11 +54,13 @@ class HomePage extends HookConsumerWidget {
                         subtitle: Text('${currentConfig.type} - ${currentConfig.ping}ms'),
                         trailing: const Icon(Icons.arrow_drop_down),
                         onTap: () {
-                          // TODO: Show config selector sheet
+                          // TODO: Show config selector
                         },
                       ),
                     );
-                  }
+                  },
+                  loading: () => const LinearProgressIndicator(),
+                  error: (e, _) => Text('Error loading configs: $e'),
                 ),
               ),
               
@@ -87,21 +70,17 @@ class HomePage extends HookConsumerWidget {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    // Get selected config
-                     ref.read(configRepositoryProvider.future).then((repo) {
-                       final configs = repo.getConfigs();
-                       if (configs.isNotEmpty) {
-                         // Decide action based on state
-                         final notifier = ref.read(connectionProvider.notifier);
-                         if (connectionState == ConnectionStatus.disconnected || connectionState == ConnectionStatus.error) {
-                           notifier.connect(configs.first); // Connect to first for now
-                         } else if (connectionState == ConnectionStatus.connected || connectionState == ConnectionStatus.connecting) {
-                           notifier.disconnect();
-                         }
-                       } else {
-                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please add a config first')));
+                     final configs = configsAsync.valueOrNull;
+                     if (configs != null && configs.isNotEmpty) {
+                       final notifier = ref.read(connectionNotifierProvider.notifier);
+                       if (connectionState == ConnectionStatus.disconnected || connectionState == ConnectionStatus.error) {
+                         notifier.connect(configs.first);
+                       } else if (connectionState == ConnectionStatus.connected || connectionState == ConnectionStatus.connecting) {
+                         notifier.disconnect();
                        }
-                     });
+                     } else {
+                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please add a config first')));
+                     }
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),

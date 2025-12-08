@@ -8,113 +8,114 @@ repository: https://github.com/hiddify/hiddify-app
 issue_tracker: https://github.com/hiddify/hiddify-app/issues
 
 environment:
-  sdk: ">=3.9.0 <4.0.0"
-  flutter: ">=3.35.0 <4.0.0"
+
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.24.0 <4.0.0"
 
 dependencies:
-  # Core Framework
+  # --- Core Framework ---
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
 
-  # State Management
+
   flutter_riverpod: ^3.0.3
   hooks_riverpod: ^3.0.3
   riverpod: ^3.0.3
   riverpod_annotation: ^3.0.3
   flutter_hooks: ^0.21.3+1
 
-  # Navigation
-  go_router: ^17.0.0
+  # --- Navigation ---
+  go_router: ^17.0.0 # آخرین نسخه پایدار فعلی
 
-  # Networking
-  dio: ^5.9.0
+  # --- Networking ---
+  dio: ^5.7.0
   dio_smart_retry: ^7.0.1
 
-  # Data & Serialization
+  # --- Data & Serialization ---
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
   json_path: ^0.8.0
 
-  # Localization
-  slang: ^4.10.0
-  slang_flutter: ^4.10.0
-  intl: ^0.20.2
+  # --- Localization ---
+  slang: ^4.4.0
+  slang_flutter: ^4.4.0
+  intl: ^0.20.0
 
-  # UI Components
-  cupertino_icons: ^1.0.6
+  # --- UI Components ---
+  cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
-  fluentui_system_icons: ^1.1.273
-  flutter_svg: ^2.2.2
-  vector_graphics: ^1.1.19
+  fluentui_system_icons: ^1.1.225
+  flutter_svg: ^2.0.10
+  vector_graphics: ^1.1.11
   gap: ^3.0.1
-  dynamic_color: ^1.8.1
+  dynamic_color: ^1.7.0
+  flutter_animate: ^4.5.0
+  wolt_modal_sheet: ^0.11.0
+  toastification: ^3.0.3
 
-  # Platform & System
-  path_provider: ^2.1.5
-  shared_preferences: ^2.5.3
-  url_launcher: ^6.3.2
+  # --- Platform & System ---
+  path_provider: ^2.1.4
+  shared_preferences: ^2.3.2
+  url_launcher: ^6.3.0
   package_info_plus: ^9.0.0
   permission_handler: ^12.0.1
   share_plus: ^12.0.1
-  in_app_review: ^2.0.11
+  in_app_review: ^2.0.9
   flutter_background_service: ^5.0.0
-
-  # Desktop Specific
+  
+  # --- Desktop Specific ---
   window_manager: ^0.5.1
   tray_manager: ^0.5.2
   launch_at_startup: ^0.5.1
-  win32: ^5.15.0
+  win32: ^5.5.4
 
-  # Android Specific
+  # --- Android Specific ---
   flutter_displaymode: ^0.7.0
 
-  # Utilities
+  # --- Utilities ---
   dartx: ^1.2.0
-  fpdart: ^1.2.0
+  fpdart: ^1.1.0
   rxdart: ^0.28.0
-  uuid: ^4.5.2
-  path: ^1.9.1
+  uuid: ^4.5.1
+  path: ^1.9.0
   version: ^3.0.2
+  archive: ^4.0.7 # نسخه ۴ معمولا تغییرات breaking دارد، چک کنید
   
-  # Logging & Crash Reporting
+  # --- Logging & Crash Reporting ---
   loggy: ^2.0.3
-  flutter_loggy: ^2.0.3+1
-  flutter_loggy_dio: ^3.1.0
+  flutter_loggy: ^2.0.3
   sentry_flutter: ^9.8.0
 
-  # App Features
+  # --- App Features ---
   upgrader: ^12.3.0
-  flutter_native_splash: ^2.4.7
-  toastification: ^2.3.0
-  accessibility_tools: ^2.7.1
+  flutter_native_splash: ^2.4.1
+  accessibility_tools: ^2.8.0 # آپدیت شده به آخرین نسخه
   
-  # Native Interop
-  ffi: ^2.1.4
+  # --- Native Interop ---
+  ffi: ^2.1.2
 
-  # QR & Image
-  mobile_scanner: ^6.0.4
+  # --- QR & Image ---
+  mobile_scanner: ^7.1.3 
   image_picker: ^1.1.2
-  wolt_modal_sheet: ^0.11.0
-  flutter_animate: ^4.5.2
-  archive: ^4.0.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  build_runner: ^2.4.0
+  build_runner: ^2.4.13 
   freezed: ^3.2.3
-  json_serializable: ^6.11.1
+  json_serializable: ^6.9.0
   riverpod_generator: ^3.0.3
-  go_router_builder: ^4.1.1
-  slang_build_runner: ^4.10.0
-  flutter_gen_runner: ^5.12.0
-  ffigen: ^20.0.0
+  go_router_builder: ^4.1.3 
+  slang_build_runner: ^4.4.0
+  flutter_gen_runner: ^5.8.0
+  ffigen: ^20.1.1 
   
-  lint: ^2.8.0
-  custom_lint: ^0.8.0
+  # --- Linting & Analysis ---
+  lint: ^2.3.0
+  custom_lint: ^0.8.1
   riverpod_lint: ^3.0.3
   sentry_dart_plugin: ^3.2.0
 

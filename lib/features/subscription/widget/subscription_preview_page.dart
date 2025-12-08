@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import '../../config/model/config.dart';
-import '../../config/data/config_repository.dart';
+import '../../config/controller/config_controller.dart';
 import '../service/subscription_service.dart';
 import '../model/subscription.dart';
-import 'package:uuid/uuid.dart';
 
 class SubscriptionPreviewPage extends HookConsumerWidget {
   final String url;
@@ -108,7 +108,6 @@ class _SubscriptionPreviewBodyState extends ConsumerState<_SubscriptionPreviewBo
             width: double.infinity,
             child: FilledButton(
               onPressed: () async {
-                // Save Subscription
                 final sub = Subscription(
                   id: const Uuid().v4(),
                   name: 'Imported Subscription',
@@ -117,18 +116,12 @@ class _SubscriptionPreviewBodyState extends ConsumerState<_SubscriptionPreviewBo
                   configs: _selectedConfigs,
                 );
                 
-                // Save configs individually too? Or just as part of sub?
-                // Request says "manage configs... add to config section"
-                // Usually we save configs to ConfigRepo
-                
-                final repo = ref.read(configRepositoryProvider).value;
-                if (repo != null) {
-                  for (final c in _selectedConfigs) {
-                    await repo.addConfig(c);
-                  }
+                final controller = ref.read(configControllerProvider.notifier);
+                for (final c in _selectedConfigs) {
+                  await controller.add(c);
                 }
                 
-                // TODO: Save subscription object itself to SubscriptionRepo
+                // TODO: Save subscription object
                 
                 if (context.mounted) {
                   Navigator.pop(context);

@@ -1,11 +1,11 @@
 [versions]
-agp = "8.8.0"
-kotlin = "2.1.0"
-coreKtx = "1.15.0"
+agp = "8.13.1"
+kotlin = "2.3.0-RC2"
+coreKtx = "1.17.0"
 appcompat = "1.7.1"
-lifecycle = "2.9.0"
+lifecycle = "2.10.0"
 gson = "2.13.2"
-flutter = "1.0.0"
+flutter = "3.38.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

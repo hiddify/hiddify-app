@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../config/data/config_repository.dart';
+import 'package:flutter/services.dart';
+import '../../config/controller/config_controller.dart';
 import '../../config/logic/config_parser.dart';
 import '../../subscription/widget/subscription_preview_page.dart';
 
@@ -64,13 +64,6 @@ class AddConfigSheet extends HookConsumerWidget {
               }
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: const Text('Manual Entry'),
-            onTap: () {
-               // Show dialog
-            },
-          ),
         ],
       ),
     );
@@ -86,7 +79,7 @@ class AddConfigSheet extends HookConsumerWidget {
 
     final config = ConfigParser.parse(content, source: source);
     if (config != null) {
-      ref.read(configRepositoryProvider).value?.addConfig(config);
+      ref.read(configControllerProvider.notifier).add(config);
       Navigator.pop(context);
        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Config added!')));
     } else {

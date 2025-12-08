@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:hiddify/features/settings/model/core_preferences.dart';
-
-import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:hiddify/features/settings/model/core_preferences.dart';
 import '../../system/data/system_optimization_service.dart';
 import '../../../core/logger/log_viewer_page.dart';
 

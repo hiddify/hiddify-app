@@ -1,46 +1,380 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+#               HIDDIFY OPTIMIZED - SOTA Analysis Configuration
+# ═══════════════════════════════════════════════════════════════════════════════
+# State-of-the-Art linting & analysis rules for Flutter/Dart 3.x
+# Last Updated: 2024-12 | Flutter 3.24+ | Dart 3.5+
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Package: lint v2.3.0 (strict mode - production recommended)
+# Superior to flutter_lints for production apps
 include: package:lint/strict.yaml
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#                              ANALYZER CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
 analyzer:
+  # ─────────────────────────── Language Settings ───────────────────────────────
+  language:
+    strict-casts: true          # Disallow implicit casts from dynamic
+    strict-inference: true       # Better type inference checking
+    strict-raw-types: true       # Disallow raw generic types
+
+  # ─────────────────────────── Custom Plugins ──────────────────────────────────
   plugins:
     - custom_lint
+
+  # ─────────────────────────── Exclusions ──────────────────────────────────────
+  # Generated code and external sources should be excluded
   exclude:
+    # Core binaries & external code
     - "libcore/**"
+    - "windows/flutter/**"
+    - "linux/flutter/**"
+    - "macos/Flutter/**"
+    - "ios/Pods/**"
+    - "android/.gradle/**"
+
+    # Generated files
     - "lib/gen/**"
     - "lib/singbox/generated/**"
     - "lib/singbox/model/*.g.dart"
-    - "lib/**/*.mapper.dart"
+
+    # Code generation output patterns
     - "**/*.g.dart"
     - "**/*.freezed.dart"
-  errors:
-    invalid_annotation_target: ignore
+    - "**/*.gr.dart"
+    - "**/*.mapper.dart"
+    - "**/*.gen.dart"
+    - "**/*.config.dart"
 
+    # Build artifacts
+    - ".dart_tool/**"
+    - "build/**"
+    - ".fvm/**"
+
+  # ─────────────────────────── Error Severity Configuration ────────────────────
+  errors:
+    # ════════ CRITICAL - Must be treated as errors ════════
+    dead_code: error
+    unused_import: error
+    unused_local_variable: warning
+    deprecated_member_use: warning
+    deprecated_member_use_from_same_package: warning
+    
+    # ════════ Type Safety ════════
+    invalid_assignment: error
+    invalid_null_aware_operator: error
+    unnecessary_type_check: warning
+    inference_failure_on_function_invocation: info
+    inference_failure_on_instance_creation: info
+    strict_raw_type: warning
+    
+    # ════════ Async/Concurrency Safety ════════
+    unawaited_futures: error       # SOTA: Must await or explicitly ignore
+    discarded_futures: warning
+    
+    # ════════ Resource Management ════════
+    close_sinks: warning
+    cancel_subscriptions: warning
+    
+    # ════════ Ignored/Disabled for Generated Code ════════
+    invalid_annotation_target: ignore
+    depend_on_referenced_packages: ignore  # Build runner dependencies
+    
+    # ════════ Code Documentation ════════
+    missing_required_param: error
+    missing_return: error
+    must_call_super: error
+    
+    # ════════ Null Safety ════════
+    invalid_use_of_protected_member: error
+    unnecessary_null_comparison: warning
+    null_check_on_nullable_type_parameter: warning
+    
+    # ════════ Performance ════════
+    avoid_function_literals_in_foreach_calls: info
+    avoid_unnecessary_containers: info
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#                                 LINTER RULES
+# ═══════════════════════════════════════════════════════════════════════════════
 linter:
   rules:
-    # Disabled rules (project-specific exceptions)
-    avoid_classes_with_only_static_members: false
-    sort_unnamed_constructors_first: false
-    sort_pub_dependencies: false
-    
-    # Enabled rules for better code quality
-    always_declare_return_types: true
-    cancel_subscriptions: true
-    close_sinks: true
-    combinators_ordering: true
-    directives_ordering: true
-    eol_at_end_of_file: true
-    lines_longer_than_80_chars: false
-    noop_primitive_operations: true
-    prefer_final_in_for_each: true
-    prefer_final_locals: true
-    unawaited_futures: false
-    unnecessary_breaks: true
-    unnecessary_null_checks: true
-    unnecessary_parenthesis: true
-    use_colored_box: true
-    use_decorated_box: true
-    use_enums: true
-    use_super_parameters: true
+    # ════════════════════════════════════════════════════════════════════════════
+    #                           DISABLED RULES
+    # ════════════════════════════════════════════════════════════════════════════
+    # Project-specific exceptions with documented reasons
 
+    # Allow utility classes with only static members
+    avoid_classes_with_only_static_members: false  # Utils, Constants, Helpers
+
+    # Constructor ordering is flexible for this project
+    sort_unnamed_constructors_first: false  # Freezed/builder patterns
+
+    # Pub dependency order is managed by pubspec organization
+    sort_pub_dependencies: false  # Organized by category, not alphabetically
+
+    # Allow longer lines for URLs and documentation
+    lines_longer_than_80_chars: false  # 120 char modern standard
+
+    # Flexible for stream-heavy code
+    avoid_types_on_closure_parameters: false  # Type safety in closures
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #                    ENABLED RULES - CORE QUALITY
+    # ════════════════════════════════════════════════════════════════════════════
+    
+    # ──────────────── Type Safety & Null Safety ────────────────────────────────
+    always_declare_return_types: true           # Explicit return types
+    avoid_dynamic_calls: true                    # No dynamic dispatch
+    avoid_returning_null_for_void: true         # Null safety compliance
+    avoid_void_async: true                       # Proper async patterns
+    cast_nullable_to_non_nullable: true         # Safe nullable casts
+    null_check_on_nullable_type_parameter: true # Generic null safety
+    null_closures: true                         # No null function arguments
+    prefer_null_aware_method_calls: true        # Modern null handling
+    unnecessary_null_checks: true               # Remove redundant checks
+    unnecessary_nullable_for_final_variable_declarations: true
+
+    # ──────────────── Resource Management ──────────────────────────────────────
+    cancel_subscriptions: true    # Prevent stream subscription leaks
+    close_sinks: true             # Prevent sink/stream leaks
+    
+    # ──────────────── Error Prevention ─────────────────────────────────────────
+    avoid_print: true             # Use logging framework instead
+    avoid_slow_async_io: true     # Performance-critical I/O
+    avoid_type_to_string: true    # Minification safety
+    avoid_web_libraries_in_flutter: true  # Platform safety
+    control_flow_in_finally: true # Prevent finally block issues
+    empty_catches: true           # No silent error swallowing
+    literal_only_boolean_expressions: true  # Prevent logic errors
+    no_adjacent_strings_in_list: true  # Prevent string concat errors
+    no_duplicate_case_values: true     # Switch case uniqueness
+    no_logic_in_create_state: true     # StatefulWidget patterns
+    prefer_void_to_null: true          # Correct void usage
+    test_types_in_equals: true         # Safe equality checks
+    throw_in_finally: true             # Prevent finally throws
+    unnecessary_statements: true       # Remove dead code
+    unrelated_type_equality_checks: true  # Type-safe comparisons
+    valid_regexps: true               # Valid regex patterns
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #                    ENABLED RULES - CODE STYLE
+    # ════════════════════════════════════════════════════════════════════════════
+    
+    # ──────────────── Naming Conventions ───────────────────────────────────────
+    camel_case_extensions: true
+    camel_case_types: true
+    constant_identifier_names: true
+    file_names: true
+    library_names: true
+    library_prefixes: true
+    non_constant_identifier_names: true
+    package_prefixed_library_names: true
+
+    # ──────────────── Code Organization ────────────────────────────────────────
+    combinators_ordering: true        # Import combinator order
+    directives_ordering: true         # Import/export ordering
+    library_annotations: true         # Proper library annotations
+    sort_child_properties_last: true  # Widget property ordering
+
+    # ──────────────── Documentation ────────────────────────────────────────────
+    comment_references: true          # Valid doc references
+    package_api_docs: false           # Optional API docs
+    public_member_api_docs: false     # Optional public docs
+    slash_for_doc_comments: true      # Use /// for docs
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #                    ENABLED RULES - PERFORMANCE
+    # ════════════════════════════════════════════════════════════════════════════
+    
+    # ──────────────── Flutter Optimization ─────────────────────────────────────
+    avoid_unnecessary_containers: true      # Remove useless Containers
+    prefer_const_constructors: true         # Widget tree optimization
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true         # Compile-time constants
+    prefer_const_literals_to_create_immutables: true
+    sized_box_for_whitespace: true          # Use SizedBox not Container
+    sized_box_shrink_expand: true           # Use SizedBox.shrink/expand
+    use_build_context_synchronously: true   # Prevent async context issues
+    use_colored_box: true                   # ColoredBox optimization
+    use_decorated_box: true                 # DecoratedBox optimization
+    use_full_hex_values_for_flutter_colors: true
+
+    # ──────────────── Dart Optimization ────────────────────────────────────────
+    avoid_function_literals_in_foreach_calls: true  # Use for-in loops
+    avoid_redundant_argument_values: true    # Remove default args
+    noop_primitive_operations: true          # Remove useless operations
+    prefer_collection_literals: true         # Efficient collection init
+    prefer_contains: true                    # Use contains() not indexOf
+    prefer_for_elements_to_map_fromIterable: true
+    prefer_function_declarations_over_variables: true
+    prefer_if_elements_to_conditional_expressions: true
+    prefer_inlined_adds: true               # Inline list additions
+    prefer_int_literals: true               # Use int not double for ints
+    prefer_is_empty: true                   # Use isEmpty not length==0
+    prefer_is_not_empty: true               # Use isNotEmpty
+    prefer_iterable_whereType: true         # Efficient type filtering
+    prefer_spread_collections: true         # Modern spread syntax
+    prefer_typing_uninitialized_variables: true
+    unnecessary_brace_in_string_interps: true
+    unnecessary_lambdas: true               # Remove unnecessary closures
+    unnecessary_string_escapes: true
+    unnecessary_string_interpolations: true
+    use_raw_strings: true                   # For regex patterns
+    use_string_buffers: true                # Efficient string building
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #                    ENABLED RULES - MODERN DART
+    # ════════════════════════════════════════════════════════════════════════════
+    
+    # ──────────────── Modern Syntax ────────────────────────────────────────────
+    avoid_escaping_inner_quotes: true       # Smart quote selection
+    avoid_init_to_null: true                # Null default is implicit
+    curly_braces_in_flow_control_structures: true
+    empty_constructor_bodies: true          # Remove empty {}
+    exhaustive_cases: true                  # Complete switch cases
+    prefer_adjacent_string_concatenation: true
+    prefer_conditional_assignment: true     # ??= syntax
+    prefer_constructors_over_static_methods: true
+    prefer_double_quotes: false             # Single quotes preferred
+    prefer_equal_for_default_values: true   # = for defaults
+    prefer_expression_function_bodies: true # => syntax where appropriate
+    prefer_final_fields: true               # Immutable fields
+    prefer_final_in_for_each: true          # final in for-each
+    prefer_final_locals: true               # Immutable locals
+    prefer_generic_function_type_aliases: true
+    prefer_if_null_operators: true          # ?? and ??=
+    prefer_initializing_formals: true       # this.x syntax
+    prefer_interpolation_to_compose_strings: true
+    prefer_mixin: true                      # Use mixin not class
+    prefer_null_aware_operators: true       # ?. and ?.
+    prefer_relative_imports: false          # Package imports preferred
+    prefer_single_quotes: true              # Consistent quotes
+    unnecessary_await_in_return: true       # Remove redundant await
+    unnecessary_breaks: true                # Modern switch without break
+    unnecessary_const: true                 # Remove redundant const
+    unnecessary_constructor_name: true      # Remove .new()
+    unnecessary_final: false                # Keep final for clarity (or true if preferred)
+    unnecessary_getters_setters: true       # Remove trivial getters
+    unnecessary_late: true                  # Remove redundant late
+    unnecessary_new: true                   # Modern constructor syntax
+    unnecessary_null_aware_assignments: true
+    unnecessary_null_aware_operator_on_extension_on_nullable: true
+    unnecessary_overrides: true             # Remove pass-through overrides
+    unnecessary_parenthesis: true           # Clean expression syntax
+    unnecessary_raw_strings: true           # Only when needed
+    unnecessary_this: true                  # Implicit this
+    unnecessary_to_list_in_spreads: true    # Remove .toList() in spreads
+    use_enums: true                         # Modern enum patterns
+    use_function_type_syntax_for_parameters: true
+    use_if_null_to_convert_nulls_to_bools: true
+    use_is_even_rather_than_modulo: true
+    use_late_for_private_fields_and_variables: true
+    use_named_constants: true
+    use_rethrow_when_possible: true
+    use_setters_to_change_properties: true
+    use_string_in_part_of_directives: true
+    use_super_parameters: true              # Dart 2.17+ super.x
+    use_test_throws_matchers: true
+    use_to_and_as_if_applicable: true
+
+    # ════════════════════════════════════════════════════════════════════════════
+    #                    CODING STANDARDS - STRICTNESS
+    # ════════════════════════════════════════════════════════════════════════════
+    
+    # ──────────────── Async Strictness ─────────────────────────────────────────
+    unawaited_futures: true             # Must await or use unawaited()
+    discarded_futures: true             # Warn on forgetting to await
+    
+    # ──────────────── Code Quality ─────────────────────────────────────────────
+    always_put_control_body_on_new_line: false  # Allow single-line if
+    always_put_required_named_parameters_first: true
+    avoid_bool_literals_in_conditional_expressions: true
+    avoid_catching_errors: true               # Errors should crash/be handled explicitly
+    avoid_double_and_int_checks: true
+    avoid_empty_else: true
+    avoid_equals_and_hash_code_on_mutable_classes: true
+    avoid_field_initializers_in_const_classes: true
+    avoid_implementing_value_types: true
+    avoid_js_rounded_ints: true              # Web compatibility
+    avoid_multiple_declarations_per_line: true
+    avoid_null_checks_in_equality_operators: true
+    avoid_positional_boolean_parameters: true
+    avoid_private_typedef_functions: true
+    avoid_renaming_method_parameters: true
+    avoid_return_types_on_setters: true
+    avoid_returning_this: true
+    avoid_setters_without_getters: true
+    avoid_shadowing_type_parameters: true
+    avoid_single_cascade_in_expression_statements: true
+    avoid_types_as_parameter_names: true
+    avoid_unused_constructor_parameters: true
+    await_only_futures: true
+    conditional_uri_does_not_exist: true
+    deprecated_consistency: true
+    do_not_use_environment: false            # Allow environment config
+    enable_null_safety: true                 # Null safety enabled
+    eol_at_end_of_file: true                 # POSIX compliance
+    hash_and_equals: true
+    implicit_call_tearoffs: true
+    implicit_reopen: true
+    implementation_imports: true
+    invalid_case_patterns: true
+    join_return_with_assignment: true
+    leading_newlines_in_multiline_strings: true
+    missing_whitespace_between_adjacent_strings: true
+    no_default_cases: false                  # Allow default in switches
+    no_leading_underscores_for_library_prefixes: true
+    no_leading_underscores_for_local_identifiers: true
+    no_literal_bool_comparisons: true
+    no_runtimeType_toString: true
+    no_self_assignments: true
+    no_wildcard_variable_uses: true
+    omit_local_variable_types: true          # Type inference
+    one_member_abstracts: false              # Allow single-method interfaces
+    only_throw_errors: true
+    overridden_fields: true
+    parameter_assignments: true
+    prefer_asserts_in_initializer_lists: true
+    prefer_asserts_with_message: true
+    provide_deprecation_message: true
+    recursive_getters: true
+    require_trailing_commas: true            # Dart formatter friendly
+    tighten_type_of_initializing_formals: true
+    type_annotate_public_apis: true
+    type_init_formals: true
+    type_literal_in_constant_pattern: true
+    unnecessary_library_directive: true
+    unnecessary_library_name: true
+    unreachable_from_main: false             # Allow unused code paths
+    use_key_in_widget_constructors: true     # Widget key best practice
+    use_truncating_division: true
+    void_checks: true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#                            CUSTOM LINT CONFIGURATION
+# ═══════════════════════════════════════════════════════════════════════════════
+# Riverpod-specific and project-specific rules
 custom_lint:
   rules:
+    # Riverpod-specific rules from riverpod_lint
+    - provider_dependencies: true    # Ensure proper provider dependencies
+    - avoid_public_notifier_properties: true
+    - notifier_extends: true
+    - avoid_manual_providers_as_generated_provider_dependency: true
+    - stateless_ref: true
+    - unsupported_provider_value: true
+    - missing_provider_scope: true
+    - functional_ref: true
+    - generator_class_extends: true
+    - avoid_ref_inside_state_dispose: true
+    - notifier_build: true
+    - riverpod_final_provider: true
+    
+    # Project custom rules
     - provider_parameters
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#               END OF CONFIGURATION - HIDDIFY OPTIMIZED
+# ═══════════════════════════════════════════════════════════════════════════════
