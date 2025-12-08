@@ -13,25 +13,15 @@ targets:
             - "**/*.g.dart"
             - "**/*.freezed.dart"
         options:
-          # SOTA: Always use explicit toJson for nested objects
           explicit_to_json: true
-          # SOTA: Generate fromJson factory constructor
           create_factory: true
-          # SOTA: Generate toJson method
           create_to_json: true
-          # SOTA: Use field rename for snake_case APIs
           field_rename: none
-          # SOTA: Include if null for optional fields
           include_if_null: false
-          # SOTA: Ignore unannotated fields (explicit only)
           ignore_unannotated: false
-          # SOTA: Generate checked fromJson for runtime type checking
           checked: false
-          # SOTA: Disable generic argument factories for simpler code
           generic_argument_factories: false
-          # SOTA: Constructor for fromJson
           constructor: ""
-          # SOTA: Any map for flexible deserialization
           any_map: false
       freezed:
         enabled: true
@@ -46,23 +36,14 @@ targets:
             - "**/*.g.dart"
             - "**/*.freezed.dart"
         options:
-          # SOTA: Use immutable collections by default
           immutable: true
-          # SOTA: Generate toString for debugging
           generate_to_string: true
-          # SOTA: Make class private for factory pattern
           make_collections_unmodifiable: true
-          # SOTA: Enable fromJson/toJson integration
           from_json: true
           to_json: true
-          # SOTA: Union type configuration
           union_key: "type"
           union_value_case: snake
 
-      # ═══════════════════════════════════════════════════════════════════════════
-      #                        RIVERPOD GENERATOR
-      # ═══════════════════════════════════════════════════════════════════════════
-      # Generates provider code from annotations
       riverpod_generator:
         enabled: true
         generate_for:
@@ -75,13 +56,7 @@ targets:
             - "**/*.g.dart"
             - "**/*.freezed.dart"
         options:
-          # SOTA: Generate provider with family modifier support
           provider_family_name_legacy: false
-
-      # ═══════════════════════════════════════════════════════════════════════════
-      #                          GO ROUTER BUILDER
-      # ═══════════════════════════════════════════════════════════════════════════
-      # Generates type-safe routing code
       go_router_builder:
         enabled: true
         generate_for:
@@ -91,90 +66,36 @@ targets:
           exclude:
             - "**/*.g.dart"
             - "**/*.gr.dart"
-
-      # ═══════════════════════════════════════════════════════════════════════════
-      #                    SLANG (Internationalization)
-      # ═══════════════════════════════════════════════════════════════════════════
-      # Generates type-safe translations
       slang_build_runner:
         enabled: true
         options:
-          # Base locale for fallback
           base_locale: en
-          
-          # Fallback strategy
           fallback_strategy: base_locale
-          
-          # Input configuration
           input_directory: assets/translations
           input_file_pattern: .i18n.json
-          
-          # Output configuration
           output_directory: lib/gen
           output_file_name: translations.g.dart
           output_format: single_file
-          
-          # Flutter integration
           flutter_integration: true
-          
-          # Key case formatting
           key_case: camel
           param_case: camel
-          
-          # String interpolation style
           string_interpolation: dart
-
-      # ═══════════════════════════════════════════════════════════════════════════
-      #                          FLUTTER GEN
-      # ═══════════════════════════════════════════════════════════════════════════
-      # Asset generation for type-safe asset references
       flutter_gen_runner:
-        enabled: true
+        enabled: false
         options:
           output: lib/gen/
           line_length: 120
-          
-          # Asset configuration
           assets:
             enabled: true
             package_parameter_enabled: false
             style: snake-case
             exclude:
               - "**/.*"
-            
-          # Font configuration
           fonts:
             enabled: true
-          
-          # Color configuration
           colors:
             enabled: false
-          
-          # Integration configuration
           integrations:
             flutter_svg: true
-            flare_flutter: false
             rive: false
             lottie: false
-
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-#                  ADDITIONAL OPTIMIZATION NOTES
-# ═══════════════════════════════════════════════════════════════════════════════
-# 
-# 🚀 PERFORMANCE TIPS:
-# 
-# 1. Incremental builds: Use `flutter pub run build_runner watch` for development
-#    Command: flutter pub run build_runner watch --delete-conflicting-outputs
-# 
-# 2. Full rebuild: Use `flutter pub run build_runner build --delete-conflicting-outputs`
-#    when build cache is corrupted
-# 
-# 3. Parallel execution: This config enables parallel builds where possible
-# 
-# 4. Scoped generation: Uses `generate_for` to limit file scanning
-# 
-# 5. Exclusion patterns: Prevents re-processing of generated files
-#
-# ═══════════════════════════════════════════════════════════════════════════════

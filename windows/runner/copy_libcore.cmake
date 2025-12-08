@@ -1,4 +1,3 @@
-# Copy libcore.dll from available source
 if(EXISTS "${SOURCE1}")
     file(COPY "${SOURCE1}" DESTINATION "${DEST}")
     message(STATUS "Copied libcore.dll from runner directory")
