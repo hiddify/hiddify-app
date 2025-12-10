@@ -44,6 +44,7 @@ migrate_working_dir/
 **/*.dylib
 **/*.xcframework
 /dist/
+/dist_docker/
 
 /assets/core/*
 !/assets/core/.gitkeep
@@ -62,3 +63,7 @@ app.*.map.json
 
 /data
 .cxx
+
+# Windows Self-Signed for msix
+windows/sign.pfx
+windows/sign.cer
