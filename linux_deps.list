@@ -1,3 +1,9 @@
+
+# ==============================================================
+#  ⚠️  USAGE: SHARED BY MAKEFILE & DOCKERFILE
+#  This list defines dependencies for both build environments.
+# ==============================================================
+
 # flutter sdk https://docs.flutter.dev/install/manual
 curl git unzip xz-utils zip libglu1-mesa
 
