@@ -50,6 +50,7 @@
     "hidden": "Oculto",
     "timeout": "Tempo esgotado",
     "sort": "Ordenar",
+    "dashboard": "Painel",
     "interval": {
       "day": {
         "zero": "",

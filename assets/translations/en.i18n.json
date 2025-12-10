@@ -50,6 +50,7 @@
     "hidden": "Hidden",
     "timeout": "Timeout",
     "sort": "Sort",
+    "dashboard": "Dashboard",
     "interval": {
       "day": {
         "zero": "",

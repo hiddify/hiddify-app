@@ -50,6 +50,7 @@
     "hidden": "Caché",
     "timeout": "Délai expiré",
     "sort": "Trier",
+    "dashboard": "Tableau de bord",
     "interval": {
       "day": {
         "zero": "",

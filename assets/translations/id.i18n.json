@@ -50,6 +50,7 @@
     "hidden": "Tersembunyi",
     "timeout": "Waktu habis",
     "sort": "Urutkan",
+    "dashboard": "Dasbor",
     "interval": {
       "day": {
         "zero": "",
