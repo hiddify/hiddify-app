@@ -5,6 +5,12 @@ version: 3.0.0+30000
 
 environment:
   sdk: ^3.9.2
+  # ! IMPORTANT !
+  # This SDK version is strictly required and must not be removed.
+  # It is parsed/grep-ed by Makefile and Dockerfile to configure the build environment.
+  # Ensure this matches the target Flutter version.
+  flutter: ^3.35.7
+  
 dependencies:
   flutter:
     sdk: flutter
@@ -161,6 +167,7 @@ flutter:
     - assets/images/connect_norouz.PNG
     - assets/images/disconnect_norouz.PNG
     - assets/images/world_map.png
+    - assets/images/source/ic_launcher_border.png
 
   fonts:
     - family: Shabnam
