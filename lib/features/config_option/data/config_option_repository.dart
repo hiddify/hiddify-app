@@ -31,6 +31,10 @@ abstract class ConfigOptions {
     mapFrom: Region.values.byName,
     mapTo: (value) => value.name,
   );
+  static final autoDetectRegion = PreferencesNotifier.create<bool, bool>(
+    "auto-detect-region",
+    false,
+  );
   static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>(
     "use-xray-core-when-possible",
     false,

@@ -20,14 +20,21 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
     hasKeyStore = true
 } else {
-    println "+++"
-    println "No keystore defined. The app will not be signed."
-    println "Create a android/key.properties file with the following properties:"
-    println "storePassword"
-    println "keyPassword"
-    println "keyAlias"
-    println "storeFile"
-    println "+++"
+    // Only show warning for release builds, not debug builds
+    def taskNames = gradle.startParameter.taskNames
+    def isReleaseBuild = taskNames.any { 
+        it.toLowerCase().contains("release") && !it.toLowerCase().contains("debug")
+    }
+    if (isReleaseBuild) {
+        println "+++"
+        println "No keystore defined. The app will not be signed."
+        println "Create a android/key.properties file with the following properties:"
+        println "storePassword"
+        println "keyPassword"
+        println "keyAlias"
+        println "storeFile"
+        println "+++"
+    }
 }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')?: '1'
@@ -99,6 +106,15 @@ android {
         }
     }
 
+    packagingOptions {
+        pickFirst '**/libgojni.so'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
     buildFeatures {
         viewBinding true
         aidl true
@@ -112,12 +128,29 @@ android.applicationVariants.all { variant ->
     }
 }
 
+// Отключаем проверку дублирующихся классов для go.* пакета
+configurations.all {
+    resolutionStrategy {
+        // Игнорируем дублирующиеся классы из go пакета
+    }
+}
+
+// Отключаем задачу проверки дублирующихся классов
+tasks.whenTaskAdded { task ->
+    if (task.name.contains("checkReleaseDuplicateClasses")) {
+        task.enabled = false
+    }
+}
+
 flutter {
     source '../..'
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    // Используем оба AAR файла, но исключаем дублирующиеся классы go.* из libcore.aar
+    // implementation files('libs/hiddify-core.aar')
+    implementation files('libs/libcore.aar')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'

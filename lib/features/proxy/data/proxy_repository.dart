@@ -11,7 +11,7 @@ import 'package:hiddify/utils/custom_loggers.dart';
 abstract interface class ProxyRepository {
   Stream<Either<ProxyFailure, List<ProxyGroupEntity>>> watchProxies();
   Stream<Either<ProxyFailure, List<ProxyGroupEntity>>> watchActiveProxies();
-  TaskEither<ProxyFailure, IpInfo> getCurrentIpInfo(CancelToken cancelToken);
+  TaskEither<ProxyFailure, IpInfo> getCurrentIpInfo(CancelToken cancelToken, {bool proxyOnly = true});
   TaskEither<ProxyFailure, Unit> selectProxy(
     String groupTag,
     String outboundTag,
@@ -130,7 +130,7 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
   };
 
   @override
-  TaskEither<ProxyFailure, IpInfo> getCurrentIpInfo(CancelToken cancelToken) {
+  TaskEither<ProxyFailure, IpInfo> getCurrentIpInfo(CancelToken cancelToken, {bool proxyOnly = true}) {
     return TaskEither.tryCatch(
       () async {
         Object? error;
@@ -140,7 +140,7 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
             final response = await client.get<Map<String, dynamic>>(
               source.key,
               cancelToken: cancelToken,
-              proxyOnly: true,
+              proxyOnly: proxyOnly,
             );
             if (response.statusCode == 200 && response.data != null) {
               return source.value(response.data!);

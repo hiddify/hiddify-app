@@ -87,10 +87,10 @@ macos-install-dependencies:
 
 ios-install-dependencies: 
 	if [ "$(flutter)" = "true" ]; then \
-		curl -L -o ~/Downloads/flutter_macos_3.19.3-stable.zip https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.22.3-stable.zip; \
+		curl -L -o ~/Downloads/flutter_macos_3.24.0-stable.zip https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.24.0-stable.zip; \
 		mkdir -p ~/develop; \
 		cd ~/develop; \
-		unzip ~/Downloads/flutter_macos_3.22.3-stable.zip; \
+		unzip ~/Downloads/flutter_macos_3.24.0-stable.zip; \
 		export PATH="$$PATH:$$HOME/develop/flutter/bin"; \
 		echo 'export PATH="$$PATH:$$HOME/develop/flutter/bin"' >> ~/.zshrc; \
 		export PATH="$PATH:$HOME/develop/flutter/bin"; \
@@ -117,7 +117,7 @@ linux-install-dependencies:
 	if [ "$(flutter)" = "true" ]; then \
 		mkdir -p ~/develop; \
 		cd ~/develop; \
-		wget -O flutter_linux-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.4-stable.tar.xz; \
+		wget -O flutter_linux-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.0-stable.tar.xz; \
 		tar xf flutter_linux-stable.tar.xz; \
 		rm flutter_linux-stable.tar.xz;\
 		export PATH="$$PATH:$$HOME/develop/flutter/bin"; \
