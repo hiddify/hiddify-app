@@ -3,6 +3,11 @@
 cd "$(dirname "$0")"
 export LD_LIBRARY_PATH=usr/lib
 
+# Handles desktop integration:
+# 1. Copies app icons to ~/.local/share/icons
+# 2. Ensures icon theme index exists
+# 3. Creates a .desktop file pointing to this AppImage
+# 4. Skips if a system-wide installation (/usr/share/applications) is detected
 install_integration() {
     if [[ -z "$APPIMAGE" ]]; then
         return
