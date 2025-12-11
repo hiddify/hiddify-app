@@ -209,6 +209,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  country_flags:
+    dependency: transitive
+    description:
+      name: country_flags
+      sha256: "714f2d415e74828eb08787d552a05e94cdf2cbe0607a5656f3e70087cd7bb7e0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   coverage:
     dependency: transitive
     description:
@@ -305,6 +313,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  data_widget:
+    dependency: transitive
+    description:
+      name: data_widget
+      sha256: "95388df890189014f702b7e93f9de6bcf7d45143a99f6288f31899f10be441ba"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   dio:
     dependency: "direct main"
     description:
@@ -337,6 +353,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.1"
+  email_validator:
+    dependency: transitive
+    description:
+      name: email_validator
+      sha256: b19aa5d92fdd76fbc65112060c94d45ba855105a28bb6e462de7ff03b12fa1fb
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   equatable:
     dependency: transitive
     description:
@@ -345,6 +369,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
+  expressions:
+    dependency: transitive
+    description:
+      name: expressions
+      sha256: f3b0e99563a9a1bde1138e728eb722f292cc7d2aec55d28136c49b1a370306c5
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.5+3"
   fake_async:
     dependency: transitive
     description:
@@ -853,6 +885,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.14.2"
+  jovial_misc:
+    dependency: transitive
+    description:
+      name: jovial_misc
+      sha256: "4301011027d87b8b919cb862db84071a34448eadbb32cc8d40fe505424dfe69a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.2"
+  jovial_svg:
+    dependency: transitive
+    description:
+      name: jovial_svg
+      sha256: "08dd24b800d48796c9c0227acb96eb00c6cacccb1d7de58d79fc924090049868"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.28"
   js:
     dependency: transitive
     description:
@@ -974,7 +1022,7 @@ packages:
     source: hosted
     version: "0.1.1"
   meta:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: meta
       sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
@@ -1181,6 +1229,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  phonecodes:
+    dependency: transitive
+    description:
+      name: phonecodes
+      sha256: d963c19d35914cd83620e64125689a0c09047e25046639f2a124142ccf5868bb
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   platform:
     dependency: transitive
     description:
@@ -1373,6 +1429,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.8.0"
+  shadcn_flutter:
+    dependency: "direct main"
+    description:
+      name: shadcn_flutter
+      sha256: "1fd4f798c39d6308dc8f7e94d9e870b5db39fbf417ea95c423c7555ce8227a1c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.47"
   share_plus:
     dependency: "direct main"
     description:
@@ -1393,10 +1457,10 @@ packages:
     dependency: "direct main"
     description:
       name: shared_preferences
-      sha256: "6e8bf70b7fef813df4e9a36f658ac46d107db4b4cfe1048b477d4e453a8159f5"
+      sha256: "2939ae520c9024cb197fc20dee269cd8cdbf564c8b5746374ec6cacdc5169e64"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.3"
+    version: "2.5.4"
   shared_preferences_android:
     dependency: transitive
     description:
@@ -1485,6 +1549,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.2"
+  skeletonizer:
+    dependency: transitive
+    description:
+      name: skeletonizer
+      sha256: "5d2d44120916cc749ede54c236cef60c2478742806df0b1f065212f00721b185"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   sky_engine:
     dependency: transitive
     description: flutter

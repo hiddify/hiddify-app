@@ -4,7 +4,7 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:toastification/toastification.dart';
 
 class CustomAlertDialog extends StatelessWidget {
-  const CustomAlertDialog({super.key, this.title, required this.message});
+  const CustomAlertDialog({required this.message, super.key, this.title});
 
   final String? title;
   final String message;
@@ -16,7 +16,7 @@ class CustomAlertDialog extends StatelessWidget {
       );
 
   Future<void> show(BuildContext context) async {
-    await showDialog(context: context, builder: (context) => this);
+    await showDialog<void>(context: context, builder: (context) => this);
   }
 
   @override
@@ -54,20 +54,20 @@ enum AlertType {
 
 class CustomToast extends StatelessWidget {
   const CustomToast(
-    this.message, {
+    this.message, {super.key, 
     this.type = AlertType.info,
     this.icon,
     this.duration = const Duration(seconds: 3),
   });
 
   const CustomToast.error(
-    this.message, {
+    this.message, {super.key, 
     this.duration = const Duration(seconds: 5),
   }) : type = AlertType.error,
        icon = FluentIcons.error_circle_24_regular;
 
   const CustomToast.success(
-    this.message, {
+    this.message, {super.key, 
     this.duration = const Duration(seconds: 3),
   }) : type = AlertType.success,
        icon = FluentIcons.checkmark_24_regular;

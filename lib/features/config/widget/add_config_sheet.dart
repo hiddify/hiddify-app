@@ -1,18 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hiddify/features/config/controller/config_controller.dart';
+import 'package:hiddify/features/config/logic/config_parser.dart';
+import 'package:hiddify/features/subscription/widget/subscription_preview_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:flutter/services.dart';
-import '../../config/controller/config_controller.dart';
-import '../../config/logic/config_parser.dart';
-import '../../subscription/widget/subscription_preview_page.dart';
 
 class AddConfigSheet extends HookConsumerWidget {
   const AddConfigSheet({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
+  Widget build(BuildContext context, WidgetRef ref) => Container(
       padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -24,7 +25,7 @@ class AddConfigSheet extends HookConsumerWidget {
             title: const Text('From Clipboard'),
             onTap: () async {
               final data = await Clipboard.getData(Clipboard.kTextPlain);
-              if (data?.text != null) {
+              if (data?.text != null && context.mounted) {
                 _processContent(context, ref, data!.text!, 'clipboard');
               }
             },
@@ -36,10 +37,10 @@ class AddConfigSheet extends HookConsumerWidget {
               // Open QR Scanner
               final result = await Navigator.push(
                 context, 
-                MaterialPageRoute(builder: (_) => const QRScannerPage())
+                MaterialPageRoute<String?>(builder: (_) => const QRScannerPage()),
               );
-              if (result != null) {
-                _processContent(context, ref, result.toString(), 'qr_camera');
+              if (result != null && context.mounted) {
+                _processContent(context, ref, result, 'qr_camera');
               }
             },
           ),
@@ -56,7 +57,7 @@ class AddConfigSheet extends HookConsumerWidget {
                    final barcodes = capture.barcodes;
                    if (barcodes.isNotEmpty) {
                      final code = barcodes.first.rawValue;
-                     if (code != null) {
+                     if (code != null && context.mounted) {
                         _processContent(context, ref, code, 'qr_image');
                      }
                    }
@@ -67,19 +68,18 @@ class AddConfigSheet extends HookConsumerWidget {
         ],
       ),
     );
-  }
 
   void _processContent(BuildContext context, WidgetRef ref, String content, String source) {
     // Check if subscription
     if (content.startsWith('http')) {
       Navigator.pop(context); // Close sheet
-      Navigator.push(context, MaterialPageRoute(builder: (_) => SubscriptionPreviewPage(url: content)));
+      unawaited(Navigator.push(context, MaterialPageRoute(builder: (_) => SubscriptionPreviewPage(url: content))));
       return;
     }
 
     final config = ConfigParser.parse(content, source: source);
     if (config != null) {
-      ref.read(configControllerProvider.notifier).add(config);
+      unawaited(ref.read(configControllerProvider.notifier).add(config));
       Navigator.pop(context);
        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Config added!')));
     } else {
@@ -91,12 +91,11 @@ class AddConfigSheet extends HookConsumerWidget {
 class QRScannerPage extends StatelessWidget {
     const QRScannerPage({super.key});
     @override
-    Widget build(BuildContext context) {
-        return Scaffold(
+    Widget build(BuildContext context) => Scaffold(
             appBar: AppBar(title: const Text('Scan QR')),
             body: MobileScanner(
                 onDetect: (capture) {
-                    final List<Barcode> barcodes = capture.barcodes;
+                    final barcodes = capture.barcodes;
                     for (final barcode in barcodes) {
                        if(barcode.rawValue != null) {
                            Navigator.pop(context, barcode.rawValue);
@@ -106,5 +105,4 @@ class QRScannerPage extends StatelessWidget {
                 },
             ),
         );
-    }
 }

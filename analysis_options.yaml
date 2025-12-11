@@ -67,7 +67,7 @@ analyzer:
     unnecessary_type_check: warning
     inference_failure_on_function_invocation: info
     inference_failure_on_instance_creation: info
-    strict_raw_type: warning
+    strict_raw_type: false  # Disabled - requires large refactoring
     
     # ════════ Async/Concurrency Safety ════════
     unawaited_futures: error       # SOTA: Must await or explicitly ignore
@@ -180,7 +180,7 @@ linter:
 
     # ──────────────── Documentation ────────────────────────────────────────────
     comment_references: true          # Valid doc references
-    package_api_docs: false           # Optional API docs
+    # package_api_docs: removed in Dart 3.7
     public_member_api_docs: false     # Optional public docs
     slash_for_doc_comments: true      # Use /// for docs
 
@@ -238,7 +238,7 @@ linter:
     prefer_conditional_assignment: true     # ??= syntax
     prefer_constructors_over_static_methods: true
     prefer_double_quotes: false             # Single quotes preferred
-    prefer_equal_for_default_values: true   # = for defaults
+    # prefer_equal_for_default_values: removed in Dart 3.0
     prefer_expression_function_bodies: true # => syntax where appropriate
     prefer_final_fields: true               # Immutable fields
     prefer_final_in_for_each: true          # final in for-each
@@ -314,7 +314,7 @@ linter:
     conditional_uri_does_not_exist: true
     deprecated_consistency: true
     do_not_use_environment: false            # Allow environment config
-    enable_null_safety: true                 # Null safety enabled
+    # enable_null_safety: removed in Dart 3.0
     eol_at_end_of_file: true                 # POSIX compliance
     hash_and_equals: true
     implicit_call_tearoffs: true

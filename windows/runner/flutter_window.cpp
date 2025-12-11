@@ -16,11 +16,10 @@ bool FlutterWindow::OnCreate() {
 
   RECT frame = GetClientArea();
 
-  RECT frame = GetClientArea();
+
   flutter_controller_ = std::make_unique<flutter::FlutterViewController>(
       frame.right - frame.left, frame.bottom - frame.top, project_);
-  flutter_controller_ = std::make_unique<flutter::FlutterViewController>(
-      frame.right - frame.left, frame.bottom - frame.top, project_);
+
   if (!flutter_controller_->engine() || !flutter_controller_->view()) {
     return false;
   }
@@ -28,8 +27,7 @@ bool FlutterWindow::OnCreate() {
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
-  flutter_controller_->engine()->SetNextFrameCallback([&]() {
-  });
+    this->Show();
   });
 
   flutter_controller_->ForceRedraw();
@@ -49,8 +47,7 @@ LRESULT
 FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
                               WPARAM const wparam,
                               LPARAM const lparam) noexcept {
-                               WPARAM const wparam,
-                               LPARAM const lparam) noexcept {
+
   if (flutter_controller_) {
     std::optional<LRESULT> result =
         flutter_controller_->HandleTopLevelWindowProc(hwnd, message, wparam,

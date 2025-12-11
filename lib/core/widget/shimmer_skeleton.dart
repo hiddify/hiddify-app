@@ -50,8 +50,7 @@ class ShimmerSkeleton extends StatelessWidget {
   final BorderRadius? borderRadius;
 
   @override
-  Widget build(BuildContext context) {
-    return Skeleton(
+  Widget build(BuildContext context) => Skeleton(
           width: width,
           height: height,
           widthFactor: widthFactor,
@@ -64,5 +63,4 @@ class ShimmerSkeleton extends StatelessWidget {
           angle: 45,
           color: color ?? Theme.of(context).colorScheme.secondary,
         );
-  }
 }

@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:hiddify/features/subscription/model/subscription.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../model/subscription.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'subscription_repository.g.dart';
 

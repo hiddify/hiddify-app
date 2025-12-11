@@ -11,8 +11,7 @@ FutureOr<SentryEvent?> sentryBeforeSend(SentryEvent event, {Hint? hint}) {
   return null;
 }
 
-bool canSendEvent(dynamic throwable) {
-  return switch (throwable) {
+bool canSendEvent(dynamic throwable) => switch (throwable) {
     UnexpectedFailure(:final error) => canSendEvent(error),
     DioException _ => false,
     SocketException _ => false,
@@ -23,7 +22,6 @@ bool canSendEvent(dynamic throwable) {
     ExpectedMeasuredFailure _ => false,
     _ => true,
   };
-}
 
 bool canLogEvent(dynamic throwable) => switch (throwable) {
   ExpectedMeasuredFailure _ => true,

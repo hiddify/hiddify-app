@@ -31,8 +31,7 @@ class TipCard extends StatelessWidget {
   final VoidCallback? onDismiss;
 
   @override
-  Widget build(BuildContext context) {
-    return Semantics(
+  Widget build(BuildContext context) => Semantics(
       label: 'Tip: $message',
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -60,5 +59,4 @@ class TipCard extends StatelessWidget {
         ),
       ),
     );
-  }
 }

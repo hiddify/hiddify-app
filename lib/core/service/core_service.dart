@@ -1,7 +1,8 @@
-import 'dart:ffi'; // For FFI
 import 'dart:convert';
-import 'package:ffi/ffi.dart';
+import 'dart:ffi'; // For FFI
 import 'dart:io';
+
+import 'package:ffi/ffi.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -25,6 +26,7 @@ class CoreService {
          _start = _lib.lookup<NativeFunction<StartFunc>>('Start').asFunction();
          _stop = _lib.lookup<NativeFunction<StopFunc>>('Stop').asFunction();
        } catch (e) {
+         // ignore: avoid_print
          print('Failed to lookup symbols: $e');
          rethrow;
        }
@@ -55,7 +57,7 @@ class CoreService {
         
         await _channel.invokeMethod('start', {
           'path': file.path, 
-          'name': 'Hiddify'
+          'name': 'Hiddify',
         });
         return null;
       } on PlatformException catch (e) {

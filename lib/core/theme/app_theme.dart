@@ -27,10 +27,9 @@ class AppTheme {
 
   /// Generates the light theme data.
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
-    final ColorScheme scheme = lightColorScheme ??
+    final scheme = lightColorScheme ??
         ColorScheme.fromSeed(
           seedColor: AppColors.brandColor,
-          brightness: Brightness.light,
         );
         
     return _buildTheme(scheme);
@@ -38,7 +37,7 @@ class AppTheme {
 
   /// Generates the dark theme data.
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
-    final ColorScheme scheme = darkColorScheme ??
+    final scheme = darkColorScheme ??
         ColorScheme.fromSeed(
           seedColor: mode.trueBlack ? Colors.white : AppColors.brandColor, // Monochrome if black mode
           brightness: Brightness.dark,
@@ -46,14 +45,13 @@ class AppTheme {
         );
         
     // Adjust logic for True Black mode if enabled
-    final Color scaffoldColor = mode.trueBlack ? Colors.black : scheme.surface;
+    final scaffoldColor = mode.trueBlack ? Colors.black : scheme.surface;
 
     return _buildTheme(scheme, scaffoldBackgroundColor: scaffoldColor);
   }
 
   /// Internal helper to build ThemeData consistent across modes.
-  ThemeData _buildTheme(ColorScheme scheme, {Color? scaffoldBackgroundColor}) {
-    return ThemeData(
+  ThemeData _buildTheme(ColorScheme scheme, {Color? scaffoldBackgroundColor}) => ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
       scaffoldBackgroundColor: scaffoldBackgroundColor,
@@ -63,13 +61,10 @@ class AppTheme {
       // cardTheme: CardTheme(...),
       // inputDecorationTheme: InputDecorationTheme(...),
       extensions: <ThemeExtension<dynamic>>{
-        scheme.brightness == Brightness.dark
-            ? ConnectionButtonTheme.dark
-            : ConnectionButtonTheme.light,
+        if (scheme.brightness == Brightness.dark) ConnectionButtonTheme.dark else ConnectionButtonTheme.light,
         JsonEditorTheme.standard,
       },
     );
-  }
 }
 
 /// A PageTransitionsBuilder that provides no transition animation.
@@ -82,7 +77,5 @@ class _NoTransitionsBuilder extends PageTransitionsBuilder {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
     Widget child,
-  ) {
-    return child;
-  }
+  ) => child;
 }

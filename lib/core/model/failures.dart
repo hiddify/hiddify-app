@@ -33,14 +33,14 @@ extension ErrorPresenter on TranslationsEn {
     if (action == null) return pair;
     return (
       type: action,
-      message: pair.type + (pair.message == null ? "" : "\n${pair.message!}"),
+      message: pair.type + (pair.message == null ? '' : '\n${pair.message!}'),
     );
   }
 
   String presentShortError(Object error, {String? action}) {
     final pair = errorToPair(error);
     if (action == null) return pair.type;
-    return "$action: ${pair.type}";
+    return '$action: ${pair.type}';
   }
 }
 

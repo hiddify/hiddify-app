@@ -2,7 +2,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
+import 'package:hiddify/core/theme/app_colors.dart';
 
 class ConnectionButtonTheme extends ThemeExtension<ConnectionButtonTheme> {
   const ConnectionButtonTheme({this.idleColor, this.connectedColor});
@@ -70,8 +70,7 @@ class JsonEditorTheme extends ThemeExtension<JsonEditorTheme> {
     double? rowHeight,
     double? popupMenuHeight,
     double? popupMenuItemPadding,
-  }) {
-    return JsonEditorTheme(
+  }) => JsonEditorTheme(
       indentSpacing: indentSpacing ?? this.indentSpacing,
       textStyle: textStyle ?? this.textStyle,
       expandIconWidth: expandIconWidth ?? this.expandIconWidth,
@@ -79,7 +78,6 @@ class JsonEditorTheme extends ThemeExtension<JsonEditorTheme> {
       popupMenuHeight: popupMenuHeight ?? this.popupMenuHeight,
       popupMenuItemPadding: popupMenuItemPadding ?? this.popupMenuItemPadding,
     );
-  }
 
   @override
   JsonEditorTheme lerp(JsonEditorTheme? other, double t) {

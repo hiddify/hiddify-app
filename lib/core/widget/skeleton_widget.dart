@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hiddify/core/widget/shimmer_skeleton.dart' show ShimmerSkeleton;
 
 /// A placeholder skeleton widget used for loading states.
 /// 

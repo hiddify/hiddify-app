@@ -67,6 +67,8 @@ dependencies:
   ffi: ^2.1.2
   mobile_scanner: ^7.1.3 
   image_picker: ^1.1.2
+  shadcn_flutter: ^0.0.47
+  meta: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

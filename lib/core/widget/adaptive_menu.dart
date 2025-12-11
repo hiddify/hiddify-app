@@ -12,8 +12,9 @@ typedef AdaptiveMenuBuilder =
       Widget? child,
     );
 
+@immutable
 class AdaptiveMenuItem<T> {
-  AdaptiveMenuItem({
+  const AdaptiveMenuItem({
     required this.title,
     this.icon,
     this.onTap,
@@ -42,10 +43,7 @@ class AdaptiveMenuItem<T> {
 
 class AdaptiveMenu extends HookConsumerWidget {
   const AdaptiveMenu({
-    super.key,
-    required this.items,
-    required this.builder,
-    required this.child,
+    required this.items, required this.builder, required this.child, super.key,
   });
 
   final Iterable<AdaptiveMenuItem> items;
@@ -87,7 +85,7 @@ class AdaptiveMenu extends HookConsumerWidget {
           } else {
             controller.open();
           }
-        }, child),
+        }, child,),
         menuChildren: buildMenuItems(items),
         child: child,
       );
@@ -109,7 +107,7 @@ class AdaptiveMenu extends HookConsumerWidget {
 
     final (mainSheetItems, nestedSheets) = useMemoized(() {
       final nestedSheets = <SliverWoltModalSheetPage>[];
-      int pageIndex = 0;
+      var pageIndex = 0;
 
       List<Widget> buildSheetItems(
         Iterable<AdaptiveMenuItem> menuItems,
@@ -162,10 +160,10 @@ class AdaptiveMenu extends HookConsumerWidget {
       }
 
       return (buildSheetItems(items, 0), nestedSheets);
-    }, [items]);
+    }, [items],);
 
     return builder(context, () async {
-      await WoltModalSheet.show(
+      await WoltModalSheet.show<void>(
         context: context,
         pageIndexNotifier: pageIndexNotifier,
         onModalDismissedWithDrag: popSheets,
@@ -182,6 +180,6 @@ class AdaptiveMenu extends HookConsumerWidget {
           ...nestedSheets,
         ],
       );
-    }, child);
+    }, child,);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hiddify/core/logger/log_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'log_service.dart';
 
 class LogViewerPage extends HookConsumerWidget {
   const LogViewerPage({super.key});
@@ -24,17 +24,13 @@ class LogViewerPage extends HookConsumerWidget {
         ],
       ),
       body: logStream.when(
-        data: (logs) {
-          return ListView.builder(
+        data: (logs) => ListView.builder(
             itemCount: logs.length,
-            itemBuilder: (context, index) {
-              return Text(
+            itemBuilder: (context, index) => Text(
                 logs[index], 
                 style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-              );
-            },
-          );
-        },
+              ),
+          ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
@@ -42,6 +38,4 @@ class LogViewerPage extends HookConsumerWidget {
   }
 }
 
-final logStreamProvider = StreamProvider<List<String>>((ref) {
-  return ref.read(logServiceProvider).streamLogs();
-});
+final logStreamProvider = StreamProvider<List<String>>((ref) => ref.read(logServiceProvider).streamLogs());

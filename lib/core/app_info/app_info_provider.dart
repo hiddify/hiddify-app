@@ -9,7 +9,7 @@ part 'app_info_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 Environment environment(Ref ref) =>
-    throw Exception("override environmentProvider");
+    throw Exception('override environmentProvider');
 
 @Riverpod(keepAlive: true)
 class AppInfo extends _$AppInfo {

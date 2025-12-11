@@ -19,10 +19,7 @@ class ScopedHandle {
   HANDLE get() const { return handle_; }
   bool is_valid() const { return handle_ != nullptr && handle_ != INVALID_HANDLE_VALUE; }
 
-  bool is_valid() const { return handle_ != nullptr && handle_ != INVALID_HANDLE_VALUE; }
   ScopedHandle(const ScopedHandle&) = delete;
-  ScopedHandle& operator=(const ScopedHandle&) = delete;
-
   ScopedHandle& operator=(const ScopedHandle&) = delete;
   ScopedHandle(ScopedHandle&& other) noexcept : handle_(other.handle_) {
     other.handle_ = nullptr;

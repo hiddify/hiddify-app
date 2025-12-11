@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hiddify/features/config/controller/config_controller.dart';
+import 'package:hiddify/features/config/model/config.dart';
+import 'package:hiddify/features/subscription/model/subscription.dart';
+import 'package:hiddify/features/subscription/service/subscription_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
-import '../../config/model/config.dart';
-import '../../config/controller/config_controller.dart';
-import '../service/subscription_service.dart';
-import '../model/subscription.dart';
 
 class SubscriptionPreviewPage extends HookConsumerWidget {
   final String url;
 
-  const SubscriptionPreviewPage({super.key, required this.url});
+  const SubscriptionPreviewPage({required this.url, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -26,7 +26,7 @@ class SubscriptionPreviewPage extends HookConsumerWidget {
   }
 }
 
-final fetchConfigsProvider = FutureProvider.family<List<Config>, String>((ref, url) async {
+final fetchConfigsProvider = FutureProvider.family<List<Config>, String>((ref, url) {
   final service = ref.read(subscriptionServiceProvider);
   return service.fetchConfigs(url);
 });
@@ -56,7 +56,7 @@ class _SubscriptionPreviewBodyState extends ConsumerState<_SubscriptionPreviewBo
       _isPingTesting = true;
     });
     // Mock ping test
-    await Future.delayed(const Duration(seconds: 2));
+    await Future<void>.delayed(const Duration(seconds: 2));
     setState(() {
       _isPingTesting = false;
     });
@@ -64,18 +64,17 @@ class _SubscriptionPreviewBodyState extends ConsumerState<_SubscriptionPreviewBo
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       children: [
         Padding(
-           padding: const EdgeInsets.all(8.0),
+           padding: const EdgeInsets.all(8),
            child: Row(
              children: [
                Expanded(child: Text('Found ${widget.configs.length} configs')),
                ElevatedButton(
                  onPressed: _isPingTesting ? null : _testPing,
                  child: const Text('Test Ping'),
-               )
+               ),
              ],
            ),
         ),
@@ -91,7 +90,7 @@ class _SubscriptionPreviewBodyState extends ConsumerState<_SubscriptionPreviewBo
                 value: isSelected,
                 onChanged: (val) {
                   setState(() {
-                    if (val == true) {
+                    if (val ?? false) {
                       _selectedConfigs.add(config);
                     } else {
                       _selectedConfigs.remove(config);
@@ -103,12 +102,13 @@ class _SubscriptionPreviewBodyState extends ConsumerState<_SubscriptionPreviewBo
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: SizedBox(
             width: double.infinity,
             child: FilledButton(
               onPressed: () async {
-                final sub = Subscription(
+                // Subscription object for future use
+                final _ = Subscription(
                   id: const Uuid().v4(),
                   name: 'Imported Subscription',
                   url: widget.url,
@@ -131,8 +131,7 @@ class _SubscriptionPreviewBodyState extends ConsumerState<_SubscriptionPreviewBo
               child: const Text('Import Selected'),
             ),
           ),
-        )
+        ),
       ],
     );
-  }
 }

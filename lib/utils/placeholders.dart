@@ -10,8 +10,7 @@ class SliverBodyPlaceholder extends HookConsumerWidget {
   final List<Widget> children;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SliverToBoxAdapter(
+  Widget build(BuildContext context, WidgetRef ref) => SliverToBoxAdapter(
       child: SizedBox(
         height: 300,
         child: Column(
@@ -20,15 +19,13 @@ class SliverBodyPlaceholder extends HookConsumerWidget {
         ),
       ),
     );
-  }
 }
 
 class SliverLoadingBodyPlaceholder extends HookConsumerWidget {
   const SliverLoadingBodyPlaceholder({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return const SliverToBoxAdapter(
+  Widget build(BuildContext context, WidgetRef ref) => const SliverToBoxAdapter(
       child: SizedBox(
         height: 300,
         child: Column(
@@ -37,7 +34,6 @@ class SliverLoadingBodyPlaceholder extends HookConsumerWidget {
         ),
       ),
     );
-  }
 }
 
 class SliverErrorBodyPlaceholder extends HookConsumerWidget {
@@ -51,8 +47,7 @@ class SliverErrorBodyPlaceholder extends HookConsumerWidget {
   final IconData? icon;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SliverToBoxAdapter(
+  Widget build(BuildContext context, WidgetRef ref) => SliverToBoxAdapter(
       child: SizedBox(
         height: 300,
         child: Column(
@@ -64,5 +59,4 @@ class SliverErrorBodyPlaceholder extends HookConsumerWidget {
         ),
       ),
     );
-  }
 }

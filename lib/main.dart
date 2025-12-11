@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/bootstrap.dart';
@@ -6,7 +8,7 @@ import 'package:hiddify/core/model/environment.dart';
 void main() {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -14,5 +16,5 @@ void main() {
     ),
   );
 
-  lazyBootstrap(widgetsBinding, Environment.dev);
+  unawaited(lazyBootstrap(widgetsBinding, Environment.dev));
 }

@@ -22,7 +22,7 @@ class PreferencesEntry<T, P> with InfraLogger {
 
   T read() {
     try {
-      loggy.debug("getting persisted preference [$key]($T)");
+      loggy.debug('getting persisted preference [$key]($T)');
       final T value;
       if (mapFrom != null) {
         final persisted = preferences.get(key) as P?;
@@ -40,7 +40,7 @@ class PreferencesEntry<T, P> with InfraLogger {
       if (validator?.call(value) ?? true) return value;
       return defaultValue;
     } catch (e, stackTrace) {
-      loggy.warning("error getting preference[$key]: $e", e, stackTrace);
+      loggy.warning('error getting preference[$key]: $e', e, stackTrace);
       return defaultValue;
     }
   }
@@ -50,10 +50,10 @@ class PreferencesEntry<T, P> with InfraLogger {
     if (mapTo != null) {
       mapped = mapTo!(value);
     }
-    loggy.debug("updating preference [$key]($T) to [$mapped]");
+    loggy.debug('updating preference [$key]($T) to [$mapped]');
     try {
       if (!(validator?.call(value) ?? true)) {
-        loggy.warning("invalid value [$value] for preference [$key]($T)");
+        loggy.warning('invalid value [$value] for preference [$key]($T)');
         return false;
       }
 
@@ -63,10 +63,10 @@ class PreferencesEntry<T, P> with InfraLogger {
         final int value => await preferences.setInt(key, value),
         final double value => await preferences.setDouble(key, value),
         final List<String> value => await preferences.setStringList(key, value),
-        _ => throw const FormatException("Invalid Type"),
+        _ => throw const FormatException('Invalid Type'),
       };
     } catch (e, stackTrace) {
-      loggy.warning("error updating preference[$key]: $e", e, stackTrace);
+      loggy.warning('error updating preference[$key]: $e', e, stackTrace);
       return false;
     }
   }
@@ -86,7 +86,7 @@ class PreferencesEntry<T, P> with InfraLogger {
     try {
       await preferences.remove(key);
     } catch (e, stackTrace) {
-      loggy.warning("error removing preference[$key]: $e", e, stackTrace);
+      loggy.warning('error removing preference[$key]: $e', e, stackTrace);
     }
   }
 }
@@ -158,8 +158,7 @@ class PreferencesNotifier<T, P> extends Notifier<T> {
     bool Function(T value)? validator,
     T? overrideValue,
     List<T>? possibleValues,
-  }) {
-    return NotifierProvider<PreferencesNotifier<T, P>, T>(
+  }) => NotifierProvider<PreferencesNotifier<T, P>, T>(
       () => PreferencesNotifier<T, P>(
         key: key,
         defaultValue: defaultValue,
@@ -171,7 +170,6 @@ class PreferencesNotifier<T, P> extends Notifier<T> {
         possibleValues: possibleValues,
       ),
     );
-  }
 
   static NotifierProvider<PreferencesNotifier<T, P>, T> createAutoDispose<T, P>(
     String key,
@@ -180,8 +178,7 @@ class PreferencesNotifier<T, P> extends Notifier<T> {
     P Function(T value)? mapTo,
     bool Function(T value)? validator,
     T? overrideValue,
-  }) {
-    return NotifierProvider.autoDispose<PreferencesNotifier<T, P>, T>(
+  }) => NotifierProvider.autoDispose<PreferencesNotifier<T, P>, T>(
       () => PreferencesNotifier<T, P>(
         key: key,
         defaultValue: defaultValue,
@@ -191,5 +188,4 @@ class PreferencesNotifier<T, P> extends Notifier<T> {
         overrideValue: overrideValue,
       ),
     );
-  }
 }

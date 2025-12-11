@@ -16,11 +16,9 @@ final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 @riverpod
 GoRouter router(Ref ref) {
   final notifier = ref.watch(routerListenableProvider.notifier);
-  late GoRouter router;
-  
-  String initialLocation = const HomeRoute().location;
+  final initialLocation = const HomeRoute().location;
 
-  return router = GoRouter(
+  return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: initialLocation,
     debugLogDiagnostics: kDebugMode,
@@ -37,15 +35,18 @@ GoRouter router(Ref ref) {
 
 final tabLocations = [
   const HomeRoute().location,
+  const SettingsRoute().location,
 ];
 
 int getCurrentIndex(BuildContext context) {
-  return 0; 
+  final location = GoRouterState.of(context).uri.path;
+  final index = tabLocations.indexWhere(location.startsWith);
+  return index < 0 ? 0 : index;
 }
 
 void switchTab(int index, BuildContext context) {
-  if (index == 0) {
-     context.go(tabLocations[0]);
+  if (index >= 0 && index < tabLocations.length) {
+     context.go(tabLocations[index]);
   }
 }
 
@@ -53,7 +54,7 @@ void switchTab(int index, BuildContext context) {
 class RouterListenable extends _$RouterListenable
     with AppLogger
     implements Listenable {
-  VoidCallback? _routerListener;
+  VoidCallback? _routerListener; // ignore: unused_field
 
   @override
   Future<void> build() async {
@@ -71,14 +72,18 @@ class RouterListenable extends _$RouterListenable
   }
 }
 
-RouteBase _buildMobileStatefulShell() {
-  return StatefulShellRoute.indexedStack(
+RouteBase _buildMobileStatefulShell() => StatefulShellRoute.indexedStack(
     builder: (context, state, navigationShell) =>
-        Scaffold(body: navigationShell), // Simplification: remove AdaptiveRootScaffold dependecy if it depended on deleted widgets?
-        // Wait, AdaptiveRootScaffold is in features/common/adaptive_root_scaffold.dart. 
-        // I kept features/common in Step 457.
-        // So I can use it.
-        // AdaptiveRootScaffold(navigationShell, navigationShell: navigationShell),
+        Scaffold(body: navigationShell), // Navigation handle by AdaptiveRootScaffold within pages or external wrapper? 
+        // Wait, AdaptiveRootScaffold wraps the child in routes.dart. 
+        // Here we just return the shell. 
+        // If we use TypedShellRoute in routes.dart, we shouldn't manually build the shell here unless we are overriding.
+        // But since we are using _buildMobileStatefulShell in app_router.dart instead of $mobileWrapperRoute, we must define it fully.
+        // Ideally we should use $mobileWrapperRoute if possible.
+        // But let's stick to consistent manual definition for now if that's what was there.
+        // Actually, routes.dart defines MobileWrapperRoute which RETURN AdaptiveRootScaffold.
+        // So the shell builder here should just return the child if the wrapper handles scaffolding.
+        
     branches: [
       // Home branch
       StatefulShellBranch(
@@ -91,7 +96,16 @@ RouteBase _buildMobileStatefulShell() {
           ),
         ],
       ),
+      // Settings branch
+       StatefulShellBranch(
+        routes: [
+          GoRoute(
+            path: const SettingsRoute().location,
+            name: SettingsRoute.name,
+            pageBuilder: (context, state) =>
+                const SettingsRoute().buildPage(context, state),
+          ),
+        ],
+      ),
     ],
   );
-}
-

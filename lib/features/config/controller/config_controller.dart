@@ -1,7 +1,8 @@
 import 'dart:convert';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import 'package:hiddify/core/preferences/preferences_provider.dart';
-import '../model/config.dart';
+import 'package:hiddify/features/config/model/config.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'config_controller.g.dart';
 
@@ -17,20 +18,20 @@ class ConfigController extends _$ConfigController {
   }
 
   Future<void> add(Config config) async {
-    final current = state.valueOrNull ?? [];
+    final current = state.asData?.value ?? [];
     state = AsyncValue.data([...current, config]);
     await _save();
   }
 
   Future<void> remove(String id) async {
-    final current = state.valueOrNull ?? [];
+    final current = state.asData?.value ?? [];
     state = AsyncValue.data(current.where((c) => c.id != id).toList());
     await _save();
   }
 
   Future<void> _save() async {
     final prefs = await ref.read(sharedPreferencesProvider.future);
-    final current = state.valueOrNull ?? [];
+    final current = state.asData?.value ?? [];
     final list = current.map((e) => jsonEncode(e.toJson())).toList();
     await prefs.setStringList(_key, list);
   }

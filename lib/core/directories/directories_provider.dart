@@ -10,18 +10,18 @@ part 'directories_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class AppDirectories extends _$AppDirectories with InfraLogger {
-  final _methodChannel = const MethodChannel("com.hiddify.app/platform");
+  final _methodChannel = const MethodChannel('com.hiddify.app/platform');
 
   @override
   Future<Directories> build() async {
     final Directories dirs;
     if (Platform.isIOS) {
-      final paths = await _methodChannel.invokeMethod<Map>("get_paths");
-      loggy.debug("paths: $paths");
+      final paths = await _methodChannel.invokeMethod<Map>('get_paths');
+      loggy.debug('paths: $paths');
       dirs = (
-        baseDir: Directory(paths?["base"]! as String),
-        workingDir: Directory(paths?["working"]! as String),
-        tempDir: Directory(paths?["temp"]! as String),
+        baseDir: Directory(paths?['base']! as String),
+        workingDir: Directory(paths?['working']! as String),
+        tempDir: Directory(paths?['temp']! as String),
       );
     } else {
       final baseDir = await getApplicationSupportDirectory();
@@ -42,12 +42,12 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
     return dirs;
   }
 
-  static Future<Directory> getDatabaseDirectory() async {
+  static Future<Directory> getDatabaseDirectory() {
     if (Platform.isIOS || Platform.isMacOS) {
-      return await getLibraryDirectory();
+      return getLibraryDirectory();
     } else if (Platform.isWindows || Platform.isLinux) {
-      return await getApplicationSupportDirectory();
+      return getApplicationSupportDirectory();
     }
-    return await getApplicationDocumentsDirectory();
+    return getApplicationDocumentsDirectory();
   }
 }

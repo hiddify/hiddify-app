@@ -1,33 +1,33 @@
+import 'package:hiddify/features/config/model/config.dart';
 import 'package:uuid/uuid.dart';
-import '../model/config.dart';
 
 class ConfigParser {
   static const _uuid = Uuid();
 
   static Config? parse(String content, {String source = 'manual'}) {
-    content = content.trim();
-    if (content.isEmpty) return null;
+    final trimmedContent = content.trim();
+    if (trimmedContent.isEmpty) return null;
 
-    String type = 'unknown';
-    String name = 'Config';
+    var type = 'unknown';
+    var name = 'Config';
 
-    if (content.startsWith('vless://')) {
+    if (trimmedContent.startsWith('vless://')) {
       type = 'vless';
-      name = _parseName(content) ?? 'VLESS Config';
-    } else if (content.startsWith('vmess://')) {
+      name = _parseName(trimmedContent) ?? 'VLESS Config';
+    } else if (trimmedContent.startsWith('vmess://')) {
       type = 'vmess';
       // vmess usually base64 encoded, need decode to get name, skipping for simple check
       name = 'VMess Config';
-    } else if (content.startsWith('trojan://')) {
+    } else if (trimmedContent.startsWith('trojan://')) {
       type = 'trojan';
-      name = _parseName(content) ?? 'Trojan Config';
-    } else if (content.startsWith('ss://')) {
+      name = _parseName(trimmedContent) ?? 'Trojan Config';
+    } else if (trimmedContent.startsWith('ss://')) {
       type = 'shadowsocks';
-      name = _parseName(content) ?? 'SS Config';
+      name = _parseName(trimmedContent) ?? 'SS Config';
     } else {
       // Assuming it might be a JSON content or universal format?
       // Check for braces
-      if (content.startsWith('{') && content.endsWith('}')) {
+      if (trimmedContent.startsWith('{') && trimmedContent.endsWith('}')) {
         type = 'json';
         name = 'Custom Config';
       }
@@ -38,7 +38,7 @@ class ConfigParser {
     return Config(
       id: _uuid.v4(),
       name: name,
-      content: content,
+      content: trimmedContent,
       type: type,
       source: source,
       addedAt: DateTime.now(),

@@ -45,6 +45,10 @@ class AdaptiveRootScaffold extends HookConsumerWidget with AppLogger {
         icon: const Icon(FluentIcons.power_20_filled),
         label: t.home.pageTitle,
       ),
+      NavigationDestination(
+        icon: const Icon(FluentIcons.settings_20_filled),
+        label: t.settings.pageTitle,
+      ),
     ];
 
     void onDestinationSelected(int index) {

@@ -1,8 +1,9 @@
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:archive/archive_io.dart';
+import 'package:hiddify/core/logger/logger_controller.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:share_plus/share_plus.dart';
 
 part 'log_service.g.dart';
@@ -14,6 +15,7 @@ class LogService {
   Future<String> getLogDirectory() async {
     final dir = await getApplicationDocumentsDirectory();
     final logDir = Directory('${dir.path}/logs');
+    // ignore: avoid_slow_async_io
     if (!await logDir.exists()) {
       await logDir.create(recursive: true);
     }
@@ -30,29 +32,16 @@ class LogService {
     return '$dir/access.log';
   }
 
-  Stream<List<String>> streamLogs() async* {
-    final path = await getCoreLogPath();
-    final file = File(path);
-    // Simple tail implementation
-    // In real world, file watcher or periodic read
-    while (true) {
-      if (await file.exists()) {
-        final lines = await file.readAsLines();
-        // Return last 100 lines
-        yield lines.length > 100 ? lines.sublist(lines.length - 100) : lines;
-      } else {
-        yield ["Log file not found..."];
-      }
-      await Future.delayed(const Duration(seconds: 2));
-    }
-  }
+  Stream<List<String>> streamLogs() => LoggerController.instance.logStream;
 
   Future<void> clearLogs() async {
     final dir = await getLogDirectory();
     final d = Directory(dir);
+    // ignore: avoid_slow_async_io
     if (await d.exists()) {
       await d.delete(recursive: true);
     }
+    // Also notify logger controller if needed, but file printer is append-only for now
   }
 
   Future<void> exportLogs() async {
@@ -61,9 +50,9 @@ class LogService {
     final tempDir = await getTemporaryDirectory();
     final zipPath = '${tempDir.path}/hiddify_logs.zip';
     encoder.create(zipPath);
-    encoder.addDirectory(Directory(dir));
-    encoder.close();
+    await encoder.addDirectory(Directory(dir));
+    await encoder.close();
     
-    await Share.shareXFiles([XFile(zipPath)], text: 'Hiddify Logs');
+    await SharePlus.instance.share(ShareParams(files: [XFile(zipPath)], text: 'Hiddify Logs'));
   }
 }

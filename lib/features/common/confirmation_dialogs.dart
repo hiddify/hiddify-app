@@ -6,8 +6,7 @@ Future<bool> showConfirmationDialog(
   required String title,
   required String message,
   IconData? icon,
-}) {
-  return showDialog<bool>(
+}) => showDialog<bool>(
     context: context,
     builder: (context) {
       final localizations = MaterialLocalizations.of(context);
@@ -28,4 +27,3 @@ Future<bool> showConfirmationDialog(
       );
     },
   ).then((value) => value ?? false);
-}

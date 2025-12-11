@@ -22,13 +22,11 @@ class AnimatedVisibility extends StatelessWidget {
   /// [duration] controls the animation speed.
   /// [curve] defines the animation curve.
   const AnimatedVisibility({
-    super.key,
-    required this.visible,
+    required this.visible, required this.child, super.key,
     this.axis = Axis.horizontal,
     this.padding = EdgeInsets.zero,
     this.duration = const Duration(milliseconds: 200),
     this.curve = Curves.easeInOut,
-    required this.child,
   });
 
   /// Whether the child widget should be visible.
@@ -50,8 +48,7 @@ class AnimatedVisibility extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
+  Widget build(BuildContext context) => AnimatedSwitcher(
       duration: duration,
       switchInCurve: curve,
       switchOutCurve: curve,
@@ -70,5 +67,4 @@ class AnimatedVisibility extends StatelessWidget {
             )
           : const SizedBox.shrink(key: ValueKey('hidden')),
     );
-  }
 }

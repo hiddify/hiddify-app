@@ -22,6 +22,10 @@ cmake_policy(SET CMP0074 NEW)  # find_package uses <PackageName>_ROOT variables
 cmake_policy(SET CMP0077 NEW)  # option() honors normal variables
 cmake_policy(SET CMP0091 NEW)  # MSVC runtime library flags are selected by CMAKE_MSVC_RUNTIME_LIBRARY
 
+if(MSVC)
+    add_compile_options(/permissive)
+endif()
+
 # ============================================================================
 # Application Configuration
 # ============================================================================
@@ -70,7 +74,7 @@ add_definitions(-DUNICODE -D_UNICODE)
 add_definitions(-D_WIN32_WINNT=0x0A00 -DWINVER=0x0A00)
 
 # Reduce Windows header bloat
-add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
+add_definitions(-DNOMINMAX)
 
 # ============================================================================
 # Standard Settings Function
@@ -79,7 +83,7 @@ add_definitions(-DWIN32_LEAN_AND_MEAN -DNOMINMAX)
 # Be cautious about adding new options here, as plugins use this function.
 function(APPLY_STANDARD_SETTINGS TARGET)
     # Modern C++ standard
-    target_compile_features(${TARGET} PUBLIC cxx_std_20)
+    target_compile_features(${TARGET} PUBLIC cxx_std_17)
     set_target_properties(${TARGET} PROPERTIES
         CXX_EXTENSIONS OFF
         CXX_STANDARD_REQUIRED ON
@@ -92,7 +96,7 @@ function(APPLY_STANDARD_SETTINGS TARGET)
             /wd"4100"              # Unreferenced formal parameter
             /wd"4127"              # Conditional expression is constant
             /wd"4244"              # Conversion, possible loss of data
-            /permissive-           # Strict conformance mode
+
             /EHsc                  # Exception handling
             /utf-8                 # Source and execution charset
             /Zc:__cplusplus        # Correct __cplusplus macro

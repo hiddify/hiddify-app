@@ -6,10 +6,11 @@ import 'package:hiddify/utils/utils.dart';
 
 bool showDrawerButton(BuildContext context) {
   if (!useMobileRouter) return true;
-  final String location = GoRouterState.of(context).uri.path;
-  if (location == const HomeRoute().location)
+  final location = GoRouterState.of(context).uri.path;
+  if (location == const HomeRoute().location) {
     // if (location == const ProfilesOverviewRoute().location)
     return true;
+  }
   // if (location.startsWith(const ProxiesRoute().location)) return true;
   return false;
 }
@@ -31,8 +32,7 @@ class NestedAppBar extends StatelessWidget {
   final PreferredSizeWidget? bottom;
 
   @override
-  Widget build(BuildContext context) {
-    return SliverAppBar(
+  Widget build(BuildContext context) => SliverAppBar(
       leading: _buildLeading(context),
       title: title,
       actions: actions,
@@ -40,7 +40,6 @@ class NestedAppBar extends StatelessWidget {
       forceElevated: forceElevated,
       bottom: bottom,
     );
-  }
 
   Widget? _buildLeading(BuildContext context) {
     final scaffold = RootScaffold.stateKey.currentState;

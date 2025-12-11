@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hiddify/core/theme/app_theme.dart' show AppTheme;
 
 /// Centralized definition of application colors.
 /// 

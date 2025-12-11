@@ -12,7 +12,7 @@ class LocalePreferences extends _$LocalePreferences with AppLogger {
     final persisted = ref
         .watch(sharedPreferencesProvider)
         .requireValue
-        .getString("locale");
+        .getString('locale');
     if (persisted == null) return AppLocaleUtils.findDeviceLocale();
     // keep backward compatibility with chinese after changing zh to zh_CN
     // if (persisted == "zh") {
@@ -21,7 +21,7 @@ class LocalePreferences extends _$LocalePreferences with AppLogger {
     try {
       return AppLocale.values.byName(persisted);
     } catch (e) {
-      loggy.error("error setting locale: [$persisted]", e);
+      loggy.error('error setting locale: [$persisted]', e);
       return AppLocale.en;
     }
   }
@@ -31,6 +31,6 @@ class LocalePreferences extends _$LocalePreferences with AppLogger {
     await ref
         .read(sharedPreferencesProvider)
         .requireValue
-        .setString("locale", value.name);
+        .setString('locale', value.name);
   }
 }

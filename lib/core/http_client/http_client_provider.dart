@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
@@ -11,11 +10,10 @@ DioHttpClient httpClient(Ref ref) {
   final client = DioHttpClient(
     timeout: const Duration(seconds: 15),
     userAgent: ref.watch(appInfoProvider).requireValue.userAgent,
-    debug: kDebugMode,
   );
 
   ref.listen<int>(Preferences.mixedPort, (_, int next) {
     client.setProxyPort(next);
-  }, fireImmediately: true);
+  }, fireImmediately: true,);
   return client;
 }

@@ -18,11 +18,11 @@ abstract class AppInfoEntity with _$AppInfoEntity {
   const AppInfoEntity._();
 
   String get userAgent =>
-      "HiddifyNext/$version ($operatingSystem) like ClashMeta v2ray sing-box";
+      'HiddifyNext/$version ($operatingSystem) like ClashMeta v2ray sing-box';
 
   String get presentVersion => environment == Environment.prod
       ? version
-      : "$version ${environment.name}";
+      : '$version ${environment.name}';
 
   /// formats app info for sharing
   String format() =>

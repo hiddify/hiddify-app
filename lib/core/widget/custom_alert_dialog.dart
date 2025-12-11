@@ -23,9 +23,8 @@ class CustomAlertDialog extends StatelessWidget {
   /// [message] is the main content text.
   /// [onDismiss] is called when the dialog is closed.
   const CustomAlertDialog({
-    super.key, 
-    this.title, 
-    required this.message,
+    required this.message, super.key, 
+    this.title,
     this.onDismiss,
   });
 
@@ -47,7 +46,7 @@ class CustomAlertDialog extends StatelessWidget {
 
   /// Shows this dialog and returns when it's dismissed.
   Future<void> show(BuildContext context) async {
-    await showDialog(context: context, builder: (context) => this);
+    await showDialog<void>(context: context, builder: (context) => this);
     onDismiss?.call();
   }
 
