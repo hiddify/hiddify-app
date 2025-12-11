@@ -2,12 +2,33 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:hiddify/core/logger/log_viewer_page.dart';
 import 'package:hiddify/features/config/controller/config_controller.dart';
 import 'package:hiddify/features/config/model/config.dart';
 import 'package:hiddify/features/config/widget/add_config_sheet.dart';
 import 'package:hiddify/features/connection/logic/connection_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// Helper to show error dialog
+void _showErrorDialog(BuildContext context, String error) {
+  unawaited(showDialog<void>(
+    context: context,
+    builder: (context) => AlertDialog(
+      icon: const Icon(Icons.error_outline, color: Colors.red, size: 48),
+      title: const Text('Connection Error'),
+      content: SingleChildScrollView(
+        child: SelectableText(error),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Close'),
+        ),
+      ],
+    ),
+  ));
+}
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -18,6 +39,29 @@ class HomePage extends HookConsumerWidget {
     final colorScheme = theme.colorScheme;
     final connectionState = ref.watch(connectionProvider);
     final configsAsync = ref.watch(configControllerProvider);
+
+    // Listen for errors and show SnackBar
+    ref.listen<ConnectionStatus>(connectionProvider, (previous, next) {
+      if (next == ConnectionStatus.error) {
+        final errorMsg = ref.read(lastConnectionErrorProvider);
+        if (errorMsg != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: $errorMsg'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: 'Details',
+                textColor: Colors.white,
+                onPressed: () {
+                  _showErrorDialog(context, errorMsg);
+                },
+              ),
+            ),
+          );
+        }
+      }
+    });
 
     return Scaffold(
       body: SafeArea(
@@ -54,27 +98,53 @@ class HomePage extends HookConsumerWidget {
 
                 const SizedBox(height: 32),
 
-                // Add Config Button
+                // Action Buttons Row
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: FilledButton.icon(
-                    onPressed: () async {
-                      await showModalBottomSheet<void>(
-                        context: context,
-                        isScrollControlled: true,
-                        useSafeArea: true,
-                        showDragHandle: true,
-                        builder: (_) => const AddConfigSheet(),
-                      );
-                    },
-                    icon: const Icon(Icons.add_rounded),
-                    label: const Text('Add Configuration'),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 56),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  child: Row(
+                    children: [
+                      // Add Config Button
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () async {
+                            await showModalBottomSheet<void>(
+                              context: context,
+                              isScrollControlled: true,
+                              useSafeArea: true,
+                              showDragHandle: true,
+                              builder: (_) => const AddConfigSheet(),
+                            );
+                          },
+                          icon: const Icon(Icons.add_rounded),
+                          label: const Text('Add Config'),
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(0, 56),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      // Logs Button
+                      FilledButton.tonalIcon(
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const LogViewerPage(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.terminal_rounded),
+                        label: const Text('Logs'),
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(0, 56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ).animate().fadeIn(delay: 300.ms, duration: 400.ms).slideY(begin: 0.1, end: 0),
 
@@ -172,21 +242,24 @@ class HomePage extends HookConsumerWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colorScheme.secondaryContainer,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                currentConfig.type.toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: colorScheme.onSecondaryContainer,
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.secondaryContainer,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  currentConfig.type.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: colorScheme.onSecondaryContainer,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ),
@@ -348,23 +421,29 @@ class HomePage extends HookConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _StatCard(
-            icon: Icons.arrow_upward_rounded,
-            label: 'Upload',
-            value: isConnected ? '0 KB/s' : '--',
-            colorScheme: colorScheme,
+          Expanded(
+            child: _StatCard(
+              icon: Icons.arrow_upward_rounded,
+              label: 'Upload',
+              value: isConnected ? '0 KB/s' : '--',
+              colorScheme: colorScheme,
+            ),
           ),
-          _StatCard(
-            icon: Icons.arrow_downward_rounded,
-            label: 'Download',
-            value: isConnected ? '0 KB/s' : '--',
-            colorScheme: colorScheme,
+          Expanded(
+            child: _StatCard(
+              icon: Icons.arrow_downward_rounded,
+              label: 'Download',
+              value: isConnected ? '0 KB/s' : '--',
+              colorScheme: colorScheme,
+            ),
           ),
-          _StatCard(
-            icon: Icons.timer_outlined,
-            label: 'Duration',
-            value: isConnected ? '00:00:00' : '--',
-            colorScheme: colorScheme,
+          Expanded(
+            child: _StatCard(
+              icon: Icons.timer_outlined,
+              label: 'Duration',
+              value: isConnected ? '00:00:00' : '--',
+              colorScheme: colorScheme,
+            ),
           ),
         ],
       ),

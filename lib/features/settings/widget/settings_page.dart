@@ -4,6 +4,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/logger/log_viewer_page.dart';
 import 'package:hiddify/features/settings/model/core_preferences.dart';
+import 'package:hiddify/features/settings/model/dns_settings.dart';
+import 'package:hiddify/features/settings/model/fragment_settings.dart';
+import 'package:hiddify/features/settings/model/inbound_settings.dart';
+import 'package:hiddify/features/settings/model/mux_settings.dart';
+import 'package:hiddify/features/settings/model/routing_settings.dart';
+import 'package:hiddify/features/settings/model/sockopt_settings.dart';
+import 'package:hiddify/features/settings/model/tls_settings.dart';
 import 'package:hiddify/features/system/data/system_optimization_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,19 +22,59 @@ class SettingsPage extends HookConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
+    // Core Settings
     final coreMode = ref.watch(CorePreferences.coreMode);
-    final routingRule = ref.watch(CorePreferences.routingRule);
     final enableLogging = ref.watch(CorePreferences.enableLogging);
     final logLevel = ref.watch(CorePreferences.logLevel);
-    // final assetPath = ref.watch(CorePreferences.assetPath); // Unused
-    final enableMux = ref.watch(CorePreferences.enableMux);
-    final muxConcurrency = ref.watch(CorePreferences.muxConcurrency);
-    final allowInsecure = ref.watch(CorePreferences.allowInsecure);
-    final domainStrategy = ref.watch(CorePreferences.domainStrategy);
-    final socksPort = ref.watch(CorePreferences.sockPort);
-    final httpPort = ref.watch(CorePreferences.httpPort);
-    final remoteDns = ref.watch(CorePreferences.remoteDns);
-    final fingerPrint = ref.watch(CorePreferences.fingerPrint);
+
+    // Inbound Settings
+    final socksPort = ref.watch(InboundSettings.socksPort);
+    final httpPort = ref.watch(InboundSettings.httpPort);
+    final enableSniffing = ref.watch(InboundSettings.sniffingEnabled);
+
+    // TLS Settings
+    final allowInsecure = ref.watch(TlsSettings.allowInsecure);
+    final fingerPrint = ref.watch(TlsSettings.fingerprint);
+    final alpn = ref.watch(TlsSettings.alpn);
+
+    // MUX Settings
+    final enableMux = ref.watch(MuxSettings.enabled);
+    final muxConcurrency = ref.watch(MuxSettings.concurrency);
+    final muxPadding = ref.watch(MuxSettings.padding);
+
+    // DNS Settings
+    final remoteDns = ref.watch(DnsSettings.remoteDns);
+    final directDns = ref.watch(DnsSettings.directDns);
+    final dnsQueryStrategy = ref.watch(DnsSettings.queryStrategy);
+    final enableFakeDns = ref.watch(DnsSettings.enableFakeDns);
+
+    // Routing Settings
+    final domainStrategy = ref.watch(RoutingSettings.domainStrategy);
+    final bypassLan = ref.watch(RoutingSettings.bypassLan);
+    final bypassIran = ref.watch(RoutingSettings.bypassIran);
+    final bypassChina = ref.watch(RoutingSettings.bypassChina);
+    final blockAds = ref.watch(RoutingSettings.blockAds);
+    final blockQuic = ref.watch(RoutingSettings.blockQuic);
+
+    // Fragment Settings (GFW-knocker)
+    final enableFragment = ref.watch(FragmentSettings.enabled);
+    final fragmentPackets = ref.watch(FragmentSettings.packets);
+    final fragmentLength = ref.watch(FragmentSettings.length);
+    final fragmentInterval = ref.watch(FragmentSettings.interval);
+
+    // Noise Settings (GFW-knocker)
+    final enableNoise = ref.watch(FragmentSettings.noiseEnabled);
+    final noiseType = ref.watch(FragmentSettings.noiseType);
+    final noisePacket = ref.watch(FragmentSettings.noisePacket);
+    final noiseDelay = ref.watch(FragmentSettings.noiseDelay);
+
+    // Security Settings
+    final blockMalware = ref.watch(RoutingSettings.blockMalware);
+    final blockPhishing = ref.watch(RoutingSettings.blockPhishing);
+
+    // Sockopt Settings
+    final tcpFastOpen = ref.watch(SockoptSettings.tcpFastOpen);
+    final tcpCongestion = ref.watch(SockoptSettings.tcpCongestion);
 
     return Scaffold(
       body: CustomScrollView(
@@ -61,15 +108,71 @@ class SettingsPage extends HookConsumerWidget {
                     ),
                     const Divider(height: 1),
                     _SettingsTile(
-                      icon: Icons.route_rounded,
-                      title: 'Routing Rule',
-                      subtitle: _getRoutingSubtitle(routingRule),
+                      icon: Icons.domain_rounded,
+                      title: 'Domain Strategy',
                       trailing: _ModernDropdown<String>(
-                        value: routingRule,
-                        items: const {'global': 'Global', 'geo_iran': 'Geo Iran', 'bypass_lan': 'Bypass LAN'},
-                        onChanged: (val) {
-                          if (val != null) unawaited(ref.read(CorePreferences.routingRule.notifier).update(val));
-                        },
+                        value: domainStrategy,
+                        items: const {'IPIfNonMatch': 'IPIfNonMatch', 'IPOnDemand': 'IPOnDemand', 'AsIs': 'AsIs'},
+                        onChanged: (v) => unawaited(ref.read(RoutingSettings.domainStrategy.notifier).update(v!)),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Routing Section
+                _SectionHeader(title: 'Routing', icon: Icons.route_rounded, colorScheme: colorScheme),
+                const SizedBox(height: 12),
+                _SettingsCard(
+                  children: [
+                    _SettingsTile(
+                      icon: Icons.home_rounded,
+                      title: 'Bypass LAN',
+                      subtitle: 'Direct local network',
+                      trailing: Switch(
+                        value: bypassLan,
+                        onChanged: (v) => ref.read(RoutingSettings.bypassLan.notifier).update(v),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.flag_rounded,
+                      title: 'Bypass Iran',
+                      subtitle: 'Direct Iran websites',
+                      trailing: Switch(
+                        value: bypassIran,
+                        onChanged: (v) => ref.read(RoutingSettings.bypassIran.notifier).update(v),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.public_rounded,
+                      title: 'Bypass China',
+                      subtitle: 'Direct China websites',
+                      trailing: Switch(
+                        value: bypassChina,
+                        onChanged: (v) => ref.read(RoutingSettings.bypassChina.notifier).update(v),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.block_rounded,
+                      title: 'Block Ads',
+                      subtitle: 'Block advertisements',
+                      trailing: Switch(
+                        value: blockAds,
+                        onChanged: (v) => ref.read(RoutingSettings.blockAds.notifier).update(v),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.speed_rounded,
+                      title: 'Block QUIC',
+                      subtitle: 'Force TLS for better XTLS',
+                      trailing: Switch(
+                        value: blockQuic,
+                        onChanged: (v) => ref.read(RoutingSettings.blockQuic.notifier).update(v),
                       ),
                     ),
                   ],
@@ -96,7 +199,7 @@ class SettingsPage extends HookConsumerWidget {
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             isDense: true,
                           ),
-                          onSubmitted: (v) => ref.read(CorePreferences.sockPort.notifier).update(int.tryParse(v) ?? 2334),
+                          onSubmitted: (v) => ref.read(InboundSettings.socksPort.notifier).update(int.tryParse(v) ?? 2334),
                         ),
                       ),
                     ),
@@ -115,8 +218,18 @@ class SettingsPage extends HookConsumerWidget {
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                             isDense: true,
                           ),
-                          onSubmitted: (v) => ref.read(CorePreferences.httpPort.notifier).update(int.tryParse(v) ?? 2335),
+                          onSubmitted: (v) => ref.read(InboundSettings.httpPort.notifier).update(int.tryParse(v) ?? 2335),
                         ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.search_rounded,
+                      title: 'Enable Sniffing',
+                      subtitle: 'Detect protocol type',
+                      trailing: Switch(
+                        value: enableSniffing,
+                        onChanged: (v) => ref.read(InboundSettings.sniffingEnabled.notifier).update(v),
                       ),
                     ),
                   ],
@@ -124,8 +237,8 @@ class SettingsPage extends HookConsumerWidget {
 
                 const SizedBox(height: 24),
 
-                // Network & Security
-                _SectionHeader(title: 'Network & Security', icon: Icons.security_rounded, colorScheme: colorScheme),
+                // TLS & Security
+                _SectionHeader(title: 'TLS & Security', icon: Icons.security_rounded, colorScheme: colorScheme),
                 const SizedBox(height: 12),
                 _SettingsCard(
                   children: [
@@ -136,7 +249,7 @@ class SettingsPage extends HookConsumerWidget {
                       isDanger: true,
                       trailing: Switch(
                         value: allowInsecure,
-                        onChanged: (v) => ref.read(CorePreferences.allowInsecure.notifier).update(v),
+                        onChanged: (v) => ref.read(TlsSettings.allowInsecure.notifier).update(v),
                       ),
                     ),
                     const Divider(height: 1),
@@ -145,45 +258,86 @@ class SettingsPage extends HookConsumerWidget {
                       title: 'TLS Fingerprint',
                       trailing: _ModernDropdown<String>(
                         value: fingerPrint,
-                        items: const {'chrome': 'Chrome', 'firefox': 'Firefox', 'ios': 'iOS', 'random': 'Random'},
-                        onChanged: (v) => ref.read(CorePreferences.fingerPrint.notifier).update(v!),
+                        items: const {
+                          'chrome': 'Chrome',
+                          'firefox': 'Firefox',
+                          'safari': 'Safari',
+                          'ios': 'iOS',
+                          'android': 'Android',
+                          'edge': 'Edge',
+                          'random': 'Random',
+                          'randomized': 'Randomized',
+                        },
+                        onChanged: (v) => ref.read(TlsSettings.fingerprint.notifier).update(v!),
                       ),
                     ),
                     const Divider(height: 1),
                     _SettingsTile(
+                      icon: Icons.text_fields_rounded,
+                      title: 'ALPN',
+                      trailing: _ModernDropdown<String>(
+                        value: alpn,
+                        items: const {
+                          'h2,http/1.1': 'H2, HTTP/1.1',
+                          'h2': 'H2 Only',
+                          'http/1.1': 'HTTP/1.1 Only',
+                        },
+                        onChanged: (v) => ref.read(TlsSettings.alpn.notifier).update(v!),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // MUX Settings
+                _SectionHeader(title: 'MUX', icon: Icons.merge_rounded, colorScheme: colorScheme),
+                const SizedBox(height: 12),
+                _SettingsCard(
+                  children: [
+                    _SettingsTile(
                       icon: Icons.merge_rounded,
-                      title: 'Enable Mux',
+                      title: 'Enable MUX',
                       subtitle: 'Multiplex connections',
                       trailing: Switch(
                         value: enableMux,
-                        onChanged: (v) => ref.read(CorePreferences.enableMux.notifier).update(v),
+                        onChanged: (v) => ref.read(MuxSettings.enabled.notifier).update(v),
                       ),
                     ),
                     if (enableMux) ...[
                       const Divider(height: 1),
                       _SettingsTile(
                         icon: Icons.tune_rounded,
-                        title: 'Mux Concurrency',
+                        title: 'Concurrency',
                         trailing: _ModernDropdown<int>(
                           value: muxConcurrency,
-                          items: const {4: '4', 8: '8', 16: '16'},
-                          onChanged: (v) => ref.read(CorePreferences.muxConcurrency.notifier).update(v ?? 8),
+                          items: const {1: '1', 2: '2', 4: '4', 8: '8', 16: '16', 32: '32'},
+                          onChanged: (v) => ref.read(MuxSettings.concurrency.notifier).update(v ?? 8),
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      _SettingsTile(
+                        icon: Icons.padding_rounded,
+                        title: 'Enable Padding',
+                        subtitle: 'Add padding to packets',
+                        trailing: Switch(
+                          value: muxPadding,
+                          onChanged: (v) => ref.read(MuxSettings.padding.notifier).update(v),
                         ),
                       ),
                     ],
-                    const Divider(height: 1),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // DNS Settings
+                _SectionHeader(title: 'DNS', icon: Icons.dns_outlined, colorScheme: colorScheme),
+                const SizedBox(height: 12),
+                _SettingsCard(
+                  children: [
                     _SettingsTile(
-                      icon: Icons.domain_rounded,
-                      title: 'Domain Strategy',
-                      trailing: _ModernDropdown<String>(
-                        value: domainStrategy,
-                        items: const {'IPIfNonMatch': 'IPIfNonMatch', 'IPOnDemand': 'IPOnDemand', 'AsIs': 'AsIs'},
-                        onChanged: (v) => ref.read(CorePreferences.domainStrategy.notifier).update(v!),
-                      ),
-                    ),
-                    const Divider(height: 1),
-                    _SettingsTile(
-                      icon: Icons.dns_outlined,
+                      icon: Icons.cloud_rounded,
                       title: 'Remote DNS',
                       trailing: SizedBox(
                         width: 140,
@@ -196,8 +350,243 @@ class SettingsPage extends HookConsumerWidget {
                             isDense: true,
                             hintText: '8.8.8.8',
                           ),
-                          onSubmitted: (v) => ref.read(CorePreferences.remoteDns.notifier).update(v),
+                          onSubmitted: (v) => ref.read(DnsSettings.remoteDns.notifier).update(v),
                         ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.computer_rounded,
+                      title: 'Direct DNS',
+                      trailing: SizedBox(
+                        width: 140,
+                        child: TextField(
+                          controller: TextEditingController(text: directDns),
+                          textAlign: TextAlign.end,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            isDense: true,
+                            hintText: '1.1.1.1',
+                          ),
+                          onSubmitted: (v) => ref.read(DnsSettings.directDns.notifier).update(v),
+                        ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.swap_horiz_rounded,
+                      title: 'Query Strategy',
+                      trailing: _ModernDropdown<String>(
+                        value: dnsQueryStrategy,
+                        items: const {'UseIP': 'UseIP', 'UseIPv4': 'UseIPv4', 'UseIPv6': 'UseIPv6'},
+                        onChanged: (v) => ref.read(DnsSettings.queryStrategy.notifier).update(v!),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.masks_rounded,
+                      title: 'Enable FakeDNS',
+                      subtitle: 'Virtual DNS for sniffing',
+                      trailing: Switch(
+                        value: enableFakeDns,
+                        onChanged: (v) => ref.read(DnsSettings.enableFakeDns.notifier).update(v),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Fragment Settings (GFW-knocker)
+                _SectionHeader(title: 'Fragment (Anti-Censorship)', icon: Icons.broken_image_rounded, colorScheme: colorScheme),
+                const SizedBox(height: 12),
+                _SettingsCard(
+                  children: [
+                    _SettingsTile(
+                      icon: Icons.broken_image_rounded,
+                      title: 'Enable Fragment',
+                      subtitle: 'TLS fragmentation for bypass',
+                      trailing: Switch(
+                        value: enableFragment,
+                        onChanged: (v) => ref.read(FragmentSettings.enabled.notifier).update(v),
+                      ),
+                    ),
+                    if (enableFragment) ...[
+                      const Divider(height: 1),
+                      _SettingsTile(
+                        icon: Icons.category_rounded,
+                        title: 'Packets Type',
+                        trailing: _ModernDropdown<String>(
+                          value: fragmentPackets,
+                          items: const {'tlshello': 'TLS Hello', '1-3': 'TCP 1-3'},
+                          onChanged: (v) => ref.read(FragmentSettings.packets.notifier).update(v!),
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      _SettingsTile(
+                        icon: Icons.straighten_rounded,
+                        title: 'Length',
+                        trailing: SizedBox(
+                          width: 100,
+                          child: TextField(
+                            controller: TextEditingController(text: fragmentLength),
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                              isDense: true,
+                              hintText: '100-200',
+                            ),
+                            onSubmitted: (v) => ref.read(FragmentSettings.length.notifier).update(v),
+                          ),
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      _SettingsTile(
+                        icon: Icons.timer_rounded,
+                        title: 'Interval (ms)',
+                        trailing: SizedBox(
+                          width: 100,
+                          child: TextField(
+                            controller: TextEditingController(text: fragmentInterval),
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                              isDense: true,
+                              hintText: '10-20',
+                            ),
+                            onSubmitted: (v) => ref.read(FragmentSettings.interval.notifier).update(v),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Noise Settings (GFW-knocker)
+                _SectionHeader(title: 'Noise (Anti-DPI)', icon: Icons.waves_rounded, colorScheme: colorScheme),
+                const SizedBox(height: 12),
+                _SettingsCard(
+                  children: [
+                    _SettingsTile(
+                      icon: Icons.waves_rounded,
+                      title: 'Enable Noise',
+                      subtitle: 'UDP noise injection',
+                      trailing: Switch(
+                        value: enableNoise,
+                        onChanged: (v) => ref.read(FragmentSettings.noiseEnabled.notifier).update(v),
+                      ),
+                    ),
+                    if (enableNoise) ...[
+                      const Divider(height: 1),
+                      _SettingsTile(
+                        icon: Icons.shuffle_rounded,
+                        title: 'Noise Type',
+                        trailing: _ModernDropdown<String>(
+                          value: noiseType,
+                          items: const {'rand': 'Random', 'str': 'String', 'base64': 'Base64'},
+                          onChanged: (v) => ref.read(FragmentSettings.noiseType.notifier).update(v!),
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      _SettingsTile(
+                        icon: Icons.data_array_rounded,
+                        title: 'Packet Size',
+                        trailing: SizedBox(
+                          width: 100,
+                          child: TextField(
+                            controller: TextEditingController(text: noisePacket),
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                              isDense: true,
+                              hintText: '10-20',
+                            ),
+                            onSubmitted: (v) => ref.read(FragmentSettings.noisePacket.notifier).update(v),
+                          ),
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      _SettingsTile(
+                        icon: Icons.timer_outlined,
+                        title: 'Delay (ms)',
+                        trailing: SizedBox(
+                          width: 100,
+                          child: TextField(
+                            controller: TextEditingController(text: noiseDelay),
+                            textAlign: TextAlign.center,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                              isDense: true,
+                              hintText: '10-16',
+                            ),
+                            onSubmitted: (v) => ref.read(FragmentSettings.noiseDelay.notifier).update(v),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Security Settings
+                _SectionHeader(title: 'Security', icon: Icons.shield_rounded, colorScheme: colorScheme),
+                const SizedBox(height: 12),
+                _SettingsCard(
+                  children: [
+                    _SettingsTile(
+                      icon: Icons.bug_report_outlined,
+                      title: 'Block Malware',
+                      subtitle: 'Block malicious domains',
+                      trailing: Switch(
+                        value: blockMalware,
+                        onChanged: (v) => ref.read(RoutingSettings.blockMalware.notifier).update(v),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.phishing_outlined,
+                      title: 'Block Phishing',
+                      subtitle: 'Block phishing sites',
+                      trailing: Switch(
+                        value: blockPhishing,
+                        onChanged: (v) => ref.read(RoutingSettings.blockPhishing.notifier).update(v),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Advanced Settings
+                _SectionHeader(title: 'Advanced', icon: Icons.settings_applications_rounded, colorScheme: colorScheme),
+                const SizedBox(height: 12),
+                _SettingsCard(
+                  children: [
+                    _SettingsTile(
+                      icon: Icons.flash_on_rounded,
+                      title: 'TCP Fast Open',
+                      subtitle: 'Reduce connection latency',
+                      trailing: Switch(
+                        value: tcpFastOpen,
+                        onChanged: (v) => ref.read(SockoptSettings.tcpFastOpen.notifier).update(v),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _SettingsTile(
+                      icon: Icons.speed_rounded,
+                      title: 'TCP Congestion',
+                      trailing: _ModernDropdown<String>(
+                        value: tcpCongestion.isEmpty ? '' : tcpCongestion,
+                        items: const {'': 'Default', 'bbr': 'BBR', 'cubic': 'Cubic'},
+                        onChanged: (v) => ref.read(SockoptSettings.tcpCongestion.notifier).update(v ?? ''),
                       ),
                     ),
                   ],
@@ -319,14 +708,6 @@ class SettingsPage extends HookConsumerWidget {
     );
   }
 
-  static String _getRoutingSubtitle(String rule) {
-    switch (rule) {
-      case 'global': return 'Proxy everything';
-      case 'geo_iran': return 'Direct Iran / Block Ads';
-      case 'bypass_lan': return 'Bypass Local Network';
-      default: return rule;
-    }
-  }
 }
 
 class _SectionHeader extends StatelessWidget {

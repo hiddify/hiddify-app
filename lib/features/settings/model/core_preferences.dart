@@ -1,72 +1,55 @@
 import 'package:hiddify/core/utils/preferences_utils.dart';
 
+/// Core preferences for basic Xray-core settings
+/// Advanced settings are in separate files:
+/// - fragment_settings.dart
+/// - dns_settings.dart
+/// - tls_settings.dart
+/// - transport_settings.dart
+/// - mux_settings.dart
+/// - routing_settings.dart
+/// - inbound_settings.dart
+/// - sockopt_settings.dart
 abstract class CorePreferences {
+  /// Custom config content (JSON format)
   static final configContent = PreferencesNotifier.create<String, String>(
     'core_config_content',
-    '''
-{
-  "log": {
-    "loglevel": "warning"
-  },
-  "inbounds": [
-    {
-      "port": 10808,
-      "protocol": "socks",
-      "settings": {
-        "auth": "noauth",
-        "udp": true
-      }
-    }
-  ],
-  "outbounds": [
-    {
-      "protocol": "freedom",
-      "settings": {}
-    }
-  ]
-}''',
+    '',
   );
 
+  /// Asset path for geoip.dat and geosite.dat
   static final assetPath = PreferencesNotifier.create<String, String>(
     'core_asset_path',
     '',
   );
 
+  /// Core mode: vpn (TUN) or proxy (SOCKS/HTTP)
   static final coreMode = PreferencesNotifier.create<String, String>(
     'core_mode',
-    'proxy', // vpn, proxy
+    'proxy',
   );
 
-  static final routingRule = PreferencesNotifier.create<String, String>(
-    'routing_rule',
-    'global', // global, geo_iran, bypass_lan
-  );
-
+  /// Enable core logging
   static final enableLogging = PreferencesNotifier.create<bool, bool>(
     'enable_logging',
     false,
   );
 
+  /// Log level: none, error, warning, info, debug
   static final logLevel = PreferencesNotifier.create<String, String>(
     'log_level',
-    'warning', // none, error, warning, info, debug
+    'warning',
   );
 
-  // Inbound Settings
-  static final sockPort = PreferencesNotifier.create<int, int>('inbound_socks_port', 2334);
-  static final httpPort = PreferencesNotifier.create<int, int>('inbound_http_port', 2335);
+  /// Available core modes
+  static const List<String> availableCoreModes = ['proxy', 'vpn'];
 
-  // Outbound/Mux Settings
-  static final enableMux = PreferencesNotifier.create<bool, bool>('mux_enable', false);
-  static final muxConcurrency = PreferencesNotifier.create<int, int>('mux_concurrency', 8);
-  static final muxPadding = PreferencesNotifier.create<bool, bool>('mux_padding', true);
-
-  // Connection Settings
-  static final allowInsecure = PreferencesNotifier.create<bool, bool>('allow_insecure', false);
-  static final fingerPrint = PreferencesNotifier.create<String, String>('tls_fingerprint', 'chrome'); // chrome, firefox, ios...
-
-  // DNS Settings
-  static final remoteDns = PreferencesNotifier.create<String, String>('remote_dns', '8.8.8.8');
-  static final localDns = PreferencesNotifier.create<String, String>('local_dns', '1.1.1.1');
-  static final domainStrategy = PreferencesNotifier.create<String, String>('domain_strategy', 'IPIfNonMatch');
+  /// Available log levels
+  static const List<String> availableLogLevels = [
+    'none',
+    'error',
+    'warning',
+    'info',
+    'debug',
+  ];
 }
