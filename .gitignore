@@ -10,6 +10,13 @@
 .svn/
 migrate_working_dir/
 .github/help
+
+# Build/Debug outputs
+analyze_output.txt
+deps.txt
+gradle_release_log.txt
+custom_lint.log
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -51,10 +58,27 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# Android
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/build
+/android/.gradle
+/android/local.properties
+/android/.idea
+/android/app/src/main/assets/
+!/android/app/src/main/assets/.gitkeep
 
+# Core binaries/libs
+*.so
+*.a
+*.o
+*.aar
+/libcore/bin/
+/assets/core/
 
 /data
+
+# Local Makefile overrides
+Makefile.local
+.env.mk

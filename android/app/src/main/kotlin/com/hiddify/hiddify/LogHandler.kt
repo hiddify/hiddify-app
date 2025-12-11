@@ -20,9 +20,11 @@ class LogHandler : FlutterPlugin {
         logsChannel.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                 val activity = MainActivity.instance
+                // Send initial full list
                 events?.success(activity.logList)
-                activity.logCallback = {
-                    events?.success(activity.logList)
+                // Send subsequent updates as single strings
+                activity.logCallback = { message ->
+                    events?.success(message)
                 }
             }
 

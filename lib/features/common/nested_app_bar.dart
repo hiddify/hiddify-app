@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hiddify/bootstrap.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
 import 'package:hiddify/utils/utils.dart';
 
 bool showDrawerButton(BuildContext context) {
   if (!useMobileRouter) return true;
-  final String location = GoRouterState.of(context).uri.path;
-  if (location == const HomeRoute().location || location == const ProfilesOverviewRoute().location) return true;
-  if (location.startsWith(const ProxiesRoute().location)) return true;
+  final location = GoRouterState.of(context).uri.path;
+  if (location == const HomeRoute().location) {
+    // if (location == const ProfilesOverviewRoute().location)
+    return true;
+  }
+  // if (location.startsWith(const ProxiesRoute().location)) return true;
   return false;
 }
 
@@ -30,30 +32,35 @@ class NestedAppBar extends StatelessWidget {
   final PreferredSizeWidget? bottom;
 
   @override
-  Widget build(BuildContext context) {
-    RootScaffold.canShowDrawer(context);
-
-    return SliverAppBar(
-      leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
-          ? DrawerButton(
-              onPressed: () {
-                RootScaffold.stateKey.currentState?.openDrawer();
-              },
-            )
-          : (Navigator.of(context).canPop()
-              ? IconButton(
-                  icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
-                  padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Pops the current route off the navigator stack
-                  },
-                )
-              : null),
+  Widget build(BuildContext context) => SliverAppBar(
+      leading: _buildLeading(context),
       title: title,
       actions: actions,
       pinned: pinned,
       forceElevated: forceElevated,
       bottom: bottom,
     );
+
+  Widget? _buildLeading(BuildContext context) {
+    final scaffold = RootScaffold.stateKey.currentState;
+    final hasDrawer = scaffold?.hasDrawer ?? false;
+
+    if (hasDrawer && showDrawerButton(context)) {
+      return IconButton(
+        icon: const Icon(Icons.menu),
+        onPressed: () => scaffold?.openDrawer(),
+      );
+    }
+
+    if (Navigator.of(context).canPop()) {
+      return IconButton(
+        icon: Icon(
+          context.isRtl ? Icons.arrow_forward : Icons.arrow_back,
+        ),
+        onPressed: context.pop,
+      );
+    }
+
+    return null;
   }
 }

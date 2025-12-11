@@ -1,0 +1,437 @@
+{
+  "general": {
+    "appTitle": "هیدیفای",
+    "reset": "بازنشانی",
+    "toggle": {
+      "enabled": "فعال",
+      "disabled": "غیرفعال"
+    },
+    "state": {
+      "disable": "غیرفعال"
+    },
+    "sort": "مرتب‌سازی",
+    "sortBy": "مرتب‌سازی براساس",
+    "addToClipboard": "افزودن به کلیپ‌ بورد",
+    "notSet": "تنظیم نشده است",
+    "agree": "پذیرفتن",
+    "decline": "رد کردن",
+    "unknown": "ناشناخته",
+    "hidden": "پنهان",
+    "timeout": "عدم اتصال",
+    "clipboardExportSuccessMsg": "در کلیپ ‌بورد کپی شد",
+    "showMore": "نمایش بیشتر",
+    "showLess": "نمایش کمتر",
+    "openAppSettings": "باز کردن تنظیمات",
+    "grantPermission": "اعطای مجوز"
+  },
+  "intro": {
+    "termsAndPolicyCaution(rich)": "با ادامه دادن، شما با ${tap(@:about.termsAndConditions)} موافقت می‌کنید",
+    "start": "شروع"
+  },
+  "home": {
+    "pageTitle": "خانه",
+    "emptyProfilesMsg": "برای شروع، یک پروفایل اضافه کنید",
+    "noActiveProfileMsg": "یک پروفایل انتخاب کنید"
+  },
+  "stats": {
+    "traffic": "ترافیک",
+    "trafficLive": "ترافیک لحظه‌ای",
+    "trafficTotal": "ترافیک کل",
+    "uplink": "آپلود",
+    "downlink": "دانلود",
+    "connection": "اتصال",
+    "speed": "سرعت",
+    "totalTransferred": "کل انتقال"
+  },
+  "profile": {
+    "overviewPageTitle": "پروفایل‌ها",
+    "detailsPageTitle": "پروفایل",
+    "activeProfileNameSemanticLabel": "پروفایل فعال: ${name}",
+    "activeProfileBtnSemanticLabel": "مشاهده همه پروفایل‌ها",
+    "nonActiveProfileBtnSemanticLabel": "انتخاب ${name} به عنوان پروفایل فعال",
+    "subscription": {
+      "traffic": "ترافیک",
+      "updatedTimeAgo": "بروزرسانی ${timeago}",
+      "remainingDuration": "${duration} روز باقی‌مانده",
+      "remainingTrafficSemanticLabel": "${consumed} از ${total} مصرف شده",
+      "expired": "منقضی شده",
+      "noTraffic": "اتمام حجم",
+      "upload": "آپلود",
+      "download": "دانلود",
+      "total": "حجم کل",
+      "expireDate": "تاریخ انقضا"
+    },
+    "sortBy": {
+      "lastUpdate": "آخرین بروزرسانی",
+      "name": "نام"
+    },
+    "add": {
+      "buttonText": "افزودن پروفایل جدید",
+      "shortBtnTxt": "پروفایل جدید",
+      "fromClipboard": "افزودن از حافظه",
+      "scanQr": "اسکن QR کد",
+      "qrScanner": {
+        "permissionDeniedError": "دسترسی رد شد",
+        "unexpectedError": "خطای غیرمنتظره",
+        "torchSemanticLabel": "چراغ قوه",
+        "facingSemanticLabel": "تعویض دوربین",
+        "permissionRequest": "دسترسی به دوربین برای اسکن QR کد"
+      },
+      "manually": "ورود دستی",
+      "addWarp": "افزودن WARP",
+      "addingWarpMsg": "لطفا صبر کنید تا WARP ثبت شود...",
+      "addingProfileMsg": "در حال افزودن پروفایل...",
+      "failureMsg": "افزودن پروفایل شکست خورد"
+    },
+    "update": {
+      "buttonTxt": "بروزرسانی",
+      "tooltip": "بروزرسانی پروفایل",
+      "updateSubscriptions": "بروزرسانی اشتراک‌ها",
+      "failureMsg": "بروزرسانی پروفایل شکست خورد",
+      "successMsg": "پروفایل با موفقیت بروزرسانی شد",
+      "namedFailureMsg": "بروزرسانی \"${name}\" شکست خورد",
+      "namedSuccessMsg": "\"${name}\" با موفقیت بروزرسانی شد"
+    },
+    "share": {
+      "buttonText": "اشتراک‌گذاری",
+      "exportToClipboardSuccess": "در حافظه کپی شد",
+      "exportSubLinkToClipboard": "کپی لینک اشتراک",
+      "subLinkQrCode": "QR کدِ لینک اشتراک",
+      "exportConfigToClipboard": "کپی تنظیمات پروفایل",
+      "exportConfigToClipboardSuccess": "تنظیمات در حافظه کپی شد"
+    },
+    "edit": {
+      "buttonTxt": "ویرایش",
+      "selectActiveTxt": "انتخاب به عنوان فعال"
+    },
+    "delete": {
+      "buttonTxt": "حذف",
+      "confirmationMsg": "آیا از حذف دائمی این پروفایل اطمینان دارید؟",
+      "successMsg": "پروفایل حذف شد"
+    },
+    "save": {
+      "buttonText": "ذخیره",
+      "successMsg": "پروفایل ذخیره شد",
+      "failureMsg": "ذخیره پروفایل شکست خورد"
+    },
+    "detailsForm": {
+      "nameLabel": "نام",
+      "nameHint": "نام پروفایل",
+      "urlLabel": "آدرس",
+      "urlHint": "لینک کانفیگ",
+      "emptyNameMsg": "نام الزامی است",
+      "invalidUrlMsg": "لینک نامعتبر است",
+      "lastUpdate": "آخرین بروزرسانی",
+      "updateInterval": "بروزرسانی خودکار",
+      "updateIntervalDialogTitle": "فاصله زمانی بروزرسانی (ساعت)"
+    }
+  },
+  "proxies": {
+    "pageTitle": "پروکسی‌ها",
+    "emptyProxiesMsg": "پروکسی موجود نیست",
+    "delayTestTooltip": "تست پینگ",
+    "sortTooltip": "مرتب‌سازی",
+    "checkIp": "بررسی IP",
+    "unknownIp": "IP ناشناخته",
+    "sortOptions": {
+      "unsorted": "پیش‌فرض",
+      "name": "الفبا",
+      "delay": "پینگ"
+    },
+    "activeProxySemanticLabel": "پروکسی فعال",
+    "delaySemantics": {
+      "result": "پینگ: ${delay} میلی‌ثانیه",
+      "timeout": "تایم‌اوت",
+      "testing": "در حال تست..."
+    },
+    "ipInfoSemantics": {
+      "address": "آدرس IP",
+      "country": "کشور"
+    }
+  },
+  "logs": {
+    "pageTitle": "لاگ‌ها",
+    "filterHint": "فیلتر",
+    "allLevelsFilter": "همه",
+    "shareCoreLogs": "اشتراک‌گذاری لاگ هسته",
+    "shareAppLogs": "اشتراک‌گذاری لاگ برنامه",
+    "pauseTooltip": "توقف",
+    "resumeTooltip": "ادامه",
+    "clearTooltip": "پاک‌سازی"
+  },
+  "settings": {
+    "pageTitle": "تنظیمات",
+    "requiresRestartMsg": "برای اعمال تغییرات، برنامه را مجددا اجرا کنید",
+    "experimental": "آزمایشی",
+    "experimentalMsg": "قابلیت‌های آزمایشی ممکن است ناپایدار باشند.",
+    "exportOptions": "کپی تنظیمات ناشناس",
+    "exportAllOptions": "کپی تمام تنظیمات",
+    "importOptions": "وارد کردن تنظیمات",
+    "importOptionsMsg": "تمام تنظیمات فعلی بازنویسی خواهند شد. ادامه می‌دهید؟",
+    "general": {
+      "sectionTitle": "عمومی",
+      "locale": "زبان",
+      "region": "منطقه",
+      "regionMsg": "تنظیمات پیش‌فرض را بر اساس منطقه بهینه می‌کند",
+      "regions": {
+        "ir": "ایران (ir) 🇮🇷",
+        "cn": "چین (cn) 🇨🇳",
+        "ru": "روسیه (ru) 🇷🇺",
+        "af": "افغانستان (af) 🇦🇫",
+        "id": "اندونزی (id) 🇮🇩",
+        "tr": "ترکیه (tr) 🇹🇷",
+        "br": "برزیل (br) 🇧🇷",
+        "other": "سایر"
+      },
+      "themeMode": "ظاهر برنامه",
+      "themeModes": {
+        "system": "پیروی از سیستم",
+        "dark": "تاریک",
+        "light": "روشن",
+        "black": "مشکی مطلق"
+      },
+      "enableAnalytics": "ارسال آمار ناشناس",
+      "enableAnalyticsMsg": "کمک به بهبود برنامه با ارسال گزارش‌های خطا و آمار استفاده",
+      "autoStart": "اجرا هنگام روشن شدن سیستم",
+      "silentStart": "اجرا به صورت مخفی",
+      "openWorkingDir": "باز کردن پوشه کاری",
+      "ignoreBatteryOptimizations": "نادیده گرفتن بهینه‌سازی باتری",
+      "ignoreBatteryOptimizationsMsg": "جلوگیری از قطع اتصال در پس‌زمینه",
+      "dynamicNotification": "نمایش سرعت در نوار اعلان",
+      "hapticFeedback": "بازخورد لرزشی",
+      "autoIpCheck": "بررسی خودکار IP",
+      "actionAtClosing": "رفتار هنگام بستن",
+      "actionsAtClosing": {
+        "askEachTime": "پرسش",
+        "hide": "پنهان‌سازی",
+        "exit": "خروج"
+      }
+    },
+    "advanced": {
+      "sectionTitle": "پیشرفته",
+      "debugMode": "حالت دیباگ",
+      "debugModeMsg": "نیاز به راه‌اندازی مجدد برنامه دارد",
+      "memoryLimit": "محدودیت حافظه",
+      "memoryLimitMsg": "فعال‌سازی در صورت کمبود حافظه یا کرش کردن",
+      "resetTunnel": "بازنشانی تونل"
+    },
+    "network": {
+      "perAppProxyPageTitle": "پروکسی اپلیکیشن‌ها",
+      "perAppProxyModes": {
+        "off": "همه",
+        "offMsg": "تونل کردن تمام اپلیکیشن‌ها",
+        "include": "شامل",
+        "includeMsg": "فقط اپلیکیشن‌های انتخاب شده تونل شوند",
+        "exclude": "به جز",
+        "excludeMsg": "تونل کردن همه به جز اپلیکیشن‌های انتخاب شده"
+      },
+      "showSystemApps": "نمایش سیستمی‌ها",
+      "hideSystemApps": "مخفی کردن سیستمی‌ها",
+      "clearSelection": "پاک‌سازی انتخاب‌ها"
+    },
+    "geoAssets": {
+      "pageTitle": "فایل‌های مسیریابی",
+      "geoip": "GeoIP",
+      "geosite": "GeoSite",
+      "version": "نسخه ${version}",
+      "fileMissing": "فایل موجود نیست",
+      "update": "بروزرسانی",
+      "download": "دانلود",
+      "failureMsg": "بروزرسانی شکست خورد",
+      "successMsg": "با موفقیت بروزرسانی شد",
+      "addRecommended": "افزودن پیشنهادی‌ها",
+      "missingGeoAssetsMsg": "فایل‌های مسیریابی وجود ندارند. لطفا دانلود کنید یا فایل دیگری انتخاب کنید."
+    }
+  },
+  "about": {
+    "pageTitle": "درباره",
+    "version": "نسخه",
+    "sourceCode": "متن‌باز",
+    "telegramChannel": "کانال تلگرام",
+    "checkForUpdate": "بررسی بروزرسانی",
+    "privacyPolicy": "حریم خصوصی",
+    "termsAndConditions": "شرایط استفاده"
+  },
+  "appUpdate": {
+    "notAvailableMsg": "شما از آخرین نسخه استفاده می‌کنید",
+    "dialogTitle": "بروزرسانی موجود است",
+    "updateMsg": "نسخه جدید @:general.appTitle منتشر شده است. مایل به بروزرسانی هستید؟",
+    "currentVersionLbl": "نسخه فعلی",
+    "newVersionLbl": "نسخه جدید",
+    "updateNowBtnTxt": "بروزرسانی",
+    "laterBtnTxt": "بعداً",
+    "ignoreBtnTxt": "نادیده گرفتن"
+  },
+  "tray": {
+    "dashboard": "داشبورد",
+    "quit": "خروج",
+    "open": "باز کردن",
+    "status": {
+      "connect": "اتصال",
+      "connecting": "در حال اتصال...",
+      "disconnect": "قطع اتصال",
+      "disconnecting": "در حال قطع..."
+    }
+  },
+  "failure": {
+    "unexpected": "خطای غیرمنتظره",
+    "clash": {
+      "unexpected": "خطای غیرمنتظره Clash",
+      "core": "خطای Clash: ${reason}"
+    },
+    "singbox": {
+      "unexpected": "خطای سرویس",
+      "serviceNotRunning": "سرویس اجرا نیست",
+      "missingPrivilege": "عدم دسترسی",
+      "missingPrivilegeMsg": "حالت VPN نیاز به دسترسی Administrator دارد.",
+      "missingGeoAssets": "فایل‌های مسیریابی ناقص",
+      "missingGeoAssetsMsg": "فایل‌های مسیریابی یافت نشدند. لطفا از تنظیمات دانلود کنید.",
+      "invalidConfigOptions": "تنظیمات نامعتبر",
+      "invalidConfig": "کانفیگ نامعتبر",
+      "create": "خطا در ایجاد سرویس",
+      "start": "خطا در اجرای سرویس"
+    },
+    "connectivity": {
+      "unexpected": "خطای اتصال",
+      "missingVpnPermission": "مجوز VPN ندارد",
+      "missingNotificationPermission": "مجوز اعلان ندارد",
+      "core": "خطای هسته"
+    },
+    "profiles": {
+      "unexpected": "خطای پروفایل",
+      "notFound": "پروفایل پیدا نشد",
+      "invalidConfig": "کانفیگ نامعتبر",
+      "invalidUrl": "آدرس نامعتبر"
+    },
+    "connection": {
+      "unexpected": "خطای اتصال",
+      "timeout": "تایم‌اوت اتصال",
+      "badResponse": "پاسخ نامعتبر",
+      "connectionError": "خطای شبکه",
+      "badCertificate": "گواهی نامعتبر"
+    },
+    "geoAssets": {
+      "unexpected": "خطا",
+      "notUpdate": "بروزرسانی موجود نیست",
+      "activeNotFound": "فایل فعال یافت نشد"
+    }
+  },
+  "play": {
+    "title": "هیدیفای",
+    "short_description": "Auto, SSH, VLESS, VMess, Trojan, Reality, Sing-Box, Clash, XRay, Shadowsocks",
+    "full_description": "هیدیفای یک کلاینت قدرتمند و امن برای دور زدن محدودیت‌های اینترنت است که بر پایه Sing-Box توسعه داده شده است.\n\nویژگی‌ها:\n- پشتیبانی از تمام پروتکل‌های محبوب\n- رابط کاربری مدرن و ساده\n- بدون تبلیغات\n- متن‌باز و امن\n- انتخاب هوشمند سرور\n\nپروتکل‌های پشتیبانی شده:\n- VLESS, VMess, Trojan\n- Reality, Vision\n- Hysteria2, TUIC\n- SSH, ShadowTLS\n- WireGuard\n\nکد منبع: https://github.com/hiddify/hiddify-app\n\nمجوزها:\n- VPN Service: برای ایجاد تونل امن و عبور ترافیک\n- Notifications: برای نمایش وضعیت اتصال\n- Query Packages: برای قابلیت Split Tunneling"
+  },
+  "connection": {
+    "tapToConnect": "برای اتصال ضربه بزنید",
+    "connecting": "در حال اتصال...",
+    "disconnecting": "در حال قطع...",
+    "connected": "متصل",
+    "reconnect": "اتصال مجدد",
+    "connectAnyWay": "اتصال",
+    "experimentalNotice": "هشدار قابلیت‌های آزمایشی",
+    "experimentalNoticeMsg": "شما از قابلیت‌های آزمایشی استفاده می‌کنید که ممکن است ناپایدار باشند.",
+    "disableExperimentalNotice": "متوجه شدم",
+    "reconnectMsg": "اتصال مجدد برای اعمال تغییرات..."
+  },
+  "config": {
+    "useXrayCoreWhenPossible": {
+      "Label": "استفاده از هسته Xray (در صورت امکان)",
+      "Description": "برای استفاده از این قابلیت، لینک اشتراک را مجددا وارد کنید."
+    },
+    "resetBtn": "بازنشانی تنظیمات",
+    "serviceMode": "حالت سرویس",
+    "quickSettings": "تنظیمات سریع",
+    "setupWarp": "نصب WARP",
+    "allOptions": "تمام تنظیمات",
+    "serviceModes": {
+      "proxy": "فقط پروکسی",
+      "systemProxy": "پروکسی سیستم",
+      "tun": "VPN",
+      "tunService": "سرویس VPN"
+    },
+    "shortServiceModes": {
+      "proxy": "پروکسی",
+      "systemProxy": "سیستم",
+      "tun": "VPN",
+      "tunService": "سرویس VPN"
+    },
+    "section": {
+      "route": "مسیریابی",
+      "dns": "DNS",
+      "inbound": "ورودی",
+      "mux": "مالتی‌پلکس (Mux)",
+      "outbound": "خروجی",
+      "tlsTricks": "ترفندهای TLS",
+      "warp": "WARP",
+      "misc": "متفرقه"
+    },
+    "warpConsent": {
+      "title": "قوانین WARP",
+      "description(rich)": "استفاده از WARP به معنای پذیرش ${tos(شرایط خدمات)} و ${privacy(حریم خصوصی)} کلاودفلر است."
+    },
+    "generateWarpConfig": "تولید کانفیگ WARP",
+    "missingWarpConfig": "کانفیگ WARP موجود نیست",
+    "warpConfigGenerated": "کانفیگ WARP ایجاد شد",
+    "pageTitle": "تنظیمات پیشرفته",
+    "logLevel": "سطح لاگ",
+    "blockAds": "مسدودسازی تبلیغات",
+    "resolveDestination": "Resolve Destination",
+    "ipv6Mode": "IPv6",
+    "ipv6Modes": {
+      "disable": "غیرفعال",
+      "enable": "فعال",
+      "prefer": "ترجیحا",
+      "only": "فقط IPv6"
+    },
+    "remoteDnsAddress": "DNS راه دور",
+    "remoteDnsDomainStrategy": "استراتژی دامنه DNS راه دور",
+    "directDnsAddress": "DNS مستقیم",
+    "directDnsDomainStrategy": "استراتژی دامنه DNS مستقیم",
+    "mixedPort": "پورت Mixed",
+    "tproxyPort": "پورت TProxy",
+    "localDnsPort": "پورت DNS محلی",
+    "allowConnectionFromLan": "اجازه اتصال از شبکه محلی (LAN)",
+    "tunImplementation": "پیاده‌سازی TUN",
+    "mtu": "MTU",
+    "connectionTestUrl": "لینک تست اتصال",
+    "urlTestInterval": "فاصله تست URL",
+    "enableClashApi": "فعال‌سازی Clash API",
+    "clashApiPort": "پورت Clash API",
+    "enableTun": "فعال‌سازی TUN",
+    "setSystemProxy": "تنظیم پروکسی سیستم",
+    "enableDnsRouting": "مسیریابی DNS",
+    "enableFakeDns": "Fake DNS",
+    "bypassLan": "دور زدن LAN",
+    "strictRoute": "Strict Route",
+    "enableTlsFragment": "TLS Fragment",
+    "tlsFragmentSize": "سایز قطعات",
+    "tlsFragmentSleep": "تأخیر",
+    "enableTlsMixedSniCase": "Mixed SNI Case",
+    "enableTlsPadding": "TLS Padding",
+    "tlsPaddingSize": "سایز Padding",
+    "enableMux": "فعال‌سازی Mux",
+    "muxProtocol": "پروتکل Mux",
+    "muxMaxStreams": "حداکثر Stream",
+    "enableWarp": "فعال‌سازی WARP",
+    "warpDetourMode": "حالت WARP",
+    "warpDetourModes": {
+      "proxyOverWarp": "پروکسی از طریق WARP",
+      "warpOverProxy": "WARP از طریق پروکسی",
+      "inbound": "WARP از طریق پروکسی",
+      "outbound": "پروکسی از طریق WARP"
+    },
+    "warpLicenseKey": "لایسنس کی",
+    "warpCleanIp": "IP تمیز",
+    "warpPort": "پورت",
+    "warpNoise": "تعداد نویز",
+    "warpNoiseSize": "سایز نویز",
+    "warpNoiseMode": "حالت نویز",
+    "warpNoiseDelay": "تأخیر نویز"
+  },
+  "window": {
+    "hide": "پنهان‌سازی",
+    "close": "خروج",
+    "alertMessage": "آیا می‌خواهید برنامه بسته شود یا در پس‌زمینه اجرا بماند؟",
+    "remember": "به‌خاطر سپردن"
+  }
+}

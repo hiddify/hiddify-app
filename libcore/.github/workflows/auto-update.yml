@@ -1,0 +1,32 @@
+name: Auto Update Core
+
+on:
+  schedule:
+    - cron: '0 */4 * * *' # Check every 4 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-core:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+
+      - name: Update Xray Core
+        run: |
+          git remote add upstream https://github.com/GFW-knocker/Xray-core.git
+          git fetch upstream
+          git checkout main || git checkout -b main
+          # Merge upstream changes
+          git merge upstream/main --allow-unrelated-histories --strategy-option=theirs -m "Auto-update Xray core from source"
+          git push origin main

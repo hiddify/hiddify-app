@@ -22,14 +22,13 @@ class StatsChannel(private val scope: CoroutineScope) : FlutterPlugin, CommandCl
 
     override fun updateStatus(status: StatusMessage) {
         MainActivity.instance.runOnUiThread {
-            val map = listOf(
-                    Pair("connections-in", status.connectionsIn),
-                    Pair("connections-out", status.connectionsOut),
-                    Pair("uplink", status.uplink),
-                    Pair("downlink", status.downlink),
-                    Pair("uplink-total", status.uplinkTotal),
-                    Pair("downlink-total", status.downlinkTotal)
-            ).associate { it.first to it.second }
+            val map = HashMap<String, Long>()
+            map["connections-in"] = status.connectionsIn
+            map["connections-out"] = status.connectionsOut
+            map["uplink"] = status.uplink
+            map["downlink"] = status.downlink
+            map["uplink-total"] = status.uplinkTotal
+            map["downlink-total"] = status.downlinkTotal
             statsEvent?.success(map)
         }
     }

@@ -50,13 +50,14 @@ class EventHandler : FlutterPlugin {
                 alertsObserver = Observer {
                     if (it == null) return@Observer
                     Log.d(TAG, "new alert: $it")
-                    val map = listOf(
-                        Pair("status", it.status.name),
-                        Pair("alert", it.alert?.name),
-                        Pair("message", it.message)
-                    )
-                        .mapNotNull { p -> p.second?.let { Pair(p.first, p.second) } }
-                        .toMap()
+                    val map = HashMap<String, String>()
+                    map["status"] = it.status.name
+                    it.alert?.name?.let { alertName ->
+                        map["alert"] = alertName
+                    }
+                    it.message?.let { msg ->
+                        map["message"] = msg
+                    }
                     events?.success(map)
                 }
                 MainActivity.instance.serviceAlerts.observeForever(alertsObserver!!)

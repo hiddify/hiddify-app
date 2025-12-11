@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-class BottomSheetPage extends Page {
+class BottomSheetPage extends Page<void> {
   const BottomSheetPage({
-    super.key,
+    required this.builder, super.key,
     super.name,
-    required this.builder,
     this.fixed = false,
   });
 
@@ -12,8 +11,7 @@ class BottomSheetPage extends Page {
   final bool fixed;
 
   @override
-  Route<void> createRoute(BuildContext context) {
-    return ModalBottomSheetRoute(
+  Route<void> createRoute(BuildContext context) => ModalBottomSheetRoute(
       settings: this,
       isScrollControlled: true,
       useSafeArea: true,
@@ -28,5 +26,4 @@ class BottomSheetPage extends Page {
         return builder(null);
       },
     );
-  }
 }

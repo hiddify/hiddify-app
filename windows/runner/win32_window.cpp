@@ -4,26 +4,14 @@
 #include <flutter_windows.h>
 
 #include "resource.h"
-#include <protocol_handler_windows/protocol_handler_windows_plugin_c_api.h>
-
 
 namespace {
-
-/// Window attribute that enables dark mode window decorations.
-///
-/// Redefined in case the developer's machine has a Windows SDK older than
-/// version 10.0.22000.0.
-/// See: https://docs.microsoft.com/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute
 #ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
 #endif
 
 constexpr const wchar_t kWindowClassName[] = L"FLUTTER_RUNNER_WIN32_WINDOW";
 
-/// Registry key for app theme preference.
-///
-/// A value of 0 indicates apps should use dark mode. A non-zero or missing
-/// value indicates apps should use light mode.
 constexpr const wchar_t kGetPreferredBrightnessRegKey[] =
   L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
 constexpr const wchar_t kGetPreferredBrightnessRegValue[] = L"AppsUseLightTheme";
@@ -33,14 +21,10 @@ static int g_active_window_count = 0;
 
 using EnableNonClientDpiScaling = BOOL __stdcall(HWND hwnd);
 
-// Scale helper to convert logical scaler values to physical using passed in
-// scale factor
 int Scale(int source, double scale_factor) {
   return static_cast<int>(source * scale_factor);
 }
 
-// Dynamically loads the |EnableNonClientDpiScaling| from the User32 module.
-// This API is only needed for PerMonitor V1 awareness mode.
 void EnableFullDpiSupportIfAvailable(HWND hwnd) {
   HMODULE user32_module = LoadLibraryA("User32.dll");
   if (!user32_module) {
@@ -62,7 +46,6 @@ class WindowClassRegistrar {
  public:
   ~WindowClassRegistrar() = default;
 
-  // Returns the singleton registrar instance.
   static WindowClassRegistrar* GetInstance() {
     if (!instance_) {
       instance_ = new WindowClassRegistrar();
@@ -142,9 +125,8 @@ bool Win32Window::Create(const std::wstring& title,
   double scale_factor = dpi / 96.0;
 
   HWND window = CreateWindow(
-      // window_class, title.c_str(), WS_OVERLAPPEDWINDOW, // window_manager hidden at launch
       window_class, title.c_str(),
-      WS_OVERLAPPEDWINDOW, // do not add WS_VISIBLE since the window will be shown later
+      WS_OVERLAPPEDWINDOW,
       Scale(origin.x, scale_factor), Scale(origin.y, scale_factor),
       Scale(size.width, scale_factor), Scale(size.height, scale_factor),
       nullptr, nullptr, GetModuleHandle(nullptr), this);
@@ -159,7 +141,7 @@ bool Win32Window::Create(const std::wstring& title,
 }
 
 bool Win32Window::Show() {
-  return ShowWindow(window_handle_, SW_SHOWNORMAL);
+  return ShowWindow(window_handle_, SW_SHOWNORMAL) != 0;
 }
 
 
@@ -170,10 +152,6 @@ bool Win32Window::SendAppLinkToInstance(const std::wstring &title)
 
   if (hwnd)
   {
-    // Dispatch new link to current window
-    DispatchToProtocolHandler(hwnd);
-
-    // (Optional) Restore our window to front in same state
     WINDOWPLACEMENT place = {sizeof(WINDOWPLACEMENT)};
     GetWindowPlacement(hwnd, &place);
 
@@ -190,7 +168,7 @@ bool Win32Window::SendAppLinkToInstance(const std::wstring &title)
       break;
     }
 
-    SetWindowPos(0, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+    SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
     SetForegroundWindow(hwnd);
 
     // Window has been found, don't create another one.
@@ -263,6 +241,12 @@ Win32Window::MessageHandler(HWND hwnd,
     case WM_DWMCOLORIZATIONCOLORCHANGED:
       UpdateTheme(hwnd);
       return 0;
+    case WM_THEMECHANGED:
+      UpdateTheme(hwnd);
+      return 0;
+    case WM_SETTINGCHANGE:
+      UpdateTheme(hwnd);
+      return 0;
   }
 
   return DefWindowProc(window_handle_, message, wparam, lparam);
@@ -311,12 +295,10 @@ void Win32Window::SetQuitOnClose(bool quit_on_close) {
 }
 
 bool Win32Window::OnCreate() {
-  // No-op; provided for subclasses.
   return true;
 }
 
 void Win32Window::OnDestroy() {
-  // No-op; provided for subclasses.
 }
 
 void Win32Window::UpdateTheme(HWND const window) {
@@ -329,7 +311,10 @@ void Win32Window::UpdateTheme(HWND const window) {
 
   if (result == ERROR_SUCCESS) {
     BOOL enable_dark_mode = light_mode == 0;
-    DwmSetWindowAttribute(window, DWMWA_USE_IMMERSIVE_DARK_MODE,
+    HRESULT hr = DwmSetWindowAttribute(window, DWMWA_USE_IMMERSIVE_DARK_MODE,
                           &enable_dark_mode, sizeof(enable_dark_mode));
+    if (FAILED(hr)) {
+        DwmSetWindowAttribute(window, 19, &enable_dark_mode, sizeof(enable_dark_mode));
+    }
   }
 }

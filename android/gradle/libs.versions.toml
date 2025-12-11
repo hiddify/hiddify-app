@@ -1,0 +1,20 @@
+[versions]
+agp = "8.13.1"
+kotlin = "2.3.0-RC2"
+coreKtx = "1.17.0"
+appcompat = "1.7.1"
+lifecycle = "2.10.0"
+gson = "2.13.2"
+flutter = "3.38.4"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+flutter-loader = { id = "dev.flutter.flutter-plugin-loader", version.ref = "flutter" }
+flutter-gradle = { id = "dev.flutter.flutter-gradle-plugin", version.ref = "flutter" }

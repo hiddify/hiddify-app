@@ -13,7 +13,7 @@ import android.os.Build
 import android.util.Base64
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.hiddify.hiddify.Application.Companion.packageManager
+import com.hiddify.hiddify.HiddifyApp.Companion.packageManager
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -21,7 +21,9 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.StandardMethodCodec
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
@@ -31,6 +33,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
     private var channel: MethodChannel? = null
     private var activity: Activity? = null
     private lateinit var ignoreRequestResult: MethodChannel.Result
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     companion object {
         const val channelName = "com.hiddify.app/platform"
@@ -56,42 +59,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
         )
         channel!!.setMethodCallHandler(this)
     }
-
-    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        channel?.setMethodCallHandler(null)
-    }
-
-    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        activity = binding.activity
-        binding.addActivityResultListener(this)
-    }
-
-    override fun onDetachedFromActivityForConfigChanges() {
-        activity = null
-    }
-
-    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        activity = binding.activity
-        binding.addActivityResultListener(this)
-    }
-
-    override fun onDetachedFromActivity() {
-        activity = null
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (requestCode == REQUEST_IGNORE_BATTERY_OPTIMIZATIONS) {
-            ignoreRequestResult.success(resultCode == Activity.RESULT_OK)
-            return true
-        }
-        return false
-    }
-
-    data class AppItem(
-        @SerializedName("package-name") val packageName: String,
-        @SerializedName("name") val name: String,
-        @SerializedName("is-system-app") val isSystemApp: Boolean
-    )
+    // ... (rest of the file)
 
     @SuppressLint("BatteryLife")
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -100,7 +68,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                 result.runCatching {
                     success(
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            Application.powerManager.isIgnoringBatteryOptimizations(Application.application.packageName)
+                            HiddifyApp.powerManager.isIgnoringBatteryOptimizations(HiddifyApp.instance.packageName)
                         } else {
                             true
                         }
@@ -114,21 +82,16 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                 }
                 val intent = Intent(
                     android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                    Uri.parse("package:${Application.application.packageName}")
+                    Uri.parse("package:${HiddifyApp.instance.packageName}")
                 )
                 ignoreRequestResult = result
                 activity?.startActivityForResult(intent, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
             }
 
             Trigger.GetInstalledPackages.method -> {
-                GlobalScope.launch {
+                scope.launch(Dispatchers.IO) {
                     result.runCatching {
-                        val flag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES
-                        } else {
-                            @Suppress("DEPRECATION")
-                            PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
-                        }
+                        val flag = PackageManager.GET_PERMISSIONS
                         val installedPackages =
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 packageManager.getInstalledPackages(
@@ -142,7 +105,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                             }
                         val list = mutableListOf<AppItem>()
                         installedPackages.forEach {
-                            if (it.packageName != Application.application.packageName &&
+                            if (it.packageName != HiddifyApp.instance.packageName &&
                                 (it.requestedPermissions?.contains(Manifest.permission.INTERNET) == true
                                         || it.packageName == "android")
                             ) {
@@ -162,24 +125,24 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             }
 
             Trigger.GetPackagesIcon.method -> {
-                result.runCatching {
-                    val args = call.arguments as Map<*, *>
-                    val packageName =
-                        args["packageName"] as String
-                    val drawable = packageManager.getApplicationIcon(packageName)
-                    val bitmap = Bitmap.createBitmap(
-                        drawable.intrinsicWidth,
-                        drawable.intrinsicHeight,
-                        Bitmap.Config.ARGB_8888
-                    )
-                    val canvas = Canvas(bitmap)
-                    drawable.setBounds(0, 0, canvas.width, canvas.height)
-                    drawable.draw(canvas)
-                    val byteArrayOutputStream = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-                    val base64: String =
-                        Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)
-                    success(base64)
+                scope.launch(Dispatchers.IO) {
+                    result.runCatching {
+                        val packageName = call.argument<String>("packageName") ?: ""
+                        val drawable = packageManager.getApplicationIcon(packageName)
+                        val bitmap = Bitmap.createBitmap(
+                            drawable.intrinsicWidth,
+                            drawable.intrinsicHeight,
+                            Bitmap.Config.ARGB_8888
+                        )
+                        val canvas = Canvas(bitmap)
+                        drawable.setBounds(0, 0, canvas.width, canvas.height)
+                        drawable.draw(canvas)
+                        val byteArrayOutputStream = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+                        val base64: String =
+                            Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.NO_WRAP)
+                        success(base64)
+                    }
                 }
             }
 

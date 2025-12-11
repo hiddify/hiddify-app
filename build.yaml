@@ -1,13 +1,73 @@
 targets:
   $default:
     builders:
-      json_serializable:
+#      json_serializable:
+#        enabled: true
+#        generate_for:
+#          include:
+#            - lib/core/model/**/*.dart
+#            - lib/features/**/model/**/*.dart
+#            - lib/features/**/data/model/**/*.dart
+#            - lib/singbox/model/**/*.dart
+#          exclude:
+#            - "**/*.g.dart"
+#            - "**/*.freezed.dart"
+#        options:
+#          explicit_to_json: true
+#          create_factory: true
+#          create_to_json: true
+#          field_rename: none
+#          include_if_null: false
+#          ignore_unannotated: false
+#          checked: false
+#          generic_argument_factories: false
+#          constructor: ""
+#          any_map: false
+#      freezed:
+#        enabled: true
+#        generate_for:
+#          include:
+#            - lib/core/model/**/*.dart
+#            - lib/features/**/model/**/*.dart
+#            - lib/features/**/data/model/**/*.dart
+#            - lib/features/**/state/**/*.dart
+#            - lib/singbox/model/**/*.dart
+#          exclude:
+#            - "**/*.g.dart"
+#            - "**/*.freezed.dart"
+#        options:
+#          immutable: true
+#          generate_to_string: true
+#          make_collections_unmodifiable: true
+#          from_json: true
+#          to_json: true
+#          union_key: "type"
+#          union_value_case: snake
+
+      riverpod_generator:
+        enabled: true
+        generate_for:
+          include:
+            - lib/core/**/*.dart
+            - lib/features/**/*.dart
+            - lib/utils/**/*.dart
+          exclude:
+            - lib/gen/**
+            - "**/*.g.dart"
+            - "**/*.freezed.dart"
         options:
-          explicit_to_json: true
-      drift_dev:
-        options:
-          store_date_time_values_as_text: true
+          provider_family_name_legacy: false
+#      go_router_builder:
+#        enabled: true
+#        generate_for:
+#          include:
+#            - lib/core/router/**/*.dart
+#            - lib/features/**/presentation/**/*.dart
+#          exclude:
+#            - "**/*.g.dart"
+#            - "**/*.gr.dart"
       slang_build_runner:
+        enabled: true
         options:
           base_locale: en
           fallback_strategy: base_locale
@@ -15,5 +75,10 @@ targets:
           input_file_pattern: .i18n.json
           output_directory: lib/gen
           output_file_name: translations.g.dart
-          translation_class_visibility: public
-          locale_handling: false
+          output_format: single_file
+          flutter_integration: true
+          key_case: camel
+          param_case: camel
+          string_interpolation: dart
+      flutter_gen_runner:
+        enabled: true

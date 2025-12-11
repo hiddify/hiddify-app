@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/model/environment.dart';
@@ -7,6 +9,7 @@ import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/utils/platform_utils.dart';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'general_preferences.g.dart';
@@ -14,75 +17,105 @@ part 'general_preferences.g.dart';
 bool _debugIntroPage = false;
 
 abstract class Preferences {
-  static final introCompleted = PreferencesNotifier.create(
-    "intro_completed",
+  static final introCompleted = PreferencesNotifier.create<bool, bool>(
+    'intro_completed',
     false,
     overrideValue: _debugIntroPage && kDebugMode ? false : null,
   );
 
   static final silentStart = PreferencesNotifier.create<bool, bool>(
-    "silent_start",
+    'silent_start',
     false,
   );
 
   static final disableMemoryLimit = PreferencesNotifier.create<bool, bool>(
-    "disable_memory_limit",
+    'disable_memory_limit',
     // disable memory limit on desktop by default
     PlatformUtils.isDesktop,
   );
 
-  static final perAppProxyMode = PreferencesNotifier.create<PerAppProxyMode, String>(
-    "per_app_proxy_mode",
-    PerAppProxyMode.off,
-    mapFrom: PerAppProxyMode.values.byName,
-    mapTo: (value) => value.name,
-  );
+  static final perAppProxyMode =
+      PreferencesNotifier.create<PerAppProxyMode, String>(
+        'per_app_proxy_mode',
+        PerAppProxyMode.off,
+        mapFrom: PerAppProxyMode.values.byName,
+        mapTo: (value) => value.name,
+      );
 
   static final markNewProfileActive = PreferencesNotifier.create<bool, bool>(
-    "mark_new_profile_active",
+    'mark_new_profile_active',
     true,
   );
 
   static final dynamicNotification = PreferencesNotifier.create<bool, bool>(
-    "dynamic_notification",
+    'dynamic_notification',
     true,
   );
 
   static final autoCheckIp = PreferencesNotifier.create<bool, bool>(
-    "auto_check_ip",
+    'auto_check_ip',
     true,
   );
 
   static final startedByUser = PreferencesNotifier.create<bool, bool>(
-    "started_by_user",
+    'started_by_user',
     false,
   );
 
   static final storeReviewedByUser = PreferencesNotifier.create<bool, bool>(
-    "store_reviewed_by_user",
+    'store_reviewed_by_user',
     false,
   );
 
-  static final actionAtClose = PreferencesNotifier.create<ActionsAtClosing, String>(
-    "action_at_close",
-    ActionsAtClosing.ask,
-    mapFrom: ActionsAtClosing.values.byName,
-    mapTo: (value) => value.name,
+  static final mixedPort = PreferencesNotifier.create<int, int>(
+    'mixed_port',
+    2334,
   );
+
+  static final actionAtClose =
+      PreferencesNotifier.create<ActionsAtClosing, String>(
+        'action_at_close',
+        ActionsAtClosing.ask,
+        mapFrom: ActionsAtClosing.values.byName,
+        mapTo: (value) => value.name,
+      );
+
+  static final windowSize = PreferencesNotifier.create<Size, List<String>>(
+    'window_size',
+    const Size(868, 668),
+    mapFrom: (value) => Size(double.parse(value[0]), double.parse(value[1])),
+    mapTo: (value) => [value.width.toString(), value.height.toString()],
+  );
+
+  static final windowPosition =
+      PreferencesNotifier.create<Offset?, List<String>?>(
+        'window_position',
+        null,
+        mapFrom:
+            (value) =>
+                value == null
+                    ? null
+                    : Offset(double.parse(value[0]), double.parse(value[1])),
+        mapTo:
+            (value) =>
+                value == null
+                    ? null
+                    : [value.dx.toString(), value.dy.toString()],
+      );
 }
 
 @Riverpod(keepAlive: true)
 class DebugModeNotifier extends _$DebugModeNotifier {
-  late final _pref = PreferencesEntry(
+  late final _pref = PreferencesEntry<bool, bool>(
     preferences: ref.watch(sharedPreferencesProvider).requireValue,
-    key: "debug_mode",
+    key: 'debug_mode',
     defaultValue: ref.read(environmentProvider) == Environment.dev,
   );
 
   @override
   bool build() => _pref.read();
 
-  Future<void> update(bool value) {
+  Future<void> update({required bool value}) {
     state = value;
     return _pref.write(value);
   }
@@ -90,20 +123,23 @@ class DebugModeNotifier extends _$DebugModeNotifier {
 
 @Riverpod(keepAlive: true)
 class PerAppProxyList extends _$PerAppProxyList {
-  late final _include = PreferencesEntry(
+  late final _include = PreferencesEntry<List<String>, List<String>>(
     preferences: ref.watch(sharedPreferencesProvider).requireValue,
-    key: "per_app_proxy_include_list",
+    key: 'per_app_proxy_include_list',
     defaultValue: <String>[],
   );
 
-  late final _exclude = PreferencesEntry(
+  late final _exclude = PreferencesEntry<List<String>, List<String>>(
     preferences: ref.watch(sharedPreferencesProvider).requireValue,
-    key: "per_app_proxy_exclude_list",
+    key: 'per_app_proxy_exclude_list',
     defaultValue: <String>[],
   );
 
   @override
-  List<String> build() => ref.watch(Preferences.perAppProxyMode) == PerAppProxyMode.include ? _include.read() : _exclude.read();
+  List<String> build() =>
+      ref.watch(Preferences.perAppProxyMode) == PerAppProxyMode.include
+      ? _include.read()
+      : _exclude.read();
 
   Future<void> update(List<String> value) {
     state = value;

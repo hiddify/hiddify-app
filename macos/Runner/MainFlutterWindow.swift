@@ -14,7 +14,6 @@ class MainFlutterWindow: NSWindow {
     super.awakeFromNib()
   }
 
-  // window manager hidden at launch
   override public func order(_ place: NSWindow.OrderingMode, relativeTo otherWin: Int) {
     super.order(place, relativeTo: otherWin)
     hiddenWindowAtLaunch()
