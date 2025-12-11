@@ -71,27 +71,20 @@ class CoreConfigurator {
     );
 
     // ============ INBOUNDS ============
-    if (coreMode == 'vpn') {
-      inbounds.add(InboundSettings.generateDokodemoDoorInbound(
-        port: 12345,
-        tag: 'tun_in',
-        sniffing: sniffingConfig,
-      ),);
-    } else {
-      inbounds.add(InboundSettings.generateSocksInbound(
-        port: socksPort,
-        listen: '127.0.0.1',
-        udp: true,
-        tag: 'socks_in',
-        sniffing: sniffingConfig,
-      ),);
-      inbounds.add(InboundSettings.generateHttpInbound(
-        port: httpPort,
-        listen: '127.0.0.1',
-        tag: 'http_in',
-        sniffing: sniffingConfig,
-      ),);
-    }
+    // Always add SOCKS and HTTP inbounds (needed for tun2socks in VPN mode too)
+    inbounds.add(InboundSettings.generateSocksInbound(
+      port: socksPort,
+      listen: '127.0.0.1',
+      udp: true,
+      tag: 'socks_in',
+      sniffing: sniffingConfig,
+    ),);
+    inbounds.add(InboundSettings.generateHttpInbound(
+      port: httpPort,
+      listen: '127.0.0.1',
+      tag: 'http_in',
+      sniffing: sniffingConfig,
+    ),);
 
     // ============ PARSE PROXY OUTBOUND ============
     Map<String, dynamic>? proxyOutbound;
@@ -127,6 +120,9 @@ class CoreConfigurator {
       'protocol': 'freedom',
       'settings': <String, dynamic>{},
     };
+
+    // External protocols (Hysteria, TUIC) are now handled by ConnectionNotifier
+    // which starts the external process and chains via SOCKS
 
     // Ensure tag is set
     proxyOutbound['tag'] = 'proxy';
@@ -288,12 +284,35 @@ class CoreConfigurator {
         if (enableLogging && errorLogPath.isNotEmpty) 'error': errorLogPath,
       },
       'dns': dnsConfig,
-      'inbounds': inbounds,
+      'api': {
+        'tag': 'api',
+        'services': ['StatsService'],
+      },
+      'stats': <String, dynamic>{},
+      'inbounds': [
+        ...inbounds,
+        {
+          'tag': 'api',
+          'port': 10085,
+          'listen': '127.0.0.1',
+          'protocol': 'dokodemo-door',
+          'settings': {
+            'address': '127.0.0.1',
+          },
+        },
+      ],
       'outbounds': outbounds,
       'routing': {
         'domainStrategy': domainStrategy,
         'domainMatcher': 'hybrid',
-        'rules': routingRules,
+        'rules': [
+          ...routingRules,
+          {
+            'type': 'field',
+            'inboundTag': ['api'],
+            'outboundTag': 'api',
+          }
+        ],
       },
       'policy': {
         'levels': {
@@ -303,6 +322,8 @@ class CoreConfigurator {
             'uplinkOnly': 1,
             'downlinkOnly': 1,
             'bufferSize': 10240,
+            'statsUserUplink': true,
+            'statsUserDownlink': true,
           },
         },
         'system': {

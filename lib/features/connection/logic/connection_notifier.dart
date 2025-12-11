@@ -1,6 +1,7 @@
 import 'package:hiddify/core/logger/log_service.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/service/core_service.dart';
+import 'package:hiddify/core/service/hysteria_service.dart';
 import 'package:hiddify/core/service/tun_service.dart';
 import 'package:hiddify/features/config/model/config.dart';
 import 'package:hiddify/features/connection/logic/core_configurator.dart';
@@ -32,12 +33,23 @@ class LastConnectionError extends _$LastConnectionError {
 class ConnectionNotifier extends _$ConnectionNotifier {
   late final CoreService _coreService;
   late final TunService _tunService;
+  late final HysteriaService _hysteriaService;
+  bool _isHysteriaMode = false;
 
   @override
   ConnectionStatus build() {
     _coreService = CoreService();
     _tunService = TunService();
+    _hysteriaService = HysteriaService();
     return ConnectionStatus.disconnected;
+  }
+
+  /// Check if config is Hysteria protocol
+  bool _isHysteriaProtocol(String content) {
+    final trimmed = content.trim().toLowerCase();
+    return trimmed.startsWith('hy2://') ||
+        trimmed.startsWith('hysteria2://') ||
+        trimmed.startsWith('hysteria://');
   }
 
   Future<void> connect(Config config) async {
@@ -117,8 +129,55 @@ class ConnectionNotifier extends _$ConnectionNotifier {
       final accessLogPath = await ref.read(logServiceProvider).getAccessLogPath();
       final errorLogPath = await ref.read(logServiceProvider).getCoreLogPath();
 
+      // Check if this is a Hysteria config
+      _isHysteriaMode = _isHysteriaProtocol(config.content);
+      
+      Config effectiveConfig = config;
+      
+      if (_isHysteriaMode) {
+        Logger.app.info('Detected Hysteria protocol, starting Hysteria plugin...');
+        
+        final hysteriaConfig = HysteriaService.parseUri(config.content);
+        if (hysteriaConfig == null) {
+          throw Exception('Failed to parse Hysteria URI');
+        }
+        
+        // Start Hysteria on a dedicated port
+        const hysteriaLocalPort = 10808;
+        final hysteriaError = await _hysteriaService.start(
+          server: hysteriaConfig['server'] as String,
+          port: hysteriaConfig['port'] as int,
+          auth: hysteriaConfig['auth'] as String,
+          sni: hysteriaConfig['sni'] as String?,
+          insecure: hysteriaConfig['insecure'] as bool? ?? false,
+          upMbps: hysteriaConfig['up'] as int? ?? 100,
+          downMbps: hysteriaConfig['down'] as int? ?? 100,
+          obfs: hysteriaConfig['obfs'] as String?,
+          obfsPassword: hysteriaConfig['obfsPassword'] as String?,
+          localPort: hysteriaLocalPort,
+        );
+        
+        if (hysteriaError != null) {
+          Logger.app.error('Hysteria error: $hysteriaError');
+          ref.read(lastConnectionErrorProvider.notifier).setError('Hysteria: $hysteriaError');
+          state = ConnectionStatus.error;
+          return;
+        }
+        
+        Logger.app.info('Hysteria started on port $hysteriaLocalPort');
+        
+        // Create a SOCKS proxy config that points to Hysteria
+        effectiveConfig = Config(
+          id: config.id,
+          name: config.name,
+          content: 'socks://127.0.0.1:$hysteriaLocalPort#${config.name}',
+          type: 'socks',
+          addedAt: config.addedAt,
+        );
+      }
+
       final fullConfig = CoreConfigurator.generateConfig(
-        activeConfig: config,
+        activeConfig: effectiveConfig,
         coreMode: coreMode,
         logLevel: logLevel,
         enableLogging: enableLogging,
@@ -234,6 +293,14 @@ class ConnectionNotifier extends _$ConnectionNotifier {
     }
     
     await _coreService.stop();
+    
+    // Stop Hysteria if running
+    if (_hysteriaService.isRunning) {
+      Logger.app.info('Stopping Hysteria...');
+      await _hysteriaService.stop();
+    }
+    _isHysteriaMode = false;
+    
     ref.read(lastConnectionErrorProvider.notifier).clear();
     state = ConnectionStatus.disconnected;
     Logger.app.info('Disconnected');

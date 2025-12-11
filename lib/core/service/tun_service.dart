@@ -106,6 +106,9 @@ class TunService {
         // Check for common errors
         if (_lastError?.contains('Access is denied') ?? false) {
           _lastError = 'Administrator access required. Please run as Administrator.';
+        } else if (_process != null && await _process!.exitCode != 0) {
+           // If it failed immediately with non-zero code, it's often permissions or conflict
+           _lastError = 'TUN failed to start (Code: ${await _process!.exitCode}).\nTry running as Administrator.';
         }
         return _lastError ?? 'TUN failed to start';
       }

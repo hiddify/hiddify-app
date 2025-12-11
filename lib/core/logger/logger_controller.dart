@@ -20,6 +20,12 @@ class LoggerController extends LoggyPrinter with InfraLogger {
   Stream<List<String>> get logStream => 
       _streamPrinter?.logStream ?? Stream.value([]);
 
+  List<String> get currentLogs => _streamPrinter?.currentBuffer ?? [];
+
+  void clearBuffer() {
+    _streamPrinter?.clearBuffer();
+  }
+
   static LoggerController get instance => _instance;
 
   static late LoggerController _instance;

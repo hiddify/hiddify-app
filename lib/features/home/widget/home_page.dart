@@ -3,10 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hiddify/core/logger/log_viewer_page.dart';
+import 'package:hiddify/core/service/ping_service.dart';
 import 'package:hiddify/features/config/controller/config_controller.dart';
 import 'package:hiddify/features/config/model/config.dart';
+import 'package:hiddify/core/service/stats_service.dart';
 import 'package:hiddify/features/config/widget/add_config_sheet.dart';
+import 'package:hiddify/features/config/widget/config_selector_sheet.dart';
 import 'package:hiddify/features/connection/logic/connection_notifier.dart';
+import 'package:hiddify/features/connection/widget/core_config_viewer.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -39,6 +43,7 @@ class HomePage extends HookConsumerWidget {
     final colorScheme = theme.colorScheme;
     final connectionState = ref.watch(connectionProvider);
     final configsAsync = ref.watch(configControllerProvider);
+    final statsAsync = ref.watch(statsServiceProvider);
 
     // Listen for errors and show SnackBar
     ref.listen<ConnectionStatus>(connectionProvider, (previous, next) {
@@ -92,7 +97,7 @@ class HomePage extends HookConsumerWidget {
                 const Spacer(),
 
                 // Stats Row
-                _buildStatsRow(connectionState, colorScheme)
+                _buildStatsRow(ref, connectionState, statsAsync, colorScheme)
                     .animate()
                     .fadeIn(delay: 200.ms, duration: 400.ms),
 
@@ -209,7 +214,19 @@ class HomePage extends HookConsumerWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () {
-              // TODO: Show config selector
+              showModalBottomSheet<void>(
+                context: context,
+                useSafeArea: true,
+                showDragHandle: true,
+                builder: (_) => const ConfigSelectorSheet(),
+              );
+            },
+            onLongPress: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                   builder: (_) => CoreConfigViewer(config: currentConfig),
+                ),
+              );
             },
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -413,8 +430,36 @@ class HomePage extends HookConsumerWidget {
         );
   }
 
-  Widget _buildStatsRow(ConnectionStatus connectionState, ColorScheme colorScheme) {
+  Widget _buildStatsRow(
+    WidgetRef ref,
+    ConnectionStatus connectionState,
+    AsyncValue<(int, int)> statsAsync,
+    ColorScheme colorScheme,
+  ) {
     final isConnected = connectionState == ConnectionStatus.connected;
+    final (uplink, downlink) = statsAsync.asData?.value ?? (0, 0);
+    final realTimePingAsync = ref.watch(realTimePingProvider);
+    final ping = realTimePingAsync.asData?.value;
+
+    // Format bytes to readable string
+    String formatBytes(int bytes) {
+      if (bytes < 1024) return '$bytes B/s';
+      if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB/s';
+      return '${(bytes / 1024 / 1024).toStringAsFixed(1)} MB/s';
+    }
+
+    // Format ping with color coding
+    String formatPing(int? pingMs) {
+      if (pingMs == null) return '--';
+      return '${pingMs}ms';
+    }
+
+    Color? getPingColor(int? pingMs) {
+      if (pingMs == null) return null;
+      if (pingMs < 200) return const Color(0xFF22C55E); // Green
+      if (pingMs < 500) return const Color(0xFFF97316); // Orange
+      return const Color(0xFFEF4444); // Red
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -425,7 +470,7 @@ class HomePage extends HookConsumerWidget {
             child: _StatCard(
               icon: Icons.arrow_upward_rounded,
               label: 'Upload',
-              value: isConnected ? '0 KB/s' : '--',
+              value: isConnected ? formatBytes(uplink) : '--',
               colorScheme: colorScheme,
             ),
           ),
@@ -433,16 +478,17 @@ class HomePage extends HookConsumerWidget {
             child: _StatCard(
               icon: Icons.arrow_downward_rounded,
               label: 'Download',
-              value: isConnected ? '0 KB/s' : '--',
+              value: isConnected ? formatBytes(downlink) : '--',
               colorScheme: colorScheme,
             ),
           ),
           Expanded(
             child: _StatCard(
-              icon: Icons.timer_outlined,
-              label: 'Duration',
-              value: isConnected ? '00:00:00' : '--',
+              icon: Icons.network_ping_rounded,
+              label: 'Ping',
+              value: isConnected ? formatPing(ping) : '--',
               colorScheme: colorScheme,
+              valueColor: getPingColor(ping),
             ),
           ),
         ],
@@ -483,12 +529,14 @@ class _StatCard extends StatelessWidget {
     required this.label,
     required this.value,
     required this.colorScheme,
+    this.valueColor,
   });
 
   final IconData icon;
   final String label;
   final String value;
   final ColorScheme colorScheme;
+  final Color? valueColor;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -500,7 +548,7 @@ class _StatCard extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
+            color: valueColor ?? colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 2),

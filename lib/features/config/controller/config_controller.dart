@@ -29,6 +29,17 @@ class ConfigController extends _$ConfigController {
     await _save();
   }
 
+  Future<void> select(String id) async {
+    final current = state.asData?.value ?? [];
+    final index = current.indexWhere((c) => c.id == id);
+    if (index != -1) {
+      final config = current[index];
+      final newList = List<Config>.from(current)..removeAt(index)..insert(0, config);
+      state = AsyncValue.data(newList);
+      await _save();
+    }
+  }
+
   Future<void> _save() async {
     final prefs = await ref.read(sharedPreferencesProvider.future);
     final current = state.asData?.value ?? [];

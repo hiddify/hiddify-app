@@ -249,31 +249,41 @@ class _CoreLogsTab extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final coreLogsAsync = ref.watch(coreLogsProvider);
+    final coreLogsStream = ref.watch(coreLogsStreamProvider);
 
-    return Column(
-      children: [
-        _LogFilterBar(
-          onRefresh: () => ref.invalidate(coreLogsProvider),
-          onClear: () => ref.read(logServiceProvider).clearCoreLog(),
+    return coreLogsStream.when(
+      data: (logs) => logs.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.memory, size: 48, color: colorScheme.outline),
+                  const SizedBox(height: 16),
+                  Text('No core logs', style: TextStyle(color: colorScheme.outline)),
+                  const SizedBox(height: 8),
+                  Text('Connect to generate logs', style: TextStyle(fontSize: 12, color: colorScheme.outline)),
+                ],
+              ),
+            )
+          : ListView.builder(
+              itemCount: logs.length,
+              reverse: true,
+              itemBuilder: (context, index) => _LogEntryTile(
+                entry: logs[logs.length - 1 - index],
+                colorScheme: colorScheme,
+              ),
+            ),
+      loading: () => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text('Loading core logs...', style: TextStyle(color: colorScheme.outline)),
+          ],
         ),
-        Expanded(
-          child: coreLogsAsync.when(
-            data: (logs) => logs.isEmpty
-                ? const Center(child: Text('No core logs'))
-                : ListView.builder(
-                    itemCount: logs.length,
-                    reverse: true,
-                    itemBuilder: (context, index) => _LogEntryTile(
-                      entry: logs[logs.length - 1 - index],
-                      colorScheme: colorScheme,
-                    ),
-                  ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(child: Text('Error: $err')),
-          ),
-        ),
-      ],
+      ),
+      error: (err, stack) => Center(child: Text('Error: $err')),
     );
   }
 }
@@ -284,60 +294,41 @@ class _AccessLogsTab extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final accessLogsAsync = ref.watch(accessLogsProvider);
+    final accessLogsStream = ref.watch(accessLogsStreamProvider);
 
-    return Column(
-      children: [
-        _LogFilterBar(
-          onRefresh: () => ref.invalidate(accessLogsProvider),
-          onClear: () => ref.read(logServiceProvider).clearAccessLog(),
+    return accessLogsStream.when(
+      data: (logs) => logs.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.swap_horiz, size: 48, color: colorScheme.outline),
+                  const SizedBox(height: 16),
+                  Text('No access logs', style: TextStyle(color: colorScheme.outline)),
+                  const SizedBox(height: 8),
+                  Text('Traffic logs will appear here', style: TextStyle(fontSize: 12, color: colorScheme.outline)),
+                ],
+              ),
+            )
+          : ListView.builder(
+              itemCount: logs.length,
+              reverse: true,
+              itemBuilder: (context, index) => _LogEntryTile(
+                entry: logs[logs.length - 1 - index],
+                colorScheme: colorScheme,
+              ),
+            ),
+      loading: () => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text('Loading access logs...', style: TextStyle(color: colorScheme.outline)),
+          ],
         ),
-        Expanded(
-          child: accessLogsAsync.when(
-            data: (logs) => logs.isEmpty
-                ? const Center(child: Text('No access logs'))
-                : ListView.builder(
-                    itemCount: logs.length,
-                    reverse: true,
-                    itemBuilder: (context, index) => _LogEntryTile(
-                      entry: logs[logs.length - 1 - index],
-                      colorScheme: colorScheme,
-                    ),
-                  ),
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(child: Text('Error: $err')),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _LogFilterBar extends StatelessWidget {
-  const _LogFilterBar({required this.onRefresh, required this.onClear});
-  final VoidCallback onRefresh;
-  final VoidCallback onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        children: [
-          IconButton.filledTonal(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
-            onPressed: onRefresh,
-          ),
-          const SizedBox(width: 8),
-          IconButton.filledTonal(
-            icon: const Icon(Icons.delete_sweep),
-            tooltip: 'Clear',
-            onPressed: onClear,
-          ),
-          const Spacer(),
-        ],
       ),
+      error: (err, stack) => Center(child: Text('Error: $err')),
     );
   }
 }
@@ -458,4 +449,14 @@ final coreLogsProvider = FutureProvider<List<LogEntry>>(
 
 final accessLogsProvider = FutureProvider<List<LogEntry>>(
   (ref) => ref.read(logServiceProvider).readAccessLogs(),
+);
+
+/// Real-time core logs stream provider
+final coreLogsStreamProvider = StreamProvider<List<LogEntry>>(
+  (ref) => ref.read(logServiceProvider).watchCoreLogs(),
+);
+
+/// Real-time access logs stream provider
+final accessLogsStreamProvider = StreamProvider<List<LogEntry>>(
+  (ref) => ref.read(logServiceProvider).watchAccessLogs(),
 );

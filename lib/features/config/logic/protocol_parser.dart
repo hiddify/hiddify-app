@@ -42,7 +42,81 @@ class ProtocolParser {
       return TuicParser.parse(trimmed);
     }
 
+    // SOCKS proxy (used for chaining with external plugins like Hysteria)
+    if (trimmed.startsWith('socks://') || trimmed.startsWith('socks5://')) {
+      return _parseSocksUri(trimmed);
+    }
+
     return null;
+  }
+
+  /// Parse SOCKS URI: socks://[user:pass@]host:port[#remark]
+  static Map<String, dynamic>? _parseSocksUri(String uri) {
+    try {
+      final schemeEnd = uri.indexOf('://') + 3;
+      final withoutScheme = uri.substring(schemeEnd);
+      final fragmentIndex = withoutScheme.indexOf('#');
+
+      String mainPart;
+      String? remark;
+
+      if (fragmentIndex != -1) {
+        mainPart = withoutScheme.substring(0, fragmentIndex);
+        remark = Uri.decodeComponent(withoutScheme.substring(fragmentIndex + 1));
+      } else {
+        mainPart = withoutScheme;
+      }
+
+      String host;
+      int port;
+      String? user;
+      String? pass;
+
+      final atIndex = mainPart.indexOf('@');
+      String hostPort;
+      
+      if (atIndex != -1) {
+        final userPass = mainPart.substring(0, atIndex);
+        hostPort = mainPart.substring(atIndex + 1);
+        final colonIndex = userPass.indexOf(':');
+        if (colonIndex != -1) {
+          user = Uri.decodeComponent(userPass.substring(0, colonIndex));
+          pass = Uri.decodeComponent(userPass.substring(colonIndex + 1));
+        } else {
+          user = Uri.decodeComponent(userPass);
+        }
+      } else {
+        hostPort = mainPart;
+      }
+
+      final colonIndex = hostPort.lastIndexOf(':');
+      if (colonIndex != -1) {
+        host = hostPort.substring(0, colonIndex);
+        port = int.parse(hostPort.substring(colonIndex + 1));
+      } else {
+        host = hostPort;
+        port = 1080;
+      }
+
+      final settings = <String, dynamic>{
+        'servers': [
+          {
+            'address': host,
+            'port': port,
+            if (user != null) 'users': [{'user': user, 'pass': pass ?? ''}],
+          },
+        ],
+      };
+
+      return {
+        'tag': 'proxy',
+        'protocol': 'socks',
+        'settings': settings,
+        if (remark != null) '_remark': remark,
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Detect protocol type from URI

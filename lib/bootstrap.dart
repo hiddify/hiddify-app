@@ -7,6 +7,7 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
+import 'package:hiddify/core/error/error_handler.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/logger/logger_controller.dart';
@@ -23,6 +24,7 @@ Future<void> lazyBootstrap(
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   LoggerController.preInit();
+  ErrorHandler.init();
   FlutterError.onError = Logger.logFlutterError;
   WidgetsBinding.instance.platformDispatcher.onError =
       Logger.logPlatformDispatcherError;

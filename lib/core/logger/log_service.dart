@@ -131,24 +131,65 @@ class LogService {
     return lines.sublist(start).map(LogEntry.fromLine).toList();
   }
 
-  /// Watch core log file for changes
+  /// Watch core log file for changes (real-time)
   Stream<List<LogEntry>> watchCoreLogs() async* {
     final path = await getCoreLogPath();
     final file = File(path);
+    var lastLength = 0;
     
     // Initial read
     // ignore: avoid_slow_async_io
     if (await file.exists()) {
-      yield await readCoreLogs();
+      final logs = await readCoreLogs();
+      lastLength = (await file.readAsLines()).length;
+      yield logs;
     }
 
-    // Watch for changes
-    await for (final _ in file.parent.watch()) {
+    // Watch for changes with polling for better cross-platform support
+    while (true) {
+      await Future<void>.delayed(const Duration(milliseconds: 500));
       // ignore: avoid_slow_async_io
       if (await file.exists()) {
-        yield await readCoreLogs();
+        final lines = await file.readAsLines();
+        if (lines.length != lastLength) {
+          lastLength = lines.length;
+          yield await readCoreLogs();
+        }
       }
     }
+  }
+
+  /// Watch access log file for changes (real-time)
+  Stream<List<LogEntry>> watchAccessLogs() async* {
+    final path = await getAccessLogPath();
+    final file = File(path);
+    var lastLength = 0;
+    
+    // Initial read
+    // ignore: avoid_slow_async_io
+    if (await file.exists()) {
+      final logs = await readAccessLogs();
+      lastLength = (await file.readAsLines()).length;
+      yield logs;
+    }
+
+    // Watch for changes with polling
+    while (true) {
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+      // ignore: avoid_slow_async_io
+      if (await file.exists()) {
+        final lines = await file.readAsLines();
+        if (lines.length != lastLength) {
+          lastLength = lines.length;
+          yield await readAccessLogs();
+        }
+      }
+    }
+  }
+
+  /// Clear app log buffer
+  void clearAppLogBuffer() {
+    LoggerController.instance.clearBuffer();
   }
 
   Future<void> clearLogs() async {

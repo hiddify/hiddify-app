@@ -86,16 +86,29 @@ class StreamLogPrinter extends LoggyPrinter {
   final List<String> _buffer = [];
 
   Stream<List<String>> get logStream => _controller.stream;
+  List<String> get currentBuffer => List.from(_buffer);
 
   @override
   void onLog(LogRecord record) {
     final time = record.time.toIso8601String().split('T')[1];
-    final logLine = '$time - ${record.message}';
+    final levelChar = switch (record.level) {
+      LogLevel.debug => 'D',
+      LogLevel.info => 'I',
+      LogLevel.warning => 'W',
+      LogLevel.error => 'E',
+      _ => '?',
+    };
+    final logLine = '$time - [$levelChar] ${record.loggerName}: ${record.message}';
     _buffer.add(logLine);
-    if (_buffer.length > 200) {
+    if (_buffer.length > 500) {
       _buffer.removeAt(0);
     }
     _controller.add(List.from(_buffer));
+  }
+
+  void clearBuffer() {
+    _buffer.clear();
+    _controller.add([]);
   }
   
   void dispose() {

@@ -24,7 +24,7 @@ dependencies:
   dio_smart_retry: ^7.0.1
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
-  json_path: ^0.8.0
+  json_path: ^0.9.0
   slang: ^4.4.0
   slang_flutter: ^4.4.0
   intl: ^0.20.0
@@ -57,7 +57,9 @@ dependencies:
   uuid: ^4.5.1
   path: ^1.9.0
   version: ^3.0.2
-  archive: ^4.0.7 
+  archive: ^4.0.7
+  grpc: ^5.1.0
+  protobuf: ^6.0.0 
   loggy: ^2.0.3
   flutter_loggy: ^2.0.3
   sentry_flutter: ^9.8.0

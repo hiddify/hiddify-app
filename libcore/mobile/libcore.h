@@ -82,15 +82,24 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern char* Start(char* configStr);
-extern void Stop(void);
-extern int IsRunning(void);
-extern int Ping(char* address, int timeoutMs);
-extern int ProxyPing(char* socksAddr, char* testUrl, int timeoutMs);
-extern long long GetUplink(void);
-extern long long GetDownlink(void);
+extern __declspec(dllexport) char* Start(char* configStr);
+extern __declspec(dllexport) void Stop(void);
+extern __declspec(dllexport) int IsRunning(void);
+
+// Ping tests direct TCP connection to server (without proxy)
+// Returns latency in milliseconds, or -1 on error
+//
+extern __declspec(dllexport) int Ping(char* address, int timeoutMs);
+extern __declspec(dllexport) int ProxyPing(char* socksAddr, char* testUrl, int timeoutMs);
+
+// GetUplink returns total uplink bytes and resets counter
+//
+extern __declspec(dllexport) long long int GetUplink(void);
+
+// GetDownlink returns total downlink bytes and resets counter
+//
+extern __declspec(dllexport) long long int GetDownlink(void);
 
 #ifdef __cplusplus
 }
 #endif
-
