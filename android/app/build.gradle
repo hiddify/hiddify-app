@@ -1,6 +1,6 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -30,23 +30,26 @@ if (keystorePropertiesFile.exists()) {
     println "+++"
 }
 
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')?: '1'
-
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
 def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
 
 android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
-    compileSdkVersion 34
-    ndkVersion "26.1.10909125"
+    compileSdk 36
+    ndkVersion "27.3.13750724"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_25
+        targetCompatibility JavaVersion.VERSION_25
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '25'
+        freeCompilerArgs += [
+            '-opt-in=kotlin.RequiresOptIn',
+            '-Xjvm-default=all'
+        ]
     }
 
     sourceSets {
@@ -55,11 +58,19 @@ android {
 
     defaultConfig {
         applicationId "app.hiddify.com"
-        minSdkVersion 21
-        targetSdkVersion 34
+        
+        minSdk 26
+        
+        targetSdk 36
+        
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        
         multiDexEnabled true
+        
+        resourceConfigurations += ['en', 'fa']
+        
+        vectorDrawables.useSupportLibrary = true
     }
 
     splits {
@@ -68,7 +79,6 @@ android {
             reset()
             //noinspection ChromeOsAbiSupport
             include "x86_64", "armeabi-v7a", "arm64-v8a"
-
             universalApk true
         }
     }
@@ -80,6 +90,10 @@ android {
                 keyPassword keystoreProperties['keyPassword']
                 storeFile file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
+                enableV4Signing true
             }
         }
     }
@@ -91,24 +105,61 @@ android {
             } else {
                 signingConfig signingConfigs.debug
             }
+            
+            minifyEnabled true
+            shrinkResources true
+            
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
             ndk {
                 //noinspection ChromeOsAbiSupport
                 abiFilters "x86_64", "armeabi-v7a", "arm64-v8a"
                 debugSymbolLevel 'FULL'
             }
+            
+            crunchPngs true
+        }
+        
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
         }
     }
 
     buildFeatures {
         viewBinding true
         aidl true
+        buildConfig false
+        renderScript false
+        resValues false
+        shaders false
     }
 
-}
+    lint {
+        checkReleaseBuilds true
+        abortOnError true
+        warningsAsErrors false
+        checkDependencies true
+        disable 'MissingTranslation', 'ExtraTranslation'
+    }
 
-android.applicationVariants.all { variant ->
-    variant.outputs.each { output ->
-        output.versionCodeOverride = android.defaultConfig.versionCode
+    packaging {
+        resources {
+            excludes += [
+                '/META-INF/{AL2.0,LGPL2.1}',
+                '/META-INF/DEPENDENCIES',
+                '/META-INF/LICENSE',
+                '/META-INF/LICENSE.txt',
+                '/META-INF/license.txt',
+                '/META-INF/NOTICE',
+                '/META-INF/NOTICE.txt',
+                '/META-INF/notice.txt',
+                '/META-INF/*.kotlin_module'
+            ]
+        }
     }
 }
 
@@ -117,9 +168,15 @@ flutter {
 }
 
 dependencies {
+    // Core libraries from local directory
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    
+    // AndroidX and Kotlin dependencies
+    implementation libs.gson
+    implementation libs.androidx.core.ktx
+    implementation libs.androidx.appcompat
+    implementation libs.androidx.lifecycle.livedata.ktx
+    
+    // Desugaring for older Android versions
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
