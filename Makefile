@@ -24,9 +24,9 @@ CORE_NAME=$(CORE_PRODUCT_NAME)
 LIB_NAME=libcore
 
 ifeq ($(CHANNEL),prod)
-	CORE_URL=https://github.com/hiddify/hiddify-next-core/releases/download/v$(core.version)
+	CORE_URL=https://github.com/hiddify/hiddify-core/releases/download/v$(core.version)
 else
-	CORE_URL=https://github.com/hiddify/hiddify-next-core/releases/download/draft
+	CORE_URL=https://github.com/hiddify/hiddify-core/releases/download/draft
 endif
 
 ifeq ($(CHANNEL),prod)
@@ -55,14 +55,14 @@ prepare:
 	@echo use the following commands to prepare the library for each platform:
 	@echo    make android-prepare
 	@echo    make windows-prepare
-	@echo    make macos-prepare
 
 windows-prepare: get gen translate windows-libs
 	
 ios-prepare:
 	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
 	
-macos-prepare: get-geo-assets get gen translate macos-libs
+macos-prepare:
+	$(error macOS platform is temporarily disabled (moved to disabled_platforms/macos))
 linux-prepare:
 	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 linux-appimage-prepare:linux-prepare
@@ -80,9 +80,7 @@ protos:
 	protoc --dart_out=grpc:lib/singbox/generated --proto_path=libcore/protos libcore/protos/*.proto
 
 macos-install-dependencies:
-	brew install create-dmg tree 
-	npm install -g appdmg
-	dart pub global activate flutter_distributor
+	$(error macOS platform is temporarily disabled (moved to disabled_platforms/macos))
 
 ios-install-dependencies:
 	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
@@ -121,7 +119,7 @@ linux-release:
 	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 
 macos-release:
-	flutter_distributor package --platform macos --targets dmg,pkg $(DISTRIBUTOR_ARGS)
+	$(error macOS platform is temporarily disabled (moved to disabled_platforms/macos))
 
 ios-release: #not tested
 	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
@@ -144,8 +142,7 @@ linux-libs:
 
 
 macos-libs:
-	mkdir -p  $(DESKTOP_OUT) 
-	curl -L $(CORE_URL)/$(CORE_NAME)-macos-universal.tar.gz | tar xz -C $(DESKTOP_OUT)
+	$(error macOS platform is temporarily disabled (moved to disabled_platforms/macos))
 
 ios-libs: #not tested
 	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
@@ -169,7 +166,7 @@ build-linux-libs:
 	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 
 build-macos-libs:
-	make -C libcore -f Makefile macos-universal
+	$(error macOS platform is temporarily disabled (moved to disabled_platforms/macos))
 
 build-ios-libs:
 	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
