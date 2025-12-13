@@ -4,6 +4,18 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def javaVersion = (findProperty('javaVersion') ?: '25').toInteger()
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(javaVersion)
+    }
+}
+
+kotlin {
+    jvmToolchain(javaVersion)
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -40,12 +52,13 @@ android {
     ndkVersion "27.3.13750724"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_25
-        targetCompatibility JavaVersion.VERSION_25
+        sourceCompatibility JavaVersion.toVersion(javaVersion)
+        targetCompatibility JavaVersion.toVersion(javaVersion)
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = '25'
+        jvmTarget = javaVersion.toString()
         freeCompilerArgs += [
             '-opt-in=kotlin.RequiresOptIn',
             '-Xjvm-default=all'

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:hiddify/core/logger/log_service.dart';
 import 'package:hiddify/core/logger/log_bus_bridge.dart';
@@ -41,9 +42,11 @@ class ConnectionNotifier extends _$ConnectionNotifier {
 
   @override
   ConnectionStatus build() {
+    ref.keepAlive();
     _coreService = CoreService();
     _tunService = TunService();
     _hysteriaService = HysteriaService();
+    unawaited(_tunService.stop());
     return ConnectionStatus.disconnected;
   }
 
