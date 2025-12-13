@@ -16,7 +16,6 @@ struct _MyApplication
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 #define ICON_PATH "./hiddify.png"
 
-// Implements GApplication::activate.
 static void my_application_activate(GApplication *application)
 {
   MyApplication *self = MY_APPLICATION(application);
@@ -24,13 +23,6 @@ static void my_application_activate(GApplication *application)
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
   gtk_window_set_icon_from_file(window, ICON_PATH, NULL);
 
-  // Use a header bar when running in GNOME as this is the common style used
-  // by applications and is the setup most users will be using (e.g. Ubuntu
-  // desktop).
-  // If running on X and not using GNOME then just use a traditional title bar
-  // in case the window manager does more exotic layout, e.g. tiling.
-  // If running on Wayland assume the header bar will work (may need changing
-  // if future cases occur).
   gboolean use_header_bar = TRUE;
 #ifdef GDK_WINDOWING_X11
   GdkScreen *screen = gtk_window_get_screen(window);
@@ -68,18 +60,17 @@ static void my_application_activate(GApplication *application)
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
-  // Flutter 3.24 breaks the gtk_widget_realize solution: https://github.com/leanflutter/window_manager/issues/179#issuecomment-2299534856
+  fl_register_plugins(FL_PLUGIN_REGISTRY(view));
   gtk_widget_hide(GTK_WIDGET(window));
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
   
 }
 
-// Implements GApplication::local_command_line.
 static gboolean my_application_local_command_line(GApplication *application, gchar ***arguments, int *exit_status)
 {
   MyApplication *self = MY_APPLICATION(application);
-  // Strip out the first argument as it is the binary name.
+  MyApplication *self = MY_APPLICATION(application);
   self->dart_entrypoint_arguments = g_strdupv(*arguments + 1);
 
   g_autoptr(GError) error = nullptr;
@@ -96,27 +87,20 @@ static gboolean my_application_local_command_line(GApplication *application, gch
   return TRUE;
 }
 
-// Implements GApplication::startup.
 static void my_application_startup(GApplication *application)
 {
   // MyApplication* self = MY_APPLICATION(object);
 
-  // Perform any actions required at application startup.
-
   G_APPLICATION_CLASS(my_application_parent_class)->startup(application);
 }
 
-// Implements GApplication::shutdown.
 static void my_application_shutdown(GApplication *application)
 {
   // MyApplication* self = MY_APPLICATION(object);
 
-  // Perform any actions required at application shutdown.
-
   G_APPLICATION_CLASS(my_application_parent_class)->shutdown(application);
 }
 
-// Implements GObject::dispose.
 static void my_application_dispose(GObject *object)
 {
   MyApplication *self = MY_APPLICATION(object);

@@ -55,17 +55,16 @@ prepare:
 	@echo use the following commands to prepare the library for each platform:
 	@echo    make android-prepare
 	@echo    make windows-prepare
-	@echo    make linux-prepare 
 	@echo    make macos-prepare
-	@echo    make ios-prepare
 
 windows-prepare: get gen translate windows-libs
 	
-ios-prepare: get-geo-assets get gen translate ios-libs 
-	cd ios; pod repo update; pod install;echo "done ios prepare"
+ios-prepare:
+	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
 	
 macos-prepare: get-geo-assets get gen translate macos-libs
-linux-prepare: get-geo-assets get gen translate linux-libs
+linux-prepare:
+	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 linux-appimage-prepare:linux-prepare
 linux-rpm-prepare:linux-prepare
 linux-deb-prepare:linux-prepare
@@ -85,27 +84,8 @@ macos-install-dependencies:
 	npm install -g appdmg
 	dart pub global activate flutter_distributor
 
-ios-install-dependencies: 
-	if [ "$(flutter)" = "true" ]; then \
-		curl -L -o ~/Downloads/flutter_macos_3.19.3-stable.zip https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.22.3-stable.zip; \
-		mkdir -p ~/develop; \
-		cd ~/develop; \
-		unzip ~/Downloads/flutter_macos_3.22.3-stable.zip; \
-		export PATH="$$PATH:$$HOME/develop/flutter/bin"; \
-		echo 'export PATH="$$PATH:$$HOME/develop/flutter/bin"' >> ~/.zshrc; \
-		export PATH="$PATH:$HOME/develop/flutter/bin"; \
-		echo 'export PATH="$PATH:$HOME/develop/flutter/bin"' >> ~/.zshrc; \
-		curl -sSL https://rvm.io/mpapis.asc | gpg --import -; \
-		curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -; \
-		curl -sSL https://get.rvm.io | bash -s stable; \
-		brew install openssl@1.1; \
-		PKG_CONFIG_PATH=$(brew --prefix openssl@1.1)/lib/pkgconfig rvm install 2.7.5; \
-		sudo gem install cocoapods -V; \
-	fi
-	brew install create-dmg tree 
-	npm install -g appdmg
-	
-	dart pub global activate flutter_distributor
+ios-install-dependencies:
+	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
 	
 
 android-install-dependencies: 
@@ -114,27 +94,7 @@ android-apk-install-dependencies: android-install-dependencies
 android-aab-install-dependencies: android-install-dependencies
 
 linux-install-dependencies:
-	if [ "$(flutter)" = "true" ]; then \
-		mkdir -p ~/develop; \
-		cd ~/develop; \
-		wget -O flutter_linux-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.4-stable.tar.xz; \
-		tar xf flutter_linux-stable.tar.xz; \
-		rm flutter_linux-stable.tar.xz;\
-		export PATH="$$PATH:$$HOME/develop/flutter/bin"; \
-		echo 'export PATH="$$PATH:$$HOME/develop/flutter/bin"' >> ~/.bashrc; \
-	fi
-	PATH="$$PATH":"$$HOME/.pub-cache/bin"
-	echo 'export PATH="$$PATH:$$HOME/.pub-cache/bin"' >>~/.bashrc
-	sudo apt-get update
-	sudo apt install -y clang ninja-build pkg-config cmake libgtk-3-dev locate ninja-build pkg-config libglib2.0-dev libgio2.0-cil-dev libayatana-appindicator3-dev fuse rpm patchelf file appstream 
-	
-	
-	sudo modprobe fuse
-	wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-	chmod +x appimagetool
-	sudo mv appimagetool /usr/local/bin/
-
-	dart pub global activate --source git  https://github.com/hiddify/flutter_distributor --git-path packages/flutter_distributor
+	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 
 windows-install-dependencies:
 	dart pub global activate flutter_distributor
@@ -157,14 +117,14 @@ android-aab-release:
 windows-release:
 	flutter_distributor package --flutter-build-args=verbose --platform windows --targets exe,msix $(DISTRIBUTOR_ARGS)
 
-linux-release: 
-	flutter_distributor package --flutter-build-args=verbose --platform linux --targets deb,rpm,appimage $(DISTRIBUTOR_ARGS)
+linux-release:
+	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 
 macos-release:
 	flutter_distributor package --platform macos --targets dmg,pkg $(DISTRIBUTOR_ARGS)
 
 ios-release: #not tested
-	flutter_distributor package --platform ios --targets ipa --build-export-options-plist  ios/exportOptions.plist $(DISTRIBUTOR_ARGS)
+	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
 
 android-libs:
 	@$(MKDIR) $(ANDROID_OUT) || echo Folder already exists. Skipping...
@@ -180,8 +140,7 @@ windows-libs:
 	
 
 linux-libs:
-	mkdir -p $(DESKTOP_OUT)
-	curl -L $(CORE_URL)/$(CORE_NAME)-linux-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)/
+	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 
 
 macos-libs:
@@ -189,9 +148,7 @@ macos-libs:
 	curl -L $(CORE_URL)/$(CORE_NAME)-macos-universal.tar.gz | tar xz -C $(DESKTOP_OUT)
 
 ios-libs: #not tested
-	mkdir -p $(IOS_OUT)
-	rm -rf $(IOS_OUT)/Libcore.xcframework
-	curl -L $(CORE_URL)/$(CORE_NAME)-ios.tar.gz | tar xz -C "$(IOS_OUT)"
+	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
 
 get-geo-assets:
 	echo ""
@@ -209,15 +166,13 @@ build-windows-libs:
 	make -C libcore -f Makefile windows-amd64
 
 build-linux-libs:
-	make -C libcore -f Makefile linux-amd64 
+	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 
 build-macos-libs:
 	make -C libcore -f Makefile macos-universal
 
-build-ios-libs: 
-	rf -rf $(IOS_OUT)/Libcore.xcframework 
-	make -C libcore -f Makefile ios  
-	mv $(BINDIR)/Libcore.xcframework $(IOS_OUT)/Libcore.xcframework
+build-ios-libs:
+	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
 
 release: # Create a new tag for release.
 	@CORE_VERSION=$(core.version) bash -c ".github/change_version.sh "
@@ -225,9 +180,6 @@ release: # Create a new tag for release.
 
 
 ios-temp-prepare: 
-	make ios-prepare
-	flutter build ios-framework
-	cd ios
-	pod install
+	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
 	
 
