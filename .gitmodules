@@ -1,3 +1,0 @@
-[submodule "libcore"]
-	path = libcore
-	url = https://github.com/hiddify/hiddify-next-core
