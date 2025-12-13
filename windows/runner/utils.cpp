@@ -10,11 +10,11 @@
 void CreateAndAttachConsole() {
   if (::AllocConsole()) {
     FILE *unused;
-    if (freopen_s(&unused, "CONOUT$", "w", stdout)) {
+    if (freopen_s(&unused, "CONOUT$", "w", stdout) == 0) {
       _dup2(_fileno(stdout), 1);
     }
-    if (freopen_s(&unused, "CONOUT$", "w", stderr)) {
-      _dup2(_fileno(stdout), 2);
+    if (freopen_s(&unused, "CONOUT$", "w", stderr) == 0) {
+      _dup2(_fileno(stderr), 2);
     }
     std::ios::sync_with_stdio();
     FlutterDesktopResyncOutputStreams();
@@ -22,7 +22,6 @@ void CreateAndAttachConsole() {
 }
 
 std::vector<std::string> GetCommandLineArguments() {
-  // Convert the UTF-16 command line arguments to UTF-8 for the Engine to use.
   int argc;
   wchar_t** argv = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
   if (argv == nullptr) {
@@ -31,7 +30,6 @@ std::vector<std::string> GetCommandLineArguments() {
 
   std::vector<std::string> command_line_arguments;
 
-  // Skip the first argument as it's the binary name.
   for (int i = 1; i < argc; i++) {
     command_line_arguments.push_back(Utf8FromUtf16(argv[i]));
   }
@@ -62,4 +60,27 @@ std::string Utf8FromUtf16(const wchar_t* utf16_string) {
     return std::string();
   }
   return utf8_string;
+}
+
+ScopedHandle::~ScopedHandle() {
+  if (handle_ && handle_ != INVALID_HANDLE_VALUE) {
+    CloseHandle(handle_);
+  }
+}
+
+ScopedMutex::ScopedMutex(const std::wstring& name)
+    : mutex_(CreateMutex(NULL, TRUE, name.c_str())) {
+  last_error_ = GetLastError();
+  owns_mutex_ = mutex_.is_valid() && last_error_ != ERROR_ALREADY_EXISTS;
+}
+
+ScopedMutex::~ScopedMutex() {
+    release();
+}
+
+void ScopedMutex::release() {
+  if (owns_mutex_ && mutex_.is_valid()) {
+    ReleaseMutex(mutex_.get());
+    owns_mutex_ = false;
+  }
 }

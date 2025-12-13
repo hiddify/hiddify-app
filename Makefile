@@ -1,12 +1,16 @@
 # .ONESHELL:
-include dependencies.properties
+-include dependencies.properties
+
+ifneq ($(wildcard .core-version),)
+	core.version ?= $(strip $(file <.core-version))
+endif
 MKDIR := mkdir -p
 RM  := rm -rf
 SEP :=/
 
 ifeq ($(OS),Windows_NT)
     ifeq ($(IS_GITHUB_ACTIONS),)
-		MKDIR := -mkdir
+		MKDIR := mkdir
 		RM := rmdir /s /q
 		SEP:=\\
 	endif
@@ -76,7 +80,7 @@ android-aab-prepare:android-prepare
 
 .PHONY: protos
 protos:
-	make -C libcore -f Makefile protos
+	$(MAKE) -C libcore -f Makefile protos
 	protoc --dart_out=grpc:lib/singbox/generated --proto_path=libcore/protos libcore/protos/*.proto
 
 macos-install-dependencies:
@@ -95,11 +99,12 @@ linux-install-dependencies:
 	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 
 windows-install-dependencies:
-	dart pub global activate flutter_distributor
+	dart pub global activate fastforge
 
 gen_translations: #generating missing translations using google translate
+	$(if $(wildcard .github/sync_translate.sh),,$(error Missing .github/sync_translate.sh))
 	cd .github && bash sync_translate.sh
-	make translate
+	$(MAKE) translate
 
 android-release: android-apk-release
 
@@ -113,7 +118,7 @@ android-aab-release:
 	ls -R build/app/outputs
 
 windows-release:
-	flutter_distributor package --flutter-build-args=verbose --platform windows --targets exe,msix $(DISTRIBUTOR_ARGS)
+	dart pub global run fastforge:fastforge package --flutter-build-args=verbose --platform windows --targets exe,msix $(DISTRIBUTOR_ARGS)
 
 linux-release:
 	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
@@ -133,7 +138,8 @@ android-aab-libs: android-libs
 
 windows-libs:
 	$(MKDIR) $(DESKTOP_OUT) || echo Folder already exists. Skipping...
-	curl -L $(CORE_URL)/$(CORE_NAME)-windows-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)$(SEP)
+	$(MAKE) build-windows-libs
+	copy /Y $(BINDIR)$(SEP)libcore.dll windows$(SEP)runner$(SEP)libcore.dll || cp -f $(BINDIR)/libcore.dll windows/runner/libcore.dll
 	ls $(DESKTOP_OUT) || dir $(DESKTOP_OUT)$(SEP)
 	
 
@@ -153,15 +159,16 @@ get-geo-assets:
 	# curl -L https://github.com/SagerNet/sing-geosite/releases/latest/download/geosite.db -o $(GEO_ASSETS_DIR)/geosite.db
 
 build-headers:
-	make -C libcore -f Makefile headers && mv $(BINDIR)/$(CORE_NAME)-headers.h $(BINDIR)/libcore.h
+	$(MAKE) -C libcore -f Makefile headers && mv $(BINDIR)/$(CORE_NAME)-headers.h $(BINDIR)/libcore.h
 
 build-android-libs:
-	make -C libcore -f Makefile android 
+	$(MAKE) -C libcore -f Makefile android 
 	mv $(BINDIR)/$(LIB_NAME).aar $(ANDROID_OUT)/
 
 build-windows-libs:
-	make -C libcore -f Makefile windows-amd64
-
+	@$(MKDIR) $(BINDIR) || echo Folder already exists. Skipping...
+	go -C libcore build -buildmode=c-shared -o bin/libcore.dll ./mobile
+	
 build-linux-libs:
 	$(error Linux platform is temporarily disabled (moved to disabled_platforms/linux))
 
@@ -172,6 +179,7 @@ build-ios-libs:
 	$(error iOS platform is temporarily disabled (moved to disabled_platforms/ios))
 
 release: # Create a new tag for release.
+	$(if $(wildcard .github/change_version.sh),,$(error Missing .github/change_version.sh))
 	@CORE_VERSION=$(core.version) bash -c ".github/change_version.sh "
 
 
