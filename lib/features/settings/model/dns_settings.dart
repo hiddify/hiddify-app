@@ -31,6 +31,13 @@ abstract class DnsSettings {
     'dns_direct_type',
     'udp',
   );
+
+  /// Backup DNS for Iran (403.online)
+  static final iranBackupDns = PreferencesNotifier.create<String, String>(
+    'dns_iran_backup',
+    '10.202.10.202', // 403.online DNS
+  );
+
   // ============ DNS Options ============
 
   /// Enable DNS routing
