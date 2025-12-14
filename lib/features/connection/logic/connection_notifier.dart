@@ -400,10 +400,8 @@ class ConnectionNotifier extends _$ConnectionNotifier {
     Logger.app.info('Disconnecting...');
     
     // Stop TUN first if running
-    if (_tunService.isRunning) {
-      Logger.app.info('Stopping TUN...');
-      await _tunService.stop();
-    }
+    Logger.app.info('Stopping TUN...');
+    await _tunService.stop();
     
     await _coreService.stop();
     

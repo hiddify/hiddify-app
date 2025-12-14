@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/features/config/controller/config_controller.dart';
-import 'package:hiddify/features/config/model/config.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 

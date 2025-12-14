@@ -134,6 +134,11 @@ class VmessParser {
           'path': path ?? '/',
           if (host != null && host.isNotEmpty) 'host': [host],
         };
+      case 'httpupgrade':
+        streamSettings['httpupgradeSettings'] = {
+          'path': path ?? '/',
+          if (host != null && host.isNotEmpty) 'host': host,
+        };
       case 'kcp':
         streamSettings['kcpSettings'] = {
           'header': {'type': headerType ?? 'none'},

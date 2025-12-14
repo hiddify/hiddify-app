@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/service/tun_asset_service.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// TUN service for managing tun2socks process
 class TunService {
@@ -24,6 +25,169 @@ class TunService {
   
   /// TUN MTU
   static const int tunMtu = 9000;
+
+  static const String _pidFileName = 'tun2socks.pid';
+
+  Future<File> _pidFile() async {
+    final dir = await getApplicationSupportDirectory();
+    final runDir = Directory('${dir.path}/run');
+    if (!await runDir.exists()) {
+      await runDir.create(recursive: true);
+    }
+    return File('${runDir.path}/$_pidFileName');
+  }
+
+  Future<({int pid, String? path})?> _readPidInfo() async {
+    try {
+      final file = await _pidFile();
+      if (!await file.exists()) return null;
+      final raw = (await file.readAsString()).trim();
+      if (raw.isEmpty) return null;
+
+      if (raw.startsWith('{')) {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) {
+          final pidVal = decoded['pid'];
+          final pathVal = decoded['path'];
+          final pid = pidVal is int
+              ? pidVal
+              : pidVal is String
+                  ? int.tryParse(pidVal)
+                  : null;
+          final path = pathVal is String && pathVal.trim().isNotEmpty
+              ? pathVal.trim()
+              : null;
+          if (pid != null && pid > 0) {
+            return (pid: pid, path: path);
+          }
+        }
+        return null;
+      }
+
+      final pid = int.tryParse(raw);
+      if (pid != null && pid > 0) {
+        return (pid: pid, path: null);
+      }
+      return null;
+    } on Exception catch (e, stackTrace) {
+      Logger.app.debug('Failed to read tun2socks pid file: $e', e, stackTrace);
+      return null;
+    }
+  }
+
+  Future<void> _writePid({required int pid, required String path}) async {
+    try {
+      final file = await _pidFile();
+      await file.writeAsString(jsonEncode({'pid': pid, 'path': path}));
+    } on Exception catch (e, stackTrace) {
+      Logger.app.debug('Failed to write tun2socks pid file: $e', e, stackTrace);
+    }
+  }
+
+  Future<void> _deletePid() async {
+    try {
+      final file = await _pidFile();
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } on Exception catch (e, stackTrace) {
+      Logger.app.debug('Failed to delete tun2socks pid file: $e', e, stackTrace);
+    }
+  }
+
+  Future<bool> _matchesTun2socksProcess({
+    required int pid,
+    String? expectedPath,
+  }) async {
+    if (!Platform.isWindows) return false;
+
+    final expected = expectedPath?.toLowerCase().trim();
+
+    try {
+      final ps = await Process.run(
+        'powershell',
+        [
+          '-NoProfile',
+          '-NonInteractive',
+          '-Command',
+          '(Get-Process -Id $pid -ErrorAction SilentlyContinue | Select-Object -Expand Path)',
+        ],
+        runInShell: false,
+      );
+
+      final stdout = ps.stdout;
+      if (stdout is String) {
+        final path = stdout.trim();
+        if (path.isNotEmpty) {
+          if (expected == null) {
+            return path.toLowerCase().endsWith('\\tun2socks.exe');
+          }
+          return path.toLowerCase() == expected;
+        }
+      }
+    } on Exception catch (e, stackTrace) {
+      Logger.app.debug('Failed to query tun2socks process path: $e', e, stackTrace);
+    }
+
+    try {
+      final tasklist = await Process.run(
+        'tasklist',
+        ['/FI', 'PID eq $pid', '/FO', 'CSV', '/NH'],
+        runInShell: false,
+      );
+
+      final stdout = tasklist.stdout;
+      if (stdout is String) {
+        final line = stdout.trim();
+        if (line.isEmpty || line.startsWith('INFO:')) return false;
+        final firstQuote = line.indexOf('"');
+        if (firstQuote == -1) return false;
+        final secondQuote = line.indexOf('"', firstQuote + 1);
+        if (secondQuote == -1) return false;
+        final imageName = line.substring(firstQuote + 1, secondQuote);
+        if (imageName.toLowerCase() != 'tun2socks.exe') return false;
+        if (expected == null) return true;
+        return expected.endsWith('\\tun2socks.exe');
+      }
+    } on Exception catch (e, stackTrace) {
+      Logger.app.debug('Failed to query tun2socks process name: $e', e, stackTrace);
+    }
+
+    return false;
+  }
+
+  Future<void> _killOrphanIfAny() async {
+    final info = await _readPidInfo();
+    if (info == null) return;
+
+    final matches =
+        await _matchesTun2socksProcess(pid: info.pid, expectedPath: info.path);
+    if (!matches) {
+      await _deletePid();
+      return;
+    }
+
+    try {
+      final killed = Process.killPid(info.pid);
+      if (killed) {
+        Logger.app.warning('Killed orphan tun2socks process (pid: ${info.pid})');
+      }
+    } on Exception catch (e, stackTrace) {
+      Logger.app.warning('Failed to kill orphan tun2socks (pid: ${info.pid}): $e', e, stackTrace);
+    }
+
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    final stillRunning =
+        await _matchesTun2socksProcess(pid: info.pid, expectedPath: info.path);
+    if (stillRunning) {
+      Logger.app.warning(
+        'Orphan tun2socks still running after kill attempt (pid: ${info.pid})',
+      );
+      return;
+    }
+
+    await _deletePid();
+  }
 
   /// Start TUN with tun2socks
   /// [socksAddr] - SOCKS5 proxy address (e.g., "127.0.0.1:2334")
@@ -54,6 +218,8 @@ class TunService {
     final deviceName = tunName ?? TunService.tunName;
     final deviceMtu = mtu ?? TunService.tunMtu;
 
+    await _killOrphanIfAny();
+
     // Build tun2socks arguments
     final args = <String>[
       '-device', 'tun://$deviceName',
@@ -79,6 +245,8 @@ class TunService {
 
       _isRunning = true;
       _lastError = null;
+
+      await _writePid(pid: _process!.pid, path: tun2socksPath);
 
       // Listen to stdout
       _process!.stdout
@@ -107,6 +275,7 @@ class TunService {
         if (code != 0) {
           _lastError = 'tun2socks exited with code $code';
         }
+        unawaited(_deletePid());
       }));
 
       // Wait a bit for process to start
@@ -136,34 +305,83 @@ class TunService {
 
   /// Stop TUN
   Future<void> stop() async {
-    if (!_isRunning || _process == null) {
+    final pidInfo = await _readPidInfo();
+    if (!_isRunning && _process == null && pidInfo == null) {
       Logger.app.debug('TUN not running');
       return;
     }
 
     Logger.app.info('Stopping TUN...');
 
+    var shouldDeletePid = true;
+
     try {
       // Send SIGTERM on Unix, kill on Windows
-      _process!.kill();
-      
-      // Wait for process to exit
-      await _process!.exitCode.timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          Logger.app.warning('TUN did not exit gracefully, force killing...');
-          _process!.kill(ProcessSignal.sigkill);
-          return -1;
-        },
-      );
+      if (_process != null) {
+        final process = _process!;
+        process.kill();
+
+        var timedOut = false;
+        await process.exitCode.timeout(
+          const Duration(seconds: 5),
+          onTimeout: () {
+            timedOut = true;
+            Logger.app.warning(
+              'TUN did not exit gracefully, force killing...',
+            );
+            process.kill();
+            return -1;
+          },
+        );
+
+        if (timedOut) {
+          final stillRunning = await _matchesTun2socksProcess(
+            pid: process.pid,
+            expectedPath: pidInfo?.path,
+          );
+          if (stillRunning) {
+            shouldDeletePid = false;
+            Logger.app.warning(
+              'tun2socks still running after stop attempt (pid: ${process.pid})',
+            );
+          }
+        }
+      } else if (pidInfo != null) {
+        final matches = await _matchesTun2socksProcess(
+          pid: pidInfo.pid,
+          expectedPath: pidInfo.path,
+        );
+        if (matches) {
+          final killed = Process.killPid(pidInfo.pid);
+          if (killed) {
+            Logger.app.warning('Killed tun2socks by pid (${pidInfo.pid})');
+          }
+
+          await Future<void>.delayed(const Duration(milliseconds: 200));
+          final stillRunning = await _matchesTun2socksProcess(
+            pid: pidInfo.pid,
+            expectedPath: pidInfo.path,
+          );
+          if (stillRunning) {
+            shouldDeletePid = false;
+            Logger.app.warning(
+              'tun2socks still running after kill attempt (pid: ${pidInfo.pid})',
+            );
+          }
+        }
+      }
     } catch (e) {
       Logger.app.error('Error stopping TUN: $e');
+    } finally {
+      if (shouldDeletePid) {
+        await _deletePid();
+      }
     }
 
     _process = null;
     _isRunning = false;
     _lastError = null;
-    
+
     Logger.app.info('TUN stopped');
   }
 

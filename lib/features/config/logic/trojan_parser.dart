@@ -22,7 +22,13 @@ class TrojanParser {
       final atIndex = mainPart.indexOf('@');
       if (atIndex == -1) return null;
 
-      final password = mainPart.substring(0, atIndex);
+      final rawPassword = mainPart.substring(0, atIndex);
+      String password;
+      try {
+        password = Uri.decodeComponent(rawPassword);
+      } catch (_) {
+        password = rawPassword;
+      }
       final rest = mainPart.substring(atIndex + 1);
 
       final queryIndex = rest.indexOf('?');
@@ -82,6 +88,9 @@ class TrojanParser {
     final sni = params['sni'] ?? params['serverName'] ?? '';
     final fp = params['fp'] ?? params['fingerprint'] ?? 'chrome';
     final alpn = params['alpn'] ?? '';
+    final pbk = params['pbk'] ?? '';
+    final sid = params['sid'] ?? '';
+    final spx = params['spx'] ?? '';
     final path = params['path'] ?? '/';
     final host = params['host'] ?? '';
     final serviceName = params['serviceName'] ?? '';
@@ -107,6 +116,9 @@ class TrojanParser {
         sni: sni.isNotEmpty ? sni : address,
         fingerprint: fp,
         alpn: alpn,
+        publicKey: pbk,
+        shortId: sid,
+        spiderX: spx,
         path: path,
         host: host,
         serviceName: serviceName,
@@ -128,6 +140,9 @@ class TrojanParser {
     required String sni,
     required String fingerprint,
     String? alpn,
+    String? publicKey,
+    String? shortId,
+    String? spiderX,
     String? path,
     String? host,
     String? serviceName,
@@ -150,13 +165,12 @@ class TrojanParser {
     }
 
     if (security == 'reality') {
-      const pbk = '';
-      const sid = '';
       streamSettings['realitySettings'] = {
         'serverName': sni,
         'fingerprint': fingerprint,
-        'publicKey': pbk,
-        'shortId': sid,
+        'publicKey': publicKey ?? '',
+        'shortId': shortId ?? '',
+        if (spiderX != null && spiderX.isNotEmpty) 'spiderX': spiderX,
       };
     }
 
@@ -176,6 +190,11 @@ class TrojanParser {
         streamSettings['httpSettings'] = {
           'path': path ?? '/',
           if (host != null && host.isNotEmpty) 'host': [host],
+        };
+      case 'httpupgrade':
+        streamSettings['httpupgradeSettings'] = {
+          'path': path ?? '/',
+          if (host != null && host.isNotEmpty) 'host': host,
         };
       case 'tcp':
       case 'raw':
@@ -207,6 +226,7 @@ class TrojanParser {
       final password = server['password'] as String;
       final address = server['address'] as String;
       final port = server['port'] as int;
+      final encodedPassword = Uri.encodeComponent(password);
 
       final network = streamSettings['network'] as String? ?? 'tcp';
       final security = streamSettings['security'] as String? ?? 'tls';
@@ -226,7 +246,7 @@ class TrojanParser {
       final queryString = params.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
       final remark = outbound['_remark'] as String? ?? 'Trojan';
 
-      return 'trojan://$password@$address:$port?$queryString#${Uri.encodeComponent(remark)}';
+      return 'trojan://$encodedPassword@$address:$port?$queryString#${Uri.encodeComponent(remark)}';
     } catch (e) {
       return '';
     }

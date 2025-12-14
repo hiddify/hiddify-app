@@ -38,7 +38,18 @@ class TunAssetService {
   Future<String> getTunAssetDirectory() async {
     if (Platform.isWindows) {
       final exeDir = File(Platform.resolvedExecutable).parent.path;
-      return exeDir;
+      final packagedWintun = File('$exeDir/wintun.dll');
+      final packagedTun2socks = File('$exeDir/tun2socks.exe');
+      if (packagedWintun.existsSync() && packagedTun2socks.existsSync()) {
+        return exeDir;
+      }
+
+      final dir = await getApplicationSupportDirectory();
+      final assetsDir = Directory('${dir.path}/tun');
+      if (!assetsDir.existsSync()) {
+        assetsDir.createSync(recursive: true);
+      }
+      return assetsDir.path;
     } else {
       final dir = await getApplicationSupportDirectory();
       return dir.path;
