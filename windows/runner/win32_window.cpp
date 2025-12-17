@@ -15,8 +15,6 @@ constexpr const wchar_t kWindowClassName[] = L"FLUTTER_RUNNER_WIN32_WINDOW";
 constexpr const wchar_t kGetPreferredBrightnessRegKey[] =
   L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
 constexpr const wchar_t kGetPreferredBrightnessRegValue[] = L"AppsUseLightTheme";
-
-// The number of Win32Window objects that currently exist.
 static int g_active_window_count = 0;
 
 using EnableNonClientDpiScaling = BOOL __stdcall(HWND hwnd);
@@ -40,8 +38,6 @@ void EnableFullDpiSupportIfAvailable(HWND hwnd) {
 }
 
 }  // namespace
-
-// Manages the Win32Window's window class registration.
 class WindowClassRegistrar {
  public:
   ~WindowClassRegistrar() = default;
@@ -50,13 +46,7 @@ class WindowClassRegistrar {
     static WindowClassRegistrar instance;
     return &instance;
   }
-
-  // Returns the name of the window class, registering the class if it hasn't
-  // previously been registered.
   const wchar_t* GetWindowClass();
-
-  // Unregisters the window class. Should only be called if there are no
-  // instances of the window.
   void UnregisterWindowClass();
 
  private:
@@ -141,7 +131,6 @@ bool Win32Window::Show() {
 
 bool Win32Window::SendAppLinkToInstance(const std::wstring &title)
 {
-  // Find our exact window
   HWND hwnd = ::FindWindow(kWindowClassName, title.c_str());
 
   if (hwnd)
@@ -164,15 +153,11 @@ bool Win32Window::SendAppLinkToInstance(const std::wstring &title)
 
     SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
     SetForegroundWindow(hwnd);
-
-    // Window has been found, don't create another one.
     return true;
   }
 
   return false;
 }
-
-// static
 LRESULT CALLBACK Win32Window::WndProc(HWND const window,
                                       UINT const message,
                                       WPARAM const wparam,
@@ -219,7 +204,6 @@ Win32Window::MessageHandler(HWND hwnd,
     case WM_SIZE: {
       RECT rect = GetClientArea();
       if (child_content_ != nullptr) {
-        // Size and position the child window.
         MoveWindow(child_content_, rect.left, rect.top, rect.right - rect.left,
                    rect.bottom - rect.top, TRUE);
       }

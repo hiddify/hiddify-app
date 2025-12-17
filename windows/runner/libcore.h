@@ -83,6 +83,7 @@ extern "C" {
 #endif
 
 extern char* Start(char* configStr);
+extern void FreeCString(char* str);
 extern void Stop(void);
 extern int IsRunning(void);
 extern int Ping(char* address, int timeoutMs);
