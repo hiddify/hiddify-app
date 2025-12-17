@@ -1,9 +1,11 @@
-/// TUIC protocol parser
-/// Note: TUIC is not natively supported by Xray-core
-/// This parser generates a compatible format for external handling
+import 'package:hiddify/core/logger/logger.dart';
+
+ // TUIC protocol parser
+ // Note: TUIC is not natively supported by Xray-core
+ // This parser generates a compatible format for external handling
 class TuicParser {
-  /// Parse TUIC URI
-  /// Format: tuic://uuid:password@host:port?params#name
+  // Parse TUIC URI
+  // Format: tuic://uuid:password@host:port?params#name
   static Map<String, dynamic>? parse(String uri) {
     if (!uri.startsWith('tuic://')) return null;
 
@@ -26,8 +28,6 @@ class TuicParser {
 
       final userInfo = mainPart.substring(0, atIndex);
       final rest = mainPart.substring(atIndex + 1);
-
-      // Parse uuid:password
       final colonIndex = userInfo.indexOf(':');
       String uuid;
       String password;
@@ -51,8 +51,6 @@ class TuicParser {
       } else {
         hostPort = rest;
       }
-
-      // Parse host and port
       String host;
       int port;
 
@@ -81,6 +79,7 @@ class TuicParser {
         params: params,
       );
     } catch (e) {
+      Logger.tuic.warning('Failed to parse TUIC URI: $e');
       return null;
     }
   }
@@ -123,7 +122,28 @@ class TuicParser {
     return config;
   }
 
-  /// Convert config back to URI
+  // Validate TUIC config and return error message if invalid
+  static String? validate(Map<String, dynamic>? config) {
+    if (config == null) return 'Failed to parse TUIC config';
+    
+    final protocol = config['_protocol'] as String?;
+    if (protocol != 'tuic') {
+      return 'Invalid TUIC protocol type';
+    }
+    
+    final server = config['server'] as String?;
+    if (server == null || server.isEmpty) return 'Missing server address in TUIC config';
+    
+    final port = config['port'] as int?;
+    if (port == null || port <= 0 || port > 65535) return 'Invalid port in TUIC config';
+    
+    final uuid = config['uuid'] as String?;
+    if (uuid == null || uuid.isEmpty) return 'Missing UUID in TUIC config';
+    
+    return null; 
+  }
+
+  // Convert config back to URI
   static String toUri(Map<String, dynamic> config) {
     try {
       final uuid = config['uuid'] as String;
@@ -149,6 +169,7 @@ class TuicParser {
 
       return 'tuic://$uuid:$password@$server:$port?$queryString#${Uri.encodeComponent(remark)}';
     } catch (e) {
+      Logger.tuic.warning('Failed to generate TUIC URI: $e');
       return '';
     }
   }

@@ -1,9 +1,11 @@
 
-/// VLESS protocol parser for Xray-core
-/// Supports VLESS, VLESS+TLS, VLESS+REALITY, VLESS+XTLS
+import 'package:hiddify/core/logger/logger.dart';
+
+ // VLESS protocol parser for Xray-core
+ // Supports VLESS, VLESS+TLS, VLESS+REALITY, VLESS+XTLS
 class VlessParser {
-  /// Parse VLESS URI to outbound config
-  /// Format: vless://uuid@host:port?params#name
+  // Parse VLESS URI to outbound config
+  // Format: vless://uuid@host:port?params#name
   static Map<String, dynamic>? parse(String uri) {
     if (!uri.startsWith('vless://')) return null;
 
@@ -38,13 +40,10 @@ class VlessParser {
       } else {
         hostPort = rest;
       }
-
-      // Parse host and port
       String host;
       int port;
       
       if (hostPort.startsWith('[')) {
-        // IPv6
         final closeBracket = hostPort.indexOf(']');
         host = hostPort.substring(1, closeBracket);
         final portPart = hostPort.substring(closeBracket + 1);
@@ -59,8 +58,6 @@ class VlessParser {
           port = 443;
         }
       }
-
-      // Build outbound config
       return _buildOutbound(
         uuid: uuid,
         address: host,
@@ -69,6 +66,7 @@ class VlessParser {
         params: params,
       );
     } catch (e) {
+      Logger.vless.warning('Failed to parse VLESS URI: $e');
       return null;
     }
   }
@@ -84,12 +82,12 @@ class VlessParser {
     final flow = params['flow'] ?? '';
     final security = params['security'] ?? 'none';
     final type = params['type'] ?? 'tcp';
-    final sni = params['sni'] ?? params['serverName'] ?? '';
+    final sni = params['sni'] ?? params['serverName'] ?? params['peer'] ?? '';
     final fp = params['fp'] ?? params['fingerprint'] ?? 'chrome';
     final alpn = params['alpn'] ?? '';
-    final pbk = params['pbk'] ?? '';
-    final sid = params['sid'] ?? '';
-    final spx = params['spx'] ?? '';
+    final pbk = params['pbk'] ?? params['publicKey'] ?? params['public_key'] ?? '';
+    final sid = params['sid'] ?? params['shortId'] ?? params['short_id'] ?? '';
+    final spx = params['spx'] ?? params['spiderX'] ?? params['spider_x'] ?? '';
     final path = params['path'] ?? '/';
     final host = params['host'] ?? '';
     final serviceName = params['serviceName'] ?? '';
@@ -161,8 +159,6 @@ class VlessParser {
       'network': network == 'tcp' ? 'raw' : network,
       'security': security,
     };
-
-    // TLS settings
     if (security == 'tls') {
       streamSettings['tlsSettings'] = {
         'serverName': sni,
@@ -172,8 +168,6 @@ class VlessParser {
           'alpn': alpn.split(',').map((e) => e.trim()).toList(),
       };
     }
-
-    // REALITY settings
     if (security == 'reality') {
       streamSettings['realitySettings'] = {
         'serverName': sni,
@@ -183,8 +177,6 @@ class VlessParser {
         if (spiderX != null && spiderX.isNotEmpty) 'spiderX': spiderX,
       };
     }
-
-    // Network-specific settings
     switch (network) {
       case 'ws':
         streamSettings['wsSettings'] = {
@@ -238,7 +230,43 @@ class VlessParser {
     return streamSettings;
   }
 
-  /// Convert parsed config back to URI
+  // Validate VLESS config and return error message if invalid
+  static String? validate(Map<String, dynamic>? config) {
+    if (config == null) return 'Failed to parse VLESS config';
+    
+    final settings = config['settings'] as Map<String, dynamic>?;
+    if (settings == null) return 'Missing settings in VLESS config';
+    
+    final vnext = settings['vnext'] as List?;
+    if (vnext == null || vnext.isEmpty) return 'Missing vnext in VLESS config';
+    
+    final server = vnext.first as Map<String, dynamic>?;
+    if (server == null) return 'Invalid server in VLESS config';
+    
+    final address = server['address'] as String?;
+    if (address == null || address.isEmpty) return 'Missing server address in VLESS config';
+    
+    final users = server['users'] as List?;
+    if (users == null || users.isEmpty) return 'Missing users in VLESS config';
+    
+    final user = users.first as Map<String, dynamic>?;
+    if (user == null) return 'Invalid user in VLESS config';
+    
+    final uuid = user['id'] as String?;
+    if (uuid == null || uuid.isEmpty) return 'Missing UUID in VLESS config';
+    try {
+      if (!RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$').hasMatch(uuid)) {
+        return 'Invalid UUID format in VLESS config';
+      }
+    } catch (_) {}
+
+    final port = server['port'] as int?;
+    if (port == null || port < 1 || port > 65535) return 'Invalid port number in VLESS config';
+    
+    return null; 
+  }
+
+  // Convert parsed config back to URI
   static String toUri(Map<String, dynamic> outbound) {
     try {
       final settings = outbound['settings'] as Map<String, dynamic>;
@@ -264,16 +292,12 @@ class VlessParser {
       if (flow.isNotEmpty) {
         params['flow'] = flow;
       }
-
-      // TLS params
       if (security == 'tls' && streamSettings['tlsSettings'] != null) {
         final tls = streamSettings['tlsSettings'] as Map<String, dynamic>;
         if (tls['serverName'] != null) params['sni'] = tls['serverName'] as String;
         if (tls['fingerprint'] != null) params['fp'] = tls['fingerprint'] as String;
         if (tls['alpn'] != null) params['alpn'] = (tls['alpn'] as List).join(',');
       }
-
-      // REALITY params
       if (security == 'reality' && streamSettings['realitySettings'] != null) {
         final reality = streamSettings['realitySettings'] as Map<String, dynamic>;
         if (reality['serverName'] != null) params['sni'] = reality['serverName'] as String;
@@ -288,6 +312,7 @@ class VlessParser {
 
       return 'vless://$uuid@$address:$port?$queryString#${Uri.encodeComponent(remark)}';
     } catch (e) {
+      Logger.vless.warning('Failed to generate VLESS URI: $e');
       return '';
     }
   }

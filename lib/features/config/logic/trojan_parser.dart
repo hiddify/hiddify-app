@@ -1,7 +1,9 @@
-/// Trojan protocol parser for Xray-core
+import 'package:hiddify/core/logger/logger.dart';
+
+ // Trojan protocol parser for Xray-core
 class TrojanParser {
-  /// Parse Trojan URI to outbound config
-  /// Format: trojan://password@host:port?params#name
+  // Parse Trojan URI to outbound config
+  // Format: trojan://password@host:port?params#name
   static Map<String, dynamic>? parse(String uri) {
     if (!uri.startsWith('trojan://')) return null;
 
@@ -42,13 +44,10 @@ class TrojanParser {
       } else {
         hostPort = rest;
       }
-
-      // Parse host and port
       String host;
       int port;
 
       if (hostPort.startsWith('[')) {
-        // IPv6
         final closeBracket = hostPort.indexOf(']');
         host = hostPort.substring(1, closeBracket);
         final portPart = hostPort.substring(closeBracket + 1);
@@ -72,6 +71,7 @@ class TrojanParser {
         params: params,
       );
     } catch (e) {
+      Logger.trojan.warning('Failed to parse Trojan URI: $e');
       return null;
     }
   }
@@ -216,7 +216,29 @@ class TrojanParser {
     return streamSettings;
   }
 
-  /// Convert parsed config back to URI
+  // Validate Trojan config and return error message if invalid
+  static String? validate(Map<String, dynamic>? config) {
+    if (config == null) return 'Failed to parse Trojan config';
+    
+    final settings = config['settings'] as Map<String, dynamic>?;
+    if (settings == null) return 'Missing settings in Trojan config';
+    
+    final servers = settings['servers'] as List?;
+    if (servers == null || servers.isEmpty) return 'Missing servers in Trojan config';
+    
+    final server = servers.first as Map<String, dynamic>?;
+    if (server == null) return 'Invalid server in Trojan config';
+    
+    final address = server['address'] as String?;
+    if (address == null || address.isEmpty) return 'Missing server address in Trojan config';
+    
+    final password = server['password'] as String?;
+    if (password == null || password.isEmpty) return 'Missing password in Trojan config';
+    
+    return null; 
+  }
+
+  // Convert parsed config back to URI
   static String toUri(Map<String, dynamic> outbound) {
     try {
       final settings = outbound['settings'] as Map<String, dynamic>;
@@ -248,6 +270,7 @@ class TrojanParser {
 
       return 'trojan://$encodedPassword@$address:$port?$queryString#${Uri.encodeComponent(remark)}';
     } catch (e) {
+      Logger.trojan.warning('Failed to generate Trojan URI: $e');
       return '';
     }
   }

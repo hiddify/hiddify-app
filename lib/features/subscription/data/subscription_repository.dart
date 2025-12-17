@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:hiddify/core/logger/logger.dart';
+import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/subscription/model/subscription.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +10,7 @@ part 'subscription_repository.g.dart';
 
 @Riverpod(keepAlive: true)
 Future<SubscriptionRepository> subscriptionRepository(Ref ref) async {
-  final prefs = await SharedPreferences.getInstance();
+  final prefs = await ref.watch(sharedPreferencesProvider.future);
   return SubscriptionRepository(prefs);
 }
 
@@ -20,7 +22,28 @@ class SubscriptionRepository {
 
   List<Subscription> getSubscriptions() {
     final list = _prefs.getStringList(_key) ?? [];
-    return list.map((e) => Subscription.fromJson(Map<String, dynamic>.from(jsonDecode(e) as Map))).toList();
+    final result = <Subscription>[];
+    for (final raw in list) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map<String, dynamic>) {
+          result.add(Subscription.fromJson(decoded));
+        } else if (decoded is Map) {
+          result.add(Subscription.fromJson(decoded.cast<String, dynamic>()));
+        } else {
+          Logger.subscription.warning(
+            'Invalid subscription entry in preferences',
+          );
+        }
+      } catch (e, stackTrace) {
+        Logger.subscription.warning(
+          'Failed to parse stored subscription: $e',
+          e,
+          stackTrace,
+        );
+      }
+    }
+    return result;
   }
 
   Future<void> addSubscription(Subscription subscription) async {

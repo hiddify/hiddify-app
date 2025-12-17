@@ -9,12 +9,8 @@ import 'package:hiddify/features/settings/model/mux_settings.dart';
 import 'package:hiddify/features/settings/model/routing_settings.dart';
 import 'package:hiddify/features/settings/model/sockopt_settings.dart';
 
-/// Full Xray-core configuration generator
-/// Supports all Xray-core features including Fragment, REALITY, MUX, advanced DNS, etc.
 class CoreConfigurator {
-  /// Generate complete Xray-core configuration
   static String generateConfig({
-    // Required params first
     required Config activeConfig,
     required String coreMode,
     required String logLevel,
@@ -31,12 +27,10 @@ class CoreConfigurator {
     required String remoteDns,
     required bool bypassLan,
     required bool bypassIran,
-    // Optional params after
     String? alpn,
     bool muxPadding = true,
     int? xudpConcurrency,
     String? xudpProxyUDP443,
-    // DNS Params
     String remoteDnsType = 'doh',
     String? directDns,
     String directDnsType = 'udp',
@@ -50,44 +44,48 @@ class CoreConfigurator {
     String? fakeDnsIpv6Pool,
     int? fakeDnsPoolSize,
     Map<String, dynamic>? dnsHosts,
-    // Inbound Params
     String socksListen = '127.0.0.1',
     bool socksUdp = true,
     String socksAuth = 'noauth',
     String httpListen = '127.0.0.1',
     bool httpAllowTransparent = false,
-    // Sniffing Params
     bool enableSniffing = true,
     String? sniffingDestOverride,
     bool sniffingRouteOnly = false,
     bool sniffingFakeDns = false,
     List<String>? sniffingExcludeDomains,
-    // Routing Params
     bool bypassChina = false,
     bool blockAds = false,
-    bool blockPorn = false,
+    bool blockPorn = true,
     bool blockQuic = false,
     bool blockMalware = true,
     bool blockPhishing = true,
     bool directYoutube = false,
     bool directNetflix = false,
+    bool blockCryptominers = true,
+    bool blockBotnet = true,
+    bool blockRansomware = true,
+    bool blockSpam = true,
+    bool blockTrackers = true,
+    bool blockGambling = false,
+    bool blockDating = false,
+    bool blockSocialMedia = false,
     List<String>? customDirectDomains,
     List<String>? customProxyDomains,
     List<String>? customBlockDomains,
     List<String>? customDirectIps,
     List<String>? customProxyIps,
     List<String>? customBlockIps,
-    // Fragment Params
+    List<String>? blockedUdpPorts,
+    List<String>? blockedTcpPorts,
     bool enableFragment = true,
     String? fragmentPackets,
     String? fragmentLength,
     String? fragmentInterval,
-    // Noise Params
     bool enableNoise = false,
     String? noiseType,
     String? noisePacket,
     String? noiseDelay,
-    // Sockopt Params
     bool tcpFastOpen = false,
     String? tcpCongestion,
     int? tcpKeepAliveInterval,
@@ -104,45 +102,37 @@ class CoreConfigurator {
     final outbounds = <Map<String, dynamic>>[];
     final routingRules = <Map<String, dynamic>>[];
 
-    // ============ SNIFFING CONFIG ============
     final sniffingConfig = InboundSettings.generateSniffingConfig(
       enabled: enableSniffing,
       destOverride: sniffingDestOverride ?? 'http,tls',
       routeOnly: sniffingRouteOnly,
-      // metadataOnly: false, // Default
       excludeDomains: sniffingExcludeDomains,
     );
-    if (sniffingFakeDns) {
-      // If sniffing FakeDNS is enabled, we might need adjustments, 
-      // but usually 'fakedns' in destOverride handles it if supported by core version.
-      // Current helper doesn't support sniffingFakeDns param directly in generateSniffingConfig 
-      // but simplistic injection or update can be done here if needed.
-    }
 
-    // ============ INBOUNDS ============
-    // Always add SOCKS and HTTP inbounds (needed for tun2socks in VPN mode too)
-    inbounds.add(InboundSettings.generateSocksInbound(
-      port: socksPort,
-      listen: socksListen,
-      udp: socksUdp,
-      auth: socksAuth,
-      tag: 'socks_in',
-      sniffing: sniffingConfig,
-    ),);
-    inbounds.add(InboundSettings.generateHttpInbound(
-      port: httpPort,
-      listen: httpListen,
-      allowTransparent: httpAllowTransparent,
-      tag: 'http_in',
-      sniffing: sniffingConfig,
-    ),);
+    inbounds.add(
+      InboundSettings.generateSocksInbound(
+        port: socksPort,
+        listen: socksListen,
+        udp: socksUdp,
+        auth: socksAuth,
+        tag: 'socks_in',
+        sniffing: sniffingConfig,
+      ),
+    );
+    inbounds.add(
+      InboundSettings.generateHttpInbound(
+        port: httpPort,
+        listen: httpListen,
+        allowTransparent: httpAllowTransparent,
+        tag: 'http_in',
+        sniffing: sniffingConfig,
+      ),
+    );
 
-    // ============ PARSE PROXY OUTBOUND ============
     Map<String, dynamic>? proxyOutbound;
 
     final content = activeConfig.content.trim();
     if (content.startsWith('{')) {
-      // JSON config
       try {
         final parsed = jsonDecode(content);
         if (parsed is Map<String, dynamic>) {
@@ -157,28 +147,19 @@ class CoreConfigurator {
             proxyOutbound = parsed;
           }
         }
-      } catch (_) {
-        // Will use fallback
-      }
+      } catch (_) {}
     } else {
-      // URI format - parse using protocol parsers
       proxyOutbound = ProtocolParser.parse(content);
     }
 
-    // Fallback if parsing failed
     proxyOutbound ??= {
       'tag': 'proxy',
       'protocol': 'freedom',
       'settings': <String, dynamic>{},
     };
 
-    // External protocols (Hysteria, TUIC) are now handled by ConnectionNotifier
-    // which starts the external process and chains via SOCKS
-
-    // Ensure tag is set
     proxyOutbound['tag'] = 'proxy';
 
-    // ============ APPLY SETTINGS TO PROXY OUTBOUND ============
     _applyOutboundSettings(
       outbound: proxyOutbound,
       allowInsecure: allowInsecure,
@@ -204,19 +185,13 @@ class CoreConfigurator {
 
     outbounds.add(proxyOutbound);
 
-    // ============ DIRECT OUTBOUND (with Fragment + Noise support) ============
-    // Note: freedom outbound only supports: AsIs, UseIP, UseIPv4, UseIPv6
-    // IPIfNonMatch/IPOnDemand are only for routing, not for outbound
     final freedomStrategy = _convertToFreedomStrategy(domainStrategy);
     final directOutbound = <String, dynamic>{
       'tag': 'direct',
       'protocol': 'freedom',
-      'settings': <String, dynamic>{
-        'domainStrategy': freedomStrategy,
-      },
+      'settings': <String, dynamic>{'domainStrategy': freedomStrategy},
     };
 
-    // Add Fragment settings if enabled (GFW-knocker feature)
     if (enableFragment) {
       final fragmentConfig = FragmentSettings.generateFragmentConfig(
         isEnabled: true,
@@ -230,7 +205,6 @@ class CoreConfigurator {
       }
     }
 
-    // Add Noise settings if enabled (GFW-knocker feature)
     if (enableNoise) {
       final noisesConfig = FragmentSettings.generateNoisesConfig(
         isEnabled: true,
@@ -247,8 +221,6 @@ class CoreConfigurator {
 
     outbounds.add(directOutbound);
 
-    // ============ FRAGMENT OUTBOUND (for proxy chain) ============
-    // This allows Fragment to be applied to proxy traffic
     if (enableFragment) {
       final fragmentOutbound = <String, dynamic>{
         'tag': 'fragment',
@@ -274,32 +246,25 @@ class CoreConfigurator {
       outbounds.add(fragmentOutbound);
     }
 
-    // ============ BLOCK OUTBOUND ============
     outbounds.add({
       'tag': 'block',
       'protocol': 'blackhole',
-      'settings': {'response': {'type': 'http'}},
-    },);
+      'settings': {
+        'response': {'type': 'http'},
+      },
+    });
 
-    // ============ DNS OUTBOUND ============
-    outbounds.add({
-      'tag': 'dns-out',
-      'protocol': 'dns',
-    },);
+    outbounds.add({'tag': 'dns-out', 'protocol': 'dns'});
 
-    // ============ ROUTING RULES ============
-    // ============ ROUTING RULES ============
-    // DNS routing
     if (enableDnsRouting) {
       routingRules.add({
         'type': 'field',
         'inboundTag': ['socks_in', 'http_in', 'tun_in'],
         'port': 53,
         'outboundTag': 'dns-out',
-      },);
+      });
     }
 
-    // Custom and preset routing rules
     final generatedRules = RoutingSettings.generateRoutingRules(
       bypassLanValue: bypassLan,
       bypassIranValue: bypassIran,
@@ -311,17 +276,25 @@ class CoreConfigurator {
       blockPhishingValue: blockPhishing,
       directYoutubeValue: directYoutube,
       directNetflixValue: directNetflix,
+      blockCryptominersValue: blockCryptominers,
+      blockBotnetValue: blockBotnet,
+      blockRansomwareValue: blockRansomware,
+      blockSpamValue: blockSpam,
+      blockTrackersValue: blockTrackers,
+      blockGamblingValue: blockGambling,
+      blockDatingValue: blockDating,
+      blockSocialMediaValue: blockSocialMedia,
       customDirectDomainsValue: customDirectDomains,
       customProxyDomainsValue: customProxyDomains,
       customBlockDomainsValue: customBlockDomains,
       customDirectIpsValue: customDirectIps,
       customProxyIpsValue: customProxyIps,
       customBlockIpsValue: customBlockIps,
+      blockedUdpPorts: blockedUdpPorts,
+      blockedTcpPorts: blockedTcpPorts,
     );
     routingRules.addAll(generatedRules);
 
-    // ============ DNS CONFIG ============
-    // ============ DNS CONFIG ============
     final dnsConfig = DnsSettings.generateDnsConfig(
       remoteDnsAddr: remoteDns,
       remoteDnsType: remoteDnsType,
@@ -335,7 +308,6 @@ class CoreConfigurator {
       hosts: dnsHosts,
     );
 
-    // ============ FAKEDNS CONFIG ============
     List<Map<String, dynamic>>? fakeDnsConfig;
     if (enableFakeDns) {
       fakeDnsConfig = DnsSettings.generateFakeDnsConfig(
@@ -347,7 +319,6 @@ class CoreConfigurator {
       );
     }
 
-    // ============ FINAL CONFIG ============
     final finalConfig = <String, dynamic>{
       'log': {
         'loglevel': enableLogging ? logLevel : 'none',
@@ -367,9 +338,7 @@ class CoreConfigurator {
           'port': 10085,
           'listen': '127.0.0.1',
           'protocol': 'dokodemo-door',
-          'settings': {
-            'address': '127.0.0.1',
-          },
+          'settings': {'address': '127.0.0.1'},
         },
       ],
       'outbounds': outbounds,
@@ -382,7 +351,7 @@ class CoreConfigurator {
             'type': 'field',
             'inboundTag': ['api'],
             'outboundTag': 'api',
-          }
+          },
         ],
       },
       'policy': {
@@ -404,10 +373,8 @@ class CoreConfigurator {
           'statsOutboundDownlink': true,
         },
       },
-
     };
 
-    // Add FakeDNS if enabled
     if (fakeDnsConfig != null) {
       finalConfig['fakedns'] = fakeDnsConfig;
     }
@@ -415,7 +382,6 @@ class CoreConfigurator {
     return jsonEncode(finalConfig);
   }
 
-  /// Apply settings to proxy outbound
   static void _applyOutboundSettings({
     required Map<String, dynamic> outbound,
     required bool allowInsecure,
@@ -438,17 +404,17 @@ class CoreConfigurator {
     String? sockoptTproxy,
     String? sockoptDomainStrategy,
   }) {
-    // Get or create streamSettings
     final streamSettings =
-        outbound['streamSettings'] as Map<String, dynamic>? ?? <String, dynamic>{};
+        outbound['streamSettings'] as Map<String, dynamic>? ??
+        <String, dynamic>{};
     outbound['streamSettings'] = streamSettings;
 
     final security = streamSettings['security'] as String? ?? 'none';
 
-    // Apply TLS settings
     if (security == 'tls') {
       final tlsSettings =
-          streamSettings['tlsSettings'] as Map<String, dynamic>? ?? <String, dynamic>{};
+          streamSettings['tlsSettings'] as Map<String, dynamic>? ??
+          <String, dynamic>{};
       streamSettings['tlsSettings'] = tlsSettings;
 
       if (allowInsecure) {
@@ -462,10 +428,10 @@ class CoreConfigurator {
       }
     }
 
-    // Apply REALITY settings fingerprint
     if (security == 'reality') {
       final realitySettings =
-          streamSettings['realitySettings'] as Map<String, dynamic>? ?? <String, dynamic>{};
+          streamSettings['realitySettings'] as Map<String, dynamic>? ??
+          <String, dynamic>{};
       streamSettings['realitySettings'] = realitySettings;
 
       if (fingerPrint.isNotEmpty) {
@@ -473,7 +439,6 @@ class CoreConfigurator {
       }
     }
 
-    // Apply Sockopt settings
     final sockopt = SockoptSettings.generateSockoptConfig(
       tcpFastOpenValue: tcpFastOpen,
       tcpCongestionValue: tcpCongestion,
@@ -491,7 +456,6 @@ class CoreConfigurator {
       streamSettings['sockopt'] = sockopt;
     }
 
-    // Apply MUX settings
     if (enableMux) {
       final muxConfig = MuxSettings.generateMuxConfig(
         isEnabled: true,
@@ -506,54 +470,49 @@ class CoreConfigurator {
     }
   }
 
-
-
-  /// Generate config with all settings from preferences
   static String generateConfigFromPreferences({
     required Config activeConfig,
     required Map<String, dynamic> preferences,
   }) => generateConfig(
-      activeConfig: activeConfig,
-      coreMode: preferences['coreMode'] as String? ?? 'proxy',
-      logLevel: preferences['logLevel'] as String? ?? 'warning',
-      enableLogging: preferences['enableLogging'] as bool? ?? false,
-      accessLogPath: preferences['accessLogPath'] as String? ?? '',
-      errorLogPath: preferences['errorLogPath'] as String? ?? '',
-      socksPort: preferences['socksPort'] as int? ?? 2334,
-      httpPort: preferences['httpPort'] as int? ?? 2335,
-      domainStrategy: preferences['domainStrategy'] as String? ?? 'IPIfNonMatch',
-      allowInsecure: preferences['allowInsecure'] as bool? ?? false,
-      fingerPrint: preferences['fingerPrint'] as String? ?? 'chrome',
-      alpn: preferences['alpn'] as String?,
-      enableMux: preferences['enableMux'] as bool? ?? false,
-      muxConcurrency: preferences['muxConcurrency'] as int? ?? 8,
-      muxPadding: preferences['muxPadding'] as bool? ?? true,
-      xudpConcurrency: preferences['xudpConcurrency'] as int?,
-      xudpProxyUDP443: preferences['xudpProxyUDP443'] as String?,
-      remoteDns: preferences['remoteDns'] as String? ?? '8.8.8.8',
-      directDns: preferences['directDns'] as String?,
-      dnsQueryStrategy: preferences['dnsQueryStrategy'] as String?,
-      enableFakeDns: preferences['enableFakeDns'] as bool? ?? false,
-      bypassLan: preferences['bypassLan'] as bool? ?? true,
-      bypassIran: preferences['bypassIran'] as bool? ?? true,
-      bypassChina: preferences['bypassChina'] as bool? ?? false,
-      blockAds: preferences['blockAds'] as bool? ?? false,
-      blockQuic: preferences['blockQuic'] as bool? ?? false,
-      enableFragment: preferences['enableFragment'] as bool? ?? false,
-      fragmentPackets: preferences['fragmentPackets'] as String?,
-      fragmentLength: preferences['fragmentLength'] as String?,
-      fragmentInterval: preferences['fragmentInterval'] as String?,
-      enableSniffing: preferences['enableSniffing'] as bool? ?? true,
-      sniffingDestOverride: preferences['sniffingDestOverride'] as String?,
-      tcpFastOpen: preferences['tcpFastOpen'] as bool? ?? false,
-      tcpCongestion: preferences['tcpCongestion'] as String?,
-      customDirectDomains: preferences['customDirectDomains'] as List<String>?,
-      customProxyDomains: preferences['customProxyDomains'] as List<String>?,
-      customBlockDomains: preferences['customBlockDomains'] as List<String>?,
-    );
+    activeConfig: activeConfig,
+    coreMode: preferences['coreMode'] as String? ?? 'proxy',
+    logLevel: preferences['logLevel'] as String? ?? 'warning',
+    enableLogging: preferences['enableLogging'] as bool? ?? false,
+    accessLogPath: preferences['accessLogPath'] as String? ?? '',
+    errorLogPath: preferences['errorLogPath'] as String? ?? '',
+    socksPort: preferences['socksPort'] as int? ?? 2334,
+    httpPort: preferences['httpPort'] as int? ?? 2335,
+    domainStrategy: preferences['domainStrategy'] as String? ?? 'IPIfNonMatch',
+    allowInsecure: preferences['allowInsecure'] as bool? ?? false,
+    fingerPrint: preferences['fingerPrint'] as String? ?? 'chrome',
+    alpn: preferences['alpn'] as String?,
+    enableMux: preferences['enableMux'] as bool? ?? false,
+    muxConcurrency: preferences['muxConcurrency'] as int? ?? 8,
+    muxPadding: preferences['muxPadding'] as bool? ?? true,
+    xudpConcurrency: preferences['xudpConcurrency'] as int?,
+    xudpProxyUDP443: preferences['xudpProxyUDP443'] as String?,
+    remoteDns: preferences['remoteDns'] as String? ?? '8.8.8.8',
+    directDns: preferences['directDns'] as String?,
+    dnsQueryStrategy: preferences['dnsQueryStrategy'] as String?,
+    enableFakeDns: preferences['enableFakeDns'] as bool? ?? false,
+    bypassLan: preferences['bypassLan'] as bool? ?? true,
+    bypassIran: preferences['bypassIran'] as bool? ?? true,
+    bypassChina: preferences['bypassChina'] as bool? ?? false,
+    blockAds: preferences['blockAds'] as bool? ?? false,
+    blockQuic: preferences['blockQuic'] as bool? ?? false,
+    enableFragment: preferences['enableFragment'] as bool? ?? false,
+    fragmentPackets: preferences['fragmentPackets'] as String?,
+    fragmentLength: preferences['fragmentLength'] as String?,
+    fragmentInterval: preferences['fragmentInterval'] as String?,
+    enableSniffing: preferences['enableSniffing'] as bool? ?? true,
+    sniffingDestOverride: preferences['sniffingDestOverride'] as String?,
+    tcpFastOpen: preferences['tcpFastOpen'] as bool? ?? false,
+    tcpCongestion: preferences['tcpCongestion'] as String?,
+    customDirectDomains: preferences['customDirectDomains'] as List<String>?,
+    customProxyDomains: preferences['customProxyDomains'] as List<String>?,
+    customBlockDomains: preferences['customBlockDomains'] as List<String>?,
+  );
 
-  /// Convert routing domain strategy to freedom outbound strategy
-  /// Freedom outbound only supports: AsIs, UseIP, UseIPv4, UseIPv6
   static String _convertToFreedomStrategy(String routingStrategy) {
     switch (routingStrategy) {
       case 'IPIfNonMatch':

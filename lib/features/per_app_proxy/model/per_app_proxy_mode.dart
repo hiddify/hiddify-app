@@ -1,5 +1,1 @@
-enum PerAppProxyMode {
-  off,
-  include,
-  exclude,
-}
+enum PerAppProxyMode { off, include, exclude }

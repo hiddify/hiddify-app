@@ -9,9 +9,10 @@ abstract class Config with _$Config {
     required String id,
     required String name,
     required String content,
-    required String type, required DateTime addedAt, // vless, vmess, trojan, etc.
+    required String type,
+    required DateTime addedAt, 
     @Default(0) int ping,
-    @Default('') String source, // e.g., 'manual', 'subscription', 'clipboard'
+    @Default('') String source, 
   }) = _Config;
 
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);

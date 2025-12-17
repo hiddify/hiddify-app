@@ -1,139 +1,145 @@
 import 'package:hiddify/core/utils/preferences_utils.dart';
 
-/// Routing settings for Xray-core traffic routing
 abstract class RoutingSettings {
-  // ============ Basic Routing ============
-
-  /// Routing rule preset: global, bypass_iran, bypass_lan, bypass_china, custom
   static final rulePreset = PreferencesNotifier.create<String, String>(
     'routing_preset',
     'bypass_iran',
   );
 
-  /// Domain strategy: AsIs, IPIfNonMatch, IPOnDemand
   static final domainStrategy = PreferencesNotifier.create<String, String>(
     'routing_domain_strategy',
-    'IPIfNonMatch',
+    'AsIs',
   );
 
-  /// Domain matcher: hybrid, linear
   static final domainMatcher = PreferencesNotifier.create<String, String>(
     'routing_domain_matcher',
     'hybrid',
   );
 
-  // ============ Bypass Options ============
-
-  /// Bypass LAN addresses 
-  /// Bypass LAN traffic
   static final bypassLan = PreferencesNotifier.create<bool, bool>(
     'routing_bypass_lan',
     true,
   );
 
-  /// Bypass Iran domains/IPs - 
   static final bypassIran = PreferencesNotifier.create<bool, bool>(
     'routing_bypass_iran',
-    true, //  Default ON for Iran users
+    true,
   );
 
-  /// Bypass China domains/IPs
   static final bypassChina = PreferencesNotifier.create<bool, bool>(
     'routing_bypass_china',
     false,
   );
 
-  // ============ Block Options ============
-
-  /// Block ads - 
   static final blockAds = PreferencesNotifier.create<bool, bool>(
     'routing_block_ads',
-    true, //  Default ON - block Iranian/global ads
+    true,
   );
 
-  /// Block porn sites
   static final blockPorn = PreferencesNotifier.create<bool, bool>(
     'routing_block_porn',
+    true,
+  );
+
+  static final blockQuic = PreferencesNotifier.create<bool, bool>(
+    'routing_block_quic',
     false,
   );
 
-  /// Block QUIC protocol (force TLS for better XTLS) - 
-  static final blockQuic = PreferencesNotifier.create<bool, bool>(
-    'routing_block_quic',
-    false, //  Default OFF - allow QUIC/UDP
-  );
-
-  /// Block malware domains
   static final blockMalware = PreferencesNotifier.create<bool, bool>(
     'routing_block_malware',
-    true, //  Default ON - security
+    true,
   );
 
-  /// Block phishing domains
   static final blockPhishing = PreferencesNotifier.create<bool, bool>(
     'routing_block_phishing',
-    true, //  Default ON - security
+    true,
   );
 
-  /// Sniff TLS for routing (improve accuracy)
+  static final blockCryptominers = PreferencesNotifier.create<bool, bool>(
+    'routing_block_cryptominers',
+    true,
+  );
+
+  static final blockBotnet = PreferencesNotifier.create<bool, bool>(
+    'routing_block_botnet',
+    true,
+  );
+
+  static final blockRansomware = PreferencesNotifier.create<bool, bool>(
+    'routing_block_ransomware',
+    true,
+  );
+
+  static final blockSpam = PreferencesNotifier.create<bool, bool>(
+    'routing_block_spam',
+    true,
+  );
+
+  static final blockTrackers = PreferencesNotifier.create<bool, bool>(
+    'routing_block_trackers',
+    true,
+  );
+
+  static final blockGambling = PreferencesNotifier.create<bool, bool>(
+    'routing_block_gambling',
+    false,
+  );
+
+  static final blockDating = PreferencesNotifier.create<bool, bool>(
+    'routing_block_dating',
+    false,
+  );
+
+  static final blockSocialMedia = PreferencesNotifier.create<bool, bool>(
+    'routing_block_social_media',
+    false,
+  );
+
   static final sniffTlsForRouting = PreferencesNotifier.create<bool, bool>(
     'routing_sniff_tls',
-    true, //  Default ON
+    true,
   );
 
-  // ============ Special Routes ============
-
-  /// Direct YouTube
   static final directYoutube = PreferencesNotifier.create<bool, bool>(
     'routing_direct_youtube',
     false,
   );
 
-  /// Direct Netflix
   static final directNetflix = PreferencesNotifier.create<bool, bool>(
     'routing_direct_netflix',
     false,
   );
 
-  // ============ Custom Rules ============
-
-  /// Custom direct domains (one per line)
   static final customDirectDomains = PreferencesNotifier.create<String, String>(
     'routing_custom_direct_domains',
     '',
   );
 
-  /// Custom proxy domains (one per line)
   static final customProxyDomains = PreferencesNotifier.create<String, String>(
     'routing_custom_proxy_domains',
     '',
   );
 
-  /// Custom block domains (one per line)
   static final customBlockDomains = PreferencesNotifier.create<String, String>(
     'routing_custom_block_domains',
     '',
   );
 
-  /// Custom direct IPs (CIDR format, one per line)
   static final customDirectIps = PreferencesNotifier.create<String, String>(
     'routing_custom_direct_ips',
     '',
   );
 
-  /// Custom proxy IPs (CIDR format, one per line)
   static final customProxyIps = PreferencesNotifier.create<String, String>(
     'routing_custom_proxy_ips',
     '',
   );
 
-  /// Custom block IPs (CIDR format, one per line)
   static final customBlockIps = PreferencesNotifier.create<String, String>(
     'routing_custom_block_ips',
     '',
   );
-
-  // ============ Available Options ============
 
   static const List<String> availablePresets = [
     'global',
@@ -149,7 +155,6 @@ abstract class RoutingSettings {
     'IPOnDemand',
   ];
 
-  /// Parse custom rules string to list
   static List<String> parseCustomRules(String rules) {
     if (rules.isEmpty) return [];
     return rules
@@ -159,7 +164,6 @@ abstract class RoutingSettings {
         .toList();
   }
 
-  /// Generate routing rules for Xray-core
   static List<Map<String, dynamic>> generateRoutingRules({
     required bool bypassLanValue,
     required bool bypassIranValue,
@@ -171,20 +175,121 @@ abstract class RoutingSettings {
     required bool blockPhishingValue,
     required bool directYoutubeValue,
     required bool directNetflixValue,
+    bool blockCryptominersValue = true,
+    bool blockBotnetValue = true,
+    bool blockRansomwareValue = true,
+    bool blockSpamValue = true,
+    bool blockTrackersValue = true,
+    bool blockGamblingValue = false,
+    bool blockDatingValue = false,
+    bool blockSocialMediaValue = false,
     List<String>? customDirectDomainsValue,
     List<String>? customProxyDomainsValue,
     List<String>? customBlockDomainsValue,
     List<String>? customDirectIpsValue,
     List<String>? customProxyIpsValue,
     List<String>? customBlockIpsValue,
+    List<String>? blockedUdpPorts,
+    List<String>? blockedTcpPorts,
   }) {
     final rules = <Map<String, dynamic>>[];
 
-    // Block rules first
+    if (blockMalwareValue || blockRansomwareValue) {
+      rules.add({
+        'type': 'field',
+        'domain': [
+          'geosite:category-malware',
+          'regexp:malware',
+          'regexp:ransomware',
+          'regexp:virus',
+          'regexp:trojan',
+          r'regexp:worm\.',
+        ],
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockPhishingValue) {
+      rules.add({
+        'type': 'field',
+        'domain': [
+          'geosite:phishing',
+          'regexp:phishing',
+          'regexp:scam',
+          'regexp:fake-login',
+        ],
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockCryptominersValue) {
+      rules.add({
+        'type': 'field',
+        'domain': [
+          'geosite:category-cryptominers',
+          'regexp:coinhive',
+          'regexp:cryptoloot',
+          'regexp:miner',
+          r'regexp:mining\.js',
+        ],
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockBotnetValue) {
+      rules.add({
+        'type': 'field',
+        'domain': [
+          'regexp:botnet',
+          'regexp:c2server',
+          'regexp:command-and-control',
+          'regexp:zombie',
+        ],
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockSpamValue) {
+      rules.add({
+        'type': 'field',
+        'domain': ['regexp:spam', 'regexp:spammer', 'regexp:bulk-mail'],
+        'outboundTag': 'block',
+      });
+    }
+
     if (blockAdsValue) {
       rules.add({
         'type': 'field',
-        'domain': ['geosite:category-ads', 'geosite:category-ads-all'],
+        'domain': [
+          'geosite:category-ads',
+          'geosite:category-ads-all',
+          'geosite:category-ads-ir',
+          'regexp:doubleclick',
+          'regexp:googlesyndication',
+          'regexp:adservice',
+          r'regexp:ads\.',
+          r'regexp:\.ads\.',
+          'regexp:adserver',
+        ],
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockTrackersValue) {
+      rules.add({
+        'type': 'field',
+        'domain': [
+          'regexp:tracker',
+          'regexp:tracking',
+          'regexp:analytics',
+          'regexp:telemetry',
+          'regexp:beacon',
+          'domain:google-analytics.com',
+          'domain:mixpanel.com',
+          'domain:segment.io',
+          'domain:amplitude.com',
+          'domain:hotjar.com',
+        ],
         'outboundTag': 'block',
       });
     }
@@ -192,7 +297,77 @@ abstract class RoutingSettings {
     if (blockPornValue) {
       rules.add({
         'type': 'field',
-        'domain': ['geosite:category-porn'],
+        'domain': [
+          'geosite:category-porn',
+          'geosite:nsfw',
+          'regexp:porn',
+          'regexp:xxx',
+          'regexp:adult',
+          r'regexp:sex\.',
+          r'regexp:\.sex',
+          'regexp:nsfw',
+          'regexp:nude',
+          'regexp:erotic',
+          r'regexp:18\+',
+          'regexp:xvideos',
+          'regexp:pornhub',
+          'regexp:xnxx',
+          'regexp:xhamster',
+          'regexp:redtube',
+          'regexp:youporn',
+          'regexp:brazzers',
+          'regexp:chaturbate',
+          'regexp:onlyfans',
+        ],
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockGamblingValue) {
+      rules.add({
+        'type': 'field',
+        'domain': [
+          'geosite:category-gambling',
+          'regexp:casino',
+          'regexp:betting',
+          'regexp:poker',
+          'regexp:gambling',
+          'regexp:slot-machine',
+          'regexp:lottery',
+        ],
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockDatingValue) {
+      rules.add({
+        'type': 'field',
+        'domain': [
+          'regexp:dating',
+          'regexp:tinder',
+          'regexp:bumble',
+          r'regexp:match\.com',
+          'regexp:okcupid',
+        ],
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockSocialMediaValue) {
+      rules.add({
+        'type': 'field',
+        'domain': [
+          'domain:facebook.com',
+          'domain:instagram.com',
+          'domain:twitter.com',
+          'domain:x.com',
+          'domain:tiktok.com',
+          'domain:snapchat.com',
+          'domain:pinterest.com',
+          'domain:linkedin.com',
+          'domain:reddit.com',
+          'domain:tumblr.com',
+        ],
         'outboundTag': 'block',
       });
     }
@@ -206,7 +381,24 @@ abstract class RoutingSettings {
       });
     }
 
-    // Custom block rules
+    if (blockedUdpPorts != null && blockedUdpPorts.isNotEmpty) {
+      rules.add({
+        'type': 'field',
+        'port': blockedUdpPorts.join(','),
+        'network': 'udp',
+        'outboundTag': 'block',
+      });
+    }
+
+    if (blockedTcpPorts != null && blockedTcpPorts.isNotEmpty) {
+      rules.add({
+        'type': 'field',
+        'port': blockedTcpPorts.join(','),
+        'network': 'tcp',
+        'outboundTag': 'block',
+      });
+    }
+
     if (customBlockDomainsValue != null && customBlockDomainsValue.isNotEmpty) {
       rules.add({
         'type': 'field',
@@ -223,7 +415,6 @@ abstract class RoutingSettings {
       });
     }
 
-    // Direct rules
     if (bypassLanValue) {
       rules.add({
         'type': 'field',
@@ -233,13 +424,11 @@ abstract class RoutingSettings {
     }
 
     if (bypassIranValue) {
-      // Iran IPs - geoip:ir available in most geoip.dat files
       rules.add({
         'type': 'field',
         'ip': ['geoip:ir'],
         'outboundTag': 'direct',
       });
-      // Iran domains - using .ir suffix as reliable fallback
       rules.add({
         'type': 'field',
         'domain': [
@@ -271,7 +460,6 @@ abstract class RoutingSettings {
       });
     }
 
-    // Special direct routes
     if (directYoutubeValue) {
       rules.add({
         'type': 'field',
@@ -288,8 +476,8 @@ abstract class RoutingSettings {
       });
     }
 
-    // Custom direct rules
-    if (customDirectDomainsValue != null && customDirectDomainsValue.isNotEmpty) {
+    if (customDirectDomainsValue != null &&
+        customDirectDomainsValue.isNotEmpty) {
       rules.add({
         'type': 'field',
         'domain': customDirectDomainsValue,
@@ -305,7 +493,6 @@ abstract class RoutingSettings {
       });
     }
 
-    // Custom proxy rules
     if (customProxyDomainsValue != null && customProxyDomainsValue.isNotEmpty) {
       rules.add({
         'type': 'field',

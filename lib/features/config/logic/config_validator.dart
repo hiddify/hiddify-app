@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-/// Config validation and warning system
-/// Identifies sensitive settings that may break connections
+// Config validation and warning system
+// Identifies sensitive settings that may break connections
 class ConfigValidator {
-  /// Settings that are critical and should not be modified
+  // Settings that are critical and should not be modified
   static const List<String> criticalSettings = [
     'address',
     'server',
@@ -15,7 +15,7 @@ class ConfigValidator {
     'privateKey',
   ];
 
-  /// Settings that may affect connection but are safer to modify
+  // Settings that may affect connection but are safer to modify
   static const List<String> sensitiveSettings = [
     'sni',
     'serverName',
@@ -27,7 +27,7 @@ class ConfigValidator {
     'security',
   ];
 
-  /// Settings that are safe to modify
+  // Settings that are safe to modify
   static const List<String> safeSettings = [
     'fingerprint',
     'alpn',
@@ -41,23 +41,23 @@ class ConfigValidator {
     'tag',
   ];
 
-  /// Check if a setting is critical (will break connection if changed)
+  // Check if a setting is critical (will break connection if changed)
   static bool isCritical(String key) => criticalSettings.contains(key);
 
-  /// Check if a setting is sensitive (may affect connection)
+  // Check if a setting is sensitive (may affect connection)
   static bool isSensitive(String key) => sensitiveSettings.contains(key);
 
-  /// Check if a setting is safe to modify
+  // Check if a setting is safe to modify
   static bool isSafe(String key) => safeSettings.contains(key);
 
-  /// Get warning level for a setting
+  // Get warning level for a setting
   static WarningLevel getWarningLevel(String key) {
     if (isCritical(key)) return WarningLevel.critical;
     if (isSensitive(key)) return WarningLevel.warning;
     return WarningLevel.safe;
   }
 
-  /// Validate a config and return list of issues
+  // Validate a config and return list of issues
   static List<ValidationIssue> validate(String configContent) {
     final issues = <ValidationIssue>[];
 
@@ -85,7 +85,6 @@ class ConfigValidator {
     Map<String, dynamic> config,
     List<ValidationIssue> issues,
   ) {
-    // Check for required fields
     if (!config.containsKey('protocol') && !config.containsKey('_protocol')) {
       issues.add(
         const ValidationIssue(
@@ -95,8 +94,6 @@ class ConfigValidator {
         ),
       );
     }
-
-    // Check outbounds
     if (config.containsKey('outbounds')) {
       final outbounds = config['outbounds'] as List?;
       if (outbounds == null || outbounds.isEmpty) {
@@ -109,8 +106,6 @@ class ConfigValidator {
         );
       }
     }
-
-    // Check for insecure settings
     if (config['allowInsecure'] == true) {
       issues.add(
         const ValidationIssue(
@@ -120,8 +115,6 @@ class ConfigValidator {
         ),
       );
     }
-
-    // Check TLS settings
     final streamSettings = config['streamSettings'] as Map<String, dynamic>?;
     if (streamSettings != null) {
       final security = streamSettings['security'] as String?;
@@ -138,7 +131,6 @@ class ConfigValidator {
   }
 
   static void _validateUri(String uri, List<ValidationIssue> issues) {
-    // Check protocol prefix
     final supportedPrefixes = [
       'vless://',
       'vmess://',
@@ -149,6 +141,9 @@ class ConfigValidator {
       'hysteria2://',
       'hysteria://',
       'tuic://',
+      'naive+https://',
+      'naive+quic://',
+      'naive://',
       'wg://',
       'wireguard://',
     ];
@@ -163,8 +158,6 @@ class ConfigValidator {
         ),
       );
     }
-
-    // Check for @ symbol (user info separator)
     if (!uri.contains('@')) {
       issues.add(
         const ValidationIssue(
@@ -176,14 +169,12 @@ class ConfigValidator {
     }
   }
 
-  /// Compare two configs and find changes
+  // Compare two configs and find changes
   static List<ConfigChange> compareConfigs(
     Map<String, dynamic> original,
     Map<String, dynamic> modified,
   ) {
     final changes = <ConfigChange>[];
-
-    // Find modified and added fields
     for (final entry in modified.entries) {
       if (!original.containsKey(entry.key)) {
         changes.add(
@@ -207,8 +198,6 @@ class ConfigValidator {
         );
       }
     }
-
-    // Find removed fields
     for (final key in original.keys) {
       if (!modified.containsKey(key)) {
         changes.add(
@@ -226,11 +215,11 @@ class ConfigValidator {
     return changes;
   }
 
-  /// Check if changes are safe to apply
+  // Check if changes are safe to apply
   static bool areChangesSafe(List<ConfigChange> changes) =>
       !changes.any((c) => c.warningLevel == WarningLevel.critical);
 
-  /// Get summary of changes
+  // Get summary of changes
   static String getChangesSummary(List<ConfigChange> changes) {
     final critical =
         changes.where((c) => c.warningLevel == WarningLevel.critical).length;
@@ -243,7 +232,7 @@ class ConfigValidator {
   }
 }
 
-/// Warning level for config settings
+// Warning level for config settings
 enum WarningLevel {
   critical('Critical', 'Will break connection'),
   warning('Warning', 'May affect connection'),
@@ -254,10 +243,10 @@ enum WarningLevel {
   final String description;
 }
 
-/// Type of validation issue
+// Type of validation issue
 enum IssueType { error, warning, info }
 
-/// Validation issue
+// Validation issue
 class ValidationIssue {
   const ValidationIssue({
     required this.type,
@@ -270,10 +259,10 @@ class ValidationIssue {
   final String? field;
 }
 
-/// Type of config change
+// Type of config change
 enum ChangeType { added, modified, removed }
 
-/// Config change with warning level
+// Config change with warning level
 class ConfigChange {
   const ConfigChange({
     required this.field,

@@ -1,168 +1,150 @@
 import 'package:hiddify/core/utils/preferences_utils.dart';
 
-/// Transport settings for Xray-core stream settings
-abstract class TransportSettings {
-  // ============ Network Type ============
 
-  /// Network type: raw, ws, grpc, kcp, http, httpupgrade, quic, xhttp
+abstract class TransportSettings {
+  
   static final network = PreferencesNotifier.create<String, String>(
     'transport_network',
     'raw',
   );
 
-  // ============ WebSocket Settings ============
-
-  /// WebSocket path
+  
   static final wsPath = PreferencesNotifier.create<String, String>(
     'transport_ws_path',
     '/',
   );
 
-  /// WebSocket host
+  
   static final wsHost = PreferencesNotifier.create<String, String>(
     'transport_ws_host',
     '',
   );
 
-  /// WebSocket max early data
+  
   static final wsMaxEarlyData = PreferencesNotifier.create<int, int>(
     'transport_ws_max_early_data',
     0,
   );
 
-  /// WebSocket early data header name
+  
   static final wsEarlyDataHeader = PreferencesNotifier.create<String, String>(
     'transport_ws_early_data_header',
     'Sec-WebSocket-Protocol',
   );
 
-  // ============ gRPC Settings ============
-
-  /// gRPC service name
+  
   static final grpcServiceName = PreferencesNotifier.create<String, String>(
     'transport_grpc_service_name',
     '',
   );
 
-  /// gRPC mode: gun, multi, raw
+  
   static final grpcMode = PreferencesNotifier.create<String, String>(
     'transport_grpc_mode',
     'gun',
   );
 
-  /// gRPC authority
+  
   static final grpcAuthority = PreferencesNotifier.create<String, String>(
     'transport_grpc_authority',
     '',
   );
 
-  // ============ HTTP/2 Settings ============
-
-  /// HTTP/2 host
+  
   static final httpHost = PreferencesNotifier.create<String, String>(
     'transport_http_host',
     '',
   );
 
-  /// HTTP/2 path
+  
   static final httpPath = PreferencesNotifier.create<String, String>(
     'transport_http_path',
     '/',
   );
 
-  /// HTTP/2 method
+  
   static final httpMethod = PreferencesNotifier.create<String, String>(
     'transport_http_method',
     'PUT',
   );
 
-  // ============ HTTPUpgrade Settings ============
-
-  /// HTTPUpgrade path
+  
   static final httpUpgradePath = PreferencesNotifier.create<String, String>(
     'transport_httpupgrade_path',
     '/',
   );
 
-  /// HTTPUpgrade host
+  
   static final httpUpgradeHost = PreferencesNotifier.create<String, String>(
     'transport_httpupgrade_host',
     '',
   );
 
-  // ============ mKCP Settings ============
-
-  /// mKCP header type: none, srtp, utp, wechat-video, dtls, wireguard
+  
   static final kcpHeaderType = PreferencesNotifier.create<String, String>(
     'transport_kcp_header',
     'none',
   );
 
-  /// mKCP seed (obfuscation password)
+  
   static final kcpSeed = PreferencesNotifier.create<String, String>(
     'transport_kcp_seed',
     '',
   );
 
-  /// mKCP congestion control
+  
   static final kcpCongestion = PreferencesNotifier.create<bool, bool>(
     'transport_kcp_congestion',
     false,
   );
 
-  /// mKCP uplink capacity
+  
   static final kcpUplinkCapacity = PreferencesNotifier.create<int, int>(
     'transport_kcp_uplink',
     5,
   );
 
-  /// mKCP downlink capacity
+  
   static final kcpDownlinkCapacity = PreferencesNotifier.create<int, int>(
     'transport_kcp_downlink',
     20,
   );
 
-  // ============ QUIC Settings ============
-
-  /// QUIC security: none, aes-128-gcm, chacha20-poly1305
+  
   static final quicSecurity = PreferencesNotifier.create<String, String>(
     'transport_quic_security',
     'none',
   );
 
-  /// QUIC key
+  
   static final quicKey = PreferencesNotifier.create<String, String>(
     'transport_quic_key',
     '',
   );
 
-  /// QUIC header type
+  
   static final quicHeaderType = PreferencesNotifier.create<String, String>(
     'transport_quic_header',
     'none',
   );
 
-  // ============ TCP/RAW Settings ============
-
-  /// TCP header type: none, http
+  
   static final tcpHeaderType = PreferencesNotifier.create<String, String>(
     'transport_tcp_header',
     'none',
   );
 
-  /// TCP HTTP request host
+  
   static final tcpHost = PreferencesNotifier.create<String, String>(
     'transport_tcp_host',
     '',
   );
 
-  /// TCP HTTP request path
+  
   static final tcpPath = PreferencesNotifier.create<String, String>(
     'transport_tcp_path',
     '/',
   );
-
-  // ============ Available Options ============
 
   static const List<String> availableNetworks = [
     'raw',
@@ -191,13 +173,9 @@ abstract class TransportSettings {
     'chacha20-poly1305',
   ];
 
-  static const List<String> availableGrpcModes = [
-    'gun',
-    'multi',
-    'raw',
-  ];
+  static const List<String> availableGrpcModes = ['gun', 'multi', 'raw'];
 
-  /// Generate WebSocket settings
+  
   static Map<String, dynamic> generateWsSettings({
     required String path,
     String? host,
@@ -205,9 +183,7 @@ abstract class TransportSettings {
     String? earlyDataHeader,
     Map<String, String>? headers,
   }) {
-    final config = <String, dynamic>{
-      'path': path,
-    };
+    final config = <String, dynamic>{'path': path};
 
     final headersMap = <String, String>{};
     if (host != null && host.isNotEmpty) {
@@ -230,7 +206,7 @@ abstract class TransportSettings {
     return config;
   }
 
-  /// Generate gRPC settings
+  
   static Map<String, dynamic> generateGrpcSettings({
     required String serviceName,
     String mode = 'gun',
@@ -248,16 +224,13 @@ abstract class TransportSettings {
     return config;
   }
 
-  /// Generate HTTP/2 settings
+  
   static Map<String, dynamic> generateHttpSettings({
     required String path,
     String? host,
     String method = 'PUT',
   }) {
-    final config = <String, dynamic>{
-      'path': path,
-      'method': method,
-    };
+    final config = <String, dynamic>{'path': path, 'method': method};
 
     if (host != null && host.isNotEmpty) {
       config['host'] = [host];
@@ -266,14 +239,12 @@ abstract class TransportSettings {
     return config;
   }
 
-  /// Generate HTTPUpgrade settings
+  
   static Map<String, dynamic> generateHttpUpgradeSettings({
     required String path,
     String? host,
   }) {
-    final config = <String, dynamic>{
-      'path': path,
-    };
+    final config = <String, dynamic>{'path': path};
 
     if (host != null && host.isNotEmpty) {
       config['host'] = host;
@@ -282,7 +253,7 @@ abstract class TransportSettings {
     return config;
   }
 
-  /// Generate mKCP settings
+  
   static Map<String, dynamic> generateKcpSettings({
     String headerType = 'none',
     String? seed,
@@ -304,7 +275,7 @@ abstract class TransportSettings {
     return config;
   }
 
-  /// Generate QUIC settings
+  
   static Map<String, dynamic> generateQuicSettings({
     String security = 'none',
     String? key,
@@ -322,7 +293,7 @@ abstract class TransportSettings {
     return config;
   }
 
-  /// Generate TCP/RAW settings
+  
   static Map<String, dynamic>? generateTcpSettings({
     String headerType = 'none',
     String? host,

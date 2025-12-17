@@ -18,7 +18,6 @@ class ConfigParser {
       name = _parseName(trimmedContent) ?? 'VLESS Config';
     } else if (trimmedContent.startsWith('vmess://')) {
       type = 'vmess';
-      // vmess usually base64 encoded, need decode to get name, skipping for simple check
       name = 'VMess Config';
     } else if (trimmedContent.startsWith('trojan://')) {
       type = 'trojan';
@@ -32,8 +31,6 @@ class ConfigParser {
       type = 'hysteria';
       name = _parseName(trimmedContent) ?? 'Hysteria Config';
     } else {
-      // Assuming it might be a JSON content or universal format?
-      // Check for braces
       if (trimmedContent.startsWith('{') && trimmedContent.endsWith('}')) {
         type = 'json';
         name = 'Custom Config';
@@ -62,19 +59,17 @@ class ConfigParser {
     return null;
   }
 
-  /// Extract server address (host:port) from config content
+  // Extract server address (host =port) from config content
   static String? extractServerAddress(String content) {
     final trimmed = content.trim();
 
     try {
-      // VLESS, Trojan, SS format: protocol://user@host:port?params#name
       if (trimmed.startsWith('vless://') ||
           trimmed.startsWith('trojan://') ||
           trimmed.startsWith('ss://') ||
           trimmed.startsWith('hy2://') ||
           trimmed.startsWith('hysteria2://') ||
           trimmed.startsWith('hysteria://')) {
-        // Remove fragment
         var uriPart = trimmed;
         final fragmentIndex = uriPart.indexOf('#');
         if (fragmentIndex != -1) {
@@ -86,17 +81,13 @@ class ConfigParser {
           return '${uri.host}:${uri.port}';
         }
       }
-
-      // VMess format: vmess://base64
       if (trimmed.startsWith('vmess://')) {
         final base64Part = trimmed.substring(8);
-        // Remove fragment if any
         var b64 = base64Part;
         final fragmentIndex = b64.indexOf('#');
         if (fragmentIndex != -1) {
           b64 = b64.substring(0, fragmentIndex);
         }
-        // Decode base64
         final decoded = utf8.decode(base64.decode(base64.normalize(b64)));
         final json = jsonDecode(decoded) as Map<String, dynamic>;
         final host = json['add'] as String?;
@@ -105,16 +96,14 @@ class ConfigParser {
           return '$host:$port';
         }
       }
-
-      // SOCKS format: socks://host:port or socks5://host:port
       if (trimmed.startsWith('socks://') || trimmed.startsWith('socks5://')) {
         final uri = Uri.parse(trimmed);
         if (uri.host.isNotEmpty && uri.port > 0) {
           return '${uri.host}:${uri.port}';
         }
       }
-    } catch (e) {
-      // Parsing failed
+    } catch (_) {
+      // Intentionally empty - return null on parse failure
     }
 
     return null;

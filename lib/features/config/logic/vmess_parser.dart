@@ -1,24 +1,22 @@
 import 'dart:convert';
 
-/// VMess protocol parser for Xray-core
+import 'package:hiddify/core/logger/logger.dart';
+
+
 class VmessParser {
-  /// Parse VMess URI to outbound config
-  /// Format: vmess://base64_json or vmess://base64_json#name
+  
+  
   static Map<String, dynamic>? parse(String uri) {
     if (!uri.startsWith('vmess://')) return null;
 
     try {
       var base64Part = uri.substring(8);
       String? remark;
-
-      // Check for fragment
       final fragmentIndex = base64Part.indexOf('#');
       if (fragmentIndex != -1) {
         remark = Uri.decodeComponent(base64Part.substring(fragmentIndex + 1));
         base64Part = base64Part.substring(0, fragmentIndex);
       }
-
-      // Decode base64
       final padded = base64Part.padRight(
         base64Part.length + (4 - base64Part.length % 4) % 4,
         '=',
@@ -28,6 +26,7 @@ class VmessParser {
 
       return _buildOutbound(json, remark);
     } catch (e) {
+      Logger.vmess.warning('Failed to parse VMess URI: $e');
       return null;
     }
   }
@@ -168,8 +167,36 @@ class VmessParser {
     return streamSettings;
   }
 
-  /// Convert parsed config back to URI
-  static String toUri(Map<String, dynamic> outbound) {
+  
+  static String? validate(Map<String, dynamic>? config) {
+    if (config == null) return 'Failed to parse VMess config';
+    
+    final settings = config['settings'] as Map<String, dynamic>?;
+    if (settings == null) return 'Missing settings in VMess config';
+    
+    final vnext = settings['vnext'] as List?;
+    if (vnext == null || vnext.isEmpty) return 'Missing vnext in VMess config';
+    
+    final server = vnext.first as Map<String, dynamic>?;
+    if (server == null) return 'Invalid server in VMess config';
+    
+    final address = server['address'] as String?;
+    if (address == null || address.isEmpty) return 'Missing server address in VMess config';
+    
+    final users = server['users'] as List?;
+    if (users == null || users.isEmpty) return 'Missing users in VMess config';
+    
+    final user = users.first as Map<String, dynamic>?;
+    if (user == null) return 'Invalid user in VMess config';
+    
+    final uuid = user['id'] as String?;
+    if (uuid == null || uuid.isEmpty) return 'Missing UUID in VMess config';
+    
+    return null; 
+  }
+
+
+static String toUri(Map<String, dynamic> outbound) {
     try {
       final settings = outbound['settings'] as Map<String, dynamic>;
       final vnext = (settings['vnext'] as List).first as Map<String, dynamic>;
@@ -193,8 +220,6 @@ class VmessParser {
         'alpn': '',
         'fp': 'chrome',
       };
-
-      // Extract TLS settings
       if (streamSettings['tlsSettings'] != null) {
         final tls = streamSettings['tlsSettings'] as Map<String, dynamic>;
         json['sni'] = tls['serverName'] ?? '';
@@ -203,8 +228,6 @@ class VmessParser {
           json['alpn'] = (tls['alpn'] as List).join(',');
         }
       }
-
-      // Extract transport settings
       final network = streamSettings['network'] as String? ?? 'tcp';
       switch (network) {
         case 'ws':
@@ -226,6 +249,7 @@ class VmessParser {
       final base64Str = base64.encode(utf8.encode(jsonStr));
       return 'vmess://$base64Str';
     } catch (e) {
+      Logger.vmess.warning('Failed to generate VMess URI: $e');
       return '';
     }
   }

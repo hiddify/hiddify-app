@@ -11,8 +11,9 @@ abstract class Subscription with _$Subscription {
     required String name,
     required String url,
     required DateTime lastUpdated,
-    @Default([]) List<Config> configs,
+    @Default(<Config>[]) List<Config> configs,
   }) = _Subscription;
 
-  factory Subscription.fromJson(Map<String, dynamic> json) => _$SubscriptionFromJson(json);
+  factory Subscription.fromJson(Map<String, dynamic> json) =>
+      _$SubscriptionFromJson(json);
 }

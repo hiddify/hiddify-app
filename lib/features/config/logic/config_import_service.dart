@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/features/config/logic/config_extractor.dart';
 import 'package:hiddify/features/config/logic/config_import_result.dart';
 import 'package:hiddify/features/config/model/config.dart';
@@ -13,8 +14,12 @@ class ConfigImportService {
     String content, {
     required String source,
   }) {
+    Logger.parser.info(
+      'Importing content from $source (length: ${content.length})',
+    );
     final trimmed = content.trim();
     if (trimmed.isEmpty) {
+      Logger.parser.warning('Import content is empty');
       return const ConfigImportResult(
         items: <ImportItem>[],
         failures: <ImportFailure>[],
@@ -23,13 +28,27 @@ class ConfigImportService {
     }
 
     final maybeDecoded = _decodeBase64IfLooksLikeSubscription(trimmed);
+    if (maybeDecoded != trimmed) {
+      Logger.parser.debug('Content decoded from Base64');
+    }
 
     final jsonResult = _tryImportJson(maybeDecoded, source: source);
-    if (jsonResult != null) return jsonResult;
+    if (jsonResult != null) {
+      Logger.parser.info(
+        'Imported as JSON with ${jsonResult.items.length} items',
+      );
+      return jsonResult;
+    }
 
     final yamlResult = _tryImportClashYaml(maybeDecoded, source: source);
-    if (yamlResult != null) return yamlResult;
+    if (yamlResult != null) {
+      Logger.parser.info(
+        'Imported as Clash YAML with ${yamlResult.items.length} items',
+      );
+      return yamlResult;
+    }
 
+    Logger.parser.debug('Attempting to import as text/URI list');
     return _importFromText(maybeDecoded, source: source);
   }
 
@@ -42,54 +61,27 @@ class ConfigImportService {
       source: source,
     );
 
+    Logger.parser.debug(
+      'Separated ${separation.configs.length} potential configs from text',
+    );
+
     final unique = _deduplicateByContent(separation.configs);
+    if (unique.length < separation.configs.length) {
+      Logger.parser.debug(
+        'Removed ${separation.configs.length - unique.length} duplicate configs',
+      );
+    }
 
     final items = <ImportItem>[];
     final failures = <ImportFailure>[];
 
     for (final config in unique) {
-      final lower = config.content.trimLeft().toLowerCase();
-      if (lower.startsWith('ssr://')) {
-        failures.add(
-          ImportFailure(
-            raw: config.content,
-            issue: const ImportIssue(
-              level: ImportIssueLevel.error,
-              message: 'ShadowsocksR (ssr://) is not supported yet',
-            ),
-          ),
-        );
-        continue;
-      }
-
-      if (lower.startsWith('naive+https://')) {
-        failures.add(
-          ImportFailure(
-            raw: config.content,
-            issue: const ImportIssue(
-              level: ImportIssueLevel.error,
-              message: 'Naive (naive+https://) is not supported yet',
-            ),
-          ),
-        );
-        continue;
-      }
-
-      if (lower.startsWith('tuic://')) {
-        failures.add(
-          ImportFailure(
-            raw: config.content,
-            issue: const ImportIssue(
-              level: ImportIssueLevel.error,
-              message: 'TUIC (tuic://) is recognized but connection is not supported yet',
-            ),
-          ),
-        );
-        continue;
-      }
-
       items.add(ImportItem(config: config));
     }
+
+    Logger.parser.info(
+      'Import finished: ${items.length} success, ${failures.length} failures',
+    );
 
     return ConfigImportResult(
       items: items,
@@ -122,8 +114,11 @@ class ConfigImportService {
     if (decoded == null) return input;
 
     final looksLikeList = decoded.contains('://');
-    final looksLikeClash = decoded.contains('proxies:') || decoded.contains('proxy-groups:');
-    final looksLikeJson = decoded.trimLeft().startsWith('{') || decoded.trimLeft().startsWith('[');
+    final looksLikeClash =
+        decoded.contains('proxies:') || decoded.contains('proxy-groups:');
+    final looksLikeJson =
+        decoded.trimLeft().startsWith('{') ||
+        decoded.trimLeft().startsWith('[');
 
     if (looksLikeList || looksLikeClash || looksLikeJson) {
       return decoded;
@@ -308,14 +303,20 @@ class ConfigImportService {
       final tag = _asString(outbound['tag']) ?? 'sing-box';
 
       final warnings = <ImportIssue>[];
-      final uri = _singBoxOutboundToUri(outbound, type: type, name: tag, warnings: warnings);
+      final uri = _singBoxOutboundToUri(
+        outbound,
+        type: type,
+        name: tag,
+        warnings: warnings,
+      );
 
       if (uri == null) {
         late final ImportIssue issue;
         if (type == 'tuic') {
           issue = const ImportIssue(
             level: ImportIssueLevel.error,
-            message: 'TUIC (type: tuic) is recognized but connection is not supported yet',
+            message:
+                'TUIC (type: tuic) is recognized but connection is not supported yet',
           );
         } else if (type == 'naive') {
           issue = const ImportIssue(
@@ -334,12 +335,7 @@ class ConfigImportService {
           );
         }
 
-        failures.add(
-          ImportFailure(
-            raw: tag,
-            issue: issue,
-          ),
-        );
+        failures.add(ImportFailure(raw: tag, issue: issue));
         continue;
       }
 
@@ -399,9 +395,7 @@ class ConfigImportService {
 
     if (server == null || port == null || uuid == null) return null;
 
-    final params = <String, String>{
-      'encryption': 'none',
-    };
+    final params = <String, String>{'encryption': 'none'};
 
     final flow = _asString(outbound['flow']);
     if (flow != null && flow.isNotEmpty) params['flow'] = flow;
@@ -429,7 +423,10 @@ class ConfigImportService {
         params['serviceName'] = serviceName;
       }
 
-      final multiMode = (_asBool(transport?['multi_mode']) ?? _asBool(transport?['multiMode'])) ?? false;
+      final multiMode =
+          (_asBool(transport?['multi_mode']) ??
+              _asBool(transport?['multiMode'])) ??
+          false;
       if (multiMode) params['mode'] = 'multi';
     }
 
@@ -443,7 +440,8 @@ class ConfigImportService {
             warnings.add(
               const ImportIssue(
                 level: ImportIssueLevel.warning,
-                message: 'Multiple HTTP hosts found in sing-box transport; using the first host',
+                message:
+                    'Multiple HTTP hosts found in sing-box transport; using the first host',
               ),
             );
           }
@@ -458,7 +456,8 @@ class ConfigImportService {
         warnings.add(
           const ImportIssue(
             level: ImportIssueLevel.warning,
-            message: 'HTTP transport method is not supported in URI import and will be ignored',
+            message:
+                'HTTP transport method is not supported in URI import and will be ignored',
           ),
         );
       }
@@ -468,7 +467,8 @@ class ConfigImportService {
         warnings.add(
           const ImportIssue(
             level: ImportIssueLevel.warning,
-            message: 'HTTP transport headers are not supported in URI import and will be ignored',
+            message:
+                'HTTP transport headers are not supported in URI import and will be ignored',
           ),
         );
       }
@@ -492,7 +492,9 @@ class ConfigImportService {
           params['security'] = 'reality';
           final pbk = _asString(reality?['public_key']);
           final sid = _asString(reality?['short_id']);
-          final spx = _asString(reality?['spider_x']) ?? _asString(reality?['spider-x']);
+          final spx =
+              _asString(reality?['spider_x']) ??
+              _asString(reality?['spider-x']);
           if (pbk != null && pbk.isNotEmpty) params['pbk'] = pbk;
           if (sid != null && sid.isNotEmpty) params['sid'] = sid;
           if (spx != null && spx.isNotEmpty) params['spx'] = spx;
@@ -520,7 +522,8 @@ class ConfigImportService {
           warnings.add(
             const ImportIssue(
               level: ImportIssueLevel.warning,
-              message: 'TLS insecure requested in sing-box but will be controlled by app TLS settings',
+              message:
+                  'TLS insecure requested in sing-box but will be controlled by app TLS settings',
             ),
           );
         }
@@ -594,7 +597,8 @@ class ConfigImportService {
             warnings.add(
               const ImportIssue(
                 level: ImportIssueLevel.warning,
-                message: 'Multiple HTTP hosts found in sing-box transport; using the first host',
+                message:
+                    'Multiple HTTP hosts found in sing-box transport; using the first host',
               ),
             );
           }
@@ -609,7 +613,8 @@ class ConfigImportService {
         warnings.add(
           const ImportIssue(
             level: ImportIssueLevel.warning,
-            message: 'HTTP transport method is not supported in URI import and will be ignored',
+            message:
+                'HTTP transport method is not supported in URI import and will be ignored',
           ),
         );
       }
@@ -619,7 +624,8 @@ class ConfigImportService {
         warnings.add(
           const ImportIssue(
             level: ImportIssueLevel.warning,
-            message: 'HTTP transport headers are not supported in URI import and will be ignored',
+            message:
+                'HTTP transport headers are not supported in URI import and will be ignored',
           ),
         );
       }
@@ -656,7 +662,8 @@ class ConfigImportService {
           warnings.add(
             const ImportIssue(
               level: ImportIssueLevel.warning,
-              message: 'TLS insecure requested in sing-box but will be controlled by app TLS settings',
+              message:
+                  'TLS insecure requested in sing-box but will be controlled by app TLS settings',
             ),
           );
         }
@@ -679,9 +686,7 @@ class ConfigImportService {
 
     if (server == null || port == null || password == null) return null;
 
-    final params = <String, String>{
-      'security': 'tls',
-    };
+    final params = <String, String>{'security': 'tls'};
 
     final tls = _asMap(outbound['tls']);
     final transport = _asMap(outbound['transport']);
@@ -706,7 +711,10 @@ class ConfigImportService {
         params['serviceName'] = serviceName;
       }
 
-      final multiMode = (_asBool(transport?['multi_mode']) ?? _asBool(transport?['multiMode'])) ?? false;
+      final multiMode =
+          (_asBool(transport?['multi_mode']) ??
+              _asBool(transport?['multiMode'])) ??
+          false;
       if (multiMode) params['mode'] = 'multi';
     }
 
@@ -720,7 +728,8 @@ class ConfigImportService {
             warnings.add(
               const ImportIssue(
                 level: ImportIssueLevel.warning,
-                message: 'Multiple HTTP hosts found in sing-box transport; using the first host',
+                message:
+                    'Multiple HTTP hosts found in sing-box transport; using the first host',
               ),
             );
           }
@@ -735,7 +744,8 @@ class ConfigImportService {
         warnings.add(
           const ImportIssue(
             level: ImportIssueLevel.warning,
-            message: 'HTTP transport method is not supported in URI import and will be ignored',
+            message:
+                'HTTP transport method is not supported in URI import and will be ignored',
           ),
         );
       }
@@ -745,7 +755,8 @@ class ConfigImportService {
         warnings.add(
           const ImportIssue(
             level: ImportIssueLevel.warning,
-            message: 'HTTP transport headers are not supported in URI import and will be ignored',
+            message:
+                'HTTP transport headers are not supported in URI import and will be ignored',
           ),
         );
       }
@@ -769,7 +780,9 @@ class ConfigImportService {
           params['security'] = 'reality';
           final pbk = _asString(reality?['public_key']);
           final sid = _asString(reality?['short_id']);
-          final spx = _asString(reality?['spider_x']) ?? _asString(reality?['spider-x']);
+          final spx =
+              _asString(reality?['spider_x']) ??
+              _asString(reality?['spider-x']);
           if (pbk != null && pbk.isNotEmpty) params['pbk'] = pbk;
           if (sid != null && sid.isNotEmpty) params['sid'] = sid;
           if (spx != null && spx.isNotEmpty) params['spx'] = spx;
@@ -795,7 +808,8 @@ class ConfigImportService {
           warnings.add(
             const ImportIssue(
               level: ImportIssueLevel.warning,
-              message: 'TLS insecure requested in sing-box but will be controlled by app TLS settings',
+              message:
+                  'TLS insecure requested in sing-box but will be controlled by app TLS settings',
             ),
           );
         }
@@ -806,7 +820,7 @@ class ConfigImportService {
         .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
         .join('&');
 
-    return 'trojan://$password@${_formatHostForUri(server)}:$port?$query#${Uri.encodeComponent(name)}';
+    return 'trojan://${Uri.encodeComponent(password)}@${_formatHostForUri(server)}:$port?$query#${Uri.encodeComponent(name)}';
   }
 
   static String? _singBoxShadowsocksToUri(
@@ -833,7 +847,8 @@ class ConfigImportService {
   }) {
     final server = _asString(outbound['server']);
     final port = _asInt(outbound['server_port']);
-    final auth = _asString(outbound['password']) ??
+    final auth =
+        _asString(outbound['password']) ??
         _asString(outbound['auth']) ??
         _asString(outbound['auth_str']) ??
         _asString(outbound['auth-str']);
@@ -859,16 +874,19 @@ class ConfigImportService {
         warnings.add(
           const ImportIssue(
             level: ImportIssueLevel.warning,
-            message: 'TLS insecure requested in sing-box but will be controlled by app TLS settings',
+            message:
+                'TLS insecure requested in sing-box but will be controlled by app TLS settings',
           ),
         );
       }
     }
 
-    final upMbps = _asIntLoose(outbound['up_mbps']) ?? _asIntLoose(outbound['up']);
+    final upMbps =
+        _asIntLoose(outbound['up_mbps']) ?? _asIntLoose(outbound['up']);
     if (upMbps != null) params['up'] = upMbps.toString();
 
-    final downMbps = _asIntLoose(outbound['down_mbps']) ?? _asIntLoose(outbound['down']);
+    final downMbps =
+        _asIntLoose(outbound['down_mbps']) ?? _asIntLoose(outbound['down']);
     if (downMbps != null) params['down'] = downMbps.toString();
 
     final obfs = _asMap(outbound['obfs']);
@@ -904,34 +922,39 @@ class ConfigImportService {
         warnings.add(
           const ImportIssue(
             level: ImportIssueLevel.warning,
-            message: 'Multiple WireGuard peers found in sing-box outbound; using the first peer',
+            message:
+                'Multiple WireGuard peers found in sing-box outbound; using the first peer',
           ),
         );
       }
     }
 
-    final server = _asString(primaryPeer?['server']) ?? _asString(outbound['server']);
-    final port = _asInt(primaryPeer?['server_port']) ?? _asInt(outbound['server_port']);
+    final server =
+        _asString(primaryPeer?['server']) ?? _asString(outbound['server']);
+    final port =
+        _asInt(primaryPeer?['server_port']) ?? _asInt(outbound['server_port']);
     if (server == null || port == null) return null;
 
-    final publicKey = _asString(outbound['peer_public_key']) ??
+    final publicKey =
+        _asString(outbound['peer_public_key']) ??
         _asString(primaryPeer?['public_key']) ??
         _asString(outbound['public_key']);
     if (publicKey == null) return null;
 
-    final preSharedKey = _asString(outbound['pre_shared_key']) ?? _asString(primaryPeer?['pre_shared_key']);
+    final preSharedKey =
+        _asString(outbound['pre_shared_key']) ??
+        _asString(primaryPeer?['pre_shared_key']);
     if (preSharedKey != null && preSharedKey.isNotEmpty) {
       warnings.add(
         const ImportIssue(
           level: ImportIssueLevel.warning,
-          message: 'WireGuard pre_shared_key exists in sing-box config but is not supported in URI import yet',
+          message:
+              'WireGuard pre_shared_key exists in sing-box config but is not supported in URI import yet',
         ),
       );
     }
 
-    final params = <String, String>{
-      'publicKey': publicKey,
-    };
+    final params = <String, String>{'publicKey': publicKey};
 
     final localAddressRaw = outbound['local_address'];
     if (localAddressRaw is String && localAddressRaw.isNotEmpty) {
@@ -1029,14 +1052,20 @@ class ConfigImportService {
       }
 
       final warnings = <ImportIssue>[];
-      final uri = _clashProxyToUri(proxy, type: type, name: name, warnings: warnings);
+      final uri = _clashProxyToUri(
+        proxy,
+        type: type,
+        name: name,
+        warnings: warnings,
+      );
 
       if (uri == null) {
         late final ImportIssue issue;
         if (type == 'tuic') {
           issue = const ImportIssue(
             level: ImportIssueLevel.error,
-            message: 'TUIC (type: tuic) is recognized but connection is not supported yet',
+            message:
+                'TUIC (type: tuic) is recognized but connection is not supported yet',
           );
         } else if (type == 'ssr') {
           issue = const ImportIssue(
@@ -1055,12 +1084,7 @@ class ConfigImportService {
           );
         }
 
-        failures.add(
-          ImportFailure(
-            raw: name,
-            issue: issue,
-          ),
-        );
+        failures.add(ImportFailure(raw: name, issue: issue));
         continue;
       }
 
@@ -1144,13 +1168,19 @@ class ConfigImportService {
       if (sid != null && sid.isNotEmpty) params['sid'] = sid;
       if (spx != null && spx.isNotEmpty) params['spx'] = spx;
 
-      final serverName = _asString(proxy['servername']) ?? _asString(proxy['sni']);
-      if (serverName != null && serverName.isNotEmpty) params['sni'] = serverName;
+      final serverName =
+          _asString(proxy['servername']) ?? _asString(proxy['sni']);
+      if (serverName != null && serverName.isNotEmpty) {
+        params['sni'] = serverName;
+      }
     } else if (tlsEnabled) {
       params['security'] = 'tls';
 
-      final serverName = _asString(proxy['servername']) ?? _asString(proxy['sni']);
-      if (serverName != null && serverName.isNotEmpty) params['sni'] = serverName;
+      final serverName =
+          _asString(proxy['servername']) ?? _asString(proxy['sni']);
+      if (serverName != null && serverName.isNotEmpty) {
+        params['sni'] = serverName;
+      }
 
       final fp = _asString(proxy['client-fingerprint']);
       if (fp != null && fp.isNotEmpty) params['fp'] = fp;
@@ -1179,7 +1209,8 @@ class ConfigImportService {
         params['serviceName'] = serviceName;
       }
 
-      final mode = _asString(grpcOpts?['grpc-mode']) ??
+      final mode =
+          _asString(grpcOpts?['grpc-mode']) ??
           _asString(grpcOpts?['grpcMode']) ??
           _asString(grpcOpts?['mode']);
       if (mode != null && mode.isNotEmpty) params['mode'] = mode;
@@ -1203,7 +1234,8 @@ class ConfigImportService {
               warnings.add(
                 const ImportIssue(
                   level: ImportIssueLevel.warning,
-                  message: 'Multiple H2 hosts found in Clash proxy; using the first host',
+                  message:
+                      'Multiple H2 hosts found in Clash proxy; using the first host',
                 ),
               );
             }
@@ -1213,7 +1245,8 @@ class ConfigImportService {
     }
 
     if (network == 'httpupgrade') {
-      final upgradeOpts = _asMap(proxy['httpupgrade-opts']) ??
+      final upgradeOpts =
+          _asMap(proxy['httpupgrade-opts']) ??
           _asMap(proxy['http-upgrade-opts']) ??
           _asMap(proxy['http-upgrade-options']);
       final path = _asString(upgradeOpts?['path']);
@@ -1225,7 +1258,9 @@ class ConfigImportService {
       } else {
         final headers = _asMap(upgradeOpts?['headers']);
         final hostHeader = _asString(headers?['Host']);
-        if (hostHeader != null && hostHeader.isNotEmpty) params['host'] = hostHeader;
+        if (hostHeader != null && hostHeader.isNotEmpty) {
+          params['host'] = hostHeader;
+        }
       }
     }
 
@@ -1234,7 +1269,8 @@ class ConfigImportService {
       warnings.add(
         const ImportIssue(
           level: ImportIssueLevel.warning,
-          message: 'skip-cert-verify requested in Clash but will be controlled by app TLS settings',
+          message:
+              'skip-cert-verify requested in Clash but will be controlled by app TLS settings',
         ),
       );
     }
@@ -1262,7 +1298,8 @@ class ConfigImportService {
     final network = _asString(proxy['network']) ?? 'tcp';
 
     final tlsEnabled = _asBool(proxy['tls']) ?? false;
-    final serverName = _asString(proxy['servername']) ?? _asString(proxy['sni']) ?? '';
+    final serverName =
+        _asString(proxy['servername']) ?? _asString(proxy['sni']) ?? '';
 
     var host = '';
     var path = '';
@@ -1299,7 +1336,8 @@ class ConfigImportService {
               warnings.add(
                 const ImportIssue(
                   level: ImportIssueLevel.warning,
-                  message: 'Multiple H2 hosts found in Clash proxy; using the first host',
+                  message:
+                      'Multiple H2 hosts found in Clash proxy; using the first host',
                 ),
               );
             }
@@ -1309,7 +1347,8 @@ class ConfigImportService {
     }
 
     if (network == 'httpupgrade') {
-      final upgradeOpts = _asMap(proxy['httpupgrade-opts']) ??
+      final upgradeOpts =
+          _asMap(proxy['httpupgrade-opts']) ??
           _asMap(proxy['http-upgrade-opts']) ??
           _asMap(proxy['http-upgrade-options']);
       path = _asString(upgradeOpts?['path']) ?? '';
@@ -1355,7 +1394,8 @@ class ConfigImportService {
       warnings.add(
         const ImportIssue(
           level: ImportIssueLevel.warning,
-          message: 'skip-cert-verify requested in Clash but will be controlled by app TLS settings',
+          message:
+              'skip-cert-verify requested in Clash but will be controlled by app TLS settings',
         ),
       );
     }
@@ -1376,9 +1416,7 @@ class ConfigImportService {
 
     if (server == null || port == null || password == null) return null;
 
-    final params = <String, String>{
-      'security': 'tls',
-    };
+    final params = <String, String>{'security': 'tls'};
 
     final network = _asString(proxy['network']) ?? 'tcp';
     params['type'] = network;
@@ -1425,7 +1463,8 @@ class ConfigImportService {
         params['serviceName'] = serviceName;
       }
 
-      final mode = _asString(grpcOpts?['grpc-mode']) ??
+      final mode =
+          _asString(grpcOpts?['grpc-mode']) ??
           _asString(grpcOpts?['grpcMode']) ??
           _asString(grpcOpts?['mode']);
       if (mode != null && mode.isNotEmpty) params['mode'] = mode;
@@ -1449,7 +1488,8 @@ class ConfigImportService {
               warnings.add(
                 const ImportIssue(
                   level: ImportIssueLevel.warning,
-                  message: 'Multiple H2 hosts found in Clash proxy; using the first host',
+                  message:
+                      'Multiple H2 hosts found in Clash proxy; using the first host',
                 ),
               );
             }
@@ -1459,7 +1499,8 @@ class ConfigImportService {
     }
 
     if (network == 'httpupgrade') {
-      final upgradeOpts = _asMap(proxy['httpupgrade-opts']) ??
+      final upgradeOpts =
+          _asMap(proxy['httpupgrade-opts']) ??
           _asMap(proxy['http-upgrade-opts']) ??
           _asMap(proxy['http-upgrade-options']);
       final path = _asString(upgradeOpts?['path']);
@@ -1471,7 +1512,9 @@ class ConfigImportService {
       } else {
         final headers = _asMap(upgradeOpts?['headers']);
         final hostHeader = _asString(headers?['Host']);
-        if (hostHeader != null && hostHeader.isNotEmpty) params['host'] = hostHeader;
+        if (hostHeader != null && hostHeader.isNotEmpty) {
+          params['host'] = hostHeader;
+        }
       }
     }
 
@@ -1480,7 +1523,8 @@ class ConfigImportService {
       warnings.add(
         const ImportIssue(
           level: ImportIssueLevel.warning,
-          message: 'skip-cert-verify requested in Clash but will be controlled by app TLS settings',
+          message:
+              'skip-cert-verify requested in Clash but will be controlled by app TLS settings',
         ),
       );
     }
@@ -1489,7 +1533,7 @@ class ConfigImportService {
         .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
         .join('&');
 
-    return 'trojan://$password@${_formatHostForUri(server)}:$port?$query#${Uri.encodeComponent(name)}';
+    return 'trojan://${Uri.encodeComponent(password)}@${_formatHostForUri(server)}:$port?$query#${Uri.encodeComponent(name)}';
   }
 
   static String? _clashHysteria2ToUri(
@@ -1499,7 +1543,8 @@ class ConfigImportService {
   }) {
     final server = _asString(proxy['server']);
     final port = _asInt(proxy['port']);
-    final auth = _asString(proxy['password']) ??
+    final auth =
+        _asString(proxy['password']) ??
         _asString(proxy['auth']) ??
         _asString(proxy['auth-str']) ??
         _asString(proxy['auth_str']);
@@ -1508,7 +1553,8 @@ class ConfigImportService {
 
     final params = <String, String>{};
 
-    final sni = _asString(proxy['sni']) ??
+    final sni =
+        _asString(proxy['sni']) ??
         _asString(proxy['servername']) ??
         _asString(proxy['peer']);
     if (sni != null && sni.isNotEmpty) params['sni'] = sni;
@@ -1531,7 +1577,8 @@ class ConfigImportService {
     final obfs = _asString(proxy['obfs']);
     if (obfs != null && obfs.isNotEmpty) params['obfs'] = obfs;
 
-    final obfsPassword = _asString(proxy['obfs-password']) ?? _asString(proxy['obfs_password']);
+    final obfsPassword =
+        _asString(proxy['obfs-password']) ?? _asString(proxy['obfs_password']);
     if (obfsPassword != null && obfsPassword.isNotEmpty) {
       params['obfs-password'] = obfsPassword;
     }
@@ -1542,7 +1589,8 @@ class ConfigImportService {
       warnings.add(
         const ImportIssue(
           level: ImportIssueLevel.warning,
-          message: 'skip-cert-verify requested in Clash but will be controlled by app TLS settings',
+          message:
+              'skip-cert-verify requested in Clash but will be controlled by app TLS settings',
         ),
       );
     }
@@ -1562,26 +1610,31 @@ class ConfigImportService {
   }) {
     final server = _asString(proxy['server']);
     final port = _asInt(proxy['port']);
-    final privateKey = _asString(proxy['private-key']) ?? _asString(proxy['private_key']);
-    final publicKey = _asString(proxy['public-key']) ?? _asString(proxy['public_key']);
+    final privateKey =
+        _asString(proxy['private-key']) ?? _asString(proxy['private_key']);
+    final publicKey =
+        _asString(proxy['public-key']) ?? _asString(proxy['public_key']);
 
-    if (server == null || port == null || privateKey == null || publicKey == null) {
+    if (server == null ||
+        port == null ||
+        privateKey == null ||
+        publicKey == null) {
       return null;
     }
 
-    final presharedKey = _asString(proxy['preshared-key']) ?? _asString(proxy['preshared_key']);
+    final presharedKey =
+        _asString(proxy['preshared-key']) ?? _asString(proxy['preshared_key']);
     if (presharedKey != null && presharedKey.isNotEmpty) {
       warnings.add(
         const ImportIssue(
           level: ImportIssueLevel.warning,
-          message: 'WireGuard preshared-key exists in Clash config but is not supported in URI import yet',
+          message:
+              'WireGuard preshared-key exists in Clash config but is not supported in URI import yet',
         ),
       );
     }
 
-    final params = <String, String>{
-      'publicKey': publicKey,
-    };
+    final params = <String, String>{'publicKey': publicKey};
 
     final addressRaw = proxy['ip'] ?? proxy['address'];
     if (addressRaw is String && addressRaw.isNotEmpty) {
@@ -1716,7 +1769,9 @@ class ConfigImportService {
 
   static String _formatHostForUri(String host) {
     final trimmed = host.trim();
-    if (trimmed.contains(':') && !trimmed.startsWith('[') && !trimmed.endsWith(']')) {
+    if (trimmed.contains(':') &&
+        !trimmed.startsWith('[') &&
+        !trimmed.endsWith(']')) {
       return '[$trimmed]';
     }
     return trimmed;

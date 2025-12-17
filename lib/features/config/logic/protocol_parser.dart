@@ -1,14 +1,16 @@
 import 'package:hiddify/features/config/logic/hysteria_parser.dart';
+import 'package:hiddify/features/config/logic/naive_parser.dart';
 import 'package:hiddify/features/config/logic/shadowsocks_parser.dart';
+import 'package:hiddify/features/config/logic/shadowsocksr_parser.dart';
 import 'package:hiddify/features/config/logic/trojan_parser.dart';
 import 'package:hiddify/features/config/logic/tuic_parser.dart';
 import 'package:hiddify/features/config/logic/vless_parser.dart';
 import 'package:hiddify/features/config/logic/vmess_parser.dart';
 import 'package:hiddify/features/config/logic/wireguard_parser.dart';
 
-/// Unified protocol parser for all supported protocols
+ // Unified protocol parser for all supported protocols
 class ProtocolParser {
-  /// Parse any supported protocol URI to outbound config
+  // Parse any supported protocol URI to outbound config
   static Map<String, dynamic>? parse(String uri) {
     final trimmed = uri.trim();
 
@@ -41,8 +43,14 @@ class ProtocolParser {
     if (trimmed.startsWith('tuic://')) {
       return TuicParser.parse(trimmed);
     }
-
-    // SOCKS proxy (used for chaining with external plugins like Hysteria)
+    if (trimmed.startsWith('ssr://')) {
+      return ShadowsocksRParser.parse(trimmed);
+    }
+    if (trimmed.startsWith('naive+https://') ||
+        trimmed.startsWith('naive+quic://') ||
+        trimmed.startsWith('naive://')) {
+      return NaiveParser.parse(trimmed);
+    }
     if (trimmed.startsWith('socks://') || trimmed.startsWith('socks5://')) {
       return _parseSocksUri(trimmed);
     }
@@ -50,7 +58,7 @@ class ProtocolParser {
     return null;
   }
 
-  /// Parse SOCKS URI: socks://[user:pass@]host:port[#remark]
+  // Parse SOCKS URI: socks://[user:pass@]host:port[#remark]
   static Map<String, dynamic>? _parseSocksUri(String uri) {
     try {
       final schemeEnd = uri.indexOf('://') + 3;
@@ -119,7 +127,7 @@ class ProtocolParser {
     }
   }
 
-  /// Detect protocol type from URI
+  // Detect protocol type from URI
   static String detectProtocol(String uri) {
     final trimmed = uri.trim().toLowerCase();
 
@@ -132,12 +140,17 @@ class ProtocolParser {
     if (trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://')) return 'hysteria2';
     if (trimmed.startsWith('hysteria://')) return 'hysteria';
     if (trimmed.startsWith('tuic://')) return 'tuic';
-    if (trimmed.startsWith('naive+https://')) return 'naive';
+    if (trimmed.startsWith('naive+https://') ||
+        trimmed.startsWith('naive+quic://') ||
+        trimmed.startsWith('naive://')) {
+      return 'naive';
+    }
+    if (trimmed.startsWith('socks://') || trimmed.startsWith('socks5://')) return 'socks';
 
     return 'unknown';
   }
 
-  /// Check if protocol is natively supported by Xray-core
+  // Check if protocol is natively supported by Xray-core
   static bool isNativeXrayProtocol(String protocol) => [
       'vless',
       'vmess',
@@ -146,7 +159,7 @@ class ProtocolParser {
       'wireguard',
     ].contains(protocol);
 
-  /// Check if protocol requires external handler
+  // Check if protocol requires external handler
   static bool isExternalProtocol(String protocol) => [
       'hysteria',
       'hysteria2',
@@ -155,26 +168,22 @@ class ProtocolParser {
       'shadowsocksr',
     ].contains(protocol);
 
-  /// Extract remark/name from parsed config
+  // Extract remark/name from parsed config
   static String? extractRemark(Map<String, dynamic>? config) {
     if (config == null) return null;
     return config['_remark'] as String?;
   }
 
-  /// Get protocol from parsed config
+  // Get protocol from parsed config
   static String? extractProtocol(Map<String, dynamic>? config) {
     if (config == null) return null;
-
-    // Check for external protocol marker
     if (config['_protocol'] != null) {
       return config['_protocol'] as String;
     }
-
-    // Check standard protocol field
     return config['protocol'] as String?;
   }
 
-  /// Convert parsed config back to URI
+  // Convert parsed config back to URI
   static String toUri(Map<String, dynamic> config) {
     final protocol = extractProtocol(config);
 
@@ -194,6 +203,10 @@ class ProtocolParser {
         return HysteriaParser.toUri(config);
       case 'tuic':
         return TuicParser.toUri(config);
+      case 'shadowsocksr':
+        return ShadowsocksRParser.toUri(config);
+      case 'naive':
+        return NaiveParser.toUri(config);
       default:
         return '';
     }

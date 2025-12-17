@@ -2,77 +2,60 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hiddify/core/logger/log_service.dart';
-import 'package:hiddify/features/config/model/config.dart';
+import 'package:hiddify/core/core.dart';
+import 'package:hiddify/features/config/config.dart';
 import 'package:hiddify/features/connection/logic/core_configurator.dart';
-import 'package:hiddify/features/settings/model/core_preferences.dart';
-import 'package:hiddify/features/settings/model/dns_settings.dart';
-import 'package:hiddify/features/settings/model/fragment_settings.dart';
-import 'package:hiddify/features/settings/model/inbound_settings.dart';
-import 'package:hiddify/features/settings/model/mux_settings.dart';
-import 'package:hiddify/features/settings/model/routing_settings.dart';
-import 'package:hiddify/features/settings/model/sockopt_settings.dart';
-import 'package:hiddify/features/settings/model/tls_settings.dart';
+import 'package:hiddify/features/settings/settings.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class CoreConfigViewer extends HookConsumerWidget {
-  const CoreConfigViewer({
-    required this.config,
-    super.key,
-  });
+  const CoreConfigViewer({required this.config, super.key});
 
   final Config config;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Core Configuration'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.copy),
-              onPressed: () async {
-                final jsonString = await _generateConfig(ref);
-                if (context.mounted) {
-                  await Clipboard.setData(ClipboardData(text: jsonString));
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Config copied to clipboard'),
-                      ),
-                    );
-                  }
-                }
-              },
-            ),
-          ],
-        ),
-        body: FutureBuilder<String>(
-          future: _generateConfig(ref),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
+    appBar: AppBar(
+      title: const Text('Core Configuration'),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.copy),
+          onPressed: () async {
+            final jsonString = await _generateConfig(ref);
+            if (context.mounted) {
+              await Clipboard.setData(ClipboardData(text: jsonString));
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Config copied to clipboard')),
+                );
+              }
             }
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: SelectableText(
-                // Simple JSON formatting
-                _prettyPrintJson(snapshot.data!),
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
-              ),
-            );
           },
         ),
-      );
+      ],
+    ),
+    body: FutureBuilder<String>(
+      future: _generateConfig(ref),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: SelectableText(
+            _prettyPrintJson(snapshot.data!),
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+          ),
+        );
+      },
+    ),
+  );
 
   Future<String> _generateConfig(WidgetRef ref) async {
-    // Re-read all providers to generate the exact config that would be used
-    // This duplicates the logic in ConnectionNotifier.connect somewhat,
-    // but ensures we see the current state of settings + config
-
     final coreMode = ref.read(CorePreferences.coreMode);
     final logLevel = ref.read(CorePreferences.logLevel);
     final enableLogging = ref.read(CorePreferences.enableLogging);
@@ -173,12 +156,15 @@ class CoreConfigViewer extends HookConsumerWidget {
       tcpCongestion: tcpCongestion,
       blockMalware: blockMalware,
       blockPhishing: blockPhishing,
-      customDirectDomains:
-          customDirectDomains.isNotEmpty ? customDirectDomains : null,
-      customProxyDomains:
-          customProxyDomains.isNotEmpty ? customProxyDomains : null,
-      customBlockDomains:
-          customBlockDomains.isNotEmpty ? customBlockDomains : null,
+      customDirectDomains: customDirectDomains.isNotEmpty
+          ? customDirectDomains
+          : null,
+      customProxyDomains: customProxyDomains.isNotEmpty
+          ? customProxyDomains
+          : null,
+      customBlockDomains: customBlockDomains.isNotEmpty
+          ? customBlockDomains
+          : null,
     );
   }
 

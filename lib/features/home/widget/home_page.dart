@@ -1,134 +1,139 @@
-import 'package:dartx/dartx.dart';
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:hiddify/core/app_info/app_info_provider.dart';
-import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/core/router/router.dart';
-import 'package:hiddify/features/common/nested_app_bar.dart';
-import 'package:hiddify/features/home/widget/connection_button.dart';
-import 'package:hiddify/features/home/widget/empty_profiles_home_body.dart';
-import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
-import 'package:hiddify/features/profile/widget/profile_tile.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_footer.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/utils/utils.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
+import 'package:hiddify/core/core.dart';
+import 'package:hiddify/features/config/config.dart';
+import 'package:hiddify/features/connection/connection.dart';
+import 'package:hiddify/features/home/widget/widgets/widgets.dart';
+import 'package:hiddify/features/settings/settings.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:sliver_tools/sliver_tools.dart';
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final tokens = context.tokens;
     final t = ref.watch(translationsProvider);
-    final hasAnyProfile = ref.watch(hasAnyProfileProvider);
-    final activeProfile = ref.watch(activeProfileProvider);
+
+    final connectionState = ref.watch(connectionProvider);
+    final configsAsync = ref.watch(configControllerProvider);
+
+    ref.listen<ConnectionStatus>(connectionProvider, (prev, next) {
+      if (next == ConnectionStatus.error) {
+        final error = ref.read(lastConnectionErrorProvider);
+        if (error != null) {
+          final coreMode = ref.read(CorePreferences.coreMode);
+          final p = ErrorHandler.presentConnectionError(
+            t: t,
+            rawError: error,
+            coreMode: coreMode,
+          );
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(ErrorHandler.toSnackBarMessage(p, t)),
+              backgroundColor: tokens.status.danger,
+              behavior: SnackBarBehavior.floating,
+              action: SnackBarAction(
+                label: t.logs.pageTitle,
+                textColor: Colors.white,
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  unawaited(
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const LogViewerPage(),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        }
+      }
+    });
 
     return Scaffold(
-      body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          CustomScrollView(
-            slivers: [
-              NestedAppBar(
-                title: Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(text: t.general.appTitle),
-                      const TextSpan(text: " "),
-                      const WidgetSpan(
-                        child: AppVersionLabel(),
-                        alignment: PlaceholderAlignment.middle,
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  IconButton(
-                    onPressed: () => const QuickSettingsRoute().push(context),
-                    icon: const Icon(FluentIcons.options_24_filled),
-                    tooltip: t.config.quickSettings,
-                  ),
-                  IconButton(
-                    onPressed: () => const AddProfileRoute().push(context),
-                    icon: const Icon(FluentIcons.add_circle_24_filled),
-                    tooltip: t.profile.add.buttonText,
-                  ),
-                ],
+      backgroundColor: tokens.surface.scaffold,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverGap(tokens.spacing.x4),
+            SliverPadding(
+              padding: tokens.spacing.pagePadding,
+              sliver: SliverToBoxAdapter(
+                child: ConfigCard(configsAsync: configsAsync, t: t),
               ),
-              switch (activeProfile) {
-                AsyncData(value: final profile?) => MultiSliver(
-                    children: [
-                      ProfileTile(profile: profile, isMain: true),
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  ConnectionButton(),
-                                  ActiveProxyDelayIndicator(),
-                                ],
-                              ),
-                            ),
-                            if (MediaQuery.sizeOf(context).width < 840) const ActiveProxyFooter(),
-                          ],
-                        ),
+            ),
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: tokens.spacing.pagePadding,
+                child: Column(
+                  children: [
+                    const Spacer(flex: 2),
+                    if (connectionState == ConnectionStatus.connected)
+                      const LiveConnectionTimer().animate().fadeIn(
+                        duration: 300.ms,
                       ),
-                    ],
-                  ),
-                AsyncData() => switch (hasAnyProfile) {
-                    AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                    _ => const EmptyProfilesHomeBody(),
-                  },
-                AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
-                _ => const SliverToBoxAdapter(),
-              },
-            ],
-          ),
-        ],
+                    if (connectionState == ConnectionStatus.connected)
+                      const Gap(20),
+                    ConnectionButton(
+                      state: connectionState,
+                      onTap: () => _handleConnectionTap(
+                        context,
+                        ref,
+                        connectionState,
+                        configsAsync,
+                      ),
+                      t: t,
+                    ),
+                    const Spacer(flex: 3),
+                    LiveStatsSection(
+                      t: t,
+                      isConnected:
+                          connectionState == ConnectionStatus.connected,
+                    ),
+                    const Gap(24),
+                    BottomActions(t: t),
+                    const Gap(16),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class AppVersionLabel extends HookConsumerWidget {
-  const AppVersionLabel({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
-    final theme = Theme.of(context);
-
-    final version = ref.watch(appInfoProvider).requireValue.presentVersion;
-    if (version.isBlank) return const SizedBox();
-
-    return Semantics(
-      label: t.about.version,
-      button: false,
-      child: Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(4),
+  void _handleConnectionTap(
+    BuildContext context,
+    WidgetRef ref,
+    ConnectionStatus state,
+    AsyncValue<List<Config>> configsAsync,
+  ) {
+    final configs = configsAsync.asData?.value;
+    if (configs == null || configs.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(ref.read(translationsProvider).home.noConfigError),
+          behavior: SnackBarBehavior.floating,
         ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 4,
-          vertical: 1,
-        ),
-        child: Text(
-          version,
-          textDirection: TextDirection.ltr,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSecondaryContainer,
-          ),
-        ),
-      ),
-    );
+      );
+      return;
+    }
+
+    final notifier = ref.read(connectionProvider.notifier);
+    if (state == ConnectionStatus.disconnected ||
+        state == ConnectionStatus.error) {
+      unawaited(notifier.connect(configs.first));
+    } else {
+      unawaited(notifier.disconnect());
+    }
   }
 }

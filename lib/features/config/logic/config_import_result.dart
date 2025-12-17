@@ -3,10 +3,7 @@ import 'package:hiddify/features/config/model/config.dart';
 enum ImportIssueLevel { info, warning, error }
 
 class ImportIssue {
-  const ImportIssue({
-    required this.level,
-    required this.message,
-  });
+  const ImportIssue({required this.level, required this.message});
 
   final ImportIssueLevel level;
   final String message;
@@ -23,10 +20,7 @@ class ImportItem {
 }
 
 class ImportFailure {
-  const ImportFailure({
-    required this.raw,
-    required this.issue,
-  });
+  const ImportFailure({required this.raw, required this.issue});
 
   final String raw;
   final ImportIssue issue;

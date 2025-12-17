@@ -1,10 +1,12 @@
-/// Hysteria2 protocol parser
-/// Note: Hysteria2 is not natively supported by Xray-core
-/// This parser generates a compatible format for external handling
+import 'package:hiddify/core/logger/logger.dart';
+
+ // Hysteria2 protocol parser
+ // Note: Hysteria2 is not natively supported by Xray-core
+ // This parser generates a compatible format for external handling
 class HysteriaParser {
-  /// Parse Hysteria2 URI
-  /// Format: hysteria2://auth@host:port?params#name
-  /// or: hy2://auth@host:port?params#name
+  // Parse Hysteria2 URI
+  // Format: hysteria2://auth@host:port?params#name
+  // or: hy2://auth@host:port?params#name
   static Map<String, dynamic>? parse(String uri) {
     final isHy2 = uri.startsWith('hy2://') || uri.startsWith('hysteria2://');
     final isHy1 = uri.startsWith('hysteria://');
@@ -43,8 +45,6 @@ class HysteriaParser {
       } else {
         hostPort = rest;
       }
-
-      // Parse host and port
       String host;
       int port;
 
@@ -73,6 +73,7 @@ class HysteriaParser {
         isHy2: isHy2,
       );
     } catch (e) {
+      Logger.hysteria.warning('Failed to parse Hysteria URI: $e');
       return null;
     }
   }
@@ -117,7 +118,28 @@ class HysteriaParser {
     return config;
   }
 
-  /// Convert config back to URI
+  // Validate Hysteria config and return error message if invalid
+  static String? validate(Map<String, dynamic>? config) {
+    if (config == null) return 'Failed to parse Hysteria config';
+    
+    final protocol = config['_protocol'] as String?;
+    if (protocol != 'hysteria' && protocol != 'hysteria2') {
+      return 'Invalid Hysteria protocol type';
+    }
+    
+    final server = config['server'] as String?;
+    if (server == null || server.isEmpty) return 'Missing server address in Hysteria config';
+    
+    final port = config['port'] as int?;
+    if (port == null || port <= 0 || port > 65535) return 'Invalid port in Hysteria config';
+    
+    final auth = config['auth'] as String?;
+    if (auth == null || auth.isEmpty) return 'Missing authentication (password) in Hysteria config';
+    
+    return null; 
+  }
+
+  // Convert config back to URI
   static String toUri(Map<String, dynamic> config) {
     try {
       final protocol = config['_protocol'] as String? ?? 'hysteria2';
@@ -148,6 +170,7 @@ class HysteriaParser {
 
       return '$scheme://${Uri.encodeComponent(auth)}@$server:$port?$queryString#${Uri.encodeComponent(remark)}';
     } catch (e) {
+      Logger.hysteria.warning('Failed to generate Hysteria URI: $e');
       return '';
     }
   }
