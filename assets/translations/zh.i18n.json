@@ -1,0 +1,137 @@
+{
+    "@@locale": "zh",
+    "general": {
+        "appTitle": "Hiddify",
+        "reset": "重置",
+        "toggle": {
+            "enabled": "已启用",
+            "disabled": "已禁用"
+        },
+        "state": {
+            "disable": "禁用"
+        },
+        "sort": "排序",
+        "sortBy": "排序方式",
+        "addToClipboard": "复制到剪贴板",
+        "notSet": "未设置",
+        "agree": "同意",
+        "decline": "拒绝",
+        "unknown": "未知",
+        "hidden": "隐藏",
+        "timeout": "超时",
+        "clipboardExportSuccessMsg": "已复制到剪贴板",
+        "showMore": "显示更多",
+        "showLess": "显示更少",
+        "openAppSettings": "打开设置",
+        "grantPermission": "授予权限"
+    },
+    "intro": {
+        "termsAndPolicyCaution(rich)": "继续即表示您同意 ${tap(@:about.termsAndConditions)}",
+        "start": "开始"
+    },
+    "home": {
+        "pageTitle": "主页",
+        "emptyProfilesMsg": "添加配置文件开始使用",
+        "noActiveProfileMsg": "选择一个配置文件",
+        "addFirstConfig": "添加您的第一个配置",
+        "noConfigError": "请先添加配置",
+        "addConfig": "添加配置",
+        "configAdded": "配置已添加！",
+        "configsCopied": "配置已复制",
+        "configSaved": "配置已保存"
+    },
+    "stats": {
+        "traffic": "流量",
+        "trafficLive": "实时流量",
+        "trafficTotal": "总流量",
+        "uplink": "上传",
+        "downlink": "下载",
+        "connection": "连接",
+        "speed": "速度",
+        "totalTransferred": "传输总量"
+    },
+    "profile": {
+        "overviewPageTitle": "配置文件",
+        "detailsPageTitle": "配置详情",
+        "add": {
+            "buttonText": "新建配置",
+            "shortBtnTxt": "新建",
+            "fromClipboard": "从剪贴板添加",
+            "scanQr": "扫描二维码",
+            "manually": "手动输入",
+            "addWarp": "添加 WARP",
+            "addingWarpMsg": "请稍候...",
+            "addingProfileMsg": "正在添加...",
+            "failureMsg": "添加失败"
+        },
+        "update": {
+            "buttonTxt": "更新",
+            "tooltip": "更新配置",
+            "failureMsg": "更新失败"
+        }
+    },
+    "settings": {
+        "pageTitle": "设置",
+        "general": {
+            "sectionTitle": "通用",
+            "locale": "语言",
+            "region": "地区",
+            "themeMode": "主题",
+            "themeModes": {
+                "system": "跟随系统",
+                "dark": "深色",
+                "light": "浅色",
+                "black": "纯黑"
+            }
+        },
+        "advanced": {
+            "sectionTitle": "高级",
+            "debugMode": "调试模式"
+        },
+        "geoAssets": {
+            "pageTitle": "路由文件",
+            "update": "更新",
+            "download": "下载"
+        }
+    },
+    "about": {
+        "pageTitle": "关于",
+        "version": "版本",
+        "sourceCode": "源代码",
+        "telegramChannel": "Telegram 频道",
+        "checkForUpdate": "检查更新",
+        "privacyPolicy": "隐私政策",
+        "termsAndConditions": "服务条款"
+    },
+    "connection": {
+        "tapToConnect": "点击连接",
+        "connecting": "连接中...",
+        "disconnecting": "断开中...",
+        "connected": "已连接",
+        "reconnect": "重新连接"
+    },
+    "config": {
+        "serviceMode": "服务模式",
+        "serviceModes": {
+            "proxy": "仅代理",
+            "systemProxy": "系统代理",
+            "tun": "VPN",
+            "tunService": "VPN 服务"
+        }
+    },
+    "security": {
+        "pageTitle": "安全",
+        "blockMalware": "阻止恶意软件",
+        "blockPhishing": "阻止钓鱼网站",
+        "blockAds": "阻止广告",
+        "blockAdultContent": "阻止成人内容",
+        "blockGambling": "阻止赌博网站",
+        "firewallEnabled": "启用防火墙"
+    },
+    "privacy": {
+        "pageTitle": "隐私",
+        "blockWebRtc": "阻止 WebRTC 泄露",
+        "blockDnsLeaks": "阻止 DNS 泄露",
+        "encryptStorage": "加密存储"
+    }
+}

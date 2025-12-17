@@ -1,0 +1,137 @@
+{
+    "@@locale": "ru",
+    "general": {
+        "appTitle": "Hiddify",
+        "reset": "Сбросить",
+        "toggle": {
+            "enabled": "Включено",
+            "disabled": "Отключено"
+        },
+        "state": {
+            "disable": "Отключить"
+        },
+        "sort": "Сортировка",
+        "sortBy": "Сортировать по",
+        "addToClipboard": "Копировать",
+        "notSet": "Не установлено",
+        "agree": "Согласен",
+        "decline": "Отказаться",
+        "unknown": "Неизвестно",
+        "hidden": "Скрыто",
+        "timeout": "Тайм-аут",
+        "clipboardExportSuccessMsg": "Скопировано",
+        "showMore": "Показать больше",
+        "showLess": "Показать меньше",
+        "openAppSettings": "Открыть настройки",
+        "grantPermission": "Предоставить разрешение"
+    },
+    "intro": {
+        "termsAndPolicyCaution(rich)": "Продолжая, вы соглашаетесь с ${tap(@:about.termsAndConditions)}",
+        "start": "Начать"
+    },
+    "home": {
+        "pageTitle": "Главная",
+        "emptyProfilesMsg": "Добавьте профиль для начала",
+        "noActiveProfileMsg": "Выберите профиль",
+        "addFirstConfig": "Добавьте первую конфигурацию",
+        "noConfigError": "Сначала добавьте конфигурацию",
+        "addConfig": "Добавить конфиг",
+        "configAdded": "Конфигурация добавлена!",
+        "configsCopied": "Конфигурации скопированы",
+        "configSaved": "Конфигурация сохранена"
+    },
+    "stats": {
+        "traffic": "Трафик",
+        "trafficLive": "Текущий трафик",
+        "trafficTotal": "Всего трафика",
+        "uplink": "Исходящий",
+        "downlink": "Входящий",
+        "connection": "Соединение",
+        "speed": "Скорость",
+        "totalTransferred": "Всего передано"
+    },
+    "profile": {
+        "overviewPageTitle": "Профили",
+        "detailsPageTitle": "Профиль",
+        "add": {
+            "buttonText": "Новый профиль",
+            "shortBtnTxt": "Новый",
+            "fromClipboard": "Из буфера обмена",
+            "scanQr": "Сканировать QR",
+            "manually": "Ввести вручную",
+            "addWarp": "Добавить WARP",
+            "addingWarpMsg": "Подождите...",
+            "addingProfileMsg": "Добавление...",
+            "failureMsg": "Ошибка добавления"
+        },
+        "update": {
+            "buttonTxt": "Обновить",
+            "tooltip": "Обновить профиль",
+            "failureMsg": "Ошибка обновления"
+        }
+    },
+    "settings": {
+        "pageTitle": "Настройки",
+        "general": {
+            "sectionTitle": "Общие",
+            "locale": "Язык",
+            "region": "Регион",
+            "themeMode": "Тема",
+            "themeModes": {
+                "system": "Системная",
+                "dark": "Тёмная",
+                "light": "Светлая",
+                "black": "Чёрная"
+            }
+        },
+        "advanced": {
+            "sectionTitle": "Расширенные",
+            "debugMode": "Режим отладки"
+        },
+        "geoAssets": {
+            "pageTitle": "Файлы маршрутизации",
+            "update": "Обновить",
+            "download": "Скачать"
+        }
+    },
+    "about": {
+        "pageTitle": "О программе",
+        "version": "Версия",
+        "sourceCode": "Исходный код",
+        "telegramChannel": "Telegram канал",
+        "checkForUpdate": "Проверить обновления",
+        "privacyPolicy": "Политика конфиденциальности",
+        "termsAndConditions": "Условия использования"
+    },
+    "connection": {
+        "tapToConnect": "Нажмите для подключения",
+        "connecting": "Подключение...",
+        "disconnecting": "Отключение...",
+        "connected": "Подключено",
+        "reconnect": "Переподключить"
+    },
+    "config": {
+        "serviceMode": "Режим сервиса",
+        "serviceModes": {
+            "proxy": "Только прокси",
+            "systemProxy": "Системный прокси",
+            "tun": "VPN",
+            "tunService": "VPN сервис"
+        }
+    },
+    "security": {
+        "pageTitle": "Безопасность",
+        "blockMalware": "Блокировка вредоносных программ",
+        "blockPhishing": "Блокировка фишинга",
+        "blockAds": "Блокировка рекламы",
+        "blockAdultContent": "Блокировка контента 18+",
+        "blockGambling": "Блокировка азартных игр",
+        "firewallEnabled": "Включить фаервол"
+    },
+    "privacy": {
+        "pageTitle": "Конфиденциальность",
+        "blockWebRtc": "Блокировка утечек WebRTC",
+        "blockDnsLeaks": "Блокировка утечек DNS",
+        "encryptStorage": "Шифрование хранилища"
+    }
+}

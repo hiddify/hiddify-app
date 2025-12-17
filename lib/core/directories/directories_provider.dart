@@ -10,30 +10,28 @@ part 'directories_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 class AppDirectories extends _$AppDirectories with InfraLogger {
-  final _methodChannel = const MethodChannel("com.hiddify.app/platform");
+  final _methodChannel = const MethodChannel('com.hiddify.app/platform');
 
   @override
   Future<Directories> build() async {
     final Directories dirs;
     if (Platform.isIOS) {
-      
-      final paths = await _methodChannel.invokeMethod<Map>("get_paths");
-      loggy.debug("paths: $paths");
+      final paths = await _methodChannel.invokeMethod<Map<String, dynamic>>(
+        'get_paths',
+      );
+      loggy.debug('paths: $paths');
       dirs = (
-        baseDir: Directory(paths?["base"]! as String),
-        workingDir: Directory(paths?["working"]! as String),
-        tempDir: Directory(paths?["temp"]! as String),
+        baseDir: Directory(paths?['base']! as String),
+        workingDir: Directory(paths?['working']! as String),
+        tempDir: Directory(paths?['temp']! as String),
       );
     } else {
       final baseDir = await getApplicationSupportDirectory();
-      final workingDir =
-          Platform.isAndroid ? await getExternalStorageDirectory() : baseDir;
+      final workingDir = Platform.isAndroid
+          ? await getExternalStorageDirectory()
+          : baseDir;
       final tempDir = await getTemporaryDirectory();
-      dirs = (
-        baseDir: baseDir,
-        workingDir: workingDir!,
-        tempDir: tempDir,
-      );
+      dirs = (baseDir: baseDir, workingDir: workingDir!, tempDir: tempDir);
     }
 
     if (!dirs.baseDir.existsSync()) {
@@ -46,7 +44,7 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
     return dirs;
   }
 
-  static Future<Directory> getDatabaseDirectory() async {
+  static Future<Directory> getDatabaseDirectory() {
     if (Platform.isIOS || Platform.isMacOS) {
       return getLibraryDirectory();
     } else if (Platform.isWindows || Platform.isLinux) {

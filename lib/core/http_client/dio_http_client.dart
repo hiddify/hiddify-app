@@ -9,13 +9,10 @@ import 'package:hiddify/utils/custom_loggers.dart';
 class DioHttpClient with InfraLogger {
   final Map<String, Dio> _dio = {};
   final Map<String, HttpClient> _httpClients = {};
-  
+
   int port = 0;
 
-  DioHttpClient({
-    required Duration timeout,
-    required String userAgent,
-  }) {
+  DioHttpClient({required Duration timeout, required String userAgent}) {
     for (final mode in ['proxy', 'direct', 'both']) {
       final dioInstance = Dio(
         BaseOptions(
@@ -43,7 +40,7 @@ class DioHttpClient with InfraLogger {
         createHttpClient: () {
           final existing = _httpClients[mode];
           if (existing != null) return existing;
-          
+
           final client = HttpClient();
           client.findProxy = (url) {
             if (mode == 'proxy') {
@@ -58,7 +55,7 @@ class DioHttpClient with InfraLogger {
           return client;
         },
       );
-      
+
       _dio[mode] = dioInstance;
     }
   }
@@ -90,23 +87,29 @@ class DioHttpClient with InfraLogger {
     String? userAgent,
     ({String username, String password})? credentials,
     bool proxyOnly = false,
+    ResponseType? responseType,
   }) async {
     final mode = proxyOnly
         ? 'proxy'
         : await isPortOpen('127.0.0.1', port)
-            ? 'both'
-            : 'direct';
-    
+        ? 'both'
+        : 'direct';
+
     final dio = _dio[mode]!;
 
     return dio.get<T>(
       url,
       cancelToken: cancelToken,
-      options: _options(url, userAgent: userAgent, credentials: credentials),
+      options: _options(
+        url,
+        userAgent: userAgent,
+        credentials: credentials,
+        responseType: responseType,
+      ),
     );
   }
 
-  Future<Response> download(
+  Future<Response<dynamic>> download(
     String url,
     String path, {
     CancelToken? cancelToken,
@@ -117,11 +120,11 @@ class DioHttpClient with InfraLogger {
     final mode = proxyOnly
         ? 'proxy'
         : await isPortOpen('127.0.0.1', port)
-            ? 'both'
-            : 'direct';
-            
+        ? 'both'
+        : 'direct';
+
     final dio = _dio[mode]!;
-    
+
     return dio.download(
       url,
       path,
@@ -134,6 +137,7 @@ class DioHttpClient with InfraLogger {
     String url, {
     String? userAgent,
     ({String username, String password})? credentials,
+    ResponseType? responseType,
   }) {
     final uri = Uri.parse(url);
 
@@ -150,6 +154,7 @@ class DioHttpClient with InfraLogger {
     }
 
     return Options(
+      responseType: responseType,
       headers: {
         if (userAgent != null) 'User-Agent': userAgent,
         if (basicAuth != null) 'authorization': basicAuth,
@@ -157,7 +162,6 @@ class DioHttpClient with InfraLogger {
     );
   }
 
-  /// Closes created HttpClient instances. Safe to call multiple times.
   void close() {
     for (final client in _httpClients.values) {
       try {

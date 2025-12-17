@@ -1,42 +1,131 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+#               HIDDIFY OPTIMIZED - Flutter Project Metadata
+# ═══════════════════════════════════════════════════════════════════════════════
 # This file tracks properties of this Flutter project.
 # Used by Flutter tool to assess capabilities and perform upgrades etc.
 #
-# This file should be version controlled and should not be manually edited.
+# ⚠️ WARNING: This file should be version controlled and should not be manually 
+#             edited unless you know what you're doing.
+# ═══════════════════════════════════════════════════════════════════════════════
 
+# ─────────────────────────────────────────────────────────────────────────────────
+#                            FLUTTER SDK VERSION
+# ─────────────────────────────────────────────────────────────────────────────────
 version:
   revision: "ef1af02aead6fe2414f3aafa5a61087b610e1332"
   channel: "stable"
 
+# ─────────────────────────────────────────────────────────────────────────────────
+#                              PROJECT TYPE
+# ─────────────────────────────────────────────────────────────────────────────────
 project_type: app
 
+# ─────────────────────────────────────────────────────────────────────────────────
+#                          MIGRATION CONFIGURATION
+# ─────────────────────────────────────────────────────────────────────────────────
 # Tracks metadata for the flutter migrate command
 migration:
   platforms:
+    # ════════ Root Platform ════════
     - platform: root
       create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
       base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+
+    # ════════ Android Platform ════════
     - platform: android
       create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
       base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+
+    # ════════ iOS Platform ════════
     - platform: ios
       create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
       base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+
+    # ════════ Linux Platform ════════
     - platform: linux
       create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
       base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+
+    # ════════ macOS Platform ════════
     - platform: macos
       create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
       base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
+
+    # ════════ Windows Platform ════════
     - platform: windows
       create_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
       base_revision: ef1af02aead6fe2414f3aafa5a61087b610e1332
 
-  # User provided section
-
+  # ────────────────────────────────────────────────────────────────────────────
+  #                        USER PROVIDED SECTION
+  # ────────────────────────────────────────────────────────────────────────────
   # List of Local paths (relative to this file) that should be
   # ignored by the migrate tool.
   #
   # Files that are not part of the templates will be ignored by default.
   unmanaged_files:
-    - 'lib/main.dart'
-    - 'ios/Runner.xcodeproj/project.pbxproj'
+    # ════════ Core Application Files ════════
+    - "lib/main.dart"
+    - "lib/main_prod.dart"
+    - "lib/bootstrap.dart"
+    
+    # ════════ iOS Configuration ════════
+    - "ios/Runner.xcodeproj/project.pbxproj"
+    - "ios/Runner/Info.plist"
+    - "ios/Runner/GoogleService-Info.plist"
+    - "ios/Podfile"
+    - "ios/Podfile.lock"
+    
+    # ════════ Android Configuration ════════
+    - "android/app/build.gradle"
+    - "android/app/build.gradle.kts"
+    - "android/app/src/main/AndroidManifest.xml"
+    - "android/app/google-services.json"
+    - "android/build.gradle"
+    - "android/build.gradle.kts"
+    - "android/settings.gradle"
+    - "android/settings.gradle.kts"
+    - "android/gradle.properties"
+    - "android/local.properties"
+    
+    # ════════ macOS Configuration ════════
+    - "macos/Runner/Info.plist"
+    - "macos/Runner/Configs/AppInfo.xcconfig"
+    - "macos/Podfile"
+    - "macos/Podfile.lock"
+    
+    # ════════ Windows Configuration ════════
+    - "windows/runner/Runner.rc"
+    - "windows/runner/flutter_window.cpp"
+    - "windows/runner/main.cpp"
+    - "windows/CMakeLists.txt"
+    
+    # ════════ Linux Configuration ════════
+    - "linux/CMakeLists.txt"
+    - "linux/my_application.cc"
+    
+    # ════════ Analysis & Build Configuration ════════
+    - "analysis_options.yaml"
+    - "build.yaml"
+    - "pubspec.yaml"
+    - "pubspec.lock"
+    
+    # ════════ Project Documentation ════════
+    - "README.md"
+    - "CHANGELOG.md"
+    - "LICENSE"
+    
+    # ════════ CI/CD Configuration ════════
+    - ".github/**"
+    - "Makefile"
+    - "Makefile.local"
+    - "Makefile.local.example"
+    
+    # ════════ Environment & Secrets ════════
+    - ".env"
+    - ".env.local"
+    - ".env.production"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#                          END OF METADATA
+# ═══════════════════════════════════════════════════════════════════════════════

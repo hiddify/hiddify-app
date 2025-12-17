@@ -60,7 +60,6 @@ static void my_application_activate(GApplication *application)
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
   fl_register_plugins(FL_PLUGIN_REGISTRY(view));
-  fl_register_plugins(FL_PLUGIN_REGISTRY(view));
   gtk_widget_hide(GTK_WIDGET(window));
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
@@ -69,7 +68,6 @@ static void my_application_activate(GApplication *application)
 
 static gboolean my_application_local_command_line(GApplication *application, gchar ***arguments, int *exit_status)
 {
-  MyApplication *self = MY_APPLICATION(application);
   MyApplication *self = MY_APPLICATION(application);
   self->dart_entrypoint_arguments = g_strdupv(*arguments + 1);
 
@@ -89,14 +87,12 @@ static gboolean my_application_local_command_line(GApplication *application, gch
 
 static void my_application_startup(GApplication *application)
 {
-  // MyApplication* self = MY_APPLICATION(object);
 
   G_APPLICATION_CLASS(my_application_parent_class)->startup(application);
 }
 
 static void my_application_shutdown(GApplication *application)
 {
-  // MyApplication* self = MY_APPLICATION(object);
 
   G_APPLICATION_CLASS(my_application_parent_class)->shutdown(application);
 }
