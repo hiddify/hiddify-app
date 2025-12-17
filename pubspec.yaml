@@ -7,7 +7,7 @@ repository: https://github.com/hiddify/hiddify-app
 issue_tracker: https://github.com/hiddify/hiddify-app/issues
 environment:
 
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"
   flutter: ">=3.24.0 <4.0.0"
 dependencies:
   flutter:
@@ -77,6 +77,8 @@ dependencies:
   mobile_scanner: ^7.1.3 
   image_picker: ^1.1.2
   meta: any
+  http: any
+  yaml: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -126,9 +128,9 @@ flutter_native_splash:
     color: "#ffffff"
     image: assets/images/source/ic_launcher_foreground.png
 ffigen:
-  name: "SingboxNativeLibrary"
-  description: "Bindings to Singbox"
-  output: "lib/gen/singbox_generated_bindings.dart"
+  name: "LibCore"
+  description: "Bindings to LibCore"
+  output: "lib/gen/libcore_bindings.dart"
   headers:
     entry-points:
       - "windows/runner/libcore.h"
