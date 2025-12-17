@@ -4,16 +4,19 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
-def javaVersion = (findProperty('javaVersion') ?: '25').toInteger()
+def targetJavaVersion = 21
+if (project.hasProperty('targetJavaVersion')) {
+    targetJavaVersion = project.property('targetJavaVersion').toString().toInteger()
+}
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(javaVersion)
+        languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
 }
 
 kotlin {
-    jvmToolchain(javaVersion)
+    jvmToolchain(targetJavaVersion)
 }
 
 def localProperties = new Properties()
@@ -49,19 +52,23 @@ android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
     compileSdk 36
-    ndkVersion "27.3.13750724"
+    ndkVersion "29.0.14206865"
 
     compileOptions {
-        sourceCompatibility JavaVersion.toVersion(javaVersion)
-        targetCompatibility JavaVersion.toVersion(javaVersion)
+        sourceCompatibility JavaVersion.toVersion(targetJavaVersion)
+        targetCompatibility JavaVersion.toVersion(targetJavaVersion)
         coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = javaVersion.toString()
+        jvmTarget = targetJavaVersion.toString()
         freeCompilerArgs += [
             '-opt-in=kotlin.RequiresOptIn',
-            '-Xjvm-default=all'
+            '-Xjvm-default=all',
+            '-Xcontext-receivers',
+            '-Xno-param-assertions',
+            '-Xno-call-assertions',
+            '-Xno-receiver-assertions'
         ]
     }
 
@@ -72,8 +79,7 @@ android {
     defaultConfig {
         applicationId "app.hiddify.com"
         
-        minSdk 26
-        
+        minSdkVersion flutter.minSdkVersion
         targetSdk 36
         
         versionCode flutterVersionCode.toInteger()
@@ -81,7 +87,7 @@ android {
         
         multiDexEnabled true
         
-        resourceConfigurations += ['en', 'fa']
+        resourceConfigurations += ['en', 'fa', 'zh', 'ru']
         
         vectorDrawables.useSupportLibrary = true
     }
@@ -90,7 +96,6 @@ android {
         abi {
             enable true
             reset()
-            //noinspection ChromeOsAbiSupport
             include "x86_64", "armeabi-v7a", "arm64-v8a"
             universalApk true
         }
@@ -125,7 +130,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             
             ndk {
-                //noinspection ChromeOsAbiSupport
                 abiFilters "x86_64", "armeabi-v7a", "arm64-v8a"
                 debugSymbolLevel 'FULL'
             }
@@ -139,13 +143,29 @@ android {
             minifyEnabled false
             shrinkResources false
             debuggable true
+            
+            ndk {
+                abiFilters "arm64-v8a", "x86_64"
+            }
+            
+            crunchPngs false
+        }
+        
+        profile {
+            initWith debug
+            applicationIdSuffix ".profile"
+            versionNameSuffix "-profile"
+            debuggable false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
     buildFeatures {
         viewBinding true
         aidl true
-        buildConfig false
+        buildConfig true
         renderScript false
         resValues false
         shaders false
@@ -181,15 +201,12 @@ flutter {
 }
 
 dependencies {
-    // Core libraries from local directory
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     
-    // AndroidX and Kotlin dependencies
     implementation libs.gson
     implementation libs.androidx.core.ktx
     implementation libs.androidx.appcompat
     implementation libs.androidx.lifecycle.livedata.ktx
     
-    // Desugaring for older Android versions
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
