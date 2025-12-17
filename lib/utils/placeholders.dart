@@ -3,37 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-// TODO: improve
 class SliverBodyPlaceholder extends HookConsumerWidget {
   const SliverBodyPlaceholder(this.children, {super.key});
 
   final List<Widget> children;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SliverFillRemaining(
-      hasScrollBody: false,
+  Widget build(BuildContext context, WidgetRef ref) => SliverToBoxAdapter(
+    child: SizedBox(
+      height: 300,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: children,
       ),
-    );
-  }
+    ),
+  );
 }
 
 class SliverLoadingBodyPlaceholder extends HookConsumerWidget {
   const SliverLoadingBodyPlaceholder({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return const SliverFillRemaining(
-      hasScrollBody: false,
+  Widget build(BuildContext context, WidgetRef ref) => const SliverToBoxAdapter(
+    child: SizedBox(
+      height: 300,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [CircularProgressIndicator()],
       ),
-    );
-  }
+    ),
+  );
 }
 
 class SliverErrorBodyPlaceholder extends HookConsumerWidget {
@@ -47,19 +46,16 @@ class SliverErrorBodyPlaceholder extends HookConsumerWidget {
   final IconData? icon;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SliverFillRemaining(
-      hasScrollBody: false,
+  Widget build(BuildContext context, WidgetRef ref) => SliverToBoxAdapter(
+    child: SizedBox(
+      height: 300,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (icon != null) ...[
-            Icon(icon),
-            const Gap(16),
-          ],
+          if (icon != null) ...[Icon(icon), const Gap(16)],
           Text(msg),
         ],
       ),
-    );
-  }
+    ),
+  );
 }

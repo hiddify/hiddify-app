@@ -8,7 +8,7 @@ class CallbackDebouncer {
   final Duration _delay;
   Timer? _timer;
 
-  /// Calls the given [callback] after the given duration has passed.
+  
   void call(VoidCallback callback) {
     if (_delay == Duration.zero) {
       callback();
@@ -18,7 +18,7 @@ class CallbackDebouncer {
     }
   }
 
-  /// Stops any running timers and disposes this instance.
+  
   void dispose() {
     _timer?.cancel();
   }

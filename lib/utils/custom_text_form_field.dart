@@ -38,8 +38,9 @@ class CustomTextFormField extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final textController =
         controller ?? useTextEditingController(text: initialValue);
-    final effectiveConstraints =
-        isDense ? const BoxConstraints(maxHeight: 56) : null;
+    final effectiveConstraints = isDense
+        ? const BoxConstraints(maxHeight: 56)
+        : null;
     final effectiveBorder = isDense
         ? OutlineInputBorder(
             borderRadius: BorderRadius.circular(36),
@@ -56,8 +57,9 @@ class CustomTextFormField extends HookConsumerWidget {
       validator: validator,
       textInputAction: TextInputAction.next,
       inputFormatters: inputFormatters,
-      autovalidateMode:
-          autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
+      autovalidateMode: autoValidate
+          ? AutovalidateMode.always
+          : AutovalidateMode.disabled,
       autocorrect: autoCorrect,
       decoration: InputDecoration(
         isDense: true,

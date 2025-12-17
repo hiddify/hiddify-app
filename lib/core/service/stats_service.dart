@@ -2,30 +2,21 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:ffi/ffi.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/features/connection/logic/connection_notifier.dart';
+import 'package:hiddify/gen/libcore_bindings.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'stats_service.g.dart';
 
-// FFI types for stats functions
-typedef GetStatsNative = Int64 Function();
-typedef GetStatsDart = int Function();
-
-// FFI types for query stats (alternative method)
-typedef QueryStatsNative = Pointer<Utf8> Function(Pointer<Utf8> pattern);
-typedef QueryStatsDart = Pointer<Utf8> Function(Pointer<Utf8> pattern);
-
-/// Traffic statistics data model
 class TrafficStats {
   final int uploadBytes;
   final int downloadBytes;
-  final int uploadSpeed; // bytes per second
-  final int downloadSpeed; // bytes per second
-  final int totalUpload; // cumulative
-  final int totalDownload; // cumulative
+  final int uploadSpeed; 
+  final int downloadSpeed; 
+  final int totalUpload; 
+  final int totalDownload; 
 
   const TrafficStats({
     required this.uploadBytes,
@@ -68,7 +59,6 @@ class TrafficStats {
       'total: ↑$totalUpload ↓$totalDownload)';
 }
 
-/// Connection duration data model
 class ConnectionDuration {
   final DateTime? connectedAt;
   final Duration duration;
@@ -94,7 +84,6 @@ class ConnectionDuration {
   String toString() => 'ConnectionDuration($formatted)';
 }
 
-/// Stats service for getting traffic statistics from Xray core
 class StatsService {
   static const _channel = MethodChannel('com.hiddify.app/method');
   static const _statsChannel = EventChannel(
@@ -102,44 +91,12 @@ class StatsService {
     JSONMethodCodec(),
   );
 
-  late final DynamicLibrary? _lib;
-  late final GetStatsDart? _getUplink;
-  late final GetStatsDart? _getDownlink;
-
-  // Track cumulative stats
   int _totalUpload = 0;
   int _totalDownload = 0;
 
-  StatsService() {
-    _initializeFFI();
-  }
+  StatsService();
 
-  void _initializeFFI() {
-    if (Platform.isAndroid || Platform.isIOS) {
-      _lib = null;
-      _getUplink = null;
-      _getDownlink = null;
-      return;
-    }
-
-    try {
-      _lib = _loadLibrary();
-      _getUplink = _lib!
-          .lookup<NativeFunction<GetStatsNative>>('GetUplink')
-          .asFunction();
-      _getDownlink = _lib!
-          .lookup<NativeFunction<GetStatsNative>>('GetDownlink')
-          .asFunction();
-      Logger.app.debug('Stats FFI initialized successfully');
-    } catch (e) {
-      Logger.app.error('Failed to load stats functions from libcore: $e');
-      _lib = null;
-      _getUplink = null;
-      _getDownlink = null;
-    }
-  }
-
-  DynamicLibrary _loadLibrary() {
+  static DynamicLibrary _loadLibrary() {
     if (Platform.isWindows) return DynamicLibrary.open('libcore.dll');
     if (Platform.isLinux) return DynamicLibrary.open('libcore.so');
     if (Platform.isMacOS) return DynamicLibrary.open('libcore.dylib');
@@ -216,50 +173,44 @@ class StatsService {
           totalDownload: totalDownload,
         );
       } catch (e) {
-        Logger.app.error('Failed to parse mobile stats event: $e');
+        Logger.stats.error('Failed to parse mobile stats event: $e');
         return TrafficStats.zero();
       }
     });
   }
 
-  /// Get uplink bytes since last call (resets counter in core)
   Future<int> getUplink() async {
     if (Platform.isAndroid || Platform.isIOS) {
       return _getMobileUplink();
     }
-    if (_getUplink == null) return 0;
     try {
-      return _getUplink!();
+      final lib = LibCore(_loadLibrary());
+      return lib.GetUplink();
     } catch (e) {
-      Logger.app.error('Error getting uplink stats: $e');
       return 0;
     }
   }
 
-  /// Get downlink bytes since last call (resets counter in core)
   Future<int> getDownlink() async {
     if (Platform.isAndroid || Platform.isIOS) {
       return _getMobileDownlink();
     }
-    if (_getDownlink == null) return 0;
     try {
-      return _getDownlink!();
+      final lib = LibCore(_loadLibrary());
+      return lib.GetDownlink();
     } catch (e) {
-      Logger.app.error('Error getting downlink stats: $e');
       return 0;
     }
   }
 
-  /// Mobile platform implementation using MethodChannel
   Future<int> _getMobileUplink() async {
     try {
       final result = await _channel.invokeMethod<int>('getUplink');
       return result ?? 0;
     } on PlatformException catch (e) {
-      Logger.app.error('Mobile getUplink failed: ${e.message}');
+      Logger.stats.error('Mobile getUplink failed: ${e.message}');
       return 0;
     } on MissingPluginException {
-      // Method not implemented on this platform
       return 0;
     }
   }
@@ -269,24 +220,19 @@ class StatsService {
       final result = await _channel.invokeMethod<int>('getDownlink');
       return result ?? 0;
     } on PlatformException catch (e) {
-      Logger.app.error('Mobile getDownlink failed: ${e.message}');
+      Logger.stats.error('Mobile getDownlink failed: ${e.message}');
       return 0;
     } on MissingPluginException {
-      // Method not implemented on this platform
       return 0;
     }
   }
 
-  /// Get current traffic stats with speed calculation
+  // Get current traffic stats with speed calculation
   Future<TrafficStats> getStats() async {
     final upload = await getUplink();
     final download = await getDownlink();
-
-    // Update cumulative totals
     _totalUpload += upload;
     _totalDownload += download;
-
-    // Speed equals bytes received in this interval (1 second)
     return TrafficStats(
       uploadBytes: upload,
       downloadBytes: download,
@@ -297,37 +243,32 @@ class StatsService {
     );
   }
 
-  /// Reset cumulative counters (call when disconnecting)
+
   void resetCounters() {
     _totalUpload = 0;
     _totalDownload = 0;
-    Logger.app.debug('Stats counters reset');
+    Logger.stats.debug('Stats counters reset');
   }
 }
-
-// Singleton instance
 final _statsService = StatsService();
 
-/// Provider for StatsService
+ 
 @riverpod
 StatsService statsService(Ref ref) => _statsService;
 
-/// Provider for connection start time
+
 @riverpod
 class ConnectionStartTime extends _$ConnectionStartTime {
   @override
   DateTime? build() {
-    // Listen to connection status changes
     ref.listen(connectionProvider, (previous, next) {
       if (next == ConnectionStatus.connected && previous != ConnectionStatus.connected) {
-        // Just connected - set start time
         state = DateTime.now();
-        Logger.app.info('Connection started at: $state');
+        Logger.connection.info('Connection started at: $state');
       } else if (next != ConnectionStatus.connected && previous == ConnectionStatus.connected) {
-        // Just disconnected - clear start time and reset stats
         state = null;
         _statsService.resetCounters();
-        Logger.app.info('Connection ended, stats reset');
+        Logger.connection.info('Connection ended, stats reset');
       }
     });
     return null;
@@ -338,7 +279,7 @@ class ConnectionStartTime extends _$ConnectionStartTime {
   void clear() => state = null;
 }
 
-/// Provider for connection duration stream (updates every second)
+
 @riverpod
 Stream<ConnectionDuration> connectionDuration(Ref ref) async* {
   final connectionStatus = ref.watch(connectionProvider);
@@ -349,8 +290,6 @@ Stream<ConnectionDuration> connectionDuration(Ref ref) async* {
   }
 
   final startTime = ref.watch(connectionStartTimeProvider) ?? DateTime.now();
-  
-  // Emit duration every second while connected
   while (true) {
     final now = DateTime.now();
     final duration = now.difference(startTime);
@@ -359,8 +298,6 @@ Stream<ConnectionDuration> connectionDuration(Ref ref) async* {
       duration: duration,
     );
     await Future<void>.delayed(const Duration(seconds: 1));
-    
-    // Check if still connected
     if (ref.read(connectionProvider) != ConnectionStatus.connected) {
       yield ConnectionDuration.notConnected();
       return;
@@ -368,7 +305,7 @@ Stream<ConnectionDuration> connectionDuration(Ref ref) async* {
   }
 }
 
-/// Provider for traffic stats stream (updates every second)
+
 @riverpod
 Stream<TrafficStats> trafficStats(Ref ref) async* {
   final connectionStatus = ref.watch(connectionProvider);
@@ -383,14 +320,10 @@ Stream<TrafficStats> trafficStats(Ref ref) async* {
     yield* statsService.mobileTrafficStatsStream();
     return;
   }
-
-  // Emit stats every second while connected
   while (true) {
     final stats = await statsService.getStats();
     yield stats;
     await Future<void>.delayed(const Duration(seconds: 1));
-    
-    // Check if still connected
     if (ref.read(connectionProvider) != ConnectionStatus.connected) {
       yield TrafficStats.zero();
       return;
@@ -398,8 +331,8 @@ Stream<TrafficStats> trafficStats(Ref ref) async* {
   }
 }
 
-/// Legacy provider for backward compatibility
-/// Returns (uplink, downlink) tuple for speed in bytes/second
+ 
+
 @riverpod
 Stream<(int, int)> statsServiceStream(Ref ref) async* {
   final connectionStatus = ref.watch(connectionProvider);
