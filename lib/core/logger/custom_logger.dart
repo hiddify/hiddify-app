@@ -36,7 +36,6 @@ class ConsolePrinter extends LoggyPrinter {
     final color = showColors
         ? levelColor(record.level) ?? AnsiColor()
         : AnsiColor();
-
     // ignore: avoid_print
     print(
       color(
@@ -55,7 +54,7 @@ class ConsolePrinter extends LoggyPrinter {
 
 class FileLogPrinter extends LoggyPrinter {
   FileLogPrinter(String filePath, {this.minLevel = LogLevel.debug})
-      : _logFile = File(filePath);
+    : _logFile = File(filePath);
 
   final File _logFile;
   final LogLevel minLevel;
@@ -98,7 +97,8 @@ class StreamLogPrinter extends LoggyPrinter {
       LogLevel.error => 'E',
       _ => '?',
     };
-    final logLine = '$time - [$levelChar] ${record.loggerName}: ${record.message}';
+    final logLine =
+        '$time - [$levelChar] ${record.loggerName}: ${record.message}';
     _buffer.add(logLine);
     if (_buffer.length > 500) {
       _buffer.removeAt(0);
@@ -110,7 +110,7 @@ class StreamLogPrinter extends LoggyPrinter {
     _buffer.clear();
     _controller.add([]);
   }
-  
+
   void dispose() {
     unawaited(_controller.close());
   }

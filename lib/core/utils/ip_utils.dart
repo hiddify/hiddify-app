@@ -12,7 +12,8 @@ String obscureIp(String ip) {
         ...splits.sublist(1).map((part) => '*' * part.length),
       ].join(':');
     }
-    // ignore: empty_catches
-  } catch (e) {}
+  } catch (_) {
+    // Intentionally empty - fallback to obscured address
+  }
   return fallbackObscuredAddress;
 }

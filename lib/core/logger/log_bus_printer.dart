@@ -6,19 +6,15 @@ class LogBusPrinter extends LoggyPrinter {
 
   final LogBus _bus;
 
-  static final RegExp _tagPrefix =
-      RegExp(r'^\[([^\]]+)\]\s*([^\r\n]*)');
+  static final RegExp _tagPrefix = RegExp(r'^\[([^\]]+)\]\s*([^\r\n]*)');
 
-  static const Set<String> _processTags = <String>{
-    'hysteria',
-    'tun2socks',
-  };
+  static const Set<String> _processTags = <String>{'hysteria', 'tun2socks'};
 
   @override
   void onLog(LogRecord record) {
     final timestamp = record.time;
 
-    var message = record.message.toString();
+    var message = record.message;
     if (record.error != null) {
       message = '$message | ${record.error}';
     }

@@ -1,19 +1,8 @@
 import 'dart:async';
 
-enum LogKind {
-  app,
-  core,
-  access,
-  process,
-  system,
-}
+enum LogKind { app, core, access, process, system }
 
-enum LogSeverity {
-  debug,
-  info,
-  warning,
-  error,
-}
+enum LogSeverity { debug, info, warning, error }
 
 class LogEvent {
   LogEvent({
@@ -42,6 +31,8 @@ class LogBus {
       StreamController<List<LogEvent>>.broadcast();
 
   final List<LogEvent> _buffer = <LogEvent>[];
+  final List<LogEvent> _pendingEvents = <LogEvent>[];
+  Timer? _debounceTimer;
 
   bool redactSensitive = true;
   int maxBuffer = _defaultMaxBuffer;
@@ -51,17 +42,28 @@ class LogBus {
   List<LogEvent> get currentBuffer => List<LogEvent>.unmodifiable(_buffer);
 
   void add(LogEvent event) {
-    final safeEvent = redactSensitive
-        ? LogEvent(
-            timestamp: event.timestamp,
-            severity: event.severity,
-            kind: event.kind,
-            source: event.source,
-            message: _redact(event.message),
-          )
-        : event;
+    _pendingEvents.add(event);
+    if (_debounceTimer?.isActive ?? false) return;
 
-    _buffer.add(safeEvent);
+    _debounceTimer = Timer(const Duration(milliseconds: 100), _flush);
+  }
+
+  void _flush() {
+    if (_pendingEvents.isEmpty) return;
+
+    for (final event in _pendingEvents) {
+      final safeEvent = redactSensitive
+          ? LogEvent(
+              timestamp: event.timestamp,
+              severity: event.severity,
+              kind: event.kind,
+              source: event.source,
+              message: _redact(event.message),
+            )
+          : event;
+      _buffer.add(safeEvent);
+    }
+    _pendingEvents.clear();
 
     final overflow = _buffer.length - maxBuffer;
     if (overflow > 0) {
@@ -73,10 +75,12 @@ class LogBus {
 
   void clear() {
     _buffer.clear();
+    _pendingEvents.clear();
     _controller.add(const <LogEvent>[]);
   }
 
   Future<void> dispose() async {
+    _debounceTimer?.cancel();
     await _controller.close();
   }
 
@@ -91,7 +95,9 @@ class LogBus {
     );
 
     out = out.replaceAllMapped(
-      RegExp(r'\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b'),
+      RegExp(
+        r'\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b',
+      ),
       (_) => '[REDACTED-UUID]',
     );
 

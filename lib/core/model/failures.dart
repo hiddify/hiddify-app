@@ -7,17 +7,13 @@ mixin Failure {
   ({String type, String? message}) present(TranslationsEn t);
 }
 
-/// failures that are not expected to happen but depending on [error] type might not be relevant (eg network errors)
 mixin UnexpectedFailure {
   Object? get error;
   StackTrace? get stackTrace;
 }
 
-/// failures that are expected to happen and should be handled by the app
-/// and should be logged, eg missing permissions
 mixin ExpectedMeasuredFailure {}
 
-/// failures ignored by analytics service etc.
 mixin ExpectedFailure {}
 
 extension ErrorPresenter on TranslationsEn {

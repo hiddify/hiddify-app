@@ -76,7 +76,9 @@ class LogBusBridge {
       final path = _corePath;
       if (path == null) return;
       final file = File(path);
-      if (!await file.exists()) return;
+      if (await FileSystemEntity.type(path) == FileSystemEntityType.notFound) {
+        return;
+      }
 
       final length = await file.length();
       if (length < _corePos) {
@@ -114,7 +116,9 @@ class LogBusBridge {
       final path = _accessPath;
       if (path == null) return;
       final file = File(path);
-      if (!await file.exists()) return;
+      if (await FileSystemEntity.type(path) == FileSystemEntityType.notFound) {
+        return;
+      }
 
       final length = await file.length();
       if (length < _accessPos) {
@@ -163,7 +167,12 @@ class LogBusBridge {
     for (final raw in parts) {
       final line = raw.trimRight();
       if (line.isEmpty) continue;
-      _addParsedLine(kind: kind, source: source, defaultSeverity: defaultSeverity, line: line);
+      _addParsedLine(
+        kind: kind,
+        source: source,
+        defaultSeverity: defaultSeverity,
+        line: line,
+      );
     }
 
     carrySetter(carry);
@@ -190,11 +199,25 @@ class LogBusBridge {
       final microsRaw = tsMatch.group(7) ?? '';
       final rest = tsMatch.group(8) ?? '';
 
-      if (year != null && month != null && day != null && hour != null && minute != null && second != null) {
+      if (year != null &&
+          month != null &&
+          day != null &&
+          hour != null &&
+          minute != null &&
+          second != null) {
         final micros = _parseMicros(microsRaw);
         final millis = micros ~/ 1000;
         final microsR = micros % 1000;
-        timestamp = DateTime(year, month, day, hour, minute, second, millis, microsR);
+        timestamp = DateTime(
+          year,
+          month,
+          day,
+          hour,
+          minute,
+          second,
+          millis,
+          microsR,
+        );
         msg = rest.trimLeft();
       }
     }
@@ -210,19 +233,14 @@ class LogBusBridge {
       switch (sev) {
         case 'error':
           severity = LogSeverity.error;
-          break;
         case 'warning':
           severity = LogSeverity.warning;
-          break;
         case 'info':
           severity = LogSeverity.info;
-          break;
         case 'debug':
           severity = LogSeverity.debug;
-          break;
         default:
           severity = defaultSeverity;
-          break;
       }
     } else if (kind == LogKind.access) {
       final lower = msg.toLowerCase();
@@ -243,21 +261,25 @@ class LogBusBridge {
   }
 
   static int _parseMicros(String input) {
-    final digits = input.replaceAll(RegExp(r'[^0-9]'), '');
+    final digits = input.replaceAll(RegExp('[^0-9]'), '');
     if (digits.isEmpty) return 0;
-    final padded = digits.length >= 6 ? digits.substring(0, 6) : digits.padRight(6, '0');
+    final padded = digits.length >= 6
+        ? digits.substring(0, 6)
+        : digits.padRight(6, '0');
     return int.tryParse(padded) ?? 0;
   }
 
-  static final RegExp _goLogPrefix =
-      RegExp(r'^(\d{4})\/(\d{2})\/(\d{2})\s+(\d{2}):(\d{2}):(\d{2})\.(\d+)\s+(.*)$');
+  static final RegExp _goLogPrefix = RegExp(
+    r'^(\d{4})\/(\d{2})\/(\d{2})\s+(\d{2}):(\d{2}):(\d{2})\.(\d+)\s+(.*)$',
+  );
 
-  static final RegExp _severityPrefix =
-      RegExp(r'^\[([^\]]+)\]\s*(.*)$');
+  static final RegExp _severityPrefix = RegExp(r'^\[([^\]]+)\]\s*(.*)$');
 
   static Future<int> _initialFilePosition(String path) async {
     final file = File(path);
-    if (!await file.exists()) return 0;
+    if (await FileSystemEntity.type(path) == FileSystemEntityType.notFound) {
+      return 0;
+    }
     return file.length();
   }
 }

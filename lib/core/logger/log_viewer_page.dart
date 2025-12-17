@@ -9,7 +9,6 @@ import 'package:hiddify/core/logger/log_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Enhanced Log Viewer with live updates and utility buttons
 class LogViewerPage extends StatefulWidget {
   const LogViewerPage({super.key});
 
@@ -17,7 +16,8 @@ class LogViewerPage extends StatefulWidget {
   State<LogViewerPage> createState() => _LogViewerPageState();
 }
 
-class _LogViewerPageState extends State<LogViewerPage> with SingleTickerProviderStateMixin {
+class _LogViewerPageState extends State<LogViewerPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _autoScroll = true;
   bool _isLogging = true;
@@ -67,10 +67,8 @@ class _LogViewerPageState extends State<LogViewerPage> with SingleTickerProvider
       ),
       body: Column(
         children: [
-          // Toolbar
           _buildToolbar(context, colorScheme),
           _buildFilters(colorScheme),
-          // Log content
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -129,80 +127,84 @@ class _LogViewerPageState extends State<LogViewerPage> with SingleTickerProvider
   }
 
   Widget _buildFilters(ColorScheme colorScheme) => Consumer(
-        builder: (context, ref, child) {
-          final events = _isLogging
-              ? ref.watch(logBusStreamProvider).maybeWhen(
-                    data: (events) => events,
-                    orElse: () => const <LogEvent>[],
-                  )
-              : _pausedEvents;
+    builder: (context, ref, child) {
+      final events = _isLogging
+          ? ref
+                .watch(logBusStreamProvider)
+                .maybeWhen(
+                  data: (events) => events,
+                  orElse: () => const <LogEvent>[],
+                )
+          : _pausedEvents;
 
-          final sources = <String>{
-            for (final e in events)
-              if (e.source.trim().isNotEmpty) e.source,
-          }.toList()
-            ..sort();
+      final sources = <String>{
+        for (final e in events)
+          if (e.source.trim().isNotEmpty) e.source,
+      }.toList()..sort();
 
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search logs',
-                    isDense: true,
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    suffixIcon: _searchQuery.trim().isEmpty
-                        ? null
-                        : IconButton(
-                            icon: const Icon(Icons.close, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _searchQuery = '');
-                            },
-                          ),
-                    border: const OutlineInputBorder(),
-                  ),
-                  onChanged: (value) => setState(() => _searchQuery = value),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    _severityChip(colorScheme, LogSeverity.debug, 'D', Colors.grey),
-                    _severityChip(colorScheme, LogSeverity.info, 'I', Colors.blue),
-                    _severityChip(colorScheme, LogSeverity.warning, 'W', Colors.orange),
-                    _severityChip(colorScheme, LogSeverity.error, 'E', Colors.red),
-                    if (sources.isNotEmpty)
-                      DropdownButtonHideUnderline(
-                        child: DropdownButton<String?>(
-                          value: _sourceFilter,
-                          isDense: true,
-                          hint: const Text('All sources'),
-                          items: [
-                            const DropdownMenuItem<String?>(
-                              child: Text('All sources'),
-                            ),
-                            for (final s in sources)
-                              DropdownMenuItem<String?>(
-                                value: s,
-                                child: Text(s),
-                              ),
-                          ],
-                          onChanged: (value) => setState(() => _sourceFilter = value),
-                        ),
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search logs',
+                isDense: true,
+                prefixIcon: const Icon(Icons.search, size: 20),
+                suffixIcon: _searchQuery.trim().isEmpty
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.close, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
                       ),
-                  ],
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: (value) => setState(() => _searchQuery = value),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                _severityChip(colorScheme, LogSeverity.debug, 'D', Colors.grey),
+                _severityChip(colorScheme, LogSeverity.info, 'I', Colors.blue),
+                _severityChip(
+                  colorScheme,
+                  LogSeverity.warning,
+                  'W',
+                  Colors.orange,
                 ),
+                _severityChip(colorScheme, LogSeverity.error, 'E', Colors.red),
+                if (sources.isNotEmpty)
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton<String?>(
+                      value: _sourceFilter,
+                      isDense: true,
+                      hint: const Text('All sources'),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          child: Text('All sources'),
+                        ),
+                        for (final s in sources)
+                          DropdownMenuItem<String?>(value: s, child: Text(s)),
+                      ],
+                      onChanged: (value) =>
+                          setState(() => _sourceFilter = value),
+                    ),
+                  ),
               ],
             ),
-          );
-        },
+          ],
+        ),
       );
+    },
+  );
 
   Widget _severityChip(
     ColorScheme colorScheme,
@@ -234,97 +236,98 @@ class _LogViewerPageState extends State<LogViewerPage> with SingleTickerProvider
     );
   }
 
-  Widget _buildToolbar(BuildContext context, ColorScheme colorScheme) => Consumer(
-        builder: (context, ref, child) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-            border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+  Widget _buildToolbar(
+    BuildContext context,
+    ColorScheme colorScheme,
+  ) => Consumer(
+    builder: (context, ref, child) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 20),
+            tooltip: 'Refresh',
+            onPressed: () {
+              ref.invalidate(logBusStreamProvider);
+            },
           ),
-          child: Row(
-            children: [
-              // Refresh
-              IconButton(
-                icon: const Icon(Icons.refresh, size: 20),
-                tooltip: 'Refresh',
-                onPressed: () {
-                  ref.invalidate(logBusStreamProvider);
-                },
-              ),
-              // Clear
-              IconButton(
-                icon: const Icon(Icons.delete_sweep, size: 20),
-                tooltip: 'Clear Logs',
-                onPressed: () => _showClearDialog(context, ref),
-              ),
-              const VerticalDivider(width: 16),
-              // Auto scroll toggle
-              IconButton(
-                icon: Icon(_autoScroll ? Icons.vertical_align_bottom : Icons.vertical_align_center, size: 20),
-                tooltip: _autoScroll ? 'Auto Scroll: ON' : 'Auto Scroll: OFF',
-                color: _autoScroll ? colorScheme.primary : null,
-                onPressed: () => setState(() => _autoScroll = !_autoScroll),
-              ),
-              // Pause/Resume logging
-              IconButton(
-                icon: Icon(_isLogging ? Icons.pause : Icons.play_arrow, size: 20),
-                tooltip: _isLogging ? 'Pause Logging' : 'Resume Logging',
-                color: _isLogging ? null : colorScheme.error,
-                onPressed: () {
-                  setState(() {
-                    if (_isLogging) {
-                      _pausedEvents = ref.read(logBusProvider).currentBuffer;
-                    } else {
-                      _pausedEvents = const <LogEvent>[];
-                    }
-                    _isLogging = !_isLogging;
-                  });
-                },
-              ),
-              const Spacer(),
-              // Open folder
-              IconButton(
-                icon: const Icon(Icons.folder_open, size: 20),
-                tooltip: 'Open Log Folder',
-                onPressed: () async {
-                  final dir = await ref.read(logServiceProvider).getLogDirectory();
-                  if (Platform.isWindows) {
-                    unawaited(Process.run('explorer', [dir]));
-                  } else {
-                    unawaited(launchUrl(Uri.file(dir)));
-                  }
-                },
-              ),
-              // Copy all
-              IconButton(
-                icon: const Icon(Icons.copy, size: 20),
-                tooltip: 'Copy All Logs',
-                onPressed: () async {
-                  final logs = ref.read(logBusProvider).currentBuffer;
-                  final text = logs
-                      .map(
-                        (e) =>
-                            '${e.timestamp.toIso8601String()} [${e.kind.name}] [${e.severity.name}] [${e.source}] ${e.message}',
-                      )
-                      .join('\n');
-                  await Clipboard.setData(ClipboardData(text: text));
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Logs copied to clipboard')),
-                    );
-                  }
-                },
-              ),
-              // Export/Share
-              IconButton(
-                icon: const Icon(Icons.share, size: 20),
-                tooltip: 'Export Logs',
-                onPressed: () => ref.read(logServiceProvider).exportLogs(),
-              ),
-            ],
+          IconButton(
+            icon: const Icon(Icons.delete_sweep, size: 20),
+            tooltip: 'Clear Logs',
+            onPressed: () => _showClearDialog(context, ref),
           ),
-        ),
-      );
+          const VerticalDivider(width: 16),
+          IconButton(
+            icon: Icon(
+              _autoScroll
+                  ? Icons.vertical_align_bottom
+                  : Icons.vertical_align_center,
+              size: 20,
+            ),
+            tooltip: _autoScroll ? 'Auto Scroll: ON' : 'Auto Scroll: OFF',
+            color: _autoScroll ? colorScheme.primary : null,
+            onPressed: () => setState(() => _autoScroll = !_autoScroll),
+          ),
+          IconButton(
+            icon: Icon(_isLogging ? Icons.pause : Icons.play_arrow, size: 20),
+            tooltip: _isLogging ? 'Pause Logging' : 'Resume Logging',
+            color: _isLogging ? null : colorScheme.error,
+            onPressed: () {
+              setState(() {
+                if (_isLogging) {
+                  _pausedEvents = ref.read(logBusProvider).currentBuffer;
+                } else {
+                  _pausedEvents = const <LogEvent>[];
+                }
+                _isLogging = !_isLogging;
+              });
+            },
+          ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.folder_open, size: 20),
+            tooltip: 'Open Log Folder',
+            onPressed: () async {
+              final dir = await ref.read(logServiceProvider).getLogDirectory();
+              if (Platform.isWindows) {
+                unawaited(Process.run('explorer', [dir]));
+              } else {
+                unawaited(launchUrl(Uri.file(dir)));
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.copy, size: 20),
+            tooltip: 'Copy All Logs',
+            onPressed: () async {
+              final logs = ref.read(logBusProvider).currentBuffer;
+              final text = logs
+                  .map(
+                    (e) =>
+                        '${e.timestamp.toIso8601String()} [${e.kind.name}] [${e.severity.name}] [${e.source}] ${e.message}',
+                  )
+                  .join('\n');
+              await Clipboard.setData(ClipboardData(text: text));
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Logs copied to clipboard')),
+                );
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.share, size: 20),
+            tooltip: 'Export Logs',
+            onPressed: () => ref.read(logServiceProvider).exportLogs(),
+          ),
+        ],
+      ),
+    ),
+  );
 
   void _showClearDialog(BuildContext context, WidgetRef ref) {
     unawaited(
@@ -380,73 +383,73 @@ class _LogEventTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-        onLongPress: () {
-          unawaited(Clipboard.setData(ClipboardData(text: event.message)));
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Copied to clipboard')),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                formattedTime,
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 10,
-                  color: colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(
-                  color: levelColor.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  event.severity.name.substring(0, 1).toUpperCase(),
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: levelColor,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  event.source,
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 10,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  event.message,
-                  style: TextStyle(
-                    fontFamily: 'monospace',
-                    fontSize: 11,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-              ),
-            ],
+    onLongPress: () {
+      unawaited(Clipboard.setData(ClipboardData(text: event.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Copied to clipboard')));
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            formattedTime,
+            style: TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 10,
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
           ),
-        ),
-      );
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            decoration: BoxDecoration(
+              color: levelColor.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              event.severity.name.substring(0, 1).toUpperCase(),
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: levelColor,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              event.source,
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 10,
+                color: colorScheme.onSurface,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              event.message,
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 11,
+                color: colorScheme.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _LogBusKindTab extends HookConsumerWidget {
@@ -534,7 +537,10 @@ class _LogBusKindTab extends HookConsumerWidget {
           children: [
             Icon(emptyIcon, size: 48, color: colorScheme.outline),
             const SizedBox(height: 16),
-            Text('Waiting for logs...', style: TextStyle(color: colorScheme.outline)),
+            Text(
+              'Waiting for logs...',
+              style: TextStyle(color: colorScheme.outline),
+            ),
           ],
         ),
       ),
@@ -563,18 +569,18 @@ class _AppLogsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _LogBusKindTab(
-        colorScheme: colorScheme,
-        autoScroll: autoScroll,
-        isLogging: isLogging,
-        frozenEvents: frozenEvents,
-        kind: LogKind.app,
-        emptyIcon: Icons.article_outlined,
-        emptyTitle: 'No app logs yet',
-        emptySubtitle: 'Logs will appear here',
-        searchQuery: searchQuery,
-        sourceFilter: sourceFilter,
-        severityFilter: severityFilter,
-      );
+    colorScheme: colorScheme,
+    autoScroll: autoScroll,
+    isLogging: isLogging,
+    frozenEvents: frozenEvents,
+    kind: LogKind.app,
+    emptyIcon: Icons.article_outlined,
+    emptyTitle: 'No app logs yet',
+    emptySubtitle: 'Logs will appear here',
+    searchQuery: searchQuery,
+    sourceFilter: sourceFilter,
+    severityFilter: severityFilter,
+  );
 }
 
 class _CoreLogsTab extends StatelessWidget {
@@ -597,18 +603,18 @@ class _CoreLogsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _LogBusKindTab(
-        colorScheme: colorScheme,
-        autoScroll: autoScroll,
-        isLogging: isLogging,
-        frozenEvents: frozenEvents,
-        kind: LogKind.core,
-        emptyIcon: Icons.memory,
-        emptyTitle: 'No core logs',
-        emptySubtitle: 'Connect to generate logs',
-        searchQuery: searchQuery,
-        sourceFilter: sourceFilter,
-        severityFilter: severityFilter,
-      );
+    colorScheme: colorScheme,
+    autoScroll: autoScroll,
+    isLogging: isLogging,
+    frozenEvents: frozenEvents,
+    kind: LogKind.core,
+    emptyIcon: Icons.memory,
+    emptyTitle: 'No core logs',
+    emptySubtitle: 'Connect to generate logs',
+    searchQuery: searchQuery,
+    sourceFilter: sourceFilter,
+    severityFilter: severityFilter,
+  );
 }
 
 class _AccessLogsTab extends StatelessWidget {
@@ -631,18 +637,18 @@ class _AccessLogsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _LogBusKindTab(
-        colorScheme: colorScheme,
-        autoScroll: autoScroll,
-        isLogging: isLogging,
-        frozenEvents: frozenEvents,
-        kind: LogKind.access,
-        emptyIcon: Icons.swap_horiz,
-        emptyTitle: 'No access logs',
-        emptySubtitle: 'Traffic logs will appear here',
-        searchQuery: searchQuery,
-        sourceFilter: sourceFilter,
-        severityFilter: severityFilter,
-      );
+    colorScheme: colorScheme,
+    autoScroll: autoScroll,
+    isLogging: isLogging,
+    frozenEvents: frozenEvents,
+    kind: LogKind.access,
+    emptyIcon: Icons.swap_horiz,
+    emptyTitle: 'No access logs',
+    emptySubtitle: 'Traffic logs will appear here',
+    searchQuery: searchQuery,
+    sourceFilter: sourceFilter,
+    severityFilter: severityFilter,
+  );
 }
 
 class _ProcessLogsTab extends StatelessWidget {
@@ -665,18 +671,18 @@ class _ProcessLogsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _LogBusKindTab(
-        colorScheme: colorScheme,
-        autoScroll: autoScroll,
-        isLogging: isLogging,
-        frozenEvents: frozenEvents,
-        kind: LogKind.process,
-        emptyIcon: Icons.terminal_rounded,
-        emptyTitle: 'No process logs',
-        emptySubtitle: 'tun2socks/hysteria logs will appear here',
-        searchQuery: searchQuery,
-        sourceFilter: sourceFilter,
-        severityFilter: severityFilter,
-      );
+    colorScheme: colorScheme,
+    autoScroll: autoScroll,
+    isLogging: isLogging,
+    frozenEvents: frozenEvents,
+    kind: LogKind.process,
+    emptyIcon: Icons.terminal_rounded,
+    emptyTitle: 'No process logs',
+    emptySubtitle: 'tun2socks/hysteria logs will appear here',
+    searchQuery: searchQuery,
+    sourceFilter: sourceFilter,
+    severityFilter: severityFilter,
+  );
 }
 
 class _SystemLogsTab extends StatelessWidget {
@@ -699,16 +705,16 @@ class _SystemLogsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _LogBusKindTab(
-        colorScheme: colorScheme,
-        autoScroll: autoScroll,
-        isLogging: isLogging,
-        frozenEvents: frozenEvents,
-        kind: LogKind.system,
-        emptyIcon: Icons.settings,
-        emptyTitle: 'No system logs',
-        emptySubtitle: 'System/bootstrap logs will appear here',
-        searchQuery: searchQuery,
-        sourceFilter: sourceFilter,
-        severityFilter: severityFilter,
-      );
+    colorScheme: colorScheme,
+    autoScroll: autoScroll,
+    isLogging: isLogging,
+    frozenEvents: frozenEvents,
+    kind: LogKind.system,
+    emptyIcon: Icons.settings,
+    emptyTitle: 'No system logs',
+    emptySubtitle: 'System/bootstrap logs will appear here',
+    searchQuery: searchQuery,
+    sourceFilter: sourceFilter,
+    severityFilter: severityFilter,
+  );
 }

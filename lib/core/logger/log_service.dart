@@ -10,7 +10,6 @@ import 'package:share_plus/share_plus.dart';
 
 part 'log_service.g.dart';
 
-/// Log levels matching Xray-core log levels
 enum LogLevel {
   debug('debug', 'Debug'),
   info('info', 'Info'),
@@ -23,7 +22,6 @@ enum LogLevel {
   final String label;
 }
 
-/// Log entry with timestamp, level, and message
 class LogEntry {
   LogEntry({
     required this.timestamp,
@@ -33,8 +31,9 @@ class LogEntry {
   });
 
   factory LogEntry.fromLine(String line) {
-    // Parse log line: [timestamp] [level] [source] message
-    final match = RegExp(r'\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*(.*)').firstMatch(line);
+    final match = RegExp(
+      r'\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*(.*)',
+    ).firstMatch(line);
     if (match != null) {
       return LogEntry(
         timestamp: DateTime.tryParse(match.group(1) ?? '') ?? DateTime.now(),
@@ -73,7 +72,8 @@ class LogEntry {
   final String source;
   final String message;
 
-  String get formattedTime => '${timestamp.hour.toString().padLeft(2, '0')}:'
+  String get formattedTime =>
+      '${timestamp.hour.toString().padLeft(2, '0')}:'
       '${timestamp.minute.toString().padLeft(2, '0')}:'
       '${timestamp.second.toString().padLeft(2, '0')}';
 }
@@ -85,8 +85,9 @@ class LogService {
   Future<String> getLogDirectory() async {
     final dir = await getApplicationDocumentsDirectory();
     final logDir = Directory('${dir.path}/logs');
-    // ignore: avoid_slow_async_io
-    if (!await logDir.exists()) {
+
+    if (await FileSystemEntity.type(logDir.path) ==
+        FileSystemEntityType.notFound) {
       await logDir.create(recursive: true);
     }
     return logDir.path;
@@ -109,49 +110,46 @@ class LogService {
 
   Stream<List<String>> streamLogs() => LoggerController.instance.logStream;
 
-  /// Read core logs from file
   Future<List<LogEntry>> readCoreLogs({int maxLines = 500}) async {
     final path = await getCoreLogPath();
     final file = File(path);
-    // ignore: avoid_slow_async_io
-    if (!await file.exists()) return [];
-    
+
+    if (await FileSystemEntity.type(path) == FileSystemEntityType.notFound) {
+      return [];
+    }
+
     final lines = await file.readAsLines();
     final start = lines.length > maxLines ? lines.length - maxLines : 0;
     return lines.sublist(start).map(LogEntry.fromLine).toList();
   }
 
-  /// Read access logs from file
   Future<List<LogEntry>> readAccessLogs({int maxLines = 500}) async {
     final path = await getAccessLogPath();
     final file = File(path);
-    // ignore: avoid_slow_async_io
-    if (!await file.exists()) return [];
-    
+
+    if (await FileSystemEntity.type(path) == FileSystemEntityType.notFound) {
+      return [];
+    }
+
     final lines = await file.readAsLines();
     final start = lines.length > maxLines ? lines.length - maxLines : 0;
     return lines.sublist(start).map(LogEntry.fromLine).toList();
   }
 
-  /// Watch core log file for changes (real-time)
   Stream<List<LogEntry>> watchCoreLogs() async* {
     final path = await getCoreLogPath();
     final file = File(path);
     var lastLength = 0;
-    
-    // Initial read
-    // ignore: avoid_slow_async_io
-    if (await file.exists()) {
+
+    if (await FileSystemEntity.type(path) != FileSystemEntityType.notFound) {
       final logs = await readCoreLogs();
       lastLength = (await file.readAsLines()).length;
       yield logs;
     }
-
-    // Watch for changes with polling for better cross-platform support
     while (true) {
       await Future<void>.delayed(const Duration(milliseconds: 500));
-      // ignore: avoid_slow_async_io
-      if (await file.exists()) {
+
+      if (await FileSystemEntity.type(path) != FileSystemEntityType.notFound) {
         final lines = await file.readAsLines();
         if (lines.length != lastLength) {
           lastLength = lines.length;
@@ -161,25 +159,20 @@ class LogService {
     }
   }
 
-  /// Watch access log file for changes (real-time)
   Stream<List<LogEntry>> watchAccessLogs() async* {
     final path = await getAccessLogPath();
     final file = File(path);
     var lastLength = 0;
-    
-    // Initial read
-    // ignore: avoid_slow_async_io
-    if (await file.exists()) {
+
+    if (await FileSystemEntity.type(path) != FileSystemEntityType.notFound) {
       final logs = await readAccessLogs();
       lastLength = (await file.readAsLines()).length;
       yield logs;
     }
-
-    // Watch for changes with polling
     while (true) {
       await Future<void>.delayed(const Duration(milliseconds: 500));
-      // ignore: avoid_slow_async_io
-      if (await file.exists()) {
+
+      if (await FileSystemEntity.type(path) != FileSystemEntityType.notFound) {
         final lines = await file.readAsLines();
         if (lines.length != lastLength) {
           lastLength = lines.length;
@@ -189,7 +182,6 @@ class LogService {
     }
   }
 
-  /// Clear app log buffer
   void clearAppLogBuffer() {
     LoggerController.instance.clearBuffer();
   }
@@ -206,8 +198,7 @@ class LogService {
   Future<void> clearCoreLog() async {
     final path = await getCoreLogPath();
     final file = File(path);
-    // ignore: avoid_slow_async_io
-    if (await file.exists()) {
+    if (await FileSystemEntity.type(path) != FileSystemEntityType.notFound) {
       try {
         await file.writeAsString('');
       } catch (_) {}
@@ -217,8 +208,7 @@ class LogService {
   Future<void> clearAccessLog() async {
     final path = await getAccessLogPath();
     final file = File(path);
-    // ignore: avoid_slow_async_io
-    if (await file.exists()) {
+    if (await FileSystemEntity.type(path) != FileSystemEntityType.notFound) {
       try {
         await file.writeAsString('');
       } catch (_) {}
@@ -229,7 +219,8 @@ class LogService {
     final tempDir = await getTemporaryDirectory();
     final exportDir = Directory('${tempDir.path}/hiddify_logs_export');
 
-    if (await exportDir.exists()) {
+    if (await FileSystemEntity.type(exportDir.path) !=
+        FileSystemEntityType.notFound) {
       await exportDir.delete(recursive: true);
     }
     await exportDir.create(recursive: true);
@@ -262,7 +253,9 @@ class LogService {
   Future<void> _tryTruncateFile(String path) async {
     try {
       final file = File(path);
-      if (!await file.exists()) return;
+      if (await FileSystemEntity.type(path) == FileSystemEntityType.notFound) {
+        return;
+      }
       await file.writeAsString('');
     } catch (_) {}
   }
@@ -287,7 +280,10 @@ class LogService {
     int maxBytes = 512 * 1024,
   }) async {
     final sourceFile = File(sourcePath);
-    if (!await sourceFile.exists()) return;
+    if (await FileSystemEntity.type(sourcePath) ==
+        FileSystemEntityType.notFound) {
+      return;
+    }
 
     try {
       final length = await sourceFile.length();
@@ -314,13 +310,13 @@ class LogService {
     } catch (_) {}
   }
 
-  /// Get log file size
   Future<int> getLogSize() async {
     final dir = await getLogDirectory();
     final d = Directory(dir);
-    // ignore: avoid_slow_async_io
-    if (!await d.exists()) return 0;
-    
+    if (await FileSystemEntity.type(dir) == FileSystemEntityType.notFound) {
+      return 0;
+    }
+
     var size = 0;
     await for (final entity in d.list(recursive: true)) {
       if (entity is File) {
@@ -330,7 +326,6 @@ class LogService {
     return size;
   }
 
-  /// Format file size for display
   String formatSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';

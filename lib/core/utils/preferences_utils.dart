@@ -159,17 +159,17 @@ class PreferencesNotifier<T, P> extends Notifier<T> {
     T? overrideValue,
     List<T>? possibleValues,
   }) => NotifierProvider<PreferencesNotifier<T, P>, T>(
-      () => PreferencesNotifier<T, P>(
-        key: key,
-        defaultValue: defaultValue,
-        defaultValueFunction: defaultValueFunction,
-        mapFrom: mapFrom,
-        mapTo: mapTo,
-        validator: validator,
-        overrideValue: overrideValue,
-        possibleValues: possibleValues,
-      ),
-    );
+    () => PreferencesNotifier<T, P>(
+      key: key,
+      defaultValue: defaultValue,
+      defaultValueFunction: defaultValueFunction,
+      mapFrom: mapFrom,
+      mapTo: mapTo,
+      validator: validator,
+      overrideValue: overrideValue,
+      possibleValues: possibleValues,
+    ),
+  );
 
   static NotifierProvider<PreferencesNotifier<T, P>, T> createAutoDispose<T, P>(
     String key,
@@ -179,13 +179,13 @@ class PreferencesNotifier<T, P> extends Notifier<T> {
     bool Function(T value)? validator,
     T? overrideValue,
   }) => NotifierProvider.autoDispose<PreferencesNotifier<T, P>, T>(
-      () => PreferencesNotifier<T, P>(
-        key: key,
-        defaultValue: defaultValue,
-        mapFrom: mapFrom,
-        mapTo: mapTo,
-        validator: validator,
-        overrideValue: overrideValue,
-      ),
-    );
+    () => PreferencesNotifier<T, P>(
+      key: key,
+      defaultValue: defaultValue,
+      mapFrom: mapFrom,
+      mapTo: mapTo,
+      validator: validator,
+      overrideValue: overrideValue,
+    ),
+  );
 }

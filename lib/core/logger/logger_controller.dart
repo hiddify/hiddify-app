@@ -8,7 +8,10 @@ import 'package:loggy/loggy.dart';
 
 class LoggerController extends LoggyPrinter with InfraLogger {
   LoggerController(this.consolePrinter, this.otherPrinters) {
-    if (kDebugMode || Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    if (kDebugMode ||
+        Platform.isWindows ||
+        Platform.isLinux ||
+        Platform.isMacOS) {
       _streamPrinter = StreamLogPrinter();
       otherPrinters['stream'] = _streamPrinter!;
     }
@@ -18,7 +21,7 @@ class LoggerController extends LoggyPrinter with InfraLogger {
   final Map<String, LoggyPrinter> otherPrinters;
   StreamLogPrinter? _streamPrinter;
 
-  Stream<List<String>> get logStream => 
+  Stream<List<String>> get logStream =>
       _streamPrinter?.logStream ?? Stream.value([]);
 
   List<String> get currentLogs => _streamPrinter?.currentBuffer ?? [];

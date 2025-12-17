@@ -4,12 +4,12 @@ enum Environment {
   prod,
   dev;
 
-  static const sentryDSN = String.fromEnvironment("sentry_dsn");
+  static const sentryDSN = String.fromEnvironment('sentry_dsn');
 }
 
 enum Release {
-  general("general"),
-  googlePlay("google-play");
+  general('general'),
+  googlePlay('google-play');
 
   const Release(this.key);
 
@@ -19,7 +19,7 @@ enum Release {
 
   static Release read() =>
       Release.values.firstOrNullWhere(
-        (e) => e.key == const String.fromEnvironment("release"),
+        (e) => e.key == const String.fromEnvironment('release'),
       ) ??
       Release.general;
 }
