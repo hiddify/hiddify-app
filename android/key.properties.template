@@ -1,0 +1,29 @@
+# Android Release Keystore Configuration Template
+#
+# ВАЖНО: Этот файл является шаблоном. Для production сборки:
+# 1. Скопируйте этот файл в key.properties (в этой же директории)
+# 2. Заполните реальные значения
+# 3. НЕ коммитьте key.properties в git (он уже в .gitignore)
+#
+# Инструкция по созданию keystore:
+#
+# keytool -genkey -v -keystore ~/go-bull-release.jks \
+#   -keyalg RSA -keysize 2048 -validity 10000 \
+#   -alias go-bull
+#
+# После создания keystore заполните значения ниже:
+
+# Пароль для keystore файла
+storePassword=YOUR_STORE_PASSWORD_HERE
+
+# Пароль для ключа (обычно такой же как storePassword)
+keyPassword=YOUR_KEY_PASSWORD_HERE
+
+# Алиас ключа (указывали при создании keystore)
+keyAlias=go-bull
+
+# Полный путь к keystore файлу
+# Примеры:
+#   Linux/Mac: /home/username/go-bull-release.jks
+#   Windows: C:\\Users\\username\\go-bull-release.jks
+storeFile=/path/to/your/keystore.jks
