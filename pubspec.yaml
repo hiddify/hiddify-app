@@ -4,12 +4,12 @@ publish_to: "none"
 version: 3.0.0+30000
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.10.4
   # ! IMPORTANT !
   # This SDK version is strictly required and must not be removed.
   # It is parsed/grep-ed by Makefile and Dockerfile to configure the build environment.
   # Ensure this matches the target Flutter version.
-  flutter: ^3.35.7
+  flutter: ^3.38.5
   
 dependencies:
   flutter:

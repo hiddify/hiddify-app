@@ -165,10 +165,10 @@ packages:
     dependency: transitive
     description:
       name: build_modules
-      sha256: b4f8d74125ab53869e63d488b8df2a036a7136d3b6d1759d3247e4d8d2e8f379
+      sha256: "8a605a996691e79c5d81d9051e849680917157e27bd655b9cd2c5bb8019a432e"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.15"
+    version: "5.1.5"
   build_resolvers:
     dependency: transitive
     description:
@@ -197,10 +197,10 @@ packages:
     dependency: "direct dev"
     description:
       name: build_web_compilers
-      sha256: "7c82235c82657efa0e6e877ef813757c7fd9e0e0406106f32ab30a874c939c63"
+      sha256: "37b1e61ae004124bfbb49079f73ee548d216acc901a58e65b0ffe02baa21cb96"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "4.4.6"
   built_collection:
     dependency: transitive
     description:
@@ -1139,10 +1139,10 @@ packages:
     dependency: "direct main"
     description:
       name: meta
-      sha256: e3641ec5d63ebf0d9b41bd43201a66e3fc79a65db5f61fc181f04cd27aab950c
+      sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
       url: "https://pub.dev"
     source: hosted
-    version: "1.16.0"
+    version: "1.17.0"
   mime:
     dependency: transitive
     description:
@@ -1523,10 +1523,10 @@ packages:
     dependency: transitive
     description:
       name: scratch_space
-      sha256: "8510fbff458d733a58fc427057d1ac86303b376d609d6e1bc43f240aad9aa445"
+      sha256: "3417e014d20b12cebc5bfb1c0b1f63806054177158596cc31cc4d9aaca767a60"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.2"
+    version: "1.2.0"
   screen_retriever:
     dependency: transitive
     description:
@@ -1872,10 +1872,10 @@ packages:
     dependency: transitive
     description:
       name: test_api
-      sha256: "522f00f556e73044315fa4585ec3270f1808a4b186c936e612cab0b565ff1e00"
+      sha256: ab2726c1a94d3176a45960b6234466ec367179b87dd74f1611adb1f3b5fb9d55
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.6"
+    version: "0.7.7"
   text_scroll:
     dependency: "direct main"
     description:
@@ -2189,5 +2189,5 @@ packages:
     source: hosted
     version: "2.2.2"
 sdks:
-  dart: ">=3.9.2 <3.10.0-z"
-  flutter: ">=3.35.7 <4.0.0"
+  dart: ">=3.9.2 <3.12.0-z"
+  flutter: ">=3.38.5 <4.0.0"

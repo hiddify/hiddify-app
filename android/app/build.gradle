@@ -55,7 +55,7 @@ android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
     compileSdkVersion 36
-    ndkVersion "26.3.11579264"
+    ndkVersion "28.2.13676358"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
