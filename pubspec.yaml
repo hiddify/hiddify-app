@@ -109,7 +109,7 @@ dependencies:
   basic_utils: 5.7.0
   showcaseview: 3.0.0
   text_scroll: ^0.2.0
-  flutter_markdown: ^0.7.6+2
+  flutter_markdown_plus: ^1.0.6
   # platform-specific  settings
   # https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup
   file_picker: ^8.1.7

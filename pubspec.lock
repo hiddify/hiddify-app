@@ -668,14 +668,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
-  flutter_markdown:
+  flutter_markdown_plus:
     dependency: "direct main"
     description:
-      name: flutter_markdown
-      sha256: e7bbc718adc9476aa14cfddc1ef048d2e21e4e8f18311aaac723266db9f9e7b5
+      name: flutter_markdown_plus
+      sha256: a3335b1047d4cbdcd20819cf69d9f2ac0e334ae13420104fb6035da1b404a0fa
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.6+2"
+    version: "1.0.6"
   flutter_native_splash:
     dependency: "direct main"
     description:
@@ -2189,5 +2189,5 @@ packages:
     source: hosted
     version: "2.2.2"
 sdks:
-  dart: ">=3.9.2 <3.12.0-z"
+  dart: ">=3.10.4 <3.12.0-z"
   flutter: ">=3.38.5 <4.0.0"
