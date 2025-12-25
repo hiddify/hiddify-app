@@ -9,7 +9,7 @@ class AppTheme {
 
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
     final ColorScheme scheme = lightColorScheme ??
-        ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0));
+        ColorScheme.fromSeed(seedColor: const Color(0xFFD32F2F));
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
@@ -23,7 +23,7 @@ class AppTheme {
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
     final ColorScheme scheme = darkColorScheme ??
         ColorScheme.fromSeed(
-          seedColor: const Color(0xFF293CA0),
+          seedColor: const Color(0xFFD32F2F),
           brightness: Brightness.dark,
         );
     return ThemeData(
