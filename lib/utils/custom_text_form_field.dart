@@ -39,10 +39,7 @@ class CustomTextFormField extends HookConsumerWidget {
     final textController = controller ?? useTextEditingController(text: initialValue);
     final effectiveConstraints = isDense ? const BoxConstraints(maxHeight: 56) : null;
     final effectiveBorder = isDense
-        ? OutlineInputBorder(
-            borderRadius: BorderRadius.circular(36),
-            borderSide: BorderSide.none,
-          )
+        ? OutlineInputBorder(borderRadius: BorderRadius.circular(36), borderSide: BorderSide.none)
         : null;
 
     return TextFormField(

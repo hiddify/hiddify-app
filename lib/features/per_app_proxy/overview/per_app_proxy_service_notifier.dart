@@ -21,34 +21,19 @@ class PerAppProxyService extends _$PerAppProxyService {
     final phonePkgs = (await InstalledApps.getInstalledApps(false)).map((e) => e.packageName).toSet();
     _includeSubscription = ref
         .read(appProxyDataSourceProvider)
-        .watchActivePackages(
-          phonePkgs: phonePkgs,
-          mode: AppProxyMode.include,
-        )
-        .listen(
-          (pkgs) => ref.read(Preferences.includeApps.notifier).update(pkgs),
-        );
+        .watchActivePackages(phonePkgs: phonePkgs, mode: AppProxyMode.include)
+        .listen((pkgs) => ref.read(Preferences.includeApps.notifier).update(pkgs));
     _excludeSubscription = ref
         .read(appProxyDataSourceProvider)
-        .watchActivePackages(
-          phonePkgs: phonePkgs,
-          mode: AppProxyMode.exclude,
-        )
-        .listen(
-          (pkgs) => ref.read(Preferences.excludeApps.notifier).update(pkgs),
-        );
+        .watchActivePackages(phonePkgs: phonePkgs, mode: AppProxyMode.exclude)
+        .listen((pkgs) => ref.read(Preferences.excludeApps.notifier).update(pkgs));
 
-    _timer = Timer.periodic(
-      const Duration(days: 1),
-      (_) async => await _autoSelectionUpdate(),
-    );
-    ref.onDispose(
-      () {
-        _includeSubscription?.cancel();
-        _excludeSubscription?.cancel();
-        _timer?.cancel();
-      },
-    );
+    _timer = Timer.periodic(const Duration(days: 1), (_) async => await _autoSelectionUpdate());
+    ref.onDispose(() {
+      _includeSubscription?.cancel();
+      _excludeSubscription?.cancel();
+      _timer?.cancel();
+    });
     await _autoSelectionUpdate();
   }
 
@@ -63,7 +48,9 @@ class PerAppProxyService extends _$PerAppProxyService {
       final rs = await ref.read(PerAppProxyProvider(mode).notifier).applyAutoSelection();
       if (rs) {
         final t = ref.read(translationsProvider).requireValue;
-        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.settings.routing.perAppProxy.autoSelection.toast.success);
+        ref
+            .read(inAppNotificationControllerProvider)
+            .showSuccessToast(t.pages.settings.routing.perAppProxy.autoSelection.toast.success);
       }
     }
   }

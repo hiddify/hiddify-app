@@ -13,12 +13,7 @@ class OkDialog extends HookConsumerWidget {
     return AlertDialog(
       title: Text(title),
       content: Text(description),
-      actions: [
-        TextButton(
-          child: Text(t.common.ok),
-          onPressed: () => context.pop(),
-        ),
-      ],
+      actions: [TextButton(child: Text(t.common.ok), onPressed: () => context.pop())],
     );
   }
 }

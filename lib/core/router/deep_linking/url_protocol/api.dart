@@ -1,4 +1,5 @@
-import 'package:hiddify/core/router/deep_linking/url_protocol/windows_protocol.dart' if (dart.library.js_interop) 'web_url_protocol.dart';
+import 'package:hiddify/core/router/deep_linking/url_protocol/windows_protocol.dart'
+    if (dart.library.js_interop) 'web_url_protocol.dart';
 
 /// Registers a protocol by [scheme] to allow for links in the form `<scheme>://...`
 /// to be processed by this application. By default, opening a link will open
@@ -18,16 +19,8 @@ import 'package:hiddify/core/router/deep_linking/url_protocol/windows_protocol.d
 /// those elements must contain the literal value `%s` to denote the URL to open.
 /// Quoting arguments is not necessary, as this will be handled for you.
 /// Escaping the `%s` as an unprocessed literal is currently unsupported.
-void registerProtocolHandler(
-  String scheme, {
-  String? executable,
-  List<String>? arguments,
-}) {
-  WindowsProtocolHandler().register(
-    scheme,
-    executable: executable,
-    arguments: arguments,
-  );
+void registerProtocolHandler(String scheme, {String? executable, List<String>? arguments}) {
+  WindowsProtocolHandler().register(scheme, executable: executable, arguments: arguments);
 }
 
 /// Unregisters the protocol handler with the underlying platform. The provided

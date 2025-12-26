@@ -13,14 +13,7 @@ class ActionsAtClosingDialog extends HookConsumerWidget {
     return SimpleDialog(
       title: Text(t.pages.settings.general.actionAtClosing),
       children: ActionsAtClosing.values
-          .map(
-            (e) => RadioListTile(
-              title: Text(e.present(t)),
-              value: e,
-              groupValue: selected,
-              onChanged: context.pop,
-            ),
-          )
+          .map((e) => RadioListTile(title: Text(e.present(t)), value: e, groupValue: selected, onChanged: context.pop))
           .toList(),
     );
   }

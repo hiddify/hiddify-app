@@ -25,8 +25,10 @@ class StatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveTitleStyle = titleStyle ?? Theme.of(context).textTheme.bodySmall;
-    final effectiveLabelStyle = labelStyle ?? Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w300);
-    final effectiveDataStyle = dataStyle ?? Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w300);
+    final effectiveLabelStyle =
+        labelStyle ?? Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w300);
+    final effectiveDataStyle =
+        dataStyle ?? Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w300);
 
     return Card(
       margin: EdgeInsets.zero,
@@ -37,45 +39,29 @@ class StatsCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (title != null) ...[
-              Text(
-                title!,
-                style: effectiveTitleStyle,
-              ),
-              const Gap(4),
-            ],
+            if (title != null) ...[Text(title!, style: effectiveTitleStyle), const Gap(4)],
             ...stats
-                .map(
-                  (stat) {
-                    Widget label = IconTheme.merge(
-                      data: const IconThemeData(size: 14),
-                      child: DefaultTextStyle(
-                        style: effectiveLabelStyle!,
-                        overflow: TextOverflow.ellipsis,
-                        child: stat.label,
-                      ),
-                    );
-                    if (stat.semanticLabel != null) {
-                      label = Tooltip(
-                        message: stat.semanticLabel,
-                        verticalOffset: 8,
-                        child: label,
-                      );
-                    }
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        label,
-                        const Gap(2),
-                        DefaultTextStyle(
-                          style: effectiveDataStyle!,
-                          overflow: TextOverflow.ellipsis,
-                          child: stat.data,
-                        ),
-                      ],
-                    );
-                  },
-                )
+                .map((stat) {
+                  Widget label = IconTheme.merge(
+                    data: const IconThemeData(size: 14),
+                    child: DefaultTextStyle(
+                      style: effectiveLabelStyle!,
+                      overflow: TextOverflow.ellipsis,
+                      child: stat.label,
+                    ),
+                  );
+                  if (stat.semanticLabel != null) {
+                    label = Tooltip(message: stat.semanticLabel, verticalOffset: 8, child: label);
+                  }
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      label,
+                      const Gap(2),
+                      DefaultTextStyle(style: effectiveDataStyle!, overflow: TextOverflow.ellipsis, child: stat.data),
+                    ],
+                  );
+                })
                 .toList()
                 .spaceBy(height: 2),
           ],

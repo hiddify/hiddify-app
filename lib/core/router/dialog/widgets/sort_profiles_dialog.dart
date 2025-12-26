@@ -21,40 +21,35 @@ class SortProfilesDialog extends HookConsumerWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ...ProfilesSort.values.map(
-                (e) {
-                  final selected = sort.by == e;
-                  final double arrowTurn = sort.mode == SortMode.ascending ? 0 : 0.5;
+              ...ProfilesSort.values.map((e) {
+                final selected = sort.by == e;
+                final double arrowTurn = sort.mode == SortMode.ascending ? 0 : 0.5;
 
-                  return ListTile(
-                    title: Text(e.present(t)),
-                    onTap: () {
-                      if (selected) {
-                        ref.read(profilesSortNotifierProvider.notifier).toggleMode();
-                      } else {
-                        ref.read(profilesSortNotifierProvider.notifier).changeSort(e);
-                      }
-                    },
-                    selected: selected,
-                    leading: Icon(e.icon),
-                    trailing: selected
-                        ? IconButton(
-                            onPressed: () {
-                              ref.read(profilesSortNotifierProvider.notifier).toggleMode();
-                            },
-                            icon: AnimatedRotation(
-                              turns: arrowTurn,
-                              duration: const Duration(milliseconds: 100),
-                              child: Icon(
-                                FluentIcons.arrow_sort_up_24_regular,
-                                semanticLabel: sort.mode.name,
-                              ),
-                            ),
-                          )
-                        : null,
-                  );
-                },
-              ),
+                return ListTile(
+                  title: Text(e.present(t)),
+                  onTap: () {
+                    if (selected) {
+                      ref.read(profilesSortNotifierProvider.notifier).toggleMode();
+                    } else {
+                      ref.read(profilesSortNotifierProvider.notifier).changeSort(e);
+                    }
+                  },
+                  selected: selected,
+                  leading: Icon(e.icon),
+                  trailing: selected
+                      ? IconButton(
+                          onPressed: () {
+                            ref.read(profilesSortNotifierProvider.notifier).toggleMode();
+                          },
+                          icon: AnimatedRotation(
+                            turns: arrowTurn,
+                            duration: const Duration(milliseconds: 100),
+                            child: Icon(FluentIcons.arrow_sort_up_24_regular, semanticLabel: sort.mode.name),
+                          ),
+                        )
+                      : null,
+                );
+              }),
             ],
           ),
         ),

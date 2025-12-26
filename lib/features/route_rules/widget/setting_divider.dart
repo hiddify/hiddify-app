@@ -13,32 +13,11 @@ class SettingDivider extends ConsumerWidget {
     if (title == null) return const Divider(indent: 16, endIndent: 16, height: 1);
     return Row(
       children: [
-        const Expanded(
-          child: Divider(
-            indent: 16,
-            endIndent: 8,
-            height: 1,
-          ),
-        ),
-        const Icon(
-          size: 16,
-          Icons.warning_rounded,
-          color: Colors.amber,
-        ),
+        const Expanded(child: Divider(indent: 16, endIndent: 8, height: 1)),
+        const Icon(size: 16, Icons.warning_rounded, color: Colors.amber),
         const Gap(2),
-        Text(
-          title!,
-          style: theme.textTheme.titleSmall!.copyWith(
-            color: theme.colorScheme.onSurface,
-          ),
-        ),
-        const Expanded(
-          child: Divider(
-            indent: 8,
-            endIndent: 16,
-            height: 1,
-          ),
-        ),
+        Text(title!, style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface)),
+        const Expanded(child: Divider(indent: 8, endIndent: 16, height: 1)),
       ],
     );
   }

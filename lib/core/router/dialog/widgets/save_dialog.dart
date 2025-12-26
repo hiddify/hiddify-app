@@ -13,19 +13,10 @@ class SaveDialog extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     return AlertDialog(
       title: Text(title),
-      content: ConstrainedBox(
-        constraints: AlertDialogConst.boxConstraints,
-        child: Text(description),
-      ),
+      content: ConstrainedBox(constraints: AlertDialogConst.boxConstraints, child: Text(description)),
       actions: [
-        TextButton(
-          onPressed: () => context.pop(false),
-          child: Text(t.common.discard),
-        ),
-        TextButton(
-          onPressed: () => context.pop(true),
-          child: Text(t.common.save),
-        ),
+        TextButton(onPressed: () => context.pop(false), child: Text(t.common.discard)),
+        TextButton(onPressed: () => context.pop(true), child: Text(t.common.save)),
       ],
     );
   }

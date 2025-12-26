@@ -9,7 +9,8 @@ class AutocompleteField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Autocomplete<String>(
       initialValue: TextEditingValue(
-        text: initialValue, selection: TextSelection(baseOffset: 0, extentOffset: initialValue.length), // Selects the entire text
+        text: initialValue,
+        selection: TextSelection(baseOffset: 0, extentOffset: initialValue.length), // Selects the entire text
       ),
       optionsBuilder: (TextEditingValue textEditingValue) {
         // if (textEditingValue.text == '') {

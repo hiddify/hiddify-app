@@ -19,9 +19,7 @@ class RouteOptionsPage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final perAppProxy = ref.watch(Preferences.perAppProxyMode).enabled;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.settings.routing.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.settings.routing.title)),
       body: ListView(
         children: [
           if (PlatformUtils.isAndroid)
@@ -54,8 +52,14 @@ class RouteOptionsPage extends HookConsumerWidget {
               await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
               final autoRegion = ref.read(Preferences.autoAppsSelectionRegion);
               final mode = ref.read(Preferences.perAppProxyMode).toAppProxy();
-              if (autoRegion != val && autoRegion != null && val != Region.other && mode != null && PlatformUtils.isAndroid) {
-                await ref.read(dialogNotifierProvider.notifier).showOk(
+              if (autoRegion != val &&
+                  autoRegion != null &&
+                  val != Region.other &&
+                  mode != null &&
+                  PlatformUtils.isAndroid) {
+                await ref
+                    .read(dialogNotifierProvider.notifier)
+                    .showOk(
                       t.pages.settings.routing.perAppProxy.autoSelection.dialog.title,
                       t.pages.settings.routing.perAppProxy.autoSelection.dialog.msg(region: val.name),
                     );

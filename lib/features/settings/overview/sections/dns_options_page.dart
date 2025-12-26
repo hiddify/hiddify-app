@@ -11,9 +11,7 @@ class DnsOptionsPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.settings.dns.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.settings.dns.title)),
       body: ListView(
         children: [
           ValuePreferenceWidget(

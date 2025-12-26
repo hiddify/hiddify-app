@@ -101,7 +101,11 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                   title: Constants.appName,
                   builder: (context, child) {
                     final theme = Theme.of(context);
-                    child = UpgradeAlert(upgrader: upgrader, navigatorKey: router.routerDelegate.navigatorKey, child: child ?? const SizedBox());
+                    child = UpgradeAlert(
+                      upgrader: upgrader,
+                      navigatorKey: router.routerDelegate.navigatorKey,
+                      child: child ?? const SizedBox(),
+                    );
                     if (kDebugMode && _debugAccessibility) {
                       return AccessibilityTools(checkFontOverflows: true, child: child);
                     }
@@ -109,7 +113,9 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                       value: SystemUiOverlayStyle(
                         statusBarColor: theme.scaffoldBackgroundColor,
                         systemNavigationBarColor: theme.scaffoldBackgroundColor,
-                        systemNavigationBarIconBrightness: theme.brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                        systemNavigationBarIconBrightness: theme.brightness == Brightness.dark
+                            ? Brightness.light
+                            : Brightness.dark,
                       ),
                       child: child,
                     );

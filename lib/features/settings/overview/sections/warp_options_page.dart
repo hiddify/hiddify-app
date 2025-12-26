@@ -36,9 +36,12 @@ class WarpOptionsPage extends HookConsumerWidget {
                 : warpOptions.when(
                     loading: () => null,
                     data: (_) => null,
-                    error: (_, _) => Text(t.pages.settings.warp.missingConfig, style: TextStyle(color: theme.colorScheme.error)),
+                    error: (_, _) =>
+                        Text(t.pages.settings.warp.missingConfig, style: TextStyle(color: theme.colorScheme.error)),
                   ),
-            trailing: warpOptions.isLoading ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator()) : null,
+            trailing: warpOptions.isLoading
+                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator())
+                : null,
             leading: const Icon(Icons.build_rounded),
             enabled: isWarpEnabled && !warpOptions.isLoading,
             onTap: warpOptions.isLoading
@@ -64,7 +67,13 @@ class WarpOptionsPage extends HookConsumerWidget {
             icon: Icons.key_rounded,
             presentValue: (value) => value.isEmpty ? t.common.notSet : value,
           ),
-          ValuePreferenceWidget(value: ref.watch(ConfigOptions.warpCleanIp), preferences: ref.watch(ConfigOptions.warpCleanIp.notifier), enabled: isWarpEnabled, title: t.pages.settings.warp.cleanIp, icon: Icons.auto_awesome_rounded),
+          ValuePreferenceWidget(
+            value: ref.watch(ConfigOptions.warpCleanIp),
+            preferences: ref.watch(ConfigOptions.warpCleanIp.notifier),
+            enabled: isWarpEnabled,
+            title: t.pages.settings.warp.cleanIp,
+            icon: Icons.auto_awesome_rounded,
+          ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.warpPort),
             preferences: ref.watch(ConfigOptions.warpPort.notifier),
@@ -85,7 +94,13 @@ class WarpOptionsPage extends HookConsumerWidget {
             presentValue: (value) => value.present(t),
             formatInputValue: (value) => value.format(),
           ),
-          ValuePreferenceWidget(value: ref.watch(ConfigOptions.warpNoiseMode), preferences: ref.watch(ConfigOptions.warpNoiseMode.notifier), enabled: isWarpEnabled, title: t.pages.settings.warp.noise.mode, icon: Icons.mode_standby_rounded),
+          ValuePreferenceWidget(
+            value: ref.watch(ConfigOptions.warpNoiseMode),
+            preferences: ref.watch(ConfigOptions.warpNoiseMode.notifier),
+            enabled: isWarpEnabled,
+            title: t.pages.settings.warp.noise.mode,
+            icon: Icons.mode_standby_rounded,
+          ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.warpNoiseSize),
             preferences: ref.watch(ConfigOptions.warpNoiseSize.notifier),

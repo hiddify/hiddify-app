@@ -71,7 +71,11 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
         label: t.pages.settings.inbound.serviceMode,
         icon: Assets.images.trayIconIco,
         submenu: Menu(
-          items: [...ServiceMode.values.map((e) => MenuItem.checkbox(checked: e == serviceMode, key: e.name, label: e.present(t)))],
+          items: [
+            ...ServiceMode.values.map(
+              (e) => MenuItem.checkbox(checked: e == serviceMode, key: e.name, label: e.present(t)),
+            ),
+          ],
         ),
       ),
       MenuItem.separator(),

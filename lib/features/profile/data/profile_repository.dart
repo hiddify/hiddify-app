@@ -24,7 +24,10 @@ abstract interface class ProfileRepository {
   TaskEither<ProfileFailure, Unit> deleteById(String id, bool isActive);
   Stream<Either<ProfileFailure, ProfileEntity?>> watchActiveProfile();
   Stream<Either<ProfileFailure, bool>> watchHasAnyProfile();
-  Stream<Either<ProfileFailure, List<ProfileEntity>>> watchAll({ProfilesSort sort = ProfilesSort.lastUpdate, SortMode sortMode = SortMode.ascending});
+  Stream<Either<ProfileFailure, List<ProfileEntity>>> watchAll({
+    ProfilesSort sort = ProfilesSort.lastUpdate,
+    SortMode sortMode = SortMode.ascending,
+  });
   TaskEither<ProfileFailure, Unit> upsertRemote(String url, {UserOverride? userOverride, CancelToken? cancelToken});
   TaskEither<ProfileFailure, Unit> addLocal(String content, {UserOverride? userOverride});
   TaskEither<ProfileFailure, Unit> offlineUpdate(ProfileEntity nProfile, String nContent);
@@ -66,7 +69,10 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
   @override
   TaskEither<ProfileFailure, ProfileEntity?> getById(String id) {
-    return TaskEither.tryCatch(() => _profileDataSource.getById(id).then((value) => value?.toEntity()), ProfileUnexpectedFailure.new);
+    return TaskEither.tryCatch(
+      () => _profileDataSource.getById(id).then((value) => value?.toEntity()),
+      ProfileUnexpectedFailure.new,
+    );
   }
 
   @override
@@ -88,7 +94,10 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
   @override
   Stream<Either<ProfileFailure, ProfileEntity?>> watchActiveProfile() {
-    return _profileDataSource.watchActiveProfile().map((event) => event?.toEntity()).handleExceptions((error, stackTrace) {
+    return _profileDataSource.watchActiveProfile().map((event) => event?.toEntity()).handleExceptions((
+      error,
+      stackTrace,
+    ) {
       loggy.error("error watching active profile", error, stackTrace);
       return ProfileUnexpectedFailure(error, stackTrace);
     });
@@ -96,17 +105,29 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
   @override
   Stream<Either<ProfileFailure, bool>> watchHasAnyProfile() {
-    return _profileDataSource.watchProfilesCount().map((event) => event != 0).handleExceptions(ProfileUnexpectedFailure.new);
+    return _profileDataSource
+        .watchProfilesCount()
+        .map((event) => event != 0)
+        .handleExceptions(ProfileUnexpectedFailure.new);
   }
 
   @override
-  Stream<Either<ProfileFailure, List<ProfileEntity>>> watchAll({ProfilesSort sort = ProfilesSort.lastUpdate, SortMode sortMode = SortMode.ascending}) {
-    return _profileDataSource.watchAll(sort: sort, sortMode: sortMode).map((event) => event.map((e) => e.toEntity()).toList()).handleExceptions(ProfileUnexpectedFailure.new);
+  Stream<Either<ProfileFailure, List<ProfileEntity>>> watchAll({
+    ProfilesSort sort = ProfilesSort.lastUpdate,
+    SortMode sortMode = SortMode.ascending,
+  }) {
+    return _profileDataSource
+        .watchAll(sort: sort, sortMode: sortMode)
+        .map((event) => event.map((e) => e.toEntity()).toList())
+        .handleExceptions(ProfileUnexpectedFailure.new);
   }
 
   @override
   TaskEither<ProfileFailure, Unit> upsertRemote(String url, {UserOverride? userOverride, CancelToken? cancelToken}) =>
-      TaskEither.tryCatch(() async => await _profileDataSource.getByUrl(url).then((profEntry) => profEntry?.toEntity()), ProfileFailure.unexpected).flatMap((profEntity) {
+      TaskEither.tryCatch(
+        () async => await _profileDataSource.getByUrl(url).then((profEntry) => profEntry?.toEntity()),
+        ProfileFailure.unexpected,
+      ).flatMap((profEntity) {
         // if profile is null, generate id
         final id = profEntity?.id ?? const Uuid().v4();
         final file = _profilePathResolver.file(id);
@@ -120,24 +141,32 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
             return _profileParser
                 .updateRemote(rp: profEntity, tempFilePath: tempFile.path, cancelToken: cancelToken)
                 .flatMap(
-                  (profEntity) => validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
-                    (unit) => TaskEither.tryCatch(() async {
-                      await _profileDataSource.edit(id, profEntity);
-                      return unit;
-                    }, ProfileFailure.unexpected),
-                  ),
+                  (profEntity) =>
+                      validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
+                        (unit) => TaskEither.tryCatch(() async {
+                          await _profileDataSource.edit(id, profEntity);
+                          return unit;
+                        }, ProfileFailure.unexpected),
+                      ),
                 );
           } else {
             // Add
             return _profileParser
-                .addRemote(id: id, url: url, tempFilePath: tempFile.path, userOverride: userOverride, cancelToken: cancelToken)
+                .addRemote(
+                  id: id,
+                  url: url,
+                  tempFilePath: tempFile.path,
+                  userOverride: userOverride,
+                  cancelToken: cancelToken,
+                )
                 .flatMap(
-                  (profEntity) => validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
-                    (unit) => TaskEither.tryCatch(() async {
-                      await _profileDataSource.insert(profEntity);
-                      return unit;
-                    }, ProfileFailure.unexpected),
-                  ),
+                  (profEntity) =>
+                      validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
+                        (unit) => TaskEither.tryCatch(() async {
+                          await _profileDataSource.insert(profEntity);
+                          return unit;
+                        }, ProfileFailure.unexpected),
+                      ),
                 );
           }
         } finally {
@@ -146,36 +175,52 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
       });
 
   @override
-  TaskEither<ProfileFailure, Unit> addLocal(String content, {UserOverride? userOverride}) => TaskEither.tryCatch(() async {
-    final id = const Uuid().v4();
-    final file = _profilePathResolver.file(id);
-    final tempFile = _profilePathResolver.tempFile(id);
-    try {
-      await tempFile.writeAsString(content);
-      final task = TaskEither.fromEither(_profileParser.addLocal(id: id, content: content, tempFilePath: tempFile.path, userOverride: userOverride)).flatMap(
-        (profEntity) => validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
-          (unit) => TaskEither.tryCatch(() async {
-            await _profileDataSource.insert(profEntity);
-            return unit;
-          }, ProfileFailure.unexpected),
-        ),
-      );
-      return (await task.run()).getOrElse((l) => throw l);
-    } finally {
-      if (tempFile.existsSync()) tempFile.deleteSync();
-    }
-  }, ProfileFailure.unexpected);
+  TaskEither<ProfileFailure, Unit> addLocal(String content, {UserOverride? userOverride}) =>
+      TaskEither.tryCatch(() async {
+        final id = const Uuid().v4();
+        final file = _profilePathResolver.file(id);
+        final tempFile = _profilePathResolver.tempFile(id);
+        try {
+          await tempFile.writeAsString(content);
+          final task =
+              TaskEither.fromEither(
+                _profileParser.addLocal(
+                  id: id,
+                  content: content,
+                  tempFilePath: tempFile.path,
+                  userOverride: userOverride,
+                ),
+              ).flatMap(
+                (profEntity) =>
+                    validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
+                      (unit) => TaskEither.tryCatch(() async {
+                        await _profileDataSource.insert(profEntity);
+                        return unit;
+                      }, ProfileFailure.unexpected),
+                    ),
+              );
+          return (await task.run()).getOrElse((l) => throw l);
+        } finally {
+          if (tempFile.existsSync()) tempFile.deleteSync();
+        }
+      }, ProfileFailure.unexpected);
 
   @override
   TaskEither<ProfileFailure, Unit> offlineUpdate(ProfileEntity profile, String nContent) =>
-      TaskEither.tryCatch(() async => await _profileDataSource.getById(profile.id).then((profEntry) => profEntry?.toEntity()), ProfileFailure.unexpected).flatMap((oProfile) {
+      TaskEither.tryCatch(
+        () async => await _profileDataSource.getById(profile.id).then((profEntry) => profEntry?.toEntity()),
+        ProfileFailure.unexpected,
+      ).flatMap((oProfile) {
         if (oProfile == null || oProfile.runtimeType != profile.runtimeType) throw const ProfileFailure.notFound();
         if (profile.userOverride == null) loggy.warning('Updaing profile content with "userOverride" == null');
         final id = oProfile.id;
         final file = _profilePathResolver.file(id);
         final tempFile = _profilePathResolver.tempFile(id);
         try {
-          return TaskEither.tryCatch(() async => await tempFile.writeAsString(nContent), ProfileFailure.unexpected).flatMap(
+          return TaskEither.tryCatch(
+            () async => await tempFile.writeAsString(nContent),
+            ProfileFailure.unexpected,
+          ).flatMap(
             (_) =>
                 TaskEither.fromEither(
                   _profileParser.offlineUpdate(
@@ -183,12 +228,13 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
                     tempFilePath: tempFile.path,
                   ),
                 ).flatMap(
-                  (profEntity) => validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
-                    (unit) => TaskEither.tryCatch(() async {
-                      await _profileDataSource.edit(id, profEntity);
-                      return unit;
-                    }, ProfileFailure.unexpected),
-                  ),
+                  (profEntity) =>
+                      validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
+                        (unit) => TaskEither.tryCatch(() async {
+                          await _profileDataSource.edit(id, profEntity);
+                          return unit;
+                        }, ProfileFailure.unexpected),
+                      ),
                 ),
           );
         } finally {
@@ -197,11 +243,20 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
       });
 
   @override
-  TaskEither<ProfileFailure, Unit> validateConfig(String path, String tempPath, String? profileOverride, bool debug) => TaskEither.fromEither(_configOptionRepo.fullOptionsOverrided(profileOverride))
-      .mapLeft((configOptionFailure) => ProfileFailure.invalidConfig(null, configOptionFailure))
-      .flatMap((overridedOptions) => _singbox.changeOptions(overridedOptions).mapLeft(ProfileFailure.invalidConfig).flatMap((_) => _singbox.validateConfigByPath(path, tempPath, debug).mapLeft(ProfileFailure.invalidConfig)));
+  TaskEither<ProfileFailure, Unit> validateConfig(String path, String tempPath, String? profileOverride, bool debug) =>
+      TaskEither.fromEither(_configOptionRepo.fullOptionsOverrided(profileOverride))
+          .mapLeft((configOptionFailure) => ProfileFailure.invalidConfig(null, configOptionFailure))
+          .flatMap(
+            (overridedOptions) => _singbox
+                .changeOptions(overridedOptions)
+                .mapLeft(ProfileFailure.invalidConfig)
+                .flatMap(
+                  (_) => _singbox.validateConfigByPath(path, tempPath, debug).mapLeft(ProfileFailure.invalidConfig),
+                ),
+          );
 
   @override
-  TaskEither<ProfileFailure, String> generateConfig(String id) =>
-      TaskEither.fromEither(Either.tryCatch(() => _profilePathResolver.file(id), ProfileFailure.unexpected)).flatMap((configFile) => _singbox.generateFullConfigByPath(configFile.path).mapLeft(ProfileFailure.unexpected));
+  TaskEither<ProfileFailure, String> generateConfig(String id) => TaskEither.fromEither(
+    Either.tryCatch(() => _profilePathResolver.file(id), ProfileFailure.unexpected),
+  ).flatMap((configFile) => _singbox.generateFullConfigByPath(configFile.path).mapLeft(ProfileFailure.unexpected));
 }

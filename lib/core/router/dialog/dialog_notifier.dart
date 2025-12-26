@@ -42,19 +42,12 @@ class DialogNotifier extends _$DialogNotifier {
     final context = rootNavKey.currentContext;
     if (context == null) return null;
     // ref.read(popupCountNotifierProvider.notifier).increase();
-    return await Navigator.of(context)
-        .push<T>(
-      DialogRoute(
-        context: context,
-        builder: (context) => child,
-      ),
-    )
-        .then(
-      (value) {
-        // ref.read(popupCountNotifierProvider.notifier).decrease();
-        return value;
-      },
-    );
+    return await Navigator.of(context).push<T>(DialogRoute(context: context, builder: (context) => child)).then((
+      value,
+    ) {
+      // ref.read(popupCountNotifierProvider.notifier).decrease();
+      return value;
+    });
   }
 
   Future<String?> showQrScanner() async {
@@ -104,13 +97,7 @@ class DialogNotifier extends _$DialogNotifier {
     required RemoteVersionEntity newVersion,
     required bool canIgnore,
   }) async {
-    return await _show<void>(
-      NewVersionDialog(
-        currentVersion,
-        newVersion,
-        canIgnore: canIgnore,
-      ),
-    );
+    return await _show<void>(NewVersionDialog(currentVersion, newVersion, canIgnore: canIgnore));
   }
 
   Future<bool> showConfirmation({
@@ -119,7 +106,10 @@ class DialogNotifier extends _$DialogNotifier {
     IconData? icon,
     String? positiveBtnTxt,
   }) async {
-    return await _show<bool>(ConfirmationDialog(title: title, message: message, icon: icon, positiveBtnTxt: positiveBtnTxt)) ?? false;
+    return await _show<bool>(
+          ConfirmationDialog(title: title, message: message, icon: icon, positiveBtnTxt: positiveBtnTxt),
+        ) ??
+        false;
   }
 
   Future<Region?> showRegion({required Region selected}) async {
@@ -161,7 +151,9 @@ class DialogNotifier extends _$DialogNotifier {
     String? defaultValue,
     FormFieldValidator<String>? validator,
   }) async {
-    return await _show<String?>(SettingTextDialog(lable: lable, value: value, defaultValue: defaultValue, validator: validator));
+    return await _show<String?>(
+      SettingTextDialog(lable: lable, value: value, defaultValue: defaultValue, validator: validator),
+    );
   }
 
   Future<List<ProtobufEnum>?> showSettingCheckbox({
@@ -171,7 +163,15 @@ class DialogNotifier extends _$DialogNotifier {
     List<ProtobufEnum>? defaultValue,
     Map<String, String>? t,
   }) async {
-    return await _show<List<ProtobufEnum>?>(SettingCheckboxDialog(title: title, values: values, selectedValues: selectedValues, defaultValue: defaultValue, t: t));
+    return await _show<List<ProtobufEnum>?>(
+      SettingCheckboxDialog(
+        title: title,
+        values: values,
+        selectedValues: selectedValues,
+        defaultValue: defaultValue,
+        t: t,
+      ),
+    );
   }
 
   Future<T?> showSettingRadio<T>({
@@ -181,7 +181,9 @@ class DialogNotifier extends _$DialogNotifier {
     T? defaultValue,
     Map<String, String>? t,
   }) async {
-    return await _show<T?>(SettingRadioDialog(title: title, values: values, value: value, defaultValue: defaultValue, t: t));
+    return await _show<T?>(
+      SettingRadioDialog(title: title, values: values, value: value, defaultValue: defaultValue, t: t),
+    );
   }
 
   Future<T?> showSettingInput<T>({
@@ -196,18 +198,20 @@ class DialogNotifier extends _$DialogNotifier {
     IconData? icon,
     bool digitsOnly = false,
   }) async {
-    return await _show<T?>(SettingInputDialog(
-      title: title,
-      initialValue: initialValue,
-      mapTo: mapTo,
-      validator: validator,
-      valueFormatter: valueFormatter,
-      possibleValues: possibleValues,
-      onReset: onReset,
-      optionalAction: optionalAction,
-      icon: icon,
-      digitsOnly: digitsOnly,
-    ));
+    return await _show<T?>(
+      SettingInputDialog(
+        title: title,
+        initialValue: initialValue,
+        mapTo: mapTo,
+        validator: validator,
+        valueFormatter: valueFormatter,
+        possibleValues: possibleValues,
+        onReset: onReset,
+        optionalAction: optionalAction,
+        icon: icon,
+        digitsOnly: digitsOnly,
+      ),
+    );
   }
 
   Future<T?> showSettingPicker<T>({
@@ -217,13 +221,9 @@ class DialogNotifier extends _$DialogNotifier {
     required String Function(T e) getTitle,
     VoidCallback? onReset,
   }) async {
-    return await _show<T?>(SettingPickerDialog(
-      title: title,
-      selected: selected,
-      options: options,
-      getTitle: getTitle,
-      onReset: onReset,
-    ));
+    return await _show<T?>(
+      SettingPickerDialog(title: title, selected: selected, options: options, getTitle: getTitle, onReset: onReset),
+    );
   }
 
   Future<bool?> showSave({required String title, required String description}) async {

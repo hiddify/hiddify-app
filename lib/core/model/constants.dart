@@ -45,8 +45,10 @@ abstract class ProfileTileConst {
   static const cardBorderRadius = BorderRadius.all(radius);
   static const borderRadiusRight = BorderRadius.horizontal(right: radius);
   static const borderRadiusLeft = BorderRadius.horizontal(left: radius);
-  static BorderRadius startBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusLeft : borderRadiusRight;
-  static BorderRadius endBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusRight : borderRadiusLeft;
+  static BorderRadius startBorderRadius(TextDirection direction) =>
+      direction == TextDirection.ltr ? borderRadiusLeft : borderRadiusRight;
+  static BorderRadius endBorderRadius(TextDirection direction) =>
+      direction == TextDirection.ltr ? borderRadiusRight : borderRadiusLeft;
 }
 
 abstract class IntroConst {
@@ -80,17 +82,7 @@ abstract class KeyboardConst {
     LogicalKeyboardKey.arrowLeft,
     LogicalKeyboardKey.arrowRight,
   };
-  static final horizontalArrows = {
-    LogicalKeyboardKey.arrowLeft,
-    LogicalKeyboardKey.arrowRight,
-  };
-  static final verticalArrows = {
-    LogicalKeyboardKey.arrowUp,
-    LogicalKeyboardKey.arrowDown,
-  };
-  static final select = {
-    LogicalKeyboardKey.select,
-    LogicalKeyboardKey.enter,
-    LogicalKeyboardKey.tab,
-  };
+  static final horizontalArrows = {LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.arrowRight};
+  static final verticalArrows = {LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.arrowDown};
+  static final select = {LogicalKeyboardKey.select, LogicalKeyboardKey.enter, LogicalKeyboardKey.tab};
 }

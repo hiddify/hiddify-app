@@ -51,10 +51,7 @@ abstract class Preferences {
     <String>[],
   );
 
-  static final silentStart = PreferencesNotifier.create<bool, bool>(
-    "silent_start",
-    false,
-  );
+  static final silentStart = PreferencesNotifier.create<bool, bool>("silent_start", false);
 
   static final disableMemoryLimit = PreferencesNotifier.create<bool, bool>(
     "disable_memory_limit",
@@ -69,30 +66,15 @@ abstract class Preferences {
     mapTo: (value) => value.name,
   );
 
-  static final markNewProfileActive = PreferencesNotifier.create<bool, bool>(
-    "mark_new_profile_active",
-    true,
-  );
+  static final markNewProfileActive = PreferencesNotifier.create<bool, bool>("mark_new_profile_active", true);
 
-  static final dynamicNotification = PreferencesNotifier.create<bool, bool>(
-    "dynamic_notification",
-    true,
-  );
+  static final dynamicNotification = PreferencesNotifier.create<bool, bool>("dynamic_notification", true);
 
-  static final autoCheckIp = PreferencesNotifier.create<bool, bool>(
-    "auto_check_ip",
-    true,
-  );
+  static final autoCheckIp = PreferencesNotifier.create<bool, bool>("auto_check_ip", true);
 
-  static final startedByUser = PreferencesNotifier.create<bool, bool>(
-    "started_by_user",
-    false,
-  );
+  static final startedByUser = PreferencesNotifier.create<bool, bool>("started_by_user", false);
 
-  static final storeReviewedByUser = PreferencesNotifier.create<bool, bool>(
-    "store_reviewed_by_user",
-    false,
-  );
+  static final storeReviewedByUser = PreferencesNotifier.create<bool, bool>("store_reviewed_by_user", false);
 
   static final actionAtClose = PreferencesNotifier.create<ActionsAtClosing, String>(
     "action_at_close",

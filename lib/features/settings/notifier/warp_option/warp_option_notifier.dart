@@ -40,7 +40,9 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
       loggy.log(LogLevel.info, 'generated warp log : $warpLog');
       loggy.log(LogLevel.info, 'generated warp2 log : $warpLog2');
       if (showToast) {
-        ref.read(inAppNotificationControllerProvider).showSuccessToast('${t.pages.settings.warp.configGenerated} $warpLog');
+        ref
+            .read(inAppNotificationControllerProvider)
+            .showSuccessToast('${t.pages.settings.warp.configGenerated} $warpLog');
       }
       state = AsyncValue.data(warpLog);
     } else {
@@ -53,7 +55,11 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
     final result = await AsyncValue.guard(() async {
       final warp = await ref
           .read(hiddifyCoreServiceProvider)
-          .generateWarpConfig(licenseKey: ref.read(ConfigOptions.warpLicenseKey), previousAccountId: ref.read(ConfigOptions.warpAccountId), previousAccessToken: ref.read(ConfigOptions.warpAccessToken))
+          .generateWarpConfig(
+            licenseKey: ref.read(ConfigOptions.warpLicenseKey),
+            previousAccountId: ref.read(ConfigOptions.warpAccountId),
+            previousAccessToken: ref.read(ConfigOptions.warpAccessToken),
+          )
           .getOrElse((l) => throw l)
           .run();
 
@@ -71,7 +77,11 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
     final result = await AsyncValue.guard(() async {
       final warp = await ref
           .read(hiddifyCoreServiceProvider)
-          .generateWarpConfig(licenseKey: ref.read(ConfigOptions.warpLicenseKey), previousAccountId: ref.read(ConfigOptions.warp2AccountId), previousAccessToken: ref.read(ConfigOptions.warp2AccessToken))
+          .generateWarpConfig(
+            licenseKey: ref.read(ConfigOptions.warpLicenseKey),
+            previousAccountId: ref.read(ConfigOptions.warp2AccountId),
+            previousAccessToken: ref.read(ConfigOptions.warp2AccessToken),
+          )
           .getOrElse((l) => throw l)
           .run();
 

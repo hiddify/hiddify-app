@@ -15,9 +15,7 @@ class InboundOptionsPage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.settings.inbound.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.settings.inbound.title)),
       body: ListView(
         children: [
           ChoicePreferenceWidget(

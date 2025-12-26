@@ -17,11 +17,7 @@ abstract class LogParser {
       _ => LogLevel.debug,
     };
 
-    return LogEntity(
-      level: level,
-      time: message.time.toDateTime(),
-      message: message.message,
-    );
+    return LogEntity(level: level, time: message.time.toDateTime(), message: message.message);
   }
 
   static LogEntity parseSingbox(String log) {
@@ -33,19 +29,13 @@ abstract class LogParser {
     if (time != null) {
       log = log.substring(26);
     }
-    final level = LogLevel.values.firstOrNullWhere(
-      (e) {
-        if (log.startsWith(e.name.toUpperCase())) {
-          log = log.removePrefix(e.name.toUpperCase());
-          return true;
-        }
-        return false;
-      },
-    );
-    return LogEntity(
-      level: level,
-      time: time,
-      message: log.trim(),
-    );
+    final level = LogLevel.values.firstOrNullWhere((e) {
+      if (log.startsWith(e.name.toUpperCase())) {
+        log = log.removePrefix(e.name.toUpperCase());
+        return true;
+      }
+      return false;
+    });
+    return LogEntity(level: level, time: time, message: log.trim());
   }
 }

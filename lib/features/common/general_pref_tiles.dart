@@ -23,7 +23,9 @@ class LocalePrefTile extends ConsumerWidget {
       subtitle: Text(locale.localeName),
       leading: const Icon(Icons.translate_rounded),
       onTap: () async {
-        final selectedLocale = await ref.read(dialogNotifierProvider.notifier).showSettingPicker<AppLocale>(
+        final selectedLocale = await ref
+            .read(dialogNotifierProvider.notifier)
+            .showSettingPicker<AppLocale>(
               title: t.pages.settings.general.locale,
               selected: locale,
               onReset: () => ref.read(localePreferencesProvider.notifier).changeLocale(AppLocale.en),
@@ -49,10 +51,7 @@ class RegionPrefTile extends ConsumerWidget {
 
     return ListTile(
       title: Text(t.pages.settings.routing.region),
-      subtitle: Text(
-        region.present(t),
-        style: Theme.of(context).textTheme.bodySmall,
-      ),
+      subtitle: Text(region.present(t), style: Theme.of(context).textTheme.bodySmall),
       leading: const Icon(Icons.place_rounded),
       onTap: () async {
         final selectedRegion = await ref.read(dialogNotifierProvider.notifier).showRegion(selected: region);
@@ -77,10 +76,7 @@ class RegionPrefTile extends ConsumerWidget {
 }
 
 class EnableAnalyticsPrefTile extends ConsumerWidget {
-  const EnableAnalyticsPrefTile({
-    super.key,
-    this.onChanged,
-  });
+  const EnableAnalyticsPrefTile({super.key, this.onChanged});
 
   final ValueChanged<bool>? onChanged;
 
@@ -92,10 +88,7 @@ class EnableAnalyticsPrefTile extends ConsumerWidget {
 
     return SwitchListTile.adaptive(
       title: Text(t.pages.settings.general.enableAnalytics),
-      subtitle: Text(
-        t.pages.settings.general.enableAnalyticsMsg,
-        style: Theme.of(context).textTheme.bodySmall,
-      ),
+      subtitle: Text(t.pages.settings.general.enableAnalyticsMsg, style: Theme.of(context).textTheme.bodySmall),
       secondary: const Icon(Icons.analytics_rounded),
       value: enabled,
       onChanged: (value) async {
@@ -124,16 +117,16 @@ class ThemeModePrefTile extends ConsumerWidget {
     return ListTile(
       title: Text(t.pages.settings.general.themeMode),
       subtitle: Text(themeMode.present(t)),
-      leading: Icon(
-        switch (ref.watch(themePreferencesProvider)) {
-          AppThemeMode.system => Icons.auto_awesome_rounded,
-          AppThemeMode.light => Icons.light_mode_rounded,
-          AppThemeMode.dark => Icons.dark_mode_rounded,
-          AppThemeMode.black => Icons.contrast_rounded,
-        },
-      ),
+      leading: Icon(switch (ref.watch(themePreferencesProvider)) {
+        AppThemeMode.system => Icons.auto_awesome_rounded,
+        AppThemeMode.light => Icons.light_mode_rounded,
+        AppThemeMode.dark => Icons.dark_mode_rounded,
+        AppThemeMode.black => Icons.contrast_rounded,
+      }),
       onTap: () async {
-        final selectedThemeMode = await ref.read(dialogNotifierProvider.notifier).showSettingPicker<AppThemeMode>(
+        final selectedThemeMode = await ref
+            .read(dialogNotifierProvider.notifier)
+            .showSettingPicker<AppThemeMode>(
               title: t.pages.settings.general.themeMode,
               selected: themeMode,
               onReset: () => ref.read(themePreferencesProvider.notifier).changeThemeMode(AppThemeMode.system),

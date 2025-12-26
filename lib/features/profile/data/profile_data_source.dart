@@ -68,7 +68,12 @@ class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogge
           (tbl) {
             final trafficRatio = (tbl.download + tbl.upload) / tbl.total;
             final isExpired = tbl.expire.isSmallerOrEqualValue(DateTime.now());
-            return OrderingTerm(expression: (trafficRatio.isNull() | trafficRatio.isSmallerThanValue(1)) & (isExpired.isNull() | isExpired.equals(false)), mode: OrderingMode.desc);
+            return OrderingTerm(
+              expression:
+                  (trafficRatio.isNull() | trafficRatio.isSmallerThanValue(1)) &
+                  (isExpired.isNull() | isExpired.equals(false)),
+              mode: OrderingMode.desc,
+            );
           },
           switch (sort) {
             ProfilesSort.name => (tbl) => OrderingTerm(expression: tbl.name, mode: orderMap[sortMode]!),
@@ -116,7 +121,9 @@ class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogge
         final profiles = await (profileEntries.select()..where((tbl) => tbl.id.equals(id).not())).get();
         if (profiles.isEmpty) return;
         final prof = profiles.first;
-        await (update(profileEntries)..where((tbl) => tbl.id.equals(prof.id))).write(const ProfileEntriesCompanion(active: Value(true)));
+        await (update(
+          profileEntries,
+        )..where((tbl) => tbl.id.equals(prof.id))).write(const ProfileEntriesCompanion(active: Value(true)));
       }
     });
   }

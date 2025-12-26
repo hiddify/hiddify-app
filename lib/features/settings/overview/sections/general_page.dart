@@ -52,7 +52,9 @@ class GeneralPage extends HookConsumerWidget {
               title: Text(t.pages.settings.general.autoStart),
               secondary: const Icon(Icons.auto_mode_rounded),
               value: ref.watch(autoStartNotifierProvider).asData!.value,
-              onChanged: (value) async => value ? await ref.read(autoStartNotifierProvider.notifier).enable() : await ref.read(autoStartNotifierProvider.notifier).disable(),
+              onChanged: (value) async => value
+                  ? await ref.read(autoStartNotifierProvider.notifier).enable()
+                  : await ref.read(autoStartNotifierProvider.notifier).disable(),
             ),
             SwitchListTile.adaptive(
               title: Text(t.pages.settings.general.silentStart),
@@ -74,7 +76,10 @@ class GeneralPage extends HookConsumerWidget {
             secondary: const Icon(Icons.bug_report_rounded),
             value: ref.watch(debugModeNotifierProvider),
             onChanged: (value) async {
-              if (value) await ref.read(dialogNotifierProvider.notifier).showOk(t.pages.settings.general.debugMode, t.pages.settings.general.debugModeMsg);
+              if (value)
+                await ref
+                    .read(dialogNotifierProvider.notifier)
+                    .showOk(t.pages.settings.general.debugMode, t.pages.settings.general.debugModeMsg);
               await ref.read(debugModeNotifierProvider.notifier).update(value);
             },
           ),
@@ -94,9 +99,7 @@ class GeneralPage extends HookConsumerWidget {
           ),
           ListTile(
             title: Text(t.pages.settings.general.urlTestInterval),
-            subtitle: Text(
-              ref.watch(ConfigOptions.urlTestInterval).toApproximateTime(isRelativeToNow: false),
-            ),
+            subtitle: Text(ref.watch(ConfigOptions.urlTestInterval).toApproximateTime(isRelativeToNow: false)),
             leading: const Icon(Icons.timer_rounded),
             onTap: () async => await ref
                 .read(dialogNotifierProvider.notifier)
@@ -109,12 +112,10 @@ class GeneralPage extends HookConsumerWidget {
                   divisions: 60,
                   labelGen: (value) => Duration(minutes: value.toInt()).toApproximateTime(isRelativeToNow: false),
                 )
-                .then(
-              (value) async {
-                if (value == null) return;
-                await ref.read(ConfigOptions.urlTestInterval.notifier).update(Duration(minutes: value.toInt()));
-              },
-            ),
+                .then((value) async {
+                  if (value == null) return;
+                  await ref.read(ConfigOptions.urlTestInterval.notifier).update(Duration(minutes: value.toInt()));
+                }),
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.clashApiPort),

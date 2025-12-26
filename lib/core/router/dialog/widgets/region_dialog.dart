@@ -14,14 +14,7 @@ class RegionDialog extends HookConsumerWidget {
     return SimpleDialog(
       title: Text(t.pages.settings.routing.region),
       children: Region.values
-          .map(
-            (e) => RadioListTile(
-              title: Text(e.present(t)),
-              value: e,
-              groupValue: selected,
-              onChanged: context.pop,
-            ),
-          )
+          .map((e) => RadioListTile(title: Text(e.present(t)), value: e, groupValue: selected, onChanged: context.pop))
           .toList(),
     );
   }

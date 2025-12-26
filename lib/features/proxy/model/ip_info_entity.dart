@@ -122,7 +122,7 @@ class IpInfo with IpInfoMappable {
         "ip": final String ip,
         "country_code": final String countryCode,
         // "state": final String region,
-        "city": final String city
+        "city": final String city,
       } =>
         IpInfo(
           ip: ip,

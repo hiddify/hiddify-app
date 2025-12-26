@@ -9,11 +9,7 @@ import 'package:hiddify/utils/custom_loggers.dart';
 
 class DioHttpClient with InfraLogger {
   final Map<String, Dio> _dio = {};
-  DioHttpClient({
-    required Duration timeout,
-    required this.userAgent,
-    required bool debug,
-  }) {
+  DioHttpClient({required Duration timeout, required this.userAgent, required bool debug}) {
     for (var mode in ["proxy", "direct", "both"]) {
       _dio[mode] = Dio(
         BaseOptions(
@@ -24,17 +20,14 @@ class DioHttpClient with InfraLogger {
         ),
       );
       _dio[mode]!.interceptors.add(
-            RetryInterceptor(
-              dio: _dio[mode]!,
-              retryDelays: [
-                const Duration(seconds: 1),
-                if (mode != "proxy") ...[
-                  const Duration(seconds: 2),
-                  const Duration(seconds: 3),
-                ],
-              ],
-            ),
-          );
+        RetryInterceptor(
+          dio: _dio[mode]!,
+          retryDelays: [
+            const Duration(seconds: 1),
+            if (mode != "proxy") ...[const Duration(seconds: 2), const Duration(seconds: 3)],
+          ],
+        ),
+      );
 
       _dio[mode]!.httpClientAdapter = IOHttpClientAdapter(
         createHttpClient: () {
@@ -100,8 +93,8 @@ class DioHttpClient with InfraLogger {
     final mode = proxyOnly
         ? "proxy"
         : await isPortOpen("127.0.0.1", port)
-            ? "both"
-            : "direct";
+        ? "both"
+        : "direct";
     final dio = _dio[mode]!;
 
     return dio.get<T>(
@@ -122,26 +115,18 @@ class DioHttpClient with InfraLogger {
     final mode = proxyOnly
         ? "proxy"
         : await isPortOpen("127.0.0.1", port)
-            ? "both"
-            : "direct";
+        ? "both"
+        : "direct";
     final dio = _dio[mode]!;
     return dio.download(
       url,
       path,
       cancelToken: cancelToken,
-      options: _options(
-        url,
-        userAgent: userAgent,
-        credentials: credentials,
-      ),
+      options: _options(url, userAgent: userAgent, credentials: credentials),
     );
   }
 
-  Options _options(
-    String url, {
-    String? userAgent,
-    ({String username, String password})? credentials,
-  }) {
+  Options _options(String url, {String? userAgent, ({String username, String password})? credentials}) {
     final uri = Uri.parse(url);
 
     String? userInfo;

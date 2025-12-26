@@ -22,19 +22,15 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
   Future<bool> build() async {
     final serviceRunning = await ref.watch(serviceRunningProvider.future);
     final serviceSingboxOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
-    ref.listen(
-      ConfigOptions.singboxConfigOptions,
-      (previous, next) {
-        if (!serviceRunning || serviceSingboxOptions == null) return;
-        if (next case AsyncData(:final value) when next != previous) {
-          if (_lastUpdate == null || DateTime.now().difference(_lastUpdate!) > const Duration(milliseconds: 100)) {
-            _lastUpdate = DateTime.now();
-            state = AsyncData(value != serviceSingboxOptions);
-          }
+    ref.listen(ConfigOptions.singboxConfigOptions, (previous, next) {
+      if (!serviceRunning || serviceSingboxOptions == null) return;
+      if (next case AsyncData(:final value) when next != previous) {
+        if (_lastUpdate == null || DateTime.now().difference(_lastUpdate!) > const Duration(milliseconds: 100)) {
+          _lastUpdate = DateTime.now();
+          state = AsyncData(value != serviceSingboxOptions);
         }
-      },
-      fireImmediately: true,
-    );
+      }
+    }, fireImmediately: true);
     return false;
   }
 
@@ -70,7 +66,9 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
       ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
       return true;
     } on PlatformException {
-      ref.read(inAppNotificationControllerProvider).showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
+      ref
+          .read(inAppNotificationControllerProvider)
+          .showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
       return false;
     } catch (e, st) {
       loggy.warning("error exporting config options to clipboard", e, st);

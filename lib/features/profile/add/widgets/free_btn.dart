@@ -30,9 +30,7 @@ class FreeBtn extends ConsumerWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: borderRadius,
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant,
-            ),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -46,9 +44,7 @@ class FreeBtn extends ConsumerWidget {
                         isFa ? freeProfile.title.fa : freeProfile.title.en,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall!.copyWith(
-                          color: theme.colorScheme.onSurface,
-                        ),
+                        style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface),
                       ),
                     ),
                     if (freeProfile.neededFeatures != null)
@@ -56,15 +52,9 @@ class FreeBtn extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (freeProfile.neededFeatures!.contains('warp_over_proxies'))
-                            Feature(
-                              title: t.common.warp,
-                              icon: Icons.add_moderator,
-                            ),
+                            Feature(title: t.common.warp, icon: Icons.add_moderator),
                           if (freeProfile.neededFeatures!.contains('fragment'))
-                            Feature(
-                              title: t.common.fragment,
-                              icon: Icons.content_cut,
-                            ),
+                            Feature(title: t.common.fragment, icon: Icons.content_cut),
                         ],
                       ),
                   ],
@@ -72,9 +62,7 @@ class FreeBtn extends ConsumerWidget {
               ),
               CustomTextScroll(
                 isFa ? freeProfile.tags.fa.join(' · ') : freeProfile.tags.en.join(' · '),
-                style: theme.textTheme.labelMedium!.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+                style: theme.textTheme.labelMedium!.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
             ],
           ),
@@ -96,18 +84,9 @@ class Feature extends ConsumerWidget {
     final color = theme.colorScheme.primary;
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 12,
-          color: theme.colorScheme.primary,
-        ),
+        Icon(icon, size: 12, color: theme.colorScheme.primary),
         const Gap(4),
-        Text(
-          title,
-          style: theme.textTheme.labelSmall!.copyWith(
-            color: color,
-          ),
-        ),
+        Text(title, style: theme.textTheme.labelSmall!.copyWith(color: color)),
       ],
     );
   }

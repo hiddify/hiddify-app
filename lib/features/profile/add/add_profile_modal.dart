@@ -57,7 +57,9 @@ class AddProfileOptions extends HookConsumerWidget {
     final isDesktop = PlatformUtils.isDesktop;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final fixBtnsHeight = (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * AddProfileModalConst.fixBtnsGapCount) / AddProfileModalConst.fixBtnsItemCount;
+        final fixBtnsHeight =
+            (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * AddProfileModalConst.fixBtnsGapCount) /
+            AddProfileModalConst.fixBtnsItemCount;
         final fullHeight = fixBtnsHeight + AddProfileModalConst.navBarHeight + 32;
         final initial = !freeSwitch ? fullHeight : fullHeight + 180;
         var min = !freeSwitch ? fullHeight : fullHeight + 100;
@@ -131,13 +133,22 @@ class AddProfileManual extends HookConsumerWidget {
             child: Row(
               children: [
                 Expanded(child: Text(t.common.manually, style: theme.textTheme.headlineMedium)),
-                IconButton(icon: const Icon(Icons.close), onPressed: () => ref.read(addProfilePageNotifierProvider.notifier).goOptions()),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => ref.read(addProfilePageNotifierProvider.notifier).goOptions(),
+                ),
               ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: CustomTextFormField(maxLines: 1, controller: nameTextController, validator: (value) => (value?.isEmpty ?? true) ? t.pages.profileDetails.form.emptyName : null, label: t.common.name, hint: t.pages.profileDetails.form.nameHint),
+            child: CustomTextFormField(
+              maxLines: 1,
+              controller: nameTextController,
+              validator: (value) => (value?.isEmpty ?? true) ? t.pages.profileDetails.form.emptyName : null,
+              label: t.common.name,
+              hint: t.pages.profileDetails.form.nameHint,
+            ),
           ),
           const Gap(16),
           Padding(
@@ -152,7 +163,10 @@ class AddProfileManual extends HookConsumerWidget {
           ),
           const Gap(12),
           SwitchListTile.adaptive(
-            title: Text(t.pages.profileDetails.form.disableAutoUpdate, style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface)),
+            title: Text(
+              t.pages.profileDetails.form.disableAutoUpdate,
+              style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface),
+            ),
             value: isAutoUpdateDisable.value,
             onChanged: (value) => isAutoUpdateDisable.value = value,
           ),
@@ -170,16 +184,29 @@ class AddProfileManual extends HookConsumerWidget {
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(t.pages.profileDetails.form.autoUpdateInterval, style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface)),
+                              child: Text(
+                                t.pages.profileDetails.form.autoUpdateInterval,
+                                style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface),
+                              ),
                             ),
-                            Text(_genSliderText(t, updateInterval.value.round()), style: theme.textTheme.labelSmall!.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                            Text(
+                              _genSliderText(t, updateInterval.value.round()),
+                              style: theme.textTheme.labelSmall!.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                            ),
                           ],
                         ),
                       ),
                       const Gap(4),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Slider(focusNode: sliderFocusNode, value: updateInterval.value, max: 96, divisions: 96, label: updateInterval.value.round().toString(), onChanged: (double value) => updateInterval.value = value),
+                        child: Slider(
+                          focusNode: sliderFocusNode,
+                          value: updateInterval.value,
+                          max: 96,
+                          divisions: 96,
+                          label: updateInterval.value.round().toString(),
+                          onChanged: (double value) => updateInterval.value = value,
+                        ),
                       ),
                     ],
                   )
@@ -201,7 +228,11 @@ class AddProfileManual extends HookConsumerWidget {
                             .read(addProfileNotifierProvider.notifier)
                             .addManual(
                               url: urlTextController.text.trim(),
-                              userOverride: UserOverride(name: nameTextController.text.trim(), isAutoUpdateDisable: isAutoUpdateDisable.value, updateInterval: interval),
+                              userOverride: UserOverride(
+                                name: nameTextController.text.trim(),
+                                isAutoUpdateDisable: isAutoUpdateDisable.value,
+                                updateInterval: interval,
+                              ),
                             );
                       }
                     },

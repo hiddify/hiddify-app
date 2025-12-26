@@ -28,12 +28,24 @@ class ProfilesPage extends HookConsumerWidget {
       appBar: AppBar(
         title: Text(t.pages.profiles.title),
         actions: [
-          IconButton(onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(), icon: const Icon(Icons.update_rounded), tooltip: t.pages.profiles.updateSubscriptions),
-          IconButton(onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(), icon: const Icon(Icons.sort_rounded), tooltip: t.common.sort),
+          IconButton(
+            onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
+            icon: const Icon(Icons.update_rounded),
+            tooltip: t.pages.profiles.updateSubscriptions,
+          ),
+          IconButton(
+            onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
+            icon: const Icon(Icons.sort_rounded),
+            tooltip: t.common.sort,
+          ),
           const Gap(8),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(onPressed: () async => await ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(), label: Text(t.pages.profiles.add), icon: const Icon(Icons.add_rounded)),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async => await ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
+        label: Text(t.pages.profiles.add),
+        icon: const Icon(Icons.add_rounded),
+      ),
       body: asyncProfiles.when(
         data: (data) => ListView.separated(
           padding: const EdgeInsets.all(12).copyWith(bottom: 84),

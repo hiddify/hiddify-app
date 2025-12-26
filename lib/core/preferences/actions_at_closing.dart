@@ -6,8 +6,8 @@ enum ActionsAtClosing {
   exit;
 
   String present(TranslationsEn t) => switch (this) {
-        ask => t.dialogs.windowClosing.askEachTime,
-        hide => t.common.hide,
-        exit => t.common.exit,
-      };
+    ask => t.dialogs.windowClosing.askEachTime,
+    hide => t.common.hide,
+    exit => t.common.exit,
+  };
 }

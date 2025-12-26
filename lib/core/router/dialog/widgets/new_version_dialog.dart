@@ -8,12 +8,7 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class NewVersionDialog extends HookConsumerWidget with PresLogger {
-  NewVersionDialog(
-    this.currentVersion,
-    this.newVersion, {
-    super.key,
-    this.canIgnore = true,
-  });
+  NewVersionDialog(this.currentVersion, this.newVersion, {super.key, this.canIgnore = true});
 
   final String currentVersion;
   final RemoteVersionEntity newVersion;
@@ -35,28 +30,16 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
           Text.rich(
             TextSpan(
               children: [
-                TextSpan(
-                  text: t.dialogs.newVersion.currentVersion,
-                  style: theme.textTheme.bodySmall,
-                ),
-                TextSpan(
-                  text: currentVersion,
-                  style: theme.textTheme.labelMedium,
-                ),
+                TextSpan(text: t.dialogs.newVersion.currentVersion, style: theme.textTheme.bodySmall),
+                TextSpan(text: currentVersion, style: theme.textTheme.labelMedium),
               ],
             ),
           ),
           Text.rich(
             TextSpan(
               children: [
-                TextSpan(
-                  text: t.dialogs.newVersion.newVersion,
-                  style: theme.textTheme.bodySmall,
-                ),
-                TextSpan(
-                  text: newVersion.presentVersion,
-                  style: theme.textTheme.labelMedium,
-                ),
+                TextSpan(text: t.dialogs.newVersion.newVersion, style: theme.textTheme.bodySmall),
+                TextSpan(text: newVersion.presentVersion, style: theme.textTheme.labelMedium),
               ],
             ),
           ),
@@ -71,10 +54,7 @@ class NewVersionDialog extends HookConsumerWidget with PresLogger {
             },
             child: Text(t.common.ignore),
           ),
-        TextButton(
-          onPressed: context.pop,
-          child: Text(t.common.later),
-        ),
+        TextButton(onPressed: context.pop, child: Text(t.common.later)),
         TextButton(
           onPressed: () async {
             await UriUtils.tryLaunch(Uri.parse(newVersion.url));

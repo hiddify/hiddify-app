@@ -30,16 +30,13 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   late HelloClient helloClient;
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
-    await methodChannel.invokeMethod(
-      "setup",
-      {
-        "baseDir": directories.baseDir.path,
-        "workingDir": directories.workingDir.path,
-        "tempDir": directories.tempDir.path,
-        "grpcPort": portFront,
-        "mode": mode,
-      },
-    );
+    await methodChannel.invokeMethod("setup", {
+      "baseDir": directories.baseDir.path,
+      "workingDir": directories.workingDir.path,
+      "tempDir": directories.tempDir.path,
+      "grpcPort": portFront,
+      "mode": mode,
+    });
     // serverPublicKey = await methodChannel.invokeMethod<Uint8List>("get_grpc_server_public_key") ?? Uint8List.fromList([]);
     // await methodChannel.invokeMethod(
     //   "add_grpc_client_public_key",
@@ -52,19 +49,34 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     //   credentials: MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientPrivateKey: cert.privateKey as ECPrivateKey),
     // );
     final channelOption = [1, 2].contains(mode)
-        ? MTLSChannelCredentials(
-            serverPublicKey: serverPublicKey,
-            clientKey: cert,
-          )
+        ? MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientKey: cert)
         : const ChannelCredentials.insecure();
 
-    helloClient = HelloClient(ClientChannel('127.0.0.1', port: portFront, options: ChannelOptions(credentials: channelOption)));
+    helloClient = HelloClient(
+      ClientChannel(
+        '127.0.0.1',
+        port: portFront,
+        options: ChannelOptions(credentials: channelOption),
+      ),
+    );
     final res = await helloClient.sayHello(HelloRequest(name: "test"));
 
     loggy.info(res.toString());
-    fgClient = CoreClient(ClientChannel('127.0.0.1', port: portFront, options: ChannelOptions(credentials: channelOption)));
+    fgClient = CoreClient(
+      ClientChannel(
+        '127.0.0.1',
+        port: portFront,
+        options: ChannelOptions(credentials: channelOption),
+      ),
+    );
 
-    bgClient = CoreClient(ClientChannel('127.0.0.1', port: portBack, options: ChannelOptions(credentials: channelOption)));
+    bgClient = CoreClient(
+      ClientChannel(
+        '127.0.0.1',
+        port: portBack,
+        options: ChannelOptions(credentials: channelOption),
+      ),
+    );
     // await start("/sdcard/Android/data/app.hiddify.com/files/configs/cdc633e9-8cfc-4a67-948d-009f779a5c91.json", "hiddify");
     return "";
   }
@@ -74,15 +86,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     await stop();
     if (!await waitUntilPort(portBack, false)) return false;
 
-    await methodChannel.invokeMethod(
-      "start",
-      {
-        "path": path,
-        "name": name,
-        "grpcPort": portBack,
-        "startBg": true,
-      },
-    );
+    await methodChannel.invokeMethod("start", {"path": path, "name": name, "grpcPort": portBack, "startBg": true});
     if (!await waitUntilPort(portBack, true)) return false;
     _isBgClientAvailable = true;
     return true;
@@ -112,13 +116,9 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 
   @override
   Future<bool> stop() async {
-    await methodChannel.invokeMethod(
-      "stop",
-    );
+    await methodChannel.invokeMethod("stop");
     // if (!await waitUntilPort(portBack, false)) {
-    await methodChannel.invokeMethod(
-      "stop",
-    );
+    await methodChannel.invokeMethod("stop");
     _isBgClientAvailable = false;
     return true;
     // return false;

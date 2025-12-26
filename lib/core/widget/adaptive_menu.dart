@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-typedef AdaptiveMenuBuilder = Widget Function(
-  BuildContext context,
-  void Function() toggleVisibility,
-  Widget? child,
-);
+typedef AdaptiveMenuBuilder = Widget Function(BuildContext context, void Function() toggleVisibility, Widget? child);
 
 class AdaptiveMenuItem<T> {
-  AdaptiveMenuItem({
-    required this.title,
-    this.icon,
-    this.onTap,
-    this.isSelected,
-    this.subItems,
-  });
+  AdaptiveMenuItem({required this.title, this.icon, this.onTap, this.isSelected, this.subItems});
 
   final String title;
   final IconData? icon;
@@ -22,7 +12,8 @@ class AdaptiveMenuItem<T> {
   final bool? isSelected;
   final List<AdaptiveMenuItem>? subItems;
 
-  (String, IconData?, T Function()?, bool?, List<AdaptiveMenuItem>?) _equality() => (title, icon, onTap, isSelected, subItems);
+  (String, IconData?, T Function()?, bool?, List<AdaptiveMenuItem>?) _equality() =>
+      (title, icon, onTap, isSelected, subItems);
 
   @override
   bool operator ==(covariant AdaptiveMenuItem other) {
@@ -35,12 +26,7 @@ class AdaptiveMenuItem<T> {
 }
 
 class AdaptiveMenu extends HookConsumerWidget {
-  const AdaptiveMenu({
-    super.key,
-    required this.items,
-    required this.builder,
-    required this.child,
-  });
+  const AdaptiveMenu({super.key, required this.items, required this.builder, required this.child});
 
   final Iterable<AdaptiveMenuItem> items;
   final AdaptiveMenuBuilder builder;
@@ -74,17 +60,13 @@ class AdaptiveMenu extends HookConsumerWidget {
     }
 
     return MenuAnchor(
-      builder: (context, controller, child) => builder(
-        context,
-        () {
-          if (controller.isOpen) {
-            controller.close();
-          } else {
-            controller.open();
-          }
-        },
-        child,
-      ),
+      builder: (context, controller, child) => builder(context, () {
+        if (controller.isOpen) {
+          controller.close();
+        } else {
+          controller.open();
+        }
+      }, child),
       menuChildren: buildMenuItems(items),
       child: child,
     );

@@ -8,12 +8,7 @@ import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProxyTile extends HookConsumerWidget with PresLogger {
-  const ProxyTile(
-    this.proxy, {
-    super.key,
-    required this.selected,
-    required this.onTap,
-  });
+  const ProxyTile(this.proxy, {super.key, required this.selected, required this.onTap});
 
   final OutboundInfo proxy;
   final bool selected;
@@ -65,8 +60,16 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
 
   Color delayColor(BuildContext context, int delay) {
     if (Theme.of(context).brightness == Brightness.dark) {
-      return switch (delay) { < 800 => Colors.lightGreen, < 1500 => Colors.orange, _ => Colors.redAccent };
+      return switch (delay) {
+        < 800 => Colors.lightGreen,
+        < 1500 => Colors.orange,
+        _ => Colors.redAccent,
+      };
     }
-    return switch (delay) { < 800 => Colors.green, < 1500 => Colors.deepOrangeAccent, _ => Colors.red };
+    return switch (delay) {
+      < 800 => Colors.green,
+      < 1500 => Colors.deepOrangeAccent,
+      _ => Colors.red,
+    };
   }
 }

@@ -13,10 +13,7 @@ class SliverBodyPlaceholder extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SliverFillRemaining(
       hasScrollBody: false,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: children,
-      ),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: children),
     );
   }
 }
@@ -28,20 +25,13 @@ class SliverLoadingBodyPlaceholder extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return const SliverFillRemaining(
       hasScrollBody: false,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [CircularProgressIndicator()],
-      ),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [CircularProgressIndicator()]),
     );
   }
 }
 
 class SliverErrorBodyPlaceholder extends HookConsumerWidget {
-  const SliverErrorBodyPlaceholder(
-    this.msg, {
-    super.key,
-    this.icon = FluentIcons.error_circle_24_regular,
-  });
+  const SliverErrorBodyPlaceholder(this.msg, {super.key, this.icon = FluentIcons.error_circle_24_regular});
 
   final String msg;
   final IconData? icon;
@@ -53,10 +43,7 @@ class SliverErrorBodyPlaceholder extends HookConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (icon != null) ...[
-            Icon(icon),
-            const Gap(16),
-          ],
+          if (icon != null) ...[Icon(icon), const Gap(16)],
           Text(msg),
         ],
       ),

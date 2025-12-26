@@ -24,8 +24,8 @@ const ResponseCode$json = {
 };
 
 /// Descriptor for `ResponseCode`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List responseCodeDescriptor = $convert.base64Decode(
-    'CgxSZXNwb25zZUNvZGUSBgoCT0sQABIKCgZGQUlMRUQQARINCglBVVRIX05FRUQQAg==');
+final $typed_data.Uint8List responseCodeDescriptor =
+    $convert.base64Decode('CgxSZXNwb25zZUNvZGUSBgoCT0sQABIKCgZGQUlMRUQQARINCglBVVRIX05FRUQQAg==');
 
 @$core.Deprecated('Use emptyDescriptor instead')
 const Empty$json = {
@@ -33,8 +33,7 @@ const Empty$json = {
 };
 
 /// Descriptor for `Empty`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List emptyDescriptor = $convert.base64Decode(
-    'CgVFbXB0eQ==');
+final $typed_data.Uint8List emptyDescriptor = $convert.base64Decode('CgVFbXB0eQ==');
 
 @$core.Deprecated('Use responseDescriptor instead')
 const Response$json = {
@@ -46,7 +45,6 @@ const Response$json = {
 };
 
 /// Descriptor for `Response`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List responseDescriptor = $convert.base64Decode(
-    'CghSZXNwb25zZRIoCgRjb2RlGAEgASgOMhQuY29tbW9uLlJlc3BvbnNlQ29kZVIEY29kZRIYCg'
-    'dtZXNzYWdlGAIgASgJUgdtZXNzYWdl');
-
+final $typed_data.Uint8List responseDescriptor =
+    $convert.base64Decode('CghSZXNwb25zZRIoCgRjb2RlGAEgASgOMhQuY29tbW9uLlJlc3BvbnNlQ29kZVIEY29kZRIYCg'
+        'dtZXNzYWdlGAIgASgJUgdtZXNzYWdl');

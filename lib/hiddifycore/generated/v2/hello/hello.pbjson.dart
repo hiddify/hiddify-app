@@ -8,6 +8,7 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
+
 @$core.Deprecated('Use helloRequestDescriptor instead')
 const HelloRequest$json = const {
   '1': 'HelloRequest',
@@ -17,7 +18,8 @@ const HelloRequest$json = const {
 };
 
 /// Descriptor for `HelloRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List helloRequestDescriptor = $convert.base64Decode('CgxIZWxsb1JlcXVlc3QSEgoEbmFtZRgBIAEoCVIEbmFtZQ==');
+final $typed_data.Uint8List helloRequestDescriptor =
+    $convert.base64Decode('CgxIZWxsb1JlcXVlc3QSEgoEbmFtZRgBIAEoCVIEbmFtZQ==');
 @$core.Deprecated('Use helloResponseDescriptor instead')
 const HelloResponse$json = const {
   '1': 'HelloResponse',
@@ -27,4 +29,5 @@ const HelloResponse$json = const {
 };
 
 /// Descriptor for `HelloResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List helloResponseDescriptor = $convert.base64Decode('Cg1IZWxsb1Jlc3BvbnNlEhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2U=');
+final $typed_data.Uint8List helloResponseDescriptor =
+    $convert.base64Decode('Cg1IZWxsb1Jlc3BvbnNlEhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2U=');

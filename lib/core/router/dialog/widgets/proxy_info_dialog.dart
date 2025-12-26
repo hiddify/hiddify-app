@@ -18,12 +18,7 @@ class ProxyInfoDialog extends HookConsumerWidget {
     return AlertDialog(
       title: SelectionArea(child: Text(outboundInfo.tagDisplay)),
       content: OutboundInfoWidget(outboundInfo: outboundInfo),
-      actions: [
-        TextButton(
-          onPressed: context.pop,
-          child: Text(t.common.close),
-        ),
-      ],
+      actions: [TextButton(onPressed: context.pop, child: Text(t.common.close))],
     );
   }
 }
@@ -45,7 +40,10 @@ class OutboundInfoWidget extends HookConsumerWidget {
           // SizedBox(height: 16.0),
           _buildInfoRow(t.dialogs.proxyInfo.fullTag, outboundInfo.tag),
           _buildInfoRow(t.dialogs.proxyInfo.type, outboundInfo.type),
-          _buildInfoRow(t.dialogs.proxyInfo.testTime, DateFormat('yyyy-MM-dd HH:mm:ss').format(outboundInfo.urlTestTime.toDateTime().toLocal())),
+          _buildInfoRow(
+            t.dialogs.proxyInfo.testTime,
+            DateFormat('yyyy-MM-dd HH:mm:ss').format(outboundInfo.urlTestTime.toDateTime().toLocal()),
+          ),
           _buildInfoRow(t.dialogs.proxyInfo.testDelay, '${outboundInfo.urlTestDelay} ms'),
           _buildIpInfo(outboundInfo.ipinfo, ref),
           _buildInfoRow(t.dialogs.proxyInfo.isSelected, outboundInfo.isSelected ? '✅' : '❌'),
@@ -71,12 +69,17 @@ class OutboundInfoWidget extends HookConsumerWidget {
           Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(width: 8.0),
           Flexible(
-              child: onTap != null
-                  ? GestureDetector(
-                      onTap: onTap,
-                      child: SelectableText(value, textAlign: TextAlign.right, style: const TextStyle(decoration: TextDecoration.underline)),
-                    )
-                  : SelectableText(value, textAlign: TextAlign.right)),
+            child: onTap != null
+                ? GestureDetector(
+                    onTap: onTap,
+                    child: SelectableText(
+                      value,
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(decoration: TextDecoration.underline),
+                    ),
+                  )
+                : SelectableText(value, textAlign: TextAlign.right),
+          ),
         ],
       ),
     );
@@ -100,7 +103,11 @@ class OutboundInfoWidget extends HookConsumerWidget {
           t.dialogs.proxyInfo.location,
           "${ipInfo.latitude}, ${ipInfo.longitude}",
           onTap: () => launchUrl(
-            Uri.parse(!PlatformUtils.isInAppStore ? 'https://maps.apple.com/?ll=${ipInfo.latitude},${ipInfo.longitude}' : 'https://www.google.com/maps/@${ipInfo.latitude},${ipInfo.longitude},18z'),
+            Uri.parse(
+              !PlatformUtils.isInAppStore
+                  ? 'https://maps.apple.com/?ll=${ipInfo.latitude},${ipInfo.longitude}'
+                  : 'https://www.google.com/maps/@${ipInfo.latitude},${ipInfo.longitude},18z',
+            ),
           ),
         ),
         _buildInfoRow(t.dialogs.proxyInfo.postalCode, ipInfo.postalCode),

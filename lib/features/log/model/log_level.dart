@@ -18,12 +18,12 @@ enum LogLevel {
   static List<LogLevel> get choices => values.takeFirst(4);
 
   Color? get color => switch (this) {
-        trace => Colors.lightBlueAccent,
-        debug => Colors.grey,
-        info => Colors.lightGreen,
-        warn => Colors.orange,
-        error => Colors.redAccent,
-        fatal => Colors.red,
-        panic => Colors.red,
-      };
+    trace => Colors.lightBlueAccent,
+    debug => Colors.grey,
+    info => Colors.lightGreen,
+    warn => Colors.orange,
+    error => Colors.redAccent,
+    fatal => Colors.red,
+    panic => Colors.red,
+  };
 }

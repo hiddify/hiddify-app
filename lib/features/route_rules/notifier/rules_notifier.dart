@@ -77,7 +77,9 @@ class RulesNotifier extends _$RulesNotifier with AppLogger {
       ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
       return true;
     } on PlatformException {
-      ref.read(inAppNotificationControllerProvider).showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
+      ref
+          .read(inAppNotificationControllerProvider)
+          .showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
       return false;
     } catch (e, st) {
       loggy.warning("error exporting route rules to clipboard", e, st);
@@ -164,9 +166,7 @@ class RulesNotifier extends _$RulesNotifier with AppLogger {
       await file.parent.create(recursive: true);
     }
     final sortedRules = state..sort((a, b) => a.listOrder.compareTo(b.listOrder));
-    final routeRules = RouteRule(
-      rules: sortedRules,
-    );
+    final routeRules = RouteRule(rules: sortedRules);
     await file.writeAsBytes(routeRules.writeToBuffer());
   }
 

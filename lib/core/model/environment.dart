@@ -20,5 +20,6 @@ enum Release {
 
   bool get allowCustomUpdateChecker => this == general;
 
-  static Release read() => Release.values.firstOrNullWhere((e) => e.key == const String.fromEnvironment("release")) ?? Release.general;
+  static Release read() =>
+      Release.values.firstOrNullWhere((e) => e.key == const String.fromEnvironment("release")) ?? Release.general;
 }

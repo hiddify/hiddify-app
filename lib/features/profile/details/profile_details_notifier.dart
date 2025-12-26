@@ -20,17 +20,14 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
 
   @override
   Future<ProfileDetailsState> build(String id) async {
-    final prof = (await _profilesRepo.getById(id).run()).match(
-      (l) => throw l,
-      (prof) {
-        // _originalProfile = prof;
-        if (prof == null) {
-          loggy.warning('profile with id: [$id] does not exist');
-          throw const ProfileNotFoundFailure();
-        }
-        return prof;
-      },
-    );
+    final prof = (await _profilesRepo.getById(id).run()).match((l) => throw l, (prof) {
+      // _originalProfile = prof;
+      if (prof == null) {
+        loggy.warning('profile with id: [$id] does not exist');
+        throw const ProfileNotFoundFailure();
+      }
+      return prof;
+    });
 
     var profContent = (await _profilesRepo.generateConfig(id).run()).match(
       (l) => throw Exception('Failed to generate config: $l'),
@@ -41,7 +38,10 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
       final List<Map<String, dynamic>> res = [];
       if (jsonObject is Map<String, dynamic> && jsonObject['outbounds'] is List) {
         for (final outbound in jsonObject['outbounds'] as List<dynamic>) {
-          if (outbound is Map<String, dynamic> && outbound['type'] != null && !['selector', 'urltest', 'dns', 'block'].contains(outbound['type']) && !['direct', 'bypass', 'direct-fragment'].contains(outbound['tag'])) {
+          if (outbound is Map<String, dynamic> &&
+              outbound['type'] != null &&
+              !['selector', 'urltest', 'dns', 'block'].contains(outbound['type']) &&
+              !['direct', 'bypass', 'direct-fragment'].contains(outbound['tag'])) {
             res.add(outbound);
           }
         }
@@ -74,22 +74,14 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
   void setUserOverride(UserOverride userOverride) {
     if (state case AsyncData(value: final ProfileDetailsState data)) {
       state = AsyncData(
-        data.copyWith(
-          profile: data.profile.copyWith(userOverride: userOverride),
-          isDetailsChanged: true,
-        ),
+        data.copyWith(profile: data.profile.copyWith(userOverride: userOverride), isDetailsChanged: true),
       );
     }
   }
 
   void setContent(String configContent) {
     if (state case AsyncData(value: final ProfileDetailsState data)) {
-      state = AsyncData(
-        data.copyWith(
-          configContent: configContent,
-          isDetailsChanged: true,
-        ),
-      );
+      state = AsyncData(data.copyWith(configContent: configContent, isDetailsChanged: true));
     }
   }
 
@@ -98,21 +90,22 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
     if (state case AsyncData(:final value)) {
       if (value.loadingState case AsyncLoading()) return false;
 
-      success = await doAsync<bool>(
-            () async {
-              final t = await ref.read(translationsProvider.future);
-              return (await _profilesRepo.offlineUpdate(value.profile, value.configContent).run()).match(
-                (l) async {
-                  await ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(l, action: t.pages.profiles.msg.update.failure));
-                  return false;
-                },
-                (r) {
-                  ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.update.success);
-                  return true;
-                },
-              );
-            },
-          ) ??
+      success =
+          await doAsync<bool>(() async {
+            final t = await ref.read(translationsProvider.future);
+            return (await _profilesRepo.offlineUpdate(value.profile, value.configContent).run()).match(
+              (l) async {
+                await ref
+                    .read(dialogNotifierProvider.notifier)
+                    .showCustomAlertFromErr(t.presentError(l, action: t.pages.profiles.msg.update.failure));
+                return false;
+              },
+              (r) {
+                ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.update.success);
+                return true;
+              },
+            );
+          }) ??
           false;
     }
     return success;

@@ -81,7 +81,9 @@ class SettingInputDialog<T> extends HookConsumerWidget with PresLogger {
               // Callback to fetch suggestions based on user input
               suggestionsCallback: (pattern) {
                 final items = possibleValues!.map((p) => p.toString());
-                var res = items.where((suggestion) => suggestion.toLowerCase().contains(pattern.toLowerCase())).toList();
+                var res = items
+                    .where((suggestion) => suggestion.toLowerCase().contains(pattern.toLowerCase()))
+                    .toList();
                 if (res.length <= 1) res = [pattern, ...items.where((s) => s != pattern)];
                 return res;
               },

@@ -25,8 +25,14 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
     if (PlatformUtils.isIOS) {
       final paths = await _methodChannel.invokeMethod<Map>("get_paths");
       loggy.debug("paths: $paths");
-      dirs = (baseDir: Directory(paths?["base"]! as String), workingDir: Directory(paths?["working"]! as String), tempDir: Directory(paths?["temp"]! as String));
-    } else if (PlatformUtils.isWindows && Environment.isPortable && await checkDirectoryAccess(getPortableDirectory())) {
+      dirs = (
+        baseDir: Directory(paths?["base"]! as String),
+        workingDir: Directory(paths?["working"]! as String),
+        tempDir: Directory(paths?["temp"]! as String),
+      );
+    } else if (PlatformUtils.isWindows &&
+        Environment.isPortable &&
+        await checkDirectoryAccess(getPortableDirectory())) {
       final portableDir = getPortableDirectory();
       dirs = (baseDir: portableDir, workingDir: portableDir, tempDir: await getTemporaryDirectory());
     } else {
@@ -52,7 +58,9 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
     }
     if (PlatformUtils.isIOS || PlatformUtils.isMacOS) {
       return await getLibraryDirectory();
-    } else if (PlatformUtils.isWindows && Environment.isPortable && await checkDirectoryAccess(getPortableDirectory())) {
+    } else if (PlatformUtils.isWindows &&
+        Environment.isPortable &&
+        await checkDirectoryAccess(getPortableDirectory())) {
       final portableDir = getPortableDirectory();
       return portableDir;
     } else if (PlatformUtils.isWindows || PlatformUtils.isLinux) {
