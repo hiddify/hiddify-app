@@ -7,6 +7,6 @@
     <!-- Filled rectangle -->
     <path
         android:pathData="M0,0 L2048,0 L2048,2048 L0,2048 Z"
-        android:fillColor="#FFF0F3FA" />
+        android:fillColor="#3E2723" />
   </group>
 </vector>
