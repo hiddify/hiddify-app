@@ -15,6 +15,7 @@ import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/settings/overview/settings_overview_page.dart';
+import 'package:hiddify/features/subscription_guard/widget/subscription_gate_screen.dart';
 import 'package:hiddify/utils/utils.dart';
 
 part 'routes.g.dart';
@@ -157,6 +158,21 @@ class IntroRoute extends GoRouteData {
       fullscreenDialog: true,
       name: name,
       child: IntroPage(),
+    );
+  }
+}
+
+@TypedGoRoute<SubscriptionGateRoute>(path: "/subscription-gate", name: SubscriptionGateRoute.name)
+class SubscriptionGateRoute extends GoRouteData {
+  const SubscriptionGateRoute();
+  static const name = "Subscription Gate";
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return const MaterialPage(
+      fullscreenDialog: true,
+      name: name,
+      child: SubscriptionGateScreen(),
     );
   }
 }
