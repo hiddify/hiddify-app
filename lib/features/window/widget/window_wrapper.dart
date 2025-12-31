@@ -72,6 +72,26 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
   }
 
   @override
+  Future<void> onWindowResized() async {
+    await ref.read(windowNotifierProvider.notifier).saveWindowState();
+  }
+
+  @override
+  Future<void> onWindowMoved() async {
+    await ref.read(windowNotifierProvider.notifier).saveWindowState();
+  }
+
+  @override
+  Future<void> onWindowMaximize() async {
+    await ref.read(windowNotifierProvider.notifier).saveWindowState();
+  }
+
+  @override
+  Future<void> onWindowUnmaximize() async {
+    await ref.read(windowNotifierProvider.notifier).saveWindowState();
+  }
+
+  @override
   void onWindowFocus() {
     setState(() {});
   }
