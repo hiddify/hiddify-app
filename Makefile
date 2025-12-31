@@ -229,7 +229,7 @@ android-release: android-release-apk android-release-aab
 android-release-apk:
 	fastforge package \
 	  --platform android \
-	  --targets apk,zip \
+	  --targets apk \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
 	  --build-target-platform=android-arm,android-arm64,android-x64 \
