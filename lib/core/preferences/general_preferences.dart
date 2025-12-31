@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/model/region.dart';
@@ -7,6 +8,7 @@ import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -49,6 +51,32 @@ abstract class Preferences {
   static final excludeApps = PreferencesNotifier.create<List<String>, List<String>>(
     "per_app_proxy_exclude_list",
     <String>[],
+  );
+
+  static final windowMaximized = PreferencesNotifier.create<bool, bool>("window_maximized", false);
+
+  static final windowPosition = PreferencesNotifier.create<Offset?, String?>(
+    "window_position",
+    null,
+    mapFrom: (value) {
+      if (value == null) return null;
+      final list = value.split(',').map((e) => double.tryParse(e)).toList();
+      return Offset(list[0]!, list[1]!);
+    },
+    mapTo: (value) {
+      if (value == null) return null;
+      return "${value.dx},${value.dy}";
+    },
+  );
+
+  static final windowSize = PreferencesNotifier.create<Size, String>(
+    "window_size",
+    defaultWindowSize,
+    mapFrom: (value) {
+      final list = value.split(',').map((e) => double.tryParse(e)).toList();
+      return Size(list[0]!, list[1]!);
+    },
+    mapTo: (value) => "${value.width},${value.height}",
   );
 
   static final silentStart = PreferencesNotifier.create<bool, bool>("silent_start", false);
