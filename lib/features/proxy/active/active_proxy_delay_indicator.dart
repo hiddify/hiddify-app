@@ -35,14 +35,38 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
                 onTap: () async {
                   await ref.read(activeProxyNotifierProvider.notifier).urlTest(proxy.tag);
                 },
-                borderRadius: BorderRadius.circular(24),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: timeout ? theme.colorScheme.error : theme.colorScheme.primary,
+                      width: 2,
+                    ),
+                    gradient: LinearGradient(
+                      colors: [
+                        (timeout ? theme.colorScheme.error : theme.colorScheme.primary).withOpacity(0.1),
+                        (timeout ? theme.colorScheme.error : theme.colorScheme.primary).withOpacity(0.05),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: (timeout ? theme.colorScheme.error : theme.colorScheme.primary).withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(FluentIcons.wifi_1_24_regular),
-                      const Gap(8),
+                      Icon(
+                        FluentIcons.wifi_1_24_filled,
+                        color: timeout ? theme.colorScheme.error : theme.colorScheme.primary,
+                        size: 20,
+                      ),
+                      const Gap(12),
                       if (delay > 0)
                         Text.rich(
                           semanticsLabel: timeout ? t.proxies.delaySemantics.timeout : t.proxies.delaySemantics.result(delay: delay),

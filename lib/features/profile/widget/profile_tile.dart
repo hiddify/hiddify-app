@@ -51,18 +51,22 @@ class ProfileTile extends HookConsumerWidget {
     };
 
     final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
-    final double effectiveElevation = profile.active ? 12 : 4;
-    final effectiveOutlineColor = profile.active ? theme.colorScheme.outlineVariant : Colors.transparent;
+    final double effectiveElevation = profile.active ? 16 : 6;
+    final effectiveOutlineColor = profile.active ? theme.colorScheme.primary : theme.colorScheme.outline.withOpacity(0.3);
+    final effectiveShadowColor = profile.active ? theme.colorScheme.primary.withOpacity(0.3) : Colors.black.withOpacity(0.2);
 
     return Card(
       margin: effectiveMargin,
       elevation: effectiveElevation,
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: effectiveOutlineColor),
-        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: effectiveOutlineColor,
+          width: profile.active ? 2 : 1,
+        ),
+        borderRadius: BorderRadius.circular(4), // Sharp corners for Go-Bull
       ),
       clipBehavior: Clip.antiAlias,
-      shadowColor: Colors.transparent,
+      shadowColor: effectiveShadowColor,
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,

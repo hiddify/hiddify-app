@@ -128,26 +128,58 @@ class _ConnectionButton extends StatelessWidget {
           child: Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
+              // Go-Bull aggressive square design with sharp corners
+              borderRadius: BorderRadius.circular(24),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  buttonColor,
+                  buttonColor.withOpacity(0.7),
+                ],
+              ),
               boxShadow: [
                 BoxShadow(
-                  blurRadius: 16,
-                  color: buttonColor.withOpacity(0.5),
+                  blurRadius: 24,
+                  spreadRadius: 4,
+                  offset: const Offset(0, 8),
+                  color: buttonColor.withOpacity(0.4),
+                ),
+                BoxShadow(
+                  blurRadius: 8,
+                  color: buttonColor.withOpacity(0.6),
                 ),
               ],
+              border: Border.all(
+                color: buttonColor.withOpacity(0.3),
+                width: 2,
+              ),
             ),
-            width: 148,
-            height: 148,
+            width: 160,
+            height: 160,
             child: Material(
               key: const ValueKey("home_connection_button"),
-              shape: const CircleBorder(),
-              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              color: Colors.transparent,
               child: InkWell(
                 onTap: onTap,
-                child: Padding(
+                borderRadius: BorderRadius.circular(24),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withOpacity(0.15),
+                        Colors.white.withOpacity(0.05),
+                      ],
+                    ),
+                  ),
                   padding: const EdgeInsets.all(36),
                   child: TweenAnimationBuilder(
-                    tween: ColorTween(end: buttonColor),
+                    tween: ColorTween(end: Colors.white),
                     duration: const Duration(milliseconds: 250),
                     builder: (context, value, child) {
                       if (useImage) {
@@ -167,11 +199,14 @@ class _ConnectionButton extends StatelessWidget {
             ).animate(target: enabled ? 0 : 1).blurXY(end: 1),
           ).animate(target: enabled ? 0 : 1).scaleXY(end: .88, curve: Curves.easeIn),
         ),
-        const Gap(16),
+        const Gap(20),
         ExcludeSemantics(
           child: AnimatedText(
             label,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
           ),
         ),
       ],
