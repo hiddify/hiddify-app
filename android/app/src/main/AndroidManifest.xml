@@ -101,7 +101,7 @@
             android:name=".bg.TileService"
             android:directBootAware="true"
             android:exported="true"
-            android:icon="@drawable/ic_stat_logo"
+            android:icon="@mipmap/ic_launcher"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             tools:targetApi="n">
             <intent-filter>
