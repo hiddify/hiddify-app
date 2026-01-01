@@ -115,13 +115,14 @@ dev_dependencies:
   dart_mappable_builder: ^4.2.1
   flutter_launcher_icons: ^0.13.1
 
-flutter_launcher_icons:
-  android: true
-  ios: false
-  image_path: "go_bull_logo.png.jpg"
-  adaptive_icon_background: "#3E2723"
-  adaptive_icon_foreground: "go_bull_logo.png.jpg"
-  remove_alpha_ios: true
+# flutter_launcher_icons configuration (icons already generated)
+# flutter_launcher_icons:
+#   android: true
+#   ios: false
+#   image_path: "go_bull_logo.png.jpg"
+#   adaptive_icon_background: "#3E2723"
+#   adaptive_icon_foreground: "go_bull_logo.png.jpg"
+#   remove_alpha_ios: true
 
 dependency_overrides:
   # drift & package_info_plus are not compatible
