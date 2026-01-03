@@ -37,10 +37,11 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
         icon: const Icon(FluentIcons.box_edit_20_filled),
         label: t.config.pageTitle,
       ),
-      NavigationDestination(
-        icon: const Icon(FluentIcons.settings_20_filled),
-        label: t.settings.pageTitle,
-      ),
+      // Settings hidden for Go-Bull
+      // NavigationDestination(
+      //   icon: const Icon(FluentIcons.settings_20_filled),
+      //   label: t.settings.pageTitle,
+      // ),
       NavigationDestination(
         icon: const Icon(FluentIcons.document_text_20_filled),
         label: t.logs.pageTitle,

@@ -56,7 +56,8 @@ final tabLocations = [
   const HomeRoute().location,
   const ProxiesRoute().location,
   const ConfigOptionsRoute().location,
-  const SettingsRoute().location,
+  // Settings hidden for Go-Bull
+  // const SettingsRoute().location,
   const LogsOverviewRoute().location,
   const AboutRoute().location,
 ];
