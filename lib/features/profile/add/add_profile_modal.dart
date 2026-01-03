@@ -151,15 +151,29 @@ class AddProfileModal extends HookConsumerWidget {
                       children: [
                         Semantics(
                           button: true,
-                          child: SizedBox(
-                            height: 36,
+                          child: Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: theme.colorScheme.primary.withOpacity(0.3),
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: theme.colorScheme.primary.withOpacity(0.2),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
                             child: Material(
                               key: const ValueKey("add_warp_button"),
-                              elevation: 8,
+                              elevation: 0,
                               color: theme.colorScheme.surface,
                               surfaceTintColor: theme.colorScheme.surfaceTint,
                               shadowColor: Colors.transparent,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(4),
                               clipBehavior: Clip.antiAlias,
                               child: InkWell(
                                 onTap: () async {
@@ -169,7 +183,7 @@ class AddProfileModal extends HookConsumerWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
-                                      FluentIcons.add_24_regular,
+                                      FluentIcons.add_24_filled,
                                       color: theme.colorScheme.primary,
                                     ),
                                     const SizedBox(width: 8),
@@ -177,6 +191,7 @@ class AddProfileModal extends HookConsumerWidget {
                                       t.profile.add.addWarp,
                                       style: theme.textTheme.labelLarge?.copyWith(
                                         color: theme.colorScheme.primary,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -189,15 +204,29 @@ class AddProfileModal extends HookConsumerWidget {
                         if (!PlatformUtils.isDesktop)
                           Semantics(
                             button: true,
-                            child: SizedBox(
-                              height: 36,
+                            child: Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: theme.colorScheme.primary.withOpacity(0.3),
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: theme.colorScheme.primary.withOpacity(0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
                               child: Material(
                                 key: const ValueKey("add_manually_button"),
-                                elevation: 8,
+                                elevation: 0,
                                 color: theme.colorScheme.surface,
                                 surfaceTintColor: theme.colorScheme.surfaceTint,
                                 shadowColor: Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(4),
                                 clipBehavior: Clip.antiAlias,
                                 child: InkWell(
                                   onTap: () async {
@@ -208,7 +237,7 @@ class AddProfileModal extends HookConsumerWidget {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(
-                                        FluentIcons.add_24_regular,
+                                        FluentIcons.add_24_filled,
                                         color: theme.colorScheme.primary,
                                       ),
                                       const SizedBox(width: 8),
@@ -216,6 +245,7 @@ class AddProfileModal extends HookConsumerWidget {
                                         t.profile.add.manually,
                                         style: theme.textTheme.labelLarge?.copyWith(
                                           color: theme.colorScheme.primary,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],
@@ -303,15 +333,29 @@ class _Button extends StatelessWidget {
 
     return Semantics(
       button: true,
-      child: SizedBox(
+      child: Container(
         width: size,
         height: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: color.withOpacity(0.3),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Material(
-          elevation: 8,
+          elevation: 0,
           color: theme.colorScheme.surface,
           surfaceTintColor: theme.colorScheme.surfaceTint,
           shadowColor: Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(4),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
@@ -327,7 +371,10 @@ class _Button extends StatelessWidget {
                 Flexible(
                   child: Text(
                     label,
-                    style: theme.textTheme.labelLarge?.copyWith(color: color),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
