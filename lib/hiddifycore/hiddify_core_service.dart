@@ -6,12 +6,13 @@ import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
-import 'package:hiddify/singbox/model/singbox_status.dart';
+import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/singbox/model/warp_account.dart';
 
 import 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper_stub.dart' if (dart.library.io) 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper.dart';
@@ -26,8 +27,8 @@ class HiddifyCoreService with InfraLogger {
   // CoreHiddifyCoreService() {}
   CoreInterface core = getCoreInterface();
 
-  SingboxStatus currentState = const SingboxStatus.stopped();
-  final statusController = BehaviorSubject<SingboxStatus>();
+  CoreStatus currentState = const CoreStatus.stopped();
+  final statusController = BehaviorSubject<CoreStatus>();
   final logController = BehaviorSubject<List<LogMessage>>();
   final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 2000));
   final Map<String, StreamSubscription?> subscriptions = {};
@@ -36,7 +37,8 @@ class HiddifyCoreService with InfraLogger {
     statusController.add(currentState);
     if (ref == null) return;
     final dirs = ref.read(appDirectoriesProvider).requireValue;
-    setup(dirs, false)
+    final debug = ref.read(debugModeNotifierProvider);
+    setup(dirs, debug)
         .mapLeft((e) {
           loggy.error(e);
           ref.read(inAppNotificationControllerProvider).showErrorToast(e);
@@ -113,10 +115,13 @@ class HiddifyCoreService with InfraLogger {
 
   TaskEither<String, Unit> start(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
-      statusController.add(currentState = const SingboxStatus.starting());
+      statusController.add(currentState = const CoreStatus.starting());
       loggy.debug("starting");
 
-      if (!await core.start(path, name)) {}
+      if (await core.start(path, name) == const CoreStatus.stopped()) {
+        statusController.add(currentState = const CoreStatus.stopped());
+        return left("failed to start core");
+      }
       if (!core.isSingleChannel()) {
         await startListeningLogs("bg", core.bgClient);
         await startListeningStatus("bg", core.bgClient);
@@ -167,7 +172,7 @@ class HiddifyCoreService with InfraLogger {
         loggy.error("failed to stop bg core: $e");
       }
       if (!await core.stop()) {}
-      statusController.add(currentState = const SingboxStatus.stopped());
+      statusController.add(currentState = const CoreStatus.stopped());
 
       return right(unit);
     });
@@ -303,21 +308,21 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  Stream<SingboxStatus> watchStatus() async* {
-    yield* statusController.stream.endWith(const SingboxStatus.stopped());
+  Stream<CoreStatus> watchStatus() async* {
+    yield* statusController.stream.endWith(const CoreStatus.stopped());
   }
 
   Future<void> startListeningStatus(String key, CoreClient cc) async {
-    await listenSingle<SingboxStatus>(
+    await listenSingle<CoreStatus>(
       "${key}StatusListener",
       () => cc
           .coreInfoListener(Empty(), options: grpcOptions)
           .map((event) {
-            currentState = SingboxStatus.fromCoreInfo(event);
+            currentState = CoreStatus.fromCoreInfo(event);
             statusController.add(currentState);
             return currentState;
           })
-          .endWith(const SingboxStatus.stopped()),
+          .endWith(const CoreStatus.stopped()),
     );
   }
 
@@ -332,9 +337,9 @@ class HiddifyCoreService with InfraLogger {
         }
         logController.add(logBuffer);
         loggy.log(getLogLevel(event.level), event.message);
-        // event.message.split('\n').forEach((line) {
-        //   loggy.log(getLogLevel(event.level), line);
-        // });
+        event.message.split('\n').forEach((line) {
+          loggy.log(getLogLevel(event.level), line);
+        });
         return event;
       }),
     );

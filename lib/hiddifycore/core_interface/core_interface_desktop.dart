@@ -108,11 +108,6 @@ class CoreInterfaceDesktop extends CoreInterface {
   }
 
   @override
-  Future<bool> start(String path, String name) async {
-    return false;
-  }
-
-  @override
   Future<bool> restart(String path, String name) async {
     return false;
   }

@@ -134,6 +134,7 @@ class BoxService(
     private var activeProfileName = ""
     private suspend fun startService() {
         try {
+            status.postValue(Status.Starting)
             Log.d(TAG, "starting service")
             withContext(Dispatchers.Main) {
                 notification.show(activeProfileName, R.string.status_starting)
@@ -162,7 +163,7 @@ class BoxService(
 //            File(selectedConfigPath).writeText(content)
 //            val content=File(selectedConfigPath).readText()
             val newService = try {
-                Mobile.setup(Settings.baseDir,Settings.workingDir,Settings.tempDir,4L,"127.0.0.1:${Settings.grpcServiceModePort}","",false,platformInterface)
+                Mobile.setup(Settings.baseDir,Settings.workingDir,Settings.tempDir,4L,"127.0.0.1:${Settings.grpcServiceModePort}","",Settings.debugMode,platformInterface)
 
 //                Libbox.newService(content,platformInterface)
 
@@ -181,9 +182,9 @@ class BoxService(
 //            commandServer?.setService(boxService)
             status.postValue(Status.Started)
 
+
             withContext(Dispatchers.Main) {
                 notification.show(activeProfileName, R.string.status_started)
-
             }
             notification.start()
         } catch (e: Exception) {

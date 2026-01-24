@@ -54,14 +54,15 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                 GlobalScope.launch {
                     result.runCatching {
                         val args = call.arguments as Map<*, *>
-                        val clientPub= args["clientPublicKey"] as ByteArray
+                        val clientPub = args["clientPublicKey"] as ByteArray
 //                        Mobile.addGrpcClientPublicKey(clientPub)
-                        Settings.grpcFlutterPublicKey=clientPub
+                        Settings.grpcFlutterPublicKey = clientPub
                         success("")
 
                     }
                 }
             }
+
             Trigger.GetGrpcServerPublicKey.method -> {
                 GlobalScope.launch {
                     result.runCatching {
@@ -69,17 +70,28 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                     }
                 }
             }
+
             Trigger.Setup.method -> {
                 GlobalScope.launch {
                     result.runCatching {
                         val args = call.arguments as Map<*, *>
-                        Settings.baseDir=args["baseDir"] as String
-                        Settings.workingDir=args["workingDir"] as String
-                        Settings.tempDir=args["tempDir"] as String
-                        val mode=args["mode"] as Int
-                        val grpcPort=args["grpcPort"] as Int
+                        Settings.baseDir = args["baseDir"] as String
+                        Settings.workingDir = args["workingDir"] as String
+                        Settings.tempDir = args["tempDir"] as String
+                        Settings.debugMode = args["debug"] as Boolean? ?: false
+                        val mode = args["mode"] as Int
+                        val grpcPort = args["grpcPort"] as Int
                         runCatching {
-                            Mobile.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir,mode.toLong(),"127.0.0.1:"+grpcPort,"", false, null)
+                            Mobile.setup(
+                                Settings.baseDir,
+                                Settings.workingDir,
+                                Settings.tempDir,
+                                mode.toLong(),
+                                "127.0.0.1:" + grpcPort,
+                                "",
+                                Settings.debugMode,
+                                null
+                            )
 //                            Libbox.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir, false)
                             Libbox.redirectStderr(File(Settings.workingDir, "stderr2.log").path)
 
@@ -93,15 +105,14 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             }
 
 
-
             Trigger.Start.method -> {
                 scope.launch {
                     result.runCatching {
                         val args = call.arguments as Map<*, *>
                         Settings.activeConfigPath = args["path"] as String? ?: ""
                         Settings.activeProfileName = args["name"] as String? ?: ""
-
-                        Settings.grpcServiceModePort=args["grpcPort"] as Int
+                        Settings.debugMode = args["debug"] as Boolean? ?: false
+                        Settings.grpcServiceModePort = args["grpcPort"] as Int
 
                         val mainActivity = MainActivity.instance
                         val started = mainActivity.serviceStatus.value == Status.Started
@@ -109,7 +120,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                             Log.w(TAG, "service is already running")
                             return@launch success(true)
                         }
-                        Settings.startCoreAfterStartingService=false
+                        Settings.startCoreAfterStartingService = false
 
                         mainActivity.startService()
                         success(true)
@@ -124,7 +135,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         val started = mainActivity.serviceStatus.value == Status.Started
                         if (!started) {
                             Log.w(TAG, "service is not running")
-                        //    return@launch success(true)
+                            //    return@launch success(true)
                         }
                         BoxService.stop()
                         success(true)

@@ -46,18 +46,8 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
 
   void onResume(WidgetRef ref) {
     // if (PlatformUtils.isDesktop) return;
-    final dirs = ref.read(appDirectoriesProvider).requireValue;
-    final singbox = ref.read(hiddifyCoreServiceProvider);
-    singbox
-        .setup(dirs, false)
-        .mapLeft((e) {
-          loggy.error(e);
-          ref.read(inAppNotificationControllerProvider).showErrorToast(e);
-        })
-        .map((_) {
-          loggy.info("Hiddify-core setup done");
-        })
-        .run();
+    ref.read(hiddifyCoreServiceProvider).init();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isOnPauseCalled && PlatformUtils.isAndroid) ref.invalidate(perAppProxyServiceProvider);
       isOnPauseCalled = false;
