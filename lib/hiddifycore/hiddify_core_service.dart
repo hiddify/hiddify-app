@@ -79,11 +79,11 @@ class HiddifyCoreService with InfraLogger {
           return left(setupResponse);
         }
         await startListeningLogs("fg", core.fgClient);
-        await startListeningStatus("fg", core.fgClient);
+        // await startListeningStatus("fg", core.fgClient);
         if (!core.isSingleChannel()) {
           await startListeningLogs("bg", core.bgClient);
-          await startListeningStatus("bg", core.bgClient);
         }
+        await startListeningStatus("bg", core.bgClient);
 
         return right(unit);
       } catch (e) {
@@ -97,13 +97,9 @@ class HiddifyCoreService with InfraLogger {
       loggy.debug("changing options");
       // latestOptions = options;
       try {
-        final res = await core.fgClient.changeHiddifySettings(
-          ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
-        );
+        final res = await core.fgClient.changeHiddifySettings(ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())));
         if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
-        await core.bgClient.changeHiddifySettings(
-          ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
-        );
+        await core.bgClient.changeHiddifySettings(ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())));
       } on GrpcError catch (e) {
         if (e.code == StatusCode.unavailable) {
           loggy.debug("background core is not started yet! $e");
@@ -182,9 +178,7 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(() async {
       loggy.debug("restarting");
       // if (!await core.restart(path, name)) {
-      final res = await core.bgClient.restart(
-        StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit, delayStart: true),
-      );
+      final res = await core.bgClient.restart(StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit, delayStart: true));
       if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
       await stop().run();
       await start(path, name, disableMemoryLimit).run();
@@ -249,9 +243,7 @@ class HiddifyCoreService with InfraLogger {
   TaskEither<String, Unit> selectOutbound(String groupTag, String outboundTag) {
     return TaskEither(() async {
       loggy.debug("selecting outbound");
-      final res = await core.bgClient.selectOutbound(
-        SelectOutboundRequest(groupTag: groupTag, outboundTag: outboundTag),
-      );
+      final res = await core.bgClient.selectOutbound(SelectOutboundRequest(groupTag: groupTag, outboundTag: outboundTag));
       if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
 
       return right(unit);
@@ -302,27 +294,12 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  TaskEither<String, WarpResponse> generateWarpConfig({
-    required String licenseKey,
-    required String previousAccountId,
-    required String previousAccessToken,
-  }) {
+  TaskEither<String, WarpResponse> generateWarpConfig({required String licenseKey, required String previousAccountId, required String previousAccessToken}) {
     return TaskEither(() async {
       loggy.debug("generating warp config");
-      final warpConfig = await core.fgClient.generateWarpConfig(
-        GenerateWarpConfigRequest(
-          licenseKey: licenseKey,
-          accountId: previousAccountId,
-          accessToken: previousAccessToken,
-        ),
-      );
+      final warpConfig = await core.fgClient.generateWarpConfig(GenerateWarpConfigRequest(licenseKey: licenseKey, accountId: previousAccountId, accessToken: previousAccessToken));
       // if (warpConfig.code != ResponseCode.OK) return left("${warpConfig.code} ${warpConfig.message}");
-      final WarpResponse warp = (
-        log: warpConfig.log,
-        accountId: warpConfig.account.accountId,
-        accessToken: warpConfig.account.accessToken,
-        wireguardConfig: jsonEncode(warpConfig.config.toProto3Json()),
-      );
+      final WarpResponse warp = (log: warpConfig.log, accountId: warpConfig.account.accountId, accessToken: warpConfig.account.accessToken, wireguardConfig: jsonEncode(warpConfig.config.toProto3Json()));
       return right(warp);
     });
   }
@@ -364,6 +341,18 @@ class HiddifyCoreService with InfraLogger {
     );
   }
 
+  Future<void> stopListenSingle(String key) async {
+    // Collect keys to remove first
+    final keysToRemove = subscriptions.entries.where((entry) => entry.key.startsWith(key)).map((entry) => entry.key).toList();
+
+    // Cancel and remove
+    for (final k in keysToRemove) {
+      final sub = subscriptions[k];
+      await sub?.cancel(); // cancel the subscription
+      subscriptions.remove(k);
+    }
+  }
+
   Future<StreamSubscription<T>?> listenSingle<T>(String key, Stream<T> Function() stream) async {
     if (subscriptions.containsKey(key)) {
       return subscriptions[key] as StreamSubscription<T>?;
@@ -390,5 +379,17 @@ class HiddifyCoreService with InfraLogger {
       LogLevel.FATAL => loggyl.LogLevel.error,
       _ => loggyl.LogLevel.info, // Default case
     };
+  }
+
+  Future<void> pause() async {
+    if (!core.isSingleChannel()) {
+      await stopListenSingle("fg");
+      try {
+        await core.fgClient.pause(PauseRequest(mode: SetupMode.GRPC_NORMAL_INSECURE));
+      } catch (e) {}
+      try {
+        await core.fgClient.pause(PauseRequest(mode: SetupMode.GRPC_NORMAL));
+      } catch (e) {}
+    }
   }
 }

@@ -40,6 +40,8 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
 
   void onPause(WidgetRef ref) {
     isOnPauseCalled = true;
+    final singbox = ref.read(hiddifyCoreServiceProvider);
+    singbox.pause();
   }
 
   void onResume(WidgetRef ref) {

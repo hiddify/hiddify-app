@@ -76,10 +76,10 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
     override fun openTun(options: TunOptions): Int {
         if (prepare(this) != null) error("android: missing vpn permission")
-        service.fileDescriptor?.close()
+//        service.fileDescriptor?.close()
 
         val builder = Builder()
-            .setSession("sing-box")
+            .setSession("hiddify")
             .setMtu(options.mtu)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

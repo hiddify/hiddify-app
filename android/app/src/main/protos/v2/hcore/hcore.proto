@@ -57,6 +57,9 @@ enum SetupMode {
     GRPC_BACKGROUND_INSECURE = 4;
 }
 
+message PauseRequest {
+  SetupMode mode = 1;
+}
 // Define the message equivalent of SetupParameters
 message SetupRequest {
     string base_path = 1;

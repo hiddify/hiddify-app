@@ -39,3 +39,5 @@ startup_notify: true
 # include:
 #   - libcurl.so.4
 include: []
+
+metainfo: linux/packaging/app.hiddify.com.appdata.xml

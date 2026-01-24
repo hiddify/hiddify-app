@@ -30,13 +30,25 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   late HelloClient helloClient;
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
-    await methodChannel.invokeMethod("setup", {
-      "baseDir": directories.baseDir.path,
-      "workingDir": directories.workingDir.path,
-      "tempDir": directories.tempDir.path,
-      "grpcPort": portFront,
-      "mode": mode,
-    });
+    final channelOption = [1, 2].contains(mode) ? MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientKey: cert) : const ChannelCredentials.insecure();
+
+    helloClient = HelloClient(
+      ClientChannel(
+        '127.0.0.1',
+        port: portFront,
+        options: ChannelOptions(credentials: channelOption),
+      ),
+    );
+
+    try {
+      await helloClient.sayHello(HelloRequest(name: "test"));
+      loggy.info("core is already started!");
+      return "";
+    } catch (e) {
+      //core is not started yet
+    }
+
+    await methodChannel.invokeMethod("setup", {"baseDir": directories.baseDir.path, "workingDir": directories.workingDir.path, "tempDir": directories.tempDir.path, "grpcPort": portFront, "mode": mode});
     // serverPublicKey = await methodChannel.invokeMethod<Uint8List>("get_grpc_server_public_key") ?? Uint8List.fromList([]);
     // await methodChannel.invokeMethod(
     //   "add_grpc_client_public_key",
@@ -48,19 +60,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     // var chanelOption = ChannelOptions(
     //   credentials: MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientPrivateKey: cert.privateKey as ECPrivateKey),
     // );
-    final channelOption = [1, 2].contains(mode)
-        ? MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientKey: cert)
-        : const ChannelCredentials.insecure();
-
-    helloClient = HelloClient(
-      ClientChannel(
-        '127.0.0.1',
-        port: portFront,
-        options: ChannelOptions(credentials: channelOption),
-      ),
-    );
     final res = await helloClient.sayHello(HelloRequest(name: "test"));
-
     loggy.info(res.toString());
     fgClient = CoreClient(
       ClientChannel(
@@ -83,46 +83,28 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 
   @override
   Future<bool> start(String path, String name) async {
+    if (!await waitUntilPort(portBack, false, stop)) return false;
     await stop();
-    if (!await waitUntilPort(portBack, false)) return false;
 
     await methodChannel.invokeMethod("start", {"path": path, "name": name, "grpcPort": portBack, "startBg": true});
-    if (!await waitUntilPort(portBack, true)) return false;
+    if (!await waitUntilPort(portBack, true, null)) return false;
     _isBgClientAvailable = true;
     return true;
   }
 
-  Future<bool> waitUntilPort(int portNumber, bool isOpen) async {
-    for (var i = 0; i < 100; i++) {
-      if (await isPortOpen("127.0.0.1", portNumber) == isOpen) {
-        return true;
-      }
-      // Non-blocking pause for 100 milliseconds
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-    return false;
-  }
-  // @override
-  // Future<bool> restart(String path, String name) async {
-  //   await stop();
-
-  //   // await methodChannel.invokeMethod(
-  //   //   "restart",
-  //   //   {"path": path, "name": name},
-  //   // );
-  //   sleep(1);
-  //   return await start(path, name);
-  // }
-
   @override
   Future<bool> stop() async {
-    await methodChannel.invokeMethod("stop");
-    // if (!await waitUntilPort(portBack, false)) {
-    await methodChannel.invokeMethod("stop");
+    await stopMethodChannel();
+    if (!await waitUntilPort(portBack, false, stopMethodChannel)) {
+      return false;
+    }
+
     _isBgClientAvailable = false;
     return true;
-    // return false;
-    // }
+  }
+
+  Future stopMethodChannel() async {
+    await methodChannel.invokeMethod("stop");
   }
 
   @override
@@ -137,7 +119,21 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   }
 }
 
-Future<bool> isPortOpen(String host, int port, {Duration timeout = const Duration(seconds: 5)}) async {
+Future<bool> waitUntilPort(int portNumber, bool isOpen, Future Function()? callFunctionIfNotOpen, {int maxTry = 10}) async {
+  for (var i = 0; i < maxTry; i++) {
+    if (await isPortOpen("127.0.0.1", portNumber) == isOpen) {
+      return true;
+    }
+    if (callFunctionIfNotOpen != null) {
+      await callFunctionIfNotOpen();
+    }
+
+    await Future.delayed(const Duration(milliseconds: 200));
+  }
+  return false;
+}
+
+Future<bool> isPortOpen(String host, int port, {Duration timeout = const Duration(microseconds: 300)}) async {
   try {
     final socket = await Socket.connect(host, port, timeout: timeout);
     await socket.close();
