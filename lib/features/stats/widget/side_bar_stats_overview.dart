@@ -11,10 +11,7 @@ import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/number_formatters.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final showAllSidebarStatsProvider = PreferencesNotifier.createAutoDispose(
-  "show_all_sidebar_stats",
-  false,
-);
+final showAllSidebarStatsProvider = PreferencesNotifier.createAutoDispose("show_all_sidebar_stats", false);
 
 class SideBarStatsOverview extends HookConsumerWidget {
   const SideBarStatsOverview({super.key});
@@ -44,14 +41,9 @@ class SideBarStatsOverview extends HookConsumerWidget {
               icon: AnimatedRotation(
                 turns: showAll ? 1 : 0.5,
                 duration: kAnimationDuration,
-                child: const Icon(
-                  FluentIcons.chevron_down_16_regular,
-                  size: 16,
-                ),
+                child: const Icon(FluentIcons.chevron_down_16_regular, size: 16),
               ),
-              label: AnimatedText(
-                showAll ? t.common.showLess : t.common.showMore,
-              ),
+              label: AnimatedText(showAll ? t.common.showLess : t.common.showMore),
             ),
           ),
           // const ConnectionStatsCard(),
@@ -68,9 +60,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                   semanticLabel: t.components.stats.speed,
                 ),
                 (
-                  label: const Icon(
-                    FluentIcons.arrow_bidirectional_up_down_16_regular,
-                  ),
+                  label: const Icon(FluentIcons.arrow_bidirectional_up_down_16_regular),
                   data: Text(stats.downlinkTotal.toInt().size()),
                   semanticLabel: t.components.stats.totalTransferred,
                 ),
@@ -83,20 +73,12 @@ class SideBarStatsOverview extends HookConsumerWidget {
                   title: t.components.stats.trafficLive,
                   stats: [
                     (
-                      label: const Text(
-                        "↑",
-                        style: TextStyle(color: Colors.green),
-                      ),
+                      label: const Text("↑", style: TextStyle(color: Colors.green)),
                       data: Text(stats.uplink.toInt().speed()),
                       semanticLabel: t.components.stats.uplink,
                     ),
                     (
-                      label: Text(
-                        "↓",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
+                      label: Text("↓", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                       data: Text(stats.downlink.toInt().speed()),
                       semanticLabel: t.components.stats.downlink,
                     ),
@@ -107,20 +89,12 @@ class SideBarStatsOverview extends HookConsumerWidget {
                   title: t.components.stats.trafficTotal,
                   stats: [
                     (
-                      label: const Text(
-                        "↑",
-                        style: TextStyle(color: Colors.green),
-                      ),
+                      label: const Text("↑", style: TextStyle(color: Colors.green)),
                       data: Text(stats.uplinkTotal.toInt().size()),
                       semanticLabel: t.components.stats.uplink,
                     ),
                     (
-                      label: Text(
-                        "↓",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
+                      label: Text("↓", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                       data: Text(stats.downlinkTotal.toInt().size()),
                       semanticLabel: t.components.stats.downlink,
                     ),

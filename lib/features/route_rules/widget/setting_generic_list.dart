@@ -5,7 +5,15 @@ import 'package:hiddify/features/route_rules/widget/setting_detail_chips.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingGenericList<T extends Object> extends ConsumerWidget {
-  const SettingGenericList({super.key, required this.title, required this.values, required this.onTap, this.useEllipsis = false, this.isPackageName = false, this.showPlatformWarning = false});
+  const SettingGenericList({
+    super.key,
+    required this.title,
+    required this.values,
+    required this.onTap,
+    this.useEllipsis = false,
+    this.isPackageName = false,
+    this.showPlatformWarning = false,
+  });
 
   final String title;
   final List<T> values;
@@ -31,11 +39,7 @@ class SettingGenericList<T extends Object> extends ConsumerWidget {
                       children: [
                         Row(
                           children: [
-                            const Icon(
-                              size: 16,
-                              Icons.warning_rounded,
-                              color: Colors.amber,
-                            ),
+                            const Icon(size: 16, Icons.warning_rounded, color: Colors.amber),
                             const Gap(2),
                             Text(
                               t.pages.settings.routing.routeRule.rule.notAvailabeInThisPlatform,
@@ -52,11 +56,7 @@ class SettingGenericList<T extends Object> extends ConsumerWidget {
               trailing: Text('${values.length}'),
             ),
             if (values.isNotEmpty)
-              SettingDetailChips<T>(
-                values: values,
-                useEllipsis: useEllipsis,
-                isPackageName: isPackageName,
-              ),
+              SettingDetailChips<T>(values: values, useEllipsis: useEllipsis, isPackageName: isPackageName),
           ],
         ),
       ),

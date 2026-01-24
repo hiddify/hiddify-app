@@ -11,7 +11,11 @@
             // "args": ["build","-c","a.txt","-d","b.txt","--full-config"] ,
             // "args": ["temp"] ,
             // "args":["profile","https://raw.githubusercontent.com/hiddify/hiddify-next/refs/heads/main/test.configs/warp"],
-            "args": ["run","-c","https://raw.githubusercontent.com/hiddify/hiddify-next/refs/heads/main/test.configs/warp"],
+            "args": [
+                "run",
+                "-c",
+                "https://raw.githubusercontent.com/hiddify/hiddify-next/refs/heads/main/test.configs/warp"
+            ],
             "buildFlags": "-tags with_clash_api,with_gvisor,with_quic,with_wireguard,with_grpc,with_ech,with_utls,with_reality_server"
         },
         {
@@ -21,7 +25,18 @@
             "flutterMode": "debug",
             "program": "lib/main.dart",
             // "args": ["-d","192.168.1.35:36463"]
-            
+        },
+        {
+            "name": "Hiddify Dev Windows Portable",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "program": "lib/main.dart",
+            "args": [
+                "-d",
+                "windows",
+                "--dart-define=portable=true"
+            ]
         },
         {
             "name": "Hiddify Dev Release",

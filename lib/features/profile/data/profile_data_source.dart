@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:hiddify/core/db/v2/db_v2.dart';
+import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:loggy/loggy.dart';
@@ -22,7 +22,7 @@ abstract interface class ProfileDataSource {
 Map<SortMode, OrderingMode> orderMap = {SortMode.ascending: OrderingMode.asc, SortMode.descending: OrderingMode.desc};
 
 @DriftAccessor(tables: [ProfileEntries])
-class ProfileDao extends DatabaseAccessor<DbV2> with _$ProfileDaoMixin, InfraLogger implements ProfileDataSource {
+class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogger implements ProfileDataSource {
   ProfileDao(super.db);
 
   @override
@@ -68,7 +68,12 @@ class ProfileDao extends DatabaseAccessor<DbV2> with _$ProfileDaoMixin, InfraLog
           (tbl) {
             final trafficRatio = (tbl.download + tbl.upload) / tbl.total;
             final isExpired = tbl.expire.isSmallerOrEqualValue(DateTime.now());
-            return OrderingTerm(expression: (trafficRatio.isNull() | trafficRatio.isSmallerThanValue(1)) & (isExpired.isNull() | isExpired.equals(false)), mode: OrderingMode.desc);
+            return OrderingTerm(
+              expression:
+                  (trafficRatio.isNull() | trafficRatio.isSmallerThanValue(1)) &
+                  (isExpired.isNull() | isExpired.equals(false)),
+              mode: OrderingMode.desc,
+            );
           },
           switch (sort) {
             ProfilesSort.name => (tbl) => OrderingTerm(expression: tbl.name, mode: orderMap[sortMode]!),
@@ -116,7 +121,9 @@ class ProfileDao extends DatabaseAccessor<DbV2> with _$ProfileDaoMixin, InfraLog
         final profiles = await (profileEntries.select()..where((tbl) => tbl.id.equals(id).not())).get();
         if (profiles.isEmpty) return;
         final prof = profiles.first;
-        await (update(profileEntries)..where((tbl) => tbl.id.equals(prof.id))).write(const ProfileEntriesCompanion(active: Value(true)));
+        await (update(
+          profileEntries,
+        )..where((tbl) => tbl.id.equals(prof.id))).write(const ProfileEntriesCompanion(active: Value(true)));
       }
     });
   }

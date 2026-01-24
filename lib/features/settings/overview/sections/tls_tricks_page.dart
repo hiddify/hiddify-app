@@ -12,9 +12,7 @@ class TlsTricksPage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final canChangeOption = ref.watch(ConfigOptions.enableTlsFragment);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.settings.tlsTricks.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.settings.tlsTricks.title)),
       body: ListView(
         children: [
           SwitchListTile.adaptive(

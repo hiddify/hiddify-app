@@ -56,15 +56,12 @@ class IntroPage extends HookConsumerWidget with PresLogger {
       IntroConst.githubKey: useFocusNode(),
       IntroConst.licenseKey: useFocusNode(),
     };
-    useEffect(
-      () {
-        for (final entry in focusNodes.entries) {
-          entry.value.addListener(() => focusStates[entry.key]!.value = entry.value.hasPrimaryFocus);
-        }
-        return null;
-      },
-      [],
-    );
+    useEffect(() {
+      for (final entry in focusNodes.entries) {
+        entry.value.addListener(() => focusStates[entry.key]!.value = entry.value.hasPrimaryFocus);
+      }
+      return null;
+    }, []);
 
     return Scaffold(
       body: Center(
@@ -78,7 +75,9 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                 children: [
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      final width = constraints.maxWidth > IntroConst.maxwidth ? IntroConst.maxwidth : constraints.maxWidth;
+                      final width = constraints.maxWidth > IntroConst.maxwidth
+                          ? IntroConst.maxwidth
+                          : constraints.maxWidth;
                       final size = width * 0.4;
                       return Assets.images.logo.svg(width: size, height: size);
                     },
@@ -86,7 +85,12 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                   const Gap(16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(t.intro.banner, style: theme.textTheme.bodyLarge, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    child: Text(
+                      t.intro.banner,
+                      style: theme.textTheme.bodyLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   const Gap(24),
                   const LocalePrefTile(),
@@ -100,12 +104,12 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                       t.intro.termsAndPolicyCaution(
                         tap: (text) => TextSpan(
                           text: text,
-                          style: TextStyle(color: focusStates[IntroConst.termsAndConditionsKey]!.value ? Colors.green : Colors.blue),
+                          style: TextStyle(
+                            color: focusStates[IntroConst.termsAndConditionsKey]!.value ? Colors.green : Colors.blue,
+                          ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
-                              await UriUtils.tryLaunch(
-                                Uri.parse(Constants.termsAndConditionsUrl),
-                              );
+                              await UriUtils.tryLaunch(Uri.parse(Constants.termsAndConditionsUrl));
                             },
                         ),
                       ),
@@ -120,22 +124,22 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                       t.intro.info(
                         tap_source: (text) => TextSpan(
                           text: text,
-                          style: TextStyle(color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue),
+                          style: TextStyle(
+                            color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue,
+                          ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
-                              await UriUtils.tryLaunch(
-                                Uri.parse(Constants.githubUrl),
-                              );
+                              await UriUtils.tryLaunch(Uri.parse(Constants.githubUrl));
                             },
                         ),
                         tap_license: (text) => TextSpan(
                           text: text,
-                          style: TextStyle(color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue),
+                          style: TextStyle(
+                            color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue,
+                          ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
-                              await UriUtils.tryLaunch(
-                                Uri.parse(Constants.licenseUrl),
-                              );
+                              await UriUtils.tryLaunch(Uri.parse(Constants.licenseUrl));
                             },
                         ),
                       ),
@@ -155,11 +159,10 @@ class IntroPage extends HookConsumerWidget with PresLogger {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        icon: isStarting.value ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator()) : const Icon(Icons.rocket_launch),
-        label: Text(
-          t.common.start,
-          style: theme.textTheme.titleMedium,
-        ),
+        icon: isStarting.value
+            ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator())
+            : const Icon(Icons.rocket_launch),
+        label: Text(t.common.start, style: theme.textTheme.titleMedium),
         onPressed: () async {
           if (isStarting.value) return;
           isStarting.value = true;
@@ -168,11 +171,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
             try {
               await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
             } catch (error, stackTrace) {
-              loggy.error(
-                "could not disable analytics",
-                error,
-                stackTrace,
-              );
+              loggy.error("could not disable analytics", error, stackTrace);
             }
           }
           await ref.read(Preferences.introCompleted.notifier).update(true);
@@ -185,18 +184,13 @@ class IntroPage extends HookConsumerWidget with PresLogger {
     try {
       final countryCode = await TimeZoneToCountry.getLocalCountryCode();
       final regionLocale = _getRegionLocale(countryCode);
-      loggy.debug(
-        'Timezone Region: ${regionLocale.region} Locale: ${regionLocale.locale}',
-      );
+      loggy.debug('Timezone Region: ${regionLocale.region} Locale: ${regionLocale.locale}');
       await ref.read(ConfigOptions.region.notifier).update(regionLocale.region);
       await ref.watch(ConfigOptions.directDnsAddress.notifier).reset();
       await ref.read(localePreferencesProvider.notifier).changeLocale(regionLocale.locale);
       return;
     } catch (e) {
-      loggy.warning(
-        'Could not get the local country code based on timezone',
-        e,
-      );
+      loggy.warning('Could not get the local country code based on timezone', e);
     }
 
     try {
@@ -211,9 +205,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
         final jsonData = response.data!;
         final regionLocale = _getRegionLocale(jsonData['country_code']?.toString() ?? "");
 
-        loggy.debug(
-          'Region: ${regionLocale.region} Locale: ${regionLocale.locale}',
-        );
+        loggy.debug('Region: ${regionLocale.region} Locale: ${regionLocale.locale}');
         await ref.read(ConfigOptions.region.notifier).update(regionLocale.region);
         await ref.read(localePreferencesProvider.notifier).changeLocale(regionLocale.locale);
       } else {

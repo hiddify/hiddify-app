@@ -25,10 +25,8 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    )..repeat(reverse: true);
+    _animationController = AnimationController(duration: const Duration(seconds: 1), vsync: this)
+      ..repeat(reverse: true);
 
     _animation = Tween<double>(begin: 0.9, end: 1).animate(_animationController);
   }
@@ -49,17 +47,14 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
     final requiresReconnect = ref.watch(configOptionNotifierProvider).valueOrNull;
     // final today = DateTime.now();
 
-    ref.listen(
-      connectionNotifierProvider,
-      (_, next) {
-        if (next case AsyncError(:final error)) {
-          ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(error));
-        }
-        if (next case AsyncData(value: Disconnected(:final connectionFailure?))) {
-          ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(connectionFailure));
-        }
-      },
-    );
+    ref.listen(connectionNotifierProvider, (_, next) {
+      if (next case AsyncError(:final error)) {
+        ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(error));
+      }
+      if (next case AsyncData(value: Disconnected(:final connectionFailure?))) {
+        ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(t.presentError(connectionFailure));
+      }
+    });
 
     return AnimatedBuilder(
       animation: _animation,
@@ -84,8 +79,11 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> with Single
                 }
               case AsyncData(value: Connected()):
                 {
-                  if (requiresReconnect == true && await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
-                    return await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
+                  if (requiresReconnect == true &&
+                      await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
+                    return await ref
+                        .read(connectionNotifierProvider.notifier)
+                        .reconnect(await ref.read(activeProfileProvider.future));
                   }
                   return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
                 }

@@ -41,10 +41,7 @@ class HomePage extends HookConsumerWidget {
                 children: [
                   TextSpan(text: t.common.appTitle),
                   const TextSpan(text: " "),
-                  const WidgetSpan(
-                    child: AppVersionLabel(),
-                    alignment: PlaceholderAlignment.middle,
-                  ),
+                  const WidgetSpan(child: AppVersionLabel(), alignment: PlaceholderAlignment.middle),
                 ],
               ),
             ),
@@ -76,10 +73,7 @@ class HomePage extends HookConsumerWidget {
             key: const ValueKey("profile_add_button"),
             label: t.pages.profiles.add,
             child: IconButton(
-              icon: Icon(
-                Icons.add_rounded,
-                color: theme.colorScheme.primary,
-              ),
+              icon: Icon(Icons.add_rounded, color: theme.colorScheme.primary),
               onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
             ),
           ),
@@ -94,7 +88,10 @@ class HomePage extends HookConsumerWidget {
             opacity: 0.09,
             colorFilter: theme.brightness == Brightness.dark
                 ? ColorFilter.mode(Colors.white.withValues(alpha: .15), BlendMode.srcIn) //
-                : ColorFilter.mode(Colors.grey.withValues(alpha: 1), BlendMode.srcATop), // Apply white tint in dark mode
+                : ColorFilter.mode(
+                    Colors.grey.withValues(alpha: 1),
+                    BlendMode.srcATop,
+                  ), // Apply white tint in dark mode
           ),
         ),
         child: Stack(
@@ -114,11 +111,11 @@ class HomePage extends HookConsumerWidget {
                         // const Gap(100),
                         switch (activeProfile) {
                           AsyncData(value: final profile?) => ProfileTile(
-                              profile: profile,
-                              isMain: true,
-                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              color: Theme.of(context).colorScheme.surfaceContainer,
-                            ),
+                            profile: profile,
+                            isMain: true,
+                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            color: Theme.of(context).colorScheme.surfaceContainer,
+                          ),
                           _ => const Text(""),
                         },
                         const SliverFillRemaining(
@@ -130,10 +127,7 @@ class HomePage extends HookConsumerWidget {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    ConnectionButton(),
-                                    ActiveProxyDelayIndicator(),
-                                  ],
+                                  children: [ConnectionButton(), ActiveProxyDelayIndicator()],
                                 ),
                               ),
                               ActiveProxyFooter(),
@@ -175,20 +169,12 @@ class AppVersionLabel extends HookConsumerWidget {
       label: t.common.version,
       button: false,
       child: Container(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 4,
-          vertical: 1,
-        ),
+        decoration: BoxDecoration(color: theme.colorScheme.secondaryContainer, borderRadius: BorderRadius.circular(4)),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
         child: Text(
           version,
           textDirection: TextDirection.ltr,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSecondaryContainer,
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSecondaryContainer),
         ),
       ),
     );

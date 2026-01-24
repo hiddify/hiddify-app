@@ -5,7 +5,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:protobuf/protobuf.dart';
 
 class SettingCheckbox extends ConsumerWidget {
-  const SettingCheckbox({super.key, required this.title, required this.values, required this.selectedValues, required this.setValue, this.defaultValue, this.t});
+  const SettingCheckbox({
+    super.key,
+    required this.title,
+    required this.values,
+    required this.selectedValues,
+    required this.setValue,
+    this.defaultValue,
+    this.t,
+  });
 
   final String title;
   final List<ProtobufEnum> values;
@@ -29,7 +37,9 @@ class SettingCheckbox extends ConsumerWidget {
       title: Text(title),
       subtitle: Text(textWithTranslation(selectedValues, ref)),
       onTap: () async {
-        final result = await ref.read(dialogNotifierProvider.notifier).showSettingCheckbox(
+        final result = await ref
+            .read(dialogNotifierProvider.notifier)
+            .showSettingCheckbox(
               title: title,
               values: values,
               selectedValues: selectedValues,

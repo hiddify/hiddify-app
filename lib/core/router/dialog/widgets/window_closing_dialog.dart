@@ -37,10 +37,7 @@ class _WindowClosingDialogState extends ConsumerState<WindowClosingDialog> {
               },
             ),
             const SizedBox(width: 16),
-            Text(
-              t.dialogs.windowClosing.remember,
-              style: const TextStyle(fontSize: 16),
-            ),
+            Text(t.dialogs.windowClosing.remember, style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),

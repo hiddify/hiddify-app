@@ -43,11 +43,11 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
     );
     useEffect(() {
       if (!isAutoEnabled) {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) async {
-            await ref.read(appProxyLoadingProvider.notifier).doAsync(ref.read(PerAppProxyProvider(mode).notifier).applyAutoSelection);
-          },
-        );
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await ref
+              .read(appProxyLoadingProvider.notifier)
+              .doAsync(ref.read(PerAppProxyProvider(mode).notifier).applyAutoSelection);
+        });
       }
       return null;
     }, []);
@@ -62,11 +62,7 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
                 child: loading
                     ? const Padding(
                         padding: EdgeInsetsDirectional.only(end: 10),
-                        child: SizedBox(
-                          width: 32,
-                          height: 32,
-                          child: CircularProgressIndicator(),
-                        ),
+                        child: SizedBox(width: 32, height: 32, child: CircularProgressIndicator()),
                       )
                     : Switch.adaptive(
                         value: isAutoEnabled,
@@ -97,16 +93,12 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
                               Expanded(
                                 child: Text(
                                   t.pages.settings.routing.perAppProxy.autoSelection.autoUpdateInterval,
-                                  style: theme.textTheme.titleSmall!.copyWith(
-                                    color: theme.colorScheme.onSurface,
-                                  ),
+                                  style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface),
                                 ),
                               ),
                               Text(
                                 _genSliderText(t, updateInterval.round()),
-                                style: theme.textTheme.labelSmall!.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
+                                style: theme.textTheme.labelSmall!.copyWith(color: theme.colorScheme.onSurfaceVariant),
                               ),
                             ],
                           ),
@@ -135,7 +127,9 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
                                   onPressed: loading
                                       ? null
                                       : () async {
-                                          await ref.read(appProxyLoadingProvider.notifier).doAsync(ref.read(PerAppProxyProvider(mode).notifier).applyAutoSelection);
+                                          await ref
+                                              .read(appProxyLoadingProvider.notifier)
+                                              .doAsync(ref.read(PerAppProxyProvider(mode).notifier).applyAutoSelection);
                                         },
                                   child: Text(t.pages.settings.routing.perAppProxy.autoSelection.performNow),
                                 ),
@@ -145,7 +139,11 @@ class AutoAppsSelectionModal extends HookConsumerWidget {
                                 onPressed: loading
                                     ? null
                                     : () async {
-                                        await ref.read(appProxyLoadingProvider.notifier).doAsync(ref.read(PerAppProxyProvider(mode).notifier).revertForceDeselection);
+                                        await ref
+                                            .read(appProxyLoadingProvider.notifier)
+                                            .doAsync(
+                                              ref.read(PerAppProxyProvider(mode).notifier).revertForceDeselection,
+                                            );
                                       },
                                 child: Text(t.pages.settings.routing.perAppProxy.autoSelection.resetToDefault),
                               ),

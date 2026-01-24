@@ -12,12 +12,10 @@ class ResetTunnelNotifier extends _$ResetTunnelNotifier with AppLogger {
   Future<void> run() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () => ref.read(hiddifyCoreServiceProvider).resetTunnel().getOrElse(
-        (err) {
-          loggy.warning("error resetting tunnel", err);
-          throw err;
-        },
-      ).run(),
+      () => ref.read(hiddifyCoreServiceProvider).resetTunnel().getOrElse((err) {
+        loggy.warning("error resetting tunnel", err);
+        throw err;
+      }).run(),
     );
   }
 }

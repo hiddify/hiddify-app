@@ -31,7 +31,10 @@ class FreeBtns extends ConsumerWidget {
                 padding: const EdgeInsets.all(16).copyWith(bottom: 0),
                 itemCount: freeProfiles.value!.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: MediaQuery.of(context).size.width <= BottomSheetConst.maxWidth || freeProfiles.value!.length < 2 ? 1 : 2,
+                  crossAxisCount:
+                      MediaQuery.of(context).size.width <= BottomSheetConst.maxWidth || freeProfiles.value!.length < 2
+                      ? 1
+                      : 2,
                   mainAxisSpacing: 8,
                   crossAxisSpacing: 8,
                   mainAxisExtent: 72,
@@ -43,9 +46,13 @@ class FreeBtns extends ConsumerWidget {
                     onTap: () async {
                       final title = isFa ? profile.title.fa : profile.title.en;
                       final consent = isFa ? profile.consent.fa : profile.consent.en;
-                      final result = await ref.read(dialogNotifierProvider.notifier).showFreeProfileConsent(title: title, consent: consent);
+                      final result = await ref
+                          .read(dialogNotifierProvider.notifier)
+                          .showFreeProfileConsent(title: title, consent: consent);
                       if (result == true) {
-                        await ref.read(addProfileNotifierProvider.notifier).addManual(
+                        await ref
+                            .read(addProfileNotifierProvider.notifier)
+                            .addManual(
                               url: profile.sublink,
                               userOverride: UserOverride(
                                 name: title,
@@ -62,10 +69,10 @@ class FreeBtns extends ConsumerWidget {
             )
           : Center(
               child: Text(
-                (freeProfiles.value?.isEmpty ?? true) ? t.pages.profiles.freeSubNotFound : t.pages.profiles.freeSubNotFoundForRegion(region: ref.watch(ConfigOptions.region).name),
-                style: theme.textTheme.bodySmall!.copyWith(
-                  color: theme.colorScheme.onSurface,
-                ),
+                (freeProfiles.value?.isEmpty ?? true)
+                    ? t.pages.profiles.freeSubNotFound
+                    : t.pages.profiles.freeSubNotFoundForRegion(region: ref.watch(ConfigOptions.region).name),
+                style: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.onSurface),
               ),
             ),
       error: (error, stackTrace) => Center(
@@ -74,9 +81,7 @@ class FreeBtns extends ConsumerWidget {
           style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface),
         ),
       ),
-      loading: () => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -39,7 +39,9 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final provider = profileDetailsNotifierProvider(id);
 
-    return ref.watch(ProfileDetailsNotifierProvider(id)).when(
+    return ref
+        .watch(ProfileDetailsNotifierProvider(id))
+        .when(
           data: (data) {
             final isLoading = data.loadingState is AsyncLoading;
             final userOverride = data.profile.userOverride ?? const UserOverride();
@@ -65,12 +67,12 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                         ? null
                         : () async {
                             if (formKey.currentState!.validate()) {
-                              await ref.read(provider.notifier).save().then(
-                                (success) {
-                                  ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.save.success);
-                                  if (success && context.mounted) context.pop();
-                                },
-                              );
+                              await ref.read(provider.notifier).save().then((success) {
+                                ref
+                                    .read(inAppNotificationControllerProvider)
+                                    .showSuccessToast(t.pages.profiles.msg.save.success);
+                                if (success && context.mounted) context.pop();
+                              });
                             }
                           },
                     icon: const Icon(Icons.check),
@@ -86,42 +88,35 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           child: CustomTextFormField(
                             maxLines: 1,
                             initialValue: userOverride.name ?? data.profile.name,
-                            validator: (value) => (value?.isEmpty ?? true) ? t.pages.profileDetails.form.emptyName : null,
-                            onChanged: (value) => ref.read(ProfileDetailsNotifierProvider(id).notifier).setUserOverride(userOverride.copyWith(name: value)),
+                            validator: (value) =>
+                                (value?.isEmpty ?? true) ? t.pages.profileDetails.form.emptyName : null,
+                            onChanged: (value) => ref
+                                .read(ProfileDetailsNotifierProvider(id).notifier)
+                                .setUserOverride(userOverride.copyWith(name: value)),
                             label: t.common.name,
                             hint: t.pages.profileDetails.form.nameHint,
                           ),
                         ),
                         if (data.profile case RemoteProfileEntity(:final url))
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   t.common.url,
-                                  style: theme.textTheme.labelMedium!.copyWith(
-                                    color: theme.colorScheme.onSurface,
-                                  ),
+                                  style: theme.textTheme.labelMedium!.copyWith(color: theme.colorScheme.onSurface),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 const Gap(4),
                                 SelectableText(
                                   url,
-                                  style: theme.textTheme.bodySmall!.copyWith(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
+                                  style: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.onSurfaceVariant),
                                 ),
                               ],
                             ),
@@ -131,12 +126,12 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                           SwitchListTile.adaptive(
                             title: Text(
                               t.pages.profileDetails.form.disableAutoUpdate,
-                              style: theme.textTheme.titleSmall!.copyWith(
-                                color: theme.colorScheme.onSurface,
-                              ),
+                              style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface),
                             ),
                             value: userOverride.isAutoUpdateDisable,
-                            onChanged: (value) => ref.read(ProfileDetailsNotifierProvider(id).notifier).setUserOverride(userOverride.copyWith(isAutoUpdateDisable: value)),
+                            onChanged: (value) => ref
+                                .read(ProfileDetailsNotifierProvider(id).notifier)
+                                .setUserOverride(userOverride.copyWith(isAutoUpdateDisable: value)),
                           ),
                           AnimatedSize(
                             alignment: Alignment.topCenter,
@@ -173,11 +168,16 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                                         padding: const EdgeInsets.symmetric(horizontal: 10),
                                         child: Slider(
                                           focusNode: sliderFocusNode,
-                                          value: userOverride.updateInterval?.toDouble() ?? options?.updateInterval.inHours.toDouble() ?? 0.0,
+                                          value:
+                                              userOverride.updateInterval?.toDouble() ??
+                                              options?.updateInterval.inHours.toDouble() ??
+                                              0.0,
                                           max: 96,
                                           divisions: 96,
                                           label: (userOverride.updateInterval ?? 0).toString(),
-                                          onChanged: (double value) => ref.read(ProfileDetailsNotifierProvider(id).notifier).setUserOverride(userOverride.copyWith(updateInterval: value.toInt())),
+                                          onChanged: (double value) => ref
+                                              .read(ProfileDetailsNotifierProvider(id).notifier)
+                                              .setUserOverride(userOverride.copyWith(updateInterval: value.toInt())),
                                         ),
                                       ),
                                     ],
@@ -197,10 +197,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                           Align(
                             alignment: AlignmentDirectional.centerStart,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 8,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -268,15 +265,11 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
             );
           },
           error: (error, stackTrace) => Scaffold(
-            appBar: AppBar(
-              title: Text(t.pages.profileDetails.title),
-            ),
+            appBar: AppBar(title: Text(t.pages.profileDetails.title)),
             body: SliverErrorBodyPlaceholder(t.presentShortError(error)),
           ),
           loading: () => Scaffold(
-            appBar: AppBar(
-              title: Text(t.pages.profileDetails.title),
-            ),
+            appBar: AppBar(title: Text(t.pages.profileDetails.title)),
             body: const Center(child: CircularProgressIndicator()),
           ),
         );

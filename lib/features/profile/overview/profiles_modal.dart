@@ -18,14 +18,11 @@ class ProfilesModal extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final asyncProfiles = ref.watch(profilesNotifierProvider);
 
-    ref.listen(
-      profilesNotifierProvider,
-      (_, next) {
-        if (next.hasValue && next.value!.isEmpty) {
-          if (context.canPop()) context.pop();
-        }
-      },
-    );
+    ref.listen(profilesNotifierProvider, (_, next) {
+      if (next.hasValue && next.value!.isEmpty) {
+        if (context.canPop()) context.pop();
+      }
+    });
 
     final initialSize = PlatformUtils.isDesktop ? .60 : .35;
     return SafeArea(
@@ -57,33 +54,23 @@ class ProfilesModal extends HookConsumerWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       FilledButton.icon(
-                        label: Text(
-                          t.common.sort,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        label: Text(t.common.sort, maxLines: 1, overflow: TextOverflow.ellipsis),
                         icon: const Icon(Icons.sort_rounded),
                         onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
                       ),
                       FilledButton.icon(
-                        label: Text(
-                          t.pages.profiles.updateSubscriptions,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        label: Text(t.pages.profiles.updateSubscriptions, maxLines: 1, overflow: TextOverflow.ellipsis),
                         icon: const Icon(Icons.update_rounded),
                         onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
         ),
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => Text(t.presentShortError(error)),
       ),
     );

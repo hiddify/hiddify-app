@@ -25,20 +25,21 @@ abstract interface class AutoSelectionRepository {
 }
 
 class AutoSelectionRepositoryImpl with AppLogger implements AutoSelectionRepository {
-  AutoSelectionRepositoryImpl({
-    required Ref ref,
-  }) : _ref = ref;
+  AutoSelectionRepositoryImpl({required Ref ref}) : _ref = ref;
   final Ref _ref;
   static const _baseUrl = 'https://raw.githubusercontent.com/hiddify/Android-GFW-Apps/refs/heads/master/';
 
   @override
-  Future<(Set<String>?, AutoSelectionResult)> getByAppProxyMode({AppProxyMode? mode, Region? region}) async => await _makeRequest(mode: mode ?? _getMode(), region: region ?? _getRegion());
+  Future<(Set<String>?, AutoSelectionResult)> getByAppProxyMode({AppProxyMode? mode, Region? region}) async =>
+      await _makeRequest(mode: mode ?? _getMode(), region: region ?? _getRegion());
 
   @override
-  Future<(Set<String>?, AutoSelectionResult)> getExclude({Region? region}) async => await _makeRequest(mode: AppProxyMode.exclude, region: region ?? _getRegion());
+  Future<(Set<String>?, AutoSelectionResult)> getExclude({Region? region}) async =>
+      await _makeRequest(mode: AppProxyMode.exclude, region: region ?? _getRegion());
 
   @override
-  Future<(Set<String>?, AutoSelectionResult)> getInclude({Region? region}) async => await _makeRequest(mode: AppProxyMode.include, region: region ?? _getRegion());
+  Future<(Set<String>?, AutoSelectionResult)> getInclude({Region? region}) async =>
+      await _makeRequest(mode: AppProxyMode.include, region: region ?? _getRegion());
 
   Future<(Set<String>?, AutoSelectionResult)> _makeRequest({required AppProxyMode mode, Region? region}) async {
     try {
@@ -63,11 +64,12 @@ class AutoSelectionRepositoryImpl with AppLogger implements AutoSelectionReposit
   }
 
   String _genUrl(AppProxyMode mode, Region region) => switch (mode) {
-        AppProxyMode.include => '${_baseUrl}proxy_${region.name}',
-        AppProxyMode.exclude => '${_baseUrl}direct_${region.name}',
-      };
+    AppProxyMode.include => '${_baseUrl}proxy_${region.name}',
+    AppProxyMode.exclude => '${_baseUrl}direct_${region.name}',
+  };
 
-  Set<String> _parseToListOfString(dynamic data) => data.toString().split('\n').map((e) => e.trim()).where((element) => element.isNotEmpty).toSet();
+  Set<String> _parseToListOfString(dynamic data) =>
+      data.toString().split('\n').map((e) => e.trim()).where((element) => element.isNotEmpty).toSet();
 
   AppProxyMode _getMode() => _ref.read(Preferences.perAppProxyMode).toAppProxy()!;
 

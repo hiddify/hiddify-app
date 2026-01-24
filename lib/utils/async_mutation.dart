@@ -21,50 +21,31 @@ class AsyncMutation with _$AsyncMutation {
 }
 
 /// temporary(and hacky) way to manage async mutations
-({
-  AsyncMutation state,
-  ValueChanged<Future<T>> setFuture,
-  ValueChanged<void Function(Object error)> setOnFailure,
-}) useMutation<T>({
-  void Function(Object error)? initialOnFailure,
-  void Function()? initialOnSuccess,
-}) {
+({AsyncMutation state, ValueChanged<Future<T>> setFuture, ValueChanged<void Function(Object error)> setOnFailure})
+useMutation<T>({void Function(Object error)? initialOnFailure, void Function()? initialOnSuccess}) {
   final mutationUpdate = useState<Future<T>?>(null);
   final mutationState = useFuture(mutationUpdate.value);
-  final failureCallBack =
-      useValueNotifier<void Function(Object error)?>(initialOnFailure);
+  final failureCallBack = useValueNotifier<void Function(Object error)?>(initialOnFailure);
   final successCallBack = useValueNotifier<void Function()?>(initialOnSuccess);
 
-  final mapped = useMemoized(
-    () {
-      return switch (mutationState.connectionState) {
-        ConnectionState.none => const Idle(),
-        ConnectionState.waiting => const InProgress(),
-        _ => mutationState.hasError
-            ? Fail(mutationState.error!, mutationState.stackTrace!)
-            : const Success(),
-      };
-    },
-    [mutationState],
-  );
+  final mapped = useMemoized(() {
+    return switch (mutationState.connectionState) {
+      ConnectionState.none => const Idle(),
+      ConnectionState.waiting => const InProgress(),
+      _ => mutationState.hasError ? Fail(mutationState.error!, mutationState.stackTrace!) : const Success(),
+    };
+  }, [mutationState]);
 
   // one-of callback in failure
-  useMemoized(
-    () {
-      if (mapped case Fail(:final error)) {
-        // if callback tries to build widget(show snackbar for example) this will prevent exceptions
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) => failureCallBack.value?.call(error),
-        );
-      }
-      if (mapped case Success()) {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) => successCallBack.value?.call(),
-        );
-      }
-    },
-    [mapped, failureCallBack.value, successCallBack.value],
-  );
+  useMemoized(() {
+    if (mapped case Fail(:final error)) {
+      // if callback tries to build widget(show snackbar for example) this will prevent exceptions
+      WidgetsBinding.instance.addPostFrameCallback((_) => failureCallBack.value?.call(error));
+    }
+    if (mapped case Success()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => successCallBack.value?.call());
+    }
+  }, [mapped, failureCallBack.value, successCallBack.value]);
 
   return (
     state: mapped,

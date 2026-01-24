@@ -52,19 +52,9 @@ class SettingCheckboxDialog extends ConsumerWidget {
         ),
       ),
       actions: [
-        if (defaultValue != null)
-          TextButton(
-            child: Text(t.common.reset),
-            onPressed: () => context.pop(defaultValue),
-          ),
-        TextButton(
-          child: Text(t.common.cancel),
-          onPressed: () => context.pop(),
-        ),
-        TextButton(
-          child: Text(t.common.done),
-          onPressed: () => context.pop(current),
-        ),
+        if (defaultValue != null) TextButton(child: Text(t.common.reset), onPressed: () => context.pop(defaultValue)),
+        TextButton(child: Text(t.common.cancel), onPressed: () => context.pop()),
+        TextButton(child: Text(t.common.done), onPressed: () => context.pop(current)),
       ],
     );
   }

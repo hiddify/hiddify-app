@@ -19,19 +19,9 @@ const _popupMenuHeight = 30.0;
 const _popupMenuItemPadding = 20.0;
 const _textSpacer = SizedBox(width: 5);
 const _newKey = "new_key_added";
-const _downArrow = SizedBox(
-  width: _expandIconWidth,
-  child: Icon(FontAwesomeIcons.caretDown, size: 14),
-);
-const _rightArrow = SizedBox(
-  width: _expandIconWidth,
-  child: Icon(FontAwesomeIcons.caretRight, size: 14),
-);
-const _newDataValue = {
-  "string": "",
-  "bool": false,
-  "num": 0,
-};
+const _downArrow = SizedBox(width: _expandIconWidth, child: Icon(FontAwesomeIcons.caretDown, size: 14));
+const _rightArrow = SizedBox(width: _expandIconWidth, child: Icon(FontAwesomeIcons.caretRight, size: 14));
+const _newDataValue = {"string": "", "bool": false, "num": 0};
 bool _enableMoreOptions = true;
 bool _enableKeyEdit = true;
 bool _enableValueEdit = true;
@@ -49,9 +39,18 @@ const Map<String, Map<String, dynamic>> protocolSchemaValues = {
     "type": "xray",
     "tag": "xray-out",
     "xray_outbound_raw": {},
-    "xray_fragment": {"packets": "tlshello", "interval": "1-10", "length": "1-10"}
+    "xray_fragment": {"packets": "tlshello", "interval": "1-10", "length": "1-10"},
   },
-  "warp": {"type": "custom", "key": "", "host": "", "port": 808, "fake_packets": "1-10", "fake_packets_size": "1-10", "fake_packets_delay": "1-10", "fake_packets_mode": "m4"},
+  "warp": {
+    "type": "custom",
+    "key": "",
+    "host": "",
+    "port": 808,
+    "fake_packets": "1-10",
+    "fake_packets_size": "1-10",
+    "fake_packets_delay": "1-10",
+    "fake_packets_mode": "m4",
+  },
   "vless": {
     "type": "vless",
     "tag": "vless-out",
@@ -105,9 +104,7 @@ const Map<String, Map<String, dynamic>> protocolSchemaValues = {
     "down_mbps": 100,
     "obfs": {"type": "salamander", "password": "cry_me_a_r1ver"},
     "password": "goofy_ahh_password",
-    "tls": {
-      "enabled": true,
-    }
+    "tls": {"enabled": true},
   },
   "shadowsocks": {
     "type": "shadowsocks",
@@ -159,7 +156,7 @@ const Map<String, Map<String, dynamic>> protocolSchemaValues = {
     "fake_packets": "1-10",
     "fake_packets_size": "1-10",
     "fake_packets_delay": "1-10",
-    "fake_packets_mode": "m4"
+    "fake_packets_mode": "m4",
   },
   "tuic": {
     "type": "tuic",
@@ -191,16 +188,16 @@ const Map<String, Map<String, dynamic>> protocolSchemaValues = {
 const Map<String, Map<String, Map<String, dynamic>>> exampleSchemaValues = {
   "config.outbounds.transport": {
     "browser user-agent": {
-      "header": {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0"}
-    }
+      "header": {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0"},
+    },
   },
   "config.outbounds.tls": {
     "fragment": {
-      "tls_fragment": {"enabled": true, "size": "1-10", "sleep": "1-10"}
+      "tls_fragment": {"enabled": true, "size": "1-10", "sleep": "1-10"},
     },
     "utls": {
-      "utls": {"enabled": true, "fingerprint": "chrome"}
-    }
+      "utls": {"enabled": true, "fingerprint": "chrome"},
+    },
   },
   "config.outbounds": {
     "multiplex": {
@@ -211,7 +208,7 @@ const Map<String, Map<String, Map<String, dynamic>>> exampleSchemaValues = {
         "min_streams": 4,
         "max_streams": 0,
         "padding": false,
-        "brutal": {"enabled": true, "up_mbps": 100, "down_mbps": 100}
+        "brutal": {"enabled": true, "up_mbps": 100, "down_mbps": 100},
       },
     },
     "reality": {
@@ -221,7 +218,7 @@ const Map<String, Map<String, Map<String, dynamic>>> exampleSchemaValues = {
         "min_version": "",
         "max_version": "",
         "utls": {"enabled": true, "fingerprint": "chrome"},
-        "reality": {"enabled": true, "public_key": "", "short_id": ""}
+        "reality": {"enabled": true, "public_key": "", "short_id": ""},
       },
     },
     "tls": {
@@ -234,37 +231,79 @@ const Map<String, Map<String, Map<String, dynamic>>> exampleSchemaValues = {
         "alpn": [],
         "min_version": "",
         "max_version": "",
-        "tls_fragment": {"enabled": false, "size": "1-10", "sleep": "1-10"}
+        "tls_fragment": {"enabled": false, "size": "1-10", "sleep": "1-10"},
       },
     },
     "websocket": {
-      "transport": {"type": "ws", "path": "", "headers": {}, "max_early_data": 0, "early_data_header_name": ""}
+      "transport": {"type": "ws", "path": "", "headers": {}, "max_early_data": 0, "early_data_header_name": ""},
     },
     "grpc": {
-      "transport": {"type": "grpc", "service_name": "TunService", "idle_timeout": "15s", "ping_timeout": "15s", "permit_without_stream": false}
+      "transport": {
+        "type": "grpc",
+        "service_name": "TunService",
+        "idle_timeout": "15s",
+        "ping_timeout": "15s",
+        "permit_without_stream": false,
+      },
     },
     "quic": {
-      "transport": {"type": "quic"}
+      "transport": {"type": "quic"},
     },
     "http": {
-      "transport": {"type": "http", "host": [], "path": "", "method": "", "headers": {}, "idle_timeout": "15s", "ping_timeout": "15s"}
+      "transport": {
+        "type": "http",
+        "host": [],
+        "path": "",
+        "method": "",
+        "headers": {},
+        "idle_timeout": "15s",
+        "ping_timeout": "15s",
+      },
     },
     "httpupgrade": {
-      "transport": {"type": "httpupgrade", "host": "", "path": "", "headers": {}}
+      "transport": {"type": "httpupgrade", "host": "", "path": "", "headers": {}},
     },
-  }
+  },
 };
 
 const Map<String, List<String>> possibleValues = {
   "config.outbounds.flow": <String>["", "xtls-rprx-vision"],
   "config.outbounds.security": <String>["", "auto", "none", "zero", "aes-128-gcm", "chacha20-poly1305"],
-  "config.outbounds.method": <String>["", "2022-blake3-aes-128-gcm", "2022-blake3-aes-256-gcm", "2022-blake3-chacha20-poly1305", "none", "aes-128-gcm", "aes-192-gcm", "aes-256-gcm", "chacha20-ietf-poly1305", "xchacha20-ietf-poly1305"],
+  "config.outbounds.method": <String>[
+    "",
+    "2022-blake3-aes-128-gcm",
+    "2022-blake3-aes-256-gcm",
+    "2022-blake3-chacha20-poly1305",
+    "none",
+    "aes-128-gcm",
+    "aes-192-gcm",
+    "aes-256-gcm",
+    "chacha20-ietf-poly1305",
+    "xchacha20-ietf-poly1305",
+  ],
   "config.outbounds.plugin": <String>["", "obfs-local", "v2ray-plugin"],
   "config.outbounds.network": <String>["", "udp", "tcp"],
   "config.outbounds.multiplex.protocol": <String>["", "smux", "yamux", "h2mux"],
   "config.outbounds.tls.min_version": <String>["", "1.0", "1.1", "1.2", "1.3"],
   "config.outbounds.tls.max_version": <String>["", "1.0", "1.1", "1.2", "1.3"],
-  "config.outbounds.tls.utls.fingerprint": <String>["", "chrome", "chrome_psk", "chrome_psk_shuffle", "chrome_padding_psk_shuffle", "chrome_pq", "chrome_pq_psk", "firefox", "edge", "safari", "360", "qq", "ios", "android", "random", "randomized"],
+  "config.outbounds.tls.utls.fingerprint": <String>[
+    "",
+    "chrome",
+    "chrome_psk",
+    "chrome_psk_shuffle",
+    "chrome_padding_psk_shuffle",
+    "chrome_pq",
+    "chrome_pq_psk",
+    "firefox",
+    "edge",
+    "safari",
+    "360",
+    "qq",
+    "ios",
+    "android",
+    "random",
+    "randomized",
+  ],
   "config.outbounds.packet_encoding": <String>["", "(none)", "xudp", "packetaddr"],
   "config.outbounds.transport.type": <String>["", "http", "ws", "grpc", "quic", "httpupgrade"],
   "config.outbounds.type": <String>[
@@ -284,7 +323,7 @@ const Map<String, List<String>> possibleValues = {
     "block",
     "socks",
     "http",
-  ]
+  ],
 };
 
 /// Edit your JSON object with this Widget. Create, edit and format objects
@@ -458,9 +497,7 @@ class _JsonEditorState extends State<JsonEditor> {
   }
 
   void copyData() async {
-    await Clipboard.setData(
-      ClipboardData(text: const JsonEncoder.withIndent(' ').convert(_data)),
-    );
+    await Clipboard.setData(ClipboardData(text: const JsonEncoder.withIndent(' ').convert(_data)));
   }
 
   bool updateParentObjects(List newExpandList) {
@@ -480,7 +517,8 @@ class _JsonEditorState extends State<JsonEditor> {
       final keys = data.keys.toList();
       for (var key in keys) {
         final keyName = key.toString();
-        if (keyName.toLowerCase().contains(text) || (data[key] is String && data[key].toString().toLowerCase().contains(text))) {
+        if (keyName.toLowerCase().contains(text) ||
+            (data[key] is String && data[key].toString().toLowerCase().contains(text))) {
           _results = _results! + 1;
           _matchedKeys[keyName] = true;
           _matchedKeysLocation.add([...nestedParents, key]);
@@ -567,9 +605,7 @@ class _JsonEditorState extends State<JsonEditor> {
 
   void scrollTo(int index) {
     final toFind = [..._matchedKeysLocation[index]];
-    final needsRebuilding = updateParentObjects(
-      [..._matchedKeysLocation[index]]..removeLast(),
-    );
+    final needsRebuilding = updateParentObjects([..._matchedKeysLocation[index]]..removeLast());
     if (needsRebuilding) setState(() {});
     Future.delayed(const Duration(milliseconds: 150), () {
       _scrollController.animateTo(
@@ -620,10 +656,7 @@ class _JsonEditorState extends State<JsonEditor> {
 
   Widget wrapWithHorizontolScroll(Widget child) {
     if (widget.enableHorizontalScroll) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: child,
-      );
+      return SingleChildScrollView(scrollDirection: Axis.horizontal, child: child);
     }
     return child;
   }
@@ -648,10 +681,7 @@ class _JsonEditorState extends State<JsonEditor> {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        border: Border.all(
-          width: _onError ? 2 : 1,
-          color: _onError ? Colors.red : _themeColor,
-        ),
+        border: Border.all(width: _onError ? 2 : 1, color: _onError ? Colors.red : _themeColor),
       ),
       child: SizedBox(
         child: Column(
@@ -659,17 +689,11 @@ class _JsonEditorState extends State<JsonEditor> {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                  color: _themeColor,
-                  border: _onError
-                      ? const Border(
-                          bottom: BorderSide(color: Colors.red, width: 2),
-                        )
-                      : null),
+                color: _themeColor,
+                border: _onError ? const Border(bottom: BorderSide(color: Colors.red, width: 2)) : null,
+              ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 6,
-                  horizontal: 10,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
                 child: Row(
                   children: [
                     const Text('Config Editor:  '),
@@ -688,10 +712,7 @@ class _JsonEditorState extends State<JsonEditor> {
                         },
                         position: PopupMenuPosition.under,
                         enabled: widget.editors.length > 1,
-                        constraints: const BoxConstraints(
-                          minWidth: 50,
-                          maxWidth: 150,
-                        ),
+                        constraints: const BoxConstraints(minWidth: 50, maxWidth: 150),
                         itemBuilder: (context) {
                           return <PopupMenuEntry<Editors>>[
                             PopupMenuItem<Editors>(
@@ -725,17 +746,11 @@ class _JsonEditorState extends State<JsonEditor> {
                         onTap: () {
                           _controller.text = _stringifyData(_data, 0, true);
                         },
-                        child: const Tooltip(
-                          message: 'Format',
-                          child: Icon(Icons.format_align_left, size: 20),
-                        ),
+                        child: const Tooltip(message: 'Format', child: Icon(Icons.format_align_left, size: 20)),
                       ),
                     ] else ...[
                       const SizedBox(width: 20),
-                      if (_results != null) ...[
-                        Text("$_results results"),
-                        const SizedBox(width: 5),
-                      ],
+                      if (_results != null) ...[Text("$_results results"), const SizedBox(width: 5)],
                       _SearchField(onSearch, onSearchAction),
                       const SizedBox(width: 20),
                       InkWell(
@@ -744,10 +759,7 @@ class _JsonEditorState extends State<JsonEditor> {
                           expandAllObjects(_data, ["config"]);
                           setState(() {});
                         },
-                        child: const Tooltip(
-                          message: 'Expand All',
-                          child: Icon(Icons.expand, size: 20),
-                        ),
+                        child: const Tooltip(message: 'Expand All', child: Icon(Icons.expand, size: 20)),
                       ),
                       const SizedBox(width: 20),
                       InkWell(
@@ -755,19 +767,13 @@ class _JsonEditorState extends State<JsonEditor> {
                           _expandedObjects.clear();
                           setState(() {});
                         },
-                        child: const Tooltip(
-                          message: 'Collapse All',
-                          child: Icon(Icons.compress, size: 20),
-                        ),
+                        child: const Tooltip(message: 'Collapse All', child: Icon(Icons.compress, size: 20)),
                       ),
                     ],
                     const SizedBox(width: 20),
                     InkWell(
                       onTap: copyData,
-                      child: const Tooltip(
-                        message: 'Copy',
-                        child: Icon(Icons.copy, size: 20),
-                      ),
+                      child: const Tooltip(message: 'Copy', child: Icon(Icons.copy, size: 20)),
                     ),
                     if (widget.actions.isNotEmpty) const SizedBox(width: 20),
                     ...widget.actions,
@@ -808,11 +814,7 @@ class _JsonEditorState extends State<JsonEditor> {
                   textAlignVertical: TextAlignVertical.top,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(
-                      left: 5,
-                      top: 8,
-                      bottom: 8,
-                    ),
+                    contentPadding: EdgeInsets.only(left: 5, top: 8, bottom: 8),
                   ),
                 ),
               ),
@@ -977,18 +979,20 @@ class _HolderState extends State<_Holder> {
       final widgetData = widget.data as Map<String, dynamic>;
       final List<String> keys = widgetData.keys.toList();
       for (var key in keys) {
-        mapWidget.add(_Holder(
-          key: Key(key),
-          data: widget.data[key],
-          keyName: key,
-          onChanged: widget.onChanged,
-          parentObject: widget.data,
-          paddingLeft: widget.paddingLeft + _space,
-          setState: setState,
-          matchedKeys: widget.matchedKeys,
-          allParents: [...widget.allParents, key],
-          expandedObjects: widget.expandedObjects,
-        ));
+        mapWidget.add(
+          _Holder(
+            key: Key(key),
+            data: widget.data[key],
+            keyName: key,
+            onChanged: widget.onChanged,
+            parentObject: widget.data,
+            paddingLeft: widget.paddingLeft + _space,
+            setState: setState,
+            matchedKeys: widget.matchedKeys,
+            allParents: [...widget.allParents, key],
+            expandedObjects: widget.expandedObjects,
+          ),
+        );
       }
 
       return Column(
@@ -1019,10 +1023,7 @@ class _HolderState extends State<_Holder> {
                     isHighlighted: widget.matchedKeys["${widget.keyName}"] == true,
                   ),
                   _textSpacer,
-                  Text(
-                    getChildSummary(widget),
-                    style: _textStyle,
-                  ),
+                  Text(getChildSummary(widget), style: _textStyle),
                 ] else
                   InkWell(
                     hoverColor: Colors.transparent,
@@ -1031,10 +1032,7 @@ class _HolderState extends State<_Holder> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        wrapWithColoredBox(
-                          Text("${widget.keyName}", style: _textStyle),
-                          "${widget.keyName}",
-                        ),
+                        wrapWithColoredBox(Text("${widget.keyName}", style: _textStyle), "${widget.keyName}"),
                         _textSpacer,
                         Text(getChildSummary(widget), style: _textStyle),
                       ],
@@ -1044,29 +1042,27 @@ class _HolderState extends State<_Holder> {
             ),
           ),
           if (isExpanded)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: mapWidget,
-            ),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: mapWidget),
         ],
       );
     } else if (widget.data is List) {
       final listWidget = <Widget>[];
       final widgetData = widget.data as List;
       for (int i = 0; i < widgetData.length; i++) {
-        listWidget.add(_Holder(
-          key: Key("$i"),
-          keyName: i,
-          data: widgetData[i],
-          onChanged: widget.onChanged,
-          parentObject: widget.data,
-          paddingLeft: widget.paddingLeft + _space,
-          setState: setState,
-          matchedKeys: widget.matchedKeys,
-          allParents: [...widget.allParents, i],
-          expandedObjects: widget.expandedObjects,
-        ));
+        listWidget.add(
+          _Holder(
+            key: Key("$i"),
+            keyName: i,
+            data: widgetData[i],
+            onChanged: widget.onChanged,
+            parentObject: widget.data,
+            paddingLeft: widget.paddingLeft + _space,
+            setState: setState,
+            matchedKeys: widget.matchedKeys,
+            allParents: [...widget.allParents, i],
+            expandedObjects: widget.expandedObjects,
+          ),
+        );
       }
 
       return Column(
@@ -1098,10 +1094,7 @@ class _HolderState extends State<_Holder> {
                     isHighlighted: widget.matchedKeys["${widget.keyName}"] == true,
                   ),
                   _textSpacer,
-                  Text(
-                    "[${widget.data.length}]",
-                    style: _textStyle,
-                  ),
+                  Text("[${widget.data.length}]", style: _textStyle),
                 ] else
                   InkWell(
                     hoverColor: Colors.transparent,
@@ -1110,10 +1103,7 @@ class _HolderState extends State<_Holder> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        wrapWithColoredBox(
-                          Text("${widget.keyName}", style: _textStyle),
-                          "${widget.keyName}",
-                        ),
+                        wrapWithColoredBox(Text("${widget.keyName}", style: _textStyle), "${widget.keyName}"),
                         _textSpacer,
                         Text("[${widget.data.length}]", style: _textStyle),
                       ],
@@ -1123,11 +1113,7 @@ class _HolderState extends State<_Holder> {
             ),
           ),
           if (isExpanded)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: listWidget,
-            ),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: listWidget),
         ],
       );
     } else {
@@ -1138,9 +1124,7 @@ class _HolderState extends State<_Holder> {
           children: [
             const SizedBox(width: _expandIconWidth),
             if (_enableMoreOptions) _Options<String>(onSelected, widget.getKeyPath()),
-            SizedBox(
-              width: widget.paddingLeft + (_expandIconWidth * 2),
-            ),
+            SizedBox(width: widget.paddingLeft + (_expandIconWidth * 2)),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -1158,10 +1142,7 @@ class _HolderState extends State<_Holder> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      wrapWithColoredBox(
-                        Text("${widget.keyName}", style: _textStyle),
-                        "${widget.keyName}",
-                      ),
+                      wrapWithColoredBox(Text("${widget.keyName}", style: _textStyle), "${widget.keyName}"),
                       _textSpacer,
                       const Text(" :", style: _textStyle),
                     ],
@@ -1190,7 +1171,15 @@ class _HolderState extends State<_Holder> {
 }
 
 class _ReplaceTextWithField extends StatefulWidget {
-  const _ReplaceTextWithField({super.key, required this.initialValue, required this.onChanged, required this.setState, this.isKey = false, this.isHighlighted = false, this.keyPath = ""});
+  const _ReplaceTextWithField({
+    super.key,
+    required this.initialValue,
+    required this.onChanged,
+    required this.setState,
+    this.isKey = false,
+    this.isHighlighted = false,
+    this.keyPath = "",
+  });
   final String keyPath;
   final dynamic initialValue;
   final bool isKey;
@@ -1284,9 +1273,7 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
               icon: const Icon(Icons.arrow_downward),
               iconSize: 24,
               elevation: 16,
-              underline: Container(
-                height: 2,
-              ),
+              underline: Container(height: 2),
               onChanged: (String? newValue) {
                 widget.onChanged(newValue!);
                 _text = newValue;
@@ -1295,10 +1282,7 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
                 });
               },
               items: options.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
+                return DropdownMenuItem<String>(value: value, child: Text(value));
               }).toList(),
             ),
           ),
@@ -1356,7 +1340,9 @@ class _ReplaceTextWithFieldState extends State<_ReplaceTextWithField> {
             _focusNode.requestFocus();
           },
           mouseCursor: WidgetStateMouseCursor.textable,
-          child: widget.initialValue is String && _text.isEmpty ? const SizedBox(width: 400, height: 18) : wrapWithColoredBox(_text),
+          child: widget.initialValue is String && _text.isEmpty
+              ? const SizedBox(width: 400, height: 18)
+              : wrapWithColoredBox(_text),
         );
       }
     }
@@ -1377,25 +1363,29 @@ class _Options<T> extends StatelessWidget {
       itemBuilder: (context) {
         return <PopupMenuEntry<_OptionItems>>[
           if (keyPath != "config" && T == Map)
-            const _PopupMenuWidget(Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(width: 5),
-                Icon(Icons.add),
-                SizedBox(width: 10),
-                Text("Insert", style: TextStyle(fontSize: 14)),
-              ],
-            )),
+            const _PopupMenuWidget(
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(width: 5),
+                  Icon(Icons.add),
+                  SizedBox(width: 10),
+                  Text("Insert", style: TextStyle(fontSize: 14)),
+                ],
+              ),
+            ),
           if (keyPath != "config" && T == List)
-            const _PopupMenuWidget(Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(width: 5),
-                Icon(Icons.add),
-                SizedBox(width: 10),
-                Text("Append", style: TextStyle(fontSize: 14)),
-              ],
-            )),
+            const _PopupMenuWidget(
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(width: 5),
+                  Icon(Icons.add),
+                  SizedBox(width: 10),
+                  Text("Append", style: TextStyle(fontSize: 14)),
+                ],
+              ),
+            ),
           if (keyPath != "config" && (T == Map || T == List)) ...[
             if (keyPath == "config.outbounds" && T == List) ...[
               for (final String key in protocolSchemaValues.keys) ...{
@@ -1589,26 +1579,14 @@ class _SearchField extends StatelessWidget {
             onTap: () {
               onAction(_SearchActions.next);
             },
-            child: const Tooltip(
-              message: 'Next',
-              child: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                size: 20,
-              ),
-            ),
+            child: const Tooltip(message: 'Next', child: Icon(Icons.keyboard_arrow_down_rounded, size: 20)),
           ),
           const SizedBox(width: 2),
           InkWell(
             onTap: () {
               onAction(_SearchActions.prev);
             },
-            child: const Tooltip(
-              message: 'Previous',
-              child: Icon(
-                Icons.keyboard_arrow_up_rounded,
-                size: 20,
-              ),
-            ),
+            child: const Tooltip(message: 'Previous', child: Icon(Icons.keyboard_arrow_up_rounded, size: 20)),
           ),
           const SizedBox(width: 5),
         ],

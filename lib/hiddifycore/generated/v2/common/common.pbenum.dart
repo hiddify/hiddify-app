@@ -18,7 +18,7 @@ class ResponseCode extends $pb.ProtobufEnum {
   static const ResponseCode FAILED = ResponseCode._(1, _omitEnumNames ? '' : 'FAILED');
   static const ResponseCode AUTH_NEED = ResponseCode._(2, _omitEnumNames ? '' : 'AUTH_NEED');
 
-  static const $core.List<ResponseCode> values = <ResponseCode> [
+  static const $core.List<ResponseCode> values = <ResponseCode>[
     OK,
     FAILED,
     AUTH_NEED,
@@ -29,6 +29,5 @@ class ResponseCode extends $pb.ProtobufEnum {
 
   const ResponseCode._($core.int v, $core.String n) : super(v, n);
 }
-
 
 const _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');

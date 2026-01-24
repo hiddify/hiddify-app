@@ -29,14 +29,8 @@ abstract class ConfigOptions {
     mapFrom: Region.values.byName,
     mapTo: (value) => value.name,
   );
-  static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>(
-    "use-xray-core-when-possible",
-    false,
-  );
-  static final blockAds = PreferencesNotifier.create<bool, bool>(
-    "block-ads",
-    false,
-  );
+  static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>("use-xray-core-when-possible", false);
+  static final blockAds = PreferencesNotifier.create<bool, bool>("block-ads", false);
   static final logLevel = PreferencesNotifier.create<LogLevel, String>(
     "log-level",
     LogLevel.warn,
@@ -44,10 +38,7 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
 
-  static final resolveDestination = PreferencesNotifier.create<bool, bool>(
-    "resolve-destination",
-    false,
-  );
+  static final resolveDestination = PreferencesNotifier.create<bool, bool>("resolve-destination", false);
 
   static final ipv6Mode = PreferencesNotifier.create<IPv6Mode, String>(
     "ipv6-mode",
@@ -158,10 +149,7 @@ abstract class ConfigOptions {
     mapTo: const IntervalInSecondsConverter().toJson,
   );
 
-  static final enableClashApi = PreferencesNotifier.create<bool, bool>(
-    "enable-clash-api",
-    true,
-  );
+  static final enableClashApi = PreferencesNotifier.create<bool, bool>("enable-clash-api", true);
 
   static final clashApiPort = PreferencesNotifier.create<int, int>(
     "clash-api-port",
@@ -171,30 +159,15 @@ abstract class ConfigOptions {
 
   static final bypassLan = PreferencesNotifier.create<bool, bool>("bypass-lan", false);
 
-  static final allowConnectionFromLan = PreferencesNotifier.create<bool, bool>(
-    "allow-connection-from-lan",
-    false,
-  );
+  static final allowConnectionFromLan = PreferencesNotifier.create<bool, bool>("allow-connection-from-lan", false);
 
-  static final enableFakeDns = PreferencesNotifier.create<bool, bool>(
-    "enable-fake-dns",
-    false,
-  );
+  static final enableFakeDns = PreferencesNotifier.create<bool, bool>("enable-fake-dns", false);
 
-  static final enableDnsRouting = PreferencesNotifier.create<bool, bool>(
-    "enable-dns-routing",
-    true,
-  );
+  static final enableDnsRouting = PreferencesNotifier.create<bool, bool>("enable-dns-routing", true);
 
-  static final independentDnsCache = PreferencesNotifier.create<bool, bool>(
-    "independent-dns-cache",
-    true,
-  );
+  static final independentDnsCache = PreferencesNotifier.create<bool, bool>("independent-dns-cache", true);
 
-  static final enableTlsFragment = PreferencesNotifier.create<bool, bool>(
-    "enable-tls-fragment",
-    false,
-  );
+  static final enableTlsFragment = PreferencesNotifier.create<bool, bool>("enable-tls-fragment", false);
 
   static final tlsFragmentSize = PreferencesNotifier.create<OptionalRange, String>(
     "tls-fragment-size",
@@ -210,15 +183,9 @@ abstract class ConfigOptions {
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final enableTlsMixedSniCase = PreferencesNotifier.create<bool, bool>(
-    "enable-tls-mixed-sni-case",
-    false,
-  );
+  static final enableTlsMixedSniCase = PreferencesNotifier.create<bool, bool>("enable-tls-mixed-sni-case", false);
 
-  static final enableTlsPadding = PreferencesNotifier.create<bool, bool>(
-    "enable-tls-padding",
-    false,
-  );
+  static final enableTlsPadding = PreferencesNotifier.create<bool, bool>("enable-tls-padding", false);
 
   static final tlsPaddingSize = PreferencesNotifier.create<OptionalRange, String>(
     "tls-padding-size",
@@ -227,15 +194,9 @@ abstract class ConfigOptions {
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final enableMux = PreferencesNotifier.create<bool, bool>(
-    "enable-mux",
-    false,
-  );
+  static final enableMux = PreferencesNotifier.create<bool, bool>("enable-mux", false);
 
-  static final muxPadding = PreferencesNotifier.create<bool, bool>(
-    "mux-padding",
-    false,
-  );
+  static final muxPadding = PreferencesNotifier.create<bool, bool>("mux-padding", false);
 
   static final muxMaxStreams = PreferencesNotifier.create<int, int>(
     "mux-max-streams",
@@ -250,10 +211,7 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
 
-  static final enableWarp = PreferencesNotifier.create<bool, bool>(
-    "enable-warp",
-    false,
-  );
+  static final enableWarp = PreferencesNotifier.create<bool, bool>("enable-warp", false);
 
   static final warpDetourMode = PreferencesNotifier.create<WarpDetourMode, String>(
     "warp-detour-mode",
@@ -262,37 +220,16 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
 
-  static final warpLicenseKey = PreferencesNotifier.create<String, String>(
-    "warp-license-key",
-    "",
-  );
-  static final warp2LicenseKey = PreferencesNotifier.create<String, String>(
-    "warp2s-license-key",
-    "",
-  );
+  static final warpLicenseKey = PreferencesNotifier.create<String, String>("warp-license-key", "");
+  static final warp2LicenseKey = PreferencesNotifier.create<String, String>("warp2s-license-key", "");
 
-  static final warpAccountId = PreferencesNotifier.create<String, String>(
-    "warp-account-id",
-    "",
-  );
-  static final warp2AccountId = PreferencesNotifier.create<String, String>(
-    "warp2-account-id",
-    "",
-  );
+  static final warpAccountId = PreferencesNotifier.create<String, String>("warp-account-id", "");
+  static final warp2AccountId = PreferencesNotifier.create<String, String>("warp2-account-id", "");
 
-  static final warpAccessToken = PreferencesNotifier.create<String, String>(
-    "warp-access-token",
-    "",
-  );
-  static final warp2AccessToken = PreferencesNotifier.create<String, String>(
-    "warp2-access-token",
-    "",
-  );
+  static final warpAccessToken = PreferencesNotifier.create<String, String>("warp-access-token", "");
+  static final warp2AccessToken = PreferencesNotifier.create<String, String>("warp2-access-token", "");
 
-  static final warpCleanIp = PreferencesNotifier.create<String, String>(
-    "warp-clean-ip",
-    "auto",
-  );
+  static final warpCleanIp = PreferencesNotifier.create<String, String>("warp-clean-ip", "auto");
 
   static final warpPort = PreferencesNotifier.create<int, int>(
     "warp-port",
@@ -306,10 +243,7 @@ abstract class ConfigOptions {
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
-  static final warpNoiseMode = PreferencesNotifier.create<String, String>(
-    "warp-noise-mode",
-    "m4",
-  );
+  static final warpNoiseMode = PreferencesNotifier.create<String, String>("warp-noise-mode", "m4");
 
   static final warpNoiseDelay = PreferencesNotifier.create<OptionalRange, String>(
     "warp-noise-delay",
@@ -324,28 +258,20 @@ abstract class ConfigOptions {
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final warpWireguardConfig = PreferencesNotifier.create<String, String>(
-    "warp-wireguard-config",
-    "",
-  );
-  static final warp2WireguardConfig = PreferencesNotifier.create<String, String>(
-    "warp2-wireguard-config",
-    "",
-  );
+  static final warpWireguardConfig = PreferencesNotifier.create<String, String>("warp-wireguard-config", "");
+  static final warp2WireguardConfig = PreferencesNotifier.create<String, String>("warp2-wireguard-config", "");
 
-  static final hasExperimentalFeatures = Provider.autoDispose<bool>(
-    (ref) {
-      // final mode = ref.watch(serviceMode);
-      // if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
-      //   return true;
-      // }
-      // if (ref.watch(enableTlsFragment) || ref.watch(enableTlsMixedSniCase) || ref.watch(enableTlsPadding) || ref.watch(enableMux) || ref.watch(enableWarp) || ref.watch(bypassLan) || ref.watch(allowConnectionFromLan)) {
-      //   return true;
-      // }
+  static final hasExperimentalFeatures = Provider.autoDispose<bool>((ref) {
+    // final mode = ref.watch(serviceMode);
+    // if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
+    //   return true;
+    // }
+    // if (ref.watch(enableTlsFragment) || ref.watch(enableTlsMixedSniCase) || ref.watch(enableTlsPadding) || ref.watch(enableMux) || ref.watch(enableWarp) || ref.watch(bypassLan) || ref.watch(allowConnectionFromLan)) {
+    //   return true;
+    // }
 
-      return false;
-    },
-  );
+    return false;
+  });
 
   /// preferences to exclude from share and export
   static final privatePreferencesKeys = {
@@ -417,157 +343,151 @@ abstract class ConfigOptions {
     "warp2.wireguard-config": warp2WireguardConfig,
   };
 
-  static final singboxConfigOptions = Provider<SingboxConfigOption>(
-    (ref) {
-      // final region = ref.watch(Preferences.region);
-      final rules = <SingboxRule>[];
-      // final rules = switch (region) {
-      //   Region.ir => [
-      //       const SingboxRule(
-      //         domains: "domain:.ir,geosite:ir",
-      //         ip: "geoip:ir",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.cn => [
-      //       const SingboxRule(
-      //         domains: "domain:.cn,geosite:cn",
-      //         ip: "geoip:cn",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.ru => [
-      //       const SingboxRule(
-      //         domains: "domain:.ru",
-      //         ip: "geoip:ru",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.af => [
-      //       const SingboxRule(
-      //         domains: "domain:.af,geosite:af",
-      //         ip: "geoip:af",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.id => [
-      //       const SingboxRule(
-      //         domains: "domain:.id,geosite:id",
-      //         ip: "geoip:id",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   _ => <SingboxRule>[],
-      // };
+  static final singboxConfigOptions = Provider<SingboxConfigOption>((ref) {
+    // final region = ref.watch(Preferences.region);
+    final rules = <SingboxRule>[];
+    // final rules = switch (region) {
+    //   Region.ir => [
+    //       const SingboxRule(
+    //         domains: "domain:.ir,geosite:ir",
+    //         ip: "geoip:ir",
+    //         outbound: RuleOutbound.bypass,
+    //       ),
+    //     ],
+    //   Region.cn => [
+    //       const SingboxRule(
+    //         domains: "domain:.cn,geosite:cn",
+    //         ip: "geoip:cn",
+    //         outbound: RuleOutbound.bypass,
+    //       ),
+    //     ],
+    //   Region.ru => [
+    //       const SingboxRule(
+    //         domains: "domain:.ru",
+    //         ip: "geoip:ru",
+    //         outbound: RuleOutbound.bypass,
+    //       ),
+    //     ],
+    //   Region.af => [
+    //       const SingboxRule(
+    //         domains: "domain:.af,geosite:af",
+    //         ip: "geoip:af",
+    //         outbound: RuleOutbound.bypass,
+    //       ),
+    //     ],
+    //   Region.id => [
+    //       const SingboxRule(
+    //         domains: "domain:.id,geosite:id",
+    //         ip: "geoip:id",
+    //         outbound: RuleOutbound.bypass,
+    //       ),
+    //     ],
+    //   _ => <SingboxRule>[],
+    // };
 
-      final mode = ref.watch(serviceMode);
-      // final reg = ref.watch(Preferences.region.notifier).raw();
+    final mode = ref.watch(serviceMode);
+    // final reg = ref.watch(Preferences.region.notifier).raw();
 
-      return SingboxConfigOption(
-        region: ref.watch(region).name,
-        blockAds: ref.watch(blockAds),
-        useXrayCoreWhenPossible: ref.watch(useXrayCoreWhenPossible),
-        executeConfigAsIs: false,
-        logLevel: ref.watch(logLevel),
-        resolveDestination: ref.watch(resolveDestination),
-        ipv6Mode: ref.watch(ipv6Mode),
-        remoteDnsAddress: ref.watch(remoteDnsAddress),
-        remoteDnsDomainStrategy: ref.watch(remoteDnsDomainStrategy),
-        directDnsAddress: ref.watch(directDnsAddress),
-        directDnsDomainStrategy: ref.watch(directDnsDomainStrategy),
-        mixedPort: ref.watch(mixedPort),
-        tproxyPort: ref.watch(tproxyPort),
-        localDnsPort: ref.watch(localDnsPort),
-        tunImplementation: ref.watch(tunImplementation),
-        mtu: ref.watch(mtu),
-        strictRoute: ref.watch(strictRoute),
-        connectionTestUrl: ref.watch(connectionTestUrl),
-        urlTestInterval: ref.watch(urlTestInterval),
-        enableClashApi: ref.watch(enableClashApi),
-        clashApiPort: ref.watch(clashApiPort),
-        enableTun: mode == ServiceMode.tun,
-        enableTunService: mode == ServiceMode.tunService,
-        setSystemProxy: mode == ServiceMode.systemProxy,
-        bypassLan: ref.watch(bypassLan),
-        allowConnectionFromLan: ref.watch(allowConnectionFromLan),
-        enableFakeDns: ref.watch(enableFakeDns),
-        enableDnsRouting: ref.watch(enableDnsRouting),
-        independentDnsCache: ref.watch(independentDnsCache),
-        mux: SingboxMuxOption(
-          enable: ref.watch(enableMux),
-          padding: ref.watch(muxPadding),
-          maxStreams: ref.watch(muxMaxStreams),
-          protocol: ref.watch(muxProtocol),
-        ),
-        tlsTricks: SingboxTlsTricks(
-          enableFragment: ref.watch(enableTlsFragment),
-          fragmentSize: ref.watch(tlsFragmentSize),
-          fragmentSleep: ref.watch(tlsFragmentSleep),
-          mixedSniCase: ref.watch(enableTlsMixedSniCase),
-          enablePadding: ref.watch(enableTlsPadding),
-          paddingSize: ref.watch(tlsPaddingSize),
-        ),
-        warp: SingboxWarpOption(
-          enable: ref.watch(enableWarp),
-          mode: ref.watch(warpDetourMode),
-          wireguardConfig: ref.watch(warpWireguardConfig),
-          licenseKey: ref.watch(warpLicenseKey),
-          accountId: ref.watch(warpAccountId),
-          accessToken: ref.watch(warpAccessToken),
-          cleanIp: ref.watch(warpCleanIp),
-          cleanPort: ref.watch(warpPort),
-          noise: ref.watch(warpNoise),
-          noiseMode: ref.watch(warpNoiseMode),
-          noiseSize: ref.watch(warpNoiseSize),
-          noiseDelay: ref.watch(warpNoiseDelay),
-        ),
-        warp2: SingboxWarpOption(
-          enable: ref.watch(enableWarp),
-          mode: ref.watch(warpDetourMode),
-          wireguardConfig: ref.watch(warp2WireguardConfig),
-          licenseKey: ref.watch(warp2LicenseKey),
-          accountId: ref.watch(warp2AccountId),
-          accessToken: ref.watch(warp2AccessToken),
-          cleanIp: ref.watch(warpCleanIp),
-          cleanPort: ref.watch(warpPort),
-          noise: ref.watch(warpNoise),
-          noiseMode: ref.watch(warpNoiseMode),
-          noiseSize: ref.watch(warpNoiseSize),
-          noiseDelay: ref.watch(warpNoiseDelay),
-        ),
-        // geoipPath: ref.watch(geoAssetPathResolverProvider).relativePath(
-        //       geoAssets.geoip.providerName,
-        //       geoAssets.geoip.fileName,
-        //     ),
-        // geositePath: ref.watch(geoAssetPathResolverProvider).relativePath(
-        //       geoAssets.geosite.providerName,
-        //       geoAssets.geosite.fileName,
-        //     ),
-        rules: rules,
-      );
-    },
-  );
+    return SingboxConfigOption(
+      region: ref.watch(region).name,
+      blockAds: ref.watch(blockAds),
+      useXrayCoreWhenPossible: ref.watch(useXrayCoreWhenPossible),
+      executeConfigAsIs: false,
+      logLevel: ref.watch(logLevel),
+      resolveDestination: ref.watch(resolveDestination),
+      ipv6Mode: ref.watch(ipv6Mode),
+      remoteDnsAddress: ref.watch(remoteDnsAddress),
+      remoteDnsDomainStrategy: ref.watch(remoteDnsDomainStrategy),
+      directDnsAddress: ref.watch(directDnsAddress),
+      directDnsDomainStrategy: ref.watch(directDnsDomainStrategy),
+      mixedPort: ref.watch(mixedPort),
+      tproxyPort: ref.watch(tproxyPort),
+      localDnsPort: ref.watch(localDnsPort),
+      tunImplementation: ref.watch(tunImplementation),
+      mtu: ref.watch(mtu),
+      strictRoute: ref.watch(strictRoute),
+      connectionTestUrl: ref.watch(connectionTestUrl),
+      urlTestInterval: ref.watch(urlTestInterval),
+      enableClashApi: ref.watch(enableClashApi),
+      clashApiPort: ref.watch(clashApiPort),
+      enableTun: mode == ServiceMode.tun,
+      enableTunService: mode == ServiceMode.tunService,
+      setSystemProxy: mode == ServiceMode.systemProxy,
+      bypassLan: ref.watch(bypassLan),
+      allowConnectionFromLan: ref.watch(allowConnectionFromLan),
+      enableFakeDns: ref.watch(enableFakeDns),
+      enableDnsRouting: ref.watch(enableDnsRouting),
+      independentDnsCache: ref.watch(independentDnsCache),
+      mux: SingboxMuxOption(
+        enable: ref.watch(enableMux),
+        padding: ref.watch(muxPadding),
+        maxStreams: ref.watch(muxMaxStreams),
+        protocol: ref.watch(muxProtocol),
+      ),
+      tlsTricks: SingboxTlsTricks(
+        enableFragment: ref.watch(enableTlsFragment),
+        fragmentSize: ref.watch(tlsFragmentSize),
+        fragmentSleep: ref.watch(tlsFragmentSleep),
+        mixedSniCase: ref.watch(enableTlsMixedSniCase),
+        enablePadding: ref.watch(enableTlsPadding),
+        paddingSize: ref.watch(tlsPaddingSize),
+      ),
+      warp: SingboxWarpOption(
+        enable: ref.watch(enableWarp),
+        mode: ref.watch(warpDetourMode),
+        wireguardConfig: ref.watch(warpWireguardConfig),
+        licenseKey: ref.watch(warpLicenseKey),
+        accountId: ref.watch(warpAccountId),
+        accessToken: ref.watch(warpAccessToken),
+        cleanIp: ref.watch(warpCleanIp),
+        cleanPort: ref.watch(warpPort),
+        noise: ref.watch(warpNoise),
+        noiseMode: ref.watch(warpNoiseMode),
+        noiseSize: ref.watch(warpNoiseSize),
+        noiseDelay: ref.watch(warpNoiseDelay),
+      ),
+      warp2: SingboxWarpOption(
+        enable: ref.watch(enableWarp),
+        mode: ref.watch(warpDetourMode),
+        wireguardConfig: ref.watch(warp2WireguardConfig),
+        licenseKey: ref.watch(warp2LicenseKey),
+        accountId: ref.watch(warp2AccountId),
+        accessToken: ref.watch(warp2AccessToken),
+        cleanIp: ref.watch(warpCleanIp),
+        cleanPort: ref.watch(warpPort),
+        noise: ref.watch(warpNoise),
+        noiseMode: ref.watch(warpNoiseMode),
+        noiseSize: ref.watch(warpNoiseSize),
+        noiseDelay: ref.watch(warpNoiseDelay),
+      ),
+      // geoipPath: ref.watch(geoAssetPathResolverProvider).relativePath(
+      //       geoAssets.geoip.providerName,
+      //       geoAssets.geoip.fileName,
+      //     ),
+      // geositePath: ref.watch(geoAssetPathResolverProvider).relativePath(
+      //       geoAssets.geosite.providerName,
+      //       geoAssets.geosite.fileName,
+      //     ),
+      rules: rules,
+    );
+  });
 }
 
 class ConfigOptionRepository with ExceptionHandler, InfraLogger {
-  ConfigOptionRepository({
-    required this.preferences,
-    required SingboxConfigOption Function() getConfigOptions,
-  }) : _getConfigOptions = getConfigOptions;
+  ConfigOptionRepository({required this.preferences, required SingboxConfigOption Function() getConfigOptions})
+    : _getConfigOptions = getConfigOptions;
 
   final SharedPreferences preferences;
   final SingboxConfigOption Function() _getConfigOptions;
 
-  Either<ConfigOptionFailure, SingboxConfigOption> fullOptions() => Either.tryCatch(
-        () => _getConfigOptions(),
-        ConfigOptionFailure.unexpected,
-      );
+  Either<ConfigOptionFailure, SingboxConfigOption> fullOptions() =>
+      Either.tryCatch(() => _getConfigOptions(), ConfigOptionFailure.unexpected);
 
-  Either<ConfigOptionFailure, SingboxConfigOption> fullOptionsOverrided(String? profileOverride) => Either.tryCatch(
-        () => _getConfigOptions(),
-        ConfigOptionFailure.unexpected,
-      ).flatMap((options) => Either.tryCatch(() {
-            final json = ProfileParser.applyProfileOverride(options.toJson(), profileOverride);
-            return SingboxConfigOption.fromJson(json);
-          }, ConfigOptionFailure.unexpected));
+  Either<ConfigOptionFailure, SingboxConfigOption> fullOptionsOverrided(String? profileOverride) =>
+      Either.tryCatch(() => _getConfigOptions(), ConfigOptionFailure.unexpected).flatMap(
+        (options) => Either.tryCatch(() {
+          final json = ProfileParser.applyProfileOverride(options.toJson(), profileOverride);
+          return SingboxConfigOption.fromJson(json);
+        }, ConfigOptionFailure.unexpected),
+      );
 }

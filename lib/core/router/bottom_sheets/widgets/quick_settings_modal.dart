@@ -28,10 +28,7 @@ class QuickSettingsModal extends HookConsumerWidget {
                         value: e,
                         label: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Text(
-                            e.presentShort(t),
-                            textAlign: TextAlign.center,
-                          ),
+                          child: Text(e.presentShort(t), textAlign: TextAlign.center),
                         ),
                         // tooltip: e.isExperimental ? t.settings.experimental : null,
                       ),

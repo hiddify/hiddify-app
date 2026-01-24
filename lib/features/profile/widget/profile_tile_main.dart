@@ -11,11 +11,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileTileMain extends HookConsumerWidget {
-  const ProfileTileMain({
-    super.key,
-    required this.profile,
-    this.isMain = false,
-  });
+  const ProfileTileMain({super.key, required this.profile, this.isMain = false});
 
   final ProfileEntity profile;
   final bool isMain;
@@ -70,7 +66,9 @@ class ProfileTileMain extends HookConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: InkWell(
-              onTap: () => ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity),
+              onTap: () => ref
+                  .read(updateProfileNotifierProvider(profile.id).notifier)
+                  .updateProfile(profile as RemoteProfileEntity),
               borderRadius: BorderRadius.circular(12),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -81,18 +79,12 @@ class ProfileTileMain extends HookConsumerWidget {
                       color: theme.colorScheme.primaryContainer.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
-                      FluentIcons.arrow_sync_24_filled,
-                      color: theme.colorScheme.primary,
-                      size: 20,
-                    ),
+                    child: Icon(FluentIcons.arrow_sync_24_filled, color: theme.colorScheme.primary, size: 20),
                   ),
                   const Gap(6),
                   Text(
                     profile.name,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -103,68 +95,72 @@ class ProfileTileMain extends HookConsumerWidget {
           if (subInfo != null)
             Container(
               width: 350,
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                IntrinsicHeight(
-                  // Add this to ensure equal height
-                  child: Row(
-                    children: [
-                      if (subInfo.total > 0) _BandwithUsageRow(subInfo),
-
-                      // if (subInfo.total > 0 && subInfo.remaining.inDays > 0)
-                      //   const VerticalDivider(
-                      //     // Add divider between items
-                      //     width: 1,
-                      //     thickness: 1,
-                      //     indent: 12,
-                      //     endIndent: 12,
-                      //   ),
-                      if (subInfo.remaining.inDays > 0)
-
-                        // Add Expanded
-                        _UsageRow(
-                          icon: null, //FluentIcons.timer_24_regular,
-                          title: subInfo.remaining.inDays > 365 ? "∞ days remaining" : "${subInfo.remaining.inDays}/30 days remaining",
-                          progress: subInfo.remaining.inDays > 365 ? 0 : subInfo.remaining.inDays / 30,
-                          color: _getProgressColor(1 - (subInfo.remaining.inDays / 30)),
-                        ),
-                    ],
-                  ),
-                ),
-                if ((subInfo.webPageUrl != null || subInfo.supportUrl != null))
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IntrinsicHeight(
+                    // Add this to ensure equal height
                     child: Row(
                       children: [
-                        if (subInfo.webPageUrl != null)
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => _launchUrlWithCheck(context, ref, subInfo.webPageUrl!),
-                              borderRadius: BorderRadius.circular(8),
-                              child: _InfoItem(
-                                icon: _getLinkIcon(subInfo.webPageUrl!, FluentIcons.building_shop_24_regular),
-                                label: t.components.subscriptionInfo.profileSite,
-                                value: _formatSupportLink(subInfo.webPageUrl!),
-                              ),
-                            ),
+                        if (subInfo.total > 0) _BandwithUsageRow(subInfo),
+
+                        // if (subInfo.total > 0 && subInfo.remaining.inDays > 0)
+                        //   const VerticalDivider(
+                        //     // Add divider between items
+                        //     width: 1,
+                        //     thickness: 1,
+                        //     indent: 12,
+                        //     endIndent: 12,
+                        //   ),
+                        if (subInfo.remaining.inDays > 0)
+                          // Add Expanded
+                          _UsageRow(
+                            icon: null, //FluentIcons.timer_24_regular,
+                            title: subInfo.remaining.inDays > 365
+                                ? "∞ days remaining"
+                                : "${subInfo.remaining.inDays}/30 days remaining",
+                            progress: subInfo.remaining.inDays > 365 ? 0 : subInfo.remaining.inDays / 30,
+                            color: _getProgressColor(1 - (subInfo.remaining.inDays / 30)),
                           ),
-                        if (subInfo.supportUrl != null) ...[
-                          const Gap(12),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => _launchUrlWithCheck(context, ref, subInfo.supportUrl!),
-                              borderRadius: BorderRadius.circular(8),
-                              child: _InfoItem(
-                                icon: _getLinkIcon(subInfo.supportUrl!, FontAwesomeIcons.headset),
-                                label: t.components.subscriptionInfo.profileSupport,
-                                value: _formatSupportLink(subInfo.supportUrl!),
-                              ),
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                   ),
-              ]),
+                  if ((subInfo.webPageUrl != null || subInfo.supportUrl != null))
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          if (subInfo.webPageUrl != null)
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _launchUrlWithCheck(context, ref, subInfo.webPageUrl!),
+                                borderRadius: BorderRadius.circular(8),
+                                child: _InfoItem(
+                                  icon: _getLinkIcon(subInfo.webPageUrl!, FluentIcons.building_shop_24_regular),
+                                  label: t.components.subscriptionInfo.profileSite,
+                                  value: _formatSupportLink(subInfo.webPageUrl!),
+                                ),
+                              ),
+                            ),
+                          if (subInfo.supportUrl != null) ...[
+                            const Gap(12),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _launchUrlWithCheck(context, ref, subInfo.supportUrl!),
+                                borderRadius: BorderRadius.circular(8),
+                                child: _InfoItem(
+                                  icon: _getLinkIcon(subInfo.supportUrl!, FontAwesomeIcons.headset),
+                                  label: t.components.subscriptionInfo.profileSupport,
+                                  value: _formatSupportLink(subInfo.supportUrl!),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
         ],
       ),
@@ -234,12 +230,7 @@ class ProfileTileMain extends HookConsumerWidget {
 // Rest of the widget classes remain the same...
 
 class _UsageRow extends StatelessWidget {
-  const _UsageRow({
-    required this.icon,
-    required this.title,
-    required this.progress,
-    required this.color,
-  });
+  const _UsageRow({required this.icon, required this.title, required this.progress, required this.color});
 
   final IconData? icon;
   final String title;
@@ -249,47 +240,38 @@ class _UsageRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 20, color: color),
-            const Gap(12),
-          ],
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const Gap(4),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-                    valueColor: AlwaysStoppedAnimation<Color>(color),
-                    minHeight: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            if (icon != null) ...[Icon(icon, size: 20, color: color), const Gap(12)],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: Theme.of(context).textTheme.bodyMedium),
+                  const Gap(4),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                      valueColor: AlwaysStoppedAnimation<Color>(color),
+                      minHeight: 4,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
 
 class _InfoItem extends StatelessWidget {
-  const _InfoItem({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
+  const _InfoItem({required this.icon, required this.label, required this.value});
 
   final IconData icon;
   final String label;
@@ -319,12 +301,7 @@ class _InfoItem extends StatelessWidget {
                     color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
                   ),
                 ),
-                Text(
-                  value,
-                  style: theme.textTheme.bodyMedium,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Text(value, style: theme.textTheme.bodyMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
               ],
             ),
           ),

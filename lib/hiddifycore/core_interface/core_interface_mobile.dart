@@ -37,7 +37,9 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   late LastStream<CoreStatus> _status;
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
-    final channelOption = [1, 2].contains(mode) ? MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientKey: cert) : const ChannelCredentials.insecure();
+    final channelOption = [1, 2].contains(mode)
+        ? MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientKey: cert)
+        : const ChannelCredentials.insecure();
     _debug = debug;
     helloClient = HelloClient(
       ClientChannel(
@@ -56,7 +58,13 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     } catch (e) {
       //core is not started yet
 
-      await methodChannel.invokeMethod("setup", {"baseDir": directories.baseDir.path, "workingDir": directories.workingDir.path, "tempDir": directories.tempDir.path, "grpcPort": portFront, "mode": mode});
+      await methodChannel.invokeMethod("setup", {
+        "baseDir": directories.baseDir.path,
+        "workingDir": directories.workingDir.path,
+        "tempDir": directories.tempDir.path,
+        "grpcPort": portFront,
+        "mode": mode,
+      });
       final res = await helloClient.sayHello(HelloRequest(name: "test"));
       loggy.info(res.toString());
     }
@@ -72,7 +80,6 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     // var chanelOption = ChannelOptions(
     //   credentials: MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientPrivateKey: cert.privateKey as ECPrivateKey),
     // );
-
     fgClient = CoreClient(
       ClientChannel(
         '127.0.0.1',
@@ -97,7 +104,13 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     if (!await waitUntilPort(portBack, false, stop)) return const CoreStatus.stopped(alert: CoreAlert.createService);
     await stop();
     _status.clean();
-    await methodChannel.invokeMethod("start", {"path": path, "name": name, "grpcPort": portBack, "startBg": true, "debug": _debug});
+    await methodChannel.invokeMethod("start", {
+      "path": path,
+      "name": name,
+      "grpcPort": portBack,
+      "startBg": true,
+      "debug": _debug,
+    });
     _isBgClientAvailable = true;
     for (var i = 0; i < 100; i++) {
       try {
@@ -117,7 +130,8 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
       }
     }
 
-    if (!await waitUntilPort(portBack, true, null, maxTry: 100)) return const CoreStatus.stopped(alert: CoreAlert.startService);
+    if (!await waitUntilPort(portBack, true, null, maxTry: 100))
+      return const CoreStatus.stopped(alert: CoreAlert.startService);
     return const CoreStarting();
   }
 
@@ -158,7 +172,12 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   }
 }
 
-Future<bool> waitUntilPort(int portNumber, bool isOpen, Future Function()? callFunctionIfNotOpen, {int maxTry = 10}) async {
+Future<bool> waitUntilPort(
+  int portNumber,
+  bool isOpen,
+  Future Function()? callFunctionIfNotOpen, {
+  int maxTry = 10,
+}) async {
   for (var i = 0; i < maxTry; i++) {
     if (await isPortOpen("127.0.0.1", portNumber) == isOpen) {
       return true;

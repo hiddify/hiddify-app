@@ -3,7 +3,15 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingRadio<T> extends ConsumerWidget {
-  const SettingRadio({super.key, required this.title, required this.values, required this.value, required this.setValue, this.defaultValue, this.t});
+  const SettingRadio({
+    super.key,
+    required this.title,
+    required this.values,
+    required this.value,
+    required this.setValue,
+    this.defaultValue,
+    this.t,
+  });
 
   final String title;
   final List<T> values;
@@ -23,13 +31,9 @@ class SettingRadio<T> extends ConsumerWidget {
       title: Text(title),
       subtitle: Text(textWithTranslation(value)),
       onTap: () async {
-        final result = await ref.read(dialogNotifierProvider.notifier).showSettingRadio<T>(
-              title: title,
-              values: values,
-              value: value,
-              defaultValue: defaultValue,
-              t: t,
-            );
+        final result = await ref
+            .read(dialogNotifierProvider.notifier)
+            .showSettingRadio<T>(title: title, values: values, value: value, defaultValue: defaultValue, t: t);
         if (result is T) setValue(result);
       },
     );

@@ -7,7 +7,14 @@ import 'package:installed_apps/app_info.dart';
 import 'package:installed_apps/installed_apps.dart';
 
 class SettingDetailChips<T extends Object> extends HookConsumerWidget {
-  const SettingDetailChips({super.key, required this.values, this.t, this.scrollController, this.useEllipsis = false, this.isPackageName = false});
+  const SettingDetailChips({
+    super.key,
+    required this.values,
+    this.t,
+    this.scrollController,
+    this.useEllipsis = false,
+    this.isPackageName = false,
+  });
 
   final List<T> values;
   final Map<String, String>? t;
@@ -21,18 +28,15 @@ class SettingDetailChips<T extends Object> extends HookConsumerWidget {
     final showStartBtn = useState(false);
     final showEndBtn = useState(true);
 
-    useEffect(
-      () {
-        void listener() {
-          showStartBtn.value = controller.position.pixels > controller.position.minScrollExtent;
-          showEndBtn.value = controller.position.pixels < controller.position.maxScrollExtent;
-        }
+    useEffect(() {
+      void listener() {
+        showStartBtn.value = controller.position.pixels > controller.position.minScrollExtent;
+        showEndBtn.value = controller.position.pixels < controller.position.maxScrollExtent;
+      }
 
-        controller.addListener(listener);
-        return () => controller.removeListener(listener);
-      },
-      [controller],
-    );
+      controller.addListener(listener);
+      return () => controller.removeListener(listener);
+    }, [controller]);
 
     void scrollToEnd() {
       controller.animateTo(
@@ -127,12 +131,7 @@ class SettingDetailChip<T extends Object> extends ConsumerWidget {
       return Row(
         children: [
           tText('${value.key}', theme),
-          VerticalDivider(
-            width: 12,
-            color: theme.colorScheme.onSurfaceVariant,
-            indent: 3,
-            endIndent: 3,
-          ),
+          VerticalDivider(width: 12, color: theme.colorScheme.onSurfaceVariant, indent: 3, endIndent: 3),
           tText('${value.value}', theme),
         ],
       );
@@ -153,16 +152,10 @@ class SettingDetailChip<T extends Object> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant,
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: theme.colorScheme.surfaceVariant, borderRadius: BorderRadius.circular(8)),
       child: isPackageName
           ? AndroidAppInfo(packageName: '$value')
-          : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: valueByType(value, theme),
-            ),
+          : Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: valueByType(value, theme)),
     );
   }
 }
@@ -192,10 +185,7 @@ class AndroidAppInfo extends HookConsumerWidget {
           children: [
             AspectRatio(
               aspectRatio: 1.0,
-              child: CircleAvatar(
-                backgroundColor: Colors.transparent,
-                child: Image.memory(app.data!.icon!),
-              ),
+              child: CircleAvatar(backgroundColor: Colors.transparent, child: Image.memory(app.data!.icon!)),
             ),
             const Gap(4),
             Text(app.data!.name, style: Theme.of(context).textTheme.labelMedium),
@@ -210,10 +200,7 @@ class AndroidAppInfo extends HookConsumerWidget {
     } else {
       return const Padding(
         padding: EdgeInsets.all(4),
-        child: AspectRatio(
-          aspectRatio: 1.0,
-          child: CircularProgressIndicator(),
-        ),
+        child: AspectRatio(aspectRatio: 1.0, child: CircularProgressIndicator()),
       );
     }
   }
@@ -230,14 +217,8 @@ class ScrollBtn extends ConsumerWidget {
     final theme = Theme.of(context);
     const radius = Radius.circular(4);
     final borderRadius = isStart
-        ? const BorderRadiusDirectional.only(
-            topEnd: radius,
-            bottomEnd: radius,
-          )
-        : const BorderRadiusDirectional.only(
-            topStart: radius,
-            bottomStart: radius,
-          );
+        ? const BorderRadiusDirectional.only(topEnd: radius, bottomEnd: radius)
+        : const BorderRadiusDirectional.only(topStart: radius, bottomStart: radius);
     return Material(
       borderRadius: borderRadius,
       child: InkWell(
@@ -249,13 +230,7 @@ class ScrollBtn extends ConsumerWidget {
           decoration: BoxDecoration(
             color: theme.colorScheme.primaryContainer,
             borderRadius: borderRadius,
-            boxShadow: [
-              BoxShadow(
-                color: theme.colorScheme.shadow,
-                blurRadius: 12,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: theme.colorScheme.shadow, blurRadius: 12, offset: const Offset(0, 3))],
           ),
           child: Icon(
             isStart ? Icons.arrow_left_rounded : Icons.arrow_right_rounded,

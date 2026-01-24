@@ -28,16 +28,26 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'routing_config_notifier.g.dart';
 
 // each branch in go router has its own focus scope
-final branchesScope = <String, FocusScopeNode>{'home': FocusScopeNode(), 'profiles': FocusScopeNode(), 'settings': FocusScopeNode(), 'logs': FocusScopeNode(), 'about': FocusScopeNode()};
+final branchesScope = <String, FocusScopeNode>{
+  'home': FocusScopeNode(),
+  'profiles': FocusScopeNode(),
+  'settings': FocusScopeNode(),
+  'logs': FocusScopeNode(),
+  'about': FocusScopeNode(),
+};
 
 // when the routing config is not yet initialized, this config is used
 final loadingConfig = RoutingConfig(
   routes: <RouteBase>[GoRoute(path: '/home', builder: (context, state) => const Material())],
 );
 
-String getNameOfBranch(bool isMobileBreakpoint, bool showProfilesAction, int index) => isMobileBreakpoint ? ['home', 'settings'][index] : ['home', if (showProfilesAction) 'profiles', 'settings', 'logs', 'about'][index];
+String getNameOfBranch(bool isMobileBreakpoint, bool showProfilesAction, int index) => isMobileBreakpoint
+    ? ['home', 'settings'][index]
+    : ['home', if (showProfilesAction) 'profiles', 'settings', 'logs', 'about'][index];
 
-int getIndexOfBranch(bool isMobileBreakpoint, bool showProfilesAction, String name) => isMobileBreakpoint ? ['home', 'settings'].indexOf(name) : ['home', if (showProfilesAction) 'profiles', 'settings', 'logs', 'about'].indexOf(name);
+int getIndexOfBranch(bool isMobileBreakpoint, bool showProfilesAction, String name) => isMobileBreakpoint
+    ? ['home', 'settings'].indexOf(name)
+    : ['home', if (showProfilesAction) 'profiles', 'settings', 'logs', 'about'].indexOf(name);
 
 @Riverpod(keepAlive: true)
 class RoutingConfigNotifier extends _$RoutingConfigNotifier {
@@ -69,17 +79,26 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
         if (!introCompleted) {
           return url != null ? '/intro?url=$url' : '/intro';
         } else if (isIntro) {
-          if (url != null) WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url));
+          if (url != null)
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url),
+            );
           return '/home';
         } else if (url != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url));
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url),
+          );
           return '/home';
         }
         return null;
       },
       routes: <RouteBase>[
         StatefulShellRoute.indexedStack(
-          builder: (_, _, navigationShell) => MyAdaptiveLayout(navigationShell: navigationShell, isMobileBreakpoint: isMobileBreakpoint, showProfilesAction: showProfilesAction),
+          builder: (_, _, navigationShell) => MyAdaptiveLayout(
+            navigationShell: navigationShell,
+            isMobileBreakpoint: isMobileBreakpoint,
+            showProfilesAction: showProfilesAction,
+          ),
           branches: <StatefulShellBranch>[
             StatefulShellBranch(
               routes: <GoRoute>[
@@ -88,12 +107,21 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                   path: '/home',
                   builder: (_, _) => FocusScope(node: branchesScope['home'], child: const HomePage()),
                   routes: <GoRoute>[
-                    GoRoute(name: 'proxies', path: '/proxies', pageBuilder: (_, state) => customTransition(TransitionType.fade, state.pageKey, const ProxiesOverviewPage())),
+                    GoRoute(
+                      name: 'proxies',
+                      path: '/proxies',
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.fade, state.pageKey, const ProxiesOverviewPage()),
+                    ),
                     if (isMobileBreakpoint)
                       GoRoute(
                         name: 'profileDetails',
                         path: '/profile-details/:id',
-                        pageBuilder: (_, state) => customTransition(TransitionType.fade, state.pageKey, ProfileDetailsPage(id: state.pathParameters['id']!)),
+                        pageBuilder: (_, state) => customTransition(
+                          TransitionType.fade,
+                          state.pageKey,
+                          ProfileDetailsPage(id: state.pathParameters['id']!),
+                        ),
                       ),
                   ],
                 ),
@@ -110,7 +138,11 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                       GoRoute(
                         name: 'profileDetails',
                         path: '/profiles/:id',
-                        pageBuilder: (_, state) => customTransition(TransitionType.fade, state.pageKey, ProfileDetailsPage(id: state.pathParameters['id']!)),
+                        pageBuilder: (_, state) => customTransition(
+                          TransitionType.fade,
+                          state.pageKey,
+                          ProfileDetailsPage(id: state.pathParameters['id']!),
+                        ),
                       ),
                     ],
                   ),
@@ -123,23 +155,70 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                   path: '/settings',
                   builder: (context, _) => FocusScope(
                     node: branchesScope['settings'],
-                    child: PopScope(canPop: false, onPopInvokedWithResult: (_, _) => context.goNamed('home'), child: SettingsPage()),
+                    child: PopScope(
+                      canPop: false,
+                      onPopInvokedWithResult: (_, _) => context.goNamed('home'),
+                      child: SettingsPage(),
+                    ),
                   ),
                   routes: <GoRoute>[
-                    GoRoute(name: 'general', path: '/general', pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const GeneralPage())),
+                    GoRoute(
+                      name: 'general',
+                      path: '/general',
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.slide, state.pageKey, const GeneralPage()),
+                    ),
                     GoRoute(
                       name: 'routeOptions',
                       path: '/route-options',
-                      pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const RouteOptionsPage()),
-                      routes: <GoRoute>[GoRoute(name: 'perAppProxy', path: '/per-app-proxy', pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const PerAppProxyPage()))],
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.slide, state.pageKey, const RouteOptionsPage()),
+                      routes: <GoRoute>[
+                        GoRoute(
+                          name: 'perAppProxy',
+                          path: '/per-app-proxy',
+                          pageBuilder: (_, state) =>
+                              customTransition(TransitionType.slide, state.pageKey, const PerAppProxyPage()),
+                        ),
+                      ],
                     ),
-                    GoRoute(name: 'dnsOptions', path: '/dns-options', pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const DnsOptionsPage())),
-                    GoRoute(name: 'inboundOptions', path: '/inbound-options', pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const InboundOptionsPage())),
-                    GoRoute(name: 'tlsTricks', path: '/tls-tricks', pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const TlsTricksPage())),
-                    GoRoute(name: 'warpOptions', path: '/warp-options', pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const WarpOptionsPage())),
+                    GoRoute(
+                      name: 'dnsOptions',
+                      path: '/dns-options',
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.slide, state.pageKey, const DnsOptionsPage()),
+                    ),
+                    GoRoute(
+                      name: 'inboundOptions',
+                      path: '/inbound-options',
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.slide, state.pageKey, const InboundOptionsPage()),
+                    ),
+                    GoRoute(
+                      name: 'tlsTricks',
+                      path: '/tls-tricks',
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.slide, state.pageKey, const TlsTricksPage()),
+                    ),
+                    GoRoute(
+                      name: 'warpOptions',
+                      path: '/warp-options',
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.slide, state.pageKey, const WarpOptionsPage()),
+                    ),
                     if (isMobileBreakpoint) ...[
-                      GoRoute(name: 'logs', path: '/logs', pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const LogsPage())),
-                      GoRoute(name: 'about', path: '/about', pageBuilder: (_, state) => customTransition(TransitionType.slide, state.pageKey, const AboutPage())),
+                      GoRoute(
+                        name: 'logs',
+                        path: '/logs',
+                        pageBuilder: (_, state) =>
+                            customTransition(TransitionType.slide, state.pageKey, const LogsPage()),
+                      ),
+                      GoRoute(
+                        name: 'about',
+                        path: '/about',
+                        pageBuilder: (_, state) =>
+                            customTransition(TransitionType.slide, state.pageKey, const AboutPage()),
+                      ),
                     ],
                   ],
                 ),

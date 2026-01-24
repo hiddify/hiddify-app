@@ -40,7 +40,9 @@ class WarpOptionNotifier extends _$WarpOptionNotifier with AppLogger {
       loggy.log(LogLevel.info, 'generated warp log : $warpLog');
       loggy.log(LogLevel.info, 'generated warp2 log : $warpLog2');
       if (showToast) {
-        ref.read(inAppNotificationControllerProvider).showSuccessToast('${t.pages.settings.warp.configGenerated} $warpLog');
+        ref
+            .read(inAppNotificationControllerProvider)
+            .showSuccessToast('${t.pages.settings.warp.configGenerated} $warpLog');
       }
       state = AsyncValue.data(warpLog);
     } else {
@@ -104,7 +106,7 @@ class WarpLicenseNotifier extends _$WarpLicenseNotifier with AppLogger {
   }
 
   Future<void> agree() async {
-    await ref.read(sharedPreferencesProvider).requireValue.setBool(WarpConst.warpConsentGiven, true);
+    await _prefs.setBool(WarpConst.warpConsentGiven, true);
     await ref.read(warpOptionNotifierProvider.notifier).genWarps(showToast: false);
     state = true;
   }

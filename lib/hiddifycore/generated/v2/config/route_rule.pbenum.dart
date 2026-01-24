@@ -10,12 +10,16 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class Outbound extends $pb.ProtobufEnum {
-  static const Outbound proxy = Outbound._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'proxy');
-  static const Outbound direct = Outbound._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'direct');
-  static const Outbound direct_with_fragment = Outbound._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'direct_with_fragment');
-  static const Outbound block = Outbound._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'block');
+  static const Outbound proxy =
+      Outbound._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'proxy');
+  static const Outbound direct =
+      Outbound._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'direct');
+  static const Outbound direct_with_fragment =
+      Outbound._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'direct_with_fragment');
+  static const Outbound block =
+      Outbound._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'block');
 
-  static const $core.List<Outbound> values = <Outbound> [
+  static const $core.List<Outbound> values = <Outbound>[
     proxy,
     direct,
     direct_with_fragment,
@@ -33,7 +37,7 @@ class Network extends $pb.ProtobufEnum {
   static const Network tcp = Network._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'tcp');
   static const Network udp = Network._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'udp');
 
-  static const $core.List<Network> values = <Network> [
+  static const $core.List<Network> values = <Network>[
     all,
     tcp,
     udp,
@@ -47,13 +51,17 @@ class Network extends $pb.ProtobufEnum {
 
 class Protocol extends $pb.ProtobufEnum {
   static const Protocol tls = Protocol._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'tls');
-  static const Protocol http = Protocol._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'http');
-  static const Protocol quic = Protocol._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'quic');
-  static const Protocol stun = Protocol._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'stun');
+  static const Protocol http =
+      Protocol._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'http');
+  static const Protocol quic =
+      Protocol._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'quic');
+  static const Protocol stun =
+      Protocol._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'stun');
   static const Protocol dns = Protocol._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'dns');
-  static const Protocol bittorrent = Protocol._(5, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'bittorrent');
+  static const Protocol bittorrent =
+      Protocol._(5, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'bittorrent');
 
-  static const $core.List<Protocol> values = <Protocol> [
+  static const $core.List<Protocol> values = <Protocol>[
     tls,
     http,
     quic,
@@ -67,4 +75,3 @@ class Protocol extends $pb.ProtobufEnum {
 
   const Protocol._($core.int v, $core.String n) : super(v, n);
 }
-

@@ -50,6 +50,7 @@
     "hidden": "隱藏",
     "timeout": "超時",
     "sort": "排序",
+    "dashboard": "儀表板",
     "interval": {
       "day": {
         "zero": "",

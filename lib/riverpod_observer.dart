@@ -14,7 +14,12 @@ class RiverpodObserver extends ProviderObserver {
   }
 
   @override
-  void didUpdateProvider(ProviderBase<Object?> provider, Object? previousValue, Object? newValue, ProviderContainer container) {
+  void didUpdateProvider(
+    ProviderBase<Object?> provider,
+    Object? previousValue,
+    Object? newValue,
+    ProviderContainer container,
+  ) {
     log('didUpdateProvider : ${provider.name ?? provider.runtimeType} : $previousValue -> $newValue');
   }
 }

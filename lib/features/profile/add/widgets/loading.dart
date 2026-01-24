@@ -18,22 +18,16 @@ class ProfileLoading extends ConsumerWidget {
         children: [
           Text(
             t.pages.profileDetails.form.loading,
-            style: theme.textTheme.bodyMedium!.copyWith(
-              color: theme.colorScheme.onSurface,
-            ),
+            style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface),
           ),
           const Gap(20),
-          const LinearProgressIndicator(
-            backgroundColor: Colors.transparent,
-          ),
+          const LinearProgressIndicator(backgroundColor: Colors.transparent),
           const Gap(8),
           TextButton(
             onPressed: () {
               ref.invalidate(addProfileNotifierProvider);
             },
-            child: Text(
-              MaterialLocalizations.of(context).cancelButtonLabel,
-            ),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           ),
         ],
       ),

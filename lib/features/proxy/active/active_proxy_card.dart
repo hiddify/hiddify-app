@@ -15,7 +15,9 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final connectionState = ref.watch(connectionNotifierProvider.select((value) => value.valueOrNull ?? const Disconnected()));
+    final connectionState = ref.watch(
+      connectionNotifierProvider.select((value) => value.valueOrNull ?? const Disconnected()),
+    );
 
     final activeProxy = ref.watch(activeProxyNotifierProvider.select((value) => value.valueOrNull));
     final t = ref.watch(translationsProvider).requireValue;
@@ -45,11 +47,7 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
         color: theme.colorScheme.background.withOpacity(1),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.secondary.withOpacity(.21),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: theme.colorScheme.secondary.withOpacity(.21), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: InkWell(
@@ -81,34 +79,22 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                     label: t.pages.proxies.activeProxy,
                     child: Text(
                       getRealOutboundTag(activeProxy),
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(height: 4),
                   if (activeProxy.ipinfo.ip.isNotEmpty)
-                    IPText(
-                      ip: activeProxy.ipinfo.ip,
-                      onLongPress: handleUrlTest,
-                      constrained: true,
-                    )
+                    IPText(ip: activeProxy.ipinfo.ip, onLongPress: handleUrlTest, constrained: true)
                   else
-                    UnknownIPText(
-                      text: t.pages.proxies.unknownIp,
-                      onTap: handleUrlTest,
-                    ),
+                    UnknownIPText(text: t.pages.proxies.unknownIp, onTap: handleUrlTest),
                 ],
               ),
             ),
             const Padding(
               padding: EdgeInsets.all(16.0),
-              child: Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.blue,
-              ),
+              child: Icon(Icons.arrow_forward_ios, color: Colors.blue),
             ),
           ],
         ),

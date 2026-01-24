@@ -15,16 +15,11 @@ class NoActiveProfileDialog extends HookConsumerWidget {
       actions: [
         TextButton(
           onPressed: () async {
-            await UriUtils.tryLaunch(
-              Uri.parse(t.dialogs.noActiveProfile.helpBtn.url),
-            );
+            await UriUtils.tryLaunch(Uri.parse(t.dialogs.noActiveProfile.helpBtn.url));
           },
           child: Text(t.dialogs.noActiveProfile.helpBtn.label),
         ),
-        TextButton(
-          onPressed: () => context.pop(),
-          child: Text(t.common.ok),
-        ),
+        TextButton(onPressed: () => context.pop(), child: Text(t.common.ok)),
       ],
     );
   }

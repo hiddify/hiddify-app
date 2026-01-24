@@ -38,7 +38,8 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
                 value: disableNotice,
                 title: Text(t.dialogs.experimentalNotice.disable),
                 secondary: const Icon(FluentIcons.eye_off_24_regular),
-                onChanged: (value) async => await ref.read(disableExperimentalFeatureNoticeProvider.notifier).update(value ?? false),
+                onChanged: (value) async =>
+                    await ref.read(disableExperimentalFeatureNoticeProvider.notifier).update(value ?? false),
                 dense: true,
               ),
               ListTile(
@@ -58,14 +59,9 @@ class ExperimentalFeatureNoticeDialog extends HookConsumerWidget {
       actions: [
         TextButton(
           onPressed: () => context.pop(false),
-          child: Text(
-            MaterialLocalizations.of(context).cancelButtonLabel.toUpperCase(),
-          ),
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel.toUpperCase()),
         ),
-        TextButton(
-          onPressed: () => context.pop(true),
-          child: Text(t.connection.connect),
-        ),
+        TextButton(onPressed: () => context.pop(true), child: Text(t.connection.connect)),
       ],
     );
   }

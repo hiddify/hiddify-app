@@ -8,31 +8,22 @@ enum AlertType {
   success;
 
   ToastificationType get _toastificationType => switch (this) {
-        success => ToastificationType.success,
-        error => ToastificationType.error,
-        info => ToastificationType.info,
-      };
+    success => ToastificationType.success,
+    error => ToastificationType.error,
+    info => ToastificationType.info,
+  };
 }
 
 class CustomToast extends StatelessWidget {
-  const CustomToast(
-    this.message, {
-    this.type = AlertType.info,
-    this.icon,
-    this.duration = const Duration(seconds: 3),
-  });
+  const CustomToast(this.message, {this.type = AlertType.info, this.icon, this.duration = const Duration(seconds: 3)});
 
-  const CustomToast.error(
-    this.message, {
-    this.duration = const Duration(seconds: 5),
-  })  : type = AlertType.error,
-        icon = FluentIcons.error_circle_24_regular;
+  const CustomToast.error(this.message, {this.duration = const Duration(seconds: 5)})
+    : type = AlertType.error,
+      icon = FluentIcons.error_circle_24_regular;
 
-  const CustomToast.success(
-    this.message, {
-    this.duration = const Duration(seconds: 3),
-  })  : type = AlertType.success,
-        icon = FluentIcons.checkmark_24_regular;
+  const CustomToast.success(this.message, {this.duration = const Duration(seconds: 3)})
+    : type = AlertType.success,
+      icon = FluentIcons.checkmark_24_regular;
 
   final String message;
   final AlertType type;
@@ -57,10 +48,7 @@ class CustomToast extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[
-            Icon(icon, color: color),
-            const SizedBox(width: 8),
-          ],
+          if (icon != null) ...[Icon(icon, color: color), const SizedBox(width: 8)],
           Flexible(child: Text(message)),
         ],
       ),

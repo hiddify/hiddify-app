@@ -22,44 +22,32 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
     // ref.read(popupCountNotifierProvider.notifier).increase();
     return await Navigator.of(context)
         .push<T>(
-      ModalBottomSheetRoute(
-        constraints: BottomSheetConst.boxConstraints,
-        isScrollControlled: isScrollControlled,
-        builder: (context) => ClipRRect(
-          borderRadius: BottomSheetConst.borderRadius,
-          child: Material(
-            child: Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: child,
+          ModalBottomSheetRoute(
+            constraints: BottomSheetConst.boxConstraints,
+            isScrollControlled: isScrollControlled,
+            builder: (context) => ClipRRect(
+              borderRadius: BottomSheetConst.borderRadius,
+              child: Material(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: child,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    )
-        .then(
-      (value) {
-        // ref.read(popupCountNotifierProvider.notifier).decrease();
-        return value;
-      },
-    );
+        )
+        .then((value) {
+          // ref.read(popupCountNotifierProvider.notifier).decrease();
+          return value;
+        });
   }
 
-  Future<void> showAddProfile({String? url}) async => await _show(
-        isScrollControlled: true,
-        child: AddProfileModal(url: url),
-      );
+  Future<void> showAddProfile({String? url}) async =>
+      await _show(isScrollControlled: true, child: AddProfileModal(url: url));
 
-  Future<void> showProfilesOverview() async => await _show(
-        isScrollControlled: true,
-        child: const ProfilesModal(),
-      );
+  Future<void> showProfilesOverview() async => await _show(isScrollControlled: true, child: const ProfilesModal());
 
-  Future<void> showQuickSettings() async => await _show(
-        isScrollControlled: false,
-        child: const QuickSettingsModal(),
-      );
-  Future<void> showAutoAppsSelection({required AppProxyMode mode}) async => await _show(
-        isScrollControlled: false,
-        child: AutoAppsSelectionModal(mode: mode),
-      );
+  Future<void> showQuickSettings() async => await _show(isScrollControlled: false, child: const QuickSettingsModal());
+  Future<void> showAutoAppsSelection({required AppProxyMode mode}) async =>
+      await _show(isScrollControlled: false, child: AutoAppsSelectionModal(mode: mode));
 }

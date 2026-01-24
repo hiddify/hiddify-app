@@ -84,26 +84,15 @@ class AndroidAppsPage extends HookConsumerWidget {
                     SizedBox(
                       width: 40,
                       height: 40,
-                      child: CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        child: Image.memory(appInfo.icon!),
-                      ),
+                      child: CircleAvatar(backgroundColor: Colors.transparent, child: Image.memory(appInfo.icon!)),
                     ),
                     const Gap(16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            appInfo.name,
-                            style: theme.textTheme.bodyLarge,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            appInfo.packageName,
-                            style: theme.textTheme.bodySmall,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          Text(appInfo.name, style: theme.textTheme.bodyLarge, overflow: TextOverflow.ellipsis),
+                          Text(appInfo.packageName, style: theme.textTheme.bodySmall, overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),
@@ -120,11 +109,7 @@ class AndroidAppsPage extends HookConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          size: 16,
-                          Icons.warning_rounded,
-                          color: Colors.amber,
-                        ),
+                        const Icon(size: 16, Icons.warning_rounded, color: Colors.amber),
                         const Gap(4),
                         Text(
                           t.pages.settings.routing.routeRule.androidApps.uninstalled,
@@ -133,11 +118,7 @@ class AndroidAppsPage extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                    Text(
-                      packageName,
-                      style: theme.textTheme.bodySmall,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    Text(packageName, style: theme.textTheme.bodySmall, overflow: TextOverflow.ellipsis),
                   ],
                 ),
                 value: selected.contains(packageName),

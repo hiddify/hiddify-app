@@ -5,9 +5,7 @@ final _urlRegex = RegExp(
 );
 
 /// https://stackoverflow.com/a/12968117
-final _portRegex = RegExp(
-  r"^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",
-);
+final _portRegex = RegExp(r"^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
 
 // android package-name
 // RegExp(r'^([A-Za-z]{1}[A-Za-z\d_]*\.)+[A-Za-z][A-Za-z\d_]*$');
@@ -26,15 +24,22 @@ final _processNameLinuxRegex = RegExp(r'^[^\\]+$');
 
 final _processNameMacOSRegex = RegExp(r'^[^\\:]+$');
 
-final _processPathWindowsRegex = RegExp(r'^[a-zA-Z]:\\([^<>:"\\/|?*]*(?<!\\)\\)*[^<>:"\\/|?*]+(?<![\s.])\.(exe|bat|cmd|com)$', caseSensitive: false);
+final _processPathWindowsRegex = RegExp(
+  r'^[a-zA-Z]:\\([^<>:"\\/|?*]*(?<!\\)\\)*[^<>:"\\/|?*]+(?<![\s.])\.(exe|bat|cmd|com)$',
+  caseSensitive: false,
+);
 
 final _processPathLinuxRegex = RegExp(r'^/([^/]*(?<!/)/)*[^/]+$');
 
 final _processPathMacOSRegex = RegExp(r'^/([^/:]*(?<!/)/)*[^/:]+$');
 
-final _portOrPortRangeRegex = RegExp(r'^(65000|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3})(-(65000|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}))?$');
+final _portOrPortRangeRegex = RegExp(
+  r'^(65000|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3})(-(65000|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}))?$',
+);
 
-final _ipCidrRegex = RegExp(r'^(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})\.(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})\.(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2}).(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})(/(3[0-2]|[1-2]\d|\d))?$');
+final _ipCidrRegex = RegExp(
+  r'^(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})\.(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})\.(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2}).(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})(/(3[0-2]|[1-2]\d|\d))?$',
+);
 
 final _domainRegex = RegExp(r'^([a-zA-Z\d\-]+\.)+[a-zA-Z\d\-]{2,}$', caseSensitive: false);
 
@@ -50,7 +55,9 @@ bool isPort(String input) {
 }
 
 bool isProcessName(String input) {
-  if (_processNameWindowsRegex.hasMatch(input) || _processNameLinuxRegex.hasMatch(input) || _processNameMacOSRegex.hasMatch(input)) {
+  if (_processNameWindowsRegex.hasMatch(input) ||
+      _processNameLinuxRegex.hasMatch(input) ||
+      _processNameMacOSRegex.hasMatch(input)) {
     return true;
   } else {
     return false;
@@ -58,7 +65,9 @@ bool isProcessName(String input) {
 }
 
 bool isProcessPath(String input) {
-  if (_processPathWindowsRegex.hasMatch(input) || _processPathLinuxRegex.hasMatch(input) || _processPathMacOSRegex.hasMatch(input)) {
+  if (_processPathWindowsRegex.hasMatch(input) ||
+      _processPathLinuxRegex.hasMatch(input) ||
+      _processPathMacOSRegex.hasMatch(input)) {
     return true;
   } else {
     return false;

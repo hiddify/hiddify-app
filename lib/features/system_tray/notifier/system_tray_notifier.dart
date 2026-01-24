@@ -33,14 +33,20 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
 
   Future<void> _initializeTray() async {
     final t = await ref.watch(translationsProvider.future);
-    final urlTestDelay = await ref.watch(activeProxyNotifierProvider.future).catchError((e) {
-      loggy.warning("error getting active proxy", e);
-      return OutboundInfo(urlTestDelay: 0);
-    }).then((connection) => connection.urlTestDelay);
-    final connection = await ref.watch(connectionNotifierProvider.future).catchError((e) {
-      loggy.warning("error getting connection status", e);
-      return const ConnectionStatus.disconnected();
-    }).then((connection) => _modifyConnectionStatus(connection, urlTestDelay));
+    final urlTestDelay = await ref
+        .watch(activeProxyNotifierProvider.future)
+        .catchError((e) {
+          loggy.warning("error getting active proxy", e);
+          return OutboundInfo(urlTestDelay: 0);
+        })
+        .then((connection) => connection.urlTestDelay);
+    final connection = await ref
+        .watch(connectionNotifierProvider.future)
+        .catchError((e) {
+          loggy.warning("error getting connection status", e);
+          return const ConnectionStatus.disconnected();
+        })
+        .then((connection) => _modifyConnectionStatus(connection, urlTestDelay));
     final serviceMode = ref.watch(ConfigOptions.serviceMode);
 
     await trayManager.setIcon(_trayIconPath(connection), isTemplate: PlatformUtils.isMacOS);
@@ -49,45 +55,33 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
   }
 
   Menu _trayMenu(ConnectionStatus connection, ServiceMode serviceMode, Translations t) => Menu(
-        items: [
-          // if (PlatformUtils.isMacOS) ...[
-          //   MenuItem(
-          //     key: 'dashboard',
-          //     label: t.tray.dashboard,
-          //   ),
-          //   MenuItem.separator(),
-          // ],
-          MenuItem(
-            key: 'connection',
-            label: switch (connection) {
-              Disconnected() => t.connection.connect,
-              Connecting() => t.connection.connecting,
-              Connected() => t.connection.disconnect,
-              Disconnecting() => t.connection.disconnecting,
-            },
-            disabled: connection.isSwitching,
-          ),
-          MenuItem.separator(),
-          MenuItem.submenu(
-            label: t.pages.settings.inbound.serviceMode,
-            icon: Assets.images.trayIconIco,
-            submenu: Menu(items: [
-              ...ServiceMode.values.map(
-                (e) => MenuItem.checkbox(
-                  checked: e == serviceMode,
-                  key: e.name,
-                  label: e.present(t),
-                ),
-              ),
-            ]),
-          ),
-          MenuItem.separator(),
-          MenuItem(
-            key: 'quit',
-            label: t.common.quit,
-          ),
-        ],
-      );
+    items: [
+      if (PlatformUtils.isLinux) ...[MenuItem(key: 'dashboard', label: t.common.dashboard), MenuItem.separator()],
+      MenuItem(
+        key: 'connection',
+        label: switch (connection) {
+          Disconnected() => t.connection.connect,
+          Connecting() => t.connection.connecting,
+          Connected() => t.connection.disconnect,
+          Disconnecting() => t.connection.disconnecting,
+        },
+        disabled: connection.isSwitching,
+      ),
+      MenuItem.submenu(
+        label: t.pages.settings.inbound.serviceMode,
+        icon: Assets.images.trayIconIco,
+        submenu: Menu(
+          items: [
+            ...ServiceMode.values.map(
+              (e) => MenuItem.checkbox(checked: e == serviceMode, key: e.name, label: e.present(t)),
+            ),
+          ],
+        ),
+      ),
+      MenuItem.separator(),
+      MenuItem(key: 'quit', label: t.common.quit),
+    ],
+  );
 
   String _trayIconPath(ConnectionStatus status) {
     final isDarkMode = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
@@ -102,11 +96,11 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
       case Disconnected():
         return isWindows
             ? isDarkMode
-                ? images.trayIconIco
-                : images.trayIconDarkIco
+                  ? images.trayIconIco
+                  : images.trayIconDarkIco
             : isDarkMode
-                ? images.trayIconDarkPng.path
-                : images.trayIconPng.path;
+            ? images.trayIconDarkPng.path
+            : images.trayIconPng.path;
     }
   }
 
@@ -134,7 +128,9 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     // if (menuItem.key == 'dashboard') {
     //   await ref.read(windowNotifierProvider.notifier).open();
     // }
-    if (menuItem.key == 'connection') {
+    if (menuItem.key == 'dashboard') {
+      await ref.read(windowNotifierProvider.notifier).show();
+    } else if (menuItem.key == 'connection') {
       await ref.read(connectionNotifierProvider.notifier).toggleConnection();
     } else if (menuItem.key == 'quit') {
       await ref.read(windowNotifierProvider.notifier).exit();

@@ -17,6 +17,5 @@ class SingboxStats with _$SingboxStats {
     required int downlinkTotal,
   }) = _SingboxStats;
 
-  factory SingboxStats.fromJson(Map<String, dynamic> json) =>
-      _$SingboxStatsFromJson(json);
+  factory SingboxStats.fromJson(Map<String, dynamic> json) => _$SingboxStatsFromJson(json);
 }
