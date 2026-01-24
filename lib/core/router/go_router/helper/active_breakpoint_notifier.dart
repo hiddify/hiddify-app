@@ -56,8 +56,4 @@ class Breakpoint {
   }
 }
 
-enum Breakpoints {
-  mobile,
-  tablet,
-  desktop,
-}
+enum Breakpoints { mobile, tablet, desktop }

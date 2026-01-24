@@ -32,16 +32,14 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
     _mode = mode;
     if (_mode == null) return Stream.value({});
     final appsInfo = InstalledApps.getInstalledApps(false);
-    return Stream.fromFuture(appsInfo).asyncExpand(
-      (appsInfo) {
-        final phonePkgs = appsInfo.map((e) => e.packageName).toSet();
-        return ref.watch(appProxyDataSourceProvider).watchFilterForDisplay(phonePkgs: phonePkgs, mode: _mode).map(
-          (entryList) {
-            return {for (final entry in entryList) entry.pkgName: entry.flags};
-          },
-        );
-      },
-    );
+    return Stream.fromFuture(appsInfo).asyncExpand((appsInfo) {
+      final phonePkgs = appsInfo.map((e) => e.packageName).toSet();
+      return ref.watch(appProxyDataSourceProvider).watchFilterForDisplay(phonePkgs: phonePkgs, mode: _mode).map((
+        entryList,
+      ) {
+        return {for (final entry in entryList) entry.pkgName: entry.flags};
+      });
+    });
   }
 
   Future<void> updatePkg(String pkg) async {
@@ -62,11 +60,17 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
         await ref.read(Preferences.autoAppsSelectionLastUpdate.notifier).update(DateTime.now());
         return true;
       case AutoSelectionResult.failure:
-        ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.settings.routing.perAppProxy.autoSelection.toast.failure);
+        ref
+            .read(inAppNotificationControllerProvider)
+            .showErrorToast(t.pages.settings.routing.perAppProxy.autoSelection.toast.failure);
         return false;
       case AutoSelectionResult.notFound:
-        ref.read(inAppNotificationControllerProvider).showInfoToast(
-              t.pages.settings.routing.perAppProxy.autoSelection.toast.regionNotFound(region: ref.watch(ConfigOptions.region).name),
+        ref
+            .read(inAppNotificationControllerProvider)
+            .showInfoToast(
+              t.pages.settings.routing.perAppProxy.autoSelection.toast.regionNotFound(
+                region: ref.watch(ConfigOptions.region).name,
+              ),
               duration: const Duration(seconds: 5),
             );
         return false;
@@ -130,7 +134,9 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
       ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
       return true;
     } on PlatformException {
-      ref.read(inAppNotificationControllerProvider).showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
+      ref
+          .read(inAppNotificationControllerProvider)
+          .showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
       return false;
     } catch (e, st) {
       loggy.warning("error exporting to clipboard", e, st);
@@ -174,34 +180,36 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
     final rs = await ref.read(autoSelectionRepoProvider).getByAppProxyMode(mode: mode, region: region);
     if (rs.$2 != AutoSelectionResult.success) return false;
     final autoList = rs.$1!;
-    final userSelected = (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode, flag: PkgFlag.userSelection))
-      ..removeWhere(
-        (pkg) => autoList.contains(pkg),
-      );
-    final forceDeselected = (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode, flag: PkgFlag.forceDeselection))
-      ..removeWhere(
-        (pkg) => !autoList.contains(pkg),
-      );
+    final userSelected =
+        (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode, flag: PkgFlag.userSelection))
+          ..removeWhere((pkg) => autoList.contains(pkg));
+    final forceDeselected =
+        (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode, flag: PkgFlag.forceDeselection))
+          ..removeWhere((pkg) => !autoList.contains(pkg));
 
     if (userSelected.isNotEmpty || forceDeselected.isNotEmpty) {
-      final agree = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
+      final agree = await ref
+          .read(dialogNotifierProvider.notifier)
+          .showConfirmation(
             title: t.dialogs.confirmation.perAppProxy.shareOnGithub.title,
             message: t.dialogs.confirmation.perAppProxy.shareOnGithub.msg,
             positiveBtnTxt: t.common.kContinue,
           );
       if (agree != true) return false;
       final title = '${region.name} | ${mode.present(t).title}';
-      var body = const JsonEncoder.withIndent('  ').convert(
-        {
-          'addedPkgs': userSelected.toList(),
-          'removedPkgs': forceDeselected.toList(),
-        },
-      );
+      var body = const JsonEncoder.withIndent(
+        '  ',
+      ).convert({'addedPkgs': userSelected.toList(), 'removedPkgs': forceDeselected.toList()});
       body = '```\n$body\n```';
       UriUtils.tryLaunch(Uri.parse('https://github.com/hiddify/Android-GFW-Apps/issues/new?title=$title&body=$body'));
       return true;
     } else {
-      ref.read(inAppNotificationControllerProvider).showInfoToast(t.pages.settings.routing.perAppProxy.autoSelection.toast.alreadyInAuto, duration: const Duration(seconds: 5));
+      ref
+          .read(inAppNotificationControllerProvider)
+          .showInfoToast(
+            t.pages.settings.routing.perAppProxy.autoSelection.toast.alreadyInAuto,
+            duration: const Duration(seconds: 5),
+          );
       return false;
     }
   }

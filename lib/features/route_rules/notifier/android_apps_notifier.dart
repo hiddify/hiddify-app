@@ -50,21 +50,19 @@ Future<List<dynamic>> filterBySearch(Ref ref, int? ruleListOrder) async {
     final selected = ref.read(SelectedPackagesNotifierProvider(ruleListOrder));
     final uninstalledPackages = await ref.read(UninstalledPackagesProvider(ruleListOrder).future);
     final fullList = [...uninstalledPackages, ...filteredByHideSystem];
-    fullList.sort(
-      (a, b) {
-        final aValue = (a is String) ? a : (a as AppInfo).packageName;
-        final bValue = (b is String) ? b : (b as AppInfo).packageName;
+    fullList.sort((a, b) {
+      final aValue = (a is String) ? a : (a as AppInfo).packageName;
+      final bValue = (b is String) ? b : (b as AppInfo).packageName;
 
-        final aIndex = selected.indexOf(aValue);
-        final bIndex = selected.indexOf(bValue);
+      final aIndex = selected.indexOf(aValue);
+      final bIndex = selected.indexOf(bValue);
 
-        if (aIndex == -1 && bIndex == -1) return 0;
-        if (aIndex == -1) return 1;
-        if (bIndex == -1) return -1;
+      if (aIndex == -1 && bIndex == -1) return 0;
+      if (aIndex == -1) return 1;
+      if (bIndex == -1) return -1;
 
-        return aIndex.compareTo(bIndex);
-      },
-    );
+      return aIndex.compareTo(bIndex);
+    });
     return fullList;
   } else {
     return filteredByHideSystem.where((app) => app.name.toLowerCase().contains(searchQuery.toLowerCase())).toList();

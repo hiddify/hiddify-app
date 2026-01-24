@@ -11,7 +11,12 @@ import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MyAdaptiveLayout extends HookConsumerWidget {
-  const MyAdaptiveLayout({super.key, required this.navigationShell, required this.isMobileBreakpoint, required this.showProfilesAction});
+  const MyAdaptiveLayout({
+    super.key,
+    required this.navigationShell,
+    required this.isMobileBreakpoint,
+    required this.showProfilesAction,
+  });
   // managed by go router(Shell Route)
   final StatefulNavigationShell navigationShell;
   final bool isMobileBreakpoint;
@@ -35,7 +40,8 @@ class MyAdaptiveLayout extends HookConsumerWidget {
             if (branchesScope.values.any((node) => node.hasFocus)) {
               navScopeNode.requestFocus();
             } else if (navScopeNode.hasFocus) {
-              branchesScope[getNameOfBranch(isMobileBreakpoint, showProfilesAction, navigationShell.currentIndex)]?.requestFocus();
+              branchesScope[getNameOfBranch(isMobileBreakpoint, showProfilesAction, navigationShell.currentIndex)]
+                  ?.requestFocus();
             }
           }
         }
@@ -46,11 +52,7 @@ class MyAdaptiveLayout extends HookConsumerWidget {
       return () {
         HardwareKeyboard.instance.removeHandler(handler);
       };
-    }, [
-      isMobileBreakpoint,
-      showProfilesAction,
-      navigationShell.currentIndex,
-    ]);
+    }, [isMobileBreakpoint, showProfilesAction, navigationShell.currentIndex]);
     return Material(
       child: Scaffold(
         body: isMobileBreakpoint
@@ -68,10 +70,7 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                           ? const Expanded(
                               child: Align(
                                 alignment: Alignment.bottomCenter,
-                                child: SizedBox(
-                                  width: 220,
-                                  child: SideBarStatsOverview(),
-                                ),
+                                child: SizedBox(width: 220, child: SideBarStatsOverview()),
                               ),
                             )
                           : null,
@@ -96,30 +95,19 @@ class MyAdaptiveLayout extends HookConsumerWidget {
 
   // shell route action onTap
   void _onTap(BuildContext context, int index) {
-    navigationShell.goBranch(
-      index,
-      initialLocation: index == navigationShell.currentIndex,
-    );
+    navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
   }
 
   List<ShellRouteAction> _actions(Translations t, bool showProfilesAction, bool isMobileBreakpoint) => [
-        ShellRouteAction(Icons.power_settings_new_rounded, t.pages.home.title),
-        if (showProfilesAction && !isMobileBreakpoint) ShellRouteAction(Icons.view_list_rounded, t.pages.profiles.title),
-        ShellRouteAction(Icons.settings_rounded, t.pages.settings.title),
-        if (!isMobileBreakpoint) ShellRouteAction(Icons.description_rounded, t.pages.logs.title),
-        if (!isMobileBreakpoint) ShellRouteAction(Icons.info_rounded, t.pages.about.title),
-      ];
+    ShellRouteAction(Icons.power_settings_new_rounded, t.pages.home.title),
+    if (showProfilesAction && !isMobileBreakpoint) ShellRouteAction(Icons.view_list_rounded, t.pages.profiles.title),
+    ShellRouteAction(Icons.settings_rounded, t.pages.settings.title),
+    if (!isMobileBreakpoint) ShellRouteAction(Icons.description_rounded, t.pages.logs.title),
+    if (!isMobileBreakpoint) ShellRouteAction(Icons.info_rounded, t.pages.about.title),
+  ];
 
-  List<NavigationDestination> _navDests(List<ShellRouteAction> actions) => actions
-      .map((e) => NavigationDestination(
-            icon: Icon(e.icon),
-            label: e.title,
-          ))
-      .toList();
-  List<NavigationRailDestination> _navRailDests(List<ShellRouteAction> actions) => actions
-      .map((e) => NavigationRailDestination(
-            icon: Icon(e.icon),
-            label: Text(e.title),
-          ))
-      .toList();
+  List<NavigationDestination> _navDests(List<ShellRouteAction> actions) =>
+      actions.map((e) => NavigationDestination(icon: Icon(e.icon), label: e.title)).toList();
+  List<NavigationRailDestination> _navRailDests(List<ShellRouteAction> actions) =>
+      actions.map((e) => NavigationRailDestination(icon: Icon(e.icon), label: Text(e.title))).toList();
 }

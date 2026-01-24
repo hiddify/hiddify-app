@@ -24,7 +24,8 @@ class ProfilesSortNotifier extends _$ProfilesSortNotifier with AppLogger {
 
   void changeSort(ProfilesSort sortBy) => state = (by: sortBy, mode: state.mode);
 
-  void toggleMode() => state = (by: state.by, mode: state.mode == SortMode.ascending ? SortMode.descending : SortMode.ascending);
+  void toggleMode() =>
+      state = (by: state.by, mode: state.mode == SortMode.ascending ? SortMode.descending : SortMode.ascending);
 }
 
 @riverpod
@@ -50,33 +51,37 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
     loggy.debug('deleting profile: ${profile.name}');
 
     if (profile.active) await ref.read(connectionNotifierProvider.notifier).abortConnection();
-    await _profilesRepo.deleteById(profile.id, profile.active).match(
-      (err) {
-        loggy.warning('failed to delete profile', err);
-        throw err;
-      },
-      (_) {
-        loggy.info(
-          'successfully deleted profile, was active? [${profile.active}]',
-        );
-        final t = ref.read(translationsProvider).requireValue;
-        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.delete.success);
-        return unit;
-      },
-    ).run();
+    await _profilesRepo
+        .deleteById(profile.id, profile.active)
+        .match(
+          (err) {
+            loggy.warning('failed to delete profile', err);
+            throw err;
+          },
+          (_) {
+            loggy.info('successfully deleted profile, was active? [${profile.active}]');
+            final t = ref.read(translationsProvider).requireValue;
+            ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.delete.success);
+            return unit;
+          },
+        )
+        .run();
   }
 
   Future<void> exportConfigToClipboard(ProfileEntity profile) async {
-    await _profilesRepo.generateConfig(profile.id).match(
-      (err) {
-        loggy.warning('error generating config', err);
-        throw err;
-      },
-      (configJson) async {
-        await Clipboard.setData(ClipboardData(text: configJson));
-        final t = ref.read(translationsProvider).requireValue;
-        ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
-      },
-    ).run();
+    await _profilesRepo
+        .generateConfig(profile.id)
+        .match(
+          (err) {
+            loggy.warning('error generating config', err);
+            throw err;
+          },
+          (configJson) async {
+            await Clipboard.setData(ClipboardData(text: configJson));
+            final t = ref.read(translationsProvider).requireValue;
+            ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
+          },
+        )
+        .run();
   }
 }

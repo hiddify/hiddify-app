@@ -64,17 +64,13 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
     }
 
     try {
-      final previousRun = DateTime.tryParse(
-        ref.read(sharedPreferencesProvider).requireValue.getString(prefKey) ?? "",
-      );
+      final previousRun = DateTime.tryParse(ref.read(sharedPreferencesProvider).requireValue.getString(prefKey) ?? "");
 
       if (!force && previousRun != null && previousRun.add(interval) > DateTime.now()) {
         loggy.debug("too soon! previous run: [$previousRun]");
         return;
       }
-      loggy.debug(
-        "${force ? "[FORCED] " : ""}running, previous run: [$previousRun]",
-      );
+      loggy.debug("${force ? "[FORCED] " : ""}running, previous run: [$previousRun]");
 
       final remoteProfiles = await ref
           .read(profileRepositoryProvider)
@@ -92,19 +88,25 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
         final updateInterval = profile.options?.updateInterval;
         if (force || updateInterval != null && updateInterval <= DateTime.now().difference(profile.lastUpdate)) {
           final t = ref.read(translationsProvider).requireValue;
-          await ref.read(profileRepositoryProvider).requireValue.upsertRemote(profile.url).mapLeft(
-            (l) {
-              loggy.debug("error updating profile [${profile.id}]", l);
-              ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.profiles.msg.update.failureNamed(name: profile.name));
-              state = AsyncData((name: profile.name, success: false));
-            },
-          ).map(
-            (_) {
-              loggy.debug("profile [${profile.id}] updated successfully");
-              ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.update.successNamed(name: profile.name));
-              state = AsyncData((name: profile.name, success: true));
-            },
-          ).run();
+          await ref
+              .read(profileRepositoryProvider)
+              .requireValue
+              .upsertRemote(profile.url)
+              .mapLeft((l) {
+                loggy.debug("error updating profile [${profile.id}]", l);
+                ref
+                    .read(inAppNotificationControllerProvider)
+                    .showErrorToast(t.pages.profiles.msg.update.failureNamed(name: profile.name));
+                state = AsyncData((name: profile.name, success: false));
+              })
+              .map((_) {
+                loggy.debug("profile [${profile.id}] updated successfully");
+                ref
+                    .read(inAppNotificationControllerProvider)
+                    .showSuccessToast(t.pages.profiles.msg.update.successNamed(name: profile.name));
+                state = AsyncData((name: profile.name, success: true));
+              })
+              .run();
         } else {
           loggy.debug(
             "skipping profile [${profile.id}] update. last successful update: [${profile.lastUpdate}] - interval: [${profile.options?.updateInterval}]",

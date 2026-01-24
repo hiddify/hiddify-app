@@ -13,10 +13,5 @@ class StatsEntity with _$StatsEntity {
     required int downlinkTotal,
   }) = _StatsEntity;
 
-  factory StatsEntity.empty() => const StatsEntity(
-        uplink: 0,
-        downlink: 0,
-        uplinkTotal: 0,
-        downlinkTotal: 0,
-      );
+  factory StatsEntity.empty() => const StatsEntity(uplink: 0, downlink: 0, uplinkTotal: 0, downlinkTotal: 0);
 }

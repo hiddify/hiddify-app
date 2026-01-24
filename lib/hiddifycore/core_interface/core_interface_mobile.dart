@@ -60,7 +60,6 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     // var chanelOption = ChannelOptions(
     //   credentials: MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientPrivateKey: cert.privateKey as ECPrivateKey),
     // );
-
     final res = await helloClient.sayHello(HelloRequest(name: "test"));
     loggy.info(res.toString());
     fgClient = CoreClient(

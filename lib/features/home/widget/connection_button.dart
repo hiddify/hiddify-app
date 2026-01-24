@@ -106,31 +106,37 @@ class ConnectionButton extends HookConsumerWidget {
     //   //   animationValue: animationValue,
     //   // );
     // }
-    var secureLabel = (ref.watch(ConfigOptions.enableWarp) && ref.watch(ConfigOptions.warpDetourMode) == WarpDetourMode.warpOverProxy) ? t.connection.secure : "";
+    var secureLabel =
+        (ref.watch(ConfigOptions.enableWarp) && ref.watch(ConfigOptions.warpDetourMode) == WarpDetourMode.warpOverProxy)
+        ? t.connection.secure
+        : "";
     if (delay <= 0 || delay > 65000 || connectionStatus.value != const Connected()) {
       secureLabel = "";
     }
     return _ConnectionButton(
       onTap: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => () async {
-            final activeProfile = await ref.read(activeProfileProvider.future);
-            return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
-          },
+          final activeProfile = await ref.read(activeProfileProvider.future);
+          return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
+        },
         AsyncData(value: Disconnected()) || AsyncError() => () async {
-            if (ref.read(activeProfileProvider).valueOrNull == null) {
-              await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile();
-              ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
-            }
-            if (await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
-              return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-            }
-          },
-        AsyncData(value: Connected()) => () async {
-            if (requiresReconnect == true && await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
-              return await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
-            }
+          if (ref.read(activeProfileProvider).valueOrNull == null) {
+            await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile();
+            ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
+          }
+          if (await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
             return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-          },
+          }
+        },
+        AsyncData(value: Connected()) => () async {
+          if (requiresReconnect == true &&
+              await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
+            return await ref
+                .read(connectionNotifierProvider.notifier)
+                .reconnect(await ref.read(activeProfileProvider.future));
+          }
+          return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
+        },
         _ => () {},
       },
       enabled: switch (connectionStatus) {
@@ -218,12 +224,7 @@ class _ConnectionButton extends StatelessWidget {
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 16,
-                  color: buttonColor.withValues(alpha: .5),
-                ),
-              ],
+              boxShadow: [BoxShadow(blurRadius: 16, color: buttonColor.withValues(alpha: .5))],
             ),
             width: 148,
             height: 148,
@@ -243,12 +244,7 @@ class _ConnectionButton extends StatelessWidget {
                       if (useImage) {
                         return image.image();
                       } else {
-                        return Assets.images.logo.svg(
-                          colorFilter: ColorFilter.mode(
-                            value!,
-                            BlendMode.srcIn,
-                          ),
-                        );
+                        return Assets.images.logo.svg(colorFilter: ColorFilter.mode(value!, BlendMode.srcIn));
                       }
                     },
                   ),
@@ -259,28 +255,29 @@ class _ConnectionButton extends StatelessWidget {
         ),
         const Gap(16),
         ExcludeSemantics(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedText(
-              label,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            if (secureLabel.isNotEmpty) ...[
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                // const Gap(8),
-                Icon(FontAwesomeIcons.shieldHalved, size: 16, color: Theme.of(context).colorScheme.secondary),
-                const Gap(4),
-                Text(
-                  secureLabel,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedText(label, style: Theme.of(context).textTheme.titleMedium),
+              if (secureLabel.isNotEmpty) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // const Gap(8),
+                    Icon(FontAwesomeIcons.shieldHalved, size: 16, color: Theme.of(context).colorScheme.secondary),
+                    const Gap(4),
+                    Text(
+                      secureLabel,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.secondary),
+                    ),
+                  ],
                 ),
-              ]),
+              ],
             ],
-          ],
-        )),
+          ),
+        ),
       ],
     );
   }

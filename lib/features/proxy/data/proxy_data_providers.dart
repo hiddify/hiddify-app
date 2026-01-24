@@ -8,8 +8,5 @@ part 'proxy_data_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 ProxyRepository proxyRepository(Ref ref) {
-  return ProxyRepositoryImpl(
-    singbox: ref.watch(hiddifyCoreServiceProvider),
-    client: ref.watch(httpClientProvider),
-  );
+  return ProxyRepositoryImpl(singbox: ref.watch(hiddifyCoreServiceProvider), client: ref.watch(httpClientProvider));
 }

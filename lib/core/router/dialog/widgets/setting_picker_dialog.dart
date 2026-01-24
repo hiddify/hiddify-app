@@ -50,10 +50,7 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
             },
             child: Text(t.common.reset),
           ),
-        TextButton(
-          onPressed: () => context.pop(),
-          child: Text(t.common.cancel),
-        ),
+        TextButton(onPressed: () => context.pop(), child: Text(t.common.cancel)),
       ],
       // scrollable: true,
     );

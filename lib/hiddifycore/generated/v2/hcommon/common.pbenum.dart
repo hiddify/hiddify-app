@@ -10,11 +10,14 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class ResponseCode extends $pb.ProtobufEnum {
-  static const ResponseCode OK = ResponseCode._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OK');
-  static const ResponseCode FAILED = ResponseCode._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'FAILED');
-  static const ResponseCode AUTH_NEED = ResponseCode._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'AUTH_NEED');
+  static const ResponseCode OK =
+      ResponseCode._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OK');
+  static const ResponseCode FAILED =
+      ResponseCode._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'FAILED');
+  static const ResponseCode AUTH_NEED =
+      ResponseCode._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'AUTH_NEED');
 
-  static const $core.List<ResponseCode> values = <ResponseCode> [
+  static const $core.List<ResponseCode> values = <ResponseCode>[
     OK,
     FAILED,
     AUTH_NEED,
@@ -25,4 +28,3 @@ class ResponseCode extends $pb.ProtobufEnum {
 
   const ResponseCode._($core.int v, $core.String n) : super(v, n);
 }
-

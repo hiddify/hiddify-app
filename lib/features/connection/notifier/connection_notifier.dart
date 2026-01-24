@@ -29,34 +29,29 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       }).run();
     }
 
-    listenSelf(
-      (previous, next) async {
-        if (previous == next) return;
-        if (previous case AsyncData(:final value) when !value.isConnected) {
-          if (next case AsyncData(value: final Connected _)) {
-            await ref.read(hapticServiceProvider.notifier).heavyImpact();
+    listenSelf((previous, next) async {
+      if (previous == next) return;
+      if (previous case AsyncData(:final value) when !value.isConnected) {
+        if (next case AsyncData(value: final Connected _)) {
+          await ref.read(hapticServiceProvider.notifier).heavyImpact();
 
-            if (Platform.isAndroid && !ref.read(Preferences.storeReviewedByUser)) {
-              if (await InAppReview.instance.isAvailable()) {
-                InAppReview.instance.requestReview();
-                ref.read(Preferences.storeReviewedByUser.notifier).update(true);
-              }
+          if (Platform.isAndroid && !ref.read(Preferences.storeReviewedByUser)) {
+            if (await InAppReview.instance.isAvailable()) {
+              InAppReview.instance.requestReview();
+              ref.read(Preferences.storeReviewedByUser.notifier).update(true);
             }
           }
         }
-      },
-    );
+      }
+    });
 
-    ref.listen(
-      activeProfileProvider.select((value) => value.asData?.value),
-      (previous, next) async {
-        if (previous == null) return;
-        final shouldReconnect = next == null || previous.id != next.id;
-        if (shouldReconnect) {
-          await reconnect(next);
-        }
-      },
-    );
+    ref.listen(activeProfileProvider.select((value) => value.asData?.value), (previous, next) async {
+      if (previous == null) return;
+      final shouldReconnect = next == null || previous.id != next.id;
+      if (shouldReconnect) {
+        await reconnect(next);
+      }
+    });
     yield* _connectionRepo.watchConnectionStatus().doOnData((event) {
       if (event case Disconnected(connectionFailure: final _?) when PlatformUtils.isDesktop) {
         ref.read(Preferences.startedByUser.notifier).update(false);
@@ -103,12 +98,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       }
       loggy.info("active profile changed, reconnecting");
       await ref.read(Preferences.startedByUser.notifier).update(true);
-      await _connectionRepo
-          .reconnect(
-        profile,
-        ref.read(Preferences.disableMemoryLimit),
-      )
-          .mapLeft((err) {
+      await _connectionRepo.reconnect(profile, ref.read(Preferences.disableMemoryLimit)).mapLeft((err) {
         loggy.warning("error reconnecting", err);
         state = AsyncError(err, StackTrace.current);
       }).run();
@@ -132,15 +122,14 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       loggy.info("no active profile, not connecting");
       return;
     }
-    await _connectionRepo
-        .connect(
-      activeProfile,
-      ref.read(Preferences.disableMemoryLimit),
-    )
-        .mapLeft((ConnectionFailure err) async {
+    await _connectionRepo.connect(activeProfile, ref.read(Preferences.disableMemoryLimit)).mapLeft((
+      ConnectionFailure err,
+    ) async {
       loggy.warning("error connecting", err);
       //Go err is not normal object to see the go errors are string and need to be dumped
-      await ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
+      await ref
+          .read(dialogNotifierProvider.notifier)
+          .showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
       loggy.warning(err);
       if (err.toString().contains("panic")) {
         await Sentry.captureException(Exception(err.toString()));
@@ -159,8 +148,5 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
 }
 
 @Riverpod(keepAlive: true)
-Future<bool> serviceRunning(Ref ref) => ref
-    .watch(
-      connectionNotifierProvider.selectAsync((data) => data.isConnected),
-    )
-    .onError((error, stackTrace) => false);
+Future<bool> serviceRunning(Ref ref) =>
+    ref.watch(connectionNotifierProvider.selectAsync((data) => data.isConnected)).onError((error, stackTrace) => false);

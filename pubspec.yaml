@@ -4,7 +4,13 @@ publish_to: "none"
 version: 3.0.0+30000
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.10.4
+  # ! IMPORTANT !
+  # This SDK version is strictly required and must not be removed.
+  # It is parsed/grep-ed by Makefile and Dockerfile to configure the build environment.
+  # Ensure this matches the target Flutter version.
+  flutter: ^3.38.5
+  
 dependencies:
   flutter:
     sdk: flutter
@@ -38,6 +44,8 @@ dependencies:
   share_plus: ^10.1.0
   window_manager: ^0.5.0
   tray_manager: ^0.5.0
+  # get list of connected monitors (on Desktops), including their size and position
+  screen_retriever: ^0.2.0
 
   package_info_plus: ^8.1.0
 
@@ -103,7 +111,7 @@ dependencies:
   basic_utils: 5.7.0
   showcaseview: 3.0.0
   text_scroll: ^0.2.0
-  flutter_markdown: ^0.7.6+2
+  flutter_markdown_plus: ^1.0.6
   # platform-specific  settings
   # https://github.com/miguelpruivo/flutter_file_picker/wiki/Setup
   file_picker: ^8.1.7
@@ -161,6 +169,7 @@ flutter:
     - assets/images/connect_norouz.PNG
     - assets/images/disconnect_norouz.PNG
     - assets/images/world_map.png
+    - assets/images/source/ic_launcher_border.png
 
   fonts:
     - family: Shabnam

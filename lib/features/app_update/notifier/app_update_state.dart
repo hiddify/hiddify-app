@@ -9,11 +9,8 @@ class AppUpdateState with _$AppUpdateState {
   const factory AppUpdateState.initial() = AppUpdateStateInitial;
   const factory AppUpdateState.disabled() = AppUpdateStateDisabled;
   const factory AppUpdateState.checking() = AppUpdateStateChecking;
-  const factory AppUpdateState.error(AppUpdateFailure error) =
-      AppUpdateStateError;
-  const factory AppUpdateState.available(RemoteVersionEntity versionInfo) =
-      AppUpdateStateAvailable;
-  const factory AppUpdateState.ignored(RemoteVersionEntity versionInfo) =
-      AppUpdateStateIgnored;
+  const factory AppUpdateState.error(AppUpdateFailure error) = AppUpdateStateError;
+  const factory AppUpdateState.available(RemoteVersionEntity versionInfo) = AppUpdateStateAvailable;
+  const factory AppUpdateState.ignored(RemoteVersionEntity versionInfo) = AppUpdateStateIgnored;
   const factory AppUpdateState.notAvailable() = AppUpdateStateNotAvailable;
 }

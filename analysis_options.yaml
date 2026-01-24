@@ -10,6 +10,9 @@ analyzer:
   errors:
     invalid_annotation_target: ignore
 
+formatter:
+  page_width: 120
+
 linter:
   rules:
     sort_pub_dependencies: false

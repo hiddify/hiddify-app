@@ -34,14 +34,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
             icon: const Icon(FluentIcons.arrow_sort_24_regular),
             tooltip: t.pages.proxies.sort,
             itemBuilder: (context) {
-              return [
-                ...ProxiesSort.values.map(
-                  (e) => PopupMenuItem(
-                    value: e,
-                    child: Text(e.present(t)),
-                  ),
-                ),
-              ];
+              return [...ProxiesSort.values.map((e) => PopupMenuItem(value: e, child: Text(e.present(t))))];
             },
           ),
           const Gap(8),
@@ -49,45 +42,44 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
       ),
       floatingActionButton: proxies.value != null
           ? FloatingActionButton(
-              onPressed: () async => await ref.watch(proxiesOverviewNotifierProvider.notifier).urlTest(proxies.value!.tag),
+              onPressed: () async =>
+                  await ref.watch(proxiesOverviewNotifierProvider.notifier).urlTest(proxies.value!.tag),
               tooltip: t.pages.proxies.testDelay,
               child: const Icon(FluentIcons.flash_24_filled),
             )
           : null,
       body: proxies.when(
         data: (group) => group != null
-            ? LayoutBuilder(builder: (context, constraints) {
-                final width = constraints.maxWidth;
-                final crossAxisCount = PlatformUtils.isMobile && width < 600 ? 1 : max(1, (width / 268).floor());
-                return GridView.builder(
-                  padding: const EdgeInsets.only(bottom: 86),
-                  itemCount: group.items.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    mainAxisExtent: 72,
-                  ),
-                  itemBuilder: (context, index) {
-                    final proxy = group.items[index];
-                    return ProxyTile(
-                      proxy,
-                      selected: group.selected.tag == proxy.tag,
-                      onTap: () {
-                        if (selectActiveProxyMutation.state.isInProgress) return;
-                        selectActiveProxyMutation.setFuture(ref.watch(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag));
-                      },
-                    );
-                  },
-                );
-              })
+            ? LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  final crossAxisCount = PlatformUtils.isMobile && width < 600 ? 1 : max(1, (width / 268).floor());
+                  return GridView.builder(
+                    padding: const EdgeInsets.only(bottom: 86),
+                    itemCount: group.items.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisExtent: 72,
+                    ),
+                    itemBuilder: (context, index) {
+                      final proxy = group.items[index];
+                      return ProxyTile(
+                        proxy,
+                        selected: group.selected.tag == proxy.tag,
+                        onTap: () {
+                          if (selectActiveProxyMutation.state.isInProgress) return;
+                          selectActiveProxyMutation.setFuture(
+                            ref.watch(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              )
             : Center(child: Text(t.pages.proxies.empty)),
-        error: (error, stackTrace) => Center(
-          child: Text(
-            t.presentShortError(error),
-          ),
-        ),
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
+        error: (error, stackTrace) => Center(child: Text(t.presentShortError(error))),
+        loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }

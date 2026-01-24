@@ -30,11 +30,7 @@ class MTLSChannelCredentials extends ChannelCredentials {
     }
     ctx.usePrivateKeyBytes(Uint8List.fromList(privateKeyPem.codeUnits));
 
-    final cert = X509Utils.generateSelfSignedCertificate(
-      clientKey.privateKey,
-      'CN=Client',
-      365,
-    );
+    final cert = X509Utils.generateSelfSignedCertificate(clientKey.privateKey, 'CN=Client', 365);
 
     ctx.useCertificateChainBytes(Uint8List.fromList(cert.codeUnits));
   }

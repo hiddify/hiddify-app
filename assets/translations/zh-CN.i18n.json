@@ -50,6 +50,7 @@
     "hidden": "隐藏",
     "timeout": "超时",
     "sort": "排序",
+    "dashboard": "仪表盘",
     "interval": {
       "day": {
         "zero": "",

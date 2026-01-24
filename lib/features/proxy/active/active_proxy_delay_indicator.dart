@@ -60,10 +60,7 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
                   ),
                 )
               else
-                Semantics(
-                  label: t.pages.proxies.delay.testing,
-                  child: const ShimmerSkeleton(width: 48, height: 18),
-                ),
+                Semantics(label: t.pages.proxies.delay.testing, child: const ShimmerSkeleton(width: 48, height: 18)),
             ],
           ),
         ),

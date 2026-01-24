@@ -41,14 +41,7 @@ class WindowsProtocolHandler extends ProtocolHandler {
     final txtValue = TEXT(valueName);
     final txtData = TEXT(data);
     try {
-      return RegSetKeyValue(
-        hKey,
-        txtKey,
-        txtValue,
-        REG_SZ,
-        txtData,
-        txtData.length * 2 + 2,
-      );
+      return RegSetKeyValue(hKey, txtKey, txtValue, REG_SZ, txtData, txtData.length * 2 + 2);
     } finally {
       free(txtKey);
       free(txtValue);

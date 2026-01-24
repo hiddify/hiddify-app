@@ -13,8 +13,7 @@ class HapticService extends _$HapticService {
   }
 
   static const String hapticFeedbackPrefKey = "haptic_feedback";
-  SharedPreferences get _preferences =>
-      ref.read(sharedPreferencesProvider).requireValue;
+  SharedPreferences get _preferences => ref.read(sharedPreferencesProvider).requireValue;
 
   Future<void> updatePreference(bool value) async {
     state = value;

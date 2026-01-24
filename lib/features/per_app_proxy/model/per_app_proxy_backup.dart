@@ -15,10 +15,8 @@ abstract class PerAppProxyBackup with _$PerAppProxyBackup {
 
 @freezed
 abstract class PerAppProxyBackupMode with _$PerAppProxyBackupMode {
-  const factory PerAppProxyBackupMode({
-    @Default([]) List<String> selected,
-    @Default([]) List<String> deselected,
-  }) = _PerAppProxyBackupMode;
+  const factory PerAppProxyBackupMode({@Default([]) List<String> selected, @Default([]) List<String> deselected}) =
+      _PerAppProxyBackupMode;
 
   factory PerAppProxyBackupMode.fromJson(Map<String, Object?> json) => _$PerAppProxyBackupModeFromJson(json);
 }

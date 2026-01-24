@@ -32,25 +32,25 @@ enum RuleEnum {
   int getIndex() => index + 1;
 
   String present(Translations t) => switch (this) {
-        listOrder => this.name,
-        enabled => this.name,
-        name => t.pages.settings.routing.routeRule.rule.tileTitle['name']!,
-        outbound => t.pages.settings.routing.routeRule.rule.tileTitle['outbound']!,
-        ruleSet => t.pages.settings.routing.routeRule.rule.tileTitle['rule_set']!,
-        packageName => t.pages.settings.routing.routeRule.rule.tileTitle['package_name']!,
-        processName => t.pages.settings.routing.routeRule.rule.tileTitle['process_name']!,
-        processPath => t.pages.settings.routing.routeRule.rule.tileTitle['process_path']!,
-        network => t.pages.settings.routing.routeRule.rule.tileTitle['network']!,
-        portRange => t.pages.settings.routing.routeRule.rule.tileTitle['port_range']!,
-        sourcePortRange => t.pages.settings.routing.routeRule.rule.tileTitle['source_port_range']!,
-        protocol => t.pages.settings.routing.routeRule.rule.tileTitle['protocol']!,
-        ipCidr => t.pages.settings.routing.routeRule.rule.tileTitle['ip_cidr']!,
-        sourceIpCidr => t.pages.settings.routing.routeRule.rule.tileTitle['source_ip_cidr']!,
-        domain => t.pages.settings.routing.routeRule.rule.tileTitle['domain']!,
-        domainSuffix => t.pages.settings.routing.routeRule.rule.tileTitle['domain_suffixe']!,
-        domainKeyword => t.pages.settings.routing.routeRule.rule.tileTitle['domain_keyword']!,
-        domainRegex => t.pages.settings.routing.routeRule.rule.tileTitle['domain_regex']!,
-      };
+    listOrder => this.name,
+    enabled => this.name,
+    name => t.pages.settings.routing.routeRule.rule.tileTitle['name']!,
+    outbound => t.pages.settings.routing.routeRule.rule.tileTitle['outbound']!,
+    ruleSet => t.pages.settings.routing.routeRule.rule.tileTitle['rule_set']!,
+    packageName => t.pages.settings.routing.routeRule.rule.tileTitle['package_name']!,
+    processName => t.pages.settings.routing.routeRule.rule.tileTitle['process_name']!,
+    processPath => t.pages.settings.routing.routeRule.rule.tileTitle['process_path']!,
+    network => t.pages.settings.routing.routeRule.rule.tileTitle['network']!,
+    portRange => t.pages.settings.routing.routeRule.rule.tileTitle['port_range']!,
+    sourcePortRange => t.pages.settings.routing.routeRule.rule.tileTitle['source_port_range']!,
+    protocol => t.pages.settings.routing.routeRule.rule.tileTitle['protocol']!,
+    ipCidr => t.pages.settings.routing.routeRule.rule.tileTitle['ip_cidr']!,
+    sourceIpCidr => t.pages.settings.routing.routeRule.rule.tileTitle['source_ip_cidr']!,
+    domain => t.pages.settings.routing.routeRule.rule.tileTitle['domain']!,
+    domainSuffix => t.pages.settings.routing.routeRule.rule.tileTitle['domain_suffixe']!,
+    domainKeyword => t.pages.settings.routing.routeRule.rule.tileTitle['domain_keyword']!,
+    domainRegex => t.pages.settings.routing.routeRule.rule.tileTitle['domain_regex']!,
+  };
 }
 
 @riverpod
@@ -60,11 +60,7 @@ class RuleNotifier extends _$RuleNotifier {
   @override
   Rule build(int? listOrder) {
     if (listOrder == null) {
-      return Rule(
-        name: 'Rule Name',
-        outbound: Outbound.direct,
-        network: Network.all,
-      );
+      return Rule(name: 'Rule Name', outbound: Outbound.direct, network: Network.all);
     } else {
       isEditMode = true;
       return ref.read(rulesNotifierProvider).where((rule) => rule.listOrder == listOrder).first;
@@ -76,8 +72,8 @@ class RuleNotifier extends _$RuleNotifier {
     map['${key.getIndex()}'] = value is ProtobufEnum
         ? '${value.value}'
         : value is List<ProtobufEnum>
-            ? value.map((e) => '${e.value}').toList()
-            : value;
+        ? value.map((e) => '${e.value}').toList()
+        : value;
     state = Rule.fromJson(jsonEncode(map));
   }
 
@@ -95,7 +91,8 @@ class RuleNotifier extends _$RuleNotifier {
 @riverpod
 bool isRuleEdited(Ref ref, int? listOrder) {
   if (listOrder == null) return true;
-  return ref.watch(RuleNotifierProvider(listOrder)) != ref.watch(rulesNotifierProvider.select((value) => value.where((rule) => rule.listOrder == listOrder))).first;
+  return ref.watch(RuleNotifierProvider(listOrder)) !=
+      ref.watch(rulesNotifierProvider.select((value) => value.where((rule) => rule.listOrder == listOrder))).first;
 }
 
 @riverpod

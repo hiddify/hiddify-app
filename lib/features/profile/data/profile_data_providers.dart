@@ -27,7 +27,7 @@ Future<ProfileRepository> profileRepository(Ref ref) async {
 
 @Riverpod(keepAlive: true)
 ProfileDataSource profileDataSource(Ref ref) {
-  return ProfileDao(ref.watch(dbV2Provider));
+  return ProfileDao(ref.watch(dbProvider));
 }
 
 @Riverpod(keepAlive: true)

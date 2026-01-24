@@ -33,13 +33,9 @@ LIB_NAME=hiddify-core
 
 ifeq ($(CHANNEL),prod)
 	CORE_URL=https://github.com/hiddify/hiddify-next-core/releases/download/v$(core.version)
-else
-	CORE_URL=https://github.com/hiddify/hiddify-next-core/releases/download/draft
-endif
-
-ifeq ($(CHANNEL),prod)
 	TARGET=lib/main_prod.dart
 else
+	CORE_URL=https://github.com/hiddify/hiddify-next-core/releases/download/draft
 	TARGET=lib/main.dart
 endif
 
@@ -73,7 +69,7 @@ ios-prepare: get gen translate ios-libs
 	cd ios; pod repo update; pod install;echo "done ios prepare"
 	
 macos-prepare: get gen translate macos-libs
-linux-prepare: get gen translate linux-libs
+linux-prepare: linux-flutter-sync get gen translate linux-libs
 linux-appimage-prepare:linux-prepare
 linux-rpm-prepare:linux-prepare
 linux-deb-prepare:linux-prepare
@@ -115,12 +111,12 @@ protos: generate_go_protoc generate_kotlin_protos generate_dart_protoc
 	
 	
 
-macos-install-dependencies:
+macos-install-deps:
 	brew install create-dmg tree 
 	npm install -g appdmg
-	dart pub global activate flutter_distributor
+	dart pub global activate fastforge
 
-ios-install-dependencies: 
+ios-install-deps: 
 	if [ "$(flutter)" = "true" ]; then \
 		curl -L -o ~/Downloads/flutter_macos_3.19.3-stable.zip https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.22.3-stable.zip; \
 		mkdir -p ~/develop; \
@@ -140,60 +136,273 @@ ios-install-dependencies:
 	brew install create-dmg tree 
 	npm install -g appdmg
 	
-	dart pub global activate flutter_distributor
+	dart pub global activate fastforge
 	
 
-android-install-dependencies: 
+android-install-deps: 
 	echo "nothing yet"
-android-apk-install-dependencies: android-install-dependencies
-android-aab-install-dependencies: android-install-dependencies
+android-apk-install-deps: android-install-deps
+android-aab-install-deps: android-install-deps
+# loads the package list from linux_deps.list
+LINUX_DEPS := $(shell grep -vE '^\s*#|^\s*$$' linux_deps.list)
+# reads the Flutter version from pubspec.yaml
+REQUIRED_VER := $(shell grep -A 2 "environment:" $(CURDIR)/pubspec.yaml | grep "flutter:" | tr -d ' ^flutter:')
 
-linux-install-dependencies:
-	if [ "$(flutter)" = "true" ]; then \
-		mkdir -p ~/develop; \
-		cd ~/develop; \
-		wget -O flutter_linux-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.4-stable.tar.xz; \
-		tar xf flutter_linux-stable.tar.xz; \
-		rm flutter_linux-stable.tar.xz;\
-		export PATH="$$PATH:$$HOME/develop/flutter/bin"; \
-		echo 'export PATH="$$PATH:$$HOME/develop/flutter/bin"' >> ~/.bashrc; \
-	fi
-	PATH="$$PATH":"$$HOME/.pub-cache/bin"
-	echo 'export PATH="$$PATH:$$HOME/.pub-cache/bin"' >>~/.bashrc
-	sudo apt-get update
-	sudo apt install -y clang ninja-build libcurl4-openssl-dev pkg-config cmake libgtk-3-dev locate ninja-build pkg-config libglib2.0-dev libgio2.0-cil-dev libayatana-appindicator3-dev fuse rpm patchelf file appstream 
-	
-	
+linux-install-deps:
+	@echo "** Installing Debian/Ubuntu dependencies..."
+	sudo apt-get update -y
+	sudo apt-get install -y $(LINUX_DEPS)
+#	loading fuce kernel module
+	@echo "** Loading fuce kernel module"
 	sudo modprobe fuse
-	wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-	chmod +x appimagetool
-	sudo mv appimagetool /usr/local/bin/
+# 	tools for appimage
+	@echo "** Installing appimagetool"
+	wget -O /tmp/appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+	chmod +x /tmp/appimagetool
+	sudo mv /tmp/appimagetool /usr/local/bin/
+#   cloning flutter sdk
+	@echo "** Cloning Flutter SDK"; \
+	mkdir -p ~/develop; \
+	cd ~/develop; \
+	\
+	if [ ! -d "flutter/.git" ]; then \
+		echo "** Flutter not found. cloning stable channel"; \
+		rm -rf flutter; \
+		git clone https://github.com/flutter/flutter.git -b stable flutter; \
+	fi; \
+	\
+	git config --global --add safe.directory $$HOME/develop/flutter; \
+	\
+	export PATH="$$HOME/develop/flutter/bin:$$PATH"; \
+	if ! grep -q 'flutter/bin' ~/.bashrc; then \
+		echo 'export PATH="$$HOME/develop/flutter/bin:$$PATH"' >> ~/.bashrc; \
+	fi
+# 	syncing flutter version
+	$(MAKE) linux-flutter-sync
+# 	installing fastforge https://pub.dev/packages/fastforge
+	@echo "** Installing fastforge"; \
+	export PATH="$$HOME/develop/flutter/bin:$$HOME/.pub-cache/bin:$$PATH"; \
+	if ! grep -q '.pub-cache/bin' ~/.bashrc; then \
+		echo 'export PATH="$$HOME/.pub-cache/bin:$$PATH"' >> ~/.bashrc; \
+	fi; \
+	dart pub global activate fastforge; \
+	echo ""; \
+	echo "============================================================"; \
+	echo "NOTE: After first setup, use the following command to update the PATH"; \
+	echo "source ~/.bashrc"; \
+	echo "============================================================"
 
-	dart pub global activate --source git  https://github.com/hiddify/flutter_distributor --git-path packages/flutter_distributor
+# 	syncing 'flutter sdk' version with pubspec.yaml flutter version
+linux-flutter-sync:
+	@echo "** Syncing Flutter version with pubspec.yaml flutter version"; \
+	export PATH="$$HOME/develop/flutter/bin:$$PATH"; \
+	echo "** Downloading Flutter SDK components..."; \
+	flutter --version > /dev/null; \
+	\
+	echo "** Checking Flutter version..."; \
+	CURRENT_VER=$$(flutter --version | head -n 1 | awk '{print $$2}'); \
+	echo "** Target: $(REQUIRED_VER) | Current: $$CURRENT_VER"; \
+	\
+	if [ "$$CURRENT_VER" != "$(REQUIRED_VER)" ]; then \
+		echo "** Version mismatch! switching to $(REQUIRED_VER)..."; \
+		cd ~/develop/flutter; \
+		git fetch --tags; \
+		git checkout $(REQUIRED_VER); \
+		echo "** Switched to $(REQUIRED_VER)"; \
+		flutter doctor; \
+	else \
+		echo "** Flutter SDK is ready."; \
+	fi
 
-windows-install-dependencies:
-	dart pub global activate flutter_distributor 
+
+windows-install-deps:
+	dart pub global activate fastforge
+	choco install innosetup -y
+	
 	
 gen_translations: #generating missing translations using google translate
 	cd .github && bash sync_translate.sh
 	make translate
 
-android-release: android-apk-release
+android-release: android-release-apk android-release-aab
 
-android-apk-release:
-	flutter build apk --target $(TARGET) $(BUILD_ARGS) --target-platform android-arm,android-arm64,android-x64 
-	#--verbose  
+android-release-apk:
+	fastforge package \
+	  --platform android \
+	  --targets apk \
+	  --skip-clean \
+	  --build-target=$(TARGET) \
+	  --build-target-platform=android-arm,android-arm64,android-x64 \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
 	ls -R build/app/outputs
 
-android-aab-release:
-	flutter build appbundle --target $(TARGET) $(BUILD_ARGS) --dart-define release=google-play
-	ls -R build/app/outputs
+android-release-aab:
+	fastforge package \
+	  --platform android \
+	  --targets aab \
+	  --skip-clean \
+	  --build-target=$(TARGET) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=release=google-play
 
-windows-release:
-	flutter_distributor package --flutter-build-args=verbose --platform windows --targets exe,msix $(DISTRIBUTOR_ARGS)
+windows-release: windows-release-zip windows-release-exe windows-release-msix
 
-linux-release: 
-	flutter_distributor package --flutter-build-args=verbose --platform linux --targets deb,rpm,appimage $(DISTRIBUTOR_ARGS)
+windows-release-zip:
+	fastforge package \
+	  --platform windows \
+	  --targets zip \
+	  --skip-clean \
+	  --build-target=$(TARGET) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=portable=true
+
+windows-release-exe:
+	fastforge package \
+	  --platform windows \
+	  --targets exe \
+	  --skip-clean \
+	  --build-target=$(TARGET) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
+
+windows-release-msix:
+	fastforge package \
+	  --platform windows \
+	  --targets msix \
+	  --skip-clean \
+	  --build-target=$(TARGET) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
+
+linux-release: linux-release-deb linux-release-appimage
+
+linux-release-deb:
+	fastforge package \
+	--platform linux \
+	--targets deb \
+	--skip-clean \
+	--build-target=$(TARGET) \
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
+
+
+# ==============================================================================
+# REFERENCE: MANUAL LIBRARY BUNDLING (INJECTION)
+# ==============================================================================
+# Use this method only if you need to manually force specific shared libraries 
+# (e.g., libcurl.so.4) into the AppImage bundle.
+#
+# IMPLEMENTATION STEPS:
+#
+# 1. PRE-BUILD SCRIPT (Add to Makefile before build command):
+#    Create a temporary directory and copy the target library there.
+#    ---------------------------------------------------------------------------
+#    mkdir -p linux/bundled_libs
+#    cp /usr/lib/x86_64-linux-gnu/libcurl.so.4 linux/bundled_libs/
+#    ---------------------------------------------------------------------------
+#
+# 2. CMAKE CONFIGURATION (Add to linux/CMakeLists.txt):
+#    Instruct CMake to include the copied file in the final bundle.
+#    ---------------------------------------------------------------------------
+#    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/bundled_libs/libcurl.so.4"
+#       DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+#       COMPONENT Runtime)
+#    ---------------------------------------------------------------------------
+#
+# ! WARNING !
+# This approach is generally DISCOURAGED. Manually bundling libraries can lead to
+# "Dependency Hell," where bundled libs conflict with system libraries or have
+# their own unresolved dependencies. It increases maintenance cost and may cause
+# runtime instability. Use only for specific edge cases where standard linking fails.
+# ==============================================================================
+linux-release-appimage:
+	fastforge package \
+	--platform linux \
+	--targets appimage \
+	--skip-clean \
+	--build-target=$(TARGET) \
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
+	@echo "---- Post-processing AppImage"
+	@FULL_PATH=$$(ls -td dist/*+* | head -n 1); \
+	VERSION_NAME=$$(basename "$$FULL_PATH"); \
+	echo "** Directory Found: $$FULL_PATH"; \
+	echo "** Detected Version: $$VERSION_NAME"; \
+	echo "** Extracting AppImage"; \
+	cd dist/$$VERSION_NAME && ./hiddify-$$VERSION_NAME-linux.AppImage --appimage-extract > /dev/null; \
+	echo "** Replacing AppRun"; \
+	cp ../../linux/packaging/appimage/AppRun squashfs-root/AppRun; \
+	echo "** Granting permissions"; \
+	chmod +x squashfs-root/AppRun; \
+	echo "** Adding StartupWMClass to hiddify.desktop"; \
+	sed -i '/^\[Desktop Entry\]/a StartupWMClass=app.hiddify.com' "squashfs-root/hiddify.desktop"; \
+	echo "** Removing old AppImage"; \
+	rm hiddify-$$VERSION_NAME-linux.AppImage; \
+	echo "** Rebuilding AppImage"; \
+	ARCH=x86_64 appimagetool squashfs-root hiddify-$$VERSION_NAME-linux.AppImage > /dev/null; \
+	echo "** Cleaning up squashfs"; \
+	rm -rf squashfs-root; \
+	echo "---- Creating Portable Package"; \
+	PKG_DIR_NAME="hiddify-$$VERSION_NAME-linux"; \
+	echo "** Creating dir: $$PKG_DIR_NAME"; \
+	mkdir -p "$$PKG_DIR_NAME"; \
+	echo "** Moving and Renaming to Hiddify.AppImage"; \
+	mv "hiddify-$$VERSION_NAME-linux.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
+	echo "** Creating Portable Home directory"; \
+	mkdir -p "$$PKG_DIR_NAME/Hiddify.AppImage.home"; \
+	echo "** Compressing to .tar.gz"; \
+	tar -czf "$$PKG_DIR_NAME.tar.gz" -C . "$$PKG_DIR_NAME"; \
+	echo "** Removing intermediate directory"; \
+	rm -rf "$$PKG_DIR_NAME"; \
+	echo "---- Successful"
+
+DOCKER_IMAGE_NAME := hiddify-linux-builder
+DOCKER_FLUTTER_VOL := hiddify-flutter-sdk-cache
+DOCKER_PUB_VOL := hiddify-pub-cache
+
+ifeq ($(OS),Windows_NT)
+    FIX_OWNERSHIP := echo \"Windows detected: Skipping chown\"
+else
+    FIX_OWNERSHIP := chown -R $(shell id -u):$(shell id -g) /host/dist_docker
+endif
+
+DOCKER_CMD := \
+	set -e; \
+	echo '** Copying source code to container...'; \
+	mkdir -p /app; \
+	cp -r /host/. /app/; \
+	cd /app; \
+	make linux-prepare; \
+	echo '** Building Release (linux-release)...'; \
+	make linux-release; \
+	echo '** Copying artifacts to host...'; \
+	rm -rf /host/dist_docker; \
+	if [ -d \"dist\" ]; then \
+		cp -r dist /host/dist_docker; \
+		echo '** Fixing permissions for dist_docker...'; \
+		$(FIX_OWNERSHIP); \
+	else \
+		echo 'Error: dist folder not found!'; \
+		exit 1; \
+	fi;
+
+linux-release-docker:
+	@echo "** Cleaning main project to reduce context size"
+	flutter clean
+	
+	@echo "** Building docker image (Cached)"
+	docker build -t $(DOCKER_IMAGE_NAME) -f Dockerfile .
+	
+	@echo "** Ensuring cache volumes exist"
+	docker volume create $(DOCKER_FLUTTER_VOL) || true
+	docker volume create $(DOCKER_PUB_VOL) || true
+
+	@echo "** Running build inside container"
+	@docker run --rm \
+		-v "$(CURDIR):/host" \
+		-v $(DOCKER_FLUTTER_VOL):/root/develop/flutter \
+		-v $(DOCKER_PUB_VOL):/root/.pub-cache \
+		-e APPIMAGE_EXTRACT_AND_RUN=1 \
+		$(DOCKER_IMAGE_NAME) \
+		/bin/bash -c "$(DOCKER_CMD)"
+
+	@echo "** [SUCCESS] Build finished. Output is in 'dist_docker' folder."
 
 macos-release:
 	flutter_distributor package --platform macos --targets dmg,pkg $(DISTRIBUTOR_ARGS)

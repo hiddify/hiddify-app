@@ -3,6 +3,66 @@
 cd "$(dirname "$0")"
 export LD_LIBRARY_PATH=usr/lib
 
+# Handles desktop integration:
+# 1. Copies app icons to ~/.local/share/icons
+# 2. Ensures icon theme index exists
+# 3. Creates a .desktop file pointing to this AppImage
+# 4. Skips if a system-wide installation (/usr/share/applications) is detected
+install_integration() {
+    if [[ -z "$APPIMAGE" ]]; then
+        return
+    fi
+
+    REAL_HOME=$(getent passwd "$USER" | cut -d: -f6)
+    
+    if [ -z "$REAL_HOME" ]; then
+        REAL_HOME="$HOME"
+    fi
+
+    APP_NAME="hiddify"
+    TARGET_DESKTOP="$REAL_HOME/.local/share/applications/hiddify.desktop"
+    LOCAL_HICOLOR="$REAL_HOME/.local/share/icons/hicolor"
+    
+    if [ ! -f "$LOCAL_HICOLOR/index.theme" ]; then
+        mkdir -p "$LOCAL_HICOLOR"
+        if [ -f "/usr/share/icons/hicolor/index.theme" ]; then
+            cp "/usr/share/icons/hicolor/index.theme" "$LOCAL_HICOLOR/"
+        else
+            echo -e "[Icon Theme]\nName=Hicolor\nDirectories=128x128/apps,256x256/apps" > "$LOCAL_HICOLOR/index.theme"
+        fi
+    fi
+
+    if [[ -f "./hiddify.png" ]]; then
+
+        mkdir -p "$LOCAL_HICOLOR/128x128/apps"
+        cp "./hiddify.png" "$LOCAL_HICOLOR/128x128/apps/hiddify.png"
+        
+        mkdir -p "$LOCAL_HICOLOR/256x256/apps"
+        cp "./hiddify.png" "$LOCAL_HICOLOR/256x256/apps/hiddify.png"
+        
+        gtk-update-icon-cache -f -t "$LOCAL_HICOLOR" 2>/dev/null || true
+    fi
+
+    if [ -f "/usr/share/applications/hiddify.desktop" ]; then
+        return
+    fi
+
+    mkdir -p "$(dirname "$TARGET_DESKTOP")"
+
+    cat > "$TARGET_DESKTOP" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Hiddify
+Exec="$APPIMAGE"
+Icon=hiddify
+Terminal=false
+StartupWMClass=app.hiddify.com
+EOF
+
+    chmod +x "$TARGET_DESKTOP"
+    update-desktop-database "$REAL_HOME/.local/share/applications" 2>/dev/null || true
+}
+
 # Usage info
 show_help() {
 cat << EOF
@@ -24,6 +84,7 @@ OPTIND=1
 
 # if no arg is provided, execute hiddify app
 if [[ $# == 0 ]];then 
+    install_integration
     exec ./hiddify
 else
 

@@ -11,11 +11,7 @@ InAppNotificationController inAppNotificationController(Ref ref) {
   return InAppNotificationController();
 }
 
-enum NotificationType {
-  info,
-  error,
-  success,
-}
+enum NotificationType { info, error, success }
 
 class InAppNotificationController with AppLogger {
   ToastificationItem _show(
@@ -38,27 +34,19 @@ class InAppNotificationController with AppLogger {
     );
   }
 
-  ToastificationItem? showErrorToast(String message) => _show(
-        message,
-        type: NotificationType.error,
-        duration: const Duration(seconds: 5),
-      );
+  ToastificationItem? showErrorToast(String message) =>
+      _show(message, type: NotificationType.error, duration: const Duration(seconds: 5));
 
-  ToastificationItem? showSuccessToast(String message) => _show(
-        message,
-        type: NotificationType.success,
-      );
+  ToastificationItem? showSuccessToast(String message) => _show(message, type: NotificationType.success);
 
-  ToastificationItem? showInfoToast(String message, {Duration duration = const Duration(seconds: 3)}) => _show(
-        message,
-        duration: duration,
-      );
+  ToastificationItem? showInfoToast(String message, {Duration duration = const Duration(seconds: 3)}) =>
+      _show(message, duration: duration);
 }
 
 extension NotificationTypeX on NotificationType {
   ToastificationType get _toastificationType => switch (this) {
-        NotificationType.success => ToastificationType.success,
-        NotificationType.error => ToastificationType.error,
-        NotificationType.info => ToastificationType.info,
-      };
+    NotificationType.success => ToastificationType.success,
+    NotificationType.error => ToastificationType.error,
+    NotificationType.info => ToastificationType.info,
+  };
 }

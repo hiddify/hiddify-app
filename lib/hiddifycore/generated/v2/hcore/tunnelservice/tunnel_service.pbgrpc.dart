@@ -15,46 +15,34 @@ import '../../hcommon/common.pb.dart' as $1;
 export 'tunnel_service.pb.dart';
 
 class TunnelServiceClient extends $grpc.Client {
-  static final _$start =
-      $grpc.ClientMethod<$2.TunnelStartRequest, $2.TunnelResponse>(
-          '/tunnelservice.TunnelService/Start',
-          ($2.TunnelStartRequest value) => value.writeToBuffer(),
-          ($core.List<$core.int> value) => $2.TunnelResponse.fromBuffer(value));
-  static final _$stop = $grpc.ClientMethod<$1.Empty, $2.TunnelResponse>(
-      '/tunnelservice.TunnelService/Stop',
-      ($1.Empty value) => value.writeToBuffer(),
+  static final _$start = $grpc.ClientMethod<$2.TunnelStartRequest, $2.TunnelResponse>(
+      '/tunnelservice.TunnelService/Start',
+      ($2.TunnelStartRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $2.TunnelResponse.fromBuffer(value));
-  static final _$status = $grpc.ClientMethod<$1.Empty, $2.TunnelResponse>(
-      '/tunnelservice.TunnelService/Status',
-      ($1.Empty value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.TunnelResponse.fromBuffer(value));
-  static final _$exit = $grpc.ClientMethod<$1.Empty, $2.TunnelResponse>(
-      '/tunnelservice.TunnelService/Exit',
-      ($1.Empty value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $2.TunnelResponse.fromBuffer(value));
+  static final _$stop = $grpc.ClientMethod<$1.Empty, $2.TunnelResponse>('/tunnelservice.TunnelService/Stop',
+      ($1.Empty value) => value.writeToBuffer(), ($core.List<$core.int> value) => $2.TunnelResponse.fromBuffer(value));
+  static final _$status = $grpc.ClientMethod<$1.Empty, $2.TunnelResponse>('/tunnelservice.TunnelService/Status',
+      ($1.Empty value) => value.writeToBuffer(), ($core.List<$core.int> value) => $2.TunnelResponse.fromBuffer(value));
+  static final _$exit = $grpc.ClientMethod<$1.Empty, $2.TunnelResponse>('/tunnelservice.TunnelService/Exit',
+      ($1.Empty value) => value.writeToBuffer(), ($core.List<$core.int> value) => $2.TunnelResponse.fromBuffer(value));
 
   TunnelServiceClient($grpc.ClientChannel channel,
-      {$grpc.CallOptions? options,
-      $core.Iterable<$grpc.ClientInterceptor>? interceptors})
+      {$grpc.CallOptions? options, $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
 
-  $grpc.ResponseFuture<$2.TunnelResponse> start($2.TunnelStartRequest request,
-      {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$2.TunnelResponse> start($2.TunnelStartRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$start, request, options: options);
   }
 
-  $grpc.ResponseFuture<$2.TunnelResponse> stop($1.Empty request,
-      {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$2.TunnelResponse> stop($1.Empty request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$stop, request, options: options);
   }
 
-  $grpc.ResponseFuture<$2.TunnelResponse> status($1.Empty request,
-      {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$2.TunnelResponse> status($1.Empty request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$status, request, options: options);
   }
 
-  $grpc.ResponseFuture<$2.TunnelResponse> exit($1.Empty request,
-      {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$2.TunnelResponse> exit($1.Empty request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$exit, request, options: options);
   }
 }
@@ -68,8 +56,7 @@ abstract class TunnelServiceBase extends $grpc.Service {
         start_Pre,
         false,
         false,
-        ($core.List<$core.int> value) =>
-            $2.TunnelStartRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $2.TunnelStartRequest.fromBuffer(value),
         ($2.TunnelResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$1.Empty, $2.TunnelResponse>(
         'Stop',
@@ -94,32 +81,25 @@ abstract class TunnelServiceBase extends $grpc.Service {
         ($2.TunnelResponse value) => value.writeToBuffer()));
   }
 
-  $async.Future<$2.TunnelResponse> start_Pre($grpc.ServiceCall call,
-      $async.Future<$2.TunnelStartRequest> request) async {
+  $async.Future<$2.TunnelResponse> start_Pre(
+      $grpc.ServiceCall call, $async.Future<$2.TunnelStartRequest> request) async {
     return start(call, await request);
   }
 
-  $async.Future<$2.TunnelResponse> stop_Pre(
-      $grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
+  $async.Future<$2.TunnelResponse> stop_Pre($grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
     return stop(call, await request);
   }
 
-  $async.Future<$2.TunnelResponse> status_Pre(
-      $grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
+  $async.Future<$2.TunnelResponse> status_Pre($grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
     return status(call, await request);
   }
 
-  $async.Future<$2.TunnelResponse> exit_Pre(
-      $grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
+  $async.Future<$2.TunnelResponse> exit_Pre($grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
     return exit(call, await request);
   }
 
-  $async.Future<$2.TunnelResponse> start(
-      $grpc.ServiceCall call, $2.TunnelStartRequest request);
-  $async.Future<$2.TunnelResponse> stop(
-      $grpc.ServiceCall call, $1.Empty request);
-  $async.Future<$2.TunnelResponse> status(
-      $grpc.ServiceCall call, $1.Empty request);
-  $async.Future<$2.TunnelResponse> exit(
-      $grpc.ServiceCall call, $1.Empty request);
+  $async.Future<$2.TunnelResponse> start($grpc.ServiceCall call, $2.TunnelStartRequest request);
+  $async.Future<$2.TunnelResponse> stop($grpc.ServiceCall call, $1.Empty request);
+  $async.Future<$2.TunnelResponse> status($grpc.ServiceCall call, $1.Empty request);
+  $async.Future<$2.TunnelResponse> exit($grpc.ServiceCall call, $1.Empty request);
 }

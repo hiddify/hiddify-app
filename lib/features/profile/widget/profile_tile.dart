@@ -23,13 +23,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileTile extends HookConsumerWidget {
-  const ProfileTile({
-    super.key,
-    required this.profile,
-    this.isMain = false,
-    this.margin = EdgeInsets.zero,
-    this.color,
-  });
+  const ProfileTile({super.key, required this.profile, this.isMain = false, this.margin = EdgeInsets.zero, this.color});
 
   final ProfileEntity profile;
 
@@ -83,18 +77,9 @@ class ProfileTile extends HookConsumerWidget {
               if (showActionButton) ...[
                 SizedBox(
                   width: 48,
-                  child: Semantics(
-                    sortKey: const OrdinalSortKey(1),
-                    child: ProfileActionButton(profile, !isMain),
-                  ),
+                  child: Semantics(sortKey: const OrdinalSortKey(1), child: ProfileActionButton(profile, !isMain)),
                 ),
-                if (profile.active)
-                  VerticalDivider(
-                    width: 1,
-                    color: theme.colorScheme.outline,
-                  )
-                else
-                  const Gap(1),
+                if (profile.active) VerticalDivider(width: 1, color: theme.colorScheme.outline) else const Gap(1),
               ],
               Expanded(
                 child: Semantics(
@@ -105,7 +90,9 @@ class ProfileTile extends HookConsumerWidget {
                   namesRoute: isMain,
                   label: isMain ? t.pages.profiles.viewAllProfiles : null,
                   child: InkWell(
-                    borderRadius: showActionButton ? ProfileTileConst.endBorderRadius(Directionality.of(context)) : ProfileTileConst.cardBorderRadius,
+                    borderRadius: showActionButton
+                        ? ProfileTileConst.endBorderRadius(Directionality.of(context))
+                        : ProfileTileConst.cardBorderRadius,
                     onTap: () {
                       if (isMain) {
                         if (Breakpoint(context).isMobile()) {
@@ -127,10 +114,7 @@ class ProfileTile extends HookConsumerWidget {
                       }
                     },
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       child: Column(
                         // mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -154,9 +138,7 @@ class ProfileTile extends HookConsumerWidget {
                                         style: theme.textTheme.titleMedium?.copyWith(
                                           fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
                                         ),
-                                        semanticsLabel: t.pages.profiles.activeProfileName(
-                                          name: profile.name,
-                                        ),
+                                        semanticsLabel: t.pages.profiles.activeProfileName(name: profile.name),
                                       ),
                                     ),
                                     const Icon(Icons.arrow_drop_down_rounded),
@@ -173,12 +155,8 @@ class ProfileTile extends HookConsumerWidget {
                                 fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
                               ),
                               semanticsLabel: profile.active
-                                  ? t.pages.profiles.activeProfileName(
-                                      name: profile.name,
-                                    )
-                                  : t.pages.profiles.nonActiveProfileName(
-                                      name: profile.name,
-                                    ),
+                                  ? t.pages.profiles.activeProfileName(name: profile.name)
+                                  : t.pages.profiles.nonActiveProfileName(name: profile.name),
                             ),
                           if (subInfo != null) ...[
                             const Gap(4),
@@ -223,29 +201,28 @@ class ProfileActionButton extends HookConsumerWidget {
               if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
                 return;
               }
-              ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
+              ref
+                  .read(updateProfileNotifierProvider(profile.id).notifier)
+                  .updateProfile(profile as RemoteProfileEntity);
             },
             child: const Icon(Icons.update_rounded),
           ),
         ),
       );
     }
-    return ProfileActionsMenu(
-      profile,
-      (context, toggleVisibility, _) {
-        return Semantics(
-          button: true,
-          child: Tooltip(
-            message: MaterialLocalizations.of(context).showMenuTooltip,
-            child: InkWell(
-              borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
-              onTap: toggleVisibility,
-              child: Icon(AdaptiveIcon(context).more),
-            ),
+    return ProfileActionsMenu(profile, (context, toggleVisibility, _) {
+      return Semantics(
+        button: true,
+        child: Tooltip(
+          message: MaterialLocalizations.of(context).showMenuTooltip,
+          child: InkWell(
+            borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
+            onTap: toggleVisibility,
+            child: Icon(AdaptiveIcon(context).more),
           ),
-        );
-      },
-    );
+        ),
+      );
+    });
   }
 }
 
@@ -284,7 +261,9 @@ class ProfileActionsMenu extends HookConsumerWidget {
                 if (link.isNotEmpty) {
                   await Clipboard.setData(ClipboardData(text: link));
                   if (context.mounted) {
-                    ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
+                    ref
+                        .read(inAppNotificationControllerProvider)
+                        .showSuccessToast(t.common.msg.export.clipboard.success);
                   }
                 }
               },
@@ -310,12 +289,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
         title: t.common.edit,
         onTap: () {
           if (Breakpoint(context).isMobile()) context.pop();
-          context.goNamed(
-            'profileDetails',
-            pathParameters: {
-              'id': profile.id,
-            },
-          );
+          context.goNamed('profileDetails', pathParameters: {'id': profile.id});
         },
       ),
       // if (!profile.active)
@@ -328,20 +302,14 @@ class ProfileActionsMenu extends HookConsumerWidget {
               title: t.dialogs.confirmation.profile.delete.title,
               message: t.dialogs.confirmation.profile.delete.msg,
             )
-            .then(
-          (deleteConfirmed) async {
-            if (!deleteConfirmed) return;
-            await ref.read(profilesNotifierProvider.notifier).deleteProfile(profile);
-          },
-        ),
+            .then((deleteConfirmed) async {
+              if (!deleteConfirmed) return;
+              await ref.read(profilesNotifierProvider.notifier).deleteProfile(profile);
+            }),
       ),
     ];
 
-    return AdaptiveMenu(
-      builder: builder,
-      items: menuItems,
-      child: child,
-    );
+    return AdaptiveMenu(builder: builder, items: menuItems, child: child);
   }
 }
 
@@ -359,10 +327,7 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
     } else if (subInfo.remaining.inDays > 365) {
       return (t.components.subscriptionInfo.remainingDuration(duration: "∞"), null);
     } else {
-      return (
-        t.components.subscriptionInfo.remainingDuration(duration: subInfo.remaining.inDays),
-        null,
-      );
+      return (t.components.subscriptionInfo.remainingDuration(duration: subInfo.remaining.inDays), null);
     }
   }
 
@@ -379,7 +344,9 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
           textDirection: TextDirection.ltr,
           child: Flexible(
             child: Text(
-              subInfo.total > 10 * 1099511627776 //10TB
+              subInfo.total >
+                      10 *
+                          1099511627776 //10TB
                   ? "∞ GiB"
                   : subInfo.consumption.sizeOf(subInfo.total),
               semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
@@ -413,31 +380,35 @@ class NewTrafficSubscriptionInfo extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
 
-    return Column(children: [
-      const Icon(Icons.assessment_rounded, color: Colors.blue),
-      Text(t.components.subscriptionInfo.remainingTraffic),
-      const SizedBox(height: 4),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: Text(
-              subInfo.total > 10 * 1099511627776 //10TB
-                  ? "∞ GiB"
-                  : subInfo.consumption.sizeOf(subInfo.total),
-              semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
-                consumed: subInfo.consumption.sizeGB(),
-                total: subInfo.total.sizeGB(),
+    return Column(
+      children: [
+        const Icon(Icons.assessment_rounded, color: Colors.blue),
+        Text(t.components.subscriptionInfo.remainingTraffic),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Directionality(
+              textDirection: TextDirection.ltr,
+              child: Text(
+                subInfo.total >
+                        10 *
+                            1099511627776 //10TB
+                    ? "∞ GiB"
+                    : subInfo.consumption.sizeOf(subInfo.total),
+                semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
+                  consumed: subInfo.consumption.sizeGB(),
+                  total: subInfo.total.sizeGB(),
+                ),
+                // style: theme.textTheme.body,
+                overflow: TextOverflow.ellipsis,
               ),
-              // style: theme.textTheme.body,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
-      ),
-    ]);
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -455,10 +426,7 @@ class NewDaySubscriptionInfo extends HookConsumerWidget {
     } else if (subInfo.remaining.inDays > 365) {
       return (t.components.subscriptionInfo.remainingDurationNew(duration: "∞"), null);
     } else {
-      return (
-        t.components.subscriptionInfo.remainingDurationNew(duration: subInfo.remaining.inDays),
-        null,
-      );
+      return (t.components.subscriptionInfo.remainingDurationNew(duration: subInfo.remaining.inDays), null);
     }
   }
 
@@ -468,24 +436,26 @@ class NewDaySubscriptionInfo extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final remaining = remainingText(t, theme);
-    return Column(children: [
-      const Icon(Icons.timer, color: Colors.blue),
-      Text(t.components.subscriptionInfo.remainingTime),
-      const SizedBox(height: 4),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: Text(
-              remaining.$1,
-              // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
-              overflow: TextOverflow.ellipsis,
+    return Column(
+      children: [
+        const Icon(Icons.timer, color: Colors.blue),
+        Text(t.components.subscriptionInfo.remainingTime),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                remaining.$1,
+                // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-          ),
-        ],
-      )
-    ]);
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -503,10 +473,7 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
     } else if (subInfo.remaining.inDays > 365) {
       return (t.components.subscriptionInfo.remainingDurationNew(duration: "∞"), null);
     } else {
-      return (
-        t.components.subscriptionInfo.remainingDurationNew(duration: subInfo.remaining.inDays),
-        null,
-      );
+      return (t.components.subscriptionInfo.remainingDurationNew(duration: subInfo.remaining.inDays), null);
     }
   }
 
@@ -516,30 +483,35 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final remaining = remainingText(t, theme);
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      const Icon(Icons.assessment_rounded, color: Colors.blue),
-      Text(t.components.subscriptionInfo.remainingUsage),
-      const SizedBox(height: 4),
-      Text(
-        remaining.$1,
-        // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
-        overflow: TextOverflow.ellipsis,
-      ),
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Text(
-          subInfo.total > 10 * 1099511627776 //10TB
-              ? "∞ GiB"
-              : subInfo.consumption.sizeOf(subInfo.total),
-          semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
-            consumed: subInfo.consumption.sizeGB(),
-            total: subInfo.total.sizeGB(),
-          ),
-          // style: theme.textTheme.body,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.assessment_rounded, color: Colors.blue),
+        Text(t.components.subscriptionInfo.remainingUsage),
+        const SizedBox(height: 4),
+        Text(
+          remaining.$1,
+          // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
           overflow: TextOverflow.ellipsis,
         ),
-      ),
-    ]);
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Text(
+            subInfo.total >
+                    10 *
+                        1099511627776 //10TB
+                ? "∞ GiB"
+                : subInfo.consumption.sizeOf(subInfo.total),
+            semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
+              consumed: subInfo.consumption.sizeGB(),
+              total: subInfo.total.sizeGB(),
+            ),
+            // style: theme.textTheme.body,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -557,8 +529,9 @@ class NewSiteSubscriptionInfo extends HookConsumerWidget {
       host = "@${uri.path.split("/").last}";
     }
     return InkWell(
-        onTap: () => launchUrl(Uri.parse(subInfo.webPageUrl ?? "")),
-        child: Column(children: [
+      onTap: () => launchUrl(Uri.parse(subInfo.webPageUrl ?? "")),
+      child: Column(
+        children: [
           const Icon(FluentIcons.globe_person_24_filled, size: 24, color: Colors.blue),
           Text(t.components.subscriptionInfo.profileSite),
           const SizedBox(height: 4),
@@ -574,8 +547,10 @@ class NewSiteSubscriptionInfo extends HookConsumerWidget {
                 ),
               ),
             ],
-          )
-        ]));
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -597,11 +572,7 @@ class RemainingTrafficIndicator extends StatelessWidget {
     //     : ratio < 0.65
     //         ? const Color.fromRGBO(98, 115, 32, 1.0)
     //         : const Color.fromRGBO(139, 30, 36, 1.0);
-    return LinearProgressIndicator(
-      value: ratio,
-      borderRadius: BorderRadius.circular(16),
-      minHeight: 6,
-    );
+    return LinearProgressIndicator(value: ratio, borderRadius: BorderRadius.circular(16), minHeight: 6);
     // return HorizontalPercentIndicator(
     //   height: 6,
 

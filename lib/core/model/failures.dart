@@ -23,29 +23,20 @@ mixin ExpectedFailure {}
 
 extension ErrorPresenter on TranslationsEn {
   PresentableError errorToPair(Object error) => switch (error) {
-        GrpcError(message: final nestedErr?) => errorToPair(nestedErr),
-        UnexpectedFailure(error: final nestedErr?) => errorToPair(nestedErr),
-        Failure() => error.present(this),
-        DioException() => error.present(this),
-        _ => (type: errors.unexpected, message: error.toString()),
-      };
+    GrpcError(message: final nestedErr?) => errorToPair(nestedErr),
+    UnexpectedFailure(error: final nestedErr?) => errorToPair(nestedErr),
+    Failure() => error.present(this),
+    DioException() => error.present(this),
+    _ => (type: errors.unexpected, message: error.toString()),
+  };
 
-  PresentableError presentError(
-    Object error, {
-    String? action,
-  }) {
+  PresentableError presentError(Object error, {String? action}) {
     final pair = errorToPair(error);
     if (action == null) return pair;
-    return (
-      type: action,
-      message: pair.type + (pair.message == null ? "" : "\n${pair.message!}"),
-    );
+    return (type: action, message: pair.type + (pair.message == null ? "" : "\n${pair.message!}"));
   }
 
-  String presentShortError(
-    Object error, {
-    String? action,
-  }) {
+  String presentShortError(Object error, {String? action}) {
     final pair = errorToPair(error);
     if (action == null) return pair.type;
     return "$action: ${pair.type}";
@@ -54,19 +45,12 @@ extension ErrorPresenter on TranslationsEn {
 
 extension DioExceptionPresenter on DioException {
   PresentableError present(TranslationsEn t) => switch (type) {
-        DioExceptionType.connectionTimeout || DioExceptionType.sendTimeout || DioExceptionType.receiveTimeout => (type: t.errors.connection.timeout, message: null),
-        DioExceptionType.badCertificate => (
-            type: t.errors.connection.badCertificate,
-            message: message,
-          ),
-        DioExceptionType.badResponse => (
-            type: t.errors.connection.badResponse,
-            message: message,
-          ),
-        DioExceptionType.connectionError => (
-            type: t.errors.connection.connectionError,
-            message: message,
-          ),
-        _ => (type: t.errors.connection.unexpected, message: message),
-      };
+    DioExceptionType.connectionTimeout ||
+    DioExceptionType.sendTimeout ||
+    DioExceptionType.receiveTimeout => (type: t.errors.connection.timeout, message: null),
+    DioExceptionType.badCertificate => (type: t.errors.connection.badCertificate, message: message),
+    DioExceptionType.badResponse => (type: t.errors.connection.badResponse, message: message),
+    DioExceptionType.connectionError => (type: t.errors.connection.connectionError, message: message),
+    _ => (type: t.errors.connection.unexpected, message: message),
+  };
 }

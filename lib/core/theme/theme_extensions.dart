@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ConnectionButtonTheme extends ThemeExtension<ConnectionButtonTheme> {
-  const ConnectionButtonTheme({
-    this.idleColor,
-    this.connectedColor,
-  });
+  const ConnectionButtonTheme({this.idleColor, this.connectedColor});
 
   final Color? idleColor;
   final Color? connectedColor;
@@ -15,20 +12,13 @@ class ConnectionButtonTheme extends ThemeExtension<ConnectionButtonTheme> {
   );
 
   @override
-  ThemeExtension<ConnectionButtonTheme> copyWith({
-    Color? idleColor,
-    Color? connectedColor,
-  }) =>
-      ConnectionButtonTheme(
-        idleColor: idleColor ?? this.idleColor,
-        connectedColor: connectedColor ?? this.connectedColor,
-      );
+  ThemeExtension<ConnectionButtonTheme> copyWith({Color? idleColor, Color? connectedColor}) => ConnectionButtonTheme(
+    idleColor: idleColor ?? this.idleColor,
+    connectedColor: connectedColor ?? this.connectedColor,
+  );
 
   @override
-  ThemeExtension<ConnectionButtonTheme> lerp(
-    covariant ThemeExtension<ConnectionButtonTheme>? other,
-    double t,
-  ) {
+  ThemeExtension<ConnectionButtonTheme> lerp(covariant ThemeExtension<ConnectionButtonTheme>? other, double t) {
     if (other is! ConnectionButtonTheme) {
       return this;
     }

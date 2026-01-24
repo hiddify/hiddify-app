@@ -14,26 +14,19 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: scheme,
       fontFamily: fontFamily,
-      extensions: const <ThemeExtension<dynamic>>{
-        ConnectionButtonTheme.light,
-      },
+      extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.light},
     );
   }
 
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
-    final ColorScheme scheme = darkColorScheme ??
-        ColorScheme.fromSeed(
-          seedColor: const Color(0xFF293CA0),
-          brightness: Brightness.dark,
-        );
+    final ColorScheme scheme =
+        darkColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0), brightness: Brightness.dark);
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
       scaffoldBackgroundColor: mode.trueBlack ? Colors.black : scheme.background,
       fontFamily: fontFamily,
-      extensions: const <ThemeExtension<dynamic>>{
-        ConnectionButtonTheme.light,
-      },
+      extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.light},
     );
   }
 
@@ -53,30 +46,14 @@ class AppTheme {
       materialTheme: defaultMaterialTheme.copyWith(
         cupertinoOverrideTheme: def.copyWith(
           textTheme: CupertinoTextThemeData(
-            textStyle: def.textTheme.textStyle.copyWith(
-              fontFamily: fontFamily,
-            ),
-            actionTextStyle: def.textTheme.actionTextStyle.copyWith(
-              fontFamily: fontFamily,
-            ),
-            navActionTextStyle: def.textTheme.navActionTextStyle.copyWith(
-              fontFamily: fontFamily,
-            ),
-            navTitleTextStyle: def.textTheme.navTitleTextStyle.copyWith(
-              fontFamily: fontFamily,
-            ),
-            navLargeTitleTextStyle: def.textTheme.navLargeTitleTextStyle.copyWith(
-              fontFamily: fontFamily,
-            ),
-            pickerTextStyle: def.textTheme.pickerTextStyle.copyWith(
-              fontFamily: fontFamily,
-            ),
-            dateTimePickerTextStyle: def.textTheme.dateTimePickerTextStyle.copyWith(
-              fontFamily: fontFamily,
-            ),
-            tabLabelTextStyle: def.textTheme.tabLabelTextStyle.copyWith(
-              fontFamily: fontFamily,
-            ),
+            textStyle: def.textTheme.textStyle.copyWith(fontFamily: fontFamily),
+            actionTextStyle: def.textTheme.actionTextStyle.copyWith(fontFamily: fontFamily),
+            navActionTextStyle: def.textTheme.navActionTextStyle.copyWith(fontFamily: fontFamily),
+            navTitleTextStyle: def.textTheme.navTitleTextStyle.copyWith(fontFamily: fontFamily),
+            navLargeTitleTextStyle: def.textTheme.navLargeTitleTextStyle.copyWith(fontFamily: fontFamily),
+            pickerTextStyle: def.textTheme.pickerTextStyle.copyWith(fontFamily: fontFamily),
+            dateTimePickerTextStyle: def.textTheme.dateTimePickerTextStyle.copyWith(fontFamily: fontFamily),
+            tabLabelTextStyle: def.textTheme.tabLabelTextStyle.copyWith(fontFamily: fontFamily),
           ).copyWith(),
           barBackgroundColor: def.barBackgroundColor,
           scaffoldBackgroundColor: def.scaffoldBackgroundColor,

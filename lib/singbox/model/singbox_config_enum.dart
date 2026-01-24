@@ -35,18 +35,18 @@ enum ServiceMode {
   //     };
 
   String present(TranslationsEn t) => switch (this) {
-        proxy => t.pages.settings.inbound.serviceModes.proxy,
-        systemProxy => t.pages.settings.inbound.serviceModes.systemProxy,
-        tun => t.pages.settings.inbound.serviceModes.tun,
-        tunService => t.pages.settings.inbound.serviceModes.tunService,
-      };
+    proxy => t.pages.settings.inbound.serviceModes.proxy,
+    systemProxy => t.pages.settings.inbound.serviceModes.systemProxy,
+    tun => t.pages.settings.inbound.serviceModes.tun,
+    tunService => t.pages.settings.inbound.serviceModes.tunService,
+  };
 
   String presentShort(TranslationsEn t) => switch (this) {
-        proxy => t.pages.settings.inbound.shortServiceModes.proxy,
-        systemProxy => t.pages.settings.inbound.shortServiceModes.systemProxy,
-        tun => t.pages.settings.inbound.shortServiceModes.tun,
-        tunService => t.pages.settings.inbound.shortServiceModes.tunService,
-      };
+    proxy => t.pages.settings.inbound.shortServiceModes.proxy,
+    systemProxy => t.pages.settings.inbound.shortServiceModes.systemProxy,
+    tun => t.pages.settings.inbound.shortServiceModes.tun,
+    tunService => t.pages.settings.inbound.shortServiceModes.tunService,
+  };
 }
 
 @JsonEnum(valueField: 'key')
@@ -61,11 +61,11 @@ enum IPv6Mode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        disable => t.pages.settings.routing.ipv6Modes.disable,
-        enable => t.pages.settings.routing.ipv6Modes.enable,
-        prefer => t.pages.settings.routing.ipv6Modes.prefer,
-        only => t.pages.settings.routing.ipv6Modes.only,
-      };
+    disable => t.pages.settings.routing.ipv6Modes.disable,
+    enable => t.pages.settings.routing.ipv6Modes.enable,
+    prefer => t.pages.settings.routing.ipv6Modes.prefer,
+    only => t.pages.settings.routing.ipv6Modes.only,
+  };
 }
 
 @JsonEnum(valueField: 'key')
@@ -81,12 +81,12 @@ enum DomainStrategy {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        auto => t.pages.settings.dns.domainStrategy.auto,
-        preferIpv6 => t.pages.settings.dns.domainStrategy.preferIpv6,
-        preferIpv4 => t.pages.settings.dns.domainStrategy.preferIpv4,
-        ipv4Only => t.pages.settings.dns.domainStrategy.ipv4Only,
-        ipv6Only => t.pages.settings.dns.domainStrategy.ipv6Only,
-      };
+    auto => t.pages.settings.dns.domainStrategy.auto,
+    preferIpv6 => t.pages.settings.dns.domainStrategy.preferIpv6,
+    preferIpv4 => t.pages.settings.dns.domainStrategy.preferIpv4,
+    ipv4Only => t.pages.settings.dns.domainStrategy.ipv4Only,
+    ipv6Only => t.pages.settings.dns.domainStrategy.ipv6Only,
+  };
 }
 
 enum TunImplementation {
@@ -95,17 +95,13 @@ enum TunImplementation {
   gvisor;
 
   String present(TranslationsEn t) => switch (this) {
-        mixed => t.pages.settings.inbound.tunImplementations.mixed,
-        system => t.pages.settings.inbound.tunImplementations.system,
-        gvisor => t.pages.settings.inbound.tunImplementations.gvisor,
-      };
+    mixed => t.pages.settings.inbound.tunImplementations.mixed,
+    system => t.pages.settings.inbound.tunImplementations.system,
+    gvisor => t.pages.settings.inbound.tunImplementations.gvisor,
+  };
 }
 
-enum MuxProtocol {
-  h2mux,
-  smux,
-  yamux;
-}
+enum MuxProtocol { h2mux, smux, yamux }
 
 @JsonEnum(valueField: 'key')
 enum WarpDetourMode {
@@ -117,12 +113,12 @@ enum WarpDetourMode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarp,
-        warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxy,
-      };
+    proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarp,
+    warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxy,
+  };
 
   String presentExplain(TranslationsEn t) => switch (this) {
-        proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarpExplain,
-        warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxyExplain,
-      };
+    proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarpExplain,
+    warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxyExplain,
+  };
 }

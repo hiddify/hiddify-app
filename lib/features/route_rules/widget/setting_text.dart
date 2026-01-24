@@ -4,7 +4,14 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingText extends ConsumerWidget {
-  const SettingText({super.key, required this.title, required this.value, required this.setValue, this.defaultValue, this.validator});
+  const SettingText({
+    super.key,
+    required this.title,
+    required this.value,
+    required this.setValue,
+    this.defaultValue,
+    this.validator,
+  });
 
   final String title;
   final String value;
@@ -19,12 +26,9 @@ class SettingText extends ConsumerWidget {
       title: Text(title),
       subtitle: Text(value.isEmpty ? t.common.empty : value),
       onTap: () async {
-        final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(
-              lable: title,
-              value: value,
-              defaultValue: defaultValue,
-              validator: validator,
-            );
+        final result = await ref
+            .read(dialogNotifierProvider.notifier)
+            .showSettingText(lable: title, value: value, defaultValue: defaultValue, validator: validator);
         if (result is String) setValue(result);
       },
     );

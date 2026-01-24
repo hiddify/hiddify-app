@@ -17,13 +17,14 @@ enum ConfigOptionSection {
   static final _fragmentKey = GlobalKey(debugLabel: "fragment-section-key");
 
   GlobalKey get key => switch (this) {
-        ConfigOptionSection.warp => _warpKey,
-        ConfigOptionSection.fragment => _fragmentKey,
-      };
+    ConfigOptionSection.warp => _warpKey,
+    ConfigOptionSection.fragment => _fragmentKey,
+  };
 }
 
 class SettingsPage extends HookConsumerWidget {
-  SettingsPage({super.key, String? section}) : section = section != null ? ConfigOptionSection.values.byName(section) : null;
+  SettingsPage({super.key, String? section})
+    : section = section != null ? ConfigOptionSection.values.byName(section) : null;
 
   final ConfigOptionSection? section;
 
@@ -69,10 +70,10 @@ class SettingsPage extends HookConsumerWidget {
                           message: t.dialogs.confirmation.settings.import.msg,
                         )
                         .then((shouldImport) async {
-                      if (shouldImport) {
-                        await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
-                      }
-                    }),
+                          if (shouldImport) {
+                            await ref.read(configOptionNotifierProvider.notifier).importFromClipboard();
+                          }
+                        }),
                     child: Text(t.pages.settings.options.import.clipboard),
                   ),
                   MenuItemButton(
@@ -83,10 +84,10 @@ class SettingsPage extends HookConsumerWidget {
                           message: t.dialogs.confirmation.settings.import.msg,
                         )
                         .then((shouldImport) async {
-                      if (shouldImport) {
-                        await ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
-                      }
-                    }),
+                          if (shouldImport) {
+                            await ref.read(configOptionNotifierProvider.notifier).importFromJsonFile();
+                          }
+                        }),
                     child: Text(t.pages.settings.options.import.file),
                   ),
                 ],
@@ -104,11 +105,14 @@ class SettingsPage extends HookConsumerWidget {
                   ),
                   const PopupMenuDivider(),
                   MenuItemButton(
-                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonClipboard(excludePrivate: false),
+                    onPressed: () async => await ref
+                        .read(configOptionNotifierProvider.notifier)
+                        .exportJsonClipboard(excludePrivate: false),
                     child: Text(t.pages.settings.options.export.allToClipboard),
                   ),
                   MenuItemButton(
-                    onPressed: () async => await ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false),
+                    onPressed: () async =>
+                        await ref.read(configOptionNotifierProvider.notifier).exportJsonFile(excludePrivate: false),
                     child: Text(t.pages.settings.options.export.allToFile),
                   ),
                 ],

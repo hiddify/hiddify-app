@@ -33,7 +33,9 @@ class RulePage extends HookConsumerWidget {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         if (isRuleEdited) {
-          final shouldSave = await ref.read(dialogNotifierProvider.notifier).showSave(
+          final shouldSave = await ref
+              .read(dialogNotifierProvider.notifier)
+              .showSave(
                 title: t.pages.settings.routing.routeRule.rule.ruleChanged,
                 description: t.pages.settings.routing.routeRule.rule.ruleChangedMsg,
               );
@@ -68,13 +70,15 @@ class RulePage extends HookConsumerWidget {
               SettingText(
                 title: RuleEnum.name.present(t),
                 value: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.name)),
-                setValue: (value) => ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<String>(RuleEnum.name, value),
+                setValue: (value) =>
+                    ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<String>(RuleEnum.name, value),
               ),
               SettingRadio<Outbound>(
                 title: RuleEnum.outbound.present(t),
                 values: Outbound.values,
                 value: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.outbound)),
-                setValue: (value) => ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<Outbound>(RuleEnum.outbound, value),
+                setValue: (value) =>
+                    ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<Outbound>(RuleEnum.outbound, value),
                 defaultValue: Outbound.direct,
                 t: t.pages.settings.routing.routeRule.rule.outbound,
               ),
@@ -151,7 +155,8 @@ class RulePage extends HookConsumerWidget {
                 title: RuleEnum.network.present(t),
                 values: Network.values,
                 value: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.network)),
-                setValue: (value) => ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<Network>(RuleEnum.network, value),
+                setValue: (value) =>
+                    ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<Network>(RuleEnum.network, value),
                 defaultValue: Network.all,
                 t: t.pages.settings.routing.routeRule.rule.network,
               ),
@@ -193,7 +198,9 @@ class RulePage extends HookConsumerWidget {
                 title: RuleEnum.protocol.present(t),
                 values: Protocol.values,
                 selectedValues: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.protocols)),
-                setValue: (value) => ref.read(ruleNotifierProvider(ruleListOrder).notifier).update<List<ProtobufEnum>>(RuleEnum.protocol, value),
+                setValue: (value) => ref
+                    .read(ruleNotifierProvider(ruleListOrder).notifier)
+                    .update<List<ProtobufEnum>>(RuleEnum.protocol, value),
                 t: t.pages.settings.routing.routeRule.rule.protocol,
               ),
               const SettingDivider(),
@@ -271,7 +278,8 @@ class RulePage extends HookConsumerWidget {
                 values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.domainKeywords)),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => GenericListPage(ruleListOrder: ruleListOrder, ruleEnum: RuleEnum.domainKeyword),
+                    builder: (context) =>
+                        GenericListPage(ruleListOrder: ruleListOrder, ruleEnum: RuleEnum.domainKeyword),
                     fullscreenDialog: true,
                   ),
                 ),

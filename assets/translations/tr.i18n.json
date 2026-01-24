@@ -50,6 +50,7 @@
     "hidden": "Gizli",
     "timeout": "Zaman aşımı",
     "sort": "Sırala",
+    "dashboard": "Gösterge Paneli",
     "interval": {
       "day": {
         "zero": "",

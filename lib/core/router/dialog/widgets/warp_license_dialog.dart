@@ -46,28 +46,36 @@ class WarpLicenseDialog extends HookConsumerWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Focus(focusNode: focusNodes[WarpConst.warpTermsOfServiceKey], onKeyEvent: (node, event) => _handleKeyEvent(event, WarpConst.warpTermsOfServiceKey), child: const Gap(0.1)),
-              Focus(focusNode: focusNodes[WarpConst.warpPrivacyPolicyKey], onKeyEvent: (node, event) => _handleKeyEvent(event, WarpConst.warpPrivacyPolicyKey), child: const Gap(0.1)),
+              Focus(
+                focusNode: focusNodes[WarpConst.warpTermsOfServiceKey],
+                onKeyEvent: (node, event) => _handleKeyEvent(event, WarpConst.warpTermsOfServiceKey),
+                child: const Gap(0.1),
+              ),
+              Focus(
+                focusNode: focusNodes[WarpConst.warpPrivacyPolicyKey],
+                onKeyEvent: (node, event) => _handleKeyEvent(event, WarpConst.warpPrivacyPolicyKey),
+                child: const Gap(0.1),
+              ),
               Text.rich(
                 t.dialogs.warpLicense.description(
                   tos: (text) => TextSpan(
                     text: text,
-                    style: TextStyle(color: focusStates[WarpConst.warpTermsOfServiceKey]!.value ? Colors.green : Colors.blue),
+                    style: TextStyle(
+                      color: focusStates[WarpConst.warpTermsOfServiceKey]!.value ? Colors.green : Colors.blue,
+                    ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () async {
-                        await UriUtils.tryLaunch(
-                          Uri.parse(Constants.cfWarpTermsOfService),
-                        );
+                        await UriUtils.tryLaunch(Uri.parse(Constants.cfWarpTermsOfService));
                       },
                   ),
                   privacy: (text) => TextSpan(
                     text: text,
-                    style: TextStyle(color: focusStates[WarpConst.warpPrivacyPolicyKey]!.value ? Colors.green : Colors.blue),
+                    style: TextStyle(
+                      color: focusStates[WarpConst.warpPrivacyPolicyKey]!.value ? Colors.green : Colors.blue,
+                    ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () async {
-                        await UriUtils.tryLaunch(
-                          Uri.parse(Constants.cfWarpPrivacyPolicy),
-                        );
+                        await UriUtils.tryLaunch(Uri.parse(Constants.cfWarpPrivacyPolicy));
                       },
                   ),
                 ),

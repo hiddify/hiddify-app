@@ -20,12 +20,7 @@ final _showIp = StateProvider.autoDispose((ref) {
 });
 
 class IPText extends HookConsumerWidget {
-  const IPText({
-    required this.ip,
-    required this.onLongPress,
-    this.constrained = false,
-    super.key,
-  });
+  const IPText({required this.ip, required this.onLongPress, this.constrained = false, super.key});
 
   final String ip;
   final VoidCallback onLongPress;
@@ -51,12 +46,7 @@ class IPText extends HookConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
           child: AnimatedCrossFade(
-            firstChild: Text(
-              ip,
-              style: ipStyle,
-              textDirection: TextDirection.ltr,
-              overflow: TextOverflow.ellipsis,
-            ),
+            firstChild: Text(ip, style: ipStyle, textDirection: TextDirection.ltr, overflow: TextOverflow.ellipsis),
             secondChild: Padding(
               padding: constrained ? EdgeInsets.zero : const EdgeInsetsDirectional.only(end: 48),
               child: Text(
@@ -77,12 +67,7 @@ class IPText extends HookConsumerWidget {
 }
 
 class UnknownIPText extends HookConsumerWidget {
-  const UnknownIPText({
-    required this.text,
-    required this.onTap,
-    this.constrained = false,
-    super.key,
-  });
+  const UnknownIPText({required this.text, required this.onTap, this.constrained = false, super.key});
 
   final String text;
   final VoidCallback onTap;
@@ -101,11 +86,7 @@ class UnknownIPText extends HookConsumerWidget {
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: Text(
-            text,
-            style: style,
-            overflow: TextOverflow.ellipsis,
-          ),
+          child: Text(text, style: style, overflow: TextOverflow.ellipsis),
         ),
       ),
     );
@@ -113,7 +94,13 @@ class UnknownIPText extends HookConsumerWidget {
 }
 
 class IPCountryFlag extends HookConsumerWidget {
-  const IPCountryFlag({required this.countryCode, this.organization, this.size = 16, this.padding = EdgeInsets.zero, super.key});
+  const IPCountryFlag({
+    required this.countryCode,
+    this.organization,
+    this.size = 16,
+    this.padding = EdgeInsets.zero,
+    super.key,
+  });
 
   final String? countryCode;
   final double size;
@@ -151,10 +138,7 @@ class IPCountryFlag extends HookConsumerWidget {
                         textDirection: Directionality.of(context),
                         bottom: 0,
                         end: 0,
-                        child: OrganisationFlag(
-                          organization: organization!,
-                          size: size / 2.5,
-                        ),
+                        child: OrganisationFlag(organization: organization!, size: size / 2.5),
                       ),
                   ],
                 ),
@@ -192,7 +176,7 @@ class OrganisationFlag extends HookConsumerWidget {
   final String organization;
   final double size;
 
-// Function to create flag widget with icon and color
+  // Function to create flag widget with icon and color
   Widget getFlagWidget({
     required Widget widget,
     required String organization,
@@ -206,10 +190,7 @@ class OrganisationFlag extends HookConsumerWidget {
         width: size,
         height: size,
 
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(100),
-        ),
+        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(100)),
         // padding: const ,
         child: widget,
       ),
@@ -222,11 +203,7 @@ class OrganisationFlag extends HookConsumerWidget {
     for (final entry in organizationData.entries) {
       if (organization.toLowerCase().contains(entry.key)) {
         return getFlagWidget(
-          widget: Icon(
-            entry.value.icon,
-            color: Colors.white,
-            size: size - 6,
-          ),
+          widget: Icon(entry.value.icon, color: Colors.white, size: size - 6),
           color: entry.value.color,
           organization: organization,
           size: size,

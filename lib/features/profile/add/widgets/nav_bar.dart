@@ -17,36 +17,24 @@ class NavBar extends ConsumerWidget {
 
     final textColor = theme.colorScheme.onSurface;
     return Padding(
-      padding: const EdgeInsets.all(AddProfileModalConst.navBarGap).copyWith(bottom: AddProfileModalConst.navBarBottomGap),
+      padding: const EdgeInsets.all(
+        AddProfileModalConst.navBarGap,
+      ).copyWith(bottom: AddProfileModalConst.navBarBottomGap),
       child: Row(
         children: [
           Row(
             key: const ValueKey('free'),
             children: [
-              Text(
-                t.common.free,
-                style: theme.textTheme.titleMedium!.copyWith(color: textColor),
-              ),
+              Text(t.common.free, style: theme.textTheme.titleMedium!.copyWith(color: textColor)),
               const Gap(8),
-              Switch(
-                value: freeSwitch,
-                onChanged: ref.read(freeSwitchNotifierProvider.notifier).onChange,
-              ),
+              Switch(value: freeSwitch, onChanged: ref.read(freeSwitchNotifierProvider.notifier).onChange),
             ],
           ),
           const Spacer(),
           ActionChip(
             key: const ValueKey("help"),
-            label: Text(
-              t.common.help,
-              style: theme.textTheme.labelLarge!.copyWith(
-                color: textColor,
-              ),
-            ),
-            avatar: Icon(
-              Icons.help_outline,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+            label: Text(t.common.help, style: theme.textTheme.labelLarge!.copyWith(color: textColor)),
+            avatar: Icon(Icons.help_outline, color: theme.colorScheme.onSurfaceVariant),
             onPressed: () async => await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile(),
           ),
         ],

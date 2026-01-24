@@ -5,7 +5,14 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingRadioDialog<T> extends ConsumerWidget {
-  const SettingRadioDialog({super.key, required this.title, required this.values, required this.value, this.defaultValue, this.t});
+  const SettingRadioDialog({
+    super.key,
+    required this.title,
+    required this.values,
+    required this.value,
+    this.defaultValue,
+    this.t,
+  });
 
   final String title;
   final List<T> values;
@@ -42,15 +49,8 @@ class SettingRadioDialog<T> extends ConsumerWidget {
         ),
       ),
       actions: [
-        if (defaultValue != null)
-          TextButton(
-            child: Text(t.common.reset),
-            onPressed: () => context.pop(defaultValue),
-          ),
-        TextButton(
-          child: Text(t.common.cancel),
-          onPressed: () => context.pop(),
-        ),
+        if (defaultValue != null) TextButton(child: Text(t.common.reset), onPressed: () => context.pop(defaultValue)),
+        TextButton(child: Text(t.common.cancel), onPressed: () => context.pop()),
       ],
     );
   }

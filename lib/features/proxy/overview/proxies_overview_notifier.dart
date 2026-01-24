@@ -22,10 +22,10 @@ enum ProxiesSort {
   delay;
 
   String present(TranslationsEn t) => switch (this) {
-        ProxiesSort.unsorted => t.pages.proxies.sortOptions.unsorted,
-        ProxiesSort.name => t.pages.proxies.sortOptions.name,
-        ProxiesSort.delay => t.pages.proxies.sortOptions.delay,
-      };
+    ProxiesSort.unsorted => t.pages.proxies.sortOptions.unsorted,
+    ProxiesSort.name => t.pages.proxies.sortOptions.name,
+    ProxiesSort.delay => t.pages.proxies.sortOptions.delay,
+  };
 }
 
 @Riverpod(keepAlive: true)
@@ -82,12 +82,10 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
         .watch(proxyRepositoryProvider)
         .watchProxies()
         .map(
-          (event) => event.getOrElse(
-            (err) {
-              loggy.warning("error receiving proxies", err);
-              throw err;
-            },
-          ),
+          (event) => event.getOrElse((err) {
+            loggy.warning("error receiving proxies", err);
+            throw err;
+          }),
         )
         .asyncMap((proxies) async => await _sortOutbounds(proxies, sortBy));
   }
@@ -135,29 +133,26 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   //   return sortedProxies;
   // }
 
-  Future<OutboundGroup?> _sortOutbounds(
-    OutboundGroup? proxies,
-    ProxiesSort sortBy,
-  ) async {
+  Future<OutboundGroup?> _sortOutbounds(OutboundGroup? proxies, ProxiesSort sortBy) async {
     if (proxies == null) return null;
 
     final sortedItems = switch (sortBy) {
       ProxiesSort.name => proxies.items.sortedWith((a, b) {
-          if (a.isGroup && !b.isGroup) return -1;
-          if (!a.isGroup && b.isGroup) return 1;
-          return a.tag.compareTo(b.tag);
-        }),
+        if (a.isGroup && !b.isGroup) return -1;
+        if (!a.isGroup && b.isGroup) return 1;
+        return a.tag.compareTo(b.tag);
+      }),
       ProxiesSort.delay => proxies.items.sortedWith((a, b) {
-          if (a.isGroup && !b.isGroup) return -1;
-          if (!a.isGroup && b.isGroup) return 1;
+        if (a.isGroup && !b.isGroup) return -1;
+        if (!a.isGroup && b.isGroup) return 1;
 
-          final ai = a.urlTestDelay;
-          final bi = b.urlTestDelay;
-          if (ai == 0 && bi == 0) return -1;
-          if (ai == 0 && bi > 0) return 1;
-          if (ai > 0 && bi == 0) return -1;
-          return ai.compareTo(bi);
-        }),
+        final ai = a.urlTestDelay;
+        final bi = b.urlTestDelay;
+        if (ai == 0 && bi == 0) return -1;
+        if (ai == 0 && bi > 0) return 1;
+        if (ai > 0 && bi == 0) return -1;
+        return ai.compareTo(bi);
+      }),
       ProxiesSort.unsorted => proxies.items,
     };
     final items = <OutboundInfo>[];
@@ -198,9 +193,7 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   // }
 
   Future<void> changeProxy(String groupTag, String outboundTag) async {
-    loggy.debug(
-      "changing proxy, group: [$groupTag] - outbound: [$outboundTag]",
-    );
+    loggy.debug("changing proxy, group: [$groupTag] - outbound: [$outboundTag]");
     if (!state.hasValue) return;
     final outbounds = state.value!;
     await ref.read(hapticServiceProvider.notifier).lightImpact();

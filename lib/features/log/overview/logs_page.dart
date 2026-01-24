@@ -97,24 +97,16 @@ class LogsPage extends HookConsumerWidget with PresLogger {
                   // ),
                   SliverPinnedHeader(
                     child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                      ),
+                      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Row(
                           children: [
                             Flexible(
                               child: TextFormField(
                                 controller: filterController,
                                 onChanged: notifier.filterMessage,
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  hintText: t.common.filter,
-                                ),
+                                decoration: InputDecoration(isDense: true, hintText: t.common.filter),
                               ),
                             ),
                             const Gap(16),
@@ -127,16 +119,8 @@ class LogsPage extends HookConsumerWidget with PresLogger {
                               padding: const EdgeInsets.symmetric(horizontal: 8),
                               borderRadius: BorderRadius.circular(4),
                               items: [
-                                DropdownMenuItem(
-                                  value: none(),
-                                  child: Text(t.common.all),
-                                ),
-                                ...LogLevel.choices.map(
-                                  (e) => DropdownMenuItem(
-                                    value: some(e),
-                                    child: Text(e.name),
-                                  ),
-                                ),
+                                DropdownMenuItem(value: none(), child: Text(t.common.all)),
+                                ...LogLevel.choices.map((e) => DropdownMenuItem(value: some(e), child: Text(e.name))),
                               ],
                             ),
                           ],
@@ -157,65 +141,45 @@ class LogsPage extends HookConsumerWidget with PresLogger {
               slivers: <Widget>[
                 switch (state.logs) {
                   AsyncData(value: final logs) => SliverList.builder(
-                      itemCount: logs.length,
-                      itemBuilder: (context, index) {
-                        final log = logs[index];
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 4,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (log.level != null)
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          log.level!.name.toUpperCase(),
-                                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                                color: log.level!.color,
-                                              ),
-                                        ),
-                                        if (log.time != null)
-                                          Text(
-                                            log.time!.toString(),
-                                            style: Theme.of(context).textTheme.labelSmall,
-                                          ),
-                                      ],
-                                    ),
-                                  Text(
-                                    extractMessage(log.message),
-                                    style: Theme.of(context).textTheme.bodySmall,
+                    itemCount: logs.length,
+                    itemBuilder: (context, index) {
+                      final log = logs[index];
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (log.level != null)
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        log.level!.name.toUpperCase(),
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.labelMedium?.copyWith(color: log.level!.color),
+                                      ),
+                                      if (log.time != null)
+                                        Text(log.time!.toString(), style: Theme.of(context).textTheme.labelSmall),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                Text(extractMessage(log.message), style: Theme.of(context).textTheme.bodySmall),
+                              ],
                             ),
-                            if (index != 0)
-                              const Divider(
-                                indent: 16,
-                                endIndent: 16,
-                                height: 4,
-                              ),
-                          ],
-                        );
-                      },
-                    ),
-                  AsyncError(:final error) => SliverErrorBodyPlaceholder(
-                      t.presentShortError(error),
-                    ),
+                          ),
+                          if (index != 0) const Divider(indent: 16, endIndent: 16, height: 4),
+                        ],
+                      );
+                    },
+                  ),
+                  AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
                   _ => const SliverLoadingBodyPlaceholder(),
                 },
-                SliverOverlapInjector(
-                  handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
-                    context,
-                  ),
-                ),
+                SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
               ],
             );
           },

@@ -22,44 +22,35 @@ class ConnectionStatsCard extends HookConsumerWidget {
       stats: [
         switch (activeProxy) {
           AsyncData(value: final proxy) => (
-              label: const Icon(FluentIcons.arrow_routing_20_regular),
-              data: Text(
-                proxy.tagDisplay,
-              ),
-              semanticLabel: null,
-            ),
-          _ => (
-              label: const Icon(FluentIcons.arrow_routing_20_regular),
-              data: const Text("..."),
-              semanticLabel: null,
-            ),
+            label: const Icon(FluentIcons.arrow_routing_20_regular),
+            data: Text(proxy.tagDisplay),
+            semanticLabel: null,
+          ),
+          _ => (label: const Icon(FluentIcons.arrow_routing_20_regular), data: const Text("..."), semanticLabel: null),
         },
         switch (activeProxy) {
           AsyncData(value: final proxy) when proxy.ipinfo.ip.isNotEmpty => (
-              label: Row(
-                children: [
-                  IPCountryFlag(
-                    countryCode: proxy.ipinfo.countryCode,
-                    size: 16,
-                  ),
-                  // const Gap(4),
-                  // OrganisationFlag(organization: proxy.ipinfo.org, size: 16),
-                ],
-              ),
-              data: IPText(
-                ip: proxy.ipinfo.ip,
-                onLongPress: () async {
-                  ref.read(ipInfoNotifierProvider.notifier).refresh();
-                },
-                constrained: true,
-              ),
-              semanticLabel: null,
+            label: Row(
+              children: [
+                IPCountryFlag(countryCode: proxy.ipinfo.countryCode, size: 16),
+                // const Gap(4),
+                // OrganisationFlag(organization: proxy.ipinfo.org, size: 16),
+              ],
             ),
+            data: IPText(
+              ip: proxy.ipinfo.ip,
+              onLongPress: () async {
+                ref.read(ipInfoNotifierProvider.notifier).refresh();
+              },
+              constrained: true,
+            ),
+            semanticLabel: null,
+          ),
           _ => (
-              label: const Icon(FluentIcons.question_circle_20_regular),
-              data: const ShimmerSkeleton(widthFactor: .85, height: 14),
-              semanticLabel: null,
-            ),
+            label: const Icon(FluentIcons.question_circle_20_regular),
+            data: const ShimmerSkeleton(widthFactor: .85, height: 14),
+            semanticLabel: null,
+          ),
         },
         // switch (ipInfo) {
         //   AsyncData(value: final info) => (

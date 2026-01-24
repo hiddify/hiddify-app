@@ -21,7 +21,9 @@ class GenericListPage extends HookConsumerWidget {
     final list = ref.watch(provider);
 
     Future<void> addNewValue() async {
-      final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(lable: t.pages.settings.routing.routeRule.genericList.addNew, validator: validator);
+      final result = await ref
+          .read(dialogNotifierProvider.notifier)
+          .showSettingText(lable: t.pages.settings.routing.routeRule.genericList.addNew, validator: validator);
       if (result is String) ref.read(provider.notifier).add(result);
     }
 
@@ -33,7 +35,9 @@ class GenericListPage extends HookConsumerWidget {
             onPressed: list.isEmpty
                 ? null
                 : () async {
-                    final result = await ref.read(dialogNotifierProvider.notifier).showConfirmation(
+                    final result = await ref
+                        .read(dialogNotifierProvider.notifier)
+                        .showConfirmation(
                           title: t.pages.settings.routing.routeRule.genericList.clearList,
                           message: t.pages.settings.routing.routeRule.genericList.clearListMsg,
                         );
@@ -45,10 +49,7 @@ class GenericListPage extends HookConsumerWidget {
         ],
       ),
       floatingActionButton: list.isNotEmpty
-          ? FloatingActionButton(
-              onPressed: addNewValue,
-              child: const Icon(Icons.add_rounded),
-            )
+          ? FloatingActionButton(onPressed: addNewValue, child: const Icon(Icons.add_rounded))
           : FloatingActionButton.extended(
               onPressed: addNewValue,
               label: Text(t.pages.settings.routing.routeRule.genericList.addNew),
@@ -59,7 +60,9 @@ class GenericListPage extends HookConsumerWidget {
           value: list[index],
           onRemove: () => ref.read(provider.notifier).remove(index),
           onUpdate: () async {
-            final result = await ref.read(dialogNotifierProvider.notifier).showSettingText(
+            final result = await ref
+                .read(dialogNotifierProvider.notifier)
+                .showSettingText(
                   lable: t.pages.settings.routing.routeRule.genericList.update,
                   value: '${list[index]}',
                   validator: validator,
@@ -91,10 +94,7 @@ class GenericListTile extends ConsumerWidget {
         pauseOnBounce: const Duration(seconds: 2),
         pauseBetween: const Duration(seconds: 2),
       ),
-      trailing: IconButton(
-        onPressed: onRemove,
-        icon: const Icon(Icons.remove),
-      ),
+      trailing: IconButton(onPressed: onRemove, icon: const Icon(Icons.remove)),
     );
   }
 }

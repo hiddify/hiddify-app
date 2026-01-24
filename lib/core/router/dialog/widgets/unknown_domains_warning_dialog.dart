@@ -26,23 +26,14 @@ class UnknownDomainsWarningDialog extends HookConsumerWidget {
         children: [
           Text(t.dialogs.unknownDomainsWarning.youAreAboutToVisit),
           const Gap(8),
-          Text(
-            url,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Text(url, style: const TextStyle(fontWeight: FontWeight.bold)),
           const Gap(16),
           Text(t.dialogs.unknownDomainsWarning.thisWebsiteIsNotInOurTrustedList),
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => context.pop(false),
-          child: Text(t.common.cancel),
-        ),
-        FilledButton(
-          onPressed: () => context.pop(true),
-          child: Text(t.common.kContinue),
-        ),
+        TextButton(onPressed: () => context.pop(false), child: Text(t.common.cancel)),
+        FilledButton(onPressed: () => context.pop(true), child: Text(t.common.kContinue)),
       ],
     );
   }

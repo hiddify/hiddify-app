@@ -5,8 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'app_update_data_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-AppUpdateRepository appUpdateRepository(
-  AppUpdateRepositoryRef ref,
-) {
+AppUpdateRepository appUpdateRepository(AppUpdateRepositoryRef ref) {
   return AppUpdateRepositoryImpl(httpClient: ref.watch(httpClientProvider));
 }

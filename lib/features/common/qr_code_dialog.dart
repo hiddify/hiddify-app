@@ -2,13 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrCodeDialog extends StatelessWidget {
-  const QrCodeDialog(
-    this.data, {
-    super.key,
-    this.message,
-    this.width = 268,
-    this.backgroundColor = Colors.white,
-  });
+  const QrCodeDialog(this.data, {super.key, this.message, this.width = 268, this.backgroundColor = Colors.white});
 
   final String data;
   final String? message;
@@ -26,10 +20,7 @@ class QrCodeDialog extends StatelessWidget {
         children: [
           SizedBox(
             width: width,
-            child: QrImageView(
-              data: data,
-              backgroundColor: backgroundColor,
-            ),
+            child: QrImageView(data: data, backgroundColor: backgroundColor),
           ),
           if (message != null)
             SizedBox(

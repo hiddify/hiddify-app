@@ -8,24 +8,15 @@ part 'singbox_status.freezed.dart';
 sealed class SingboxStatus with _$SingboxStatus {
   const SingboxStatus._();
 
-  const factory SingboxStatus.stopped({
-    SingboxAlert? alert,
-    String? message,
-  }) = SingboxStopped;
+  const factory SingboxStatus.stopped({SingboxAlert? alert, String? message}) = SingboxStopped;
   const factory SingboxStatus.starting() = SingboxStarting;
   const factory SingboxStatus.started() = SingboxStarted;
   const factory SingboxStatus.stopping() = SingboxStopping;
 
   factory SingboxStatus.fromEvent(dynamic event) {
     switch (event) {
-      case {
-          "status": "Stopped",
-          "alert": final String? alertStr,
-          "message": final String? messageStr,
-        }:
-        final alert = SingboxAlert.values.firstOrNullWhere(
-          (e) => alertStr?.toLowerCase() == e.name.toLowerCase(),
-        );
+      case {"status": "Stopped", "alert": final String? alertStr, "message": final String? messageStr}:
+        final alert = SingboxAlert.values.firstOrNullWhere((e) => alertStr?.toLowerCase() == e.name.toLowerCase());
         return SingboxStatus.stopped(alert: alert, message: messageStr);
       case {"status": "Stopped"}:
         return const SingboxStatus.stopped();
@@ -81,5 +72,5 @@ enum SingboxAlert {
   emptyConfiguration,
   startCommandServer,
   createService,
-  startService;
+  startService,
 }

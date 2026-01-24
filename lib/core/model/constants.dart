@@ -45,8 +45,10 @@ abstract class ProfileTileConst {
   static const cardBorderRadius = BorderRadius.all(radius);
   static const borderRadiusRight = BorderRadius.horizontal(right: radius);
   static const borderRadiusLeft = BorderRadius.horizontal(left: radius);
-  static BorderRadius startBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusLeft : borderRadiusRight;
-  static BorderRadius endBorderRadius(TextDirection direction) => direction == TextDirection.ltr ? borderRadiusRight : borderRadiusLeft;
+  static BorderRadius startBorderRadius(TextDirection direction) =>
+      direction == TextDirection.ltr ? borderRadiusLeft : borderRadiusRight;
+  static BorderRadius endBorderRadius(TextDirection direction) =>
+      direction == TextDirection.ltr ? borderRadiusRight : borderRadiusLeft;
 }
 
 abstract class IntroConst {

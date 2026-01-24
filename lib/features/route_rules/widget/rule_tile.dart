@@ -57,7 +57,9 @@ class RuleTile extends HookConsumerWidget {
     });
     return Material(
       child: InkWell(
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => RulePage(ruleListOrder: rule.listOrder))),
+        onTap: () => Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => RulePage(ruleListOrder: rule.listOrder))),
         onLongPress: () async => await handleDelete(context, ref),
         onSecondaryTapUp: PlatformUtils.isDesktop
             ? (details) {
@@ -65,7 +67,12 @@ class RuleTile extends HookConsumerWidget {
                 showMenu(
                   context: context,
                   position: RelativeRect.fromLTRB(offset.dx, offset.dy, offset.dx, offset.dy),
-                  items: [PopupMenuItem(child: Text(t.pages.settings.routing.routeRule.deleteRule), onTap: () async => await handleDelete(context, ref))],
+                  items: [
+                    PopupMenuItem(
+                      child: Text(t.pages.settings.routing.routeRule.deleteRule),
+                      onTap: () async => await handleDelete(context, ref),
+                    ),
+                  ],
                 );
               }
             : null,
@@ -73,15 +80,26 @@ class RuleTile extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              title: Text(t.pages.settings.routing.routeRule.rule.outbound[rule.outbound.name] ?? rule.outbound.name, style: Theme.of(context).textTheme.labelMedium),
+              title: Text(
+                t.pages.settings.routing.routeRule.rule.outbound[rule.outbound.name] ?? rule.outbound.name,
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
               subtitle: Text(rule.name, style: Theme.of(context).textTheme.bodyLarge),
               leading: ReorderableDragStartListener(index: index, child: const Icon(Icons.drag_handle_rounded)),
-              trailing: Switch(value: rule.enabled, onChanged: (value) async => await ref.read(rulesNotifierProvider.notifier).updateEnabled(value, rule.listOrder)),
+              trailing: Switch(
+                value: rule.enabled,
+                onChanged: (value) async =>
+                    await ref.read(rulesNotifierProvider.notifier).updateEnabled(value, rule.listOrder),
+              ),
             ),
             SettingDetailChips<MapEntry>(
               values: detailChipsValue().entries.toList(),
               scrollController: scrollController,
-              t: mergeTranslation([t.pages.settings.routing.routeRule.rule.tileTitle, t.pages.settings.routing.routeRule.rule.network, t.pages.settings.routing.routeRule.rule.outbound]),
+              t: mergeTranslation([
+                t.pages.settings.routing.routeRule.rule.tileTitle,
+                t.pages.settings.routing.routeRule.rule.network,
+                t.pages.settings.routing.routeRule.rule.outbound,
+              ]),
             ),
           ],
         ),

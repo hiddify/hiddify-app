@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BottomSheetPage extends Page {
-  const BottomSheetPage({
-    super.key,
-    super.name,
-    required this.builder,
-    this.fixed = false,
-  });
+  const BottomSheetPage({super.key, super.name, required this.builder, this.fixed = false});
 
   final Widget Function(ScrollController? controller) builder;
   final bool fixed;
@@ -20,10 +15,7 @@ class BottomSheetPage extends Page {
       showDragHandle: true,
       builder: (_) {
         if (!fixed) {
-          return DraggableScrollableSheet(
-            expand: false,
-            builder: (_, scrollController) => builder(scrollController),
-          );
+          return DraggableScrollableSheet(expand: false, builder: (_, scrollController) => builder(scrollController));
         }
         return builder(null);
       },

@@ -9,8 +9,7 @@ part 'locale_preferences.g.dart';
 class LocalePreferences extends _$LocalePreferences with AppLogger {
   @override
   AppLocale build() {
-    final persisted =
-        ref.watch(sharedPreferencesProvider).requireValue.getString("locale");
+    final persisted = ref.watch(sharedPreferencesProvider).requireValue.getString("locale");
     if (persisted == null) return AppLocaleUtils.findDeviceLocale();
     // keep backward compatibility with chinese after changing zh to zh_CN
     if (persisted == "zh") {
@@ -26,9 +25,6 @@ class LocalePreferences extends _$LocalePreferences with AppLogger {
 
   Future<void> changeLocale(AppLocale value) async {
     state = value;
-    await ref
-        .read(sharedPreferencesProvider)
-        .requireValue
-        .setString("locale", value.name);
+    await ref.read(sharedPreferencesProvider).requireValue.setString("locale", value.name);
   }
 }

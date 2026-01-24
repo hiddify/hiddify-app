@@ -30,10 +30,7 @@ abstract class LinkParser {
   static ProfileLink? simple(String link) {
     if (!isUrl(link)) return null;
     final uri = Uri.parse(link.trim());
-    return (
-      url: uri.toString(),
-      name: uri.queryParameters['name'] ?? '',
-    );
+    return (url: uri.toString(), name: uri.queryParameters['name'] ?? '');
   }
 
   static ProfileLink? deep(String link) {

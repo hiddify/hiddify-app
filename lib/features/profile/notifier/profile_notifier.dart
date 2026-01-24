@@ -33,26 +33,24 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
       loggy.debug("disposing");
       _cancelToken?.cancel();
     });
-    listenSelf(
-      (previous, next) {
-        final t = ref.read(translationsProvider).requireValue;
-        final notification = ref.read(inAppNotificationControllerProvider);
-        switch (next) {
-          case AsyncData(value: final _?):
-            notification.showSuccessToast(t.pages.profiles.msg.save.success);
-          case AsyncError(:final error):
-            if (error case ProfileInvalidUrlFailure()) {
-              notification.showErrorToast(t.pages.profiles.msg.invalidUrl);
-            } else if (error case ProfileCancelByUserFailure()) {
-              return;
-            } else {
-              ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(
-                    t.presentError(error, action: t.pages.profiles.msg.add.failure),
-                  );
-            }
-        }
-      },
-    );
+    listenSelf((previous, next) {
+      final t = ref.read(translationsProvider).requireValue;
+      final notification = ref.read(inAppNotificationControllerProvider);
+      switch (next) {
+        case AsyncData(value: final _?):
+          notification.showSuccessToast(t.pages.profiles.msg.save.success);
+        case AsyncError(:final error):
+          if (error case ProfileInvalidUrlFailure()) {
+            notification.showErrorToast(t.pages.profiles.msg.invalidUrl);
+          } else if (error case ProfileCancelByUserFailure()) {
+            return;
+          } else {
+            ref
+                .read(dialogNotifierProvider.notifier)
+                .showCustomAlertFromErr(t.presentError(error, action: t.pages.profiles.msg.add.failure));
+          }
+      }
+    });
     ref.onDispose(() {
       if (!(_cancelToken?.isCancelled ?? true)) _cancelToken?.cancel();
     });
@@ -65,56 +63,54 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
   Future<void> addClipboard(String rawInput) async {
     if (state.isLoading) return;
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () async {
-        // final activeProfile = await ref.read(activeProfileProvider.future);
-        // final markAsActive = activeProfile == null || ref.read(Preferences.markNewProfileActive);
-        final TaskEither<ProfileFailure, Unit> task;
-        if (LinkParser.parse(rawInput) case (final rs)?) {
-          loggy.debug("adding profile, url: [${rs.url}]");
-          task = _profilesRepo.upsertRemote(
-            rs.url,
-            userOverride: rs.name.isNotEmpty ? UserOverride(name: rs.name) : null,
-            cancelToken: _cancelToken = CancelToken(),
-          );
-        } else {
-          loggy.debug("adding profile, content");
-          task = _profilesRepo.addLocal(safeDecodeBase64(rawInput));
-        }
-        return await task.match(
-          (err) {
-            loggy.warning("failed to add profile", err);
-            throw err;
-          },
-          (_) {
-            loggy.info("successfully added profile");
-            return unit;
-          },
-        ).run();
-      },
-    );
+    state = await AsyncValue.guard(() async {
+      // final activeProfile = await ref.read(activeProfileProvider.future);
+      // final markAsActive = activeProfile == null || ref.read(Preferences.markNewProfileActive);
+      final TaskEither<ProfileFailure, Unit> task;
+      if (LinkParser.parse(rawInput) case (final rs)?) {
+        loggy.debug("adding profile, url: [${rs.url}]");
+        task = _profilesRepo.upsertRemote(
+          rs.url,
+          userOverride: rs.name.isNotEmpty ? UserOverride(name: rs.name) : null,
+          cancelToken: _cancelToken = CancelToken(),
+        );
+      } else {
+        loggy.debug("adding profile, content");
+        task = _profilesRepo.addLocal(safeDecodeBase64(rawInput));
+      }
+      return await task
+          .match(
+            (err) {
+              loggy.warning("failed to add profile", err);
+              throw err;
+            },
+            (_) {
+              loggy.info("successfully added profile");
+              return unit;
+            },
+          )
+          .run();
+    });
   }
 
   Future<void> addManual({required String url, required UserOverride userOverride}) async {
     if (state.isLoading) return;
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () async {
-        final task = _profilesRepo.upsertRemote(url, userOverride: userOverride);
-        return await task.match(
-          (err) {
-            loggy.warning("failed to add profile", err);
-            throw err;
-          },
-          (r) {
-            loggy.info(
-              "successfully added profile, mark as active? [true]",
-            );
-            return r;
-          },
-        ).run();
-      },
-    );
+    state = await AsyncValue.guard(() async {
+      final task = _profilesRepo.upsertRemote(url, userOverride: userOverride);
+      return await task
+          .match(
+            (err) {
+              loggy.warning("failed to add profile", err);
+              throw err;
+            },
+            (r) {
+              loggy.info("successfully added profile, mark as active? [true]");
+              return r;
+            },
+          )
+          .run();
+    });
   }
 }
 
@@ -123,20 +119,18 @@ class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
   @override
   AsyncValue<Unit?> build(String id) {
     ref.disposeDelay(const Duration(minutes: 1));
-    listenSelf(
-      (previous, next) {
-        final t = ref.read(translationsProvider).requireValue;
-        final notification = ref.read(inAppNotificationControllerProvider);
-        switch (next) {
-          case AsyncData(value: final _?):
-            notification.showSuccessToast(t.pages.profiles.msg.update.success);
-          case AsyncError(:final error):
-            ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(
-                  t.presentError(error, action: t.pages.profiles.msg.update.failure),
-                );
-        }
-      },
-    );
+    listenSelf((previous, next) {
+      final t = ref.read(translationsProvider).requireValue;
+      final notification = ref.read(inAppNotificationControllerProvider);
+      switch (next) {
+        case AsyncData(value: final _?):
+          notification.showSuccessToast(t.pages.profiles.msg.update.success);
+        case AsyncError(:final error):
+          ref
+              .read(dialogNotifierProvider.notifier)
+              .showCustomAlertFromErr(t.presentError(error, action: t.pages.profiles.msg.update.failure));
+      }
+    });
     return const AsyncData(null);
   }
 
@@ -146,26 +140,27 @@ class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
     if (state.isLoading) return;
     state = const AsyncLoading();
     await ref.read(hapticServiceProvider.notifier).lightImpact();
-    state = await AsyncValue.guard(
-      () async {
-        return await _profilesRepo.upsertRemote(profile.url).match(
-          (err) {
-            loggy.warning("failed to update profile", err);
-            throw err;
-          },
-          (_) async {
-            loggy.info('successfully updated profile');
+    state = await AsyncValue.guard(() async {
+      return await _profilesRepo
+          .upsertRemote(profile.url)
+          .match(
+            (err) {
+              loggy.warning("failed to update profile", err);
+              throw err;
+            },
+            (_) async {
+              loggy.info('successfully updated profile');
 
-            await ref.read(activeProfileProvider.future).then((active) async {
-              if (active != null && active.id == profile.id) {
-                await ref.read(connectionNotifierProvider.notifier).reconnect(profile);
-              }
-            });
-            return unit;
-          },
-        ).run();
-      },
-    );
+              await ref.read(activeProfileProvider.future).then((active) async {
+                if (active != null && active.id == profile.id) {
+                  await ref.read(connectionNotifierProvider.notifier).reconnect(profile);
+                }
+              });
+              return unit;
+            },
+          )
+          .run();
+    });
   }
 }
 
@@ -188,17 +183,16 @@ class AddProfilePageNotifier extends _$AddProfilePageNotifier {
   void goManual() => state = AddProfilePages.manual;
 }
 
-enum AddProfilePages {
-  options,
-  manual,
-}
+enum AddProfilePages { options, manual }
 
 @riverpod
 class FreeProfilesNotifier extends _$FreeProfilesNotifier {
   @override
   Future<List<FreeProfile>> build() async {
     final httpClient = ref.watch(httpClientProvider);
-    final res = await httpClient.get('https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs');
+    final res = await httpClient.get(
+      'https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/free_configs',
+    );
     if (res.statusCode == 200) {
       return FreeProfilesModel.fromJson(jsonDecode(res.data.toString()) as Map<String, dynamic>).profiles;
     }

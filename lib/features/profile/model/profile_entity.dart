@@ -39,9 +39,7 @@ sealed class ProfileEntity with _$ProfileEntity {
 
 @freezed
 class ProfileOptions with _$ProfileOptions {
-  const factory ProfileOptions({
-    @Default(Duration.zero) Duration updateInterval,
-  }) = _ProfileOptions;
+  const factory ProfileOptions({@Default(Duration.zero) Duration updateInterval}) = _ProfileOptions;
 }
 
 @freezed

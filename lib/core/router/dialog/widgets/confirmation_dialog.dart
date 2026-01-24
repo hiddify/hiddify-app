@@ -17,19 +17,10 @@ class ConfirmationDialog extends HookConsumerWidget {
     return AlertDialog(
       icon: icon != null ? Icon(icon) : null,
       title: Text(title),
-      content: ConstrainedBox(
-        constraints: AlertDialogConst.boxConstraints,
-        child: Text(message),
-      ),
+      content: ConstrainedBox(constraints: AlertDialogConst.boxConstraints, child: Text(message)),
       actions: [
-        TextButton(
-          onPressed: () => context.pop(false),
-          child: Text(t.common.cancel),
-        ),
-        TextButton(
-          onPressed: () => context.pop(true),
-          child: Text(positiveBtnTxt ?? t.common.ok),
-        ),
+        TextButton(onPressed: () => context.pop(false), child: Text(t.common.cancel)),
+        TextButton(onPressed: () => context.pop(true), child: Text(positiveBtnTxt ?? t.common.ok)),
       ],
     );
   }
