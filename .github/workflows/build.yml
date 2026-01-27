@@ -146,7 +146,7 @@ jobs:
           gradle-version: 8.7
       - name: Setup dependencies
         run: |
-          make ${{ matrix.platform }}-install-dependencies
+          make ${{ matrix.platform }}-install-deps
 
 
       - name: Setup Android Signing Properties
