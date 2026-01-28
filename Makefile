@@ -140,7 +140,7 @@ ios-install-deps:
 	
 
 android-install-deps: 
-	echo "nothing yet"
+	dart pub global activate fastforge
 android-apk-install-deps: android-install-deps
 android-aab-install-deps: android-install-deps
 # loads the package list from linux_deps.list
