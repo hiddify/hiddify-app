@@ -217,16 +217,16 @@ linux-flutter-sync:
 
 windows-install-deps:
 	dart pub global activate fastforge
-	choco install innosetup -y
+# 	choco install innosetup -y
 	
 	
 gen_translations: #generating missing translations using google translate
 	cd .github && bash sync_translate.sh
 	make translate
 
-android-release: android-release-apk android-release-aab
+android-release: android-apk-release android-aab-release
 
-android-release-apk:
+android-apk-release:
 	fastforge package \
 	  --platform android \
 	  --targets apk \
@@ -236,7 +236,7 @@ android-release-apk:
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
 	ls -R build/app/outputs
 
-android-release-aab:
+android-aab-release:
 	fastforge package \
 	  --platform android \
 	  --targets aab \
@@ -245,9 +245,9 @@ android-release-aab:
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
 	  --build-dart-define=release=google-play
 
-windows-release: windows-release-zip windows-release-exe windows-release-msix
+windows-release: windows-zip-release windows-exe-release windows-msix-release
 
-windows-release-zip:
+windows-zip-release:
 	fastforge package \
 	  --platform windows \
 	  --targets zip \
@@ -256,7 +256,7 @@ windows-release-zip:
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
 	  --build-dart-define=portable=true
 
-windows-release-exe:
+windows-exe-release:
 	fastforge package \
 	  --platform windows \
 	  --targets exe \
@@ -264,7 +264,7 @@ windows-release-exe:
 	  --build-target=$(TARGET) \
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
 
-windows-release-msix:
+windows-msix-release:
 	fastforge package \
 	  --platform windows \
 	  --targets msix \
@@ -272,9 +272,9 @@ windows-release-msix:
 	  --build-target=$(TARGET) \
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
 
-linux-release: linux-release-deb linux-release-appimage
+linux-release: linux-deb-release linux-appimage-release
 
-linux-release-deb:
+linux-deb-release:
 	fastforge package \
 	--platform linux \
 	--targets deb \
@@ -312,7 +312,7 @@ linux-release-deb:
 # their own unresolved dependencies. It increases maintenance cost and may cause
 # runtime instability. Use only for specific edge cases where standard linking fails.
 # ==============================================================================
-linux-release-appimage:
+linux-appimage-release:
 	fastforge package \
 	--platform linux \
 	--targets appimage \
@@ -382,7 +382,7 @@ DOCKER_CMD := \
 		exit 1; \
 	fi;
 
-linux-release-docker:
+linux-docker-release:
 	@echo "** Cleaning main project to reduce context size"
 	flutter clean
 	
