@@ -18,11 +18,11 @@ ifeq ($(OS),Windows_NT)
     # Windows (Assume Git Bash or similar sed is available, or standard syntax)
     SED := sed -i
 else
-ifeq ($(shell uname),Darwin) # macOS
-    SED :=sed -i ''
-else # Linux
-    SED :=sed -i
-endif
+	ifeq ($(shell uname),Darwin) # macOS
+    	SED :=sed -i ''
+	else # Linux
+    	SED :=sed -i
+	endif
 endif
 
 
@@ -95,7 +95,7 @@ generate_kotlin_protos:
 		--include='*/' \
 		--include='*.proto' \
 		--exclude='*' \
-		hiddify-core/{v2,extension} ./android/app/src/main/protos/
+		hiddify-core/v2 hiddify-core/extension ./android/app/src/main/protos/
 	# # Find .proto files and update package declarations
 	# find "./android/app/src/main/java/com/hiddify/hiddify/protos" -type f -name "*.java" | while read -r proto_file; do \
 	#     if grep -q "^package " "$$proto_file"; then \
