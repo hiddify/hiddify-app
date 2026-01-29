@@ -14,10 +14,15 @@ endif
 
 
 # Define sed command based on the OS
+ifeq ($(OS),Windows_NT)
+    # Windows (Assume Git Bash or similar sed is available, or standard syntax)
+    SED := sed -i
+else
 ifeq ($(shell uname),Darwin) # macOS
     SED :=sed -i ''
 else # Linux
     SED :=sed -i
+endif
 endif
 
 
