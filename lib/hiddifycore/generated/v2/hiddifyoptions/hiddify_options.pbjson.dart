@@ -8,7 +8,6 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
-
 @$core.Deprecated('Use domainStrategyDescriptor instead')
 const DomainStrategy$json = const {
   '1': 'DomainStrategy',
@@ -22,8 +21,7 @@ const DomainStrategy$json = const {
 };
 
 /// Descriptor for `DomainStrategy`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List domainStrategyDescriptor = $convert.base64Decode(
-    'Cg5Eb21haW5TdHJhdGVneRIJCgVhc19pcxAAEg8KC3ByZWZlcl9pcHY0EAESDwoLcHJlZmVyX2lwdjYQAhINCglpcHY0X29ubHkQAxINCglpcHY2X29ubHkQBA==');
+final $typed_data.Uint8List domainStrategyDescriptor = $convert.base64Decode('Cg5Eb21haW5TdHJhdGVneRIJCgVhc19pcxAAEg8KC3ByZWZlcl9pcHY0EAESDwoLcHJlZmVyX2lwdjYQAhINCglpcHY0X29ubHkQAxINCglpcHY2X29ubHkQBA==');
 @$core.Deprecated('Use hiddifyOptionsDescriptor instead')
 const HiddifyOptions$json = const {
   '1': 'HiddifyOptions',
@@ -43,29 +41,14 @@ const HiddifyOptions$json = const {
     const {'1': 'mux', '3': 13, '4': 1, '5': 11, '6': '.hiddifyoptions.MuxOptions', '10': 'mux'},
     const {'1': 'tls_tricks', '3': 14, '4': 1, '5': 11, '6': '.hiddifyoptions.TLSTricks', '10': 'tlsTricks'},
     const {'1': 'dns_options', '3': 15, '4': 1, '5': 11, '6': '.hiddifyoptions.DNSOptions', '10': 'dnsOptions'},
-    const {
-      '1': 'inbound_options',
-      '3': 16,
-      '4': 1,
-      '5': 11,
-      '6': '.hiddifyoptions.InboundOptions',
-      '10': 'inboundOptions'
-    },
-    const {
-      '1': 'url_test_options',
-      '3': 17,
-      '4': 1,
-      '5': 11,
-      '6': '.hiddifyoptions.URLTestOptions',
-      '10': 'urlTestOptions'
-    },
+    const {'1': 'inbound_options', '3': 16, '4': 1, '5': 11, '6': '.hiddifyoptions.InboundOptions', '10': 'inboundOptions'},
+    const {'1': 'url_test_options', '3': 17, '4': 1, '5': 11, '6': '.hiddifyoptions.URLTestOptions', '10': 'urlTestOptions'},
     const {'1': 'route_options', '3': 18, '4': 1, '5': 11, '6': '.hiddifyoptions.RouteOptions', '10': 'routeOptions'},
   ],
 };
 
 /// Descriptor for `HiddifyOptions`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List hiddifyOptionsDescriptor = $convert.base64Decode(
-    'Cg5IaWRkaWZ5T3B0aW9ucxIsChJlbmFibGVfZnVsbF9jb25maWcYASABKAhSEGVuYWJsZUZ1bGxDb25maWcSGwoJbG9nX2xldmVsGAIgASgJUghsb2dMZXZlbBIZCghsb2dfZmlsZRgDIAEoCVIHbG9nRmlsZRIoChBlbmFibGVfY2xhc2hfYXBpGAQgASgIUg5lbmFibGVDbGFzaEFwaRIkCg5jbGFzaF9hcGlfcG9ydBgFIAEoDVIMY2xhc2hBcGlQb3J0Eh0KCndlYl9zZWNyZXQYBiABKAlSCXdlYlNlY3JldBIWCgZyZWdpb24YByABKAlSBnJlZ2lvbhIbCglibG9ja19hZHMYCCABKAhSCGJsb2NrQWRzEjwKG3VzZV94cmF5X2NvcmVfd2hlbl9wb3NzaWJsZRgJIAEoCFIXdXNlWHJheUNvcmVXaGVuUG9zc2libGUSKgoFcnVsZXMYCiADKAsyFC5oaWRkaWZ5b3B0aW9ucy5SdWxlUgVydWxlcxIvCgR3YXJwGAsgASgLMhsuaGlkZGlmeW9wdGlvbnMuV2FycE9wdGlvbnNSBHdhcnASMQoFd2FycDIYDCABKAsyGy5oaWRkaWZ5b3B0aW9ucy5XYXJwT3B0aW9uc1IFd2FycDISLAoDbXV4GA0gASgLMhouaGlkZGlmeW9wdGlvbnMuTXV4T3B0aW9uc1IDbXV4EjgKCnRsc190cmlja3MYDiABKAsyGS5oaWRkaWZ5b3B0aW9ucy5UTFNUcmlja3NSCXRsc1RyaWNrcxI7CgtkbnNfb3B0aW9ucxgPIAEoCzIaLmhpZGRpZnlvcHRpb25zLkROU09wdGlvbnNSCmRuc09wdGlvbnMSRwoPaW5ib3VuZF9vcHRpb25zGBAgASgLMh4uaGlkZGlmeW9wdGlvbnMuSW5ib3VuZE9wdGlvbnNSDmluYm91bmRPcHRpb25zEkgKEHVybF90ZXN0X29wdGlvbnMYESABKAsyHi5oaWRkaWZ5b3B0aW9ucy5VUkxUZXN0T3B0aW9uc1IOdXJsVGVzdE9wdGlvbnMSQQoNcm91dGVfb3B0aW9ucxgSIAEoCzIcLmhpZGRpZnlvcHRpb25zLlJvdXRlT3B0aW9uc1IMcm91dGVPcHRpb25z');
+final $typed_data.Uint8List hiddifyOptionsDescriptor = $convert.base64Decode('Cg5IaWRkaWZ5T3B0aW9ucxIsChJlbmFibGVfZnVsbF9jb25maWcYASABKAhSEGVuYWJsZUZ1bGxDb25maWcSGwoJbG9nX2xldmVsGAIgASgJUghsb2dMZXZlbBIZCghsb2dfZmlsZRgDIAEoCVIHbG9nRmlsZRIoChBlbmFibGVfY2xhc2hfYXBpGAQgASgIUg5lbmFibGVDbGFzaEFwaRIkCg5jbGFzaF9hcGlfcG9ydBgFIAEoDVIMY2xhc2hBcGlQb3J0Eh0KCndlYl9zZWNyZXQYBiABKAlSCXdlYlNlY3JldBIWCgZyZWdpb24YByABKAlSBnJlZ2lvbhIbCglibG9ja19hZHMYCCABKAhSCGJsb2NrQWRzEjwKG3VzZV94cmF5X2NvcmVfd2hlbl9wb3NzaWJsZRgJIAEoCFIXdXNlWHJheUNvcmVXaGVuUG9zc2libGUSKgoFcnVsZXMYCiADKAsyFC5oaWRkaWZ5b3B0aW9ucy5SdWxlUgVydWxlcxIvCgR3YXJwGAsgASgLMhsuaGlkZGlmeW9wdGlvbnMuV2FycE9wdGlvbnNSBHdhcnASMQoFd2FycDIYDCABKAsyGy5oaWRkaWZ5b3B0aW9ucy5XYXJwT3B0aW9uc1IFd2FycDISLAoDbXV4GA0gASgLMhouaGlkZGlmeW9wdGlvbnMuTXV4T3B0aW9uc1IDbXV4EjgKCnRsc190cmlja3MYDiABKAsyGS5oaWRkaWZ5b3B0aW9ucy5UTFNUcmlja3NSCXRsc1RyaWNrcxI7CgtkbnNfb3B0aW9ucxgPIAEoCzIaLmhpZGRpZnlvcHRpb25zLkROU09wdGlvbnNSCmRuc09wdGlvbnMSRwoPaW5ib3VuZF9vcHRpb25zGBAgASgLMh4uaGlkZGlmeW9wdGlvbnMuSW5ib3VuZE9wdGlvbnNSDmluYm91bmRPcHRpb25zEkgKEHVybF90ZXN0X29wdGlvbnMYESABKAsyHi5oaWRkaWZ5b3B0aW9ucy5VUkxUZXN0T3B0aW9uc1IOdXJsVGVzdE9wdGlvbnMSQQoNcm91dGVfb3B0aW9ucxgSIAEoCzIcLmhpZGRpZnlvcHRpb25zLlJvdXRlT3B0aW9uc1IMcm91dGVPcHRpb25z');
 @$core.Deprecated('Use intRangeDescriptor instead')
 const IntRange$json = const {
   '1': 'IntRange',
@@ -76,30 +59,15 @@ const IntRange$json = const {
 };
 
 /// Descriptor for `IntRange`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List intRangeDescriptor =
-    $convert.base64Decode('CghJbnRSYW5nZRISCgRmcm9tGAEgASgFUgRmcm9tEg4KAnRvGAIgASgFUgJ0bw==');
+final $typed_data.Uint8List intRangeDescriptor = $convert.base64Decode('CghJbnRSYW5nZRISCgRmcm9tGAEgASgFUgRmcm9tEg4KAnRvGAIgASgFUgJ0bw==');
 @$core.Deprecated('Use dNSOptionsDescriptor instead')
 const DNSOptions$json = const {
   '1': 'DNSOptions',
   '2': const [
     const {'1': 'remote_dns_address', '3': 1, '4': 1, '5': 9, '10': 'remoteDnsAddress'},
-    const {
-      '1': 'remote_dns_domain_strategy',
-      '3': 2,
-      '4': 1,
-      '5': 14,
-      '6': '.hiddifyoptions.DomainStrategy',
-      '10': 'remoteDnsDomainStrategy'
-    },
+    const {'1': 'remote_dns_domain_strategy', '3': 2, '4': 1, '5': 14, '6': '.hiddifyoptions.DomainStrategy', '10': 'remoteDnsDomainStrategy'},
     const {'1': 'direct_dns_address', '3': 3, '4': 1, '5': 9, '10': 'directDnsAddress'},
-    const {
-      '1': 'direct_dns_domain_strategy',
-      '3': 4,
-      '4': 1,
-      '5': 14,
-      '6': '.hiddifyoptions.DomainStrategy',
-      '10': 'directDnsDomainStrategy'
-    },
+    const {'1': 'direct_dns_domain_strategy', '3': 4, '4': 1, '5': 14, '6': '.hiddifyoptions.DomainStrategy', '10': 'directDnsDomainStrategy'},
     const {'1': 'independent_dns_cache', '3': 5, '4': 1, '5': 8, '10': 'independentDnsCache'},
     const {'1': 'enable_fake_dns', '3': 6, '4': 1, '5': 8, '10': 'enableFakeDns'},
     const {'1': 'enable_dns_routing', '3': 7, '4': 1, '5': 8, '10': 'enableDnsRouting'},
@@ -107,8 +75,7 @@ const DNSOptions$json = const {
 };
 
 /// Descriptor for `DNSOptions`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List dNSOptionsDescriptor = $convert.base64Decode(
-    'CgpETlNPcHRpb25zEiwKEnJlbW90ZV9kbnNfYWRkcmVzcxgBIAEoCVIQcmVtb3RlRG5zQWRkcmVzcxJbChpyZW1vdGVfZG5zX2RvbWFpbl9zdHJhdGVneRgCIAEoDjIeLmhpZGRpZnlvcHRpb25zLkRvbWFpblN0cmF0ZWd5UhdyZW1vdGVEbnNEb21haW5TdHJhdGVneRIsChJkaXJlY3RfZG5zX2FkZHJlc3MYAyABKAlSEGRpcmVjdERuc0FkZHJlc3MSWwoaZGlyZWN0X2Ruc19kb21haW5fc3RyYXRlZ3kYBCABKA4yHi5oaWRkaWZ5b3B0aW9ucy5Eb21haW5TdHJhdGVneVIXZGlyZWN0RG5zRG9tYWluU3RyYXRlZ3kSMgoVaW5kZXBlbmRlbnRfZG5zX2NhY2hlGAUgASgIUhNpbmRlcGVuZGVudERuc0NhY2hlEiYKD2VuYWJsZV9mYWtlX2RucxgGIAEoCFINZW5hYmxlRmFrZURucxIsChJlbmFibGVfZG5zX3JvdXRpbmcYByABKAhSEGVuYWJsZURuc1JvdXRpbmc=');
+final $typed_data.Uint8List dNSOptionsDescriptor = $convert.base64Decode('CgpETlNPcHRpb25zEiwKEnJlbW90ZV9kbnNfYWRkcmVzcxgBIAEoCVIQcmVtb3RlRG5zQWRkcmVzcxJbChpyZW1vdGVfZG5zX2RvbWFpbl9zdHJhdGVneRgCIAEoDjIeLmhpZGRpZnlvcHRpb25zLkRvbWFpblN0cmF0ZWd5UhdyZW1vdGVEbnNEb21haW5TdHJhdGVneRIsChJkaXJlY3RfZG5zX2FkZHJlc3MYAyABKAlSEGRpcmVjdERuc0FkZHJlc3MSWwoaZGlyZWN0X2Ruc19kb21haW5fc3RyYXRlZ3kYBCABKA4yHi5oaWRkaWZ5b3B0aW9ucy5Eb21haW5TdHJhdGVneVIXZGlyZWN0RG5zRG9tYWluU3RyYXRlZ3kSMgoVaW5kZXBlbmRlbnRfZG5zX2NhY2hlGAUgASgIUhNpbmRlcGVuZGVudERuc0NhY2hlEiYKD2VuYWJsZV9mYWtlX2RucxgGIAEoCFINZW5hYmxlRmFrZURucxIsChJlbmFibGVfZG5zX3JvdXRpbmcYByABKAhSEGVuYWJsZURuc1JvdXRpbmc=');
 @$core.Deprecated('Use inboundOptionsDescriptor instead')
 const InboundOptions$json = const {
   '1': 'InboundOptions',
@@ -126,8 +93,7 @@ const InboundOptions$json = const {
 };
 
 /// Descriptor for `InboundOptions`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List inboundOptionsDescriptor = $convert.base64Decode(
-    'Cg5JbmJvdW5kT3B0aW9ucxIdCgplbmFibGVfdHVuGAEgASgIUgllbmFibGVUdW4SLAoSZW5hYmxlX3R1bl9zZXJ2aWNlGAIgASgIUhBlbmFibGVUdW5TZXJ2aWNlEigKEHNldF9zeXN0ZW1fcHJveHkYAyABKAhSDnNldFN5c3RlbVByb3h5Eh0KCm1peGVkX3BvcnQYBCABKA1SCW1peGVkUG9ydBIfCgt0cHJveHlfcG9ydBgFIAEoDVIKdHByb3h5UG9ydBIkCg5sb2NhbF9kbnNfcG9ydBgGIAEoDVIMbG9jYWxEbnNQb3J0EhAKA210dRgHIAEoDVIDbXR1EiEKDHN0cmljdF9yb3V0ZRgIIAEoCFILc3RyaWN0Um91dGUSGwoJdHVuX3N0YWNrGAkgASgJUgh0dW5TdGFjaw==');
+final $typed_data.Uint8List inboundOptionsDescriptor = $convert.base64Decode('Cg5JbmJvdW5kT3B0aW9ucxIdCgplbmFibGVfdHVuGAEgASgIUgllbmFibGVUdW4SLAoSZW5hYmxlX3R1bl9zZXJ2aWNlGAIgASgIUhBlbmFibGVUdW5TZXJ2aWNlEigKEHNldF9zeXN0ZW1fcHJveHkYAyABKAhSDnNldFN5c3RlbVByb3h5Eh0KCm1peGVkX3BvcnQYBCABKA1SCW1peGVkUG9ydBIfCgt0cHJveHlfcG9ydBgFIAEoDVIKdHByb3h5UG9ydBIkCg5sb2NhbF9kbnNfcG9ydBgGIAEoDVIMbG9jYWxEbnNQb3J0EhAKA210dRgHIAEoDVIDbXR1EiEKDHN0cmljdF9yb3V0ZRgIIAEoCFILc3RyaWN0Um91dGUSGwoJdHVuX3N0YWNrGAkgASgJUgh0dW5TdGFjaw==');
 @$core.Deprecated('Use uRLTestOptionsDescriptor instead')
 const URLTestOptions$json = const {
   '1': 'URLTestOptions',
@@ -138,8 +104,7 @@ const URLTestOptions$json = const {
 };
 
 /// Descriptor for `URLTestOptions`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List uRLTestOptionsDescriptor = $convert.base64Decode(
-    'Cg5VUkxUZXN0T3B0aW9ucxIuChNjb25uZWN0aW9uX3Rlc3RfdXJsGAEgASgJUhFjb25uZWN0aW9uVGVzdFVybBIqChF1cmxfdGVzdF9pbnRlcnZhbBgCIAEoA1IPdXJsVGVzdEludGVydmFs');
+final $typed_data.Uint8List uRLTestOptionsDescriptor = $convert.base64Decode('Cg5VUkxUZXN0T3B0aW9ucxIuChNjb25uZWN0aW9uX3Rlc3RfdXJsGAEgASgJUhFjb25uZWN0aW9uVGVzdFVybBIqChF1cmxfdGVzdF9pbnRlcnZhbBgCIAEoA1IPdXJsVGVzdEludGVydmFs');
 @$core.Deprecated('Use routeOptionsDescriptor instead')
 const RouteOptions$json = const {
   '1': 'RouteOptions',
@@ -152,8 +117,7 @@ const RouteOptions$json = const {
 };
 
 /// Descriptor for `RouteOptions`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List routeOptionsDescriptor = $convert.base64Decode(
-    'CgxSb3V0ZU9wdGlvbnMSLwoTcmVzb2x2ZV9kZXN0aW5hdGlvbhgBIAEoCFIScmVzb2x2ZURlc3RpbmF0aW9uEjsKCWlwdjZfbW9kZRgCIAEoDjIeLmhpZGRpZnlvcHRpb25zLkRvbWFpblN0cmF0ZWd5UghpcHY2TW9kZRIdCgpieXBhc3NfbGFuGAMgASgIUglieXBhc3NMYW4SOQoZYWxsb3dfY29ubmVjdGlvbl9mcm9tX2xhbhgEIAEoCFIWYWxsb3dDb25uZWN0aW9uRnJvbUxhbg==');
+final $typed_data.Uint8List routeOptionsDescriptor = $convert.base64Decode('CgxSb3V0ZU9wdGlvbnMSLwoTcmVzb2x2ZV9kZXN0aW5hdGlvbhgBIAEoCFIScmVzb2x2ZURlc3RpbmF0aW9uEjsKCWlwdjZfbW9kZRgCIAEoDjIeLmhpZGRpZnlvcHRpb25zLkRvbWFpblN0cmF0ZWd5UghpcHY2TW9kZRIdCgpieXBhc3NfbGFuGAMgASgIUglieXBhc3NMYW4SOQoZYWxsb3dfY29ubmVjdGlvbl9mcm9tX2xhbhgEIAEoCFIWYWxsb3dDb25uZWN0aW9uRnJvbUxhbg==');
 @$core.Deprecated('Use tLSTricksDescriptor instead')
 const TLSTricks$json = const {
   '1': 'TLSTricks',
@@ -168,8 +132,7 @@ const TLSTricks$json = const {
 };
 
 /// Descriptor for `TLSTricks`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List tLSTricksDescriptor = $convert.base64Decode(
-    'CglUTFNUcmlja3MSJwoPZW5hYmxlX2ZyYWdtZW50GAEgASgIUg5lbmFibGVGcmFnbWVudBI9Cg1mcmFnbWVudF9zaXplGAIgASgLMhguaGlkZGlmeW9wdGlvbnMuSW50UmFuZ2VSDGZyYWdtZW50U2l6ZRI/Cg5mcmFnbWVudF9zbGVlcBgDIAEoCzIYLmhpZGRpZnlvcHRpb25zLkludFJhbmdlUg1mcmFnbWVudFNsZWVwEiQKDm1peGVkX3NuaV9jYXNlGAQgASgIUgxtaXhlZFNuaUNhc2USJQoOZW5hYmxlX3BhZGRpbmcYBSABKAhSDWVuYWJsZVBhZGRpbmcSOwoMcGFkZGluZ19zaXplGAYgASgLMhguaGlkZGlmeW9wdGlvbnMuSW50UmFuZ2VSC3BhZGRpbmdTaXpl');
+final $typed_data.Uint8List tLSTricksDescriptor = $convert.base64Decode('CglUTFNUcmlja3MSJwoPZW5hYmxlX2ZyYWdtZW50GAEgASgIUg5lbmFibGVGcmFnbWVudBI9Cg1mcmFnbWVudF9zaXplGAIgASgLMhguaGlkZGlmeW9wdGlvbnMuSW50UmFuZ2VSDGZyYWdtZW50U2l6ZRI/Cg5mcmFnbWVudF9zbGVlcBgDIAEoCzIYLmhpZGRpZnlvcHRpb25zLkludFJhbmdlUg1mcmFnbWVudFNsZWVwEiQKDm1peGVkX3NuaV9jYXNlGAQgASgIUgxtaXhlZFNuaUNhc2USJQoOZW5hYmxlX3BhZGRpbmcYBSABKAhSDWVuYWJsZVBhZGRpbmcSOwoMcGFkZGluZ19zaXplGAYgASgLMhguaGlkZGlmeW9wdGlvbnMuSW50UmFuZ2VSC3BhZGRpbmdTaXpl');
 @$core.Deprecated('Use muxOptionsDescriptor instead')
 const MuxOptions$json = const {
   '1': 'MuxOptions',
@@ -182,8 +145,7 @@ const MuxOptions$json = const {
 };
 
 /// Descriptor for `MuxOptions`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List muxOptionsDescriptor = $convert.base64Decode(
-    'CgpNdXhPcHRpb25zEhYKBmVuYWJsZRgBIAEoCFIGZW5hYmxlEhgKB3BhZGRpbmcYAiABKAhSB3BhZGRpbmcSHwoLbWF4X3N0cmVhbXMYAyABKAVSCm1heFN0cmVhbXMSGgoIcHJvdG9jb2wYBCABKAlSCHByb3RvY29s');
+final $typed_data.Uint8List muxOptionsDescriptor = $convert.base64Decode('CgpNdXhPcHRpb25zEhYKBmVuYWJsZRgBIAEoCFIGZW5hYmxlEhgKB3BhZGRpbmcYAiABKAhSB3BhZGRpbmcSHwoLbWF4X3N0cmVhbXMYAyABKAVSCm1heFN0cmVhbXMSGgoIcHJvdG9jb2wYBCABKAlSCHByb3RvY29s');
 @$core.Deprecated('Use warpOptionsDescriptor instead')
 const WarpOptions$json = const {
   '1': 'WarpOptions',
@@ -191,14 +153,7 @@ const WarpOptions$json = const {
     const {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
     const {'1': 'enable_warp', '3': 2, '4': 1, '5': 8, '10': 'enableWarp'},
     const {'1': 'mode', '3': 3, '4': 1, '5': 9, '10': 'mode'},
-    const {
-      '1': 'wireguard_config',
-      '3': 5,
-      '4': 1,
-      '5': 11,
-      '6': '.hiddifyoptions.WarpWireguardConfig',
-      '10': 'wireguardConfig'
-    },
+    const {'1': 'wireguard_config', '3': 5, '4': 1, '5': 11, '6': '.hiddifyoptions.WarpWireguardConfig', '10': 'wireguardConfig'},
     const {'1': 'fake_packets', '3': 6, '4': 1, '5': 9, '10': 'fakePackets'},
     const {'1': 'fake_packet_size', '3': 7, '4': 1, '5': 11, '6': '.hiddifyoptions.IntRange', '10': 'fakePacketSize'},
     const {'1': 'fake_packet_delay', '3': 8, '4': 1, '5': 11, '6': '.hiddifyoptions.IntRange', '10': 'fakePacketDelay'},
@@ -210,8 +165,7 @@ const WarpOptions$json = const {
 };
 
 /// Descriptor for `WarpOptions`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List warpOptionsDescriptor = $convert.base64Decode(
-    'CgtXYXJwT3B0aW9ucxIOCgJpZBgBIAEoCVICaWQSHwoLZW5hYmxlX3dhcnAYAiABKAhSCmVuYWJsZVdhcnASEgoEbW9kZRgDIAEoCVIEbW9kZRJOChB3aXJlZ3VhcmRfY29uZmlnGAUgASgLMiMuaGlkZGlmeW9wdGlvbnMuV2FycFdpcmVndWFyZENvbmZpZ1IPd2lyZWd1YXJkQ29uZmlnEiEKDGZha2VfcGFja2V0cxgGIAEoCVILZmFrZVBhY2tldHMSQgoQZmFrZV9wYWNrZXRfc2l6ZRgHIAEoCzIYLmhpZGRpZnlvcHRpb25zLkludFJhbmdlUg5mYWtlUGFja2V0U2l6ZRJEChFmYWtlX3BhY2tldF9kZWxheRgIIAEoCzIYLmhpZGRpZnlvcHRpb25zLkludFJhbmdlUg9mYWtlUGFja2V0RGVsYXkSKAoQZmFrZV9wYWNrZXRfbW9kZRgJIAEoCVIOZmFrZVBhY2tldE1vZGUSGQoIY2xlYW5faXAYCiABKAlSB2NsZWFuSXASHQoKY2xlYW5fcG9ydBgLIAEoDVIJY2xlYW5Qb3J0EjUKB2FjY291bnQYDCABKAsyGy5oaWRkaWZ5b3B0aW9ucy5XYXJwQWNjb3VudFIHYWNjb3VudA==');
+final $typed_data.Uint8List warpOptionsDescriptor = $convert.base64Decode('CgtXYXJwT3B0aW9ucxIOCgJpZBgBIAEoCVICaWQSHwoLZW5hYmxlX3dhcnAYAiABKAhSCmVuYWJsZVdhcnASEgoEbW9kZRgDIAEoCVIEbW9kZRJOChB3aXJlZ3VhcmRfY29uZmlnGAUgASgLMiMuaGlkZGlmeW9wdGlvbnMuV2FycFdpcmVndWFyZENvbmZpZ1IPd2lyZWd1YXJkQ29uZmlnEiEKDGZha2VfcGFja2V0cxgGIAEoCVILZmFrZVBhY2tldHMSQgoQZmFrZV9wYWNrZXRfc2l6ZRgHIAEoCzIYLmhpZGRpZnlvcHRpb25zLkludFJhbmdlUg5mYWtlUGFja2V0U2l6ZRJEChFmYWtlX3BhY2tldF9kZWxheRgIIAEoCzIYLmhpZGRpZnlvcHRpb25zLkludFJhbmdlUg9mYWtlUGFja2V0RGVsYXkSKAoQZmFrZV9wYWNrZXRfbW9kZRgJIAEoCVIOZmFrZVBhY2tldE1vZGUSGQoIY2xlYW5faXAYCiABKAlSB2NsZWFuSXASHQoKY2xlYW5fcG9ydBgLIAEoDVIJY2xlYW5Qb3J0EjUKB2FjY291bnQYDCABKAsyGy5oaWRkaWZ5b3B0aW9ucy5XYXJwQWNjb3VudFIHYWNjb3VudA==');
 @$core.Deprecated('Use warpAccountDescriptor instead')
 const WarpAccount$json = const {
   '1': 'WarpAccount',
@@ -222,8 +176,7 @@ const WarpAccount$json = const {
 };
 
 /// Descriptor for `WarpAccount`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List warpAccountDescriptor = $convert.base64Decode(
-    'CgtXYXJwQWNjb3VudBIdCgphY2NvdW50X2lkGAEgASgJUglhY2NvdW50SWQSIQoMYWNjZXNzX3Rva2VuGAIgASgJUgthY2Nlc3NUb2tlbg==');
+final $typed_data.Uint8List warpAccountDescriptor = $convert.base64Decode('CgtXYXJwQWNjb3VudBIdCgphY2NvdW50X2lkGAEgASgJUglhY2NvdW50SWQSIQoMYWNjZXNzX3Rva2VuGAIgASgJUgthY2Nlc3NUb2tlbg==');
 @$core.Deprecated('Use warpWireguardConfigDescriptor instead')
 const WarpWireguardConfig$json = const {
   '1': 'WarpWireguardConfig',
@@ -237,8 +190,7 @@ const WarpWireguardConfig$json = const {
 };
 
 /// Descriptor for `WarpWireguardConfig`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List warpWireguardConfigDescriptor = $convert.base64Decode(
-    'ChNXYXJwV2lyZWd1YXJkQ29uZmlnEh8KC3ByaXZhdGVfa2V5GAEgASgJUgpwcml2YXRlS2V5EiwKEmxvY2FsX2FkZHJlc3NfaXB2NBgCIAEoCVIQbG9jYWxBZGRyZXNzSXB2NBIsChJsb2NhbF9hZGRyZXNzX2lwdjYYAyABKAlSEGxvY2FsQWRkcmVzc0lwdjYSJgoPcGVlcl9wdWJsaWNfa2V5GAQgASgJUg1wZWVyUHVibGljS2V5EhsKCWNsaWVudF9pZBgFIAEoCVIIY2xpZW50SWQ=');
+final $typed_data.Uint8List warpWireguardConfigDescriptor = $convert.base64Decode('ChNXYXJwV2lyZWd1YXJkQ29uZmlnEh8KC3ByaXZhdGVfa2V5GAEgASgJUgpwcml2YXRlS2V5EiwKEmxvY2FsX2FkZHJlc3NfaXB2NBgCIAEoCVIQbG9jYWxBZGRyZXNzSXB2NBIsChJsb2NhbF9hZGRyZXNzX2lwdjYYAyABKAlSEGxvY2FsQWRkcmVzc0lwdjYSJgoPcGVlcl9wdWJsaWNfa2V5GAQgASgJUg1wZWVyUHVibGljS2V5EhsKCWNsaWVudF9pZBgFIAEoCVIIY2xpZW50SWQ=');
 @$core.Deprecated('Use ruleDescriptor instead')
 const Rule$json = const {
   '1': 'Rule',
@@ -254,5 +206,4 @@ const Rule$json = const {
 };
 
 /// Descriptor for `Rule`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List ruleDescriptor = $convert.base64Decode(
-    'CgRSdWxlEiAKDHJ1bGVfc2V0X3VybBgBIAEoCVIKcnVsZVNldFVybBIYCgdkb21haW5zGAIgASgJUgdkb21haW5zEg4KAmlwGAMgASgJUgJpcBISCgRwb3J0GAQgASgJUgRwb3J0EhgKB25ldHdvcmsYBSABKAlSB25ldHdvcmsSGgoIcHJvdG9jb2wYBiABKAlSCHByb3RvY29sEhoKCG91dGJvdW5kGAcgASgJUghvdXRib3VuZA==');
+final $typed_data.Uint8List ruleDescriptor = $convert.base64Decode('CgRSdWxlEiAKDHJ1bGVfc2V0X3VybBgBIAEoCVIKcnVsZVNldFVybBIYCgdkb21haW5zGAIgASgJUgdkb21haW5zEg4KAmlwGAMgASgJUgJpcBISCgRwb3J0GAQgASgJUgRwb3J0EhgKB25ldHdvcmsYBSABKAlSB25ldHdvcmsSGgoIcHJvdG9jb2wYBiABKAlSCHByb3RvY29sEhoKCG91dGJvdW5kGAcgASgJUghvdXRib3VuZA==');

@@ -8,7 +8,6 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
-
 @$core.Deprecated('Use outboundDescriptor instead')
 const Outbound$json = const {
   '1': 'Outbound',
@@ -21,8 +20,7 @@ const Outbound$json = const {
 };
 
 /// Descriptor for `Outbound`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List outboundDescriptor = $convert
-    .base64Decode('CghPdXRib3VuZBIJCgVwcm94eRAAEgoKBmRpcmVjdBABEhgKFGRpcmVjdF93aXRoX2ZyYWdtZW50EAISCQoFYmxvY2sQAw==');
+final $typed_data.Uint8List outboundDescriptor = $convert.base64Decode('CghPdXRib3VuZBIJCgVwcm94eRAAEgoKBmRpcmVjdBABEhgKFGRpcmVjdF93aXRoX2ZyYWdtZW50EAISCQoFYmxvY2sQAw==');
 @$core.Deprecated('Use networkDescriptor instead')
 const Network$json = const {
   '1': 'Network',
@@ -34,8 +32,7 @@ const Network$json = const {
 };
 
 /// Descriptor for `Network`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List networkDescriptor =
-    $convert.base64Decode('CgdOZXR3b3JrEgcKA2FsbBAAEgcKA3RjcBABEgcKA3VkcBAC');
+final $typed_data.Uint8List networkDescriptor = $convert.base64Decode('CgdOZXR3b3JrEgcKA2FsbBAAEgcKA3RjcBABEgcKA3VkcBAC');
 @$core.Deprecated('Use protocolDescriptor instead')
 const Protocol$json = const {
   '1': 'Protocol',
@@ -50,8 +47,7 @@ const Protocol$json = const {
 };
 
 /// Descriptor for `Protocol`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List protocolDescriptor = $convert.base64Decode(
-    'CghQcm90b2NvbBIHCgN0bHMQABIICgRodHRwEAESCAoEcXVpYxACEggKBHN0dW4QAxIHCgNkbnMQBBIOCgpiaXR0b3JyZW50EAU=');
+final $typed_data.Uint8List protocolDescriptor = $convert.base64Decode('CghQcm90b2NvbBIHCgN0bHMQABIICgRodHRwEAESCAoEcXVpYxACEggKBHN0dW4QAxIHCgNkbnMQBBIOCgpiaXR0b3JyZW50EAU=');
 @$core.Deprecated('Use routeRuleDescriptor instead')
 const RouteRule$json = const {
   '1': 'RouteRule',
@@ -61,8 +57,7 @@ const RouteRule$json = const {
 };
 
 /// Descriptor for `RouteRule`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List routeRuleDescriptor =
-    $convert.base64Decode('CglSb3V0ZVJ1bGUSIgoFcnVsZXMYASADKAsyDC5jb25maWcuUnVsZVIFcnVsZXM=');
+final $typed_data.Uint8List routeRuleDescriptor = $convert.base64Decode('CglSb3V0ZVJ1bGUSIgoFcnVsZXMYASADKAsyDC5jb25maWcuUnVsZVIFcnVsZXM=');
 @$core.Deprecated('Use ruleDescriptor instead')
 const Rule$json = const {
   '1': 'Rule',
@@ -89,5 +84,4 @@ const Rule$json = const {
 };
 
 /// Descriptor for `Rule`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List ruleDescriptor = $convert.base64Decode(
-    'CgRSdWxlEh4KCmxpc3Rfb3JkZXIYASABKA1SCmxpc3Rfb3JkZXISGAoHZW5hYmxlZBgCIAEoCFIHZW5hYmxlZBISCgRuYW1lGAMgASgJUgRuYW1lEiwKCG91dGJvdW5kGAQgASgOMhAuY29uZmlnLk91dGJvdW5kUghvdXRib3VuZBIbCglydWxlX3NldHMYBSADKAlSCHJ1bGVfc2V0EiMKDXBhY2thZ2VfbmFtZXMYBiADKAlSDHBhY2thZ2VfbmFtZRIjCg1wcm9jZXNzX25hbWVzGAcgAygJUgxwcm9jZXNzX25hbWUSIwoNcHJvY2Vzc19wYXRocxgIIAMoCVIMcHJvY2Vzc19wYXRoEikKB25ldHdvcmsYCSABKA4yDy5jb25maWcuTmV0d29ya1IHbmV0d29yaxIfCgtwb3J0X3JhbmdlcxgKIAMoCVIKcG9ydF9yYW5nZRItChJzb3VyY2VfcG9ydF9yYW5nZXMYCyADKAlSEXNvdXJjZV9wb3J0X3JhbmdlEi0KCXByb3RvY29scxgMIAMoDjIQLmNvbmZpZy5Qcm90b2NvbFIIcHJvdG9jb2wSGQoIaXBfY2lkcnMYDSADKAlSB2lwX2NpZHISJwoPc291cmNlX2lwX2NpZHJzGA4gAygJUg5zb3VyY2VfaXBfY2lkchIXCgdkb21haW5zGA8gAygJUgZkb21haW4SJgoPZG9tYWluX3N1ZmZpeGVzGBAgAygJUg1kb21haW5fc3VmZml4EicKD2RvbWFpbl9rZXl3b3JkcxgRIAMoCVIOZG9tYWluX2tleXdvcmQSJAoOZG9tYWluX3JlZ2V4ZXMYEiADKAlSDGRvbWFpbl9yZWdleA==');
+final $typed_data.Uint8List ruleDescriptor = $convert.base64Decode('CgRSdWxlEh4KCmxpc3Rfb3JkZXIYASABKA1SCmxpc3Rfb3JkZXISGAoHZW5hYmxlZBgCIAEoCFIHZW5hYmxlZBISCgRuYW1lGAMgASgJUgRuYW1lEiwKCG91dGJvdW5kGAQgASgOMhAuY29uZmlnLk91dGJvdW5kUghvdXRib3VuZBIbCglydWxlX3NldHMYBSADKAlSCHJ1bGVfc2V0EiMKDXBhY2thZ2VfbmFtZXMYBiADKAlSDHBhY2thZ2VfbmFtZRIjCg1wcm9jZXNzX25hbWVzGAcgAygJUgxwcm9jZXNzX25hbWUSIwoNcHJvY2Vzc19wYXRocxgIIAMoCVIMcHJvY2Vzc19wYXRoEikKB25ldHdvcmsYCSABKA4yDy5jb25maWcuTmV0d29ya1IHbmV0d29yaxIfCgtwb3J0X3JhbmdlcxgKIAMoCVIKcG9ydF9yYW5nZRItChJzb3VyY2VfcG9ydF9yYW5nZXMYCyADKAlSEXNvdXJjZV9wb3J0X3JhbmdlEi0KCXByb3RvY29scxgMIAMoDjIQLmNvbmZpZy5Qcm90b2NvbFIIcHJvdG9jb2wSGQoIaXBfY2lkcnMYDSADKAlSB2lwX2NpZHISJwoPc291cmNlX2lwX2NpZHJzGA4gAygJUg5zb3VyY2VfaXBfY2lkchIXCgdkb21haW5zGA8gAygJUgZkb21haW4SJgoPZG9tYWluX3N1ZmZpeGVzGBAgAygJUg1kb21haW5fc3VmZml4EicKD2RvbWFpbl9rZXl3b3JkcxgRIAMoCVIOZG9tYWluX2tleXdvcmQSJAoOZG9tYWluX3JlZ2V4ZXMYEiADKAlSDGRvbWFpbl9yZWdleA==');

@@ -18,18 +18,12 @@ import '../hcommon/common.pbenum.dart' as $1;
 export 'hcore.pbenum.dart';
 
 class CoreInfoResponse extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CoreInfoResponse',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
-    ..e<CoreStates>(
-        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'coreState', $pb.PbFieldType.OE,
-        defaultOrMaker: CoreStates.STOPPED, valueOf: CoreStates.valueOf, enumValues: CoreStates.values)
-    ..e<MessageType>(
-        2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'messageType', $pb.PbFieldType.OE,
-        defaultOrMaker: MessageType.EMPTY, valueOf: MessageType.valueOf, enumValues: MessageType.values)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CoreInfoResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..e<CoreStates>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'coreState', $pb.PbFieldType.OE, defaultOrMaker: CoreStates.STOPPED, valueOf: CoreStates.valueOf, enumValues: CoreStates.values)
+    ..e<MessageType>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'messageType', $pb.PbFieldType.OE, defaultOrMaker: MessageType.EMPTY, valueOf: MessageType.valueOf, enumValues: MessageType.values)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   CoreInfoResponse._() : super();
   factory CoreInfoResponse({
@@ -49,38 +43,31 @@ class CoreInfoResponse extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory CoreInfoResponse.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory CoreInfoResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory CoreInfoResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CoreInfoResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   CoreInfoResponse clone() => CoreInfoResponse()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  CoreInfoResponse copyWith(void Function(CoreInfoResponse) updates) =>
-      super.copyWith((message) => updates(message as CoreInfoResponse))
-          as CoreInfoResponse; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  CoreInfoResponse copyWith(void Function(CoreInfoResponse) updates) => super.copyWith((message) => updates(message as CoreInfoResponse)) as CoreInfoResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static CoreInfoResponse create() => CoreInfoResponse._();
   CoreInfoResponse createEmptyInstance() => create();
   static $pb.PbList<CoreInfoResponse> createRepeated() => $pb.PbList<CoreInfoResponse>();
   @$core.pragma('dart2js:noInline')
-  static CoreInfoResponse getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CoreInfoResponse>(create);
+  static CoreInfoResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CoreInfoResponse>(create);
   static CoreInfoResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   CoreStates get coreState => $_getN(0);
   @$pb.TagNumber(1)
-  set coreState(CoreStates v) {
-    setField(1, v);
-  }
-
+  set coreState(CoreStates v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasCoreState() => $_has(0);
   @$pb.TagNumber(1)
@@ -89,10 +76,7 @@ class CoreInfoResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   MessageType get messageType => $_getN(1);
   @$pb.TagNumber(2)
-  set messageType(MessageType v) {
-    setField(2, v);
-  }
-
+  set messageType(MessageType v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasMessageType() => $_has(1);
   @$pb.TagNumber(2)
@@ -101,10 +85,7 @@ class CoreInfoResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get message => $_getSZ(2);
   @$pb.TagNumber(3)
-  set message($core.String v) {
-    $_setString(2, v);
-  }
-
+  set message($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasMessage() => $_has(2);
   @$pb.TagNumber(3)
@@ -112,10 +93,7 @@ class CoreInfoResponse extends $pb.GeneratedMessage {
 }
 
 class StartRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'StartRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'StartRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'configPath')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'configContent')
     ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'disableMemoryLimit')
@@ -123,7 +101,8 @@ class StartRequest extends $pb.GeneratedMessage {
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableOldCommandServer')
     ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableRawConfig')
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'configName')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   StartRequest._() : super();
   factory StartRequest({
@@ -159,19 +138,18 @@ class StartRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory StartRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory StartRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory StartRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory StartRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   StartRequest clone() => StartRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  StartRequest copyWith(void Function(StartRequest) updates) =>
-      super.copyWith((message) => updates(message as StartRequest)) as StartRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  StartRequest copyWith(void Function(StartRequest) updates) => super.copyWith((message) => updates(message as StartRequest)) as StartRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static StartRequest create() => StartRequest._();
@@ -184,10 +162,7 @@ class StartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get configPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set configPath($core.String v) {
-    $_setString(0, v);
-  }
-
+  set configPath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasConfigPath() => $_has(0);
   @$pb.TagNumber(1)
@@ -196,10 +171,7 @@ class StartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get configContent => $_getSZ(1);
   @$pb.TagNumber(2)
-  set configContent($core.String v) {
-    $_setString(1, v);
-  }
-
+  set configContent($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasConfigContent() => $_has(1);
   @$pb.TagNumber(2)
@@ -208,10 +180,7 @@ class StartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool get disableMemoryLimit => $_getBF(2);
   @$pb.TagNumber(3)
-  set disableMemoryLimit($core.bool v) {
-    $_setBool(2, v);
-  }
-
+  set disableMemoryLimit($core.bool v) { $_setBool(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasDisableMemoryLimit() => $_has(2);
   @$pb.TagNumber(3)
@@ -220,10 +189,7 @@ class StartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool get delayStart => $_getBF(3);
   @$pb.TagNumber(4)
-  set delayStart($core.bool v) {
-    $_setBool(3, v);
-  }
-
+  set delayStart($core.bool v) { $_setBool(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasDelayStart() => $_has(3);
   @$pb.TagNumber(4)
@@ -232,10 +198,7 @@ class StartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool get enableOldCommandServer => $_getBF(4);
   @$pb.TagNumber(5)
-  set enableOldCommandServer($core.bool v) {
-    $_setBool(4, v);
-  }
-
+  set enableOldCommandServer($core.bool v) { $_setBool(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasEnableOldCommandServer() => $_has(4);
   @$pb.TagNumber(5)
@@ -244,10 +207,7 @@ class StartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool get enableRawConfig => $_getBF(5);
   @$pb.TagNumber(6)
-  set enableRawConfig($core.bool v) {
-    $_setBool(5, v);
-  }
-
+  set enableRawConfig($core.bool v) { $_setBool(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasEnableRawConfig() => $_has(5);
   @$pb.TagNumber(6)
@@ -256,10 +216,7 @@ class StartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.String get configName => $_getSZ(6);
   @$pb.TagNumber(7)
-  set configName($core.String v) {
-    $_setString(6, v);
-  }
-
+  set configName($core.String v) { $_setString(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasConfigName() => $_has(6);
   @$pb.TagNumber(7)
@@ -314,10 +271,7 @@ class PauseRequest extends $pb.GeneratedMessage {
 }
 
 class SetupRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SetupRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SetupRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'basePath')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'workingDir')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tempDir')
@@ -325,9 +279,9 @@ class SetupRequest extends $pb.GeneratedMessage {
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'listen')
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'secret')
     ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'debug')
-    ..e<SetupMode>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mode', $pb.PbFieldType.OE,
-        defaultOrMaker: SetupMode.OLD, valueOf: SetupMode.valueOf, enumValues: SetupMode.values)
-    ..hasRequiredFields = false;
+    ..e<SetupMode>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mode', $pb.PbFieldType.OE, defaultOrMaker: SetupMode.OLD, valueOf: SetupMode.valueOf, enumValues: SetupMode.values)
+    ..hasRequiredFields = false
+  ;
 
   SetupRequest._() : super();
   factory SetupRequest({
@@ -367,19 +321,18 @@ class SetupRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory SetupRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory SetupRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory SetupRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SetupRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   SetupRequest clone() => SetupRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  SetupRequest copyWith(void Function(SetupRequest) updates) =>
-      super.copyWith((message) => updates(message as SetupRequest)) as SetupRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SetupRequest copyWith(void Function(SetupRequest) updates) => super.copyWith((message) => updates(message as SetupRequest)) as SetupRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static SetupRequest create() => SetupRequest._();
@@ -392,10 +345,7 @@ class SetupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get basePath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set basePath($core.String v) {
-    $_setString(0, v);
-  }
-
+  set basePath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasBasePath() => $_has(0);
   @$pb.TagNumber(1)
@@ -404,10 +354,7 @@ class SetupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get workingDir => $_getSZ(1);
   @$pb.TagNumber(2)
-  set workingDir($core.String v) {
-    $_setString(1, v);
-  }
-
+  set workingDir($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasWorkingDir() => $_has(1);
   @$pb.TagNumber(2)
@@ -416,10 +363,7 @@ class SetupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get tempDir => $_getSZ(2);
   @$pb.TagNumber(3)
-  set tempDir($core.String v) {
-    $_setString(2, v);
-  }
-
+  set tempDir($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasTempDir() => $_has(2);
   @$pb.TagNumber(3)
@@ -428,10 +372,7 @@ class SetupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $fixnum.Int64 get flutterStatusPort => $_getI64(3);
   @$pb.TagNumber(4)
-  set flutterStatusPort($fixnum.Int64 v) {
-    $_setInt64(3, v);
-  }
-
+  set flutterStatusPort($fixnum.Int64 v) { $_setInt64(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasFlutterStatusPort() => $_has(3);
   @$pb.TagNumber(4)
@@ -440,10 +381,7 @@ class SetupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.String get listen => $_getSZ(4);
   @$pb.TagNumber(5)
-  set listen($core.String v) {
-    $_setString(4, v);
-  }
-
+  set listen($core.String v) { $_setString(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasListen() => $_has(4);
   @$pb.TagNumber(5)
@@ -452,10 +390,7 @@ class SetupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.String get secret => $_getSZ(5);
   @$pb.TagNumber(6)
-  set secret($core.String v) {
-    $_setString(5, v);
-  }
-
+  set secret($core.String v) { $_setString(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasSecret() => $_has(5);
   @$pb.TagNumber(6)
@@ -464,10 +399,7 @@ class SetupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool get debug => $_getBF(6);
   @$pb.TagNumber(7)
-  set debug($core.bool v) {
-    $_setBool(6, v);
-  }
-
+  set debug($core.bool v) { $_setBool(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasDebug() => $_has(6);
   @$pb.TagNumber(7)
@@ -476,10 +408,7 @@ class SetupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   SetupMode get mode => $_getN(7);
   @$pb.TagNumber(8)
-  set mode(SetupMode v) {
-    setField(8, v);
-  }
-
+  set mode(SetupMode v) { setField(8, v); }
   @$pb.TagNumber(8)
   $core.bool hasMode() => $_has(7);
   @$pb.TagNumber(8)
@@ -487,17 +416,11 @@ class SetupRequest extends $pb.GeneratedMessage {
 }
 
 class SystemInfo extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SystemInfo',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SystemInfo', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aInt64(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'memory')
-    ..a<$core.int>(
-        2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'goroutines', $pb.PbFieldType.O3)
-    ..a<$core.int>(
-        3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'connectionsIn', $pb.PbFieldType.O3)
-    ..a<$core.int>(
-        4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'connectionsOut', $pb.PbFieldType.O3)
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'goroutines', $pb.PbFieldType.O3)
+    ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'connectionsIn', $pb.PbFieldType.O3)
+    ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'connectionsOut', $pb.PbFieldType.O3)
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'trafficAvailable')
     ..aInt64(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'uplink')
     ..aInt64(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'downlink')
@@ -505,7 +428,8 @@ class SystemInfo extends $pb.GeneratedMessage {
     ..aInt64(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'downlinkTotal')
     ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentOutbound')
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentProfile')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   SystemInfo._() : super();
   factory SystemInfo({
@@ -557,19 +481,18 @@ class SystemInfo extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory SystemInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory SystemInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory SystemInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SystemInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   SystemInfo clone() => SystemInfo()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  SystemInfo copyWith(void Function(SystemInfo) updates) =>
-      super.copyWith((message) => updates(message as SystemInfo)) as SystemInfo; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SystemInfo copyWith(void Function(SystemInfo) updates) => super.copyWith((message) => updates(message as SystemInfo)) as SystemInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static SystemInfo create() => SystemInfo._();
@@ -582,10 +505,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $fixnum.Int64 get memory => $_getI64(0);
   @$pb.TagNumber(1)
-  set memory($fixnum.Int64 v) {
-    $_setInt64(0, v);
-  }
-
+  set memory($fixnum.Int64 v) { $_setInt64(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasMemory() => $_has(0);
   @$pb.TagNumber(1)
@@ -594,10 +514,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.int get goroutines => $_getIZ(1);
   @$pb.TagNumber(2)
-  set goroutines($core.int v) {
-    $_setSignedInt32(1, v);
-  }
-
+  set goroutines($core.int v) { $_setSignedInt32(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasGoroutines() => $_has(1);
   @$pb.TagNumber(2)
@@ -606,10 +523,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.int get connectionsIn => $_getIZ(2);
   @$pb.TagNumber(3)
-  set connectionsIn($core.int v) {
-    $_setSignedInt32(2, v);
-  }
-
+  set connectionsIn($core.int v) { $_setSignedInt32(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasConnectionsIn() => $_has(2);
   @$pb.TagNumber(3)
@@ -618,10 +532,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.int get connectionsOut => $_getIZ(3);
   @$pb.TagNumber(4)
-  set connectionsOut($core.int v) {
-    $_setSignedInt32(3, v);
-  }
-
+  set connectionsOut($core.int v) { $_setSignedInt32(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasConnectionsOut() => $_has(3);
   @$pb.TagNumber(4)
@@ -630,10 +541,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool get trafficAvailable => $_getBF(4);
   @$pb.TagNumber(5)
-  set trafficAvailable($core.bool v) {
-    $_setBool(4, v);
-  }
-
+  set trafficAvailable($core.bool v) { $_setBool(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasTrafficAvailable() => $_has(4);
   @$pb.TagNumber(5)
@@ -642,10 +550,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $fixnum.Int64 get uplink => $_getI64(5);
   @$pb.TagNumber(6)
-  set uplink($fixnum.Int64 v) {
-    $_setInt64(5, v);
-  }
-
+  set uplink($fixnum.Int64 v) { $_setInt64(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasUplink() => $_has(5);
   @$pb.TagNumber(6)
@@ -654,10 +559,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $fixnum.Int64 get downlink => $_getI64(6);
   @$pb.TagNumber(7)
-  set downlink($fixnum.Int64 v) {
-    $_setInt64(6, v);
-  }
-
+  set downlink($fixnum.Int64 v) { $_setInt64(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasDownlink() => $_has(6);
   @$pb.TagNumber(7)
@@ -666,10 +568,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   $fixnum.Int64 get uplinkTotal => $_getI64(7);
   @$pb.TagNumber(8)
-  set uplinkTotal($fixnum.Int64 v) {
-    $_setInt64(7, v);
-  }
-
+  set uplinkTotal($fixnum.Int64 v) { $_setInt64(7, v); }
   @$pb.TagNumber(8)
   $core.bool hasUplinkTotal() => $_has(7);
   @$pb.TagNumber(8)
@@ -678,10 +577,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $fixnum.Int64 get downlinkTotal => $_getI64(8);
   @$pb.TagNumber(9)
-  set downlinkTotal($fixnum.Int64 v) {
-    $_setInt64(8, v);
-  }
-
+  set downlinkTotal($fixnum.Int64 v) { $_setInt64(8, v); }
   @$pb.TagNumber(9)
   $core.bool hasDownlinkTotal() => $_has(8);
   @$pb.TagNumber(9)
@@ -690,10 +586,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(10)
   $core.String get currentOutbound => $_getSZ(9);
   @$pb.TagNumber(10)
-  set currentOutbound($core.String v) {
-    $_setString(9, v);
-  }
-
+  set currentOutbound($core.String v) { $_setString(9, v); }
   @$pb.TagNumber(10)
   $core.bool hasCurrentOutbound() => $_has(9);
   @$pb.TagNumber(10)
@@ -702,10 +595,7 @@ class SystemInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(11)
   $core.String get currentProfile => $_getSZ(10);
   @$pb.TagNumber(11)
-  set currentProfile($core.String v) {
-    $_setString(10, v);
-  }
-
+  set currentProfile($core.String v) { $_setString(10, v); }
   @$pb.TagNumber(11)
   $core.bool hasCurrentProfile() => $_has(10);
   @$pb.TagNumber(11)
@@ -713,18 +603,12 @@ class SystemInfo extends $pb.GeneratedMessage {
 }
 
 class OutboundInfo extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'OutboundInfo',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'OutboundInfo', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tag')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type')
-    ..aOM<$7.Timestamp>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestTime',
-        subBuilder: $7.Timestamp.create)
-    ..a<$core.int>(
-        4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestDelay', $pb.PbFieldType.O3)
-    ..aOM<IpInfo>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ipinfo',
-        subBuilder: IpInfo.create)
+    ..aOM<$7.Timestamp>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestTime', subBuilder: $7.Timestamp.create)
+    ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestDelay', $pb.PbFieldType.O3)
+    ..aOM<IpInfo>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ipinfo', subBuilder: IpInfo.create)
     ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isSelected')
     ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isGroup')
     ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isSecure')
@@ -732,10 +616,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..a<$core.int>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'port', $pb.PbFieldType.OU3)
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'host')
     ..aOS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tagDisplay')
-    ..aOM<OutboundInfo>(
-        13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupSelectedOutbound',
-        subBuilder: OutboundInfo.create)
-    ..hasRequiredFields = false;
+    ..aOM<OutboundInfo>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupSelectedOutbound', subBuilder: OutboundInfo.create)
+    ..hasRequiredFields = false
+  ;
 
   OutboundInfo._() : super();
   factory OutboundInfo({
@@ -795,19 +678,18 @@ class OutboundInfo extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory OutboundInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory OutboundInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory OutboundInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory OutboundInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   OutboundInfo clone() => OutboundInfo()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  OutboundInfo copyWith(void Function(OutboundInfo) updates) =>
-      super.copyWith((message) => updates(message as OutboundInfo)) as OutboundInfo; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  OutboundInfo copyWith(void Function(OutboundInfo) updates) => super.copyWith((message) => updates(message as OutboundInfo)) as OutboundInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static OutboundInfo create() => OutboundInfo._();
@@ -820,10 +702,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get tag => $_getSZ(0);
   @$pb.TagNumber(1)
-  set tag($core.String v) {
-    $_setString(0, v);
-  }
-
+  set tag($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasTag() => $_has(0);
   @$pb.TagNumber(1)
@@ -832,10 +711,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get type => $_getSZ(1);
   @$pb.TagNumber(2)
-  set type($core.String v) {
-    $_setString(1, v);
-  }
-
+  set type($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasType() => $_has(1);
   @$pb.TagNumber(2)
@@ -844,10 +720,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $7.Timestamp get urlTestTime => $_getN(2);
   @$pb.TagNumber(3)
-  set urlTestTime($7.Timestamp v) {
-    setField(3, v);
-  }
-
+  set urlTestTime($7.Timestamp v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasUrlTestTime() => $_has(2);
   @$pb.TagNumber(3)
@@ -858,10 +731,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.int get urlTestDelay => $_getIZ(3);
   @$pb.TagNumber(4)
-  set urlTestDelay($core.int v) {
-    $_setSignedInt32(3, v);
-  }
-
+  set urlTestDelay($core.int v) { $_setSignedInt32(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasUrlTestDelay() => $_has(3);
   @$pb.TagNumber(4)
@@ -870,10 +740,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   IpInfo get ipinfo => $_getN(4);
   @$pb.TagNumber(5)
-  set ipinfo(IpInfo v) {
-    setField(5, v);
-  }
-
+  set ipinfo(IpInfo v) { setField(5, v); }
   @$pb.TagNumber(5)
   $core.bool hasIpinfo() => $_has(4);
   @$pb.TagNumber(5)
@@ -884,10 +751,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool get isSelected => $_getBF(5);
   @$pb.TagNumber(6)
-  set isSelected($core.bool v) {
-    $_setBool(5, v);
-  }
-
+  set isSelected($core.bool v) { $_setBool(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasIsSelected() => $_has(5);
   @$pb.TagNumber(6)
@@ -896,10 +760,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool get isGroup => $_getBF(6);
   @$pb.TagNumber(7)
-  set isGroup($core.bool v) {
-    $_setBool(6, v);
-  }
-
+  set isGroup($core.bool v) { $_setBool(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasIsGroup() => $_has(6);
   @$pb.TagNumber(7)
@@ -908,10 +769,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   $core.bool get isSecure => $_getBF(7);
   @$pb.TagNumber(8)
-  set isSecure($core.bool v) {
-    $_setBool(7, v);
-  }
-
+  set isSecure($core.bool v) { $_setBool(7, v); }
   @$pb.TagNumber(8)
   $core.bool hasIsSecure() => $_has(7);
   @$pb.TagNumber(8)
@@ -920,10 +778,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $core.bool get isVisible => $_getBF(8);
   @$pb.TagNumber(9)
-  set isVisible($core.bool v) {
-    $_setBool(8, v);
-  }
-
+  set isVisible($core.bool v) { $_setBool(8, v); }
   @$pb.TagNumber(9)
   $core.bool hasIsVisible() => $_has(8);
   @$pb.TagNumber(9)
@@ -932,10 +787,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(10)
   $core.int get port => $_getIZ(9);
   @$pb.TagNumber(10)
-  set port($core.int v) {
-    $_setUnsignedInt32(9, v);
-  }
-
+  set port($core.int v) { $_setUnsignedInt32(9, v); }
   @$pb.TagNumber(10)
   $core.bool hasPort() => $_has(9);
   @$pb.TagNumber(10)
@@ -944,10 +796,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(11)
   $core.String get host => $_getSZ(10);
   @$pb.TagNumber(11)
-  set host($core.String v) {
-    $_setString(10, v);
-  }
-
+  set host($core.String v) { $_setString(10, v); }
   @$pb.TagNumber(11)
   $core.bool hasHost() => $_has(10);
   @$pb.TagNumber(11)
@@ -956,10 +805,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(12)
   $core.String get tagDisplay => $_getSZ(11);
   @$pb.TagNumber(12)
-  set tagDisplay($core.String v) {
-    $_setString(11, v);
-  }
-
+  set tagDisplay($core.String v) { $_setString(11, v); }
   @$pb.TagNumber(12)
   $core.bool hasTagDisplay() => $_has(11);
   @$pb.TagNumber(12)
@@ -968,10 +814,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(13)
   OutboundInfo get groupSelectedOutbound => $_getN(12);
   @$pb.TagNumber(13)
-  set groupSelectedOutbound(OutboundInfo v) {
-    setField(13, v);
-  }
-
+  set groupSelectedOutbound(OutboundInfo v) { setField(13, v); }
   @$pb.TagNumber(13)
   $core.bool hasGroupSelectedOutbound() => $_has(12);
   @$pb.TagNumber(13)
@@ -981,22 +824,18 @@ class OutboundInfo extends $pb.GeneratedMessage {
 }
 
 class IpInfo extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'IpInfo',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'IpInfo', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ip')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'country_code')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'region')
     ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'city')
     ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'asn', $pb.PbFieldType.O3)
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'org')
-    ..a<$core.double>(
-        7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'latitude', $pb.PbFieldType.OD)
-    ..a<$core.double>(
-        8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'longitude', $pb.PbFieldType.OD)
+    ..a<$core.double>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'latitude', $pb.PbFieldType.OD)
+    ..a<$core.double>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'longitude', $pb.PbFieldType.OD)
     ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'postal_code')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   IpInfo._() : super();
   factory IpInfo({
@@ -1040,19 +879,18 @@ class IpInfo extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory IpInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory IpInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory IpInfo.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory IpInfo.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   IpInfo clone() => IpInfo()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  IpInfo copyWith(void Function(IpInfo) updates) =>
-      super.copyWith((message) => updates(message as IpInfo)) as IpInfo; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  IpInfo copyWith(void Function(IpInfo) updates) => super.copyWith((message) => updates(message as IpInfo)) as IpInfo; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static IpInfo create() => IpInfo._();
@@ -1065,10 +903,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get ip => $_getSZ(0);
   @$pb.TagNumber(1)
-  set ip($core.String v) {
-    $_setString(0, v);
-  }
-
+  set ip($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasIp() => $_has(0);
   @$pb.TagNumber(1)
@@ -1077,10 +912,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get countryCode => $_getSZ(1);
   @$pb.TagNumber(2)
-  set countryCode($core.String v) {
-    $_setString(1, v);
-  }
-
+  set countryCode($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasCountryCode() => $_has(1);
   @$pb.TagNumber(2)
@@ -1089,10 +921,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get region => $_getSZ(2);
   @$pb.TagNumber(3)
-  set region($core.String v) {
-    $_setString(2, v);
-  }
-
+  set region($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasRegion() => $_has(2);
   @$pb.TagNumber(3)
@@ -1101,10 +930,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.String get city => $_getSZ(3);
   @$pb.TagNumber(4)
-  set city($core.String v) {
-    $_setString(3, v);
-  }
-
+  set city($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasCity() => $_has(3);
   @$pb.TagNumber(4)
@@ -1113,10 +939,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.int get asn => $_getIZ(4);
   @$pb.TagNumber(5)
-  set asn($core.int v) {
-    $_setSignedInt32(4, v);
-  }
-
+  set asn($core.int v) { $_setSignedInt32(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasAsn() => $_has(4);
   @$pb.TagNumber(5)
@@ -1125,10 +948,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.String get org => $_getSZ(5);
   @$pb.TagNumber(6)
-  set org($core.String v) {
-    $_setString(5, v);
-  }
-
+  set org($core.String v) { $_setString(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasOrg() => $_has(5);
   @$pb.TagNumber(6)
@@ -1137,10 +957,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.double get latitude => $_getN(6);
   @$pb.TagNumber(7)
-  set latitude($core.double v) {
-    $_setDouble(6, v);
-  }
-
+  set latitude($core.double v) { $_setDouble(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasLatitude() => $_has(6);
   @$pb.TagNumber(7)
@@ -1149,10 +966,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   $core.double get longitude => $_getN(7);
   @$pb.TagNumber(8)
-  set longitude($core.double v) {
-    $_setDouble(7, v);
-  }
-
+  set longitude($core.double v) { $_setDouble(7, v); }
   @$pb.TagNumber(8)
   $core.bool hasLongitude() => $_has(7);
   @$pb.TagNumber(8)
@@ -1161,10 +975,7 @@ class IpInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $core.String get postalCode => $_getSZ(8);
   @$pb.TagNumber(9)
-  set postalCode($core.String v) {
-    $_setString(8, v);
-  }
-
+  set postalCode($core.String v) { $_setString(8, v); }
   @$pb.TagNumber(9)
   $core.bool hasPostalCode() => $_has(8);
   @$pb.TagNumber(9)
@@ -1172,20 +983,15 @@ class IpInfo extends $pb.GeneratedMessage {
 }
 
 class OutboundGroup extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'OutboundGroup',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'OutboundGroup', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tag')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type')
-    ..aOM<OutboundInfo>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'selected',
-        subBuilder: OutboundInfo.create)
+    ..aOM<OutboundInfo>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'selected', subBuilder: OutboundInfo.create)
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'selectable')
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'IsExpand', protoName: 'Is_expand')
-    ..pc<OutboundInfo>(
-        6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'items', $pb.PbFieldType.PM,
-        subBuilder: OutboundInfo.create)
-    ..hasRequiredFields = false;
+    ..pc<OutboundInfo>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'items', $pb.PbFieldType.PM, subBuilder: OutboundInfo.create)
+    ..hasRequiredFields = false
+  ;
 
   OutboundGroup._() : super();
   factory OutboundGroup({
@@ -1217,19 +1023,18 @@ class OutboundGroup extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory OutboundGroup.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory OutboundGroup.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory OutboundGroup.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory OutboundGroup.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   OutboundGroup clone() => OutboundGroup()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  OutboundGroup copyWith(void Function(OutboundGroup) updates) =>
-      super.copyWith((message) => updates(message as OutboundGroup)) as OutboundGroup; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  OutboundGroup copyWith(void Function(OutboundGroup) updates) => super.copyWith((message) => updates(message as OutboundGroup)) as OutboundGroup; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static OutboundGroup create() => OutboundGroup._();
@@ -1242,10 +1047,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get tag => $_getSZ(0);
   @$pb.TagNumber(1)
-  set tag($core.String v) {
-    $_setString(0, v);
-  }
-
+  set tag($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasTag() => $_has(0);
   @$pb.TagNumber(1)
@@ -1254,10 +1056,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get type => $_getSZ(1);
   @$pb.TagNumber(2)
-  set type($core.String v) {
-    $_setString(1, v);
-  }
-
+  set type($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasType() => $_has(1);
   @$pb.TagNumber(2)
@@ -1266,10 +1065,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   OutboundInfo get selected => $_getN(2);
   @$pb.TagNumber(3)
-  set selected(OutboundInfo v) {
-    setField(3, v);
-  }
-
+  set selected(OutboundInfo v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasSelected() => $_has(2);
   @$pb.TagNumber(3)
@@ -1280,10 +1076,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool get selectable => $_getBF(3);
   @$pb.TagNumber(4)
-  set selectable($core.bool v) {
-    $_setBool(3, v);
-  }
-
+  set selectable($core.bool v) { $_setBool(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasSelectable() => $_has(3);
   @$pb.TagNumber(4)
@@ -1292,10 +1085,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool get isExpand => $_getBF(4);
   @$pb.TagNumber(5)
-  set isExpand($core.bool v) {
-    $_setBool(4, v);
-  }
-
+  set isExpand($core.bool v) { $_setBool(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasIsExpand() => $_has(4);
   @$pb.TagNumber(5)
@@ -1306,14 +1096,10 @@ class OutboundGroup extends $pb.GeneratedMessage {
 }
 
 class OutboundGroupList extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'OutboundGroupList',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
-    ..pc<OutboundGroup>(
-        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'items', $pb.PbFieldType.PM,
-        subBuilder: OutboundGroup.create)
-    ..hasRequiredFields = false;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'OutboundGroupList', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..pc<OutboundGroup>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'items', $pb.PbFieldType.PM, subBuilder: OutboundGroup.create)
+    ..hasRequiredFields = false
+  ;
 
   OutboundGroupList._() : super();
   factory OutboundGroupList({
@@ -1325,29 +1111,25 @@ class OutboundGroupList extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory OutboundGroupList.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory OutboundGroupList.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory OutboundGroupList.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory OutboundGroupList.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   OutboundGroupList clone() => OutboundGroupList()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  OutboundGroupList copyWith(void Function(OutboundGroupList) updates) =>
-      super.copyWith((message) => updates(message as OutboundGroupList))
-          as OutboundGroupList; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  OutboundGroupList copyWith(void Function(OutboundGroupList) updates) => super.copyWith((message) => updates(message as OutboundGroupList)) as OutboundGroupList; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static OutboundGroupList create() => OutboundGroupList._();
   OutboundGroupList createEmptyInstance() => create();
   static $pb.PbList<OutboundGroupList> createRepeated() => $pb.PbList<OutboundGroupList>();
   @$core.pragma('dart2js:noInline')
-  static OutboundGroupList getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<OutboundGroupList>(create);
+  static OutboundGroupList getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<OutboundGroupList>(create);
   static OutboundGroupList? _defaultInstance;
 
   @$pb.TagNumber(1)
@@ -1355,13 +1137,11 @@ class OutboundGroupList extends $pb.GeneratedMessage {
 }
 
 class WarpAccount extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpAccount',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpAccount', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accessToken')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   WarpAccount._() : super();
   factory WarpAccount({
@@ -1377,19 +1157,18 @@ class WarpAccount extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory WarpAccount.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory WarpAccount.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory WarpAccount.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory WarpAccount.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   WarpAccount clone() => WarpAccount()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  WarpAccount copyWith(void Function(WarpAccount) updates) =>
-      super.copyWith((message) => updates(message as WarpAccount)) as WarpAccount; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  WarpAccount copyWith(void Function(WarpAccount) updates) => super.copyWith((message) => updates(message as WarpAccount)) as WarpAccount; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WarpAccount create() => WarpAccount._();
@@ -1402,10 +1181,7 @@ class WarpAccount extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get accountId => $_getSZ(0);
   @$pb.TagNumber(1)
-  set accountId($core.String v) {
-    $_setString(0, v);
-  }
-
+  set accountId($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasAccountId() => $_has(0);
   @$pb.TagNumber(1)
@@ -1414,10 +1190,7 @@ class WarpAccount extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get accessToken => $_getSZ(1);
   @$pb.TagNumber(2)
-  set accessToken($core.String v) {
-    $_setString(1, v);
-  }
-
+  set accessToken($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasAccessToken() => $_has(1);
   @$pb.TagNumber(2)
@@ -1425,20 +1198,14 @@ class WarpAccount extends $pb.GeneratedMessage {
 }
 
 class WarpWireguardConfig extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpWireguardConfig',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'private-key',
-        protoName: 'private_key')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'local-address-ipv4',
-        protoName: 'local_address_ipv4')
-    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'local-address-ipv6',
-        protoName: 'local_address_ipv6')
-    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'peer-public-key',
-        protoName: 'peer_public_key')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpWireguardConfig', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'private-key', protoName: 'private_key')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'local-address-ipv4', protoName: 'local_address_ipv4')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'local-address-ipv6', protoName: 'local_address_ipv6')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'peer-public-key', protoName: 'peer_public_key')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'client-id', protoName: 'client_id')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   WarpWireguardConfig._() : super();
   factory WarpWireguardConfig({
@@ -1466,38 +1233,31 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory WarpWireguardConfig.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory WarpWireguardConfig.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory WarpWireguardConfig.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory WarpWireguardConfig.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   WarpWireguardConfig clone() => WarpWireguardConfig()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  WarpWireguardConfig copyWith(void Function(WarpWireguardConfig) updates) =>
-      super.copyWith((message) => updates(message as WarpWireguardConfig))
-          as WarpWireguardConfig; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  WarpWireguardConfig copyWith(void Function(WarpWireguardConfig) updates) => super.copyWith((message) => updates(message as WarpWireguardConfig)) as WarpWireguardConfig; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WarpWireguardConfig create() => WarpWireguardConfig._();
   WarpWireguardConfig createEmptyInstance() => create();
   static $pb.PbList<WarpWireguardConfig> createRepeated() => $pb.PbList<WarpWireguardConfig>();
   @$core.pragma('dart2js:noInline')
-  static WarpWireguardConfig getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WarpWireguardConfig>(create);
+  static WarpWireguardConfig getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WarpWireguardConfig>(create);
   static WarpWireguardConfig? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get privateKey => $_getSZ(0);
   @$pb.TagNumber(1)
-  set privateKey($core.String v) {
-    $_setString(0, v);
-  }
-
+  set privateKey($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasPrivateKey() => $_has(0);
   @$pb.TagNumber(1)
@@ -1506,10 +1266,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get localAddressIpv4 => $_getSZ(1);
   @$pb.TagNumber(2)
-  set localAddressIpv4($core.String v) {
-    $_setString(1, v);
-  }
-
+  set localAddressIpv4($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasLocalAddressIpv4() => $_has(1);
   @$pb.TagNumber(2)
@@ -1518,10 +1275,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get localAddressIpv6 => $_getSZ(2);
   @$pb.TagNumber(3)
-  set localAddressIpv6($core.String v) {
-    $_setString(2, v);
-  }
-
+  set localAddressIpv6($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasLocalAddressIpv6() => $_has(2);
   @$pb.TagNumber(3)
@@ -1530,10 +1284,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.String get peerPublicKey => $_getSZ(3);
   @$pb.TagNumber(4)
-  set peerPublicKey($core.String v) {
-    $_setString(3, v);
-  }
-
+  set peerPublicKey($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasPeerPublicKey() => $_has(3);
   @$pb.TagNumber(4)
@@ -1542,10 +1293,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.String get clientId => $_getSZ(4);
   @$pb.TagNumber(5)
-  set clientId($core.String v) {
-    $_setString(4, v);
-  }
-
+  set clientId($core.String v) { $_setString(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasClientId() => $_has(4);
   @$pb.TagNumber(5)
@@ -1553,16 +1301,12 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
 }
 
 class WarpGenerationResponse extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpGenerationResponse',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
-    ..aOM<WarpAccount>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'account',
-        subBuilder: WarpAccount.create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpGenerationResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOM<WarpAccount>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'account', subBuilder: WarpAccount.create)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'log')
-    ..aOM<WarpWireguardConfig>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'config',
-        subBuilder: WarpWireguardConfig.create)
-    ..hasRequiredFields = false;
+    ..aOM<WarpWireguardConfig>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'config', subBuilder: WarpWireguardConfig.create)
+    ..hasRequiredFields = false
+  ;
 
   WarpGenerationResponse._() : super();
   factory WarpGenerationResponse({
@@ -1582,38 +1326,31 @@ class WarpGenerationResponse extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory WarpGenerationResponse.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory WarpGenerationResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory WarpGenerationResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory WarpGenerationResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   WarpGenerationResponse clone() => WarpGenerationResponse()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  WarpGenerationResponse copyWith(void Function(WarpGenerationResponse) updates) =>
-      super.copyWith((message) => updates(message as WarpGenerationResponse))
-          as WarpGenerationResponse; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  WarpGenerationResponse copyWith(void Function(WarpGenerationResponse) updates) => super.copyWith((message) => updates(message as WarpGenerationResponse)) as WarpGenerationResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WarpGenerationResponse create() => WarpGenerationResponse._();
   WarpGenerationResponse createEmptyInstance() => create();
   static $pb.PbList<WarpGenerationResponse> createRepeated() => $pb.PbList<WarpGenerationResponse>();
   @$core.pragma('dart2js:noInline')
-  static WarpGenerationResponse getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WarpGenerationResponse>(create);
+  static WarpGenerationResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WarpGenerationResponse>(create);
   static WarpGenerationResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   WarpAccount get account => $_getN(0);
   @$pb.TagNumber(1)
-  set account(WarpAccount v) {
-    setField(1, v);
-  }
-
+  set account(WarpAccount v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasAccount() => $_has(0);
   @$pb.TagNumber(1)
@@ -1624,10 +1361,7 @@ class WarpGenerationResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get log => $_getSZ(1);
   @$pb.TagNumber(2)
-  set log($core.String v) {
-    $_setString(1, v);
-  }
-
+  set log($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasLog() => $_has(1);
   @$pb.TagNumber(2)
@@ -1636,10 +1370,7 @@ class WarpGenerationResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   WarpWireguardConfig get config => $_getN(2);
   @$pb.TagNumber(3)
-  set config(WarpWireguardConfig v) {
-    setField(3, v);
-  }
-
+  set config(WarpWireguardConfig v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasConfig() => $_has(2);
   @$pb.TagNumber(3)
@@ -1649,13 +1380,11 @@ class WarpGenerationResponse extends $pb.GeneratedMessage {
 }
 
 class SystemProxyStatus extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SystemProxyStatus',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SystemProxyStatus', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'available')
     ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enabled')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   SystemProxyStatus._() : super();
   factory SystemProxyStatus({
@@ -1671,38 +1400,31 @@ class SystemProxyStatus extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory SystemProxyStatus.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory SystemProxyStatus.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory SystemProxyStatus.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SystemProxyStatus.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   SystemProxyStatus clone() => SystemProxyStatus()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  SystemProxyStatus copyWith(void Function(SystemProxyStatus) updates) =>
-      super.copyWith((message) => updates(message as SystemProxyStatus))
-          as SystemProxyStatus; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SystemProxyStatus copyWith(void Function(SystemProxyStatus) updates) => super.copyWith((message) => updates(message as SystemProxyStatus)) as SystemProxyStatus; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static SystemProxyStatus create() => SystemProxyStatus._();
   SystemProxyStatus createEmptyInstance() => create();
   static $pb.PbList<SystemProxyStatus> createRepeated() => $pb.PbList<SystemProxyStatus>();
   @$core.pragma('dart2js:noInline')
-  static SystemProxyStatus getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SystemProxyStatus>(create);
+  static SystemProxyStatus getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SystemProxyStatus>(create);
   static SystemProxyStatus? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.bool get available => $_getBF(0);
   @$pb.TagNumber(1)
-  set available($core.bool v) {
-    $_setBool(0, v);
-  }
-
+  set available($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasAvailable() => $_has(0);
   @$pb.TagNumber(1)
@@ -1711,10 +1433,7 @@ class SystemProxyStatus extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool get enabled => $_getBF(1);
   @$pb.TagNumber(2)
-  set enabled($core.bool v) {
-    $_setBool(1, v);
-  }
-
+  set enabled($core.bool v) { $_setBool(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasEnabled() => $_has(1);
   @$pb.TagNumber(2)
@@ -1722,15 +1441,13 @@ class SystemProxyStatus extends $pb.GeneratedMessage {
 }
 
 class ParseRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ParseRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ParseRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'configPath')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tempPath')
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'debug')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   ParseRequest._() : super();
   factory ParseRequest({
@@ -1754,19 +1471,18 @@ class ParseRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory ParseRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory ParseRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory ParseRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ParseRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   ParseRequest clone() => ParseRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  ParseRequest copyWith(void Function(ParseRequest) updates) =>
-      super.copyWith((message) => updates(message as ParseRequest)) as ParseRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ParseRequest copyWith(void Function(ParseRequest) updates) => super.copyWith((message) => updates(message as ParseRequest)) as ParseRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ParseRequest create() => ParseRequest._();
@@ -1779,10 +1495,7 @@ class ParseRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get content => $_getSZ(0);
   @$pb.TagNumber(1)
-  set content($core.String v) {
-    $_setString(0, v);
-  }
-
+  set content($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasContent() => $_has(0);
   @$pb.TagNumber(1)
@@ -1791,10 +1504,7 @@ class ParseRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get configPath => $_getSZ(1);
   @$pb.TagNumber(2)
-  set configPath($core.String v) {
-    $_setString(1, v);
-  }
-
+  set configPath($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasConfigPath() => $_has(1);
   @$pb.TagNumber(2)
@@ -1803,10 +1513,7 @@ class ParseRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get tempPath => $_getSZ(2);
   @$pb.TagNumber(3)
-  set tempPath($core.String v) {
-    $_setString(2, v);
-  }
-
+  set tempPath($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasTempPath() => $_has(2);
   @$pb.TagNumber(3)
@@ -1815,10 +1522,7 @@ class ParseRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool get debug => $_getBF(3);
   @$pb.TagNumber(4)
-  set debug($core.bool v) {
-    $_setBool(3, v);
-  }
-
+  set debug($core.bool v) { $_setBool(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasDebug() => $_has(3);
   @$pb.TagNumber(4)
@@ -1826,16 +1530,12 @@ class ParseRequest extends $pb.GeneratedMessage {
 }
 
 class ParseResponse extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ParseResponse',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
-    ..e<$1.ResponseCode>(
-        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'responseCode', $pb.PbFieldType.OE,
-        defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ParseResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..e<$1.ResponseCode>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'responseCode', $pb.PbFieldType.OE, defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'content')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   ParseResponse._() : super();
   factory ParseResponse({
@@ -1855,19 +1555,18 @@ class ParseResponse extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory ParseResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory ParseResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory ParseResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ParseResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   ParseResponse clone() => ParseResponse()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  ParseResponse copyWith(void Function(ParseResponse) updates) =>
-      super.copyWith((message) => updates(message as ParseResponse)) as ParseResponse; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ParseResponse copyWith(void Function(ParseResponse) updates) => super.copyWith((message) => updates(message as ParseResponse)) as ParseResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ParseResponse create() => ParseResponse._();
@@ -1880,10 +1579,7 @@ class ParseResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $1.ResponseCode get responseCode => $_getN(0);
   @$pb.TagNumber(1)
-  set responseCode($1.ResponseCode v) {
-    setField(1, v);
-  }
-
+  set responseCode($1.ResponseCode v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasResponseCode() => $_has(0);
   @$pb.TagNumber(1)
@@ -1892,10 +1588,7 @@ class ParseResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get content => $_getSZ(1);
   @$pb.TagNumber(2)
-  set content($core.String v) {
-    $_setString(1, v);
-  }
-
+  set content($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasContent() => $_has(1);
   @$pb.TagNumber(2)
@@ -1904,10 +1597,7 @@ class ParseResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get message => $_getSZ(2);
   @$pb.TagNumber(3)
-  set message($core.String v) {
-    $_setString(2, v);
-  }
-
+  set message($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasMessage() => $_has(2);
   @$pb.TagNumber(3)
@@ -1915,12 +1605,10 @@ class ParseResponse extends $pb.GeneratedMessage {
 }
 
 class ChangeHiddifySettingsRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ChangeHiddifySettingsRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ChangeHiddifySettingsRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'hiddifySettingsJson')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   ChangeHiddifySettingsRequest._() : super();
   factory ChangeHiddifySettingsRequest({
@@ -1932,39 +1620,31 @@ class ChangeHiddifySettingsRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory ChangeHiddifySettingsRequest.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory ChangeHiddifySettingsRequest.fromJson($core.String i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory ChangeHiddifySettingsRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ChangeHiddifySettingsRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   ChangeHiddifySettingsRequest clone() => ChangeHiddifySettingsRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  ChangeHiddifySettingsRequest copyWith(void Function(ChangeHiddifySettingsRequest) updates) =>
-      super.copyWith((message) => updates(message as ChangeHiddifySettingsRequest))
-          as ChangeHiddifySettingsRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ChangeHiddifySettingsRequest copyWith(void Function(ChangeHiddifySettingsRequest) updates) => super.copyWith((message) => updates(message as ChangeHiddifySettingsRequest)) as ChangeHiddifySettingsRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ChangeHiddifySettingsRequest create() => ChangeHiddifySettingsRequest._();
   ChangeHiddifySettingsRequest createEmptyInstance() => create();
   static $pb.PbList<ChangeHiddifySettingsRequest> createRepeated() => $pb.PbList<ChangeHiddifySettingsRequest>();
   @$core.pragma('dart2js:noInline')
-  static ChangeHiddifySettingsRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ChangeHiddifySettingsRequest>(create);
+  static ChangeHiddifySettingsRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ChangeHiddifySettingsRequest>(create);
   static ChangeHiddifySettingsRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get hiddifySettingsJson => $_getSZ(0);
   @$pb.TagNumber(1)
-  set hiddifySettingsJson($core.String v) {
-    $_setString(0, v);
-  }
-
+  set hiddifySettingsJson($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasHiddifySettingsJson() => $_has(0);
   @$pb.TagNumber(1)
@@ -1972,14 +1652,12 @@ class ChangeHiddifySettingsRequest extends $pb.GeneratedMessage {
 }
 
 class GenerateConfigRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GenerateConfigRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GenerateConfigRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'path')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tempPath')
     ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'debug')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   GenerateConfigRequest._() : super();
   factory GenerateConfigRequest({
@@ -1999,38 +1677,31 @@ class GenerateConfigRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory GenerateConfigRequest.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory GenerateConfigRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory GenerateConfigRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GenerateConfigRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   GenerateConfigRequest clone() => GenerateConfigRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  GenerateConfigRequest copyWith(void Function(GenerateConfigRequest) updates) =>
-      super.copyWith((message) => updates(message as GenerateConfigRequest))
-          as GenerateConfigRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GenerateConfigRequest copyWith(void Function(GenerateConfigRequest) updates) => super.copyWith((message) => updates(message as GenerateConfigRequest)) as GenerateConfigRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static GenerateConfigRequest create() => GenerateConfigRequest._();
   GenerateConfigRequest createEmptyInstance() => create();
   static $pb.PbList<GenerateConfigRequest> createRepeated() => $pb.PbList<GenerateConfigRequest>();
   @$core.pragma('dart2js:noInline')
-  static GenerateConfigRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GenerateConfigRequest>(create);
+  static GenerateConfigRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GenerateConfigRequest>(create);
   static GenerateConfigRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get path => $_getSZ(0);
   @$pb.TagNumber(1)
-  set path($core.String v) {
-    $_setString(0, v);
-  }
-
+  set path($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasPath() => $_has(0);
   @$pb.TagNumber(1)
@@ -2039,10 +1710,7 @@ class GenerateConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get tempPath => $_getSZ(1);
   @$pb.TagNumber(2)
-  set tempPath($core.String v) {
-    $_setString(1, v);
-  }
-
+  set tempPath($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasTempPath() => $_has(1);
   @$pb.TagNumber(2)
@@ -2051,10 +1719,7 @@ class GenerateConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool get debug => $_getBF(2);
   @$pb.TagNumber(3)
-  set debug($core.bool v) {
-    $_setBool(2, v);
-  }
-
+  set debug($core.bool v) { $_setBool(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasDebug() => $_has(2);
   @$pb.TagNumber(3)
@@ -2062,12 +1727,10 @@ class GenerateConfigRequest extends $pb.GeneratedMessage {
 }
 
 class GenerateConfigResponse extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GenerateConfigResponse',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GenerateConfigResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'configContent')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   GenerateConfigResponse._() : super();
   factory GenerateConfigResponse({
@@ -2079,38 +1742,31 @@ class GenerateConfigResponse extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory GenerateConfigResponse.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory GenerateConfigResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory GenerateConfigResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GenerateConfigResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   GenerateConfigResponse clone() => GenerateConfigResponse()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  GenerateConfigResponse copyWith(void Function(GenerateConfigResponse) updates) =>
-      super.copyWith((message) => updates(message as GenerateConfigResponse))
-          as GenerateConfigResponse; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GenerateConfigResponse copyWith(void Function(GenerateConfigResponse) updates) => super.copyWith((message) => updates(message as GenerateConfigResponse)) as GenerateConfigResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static GenerateConfigResponse create() => GenerateConfigResponse._();
   GenerateConfigResponse createEmptyInstance() => create();
   static $pb.PbList<GenerateConfigResponse> createRepeated() => $pb.PbList<GenerateConfigResponse>();
   @$core.pragma('dart2js:noInline')
-  static GenerateConfigResponse getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GenerateConfigResponse>(create);
+  static GenerateConfigResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GenerateConfigResponse>(create);
   static GenerateConfigResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get configContent => $_getSZ(0);
   @$pb.TagNumber(1)
-  set configContent($core.String v) {
-    $_setString(0, v);
-  }
-
+  set configContent($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasConfigContent() => $_has(0);
   @$pb.TagNumber(1)
@@ -2118,13 +1774,11 @@ class GenerateConfigResponse extends $pb.GeneratedMessage {
 }
 
 class SelectOutboundRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SelectOutboundRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SelectOutboundRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupTag')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'outboundTag')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   SelectOutboundRequest._() : super();
   factory SelectOutboundRequest({
@@ -2140,38 +1794,31 @@ class SelectOutboundRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory SelectOutboundRequest.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory SelectOutboundRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory SelectOutboundRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SelectOutboundRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   SelectOutboundRequest clone() => SelectOutboundRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  SelectOutboundRequest copyWith(void Function(SelectOutboundRequest) updates) =>
-      super.copyWith((message) => updates(message as SelectOutboundRequest))
-          as SelectOutboundRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SelectOutboundRequest copyWith(void Function(SelectOutboundRequest) updates) => super.copyWith((message) => updates(message as SelectOutboundRequest)) as SelectOutboundRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static SelectOutboundRequest create() => SelectOutboundRequest._();
   SelectOutboundRequest createEmptyInstance() => create();
   static $pb.PbList<SelectOutboundRequest> createRepeated() => $pb.PbList<SelectOutboundRequest>();
   @$core.pragma('dart2js:noInline')
-  static SelectOutboundRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SelectOutboundRequest>(create);
+  static SelectOutboundRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SelectOutboundRequest>(create);
   static SelectOutboundRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get groupTag => $_getSZ(0);
   @$pb.TagNumber(1)
-  set groupTag($core.String v) {
-    $_setString(0, v);
-  }
-
+  set groupTag($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasGroupTag() => $_has(0);
   @$pb.TagNumber(1)
@@ -2180,10 +1827,7 @@ class SelectOutboundRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get outboundTag => $_getSZ(1);
   @$pb.TagNumber(2)
-  set outboundTag($core.String v) {
-    $_setString(1, v);
-  }
-
+  set outboundTag($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasOutboundTag() => $_has(1);
   @$pb.TagNumber(2)
@@ -2191,12 +1835,10 @@ class SelectOutboundRequest extends $pb.GeneratedMessage {
 }
 
 class UrlTestRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UrlTestRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UrlTestRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupTag')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   UrlTestRequest._() : super();
   factory UrlTestRequest({
@@ -2208,20 +1850,18 @@ class UrlTestRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory UrlTestRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory UrlTestRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory UrlTestRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory UrlTestRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   UrlTestRequest clone() => UrlTestRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  UrlTestRequest copyWith(void Function(UrlTestRequest) updates) =>
-      super.copyWith((message) => updates(message as UrlTestRequest))
-          as UrlTestRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  UrlTestRequest copyWith(void Function(UrlTestRequest) updates) => super.copyWith((message) => updates(message as UrlTestRequest)) as UrlTestRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static UrlTestRequest create() => UrlTestRequest._();
@@ -2234,10 +1874,7 @@ class UrlTestRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get groupTag => $_getSZ(0);
   @$pb.TagNumber(1)
-  set groupTag($core.String v) {
-    $_setString(0, v);
-  }
-
+  set groupTag($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasGroupTag() => $_has(0);
   @$pb.TagNumber(1)
@@ -2245,14 +1882,12 @@ class UrlTestRequest extends $pb.GeneratedMessage {
 }
 
 class GenerateWarpConfigRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GenerateWarpConfigRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GenerateWarpConfigRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'licenseKey')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accessToken')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   GenerateWarpConfigRequest._() : super();
   factory GenerateWarpConfigRequest({
@@ -2272,38 +1907,31 @@ class GenerateWarpConfigRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory GenerateWarpConfigRequest.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory GenerateWarpConfigRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory GenerateWarpConfigRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GenerateWarpConfigRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   GenerateWarpConfigRequest clone() => GenerateWarpConfigRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  GenerateWarpConfigRequest copyWith(void Function(GenerateWarpConfigRequest) updates) =>
-      super.copyWith((message) => updates(message as GenerateWarpConfigRequest))
-          as GenerateWarpConfigRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GenerateWarpConfigRequest copyWith(void Function(GenerateWarpConfigRequest) updates) => super.copyWith((message) => updates(message as GenerateWarpConfigRequest)) as GenerateWarpConfigRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static GenerateWarpConfigRequest create() => GenerateWarpConfigRequest._();
   GenerateWarpConfigRequest createEmptyInstance() => create();
   static $pb.PbList<GenerateWarpConfigRequest> createRepeated() => $pb.PbList<GenerateWarpConfigRequest>();
   @$core.pragma('dart2js:noInline')
-  static GenerateWarpConfigRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GenerateWarpConfigRequest>(create);
+  static GenerateWarpConfigRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GenerateWarpConfigRequest>(create);
   static GenerateWarpConfigRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get licenseKey => $_getSZ(0);
   @$pb.TagNumber(1)
-  set licenseKey($core.String v) {
-    $_setString(0, v);
-  }
-
+  set licenseKey($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasLicenseKey() => $_has(0);
   @$pb.TagNumber(1)
@@ -2312,10 +1940,7 @@ class GenerateWarpConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get accountId => $_getSZ(1);
   @$pb.TagNumber(2)
-  set accountId($core.String v) {
-    $_setString(1, v);
-  }
-
+  set accountId($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasAccountId() => $_has(1);
   @$pb.TagNumber(2)
@@ -2324,10 +1949,7 @@ class GenerateWarpConfigRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get accessToken => $_getSZ(2);
   @$pb.TagNumber(3)
-  set accessToken($core.String v) {
-    $_setString(2, v);
-  }
-
+  set accessToken($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasAccessToken() => $_has(2);
   @$pb.TagNumber(3)
@@ -2335,12 +1957,10 @@ class GenerateWarpConfigRequest extends $pb.GeneratedMessage {
 }
 
 class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SetSystemProxyEnabledRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'SetSystemProxyEnabledRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isEnabled')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   SetSystemProxyEnabledRequest._() : super();
   factory SetSystemProxyEnabledRequest({
@@ -2352,39 +1972,31 @@ class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory SetSystemProxyEnabledRequest.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory SetSystemProxyEnabledRequest.fromJson($core.String i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory SetSystemProxyEnabledRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SetSystemProxyEnabledRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   SetSystemProxyEnabledRequest clone() => SetSystemProxyEnabledRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  SetSystemProxyEnabledRequest copyWith(void Function(SetSystemProxyEnabledRequest) updates) =>
-      super.copyWith((message) => updates(message as SetSystemProxyEnabledRequest))
-          as SetSystemProxyEnabledRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SetSystemProxyEnabledRequest copyWith(void Function(SetSystemProxyEnabledRequest) updates) => super.copyWith((message) => updates(message as SetSystemProxyEnabledRequest)) as SetSystemProxyEnabledRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static SetSystemProxyEnabledRequest create() => SetSystemProxyEnabledRequest._();
   SetSystemProxyEnabledRequest createEmptyInstance() => create();
   static $pb.PbList<SetSystemProxyEnabledRequest> createRepeated() => $pb.PbList<SetSystemProxyEnabledRequest>();
   @$core.pragma('dart2js:noInline')
-  static SetSystemProxyEnabledRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SetSystemProxyEnabledRequest>(create);
+  static SetSystemProxyEnabledRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SetSystemProxyEnabledRequest>(create);
   static SetSystemProxyEnabledRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.bool get isEnabled => $_getBF(0);
   @$pb.TagNumber(1)
-  set isEnabled($core.bool v) {
-    $_setBool(0, v);
-  }
-
+  set isEnabled($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasIsEnabled() => $_has(0);
   @$pb.TagNumber(1)
@@ -2392,18 +2004,13 @@ class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
 }
 
 class LogMessage extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LogMessage',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
-    ..e<LogLevel>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE,
-        defaultOrMaker: LogLevel.DEBUG, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
-    ..e<LogType>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE,
-        defaultOrMaker: LogType.CORE, valueOf: LogType.valueOf, enumValues: LogType.values)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LogMessage', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..e<LogLevel>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.DEBUG, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
+    ..e<LogType>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: LogType.CORE, valueOf: LogType.valueOf, enumValues: LogType.values)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
-    ..aOM<$7.Timestamp>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'time',
-        subBuilder: $7.Timestamp.create)
-    ..hasRequiredFields = false;
+    ..aOM<$7.Timestamp>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'time', subBuilder: $7.Timestamp.create)
+    ..hasRequiredFields = false
+  ;
 
   LogMessage._() : super();
   factory LogMessage({
@@ -2427,19 +2034,18 @@ class LogMessage extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory LogMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory LogMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory LogMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory LogMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   LogMessage clone() => LogMessage()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  LogMessage copyWith(void Function(LogMessage) updates) =>
-      super.copyWith((message) => updates(message as LogMessage)) as LogMessage; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  LogMessage copyWith(void Function(LogMessage) updates) => super.copyWith((message) => updates(message as LogMessage)) as LogMessage; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static LogMessage create() => LogMessage._();
@@ -2452,10 +2058,7 @@ class LogMessage extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   LogLevel get level => $_getN(0);
   @$pb.TagNumber(1)
-  set level(LogLevel v) {
-    setField(1, v);
-  }
-
+  set level(LogLevel v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasLevel() => $_has(0);
   @$pb.TagNumber(1)
@@ -2464,10 +2067,7 @@ class LogMessage extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   LogType get type => $_getN(1);
   @$pb.TagNumber(2)
-  set type(LogType v) {
-    setField(2, v);
-  }
-
+  set type(LogType v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasType() => $_has(1);
   @$pb.TagNumber(2)
@@ -2476,10 +2076,7 @@ class LogMessage extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get message => $_getSZ(2);
   @$pb.TagNumber(3)
-  set message($core.String v) {
-    $_setString(2, v);
-  }
-
+  set message($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasMessage() => $_has(2);
   @$pb.TagNumber(3)
@@ -2488,10 +2085,7 @@ class LogMessage extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $7.Timestamp get time => $_getN(3);
   @$pb.TagNumber(4)
-  set time($7.Timestamp v) {
-    setField(4, v);
-  }
-
+  set time($7.Timestamp v) { setField(4, v); }
   @$pb.TagNumber(4)
   $core.bool hasTime() => $_has(3);
   @$pb.TagNumber(4)
@@ -2501,27 +2095,24 @@ class LogMessage extends $pb.GeneratedMessage {
 }
 
 class StopRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'StopRequest',
-      package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'),
-      createEmptyInstance: create)
-    ..hasRequiredFields = false;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'StopRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
 
   StopRequest._() : super();
   factory StopRequest() => create();
-  factory StopRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory StopRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory StopRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory StopRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   StopRequest clone() => StopRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  StopRequest copyWith(void Function(StopRequest) updates) =>
-      super.copyWith((message) => updates(message as StopRequest)) as StopRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  StopRequest copyWith(void Function(StopRequest) updates) => super.copyWith((message) => updates(message as StopRequest)) as StopRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static StopRequest create() => StopRequest._();
@@ -2531,3 +2122,4 @@ class StopRequest extends $pb.GeneratedMessage {
   static StopRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<StopRequest>(create);
   static StopRequest? _defaultInstance;
 }
+
