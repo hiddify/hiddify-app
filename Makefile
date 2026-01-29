@@ -186,6 +186,7 @@ linux-install-deps:
 		echo 'export PATH="$$HOME/.pub-cache/bin:$$PATH"' >> ~/.bashrc; \
 	fi; \
 	dart pub global activate fastforge; \
+	dart pub global activate protoc_plugin; \
 	echo ""; \
 	echo "============================================================"; \
 	echo "NOTE: After first setup, use the following command to update the PATH"; \
