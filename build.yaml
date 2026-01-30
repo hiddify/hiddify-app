@@ -1,4 +1,4 @@
-targets:
+   targets:
   $default:
     builders:
       json_serializable:
@@ -35,6 +35,14 @@ targets:
           input_file_pattern: .i18n.json
           output_directory: lib/gen
           output_file_name: translations.g.dart
+          output_format: single_file
+          flutter_integration: true
+          key_case: camel
+          param_case: camel
+
+      flutter_gen_runner:
+        enabled: true
+       output_file_name: translations.g.dart
           output_format: single_file
           flutter_integration: true
           key_case: camel
