@@ -3,15 +3,16 @@
 
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
-
 #include <memory>
-
+#include <string>
 #include "win32_window.h"
 
 class FlutterWindow : public Win32Window {
  public:
   explicit FlutterWindow(const flutter::DartProject& project);
   virtual ~FlutterWindow();
+
+  bool SendAppLinkToInstance(const std::wstring& title);
 
  protected:
   bool OnCreate() override;
@@ -21,8 +22,7 @@ class FlutterWindow : public Win32Window {
 
  private:
   flutter::DartProject project_;
-
   std::unique_ptr<flutter::FlutterViewController> flutter_controller_;
 };
 
-#endif  // RUNNER_FLUTTER_WINDOW_H_
+#endif
