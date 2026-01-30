@@ -1,77 +1,39 @@
 #include "utils.h"
-
 #include <flutter_windows.h>
-#include <io.h>
-#include <stdio.h>
 #include <windows.h>
-
+#include <shellapi.h>
 #include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
 
 void CreateAndAttachConsole() {
-  if (::AllocConsole()) {
-    FILE *unused;
-    if (freopen_s(&unused, "CONOUT$", "w", stdout) == 0) {
-      _dup2(_fileno(stdout), 1);
+    if (!::AttachConsole(ATTACH_PARENT_PROCESS)) {
+        if (!::AllocConsole()) return;
     }
-    if (freopen_s(&unused, "CONOUT$", "w", stderr) == 0) {
-      _dup2(_fileno(stderr), 2);
-    }
-    std::ios::sync_with_stdio();
+    FILE* unused;
+    freopen_s(&unused, "CONOUT$", "w", stdout);
+    freopen_s(&unused, "CONOUT$", "w", stderr);
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
     FlutterDesktopResyncOutputStreams();
-  }
-}
-
-std::vector<std::string> GetCommandLineArguments() {
-  int argc;
-  wchar_t** argv = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
-  if (argv == nullptr) {
-    return std::vector<std::string>();
-  }
-
-  std::vector<std::string> command_line_arguments;
-
-  for (int i = 1; i < argc; i++) {
-    command_line_arguments.push_back(Utf8FromUtf16(argv[i]));
-  }
-
-  ::LocalFree(argv);
-
-  return command_line_arguments;
 }
 
 std::string Utf8FromUtf16(const wchar_t* utf16_string) {
-  if (utf16_string == nullptr) {
-    return std::string();
-  }
-  int target_length = ::WideCharToMultiByte(
-      CP_UTF8, WC_ERR_INVALID_CHARS, utf16_string,
-      -1, nullptr, 0, nullptr, nullptr)
-    -1; // remove the trailing null character
-  int input_length = (int)wcslen(utf16_string);
-  std::string utf8_string;
-  if (target_length <= 0 || target_length > utf8_string.max_size()) {
-    return utf8_string;
-  }
-  utf8_string.resize(target_length);
-  int converted_length = ::WideCharToMultiByte(
-      CP_UTF8, WC_ERR_INVALID_CHARS, utf16_string,
-      input_length, utf8_string.data(), target_length, nullptr, nullptr);
-  if (converted_length == 0) {
-    return std::string();
-  }
-  return utf8_string;
+    if (!utf16_string || *utf16_string == L'\0') return {};
+    int size_needed = ::WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, utf16_string, -1, nullptr, 0, nullptr, nullptr);
+    if (size_needed <= 1) return {};
+    std::string result(size_needed - 1, 0);
+    int converted = ::WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, utf16_string, -1, result.data(), size_needed, nullptr, nullptr);
+    if (converted == 0) return {};
+    return result;
 }
 
-ScopedHandle::~ScopedHandle() {
-  if (handle_ && handle_ != INVALID_HANDLE_VALUE) {
-    CloseHandle(handle_);
-  }
-}
-
-ScopedMutex::ScopedMutex(const std::wstring& name)
-    : mutex_(CreateMutex(NULL, TRUE, name.c_str())) {
-  last_error_ = GetLastError();
-  owns_mutex_ = mutex_.is_valid() && last_error_ != ERROR_ALREADY_EXISTS;
+ScopedMutex::ScopedMutex(const std::wstring& name) {
+    std::wstring global_name = L"Global\\" + name;
+    mutex_handle_ = ::CreateMutexW(nullptr, TRUE, global_name.c_str());
+    last_error_ = ::GetLastError();
+    owns_mutex_ = (mutex_handle_ != nullptr && last_error_ != ERROR_ALREADY_EXISTS);
 }
 
 ScopedMutex::~ScopedMutex() {
@@ -79,8 +41,10 @@ ScopedMutex::~ScopedMutex() {
 }
 
 void ScopedMutex::release() {
-  if (owns_mutex_ && mutex_.is_valid()) {
-    ReleaseMutex(mutex_.get());
-    owns_mutex_ = false;
-  }
+    if (mutex_handle_) {
+        if (owns_mutex_) ::ReleaseMutex(mutex_handle_);
+        ::CloseHandle(mutex_handle_);
+        mutex_handle_ = nullptr;
+        owns_mutex_ = false;
+    }
 }
