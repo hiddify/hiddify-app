@@ -5,29 +5,35 @@ version: 3.0.0-preview.1
 homepage: https://github.com/hiddify/hiddify-app
 repository: https://github.com/hiddify/hiddify-app
 issue_tracker: https://github.com/hiddify/hiddify-app/issues
-environment:
 
+environment:
   sdk: ">=3.8.0 <4.0.0"
   flutter: ">=3.24.0 <4.0.0"
+
 dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
+  
   flutter_riverpod: ^3.0.3
   hooks_riverpod: ^3.0.3
   riverpod: ^3.0.3
   riverpod_annotation: ^3.0.3
   flutter_hooks: ^0.21.3+1
+  
   go_router: ^17.0.0 
   dio: ^5.7.0
   dio_smart_retry: ^7.0.1
+  
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
   json_path: ^0.9.0
+  
   slang: ^4.4.0
   slang_flutter: ^4.4.0
   intl: ^0.20.0
+  
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
   fluentui_system_icons: ^1.1.225
@@ -38,23 +44,28 @@ dependencies:
   flutter_animate: ^4.5.0
   wolt_modal_sheet: ^0.11.0
   toastification: ^3.0.3
+  
   path_provider: ^2.1.4
   shared_preferences: ^2.3.2
   flutter_secure_storage: ^10.0.0
+  
   drift: ^2.30.0
   drift_flutter: ^0.2.8
   sqlite3: ^2.9.4
+  
   url_launcher: ^6.3.0
   package_info_plus: ^9.0.0
   permission_handler: ^12.0.1
   share_plus: ^12.0.1
   in_app_review: ^2.0.9
+  
   flutter_background_service: ^5.0.0
   window_manager: ^0.5.1
   tray_manager: ^0.5.2
   launch_at_startup: ^0.5.1
   win32: ^5.5.4
   flutter_displaymode: ^0.7.0
+  
   dartx: ^1.2.0
   fpdart: ^1.1.0
   rxdart: ^0.28.0
@@ -62,11 +73,13 @@ dependencies:
   path: ^1.9.0
   version: ^3.0.2
   archive: ^4.0.7
+  
   grpc: ^5.1.0
   protobuf: ^6.0.0 
   logging: ^1.3.0
   loggy: ^2.0.3
   flutter_loggy: ^2.0.3
+  
   cryptography: ^2.9.0
   crypto: ^3.0.3
   sentry_flutter: ^9.8.0
@@ -76,9 +89,10 @@ dependencies:
   ffi: ^2.1.2
   mobile_scanner: ^7.1.3 
   image_picker: ^1.1.2
-  meta: any
-  http: any
-  yaml: any
+  meta: ^1.16.0
+  http: ^1.3.0
+  yaml: ^3.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -95,6 +109,7 @@ dev_dependencies:
   custom_lint: ^0.8.1
   riverpod_lint: ^3.0.3
   sentry_dart_plugin: ^3.2.0
+
 flutter:
   uses-material-design: true
   assets:
@@ -116,10 +131,12 @@ flutter:
     - family: Emoji
       fonts:
         - asset: assets/fonts/Emoji.ttf
+
 flutter_gen:
   output: lib/gen/
   integrations:
     flutter_svg: true
+
 flutter_native_splash:
   color: "#ffffff"
   image: assets/images/source/ic_launcher_splash.png
@@ -127,6 +144,7 @@ flutter_native_splash:
   android_12:
     color: "#ffffff"
     image: assets/images/source/ic_launcher_foreground.png
+
 ffigen:
   name: "LibCore"
   description: "Bindings to LibCore"
@@ -136,6 +154,7 @@ ffigen:
       - "windows/runner/libcore.h"
   llvm-path:
     - "C:/Program Files/LLVM/bin"
+
 sentry:
   upload_debug_symbols: true
   upload_source_maps: true
