@@ -46,9 +46,7 @@ object DefaultNetworkMonitor {
         checkDefaultInterfaceUpdate(defaultNetwork)
     }
 
-    private fun checkDefaultInterfaceUpdate(
-        newNetwork: Network?
-    ) {
+    private fun checkDefaultInterfaceUpdate(newNetwork: Network?) {
         val listener = listener ?: return
         if (newNetwork != null) {
             val interfaceName =
@@ -61,23 +59,10 @@ object DefaultNetworkMonitor {
                     Thread.sleep(100)
                     continue
                 }
-                if (Bugs.fixAndroidStack) {
-                    GlobalScope.launch(Dispatchers.IO) {
-                        listener.updateDefaultInterface(interfaceName, interfaceIndex)
-                    }
-                } else {
-                    listener.updateDefaultInterface(interfaceName, interfaceIndex)
-                }
+                listener.updateDefaultInterface(interfaceName, interfaceIndex, false, false)
             }
         } else {
-            if (Bugs.fixAndroidStack) {
-                GlobalScope.launch(Dispatchers.IO) {
-                    listener.updateDefaultInterface("", -1)
-                }
-            } else {
-                listener.updateDefaultInterface("", -1)
-            }
+            listener.updateDefaultInterface("", -1, false, false)
         }
     }
-
 }

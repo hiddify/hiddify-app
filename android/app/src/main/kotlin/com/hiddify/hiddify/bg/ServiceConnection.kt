@@ -18,12 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-class ServiceConnection(
-    private val context: Context,
-    callback: Callback,
-    private val register: Boolean = true,
-) : ServiceConnection {
 
+class ServiceConnection(private val context: Context, callback: Callback, private val register: Boolean = true) : ServiceConnection {
     companion object {
         private const val TAG = "ServiceConnection"
     }
@@ -34,12 +30,14 @@ class ServiceConnection(
     val status get() = service?.status?.let { Status.values()[it] } ?: Status.Stopped
 
     fun connect() {
-        val intent = runBlocking {
-            withContext(Dispatchers.IO) {
-                Intent(context, Settings.serviceClass()).setAction(Action.SERVICE)
+        val intent =
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    Intent(context, Settings.serviceClass()).setAction(Action.SERVICE)
+                }
             }
-        }
         context.bindService(intent, this, AppCompatActivity.BIND_AUTO_CREATE)
+        Log.d(TAG, "request connect")
     }
 
     fun disconnect() {
@@ -47,6 +45,7 @@ class ServiceConnection(
             context.unbindService(this)
         } catch (_: IllegalArgumentException) {
         }
+        Log.d(TAG, "request disconnect")
     }
 
     fun reconnect() {
@@ -54,12 +53,14 @@ class ServiceConnection(
             context.unbindService(this)
         } catch (_: IllegalArgumentException) {
         }
-        val intent = runBlocking {
-            withContext(Dispatchers.IO) {
-                Intent(context, Settings.serviceClass()).setAction(Action.SERVICE)
+        val intent =
+            runBlocking {
+                withContext(Dispatchers.IO) {
+                    Intent(context, Settings.serviceClass()).setAction(Action.SERVICE)
+                }
             }
-        }
         context.bindService(intent, this, AppCompatActivity.BIND_AUTO_CREATE)
+        Log.d(TAG, "request reconnect")
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
@@ -71,6 +72,7 @@ class ServiceConnection(
         } catch (e: RemoteException) {
             Log.e(TAG, "initialize service connection", e)
         }
+        Log.d(TAG, "service connected")
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -79,17 +81,19 @@ class ServiceConnection(
         } catch (e: RemoteException) {
             Log.e(TAG, "cleanup service connection", e)
         }
+        Log.d(TAG, "service disconnected")
     }
 
     override fun onBindingDied(name: ComponentName?) {
         reconnect()
+        Log.d(TAG, "service dead")
     }
 
     interface Callback {
         fun onServiceStatusChanged(status: Status)
-        fun onServiceAlert(type: Alert, message: String?) {}
-        fun onServiceWriteLog(message: String?) {}
-        fun onServiceResetLogs(messages: MutableList<String>) {}
+
+        fun onServiceAlert(type: Alert, message: String?) {
+        }
     }
 
     class ServiceCallback(private val callback: Callback) : IServiceCallback.Stub() {
@@ -101,9 +105,12 @@ class ServiceConnection(
             callback.onServiceAlert(Alert.values()[type], message)
         }
 
-        override fun onServiceWriteLog(message: String?) = callback.onServiceWriteLog(message)
+        override fun onServiceWriteLog(message: String?) {
+            //TODO("Not yet implemented")
+        }
 
-        override fun onServiceResetLogs(messages: MutableList<String>) =
-            callback.onServiceResetLogs(messages)
+        override fun onServiceResetLogs(messages: List<String?>?) {
+            //TODO("Not yet implemented")
+        }
     }
 }

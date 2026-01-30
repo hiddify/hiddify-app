@@ -70,6 +70,7 @@ message SetupRequest {
     string secret = 6;
     bool debug = 7;
     SetupMode mode = 8;
+    bool fix_android_stack = 9;
 }
 
 message SystemInfo {

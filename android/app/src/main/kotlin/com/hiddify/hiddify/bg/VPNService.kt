@@ -26,7 +26,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     private val service = BoxService(this, this)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) =
-        service.onStartCommand(intent, flags, startId)
+        service.onStartCommand()
 
     override fun onBind(intent: Intent): IBinder {
         val binder = super.onBind(intent)
@@ -199,7 +199,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
         return pfd.fd
     }
 
-    override fun writeLog(message: String) = service.writeLog(message)
+//    override fun writeLog(message: String) = service.writeLog(message)
 
     override fun sendNotification(notification: Notification) {
 //        service.sendNotification(notification)

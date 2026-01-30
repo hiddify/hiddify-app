@@ -1,5 +1,7 @@
 package com.hiddify.hiddify.bg
 
+import android.app.KeyguardManager
+import android.content.Context
 import android.content.Intent
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
@@ -22,20 +24,15 @@ class TileService : TileService(), ServiceConnection.Callback {
     private val connection = ServiceConnection(this, this)
 
     override fun onServiceStatusChanged(status: Status) {
-        when (status) {
-            Status.Started -> qsTile?.apply {
-                state = Tile.STATE_ACTIVE
-                updateTile()
-            }
-
-            Status.Stopped -> qsTile?.apply {
-                state = Tile.STATE_INACTIVE
-                updateTile()
-            }
-
-            else -> {}
+        qsTile?.apply {
+            state =
+                when (status) {
+                    Status.Started -> Tile.STATE_ACTIVE
+                    Status.Stopped -> Tile.STATE_INACTIVE
+                    else -> Tile.STATE_UNAVAILABLE
+                }
+            updateTile()
         }
-
     }
 
     override fun onStartListening() {
@@ -47,36 +44,36 @@ class TileService : TileService(), ServiceConnection.Callback {
         connection.disconnect()
         super.onStopListening()
     }
-
-    override fun onClick() {
+    private fun toggleService() {
         when (connection.status) {
             Status.Stopped -> {
-//                val mainActivity = MainActivity.instance
                 Settings.startCoreAfterStartingService = true
-
-
-                val intent = Intent(Application.application, Settings.serviceClass())
-
-                ContextCompat.startForegroundService(Application.application, intent)
-
-
+                BoxService.start()
                 qsTile?.apply {
                     state = Tile.STATE_ACTIVE
                     updateTile()
                 }
             }
-
-            else -> {
+            Status.Started -> {
                 BoxService.stop()
                 qsTile?.apply {
                     state = Tile.STATE_INACTIVE
                     updateTile()
                 }
             }
-//
-//            else -> {}
+            else -> {}
         }
+    }
 
+    override fun onClick() {
+        val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        if (keyguardManager.isKeyguardLocked) {
+            unlockAndRun {
+                toggleService()
+            }
+        } else {
+            toggleService()
+        }
     }
 
 }

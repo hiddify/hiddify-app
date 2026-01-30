@@ -48,9 +48,9 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         flutterEngine.plugins.add(PlatformSettingsHandler())
         flutterEngine.plugins.add(EventHandler())
         flutterEngine.plugins.add(LogHandler())
-        flutterEngine.plugins.add(GroupsChannel(lifecycleScope))
-        flutterEngine.plugins.add(ActiveGroupsChannel(lifecycleScope))
-        flutterEngine.plugins.add(StatsChannel(lifecycleScope))
+//        flutterEngine.plugins.add(GroupsChannel(lifecycleScope))
+//        flutterEngine.plugins.add(ActiveGroupsChannel(lifecycleScope))
+//        flutterEngine.plugins.add(StatsChannel(lifecycleScope))
     }
 
     fun reconnect() {
@@ -103,19 +103,8 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         serviceAlerts.postValue(ServiceEvent(Status.Stopped, type, message))
     }
 
-    override fun onServiceWriteLog(message: String?) {
-        if (logList.size > 300) {
-            logList.removeFirst()
-        }
-        logList.addLast(message?:"")
-        logCallback?.invoke(false)
-    }
 
-    override fun onServiceResetLogs(messages: MutableList<String>) {
-        logList.clear()
-        logList.addAll(messages)
-        logCallback?.invoke(true)
-    }
+
 
     override fun onDestroy() {
         connection.disconnect()
