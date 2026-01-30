@@ -11,7 +11,7 @@ targets:
           include_if_null: false
           ignore_unannotated: false
           checked: false
-          
+
       freezed:
         enabled: true
         options:
@@ -39,6 +39,6 @@ targets:
           flutter_integration: true
           key_case: camel
           param_case: camel
-          
+
       flutter_gen_runner:
         enabled: true
