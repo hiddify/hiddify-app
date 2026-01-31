@@ -26,20 +26,22 @@ CORE_NAME := hiddify-core
 ifeq ($(CHANNEL),prod)
 	CORE_URL := https://github.com/hiddify/hiddify-core/releases/download/v$(core.version)
 	TARGET := lib/main_prod.dart
-	BUILD_MODE := release
 else
 	CORE_URL := https://github.com/hiddify/hiddify-core/releases/download/draft
 	TARGET := lib/main.dart
-	BUILD_MODE := debug
 endif
 
 DART_DEFINES := --dart-define sentry_dsn=$(SENTRY_DSN) --dart-define-from-file=config.json
 FLUTTER_OPTIMIZE := --obfuscate --split-debug-info=build/debug-info --tree-shake-icons
 GO_LDFLAGS := -s -w -X 'main.version=$(core.version)' -X 'main.buildTime=$(shell date +%FT%T%z)'
 
-.PHONY: all get gen translate prepare windows-libs android-libs protos clean
+.PHONY: all check-env get gen translate prepare windows-libs android-libs protos clean
 
-all: prepare
+all: check-env prepare
+
+check-env:
+	@flutter --version > $(if $(filter Windows_NT,$(OS)),$$null,/dev/null) 2>&1 || (echo "Error: Flutter not found"; exit 1)
+	@go version > $(if $(filter Windows_NT,$(OS)),$$null,/dev/null) 2>&1 || (echo "Error: Go not found"; exit 1)
 
 get:
 	flutter pub get
@@ -50,8 +52,7 @@ gen:
 translate:
 	dart run slang
 
-prepare: get gen translate
-	@echo "Preparation complete for $(OS)"
+prepare: check-env get gen translate
 
 windows-prepare: prepare windows-libs
 
@@ -64,11 +65,8 @@ protos:
 android-release:
 	flutter build apk --target $(TARGET) $(DART_DEFINES) $(FLUTTER_OPTIMIZE) --target-platform android-arm,android-arm64,android-x64 --split-per-abi
 
-android-bundle:
-	flutter build appbundle --target $(TARGET) $(DART_DEFINES) $(FLUTTER_OPTIMIZE)
-
 windows-release:
-	dart pub global run fastforge:fastforge package --platform windows --targets exe,msix --build-target $(TARGET) --build-dart-define sentry_dsn=$(SENTRY_DSN)
+	dart pub global run fastforge:fastforge package --platform windows --targets exe,msix --build-target $(TARGET) $(DART_DEFINES)
 
 android-libs:
 	@$(MKDIR) $(ANDROID_OUT)
@@ -77,7 +75,7 @@ android-libs:
 windows-libs:
 	@$(MKDIR) $(BINDIR)
 	$(MAKE) build-windows-libs
-	@powershell -NoProfile -Command "if (Test-Path '$(BINDIR)$(SEP)libcore.dll') { Copy-Item -Force '$(BINDIR)$(SEP)libcore.dll' 'windows\runner\libcore.dll' }"
+	@powershell -NoProfile -Command "if (Test-Path '$(BINDIR)$(SEP)libcore.dll') { Copy-Item -Force '$(BINDIR)$(SEP)libcore.dll' 'windows\runner\libcore.dll' } else { Write-Error 'DLL not found' }"
 
 build-windows-libs:
 	cd libcore && go build -buildmode=c-shared -trimpath -ldflags="$(GO_LDFLAGS)" -o bin/libcore.dll ./mobile
