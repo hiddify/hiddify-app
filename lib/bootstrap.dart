@@ -38,6 +38,132 @@ Future<void> lazyBootstrap(
     await windowManager.ensureInitialized();
     const windowOptions = WindowOptions(
       size: Size(900, 700),
+      minimumSize: Size(450, 650),
+      center: true,
+      skipTaskbar: false,
+      title: "Hiddify",
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+
+    await windowManager.waitUntilReadyToShow(windowOptions, () async {
+      final prefs = container.read(sharedPreferencesProvider).requireValue;
+      final silentStart = prefs.getBool('silent_start') ?? false;
+      if (!silentStart) {
+        await windowManager.show();
+        await windowManager.focus();
+      } else {
+        await windowManager.hide();
+      }
+    });
+  }
+
+  await _init(
+    'directories',
+    () => container.read(appDirectoriesProvider.future),
+  );
+
+  if (Platform.isAndroid || Platform.isIOS) {
+    await _safeInit('core setup', () async {
+      await const MethodChannel('com.hiddify.app/method').invokeMethod('setup');
+    }, timeout: 5000);
+  }
+
+  final logDir = await container.read(logServiceProvider).getLogDirectory();
+  LoggerController.init(File('$logDir/app.log').path);
+
+  final appInfo = await _init(
+    'app info',
+    () => container.read(appInfoProvider.future),
+  );
+
+  await _init('locale preload', () async {
+    final locale = container.read(localePreferencesProvider);
+    await locale.build();
+  });
+
+  await _init(
+    'logger controller',
+    () => LoggerController.postInit(debugMode: kDebugMode),
+  );
+
+  Logger.bootstrap.info(appInfo.format());
+
+  if (Platform.isAndroid) {
+    await _safeInit('android display mode', () async {
+      await FlutterDisplayMode.setHighRefreshRate();
+    });
+  }
+
+  await _safeInit('geo assets', () async {
+    await container.read(geoAssetServiceProvider).ensureAssetsExist();
+  });
+
+  await _safeInit('resource manager', () async {
+    await container.read(resourceManagerProvider).initialize();
+  });
+
+  await _safeInit('process manager', () async {
+    await container.read(processManagerProvider).initialize();
+  });
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await _safeInit('tray service', () async {
+      await container.read(trayServiceProvider.future);
+    });
+  }
+
+  Logger.bootstrap.info('bootstrap took [${stopWatch.elapsedMilliseconds}ms]');
+  stopWatch.stop();
+
+  runApp(
+    ProviderScope(
+      parent: container,
+      child: const App(),
+    ),
+  );
+
+  FlutterNativeSplash.remove();
+}
+
+Future<T> _init<T>(
+  String name,
+  Future<T> Function() initializer, {
+  int? timeout,
+}) async {
+  final stopWatch = Stopwatch()..start();
+  try {
+    final Future<T> initFuture = initializer();
+    final result = timeout != null 
+        ? await initFuture.timeout(Duration(milliseconds: timeout)) 
+        : await initFuture;
+    return result;
+  } catch (e, stackTrace) {
+    Logger.bootstrap.error('[$name] init error', e, stackTrace);
+    rethrow;
+  } finally {
+    stopWatch.stop();
+  }
+}
+
+Future<T?> _safeInit<T>(
+  String name,
+  Future<T> Function() initializer, {
+  int? timeout,
+}) async {
+  try {
+    final Future<T> initFuture = initializer();
+    return timeout != null 
+        ? await initFuture.timeout(Duration(milliseconds: timeout)) 
+        : await initFuture;
+  } catch (e, stackTrace) {
+    Logger.bootstrap.warning('[$name] skipped', e, stackTrace);
+    return null;
+  }
+}
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await windowManager.ensureInitialized();
+    const windowOptions = WindowOptions(
+      size: Size(900, 700),
       minimumSize: Size(400, 600),
       center: true,
       skipTaskbar: false,
