@@ -1,39 +1,143 @@
 plugins {
-    id "com.android.application"
-    id "org.jetbrains.kotlin.android"
-    id "dev.flutter.flutter-gradle-plugin"
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.flutter.loader)
 }
 
-def targetJavaVersion = 21
-if (project.hasProperty('targetJavaVersion')) {
-    targetJavaVersion = project.property('targetJavaVersion').toString().toInteger()
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-kotlin {
-    jvmToolchain(targetJavaVersion)
-}
-
+def targetJavaVersion = 24
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
+    localPropertiesFile.withReader('UTF-8') { reader -> localProperties.load(reader) }
 }
-
-boolean hasKeyStore = false
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-    hasKeyStore = true
+def hasKeyStore = keystorePropertiesFile.exists()
+if (hasKeyStore) {
+    keystorePropertiesFile.withInputStream { is -> keystoreProperties.load(is) }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
+def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
+
+android {
+    namespace "com.hiddify.hiddify"
+    compileSdk 36
+    ndkVersion "29.0.14206865"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.toVersion(targetJavaVersion)
+        targetCompatibility JavaVersion.toVersion(targetJavaVersion)
+        isCoreLibraryDesugaringEnabled true
+    }
+
+    kotlinOptions {
+        jvmTarget = targetJavaVersion.toString()
+        freeCompilerArgs += [
+            "-Xbackend-threads=16",
+            "-Xuse-k2",
+            "-Xcontext-receivers",
+            "-Xjvm-default=all",
+            "-Xemit-jvm-type-annotations",
+            "-Xsam-conversions=class",
+            "-Xlambdas=indy"
+        ]
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "app.hiddify.com"
+        minSdk 28
+        targetSdk 36
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+
+        multiDexEnabled true
+        resourceConfigurations += ['en', 'fa', 'zh', 'ru']
+        vectorDrawables.useSupportLibrary = true
+
+        buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
+    }
+
+    if (hasKeyStore) {
+        signingConfigs {
+            release {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                v1SigningEnabled true
+                v2SigningEnabled true
+                v3SigningEnabled true
+                v4SigningEnabled true
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig hasKeyStore ? signingConfigs.release : signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            ndk {
+                abiFilters "arm64-v8a", "x86_64"
+                debugSymbolLevel 'FULL'
+            }
+            crunchPngs true
+        }
+
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+            ndk { abiFilters "arm64-v8a", "x86_64" }
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+        buildConfig true
+        aidl true
+    }
+
+    packaging {
+        resources {
+            excludes += [
+                '/META-INF/{AL2.0,LGPL2.1}',
+                '/META-INF/*.kotlin_module',
+                '**/kotlin-tooling-metadata.json'
+            ]
+        }
+    }
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.gson)
+    
+    coreLibraryDesugaring(libs.android.desugarJdkLibs)
+}
+
+def getGitHash() {
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
+    } catch (Exception e) {
+        return "unknown"
+    }
+}
 } else {
     println "+++"
     println "No keystore defined. The app will not be signed."
