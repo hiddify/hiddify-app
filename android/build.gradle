@@ -1,12 +1,28 @@
 allprojects {
     layout.buildDirectory = file("${rootProject.layout.buildDirectory.get().asFile}/${project.name}")
+    
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://storage.googleapis.com/download.flutter.io' }
+        maven { url 'https://jitpack.io' }
+    }
 }
 
 subprojects {
     project.evaluationDependsOn(':app')
+    
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "24"
+            freeCompilerArgs += [
+                "-Xbackend-threads=8",
+                "-Xuse-k2"
+            ]
+        }
+    }
 }
 
 tasks.register("clean", Delete) {
     delete rootProject.layout.buildDirectory
 }
-
