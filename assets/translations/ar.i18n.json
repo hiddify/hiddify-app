@@ -1,0 +1,137 @@
+{
+  "@@locale": "ar",
+  "general": {
+    "appTitle": "هيديفاي",
+    "reset": "إعادة تعيين",
+    "toggle": {
+      "enabled": "مُفعّل",
+      "disabled": "معطّل"
+    },
+    "state": {
+      "disable": "تعطيل"
+    },
+    "sort": "ترتيب",
+    "sortBy": "ترتيب حسب",
+    "addToClipboard": "نسخ إلى الحافظة",
+    "notSet": "غير محدد",
+    "agree": "موافق",
+    "decline": "رفض",
+    "unknown": "غير معروف",
+    "hidden": "مخفي",
+    "timeout": "انتهت المهلة",
+    "clipboardExportSuccessMsg": "تم النسخ إلى الحافظة",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "openAppSettings": "فتح الإعدادات",
+    "grantPermission": "منح الإذن"
+  },
+  "intro": {
+    "termsAndPolicyCaution(rich)": "بالمتابعة، أنت توافق على ${tap(@:about.termsAndConditions)}",
+    "start": "ابدأ"
+  },
+  "home": {
+    "pageTitle": "الرئيسية",
+    "emptyProfilesMsg": "أضف ملف تعريف للبدء",
+    "noActiveProfileMsg": "اختر ملف تعريف",
+    "addFirstConfig": "أضف أول إعداد",
+    "noConfigError": "الرجاء إضافة إعداد أولاً",
+    "addConfig": "إضافة إعداد",
+    "configAdded": "تمت إضافة الإعداد!",
+    "configsCopied": "تم نسخ الإعدادات",
+    "configSaved": "تم حفظ الإعداد"
+  },
+  "stats": {
+    "traffic": "حركة البيانات",
+    "trafficLive": "البيانات الحالية",
+    "trafficTotal": "إجمالي البيانات",
+    "uplink": "الرفع",
+    "downlink": "التنزيل",
+    "connection": "الاتصال",
+    "speed": "السرعة",
+    "totalTransferred": "إجمالي المنقول"
+  },
+  "profile": {
+    "overviewPageTitle": "الملفات الشخصية",
+    "detailsPageTitle": "الملف الشخصي",
+    "add": {
+      "buttonText": "ملف جديد",
+      "shortBtnTxt": "ملف جديد",
+      "fromClipboard": "إضافة من الحافظة",
+      "scanQr": "مسح رمز QR",
+      "manually": "إدخال يدوي",
+      "addWarp": "إضافة WARP",
+      "addingWarpMsg": "يرجى الانتظار...",
+      "addingProfileMsg": "جاري الإضافة...",
+      "failureMsg": "فشل إضافة الملف"
+    },
+    "update": {
+      "buttonTxt": "تحديث",
+      "tooltip": "تحديث الملف",
+      "failureMsg": "فشل التحديث"
+    }
+  },
+  "settings": {
+    "pageTitle": "الإعدادات",
+    "general": {
+      "sectionTitle": "عام",
+      "locale": "اللغة",
+      "region": "المنطقة",
+      "themeMode": "المظهر",
+      "themeModes": {
+        "system": "تلقائي",
+        "dark": "داكن",
+        "light": "فاتح",
+        "black": "أسود"
+      }
+    },
+    "advanced": {
+      "sectionTitle": "متقدم",
+      "debugMode": "وضع التصحيح"
+    },
+    "geoAssets": {
+      "pageTitle": "ملفات التوجيه",
+      "update": "تحديث",
+      "download": "تنزيل"
+    }
+  },
+  "about": {
+    "pageTitle": "حول",
+    "version": "الإصدار",
+    "sourceCode": "الكود المصدري",
+    "telegramChannel": "قناة تيليجرام",
+    "checkForUpdate": "التحقق من التحديثات",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsAndConditions": "الشروط والأحكام"
+  },
+  "connection": {
+    "tapToConnect": "اضغط للاتصال",
+    "connecting": "جاري الاتصال...",
+    "disconnecting": "جاري قطع الاتصال...",
+    "connected": "متصل",
+    "reconnect": "إعادة الاتصال"
+  },
+  "config": {
+    "serviceMode": "وضع الخدمة",
+    "serviceModes": {
+      "proxy": "بروكسي فقط",
+      "systemProxy": "بروكسي النظام",
+      "tun": "VPN",
+      "tunService": "خدمة VPN"
+    }
+  },
+  "security": {
+    "pageTitle": "الأمان",
+    "blockMalware": "حظر البرمجيات الخبيثة",
+    "blockPhishing": "حظر التصيد",
+    "blockAds": "حظر الإعلانات",
+    "blockAdultContent": "حظر المحتوى للبالغين",
+    "blockGambling": "حظر القمار",
+    "firewallEnabled": "تمكين جدار الحماية"
+  },
+  "privacy": {
+    "pageTitle": "الخصوصية",
+    "blockWebRtc": "حظر تسريب WebRTC",
+    "blockDnsLeaks": "حظر تسريب DNS",
+    "encryptStorage": "تشفير التخزين"
+  }
+}

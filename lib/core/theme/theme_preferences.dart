@@ -11,7 +11,7 @@ class ThemePreferences extends _$ThemePreferences {
     final persisted = ref
         .watch(sharedPreferencesProvider)
         .requireValue
-        .getString("theme_mode");
+        .getString('theme_mode');
     if (persisted == null) return AppThemeMode.system;
     return AppThemeMode.values.byName(persisted);
   }
@@ -21,6 +21,6 @@ class ThemePreferences extends _$ThemePreferences {
     await ref
         .read(sharedPreferencesProvider)
         .requireValue
-        .setString("theme_mode", value.name);
+        .setString('theme_mode', value.name);
   }
 }

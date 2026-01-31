@@ -1,22 +1,68 @@
 include: package:lint/strict.yaml
 
 analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
   plugins:
     - custom_lint
+
   exclude:
     - "libcore/**"
-    - "**.g.dart"
+    - "windows/flutter/**"
+    - "linux/flutter/**"
+    - "macos/Flutter/**"
+    - "ios/Pods/**"
+    - "android/.gradle/**"
     - "lib/gen/**"
+    - "lib/singbox/generated/**"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.gr.dart"
+    - "**/*.gen.dart"
+    - "build/**"
+    - ".dart_tool/**"
+
   errors:
     invalid_annotation_target: ignore
+    dead_code: error
+    unused_import: error
+    unused_local_variable: warning
+    deprecated_member_use: warning
+    missing_required_param: error
+    missing_return: error
+    must_call_super: error
+    unawaited_futures: error
+    close_sinks: warning
+    cancel_subscriptions: warning
 
 linter:
   rules:
-    sort_pub_dependencies: false
-    sort_unnamed_constructors_first: false
     avoid_classes_with_only_static_members: false
-
+    sort_unnamed_constructors_first: false
+    sort_pub_dependencies: false
+    lines_longer_than_80_chars: false
+    avoid_types_on_closure_parameters: false
+    prefer_single_quotes: true
+    avoid_print: true
+    prefer_const_constructors: true
+    prefer_final_fields: true
+    use_build_context_synchronously: true
+    use_super_parameters: true
+    
 custom_lint:
   rules:
-    # Enable one rule
-    - provider_parameters
+    - provider_dependencies: true
+    - avoid_public_notifier_properties: true
+    - notifier_extends: true
+    - avoid_manual_providers_as_generated_provider_dependency: true
+    - stateless_ref: true
+    - unsupported_provider_value: true
+    - missing_provider_scope: true
+    - functional_ref: true
+    - generator_class_extends: true
+    - avoid_ref_inside_state_dispose: true
+    - notifier_build: true
+    - riverpod_final_provider: true

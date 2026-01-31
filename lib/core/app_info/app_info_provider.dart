@@ -8,8 +8,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'app_info_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-Environment environment(EnvironmentRef ref) =>
-    throw Exception("override environmentProvider");
+Environment environment(Ref ref) =>
+    throw Exception('override environmentProvider');
 
 @Riverpod(keepAlive: true)
 class AppInfo extends _$AppInfo {

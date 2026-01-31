@@ -1,0 +1,25 @@
+[versions]
+agp = "8.13.2"
+kotlin = "2.2.20"
+coreKtx = "1.18.0-alpha01"
+appcompat = "1.8.0-alpha03"
+lifecycle = "2.11.0-beta01"
+gson = "2.13.2"
+flutter = "1.1.0-beta.1"
+desugar = "2.1.4"
+coroutines = "1.10.1"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+flutter-loader = { id = "dev.flutter.flutter-plugin-loader", version.ref = "flutter" }
+flutter-gradle = { id = "dev.flutter.flutter-gradle-plugin", version.ref = "flutter" }

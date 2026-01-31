@@ -1,0 +1,68 @@
+# EditorConfig - https://editorconfig.org
+root = true
+
+# Default settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Dart files
+[*.dart]
+indent_size = 2
+max_line_length = 80
+
+# YAML files
+[*.{yaml,yml}]
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefile
+[Makefile]
+indent_style = tab
+
+# Shell scripts
+[*.sh]
+indent_size = 2
+
+# Batch files (Windows)
+[*.{bat,cmd}]
+end_of_line = crlf
+
+# C/C++ files
+[*.{c,cpp,h,hpp}]
+indent_size = 4
+
+# Swift files
+[*.swift]
+indent_size = 4
+
+# Kotlin files
+[*.kt]
+indent_size = 4
+
+# Java files
+[*.java]
+indent_size = 4
+
+# XML files (Android)
+[*.xml]
+indent_size = 4
+
+# Gradle files
+[*.gradle]
+indent_size = 4
+
+# Properties files
+[*.properties]
+charset = latin1

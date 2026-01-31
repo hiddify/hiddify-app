@@ -12,41 +12,46 @@ class AnimatedText extends Text {
   });
 
   final Duration duration;
+
   final bool size;
+
   final bool slide;
 
   @override
   Widget build(BuildContext context) {
+    final textData = data ?? '';
+
     return AnimatedSwitcher(
       duration: duration,
       transitionBuilder: (child, animation) {
-        child = FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        Widget result = FadeTransition(opacity: animation, child: child);
+
         if (size) {
-          child = SizeTransition(
+          result = SizeTransition(
             axis: Axis.horizontal,
             fixedCrossAxisSizeFactor: 1,
             sizeFactor: Tween<double>(begin: 0.88, end: 1).animate(animation),
-            child: child,
+            child: result,
           );
         }
+
         if (slide) {
-          child = SlideTransition(
+          result = SlideTransition(
             position: Tween<Offset>(
-              begin: const Offset(0.0, -0.2),
+              begin: const Offset(0, -0.2),
               end: Offset.zero,
             ).animate(animation),
-            child: child,
+            child: result,
           );
         }
-        return child;
+
+        return result;
       },
       child: Text(
-        data!,
-        key: ValueKey<String>(data!),
+        textData,
+        key: ValueKey<String>(textData),
         style: style,
+        semanticsLabel: textData,
       ),
     );
   }

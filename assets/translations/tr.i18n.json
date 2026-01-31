@@ -1,0 +1,137 @@
+{
+    "@@locale": "tr",
+    "general": {
+        "appTitle": "Hiddify",
+        "reset": "Sıfırla",
+        "toggle": {
+            "enabled": "Etkin",
+            "disabled": "Devre Dışı"
+        },
+        "state": {
+            "disable": "Devre Dışı"
+        },
+        "sort": "Sırala",
+        "sortBy": "Sıralama Ölçütü",
+        "addToClipboard": "Panoya Kopyala",
+        "notSet": "Ayarlanmadı",
+        "agree": "Kabul Et",
+        "decline": "Reddet",
+        "unknown": "Bilinmiyor",
+        "hidden": "Gizli",
+        "timeout": "Zaman Aşımı",
+        "clipboardExportSuccessMsg": "Panoya Kopyalandı",
+        "showMore": "Daha Fazla",
+        "showLess": "Daha Az",
+        "openAppSettings": "Ayarları Aç",
+        "grantPermission": "İzin Ver"
+    },
+    "intro": {
+        "termsAndPolicyCaution(rich)": "Devam ederek ${tap(@:about.termsAndConditions)} kabul etmiş olursunuz",
+        "start": "Başla"
+    },
+    "home": {
+        "pageTitle": "Ana Sayfa",
+        "emptyProfilesMsg": "Başlamak için bir profil ekleyin",
+        "noActiveProfileMsg": "Bir profil seçin",
+        "addFirstConfig": "İlk yapılandırmanızı ekleyin",
+        "noConfigError": "Lütfen önce bir yapılandırma ekleyin",
+        "addConfig": "Yapılandırma Ekle",
+        "configAdded": "Yapılandırma eklendi!",
+        "configsCopied": "Yapılandırmalar kopyalandı",
+        "configSaved": "Yapılandırma kaydedildi"
+    },
+    "stats": {
+        "traffic": "Trafik",
+        "trafficLive": "Anlık Trafik",
+        "trafficTotal": "Toplam Trafik",
+        "uplink": "Gönderilen",
+        "downlink": "Alınan",
+        "connection": "Bağlantı",
+        "speed": "Hız",
+        "totalTransferred": "Toplam Aktarılan"
+    },
+    "profile": {
+        "overviewPageTitle": "Profiller",
+        "detailsPageTitle": "Profil",
+        "add": {
+            "buttonText": "Yeni Profil",
+            "shortBtnTxt": "Yeni",
+            "fromClipboard": "Panodan Ekle",
+            "scanQr": "QR Tara",
+            "manually": "Manuel Giriş",
+            "addWarp": "WARP Ekle",
+            "addingWarpMsg": "Lütfen bekleyin...",
+            "addingProfileMsg": "Ekleniyor...",
+            "failureMsg": "Ekleme başarısız"
+        },
+        "update": {
+            "buttonTxt": "Güncelle",
+            "tooltip": "Profili Güncelle",
+            "failureMsg": "Güncelleme başarısız"
+        }
+    },
+    "settings": {
+        "pageTitle": "Ayarlar",
+        "general": {
+            "sectionTitle": "Genel",
+            "locale": "Dil",
+            "region": "Bölge",
+            "themeMode": "Tema",
+            "themeModes": {
+                "system": "Sistem",
+                "dark": "Koyu",
+                "light": "Açık",
+                "black": "Siyah"
+            }
+        },
+        "advanced": {
+            "sectionTitle": "Gelişmiş",
+            "debugMode": "Hata Ayıklama"
+        },
+        "geoAssets": {
+            "pageTitle": "Yönlendirme Dosyaları",
+            "update": "Güncelle",
+            "download": "İndir"
+        }
+    },
+    "about": {
+        "pageTitle": "Hakkında",
+        "version": "Sürüm",
+        "sourceCode": "Kaynak Kod",
+        "telegramChannel": "Telegram Kanalı",
+        "checkForUpdate": "Güncelleme Kontrolü",
+        "privacyPolicy": "Gizlilik Politikası",
+        "termsAndConditions": "Kullanım Koşulları"
+    },
+    "connection": {
+        "tapToConnect": "Bağlanmak için dokunun",
+        "connecting": "Bağlanıyor...",
+        "disconnecting": "Bağlantı kesiliyor...",
+        "connected": "Bağlandı",
+        "reconnect": "Yeniden Bağlan"
+    },
+    "config": {
+        "serviceMode": "Servis Modu",
+        "serviceModes": {
+            "proxy": "Sadece Proxy",
+            "systemProxy": "Sistem Proxy",
+            "tun": "VPN",
+            "tunService": "VPN Servisi"
+        }
+    },
+    "security": {
+        "pageTitle": "Güvenlik",
+        "blockMalware": "Zararlı Yazılımları Engelle",
+        "blockPhishing": "Kimlik Avını Engelle",
+        "blockAds": "Reklamları Engelle",
+        "blockAdultContent": "Yetişkin İçeriği Engelle",
+        "blockGambling": "Kumar Sitelerini Engelle",
+        "firewallEnabled": "Güvenlik Duvarı"
+    },
+    "privacy": {
+        "pageTitle": "Gizlilik",
+        "blockWebRtc": "WebRTC Sızıntısını Engelle",
+        "blockDnsLeaks": "DNS Sızıntısını Engelle",
+        "encryptStorage": "Depolamayı Şifrele"
+    }
+}
