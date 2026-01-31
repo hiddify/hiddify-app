@@ -1,15 +1,15 @@
--optimizationpasses 7
+-optimizationpasses 10
 -dontusemixedcaseclassnames
 -dontskipnonpubliclibraryclasses
 -verbose
 -allowaccessmodification
 -repackageclasses ''
 -mergeinterfacesaggressively
+-overloadaggressively
 
--keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable,Signature,Exceptions,*Annotation*,InnerClasses,EnclosingMethod,Deprecated,RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations
+
 -renamesourcefileattribute SourceFile
-
--keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 
 -keep class io.flutter.** { *; }
 -keep class io.flutter.embedding.** { *; }
@@ -19,13 +19,10 @@
 -keep class io.flutter.view.** { *; }
 -dontwarn io.flutter.**
 
--keepclassmembers class * {
-    native <methods>;
-}
-
 -keep class kotlin.Metadata { *; }
 -keep class kotlin.** { *; }
 -keep interface kotlin.** { *; }
+-dontwarn kotlin.**
 
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
@@ -44,15 +41,16 @@
 -keep class com.google.gson.** { *; }
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
-
--keepattributes Signature
-
 -keepclassmembers,allowobfuscation class * {
     @com.google.gson.annotations.SerializedName <fields>;
 }
 
 -keep class com.hiddify.hiddify.** { *; }
 -keep class app.hiddify.com.** { *; }
+
+-keepclassmembers class * {
+    native <methods>;
+}
 
 -keepclasseswithmembernames,includedescriptorclasses class * {
     native <methods>;
@@ -66,13 +64,8 @@
 -keep class go.** { *; }
 -keep class io.nekohasekai.libbox.** { *; }
 -keep interface io.nekohasekai.** { *; }
-
 -dontwarn go.**
 -dontwarn io.nekohasekai.**
-
--keepclasseswithmembers class * {
-    native <methods>;
-}
 
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
@@ -102,7 +95,6 @@
     public static *** d(...);
     public static *** v(...);
     public static *** i(...);
-    public static *** w(...);
 }
 
 -assumenosideeffects class java.io.PrintStream {
@@ -116,28 +108,11 @@
     public java.lang.StringBuilder(java.lang.String);
     public java.lang.StringBuilder append(java.lang.Object);
     public java.lang.StringBuilder append(java.lang.String);
-    public java.lang.StringBuilder append(java.lang.StringBuffer);
-    public java.lang.StringBuilder append(char[]);
-    public java.lang.StringBuilder append(char[], int, int);
     public java.lang.StringBuilder append(boolean);
     public java.lang.StringBuilder append(char);
     public java.lang.StringBuilder append(int);
     public java.lang.StringBuilder append(long);
-    public java.lang.StringBuilder append(float);
-    public java.lang.StringBuilder append(double);
     public java.lang.String toString();
 }
 
--assumenoexternalreturnvalues public final class java.lang.StringBuilder {
-    public java.lang.StringBuilder append(java.lang.Object);
-    public java.lang.StringBuilder append(java.lang.String);
-    public java.lang.StringBuilder append(java.lang.StringBuffer);
-    public java.lang.StringBuilder append(char[]);
-    public java.lang.StringBuilder append(char[], int, int);
-    public java.lang.StringBuilder append(boolean);
-    public java.lang.StringBuilder append(char);
-    public java.lang.StringBuilder append(int);
-    public java.lang.StringBuilder append(long);
-    public java.lang.StringBuilder append(float);
-    public java.lang.StringBuilder append(double);
-}
+-nooptimizations class com.hiddify.hiddify.Settings*
