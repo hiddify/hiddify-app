@@ -4,6 +4,7 @@
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -13,8 +14,9 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <!-- Camera permission is likely not needed for core VPN functionality unless for QR scanning -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" 
+        tools:ignore="QueryAllPackagesPermission" />
 
     <queries>
         <intent>
@@ -34,6 +36,8 @@
         android:usesCleartextTraffic="false" 
         android:networkSecurityConfig="@xml/network_security_config" 
         android:extractNativeLibs="true"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         tools:targetApi="36">
 
         <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
@@ -47,13 +51,13 @@
             android:theme="@style/LaunchTheme" 
             android:windowSoftInputMode="adjustResize">
 
-
             <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
@@ -63,15 +67,11 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="sing-box" />
-                <data android:host="import-remote-profile" />
-                <data android:scheme="clash" />
-                <data android:host="install-config" />
+                <data android:scheme="sing-box" android:host="import-remote-profile" />
+                <data android:scheme="clash" android:host="install-config" />
                 <data android:scheme="clashmeta" />
                 <data android:scheme="hiddify" />
                 <data android:host="install-sub" />
-                <data android:scheme="hiddify" />
                 <data android:host="import" />
             </intent-filter>
 
@@ -97,8 +97,8 @@
             android:directBootAware="true" 
             android:exported="true" 
             android:icon="@drawable/ic_stat_logo" 
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" 
-            tools:targetApi="n">
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
