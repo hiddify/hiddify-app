@@ -1,28 +1,95 @@
-allprojects {
-    layout.buildDirectory = file("${rootProject.layout.buildDirectory.get().asFile}/${project.name}")
-    
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://storage.googleapis.com/download.flutter.io' }
-        maven { url 'https://jitpack.io' }
-    }
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.flutter.loader)
 }
 
-subprojects {
-    project.evaluationDependsOn(':app')
-    
-    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-        kotlinOptions {
-            jvmTarget = "24"
-            freeCompilerArgs += [
-                "-Xbackend-threads=8",
-                "-Xuse-k2"
-            ]
+android {
+    namespace "com.hiddify.app"
+    compileSdk 36
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "com.hiddify.app"
+        minSdk 28
+        targetSdk 36
+        versionCode flutter.versionCode.toInteger()
+        versionName flutter.versionName
+
+        ndk {
+            abiFilters 'arm64-v8a', 'x86_64'
+        }
+
+        buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_24
+        targetCompatibility JavaVersion.VERSION_24
+        isCoreLibraryDesugaringEnabled true
+    }
+
+    kotlinOptions {
+        jvmTarget = "24"
+        freeCompilerArgs += [
+            "-Xbackend-threads=16",
+            "-Xuse-k2",
+            "-Xjvm-default=all",
+            "-Xcontext-receivers",
+            "-Xemit-jvm-type-annotations",
+            "-Xenhance-jdk-build-improvements",
+            "-Xsam-conversions=class",
+            "-Xlambdas=indy"
+        ]
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            
+            ndk {
+                debugSymbolLevel 'full'
+            }
+        }
+    }
+
+    packaging {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += '/META-INF/versions/9/previous-compilation_data.bin'
+            excludes += '/META-INF/proguard/**'
+            excludes += '/kotlin/**'
+            excludes += '**/kotlin-tooling-metadata.json'
         }
     }
 }
 
-tasks.register("clean", Delete) {
-    delete rootProject.layout.buildDirectory
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.gson)
+    
+    coreLibraryDesugaring(libs.android.desugarJdkLibs)
+}
+
+def getGitHash() {
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
+    } catch (Exception e) {
+        return "unknown"
+    }
 }
