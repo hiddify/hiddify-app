@@ -1,121 +1,131 @@
-cmake_minimum_required(VERSION 3.14)
+-include dependencies.properties
 
-project(hiddify LANGUAGES CXX)
+# --- Version & Configuration ---
+ifneq ($(wildcard .core-version),)
+	core.version ?= $(strip $(file <.core-version))
+endif
 
-set(BINARY_NAME "Hiddify")
+# Default to 'latest' if not defined in dependencies.properties
+GEOIP_TAG ?= latest
+GEOSITE_TAG ?= latest
+CHANNEL ?= dev
 
-cmake_policy(VERSION 3.14...3.25)
+# --- Constants ---
+CORE_NAME      := hiddify-core
+BINDIR         := libcore/bin
+ANDROID_OUT    := android/app/libs
+GEO_ASSETS_DIR := assets/core
+DL_DIR         := .cache/downloads
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# --- URLs ---
+ifeq ($(CHANNEL),prod)
+	CORE_URL := https://github.com/hiddify/hiddify-core/releases/download/v$(core.version)
+	TARGET   := lib/main_prod.dart
+else
+	CORE_URL := https://github.com/hiddify/hiddify-core/releases/download/draft
+	TARGET   := lib/main.dart
+endif
 
-get_property(IS_MULTICONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-if(IS_MULTICONFIG)
-    set(CMAKE_CONFIGURATION_TYPES "Debug;Profile;Release" CACHE STRING "" FORCE)
-else()
-    if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-        set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Flutter build mode" FORCE)
-        set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Profile" "Release")
-    endif()
-endif()
+# Dynamic URLs based on TAGs for reproducibility
+ifeq ($(GEOIP_TAG),latest)
+	GEOIP_URL := https://github.com/SagerNet/sing-geoip/releases/latest/download/geoip.db
+else
+	GEOIP_URL := https://github.com/SagerNet/sing-geoip/releases/download/$(GEOIP_TAG)/geoip.db
+endif
 
-set(CMAKE_EXE_LINKER_FLAGS_PROFILE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-set(CMAKE_SHARED_LINKER_FLAGS_PROFILE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}")
-set(CMAKE_C_FLAGS_PROFILE "${CMAKE_C_FLAGS_RELEASE}")
-set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
+ifeq ($(GEOSITE_TAG),latest)
+	GEOSITE_URL := https://github.com/SagerNet/sing-geosite/releases/latest/download/geosite.db
+else
+	GEOSITE_URL := https://github.com/SagerNet/sing-geosite/releases/download/$(GEOSITE_TAG)/geosite.db
+endif
 
-add_compile_definitions(UNICODE _UNICODE)
+# --- Build Flags ---
+DART_DEFINES     := $(if $(SENTRY_DSN),--dart-define sentry_dsn=$(SENTRY_DSN),) --dart-define-from-file=config.json
+FLUTTER_OPTIMIZE := --obfuscate --split-debug-info=build/debug-info --tree-shake-icons
 
-function(APPLY_STANDARD_SETTINGS TARGET)
-    target_compile_features(${TARGET} PUBLIC cxx_std_17)
-    if(MSVC)
-        target_compile_options(${TARGET} PRIVATE /W4 /wd4100)
-        target_compile_options(${TARGET} PRIVATE /EHsc)
-        target_compile_definitions(${TARGET} PRIVATE _HAS_EXCEPTIONS=0)
-        target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
-    endif()
-endfunction()
+# Platform specific setup
+ifeq ($(OS),Windows_NT)
+	# Windows (PowerShell) Logic
+	SHELL := powershell.exe
+	.SHELLFLAGS := -NoProfile -Command
+	
+	MKDIR = if (-not (Test-Path "$1")) { New-Item -ItemType Directory -Force "$1" | Out-Null }
+	RM_RF = if (Test-Path "$1") { Remove-Item -Recurse -Force "$1" -ErrorAction SilentlyContinue }
+	DOWNLOAD = if (-not (Test-Path "$2")) { Write-Host "Downloading $1..."; curl.exe -fL "$1" -o "$2" }
+	EXTRACT = tar -xzf "$1" -C "$2"
+	CHECK_CMD = if (-not (Get-Command "$1" -ErrorAction SilentlyContinue)) { Write-Error "Error: $1 not found"; exit 1 }
+	COPY_DLL = if (Test-Path "$1") { Copy-Item -Force "$1" "$2" } else { Write-Error "Fatal: DLL not found at $1"; exit 1 }
+	GO_BUILD_CMD = $$ver="$(core.version)"; $$date=(Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz'); cd libcore; go build -buildmode=c-shared -trimpath -ldflags "-s -w -X main.version=$$ver -X main.buildTime=$$date" -o bin/libcore.dll ./mobile
+else
+	# Linux / macOS (Bash) Logic
+	SHELL := /bin/bash
+	
+	MKDIR = mkdir -p "$1"
+	RM_RF = rm -rf "$1"
+	DOWNLOAD = if [ ! -f "$2" ]; then echo "Downloading $1..."; curl -fL --retry 3 "$1" -o "$2"; fi
+	EXTRACT = tar -xzf "$1" -C "$2"
+	CHECK_CMD = command -v "$1" >/dev/null 2>&1 || { echo "Error: $1 not found"; exit 1; }
+	COPY_DLL = if [ -f "$1" ]; then cp -f "$1" "$2"; else echo "Fatal: DLL not found at $1"; exit 1; fi
+	GO_BUILD_CMD = date_val=$$(date +%FT%T%z); cd libcore && go build -buildmode=c-shared -trimpath -ldflags "-s -w -X main.version=$(core.version) -X main.buildTime=$$date_val" -o bin/libcore.dll ./mobile
+endif
 
-set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
-add_subdirectory(${FLUTTER_MANAGED_DIR})
-add_subdirectory("runner")
+# --- Targets ---
 
-include(flutter/generated_plugins.cmake)
+.PHONY: all check-env get gen translate prepare windows-libs android-libs protos clean
 
-set(BUILD_BUNDLE_DIR "$<TARGET_FILE_DIR:${BINARY_NAME}>")
-set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set(CMAKE_INSTALL_PREFIX "${BUILD_BUNDLE_DIR}" CACHE PATH "Install prefix" FORCE)
-endif()
+all: check-env prepare
 
-set(INSTALL_BUNDLE_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data")
-set(INSTALL_BUNDLE_LIB_DIR "${CMAKE_INSTALL_PREFIX}")
+check-env:
+	@$(call CHECK_CMD,flutter)
+	@$(call CHECK_CMD,go)
+	@$(call CHECK_CMD,tar)
+	@test -n "$(strip $(core.version))" || (echo "Error: core.version is empty"; exit 1)
 
-install(TARGETS ${BINARY_NAME}
-    RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
-    COMPONENT Runtime
-)
+get:
+	flutter pub get
 
-install(FILES "${FLUTTER_ICU_DATA_FILE}"
-    DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
-    COMPONENT Runtime
-)
+gen:
+	dart run build_runner build --delete-conflicting-outputs
 
-install(FILES "${FLUTTER_LIBRARY}"
-    DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-    COMPONENT Runtime
-)
+translate:
+	dart run slang
 
-if(PLUGIN_BUNDLED_LIBRARIES)
-    install(FILES ${PLUGIN_BUNDLED_LIBRARIES}
-        DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-        COMPONENT Runtime
-    )
-endif()
+prepare: check-env get gen translate
 
-set(LIBCORE_DLL_CANDIDATES
-    "${CMAKE_CURRENT_SOURCE_DIR}/runner/libcore.dll"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../libcore/bin/libcore.dll"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../libcore/libcore.dll"
-)
+windows-prepare: prepare windows-libs
 
-set(LIBCORE_DLL_PATH "")
-foreach(p IN LISTS LIBCORE_DLL_CANDIDATES)
-    if(EXISTS "${p}")
-        set(LIBCORE_DLL_PATH "${p}")
-        break()
-    endif()
-endforeach()
+android-prepare: get-geo-assets prepare android-libs
 
-if(LIBCORE_DLL_PATH)
-    install(FILES "${LIBCORE_DLL_PATH}"
-        DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-        COMPONENT Runtime
-    )
-else()
-    message(WARNING "libcore.dll not found; app may not function correctly.")
-endif()
+protos:
+	$(MAKE) -C libcore -f Makefile protos
+	protoc --dart_out=grpc:lib/singbox/generated --proto_path=libcore/protos libcore/protos/*.proto
 
-set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}/native_assets/windows")
-if(EXISTS "${NATIVE_ASSETS_DIR}")
-    install(DIRECTORY "${NATIVE_ASSETS_DIR}/"
-        DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-        COMPONENT Runtime
-    )
-endif()
+android-release:
+	flutter build apk --target $(TARGET) $(DART_DEFINES) $(FLUTTER_OPTIMIZE) --target-platform android-arm,android-arm64,android-x64 --split-per-abi
 
-set(FLUTTER_ASSET_DIR_NAME "flutter_assets")
-install(CODE "file(REMOVE_RECURSE \"${INSTALL_BUNDLE_DATA_DIR}/${FLUTTER_ASSET_DIR_NAME}\")"
-    COMPONENT Runtime
-)
+windows-release:
+	dart pub global run fastforge:fastforge package --platform windows --targets exe,msix --build-target $(TARGET) $(DART_DEFINES)
 
-install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
-    DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
-    COMPONENT Runtime
-)
+# --- Asset & Lib Management ---
 
-install(FILES "${AOT_LIBRARY}"
-    DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
-    CONFIGURATIONS Profile;Release
-    COMPONENT Runtime
-)
+get-geo-assets:
+	@$(call MKDIR,$(GEO_ASSETS_DIR))
+	@$(call DOWNLOAD,$(GEOIP_URL),$(GEO_ASSETS_DIR)/geoip.db)
+	@$(call DOWNLOAD,$(GEOSITE_URL),$(GEO_ASSETS_DIR)/geosite.db)
+
+android-libs:
+	@$(call MKDIR,$(DL_DIR))
+	@$(call MKDIR,$(ANDROID_OUT))
+	@$(call DOWNLOAD,$(CORE_URL)/$(CORE_NAME)-android.tar.gz,$(DL_DIR)/$(CORE_NAME)-android.tar.gz)
+	@$(call EXTRACT,$(DL_DIR)/$(CORE_NAME)-android.tar.gz,$(ANDROID_OUT)/)
+
+windows-libs:
+	@$(call MKDIR,$(BINDIR))
+	@$(GO_BUILD_CMD)
+	@$(call COPY_DLL,$(BINDIR)/libcore.dll,windows/runner/libcore.dll)
+
+clean:
+	flutter clean
+	@$(call RM_RF,$(BINDIR))
+	@$(call RM_RF,$(DL_DIR))
+	@$(call RM_RF,build)
