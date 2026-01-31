@@ -8,7 +8,6 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
-
 @$core.Deprecated('Use extensionResponseTypeDescriptor instead')
 const ExtensionResponseType$json = const {
   '1': 'ExtensionResponseType',
@@ -21,8 +20,7 @@ const ExtensionResponseType$json = const {
 };
 
 /// Descriptor for `ExtensionResponseType`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List extensionResponseTypeDescriptor = $convert.base64Decode(
-    'ChVFeHRlbnNpb25SZXNwb25zZVR5cGUSCwoHTk9USElORxAAEg0KCVVQREFURV9VSRABEg8KC1NIT1dfRElBTE9HEAISBwoDRU5EEAM=');
+final $typed_data.Uint8List extensionResponseTypeDescriptor = $convert.base64Decode('ChVFeHRlbnNpb25SZXNwb25zZVR5cGUSCwoHTk9USElORxAAEg0KCVVQREFURV9VSRABEg8KC1NIT1dfRElBTE9HEAISBwoDRU5EEAM=');
 @$core.Deprecated('Use extensionActionResultDescriptor instead')
 const ExtensionActionResult$json = const {
   '1': 'ExtensionActionResult',
@@ -34,8 +32,7 @@ const ExtensionActionResult$json = const {
 };
 
 /// Descriptor for `ExtensionActionResult`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List extensionActionResultDescriptor = $convert.base64Decode(
-    'ChVFeHRlbnNpb25BY3Rpb25SZXN1bHQSIQoMZXh0ZW5zaW9uX2lkGAEgASgJUgtleHRlbnNpb25JZBIpCgRjb2RlGAIgASgOMhUuaGNvbW1vbi5SZXNwb25zZUNvZGVSBGNvZGUSGAoHbWVzc2FnZRgDIAEoCVIHbWVzc2FnZQ==');
+final $typed_data.Uint8List extensionActionResultDescriptor = $convert.base64Decode('ChVFeHRlbnNpb25BY3Rpb25SZXN1bHQSIQoMZXh0ZW5zaW9uX2lkGAEgASgJUgtleHRlbnNpb25JZBIpCgRjb2RlGAIgASgOMhUuaGNvbW1vbi5SZXNwb25zZUNvZGVSBGNvZGUSGAoHbWVzc2FnZRgDIAEoCVIHbWVzc2FnZQ==');
 @$core.Deprecated('Use extensionListDescriptor instead')
 const ExtensionList$json = const {
   '1': 'ExtensionList',
@@ -45,8 +42,7 @@ const ExtensionList$json = const {
 };
 
 /// Descriptor for `ExtensionList`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List extensionListDescriptor = $convert
-    .base64Decode('Cg1FeHRlbnNpb25MaXN0EjcKCmV4dGVuc2lvbnMYASADKAsyFy5leHRlbnNpb24uRXh0ZW5zaW9uTXNnUgpleHRlbnNpb25z');
+final $typed_data.Uint8List extensionListDescriptor = $convert.base64Decode('Cg1FeHRlbnNpb25MaXN0EjcKCmV4dGVuc2lvbnMYASADKAsyFy5leHRlbnNpb24uRXh0ZW5zaW9uTXNnUgpleHRlbnNpb25z');
 @$core.Deprecated('Use editExtensionRequestDescriptor instead')
 const EditExtensionRequest$json = const {
   '1': 'EditExtensionRequest',
@@ -57,8 +53,7 @@ const EditExtensionRequest$json = const {
 };
 
 /// Descriptor for `EditExtensionRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List editExtensionRequestDescriptor = $convert.base64Decode(
-    'ChRFZGl0RXh0ZW5zaW9uUmVxdWVzdBIhCgxleHRlbnNpb25faWQYASABKAlSC2V4dGVuc2lvbklkEhYKBmVuYWJsZRgCIAEoCFIGZW5hYmxl');
+final $typed_data.Uint8List editExtensionRequestDescriptor = $convert.base64Decode('ChRFZGl0RXh0ZW5zaW9uUmVxdWVzdBIhCgxleHRlbnNpb25faWQYASABKAlSC2V4dGVuc2lvbklkEhYKBmVuYWJsZRgCIAEoCFIGZW5hYmxl');
 @$core.Deprecated('Use extensionMsgDescriptor instead')
 const ExtensionMsg$json = const {
   '1': 'ExtensionMsg',
@@ -71,8 +66,7 @@ const ExtensionMsg$json = const {
 };
 
 /// Descriptor for `ExtensionMsg`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List extensionMsgDescriptor = $convert.base64Decode(
-    'CgxFeHRlbnNpb25Nc2cSDgoCaWQYASABKAlSAmlkEhQKBXRpdGxlGAIgASgJUgV0aXRsZRIgCgtkZXNjcmlwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SFgoGZW5hYmxlGAQgASgIUgZlbmFibGU=');
+final $typed_data.Uint8List extensionMsgDescriptor = $convert.base64Decode('CgxFeHRlbnNpb25Nc2cSDgoCaWQYASABKAlSAmlkEhQKBXRpdGxlGAIgASgJUgV0aXRsZRIgCgtkZXNjcmlwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SFgoGZW5hYmxlGAQgASgIUgZlbmFibGU=');
 @$core.Deprecated('Use extensionRequestDescriptor instead')
 const ExtensionRequest$json = const {
   '1': 'ExtensionRequest',
@@ -94,8 +88,7 @@ const ExtensionRequest_DataEntry$json = const {
 };
 
 /// Descriptor for `ExtensionRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List extensionRequestDescriptor = $convert.base64Decode(
-    'ChBFeHRlbnNpb25SZXF1ZXN0EiEKDGV4dGVuc2lvbl9pZBgBIAEoCVILZXh0ZW5zaW9uSWQSOQoEZGF0YRgCIAMoCzIlLmV4dGVuc2lvbi5FeHRlbnNpb25SZXF1ZXN0LkRhdGFFbnRyeVIEZGF0YRo3CglEYXRhRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4AQ==');
+final $typed_data.Uint8List extensionRequestDescriptor = $convert.base64Decode('ChBFeHRlbnNpb25SZXF1ZXN0EiEKDGV4dGVuc2lvbl9pZBgBIAEoCVILZXh0ZW5zaW9uSWQSOQoEZGF0YRgCIAMoCzIlLmV4dGVuc2lvbi5FeHRlbnNpb25SZXF1ZXN0LkRhdGFFbnRyeVIEZGF0YRo3CglEYXRhRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUYAiABKAlSBXZhbHVlOgI4AQ==');
 @$core.Deprecated('Use sendExtensionDataRequestDescriptor instead')
 const SendExtensionDataRequest$json = const {
   '1': 'SendExtensionDataRequest',
@@ -118,8 +111,7 @@ const SendExtensionDataRequest_DataEntry$json = const {
 };
 
 /// Descriptor for `SendExtensionDataRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List sendExtensionDataRequestDescriptor = $convert.base64Decode(
-    'ChhTZW5kRXh0ZW5zaW9uRGF0YVJlcXVlc3QSIQoMZXh0ZW5zaW9uX2lkGAEgASgJUgtleHRlbnNpb25JZBIWCgZidXR0b24YAiABKAlSBmJ1dHRvbhJBCgRkYXRhGAMgAygLMi0uZXh0ZW5zaW9uLlNlbmRFeHRlbnNpb25EYXRhUmVxdWVzdC5EYXRhRW50cnlSBGRhdGEaNwoJRGF0YUVudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
+final $typed_data.Uint8List sendExtensionDataRequestDescriptor = $convert.base64Decode('ChhTZW5kRXh0ZW5zaW9uRGF0YVJlcXVlc3QSIQoMZXh0ZW5zaW9uX2lkGAEgASgJUgtleHRlbnNpb25JZBIWCgZidXR0b24YAiABKAlSBmJ1dHRvbhJBCgRkYXRhGAMgAygLMi0uZXh0ZW5zaW9uLlNlbmRFeHRlbnNpb25EYXRhUmVxdWVzdC5EYXRhRW50cnlSBGRhdGEaNwoJRGF0YUVudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgJUgV2YWx1ZToCOAE=');
 @$core.Deprecated('Use extensionResponseDescriptor instead')
 const ExtensionResponse$json = const {
   '1': 'ExtensionResponse',
@@ -131,5 +123,4 @@ const ExtensionResponse$json = const {
 };
 
 /// Descriptor for `ExtensionResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List extensionResponseDescriptor = $convert.base64Decode(
-    'ChFFeHRlbnNpb25SZXNwb25zZRI0CgR0eXBlGAEgASgOMiAuZXh0ZW5zaW9uLkV4dGVuc2lvblJlc3BvbnNlVHlwZVIEdHlwZRIhCgxleHRlbnNpb25faWQYAiABKAlSC2V4dGVuc2lvbklkEhcKB2pzb25fdWkYAyABKAlSBmpzb25VaQ==');
+final $typed_data.Uint8List extensionResponseDescriptor = $convert.base64Decode('ChFFeHRlbnNpb25SZXNwb25zZRI0CgR0eXBlGAEgASgOMiAuZXh0ZW5zaW9uLkV4dGVuc2lvblJlc3BvbnNlVHlwZVIEdHlwZRIhCgxleHRlbnNpb25faWQYAiABKAlSC2V4dGVuc2lvbklkEhcKB2pzb25fdWkYAyABKAlSBmpzb25VaQ==');

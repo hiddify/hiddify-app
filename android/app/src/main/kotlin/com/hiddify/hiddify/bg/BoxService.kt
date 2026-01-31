@@ -181,8 +181,11 @@ class BoxService(
                 stopAndAlert(Alert.CreateService, e.message)
                 return
             }
-            if (Settings.startCoreAfterStartingService)
+            status.postValue(Status.Started)
+
+            if (Settings.startCoreAfterStartingService){
                 Mobile.start("","")
+                }
 //            if (delayStart) {
 //                delay(1000L)
 //            }
@@ -190,7 +193,6 @@ class BoxService(
 //            newService.start()
 //            boxService = newService
 //            commandServer?.setService(boxService)
-            status.postValue(Status.Started)
 
 
             withContext(Dispatchers.Main) {
@@ -259,7 +261,7 @@ class BoxService(
     }
 
     private fun stopService() {
-//        if (status.value != Status.Started) return
+        if (status.value == Status.Stopped) return
         status.value = Status.Stopping
         if (receiverRegistered) {
             service.unregisterReceiver(receiver)
@@ -281,7 +283,7 @@ class BoxService(
 //                }
 //                //Seq.destroyRef(refnum)
 //            }
-            Mobile.close(4L)
+
 //            boxService = null
 //            Libbox.registerLocalDNSTransport(null)
             DefaultNetworkMonitor.stop()
@@ -293,6 +295,7 @@ class BoxService(
 //            commandServer = null
             Settings.startedByUser = false
             withContext(Dispatchers.Main) {
+                Mobile.close(4L)
                 status.value = Status.Stopped
                 service.stopSelf()
             }

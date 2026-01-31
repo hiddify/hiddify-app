@@ -14,24 +14,29 @@ import 'hello.pb.dart' as $5;
 export 'hello_service.pb.dart';
 
 class HelloClient extends $grpc.Client {
-  static final _$sayHello = $grpc.ClientMethod<$5.HelloRequest, $5.HelloResponse>(
-      '/hello.Hello/SayHello',
-      ($5.HelloRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $5.HelloResponse.fromBuffer(value));
-  static final _$sayHelloStream = $grpc.ClientMethod<$5.HelloRequest, $5.HelloResponse>(
-      '/hello.Hello/SayHelloStream',
-      ($5.HelloRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $5.HelloResponse.fromBuffer(value));
+  static final _$sayHello =
+      $grpc.ClientMethod<$5.HelloRequest, $5.HelloResponse>(
+          '/hello.Hello/SayHello',
+          ($5.HelloRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $5.HelloResponse.fromBuffer(value));
+  static final _$sayHelloStream =
+      $grpc.ClientMethod<$5.HelloRequest, $5.HelloResponse>(
+          '/hello.Hello/SayHelloStream',
+          ($5.HelloRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $5.HelloResponse.fromBuffer(value));
 
   HelloClient($grpc.ClientChannel channel,
-      {$grpc.CallOptions? options, $core.Iterable<$grpc.ClientInterceptor>? interceptors})
+      {$grpc.CallOptions? options,
+      $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
 
-  $grpc.ResponseFuture<$5.HelloResponse> sayHello($5.HelloRequest request, {$grpc.CallOptions? options}) {
+  $grpc.ResponseFuture<$5.HelloResponse> sayHello($5.HelloRequest request,
+      {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$sayHello, request, options: options);
   }
 
-  $grpc.ResponseStream<$5.HelloResponse> sayHelloStream($async.Stream<$5.HelloRequest> request,
+  $grpc.ResponseStream<$5.HelloResponse> sayHelloStream(
+      $async.Stream<$5.HelloRequest> request,
       {$grpc.CallOptions? options}) {
     return $createStreamingCall(_$sayHelloStream, request, options: options);
   }
@@ -57,10 +62,13 @@ abstract class HelloServiceBase extends $grpc.Service {
         ($5.HelloResponse value) => value.writeToBuffer()));
   }
 
-  $async.Future<$5.HelloResponse> sayHello_Pre($grpc.ServiceCall call, $async.Future<$5.HelloRequest> request) async {
+  $async.Future<$5.HelloResponse> sayHello_Pre(
+      $grpc.ServiceCall call, $async.Future<$5.HelloRequest> request) async {
     return sayHello(call, await request);
   }
 
-  $async.Future<$5.HelloResponse> sayHello($grpc.ServiceCall call, $5.HelloRequest request);
-  $async.Stream<$5.HelloResponse> sayHelloStream($grpc.ServiceCall call, $async.Stream<$5.HelloRequest> request);
+  $async.Future<$5.HelloResponse> sayHello(
+      $grpc.ServiceCall call, $5.HelloRequest request);
+  $async.Stream<$5.HelloResponse> sayHelloStream(
+      $grpc.ServiceCall call, $async.Stream<$5.HelloRequest> request);
 }

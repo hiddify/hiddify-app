@@ -43,7 +43,7 @@ class SingboxConfigOption with _$SingboxConfigOption {
     required bool bypassLan,
     required bool allowConnectionFromLan,
     required bool enableFakeDns,
-    required bool enableDnsRouting,
+    // required bool enableDnsRouting,
     required bool independentDnsCache,
     // required String geoipPath,
     // required String geositePath,

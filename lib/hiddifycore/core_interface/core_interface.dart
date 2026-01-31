@@ -10,8 +10,8 @@ class CoreInterface {
     return "";
   }
 
-  Future<CoreStatus> start(String path, String name) async {
-    return const CoreStarting();
+  Future<CoreStatus> setupBackground(String path, String name) async {
+    return const CoreStarted();
   }
 
   Future<bool> restart(String path, String name) async {
@@ -41,5 +41,14 @@ class CoreInterface {
 
   Future<bool> isActiveBg() async {
     return true;
+  }
+
+  bool isInitialized() {
+    try {
+      bgClient; // touch it
+      return true;
+    } on Exception {
+      return false;
+    }
   }
 }

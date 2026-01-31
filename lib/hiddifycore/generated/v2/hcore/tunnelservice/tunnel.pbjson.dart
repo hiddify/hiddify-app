@@ -8,7 +8,6 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
-
 @$core.Deprecated('Use tunnelStartRequestDescriptor instead')
 const TunnelStartRequest$json = const {
   '1': 'TunnelStartRequest',
@@ -24,8 +23,7 @@ const TunnelStartRequest$json = const {
 };
 
 /// Descriptor for `TunnelStartRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List tunnelStartRequestDescriptor = $convert.base64Decode(
-    'ChJUdW5uZWxTdGFydFJlcXVlc3QSEgoEaXB2NhgBIAEoCFIEaXB2NhIfCgtzZXJ2ZXJfcG9ydBgCIAEoBVIKc2VydmVyUG9ydBInCg9zZXJ2ZXJfdXNlcm5hbWUYAyABKAlSDnNlcnZlclVzZXJuYW1lEicKD3NlcnZlcl9wYXNzd29yZBgEIAEoCVIOc2VydmVyUGFzc3dvcmQSIQoMc3RyaWN0X3JvdXRlGAUgASgIUgtzdHJpY3RSb3V0ZRI4ChhlbmRwb2ludF9pbmRlcGVuZGVudF9uYXQYBiABKAhSFmVuZHBvaW50SW5kZXBlbmRlbnROYXQSFAoFc3RhY2sYByABKAlSBXN0YWNr');
+final $typed_data.Uint8List tunnelStartRequestDescriptor = $convert.base64Decode('ChJUdW5uZWxTdGFydFJlcXVlc3QSEgoEaXB2NhgBIAEoCFIEaXB2NhIfCgtzZXJ2ZXJfcG9ydBgCIAEoBVIKc2VydmVyUG9ydBInCg9zZXJ2ZXJfdXNlcm5hbWUYAyABKAlSDnNlcnZlclVzZXJuYW1lEicKD3NlcnZlcl9wYXNzd29yZBgEIAEoCVIOc2VydmVyUGFzc3dvcmQSIQoMc3RyaWN0X3JvdXRlGAUgASgIUgtzdHJpY3RSb3V0ZRI4ChhlbmRwb2ludF9pbmRlcGVuZGVudF9uYXQYBiABKAhSFmVuZHBvaW50SW5kZXBlbmRlbnROYXQSFAoFc3RhY2sYByABKAlSBXN0YWNr');
 @$core.Deprecated('Use tunnelResponseDescriptor instead')
 const TunnelResponse$json = const {
   '1': 'TunnelResponse',
@@ -35,5 +33,4 @@ const TunnelResponse$json = const {
 };
 
 /// Descriptor for `TunnelResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List tunnelResponseDescriptor =
-    $convert.base64Decode('Cg5UdW5uZWxSZXNwb25zZRIYCgdtZXNzYWdlGAEgASgJUgdtZXNzYWdl');
+final $typed_data.Uint8List tunnelResponseDescriptor = $convert.base64Decode('Cg5UdW5uZWxSZXNwb25zZRIYCgdtZXNzYWdlGAEgASgJUgdtZXNzYWdl');

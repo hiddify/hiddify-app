@@ -119,11 +119,11 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         Settings.grpcServiceModePort = args["grpcPort"] as Int
 
                         val mainActivity = MainActivity.instance
-                        val started = mainActivity.serviceStatus.value == Status.Started
-                        if (started) {
-                            Log.w(TAG, "service is already running")
-                            return@launch success(true)
-                        }
+//                        val started = mainActivity.serviceStatus.value == Status.Started
+//                        if (started) {
+//                            Log.w(TAG, "service is already running")
+//                            return@launch success(true)
+//                        }
                         Settings.startCoreAfterStartingService = false
 
                         mainActivity.startService()

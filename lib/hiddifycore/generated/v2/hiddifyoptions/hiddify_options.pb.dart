@@ -15,40 +15,27 @@ import 'hiddify_options.pbenum.dart';
 export 'hiddify_options.pbenum.dart';
 
 class HiddifyOptions extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'HiddifyOptions',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'HiddifyOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableFullConfig')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'logLevel')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'logFile')
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableClashApi')
-    ..a<$core.int>(
-        5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'clashApiPort', $pb.PbFieldType.OU3)
+    ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'clashApiPort', $pb.PbFieldType.OU3)
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'webSecret')
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'region')
     ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'blockAds')
     ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'useXrayCoreWhenPossible')
-    ..pc<Rule>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rules', $pb.PbFieldType.PM,
-        subBuilder: Rule.create)
-    ..aOM<WarpOptions>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'warp',
-        subBuilder: WarpOptions.create)
-    ..aOM<WarpOptions>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'warp2',
-        subBuilder: WarpOptions.create)
-    ..aOM<MuxOptions>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mux',
-        subBuilder: MuxOptions.create)
-    ..aOM<TLSTricks>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tlsTricks',
-        subBuilder: TLSTricks.create)
-    ..aOM<DNSOptions>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dnsOptions',
-        subBuilder: DNSOptions.create)
-    ..aOM<InboundOptions>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'inboundOptions',
-        subBuilder: InboundOptions.create)
-    ..aOM<URLTestOptions>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestOptions',
-        subBuilder: URLTestOptions.create)
-    ..aOM<RouteOptions>(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'routeOptions',
-        subBuilder: RouteOptions.create)
-    ..hasRequiredFields = false;
+    ..pc<Rule>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'rules', $pb.PbFieldType.PM, subBuilder: Rule.create)
+    ..aOM<WarpOptions>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'warp', subBuilder: WarpOptions.create)
+    ..aOM<WarpOptions>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'warp2', subBuilder: WarpOptions.create)
+    ..aOM<MuxOptions>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mux', subBuilder: MuxOptions.create)
+    ..aOM<TLSTricks>(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tlsTricks', subBuilder: TLSTricks.create)
+    ..aOM<DNSOptions>(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'dnsOptions', subBuilder: DNSOptions.create)
+    ..aOM<InboundOptions>(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'inboundOptions', subBuilder: InboundOptions.create)
+    ..aOM<URLTestOptions>(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestOptions', subBuilder: URLTestOptions.create)
+    ..aOM<RouteOptions>(18, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'routeOptions', subBuilder: RouteOptions.create)
+    ..hasRequiredFields = false
+  ;
 
   HiddifyOptions._() : super();
   factory HiddifyOptions({
@@ -128,20 +115,18 @@ class HiddifyOptions extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory HiddifyOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory HiddifyOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory HiddifyOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory HiddifyOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   HiddifyOptions clone() => HiddifyOptions()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  HiddifyOptions copyWith(void Function(HiddifyOptions) updates) =>
-      super.copyWith((message) => updates(message as HiddifyOptions))
-          as HiddifyOptions; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  HiddifyOptions copyWith(void Function(HiddifyOptions) updates) => super.copyWith((message) => updates(message as HiddifyOptions)) as HiddifyOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static HiddifyOptions create() => HiddifyOptions._();
@@ -154,10 +139,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool get enableFullConfig => $_getBF(0);
   @$pb.TagNumber(1)
-  set enableFullConfig($core.bool v) {
-    $_setBool(0, v);
-  }
-
+  set enableFullConfig($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasEnableFullConfig() => $_has(0);
   @$pb.TagNumber(1)
@@ -166,10 +148,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get logLevel => $_getSZ(1);
   @$pb.TagNumber(2)
-  set logLevel($core.String v) {
-    $_setString(1, v);
-  }
-
+  set logLevel($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasLogLevel() => $_has(1);
   @$pb.TagNumber(2)
@@ -178,10 +157,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get logFile => $_getSZ(2);
   @$pb.TagNumber(3)
-  set logFile($core.String v) {
-    $_setString(2, v);
-  }
-
+  set logFile($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasLogFile() => $_has(2);
   @$pb.TagNumber(3)
@@ -190,10 +166,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool get enableClashApi => $_getBF(3);
   @$pb.TagNumber(4)
-  set enableClashApi($core.bool v) {
-    $_setBool(3, v);
-  }
-
+  set enableClashApi($core.bool v) { $_setBool(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasEnableClashApi() => $_has(3);
   @$pb.TagNumber(4)
@@ -202,10 +175,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.int get clashApiPort => $_getIZ(4);
   @$pb.TagNumber(5)
-  set clashApiPort($core.int v) {
-    $_setUnsignedInt32(4, v);
-  }
-
+  set clashApiPort($core.int v) { $_setUnsignedInt32(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasClashApiPort() => $_has(4);
   @$pb.TagNumber(5)
@@ -214,10 +184,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.String get webSecret => $_getSZ(5);
   @$pb.TagNumber(6)
-  set webSecret($core.String v) {
-    $_setString(5, v);
-  }
-
+  set webSecret($core.String v) { $_setString(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasWebSecret() => $_has(5);
   @$pb.TagNumber(6)
@@ -226,10 +193,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.String get region => $_getSZ(6);
   @$pb.TagNumber(7)
-  set region($core.String v) {
-    $_setString(6, v);
-  }
-
+  set region($core.String v) { $_setString(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasRegion() => $_has(6);
   @$pb.TagNumber(7)
@@ -238,10 +202,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   $core.bool get blockAds => $_getBF(7);
   @$pb.TagNumber(8)
-  set blockAds($core.bool v) {
-    $_setBool(7, v);
-  }
-
+  set blockAds($core.bool v) { $_setBool(7, v); }
   @$pb.TagNumber(8)
   $core.bool hasBlockAds() => $_has(7);
   @$pb.TagNumber(8)
@@ -250,10 +211,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $core.bool get useXrayCoreWhenPossible => $_getBF(8);
   @$pb.TagNumber(9)
-  set useXrayCoreWhenPossible($core.bool v) {
-    $_setBool(8, v);
-  }
-
+  set useXrayCoreWhenPossible($core.bool v) { $_setBool(8, v); }
   @$pb.TagNumber(9)
   $core.bool hasUseXrayCoreWhenPossible() => $_has(8);
   @$pb.TagNumber(9)
@@ -265,10 +223,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(11)
   WarpOptions get warp => $_getN(10);
   @$pb.TagNumber(11)
-  set warp(WarpOptions v) {
-    setField(11, v);
-  }
-
+  set warp(WarpOptions v) { setField(11, v); }
   @$pb.TagNumber(11)
   $core.bool hasWarp() => $_has(10);
   @$pb.TagNumber(11)
@@ -279,10 +234,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(12)
   WarpOptions get warp2 => $_getN(11);
   @$pb.TagNumber(12)
-  set warp2(WarpOptions v) {
-    setField(12, v);
-  }
-
+  set warp2(WarpOptions v) { setField(12, v); }
   @$pb.TagNumber(12)
   $core.bool hasWarp2() => $_has(11);
   @$pb.TagNumber(12)
@@ -293,10 +245,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(13)
   MuxOptions get mux => $_getN(12);
   @$pb.TagNumber(13)
-  set mux(MuxOptions v) {
-    setField(13, v);
-  }
-
+  set mux(MuxOptions v) { setField(13, v); }
   @$pb.TagNumber(13)
   $core.bool hasMux() => $_has(12);
   @$pb.TagNumber(13)
@@ -307,10 +256,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(14)
   TLSTricks get tlsTricks => $_getN(13);
   @$pb.TagNumber(14)
-  set tlsTricks(TLSTricks v) {
-    setField(14, v);
-  }
-
+  set tlsTricks(TLSTricks v) { setField(14, v); }
   @$pb.TagNumber(14)
   $core.bool hasTlsTricks() => $_has(13);
   @$pb.TagNumber(14)
@@ -321,10 +267,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(15)
   DNSOptions get dnsOptions => $_getN(14);
   @$pb.TagNumber(15)
-  set dnsOptions(DNSOptions v) {
-    setField(15, v);
-  }
-
+  set dnsOptions(DNSOptions v) { setField(15, v); }
   @$pb.TagNumber(15)
   $core.bool hasDnsOptions() => $_has(14);
   @$pb.TagNumber(15)
@@ -335,10 +278,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(16)
   InboundOptions get inboundOptions => $_getN(15);
   @$pb.TagNumber(16)
-  set inboundOptions(InboundOptions v) {
-    setField(16, v);
-  }
-
+  set inboundOptions(InboundOptions v) { setField(16, v); }
   @$pb.TagNumber(16)
   $core.bool hasInboundOptions() => $_has(15);
   @$pb.TagNumber(16)
@@ -349,10 +289,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(17)
   URLTestOptions get urlTestOptions => $_getN(16);
   @$pb.TagNumber(17)
-  set urlTestOptions(URLTestOptions v) {
-    setField(17, v);
-  }
-
+  set urlTestOptions(URLTestOptions v) { setField(17, v); }
   @$pb.TagNumber(17)
   $core.bool hasUrlTestOptions() => $_has(16);
   @$pb.TagNumber(17)
@@ -363,10 +300,7 @@ class HiddifyOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(18)
   RouteOptions get routeOptions => $_getN(17);
   @$pb.TagNumber(18)
-  set routeOptions(RouteOptions v) {
-    setField(18, v);
-  }
-
+  set routeOptions(RouteOptions v) { setField(18, v); }
   @$pb.TagNumber(18)
   $core.bool hasRouteOptions() => $_has(17);
   @$pb.TagNumber(18)
@@ -376,14 +310,11 @@ class HiddifyOptions extends $pb.GeneratedMessage {
 }
 
 class IntRange extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'IntRange',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'IntRange', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'from', $pb.PbFieldType.O3)
     ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'to', $pb.PbFieldType.O3)
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   IntRange._() : super();
   factory IntRange({
@@ -399,19 +330,18 @@ class IntRange extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory IntRange.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory IntRange.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory IntRange.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory IntRange.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   IntRange clone() => IntRange()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  IntRange copyWith(void Function(IntRange) updates) =>
-      super.copyWith((message) => updates(message as IntRange)) as IntRange; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  IntRange copyWith(void Function(IntRange) updates) => super.copyWith((message) => updates(message as IntRange)) as IntRange; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static IntRange create() => IntRange._();
@@ -424,10 +354,7 @@ class IntRange extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.int get from => $_getIZ(0);
   @$pb.TagNumber(1)
-  set from($core.int v) {
-    $_setSignedInt32(0, v);
-  }
-
+  set from($core.int v) { $_setSignedInt32(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasFrom() => $_has(0);
   @$pb.TagNumber(1)
@@ -436,10 +363,7 @@ class IntRange extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.int get to => $_getIZ(1);
   @$pb.TagNumber(2)
-  set to($core.int v) {
-    $_setSignedInt32(1, v);
-  }
-
+  set to($core.int v) { $_setSignedInt32(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasTo() => $_has(1);
   @$pb.TagNumber(2)
@@ -447,31 +371,16 @@ class IntRange extends $pb.GeneratedMessage {
 }
 
 class DNSOptions extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DNSOptions',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DNSOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'remoteDnsAddress')
-    ..e<DomainStrategy>(
-        2,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'remoteDnsDomainStrategy',
-        $pb.PbFieldType.OE,
-        defaultOrMaker: DomainStrategy.as_is,
-        valueOf: DomainStrategy.valueOf,
-        enumValues: DomainStrategy.values)
+    ..e<DomainStrategy>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'remoteDnsDomainStrategy', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'directDnsAddress')
-    ..e<DomainStrategy>(
-        4,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'directDnsDomainStrategy',
-        $pb.PbFieldType.OE,
-        defaultOrMaker: DomainStrategy.as_is,
-        valueOf: DomainStrategy.valueOf,
-        enumValues: DomainStrategy.values)
+    ..e<DomainStrategy>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'directDnsDomainStrategy', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'independentDnsCache')
     ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableFakeDns')
     ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableDnsRouting')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   DNSOptions._() : super();
   factory DNSOptions({
@@ -507,19 +416,18 @@ class DNSOptions extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory DNSOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory DNSOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory DNSOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory DNSOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   DNSOptions clone() => DNSOptions()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  DNSOptions copyWith(void Function(DNSOptions) updates) =>
-      super.copyWith((message) => updates(message as DNSOptions)) as DNSOptions; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  DNSOptions copyWith(void Function(DNSOptions) updates) => super.copyWith((message) => updates(message as DNSOptions)) as DNSOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DNSOptions create() => DNSOptions._();
@@ -532,10 +440,7 @@ class DNSOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get remoteDnsAddress => $_getSZ(0);
   @$pb.TagNumber(1)
-  set remoteDnsAddress($core.String v) {
-    $_setString(0, v);
-  }
-
+  set remoteDnsAddress($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasRemoteDnsAddress() => $_has(0);
   @$pb.TagNumber(1)
@@ -544,10 +449,7 @@ class DNSOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   DomainStrategy get remoteDnsDomainStrategy => $_getN(1);
   @$pb.TagNumber(2)
-  set remoteDnsDomainStrategy(DomainStrategy v) {
-    setField(2, v);
-  }
-
+  set remoteDnsDomainStrategy(DomainStrategy v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasRemoteDnsDomainStrategy() => $_has(1);
   @$pb.TagNumber(2)
@@ -556,10 +458,7 @@ class DNSOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get directDnsAddress => $_getSZ(2);
   @$pb.TagNumber(3)
-  set directDnsAddress($core.String v) {
-    $_setString(2, v);
-  }
-
+  set directDnsAddress($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasDirectDnsAddress() => $_has(2);
   @$pb.TagNumber(3)
@@ -568,10 +467,7 @@ class DNSOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   DomainStrategy get directDnsDomainStrategy => $_getN(3);
   @$pb.TagNumber(4)
-  set directDnsDomainStrategy(DomainStrategy v) {
-    setField(4, v);
-  }
-
+  set directDnsDomainStrategy(DomainStrategy v) { setField(4, v); }
   @$pb.TagNumber(4)
   $core.bool hasDirectDnsDomainStrategy() => $_has(3);
   @$pb.TagNumber(4)
@@ -580,10 +476,7 @@ class DNSOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool get independentDnsCache => $_getBF(4);
   @$pb.TagNumber(5)
-  set independentDnsCache($core.bool v) {
-    $_setBool(4, v);
-  }
-
+  set independentDnsCache($core.bool v) { $_setBool(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasIndependentDnsCache() => $_has(4);
   @$pb.TagNumber(5)
@@ -592,10 +485,7 @@ class DNSOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool get enableFakeDns => $_getBF(5);
   @$pb.TagNumber(6)
-  set enableFakeDns($core.bool v) {
-    $_setBool(5, v);
-  }
-
+  set enableFakeDns($core.bool v) { $_setBool(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasEnableFakeDns() => $_has(5);
   @$pb.TagNumber(6)
@@ -604,10 +494,7 @@ class DNSOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool get enableDnsRouting => $_getBF(6);
   @$pb.TagNumber(7)
-  set enableDnsRouting($core.bool v) {
-    $_setBool(6, v);
-  }
-
+  set enableDnsRouting($core.bool v) { $_setBool(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasEnableDnsRouting() => $_has(6);
   @$pb.TagNumber(7)
@@ -615,24 +502,18 @@ class DNSOptions extends $pb.GeneratedMessage {
 }
 
 class InboundOptions extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'InboundOptions',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'InboundOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableTun')
     ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableTunService')
     ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'setSystemProxy')
-    ..a<$core.int>(
-        4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mixedPort', $pb.PbFieldType.OU3)
-    ..a<$core.int>(
-        5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tproxyPort', $pb.PbFieldType.OU3)
-    ..a<$core.int>(
-        6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'localDnsPort', $pb.PbFieldType.OU3)
+    ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mixedPort', $pb.PbFieldType.OU3)
+    ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tproxyPort', $pb.PbFieldType.OU3)
+    ..a<$core.int>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'localDnsPort', $pb.PbFieldType.OU3)
     ..a<$core.int>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mtu', $pb.PbFieldType.OU3)
     ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'strictRoute')
     ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tunStack')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   InboundOptions._() : super();
   factory InboundOptions({
@@ -676,20 +557,18 @@ class InboundOptions extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory InboundOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory InboundOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory InboundOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory InboundOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   InboundOptions clone() => InboundOptions()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  InboundOptions copyWith(void Function(InboundOptions) updates) =>
-      super.copyWith((message) => updates(message as InboundOptions))
-          as InboundOptions; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  InboundOptions copyWith(void Function(InboundOptions) updates) => super.copyWith((message) => updates(message as InboundOptions)) as InboundOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static InboundOptions create() => InboundOptions._();
@@ -702,10 +581,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool get enableTun => $_getBF(0);
   @$pb.TagNumber(1)
-  set enableTun($core.bool v) {
-    $_setBool(0, v);
-  }
-
+  set enableTun($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasEnableTun() => $_has(0);
   @$pb.TagNumber(1)
@@ -714,10 +590,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool get enableTunService => $_getBF(1);
   @$pb.TagNumber(2)
-  set enableTunService($core.bool v) {
-    $_setBool(1, v);
-  }
-
+  set enableTunService($core.bool v) { $_setBool(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasEnableTunService() => $_has(1);
   @$pb.TagNumber(2)
@@ -726,10 +599,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool get setSystemProxy => $_getBF(2);
   @$pb.TagNumber(3)
-  set setSystemProxy($core.bool v) {
-    $_setBool(2, v);
-  }
-
+  set setSystemProxy($core.bool v) { $_setBool(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasSetSystemProxy() => $_has(2);
   @$pb.TagNumber(3)
@@ -738,10 +608,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.int get mixedPort => $_getIZ(3);
   @$pb.TagNumber(4)
-  set mixedPort($core.int v) {
-    $_setUnsignedInt32(3, v);
-  }
-
+  set mixedPort($core.int v) { $_setUnsignedInt32(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasMixedPort() => $_has(3);
   @$pb.TagNumber(4)
@@ -750,10 +617,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.int get tproxyPort => $_getIZ(4);
   @$pb.TagNumber(5)
-  set tproxyPort($core.int v) {
-    $_setUnsignedInt32(4, v);
-  }
-
+  set tproxyPort($core.int v) { $_setUnsignedInt32(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasTproxyPort() => $_has(4);
   @$pb.TagNumber(5)
@@ -762,10 +626,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.int get localDnsPort => $_getIZ(5);
   @$pb.TagNumber(6)
-  set localDnsPort($core.int v) {
-    $_setUnsignedInt32(5, v);
-  }
-
+  set localDnsPort($core.int v) { $_setUnsignedInt32(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasLocalDnsPort() => $_has(5);
   @$pb.TagNumber(6)
@@ -774,10 +635,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.int get mtu => $_getIZ(6);
   @$pb.TagNumber(7)
-  set mtu($core.int v) {
-    $_setUnsignedInt32(6, v);
-  }
-
+  set mtu($core.int v) { $_setUnsignedInt32(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasMtu() => $_has(6);
   @$pb.TagNumber(7)
@@ -786,10 +644,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   $core.bool get strictRoute => $_getBF(7);
   @$pb.TagNumber(8)
-  set strictRoute($core.bool v) {
-    $_setBool(7, v);
-  }
-
+  set strictRoute($core.bool v) { $_setBool(7, v); }
   @$pb.TagNumber(8)
   $core.bool hasStrictRoute() => $_has(7);
   @$pb.TagNumber(8)
@@ -798,10 +653,7 @@ class InboundOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $core.String get tunStack => $_getSZ(8);
   @$pb.TagNumber(9)
-  set tunStack($core.String v) {
-    $_setString(8, v);
-  }
-
+  set tunStack($core.String v) { $_setString(8, v); }
   @$pb.TagNumber(9)
   $core.bool hasTunStack() => $_has(8);
   @$pb.TagNumber(9)
@@ -809,14 +661,11 @@ class InboundOptions extends $pb.GeneratedMessage {
 }
 
 class URLTestOptions extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'URLTestOptions',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'URLTestOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'connectionTestUrl')
     ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'urlTestInterval')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   URLTestOptions._() : super();
   factory URLTestOptions({
@@ -832,20 +681,18 @@ class URLTestOptions extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory URLTestOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory URLTestOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory URLTestOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory URLTestOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   URLTestOptions clone() => URLTestOptions()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  URLTestOptions copyWith(void Function(URLTestOptions) updates) =>
-      super.copyWith((message) => updates(message as URLTestOptions))
-          as URLTestOptions; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  URLTestOptions copyWith(void Function(URLTestOptions) updates) => super.copyWith((message) => updates(message as URLTestOptions)) as URLTestOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static URLTestOptions create() => URLTestOptions._();
@@ -858,10 +705,7 @@ class URLTestOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get connectionTestUrl => $_getSZ(0);
   @$pb.TagNumber(1)
-  set connectionTestUrl($core.String v) {
-    $_setString(0, v);
-  }
-
+  set connectionTestUrl($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasConnectionTestUrl() => $_has(0);
   @$pb.TagNumber(1)
@@ -870,10 +714,7 @@ class URLTestOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $fixnum.Int64 get urlTestInterval => $_getI64(1);
   @$pb.TagNumber(2)
-  set urlTestInterval($fixnum.Int64 v) {
-    $_setInt64(1, v);
-  }
-
+  set urlTestInterval($fixnum.Int64 v) { $_setInt64(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasUrlTestInterval() => $_has(1);
   @$pb.TagNumber(2)
@@ -881,18 +722,13 @@ class URLTestOptions extends $pb.GeneratedMessage {
 }
 
 class RouteOptions extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RouteOptions',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RouteOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'resolveDestination')
-    ..e<DomainStrategy>(
-        2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ipv6Mode', $pb.PbFieldType.OE,
-        defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
+    ..e<DomainStrategy>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ipv6Mode', $pb.PbFieldType.OE, defaultOrMaker: DomainStrategy.as_is, valueOf: DomainStrategy.valueOf, enumValues: DomainStrategy.values)
     ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'bypassLan')
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'allowConnectionFromLan')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   RouteOptions._() : super();
   factory RouteOptions({
@@ -916,19 +752,18 @@ class RouteOptions extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory RouteOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory RouteOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory RouteOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory RouteOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   RouteOptions clone() => RouteOptions()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  RouteOptions copyWith(void Function(RouteOptions) updates) =>
-      super.copyWith((message) => updates(message as RouteOptions)) as RouteOptions; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  RouteOptions copyWith(void Function(RouteOptions) updates) => super.copyWith((message) => updates(message as RouteOptions)) as RouteOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static RouteOptions create() => RouteOptions._();
@@ -941,10 +776,7 @@ class RouteOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool get resolveDestination => $_getBF(0);
   @$pb.TagNumber(1)
-  set resolveDestination($core.bool v) {
-    $_setBool(0, v);
-  }
-
+  set resolveDestination($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasResolveDestination() => $_has(0);
   @$pb.TagNumber(1)
@@ -953,10 +785,7 @@ class RouteOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   DomainStrategy get ipv6Mode => $_getN(1);
   @$pb.TagNumber(2)
-  set ipv6Mode(DomainStrategy v) {
-    setField(2, v);
-  }
-
+  set ipv6Mode(DomainStrategy v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasIpv6Mode() => $_has(1);
   @$pb.TagNumber(2)
@@ -965,10 +794,7 @@ class RouteOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool get bypassLan => $_getBF(2);
   @$pb.TagNumber(3)
-  set bypassLan($core.bool v) {
-    $_setBool(2, v);
-  }
-
+  set bypassLan($core.bool v) { $_setBool(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasBypassLan() => $_has(2);
   @$pb.TagNumber(3)
@@ -977,10 +803,7 @@ class RouteOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool get allowConnectionFromLan => $_getBF(3);
   @$pb.TagNumber(4)
-  set allowConnectionFromLan($core.bool v) {
-    $_setBool(3, v);
-  }
-
+  set allowConnectionFromLan($core.bool v) { $_setBool(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasAllowConnectionFromLan() => $_has(3);
   @$pb.TagNumber(4)
@@ -988,21 +811,15 @@ class RouteOptions extends $pb.GeneratedMessage {
 }
 
 class TLSTricks extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TLSTricks',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TLSTricks', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableFragment')
-    ..aOM<IntRange>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fragmentSize',
-        subBuilder: IntRange.create)
-    ..aOM<IntRange>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fragmentSleep',
-        subBuilder: IntRange.create)
+    ..aOM<IntRange>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fragmentSize', subBuilder: IntRange.create)
+    ..aOM<IntRange>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fragmentSleep', subBuilder: IntRange.create)
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mixedSniCase')
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enablePadding')
-    ..aOM<IntRange>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'paddingSize',
-        subBuilder: IntRange.create)
-    ..hasRequiredFields = false;
+    ..aOM<IntRange>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'paddingSize', subBuilder: IntRange.create)
+    ..hasRequiredFields = false
+  ;
 
   TLSTricks._() : super();
   factory TLSTricks({
@@ -1034,19 +851,18 @@ class TLSTricks extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory TLSTricks.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory TLSTricks.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory TLSTricks.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TLSTricks.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   TLSTricks clone() => TLSTricks()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  TLSTricks copyWith(void Function(TLSTricks) updates) =>
-      super.copyWith((message) => updates(message as TLSTricks)) as TLSTricks; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  TLSTricks copyWith(void Function(TLSTricks) updates) => super.copyWith((message) => updates(message as TLSTricks)) as TLSTricks; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static TLSTricks create() => TLSTricks._();
@@ -1059,10 +875,7 @@ class TLSTricks extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool get enableFragment => $_getBF(0);
   @$pb.TagNumber(1)
-  set enableFragment($core.bool v) {
-    $_setBool(0, v);
-  }
-
+  set enableFragment($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasEnableFragment() => $_has(0);
   @$pb.TagNumber(1)
@@ -1071,10 +884,7 @@ class TLSTricks extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   IntRange get fragmentSize => $_getN(1);
   @$pb.TagNumber(2)
-  set fragmentSize(IntRange v) {
-    setField(2, v);
-  }
-
+  set fragmentSize(IntRange v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasFragmentSize() => $_has(1);
   @$pb.TagNumber(2)
@@ -1085,10 +895,7 @@ class TLSTricks extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   IntRange get fragmentSleep => $_getN(2);
   @$pb.TagNumber(3)
-  set fragmentSleep(IntRange v) {
-    setField(3, v);
-  }
-
+  set fragmentSleep(IntRange v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasFragmentSleep() => $_has(2);
   @$pb.TagNumber(3)
@@ -1099,10 +906,7 @@ class TLSTricks extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool get mixedSniCase => $_getBF(3);
   @$pb.TagNumber(4)
-  set mixedSniCase($core.bool v) {
-    $_setBool(3, v);
-  }
-
+  set mixedSniCase($core.bool v) { $_setBool(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasMixedSniCase() => $_has(3);
   @$pb.TagNumber(4)
@@ -1111,10 +915,7 @@ class TLSTricks extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool get enablePadding => $_getBF(4);
   @$pb.TagNumber(5)
-  set enablePadding($core.bool v) {
-    $_setBool(4, v);
-  }
-
+  set enablePadding($core.bool v) { $_setBool(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasEnablePadding() => $_has(4);
   @$pb.TagNumber(5)
@@ -1123,10 +924,7 @@ class TLSTricks extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   IntRange get paddingSize => $_getN(5);
   @$pb.TagNumber(6)
-  set paddingSize(IntRange v) {
-    setField(6, v);
-  }
-
+  set paddingSize(IntRange v) { setField(6, v); }
   @$pb.TagNumber(6)
   $core.bool hasPaddingSize() => $_has(5);
   @$pb.TagNumber(6)
@@ -1136,17 +934,13 @@ class TLSTricks extends $pb.GeneratedMessage {
 }
 
 class MuxOptions extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'MuxOptions',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'MuxOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enable')
     ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'padding')
-    ..a<$core.int>(
-        3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'maxStreams', $pb.PbFieldType.O3)
+    ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'maxStreams', $pb.PbFieldType.O3)
     ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'protocol')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   MuxOptions._() : super();
   factory MuxOptions({
@@ -1170,19 +964,18 @@ class MuxOptions extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory MuxOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory MuxOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory MuxOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory MuxOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   MuxOptions clone() => MuxOptions()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  MuxOptions copyWith(void Function(MuxOptions) updates) =>
-      super.copyWith((message) => updates(message as MuxOptions)) as MuxOptions; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  MuxOptions copyWith(void Function(MuxOptions) updates) => super.copyWith((message) => updates(message as MuxOptions)) as MuxOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static MuxOptions create() => MuxOptions._();
@@ -1195,10 +988,7 @@ class MuxOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool get enable => $_getBF(0);
   @$pb.TagNumber(1)
-  set enable($core.bool v) {
-    $_setBool(0, v);
-  }
-
+  set enable($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasEnable() => $_has(0);
   @$pb.TagNumber(1)
@@ -1207,10 +997,7 @@ class MuxOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool get padding => $_getBF(1);
   @$pb.TagNumber(2)
-  set padding($core.bool v) {
-    $_setBool(1, v);
-  }
-
+  set padding($core.bool v) { $_setBool(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasPadding() => $_has(1);
   @$pb.TagNumber(2)
@@ -1219,10 +1006,7 @@ class MuxOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.int get maxStreams => $_getIZ(2);
   @$pb.TagNumber(3)
-  set maxStreams($core.int v) {
-    $_setSignedInt32(2, v);
-  }
-
+  set maxStreams($core.int v) { $_setSignedInt32(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasMaxStreams() => $_has(2);
   @$pb.TagNumber(3)
@@ -1231,10 +1015,7 @@ class MuxOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.String get protocol => $_getSZ(3);
   @$pb.TagNumber(4)
-  set protocol($core.String v) {
-    $_setString(3, v);
-  }
-
+  set protocol($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasProtocol() => $_has(3);
   @$pb.TagNumber(4)
@@ -1242,29 +1023,20 @@ class MuxOptions extends $pb.GeneratedMessage {
 }
 
 class WarpOptions extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpOptions',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpOptions', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
     ..aOB(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'enableWarp')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mode')
-    ..aOM<WarpWireguardConfig>(
-        5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'wireguardConfig',
-        subBuilder: WarpWireguardConfig.create)
+    ..aOM<WarpWireguardConfig>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'wireguardConfig', subBuilder: WarpWireguardConfig.create)
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePackets')
-    ..aOM<IntRange>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePacketSize',
-        subBuilder: IntRange.create)
-    ..aOM<IntRange>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePacketDelay',
-        subBuilder: IntRange.create)
+    ..aOM<IntRange>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePacketSize', subBuilder: IntRange.create)
+    ..aOM<IntRange>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePacketDelay', subBuilder: IntRange.create)
     ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fakePacketMode')
     ..aOS(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cleanIp')
-    ..a<$core.int>(
-        11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cleanPort', $pb.PbFieldType.OU3)
-    ..aOM<WarpAccount>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'account',
-        subBuilder: WarpAccount.create)
-    ..hasRequiredFields = false;
+    ..a<$core.int>(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cleanPort', $pb.PbFieldType.OU3)
+    ..aOM<WarpAccount>(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'account', subBuilder: WarpAccount.create)
+    ..hasRequiredFields = false
+  ;
 
   WarpOptions._() : super();
   factory WarpOptions({
@@ -1316,19 +1088,18 @@ class WarpOptions extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory WarpOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory WarpOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory WarpOptions.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory WarpOptions.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   WarpOptions clone() => WarpOptions()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  WarpOptions copyWith(void Function(WarpOptions) updates) =>
-      super.copyWith((message) => updates(message as WarpOptions)) as WarpOptions; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  WarpOptions copyWith(void Function(WarpOptions) updates) => super.copyWith((message) => updates(message as WarpOptions)) as WarpOptions; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WarpOptions create() => WarpOptions._();
@@ -1341,10 +1112,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get id => $_getSZ(0);
   @$pb.TagNumber(1)
-  set id($core.String v) {
-    $_setString(0, v);
-  }
-
+  set id($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
@@ -1353,10 +1121,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool get enableWarp => $_getBF(1);
   @$pb.TagNumber(2)
-  set enableWarp($core.bool v) {
-    $_setBool(1, v);
-  }
-
+  set enableWarp($core.bool v) { $_setBool(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasEnableWarp() => $_has(1);
   @$pb.TagNumber(2)
@@ -1365,10 +1130,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get mode => $_getSZ(2);
   @$pb.TagNumber(3)
-  set mode($core.String v) {
-    $_setString(2, v);
-  }
-
+  set mode($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasMode() => $_has(2);
   @$pb.TagNumber(3)
@@ -1377,10 +1139,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   WarpWireguardConfig get wireguardConfig => $_getN(3);
   @$pb.TagNumber(5)
-  set wireguardConfig(WarpWireguardConfig v) {
-    setField(5, v);
-  }
-
+  set wireguardConfig(WarpWireguardConfig v) { setField(5, v); }
   @$pb.TagNumber(5)
   $core.bool hasWireguardConfig() => $_has(3);
   @$pb.TagNumber(5)
@@ -1391,10 +1150,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.String get fakePackets => $_getSZ(4);
   @$pb.TagNumber(6)
-  set fakePackets($core.String v) {
-    $_setString(4, v);
-  }
-
+  set fakePackets($core.String v) { $_setString(4, v); }
   @$pb.TagNumber(6)
   $core.bool hasFakePackets() => $_has(4);
   @$pb.TagNumber(6)
@@ -1403,10 +1159,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   IntRange get fakePacketSize => $_getN(5);
   @$pb.TagNumber(7)
-  set fakePacketSize(IntRange v) {
-    setField(7, v);
-  }
-
+  set fakePacketSize(IntRange v) { setField(7, v); }
   @$pb.TagNumber(7)
   $core.bool hasFakePacketSize() => $_has(5);
   @$pb.TagNumber(7)
@@ -1417,10 +1170,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(8)
   IntRange get fakePacketDelay => $_getN(6);
   @$pb.TagNumber(8)
-  set fakePacketDelay(IntRange v) {
-    setField(8, v);
-  }
-
+  set fakePacketDelay(IntRange v) { setField(8, v); }
   @$pb.TagNumber(8)
   $core.bool hasFakePacketDelay() => $_has(6);
   @$pb.TagNumber(8)
@@ -1431,10 +1181,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $core.String get fakePacketMode => $_getSZ(7);
   @$pb.TagNumber(9)
-  set fakePacketMode($core.String v) {
-    $_setString(7, v);
-  }
-
+  set fakePacketMode($core.String v) { $_setString(7, v); }
   @$pb.TagNumber(9)
   $core.bool hasFakePacketMode() => $_has(7);
   @$pb.TagNumber(9)
@@ -1443,10 +1190,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(10)
   $core.String get cleanIp => $_getSZ(8);
   @$pb.TagNumber(10)
-  set cleanIp($core.String v) {
-    $_setString(8, v);
-  }
-
+  set cleanIp($core.String v) { $_setString(8, v); }
   @$pb.TagNumber(10)
   $core.bool hasCleanIp() => $_has(8);
   @$pb.TagNumber(10)
@@ -1455,10 +1199,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(11)
   $core.int get cleanPort => $_getIZ(9);
   @$pb.TagNumber(11)
-  set cleanPort($core.int v) {
-    $_setUnsignedInt32(9, v);
-  }
-
+  set cleanPort($core.int v) { $_setUnsignedInt32(9, v); }
   @$pb.TagNumber(11)
   $core.bool hasCleanPort() => $_has(9);
   @$pb.TagNumber(11)
@@ -1467,10 +1208,7 @@ class WarpOptions extends $pb.GeneratedMessage {
   @$pb.TagNumber(12)
   WarpAccount get account => $_getN(10);
   @$pb.TagNumber(12)
-  set account(WarpAccount v) {
-    setField(12, v);
-  }
-
+  set account(WarpAccount v) { setField(12, v); }
   @$pb.TagNumber(12)
   $core.bool hasAccount() => $_has(10);
   @$pb.TagNumber(12)
@@ -1480,14 +1218,11 @@ class WarpOptions extends $pb.GeneratedMessage {
 }
 
 class WarpAccount extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpAccount',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpAccount', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accountId')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'accessToken')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   WarpAccount._() : super();
   factory WarpAccount({
@@ -1503,19 +1238,18 @@ class WarpAccount extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory WarpAccount.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory WarpAccount.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory WarpAccount.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory WarpAccount.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   WarpAccount clone() => WarpAccount()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  WarpAccount copyWith(void Function(WarpAccount) updates) =>
-      super.copyWith((message) => updates(message as WarpAccount)) as WarpAccount; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  WarpAccount copyWith(void Function(WarpAccount) updates) => super.copyWith((message) => updates(message as WarpAccount)) as WarpAccount; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WarpAccount create() => WarpAccount._();
@@ -1528,10 +1262,7 @@ class WarpAccount extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get accountId => $_getSZ(0);
   @$pb.TagNumber(1)
-  set accountId($core.String v) {
-    $_setString(0, v);
-  }
-
+  set accountId($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasAccountId() => $_has(0);
   @$pb.TagNumber(1)
@@ -1540,10 +1271,7 @@ class WarpAccount extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get accessToken => $_getSZ(1);
   @$pb.TagNumber(2)
-  set accessToken($core.String v) {
-    $_setString(1, v);
-  }
-
+  set accessToken($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasAccessToken() => $_has(1);
   @$pb.TagNumber(2)
@@ -1551,17 +1279,14 @@ class WarpAccount extends $pb.GeneratedMessage {
 }
 
 class WarpWireguardConfig extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpWireguardConfig',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WarpWireguardConfig', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'privateKey')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'localAddressIpv4')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'localAddressIpv6')
     ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'peerPublicKey')
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'clientId')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   WarpWireguardConfig._() : super();
   factory WarpWireguardConfig({
@@ -1589,38 +1314,31 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory WarpWireguardConfig.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory WarpWireguardConfig.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory WarpWireguardConfig.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory WarpWireguardConfig.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   WarpWireguardConfig clone() => WarpWireguardConfig()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  WarpWireguardConfig copyWith(void Function(WarpWireguardConfig) updates) =>
-      super.copyWith((message) => updates(message as WarpWireguardConfig))
-          as WarpWireguardConfig; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  WarpWireguardConfig copyWith(void Function(WarpWireguardConfig) updates) => super.copyWith((message) => updates(message as WarpWireguardConfig)) as WarpWireguardConfig; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WarpWireguardConfig create() => WarpWireguardConfig._();
   WarpWireguardConfig createEmptyInstance() => create();
   static $pb.PbList<WarpWireguardConfig> createRepeated() => $pb.PbList<WarpWireguardConfig>();
   @$core.pragma('dart2js:noInline')
-  static WarpWireguardConfig getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WarpWireguardConfig>(create);
+  static WarpWireguardConfig getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WarpWireguardConfig>(create);
   static WarpWireguardConfig? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get privateKey => $_getSZ(0);
   @$pb.TagNumber(1)
-  set privateKey($core.String v) {
-    $_setString(0, v);
-  }
-
+  set privateKey($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasPrivateKey() => $_has(0);
   @$pb.TagNumber(1)
@@ -1629,10 +1347,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get localAddressIpv4 => $_getSZ(1);
   @$pb.TagNumber(2)
-  set localAddressIpv4($core.String v) {
-    $_setString(1, v);
-  }
-
+  set localAddressIpv4($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasLocalAddressIpv4() => $_has(1);
   @$pb.TagNumber(2)
@@ -1641,10 +1356,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get localAddressIpv6 => $_getSZ(2);
   @$pb.TagNumber(3)
-  set localAddressIpv6($core.String v) {
-    $_setString(2, v);
-  }
-
+  set localAddressIpv6($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasLocalAddressIpv6() => $_has(2);
   @$pb.TagNumber(3)
@@ -1653,10 +1365,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.String get peerPublicKey => $_getSZ(3);
   @$pb.TagNumber(4)
-  set peerPublicKey($core.String v) {
-    $_setString(3, v);
-  }
-
+  set peerPublicKey($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasPeerPublicKey() => $_has(3);
   @$pb.TagNumber(4)
@@ -1665,10 +1374,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.String get clientId => $_getSZ(4);
   @$pb.TagNumber(5)
-  set clientId($core.String v) {
-    $_setString(4, v);
-  }
-
+  set clientId($core.String v) { $_setString(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasClientId() => $_has(4);
   @$pb.TagNumber(5)
@@ -1676,11 +1382,7 @@ class WarpWireguardConfig extends $pb.GeneratedMessage {
 }
 
 class Rule extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Rule',
-      package: const $pb.PackageName(
-          const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Rule', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hiddifyoptions'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ruleSetUrl')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'domains')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ip')
@@ -1688,7 +1390,8 @@ class Rule extends $pb.GeneratedMessage {
     ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'network')
     ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'protocol')
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'outbound')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   Rule._() : super();
   factory Rule({
@@ -1724,19 +1427,18 @@ class Rule extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory Rule.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory Rule.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory Rule.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory Rule.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   Rule clone() => Rule()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  Rule copyWith(void Function(Rule) updates) =>
-      super.copyWith((message) => updates(message as Rule)) as Rule; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  Rule copyWith(void Function(Rule) updates) => super.copyWith((message) => updates(message as Rule)) as Rule; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static Rule create() => Rule._();
@@ -1749,10 +1451,7 @@ class Rule extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get ruleSetUrl => $_getSZ(0);
   @$pb.TagNumber(1)
-  set ruleSetUrl($core.String v) {
-    $_setString(0, v);
-  }
-
+  set ruleSetUrl($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasRuleSetUrl() => $_has(0);
   @$pb.TagNumber(1)
@@ -1761,10 +1460,7 @@ class Rule extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get domains => $_getSZ(1);
   @$pb.TagNumber(2)
-  set domains($core.String v) {
-    $_setString(1, v);
-  }
-
+  set domains($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasDomains() => $_has(1);
   @$pb.TagNumber(2)
@@ -1773,10 +1469,7 @@ class Rule extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get ip => $_getSZ(2);
   @$pb.TagNumber(3)
-  set ip($core.String v) {
-    $_setString(2, v);
-  }
-
+  set ip($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasIp() => $_has(2);
   @$pb.TagNumber(3)
@@ -1785,10 +1478,7 @@ class Rule extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.String get port => $_getSZ(3);
   @$pb.TagNumber(4)
-  set port($core.String v) {
-    $_setString(3, v);
-  }
-
+  set port($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasPort() => $_has(3);
   @$pb.TagNumber(4)
@@ -1797,10 +1487,7 @@ class Rule extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.String get network => $_getSZ(4);
   @$pb.TagNumber(5)
-  set network($core.String v) {
-    $_setString(4, v);
-  }
-
+  set network($core.String v) { $_setString(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasNetwork() => $_has(4);
   @$pb.TagNumber(5)
@@ -1809,10 +1496,7 @@ class Rule extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.String get protocol => $_getSZ(5);
   @$pb.TagNumber(6)
-  set protocol($core.String v) {
-    $_setString(5, v);
-  }
-
+  set protocol($core.String v) { $_setString(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasProtocol() => $_has(5);
   @$pb.TagNumber(6)
@@ -1821,12 +1505,10 @@ class Rule extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.String get outbound => $_getSZ(6);
   @$pb.TagNumber(7)
-  set outbound($core.String v) {
-    $_setString(6, v);
-  }
-
+  set outbound($core.String v) { $_setString(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasOutbound() => $_has(6);
   @$pb.TagNumber(7)
   void clearOutbound() => clearField(7);
 }
+

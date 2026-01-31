@@ -10,18 +10,13 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class DomainStrategy extends $pb.ProtobufEnum {
-  static const DomainStrategy as_is =
-      DomainStrategy._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'as_is');
-  static const DomainStrategy prefer_ipv4 =
-      DomainStrategy._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'prefer_ipv4');
-  static const DomainStrategy prefer_ipv6 =
-      DomainStrategy._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'prefer_ipv6');
-  static const DomainStrategy ipv4_only =
-      DomainStrategy._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ipv4_only');
-  static const DomainStrategy ipv6_only =
-      DomainStrategy._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ipv6_only');
+  static const DomainStrategy as_is = DomainStrategy._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'as_is');
+  static const DomainStrategy prefer_ipv4 = DomainStrategy._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'prefer_ipv4');
+  static const DomainStrategy prefer_ipv6 = DomainStrategy._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'prefer_ipv6');
+  static const DomainStrategy ipv4_only = DomainStrategy._(3, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ipv4_only');
+  static const DomainStrategy ipv6_only = DomainStrategy._(4, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'ipv6_only');
 
-  static const $core.List<DomainStrategy> values = <DomainStrategy>[
+  static const $core.List<DomainStrategy> values = <DomainStrategy> [
     as_is,
     prefer_ipv4,
     prefer_ipv6,
@@ -34,3 +29,4 @@ class DomainStrategy extends $pb.ProtobufEnum {
 
   const DomainStrategy._($core.int v, $core.String n) : super(v, n);
 }
+

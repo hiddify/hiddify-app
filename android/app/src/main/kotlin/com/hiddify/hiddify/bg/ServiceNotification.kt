@@ -115,7 +115,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
 
 
     suspend fun start() {
-        if (Settings.dynamicNotification) {
+        if (Settings.dynamicNotification && checkPermission()) {
 //            commandClient.connect()
             startListenSystemInfo()
             withContext(Dispatchers.Main) {

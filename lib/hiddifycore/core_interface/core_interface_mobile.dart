@@ -100,9 +100,9 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   }
 
   @override
-  Future<CoreStatus> start(String path, String name) async {
-    if (!await waitUntilPort(portBack, false, stop)) return const CoreStatus.stopped(alert: CoreAlert.createService);
-    await stop();
+  Future<CoreStatus> setupBackground(String path, String name) async {
+    // if (!await waitUntilPort(portBack, false, stop)) return const CoreStatus.stopped(alert: CoreAlert.createService);
+    if (!await stop()) return const CoreStatus.stopped(alert: CoreAlert.createService);
     _status.clean();
     await methodChannel.invokeMethod("start", {
       "path": path,
@@ -114,15 +114,16 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     _isBgClientAvailable = true;
     for (var i = 0; i < 100; i++) {
       try {
-        final res = await _status.get(timeout: const Duration(seconds: 1));
+        final res = await _status.get(timeout: const Duration(milliseconds: 100));
 
         switch (res) {
           case CoreStarted():
             break;
           case CoreStopped():
-            return res;
+            if (res.alert != null) return res;
+
           case CoreStopping():
-            return res;
+          // return res;
           case CoreStarting():
         }
       } on TimeoutException {
@@ -130,15 +131,17 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
       }
     }
 
-    if (!await waitUntilPort(portBack, true, null, maxTry: 100))
+    if (!await waitUntilPort(portBack, true, null, maxTry: 10)) {
+      await stopMethodChannel();
       return const CoreStatus.stopped(alert: CoreAlert.startService);
-    return const CoreStarting();
+    }
+    return const CoreStarted();
   }
 
   @override
   Future<bool> stop() async {
     await stopMethodChannel();
-    if (!await waitUntilPort(portBack, false, stopMethodChannel)) {
+    if (!await waitUntilPort(portBack, false, null, maxTry: 10)) {
       return false;
     }
 
@@ -175,15 +178,15 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 Future<bool> waitUntilPort(
   int portNumber,
   bool isOpen,
-  Future Function()? callFunctionIfNotOpen, {
+  Future Function()? callFunctionAfterEachFail, {
   int maxTry = 10,
 }) async {
   for (var i = 0; i < maxTry; i++) {
     if (await isPortOpen("127.0.0.1", portNumber) == isOpen) {
       return true;
     }
-    if (callFunctionIfNotOpen != null) {
-      await callFunctionIfNotOpen();
+    if (callFunctionAfterEachFail != null) {
+      await callFunctionAfterEachFail();
     }
 
     await Future.delayed(const Duration(milliseconds: 200));
@@ -191,7 +194,7 @@ Future<bool> waitUntilPort(
   return false;
 }
 
-Future<bool> isPortOpen(String host, int port, {Duration timeout = const Duration(microseconds: 300)}) async {
+Future<bool> isPortOpen(String host, int port, {Duration timeout = const Duration(milliseconds: 300)}) async {
   try {
     final socket = await Socket.connect(host, port, timeout: timeout);
     await socket.close();

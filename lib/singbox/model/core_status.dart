@@ -14,17 +14,19 @@ sealed class CoreStatus with _$CoreStatus {
   const factory CoreStatus.stopping() = CoreStopping;
 
   factory CoreStatus.fromEvent(dynamic event) {
-    switch (event) {
-      case {"status": "Stopped", "alert": final String? alertStr, "message": final String? messageStr}:
-        final alert = CoreAlert.values.firstOrNullWhere((e) => alertStr?.toLowerCase() == e.name.toLowerCase());
-        return CoreStatus.stopped(alert: alert, message: messageStr);
-      case {"status": "Stopped"}:
-        return const CoreStatus.stopped();
-      case {"status": "Starting"}:
+    event = event as Map<String, dynamic>?;
+    switch (event?["status"]) {
+      case "Stopped":
+        final alertstr = event?["alert"] as String?;
+        final alert = CoreAlert.values.firstOrNullWhere((e) => alertstr?.toLowerCase() == e.name.toLowerCase());
+        final msgStr = event?["message"] as String?;
+        return CoreStatus.stopped(alert: alert, message: msgStr);
+
+      case "Starting":
         return const CoreStarting();
-      case {"status": "Started"}:
+      case "Started":
         return const CoreStarted();
-      case {"status": "Stopping"}:
+      case "Stopping":
         return const CoreStopping();
       default:
         throw Exception("unexpected status [$event]");
@@ -66,4 +68,13 @@ sealed class CoreStatus with _$CoreStatus {
   }
 }
 
-enum CoreAlert { requestVPNPermission, requestNotificationPermission, emptyConfiguration, startCommandServer, createService, startService, alreadyStarted, startFailed }
+enum CoreAlert {
+  requestVPNPermission,
+  requestNotificationPermission,
+  emptyConfiguration,
+  startCommandServer,
+  createService,
+  startService,
+  alreadyStarted,
+  startFailed,
+}

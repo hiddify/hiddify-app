@@ -42,12 +42,12 @@ class DnsOptionsPage extends HookConsumerWidget {
             icon: Icons.sync_alt_rounded,
             presentChoice: (value) => value.present(t),
           ),
-          SwitchListTile.adaptive(
-            title: Text(t.pages.settings.dns.enableDnsRouting),
-            secondary: const Icon(Icons.private_connectivity_rounded),
-            value: ref.watch(ConfigOptions.enableDnsRouting),
-            onChanged: ref.read(ConfigOptions.enableDnsRouting.notifier).update,
-          ),
+          // SwitchListTile.adaptive(
+          //   title: Text(t.pages.settings.dns.enableDnsRouting),
+          //   secondary: const Icon(Icons.private_connectivity_rounded),
+          //   value: ref.watch(ConfigOptions.enableDnsRouting),
+          //   onChanged: ref.read(ConfigOptions.enableDnsRouting.notifier).update,
+          // ),
         ],
       ),
     );

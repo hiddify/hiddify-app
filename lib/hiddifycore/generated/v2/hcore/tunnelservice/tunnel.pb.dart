@@ -10,20 +10,16 @@ import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class TunnelStartRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TunnelStartRequest',
-      package:
-          const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'tunnelservice'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TunnelStartRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'tunnelservice'), createEmptyInstance: create)
     ..aOB(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'ipv6')
-    ..a<$core.int>(
-        2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serverPort', $pb.PbFieldType.O3)
+    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serverPort', $pb.PbFieldType.O3)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serverUsername')
     ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'serverPassword')
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'strictRoute')
     ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'endpointIndependentNat')
     ..aOS(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'stack')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   TunnelStartRequest._() : super();
   factory TunnelStartRequest({
@@ -59,38 +55,31 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory TunnelStartRequest.fromBuffer($core.List<$core.int> i,
-          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory TunnelStartRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory TunnelStartRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TunnelStartRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   TunnelStartRequest clone() => TunnelStartRequest()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  TunnelStartRequest copyWith(void Function(TunnelStartRequest) updates) =>
-      super.copyWith((message) => updates(message as TunnelStartRequest))
-          as TunnelStartRequest; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  TunnelStartRequest copyWith(void Function(TunnelStartRequest) updates) => super.copyWith((message) => updates(message as TunnelStartRequest)) as TunnelStartRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static TunnelStartRequest create() => TunnelStartRequest._();
   TunnelStartRequest createEmptyInstance() => create();
   static $pb.PbList<TunnelStartRequest> createRepeated() => $pb.PbList<TunnelStartRequest>();
   @$core.pragma('dart2js:noInline')
-  static TunnelStartRequest getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TunnelStartRequest>(create);
+  static TunnelStartRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TunnelStartRequest>(create);
   static TunnelStartRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.bool get ipv6 => $_getBF(0);
   @$pb.TagNumber(1)
-  set ipv6($core.bool v) {
-    $_setBool(0, v);
-  }
-
+  set ipv6($core.bool v) { $_setBool(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasIpv6() => $_has(0);
   @$pb.TagNumber(1)
@@ -99,10 +88,7 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.int get serverPort => $_getIZ(1);
   @$pb.TagNumber(2)
-  set serverPort($core.int v) {
-    $_setSignedInt32(1, v);
-  }
-
+  set serverPort($core.int v) { $_setSignedInt32(1, v); }
   @$pb.TagNumber(2)
   $core.bool hasServerPort() => $_has(1);
   @$pb.TagNumber(2)
@@ -111,10 +97,7 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.String get serverUsername => $_getSZ(2);
   @$pb.TagNumber(3)
-  set serverUsername($core.String v) {
-    $_setString(2, v);
-  }
-
+  set serverUsername($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasServerUsername() => $_has(2);
   @$pb.TagNumber(3)
@@ -123,10 +106,7 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.String get serverPassword => $_getSZ(3);
   @$pb.TagNumber(4)
-  set serverPassword($core.String v) {
-    $_setString(3, v);
-  }
-
+  set serverPassword($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
   $core.bool hasServerPassword() => $_has(3);
   @$pb.TagNumber(4)
@@ -135,10 +115,7 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool get strictRoute => $_getBF(4);
   @$pb.TagNumber(5)
-  set strictRoute($core.bool v) {
-    $_setBool(4, v);
-  }
-
+  set strictRoute($core.bool v) { $_setBool(4, v); }
   @$pb.TagNumber(5)
   $core.bool hasStrictRoute() => $_has(4);
   @$pb.TagNumber(5)
@@ -147,10 +124,7 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool get endpointIndependentNat => $_getBF(5);
   @$pb.TagNumber(6)
-  set endpointIndependentNat($core.bool v) {
-    $_setBool(5, v);
-  }
-
+  set endpointIndependentNat($core.bool v) { $_setBool(5, v); }
   @$pb.TagNumber(6)
   $core.bool hasEndpointIndependentNat() => $_has(5);
   @$pb.TagNumber(6)
@@ -159,10 +133,7 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.String get stack => $_getSZ(6);
   @$pb.TagNumber(7)
-  set stack($core.String v) {
-    $_setString(6, v);
-  }
-
+  set stack($core.String v) { $_setString(6, v); }
   @$pb.TagNumber(7)
   $core.bool hasStack() => $_has(6);
   @$pb.TagNumber(7)
@@ -170,13 +141,10 @@ class TunnelStartRequest extends $pb.GeneratedMessage {
 }
 
 class TunnelResponse extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TunnelResponse',
-      package:
-          const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'tunnelservice'),
-      createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'TunnelResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'tunnelservice'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
-    ..hasRequiredFields = false;
+    ..hasRequiredFields = false
+  ;
 
   TunnelResponse._() : super();
   factory TunnelResponse({
@@ -188,20 +156,18 @@ class TunnelResponse extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory TunnelResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromBuffer(i, r);
-  factory TunnelResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
-      create()..mergeFromJson(i, r);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-      'Will be removed in next major version')
+  factory TunnelResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TunnelResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
   TunnelResponse clone() => TunnelResponse()..mergeFromMessage(this);
-  @$core.Deprecated('Using this can add significant overhead to your binary. '
-      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-      'Will be removed in next major version')
-  TunnelResponse copyWith(void Function(TunnelResponse) updates) =>
-      super.copyWith((message) => updates(message as TunnelResponse))
-          as TunnelResponse; // ignore: deprecated_member_use
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  TunnelResponse copyWith(void Function(TunnelResponse) updates) => super.copyWith((message) => updates(message as TunnelResponse)) as TunnelResponse; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static TunnelResponse create() => TunnelResponse._();
@@ -214,12 +180,10 @@ class TunnelResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.String get message => $_getSZ(0);
   @$pb.TagNumber(1)
-  set message($core.String v) {
-    $_setString(0, v);
-  }
-
+  set message($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasMessage() => $_has(0);
   @$pb.TagNumber(1)
   void clearMessage() => clearField(1);
 }
+
