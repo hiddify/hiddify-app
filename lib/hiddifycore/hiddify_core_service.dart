@@ -42,6 +42,7 @@ class HiddifyCoreService with InfraLogger {
     setup(dirs, debug)
         .mapLeft((e) {
           loggy.error(e);
+          if (PlatformUtils.isIOS) return;
           ref.read(inAppNotificationControllerProvider).showErrorToast(e);
         })
         .map((_) {

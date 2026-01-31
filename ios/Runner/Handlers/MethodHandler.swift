@@ -77,7 +77,20 @@ public class MethodHandler: NSObject, FlutterPlugin {
                     VPNConfig.shared.workingDir=workingDir
                     VPNConfig.shared.tempDir=tempDir
                     var error: NSError?
-                    MobileSetup(baseDir, workingDir, tempDir, mode, "127.0.0.1:\(grpcPort)", "", false, nil, &error)
+                    let opts = MobileSetupOptions()
+                    opts.basePath = baseDir
+                    opts.workingDir = workingDir
+                    opts.tempDir = tempDir
+                    opts.listen = "127.0.0.1:\(grpcPort)"
+                    opts.secret = ""
+                    opts.debug = false
+                    opts.mode = 4
+                    opts.fixAndroidStack = false
+                    MobileSetup(opts,
+                        nil,
+                        &error
+                    )
+                    
                     if let error {
                         result(FlutterError(code: String(error.code), message: error.localizedDescription, details: nil))
                         return
@@ -106,14 +119,14 @@ public class MethodHandler: NSObject, FlutterPlugin {
                 VPNConfig.shared.grpcServiceModePort=grpcPort
                 
                 var error: NSError?
-                let configstr=MobileBuildConfig(path,&error) as String
+                //let configstr=MobileBuildConfig(path,&error) as String
                 if let error {
                     await mainResult(FlutterError(code: String(error.code), message: error.description, details: nil))
                     return
                 }
                 do {
                     try await VPNManager.shared.setup()
-                    try await VPNManager.shared.connect(with: configstr, grpcServiceModePort: grpcPort, disableMemoryLimit: VPNConfig.shared.disableMemoryLimit)
+                    try await VPNManager.shared.connect(with: path, grpcServiceModePort: grpcPort, disableMemoryLimit: VPNConfig.shared.disableMemoryLimit)
                 } catch {
                     await mainResult(FlutterError(code: "SETUP_CONNECTION", message: error.localizedDescription, details: nil))
                     return

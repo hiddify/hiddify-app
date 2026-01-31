@@ -29,8 +29,9 @@ class PacketTunnelProvider: ExtensionProvider {
     }
     
     override func handleAppMessage(_ messageData: Data) async -> Data? {
-        NSLog("H?C2")
+        
         let message = String(data: messageData, encoding: .utf8)
+//        NSLog("H?C2"+message??"")
         switch message {
         case "stats":
             return "\(upload),\(download)".data(using: .utf8)!

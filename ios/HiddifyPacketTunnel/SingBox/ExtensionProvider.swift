@@ -7,7 +7,7 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     public static let errorFile = FilePath.workingDirectory.appendingPathComponent("network_extension_error.log")
     private let logger = Logger(subsystem: "apple.hiddify.com.HiddifyPacketTunnel", category: "PacketTunnel")
     
-    private var commandServer: LibboxCommandServer!
+//    private var commandServer: LibboxCommandServer!
     private var systemProxyAvailable = false
     private var systemProxyEnabled = false
     private var platformInterface: ExtensionPlatformInterface!
@@ -54,14 +54,17 @@ open class ExtensionProvider: NEPacketTunnelProvider {
             }
             // Initialize mobile setup with error handling
             var setupError: NSError?
-            MobileSetup(
-                sharedDir,
-                workDir,
-                cacheDir,
-                4,
-                "127.0.0.1:\(grpcServiceModePort)",
-                "",
-                false,
+            let opts = MobileSetupOptions()
+            opts.basePath = sharedDir
+            opts.workingDir = workDir
+            opts.tempDir = cacheDir
+            opts.listen = "127.0.0.1:\(grpcServiceModePort)"
+            opts.secret = ""
+            opts.debug = false
+            opts.mode = 4
+            opts.fixAndroidStack = false
+
+            MobileSetup(opts,
                 platformInterface,
                 &setupError
             )
@@ -69,6 +72,7 @@ open class ExtensionProvider: NEPacketTunnelProvider {
             if let setupError = setupError {
                 throw setupError
             }
+            
             
             LibboxSetMemoryLimit(!disableMemoryLimit)
             
@@ -84,19 +88,19 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     }
     
     private func startService(_ config: String) async throws {
-        writeMessage("Starting service")
-        var error: NSError?
-        
-        do {
-            try MobileStart("", config, &error)
-            if let error = error {
-                throw error
-            }
-            writeMessage("(packet-tunnel) service started successfully")
-        } catch {
-            writeFatalError("(packet-tunnel) error: start service: \(error.localizedDescription)")
-            throw error
-        }
+//        writeMessage("Starting service")
+//        var error: NSError?
+//        
+//        do {
+////            try MobileStart("", "", &error)
+//            if let error = error {
+//                throw error
+//            }
+//            writeMessage("(packet-tunnel) service started successfully")
+//        } catch {
+//            writeFatalError("(packet-tunnel) error: start service: \(error.localizedDescription)")
+//            throw error
+//        }
     }
     
     private func createRequiredDirectories() throws {
@@ -155,13 +159,13 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         writeMessage("(packet-tunnel) stopping, reason: \(reason)")
         stopService()
         
-        // Allow time for cleanup
-        try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
-        
-        if let server = commandServer {
-            try? server.close()
-            commandServer = nil
-        }
+//        // Allow time for cleanup
+//        try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
+//        
+//        if let server = commandServer {
+//            try? server.close()
+//            commandServer = nil
+//        }
     }
     
     private func stopService() {
@@ -197,11 +201,13 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     
     override open func sleep() async {
         logger.debug("Entering sleep mode")
+        MobilePause()
         // Add any sleep mode handling if needed
     }
     
     override open func wake() {
         logger.debug("Waking from sleep")
+        MobileWake()
         // Add any wake handling if needed
     }
 }
