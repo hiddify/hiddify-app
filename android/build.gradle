@@ -24,6 +24,8 @@ android {
         }
 
         buildConfigField "String", "GIT_HASH", "\"${getGitHash()}\""
+        
+        vectorDrawables.useSupportLibrary true
     }
 
     compileOptions {
@@ -42,7 +44,8 @@ android {
             "-Xemit-jvm-type-annotations",
             "-Xenhance-jdk-build-improvements",
             "-Xsam-conversions=class",
-            "-Xlambdas=indy"
+            "-Xlambdas=indy",
+            "-Xjvm-enable-preview"
         ]
     }
 
@@ -56,6 +59,9 @@ android {
             ndk {
                 debugSymbolLevel 'full'
             }
+            
+            v2SigningEnabled true
+            v3SigningEnabled true
         }
     }
 
@@ -66,7 +72,14 @@ android {
             excludes += '/META-INF/proguard/**'
             excludes += '/kotlin/**'
             excludes += '**/kotlin-tooling-metadata.json'
+            excludes += '**/MANIFEST.MF'
         }
+    }
+    
+    bundle {
+        language { enableSplit = false }
+        density { enableSplit = true }
+        abi { enableSplit = true }
     }
 }
 
