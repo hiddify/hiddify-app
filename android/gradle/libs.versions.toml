@@ -1,18 +1,20 @@
 [versions]
 agp = "8.13.2"
 kotlin = "2.2.20"
-coreKtx = "1.17.0"
-appcompat = "1.7.1"
-lifecycle = "2.10.0"
+coreKtx = "1.18.0-alpha01"
+appcompat = "1.8.0-alpha03"
+lifecycle = "2.11.0-beta01"
 gson = "2.13.2"
-flutter = "1.0.0"
+flutter = "1.1.0-beta.1"
 desugar = "2.1.4"
+coroutines = "1.10.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
 
