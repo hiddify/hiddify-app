@@ -248,7 +248,7 @@ jobs:
             echo "For $EXT ($KEY) filename is ${FILENAME}"
             mv dist/*/*.$EXT* tmp_out/${FILENAME}.$EXT$( [ "$EXT" = "tar" ] && echo ".gz" )
             ls tmp_out
-            chmod +x tmp_out/${FILENAME}.$EXT
+            [[ "$EXT" != "tar" ]] && chmod +x tmp_out/${FILENAME}.$EXT || echo "Skipping chmod for tar"
             if [ "${{matrix.platform}}" == "linux" ];then
               cp ./.github/help/linux/* tmp_out/
             else
