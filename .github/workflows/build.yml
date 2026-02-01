@@ -21,7 +21,7 @@ env:
   TAG_NAME: "${{ inputs.tag-name }}"
   TARGET_NAME_AppImage: "Hiddify-Linux-x64"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
-  TARGET_NAME_rpm: "Hiddify-rpm-x64"
+  # TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
   TARGET_NAME_aab: "Hiddify-Android"
   #TARGET_NAME_exe: "Hiddify-Windows-x64"
@@ -76,7 +76,7 @@ jobs:
           - platform: linux
             os: ubuntu-22.04
             aarch: amd64
-            targets: AppImage,deb,rpm
+            targets: .tar.gz,deb
 
           - platform: macos
             os: macos-13
