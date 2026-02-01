@@ -19,7 +19,7 @@ env:
   NDK_VERSION: r26d
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   TAG_NAME: "${{ inputs.tag-name }}"
-  TARGET_NAME_AppImage: "Hiddify-Linux-x64"
+  TARGET_NAME_tar: "Hiddify-Linux-x64-AppImage"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
   # TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
@@ -76,7 +76,7 @@ jobs:
           - platform: linux
             os: ubuntu-22.04
             aarch: amd64
-            targets: .tar.gz,deb
+            targets: deb,tar
 
           - platform: macos
             os: macos-13
@@ -246,7 +246,7 @@ jobs:
             KEY=TARGET_NAME_${EXT}
             FILENAME=${!KEY}
             echo "For $EXT ($KEY) filename is ${FILENAME}"
-            mv dist/*/*.$EXT tmp_out/${FILENAME}.$EXT
+            mv dist/*/*.$EXT* tmp_out/${FILENAME}.$EXT$( [ "$EXT" = "tar" ] && echo ".gz" )
             ls tmp_out
             chmod +x tmp_out/${FILENAME}.$EXT
             if [ "${{matrix.platform}}" == "linux" ];then
