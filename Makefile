@@ -151,7 +151,7 @@ android-aab-install-deps: android-install-deps
 # loads the package list from linux_deps.list
 LINUX_DEPS = $(shell grep -vE '^\s*#|^\s*$$' linux_deps.list)
 # reads the Flutter version from pubspec.yaml
-REQUIRED_VER = $(shell grep -A 2 "environment:" $(CURDIR)/pubspec.yaml | grep "flutter:" | tr -d ' ^flutter:')
+REQUIRED_VER = $(shell sed -n '/environment:/,/flutter:/ s/.*flutter:[[:space:]]*//p' pubspec.yaml | tr -d " '^\"")
 
 linux-install-deps:
 	@echo "** Installing Debian/Ubuntu dependencies..."
