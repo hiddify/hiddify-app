@@ -171,7 +171,7 @@ class BoxService(
                         it.mode=4L//mode.toLong()
                         it.listen= "127.0.0.1:${Settings.grpcServiceModePort}"
                         it.secret=""
-                        it.debug = BuildConfig.DEBUG||Settings.debugMode
+                        it.debug = Settings.debugMode
                     },platformInterface)
 
 

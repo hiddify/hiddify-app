@@ -64,6 +64,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
         "tempDir": directories.tempDir.path,
         "grpcPort": portFront,
         "mode": mode,
+        "debug": debug,
       });
       final res = await helloClient.sayHello(HelloRequest(name: "test"));
       loggy.info(res.toString());

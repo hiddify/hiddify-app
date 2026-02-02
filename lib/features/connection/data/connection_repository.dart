@@ -53,8 +53,9 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     if (_initialized) return TaskEither.of(unit);
     return exceptionHandler(() {
       loggy.debug("setting up singbox");
+
       return singbox
-          .setup(directories, false)
+          .setup(directories)
           .map((r) {
             _initialized = true;
             return r;
@@ -118,11 +119,12 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
                 final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense();
                 if (isAgreed == true) {
                   await ref.read(warpLicenseNotifierProvider.notifier).agree();
-                  return (await applyConfigOption(prof).run()).match((l) => throw l, (_) => unit);
+                  // return (await applyConfigOption(prof).run()).match((l) => throw l, (_) => unit);
                 } else {
                   throw const MissingWarpLicense();
                 }
               }
+              await singbox.changeOptions(overridedOptions).run();
               return unit;
             }, (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st)),
           );

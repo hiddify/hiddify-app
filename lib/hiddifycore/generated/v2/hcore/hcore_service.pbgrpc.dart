@@ -43,6 +43,11 @@ class CoreClient extends $grpc.Client {
       '/hcore.Core/GetSystemInfo',
       ($1.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.SystemInfo.fromBuffer(value));
+  static final _$getSystemInfoStream =
+      $grpc.ClientMethod<$1.Empty, $0.SystemInfo>(
+          '/hcore.Core/GetSystemInfoStream',
+          ($1.Empty value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $0.SystemInfo.fromBuffer(value));
   static final _$setup = $grpc.ClientMethod<$0.SetupRequest, $1.Response>(
       '/hcore.Core/Setup',
       ($0.SetupRequest value) => value.writeToBuffer(),
@@ -99,13 +104,13 @@ class CoreClient extends $grpc.Client {
           '/hcore.Core/SetSystemProxyEnabled',
           ($0.SetSystemProxyEnabledRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) => $1.Response.fromBuffer(value));
-  static final _$logListener = $grpc.ClientMethod<$1.Empty, $0.LogMessage>(
+  static final _$logListener = $grpc.ClientMethod<$0.LogRequest, $0.LogMessage>(
       '/hcore.Core/LogListener',
-      ($1.Empty value) => value.writeToBuffer(),
+      ($0.LogRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.LogMessage.fromBuffer(value));
-  static final _$pause = $grpc.ClientMethod<$0.PauseRequest, $1.Empty>(
-      '/hcore.Core/Pause',
-      ($0.PauseRequest value) => value.writeToBuffer(),
+  static final _$close = $grpc.ClientMethod<$0.CloseRequest, $1.Empty>(
+      '/hcore.Core/Close',
+      ($0.CloseRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $1.Empty.fromBuffer(value));
 
   CoreClient($grpc.ClientChannel channel,
@@ -139,10 +144,15 @@ class CoreClient extends $grpc.Client {
         options: options);
   }
 
-  $grpc.ResponseStream<$0.SystemInfo> getSystemInfo($1.Empty request,
+  $grpc.ResponseFuture<$0.SystemInfo> getSystemInfo($1.Empty request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getSystemInfo, request, options: options);
+  }
+
+  $grpc.ResponseStream<$0.SystemInfo> getSystemInfoStream($1.Empty request,
       {$grpc.CallOptions? options}) {
     return $createStreamingCall(
-        _$getSystemInfo, $async.Stream.fromIterable([request]),
+        _$getSystemInfoStream, $async.Stream.fromIterable([request]),
         options: options);
   }
 
@@ -207,16 +217,16 @@ class CoreClient extends $grpc.Client {
     return $createUnaryCall(_$setSystemProxyEnabled, request, options: options);
   }
 
-  $grpc.ResponseStream<$0.LogMessage> logListener($1.Empty request,
+  $grpc.ResponseStream<$0.LogMessage> logListener($0.LogRequest request,
       {$grpc.CallOptions? options}) {
     return $createStreamingCall(
         _$logListener, $async.Stream.fromIterable([request]),
         options: options);
   }
 
-  $grpc.ResponseFuture<$1.Empty> pause($0.PauseRequest request,
+  $grpc.ResponseFuture<$1.Empty> close($0.CloseRequest request,
       {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$pause, request, options: options);
+    return $createUnaryCall(_$close, request, options: options);
   }
 }
 
@@ -255,6 +265,13 @@ abstract class CoreServiceBase extends $grpc.Service {
     $addMethod($grpc.ServiceMethod<$1.Empty, $0.SystemInfo>(
         'GetSystemInfo',
         getSystemInfo_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
+        ($0.SystemInfo value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.Empty, $0.SystemInfo>(
+        'GetSystemInfoStream',
+        getSystemInfoStream_Pre,
         false,
         true,
         ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
@@ -343,19 +360,19 @@ abstract class CoreServiceBase extends $grpc.Service {
             ($core.List<$core.int> value) =>
                 $0.SetSystemProxyEnabledRequest.fromBuffer(value),
             ($1.Response value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$1.Empty, $0.LogMessage>(
+    $addMethod($grpc.ServiceMethod<$0.LogRequest, $0.LogMessage>(
         'LogListener',
         logListener_Pre,
         false,
         true,
-        ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.LogRequest.fromBuffer(value),
         ($0.LogMessage value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.PauseRequest, $1.Empty>(
-        'Pause',
-        pause_Pre,
+    $addMethod($grpc.ServiceMethod<$0.CloseRequest, $1.Empty>(
+        'Close',
+        close_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $0.PauseRequest.fromBuffer(value),
+        ($core.List<$core.int> value) => $0.CloseRequest.fromBuffer(value),
         ($1.Empty value) => value.writeToBuffer()));
   }
 
@@ -379,9 +396,14 @@ abstract class CoreServiceBase extends $grpc.Service {
     yield* mainOutboundsInfo(call, await request);
   }
 
-  $async.Stream<$0.SystemInfo> getSystemInfo_Pre(
+  $async.Future<$0.SystemInfo> getSystemInfo_Pre(
+      $grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
+    return getSystemInfo(call, await request);
+  }
+
+  $async.Stream<$0.SystemInfo> getSystemInfoStream_Pre(
       $grpc.ServiceCall call, $async.Future<$1.Empty> request) async* {
-    yield* getSystemInfo(call, await request);
+    yield* getSystemInfoStream(call, await request);
   }
 
   $async.Future<$1.Response> setup_Pre(
@@ -442,13 +464,13 @@ abstract class CoreServiceBase extends $grpc.Service {
   }
 
   $async.Stream<$0.LogMessage> logListener_Pre(
-      $grpc.ServiceCall call, $async.Future<$1.Empty> request) async* {
+      $grpc.ServiceCall call, $async.Future<$0.LogRequest> request) async* {
     yield* logListener(call, await request);
   }
 
-  $async.Future<$1.Empty> pause_Pre(
-      $grpc.ServiceCall call, $async.Future<$0.PauseRequest> request) async {
-    return pause(call, await request);
+  $async.Future<$1.Empty> close_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.CloseRequest> request) async {
+    return close(call, await request);
   }
 
   $async.Future<$0.CoreInfoResponse> start(
@@ -459,7 +481,9 @@ abstract class CoreServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $1.Empty request);
   $async.Stream<$0.OutboundGroupList> mainOutboundsInfo(
       $grpc.ServiceCall call, $1.Empty request);
-  $async.Stream<$0.SystemInfo> getSystemInfo(
+  $async.Future<$0.SystemInfo> getSystemInfo(
+      $grpc.ServiceCall call, $1.Empty request);
+  $async.Stream<$0.SystemInfo> getSystemInfoStream(
       $grpc.ServiceCall call, $1.Empty request);
   $async.Future<$1.Response> setup(
       $grpc.ServiceCall call, $0.SetupRequest request);
@@ -484,7 +508,7 @@ abstract class CoreServiceBase extends $grpc.Service {
   $async.Future<$1.Response> setSystemProxyEnabled(
       $grpc.ServiceCall call, $0.SetSystemProxyEnabledRequest request);
   $async.Stream<$0.LogMessage> logListener(
-      $grpc.ServiceCall call, $1.Empty request);
-  $async.Future<$1.Empty> pause(
-      $grpc.ServiceCall call, $0.PauseRequest request);
+      $grpc.ServiceCall call, $0.LogRequest request);
+  $async.Future<$1.Empty> close(
+      $grpc.ServiceCall call, $0.CloseRequest request);
 }

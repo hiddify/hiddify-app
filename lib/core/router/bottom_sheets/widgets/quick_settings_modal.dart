@@ -42,30 +42,35 @@ class QuickSettingsModal extends HookConsumerWidget {
             ListTile(
               leading: const Icon(Icons.cloud_rounded),
               title: Text(ref.watch(ConfigOptions.warpDetourMode).presentExplain(t)),
-              onTap: () {
+              onLongPress: () {
                 context.pop();
                 context.goNamed('warpOptions');
+              },
+              onTap: () async {
+                final value = ref.watch(ConfigOptions.enableWarp);
+                await ref.read(ConfigOptions.enableWarp.notifier).update(!value);
               },
               trailing: Switch.adaptive(
                 value: ref.watch(ConfigOptions.enableWarp),
                 onChanged: (value) async {
                   await ref.read(ConfigOptions.enableWarp.notifier).update(value);
-                  await ref.read(warpOptionNotifierProvider.notifier).genWarps();
+                  // await ref.read(warpOptionNotifierProvider.notifier).genWarps();
                 },
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.content_cut_rounded),
-              title: Text(t.pages.settings.tlsTricks.title),
-              onTap: () {
-                context.pop();
-                context.goNamed('tlsTricks');
-              },
-              trailing: Switch.adaptive(
-                value: ref.watch(ConfigOptions.enableTlsFragment),
-                onChanged: ref.read(ConfigOptions.enableTlsFragment.notifier).update,
-              ),
-            ),
+            // ListTile(
+
+            //   leading: const Icon(Icons.content_cut_rounded),
+            //   title: Text(t.pages.settings.tlsTricks.title),
+            //   onTap: () {
+            //     context.pop();
+            //     context.goNamed('tlsTricks');
+            //   },
+            //   trailing: Switch.adaptive(
+            //     value: ref.watch(ConfigOptions.enableTlsFragment),
+            //     onChanged: ref.read(ConfigOptions.enableTlsFragment.notifier).update,
+            //   ),
+            // ),
             const Gap(16),
           ],
         ),

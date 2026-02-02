@@ -51,28 +51,21 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     await _init("analytics", () => container.read(analyticsControllerProvider.notifier).enableAnalytics());
   }
 
-  await _init(
-    "preferences migration",
-    () async {
-      try {
-        await PreferencesMigration(
-          sharedPreferences: container.read(sharedPreferencesProvider).requireValue,
-        ).migrate();
-      } catch (e, stackTrace) {
-        Logger.bootstrap.error("preferences migration failed", e, stackTrace);
-        if (env == Environment.dev) rethrow;
-        Logger.bootstrap.info("clearing preferences");
-        await container.read(sharedPreferencesProvider).requireValue.clear();
-      }
+  await _init("preferences migration", () async {
+    try {
+      await PreferencesMigration(sharedPreferences: container.read(sharedPreferencesProvider).requireValue).migrate();
+    } catch (e, stackTrace) {
+      Logger.bootstrap.error("preferences migration failed", e, stackTrace);
+      if (env == Environment.dev) rethrow;
+      Logger.bootstrap.info("clearing preferences");
+      await container.read(sharedPreferencesProvider).requireValue.clear();
+    }
   });
 
   final debug = container.read(debugModeNotifierProvider) || kDebugMode;
 
   if (PlatformUtils.isDesktop) {
-    await _init(
-      "window controller",
-      () => container.read(windowNotifierProvider.future),
-    );
+    await _init("window controller", () => container.read(windowNotifierProvider.future));
 
     final silentStart = container.read(Preferences.silentStart);
     Logger.bootstrap.debug("silent start [${silentStart ? "Enabled" : "Disabled"}]");
@@ -81,10 +74,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     } else {
       Logger.bootstrap.debug("silent start, remain hidden accessible via tray");
     }
-    await _init(
-      "auto start service",
-      () => container.read(autoStartNotifierProvider.future),
-    );
+    await _init("auto start service", () => container.read(autoStartNotifierProvider.future));
   }
   await _init("logs repository", () => container.read(logRepositoryProvider.future));
   await _init("logger controller", () => LoggerController.postInit(debug));
@@ -95,13 +85,8 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
 
   await _init("translations", () => container.read(translationsProvider.future));
 
-  await _safeInit(
-    "active profile",
-    () => container.read(activeProfileProvider.future),
-    timeout: 1000,
-  );
-  await _init("hiddify-core", () => container.read(hiddifyCoreServiceProvider).init(ref: container));
-
+  await _safeInit("active profile", () => container.read(activeProfileProvider.future), timeout: 1000);
+  await _init("hiddify-core", () => container.read(hiddifyCoreServiceProvider).init());
 
   if (!kIsWeb) {
     // await _safeInit(
@@ -119,12 +104,9 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     // }
 
     if (PlatformUtils.isAndroid) {
-      await _safeInit(
-        "android display mode",
-        () async {
-          await FlutterDisplayMode.setHighRefreshRate();
-        },
-      );
+      await _safeInit("android display mode", () async {
+        await FlutterDisplayMode.setHighRefreshRate();
+      });
     }
   }
 
@@ -142,7 +124,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   if (!kIsWeb) {
     FlutterNativeSplash.remove();
   }
-  SentryFlutter.setAppStartEnd(DateTime.now().toUtc());
+  // SentryFlutter.s(DateTime.now().toUtc());
 }
 
 Future<T> _init<T>(String name, Future<T> Function() initializer, {int? timeout}) async {

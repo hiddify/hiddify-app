@@ -43,7 +43,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
       floatingActionButton: proxies.value != null
           ? FloatingActionButton(
               onPressed: () async =>
-                  await ref.watch(proxiesOverviewNotifierProvider.notifier).urlTest(proxies.value!.tag),
+                  await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest(proxies.value!.tag),
               tooltip: t.pages.proxies.testDelay,
               child: const Icon(FluentIcons.flash_24_filled),
             )
@@ -66,11 +66,11 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                       return ProxyTile(
                         proxy,
                         selected: group.selected.tag == proxy.tag,
-                        onTap: () {
-                          if (selectActiveProxyMutation.state.isInProgress) return;
-                          selectActiveProxyMutation.setFuture(
-                            ref.watch(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag),
-                          );
+                        onTap: () async {
+                          await ref.read(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag);
+                          // if (selectActiveProxyMutation.state.isInProgress) return;
+                          // selectActiveProxyMutation.setFuture(
+                          // );
                         },
                       );
                     },

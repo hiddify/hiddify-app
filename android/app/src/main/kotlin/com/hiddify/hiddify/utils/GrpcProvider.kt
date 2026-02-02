@@ -17,6 +17,7 @@ package com.hiddify.hiddify.utils
  */
 
 import com.hiddify.core.api.v2.hcore.CoreClient
+import com.hiddify.hiddify.Settings
 import com.squareup.wire.GrpcClient
 import io.grpc.CallOptions
 import io.grpc.ManagedChannelBuilder
@@ -41,28 +42,17 @@ import java.util.concurrent.TimeUnit
 
 object GrpcClientProvider {
     private val okHttpClient = OkHttpClient.Builder()
-
+        .protocols(listOf(Protocol.H2_PRIOR_KNOWLEDGE))
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
-//        .apply {
-//            val (sslSocketFactory, trustManager) = socketFactoryAndTrustManager()
-//            sslSocketFactory(sslSocketFactory, trustManager)
-//        }
-        .protocols(listOf(Protocol.H2_PRIOR_KNOWLEDGE))
-
         .build()
 
-
-    val channel = ManagedChannelBuilder.forAddress("127.0.0.1", 17079)
-        .usePlaintext()
-        .build()
-
-    val grpcClient = GrpcClient.Builder()
+    val grpcClient: GrpcClient = GrpcClient.Builder()
         .client(okHttpClient)
-
-        .baseUrl("http://127.0.0.1:17079")
+        .baseUrl("http://127.0.0.1:${Settings.grpcServiceModePort}")
         .build()
+
 
     private fun socketFactoryAndTrustManager(): Pair<SSLSocketFactory, X509TrustManager> {
         val trustManager: X509TrustManager

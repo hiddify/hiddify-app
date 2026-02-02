@@ -18,6 +18,8 @@ import com.hiddify.core.api.v2.config.Protocol
 import com.hiddify.core.api.v2.hcommon.Empty
 import com.hiddify.core.api.v2.hcore.CoreClient
 import com.hiddify.core.api.v2.hcore.SystemInfo
+import com.hiddify.core.api.v2.hello.HelloClient
+import com.hiddify.core.api.v2.hello.HelloRequest
 import com.hiddify.hiddify.Application
 import com.hiddify.hiddify.MainActivity
 import com.hiddify.hiddify.R
@@ -32,6 +34,8 @@ import com.squareup.wire.GrpcClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.isActive
+
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -40,7 +44,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import java.io.IOException
-
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
 class ServiceNotification(private val status: MutableLiveData<Status>, private val service: Service) : BroadcastReceiver(){
     companion object {
         private const val notificationId = 1
@@ -90,7 +95,9 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
                                     0, service.getText(R.string.stop), PendingIntent.getBroadcast(
                                     service,
                                     0,
-                                    Intent(Action.SERVICE_CLOSE).setPackage(service.packageName),
+                                    Intent(Action.SERVICE_CLOSE).setPackage(
+                                        Application.application.packageName
+                                    ),
                                     flags
                             )
                             ).build()
@@ -132,8 +139,10 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         receiverRegistered = true
     }
 
-    fun updateStatus(status: SystemInfo) {
-        val content = "${Libbox.formatBytes(status.uplink)}/s ↑\t${Libbox.formatBytes(status.downlink)}/s ↓ \n${status.current_outbound}"
+    fun updateStatus(previous:SystemInfo,status: SystemInfo) {
+        val uplink=status.uplink_total - previous.uplink_total
+        val downlink=status.downlink_total - previous.downlink_total
+        val content = "${Libbox.formatBytes(uplink)}/s ↑\t${Libbox.formatBytes(downlink)}/s ↓ \n${status.current_outbound}"
         val title = "${status.current_profile}"
         Application.notificationManager.notify(
                 notificationId,
@@ -166,27 +175,30 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
 
     fun startListenSystemInfo() {
         // Cancel any previous stream if still running
+        Log.d("notification","startListenSystemInfo")
         streamingJob?.cancel()
 
-        streamingJob = streamingCoroutineScope.launch {
+        streamingJob = streamingCoroutineScope.launch(Dispatchers.IO) {
+            Log.d("notification", "startListenSystemInfo-launch")
+
+            val coreClient = GrpcClientProvider.grpcClient.create(CoreClient::class)
+
             try {
-                val coreClient = GrpcClientProvider.grpcClient.create(CoreClient::class)
+                var previous = coreClient.GetSystemInfo().executeBlocking(Empty())
 
-                val (sendCommandChannel, receiveUpdateChannel) = coreClient.GetSystemInfo().executeIn(this)
-
-                // Send initial command
-                sendCommandChannel.send(Empty())
-
-                // Consume incoming updates
-                for (update in receiveUpdateChannel) {
-                    updateStatus(update)
+                while (isActive) {
+                    delay(1_000) // ✅ coroutine-friendly
+                    val current = coreClient.GetSystemInfo().executeBlocking(Empty())
+                    updateStatus(previous,current)
+                    previous = current
                 }
-
-                // When the stream ends normally, cancel notification
-                notification.cancel(notificationId)
+            } catch (e: CancellationException) {
+                // coroutine cancelled normally
+                Log.d("notification", "SystemInfo polling cancelled")
 
             } catch (e: Exception) {
-                Log.d("notification", "Exception: $e")
+                Log.e("notification", "SystemInfo polling failed", e)
+                notification.cancel(notificationId)
             }
         }
     }

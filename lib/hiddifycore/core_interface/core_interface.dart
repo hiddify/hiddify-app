@@ -47,7 +47,7 @@ class CoreInterface {
     try {
       bgClient; // touch it
       return true;
-    } on Exception {
+    } catch (_) {
       return false;
     }
   }

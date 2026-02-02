@@ -215,7 +215,7 @@ abstract class ConfigOptions {
 
   static final warpDetourMode = PreferencesNotifier.create<WarpDetourMode, String>(
     "warp-detour-mode",
-    WarpDetourMode.proxyOverWarp,
+    WarpDetourMode.warpOverProxy,
     mapFrom: WarpDetourMode.values.byName,
     mapTo: (value) => value.name,
   );

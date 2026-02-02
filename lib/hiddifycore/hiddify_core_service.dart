@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:grpc/grpc.dart';
@@ -7,11 +8,13 @@ import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
+import 'package:hiddify/features/log/model/log_level.dart' as config_log_level;
 import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/singbox/model/warp_account.dart';
 
@@ -25,6 +28,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HiddifyCoreService with InfraLogger {
+  HiddifyCoreService(this.ref);
+  final Ref ref;
+
   // CoreHiddifyCoreService() {}
   CoreInterface core = getCoreInterface();
 
@@ -34,12 +40,10 @@ class HiddifyCoreService with InfraLogger {
   final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 2000));
   final Map<String, StreamSubscription?> subscriptions = {};
 
-  Future<void> init({ProviderContainer? ref}) async {
-    statusController.add(currentState);
-    if (ref == null) return;
+  Future<void> init() async {
     final dirs = ref.read(appDirectoriesProvider).requireValue;
-    final debug = ref.read(debugModeNotifierProvider);
-    setup(dirs, debug)
+
+    setup(dirs)
         .mapLeft((e) {
           loggy.error(e);
           if (PlatformUtils.isIOS) return;
@@ -73,19 +77,22 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  TaskEither<String, Unit> setup(Directories directories, bool debug) {
+  TaskEither<String, Unit> setup(Directories directories) {
     return TaskEither(() async {
       try {
+        final debug = ref.read(debugModeNotifierProvider);
         final setupResponse = await core.setup(directories, debug, 3);
 
         if (setupResponse.isNotEmpty) {
           return left(setupResponse);
         }
+
         await startListeningLogs("fg", core.fgClient);
         // await startListeningStatus("fg", core.fgClient);
         if (!core.isSingleChannel()) {
           await startListeningLogs("bg", core.bgClient);
         }
+        statusController.add(currentState);
         await startListeningStatus("bg", core.bgClient);
 
         return right(unit);
@@ -125,8 +132,9 @@ class HiddifyCoreService with InfraLogger {
       loggy.debug("starting");
       final background = await core.setupBackground(path, name);
       if (background != const CoreStatus.started()) {
+        statusController.add(currentState = background);
         statusController.add(currentState = const CoreStatus.stopped());
-        return left("failed to start core: ${background}");
+        return left("failed to start core: $background");
       }
       if (!core.isSingleChannel()) {
         await startListeningLogs("bg", core.bgClient);
@@ -228,7 +236,12 @@ class HiddifyCoreService with InfraLogger {
   Stream<OutboundGroup?> watchGroup() async* {
     loggy.debug("watching group");
     // interrupt managed by core
-    yield* core.bgClient.outboundsInfo(Empty()).map((event) => event.items.isEmpty ? null : event.items.first);
+    try {
+      yield* core.bgClient.outboundsInfo(Empty()).map((event) => event.items.isEmpty ? null : event.items.first);
+    } catch (e) {
+      loggy.error("error watching group: $e");
+      rethrow;
+    }
     // //emitting first event immediately
     // yield* core.bgClient.outboundsInfo(Empty()).take(1).map((event) => event.items.isEmpty ? null : event.items.first);
     // //emitting other event after every 4 seconds(latest event)
@@ -238,8 +251,12 @@ class HiddifyCoreService with InfraLogger {
   @riverpod
   Stream<List<OutboundGroup>> watchActiveGroups() async* {
     loggy.debug("watching active groups");
-
-    yield* core.bgClient.mainOutboundsInfo(Empty()).map((event) => event.items);
+    try {
+      yield* core.bgClient.mainOutboundsInfo(Empty()).map((event) => event.items);
+    } catch (e) {
+      loggy.error("error watching active groups: $e");
+      rethrow;
+    }
   }
 
   //
@@ -248,28 +265,43 @@ class HiddifyCoreService with InfraLogger {
   @riverpod
   ResponseStream<SystemInfo> watchStats() {
     loggy.debug("watching stats");
-    final res = core.bgClient.getSystemInfo(Empty());
-    return res;
+    try {
+      return core.bgClient.getSystemInfoStream(Empty());
+    } catch (e) {
+      loggy.error("error watching stats: $e");
+      rethrow;
+    }
   }
 
   TaskEither<String, Unit> selectOutbound(String groupTag, String outboundTag) {
     return TaskEither(() async {
       loggy.debug("selecting outbound");
-      final res = await core.bgClient.selectOutbound(
-        SelectOutboundRequest(groupTag: groupTag, outboundTag: outboundTag),
-      );
-      if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
+      try {
+        final res = await core.bgClient.selectOutbound(
+          SelectOutboundRequest(groupTag: groupTag, outboundTag: outboundTag),
+          options: CallOptions(timeout: const Duration(seconds: 1)),
+        );
+        if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
 
-      return right(unit);
+        return right(unit);
+      } catch (e) {
+        loggy.error("error selecting outbound: $e");
+        rethrow;
+      }
     });
   }
 
   TaskEither<String, Unit> urlTest(String groupTag) {
     return TaskEither(() async {
       loggy.debug("url test");
-      final res = await core.bgClient.urlTest(UrlTestRequest(groupTag: groupTag));
-      if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
-      return right(unit);
+      try {
+        final res = await core.bgClient.urlTest(UrlTestRequest(groupTag: groupTag));
+        if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
+        return right(unit);
+      } catch (e) {
+        loggy.error("error in url test: $e");
+        rethrow;
+      }
     });
   }
 
@@ -278,7 +310,12 @@ class HiddifyCoreService with InfraLogger {
   // SingboxConfigOption? latestOptions;
 
   Stream<List<LogMessage>> watchLogs(String path) async* {
-    yield* logController.stream;
+    try {
+      yield* logController.stream;
+    } catch (e) {
+      loggy.error("error watching logs: $e");
+      rethrow;
+    }
     // Stream<List<String>> logStream(CoreClient coreClient) {
     //   return coreClient.logListener(Empty()).asBroadcastStream().map((event) => [event.message]).onErrorResume((error, stackTrace) {
     //     loggy.debug('Error in $coreClient: $error, retrying...');
@@ -334,7 +371,12 @@ class HiddifyCoreService with InfraLogger {
   }
 
   Stream<CoreStatus> watchStatus() async* {
-    yield* statusController.stream.endWith(const CoreStatus.stopped());
+    try {
+      yield* statusController.stream.endWith(const CoreStatus.stopped());
+    } catch (e) {
+      loggy.error("error watching status: $e");
+      rethrow;
+    }
   }
 
   Future<void> startListeningStatus(String key, CoreClient cc) async {
@@ -348,26 +390,37 @@ class HiddifyCoreService with InfraLogger {
             return currentState;
           })
           .endWith(const CoreStatus.stopped()),
+      onError: () {
+        statusController.add(const CoreStatus.stopped());
+      },
     );
   }
 
   Future<void> startListeningLogs(String key, CoreClient cc) async {
-    await listenSingle<LogMessage>(
-      "${key}LogListener",
-      () => cc.logListener(Empty(), options: grpcOptions).map((event) {
+    final logLevel = ref.read(ConfigOptions.logLevel);
+    final coreLogLevel = getCoreLogLevel(logLevel);
+    final listenKey = "${key}LogListener";
+    await listenSingle<LogMessage>(listenKey, () {
+      late final ProviderSubscription sub;
+      sub = ref.listen<config_log_level.LogLevel>(ConfigOptions.logLevel, (previous, next) async {
+        await stopListenSingle(listenKey);
+        startListeningLogs(key, cc);
+        sub.close();
+      });
+      return cc.logListener(LogRequest(level: coreLogLevel), options: grpcOptions).map((event) {
         // Handle incoming event
         logBuffer.add(event);
         if (logBuffer.length > 300) {
           logBuffer.removeAt(0);
         }
         logController.add(logBuffer);
-        loggy.log(getLogLevel(event.level), event.message);
+        // loggy.log(getLogLevel(event.level), event.message);
         event.message.split('\n').forEach((line) {
           loggy.log(getLogLevel(event.level), line);
         });
         return event;
-      }),
-    );
+      });
+    });
   }
 
   Future<void> stopListenSingle(String key) async {
@@ -385,7 +438,7 @@ class HiddifyCoreService with InfraLogger {
     }
   }
 
-  Future<StreamSubscription<T>?> listenSingle<T>(String key, Stream<T> Function() stream) async {
+  Future<StreamSubscription<T>?> listenSingle<T>(String key, Stream<T> Function() stream, {Function()? onError}) async {
     if (subscriptions.containsKey(key)) {
       return subscriptions[key] as StreamSubscription<T>?;
     }
@@ -395,6 +448,7 @@ class HiddifyCoreService with InfraLogger {
       cancelOnError: true,
       onError: (error) {
         loggy.log(loggyl.LogLevel.error, 'Stream error: $error');
+        onError?.call();
         subscriptions[key]?.cancel();
         subscriptions.remove(key);
       },
@@ -413,17 +467,31 @@ class HiddifyCoreService with InfraLogger {
     };
   }
 
-  Future<void> pause() async {
+  LogLevel getCoreLogLevel(config_log_level.LogLevel level) {
+    return switch (level) {
+      config_log_level.LogLevel.trace => LogLevel.DEBUG,
+      config_log_level.LogLevel.debug => LogLevel.DEBUG,
+      config_log_level.LogLevel.info => LogLevel.INFO,
+      config_log_level.LogLevel.warn => LogLevel.WARNING,
+      config_log_level.LogLevel.error => LogLevel.ERROR,
+      config_log_level.LogLevel.fatal => LogLevel.FATAL,
+      config_log_level.LogLevel.panic => LogLevel.FATAL,
+      _ => LogLevel.INFO, // Default case
+    };
+  }
+
+  Future<void> closeFront() async {
     if (!core.isInitialized()) {
       return;
     }
     if (!core.isSingleChannel()) {
       await stopListenSingle("fg");
+      await stopListenSingle("bg");
       try {
-        await core.fgClient.pause(PauseRequest(mode: SetupMode.GRPC_NORMAL_INSECURE));
+        await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL_INSECURE));
       } catch (e) {}
       try {
-        await core.fgClient.pause(PauseRequest(mode: SetupMode.GRPC_NORMAL));
+        await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL));
       } catch (e) {}
     }
   }

@@ -113,16 +113,16 @@ const StartRequest$json = const {
 
 /// Descriptor for `StartRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List startRequestDescriptor = $convert.base64Decode('CgxTdGFydFJlcXVlc3QSHwoLY29uZmlnX3BhdGgYASABKAlSCmNvbmZpZ1BhdGgSJQoOY29uZmlnX2NvbnRlbnQYAiABKAlSDWNvbmZpZ0NvbnRlbnQSMAoUZGlzYWJsZV9tZW1vcnlfbGltaXQYAyABKAhSEmRpc2FibGVNZW1vcnlMaW1pdBIfCgtkZWxheV9zdGFydBgEIAEoCFIKZGVsYXlTdGFydBI5ChllbmFibGVfb2xkX2NvbW1hbmRfc2VydmVyGAUgASgIUhZlbmFibGVPbGRDb21tYW5kU2VydmVyEioKEWVuYWJsZV9yYXdfY29uZmlnGAYgASgIUg9lbmFibGVSYXdDb25maWcSHwoLY29uZmlnX25hbWUYByABKAlSCmNvbmZpZ05hbWU=');
-@$core.Deprecated('Use pauseRequestDescriptor instead')
-const PauseRequest$json = const {
-  '1': 'PauseRequest',
+@$core.Deprecated('Use closeRequestDescriptor instead')
+const CloseRequest$json = const {
+  '1': 'CloseRequest',
   '2': const [
     const {'1': 'mode', '3': 1, '4': 1, '5': 14, '6': '.hcore.SetupMode', '10': 'mode'},
   ],
 };
 
-/// Descriptor for `PauseRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List pauseRequestDescriptor = $convert.base64Decode('CgxQYXVzZVJlcXVlc3QSJAoEbW9kZRgBIAEoDjIQLmhjb3JlLlNldHVwTW9kZVIEbW9kZQ==');
+/// Descriptor for `CloseRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List closeRequestDescriptor = $convert.base64Decode('CgxDbG9zZVJlcXVlc3QSJAoEbW9kZRgBIAEoDjIQLmhjb3JlLlNldHVwTW9kZVIEbW9kZQ==');
 @$core.Deprecated('Use setupRequestDescriptor instead')
 const SetupRequest$json = const {
   '1': 'SetupRequest',
@@ -391,6 +391,16 @@ const LogMessage$json = const {
 
 /// Descriptor for `LogMessage`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List logMessageDescriptor = $convert.base64Decode('CgpMb2dNZXNzYWdlEiUKBWxldmVsGAEgASgOMg8uaGNvcmUuTG9nTGV2ZWxSBWxldmVsEiIKBHR5cGUYAiABKA4yDi5oY29yZS5Mb2dUeXBlUgR0eXBlEhgKB21lc3NhZ2UYAyABKAlSB21lc3NhZ2USLgoEdGltZRgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSBHRpbWU=');
+@$core.Deprecated('Use logRequestDescriptor instead')
+const LogRequest$json = const {
+  '1': 'LogRequest',
+  '2': const [
+    const {'1': 'level', '3': 1, '4': 1, '5': 14, '6': '.hcore.LogLevel', '10': 'level'},
+  ],
+};
+
+/// Descriptor for `LogRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List logRequestDescriptor = $convert.base64Decode('CgpMb2dSZXF1ZXN0EiUKBWxldmVsGAEgASgOMg8uaGNvcmUuTG9nTGV2ZWxSBWxldmVs');
 @$core.Deprecated('Use stopRequestDescriptor instead')
 const StopRequest$json = const {
   '1': 'StopRequest',

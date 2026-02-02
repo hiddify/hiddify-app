@@ -83,6 +83,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         Settings.debugMode = args["debug"] as Boolean? ?: false
                         val mode = args["mode"] as Int
                         val grpcPort = args["grpcPort"] as Int
+                        Log.d("debugmode","${Settings.debugMode}")
                         runCatching {
                             Mobile.setup(
                                 SetupOptions().also {
@@ -93,7 +94,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                                     it.mode=mode.toLong()
                                     it.listen= "127.0.0.1:" + grpcPort
                                     it.secret=""
-                                    it.debug = BuildConfig.DEBUG||Settings.debugMode
+                                    it.debug = Settings.debugMode
                                 },null)
 
 //                            Libbox.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir, false)

@@ -41,7 +41,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         error("invalid argument")
     }
 
-    override fun useProcFS(): Boolean = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+    override fun useProcFS(): Boolean =  Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun findConnectionOwner(
@@ -58,12 +58,15 @@ interface PlatformInterfaceWrapper : PlatformInterface {
                     InetSocketAddress(sourceAddress, sourcePort),
                     InetSocketAddress(destinationAddress, destinationPort),
                 )
-            if (uid == Process.INVALID_UID) error("android: connection owner not found")
-            val packages = Application.packageManager.getPackagesForUid(uid)
+//            if (uid == Process.INVALID_UID)error("android: connection owner not found")
+
             val owner = ConnectionOwner()
             owner.userId = uid
-            owner.userName = packages?.firstOrNull() ?: ""
-            owner.androidPackageName = packages?.firstOrNull() ?: ""
+            if (uid!=Process.INVALID_UID) {
+                val packages = Application.packageManager.getPackagesForUid(uid)
+                owner.userName = packages?.firstOrNull() ?: ""
+                owner.androidPackageName = owner.userName
+            }
             return owner
         } catch (e: Exception) {
             Log.e("PlatformInterface", "getConnectionOwnerUid", e)

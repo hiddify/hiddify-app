@@ -53,23 +53,10 @@ class CoreInterfaceDesktop extends CoreInterface {
 
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
-    try {
-      fgClient.toString();
-      // final res = await fgClient.setup(
-      //   SetupRequest(
-      //     basePath: directories.baseDir.path,
-      //     workingDir: directories.workingDir.path,
-      //     tempDir: directories.tempDir.path,
-      //     mode: SetupMode.GRPC_NORMAL_INSECURE,
-      //     listen: "127.0.0.1:$port",
-      //   ),
-      //   options: CallOptions(timeout: Duration(milliseconds: 100)),
-      // );
-      // if (res.code == ResponseCode.OK) return "";
+    if (isInitialized()) {
       return "";
-    } catch (e) {
-      // _logger.warning(e.toString());
     }
+
     // Generate a random password for the grpc service
     // final errPtr2 = _box.stop();
     // final err = errPtr2.cast<Utf8>().toDartString();

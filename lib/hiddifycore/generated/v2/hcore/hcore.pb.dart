@@ -223,14 +223,14 @@ class StartRequest extends $pb.GeneratedMessage {
   void clearConfigName() => clearField(7);
 }
 
-class PauseRequest extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PauseRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+class CloseRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CloseRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..e<SetupMode>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mode', $pb.PbFieldType.OE, defaultOrMaker: SetupMode.OLD, valueOf: SetupMode.valueOf, enumValues: SetupMode.values)
     ..hasRequiredFields = false
   ;
 
-  PauseRequest._() : super();
-  factory PauseRequest({
+  CloseRequest._() : super();
+  factory CloseRequest({
     SetupMode? mode,
   }) {
     final _result = create();
@@ -239,26 +239,26 @@ class PauseRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory PauseRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory PauseRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  factory CloseRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CloseRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  PauseRequest clone() => PauseRequest()..mergeFromMessage(this);
+  CloseRequest clone() => CloseRequest()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  PauseRequest copyWith(void Function(PauseRequest) updates) => super.copyWith((message) => updates(message as PauseRequest)) as PauseRequest; // ignore: deprecated_member_use
+  CloseRequest copyWith(void Function(CloseRequest) updates) => super.copyWith((message) => updates(message as CloseRequest)) as CloseRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static PauseRequest create() => PauseRequest._();
-  PauseRequest createEmptyInstance() => create();
-  static $pb.PbList<PauseRequest> createRepeated() => $pb.PbList<PauseRequest>();
+  static CloseRequest create() => CloseRequest._();
+  CloseRequest createEmptyInstance() => create();
+  static $pb.PbList<CloseRequest> createRepeated() => $pb.PbList<CloseRequest>();
   @$core.pragma('dart2js:noInline')
-  static PauseRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<PauseRequest>(create);
-  static PauseRequest? _defaultInstance;
+  static CloseRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CloseRequest>(create);
+  static CloseRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   SetupMode get mode => $_getN(0);
@@ -2106,6 +2106,53 @@ class LogMessage extends $pb.GeneratedMessage {
   void clearTime() => clearField(4);
   @$pb.TagNumber(4)
   $7.Timestamp ensureTime() => $_ensure(3);
+}
+
+class LogRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LogRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
+    ..e<LogLevel>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.DEBUG, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
+    ..hasRequiredFields = false
+  ;
+
+  LogRequest._() : super();
+  factory LogRequest({
+    LogLevel? level,
+  }) {
+    final _result = create();
+    if (level != null) {
+      _result.level = level;
+    }
+    return _result;
+  }
+  factory LogRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory LogRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  LogRequest clone() => LogRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  LogRequest copyWith(void Function(LogRequest) updates) => super.copyWith((message) => updates(message as LogRequest)) as LogRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static LogRequest create() => LogRequest._();
+  LogRequest createEmptyInstance() => create();
+  static $pb.PbList<LogRequest> createRepeated() => $pb.PbList<LogRequest>();
+  @$core.pragma('dart2js:noInline')
+  static LogRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<LogRequest>(create);
+  static LogRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  LogLevel get level => $_getN(0);
+  @$pb.TagNumber(1)
+  set level(LogLevel v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasLevel() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLevel() => clearField(1);
 }
 
 class StopRequest extends $pb.GeneratedMessage {

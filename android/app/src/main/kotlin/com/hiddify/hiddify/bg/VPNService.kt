@@ -75,7 +75,20 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     }
 
     override fun openTun(options: TunOptions): Int {
-        if (prepare(this) != null) error("android: missing vpn permission")
+        var hasPermission = false
+        for (i in 0 until 20) {
+            if (prepare(this) != null) {
+                Log.w("VPN", "android: missing vpn permission")
+            } else {
+                hasPermission = true
+                break
+            }
+            Thread.sleep(50)
+        }
+
+        if (!hasPermission) {
+             error("android: missing vpn permission")
+    }
 //        service.fileDescriptor?.close()
 
         val builder = Builder()

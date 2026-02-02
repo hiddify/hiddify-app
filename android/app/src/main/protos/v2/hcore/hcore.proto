@@ -57,7 +57,7 @@ enum SetupMode {
     GRPC_BACKGROUND_INSECURE = 4;
 }
 
-message PauseRequest {
+message CloseRequest {
   SetupMode mode = 1;
 }
 // Define the message equivalent of SetupParameters
@@ -216,6 +216,10 @@ message LogMessage {
   LogType type = 2;
   string message = 3;
   google.protobuf.Timestamp time = 4;
+}
+
+message LogRequest {
+  LogLevel level = 1;
 }
 
 message StopRequest{
