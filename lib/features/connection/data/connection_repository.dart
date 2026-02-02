@@ -55,7 +55,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
       loggy.debug("setting up singbox");
 
       return singbox
-          .setup(directories)
+          .setup()
           .map((r) {
             _initialized = true;
             return r;

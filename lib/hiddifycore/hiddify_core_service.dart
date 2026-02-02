@@ -41,9 +41,7 @@ class HiddifyCoreService with InfraLogger {
   final Map<String, StreamSubscription?> subscriptions = {};
 
   Future<void> init() async {
-    final dirs = ref.read(appDirectoriesProvider).requireValue;
-
-    setup(dirs)
+    setup()
         .mapLeft((e) {
           loggy.error(e);
           if (PlatformUtils.isIOS) return;
@@ -63,8 +61,14 @@ class HiddifyCoreService with InfraLogger {
 
   TaskEither<String, Unit> validateConfigByPath(String path, String tempPath, bool debug) {
     return TaskEither(() async {
-      final response = await core.fgClient.parse(ParseRequest(tempPath: tempPath, configPath: path, debug: false));
-      if (response.responseCode != ResponseCode.OK) return left("${response.responseCode} ${response.message}");
+      try {
+        final response = await core.fgClient.parse(ParseRequest(tempPath: tempPath, configPath: path, debug: false));
+        if (response.responseCode != ResponseCode.OK) return left("${response.responseCode} ${response.message}");
+      } catch (e) {
+        await setup().run();
+        final response = await core.fgClient.parse(ParseRequest(tempPath: tempPath, configPath: path, debug: false));
+        if (response.responseCode != ResponseCode.OK) return left("${response.responseCode} ${response.message}");
+      }
       return right(unit);
     });
   }
@@ -77,9 +81,10 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  TaskEither<String, Unit> setup(Directories directories) {
+  TaskEither<String, Unit> setup() {
     return TaskEither(() async {
       try {
+        final directories = ref.read(appDirectoriesProvider).requireValue;
         final debug = ref.read(debugModeNotifierProvider);
         final setupResponse = await core.setup(directories, debug, 3);
 

@@ -178,6 +178,19 @@ jobs:
       - name: Prepare for ${{ matrix.platform }}
         run: |
           make ${{ matrix.platform }}-prepare
+          echo "Listing 100 largest packages"
+          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          rm -rf ~/.android
+          rm -rf ~/.gradle/caches
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          df -h
+
           tree
       - name: Build ${{ matrix.platform }}
         env:
