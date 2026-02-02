@@ -11,7 +11,7 @@
     }
   },
   {
-    "region": ["ir"],
+    "region": ["-"],
     "title": {"en": "Insta-Youtube only", "fa": "فقط اینستا و یوتیوب"},
     "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/fragment",
     "tags": { "en": ["Fragment"], "fa": ["فرگمنت"] },
@@ -21,7 +21,7 @@
     }
   },
   {
-    "region": ["ir"],
+    "region": ["-"],
     "title": {"en": "Ainita.net", "fa": "آی نیتا"},
     "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/ainita",
     "tags": { "en": ["mix"], "fa": ["عمومی"] },
@@ -43,7 +43,7 @@
     "needed_features": ["warp_over_proxies"]
   },
 {
-    "region": ["ir"],
+    "region": ["-"],
     "title": {"en": "soroushmirzaei (Heavy)", "fa": "سروش میرزایی (سنگین)"},
     "sublink": "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/splitted/mixed",
     "tags": { "en": ["mix"], "fa": ["عمومی"] },
