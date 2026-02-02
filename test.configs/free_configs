@@ -11,7 +11,7 @@
     }
   },
   {
-    "region": ["-"],
+    "region": ["k"],
     "title": {"en": "Insta-Youtube only", "fa": "فقط اینستا و یوتیوب"},
     "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/fragment",
     "tags": { "en": ["Fragment"], "fa": ["فرگمنت"] },
@@ -21,7 +21,7 @@
     }
   },
   {
-    "region": ["-"],
+    "region": ["k"],
     "title": {"en": "Ainita.net", "fa": "آی نیتا"},
     "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/ainita",
     "tags": { "en": ["mix"], "fa": ["عمومی"] },
