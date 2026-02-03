@@ -5,16 +5,17 @@
     "en",
     "ar",
     "ckb-KUR",
+    "de",
     "es",
     "fa",
     "fr",
+    "hi",
     "id",
     "pt-BR",
     "ru",
     "tr",
     "zh-CN",
-    "zh-TW",
-    "hi"
+    "zh-TW"
   ],
   "modules": [
     "https://cdn.jsdelivr.net/npm/@inlang/plugin-i18next@4/dist/index.js",
