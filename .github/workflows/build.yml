@@ -76,7 +76,7 @@ jobs:
           - platform: linux
             os: ubuntu-22.04
             aarch: amd64
-            targets: AppImage,deb,rpm
+            targets: AppImage,deb
 
           - platform: macos
             os: macos-15
@@ -178,19 +178,24 @@ jobs:
       - name: Prepare for ${{ matrix.platform }}
         run: |
           make ${{ matrix.platform }}-prepare
-          echo "Listing 100 largest packages"
-          dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
+
+      - name: Clean up disk space
+        if: ${{ matrix.platform == 'linux' }}
           df -h
           sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /opt/ghc
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          rm -rf ~/.android
-          rm -rf ~/.gradle/caches
-          sudo apt-get autoremove -y
-          sudo apt-get clean
           df -h
-
+          sudo rm -rf /usr/local/lib/android
+          df -h
+          sudo rm -rf /opt/ghc
+          df -h
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          df -h
+          rm -rf ~/.gradle/caches
+          df -h
+          sudo apt-get autoremove -y || true
+          df -h
+          sudo apt-get clean || true
+          df -h
           tree
       - name: Build ${{ matrix.platform }}
         env:
