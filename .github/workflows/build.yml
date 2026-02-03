@@ -181,6 +181,7 @@ jobs:
 
       - name: Clean up disk space
         if: ${{ matrix.platform == 'linux' }}
+        run: |
           df -h
           sudo rm -rf /usr/share/dotnet
           df -h
