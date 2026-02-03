@@ -180,7 +180,7 @@ jobs:
           make ${{ matrix.platform }}-prepare
 
       - name: Clean up disk space
-        if: ${{ matrix.platform == 'linux' }}
+        if: startsWith(matrix.platform,'android')
         run: |
           df -h
           sudo rm -rf /usr/share/dotnet
