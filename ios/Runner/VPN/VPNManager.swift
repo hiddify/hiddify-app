@@ -113,6 +113,12 @@ class VPNManager: ObservableObject {
     
     private func enableVPNManager() async throws {
         manager.isEnabled = true
+        let rule = NEOnDemandRuleConnect()
+        rule.interfaceTypeMatch = .any
+        rule.probeURL = URL(string: "http://captive.apple.com")
+        manager.onDemandRules = [rule]
+        manager.isOnDemandEnabled = true
+        
         do {
             try await manager.saveToPreferences()
             try await manager.loadFromPreferences()

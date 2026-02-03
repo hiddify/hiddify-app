@@ -185,17 +185,15 @@ jobs:
           df -h
           sudo rm -rf /usr/share/dotnet
           df -h
-          sudo rm -rf /usr/local/lib/android
-          df -h
           sudo rm -rf /opt/ghc
           df -h
           sudo rm -rf /opt/hostedtoolcache/CodeQL
           df -h
           rm -rf ~/.gradle/caches
           df -h
-          sudo apt-get autoremove -y || true
+          sudo apt-get autoremove -y
           df -h
-          sudo apt-get clean || true
+          sudo apt-get clean 
           df -h
           tree
       - name: Build ${{ matrix.platform }}
