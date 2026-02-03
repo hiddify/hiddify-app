@@ -53,25 +53,37 @@ class ProfileParser {
   final DioHttpClient _httpClient;
 
   ProfileParser({required Ref ref, required DioHttpClient httpClient}) : _ref = ref, _httpClient = httpClient;
-
-  Either<ProfileFailure, ProfileEntriesCompanion> addLocal({
+  TaskEither<ProfileFailure, ProfileEntriesCompanion> addLocal({
     required String id,
     required String content,
     required String tempFilePath,
     required UserOverride? userOverride,
-  }) => populateHeaders(content: content).flatMap(
-    (populatedHeaders) => parse(
-      tempFilePath: tempFilePath,
-      profile: ProfileEntity.local(
-        id: id,
-        active: true,
-        name: '',
-        lastUpdate: DateTime.now(),
-        userOverride: userOverride,
-        populatedHeaders: populatedHeaders,
-      ),
-    ).flatMap((profEntity) => Either.tryCatch(() => profEntity.toInsertEntry(), ProfileFailure.unexpected)),
-  );
+  }) {
+    return TaskEither.tryCatch(() async {
+          await expandRemoteLinesInParallel(
+            tempFilePath: tempFilePath,
+            httpClient: _httpClient,
+            cancelToken: CancelToken(),
+            ref: _ref,
+          );
+        }, (_, __) => ProfileFailure.unexpected())
+        .flatMap((_) => TaskEither.fromEither(populateHeaders(content: content)))
+        .flatMap(
+          (populatedHeaders) => TaskEither.fromEither(
+            parse(
+              tempFilePath: tempFilePath,
+              profile: ProfileEntity.local(
+                id: id,
+                active: true,
+                name: '',
+                lastUpdate: DateTime.now(),
+                userOverride: userOverride,
+                populatedHeaders: populatedHeaders,
+              ),
+            ).flatMap((profEntity) => Either.tryCatch(() => profEntity.toInsertEntry(), ProfileFailure.unexpected)),
+          ),
+        );
+  }
 
   TaskEither<ProfileFailure, ProfileEntriesCompanion> addRemote({
     required String id,
@@ -392,12 +404,15 @@ class ProfileParser {
       }, ProfileFailure.unexpected);
 
   static String protocol(String content) {
+    if (content.contains("[Interface]")) {
+      return ProxyType.wireguard.label;
+    }
     final lines = content.split('\n');
     String? name;
     for (final line in lines) {
       final uri = Uri.tryParse(line);
       if (uri == null) continue;
-      final fragment = uri.hasFragment ? Uri.decodeComponent(uri.fragment.split("&&detour")[0]) : null;
+      final fragment = uri.hasFragment ? Uri.decodeComponent(uri.fragment.split(" -> ")[0]) : null;
       name ??= switch (uri.scheme) {
         'ss' => fragment ?? ProxyType.shadowsocks.label,
         'ssconf' => fragment ?? ProxyType.shadowsocks.label,
@@ -409,6 +424,9 @@ class ProfileParser {
         'hy' || 'hysteria' => fragment ?? ProxyType.hysteria.label,
         'ssh' => fragment ?? ProxyType.ssh.label,
         'wg' => fragment ?? ProxyType.wireguard.label,
+        'awg' => fragment ?? ProxyType.awg.label,
+        'shadowtls' => fragment ?? ProxyType.shadowtls.label,
+        'mieru' => fragment ?? ProxyType.mieru.label,
         'warp' => fragment ?? ProxyType.warp.label,
         _ => null,
       };

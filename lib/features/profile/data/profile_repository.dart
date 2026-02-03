@@ -182,15 +182,9 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         final tempFile = _profilePathResolver.tempFile(id);
         try {
           await tempFile.writeAsString(content);
-          final task =
-              TaskEither.fromEither(
-                _profileParser.addLocal(
-                  id: id,
-                  content: content,
-                  tempFilePath: tempFile.path,
-                  userOverride: userOverride,
-                ),
-              ).flatMap(
+          final task = _profileParser
+              .addLocal(id: id, content: content, tempFilePath: tempFile.path, userOverride: userOverride)
+              .flatMap(
                 (profEntity) =>
                     validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
                       (unit) => TaskEither.tryCatch(() async {

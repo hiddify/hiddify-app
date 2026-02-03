@@ -25,15 +25,13 @@ open class ExtensionProvider: NEPacketTunnelProvider {
             let disableMemoryLimit = false && (options?["DisableMemoryLimit"] as? NSString as? String ?? "NO") == "YES" 
             let grpcServiceModePort = (options?["GrpcServiceModePort"] as? NSNumber)?.intValue ?? 17079
             
-            guard let config = options?["Config"] as? NSString as? String else {
-                throw NSError(domain: "ExtensionProvider", code: 1, userInfo: [NSLocalizedDescriptionKey: "Config not provided"])
-            }
+            let config = options?["Config"] as? NSString as? String ?? ""
             
             // guard let config = SingBox.setupConfig(config: config2) else {
             //             writeFatalError("(packet-tunnel) error: config is invalid")
             //             return
             // }
-            self.config = config
+//            self.config = config
 
             do {
                 try FileManager.default.createDirectory(at: FilePath.workingDirectory, withIntermediateDirectories: true)
@@ -77,8 +75,10 @@ open class ExtensionProvider: NEPacketTunnelProvider {
             LibboxSetMemoryLimit(!disableMemoryLimit)
             
             writeMessage("(packet-tunnel) setup completed successfully")
-            
-//            try await startService(config)
+            if (config==""){
+                try await startService1(config)
+            }
+
             
         } catch {
             logger.error("Tunnel setup failed: \(error.localizedDescription)")
@@ -87,20 +87,20 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         }
     }
     
-    private func startService(_ config: String) async throws {
-//        writeMessage("Starting service")
-//        var error: NSError?
+    private func startService1(_ config: String) async throws {
+        writeMessage("Starting service")
+        var error: NSError?
 //        
-//        do {
-////            try MobileStart("", "", &error)
-//            if let error = error {
-//                throw error
-//            }
-//            writeMessage("(packet-tunnel) service started successfully")
-//        } catch {
-//            writeFatalError("(packet-tunnel) error: start service: \(error.localizedDescription)")
-//            throw error
-//        }
+        do {
+            try MobileStart(config, "", &error)
+            if let error = error {
+                throw error
+            }
+            writeMessage("(packet-tunnel) service started successfully")
+        } catch {
+            writeFatalError("(packet-tunnel) error: start service: \(error.localizedDescription)")
+            throw error
+        }
     }
     
     private func createRequiredDirectories() throws {

@@ -170,6 +170,7 @@ class VPNManager: ObservableObject {
         
     }
     
+    
     private func updateStats() {
         let isAnyVPNConnected = self.isAnyVPNConnected
         if isConnectedToAnyVPN != isAnyVPNConnected {
@@ -217,6 +218,18 @@ class VPNManager: ObservableObject {
     }
     
     func disconnect() {
+        if manager.isOnDemandEnabled {
+            manager.isOnDemandEnabled = false
+            manager.onDemandRules = []
+            
+            manager.saveToPreferences { error in
+                if let error = error {
+                    print("save error:", error)
+                    return
+                }
+            }
+        }
+
 //        guard state == .connected else { return }
         manager.connection.stopVPNTunnel()
     }
