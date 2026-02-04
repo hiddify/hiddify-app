@@ -24,7 +24,9 @@ env:
   # TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
   TARGET_NAME_aab: "Hiddify-Android"
-  #TARGET_NAME_exe: "Hiddify-Windows-x64"
+  TARGET_NAME_exe: "Hiddify-Windows-Setup-x64"
+  TARGET_NAME_msix: "Hiddify-Windows-Setup-x64"
+  TARGET_NAME_zip: "Hiddify-Windows-Portable-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
   TARGET_NAME_ipa: "Hiddify-iOS"
@@ -71,7 +73,7 @@ jobs:
           - platform: windows
             os: windows-latest
             aarch: amd64
-            targets: exe,msix
+            targets: exe,msix,zip
 
           - platform: linux
             os: ubuntu-22.04
@@ -199,9 +201,19 @@ jobs:
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows'
+        shell: bash
         run: |
-          tree
-          .\scripts\package_windows.ps1
+          ls -R dist/
+          mkdir out
+          for EXT in $(echo ${{ matrix.targets }} | tr ',' '\n'); do
+            KEY=TARGET_NAME_${EXT}
+            FILENAME=${!KEY}
+            echo "For $EXT ($KEY) filename is ${FILENAME}"
+            mv dist/*/*.$EXT out/${FILENAME}.$EXT
+            rm -rf "$HOME/.pub-cache/git/cache/flutter_circle_flags*" || true
+            ls out
+          done
+          
           
           
       - name: Upload Debug Symbols
