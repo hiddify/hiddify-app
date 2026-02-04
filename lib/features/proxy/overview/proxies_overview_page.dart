@@ -65,7 +65,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                       final proxy = group.items[index];
                       return ProxyTile(
                         proxy,
-                        selected: group.selected.tag == proxy.tag,
+                        selected: group.selected == proxy.tag,
                         onTap: () async {
                           await ref.read(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag);
                           // if (selectActiveProxyMutation.state.isInProgress) return;

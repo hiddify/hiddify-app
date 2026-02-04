@@ -172,7 +172,8 @@ const OutboundInfo$json = const {
     const {'1': 'ipinfo', '3': 5, '4': 1, '5': 11, '6': '.hcore.IpInfo', '9': 0, '10': 'ipinfo', '17': true},
     const {'1': 'is_selected', '3': 6, '4': 1, '5': 8, '10': 'isSelected'},
     const {'1': 'is_group', '3': 7, '4': 1, '5': 8, '10': 'isGroup'},
-    const {'1': 'group_selected_outbound', '3': 13, '4': 1, '5': 11, '6': '.hcore.OutboundInfo', '9': 1, '10': 'groupSelectedOutbound', '17': true},
+    const {'1': 'group_selected_tag', '3': 13, '4': 1, '5': 9, '9': 1, '10': 'groupSelectedTag', '17': true},
+    const {'1': 'group_selected_tag_display', '3': 14, '4': 1, '5': 9, '9': 2, '10': 'groupSelectedTagDisplay', '17': true},
     const {'1': 'is_secure', '3': 8, '4': 1, '5': 8, '10': 'isSecure'},
     const {'1': 'is_visible', '3': 9, '4': 1, '5': 8, '10': 'isVisible'},
     const {'1': 'port', '3': 10, '4': 1, '5': 13, '10': 'port'},
@@ -181,12 +182,13 @@ const OutboundInfo$json = const {
   ],
   '8': const [
     const {'1': '_ipinfo'},
-    const {'1': '_group_selected_outbound'},
+    const {'1': '_group_selected_tag'},
+    const {'1': '_group_selected_tag_display'},
   ],
 };
 
 /// Descriptor for `OutboundInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode('CgxPdXRib3VuZEluZm8SEAoDdGFnGAEgASgJUgN0YWcSEgoEdHlwZRgCIAEoCVIEdHlwZRI+Cg11cmxfdGVzdF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFILdXJsVGVzdFRpbWUSJAoOdXJsX3Rlc3RfZGVsYXkYBCABKAVSDHVybFRlc3REZWxheRIqCgZpcGluZm8YBSABKAsyDS5oY29yZS5JcEluZm9IAFIGaXBpbmZviAEBEh8KC2lzX3NlbGVjdGVkGAYgASgIUgppc1NlbGVjdGVkEhkKCGlzX2dyb3VwGAcgASgIUgdpc0dyb3VwElAKF2dyb3VwX3NlbGVjdGVkX291dGJvdW5kGA0gASgLMhMuaGNvcmUuT3V0Ym91bmRJbmZvSAFSFWdyb3VwU2VsZWN0ZWRPdXRib3VuZIgBARIbCglpc19zZWN1cmUYCCABKAhSCGlzU2VjdXJlEh0KCmlzX3Zpc2libGUYCSABKAhSCWlzVmlzaWJsZRISCgRwb3J0GAogASgNUgRwb3J0EhIKBGhvc3QYCyABKAlSBGhvc3QSHwoLdGFnX2Rpc3BsYXkYDCABKAlSCnRhZ0Rpc3BsYXlCCQoHX2lwaW5mb0IaChhfZ3JvdXBfc2VsZWN0ZWRfb3V0Ym91bmQ=');
+final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode('CgxPdXRib3VuZEluZm8SEAoDdGFnGAEgASgJUgN0YWcSEgoEdHlwZRgCIAEoCVIEdHlwZRI+Cg11cmxfdGVzdF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFILdXJsVGVzdFRpbWUSJAoOdXJsX3Rlc3RfZGVsYXkYBCABKAVSDHVybFRlc3REZWxheRIqCgZpcGluZm8YBSABKAsyDS5oY29yZS5JcEluZm9IAFIGaXBpbmZviAEBEh8KC2lzX3NlbGVjdGVkGAYgASgIUgppc1NlbGVjdGVkEhkKCGlzX2dyb3VwGAcgASgIUgdpc0dyb3VwEjEKEmdyb3VwX3NlbGVjdGVkX3RhZxgNIAEoCUgBUhBncm91cFNlbGVjdGVkVGFniAEBEkAKGmdyb3VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5GA4gASgJSAJSF2dyb3VwU2VsZWN0ZWRUYWdEaXNwbGF5iAEBEhsKCWlzX3NlY3VyZRgIIAEoCFIIaXNTZWN1cmUSHQoKaXNfdmlzaWJsZRgJIAEoCFIJaXNWaXNpYmxlEhIKBHBvcnQYCiABKA1SBHBvcnQSEgoEaG9zdBgLIAEoCVIEaG9zdBIfCgt0YWdfZGlzcGxheRgMIAEoCVIKdGFnRGlzcGxheUIJCgdfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dyb3VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5');
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = const {
   '1': 'IpInfo',
@@ -211,7 +213,7 @@ const OutboundGroup$json = const {
   '2': const [
     const {'1': 'tag', '3': 1, '4': 1, '5': 9, '10': 'tag'},
     const {'1': 'type', '3': 2, '4': 1, '5': 9, '10': 'type'},
-    const {'1': 'selected', '3': 3, '4': 1, '5': 11, '6': '.hcore.OutboundInfo', '10': 'selected'},
+    const {'1': 'selected', '3': 3, '4': 1, '5': 9, '10': 'selected'},
     const {'1': 'selectable', '3': 4, '4': 1, '5': 8, '10': 'selectable'},
     const {'1': 'Is_expand', '3': 5, '4': 1, '5': 8, '10': 'IsExpand'},
     const {'1': 'items', '3': 6, '4': 3, '5': 11, '6': '.hcore.OutboundInfo', '10': 'items'},
@@ -219,7 +221,7 @@ const OutboundGroup$json = const {
 };
 
 /// Descriptor for `OutboundGroup`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List outboundGroupDescriptor = $convert.base64Decode('Cg1PdXRib3VuZEdyb3VwEhAKA3RhZxgBIAEoCVIDdGFnEhIKBHR5cGUYAiABKAlSBHR5cGUSLwoIc2VsZWN0ZWQYAyABKAsyEy5oY29yZS5PdXRib3VuZEluZm9SCHNlbGVjdGVkEh4KCnNlbGVjdGFibGUYBCABKAhSCnNlbGVjdGFibGUSGwoJSXNfZXhwYW5kGAUgASgIUghJc0V4cGFuZBIpCgVpdGVtcxgGIAMoCzITLmhjb3JlLk91dGJvdW5kSW5mb1IFaXRlbXM=');
+final $typed_data.Uint8List outboundGroupDescriptor = $convert.base64Decode('Cg1PdXRib3VuZEdyb3VwEhAKA3RhZxgBIAEoCVIDdGFnEhIKBHR5cGUYAiABKAlSBHR5cGUSGgoIc2VsZWN0ZWQYAyABKAlSCHNlbGVjdGVkEh4KCnNlbGVjdGFibGUYBCABKAhSCnNlbGVjdGFibGUSGwoJSXNfZXhwYW5kGAUgASgIUghJc0V4cGFuZBIpCgVpdGVtcxgGIAMoCzITLmhjb3JlLk91dGJvdW5kSW5mb1IFaXRlbXM=');
 @$core.Deprecated('Use outboundGroupListDescriptor instead')
 const OutboundGroupList$json = const {
   '1': 'OutboundGroupList',

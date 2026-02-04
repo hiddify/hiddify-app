@@ -630,7 +630,8 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..a<$core.int>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'port', $pb.PbFieldType.OU3)
     ..aOS(11, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'host')
     ..aOS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tagDisplay')
-    ..aOM<OutboundInfo>(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupSelectedOutbound', subBuilder: OutboundInfo.create)
+    ..aOS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupSelectedTag')
+    ..aOS(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupSelectedTagDisplay')
     ..hasRequiredFields = false
   ;
 
@@ -648,7 +649,8 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.int? port,
     $core.String? host,
     $core.String? tagDisplay,
-    OutboundInfo? groupSelectedOutbound,
+    $core.String? groupSelectedTag,
+    $core.String? groupSelectedTagDisplay,
   }) {
     final _result = create();
     if (tag != null) {
@@ -687,8 +689,11 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (tagDisplay != null) {
       _result.tagDisplay = tagDisplay;
     }
-    if (groupSelectedOutbound != null) {
-      _result.groupSelectedOutbound = groupSelectedOutbound;
+    if (groupSelectedTag != null) {
+      _result.groupSelectedTag = groupSelectedTag;
+    }
+    if (groupSelectedTagDisplay != null) {
+      _result.groupSelectedTagDisplay = groupSelectedTagDisplay;
     }
     return _result;
   }
@@ -826,15 +831,22 @@ class OutboundInfo extends $pb.GeneratedMessage {
   void clearTagDisplay() => clearField(12);
 
   @$pb.TagNumber(13)
-  OutboundInfo get groupSelectedOutbound => $_getN(12);
+  $core.String get groupSelectedTag => $_getSZ(12);
   @$pb.TagNumber(13)
-  set groupSelectedOutbound(OutboundInfo v) { setField(13, v); }
+  set groupSelectedTag($core.String v) { $_setString(12, v); }
   @$pb.TagNumber(13)
-  $core.bool hasGroupSelectedOutbound() => $_has(12);
+  $core.bool hasGroupSelectedTag() => $_has(12);
   @$pb.TagNumber(13)
-  void clearGroupSelectedOutbound() => clearField(13);
-  @$pb.TagNumber(13)
-  OutboundInfo ensureGroupSelectedOutbound() => $_ensure(12);
+  void clearGroupSelectedTag() => clearField(13);
+
+  @$pb.TagNumber(14)
+  $core.String get groupSelectedTagDisplay => $_getSZ(13);
+  @$pb.TagNumber(14)
+  set groupSelectedTagDisplay($core.String v) { $_setString(13, v); }
+  @$pb.TagNumber(14)
+  $core.bool hasGroupSelectedTagDisplay() => $_has(13);
+  @$pb.TagNumber(14)
+  void clearGroupSelectedTagDisplay() => clearField(14);
 }
 
 class IpInfo extends $pb.GeneratedMessage {
@@ -1000,7 +1012,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'OutboundGroup', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tag')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type')
-    ..aOM<OutboundInfo>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'selected', subBuilder: OutboundInfo.create)
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'selected')
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'selectable')
     ..aOB(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'IsExpand', protoName: 'Is_expand')
     ..pc<OutboundInfo>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'items', $pb.PbFieldType.PM, subBuilder: OutboundInfo.create)
@@ -1011,7 +1023,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
   factory OutboundGroup({
     $core.String? tag,
     $core.String? type,
-    OutboundInfo? selected,
+    $core.String? selected,
     $core.bool? selectable,
     $core.bool? isExpand,
     $core.Iterable<OutboundInfo>? items,
@@ -1077,15 +1089,13 @@ class OutboundGroup extends $pb.GeneratedMessage {
   void clearType() => clearField(2);
 
   @$pb.TagNumber(3)
-  OutboundInfo get selected => $_getN(2);
+  $core.String get selected => $_getSZ(2);
   @$pb.TagNumber(3)
-  set selected(OutboundInfo v) { setField(3, v); }
+  set selected($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
   $core.bool hasSelected() => $_has(2);
   @$pb.TagNumber(3)
   void clearSelected() => clearField(3);
-  @$pb.TagNumber(3)
-  OutboundInfo ensureSelected() => $_ensure(2);
 
   @$pb.TagNumber(4)
   $core.bool get selectable => $_getBF(3);

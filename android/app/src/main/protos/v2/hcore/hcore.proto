@@ -95,7 +95,8 @@ message OutboundInfo {
   optional IpInfo ipinfo = 5;
   bool is_selected = 6;
   bool is_group = 7;
-  optional OutboundInfo group_selected_outbound=13;
+  optional string group_selected_tag=13;
+  optional string group_selected_tag_display=14;
   bool is_secure = 8;
   bool is_visible = 9;
   uint32 port = 10;
@@ -117,7 +118,7 @@ message IpInfo {
 message OutboundGroup {
   string tag = 1;
   string type = 2;
-  OutboundInfo selected=3;
+  string selected=3;
   bool selectable=4;
   bool Is_expand=5;
   repeated OutboundInfo items = 6;

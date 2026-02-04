@@ -105,8 +105,8 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
 
 String getRealOutboundTag(OutboundInfo group) {
   var tag = group.tagDisplay;
-  if (group.groupSelectedOutbound.tagDisplay != "") {
-    tag = "$tag → ${getRealOutboundTag(group.groupSelectedOutbound)}";
+  if (group.groupSelectedTagDisplay != "") {
+    tag = "$tag → ${group.groupSelectedTagDisplay}";
   }
   return tag;
 }
