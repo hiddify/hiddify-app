@@ -2,7 +2,7 @@
 "profiles":[
   {
     "region": ["ir", "cn"],
-    "title": {"en": "Warp", "fa": "وارپ"},
+    "title": {"en": "Warp & Psiphon", "fa": "وارپ و سایفون"},
     "sublink": "https://raw.githubusercontent.com/hiddify/hiddify-app/refs/heads/main/test.configs/warp",
     "tags": { "en": ["Warp"], "fa": ["وارپ"] },
     "consent": {
