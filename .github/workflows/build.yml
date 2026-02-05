@@ -19,13 +19,13 @@ env:
   NDK_VERSION: r28c
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   TAG_NAME: "${{ inputs.tag-name }}"
-  TARGET_NAME_tar: "Hiddify-Linux-x64-AppImage"
+  TARGET_NAME_gz: "Hiddify-Linux-x64-AppImage.tar"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
   # TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
   TARGET_NAME_aab: "Hiddify-Android"
   TARGET_NAME_exe: "Hiddify-Windows-Setup-x64"
-  TARGET_NAME_msix: "Hiddify-Windows-Setup-x64"
+  TARGET_NAME_msix: "Hiddify-Windows-x64"
   TARGET_NAME_zip: "Hiddify-Windows-Portable-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
@@ -78,7 +78,7 @@ jobs:
           - platform: linux
             os: ubuntu-22.04
             aarch: amd64
-            targets: deb,tar
+            targets: deb,gz
 
           - platform: macos
             os: macos-13
@@ -201,20 +201,24 @@ jobs:
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows'
-        shell: bash
+        shell: pwsh
         run: |
-          ls -R dist/
-          mkdir out
-          for EXT in $(echo ${{ matrix.targets }} | tr ',' '\n'); do
-            KEY=TARGET_NAME_${EXT}
-            FILENAME=${!KEY}
-            echo "For $EXT ($KEY) filename is ${FILENAME}"
-            mv dist/*/*.$EXT out/${FILENAME}.$EXT
-            rm -rf "$HOME/.pub-cache/git/cache/flutter_circle_flags*" || true
-            ls out
-          done
-          
-          
+          Get-ChildItem -Path dist -Recurse | Select-Object FullName
+          New-Item -ItemType Directory -Path "out" -Force | Out-Null
+          $targets = "${{ matrix.targets }}".Split(',')
+          foreach ($ext in $targets) {
+            $ext = $ext.Trim()
+            $key = "TARGET_NAME_$ext"
+            $targetName = (Get-Item "env:$key").Value
+            
+            $files = Get-ChildItem -Path dist -Recurse -Filter "*.$ext"
+            
+            foreach ($file in $files) {
+                $destination = Join-Path -Path "out" -ChildPath "$targetName.$ext"
+                Move-Item -Path $file.FullName -Destination $destination -Force
+            }
+          }
+          Get-ChildItem -Path out
           
       - name: Upload Debug Symbols
         if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
@@ -258,9 +262,9 @@ jobs:
             KEY=TARGET_NAME_${EXT}
             FILENAME=${!KEY}
             echo "For $EXT ($KEY) filename is ${FILENAME}"
-            mv dist/*/*.$EXT* tmp_out/${FILENAME}.$EXT$( [ "$EXT" = "tar" ] && echo ".gz" )
+            mv dist/*/*.$EXT tmp_out/${FILENAME}.$EXT
             ls tmp_out
-            [[ "$EXT" != "tar" ]] && chmod +x tmp_out/${FILENAME}.$EXT || echo "Skipping chmod for tar"
+            [[ "$EXT" != "gz" ]] && chmod +x tmp_out/${FILENAME}.$EXT || echo "Skipping chmod for gz"
             if [ "${{matrix.platform}}" == "linux" ];then
               cp ./.github/help/linux/* tmp_out/
             else
