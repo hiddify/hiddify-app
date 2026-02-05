@@ -6,8 +6,8 @@
 
 psiphon://auto/
 #psiphon://auto/?region=...&remote_server_list_url=...&remote_server_list_download_filename=...&remote_server_list_signature_public_key=...
-warp://p2@188.114.97.170:894#warp_in_warp -> warp://p1@188.114.97.170:894?ifp=40-80&ifps=40-100&ifpd=4-8&ifpm=m4#m4 
-warp://p2@auto#WarpInWarp✅ -> warp://p1@auto?ifpm=m4#LocalIP
+warp://A1@188.114.97.170:894#warp_in_warp -> warp://A2@188.114.97.170:894?ifp=40-80&ifps=40-100&ifpd=4-8&ifpm=m4#m4 
+warp://B1@auto#WarpInWarp✅ -> warp://B2@auto?ifpm=m4#LocalIP
 #warp://p1@ip1?ifp=1-3#WarpInWarp✅ -> warp://p2@ip2ifp=1-3#Warp🇮🇷IP
 
 #warp://auto?ifp=10-20&ifps=40-100&ifpd=10-20#Warp_10-20_40-100_10-20
