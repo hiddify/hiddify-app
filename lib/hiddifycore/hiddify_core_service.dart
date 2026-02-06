@@ -163,7 +163,9 @@ class HiddifyCoreService with InfraLogger {
             disableMemoryLimit: disableMemoryLimit,
           ),
         );
-        if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
+        if (res.messageType != MessageType.ALREADY_STARTED && res.messageType != MessageType.EMPTY) {
+          return left("${res.messageType} ${res.message}");
+        }
       } on GrpcError catch (e) {
         loggy.error("failed to start bg core: $e");
         if (e.code == StatusCode.unavailable) {

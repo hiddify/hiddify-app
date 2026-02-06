@@ -49,17 +49,17 @@ abstract class ConfigOptions {
 
   static final remoteDnsAddress = PreferencesNotifier.create<String, String>(
     "remote-dns-address",
-    "udp://1.1.1.1",
+    "tcp://8.8.8.8",
     possibleValues: List.of([
       "local",
-      "udp://223.5.5.5",
-      "udp://1.1.1.1",
-      "udp://1.1.1.2",
+      // "udp://223.5.5.5",
+      // "udp://1.1.1.1",
+      // "udp://1.1.1.2",
+      "tcp://8.8.8.8",
       "tcp://1.1.1.1",
       "https://1.1.1.1/dns-query",
       "https://dns.cloudflare.com/dns-query",
-      "4.4.2.2",
-      "8.8.8.8",
+      "tcp://4.4.2.2",
     ]),
     validator: (value) => value.isNotBlank,
   );

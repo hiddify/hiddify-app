@@ -253,7 +253,7 @@ class BoxService(
     private fun serviceUpdateIdleMode() {
         if (Application.powerManager.isDeviceIdleMode) {
 //            boxService?.pause()
-            Mobile.pause()
+            //Mobile.pause()
         } else {
             Mobile.wake()
 //            boxService?.wake()

@@ -41,12 +41,12 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
         let systemProxyEnabled = false//prefs.systemProxyEnabled
 
         
-        let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
+        let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "::1")
         if options.getAutoRoute() {
             settings.mtu = NSNumber(value: options.getMTU())
 
            let dnsServer = try options.getDNSServerAddress()
-            let dnsSettings = NEDNSSettings(servers: [dnsServer.value])
+            let dnsSettings = NEDNSSettings(servers: [dnsServer.value,"fdfe:dcba:9876::1"])
             dnsSettings.matchDomains = [""]
             dnsSettings.matchDomainsNoSearch = true
             settings.dnsSettings = dnsSettings
@@ -78,6 +78,7 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
                 ipv4Routes.append(NEIPv4Route(destinationAddress: "32.0.0.0", subnetMask: "224.0.0.0"))
                 ipv4Routes.append(NEIPv4Route(destinationAddress: "64.0.0.0", subnetMask: "192.0.0.0"))
                 ipv4Routes.append(NEIPv4Route(destinationAddress: "128.0.0.0", subnetMask: "128.0.0.0"))
+                ipv4Routes.append(NEIPv4Route.default())
             } else {
                 ipv4Routes.append(NEIPv4Route.default())
             }
@@ -132,6 +133,7 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
                 ipv6Routes.append(NEIPv6Route(destinationAddress: "2000::", networkPrefixLength: 3))
                 ipv6Routes.append(NEIPv6Route(destinationAddress: "4000::", networkPrefixLength: 2))
                 ipv6Routes.append(NEIPv6Route(destinationAddress: "8000::", networkPrefixLength: 1))
+                ipv6Routes.append(NEIPv6Route.default())
             } else {
                 ipv6Routes.append(NEIPv6Route.default())
             }

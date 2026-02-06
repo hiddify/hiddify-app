@@ -95,7 +95,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
                 false
             }
         } catch (e: Exception) {
-            onServiceAlert(Alert.RequestVPNPermission, e.message)
+//            onServiceAlert(Alert.RequestVPNPermission, e.message)
             true
         }
     }
