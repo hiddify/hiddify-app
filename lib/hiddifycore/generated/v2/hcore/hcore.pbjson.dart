@@ -179,6 +179,8 @@ const OutboundInfo$json = const {
     const {'1': 'port', '3': 10, '4': 1, '5': 13, '10': 'port'},
     const {'1': 'host', '3': 11, '4': 1, '5': 9, '10': 'host'},
     const {'1': 'tag_display', '3': 12, '4': 1, '5': 9, '10': 'tagDisplay'},
+    const {'1': 'upload', '3': 15, '4': 1, '5': 3, '10': 'upload'},
+    const {'1': 'download', '3': 16, '4': 1, '5': 3, '10': 'download'},
   ],
   '8': const [
     const {'1': '_ipinfo'},
@@ -188,7 +190,7 @@ const OutboundInfo$json = const {
 };
 
 /// Descriptor for `OutboundInfo`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode('CgxPdXRib3VuZEluZm8SEAoDdGFnGAEgASgJUgN0YWcSEgoEdHlwZRgCIAEoCVIEdHlwZRI+Cg11cmxfdGVzdF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFILdXJsVGVzdFRpbWUSJAoOdXJsX3Rlc3RfZGVsYXkYBCABKAVSDHVybFRlc3REZWxheRIqCgZpcGluZm8YBSABKAsyDS5oY29yZS5JcEluZm9IAFIGaXBpbmZviAEBEh8KC2lzX3NlbGVjdGVkGAYgASgIUgppc1NlbGVjdGVkEhkKCGlzX2dyb3VwGAcgASgIUgdpc0dyb3VwEjEKEmdyb3VwX3NlbGVjdGVkX3RhZxgNIAEoCUgBUhBncm91cFNlbGVjdGVkVGFniAEBEkAKGmdyb3VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5GA4gASgJSAJSF2dyb3VwU2VsZWN0ZWRUYWdEaXNwbGF5iAEBEhsKCWlzX3NlY3VyZRgIIAEoCFIIaXNTZWN1cmUSHQoKaXNfdmlzaWJsZRgJIAEoCFIJaXNWaXNpYmxlEhIKBHBvcnQYCiABKA1SBHBvcnQSEgoEaG9zdBgLIAEoCVIEaG9zdBIfCgt0YWdfZGlzcGxheRgMIAEoCVIKdGFnRGlzcGxheUIJCgdfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dyb3VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5');
+final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode('CgxPdXRib3VuZEluZm8SEAoDdGFnGAEgASgJUgN0YWcSEgoEdHlwZRgCIAEoCVIEdHlwZRI+Cg11cmxfdGVzdF90aW1lGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcFILdXJsVGVzdFRpbWUSJAoOdXJsX3Rlc3RfZGVsYXkYBCABKAVSDHVybFRlc3REZWxheRIqCgZpcGluZm8YBSABKAsyDS5oY29yZS5JcEluZm9IAFIGaXBpbmZviAEBEh8KC2lzX3NlbGVjdGVkGAYgASgIUgppc1NlbGVjdGVkEhkKCGlzX2dyb3VwGAcgASgIUgdpc0dyb3VwEjEKEmdyb3VwX3NlbGVjdGVkX3RhZxgNIAEoCUgBUhBncm91cFNlbGVjdGVkVGFniAEBEkAKGmdyb3VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5GA4gASgJSAJSF2dyb3VwU2VsZWN0ZWRUYWdEaXNwbGF5iAEBEhsKCWlzX3NlY3VyZRgIIAEoCFIIaXNTZWN1cmUSHQoKaXNfdmlzaWJsZRgJIAEoCFIJaXNWaXNpYmxlEhIKBHBvcnQYCiABKA1SBHBvcnQSEgoEaG9zdBgLIAEoCVIEaG9zdBIfCgt0YWdfZGlzcGxheRgMIAEoCVIKdGFnRGlzcGxheRIWCgZ1cGxvYWQYDyABKANSBnVwbG9hZBIaCghkb3dubG9hZBgQIAEoA1IIZG93bmxvYWRCCQoHX2lwaW5mb0IVChNfZ3JvdXBfc2VsZWN0ZWRfdGFnQh0KG19ncm91cF9zZWxlY3RlZF90YWdfZGlzcGxheQ==');
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = const {
   '1': 'IpInfo',

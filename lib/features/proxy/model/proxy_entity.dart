@@ -23,7 +23,7 @@ class ProxyItemEntity with _$ProxyItemEntity {
 
   const factory ProxyItemEntity({
     required String tag,
-    required ProxyType type,
+    required String type,
     required int urlTestDelay,
     String? selectedTag,
   }) = _ProxyItemEntity;

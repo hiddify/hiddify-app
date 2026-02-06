@@ -19,12 +19,14 @@ part 'proxies_overview_notifier.g.dart';
 enum ProxiesSort {
   unsorted,
   name,
-  delay;
+  delay,
+  usage;
 
   String present(TranslationsEn t) => switch (this) {
     ProxiesSort.unsorted => t.pages.proxies.sortOptions.unsorted,
     ProxiesSort.name => t.pages.proxies.sortOptions.name,
     ProxiesSort.delay => t.pages.proxies.sortOptions.delay,
+    ProxiesSort.usage => t.pages.proxies.sortOptions.usage,
   };
 }
 
@@ -154,6 +156,11 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
         return ai.compareTo(bi);
       }),
       ProxiesSort.unsorted => proxies.items,
+      ProxiesSort.usage => proxies.items.sortedWith((a, b) {
+        if (a.isGroup && !b.isGroup) return -1;
+        if (!a.isGroup && b.isGroup) return 1;
+        return (b.upload + b.download).compareTo(a.upload + a.download);
+      }),
     };
     final items = <OutboundInfo>[];
     for (final item in sortedItems) {

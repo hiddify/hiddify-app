@@ -46,6 +46,8 @@ class OutboundInfoWidget extends HookConsumerWidget {
           ),
           _buildInfoRow(t.dialogs.proxyInfo.testDelay, '${outboundInfo.urlTestDelay} ms'),
           _buildIpInfo(outboundInfo.ipinfo, ref),
+          _buildInfoRow(t.dialogs.proxyInfo.upload, formatBytes(outboundInfo.upload.toInt())),
+          _buildInfoRow(t.dialogs.proxyInfo.download, formatBytes(outboundInfo.download.toInt())),
           _buildInfoRow(t.dialogs.proxyInfo.isSelected, outboundInfo.isSelected ? '✅' : '❌'),
           _buildInfoRow(t.dialogs.proxyInfo.isGroup, outboundInfo.isGroup ? '✅' : '❌'),
           _buildInfoRow(t.dialogs.proxyInfo.isSecure, outboundInfo.isSecure ? '✅' : '❌'),
@@ -55,6 +57,27 @@ class OutboundInfoWidget extends HookConsumerWidget {
         ],
       ),
     );
+  }
+
+  String formatBytes(int bytes, {int decimals = 3}) {
+    if (bytes <= 0) return '0 B';
+
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    int unitIndex = 0;
+    double size = bytes.toDouble();
+
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+    final decimals2 = switch (unitIndex) {
+      0 => 0,
+      1 => 0,
+      2 => 1,
+      _ => decimals,
+    };
+
+    return '${size.toStringAsFixed(decimals2)} ${units[unitIndex]}';
   }
 
   Widget _buildInfoRow(String title, String value, {Future<bool>? Function()? onTap}) {

@@ -21,6 +21,7 @@ import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/riverpod_observer.dart';
@@ -95,13 +96,9 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     //   timeout: 1000,
     // );
 
-    // if (PlatformUtils.isDesktop) {
-    //   await _safeInit(
-    //     "system tray",
-    //     () => container.read(systemTrayNotifierProvider.future),
-    //     timeout: 1000,
-    //   );
-    // }
+    if (PlatformUtils.isDesktop) {
+      await _safeInit("system tray", () => container.read(systemTrayNotifierProvider.future), timeout: 1000);
+    }
 
     if (PlatformUtils.isAndroid) {
       await _safeInit("android display mode", () async {

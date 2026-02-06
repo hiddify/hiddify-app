@@ -632,6 +632,8 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aOS(12, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tagDisplay')
     ..aOS(13, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupSelectedTag')
     ..aOS(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupSelectedTagDisplay')
+    ..aInt64(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'upload')
+    ..aInt64(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'download')
     ..hasRequiredFields = false
   ;
 
@@ -651,6 +653,8 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.String? tagDisplay,
     $core.String? groupSelectedTag,
     $core.String? groupSelectedTagDisplay,
+    $fixnum.Int64? upload,
+    $fixnum.Int64? download,
   }) {
     final _result = create();
     if (tag != null) {
@@ -694,6 +698,12 @@ class OutboundInfo extends $pb.GeneratedMessage {
     }
     if (groupSelectedTagDisplay != null) {
       _result.groupSelectedTagDisplay = groupSelectedTagDisplay;
+    }
+    if (upload != null) {
+      _result.upload = upload;
+    }
+    if (download != null) {
+      _result.download = download;
     }
     return _result;
   }
@@ -847,6 +857,24 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasGroupSelectedTagDisplay() => $_has(13);
   @$pb.TagNumber(14)
   void clearGroupSelectedTagDisplay() => clearField(14);
+
+  @$pb.TagNumber(15)
+  $fixnum.Int64 get upload => $_getI64(14);
+  @$pb.TagNumber(15)
+  set upload($fixnum.Int64 v) { $_setInt64(14, v); }
+  @$pb.TagNumber(15)
+  $core.bool hasUpload() => $_has(14);
+  @$pb.TagNumber(15)
+  void clearUpload() => clearField(15);
+
+  @$pb.TagNumber(16)
+  $fixnum.Int64 get download => $_getI64(15);
+  @$pb.TagNumber(16)
+  set download($fixnum.Int64 v) { $_setInt64(15, v); }
+  @$pb.TagNumber(16)
+  $core.bool hasDownload() => $_has(15);
+  @$pb.TagNumber(16)
+  void clearDownload() => clearField(16);
 }
 
 class IpInfo extends $pb.GeneratedMessage {

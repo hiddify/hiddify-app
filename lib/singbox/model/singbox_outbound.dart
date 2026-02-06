@@ -24,11 +24,8 @@ class SingboxOutboundGroupItem with _$SingboxOutboundGroupItem {
   const SingboxOutboundGroupItem._();
 
   @JsonSerializable(fieldRename: FieldRename.kebab)
-  const factory SingboxOutboundGroupItem({
-    required String tag,
-    @JsonKey(fromJson: _typeFromJson) required ProxyType type,
-    required int urlTestDelay,
-  }) = _SingboxOutboundGroupItem;
+  const factory SingboxOutboundGroupItem({required String tag, required String type, required int urlTestDelay}) =
+      _SingboxOutboundGroupItem;
 
   factory SingboxOutboundGroupItem.fromJson(Map<String, dynamic> json) => _$SingboxOutboundGroupItemFromJson(json);
 }

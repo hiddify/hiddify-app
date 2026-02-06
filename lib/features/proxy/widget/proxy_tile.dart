@@ -42,14 +42,21 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
               ),
           ],
         ),
+        maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: proxy.urlTestDelay != 0
-          ? Text(
+      trailing: Column(
+        children: [
+          if (proxy.urlTestDelay != 0)
+            Text(
               proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
               style: TextStyle(color: delayColor(context, proxy.urlTestDelay)),
-            )
-          : null,
+            ),
+
+          if (proxy.download > 0) Text("⬩", style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+
       selected: selected,
       selectedTileColor: theme.colorScheme.primaryContainer,
       onTap: onTap,

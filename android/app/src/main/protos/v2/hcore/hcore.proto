@@ -102,6 +102,8 @@ message OutboundInfo {
   uint32 port = 10;
   string host = 11;
   string tag_display = 12;
+  int64 upload = 15;
+  int64 download = 16;
 }
 
 message IpInfo {

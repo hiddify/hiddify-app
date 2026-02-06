@@ -201,7 +201,7 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     
     override open func sleep() async {
         logger.debug("Entering sleep mode")
-        MobilePause()
+//        MobilePause()
         // Add any sleep mode handling if needed
     }
     
