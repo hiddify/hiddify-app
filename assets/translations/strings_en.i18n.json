@@ -22,7 +22,8 @@
     "showMore": "Show More",
     "showLess": "Show Less",
     "openAppSettings": "Open App Settings",
-    "grantPermission": "Grant Permission"
+    "grantPermission": "Grant Permission",
+    "rules": "rules"
   },
   "intro": {
     "termsAndPolicyCaution(rich)": "By Continuing You Agree With ${tap(@:about.termsAndConditions)}",
@@ -426,7 +427,26 @@
     "warpNoise": "Noise Count",
     "warpNoiseSize": "Noise Size",
     "warpNoiseMode": "Noise Mode",
-    "warpNoiseDelay": "Noise Delay"
+    "warpNoiseDelay": "Noise Delay",
+    "customRoutingRules": "Custom Routing Rules",
+    "addCustomRule": "Add Custom Rule",
+    "editCustomRule": "Edit Custom Rule",
+    "noCustomRules": "No custom rules defined",
+    "addCustomRuleHint": "Click the + button to add a new rule",
+    "domains": "Domains",
+    "domainsHint": "Example: example.com, *.google.com, geosite:ir",
+    "ip": "IP",
+    "ipHint": "Example: 192.168.1.1, geoip:ir",
+    "port": "Port",
+    "portHint": "Example: 80, 443, 8080",
+    "protocol": "Protocol",
+    "protocolHint": "Example: http, https, tcp, udp",
+    "outbound": "Outbound",
+    "network": "Network",
+    "proxy": "Proxy",
+    "direct": "Direct",
+    "block": "Block",
+    "customRule": "Custom Rule"
   },
   "window": {
     "hide": "Hide",
