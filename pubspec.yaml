@@ -49,8 +49,8 @@ dependencies:
   url_launcher: ^6.2.5
   vclibs: ^0.1.2
   launch_at_startup: ^0.2.2
-  sentry_flutter: ^7.16.1
-  sentry_dart_plugin: ^1.7.1
+  sentry_flutter: ^8.13.0
+  sentry_dart_plugin: ^2.4.0
   combine: ^0.5.7
   path: ^1.8.3
   loggy: ^2.0.3
@@ -88,8 +88,8 @@ dependencies:
   json_path: ^0.7.1
   # permission_handler: ^11.3.0 # is not compatible with windows
   #flutter_easy_permission: ^1.1.2
-  flutter_easy_permission: 
-     git: https://github.com/unger1984/flutter_easy_permission.git
+  flutter_easy_permission:
+    git: https://github.com/unger1984/flutter_easy_permission.git
   in_app_review: ^2.0.9
   # circle_flags: ^4.0.2
   circle_flags:
