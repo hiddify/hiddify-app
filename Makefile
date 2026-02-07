@@ -237,21 +237,9 @@ linux-flutter-sync:
 		$(GREEN)Flutter SDK is ready.$(DONE); \
 	fi
 
-
 windows-install-deps:
 	dart pub global activate fastforge
 # 	choco install innosetup -y
-	
-	
-	sudo modprobe fuse
-	wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-	chmod +x appimagetool
-	sudo mv appimagetool /usr/local/bin/
-
-	dart pub global activate --source git  https://github.com/hiddify/flutter_distributor --git-path packages/flutter_distributor
-
-windows-install-deps:
-	dart pub global activate fastforge 
 	
 gen_translations: #generating missing translations using google translate
 	cd .github && bash sync_translate.sh
