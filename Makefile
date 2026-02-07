@@ -253,6 +253,10 @@ android-aab-release:
 
 windows-release: windows-zip-release windows-exe-release windows-msix-release
 
+FULL_PATH = $(wildcard dist/*/*.zip)
+ZIP_DIR = $(dir $(FULL_PATH))
+FILE_NAME = $(basename $(notdir $(FULL_PATH)))
+
 windows-zip-release:
 	fastforge package \
 	  --platform windows \
@@ -261,6 +265,18 @@ windows-zip-release:
 	  --build-target=$(TARGET) \
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
 	  --build-dart-define=portable=true
+	@FULL_PATH=$$(ls dist/*/*.zip | head -n 1) && \
+	ZIP_DIR=$$(dirname "$$FULL_PATH") && \
+	ZIP_FILE=$$(basename "$$FULL_PATH") && \
+	FILE_NAME=$${ZIP_FILE%.*} && \
+	echo -e "\033[1;34mPost-processing Windows portable\033[0m" && \
+	cd "$$ZIP_DIR" && \
+	mkdir -p Hiddify && \
+	unzip -q "$$ZIP_FILE" -d Hiddify/ && \
+	rm "$$ZIP_FILE" && \
+	tar -a -cf "$$FILE_NAME.zip" Hiddify && \
+	rm -rf Hiddify && \
+	echo -e "\033[1;92mSuccessful\033[0m"
 
 windows-exe-release:
 	fastforge package \
