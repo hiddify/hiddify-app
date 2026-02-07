@@ -16,15 +16,17 @@ env:
   IS_GITHUB_ACTIONS: 1
   CHANNEL: "${{ inputs.channel }}"
   FLUTTER_VERSION: '3.38.5'
-  NDK_VERSION: r26d
+  NDK_VERSION: r28c
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   TAG_NAME: "${{ inputs.tag-name }}"
-  TARGET_NAME_AppImage: "Hiddify-Linux-x64"
+  TARGET_NAME_gz: "Hiddify-Linux-x64-AppImage.tar"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
-  TARGET_NAME_rpm: "Hiddify-rpm-x64"
+  # TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
   TARGET_NAME_aab: "Hiddify-Android"
-  #TARGET_NAME_exe: "Hiddify-Windows-x64"
+  TARGET_NAME_exe: "Hiddify-Windows-Setup-x64"
+  TARGET_NAME_msix: "Hiddify-Windows-x64"
+  TARGET_NAME_zip: "Hiddify-Windows-Portable-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
   TARGET_NAME_ipa: "Hiddify-iOS"
@@ -71,12 +73,12 @@ jobs:
           - platform: windows
             os: windows-latest
             aarch: amd64
-            targets: exe,msix
+            targets: exe,msix,zip
 
           - platform: linux
             os: ubuntu-22.04
             aarch: amd64
-            targets: AppImage,deb
+            targets: deb,gz
 
           - platform: macos
             os: macos-15
@@ -139,15 +141,13 @@ jobs:
           add-to-path: true
           link-to-sdk: true
 
-      - name: Setup Gradle 8.7
+      - uses: android-actions/setup-android@v3
         if: startsWith(matrix.platform,'android')
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 8.7
+      
+      
       - name: Setup dependencies
         run: |
-          make ${{ matrix.platform }}-install-dependencies
-
+          make ${{ matrix.platform }}-install-deps  
 
       - name: Setup Android Signing Properties
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'android') }}
@@ -216,10 +216,24 @@ jobs:
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows'
+        shell: pwsh
         run: |
-          tree
-          .\scripts\package_windows.ps1
-          
+          Get-ChildItem -Path dist -Recurse | Select-Object FullName
+          New-Item -ItemType Directory -Path "out" -Force | Out-Null
+          $targets = "${{ matrix.targets }}".Split(',')
+          foreach ($ext in $targets) {
+            $ext = $ext.Trim()
+            $key = "TARGET_NAME_$ext"
+            $targetName = (Get-Item "env:$key").Value
+            
+            $files = Get-ChildItem -Path dist -Recurse -Filter "*.$ext"
+            
+            foreach ($file in $files) {
+                $destination = Join-Path -Path "out" -ChildPath "$targetName.$ext"
+                Move-Item -Path $file.FullName -Destination $destination -Force
+            }
+          }
+          Get-ChildItem -Path out
           
       - name: Upload Debug Symbols
         if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
@@ -265,7 +279,7 @@ jobs:
             echo "For $EXT ($KEY) filename is ${FILENAME}"
             mv dist/*/*.$EXT tmp_out/${FILENAME}.$EXT
             ls tmp_out
-            chmod +x tmp_out/${FILENAME}.$EXT
+            [[ "$EXT" != "gz" ]] && chmod +x tmp_out/${FILENAME}.$EXT || echo "Skipping chmod for gz"
             if [ "${{matrix.platform}}" == "linux" ];then
               cp ./.github/help/linux/* tmp_out/
             else
