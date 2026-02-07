@@ -1,5 +1,18 @@
 # .ONESHELL:
 include dependencies.properties
+
+# --- Log Colors ---
+blue   := \033[1;34m
+green  := \033[1;92m
+yellow := \033[1;33m
+reset  := \033[0m
+# --- Log helpers ---
+# Usage: $(BLUE) <text> $(DONE)
+BLUE   := echo -e "$(blue)
+GREEN  := echo -e "$(green)
+YELLOW := echo -e "$(yellow)
+DONE := $(reset)"
+
 MKDIR := mkdir -p
 RM  := rm -rf
 SEP :=/
@@ -154,24 +167,24 @@ LINUX_DEPS = $(shell grep -vE '^\s*#|^\s*$$' linux_deps.list)
 REQUIRED_VER = $(shell sed -n '/environment:/,/flutter:/ s/.*flutter:[[:space:]]*//p' pubspec.yaml | tr -d " '^\"")
 
 linux-install-deps:
-	@echo "** Installing Debian/Ubuntu dependencies..."
+	@$(BLUE)Installing Debian/Ubuntu dependencies...$(DONE)
 	sudo apt-get update -y
 	sudo apt-get install -y $(LINUX_DEPS)
 #	loading fuce kernel module
-	@echo "** Loading fuce kernel module"
+	@$(BLUE)Loading fuce kernel module$(DONE)
 	sudo modprobe fuse
 # 	tools for appimage
-	@echo "** Installing appimagetool"
+	@$(BLUE)Installing appimagetool$(DONE)
 	wget -O /tmp/appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 	chmod +x /tmp/appimagetool
 	sudo mv /tmp/appimagetool /usr/local/bin/
 #   cloning flutter sdk
-	@echo "** Cloning Flutter SDK"; \
+	@$(BLUE)Cloning Flutter SDK$(DONE); \
 	mkdir -p ~/develop; \
 	cd ~/develop; \
 	\
 	if [ ! -d "flutter/.git" ]; then \
-		echo "** Flutter not found. cloning stable channel"; \
+		$(BLUE)Flutter not found. cloning stable channel$(DONE); \
 		rm -rf flutter; \
 		git clone https://github.com/flutter/flutter.git -b stable flutter; \
 	fi; \
@@ -185,7 +198,7 @@ linux-install-deps:
 # 	syncing flutter version
 	$(MAKE) linux-flutter-sync
 # 	installing fastforge https://pub.dev/packages/fastforge
-	@echo "** Installing fastforge"; \
+	@$(BLUE)Installing fastforge$(DONE); \
 	export PATH="$$HOME/develop/flutter/bin:$$HOME/.pub-cache/bin:$$PATH"; \
 	if ! grep -q '.pub-cache/bin' ~/.bashrc; then \
 		echo 'export PATH="$$HOME/.pub-cache/bin:$$PATH"' >> ~/.bashrc; \
@@ -200,24 +213,24 @@ linux-install-deps:
 
 # 	syncing 'flutter sdk' version with pubspec.yaml flutter version
 linux-flutter-sync:
-	@echo "** Syncing Flutter version with pubspec.yaml flutter version"; \
+	@$(BLUE)Syncing Flutter version with pubspec.yaml flutter version$(DONE); \
 	export PATH="$$HOME/develop/flutter/bin:$$PATH"; \
-	echo "** Downloading Flutter SDK components..."; \
+	$(BLUE)Downloading Flutter SDK components...$(DONE); \
 	flutter --version > /dev/null; \
 	\
-	echo "** Checking Flutter version..."; \
+	$(BLUE)Checking Flutter version...$(DONE); \
 	CURRENT_VER=$$(flutter --version | head -n 1 | awk '{print $$2}'); \
-	echo "** Target: $(REQUIRED_VER) | Current: $$CURRENT_VER"; \
+	$(BLUE)Target: $(REQUIRED_VER) | Current: $$CURRENT_VER$(DONE); \
 	\
 	if [ "$$CURRENT_VER" != "$(REQUIRED_VER)" ]; then \
-		echo "** Version mismatch! switching to $(REQUIRED_VER)..."; \
+		$(BLUE)Version mismatch! switching to $(REQUIRED_VER)...$(DONE); \
 		cd ~/develop/flutter; \
 		git fetch --tags; \
 		git checkout $(REQUIRED_VER); \
-		echo "** Switched to $(REQUIRED_VER)"; \
+		$(BLUE)Switched to $(REQUIRED_VER)$(DONE); \
 		flutter doctor; \
 	else \
-		echo "** Flutter SDK is ready."; \
+		$(GREEN)Flutter SDK is ready.$(DONE); \
 	fi
 
 
@@ -265,18 +278,19 @@ windows-zip-release:
 	  --build-target=$(TARGET) \
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
 	  --build-dart-define=portable=true
-	@FULL_PATH=$$(ls dist/*/*.zip | head -n 1) && \
-	ZIP_DIR=$$(dirname "$$FULL_PATH") && \
-	ZIP_FILE=$$(basename "$$FULL_PATH") && \
-	FILE_NAME=$${ZIP_FILE%.*} && \
-	echo -e "\033[1;34mPost-processing Windows portable\033[0m" && \
-	cd "$$ZIP_DIR" && \
-	mkdir -p Hiddify && \
-	unzip -q "$$ZIP_FILE" -d Hiddify/ && \
-	rm "$$ZIP_FILE" && \
-	tar -a -cf "$$FILE_NAME.zip" Hiddify && \
-	rm -rf Hiddify && \
-	echo -e "\033[1;92mSuccessful\033[0m"
+	@FULL_PATH=$$(ls dist/*/*.zip | head -n 1); \
+	ZIP_DIR=$$(dirname "$$FULL_PATH"); \
+	ZIP_FILE=$$(basename "$$FULL_PATH"); \
+	FILE_NAME=$${ZIP_FILE%.*}; \
+	$(YELLOW)Post-processing Windows portable$(DONE); \
+	cd "$$ZIP_DIR"; \
+	$(BLUE)Extracting and Repacking...$(DONE); \
+	mkdir -p Hiddify; \
+	unzip -q "$$ZIP_FILE" -d Hiddify/; \
+	rm "$$ZIP_FILE"; \
+	tar -a -cf "$$FILE_NAME.zip" Hiddify; \
+	rm -rf Hiddify; \
+	$(GREEN)Successful$(DONE)
 
 windows-exe-release:
 	fastforge package \
@@ -341,38 +355,38 @@ linux-appimage-release:
 	--skip-clean \
 	--build-target=$(TARGET) \
 	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
-	@echo "---- Post-processing AppImage"
+	@$(YELLOW)Post-processing AppImage$(DONE)
 	@FULL_PATH=$$(ls -td dist/*+* | head -n 1); \
 	VERSION_NAME=$$(basename "$$FULL_PATH"); \
-	echo "** Directory Found: $$FULL_PATH"; \
-	echo "** Detected Version: $$VERSION_NAME"; \
-	echo "** Extracting AppImage"; \
+	$(BLUE)Directory Found: $$FULL_PATH$(DONE); \
+	$(BLUE)Detected Version: $$VERSION_NAME$(DONE); \
+	$(BLUE)Extracting AppImage$(DONE); \
 	cd dist/$$VERSION_NAME && ./hiddify-$$VERSION_NAME-linux.AppImage --appimage-extract > /dev/null; \
-	echo "** Replacing AppRun"; \
+	$(BLUE)Replacing AppRun$(DONE); \
 	cp ../../linux/packaging/appimage/AppRun squashfs-root/AppRun; \
-	echo "** Granting permissions"; \
+	$(BLUE)Granting permissions$(DONE); \
 	chmod +x squashfs-root/AppRun; \
-	echo "** Adding StartupWMClass to hiddify.desktop"; \
+	$(BLUE)Adding StartupWMClass to hiddify.desktop$(DONE); \
 	sed -i '/^\[Desktop Entry\]/a StartupWMClass=app.hiddify.com' "squashfs-root/hiddify.desktop"; \
-	echo "** Removing old AppImage"; \
+	$(BLUE)Removing old AppImage$(DONE); \
 	rm hiddify-$$VERSION_NAME-linux.AppImage; \
-	echo "** Rebuilding AppImage"; \
+	$(BLUE)Rebuilding AppImage$(DONE); \
 	ARCH=x86_64 appimagetool squashfs-root hiddify-$$VERSION_NAME-linux.AppImage > /dev/null; \
-	echo "** Cleaning up squashfs"; \
+	$(BLUE)Cleaning up squashfs$(DONE); \
 	rm -rf squashfs-root; \
-	echo "---- Creating Portable Package"; \
+	$(YELLOW)Creating Portable Package$(DONE); \
 	PKG_DIR_NAME="hiddify-$$VERSION_NAME-linux"; \
-	echo "** Creating dir: $$PKG_DIR_NAME"; \
+	$(BLUE)Creating dir: $$PKG_DIR_NAME$(DONE); \
 	mkdir -p "$$PKG_DIR_NAME"; \
-	echo "** Moving and Renaming to Hiddify.AppImage"; \
+	$(BLUE)Moving and Renaming to Hiddify.AppImage$(DONE); \
 	mv "hiddify-$$VERSION_NAME-linux.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
-	echo "** Creating Portable Home directory"; \
+	$(BLUE)Creating Portable Home directory$(DONE); \
 	mkdir -p "$$PKG_DIR_NAME/Hiddify.AppImage.home"; \
-	echo "** Compressing to .tar.gz"; \
+	$(BLUE)Compressing to .tar.gz$(DONE); \
 	tar -czf "$$PKG_DIR_NAME.tar.gz" -C . "$$PKG_DIR_NAME"; \
-	echo "** Removing intermediate directory"; \
+	$(BLUE)Removing intermediate directory$(DONE); \
 	rm -rf "$$PKG_DIR_NAME"; \
-	echo "---- Successful"
+	$(GREEN)Successful$(DONE)
 
 DOCKER_IMAGE_NAME := hiddify-linux-builder
 DOCKER_FLUTTER_VOL := hiddify-flutter-sdk-cache
@@ -405,17 +419,17 @@ DOCKER_CMD := \
 	fi;
 
 linux-docker-release:
-	@echo "** Cleaning main project to reduce context size"
+	@$(BLUE)Cleaning main project to reduce context size$(DONE)
 	flutter clean
 	
-	@echo "** Building docker image (Cached)"
+	@$(BLUE)Building docker image (Cached)$(DONE)
 	docker build -t $(DOCKER_IMAGE_NAME) -f Dockerfile .
 	
-	@echo "** Ensuring cache volumes exist"
+	@$(BLUE)Ensuring cache volumes exist$(DONE)
 	docker volume create $(DOCKER_FLUTTER_VOL) || true
 	docker volume create $(DOCKER_PUB_VOL) || true
 
-	@echo "** Running build inside container"
+	@$(YELLOW)Running build inside container$(DONE)
 	@docker run --rm \
 		-v "$(CURDIR):/host" \
 		-v $(DOCKER_FLUTTER_VOL):/root/develop/flutter \
@@ -424,7 +438,7 @@ linux-docker-release:
 		$(DOCKER_IMAGE_NAME) \
 		/bin/bash -c "$(DOCKER_CMD)"
 
-	@echo "** [SUCCESS] Build finished. Output is in 'dist_docker' folder."
+	@$(GREEN)Successful. Output is in 'dist_docker' folder.$(DONE)
 
 macos-release:
 	fastforge package --platform macos --targets dmg,pkg $(DISTRIBUTOR_ARGS)
