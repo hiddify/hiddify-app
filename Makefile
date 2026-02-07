@@ -133,12 +133,12 @@ protos: generate_go_protoc generate_kotlin_protos generate_dart_protoc
 	
 	
 
-macos-install-dependencies:
+macos-install-deps:
 	brew install create-dmg tree 
 	npm install -g appdmg
-	dart pub global activate flutter_distributor
+	dart pub global activate fastforge
 
-ios-install-dependencies: 
+ios-install-deps: 
 	if [ "$(flutter)" = "true" ]; then \
 		curl -L -o ~/Downloads/flutter_macos_3.19.3-stable.zip https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.22.3-stable.zip; \
 		mkdir -p ~/develop; \
@@ -158,7 +158,7 @@ ios-install-dependencies:
 	brew install create-dmg tree 
 	npm install -g appdmg
 	
-	dart pub global activate flutter_distributor
+	dart pub global activate fastforge
 	
 
 android-install-deps: 
@@ -250,8 +250,8 @@ windows-install-deps:
 
 	dart pub global activate --source git  https://github.com/hiddify/flutter_distributor --git-path packages/flutter_distributor
 
-windows-install-dependencies:
-	dart pub global activate flutter_distributor 
+windows-install-deps:
+	dart pub global activate fastforge 
 	
 gen_translations: #generating missing translations using google translate
 	cd .github && bash sync_translate.sh
