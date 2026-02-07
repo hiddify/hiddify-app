@@ -411,10 +411,10 @@ linux-docker-release:
 	@echo "** [SUCCESS] Build finished. Output is in 'dist_docker' folder."
 
 macos-release:
-	flutter_distributor package --platform macos --targets dmg,pkg $(DISTRIBUTOR_ARGS)
+	fastforge package --platform macos --targets dmg,pkg $(DISTRIBUTOR_ARGS)
 
 ios-release: #not tested
-	flutter_distributor package --platform ios --targets ipa --build-export-options-plist  ios/exportOptions.plist $(DISTRIBUTOR_ARGS)
+	fastforge package --platform ios --targets ipa --build-export-options-plist  ios/exportOptions.plist $(DISTRIBUTOR_ARGS)
 
 android-libs:
 	$(MKDIR) $(ANDROID_OUT) || echo Folder already exists. Skipping...
