@@ -9,6 +9,7 @@ import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/model/ip_info_entity.dart' as oldipinfo;
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/hiddifycore/init_signal.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -75,23 +76,22 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
   @override
   Stream<OutboundInfo> build() async* {
     // ref.disposeDelay(const Duration(seconds: 20));
-
+    ref.watch(coreRestartSignalProvider);
     final serviceRunning = await ref.watch(serviceRunningProvider.future);
     if (!serviceRunning) {
       throw const ServiceNotRunning();
     }
-
-    yield* ref
-        .watch(proxyRepositoryProvider)
+    final proxyprovider = ref.watch(proxyRepositoryProvider);
+    yield* proxyprovider
         .watchActiveProxies()
         .map((event) => event.getOrElse((l) => List<OutboundGroup>.empty()))
         .map((event) => event.firstOrNull?.items.first ?? OutboundInfo());
   }
 
-  final _urlTestThrottler = Throttler(const Duration(seconds: 2));
+  final _urlTestThrottler = Throttler(const Duration(seconds: 1));
 
   Future<void> urlTest(String? groupTag_) async {
-    final groupTag = groupTag_ ?? "auto";
+    final groupTag = groupTag_ ?? "";
     _urlTestThrottler(() async {
       if (state case AsyncData()) {
         await ref.read(hapticServiceProvider.notifier).lightImpact();

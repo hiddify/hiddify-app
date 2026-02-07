@@ -189,7 +189,7 @@ message SelectOutboundRequest {
 }
 
 message UrlTestRequest {
-  string group_tag = 1;
+  string tag = 1;
 }
 
 message GenerateWarpConfigRequest {
@@ -203,11 +203,12 @@ message SetSystemProxyEnabledRequest {
 }
 
 enum LogLevel {
-  DEBUG = 0;
-  INFO = 1;
-  WARNING = 2;
-  ERROR = 3;
-  FATAL = 4;
+  TRACE = 0; 
+  DEBUG = 1;
+  INFO = 2;
+  WARNING = 3;
+  ERROR = 4;
+  FATAL = 5;
 }
 enum LogType {
   CORE = 0;

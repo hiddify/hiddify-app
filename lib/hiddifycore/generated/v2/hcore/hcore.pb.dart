@@ -1888,17 +1888,17 @@ class SelectOutboundRequest extends $pb.GeneratedMessage {
 
 class UrlTestRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UrlTestRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupTag')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tag')
     ..hasRequiredFields = false
   ;
 
   UrlTestRequest._() : super();
   factory UrlTestRequest({
-    $core.String? groupTag,
+    $core.String? tag,
   }) {
     final _result = create();
-    if (groupTag != null) {
-      _result.groupTag = groupTag;
+    if (tag != null) {
+      _result.tag = tag;
     }
     return _result;
   }
@@ -1924,13 +1924,13 @@ class UrlTestRequest extends $pb.GeneratedMessage {
   static UrlTestRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get groupTag => $_getSZ(0);
+  $core.String get tag => $_getSZ(0);
   @$pb.TagNumber(1)
-  set groupTag($core.String v) { $_setString(0, v); }
+  set tag($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasGroupTag() => $_has(0);
+  $core.bool hasTag() => $_has(0);
   @$pb.TagNumber(1)
-  void clearGroupTag() => clearField(1);
+  void clearTag() => clearField(1);
 }
 
 class GenerateWarpConfigRequest extends $pb.GeneratedMessage {
@@ -2057,7 +2057,7 @@ class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
 
 class LogMessage extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LogMessage', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
-    ..e<LogLevel>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.DEBUG, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
+    ..e<LogLevel>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.TRACE, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
     ..e<LogType>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: LogType.CORE, valueOf: LogType.valueOf, enumValues: LogType.values)
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'message')
     ..aOM<$7.Timestamp>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'time', subBuilder: $7.Timestamp.create)
@@ -2148,7 +2148,7 @@ class LogMessage extends $pb.GeneratedMessage {
 
 class LogRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'LogRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'hcore'), createEmptyInstance: create)
-    ..e<LogLevel>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.DEBUG, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
+    ..e<LogLevel>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.TRACE, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
     ..hasRequiredFields = false
   ;
 

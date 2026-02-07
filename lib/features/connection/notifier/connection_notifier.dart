@@ -10,6 +10,7 @@ import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/hiddifycore/init_signal.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -52,6 +53,8 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
         await reconnect(next);
       }
     });
+    // ref.watch(coreRestartSignalProvider);
+
     yield* _connectionRepo.watchConnectionStatus().doOnData((event) {
       if (event case Disconnected(connectionFailure: final _?) when PlatformUtils.isDesktop) {
         ref.read(Preferences.startedByUser.notifier).update(false);
@@ -98,9 +101,12 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       }
       loggy.info("active profile changed, reconnecting");
       await ref.read(Preferences.startedByUser.notifier).update(true);
-      await _connectionRepo.reconnect(profile, ref.read(Preferences.disableMemoryLimit)).mapLeft((err) {
+      await _connectionRepo.reconnect(profile, ref.read(Preferences.disableMemoryLimit)).mapLeft((err) async {
         loggy.warning("error reconnecting", err);
         state = AsyncError(err, StackTrace.current);
+        await ref
+            .read(dialogNotifierProvider.notifier)
+            .showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
       }).run();
     }
   }
@@ -142,11 +148,18 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   Future<void> _disconnect() async {
     await _connectionRepo.disconnect().mapLeft((err) {
       loggy.warning("error disconnecting", err);
+      ref
+          .read(dialogNotifierProvider.notifier)
+          .showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
       state = AsyncError(err, StackTrace.current);
     }).run();
   }
 }
 
 @Riverpod(keepAlive: true)
-Future<bool> serviceRunning(Ref ref) =>
-    ref.watch(connectionNotifierProvider.selectAsync((data) => data.isConnected)).onError((error, stackTrace) => false);
+Future<bool> serviceRunning(Ref ref) async {
+  ref.watch(coreRestartSignalProvider);
+  return await ref
+      .watch(connectionNotifierProvider.selectAsync((data) => data.isConnected))
+      .onError((error, stackTrace) => false);
+}

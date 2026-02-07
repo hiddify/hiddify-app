@@ -12,8 +12,8 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final theme = Theme.of(context);
     final activeProxy = ref.watch(activeProxyNotifierProvider);
+    final theme = Theme.of(context);
 
     if (activeProxy is! AsyncData) {
       return const SizedBox(); // Avoid building widget if data is not available
@@ -26,7 +26,7 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
     return Center(
       child: InkWell(
         onTap: () async {
-          await ref.read(activeProxyNotifierProvider.notifier).urlTest(proxy.tag);
+          await ref.read(activeProxyNotifierProvider.notifier).urlTest("");
         },
         borderRadius: BorderRadius.circular(24),
         child: Padding(

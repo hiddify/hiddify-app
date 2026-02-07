@@ -10,6 +10,6 @@ part 'config_option_data_providers.g.dart';
 ConfigOptionRepository configOptionRepository(Ref ref) {
   return ConfigOptionRepository(
     preferences: ref.watch(sharedPreferencesProvider).requireValue,
-    getConfigOptions: () => ref.watch(ConfigOptions.singboxConfigOptions),
+    getConfigOptions: () => ref.read(ConfigOptions.singboxConfigOptions),
   );
 }

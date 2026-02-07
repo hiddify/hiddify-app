@@ -63,16 +63,17 @@ final $typed_data.Uint8List setupModeDescriptor = $convert.base64Decode('CglTZXR
 const LogLevel$json = const {
   '1': 'LogLevel',
   '2': const [
-    const {'1': 'DEBUG', '2': 0},
-    const {'1': 'INFO', '2': 1},
-    const {'1': 'WARNING', '2': 2},
-    const {'1': 'ERROR', '2': 3},
-    const {'1': 'FATAL', '2': 4},
+    const {'1': 'TRACE', '2': 0},
+    const {'1': 'DEBUG', '2': 1},
+    const {'1': 'INFO', '2': 2},
+    const {'1': 'WARNING', '2': 3},
+    const {'1': 'ERROR', '2': 4},
+    const {'1': 'FATAL', '2': 5},
   ],
 };
 
 /// Descriptor for `LogLevel`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List logLevelDescriptor = $convert.base64Decode('CghMb2dMZXZlbBIJCgVERUJVRxAAEggKBElORk8QARILCgdXQVJOSU5HEAISCQoFRVJST1IQAxIJCgVGQVRBTBAE');
+final $typed_data.Uint8List logLevelDescriptor = $convert.base64Decode('CghMb2dMZXZlbBIJCgVUUkFDRRAAEgkKBURFQlVHEAESCAoESU5GTxACEgsKB1dBUk5JTkcQAxIJCgVFUlJPUhAEEgkKBUZBVEFMEAU=');
 @$core.Deprecated('Use logTypeDescriptor instead')
 const LogType$json = const {
   '1': 'LogType',
@@ -354,12 +355,12 @@ final $typed_data.Uint8List selectOutboundRequestDescriptor = $convert.base64Dec
 const UrlTestRequest$json = const {
   '1': 'UrlTestRequest',
   '2': const [
-    const {'1': 'group_tag', '3': 1, '4': 1, '5': 9, '10': 'groupTag'},
+    const {'1': 'tag', '3': 1, '4': 1, '5': 9, '10': 'tag'},
   ],
 };
 
 /// Descriptor for `UrlTestRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List urlTestRequestDescriptor = $convert.base64Decode('Cg5VcmxUZXN0UmVxdWVzdBIbCglncm91cF90YWcYASABKAlSCGdyb3VwVGFn');
+final $typed_data.Uint8List urlTestRequestDescriptor = $convert.base64Decode('Cg5VcmxUZXN0UmVxdWVzdBIQCgN0YWcYASABKAlSA3RhZw==');
 @$core.Deprecated('Use generateWarpConfigRequestDescriptor instead')
 const GenerateWarpConfigRequest$json = const {
   '1': 'GenerateWarpConfigRequest',

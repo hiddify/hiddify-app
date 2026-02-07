@@ -20,9 +20,9 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
     final proxies = ref.watch(proxiesOverviewNotifierProvider);
     final sortBy = ref.watch(proxiesSortNotifierProvider);
 
-    final selectActiveProxyMutation = useMutation(
-      initialOnFailure: (error) => CustomToast.error(t.presentShortError(error)).show(context),
-    );
+    // final selectActiveProxyMutation = useMutation(
+    //   initialOnFailure: (error) => CustomToast.error(t.presentShortError(error)).show(context),
+    // );
 
     return Scaffold(
       appBar: AppBar(
@@ -40,14 +40,11 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
           const Gap(8),
         ],
       ),
-      floatingActionButton: proxies.value != null
-          ? FloatingActionButton(
-              onPressed: () async =>
-                  await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest(proxies.value!.tag),
-              tooltip: t.pages.proxies.testDelay,
-              child: const Icon(FluentIcons.flash_24_filled),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest("select"),
+        tooltip: t.pages.proxies.testDelay,
+        child: const Icon(FluentIcons.flash_24_filled),
+      ),
       body: proxies.when(
         data: (group) => group != null
             ? LayoutBuilder(

@@ -97,7 +97,9 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
               (l) async {
                 await ref
                     .read(dialogNotifierProvider.notifier)
-                    .showCustomAlertFromErr(t.presentError(l, action: t.pages.profiles.msg.update.failure));
+                    .showCustomAlertFromErr(
+                      t.presentError(l, action: t.pages.profiles.msg.update.failureNamed(name: value.profile.name)),
+                    );
                 return false;
               },
               (r) {

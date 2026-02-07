@@ -33,7 +33,7 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     Future<void> handleUrlTest() async {
       try {
         if (!context.mounted) return;
-        await ref.read(activeProxyNotifierProvider.notifier).urlTest(activeProxy.tag);
+        await ref.read(activeProxyNotifierProvider.notifier).urlTest("");
       } catch (e) {
         // Handle error here
         loggy.error("Error during URL test: $e");

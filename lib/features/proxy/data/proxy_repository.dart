@@ -69,36 +69,10 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
 
   @override
   Stream<Either<ProxyFailure, List<OutboundGroup>>> watchActiveProxies() {
-    return singbox
-        .watchActiveGroups()
-        .map((event) {
-          // final groupWithSelected = {
-          //   for (final group in event) group.tag: group.selected,
-          // };
-          return event;
-          // .map(
-          //   (e) => ProxyGroupEntity(
-          //     tag: e.tag,
-          //     type: e.type,
-          //     selected: e.selected,
-          //     items: e.items
-          //         .map(
-          //           (e) => ProxyItemEntity(
-          //             tag: e.tag,
-          //             type: e.type,
-          //             urlTestDelay: e.urlTestDelay,
-          //             selectedTag: groupWithSelected[e.tag],
-          //           ),
-          //         )
-          //         .toList(),
-          //   ),
-          // )
-          // .toList();
-        })
-        .handleExceptions((error, stackTrace) {
-          loggy.error("error watching active proxies", error, stackTrace);
-          return ProxyUnexpectedFailure(error, stackTrace);
-        });
+    return singbox.watchActiveGroups().handleExceptions((error, stackTrace) {
+      loggy.error("error watching active proxies", error, stackTrace);
+      return ProxyUnexpectedFailure(error, stackTrace);
+    });
   }
 
   @override
@@ -110,14 +84,7 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
   }
 
   @override
-  TaskEither<ProxyFailure, Unit> urlTest(String groupTag_) {
-    var groupTag = groupTag_;
-    loggy.debug("testing group: [$groupTag]");
-    if (!["auto"].contains(groupTag)) {
-      loggy.warning("only auto proxy group can do url test. Please change go code if you want");
-    }
-    groupTag = "auto";
-
+  TaskEither<ProxyFailure, Unit> urlTest(String groupTag) {
     return exceptionHandler(
       () => singbox.urlTest(groupTag).mapLeft(ProxyUnexpectedFailure.new).run(),
       ProxyUnexpectedFailure.new,

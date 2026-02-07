@@ -4,6 +4,7 @@ import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/model/log_entity.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/log/overview/logs_overview_state.dart';
+import 'package:hiddify/hiddifycore/init_signal.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -43,6 +44,7 @@ class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
 
   Future<void> _addListeners() async {
     loggy.debug("adding listeners");
+    ref.watch(coreRestartSignalProvider);
     await _listener?.cancel();
     _listener = ref
         .read(logRepositoryProvider)
