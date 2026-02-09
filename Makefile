@@ -133,12 +133,12 @@ protos: generate_go_protoc generate_kotlin_protos generate_dart_protoc
 	
 	
 
-macos-install-dependencies:
+macos-install-deps:
 	brew install create-dmg tree 
 	npm install -g appdmg
-	dart pub global activate flutter_distributor
+	dart pub global activate fastforge
 
-ios-install-dependencies: 
+ios-install-deps: 
 	if [ "$(flutter)" = "true" ]; then \
 		curl -L -o ~/Downloads/flutter_macos_3.19.3-stable.zip https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.22.3-stable.zip; \
 		mkdir -p ~/develop; \
@@ -158,7 +158,7 @@ ios-install-dependencies:
 	brew install create-dmg tree 
 	npm install -g appdmg
 	
-	dart pub global activate flutter_distributor
+	dart pub global activate fastforge
 	
 
 android-install-deps: 
@@ -237,21 +237,9 @@ linux-flutter-sync:
 		$(GREEN)Flutter SDK is ready.$(DONE); \
 	fi
 
-
 windows-install-deps:
 	dart pub global activate fastforge
 # 	choco install innosetup -y
-	
-	
-	sudo modprobe fuse
-	wget -O appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-	chmod +x appimagetool
-	sudo mv appimagetool /usr/local/bin/
-
-	dart pub global activate --source git  https://github.com/hiddify/flutter_distributor --git-path packages/flutter_distributor
-
-windows-install-dependencies:
-	dart pub global activate flutter_distributor 
 	
 gen_translations: #generating missing translations using google translate
 	cd .github && bash sync_translate.sh
@@ -279,10 +267,6 @@ android-aab-release:
 	  --build-dart-define=release=google-play
 
 windows-release: windows-zip-release windows-exe-release windows-msix-release
-
-FULL_PATH = $(wildcard dist/*/*.zip)
-ZIP_DIR = $(dir $(FULL_PATH))
-FILE_NAME = $(basename $(notdir $(FULL_PATH)))
 
 windows-zip-release:
 	fastforge package \
@@ -369,13 +353,9 @@ linux-appimage-release:
 	--skip-clean \
 	--build-target=$(TARGET) \
 	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
-	@$(YELLOW)Post-processing AppImage$(DONE)
-	@FULL_PATH=$$(ls -td dist/*+* | head -n 1); \
-	VERSION_NAME=$$(basename "$$FULL_PATH"); \
-	$(BLUE)Directory Found: $$FULL_PATH$(DONE); \
-	$(BLUE)Detected Version: $$VERSION_NAME$(DONE); \
+	@$(YELLOW)Post-processing AppImage$(DONE); \
 	$(BLUE)Extracting AppImage$(DONE); \
-	cd dist/$$VERSION_NAME && ./hiddify-$$VERSION_NAME-linux.AppImage --appimage-extract > /dev/null; \
+	cd dist/* && ./*.AppImage --appimage-extract > /dev/null; \
 	$(BLUE)Replacing AppRun$(DONE); \
 	cp ../../linux/packaging/appimage/AppRun squashfs-root/AppRun; \
 	$(BLUE)Granting permissions$(DONE); \
@@ -383,17 +363,17 @@ linux-appimage-release:
 	$(BLUE)Adding StartupWMClass to hiddify.desktop$(DONE); \
 	sed -i '/^\[Desktop Entry\]/a StartupWMClass=app.hiddify.com' "squashfs-root/hiddify.desktop"; \
 	$(BLUE)Removing old AppImage$(DONE); \
-	rm hiddify-$$VERSION_NAME-linux.AppImage; \
+	rm *.AppImage; \
 	$(BLUE)Rebuilding AppImage$(DONE); \
-	ARCH=x86_64 appimagetool squashfs-root hiddify-$$VERSION_NAME-linux.AppImage > /dev/null; \
+	ARCH=x86_64 appimagetool --no-appstream squashfs-root Hiddify.AppImage > /dev/null; \
 	$(BLUE)Cleaning up squashfs$(DONE); \
 	rm -rf squashfs-root; \
 	$(YELLOW)Creating Portable Package$(DONE); \
-	PKG_DIR_NAME="hiddify-$$VERSION_NAME-linux"; \
+	PKG_DIR_NAME="hiddify-linux-appimage"; \
 	$(BLUE)Creating dir: $$PKG_DIR_NAME$(DONE); \
 	mkdir -p "$$PKG_DIR_NAME"; \
 	$(BLUE)Moving and Renaming to Hiddify.AppImage$(DONE); \
-	mv "hiddify-$$VERSION_NAME-linux.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
+	mv "Hiddify.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
 	$(BLUE)Creating Portable Home directory$(DONE); \
 	mkdir -p "$$PKG_DIR_NAME/Hiddify.AppImage.home"; \
 	$(BLUE)Compressing to .tar.gz$(DONE); \
@@ -418,6 +398,7 @@ DOCKER_CMD := \
 	mkdir -p /app; \
 	cp -r /host/. /app/; \
 	cd /app; \
+	make linux-flutter-sync; \
 	make linux-prepare; \
 	echo '** Building Release (linux-release)...'; \
 	make linux-release; \
@@ -445,12 +426,12 @@ linux-docker-release:
 
 	@$(YELLOW)Running build inside container$(DONE)
 	@docker run --rm \
-		-v "$(CURDIR):/host" \
-		-v $(DOCKER_FLUTTER_VOL):/root/develop/flutter \
-		-v $(DOCKER_PUB_VOL):/root/.pub-cache \
+		-v "$(CURDIR)://host" \
+		-v $(DOCKER_FLUTTER_VOL)://root/develop/flutter \
+		-v $(DOCKER_PUB_VOL)://root/.pub-cache \
 		-e APPIMAGE_EXTRACT_AND_RUN=1 \
 		$(DOCKER_IMAGE_NAME) \
-		/bin/bash -c "$(DOCKER_CMD)"
+		//bin/bash -c "$(DOCKER_CMD)"
 
 	@$(GREEN)Successful. Output is in 'dist_docker' folder.$(DONE)
 
