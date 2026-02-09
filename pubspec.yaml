@@ -52,8 +52,8 @@ dependencies:
   url_launcher: ^6.2.5
   vclibs: ^0.1.2
   launch_at_startup: ^0.5.1
-  sentry_flutter: ^9.10.0
-  sentry_dart_plugin: ^3.2.1
+  sentry_flutter: ^8.14.0
+  sentry_dart_plugin: ^2.4.1
   sqlite3_flutter_libs: ^0.5.28
 
   combine: ^0.5.7
