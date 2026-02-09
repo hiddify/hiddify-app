@@ -281,7 +281,6 @@ class HiddifyCoreService with InfraLogger {
     // yield* core.bgClient.outboundsInfo(Empty()).throttleTime(const Duration(seconds: 4), leading: false, trailing: true).map((event) => event.items.isEmpty ? null : event.items.first);
   }
 
-  @riverpod
   Stream<List<OutboundGroup>> watchActiveGroups() async* {
     loggy.info("watching active groups");
 
@@ -301,7 +300,6 @@ class HiddifyCoreService with InfraLogger {
   //
   // Stream<SingboxStatus> watchStatus() => _status;
 
-  @riverpod
   ResponseStream<SystemInfo> watchStats() {
     loggy.debug("watching stats");
     try {
