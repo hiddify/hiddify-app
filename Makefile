@@ -369,7 +369,7 @@ linux-appimage-release:
 	$(BLUE)Removing old AppImage$(DONE); \
 	rm *.AppImage; \
 	$(BLUE)Rebuilding AppImage$(DONE); \
-	ARCH=x86_64 appimagetool squashfs-root Hiddify.AppImage > /dev/null; \
+	ARCH=x86_64 appimagetool --no-appstream squashfs-root Hiddify.AppImage > /dev/null; \
 	$(BLUE)Cleaning up squashfs$(DONE); \
 	rm -rf squashfs-root; \
 	$(YELLOW)Creating Portable Package$(DONE); \
@@ -377,7 +377,7 @@ linux-appimage-release:
 	$(BLUE)Creating dir: $$PKG_DIR_NAME$(DONE); \
 	mkdir -p "$$PKG_DIR_NAME"; \
 	$(BLUE)Moving and Renaming to Hiddify.AppImage$(DONE); \
-	mv "*.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
+	mv "Hiddify.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
 	$(BLUE)Creating Portable Home directory$(DONE); \
 	mkdir -p "$$PKG_DIR_NAME/Hiddify.AppImage.home"; \
 	$(BLUE)Compressing to .tar.gz$(DONE); \
