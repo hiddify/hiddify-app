@@ -268,10 +268,6 @@ android-aab-release:
 
 windows-release: windows-zip-release windows-exe-release windows-msix-release
 
-FULL_PATH = $(wildcard dist/*/*.zip)
-ZIP_DIR = $(dir $(FULL_PATH))
-FILE_NAME = $(basename $(notdir $(FULL_PATH)))
-
 windows-zip-release:
 	fastforge package \
 	  --platform windows \
