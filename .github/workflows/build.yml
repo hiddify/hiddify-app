@@ -66,9 +66,9 @@ jobs:
             os: ubuntu-latest
             targets: apk,aab
 
-          # - platform: android-aab
-          #   os: ubuntu-latest
-          #   targets: aab
+          - platform: android-aab
+            os: ubuntu-latest
+            targets: aab
 
           - platform: windows
             os: windows-latest

@@ -7,7 +7,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'hiddify_core_service_provider.g.dart';
 
-@Riverpod(keepAlive: true, dependencies: [AppDirectories, DebugModeNotifier])
+@Riverpod(keepAlive: true, dependencies: [AppDirectories, DebugModeNotifier, InAppNotificationController])
 HiddifyCoreService hiddifyCoreService(Ref ref) {
   return HiddifyCoreService(ref);
 }
