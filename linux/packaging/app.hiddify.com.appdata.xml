@@ -35,7 +35,7 @@
 
   <launchable type="desktop-id">hiddify.desktop</launchable>
 
-  <icon type="local">./assets/images/source/ic_launcher_border.png</icon>
+  <icon type="stock">hiddify</icon>
 
   <categories>
     <category>Network</category>
