@@ -195,7 +195,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
             } catch (e: CancellationException) {
                 // coroutine cancelled normally
                 Log.d("notification", "SystemInfo polling cancelled")
-
+                notification.cancel(notificationId)
             } catch (e: Exception) {
                 Log.e("notification", "SystemInfo polling failed", e)
                 notification.cancel(notificationId)

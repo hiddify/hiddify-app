@@ -195,7 +195,7 @@ class HiddifyCoreService with InfraLogger {
       try {
         final res = await core.bgClient.stop(Empty());
       } on GrpcError catch (e) {
-        if (e.code == StatusCode.unknown) {
+        if (e.code == StatusCode.unknown && !(e.message?.contains("HTTP/2") ?? false)) {
           errMsg = e.message ?? "failed to stop core: $e";
 
           loggy.error("failed to stop bg core: $e");
@@ -222,7 +222,7 @@ class HiddifyCoreService with InfraLogger {
         if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
       } on GrpcError catch (e) {
         loggy.error("failed to restart bg core: $e");
-        if (e.code == StatusCode.unknown) {
+        if (e.code == StatusCode.unknown && !(e.message?.contains("HTTP/2 error") ?? false)) {
           return left("${e.message}");
         }
       }

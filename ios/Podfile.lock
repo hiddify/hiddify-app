@@ -110,9 +110,9 @@ PODS:
   - pointer_interceptor_ios (0.0.1):
     - Flutter
   - PromisesObjC (2.4.0)
-  - SDWebImage (5.21.5):
-    - SDWebImage/Core (= 5.21.5)
-  - SDWebImage/Core (5.21.5)
+  - SDWebImage (5.21.6):
+    - SDWebImage/Core (= 5.21.6)
+  - SDWebImage/Core (5.21.6)
   - Sentry/HybridSDK (8.56.2)
   - sentry_flutter (9.10.0):
     - Flutter
@@ -262,7 +262,7 @@ SPEC CHECKSUMS:
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   pointer_interceptor_ios: 508241697ff0947f853c061945a8b822463947c1
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
-  SDWebImage: e9c98383c7572d713c1a0d7dd2783b10599b9838
+  SDWebImage: 1bb6a1b84b6fe87b972a102bdc77dd589df33477
   Sentry: b53951377b78e21a734f5dc8318e333dbfc682d7
   sentry_flutter: bbcc012a946214d9baba4567feac162ea87700fa
   share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f
