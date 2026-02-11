@@ -1,0 +1,111 @@
+name: Build Artifacts (Hiddify-compatible) + Logs
+
+on:
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: "3.24.0"
+  NDK_VERSION: r26d
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android-apk
+            os: ubuntu-latest
+          - platform: windows
+            os: windows-2019
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout (submodules + LFS)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Setup Java 17 (Android only)
+        if: startsWith(matrix.platform,'android')
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: "17"
+
+      - name: Setup NDK (Android only)
+        if: startsWith(matrix.platform,'android')
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Diagnostics
+        shell: bash
+        run: |
+          flutter --version
+          flutter doctor -v || true
+
+      - name: Prepare (linux-prepare)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -o pipefail
+          make linux-prepare 2>&1 | tee build.log
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          set -o pipefail
+          make ${{ matrix.platform }}-install-dependencies 2>&1 | tee -a build.log
+
+      - name: Prepare platform
+        shell: bash
+        run: |
+          set -o pipefail
+          make ${{ matrix.platform }}-prepare 2>&1 | tee -a build.log
+
+      - name: Build release
+        shell: bash
+        run: |
+          set -o pipefail
+          make ${{ matrix.platform }}-release 2>&1 | tee -a build.log
+
+      - name: Collect outputs (Android)
+        if: matrix.platform == 'android-apk'
+        shell: bash
+        run: |
+          mkdir -p out
+          ls -R build/app/outputs || true
+          cp build/app/outputs/flutter-apk/*.apk out/ || true
+          ls -la out || true
+
+      - name: Collect outputs (Windows)
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          if (Test-Path build\windows\x64\runner\Release) {
+            Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath windows-release.zip
+          } else {
+            Write-Host "Windows Release folder not found"
+          }
+
+      - name: Upload artifacts (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-artifacts-and-logs
+          path: |
+            build.log
+            out
+            windows-release.zip
+          retention-days: 7
