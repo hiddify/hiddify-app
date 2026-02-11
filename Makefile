@@ -46,7 +46,7 @@ DESKTOP_OUT=hiddify-core$(SEP)bin
 GEO_ASSETS_DIR=assets$(SEP)core
 
 CORE_PRODUCT_NAME=hiddify-core
-CORE_NAME=$(CORE_PRODUCT_NAME)
+CORE_NAME=hiddify-lib
 LIB_NAME=hiddify-core
 
 ifeq ($(CHANNEL),prod)

@@ -64,7 +64,7 @@ jobs:
         include:
           - platform: android-apk
             os: ubuntu-latest
-            targets: apk,aab
+            targets: apk
 
           - platform: android-aab
             os: ubuntu-latest
