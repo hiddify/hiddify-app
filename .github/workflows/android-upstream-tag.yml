@@ -11,7 +11,8 @@ on:
 env:
   FLUTTER_VERSION: "3.24.0"
   NDK_VERSION: r26d
-
+  CHANNEL: "prod"
+  
 jobs:
   android:
     runs-on: ubuntu-latest
@@ -58,19 +59,19 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          make linux-prepare 2>&1 | tee build.log
+          make CHANNEL=prod linux-prepare 2>&1 | tee build.log
 
       - name: android-apk install dependencies
         shell: bash
         run: |
           set -o pipefail
-          make android-apk-install-dependencies 2>&1 | tee -a build.log
+          make CHANNEL=prod android-apk-install-dependencies 2>&1 | tee -a build.log
 
       - name: android-apk prepare
         shell: bash
         run: |
           set -o pipefail
-          make android-apk-prepare 2>&1 | tee -a build.log
+          make CHANNEL=prod android-apk-prepare 2>&1 | tee -a build.log
 
       # TEMP signing فقط برای Artifact (برای انتشار واقعی بعداً keystore خودت را اضافه می‌کنیم)
       - name: Create TEMP Android signing (CI artifact only)
@@ -95,7 +96,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          make android-apk-release 2>&1 | tee -a build.log
+          make CHANNEL=prod android-apk-release 2>&1 | tee -a build.log
 
       - name: Collect outputs
         if: always()
