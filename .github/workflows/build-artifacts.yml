@@ -10,7 +10,11 @@ jobs:
   android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (with submodules + LFS)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -19,8 +23,33 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Diagnostics
+        run: |
+          flutter --version
+          flutter doctor -v
+          ls -la
+
       - name: Pub get
         run: flutter pub get
+
+      - name: Create TEMP Android signing (for CI artifacts only)
+        run: |
+          mkdir -p android
+          keytool -genkeypair -v \
+            -keystore android/key.jks \
+            -storetype JKS \
+            -storepass tempstorepass \
+            -keypass tempkeypass \
+            -alias tempalias \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Temp, OU=Temp, O=Temp, L=Temp, S=Temp, C=US"
+
+          cat > android/key.properties << EOF
+          storeFile=$(pwd)/android/key.jks
+          storePassword=tempstorepass
+          keyPassword=tempkeypass
+          keyAlias=tempalias
+          EOF
 
       - name: Build APK (release)
         run: flutter build apk --release
@@ -40,7 +69,14 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (with submodules + LFS)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
+
+      - name: Enable long paths
+        run: git config --system core.longpaths true
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -48,6 +84,11 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: Diagnostics
+        run: |
+          flutter --version
+          flutter doctor -v
 
       - name: Pub get
         run: flutter pub get
