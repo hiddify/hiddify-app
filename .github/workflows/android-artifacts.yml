@@ -1,0 +1,117 @@
+name: Android Artifact (Hiddify prepare)
+
+on:
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: "3.24.0"
+  NDK_VERSION: r26d
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (submodules + LFS)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          lfs: true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: "17"
+
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Ensure submodules present (debug)
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git submodule update --init --recursive
+          git submodule status --recursive | head -n 200
+
+      - name: Diagnostics
+        shell: bash
+        run: |
+          flutter --version
+          flutter doctor -v || true
+
+      # Hiddify standard prepare steps (IMPORTANT)
+      - name: linux-prepare
+        shell: bash
+        run: |
+          set -o pipefail
+          make linux-prepare 2>&1 | tee build.log
+
+      - name: android-apk install dependencies
+        shell: bash
+        run: |
+          set -o pipefail
+          make android-apk-install-dependencies 2>&1 | tee -a build.log
+
+      - name: android-apk prepare
+        shell: bash
+        run: |
+          set -o pipefail
+          make android-apk-prepare 2>&1 | tee -a build.log
+
+      # TEMP signing فقط برای اینکه release artifact ساخته شود (برای انتشار واقعی بعداً keystore خودت را می‌گذاریم)
+      - name: Create TEMP Android signing (CI artifact only)
+        shell: bash
+        run: |
+          keytool -genkeypair -v \
+            -keystore android/key.jks \
+            -storetype JKS \
+            -storepass tempstorepass \
+            -keypass tempkeypass \
+            -alias tempalias \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Temp, OU=Temp, O=Temp, L=Temp, S=Temp, C=US"
+          cat > android/key.properties << EOF
+          storeFile=$(pwd)/android/key.jks
+          storePassword=tempstorepass
+          keyPassword=tempkeypass
+          keyAlias=tempalias
+          EOF
+
+      - name: android-apk release
+        shell: bash
+        run: |
+          set -o pipefail
+          make android-apk-release 2>&1 | tee -a build.log
+
+      - name: Collect outputs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p out
+          ls -R ./build/app/outputs || true
+          cp ./build/app/outputs/flutter-apk/*.apk out/ || true
+          cp ./build/app/outputs/bundle/release/*.aab out/ || true
+          ls -la out || true
+
+      - name: Upload artifacts + logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifacts-and-log
+          path: |
+            out
+            build.log
+          retention-days: 7
