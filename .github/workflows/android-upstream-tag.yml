@@ -73,6 +73,13 @@ jobs:
           set -o pipefail
           make CHANNEL=prod android-apk-prepare 2>&1 | tee -a build.log
 
+      - name: Build APK with PANEL_API_BASE_URL
+        shell: bash
+        run: |
+         flutter build apk --release \
+         --dart-define=PANEL_API_BASE_URL=${{ vars.PANEL_API_BASE_URL }}
+          
+
       # TEMP signing فقط برای Artifact (برای انتشار واقعی بعداً keystore خودت را اضافه می‌کنیم)
       - name: Create TEMP Android signing (CI artifact only)
         shell: bash
