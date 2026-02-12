@@ -85,18 +85,27 @@ prepare:
 	@echo    make macos-prepare
 	@echo    make ios-prepare
 
-windows-prepare: get gen translate windows-libs
+common-prepare:  get gen translate
+windows-prepare: common-prepare windows-libs
 	
-ios-prepare: get-geo-assets get gen translate ios-libs 
+ios-prepare: common-prepare ios-libs 
 	cd ios; pod repo update; pod install;echo "done ios prepare"
 	
-macos-prepare: get-geo-assets get gen translate macos-libs
-linux-prepare: get-geo-assets get gen translate linux-libs
+macos-prepare: common-prepare macos-libs
+linux-prepare: common-prepare linux-libs
+
+
+linux-amd64-prepare: common-prepare linux-amd64-libs
+linux-arm64-prepare: common-prepare linux-arm64-libs
+linux-amd64-musl-prepare: common-prepare linux-amd64-musl-libs
+linux-arm64-musl-prepare: common-prepare linux-arm64-musl-libs
+
+
 linux-appimage-prepare:linux-prepare
 linux-rpm-prepare:linux-prepare
 linux-deb-prepare:linux-prepare
 
-android-prepare: get-geo-assets get gen translate android-libs	
+android-prepare:common-prepare android-libs	
 android-apk-prepare:android-prepare
 android-aab-prepare:android-prepare
 

@@ -46,7 +46,7 @@ jobs:
           cache: true
           
       - name: Prepare
-        run: make linux-prepare
+        run: make linux-amd64-prepare
       - name: Test
         run: flutter test
 
