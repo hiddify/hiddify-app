@@ -62,43 +62,43 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: android-apk
-            os: ubuntu-latest
-            targets: apk
+          # - platform: android-apk
+          #   os: ubuntu-latest
+          #   targets: apk
 
-          - platform: android-aab
-            os: ubuntu-latest
-            targets: aab
+          # - platform: android-aab
+          #   os: ubuntu-latest
+          #   targets: aab
 
-          - platform: windows
-            os: windows-latest
-            aarch: amd64
-            targets: exe,msix,zip
+          # - platform: windows
+          #   os: windows-latest
+          #   aarch: amd64
+          #   targets: exe,msix,zip
 
-          - platform: linux-amd64
-            os: ubuntu-22.04
-            aarch: amd64
-            targets: deb,gz
+          # - platform: linux-amd64
+          #   os: ubuntu-22.04
+          #   aarch: amd64
+          #   targets: deb,gz
 
           - platform: linux-arm64
             os: ubuntu-24.04-arm
             aarch: arm64
             targets: deb,gz
 
-          # - platform: linux-musl-amd64
+          # - platform: linux-amd64-musl
           #   os: ubuntu-22.04
           #   aarch: amd64
           #   targets: deb,gz
 
-          # - platform: linux-musl-arm64
+          # - platform: linux-arm64-musl
           #   os: ubuntu-24.04-arm
           #   aarch: arm64
           #   targets: deb,gz
             
-          - platform: macos
-            os: macos-15
-            aarch: universal
-            targets: dmg,pkg
+          # - platform: macos
+          #   os: macos-15
+          #   aarch: universal
+          #   targets: dmg,pkg
             
           # - platform: ios
           #   os: macos-14
@@ -131,15 +131,38 @@ jobs:
           
 
 
-      
+      - id: Setup Flutter for arm64
+        if: startsWith(matrix.platform,'linux-arm64')
+        uses: hurelhuyag/flutter-arm64-action@HEAD
+        with:
+          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
       - name: Setup Flutter
+        if: !startsWith(matrix.platform,'linux-arm64')
         uses: subosito/flutter-action@v2.21.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           # flutter-version-file: pubspec.yaml
           channel: 'stable'
           cache: true
-
+      - name: Clean up disk space
+        if: startsWith(matrix.platform,'android')
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          df -h
+          sudo rm -rf /opt/ghc
+          df -h
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          df -h
+          rm -rf ~/.gradle/caches
+          df -h
+          sudo apt-get autoremove -y
+          df -h
+          sudo apt-get clean 
+          df -h
+          tree
       
       - name: Setup Java
         if: startsWith(matrix.platform,'android')
@@ -214,23 +237,7 @@ jobs:
         run: |
           make ${{ matrix.platform }}-prepare
 
-      - name: Clean up disk space
-        if: startsWith(matrix.platform,'android')
-        run: |
-          df -h
-          sudo rm -rf /usr/share/dotnet
-          df -h
-          sudo rm -rf /opt/ghc
-          df -h
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          df -h
-          rm -rf ~/.gradle/caches
-          df -h
-          sudo apt-get autoremove -y
-          df -h
-          sudo apt-get clean 
-          df -h
-          tree
+
       - name: Build ${{ matrix.platform }}
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
