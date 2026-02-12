@@ -205,7 +205,13 @@
         "askEachTime": "هر بار پرسیده شود",
         "hide": "مخفی کردن",
         "exit": "خارج شدن"
-      }
+      },
+      "linkAccount": "اتصال به حساب",
+      "linkAccountSubtitle": "حساب پاسارگارد خود را متصل کنید",
+      "linkAccountUsername": "نام کاربری پاسارگارد",
+      "linkAccountSending": "در حال ارسال...",
+      "linkAccountSuccess": "حساب با موفقیت متصل شد",
+      "linkAccountError": "خطا در اتصال حساب. لطفاً دوباره تلاش کنید"
     },
     "advanced": {
       "sectionTitle": "پیشرفته",

@@ -44,6 +44,47 @@ class TelemetryService {
     }
   }
 
+  /// Link a Pasarguard username to this device's installId.
+  ///
+  /// Returns `true` on success (2xx), `false` on any failure.
+  /// Never throws.
+  static Future<bool> linkUser(
+    SharedPreferences prefs,
+    String pasarguardUsername,
+  ) async {
+    if (!TelemetryConfig.isEnabled) return false;
+
+    try {
+      final installId = _getOrCreateInstallId(prefs);
+      final url = Uri.parse(
+        '${TelemetryConfig.panelBaseUrl}/telemetry/link-user',
+      );
+      final body = <String, dynamic>{
+        'installId': installId,
+        'pasarguardUsername': pasarguardUsername,
+      };
+
+      _log.debug('linking user to $url');
+      final ok = await _post(url, body);
+      if (ok) {
+        await prefs.setString(
+          TelemetryConfig.linkedUsernameKey,
+          pasarguardUsername,
+        );
+      }
+      return ok;
+    } catch (e, st) {
+      _log.warning('linkUser failed', e, st);
+      return false;
+    }
+  }
+
+  /// Returns the previously linked username, or `null` if not yet linked.
+  static String? getLinkedUsername(SharedPreferences prefs) {
+    final value = prefs.getString(TelemetryConfig.linkedUsernameKey);
+    return (value != null && value.isNotEmpty) ? value : null;
+  }
+
   // ── private implementation ────────────────────────────────────────────
 
   static Future<void> _run(SharedPreferences prefs) async {

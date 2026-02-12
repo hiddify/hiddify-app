@@ -22,4 +22,5 @@ abstract class TelemetryConfig {
   // SharedPreferences keys
   static const installIdKey = 'install_id';
   static const lastHeartbeatKey = 'telemetry_last_heartbeat_at';
+  static const linkedUsernameKey = 'telemetry_linked_username';
 }

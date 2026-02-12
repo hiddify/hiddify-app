@@ -205,7 +205,13 @@
         "askEachTime": "Ask each time",
         "hide": "Hide",
         "exit": "Exit"
-      }
+      },
+      "linkAccount": "Link Account",
+      "linkAccountSubtitle": "Link your Pasarguard account",
+      "linkAccountUsername": "Pasarguard Username",
+      "linkAccountSending": "Sending...",
+      "linkAccountSuccess": "Account linked successfully",
+      "linkAccountError": "Failed to link account. Please try again"
     },
     "advanced": {
       "sectionTitle": "Advanced",
