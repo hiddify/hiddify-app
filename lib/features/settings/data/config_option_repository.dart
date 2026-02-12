@@ -107,10 +107,14 @@ abstract class ConfigOptions {
     12335,
     validator: (value) => isPort(value.toString()),
   );
-
-  static final localDnsPort = PreferencesNotifier.create<int, int>(
-    "local-dns-port",
-    16450,
+  static final redirectPort = PreferencesNotifier.create<int, int>(
+    "redirect-port",
+    12336,
+    validator: (value) => isPort(value.toString()),
+  );
+  static final directPort = PreferencesNotifier.create<int, int>(
+    "direct-port",
+    12337,
     validator: (value) => isPort(value.toString()),
   );
 
@@ -299,7 +303,8 @@ abstract class ConfigOptions {
     "direct-dns-domain-strategy": directDnsDomainStrategy,
     "mixed-port": mixedPort,
     "tproxy-port": tproxyPort,
-    "local-dns-port": localDnsPort,
+    "direct-port": directPort,
+    "redirect-port": redirectPort,
     "tun-implementation": tunImplementation,
     "mtu": mtu,
     "strict-route": strictRoute,
@@ -402,7 +407,8 @@ abstract class ConfigOptions {
       directDnsDomainStrategy: ref.watch(directDnsDomainStrategy),
       mixedPort: ref.watch(mixedPort),
       tproxyPort: ref.watch(tproxyPort),
-      localDnsPort: ref.watch(localDnsPort),
+      directPort: ref.watch(directPort),
+      redirectPort: ref.watch(redirectPort),
       tunImplementation: ref.watch(tunImplementation),
       mtu: ref.watch(mtu),
       strictRoute: ref.watch(strictRoute),

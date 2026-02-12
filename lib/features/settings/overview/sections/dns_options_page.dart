@@ -28,6 +28,12 @@ class DnsOptionsPage extends HookConsumerWidget {
             icon: Icons.sync_alt_rounded,
             presentChoice: (value) => value.present(t),
           ),
+          SwitchListTile.adaptive(
+            title: Text(t.pages.settings.dns.enableFakeDns),
+            secondary: const Icon(Icons.private_connectivity_rounded),
+            value: ref.watch(ConfigOptions.enableFakeDns),
+            onChanged: ref.read(ConfigOptions.enableFakeDns.notifier).update,
+          ),
           ValuePreferenceWidget(
             title: t.pages.settings.dns.directDns,
             icon: Icons.public_rounded,

@@ -75,10 +75,10 @@ class PreferencesVersion1Migration extends PreferencesMigrationStep with InfraLo
       await sharedPreferences.setString("direct-dns-domain-strategy", _domainStrategyMapper(directDomainStrategy));
     }
 
-    if (sharedPreferences.getInt("localDns-port") case final int localDnsPort) {
-      loggy.debug("changing [localDns-port] to [local-dns-port]");
+    if (sharedPreferences.getInt("localDns-port") case final int directPort) {
+      loggy.debug("changing [localDns-port] to [direct-port]");
       await sharedPreferences.remove("localDns-port");
-      await sharedPreferences.setInt("local-dns-port", localDnsPort);
+      await sharedPreferences.setInt("direct-port", directPort);
     }
 
     await sharedPreferences.remove("execute-config-as-is");
