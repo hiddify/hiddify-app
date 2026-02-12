@@ -139,7 +139,7 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: Setup Flutter
-        if: !startsWith(matrix.platform,'linux-arm64')
+        if: ${{ !startsWith(matrix.platform, 'linux-arm64') }}
         uses: subosito/flutter-action@v2.21.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
