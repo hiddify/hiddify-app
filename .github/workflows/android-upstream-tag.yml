@@ -18,11 +18,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout upstream tag (with submodules + LFS)
+      - name: Checkout (submodules + LFS)
         uses: actions/checkout@v4
         with:
-          repository: hiddify/hiddify-app
-          ref: ${{ inputs.tag }}
           fetch-depth: 0
           submodules: recursive
           lfs: true
