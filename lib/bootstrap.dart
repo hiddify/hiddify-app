@@ -14,10 +14,10 @@ import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_migration.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
+import 'package:hiddify/core/telemetry/telemetry_service.dart';
 import 'package:hiddify/features/app/widget/app.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/deep_link/notifier/deep_link_notifier.dart';
-
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -59,6 +59,15 @@ Future<void> lazyBootstrap(
   await _init(
     "preferences",
     () => container.read(sharedPreferencesProvider.future),
+  );
+
+  // Panel telemetry – fire-and-forget, never blocks startup.
+  await _safeInit(
+    "panel telemetry",
+    () => TelemetryService.initAndSend(
+      container.read(sharedPreferencesProvider).requireValue,
+    ),
+    timeout: 8000,
   );
 
   final enableAnalytics = await container.read(analyticsControllerProvider.future);

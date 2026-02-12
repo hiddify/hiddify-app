@@ -98,6 +98,7 @@ dependencies:
   grpc: ^3.2.4
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
+  device_info_plus: ^9.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

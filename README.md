@@ -138,6 +138,48 @@ Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH etc.
 
 Improve existing languages or add new ones by manually editing the JSON files located in `/assets/translations` or by using the [Inlang online editor](https://inlang.com/editor/github.com/hiddify/hiddify-next).
 
+## 📡 Panel Telemetry (Milestone 12B)
+
+The app can optionally send minimal, anonymous telemetry (install + periodic heartbeat) to a panel backend. **Telemetry is disabled by default** – it only activates when you supply the panel URL at build time.
+
+### Building with telemetry enabled
+
+Pass `PANEL_API_BASE_URL` via `--dart-define`:
+
+```bash
+# Android
+flutter build apk --dart-define=PANEL_API_BASE_URL=https://YOUR_PANEL_DOMAIN
+
+# Or with multiple defines (e.g. Sentry + panel)
+flutter build apk \
+  --dart-define=PANEL_API_BASE_URL=https://YOUR_PANEL_DOMAIN \
+  --dart-define=sentry_dsn=YOUR_SENTRY_DSN
+```
+
+If `PANEL_API_BASE_URL` is empty or not provided, **no network requests are made**.
+
+### CI / GitHub Actions
+
+For automated builds, add `PANEL_API_BASE_URL` as a repository secret and reference it in your workflow:
+
+```yaml
+- name: Build APK
+  run: flutter build apk --dart-define=PANEL_API_BASE_URL=${{ secrets.PANEL_API_BASE_URL }}
+```
+
+### What is sent?
+
+| Endpoint | When | Payload |
+|---|---|---|
+| `POST /telemetry/install` | First launch only | `installId`, `platform`, `appVersion`, `deviceModel`, `osVersion`, `locale` |
+| `POST /telemetry/heartbeat` | Every ≥ 6 hours | `installId`, `appVersion`, `deviceModel`, `osVersion` |
+
+- `installId` is a random UUID v4 generated on first run and persisted locally.
+- All network calls have a 5-second timeout and fail silently.
+- Windows, macOS, and Linux builds are unaffected (telemetry is Android-only in Phase 1).
+
+---
+
 ## ✏️ Acknowledgements
 
 We would like to express our sincere appreciation to the contributors of the following projects, whose robust foundation and innovative features have significantly enhanced the success and functionality of this project.
