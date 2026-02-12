@@ -131,7 +131,7 @@ jobs:
           
 
 
-      - id: Setup Flutter for arm64
+      - name: Setup Flutter for arm64
         if: ${{ startsWith(matrix.platform,'linux-arm64') }}
         uses: hurelhuyag/flutter-arm64-action@HEAD
         with:
