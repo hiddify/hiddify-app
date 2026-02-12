@@ -170,6 +170,11 @@ LINUX_DEPS = $(shell grep -vE '^\s*#|^\s*$$' linux_deps.list)
 # reads the Flutter version from pubspec.yaml
 REQUIRED_VER = $(shell sed -n '/environment:/,/flutter:/ s/.*flutter:[[:space:]]*//p' pubspec.yaml | tr -d " '^\"")
 
+linux-amd64-install-deps:linux-install-deps
+linux-amd64-musl-install-deps:linux-install-deps
+linux-arm64-install-deps:linux-install-deps
+linux-arm64-musl-install-deps:linux-install-deps
+
 linux-install-deps:
 	@$(BLUE)Installing Debian/Ubuntu dependencies...$(DONE)
 	sudo apt-get update -y
@@ -179,7 +184,11 @@ linux-install-deps:
 	sudo modprobe fuse
 # 	tools for appimage
 	@$(BLUE)Installing appimagetool$(DONE)
-	wget -O /tmp/appimagetool "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+	if [ "$$(uname -m)" = "aarch64" ]; then \
+		wget -O /tmp/appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-aarch64.AppImage"; \
+	else \
+		wget -O /tmp/appimagetool "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"; \
+	fi
 	chmod +x /tmp/appimagetool
 	sudo mv /tmp/appimagetool /usr/local/bin/
 #   cloning flutter sdk
@@ -307,6 +316,12 @@ windows-msix-release:
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
 
 linux-release: linux-deb-release linux-appimage-release
+
+linux-amd64-release: linux-release
+linux-arm64-release: linux-release
+linux-amd64-musl-release: linux-release 
+linux-arm64-musl-release: linux-release
+
 
 linux-deb-release:
 	fastforge package \
@@ -454,9 +469,21 @@ windows-libs:
 	ls $(DESKTOP_OUT) || dir $(DESKTOP_OUT)/
 	
 
-linux-libs:
+linux-amd64-libs:
 	mkdir -p $(DESKTOP_OUT)
 	curl -L $(CORE_URL)/$(CORE_NAME)-linux-amd64.tar.gz | tar xz -C $(DESKTOP_OUT)/
+
+linux-arm64-libs:
+	mkdir -p $(DESKTOP_OUT)
+	curl -L $(CORE_URL)/$(CORE_NAME)-linux-arm64.tar.gz | tar xz -C $(DESKTOP_OUT)/
+
+linux-amd64-musl-libs:
+	mkdir -p $(DESKTOP_OUT)
+	curl -L $(CORE_URL)/$(CORE_NAME)-linux-amd64-musl.tar.gz | tar xz -C $(DESKTOP_OUT)/
+
+linux-arm64-musl-libs:
+	mkdir -p $(DESKTOP_OUT)
+	curl -L $(CORE_URL)/$(CORE_NAME)-linux-arm64-musl.tar.gz | tar xz -C $(DESKTOP_OUT)/
 
 
 macos-libs:

@@ -508,10 +508,11 @@ class InboundOptions extends $pb.GeneratedMessage {
     ..aOB(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'setSystemProxy')
     ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mixedPort', $pb.PbFieldType.OU3)
     ..a<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tproxyPort', $pb.PbFieldType.OU3)
-    ..a<$core.int>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'localDnsPort', $pb.PbFieldType.OU3)
+    ..a<$core.int>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'directPort', $pb.PbFieldType.OU3)
     ..a<$core.int>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'mtu', $pb.PbFieldType.OU3)
     ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'strictRoute')
     ..aOS(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tunStack')
+    ..a<$core.int>(10, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'redirectPort', $pb.PbFieldType.OU3)
     ..hasRequiredFields = false
   ;
 
@@ -522,10 +523,11 @@ class InboundOptions extends $pb.GeneratedMessage {
     $core.bool? setSystemProxy,
     $core.int? mixedPort,
     $core.int? tproxyPort,
-    $core.int? localDnsPort,
+    $core.int? directPort,
     $core.int? mtu,
     $core.bool? strictRoute,
     $core.String? tunStack,
+    $core.int? redirectPort,
   }) {
     final _result = create();
     if (enableTun != null) {
@@ -543,8 +545,8 @@ class InboundOptions extends $pb.GeneratedMessage {
     if (tproxyPort != null) {
       _result.tproxyPort = tproxyPort;
     }
-    if (localDnsPort != null) {
-      _result.localDnsPort = localDnsPort;
+    if (directPort != null) {
+      _result.directPort = directPort;
     }
     if (mtu != null) {
       _result.mtu = mtu;
@@ -554,6 +556,9 @@ class InboundOptions extends $pb.GeneratedMessage {
     }
     if (tunStack != null) {
       _result.tunStack = tunStack;
+    }
+    if (redirectPort != null) {
+      _result.redirectPort = redirectPort;
     }
     return _result;
   }
@@ -624,13 +629,13 @@ class InboundOptions extends $pb.GeneratedMessage {
   void clearTproxyPort() => clearField(5);
 
   @$pb.TagNumber(6)
-  $core.int get localDnsPort => $_getIZ(5);
+  $core.int get directPort => $_getIZ(5);
   @$pb.TagNumber(6)
-  set localDnsPort($core.int v) { $_setUnsignedInt32(5, v); }
+  set directPort($core.int v) { $_setUnsignedInt32(5, v); }
   @$pb.TagNumber(6)
-  $core.bool hasLocalDnsPort() => $_has(5);
+  $core.bool hasDirectPort() => $_has(5);
   @$pb.TagNumber(6)
-  void clearLocalDnsPort() => clearField(6);
+  void clearDirectPort() => clearField(6);
 
   @$pb.TagNumber(7)
   $core.int get mtu => $_getIZ(6);
@@ -658,6 +663,15 @@ class InboundOptions extends $pb.GeneratedMessage {
   $core.bool hasTunStack() => $_has(8);
   @$pb.TagNumber(9)
   void clearTunStack() => clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.int get redirectPort => $_getIZ(9);
+  @$pb.TagNumber(10)
+  set redirectPort($core.int v) { $_setUnsignedInt32(9, v); }
+  @$pb.TagNumber(10)
+  $core.bool hasRedirectPort() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearRedirectPort() => clearField(10);
 }
 
 class URLTestOptions extends $pb.GeneratedMessage {

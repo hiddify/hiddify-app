@@ -33,7 +33,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 
   bool _isBgClientAvailable = false;
   bool _debug = false;
-  late HelloClient helloClient;
+
   late LastStream<CoreStatus> _status;
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
@@ -41,7 +41,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
         ? MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientKey: cert)
         : const ChannelCredentials.insecure();
     _debug = debug;
-    helloClient = HelloClient(
+    final helloClient = HelloClient(
       ClientChannel(
         '127.0.0.1',
         port: portFront,

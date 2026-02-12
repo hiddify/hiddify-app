@@ -85,7 +85,8 @@ const InboundOptions$json = const {
     const {'1': 'set_system_proxy', '3': 3, '4': 1, '5': 8, '10': 'setSystemProxy'},
     const {'1': 'mixed_port', '3': 4, '4': 1, '5': 13, '10': 'mixedPort'},
     const {'1': 'tproxy_port', '3': 5, '4': 1, '5': 13, '10': 'tproxyPort'},
-    const {'1': 'local_dns_port', '3': 6, '4': 1, '5': 13, '10': 'localDnsPort'},
+    const {'1': 'redirect_port', '3': 10, '4': 1, '5': 13, '10': 'redirectPort'},
+    const {'1': 'direct_port', '3': 6, '4': 1, '5': 13, '10': 'directPort'},
     const {'1': 'mtu', '3': 7, '4': 1, '5': 13, '10': 'mtu'},
     const {'1': 'strict_route', '3': 8, '4': 1, '5': 8, '10': 'strictRoute'},
     const {'1': 'tun_stack', '3': 9, '4': 1, '5': 9, '10': 'tunStack'},
@@ -93,7 +94,7 @@ const InboundOptions$json = const {
 };
 
 /// Descriptor for `InboundOptions`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List inboundOptionsDescriptor = $convert.base64Decode('Cg5JbmJvdW5kT3B0aW9ucxIdCgplbmFibGVfdHVuGAEgASgIUgllbmFibGVUdW4SLAoSZW5hYmxlX3R1bl9zZXJ2aWNlGAIgASgIUhBlbmFibGVUdW5TZXJ2aWNlEigKEHNldF9zeXN0ZW1fcHJveHkYAyABKAhSDnNldFN5c3RlbVByb3h5Eh0KCm1peGVkX3BvcnQYBCABKA1SCW1peGVkUG9ydBIfCgt0cHJveHlfcG9ydBgFIAEoDVIKdHByb3h5UG9ydBIkCg5sb2NhbF9kbnNfcG9ydBgGIAEoDVIMbG9jYWxEbnNQb3J0EhAKA210dRgHIAEoDVIDbXR1EiEKDHN0cmljdF9yb3V0ZRgIIAEoCFILc3RyaWN0Um91dGUSGwoJdHVuX3N0YWNrGAkgASgJUgh0dW5TdGFjaw==');
+final $typed_data.Uint8List inboundOptionsDescriptor = $convert.base64Decode('Cg5JbmJvdW5kT3B0aW9ucxIdCgplbmFibGVfdHVuGAEgASgIUgllbmFibGVUdW4SLAoSZW5hYmxlX3R1bl9zZXJ2aWNlGAIgASgIUhBlbmFibGVUdW5TZXJ2aWNlEigKEHNldF9zeXN0ZW1fcHJveHkYAyABKAhSDnNldFN5c3RlbVByb3h5Eh0KCm1peGVkX3BvcnQYBCABKA1SCW1peGVkUG9ydBIfCgt0cHJveHlfcG9ydBgFIAEoDVIKdHByb3h5UG9ydBIjCg1yZWRpcmVjdF9wb3J0GAogASgNUgxyZWRpcmVjdFBvcnQSHwoLZGlyZWN0X3BvcnQYBiABKA1SCmRpcmVjdFBvcnQSEAoDbXR1GAcgASgNUgNtdHUSIQoMc3RyaWN0X3JvdXRlGAggASgIUgtzdHJpY3RSb3V0ZRIbCgl0dW5fc3RhY2sYCSABKAlSCHR1blN0YWNr');
 @$core.Deprecated('Use uRLTestOptionsDescriptor instead')
 const URLTestOptions$json = const {
   '1': 'URLTestOptions',

@@ -7,17 +7,22 @@ import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/gen/hiddify_core_generated_bindings.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
+import 'package:hiddify/hiddifycore/core_interface/mtls_channel_cred.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hello/hello.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hello/hello_service.pbgrpc.dart';
+import 'package:hiddify/utils/custom_loggers.dart';
 
 import 'package:loggy/loggy.dart';
+
 import 'package:path/path.dart' as p;
 
 final _logger = Loggy('HiddifyCoreFFI');
 typedef StopFunc = Pointer<Utf8> Function();
 typedef StopFuncDart = Pointer<Utf8> Function();
 
-class CoreInterfaceDesktop extends CoreInterface {
+class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
   static final HiddifyCoreNativeLibrary _box = _gen();
 
   static HiddifyCoreNativeLibrary _gen() {
@@ -42,6 +47,15 @@ class CoreInterfaceDesktop extends CoreInterface {
     return HiddifyCoreNativeLibrary(lib);
   }
 
+  Future<bool> isMusl() async {
+    try {
+      final result = await Process.run('ldd', ['--version']);
+      return result.stdout.toString().toLowerCase().contains('musl');
+    } catch (_) {
+      return false;
+    }
+  }
+
   final port = 17078;
   static String generateRandomPassword(int length) {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -53,30 +67,43 @@ class CoreInterfaceDesktop extends CoreInterface {
 
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
-    if (isInitialized()) {
-      return "";
-    }
-
     // Generate a random password for the grpc service
     // final errPtr2 = _box.stop();
     // final err = errPtr2.cast<Utf8>().toDartString();
     // throw Exception('stop: $err');
-    final errPtr = _box.setup(
-      directories.baseDir.path.toNativeUtf8().cast(),
-      directories.workingDir.path.toNativeUtf8().cast(),
-      directories.tempDir.path.toNativeUtf8().cast(),
-      SetupMode.GRPC_NORMAL_INSECURE.value,
-      "127.0.0.1:$port".toNativeUtf8().cast(),
-      secret.toNativeUtf8().cast(),
-      0,
-      debug ? 1 : 0,
+    const channelOption = ChannelCredentials.insecure();
+    final helloClient = HelloClient(
+      ClientChannel(
+        '127.0.0.1',
+        port: port,
+        options: const ChannelOptions(credentials: channelOption),
+      ),
     );
-    final err = errPtr.cast<Utf8>().toDartString();
 
-    if (err.isNotEmpty) {
-      return err;
+    try {
+      await helloClient.sayHello(HelloRequest(name: "test"));
+      loggy.info("core is already started!");
+    } catch (e) {
+      //core is not started yet
+
+      final errPtr = _box.setup(
+        directories.baseDir.path.toNativeUtf8().cast(),
+        directories.workingDir.path.toNativeUtf8().cast(),
+        directories.tempDir.path.toNativeUtf8().cast(),
+        SetupMode.GRPC_NORMAL_INSECURE.value,
+        "127.0.0.1:$port".toNativeUtf8().cast(),
+        secret.toNativeUtf8().cast(),
+        0,
+        debug ? 1 : 0,
+      );
+      final err = errPtr.cast<Utf8>().toDartString();
+
+      if (err.isNotEmpty) {
+        return err;
+      }
+      final res = await helloClient.sayHello(HelloRequest(name: "test"));
+      loggy.info(res.toString());
     }
-
     bgClient = fgClient = CoreClient(
       ClientChannel(
         'localhost',

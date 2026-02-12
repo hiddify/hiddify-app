@@ -75,11 +75,26 @@ jobs:
             aarch: amd64
             targets: exe,msix,zip
 
-          - platform: linux
+          - platform: linux-amd64
             os: ubuntu-22.04
             aarch: amd64
             targets: deb,gz
 
+          - platform: linux-arm64
+            os: ubuntu-24.04-arm
+            aarch: arm64
+            targets: deb,gz
+
+          # - platform: linux-musl-amd64
+          #   os: ubuntu-22.04
+          #   aarch: amd64
+          #   targets: deb,gz
+
+          # - platform: linux-musl-arm64
+          #   os: ubuntu-24.04-arm
+          #   aarch: arm64
+          #   targets: deb,gz
+            
           - platform: macos
             os: macos-15
             aarch: universal
@@ -132,14 +147,14 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-      - name: Setup NDK
-        if: startsWith(matrix.platform,'android')
-        uses: nttld/setup-ndk@v1
-        id: setup-ndk
-        with:
-          ndk-version: ${{ env.NDK_VERSION }}
-          add-to-path: true
-          link-to-sdk: true
+      # - name: Setup NDK
+      #   if: startsWith(matrix.platform,'android')
+      #   uses: nttld/setup-ndk@v1
+      #   id: setup-ndk
+      #   with:
+      #     ndk-version: ${{ env.NDK_VERSION }}
+      #     add-to-path: true
+      #     link-to-sdk: true
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3

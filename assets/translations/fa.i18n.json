@@ -384,9 +384,9 @@
       },
       "dns": {
         "title": "DNS",
-        "remoteDns": "DNS راه دور",
-        "remoteDnsDomainStrategy": "استراتژی دامنه DNS راه دور",
-        "directDns": "DNS مستقیم",
+        "remoteDns": "DNS اصلی (ریموت)",
+        "remoteDnsDomainStrategy": "استراتژی دامنه DNS ",
+        "directDns": "DNS پروکسیها (مستقیم)",
         "directDnsDomainStrategy": "استراتژی دامنه DNS مستقیم",
         "enableDnsRouting": "فعال‌سازی مسیریابی DNS",
         "domainStrategy": {
@@ -421,7 +421,7 @@
         },
         "mixedPort": "پورت ترکیبی",
         "tproxyPort": "پورت پروکسی شفاف",
-        "localDnsPort": "پورت DNS محلی",
+        "directPort": "پورت مستقیم",
         "allowConnectionFromLan": "اشتراک VPN در شبکه محلی"
       },
       "tlsTricks": {

@@ -421,7 +421,7 @@
         },
         "mixedPort": "Port mixte",
         "tproxyPort": "Port de proxy transparent",
-        "localDnsPort": "Port DNS local",
+        "directPort": "Port direct local",
         "allowConnectionFromLan": "Partager le VPN sur le réseau local"
       },
       "tlsTricks": {

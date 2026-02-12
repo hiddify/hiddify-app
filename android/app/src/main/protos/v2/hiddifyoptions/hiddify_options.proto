@@ -74,7 +74,8 @@ message InboundOptions {
   bool set_system_proxy = 3; // If true, sets the system proxy.
   uint32 mixed_port = 4; // Port for mixed traffic (using uint32 for compatibility).
   uint32 tproxy_port = 5; // Port for TProxy connections (using uint32 for compatibility).
-  uint32 local_dns_port = 6; // Port for local DNS service (using uint32 for compatibility).
+  uint32 redirect_port = 10; // Port for TProxy connections (using uint32 for compatibility).
+  uint32 direct_port = 6; // Port for local DNS service (using uint32 for compatibility).
   uint32 mtu = 7; // Maximum Transmission Unit size (using uint32 for compatibility).
   bool strict_route = 8; // If true, enforces strict routing.
   string tun_stack = 9; // Specifies the TUN stack to use.

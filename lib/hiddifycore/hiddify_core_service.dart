@@ -291,6 +291,10 @@ class HiddifyCoreService with InfraLogger {
 
     try {
       yield* core.bgClient.mainOutboundsInfo(Empty()).map((event) => event.items);
+      // .doOnEach((event) {
+      //   // loggy.debug("received active groups update: ${event}");
+      // }
+      // );
     } catch (e) {
       loggy.error("error watching active groups: $e");
       // rethrow;
@@ -415,20 +419,20 @@ class HiddifyCoreService with InfraLogger {
   }
 
   Stream<CoreStatus> watchStatus() async* {
-    yield* statusController.stream.endWith(const CoreStatus.stopped());
+    startListeningStatus("bg", core.bgClient);
+    yield* statusController.stream;
+    // .endWith(const CoreStatus.stopped());
   }
 
   void startListeningStatus(String key, CoreClient cc) {
     listenSingle<CoreStatus>(
       "${key}StatusListener",
-      () => cc
-          .coreInfoListener(Empty(), options: grpcOptions)
-          .map((event) {
-            currentState = CoreStatus.fromCoreInfo(event);
-            statusController.add(currentState);
-            return currentState;
-          })
-          .endWith(const CoreStatus.stopped()),
+      () => cc.coreInfoListener(Empty(), options: grpcOptions).map((event) {
+        currentState = CoreStatus.fromCoreInfo(event);
+        statusController.add(currentState);
+        return currentState;
+      }),
+      // .endWith(const CoreStatus.stopped())
       onError: (error) {
         loggy.error("Stream error in ${key}StatusListener: $error");
 
@@ -480,10 +484,13 @@ class HiddifyCoreService with InfraLogger {
   StreamSubscription<T>? listenSingle<T>(String key, Stream<T> Function() stream, {Function(dynamic error)? onError}) {
     if (subscriptions.containsKey(key)) {
       return subscriptions[key] as StreamSubscription<T>?;
+      // stopListenSingle(key);
     }
     subscriptions[key] = null;
     subscriptions[key] = stream().listen(
-      (event) {},
+      (event) {
+        // loggy.debug(event);
+      },
       cancelOnError: true,
       onError: (error) {
         loggy.log(loggyl.LogLevel.error, 'Stream error: $error');

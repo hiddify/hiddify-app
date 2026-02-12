@@ -53,7 +53,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
         await reconnect(next);
       }
     });
-    // ref.watch(coreRestartSignalProvider);
+    ref.watch(coreRestartSignalProvider);
 
     yield* _connectionRepo.watchConnectionStatus().doOnData((event) {
       if (event case Disconnected(connectionFailure: final _?) when PlatformUtils.isDesktop) {
@@ -158,7 +158,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
 
 @Riverpod(keepAlive: true)
 Future<bool> serviceRunning(Ref ref) async {
-  ref.watch(coreRestartSignalProvider);
+  // ref.watch(coreRestartSignalProvider);
   return await ref
       .watch(connectionNotifierProvider.selectAsync((data) => data.isConnected))
       .onError((error, stackTrace) => false);

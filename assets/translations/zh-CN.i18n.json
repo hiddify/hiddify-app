@@ -421,7 +421,7 @@
         },
         "mixedPort": "混合端口",
         "tproxyPort": "透明代理端口",
-        "localDnsPort": "本地 DNS 端口",
+        "directPort": "本地 Direct 端口",
         "allowConnectionFromLan": "允许来自局域网的连接"
       },
       "tlsTricks": {

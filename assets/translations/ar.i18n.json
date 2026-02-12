@@ -427,7 +427,7 @@
         },
         "mixedPort": "منفذ مختلط",
         "tproxyPort": "منفذ البروكسي الشفاف",
-        "localDnsPort": "منفذ DNS المحلي",
+        
         "allowConnectionFromLan": "مشاركة VPN على الشبكة المحلية"
       },
       "tlsTricks": {

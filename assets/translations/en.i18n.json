@@ -387,9 +387,10 @@
         "title": "DNS",
         "remoteDns": "Remote DNS",
         "remoteDnsDomainStrategy": "Remote DNS domain strategy",
-        "directDns": "Direct DNS",
-        "directDnsDomainStrategy": "Direct DNS domain strategy",
+        "directDns": "Outbound Server Resolver (Direct)",
+        "directDnsDomainStrategy": "Outbound Domain strategy",
         "enableDnsRouting": "Enable DNS routing",
+        "enableFakeDns": "Enable fake DNS",
         "domainStrategy": {
           "auto": "Auto",
           "preferIpv6": "Prefer IPv6",
@@ -422,7 +423,8 @@
         },
         "mixedPort": "Mixed port",
         "tproxyPort": "Transparent proxy port",
-        "localDnsPort": "Local DNS port",
+        "directPort": "Direct port",
+        "redirectPort": "Redirect port",
         "allowConnectionFromLan": "Share VPN in local network"
       },
       "tlsTricks": {
