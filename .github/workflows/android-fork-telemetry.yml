@@ -1,0 +1,118 @@
+name: Android (Fork Telemetry Build)
+
+on:
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: "3.24.0"
+  NDK_VERSION: r26d
+  CHANNEL: "prod"
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (submodules + LFS)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          lfs: true
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: "17"
+
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Diagnostics
+        shell: bash
+        run: |
+          flutter --version
+          flutter doctor -v || true
+          git rev-parse HEAD
+          git submodule status --recursive | head -n 200
+
+      - name: linux-prepare
+        shell: bash
+        run: |
+          set -o pipefail
+          make CHANNEL=prod linux-prepare 2>&1 | tee build.log
+
+      - name: android-apk install dependencies
+        shell: bash
+        run: |
+          set -o pipefail
+          make CHANNEL=prod android-apk-install-dependencies 2>&1 | tee -a build.log
+
+      - name: android-apk prepare
+        shell: bash
+        run: |
+          set -o pipefail
+          make CHANNEL=prod android-apk-prepare 2>&1 | tee -a build.log
+
+      # TEMP signing (برای اینکه Release بیلد بدون keystore نخوابه)
+      - name: Create TEMP Android signing (CI artifact only)
+        shell: bash
+        run: |
+          keytool -genkeypair -v \
+            -keystore android/key.jks \
+            -storetype JKS \
+            -storepass tempstorepass \
+            -keypass tempkeypass \
+            -alias tempalias \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Temp, OU=Temp, O=Temp, L=Temp, S=Temp, C=US"
+          cat > android/key.properties << EOF
+          storeFile=$(pwd)/android/key.jks
+          storePassword=tempstorepass
+          keyPassword=tempkeypass
+          keyAlias=tempalias
+          EOF
+
+      - name: Build APK (with PANEL_API_BASE_URL)
+        shell: bash
+        run: |
+          flutter build apk --release \
+            --dart-define=PANEL_API_BASE_URL=${{ vars.PANEL_API_BASE_URL }}
+
+      - name: Build AAB (with PANEL_API_BASE_URL)
+        shell: bash
+        run: |
+          flutter build appbundle --release \
+            --dart-define=PANEL_API_BASE_URL=${{ vars.PANEL_API_BASE_URL }}
+
+      - name: Collect outputs
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p out
+          ls -R ./build/app/outputs || true
+          cp ./build/app/outputs/flutter-apk/*.apk out/ || true
+          cp ./build/app/outputs/bundle/release/*.aab out/ || true
+          ls -la out || true
+
+      - name: Upload artifacts + logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-fork-${{ github.ref_name }}
+          path: |
+            out
+            build.log
+          retention-days: 7
