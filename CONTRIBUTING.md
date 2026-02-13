@@ -38,10 +38,10 @@ Hiddify uses [Flutter](https://flutter.dev), make sure that you have the correct
 $ flutter --version
 
 # example response
-Flutter 3.13.4 • channel stable • https://github.com/flutter/flutter.git
-Framework • revision 367f9ea16b (4 weeks ago) • 2023-09-12 23:27:53 -0500
-Engine • revision 9064459a8b
-Tools • Dart 3.1.2 • DevTools 2.25.0
+Flutter 3.38.9 • channel stable • https://github.com/flutter/flutter.git
+Framework • revision be880b7aef (1 week ago) • 2026-01-29 12:00:00 -0500
+Engine • revision abc123def4
+Tools • Dart 3.10.8 • DevTools 3.0.0
 ```
 
 
