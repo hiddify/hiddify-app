@@ -78,17 +78,30 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                   Semantics(
                     label: t.pages.proxies.activeProxy,
                     child: Text(
-                      getRealOutboundTag(activeProxy),
+                      // getRealOutboundTag(activeProxy),
+                      activeProxy.tagDisplay,
                       style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  if (activeProxy.ipinfo.ip.isNotEmpty)
-                    IPText(ip: activeProxy.ipinfo.ip, onLongPress: handleUrlTest, constrained: true)
-                  else
-                    UnknownIPText(text: t.pages.proxies.unknownIp, onTap: handleUrlTest),
+                  Row(
+                    children: [
+                      if (activeProxy.ipinfo.ip.isNotEmpty)
+                        IPText(ip: activeProxy.ipinfo.ip, onLongPress: handleUrlTest, constrained: true)
+                      else
+                        UnknownIPText(text: t.pages.proxies.unknownIp, onTap: handleUrlTest),
+                      const Spacer(),
+                      Text(
+                        // getRealOutboundTag(activeProxy),
+                        activeProxy.type,
+                        style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

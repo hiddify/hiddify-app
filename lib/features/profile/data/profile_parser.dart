@@ -176,73 +176,62 @@ class ProfileParser {
       return MapEntry(key, value);
     });
   }, (err, st) => err is ProfileFailure ? err : ProfileFailure.unexpected(err, st));
-
   Future<void> expandRemoteLinesInParallel({
     required String tempFilePath,
     required DioHttpClient httpClient,
     required CancelToken cancelToken,
     required Ref ref,
-    int parallelism = 4, // tune this
+    int parallelism = 4,
   }) async {
     final content = await File(tempFilePath).readAsString();
     final lines = content.split('\n');
 
     final results = List<String?>.filled(lines.length, null);
-    final futures = <Future<void>>[];
 
-    int active = 0;
     int index = 0;
 
-    Future<void> runNext() async {
-      if (index >= lines.length) return;
-      if (cancelToken.isCancelled) return;
+    Future<void> worker() async {
+      while (true) {
+        if (cancelToken.isCancelled) return;
 
-      final currentIndex = index++;
-      final line = lines[currentIndex];
+        final currentIndex = index++;
+        if (currentIndex >= lines.length) return;
 
-      // Non-URL → copy directly
-      if (!line.startsWith('http://') && !line.startsWith('https://')) {
-        results[currentIndex] = '$line\n';
-        return runNext();
-      }
+        final line = lines[currentIndex];
 
-      active++;
-
-      try {
-        final tmpPath = '$tempFilePath.$currentIndex';
-
-        await httpClient.download(
-          line,
-          tmpPath,
-          cancelToken: cancelToken,
-          userAgent: ref.read(ConfigOptions.useXrayCoreWhenPossible)
-              ? httpClient.userAgent.replaceAll('HiddifyNext', 'HiddifyNextX')
-              : null,
-        );
-
-        results[currentIndex] = '${await File(tmpPath).readAsString()}\n';
-      } catch (err) {
-        if (err is DioException && CancelToken.isCancel(err)) {
-          return;
+        // Non-URL
+        if (!line.startsWith('http://') && !line.startsWith('https://')) {
+          results[currentIndex] = line.trim();
+          continue;
         }
-        // swallow or log if you want
-        results[currentIndex] = '';
-      } finally {
-        active--;
-        await runNext();
+
+        try {
+          final tmpPath = '$tempFilePath.$currentIndex';
+
+          await httpClient.download(
+            line,
+            tmpPath,
+            cancelToken: cancelToken,
+            userAgent: ref.read(ConfigOptions.useXrayCoreWhenPossible)
+                ? httpClient.userAgent.replaceAll('HiddifyNext', 'HiddifyNextX')
+                : null,
+          );
+
+          results[currentIndex] = (await File(tmpPath).readAsString()).trim();
+        } catch (err) {
+          if (err is DioException && CancelToken.isCancel(err)) {
+            return;
+          }
+          results[currentIndex] = '';
+        }
       }
     }
 
     // Start workers
-    for (var i = 0; i < parallelism; i++) {
-      futures.add(runNext());
-    }
+    await Future.wait(List.generate(parallelism, (_) => worker()));
 
-    await Future.wait(futures);
-
-    // Write back only if something changed
     if (results.any((e) => e != null)) {
-      final newContent = results.whereType<String>().join();
+      final newContent = results.join("\n");
       await File(tempFilePath).writeAsString(newContent);
     }
   }
