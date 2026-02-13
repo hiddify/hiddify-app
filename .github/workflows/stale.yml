@@ -1,0 +1,16 @@
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+    - cron: "30 7 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-issue-message: 'With the release of v4.0.0 (pre-release), most reported issues have been fixed. We’re closing all current issues to start fresh.If you’re still experiencing the problem, please open a new issue and let us know.'
+          days-before-stale: 2
+          days-before-close: 1
+          
