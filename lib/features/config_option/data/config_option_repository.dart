@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dartx/dartx.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/optional_range.dart';
@@ -335,6 +337,26 @@ abstract class ConfigOptions {
     "",
   );
 
+  static final customRoutingRules = PreferencesNotifier.create<List<SingboxRule>, String>(
+    "custom-routing-rules",
+    <SingboxRule>[],
+    mapFrom: (value) {
+      try {
+        final List<dynamic> jsonList = jsonDecode(value);
+        return jsonList.map((json) => SingboxRule.fromJson(json as Map<String, dynamic>)).toList();
+      } catch (e) {
+        return <SingboxRule>[];
+      }
+    },
+    mapTo: (value) {
+      try {
+        return jsonEncode(value.map((rule) => rule.toJson()).toList());
+      } catch (e) {
+        return jsonEncode(<Map<String, dynamic>>[]);
+      }
+    },
+  );
+
   static final hasExperimentalFeatures = Provider.autoDispose<bool>(
     (ref) {
       final mode = ref.watch(serviceMode);
@@ -417,12 +439,16 @@ abstract class ConfigOptions {
     "warp2.account-id": warp2AccountId,
     "warp2.access-token": warp2AccessToken,
     "warp2.wireguard-config": warp2WireguardConfig,
+
+    // custom routing rules
+    "custom-routing-rules": customRoutingRules,
   };
 
   static final singboxConfigOptions = FutureProvider<SingboxConfigOption>(
     (ref) async {
       // final region = ref.watch(Preferences.region);
-      final rules = <SingboxRule>[];
+      final customRules = ref.watch(customRoutingRules);
+      final rules = <SingboxRule>[...customRules];
       // final rules = switch (region) {
       //   Region.ir => [
       //       const SingboxRule(
