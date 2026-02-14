@@ -5,7 +5,7 @@ import 'package:hiddify/core/model/failures.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
-FutureOr<SentryEvent?> sentryBeforeSend(SentryEvent event, {Hint? hint}) {
+FutureOr<SentryEvent?> sentryBeforeSend(SentryEvent event, Hint? hint) {
   if (!canSendEvent(event.throwable)) return null;
   return event.copyWith(
     user: SentryUser(email: "", username: "", ipAddress: "0.0.0.0"),
