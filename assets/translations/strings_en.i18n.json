@@ -387,7 +387,7 @@
     "remoteDnsDomainStrategy": "Remote DNS Domain Strategy",
     "directDnsAddress": "Direct DNS",
     "directDnsDomainStrategy": "Direct DNS Domain Strategy",
-    "mixedPort": "Mixed Port",
+    "mixedPort": "Mixed ",
     "tproxyPort": "Transparent Proxy Port",
     "localDnsPort": "Local DNS Port",
     "allowConnectionFromLan": "Share VPN in Local Network",
