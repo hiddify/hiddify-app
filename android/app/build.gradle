@@ -55,7 +55,7 @@ android {
 
     defaultConfig {
         applicationId "app.hiddify.com"
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

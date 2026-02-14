@@ -13,7 +13,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   cupertino_icons: ^1.0.6
-  intl: ^0.19.0
+  intl: ^0.20.2
   # humanizer: ^2.2.0
   # intl: ^0.19.0
   humanizer:
@@ -26,6 +26,7 @@ dependencies:
 
   slang: ^3.30.1
   slang_flutter: ^3.30.0
+  flutter_timezone: ^5.0.1
   fpdart: ^1.1.0
   freezed_annotation: ^2.4.1
   json_annotation: ^4.9.0
@@ -51,7 +52,7 @@ dependencies:
   launch_at_startup: ^0.2.2
   sentry_flutter: ^7.16.1
   sentry_dart_plugin: ^1.7.1
-  combine: ^0.5.7
+  combine: ^0.5.8
   path: ^1.8.3
   loggy: ^2.0.3
   flutter_loggy: ^2.0.2
@@ -84,12 +85,12 @@ dependencies:
   dart_mappable: ^4.2.1
   fluentui_system_icons: ^1.1.229
   http: ^1.2.0
-  timezone_to_country: ^2.1.0
+  timezone_to_country: ^3.1.0
   json_path: ^0.7.1
   # permission_handler: ^11.3.0 # is not compatible with windows
   #flutter_easy_permission: ^1.1.2
-  flutter_easy_permission: 
-     git: https://github.com/unger1984/flutter_easy_permission.git
+  flutter_easy_permission:
+    git: https://github.com/unger1984/flutter_easy_permission.git
   in_app_review: ^2.0.9
   # circle_flags: ^4.0.2
   circle_flags:
@@ -117,6 +118,8 @@ dev_dependencies:
 dependency_overrides:
   # drift & package_info_plus are not compatible
   web: ^1.0.0
+  # humanizer still pins intl ^0.19.0
+  intl: 0.20.2
 
 flutter:
   uses-material-design: true
