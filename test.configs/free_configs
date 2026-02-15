@@ -19,8 +19,7 @@
     "consent": {
       "en": "This profile collects public and published configurations with the consent of their owners, and tests and verifies them to help the free flow of information.\nTo enhance security, Hidify applies a Warp-based security layer to these configurations to prevent the risk of unauthorized access to information.\nThere is no guarantee that this configuration will function properly and it is recommended to use it only in emergency situations.",
       "fa": "این پروفایل کانفیگ‌های عمومی و منتشر شده را با رضایت صاحبان آن‌ها جمع آوری می‌کند و تست و بررسی می‌کند تا به گردش آزاد اطلاعات کمک کند.\nبرای بالا بردن امنیت، هیدیفای یک لایه امنیتی مبتنی بر وارپ بر روی این کانفیگها اعمال میکند تا از خطر دسترسی غیرمجاز به اطلاعات جلوگیری کند.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ وجود ندارد و پیشنهاد میشود صرفا در مواقع اضطراری از آن استفاده کنید"
-    },
-    "needed_features": ["warp_over_proxies"]
+    }
   },
 {
     "region": ["ir"],
@@ -30,8 +29,7 @@
     "consent": {
       "en": "This profile collects public and published configurations with the consent of their owners, and tests and verifies them to help the free flow of information.\nTo enhance security, Hidify applies a Warp-based security layer to these configurations to prevent the risk of unauthorized access to information.\nThere is no guarantee that this configuration will function properly and it is recommended to use it only in emergency situations.",
       "fa": "این پروفایل کانفیگ‌های عمومی و منتشر شده را با رضایت صاحبان آن‌ها جمع آوری می‌کند و تست و بررسی می‌کند تا به گردش آزاد اطلاعات کمک کند.\nبرای بالا بردن امنیت، هیدیفای یک لایه امنیتی مبتنی بر وارپ بر روی این کانفیگها اعمال میکند تا از خطر دسترسی غیرمجاز به اطلاعات جلوگیری کند.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ وجود ندارد و پیشنهاد میشود صرفا در مواقع اضطراری از آن استفاده کنید"
-    },
-    "needed_features": ["warp_over_proxies"]
+    }
   }
 ]
 }
