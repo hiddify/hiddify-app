@@ -4,9 +4,10 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ActiveProxyDelayIndicator extends HookConsumerWidget {
+class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
   const ActiveProxyDelayIndicator({super.key});
 
   @override
@@ -26,7 +27,12 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget {
     return Center(
       child: InkWell(
         onTap: () async {
-          await ref.read(activeProxyNotifierProvider.notifier).urlTest("");
+          try {
+            await ref.read(activeProxyNotifierProvider.notifier).urlTest("");
+          } catch (e) {
+            // Handle error here
+            loggy.error("Error during URL test: $e");
+          }
         },
         borderRadius: BorderRadius.circular(24),
         child: Padding(
