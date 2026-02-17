@@ -112,8 +112,9 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
       "startBg": true,
       "debug": _debug,
     });
+
     _isBgClientAvailable = true;
-    for (var i = 0; i < 100; i++) {
+    for (var i = 0; i < 200; i++) {
       try {
         final res = await _status.get(timeout: const Duration(milliseconds: 100));
 
@@ -134,7 +135,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 
     if (!await waitUntilPort(portBack, true, null, maxTry: 10)) {
       await stopMethodChannel();
-      return const CoreStatus.stopped(alert: CoreAlert.startService);
+      return const CoreStatus.stopped(alert: CoreAlert.startService, message: "starting background core...");
     }
     return const CoreStarted();
   }

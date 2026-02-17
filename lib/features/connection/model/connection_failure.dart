@@ -39,7 +39,7 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
     return switch (this) {
       UnexpectedConnectionFailure(:final error) when error != null => (
         type: t.errors.connectivity.unexpected,
-        message: error.toString(),
+        message: "$error",
       ),
       UnexpectedConnectionFailure() => (type: t.errors.connectivity.unexpected, message: null),
       MissingVpnPermission(:final message) => (type: t.errors.connectivity.missingVpnPermission, message: message),

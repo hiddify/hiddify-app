@@ -8,6 +8,7 @@ import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
@@ -38,7 +39,7 @@ class HiddifyCoreService with InfraLogger {
   CoreStatus currentState = const CoreStatus.stopped();
   final statusController = BehaviorSubject<CoreStatus>();
   final logController = BehaviorSubject<List<LogMessage>>();
-  final CallOptions? grpcOptions = CallOptions(timeout: const Duration(milliseconds: 2000));
+  final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 10000));
   final Map<String, StreamSubscription?> subscriptions = {};
   List<OutboundGroup> latest = [];
 
@@ -135,15 +136,14 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  TaskEither<String, Unit> start(String path, String name, bool disableMemoryLimit) {
+  TaskEither<ConnectionFailure, Unit> start(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
       statusController.add(currentState = const CoreStatus.starting());
       loggy.debug("starting");
       final background = await core.setupBackground(path, name);
       if (background != const CoreStatus.started()) {
-        statusController.add(currentState = background);
         statusController.add(currentState = const CoreStatus.stopped());
-        return left("failed to start core: $background");
+        return left(background.getCoreAlert() ?? const ConnectionFailure.unexpected("failed to start core"));
       }
       if (!core.isSingleChannel()) {
         await startListeningLogs("bg", core.bgClient);
@@ -169,19 +169,20 @@ class HiddifyCoreService with InfraLogger {
         );
         ref.read(coreRestartSignalProvider.notifier).restart();
         if (res.messageType != MessageType.ALREADY_STARTED && res.messageType != MessageType.EMPTY) {
-          return left("${res.messageType} ${res.message}");
+          statusController.add(currentState = const CoreStatus.stopped(alert: CoreAlert.startFailed));
+          return left(const ConnectionFailure.unexpected("failed to start background core"));
         }
       } on GrpcError catch (e) {
         loggy.error("failed to start bg core: $e");
         ref.read(coreRestartSignalProvider.notifier).restart();
         if (e.code == StatusCode.unavailable) {
-          return left("background core is not started yet!");
+          return left(const ConnectionFailure.unexpected("background core is not started yet!"));
         }
         // throw InvalidConfig(e.message);
         // throw DioException.connectionError(requestOptions: RequestOptions(), reason: e.codeName, error: e);
 
         // throw DioException(requestOptions: RequestOptions(), error: e);
-        return left("${e.message}");
+        return left(const ConnectionFailure.unexpected("failed to start background core"));
       }
 
       // if (res.messageType != MessageType.EMPTY) return left(res);

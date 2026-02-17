@@ -42,14 +42,33 @@ const Map<String, Map<String, dynamic>> protocolSchemaValues = {
     "xray_fragment": {"packets": "tlshello", "interval": "1-10", "length": "1-10"},
   },
   "warp": {
-    "type": "custom",
+    "type": "warp",
     "key": "",
     "host": "",
     "port": 808,
-    "fake_packets": "1-10",
-    "fake_packets_size": "1-10",
-    "fake_packets_delay": "1-10",
-    "fake_packets_mode": "m4",
+    "noise": {
+      "fake_packets": {"enabled": true, "count": "1-10", "delay": "1-10", "mode": "m4"},
+    },
+  },
+  "mieru": {
+    "type": "mieru",
+    "tag": "mieru-out",
+    "server": "127.0.0.1",
+    "portBindings": [
+      {"protocol": "tcp", "port": 1080},
+      {"protocol": "udp", "portRanges": "1080-1090"},
+    ],
+    "multiplexing": "high",
+    "handshake": "no_wait",
+  },
+  "naive": {
+    "type": "naive",
+    "tag": "naive-out",
+    "server": "127.0.0.1",
+    "server_port": 1080,
+    "username": "",
+    "password": "",
+    "tls": {"enabled": true},
   },
   "vless": {
     "type": "vless",
@@ -263,6 +282,9 @@ const Map<String, Map<String, Map<String, dynamic>>> exampleSchemaValues = {
     "httpupgrade": {
       "transport": {"type": "httpupgrade", "host": "", "path": "", "headers": {}},
     },
+    "xhttp": {
+      "transport": {"type": "xhttp", "host": "", "path": "", "headers": {}},
+    },
   },
 };
 
@@ -323,6 +345,9 @@ const Map<String, List<String>> possibleValues = {
     "block",
     "socks",
     "http",
+    "mieru",
+    "naive",
+    "anytls",
   ],
 };
 
@@ -679,146 +704,149 @@ class _JsonEditorState extends State<JsonEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(width: _onError ? 2 : 1, color: _onError ? Colors.red : _themeColor),
-      ),
-      child: SizedBox(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: _themeColor,
-                border: _onError ? const Border(bottom: BorderSide(color: Colors.red, width: 2)) : null,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                child: Row(
-                  children: [
-                    const Text('Config Editor:  '),
-                    if (!widget.hideEditorsMenuButton)
-                      PopupMenuButton<Editors>(
-                        initialValue: _editor,
-                        tooltip: 'Change editor',
-                        padding: EdgeInsets.zero,
-                        onSelected: (value) {
-                          if (value == Editors.text) {
-                            _controller.text = _stringifyData(_data, 0, true);
-                          }
-                          setState(() {
-                            _editor = value;
-                          });
-                        },
-                        position: PopupMenuPosition.under,
-                        enabled: widget.editors.length > 1,
-                        constraints: const BoxConstraints(minWidth: 50, maxWidth: 150),
-                        itemBuilder: (context) {
-                          return <PopupMenuEntry<Editors>>[
-                            PopupMenuItem<Editors>(
-                              height: _popupMenuHeight,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              enabled: widget.editors.contains(Editors.tree),
-                              value: Editors.tree,
-                              child: const Text("Tree"),
-                            ),
-                            PopupMenuItem<Editors>(
-                              height: _popupMenuHeight,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              enabled: widget.editors.contains(Editors.text),
-                              value: Editors.text,
-                              child: const Text("Text"),
-                            ),
-                          ];
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(_editor.name, style: _textStyle),
-                            const Icon(Icons.arrow_drop_down, size: 20),
-                          ],
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(width: _onError ? 2 : 1, color: _onError ? Colors.red : _themeColor),
+        ),
+        child: SizedBox(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: _themeColor,
+                  border: _onError ? const Border(bottom: BorderSide(color: Colors.red, width: 2)) : null,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                  child: Row(
+                    children: [
+                      const Text('Config Editor:  '),
+                      if (!widget.hideEditorsMenuButton)
+                        PopupMenuButton<Editors>(
+                          initialValue: _editor,
+                          tooltip: 'Change editor',
+                          padding: EdgeInsets.zero,
+                          onSelected: (value) {
+                            if (value == Editors.text) {
+                              _controller.text = _stringifyData(_data, 0, true);
+                            }
+                            setState(() {
+                              _editor = value;
+                            });
+                          },
+                          position: PopupMenuPosition.under,
+                          enabled: widget.editors.length > 1,
+                          constraints: const BoxConstraints(minWidth: 50, maxWidth: 150),
+                          itemBuilder: (context) {
+                            return <PopupMenuEntry<Editors>>[
+                              PopupMenuItem<Editors>(
+                                height: _popupMenuHeight,
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                enabled: widget.editors.contains(Editors.tree),
+                                value: Editors.tree,
+                                child: const Text("Tree"),
+                              ),
+                              PopupMenuItem<Editors>(
+                                height: _popupMenuHeight,
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                enabled: widget.editors.contains(Editors.text),
+                                value: Editors.text,
+                                child: const Text("Text"),
+                              ),
+                            ];
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(_editor.name, style: _textStyle),
+                              const Icon(Icons.arrow_drop_down, size: 20),
+                            ],
+                          ),
                         ),
-                      ),
-                    const Spacer(),
-                    if (_editor == Editors.text) ...[
+                      const Spacer(),
+                      if (_editor == Editors.text) ...[
+                        const SizedBox(width: 20),
+                        InkWell(
+                          onTap: () {
+                            _controller.text = _stringifyData(_data, 0, true);
+                          },
+                          child: const Tooltip(message: 'Format', child: Icon(Icons.format_align_left, size: 20)),
+                        ),
+                      ] else ...[
+                        const SizedBox(width: 20),
+                        if (_results != null) ...[Text("$_results results"), const SizedBox(width: 5)],
+                        _SearchField(onSearch, onSearchAction),
+                        const SizedBox(width: 20),
+                        InkWell(
+                          onTap: () {
+                            _expandedObjects[["config"].toString()] = true;
+                            expandAllObjects(_data, ["config"]);
+                            setState(() {});
+                          },
+                          child: const Tooltip(message: 'Expand All', child: Icon(Icons.expand, size: 20)),
+                        ),
+                        const SizedBox(width: 20),
+                        InkWell(
+                          onTap: () {
+                            _expandedObjects.clear();
+                            setState(() {});
+                          },
+                          child: const Tooltip(message: 'Collapse All', child: Icon(Icons.compress, size: 20)),
+                        ),
+                      ],
                       const SizedBox(width: 20),
                       InkWell(
-                        onTap: () {
-                          _controller.text = _stringifyData(_data, 0, true);
-                        },
-                        child: const Tooltip(message: 'Format', child: Icon(Icons.format_align_left, size: 20)),
+                        onTap: copyData,
+                        child: const Tooltip(message: 'Copy', child: Icon(Icons.copy, size: 20)),
                       ),
-                    ] else ...[
-                      const SizedBox(width: 20),
-                      if (_results != null) ...[Text("$_results results"), const SizedBox(width: 5)],
-                      _SearchField(onSearch, onSearchAction),
-                      const SizedBox(width: 20),
-                      InkWell(
-                        onTap: () {
-                          _expandedObjects[["config"].toString()] = true;
-                          expandAllObjects(_data, ["config"]);
-                          setState(() {});
-                        },
-                        child: const Tooltip(message: 'Expand All', child: Icon(Icons.expand, size: 20)),
-                      ),
-                      const SizedBox(width: 20),
-                      InkWell(
-                        onTap: () {
-                          _expandedObjects.clear();
-                          setState(() {});
-                        },
-                        child: const Tooltip(message: 'Collapse All', child: Icon(Icons.compress, size: 20)),
-                      ),
+                      if (widget.actions.isNotEmpty) const SizedBox(width: 20),
+                      ...widget.actions,
                     ],
-                    const SizedBox(width: 20),
-                    InkWell(
-                      onTap: copyData,
-                      child: const Tooltip(message: 'Copy', child: Icon(Icons.copy, size: 20)),
-                    ),
-                    if (widget.actions.isNotEmpty) const SizedBox(width: 20),
-                    ...widget.actions,
-                  ],
-                ),
-              ),
-            ),
-            if (_editor == Editors.tree)
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  physics: const ClampingScrollPhysics(),
-                  child: wrapWithHorizontolScroll(
-                    _Holder(
-                      key: UniqueKey(),
-                      data: _data,
-                      keyName: "config",
-                      paddingLeft: _space,
-                      onChanged: callOnChanged,
-                      parentObject: {"config": _data},
-                      setState: setState,
-                      matchedKeys: _matchedKeys,
-                      allParents: const ["config"],
-                      expandedObjects: _expandedObjects,
-                    ),
                   ),
                 ),
               ),
-            if (_editor == Editors.text)
-              Expanded(
-                child: TextFormField(
-                  style: _textStyle,
-                  controller: _controller,
-                  onChanged: parseData,
-                  maxLines: null,
-                  minLines: null,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.top,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(left: 5, top: 8, bottom: 8),
+              if (_editor == Editors.tree)
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    physics: const ClampingScrollPhysics(),
+                    child: wrapWithHorizontolScroll(
+                      _Holder(
+                        key: UniqueKey(),
+                        data: _data,
+                        keyName: "config",
+                        paddingLeft: _space,
+                        onChanged: callOnChanged,
+                        parentObject: {"config": _data},
+                        setState: setState,
+                        matchedKeys: _matchedKeys,
+                        allParents: const ["config"],
+                        expandedObjects: _expandedObjects,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-          ],
+              if (_editor == Editors.text)
+                Expanded(
+                  child: TextFormField(
+                    style: _textStyle,
+                    controller: _controller,
+                    onChanged: parseData,
+                    maxLines: null,
+                    minLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.only(left: 5, top: 8, bottom: 8),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

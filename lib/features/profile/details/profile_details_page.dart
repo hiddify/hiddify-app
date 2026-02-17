@@ -249,16 +249,34 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                   ),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.7,
-                    child: JsonEditor(
-                      expandedObjects: const ["outbounds"],
-                      onChanged: (value) {
-                        if (value == null) return;
-                        const encoder = JsonEncoder.withIndent('  ');
-                        ref.read(provider.notifier).setContent(encoder.convert(value));
-                      },
-                      enableHorizontalScroll: true,
-                      json: data.configContent,
-                    ),
+                    child: isJson(data.configContent)
+                        ? JsonEditor(
+                            expandedObjects: const ["outbounds"],
+                            onChanged: (value) {
+                              if (value == null) return;
+                              try {
+                                const encoder = JsonEncoder.withIndent('  ');
+                                ref.read(provider.notifier).setContent(encoder.convert(value));
+                              } catch (e) {
+                                ref.read(provider.notifier).setContent("$value");
+                              }
+                            },
+                            enableHorizontalScroll: true,
+                            json: data.configContent,
+                          )
+                        : TextFormField(
+                            onChanged: (value) {
+                              ref.read(provider.notifier).setContent(value);
+                            },
+                            maxLines: null,
+                            minLines: null,
+                            expands: true,
+                            textAlignVertical: TextAlignVertical.top,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.only(left: 5, top: 8, bottom: 8),
+                            ),
+                          ),
                   ),
                 ],
               ),
@@ -266,7 +284,16 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
           },
           error: (error, stackTrace) => Scaffold(
             appBar: AppBar(title: Text(t.pages.profileDetails.title)),
-            body: SliverErrorBodyPlaceholder(t.presentShortError(error)),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(FluentIcons.error_circle_12_filled),
+                  Text(t.presentShortError(error)),
+                  Text(error.toString()),
+                ],
+              ),
+            ),
           ),
           loading: () => Scaffold(
             appBar: AppBar(title: Text(t.pages.profileDetails.title)),
@@ -283,5 +310,14 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
         TextSpan(text: text),
       ],
     );
+  }
+}
+
+bool isJson(String value) {
+  try {
+    jsonDecode(value);
+    return true;
+  } catch (_) {
+    return false;
   }
 }

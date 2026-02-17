@@ -33,6 +33,7 @@ abstract interface class ProfileRepository {
   TaskEither<ProfileFailure, Unit> offlineUpdate(ProfileEntity nProfile, String nContent);
   TaskEither<ProfileFailure, Unit> validateConfig(String path, String tempPath, String? profileOverride, bool debug);
   TaskEither<ProfileFailure, String> generateConfig(String id);
+  TaskEither<ProfileFailure, String> getRawConfig(String id);
 }
 
 class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements ProfileRepository {
@@ -253,4 +254,11 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   TaskEither<ProfileFailure, String> generateConfig(String id) => TaskEither.fromEither(
     Either.tryCatch(() => _profilePathResolver.file(id), ProfileFailure.unexpected),
   ).flatMap((configFile) => _singbox.generateFullConfigByPath(configFile.path).mapLeft(ProfileFailure.unexpected));
+
+  @override
+  TaskEither<ProfileFailure, String> getRawConfig(String id) {
+    return TaskEither.fromEither(
+      Either.tryCatch(() => _profilePathResolver.file(id), ProfileFailure.unexpected),
+    ).flatMap((configFile) => TaskEither.tryCatch(() => configFile.readAsString(), ProfileFailure.unexpected));
+  }
 }

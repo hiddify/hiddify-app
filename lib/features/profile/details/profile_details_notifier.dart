@@ -28,11 +28,17 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
       }
       return prof;
     });
-
-    var profContent = (await _profilesRepo.generateConfig(id).run()).match(
-      (l) => throw Exception('Failed to generate config: $l'),
-      (content) => content,
-    );
+    var profContent = "";
+    try {
+      profContent = (await _profilesRepo.generateConfig(id).run()).match(
+        (l) => throw Exception('Failed to generate config: $l'),
+        (content) => content,
+      );
+    } catch (e, st) {
+      loggy.error('Error generating config for profile $id', e, st);
+      // Optionally, you can set profContent to an empty string or keep the original content
+      profContent = await _profilesRepo.getRawConfig(id).run().then((e) => e.getOrElse((f) => ""));
+    }
     try {
       final jsonObject = jsonDecode(profContent);
       final List<Map<String, dynamic>> res = [];
@@ -51,7 +57,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
       profContent = '{"outbounds": ${json.encode(res)}}';
     } catch (e, st) {
       loggy.error('Error parsing profile-content JSON', e, st);
-      rethrow;
+      // rethrow;
     }
     return ProfileDetailsState(
       loadingState: const AsyncData(null),

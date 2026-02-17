@@ -122,7 +122,20 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     }
   }
 
+  final _singleStart = SingleCall();
+
   Future<void> _connect() async {
+    _singleStart.run(
+      () async {
+        await _connectThrottled();
+      },
+      onIgnored: () {
+        loggy.debug("connect called while another connect/disconnect is still running, ignoring");
+      },
+    );
+  }
+
+  Future<void> _connectThrottled() async {
     final activeProfile = await ref.read(activeProfileProvider.future);
     if (activeProfile == null) {
       loggy.info("no active profile, not connecting");
@@ -162,4 +175,19 @@ Future<bool> serviceRunning(Ref ref) async {
   return await ref
       .watch(connectionNotifierProvider.selectAsync((data) => data.isConnected))
       .onError((error, stackTrace) => false);
+}
+
+class SingleCall {
+  bool _running = false;
+
+  Future<T> run<T>(Future<T> Function() task, {required T onIgnored}) async {
+    if (_running) return onIgnored;
+
+    _running = true;
+    try {
+      return await task();
+    } finally {
+      _running = false;
+    }
+  }
 }

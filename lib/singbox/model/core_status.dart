@@ -1,5 +1,6 @@
 import 'package:dartx/dartx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 
 part 'core_status.freezed.dart';
@@ -65,6 +66,28 @@ sealed class CoreStatus with _$CoreStatus {
       default:
         throw Exception("unexpected status [$event]");
     }
+  }
+
+  ConnectionFailure? getCoreAlert() {
+    return switch (this) {
+      CoreStopped(alert: final alert, message: final message) when alert != null => switch (alert) {
+        CoreAlert.emptyConfiguration => ConnectionFailure.invalidConfig(message),
+
+        CoreAlert.requestNotificationPermission => ConnectionFailure.missingNotificationPermission(message),
+
+        CoreAlert.requestVPNPermission => ConnectionFailure.missingVpnPermission(message),
+
+        CoreAlert.startCommandServer ||
+        CoreAlert.createService ||
+        CoreAlert.startService ||
+        CoreAlert.alreadyStarted ||
+        CoreAlert.startFailed => ConnectionFailure.unexpected("${alert.name} - $message"),
+
+        _ => null,
+      },
+
+      _ => null,
+    };
   }
 }
 

@@ -69,17 +69,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   Stream<ConnectionStatus> watchConnectionStatus() {
     return singbox.watchStatus().map(
       (event) => switch (event) {
-        CoreStopped(:final alert?, :final message) => Disconnected(switch (alert) {
-          CoreAlert.emptyConfiguration => ConnectionFailure.invalidConfig(message),
-          CoreAlert.requestNotificationPermission => ConnectionFailure.missingNotificationPermission(message),
-          CoreAlert.requestVPNPermission => ConnectionFailure.missingVpnPermission(message),
-          CoreAlert.startCommandServer ||
-          CoreAlert.createService ||
-          CoreAlert.startService ||
-          CoreAlert.alreadyStarted ||
-          CoreAlert.startFailed => ConnectionFailure.unexpected(message),
-        }),
-        CoreStopped() => const Disconnected(),
+        CoreStopped() => Disconnected(event.getCoreAlert()),
         CoreStarting() => const Connecting(),
         CoreStarted() => const Connected(),
         CoreStopping() => const Disconnecting(),
@@ -90,9 +80,8 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   @override
   TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit) => setup().flatMap(
     (_) => applyConfigOption(activeProfile).flatMap(
-      (_) => singbox
-          .start(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit)
-          .mapLeft(UnexpectedConnectionFailure.new),
+      (_) => singbox.start(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit),
+      // .mapLeft(UnexpectedConnectionFailure.new),
     ),
   );
 
