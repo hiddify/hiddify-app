@@ -9,9 +9,9 @@ fi
 
 
 cversion_string=$(grep -e "^version:" pubspec.yaml | cut -d: -f2-)
-cstr_version=`echo "${cversion_string}" | sed -n "s/[ ]*\\([0-9]\\+\\.[0-9]\\+\\.[0-9]\\+\\)+.*/\\1/p"`
+cstr_version=`echo "${cversion_string}" | sed -E -n 's/ *([0-9]+\.[0-9]+\.[0-9]+).*/\1/p'`
 [ "$cversion_string" == "" ] && { echo "getting old version error"; exit 1 ; }
-cbuild_number=`echo "${cversion_string}" | sed -n "s/.*+\\([0-9]\\+\\)/\\1/p"`
+cbuild_number=`echo "${cversion_string}" | sed -E -n 's/.*\+([0-9]+)$/\1/p'`
 echo "Current Version Name:${cstr_version}   Build Number:${cbuild_number}"
 read -p "new Version? (provide the next x.y.z semver) : " TAG 
 echo $TAG 
@@ -20,10 +20,10 @@ IFS="." read -r -a VERSION_ARRAY <<< "$TAG"
 VERSION_STR="${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}.${VERSION_ARRAY[2]}" 
 BUILD_NUMBER=$(( ${VERSION_ARRAY[0]} * 10000 + ${VERSION_ARRAY[1]} * 100 + ${VERSION_ARRAY[2]} )) 
 echo "version: ${VERSION_STR}+${BUILD_NUMBER}" 
-
+echo "====$cbuild_number"
 SED "s/^version: .*/version: ${VERSION_STR}\+${BUILD_NUMBER}/g" pubspec.yaml 
 SED "s/^msix_version: .*/msix_version: ${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}.${VERSION_ARRAY[2]}.0/g" windows/packaging/msix/make_config.yaml 
-SED "s/CURRENT_PROJECT_VERSION = ${cbuild_number}/CURRENT_PROJECT_VERSION = ${BUILD_NUMBER}/g" ios/Runner.xcodeproj/project.pbxproj 
+SED "s|CURRENT_PROJECT_VERSION = ${cbuild_number}|CURRENT_PROJECT_VERSION = ${BUILD_NUMBER}|g" ios/Runner.xcodeproj/project.pbxproj 
 SED "s/MARKETING_VERSION = ${cstr_version}/MARKETING_VERSION = ${VERSION_STR}/g" ios/Runner.xcodeproj/project.pbxproj 
 
 git tag ${TAG} > /dev/null 

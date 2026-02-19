@@ -1,9 +1,11 @@
 # Changelog
 
 
-## 4.0.0 (2026-02-12)
+## 4.0.4 (2026-02-19)
 
 #### New
+
+* Add endpoint to json editor, 
 
 * Add more inbounds(TPROXY, REDIRECT DIRECT) disable pause on desktop. 
 
@@ -60,6 +62,14 @@
 * Some refactor. 
 
 #### Fix
+
+* Issue in profile editor, better error display. 
+
+* Issues. 
+
+* Update build matrix to include Android and Windows targets. 
+
+* Version issue. 
 
 * Update step name for Flutter setup in build workflow. 
 
@@ -154,6 +164,10 @@
 * Typos for ios. 
 
 #### Other
+
+* Merge branch 'new-design-v2' 
+
+* Fix arm build. 
 
 * Refactor: update InboundOptions fields and translations for direct and redirect ports. 
 
@@ -1152,15 +1166,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Merge remote-tracking branch 'origin/main' into ios. 
 
-* Update CONTRIBUTING.md. 
-
-* Update README.md. 
-
-* Merge pull request #1403 from ldm0206/main. 
-  _Update translations zh-CN_
-
-* Chore: update translations with Fink 🐦 
-
 * Update. 
 
 * Update. 
@@ -1182,6 +1187,191 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 * Update. 
 
 * Update ios. 
+
+* Remove 'needed_features' from free_configs. 
+
+* Update free_configs. 
+
+* Update cron schedule and add operations limit. 
+
+* Modify stale.yml for cron schedule and messages. 
+  _Updated the stale issue workflow to change the cron schedule and modify the stale issue message and timing._
+
+* Update warp configuration with new server entries. 
+
+* Update profile title in warp configuration. 
+
+* Add new warp configurations and psiphon links. 
+
+* Update title in free_configs for Warp profile. 
+
+* Remove unused configurations for Insta-Youtube and Ainita. 
+  _Removed several configurations related to Insta-Youtube and Ainita.net, including their titles, sublinks, tags, and consent messages._
+
+* Change region from '-' to 'k' in free_configs. 
+  _Updated region values from '-' to 'k' for two configurations._
+
+* Add Mahsa profile configuration file. 
+
+* Add Mahsa configuration profile to free_configs. 
+
+* Update free_configs. 
+
+* Update warp configuration with new detour format. 
+
+* Update free_configs. 
+
+* Update free_configs. 
+
+* Create ainita. 
+
+* Update free_configs. 
+
+* Chore: update translations with Fink 🐦 
+
+* Update super_fragment. 
+
+* Update super_fragment. 
+
+* Update super_fragment. 
+
+* Update super_fragment. 
+
+* Rename super_fragment.json to super_fragment. 
+
+* Update super_fragment.json. 
+
+* Create super_fragment.json. 
+
+* Update free_configs. 
+
+* Update free_configs. 
+
+* Create free_configs. 
+
+* Update fragment. 
+
+* Update fragment. 
+
+* Update fragment. 
+
+* Create fragment. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update bug_report.yaml. 
+
+* Update README_ru.md. 
+
+* Update README_cn.md. 
+
+* Update README_br.md. 
+
+* Update README_ja.md. 
+
+* Update README_br.md. 
+
+* Update README.md. 
+
+* Update README_fa.md. 
+
+* Update README_ru.md. 
+
+* Update README_ja.md. 
+
+* Update README_fa.md. 
+
+* Update README_cn.md. 
+
+* Update README_br.md. 
+
+* Update README.md. 
+
+* Merge pull request #1475 from simonkimi/main. 
+  _Profile Tile InkWell Overflow Fix_
+
+* Fix profile_tile clipBehavior. 
+
+* Update README.md. 
+
+* Merge pull request #1464 from kekomenos/patch-1. 
+  _Update README.md_
+
+* Update README.md. 
+  _<!-- Copy-paste in your Readme.md file -->
+
+<a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=643504282" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=dark" width="721" height="auto">
+    <img alt="Star History of hiddify/hiddify-app" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=light" width="721" height="auto">
+  </picture>
+</a>
+
+<!-- Made with [OSS Insight](https://ossinsight.io/) -->_
+
+* Update README.md. 
+
+* Create README.md. 
+
+* Update README_ru.md. 
+
+* Update README_cn.md. 
+
+* Update README_ja.md. 
+
+* Update README_br.md. 
+
+* Update README_fa.md. 
+
+* Update README.md. 
+
+* Update README_br.md. 
+
+* Update README_ja.md. 
+
+* Update README_ru.md. 
+
+* Update README_cn.md. 
+
+* Update README_fa.md. 
+
+* Update README_fa.md. 
+
+* Update README.md. 
+
+* Update README.md. 
+
+* Merge pull request #1438 from proninyaroslav/linux-fix-silent. 
+  _[Linux] Fix minimize to tray (silent start) option_
+
+* [Linux] Fix minimize to tray if the option is enabled. 
+
+* Update LICENSE.md. 
+
+* Update CONTRIBUTING.md. 
+
+* Update README.md. 
+
+* Merge pull request #1403 from ldm0206/main. 
+  _Update translations zh-CN_
+
+* Chore: update translations with Fink 🐦 
 
 
 
@@ -1794,84 +1984,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 ## v1.4.0 (2024-06-02)
 
-#### New
-
-* Add tproxy. 
-
-* Add review. 
-
-* Refactor testflight. 
-
-* Add installation dependencies for apple. 
-
-* Add ios build process. 
-
-* Add Indonesian language. 
-
-* Add hiddifycli and resolve all false positve from anti virus, auto exit during installation. 
-
-* Add support for flag emoji in proxy names. 
-
-* Add version draft. 
-
-* Auto replace signed exec. 
-
-* Update to singboc 1.8.7. 
-
-* Enable tunnel service again, add signing, msix, more log less info. 
-
-* Add ipwho.is. 
-
-* Use timezone for location detector. 
-
-* Add warp fake packet delay, add warp detour, add new ipinfo api. 
-
-* Update icon. 
-
-* Add seperated VPN service mode. 
-
-* Add some example of new warp configs. 
-
-* Update active profile and its ping, 
-
-* Change app icon to stable. 
-
-* Add unavailble mark, fix: windows release bug. 
-
-* Add macos pkg file and remove zip wrapper. 
-
-* Add custom AppRun: need forked distributor. 
-
-* Add intro based on user lang and region. 
-
-* Hide hidden nodes. 
-
-* Move running admin service to core. 
-
-* Display go errors. 
-
-* Add tunnel service for windows and linux. 
-
-* Show groups always on top. 
-
-* Change update time when selected. 
-
-* Make activated profile always in top. 
-
-* Add postfix to name if it is not unique. 
-
-* Add link parser and allow custom configs to be imported. 
-
-* Add warp option (experimental) 
-
-* Add deb and rpm build. 
-
-#### Changes
-
-* Change name to Hiddify. 
-
-* Use our flutter distrobutor version and downgrade windows version (possible fix of build error) 
-
 #### Fix
 
 * Naming bug. 
@@ -1887,133 +1999,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 * Bug. 
 
 * Make dark tray icon windows-only. 
-
-* Gvisor. 
-
-* Issue. 
-
-* Isssue with singbox 1.8.9. 
-
-* Ios. 
-
-* Implementation. 
-
-* Test, update to singbox 1.8.9. 
-
-* Bug in warp config. 
-
-* Apple release. 
-
-* Bug. 
-
-* No commit message. 
-
-* Release to ios. 
-
-* Ios publishing. 
-
-* Var. 
-
-* Var. 
-
-* Vaiable issue. 
-
-* Potential fix to issue in some windows? 
-
-* Msix package. 
-
-* Signing. 
-
-* Version. 
-
-* Pub get issue? 
-
-* Build. 
-
-* Flag. 
-
-* Ip flag. 
-
-* Bug in versioned draft. 
-
-* Invalid version string for draft. 
-
-* Action bugs. 
-
-* Signing. 
-
-* Signing. 
-
-* Cert? 
-
-* Generate Warp Config on iOS. 
-  _+ pod install new packages_
-
-* Msix issue. 
-
-* Appimage fixed. issue: #513. 
-
-* Name. 
-
-* Intro page bug and fakepacket delay bug. 
-
-* Exception reporting on failing in getting ip. 
-
-* Exception when there is no active profile. 
-
-* Ip info. 
-
-* Build bug. 
-
-* Translation bug, disable signing for pull req. 
-
-* Bug in change interface listener. 
-
-* Update download paths in release page. 
-
-* Logo, add name for hiddify warp sub. 
-
-* Appimage tunnel service bug. 
-
-* Unix copy bug. 
-
-* Build linux. 
-
-* Dynamic varible in github action. 
-
-* Windows? 
-
-* Windows build? 
-
-* Typo. 
-
-* Windows build. 
-
-* Appimage build and add make req for linux. 
-
-* Service location bug in linux. 
-
-* Update of protocol handler. 
-
-* Bug in logging go erros. 
-
-* Check core before release. 
-
-* Fragment bug. 
-
-* Typo. 
-
-* Versioning issue in ios singbox platform extension. 
-
-* Release bug. 
-
-* Release bug. 
-
-* Build linux. 
-
-* Stats bug in iOS. 
-
-* Some bugs in ios. 
 
 #### Other
 
@@ -2248,6 +2233,22 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Inlang: update translations. 
 
+
+
+## v1.1.1 (2024-03-20)
+
+#### New
+
+* Add tproxy. 
+
+#### Fix
+
+* Gvisor. 
+
+* Issue. 
+
+#### Other
+
 * Merge branch 'main' of hiddify-github:hiddify/hiddify-next. 
 
 * Merge pull request #696 from HSSkyBoy/main. 
@@ -2305,6 +2306,32 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 * Update bug_report.yaml. 
 
 * Update bug_report.yaml. 
+
+* Fink 🐦: update translations. 
+
+* Fink 🐦: update translations. 
+
+
+
+## v1.0.0 (2024-03-18)
+
+#### New
+
+* Add review. 
+
+#### Fix
+
+* Isssue with singbox 1.8.9. 
+
+* Ios. 
+
+* Implementation. 
+
+* Test, update to singbox 1.8.9. 
+
+* Bug in warp config. 
+
+#### Other
 
 * Update release_message.md. 
 
@@ -2364,12 +2391,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 * Merge pull request #653 from alirezafarvardin/main. 
   _Update translations_
 
-* Test flight only release. 
-
-* Fink 🐦: update translations. 
-
-* Fink 🐦: update translations. 
-
 * Inlang/manage: add languageTag zh-TW. 
 
 * Inlang/manage: add languageTag zh-CN. 
@@ -2404,9 +2425,118 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Merge branch 'hiddify:main' into main. 
 
+* Fink 🐦: update translations. 
+
+* Test flight only release. 
+
 * Add core grpc server. 
 
-* Fink 🐦: update translations. 
+
+
+## v0.17.12 (2024-03-14)
+
+#### New
+
+* Refactor testflight. 
+
+* Add installation dependencies for apple. 
+
+* Add ios build process. 
+
+* Add Indonesian language. 
+
+* Add hiddifycli and resolve all false positve from anti virus, auto exit during installation. 
+
+* Add support for flag emoji in proxy names. 
+
+* Add version draft. 
+
+* Auto replace signed exec. 
+
+* Update to singboc 1.8.7. 
+
+* Enable tunnel service again, add signing, msix, more log less info. 
+
+* Add ipwho.is. 
+
+* Use timezone for location detector. 
+
+* Add warp fake packet delay, add warp detour, add new ipinfo api. 
+
+#### Fix
+
+* Apple release. 
+
+* Bug. 
+
+* No commit message. 
+
+* Release to ios. 
+
+* Ios publishing. 
+
+* Var. 
+
+* Var. 
+
+* Vaiable issue. 
+
+* Potential fix to issue in some windows? 
+
+* Msix package. 
+
+* Signing. 
+
+* Version. 
+
+* Pub get issue? 
+
+* Build. 
+
+* Flag. 
+
+* Ip flag. 
+
+* Bug in versioned draft. 
+
+* Invalid version string for draft. 
+
+* Action bugs. 
+
+* Signing. 
+
+* Signing. 
+
+* Cert? 
+
+* Generate Warp Config on iOS. 
+  _+ pod install new packages_
+
+* Msix issue. 
+
+* Appimage fixed. issue: #513. 
+
+* Name. 
+
+* Intro page bug and fakepacket delay bug. 
+
+* Exception reporting on failing in getting ip. 
+
+* Exception when there is no active profile. 
+
+* Ip info. 
+
+* Build bug. 
+
+* Translation bug, disable signing for pull req. 
+
+* Bug in change interface listener. 
+
+* Update download paths in release page. 
+
+* Logo, add name for hiddify warp sub. 
+
+#### Other
 
 * Update. 
 
@@ -2976,6 +3106,38 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Fix ip widget directionality. 
 
+* Merge branch 'main' into main. 
+
+* Inlang: update translations. 
+
+
+
+## v0.15.8 (2024-02-14)
+
+#### New
+
+* Update icon. 
+
+* Add seperated VPN service mode. 
+
+* Add some example of new warp configs. 
+
+* Update active profile and its ping, 
+
+* Change app icon to stable. 
+
+* Add unavailble mark, fix: windows release bug. 
+
+#### Changes
+
+* Change name to Hiddify. 
+
+#### Fix
+
+* Appimage tunnel service bug. 
+
+#### Other
+
 * Change ip obscure. 
 
 * Improve accessibility. 
@@ -3053,6 +3215,68 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Fix iOS Logger. 
 
+
+
+## v0.15.6 (2024-02-09)
+
+#### New
+
+* Add macos pkg file and remove zip wrapper. 
+
+* Add custom AppRun: need forked distributor. 
+
+* Add intro based on user lang and region. 
+
+* Hide hidden nodes. 
+
+* Move running admin service to core. 
+
+* Display go errors. 
+
+* Add tunnel service for windows and linux. 
+
+* Show groups always on top. 
+
+* Change update time when selected. 
+
+* Make activated profile always in top. 
+
+* Add postfix to name if it is not unique. 
+
+* Add link parser and allow custom configs to be imported. 
+
+#### Changes
+
+* Use our flutter distrobutor version and downgrade windows version (possible fix of build error) 
+
+#### Fix
+
+* Unix copy bug. 
+
+* Build linux. 
+
+* Dynamic varible in github action. 
+
+* Windows? 
+
+* Windows build? 
+
+* Typo. 
+
+* Windows build. 
+
+* Appimage build and add make req for linux. 
+
+* Service location bug in linux. 
+
+* Update of protocol handler. 
+
+* Bug in logging go erros. 
+
+* Check core before release. 
+
+#### Other
+
 * Refactor  build. 
 
 * Add debug build for windows. 
@@ -3078,8 +3302,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Added shared instance for LogsEventHandler. 
 
-* Merge branch 'main' into main. 
-
 * Merge pull request #414 from amirsaam/main. 
   _Log for iOS by @ Akuma_
 
@@ -3100,8 +3322,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 * Temporary disable app image build. 
 
 * Change again to ubuntu 22.04. 
-
-* Inlang: update translations. 
 
 * Update ci.yml. 
 
@@ -3137,6 +3357,28 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Add mux to experiments && update translations. 
 
+
+
+## v0.15.4 (2024-01-26)
+
+#### Fix
+
+* Fragment bug. 
+
+
+
+## v0.15.3 (2024-01-26)
+
+#### New
+
+* Add warp option (experimental) 
+
+#### Fix
+
+* Typo. 
+
+#### Other
+
 * Bump to singbox 1.8.4, and fix bugs. 
 
 * Refactor makefile. 
@@ -3163,9 +3405,39 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Update libcore. 
 
+
+
+## v0.14.20 (2024-01-21)
+
+#### Other
+
 * Update feature_request.yaml. 
 
 * Update bug_report.yaml. 
+
+
+
+## v0.14.11 (2024-01-20)
+
+#### New
+
+* Add deb and rpm build. 
+
+#### Fix
+
+* Versioning issue in ios singbox platform extension. 
+
+* Release bug. 
+
+* Release bug. 
+
+* Build linux. 
+
+* Stats bug in iOS. 
+
+* Some bugs in ios. 
+
+#### Other
 
 * Merge pull request #351 from amirsaam/main. 
   _use universal bundleid from base.xconfig_
@@ -4280,6 +4552,12 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Fix android arm bug. 
 
+
+
+## v0.9.1 (2023-10-15)
+
+#### Other
+
 * Update README_cn.md. 
 
 * Update README.md. 
@@ -4400,14 +4678,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 ## v0.8.12 (2023-10-13)
 
-#### New
-
-* Add chinese lang. 
-
-#### Changes
-
-* Remove auto release message. 
-
 #### Fix
 
 * Typo. 
@@ -4415,26 +4685,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 * Bug. 
 
 * Release names. 
-
-* Release changelog. 
-
-* Missing libs. 
-
-* Release bug. 
-
-* Release message. 
-
-* Windows build. 
-
-* Build issue. 
-
-* Bug. 
-
-* Translate. 
-
-* Hysteria2 and some links. 
-
-* Chinese translation. 
 
 #### Other
 
@@ -4538,6 +4788,58 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Update release template. 
 
+
+
+## v0.8.11 (2023-10-08)
+
+#### Changes
+
+* Remove auto release message. 
+
+
+
+## v0.8.10 (2023-10-08)
+
+#### Fix
+
+* Release changelog. 
+
+
+
+## v0.8.9 (2023-10-08)
+
+#### Fix
+
+* Missing libs. 
+
+
+
+## v0.8.8 (2023-10-08)
+
+#### Fix
+
+* Release bug. 
+
+
+
+## v0.8.7 (2023-10-08)
+
+#### Fix
+
+* Release message. 
+
+
+
+## v0.8.6 (2023-10-08)
+
+#### Fix
+
+* Windows build. 
+
+* Build issue. 
+
+#### Other
+
 * Merge branch 'main' of hiddify-github:hiddify/hiddify-next. 
 
 * Update release_message.md. 
@@ -4573,6 +4875,28 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 * Update release_message.md. 
 
 * Fix build. 
+
+
+
+## v0.8.5 (2023-10-07)
+
+#### Fix
+
+* Bug. 
+
+
+
+## v0.8.4 (2023-10-07)
+
+#### Fix
+
+* Translate. 
+
+
+
+## v0.8.3 (2023-10-07)
+
+#### Other
 
 * Add release message  and help. 
 
@@ -4628,6 +4952,16 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 * Add issue template. 
 
+
+
+## v0.8.2 (2023-10-07)
+
+#### Fix
+
+* Hysteria2 and some links. 
+
+#### Other
+
 * Update README_fa.md. 
 
 * Update README_fa.md. 
@@ -4668,6 +5002,20 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
   _Add some features to the readme_
 
 * Add debug export to clipboard. 
+
+
+
+## v0.8.1 (2023-10-06)
+
+#### New
+
+* Add chinese lang. 
+
+#### Fix
+
+* Chinese translation. 
+
+#### Other
 
 * Update core 0.5.1. 
 
@@ -4771,6 +5119,24 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 
 ## v0.5.10 (2023-09-22)
 
+#### Other
+
+* Fix minor bugs. 
+
+* Fix profile update bug. 
+
+
+
+## v0.5.9 (2023-09-22)
+
+#### Other
+
+* Add build number. 
+
+
+
+## v0.5.8 (2023-09-22)
+
 #### New
 
 * Add crashlytics. 
@@ -4830,12 +5196,6 @@ from version 3.32.5 to 3.35.4 and resolve version solving failures._
 * Bug. 
 
 #### Other
-
-* Fix minor bugs. 
-
-* Fix profile update bug. 
-
-* Add build number. 
 
 * Fix ci. 
 
