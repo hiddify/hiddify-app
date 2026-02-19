@@ -305,6 +305,7 @@ const Map<String, List<String>> possibleValues = {
   ],
   "config.outbounds.plugin": <String>["", "obfs-local", "v2ray-plugin"],
   "config.outbounds.network": <String>["", "udp", "tcp"],
+  "config.endpoints.network": <String>["", "udp", "tcp"],
   "config.outbounds.multiplex.protocol": <String>["", "smux", "yamux", "h2mux"],
   "config.outbounds.tls.min_version": <String>["", "1.0", "1.1", "1.2", "1.3"],
   "config.outbounds.tls.max_version": <String>["", "1.0", "1.1", "1.2", "1.3"],
@@ -349,6 +350,7 @@ const Map<String, List<String>> possibleValues = {
     "naive",
     "anytls",
   ],
+  "config.endpoints.type": <String>["wireguard", "warp"],
 };
 
 /// Edit your JSON object with this Widget. Create, edit and format objects
@@ -1415,7 +1417,7 @@ class _Options<T> extends StatelessWidget {
               ),
             ),
           if (keyPath != "config" && (T == Map || T == List)) ...[
-            if (keyPath == "config.outbounds" && T == List) ...[
+            if ((keyPath == "config.outbounds" || keyPath == "config.endpoints") && T == List) ...[
               for (final String key in protocolSchemaValues.keys) ...{
                 PopupMenuItem<_OptionItems>(
                   height: _popupMenuHeight,
@@ -1454,7 +1456,8 @@ class _Options<T> extends StatelessWidget {
                 const PopupMenuDivider(height: 1),
               },
             ],
-            if (keyPath != "config" && !(T == List && keyPath == "config.outbounds")) ...[
+            if (keyPath != "config" &&
+                !(T == List && (keyPath == "config.outbounds" || keyPath == "config.endpoints"))) ...[
               const PopupMenuItem<_OptionItems>(
                 height: _popupMenuHeight,
                 padding: EdgeInsets.only(left: _popupMenuItemPadding),
@@ -1523,7 +1526,7 @@ class _Options<T> extends StatelessWidget {
             ],
           ],
           const PopupMenuDivider(height: 1),
-          if (keyPath != "config" && !(T == List && keyPath == "config.outbounds"))
+          if (keyPath != "config" && !(T == List && (keyPath == "config.outbounds" || keyPath == "config.endpoints")))
             const PopupMenuItem<_OptionItems>(
               height: _popupMenuHeight,
               padding: EdgeInsets.only(left: 5),

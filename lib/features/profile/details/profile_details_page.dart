@@ -251,7 +251,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                     height: MediaQuery.of(context).size.height * 0.7,
                     child: isJson(data.configContent)
                         ? JsonEditor(
-                            expandedObjects: const ["outbounds"],
+                            expandedObjects: const ["outbounds", "endpoints"],
                             onChanged: (value) {
                               if (value == null) return;
                               try {
