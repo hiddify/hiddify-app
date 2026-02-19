@@ -136,7 +136,7 @@ Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH etc.
 [![inlang status badge](https://inlang.com/badge?url=github.com/hiddify/hiddify-next)](https://inlang.com/editor/github.com/hiddify/hiddify-next?ref=badge)
 </div>
 
-Improve existing languages or add new ones by manually editing the JSON files located in `/assets/translations` or by using the [Inlang online editor](https://inlang.com/editor/github.com/hiddify/hiddify-next).
+Improve existing languages or add new ones by manually editing the JSON files located in `/assets/translations` or by using the [Inlang online editor](https://fink.inlang.com/github.com/hiddify/hiddify-next).
 
 ## ✏️ Acknowledgements
 
