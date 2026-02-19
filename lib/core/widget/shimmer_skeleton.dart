@@ -22,19 +22,8 @@ class ShimmerSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Skeleton(
-      width: width,
-      height: height,
-      widthFactor: widthFactor,
-      heightFactor: heightFactor,
-    )
-        .animate(
-          onPlay: (controller) => controller.loop(),
-        )
-        .shimmer(
-          duration: duration,
-          angle: 45,
-          color: color ?? Theme.of(context).colorScheme.secondary,
-        );
+    return Skeleton(width: width, height: height, widthFactor: widthFactor, heightFactor: heightFactor)
+        .animate(onPlay: (controller) => controller.loop())
+        .shimmer(duration: duration, angle: 45, color: color ?? Theme.of(context).colorScheme.secondary);
   }
 }

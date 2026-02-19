@@ -20,6 +20,14 @@ G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
 static void my_application_activate(GApplication *application)
 {
   MyApplication *self = MY_APPLICATION(application);
+
+  GList *windows = gtk_application_get_windows(GTK_APPLICATION(application));
+  if (windows)
+  {
+    gtk_window_present(GTK_WINDOW(windows->data));
+    return;
+  }
+
   GtkWindow *window =
       GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
   gtk_window_set_icon_from_file(window, ICON_PATH, NULL);
@@ -50,7 +58,6 @@ static void my_application_activate(GApplication *application)
     gtk_header_bar_set_title(header_bar, "Hiddify");
     gtk_header_bar_set_show_close_button(header_bar, TRUE);
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
-    
   }
   else
   {
@@ -72,7 +79,6 @@ static void my_application_activate(GApplication *application)
   gtk_widget_hide(GTK_WIDGET(window));
 
   gtk_widget_grab_focus(GTK_WIDGET(view));
-  
 }
 
 // Implements GApplication::local_command_line.
@@ -93,7 +99,7 @@ static gboolean my_application_local_command_line(GApplication *application, gch
   g_application_activate(application);
   *exit_status = 0;
 
-  return TRUE;
+  return FALSE;
 }
 
 // Implements GApplication::startup.
@@ -137,8 +143,10 @@ static void my_application_init(MyApplication *self) {}
 
 MyApplication *my_application_new()
 {
+  g_set_prgname(APPLICATION_ID);
+
   return MY_APPLICATION(g_object_new(my_application_get_type(),
                                      "application-id", APPLICATION_ID,
-                                     "flags", G_APPLICATION_DEFAULT_FLAGS,
+                                     "flags", G_APPLICATION_HANDLES_COMMAND_LINE | G_APPLICATION_HANDLES_OPEN,
                                      nullptr));
 }

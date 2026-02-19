@@ -1,13 +1,9 @@
 {
-	"dart.lineLength": 250,
 	"[dart]": {
 		"editor.defaultFormatter": "Dart-Code.dart-code",
         "editor.formatOnSave": true,
         "editor.formatOnType": true,
         "editor.tabSize": 2,
-        "editor.rulers": [
-            250
-        ],
         "editor.detectIndentation": false,
         "editor.selectionHighlight": false,
         "editor.suggest.snippetsPreventQuickSuggestions": false,
@@ -16,6 +12,6 @@
         "editor.wordBasedSuggestions": "off"
 	},
 
-	"html.format.wrapLineLength": 250,
+    "html.format.wrapLineLength": 250
 	
 }

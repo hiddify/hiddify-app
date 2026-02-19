@@ -1,11 +1,11 @@
 display_name: Hiddify
 publisher_display_name: Hiddify
 identity_name: Hiddify.HiddifyNext
-msix_version: 2.5.7.0
+msix_version: 4.0.0.0
 logo_path: windows\runner\resources\app_icon.ico
 capabilities: internetClient, internetClientServer, privateNetworkClientServer
-languages: en-us, zh-cn, zh-tw, tr-tr,fa-ir,ru-ru,pt-br,es-es
-protocol_activation: hiddify
+languages: ar, en-us, es-es, fa-ir, fr-fr, id-id, pt-br, ru-ru, tr-tr, zh-cn, zh-tw
+protocol_activation: hiddify, v2ray, v2rayn, v2rayng, clash, clashmeta, sing-box
 execution_alias: hiddify
 certificate_path: windows\sign.pfx
 certificate_password:
@@ -14,3 +14,8 @@ install_certificate: "false"
 enable_at_startup: "true"
 startup_task:
   parameters: --autostart
+
+# For testing with a self-signed certificate
+# publisher: CN=Hiddify-Test
+# certificate_password: "1234"
+# install_certificate: "true"

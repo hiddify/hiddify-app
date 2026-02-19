@@ -1,53 +1,43 @@
-import 'dart:io';
+// class TrayWrapper extends StatefulHookConsumerWidget {
+//   const TrayWrapper(this.child, {super.key});
 
-import 'package:flutter/material.dart';
-import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
-import 'package:hiddify/features/window/notifier/window_notifier.dart';
-import 'package:hiddify/utils/custom_loggers.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:tray_manager/tray_manager.dart';
+//   final Widget child;
 
-class TrayWrapper extends StatefulHookConsumerWidget {
-  const TrayWrapper(this.child, {super.key});
+//   @override
+//   ConsumerState<ConsumerStatefulWidget> createState() => _TrayWrapperState();
+// }
 
-  final Widget child;
+// class _TrayWrapperState extends ConsumerState<TrayWrapper> with TrayListener, AppLogger {
+//   @override
+//   Widget build(BuildContext context) {
+//     ref.listen(systemTrayNotifierProvider, (_, __) {});
 
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _TrayWrapperState();
-}
+//     return widget.child;
+//   }
 
-class _TrayWrapperState extends ConsumerState<TrayWrapper>
-    with TrayListener, AppLogger {
-  @override
-  Widget build(BuildContext context) {
-    ref.listen(systemTrayNotifierProvider, (_, __) {});
+//   @override
+//   void initState() {
+//     super.initState();
+//     trayManager.addListener(this);
+//   }
 
-    return widget.child;
-  }
+//   @override
+//   void dispose() {
+//     trayManager.removeListener(this);
+//     super.dispose();
+//   }
 
-  @override
-  void initState() {
-    super.initState();
-    trayManager.addListener(this);
-  }
+//   @override
+//   Future<void> onTrayIconMouseDown() async {
+//     if (Platform.isMacOS) {
+//       await trayManager.popUpContextMenu();
+//     } else {
+//       await ref.read(windowNotifierProvider.notifier).open();
+//     }
+//   }
 
-  @override
-  void dispose() {
-    trayManager.removeListener(this);
-    super.dispose();
-  }
-
-  @override
-  Future<void> onTrayIconMouseDown() async {
-    if (Platform.isMacOS) {
-      await trayManager.popUpContextMenu();
-    } else {
-      await ref.read(windowNotifierProvider.notifier).open();
-    }
-  }
-
-  @override
-  Future<void> onTrayIconRightMouseDown() async {
-    await trayManager.popUpContextMenu();
-  }
-}
+//   @override
+//   Future<void> onTrayIconRightMouseDown() async {
+//     await trayManager.popUpContextMenu();
+//   }
+// }

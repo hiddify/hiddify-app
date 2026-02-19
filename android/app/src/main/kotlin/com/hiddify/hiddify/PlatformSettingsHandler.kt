@@ -149,8 +149,8 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                                 list.add(
                                     AppItem(
                                         it.packageName,
-                                        it.applicationInfo.loadLabel(packageManager).toString(),
-                                        it.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == 1
+                                        it.applicationInfo?.loadLabel(packageManager).toString(),
+                                        (it.applicationInfo?.flags?.and(ApplicationInfo.FLAG_SYSTEM) == 1)
                                     )
                                 )
                             }

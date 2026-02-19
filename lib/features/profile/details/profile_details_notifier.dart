@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 
-import 'package:dartx/dartx.dart';
-import 'package:fpdart/fpdart.dart';
+import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/profile/details/profile_details_state.dart';
@@ -9,224 +12,113 @@ import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:uuid/uuid.dart';
 
 part 'profile_details_notifier.g.dart';
 
 @riverpod
 class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
+  ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
+
   @override
-  Future<ProfileDetailsState> build(
-    String id, {
-    String? url,
-    String? profileName,
-  }) async {
-    if (id == 'new') {
-      return ProfileDetailsState(
-        profile: RemoteProfileEntity(
-          id: const Uuid().v4(),
-          active: true,
-          name: profileName ?? "",
-          url: url ?? "",
-          lastUpdate: DateTime.now(),
-        ),
+  Future<ProfileDetailsState> build(String id) async {
+    final prof = (await _profilesRepo.getById(id).run()).match((l) => throw l, (prof) {
+      // _originalProfile = prof;
+      if (prof == null) {
+        loggy.warning('profile with id: [$id] does not exist');
+        throw const ProfileNotFoundFailure();
+      }
+      return prof;
+    });
+    var profContent = "";
+    try {
+      profContent = (await _profilesRepo.generateConfig(id).run()).match(
+        (l) => throw Exception('Failed to generate config: $l'),
+        (content) => content,
       );
+    } catch (e, st) {
+      loggy.error('Error generating config for profile $id', e, st);
+      // Optionally, you can set profContent to an empty string or keep the original content
+      profContent = await _profilesRepo.getRawConfig(id).run().then((e) => e.getOrElse((f) => ""));
     }
-    final failureOrProfile = await _profilesRepo.getById(id).run();
-    return failureOrProfile.match(
-      (err) {
-        loggy.warning('failed to load profile', err);
-        throw err;
-      },
-      (profile) async {
-        if (profile == null) {
-          loggy.warning('profile with id: [$id] does not exist');
-          throw const ProfileNotFoundFailure();
-        }
-
-        _originalProfile = profile;
-        final result = await _profilesRepo.generateConfig(id).run();
-
-        var configContent = result.fold(
-          (failure) => throw Exception('Failed to generate config: $failure'),
-          (config) => config,
-        );
-        if (configContent.isNotEmpty) {
-          try {
-            final jsonObject = jsonDecode(configContent);
-            List<Map<String, dynamic>> res = [];
-            if (jsonObject is Map<String, dynamic> && jsonObject['outbounds'] is List) {
-              for (var outbound in jsonObject['outbounds'] as List<dynamic>) {
-                if (outbound is Map<String, dynamic> && outbound['type'] != null && !['selector', 'urltest', 'dns', 'block'].contains(outbound['type']) && !['direct', 'bypass', 'direct-fragment'].contains(outbound['tag'])) {
-                  res.add(outbound);
-                }
-              }
-            } else {
-              // print('No outbounds found in the config');
-            }
-            configContent = '{"outbounds": ${json.encode(res)}}';
-          } catch (e) {
-            // print('Error parsing JSON: $e');
+    try {
+      final jsonObject = jsonDecode(profContent);
+      final List<Map<String, dynamic>> outbounds = [];
+      if (jsonObject is Map<String, dynamic> && jsonObject['outbounds'] is List) {
+        for (final outbound in jsonObject['outbounds'] as List<dynamic>) {
+          if (outbound is Map<String, dynamic> &&
+              outbound['type'] != null &&
+              !['selector', 'urltest', 'dns', 'block'].contains(outbound['type']) &&
+              !['direct', 'bypass', 'direct-fragment'].contains(outbound['tag'])) {
+            outbounds.add(outbound);
           }
-        } else {
-          // print('Config content is null or empty');
         }
-        return ProfileDetailsState(profile: profile, isEditing: true, configContent: configContent);
-      },
+      } else {
+        // print('No outbounds found in the config');
+      }
+      final endpoints = jsonObject['endpoints'] as List? ?? [];
+      profContent = '{"outbounds": ${json.encode(outbounds)},"endpoints":${json.encode(endpoints)} }';
+      loggy.info(profContent);
+    } catch (e, st) {
+      loggy.error('Error parsing profile-content JSON', e, st);
+      // rethrow;
+    }
+    return ProfileDetailsState(
+      loadingState: const AsyncData(null),
+      profile: prof,
+      configContent: profContent,
+      isDetailsChanged: false,
     );
   }
 
-  ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
-  ProfileEntity? _originalProfile;
+  Future<T?> doAsync<T>(Future<T> Function() operation) async {
+    if (state case AsyncData(value: final ProfileDetailsState data)) {
+      state = AsyncData(data.copyWith(loadingState: const AsyncLoading()));
+      final T? result = await operation();
+      state = AsyncData(data.copyWith(loadingState: const AsyncData(null)));
+      return result;
+    }
+    return null;
+  }
 
-  void setField({
-    String? name,
-    String? url,
-    Option<int>? updateInterval,
-    String? configContent,
-  }) {
-    if (state case AsyncData(:final value)) {
-      final configContentChanged = value.configContentChanged || value.configContent != configContent;
-      // if (!configContentChanged) {
-      //   return;
-      // }
+  void setUserOverride(UserOverride userOverride) {
+    if (state case AsyncData(value: final ProfileDetailsState data)) {
       state = AsyncData(
-        value.copyWith(
-          profile: value.profile.map(
-            remote: (rp) => rp.copyWith(
-              name: name ?? rp.name,
-              url: url ?? rp.url,
-              options: updateInterval == null
-                  ? rp.options
-                  : updateInterval.fold(
-                      () => null,
-                      (t) => ProfileOptions(
-                        updateInterval: Duration(hours: t),
-                      ),
-                    ),
-            ),
-            local: (lp) => lp.copyWith(name: name ?? lp.name),
-          ),
-          configContentChanged: configContentChanged,
-          configContent: configContent ?? value.configContent,
-        ),
+        data.copyWith(profile: data.profile.copyWith(userOverride: userOverride), isDetailsChanged: true),
       );
     }
   }
 
-  Future<void> save() async {
-    if (state case AsyncData(:final value)) {
-      if (value.save case AsyncLoading()) return;
-
-      final profile = value.profile;
-      Either<ProfileFailure, Unit>? failureOrSuccess;
-      state = AsyncData(value.copyWith(save: const AsyncLoading()));
-
-      switch (profile) {
-        case RemoteProfileEntity():
-          loggy.debug(
-            'saving profile, url: [${profile.url}], name: [${profile.name}]',
-          );
-          if (profile.name.isBlank || profile.url.isBlank) {
-            loggy.debug('save: invalid arguments');
-          } else if (value.isEditing) {
-            if (_originalProfile case RemoteProfileEntity(:final url) when url == profile.url) {
-              loggy.debug('editing profile');
-              failureOrSuccess = await _profilesRepo.patch(profile).run();
-              if (failureOrSuccess.isRight()) {
-                failureOrSuccess = await _profilesRepo
-                    .updateContent(
-                      profile.id,
-                      value.configContent,
-                    )
-                    .run();
-              }
-            } else {
-              loggy.debug('updating profile');
-              failureOrSuccess = await _profilesRepo.updateSubscription(profile, patchBaseProfile: true).run();
-              if (failureOrSuccess.isRight()) {
-                failureOrSuccess = await _profilesRepo
-                    .updateContent(
-                      profile.id,
-                      value.configContent,
-                    )
-                    .run();
-              }
-            }
-          } else {
-            loggy.debug('adding profile, url: [${profile.url}]');
-            failureOrSuccess = await _profilesRepo.add(profile).run();
-          }
-
-        case LocalProfileEntity() when value.isEditing:
-          loggy.debug('editing profile');
-          failureOrSuccess = await _profilesRepo.patch(profile).run();
-          if (failureOrSuccess.isRight()) {
-            failureOrSuccess = await _profilesRepo
-                .updateContent(
-                  profile.id,
-                  value.configContent,
-                )
-                .run();
-          }
-        default:
-          loggy.warning("local profile can't be added manually");
-      }
-
-      state = AsyncData(
-        value.copyWith(
-          save: failureOrSuccess?.fold(
-                (l) => AsyncError(l, StackTrace.current),
-                (_) => const AsyncData(null),
-              ) ??
-              value.save,
-          showErrorMessages: true,
-        ),
-      );
+  void setContent(String configContent) {
+    if (state case AsyncData(value: final ProfileDetailsState data)) {
+      state = AsyncData(data.copyWith(configContent: configContent, isDetailsChanged: true));
     }
   }
 
-  Future<void> updateProfile() async {
+  Future<bool> save() async {
+    bool success = false;
     if (state case AsyncData(:final value)) {
-      if (value.update?.isLoading ?? false || !value.isEditing) return;
-      if (value.profile case LocalProfileEntity()) {
-        loggy.warning("local profile can't be updated");
-        return;
-      }
+      if (value.loadingState case AsyncLoading()) return false;
 
-      final profile = value.profile;
-      state = AsyncData(value.copyWith(update: const AsyncLoading()));
-
-      final failureOrUpdatedProfile = await _profilesRepo.updateSubscription(profile as RemoteProfileEntity).flatMap((_) => _profilesRepo.getById(id)).run();
-
-      state = AsyncData(
-        value.copyWith(
-          update: failureOrUpdatedProfile.match(
-            (l) => AsyncError(l, StackTrace.current),
-            (_) => const AsyncData(null),
-          ),
-          profile: failureOrUpdatedProfile.match(
-            (_) => profile,
-            (updatedProfile) => updatedProfile ?? profile,
-          ),
-        ),
-      );
+      success =
+          await doAsync<bool>(() async {
+            final t = await ref.read(translationsProvider.future);
+            return (await _profilesRepo.offlineUpdate(value.profile, value.configContent).run()).match(
+              (l) async {
+                await ref
+                    .read(dialogNotifierProvider.notifier)
+                    .showCustomAlertFromErr(
+                      t.presentError(l, action: t.pages.profiles.msg.update.failureNamed(name: value.profile.name)),
+                    );
+                return false;
+              },
+              (r) {
+                ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.update.success);
+                return true;
+              },
+            );
+          }) ??
+          false;
     }
-  }
-
-  Future<void> delete() async {
-    if (state case AsyncData(:final value)) {
-      if (value.delete case AsyncLoading()) return;
-      final profile = value.profile;
-      state = AsyncData(value.copyWith(delete: const AsyncLoading()));
-
-      state = AsyncData(
-        value.copyWith(
-          delete: await AsyncValue.guard(() async {
-            await _profilesRepo.deleteById(profile.id).getOrElse((l) => throw l).run();
-          }),
-        ),
-      );
-    }
+    return success;
   }
 }

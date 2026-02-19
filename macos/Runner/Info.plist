@@ -35,14 +35,31 @@
 			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>hiddify</string>
+				<string>v2ray</string>
+				<string>v2rayn</string>
+				<string>v2rayng</string>
 				<string>clash</string>
 				<string>clashmeta</string>
 				<string>sing-box</string>
-				<string>hiddify</string>
 			</array>
 		</dict>
 	</array>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>ar</string>
+		<string>en</string>
+		<string>es</string>
+		<string>fa</string>
+		<string>fr</string>
+		<string>id</string>
+		<string>pt-BR</string>
+		<string>ru</string>
+		<string>tr</string>
+		<string>zh-CN</string>
+		<string>zh-TW</string>
+	</array>
 </dict>
 </plist>

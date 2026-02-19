@@ -1,86 +1,82 @@
 import 'package:flutter/material.dart';
-import 'package:hiddify/features/proxy/model/proxy_entity.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
+import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProxyTile extends HookConsumerWidget with PresLogger {
-  const ProxyTile(
-    this.proxy, {
-    super.key,
-    required this.selected,
-    required this.onSelect,
-  });
+  const ProxyTile(this.proxy, {super.key, required this.selected, required this.onTap});
 
-  final ProxyItemEntity proxy;
+  final OutboundInfo proxy;
   final bool selected;
-  final VoidCallback onSelect;
+  final GestureTapCallback? onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
     return ListTile(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       title: Text(
-        proxy.name,
+        proxy.tagDisplay,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(fontFamily: FontFamily.emoji),
+        style: PlatformUtils.isWindows ? const TextStyle(fontFamily: FontFamily.emoji) : null,
       ),
-      leading: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Container(
-          width: 6,
-          height: double.maxFinite,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: selected ? theme.colorScheme.primary : Colors.transparent,
-          ),
-        ),
+      leading: IPCountryFlag(
+        countryCode: proxy.ipinfo.countryCode,
+        organization: proxy.ipinfo.org,
+        size: 40,
+        padding: const EdgeInsetsDirectional.only(end: 8),
       ),
       subtitle: Text.rich(
         TextSpan(
-          text: proxy.type.label,
+          text: proxy.type,
           children: [
-            if (proxy.selectedName != null)
+            if (proxy.isGroup)
               TextSpan(
-                text: ' (${proxy.selectedName})',
+                text: ' (${proxy.groupSelectedTagDisplay.trim()})',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
           ],
         ),
+        maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: proxy.urlTestDelay != 0
-          ? Text(
+      trailing: Column(
+        children: [
+          if (proxy.urlTestDelay != 0)
+            Text(
               proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
               style: TextStyle(color: delayColor(context, proxy.urlTestDelay)),
-            )
-          : null,
+            ),
+
+          if (proxy.download > 0) Text("⬩", style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+
       selected: selected,
-      onTap: onSelect,
-      onLongPress: () async {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            content: SelectionArea(child: Text(proxy.name)),
-            actions: [
-              TextButton(
-                onPressed: Navigator.of(context).pop,
-                child: Text(MaterialLocalizations.of(context).closeButtonLabel),
-              ),
-            ],
-          ),
-        );
-      },
+      selectedTileColor: theme.colorScheme.primaryContainer,
+      onTap: onTap,
+      onLongPress: () async => await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: proxy),
       horizontalTitleGap: 4,
     );
   }
 
   Color delayColor(BuildContext context, int delay) {
     if (Theme.of(context).brightness == Brightness.dark) {
-      return switch (delay) { < 800 => Colors.lightGreen, < 1500 => Colors.orange, _ => Colors.redAccent };
+      return switch (delay) {
+        < 800 => Colors.lightGreen,
+        < 1500 => Colors.orange,
+        _ => Colors.redAccent,
+      };
     }
-    return switch (delay) { < 800 => Colors.green, < 1500 => Colors.deepOrangeAccent, _ => Colors.red };
+    return switch (delay) {
+      < 800 => Colors.green,
+      < 1500 => Colors.deepOrangeAccent,
+      _ => Colors.red,
+    };
   }
 }

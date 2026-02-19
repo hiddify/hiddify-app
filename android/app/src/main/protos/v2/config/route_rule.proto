@@ -1,0 +1,50 @@
+syntax = "proto3";
+package config;
+option go_package = "github.com/hiddify/hiddify-core/v2/config";
+option java_package = "com.hiddify.core.api.v2.config";
+message RouteRule {
+  repeated Rule rules = 1 [json_name = "rules"];
+}
+
+message Rule {
+  uint32 list_order = 1 [json_name = "list_order"];
+  bool enabled = 2 [json_name = "enabled"];
+  string name = 3 [json_name = "name"];
+  Outbound outbound = 4 [json_name = "outbound"];
+  repeated string rule_sets = 5 [json_name = "rule_set"];
+  repeated string package_names = 6 [json_name = "package_name"];
+  repeated string process_names = 7 [json_name = "process_name"];
+  repeated string process_paths = 8 [json_name = "process_path"];
+  Network network = 9 [json_name = "network"];
+  repeated string port_ranges = 10 [json_name = "port_range"];
+  repeated string source_port_ranges = 11 [json_name = "source_port_range"];
+  repeated Protocol protocols = 12 [json_name = "protocol"];
+  repeated string ip_cidrs = 13 [json_name = "ip_cidr"];
+  repeated string source_ip_cidrs = 14 [json_name = "source_ip_cidr"];
+  repeated string domains = 15 [json_name = "domain"];
+  repeated string domain_suffixes = 16 [json_name = "domain_suffix"];
+  repeated string domain_keywords = 17 [json_name = "domain_keyword"];
+  repeated string domain_regexes = 18 [json_name = "domain_regex"];
+}
+
+enum Outbound {
+  proxy = 0;
+  direct = 1;
+  direct_with_fragment = 2;
+  block = 3;
+}
+  
+enum Network {
+  all = 0;
+  tcp = 1;
+  udp = 2;
+}
+
+enum Protocol {
+  tls = 0;
+  http = 1;
+  quic = 2;
+  stun = 3;
+  dns = 4;
+  bittorrent = 5;
+}

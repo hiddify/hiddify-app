@@ -1,0 +1,171 @@
+/**
+ * This file defines various configuration options for the Hiddify application.
+ */
+
+syntax = "proto3";
+
+package hiddifyoptions;
+option go_package = "github.com/hiddify/hiddify-core/v2/hiddifyoptions";
+option java_package = "com.hiddify.core.api.v2.hiddifyoptions";
+
+/**
+ * HiddifyOptions defines the configuration options for the Hiddify application.
+ */
+message HiddifyOptions {
+  bool enable_full_config = 1; // Enables full configuration options.
+  string log_level = 2; // Specifies the logging level (e.g., INFO, DEBUG).
+  string log_file = 3; // Path to the log file.
+  bool enable_clash_api = 4; // Indicates whether the Clash API is enabled.
+  uint32 clash_api_port = 5; // Port for the Clash API (using uint32 for compatibility).
+  string web_secret = 6; // Secret key for accessing the Clash API.
+  string region = 7; // Region for the application.
+  bool block_ads = 8; // If true, blocks ads.
+  bool use_xray_core_when_possible = 9; // If true, use XRay core when possible.
+  repeated Rule rules = 10; // List of routing rules for traffic management.
+  WarpOptions warp = 11; // Configuration options for Warp.
+  WarpOptions warp2 = 12; // Additional configuration options for a second Warp instance.
+  MuxOptions mux = 13; // Configuration options for multiplexing.
+  TLSTricks tls_tricks = 14; // Options for TLS tricks.
+  DNSOptions dns_options = 15; // DNS-related options.
+  InboundOptions inbound_options = 16; // Inbound connection options.
+  URLTestOptions url_test_options = 17; // URL test configuration options.
+  RouteOptions route_options = 18; // Routing-related options.
+}
+
+/**
+ * DomainStrategy defines the strategies for IP address preference when resolving domain names.
+ */
+enum DomainStrategy {
+  as_is =0; // As it is.
+  prefer_ipv4 = 1; // Prefer IPv4 addresses.
+  prefer_ipv6 = 2; // Prefer IPv6 addresses.
+  ipv4_only = 3; // Only use IPv4 addresses.
+  ipv6_only = 4; // Only use IPv6 addresses.
+}
+
+/**
+ * IntRange defines a range of integers for various configurations.
+ * It includes the starting and ending values of the range.
+ */
+message IntRange {
+  int32 from = 1; // Starting value of the range.
+  int32 to = 2; // Ending value of the range.
+}
+
+/**
+ * DNSOptions defines DNS-related configuration options.
+ */
+message DNSOptions {
+  string remote_dns_address = 1; // Remote DNS server address.
+  DomainStrategy remote_dns_domain_strategy = 2; // Strategy for resolving domains with remote DNS.
+  string direct_dns_address = 3; // Direct DNS server address.
+  DomainStrategy direct_dns_domain_strategy = 4; // Strategy for resolving domains with direct DNS.
+  bool independent_dns_cache = 5; // If true, enables independent DNS caching.
+  bool enable_fake_dns = 6; // If true, enables fake DNS responses.
+  bool enable_dns_routing = 7; // If true, enables DNS routing.
+}
+
+/**
+ * InboundOptions defines the configuration options for inbound connections.
+ */
+message InboundOptions {
+  bool enable_tun = 1; // If true, enables TUN interface.
+  bool enable_tun_service = 2; // If true, enables TUN service.
+  bool set_system_proxy = 3; // If true, sets the system proxy.
+  uint32 mixed_port = 4; // Port for mixed traffic (using uint32 for compatibility).
+  uint32 tproxy_port = 5; // Port for TProxy connections (using uint32 for compatibility).
+  uint32 redirect_port = 10; // Port for TProxy connections (using uint32 for compatibility).
+  uint32 direct_port = 6; // Port for local DNS service (using uint32 for compatibility).
+  uint32 mtu = 7; // Maximum Transmission Unit size (using uint32 for compatibility).
+  bool strict_route = 8; // If true, enforces strict routing.
+  string tun_stack = 9; // Specifies the TUN stack to use.
+}
+
+/**
+ * URLTestOptions defines the configuration options for URL testing.
+ */
+message URLTestOptions {
+  string connection_test_url = 1; // URL used for connection testing.
+  int64 url_test_interval = 2; // Interval for URL tests in milliseconds.
+}
+
+/**
+ * RouteOptions defines options related to traffic routing.
+ */
+message RouteOptions {
+  bool resolve_destination = 1; // If true, resolves the destination address.
+  DomainStrategy ipv6_mode = 2; // Strategy for handling IPv6 addresses.
+  bool bypass_lan = 3; // If true, bypasses LAN connections.
+  bool allow_connection_from_lan = 4; // If true, allows connections from LAN.
+}
+
+/**
+ * TLSTricks defines options for TLS tricks to obfuscate traffic.
+ */
+message TLSTricks {
+  bool enable_fragment = 1; // If true, enables fragmentation of packets.
+  IntRange fragment_size = 2; // Size of fragments to be used.
+  IntRange fragment_sleep = 3; // Sleep time between fragments.
+  bool mixed_sni_case = 4; // If true, enables mixed SNI case for obfuscation.
+  bool enable_padding = 5; // If true, enables padding of packets.
+  IntRange padding_size = 6; // Size of padding to be used.
+}
+
+/**
+ * MuxOptions defines options for multiplexing connections.
+ */
+message MuxOptions {
+  bool enable = 1; // If true, enables multiplexing.
+  bool padding = 2; // If true, enables padding for multiplexed connections.
+  int32 max_streams = 3; // Maximum number of streams allowed (using int32).
+  string protocol = 4; // Protocol used for multiplexing.
+}
+
+/**
+ * WarpOptions defines configuration options for Warp.
+ */
+message WarpOptions {
+  string id = 1; // Unique identifier for the Warp configuration.
+  bool enable_warp = 2; // If true, enables Warp functionality.
+  string mode = 3; // Operating mode for Warp.
+  WarpWireguardConfig wireguard_config = 5; // Configuration for WireGuard (defined elsewhere).
+  string fake_packets = 6; // Fake packet configuration.
+  IntRange fake_packet_size = 7; // Size of fake packets.
+  IntRange fake_packet_delay = 8; // Delay for sending fake packets.
+  string fake_packet_mode = 9; // Mode for sending fake packets.
+  string clean_ip = 10; // Clean IP address to use.
+  uint32 clean_port = 11; // Port for clean traffic (using uint32 for compatibility).
+  WarpAccount account = 12; // Account details for Warp (defined elsewhere).
+}
+
+/**
+ * WarpAccount defines account details for Warp.
+ */
+message WarpAccount {
+  string account_id = 1; // Unique account identifier.
+  string access_token = 2; // Access token for the account.
+}
+
+/**
+ * WarpWireguardConfig defines the configuration details for WireGuard.
+ */
+message WarpWireguardConfig {
+  string private_key = 1; // Private key for WireGuard.
+  string local_address_ipv4 = 2; // Local IPv4 address for WireGuard.
+  string local_address_ipv6 = 3; // Local IPv6 address for WireGuard.
+  string peer_public_key = 4; // Peer public key for WireGuard.
+  string client_id = 5; // Client identifier for WireGuard.
+}
+
+/**
+ * Rule defines routing rules for managing traffic.
+ */
+message Rule {
+  string rule_set_url = 1; // URL of the rule set.
+  string domains = 2;       // List of domains affected by this rule.
+  string ip = 3;            // IP address associated with this rule.
+  string port = 4;          // Port number associated with this rule.
+  string network = 5;       // Network type (e.g., IPv4, IPv6).
+  string protocol = 6;      // Protocol type (e.g., TCP, UDP).
+  string outbound = 7;      // Outbound traffic handling (e.g., allow, deny).
+}

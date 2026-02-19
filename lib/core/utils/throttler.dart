@@ -7,8 +7,7 @@ class Throttler {
   DateTime? _lastCall;
 
   void call(VoidCallback callback) {
-    if (_lastCall == null ||
-        DateTime.now().difference(_lastCall!) > throttleFor) {
+    if (_lastCall == null || DateTime.now().difference(_lastCall!) > throttleFor) {
       callback();
       _lastCall = DateTime.now();
     }

@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package profile;
+option go_package = "github.com/hiddify/hiddify-core/v2/profile";
+option java_package = "com.hiddify.core.api.v2.profile";
+/**
+ * This proto file defines the ProfileService with RPC methods 
+ * to manage profiles (add, fetch, update, delete, and set active profiles).
+ */
+
+// Import dependencies
+import "v2/profile/profile.proto"; // Import the ProfileEntity message from another proto file.
+import "v2/hcommon/common.proto";   // Import the common response codes and messages.
+
+/**
+ * ProfileRequest is the request message for fetching or identifying
+ * a profile by ID, name, or URL.
+ */
+message ProfileRequest {
+  string id = 1;    // The ID of the profile to fetch (Fastest and recommended).
+  string name = 2;  // The name of the profile to fetch (if both 'id' and 'url' are empty).
+  string url = 3;   // The URL of the profile to fetch (if both 'id' and 'name' are empty).  
+}
+
+/**
+ * AddProfileRequest is the request message for adding a profile
+ * via URL or content.
+ */
+message AddProfileRequest {
+  string url = 1;        // The URL of the profile to add.
+  string content = 2;    // The profile content to add (used if 'url' is empty).
+  string name = 3;       // The optional name of the profile.
+  bool mark_as_active = 4; // Whether to mark the profile as active.
+}
+
+/**
+ * ProfileResponse is the response message for profile service operations.
+ */
+message ProfileResponse {
+  ProfileEntity profile = 1;  // The profile entity, populated in successful operations.
+  hcommon.ResponseCode response_code = 2;   // The response code indicating success or failure.
+  string message = 3;   // A message indicating the result or error, if any.
+}
+
+/**
+ * MultiProfilesResponse is the response message for fetching multi profiles.
+ */
+message MultiProfilesResponse {
+  repeated ProfileEntity profiles = 1;  // A list of profile entities.
+  hcommon.ResponseCode response_code = 2;   // The response code indicating success or failure.
+  string message = 3;   // A message indicating the result or error, if any.
+}
+
+/**
+ * ProfileService defines the RPC methods available for managing profiles.
+ */
+service ProfileService {
+
+  /**
+   * GetProfile fetches a profile by ID, name, or URL.
+   */
+  rpc GetProfile(ProfileRequest) returns (ProfileResponse);
+
+  /**
+   * UpdateProfile updates an existing profile.
+   */
+  rpc UpdateProfile(ProfileEntity) returns (ProfileResponse);
+
+  /**
+   * GetAllProfiles fetches all profiles.
+   */
+  rpc GetAllProfiles(hcommon.Empty) returns (MultiProfilesResponse);
+
+  /**
+   * GetActiveProfile retrieves the currently active profile.
+   */
+  rpc GetActiveProfile(hcommon.Empty) returns (ProfileResponse);
+
+  /**
+   * SetActiveProfile sets a profile as active, identified by ID, name, or URL.
+   */
+  rpc SetActiveProfile(ProfileRequest) returns (hcommon.Response);
+
+  /**
+   * AddProfile adds a new profile using either a URL or the raw profile content.
+   */
+  rpc AddProfile(AddProfileRequest) returns (ProfileResponse);
+
+  /**
+   * DeleteProfile deletes a profile identified by ID, name, or URL.
+   */
+  rpc DeleteProfile(ProfileRequest) returns (hcommon.Response);
+}

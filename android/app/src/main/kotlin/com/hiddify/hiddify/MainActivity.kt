@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -48,35 +49,39 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         flutterEngine.plugins.add(PlatformSettingsHandler())
         flutterEngine.plugins.add(EventHandler())
         flutterEngine.plugins.add(LogHandler())
-        flutterEngine.plugins.add(GroupsChannel(lifecycleScope))
-        flutterEngine.plugins.add(ActiveGroupsChannel(lifecycleScope))
-        flutterEngine.plugins.add(StatsChannel(lifecycleScope))
+//        flutterEngine.plugins.add(GroupsChannel(lifecycleScope))
+//        flutterEngine.plugins.add(ActiveGroupsChannel(lifecycleScope))
+//        flutterEngine.plugins.add(StatsChannel(lifecycleScope))
     }
 
     fun reconnect() {
         connection.reconnect()
     }
 
+    @SuppressLint("NewApi")
     fun startService() {
-        if (!ServiceNotification.checkPermission()) {
-            grantNotificationPermission()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !ServiceNotification.checkPermission()) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             return
         }
+        startService0()
+    }
+
+    private fun startService0() {
         lifecycleScope.launch(Dispatchers.IO) {
             if (Settings.rebuildServiceMode()) {
-                reconnect()
+                connection.reconnect()
             }
             if (Settings.serviceMode == ServiceMode.VPN) {
                 if (prepare()) {
-                    Log.d(TAG, "VPN permission required")
                     return@launch
                 }
             }
-
             val intent = Intent(Application.application, Settings.serviceClass())
             withContext(Dispatchers.Main) {
-                ContextCompat.startForegroundService(Application.application, intent)
+                ContextCompat.startForegroundService(this@MainActivity, intent)
             }
+            Settings.startedByUser = true
         }
     }
 
@@ -84,16 +89,37 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         try {
             val intent = VpnService.prepare(this@MainActivity)
             if (intent != null) {
-                startActivityForResult(intent, VPN_PERMISSION_REQUEST_CODE)
+                prepareLauncher.launch(intent)
                 true
             } else {
                 false
             }
         } catch (e: Exception) {
             onServiceAlert(Alert.RequestVPNPermission, e.message)
-            false
+            true
         }
     }
+    private val notificationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            if (Settings.dynamicNotification && !isGranted) {
+                onServiceAlert(Alert.RequestNotificationPermission, null)
+            } else {
+                startService0()
+            }
+        }
+
+    private val prepareLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                startService0()
+            } else {
+                onServiceAlert(Alert.RequestVPNPermission, null)
+            }
+        }
 
     override fun onServiceStatusChanged(status: Status) {
         serviceStatus.postValue(status)
@@ -103,19 +129,8 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         serviceAlerts.postValue(ServiceEvent(Status.Stopped, type, message))
     }
 
-    override fun onServiceWriteLog(message: String?) {
-        if (logList.size > 300) {
-            logList.removeFirst()
-        }
-        logList.addLast(message)
-        logCallback?.invoke(false)
-    }
 
-    override fun onServiceResetLogs(messages: MutableList<String>) {
-        logList.clear()
-        logList.addAll(messages)
-        logCallback?.invoke(true)
-    }
+
 
     override fun onDestroy() {
         connection.disconnect()

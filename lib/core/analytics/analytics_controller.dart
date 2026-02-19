@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/analytics/analytics_filter.dart';
 import 'package:hiddify/core/analytics/analytics_logger.dart';
-import 'package:hiddify/core/app_info/app_info_provider.dart';
+
 import 'package:hiddify/core/logger/logger_controller.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
@@ -33,29 +33,28 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
         await _preferences.setBool(enableAnalyticsPrefKey, true);
       }
 
-      final env = ref.read(environmentProvider);
-      final appInfo = await ref.read(appInfoProvider.future);
+      // final env = ref.read(environmentProvider);
+      // final appInfo = await ref.read(appInfoProvider.future);
       final dsn = !kDebugMode || _testCrashReport ? Environment.sentryDSN : "";
       final sentryLogger = SentryLoggyIntegration();
       LoggerController.instance.addPrinter("analytics", sentryLogger);
 
-      await SentryFlutter.init(
-        (options) {
-          options.dsn = dsn;
-          options.environment = env.name;
-          options.dist = appInfo.release.name;
-          options.debug = kDebugMode;
-          options.enableNativeCrashHandling = true;
-          options.enableNdkScopeSync = true;
-          // options.attachScreenshot = true;
-          options.serverName = "";
-          options.attachThreads = true;
-          options.tracesSampleRate = 0.20;
-          options.enableUserInteractionTracing = true;
-          options.addIntegration(sentryLogger);
-          options.beforeSend = sentryBeforeSend;
-        },
-      );
+      await SentryFlutter.init((options) {
+        options.dsn = dsn;
+        // options.environment = env.name;
+        // options.dist = appInfo.release.name;
+        options.debug = kDebugMode;
+        options.enableNativeCrashHandling = true;
+        options.enableNdkScopeSync = true;
+        // options.autoAppStart = false;
+        // options.attachScreenshot = true;
+        options.serverName = "";
+        options.attachThreads = true;
+        options.tracesSampleRate = 0.20;
+        options.enableUserInteractionTracing = true;
+        options.addIntegration(sentryLogger);
+        options.beforeSend = sentryBeforeSend;
+      });
 
       state = const AsyncData(true);
     }

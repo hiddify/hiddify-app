@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
-import 'package:hiddify/features/config_option/notifier/config_option_notifier.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,12 +19,14 @@ class ConnectionWrapper extends StatefulHookConsumerWidget {
 class _ConnectionWrapperState extends ConsumerState<ConnectionWrapper> with AppLogger {
   @override
   Widget build(BuildContext context) {
-    ref.listen(connectionNotifierProvider, (_, __) {});
+    ref.listen(connectionNotifierProvider, (_, _) {});
 
     ref.listen(configOptionNotifierProvider, (previous, next) async {
       if (next case AsyncData(value: true)) {
-        final t = ref.read(translationsProvider);
-        ref.watch(inAppNotificationControllerProvider).showInfoToast(
+        final t = ref.read(translationsProvider).requireValue;
+        ref
+            .read(inAppNotificationControllerProvider)
+            .showInfoToast(
               t.connection.reconnectMsg,
               // actionText: t.connection.reconnect,
               // callback: () async {

@@ -8,6 +8,10 @@ class AppDelegate: FlutterAppDelegate {
     // https://github.com/leanflutter/window_manager/issues/214
     return false
   }
+  
+  override func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
+    return true
+  }
   override func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Request notification authorization
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge]) { granted, error in

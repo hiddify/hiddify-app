@@ -11,6 +11,7 @@ on:
        - main
        - dev
        - android-fix-action-bug
+       - new-design-v2 
     paths-ignore:
       - '**.md'
       - 'docs/**'

@@ -11,13 +11,13 @@ enum Region {
   other;
 
   String present(TranslationsEn t) => switch (this) {
-        ir => t.settings.general.regions.ir,
-        cn => t.settings.general.regions.cn,
-        ru => t.settings.general.regions.ru,
-        tr => t.settings.general.regions.tr,
-        af => t.settings.general.regions.af,
-        id => t.settings.general.regions.id,
-        br => t.settings.general.regions.br,
-        other => t.settings.general.regions.other,
-      };
+    ir => t.pages.settings.routing.regions.ir,
+    cn => t.pages.settings.routing.regions.cn,
+    ru => t.pages.settings.routing.regions.ru,
+    af => t.pages.settings.routing.regions.af,
+    id => t.pages.settings.routing.regions.id,
+    tr => t.pages.settings.routing.regions.tr,
+    br => t.pages.settings.routing.regions.br,
+    other => t.pages.settings.routing.regions.other,
+  };
 }

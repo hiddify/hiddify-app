@@ -8,15 +8,15 @@ enum ProfilesSort {
 
   String present(TranslationsEn t) {
     return switch (this) {
-      lastUpdate => t.profile.sortBy.lastUpdate,
-      name => t.profile.sortBy.name,
+      lastUpdate => t.dialogs.sortProfiles.sort.name,
+      name => t.dialogs.sortProfiles.sort.lastUpdate,
     };
   }
 
   IconData get icon => switch (this) {
-        lastUpdate => FluentIcons.history_24_regular,
-        name => FluentIcons.text_sort_ascending_24_regular,
-      };
+    lastUpdate => FluentIcons.history_24_regular,
+    name => FluentIcons.text_sort_ascending_24_regular,
+  };
 }
 
 enum SortMode { ascending, descending }

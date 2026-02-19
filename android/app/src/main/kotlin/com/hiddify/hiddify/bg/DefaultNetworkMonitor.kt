@@ -3,8 +3,13 @@ package com.hiddify.hiddify.bg
 import android.net.Network
 import android.os.Build
 import com.hiddify.hiddify.Application
-import io.nekohasekai.libbox.InterfaceUpdateListener
+import com.hiddify.core.libbox.InterfaceUpdateListener
+import com.hiddify.hiddify.constant.Bugs
 
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.net.NetworkInterface
 
 object DefaultNetworkMonitor {
@@ -41,9 +46,7 @@ object DefaultNetworkMonitor {
         checkDefaultInterfaceUpdate(defaultNetwork)
     }
 
-    private fun checkDefaultInterfaceUpdate(
-        newNetwork: Network?
-    ) {
+    private fun checkDefaultInterfaceUpdate(newNetwork: Network?) {
         val listener = listener ?: return
         if (newNetwork != null) {
             val interfaceName =
@@ -56,12 +59,10 @@ object DefaultNetworkMonitor {
                     Thread.sleep(100)
                     continue
                 }
-                listener.updateDefaultInterface(interfaceName, interfaceIndex)
+                listener.updateDefaultInterface(interfaceName, interfaceIndex, false, false)
             }
         } else {
-            listener.updateDefaultInterface("", -1)
+            listener.updateDefaultInterface("", -1, false, false)
         }
     }
-
-
 }

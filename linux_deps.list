@@ -1,0 +1,32 @@
+
+# ==============================================================
+#  ⚠️  USAGE: SHARED BY MAKEFILE & DOCKERFILE
+#  This list defines dependencies for both build environments.
+# ==============================================================
+
+# flutter sdk https://docs.flutter.dev/install/manual
+curl git unzip xz-utils zip libglu1-mesa
+
+# linux development https://docs.flutter.dev/platform-integration/linux/setup
+clang cmake ninja-build pkg-config libgtk-3-dev libstdc++-12-dev
+
+# build & run https://docs.flutter.dev/platform-integration/linux/building
+libgtk-3-0 libblkid1 liblzma5
+
+# fastforge rpm https://fastforge.dev/makers/rpm
+rpm patchelf
+
+# fastforge appimage https://fastforge.dev/makers/appimage
+locate
+
+# tray_manager https://pub.dev/packages/tray_manager
+libayatana-appindicator3-dev
+
+# for running .appimage
+fuse
+
+# Dockerfile
+make sudo wget grep sed ca-certificates
+
+# Unknown Purpose
+libcurl4-openssl-dev libglib2.0-dev file appstream

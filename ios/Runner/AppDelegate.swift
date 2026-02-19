@@ -1,7 +1,7 @@
 import UIKit
 import Flutter
-import Libcore
-
+import HiddifyCore
+import Sentry
 @main
 @objc class AppDelegate: FlutterAppDelegate {
     
@@ -26,10 +26,10 @@ import Libcore
         FileMethodHandler.register(with: self.registrar(forPlugin: FileMethodHandler.name)!)
         StatusEventHandler.register(with: self.registrar(forPlugin: StatusEventHandler.name)!)
         AlertsEventHandler.register(with: self.registrar(forPlugin: AlertsEventHandler.name)!)
-        LogsEventHandler.register(with: self.registrar(forPlugin: LogsEventHandler.name)!)
-        GroupsEventHandler.register(with: self.registrar(forPlugin: GroupsEventHandler.name)!)
-        ActiveGroupsEventHandler.register(with: self.registrar(forPlugin: ActiveGroupsEventHandler.name)!)
-        StatsEventHandler.register(with: self.registrar(forPlugin: StatsEventHandler.name)!)
+//        LogsEventHandler.register(with: self.registrar(forPlugin: LogsEventHandler.name)!)
+//        GroupsEventHandler.register(with: self.registrar(forPlugin: GroupsEventHandler.name)!)
+//        ActiveGroupsEventHandler.register(with: self.registrar(forPlugin: ActiveGroupsEventHandler.name)!)
+//        StatsEventHandler.register(with: self.registrar(forPlugin: StatsEventHandler.name)!)
     }
 }
 

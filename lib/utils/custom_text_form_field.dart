@@ -36,15 +36,10 @@ class CustomTextFormField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final textController =
-        controller ?? useTextEditingController(text: initialValue);
-    final effectiveConstraints =
-        isDense ? const BoxConstraints(maxHeight: 56) : null;
+    final textController = controller ?? useTextEditingController(text: initialValue);
+    final effectiveConstraints = isDense ? const BoxConstraints(maxHeight: 56) : null;
     final effectiveBorder = isDense
-        ? OutlineInputBorder(
-            borderRadius: BorderRadius.circular(36),
-            borderSide: BorderSide.none,
-          )
+        ? OutlineInputBorder(borderRadius: BorderRadius.circular(36), borderSide: BorderSide.none)
         : null;
 
     return TextFormField(
@@ -53,12 +48,6 @@ class CustomTextFormField extends HookConsumerWidget {
       maxLines: maxLines,
       onChanged: onChanged,
       textDirection: textController.textDirection,
-      validator: validator,
-      textInputAction: TextInputAction.next,
-      inputFormatters: inputFormatters,
-      autovalidateMode:
-          autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
-      autocorrect: autoCorrect,
       decoration: InputDecoration(
         isDense: true,
         label: label != null ? Text(label!) : null,
@@ -72,6 +61,11 @@ class CustomTextFormField extends HookConsumerWidget {
         focusedBorder: effectiveBorder,
         focusedErrorBorder: effectiveBorder,
       ),
+      validator: validator,
+      textInputAction: TextInputAction.next,
+      inputFormatters: inputFormatters,
+      autovalidateMode: autoValidate ? AutovalidateMode.always : AutovalidateMode.disabled,
+      autocorrect: autoCorrect,
     );
   }
 }

@@ -1,0 +1,14 @@
+syntax = "proto3";
+import "v2/hcommon/common.proto";
+package tunnelservice;
+
+option go_package = "github.com/hiddify/hiddify-core/v2/hcore/tunnelservice";
+option java_package = "com.hiddify.core.api.v2.hcore.tunnelservice";
+import "v2/hcore/tunnelservice/tunnel.proto";
+
+service TunnelService {
+    rpc Start(TunnelStartRequest) returns (TunnelResponse);
+    rpc Stop(hcommon.Empty) returns (TunnelResponse);
+    rpc Status(hcommon.Empty) returns (TunnelResponse);
+    rpc Exit(hcommon.Empty) returns (TunnelResponse);
+}

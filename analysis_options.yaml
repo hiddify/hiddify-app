@@ -4,11 +4,14 @@ analyzer:
   plugins:
     - custom_lint
   exclude:
-    - "libcore/**"
+    - "hiddify-core/**"
     - "**.g.dart"
     - "lib/gen/**"
   errors:
     invalid_annotation_target: ignore
+
+formatter:
+  page_width: 120
 
 linter:
   rules:

@@ -9,6 +9,7 @@ enum ProxyType {
   trojan("Trojan"),
   naive("Naive"),
   wireguard("WireGuard"),
+  awg("AWG"),
   hysteria("Hysteria"),
   tor("Tor"),
   ssh("SSH"),
@@ -17,9 +18,11 @@ enum ProxyType {
   vless("VLESS"),
   tuic("TUIC"),
   hysteria2("Hysteria2"),
+  mieru("Mieru"),
 
   selector("Selector"),
   urltest("URLTest"),
+  balancer("Balancer"),
   warp("Warp"),
 
   xvless("xVLESS"),
@@ -37,7 +40,7 @@ enum ProxyType {
 
   String get key => name;
 
-  static List<ProxyType> groupValues = [selector, urltest];
+  static List<ProxyType> groupValues = [selector, urltest, balancer];
 
   bool get isGroup => ProxyType.groupValues.contains(this);
   static final Map<String, ProxyType> _keyMap = Map.fromEntries(ProxyType.values.map((e) => MapEntry(e.key, e)));

@@ -8,9 +8,11 @@ import android.net.ProxyInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
+import android.os.ParcelFileDescriptor
+import com.hiddify.core.libbox.Notification
 import com.hiddify.hiddify.constant.PerAppProxyMode
 import com.hiddify.hiddify.ktx.toIpPrefix
-import io.nekohasekai.libbox.TunOptions
+import com.hiddify.core.libbox.TunOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -24,7 +26,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     private val service = BoxService(this, this)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) =
-        service.onStartCommand(intent, flags, startId)
+        service.onStartCommand()
 
     override fun onBind(intent: Intent): IBinder {
         val binder = super.onBind(intent)
@@ -73,10 +75,24 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     }
 
     override fun openTun(options: TunOptions): Int {
-        if (prepare(this) != null) error("android: missing vpn permission")
+        var hasPermission = false
+        for (i in 0 until 20) {
+            if (prepare(this) != null) {
+                Log.w("VPN", "android: missing vpn permission")
+            } else {
+                hasPermission = true
+                break
+            }
+            Thread.sleep(50)
+        }
+
+        if (!hasPermission) {
+             error("android: missing vpn permission")
+    }
+//        service.fileDescriptor?.close()
 
         val builder = Builder()
-            .setSession("sing-box")
+            .setSession("hiddify")
             .setMtu(options.mtu)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -96,7 +112,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
         }
 
         if (options.autoRoute) {
-            builder.addDnsServer(options.dnsServerAddress)
+            builder.addDnsServer(options.dnsServerAddress.value)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val inet4RouteAddress = options.inet4RouteAddress
@@ -150,12 +166,12 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                     appList.forEach {
                         addIncludePackage(builder,it)
                     }
-                    addIncludePackage(builder,packageName)
+//                    addIncludePackage(builder,packageName)
                 } else {
                     appList.forEach {
                         addExcludePackage(builder,it)
                     }
-                    //addExcludePackage(builder,packageName)
+                    addExcludePackage(builder,packageName)
                 }
             } else {
                 val includePackage = options.includePackage
@@ -163,14 +179,17 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                     while (includePackage.hasNext()) {
                         addIncludePackage(builder,includePackage.next())
                     }
-                }
-                val excludePackage = options.excludePackage
-                if (excludePackage.hasNext()) {
-                    while (excludePackage.hasNext()) {
-                        addExcludePackage(builder,excludePackage.next())
+                    //                    addIncludePackage(builder,packageName)
+                }else {
+                    val excludePackage = options.excludePackage
+                    if (excludePackage.hasNext()) {
+                        while (excludePackage.hasNext()) {
+                            addExcludePackage(builder, excludePackage.next())
+                        }
                     }
+
+                    addExcludePackage(builder, packageName)
                 }
-                //addExcludePackage(builder,packageName)
                 
             }
         }
@@ -188,12 +207,14 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
             systemProxyEnabled = false
         }
 
-        val pfd =
-            builder.establish() ?: error("android: the application is not prepared or is revoked")
+        val pfd = builder.establish() ?: error("android: the application is not prepared or is revoked")
         service.fileDescriptor = pfd
         return pfd.fd
     }
 
-    override fun writeLog(message: String) = service.writeLog(message)
+//    override fun writeLog(message: String) = service.writeLog(message)
 
+    override fun sendNotification(notification: Notification) {
+//        service.sendNotification(notification)
+    }
 }

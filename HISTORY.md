@@ -1,7 +1,1191 @@
 # Changelog
 
 
-## 2.5.7 (2024-10-03)
+## 4.0.0 (2026-02-12)
+
+#### New
+
+* Add more inbounds(TPROXY, REDIRECT DIRECT) disable pause on desktop. 
+
+* Add ios limits and fix workflow. 
+
+* Better connection management. 
+
+* Add up/down and active profile in android notification. 
+
+* Add HiddifyRPC in android. 
+
+* Add extra security mode. 
+
+* Add fragment button. 
+
+* Add remote config support. 
+
+* Add better platform management. 
+
+* Update the ios interface. 
+
+* Add some more checks. 
+
+* Add real active tag. 
+
+* Upgrade flutter and libs. 
+
+* Add quick setting, organize settings, fix reconnect bug, remove profile tab in mobile, use hiddifynextx forfetch profile in xray mode, update flutter. 
+
+* Refactor configs to better visualisation. 
+
+* Update ci. 
+
+* Upgrade dependencies. 
+
+* Redesign core interface. 
+
+* Add detailed  ipinfo. 
+
+* Redisgn ip panel. 
+
+* Add auto start for mac. 
+
+* Add support for auto start in macos. 
+
+* Add org flag. 
+
+#### Changes
+
+* Remove platform widget. 
+
+* Disable HTTP subscribe link as they create great issue. 
+
+* Some refactor. 
+
+#### Fix
+
+* Update step name for Flutter setup in build workflow. 
+
+* Correct syntax for conditional in Flutter setup for arm64. 
+
+* Update Flutter setup condition for non-linux-arm64 platforms. 
+
+* Bug. 
+
+* Prepare. 
+
+* Remove unused variables for zip file path in windows release process. 
+
+* Update app icon type to use stock icon for consistency. 
+
+* Update AppImage build command to disable appstream and correct file move. 
+
+* Downgrade `sentry_flutter` to remove jni dependency (avoids forced JDK installation) 
+
+* Update AppImage post-processing steps and improve Docker volume mounts. 
+
+* Update build targets for Android to include AAB format and fix windows-install-deps. 
+
+* Sticky notif. 
+
+* Update macOS version from 13 to 15 in build workflow. 
+
+* Replace flutter_distributor with fastforge for macOS and iOS packaging. 
+
+* Improve sh compatibility. 
+
+* Change variable assignment from := to = for consistency in Makefile. 
+
+* Update sed command definition for Windows compatibility. 
+
+* Workflow. 
+
+* Workflow. 
+
+* Persistent data after uninstalling Windows EXE. 
+
+* Issue in ios and imrpove stablity. 
+
+* Android bug. 
+
+* Notification AND VPN MODE  in android. 
+
+* Font json editor. 
+
+* Ios. 
+
+* Per app proxy. 
+
+* Tile service. 
+
+* Windows build issue. 
+
+* Typo. 
+
+* Bugs and improvement. 
+
+* Select tag bug. 
+
+* Makefile path issue in Windows OS. 
+
+* Linux installation. 
+
+* Ios build. 
+
+* Bug. 
+
+* Interface change and warp crash. 
+
+* Quicktile bug and update to singbox 10.3. 
+
+* Bug? 
+
+* Macos. 
+
+* Macos build. 
+
+* Emoji in profile and proxies. 
+
+* No commit message. 
+
+* Ios. 
+
+* Ios interface. 
+
+* Name changing. 
+
+* Typos for ios. 
+
+#### Other
+
+* Refactor: update InboundOptions fields and translations for direct and redirect ports. 
+
+* Add naive. 
+
+* Fix. 
+
+* Update. 
+
+* Merge pull request #36 from veto9292/new-design-v2. 
+  _CI_
+
+* Feat: add supported MIME types for app links on Linux AppImage. 
+
+* Refactor: rename macOS and iOS install dependencies targets and update activation command. 
+
+* Speedup ci. 
+
+* Merge. 
+
+* Feat: enhance logging in Makefile with color-coded output. 
+
+* Feat: add post-processing for Windows portable zip release. 
+
+* Fix CI: "copy to out" for "windows" 
+
+* Fix CI: Copy to out Windows. 
+
+* Fix CI: skipping chmod for tar. 
+
+* Fix CI: NDK version. 
+
+* Fix CI: linux AppImage build. 
+
+* Fix CI: linxu AppImage build. 
+
+* If: REQUIRED_VER in Makefile. 
+
+* Update: hiddify-core.diff. 
+
+* Generate: proto files. 
+
+* Add protoc_plugin activation to linux-install-deps. 
+
+* Fix CI "Build platform" 
+
+* Fix CI "Setup dependencies" 
+
+* Fix connection change issue and more and more optimisation. 
+
+* Update psiphon add new dns manager, fix ios ipv6 issue. 
+
+* Add proxy usage bytes, psiphon and more and more. 
+
+* New balancer approach. 
+
+* Better proxy,fix ios. 
+
+* New add amnezia, wiregaurd raw config, wiregaurd noise. 
+
+* Add inner proxy link, add debounce. 
+
+* Revert makefile. 
+
+* Fixes and improvements. 
+
+* Update ios. 
+
+* Better android vpn service start and fix bugs. 
+
+* Update android codes to latest singbox. 
+
+* Update macos. 
+
+* Update fultter. 
+
+* Merge. 
+
+* Merge pull request #34 from veto9292/small-fix/fastforge-apk-release. 
+  _fastforge migration (android, windows, linux) | storage and path | format codebase | upgrade flutter | flutter discontinued package | dart style | restore window state on Desktops | fastforge release-apk (small fix)_
+
+* Merge remote-tracking branch 'h/new-design-v2' into small-fix/fastforge-apk-release. 
+
+* Remove forgotten test parameter. 
+
+* Implement window state persistence and position validation - Added `saveWindowState` to persist window size, position, and maximized state. - Added `initWindowState` to restore window bounds with safety checks. - Implemented `checkWindowVisibility` to prevent off-screen startup in multi-monitor setups. 
+
+* Calling saveWindowState in onWindow (Resized, Moved, Maximize, Unmaximize) methods. 
+
+* Add window (position, size, maximize) preferences to general_preferences. 
+
+* Relocate 'window silent start' logic to window_notifier.dart. 
+
+* Installing 'screen_retriever' package. 
+
+* Format .dart files. 
+
+* Fix dart formatter width. 
+
+* Replace flutter_markdown with flutter_markdown_plus and update version in pubspec.yaml; adjust pubspec.lock accordingly. 
+
+* Upgrade Flutter and SDK versions; update NDK and Kotlin plugin versions; refresh package dependencies in pubspec.lock. 
+
+* Added 'Hiddify Dev Windows Portable' config to launch.json for easier testing and development of the Windows Portable version. 
+
+* Migrate release builds to fastforge and overhaul Linux/Docker systems. 
+  _This major update migrates all release pipelines (except macOS/iOS) to fastforge and completely overhauls the Linux build process.
+
+### Migration to fastforge
+- Migrated all release commands to fastforge for consistency and better management.
+- Replaced legacy build scripts with fastforge commands for Windows, Linux, and Android.
+- Android APK/AAB builds now utilize fastforge instead of raw commands.
+
+### Linux Build Refactor
+- Introduced `linux-release-docker` command.
+- Updated `linux-release-appimage` with new post-build scripts.
+- Implemented `Linux Install Deps` script:
+  - Automatically prepares the environment (Ubuntu/WSL).
+  - Clones Flutter SDK from GitHub (stable branch) instead of downloading the archive.
+  - Checks out the specific Flutter version defined in `pubspec.yaml` using `Linux Flutter Sync`.
+  - Installs required dependencies from `linux_deps.list`.
+- Rewrote AppImage packaging:
+  - Manually constructs the AppImage directory structure.
+  - Injects a custom `AppRun` script.
+  - Implements a self-contained portable data structure:
+    - Creates `hiddify.appimage.home` directory alongside the AppImage.
+    - Stores configuration and user data within this directory to keep the system clean.
+
+### Dockerized Build System
+- Added `linux-release-docker` for building Linux artifacts without a local Linux environment.
+- Caches Flutter SDK and Pub packages via Docker volumes to speed up subsequent builds.
+- Outputs artifacts to `dist_docker` directory on the host machine.
+
+### Windows Improvements
+- Updated `windows-release-zip` to include the `portable` environment variable for portable builds.
+
+### Other Changes
+- Added `linux_deps.list` to centralize dependency management.
+- Added `linux-flutter-sync` to `linux-prepare` command.
+- Introduced `LINUX_DEPS` variable to extract package list from `linux_deps.list`.
+- Introduced `REQUIRED_VER` variable to extract Flutter version from `pubspec.yaml`.
+- Added `linux-flutter-sync` command to ensure the installed Flutter version matches `pubspec.yaml`._
+
+* - Update getDatabaseDirectory to support portable mode based on the `` env var. - Create 'hiddify_portable_data' in the app directory if running in portable mode. - Add 'checkDirectoryAccess' to verify read/write permissions for the portable data folder. - Fallback to the default system path if write access to the portable directory is denied. 
+
+* - Add  environment variable to identify the Windows portable version - This variable is set during the 'windows-release-zip' build process. 
+
+* On Linux, left-clicking the tray icon opens the context menu instead of triggering `onTrayIconMouseDown`. Added a "Dashboard" menu item as a workaround to allow users to open the app window. 
+
+* - Ignore MSIX self-signed keys to prevent accidental commit of secrets - Add dist_docker directory (Docker build output) to ignored paths. 
+
+* - Enable Linux artifact building without requiring a local Linux environment (e.g., WSL or native Ubuntu) - Designed to be executed via the 'linux-release-docker' command in the Makefile. 
+
+* Add some comments. 
+
+* Pin Flutter SDK version and register new icon asset - Explicitly define Flutter SDK version in pubspec.yaml for consistency. - Note: This version is critical as it is parsed by Makefile and Dockerfile to setup the build environment. - Add 'ic_launcher_border.png' to the assets list. 
+
+* Created a dedicated list file for Linux dependencies and integrated it into both Dockerfile and Makefile. 
+
+* Switched to C++17 to ensure better compatibility with modern libraries and potential future dependencies. 
+
+* Add some comments. 
+
+* Update AppImage configuration in make_config.yaml - Remove app_run_file parameter (AppRun is now injected post-build) - Fix icon path - Update AppRun: Add install_integration to setup icons and create local .desktop entry with correct Exec path - Ensure index.theme creation if missing. 
+
+* Update deb configuration in make_config.yaml - Add comments for supported_mime_type parameter - Add user data cleanup script to postuninstall_scripts - Update postinstall_scripts to set StartupWMClass to app.hiddify.com and remove conflicting hiddify.desktop from .local. 
+
+* We decided to remove RPM packaging for the following reasons: - Flutter officially supports Debian-based systems only. - Persistent issues with dependency linking. - High maintenance overhead (requires Fedora environment setup). - Successful builds do not guarantee runtime stability on Red Hat-based systems. 
+
+* Update MSIX config in make_config.yaml - Complete the list of supported languages - Add commented-out parameters for self-signed certificate. 
+
+* Update exe configuration in make_config.yaml - Update publisher_url from hiddify-next to hiddify-app - Fix app_icon.ico path - Complete list of setup locales - Remove redundant 'executable_name' and 'output_base_file_name' parameters. 
+
+* Synchronizing main_prod.dart with main.dart. 
+
+* Removing "distribute_options.yaml" because we are using "fastforge package" command and "distribute_options.yaml" is realated to "fastforge release" command. 
+
+* Fixing riverpod issue with adding "agreed" parameter to recurcise method (applyConfigOption) and using this paramter instead of reading provider state in next call. 
+
+* Small fix/ using _prefs instead of ref.read. 
+
+* "not important" formating text for better understaning changes in next commits. 
+
+* Renaming db name and import path. 
+
+* Removing "DbV1" provider and renamign "DbV2" to "Db" 
+
+* Renaming "db_v2" to "db" and using this "db" as main database by adding onUpgrade and increasing "schemaVersion" to 5 and fixing directory issue by adding "native" parameter to "driftDatabase" method. 
+
+* Generation new steps.dart for new database. 
+
+* Removing migration helper for copying data from "db_v1" to "db_v2" 
+
+* "not important" formating text for better understaning changes in next commit. 
+
+* Updating "test\drift". auto generated with drift_dev. 
+
+* Moving "db_v1" schemas to "schemas\db" and generation "schema_v5" 
+
+* Removing "db_v2" and rename "db_v1" to "db" 
+
+* Merge branch 'new-design-v2' into remove/geo-assets. 
+
+* Update release files. 
+
+* Improve notification AND VPN MODE  in android. 
+
+* Merge pull request #30 from veto9292/remove/geo-assets. 
+  _Remove/geo assets_
+
+* Removing "get-geo-assets" target from "Makefile" 
+
+* Removing "MissingGeoAssets" from "ConnectionFailure" 
+
+* Moving "GeoAssetType" to "db_v1" 
+
+* Removing translations related to "geo-assets" 
+
+* Removing lib\features\geo_asset. 
+
+* Merge pull request #29 from veto9292/fix/reported-issues-v1. 
+  _Fix/reported issues v1_
+
+* Update/test file. auto generated with drift_dev. 
+
+* Update/ using DbV2 instead of AppDatabase. 
+
+* Comment geo asset data 'mapper | source' 
+
+* New/ run db migration from v1 to v2 in bootstrap. 
+
+* New/ db migration helper from v1 to v2. 
+
+* Improve/ renaming. add dbV2 provider. 
+
+* New/creating db_v2 that equals db_v1 v5 schema. downgrade db_v1 to v4 schema. merging tables logics with db logics. 
+
+* Update/schemas move db schema to new location and regenerate db_v1 schema_v4. 
+
+* Update/build.yaml add 'db v2' path to drift_dev. changing drift_dev path (schema_dir, db_v1). 
+
+* Fix/ with the new version of go_router, there is no need to add a navigatorKey to StatefulShellBranch to preserve its state. 
+
+* Small fix/warnings "unnecessary_underscores" 
+
+* Fix/ fixing prevent closing branch issue... removing "back_button_interceptor" and "prevent_closing_branch.dart"... upgrading go_router to 16.2.4 and using "PopScope" instead of "back_button_interceptor" package. 
+
+* Small fix/ add: Warp, Fragment, and Padding icons in Settings option. Change the icon for the 'Padding-Size' option. 
+
+* Update macos. 
+
+* Merge pull request #28 from veto9292/chore/upgrade-flutter-version. 
+  _Chore/upgrade flutter version_
+
+* Resolve dependency conflicts for Flutter upgrade. 
+  _Upgraded development dependencies to support the Flutter SDK migration
+from version 3.32.5 to 3.35.4 and resolve version solving failures._
+
+* Merge pull request #27 from veto9292/feature/i18n-refactor. 
+  _Feature/i18n refactor_
+
+* Small fix/ update pages.profiles.updateSub to updateSubscriptions. "Update connection profiles" => "Update subscriptions" 
+
+* Refactor(localization): Sync codebase with new i18n structure. 
+  _This commit adapts the application's source code to the newly restructured and renamed translation files. It ensures all UI text is correctly referenced and improves how feedback messages are handled.
+
+- Updated all translation keys throughout the source code to align with the new nested structure.
+- Added and corrected translations for user-facing toasts to provide appropriate success and failure feedback (e.g., for import/export actions).
+- Implemented logic to display newly added translations where they were previously missing._
+
+* Refactor(i18n): Restructure and clean up localization files. 
+  _- Restructured keys into a feature-based nested format for better maintainability.
+- Renamed files from strings_[locale] to [locale].i18n.json to fix tooling warnings.
+- Removed the unused Sorani Kurdish (ckb) locale._
+
+* New/ auto generated by "dart run slang configure" 
+
+* Upgrade/ slang(4.4.0 to 4.5.1) slang_flutter(4.4.0 to 4.8.0) 
+
+* Update workflow. 
+
+* Merge branch 'new-design-v2' of ssh://github.com/hiddify/hiddify-next-ios into new-design-v2. 
+
+* Merge pull request #26 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Small fix/ profile_parser_test file was updated based on the changes in 'ProfileParser' 
+
+* Update/ Improved UI/UX and aligned it with the manual section of the 'Add Profile' modal. 
+
+* Update/ using loadingState instead of (save, update, delete & isBusy). ProfileDetailsPage is now used only for editing. The profile_details_notifier was completely rewritten, and the logic for applying and saving changes has been greatly simplified. 
+
+* Update/ using Material icons instead of FluentIcons. 
+
+* Update/ UI improvment. 
+
+* Delete profile_local_override.dart. 
+
+* Small fix/ using Material Icons instead of Cupertino Icons. 
+
+* Update, fix/ fixed 'Free' profiles not updating and made minor changes to align with AddProfileNotifier.addManual. 
+
+* Update, fix/ using Material icons instead of FluentIcons. Fixed the bottom sheet not closing when showing profileDetails. 
+
+* Update/ rename method and use url to upsert. 
+
+* Update/ rename methods. 
+
+* Small fix. 
+
+* Update/ moved part of the deleteProfile logic to ProfileDataSource. replaced the abortConnection method with toggleConnection. 
+
+* Update/ updated AddProfileNotifier methods. added a Tile for isAutoUpdateDisable and to display the auto-update status. made minor changes to the Add button logic. 
+
+* Update/ prevented error display on HTTP request cancellation. removed commented-out code. separated profile addition methods (addClipboard, addManual). rewrote the add method based on profileRepository changes and removed the renaming logic. canceled the request when AddProfileNotifier is disposed. 
+
+* Update/ added profileParser and removed httpClient from the profileRepository's input parameters, adding profileParser as the new input parameter. 
+
+* Update/ removed the local-override logic that was previously added to watchActiveProfile for preserving userOverride. added renaming logic to the insert operation; if a name is duplicated, random numbers are appended to the end (using getByName) so the user can differentiate. added logic to check for a profile's existence before editing. to manage the active profile during deletion, the isActive parameter is received. If the profile being deleted is active, another profile is selected as active after its removal. 
+
+* Update/ passing the profile object to connect and reconnect. 
+
+* Update/ parameters of the connect and reconnect methods were changed for simplicity. Commented-out code was removed. applyConfigOption was rewritten to align with the profileOverride changes. 
+
+* Refactor/ deleted methods include (getByName, addByUrl, updateContent, addByContent, updateSubscription, add, patch, fetch). upsertRemote: Handles both creation and updating of remote profiles from a single entry point. It checks for an existing profile via URL to prevent duplicates. addLocal: Allows for creating profiles directly from local string content. offlineUpdate: Enables offline modifications by re-parsing the profile with new content while preserving existing headers. validateConfig: The logic has been updated to correctly handle and apply configuration overrides, which were previously ignored. removed the 'http_client' dependency from the repository. This responsibility has been moved to the 'profile_parser' to better separate concerns. a previously public field has been made private. the 'setActive' and 'deleteById' methods have been formally defined in the abstract interface. 
+
+* Refactor/ converts the static 'ProfileParser' into a service class with access to Riverpod's 'ref'. adds 'addRemote', 'addLocal', 'updateRemote', and 'offlineUpdate' methods using 'fpdart'. moves profile download logic from 'profile_repository' to 'ProfileParser' and rewrites it with 'fpdart'. adds error handling for user-cancelled downloads. reads 'useXrayCoreWhenPossible' directly from 'ref' instead of passing all settings. changes the 'parse' method's input to 'ProfileEntity', simplifying the return logic with 'profile.map'. updates the name parser hierarchy to use the link protocol as a fallback. adds logic to disable profile auto-updates via user override. 
+
+* Remove/ move 'protocol' method from 'link_parsers' to 'profile_parser' 
+
+* Update/ removed 'toEntry' and 'subInfoPatch' methods from 'ProfileEntity'. added 'toInsertEntry' and 'toUpdateEntry' methods and replaced 'map' with 'switch'. added 'userOverride' and 'populatedHeaders' to the 'toEntity' method and renamed 'testUrl' to 'profileOverride'. 
+
+* Update/ renamed 'testUrl' to 'profileOverride'. added a default value of 'Duration.zero' to 'updateInterval'. add/ added 'userOverride' and 'populatedHeaders' to the remote and local models. added a 'UserOverride' model with a version structure to ensure backward compatibility in the future. added isAutoUpdateDisable with default(false) to 'userOverride' 
+
+* Update/ changes to 'ConfigOptionRepository' class: made 'getConfigOptions' private. renamed method 'getFullSingboxConfigOption' to 'fullOptions'. added method 'fullOptionsOverrided', which applies 'profileOverride' to the 'config options' before they're sent. improved error handling with 'fpdart'. 
+
+* Update/ add 'ConfigOptionFailure' to 'ProfileFailure.invalidConfig' parameters to easily convert 'ConfigOptionFailure' to 'ProfileFailure'. add 'cancelByUser' for when an HTTP request is cancelled by the user(this helps to distinguish the error and prevent its display) 
+
+* Update/ add 'ConfigOptionFailure' to 'ConnectionFailure.invalidConfigOption' parameters to easily convert 'ConfigOptionFailure' to 'ConnectionFailure' 
+
+* Update/ schema_v5 test file(auto generated by drift_dev) 
+
+* Delete/ old drift test files. 
+
+* Update/ adding columns(userOverride, populatedHeaders) to profile table in db. renaming test_url column to profileOverride. app_database.steps.dart & drift_schema_v5.json is auto generated by drift_dev. 
+
+* Update/ en, fa translations. add(general.auto, profile.add.disableAutoUpdate, failure.profiles.canceledByUser). update(profile.detailsForm.updateInterval). 
+
+* Update/ supporting deselected state for Per-app porxy apps in UI. 
+
+* Update/ bump target/compileSdk to 36; align AGP/Kotlin. 
+
+* Fix/ deprecated warning. 
+
+* New/ apps auto selection modal. features: auto update, reset to default, changing update interval, enable or disable auto-selection, perform now. 
+
+* Update/ using db for managing state. moving and removing providers. adding shareOnGithub to notifier. removing installed apps notifier provider. 
+
+* Update/ notifying user and disabling auto-selection after a region change. 
+
+* New/ activating and managing the per-app proxy auto-selection service. 
+
+* New/ managing loading for asynchronous operations. 
+
+* New/ this service is initialized in app.dart and is responsible for auto-update functionality for auto-selection feature. It is also in charge of updating the active list in prefs. 
+
+* Update/ new sort logic with 4 priority. using hooks for getting and managing installed apps. auto sort feature. adding scroll to top feature. adding loading for share to all. adding FAB for auto selection modal. 
+
+* Fix/ AppProxyMode not found error. 
+
+* New/ AppProxyDao is for interacting with the AppProxyEntries table. 
+
+* Update/ change return types from List to Set. removing share method from repository. renaming methods. using AppProxyMode instead of PerAppProxyMode. 
+
+* New/ appProxyDataSourceProvider. 
+
+* New/remove/ adding AppPackageInfo as a replacement for InstalledPackageInfo to store installed apps. 
+
+* New/ per_app_proxy_backup model is used for import & export. 
+
+* New/ adding AppProxyMode alongside PerAppProxyMode; the difference is the lack of an off state. 
+
+* New/ PkgFlag, managing bit-flags for selected apps in per-app-proxy. 
+
+* Update/ import UI and logic for add_profile_modal.dart. 
+
+* New/update/ moving per_app_proxy_include_list & per_app_proxy_exclude_list to Preferences. adding auto_apps_selection_update_interval & auto_apps_selection_last_update. renaming autoSelectionAppsRegion to autoAppsSelectionRegion. 
+
+* New/ drift migration test files (generated by drift_dev) 
+
+* Add/update/fix/remove/ adding AppProxyEntries to db tables, fixing AppDatabase constructor, adding from4To5 and increasing schemaVersion to 5, generating drit_schema_v5 with drift_dev, removing database_connection.dart. 
+
+* New/ app_database.steps.dart generated by drift_dev. 
+
+* Move file/ moving drift schema from schemas\ to schemas\app_database. 
+
+* New/ adding AppProxyEntries to db tables. 
+
+* Fix/ adding translationsProvider to bootstrap. 
+
+* Update/ en, fa translations new: autoSelection(performNow, resetToDefault) network.share(alreadyInAuto) update: network(clearSelection) autoSelection(dialogTitle, msg, success, regionNotFound) network.share(emptyList) 
+
+* Update/ adding database and schema dir to drift_dev in build.yaml. 
+
+* New/ drift migration test files (generated by drift_dev) 
+
+* Adding method to RuleEnum for getting index of key. 
+
+* Updating en, fa translations. Using " instead of ( for autoSelection.dialogTitle. Adding positiveBtnTxt to per-app proxy share dialog. 
+
+* Improving error management and preventing possible crash for auto_selection_repository. 
+
+* Changing text "Share" to "Share To All" in per-app proxy. 
+
+* Displaying a notification dialog before sharing selected apps. 
+
+* Updation en, fa translations Adding title, dialogTitle, msg to settings.network.share. 
+
+* Merge branch 'fix/reported-issues' of https://github.com/veto9292/hiddify-next-ios into fix/reported-issues. 
+
+* Suggesting auto selection apps when changing region. 
+
+* Improving naming and logic in 'per_app_proxy_page.dart' and adding auto selection, share, import/export to the menu, sorting selected items, using menu for mode selection, setting 'hideSystemApps' with a chip. 
+
+* Improving naming and logic in 'per_app_proxy_notifier.dart' and adding methods (share, clearSelection, autoSelection, export clipboard/file, import clipboard/file). 
+
+* Add auto selection data provider and repository To get the list of proxy/bypass applications from GitHub and share the selected list as an issue. 
+
+* Removing per_app_proxy_data_providers & per_app_proxy_repository Instead, the `installed_apps` package is used. 
+
+* Using MenuAnchor instead of PopupMenuButton in settings_page. 
+
+* Updating en & fa translations adding (import, export, share) to general adding (autoSelection, share, import, export) to setting.network. 
+
+* Adding 'auto_selection_apps_region' to 'general_preferences.dart' 
+
+* Changing the order of buttons in ConfirmationDialog. 
+
+* Renaming 'okText' to 'positiveBtnTxt' for confirmation dialog. 
+
+* Merge pull request #25 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Merge branch 'new-design-v2' into fix/reported-issues. 
+
+* Better log page, upgrade to flutter 3.32.4. 
+
+* Merge branch 'new-design-v2' of ssh://github.com/hiddify/hiddify-next-ios into new-design-v2. 
+
+* Merge pull request #24 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Merge. 
+
+* Merge branch 'new-design-v2' of ssh://github.com/hiddify/hiddify-next-ios into new-design-v2. 
+
+* Merge branch 'new-design-v2' of ssh://github.com/hiddify/hiddify-next-ios into new-design-v2. 
+
+* Update flutter. 
+
+* Fixing setSkipTaskbar in macOS and renaming WindowNotifier methods. 
+
+* Updating  window_manager & tray_manager packages. 
+
+* Remove experimental feature references from settings pages and related files. 
+
+* Renaming 'inbound_options.dart' to 'inbound_options_page.dart' 
+
+* Using 'profileDataSourceProvider' instead of 'profileRepositoryProvider' in 'active_profile_notifier.dart' to prevent redundant builds. 
+
+* Removing 'distinct()' from 'profile_repository.dart' and adding it to 'profile_data_source.dart' to prevent emitting extra events. 
+
+* Removing 'async' from 'SingConfigOption' and using watch instead of read. 
+
+* Removing extra file. 
+
+* Preventing redundant builds in 'routing_config_notifier.dart' when the last profile is deleted and 'Breakpoint' is 'isMobile'. 
+
+* Fixing SideBarStatsOverview issue. 
+
+* Removing 'flutter_adaptive_scaffold' and using Flutter SDK. Updating logic related to 'Breakpoint'. 
+
+* Using 'Breakpoint' instead of Breakpoints in 'flutter_adaptive_scaffold' method. 
+
+* Using 'Breakpoint' instead of Breakpoints in 'flutter_adaptive_scaffold' method. 
+
+* Removing 'branchNavKey' and using new 'Breakpoint' logic instead of 'isSmallActive'. 
+
+* Updating 'ActiveBreakpointNotifier' update logic. 
+
+* Renaming 'is_small_active' to 'active_breakpoint_notifier'. Adding 'Breakpoint' class for storing breakpoint and helper methods for detecting the active breakpoint. Changing 'ActiveBreakpointNotifier' output to 'Breakpoint' and adding a provider named 'isMobileBreakpoint'. 
+
+* Commenting out 'PopupCountNotifier'. 
+
+* Using 'rootNavKey' instead of 'branchNavKey'. 
+
+* Using 'rootNavKey' instead of 'branchNavKey' and commenting out 'PopupCountNotifier' methods. 
+
+* Removing flutter_adaptive_scaffold from pubspec. 
+
+* Updating Flutter to 3.32.5 and upgrading pub. Updating intl to 0.20.2. Solving pub get issue by adding humanizer version 3.0.1 instead of getting from GitHub. 
+
+* Organizing per app proxy page. 
+
+* Fix import and use read instead of watch. 
+
+* Unifying the status bar and system navigation bar color with the scaffold color. 
+
+* Fixing profile disappearance (when the profile being updated is selected as the active profile) 
+
+* Improving popup hiding nav bar animation(temporary) 
+
+* Fixing Segmented Button UI in Quick Setting Modal. 
+
+* Fixing routing config rebuilding when deleting profile. 
+
+* Fixing bottom sheet overlapping with keyboard. 
+
+* Fix warp secure lable for connection button. 
+
+* Improve warp generation toast, merge warp loading logic in warp_option_notifier.dart. 
+
+* Improve out animation for bottom sheet when popup is showing. 
+
+* Fix toast direction, removing context from "in_app_notification_controller", add dismissAll() to _show. 
+
+* Removing toast handler from "profiles_modal" and "profiles_page", move toast handler for success or failure profiles update to "profiles_update_notifier" 
+
+* Preventing redundant builds by removing duplicate events from the stream and using "hasAnyProfileProvider" in routing_config_notifier.dart. 
+
+* Adding ToastificationWrapper for showing toast without context. 
+
+* Renaming and organizing files and classes related to "Profiles" 
+
+* Merge pull request #23 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Move popup_count_notifier from dialog_notifier to dedicated file. 
+
+* Rename riverpod_listenable to refresh_listenable. 
+
+* Remove disabled parameter from SideBarStatsOverview. 
+
+* Removing unnecessary files. 
+
+* Remove CustomAlertDialog from alerts.dart (move it to the dialog/widgets) 
+
+* Using dialog notifier, using new global key. 
+
+* Fix bottom sheet typo, rename root nav key. 
+
+* Merge config options with settings feature. 
+
+* Rewriting all items in settings, adding icons, organizing folder structure and files. 
+
+* Rename settings_repository to battery_optimization_repository. 
+
+* Fix imports. 
+
+* Fix imports. 
+
+* Fix imports. 
+
+* Move WarpLicenseDialog.dart to dialog\widgets, fixing import warning dialog_notifier.dart. 
+
+* Move quick settings modal to botto_sheets\widgets, fixing import warning in bottom_sheets_notifier.dart. 
+
+* Show toast instead of dialog for warp success generation. 
+
+* Fix platform_settings_notifier async issue, applying name changes, manage loading state, rewriting platform_settings_tiles and fixing loading. 
+
+* Rename settings_repository to battery_optimization_repository rename settings_data_providers to battery optimization_provider move files. 
+
+* Using dialog notifier, moving SettingTextDialog to dialog/widgets. 
+
+* Using dialog notifier moving SettingsRadioDialog to dialog/widgets. 
+
+* Using dialog notifier, moving setting_checkbox to dialog/widgets. 
+
+* Using dialog notifier. 
+
+* Using dialog notifier. 
+
+* Using dialog notifier. 
+
+* Moving proxy-info dialog to the dialog notifier, using goNamed. 
+
+* Fix bottom sheet typo, using goNamed, using dialog notifier. 
+
+* Using dialog notifier, add ref to _launchUrlWithCheck method. 
+
+* Renaming ProfilesOverviewPage to ProfilesPage, fix bottom sheet typo, use context.goNamed, removing autoImplyLeading "becase routing is fixed" 
+
+* Using dialog notifier. 
+
+* Using dialog notifier. 
+
+* Fix imports. 
+
+* Fix ref and imports. 
+
+* Using dialog notifier. 
+
+* Using dialog notifier. 
+
+* Set return type for dialog. 
+
+* Renaming LogsOverviewPage to LogsPage, use AppBar instead NestedScrollView. 
+
+* Add const to constructor, romoving SafeArea to solve UI issue,  preventing operations during loading. 
+
+* Commenting unused widget, fix bottom sheet typo. 
+
+* Remove showAddProfile and url parameter from HomePage this logic is moved to the redirect in routing-config-notifier. 
+
+* Using dialog notififer, remove showExperimentalNotice "moved to dialog notifier" 
+
+* Using dialog notifier, move showExperimenNotice logic to dialog-notifier. 
+
+* Fix import. 
+
+* Using dialog notifier, changing icons, dynamic icon for theme mode. 
+
+* Fix imports, using dialog notifier. 
+
+* Fix imports, set return type for showing dialog. 
+
+* Fix imports. 
+
+* Move new_version_dialog.dart to lib\core\router\dialog\widgets. 
+
+* Fix ref warning. 
+
+* Move about_page.dart to lib\features\about\widget. 
+
+* PreventClosingApp in routing_config_notifier.dart is used for preventing the branch from closing. It transfers the user to Home route after preventing the closing. 
+
+* Is_small_active.dart IsSmallActive is true when the breakpoint is in the small range, and false otherwise. app.dart Updating the router provider. Assigning a value to IsSmallActive. useEffect has been used for improving performance. 
+
+* CustomTransition is used for adding animation to pages in routing_config_notifier.dart. The purpose of creating this class is to prevent boilerplate code. 
+
+* RoutingConfigNotifier returns a RoutingConfig which is used for updating rConfig in GoRouterNotifier. The structure of routes is defined in RoutingConfigNotifier. The redirect method is defined in RoutingConfigNotifier. By listening to other providers, a new list of routes can be returned dynamically. 
+
+* An instance of RefreshListenable is passed to refreshListenable in GoRouterNotifier. If the notifyListeners method is called, the anonymous redirect function in RoutingConfig is executed. By using ref, a specific provider is listened to, and if it changes, the provider's value is stored globally in a variable, and notifyListeners is called. 
+
+* GoRouterNotifier creates the GoRouter instance that is passed to MaterialApp.router. It holds a RoutingConfig within itself, which gets its value updated by listening to RoutingConfigNotifier. With changes to RoutingConfig, the app's routes will change dynamically. 
+
+* Move dialogs from project to lib\core\router\dialog\widgets fix navigation logic for dialogs add translations. 
+
+* Adding the _show method for managing the number of popups, reducing boilerplate code, and managing context move all dialog to this notifier explicitly specifying a return type. 
+
+* Fix typo(buttom to bottom), adding the _show method for managing the number of popups, reducing boilerplate code, and managing context. 
+
+* Fix import, fix Ref warning, remove "error dialog", changing context that are used for displaying toast. 
+
+* Fix warning/ Ref, import, async. 
+
+* My_adaptive_layout.dart is a shell for the main navigator which is used inside StatefulShellRoute in go_router shell_route_action.dart, which stores information related to each action in my_adaptive_layout.dart. 
+
+* Move my_app_links.dart to lib\core\router\deep_linking. 
+
+* Remove/ app_router.dart, router.dart, routes.dart. 
+
+* New/ move url_protocol to lib\core\router\deep_linking\url_protocol. 
+
+* Update/ translations(en, fa) general.save general.close unknownDomains.title unknownDomains.youAreAboutToVisit unknownDomains.thisWebsiteIsNotInOurTrustedList. 
+
+* Add/ back_button_interceptor package to pubspec, update AndroidManifest (platform-specific setting) 
+
+* Update go_router and flutter_adaptive_scaffold packages, remove go_router_builder package. 
+
+* New/ show "qr dialog" for "allow connection from LAN" 
+
+* Improve/ add comment for network_info_plus package. 
+
+* Add/ network_info_plus package. 
+
+* Small fix/ profile tile radius issue. 
+
+* New/ merge warp license aggrement, seprate warp options logic, move license agreement to connection button and connection repo and more... 
+
+* New/ add missing warp license to connection_failure. 
+
+* Small fix/ warnings & rename testUrl to override. 
+
+* Improve/ add showWarpLicense & showWarpConfig dialog to dialog_notifier. 
+
+* Add translations/ failure.warp.missingLicense & missingLicenseMsg. 
+
+* Small fix/ rename testUrl to override. 
+
+* Fix/ warp license agreeement focus, rename intro page const. 
+
+* Improve/ focus logic for intro page. 
+
+* Fix/ adding a timer for syncing status with changes outside the app. 
+
+* Small fix/ add gap to app bar actions. 
+
+* Small fix/ add gap to app bar action. 
+
+* Fix/ fix warnings, fix focus issue, removing extra code related to focus management. 
+
+* Small fix/ settings_inpu_dialog warnings. 
+
+* Fix slider focus for settings_inpu_dialog.dart SettingsSliderDialog. 
+
+* Small fix/ add-profile slider focus. 
+
+* Fix/ prevent scope switch while overlay is displayed. 
+
+* Remove/ add_manual_profile_modal.dart. 
+
+* Fix/ focus issue for adaptive-scaffold, add keyboard const, fix adaptive_root_scaffold warnings. 
+
+* Small fix/ connection button focus color. 
+
+* Small fix/ improve home_page logic and ui. 
+
+* Fix/rewrite intro_page & fix rich text focus, remove _dynamicRootKey, add intro const. 
+
+* Small fix/ hide adaptive scaffold from intro, fix warnings for routes.dart. 
+
+* Fix/ merge add profile with manual modal(logic & ui), fix cancel for manual. 
+
+* Small fix/ config_options_page(async await) 
+
+* Small fix/ warning(use StringBuffer instead of String) 
+
+* Small fix/ import warning. 
+
+* Small fix/ log message. 
+
+* Package update/ launch_at_startup. 
+
+* Small fix/ fix waring for config_options_page. 
+
+* Merge pull request #22 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Small fix/ update profile_parser_test. 
+
+* Small fix/ free profile typo. 
+
+* Merge pull request #21 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Small fix/ neededFeatures(warp to warp_over_proxies) 
+
+* Fix/ free profile typo. 
+
+* New/ overriding profile name and options locally and remotely(profile, fragment, name) 
+
+* Update. 
+
+* Update core. 
+
+* Update flutter. 
+
+* Update pipeline. 
+
+* Change default connection test url to apple. 
+
+* Merge branch 'new-design-v2' of https://github.com/hiddify/hiddify-next-ios into new-design-v2. 
+
+* Merge pull request #20 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Small fix/ prefer_const_constructors. 
+
+* Small fix/ prefer_final_locals. 
+
+* Small fix/ remove commented imports. 
+
+* Small fix/ remove unused_import. 
+
+* Fix/ UI blocking during connection. 
+
+* Feature/ support for enable-warp in profile headers. 
+
+* Improve/ sync tray begavior in macOS with other Desktops. 
+
+* Improve/ add support for custom scheme in flutter. 
+
+* Setup/ add schemes for Windows. 
+
+* Setup/ add schemes for Linux. 
+
+* Setup/ add schemes for macOS. 
+
+* Setup/ add schemes for iOS. 
+
+* Setup/ add schemes for Android. 
+
+* Feature/ ability to delete active profile. 
+
+* Improve/ show sort profile dialog. 
+
+* Small fix/ format source code, fix warning. 
+
+* Small fix/ 'no active profile' dialog boxConstraints. 
+
+* Moving interrupt handling in proxy reception to core. 
+
+* Update to fultter 3.29.3. 
+
+* Add profilename in start. 
+
+* Merge branch 'new-design-v2' of https://github.com/hiddify/hiddify-next-ios into new-design-v2. 
+
+* Merge pull request #19 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Small fix/ tray manager logic, bootstrap import. 
+
+* Fix tray_manager, logic rewrite. 
+
+* Fix proxy_overview_page performance issue, improve UI. 
+
+* Hide back button for profiles_overview_page. 
+
+* Improve ux and logic for add_profile_modal by showing region specific message (translation changed) 
+
+* Custom scheme setup for registration in Windows OS (unpackaged app) 
+
+* Setup app_links for flutter, merge app_links with go_router. 
+
+* Setup app_links package for Linux. 
+
+* Setup app_links package for macOS. 
+
+* Setup app_links package for Windows OS. 
+
+* Improve performance. 
+
+* Add upload to app-draft. 
+
+* Improve windows luncher. 
+
+* Merge branch 'new-design-v2' of https://github.com/hiddify/hiddify-next-ios into new-design-v2. 
+
+* Merge pull request #18 from veto9292/fix/reported-issues. 
+  _Fix/reported issues_
+
+* Create custom_text_scroll, fix ButtonSegment over flow. 
+
+* Fix loading height for add_profile_modal. 
+
+* Justification is not possible, remove WrapAlignment.spaceBetween. 
+
+* Remove percent_indicator_premium, fix profile_tile RemainingTrafficIndicator. 
+
+* Fix per_app_proxy performance issue. 
+
+* Remove protocol_handler from Windows and macOS. 
+
+* Fix macos. 
+
+* Merge branch 'new-design-v2' of https://github.com/hiddify/hiddify-next-ios into new-design-v2. 
+
+* Merge pull request #17 from veto9292/fix/reported-issues2. 
+  _Fix/reported issues2_
+
+* Fix deep link query-parameter. 
+
+* Fix go router refreshListenable. 
+
+* Handle deep link with go router. 
+
+* Remove protocol_handler, deep_link_notifier. 
+
+* Fix bottom sheets padding. 
+
+* Fix per app proxy error. 
+
+* Edit routes location. 
+
+* Fix canChangeOption. 
+
+* Fix ChoicePreferenceWidget enable (Enable WARP/Detour Mode) 
+
+* Hide auto generated back button for settings page. 
+
+* Return to home page from settings page when back button pressed. 
+
+* Improve ux, preventing back when user intent to work with slider. 
+
+* Preventing delete selected profile. 
+
+* Update deoebdebcies. 
+
+* Merge pull request #15 from veto9292/fix/reported-issues. 
+  _fix reported issues and add en, fa translations_
+
+* Fix reported issues and add en, fa translations. 
+
+* Improve android stability. 
+
+* Upgrade flutter to 3.29.1. 
+
+* Update ios macos. 
+
+* Merge pull request #14 from veto9292/fix/proto-and-sentry. 
+  _Fix/proto and sentry_
+
+* Remove protoc_builder. 
+
+* Add .sentry-native to .gitignore. 
+
+* Delete .sentry-native folder. 
+
+* Fix route_rule.pb.dart import. 
+
+* Merge pull request #13 from veto9292/feature/route-rule. 
+  _Feature/route rule_
+
+* Route rule(not complete) 
+
+* Add route rule regex validators. 
+
+* Add riverpod_observer for better debugging. 
+
+* Config-option file import/export. 
+
+* Custom okText for confirmationDialog and fix content constraints. 
+
+* Add package to pubspec.yaml(file_picker, installed_apps, recase) 
+
+* Fix android. 
+
+* Move proto to core. 
+
+* Merge pull request #12 from veto9292/fix/add-profile. 
+  _empty region in free config mean all, fix grid crossAxisCount for single item_
+
+* Empty region mean all, fix grid crossAxisCount for single item. 
+
+* Merge pull request #11 from veto9292/update/add-profile. 
+  _update/add_profile_modal_
+
+* Update/add_profile_modal add/free profiles to add_profile_modal remove/http package from pubspec.yaml. 
+
+* Merge pull request #8 from veto9292/fix/makefile. 
+  _fix: makefile path issue in Windows OS_
+
+* Merge pull request #10 from veto9292/feature/route-rule. 
+  _add: proto packages & route_rule.proto file_
+
+* Add: proto packages & route_rule.proto file. 
+
+* Fix windows compile. 
+
+* Improve ios  and windows. 
+
+* Disallow delete active profile. 
+
+* Better connection management, add bounce and show connection error. 
+
+* Make easier access for quick setuo. 
+
+* Refactor config options. 
+
+* Update pods. 
+
+* Update sentry. 
+
+* Update. 
+
+* Update sqlite3 dependency. 
+
+* Update flutter. 
+
+* Handle profile size. 
+
+* Support correctly ios. 
+
+* Update android libs. 
+
+* Update packages. 
+
+* Show error incase of fail. 
+
+* Upgrade flutter. 
+
+* Some refactor. 
+
+* Refactor router. 
+
+* Refactor: routes. 
+
+* Update. 
+
+* Merge branch 'ios' into new-design-v2. 
+
+* Update dialog to platform dialog. 
+
+* Merge remote-tracking branch 'origin/main' into ios. 
+
+* Update CONTRIBUTING.md. 
+
+* Update README.md. 
+
+* Merge pull request #1403 from ldm0206/main. 
+  _Update translations zh-CN_
+
+* Chore: update translations with Fink 🐦 
+
+* Update. 
+
+* Update. 
+
+* Merge branch 'fix-latest' into new-design. 
+
+* Update packages and fix web issues. 
+
+* V3. 
+
+* New UI design. 
+
+* Merge remote-tracking branch 'origin/main' into ios-pv. 
+
+* Add make with love in intro. 
+
+* Improve ios UI and integrate it with os. 
+
+* Update. 
+
+* Update ios. 
+
+
+
+## v2.5.7 (2024-10-03)
 
 #### Other
 
@@ -610,6 +1794,84 @@
 
 ## v1.4.0 (2024-06-02)
 
+#### New
+
+* Add tproxy. 
+
+* Add review. 
+
+* Refactor testflight. 
+
+* Add installation dependencies for apple. 
+
+* Add ios build process. 
+
+* Add Indonesian language. 
+
+* Add hiddifycli and resolve all false positve from anti virus, auto exit during installation. 
+
+* Add support for flag emoji in proxy names. 
+
+* Add version draft. 
+
+* Auto replace signed exec. 
+
+* Update to singboc 1.8.7. 
+
+* Enable tunnel service again, add signing, msix, more log less info. 
+
+* Add ipwho.is. 
+
+* Use timezone for location detector. 
+
+* Add warp fake packet delay, add warp detour, add new ipinfo api. 
+
+* Update icon. 
+
+* Add seperated VPN service mode. 
+
+* Add some example of new warp configs. 
+
+* Update active profile and its ping, 
+
+* Change app icon to stable. 
+
+* Add unavailble mark, fix: windows release bug. 
+
+* Add macos pkg file and remove zip wrapper. 
+
+* Add custom AppRun: need forked distributor. 
+
+* Add intro based on user lang and region. 
+
+* Hide hidden nodes. 
+
+* Move running admin service to core. 
+
+* Display go errors. 
+
+* Add tunnel service for windows and linux. 
+
+* Show groups always on top. 
+
+* Change update time when selected. 
+
+* Make activated profile always in top. 
+
+* Add postfix to name if it is not unique. 
+
+* Add link parser and allow custom configs to be imported. 
+
+* Add warp option (experimental) 
+
+* Add deb and rpm build. 
+
+#### Changes
+
+* Change name to Hiddify. 
+
+* Use our flutter distrobutor version and downgrade windows version (possible fix of build error) 
+
 #### Fix
 
 * Naming bug. 
@@ -625,6 +1887,133 @@
 * Bug. 
 
 * Make dark tray icon windows-only. 
+
+* Gvisor. 
+
+* Issue. 
+
+* Isssue with singbox 1.8.9. 
+
+* Ios. 
+
+* Implementation. 
+
+* Test, update to singbox 1.8.9. 
+
+* Bug in warp config. 
+
+* Apple release. 
+
+* Bug. 
+
+* No commit message. 
+
+* Release to ios. 
+
+* Ios publishing. 
+
+* Var. 
+
+* Var. 
+
+* Vaiable issue. 
+
+* Potential fix to issue in some windows? 
+
+* Msix package. 
+
+* Signing. 
+
+* Version. 
+
+* Pub get issue? 
+
+* Build. 
+
+* Flag. 
+
+* Ip flag. 
+
+* Bug in versioned draft. 
+
+* Invalid version string for draft. 
+
+* Action bugs. 
+
+* Signing. 
+
+* Signing. 
+
+* Cert? 
+
+* Generate Warp Config on iOS. 
+  _+ pod install new packages_
+
+* Msix issue. 
+
+* Appimage fixed. issue: #513. 
+
+* Name. 
+
+* Intro page bug and fakepacket delay bug. 
+
+* Exception reporting on failing in getting ip. 
+
+* Exception when there is no active profile. 
+
+* Ip info. 
+
+* Build bug. 
+
+* Translation bug, disable signing for pull req. 
+
+* Bug in change interface listener. 
+
+* Update download paths in release page. 
+
+* Logo, add name for hiddify warp sub. 
+
+* Appimage tunnel service bug. 
+
+* Unix copy bug. 
+
+* Build linux. 
+
+* Dynamic varible in github action. 
+
+* Windows? 
+
+* Windows build? 
+
+* Typo. 
+
+* Windows build. 
+
+* Appimage build and add make req for linux. 
+
+* Service location bug in linux. 
+
+* Update of protocol handler. 
+
+* Bug in logging go erros. 
+
+* Check core before release. 
+
+* Fragment bug. 
+
+* Typo. 
+
+* Versioning issue in ios singbox platform extension. 
+
+* Release bug. 
+
+* Release bug. 
+
+* Build linux. 
+
+* Stats bug in iOS. 
+
+* Some bugs in ios. 
 
 #### Other
 
@@ -859,22 +2248,6 @@
 
 * Inlang: update translations. 
 
-
-
-## v1.1.1 (2024-03-20)
-
-#### New
-
-* Add tproxy. 
-
-#### Fix
-
-* Gvisor. 
-
-* Issue. 
-
-#### Other
-
 * Merge branch 'main' of hiddify-github:hiddify/hiddify-next. 
 
 * Merge pull request #696 from HSSkyBoy/main. 
@@ -932,32 +2305,6 @@
 * Update bug_report.yaml. 
 
 * Update bug_report.yaml. 
-
-* Fink 🐦: update translations. 
-
-* Fink 🐦: update translations. 
-
-
-
-## v1.0.0 (2024-03-18)
-
-#### New
-
-* Add review. 
-
-#### Fix
-
-* Isssue with singbox 1.8.9. 
-
-* Ios. 
-
-* Implementation. 
-
-* Test, update to singbox 1.8.9. 
-
-* Bug in warp config. 
-
-#### Other
 
 * Update release_message.md. 
 
@@ -1017,6 +2364,12 @@
 * Merge pull request #653 from alirezafarvardin/main. 
   _Update translations_
 
+* Test flight only release. 
+
+* Fink 🐦: update translations. 
+
+* Fink 🐦: update translations. 
+
 * Inlang/manage: add languageTag zh-TW. 
 
 * Inlang/manage: add languageTag zh-CN. 
@@ -1051,118 +2404,9 @@
 
 * Merge branch 'hiddify:main' into main. 
 
-* Fink 🐦: update translations. 
-
-* Test flight only release. 
-
 * Add core grpc server. 
 
-
-
-## v0.17.12 (2024-03-14)
-
-#### New
-
-* Refactor testflight. 
-
-* Add installation dependencies for apple. 
-
-* Add ios build process. 
-
-* Add Indonesian language. 
-
-* Add hiddifycli and resolve all false positve from anti virus, auto exit during installation. 
-
-* Add support for flag emoji in proxy names. 
-
-* Add version draft. 
-
-* Auto replace signed exec. 
-
-* Update to singboc 1.8.7. 
-
-* Enable tunnel service again, add signing, msix, more log less info. 
-
-* Add ipwho.is. 
-
-* Use timezone for location detector. 
-
-* Add warp fake packet delay, add warp detour, add new ipinfo api. 
-
-#### Fix
-
-* Apple release. 
-
-* Bug. 
-
-* No commit message. 
-
-* Release to ios. 
-
-* Ios publishing. 
-
-* Var. 
-
-* Var. 
-
-* Vaiable issue. 
-
-* Potential fix to issue in some windows? 
-
-* Msix package. 
-
-* Signing. 
-
-* Version. 
-
-* Pub get issue? 
-
-* Build. 
-
-* Flag. 
-
-* Ip flag. 
-
-* Bug in versioned draft. 
-
-* Invalid version string for draft. 
-
-* Action bugs. 
-
-* Signing. 
-
-* Signing. 
-
-* Cert? 
-
-* Generate Warp Config on iOS. 
-  _+ pod install new packages_
-
-* Msix issue. 
-
-* Appimage fixed. issue: #513. 
-
-* Name. 
-
-* Intro page bug and fakepacket delay bug. 
-
-* Exception reporting on failing in getting ip. 
-
-* Exception when there is no active profile. 
-
-* Ip info. 
-
-* Build bug. 
-
-* Translation bug, disable signing for pull req. 
-
-* Bug in change interface listener. 
-
-* Update download paths in release page. 
-
-* Logo, add name for hiddify warp sub. 
-
-#### Other
+* Fink 🐦: update translations. 
 
 * Update. 
 
@@ -1732,38 +2976,6 @@
 
 * Fix ip widget directionality. 
 
-* Merge branch 'main' into main. 
-
-* Inlang: update translations. 
-
-
-
-## v0.15.8 (2024-02-14)
-
-#### New
-
-* Update icon. 
-
-* Add seperated VPN service mode. 
-
-* Add some example of new warp configs. 
-
-* Update active profile and its ping, 
-
-* Change app icon to stable. 
-
-* Add unavailble mark, fix: windows release bug. 
-
-#### Changes
-
-* Change name to Hiddify. 
-
-#### Fix
-
-* Appimage tunnel service bug. 
-
-#### Other
-
 * Change ip obscure. 
 
 * Improve accessibility. 
@@ -1841,68 +3053,6 @@
 
 * Fix iOS Logger. 
 
-
-
-## v0.15.6 (2024-02-09)
-
-#### New
-
-* Add macos pkg file and remove zip wrapper. 
-
-* Add custom AppRun: need forked distributor. 
-
-* Add intro based on user lang and region. 
-
-* Hide hidden nodes. 
-
-* Move running admin service to core. 
-
-* Display go errors. 
-
-* Add tunnel service for windows and linux. 
-
-* Show groups always on top. 
-
-* Change update time when selected. 
-
-* Make activated profile always in top. 
-
-* Add postfix to name if it is not unique. 
-
-* Add link parser and allow custom configs to be imported. 
-
-#### Changes
-
-* Use our flutter distrobutor version and downgrade windows version (possible fix of build error) 
-
-#### Fix
-
-* Unix copy bug. 
-
-* Build linux. 
-
-* Dynamic varible in github action. 
-
-* Windows? 
-
-* Windows build? 
-
-* Typo. 
-
-* Windows build. 
-
-* Appimage build and add make req for linux. 
-
-* Service location bug in linux. 
-
-* Update of protocol handler. 
-
-* Bug in logging go erros. 
-
-* Check core before release. 
-
-#### Other
-
 * Refactor  build. 
 
 * Add debug build for windows. 
@@ -1928,6 +3078,8 @@
 
 * Added shared instance for LogsEventHandler. 
 
+* Merge branch 'main' into main. 
+
 * Merge pull request #414 from amirsaam/main. 
   _Log for iOS by @ Akuma_
 
@@ -1948,6 +3100,8 @@
 * Temporary disable app image build. 
 
 * Change again to ubuntu 22.04. 
+
+* Inlang: update translations. 
 
 * Update ci.yml. 
 
@@ -1983,28 +3137,6 @@
 
 * Add mux to experiments && update translations. 
 
-
-
-## v0.15.4 (2024-01-26)
-
-#### Fix
-
-* Fragment bug. 
-
-
-
-## v0.15.3 (2024-01-26)
-
-#### New
-
-* Add warp option (experimental) 
-
-#### Fix
-
-* Typo. 
-
-#### Other
-
 * Bump to singbox 1.8.4, and fix bugs. 
 
 * Refactor makefile. 
@@ -2031,39 +3163,9 @@
 
 * Update libcore. 
 
-
-
-## v0.14.20 (2024-01-21)
-
-#### Other
-
 * Update feature_request.yaml. 
 
 * Update bug_report.yaml. 
-
-
-
-## v0.14.11 (2024-01-20)
-
-#### New
-
-* Add deb and rpm build. 
-
-#### Fix
-
-* Versioning issue in ios singbox platform extension. 
-
-* Release bug. 
-
-* Release bug. 
-
-* Build linux. 
-
-* Stats bug in iOS. 
-
-* Some bugs in ios. 
-
-#### Other
 
 * Merge pull request #351 from amirsaam/main. 
   _use universal bundleid from base.xconfig_
@@ -3178,12 +4280,6 @@
 
 * Fix android arm bug. 
 
-
-
-## v0.9.1 (2023-10-15)
-
-#### Other
-
 * Update README_cn.md. 
 
 * Update README.md. 
@@ -3304,6 +4400,14 @@
 
 ## v0.8.12 (2023-10-13)
 
+#### New
+
+* Add chinese lang. 
+
+#### Changes
+
+* Remove auto release message. 
+
 #### Fix
 
 * Typo. 
@@ -3311,6 +4415,26 @@
 * Bug. 
 
 * Release names. 
+
+* Release changelog. 
+
+* Missing libs. 
+
+* Release bug. 
+
+* Release message. 
+
+* Windows build. 
+
+* Build issue. 
+
+* Bug. 
+
+* Translate. 
+
+* Hysteria2 and some links. 
+
+* Chinese translation. 
 
 #### Other
 
@@ -3414,58 +4538,6 @@
 
 * Update release template. 
 
-
-
-## v0.8.11 (2023-10-08)
-
-#### Changes
-
-* Remove auto release message. 
-
-
-
-## v0.8.10 (2023-10-08)
-
-#### Fix
-
-* Release changelog. 
-
-
-
-## v0.8.9 (2023-10-08)
-
-#### Fix
-
-* Missing libs. 
-
-
-
-## v0.8.8 (2023-10-08)
-
-#### Fix
-
-* Release bug. 
-
-
-
-## v0.8.7 (2023-10-08)
-
-#### Fix
-
-* Release message. 
-
-
-
-## v0.8.6 (2023-10-08)
-
-#### Fix
-
-* Windows build. 
-
-* Build issue. 
-
-#### Other
-
 * Merge branch 'main' of hiddify-github:hiddify/hiddify-next. 
 
 * Update release_message.md. 
@@ -3501,28 +4573,6 @@
 * Update release_message.md. 
 
 * Fix build. 
-
-
-
-## v0.8.5 (2023-10-07)
-
-#### Fix
-
-* Bug. 
-
-
-
-## v0.8.4 (2023-10-07)
-
-#### Fix
-
-* Translate. 
-
-
-
-## v0.8.3 (2023-10-07)
-
-#### Other
 
 * Add release message  and help. 
 
@@ -3578,16 +4628,6 @@
 
 * Add issue template. 
 
-
-
-## v0.8.2 (2023-10-07)
-
-#### Fix
-
-* Hysteria2 and some links. 
-
-#### Other
-
 * Update README_fa.md. 
 
 * Update README_fa.md. 
@@ -3628,20 +4668,6 @@
   _Add some features to the readme_
 
 * Add debug export to clipboard. 
-
-
-
-## v0.8.1 (2023-10-06)
-
-#### New
-
-* Add chinese lang. 
-
-#### Fix
-
-* Chinese translation. 
-
-#### Other
 
 * Update core 0.5.1. 
 
@@ -3745,24 +4771,6 @@
 
 ## v0.5.10 (2023-09-22)
 
-#### Other
-
-* Fix minor bugs. 
-
-* Fix profile update bug. 
-
-
-
-## v0.5.9 (2023-09-22)
-
-#### Other
-
-* Add build number. 
-
-
-
-## v0.5.8 (2023-09-22)
-
 #### New
 
 * Add crashlytics. 
@@ -3822,6 +4830,12 @@
 * Bug. 
 
 #### Other
+
+* Fix minor bugs. 
+
+* Fix profile update bug. 
+
+* Add build number. 
 
 * Fix ci. 
 

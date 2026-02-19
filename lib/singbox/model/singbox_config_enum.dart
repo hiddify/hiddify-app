@@ -15,8 +15,7 @@ enum ServiceMode {
 
   final String key;
 
-  static ServiceMode get defaultMode =>
-      PlatformUtils.isDesktop ? systemProxy : tun;
+  static ServiceMode get defaultMode => PlatformUtils.isDesktop ? systemProxy : tun;
 
   /// supported service mode based on platform, use this instead of [values] in UI
   static List<ServiceMode> get choices {
@@ -29,27 +28,25 @@ enum ServiceMode {
     return [proxy, tun];
   }
 
-  bool get isExperimental => switch (this) {
-        tun => PlatformUtils.isDesktop,
-        tunService => PlatformUtils.isDesktop,
-        _ => false,
-      };
+  // bool get isExperimental => switch (this) {
+  //       tun => PlatformUtils.isDesktop,
+  //       tunService => PlatformUtils.isDesktop,
+  //       _ => false,
+  //     };
 
   String present(TranslationsEn t) => switch (this) {
-        proxy => t.config.serviceModes.proxy,
-        systemProxy => t.config.serviceModes.systemProxy,
-        tun =>
-          "${t.config.serviceModes.tun}${isExperimental ? " (${t.settings.experimental})" : ""}",
-        tunService =>
-          "${t.config.serviceModes.tunService}${isExperimental ? " (${t.settings.experimental})" : ""}",
-      };
+    proxy => t.pages.settings.inbound.serviceModes.proxy,
+    systemProxy => t.pages.settings.inbound.serviceModes.systemProxy,
+    tun => t.pages.settings.inbound.serviceModes.tun,
+    tunService => t.pages.settings.inbound.serviceModes.tunService,
+  };
 
   String presentShort(TranslationsEn t) => switch (this) {
-        proxy => t.config.shortServiceModes.proxy,
-        systemProxy => t.config.shortServiceModes.systemProxy,
-        tun => t.config.shortServiceModes.tun,
-        tunService => t.config.shortServiceModes.tunService,
-      };
+    proxy => t.pages.settings.inbound.shortServiceModes.proxy,
+    systemProxy => t.pages.settings.inbound.shortServiceModes.systemProxy,
+    tun => t.pages.settings.inbound.shortServiceModes.tun,
+    tunService => t.pages.settings.inbound.shortServiceModes.tunService,
+  };
 }
 
 @JsonEnum(valueField: 'key')
@@ -64,11 +61,11 @@ enum IPv6Mode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        disable => t.config.ipv6Modes.disable,
-        enable => t.config.ipv6Modes.enable,
-        prefer => t.config.ipv6Modes.prefer,
-        only => t.config.ipv6Modes.only,
-      };
+    disable => t.pages.settings.routing.ipv6Modes.disable,
+    enable => t.pages.settings.routing.ipv6Modes.enable,
+    prefer => t.pages.settings.routing.ipv6Modes.prefer,
+    only => t.pages.settings.routing.ipv6Modes.only,
+  };
 }
 
 @JsonEnum(valueField: 'key')
@@ -83,23 +80,28 @@ enum DomainStrategy {
 
   final String key;
 
-  String get displayName => switch (this) {
-        auto => "auto",
-        _ => key,
-      };
+  String present(TranslationsEn t) => switch (this) {
+    auto => t.pages.settings.dns.domainStrategy.auto,
+    preferIpv6 => t.pages.settings.dns.domainStrategy.preferIpv6,
+    preferIpv4 => t.pages.settings.dns.domainStrategy.preferIpv4,
+    ipv4Only => t.pages.settings.dns.domainStrategy.ipv4Only,
+    ipv6Only => t.pages.settings.dns.domainStrategy.ipv6Only,
+  };
 }
 
 enum TunImplementation {
   mixed,
   system,
   gvisor;
+
+  String present(TranslationsEn t) => switch (this) {
+    mixed => t.pages.settings.inbound.tunImplementations.mixed,
+    system => t.pages.settings.inbound.tunImplementations.system,
+    gvisor => t.pages.settings.inbound.tunImplementations.gvisor,
+  };
 }
 
-enum MuxProtocol {
-  h2mux,
-  smux,
-  yamux;
-}
+enum MuxProtocol { h2mux, smux, yamux }
 
 @JsonEnum(valueField: 'key')
 enum WarpDetourMode {
@@ -111,7 +113,12 @@ enum WarpDetourMode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-        proxyOverWarp => t.config.warpDetourModes.proxyOverWarp,
-        warpOverProxy => t.config.warpDetourModes.warpOverProxy,
-      };
+    proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarp,
+    warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxy,
+  };
+
+  String presentExplain(TranslationsEn t) => switch (this) {
+    proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarpExplain,
+    warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxyExplain,
+  };
 }

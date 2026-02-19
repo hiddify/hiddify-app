@@ -3,13 +3,10 @@ import 'package:loggy/loggy.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 // modified version of https://github.com/getsentry/sentry-dart/tree/main/logging
-class SentryLoggyIntegration extends LoggyPrinter
-    implements Integration<SentryOptions> {
-  SentryLoggyIntegration({
-    LogLevel minBreadcrumbLevel = LogLevel.info,
-    LogLevel minEventLevel = LogLevel.error,
-  })  : _minBreadcrumbLevel = minBreadcrumbLevel,
-        _minEventLevel = minEventLevel;
+class SentryLoggyIntegration extends LoggyPrinter implements Integration<SentryOptions> {
+  SentryLoggyIntegration({LogLevel minBreadcrumbLevel = LogLevel.info, LogLevel minEventLevel = LogLevel.error})
+    : _minBreadcrumbLevel = minBreadcrumbLevel,
+      _minEventLevel = minEventLevel;
 
   final LogLevel _minBreadcrumbLevel;
   final LogLevel _minEventLevel;
@@ -45,10 +42,7 @@ class SentryLoggyIntegration extends LoggyPrinter
     }
 
     if (_shouldLog(record.level, _minBreadcrumbLevel)) {
-      await _hub.addBreadcrumb(
-        record.toBreadcrumb(),
-        hint: Hint.withMap({TypeCheckHint.record: record}),
-      );
+      await _hub.addBreadcrumb(record.toBreadcrumb(), hint: Hint.withMap({TypeCheckHint.record: record}));
     }
   }
 }
@@ -89,10 +83,10 @@ extension LogRecordX on LogRecord {
 
 extension LogLevelX on LogLevel {
   SentryLevel? toSentryLevel() => switch (this) {
-        LogLevel.all || LogLevel.debug => SentryLevel.debug,
-        LogLevel.info => SentryLevel.info,
-        LogLevel.warning => SentryLevel.warning,
-        LogLevel.error => SentryLevel.error,
-        _ => null,
-      };
+    LogLevel.all || LogLevel.debug => SentryLevel.debug,
+    LogLevel.info => SentryLevel.info,
+    LogLevel.warning => SentryLevel.warning,
+    LogLevel.error => SentryLevel.error,
+    _ => null,
+  };
 }

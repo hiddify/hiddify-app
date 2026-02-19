@@ -1,3 +1,4 @@
-[submodule "libcore"]
-	path = libcore
-	url = https://github.com/hiddify/hiddify-next-core
+[submodule "hiddify-core"]
+	path = hiddify-core
+	url = ssh://git@github.com/hiddify/hiddify-core
+	branch = v3

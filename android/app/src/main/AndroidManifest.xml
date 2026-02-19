@@ -30,7 +30,12 @@
         android:icon="@mipmap/ic_launcher"
         android:label="Hiddify"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="flutter_deeplinking_enabled"
+            android:value="true" />
 
         <meta-data
             android:name="android.app.shortcuts"
@@ -69,15 +74,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="sing-box" />
-                <data android:host="import-remote-profile" />
+                <data android:scheme="hiddify" />
+                <data android:scheme="v2ray" />
+                <data android:scheme="v2rayn" />
+                <data android:scheme="v2rayng" />
                 <data android:scheme="clash" />
-                <data android:host="install-config" />
                 <data android:scheme="clashmeta" />
-                <data android:scheme="hiddify" />
-                <data android:host="install-sub" />
-                <data android:scheme="hiddify" />
-                <data android:host="import" />
+                <data android:scheme="sing-box" />
+
+                <!-- <data android:host="import" />
+                <data android:host="install-config" />
+                <data android:host="import-remote-profile" />
+                <data android:host="install-sub" /> -->
             </intent-filter>
 
             <intent-filter>
@@ -122,6 +130,8 @@
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="vpn" />
+            <meta-data android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true"/>
         </service>
         <service
             android:name=".bg.ProxyService"

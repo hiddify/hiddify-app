@@ -7,7 +7,7 @@
 
 import Flutter
 import Combine
-import Libcore
+import HiddifyCore
 
 public class PlatformMethodHandler: NSObject, FlutterPlugin {
         
@@ -25,7 +25,7 @@ public class PlatformMethodHandler: NSObject, FlutterPlugin {
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "get_paths":
-            result(getPaths(args: call.arguments))
+            result(getPaths(args: call.arguments) as NSDictionary)
         default:
             result(FlutterMethodNotImplemented)
         }

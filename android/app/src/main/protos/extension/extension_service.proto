@@ -1,0 +1,19 @@
+
+
+syntax = "proto3";
+
+import "extension/extension.proto";
+import "v2/hcommon/common.proto";
+package extension;
+
+option go_package = "github.com/hiddify/hiddify-core/extension";
+option java_package = "com.hiddify.core.api.extension";
+service ExtensionHostService {
+  rpc ListExtensions (hcommon.Empty) returns (ExtensionList) {}
+  rpc Connect (ExtensionRequest) returns (stream ExtensionResponse) {}
+  rpc EditExtension (EditExtensionRequest) returns (ExtensionActionResult) {}
+  rpc SubmitForm (SendExtensionDataRequest) returns (ExtensionActionResult) {}
+  rpc Close (ExtensionRequest) returns (ExtensionActionResult) {}
+
+  rpc GetUI (ExtensionRequest) returns (ExtensionActionResult) {}
+}

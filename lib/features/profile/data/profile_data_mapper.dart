@@ -1,49 +1,64 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
-import 'package:hiddify/core/database/app_database.dart';
+import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 
 extension ProfileEntityMapper on ProfileEntity {
-  ProfileEntriesCompanion toEntry() {
-    return switch (this) {
-      RemoteProfileEntity(:final url, :final options, :final subInfo) => ProfileEntriesCompanion.insert(
-          id: id,
-          type: ProfileType.remote,
-          active: active,
-          name: name,
-          url: Value(url),
-          lastUpdate: lastUpdate,
-          updateInterval: Value(options?.updateInterval),
-          upload: Value(subInfo?.upload),
-          download: Value(subInfo?.download),
-          total: Value(subInfo?.total),
-          expire: Value(subInfo?.expire),
-          webPageUrl: Value(subInfo?.webPageUrl),
-          supportUrl: Value(subInfo?.supportUrl),
-          testUrl: Value(testUrl),
-        ),
-      LocalProfileEntity() => ProfileEntriesCompanion.insert(
-          id: id,
-          type: ProfileType.local,
-          active: active,
-          name: name,
-          lastUpdate: lastUpdate,
-        ),
-    };
-  }
-}
+  ProfileEntriesCompanion toInsertEntry() => map(
+    remote: (rp) => ProfileEntriesCompanion.insert(
+      id: rp.id,
+      type: ProfileType.remote,
+      active: rp.active,
+      name: rp.name,
+      url: Value(rp.url),
+      lastUpdate: rp.lastUpdate,
+      updateInterval: Value(rp.options?.updateInterval),
+      populatedHeaders: Value(jsonEncode(rp.populatedHeaders)),
+      profileOverride: Value(rp.profileOverride),
+      userOverride: Value(rp.userOverride?.toStr()),
+      upload: Value(rp.subInfo?.upload),
+      download: Value(rp.subInfo?.download),
+      total: Value(rp.subInfo?.total),
+      expire: Value(rp.subInfo?.expire),
+      webPageUrl: Value(rp.subInfo?.webPageUrl),
+      supportUrl: Value(rp.subInfo?.supportUrl),
+    ),
+    local: (lp) => ProfileEntriesCompanion.insert(
+      id: lp.id,
+      type: ProfileType.local,
+      active: lp.active,
+      name: lp.name,
+      lastUpdate: lp.lastUpdate,
+      populatedHeaders: Value(jsonEncode(lp.populatedHeaders)),
+      profileOverride: Value(lp.profileOverride),
+      userOverride: Value(lp.userOverride?.toStr()),
+    ),
+  );
 
-extension RemoteProfileEntityMapper on RemoteProfileEntity {
-  ProfileEntriesCompanion subInfoPatch() {
-    return ProfileEntriesCompanion(
-      upload: Value(subInfo?.upload),
-      download: Value(subInfo?.download),
-      total: Value(subInfo?.total),
-      expire: Value(subInfo?.expire),
-      webPageUrl: Value(subInfo?.webPageUrl),
-      supportUrl: Value(subInfo?.supportUrl),
-      testUrl: Value(testUrl),
-    );
-  }
+  ProfileEntriesCompanion toUpdateEntry() => map(
+    remote: (rp) => ProfileEntriesCompanion(
+      name: Value(rp.name),
+      lastUpdate: Value(rp.lastUpdate),
+      updateInterval: Value(rp.options?.updateInterval),
+      populatedHeaders: Value(jsonEncode(rp.populatedHeaders)),
+      profileOverride: Value(rp.profileOverride),
+      userOverride: Value(rp.userOverride?.toStr()),
+      upload: Value(rp.subInfo?.upload),
+      download: Value(rp.subInfo?.download),
+      total: Value(rp.subInfo?.total),
+      expire: Value(rp.subInfo?.expire),
+      webPageUrl: Value(rp.subInfo?.webPageUrl),
+      supportUrl: Value(rp.subInfo?.supportUrl),
+    ),
+    local: (lp) => ProfileEntriesCompanion(
+      name: Value(lp.name),
+      lastUpdate: Value(lp.lastUpdate),
+      populatedHeaders: Value(jsonEncode(lp.populatedHeaders)),
+      profileOverride: Value(lp.profileOverride),
+      userOverride: Value(lp.userOverride?.toStr()),
+    ),
+  );
 }
 
 extension ProfileEntryMapper on ProfileEntry {
@@ -64,25 +79,35 @@ extension ProfileEntryMapper on ProfileEntry {
         supportUrl: supportUrl,
       );
     }
+    Map<String, dynamic>? mPopulatedHeaders;
+
+    if (populatedHeaders != null) {
+      final m = jsonDecode(populatedHeaders!) as Map;
+      mPopulatedHeaders = m.cast<String, dynamic>();
+    }
 
     return switch (type) {
       ProfileType.remote => RemoteProfileEntity(
-          id: id,
-          active: active,
-          name: name,
-          url: url!,
-          lastUpdate: lastUpdate,
-          options: options,
-          subInfo: subInfo,
-          testUrl: testUrl,
-        ),
+        id: id,
+        active: active,
+        name: name,
+        url: url!,
+        lastUpdate: lastUpdate,
+        options: options,
+        subInfo: subInfo,
+        populatedHeaders: mPopulatedHeaders,
+        profileOverride: profileOverride,
+        userOverride: UserOverride.fromStr(userOverride),
+      ),
       ProfileType.local => LocalProfileEntity(
-          id: id,
-          active: active,
-          name: name,
-          lastUpdate: lastUpdate,
-          testUrl: testUrl,
-        ),
+        id: id,
+        active: active,
+        name: name,
+        lastUpdate: lastUpdate,
+        populatedHeaders: mPopulatedHeaders,
+        profileOverride: profileOverride,
+        userOverride: UserOverride.fromStr(userOverride),
+      ),
     };
   }
 }

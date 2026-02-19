@@ -1,0 +1,33 @@
+syntax = "proto3";
+import "v2/hcommon/common.proto";
+package hcore;
+
+option go_package = "github.com/hiddify/hiddify-core/v2/hcore";
+option java_package = "com.hiddify.core.api.v2.hcore";
+import "v2/hcore/hcore.proto";
+
+service Core {
+  rpc Start (StartRequest) returns (CoreInfoResponse);
+  rpc CoreInfoListener (hcommon.Empty) returns (stream CoreInfoResponse);
+  rpc OutboundsInfo (hcommon.Empty) returns (stream OutboundGroupList);
+  rpc MainOutboundsInfo (hcommon.Empty) returns (stream OutboundGroupList);
+  rpc GetSystemInfo (hcommon.Empty) returns (SystemInfo);
+  rpc GetSystemInfoStream (hcommon.Empty) returns (stream SystemInfo);
+  rpc Setup (SetupRequest) returns (hcommon.Response);
+  rpc Parse (ParseRequest) returns (ParseResponse);
+  rpc ChangeHiddifySettings (ChangeHiddifySettingsRequest) returns (CoreInfoResponse);
+  //rpc GenerateConfig (GenerateConfigRequest) returns (GenerateConfigResponse);
+  rpc StartService (StartRequest) returns (CoreInfoResponse);
+  rpc Stop (hcommon.Empty) returns (CoreInfoResponse);
+  rpc Restart (StartRequest) returns (CoreInfoResponse);
+  rpc SelectOutbound (SelectOutboundRequest) returns (hcommon.Response);
+  rpc UrlTest (UrlTestRequest) returns (hcommon.Response);
+  rpc UrlTestActive (hcommon.Empty) returns (hcommon.Response);
+  rpc GenerateWarpConfig (GenerateWarpConfigRequest) returns (WarpGenerationResponse);
+  rpc GetSystemProxyStatus (hcommon.Empty) returns (SystemProxyStatus);
+  rpc SetSystemProxyEnabled (SetSystemProxyEnabledRequest) returns (hcommon.Response);
+  rpc LogListener (LogRequest) returns (stream LogMessage); 
+  rpc Close (CloseRequest) returns (hcommon.Empty); 
+}
+
+

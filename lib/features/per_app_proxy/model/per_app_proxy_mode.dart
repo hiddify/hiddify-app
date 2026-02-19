@@ -8,17 +8,44 @@ enum PerAppProxyMode {
   bool get enabled => this != off;
 
   ({String title, String message}) present(TranslationsEn t) => switch (this) {
-        off => (
-            title: t.settings.network.perAppProxyModes.off,
-            message: t.settings.network.perAppProxyModes.offMsg,
-          ),
-        include => (
-            title: t.settings.network.perAppProxyModes.include,
-            message: t.settings.network.perAppProxyModes.includeMsg,
-          ),
-        exclude => (
-            title: t.settings.network.perAppProxyModes.exclude,
-            message: t.settings.network.perAppProxyModes.excludeMsg,
-          ),
-      };
+    off => (
+      title: t.pages.settings.routing.perAppProxy.modes.all,
+      message: t.pages.settings.routing.perAppProxy.modes.allMsg,
+    ),
+    include => (
+      title: t.pages.settings.routing.perAppProxy.modes.proxy,
+      message: t.pages.settings.routing.perAppProxy.modes.proxyMsg,
+    ),
+    exclude => (
+      title: t.pages.settings.routing.perAppProxy.modes.bypass,
+      message: t.pages.settings.routing.perAppProxy.modes.bypassMsg,
+    ),
+  };
+
+  AppProxyMode? toAppProxy() => switch (this) {
+    PerAppProxyMode.off => null,
+    PerAppProxyMode.include => AppProxyMode.include,
+    PerAppProxyMode.exclude => AppProxyMode.exclude,
+  };
+}
+
+enum AppProxyMode {
+  include,
+  exclude;
+
+  PerAppProxyMode toPerAppProxy() => switch (this) {
+    AppProxyMode.include => PerAppProxyMode.include,
+    AppProxyMode.exclude => PerAppProxyMode.exclude,
+  };
+
+  ({String title, String message}) present(Translations t) => switch (this) {
+    include => (
+      title: t.pages.settings.routing.perAppProxy.modes.proxy,
+      message: t.pages.settings.routing.perAppProxy.modes.proxyMsg,
+    ),
+    exclude => (
+      title: t.pages.settings.routing.perAppProxy.modes.bypass,
+      message: t.pages.settings.routing.perAppProxy.modes.bypassMsg,
+    ),
+  };
 }

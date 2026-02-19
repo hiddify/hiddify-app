@@ -9,15 +9,11 @@ class ProfileDetailsState with _$ProfileDetailsState {
   const ProfileDetailsState._();
 
   const factory ProfileDetailsState({
+    required AsyncValue<void> loadingState,
     required ProfileEntity profile,
-    @Default(false) bool isEditing,
-    @Default(false) bool showErrorMessages,
-    AsyncValue<void>? save,
-    AsyncValue<void>? update,
-    AsyncValue<void>? delete,
-    @Default("") String configContent,
-    @Default(false) bool configContentChanged,
+    required String configContent,
+    required bool isDetailsChanged,
   }) = _ProfileDetailsState;
 
-  bool get isBusy => save is AsyncLoading || delete is AsyncLoading || update is AsyncLoading;
+  bool get isLoading => loadingState is AsyncLoading;
 }

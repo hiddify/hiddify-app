@@ -6,6 +6,9 @@ targets:
           explicit_to_json: true
       drift_dev:
         options:
+          databases:
+            db: "lib/core/db/db.dart"
+          schema_dir: "lib/core/db/schemas"
           store_date_time_values_as_text: true
       slang_build_runner:
         options:
@@ -17,3 +20,13 @@ targets:
           output_file_name: translations.g.dart
           translation_class_visibility: public
           locale_handling: false
+      # protoc_builder:
+      #   options:
+      #     protobuf_version: "3.1.0"
+      #     protoc_plugin_version: "21.1.2"
+      #     root_dir: "assets/proto"
+      #     proto_paths:
+      #       - "assets/proto"
+      #     out_dir: "lib/gen/proto"
+      #     use_installed_protoc: true
+      #     precompile_protoc_plugin: false

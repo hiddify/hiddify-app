@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -17,59 +19,50 @@ class ShortcutWrapper extends HookConsumerWidget {
       shortcuts: {
         // Android TV D-pad select support
         LogicalKeySet(LogicalKeyboardKey.select): const ActivateIntent(),
+        if (!kIsWeb) ...{
+          if (Platform.isLinux) ...{
+            // quit app using Control+Q on Linux
+            const SingleActivator(LogicalKeyboardKey.keyQ, control: true): QuitAppIntent(),
+          },
+          if (Platform.isMacOS) ...{
+            // close window using Command+W on macOS
+            const SingleActivator(LogicalKeyboardKey.keyW, meta: true): CloseWindowIntent(),
 
-        if (Platform.isLinux) ...{
-          // quit app using Control+Q on Linux
-          const SingleActivator(LogicalKeyboardKey.keyQ, control: true):
-              QuitAppIntent(),
+            // open settings using Command+, on macOS
+            const SingleActivator(LogicalKeyboardKey.comma, meta: true): OpenSettingsIntent(),
+          },
         },
-
-        if (Platform.isMacOS) ...{
-          // close window using Command+W on macOS
-          const SingleActivator(LogicalKeyboardKey.keyW, meta: true):
-              CloseWindowIntent(),
-
-          // open settings using Command+, on macOS
-          const SingleActivator(LogicalKeyboardKey.comma, meta: true):
-              OpenSettingsIntent(),
-        },
-
         // try adding profile using Command+V and Control+V
-        const SingleActivator(LogicalKeyboardKey.keyV, meta: true):
-            PasteIntent(),
-        const SingleActivator(LogicalKeyboardKey.keyV, control: true):
-            PasteIntent(),
+        const SingleActivator(LogicalKeyboardKey.keyV, meta: true): PasteIntent(),
+        const SingleActivator(LogicalKeyboardKey.keyV, control: true): PasteIntent(),
       },
       child: Actions(
         actions: {
           CloseWindowIntent: CallbackAction(
             onInvoke: (_) async {
-              await ref.read(windowNotifierProvider.notifier).close();
+              await ref.read(windowNotifierProvider.notifier).hide();
               return null;
             },
           ),
           QuitAppIntent: CallbackAction(
             onInvoke: (_) async {
-              await ref.read(windowNotifierProvider.notifier).quit();
+              await ref.read(windowNotifierProvider.notifier).exit();
               return null;
             },
           ),
           OpenSettingsIntent: CallbackAction(
             onInvoke: (_) {
-              if (rootNavigatorKey.currentContext != null) {
-                const SettingsRoute().go(rootNavigatorKey.currentContext!);
+              if (rootNavKey.currentContext != null) {
+                // const SettingsRoute().go(rootNavigatorKey.currentContext!);
               }
               return null;
             },
           ),
           PasteIntent: CallbackAction(
             onInvoke: (_) async {
-              if (rootNavigatorKey.currentContext != null) {
-                final captureResult =
-                    await Clipboard.getData(Clipboard.kTextPlain)
-                        .then((value) => value?.text ?? '');
-                AddProfileRoute(url: captureResult)
-                    .push(rootNavigatorKey.currentContext!);
+              if (rootNavKey.currentContext != null) {
+                final captureResult = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
+                ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: captureResult);
               }
               return null;
             },

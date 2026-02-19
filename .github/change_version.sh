@@ -30,7 +30,7 @@ git tag ${TAG} > /dev/null
 
 gitchangelog > HISTORY.md || { git tag -d ${TAG}; echo "Please run pip install gitchangelog pystache mustache markdown"; exit 2; } 
 git tag -d ${TAG} > /dev/null 
-git add libcore dependencies.properties ios/Runner.xcodeproj/project.pbxproj pubspec.yaml windows/packaging/msix/make_config.yaml HISTORY.md 
+git add hiddify-core dependencies.properties ios/Runner.xcodeproj/project.pbxproj pubspec.yaml windows/packaging/msix/make_config.yaml HISTORY.md 
 git commit -m "release: version ${TAG}" 
 echo "creating git tag : v${TAG}" 
 git push 

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
-import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
-import 'package:hiddify/features/window/widget/window_closing_dialog.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -51,8 +51,8 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
 
   @override
   Future<void> onWindowClose() async {
-    if (RootScaffold.stateKey.currentContext == null) {
-      await ref.read(windowNotifierProvider.notifier).close();
+    if (rootNavKey.currentContext == null) {
+      await ref.read(windowNotifierProvider.notifier).hide();
       return;
     }
 
@@ -60,18 +60,35 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
       case ActionsAtClosing.ask:
         if (isWindowClosingDialogOpened) return;
         isWindowClosingDialogOpened = true;
-        await showDialog(
-          context: RootScaffold.stateKey.currentContext!,
-          builder: (BuildContext context) => const WindowClosingDialog(),
-        );
+        await ref.read(dialogNotifierProvider.notifier).showWindowClosing();
         isWindowClosingDialogOpened = false;
 
       case ActionsAtClosing.hide:
-        await ref.read(windowNotifierProvider.notifier).close();
+        await ref.read(windowNotifierProvider.notifier).hide();
 
       case ActionsAtClosing.exit:
-        await ref.read(windowNotifierProvider.notifier).quit();
+        await ref.read(windowNotifierProvider.notifier).exit();
     }
+  }
+
+  @override
+  Future<void> onWindowResized() async {
+    await ref.read(windowNotifierProvider.notifier).saveWindowState();
+  }
+
+  @override
+  Future<void> onWindowMoved() async {
+    await ref.read(windowNotifierProvider.notifier).saveWindowState();
+  }
+
+  @override
+  Future<void> onWindowMaximize() async {
+    await ref.read(windowNotifierProvider.notifier).saveWindowState();
+  }
+
+  @override
+  Future<void> onWindowUnmaximize() async {
+    await ref.read(windowNotifierProvider.notifier).saveWindowState();
   }
 
   @override

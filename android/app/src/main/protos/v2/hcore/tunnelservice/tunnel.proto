@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package tunnelservice;
+
+option go_package = "github.com/hiddify/hiddify-core/v2/hcore/tunnelservice";
+option java_package = "com.hiddify.core.api.v2.tunnelservice";
+
+
+
+message TunnelStartRequest {
+    bool ipv6 = 1;
+    int32 server_port = 2;
+    string server_username=3;
+    string server_password=4;
+    bool strict_route = 5;
+    bool endpoint_independent_nat = 6;
+    string stack = 7;
+}
+
+message TunnelResponse {
+    string message = 1;
+}

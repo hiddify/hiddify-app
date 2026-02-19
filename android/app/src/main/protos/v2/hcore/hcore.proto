@@ -1,0 +1,234 @@
+syntax = "proto3";
+import "v2/hcommon/common.proto";
+import "google/protobuf/timestamp.proto";
+
+package hcore;
+option go_package = "github.com/hiddify/hiddify-core/v2/hcore";
+option java_package = "com.hiddify.core.api.v2.hcore";
+
+
+enum CoreStates {
+  STOPPED = 0;
+  STARTING = 1;
+  STARTED = 2;
+  STOPPING = 3;
+}
+
+enum MessageType {
+  EMPTY=0;
+  EMPTY_CONFIGURATION = 1;
+  START_COMMAND_SERVER = 2;
+  CREATE_SERVICE = 3;
+  START_SERVICE = 4;
+  UNEXPECTED_ERROR = 5;
+  ALREADY_STARTED = 6;
+  ALREADY_STOPPED = 7;
+  INSTANCE_NOT_FOUND = 8;
+  INSTANCE_NOT_STOPPED = 9;
+  INSTANCE_NOT_STARTED = 10;
+  ERROR_BUILDING_CONFIG = 11;
+  ERROR_PARSING_CONFIG = 12;
+  ERROR_READING_CONFIG = 13;
+  ERROR_EXTENSION = 14;
+}
+
+message CoreInfoResponse {
+  CoreStates core_state = 1;
+  MessageType message_type = 2;
+  string message = 3;
+}
+
+message StartRequest {
+  string config_path = 1;
+  string config_content = 2;  // Optional if configPath is not provided.
+  bool disable_memory_limit = 3;
+  bool delay_start = 4;
+  bool enable_old_command_server = 5;
+  bool enable_raw_config = 6;
+  string config_name = 7; 
+}
+
+
+enum SetupMode {
+    OLD = 0;
+    GRPC_NORMAL = 1;
+    GRPC_BACKGROUND = 2;
+    GRPC_NORMAL_INSECURE = 3;
+    GRPC_BACKGROUND_INSECURE = 4;
+}
+
+message CloseRequest {
+  SetupMode mode = 1;
+}
+// Define the message equivalent of SetupParameters
+message SetupRequest {
+    string base_path = 1;
+    string working_dir = 2;
+    string temp_dir = 3;
+    int64 flutter_status_port = 4;
+    string listen = 5;
+    string secret = 6;
+    bool debug = 7;
+    SetupMode mode = 8;
+    bool fix_android_stack = 9;
+}
+
+message SystemInfo {
+  int64 memory = 1;
+  int32 goroutines = 2;
+  int32 connections_in = 3;
+  int32 connections_out = 4;
+  bool traffic_available = 5;
+  int64 uplink = 6;
+  int64 downlink = 7;
+  int64 uplink_total = 8;
+  int64 downlink_total = 9;
+  string current_outbound = 10;
+  string current_profile = 11;
+}
+
+message OutboundInfo {
+  string tag = 1;
+  string type = 2;
+  google.protobuf.Timestamp url_test_time = 3;
+  int32 url_test_delay = 4;
+  optional IpInfo ipinfo = 5;
+  bool is_selected = 6;
+  bool is_group = 7;
+  optional string group_selected_tag=13;
+  optional string group_selected_tag_display=14;
+  bool is_secure = 8;
+  bool is_visible = 9;
+  uint32 port = 10;
+  string host = 11;
+  string tag_display = 12;
+  int64 upload = 15;
+  int64 download = 16;
+}
+
+message IpInfo {
+    string ip = 1 [json_name = "ip"];                        // The IP address.
+    string country_code = 2 [json_name = "country_code"];    // The country code.
+    string region = 3 [json_name = "region"];                // The region (optional).
+    string city = 4 [json_name = "city"];                    // The city (optional).
+    int32 asn = 5 [json_name = "asn"];                       // The Autonomous System Number (optional).
+    string org = 6 [json_name = "org"];                      // The organization (optional).
+    double latitude = 7 [json_name = "latitude"];            // The latitude (optional).
+    double longitude = 8 [json_name = "longitude"];          // The longitude (optional).
+    string postal_code = 9 [json_name = "postal_code"];      // The postal code (optional).
+}
+message OutboundGroup {
+  string tag = 1;
+  string type = 2;
+  string selected=3;
+  bool selectable=4;
+  bool Is_expand=5;
+  repeated OutboundInfo items = 6;
+  
+}
+message OutboundGroupList{
+  repeated OutboundGroup items = 1;
+}
+
+message WarpAccount {
+  string account_id = 1;
+  string access_token = 2;
+}
+
+message WarpWireguardConfig {
+  string private_key = 1 [json_name = "private-key"];
+  string local_address_ipv4 = 2 [json_name = "local-address-ipv4"];
+  string local_address_ipv6 = 3 [json_name = "local-address-ipv6"];
+  string peer_public_key = 4 [json_name = "peer-public-key"];
+  string client_id=5 [json_name = "client-id"];
+}
+
+message WarpGenerationResponse {
+  WarpAccount account = 1;
+  string log = 2;
+  WarpWireguardConfig config = 3;
+}
+
+message SystemProxyStatus {
+  bool available = 1;
+  bool enabled = 2;
+}
+
+message ParseRequest {
+  string content = 1; 
+  string config_path = 2; 
+  string temp_path = 3; 
+  bool debug = 4;
+}
+
+message ParseResponse {
+  hcommon.ResponseCode response_code = 1;
+  string content = 2;  
+  string message = 3;
+}
+
+message ChangeHiddifySettingsRequest {
+  string hiddify_settings_json = 1;
+}
+
+message GenerateConfigRequest {
+  string path = 1;
+  string temp_path = 2;
+  bool debug = 3;
+}
+
+message GenerateConfigResponse {
+  string config_content = 1;
+}
+
+
+
+message SelectOutboundRequest {
+  string group_tag = 1;
+  string outbound_tag = 2;
+}
+
+message UrlTestRequest {
+  string tag = 1;
+}
+
+message GenerateWarpConfigRequest {
+  string license_key = 1;
+  string account_id = 2;
+  string access_token = 3;
+}
+
+message SetSystemProxyEnabledRequest {
+  bool is_enabled = 1;
+}
+
+enum LogLevel {
+  TRACE = 0; 
+  DEBUG = 1;
+  INFO = 2;
+  WARNING = 3;
+  ERROR = 4;
+  FATAL = 5;
+}
+enum LogType {
+  CORE = 0;
+  SERVICE = 1;
+  CONFIG = 2;
+}
+message LogMessage {
+  LogLevel level = 1;
+  LogType type = 2;
+  string message = 3;
+  google.protobuf.Timestamp time = 4;
+}
+
+message LogRequest {
+  LogLevel level = 1;
+}
+
+message StopRequest{
+}
+
+
+
+

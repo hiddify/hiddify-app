@@ -3,12 +3,10 @@ import 'dart:io';
 import 'package:hiddify/core/logger/custom_logger.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:loggy/loggy.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class LoggerController extends LoggyPrinter with InfraLogger {
-  LoggerController(
-    this.consolePrinter,
-    this.otherPrinters,
-  );
+  LoggerController(this.consolePrinter, this.otherPrinters);
 
   final LoggyPrinter consolePrinter;
   final Map<String, LoggyPrinter> otherPrinters;
@@ -22,23 +20,17 @@ class LoggerController extends LoggyPrinter with InfraLogger {
   }
 
   static void init(String appLogPath) {
-    _instance = LoggerController(
-      const ConsolePrinter(),
-      {"app": FileLogPrinter(appLogPath)},
-    );
+    _instance = LoggerController(const ConsolePrinter(), {"app": kIsWeb ? const ConsolePrinter() : FileLogPrinter(appLogPath)});
     Loggy.initLoggy(logPrinter: _instance);
   }
 
   static Future<void> postInit(bool debugMode) async {
-    final logLevel = debugMode ? LogLevel.all : LogLevel.info;
+    final logLevel = debugMode && false ? LogLevel.all : LogLevel.info;
     final logToFile = debugMode || (!Platform.isAndroid && !Platform.isIOS);
 
-    if (!logToFile) _instance.removePrinter("app");
+    if (!logToFile || kIsWeb) _instance.removePrinter("app");
 
-    Loggy.initLoggy(
-      logPrinter: _instance,
-      logOptions: LogOptions(logLevel),
-    );
+    Loggy.initLoggy(logPrinter: _instance, logOptions: LogOptions(logLevel));
   }
 
   void addPrinter(String name, LoggyPrinter printer) {

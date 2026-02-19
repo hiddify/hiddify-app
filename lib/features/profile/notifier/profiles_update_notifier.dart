@@ -1,4 +1,6 @@
 import 'package:dartx/dartx.dart';
+import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
@@ -13,8 +15,7 @@ part 'profiles_update_notifier.g.dart';
 typedef ProfileUpdateStatus = ({String name, bool success});
 
 @Riverpod(keepAlive: true)
-class ForegroundProfilesUpdateNotifier
-    extends _$ForegroundProfilesUpdateNotifier with AppLogger {
+class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifier with AppLogger {
   static const prefKey = "profiles_update_check";
   static const interval = Duration(minutes: 15);
 
@@ -63,20 +64,13 @@ class ForegroundProfilesUpdateNotifier
     }
 
     try {
-      final previousRun = DateTime.tryParse(
-        ref.read(sharedPreferencesProvider).requireValue.getString(prefKey) ??
-            "",
-      );
+      final previousRun = DateTime.tryParse(ref.read(sharedPreferencesProvider).requireValue.getString(prefKey) ?? "");
 
-      if (!force &&
-          previousRun != null &&
-          previousRun.add(interval) > DateTime.now()) {
+      if (!force && previousRun != null && previousRun.add(interval) > DateTime.now()) {
         loggy.debug("too soon! previous run: [$previousRun]");
         return;
       }
-      loggy.debug(
-        "${force ? "[FORCED] " : ""}running, previous run: [$previousRun]",
-      );
+      loggy.debug("${force ? "[FORCED] " : ""}running, previous run: [$previousRun]");
 
       final remoteProfiles = await ref
           .read(profileRepositoryProvider)
@@ -92,25 +86,27 @@ class ForegroundProfilesUpdateNotifier
 
       await for (final profile in Stream.fromIterable(remoteProfiles)) {
         final updateInterval = profile.options?.updateInterval;
-        if (force ||
-            updateInterval != null &&
-                updateInterval <=
-                    DateTime.now().difference(profile.lastUpdate)) {
+        if (force || updateInterval != null && updateInterval <= DateTime.now().difference(profile.lastUpdate)) {
+          final t = ref.read(translationsProvider).requireValue;
           await ref
               .read(profileRepositoryProvider)
               .requireValue
-              .updateSubscription(profile)
-              .mapLeft(
-            (l) {
-              loggy.debug("error updating profile [${profile.id}]", l);
-              state = AsyncData((name: profile.name, success: false));
-            },
-          ).map(
-            (_) {
-              loggy.debug("profile [${profile.id}] updated successfully");
-              state = AsyncData((name: profile.name, success: true));
-            },
-          ).run();
+              .upsertRemote(profile.url)
+              .mapLeft((l) {
+                loggy.debug("error updating profile [${profile.id}]", l);
+                ref
+                    .read(inAppNotificationControllerProvider)
+                    .showErrorToast(t.pages.profiles.msg.update.failureNamed(name: profile.name));
+                state = AsyncData((name: profile.name, success: false));
+              })
+              .map((_) {
+                loggy.debug("profile [${profile.id}] updated successfully");
+                ref
+                    .read(inAppNotificationControllerProvider)
+                    .showSuccessToast(t.pages.profiles.msg.update.successNamed(name: profile.name));
+                state = AsyncData((name: profile.name, success: true));
+              })
+              .run();
         } else {
           loggy.debug(
             "skipping profile [${profile.id}] update. last successful update: [${profile.lastUpdate}] - interval: [${profile.options?.updateInterval}]",
@@ -118,10 +114,7 @@ class ForegroundProfilesUpdateNotifier
         }
       }
     } finally {
-      await ref
-          .read(sharedPreferencesProvider)
-          .requireValue
-          .setString(prefKey, DateTime.now().toIso8601String());
+      await ref.read(sharedPreferencesProvider).requireValue.setString(prefKey, DateTime.now().toIso8601String());
     }
   }
 }

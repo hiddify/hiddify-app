@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
@@ -10,21 +13,30 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
-import 'package:hiddify/features/config_option/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:sliver_tools/sliver_tools.dart';
 import 'package:timezone_to_country/timezone_to_country.dart';
 
 class IntroPage extends HookConsumerWidget with PresLogger {
-  IntroPage({super.key});
+  const IntroPage({super.key});
 
-  bool locationInfoLoaded = false;
+  static bool locationInfoLoaded = false;
+
+  // for focus management
+  KeyEventResult _handleKeyEvent(KeyEvent event, String key) {
+    if (KeyboardConst.select.contains(event.logicalKey) && event is KeyUpEvent) {
+      UriUtils.tryLaunch(Uri.parse(IntroConst.url[key]!));
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
 
     final isStarting = useState(false);
 
@@ -33,85 +45,137 @@ class IntroPage extends HookConsumerWidget with PresLogger {
       locationInfoLoaded = true;
     }
 
+    // for focus management
+    final focusStates = <String, ValueNotifier<bool>>{
+      IntroConst.termsAndConditionsKey: useState<bool>(false),
+      IntroConst.githubKey: useState<bool>(false),
+      IntroConst.licenseKey: useState<bool>(false),
+    };
+    final focusNodes = <String, FocusNode>{
+      IntroConst.termsAndConditionsKey: useFocusNode(),
+      IntroConst.githubKey: useFocusNode(),
+      IntroConst.licenseKey: useFocusNode(),
+    };
+    useEffect(() {
+      for (final entry in focusNodes.entries) {
+        entry.value.addListener(() => focusStates[entry.key]!.value = entry.value.hasPrimaryFocus);
+      }
+      return null;
+    }, []);
+
     return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          shrinkWrap: true,
-          slivers: [
-            SliverToBoxAdapter(
-              child: SizedBox(
-                width: 224,
-                height: 224,
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Assets.images.logo.svg(),
-                ),
-              ),
-            ),
-            SliverCrossAxisConstrained(
-              maxCrossAxisExtent: 368,
-              child: MultiSliver(
+      body: Center(
+        child: ScrollConfiguration(
+          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 620),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const LocalePrefTile(),
-                  const SliverGap(4),
-                  const RegionPrefTile(),
-                  const SliverGap(4),
-                  const EnableAnalyticsPrefTile(),
-                  const SliverGap(4),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final width = constraints.maxWidth > IntroConst.maxwidth
+                          ? IntroConst.maxwidth
+                          : constraints.maxWidth;
+                      final size = width * 0.4;
+                      return Assets.images.logo.svg(width: size, height: size);
+                    },
+                  ),
+                  const Gap(16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      t.intro.banner,
+                      style: theme.textTheme.bodyLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const Gap(24),
+                  const LocalePrefTile(),
+                  const RegionPrefTile(),
+                  const EnableAnalyticsPrefTile(),
+                  const Gap(24),
+                  Focus(
+                    focusNode: focusNodes[IntroConst.termsAndConditionsKey],
+                    onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.termsAndConditionsKey),
                     child: Text.rich(
                       t.intro.termsAndPolicyCaution(
                         tap: (text) => TextSpan(
                           text: text,
-                          style: const TextStyle(color: Colors.blue),
+                          style: TextStyle(
+                            color: focusStates[IntroConst.termsAndConditionsKey]!.value ? Colors.green : Colors.blue,
+                          ),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () async {
-                              await UriUtils.tryLaunch(
-                                Uri.parse(Constants.termsAndConditionsUrl),
-                              );
+                              await UriUtils.tryLaunch(Uri.parse(Constants.termsAndConditionsUrl));
                             },
                         ),
                       ),
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 24,
+                  const Gap(8),
+                  Focus(
+                    focusNode: focusNodes[IntroConst.githubKey],
+                    onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.githubKey),
+                    child: Text.rich(
+                      t.intro.info(
+                        tap_source: (text) => TextSpan(
+                          text: text,
+                          style: TextStyle(
+                            color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              await UriUtils.tryLaunch(Uri.parse(Constants.githubUrl));
+                            },
+                        ),
+                        tap_license: (text) => TextSpan(
+                          text: text,
+                          style: TextStyle(
+                            color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () async {
+                              await UriUtils.tryLaunch(Uri.parse(Constants.licenseUrl));
+                            },
+                        ),
+                      ),
+                      style: theme.textTheme.bodySmall,
                     ),
-                    child: FilledButton(
-                      onPressed: () async {
-                        if (isStarting.value) return;
-                        isStarting.value = true;
-                        if (!ref.read(analyticsControllerProvider).requireValue) {
-                          loggy.info("disabling analytics per user request");
-                          try {
-                            await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
-                          } catch (error, stackTrace) {
-                            loggy.error(
-                              "could not disable analytics",
-                              error,
-                              stackTrace,
-                            );
-                          }
-                        }
-                        await ref.read(Preferences.introCompleted.notifier).update(true);
-                      },
-                      child: isStarting.value
-                          ? LinearProgressIndicator(
-                              backgroundColor: Colors.transparent,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            )
-                          : Text(t.intro.start),
-                    ),
+                  ),
+                  // only for managing license node focus
+                  Focus(
+                    focusNode: focusNodes[IntroConst.licenseKey],
+                    onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.licenseKey),
+                    child: const Gap(88),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: isStarting.value
+            ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator())
+            : const Icon(Icons.rocket_launch),
+        label: Text(t.common.start, style: theme.textTheme.titleMedium),
+        onPressed: () async {
+          if (isStarting.value) return;
+          isStarting.value = true;
+          if (!ref.read(analyticsControllerProvider).requireValue) {
+            loggy.info("disabling analytics per user request");
+            try {
+              await ref.read(analyticsControllerProvider.notifier).disableAnalytics();
+            } catch (error, stackTrace) {
+              loggy.error("could not disable analytics", error, stackTrace);
+            }
+          }
+          await ref.read(Preferences.introCompleted.notifier).update(true);
+        },
       ),
     );
   }
@@ -120,18 +184,13 @@ class IntroPage extends HookConsumerWidget with PresLogger {
     try {
       final countryCode = await TimeZoneToCountry.getLocalCountryCode();
       final regionLocale = _getRegionLocale(countryCode);
-      loggy.debug(
-        'Timezone Region: ${regionLocale.region} Locale: ${regionLocale.locale}',
-      );
+      loggy.debug('Timezone Region: ${regionLocale.region} Locale: ${regionLocale.locale}');
       await ref.read(ConfigOptions.region.notifier).update(regionLocale.region);
       await ref.watch(ConfigOptions.directDnsAddress.notifier).reset();
       await ref.read(localePreferencesProvider.notifier).changeLocale(regionLocale.locale);
       return;
     } catch (e) {
-      loggy.warning(
-        'Could not get the local country code based on timezone',
-        e,
-      );
+      loggy.warning('Could not get the local country code based on timezone', e);
     }
 
     try {
@@ -146,9 +205,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
         final jsonData = response.data!;
         final regionLocale = _getRegionLocale(jsonData['country_code']?.toString() ?? "");
 
-        loggy.debug(
-          'Region: ${regionLocale.region} Locale: ${regionLocale.locale}',
-        );
+        loggy.debug('Region: ${regionLocale.region} Locale: ${regionLocale.locale}');
         await ref.read(ConfigOptions.region.notifier).update(regionLocale.region);
         await ref.read(localePreferencesProvider.notifier).changeLocale(regionLocale.locale);
       } else {

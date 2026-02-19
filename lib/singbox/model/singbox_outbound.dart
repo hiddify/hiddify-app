@@ -1,4 +1,3 @@
-import 'package:dartx/dartx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 
@@ -16,6 +15,8 @@ class SingboxOutboundGroup with _$SingboxOutboundGroup {
   }) = _SingboxOutboundGroup;
 
   factory SingboxOutboundGroup.fromJson(Map<String, dynamic> json) => _$SingboxOutboundGroupFromJson(json);
+
+  // factory SingboxOutboundGroup.fromGrpc(OutboundGroup og) => _$SingboxOutboundGroup(tag=og.tag, type=_keyMap[og.type]!, selected=og.selected, items=og.items.map((e) => SingboxOutboundGroupItem.fromGRPC(e)).toList());
 }
 
 @freezed
@@ -23,11 +24,8 @@ class SingboxOutboundGroupItem with _$SingboxOutboundGroupItem {
   const SingboxOutboundGroupItem._();
 
   @JsonSerializable(fieldRename: FieldRename.kebab)
-  const factory SingboxOutboundGroupItem({
-    required String tag,
-    @JsonKey(fromJson: _typeFromJson) required ProxyType type,
-    required int urlTestDelay,
-  }) = _SingboxOutboundGroupItem;
+  const factory SingboxOutboundGroupItem({required String tag, required String type, required int urlTestDelay}) =
+      _SingboxOutboundGroupItem;
 
   factory SingboxOutboundGroupItem.fromJson(Map<String, dynamic> json) => _$SingboxOutboundGroupItemFromJson(json);
 }

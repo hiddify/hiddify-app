@@ -1,0 +1,633 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "Start",
+    "version": "Version",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "kContinue": "Continue",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "filter": "Filter",
+    "all": "All",
+    "pause": "Pause",
+    "resume": "Resume",
+    "clear": "Clear",
+    "close": "Close",
+    "auto": "Auto",
+    "manually": "Manually",
+    "name": "Name",
+    "url": "URL",
+    "add": "Add",
+    "clipboard": "Clipboard",
+    "addToClipboard": "Add to clipboard",
+    "scanQr": "Scan QR",
+    "free": "Free",
+    "warp": "WARP",
+    "fragment": "Fragment",
+    "help": "Help",
+    "save": "Save",
+    "update": "Update",
+    "share": "Share",
+    "edit": "Edit",
+    "delete": "Delete",
+    "discard": "Discard",
+    "import": "Import",
+    "export": "Export",
+    "later": "Later",
+    "ignore": "Ignore",
+    "quit": "Quit",
+    "notSet": "Not set",
+    "hide": "Hide",
+    "exit": "Exit",
+    "reset": "Reset",
+    "done": "Done",
+    "search": "Search",
+    "decline": "Decline",
+    "agree": "Agree",
+    "empty": "Empty",
+    "unknown": "Unknown",
+    "hidden": "Hidden",
+    "timeout": "Timeout",
+    "sort": "Sort",
+    "dashboard": "Dashboard",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n day",
+        "other": "$n days"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n hour",
+        "other": "$n hours"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "Permission denied"
+      },
+      "export": {
+        "clipboard": {
+          "success": "Added to clipboard successfully",
+          "failure": "Failed to copy to clipboard",
+          "contentTooLarge": "Content too large. Use export file instead"
+        },
+        "file": {
+          "success": "JSON file created successfully",
+          "failure": "Failed to create file"
+        }
+      },
+      "import": {
+        "confirm": "Confirm import",
+        "success": "Imported successfully",
+        "failure": "Failed to import"
+      }
+    }
+  },
+  "intro": {
+    "banner": "All you need for an unrestricted internet",
+    "termsAndPolicyCaution(rich)": "By continuing you agree to ${tap(@:pages.about.termsAndConditions)}",
+    "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open Source)} (${tap_license(License)})"
+  },
+  "pages": {
+    "home": {
+      "title": "Home",
+      "quickSettings": "Quick settings"
+    },
+    "proxies": {
+      "title": "Proxies",
+      "sort": "Sort proxies",
+      "testDelay": "Test delay",
+      "empty": "No proxies available",
+      "activeProxy": "Active proxy",
+      "unknownIp": "Unknown IP",
+      "sortOptions": {
+        "unsorted": "Default",
+        "name": "Alphabetically",
+        "delay": "By delay",
+        "usage": "By usage"
+      },
+      "ipInfo": {
+        "address": "IP address",
+        "country": "Country",
+        "organization": "Organization"
+      },
+      "delay": {
+        "result": "Delay: ${delay}ms",
+        "timeout": "Delay test timeout",
+        "testing": "Delay: testing..."
+      }
+    },
+    "profiles": {
+      "title": "Profiles",
+      "add": "Add profile",
+      "update": "Update profile",
+      "viewAllProfiles": "View all profiles",
+      "activeProfileName": "Active profile name: \"${name}\".",
+      "nonActiveProfileName": "Select \"${name}\" as active profile",
+      "freeSubNotFound": "No free subscription was found",
+      "freeSubNotFoundForRegion": "No free subscription was found for \"${region}\" region.",
+      "failedToLoad": "Failed to load",
+      "updateSubscriptions": "Update subscriptions",
+      "share": {
+        "urlToClipboard": "URL to clipboard",
+        "showUrlQr": "Show URL QR",
+        "jsonToClipboard": "JSON to clipboard"
+      },
+      "msg": {
+        "save": {
+          "success": "Profile saved successfully"
+        },
+        "invalidUrl": "Invalid URL",
+        "add": {
+          "failure": "Failed to add profile"
+        },
+        "update": {
+          "success": "Profile updated successfully",
+          "successNamed": "\"${name}\" updated successfully",
+          "failure": "Failed to update profile",
+          "failureNamed": "Failed to update \"${name}\""
+        },
+        "delete": {
+          "success": "Profile deleted successfully"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "Profile",
+      "lastUpdate": "Last update",
+      "form": {
+        "nameHint": "Profile name",
+        "emptyName": "Name is required",
+        "invalidUrl": "Invalid URL",
+        "urlHint": "Full config URL",
+        "disableAutoUpdate": "Disable auto update",
+        "autoUpdateInterval": "Auto update interval",
+        "loading": "Adding profile..."
+      }
+    },
+    "logs": {
+      "title": "Logs",
+      "shareCoreLogs": "Share core logs",
+      "shareAppLogs": "Share app logs"
+    },
+    "about": {
+      "title": "About",
+      "notAvailableMsg": "Already using the latest version",
+      "checkForUpdate": "Check for update",
+      "openWorkingDir": "Open working directory",
+      "sourceCode": "Source code",
+      "telegramChannel": "Telegram channel",
+      "termsAndConditions": "Terms and conditions",
+      "privacyPolicy": "Privacy policy"
+    },
+    "settings": {
+      "title": "Settings",
+      "resetTunnel": "Reset VPN profile",
+      "options": {
+        "import": {
+          "clipboard": "Import options from clipboard",
+          "file": "Import options from file"
+        },
+        "export": {
+          "anonymousToClipboard": "Copy anonymous options to clipboard",
+          "anonymousToFile": "Export anonymous options to file",
+          "allToClipboard": "Copy all options to clipboard",
+          "allToFile": "Export all options to file"
+        },
+        "reset": "Reset options"
+      },
+      "general": {
+        "title": "General",
+        "locale": "Language",
+        "themeMode": "Theme mode",
+        "themeModes": {
+          "system": "System default",
+          "dark": "Dark mode",
+          "light": "Light mode",
+          "black": "Black mode"
+        },
+        "enableAnalytics": "Enable analytics",
+        "enableAnalyticsMsg": "Give permission to collect analytics and send crash reports to improve the app",
+        "autoIpCheck": "Automatically check connection IP",
+        "dynamicNotification": "Display speed in notification",
+        "hapticFeedback": "Haptic feedback",
+        "actionAtClosing": "Action at closing",
+        "autoStart": "Start at login",
+        "silentStart": "Start minimized",
+        "ignoreBatteryOptimizations": "Disable battery optimization",
+        "ignoreBatteryOptimizationsMsg": "Remove restrictions for optimal VPN performance",
+        "memoryLimit": "Memory limit",
+        "memoryLimitMsg": "Enable if you're experiencing out of memory errors or frequent app crashes",
+        "debugMode": "Debug mode",
+        "debugModeMsg": "Restart the app for applying this change",
+        "logLevel": "Log level",
+        "connectionTestUrl": "Connection test URL",
+        "urlTestInterval": "URL test interval",
+        "clashApiPort": "Clash API port",
+        "useXrayCoreWhenPossible": "Use xray-core when possible",
+        "useXrayCoreWhenPossibleMsg": "Use xray-core during parsing sub links. You need to reimport the sub link to enable this option."
+      },
+      "routing": {
+        "title": "Routing",
+        "perAppProxy": {
+          "title": "Per-app proxy",
+          "hideSysApps": "Hide system apps",
+          "options": {
+            "import": {
+              "clipboard": "Import selection from clipboard",
+              "file": "Import selection from file",
+              "msg": "Importing will replace your current selections. Are you sure you want to continue?"
+            },
+            "export": {
+              "clipboard": "Copy selection to clipboard",
+              "file": "Export selection to file"
+            },
+            "shareToAll": "Share to all",
+            "clearAllSelections": "Clear all selections"
+          },
+          "modes": {
+            "all": "All",
+            "proxy": "Proxy",
+            "bypass": "Bypass",
+            "allMsg": "Proxy all apps",
+            "proxyMsg": "Proxy only selected apps",
+            "bypassMsg": "Do not proxy selected apps"
+          },
+          "autoSelection": {
+            "title": "Auto selection",
+            "performNow": "Perform now",
+            "resetToDefault": "Reset to default",
+            "autoUpdateInterval": "Auto update interval",
+            "toast": {
+              "success": "Auto apps selection completed successfully",
+              "failure": "Auto selection failed",
+              "regionNotFound": "Auto selection not found, region \"${region}\"",
+              "alreadyInAuto": "Your selections are already in the auto-list"
+            },
+            "dialog": {
+              "title": "Auto apps selection",
+              "msg": "The auto selection feature for per-app proxy was disabled due to the region change to \"${region}\""
+            }
+          }
+        },
+        "region": "Region",
+        "regions": {
+          "ir": "Iran (ir) 🇮🇷",
+          "cn": "China (cn) 🇨🇳",
+          "ru": "Russia (ru) 🇷🇺",
+          "af": "Afghanistan (af) 🇦🇫",
+          "id": "Indonesia (id) 🇮🇩",
+          "tr": "Türkiye (tr) 🇹🇷",
+          "br": "Brazil (br) 🇧🇷",
+          "other": "Other"
+        },
+        "blockAds": "Block advertisements",
+        "bypassLan": "Bypass LAN",
+        "resolveDestination": "Resolve destination",
+        "ipv6Route": "IPv6 route",
+        "ipv6Modes": {
+          "disable": "Disable",
+          "enable": "Enable",
+          "prefer": "Preferred",
+          "only": "Exclusive"
+        },
+        "routeRule": {
+          "title": "Route rules",
+          "options": {
+            "import": {
+              "clipboard": "Import rules from clipboard",
+              "file": "Import rules from file"
+            },
+            "export": {
+              "clipboard": "Copy rules to clipboard",
+              "file": "Save rules to file"
+            },
+            "reset": "Reset rules"
+          },
+          "deleteRule": "Delete rule",
+          "createRule": "Create new rule",
+          "rule": {
+            "title": "Rule",
+            "ruleChanged": "Rule changed",
+            "ruleChangedMsg": "Do you want to save your edits?",
+            "onlyTunMode": "Available only in tun mode",
+            "notAvailabeInThisPlatform": "Not available in this platform",
+            "canNotBeEmpty": "Can not be empty",
+            "validUrlEx": "https://example.com",
+            "validUrl": "Valid \"URL\" like\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe or google chrome or chrome",
+            "validProcessName": "Valid \"Process Name\" like\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "Valid \"Process Path\" like\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 or 1-65000",
+            "validPortRange": "Valid \"Port\" or \"Port Range\" like\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8 or 10.0.0.0/24",
+            "validIpCidr": "Valid IP CIDR like\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com or dl.google.com",
+            "validDomain": "Valid \"Domain\" like\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com or .ir",
+            "validDomainSuffix": "Valid \"Domain Suffix\" like\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "tileTitle(map)": {
+              "name": "Name",
+              "outbound": "Outbound if match",
+              "rule_set": "Rule set URL",
+              "package_name": "Package names",
+              "process_name": "Process names",
+              "process_path": "Process paths",
+              "network": "Networks",
+              "port_range": "Destination ports",
+              "source_port_range": "Source ports",
+              "protocol": "Protocol",
+              "ip_cidr": "Destination IP CIDR",
+              "source_ip_cidr": "Source IP CIDR",
+              "domain": "Domain",
+              "domain_suffixe": "Domain suffix",
+              "domain_keyword": "Domain keyword",
+              "domain_regex": "Domain regex"
+            },
+            "outbound(map)": {
+              "proxy": "Proxy",
+              "direct": "Direct",
+              "direct_with_fragment": "Direct with fragment",
+              "block": "Block"
+            },
+            "network(map)": {
+              "all": "All",
+              "tcp": "TCP",
+              "udp": "UDP"
+            },
+            "protocol(map)": {
+              "": "All",
+              "tls": "TLS",
+              "http": "HTTP",
+              "quic": "QUIC",
+              "stun": "STUN",
+              "dns": "DNS",
+              "bittorrent": "BitTorrent"
+            }
+          },
+          "genericList": {
+            "addNew": "Add new value",
+            "update": "Update value",
+            "clearList": "Clear list",
+            "clearListMsg": "All items are deleted"
+          },
+          "androidApps": {
+            "pageTitle": "Android apps",
+            "showSystemApps": "Show system apps",
+            "hideSystemApps": "Hide system apps",
+            "clearSelection": "Clear selection",
+            "uninstalled": "Uninstalled"
+          }
+        }
+      },
+      "dns": {
+        "title": "DNS",
+        "remoteDns": "Remote DNS",
+        "remoteDnsDomainStrategy": "Remote DNS domain strategy",
+        "directDns": "Outbound Server Resolver (Direct)",
+        "directDnsDomainStrategy": "Outbound Domain strategy",
+        "enableDnsRouting": "Enable DNS routing",
+        "enableFakeDns": "Enable fake DNS",
+        "domainStrategy": {
+          "auto": "Auto",
+          "preferIpv6": "Prefer IPv6",
+          "preferIpv4": "Prefer IPv4",
+          "ipv4Only": "IPv4 only",
+          "ipv6Only": "IPv6 only"
+        }
+      },
+      "inbound": {
+        "title": "Inbound",
+        "serviceMode": "Service mode",
+        "serviceModes": {
+          "proxy": "Proxy service only",
+          "systemProxy": "Set system proxy",
+          "tun": "VPN",
+          "tunService": "VPN service"
+        },
+        "shortServiceModes": {
+          "proxy": "Proxy",
+          "systemProxy": "System proxy",
+          "tun": "VPN",
+          "tunService": "VPN service"
+        },
+        "strictRoute": "Strict route",
+        "tunImplementation": "Tun implementation",
+        "tunImplementations": {
+          "mixed": "Mixed",
+          "system": "System",
+          "gvisor": "gVisor"
+        },
+        "mixedPort": "Mixed port",
+        "tproxyPort": "Transparent proxy port",
+        "directPort": "Direct port",
+        "redirectPort": "Redirect port",
+        "allowConnectionFromLan": "Share VPN in local network"
+      },
+      "tlsTricks": {
+        "title": "TLS tricks",
+        "enable": "Enable fragment",
+        "size": "Fragment size",
+        "sleep": "Fragment sleep",
+        "mixedSniCase": {
+          "enable": "Enable mixed SNI case"
+        },
+        "padding": {
+          "enable": "Enable padding",
+          "size": "Padding size"
+        }
+      },
+      "warp": {
+        "title": "WARP",
+        "enable": "Enable WARP",
+        "generateConfig": "Generate WARP config",
+        "configGenerated": "Warp config is generated",
+        "missingConfig": "Missing WARP config",
+        "detourMode": "Detour mode",
+        "detourModes": {
+          "proxyOverWarp": "Detour proxies through WARP ",
+          "warpOverProxy": "Detour WARP through proxies",
+          "proxyOverWarpExplain": "Unblock proxies by WARP",
+          "warpOverProxyExplain": "Extra security by WARP"
+        },
+        "licenseKey": "License key",
+        "cleanIp": "Clean IP",
+        "port": "Port",
+        "noise": {
+          "count": "Noise count",
+          "mode": "Noise mode",
+          "size": "Noise size",
+          "delay": "Noise delay"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "Connection",
+      "traffic": "Traffic",
+      "trafficLive": "Live traffic",
+      "trafficTotal": "Total traffic",
+      "uplink": "Uplink",
+      "downlink": "Downlink",
+      "speed": "Speed",
+      "totalTransferred": "Total transferred"
+    },
+    "subscriptionInfo": {
+      "upload": "Upload",
+      "download": "Download",
+      "total": "Total traffic",
+      "expireDate": "Expire date",
+      "expired": "Expired",
+      "noTraffic": "Out of quota",
+      "remainingTime": "Remaining time",
+      "remainingDuration": "${duration} days remaining",
+      "remainingDurationNew": "${duration} days",
+      "remainingTrafficSemanticLabel": "${consumed} of ${total} traffic consumed",
+      "remainingTraffic": "Remaining traffic",
+      "remainingUsage": "Remaining",
+      "profileSite": "Provider",
+      "profileSupport": "Support"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "Sort by",
+      "sort": {
+        "name": "Alphabetically",
+        "lastUpdate": "Recently updated"
+      }
+    },
+    "warpLicense": {
+      "title": "Cloudflare WARP consent",
+      "description(rich)": "Cloudflare WARP is a free WireGuard VPN provider. By enabling this option you are agreeing to the Cloudflare WARP's ${tos(Terms of service)} and ${privacy(Privacy policy)}."
+    },
+    "newVersion": {
+      "title": "Update available",
+      "msg": "A new version of @:common.appTitle is available. Would you like to update now?",
+      "currentVersion": "Current version: ",
+      "newVersion": "New version: ",
+      "updateNow": "Update now"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "This will rewrite all config options with provided values. Are you sure?"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "Delete profile",
+          "msg": "Are you sure you want to permanently delete this profile?"
+        }
+      },
+      "perAppProxy": {
+        "shareOnGithub": {
+          "title": "Improving auto selection",
+          "msg": "By sharing selected apps, you help complete the \"auto selection\" list"
+        },
+        "import": {
+          "msg": "This will replace all your current per-app proxy selections. Are you sure you want to continue?"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "Delete rule",
+          "msg": "Are you sure you want to delete the \"$rulename\" rule?"
+        }
+      }
+    },
+    "experimentalNotice": {
+      "title": "Experimental features in use",
+      "msg": "You've enabled some experimental features which might affect connection quality and cause unexpected errors. You can always change or reset these options from config options page.",
+      "disable": "Don't show again"
+    },
+    "noActiveProfile": {
+      "title": "Choose a profile",
+      "msg": "Let's get started by adding a connection profile that includes your VPN connection details.\n\nDon’t have a VPN server yet? No worries—just follow the tutorial below to set one up quickly and for free.",
+      "helpBtn": {
+        "label": "Show me how",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "External link warning",
+      "youAreAboutToVisit": "You are about to visit :",
+      "thisWebsiteIsNotInOurTrustedList": "This website is not in our trusted list. Please proceed with caution."
+    },
+    "proxyInfo": {
+      "fullTag": "Full tag:",
+      "type": "Type:",
+      "testTime": "Test time:",
+      "testDelay": "Test delay:",
+      "isSelected": "Is selected:",
+      "isGroup": "Is group",
+      "isSecure": "Is secure:",
+      "port": "Port:",
+      "host": "Host:",
+      "ip": "IP:",
+      "countryCode": "Country code:",
+      "region": "Region:",
+      "city": "City:",
+      "asn": "ASN:",
+      "organization": "Organization:",
+      "location": "Location:",
+      "postalCode": "Postal code:",
+      "download": "Download:",
+      "upload": "Upload:"
+    },
+    "windowClosing": {
+      "askEachTime": "Ask each time",
+      "alertMessage": "Hide or exit the application?",
+      "remember": "Remember my choice"
+    }
+  },
+  "connection": {
+    "tapToConnect": "Tap to connect",
+    "connect": "Connect",
+    "connecting": "Connecting...",
+    "connected": "Connected",
+    "disconnect": "Disconnect",
+    "disconnecting": "Disconnecting...",
+    "reconnect": "Reconnect",
+    "reconnectMsg": "Reconnecting for taking into account the changes...",
+    "secure": "Secured by WARP"
+  },
+  "errors": {
+    "unexpected": "Unexpected error",
+    "connection": {
+      "unexpected": "Unexpected connection error",
+      "timeout": "Connection timeout",
+      "badResponse": "Bad response",
+      "connectionError": "Connection error",
+      "badCertificate": "Bad certificate"
+    },
+    "profiles": {
+      "unexpected": "Unexpected error",
+      "notFound": "Profile not found",
+      "invalidConfig": "Invalid configs",
+      "invalidUrl": "Invalid URL",
+      "canceledByUser": "Canceled by user"
+    },
+    "connectivity": {
+      "unexpected": "Unexpected failure",
+      "missingVpnPermission": "Missing VPN permission",
+      "missingNotificationPermission": "Missing notification permission",
+      "core": "Core error"
+    },
+    "singbox": {
+      "serviceNotRunning": "Service is not running",
+      "missingPrivilege": "Missing privilege",
+      "missingPrivilegeMsg": "VPN mode requires administrator privileges. Either relaunch the app as administrator or change service mode.",
+      "invalidConfigOptions": "Invalid configuration options",
+      "invalidConfig": "Invalid configuration"
+    },
+    "warp": {
+      "missingLicense": "Warp license",
+      "missingLicenseMsg": "The selected profile uses the WARP feature; to use this feature, the WARP license must be agreed to."
+    }
+  }
+}

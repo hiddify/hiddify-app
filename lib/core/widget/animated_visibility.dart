@@ -16,9 +16,7 @@ class AnimatedVisibility extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final replacement = axis == Axis.vertical
-        ? const SizedBox(width: double.infinity)
-        : const SizedBox.shrink();
+    final replacement = axis == Axis.vertical ? const SizedBox(width: double.infinity) : const SizedBox.shrink();
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
@@ -27,11 +25,7 @@ class AnimatedVisibility extends StatelessWidget {
         child: FadeTransition(opacity: animation, child: child),
       ),
       child: visible
-          ? AnimatedPadding(
-              padding: padding,
-              duration: const Duration(milliseconds: 200),
-              child: child,
-            )
+          ? AnimatedPadding(padding: padding, duration: const Duration(milliseconds: 200), child: child)
           : replacement,
     );
   }

@@ -1,13 +1,17 @@
+
 # Miscellaneous
 *.class
 *.log
 *.pyc
 *.swp
+.sentry-native
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 .github/help
 # IntelliJ related
@@ -41,6 +45,7 @@ migrate_working_dir/
 **/*.dylib
 **/*.xcframework
 /dist/
+/dist_docker/
 
 /assets/core/*
 !/assets/core/.gitkeep
@@ -58,3 +63,8 @@ app.*.map.json
 
 
 /data
+.cxx
+
+# Windows Self-Signed for msix
+windows/sign.pfx
+windows/sign.cer

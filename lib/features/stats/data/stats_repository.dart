@@ -1,33 +1,21 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
-import 'package:hiddify/features/stats/model/stats_entity.dart';
 import 'package:hiddify/features/stats/model/stats_failure.dart';
-import 'package:hiddify/singbox/service/singbox_service.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
 abstract interface class StatsRepository {
-  Stream<Either<StatsFailure, StatsEntity>> watchStats();
+  Stream<Either<StatsFailure, SystemInfo>> watchStats();
 }
 
-class StatsRepositoryImpl
-    with ExceptionHandler, InfraLogger
-    implements StatsRepository {
+class StatsRepositoryImpl with ExceptionHandler, InfraLogger implements StatsRepository {
   StatsRepositoryImpl({required this.singbox});
 
-  final SingboxService singbox;
+  final HiddifyCoreService singbox;
 
   @override
-  Stream<Either<StatsFailure, StatsEntity>> watchStats() {
-    return singbox
-        .watchStats()
-        .map(
-          (event) => StatsEntity(
-            uplink: event.uplink,
-            downlink: event.downlink,
-            uplinkTotal: event.uplinkTotal,
-            downlinkTotal: event.downlinkTotal,
-          ),
-        )
-        .handleExceptions(StatsUnexpectedFailure.new);
+  Stream<Either<StatsFailure, SystemInfo>> watchStats() {
+    return singbox.watchStats().handleExceptions(StatsUnexpectedFailure.new);
   }
 }

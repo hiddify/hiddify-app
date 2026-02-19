@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Logger {
+class Logger2 {
     private static let queue = DispatchQueue.init(label: "\(FilePath.packageName).PacketTunnelLog", qos: .utility)
     
     private let fileManager = FileManager.default
@@ -30,7 +30,7 @@ class Logger {
     }
     
     func write(_ message: String) {
-        Logger.queue.async { [message, unowned self] () in
+        Logger2.queue.async { [message, unowned self] () in
             lock.lock()
             defer { lock.unlock() }
             let output = message + "\n"

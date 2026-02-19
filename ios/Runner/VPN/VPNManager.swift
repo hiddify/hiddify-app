@@ -99,7 +99,7 @@ class VPNManager: ObservableObject {
             }
             let newManager = NETunnelProviderManager()
             let `protocol` = NETunnelProviderProtocol()
-            `protocol`.providerBundleIdentifier = Bundle.main.baseBundleIdentifier + ".SingBoxPacketTunnel"
+            `protocol`.providerBundleIdentifier = Bundle.main.baseBundleIdentifier + ".HiddifyPacketTunnel"
             `protocol`.serverAddress = "localhost"
             newManager.protocolConfiguration = `protocol`
             newManager.localizedDescription = "Hiddify"
@@ -107,12 +107,18 @@ class VPNManager: ObservableObject {
             try await newManager.loadFromPreferences()
             self.manager = newManager
         } catch {
-            print(error.localizedDescription)
+            print(error.localizedDescription)	
         }
     }
     
     private func enableVPNManager() async throws {
         manager.isEnabled = true
+        let rule = NEOnDemandRuleConnect()
+        rule.interfaceTypeMatch = .any
+        rule.probeURL = URL(string: "http://captive.apple.com")
+        manager.onDemandRules = [rule]
+        manager.isOnDemandEnabled = true
+        
         do {
             try await manager.saveToPreferences()
             try await manager.loadFromPreferences()
@@ -164,6 +170,7 @@ class VPNManager: ObservableObject {
         
     }
     
+    
     private func updateStats() {
         let isAnyVPNConnected = self.isAnyVPNConnected
         if isConnectedToAnyVPN != isAnyVPNConnected {
@@ -192,15 +199,18 @@ class VPNManager: ObservableObject {
         }
     }
     
-    func connect(with config: String, disableMemoryLimit: Bool = false) async throws {
+    func connect(with config: String, grpcServiceModePort:Int, disableMemoryLimit: Bool = false) async throws {
+        
         await set(upload: 0, download: 0)
-        guard state == .disconnected else { return }
+//        guard state == .disconnected else { return }
         do {
             try await enableVPNManager()
             try manager.connection.startVPNTunnel(options: [
                 "Config": config as NSString,
+                "GrpcServiceModePort":NSNumber(value: grpcServiceModePort),
                 "DisableMemoryLimit": (disableMemoryLimit ? "YES" : "NO") as NSString,
             ])
+            
         } catch {
             print(error.localizedDescription)
         }
@@ -208,7 +218,19 @@ class VPNManager: ObservableObject {
     }
     
     func disconnect() {
-        guard state == .connected else { return }
+        if manager.isOnDemandEnabled {
+            manager.isOnDemandEnabled = false
+            manager.onDemandRules = []
+            
+            manager.saveToPreferences { error in
+                if let error = error {
+                    print("save error:", error)
+                    return
+                }
+            }
+        }
+
+//        guard state == .connected else { return }
         manager.connection.stopVPNTunnel()
     }
 }

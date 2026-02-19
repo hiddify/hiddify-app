@@ -1,8 +1,25 @@
-plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
+
+plugins { 
+    id "com.android.application" 
+    id "org.jetbrains.kotlin.android" 
+    id "dev.flutter.flutter-gradle-plugin" 
+    id "com.google.protobuf" version "0.9.4" 
+    id "com.squareup.wire" version "5.3.1"
 }
+
+wire {
+    kotlin {
+        android = true
+    }
+    protoPath {
+        srcDir 'src/main/protos'
+    }
+    sourcePath {
+        srcDir 'src/main/protos/'
+        include '**'
+    }
+}
+
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
@@ -37,8 +54,8 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '
 android {
     namespace 'com.hiddify.hiddify'
     testNamespace "test.com.hiddify.hiddify"
-    compileSdkVersion 34
-    ndkVersion "26.1.10909125"
+    compileSdkVersion 36
+    ndkVersion "28.2.13676358"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -55,8 +72,8 @@ android {
 
     defaultConfig {
         applicationId "app.hiddify.com"
-        minSdkVersion 21
-        targetSdkVersion 34
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
@@ -118,8 +135,21 @@ flutter {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'androidx.core:core-ktx:1.16.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
+    implementation "androidx.compose.ui:ui:1.7.8"
+    implementation("com.squareup.wire:wire-grpc-client:5.3.1")
+
+    implementation 'io.grpc:grpc-okhttp:1.64.0'
+    implementation 'io.grpc:grpc-protobuf-lite:1.64.0'
+    implementation 'io.grpc:grpc-stub:1.64.0'
+//    protoPath(project(':hiddify_api'))
+//    implementation project(':hiddify_api')
+
+
+
+
 }

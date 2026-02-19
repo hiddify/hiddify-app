@@ -16,6 +16,9 @@ class PacketTunnelProvider: ExtensionProvider {
     // var trafficReader: TrafficReader!
     
     override func startTunnel(options: [String : NSObject]?) async throws {
+//    override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+
+        NSLog("H?C1")
         try await super.startTunnel(options: options)
         /*trafficReader = TrafficReader { [unowned self] traffic in
             trafficLock.lock()
@@ -26,7 +29,9 @@ class PacketTunnelProvider: ExtensionProvider {
     }
     
     override func handleAppMessage(_ messageData: Data) async -> Data? {
+        
         let message = String(data: messageData, encoding: .utf8)
+//        NSLog("H?C2"+message??"")
         switch message {
         case "stats":
             return "\(upload),\(download)".data(using: .utf8)!

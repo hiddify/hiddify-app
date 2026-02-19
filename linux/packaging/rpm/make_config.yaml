@@ -1,28 +1,50 @@
-display_name: Hiddify
-url: https://github.com/hiddify/hiddify-next/
-license: Other
 
-packager: hiddify
-packagerEmail: linux@hiddify.com
 
-priority: optional
-section: x11
-installed_size: 6604
-essential: false
-icon: ./assets/images/source/ic_launcher_border.png
+# <<<   RPM NOT SUPPORTED   >>>
+# We decided to remove RPM packaging for the following reasons:
+# - Flutter officially supports Debian-based systems only.
+# - Persistent issues with dependency linking.
+# - High maintenance overhead (requires Fedora environment setup).
+# - Successful builds do not guarantee runtime stability on Red Hat-based systems.
 
-keywords:
-  - Hiddify
-  - Proxy
-  - VPN
-  - V2ray
-  - Nekoray
-  - Xray
-  - Psiphon
-  - OpenVPN
 
-generic_name: Hiddify
+# display_name: Hiddify
+# url: https://github.com/hiddify/hiddify-app
+# license: Other
 
-group: Applications/Internet
+# packager: hiddify
+# packagerEmail: linux@hiddify.com
 
-startup_notify: true
+# icon: assets/images/source/ic_launcher_border.png
+
+# keywords:
+#   - Hiddify
+#   - Proxy
+#   - VPN
+#   - V2ray
+#   - Nekoray
+#   - Xray
+#   - Psiphon
+#   - OpenVPN
+
+# generic_name: Hiddify
+
+# requires:
+#   - libayatana-appindicator-gtk3
+#   # - libcurl
+#   # - openssl
+
+# categories:
+#   - Network
+
+# startup_notify: true
+# # app_links setup for Linux
+# # https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
+# supported_mime_type:
+#   - x-scheme-handler/hiddify
+#   - x-scheme-handler/v2ray
+#   - x-scheme-handler/v2rayn
+#   - x-scheme-handler/v2rayng
+#   - x-scheme-handler/clash
+#   - x-scheme-handler/clashmeta
+#   - x-scheme-handler/sing-box

@@ -9,29 +9,50 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.MutableLiveData
+import com.hiddify.core.api.v2.config.Protocol
+import com.hiddify.core.api.v2.hcommon.Empty
+import com.hiddify.core.api.v2.hcore.CoreClient
+import com.hiddify.core.api.v2.hcore.SystemInfo
+import com.hiddify.core.api.v2.hello.HelloClient
+import com.hiddify.core.api.v2.hello.HelloRequest
 import com.hiddify.hiddify.Application
 import com.hiddify.hiddify.MainActivity
 import com.hiddify.hiddify.R
 import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Action
 import com.hiddify.hiddify.constant.Status
-import com.hiddify.hiddify.utils.CommandClient
-import io.nekohasekai.libbox.Libbox
-import io.nekohasekai.libbox.StatusMessage
+//import com.hiddify.hiddify.utils.CommandClient
+import com.hiddify.core.libbox.Libbox
+import com.hiddify.hiddify.Application.Companion.notification
+import com.hiddify.hiddify.utils.GrpcClientProvider
+import com.squareup.wire.GrpcClient
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.isActive
 
-class ServiceNotification(private val status: MutableLiveData<Status>, private val service: Service) : BroadcastReceiver(), CommandClient.Handler {
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import java.io.IOException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
+class ServiceNotification(private val status: MutableLiveData<Status>, private val service: Service) : BroadcastReceiver(){
     companion object {
         private const val notificationId = 1
         private const val notificationChannel = "service"
-        private val flags =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+        var coreClient: CoreClient?=null
+        val flags =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 
         fun checkPermission(): Boolean {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
@@ -40,10 +61,12 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
             return Application.notification.areNotificationsEnabled()
         }
     }
+    val streamingCoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
 
-    private val commandClient =
-            CommandClient(GlobalScope, CommandClient.ConnectionType.Status, this)
+//
+//    private val commandClient =
+//            CommandClient(GlobalScope, CommandClient.ConnectionType.Status, this)
     private var receiverRegistered = false
 
 
@@ -72,7 +95,9 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
                                     0, service.getText(R.string.stop), PendingIntent.getBroadcast(
                                     service,
                                     0,
-                                    Intent(Action.SERVICE_CLOSE).setPackage(service.packageName),
+                                    Intent(Action.SERVICE_CLOSE).setPackage(
+                                        Application.application.packageName
+                                    ),
                                     flags
                             )
                             ).build()
@@ -97,8 +122,9 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
 
 
     suspend fun start() {
-        if (Settings.dynamicNotification) {
-            commandClient.connect()
+        if (Settings.dynamicNotification && checkPermission()) {
+//            commandClient.connect()
+            startListenSystemInfo()
             withContext(Dispatchers.Main) {
                 registerReceiver()
             }
@@ -113,33 +139,74 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         receiverRegistered = true
     }
 
-    override fun updateStatus(status: StatusMessage) {
-        val content =
-                Libbox.formatBytes(status.uplink) + "/s ↑\t" + Libbox.formatBytes(status.downlink) + "/s ↓"
+    fun updateStatus(previous:SystemInfo,status: SystemInfo) {
+        val uplink=status.uplink_total - previous.uplink_total
+        val downlink=status.downlink_total - previous.downlink_total
+        val content = "${Libbox.formatBytes(uplink)}/s ↑\t${Libbox.formatBytes(downlink)}/s ↓ \n${status.current_outbound}"
+        val title = "${status.current_profile}"
         Application.notificationManager.notify(
                 notificationId,
-                notificationBuilder.setContentText(content).build()
+                notificationBuilder.setContentTitle(title).setContentText(content).build()
         )
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             Intent.ACTION_SCREEN_ON -> {
-                commandClient.connect()
+                startListenSystemInfo()
             }
 
             Intent.ACTION_SCREEN_OFF -> {
-                commandClient.disconnect()
+                stopListenSystemInfo()
             }
         }
     }
 
     fun close() {
-        commandClient.disconnect()
+        stopListenSystemInfo()
         ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
         if (receiverRegistered) {
             service.unregisterReceiver(this)
             receiverRegistered = false
+        }
+    }
+
+    private var streamingJob: Job? = null
+
+    fun startListenSystemInfo() {
+        // Cancel any previous stream if still running
+        Log.d("notification","startListenSystemInfo")
+        streamingJob?.cancel()
+
+        streamingJob = streamingCoroutineScope.launch(Dispatchers.IO) {
+            Log.d("notification", "startListenSystemInfo-launch")
+
+            val coreClient = GrpcClientProvider.grpcClient.create(CoreClient::class)
+
+            try {
+                var previous = coreClient.GetSystemInfo().executeBlocking(Empty())
+
+                while (isActive) {
+                    delay(1_000) // ✅ coroutine-friendly
+                    val current = coreClient.GetSystemInfo().executeBlocking(Empty())
+                    updateStatus(previous,current)
+                    previous = current
+                }
+            } catch (e: CancellationException) {
+                // coroutine cancelled normally
+                Log.d("notification", "SystemInfo polling cancelled")
+                notification.cancel(notificationId)
+            } catch (e: Exception) {
+                Log.e("notification", "SystemInfo polling failed", e)
+                notification.cancel(notificationId)
+            }
+        }
+    }
+    fun stopListenSystemInfo(){
+        try {
+            streamingJob?.cancel()
+        }catch (e: Exception){
+            Log.d("notification", "Exception ${e}")
         }
     }
 }

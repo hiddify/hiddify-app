@@ -15,16 +15,18 @@ on:
 env:
   IS_GITHUB_ACTIONS: 1
   CHANNEL: "${{ inputs.channel }}"
-  FLUTTER_VERSION: '3.24.0'
-  NDK_VERSION: r26d
+  FLUTTER_VERSION: '3.38.5'
+  NDK_VERSION: r28c
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   TAG_NAME: "${{ inputs.tag-name }}"
-  TARGET_NAME_AppImage: "Hiddify-Linux-x64"
+  TARGET_NAME_gz: "Hiddify-Linux-x64-AppImage.tar"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
-  TARGET_NAME_rpm: "Hiddify-rpm-x64"
+  # TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
   TARGET_NAME_aab: "Hiddify-Android"
-  #TARGET_NAME_exe: "Hiddify-Windows-x64"
+  TARGET_NAME_exe: "Hiddify-Windows-Setup-x64"
+  TARGET_NAME_msix: "Hiddify-Windows-x64"
+  TARGET_NAME_zip: "Hiddify-Windows-Portable-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
   TARGET_NAME_ipa: "Hiddify-iOS"
@@ -44,7 +46,7 @@ jobs:
           cache: true
           
       - name: Prepare
-        run: make linux-prepare
+        run: make linux-amd64-prepare
       - name: Test
         run: flutter test
 
@@ -69,17 +71,32 @@ jobs:
             targets: aab
 
           - platform: windows
-            os: windows-2019
+            os: windows-latest
             aarch: amd64
-            targets: exe,msix
+            targets: exe,msix,zip
 
-          - platform: linux
+          - platform: linux-amd64
             os: ubuntu-22.04
             aarch: amd64
-            targets: AppImage,deb,rpm
+            targets: deb,gz
 
+          # - platform: linux-arm64
+          #   os: ubuntu-24.04-arm
+          #   aarch: arm64
+          #   targets: deb,gz
+
+          # - platform: linux-amd64-musl
+          #   os: ubuntu-22.04
+          #   aarch: amd64
+          #   targets: deb,gz
+
+          # - platform: linux-arm64-musl
+          #   os: ubuntu-24.04-arm
+          #   aarch: arm64
+          #   targets: deb,gz
+            
           - platform: macos
-            os: macos-13
+            os: macos-15
             aarch: universal
             targets: dmg,pkg
             
@@ -106,21 +123,46 @@ jobs:
            mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
            echo "${{secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
            ls ~/Library/MobileDevice/Provisioning\ Profiles
+           security unlock-keychain -p "" signing_temp.keychain
+           security find-identity -v -p codesigning
         #   ls ~/Library/MobileDevice/Provisioning\ Profiles
         #   echo "${{secrets.NEW_APPLE_MOBILE_PROVISIONING_PROFILES_TARXZ_BASE64}}"|base64 --decode | tar xJ -C ~/Library/MobileDevice/Provisioning\ Profiles
         #   # echo "${{secrets.NEW_APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64_2}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
           
 
 
-      
+      - name: Setup Flutter for arm64
+        if: ${{ startsWith(matrix.platform,'linux-arm64') }}
+        uses: hurelhuyag/flutter-arm64-action@HEAD
+        with:
+          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2.16.0 #issue with 2.13
+        if: ${{ !startsWith(matrix.platform, 'linux-arm64') }}
+        uses: subosito/flutter-action@v2.21.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           # flutter-version-file: pubspec.yaml
           channel: 'stable'
           cache: true
-
+      - name: Clean up disk space
+        if: startsWith(matrix.platform,'android')
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          df -h
+          sudo rm -rf /opt/ghc
+          df -h
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          df -h
+          rm -rf ~/.gradle/caches
+          df -h
+          sudo apt-get autoremove -y
+          df -h
+          sudo apt-get clean 
+          df -h
+          tree
       
       - name: Setup Java
         if: startsWith(matrix.platform,'android')
@@ -128,24 +170,43 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-      - name: Setup NDK
-        if: startsWith(matrix.platform,'android')
-        uses: nttld/setup-ndk@v1
-        id: setup-ndk
-        with:
-          ndk-version: ${{ env.NDK_VERSION }}
-          add-to-path: true
-          link-to-sdk: true
+      # - name: Setup NDK
+      #   if: startsWith(matrix.platform,'android')
+      #   uses: nttld/setup-ndk@v1
+      #   id: setup-ndk
+      #   with:
+      #     ndk-version: ${{ env.NDK_VERSION }}
+      #     add-to-path: true
+      #     link-to-sdk: true
 
-      - name: Setup Gradle 8.1
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
         if: startsWith(matrix.platform,'android')
-        uses: gradle/actions/setup-gradle@v3
+      # - name: Cache Android SDK
+      #   uses: actions/cache@v4
+      #   if: startsWith(matrix.platform,'android')
+      #   with:
+      #     path: |
+      #       /usr/local/lib/android/sdk
+      #     key: android-sdk-${{ runner.os }}-${{ env.NDK_VERSION }}
+      #     restore-keys: |
+      #       android-sdk-${{ runner.os }}-      
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        if: startsWith(matrix.platform,'android')
+
         with:
-          gradle-version: 7.5
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+                  
       - name: Setup dependencies
         run: |
-          make ${{ matrix.platform }}-install-dependencies
-
+          make ${{ matrix.platform }}-install-deps  
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
 
       - name: Setup Android Signing Properties
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'android') }}
@@ -176,7 +237,8 @@ jobs:
       - name: Prepare for ${{ matrix.platform }}
         run: |
           make ${{ matrix.platform }}-prepare
-          tree
+
+
       - name: Build ${{ matrix.platform }}
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -197,10 +259,24 @@ jobs:
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows'
+        shell: pwsh
         run: |
-          tree
-          .\scripts\package_windows.ps1
-          
+          Get-ChildItem -Path dist -Recurse | Select-Object FullName
+          New-Item -ItemType Directory -Path "out" -Force | Out-Null
+          $targets = "${{ matrix.targets }}".Split(',')
+          foreach ($ext in $targets) {
+            $ext = $ext.Trim()
+            $key = "TARGET_NAME_$ext"
+            $targetName = (Get-Item "env:$key").Value
+            
+            $files = Get-ChildItem -Path dist -Recurse -Filter "*.$ext"
+            
+            foreach ($file in $files) {
+                $destination = Join-Path -Path "out" -ChildPath "$targetName.$ext"
+                Move-Item -Path $file.FullName -Destination $destination -Force
+            }
+          }
+          Get-ChildItem -Path out
           
       - name: Upload Debug Symbols
         if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
@@ -246,7 +322,7 @@ jobs:
             echo "For $EXT ($KEY) filename is ${FILENAME}"
             mv dist/*/*.$EXT tmp_out/${FILENAME}.$EXT
             ls tmp_out
-            chmod +x tmp_out/${FILENAME}.$EXT
+            [[ "$EXT" != "gz" ]] && chmod +x tmp_out/${FILENAME}.$EXT || echo "Skipping chmod for gz"
             if [ "${{matrix.platform}}" == "linux" ];then
               cp ./.github/help/linux/* tmp_out/
             else
@@ -310,11 +386,12 @@ jobs:
           deleteOnlyFromDrafts: false
           
       - name: prepare_release_message
+        continue-on-error: true
         run: |
-          pip install gitchangelog pystache mustache markdown
-          prelease=$(curl --silent "https://api.github.com/repos/hiddify/hiddify-next/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-          current="${{ github.ref_name }}"
+          set +e 
           sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md > release.md
+          pip install gitchangelog pystache mustache markdown
+          prelease=$(curl --silent "https://api.github.com/repos/hiddify/hiddify-app/releases/latest" | grep -Po '"tag_name": "\K([^"]*)') 
           echo -e "\n\n<details markdown=1><summary>All changes from $current to the latest commit:</summary>\n\n">>release.md
           gitchangelog "${prelease}.." >> release.md  2>&1 || echo "Error in gitchangelog"
           echo -e "\n\n</details>">>release.md
@@ -328,6 +405,21 @@ jobs:
           tag_name: 'draft'
           body_path: './release.md'
           prerelease: true
+
+      - name: Create or Update Draft Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_FOR_HIDDIFY_APP_REPO }}
+          GITHUB_REPOSITORY: hiddify/hiddify-app
+        with:
+          files: ./out/*
+          name: 'draft'
+          tag_name: 'draft'
+          body_path: './release.md'
+          target_commitish: '530bf77839a74d4f13847ba244a20734ac7ab119'
+          prerelease: true
+          repository: hiddify/hiddify-app
+
   upload-release:
     permissions: write-all
     if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}

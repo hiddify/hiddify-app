@@ -8,12 +8,28 @@ priority: optional
 section: x11
 installed_size: 6604
 essential: false
-icon: ./assets/images/source/ic_launcher_border.png
+icon: assets/images/source/ic_launcher_border.png
 
+# Post-installation tasks:
+# 1. Inject StartupWMClass into the system .desktop file for correct icon association
+# 2. Remove conflicting hiddify.desktop files from users' .local directories (cleanup AppImage artifacts)
+# 3. Update the desktop database to apply changes immediately
 postinstall_scripts:
-  - echo "Installed Hiddify"
+  - echo "Setting up Hiddify..."
+  - sudo sed -i '/^\[Desktop Entry\]/a StartupWMClass=app.hiddify.com' "/usr/share/applications/hiddify.desktop"
+  - echo "Search and remove hiddify.desktop from .local"
+  - for user_dir in /home/*; do if [ -f "$user_dir/.local/share/applications/hiddify.desktop" ]; then rm -f "$user_dir/.local/share/applications/hiddify.desktop"; echo "Found and removed hiddify.desktop from $user_dir .local"; fi; done
+  - update-desktop-database /usr/share/applications
+  - echo "Hiddify is ready to use :)"
+
+# Post-uninstallation tasks:
+# 1. Iterate through all user directories to remove Hiddify configuration and data
+# 2. Clean up root user data to ensure a clean removal
 postuninstall_scripts:
-  - echo "Surprised Why?"
+  - echo "Removing Hiddify user data..."
+  - for user_dir in /home/*; do if [ -d "$user_dir/.local/share/hiddify" ]; then rm -rf "$user_dir/.local/share/hiddify"; echo "Removed data from $user_dir"; fi; done
+  - rm -rf /root/.local/share/hiddify
+  - echo "Hiddify data cleanup complete."
 
 keywords:
   - Hiddify
@@ -31,3 +47,15 @@ categories:
   - Network
 
 startup_notify: true
+# app_links setup for Linux
+# https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
+supported_mime_type:
+  - x-scheme-handler/hiddify
+  - x-scheme-handler/v2ray
+  - x-scheme-handler/v2rayn
+  - x-scheme-handler/v2rayng
+  - x-scheme-handler/clash
+  - x-scheme-handler/clashmeta
+  - x-scheme-handler/sing-box
+
+metainfo: linux/packaging/app.hiddify.com.appdata.xml
