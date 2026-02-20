@@ -64,23 +64,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: android-apk
-            os: ubuntu-latest
-            targets: apk
+          # - platform: android-apk
+          #   os: ubuntu-latest
+          #   targets: apk
 
           - platform: android-aab
             os: ubuntu-latest
             targets: aab
 
-          - platform: windows
-            os: windows-latest
-            aarch: amd64
-            targets: exe,msix,zip
+          # - platform: windows
+          #   os: windows-latest
+          #   aarch: amd64
+          #   targets: exe,msix,zip
 
-          - platform: linux-amd64
-            os: ubuntu-22.04
-            aarch: amd64
-            targets: deb,gz
+          # - platform: linux-amd64
+          #   os: ubuntu-22.04
+          #   aarch: amd64
+          #   targets: deb,gz
 
           # - platform: linux-arm64
           #   os: ubuntu-24.04-arm
@@ -97,16 +97,16 @@ jobs:
           #   aarch: arm64
           #   targets: deb,gz
             
-          - platform: macos
-            os: macos-15
-            aarch: universal
-            targets: dmg,pkg
+          # - platform: macos
+          #   os: macos-15
+          #   aarch: universal
+          #   targets: dmg,pkg
             
-          - platform: ios
-            os: macos-15
-            aarch: universal
-            filename: hiddify-ios
-            targets: ipa
+          # - platform: ios
+          #   os: macos-15
+          #   aarch: universal
+          #   filename: hiddify-ios
+          #   targets: ipa
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout

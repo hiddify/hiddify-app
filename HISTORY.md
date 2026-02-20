@@ -1,7 +1,15 @@
 # Changelog
 
 
-## 4.0.4 (2026-02-19)
+## 4.0.5 (2026-02-20)
+
+#### Other
+
+* Better support for events. 
+
+
+
+## v4.0.4 (2026-02-19)
 
 #### New
 
