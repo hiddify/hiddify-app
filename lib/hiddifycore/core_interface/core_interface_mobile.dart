@@ -114,24 +114,29 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     });
 
     _isBgClientAvailable = true;
-    for (var i = 0; i < 200; i++) {
+    loggy.info("Waiting for starting core");
+    for (var i = 0; i < 20; i++) {
       try {
-        final res = await _status.get(timeout: const Duration(milliseconds: 100));
+        final res = await _status.get(timeout: const Duration(seconds: 1));
 
         switch (res) {
           case CoreStarted():
             break;
           case CoreStopped():
-            if (res.alert != null) return res;
+            if (res.alert != null) {
+              return res;
+            }
 
           case CoreStopping():
           // return res;
           case CoreStarting():
         }
+        await Future.delayed(const Duration(milliseconds: 200));
       } on TimeoutException {
         // just retry
       }
     }
+    loggy.info("Waiting for starting core finished");
 
     if (!await waitUntilPort(portBack, true, null, maxTry: 10)) {
       await stopMethodChannel();

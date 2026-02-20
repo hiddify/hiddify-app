@@ -19,8 +19,12 @@ sealed class CoreStatus with _$CoreStatus {
     switch (event?["status"]) {
       case "Stopped":
         final alertstr = event?["alert"] as String?;
-        final alert = CoreAlert.values.firstOrNullWhere((e) => alertstr?.toLowerCase() == e.name.toLowerCase());
-        final msgStr = event?["message"] as String?;
+        var msgStr = event?["message"] as String?;
+        var alert = CoreAlert.values.firstOrNullWhere((e) => alertstr?.toLowerCase() == e.name.toLowerCase());
+        if ((alert == null) && (alertstr ?? "") != "") {
+          msgStr = ((msgStr ?? "") != "") ? "$alertstr: $msgStr" : alertstr;
+          alert = CoreAlert.unknown;
+        }
         return CoreStatus.stopped(alert: alert, message: msgStr);
 
       case "Starting":
@@ -100,4 +104,5 @@ enum CoreAlert {
   startService,
   alreadyStarted,
   startFailed,
+  unknown,
 }
