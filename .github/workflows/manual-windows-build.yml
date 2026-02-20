@@ -23,7 +23,8 @@ jobs:
   build-windows:
     runs-on: windows-latest
     permissions: write-all
-    
+    env:
+      PATH: ${{ env.PATH }}:$HOME/.pub-cache/bin
     steps:
       - uses: actions/checkout@v3
         with:
@@ -34,6 +35,13 @@ jobs:
           flutter-version: '3.38.5'
           channel: 'stable'
           cache: true
+
+      - name: Install fastforge
+        run: |
+          echo "Installing fastforge..."
+          dart pub global activate fastforge
+        shell: bash
+
 
       - name: Prepare Windows Build
         run: make windows-prepare
