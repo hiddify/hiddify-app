@@ -46,7 +46,13 @@ class Db extends _$Db with InfraLogger {
           await m.createTable(schema.geoAssetEntries);
         },
         from3To4: (m, schema) async {
-          await m.addColumn(schema.profileEntries, schema.profileEntries.testUrl);
+          final columnExists = await _columnExists(
+            schema.profileEntries.actualTableName,
+            schema.profileEntries.testUrl.name,
+          );
+          if (!columnExists) {
+            await m.addColumn(schema.profileEntries, schema.profileEntries.testUrl);
+          }
         },
         from4To5: (m, schema) async {
           await m.deleteTable('geo_asset_entries');
@@ -57,6 +63,11 @@ class Db extends _$Db with InfraLogger {
         },
       ),
     );
+  }
+
+  Future<bool> _columnExists(String table, String column) async {
+    final result = await customSelect('PRAGMA table_info($table);').get();
+    return result.any((row) => row.data['name'] == column);
   }
 }
 
