@@ -173,6 +173,12 @@ abstract class ConfigOptions {
 
   static final enableTlsFragment = PreferencesNotifier.create<bool, bool>("enable-tls-fragment", false);
 
+  static final fragmentPackets = PreferencesNotifier.create<String, String>(
+    "fragment-packets",
+    "tlshello",
+    possibleValues: ["tlshello", "1-1", "1-2", "1-3", "1-4", "1-5"],
+  );
+
   static final tlsFragmentSize = PreferencesNotifier.create<OptionalRange, String>(
     "tls-fragment-size",
     const OptionalRange(min: 10, max: 30),
@@ -323,6 +329,7 @@ abstract class ConfigOptions {
 
     // tls-tricks
     "tls-tricks.enable-fragment": enableTlsFragment,
+    "tls-tricks.fragment-packets": fragmentPackets,
     "tls-tricks.fragment-size": tlsFragmentSize,
     "tls-tricks.fragment-sleep": tlsFragmentSleep,
     "tls-tricks.mixed-sni-case": enableTlsMixedSniCase,

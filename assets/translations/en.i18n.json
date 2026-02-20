@@ -430,6 +430,13 @@
       "tlsTricks": {
         "title": "TLS tricks",
         "enable": "Enable fragment",
+        "packets": "Fragmentation Packets",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
         "size": "Fragment size",
         "sleep": "Fragment sleep",
         "mixedSniCase": {

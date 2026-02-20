@@ -7,6 +7,17 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class TlsTricksPage extends HookConsumerWidget {
   const TlsTricksPage({super.key});
+
+  String _presentFragmentPackets(TranslationsEn t, String value) => switch (value) {
+    "tlshello" => t.pages.settings.tlsTricks.packetsTlsHello,
+    "1-1" => t.pages.settings.tlsTricks.packets1_1,
+    "1-2" => t.pages.settings.tlsTricks.packets1_2,
+    "1-3" => t.pages.settings.tlsTricks.packets1_3,
+    "1-4" => t.pages.settings.tlsTricks.packets1_4,
+    "1-5" => t.pages.settings.tlsTricks.packets1_5,
+    _ => value,
+  };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
@@ -20,6 +31,15 @@ class TlsTricksPage extends HookConsumerWidget {
             value: ref.watch(ConfigOptions.enableTlsFragment),
             secondary: const Icon(Icons.content_cut_rounded),
             onChanged: ref.read(ConfigOptions.enableTlsFragment.notifier).update,
+          ),
+          ChoicePreferenceWidget(
+            selected: ref.watch(ConfigOptions.fragmentPackets),
+            preferences: ref.watch(ConfigOptions.fragmentPackets.notifier),
+            choices: ["tlshello", "1-1", "1-2", "1-3", "1-4", "1-5"],
+            title: t.pages.settings.tlsTricks.packets,
+            icon: Icons.layers_rounded,
+            presentChoice: (value) => _presentFragmentPackets(t, value),
+            enabled: canChangeOption,
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.tlsFragmentSize),
