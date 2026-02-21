@@ -395,6 +395,7 @@
         "directDns": "DNS پروکسیها (مستقیم)",
         "directDnsDomainStrategy": "استراتژی دامنه DNS مستقیم",
         "enableDnsRouting": "فعال‌سازی مسیریابی DNS",
+        "enableFakeDns": "فعال‌سازی DNS جعلی",
         "domainStrategy": {
           "auto": "خودکار",
           "preferIpv6": "ترجیح IPv6",

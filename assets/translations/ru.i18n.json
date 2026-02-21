@@ -399,6 +399,7 @@
         "directDns": "Прямой DNS",
         "directDnsDomainStrategy": "Стратегия прямого домена DNS",
         "enableDnsRouting": "Включить маршрутизацию DNS",
+        "enableFakeDns": "Включить поддельный DNS",
         "domainStrategy": {
           "auto": "Авто",
           "preferIpv6": "Предпочитать IPv6",

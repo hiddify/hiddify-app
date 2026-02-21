@@ -395,6 +395,7 @@
         "directDns": "DNS directo",
         "directDnsDomainStrategy": "Estrategia de dominio de DNS directo",
         "enableDnsRouting": "Habilitar enrutamiento de DNS",
+        "enableFakeDns": "Habilitar DNS falso",
         "domainStrategy": {
           "auto": "Automático",
           "preferIpv6": "Preferir IPv6",

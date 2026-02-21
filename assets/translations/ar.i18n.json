@@ -401,6 +401,7 @@
         "directDns": "DNS مباشر",
         "directDnsDomainStrategy": "استراتيجية نطاق DNS مباشر",
         "enableDnsRouting": "تفعيل توجيه DNS",
+        "enableFakeDns": "تمكين DNS الوهمي",
         "domainStrategy": {
           "auto": "تلقائي",
           "preferIpv6": "تفضيل IPv6",

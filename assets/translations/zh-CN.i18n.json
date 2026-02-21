@@ -395,6 +395,7 @@
         "directDns": "直连 DNS",
         "directDnsDomainStrategy": "直连 DNS 域名策略",
         "enableDnsRouting": "启用 DNS 路由",
+        "enableFakeDns": "启用伪造 DNS",
         "domainStrategy": {
           "auto": "自动",
           "preferIpv6": "首选 IPv6",

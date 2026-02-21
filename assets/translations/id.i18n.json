@@ -395,6 +395,7 @@
         "directDns": "DNS langsung",
         "directDnsDomainStrategy": "Strategi domain DNS langsung",
         "enableDnsRouting": "Aktifkan perutean DNS",
+        "enableFakeDns": "Aktifkan DNS palsu",
         "domainStrategy": {
           "auto": "Otomatis",
           "preferIpv6": "Prioritaskan IPv6",

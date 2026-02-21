@@ -395,6 +395,7 @@
         "directDns": "Doğrudan DNS",
         "directDnsDomainStrategy": "Doğrudan DNS alan adı stratejisi",
         "enableDnsRouting": "DNS yönlendirmeyi etkinleştir",
+        "enableFakeDns": "Sahte DNS'i etkinleştir",
         "domainStrategy": {
           "auto": "Otomatik",
           "preferIpv6": "IPv6'yı tercih et",
