@@ -8,6 +8,8 @@ import 'generated/schema.dart';
 
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
+import 'generated/schema_v3.dart' as v3;
+import 'generated/schema_v4.dart' as v4;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -65,6 +67,64 @@ void main() {
           expectedNewProfileEntriesData,
           await newDb.select(newDb.profileEntries).get(),
         );
+      },
+    );
+  });
+
+  group('_columnExists-backed migrations', () {
+    test('migration from v3 to v4 adds test_url when missing', () async {
+      final schema = await verifier.schemaAt(3);
+      addTearDown(() => schema.rawDatabase.dispose());
+
+      final oldDb = v3.DatabaseAtV3(schema.newConnection());
+      final oldColumns = await oldDb
+          .customSelect('PRAGMA table_info(profile_entries);')
+          .get();
+
+      expect(
+        oldColumns.where((row) => row.data['name'] == 'test_url'),
+        isEmpty,
+      );
+      await oldDb.close();
+
+      final migratedDb = Db(schema.newConnection());
+      await verifier.migrateAndValidate(migratedDb, 4);
+      await migratedDb.close();
+
+      final newDb = v4.DatabaseAtV4(schema.newConnection());
+      final newColumns = await newDb
+          .customSelect('PRAGMA table_info(profile_entries);')
+          .get();
+      expect(
+        newColumns.where((row) => row.data['name'] == 'test_url'),
+        hasLength(1),
+      );
+      await newDb.close();
+    });
+
+    test(
+      'migration from v3 to v4 skips adding test_url when it already exists',
+      () async {
+        final schema = await verifier.schemaAt(3);
+        addTearDown(() => schema.rawDatabase.dispose());
+
+        schema.rawDatabase.execute(
+          'ALTER TABLE profile_entries ADD COLUMN test_url TEXT NULL;',
+        );
+
+        final migratedDb = Db(schema.newConnection());
+        await verifier.migrateAndValidate(migratedDb, 4);
+        await migratedDb.close();
+
+        final newDb = v4.DatabaseAtV4(schema.newConnection());
+        final newColumns = await newDb
+            .customSelect('PRAGMA table_info(profile_entries);')
+            .get();
+        expect(
+          newColumns.where((row) => row.data['name'] == 'test_url'),
+          hasLength(1),
+        );
+        await newDb.close();
       },
     );
   });
