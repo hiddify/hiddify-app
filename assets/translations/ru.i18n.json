@@ -432,6 +432,7 @@
         "mixedPort": "Смешанный порт",
         "tproxyPort": "Порт прозрачного прокси",
         "directPort": "Локальный порт direct",
+        "redirectPort": "Порт перенаправления",
         "allowConnectionFromLan": "Поделиться VPN в локальной сети"
       },
       "tlsTricks": {

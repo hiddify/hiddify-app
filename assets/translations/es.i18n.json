@@ -428,6 +428,7 @@
         "mixedPort": "Puerto mixto",
         "tproxyPort": "Puerto de proxy transparente",
         "directPort": "Puerto de Directo",
+        "redirectPort": "Puerto de redirección",
         "allowConnectionFromLan": "Compartir VPN en la red local"
       },
       "tlsTricks": {

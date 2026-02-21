@@ -428,6 +428,7 @@
         "mixedPort": "Port campuran",
         "tproxyPort": "Port proksi transparan",
         "directPort": "Port direct",
+        "redirectPort": "Port pengalihan",
         "allowConnectionFromLan": "Bagikan VPN di jaringan lokal"
       },
       "tlsTricks": {

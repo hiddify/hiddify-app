@@ -428,6 +428,7 @@
         "mixedPort": "پورت ترکیبی",
         "tproxyPort": "پورت پروکسی شفاف",
         "directPort": "پورت مستقیم",
+        "redirectPort": "پورت تغییر مسیر",
         "allowConnectionFromLan": "اشتراک VPN در شبکه محلی"
       },
       "tlsTricks": {

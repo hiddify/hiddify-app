@@ -428,6 +428,7 @@
         "mixedPort": "Karışık port",
         "tproxyPort": "Şeffaf proxy portu",
         "directPort": "Direct portu",
+        "redirectPort": "Yönlendirme portu",
         "allowConnectionFromLan": "VPN'i yerel ağda paylaş"
       },
       "tlsTricks": {

@@ -428,6 +428,7 @@
         "mixedPort": "混合端口",
         "tproxyPort": "透明代理端口",
         "directPort": "本地 Direct 端口",
+        "redirectPort": "重定向端口",
         "allowConnectionFromLan": "允许来自局域网的连接"
       },
       "tlsTricks": {

@@ -434,6 +434,7 @@
         "mixedPort": "منفذ مختلط",
         "tproxyPort": "منفذ البروكسي الشفاف",
         "directPort": "منفذ مباشر",
+        "redirectPort": "منفذ إعادة التوجيه",
         "allowConnectionFromLan": "مشاركة VPN على الشبكة المحلية"
       },
       "tlsTricks": {
