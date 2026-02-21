@@ -23,6 +23,13 @@ abstract class ConfigOptions {
     mapTo: (value) => value.key,
   );
 
+  static final balancerStrategy = PreferencesNotifier.create<BalancerStrategy, String>(
+    "balancer-strategy",
+    BalancerStrategy.roundRobin,
+    mapFrom: (value) => BalancerStrategy.values.firstWhere((e) => e.key == value),
+    mapTo: (value) => value.key,
+  );
+
   static final region = PreferencesNotifier.create<Region, String>(
     "region",
     Region.other,
@@ -291,6 +298,7 @@ abstract class ConfigOptions {
 
   static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>> preferences = {
     "region": region,
+    "balancer-strategy": balancerStrategy,
     "block-ads": blockAds,
     "use-xray-core-when-possible": useXrayCoreWhenPossible,
     "service-mode": serviceMode,
@@ -395,6 +403,7 @@ abstract class ConfigOptions {
 
     return SingboxConfigOption(
       region: ref.watch(region).name,
+      balancerStrategy: ref.watch(balancerStrategy),
       blockAds: ref.watch(blockAds),
       useXrayCoreWhenPossible: ref.watch(useXrayCoreWhenPossible),
       executeConfigAsIs: false,

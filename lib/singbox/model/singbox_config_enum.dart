@@ -50,6 +50,23 @@ enum ServiceMode {
 }
 
 @JsonEnum(valueField: 'key')
+enum BalancerStrategy {
+  roundRobin("round-robin"),
+  consistentHash("consistent-hash"),
+  stickySession("sticky-session");
+
+  const BalancerStrategy(this.key);
+
+  final String key;
+
+  String present(TranslationsEn t) => switch (this) {
+    roundRobin => t.pages.settings.routing.balancerStrategy.roundRobin,
+    consistentHash => t.pages.settings.routing.balancerStrategy.consistentHash,
+    stickySession => t.pages.settings.routing.balancerStrategy.stickySession,
+  };
+}
+
+@JsonEnum(valueField: 'key')
 enum IPv6Mode {
   disable("ipv4_only"),
   enable("prefer_ipv4"),
