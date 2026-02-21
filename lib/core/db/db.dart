@@ -57,8 +57,23 @@ class Db extends _$Db with InfraLogger {
         from4To5: (m, schema) async {
           await m.deleteTable('geo_asset_entries');
           await m.renameColumn(schema.profileEntries, 'test_url', schema.profileEntries.profileOverride);
-          await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
-          await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
+
+          final userOverrideExists = await _columnExists(
+            schema.profileEntries.actualTableName,
+            schema.profileEntries.userOverride.name,
+          );
+          if (!userOverrideExists) {
+            await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
+          }
+
+          final populatedHeadersExists = await _columnExists(
+            schema.profileEntries.actualTableName,
+            schema.profileEntries.populatedHeaders.name,
+          );
+          if (!populatedHeadersExists) {
+            await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
+          }
+
           await m.createTable(schema.appProxyEntries);
         },
       ),
