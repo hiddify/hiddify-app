@@ -46,11 +46,11 @@ class Db extends _$Db with InfraLogger {
           await m.createTable(schema.geoAssetEntries);
         },
         from3To4: (m, schema) async {
-          final columnExists = await _columnExists(
+          final testUrlExists = await _columnExists(
             schema.profileEntries.actualTableName,
             schema.profileEntries.testUrl.name,
           );
-          if (!columnExists) {
+          if (!testUrlExists) {
             await m.addColumn(schema.profileEntries, schema.profileEntries.testUrl);
           }
         },
