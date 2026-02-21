@@ -324,10 +324,10 @@ abstract class ConfigOptions {
     // "enable-dns-routing": enableDnsRouting,
 
     // mux
-    "mux.enable": enableMux,
-    "mux.padding": muxPadding,
-    "mux.max-streams": muxMaxStreams,
-    "mux.protocol": muxProtocol,
+    // "mux.enable": enableMux,
+    // "mux.padding": muxPadding,
+    // "mux.max-streams": muxMaxStreams,
+    // "mux.protocol": muxProtocol,
 
     // tls-tricks
     "tls-tricks.enable-fragment": enableTlsFragment,
@@ -433,12 +433,12 @@ abstract class ConfigOptions {
       enableFakeDns: ref.watch(enableFakeDns),
       // enableDnsRouting: ref.watch(enableDnsRouting),
       independentDnsCache: ref.watch(independentDnsCache),
-      mux: SingboxMuxOption(
-        enable: ref.watch(enableMux),
-        padding: ref.watch(muxPadding),
-        maxStreams: ref.watch(muxMaxStreams),
-        protocol: ref.watch(muxProtocol),
-      ),
+      // mux: SingboxMuxOption(
+      //   enable: ref.watch(enableMux),
+      //   padding: ref.watch(muxPadding),
+      //   maxStreams: ref.watch(muxMaxStreams),
+      //   protocol: ref.watch(muxProtocol),
+      // ),
       tlsTricks: SingboxTlsTricks(
         enableFragment: ref.watch(enableTlsFragment),
         fragmentSize: ref.watch(tlsFragmentSize),
@@ -475,14 +475,6 @@ abstract class ConfigOptions {
         noiseSize: ref.watch(warpNoiseSize),
         noiseDelay: ref.watch(warpNoiseDelay),
       ),
-      // geoipPath: ref.watch(geoAssetPathResolverProvider).relativePath(
-      //       geoAssets.geoip.providerName,
-      //       geoAssets.geoip.fileName,
-      //     ),
-      // geositePath: ref.watch(geoAssetPathResolverProvider).relativePath(
-      //       geoAssets.geosite.providerName,
-      //       geoAssets.geosite.fileName,
-      //     ),
       rules: rules,
     );
   });
