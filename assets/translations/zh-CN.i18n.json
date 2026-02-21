@@ -392,14 +392,14 @@
         "title": "DNS",
         "remoteDns": "远程 DNS",
         "remoteDnsDomainStrategy": "远程 DNS 域名策略",
-        "directDns": "直连 DNS",
-        "directDnsDomainStrategy": "直连 DNS 域名策略",
+        "directDns": "出站服务器解析器（直连）",
+        "directDnsDomainStrategy": "出站域名策略",
         "enableDnsRouting": "启用 DNS 路由",
         "enableFakeDns": "启用伪造 DNS",
         "domainStrategy": {
           "auto": "自动",
-          "preferIpv6": "首选 IPv6",
-          "preferIpv4": "首选 IPv4",
+          "preferIpv6": "偏好 IPv6",
+          "preferIpv4": "偏好 IPv4",
           "ipv4Only": "仅 IPv4",
           "ipv6Only": "仅 IPv6"
         }

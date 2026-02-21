@@ -393,8 +393,8 @@
         "title": "DNS",
         "remoteDns": "Remote DNS",
         "remoteDnsDomainStrategy": "Remote DNS domain strategy",
-        "directDns": "Outbound Server Resolver (Direct)",
-        "directDnsDomainStrategy": "Outbound Domain strategy",
+        "directDns": "Outbound server resolver (direct)",
+        "directDnsDomainStrategy": "Outbound domain strategy",
         "enableDnsRouting": "Enable DNS routing",
         "enableFakeDns": "Enable fake DNS",
         "domainStrategy": {

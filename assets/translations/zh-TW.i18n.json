@@ -391,15 +391,15 @@
       "dns": {
         "title": "DNS",
         "remoteDns": "遠端 DNS",
-        "remoteDnsDomainStrategy": "遠端 DNS 域名策略",
-        "directDns": "直連 DNS",
-        "directDnsDomainStrategy": "直連 DNS 域名策略",
+        "remoteDnsDomainStrategy": "遠端 DNS 網域策略",
+        "directDns": "出站伺服器解析器（直連）",
+        "directDnsDomainStrategy": "出站網域策略",
         "enableDnsRouting": "啟用 DNS 路由",
         "enableFakeDns": "啟用偽造 DNS",
         "domainStrategy": {
           "auto": "自動",
-          "preferIpv6": "首選 IPv6",
-          "preferIpv4": "首選 IPv4",
+          "preferIpv6": "偏好 IPv6",
+          "preferIpv4": "偏好 IPv4",
           "ipv4Only": "僅 IPv4",
           "ipv6Only": "僅 IPv6"
         }

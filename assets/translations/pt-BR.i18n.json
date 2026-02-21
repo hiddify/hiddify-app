@@ -392,8 +392,8 @@
         "title": "DNS",
         "remoteDns": "DNS remoto",
         "remoteDnsDomainStrategy": "Estratégia de domínio de DNS remoto",
-        "directDns": "DNS direto",
-        "directDnsDomainStrategy": "Estratégia de domínio de DNS direto",
+        "directDns": "Resolvedor de servidor de saída (direto)",
+        "directDnsDomainStrategy": "Estratégia de domínio de saída",
         "enableDnsRouting": "Ativar roteamento de DNS",
         "enableFakeDns": "Ativar DNS falso",
         "domainStrategy": {

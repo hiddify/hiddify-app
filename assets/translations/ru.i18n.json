@@ -395,9 +395,9 @@
       "dns": {
         "title": "DNS",
         "remoteDns": "Удаленный DNS",
-        "remoteDnsDomainStrategy": "Стратегия удаленного домена DNS",
-        "directDns": "Прямой DNS",
-        "directDnsDomainStrategy": "Стратегия прямого домена DNS",
+        "remoteDnsDomainStrategy": "Стратегия домена удаленного DNS",
+        "directDns": "Распознаватель исходящего сервера (напрямую)",
+        "directDnsDomainStrategy": "Стратегия исходящего домена",
         "enableDnsRouting": "Включить маршрутизацию DNS",
         "enableFakeDns": "Включить поддельный DNS",
         "domainStrategy": {

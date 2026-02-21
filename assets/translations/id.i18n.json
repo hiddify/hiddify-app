@@ -392,14 +392,14 @@
         "title": "DNS",
         "remoteDns": "DNS jarak jauh",
         "remoteDnsDomainStrategy": "Strategi domain DNS jarak jauh",
-        "directDns": "DNS langsung",
-        "directDnsDomainStrategy": "Strategi domain DNS langsung",
+        "directDns": "Penyelesai server keluar (langsung)",
+        "directDnsDomainStrategy": "Strategi domain keluar",
         "enableDnsRouting": "Aktifkan perutean DNS",
         "enableFakeDns": "Aktifkan DNS palsu",
         "domainStrategy": {
           "auto": "Otomatis",
-          "preferIpv6": "Prioritaskan IPv6",
-          "preferIpv4": "Prioritaskan IPv4",
+          "preferIpv6": "Pilih IPv6",
+          "preferIpv4": "Pilih IPv4",
           "ipv4Only": "Hanya IPv4",
           "ipv6Only": "Hanya IPv6"
         }

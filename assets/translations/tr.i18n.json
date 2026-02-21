@@ -392,16 +392,16 @@
         "title": "DNS",
         "remoteDns": "Uzak DNS",
         "remoteDnsDomainStrategy": "Uzak DNS alan adı stratejisi",
-        "directDns": "Doğrudan DNS",
-        "directDnsDomainStrategy": "Doğrudan DNS alan adı stratejisi",
+        "directDns": "Giden sunucu çözümleyicisi (doğrudan)",
+        "directDnsDomainStrategy": "Giden alan adı stratejisi",
         "enableDnsRouting": "DNS yönlendirmeyi etkinleştir",
         "enableFakeDns": "Sahte DNS'i etkinleştir",
         "domainStrategy": {
           "auto": "Otomatik",
-          "preferIpv6": "IPv6'yı tercih et",
-          "preferIpv4": "IPv4'ü tercih et",
-          "ipv4Only": "Yalnızca IPv4",
-          "ipv6Only": "Yalnızca IPv6"
+          "preferIpv6": "IPv6 tercih et",
+          "preferIpv4": "IPv4 tercih et",
+          "ipv4Only": "Sadece IPv4",
+          "ipv6Only": "Sadece IPv6"
         }
       },
       "inbound": {

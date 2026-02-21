@@ -396,11 +396,11 @@
       },
       "dns": {
         "title": "DNS",
-        "remoteDns": "DNS عن بعد",
-        "remoteDnsDomainStrategy": "استراتيجية نطاق DNS عن بعد",
-        "directDns": "DNS مباشر",
-        "directDnsDomainStrategy": "استراتيجية نطاق DNS مباشر",
-        "enableDnsRouting": "تفعيل توجيه DNS",
+        "remoteDns": "DNS البعيد",
+        "remoteDnsDomainStrategy": "استراتيجية نطاق DNS البعيد",
+        "directDns": "محلل خادم الصادر (مباشر)",
+        "directDnsDomainStrategy": "استراتيجية النطاق الصادر",
+        "enableDnsRouting": "تمكين توجيه DNS",
         "enableFakeDns": "تمكين DNS الوهمي",
         "domainStrategy": {
           "auto": "تلقائي",
