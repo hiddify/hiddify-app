@@ -433,7 +433,7 @@
         },
         "mixedPort": "منفذ مختلط",
         "tproxyPort": "منفذ البروكسي الشفاف",
-        
+        "directPort": "منفذ مباشر",
         "allowConnectionFromLan": "مشاركة VPN على الشبكة المحلية"
       },
       "tlsTricks": {
