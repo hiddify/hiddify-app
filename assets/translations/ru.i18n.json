@@ -286,6 +286,12 @@
           "br": "Бразилия (br) 🇧🇷",
           "other": "Другой"
         },
+        "balancerStrategy": {
+          "title": "Стратегия Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Блокировать рекламу",
         "bypassLan": "Обход LAN",
         "resolveDestination": "Определять адрес назначения",

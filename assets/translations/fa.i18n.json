@@ -282,6 +282,12 @@
           "br": "برزیل (br) 🇧🇷",
           "other": "سایر"
         },
+        "balancerStrategy": {
+          "title": "استراتژی Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "مسدودسازی تبلیغات",
         "bypassLan": "دور زدن LAN",
         "resolveDestination": "تحلیل آدرس مقصد",

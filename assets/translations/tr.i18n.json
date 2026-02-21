@@ -282,6 +282,12 @@
           "br": "Brezilya (br) 🇧🇷",
           "other": "Diğer"
         },
+        "balancerStrategy": {
+          "title": "Balancer stratejisi",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Reklamları engelle",
         "bypassLan": "LAN'ı atla",
         "resolveDestination": "Hedefi çözümle",

@@ -282,6 +282,12 @@
           "br": "Brésil (br) 🇧🇷",
           "other": "Autre"
         },
+        "balancerStrategy": {
+          "title": "Stratégie de Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Bloquer les publicités",
         "bypassLan": "Contourner le LAN",
         "resolveDestination": "Résoudre la destination",

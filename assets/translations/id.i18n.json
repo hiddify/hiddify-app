@@ -282,6 +282,12 @@
           "br": "Brasil (br) 🇧🇷",
           "other": "Lainnya"
         },
+        "balancerStrategy": {
+          "title": "Strategi Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Blokir iklan",
         "bypassLan": "Lewati LAN",
         "resolveDestination": "Resolusi tujuan",

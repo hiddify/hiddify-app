@@ -288,6 +288,12 @@
           "br": "البرازيل (br) 🇧🇷",
           "other": "أخرى"
         },
+        "balancerStrategy": {
+          "title": "استراتيجية Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "حظر الإعلانات",
         "bypassLan": "تجاوز الشبكة المحلية",
         "resolveDestination": "تحديد وجهة الاتصال",

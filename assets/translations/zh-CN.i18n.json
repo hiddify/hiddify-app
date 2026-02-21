@@ -282,6 +282,12 @@
           "br": "巴西 (br) 🇧🇷",
           "other": "其他"
         },
+        "balancerStrategy": {
+          "title": "Balancer 策略",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "拦截广告",
         "bypassLan": "绕过局域网",
         "resolveDestination": "解析目的地",

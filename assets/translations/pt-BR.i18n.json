@@ -282,6 +282,12 @@
           "br": "Brasil (br) 🇧🇷",
           "other": "Outro"
         },
+        "balancerStrategy": {
+          "title": "Estratégia de Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Bloquear anúncios",
         "bypassLan": "Ignorar LAN",
         "resolveDestination": "Resolver destino",
