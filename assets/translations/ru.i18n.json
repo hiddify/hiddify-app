@@ -286,6 +286,12 @@
           "br": "Бразилия (br) 🇧🇷",
           "other": "Другой"
         },
+        "balancerStrategy": {
+          "title": "Стратегия Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Блокировать рекламу",
         "bypassLan": "Обход LAN",
         "resolveDestination": "Определять адрес назначения",
@@ -389,10 +395,11 @@
       "dns": {
         "title": "DNS",
         "remoteDns": "Удаленный DNS",
-        "remoteDnsDomainStrategy": "Стратегия удаленного домена DNS",
-        "directDns": "Прямой DNS",
-        "directDnsDomainStrategy": "Стратегия прямого домена DNS",
+        "remoteDnsDomainStrategy": "Стратегия домена удаленного DNS",
+        "directDns": "Распознаватель исходящего сервера (напрямую)",
+        "directDnsDomainStrategy": "Стратегия исходящего домена",
         "enableDnsRouting": "Включить маршрутизацию DNS",
+        "enableFakeDns": "Включить поддельный DNS",
         "domainStrategy": {
           "auto": "Авто",
           "preferIpv6": "Предпочитать IPv6",
@@ -426,6 +433,7 @@
         "mixedPort": "Смешанный порт",
         "tproxyPort": "Порт прозрачного прокси",
         "directPort": "Локальный порт direct",
+        "redirectPort": "Порт перенаправления",
         "allowConnectionFromLan": "Поделиться VPN в локальной сети"
       },
       "tlsTricks": {

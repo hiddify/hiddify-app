@@ -282,6 +282,12 @@
           "br": "Brésil (br) 🇧🇷",
           "other": "Autre"
         },
+        "balancerStrategy": {
+          "title": "Stratégie de Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Bloquer les publicités",
         "bypassLan": "Contourner le LAN",
         "resolveDestination": "Résoudre la destination",
@@ -386,11 +392,12 @@
         "title": "DNS",
         "remoteDns": "DNS distant",
         "remoteDnsDomainStrategy": "Stratégie de domaine DNS distant",
-        "directDns": "DNS direct",
-        "directDnsDomainStrategy": "Stratégie de domaine DNS direct",
+        "directDns": "Résolveur de serveur sortant (direct)",
+        "directDnsDomainStrategy": "Stratégie de domaine sortant",
         "enableDnsRouting": "Activer le routage DNS",
+        "enableFakeDns": "Activer le faux DNS",
         "domainStrategy": {
-          "auto": "Automatique",
+          "auto": "Auto",
           "preferIpv6": "Préférer IPv6",
           "preferIpv4": "Préférer IPv4",
           "ipv4Only": "IPv4 uniquement",
@@ -422,6 +429,7 @@
         "mixedPort": "Port mixte",
         "tproxyPort": "Port de proxy transparent",
         "directPort": "Port direct local",
+        "redirectPort": "Port de redirection",
         "allowConnectionFromLan": "Partager le VPN sur le réseau local"
       },
       "tlsTricks": {
