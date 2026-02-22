@@ -288,6 +288,12 @@
           "br": "البرازيل (br) 🇧🇷",
           "other": "أخرى"
         },
+        "balancerStrategy": {
+          "title": "استراتيجية Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "حظر الإعلانات",
         "bypassLan": "تجاوز الشبكة المحلية",
         "resolveDestination": "تحديد وجهة الاتصال",
@@ -390,11 +396,12 @@
       },
       "dns": {
         "title": "DNS",
-        "remoteDns": "DNS عن بعد",
-        "remoteDnsDomainStrategy": "استراتيجية نطاق DNS عن بعد",
-        "directDns": "DNS مباشر",
-        "directDnsDomainStrategy": "استراتيجية نطاق DNS مباشر",
-        "enableDnsRouting": "تفعيل توجيه DNS",
+        "remoteDns": "DNS البعيد",
+        "remoteDnsDomainStrategy": "استراتيجية نطاق DNS البعيد",
+        "directDns": "محلل خادم الصادر (مباشر)",
+        "directDnsDomainStrategy": "استراتيجية النطاق الصادر",
+        "enableDnsRouting": "تمكين توجيه DNS",
+        "enableFakeDns": "تمكين DNS الوهمي",
         "domainStrategy": {
           "auto": "تلقائي",
           "preferIpv6": "تفضيل IPv6",
@@ -427,12 +434,20 @@
         },
         "mixedPort": "منفذ مختلط",
         "tproxyPort": "منفذ البروكسي الشفاف",
-        
+        "directPort": "منفذ مباشر",
+        "redirectPort": "منفذ إعادة التوجيه",
         "allowConnectionFromLan": "مشاركة VPN على الشبكة المحلية"
       },
       "tlsTricks": {
         "title": "حيل TLS",
         "enable": "تفعيل fragment",
+        "packets": "حزم التجزئة",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
         "size": "حجم fragment",
         "sleep": "تأخير fragment",
         "mixedSniCase": {

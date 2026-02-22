@@ -282,6 +282,12 @@
           "br": "Brasil (br) 🇧🇷",
           "other": "Lainnya"
         },
+        "balancerStrategy": {
+          "title": "Strategi Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Blokir iklan",
         "bypassLan": "Lewati LAN",
         "resolveDestination": "Resolusi tujuan",
@@ -386,13 +392,14 @@
         "title": "DNS",
         "remoteDns": "DNS jarak jauh",
         "remoteDnsDomainStrategy": "Strategi domain DNS jarak jauh",
-        "directDns": "DNS langsung",
-        "directDnsDomainStrategy": "Strategi domain DNS langsung",
+        "directDns": "Penyelesai server keluar (langsung)",
+        "directDnsDomainStrategy": "Strategi domain keluar",
         "enableDnsRouting": "Aktifkan perutean DNS",
+        "enableFakeDns": "Aktifkan DNS palsu",
         "domainStrategy": {
           "auto": "Otomatis",
-          "preferIpv6": "Prioritaskan IPv6",
-          "preferIpv4": "Prioritaskan IPv4",
+          "preferIpv6": "Pilih IPv6",
+          "preferIpv4": "Pilih IPv4",
           "ipv4Only": "Hanya IPv4",
           "ipv6Only": "Hanya IPv6"
         }
@@ -422,11 +429,19 @@
         "mixedPort": "Port campuran",
         "tproxyPort": "Port proksi transparan",
         "directPort": "Port direct",
+        "redirectPort": "Port pengalihan",
         "allowConnectionFromLan": "Bagikan VPN di jaringan lokal"
       },
       "tlsTricks": {
         "title": "Trik TLS",
         "enable": "Aktifkan fragmen",
+        "packets": "Paket Fragmentasi",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
         "size": "Ukuran fragmen",
         "sleep": "Jeda fragmen",
         "mixedSniCase": {

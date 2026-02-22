@@ -23,6 +23,13 @@ abstract class ConfigOptions {
     mapTo: (value) => value.key,
   );
 
+  static final balancerStrategy = PreferencesNotifier.create<BalancerStrategy, String>(
+    "balancer-strategy",
+    BalancerStrategy.roundRobin,
+    mapFrom: (value) => BalancerStrategy.values.firstWhere((e) => e.key == value),
+    mapTo: (value) => value.key,
+  );
+
   static final region = PreferencesNotifier.create<Region, String>(
     "region",
     Region.other,
@@ -173,6 +180,12 @@ abstract class ConfigOptions {
 
   static final enableTlsFragment = PreferencesNotifier.create<bool, bool>("enable-tls-fragment", false);
 
+  static final fragmentPackets = PreferencesNotifier.create<String, String>(
+    "fragment-packets",
+    "tlshello",
+    possibleValues: ["tlshello", "1-1", "1-2", "1-3", "1-4", "1-5"],
+  );
+
   static final tlsFragmentSize = PreferencesNotifier.create<OptionalRange, String>(
     "tls-fragment-size",
     const OptionalRange(min: 10, max: 30),
@@ -291,6 +304,7 @@ abstract class ConfigOptions {
 
   static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>> preferences = {
     "region": region,
+    "balancer-strategy": balancerStrategy,
     "block-ads": blockAds,
     "use-xray-core-when-possible": useXrayCoreWhenPossible,
     "service-mode": serviceMode,
@@ -316,13 +330,14 @@ abstract class ConfigOptions {
     // "enable-dns-routing": enableDnsRouting,
 
     // mux
-    "mux.enable": enableMux,
-    "mux.padding": muxPadding,
-    "mux.max-streams": muxMaxStreams,
-    "mux.protocol": muxProtocol,
+    // "mux.enable": enableMux,
+    // "mux.padding": muxPadding,
+    // "mux.max-streams": muxMaxStreams,
+    // "mux.protocol": muxProtocol,
 
     // tls-tricks
     "tls-tricks.enable-fragment": enableTlsFragment,
+    "tls-tricks.fragment-packets": fragmentPackets,
     "tls-tricks.fragment-size": tlsFragmentSize,
     "tls-tricks.fragment-sleep": tlsFragmentSleep,
     "tls-tricks.mixed-sni-case": enableTlsMixedSniCase,
@@ -395,6 +410,7 @@ abstract class ConfigOptions {
 
     return SingboxConfigOption(
       region: ref.watch(region).name,
+      balancerStrategy: ref.watch(balancerStrategy),
       blockAds: ref.watch(blockAds),
       useXrayCoreWhenPossible: ref.watch(useXrayCoreWhenPossible),
       executeConfigAsIs: false,
@@ -424,12 +440,12 @@ abstract class ConfigOptions {
       enableFakeDns: ref.watch(enableFakeDns),
       // enableDnsRouting: ref.watch(enableDnsRouting),
       independentDnsCache: ref.watch(independentDnsCache),
-      mux: SingboxMuxOption(
-        enable: ref.watch(enableMux),
-        padding: ref.watch(muxPadding),
-        maxStreams: ref.watch(muxMaxStreams),
-        protocol: ref.watch(muxProtocol),
-      ),
+      // mux: SingboxMuxOption(
+      //   enable: ref.watch(enableMux),
+      //   padding: ref.watch(muxPadding),
+      //   maxStreams: ref.watch(muxMaxStreams),
+      //   protocol: ref.watch(muxProtocol),
+      // ),
       tlsTricks: SingboxTlsTricks(
         enableFragment: ref.watch(enableTlsFragment),
         fragmentSize: ref.watch(tlsFragmentSize),
@@ -466,14 +482,6 @@ abstract class ConfigOptions {
         noiseSize: ref.watch(warpNoiseSize),
         noiseDelay: ref.watch(warpNoiseDelay),
       ),
-      // geoipPath: ref.watch(geoAssetPathResolverProvider).relativePath(
-      //       geoAssets.geoip.providerName,
-      //       geoAssets.geoip.fileName,
-      //     ),
-      // geositePath: ref.watch(geoAssetPathResolverProvider).relativePath(
-      //       geoAssets.geosite.providerName,
-      //       geoAssets.geosite.fileName,
-      //     ),
       rules: rules,
     );
   });

@@ -282,6 +282,12 @@
           "br": "برزیل (br) 🇧🇷",
           "other": "سایر"
         },
+        "balancerStrategy": {
+          "title": "استراتژی Balancer",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "مسدودسازی تبلیغات",
         "bypassLan": "دور زدن LAN",
         "resolveDestination": "تحلیل آدرس مقصد",
@@ -385,10 +391,11 @@
       "dns": {
         "title": "DNS",
         "remoteDns": "DNS اصلی (ریموت)",
-        "remoteDnsDomainStrategy": "استراتژی دامنه DNS ",
-        "directDns": "DNS پروکسیها (مستقیم)",
+        "remoteDnsDomainStrategy": "استراتژی دامنه DNS",
+        "directDns": "DNS پروکسی‌ها (مستقیم)",
         "directDnsDomainStrategy": "استراتژی دامنه DNS مستقیم",
         "enableDnsRouting": "فعال‌سازی مسیریابی DNS",
+        "enableFakeDns": "فعال‌سازی DNS جعلی",
         "domainStrategy": {
           "auto": "خودکار",
           "preferIpv6": "ترجیح IPv6",
@@ -422,11 +429,19 @@
         "mixedPort": "پورت ترکیبی",
         "tproxyPort": "پورت پروکسی شفاف",
         "directPort": "پورت مستقیم",
+        "redirectPort": "پورت تغییر مسیر",
         "allowConnectionFromLan": "اشتراک VPN در شبکه محلی"
       },
       "tlsTricks": {
         "title": "ترفندهای TLS",
         "enable": "فعال‌سازی fragment",
+        "packets": "بسته‌های Fragment",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
         "size": "اندازه fragment",
         "sleep": "تأخیر fragment",
         "mixedSniCase": {

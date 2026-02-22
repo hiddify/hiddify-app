@@ -67,6 +67,14 @@ class RouteOptionsPage extends HookConsumerWidget {
               }
             },
           ),
+          ChoicePreferenceWidget(
+            title: t.pages.settings.routing.balancerStrategy.title,
+            icon: Icons.balance_rounded,
+            selected: ref.watch(ConfigOptions.balancerStrategy),
+            preferences: ref.watch(ConfigOptions.balancerStrategy.notifier),
+            choices: BalancerStrategy.values,
+            presentChoice: (value) => value.present(t),
+          ),
           SwitchListTile.adaptive(
             title: Text(t.pages.settings.routing.blockAds),
             secondary: const Icon(Icons.block_rounded),

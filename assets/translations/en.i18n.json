@@ -283,6 +283,12 @@
           "br": "Brazil (br) 🇧🇷",
           "other": "Other"
         },
+        "balancerStrategy": {
+          "title": "Balancer strategy",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "Block advertisements",
         "bypassLan": "Bypass LAN",
         "resolveDestination": "Resolve destination",
@@ -387,8 +393,8 @@
         "title": "DNS",
         "remoteDns": "Remote DNS",
         "remoteDnsDomainStrategy": "Remote DNS domain strategy",
-        "directDns": "Outbound Server Resolver (Direct)",
-        "directDnsDomainStrategy": "Outbound Domain strategy",
+        "directDns": "Outbound server resolver (direct)",
+        "directDnsDomainStrategy": "Outbound domain strategy",
         "enableDnsRouting": "Enable DNS routing",
         "enableFakeDns": "Enable fake DNS",
         "domainStrategy": {
@@ -430,6 +436,13 @@
       "tlsTricks": {
         "title": "TLS tricks",
         "enable": "Enable fragment",
+        "packets": "Fragmentation Packets",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
         "size": "Fragment size",
         "sleep": "Fragment sleep",
         "mixedSniCase": {

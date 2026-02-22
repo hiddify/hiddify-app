@@ -282,6 +282,12 @@
           "br": "巴西 (br) 🇧🇷",
           "other": "其他"
         },
+        "balancerStrategy": {
+          "title": "Balancer 策略",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session"
+        },
         "blockAds": "拦截广告",
         "bypassLan": "绕过局域网",
         "resolveDestination": "解析目的地",
@@ -386,13 +392,14 @@
         "title": "DNS",
         "remoteDns": "远程 DNS",
         "remoteDnsDomainStrategy": "远程 DNS 域名策略",
-        "directDns": "直连 DNS",
-        "directDnsDomainStrategy": "直连 DNS 域名策略",
+        "directDns": "出站服务器解析器（直连）",
+        "directDnsDomainStrategy": "出站域名策略",
         "enableDnsRouting": "启用 DNS 路由",
+        "enableFakeDns": "启用伪造 DNS",
         "domainStrategy": {
           "auto": "自动",
-          "preferIpv6": "首选 IPv6",
-          "preferIpv4": "首选 IPv4",
+          "preferIpv6": "偏好 IPv6",
+          "preferIpv4": "偏好 IPv4",
           "ipv4Only": "仅 IPv4",
           "ipv6Only": "仅 IPv6"
         }
@@ -422,11 +429,19 @@
         "mixedPort": "混合端口",
         "tproxyPort": "透明代理端口",
         "directPort": "本地 Direct 端口",
+        "redirectPort": "重定向端口",
         "allowConnectionFromLan": "允许来自局域网的连接"
       },
       "tlsTricks": {
         "title": "TLS 技巧",
         "enable": "启用分片",
+        "packets": "分片数据包",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
         "size": "分片大小",
         "sleep": "分片延迟",
         "mixedSniCase": {
