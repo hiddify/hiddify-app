@@ -34,12 +34,12 @@ enum _SearchActions { next, prev }
 /// Supported editors for JSON Editor.
 enum Editors { tree, text }
 
-const Map<String, Map<String, dynamic>> protocolSchemaValues = {
+Map<String, Map<String, dynamic>> getProtocolSchemaValues({String fragmentPackets = "tlshello"}) => {
   "xray": {
     "type": "xray",
     "tag": "xray-out",
     "xray_outbound_raw": {},
-    "xray_fragment": {"packets": "tlshello", "interval": "1-10", "length": "1-10"},
+    "xray_fragment": {"packets": fragmentPackets, "interval": "1-10", "length": "1-10"},
   },
   "warp": {
     "type": "warp",
@@ -467,6 +467,7 @@ class _JsonEditorState extends State<JsonEditor> {
   Timer? _searchTimer;
   late dynamic _data;
   late final _themeColor = widget.themeColor ?? Theme.of(context).primaryColor;
+  late final protocolSchemaValues = getProtocolSchemaValues();
   late Editors _editor = widget.editors.first;
   bool _onError = false;
   bool? allExpanded;

@@ -435,6 +435,13 @@
       "tlsTricks": {
         "title": "TLS 技巧",
         "enable": "启用分片",
+        "packets": "分片数据包",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
         "size": "分片大小",
         "sleep": "分片延迟",
         "mixedSniCase": {

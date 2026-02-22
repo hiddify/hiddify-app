@@ -435,6 +435,13 @@
       "tlsTricks": {
         "title": "Trucos de TLS",
         "enable": "Habilitar fragmento",
+        "packets": "Paquetes de fragmentación",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
         "size": "Tamaño de fragmento",
         "sleep": "Retraso de fragmento",
         "mixedSniCase": {
