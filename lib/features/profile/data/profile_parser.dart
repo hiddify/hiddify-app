@@ -28,8 +28,8 @@ import 'package:meta/meta.dart';
 /// - local: fallback to protocol, extracted from content by protocol()
 
 class ProfileParser {
-  static const infiniteTrafficThreshold = 92233720368;
-  static const infiniteTimeThreshold = 92233720368;
+  static const infiniteTrafficThreshold = 920_233_720_368;
+  static const infiniteTimeThreshold = 92_233_720_368;
   static const allowedOverrideConfigs = [
     'connection-test-url',
     'direct-dns-address',
@@ -284,7 +284,7 @@ class ProfileParser {
     final values = subInfoStr.split(';');
     final map = {for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt()};
     if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
-      final total1 = (total == null || total == 0) ? infiniteTrafficThreshold : total;
+      final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
       expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
       return SubscriptionInfo(
         upload: upload,

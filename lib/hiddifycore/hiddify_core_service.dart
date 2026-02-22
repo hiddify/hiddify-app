@@ -169,8 +169,18 @@ class HiddifyCoreService with InfraLogger {
         );
         ref.read(coreRestartSignalProvider.notifier).restart();
         if (res.messageType != MessageType.ALREADY_STARTED && res.messageType != MessageType.EMPTY) {
-          statusController.add(currentState = const CoreStatus.stopped(alert: CoreAlert.startFailed));
-          return left(const ConnectionFailure.unexpected("failed to start background core"));
+          final alert = res.message.contains("denied") ? CoreAlert.requestVPNPermission : CoreAlert.startFailed;
+          currentState = CoreStatus.stopped(
+            alert: alert,
+            message: "failed to start core ${res.messageType} ${res.message}",
+          );
+
+          statusController.add(currentState);
+
+          return left(
+            currentState.getCoreAlert() ??
+                ConnectionFailure.unexpected("failed to start core ${res.messageType} ${res.message}"),
+          );
         }
       } on GrpcError catch (e) {
         loggy.error("failed to start bg core: $e");

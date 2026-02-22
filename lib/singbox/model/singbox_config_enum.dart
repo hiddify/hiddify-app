@@ -8,8 +8,9 @@ import 'package:hiddify/utils/platform_utils.dart';
 enum ServiceMode {
   proxy("proxy"),
   systemProxy("system-proxy"),
-  tun("vpn"),
-  tunService("vpn-service");
+  tun("vpn")
+  // tunService("vpn-service")
+  ;
 
   const ServiceMode(this.key);
 
@@ -38,22 +39,22 @@ enum ServiceMode {
     proxy => t.pages.settings.inbound.serviceModes.proxy,
     systemProxy => t.pages.settings.inbound.serviceModes.systemProxy,
     tun => t.pages.settings.inbound.serviceModes.tun,
-    tunService => t.pages.settings.inbound.serviceModes.tunService,
+    // tunService => t.pages.settings.inbound.serviceModes.tunService,
   };
 
   String presentShort(TranslationsEn t) => switch (this) {
     proxy => t.pages.settings.inbound.shortServiceModes.proxy,
     systemProxy => t.pages.settings.inbound.shortServiceModes.systemProxy,
     tun => t.pages.settings.inbound.shortServiceModes.tun,
-    tunService => t.pages.settings.inbound.shortServiceModes.tunService,
+    // tunService => t.pages.settings.inbound.shortServiceModes.tunService,
   };
 }
 
 @JsonEnum(valueField: 'key')
 enum BalancerStrategy {
   roundRobin("round-robin"),
-  consistentHash("consistent-hash"),
-  stickySession("sticky-session");
+  consistentHash("consistent-hashing"),
+  stickySession("sticky-sessions");
 
   const BalancerStrategy(this.key);
 
