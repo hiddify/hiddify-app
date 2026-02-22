@@ -411,7 +411,7 @@ class QrCodeScannerDialog extends ConsumerWidget {
           alignment: Alignment.center,
           children: [
             MobileScanner(
-              placeholderBuilder: (p0, p1) => const Center(child: CircularProgressIndicator()),
+              placeholderBuilder: (context) => const Center(child: CircularProgressIndicator()),
               overlayBuilder: (context, constraints) => Container(
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.width * 0.7,
@@ -420,7 +420,7 @@ class QrCodeScannerDialog extends ConsumerWidget {
                   border: Border.all(color: Theme.of(context).colorScheme.primaryContainer, width: 4),
                 ),
               ),
-              errorBuilder: (p0, p1, p2) => Center(child: Text(t.common.msg.permission.denied)),
+              errorBuilder: (context, error) => Center(child: Text(t.common.msg.permission.denied)),
               onDetect: (barcodes) {
                 final rawData = barcodes.barcodes.first.rawValue;
                 if (rawData != null) context.pop(rawData);
