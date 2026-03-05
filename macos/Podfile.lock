@@ -10,8 +10,6 @@ PODS:
     - FlutterMacOS
   - file_picker (0.0.1):
     - FlutterMacOS
-  - flutter_timezone (0.1.0):
-    - FlutterMacOS
   - FlutterMacOS (1.0.0)
   - in_app_review (2.0.0):
     - FlutterMacOS
@@ -71,7 +69,6 @@ DEPENDENCIES:
   - device_info_plus (from `Flutter/ephemeral/.symlinks/plugins/device_info_plus/macos`)
   - dynamic_color (from `Flutter/ephemeral/.symlinks/plugins/dynamic_color/macos`)
   - file_picker (from `Flutter/ephemeral/.symlinks/plugins/file_picker/macos`)
-  - flutter_timezone (from `Flutter/ephemeral/.symlinks/plugins/flutter_timezone/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - in_app_review (from `Flutter/ephemeral/.symlinks/plugins/in_app_review/macos`)
   - mobile_scanner (from `Flutter/ephemeral/.symlinks/plugins/mobile_scanner/darwin`)
@@ -104,8 +101,6 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/dynamic_color/macos
   file_picker:
     :path: Flutter/ephemeral/.symlinks/plugins/file_picker/macos
-  flutter_timezone:
-    :path: Flutter/ephemeral/.symlinks/plugins/flutter_timezone/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   in_app_review:
@@ -143,7 +138,6 @@ SPEC CHECKSUMS:
   device_info_plus: 1b14eed9bf95428983aed283a8d51cce3d8c4215
   dynamic_color: 2eaa27267de1ca20d879fbd6e01259773fb1670f
   file_picker: e716a70a9fe5fd9e09ebc922d7541464289443af
-  flutter_timezone: 62400baa441155f2a4144188648f2ff861649747
   FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   in_app_review: a6a031b9acd03c7d103e341aa334adf2c493fb93
   mobile_scanner: 77265f3dc8d580810e91849d4a0811a90467ed5e

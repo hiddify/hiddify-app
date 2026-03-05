@@ -132,12 +132,9 @@ Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH, etc.
 
 
 ## 🌎 ترجمه‌ها
-<div align=center>
-    
-![Improve Translations](https://github.com/hiddify/hiddify-app/assets/125398461/c6f1f746-db8e-477d-ae05-b8305af838aa)
-</div>
 
-با ویرایش دستی فایل‌های JSON در assets/translations/ یا با استفاده از [ویرایشگر آنلاین Inlang](https://inlang.com/editor/github.com/hiddify/hiddify-next)، زبان‌های موجود را بهبود بدهید و یا زبان‌های جدید اضافه کنید.
+
+با ویرایش دستی فایل‌های JSON در assets/translations/ یا با استفاده از [![Translate with Inlang](https://img.shields.io/badge/%20-%20-3ECF8E?logo=i18next&logoColor=white)](https://fink.inlang.com/github.com/hiddify/hiddify-app) [ویرایشگر آنلاین Inlang](https://fink.inlang.com/editor/github.com/hiddify/hiddify-app)، زبان‌های موجود را بهبود بدهید و یا زبان‌های جدید اضافه کنید.
 
 ## ✏️ سپاسگزاری‌ها
 مایلیم از دست‌اندرکاران پروژه‌های زیر صمیمانه قدردانی کنیم که پایه قوی و ویژگی‌های نوآورانه آنها موفقیت و عملکرد این پروژه را به میزان قابل توجهی افزایش داده است.
@@ -157,11 +154,16 @@ Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH, etc.
 
 <div align=center>
     
-<img alt="Star History Chart" width=50% src="https://api.star-history.com/svg?repos=Hiddify/hiddify-next&type=Date)](https://star-history.com/#Hiddify/hiddify-next&Date" />
+<a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=643504282" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=dark" width="721" height="auto">
+    <img alt="Star History of hiddify/hiddify-app" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=light" width="721" height="auto">
+  </picture>
+</a>
 
 </div>
 
-ما برای سرویس هایمان به کمک مالی هم نیاز داریم. تمامی فعالیت‌های ما به صورت داوطلبانه انجام می‌شود و حمایت‌های مالی صرف توسعه پروژه می‌شود. اطلاعات و آدرس‌های حمایت‌ از ما را در [این لینک](https://github.com/hiddify/hiddify-server/wiki/support) مشاهده فرمایید.
+ما برای سرویس هایمان به کمک مالی هم نیاز داریم. تمامی فعالیت‌های ما به صورت داوطلبانه انجام می‌شود و حمایت‌های مالی صرف توسعه پروژه می‌شود. اطلاعات و آدرس‌های حمایت‌ از ما را در [این لینک](https://hiddify.com/fa/donation-and-support/) مشاهده فرمایید.
 
 ## 👩‍🏫 راه‌های همکاری و ارتباط با ما
 

@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
-  flutter_timezone
   gtk
   screen_retriever_linux
   sentry_flutter

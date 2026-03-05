@@ -127,13 +127,8 @@
  
 
 ## 🌎 翻译
-<div align=center>
-    
-[![inlang status badge](https://inlang.com/badge?url=github.com/hiddify/hiddify-next)](https://inlang.com/editor/github.com/hiddify/hiddify-next?ref=badge)
 
-</div>
-
-您可以通过手动编辑位于 `/assets/translations` 中的 JSON 文件，或使用 [Inlang 在线编辑器](https://inlang.com/editor/github.com/hiddify/hiddify-next)来改进现有语言或添加新语言。
+您可以通过手动编辑位于 `/assets/translations` 中的 JSON 文件，或使用 [Inlang 在线编辑器](https://fink.inlang.com/editor/github.com/hiddify/hiddify-app)来改进现有语言或添加新语言。
 
 ## ✏️ 致谢
 我们谨向以下项目的贡献者表示诚挚的谢意，这些项目打下的坚实基础和开发的创新功能，显着增强了本项目的功能，为本项目的开发带来了成功。
@@ -154,11 +149,16 @@
 
 <div align=center>
 
-<img alt="Star History Chart" width=50% src="https://api.star-history.com/svg?repos=Hiddify/hiddify-next&type=Date)](https://star-history.com/#Hiddify/hiddify-next&Date" />
+<a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=643504282" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=dark" width="721" height="auto">
+    <img alt="Star History of hiddify/hiddify-app" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=light" width="721" height="auto">
+  </picture>
+</a>
 
 </div>
 
-我们的服务也需要经济支持。我们所有的活动都是志愿性质的，经济支持将被用于项目的发展。您可以在 [这里](https://github.com/hiddify/hiddify-server/wiki/support) 查看我们的支持地址。
+我们的服务也需要经济支持。我们所有的活动都是志愿性质的，经济支持将被用于项目的发展。您可以在 [这里](https://hiddify.com/donation-and-support/) 查看我们的支持地址。
 
 ## 👩‍🏫 合作及联系信息
 

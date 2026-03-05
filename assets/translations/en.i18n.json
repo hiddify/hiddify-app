@@ -274,13 +274,13 @@
         },
         "region": "Region",
         "regions": {
-          "ir": "Iran (ir) 🇮🇷",
-          "cn": "China (cn) 🇨🇳",
-          "ru": "Russia (ru) 🇷🇺",
-          "af": "Afghanistan (af) 🇦🇫",
-          "id": "Indonesia (id) 🇮🇩",
-          "tr": "Türkiye (tr) 🇹🇷",
-          "br": "Brazil (br) 🇧🇷",
+          "ir": "Iran (ir)",
+          "cn": "China (cn)",
+          "ru": "Russia (ru)",
+          "af": "Afghanistan (af)",
+          "id": "Indonesia (id)",
+          "tr": "Türkiye (tr)",
+          "br": "Brazil (br)",
           "other": "Other"
         },
         "balancerStrategy": {

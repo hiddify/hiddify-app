@@ -133,12 +133,8 @@ Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH, etc.
 
 ## 🌎 Tradução
 
-<div align=center>
-    
-[![inlang status badge](https://inlang.com/badge?url=github.com/hiddify/hiddify-next)](https://inlang.com/editor/github.com/hiddify/hiddify-next?ref=badge)
-</div>
 
-Melhore os idiomas existentes ou adicione novos editando manualmente os arquivos JSON localizados em `/assets/translations` ou usando o [editor online Inlang](https://inlang.com/editor/github.com/hiddify/hiddify-next).
+Melhore os idiomas existentes ou adicione novos editando manualmente os arquivos JSON localizados em `/assets/translations` ou [![Translate with Inlang](https://img.shields.io/badge/%20-%20-3ECF8E?logo=i18next&logoColor=white)](https://fink.inlang.com/github.com/hiddify/hiddify-app) usando o [editor online Inlang](https://fink.inlang.com/editor/github.com/hiddify/hiddify-app).
 
 ## ✏️ Agradecimentos
 
@@ -159,11 +155,16 @@ A maneira mais fácil de nos apoiar é clicar na estrela (⭐) no topo desta pá
 
 <div align=center>
     
-<img alt="Star History Chart" width=50% src="https://api.star-history.com/svg?repos=Hiddify/hiddify-next&type=Date)](https://star-history.com/#Hiddify/hiddify-next&Date" />
+<a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=643504282" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=dark" width="721" height="auto">
+    <img alt="Star History of hiddify/hiddify-app" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=light" width="721" height="auto">
+  </picture>
+</a>
 
 </div>
 
-Também precisamos de apoio financeiro para nossos serviços. Todas as nossas atividades são realizadas voluntariamente e o apoio financeiro será utilizado no desenvolvimento do projeto. Você pode ver nossos links de suporte [aqui](https://github.com/hiddify/hiddify-server/wiki/support).
+Também precisamos de apoio financeiro para nossos serviços. Todas as nossas atividades são realizadas voluntariamente e o apoio financeiro será utilizado no desenvolvimento do projeto. Você pode ver nossos links de suporte [aqui](https://hiddify.com/donation-and-support/).
 
 ## 👩‍🏫 Colaboração e Informações de Contato
 

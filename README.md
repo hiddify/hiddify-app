@@ -131,12 +131,9 @@ Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH etc.
 
 ## 🌎 Translations
 
-<div align=center>
     
-[![inlang status badge](https://inlang.com/badge?url=github.com/hiddify/hiddify-next)](https://inlang.com/editor/github.com/hiddify/hiddify-next?ref=badge)
-</div>
+You can improve existing languages or contribute new ones either by editing the JSON files in `/assets/translations` or [![Translate with Inlang](https://img.shields.io/badge/%20-%20-3ECF8E?logo=i18next&logoColor=white)](https://fink.inlang.com/github.com/hiddify/hiddify-app) by using [Inlang online editor](https://fink.inlang.com/github.com/hiddify/hiddify-app).    
 
-Improve existing languages or add new ones by manually editing the JSON files located in `/assets/translations` or by using the [Inlang online editor](https://fink.inlang.com/github.com/hiddify/hiddify-next).
 
 ## ✏️ Acknowledgements
 
@@ -154,6 +151,8 @@ We would like to express our sincere appreciation to the contributors of the fol
 ## 🎯 Donation and Support
 
 The easiest way to support us is to click on the star (⭐) at the top of this page.
+
+<div align=center>
     
 <a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=643504282" target="_blank" style="display: block" align="center">
   <picture>
@@ -162,7 +161,9 @@ The easiest way to support us is to click on the star (⭐) at the top of this p
   </picture>
 </a>
 
-We also need financial support for our services. All of our activities are done voluntarily and financial support will be spent on the development of the project. You can view our support addresses [here](https://github.com/hiddify/hiddify-server/wiki/support).
+</div>
+
+We also need financial support for our services. All of our activities are done voluntarily and financial support will be spent on the development of the project. You can view our support addresses [here](https://hiddify.com/donation-and-support/).
 
 ## 👩‍🏫 Collaboration and Contact Information
 

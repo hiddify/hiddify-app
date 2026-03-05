@@ -20,6 +20,7 @@ env:
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   TAG_NAME: "${{ inputs.tag-name }}"
   TARGET_NAME_gz: "Hiddify-Linux-x64-AppImage.tar"
+  TARGET_NAME_AppImage: "Hiddify-Linux-x64-AppImage"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
   # TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
@@ -64,18 +65,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - platform: android-apk
-          #   os: ubuntu-latest
-          #   targets: apk
+          - platform: android-apk
+            os: ubuntu-latest
+            targets: apk
 
           - platform: android-aab
             os: ubuntu-latest
             targets: aab
 
-          # - platform: windows
-          #   os: windows-latest
-          #   aarch: amd64
-          #   targets: exe,msix,zip
+          - platform: windows
+            os: windows-latest
+            aarch: amd64
+            targets: exe,msix,zip
+
+          - platform: linux
+            os: ubuntu-22.04
+            aarch: amd64
+            targets: deb,gz,AppImage
 
           # - platform: linux-amd64
           #   os: ubuntu-22.04
@@ -97,10 +103,10 @@ jobs:
           #   aarch: arm64
           #   targets: deb,gz
             
-          # - platform: macos
-          #   os: macos-15
-          #   aarch: universal
-          #   targets: dmg,pkg
+          - platform: macos
+            os: macos-15
+            aarch: universal
+            targets: dmg,pkg
             
           # - platform: ios
           #   os: macos-15
@@ -133,21 +139,21 @@ jobs:
           
 
 
-      - name: Setup Flutter for arm64
-        if: ${{ startsWith(matrix.platform,'linux-arm64') }}
-        uses: hurelhuyag/flutter-arm64-action@HEAD
-        with:
-          channel: 'stable'
-          flutter-version: ${{ env.FLUTTER_VERSION }}
+      # - name: Setup Flutter for arm64
+      #   if: ${{ startsWith(matrix.platform,'linux-arm64') }}
+      #   uses: hurelhuyag/flutter-arm64-action@HEAD
+      #   with:
+      #     channel: 'stable'
+      #     flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: Setup Flutter
-        if: ${{ !startsWith(matrix.platform, 'linux-arm64') }}
         uses: subosito/flutter-action@v2.21.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           # flutter-version-file: pubspec.yaml
           channel: 'stable'
           cache: true
+
       - name: Clean up disk space
         if: startsWith(matrix.platform,'android')
         run: |

@@ -273,13 +273,13 @@
         },
         "region": "Wilayah",
         "regions": {
-          "ir": "Iran (ir) 🇮🇷",
-          "cn": "Tiongkok (cn) 🇨🇳",
-          "ru": "Rusia (ru) 🇷🇺",
-          "af": "Afghanistan (af) 🇦🇫",
-          "id": "Indonesia (id) 🇮🇩",
-          "tr": "Turki (tr) 🇹🇷",
-          "br": "Brasil (br) 🇧🇷",
+          "ir": "Iran (ir)",
+          "cn": "Tiongkok (cn)",
+          "ru": "Rusia (ru)",
+          "af": "Afghanistan (af)",
+          "id": "Indonesia (id)",
+          "tr": "Turki (tr)",
+          "br": "Brasil (br)",
           "other": "Lainnya"
         },
         "balancerStrategy": {

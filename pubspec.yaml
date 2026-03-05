@@ -85,7 +85,6 @@ dependencies:
   cupertino_http: ^2.0.1
   dart_mappable: ^4.2.1
   fluentui_system_icons: ^1.1.229
-  timezone_to_country: ^3.0.0
   json_path: ^0.7.1
   # permission_handler: ^11.3.0 # is not compatible with windows
   #flutter_easy_permission: ^1.1.2

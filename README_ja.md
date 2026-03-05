@@ -135,12 +135,7 @@ Vless、Vmess、Reality、TUIC、Hysteria、Wireguard、SSH など。
 
 ## 🌎 翻訳
 
-<div align=center>
-
-[![inlang status badge](https://inlang.com/badge?url=github.com/hiddify/hiddify-next)](https://inlang.com/editor/github.com/hiddify/hiddify-next?ref=badge)
-</div>
-
-インストールとチュートリアル `/assets/translations` にある JSON ファイルを手動で編集するか、[Inlang オンラインエディタ](https://inlang.com/editor/github.com/hiddify/hiddify-next)を使って、既存の言語を改良したり、新しい言語を追加したりすることができます。
+インストールとチュートリアル `/assets/translations` にある JSON ファイルを手動で編集するか、[Inlang オンラインエディタ](https://fink.inlang.com/editor/github.com/hiddify/hiddify-app)を使って、既存の言語を改良したり、新しい言語を追加したりすることができます。
 
 ## ✏️ 謝辞
 
@@ -161,11 +156,16 @@ Vless、Vmess、Reality、TUIC、Hysteria、Wireguard、SSH など。
 
 <div align=center>
 
-<img alt="Star History Chart" width=50% src="https://api.star-history.com/svg?repos=Hiddify/hiddify-next&type=Date)](https://star-history.com/#Hiddify/hiddify-next&Date" />
+<a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=643504282" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=dark" width="721" height="auto">
+    <img alt="Star History of hiddify/hiddify-app" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=light" width="721" height="auto">
+  </picture>
+</a>
 
 </div>
 
-また、私たちのサービスには財政的な支援も必要です。私たちの活動はすべて自発的に行われており、経済的支援はプロジェクトの発展に費やされます。私たちのサポートアドレスは[こちら](https://github.com/hiddify/hiddify-server/wiki/support)からご覧いただけます。
+また、私たちのサービスには財政的な支援も必要です。私たちの活動はすべて自発的に行われており、経済的支援はプロジェクトの発展に費やされます。私たちのサポートアドレスは[こちら](https://hiddify.com/donation-and-support/)からご覧いただけます。
 
 ## 👩‍🏫 コラボレーションおよび連絡先
 

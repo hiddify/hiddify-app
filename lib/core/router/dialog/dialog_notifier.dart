@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/router/dialog/widgets/action_at_closing_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/confirmation_dialog.dart';
@@ -10,7 +9,6 @@ import 'package:hiddify/core/router/dialog/widgets/new_version_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/no_active_profile_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/ok_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/proxy_info_dialog.dart';
-import 'package:hiddify/core/router/dialog/widgets/region_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/save_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/setting_checkbox_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/setting_input_dialog.dart';
@@ -110,10 +108,6 @@ class DialogNotifier extends _$DialogNotifier {
           ConfirmationDialog(title: title, message: message, icon: icon, positiveBtnTxt: positiveBtnTxt),
         ) ??
         false;
-  }
-
-  Future<Region?> showRegion({required Region selected}) async {
-    return await _show<Region?>(RegionDialog(selected: selected));
   }
 
   Future<ActionsAtClosing?> showActionAtClosing({required ActionsAtClosing selected}) async {
@@ -216,13 +210,21 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<T?> showSettingPicker<T>({
     required String title,
+    bool showFlag = false,
     required T selected,
     required List<T> options,
     required String Function(T e) getTitle,
     VoidCallback? onReset,
   }) async {
     return await _show<T?>(
-      SettingPickerDialog(title: title, selected: selected, options: options, getTitle: getTitle, onReset: onReset),
+      SettingPickerDialog(
+        title: title,
+        showFlag: showFlag,
+        selected: selected,
+        options: options,
+        getTitle: getTitle,
+        onReset: onReset,
+      ),
     );
   }
 
