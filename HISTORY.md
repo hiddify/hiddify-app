@@ -1,7 +1,142 @@
 # Changelog
 
 
-## 4.0.5 (2026-02-20)
+## 4.1.0 (2026-03-05)
+
+#### New
+
+* Add dnstt. 
+
+* Add dnstt. 
+
+#### Fix
+
+* Set ir flag to shir. 
+
+* Update linux-appimage-release to copy instead of move Hiddify.AppImage. 
+
+* Update linux-prepare target to use linux-amd64-libs. 
+
+* Delete bundled libstdc++ for Arch Linux compatibility in AppImage build. 
+
+* Resolve shared_preferences conflict between portable and exe formats on Windows. 
+
+* Remove timezone_to_country package. 
+  _This package caused a black screen and prevented the app from running on the Windows (old) platform._
+
+* Install fastforge and update PATH for Windows build. 
+
+* Disable mux and remove geo-related logic. 
+
+#### Other
+
+* Merge pull request #1995 from veto9292/main. 
+  _black screen and running issue on Windows | shared_preferences conflict between portable and exe on Windows | AppImage running on arch etc… | linux build in ci | add .AppImage release next to the tar | replace ir shir flag | add background for dmg format_
+
+* Feat: replate dmg background image and & improve size and position. 
+
+* Test ci. 
+
+* Feat: removing country flag from regions text. 
+
+* Feat: add raw AppImage support for linux. 
+
+* Feat: implement region detection based on timezone and locale. 
+
+* Update README_ru.md. 
+
+* Update README_cn.md. 
+
+* Update README_ja.md. 
+
+* Update README_br.md. 
+
+* Update README_fa.md. 
+
+* Update README.md. 
+
+* Centralize the star image. 
+  _Added donation support section with links and details._
+
+* Update README_ru.md. 
+
+* Update README_cn.md. 
+
+* Update star history chart in README_ja.md. 
+
+* Update README_br.md. 
+
+* Fix star history image. 
+
+* Update README_ru.md. 
+
+* Update README_cn.md. 
+
+* Update donation link in README_cn.md. 
+
+* Update README_ja.md. 
+
+* Update README_br.md. 
+
+* Fix donation link and star history chart source. 
+  _Updated the donation link and corrected the star history chart image source._
+
+* Update README.md. 
+
+* Update qrcode reader lib to support 16kb page. 
+
+* Refactor: update project configuration and clean up unused code. 
+
+* Merge pull request #1929 from ChabanovX/add-column-exists-check. 
+  _Add column exists check_
+
+* Add test in migration that column check works properly. 
+
+* Add column checks on 4to5 migration. 
+
+* Rename column check for more explicit one. 
+
+* Add `column_check` method inside db. 
+
+* Merge pull request #1986 from salmanmkc/upgrade-github-actions-node24-general. 
+  _Upgrade GitHub Actions to latest versions_
+
+* Merge branch 'main' into upgrade-github-actions-node24-general. 
+
+* Merge pull request #1985 from salmanmkc/upgrade-github-actions-node24. 
+  _Upgrade GitHub Actions for Node 24 compatibility_
+
+* Upgrade GitHub Actions for Node 24 compatibility. 
+
+* Merge pull request #1959 from Enqvy/main. 
+  _added tls fragmenting packet option_
+
+* Added manual build (dont meant to be merged) 
+
+* Feat: add manual Windows build workflow. 
+
+* Added tls fragmenting packet option. 
+
+* Merge pull request #1978 from veto9292/sync-slang. 
+  _balancer-strategy | remove-mux-geo | sync-slang_
+
+* Feat: update DNS translations for multiple languages. 
+
+* Feat: add "enableFakeDns" translation for multiple languages. 
+
+* Feat: add "redirectPort" translations for multiple languages. 
+
+* Feat: add "directPort" translation to ar. 
+
+* Feat: implement balancer strategy configuration and UI integration. 
+
+* Feat: add balancer strategy translations for multiple languages. 
+
+* Upgrade GitHub Actions to latest versions. 
+
+
+
+## v4.0.5 (2026-02-20)
 
 #### Other
 
