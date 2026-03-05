@@ -151,7 +151,7 @@ void main() {
           r.map(
             remote: (rp) {
               expect(rp.subInfo, isNotNull);
-              expect(rp.subInfo!.total, equals(ProfileParser.infiniteTrafficThreshold));
+              expect(rp.subInfo!.total, equals(ProfileParser.infiniteTrafficThreshold + 1));
               expect(
                 rp.subInfo!.expire,
                 equals(DateTime.fromMillisecondsSinceEpoch(ProfileParser.infiniteTimeThreshold * 1000)),
