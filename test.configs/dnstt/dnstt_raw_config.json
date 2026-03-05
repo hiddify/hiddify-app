@@ -1,0 +1,226 @@
+
+{
+"outbounds": [
+    {
+      "type": "dnstt",
+      "tag": "§hide§ § 0",
+      "publicKey": "publickey",
+      "domain": "yourdomain",
+      "resolvers": [
+        "8.8.8.8:53",
+        "8.8.4.4:53",
+//add more dns server
+      ],
+      "tunnel_per_resolver": 40,
+      "udp_over_tcp": true
+    },
+    {
+      "type": "socks",
+      "tag": "select",
+      "detour": "§hide§ § 0",
+      "server": "",
+      "server_port": 0
+    },
+    {
+      "type": "direct",
+      "tag": "direct §hide§"
+    },
+    {
+      "type": "direct",
+      "tag": "direct-fragment §hide§",
+      "tls_fragment": {
+        "enabled": true,
+        "size": "10-30",
+        "sleep": "2-8"
+      }
+    }
+  ],
+"inbounds": [
+    {
+      "type": "mixed",
+      "tag": "mixed-in127.0.0.1",
+      "listen": "127.0.0.1",
+      "listen_port": 12334
+    },
+    {
+      "type": "tproxy",
+      "tag": "tproxy-in127.0.0.1",
+      "listen": "127.0.0.1",
+      "listen_port": 12335
+    },
+    {
+      "type": "redirect",
+      "tag": "redirect-in127.0.0.1",
+      "listen": "127.0.0.1",
+      "listen_port": 12336
+    },
+    {
+      "type": "direct",
+      "tag": "dns-in127.0.0.1",
+      "listen": "127.0.0.1",
+      "listen_port": 12337
+    }
+  ],
+
+  "log": {
+    "level": "info",
+    "output": "data/box.log"
+  },
+  "dns": {
+    "servers": [
+      {
+        "type": "hosts",
+        "tag": "dns-static"
+      },
+      {
+        "type": "tcp",
+        "tag": "dns-remote",
+        "detour": "select",
+        "server": "1.1.1.1"
+      },
+      {
+        "type": "https",
+        "tag": "dns-remote-fallback",
+        "detour": "select",
+        "server": "8.8.8.8",
+        "tls": {
+          "enabled": true
+        }
+      },
+      {
+        "type": "https",
+        "tag": "dns-trick-direct",
+        "detour": "direct-fragment §hide§",
+        "domain_resolver": {
+          "server": "dns-direct",
+          "strategy": "prefer_ipv4"
+        },
+        "server": "dns.cloudflare.com",
+        "tls": {
+          "enabled": true,
+          "fragment": true,
+          "fragment_fallback_delay": "300ms",
+          "record_fragment": true
+        }
+      },
+      {
+        "type": "udp",
+        "tag": "dns-direct",
+        "connect_timeout": "5s",
+        "disable_tcp_keep_alive": true,
+        "server": "1.1.1.1"
+      },
+      {
+        "type": "local",
+        "tag": "dns-local",
+        "prefer_go": true
+      },
+      {
+        "type": "tcp",
+        "tag": "dns-remote-no-warp",
+        "detour": "direct-fragment §hide§",
+        "server": "1.1.1.1"
+      },
+      {
+        "type": "fakeip",
+        "tag": "dns-fake",
+        "inet4_range": "198.18.0.0/15",
+        "inet6_range": "fc00::/18"
+      }
+    ],
+    "rules": [
+      {
+        "domain": "api.cloudflareclient.com",
+        "server": "dns-remote-no-warp",
+        "rewrite_ttl": 86400
+      },
+      {
+        "domain": [
+          "captive.apple.com",
+          "cp.cloudflare.com",
+          "google.com",
+          "api.cloudflareclient.com",
+          "www.gstatic.com"
+        ],
+        "server": "dns-direct",
+        "rewrite_ttl": 86400
+      },
+      {
+        "domain_suffix": ".ir",
+        "server": "dns-direct",
+        "rewrite_ttl": 86400
+      },
+      {
+        "rule_set": "geosite-ir",
+        "server": "dns-direct",
+        "rewrite_ttl": 86400
+      },
+      {
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "dns-fake",
+        "disable_cache": true,
+        "rewrite_ttl": 86400
+      },
+      {
+        "server": "dns-remote",
+        "rewrite_ttl": 86400
+      }
+    ],
+    "final": "dns-remote",
+    "disable_expire": true,
+    "independent_cache": true
+  },
+    
+  "route": {
+    "rules": [
+      {
+        "action": "sniff"
+      },
+      {
+        "protocol": "dns",
+        "action": "hijack-dns"
+      },
+      {
+        "ip_cidr": [
+          "10.10.34.0/24",
+          "2001:4188:2:600:10:10:34:0/120"
+        ],
+        "outbound": "select"
+      },
+      {
+        "domain_suffix": ".ir",
+        "outbound": "direct §hide§"
+      },
+      {
+        "rule_set": [
+          "geoip-ir",
+          "geosite-ir"
+        ],
+        "outbound": "direct §hide§"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "geoip-ir",
+        "url": "https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set/country/geoip-ir.srs",
+        "download_detour": "select",
+        "update_interval": "120h0m0s"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-ir",
+        "url": "https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set/country/geosite-ir.srs",
+        "download_detour": "select",
+        "update_interval": "120h0m0s"
+      }
+    ],
+    "final": "select",
+    "default_domain_resolver": "dns-direct"
+  }
+  
+}
+

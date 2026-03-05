@@ -4,6 +4,7 @@ on:
     paths-ignore:
       - '**.md'
       - 'docs/**'
+      - 'test.configs/**'
       - '.vscode/'
       - 'appcast.xml'
   push:
