@@ -70,6 +70,14 @@ const Map<String, Map<String, dynamic>> protocolSchemaValues = {
     "password": "",
     "tls": {"enabled": true},
   },
+  "dnstt": {
+    "type": "dnstt",
+    "tag": "dnstt-out",
+    "domain": "dnstt.hiddify.com",
+    "publicKey": "publickey",
+    "resolvers": ["8.8.8.8:53", "8.8.4.4:53"],
+    "tunnel_per_resolver": 4,
+  },
   "vless": {
     "type": "vless",
     "tag": "vless-out",
@@ -331,6 +339,7 @@ const Map<String, List<String>> possibleValues = {
   "config.outbounds.transport.type": <String>["", "http", "ws", "grpc", "quic", "httpupgrade"],
   "config.outbounds.type": <String>[
     "vless",
+    "dnstt",
     "vmess",
     "trojan",
     "xray",

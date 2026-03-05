@@ -15,7 +15,8 @@ PODS:
   - FlutterMacOS (1.0.0)
   - in_app_review (2.0.0):
     - FlutterMacOS
-  - mobile_scanner (6.0.2):
+  - mobile_scanner (7.0.0):
+    - Flutter
     - FlutterMacOS
   - network_info_plus (0.0.1):
     - FlutterMacOS
@@ -73,7 +74,7 @@ DEPENDENCIES:
   - flutter_timezone (from `Flutter/ephemeral/.symlinks/plugins/flutter_timezone/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - in_app_review (from `Flutter/ephemeral/.symlinks/plugins/in_app_review/macos`)
-  - mobile_scanner (from `Flutter/ephemeral/.symlinks/plugins/mobile_scanner/macos`)
+  - mobile_scanner (from `Flutter/ephemeral/.symlinks/plugins/mobile_scanner/darwin`)
   - network_info_plus (from `Flutter/ephemeral/.symlinks/plugins/network_info_plus/macos`)
   - objective_c (from `Flutter/ephemeral/.symlinks/plugins/objective_c/macos`)
   - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
@@ -110,7 +111,7 @@ EXTERNAL SOURCES:
   in_app_review:
     :path: Flutter/ephemeral/.symlinks/plugins/in_app_review/macos
   mobile_scanner:
-    :path: Flutter/ephemeral/.symlinks/plugins/mobile_scanner/macos
+    :path: Flutter/ephemeral/.symlinks/plugins/mobile_scanner/darwin
   network_info_plus:
     :path: Flutter/ephemeral/.symlinks/plugins/network_info_plus/macos
   objective_c:
@@ -145,7 +146,7 @@ SPEC CHECKSUMS:
   flutter_timezone: 62400baa441155f2a4144188648f2ff861649747
   FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   in_app_review: a6a031b9acd03c7d103e341aa334adf2c493fb93
-  mobile_scanner: 07710d6b9b2c220ae899de2d7ecf5d77ffa56333
+  mobile_scanner: 77265f3dc8d580810e91849d4a0811a90467ed5e
   network_info_plus: 2cb02d8435635eae13b3b79279681985121cf30c
   objective_c: e5f8194456e8fc943e034d1af00510a1bc29c067
   package_info_plus: 12f1c5c2cfe8727ca46cbd0b26677728972d9a5b
