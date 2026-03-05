@@ -92,7 +92,7 @@ ios-prepare: common-prepare ios-libs
 	cd ios; pod repo update; pod install;echo "done ios prepare"
 	
 macos-prepare: common-prepare macos-libs
-linux-prepare: common-prepare linux-libs
+linux-prepare: common-prepare linux-amd64-libs
 
 
 linux-amd64-prepare: common-prepare linux-amd64-libs
@@ -388,6 +388,8 @@ linux-appimage-release:
 	sed -i '/^\[Desktop Entry\]/a StartupWMClass=app.hiddify.com' "squashfs-root/hiddify.desktop"; \
 	$(BLUE)Removing old AppImage$(DONE); \
 	rm *.AppImage; \
+	$(BLUE)Deleting bundled libstdc++ to fix Arch Linux compatibility...$(DONE); \
+	find squashfs-root/usr/lib -name "libstdc++.so.6" -delete; \
 	$(BLUE)Rebuilding AppImage$(DONE); \
 	ARCH=x86_64 appimagetool --no-appstream squashfs-root Hiddify.AppImage > /dev/null; \
 	$(BLUE)Cleaning up squashfs$(DONE); \
@@ -396,8 +398,8 @@ linux-appimage-release:
 	PKG_DIR_NAME="hiddify-linux-appimage"; \
 	$(BLUE)Creating dir: $$PKG_DIR_NAME$(DONE); \
 	mkdir -p "$$PKG_DIR_NAME"; \
-	$(BLUE)Moving and Renaming to Hiddify.AppImage$(DONE); \
-	mv "Hiddify.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
+	$(BLUE)Moving Hiddify.AppImage$(DONE); \
+	cp -p "Hiddify.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
 	$(BLUE)Creating Portable Home directory$(DONE); \
 	mkdir -p "$$PKG_DIR_NAME/Hiddify.AppImage.home"; \
 	$(BLUE)Compressing to .tar.gz$(DONE); \

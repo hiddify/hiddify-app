@@ -7,7 +7,6 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/app_theme_mode.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class LocalePrefTile extends ConsumerWidget {
@@ -34,41 +33,6 @@ class LocalePrefTile extends ConsumerWidget {
             );
         if (selectedLocale != null) {
           await ref.read(localePreferencesProvider.notifier).changeLocale(selectedLocale);
-        }
-      },
-    );
-  }
-}
-
-class RegionPrefTile extends ConsumerWidget {
-  const RegionPrefTile({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-
-    final region = ref.watch(ConfigOptions.region);
-
-    return ListTile(
-      title: Text(t.pages.settings.routing.region),
-      subtitle: Text(region.present(t), style: Theme.of(context).textTheme.bodySmall),
-      leading: const Icon(Icons.place_rounded),
-      onTap: () async {
-        final selectedRegion = await ref.read(dialogNotifierProvider.notifier).showRegion(selected: region);
-        if (selectedRegion != null) {
-          // await ref.read(Preferences.region.notifier).update(selectedRegion);
-
-          await ref.watch(ConfigOptions.region.notifier).update(selectedRegion);
-
-          await ref.watch(ConfigOptions.directDnsAddress.notifier).reset();
-
-          // await ref.read(configOptionNotifierProvider.notifier).build();
-          // await ref.watch(ConfigOptions.resolveDestination.notifier).update(!ref.watch(ConfigOptions.resolveDestination.notifier).raw());
-          //for reload config
-          // final tmp = ref.watch(ConfigOptions.resolveDestination.notifier).raw();
-          // await ref.watch(ConfigOptions.resolveDestination.notifier).update(!tmp);
-          // await ref.watch(ConfigOptions.resolveDestination.notifier).update(tmp);
-          //TODO: fix it
         }
       },
     );

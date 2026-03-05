@@ -46,6 +46,7 @@ class RouteOptionsPage extends HookConsumerWidget {
             preferences: ref.watch(ConfigOptions.region.notifier),
             choices: Region.values,
             title: t.pages.settings.routing.region,
+            showFlag: true,
             icon: Icons.place_rounded,
             presentChoice: (value) => value.present(t),
             onChanged: (val) async {

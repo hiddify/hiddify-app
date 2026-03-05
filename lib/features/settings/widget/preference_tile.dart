@@ -71,6 +71,7 @@ class ChoicePreferenceWidget<T> extends HookConsumerWidget {
     this.enabled = true,
     required this.choices,
     required this.title,
+    this.showFlag = false,
     this.icon,
     required this.presentChoice,
     this.validateInput,
@@ -82,6 +83,7 @@ class ChoicePreferenceWidget<T> extends HookConsumerWidget {
   final bool enabled;
   final List<T> choices;
   final String title;
+  final bool showFlag;
   final IconData? icon;
   final String Function(T value) presentChoice;
   final bool Function(String value)? validateInput;
@@ -98,6 +100,7 @@ class ChoicePreferenceWidget<T> extends HookConsumerWidget {
             .read(dialogNotifierProvider.notifier)
             .showSettingPicker<T>(
               title: title,
+              showFlag: showFlag,
               selected: selected,
               options: choices,
               getTitle: (e) => presentChoice(e),

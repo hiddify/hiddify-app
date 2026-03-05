@@ -273,13 +273,13 @@
         },
         "region": "Bölge",
         "regions": {
-          "ir": "İran (ir) 🇮🇷",
-          "cn": "Çin (cn) 🇨🇳",
-          "ru": "Rusya (ru) 🇷🇺",
-          "af": "Afganistan (af) 🇦🇫",
-          "id": "Endonezya (id) 🇮🇩",
-          "tr": "Türkiye (tr) 🇹🇷",
-          "br": "Brezilya (br) 🇧🇷",
+          "ir": "İran (ir)",
+          "cn": "Çin (cn)",
+          "ru": "Rusya (ru)",
+          "af": "Afganistan (af)",
+          "id": "Endonezya (id)",
+          "tr": "Türkiye (tr)",
+          "br": "Brezilya (br)",
           "other": "Diğer"
         },
         "balancerStrategy": {
