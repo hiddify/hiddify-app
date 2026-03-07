@@ -34,10 +34,9 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
           mainAxisSize: MainAxisSize.min,
           children: options.map((e) {
             final title = getTitle(e);
-            final countryCode = title.substring(title.length - 3, title.length - 1);
             return RadioListTile(
               title: Text(title),
-              secondary: showFlag ? IPCountryFlag(countryCode: countryCode, size: 32) : null,
+              secondary: _getSecondaryWidget(title),
               value: e,
               groupValue: selected,
               onChanged: (value) => context.pop(e),
@@ -58,5 +57,18 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
       ],
       // scrollable: true,
     );
+  }
+
+  Widget? _getSecondaryWidget(String title) {
+    if (!showFlag || title.isEmpty) return null;
+    try {
+      // Matches content inside parenthesis at the end of string, e.g. "US (US)" -> "US"
+      final match = RegExp(r'\(([^)]+)\)$').firstMatch(title);
+      final countryCode = match?.group(1);
+      if (countryCode == null) return null;
+      return IPCountryFlag(countryCode: countryCode, size: 32);
+    } catch (e) {
+      return null;
+    }
   }
 }
