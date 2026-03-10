@@ -130,7 +130,7 @@
 - [Sing-box для Apple](https://github.com/SagerNet/sing-box-for-apple)
 - [Clash](https://github.com/Dreamacro/clash)
 - [Clash Meta](https://github.com/MetaCubeX/Clash.Meta)
-- [FClash](https://github.com/Fclash/Fclash)
+- [FlClash](https://github.com/chen08209/FlClash)
 - [Шрифт Vazirmatn от Saber Rastikerdar](https://github.com/rastikerdar/vazirmatn)
 - [Others](./pubspec.yaml)
 
