@@ -146,7 +146,7 @@ Vless、Vmess、Reality、TUIC、Hysteria、Wireguard、SSH など。
 - [Sing-box for Apple](https://github.com/SagerNet/sing-box-for-apple)
 - [Clash](https://github.com/Dreamacro/clash)
 - [Clash Meta](https://github.com/MetaCubeX/Clash.Meta)
-- [FClash](https://github.com/Fclash/Fclash)
+- [FlClash](https://github.com/chen08209/FlClash)
 - [Saber Rastikerdar による Vazirmatn フォント](https://github.com/rastikerdar/vazirmatn)
 - [その他](./pubspec.yaml)
 

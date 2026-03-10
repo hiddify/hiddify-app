@@ -144,7 +144,7 @@ We would like to express our sincere appreciation to the contributors of the fol
 - [Sing-box for Apple](https://github.com/SagerNet/sing-box-for-apple)
 - [Clash](https://github.com/Dreamacro/clash)
 - [Clash Meta](https://github.com/MetaCubeX/Clash.Meta)
-- [FClash](https://github.com/Fclash/Fclash)
+- [FlClash](https://github.com/chen08209/FlClash)
 - [Vazirmatn Font by Saber Rastikerdar](https://github.com/rastikerdar/vazirmatn)
 - [Others](./pubspec.yaml)
 
