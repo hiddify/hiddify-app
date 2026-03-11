@@ -13,6 +13,7 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
+import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
@@ -344,9 +345,7 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
           textDirection: TextDirection.ltr,
           child: Flexible(
             child: Text(
-              subInfo.total >
-                      10 *
-                          1099511627776 //10TB
+              subInfo.total > ProfileParser.infiniteTrafficThreshold
                   ? "∞ GiB"
                   : subInfo.consumption.sizeOf(subInfo.total),
               semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
@@ -392,9 +391,7 @@ class NewTrafficSubscriptionInfo extends HookConsumerWidget {
             Directionality(
               textDirection: TextDirection.ltr,
               child: Text(
-                subInfo.total >
-                        10 *
-                            1099511627776 //10TB
+                subInfo.total > ProfileParser.infiniteTrafficThreshold
                     ? "∞ GiB"
                     : subInfo.consumption.sizeOf(subInfo.total),
                 semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
@@ -497,9 +494,7 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
         Directionality(
           textDirection: TextDirection.ltr,
           child: Text(
-            subInfo.total >
-                    10 *
-                        1099511627776 //10TB
+            subInfo.total > ProfileParser.infiniteTrafficThreshold
                 ? "∞ GiB"
                 : subInfo.consumption.sizeOf(subInfo.total),
             semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(

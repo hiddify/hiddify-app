@@ -28,7 +28,7 @@ import 'package:meta/meta.dart';
 /// - local: fallback to protocol, extracted from content by protocol()
 
 class ProfileParser {
-  static const infiniteTrafficThreshold = 920_233_720_368;
+  static const infiniteTrafficThreshold = 10_995_116_277_760;
   static const infiniteTimeThreshold = 92_233_720_368;
   static const allowedOverrideConfigs = [
     'connection-test-url',
