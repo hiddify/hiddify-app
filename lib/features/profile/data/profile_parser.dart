@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:dartx/dartx.dart';
 import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
@@ -149,6 +151,14 @@ class ProfileParser {
     // if (url.startsWith("http://"))
     //   throw const ProfileFailure.invalidUrl('HTTP is not supported. Please use HTTPS for secure connection.');
 
+    final appInfo = _ref.read(appInfoProvider).requireValue;
+    final hwid = _ref.read(hwidProvider);
+    final hwidHeaders = <String, String>{
+      'x-hwid': hwid,
+      'x-device-os': appInfo.operatingSystem,
+      'x-ver-os': appInfo.operatingSystemVersion,
+    };
+
     final rs = await _httpClient
         .download(
           url.trim(),
@@ -157,6 +167,7 @@ class ProfileParser {
           userAgent: _ref.read(ConfigOptions.useXrayCoreWhenPossible)
               ? _httpClient.userAgent.replaceAll("HiddifyNext", "HiddifyNextX")
               : null,
+          extraHeaders: hwidHeaders,
         )
         .catchError((err) {
           if (CancelToken.isCancel(err as DioException)) {

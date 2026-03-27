@@ -10,7 +10,9 @@ import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/utils/platform_utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'general_preferences.g.dart';
 
@@ -128,3 +130,15 @@ class DebugModeNotifier extends _$DebugModeNotifier {
     return _pref.write(value);
   }
 }
+
+/// Persistent hardware ID — генерируется один раз при первом запуске.
+/// Используется для идентификации устройства на стороне панели (Remnawave HWID).
+final hwidProvider = Provider<String>((ref) {
+  final prefs = ref.read(sharedPreferencesProvider).requireValue;
+  const key = 'device_hwid';
+  final stored = prefs.getString(key);
+  if (stored != null && stored.isNotEmpty) return stored;
+  final hwid = const Uuid().v4();
+  prefs.setString(key, hwid);
+  return hwid;
+});
