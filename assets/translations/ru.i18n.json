@@ -109,7 +109,8 @@
       "sortOptions": {
         "unsorted": "По умолчанию",
         "name": "По алфавиту",
-        "delay": "По задержке"
+        "delay": "По задержке",
+        "usage": "По использованию"
       },
       "ipInfo": {
         "address": "IP-адрес",
@@ -325,19 +326,19 @@
             "notAvailabeInThisPlatform": "Недоступно на этой платформе",
             "canNotBeEmpty": "Не может быть пустым",
             "validUrlEx": "https://example.com",
-            "validUrl": "Валидный \"URL\", например\n@:pages.settings.routing.routeRule.rule.validUrlEx",
-            "validProcessNameEx": "Chrome.exe или google chrome или chrome",
-            "validProcessName": "Валидное \"Имя процесса\", например\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validUrl": "Действующий \"URL\", например\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe или Google Chrome или Chrome",
+            "validProcessName": "Действующее \"Имя процесса\", например\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "Валидный \"Путь к процессу\", например\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "Действующий \"Путь к процессу\", например\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 или 1-65000",
-            "validPortRange": "Валидный \"Порт\" или \"Диапазон портов\", например\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "Действующий \"Порт\" или \"Диапазон портов\", например\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 или 10.0.0.0/24",
-            "validIpCidr": "Валидный IP CIDR, например\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validIpCidr": "Действующий IP CIDR, например\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com или dl.google.com",
-            "validDomain": "Валидный \"Домен\", например\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "Действующий \"Домен\", например\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com или .ru",
-            "validDomainSuffix": "Валидный \"Суффикс домена\", например\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "Действующий \"Суффикс домена\", например\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Имя",
               "outbound": "Исходящий при совпадении",
@@ -431,8 +432,8 @@
           "gvisor": "gVisor"
         },
         "mixedPort": "Смешанный порт",
-        "tproxyPort": "Порт прозрачного прокси",
-        "directPort": "Локальный порт direct",
+        "tproxyPort": "Прозрачный прокси-порт",
+        "directPort": "Прямой порт",
         "redirectPort": "Порт перенаправления",
         "allowConnectionFromLan": "Поделиться VPN в локальной сети"
       },
@@ -511,10 +512,10 @@
   },
   "dialogs": {
     "sortProfiles": {
-      "title": "Сортировать по",
+      "title": "Сортировка",
       "sort": {
         "name": "По алфавиту",
-        "lastUpdate": "Последнему обновлению"
+        "lastUpdate": "Последнее обновление"
       }
     },
     "warpLicense": {
@@ -591,7 +592,9 @@
       "asn": "ASN:",
       "organization": "Организация:",
       "location": "Местоположение:",
-      "postalCode": "Почтовый индекс:"
+      "postalCode": "Почтовый индекс:",
+      "download": "Скачивание:",
+      "upload": "Отправка:"
     },
     "windowClosing": {
       "askEachTime": "Спрашивать каждый раз",
