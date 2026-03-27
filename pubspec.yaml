@@ -48,6 +48,7 @@ dependencies:
   screen_retriever: ^0.2.0
 
   package_info_plus: ^8.1.0
+  device_info_plus: ^10.1.0
 
   url_launcher: ^6.2.5
   vclibs: ^0.1.2
