@@ -8,5 +8,5 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       upload-artifact: true
-      tag-name: "hwid-build"
+      tag-name: "draft"
       channel: "dev"
