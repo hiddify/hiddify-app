@@ -1,0 +1,12 @@
+name: Build Windows (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    with:
+      upload-artifact: true
+      tag-name: "hwid-build"
+      channel: "dev"
