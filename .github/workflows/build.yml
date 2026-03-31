@@ -39,7 +39,7 @@ jobs:
       draftBuildCode: ${{ steps.draftBuildCode.outputs.datetime }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - uses: subosito/flutter-action@v2.21.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
