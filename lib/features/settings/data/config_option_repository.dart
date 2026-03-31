@@ -143,6 +143,7 @@ abstract class ConfigOptions {
       "http://connectivitycheck.gstatic.com/generate_204",
       "http://www.gstatic.com/generate_204",
       "https://www.gstatic.com/generate_204",
+      "https://redirector.googlevideo.com/generate_204",
       "http://cp.cloudflare.com",
       "http://kernel.org",
       "http://detectportal.firefox.com",
