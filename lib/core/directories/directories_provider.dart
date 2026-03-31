@@ -37,7 +37,7 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
       dirs = (baseDir: portableDir, workingDir: portableDir, tempDir: await getTemporaryDirectory());
     } else {
       final baseDir = await getApplicationSupportDirectory();
-      final workingDir = Platform.isAndroid ? await getExternalStorageDirectory() : baseDir;
+      final workingDir = Platform.isAndroid ? await _getAndroidWorkingDirectory() : baseDir;
       final tempDir = await getTemporaryDirectory();
       dirs = (baseDir: baseDir, workingDir: workingDir!, tempDir: tempDir);
     }
@@ -50,6 +50,17 @@ class AppDirectories extends _$AppDirectories with InfraLogger {
     }
 
     return dirs;
+  }
+
+  static Future<Directory> _getAndroidWorkingDirectory() async {
+    try {
+      final extDir = await getExternalStorageDirectory();
+      if (extDir == null) return getApplicationDocumentsDirectory();
+      if (extDir.existsSync()) return extDir;
+      await extDir.create(recursive: true);
+      return extDir;
+    } catch (_) {}
+    return getApplicationDocumentsDirectory();
   }
 
   static Future<Directory> getDatabaseDirectory() async {
