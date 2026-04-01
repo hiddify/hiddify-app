@@ -19,6 +19,16 @@ class AppInfoEntity with _$AppInfoEntity {
 
   String get userAgent => "HiddifyNext/$version ($operatingSystem) like ClashMeta v2ray sing-box";
 
+  /// Normalized OS name for HTTP headers (e.g. x-device-os).
+  String get displayOs => switch (operatingSystem) {
+    'android' => 'Android',
+    'ios' => 'iOS',
+    'macos' => 'macOS',
+    'windows' => 'Windows',
+    'linux' => 'Linux',
+    _ => operatingSystem,
+  };
+
   String get presentVersion => environment == Environment.prod ? version : "$version ${environment.name}";
 
   /// formats app info for sharing
