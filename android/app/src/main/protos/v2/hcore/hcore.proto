@@ -104,6 +104,7 @@ message OutboundInfo {
   string tag_display = 12;
   int64 upload = 15;
   int64 download = 16;
+  string detour = 17;
 }
 
 message IpInfo {

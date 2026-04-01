@@ -634,6 +634,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aOS(14, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'groupSelectedTagDisplay')
     ..aInt64(15, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'upload')
     ..aInt64(16, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'download')
+    ..aOS(17, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'detour')
     ..hasRequiredFields = false
   ;
 
@@ -655,6 +656,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.String? groupSelectedTagDisplay,
     $fixnum.Int64? upload,
     $fixnum.Int64? download,
+    $core.String? detour,
   }) {
     final _result = create();
     if (tag != null) {
@@ -704,6 +706,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     }
     if (download != null) {
       _result.download = download;
+    }
+    if (detour != null) {
+      _result.detour = detour;
     }
     return _result;
   }
@@ -875,6 +880,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasDownload() => $_has(15);
   @$pb.TagNumber(16)
   void clearDownload() => clearField(16);
+
+  @$pb.TagNumber(17)
+  $core.String get detour => $_getSZ(16);
+  @$pb.TagNumber(17)
+  set detour($core.String v) { $_setString(16, v); }
+  @$pb.TagNumber(17)
+  $core.bool hasDetour() => $_has(16);
+  @$pb.TagNumber(17)
+  void clearDetour() => clearField(17);
 }
 
 class IpInfo extends $pb.GeneratedMessage {
