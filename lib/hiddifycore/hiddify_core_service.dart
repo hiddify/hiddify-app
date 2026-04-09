@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:fpdart/fpdart.dart';
@@ -12,6 +13,7 @@ import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
+import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
@@ -38,7 +40,7 @@ class HiddifyCoreService with InfraLogger {
 
   CoreStatus currentState = const CoreStatus.stopped();
   final statusController = BehaviorSubject<CoreStatus>();
-  final logController = BehaviorSubject<List<LogMessage>>();
+  final logController = BehaviorSubject<List<LogMessage>>.seeded([]);
   final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 10000));
   final Map<String, StreamSubscription?> subscriptions = {};
   List<OutboundGroup> latest = [];
@@ -366,8 +368,11 @@ class HiddifyCoreService with InfraLogger {
   // SingboxConfigOption? latestOptions;
 
   Stream<List<LogMessage>> watchLogs(String path) async* {
+    // Immediately yield the current buffer so the UI never hangs on a spinner.
+    yield List.of(logBuffer);
     if (!core.isInitialized()) {
-      loggy.debug("core is not initialized, returning empty log stream");
+      loggy.debug("core is not initialized, falling back to log file");
+      yield* _watchLogFile(path);
       return;
     }
     await startListeningLogs("bg", core.bgClient);
@@ -397,12 +402,45 @@ class HiddifyCoreService with InfraLogger {
     // yield* MergeStream([bgLogStream, fgLogStream]);
   }
 
+  int _logFilePosition = 0;
+
+  /// Fallback: read logs directly from the log file when gRPC is unavailable.
+  Stream<List<LogMessage>> _watchLogFile(String path) async* {
+    final file = File(path);
+    if (!await file.exists()) return;
+
+    Future<List<LogMessage>> readNewLines() async {
+      if (!await file.exists()) return List.of(logBuffer);
+      final length = await file.length();
+      if (length < _logFilePosition) _logFilePosition = 0;
+      if (length == _logFilePosition) return List.of(logBuffer);
+      final content = await file.openRead(_logFilePosition).transform(utf8.decoder).join();
+      _logFilePosition = length;
+      final now = Timestamp.fromDateTime(DateTime.now());
+      for (final line in const LineSplitter().convert(content)) {
+        if (line.trim().isEmpty) continue;
+        logBuffer.add(LogMessage(level: LogLevel.INFO, message: line, time: now));
+        if (logBuffer.length > 300) {
+          logBuffer.removeAt(0);
+        }
+      }
+      return List.of(logBuffer);
+    }
+
+    yield await readNewLines();
+    await for (final _ in Stream.periodic(const Duration(seconds: 1))) {
+      // Stop file polling if gRPC core becomes available.
+      if (core.isInitialized()) return;
+      yield await readNewLines();
+    }
+  }
+
   TaskEither<String, Unit> clearLogs() {
     return TaskEither(() async {
       loggy.debug("clearing logs");
       logBuffer.clear();
-      // final res = await core.bgClient(Empty());
-      // if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
+      _logFilePosition = 0;
+      logController.add(List.of(logBuffer));
       return right(unit);
     });
   }
@@ -485,7 +523,7 @@ class HiddifyCoreService with InfraLogger {
         if (logBuffer.length > 300) {
           logBuffer.removeAt(0);
         }
-        logController.add(logBuffer);
+        logController.add(List.of(logBuffer));
         // loggy.log(getLogLevel(event.level), event.message);
         event.message.split('\n').forEach((line) {
           loggy.log(getLogLevel(event.level), line);
@@ -525,12 +563,10 @@ class HiddifyCoreService with InfraLogger {
       (event) {
         // loggy.debug(event);
       },
-      cancelOnError: true,
+      cancelOnError: false,
       onError: (error) {
         loggy.log(loggyl.LogLevel.error, 'Stream error: $error');
         onError?.call(error);
-        subscriptions[key]?.cancel();
-        subscriptions.remove(key);
       },
     );
     return subscriptions[key] as StreamSubscription<T>?;
