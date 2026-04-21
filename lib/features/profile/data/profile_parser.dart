@@ -87,9 +87,7 @@ class ProfileParser {
       }
     }
 
-    return port != null
-        ? uri.replace(host: host, port: port).toString()
-        : uri.replace(host: host).toString();
+    return uri.replace(host: host, port: port ?? 0).toString();
   }
 
   final Ref _ref;
