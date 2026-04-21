@@ -50,7 +50,9 @@ class ProfileParser {
   ];
 
   // Resolves `new-domain` from response headers or subscription body content.
-  // Replaces only the host portion of [url], preserving path, query, and fragment.
+  // Replaces the host of [url] and the port if the new value includes one.
+  // If no port is given in new-domain, the original URL's port is preserved.
+  // Accepts: "example.com", "example.com:8080", "1.2.3.4", "1.2.3.4:8080", "[::1]", "[::1]:8080".
   static String resolveNewDomain(String url, String content, Map<String, dynamic> remoteHeaders) {
     String? newDomain = remoteHeaders['new-domain']?.toString().trim();
     if (newDomain == null || newDomain.isEmpty) {
@@ -59,7 +61,35 @@ class ProfileParser {
     if (newDomain == null || newDomain.isEmpty) return url;
     final uri = Uri.tryParse(url);
     if (uri == null) return url;
-    return uri.replace(host: newDomain).toString();
+
+    String host;
+    int? port;
+
+    if (newDomain.startsWith('[')) {
+      // IPv6: "[::1]" or "[::1]:8080"
+      final closingBracket = newDomain.indexOf(']');
+      host = newDomain.substring(0, closingBracket + 1);
+      if (closingBracket + 1 < newDomain.length && newDomain[closingBracket + 1] == ':') {
+        port = int.tryParse(newDomain.substring(closingBracket + 2));
+      }
+    } else {
+      final colonIndex = newDomain.lastIndexOf(':');
+      if (colonIndex != -1) {
+        final maybePort = int.tryParse(newDomain.substring(colonIndex + 1));
+        if (maybePort != null) {
+          host = newDomain.substring(0, colonIndex);
+          port = maybePort;
+        } else {
+          host = newDomain;
+        }
+      } else {
+        host = newDomain;
+      }
+    }
+
+    return port != null
+        ? uri.replace(host: host, port: port).toString()
+        : uri.replace(host: host).toString();
   }
 
   final Ref _ref;
