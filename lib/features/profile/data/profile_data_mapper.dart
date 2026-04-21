@@ -39,6 +39,7 @@ extension ProfileEntityMapper on ProfileEntity {
   ProfileEntriesCompanion toUpdateEntry() => map(
     remote: (rp) => ProfileEntriesCompanion(
       name: Value(rp.name),
+      url: Value(rp.url),
       lastUpdate: Value(rp.lastUpdate),
       updateInterval: Value(rp.options?.updateInterval),
       populatedHeaders: Value(jsonEncode(rp.populatedHeaders)),

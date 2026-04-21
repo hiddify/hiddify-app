@@ -49,6 +49,19 @@ class ProfileParser {
     'enable-fragment',
   ];
 
+  // Resolves `new-domain` from response headers or subscription body content.
+  // Replaces only the host portion of [url], preserving path, query, and fragment.
+  static String resolveNewDomain(String url, String content, Map<String, dynamic> remoteHeaders) {
+    String? newDomain = remoteHeaders['new-domain']?.toString().trim();
+    if (newDomain == null || newDomain.isEmpty) {
+      newDomain = _parseHeadersFromContent(content)['new-domain']?.toString().trim();
+    }
+    if (newDomain == null || newDomain.isEmpty) return url;
+    final uri = Uri.tryParse(url);
+    if (uri == null) return url;
+    return uri.replace(host: newDomain).toString();
+  }
+
   final Ref _ref;
   final DioHttpClient _httpClient;
 
@@ -92,25 +105,28 @@ class ProfileParser {
     required UserOverride? userOverride,
     CancelToken? cancelToken,
   }) => _downloadProfile(url, tempFilePath, cancelToken).flatMap(
-    (remoteHeaders) =>
-        TaskEither.fromEither(
-          populateHeaders(content: File(tempFilePath).readAsStringSync(), remoteHeaders: remoteHeaders),
-        ).flatMap(
-          (populatedHeaders) => TaskEither.fromEither(
-            parse(
-              tempFilePath: tempFilePath,
-              profile: ProfileEntity.remote(
-                id: id,
-                active: true,
-                name: '',
-                url: url,
-                lastUpdate: DateTime.now(),
-                userOverride: userOverride,
-                populatedHeaders: populatedHeaders,
-              ),
-            ).flatMap((profEntity) => Either.tryCatch(() => profEntity.toInsertEntry(), ProfileFailure.unexpected)),
-          ),
+    (remoteHeaders) {
+      final content = File(tempFilePath).readAsStringSync();
+      final resolvedUrl = resolveNewDomain(url, content, remoteHeaders);
+      return TaskEither.fromEither(
+        populateHeaders(content: content, remoteHeaders: remoteHeaders),
+      ).flatMap(
+        (populatedHeaders) => TaskEither.fromEither(
+          parse(
+            tempFilePath: tempFilePath,
+            profile: ProfileEntity.remote(
+              id: id,
+              active: true,
+              name: '',
+              url: resolvedUrl,
+              lastUpdate: DateTime.now(),
+              userOverride: userOverride,
+              populatedHeaders: populatedHeaders,
+            ),
+          ).flatMap((profEntity) => Either.tryCatch(() => profEntity.toInsertEntry(), ProfileFailure.unexpected)),
         ),
+      );
+    },
   );
 
   TaskEither<ProfileFailure, ProfileEntriesCompanion> updateRemote({
@@ -118,17 +134,20 @@ class ProfileParser {
     required String tempFilePath,
     CancelToken? cancelToken,
   }) => _downloadProfile(rp.url, tempFilePath, cancelToken).flatMap(
-    (remoteHeaders) =>
-        TaskEither.fromEither(
-          populateHeaders(content: File(tempFilePath).readAsStringSync(), remoteHeaders: remoteHeaders),
-        ).flatMap(
-          (populatedHeaders) => TaskEither.fromEither(
-            parse(
-              tempFilePath: tempFilePath,
-              profile: rp.copyWith(populatedHeaders: populatedHeaders),
-            ).flatMap((profEntity) => Either.tryCatch(() => profEntity.toUpdateEntry(), ProfileFailure.unexpected)),
-          ),
+    (remoteHeaders) {
+      final content = File(tempFilePath).readAsStringSync();
+      final resolvedUrl = resolveNewDomain(rp.url, content, remoteHeaders);
+      return TaskEither.fromEither(
+        populateHeaders(content: content, remoteHeaders: remoteHeaders),
+      ).flatMap(
+        (populatedHeaders) => TaskEither.fromEither(
+          parse(
+            tempFilePath: tempFilePath,
+            profile: rp.copyWith(url: resolvedUrl, populatedHeaders: populatedHeaders),
+          ).flatMap((profEntity) => Either.tryCatch(() => profEntity.toUpdateEntry(), ProfileFailure.unexpected)),
         ),
+      );
+    },
   );
 
   Either<ProfileFailure, ProfileEntriesCompanion> offlineUpdate({
