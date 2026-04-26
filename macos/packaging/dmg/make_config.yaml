@@ -3,13 +3,13 @@ background: "background.png"
 window:
   size:
     width: 600
-    height: 400
+    height: 328
 contents:
   - x: 440
-    y: 230
+    y: 190
     type: link
     path: "/Applications"
   - x: 160
-    y: 230
+    y: 190
     type: file
     path: Hiddify.app
