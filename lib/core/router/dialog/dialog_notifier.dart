@@ -9,6 +9,7 @@ import 'package:hiddify/core/router/dialog/widgets/new_version_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/no_active_profile_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/ok_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/proxy_info_dialog.dart';
+import 'package:hiddify/core/router/dialog/widgets/relaunch_admin_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/save_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/setting_checkbox_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/setting_input_dialog.dart';
@@ -242,5 +243,9 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<void> showCustomAlertFromErr(({String type, String? message}) err) async {
     return await _show<void>(CustomAlertDialog.fromErr(err));
+  }
+
+  Future<bool> showRelaunchAsAdmin() async {
+    return await _show<bool?>(const RelaunchAdminDialog()) ?? false;
   }
 }

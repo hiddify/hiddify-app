@@ -632,6 +632,7 @@
       "serviceNotRunning": "服务未运行",
       "missingPrivilege": "缺少权限",
       "missingPrivilegeMsg": "VPN 模式需要管理员权限。请以管理员身份重新启动应用，或更改服务模式。",
+      "relaunchAsAdmin": "以管理员身份重新启动",
       "invalidConfigOptions": "配置选项无效",
       "invalidConfig": "配置无效"
     },
