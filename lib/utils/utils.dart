@@ -5,6 +5,7 @@ export 'callback_debouncer.dart';
 export 'custom_loggers.dart';
 export 'custom_text_form_field.dart';
 export 'date_time_formatter.dart';
+export 'elevation_utils.dart';
 export 'link_parsers.dart';
 export 'mutation_state.dart';
 export 'number_formatters.dart';

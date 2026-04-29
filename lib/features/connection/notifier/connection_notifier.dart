@@ -10,7 +10,9 @@ import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -103,6 +105,11 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       await ref.read(Preferences.startedByUser.notifier).update(true);
       await _connectionRepo.reconnect(profile, ref.read(Preferences.disableMemoryLimit)).mapLeft((err) async {
         loggy.warning("error reconnecting", err);
+        if (await _maybePromptForElevation(err)) {
+          await ref.read(Preferences.startedByUser.notifier).update(false);
+          state = AsyncError(err, StackTrace.current);
+          return;
+        }
         state = AsyncError(err, StackTrace.current);
         await ref
             .read(dialogNotifierProvider.notifier)
@@ -146,6 +153,11 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     ) async {
       loggy.warning("error connecting", err);
       //Go err is not normal object to see the go errors are string and need to be dumped
+      if (await _maybePromptForElevation(err)) {
+        await ref.read(Preferences.startedByUser.notifier).update(false);
+        state = AsyncError(err, StackTrace.current);
+        return;
+      }
       await ref
           .read(dialogNotifierProvider.notifier)
           .showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
@@ -156,6 +168,41 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       await ref.read(Preferences.startedByUser.notifier).update(false);
       state = AsyncError(err, StackTrace.current);
     }).run();
+  }
+
+  /// Returns `true` when the failure was handled by surfacing the
+  /// "relaunch as administrator" dialog (so callers should skip the
+  /// generic error toast).
+  Future<bool> _maybePromptForElevation(ConnectionFailure err) async {
+    if (!PlatformUtils.isDesktop) return false;
+    if (ElevationUtils.isElevated) return false;
+    if (ref.read(ConfigOptions.serviceMode) != ServiceMode.tun) return false;
+    if (!_failureLooksLikeMissingPrivilege(err)) return false;
+
+    final shouldRelaunch = await ref.read(dialogNotifierProvider.notifier).showRelaunchAsAdmin();
+    if (!shouldRelaunch) return true;
+
+    final relaunched = await ElevationUtils.relaunchElevated();
+    if (!relaunched) {
+      // The user cancelled the OS prompt or no helper was available;
+      // fall back to the regular error notification so they're not left
+      // wondering what happened.
+      await ref
+          .read(dialogNotifierProvider.notifier)
+          .showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
+    }
+    return true;
+  }
+
+  static bool _failureLooksLikeMissingPrivilege(ConnectionFailure err) {
+    if (err is MissingPrivilege || err is MissingVpnPermission) return true;
+    final text = err.toString().toLowerCase();
+    return text.contains("permission denied") ||
+        text.contains("operation not permitted") ||
+        text.contains("administrator") ||
+        text.contains("privilege") ||
+        text.contains("must be root") ||
+        text.contains("requires root");
   }
 
   Future<void> _disconnect() async {
