@@ -82,7 +82,6 @@
       "addingWarpMsg": "Please wait while we register WARP.",
       "addingProfileMsg": "Adding Profile",
       "failureMsg": "Failed to Add Profile"
-      
     },
     "update": {
       "buttonTxt": "Update",

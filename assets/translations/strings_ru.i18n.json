@@ -16,13 +16,13 @@
     "agree": "Соглашаться",
     "decline": "Отклонить",
     "unknown": "Неизвестный",
+    "hidden": "Скрытый",
     "timeout": "Таймаут",
     "clipboardExportSuccessMsg": "Скопировано",
     "showMore": "Развернуть ",
     "showLess": "Свернуть ",
     "openAppSettings": "Открыть настройки",
-    "grantPermission": "Дать права доступа",
-    "hidden": "Скрытый"
+    "grantPermission": "Дать права доступа"
   },
   "intro": {
     "termsAndPolicyCaution(rich)": "Продолжая, Вы соглашаетесь с ${tap(@:about.termsAndConditions)}",
@@ -42,7 +42,6 @@
     "connection": "Соединение ",
     "speed": "Скорость",
     "totalTransferred": "Всего передано"
-
   },
   "profile": {
     "overviewPageTitle": "Профили",
@@ -163,7 +162,6 @@
     "requiresRestartMsg": "Чтобы применить изменения, перезапустите приложение.",
     "experimental": "Экспериментальный",
     "experimentalMsg": "Функции с флагом «Экспериментально» все еще находятся в разработке и могут вызвать проблемы.",
-    
     "importOptions": "Импорт параметров из буфера обмена",
     "importOptionsMsg": "Это перезапишет все параметры конфига предоставленными значениями. Вы уверены?",
     "general": {
@@ -325,8 +323,8 @@
     "resetBtn": "Сбросить параметры",
     "serviceMode": "Режим работы",
     "quickSettings": "Быстрые настройки",
-    "allOptions": "Все параметры ",
     "setupWarp": "Настроить WARP",
+    "allOptions": "Все параметры ",
     "serviceModes": {
       "proxy": "Прокси",
       "systemProxy": "Системный прокси",

@@ -78,6 +78,7 @@
         "permissionRequest": "授予相機權限已允許掃描 QR code"
       },
       "manually": "手動輸入",
+      "addingWarpMsg": "請稍候，我們正在註冊 WARP。",
       "addingProfileMsg": "新增設定檔",
       "failureMsg": "新增設定檔失敗"
     },
