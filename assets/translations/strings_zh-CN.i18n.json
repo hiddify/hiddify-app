@@ -162,7 +162,6 @@
     "requiresRestartMsg": "要使其生效，请重新启动应用程序",
     "experimental": "实验性选项",
     "experimentalMsg": "带有实验标志的功能仍在开发中，可能会出现问题。",
-    
     "importOptions": "从剪切板导入选项",
     "importOptionsMsg": "这将使用提供的值重写所有配置选项。您确定吗？",
     "general": {
