@@ -9,7 +9,6 @@ import 'package:hiddify/core/http_client/dio_http_client.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,6 +27,7 @@ import 'package:meta/meta.dart';
 /// - local: fallback to protocol, extracted from content by protocol()
 
 class ProfileParser {
+  static const clashSubscriptionUserAgent = 'clash.meta';
   static const infiniteTrafficThreshold = 920_233_720_368;
   static const infiniteTimeThreshold = 92_233_720_368;
   static const allowedOverrideConfigs = [
@@ -66,7 +66,7 @@ class ProfileParser {
             cancelToken: CancelToken(),
             ref: _ref,
           );
-        }, (_, __) => ProfileFailure.unexpected())
+        }, ProfileFailure.unexpected)
         .flatMap((_) => TaskEither.fromEither(populateHeaders(content: content)))
         .flatMap(
           (populatedHeaders) => TaskEither.fromEither(
@@ -149,21 +149,12 @@ class ProfileParser {
     // if (url.startsWith("http://"))
     //   throw const ProfileFailure.invalidUrl('HTTP is not supported. Please use HTTPS for secure connection.');
 
-    final rs = await _httpClient
-        .download(
-          url.trim(),
-          tempFilePath,
-          cancelToken: cancelToken,
-          userAgent: _ref.read(ConfigOptions.useXrayCoreWhenPossible)
-              ? _httpClient.userAgent.replaceAll("HiddifyNext", "HiddifyNextX")
-              : null,
-        )
-        .catchError((err) {
-          if (CancelToken.isCancel(err as DioException)) {
-            throw const ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
-          }
-          throw err;
-        });
+    final rs = await _downloadSubscription(
+      url.trim(),
+      tempFilePath,
+      cancelToken: cancelToken,
+      userAgent: clashSubscriptionUserAgent,
+    );
     await expandRemoteLinesInParallel(
       tempFilePath: tempFilePath,
       httpClient: _httpClient,
@@ -201,20 +192,19 @@ class ProfileParser {
 
         // Non-URL
         if (!line.startsWith('http://') && !line.startsWith('https://')) {
-          results[currentIndex] = line.trim();
+          results[currentIndex] = line;
           continue;
         }
 
         try {
           final tmpPath = '$tempFilePath.$currentIndex';
 
-          await httpClient.download(
-            line,
-            tmpPath,
+          await downloadSubscription(
+            httpClient: httpClient,
+            url: line,
+            path: tmpPath,
             cancelToken: cancelToken,
-            userAgent: ref.read(ConfigOptions.useXrayCoreWhenPossible)
-                ? httpClient.userAgent.replaceAll('HiddifyNext', 'HiddifyNextX')
-                : null,
+            userAgent: clashSubscriptionUserAgent,
           );
 
           results[currentIndex] = (await File(tmpPath).readAsString()).trim();
@@ -234,6 +224,50 @@ class ProfileParser {
       final newContent = results.join("\n");
       await File(tempFilePath).writeAsString(newContent);
     }
+  }
+
+  Future<Response> _downloadSubscription(String url, String path, {CancelToken? cancelToken, String? userAgent}) =>
+      downloadSubscription(
+        httpClient: _httpClient,
+        url: url,
+        path: path,
+        cancelToken: cancelToken,
+        userAgent: userAgent,
+      );
+
+  static Future<Response> downloadSubscription({
+    required DioHttpClient httpClient,
+    required String url,
+    required String path,
+    CancelToken? cancelToken,
+    String? userAgent,
+  }) async {
+    try {
+      final response = await httpClient.download(url, path, cancelToken: cancelToken, userAgent: userAgent);
+      if (await _shouldRetryWithClashUserAgent(path)) {
+        return httpClient.download(url, path, cancelToken: cancelToken, userAgent: clashSubscriptionUserAgent);
+      }
+      return response;
+    } catch (err) {
+      if (err is DioException && CancelToken.isCancel(err)) {
+        throw const ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
+      }
+      if (_shouldRetryErrorWithClashUserAgent(err)) {
+        return httpClient.download(url, path, cancelToken: cancelToken, userAgent: clashSubscriptionUserAgent);
+      }
+      rethrow;
+    }
+  }
+
+  static Future<bool> _shouldRetryWithClashUserAgent(String path) async {
+    final content = await File(path).readAsString();
+    final decoded = safeDecodeBase64(content);
+    return decoded != content && decoded.contains('anytls://');
+  }
+
+  static bool _shouldRetryErrorWithClashUserAgent(Object err) {
+    if (err is! DioException) return false;
+    return err.response?.statusCode == 403;
   }
 
   static Either<ProfileFailure, Map<String, dynamic>> populateHeaders({
