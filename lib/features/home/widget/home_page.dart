@@ -60,14 +60,15 @@ class HomePage extends HookConsumerWidget {
           //     material: (context, platform) => MaterialIconButtonData(
           //           tooltip: t.profile.add.buttonText,
           //         )),
-          Semantics(
-            key: const ValueKey("profile_quick_settings"),
-            label: t.pages.home.quickSettings,
-            child: IconButton(
-              icon: Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
-              onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
+          if (ref.watch(hasAnyProfileProvider).value ?? false)
+            Semantics(
+              key: const ValueKey("profile_quick_settings"),
+              label: t.pages.home.quickSettings,
+              child: IconButton(
+                icon: Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
+                onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
+              ),
             ),
-          ),
           const Gap(8),
           Semantics(
             key: const ValueKey("profile_add_button"),

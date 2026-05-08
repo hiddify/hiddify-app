@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/features/proxy/active/ip_widget.dart';
+import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -36,7 +36,7 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
             final title = getTitle(e);
             return RadioListTile(
               title: Text(title),
-              secondary: _getSecondaryWidget(title),
+              secondary: showFlag ? ChoicePreferenceWidget.flagByTitle(title) : null,
               value: e,
               groupValue: selected,
               onChanged: (value) => context.pop(e),
@@ -57,18 +57,5 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
       ],
       // scrollable: true,
     );
-  }
-
-  Widget? _getSecondaryWidget(String title) {
-    if (!showFlag || title.isEmpty) return null;
-    try {
-      // Matches content inside parenthesis at the end of string, e.g. "US (US)" -> "US"
-      final match = RegExp(r'\(([^)]+)\)$').firstMatch(title);
-      final countryCode = match?.group(1);
-      if (countryCode == null) return null;
-      return IPCountryFlag(countryCode: countryCode, size: 32);
-    } catch (e) {
-      return null;
-    }
   }
 }

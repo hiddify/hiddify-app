@@ -10,6 +10,8 @@ import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -58,10 +60,19 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
             loggy.warning('failed to delete profile', err);
             throw err;
           },
-          (_) {
+          (_) async {
             loggy.info('successfully deleted profile, was active? [${profile.active}]');
             final t = ref.read(translationsProvider).requireValue;
             ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.delete.success);
+
+            final activePrfile = await ref.read(activeProfileProvider.future);
+            if (profile.id == ref.read(ConfigOptions.extraSecurityProfileId)) {
+              ref.read(ConfigOptions.extraSecurityProfileId.notifier).update(activePrfile?.id);
+            }
+            if (profile.id == ref.read(ConfigOptions.unblockerProfileId)) {
+              ref.read(ConfigOptions.unblockerProfileId.notifier).update(activePrfile?.id);
+            }
+
             return unit;
           },
         )

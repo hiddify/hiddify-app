@@ -241,7 +241,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
       if (profile case RemoteProfileEntity())
         AdaptiveMenuItem(
           title: t.common.update,
-          icon: Icons.update_rounded,
+          leadingIcon: const Icon(Icons.update_rounded),
           onTap: () {
             if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
               return;
@@ -251,7 +251,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
         ),
       AdaptiveMenuItem(
         title: t.common.share,
-        icon: AdaptiveIcon(context).share,
+        leadingIcon: Icon(AdaptiveIcon(context).share),
         subItems: [
           if (profile case RemoteProfileEntity(:final url, :final name)) ...[
             AdaptiveMenuItem(
@@ -285,7 +285,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
         ],
       ),
       AdaptiveMenuItem(
-        icon: Icons.edit_rounded,
+        leadingIcon: const Icon(Icons.edit_rounded),
         title: t.common.edit,
         onTap: () {
           if (Breakpoint(context).isMobile()) context.pop();
@@ -294,7 +294,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
       ),
       // if (!profile.active)
       AdaptiveMenuItem(
-        icon: Icons.delete_outline_rounded,
+        leadingIcon: const Icon(Icons.delete_outline_rounded),
         title: t.common.delete,
         onTap: () async => await ref
             .read(dialogNotifierProvider.notifier)

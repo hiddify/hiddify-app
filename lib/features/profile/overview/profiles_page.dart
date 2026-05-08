@@ -5,6 +5,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
@@ -18,8 +19,8 @@ class ProfilesPage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final asyncProfiles = ref.watch(profilesNotifierProvider);
 
-    ref.listen(profilesNotifierProvider, (_, next) {
-      if (next.hasValue && next.value!.isEmpty) {
+    ref.listen(hasAnyProfileProvider, (_, next) {
+      if (next.value == false) {
         context.goNamed('home');
       }
     });
