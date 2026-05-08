@@ -78,7 +78,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                       semanticLabel: t.components.stats.uplink,
                     ),
                     (
-                      label: Text("↓", style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                      label: const Text("↓", style: TextStyle(color: Colors.blue)),
                       data: Text(stats.downlink.toInt().speed()),
                       semanticLabel: t.components.stats.downlink,
                     ),
@@ -94,7 +94,7 @@ class SideBarStatsOverview extends HookConsumerWidget {
                       semanticLabel: t.components.stats.uplink,
                     ),
                     (
-                      label: Text("↓", style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                      label: const Text("↓", style: TextStyle(color: Colors.blue)),
                       data: Text(stats.downlinkTotal.toInt().size()),
                       semanticLabel: t.components.stats.downlink,
                     ),

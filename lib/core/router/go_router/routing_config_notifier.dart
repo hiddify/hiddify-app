@@ -15,6 +15,7 @@ import 'package:hiddify/features/profile/details/profile_details_page.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
+import 'package:hiddify/features/route_rules/overview/rules_page.dart';
 import 'package:hiddify/features/settings/overview/sections/dns_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/general_page.dart';
 import 'package:hiddify/features/settings/overview/sections/inbound_options_page.dart';
@@ -22,6 +23,7 @@ import 'package:hiddify/features/settings/overview/sections/route_options_page.d
 import 'package:hiddify/features/settings/overview/sections/tls_tricks_page.dart';
 import 'package:hiddify/features/settings/overview/sections/warp_options_page.dart';
 import 'package:hiddify/features/settings/overview/settings_page.dart';
+import 'package:hiddify/features/stats/overview/traffic_dashboard_page.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -79,10 +81,11 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
         if (!introCompleted) {
           return url != null ? '/intro?url=$url' : '/intro';
         } else if (isIntro) {
-          if (url != null)
+          if (url != null) {
             WidgetsBinding.instance.addPostFrameCallback(
               (_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url),
             );
+          }
           return '/home';
         } else if (url != null) {
           WidgetsBinding.instance.addPostFrameCallback(
@@ -112,6 +115,12 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                       path: '/proxies',
                       pageBuilder: (_, state) =>
                           customTransition(TransitionType.fade, state.pageKey, const ProxiesOverviewPage()),
+                    ),
+                    GoRoute(
+                      name: 'dashboard',
+                      path: '/dashboard',
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.fade, state.pageKey, const TrafficDashboardPage()),
                     ),
                     if (isMobileBreakpoint)
                       GoRoute(
@@ -179,6 +188,12 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                           path: '/per-app-proxy',
                           pageBuilder: (_, state) =>
                               customTransition(TransitionType.slide, state.pageKey, const PerAppProxyPage()),
+                        ),
+                        GoRoute(
+                          name: 'routeRules',
+                          path: '/route-rules',
+                          pageBuilder: (_, state) =>
+                              customTransition(TransitionType.slide, state.pageKey, const RulesPage()),
                         ),
                       ],
                     ),

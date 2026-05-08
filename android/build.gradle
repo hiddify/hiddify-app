@@ -13,6 +13,12 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(':app')
+    afterEvaluate {
+        if (project.hasProperty('android')) {
+            project.android.compileOptions.sourceCompatibility JavaVersion.VERSION_21
+            project.android.compileOptions.targetCompatibility JavaVersion.VERSION_21
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

@@ -50,7 +50,7 @@ class WindowsProtocolHandler extends ProtocolHandler {
   }
 
   String _sanitize(String value) {
-    value = value.replaceAll(r'%s', '%1').replaceAll(r'"', '\\"');
+    value = value.replaceAll('%s', '%1').replaceAll('"', '\\"');
     return '"$value"';
   }
 }

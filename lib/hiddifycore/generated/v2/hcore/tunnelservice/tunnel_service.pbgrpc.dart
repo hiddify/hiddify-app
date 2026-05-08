@@ -10,8 +10,8 @@ import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
-import 'tunnel.pb.dart' as $2;
-import '../../hcommon/common.pb.dart' as $1;
+import 'package:hiddify/hiddifycore/generated/v2/hcore/tunnelservice/tunnel.pb.dart' as $2;
+import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart' as $1;
 export 'tunnel_service.pb.dart';
 
 class TunnelServiceClient extends $grpc.Client {

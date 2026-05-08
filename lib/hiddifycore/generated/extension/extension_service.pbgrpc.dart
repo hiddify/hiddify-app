@@ -10,8 +10,8 @@ import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
-import '../v2/hcommon/common.pb.dart' as $1;
-import 'extension.pb.dart' as $6;
+import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart' as $1;
+import 'package:hiddify/hiddifycore/generated/extension/extension.pb.dart' as $6;
 export 'extension_service.pb.dart';
 
 class ExtensionHostServiceClient extends $grpc.Client {
