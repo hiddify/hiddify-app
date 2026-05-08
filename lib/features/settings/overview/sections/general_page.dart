@@ -76,10 +76,11 @@ class GeneralPage extends HookConsumerWidget {
             secondary: const Icon(Icons.bug_report_rounded),
             value: ref.watch(debugModeNotifierProvider),
             onChanged: (value) async {
-              if (value)
+              if (value) {
                 await ref
                     .read(dialogNotifierProvider.notifier)
                     .showOk(t.pages.settings.general.debugMode, t.pages.settings.general.debugModeMsg);
+              }
               await ref.read(debugModeNotifierProvider.notifier).update(value);
             },
           ),

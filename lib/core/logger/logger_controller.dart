@@ -1,9 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:hiddify/core/logger/custom_logger.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:loggy/loggy.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class LoggerController extends LoggyPrinter with InfraLogger {
   LoggerController(this.consolePrinter, this.otherPrinters);

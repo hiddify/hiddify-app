@@ -22,6 +22,12 @@ class RouteOptionsPage extends HookConsumerWidget {
       appBar: AppBar(title: Text(t.pages.settings.routing.title)),
       body: ListView(
         children: [
+          ListTile(
+            title: Text(t.pages.settings.routing.routeRule.title),
+            leading: const Icon(Icons.rule_rounded),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => context.goNamed('routeRules'),
+          ),
           if (PlatformUtils.isAndroid)
             ListTile(
               title: Text(t.pages.settings.routing.perAppProxy.title),

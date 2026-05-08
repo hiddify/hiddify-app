@@ -10,7 +10,7 @@ import 'package:hiddify/utils/custom_loggers.dart';
 class DioHttpClient with InfraLogger {
   final Map<String, Dio> _dio = {};
   DioHttpClient({required Duration timeout, required this.userAgent, required bool debug}) {
-    for (var mode in ["proxy", "direct", "both"]) {
+    for (final mode in ["proxy", "direct", "both"]) {
       _dio[mode] = Dio(
         BaseOptions(
           connectTimeout: timeout,

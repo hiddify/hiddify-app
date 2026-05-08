@@ -11,13 +11,13 @@ class CircleDesignWidget extends StatelessWidget {
   final String label;
 
   const CircleDesignWidget({
-    Key? key,
+    super.key,
     required this.animationValue,
     required this.color,
     required this.onTap,
     required this.enabled,
     required this.label,
-  }) : super(key: key);
+  });
   // GestureDetector(
   //       onTap: onTap,
   //       child: CustomPaint(
@@ -120,7 +120,7 @@ class CirclePainter extends CustomPainter {
         end: Alignment.bottomCenter,
         colors: innerCircleColor,
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 36));
-    final double innerRadius = 36;
+    const double innerRadius = 36;
     canvas.drawCircle(Offset(cx, cy), innerRadius, innerCirclePaint);
 
     // Draw path and vertical line (same as original)

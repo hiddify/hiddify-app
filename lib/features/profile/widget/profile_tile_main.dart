@@ -93,7 +93,7 @@ class ProfileTileMain extends HookConsumerWidget {
             ),
           ),
           if (subInfo != null)
-            Container(
+            SizedBox(
               width: 350,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -125,7 +125,7 @@ class ProfileTileMain extends HookConsumerWidget {
                       ],
                     ),
                   ),
-                  if ((subInfo.webPageUrl != null || subInfo.supportUrl != null))
+                  if (subInfo.webPageUrl != null || subInfo.supportUrl != null)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Row(
@@ -255,7 +255,7 @@ class _UsageRow extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                       valueColor: AlwaysStoppedAnimation<Color>(color),
                       minHeight: 4,
                     ),

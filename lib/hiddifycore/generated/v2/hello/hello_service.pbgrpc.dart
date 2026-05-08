@@ -10,7 +10,7 @@ import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
-import 'hello.pb.dart' as $5;
+import 'package:hiddify/hiddifycore/generated/v2/hello/hello.pb.dart' as $5;
 export 'hello_service.pb.dart';
 
 class HelloClient extends $grpc.Client {

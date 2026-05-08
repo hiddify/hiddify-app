@@ -10,9 +10,9 @@ import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
-import 'profile_service.pb.dart' as $3;
-import 'profile.pb.dart' as $4;
-import '../hcommon/common.pb.dart' as $1;
+import 'package:hiddify/hiddifycore/generated/v2/profile/profile_service.pb.dart' as $3;
+import 'package:hiddify/hiddifycore/generated/v2/profile/profile.pb.dart' as $4;
+import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart' as $1;
 export 'profile_service.pb.dart';
 
 class ProfileServiceClient extends $grpc.Client {

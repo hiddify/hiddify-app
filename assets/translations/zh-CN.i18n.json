@@ -95,6 +95,20 @@
       "title": "主页",
       "quickSettings": "快速设置"
     },
+    "dashboard": {
+      "title": "流量监控",
+      "realtimeSpeed": "实时速度",
+      "systemInfo": "系统信息",
+      "connected": "已连接",
+      "disconnected": "未连接",
+      "currentOutbound": "当前出站",
+      "currentProfile": "当前配置",
+      "connectionsIn": "入站连接",
+      "connectionsOut": "出站连接",
+      "memoryUsage": "内存使用",
+      "goroutines": "协程数",
+      "trafficDistribution": "流量分布"
+    },
     "proxies": {
       "title": "代理",
       "sort": "排序代理",

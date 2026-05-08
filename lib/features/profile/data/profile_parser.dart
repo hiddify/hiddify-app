@@ -66,7 +66,7 @@ class ProfileParser {
             cancelToken: CancelToken(),
             ref: _ref,
           );
-        }, (_, __) => ProfileFailure.unexpected())
+        }, (_, _) => const ProfileFailure.unexpected())
         .flatMap((_) => TaskEither.fromEither(populateHeaders(content: content)))
         .flatMap(
           (populatedHeaders) => TaskEither.fromEither(

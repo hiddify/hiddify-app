@@ -95,6 +95,20 @@
       "title": "Home",
       "quickSettings": "Quick settings"
     },
+    "dashboard": {
+      "title": "Traffic Monitor",
+      "realtimeSpeed": "Real-time Speed",
+      "systemInfo": "System Info",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "currentOutbound": "Current Outbound",
+      "currentProfile": "Current Profile",
+      "connectionsIn": "Connections In",
+      "connectionsOut": "Connections Out",
+      "memoryUsage": "Memory Usage",
+      "goroutines": "Goroutines",
+      "trafficDistribution": "Traffic Distribution"
+    },
     "proxies": {
       "title": "Proxies",
       "sort": "Sort proxies",
