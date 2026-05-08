@@ -483,6 +483,7 @@
           }
         },
         "warp": {
+          "missingConfig": "Missing WARP config",
           "licenseKey": "License key",
           "cleanIp": "Clean IP",
           "port": "Port",

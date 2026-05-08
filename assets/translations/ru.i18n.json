@@ -486,6 +486,7 @@
           }
         },
         "warp": {
+          "missingConfig": "Отсутствует конфигурация WARP",
           "licenseKey": "Лицензионный ключ",
           "cleanIp": "Чистый IP",
           "port": "Порт",

@@ -488,6 +488,7 @@
           }
         },
         "warp": {
+          "missingConfig": "تكوين وارب مفقود",
           "licenseKey": "مفتاح الترخيص",
           "cleanIp": "IP نظيف",
           "port": "المنفذ",

@@ -482,6 +482,7 @@
           }
         },
         "warp": {
+          "missingConfig": "WARP yapılandırması eksik",
           "licenseKey": "Lisans anahtarı",
           "cleanIp": "Temiz IP",
           "port": "Port",

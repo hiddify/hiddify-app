@@ -482,6 +482,7 @@
           }
         },
         "warp": {
+          "missingConfig": "Konfigurasi WARP hilang",
           "licenseKey": "Kunci lisensi",
           "cleanIp": "IP bersih",
           "port": "Port",

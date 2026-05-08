@@ -482,6 +482,7 @@
           }
         },
         "warp": {
+          "missingConfig": "Falta la configuración de WARP",
           "licenseKey": "Clave de licencia",
           "cleanIp": "IP limpia",
           "port": "Puerto",

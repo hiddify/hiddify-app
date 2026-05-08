@@ -482,6 +482,7 @@
           }
         },
         "warp": {
+          "missingConfig": "WARP 配置缺失",
           "licenseKey": "许可证密钥",
           "cleanIp": "优选 IP",
           "port": "端口",
