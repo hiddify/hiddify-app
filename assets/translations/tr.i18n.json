@@ -51,6 +51,10 @@
     "timeout": "Zaman aşımı",
     "sort": "Sırala",
     "dashboard": "Gösterge Paneli",
+    "disable": "Devre dışı bırak",
+    "psiphon": "Psiphon",
+    "profile": "Profil",
+    "configuration": "Yapılandırma",
     "interval": {
       "day": {
         "zero": "",
@@ -452,27 +456,82 @@
           "size": "Dolgu boyutu"
         }
       },
-      "warp": {
-        "title": "WARP",
-        "enable": "WARP'ı etkinleştir",
-        "generateConfig": "WARP yapılandırması oluştur",
-        "configGenerated": "WARP yapılandırması oluşturuldu",
-        "missingConfig": "WARP yapılandırması eksik",
-        "detourMode": "Yönlendirme modu",
-        "detourModes": {
-          "proxyOverWarp": "Proxy'leri WARP üzerinden yönlendir",
-          "warpOverProxy": "WARP'ı proxy'ler üzerinden yönlendir",
-          "proxyOverWarpExplain": "Proxy'lerin engelini WARP ile kaldır",
-          "warpOverProxyExplain": "WARP ile ekstra güvenlik"
+      "chain": {
+        "title": "Zincir",
+        "subtitle": "Ekstra güvenlik ve Engel kaldırıcı",
+        "finalIp": "Nihai IP",
+        "levels": {
+          "app": {
+            "title": "Uygulama",
+            "msg": "Başlangıç noktası: Uygulama trafiğiniz burada zincire girer ve son bypass'a hazırlanmak için sonraki katmanlardan geçer"
+          },
+          "extraSecurity": {
+            "title": "Ekstra güvenlik",
+            "msg": "Ana profiliniz güvenilir olmasa bile verilerinizi gizli tutmak için ekstra bir kalkan ekler"
+          },
+          "mainProfile": {
+            "title": "Ana profil"
+          },
+          "unblocker": {
+            "title": "Engel kaldırıcı",
+            "msg": "Ağ kısıtlamalarını aşmaya yardımcı olur. Yardımcı bağlanırsa, ana profiliniz şu anda engellenmiş olsa bile çalışmaya devam edebilir"
+          },
+          "filtering": {
+            "title": "Filtreleme",
+            "msg": "Son çıkış: Aktif katmanlardan (Ekstra güvenlik, Ana profil veya Engel kaldırıcı) geçtikten ve etkilerini uyguladıktan sonra, trafiğiniz nihayet yerel ağ filtrelemesini aşacak şekilde yönlendirilir"
+          }
         },
-        "licenseKey": "Lisans anahtarı",
-        "cleanIp": "Temiz IP",
-        "port": "Port",
-        "noise": {
-          "count": "Gürültü sayısı",
-          "mode": "Gürültü modu",
-          "size": "Gürültü boyutu",
-          "delay": "Gürültü gecikmesi"
+        "warp": {
+          "missingConfig": "WARP yapılandırması eksik",
+          "licenseKey": "Lisans anahtarı",
+          "cleanIp": "Temiz IP",
+          "port": "Port",
+          "noise": {
+            "count": "Gürültü sayısı",
+            "mode": "Gürültü modu",
+            "size": "Gürültü boyutu",
+            "delay": "Gürültü gecikmesi"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "Sunucu bölgesini seçin",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "Avusturya (at)",
+            "au": "Avustralya (au)",
+            "be": "Belçika (be)",
+            "bg": "Bulgaristan (bg)",
+            "ca": "Kanada (ca)",
+            "ch": "İsviçre (ch)",
+            "cz": "Çek Cumhuriyeti (cz)",
+            "de": "Almanya (de)",
+            "dk": "Danimarka (dk)",
+            "ee": "Estonya (ee)",
+            "es": "İspanya (es)",
+            "fi": "Finlandiya (fi)",
+            "fr": "Fransa (fr)",
+            "gb": "Birleşik Krallık (gb)",
+            "hr": "Hırvatistan (hr)",
+            "hu": "Macaristan (hu)",
+            "ie": "İrlanda (ie)",
+            "in": "Hindistan (in)",
+            "it": "İtalya (it)",
+            "jp": "Japonya (jp)",
+            "lv": "Letonya (lv)",
+            "nl": "Hollanda (nl)",
+            "no": "Norveç (no)",
+            "pl": "Polonya (pl)",
+            "pt": "Portekiz (pt)",
+            "ro": "Romanya (ro)",
+            "rs": "Sırbistan (rs)",
+            "se": "İsveç (se)",
+            "sg": "Singapur (sg)",
+            "sk": "Slovakya (sk)",
+            "us": "Amerika Birleşik Devletleri (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "Profil seçin"
         }
       }
     }

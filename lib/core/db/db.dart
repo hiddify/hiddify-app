@@ -14,7 +14,7 @@ class Db extends _$Db with InfraLogger {
   Db([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   static QueryExecutor _openConnection() {
     return LazyDatabase(
@@ -57,24 +57,13 @@ class Db extends _$Db with InfraLogger {
         from4To5: (m, schema) async {
           await m.deleteTable('geo_asset_entries');
           await m.renameColumn(schema.profileEntries, 'test_url', schema.profileEntries.profileOverride);
-
-          final userOverrideExists = await _columnExists(
-            schema.profileEntries.actualTableName,
-            schema.profileEntries.userOverride.name,
-          );
-          if (!userOverrideExists) {
-            await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
-          }
-
-          final populatedHeadersExists = await _columnExists(
-            schema.profileEntries.actualTableName,
-            schema.profileEntries.populatedHeaders.name,
-          );
-          if (!populatedHeadersExists) {
-            await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
-          }
+          await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
+          await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
 
           await m.createTable(schema.appProxyEntries);
+        },
+        from5To6: (m, schema) async {
+          await m.dropColumn(schema.profileEntries, 'profile_override');
         },
       ),
     );
@@ -102,7 +91,6 @@ class ProfileEntries extends Table {
   TextColumn get webPageUrl => text().nullable()();
   TextColumn get supportUrl => text().nullable()();
   TextColumn get populatedHeaders => text().nullable()();
-  TextColumn get profileOverride => text().nullable()();
   TextColumn get userOverride => text().nullable()();
 
   @override

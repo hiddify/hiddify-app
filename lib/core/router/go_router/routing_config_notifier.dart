@@ -15,12 +15,12 @@ import 'package:hiddify/features/profile/details/profile_details_page.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
+import 'package:hiddify/features/settings/overview/sections/chain_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/dns_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/general_page.dart';
 import 'package:hiddify/features/settings/overview/sections/inbound_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/route_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/tls_tricks_page.dart';
-import 'package:hiddify/features/settings/overview/sections/warp_options_page.dart';
 import 'package:hiddify/features/settings/overview/settings_page.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -63,8 +63,6 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
     if (isMobileBreakpoint == null) return loadingConfig;
     return RoutingConfig(
       redirect: (context, state) {
-        final introCompleted = ref.read(Preferences.introCompleted);
-        final isIntro = state.matchedLocation == '/intro';
         // fix path-parameters for deep link
         String? url;
         if (LinkParser.protocols.contains(state.uri.scheme)) {
@@ -76,19 +74,27 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
           url = state.uri.queryParameters['url'];
         }
 
-        if (!introCompleted) {
+        if (!ref.read(Preferences.introCompleted)) {
+          // Intro completed
           return url != null ? '/intro?url=$url' : '/intro';
-        } else if (isIntro) {
-          if (url != null)
+        } else if (state.matchedLocation == '/intro') {
+          // Is Intro Page
+          if (url != null) {
             WidgetsBinding.instance.addPostFrameCallback(
               (_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url),
             );
+          }
           return '/home';
         } else if (url != null) {
+          // Auto import profile from url
           WidgetsBinding.instance.addPostFrameCallback(
             (_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url),
           );
           return '/home';
+        } else if (state.matchedLocation.contains('chain-options') &&
+            (ref.watch(hasAnyProfileProvider).value == false)) {
+          // Prevent showing chainOptions while hasAnyProfile == false
+          return '/settings';
         }
         return null;
       },
@@ -201,10 +207,10 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                           customTransition(TransitionType.slide, state.pageKey, const TlsTricksPage()),
                     ),
                     GoRoute(
-                      name: 'warpOptions',
-                      path: '/warp-options',
+                      name: 'chainOptions',
+                      path: '/chain-options',
                       pageBuilder: (_, state) =>
-                          customTransition(TransitionType.slide, state.pageKey, const WarpOptionsPage()),
+                          customTransition(TransitionType.slide, state.pageKey, const ChainOptionsPage()),
                     ),
                     if (isMobileBreakpoint) ...[
                       GoRoute(

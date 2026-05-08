@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/features/settings/notifier/reset_tunnel/reset_tunnel_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -166,11 +167,13 @@ class SettingsPage extends HookConsumerWidget {
             icon: Icons.content_cut_rounded,
             namedLocation: context.namedLocation('tlsTricks'),
           ),
-          SettingsSection(
-            title: t.pages.settings.warp.title,
-            icon: Icons.cloud_rounded,
-            namedLocation: context.namedLocation('warpOptions'),
-          ),
+          if (ref.watch(hasAnyProfileProvider).value ?? false)
+            SettingsSection(
+              title: t.pages.settings.chain.title,
+              icon: Icons.webhook_rounded,
+              subtitle: Text(t.pages.settings.chain.subtitle),
+              namedLocation: context.namedLocation('chainOptions'),
+            ),
           if (PlatformUtils.isIOS)
             Material(
               child: ListTile(
@@ -200,9 +203,16 @@ class SettingsPage extends HookConsumerWidget {
 }
 
 class SettingsSection extends HookConsumerWidget {
-  const SettingsSection({super.key, required this.title, required this.icon, required this.namedLocation});
+  const SettingsSection({
+    super.key,
+    required this.title,
+    required this.icon,
+    this.subtitle,
+    required this.namedLocation,
+  });
 
   final String title;
+  final Widget? subtitle;
   final IconData icon;
   final String namedLocation;
 
@@ -211,6 +221,7 @@ class SettingsSection extends HookConsumerWidget {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
+      subtitle: subtitle,
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: () => context.go(namedLocation),
     );

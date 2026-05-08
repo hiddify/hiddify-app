@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:dartx/dartx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hiddify/features/profile/data/profile_parser.dart';
 
 part 'profile_entity.freezed.dart';
 part 'profile_entity.g.dart';
@@ -22,7 +23,6 @@ sealed class ProfileEntity with _$ProfileEntity {
     ProfileOptions? options,
     SubscriptionInfo? subInfo,
     Map<String, dynamic>? populatedHeaders,
-    String? profileOverride,
     UserOverride? userOverride,
   }) = RemoteProfileEntity;
 
@@ -32,9 +32,11 @@ sealed class ProfileEntity with _$ProfileEntity {
     required String name,
     required DateTime lastUpdate,
     Map<String, dynamic>? populatedHeaders,
-    String? profileOverride,
     UserOverride? userOverride,
   }) = LocalProfileEntity;
+
+  String profileOverride() =>
+      ProfileParser.profileOverride(populatedHeaders: populatedHeaders, userOverride: userOverride);
 }
 
 @freezed

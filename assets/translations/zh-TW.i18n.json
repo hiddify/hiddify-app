@@ -51,6 +51,10 @@
     "timeout": "超時",
     "sort": "排序",
     "dashboard": "儀表板",
+    "disable": "停用",
+    "psiphon": "Psiphon",
+    "profile": "設定檔",
+    "configuration": "設定檔",
     "interval": {
       "day": {
         "zero": "",
@@ -452,27 +456,82 @@
           "size": "填充大小"
         }
       },
-      "warp": {
-        "title": "WARP",
-        "enable": "啟用 WARP",
-        "generateConfig": "產生 WARP 設定",
-        "configGenerated": "WARP 設定已產生",
-        "missingConfig": "WARP 設定缺失",
-        "detourMode": "WARP 路由模式",
-        "detourModes": {
-          "proxyOverWarp": "透過 WARP 路由代理",
-          "warpOverProxy": "透過代理路由 WARP",
-          "proxyOverWarpExplain": "透過 WARP 解鎖代理",
-          "warpOverProxyExplain": "透過 WARP 增強安全性"
+      "chain": {
+        "title": "鏈",
+        "subtitle": "額外安全與解鎖器",
+        "finalIp": "最終 IP",
+        "levels": {
+          "app": {
+            "title": "應用",
+            "msg": "起始點：您的應用程式流量在此進入鏈條，並經過後續層級以為最終繞過做準備"
+          },
+          "extraSecurity": {
+            "title": "額外安全",
+            "msg": "增加一個額外的防护層以保護您的數據隱私，即使您的主設定檔不可信"
+          },
+          "mainProfile": {
+            "title": "主設定檔"
+          },
+          "unblocker": {
+            "title": "解鎖器",
+            "msg": "幫助繞過網路限制。如果輔助程序連接成功，即使您的主設定檔當前被封鎖，它仍可繼續工作"
+          },
+          "filtering": {
+            "title": "過濾",
+            "msg": "最終出口：通過活動層（額外安全、主設定檔或解鎖器）並應用其效果後，您的流量最終被路由以繞过本地網路過濾"
+          }
         },
-        "licenseKey": "授權金鑰",
-        "cleanIp": "優選 IP",
-        "port": "連接埠",
-        "noise": {
-          "count": "噪音數量",
-          "mode": "噪音模式",
-          "size": "噪音大小",
-          "delay": "噪音延遲"
+        "warp": {
+          "missingConfig": "WARP 設定缺失",
+          "licenseKey": "授權金鑰",
+          "cleanIp": "優選 IP",
+          "port": "連接埠",
+          "noise": {
+            "count": "噪音數量",
+            "mode": "噪音模式",
+            "size": "噪音大小",
+            "delay": "噪音延遲"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "選擇伺服器地區",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "奧地利 (at)",
+            "au": "澳大利亞 (au)",
+            "be": "比利時 (be)",
+            "bg": "保加利亞 (bg)",
+            "ca": "加拿大 (ca)",
+            "ch": "瑞士 (ch)",
+            "cz": "捷克共和國 (cz)",
+            "de": "德國 (de)",
+            "dk": "丹麥 (dk)",
+            "ee": "愛沙尼亞 (ee)",
+            "es": "西班牙 (es)",
+            "fi": "芬蘭 (fi)",
+            "fr": "法國 (fr)",
+            "gb": "英國 (gb)",
+            "hr": "克羅地亞 (hr)",
+            "hu": "匈牙利 (hu)",
+            "ie": "愛爾蘭 (ie)",
+            "in": "印度 (in)",
+            "it": "義大利 (it)",
+            "jp": "日本 (jp)",
+            "lv": "拉脫維亞 (lv)",
+            "nl": "荷蘭 (nl)",
+            "no": "挪威 (no)",
+            "pl": "波蘭 (pl)",
+            "pt": "葡萄牙 (pt)",
+            "ro": "羅馬尼亞 (ro)",
+            "rs": "塞爾維亞 (rs)",
+            "se": "瑞典 (se)",
+            "sg": "新加坡 (sg)",
+            "sk": "斯洛伐克 (sk)",
+            "us": "美國 (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "選擇設定檔"
         }
       }
     }

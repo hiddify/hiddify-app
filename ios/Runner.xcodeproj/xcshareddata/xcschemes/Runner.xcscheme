@@ -73,7 +73,6 @@
             ReferencedContainer = "container:Runner.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "IDEPreferLogStreaming"

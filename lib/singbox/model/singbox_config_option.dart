@@ -50,8 +50,9 @@ class SingboxConfigOption with _$SingboxConfigOption {
     required List<SingboxRule> rules,
     // required SingboxMuxOption mux,
     required SingboxTlsTricks tlsTricks,
-    required SingboxWarpOption warp,
-    required SingboxWarpOption warp2,
+    required ChainStatus chainStatus,
+    required SingboxExtraSecurityOption extraSecurity,
+    required SingboxUnblockerOption unblocker,
   }) = _SingboxConfigOption;
 
   String format() {
@@ -63,24 +64,90 @@ class SingboxConfigOption with _$SingboxConfigOption {
 }
 
 @freezed
-class SingboxWarpOption with _$SingboxWarpOption {
+class SingboxExtraSecurityOption with _$SingboxExtraSecurityOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
-  const factory SingboxWarpOption({
-    required bool enable,
-    required WarpDetourMode mode,
-    required String wireguardConfig,
+  const factory SingboxExtraSecurityOption({
+    required ChainMode mode,
+    required SingboxExtraSecurityWarpOption warp,
+    required SingboxExtraSecurityPsiphonOption psiphon,
+    required SingboxExtraSecurityProfileOption profile,
+  }) = _SingboxExtraSecurityOption;
+
+  factory SingboxExtraSecurityOption.fromJson(Map<String, dynamic> json) => _$SingboxExtraSecurityOptionFromJson(json);
+}
+
+@freezed
+class SingboxUnblockerOption with _$SingboxUnblockerOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxUnblockerOption({
+    required ChainMode mode,
+    required SingboxUnblockerWarpOption warp,
+    required SingboxUnblockerPsiphonOption psiphon,
+    required SingboxUnblockerProfileOption profile,
+  }) = _SingboxUnblockerOption;
+
+  factory SingboxUnblockerOption.fromJson(Map<String, dynamic> json) => _$SingboxUnblockerOptionFromJson(json);
+}
+
+@freezed
+class SingboxExtraSecurityWarpOption with _$SingboxExtraSecurityWarpOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxExtraSecurityWarpOption({required String licenseKey}) = _SingboxExtraSecurityWarpOption;
+
+  factory SingboxExtraSecurityWarpOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxExtraSecurityWarpOptionFromJson(json);
+}
+
+@freezed
+class SingboxUnblockerWarpOption with _$SingboxUnblockerWarpOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxUnblockerWarpOption({
     required String licenseKey,
-    required String accountId,
-    required String accessToken,
     required String cleanIp,
     required int cleanPort,
     @OptionalRangeJsonConverter() required OptionalRange noise,
     @OptionalRangeJsonConverter() required OptionalRange noiseSize,
     @OptionalRangeJsonConverter() required OptionalRange noiseDelay,
-    @OptionalRangeJsonConverter() required String noiseMode,
-  }) = _SingboxWarpOption;
+    required String noiseMode,
+  }) = _SingboxUnblockerWarpOption;
 
-  factory SingboxWarpOption.fromJson(Map<String, dynamic> json) => _$SingboxWarpOptionFromJson(json);
+  factory SingboxUnblockerWarpOption.fromJson(Map<String, dynamic> json) => _$SingboxUnblockerWarpOptionFromJson(json);
+}
+
+@freezed
+class SingboxExtraSecurityPsiphonOption with _$SingboxExtraSecurityPsiphonOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxExtraSecurityPsiphonOption({required PsiphonRegion region}) = _SingboxExtraSecurityPsiphonOption;
+
+  factory SingboxExtraSecurityPsiphonOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxExtraSecurityPsiphonOptionFromJson(json);
+}
+
+@freezed
+class SingboxUnblockerPsiphonOption with _$SingboxUnblockerPsiphonOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxUnblockerPsiphonOption({required PsiphonRegion region}) = _SingboxUnblockerPsiphonOption;
+
+  factory SingboxUnblockerPsiphonOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxUnblockerPsiphonOptionFromJson(json);
+}
+
+@freezed
+class SingboxExtraSecurityProfileOption with _$SingboxExtraSecurityProfileOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxExtraSecurityProfileOption({required String? id}) = _SingboxExtraSecurityProfileOption;
+
+  factory SingboxExtraSecurityProfileOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxExtraSecurityProfileOptionFromJson(json);
+}
+
+@freezed
+class SingboxUnblockerProfileOption with _$SingboxUnblockerProfileOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxUnblockerProfileOption({required String? id}) = _SingboxUnblockerProfileOption;
+
+  factory SingboxUnblockerProfileOption.fromJson(Map<String, dynamic> json) =>
+      _$SingboxUnblockerProfileOptionFromJson(json);
 }
 
 // @freezed

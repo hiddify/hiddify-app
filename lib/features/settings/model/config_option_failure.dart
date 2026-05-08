@@ -18,7 +18,7 @@ sealed class ConfigOptionFailure with _$ConfigOptionFailure, Failure {
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
       ConfigOptionUnexpectedFailure() => (type: t.errors.unexpected, message: null),
-      MissingWarpConfigFailure() => (type: t.pages.settings.warp.missingConfig, message: null),
+      MissingWarpConfigFailure() => (type: t.pages.settings.chain.warp.missingConfig, message: null),
     };
   }
 }

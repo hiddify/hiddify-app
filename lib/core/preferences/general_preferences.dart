@@ -110,6 +110,8 @@ abstract class Preferences {
     mapFrom: ActionsAtClosing.values.byName,
     mapTo: (value) => value.name,
   );
+
+  static final warpConsentGiven = PreferencesNotifier.create<bool, bool>("warp-consent-given", false);
 }
 
 @Riverpod(keepAlive: true)

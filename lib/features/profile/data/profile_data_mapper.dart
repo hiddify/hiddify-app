@@ -15,7 +15,6 @@ extension ProfileEntityMapper on ProfileEntity {
       lastUpdate: rp.lastUpdate,
       updateInterval: Value(rp.options?.updateInterval),
       populatedHeaders: Value(jsonEncode(rp.populatedHeaders)),
-      profileOverride: Value(rp.profileOverride),
       userOverride: Value(rp.userOverride?.toStr()),
       upload: Value(rp.subInfo?.upload),
       download: Value(rp.subInfo?.download),
@@ -31,7 +30,6 @@ extension ProfileEntityMapper on ProfileEntity {
       name: lp.name,
       lastUpdate: lp.lastUpdate,
       populatedHeaders: Value(jsonEncode(lp.populatedHeaders)),
-      profileOverride: Value(lp.profileOverride),
       userOverride: Value(lp.userOverride?.toStr()),
     ),
   );
@@ -42,7 +40,6 @@ extension ProfileEntityMapper on ProfileEntity {
       lastUpdate: Value(rp.lastUpdate),
       updateInterval: Value(rp.options?.updateInterval),
       populatedHeaders: Value(jsonEncode(rp.populatedHeaders)),
-      profileOverride: Value(rp.profileOverride),
       userOverride: Value(rp.userOverride?.toStr()),
       upload: Value(rp.subInfo?.upload),
       download: Value(rp.subInfo?.download),
@@ -55,7 +52,6 @@ extension ProfileEntityMapper on ProfileEntity {
       name: Value(lp.name),
       lastUpdate: Value(lp.lastUpdate),
       populatedHeaders: Value(jsonEncode(lp.populatedHeaders)),
-      profileOverride: Value(lp.profileOverride),
       userOverride: Value(lp.userOverride?.toStr()),
     ),
   );
@@ -96,7 +92,6 @@ extension ProfileEntryMapper on ProfileEntry {
         options: options,
         subInfo: subInfo,
         populatedHeaders: mPopulatedHeaders,
-        profileOverride: profileOverride,
         userOverride: UserOverride.fromStr(userOverride),
       ),
       ProfileType.local => LocalProfileEntity(
@@ -105,7 +100,6 @@ extension ProfileEntryMapper on ProfileEntry {
         name: name,
         lastUpdate: lastUpdate,
         populatedHeaders: mPopulatedHeaders,
-        profileOverride: profileOverride,
         userOverride: UserOverride.fromStr(userOverride),
       ),
     };
