@@ -51,6 +51,10 @@
     "timeout": "Tempo esgotado",
     "sort": "Ordenar",
     "dashboard": "Painel",
+    "disable": "Desativar",
+    "psiphon": "Psiphon",
+    "profile": "Perfil",
+    "configuration": "Configuração",
     "interval": {
       "day": {
         "zero": "",
@@ -452,27 +456,81 @@
           "size": "Tamanho do preenchimento"
         }
       },
-      "warp": {
-        "title": "WARP",
-        "enable": "Ativar WARP",
-        "generateConfig": "Gerar configuração WARP",
-        "configGenerated": "Configuração WARP gerada",
-        "missingConfig": "Configuração WARP ausente",
-        "detourMode": "Modo de Roteamento WARP",
-        "detourModes": {
-          "proxyOverWarp": "Desviar proxies através do WARP",
-          "warpOverProxy": "Desviar WARP através de proxies",
-          "proxyOverWarpExplain": "Desbloquear proxies com WARP",
-          "warpOverProxyExplain": "Segurança extra com WARP"
+      "chain": {
+        "title": "Cadeia",
+        "subtitle": "Segurança extra & Desbloqueador",
+        "finalIp": "IP final",
+        "levels": {
+          "app": {
+            "title": "App",
+            "msg": "Ponto de início: O tráfego do seu app entra na cadeia aqui e passa pelas camadas seguintes para se preparar para o bypass final"
+          },
+          "extraSecurity": {
+            "title": "Segurança extra",
+            "msg": "Adiciona um escudo extra para manter seus dados privados, mesmo que seu perfil principal não seja confiável"
+          },
+          "mainProfile": {
+            "title": "Perfil principal"
+          },
+          "unblocker": {
+            "title": "Desbloqueador",
+            "msg": "Ajuda a contornar restrições de rede. Se o ajudante se conectar, seu perfil principal ainda poderá funcionar mesmo que esteja bloqueado no momento"
+          },
+          "filtering": {
+            "title": "Filtragem",
+            "msg": "Saída final: Após passar pelas camadas ativas (Segurança extra, Perfil principal ou Desbloqueador) e aplicar seus efeitos, seu tráfego é finalmente roteado para contornar a filtragem da rede local"
+          }
         },
-        "licenseKey": "Chave de licença",
-        "cleanIp": "IP limpo",
-        "port": "Porta",
-        "noise": {
-          "count": "Contagem de ruído",
-          "mode": "Modo de ruído",
-          "size": "Tamanho do ruído",
-          "delay": "Atraso do ruído"
+        "warp": {
+          "licenseKey": "Chave de licença",
+          "cleanIp": "IP limpo",
+          "port": "Porta",
+          "noise": {
+            "count": "Contagem de ruído",
+            "mode": "Modo de ruído",
+            "size": "Tamanho do ruído",
+            "delay": "Atraso do ruído"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "Selecionar região do servidor",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "Áustria (at)",
+            "au": "Austrália (au)",
+            "be": "Bélgica (be)",
+            "bg": "Bulgária (bg)",
+            "ca": "Canadá (ca)",
+            "ch": "Suíça (ch)",
+            "cz": "República Tcheca (cz)",
+            "de": "Alemanha (de)",
+            "dk": "Dinamarca (dk)",
+            "ee": "Estônia (ee)",
+            "es": "Espanha (es)",
+            "fi": "Finlândia (fi)",
+            "fr": "França (fr)",
+            "gb": "Reino Unido (gb)",
+            "hr": "Croácia (hr)",
+            "hu": "Hungria (hu)",
+            "ie": "Irlanda (ie)",
+            "in": "Índia (in)",
+            "it": "Itália (it)",
+            "jp": "Japão (jp)",
+            "lv": "Letônia (lv)",
+            "nl": "Países Baixos (nl)",
+            "no": "Noruega (no)",
+            "pl": "Polônia (pl)",
+            "pt": "Portugal (pt)",
+            "ro": "Romênia (ro)",
+            "rs": "Sérvia (rs)",
+            "se": "Suécia (se)",
+            "sg": "Singapura (sg)",
+            "sk": "Eslováquia (sk)",
+            "us": "Estados Unidos (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "Selecionar perfil"
         }
       }
     }

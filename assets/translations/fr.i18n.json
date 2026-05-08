@@ -51,6 +51,10 @@
     "timeout": "Délai expiré",
     "sort": "Trier",
     "dashboard": "Tableau de bord",
+    "disable": "Désactiver",
+    "psiphon": "Psiphon",
+    "profile": "Profil",
+    "configuration": "Configuration",
     "interval": {
       "day": {
         "zero": "",
@@ -452,27 +456,81 @@
           "size": "Taille du remplissage"
         }
       },
-      "warp": {
-        "title": "WARP",
-        "enable": "Activer WARP",
-        "generateConfig": "Générer la configuration WARP",
-        "configGenerated": "Configuration WARP générée",
-        "missingConfig": "Configuration WARP manquante",
-        "detourMode": "Mode de détour",
-        "detourModes": {
-          "proxyOverWarp": "Détourner les proxys via WARP",
-          "warpOverProxy": "Détourner WARP via les proxys",
-          "proxyOverWarpExplain": "Débloquer les proxys avec WARP",
-          "warpOverProxyExplain": "Sécurité supplémentaire avec WARP"
+      "chain": {
+        "title": "Chaîne",
+        "subtitle": "Sécurité supplémentaire & Débloqueur",
+        "finalIp": "IP finale",
+        "levels": {
+          "app": {
+            "title": "App",
+            "msg": "Point de départ : le trafic de votre application entre dans la chaîne ici et passe par les couches suivantes pour se préparer au bypass final"
+          },
+          "extraSecurity": {
+            "title": "Sécurité supplémentaire",
+            "msg": "Ajoute un bouclier supplémentaire pour garder vos données privées, même si votre profil principal n'est pas fiable"
+          },
+          "mainProfile": {
+            "title": "Profil principal"
+          },
+          "unblocker": {
+            "title": "Débloqueur",
+            "msg": "Aide à contourner les restrictions réseau. Si l'assistant se connecte, votre profil principal peut toujours fonctionner même s'il est actuellement bloqué"
+          },
+          "filtering": {
+            "title": "Filtrage",
+            "msg": "Sortie finale : après avoir traversé les couches actives (Sécurité supplémentaire, Profil principal ou Débloqueur) et appliqué leurs effets, votre trafic est finalement acheminé pour contourner le filtrage du réseau local"
+          }
         },
-        "licenseKey": "Clé de licence",
-        "cleanIp": "IP propre",
-        "port": "Port",
-        "noise": {
-          "count": "Nombre de bruits",
-          "mode": "Mode bruit",
-          "size": "Taille du bruit",
-          "delay": "Délai du bruit"
+        "warp": {
+          "licenseKey": "Clé de licence",
+          "cleanIp": "IP propre",
+          "port": "Port",
+          "noise": {
+            "count": "Nombre de bruits",
+            "mode": "Mode bruit",
+            "size": "Taille du bruit",
+            "delay": "Délai du bruit"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "Sélectionner la région du serveur",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "Autriche (at)",
+            "au": "Australie (au)",
+            "be": "Belgique (be)",
+            "bg": "Bulgarie (bg)",
+            "ca": "Canada (ca)",
+            "ch": "Suisse (ch)",
+            "cz": "République Tchèque (cz)",
+            "de": "Allemagne (de)",
+            "dk": "Danemark (dk)",
+            "ee": "Estonie (ee)",
+            "es": "Espagne (es)",
+            "fi": "Finlande (fi)",
+            "fr": "France (fr)",
+            "gb": "Royaume-Uni (gb)",
+            "hr": "Croatie (hr)",
+            "hu": "Hongrie (hu)",
+            "ie": "Irlande (ie)",
+            "in": "Inde (in)",
+            "it": "Italie (it)",
+            "jp": "Japon (jp)",
+            "lv": "Lettonie (lv)",
+            "nl": "Pays-Bas (nl)",
+            "no": "Norvège (no)",
+            "pl": "Pologne (pl)",
+            "pt": "Portugal (pt)",
+            "ro": "Roumanie (ro)",
+            "rs": "Serbie (rs)",
+            "se": "Suède (se)",
+            "sg": "Singapour (sg)",
+            "sk": "Slovaquie (sk)",
+            "us": "États-Unis (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "Sélectionner le profil"
         }
       }
     }

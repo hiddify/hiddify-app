@@ -51,6 +51,10 @@
     "timeout": "Waktu habis",
     "sort": "Urutkan",
     "dashboard": "Dasbor",
+    "disable": "Nonaktifkan",
+    "psiphon": "Psiphon",
+    "profile": "Profil",
+    "configuration": "Konfigurasi",
     "interval": {
       "day": {
         "zero": "",
@@ -452,27 +456,81 @@
           "size": "Ukuran padding"
         }
       },
-      "warp": {
-        "title": "WARP",
-        "enable": "Aktifkan WARP",
-        "generateConfig": "Buat konfigurasi WARP",
-        "configGenerated": "Konfigurasi WARP dibuat",
-        "missingConfig": "Konfigurasi WARP hilang",
-        "detourMode": "Mode Rute WARP",
-        "detourModes": {
-          "proxyOverWarp": "Alihkan proksi melalui WARP",
-          "warpOverProxy": "Alihkan WARP melalui proksi",
-          "proxyOverWarpExplain": "Buka blokir proksi dengan WARP",
-          "warpOverProxyExplain": "Keamanan ekstra dengan WARP"
+      "chain": {
+        "title": "Rantai",
+        "subtitle": "Keamanan tambahan & Pembuka blokir",
+        "finalIp": "IP akhir",
+        "levels": {
+          "app": {
+            "title": "App",
+            "msg": "Titik awal: Lalu lintas aplikasi Anda masuk ke rantai di sini dan melewati lapisan berikutnya untuk bersiap melakukan bypass akhir"
+          },
+          "extraSecurity": {
+            "title": "Keamanan tambahan",
+            "msg": "Menambahkan pelindung ekstra untuk menjaga privasi data Anda, bahkan jika profil utama Anda tidak dipercaya"
+          },
+          "mainProfile": {
+            "title": "Profil utama"
+          },
+          "unblocker": {
+            "title": "Pembuka blokir",
+            "msg": "Membantu melewati batasan jaringan. Jika pembantu terhubung, profil utama Anda tetap dapat bekerja meskipun saat ini sedang diblokir"
+          },
+          "filtering": {
+            "title": "Pemfilteran",
+            "msg": "Keluar akhir: Setelah melewati lapisan aktif (Keamanan tambahan, Profil utama, atau Pembuka blokir) dan menerapkan efeknya, lalu lintas Anda akhirnya dirutekan untuk melewati pemfilteran jaringan lokal"
+          }
         },
-        "licenseKey": "Kunci lisensi",
-        "cleanIp": "IP bersih",
-        "port": "Port",
-        "noise": {
-          "count": "Jumlah kebisingan",
-          "mode": "Mode kebisingan",
-          "size": "Ukuran kebisingan",
-          "delay": "Penundaan kebisingan"
+        "warp": {
+          "licenseKey": "Kunci lisensi",
+          "cleanIp": "IP bersih",
+          "port": "Port",
+          "noise": {
+            "count": "Jumlah kebisingan",
+            "mode": "Mode kebisingan",
+            "size": "Ukuran kebisingan",
+            "delay": "Penundaan kebisingan"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "Pilih wilayah server",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "Austria (at)",
+            "au": "Australia (au)",
+            "be": "Belgia (be)",
+            "bg": "Bulgaria (bg)",
+            "ca": "Kanada (ca)",
+            "ch": "Swiss (ch)",
+            "cz": "Republik Ceko (cz)",
+            "de": "Jerman (de)",
+            "dk": "Denmark (dk)",
+            "ee": "Estonia (ee)",
+            "es": "Spanyol (es)",
+            "fi": "Finlandia (fi)",
+            "fr": "Prancis (fr)",
+            "gb": "Britania Raya (gb)",
+            "hr": "Kroasia (hr)",
+            "hu": "Hongaria (hu)",
+            "ie": "Irlandia (ie)",
+            "in": "India (in)",
+            "it": "Italia (it)",
+            "jp": "Jepang (jp)",
+            "lv": "Latvia (lv)",
+            "nl": "Belanda (nl)",
+            "no": "Norwegia (no)",
+            "pl": "Polandia (pl)",
+            "pt": "Portugal (pt)",
+            "ro": "Rumania (ro)",
+            "rs": "Serbia (rs)",
+            "se": "Swedia (se)",
+            "sg": "Singapura (sg)",
+            "sk": "Slovakia (sk)",
+            "us": "Amerika Serikat (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "Pilih profil"
         }
       }
     }

@@ -51,6 +51,10 @@
     "timeout": "Tiempo agotado",
     "sort": "Ordenar",
     "dashboard": "Panel",
+    "disable": "Desactivar",
+    "psiphon": "Psiphon",
+    "profile": "Perfil",
+    "configuration": "Configuración",
     "interval": {
       "day": {
         "zero": "",
@@ -452,27 +456,81 @@
           "size": "Tamaño de relleno"
         }
       },
-      "warp": {
-        "title": "WARP",
-        "enable": "Habilitar WARP",
-        "generateConfig": "Generar configuración de WARP",
-        "configGenerated": "Configuración de WARP generada",
-        "missingConfig": "Falta la configuración de WARP",
-        "detourMode": "Modo de desvío",
-        "detourModes": {
-          "proxyOverWarp": "Desviar proxies a través de WARP",
-          "warpOverProxy": "Desviar WARP a través de proxies",
-          "proxyOverWarpExplain": "Desbloquear proxies con WARP",
-          "warpOverProxyExplain": "Seguridad extra con WARP"
+      "chain": {
+        "title": "Cadena",
+        "subtitle": "Seguridad extra y Desbloqueador",
+        "finalIp": "IP final",
+        "levels": {
+          "app": {
+            "title": "App",
+            "msg": "Punto de inicio: El tráfico de tu app entra en la cadena aquí y pasa por las siguientes capas para prepararse para el bypass final"
+          },
+          "extraSecurity": {
+            "title": "Seguridad extra",
+            "msg": "Añade un escudo adicional para mantener tus datos privados, incluso si tu perfil principal no es de confianza"
+          },
+          "mainProfile": {
+            "title": "Perfil principal"
+          },
+          "unblocker": {
+            "title": "Desbloqueador",
+            "msg": "Ayuda a evitar restricciones de red. Si el ayudante se conecta, tu perfil principal puede seguir funcionando incluso si está bloqueado actualmente"
+          },
+          "filtering": {
+            "title": "Filtrado",
+            "msg": "Salida final: Después de pasar por las capas activas (Seguridad extra, Perfil principal o Desbloqueador) y aplicar sus efectos, tu tráfico es finalmente enrutado para evitar el filtrado de la red local"
+          }
         },
-        "licenseKey": "Clave de licencia",
-        "cleanIp": "IP limpia",
-        "port": "Puerto",
-        "noise": {
-          "count": "Cantidad de ruido",
-          "mode": "Modo de ruido",
-          "size": "Tamaño de ruido",
-          "delay": "Retraso de ruido"
+        "warp": {
+          "licenseKey": "Clave de licencia",
+          "cleanIp": "IP limpia",
+          "port": "Puerto",
+          "noise": {
+            "count": "Cantidad de ruido",
+            "mode": "Modo de ruido",
+            "size": "Tamaño de ruido",
+            "delay": "Retraso de ruido"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "Seleccionar región del servidor",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "Austria (at)",
+            "au": "Australia (au)",
+            "be": "Bélgica (be)",
+            "bg": "Bulgaria (bg)",
+            "ca": "Canadá (ca)",
+            "ch": "Suiza (ch)",
+            "cz": "República Checa (cz)",
+            "de": "Alemania (de)",
+            "dk": "Dinamarca (dk)",
+            "ee": "Estonia (ee)",
+            "es": "España (es)",
+            "fi": "Finlandia (fi)",
+            "fr": "Francia (fr)",
+            "gb": "Reino Unido (gb)",
+            "hr": "Croacia (hr)",
+            "hu": "Hungría (hu)",
+            "ie": "Irlanda (ie)",
+            "in": "India (in)",
+            "it": "Italia (it)",
+            "jp": "Japón (jp)",
+            "lv": "Letonia (lv)",
+            "nl": "Países Bajos (nl)",
+            "no": "Noruega (no)",
+            "pl": "Polonia (pl)",
+            "pt": "Portugal (pt)",
+            "ro": "Rumania (ro)",
+            "rs": "Serbia (rs)",
+            "se": "Suecia (se)",
+            "sg": "Singapur (sg)",
+            "sk": "Eslovaquia (sk)",
+            "us": "Estados Unidos (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "Seleccionar perfil"
         }
       }
     }

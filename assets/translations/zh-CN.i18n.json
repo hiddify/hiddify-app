@@ -51,6 +51,10 @@
     "timeout": "超时",
     "sort": "排序",
     "dashboard": "仪表盘",
+    "disable": "禁用",
+    "psiphon": "Psiphon",
+    "profile": "配置",
+    "configuration": "配置",
     "interval": {
       "day": {
         "zero": "",
@@ -452,27 +456,81 @@
           "size": "填充大小"
         }
       },
-      "warp": {
-        "title": "WARP",
-        "enable": "启用 WARP",
-        "generateConfig": "生成 WARP 配置",
-        "configGenerated": "WARP 配置已生成",
-        "missingConfig": "WARP 配置缺失",
-        "detourMode": "WARP 路由模式",
-        "detourModes": {
-          "proxyOverWarp": "通过 WARP 路由代理",
-          "warpOverProxy": "通过代理路由 WARP",
-          "proxyOverWarpExplain": "通过 WARP 解锁代理",
-          "warpOverProxyExplain": "通过 WARP 增强安全性"
+      "chain": {
+        "title": "链",
+        "subtitle": "额外安全与解锁器",
+        "finalIp": "最终 IP",
+        "levels": {
+          "app": {
+            "title": "应用",
+            "msg": "起始点：您的应用流量在此进入链条，并经过后续层级以为最终分流做准备"
+          },
+          "extraSecurity": {
+            "title": "额外安全",
+            "msg": "增加一个额外的防护层以保护您的数据隐私，即使您的主配置文件不可信"
+          },
+          "mainProfile": {
+            "title": "主配置"
+          },
+          "unblocker": {
+            "title": "解锁器",
+            "msg": "帮助绕过网络限制。如果辅助程序连接成功，即使您的主配置当前被封锁，它仍可继续工作"
+          },
+          "filtering": {
+            "title": "分流",
+            "msg": "最终出口：通过活动层（额外安全、主配置或解锁器）并应用其效果后，您的流量最终被路由以绕过本地网络过滤"
+          }
         },
-        "licenseKey": "许可证密钥",
-        "cleanIp": "优选 IP",
-        "port": "端口",
-        "noise": {
-          "count": "噪声数量",
-          "mode": "噪声模式",
-          "size": "噪声大小",
-          "delay": "噪声延迟"
+        "warp": {
+          "licenseKey": "许可证密钥",
+          "cleanIp": "优选 IP",
+          "port": "端口",
+          "noise": {
+            "count": "噪声数量",
+            "mode": "噪声模式",
+            "size": "噪声大小",
+            "delay": "噪声延迟"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "选择服务器地区",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "奥地利 (at)",
+            "au": "澳大利亚 (au)",
+            "be": "比利时 (be)",
+            "bg": "保加利亚 (bg)",
+            "ca": "加拿大 (ca)",
+            "ch": "瑞士 (ch)",
+            "cz": "捷克共和国 (cz)",
+            "de": "德国 (de)",
+            "dk": "丹麦 (dk)",
+            "ee": "爱沙尼亚 (ee)",
+            "es": "西班牙 (es)",
+            "fi": "芬兰 (fi)",
+            "fr": "法国 (fr)",
+            "gb": "英国 (gb)",
+            "hr": "克罗地亚 (hr)",
+            "hu": "匈牙利 (hu)",
+            "ie": "爱尔兰 (ie)",
+            "in": "印度 (in)",
+            "it": "意大利 (it)",
+            "jp": "日本 (jp)",
+            "lv": "拉脱维亚 (lv)",
+            "nl": "荷兰 (nl)",
+            "no": "挪威 (no)",
+            "pl": "波兰 (pl)",
+            "pt": "葡萄牙 (pt)",
+            "ro": "罗马尼亚 (ro)",
+            "rs": "塞尔维亚 (rs)",
+            "se": "瑞典 (se)",
+            "sg": "新加坡 (sg)",
+            "sk": "斯洛伐克 (sk)",
+            "us": "美国 (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "选择配置"
         }
       }
     }
