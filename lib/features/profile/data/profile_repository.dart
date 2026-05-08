@@ -143,7 +143,12 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
                 .updateRemote(rp: profEntity, tempFilePath: tempFile.path, cancelToken: cancelToken)
                 .flatMap(
                   (profEntity) =>
-                      validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
+                      validateConfig(
+                        file.path,
+                        tempFile.path,
+                        ProfileParser.profileOverrideHelper(profile: profEntity),
+                        false,
+                      ).flatMap(
                         (unit) => TaskEither.tryCatch(() async {
                           await _profileDataSource.edit(id, profEntity);
                           return unit;
@@ -162,7 +167,12 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
                 )
                 .flatMap(
                   (profEntity) =>
-                      validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
+                      validateConfig(
+                        file.path,
+                        tempFile.path,
+                        ProfileParser.profileOverrideHelper(profile: profEntity),
+                        false,
+                      ).flatMap(
                         (unit) => TaskEither.tryCatch(() async {
                           await _profileDataSource.insert(profEntity);
                           return unit;
@@ -187,7 +197,12 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
               .addLocal(id: id, content: content, tempFilePath: tempFile.path, userOverride: userOverride)
               .flatMap(
                 (profEntity) =>
-                    validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
+                    validateConfig(
+                      file.path,
+                      tempFile.path,
+                      ProfileParser.profileOverrideHelper(profile: profEntity),
+                      false,
+                    ).flatMap(
                       (unit) => TaskEither.tryCatch(() async {
                         await _profileDataSource.insert(profEntity);
                         return unit;
@@ -224,7 +239,12 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
                   ),
                 ).flatMap(
                   (profEntity) =>
-                      validateConfig(file.path, tempFile.path, profEntity.profileOverride.value, false).flatMap(
+                      validateConfig(
+                        file.path,
+                        tempFile.path,
+                        ProfileParser.profileOverrideHelper(profile: profEntity),
+                        false,
+                      ).flatMap(
                         (unit) => TaskEither.tryCatch(() async {
                           await _profileDataSource.edit(id, profEntity);
                           return unit;
