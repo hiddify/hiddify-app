@@ -51,6 +51,10 @@
     "timeout": "Timeout",
     "sort": "Sort",
     "dashboard": "Dashboard",
+    "disable": "Disable",
+    "psiphon": "Psiphon",
+    "profile": "Profile",
+    "configuration": "Configuration",
     "interval": {
       "day": {
         "zero": "",
@@ -453,27 +457,81 @@
           "size": "Padding size"
         }
       },
-      "warp": {
-        "title": "WARP",
-        "enable": "Enable WARP",
-        "generateConfig": "Generate WARP config",
-        "configGenerated": "Warp config is generated",
-        "missingConfig": "Missing WARP config",
-        "detourMode": "Detour mode",
-        "detourModes": {
-          "proxyOverWarp": "Detour proxies through WARP ",
-          "warpOverProxy": "Detour WARP through proxies",
-          "proxyOverWarpExplain": "Unblock proxies by WARP",
-          "warpOverProxyExplain": "Extra security by WARP"
+      "chain": {
+        "title": "Chain",
+        "subtitle": "Extra security & Unblocker",
+        "finalIp": "Final IP",
+        "levels": {
+          "app": {
+            "title": "App",
+            "msg": "Start point: Your app traffic enters the chain here and passes through the next layers to prepare for the final bypass"
+          },
+          "extraSecurity": {
+            "title": "Extra security",
+            "msg": "Adds an extra shield to keep your data private, even if your main profile is untrusted"
+          },
+          "mainProfile": {
+            "title": "Main profile"
+          },
+          "unblocker": {
+            "title": "Unblocker",
+            "msg": "Helps bypass network restrictions. If the helper connects, your main profile can still work even if it's currently blocked"
+          },
+          "filtering": {
+            "title": "Filtering",
+            "msg": "Final exit: After passing through the active layers (Extra Security, Main Profile, or Unblocker) and applying their effects, your traffic is finally routed to bypass local network filtering"
+          }
         },
-        "licenseKey": "License key",
-        "cleanIp": "Clean IP",
-        "port": "Port",
-        "noise": {
-          "count": "Noise count",
-          "mode": "Noise mode",
-          "size": "Noise size",
-          "delay": "Noise delay"
+        "warp": {
+          "licenseKey": "License key",
+          "cleanIp": "Clean IP",
+          "port": "Port",
+          "noise": {
+            "count": "Noise count",
+            "mode": "Noise mode",
+            "size": "Noise size",
+            "delay": "Noise delay"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "Select server region",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "Austria (at)",
+            "au": "Australia (au)",
+            "be": "Belgium (be)",
+            "bg": "Bulgaria (bg)",
+            "ca": "Canada (ca)",
+            "ch": "Switzerland (ch)",
+            "cz": "Czech Republic (cz)",
+            "de": "Germany (de)",
+            "dk": "Denmark (dk)",
+            "ee": "Estonia (ee)",
+            "es": "Spain (es)",
+            "fi": "Finland (fi)",
+            "fr": "France (fr)",
+            "gb": "United Kingdom (gb)",
+            "hr": "Croatia (hr)",
+            "hu": "Hungary (hu)",
+            "ie": "Ireland (ie)",
+            "in": "India (in)",
+            "it": "Italy (it)",
+            "jp": "Japan (jp)",
+            "lv": "Latvia (lv)",
+            "nl": "Netherlands (nl)",
+            "no": "Norway (no)",
+            "pl": "Poland (pl)",
+            "pt": "Portugal (pt)",
+            "ro": "Romania (ro)",
+            "rs": "Serbia (rs)",
+            "se": "Sweden (se)",
+            "sg": "Singapore (sg)",
+            "sk": "Slovakia (sk)",
+            "us": "United States (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "Select profile"
         }
       }
     }
