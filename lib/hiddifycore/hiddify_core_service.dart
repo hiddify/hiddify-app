@@ -407,30 +407,30 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  TaskEither<String, WarpResponse> generateWarpConfig({
-    required String licenseKey,
-    required String previousAccountId,
-    required String previousAccessToken,
-  }) {
-    return TaskEither(() async {
-      loggy.debug("generating warp config");
-      final warpConfig = await core.fgClient.generateWarpConfig(
-        GenerateWarpConfigRequest(
-          licenseKey: licenseKey,
-          accountId: previousAccountId,
-          accessToken: previousAccessToken,
-        ),
-      );
-      // if (warpConfig.code != ResponseCode.OK) return left("${warpConfig.code} ${warpConfig.message}");
-      final WarpResponse warp = (
-        log: warpConfig.log,
-        accountId: warpConfig.account.accountId,
-        accessToken: warpConfig.account.accessToken,
-        wireguardConfig: jsonEncode(warpConfig.config.toProto3Json()),
-      );
-      return right(warp);
-    });
-  }
+  // TaskEither<String, WarpResponse> generateWarpConfig({
+  //   required String licenseKey,
+  //   required String previousAccountId,
+  //   required String previousAccessToken,
+  // }) {
+  //   return TaskEither(() async {
+  //     loggy.debug("generating warp config");
+  //     final warpConfig = await core.fgClient.generateWarpConfig(
+  //       GenerateWarpConfigRequest(
+  //         licenseKey: licenseKey,
+  //         accountId: previousAccountId,
+  //         accessToken: previousAccessToken,
+  //       ),
+  //     );
+  //     // if (warpConfig.code != ResponseCode.OK) return left("${warpConfig.code} ${warpConfig.message}");
+  //     final WarpResponse warp = (
+  //       log: warpConfig.log,
+  //       accountId: warpConfig.account.accountId,
+  //       accessToken: warpConfig.account.accessToken,
+  //       wireguardConfig: jsonEncode(warpConfig.config.toProto3Json()),
+  //     );
+  //     return right(warp);
+  //   });
+  // }
 
   Stream<CoreStatus> watchStatus() async* {
     await startListeningStatus("bg", core.bgClient);
