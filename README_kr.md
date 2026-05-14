@@ -1,6 +1,6 @@
 <div dir="ltr" align=center>
     
-[**![Lang_farsi](https://user-images.githubusercontent.com/125398461/234186932-52f1fa82-52c6-417f-8b37-08fe9250a55f.png) فارسی**](README_fa.md) / [**Русский 🇷🇺**](README_ru.md) / [**简体中文 🇨🇳**](README_cn.md) / [**日本語 🇯🇵**](README_ja.md) / [**Portugês-BR 🇧🇷**](README_br.md)
+[**![Lang_farsi](https://user-images.githubusercontent.com/125398461/234186932-52f1fa82-52c6-417f-8b37-08fe9250a55f.png) فارسی**](README_fa.md) / [**Русский 🇷🇺**](README_ru.md) / [**简体中文 🇨🇳**](README_cn.md) / [**日本語 🇯🇵**](README_ja.md) / [**Portugês-BR 🇧🇷**](README_br.md) / [**한국어 🇰🇷**](README_kr.md)
 
 </div>
 <br>
@@ -22,54 +22,54 @@
 
 
 
-## What is Hiddify app?
+## Hiddify app 이란?
 
-<p dir="ltr" style="font-size: 16px">A multi-platform proxy client based on <a href="https://github.com/SagerNet/sing-box">Sing-box</a> universal proxy tool-chain. Hiddify offers a wide range of capabilities, like automatic node selection, TUN mode, remote profiles etc. Hiddify is ad-free and open-source. With support for a wide range of protocols, it provides a secure and private way for accessing free internet.</p>
+<p dir="ltr" style="font-size: 16px"><a href="https://github.com/SagerNet/sing-box">Sing-box</a> 범용 프록시 툴체인을 기반으로 한 크로스플랫폼 프록시 클라이언트입니다. Hiddify는 자동 노드 선택, TUN 모드, 원격 프로필 등 다양한 기능을 제공합니다. Hiddify는 광고가 없고 오픈 소스입니다. 다양한 프로토콜을 지원해 자유로운 인터넷 접근을 위한 안전하고 프라이빗한 인터넷 접속을 제공합니다.</p>
 
 <div align=center>
 <img width=90% alt="English Demo" src="https://github.com/hiddify/hiddify-app/assets/125398461/ffe5346d-3404-470f-b5e0-4364e23743d2">
 
 </div>
 
-## 🚀 Main features
+## 🚀 주요 기능
 
-✈️ Multi-platform: Android, iOS, Windows, macOS and Linux
+✈️ 멀티플랫폼: Android, iOS, Windows, macOS, Linux
 
-⭐ Intuitive and accessible UI
+⭐ 직관적이고 접근성 높은 UI
 
-🔍 Delay based node selection
+🔍 지연 시간 기반 노드 선택
 
-🟡 Wide range of protocols:
-Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH etc.
+🟡 다양한 프로토콜:
+Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH 등
 
-🟡 Subscription link and configuration formats: Sing-box, V2ray, Clash, Clash meta
+🟡 구독 링크 및 설정 형식: Sing-box, V2ray, Clash, Clash meta
 
-🔄 Automatic subscription update
+🔄 구독 자동 업데이트
 
-🔎 Display profile information including remaining days and traffic usage
+🔎 남은 일수와 트래픽 사용량을 포함한 프로필 정보 표시
 
-🛡 Open source, secure and community driven
+🛡 오픈 소스, 보안, 커뮤니티 중심
 
-🌙 Dark and light modes
+🌙 다크 및 라이트 모드
 
-⚙ Compatible with all proxy management panels
+⚙ 모든 프록시 관리 패널과 호환
 
-⭐ Appropriate configuration for Iran, China, Russia and other countries
+⭐ 이란, 중국, 러시아 등 국가에 적합한 설정
 
-📱 Available on official stores
+📱 공식 스토어에서 제공
 
-## 🛍️ Get It On Stores
+## 🛍️ 스토어에서 받기
 <a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone"><img height=50px src="https://github.com/user-attachments/assets/a7c62126-07ce-4f18-8197-bbb672f6d8be"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=app.hiddify.com"><img height=50px src="https://github.com/hiddify/hiddify-next/blob/main/docs/google-play-badge.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://apps.microsoft.com/detail/Hiddify/9pdfnl3qv2s5?mode=mini" target="_blank"><img height=50px src="https://github.com/hiddify/hiddify-next/assets/125398461/620750bb-4459-41b5-9f86-ba82119345b8" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 
-## 📥 Direct Download
+## 📥 다운로드
 
 <div align=left>
 <table>
     <thead align=left>
         <tr>
-            <th>OS</th>
-            <th>Download</th>
+            <th>운영체제</th>
+            <th>다운로드</th>
         </tr>
     </thead>
     <tbody align=left>
@@ -118,9 +118,9 @@ Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH etc.
 
 </div>
 
-## ⚙️ Installation and tutorials
+## ⚙️ 설치 및 튜토리얼
 
-**Find tutorial information on our wiki page by clicking on image below.**
+**아래 이미지를 클릭하면 위키에서 튜토리얼 정보를 확인할 수 있습니다.**
 
 <div align="center">
 
@@ -129,15 +129,15 @@ Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH etc.
 
 </div>
 
-## 🌎 Translations
+## 🌎 번역
 
     
-You can improve existing languages or contribute new ones either by editing the JSON files in `/assets/translations` or [![Translate with Inlang](https://img.shields.io/badge/%20-%20-3ECF8E?logo=i18next&logoColor=white)](https://fink.inlang.com/github.com/hiddify/hiddify-app) by using [Inlang online editor](https://fink.inlang.com/github.com/hiddify/hiddify-app).    
+기존 언어를 개선하거나 새 언어를 추가하려면 `/assets/translations`의 JSON 파일을 수정하거나 [![Translate with Inlang](https://img.shields.io/badge/%20-%20-3ECF8E?logo=i18next&logoColor=white)](https://fink.inlang.com/github.com/hiddify/hiddify-app) 배지를 통해 [Inlang 온라인 편집기](https://fink.inlang.com/github.com/hiddify/hiddify-app)를 사용하시면 됩니다.    
 
 
-## ✏️ Acknowledgements
+## ✏️ 감사의 말
 
-We would like to express our sincere appreciation to the contributors of the following projects, whose robust foundation and innovative features have significantly enhanced the success and functionality of this project.
+이 프로젝트의 성공과 기능 향상에 큰 기여를 해주신 다음 프로젝트의 기여자들께 깊이 감사드립니다.
 
 - [Sing-box](https://github.com/SagerNet/sing-box)
 - [Sing-box for Android](https://github.com/SagerNet/sing-box-for-android)
@@ -146,11 +146,11 @@ We would like to express our sincere appreciation to the contributors of the fol
 - [Clash Meta](https://github.com/MetaCubeX/Clash.Meta)
 - [FClash](https://github.com/Fclash/Fclash)
 - [Vazirmatn Font by Saber Rastikerdar](https://github.com/rastikerdar/vazirmatn)
-- [Others](./pubspec.yaml)
+- [기타](./pubspec.yaml)
 
-## 🎯 Donation and Support
+## 🎯 후원 및 지원
 
-The easiest way to support us is to click on the star (⭐) at the top of this page.
+페이지 상단의 별(⭐)을 눌러 이 프로젝트를 지원해주세요
 
 <div align=center>
     
@@ -163,11 +163,11 @@ The easiest way to support us is to click on the star (⭐) at the top of this p
 
 </div>
 
-We also need financial support for our services. All of our activities are done voluntarily and financial support will be spent on the development of the project. You can view our support addresses [here](https://hiddify.com/donation-and-support/).
+서비스 운영을 위한 재정적 지원도 필요합니다. 모든 활동은 자원봉사로 진행되며, 후원금은 프로젝트 개발에 사용됩니다. 후원 주소는 [여기](https://hiddify.com/donation-and-support/)에서 확인할 수 있습니다.
 
-## 👩‍🏫 Collaboration and Contact Information
+## 👩‍🏫 협업 및 연락처
 
-Hiddify is a community driven project. If you're interested in contributing, please read the [contribution guidelines](./CONTRIBUTING.md). We would specially appreciate any help we can get in these areas: **Flutter, Go, iOS development (Swift), Android development (Kotlin).**
+Hiddify는 커뮤니티 주도하의 프로젝트입니다. 기여에 관심이 있다면 [기여 가이드라인](./CONTRIBUTING.md)을 읽어 주세요. 특히 다음 분야의 도움을 환영합니다: **Flutter, Go, iOS 개발(Swift), Android 개발(Kotlin).**
 
 <div align=center>
 
@@ -182,7 +182,7 @@ Hiddify is a community driven project. If you're interested in contributing, ple
 </div>
 
 <p align=center>
- We appreciate all people who are participating in this project. Some people here and many many more outside of Github. It means a lot to us. ♥
+ 이 프로젝트에 참여해주시는 모든 분들께 감사드립니다. GitHub 안팎에서 함께해 주시는 더 많은 분들이 있습니다. 정말 큰 힘이 됩니다. ♥
  </p>
  
 <p align=center> 
@@ -191,7 +191,7 @@ Hiddify is a community driven project. If you're interested in contributing, ple
 </a>
 </p>
 <p align=center>
- Made with <a rel="" target="_blank" href="https://contrib.rocks">Contrib.Rocks</a> 
+ <a rel="" target="_blank" href="https://contrib.rocks">Contrib.Rocks</a>로 제작 
 </p>
 
 
