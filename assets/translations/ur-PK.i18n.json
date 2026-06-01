@@ -1,0 +1,643 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "شروع",
+    "version": "ورژن",
+    "ok": "ٹھیک ہے",
+    "cancel": "منسوخ",
+    "kContinue": "جاری رکھیں",
+    "showMore": "مزید دکھائیں",
+    "showLess": "کم دکھائیں",
+    "filter": "فلٹر",
+    "all": "سب",
+    "pause": "روکیں",
+    "resume": "دوبارہ شروع کریں",
+    "clear": "صاف کریں",
+    "close": "بند کریں",
+    "auto": "خودکار",
+    "manually": "دستی طور پر",
+    "name": "نام",
+    "url": "یو آر ایل",
+    "add": "شامل کریں",
+    "clipboard": "کلپ بورڈ",
+    "addToClipboard": "کلپ بورڈ میں شامل کریں",
+    "scanQr": "کیو آر کوڈ اسکین کریں",
+    "free": "مفت",
+    "warp": "وارپ",
+    "fragment": "فریگمنٹ",
+    "help": "مدد",
+    "save": "محفوظ کریں",
+    "update": "اپ ڈیٹ",
+    "share": "شیئر کریں",
+    "edit": "ترمیم",
+    "delete": "حذف کریں",
+    "discard": "ترک کریں",
+    "import": "درآمد",
+    "export": "برآمد",
+    "later": "بعد میں",
+    "ignore": "نظر انداز کریں",
+    "quit": "چھوڑیں",
+    "notSet": "سیٹ نہیں",
+    "hide": "چھپائیں",
+    "exit": "باہر نکلیں",
+    "reset": "ری سیٹ",
+    "done": "مکمل",
+    "search": "تلاش",
+    "decline": "انکار",
+    "agree": "متفق",
+    "empty": "خالی",
+    "unknown": "نامعلوم",
+    "hidden": "چھپا ہوا",
+    "timeout": "وقت ختم",
+    "sort": "ترتیب دیں",
+    "dashboard": "ڈیش بورڈ",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n دن",
+        "other": "$n دن"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n گھنٹہ",
+        "other": "$n گھنٹے"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "اجازت مسترد کر دی گئی"
+      },
+      "export": {
+        "clipboard": {
+          "success": "کلپ بورڈ میں کامیابی سے شامل ہو گیا",
+          "failure": "کلپ بورڈ میں کاپی کرنے میں ناکام",
+          "contentTooLarge": "مواد بہت بڑا ہے، فائل کے ذریعے برآمد کریں"
+        },
+        "file": {
+          "success": "جی ایس او این فائل کامیابی سے بن گئی",
+          "failure": "فائل بنانے میں ناکام"
+        }
+      },
+      "import": {
+        "confirm": "درآمد کی تصدیق کریں",
+        "success": "درآمد کامیاب",
+        "failure": "درآمد ناکام"
+      }
+    }
+  },
+  "intro": {
+    "banner": "بلا پابندی انٹرنیٹ کے لیے تمام سہولیات",
+    "termsAndPolicyCaution(rich)": "جاری رکھنے سے آپ ${tap(@:pages.about.termsAndConditions)} سے اتفاق کر رہے ہیں",
+    "info(rich)": "Hiddify کی جانب سے ❤️ کے ساتھ تیار کردہ - ${tap_source(اوپن سورس)} (${tap_license(لائسنس)})"
+  },
+  "pages": {
+    "home": {
+      "title": "ہوم",
+      "quickSettings": "فوری سیٹنگز"
+    },
+    "proxies": {
+      "title": "پراکسی",
+      "sort": "پراکسی ترتیب دیں",
+      "testDelay": "تاخیر جانچیں",
+      "empty": "کوئی دستیاب پراکسی نہیں",
+      "activeProxy": "موجودہ پراکسی",
+      "unknownIp": "نامعلوم آئی پی",
+      "sortOptions": {
+        "unsorted": "پہلے سے طے شدہ",
+        "name": "نام کے لحاظ سے",
+        "delay": "تاخیر کے لحاظ سے"
+      },
+      "ipInfo": {
+        "address": "آئی پی ایڈریس",
+        "country": "ملک",
+        "organization": "تنظیم"
+      },
+      "delay": {
+        "result": "تاخیر: ${delay} ملی سیکنڈ",
+        "timeout": "تاخیر جانچ کا وقت ختم",
+        "testing": "تاخیر: جانچ جاری..."
+      }
+    },
+    "profiles": {
+      "title": "پروفائلز",
+      "add": "نیا پروفائل شامل کریں",
+      "update": "پروفائل اپ ڈیٹ کریں",
+      "viewAllProfiles": "تمام پروفائلز دیکھیں",
+      "activeProfileName": "موجودہ پروفائل: «${name}»",
+      "nonActiveProfileName": "«${name}» کو موجودہ پروفائل کے طور پر منتخب کریں",
+      "freeSubNotFound": "مفت سبسکرپشن نہیں ملا",
+      "freeSubNotFoundForRegion": "«${region}» علاقے کے لیے مفت سبسکرپشن نہیں ملا",
+      "failedToLoad": "لوڈ کرنے میں ناکام",
+      "updateSubscriptions": "سبسکرپشن اپ ڈیٹ کریں",
+      "share": {
+        "urlToClipboard": "یو آر ایل کلپ بورڈ میں",
+        "showUrlQr": "یو آر ایل کا کیو آر کوڈ دکھائیں",
+        "jsonToClipboard": "جی ایس او این کلپ بورڈ میں"
+      },
+      "msg": {
+        "save": {
+          "success": "پروفائل محفوظ ہو گیا"
+        },
+        "invalidUrl": "غلط یو آر ایل",
+        "add": {
+          "failure": "پروفائل شامل کرنے میں ناکام"
+        },
+        "update": {
+          "success": "پروفائل اپ ڈیٹ ہو گیا",
+          "successNamed": "«${name}» اپ ڈیٹ ہو گیا",
+          "failure": "پروفائل اپ ڈیٹ کرنے میں ناکام",
+          "failureNamed": "«${name}» اپ ڈیٹ کرنے میں ناکام"
+        },
+        "delete": {
+          "success": "پروفائل حذف ہو گیا"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "پروفائل کی تفصیلات",
+      "lastUpdate": "آخری اپ ڈیٹ",
+      "form": {
+        "nameHint": "پروفائل کا نام",
+        "emptyName": "نام درکار ہے",
+        "invalidUrl": "غلط یو آر ایل",
+        "urlHint": "مکمل سیٹنگز یو آر ایل",
+        "disableAutoUpdate": "خودکار اپ ڈیٹ بند کریں",
+        "autoUpdateInterval": "خودکار اپ ڈیٹ کا وقفہ",
+        "loading": "پروفائل شامل ہو رہا ہے..."
+      }
+    },
+    "logs": {
+      "title": "لاگز",
+      "shareCoreLogs": "بنیادی لاگز شیئر کریں",
+      "shareAppLogs": "ایپلی کیشن لاگز شیئر کریں"
+    },
+    "about": {
+      "title": "ہمارے بارے میں",
+      "notAvailableMsg": "پہلے ہی تازہ ترین ورژن ہے",
+      "checkForUpdate": "اپ ڈیٹ چیک کریں",
+      "openWorkingDir": "ورکنگ ڈائریکٹری کھولیں",
+      "sourceCode": "سورس کوڈ",
+      "telegramChannel": "ٹیلی گرام چینل",
+      "termsAndConditions": "شرائط و ضوابط",
+      "privacyPolicy": "پرائیویسی پالیسی"
+    },
+    "settings": {
+      "title": "سیٹنگز",
+      "resetTunnel": "وی پی این سیٹنگز ری سیٹ کریں",
+      "options": {
+        "import": {
+          "clipboard": "کلپ بورڈ سے سیٹنگز درآمد کریں",
+          "file": "فائل سے سیٹنگز درآمد کریں"
+        },
+        "export": {
+          "anonymousToClipboard": "گمنام سیٹنگز کلپ بورڈ میں کاپی کریں",
+          "anonymousToFile": "گمنام سیٹنگز فائل میں برآمد کریں",
+          "allToClipboard": "تمام سیٹنگز کلپ بورڈ میں کاپی کریں",
+          "allToFile": "تمام سیٹنگز فائل میں برآمد کریں"
+        },
+        "reset": "سیٹنگز ری سیٹ کریں"
+      },
+      "general": {
+        "title": "عمومی",
+        "locale": "زبان",
+        "themeMode": "تھیم موڈ",
+        "themeModes": {
+          "system": "سسٹم کے مطابق",
+          "dark": "ڈارک موڈ",
+          "light": "لائٹ موڈ",
+          "black": "بلیک موڈ"
+        },
+        "enableAnalytics": "اینالیٹکس فعال کریں",
+        "enableAnalyticsMsg": "ایپ کو بہتر بنانے کے لیے ڈیٹا اور کریش رپورٹس جمع کرنے کی اجازت دیں",
+        "autoIpCheck": "آئی پی خودکار جانچ",
+        "dynamicNotification": "نوٹیفیکیشن میں رفتار دکھائیں",
+        "hapticFeedback": "ٹچ فیڈ بیک",
+        "actionAtClosing": "بند ہونے پر کارروائی",
+        "autoStart": "سٹارٹ اپ پر خودکار چلائیں",
+        "silentStart": "خاموش طریقے سے شروع ہو",
+        "ignoreBatteryOptimizations": "بیٹری آپٹیمائزیشن نظر انداز کریں",
+        "ignoreBatteryOptimizationsMsg": "بہترین وی پی این کارکردگی کے لیے پابندیاں ہٹائیں",
+        "memoryLimit": "میموری کی حد",
+        "memoryLimitMsg": "میموری کی کمی یا بار بار کریش ہونے پر یہ آپشن فعال کریں",
+        "debugMode": "ڈیبگ موڈ",
+        "debugModeMsg": "تبدیلیاں لاگو کرنے کے لیے ایپ دوبارہ شروع کریں",
+        "logLevel": "لاگ لیول",
+        "connectionTestUrl": "کنکشن جانچ کا یو آر ایل",
+        "urlTestInterval": "یو آر ایل جانچ کا وقفہ",
+        "clashApiPort": "کلش اے پی آئی پورٹ",
+        "useXrayCoreWhenPossible": "جہاں ممکن ہو ایکس رے کور استعمال کریں",
+        "useXrayCoreWhenPossibleMsg": "سبسکرپشن لنکس کے لیے ایکس رے کور استعمال ہوگا، لنکس دوبارہ درآمد کریں"
+      },
+      "routing": {
+        "title": "روٹنگ",
+        "perAppProxy": {
+          "title": "ایپ کے لحاظ سے پراکسی",
+          "hideSysApps": "سسٹم ایپس چھپائیں",
+          "options": {
+            "import": {
+              "clipboard": "کلپ بورڈ سے سلیکشن درآمد کریں",
+              "file": "فائل سے سلیکشن درآمد کریں",
+              "msg": "درآمد آپ کے موجودہ انتخاب کو تبدیل کر دے گا۔ جاری رکھیں؟"
+            },
+            "export": {
+              "clipboard": "سلیکشن کلپ بورڈ میں کاپی کریں",
+              "file": "سلیکشن فائل میں برآمد کریں"
+            },
+            "shareToAll": "سب کے ساتھ شیئر کریں",
+            "clearAllSelections": "تمام انتخاب صاف کریں"
+          },
+          "modes": {
+            "all": "سب",
+            "proxy": "پراکسی",
+            "bypass": "بائی پاس",
+            "allMsg": "تمام ایپس کو پراکسی دیں",
+            "proxyMsg": "صرف منتخب ایپس کو پراکسی دیں",
+            "bypassMsg": "منتخب ایپس کو پراکسی نہ دیں"
+          },
+          "autoSelection": {
+            "title": "خودکار انتخاب",
+            "performNow": "ابھی عمل کریں",
+            "resetToDefault": "پہلے سے طے شدہ پر ری سیٹ کریں",
+            "autoUpdateInterval": "خودکار اپ ڈیٹ کا وقفہ",
+            "toast": {
+              "success": "ایپس کا خودکار انتخاب مکمل ہو گیا",
+              "failure": "خودکار انتخاب ناکام",
+              "regionNotFound": "«${region}» علاقے کے لیے خودکار انتخاب نہیں ملا",
+              "alreadyInAuto": "آپ کا انتخاب پہلے ہی خودکار فہرست میں موجود ہے"
+            },
+            "dialog": {
+              "title": "ایپس کا خودکار انتخاب",
+              "msg": "علاقہ «${region}» تبدیل ہونے سے ایپ پراکسی کا خودکار انتخاب بند ہو گیا"
+            }
+          }
+        },
+        "region": "علاقہ",
+        "regions": {
+          "ir": "ایران (ir)",
+          "cn": "چین (cn)",
+          "ru": "روس (ru)",
+          "af": "افغانستان (af)",
+          "id": "انڈونیشیا (id)",
+          "tr": "ترکی (tr)",
+          "br": "برازیل (br)",
+          "other": "دیگر"
+        },
+        "balancerStrategy": {
+          "title": "بیلنسر حکمت عملی",
+          "roundRobin": "راؤنڈ رابن",
+          "consistentHash": "مستقل ہیش",
+          "stickySession": "اسٹیکی سیشن"
+        },
+        "blockAds": "اشتہارات روکیں",
+        "bypassLan": "مقامی نیٹ ورک بائی پاس",
+        "resolveDestination": "منزل حل کریں",
+        "ipv6Route": "آئی پی وی 6 روٹنگ",
+        "ipv6Modes": {
+          "disable": "بند",
+          "enable": "فعال",
+          "prefer": "ترجیح دیں",
+          "only": "صرف"
+        },
+        "routeRule": {
+          "title": "روٹ کے اصول",
+          "options": {
+            "import": {
+              "clipboard": "کلپ بورڈ سے اصول درآمد کریں",
+              "file": "فائل سے اصول درآمد کریں"
+            },
+            "export": {
+              "clipboard": "اصول کلپ بورڈ میں کاپی کریں",
+              "file": "اصول فائل میں محفوظ کریں"
+            },
+            "reset": "اصول ری سیٹ کریں"
+          },
+          "deleteRule": "اصول حذف کریں",
+          "createRule": "نیا اصول بنائیں",
+          "rule": {
+            "title": "اصول",
+            "ruleChanged": "اصول تبدیل ہو گئے",
+            "ruleChangedMsg": "آپ اپنی ترامیم محفوظ کرنا چاہتے ہیں؟",
+            "onlyTunMode": "صرف ٹن موڈ میں دستیاب",
+            "notAvailabeInThisPlatform": "اس پلیٹ فارم پر دستیاب نہیں",
+            "canNotBeEmpty": "خالی نہیں ہو سکتا",
+            "validUrlEx": "https://example.com",
+            "validUrl": "درست یو آر ایل، مثال کے طور پر\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe یا google chrome یا chrome",
+            "validProcessName": "درست عمل کا نام، مثال کے طور پر\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "درست عمل کا راستہ، مثال کے طور پر\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 یا 1-65000",
+            "validPortRange": "درست پورٹ یا پورٹ رینج، مثال کے طور پر\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8 یا 10.0.0.0/24",
+            "validIpCidr": "درست آئی پی سی آئی ڈی آر، مثال کے طور پر\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com یا dl.google.com",
+            "validDomain": "درست ڈومین، مثال کے طور پر\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com یا .tw",
+            "validDomainSuffix": "درست ڈومین سفیکس، مثال کے طور پر\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "tileTitle(map)": {
+              "name": "نام",
+              "outbound": "میل ہونے پر آؤٹ باؤنڈ",
+              "rule_set": "اصول سیٹ یو آر ایل",
+              "package_name": "پیکیج نام",
+              "process_name": "عمل کا نام",
+              "process_path": "عمل کا راستہ",
+              "network": "نیٹ ورک",
+              "port_range": "ٹارگٹ پورٹ",
+              "source_port_range": "ماخذ پورٹ",
+              "protocol": "پروٹوکول",
+              "ip_cidr": "ٹارگٹ آئی پی سی آئی ڈی آر",
+              "source_ip_cidr": "ماخذ آئی پی سی آئی ڈی آر",
+              "domain": "ڈومین",
+              "domain_suffixe": "ڈومین سفیکس",
+              "domain_keyword": "ڈومین کلیدی لفظ",
+              "domain_regex": "ڈومین ریجیکس"
+            },
+            "outbound(map)": {
+              "proxy": "پراکسی",
+              "direct": "براہ راست کنکشن",
+              "direct_with_fragment": "براہ راست کنکشن + فریگمنٹ",
+              "block": "بلاک"
+            },
+            "network(map)": {
+              "all": "سب",
+              "tcp": "ٹی سی پی",
+              "udp": "یو ڈی پی"
+            },
+            "protocol(map)": {
+              "": "سب",
+              "tls": "ٹی ایل ایس",
+              "http": "ایچ ٹی ٹی پی",
+              "quic": "کوئیک",
+              "stun": "سٹن",
+              "dns": "ڈی این ایس",
+              "bittorrent": "بٹ ٹورینٹ"
+            }
+          },
+          "genericList": {
+            "addNew": "نیا قدر شامل کریں",
+            "update": "قدر اپ ڈیٹ کریں",
+            "clearList": "فہرست صاف کریں",
+            "clearListMsg": "تمام آئٹمز حذف ہو گئے"
+          },
+          "androidApps": {
+            "pageTitle": "اینڈروئیڈ ایپس",
+            "showSystemApps": "سسٹم ایپس دکھائیں",
+            "hideSystemApps": "سسٹم ایپس چھپائیں",
+            "clearSelection": "انتخاب صاف کریں",
+            "uninstalled": "ان انسٹال شدہ"
+          }
+        }
+      },
+      "dns": {
+        "title": "ڈی این ایس",
+        "remoteDns": "ریموٹ ڈی این ایس",
+        "remoteDnsDomainStrategy": "ریموٹ ڈی این ایس ڈومین حکمت عملی",
+        "directDns": "براہ راست سرور ریزولور",
+        "directDnsDomainStrategy": "براہ راست ڈومین حکمت عملی",
+        "enableDnsRouting": "ڈی این ایس روٹنگ فعال کریں",
+        "enableFakeDns": "جعلی ڈی این ایس فعال کریں",
+        "domainStrategy": {
+          "auto": "خودکار",
+          "preferIpv6": "آئی پی وی 6 کو ترجیح دیں",
+          "preferIpv4": "آئی پی وی 4 کو ترجیح دیں",
+          "ipv4Only": "صرف آئی پی وی 4",
+          "ipv6Only": "صرف آئی پی وی 6"
+        }
+      },
+      "inbound": {
+        "title": "ان باؤنڈ",
+        "serviceMode": "سروس موڈ",
+        "serviceModes": {
+          "proxy": "صرف پراکسی سروس",
+          "systemProxy": "سسٹم پراکسی سیٹ کریں",
+          "tun": "وی پی این",
+          "tunService": "وی پی این سروس"
+        },
+        "shortServiceModes": {
+          "proxy": "پراکسی",
+          "systemProxy": "سسٹم پراکسی",
+          "tun": "وی پی این",
+          "tunService": "وی پی این سروس"
+        },
+        "strictRoute": "سخت روٹنگ",
+        "tunImplementation": "ٹن نفاذ",
+        "tunImplementations": {
+          "mixed": "مکسڈ",
+          "system": "سسٹم",
+          "gvisor": "جی ویزر"
+        },
+        "mixedPort": "مکسڈ پورٹ",
+        "tproxyPort": "ٹرانسپیرنٹ پراکسی پورٹ",
+        "directPort": "مقامی ڈائریکٹ پورٹ",
+        "redirectPort": "ری ڈائریکٹ پورٹ",
+        "allowConnectionFromLan": "مقامی نیٹ ورک سے کنکشن کی اجازت دیں"
+      },
+      "tlsTricks": {
+        "title": "ٹی ایل ایس ٹرکس",
+        "enable": "فریگمنٹیشن فعال کریں",
+        "packets": "پیکٹس",
+        "packetsTlsHello": "ٹی ایل ایس ہیلو",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
+        "size": "سائز",
+        "sleep": "تاخیر",
+        "mixedSniCase": {
+          "enable": "مکس کیس ایس این آئی فعال کریں"
+        },
+        "padding": {
+          "enable": "پیڈنگ فعال کریں",
+          "size": "پیڈنگ سائز"
+        }
+      },
+      "warp": {
+        "title": "وارپ",
+        "enable": "وارپ فعال کریں",
+        "generateConfig": "وارپ سیٹنگز بنائیں",
+        "configGenerated": "وارپ سیٹنگز تیار ہو گئیں",
+        "missingConfig": "وارپ سیٹنگز غائب ہیں",
+        "detourMode": "وارپ روٹ موڈ",
+        "detourModes": {
+          "proxyOverWarp": "وارپ کے ذریعے پراکسی چلائیں",
+          "warpOverProxy": "پراکسی کے ذریعے وارپ چلائیں",
+          "proxyOverWarpExplain": "وارپ سے پراکسی غیر مقفل کریں",
+          "warpOverProxyExplain": "وارپ سے سیکیورٹی بہتر بنائیں"
+        },
+        "licenseKey": "لائسنس کلید",
+        "cleanIp": "بہترین آئی پی",
+        "port": "پورٹ",
+        "noise": {
+          "count": "شور کی تعداد",
+          "mode": "شور موڈ",
+          "size": "شور کا سائز",
+          "delay": "شور کی تاخیر"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "کنکشن",
+      "traffic": "ٹریفک",
+      "trafficLive": "براہ راست ٹریفک",
+      "trafficTotal": "کل ٹریفک",
+      "uplink": "اپ لوڈ",
+      "downlink": "ڈاؤن لوڈ",
+      "speed": "رفتار",
+      "totalTransferred": "کل منتقل شدہ ڈیٹا"
+    },
+    "subscriptionInfo": {
+      "upload": "اپ لوڈ",
+      "download": "ڈاؤن لوڈ",
+      "total": "کل",
+      "expireDate": "ختم ہونے کی تاریخ",
+      "expired": "ختم ہو گیا",
+      "noTraffic": "ٹریفک ختم ہو گیا",
+      "remainingTime": "باقی وقت",
+      "remainingDuration": "باقی ${duration} دن",
+      "remainingDurationNew": "${duration} دن",
+      "remainingTrafficSemanticLabel": "استعمال شدہ ${consumed} / ${total} ٹریفک",
+      "remainingTraffic": "باقی ٹریفک",
+      "remainingUsage": "باقی",
+      "profileSite": "فراہم کنندہ",
+      "profileSupport": "سپورٹ"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "ترتیب کا طریقہ",
+      "sort": {
+        "name": "حروف تہجی کے لحاظ سے",
+        "lastUpdate": "حالیہ اپ ڈیٹ کے لحاظ سے"
+      }
+    },
+    "warpLicense": {
+      "title": "کلاؤڈ فلیئر وارپ معاہدہ",
+      "description(rich)": "کلاؤڈ فلیئر وارپ ایک مفت وائر گارڈ وی پی این سروس ہے۔ اس آپشن کو فعال کرنے سے آپ کلاؤڈ فلیئر وارپ کے ${tos(سروس کی شرائط)} اور ${privacy(پرائیویسی پالیسی)} سے اتفاق کر رہے ہیں۔"
+    },
+    "newVersion": {
+      "title": "نیا ورژن دستیاب ہے",
+      "msg": "@:common.appTitle کا نیا ورژن جاری ہو چکا ہے۔ ابھی اپ ڈیٹ کرنا چاہتے ہیں؟",
+      "currentVersion": "موجودہ ورژن:",
+      "newVersion": "نیا ورژن:",
+      "updateNow": "ابھی اپ ڈیٹ کریں"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "یہ تمام موجودہ سیٹنگز کو نئی اقدار سے تبدیل کر دے گا۔ کیا آپ یقینی ہیں؟"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "پروفائل حذف کریں",
+          "msg": "کیا آپ اس پروفائل کو مستقل طور پر حذف کرنا چاہتے ہیں؟"
+        }
+      },
+      "perAppProxy": {
+        "shareOnGithub": {
+          "title": "خودکار انتخاب کو بہتر بنائیں",
+          "msg": "اپنے منتخب ایپس شیئر کر کے خودکار انتخاب کی فہرست کو بہتر بنانے میں مدد کریں"
+        },
+        "import": {
+          "msg": "یہ ایپ پراکسی کے تمام موجودہ انتخاب کو تبدیل کر دے گا۔ جاری رکھیں؟"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "اصول حذف کریں",
+          "msg": "کیا آپ اصول «$rulename» کو حذف کرنا چاہتے ہیں؟"
+        }
+      }
+    },
+    "experimentalNotice": {
+      "title": "تجرباتی فیچر استعمال ہو رہے ہیں",
+      "msg": "آپ نے کچھ تجرباتی فیچرز فعال کیے ہیں جو کنکشن کو متاثر کر سکتے ہیں اور غیر متوقع خرابیوں کا سبب بن سکتے ہیں۔ آپ سیٹنگز سے انہیں کسی بھی وقت تبدیل یا ری سیٹ کر سکتے ہیں۔",
+      "disable": "دوبارہ نہ دکھائیں"
+    },
+    "noActiveProfile": {
+      "title": "پروفائل منتخب کریں",
+      "msg": "اپنے وی پی این کنکشن کی تفصیلات والا پروفائل شامل کر کے شروع کریں۔\n\nکوئی وی پی این سرور نہیں؟ پریشان نہ ہوں، نیچے دی گئی گائیڈ سے مفت میں سیٹ اپ کریں۔",
+      "helpBtn": {
+        "label": "مجھے طریقہ بتائیں",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "بیرونی لنک انتباہ",
+      "youAreAboutToVisit": "آپ یہاں جانے والے ہیں:",
+      "thisWebsiteIsNotInOurTrustedList": "یہ ویب سائٹ ہماری قابل اعتماد فہرست میں نہیں ہے۔ براہ کرم محتاط رہیں۔"
+    },
+    "proxyInfo": {
+      "fullTag": "مکمل ٹیگ:",
+      "type": "قسم:",
+      "testTime": "جانچ کا وقت:",
+      "testDelay": "جانچ کا تاخیر:",
+      "isSelected": "منتخب شدہ:",
+      "isGroup": "گروپ ہے",
+      "isSecure": "محفوظ:",
+      "port": "پورٹ:",
+      "host": "میزبان:",
+      "ip": "آئی پی:",
+      "countryCode": "ملک کوڈ:",
+      "region": "علاقہ:",
+      "city": "شہر:",
+      "asn": "اے ایس این:",
+      "organization": "تنظیم:",
+      "location": "مقام:",
+      "postalCode": "پوسٹل کوڈ:"
+    },
+    "windowClosing": {
+      "askEachTime": "ہر بار پوچھیں",
+      "alertMessage": "ایپ چھپائیں یا باہر نکلیں؟",
+      "remember": "میرا انتخاب یاد رکھیں"
+    }
+  },
+  "connection": {
+    "tapToConnect": "کنکٹ کرنے کے لیے ٹیپ کریں",
+    "connect": "کنکٹ کریں",
+    "connecting": "کنکشن جاری ہے...",
+    "connected": "کنکٹ ہو گیا",
+    "disconnect": "کنکشن منقطع کریں",
+    "disconnecting": "کنکشن منقطع ہو رہا ہے...",
+    "reconnect": "دوبارہ کنکٹ کریں",
+    "reconnectMsg": "تبدیلیاں لاگو کرنے کے لیے دوبارہ کنکٹ ہو رہا ہے...",
+    "secure": "وارپ کے ذریعے محفوظ"
+  },
+  "errors": {
+    "unexpected": "غیر متوقع خرابی",
+    "connection": {
+      "unexpected": "کنکشن میں غیر متوقع خرابی",
+      "timeout": "کنکشن کا وقت ختم",
+      "badResponse": "غلط رسپانس",
+      "connectionError": "کنکشن کی خرابی",
+      "badCertificate": "غلط سرٹیفکیٹ"
+    },
+    "profiles": {
+      "unexpected": "غیر متوقع خرابی",
+      "notFound": "پروفائل نہیں ملا",
+      "invalidConfig": "سیٹنگز غلط",
+      "invalidUrl": "یو آر ایل غلط",
+      "canceledByUser": "صارف نے منسوخ کر دیا"
+    },
+    "connectivity": {
+      "unexpected": "غیر متوقع ناکامی",
+      "missingVpnPermission": "وی پی این اجازت غائب",
+      "missingNotificationPermission": "نوٹیفیکیشن اجازت غائب",
+      "core": "بنیادی خرابی"
+    },
+    "singbox": {
+      "serviceNotRunning": "سروس چل نہیں رہی",
+      "missingPrivilege": "اجازت غائب",
+      "missingPrivilegeMsg": "وی پی این موڈ کے لیے ایڈمن حقوق درکار ہیں۔ ایپ ایڈمن طور پر دوبارہ شروع کریں یا سروس موڈ تبدیل کریں۔",
+      "invalidConfigOptions": "سیٹنگز کے آپشنز غلط",
+      "invalidConfig": "سیٹنگز غلط"
+    },
+    "warp": {
+      "missingLicense": "وارپ لائسنس غائب",
+      "missingLicenseMsg": "منتخب پروفائل وارپ استعمال کر رہا ہے، اس کے لیے وارپ لائسنس معاہدے سے اتفاق کرنا ضروری ہے۔"
+    }
+  }
+}
