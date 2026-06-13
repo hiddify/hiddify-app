@@ -21,11 +21,26 @@ class AutoStartNotifier extends _$AutoStartNotifier with InfraLogger {
       appPath: Platform.resolvedExecutable,
       packageName: "Hiddify.HiddifyNext",
     );
-    final isEnabled = await launchAtStartup.isEnabled();
+    final isEnabled = await _isEnabledSafe();
     loggy.info("auto start is [${isEnabled ? "Enabled" : "Disabled"}]");
     _startTimer();
     ref.onDispose(() => _timer?.cancel());
     return isEnabled;
+  }
+
+  /// Reads the launch-at-startup status, treating a read failure as disabled.
+  ///
+  /// On a fresh Windows install the relevant registry key may not exist yet,
+  /// in which case `launchAtStartup.isEnabled()` throws instead of returning
+  /// false. A missing key means auto start is not registered, so treat any
+  /// read failure as disabled rather than letting it propagate.
+  Future<bool> _isEnabledSafe() async {
+    try {
+      return await launchAtStartup.isEnabled();
+    } catch (e, stackTrace) {
+      loggy.warning("failed to read auto start status, assuming disabled", e, stackTrace);
+      return false;
+    }
   }
 
   void _startTimer() {
@@ -35,7 +50,7 @@ class AutoStartNotifier extends _$AutoStartNotifier with InfraLogger {
 
   Future<bool> updateStatus() async {
     loggy.debug("update auto start status");
-    final isEnabled = await launchAtStartup.isEnabled();
+    final isEnabled = await _isEnabledSafe();
     state = AsyncValue.data(isEnabled);
     return isEnabled;
   }
