@@ -283,7 +283,13 @@ class ProfileParser {
   static SubscriptionInfo? _parseSubscriptionInfo(String subInfoStr) {
     final values = subInfoStr.split(';');
     final map = {for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt()};
-    if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
+    // Only upload+download are required. total/expire are optional - many panels omit them (e.g.
+    // `expire` for no-expiry plans) - and are already defaulted to the "unlimited" sentinels below.
+    // Requiring their keys here discarded the WHOLE subscription-userinfo when either was absent,
+    // which silently drops the usage bar AND the support-url / profile-web-page-url tiles.
+    if (map case {"upload": final upload?, "download": final download?}) {
+      final total = map["total"];
+      var expire = map["expire"];
       final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
       expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
       return SubscriptionInfo(
