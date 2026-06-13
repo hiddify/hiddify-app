@@ -97,7 +97,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     "chain profile unblocker",
     () => container.read(chainProfileNotifierProvider(ChainType.unblocker).future),
   );
-  await _init("hiddify-core", () => container.read(hiddifyCoreServiceProvider).init());
+  await _safeInit("hiddify-core", () => container.read(hiddifyCoreServiceProvider).init());
 
   // Eagerly listen to activeProxyNotifierProvider to force synchronous evaluation in microtasks,
   // avoiding lazy build-phase flushes and sibling dependency collisions on the Home page.
