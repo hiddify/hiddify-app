@@ -86,14 +86,15 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
           // Is Intro Page
           if (url != null) {
             WidgetsBinding.instance.addPostFrameCallback(
-              (_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url),
+              (_) =>
+                  ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url, triggeredByDeepLink: true),
             );
           }
           return '/home';
         } else if (url != null) {
           // Auto import profile from url
           WidgetsBinding.instance.addPostFrameCallback(
-            (_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url),
+            (_) => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(url: url, triggeredByDeepLink: true),
           );
           return '/home';
         } else if (state.matchedLocation.contains('chain-options') &&

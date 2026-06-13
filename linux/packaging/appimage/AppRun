@@ -47,16 +47,28 @@ install_integration() {
         return
     fi
 
+    APP_VERSION=$(jq -r .version < "./data/flutter_assets/version.json" 2>/dev/null || grep -oP '"version":\s*"\K[^"]+' "./data/flutter_assets/version.json" 2>/dev/null || echo "1.0.0")
     mkdir -p "$(dirname "$TARGET_DESKTOP")"
 
     cat > "$TARGET_DESKTOP" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Hiddify
+GenericName=Hiddify
+GenericName[fa]=هیدیفای
 Exec="$APPIMAGE"
 Icon=hiddify
 Terminal=false
 StartupWMClass=app.hiddify.com
+Comment=A multi-platform proxy client based on Sing-box universal proxy tool-chain.
+Comment[fa]=یک کلاینت پروکسی چند‌سکویی بر پایه زنجیره-ابزار پروکسی همه‌منظوره سینگ-باکس.
+Keywords=Hiddify;Proxy;VPN;V2ray;Nekoray;Xray;Psiphon;OpenVPN;AntiCensorship;
+Keywords[fa]=هیدیفای;پروکسی;وی‌پی‌ان;وی۲ری;نکوباکس;ایکسری;سایفون;اوپن‌وی‌پی‌ان;فیلترشکن;
+X-AppImage-Name=Hiddify
+X-AppImage-Version=$APP_VERSION
+X-AppImage-Arch=x86_64
+X-AppImage-Homepage=https://github.com/hiddify/hiddify-app
+X-AppImage-UpdateURL=https://github.com/hiddify/hiddify-app
 EOF
 
     chmod +x "$TARGET_DESKTOP"
@@ -82,14 +94,23 @@ OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
 # It is a good idea to make OPTIND local if you process options in a function.
 
-# if no arg is provided, execute hiddify app
+# Filter out invalid environment arguments like %u before processing
+CLEANED_ARGS=()
+for arg in "$@"; do
+    case "$arg" in
+        %u|%U|%f|%F) ;; # Drop these arguments
+        *) CLEANED_ARGS+=("$arg") ;;
+    esac
+done
+set -- "${CLEANED_ARGS[@]}"
+
+# If no arg is provided, execute hiddify app
 if [[ $# == 0 ]];then 
     install_integration
     exec ./hiddify
 else
 
-# processing arguments
-
+# Processing arguments
     case $1 in
         HiddifyCli)  
             exec ./HiddifyCli ${@:3}
@@ -103,11 +124,9 @@ else
             exit 0
             ;;
         *)
-            show_help >&2
-            exit 1
+            # Pass deep-links or valid arguments to the UI app
+            install_integration
+            exec ./hiddify "$@"
             ;;
     esac
-
-
-
 fi

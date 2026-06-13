@@ -54,6 +54,7 @@
     "psiphon": "Psiphon",
     "profile": "ملف تعريف",
     "configuration": "تكوين",
+    "file": "ملف",
     "interval": {
       "day": {
         "zero": "",
@@ -443,7 +444,12 @@
         "tproxyPort": "منفذ البروكسي الشفاف",
         "directPort": "منفذ مباشر",
         "redirectPort": "منفذ إعادة التوجيه",
-        "allowConnectionFromLan": "مشاركة VPN على الشبكة المحلية"
+        "lanSharing": "مشاركة VPN",
+        "lanSharingPasswordNotSet": "كلمة المرور غير محددة",
+        "lanSharingPassword": "كلمة مرور مشاركة VPN",
+        "copyLink": "نسخ الرابط",
+        "qrCode": "رمز QR",
+        "lanIPError": "فشل في الحصول على عنوان IP المحلي"
       },
       "tlsTricks": {
         "title": "حيل TLS",
@@ -586,6 +592,10 @@
       "title": "موافقة Cloudflare WARP",
       "description(rich)": "Cloudflare WARP هو مزود VPN مجاني لـ WireGuard. بتفعيل هذا الخيار، فإنك توافق على ${tos(شروط الخدمة)} و ${privacy(سياسة الخصوصية)} الخاصة بـ Cloudflare WARP."
     },
+    "psiphonLicense": {
+      "title": "اتفاقية رخصة Psiphon",
+      "description(rich)": "باستخدام Psiphon، أنت توافق على ${tos(شروط الخدمة)} وتقر بـ ${privacy(سياسة الخصوصية)}. يرجى قراءتها بعناية قبل المتابعة."
+    },
     "newVersion": {
       "title": "تحديث متاح",
       "msg": "إصدار جديد من @:common.appTitle متاح. هل ترغب في التحديث الآن؟",
@@ -619,6 +629,10 @@
           "title": "حذف القاعدة",
           "msg": "هل أنت متأكد من رغبتك في حذف قاعدة \"$rulename\"؟"
         }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "إضافة ملف شخصي؟",
+        "message": "رابط خارجي من \"${host}\" يطلب إضافة ملف شخصي جديد. هل تريد استيراده؟"
       }
     },
     "experimentalNotice": {
@@ -707,7 +721,11 @@
     },
     "warp": {
       "missingLicense": "رخصة WARP مفقودة",
-      "missingLicenseMsg": "الملف الشخصي المحدد يستخدم ميزة WARP. لاستخدام هذه الميزة، يجب الموافقة على شروط رخصة WARP."
+      "missingLicenseMsg": "الملف الشخصي المحدد يستخدم ميزة WARP؛ لاستخدام هذه الميزة، يجب الموافقة على رخصة WARP"
+    },
+    "psiphon": {
+      "missingLicense": "رخصة Psiphon مطلوبة",
+      "missingLicenseMsg": "الملف الشخصي المحدد يستخدم ميزة Psiphon؛ لاستخدام هذه الميزة، يجب الموافقة على رخصة Psiphon"
     }
   }
 }

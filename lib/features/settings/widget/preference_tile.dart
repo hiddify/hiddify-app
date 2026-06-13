@@ -19,6 +19,7 @@ class ValuePreferenceWidget<T> extends HookConsumerWidget {
     this.inputToValue,
     this.digitsOnly = false,
     this.icon,
+    this.trailing,
   });
 
   final T value;
@@ -31,6 +32,7 @@ class ValuePreferenceWidget<T> extends HookConsumerWidget {
   final T? Function(String input)? inputToValue;
   final bool digitsOnly;
   final IconData? icon;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,6 +40,7 @@ class ValuePreferenceWidget<T> extends HookConsumerWidget {
       title: Text(title),
       subtitle: Text(presentValue?.call(value) ?? value.toString()),
       leading: icon != null ? Icon(icon) : null,
+      trailing: trailing,
       // material: (context, platform) => MaterialListTileData(
       enabled: enabled,
 
@@ -59,6 +62,23 @@ class ValuePreferenceWidget<T> extends HookConsumerWidget {
           return;
         }
         await preferences.update(inputValue);
+      },
+    );
+  }
+}
+
+class SwitchPreferenceWidget extends HookConsumerWidget {
+  const SwitchPreferenceWidget({super.key, required this.preference});
+
+  final StateNotifierProvider<StateNotifier<bool>, bool> preference;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final value = ref.watch(preference);
+    return Switch.adaptive(
+      value: value,
+      onChanged: (val) {
+        (ref.read(preference.notifier) as dynamic).update(val);
       },
     );
   }

@@ -54,6 +54,7 @@
     "psiphon": "Psiphon",
     "profile": "配置",
     "configuration": "配置",
+    "file": "文件",
     "interval": {
       "day": {
         "zero": "",
@@ -437,7 +438,12 @@
         "tproxyPort": "透明代理端口",
         "directPort": "本地 Direct 端口",
         "redirectPort": "重定向端口",
-        "allowConnectionFromLan": "在本地网络中共享 VPN"
+        "lanSharing": "VPN 共享",
+        "lanSharingPasswordNotSet": "密码未设置",
+        "lanSharingPassword": "VPN 共享密码",
+        "copyLink": "复制链接",
+        "qrCode": "二维码",
+        "lanIPError": "获取本地 IP 地址失败"
       },
       "tlsTricks": {
         "title": "TLS 技巧",
@@ -580,6 +586,10 @@
       "title": "Cloudflare WARP 同意书",
       "description(rich)": "Cloudflare WARP 是一个免费的 WireGuard VPN 提供商。启用此选项即表示您同意 Cloudflare WARP 的 ${tos(服务条款)} 和 ${privacy(隐私政策)}。"
     },
+    "psiphonLicense": {
+      "title": "Psiphon 许可协议",
+      "description(rich)": "使用 Psiphon 即表示您同意 ${tos(服务条款)} 并确认 ${privacy(隐私政策)}。请在继续之前仔细阅读它们。"
+    },
     "newVersion": {
       "title": "有可用更新",
       "msg": "@:common.appTitle 的新版本已发布。您想现在更新吗？",
@@ -613,6 +623,10 @@
           "title": "删除规则",
           "msg": "您确定要删除规则 \"$rulename\" 吗？"
         }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "添加配置？",
+        "message": "来自 \"${host}\" 的外部链接请求添加新配置。您想要导入吗？"
       }
     },
     "experimentalNotice": {
@@ -701,7 +715,11 @@
     },
     "warp": {
       "missingLicense": "WARP 许可证缺失",
-      "missingLicenseMsg": "所选配置文件使用 WARP 功能；要使用此功能，必须同意 WARP 许可证。"
+      "missingLicenseMsg": "所选配置文件使用 WARP 功能；要使用此功能，必须同意 WARP 许可证"
+    },
+    "psiphon": {
+      "missingLicense": "需要 Psiphon 许可证",
+      "missingLicenseMsg": "所选配置文件使用 Psiphon 功能；要使用此功能，必须同意 Psiphon 许可证"
     }
   }
 }

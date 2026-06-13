@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
@@ -20,6 +24,36 @@ class FixBtns extends ConsumerWidget {
     final isDesktop = PlatformUtils.isDesktop;
     return Row(
       children: [
+        const Gap(AddProfileModalConst.fixBtnsGap),
+        FixBtn(
+          key: const ValueKey('add_from_clipboard_button'),
+          height: height,
+          title: t.common.clipboard,
+          icon: Icons.content_paste,
+          onTap: () async {
+            final cr = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
+            ref.read(addProfileNotifierProvider.notifier).addClipboard(cr);
+          },
+        ),
+        const Gap(AddProfileModalConst.fixBtnsGap),
+        FixBtn(
+          key: const ValueKey('add_from_file_button'),
+          height: height,
+          title: t.common.file,
+          icon: Icons.insert_drive_file,
+          onTap: () async {
+            final result = await FilePicker.platform.pickFiles(
+              type: FileType.custom,
+              allowedExtensions: ['txt', 'json'],
+            );
+            if (result == null) return;
+            final file = File(result.files.single.path!);
+            if (!await file.exists()) return;
+            final bytes = await file.readAsBytes();
+            final content = utf8.decode(bytes);
+            ref.read(addProfileNotifierProvider.notifier).addClipboard(content);
+          },
+        ),
         if (!isDesktop) ...[
           const Gap(AddProfileModalConst.fixBtnsGap),
           FixBtn(
@@ -34,17 +68,6 @@ class FixBtns extends ConsumerWidget {
             },
           ),
         ],
-        const Gap(AddProfileModalConst.fixBtnsGap),
-        FixBtn(
-          key: const ValueKey('add_from_clipboard_button'),
-          height: height,
-          title: t.common.clipboard,
-          icon: Icons.content_paste,
-          onTap: () async {
-            final cr = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
-            ref.read(addProfileNotifierProvider.notifier).addClipboard(cr);
-          },
-        ),
         const Gap(AddProfileModalConst.fixBtnsGap),
         FixBtn(
           key: const ValueKey('add_manually_button'),

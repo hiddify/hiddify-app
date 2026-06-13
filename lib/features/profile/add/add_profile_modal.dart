@@ -55,11 +55,11 @@ class AddProfileOptions extends HookConsumerWidget {
     // final isLoadingProfile = ref.watch(addProfileNotifierProvider).isLoading;
     final freeSwitch = ref.watch(freeSwitchNotifierProvider);
     final isDesktop = PlatformUtils.isDesktop;
+    final gapCount = isDesktop ? AddProfileModalConst.fixBtnsGapCountDesktop : AddProfileModalConst.fixBtnsGapCount;
+    final itemCount = isDesktop ? AddProfileModalConst.fixBtnsItemCountDesktop : AddProfileModalConst.fixBtnsItemCount;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final fixBtnsHeight =
-            (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * AddProfileModalConst.fixBtnsGapCount) /
-            AddProfileModalConst.fixBtnsItemCount;
+        final fixBtnsHeight = (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * gapCount) / itemCount;
         final fullHeight = fixBtnsHeight + AddProfileModalConst.navBarHeight + 32;
         final initial = !freeSwitch ? fullHeight : fullHeight + 180;
         var min = !freeSwitch ? fullHeight : fullHeight + 100;

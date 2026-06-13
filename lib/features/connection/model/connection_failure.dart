@@ -34,6 +34,9 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
   @With<ExpectedMeasuredFailure>()
   const factory ConnectionFailure.missiingWarpLicense() = MissingWarpLicense;
 
+  @With<ExpectedMeasuredFailure>()
+  const factory ConnectionFailure.missingPsiphonLicense() = MissingPsiphonLicense;
+
   @override
   ({String type, String? message}) present(TranslationsEn t) {
     return switch (this) {
@@ -53,6 +56,7 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
       InvalidConfig(:final message) => (type: t.errors.singbox.invalidConfig, message: message),
       BackgroundCoreNotAvailable(:final message) => (type: t.errors.connectivity.core, message: message),
       MissingWarpLicense() => (type: t.errors.warp.missingLicense, message: t.errors.warp.missingLicenseMsg),
+      MissingPsiphonLicense() => (type: t.errors.psiphon.missingLicense, message: t.errors.psiphon.missingLicenseMsg),
     };
   }
 }

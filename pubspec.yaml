@@ -56,17 +56,14 @@ dependencies:
   sentry_dart_plugin: ^2.4.1
   sqlite3_flutter_libs: ^0.5.28
 
-  combine: ^0.5.7
   path: ^1.9.0
   loggy: ^2.0.3
-  flutter_loggy: ^2.0.2
   meta: ^1.15.0
   dartx: ^1.2.0
   uuid: ^4.3.3
   tint: ^2.0.1
   accessibility_tools: ^2.2.3
   neat_periodic_task: ^2.0.1
-  watcher: ^1.1.0
   go_router: ^16.2.4
   flutter_animate: ^4.5.0
   flutter_svg: ^2.0.10+1
@@ -77,10 +74,8 @@ dependencies:
   upgrader: ^11.3.0
   toastification: ^2.3.0
   version: ^3.0.2
-  posix: ^6.0.1
   qr_flutter: ^4.1.0
   flutter_displaymode: ^0.6.0
-  flutter_loggy_dio: ^3.1.0
   dio_smart_retry: ^7.0.1
   cupertino_http: ^2.0.1
   dart_mappable: ^4.2.1
@@ -95,20 +90,17 @@ dependencies:
   circle_flags:
     git: https://github.com/hiddify-com/flutter_circle_flags.git
   fixnum: ^1.1.0
-  grpc: ^4.0.1
-  bottom_navy_bar: ^6.1.0
   # # for using protobuf install protoc from this link -> https://github.com/protocolbuffers/protobuf/releases
   # # then add path to "environment variable" e.g. -> C:\src\protoc-28.3-win64\bin
   # # then active "protoc_plugin" by running this command -> dart pub global activate protoc_plugin
   # # then add path to "environment variable" e.g. -> C:\Users\%USERPROFILE%\AppData\Local\Pub\Cache\global_packages\protoc_plugin\bin
-  protobuf: ^2.0.0
+  protobuf: ^5.0.0
+  grpc: ^4.0.1
   dynamic_color: ^1.7.0
   flutter_typeahead: ^5.0.1
   # flutter_platform_widgets: ^7.0.1
   simple_icons: ^10.1.3
-  animated_notch_bottom_bar: ^1.0.0
-  basic_utils: 5.7.0
-  showcaseview: 3.0.0
+  basic_utils: ^5.7.0
   text_scroll: ^0.2.0
   flutter_markdown_plus: ^1.0.6
   # platform-specific  settings
@@ -127,12 +119,7 @@ dependencies:
   app_links: ^6.4.0
   # Used for registering custom schemes in the Windows registry
   win32: ^5.12.0
-  # Working with Wifi(get LAN IP address)
-  # Web platform not supported
-  # platform-specific settings
-  network_info_plus: ^6.1.4
   humanizer: ^3.0.1
-  dependency_validator: ^5.0.2
 
 dev_dependencies:
   # flutter_test:

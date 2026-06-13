@@ -54,6 +54,7 @@
     "psiphon": "Psiphon",
     "profile": "Perfil",
     "configuration": "Configuración",
+    "file": "Archivo",
     "interval": {
       "day": {
         "zero": "",
@@ -437,7 +438,12 @@
         "tproxyPort": "Puerto de proxy transparente",
         "directPort": "Puerto de Directo",
         "redirectPort": "Puerto de redirección",
-        "allowConnectionFromLan": "Compartir VPN en la red local"
+        "lanSharing": "Compartir VPN",
+        "lanSharingPasswordNotSet": "Contraseña no establecida",
+        "lanSharingPassword": "Contraseña de compartir VPN",
+        "copyLink": "Copiar enlace",
+        "qrCode": "Código QR",
+        "lanIPError": "Error al obtener la IP local"
       },
       "tlsTricks": {
         "title": "Trucos de TLS",
@@ -580,6 +586,10 @@
       "title": "Consentimiento de Cloudflare WARP",
       "description(rich)": "Cloudflare WARP es un proveedor de VPN WireGuard gratuito. Al habilitar esta opción, aceptas los ${tos(Términos de servicio)} y la ${privacy(Política de privacidad)} de Cloudflare WARP."
     },
+    "psiphonLicense": {
+      "title": "Acuerdo de licencia de Psiphon",
+      "description(rich)": "Al usar Psiphon, aceptas los ${tos(Términos de servicio)} y reconoces la ${privacy(Política de privacidad)}. Por favor, léelos detenidamente antes de continuar."
+    },
     "newVersion": {
       "title": "Actualización disponible",
       "msg": "Hay disponible una nueva versión de @:common.appTitle. ¿Quieres actualizar ahora?",
@@ -613,6 +623,10 @@
           "title": "Eliminar regla",
           "msg": "¿Estás seguro de que quieres eliminar la regla \"$rulename\"?"
         }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "¿Añadir perfil?",
+        "message": "Un enlace externo de \"${host}\" está solicitando añadir un nuevo perfil. ¿Quieres importarlo?"
       }
     },
     "experimentalNotice": {
@@ -701,7 +715,11 @@
     },
     "warp": {
       "missingLicense": "Falta la licencia de WARP",
-      "missingLicenseMsg": "El perfil seleccionado utiliza la función WARP. Para usar esta función, debes aceptar la licencia de WARP."
+      "missingLicenseMsg": "El perfil seleccionado utiliza la función WARP; para utilizar esta función, debe aceptarse la licencia de WARP"
+    },
+    "psiphon": {
+      "missingLicense": "Se requiere licencia de Psiphon",
+      "missingLicenseMsg": "El perfil seleccionado utiliza la función Psiphon; para utilizar esta función, debe aceptarse la licencia de Psiphon"
     }
   }
 }

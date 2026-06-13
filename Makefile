@@ -50,9 +50,9 @@ CORE_NAME=hiddify-lib
 LIB_NAME=hiddify-core
 
 ifeq ($(CHANNEL),prod)
-	CORE_URL=https://github.com/hiddify/hiddify-next-core/releases/download/v$(core.version)
+	CORE_URL=https://github.com/hiddify/hiddify-core/releases/download/v$(core.version)
 else
-	CORE_URL=https://github.com/hiddify/hiddify-next-core/releases/download/draft
+	CORE_URL=https://github.com/hiddify/hiddify-core/releases/download/draft
 endif
 
 ifeq ($(CHANNEL),prod)
@@ -422,7 +422,7 @@ DOCKER_CMD := \
 	set -e; \
 	echo '** Copying source code to container...'; \
 	mkdir -p /app; \
-	cp -r /host/. /app/; \
+	tar -cf - --exclude='build' --exclude='.dart_tool' --exclude='dist' --exclude='dist_docker' --exclude='android' --exclude='windows' --exclude='ios' --exclude='macos' --exclude='.git' -C /host . | tar -xf - -C /app; \
 	cd /app; \
 	make linux-flutter-sync; \
 	make linux-prepare; \
@@ -439,10 +439,7 @@ DOCKER_CMD := \
 		exit 1; \
 	fi;
 
-linux-docker-release:
-	@$(BLUE)Cleaning main project to reduce context size$(DONE)
-	flutter clean
-	
+linux-docker-release:	
 	@$(BLUE)Building docker image (Cached)$(DONE)
 	docker build -t $(DOCKER_IMAGE_NAME) -f Dockerfile .
 	

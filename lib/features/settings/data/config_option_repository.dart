@@ -109,7 +109,6 @@ abstract class ConfigOptions {
     12334,
     validator: (value) => isPort(value.toString()),
   );
-
   static final tproxyPort = PreferencesNotifier.create<int, int>(
     "tproxy-port",
     12335,
@@ -125,6 +124,11 @@ abstract class ConfigOptions {
     12337,
     validator: (value) => isPort(value.toString()),
   );
+
+  static final enableMixedPort = PreferencesNotifier.create<bool, bool>("enable-mixed-port", true);
+  static final enableTproxyPort = PreferencesNotifier.create<bool, bool>("enable-tproxy-port", true);
+  static final enableRedirectPort = PreferencesNotifier.create<bool, bool>("enable-redirect-port", true);
+  static final enableDirectPort = PreferencesNotifier.create<bool, bool>("enable-direct-port", true);
 
   static final tunImplementation = PreferencesNotifier.create<TunImplementation, String>(
     "tun-implementation",
@@ -173,6 +177,8 @@ abstract class ConfigOptions {
   // static final bypassLan = PreferencesNotifier.create<bool, bool>("bypass-lan", false);
 
   static final allowConnectionFromLan = PreferencesNotifier.create<bool, bool>("allow-connection-from-lan", false);
+
+  static final lanSharingPassword = PreferencesNotifier.create<String, String>("lan_sharing_password", "");
 
   static final enableFakeDns = PreferencesNotifier.create<bool, bool>("enable-fake-dns", false);
 
@@ -338,7 +344,11 @@ abstract class ConfigOptions {
   });
 
   /// preferences to exclude from share and export
-  static final privatePreferencesKeys = {"extra-security.warp.license-key", "unblocker.warp.license-key"};
+  static final privatePreferencesKeys = {
+    "extra-security.warp.license-key",
+    "unblocker.warp.license-key",
+    "lan-sharing-password",
+  };
 
   static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>> preferences = {
     "region": region,
@@ -357,6 +367,10 @@ abstract class ConfigOptions {
     "tproxy-port": tproxyPort,
     "direct-port": directPort,
     "redirect-port": redirectPort,
+    "enable-mixed-port": enableMixedPort,
+    "enable-tproxy-port": enableTproxyPort,
+    "enable-direct-port": enableDirectPort,
+    "enable-redirect-port": enableRedirectPort,
     "tun-implementation": tunImplementation,
     "mtu": mtu,
     "strict-route": strictRoute,
@@ -365,6 +379,7 @@ abstract class ConfigOptions {
     "clash-api-port": clashApiPort,
     // "bypass-lan": bypassLan,
     "allow-connection-from-lan": allowConnectionFromLan,
+    "lan-sharing-password": lanSharingPassword,
     // "enable-dns-routing": enableDnsRouting,
 
     // mux
@@ -468,6 +483,10 @@ abstract class ConfigOptions {
       tproxyPort: ref.watch(tproxyPort),
       directPort: ref.watch(directPort),
       redirectPort: ref.watch(redirectPort),
+      enableMixedPort: ref.watch(enableMixedPort),
+      enableTproxyPort: ref.watch(enableTproxyPort),
+      enableDirectPort: ref.watch(enableDirectPort),
+      enableRedirectPort: ref.watch(enableRedirectPort),
       tunImplementation: ref.watch(tunImplementation),
       mtu: ref.watch(mtu),
       strictRoute: ref.watch(strictRoute),
@@ -480,6 +499,7 @@ abstract class ConfigOptions {
       setSystemProxy: mode == ServiceMode.systemProxy,
       // bypassLan: ref.watch(bypassLan),
       allowConnectionFromLan: ref.watch(allowConnectionFromLan),
+      lanSharingPassword: ref.watch(lanSharingPassword),
       enableFakeDns: ref.watch(enableFakeDns),
       // enableDnsRouting: ref.watch(enableDnsRouting),
       independentDnsCache: ref.watch(independentDnsCache),

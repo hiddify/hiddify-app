@@ -81,6 +81,7 @@ abstract class UserOverride with _$UserOverride {
     // hours
     int? updateInterval,
     bool? enableWarp,
+    bool? enablePsiphon,
     bool? enableFragment,
   }) = _UserOverride;
 

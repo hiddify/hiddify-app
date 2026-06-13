@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/chain/overview/chain_quick_settings.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/widget/lan_sharing_tile.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -36,6 +37,8 @@ class QuickSettingsModal extends HookConsumerWidget {
                 onSelectionChanged: (newSet) => ref.read(ConfigOptions.serviceMode.notifier).update(newSet.first),
               ),
             ),
+            const Divider(height: 2, thickness: 2),
+            const LanSharingPreferenceWidget(),
             const Divider(height: 2, thickness: 2),
             const ChainQuickSettings(),
             // const Gap(12),

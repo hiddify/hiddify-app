@@ -166,7 +166,7 @@ class ChainQuickSettings extends HookConsumerWidget {
                     ],
                   ),
                   const Gap(4),
-                  Icon(Icons.arrow_downward_rounded, size: 20, color: theme.colorScheme.primary),
+                  Icon(Icons.arrow_upward_rounded, size: 20, color: theme.colorScheme.primary),
                   const Gap(4),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),

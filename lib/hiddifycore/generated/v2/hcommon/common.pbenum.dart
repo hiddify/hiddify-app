@@ -1,28 +1,39 @@
-///
-//  Generated code. Do not modify.
-//  source: v2/hcommon/common.proto
+// This is a generated file - do not edit.
 //
-// @dart = 2.12
-// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
+// Generated from v2/hcommon/common.proto.
 
-// ignore_for_file: UNDEFINED_SHOWN_NAME
+// @dart = 3.3
+
+// ignore_for_file: annotate_overrides, camel_case_types, comment_references
+// ignore_for_file: constant_identifier_names
+// ignore_for_file: curly_braces_in_flow_control_structures
+// ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:core' as $core;
+
 import 'package:protobuf/protobuf.dart' as $pb;
 
 class ResponseCode extends $pb.ProtobufEnum {
-  static const ResponseCode OK = ResponseCode._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'OK');
-  static const ResponseCode FAILED = ResponseCode._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'FAILED');
-  static const ResponseCode AUTH_NEED = ResponseCode._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'AUTH_NEED');
+  static const ResponseCode OK = ResponseCode._(0, _omitEnumNames ? '' : 'OK');
+  static const ResponseCode FAILED =
+      ResponseCode._(1, _omitEnumNames ? '' : 'FAILED');
+  static const ResponseCode AUTH_NEED =
+      ResponseCode._(2, _omitEnumNames ? '' : 'AUTH_NEED');
 
-  static const $core.List<ResponseCode> values = <ResponseCode> [
+  static const $core.List<ResponseCode> values = <ResponseCode>[
     OK,
     FAILED,
     AUTH_NEED,
   ];
 
-  static final $core.Map<$core.int, ResponseCode> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static ResponseCode? valueOf($core.int value) => _byValue[value];
+  static final $core.List<ResponseCode?> _byValue =
+      $pb.ProtobufEnum.$_initByValueList(values, 2);
+  static ResponseCode? valueOf($core.int value) =>
+      value < 0 || value >= _byValue.length ? null : _byValue[value];
 
-  const ResponseCode._($core.int v, $core.String n) : super(v, n);
+  const ResponseCode._(super.value, super.name);
 }
 
+const $core.bool _omitEnumNames =
+    $core.bool.fromEnvironment('protobuf.omit_enum_names');

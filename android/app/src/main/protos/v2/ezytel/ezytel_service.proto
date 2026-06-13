@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package ezytel;
+option go_package = "github.com/hiddify/hiddify-core/v2/ezytel";
+option java_package = "com.hiddify.core.api.v2.ezytel";
+import "v2/ezytel/ezytel.proto";
+
+// Ezytel exposes the Telegram public-channel viewer originally shipped as
+// the ezytel.zip PHP app. Traffic to t.me is routed through Google's
+// translate.goog domain front so it reaches users behind GFW-style filters.
+service Ezytel {
+  rpc GetChannelInfo (ChannelInfoRequest) returns (ChannelInfo);
+  rpc GetChannelMessages (ChannelMessagesRequest) returns (ChannelMessagesResponse);
+  rpc ProxyImage (ProxyImageRequest) returns (ProxyImageResponse);
+  rpc ParseChannels (ParseChannelsRequest) returns (ParseChannelsResponse);
+}

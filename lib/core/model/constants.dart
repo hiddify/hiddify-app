@@ -20,8 +20,10 @@ const kAnimationDuration = Duration(milliseconds: 250);
 
 abstract class AddProfileModalConst {
   static const fixBtnsGap = 16.0;
-  static const fixBtnsGapCount = 4;
-  static const fixBtnsItemCount = 3;
+  static const fixBtnsGapCount = 5;
+  static const fixBtnsGapCountDesktop = 4;
+  static const fixBtnsItemCount = 4;
+  static const fixBtnsItemCountDesktop = 3;
   static const navBarGap = 16.0;
   static const navBarBottomGap = 4.0;
   //switch default height
@@ -71,6 +73,16 @@ abstract class WarpConst {
   static const url = <String, String>{
     WarpConst.warpTermsOfServiceKey: Constants.cfWarpTermsOfService,
     WarpConst.warpPrivacyPolicyKey: Constants.cfWarpPrivacyPolicy,
+  };
+}
+
+abstract class PsiphonConst {
+  static const psiphonConsentGiven = "psiphon-consent-given";
+  static const psiphonTermsOfServiceKey = 'psiphon-terms-of-service';
+  static const psiphonPrivacyPolicyKey = 'psiphon-privacy-policy';
+  static const url = <String, String>{
+    PsiphonConst.psiphonTermsOfServiceKey: "https://psiphon.ca/en/license.html",
+    PsiphonConst.psiphonPrivacyPolicyKey: "https://psiphon.ca/en/privacy.html",
   };
 }
 

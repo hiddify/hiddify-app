@@ -54,6 +54,7 @@
     "psiphon": "Psiphon",
     "profile": "Profil",
     "configuration": "Configuration",
+    "file": "Fichier",
     "interval": {
       "day": {
         "zero": "",
@@ -437,7 +438,12 @@
         "tproxyPort": "Port de proxy transparent",
         "directPort": "Port direct local",
         "redirectPort": "Port de redirection",
-        "allowConnectionFromLan": "Partager le VPN sur le réseau local"
+        "lanSharing": "Partage VPN",
+        "lanSharingPasswordNotSet": "Mot de passe non défini",
+        "lanSharingPassword": "Mot de passe du partage VPN",
+        "copyLink": "Copier le lien",
+        "qrCode": "Code QR",
+        "lanIPError": "Échec de l'obtention de l'adresse IP locale"
       },
       "tlsTricks": {
         "title": "Astuces TLS",
@@ -580,6 +586,10 @@
       "title": "Consentement Cloudflare WARP",
       "description(rich)": "Cloudflare WARP est un fournisseur VPN WireGuard gratuit. En activant cette option, vous acceptez les ${tos(Conditions d'utilisation)} et la ${privacy(Politique de confidentialité)} de Cloudflare WARP."
     },
+    "psiphonLicense": {
+      "title": "Contrat de licence Psiphon",
+      "description(rich)": "En utilisant Psiphon, vous acceptez les ${tos(Conditions d'utilisation)} et reconnaissez la ${privacy(Politique de confidentialité)}. Veuillez les lire attentivement avant de continuer."
+    },
     "newVersion": {
       "title": "Mise à jour disponible",
       "msg": "Une nouvelle version de @:common.appTitle est disponible. Voulez-vous mettre à jour maintenant ?",
@@ -701,7 +711,11 @@
     },
     "warp": {
       "missingLicense": "Licence WARP manquante",
-      "missingLicenseMsg": "Le profil sélectionné utilise la fonctionnalité WARP. Pour utiliser cette fonctionnalité, vous devez accepter la licence WARP."
+      "missingLicenseMsg": "Le profil sélectionné utilise la fonctionnalité WARP ; pour utiliser cette fonctionnalité, vous devez accepter la licence WARP"
+    },
+    "psiphon": {
+      "missingLicense": "Licence Psiphon requise",
+      "missingLicenseMsg": "Le profil sélectionné utilise la fonctionnalité Psiphon ; pour utiliser cette fonctionnalité, vous devez accepter la licence Psiphon"
     }
   }
 }

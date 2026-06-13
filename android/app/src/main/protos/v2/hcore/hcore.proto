@@ -230,6 +230,6 @@ message LogRequest {
 message StopRequest{
 }
 
-
-
-
+message LANIPResponse {
+  string ip = 1;
+}

@@ -102,18 +102,33 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
           .mapLeft((l) => ConnectionFailure.invalidConfigOption(null, l))
           .flatMap(
             (overridedOptions) => TaskEither.tryCatch(() async {
-              final isWarpLicenseAgreed = ref.read(Preferences.warpConsentGiven) == true;
-              final isWarpEnabled =
-                  overridedOptions.unblocker.mode.isWarp() || overridedOptions.extraSecurity.mode.isWarp();
-              if (!isWarpLicenseAgreed && isWarpEnabled) {
-                final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense();
-                if (isAgreed == true) {
-                  await ref.read(Preferences.warpConsentGiven.notifier).update(true);
-                  // return (await applyConfigOption(prof).run()).match((l) => throw l, (_) => unit);
-                } else {
-                  throw const MissingWarpLicense();
+              if (!overridedOptions.chainStatus.isOff()) {
+                final isWarpLicenseAgreed = ref.read(Preferences.warpConsentGiven) == true;
+                final isWarpEnabled =
+                    overridedOptions.unblocker.mode.isWarp() || overridedOptions.extraSecurity.mode.isWarp();
+                if (!isWarpLicenseAgreed && isWarpEnabled) {
+                  final isAgreed = await ref.read(dialogNotifierProvider.notifier).showWarpLicense();
+                  if (isAgreed == true) {
+                    await ref.read(Preferences.warpConsentGiven.notifier).update(true);
+                    // return (await applyConfigOption(prof).run()).match((l) => throw l, (_) => unit);
+                  } else {
+                    throw const MissingWarpLicense();
+                  }
+                }
+
+                final isPsiphonLicenseAgreed = ref.read(Preferences.psiphonConsentGiven) == true;
+                final isPsiphonEnabled =
+                    overridedOptions.unblocker.mode.isPsiphon() || overridedOptions.extraSecurity.mode.isPsiphon();
+                if (!isPsiphonLicenseAgreed && isPsiphonEnabled) {
+                  final isAgreed = await ref.read(dialogNotifierProvider.notifier).showPsiphonLicense();
+                  if (isAgreed == true) {
+                    await ref.read(Preferences.psiphonConsentGiven.notifier).update(true);
+                  } else {
+                    throw const MissingPsiphonLicense();
+                  }
                 }
               }
+
               _configOptionsSnapshot = overridedOptions;
               await singbox.changeOptions(overridedOptions).run();
               return unit;

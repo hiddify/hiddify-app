@@ -306,7 +306,7 @@ class HiddifyCoreService with InfraLogger {
       yield* core.bgClient
           .mainOutboundsInfo(Empty())
           .map((event) {
-            return latest = event.items;
+            return latest = event.items.toList();
           })
           .startWith(latest);
     } catch (e) {
@@ -574,5 +574,17 @@ class HiddifyCoreService with InfraLogger {
         await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL));
       } catch (e) {}
     }
+  }
+
+  TaskEither<String, LANIPResponse> getLANIP() {
+    return TaskEither(() async {
+      try {
+        final response = await core.fgClient.getLANIP(Empty());
+        return right(response);
+      } catch (e) {
+        loggy.error("failed to get LAN IP: $e");
+        return left(e.toString());
+      }
+    });
   }
 }

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/settings/widget/lan_sharing_tile.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:network_info_plus/network_info_plus.dart';
 
-class InboundOptionsPage extends HookConsumerWidget {
+class InboundOptionsPage extends HookConsumerWidget with AppLogger {
   const InboundOptionsPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -48,6 +47,7 @@ class InboundOptionsPage extends HookConsumerWidget {
             inputToValue: int.tryParse,
             digitsOnly: true,
             validateInput: isPort,
+            trailing: SwitchPreferenceWidget(preference: ConfigOptions.enableMixedPort),
           ),
           if (PlatformUtils.isLinux)
             ValuePreferenceWidget(
@@ -58,6 +58,7 @@ class InboundOptionsPage extends HookConsumerWidget {
               inputToValue: int.tryParse,
               digitsOnly: true,
               validateInput: isPort,
+              trailing: SwitchPreferenceWidget(preference: ConfigOptions.enableTproxyPort),
             ),
           if (PlatformUtils.isLinux || PlatformUtils.isMacOS)
             ValuePreferenceWidget(
@@ -68,6 +69,7 @@ class InboundOptionsPage extends HookConsumerWidget {
               inputToValue: int.tryParse,
               digitsOnly: true,
               validateInput: isPort,
+              trailing: SwitchPreferenceWidget(preference: ConfigOptions.enableRedirectPort),
             ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.directPort),
@@ -77,24 +79,9 @@ class InboundOptionsPage extends HookConsumerWidget {
             inputToValue: int.tryParse,
             digitsOnly: true,
             validateInput: isPort,
+            trailing: SwitchPreferenceWidget(preference: ConfigOptions.enableDirectPort),
           ),
-          SwitchListTile.adaptive(
-            title: Text(t.pages.settings.inbound.allowConnectionFromLan),
-            secondary: const Icon(Icons.share_rounded),
-            value: ref.watch(ConfigOptions.allowConnectionFromLan),
-            onChanged: (bool value) async {
-              await ref.read(ConfigOptions.allowConnectionFromLan.notifier).update(value);
-              if (value == true) {
-                final ip = await NetworkInfo().getWifiIP();
-                // final ipp = Networkinfo
-                if (ip == null) return;
-                final port = ref.read(ConfigOptions.mixedPort);
-                final link = '#profile-title: LAN only\nsocks://$ip:$port#LAN only';
-                final message = 'socks://$ip:$port';
-                await ref.read(dialogNotifierProvider.notifier).showQrCode(link, message: message);
-              }
-            },
-          ),
+          const LanSharingPreferenceWidget(),
         ],
       ),
     );

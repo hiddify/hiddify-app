@@ -21,7 +21,9 @@ class ChainTimelineHeader extends HookConsumerWidget {
       margin: const EdgeInsetsDirectional.only(end: 16),
       height: 32,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? theme.colorScheme.surfaceContainerHighest
+            : Colors.black12,
         borderRadius: const BorderRadiusDirectional.only(topEnd: Radius.circular(100), bottomEnd: Radius.circular(100)),
       ),
       child: Row(

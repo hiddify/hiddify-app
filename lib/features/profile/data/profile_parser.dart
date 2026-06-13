@@ -46,6 +46,7 @@ class ProfileParser {
     'support-url',
     'profile-web-page-url',
     'enable-warp',
+    'enable-psiphon',
     'enable-fragment',
   ];
 
@@ -425,6 +426,11 @@ class ProfileParser {
     if (headers['enable-warp'].toString() == 'true' || userOverride?.enableWarp == true) {
       headers['chain-status'] = 'extra_security';
       headers['extra-security'] = {'mode': 'warp'};
+    }
+
+    if (headers['enable-psiphon'].toString() == 'true' || userOverride?.enablePsiphon == true) {
+      headers['chain-status'] = 'extra_security';
+      headers['extra-security'] = {'mode': 'psiphon'};
     }
 
     if (headers['enable-fragment'].toString() == 'true' || userOverride?.enableFragment == true) {

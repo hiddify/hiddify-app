@@ -27,7 +27,8 @@ service Core {
   rpc GetSystemProxyStatus (hcommon.Empty) returns (SystemProxyStatus);
   rpc SetSystemProxyEnabled (SetSystemProxyEnabledRequest) returns (hcommon.Response);
   rpc LogListener (LogRequest) returns (stream LogMessage); 
-  rpc Close (CloseRequest) returns (hcommon.Empty); 
+  rpc Close (CloseRequest) returns (hcommon.Empty);
+  rpc GetLANIP (hcommon.Empty) returns (LANIPResponse);
 }
 
 

@@ -54,6 +54,7 @@
     "psiphon": "Psiphon",
     "profile": "Profil",
     "configuration": "Konfigurasi",
+    "file": "Berkas",
     "interval": {
       "day": {
         "zero": "",
@@ -437,7 +438,12 @@
         "tproxyPort": "Port proksi transparan",
         "directPort": "Port direct",
         "redirectPort": "Port pengalihan",
-        "allowConnectionFromLan": "Bagikan VPN di jaringan lokal"
+        "lanSharing": "Berbagi VPN",
+        "lanSharingPasswordNotSet": "Kata sandi belum diatur",
+        "lanSharingPassword": "Kata sandi berbagi VPN",
+        "copyLink": "Salin tautan",
+        "qrCode": "Kode QR",
+        "lanIPError": "Gagal mendapatkan alamat IP lokal"
       },
       "tlsTricks": {
         "title": "Trik TLS",
@@ -580,6 +586,10 @@
       "title": "Persetujuan Cloudflare WARP",
       "description(rich)": "Cloudflare WARP adalah penyedia VPN WireGuard gratis. Dengan mengaktifkan opsi ini, Anda menyetujui ${tos(Ketentuan Layanan)} dan ${privacy(Kebijakan Privasi)} Cloudflare WARP."
     },
+    "psiphonLicense": {
+      "title": "Perjanjian Lisensi Psiphon",
+      "description(rich)": "Dengan menggunakan Psiphon, Anda menyetujui ${tos(Syarat Layanan)} dan mengakui ${privacy(Kebijakan Privasi)}. Harap baca dengan teliti sebelum melanjutkan."
+    },
     "newVersion": {
       "title": "Pembaruan tersedia",
       "msg": "Versi baru @:common.appTitle tersedia. Apakah Anda ingin memperbarui sekarang?",
@@ -613,6 +623,10 @@
           "title": "Hapus aturan",
           "msg": "Anda yakin ingin menghapus aturan \"$rulename\"?"
         }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "Tambah Profil?",
+        "message": "Tautan eksternal dari \"${host}\" meminta untuk menambahkan profil baru. Apakah Anda ingin mengimpornya?"
       }
     },
     "experimentalNotice": {
@@ -701,7 +715,11 @@
     },
     "warp": {
       "missingLicense": "Lisensi WARP hilang",
-      "missingLicenseMsg": "Profil yang dipilih menggunakan fitur WARP. Untuk menggunakan fitur ini, Anda harus menyetujui lisensi WARP."
+      "missingLicenseMsg": "Profil yang dipilih menggunakan fitur WARP; untuk menggunakan fitur ini, Anda harus menyetujui lisensi WARP"
+    },
+    "psiphon": {
+      "missingLicense": "Lisensi Psiphon diperlukan",
+      "missingLicenseMsg": "Profil yang dipilih menggunakan fitur Psiphon; untuk menggunakan fitur ini, Anda harus menyetujui lisensi Psiphon"
     }
   }
 }

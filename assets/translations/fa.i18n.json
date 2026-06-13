@@ -54,6 +54,7 @@
     "psiphon": "سایفون",
     "profile": "پروفایل",
     "configuration": "پیکربندی",
+    "file": "فایل",
     "interval": {
       "day": {
         "zero": "",
@@ -437,7 +438,12 @@
         "tproxyPort": "پورت پروکسی شفاف",
         "directPort": "پورت مستقیم",
         "redirectPort": "پورت تغییر مسیر",
-        "allowConnectionFromLan": "اشتراک VPN در شبکه محلی"
+        "lanSharing": "اشتراک VPN",
+        "lanSharingPasswordNotSet": "رمز عبور تنظیم نشده",
+        "lanSharingPassword": "رمز عبور اشتراک VPN",
+        "copyLink": "کپی لینک",
+        "qrCode": "کد QR",
+        "lanIPError": "خطا در دریافت آدرس IP محلی"
       },
       "tlsTricks": {
         "title": "ترفندهای TLS",
@@ -580,6 +586,10 @@
       "title": "رضایت‌نامه Cloudflare WARP",
       "description(rich)": "Cloudflare WARP یک ارائه‌دهنده رایگان WireGuard VPN است. با فعال کردن این گزینه، شما با ${tos(شرایط خدمات)} و ${privacy(سیاست حفظ حریم خصوصی)} Cloudflare WARP موافقت می‌کنید."
     },
+    "psiphonLicense": {
+      "title": "قرارداد لایسنس Psiphon",
+      "description(rich)": "با استفاده از Psiphon، شما با ${tos(شرایط خدمات)} موافقت کرده و ${privacy(سیاست حفظ حریم خصوصی)} را تایید می‌کنید. لطفاً پیش از ادامه، آن‌ها را با دقت بخوانید."
+    },
     "newVersion": {
       "title": "به‌روزرسانی موجود است",
       "msg": "نسخه جدیدی از @:common.appTitle در دسترس است. آیا مایل به به‌روزرسانی هستید؟",
@@ -613,6 +623,10 @@
           "title": "حذف قانون",
           "msg": "آیا از حذف قانون «$rulename» مطمئن هستید؟"
         }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "افزودن پروفایل؟",
+        "message": "یک لینک خارجی از «${host}» درخواست افزودن پروفایل جدید دارد. آیا می‌خواهید آن را وارد کنید؟"
       }
     },
     "experimentalNotice": {
@@ -700,8 +714,12 @@
       "invalidConfig": "پیکربندی نامعتبر"
     },
     "warp": {
-      "missingLicense": "لایسنس WARP",
-      "missingLicenseMsg": "پروفایل انتخاب‌شده از ویژگی WARP استفاده می‌کند؛ برای استفاده از این قابلیت، باید با لایسنس WARP موافقت شود."
+      "missingLicense": "لایسنس WARP لازم است",
+      "missingLicenseMsg": "پروفایل انتخاب‌شده از ویژگی WARP استفاده می‌کند؛ برای استفاده از این قابلیت، باید با لایسنس WARP موافقت شود"
+    },
+    "psiphon": {
+      "missingLicense": "لایسنس Psiphon لازم است",
+      "missingLicenseMsg": "پروفایل انتخاب‌شده از ویژگی Psiphon استفاده می‌کند؛ برای استفاده از این قابلیت، باید با لایسنس Psiphon موافقت شود"
     }
   }
 }

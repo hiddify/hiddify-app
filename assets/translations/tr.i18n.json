@@ -54,6 +54,7 @@
     "psiphon": "Psiphon",
     "profile": "Profil",
     "configuration": "Yapılandırma",
+    "file": "Dosya",
     "interval": {
       "day": {
         "zero": "",
@@ -437,7 +438,12 @@
         "tproxyPort": "Şeffaf proxy portu",
         "directPort": "Direct portu",
         "redirectPort": "Yönlendirme portu",
-        "allowConnectionFromLan": "VPN'i yerel ağda paylaş"
+        "lanSharing": "VPN paylaşımı",
+        "lanSharingPasswordNotSet": "Şifre ayarlanmamış",
+        "lanSharingPassword": "VPN paylaşım şifresi",
+        "copyLink": "Bağlantıyı kopyala",
+        "qrCode": "QR Kod",
+        "lanIPError": "Yerel IP adresi alınamadı"
       },
       "tlsTricks": {
         "title": "TLS hileleri",
@@ -580,6 +586,10 @@
       "title": "Cloudflare WARP onayı",
       "description(rich)": "Cloudflare WARP ücretsiz bir WireGuard VPN sağlayıcısıdır. Bu seçeneği etkinleştirerek Cloudflare WARP'ın ${tos(Hizmet Şartları)}'nı ve ${privacy(Gizlilik Politikası)}'nı kabul etmiş olursunuz."
     },
+    "psiphonLicense": {
+      "title": "Psiphon Lisans Sözleşmesi",
+      "description(rich)": "Psiphon'u kullanarak, ${tos(Hizmet Şartları)}'nı kabul etmiş olursunuz ve ${privacy(Gizlilik Politikası)}'nı onaylamış olursunuz. Lütfen devam etmeden önce bunları dikkatle okuyun."
+    },
     "newVersion": {
       "title": "Güncelleme mevcut",
       "msg": "@:common.appTitle'ın yeni bir sürümü mevcut. Şimdi güncellemek ister misiniz?",
@@ -613,6 +623,10 @@
           "title": "Kuralı sil",
           "msg": "\"$rulename\" kuralını silmek istediğinizden emin misiniz?"
         }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "Profil ekle?",
+        "message": "\"${host}\" adresinden bir dış bağlantı yeni bir profil eklemek istiyor. İçe aktarmak ister misiniz?"
       }
     },
     "experimentalNotice": {
@@ -700,8 +714,12 @@
       "invalidConfig": "Geçersiz yapılandırma"
     },
     "warp": {
-      "missingLicense": "WARP lisansı eksik",
-      "missingLicenseMsg": "Seçili profil WARP özelliğini kullanıyor. Bu özelliği kullanmak için WARP lisansını kabul etmeniz gerekir."
+      "missingLicense": "WARP lisansı gerekli",
+      "missingLicenseMsg": "Seçili profil WARP özelliğini kullanıyor. Bu özelliği kullanmak için WARP lisansını kabul etmeniz gerekir"
+    },
+    "psiphon": {
+      "missingLicense": "Psiphon lisansı gerekli",
+      "missingLicenseMsg": "Seçili profil Psiphon özelliğini kullanıyor; bu özelliği kullanmak için Psiphon lisansı kabul edilmelidir"
     }
   }
 }
