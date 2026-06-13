@@ -28,7 +28,12 @@ import 'package:meta/meta.dart';
 /// - local: fallback to protocol, extracted from content by protocol()
 
 class ProfileParser {
-  static const infiniteTrafficThreshold = 920_233_720_368;
+  // Synthetic sentinel assigned to `total` for "unlimited" traffic (subscription-userinfo total=0 or
+  // missing). It MUST stay above the 10 TB "unlimited" threshold the UI uses to decide whether to show
+  // "∞" (isInfinitSize() in lib/utils/number_formatters.dart, and profile_tile.dart). The previous
+  // value (~857 GiB) was below that gate, so total=0 rendered as a finite cap / "quota exceeded".
+  // See https://github.com/hiddify/hiddify-app/issues/1974 . 1000 TiB.
+  static const infiniteTrafficThreshold = 1_099_511_627_776_000;
   static const infiniteTimeThreshold = 92_233_720_368;
   static const allowedOverrideConfigs = [
     'connection-test-url',
