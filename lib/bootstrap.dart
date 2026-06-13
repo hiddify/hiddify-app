@@ -77,7 +77,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     } else {
       Logger.bootstrap.debug("silent start, remain hidden accessible via tray");
     }
-    await _init("auto start service", () => container.read(autoStartNotifierProvider.future));
+    await _safeInit("auto start service", () => container.read(autoStartNotifierProvider.future));
   }
   await _init("logs repository", () => container.read(logRepositoryProvider.future));
   await _init("logger controller", () => LoggerController.postInit(debug));
