@@ -113,12 +113,10 @@ class VPNManager: ObservableObject {
     
     private func enableVPNManager() async throws {
         manager.isEnabled = true
-        let rule = NEOnDemandRuleConnect()
-        rule.interfaceTypeMatch = .any
-        rule.probeURL = URL(string: "http://captive.apple.com")
-        manager.onDemandRules = [rule]
-        manager.isOnDemandEnabled = true
-        
+        // keep on-demand off so the native iOS VPN toggle can turn the tunnel off
+        manager.onDemandRules = []
+        manager.isOnDemandEnabled = false
+
         do {
             try await manager.saveToPreferences()
             try await manager.loadFromPreferences()
