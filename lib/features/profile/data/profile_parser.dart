@@ -287,25 +287,39 @@ class ProfileParser {
   }
 
   static SubscriptionInfo? _parseSubscriptionInfo(String subInfoStr) {
-    final values = subInfoStr.split(';');
-    final map = {for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt()};
-    // Only upload+download are required. total/expire are optional - many panels omit them (e.g.
-    // `expire` for no-expiry plans) - and are already defaulted to the "unlimited" sentinels below.
-    // Requiring their keys here discarded the WHOLE subscription-userinfo when either was absent,
-    // which silently drops the usage bar AND the support-url / profile-web-page-url tiles.
-    if (map case {"upload": final upload?, "download": final download?}) {
-      final total = map["total"];
-      var expire = map["expire"];
-      final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
-      expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
-      return SubscriptionInfo(
-        upload: upload,
-        download: download,
-        total: total1,
-        expire: DateTime.fromMillisecondsSinceEpoch(expire * 1000),
-      );
+    // Parse "key=value;key=value" defensively: skip any segment that isn't a well-formed key=value
+    // pair instead of throwing. A malformed segment (no '=') would otherwise bubble up through
+    // parse()'s tryCatch and drop the WHOLE profile.
+    final map = <String, int?>{};
+    for (final segment in subInfoStr.split(';')) {
+      final parts = segment.split('=');
+      if (parts.length < 2) continue;
+      // Guard toInt() against non-finite values: num.tryParse of "1e999"/"Infinity"/"NaN" yields a
+      // non-finite double and double.toInt() throws on those, which would again take down the whole
+      // profile parse. Treat them as absent so the field falls back gracefully (null / unlimited sentinel).
+      final value = num.tryParse(parts[1].trim());
+      map[parts.first.trim()] = (value != null && value.isFinite) ? value.toInt() : null;
     }
-    return null;
+
+    // Only upload+download are required. total/expire are optional - panels omit total for unlimited
+    // plans and expire for no-expiry plans - and default to the "unlimited" sentinels below. Requiring
+    // their keys discarded the WHOLE subscription-userinfo when either was absent, silently dropping the
+    // usage bar AND the support-url / profile-web-page-url tiles parsed alongside it.
+    final upload = map['upload'];
+    final download = map['download'];
+    if (upload == null || download == null) return null;
+
+    final total = map['total'];
+    final expire = map['expire'];
+    final resolvedTotal = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
+    final resolvedExpire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
+
+    return SubscriptionInfo(
+      upload: upload,
+      download: download,
+      total: resolvedTotal,
+      expire: DateTime.fromMillisecondsSinceEpoch(resolvedExpire * 1000),
+    );
   }
 
   @visibleForTesting

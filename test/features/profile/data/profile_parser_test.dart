@@ -162,5 +162,222 @@ void main() {
         });
       });
     });
+
+    test("Should keep subscription info when total and expire are omitted", () {
+      // Panels routinely omit total (unlimited plans) and expire (no-expiry plans). The header must
+      // still produce a SubscriptionInfo, and the support-url / profile-web-page-url tiles parsed
+      // alongside it must still be applied. Regression test for #2242.
+      final headers = <String, List<String>>{
+        "profile-title": ["title"],
+        "subscription-userinfo": ["upload=100;download=200"],
+        "profile-web-page-url": [validBaseUrl],
+        "support-url": [validSupportUrl],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: RemoteProfileEntity(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.subInfo, isNotNull);
+              expect(rp.subInfo!.upload, equals(100));
+              expect(rp.subInfo!.download, equals(200));
+              expect(rp.subInfo!.total, equals(ProfileParser.infiniteTrafficThreshold + 1));
+              expect(
+                rp.subInfo!.expire,
+                equals(DateTime.fromMillisecondsSinceEpoch(ProfileParser.infiniteTimeThreshold * 1000)),
+              );
+              expect(rp.subInfo!.webPageUrl, equals(validBaseUrl));
+              expect(rp.subInfo!.supportUrl, equals(validSupportUrl));
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
+
+    test("Should not drop the profile when a subscription-userinfo segment is malformed", () {
+      // A segment without '=' (here "garbage") previously threw and failed the entire profile parse.
+      // It must now be skipped while the valid fields are still parsed.
+      final headers = <String, List<String>>{
+        "profile-title": ["title"],
+        "subscription-userinfo": ["upload=100;download=200;garbage;total=5000;expire=1704054600"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: RemoteProfileEntity(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.subInfo, isNotNull);
+              expect(rp.subInfo!.upload, equals(100));
+              expect(rp.subInfo!.download, equals(200));
+              expect(rp.subInfo!.total, equals(5000));
+              expect(
+                rp.subInfo!.expire,
+                equals(DateTime.fromMillisecondsSinceEpoch(1704054600 * 1000)),
+              );
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
+
+    test("Should fall back to unlimited traffic when only total is omitted", () {
+      final headers = <String, List<String>>{
+        "profile-title": ["title"],
+        "subscription-userinfo": ["upload=100;download=200;expire=1704054600"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: RemoteProfileEntity(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.subInfo, isNotNull);
+              expect(rp.subInfo!.total, equals(ProfileParser.infiniteTrafficThreshold + 1));
+              expect(rp.subInfo!.expire, equals(DateTime.fromMillisecondsSinceEpoch(1704054600 * 1000)));
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
+
+    test("Should fall back to no-expiry when only expire is omitted", () {
+      final headers = <String, List<String>>{
+        "profile-title": ["title"],
+        "subscription-userinfo": ["upload=100;download=200;total=5000"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: RemoteProfileEntity(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.subInfo, isNotNull);
+              expect(rp.subInfo!.total, equals(5000));
+              expect(
+                rp.subInfo!.expire,
+                equals(DateTime.fromMillisecondsSinceEpoch(ProfileParser.infiniteTimeThreshold * 1000)),
+              );
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
+
+    test("Should not throw the whole profile away on non-finite numeric values", () {
+      // num.tryParse of "1e999"/"Infinity"/"NaN" yields a non-finite double; double.toInt() throws on
+      // those. The parser must degrade them gracefully (unlimited sentinels) instead of failing the parse.
+      final headers = <String, List<String>>{
+        "profile-title": ["title"],
+        "subscription-userinfo": ["upload=100;download=200;total=1e999;expire=NaN"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: RemoteProfileEntity(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.subInfo, isNotNull);
+              expect(rp.subInfo!.total, equals(ProfileParser.infiniteTrafficThreshold + 1));
+              expect(
+                rp.subInfo!.expire,
+                equals(DateTime.fromMillisecondsSinceEpoch(ProfileParser.infiniteTimeThreshold * 1000)),
+              );
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
   });
 }
