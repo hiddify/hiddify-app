@@ -4,6 +4,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -21,6 +22,20 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
 
     final activeProxy = ref.watch(activeProxyNotifierProvider.select((value) => value.valueOrNull));
     final t = ref.watch(translationsProvider).requireValue;
+
+    // Multi-profile mode: the active outbound's tag is prefixed with
+    // `${profileId}::${originalTag}`. Resolve which profile it came from so
+    // we can show "via <profile name>" under the active proxy.
+    final activeProfiles = ref.watch(activeProfilesProvider).valueOrNull ?? const <ProfileEntity>[];
+    final tagDisplay = activeProxy?.tagDisplay ?? '';
+    ProfileEntity? profileOfProxy;
+    for (final p in activeProfiles) {
+      if (tagDisplay.startsWith('${p.id}::')) {
+        profileOfProxy = p;
+        break;
+      }
+    }
+    final profileName = profileOfProxy?.name;
 
     // Early return if required data is not available
     if (connectionState != const Connected() || activeProxy == null) {
@@ -78,13 +93,24 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                   Semantics(
                     label: t.pages.proxies.activeProxy,
                     child: Text(
-                      // getRealOutboundTag(activeProxy),
-                      activeProxy.tagDisplay,
+                      // Strip the `${profileId}::` prefix when showing the
+                      // outbound tag to the user — they don't care about the
+                      // internal id, only the country / server name.
+                      _stripProfilePrefix(activeProxy.tagDisplay),
                       style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (profileName != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      "via $profileName",
+                      style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.primary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                   const SizedBox(height: 4),
                   Row(
                     children: [
@@ -120,6 +146,15 @@ String getRealOutboundTag(OutboundInfo group) {
   var tag = group.tagDisplay;
   if (group.groupSelectedTagDisplay != "" && group.groupSelectedTagDisplay != tag) {
     tag = "$tag → ${group.groupSelectedTagDisplay}";
+  }
+  return tag;
+}
+
+/// Strip the `${profileId}::` prefix from a tag if present.
+String _stripProfilePrefix(String tag) {
+  final idx = tag.indexOf('::');
+  if (idx > 0 && idx < tag.length - 2) {
+    return tag.substring(idx + 2);
   }
   return tag;
 }

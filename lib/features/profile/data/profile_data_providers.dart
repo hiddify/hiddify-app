@@ -1,6 +1,7 @@
 import 'package:hiddify/core/db/provider/db_providers.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/http_client/http_client_provider.dart';
+import 'package:hiddify/features/profile/data/merged_config_builder.dart';
 import 'package:hiddify/features/profile/data/profile_data_source.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
@@ -38,4 +39,17 @@ ProfilePathResolver profilePathResolver(Ref ref) {
 @Riverpod(keepAlive: true)
 ProfileParser profileParser(Ref ref) {
   return ProfileParser(ref: ref, httpClient: ref.watch(httpClientProvider));
+}
+
+/// Merged-config builder used by the multi-profile "pool fastest across all
+/// active profiles" feature. Stateless / cheap — safe to keep alive.
+@Riverpod(keepAlive: true)
+MergedConfigBuilder mergedConfigBuilder(Ref ref) {
+  // Use `.requireValue` because `profileRepositoryProvider` is keepAlive and
+  // initialised at app start, so by the time anyone asks for the builder it
+  // will already be ready.
+  return MergedConfigBuilder(
+    profileRepository: ref.watch(profileRepositoryProvider).requireValue,
+    profilePathResolver: ref.watch(profilePathResolverProvider),
+  );
 }

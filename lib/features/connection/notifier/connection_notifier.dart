@@ -46,11 +46,17 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       }
     });
 
-    ref.listen(activeProfileProvider.select((value) => value.asData?.value), (previous, next) async {
-      if (previous == null) return;
-      final shouldReconnect = next == null || previous.id != next.id;
+    ref.listen(activeProfilesProvider.select((value) => value.asData?.value), (previous, next) async {
+      // Compare the SET of active profile ids — only reconnect when the
+      // active set actually changes. This is what powers "switch to a
+      // different profile by itself" when an outbound in another profile
+      // becomes the fastest.
+      final prevIds = previous?.map((e) => e.id).toSet() ?? <String>{};
+      final nextList = next ?? const <ProfileEntity>[];
+      final nextIds = nextList.map((e) => e.id).toSet();
+      final shouldReconnect = prevIds.length != nextIds.length || !prevIds.containsAll(nextIds);
       if (shouldReconnect) {
-        await reconnect(next);
+        await reconnect(nextList);
       }
     });
     ref.watch(coreRestartSignalProvider);
@@ -93,15 +99,15 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     }
   }
 
-  Future<void> reconnect(ProfileEntity? profile) async {
+  Future<void> reconnect(List<ProfileEntity>? profiles) async {
     if (state case AsyncData(:final value) when value == const Connected()) {
-      if (profile == null) {
-        loggy.info("no active profile, disconnecting");
+      if (profiles == null || profiles.isEmpty) {
+        loggy.info("no active profile(s), disconnecting");
         return _disconnect();
       }
-      loggy.info("active profile changed, reconnecting");
+      loggy.info("active profile set changed, reconnecting with ${profiles.length} profile(s)");
       await ref.read(Preferences.startedByUser.notifier).update(true);
-      await _connectionRepo.reconnect(profile, ref.read(Preferences.disableMemoryLimit)).mapLeft((err) async {
+      await _connectionRepo.reconnect(profiles, ref.read(Preferences.disableMemoryLimit)).mapLeft((err) async {
         loggy.warning("error reconnecting", err);
         state = AsyncError(err, StackTrace.current);
         await ref
@@ -136,12 +142,12 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   }
 
   Future<void> _connectThrottled() async {
-    final activeProfile = await ref.read(activeProfileProvider.future);
-    if (activeProfile == null) {
-      loggy.info("no active profile, not connecting");
+    final activeProfiles = await ref.read(activeProfilesProvider.future);
+    if (activeProfiles.isEmpty) {
+      loggy.info("no active profile(s), not connecting");
       return;
     }
-    await _connectionRepo.connect(activeProfile, ref.read(Preferences.disableMemoryLimit)).mapLeft((
+    await _connectionRepo.connect(activeProfiles, ref.read(Preferences.disableMemoryLimit)).mapLeft((
       ConnectionFailure err,
     ) async {
       loggy.warning("error connecting", err);

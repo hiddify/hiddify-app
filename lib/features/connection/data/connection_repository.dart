@@ -5,6 +5,7 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
+import 'package:hiddify/features/profile/data/merged_config_builder.dart';
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
@@ -20,9 +21,13 @@ abstract interface class ConnectionRepository {
 
   TaskEither<ConnectionFailure, Unit> setup();
   Stream<ConnectionStatus> watchConnectionStatus();
-  TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit);
+  /// Connect using a POOL of active profiles. All their outbounds are merged
+  /// into a single sing-box config, and a top-level `urltest` group named
+  /// `select` is created so the core can auto-pick the fastest outbound
+  /// across every profile.
+  TaskEither<ConnectionFailure, Unit> connect(List<ProfileEntity> activeProfiles, bool disableMemoryLimit);
   TaskEither<ConnectionFailure, Unit> disconnect();
-  TaskEither<ConnectionFailure, Unit> reconnect(ProfileEntity activeProfile, bool disableMemoryLimit);
+  TaskEither<ConnectionFailure, Unit> reconnect(List<ProfileEntity> activeProfiles, bool disableMemoryLimit);
 }
 
 class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements ConnectionRepository {
@@ -32,6 +37,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     required this.singbox,
     required this.configOptionRepository,
     required this.profilePathResolver,
+    required this.mergedConfigBuilder,
   });
 
   final Ref ref;
@@ -41,6 +47,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
 
   final ConfigOptionRepository configOptionRepository;
   final ProfilePathResolver profilePathResolver;
+  final MergedConfigBuilder mergedConfigBuilder;
 
   SingboxConfigOption? _configOptionsSnapshot;
   @override
@@ -78,23 +85,52 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   }
 
   @override
-  TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit) => setup().flatMap(
-    (_) => applyConfigOption(activeProfile).flatMap(
-      (_) => singbox.start(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit),
-      // .mapLeft(UnexpectedConnectionFailure.new),
-    ),
-  );
+  TaskEither<ConnectionFailure, Unit> connect(List<ProfileEntity> activeProfiles, bool disableMemoryLimit) {
+    if (activeProfiles.isEmpty) {
+      return TaskEither.left(const UnexpectedConnectionFailure("no active profile to connect"));
+    }
+    return setup().flatMap((_) => _buildMergedConfig(activeProfiles).flatMap((mergedPath) {
+      final displayName = activeProfiles.length == 1
+          ? activeProfiles.first.name
+          : "Multi (${activeProfiles.length})";
+      // Apply the FIRST active profile's user-override (warp/fragment/etc).
+      // This is a simplification — the global SingboxConfigOption dominates
+      // anyway, and per-profile overrides are rare. If you need per-profile
+      // overrides to be merged, see `ProfileParser.applyProfileOverride` /
+      // `_mergeJson` and extend `applyConfigOption` to take a list.
+      return applyConfigOption(activeProfiles.first).flatMap(
+        (_) => singbox.start(mergedPath, displayName, disableMemoryLimit),
+      );
+    }));
+  }
 
   @override
   TaskEither<ConnectionFailure, Unit> disconnect() => singbox.stop().mapLeft(UnexpectedConnectionFailure.new);
 
   @override
-  TaskEither<ConnectionFailure, Unit> reconnect(ProfileEntity activeProfile, bool disableMemoryLimit) =>
-      applyConfigOption(activeProfile).flatMap(
+  TaskEither<ConnectionFailure, Unit> reconnect(List<ProfileEntity> activeProfiles, bool disableMemoryLimit) {
+    if (activeProfiles.isEmpty) {
+      // Nothing to reconnect to — disconnect instead.
+      return disconnect();
+    }
+    return _buildMergedConfig(activeProfiles).flatMap((mergedPath) {
+      final displayName = activeProfiles.length == 1
+          ? activeProfiles.first.name
+          : "Multi (${activeProfiles.length})";
+      return applyConfigOption(activeProfiles.first).flatMap(
         (_) => singbox
-            .restart(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit)
+            .restart(mergedPath, displayName, disableMemoryLimit)
             .mapLeft(UnexpectedConnectionFailure.new),
       );
+    });
+  }
+
+  /// Build the merged config from [activeProfiles] and return its file path.
+  TaskEither<ConnectionFailure, String> _buildMergedConfig(List<ProfileEntity> activeProfiles) {
+    return mergedConfigBuilder
+        .buildMergedConfig(activeProfiles)
+        .mapLeft((l) => ConnectionFailure.unexpected(l));
+  }
 
   @visibleForTesting
   TaskEither<ConnectionFailure, Unit> applyConfigOption(ProfileEntity prof) =>

@@ -49,6 +49,19 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
     }).run();
   }
 
+  /// Multi-profile mode: toggle the active flag of a single profile without
+  /// touching the others. Called by the per-profile checkbox in the profiles
+  /// list. Reconnecting the tunnel is handled by the listener in
+  /// `ConnectionNotifier` watching `activeProfilesProvider`.
+  Future<Unit> toggleActiveProfile(String id, bool value) async {
+    loggy.debug('setting profile [$id] active=[$value]');
+    await ref.read(hapticServiceProvider.notifier).lightImpact();
+    return _profilesRepo.setActive(id, value).getOrElse((err) {
+      loggy.warning('failed to set [$id] active=[$value]', err);
+      throw err;
+    }).run();
+  }
+
   Future<void> deleteProfile(ProfileEntity profile) async {
     loggy.debug('deleting profile: ${profile.name}');
 
@@ -65,12 +78,14 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
             final t = ref.read(translationsProvider).requireValue;
             ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.delete.success);
 
-            final activePrfile = await ref.read(activeProfileProvider.future);
+            // Pick any remaining active profile for chain fallback ids.
+            final activeProfiles = await ref.read(activeProfilesProvider.future);
+            final firstActive = activeProfiles.firstOrNull;
             if (profile.id == ref.read(ConfigOptions.extraSecurityProfileId)) {
-              ref.read(ConfigOptions.extraSecurityProfileId.notifier).update(activePrfile?.id);
+              ref.read(ConfigOptions.extraSecurityProfileId.notifier).update(firstActive?.id);
             }
             if (profile.id == ref.read(ConfigOptions.unblockerProfileId)) {
-              ref.read(ConfigOptions.unblockerProfileId.notifier).update(activePrfile?.id);
+              ref.read(ConfigOptions.unblockerProfileId.notifier).update(firstActive?.id);
             }
 
             return unit;

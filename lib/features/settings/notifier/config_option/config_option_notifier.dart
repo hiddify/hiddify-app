@@ -34,8 +34,8 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
             await ref.read(connectionNotifierProvider.notifier).toggleConnection();
             await ref.read(connectionNotifierProvider.notifier).toggleConnection();
           } else {
-            final activeProfile = await ref.read(activeProfileProvider.future);
-            return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
+            final activeProfiles = await ref.read(activeProfilesProvider.future);
+            return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfiles);
           }
           state = const AsyncData(false);
         }

@@ -119,11 +119,11 @@ class ConnectionButton extends HookConsumerWidget {
     return _ConnectionButton(
       onTap: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => () async {
-          final activeProfile = await ref.read(activeProfileProvider.future);
-          return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
+          final activeProfiles = await ref.read(activeProfilesProvider.future);
+          return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfiles);
         },
         AsyncData(value: Disconnected()) || AsyncError() => () async {
-          if (ref.read(activeProfileProvider).valueOrNull == null) {
+          if (ref.read(activeProfilesProvider).valueOrNull?.isEmpty ?? true) {
             await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile();
             ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
           }
@@ -136,7 +136,7 @@ class ConnectionButton extends HookConsumerWidget {
               await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
             return await ref
                 .read(connectionNotifierProvider.notifier)
-                .reconnect(await ref.read(activeProfileProvider.future));
+                .reconnect(await ref.read(activeProfilesProvider.future));
           }
           return await ref.read(connectionNotifierProvider.notifier).toggleConnection();
         },

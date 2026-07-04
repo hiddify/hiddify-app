@@ -22,6 +22,9 @@ class HomePage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     // final hasAnyProfile = ref.watch(hasAnyProfileProvider);
     final activeProfile = ref.watch(activeProfileProvider);
+    // Multi-profile mode: also watch the plural list so we can show how many
+    // profiles are currently active (and pooled for fastest-node selection).
+    final activeProfiles = ref.watch(activeProfilesProvider).valueOrNull ?? const [];
 
     return Scaffold(
       appBar: AppBar(
@@ -109,6 +112,35 @@ class HomePage extends HookConsumerWidget {
                           ),
                           _ => const Text(""),
                         },
+                        // Multi-profile badge: if more than one profile is
+                        // active, show a small chip indicating how many are
+                        // being pooled together for fastest-node selection.
+                        if (activeProfiles.length > 1)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 4, bottom: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.secondaryContainer,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.bolt_rounded, size: 14, color: theme.colorScheme.primary),
+                                    const Gap(4),
+                                    Text(
+                                      "${activeProfiles.length} active profiles pooled",
+                                      style: theme.textTheme.labelSmall,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         const SliverFillRemaining(
                           hasScrollBody: false,
                           child: Column(

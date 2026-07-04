@@ -21,8 +21,14 @@ abstract interface class ProfileRepository {
   TaskEither<ProfileFailure, Unit> init();
   TaskEither<ProfileFailure, ProfileEntity?> getById(String id);
   TaskEither<ProfileFailure, Unit> setAsActive(String id);
+  /// Multi-active: toggle the active flag of a single profile on/off
+  /// without touching any other profile's active flag.
+  TaskEither<ProfileFailure, Unit> setActive(String id, bool value);
   TaskEither<ProfileFailure, Unit> deleteById(String id, bool isActive);
   Stream<Either<ProfileFailure, ProfileEntity?>> watchActiveProfile();
+  /// Stream ALL active profiles (plural). Used by the multi-profile
+  /// "pool fastest across profiles" feature.
+  Stream<Either<ProfileFailure, List<ProfileEntity>>> watchActiveProfiles();
   Stream<Either<ProfileFailure, bool>> watchHasAnyProfile();
   Stream<Either<ProfileFailure, List<ProfileEntity>>> watchAll({
     ProfilesSort sort = ProfilesSort.lastUpdate,
@@ -84,6 +90,16 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
     }, ProfileUnexpectedFailure.new);
   }
 
+  /// Toggle the active flag on a single profile.
+  /// In multi-profile mode this does NOT clear other profiles' active flags.
+  @override
+  TaskEither<ProfileFailure, Unit> setActive(String id, bool value) {
+    return TaskEither.tryCatch(() async {
+      await _profileDataSource.edit(id, ProfileEntriesCompanion(active: Value(value)));
+      return unit;
+    }, ProfileUnexpectedFailure.new);
+  }
+
   @override
   TaskEither<ProfileFailure, Unit> deleteById(String id, bool isActive) {
     return TaskEither.tryCatch(() async {
@@ -102,6 +118,18 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
       loggy.error("error watching active profile", error, stackTrace);
       return ProfileUnexpectedFailure(error, stackTrace);
     });
+  }
+
+  /// Stream ALL active profiles (plural).
+  @override
+  Stream<Either<ProfileFailure, List<ProfileEntity>>> watchActiveProfiles() {
+    return _profileDataSource
+        .watchActiveProfiles()
+        .map((event) => event.map((e) => e.toEntity()).toList())
+        .handleExceptions((error, stackTrace) {
+          loggy.error("error watching active profiles (plural)", error, stackTrace);
+          return ProfileUnexpectedFailure(error, stackTrace);
+        });
   }
 
   @override

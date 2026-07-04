@@ -151,11 +151,12 @@ class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
             (_) async {
               loggy.info('successfully updated profile');
 
-              await ref.read(activeProfileProvider.future).then((active) async {
-                if (active != null && active.id == profile.id) {
-                  await ref.read(connectionNotifierProvider.notifier).reconnect(profile);
-                }
-              });
+              // If this profile is part of the active set, rebuild the merged
+              // config and reconnect so the new outbounds are picked up.
+              final activeProfiles = await ref.read(activeProfilesProvider.future);
+              if (activeProfiles.any((p) => p.id == profile.id)) {
+                await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfiles);
+              }
               return unit;
             },
           )

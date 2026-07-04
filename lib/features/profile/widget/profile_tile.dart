@@ -42,7 +42,8 @@ class ProfileTile extends HookConsumerWidget {
         CustomToast.error(t.presentShortError(err)).show(context);
       },
       initialOnSuccess: () {
-        if (context.mounted && context.canPop()) context.pop();
+        // In multi-profile mode we don't auto-pop the modal on toggle —
+        // the user may want to toggle several profiles at once.
       },
     );
 
@@ -102,15 +103,15 @@ class ProfileTile extends HookConsumerWidget {
                         }
                       } else {
                         if (selectActiveMutation.state.isInProgress) return;
-                        // if (profile.active) return;
+                        // Multi-profile mode: toggle this profile's active
+                        // flag WITHOUT deactivating the others. The connection
+                        // notifier listens to the active-profiles stream and
+                        // will reconnect with the new merged config.
                         selectActiveMutation.setFuture(
-                          ref.read(profilesNotifierProvider.notifier).selectActiveProfile(profile.id),
+                          ref
+                              .read(profilesNotifierProvider.notifier)
+                              .toggleActiveProfile(profile.id, !profile.active),
                         );
-                        if (context.canPop()) {
-                          context.pop();
-                        } else {
-                          context.goNamed('home');
-                        }
                       }
                     },
                     child: Padding(

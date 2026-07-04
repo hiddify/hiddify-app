@@ -12,6 +12,8 @@ abstract interface class ProfileDataSource {
   Future<ProfileEntry?> getByUrl(String url);
   Future<ProfileEntry?> getByName(String name);
   Stream<ProfileEntry?> watchActiveProfile();
+  Stream<List<ProfileEntry>> watchActiveProfiles();
+  Future<List<ProfileEntry>> getActiveProfiles();
   Stream<int> watchProfilesCount();
   Stream<List<ProfileEntry>> watchAll({required ProfilesSort sort, required SortMode sortMode});
   Future<void> insert(ProfileEntriesCompanion entry);
@@ -55,6 +57,23 @@ class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogge
         .distinct();
   }
 
+  /// Multi-active: stream ALL profiles where active == true.
+  /// Used by the new "pool fastest across multiple profiles" feature.
+  @override
+  Stream<List<ProfileEntry>> watchActiveProfiles() {
+    return (profileEntries.select()..where((tbl) => tbl.active.equals(true))).watch().distinct((a, b) {
+      if (a.length != b.length) return false;
+      final idsA = a.map((e) => e.id).toSet();
+      final idsB = b.map((e) => e.id).toSet();
+      return idsA.containsAll(idsB) && idsB.containsAll(idsA);
+    });
+  }
+
+  @override
+  Future<List<ProfileEntry>> getActiveProfiles() {
+    return (profileEntries.select()..where((tbl) => tbl.active.equals(true))).get();
+  }
+
   @override
   Stream<int> watchProfilesCount() {
     final count = profileEntries.id.count();
@@ -83,12 +102,11 @@ class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogge
         .watch();
   }
 
+  /// Insert WITHOUT clearing other active flags.
+  /// Multi-profile mode: more than one profile may be active at the same time.
   @override
   Future<void> insert(ProfileEntriesCompanion entry) async {
     await transaction(() async {
-      if (entry.active.present && entry.active.value) {
-        await update(profileEntries).write(const ProfileEntriesCompanion(active: Value(false)));
-      }
       final name = StringBuffer(entry.name.value);
       while (await getByName(name.toString()) != null) {
         name.write('${randomInt(0, 9).run()}');
@@ -97,6 +115,8 @@ class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogge
     });
   }
 
+  /// Edit WITHOUT clearing other active flags.
+  /// Toggling `active` on a profile no longer deactivates the others.
   @override
   Future<void> edit(String id, ProfileEntriesCompanion entry) async {
     await transaction(() async {
@@ -105,26 +125,16 @@ class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogge
         loggy.log(LogLevel.info, 'profile with id : [$id] deleted');
         return;
       }
-      if (entry.active.present && entry.active.value) {
-        await update(profileEntries).write(const ProfileEntriesCompanion(active: Value(false)));
-      }
       await (update(profileEntries)..where((tbl) => tbl.id.equals(id))).write(entry);
     });
   }
 
+  /// Delete by id. Multi-active: we no longer auto-promote any other profile to active.
   @override
   Future<void> deleteById(String id, bool isActive) async {
     await transaction(() async {
       await (delete(profileEntries)..where((tbl) => tbl.id.equals(id))).go();
-
-      if (isActive) {
-        final profiles = await (profileEntries.select()..where((tbl) => tbl.id.equals(id).not())).get();
-        if (profiles.isEmpty) return;
-        final prof = profiles.first;
-        await (update(
-          profileEntries,
-        )..where((tbl) => tbl.id.equals(prof.id))).write(const ProfileEntriesCompanion(active: Value(true)));
-      }
+      // No auto-promotion — the remaining active profiles stay active.
     });
   }
 }

@@ -3,6 +3,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/profile/notifier/auto_profile_switch_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -21,6 +22,12 @@ class _ConnectionWrapperState extends ConsumerState<ConnectionWrapper> with AppL
   Widget build(BuildContext context) {
     ref.listen(connectionNotifierProvider, (_, _) {});
 
+    // Auto-switch: keep the auto-profile-switch notifier alive whenever the
+    // service is running. It listens to the active-proxy stream and
+    // deactivates profiles whose outbounds are all unreachable, causing the
+    // connection notifier to reconnect with the remaining (healthy) profiles.
+    ref.watch(autoProfileSwitchNotifierProvider);
+
     ref.listen(configOptionNotifierProvider, (previous, next) async {
       if (next case AsyncData(value: true)) {
         final t = ref.read(translationsProvider).requireValue;
@@ -35,7 +42,9 @@ class _ConnectionWrapperState extends ConsumerState<ConnectionWrapper> with AppL
               //       .reconnect(await ref.read(activeProfileProvider.future));
               // },
             );
-        await ref.read(connectionNotifierProvider.notifier).reconnect(await ref.read(activeProfileProvider.future));
+        await ref
+            .read(connectionNotifierProvider.notifier)
+            .reconnect(await ref.read(activeProfilesProvider.future));
       }
     });
 
