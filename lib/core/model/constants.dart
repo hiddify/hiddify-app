@@ -115,3 +115,14 @@ abstract class ChainConst {
 
   static const finalIpDuration = Duration(milliseconds: 500);
 }
+
+abstract class ConnectionConst {
+  /// url-test delay (ms) boundary. A delay of `0` means "not measured / failed",
+  /// and `delay >= maxDelay` is treated as not a real connection (`> maxDelay` is
+  /// rendered as a timeout); only `0 < delay < maxDelay` is a live connection.
+  /// Single source of truth for connection-quality checks.
+  static const maxDelay = 65000;
+
+  /// Whether a url-test [delay] (ms) represents a live, usable connection.
+  static bool isValidDelay(int delay) => delay > 0 && delay < maxDelay;
+}

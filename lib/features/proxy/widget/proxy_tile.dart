@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
@@ -49,7 +50,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
         children: [
           if (proxy.urlTestDelay != 0)
             Text(
-              proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
+              ConnectionConst.isValidDelay(proxy.urlTestDelay) ? proxy.urlTestDelay.toString() : "×",
               style: TextStyle(color: delayColor(context, proxy.urlTestDelay)),
             ),
 
