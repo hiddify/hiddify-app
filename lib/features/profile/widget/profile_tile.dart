@@ -1,4 +1,3 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -20,17 +19,14 @@ import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import 'package:url_launcher/url_launcher.dart';
-
 class ProfileTile extends HookConsumerWidget {
-  const ProfileTile({super.key, required this.profile, this.isMain = false, this.margin = EdgeInsets.zero, this.color});
+  const ProfileTile({super.key, required this.profile, this.isMain = false, this.margin = EdgeInsets.zero});
 
   final ProfileEntity profile;
 
   /// home screen active profile card
   final bool isMain;
   final EdgeInsets margin;
-  final Color? color;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,21 +49,31 @@ class ProfileTile extends HookConsumerWidget {
 
     final showActionButton = profile is RemoteProfileEntity || !isMain;
 
-    // final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
-    // final double effectiveElevation = profile.active ? 12 : 4;
-    // final effectiveOutlineColor = profile.active ? theme.colorScheme.outline : Colors.transparent;
+    void handleTap() {
+      if (isMain) {
+        if (Breakpoint(context).isMobile()) {
+          ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
+        } else {
+          context.goNamed('profiles');
+        }
+        return;
+      }
+      if (selectActiveMutation.state.isInProgress) return;
+      selectActiveMutation.setFuture(ref.read(profilesNotifierProvider.notifier).selectActiveProfile(profile.id));
+      if (context.canPop()) {
+        context.pop();
+      } else {
+        context.goNamed('home');
+      }
+    }
+
     return Card(
-      // margin: effectiveMargin,
-      // elevation: effectiveElevation,
       margin: margin,
       shape: RoundedRectangleBorder(
         side: profile.active ? BorderSide(color: theme.colorScheme.outline) : BorderSide.none,
         borderRadius: ProfileTileConst.cardBorderRadius,
       ),
-      // color: color ?? theme.colorScheme.secondaryContainer,
       elevation: profile.active ? 0 : 1,
-
-      // shadowColor: Colors.transparent,
       child: IntrinsicHeight(
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 48),
@@ -81,98 +87,83 @@ class ProfileTile extends HookConsumerWidget {
                 ),
                 if (profile.active) VerticalDivider(width: 1, color: theme.colorScheme.outline) else const Gap(1),
               ],
-              Expanded(
-                child: Semantics(
-                  button: true,
-                  sortKey: isMain ? const OrdinalSortKey(0) : null,
-                  focused: isMain,
-                  liveRegion: isMain,
-                  namesRoute: isMain,
-                  label: isMain ? t.pages.profiles.viewAllProfiles : null,
-                  child: InkWell(
-                    borderRadius: showActionButton
-                        ? ProfileTileConst.endBorderRadius(Directionality.of(context))
-                        : ProfileTileConst.cardBorderRadius,
-                    onTap: () {
-                      if (isMain) {
-                        if (Breakpoint(context).isMobile()) {
-                          ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
-                        } else {
-                          context.goNamed('profiles');
-                        }
-                      } else {
-                        if (selectActiveMutation.state.isInProgress) return;
-                        // if (profile.active) return;
-                        selectActiveMutation.setFuture(
-                          ref.read(profilesNotifierProvider.notifier).selectActiveProfile(profile.id),
-                        );
-                        if (context.canPop()) {
-                          context.pop();
-                        } else {
-                          context.goNamed('home');
-                        }
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      child: Column(
-                        // mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (isMain)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Material(
-                                borderRadius: BorderRadius.circular(8),
-                                color: Colors.transparent,
-                                clipBehavior: Clip.antiAlias,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        profile.name,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: theme.textTheme.titleMedium?.copyWith(
-                                          fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
-                                        ),
-                                        semanticsLabel: t.pages.profiles.activeProfileName(name: profile.name),
-                                      ),
-                                    ),
-                                    const Icon(Icons.arrow_drop_down_rounded),
-                                  ],
-                                ),
-                              ),
-                            )
-                          else
-                            Text(
-                              profile.name,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
-                              ),
-                              semanticsLabel: profile.active
-                                  ? t.pages.profiles.activeProfileName(name: profile.name)
-                                  : t.pages.profiles.nonActiveProfileName(name: profile.name),
-                            ),
-                          if (subInfo != null) ...[
-                            const Gap(4),
-                            RemainingTrafficIndicator(subInfo.ratio),
-                            const Gap(4),
-                            ProfileSubscriptionInfo(subInfo),
-                            const Gap(4),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              Expanded(child: _body(context, t, theme, subInfo, showActionButton, handleTap)),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// The tappable content: the profile name (wrapped with a dropdown
+  /// affordance on the main card) followed by the subscription info.
+  Widget _body(
+    BuildContext context,
+    TranslationsEn t,
+    ThemeData theme,
+    SubscriptionInfo? subInfo,
+    bool showActionButton,
+    VoidCallback onTap,
+  ) {
+    return Semantics(
+      button: true,
+      sortKey: isMain ? const OrdinalSortKey(0) : null,
+      focused: isMain,
+      liveRegion: isMain,
+      namesRoute: isMain,
+      label: isMain ? t.pages.profiles.viewAllProfiles : null,
+      child: InkWell(
+        borderRadius: showActionButton
+            ? ProfileTileConst.endBorderRadius(Directionality.of(context))
+            : ProfileTileConst.cardBorderRadius,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _title(t, theme),
+              if (subInfo != null) ...[
+                const Gap(4),
+                RemainingTrafficIndicator(subInfo.ratio),
+                const Gap(4),
+                ProfileSubscriptionInfo(subInfo),
+                const Gap(4),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Profile name. On the main card it is wrapped with a dropdown affordance.
+  Widget _title(TranslationsEn t, ThemeData theme) {
+    final nameText = Text(
+      profile.name,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.titleMedium?.copyWith(fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null),
+      semanticsLabel: isMain || profile.active
+          ? t.pages.profiles.activeProfileName(name: profile.name)
+          : t.pages.profiles.nonActiveProfileName(name: profile.name),
+    );
+
+    if (!isMain) return nameText;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Material(
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.transparent,
+        clipBehavior: Clip.antiAlias,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(child: nameText),
+            const Icon(Icons.arrow_drop_down_rounded),
+          ],
         ),
       ),
     );
@@ -188,27 +179,83 @@ class ProfileActionButton extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final update = ref.watch(updateProfileNotifierProvider(profile.id));
+    final isUpdating = update.isLoading;
+    // Success/failure flash is derived straight from the provider state, which
+    // UpdateProfileNotifier holds for 2s then resets. It lives in the provider
+    // (not widget state), so it survives the list re-sorting after an update.
+    final bool? outcome = isUpdating
+        ? null
+        : update.hasError
+        ? false
+        : (update.value != null ? true : null);
 
-    if (profile case RemoteProfileEntity() when !showAllActions) {
-      return Semantics(
-        button: true,
-        enabled: !ref.watch(updateProfileNotifierProvider(profile.id)).isLoading,
-        child: Tooltip(
-          message: t.pages.profiles.update,
-          child: InkWell(
-            borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
-            onTap: () {
-              if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
-                return;
-              }
-              ref
-                  .read(updateProfileNotifierProvider(profile.id).notifier)
-                  .updateProfile(profile as RemoteProfileEntity);
-            },
-            child: const Icon(Icons.update_rounded),
-          ),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0, 0.6, curve: Curves.easeOut),
+          reverseCurve: Curves.easeIn,
         ),
-      );
+        child: ScaleTransition(
+          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack, reverseCurve: Curves.easeIn),
+          child: child,
+        ),
+      ),
+      // Expand children so the interactive leading keeps its full tap target.
+      layoutBuilder: (currentChild, previousChildren) => Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.center,
+        children: [...previousChildren, if (currentChild != null) currentChild],
+      ),
+      child: _leading(context, ref, t, isUpdating, outcome),
+    );
+  }
+
+  /// The current leading content. Each state carries a distinct key so the
+  /// [AnimatedSwitcher] cross-fades between them.
+  Widget _leading(BuildContext context, WidgetRef ref, TranslationsEn t, bool isUpdating, bool? outcome) {
+    if (profile case RemoteProfileEntity()) {
+      // While updating, the leading is a spinning indicator; its action is blocked.
+      if (isUpdating) {
+        return Semantics(
+          key: const ValueKey('updating'),
+          label: t.pages.profiles.update,
+          liveRegion: true,
+          child: Tooltip(message: t.pages.profiles.update, child: const _UpdatingIndicator()),
+        );
+      }
+
+      // Transient success/failure feedback shown for 2s right after the spinner.
+      if (outcome case final success?) {
+        return Semantics(
+          key: ValueKey(success),
+          label: success ? t.pages.profiles.msg.update.success : t.pages.profiles.msg.update.failure,
+          liveRegion: true,
+          child: Icon(
+            success ? Icons.check_circle_outline_rounded : Icons.error_outline_rounded,
+            color: success ? Colors.green : Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+
+      if (!showAllActions) {
+        return Semantics(
+          key: const ValueKey('update'),
+          button: true,
+          child: Tooltip(
+            message: t.pages.profiles.update,
+            child: InkWell(
+              borderRadius: ProfileTileConst.startBorderRadius(Directionality.of(context)),
+              onTap: () => ref
+                  .read(updateProfileNotifierProvider(profile.id).notifier)
+                  .updateProfile(profile as RemoteProfileEntity),
+              child: const Icon(Icons.sync_rounded),
+            ),
+          ),
+        );
+      }
     }
     return ProfileActionsMenu(profile, (context, toggleVisibility, _) {
       return Semantics(
@@ -222,7 +269,35 @@ class ProfileActionButton extends HookConsumerWidget {
           ),
         ),
       );
-    });
+    }, key: const ValueKey('menu'));
+  }
+}
+
+/// A minimal, continuously spinning icon shown in the leading slot while a
+/// remote profile is being updated.
+class _UpdatingIndicator extends StatefulWidget {
+  const _UpdatingIndicator();
+
+  @override
+  State<_UpdatingIndicator> createState() => _UpdatingIndicatorState();
+}
+
+class _UpdatingIndicatorState extends State<_UpdatingIndicator> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(vsync: this, duration: const Duration(seconds: 1))
+    ..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RotationTransition(
+      turns: ReverseAnimation(_controller),
+      child: Icon(Icons.sync_rounded, color: Theme.of(context).colorScheme.onSurface),
+    );
   }
 }
 
@@ -241,7 +316,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
       if (profile case RemoteProfileEntity())
         AdaptiveMenuItem(
           title: t.common.update,
-          leadingIcon: const Icon(Icons.update_rounded),
+          leadingIcon: const Icon(Icons.sync_rounded),
           onTap: () {
             if (ref.read(updateProfileNotifierProvider(profile.id)).isLoading) {
               return;
@@ -292,7 +367,6 @@ class ProfileActionsMenu extends HookConsumerWidget {
           context.goNamed('profileDetails', pathParameters: {'id': profile.id});
         },
       ),
-      // if (!profile.active)
       AdaptiveMenuItem(
         leadingIcon: const Icon(Icons.delete_outline_rounded),
         title: t.common.delete,
@@ -370,190 +444,6 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
   }
 }
 
-// TODO add support url
-class NewTrafficSubscriptionInfo extends HookConsumerWidget {
-  const NewTrafficSubscriptionInfo(this.subInfo, {super.key});
-
-  final SubscriptionInfo subInfo;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-
-    return Column(
-      children: [
-        const Icon(Icons.assessment_rounded, color: Colors.blue),
-        Text(t.components.subscriptionInfo.remainingTraffic),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: Text(
-                subInfo.total >
-                        10 *
-                            1099511627776 //10TB
-                    ? "∞ GiB"
-                    : subInfo.consumption.sizeOf(subInfo.total),
-                semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
-                  consumed: subInfo.consumption.sizeGB(),
-                  total: subInfo.total.sizeGB(),
-                ),
-                // style: theme.textTheme.body,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-// TODO add support url
-class NewDaySubscriptionInfo extends HookConsumerWidget {
-  const NewDaySubscriptionInfo(this.subInfo, {super.key});
-
-  final SubscriptionInfo subInfo;
-
-  (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
-    if (subInfo.isExpired) {
-      return (t.components.subscriptionInfo.expired, theme.colorScheme.error);
-    } else if (subInfo.ratio >= 1) {
-      return (t.components.subscriptionInfo.noTraffic, theme.colorScheme.error);
-    } else if (subInfo.remaining.inDays > 365) {
-      return (t.components.subscriptionInfo.remainingDurationNew(duration: "∞"), null);
-    } else {
-      return (t.components.subscriptionInfo.remainingDurationNew(duration: subInfo.remaining.inDays), null);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-    final theme = Theme.of(context);
-
-    final remaining = remainingText(t, theme);
-    return Column(
-      children: [
-        const Icon(Icons.timer, color: Colors.blue),
-        Text(t.components.subscriptionInfo.remainingTime),
-        const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Flexible(
-              child: Text(
-                remaining.$1,
-                // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-// TODO add support url
-class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
-  const NewDayTrafficSubscriptionInfo(this.subInfo, {super.key});
-
-  final SubscriptionInfo subInfo;
-
-  (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
-    if (subInfo.isExpired) {
-      return (t.components.subscriptionInfo.expired, theme.colorScheme.error);
-    } else if (subInfo.ratio >= 1) {
-      return (t.components.subscriptionInfo.noTraffic, theme.colorScheme.error);
-    } else if (subInfo.remaining.inDays > 365) {
-      return (t.components.subscriptionInfo.remainingDurationNew(duration: "∞"), null);
-    } else {
-      return (t.components.subscriptionInfo.remainingDurationNew(duration: subInfo.remaining.inDays), null);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-    final theme = Theme.of(context);
-
-    final remaining = remainingText(t, theme);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(Icons.assessment_rounded, color: Colors.blue),
-        Text(t.components.subscriptionInfo.remainingUsage),
-        const SizedBox(height: 4),
-        Text(
-          remaining.$1,
-          // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
-          overflow: TextOverflow.ellipsis,
-        ),
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: Text(
-            subInfo.total >
-                    10 *
-                        1099511627776 //10TB
-                ? "∞ GiB"
-                : subInfo.consumption.sizeOf(subInfo.total),
-            semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
-              consumed: subInfo.consumption.sizeGB(),
-              total: subInfo.total.sizeGB(),
-            ),
-            // style: theme.textTheme.body,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class NewSiteSubscriptionInfo extends HookConsumerWidget {
-  const NewSiteSubscriptionInfo(this.subInfo, {super.key});
-
-  final SubscriptionInfo subInfo;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-    final uri = Uri.parse(subInfo.webPageUrl ?? "");
-    var host = uri.host;
-    if (["telegram.me", "t.me"].contains(host)) {
-      host = "@${uri.path.split("/").last}";
-    }
-    return InkWell(
-      onTap: () => launchUrl(Uri.parse(subInfo.webPageUrl ?? "")),
-      child: Column(
-        children: [
-          const Icon(FluentIcons.globe_person_24_filled, size: 24, color: Colors.blue),
-          Text(t.components.subscriptionInfo.profileSite),
-          const SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: Text(
-                  host,
-                  // style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // TODO change colors
 class RemainingTrafficIndicator extends StatelessWidget {
   const RemainingTrafficIndicator(this.ratio, {super.key});
@@ -562,35 +452,6 @@ class RemainingTrafficIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final startColor = ratio < 0.25
-    //     ? const Color.fromRGBO(93, 205, 251, 1.0)
-    //     : ratio < 0.65
-    //         ? const Color.fromRGBO(205, 199, 64, 1.0)
-    //         : const Color.fromRGBO(241, 82, 81, 1.0);
-    // final endColor = ratio < 0.25
-    //     ? const Color.fromRGBO(49, 146, 248, 1.0)
-    //     : ratio < 0.65
-    //         ? const Color.fromRGBO(98, 115, 32, 1.0)
-    //         : const Color.fromRGBO(139, 30, 36, 1.0);
     return LinearProgressIndicator(value: ratio, borderRadius: BorderRadius.circular(16), minHeight: 6);
-    // return HorizontalPercentIndicator(
-    //   height: 6,
-
-    //   borderRadius: 16,
-    //   loadingPercent: ratio,
-    //   // inactiveTrackColor: Color.fromRGBO(r, g, b, opacity),
-
-    //   activeTrackColor: [startColor, endColor],
-    // );
-    // return LinearPercentIndicator(
-    //     // percent: ratio,
-    //     // animation: false,
-    //     // padding: EdgeInsets.zero,
-    //     // lineHeight: 6,
-    //     // barRadius: const Radius.circular(16),
-    //     // linearGradient: LinearGradient(
-    //     //   colors: [startColor, endColor],
-    //     // ),
-    //     );
   }
 }
