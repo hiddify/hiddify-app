@@ -154,7 +154,9 @@
           "success": "Profil başarıyla güncellendi",
           "successNamed": "\"${name}\" başarıyla güncellendi",
           "failure": "Profil güncellenemedi",
-          "failureNamed": "\"${name}\" güncellenemedi"
+          "failureNamed": "\"${name}\" güncellenemedi",
+          "bulkSuccess": "${count} profil güncellendi",
+          "bulkPartial": "${success} başarılı\n${failed} başarısız: ${names}"
         },
         "delete": {
           "success": "Profil başarıyla silindi"
@@ -580,6 +582,10 @@
       "sort": {
         "name": "Alfabetik",
         "lastUpdate": "Son güncelleme"
+      },
+      "direction": {
+        "newestFirst": "Önce en yeni",
+        "oldestFirst": "Önce en eski"
       }
     },
     "warpLicense": {

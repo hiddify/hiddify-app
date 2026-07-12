@@ -158,7 +158,9 @@
           "success": "Профиль успешно обновлен",
           "successNamed": "\"${name}\" успешно обновлен",
           "failure": "Не удалось обновить профиль",
-          "failureNamed": "Не удалось обновить \"${name}\""
+          "failureNamed": "Не удалось обновить \"${name}\"",
+          "bulkSuccess": "Обновлено профилей: ${count}",
+          "bulkPartial": "${success} успешно\n${failed} с ошибкой: ${names}"
         },
         "delete": {
           "success": "Профиль успешно удален"
@@ -584,6 +586,10 @@
       "sort": {
         "name": "По алфавиту",
         "lastUpdate": "Последнему обновлению"
+      },
+      "direction": {
+        "newestFirst": "Сначала новые",
+        "oldestFirst": "Сначала старые"
       }
     },
     "warpLicense": {

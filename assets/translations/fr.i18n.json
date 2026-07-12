@@ -154,7 +154,9 @@
           "success": "Profil mis à jour avec succès",
           "successNamed": "\"${name}\" a été mis à jour avec succès",
           "failure": "Échec de la mise à jour du profil",
-          "failureNamed": "Échec de la mise à jour de \"${name}\""
+          "failureNamed": "Échec de la mise à jour de \"${name}\"",
+          "bulkSuccess": "${count} profils mis à jour",
+          "bulkPartial": "${success} réussis\n${failed} échoués : ${names}"
         },
         "delete": {
           "success": "Profil supprimé avec succès"
@@ -580,6 +582,10 @@
       "sort": {
         "name": "Alphabétiquement",
         "lastUpdate": "Dernière mise à jour"
+      },
+      "direction": {
+        "newestFirst": "Plus récents d'abord",
+        "oldestFirst": "Plus anciens d'abord"
       }
     },
     "warpLicense": {

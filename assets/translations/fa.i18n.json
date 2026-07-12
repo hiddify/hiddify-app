@@ -154,7 +154,9 @@
           "success": "پروفایل با موفقیت به‌روز شد",
           "successNamed": "«${name}» با موفقیت به‌روز شد",
           "failure": "به‌روزرسانی پروفایل ناموفق بود",
-          "failureNamed": "به‌روزرسانی «${name}» ناموفق بود"
+          "failureNamed": "به‌روزرسانی «${name}» ناموفق بود",
+          "bulkSuccess": "${count} پروفایل به‌روزرسانی شد",
+          "bulkPartial": "${success} موفق\n${failed} ناموفق: ${names}"
         },
         "delete": {
           "success": "پروفایل با موفقیت حذف شد"
@@ -580,6 +582,10 @@
       "sort": {
         "name": "بر اساس نام",
         "lastUpdate": "آخرین به‌روزرسانی"
+      },
+      "direction": {
+        "newestFirst": "جدیدترین اول",
+        "oldestFirst": "قدیمی‌ترین اول"
       }
     },
     "warpLicense": {

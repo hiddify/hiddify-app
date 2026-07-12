@@ -154,7 +154,9 @@
           "success": "設定檔更新成功",
           "successNamed": "「${name}」更新成功",
           "failure": "更新設定檔失敗",
-          "failureNamed": "更新「${name}」失敗"
+          "failureNamed": "更新「${name}」失敗",
+          "bulkSuccess": "已更新 ${count} 個設定檔",
+          "bulkPartial": "${success} 個成功\n${failed} 個失敗：${names}"
         },
         "delete": {
           "success": "設定檔刪除成功"
@@ -580,6 +582,10 @@
       "sort": {
         "name": "按字母順序",
         "lastUpdate": "最近更新"
+      },
+      "direction": {
+        "newestFirst": "最新優先",
+        "oldestFirst": "最舊優先"
       }
     },
     "warpLicense": {

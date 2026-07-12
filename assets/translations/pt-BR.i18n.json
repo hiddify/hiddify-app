@@ -154,7 +154,9 @@
           "success": "Perfil atualizado com sucesso",
           "successNamed": "\"${name}\" atualizado com sucesso",
           "failure": "Falha ao atualizar perfil",
-          "failureNamed": "Falha ao atualizar \"${name}\""
+          "failureNamed": "Falha ao atualizar \"${name}\"",
+          "bulkSuccess": "${count} perfis atualizados",
+          "bulkPartial": "${success} com sucesso\n${failed} com falha: ${names}"
         },
         "delete": {
           "success": "Perfil excluído com sucesso"
@@ -580,6 +582,10 @@
       "sort": {
         "name": "Alfabeticamente",
         "lastUpdate": "Última atualização"
+      },
+      "direction": {
+        "newestFirst": "Mais recentes primeiro",
+        "oldestFirst": "Mais antigos primeiro"
       }
     },
     "warpLicense": {

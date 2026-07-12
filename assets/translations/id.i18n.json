@@ -154,7 +154,9 @@
           "success": "Profil berhasil diperbarui",
           "successNamed": "\"${name}\" berhasil diperbarui",
           "failure": "Gagal memperbarui profil",
-          "failureNamed": "Gagal memperbarui \"${name}\""
+          "failureNamed": "Gagal memperbarui \"${name}\"",
+          "bulkSuccess": "${count} profil diperbarui",
+          "bulkPartial": "${success} berhasil\n${failed} gagal: ${names}"
         },
         "delete": {
           "success": "Profil berhasil dihapus"
@@ -580,6 +582,10 @@
       "sort": {
         "name": "Menurut abjad",
         "lastUpdate": "Terakhir diperbarui"
+      },
+      "direction": {
+        "newestFirst": "Terbaru dulu",
+        "oldestFirst": "Terlama dulu"
       }
     },
     "warpLicense": {

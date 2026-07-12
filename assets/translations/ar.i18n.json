@@ -160,7 +160,9 @@
           "success": "تم تحديث الملف الشخصي بنجاح",
           "successNamed": "تم تحديث \"${name}\" بنجاح",
           "failure": "فشل تحديث الملف الشخصي",
-          "failureNamed": "فشل تحديث \"${name}\""
+          "failureNamed": "فشل تحديث \"${name}\"",
+          "bulkSuccess": "تم تحديث ${count} ملف شخصي",
+          "bulkPartial": "${success} ناجح\n${failed} فاشل: ${names}"
         },
         "delete": {
           "success": "تم حذف الملف الشخصي بنجاح"
@@ -586,6 +588,10 @@
       "sort": {
         "name": "أبجديًا",
         "lastUpdate": "آخر تحديث"
+      },
+      "direction": {
+        "newestFirst": "الأحدث أولاً",
+        "oldestFirst": "الأقدم أولاً"
       }
     },
     "warpLicense": {

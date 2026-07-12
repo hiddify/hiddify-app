@@ -154,7 +154,9 @@
           "success": "配置文件更新成功",
           "successNamed": "\"${name}\" 更新成功",
           "failure": "更新配置文件失败",
-          "failureNamed": "更新 \"${name}\" 失败"
+          "failureNamed": "更新 \"${name}\" 失败",
+          "bulkSuccess": "已更新 ${count} 个配置文件",
+          "bulkPartial": "${success} 个成功\n${failed} 个失败：${names}"
         },
         "delete": {
           "success": "配置文件删除成功"
@@ -580,6 +582,10 @@
       "sort": {
         "name": "按字母顺序",
         "lastUpdate": "最近更新"
+      },
+      "direction": {
+        "newestFirst": "最新优先",
+        "oldestFirst": "最旧优先"
       }
     },
     "warpLicense": {
