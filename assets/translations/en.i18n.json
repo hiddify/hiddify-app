@@ -154,7 +154,9 @@
           "success": "Profile updated successfully",
           "successNamed": "\"${name}\" updated successfully",
           "failure": "Failed to update profile",
-          "failureNamed": "Failed to update \"${name}\""
+          "failureNamed": "Failed to update \"${name}\"",
+          "bulkSuccess": "${count} profiles updated",
+          "bulkPartial": "${success} success\n${failed} failed: ${names}"
         },
         "delete": {
           "success": "Profile deleted successfully"
@@ -580,6 +582,10 @@
       "sort": {
         "name": "Alphabetically",
         "lastUpdate": "Recently updated"
+      },
+      "direction": {
+        "newestFirst": "Newest first",
+        "oldestFirst": "Oldest first"
       }
     },
     "warpLicense": {
