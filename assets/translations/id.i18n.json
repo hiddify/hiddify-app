@@ -152,7 +152,6 @@
         },
         "update": {
           "success": "Profil berhasil diperbarui",
-          "successNamed": "\"${name}\" berhasil diperbarui",
           "failure": "Gagal memperbarui profil",
           "failureNamed": "Gagal memperbarui \"${name}\"",
           "bulkSuccess": "${count} profil diperbarui",
@@ -566,14 +565,9 @@
       "expireDate": "Tanggal kedaluwarsa",
       "expired": "Kedaluwarsa",
       "noTraffic": "Kuota habis",
-      "remainingTime": "Sisa waktu",
       "remainingDuration": "tersisa ${duration} hari",
-      "remainingDurationNew": "${duration} hari",
       "remainingTrafficSemanticLabel": "${consumed} dari ${total} lalu lintas terpakai",
-      "remainingTraffic": "Sisa lalu lintas",
-      "remainingUsage": "Sisa",
-      "profileSite": "Penyedia",
-      "profileSupport": "Dukungan"
+      "remainingTraffic": "Sisa lalu lintas"
     }
   },
   "dialogs": {

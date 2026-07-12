@@ -152,7 +152,6 @@
         },
         "update": {
           "success": "پروفایل با موفقیت به‌روز شد",
-          "successNamed": "«${name}» با موفقیت به‌روز شد",
           "failure": "به‌روزرسانی پروفایل ناموفق بود",
           "failureNamed": "به‌روزرسانی «${name}» ناموفق بود",
           "bulkSuccess": "${count} پروفایل به‌روزرسانی شد",
@@ -566,14 +565,9 @@
       "expireDate": "تاریخ انقضا",
       "expired": "منقضی شده",
       "noTraffic": "حجم تمام شده",
-      "remainingTime": "زمان باقی‌مانده",
       "remainingDuration": "${duration} روز باقی‌مانده",
-      "remainingDurationNew": "${duration} روز",
       "remainingTrafficSemanticLabel": "${consumed} از ${total} ترافیک مصرف شده",
-      "remainingTraffic": "ترافیک باقی‌مانده",
-      "remainingUsage": "باقی‌مانده",
-      "profileSite": "سرویس‌دهنده",
-      "profileSupport": "پشتیبانی"
+      "remainingTraffic": "ترافیک باقی‌مانده"
     }
   },
   "dialogs": {

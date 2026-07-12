@@ -152,7 +152,6 @@
         },
         "update": {
           "success": "Profile updated successfully",
-          "successNamed": "\"${name}\" updated successfully",
           "failure": "Failed to update profile",
           "failureNamed": "Failed to update \"${name}\"",
           "bulkSuccess": "${count} profiles updated",
@@ -566,14 +565,9 @@
       "expireDate": "Expire date",
       "expired": "Expired",
       "noTraffic": "Out of quota",
-      "remainingTime": "Remaining time",
       "remainingDuration": "${duration} days remaining",
-      "remainingDurationNew": "${duration} days",
       "remainingTrafficSemanticLabel": "${consumed} of ${total} traffic consumed",
-      "remainingTraffic": "Remaining traffic",
-      "remainingUsage": "Remaining",
-      "profileSite": "Provider",
-      "profileSupport": "Support"
+      "remainingTraffic": "Remaining traffic"
     }
   },
   "dialogs": {

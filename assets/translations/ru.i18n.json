@@ -156,7 +156,6 @@
         },
         "update": {
           "success": "Профиль успешно обновлен",
-          "successNamed": "\"${name}\" успешно обновлен",
           "failure": "Не удалось обновить профиль",
           "failureNamed": "Не удалось обновить \"${name}\"",
           "bulkSuccess": "Обновлено профилей: ${count}",
@@ -570,14 +569,9 @@
       "expireDate": "Дата окончания",
       "expired": "Истек",
       "noTraffic": "Квота исчерпана",
-      "remainingTime": "Оставшееся время",
       "remainingDuration": "осталось ${duration} дней",
-      "remainingDurationNew": "${duration} дней",
       "remainingTrafficSemanticLabel": "израсходовано ${consumed} из ${total} трафика",
-      "remainingTraffic": "Оставшийся трафик",
-      "remainingUsage": "Осталось",
-      "profileSite": "Провайдер",
-      "profileSupport": "Поддержка"
+      "remainingTraffic": "Оставшийся трафик"
     }
   },
   "dialogs": {

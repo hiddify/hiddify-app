@@ -152,7 +152,6 @@
         },
         "update": {
           "success": "Perfil atualizado com sucesso",
-          "successNamed": "\"${name}\" atualizado com sucesso",
           "failure": "Falha ao atualizar perfil",
           "failureNamed": "Falha ao atualizar \"${name}\"",
           "bulkSuccess": "${count} perfis atualizados",
@@ -566,14 +565,9 @@
       "expireDate": "Data de validade",
       "expired": "Expirado",
       "noTraffic": "Cota esgotada",
-      "remainingTime": "Tempo restante",
       "remainingDuration": "${duration} dias restantes",
-      "remainingDurationNew": "${duration} dias",
       "remainingTrafficSemanticLabel": "${consumed} de ${total} de tráfego consumido",
-      "remainingTraffic": "Tráfego restante",
-      "remainingUsage": "Restante",
-      "profileSite": "Provedor",
-      "profileSupport": "Suporte"
+      "remainingTraffic": "Tráfego restante"
     }
   },
   "dialogs": {

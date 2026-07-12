@@ -152,7 +152,6 @@
         },
         "update": {
           "success": "設定檔更新成功",
-          "successNamed": "「${name}」更新成功",
           "failure": "更新設定檔失敗",
           "failureNamed": "更新「${name}」失敗",
           "bulkSuccess": "已更新 ${count} 個設定檔",
@@ -566,14 +565,9 @@
       "expireDate": "到期日期",
       "expired": "已到期",
       "noTraffic": "流量已用盡",
-      "remainingTime": "剩餘時間",
       "remainingDuration": "剩餘 ${duration} 天",
-      "remainingDurationNew": "${duration} 天",
       "remainingTrafficSemanticLabel": "已使用 ${consumed} / ${total} 流量",
-      "remainingTraffic": "剩餘流量",
-      "remainingUsage": "剩餘",
-      "profileSite": "提供商",
-      "profileSupport": "支援"
+      "remainingTraffic": "剩餘流量"
     }
   },
   "dialogs": {

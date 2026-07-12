@@ -152,7 +152,6 @@
         },
         "update": {
           "success": "Profil mis à jour avec succès",
-          "successNamed": "\"${name}\" a été mis à jour avec succès",
           "failure": "Échec de la mise à jour du profil",
           "failureNamed": "Échec de la mise à jour de \"${name}\"",
           "bulkSuccess": "${count} profils mis à jour",
@@ -566,14 +565,9 @@
       "expireDate": "Date d'expiration",
       "expired": "Expiré",
       "noTraffic": "Quota épuisé",
-      "remainingTime": "Temps restant",
       "remainingDuration": "${duration} jours restants",
-      "remainingDurationNew": "${duration} jours",
       "remainingTrafficSemanticLabel": "${consumed} sur ${total} de trafic consommé",
-      "remainingTraffic": "Trafic restant",
-      "remainingUsage": "Restant",
-      "profileSite": "Fournisseur",
-      "profileSupport": "Support"
+      "remainingTraffic": "Trafic restant"
     }
   },
   "dialogs": {

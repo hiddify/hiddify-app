@@ -152,7 +152,6 @@
         },
         "update": {
           "success": "Profil başarıyla güncellendi",
-          "successNamed": "\"${name}\" başarıyla güncellendi",
           "failure": "Profil güncellenemedi",
           "failureNamed": "\"${name}\" güncellenemedi",
           "bulkSuccess": "${count} profil güncellendi",
@@ -566,14 +565,9 @@
       "expireDate": "Bitiş tarihi",
       "expired": "Süresi doldu",
       "noTraffic": "Kota doldu",
-      "remainingTime": "Kalan süre",
       "remainingDuration": "kalan ${duration} gün",
-      "remainingDurationNew": "${duration} gün",
       "remainingTrafficSemanticLabel": "${consumed} / ${total} trafik kullanıldı",
-      "remainingTraffic": "Kalan trafik",
-      "remainingUsage": "Kalan",
-      "profileSite": "Sağlayıcı",
-      "profileSupport": "Destek"
+      "remainingTraffic": "Kalan trafik"
     }
   },
   "dialogs": {

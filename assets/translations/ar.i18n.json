@@ -158,7 +158,6 @@
         },
         "update": {
           "success": "تم تحديث الملف الشخصي بنجاح",
-          "successNamed": "تم تحديث \"${name}\" بنجاح",
           "failure": "فشل تحديث الملف الشخصي",
           "failureNamed": "فشل تحديث \"${name}\"",
           "bulkSuccess": "تم تحديث ${count} ملف شخصي",
@@ -572,14 +571,9 @@
       "expireDate": "تاريخ الانتهاء",
       "expired": "منتهي الصلاحية",
       "noTraffic": "نفدت الباقة",
-      "remainingTime": "الوقت المتبقي",
       "remainingDuration": "متبقٍ ${duration} يوم",
-      "remainingDurationNew": "${duration} يوم",
       "remainingTrafficSemanticLabel": "تم استهلاك ${consumed} من ${total}",
-      "remainingTraffic": "البيانات المتبقية",
-      "remainingUsage": "المتبقي",
-      "profileSite": "المزوّد",
-      "profileSupport": "الدعم"
+      "remainingTraffic": "البيانات المتبقية"
     }
   },
   "dialogs": {

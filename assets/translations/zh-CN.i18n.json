@@ -152,7 +152,6 @@
         },
         "update": {
           "success": "配置文件更新成功",
-          "successNamed": "\"${name}\" 更新成功",
           "failure": "更新配置文件失败",
           "failureNamed": "更新 \"${name}\" 失败",
           "bulkSuccess": "已更新 ${count} 个配置文件",
@@ -566,14 +565,9 @@
       "expireDate": "到期日期",
       "expired": "已过期",
       "noTraffic": "流量已用尽",
-      "remainingTime": "剩余时间",
       "remainingDuration": "剩余 ${duration} 天",
-      "remainingDurationNew": "${duration} 天",
       "remainingTrafficSemanticLabel": "已使用 ${consumed} / ${total} 流量",
-      "remainingTraffic": "剩余流量",
-      "remainingUsage": "剩余",
-      "profileSite": "提供商",
-      "profileSupport": "支持"
+      "remainingTraffic": "剩余流量"
     }
   },
   "dialogs": {
