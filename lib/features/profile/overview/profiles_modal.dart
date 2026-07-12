@@ -41,7 +41,7 @@ class ProfilesModal extends HookConsumerWidget {
                     separatorBuilder: (context, index) => const Gap(12),
                     // shrinkWrap: true,
                     controller: scrollController,
-                    itemBuilder: (context, index) => ProfileTile(profile: data[index]),
+                    itemBuilder: (context, index) => ProfileTile(key: ValueKey(data[index].id), profile: data[index]),
                     itemCount: data.length,
                   ),
                 ),
@@ -60,7 +60,7 @@ class ProfilesModal extends HookConsumerWidget {
                       ),
                       FilledButton.icon(
                         label: Text(t.pages.profiles.updateSubscriptions, maxLines: 1, overflow: TextOverflow.ellipsis),
-                        icon: const Icon(Icons.update_rounded),
+                        icon: const Icon(Icons.sync_rounded),
                         onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
                       ),
                     ],
