@@ -39,23 +39,60 @@ This is distinctive, but it creates a second ritual-like focal point and risks c
 
 ## Selected Design
 
+### Nova Design System Integration
+
+The existing Nova Design System is the source of truth. The dock must extend it rather than introduce a parallel set of inline values.
+
+The implementation follows the existing primitive-to-semantic structure in `design/tokens/` and adds a component-token layer for navigation:
+
+- Existing primitives remain in `colors.css`, `spacing.css`, `radius.css`, `elevation.css`, `motion.css`, and `typography.css`.
+- Existing semantic aliases such as `--accent`, `--accent-fill`, `--text-primary`, `--text-tertiary`, `--border`, and `--bg-sheet` remain the meaning layer.
+- New `--tabbar-*` component aliases are defined in `design/tokens/components.css` and imported by `design/styles.css` after the foundational token files.
+- `TabBar` consumes only Nova tokens. Raw colors, spacing, radii, shadows, blur values, duration values, and font declarations are not hard-coded in the component.
+
+Initial component-token mapping:
+
+```css
+--tabbar-height: var(--sp-11);
+--tabbar-inset-x: var(--sp-4);
+--tabbar-bottom-gap: var(--sp-3);
+--tabbar-radius: calc(var(--tabbar-height) / 2);
+--tabbar-bg: var(--glass-regular);
+--tabbar-border: var(--border);
+--tabbar-highlight: var(--sheen-top);
+--tabbar-shadow: var(--shadow-dock);
+--tabbar-blur: var(--blur-nav);
+--tabbar-item-fg: var(--text-tertiary);
+--tabbar-item-selected-fg: var(--accent-hover);
+--tabbar-item-selected-bg: var(--accent-fill);
+--tabbar-item-radius: var(--r-xl);
+--tabbar-item-min-target: var(--touch-min);
+--tabbar-item-padding: var(--sp-2) var(--sp-3);
+--tabbar-item-gap: var(--sp-1);
+--tabbar-icon-size: var(--sp-6);
+--tabbar-label-font: var(--w-medium) var(--fs-micro)/1 var(--font-sans);
+--tabbar-transition: var(--dur-2) var(--ease-out);
+```
+
+The three missing foundation values — `--glass-regular`, `--shadow-dock`, and `--blur-nav` — are added beside their related color/elevation primitives. They are reusable navigation-surface primitives, not TabBar-only literals.
+
 ### Structure
 
 - Four stable destinations: `Главная`, `Серверы`, `Правила`, `Настройки`.
 - The connection power control remains exclusively inside the Hero and is never used as a tab icon.
 - The dock floats 8 px above the iPhone home-indicator safe area.
-- Horizontal screen inset is 14 px.
-- Dock height is 64 px; corner radius is 32 px.
+- Horizontal screen inset uses `--tabbar-inset-x`, mapped to the existing 12 px rhythm step.
+- Dock height uses `--sp-11` (64 px); corner radius derives from half the component height.
 - Each tab receives an equal-width area and a minimum 44 x 44 px interaction target.
 
 ### Material
 
-- Dark background: `rgba(18, 18, 22, 0.62)`.
-- Backdrop blur: 28 px for the prototype.
+- Dark background: `--tabbar-bg`, backed by the reusable `--glass-regular` primitive.
+- Backdrop blur: `--tabbar-blur`, backed by the reusable `--blur-nav` primitive.
 - Saturation: keep native/default in the prototype; do not simulate glossy chromatic distortion.
-- Outer stroke: `rgba(255, 255, 255, 0.12)`.
-- Inner top highlight: `rgba(255, 255, 255, 0.08)`.
-- Shadow: `0 12px 32px rgba(0, 0, 0, 0.34)`.
+- Outer stroke: existing semantic `--border` through `--tabbar-border`.
+- Inner top highlight: existing `--sheen-top` through `--tabbar-highlight`.
+- Shadow: `--tabbar-shadow`, backed by the reusable `--shadow-dock` elevation primitive.
 - No permanent red border and no large red glow around the dock.
 
 These values are prototype targets, not a substitute for semantic system materials in native implementation.
@@ -63,18 +100,18 @@ These values are prototype targets, not a substitute for semantic system materia
 ### Tab item
 
 - Layout: icon above a one-word label.
-- Icon size: 21–22 px.
-- Label size: 10 px, medium weight.
-- Gap between icon and label: 3 px.
-- Inactive foreground: `var(--text-3)`.
-- Selected foreground: `var(--red-400)`.
-- Selected lens: compact rounded rectangle using `rgba(255, 45, 62, 0.10)`.
+- Icon size: existing 20 px rhythm value through `--tabbar-icon-size`.
+- Label style: existing `--fs-micro`, `--w-medium`, and `--font-sans` through `--tabbar-label-font`.
+- Gap between icon and label: existing `--sp-1` through `--tabbar-item-gap`.
+- Inactive foreground: semantic `--text-tertiary` through `--tabbar-item-fg`.
+- Selected foreground: semantic `--accent-hover` through `--tabbar-item-selected-fg`.
+- Selected lens: semantic `--accent-fill` through `--tabbar-item-selected-bg`.
 - Selected state uses color, lens shape, icon weight, and label weight together; it never relies on red alone.
 - Remove the existing 8 px red drop shadow. A maximum 4 px low-opacity accent bloom is acceptable only if the active state feels too flat during visual review.
 
 ### Motion and feedback
 
-- Selection transition: 180–220 ms.
+- Selection transition: existing `--dur-2` and `--ease-out` through `--tabbar-transition`.
 - Lens movement: restrained ease-out or low-bounce spring.
 - Icon scale: at most `1.04` on selection.
 - No looping animation in the dock.
@@ -108,11 +145,13 @@ For iPadOS, the same four destinations should adapt to a top tab bar or sidebar.
 
 The first implementation changes only the Nova prototype:
 
+- Add reusable navigation material primitives to the relevant Nova token files.
+- Add `design/tokens/components.css` with the `--tabbar-*` aliases and import it from `design/styles.css`.
 - Update the bundled `TabBar` component in `design/_ds_bundle.js`.
 - Add localized labels to the four items in `design/ui_kits/nova-ios/App.jsx`.
 - Add bottom content clearance only if visual verification shows overlap.
 
-Do not modify `Home.jsx`, `RitualHero.jsx`, `RadarField.jsx`, connection logic, or the Flutter production navigation in this prototype pass.
+Do not modify the visual content or behavior of `Home.jsx`, `RitualHero.jsx`, `RadarField.jsx`, connection logic, or the Flutter production navigation in this prototype pass. A bottom-padding-only change in `Home.jsx` is permitted if required to keep content clear of the floating dock.
 
 Flutter integration is a follow-up implementation based on the approved and visually verified component.
 
@@ -130,3 +169,4 @@ The prototype passes when:
 8. The bar remains legible over the darkest and brightest visible parts of the Nova screen.
 9. Keyboard focus is visible in the browser prototype.
 10. Reduced-motion behavior is respected by CSS or component logic.
+11. The component contains no raw visual constants that belong in the Nova token system.
