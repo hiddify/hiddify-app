@@ -5,7 +5,7 @@ import os.log
 
 open class ExtensionProvider: NEPacketTunnelProvider {
     public static let errorFile = FilePath.workingDirectory.appendingPathComponent("network_extension_error.log")
-    private let logger = Logger(subsystem: "apple.hiddify.com.HiddifyPacketTunnel", category: "PacketTunnel")
+    private let logger = Logger(subsystem: "com.womaninred.app.HiddifyPacketTunnel", category: "PacketTunnel")
     
 //    private var commandServer: LibboxCommandServer!
     private var systemProxyAvailable = false

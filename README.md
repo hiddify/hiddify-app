@@ -22,6 +22,18 @@
 
 
 
+## Woman in Red fork
+
+Woman in Red is a public, non-commercial fork of the [Hiddify app](https://github.com/hiddify/hiddify-app). It remains subject to the upstream [Hiddify Extended GPLv3 license](./LICENSE.md); the fork-specific compliance notes are recorded in [docs/gpl-compliance.md](./docs/gpl-compliance.md).
+
+### Changes from upstream — 2026-07-13
+
+- renamed the user-facing app and platform identifiers to Woman in Red;
+- replaced the application icon and primary accent with the Woman in Red visual identity;
+- added the Nova design research layer under `design/` for future interface work.
+
+The internal Dart package name and upstream-compatible protocol handling remain unchanged to keep future rebases manageable.
+
 ## What is Hiddify app?
 
 <p dir="ltr" style="font-size: 16px">A multi-platform proxy client based on <a href="https://github.com/SagerNet/sing-box">Sing-box</a> universal proxy tool-chain. Hiddify offers a wide range of capabilities, like automatic node selection, TUN mode, remote profiles etc. Hiddify is ad-free and open-source. With support for a wide range of protocols, it provides a secure and private way for accessing free internet.</p>
@@ -193,8 +205,6 @@ Hiddify is a community driven project. If you're interested in contributing, ple
 <p align=center>
  Made with <a rel="" target="_blank" href="https://contrib.rocks">Contrib.Rocks</a> 
 </p>
-
-
 
 
 

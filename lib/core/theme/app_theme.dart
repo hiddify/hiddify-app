@@ -5,11 +5,13 @@ import 'package:hiddify/core/theme/theme_extensions.dart';
 
 class AppTheme {
   AppTheme(this.mode, this.fontFamily);
+  static const brandSeedColor = Color(0xFFFF2D3E);
+
   final AppThemeMode mode;
   final String fontFamily;
 
   ThemeData lightTheme(ColorScheme? lightColorScheme) {
-    final ColorScheme scheme = lightColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0));
+    final ColorScheme scheme = lightColorScheme ?? ColorScheme.fromSeed(seedColor: brandSeedColor);
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
@@ -20,7 +22,7 @@ class AppTheme {
 
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
     final ColorScheme scheme =
-        darkColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0), brightness: Brightness.dark);
+        darkColorScheme ?? ColorScheme.fromSeed(seedColor: brandSeedColor, brightness: Brightness.dark);
     return ThemeData(
       useMaterial3: true,
       colorScheme: scheme,

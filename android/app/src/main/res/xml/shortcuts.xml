@@ -8,6 +8,6 @@
         <intent
             android:action="android.intent.action.MAIN"
             android:targetClass="com.hiddify.hiddify.ShortcutActivity"
-            android:targetPackage="app.hiddify.com" />
+            android:targetPackage="com.womaninred" />
     </shortcut>
 </shortcuts>
