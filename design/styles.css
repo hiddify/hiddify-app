@@ -1,0 +1,13 @@
+/* ============================================================
+   NOVA VPN — DESIGN SYSTEM ENTRY
+   Consumers link THIS file. Import order only — no rules here.
+   ============================================================ */
+
+@import url("tokens/fonts.css");
+@import url("tokens/colors.css");
+@import url("tokens/typography.css");
+@import url("tokens/spacing.css");
+@import url("tokens/radius.css");
+@import url("tokens/elevation.css");
+@import url("tokens/motion.css");
+@import url("base.css");

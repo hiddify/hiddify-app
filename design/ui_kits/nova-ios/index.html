@@ -1,0 +1,42 @@
+<!-- @dsCard group="Приложение iOS" viewport="470x760" name="Nova VPN — iOS app" subtitle="Интерактив: вход · подключение · выбор локации · правила · настройки" -->
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nova VPN — iOS</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="data.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<script>window.C = window.NovaVPNDesignSystem_e35630; if(window.C) Object.assign(window, window.C);</script>
+<style>
+  html,body{margin:0;height:100%}
+  body{background:
+    radial-gradient(80% 60% at 50% 12%, rgba(255,45,62,0.06), transparent 60%),
+    var(--void);
+    display:grid;place-items:center;padding:28px;box-sizing:border-box;font-family:var(--font-sans);
+    -webkit-font-smoothing:antialiased;min-height:100%}
+  @keyframes nova-floaty{0%,100%{transform:translate(0,0) rotate(0deg)}25%{transform:translate(4px,-9px) rotate(2deg)}50%{transform:translate(-3px,-4px) rotate(-1deg)}75%{transform:translate(3px,-11px) rotate(1deg)}}
+  @keyframes nova-dash{0%{opacity:0;transform:translate(-70px,0) scaleX(1)}12%{opacity:1}88%{opacity:1}100%{opacity:0;transform:translate(360px,-40px) scaleX(1)}}
+  @keyframes nova-scan{0%{opacity:0}30%{opacity:.6}60%{opacity:.2}100%{opacity:0}}
+  @keyframes nova-shake{0%,100%{transform:translate(0)}20%{transform:translate(-2px,1px)}40%{transform:translate(2px,-2px)}60%{transform:translate(-2px,2px)}80%{transform:translate(2px,-1px)}}
+  .nova-rabbit{animation:nova-dash 1s cubic-bezier(.6,0,.2,1) forwards}
+  .nova-shake{animation:nova-shake .5s steps(2) 1}
+  .nova-scan{animation:nova-scan .5s steps(3) 1}
+  @media (prefers-reduced-motion: reduce){
+    .nova-glyph,.nova-rabbit,.nova-shake,.nova-scan{animation:none!important}
+  }
+</style></head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="RadarField.jsx" data-presets="react"></script>
+<script type="text/babel" src="RitualHero.jsx" data-presets="react"></script>
+<script type="text/babel" src="Phone.jsx" data-presets="react"></script>
+<script type="text/babel" src="Welcome.jsx" data-presets="react"></script>
+<script type="text/babel" src="Home.jsx" data-presets="react"></script>
+<script type="text/babel" src="Servers.jsx" data-presets="react"></script>
+<script type="text/babel" src="Rules.jsx" data-presets="react"></script>
+<script type="text/babel" src="Settings.jsx" data-presets="react"></script>
+<script type="text/babel" src="App.jsx" data-presets="react"></script>
+</body></html>

@@ -1,0 +1,35 @@
+/* ============================================================
+   NOVA VPN — SPACING & LAYOUT TOKENS
+   4-based rhythm. iOS safe-area & gutter conventions.
+   ============================================================ */
+
+:root {
+  --sp-0:   0px;
+  --sp-1:   2px;
+  --sp-2:   4px;
+  --sp-3:   8px;
+  --sp-4:   12px;
+  --sp-5:   16px;
+  --sp-6:   20px;
+  --sp-7:   24px;
+  --sp-8:   32px;
+  --sp-9:   40px;
+  --sp-10:  48px;
+  --sp-11:  64px;
+  --sp-12:  80px;
+
+  /* ---- Layout ---- */
+  --gutter:        20px;   /* screen side padding */
+  --gutter-tight:  16px;
+  --row-h:         56px;   /* standard list row height */
+  --row-h-lg:      64px;   /* country / server row */
+  --nav-h:         52px;   /* top nav bar */
+  --sheet-radius:  28px;   /* bottom-sheet top corners */
+  --touch-min:     44px;   /* min hit target */
+  --screen-w:      390px;  /* iPhone design width */
+  --screen-h:      844px;
+
+  /* safe areas (iPhone with notch) */
+  --safe-top:    59px;
+  --safe-bottom: 34px;
+}

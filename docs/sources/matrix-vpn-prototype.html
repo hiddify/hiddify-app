@@ -1,0 +1,259 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VPN · Red Distraction → Awakening</title>
+<style>
+  :root{
+    --bg:#07080a; --ink:#e8eef0; --dim:#5a6169;
+    --red:#ff2d3f; --teal:#00ff00; --teal-soft:rgba(0,255,0,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(120% 120% at 50% -10%,#12151a 0%,#07080a 60%);
+    color:var(--ink); font-family:-apple-system,Segoe UI,Roboto,sans-serif;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:100%; gap:18px; padding:24px; -webkit-font-smoothing:antialiased;
+  }
+  .phone{
+    position:relative; width:320px; height:620px; border-radius:44px;
+    background:#0a0c10; border:1px solid #1b1f26;
+    box-shadow:0 40px 120px rgba(0,0,0,.6), inset 0 0 0 6px #05060898;
+    overflow:hidden;
+  }
+  /* screen holds all animated layers */
+  .screen{
+    position:absolute; inset:0; border-radius:44px; overflow:hidden;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(120% 90% at 50% 40%,#0d1013 0%,#0a0c10 60%);
+    filter:brightness(.9) contrast(.97) saturate(.92);
+    transition:filter 1.1s ease, background 1.1s ease;
+  }
+  /* ON — awake: brighter + deep emerald #1B4D3E capsule background */
+  .screen[data-state="on"]{
+    filter:brightness(1) contrast(1.05) saturate(1.12);
+    background:radial-gradient(125% 95% at 50% 40%,#178a3d 0%,#0f6330 42%,#0b3d21 72%,#061f13 100%);
+  }
+
+  /* faint digital grid — invisible OFF, breathes ON */
+  .grid{
+    position:absolute; inset:0; opacity:0; transition:opacity 1.1s ease;
+    background-image:linear-gradient(var(--teal-soft) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--teal-soft) 1px,transparent 1px);
+    background-size:34px 34px; mask-image:radial-gradient(70% 60% at 50% 45%,#000 30%,transparent 75%);
+  }
+  .screen[data-state="on"] .grid{ opacity:.16; animation:gridpulse 6s ease-in-out infinite; }
+  @keyframes gridpulse{0%,100%{opacity:.10}50%{opacity:.20}}
+
+  /* red distraction — matrix glyphs gently floating near the edges (behind UI) */
+  .glyphs{position:absolute; inset:0; pointer-events:none;}
+  .glyph{
+    position:absolute; font-family:ui-monospace,Menlo,monospace; font-weight:600;
+    color:var(--red); text-shadow:0 0 12px rgba(255,45,63,.7),0 0 2px rgba(255,45,63,.9);
+    opacity:.85; will-change:transform,opacity;
+    animation:floaty var(--dur,7s) ease-in-out infinite; animation-delay:var(--del,0s);
+  }
+  @keyframes floaty{
+    0%  {transform:translate(0,0) rotate(0deg); opacity:.55}
+    25% {transform:translate(4px,-9px) rotate(2deg); opacity:.9}
+    50% {transform:translate(-3px,-4px) rotate(-1deg); opacity:.7}
+    75% {transform:translate(3px,-11px) rotate(1deg); opacity:.85}
+    100%{transform:translate(0,0) rotate(0deg); opacity:.55}
+  }
+  /* when ON — glyphs freeze in place (no floating) and turn grey */
+  .screen[data-state="on"] .glyph{
+    animation-play-state:paused; opacity:.5;
+    color:#767c85; text-shadow:0 0 8px rgba(120,128,138,.35);
+  }
+  body.reduce .glyph{animation:none!important}
+
+  /* rabbit — dashes across during the switch */
+  .rabbit{
+    position:absolute; top:52%; left:-60px; width:46px; height:46px; opacity:0;
+    filter:drop-shadow(0 0 10px rgba(255,255,255,.85));
+  }
+  .rabbit svg{width:100%;height:100%;fill:#f4f7f8}
+  .screen[data-state="switching"] .rabbit{ animation:dash 1s cubic-bezier(.6,0,.2,1) forwards; }
+  @keyframes dash{
+    0%{opacity:0; left:-60px; transform:translateY(0) scaleX(1)}
+    12%{opacity:1}
+    88%{opacity:1}
+    100%{opacity:0; left:360px; transform:translateY(-40px) scaleX(1)}
+  }
+  /* rabbit trail */
+  .trail{
+    position:absolute; top:calc(52% + 20px); left:0; height:2px; width:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);
+    opacity:0;
+  }
+  .screen[data-state="switching"] .trail{ animation:trail 1s ease forwards; }
+  @keyframes trail{0%{width:0;opacity:0;left:0}20%{opacity:.9}100%{width:100%;opacity:0;left:10%}}
+
+  /* power button */
+  .btn-wrap{position:relative; width:170px; height:170px; display:grid; place-items:center; cursor:pointer;}
+  .ring{
+    position:absolute; inset:0; border-radius:50%;
+    border:2px solid #2c333c; transition:all 1.1s ease;
+  }
+  .screen[data-state="on"] .ring{
+    border-color:var(--teal);
+    box-shadow:0 0 40px var(--teal-soft), inset 0 0 30px rgba(38,224,176,.12);
+    animation:breathe 4.5s ease-in-out infinite;
+  }
+  @keyframes breathe{0%,100%{transform:scale(1);box-shadow:0 0 30px var(--teal-soft)}50%{transform:scale(1.035);box-shadow:0 0 55px var(--teal-soft)}}
+  .core{
+    width:118px;height:118px;border-radius:50%;
+    background:radial-gradient(circle at 50% 40%,#171b21,#0b0d11);
+    display:grid;place-items:center; transition:all 1.1s ease;
+  }
+  .screen[data-state="on"] .core{ background:radial-gradient(circle at 50% 40%,#123028,#0b0d11); }
+  .power{width:44px;height:44px;color:#4b525b;transition:color 1.1s ease}
+  .screen[data-state="on"] .power{color:var(--teal)}
+  .power svg{width:100%;height:100%;stroke:currentColor;stroke-width:2.4;fill:none;stroke-linecap:round}
+
+  /* text */
+  .status{
+    position:absolute; bottom:120px; width:100%; text-align:center;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.22em;
+    font-size:12px; color:var(--dim); text-transform:uppercase; transition:color 1.1s;
+  }
+  .screen[data-state="on"] .status{color:var(--teal)}
+  .welcome{
+    position:absolute; top:120px; width:100%; text-align:center;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.28em;
+    font-size:15px; color:#eef4f2; opacity:0; transition:opacity .4s; min-height:20px;
+  }
+  .screen[data-state="on"] .welcome{opacity:1}
+  .sub{
+    position:absolute; bottom:92px; width:100%; text-align:center;
+    font-size:11px; color:#3a4048; letter-spacing:.05em;
+  }
+
+  /* glitch burst */
+  .screen.glitch{ animation:shake .5s steps(2) 1; }
+  @keyframes shake{0%{transform:translate(0)}20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,2px)}80%{transform:translate(2px,-1px)}100%{transform:translate(0)}}
+  .scan{
+    position:absolute; inset:0; opacity:0; pointer-events:none; mix-blend-mode:screen;
+    background:repeating-linear-gradient(0deg,rgba(255,255,255,.06) 0 1px,transparent 1px 4px);
+  }
+  .screen.glitch .scan{ animation:scanflick .5s steps(3) 1; }
+  @keyframes scanflick{0%{opacity:0}30%{opacity:.8}60%{opacity:.2}100%{opacity:0}}
+  .rgb{
+    position:absolute; inset:0; opacity:0; pointer-events:none; mix-blend-mode:screen;
+    background:
+      linear-gradient(90deg,rgba(255,0,60,.25),transparent 40%),
+      linear-gradient(270deg,rgba(0,200,255,.22),transparent 40%);
+  }
+  .screen.glitch .rgb{ animation:rgbflick .5s steps(4) 1; }
+  @keyframes rgbflick{0%,100%{opacity:0;transform:translate(0)}25%{opacity:1;transform:translate(4px)}50%{opacity:.6;transform:translate(-4px)}75%{opacity:.9;transform:translate(2px)}}
+
+  /* page chrome */
+  .hint{color:#666d76;font-size:13px;letter-spacing:.03em}
+  .cap{color:#444a52;font-size:11px;max-width:320px;text-align:center;line-height:1.5}
+  .rm{color:#565d66;font-size:11px;display:flex;gap:6px;align-items:center;cursor:pointer;user-select:none}
+  body.reduce .distraction,body.reduce .ring{animation:none!important}
+</style>
+
+<div class="phone">
+  <div class="screen" id="screen" data-state="off">
+    <div class="grid"></div>
+    <div class="scan"></div>
+    <div class="rgb"></div>
+
+    <div class="glyphs" id="glyphs">
+      <span class="glyph" style="top:74px;  left:20px;  font-size:22px; --dur:6.5s; --del:0s"></span>
+      <span class="glyph" style="top:300px; left:14px;  font-size:18px; --dur:8s;   --del:1.2s"></span>
+      <span class="glyph" style="top:512px; left:44px;  font-size:20px; --dur:7.2s; --del:.6s"></span>
+      <span class="glyph" style="top:112px; left:272px; font-size:19px; --dur:7.6s; --del:.9s"></span>
+      <span class="glyph" style="top:346px; left:286px; font-size:24px; --dur:6.8s; --del:.3s"></span>
+      <span class="glyph" style="top:498px; left:264px; font-size:17px; --dur:8.4s; --del:1.6s"></span>
+    </div>
+
+    <div class="trail"></div>
+    <div class="rabbit" id="rabbit">
+      <svg viewBox="0 0 64 64"><path d="M24 60c-8 0-13-5-13-13 0-6 3-10 7-13-2-3-3-7-3-13 0-4 1-8 3-8 3 0 5 5 6 12 1-.2 2-.3 3-.3s2 .1 3 .3c1-7 3-12 6-12 2 0 3 4 3 8 0 6-1 10-3 13 4 3 7 7 7 13 0 8-5 13-13 13z"/></svg>
+    </div>
+
+    <div class="welcome" id="welcome"></div>
+
+    <div class="btn-wrap" id="btn">
+      <div class="ring"></div>
+      <div class="core">
+        <div class="power"><svg viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M6.6 6.6a8 8 0 1 0 10.8 0"/></svg></div>
+      </div>
+    </div>
+
+    <div class="status" id="status">Защита выключена</div>
+    <div class="sub" id="sub">Ты на виду · нажми кнопку</div>
+  </div>
+</div>
+
+<div class="hint">Нажми на кнопку питания ↑</div>
+<div class="cap">Вариант A — «Red Distraction → Awakening». OFF: красное отвлечение дрейфует у края, мир монохромный. Переключение: кролик + глитч. ON: пробуждение, «расшифровка» надписи, спокойное дыхание.</div>
+<label class="rm"><input type="checkbox" id="reduce"> Reduced motion</label>
+
+<script>
+  const screen=document.getElementById('screen');
+  const btn=document.getElementById('btn');
+  const statusEl=document.getElementById('status');
+  const subEl=document.getElementById('sub');
+  const welcomeEl=document.getElementById('welcome');
+  const reduce=document.getElementById('reduce');
+  let state='off', busy=false;
+
+  const GLYPHS='アイウエオカキサソタネハヲ01<>[]#$%&*+=';
+
+  // seed the floating matrix glyphs + gently swap them while OFF
+  const glyphEls=[...document.querySelectorAll('.glyph')];
+  const rnd=()=>GLYPHS[Math.floor(Math.random()*GLYPHS.length)];
+  glyphEls.forEach(el=>el.textContent=rnd());
+  setInterval(()=>{
+    if(state!=='off'||reduce.checked) return;      // frozen when ON
+    const el=glyphEls[Math.floor(Math.random()*glyphEls.length)];
+    el.textContent=rnd();
+  },900);
+  function decrypt(el,target,dur=750){
+    const start=performance.now();
+    const len=target.length;
+    function frame(t){
+      const p=Math.min(1,(t-start)/dur);
+      const reveal=Math.floor(p*len);
+      let out='';
+      for(let i=0;i<len;i++){
+        if(target[i]===' '){out+=' ';continue;}
+        out+= i<reveal ? target[i] : GLYPHS[Math.floor(Math.random()*GLYPHS.length)];
+      }
+      el.textContent=out;
+      if(p<1) requestAnimationFrame(frame); else el.textContent=target;
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function turnOn(){
+    busy=true; state='switching'; screen.dataset.state='switching';
+    statusEl.textContent='Установка канала…'; subEl.textContent='Следуй за кроликом';
+    const fast=reduce.checked;
+    const rabbitTime=fast?100:520;
+    // glitch burst mid-way
+    setTimeout(()=>{ if(!fast) screen.classList.add('glitch');
+      setTimeout(()=>screen.classList.remove('glitch'),500);
+    }, rabbitTime);
+    // settle into ON
+    setTimeout(()=>{
+      state='on'; screen.dataset.state='on';
+      statusEl.textContent='Защита активна';
+      subEl.textContent='Канал зашифрован';
+      decrypt(welcomeEl,'С ВОЗВРАЩЕНИЕМ', fast?200:750);
+      busy=false;
+    }, fast?250:1050);
+  }
+  function turnOff(){
+    busy=true; state='off'; screen.dataset.state='off';
+    welcomeEl.textContent='';
+    statusEl.textContent='Защита выключена';
+    subEl.textContent='Ты на виду · нажми кнопку';
+    setTimeout(()=>busy=false,300);
+  }
+  btn.addEventListener('click',()=>{ if(busy) return; state==='on'?turnOff():turnOn(); });
+  reduce.addEventListener('change',()=>document.body.classList.toggle('reduce',reduce.checked));
+  if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){reduce.checked=true;document.body.classList.add('reduce');}
+</script>

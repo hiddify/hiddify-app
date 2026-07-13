@@ -1,0 +1,17 @@
+/* ============================================================
+   NOVA VPN — BASE A11Y RULES (layered on the tokens)
+   Components style inline, so keyboard-focus lives here. Uses
+   outline (not box-shadow) to avoid clobbering inline shadows/glows.
+   ============================================================ */
+
+:where(button, a, input, textarea, select,
+       [role="switch"], [role="radio"], [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--red-400);
+  outline-offset: 2px;
+}
+
+/* Never show the ring on mouse/touch — only keyboard (:focus-visible handles this,
+   this clears the legacy :focus fallback some engines still paint). */
+:where(button, a, input, textarea, select, [tabindex]):focus:not(:focus-visible) {
+  outline: none;
+}

@@ -1,0 +1,89 @@
+/* ============================================================
+   NOVA VPN — COLOR TOKENS
+   Digital-mysticism / deep-black + one ritual-red accent.
+   Base values first, semantic aliases below.
+   ============================================================ */
+
+:root {
+  /* ---- Void & surfaces (near-black, cool tint) ---- */
+  --void:        #060608;   /* app base */
+  --ink-900:     #0A0A0D;
+  --ink-850:     #0E0E12;
+  --surface-1:   #101015;   /* base card */
+  --surface-2:   #16161C;   /* elevated card / bottom sheet */
+  --surface-3:   #1E1E26;   /* input, pressed row */
+  --surface-4:   #262630;   /* max elevation / hover */
+
+  /* ---- Hairlines & separators ---- */
+  --line:        rgba(255, 255, 255, 0.07);
+  --line-2:      rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.20);
+
+  /* ---- Text ----
+     Contrast rule (WCAG AA on --void #060608):
+       text-1 ~15:1, text-2 ~7:1  -> readable content (body, secondary).
+       text-3 ~4.9:1              -> small uppercase micro-labels ONLY.
+       text-4 ~2:1                -> disabled / placeholder / decorative dots.
+     Any string a user must READ uses >= --text-2. --text-4 never carries meaning. */
+  --text-1: #F2F2F5;   /* primary */
+  --text-2: #9A9AA4;   /* secondary / body */
+  --text-3: #7C7C86;   /* micro-labels only (lifted from #63636D for AA ~4.9:1) */
+  --text-4: #42424B;   /* disabled / placeholder / decorative — NOT for readable text */
+  --text-on-red: #FFFFFF;
+
+  /* ---- Ritual red (the pill / active / connected) ---- */
+  --red-700: #B8121F;
+  --red-600: #E01B2C;   /* pressed */
+  --red-500: #FF2D3E;   /* primary accent */
+  --red-400: #FF5C68;   /* hover / light */
+  --red-300: #FF8A92;
+  --red-tint:      rgba(255, 45, 62, 0.10);  /* fills / row highlight */
+  --red-tint-2:    rgba(255, 45, 62, 0.16);
+  --red-glow:      rgba(255, 45, 62, 0.45);  /* connect glow */
+  --red-glow-soft: rgba(255, 45, 62, 0.22);
+
+  /* ---- Latency / signal-quality scale (kept OFF the brand red) ---- */
+  --sig-good: #3DD6B0;   /* fast   */
+  --sig-mid:  #E9B23C;   /* medium */
+  --sig-slow: #7C7C86;   /* slow   */
+
+  /* ---- Utility semantics ---- */
+  --warn:      #E9B23C;
+  --danger:    #FF2D3E;   /* destructive actions reuse the red */
+  --info:      #5B8BFF;
+
+  /* ============================================================
+     SEMANTIC ALIASES — reference these in components
+     ============================================================ */
+
+  /* backgrounds */
+  --bg-app:        var(--void);
+  --bg-elevated:   var(--surface-1);
+  --bg-sheet:      var(--surface-2);
+  --bg-input:      var(--surface-3);
+  --bg-hover:      var(--surface-4);
+
+  /* borders */
+  --border-subtle: var(--line);
+  --border:        var(--line-2);
+  --border-strong: var(--line-strong);
+
+  /* text */
+  --text-primary:   var(--text-1);
+  --text-secondary: var(--text-2);
+  --text-tertiary:  var(--text-3);
+  --text-muted:     var(--text-4);
+
+  /* accent */
+  --accent:        var(--red-500);
+  --accent-hover:  var(--red-400);
+  --accent-press:  var(--red-600);
+  --accent-fill:   var(--red-tint);
+  --accent-glow:   var(--red-glow);
+
+  /* status dots */
+  --status-fast: var(--sig-good);
+  --status-mid:  var(--sig-mid);
+  --status-slow: var(--sig-slow);
+  --status-on:   var(--red-500);   /* connected / active */
+}

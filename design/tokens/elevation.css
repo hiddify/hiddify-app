@@ -1,0 +1,29 @@
+/* ============================================================
+   NOVA VPN — ELEVATION TOKENS
+   Dark UI: depth via hairline borders + soft ambient shadow.
+   The red glow is reserved for the connect / active moment.
+   ============================================================ */
+
+:root {
+  /* ambient shadows (subtle on black) */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.40);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg:   0 12px 40px rgba(0, 0, 0, 0.55);
+  --shadow-sheet: 0 -12px 48px rgba(0, 0, 0, 0.60);
+
+  /* the ritual glow — connect button, connected pill */
+  --glow-red:      0 0 0 1px var(--red-500),
+                   0 0 24px var(--red-glow),
+                   0 0 64px var(--red-glow-soft);
+  --glow-red-soft: 0 0 20px var(--red-glow-soft);
+
+  /* inner sheen for elevated glass surfaces */
+  --sheen-top: inset 0 1px 0 rgba(255, 255, 255, 0.05); /* @kind shadow */
+
+  /* focus ring */
+  --ring: 0 0 0 3px var(--red-tint-2);
+
+  /* blur presets (backdrop) */
+  --blur-sheet: 24px; /* @kind other */
+  --blur-chip:  12px; /* @kind other */
+}

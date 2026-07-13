@@ -1,0 +1,56 @@
+/* ============================================================
+   NOVA VPN — MOTION TOKENS
+   Quiet, precise, spatial. Nothing bouncy or playful.
+   Connection is the one moment allowed a slow, deliberate build.
+   ============================================================ */
+
+:root {
+  /* durations */
+  --dur-1: 120ms;   /* @kind other */
+  --dur-2: 200ms;   /* @kind other */
+  --dur-3: 320ms;   /* @kind other */
+  --dur-4: 520ms;   /* @kind other */
+  --dur-ritual: 1600ms; /* @kind other */
+
+  /* easing */
+  --ease-out:   cubic-bezier(0.16, 1, 0.30, 1);   /* @kind other */
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+  --ease-in:    cubic-bezier(0.4, 0, 1, 1); /* @kind other */
+  --ease-linear: linear; /* @kind other */
+
+  /* press feedback */
+  --press-scale: 0.97; /* @kind other */
+}
+
+/* Ritual pulse — the beacon while connecting */
+@keyframes nova-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+/* Radar sweep for the hero motif */
+@keyframes nova-sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Expanding signal ring */
+@keyframes nova-ring {
+  0%   { transform: scale(0.6); opacity: 0.7; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   Collapse ritual/ambient timings so any class-driven animation
+   settles instantly. Inline style={{animation}} on the connect
+   button, radar sweep and glyphs is guarded in JS (matchMedia)
+   — CSS alone can't override inline animation. Both layers apply.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-ritual: var(--dur-1);
+    --dur-4: var(--dur-2);
+  }
+  .nova-glyph, .nova-rabbit, .nova-shake, .nova-scan { animation: none !important; }
+}

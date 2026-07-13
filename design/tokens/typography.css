@@ -1,0 +1,61 @@
+/* ============================================================
+   NOVA VPN — TYPOGRAPHY TOKENS
+   Geist (UI/display) + Geist Mono (data, coordinates, ciphers).
+   Mono carries the "signal / terminal" register — used for
+   latency, IP, traffic, protocol tags, coordinates.
+   ============================================================ */
+
+:root {
+  /* ---- Families ---- */
+  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text",
+               "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono",
+               "Menlo", monospace;
+
+  /* ---- Weights ---- */
+  --w-light:    300; /* @kind font */
+  --w-regular:  400; /* @kind font */
+  --w-medium:   500; /* @kind font */
+  --w-semibold: 600; /* @kind font */
+  --w-bold:     700; /* @kind font */
+
+  /* ---- Type scale (px) — iOS-anchored, 17 = body ---- */
+  --fs-display: 40px;  /* hero headings: "Awaken." */
+  --fs-h1:      30px;
+  --fs-h2:      24px;
+  --fs-h3:      20px;
+  --fs-title:   17px;  /* nav title / list title */
+  --fs-body:    17px;
+  --fs-callout: 16px;
+  --fs-sub:     15px;
+  --fs-foot:    13px;
+  --fs-cap:     12px;
+  --fs-micro:   11px;
+
+  /* ---- Line heights ---- */
+  --lh-tight:   1.05; /* @kind font */
+  --lh-snug:    1.2;  /* @kind font */
+  --lh-normal:  1.35; /* @kind font */
+  --lh-relaxed: 1.5;  /* @kind font */
+
+  /* ---- Tracking ---- */
+  --ls-display: -0.02em; /* @kind font */
+  --ls-tight:   -0.01em; /* @kind font */
+  --ls-normal:  0;       /* @kind font */
+  --ls-wide:    0.04em;  /* @kind font */
+  --ls-mono:    0.02em;  /* @kind font */
+  --ls-label:   0.12em;  /* @kind font */
+
+  /* ============================================================
+     SEMANTIC TEXT ROLES (shorthand font: values)
+     ============================================================ */
+  --text-display: var(--w-bold) var(--fs-display)/var(--lh-tight) var(--font-sans);
+  --text-h1:      var(--w-bold) var(--fs-h1)/var(--lh-snug) var(--font-sans);
+  --text-h2:      var(--w-semibold) var(--fs-h2)/var(--lh-snug) var(--font-sans);
+  --text-h3:      var(--w-semibold) var(--fs-h3)/var(--lh-normal) var(--font-sans);
+  --text-title:   var(--w-semibold) var(--fs-title)/var(--lh-normal) var(--font-sans);
+  --text-body:    var(--w-regular) var(--fs-body)/var(--lh-normal) var(--font-sans);
+  --text-sub:     var(--w-regular) var(--fs-sub)/var(--lh-normal) var(--font-sans);
+  --text-foot:    var(--w-regular) var(--fs-foot)/var(--lh-normal) var(--font-sans);
+  --text-mono:    var(--w-regular) var(--fs-foot)/var(--lh-normal) var(--font-mono);
+}

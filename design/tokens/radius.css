@@ -1,0 +1,16 @@
+/* ============================================================
+   NOVA VPN — RADIUS TOKENS
+   Soft, confident corners. Pills for actions & status.
+   ============================================================ */
+
+:root {
+  --r-xs:   6px;
+  --r-sm:   10px;
+  --r-md:   14px;   /* inputs, small cards */
+  --r-lg:   18px;   /* cards */
+  --r-xl:   22px;   /* large cards */
+  --r-2xl:  28px;   /* sheets, hero cards */
+  --r-3xl:  36px;
+  --r-pill: 999px;  /* buttons, chips, status pill */
+  --r-full: 50%;    /* avatars, flag dots */
+}
