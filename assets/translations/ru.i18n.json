@@ -336,10 +336,10 @@
             "other": "Другой"
           },
           "balancerStrategy": {
-            "title": "Стратегия сбалансированности",
-            "roundRobin": "Круговая система",
-            "consistentHash": "Последовательный хеш",
-            "stickySession": "Липкая сессия"
+            "title": "Стратегия Balancer",
+            "roundRobin": "Round robin",
+            "consistentHash": "Consistent hash",
+            "stickySession": "Sticky session"
           },
           "resolveDestination": "Определять адрес назначения",
           "ipv6Route": "Маршрут IPv6",
