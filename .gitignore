@@ -71,3 +71,6 @@ windows/sign.cer
 .aider.input.history
 .aider.chat.history.md
 .aider.tags.cache.v4
+
+# Local isolated feature worktrees
+.worktrees/
