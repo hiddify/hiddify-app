@@ -72,6 +72,7 @@ Initial component-token mapping:
 --tabbar-icon-size: var(--sp-6);
 --tabbar-label-font: var(--w-medium) var(--fs-micro)/1 var(--font-sans);
 --tabbar-transition: var(--dur-2) var(--ease-out);
+--tabbar-transition-reduced: var(--dur-1) var(--ease-out);
 ```
 
 The three missing foundation values — `--glass-regular`, `--shadow-dock`, and `--blur-nav` — are added beside their related color/elevation primitives. They are reusable navigation-surface primitives, not TabBar-only literals.
