@@ -12,7 +12,7 @@ const Home = ({ status, onToggle, sel, onOpenServers, onSettings, timer, down, u
     : "Ты на виду · нажми кнопку";
   return (
     <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column" }}>
-      <HNav brand={<span style={{font:"var(--w-bold) 17px/1 var(--font-sans)",letterSpacing:"-0.01em"}}>Woman in <span style={{color:"var(--red-500)"}}>Red</span></span>}
+      <HNav brand={<span style={{font:"var(--w-bold) 17px/1 var(--font-sans)",letterSpacing:"-0.01em",color:"var(--text-1)"}}>Woman in <span style={{color:"var(--red-500)"}}>Red</span></span>}
         left={<HIcon icon="grip" variant="plain" size={36}/>}
         right={<HIcon icon="settings" variant="plain" size={36} onClick={onSettings}/>}/>
       <div style={{ flex:1, minHeight:0, overflowY:"auto", position:"relative" }}>
@@ -35,21 +35,18 @@ const Home = ({ status, onToggle, sel, onOpenServers, onSettings, timer, down, u
             </div>
           </HCard>
 
-          {/* subscription / traffic — always visible; values are placeholders until Remnawave wiring */}
+          {/* subscription / traffic — compact single row + bar; placeholder values until Remnawave wiring */}
           <HCard tone="base" pad={0}>
-            <div style={{ padding:"12px 16px", display:"flex", flexDirection:"column", gap:9 }}>
+            <div style={{ padding:"10px 16px", display:"flex", flexDirection:"column", gap:8 }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                  <HGlyph name="gauge" size={15} color="var(--text-3)"/>
-                  <span style={{ font:"var(--w-medium) var(--fs-cap)/1 var(--font-sans)", letterSpacing:"var(--ls-label)", textTransform:"uppercase", color:"var(--text-3)" }}>Трафик</span>
+                <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                  <HGlyph name="gauge" size={14} color="var(--text-3)"/>
+                  <span style={{ font:"var(--w-semibold) var(--fs-sub)/1 var(--font-mono)", color:"var(--text-1)" }}>42 ГБ</span>
+                  <span style={{ font:"var(--text-foot)", color:"var(--text-3)" }}>из 100</span>
                 </div>
                 <span style={{ font:"var(--text-mono)", color:"var(--text-2)" }}>до 12 авг</span>
               </div>
-              <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between" }}>
-                <span style={{ font:"var(--w-semibold) var(--fs-title)/1 var(--font-mono)", color:"var(--text-1)" }}>42 ГБ</span>
-                <span style={{ font:"var(--text-foot)", color:"var(--text-3)" }}>из 100 ГБ</span>
-              </div>
-              <div style={{ height:6, borderRadius:"var(--r-pill)", background:"var(--surface-3)", overflow:"hidden" }}>
+              <div style={{ height:5, borderRadius:"var(--r-pill)", background:"var(--surface-3)", overflow:"hidden" }}>
                 <div style={{ width:"42%", height:"100%", borderRadius:"var(--r-pill)", background:"var(--red-500)", boxShadow:"var(--glow-red-soft)" }}/>
               </div>
             </div>

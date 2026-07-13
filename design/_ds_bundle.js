@@ -1342,10 +1342,23 @@ function ServerRow({
   }), signal != null && /*#__PURE__*/React.createElement(__ds_scope.SignalBars, {
     level: signal,
     size: 16
-  }), select === "radio" && /*#__PURE__*/React.createElement(__ds_scope.Radio, {
-    checked: selected,
-    onChange: onClick
-  }), select === "dot" && /*#__PURE__*/React.createElement("span", {
+  }), select === "radio" && selected && /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: 22,
+      height: 22,
+      borderRadius: "var(--r-full)",
+      background: "var(--red-500)",
+      display: "grid",
+      placeItems: "center",
+      boxShadow: "var(--glow-red-soft)",
+      flexShrink: 0
+    }
+  }, /*#__PURE__*/React.createElement(__ds_scope.Icon, {
+    name: "check",
+    size: 14,
+    color: "var(--text-on-red)",
+    stroke: 3
+  })), select === "dot" && /*#__PURE__*/React.createElement("span", {
     style: {
       width: 9,
       height: 9,

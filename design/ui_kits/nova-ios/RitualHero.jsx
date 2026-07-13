@@ -46,9 +46,9 @@ const RitualHero = ({ status, children }) => {
   }, [on]);
 
   return (
-    <div style={{ position:"relative", height:340, display:"grid", placeItems:"center", overflow:"hidden" }}
+    <div style={{ position:"relative", height:300, display:"grid", placeItems:"center", overflow:"hidden" }}
       className={connecting && !rm ? "nova-shake" : ""}>
-      <RadarField active={on} height={340} hideCenter={true}/>
+      <RadarField active={on} height={300} hideCenter={true}/>
 
       {/* cold drifting glyphs — the sterile matrix */}
       <div style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:1 }}>

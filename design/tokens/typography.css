@@ -1,15 +1,16 @@
 /* ============================================================
    NOVA VPN — TYPOGRAPHY TOKENS
-   Geist (UI/display) + Geist Mono (data, coordinates, ciphers).
+   IBM Plex Sans (UI/display) + IBM Plex Mono (data, coordinates, ciphers).
    Mono carries the "signal / terminal" register — used for
    latency, IP, traffic, protocol tags, coordinates.
+   Full Cyrillic coverage (the UI is Russian).
    ============================================================ */
 
 :root {
   /* ---- Families ---- */
-  --font-sans: "Geist", -apple-system, BlinkMacSystemFont, "SF Pro Text",
+  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "SF Pro Text",
                "Segoe UI", system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono",
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "JetBrains Mono",
                "Menlo", monospace;
 
   /* ---- Weights ---- */

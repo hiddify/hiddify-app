@@ -1,12 +1,11 @@
 /* ============================================================
    NOVA VPN — WEBFONTS
-   Geist + Geist Mono via Google Fonts CDN.
-   NOTE: served from fonts.gstatic.com. To fully self-host,
-   drop the .woff2 files in assets/fonts/ and replace this
-   @import with local @font-face rules.
+   IBM Plex Sans (UI/display) + IBM Plex Mono (data/signal).
+   Chosen for full Cyrillic coverage — the UI is Russian, so the
+   family must render Cyrillic natively rather than fall back.
    ============================================================ */
 
 /* TODO(privacy): self-host before ship — a VPN must not fetch fonts from Google.
    Replace this @import with local @font-face. Spec: design/SELF_HOST_ASSETS.md §1.
    (Kept as CDN import so the preview stays viewable; harmless — preview isn't shipped.) */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');

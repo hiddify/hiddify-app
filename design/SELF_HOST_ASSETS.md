@@ -13,17 +13,19 @@ authoring session (no network for binaries) — it is the one carried-forward bl
 
 ---
 
-## 1. Fonts — Geist + Geist Mono
+## 1. Fonts — IBM Plex Sans + IBM Plex Mono
 
 **Now (preview):** `design/tokens/fonts.css` `@import`s from `fonts.googleapis.com`.
-**Ship:** self-host.
+**Ship:** self-host. Chosen for full **Cyrillic** coverage (the UI is Russian) — do not
+substitute a Latin-only family or Russian text falls back to system fonts.
 
-- Download the Geist + Geist Mono `.woff2` (OFL, self-hosting allowed) for the weights
-  actually used: sans `300/400/500/600/700`, mono `400/500/600`.
-- Preview kit: drop into `design/assets/fonts/geist/`, replace the `@import` in
-  `fonts.css` with local `@font-face` rules (`src: url("../assets/fonts/geist/...woff2") format("woff2")`).
-- **Flutter app:** put the `.ttf`/`.otf` under `assets/fonts/` and declare them in
-  `pubspec.yaml` `flutter: fonts:` (families `Geist`, `Geist Mono`). Ship the OFL license file.
+- Download IBM Plex Sans + IBM Plex Mono `.woff2` (OFL, self-hosting allowed) for the
+  weights actually used: sans `300/400/500/600/700`, mono `400/500/600`. Include the
+  **Cyrillic** subset.
+- Preview kit: drop into `design/assets/fonts/plex/`, replace the `@import` in
+  `fonts.css` with local `@font-face` rules (`src: url("../assets/fonts/plex/...woff2") format("woff2")`).
+- **Flutter app:** put the `.ttf` under `assets/fonts/` and declare them in
+  `pubspec.yaml` `flutter: fonts:` (families `IBM Plex Sans`, `IBM Plex Mono`). Ship the OFL license file.
 
 ## 2. Flags — country flags in `ServerRow` / `Flag`
 
