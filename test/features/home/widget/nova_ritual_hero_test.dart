@@ -24,7 +24,7 @@ const inheritedTheme = NovaThemeData(
 );
 
 void main() {
-  testWidgets('renders Home ritual copy from the English translations provider', (tester) async {
+  testWidgets('omits duplicate ritual copy with the English translations provider', (tester) async {
     final translations = await AppLocale.en.build();
     await tester.pumpWidget(
       ProviderScope(
@@ -34,11 +34,7 @@ void main() {
             builder: (context, ref, _) {
               final t = ref.watch(translationsProvider).requireValue;
               return Scaffold(
-                body: NovaRitualHero(
-                  state: NovaRitualState.disconnected,
-                  statusLabel: t.connection.tapToConnect,
-                  child: const Text('control'),
-                ),
+                body: NovaRitualHero(state: NovaRitualState.disconnected, child: Text(t.pages.home.title)),
               );
             },
           ),
@@ -46,7 +42,9 @@ void main() {
       ),
     );
 
-    expect(find.text('Tap to connect'), findsOneWidget);
+    expect(translations.connection.tapToConnect, 'Tap to connect');
+    expect(find.text('Home'), findsOneWidget);
+    expect(find.text('Tap to connect'), findsNothing);
     expect(find.text('Ты на виду · нажми кнопку'), findsNothing);
   });
 

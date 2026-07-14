@@ -61,6 +61,7 @@ void main() {
 
   test('production Home and dock copy comes from translations', () {
     final home = File('lib/features/home/widget/home_page.dart').readAsStringSync();
+    final connection = File('lib/features/home/widget/connection_button.dart').readAsStringSync();
     final adaptive = File('lib/core/router/adaptive_layout/my_adaptive_layout.dart').readAsStringSync();
     final ritual = File('lib/features/home/widget/nova_ritual_hero.dart').readAsStringSync();
 
@@ -73,7 +74,8 @@ void main() {
     expect(ritual, isNot(contains('Ты вне матрицы')));
     expect(home, contains('t.pages.home.title'));
     expect(adaptive, contains('t.pages.settings.routing.title'));
-    expect(home, contains('statusLabel:'));
+    expect(home, isNot(contains('statusLabel: ritualStatus')));
     expect(home, isNot(contains('callToActionLabel: isConnected ? t.connection.connected : null')));
+    expect(RegExp(r't\.connection\.tapToConnect').allMatches('$home\n$connection'), hasLength(1));
   });
 }

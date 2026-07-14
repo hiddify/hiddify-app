@@ -6,16 +6,10 @@ import 'package:hiddify/core/theme/nova_tokens.dart';
 enum NovaRitualState { disconnected, connecting, connected, error }
 
 class NovaRitualHero extends StatelessWidget {
-  const NovaRitualHero({
-    super.key,
-    required this.state,
-    required this.statusLabel,
-    required this.child,
-    this.callToActionLabel,
-  });
+  const NovaRitualHero({super.key, required this.state, required this.child, this.statusLabel, this.callToActionLabel});
 
   final NovaRitualState state;
-  final String statusLabel;
+  final String? statusLabel;
   final String? callToActionLabel;
   final Widget child;
 
@@ -108,16 +102,17 @@ class NovaRitualHero extends StatelessWidget {
               children: [
                 child,
                 const SizedBox(height: NovaSpacing.lg),
-                Text(
-                  statusLabel,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: state == NovaRitualState.error ? Theme.of(context).colorScheme.error : nova.tertiaryText,
-                    fontFamily: 'monospace',
-                    fontSize: 11,
-                    letterSpacing: 0.65,
+                if (statusLabel != null)
+                  Text(
+                    statusLabel!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: state == NovaRitualState.error ? Theme.of(context).colorScheme.error : nova.tertiaryText,
+                      fontFamily: 'monospace',
+                      fontSize: 11,
+                      letterSpacing: 0.65,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

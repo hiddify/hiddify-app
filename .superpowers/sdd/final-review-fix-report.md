@@ -61,3 +61,11 @@ GREEN verification:
 - Kept `NovaRitualHero.callToActionLabel` optional so a distinct localized call-to-action can be supplied later without restoring hard-coded copy.
 - RED: the production wiring regression found `callToActionLabel: isConnected ? t.connection.connected : null`.
 - GREEN: focused Home/ritual tests passed `9/9`; scoped analyzer reported no issues; the full Flutter suite passed `84/84`.
+
+## Simulator follow-up
+
+- A fresh disconnected simulator capture showed `Tap to connect` twice: once in `NovaConnectionControl` and once in the ritual status below it.
+- Home now passes neither ritual status nor ritual call-to-action for any connection state until distinct localized explanatory copy exists.
+- `NovaRitualHero.statusLabel` and `callToActionLabel` remain optional for future localized product copy and focused component states.
+- RED: the widget contract failed because `statusLabel` was required, and the production source contract found two `t.connection.tapToConnect` references across Home and ConnectionButton.
+- GREEN: focused Home/ritual tests passed `9/9`; scoped analyzer reported no issues; the full Flutter suite passed `84/84`.

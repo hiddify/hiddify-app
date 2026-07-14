@@ -42,13 +42,6 @@ class HomePage extends HookConsumerWidget {
       AsyncData(value: Connecting()) || AsyncData(value: Disconnecting()) => NovaRitualState.connecting,
       _ => NovaRitualState.disconnected,
     };
-    final ritualStatus = switch (ritualState) {
-      NovaRitualState.connected => t.connection.connected,
-      NovaRitualState.connecting => t.connection.connecting,
-      NovaRitualState.error => t.errors.connection.connectionError,
-      NovaRitualState.disconnected => t.connection.tapToConnect,
-    };
-
     final subscription = switch (activeProfile) {
       RemoteProfileEntity(:final subInfo) => subInfo,
       _ => null,
@@ -78,11 +71,7 @@ class HomePage extends HookConsumerWidget {
                       child: CustomScrollView(
                         slivers: [
                           SliverToBoxAdapter(
-                            child: NovaRitualHero(
-                              state: ritualState,
-                              statusLabel: ritualStatus,
-                              child: const ConnectionButton(),
-                            ),
+                            child: NovaRitualHero(state: ritualState, child: const ConnectionButton()),
                           ),
                           SliverPadding(
                             padding: EdgeInsets.fromLTRB(
