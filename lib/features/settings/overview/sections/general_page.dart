@@ -4,6 +4,7 @@ import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/theme/app_theme_policy.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
@@ -24,7 +25,7 @@ class GeneralPage extends HookConsumerWidget {
       body: ListView(
         children: [
           const LocalePrefTile(),
-          const ThemeModePrefTile(),
+          if (AppThemePolicy.showAppearancePicker) const ThemeModePrefTile(),
           const EnableAnalyticsPrefTile(),
           SwitchListTile.adaptive(
             title: Text(t.pages.settings.general.autoIpCheck),
@@ -76,10 +77,11 @@ class GeneralPage extends HookConsumerWidget {
             secondary: const Icon(Icons.bug_report_rounded),
             value: ref.watch(debugModeNotifierProvider),
             onChanged: (value) async {
-              if (value)
+              if (value) {
                 await ref
                     .read(dialogNotifierProvider.notifier)
                     .showOk(t.pages.settings.general.debugMode, t.pages.settings.general.debugModeMsg);
+              }
               await ref.read(debugModeNotifierProvider.notifier).update(value);
             },
           ),
