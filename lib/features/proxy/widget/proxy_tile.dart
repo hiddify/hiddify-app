@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/theme/nova_tokens.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -16,7 +17,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
+    final nova = NovaThemeData.of(context);
 
     return ListTile(
       // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -50,7 +51,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
           if (proxy.urlTestDelay != 0)
             Text(
               proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
-              style: TextStyle(color: delayColor(context, proxy.urlTestDelay)),
+              style: TextStyle(color: delayColor(proxy.urlTestDelay)),
             ),
 
           if (proxy.download > 0) Text("⬩", style: Theme.of(context).textTheme.bodySmall),
@@ -58,25 +59,17 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       ),
 
       selected: selected,
-      selectedTileColor: theme.colorScheme.primaryContainer,
+      selectedColor: nova.accent,
+      selectedTileColor: nova.accentFill,
       onTap: onTap,
       onLongPress: () async => await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: proxy),
       horizontalTitleGap: 4,
     );
   }
 
-  Color delayColor(BuildContext context, int delay) {
-    if (Theme.of(context).brightness == Brightness.dark) {
-      return switch (delay) {
-        < 800 => Colors.lightGreen,
-        < 1500 => Colors.orange,
-        _ => Colors.redAccent,
-      };
-    }
-    return switch (delay) {
-      < 800 => Colors.green,
-      < 1500 => Colors.deepOrangeAccent,
-      _ => Colors.red,
-    };
-  }
+  Color delayColor(int delay) => switch (delay) {
+    < 800 => NovaColors.signalGood,
+    < 1500 => NovaColors.signalMid,
+    _ => NovaColors.signalBad,
+  };
 }

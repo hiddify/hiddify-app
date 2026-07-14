@@ -28,15 +28,19 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
           ModalBottomSheetRoute(
             constraints: BottomSheetConst.boxConstraints,
             isScrollControlled: isScrollControlled,
-            builder: (context) => ClipRRect(
-              borderRadius: BottomSheetConst.borderRadius,
-              child: Material(
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-                  child: child,
+            builder: (context) {
+              final theme = Theme.of(context);
+              return ClipRRect(
+                borderRadius: BottomSheetConst.borderRadius,
+                child: Material(
+                  color: theme.bottomSheetTheme.modalBackgroundColor ?? theme.colorScheme.surface,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+                    child: child,
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         )
         .then((value) {
