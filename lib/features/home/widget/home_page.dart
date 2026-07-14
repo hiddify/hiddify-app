@@ -81,7 +81,6 @@ class HomePage extends HookConsumerWidget {
                             child: NovaRitualHero(
                               state: ritualState,
                               statusLabel: ritualStatus,
-                              callToActionLabel: isConnected ? t.connection.connected : null,
                               child: const ConnectionButton(),
                             ),
                           ),

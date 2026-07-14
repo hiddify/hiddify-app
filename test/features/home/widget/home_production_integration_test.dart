@@ -74,5 +74,6 @@ void main() {
     expect(home, contains('t.pages.home.title'));
     expect(adaptive, contains('t.pages.settings.routing.title'));
     expect(home, contains('statusLabel:'));
+    expect(home, isNot(contains('callToActionLabel: isConnected ? t.connection.connected : null')));
   });
 }

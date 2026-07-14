@@ -53,4 +53,11 @@ GREEN verification:
 ## Concerns
 
 - No translation source or generated-localization files were changed. The current English wording therefore follows existing product vocabulary (`Proxies` and `Routing`) rather than introducing new `Servers` or ritual-specific copy.
-- The status and connected call-to-action intentionally share `connection.connected` because no distinct existing localized welcome key is available.
+- No distinct existing localized welcome key is available, so the connected call-to-action is omitted instead of duplicating `connection.connected`.
+
+## Follow-up polish
+
+- Removed the connected call-to-action from the Home adapter because using `connection.connected` for both status and call-to-action duplicated the same visible label.
+- Kept `NovaRitualHero.callToActionLabel` optional so a distinct localized call-to-action can be supplied later without restoring hard-coded copy.
+- RED: the production wiring regression found `callToActionLabel: isConnected ? t.connection.connected : null`.
+- GREEN: focused Home/ritual tests passed `9/9`; scoped analyzer reported no issues; the full Flutter suite passed `84/84`.

@@ -54,17 +54,11 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
-          body: NovaRitualHero(
-            state: NovaRitualState.connected,
-            statusLabel: 'Connected',
-            callToActionLabel: 'Welcome back',
-            child: Text('control'),
-          ),
+          body: NovaRitualHero(state: NovaRitualState.connected, statusLabel: 'Connected', child: Text('control')),
         ),
       ),
     );
 
-    expect(find.text('Welcome back'), findsOneWidget);
     expect(find.text('Connected'), findsOneWidget);
     expect(find.text('control'), findsOneWidget);
   });
