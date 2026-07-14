@@ -69,3 +69,10 @@ GREEN verification:
 - `NovaRitualHero.statusLabel` and `callToActionLabel` remain optional for future localized product copy and focused component states.
 - RED: the widget contract failed because `statusLabel` was required, and the production source contract found two `t.connection.tapToConnect` references across Home and ConnectionButton.
 - GREEN: focused Home/ritual tests passed `9/9`; scoped analyzer reported no issues; the full Flutter suite passed `84/84`.
+
+## Error-state follow-up
+
+- Restored a ritual status only for `NovaRitualState.error`; connected, connecting, and disconnected continue to omit ritual copy.
+- The error uses existing `errors.connection.connectionError` and the already-tested semantic `colorScheme.error` treatment.
+- RED: the production source contract found no error-only `statusLabel` wiring.
+- GREEN: focused Home/ritual tests passed `9/9` and scoped analyzer reported no issues. The immediately preceding universal-copy commit passed the full suite `84/84`; this follow-up only restores the covered error label wiring.

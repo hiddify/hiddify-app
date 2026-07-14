@@ -71,7 +71,13 @@ class HomePage extends HookConsumerWidget {
                       child: CustomScrollView(
                         slivers: [
                           SliverToBoxAdapter(
-                            child: NovaRitualHero(state: ritualState, child: const ConnectionButton()),
+                            child: NovaRitualHero(
+                              state: ritualState,
+                              statusLabel: ritualState == NovaRitualState.error
+                                  ? t.errors.connection.connectionError
+                                  : null,
+                              child: const ConnectionButton(),
+                            ),
                           ),
                           SliverPadding(
                             padding: EdgeInsets.fromLTRB(

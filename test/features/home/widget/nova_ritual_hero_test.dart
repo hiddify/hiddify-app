@@ -100,6 +100,7 @@ void main() {
       ),
     );
 
+    expect(find.text('Connection error'), findsOneWidget);
     expect(tester.widget<Text>(find.text('Connection error')).style?.color, error);
   });
 }

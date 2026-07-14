@@ -77,5 +77,14 @@ void main() {
     expect(home, isNot(contains('statusLabel: ritualStatus')));
     expect(home, isNot(contains('callToActionLabel: isConnected ? t.connection.connected : null')));
     expect(RegExp(r't\.connection\.tapToConnect').allMatches('$home\n$connection'), hasLength(1));
+    expect(
+      home,
+      contains(
+        RegExp(
+          r'statusLabel:\s*ritualState == NovaRitualState\.error\s*\? t\.errors\.connection\.connectionError\s*:\s*null',
+        ),
+      ),
+    );
+    expect(RegExp(r't\.errors\.connection\.connectionError').allMatches('$home\n$connection'), hasLength(1));
   });
 }
