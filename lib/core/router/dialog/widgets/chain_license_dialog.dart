@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/theme/nova_tokens.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,6 +30,8 @@ class ChainLicenseDialog extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    final nova = NovaThemeData.of(context);
 
     final termsKey = mode.isWarp() ? WarpConst.warpTermsOfServiceKey : PsiphonConst.psiphonTermsOfServiceKey;
     final privacyKey = mode.isWarp() ? WarpConst.warpPrivacyPolicyKey : PsiphonConst.psiphonPrivacyPolicyKey;
@@ -37,10 +40,7 @@ class ChainLicenseDialog extends HookConsumerWidget {
       termsKey: useState<bool>(false),
       privacyKey: useState<bool>(false),
     };
-    final focusNodes = <String, FocusNode>{
-      termsKey: useFocusNode(),
-      privacyKey: useFocusNode(),
-    };
+    final focusNodes = <String, FocusNode>{termsKey: useFocusNode(), privacyKey: useFocusNode()};
 
     useEffect(() {
       for (final entry in focusNodes.entries) {
@@ -55,9 +55,7 @@ class ChainLicenseDialog extends HookConsumerWidget {
         ? t.dialogs.warpLicense.description(
             tos: (text) => TextSpan(
               text: text,
-              style: TextStyle(
-                color: focusStates[termsKey]!.value ? Colors.green : Colors.blue,
-              ),
+              style: TextStyle(color: focusStates[termsKey]!.value ? nova.accentHover : theme.colorScheme.primary),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
                   await UriUtils.tryLaunch(Uri.parse(WarpConst.url[termsKey]!));
@@ -65,9 +63,7 @@ class ChainLicenseDialog extends HookConsumerWidget {
             ),
             privacy: (text) => TextSpan(
               text: text,
-              style: TextStyle(
-                color: focusStates[privacyKey]!.value ? Colors.green : Colors.blue,
-              ),
+              style: TextStyle(color: focusStates[privacyKey]!.value ? nova.accentHover : theme.colorScheme.primary),
               recognizer: TapGestureRecognizer()
                 ..onTap = () async {
                   await UriUtils.tryLaunch(Uri.parse(WarpConst.url[privacyKey]!));
@@ -78,7 +74,7 @@ class ChainLicenseDialog extends HookConsumerWidget {
             tos: (text) => TextSpan(
               text: text,
               style: TextStyle(
-                color: focusStates[termsKey]!.value ? Colors.green : Colors.blue,
+                color: focusStates[termsKey]!.value ? nova.accentHover : theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.underline,
               ),
@@ -90,7 +86,7 @@ class ChainLicenseDialog extends HookConsumerWidget {
             privacy: (text) => TextSpan(
               text: text,
               style: TextStyle(
-                color: focusStates[privacyKey]!.value ? Colors.green : Colors.blue,
+                color: focusStates[privacyKey]!.value ? nova.accentHover : theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 decoration: TextDecoration.underline,
               ),

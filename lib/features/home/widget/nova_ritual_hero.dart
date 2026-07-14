@@ -6,17 +6,18 @@ import 'package:hiddify/core/theme/nova_tokens.dart';
 enum NovaRitualState { disconnected, connecting, connected, error }
 
 class NovaRitualHero extends StatelessWidget {
-  const NovaRitualHero({super.key, required this.state, required this.child});
+  const NovaRitualHero({
+    super.key,
+    required this.state,
+    required this.statusLabel,
+    required this.child,
+    this.callToActionLabel,
+  });
 
   final NovaRitualState state;
+  final String statusLabel;
+  final String? callToActionLabel;
   final Widget child;
-
-  String get _status => switch (state) {
-    NovaRitualState.connected => 'Ты вне матрицы',
-    NovaRitualState.connecting => 'Агент Смит ищет тебя',
-    NovaRitualState.error => 'Не удалось подключиться · проверьте сеть',
-    NovaRitualState.disconnected => 'Ты на виду · нажми кнопку',
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -64,11 +65,11 @@ class NovaRitualHero extends StatelessWidget {
               ),
             ),
           ),
-          if (connected)
+          if (connected && callToActionLabel != null)
             Positioned(
               top: 10,
               child: Text(
-                'С ВОЗВРАЩЕНИЕМ',
+                callToActionLabel!,
                 style: TextStyle(
                   color: nova.accentHover,
                   fontFamily: 'monospace',
@@ -108,10 +109,10 @@ class NovaRitualHero extends StatelessWidget {
                 child,
                 const SizedBox(height: NovaSpacing.lg),
                 Text(
-                  _status,
+                  statusLabel,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: state == NovaRitualState.error ? nova.accent : nova.tertiaryText,
+                    color: state == NovaRitualState.error ? Theme.of(context).colorScheme.error : nova.tertiaryText,
                     fontFamily: 'monospace',
                     fontSize: 11,
                     letterSpacing: 0.65,

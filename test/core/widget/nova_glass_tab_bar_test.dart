@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/theme/nova_tokens.dart';
 import 'package:hiddify/core/widget/nova_glass_tab_bar.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const inheritedTheme = NovaThemeData(
   background: Color(0xFF010203),
@@ -24,6 +26,44 @@ const inheritedTheme = NovaThemeData(
 );
 
 void main() {
+  testWidgets('shows English provider labels visibly and in semantics', (tester) async {
+    final translations = await AppLocale.en.build();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [translationsProvider.overrideWith((ref) => translations)],
+        child: MaterialApp(
+          theme: ThemeData(extensions: const [inheritedTheme]),
+          home: Consumer(
+            builder: (context, ref, _) {
+              final t = ref.watch(translationsProvider).requireValue;
+              return Scaffold(
+                body: Stack(
+                  children: [
+                    NovaGlassTabBar(
+                      selected: NovaTab.home,
+                      labels: {
+                        NovaTab.home: t.pages.home.title,
+                        NovaTab.servers: t.pages.proxies.title,
+                        NovaTab.rules: t.pages.settings.routing.title,
+                        NovaTab.settings: t.pages.settings.title,
+                      },
+                      onSelected: (_) {},
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    for (final label in const ['Home', 'Proxies', 'Routing', 'Settings']) {
+      expect(find.text(label), findsOneWidget);
+      expect(find.bySemanticsLabel(label), findsOneWidget);
+    }
+  });
+
   testWidgets('shows four labeled destinations and reports selection', (tester) async {
     var selected = NovaTab.home;
     final selections = <NovaTab>[];
@@ -144,7 +184,12 @@ void main() {
     final surface = tester.widget<DecoratedBox>(find.byKey(const ValueKey('nova_dock_surface')));
     final decoration = surface.decoration as BoxDecoration;
     expect(decoration.color, inheritedTheme.elevatedSurface);
-    expect(decoration.border, Border.all(color: inheritedTheme.separator));
+    expect(decoration.border, Border.all(color: inheritedTheme.separator, width: 1.5));
+    final inactiveIcons = tester.widgetList<Icon>(find.byType(Icon)).where((icon) => icon.icon != Icons.home_rounded);
+    expect(inactiveIcons.every((icon) => icon.color == inheritedTheme.secondaryText), isTrue);
+    for (final label in const ['Серверы', 'Правила', 'Настройки']) {
+      expect(tester.widget<Text>(find.text(label)).style?.color, inheritedTheme.secondaryText);
+    }
     expect(
       tester.widgetList<AnimatedContainer>(find.byType(AnimatedContainer)).every((w) => w.duration == Duration.zero),
       isTrue,

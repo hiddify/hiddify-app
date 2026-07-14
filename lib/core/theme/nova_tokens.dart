@@ -10,7 +10,7 @@ abstract final class NovaColors {
 
   static const primaryText = Color(0xFFF2F2F7);
   static const secondaryText = Color(0xFFA1A1AA);
-  static const tertiaryText = Color(0xFF6E6E73);
+  static const tertiaryText = Color(0xFF98989F);
   static const mutedText = Color(0xFF48484A);
 
   static const ritualRed = Color(0xFFFF2D3E);

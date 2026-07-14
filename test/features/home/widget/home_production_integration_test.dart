@@ -58,4 +58,21 @@ void main() {
     expect(connection, contains('showNoActiveProfile()'));
     expect(connection, contains('showExperimentalFeatureNotice()'));
   });
+
+  test('production Home and dock copy comes from translations', () {
+    final home = File('lib/features/home/widget/home_page.dart').readAsStringSync();
+    final adaptive = File('lib/core/router/adaptive_layout/my_adaptive_layout.dart').readAsStringSync();
+    final ritual = File('lib/features/home/widget/nova_ritual_hero.dart').readAsStringSync();
+
+    for (final russianLiteral in ['Добавьте', 'Активный', 'ПРИЁМ', 'ЗАДЕРЖКА']) {
+      expect(home, isNot(contains(russianLiteral)));
+    }
+    for (final russianLiteral in ['Главная', 'Серверы', 'Правила', 'Настройки']) {
+      expect(adaptive, isNot(contains("'$russianLiteral'")));
+    }
+    expect(ritual, isNot(contains('Ты вне матрицы')));
+    expect(home, contains('t.pages.home.title'));
+    expect(adaptive, contains('t.pages.settings.routing.title'));
+    expect(home, contains('statusLabel:'));
+  });
 }

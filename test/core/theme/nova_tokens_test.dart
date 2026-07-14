@@ -3,6 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/theme/nova_tokens.dart';
 
 void main() {
+  double contrastRatio(Color foreground, Color background) {
+    final foregroundLuminance = foreground.computeLuminance();
+    final backgroundLuminance = background.computeLuminance();
+    final lighter = foregroundLuminance > backgroundLuminance ? foregroundLuminance : backgroundLuminance;
+    final darker = foregroundLuminance > backgroundLuminance ? backgroundLuminance : foregroundLuminance;
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+
   test('defines the Woman in Red dark semantic hierarchy', () {
     expect(NovaColors.voidBackground, const Color(0xFF060608));
     expect(NovaColors.groupedBackground, const Color(0xFF000000));
@@ -21,5 +29,20 @@ void main() {
     expect(NovaDockTokens.minimumTarget, 44);
     expect(NovaDockTokens.horizontalInset, 12);
     expect(NovaDockTokens.bottomGap, 8);
+  });
+
+  test('keeps tertiary small text legible on production dark surfaces', () {
+    for (final background in const [
+      NovaColors.voidBackground,
+      NovaColors.groupedBackground,
+      NovaColors.surface,
+      NovaColors.elevatedSurface,
+    ]) {
+      expect(
+        contrastRatio(NovaColors.tertiaryText, background),
+        greaterThanOrEqualTo(4.5),
+        reason: 'tertiary text must remain readable on $background',
+      );
+    }
   });
 }

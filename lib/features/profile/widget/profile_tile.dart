@@ -11,6 +11,7 @@ import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
+import 'package:hiddify/core/theme/nova_tokens.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
@@ -382,7 +383,7 @@ class NewTrafficSubscriptionInfo extends HookConsumerWidget {
 
     return Column(
       children: [
-        const Icon(Icons.assessment_rounded, color: Colors.blue),
+        Icon(Icons.assessment_rounded, color: Theme.of(context).colorScheme.primary),
         Text(t.components.subscriptionInfo.remainingTraffic),
         const SizedBox(height: 4),
         Row(
@@ -438,7 +439,7 @@ class NewDaySubscriptionInfo extends HookConsumerWidget {
     final remaining = remainingText(t, theme);
     return Column(
       children: [
-        const Icon(Icons.timer, color: Colors.blue),
+        Icon(Icons.timer, color: theme.colorScheme.primary),
         Text(t.components.subscriptionInfo.remainingTime),
         const SizedBox(height: 4),
         Row(
@@ -486,7 +487,7 @@ class NewDayTrafficSubscriptionInfo extends HookConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.assessment_rounded, color: Colors.blue),
+        Icon(Icons.assessment_rounded, color: theme.colorScheme.primary),
         Text(t.components.subscriptionInfo.remainingUsage),
         const SizedBox(height: 4),
         Text(
@@ -523,6 +524,8 @@ class NewSiteSubscriptionInfo extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    final nova = NovaThemeData.of(context);
     final uri = Uri.parse(subInfo.webPageUrl ?? "");
     var host = uri.host;
     if (["telegram.me", "t.me"].contains(host)) {
@@ -530,9 +533,16 @@ class NewSiteSubscriptionInfo extends HookConsumerWidget {
     }
     return InkWell(
       onTap: () => launchUrl(Uri.parse(subInfo.webPageUrl ?? "")),
+      hoverColor: nova.accentFill,
+      focusColor: nova.accentHover.withValues(alpha: 0.24),
       child: Column(
         children: [
-          const Icon(FluentIcons.globe_person_24_filled, size: 24, color: Colors.blue),
+          Icon(
+            FluentIcons.globe_person_24_filled,
+            key: const ValueKey('profile_site_icon'),
+            size: 24,
+            color: theme.colorScheme.primary,
+          ),
           Text(t.components.subscriptionInfo.profileSite),
           const SizedBox(height: 4),
           Row(

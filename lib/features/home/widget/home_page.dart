@@ -42,6 +42,12 @@ class HomePage extends HookConsumerWidget {
       AsyncData(value: Connecting()) || AsyncData(value: Disconnecting()) => NovaRitualState.connecting,
       _ => NovaRitualState.disconnected,
     };
+    final ritualStatus = switch (ritualState) {
+      NovaRitualState.connected => t.connection.connected,
+      NovaRitualState.connecting => t.connection.connecting,
+      NovaRitualState.error => t.errors.connection.connectionError,
+      NovaRitualState.disconnected => t.connection.tapToConnect,
+    };
 
     final subscription = switch (activeProfile) {
       RemoteProfileEntity(:final subInfo) => subInfo,
@@ -52,75 +58,96 @@ class HomePage extends HookConsumerWidget {
       backgroundColor: nova.background,
       body: ColoredBox(
         color: nova.background,
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            children: [
-              _NovaHeader(
-                addProfileLabel: t.pages.profiles.add,
-                settingsLabel: t.pages.settings.title,
-                onAddProfile: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
-                onSettings: () => context.goNamed('settings'),
-              ),
-              Expanded(
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 600),
-                    child: CustomScrollView(
-                      slivers: [
-                        SliverToBoxAdapter(
-                          child: NovaRitualHero(state: ritualState, child: const ConnectionButton()),
-                        ),
-                        SliverPadding(
-                          padding: EdgeInsets.fromLTRB(
-                            NovaSpacing.gutter,
-                            NovaSpacing.xs,
-                            NovaSpacing.gutter,
-                            MediaQuery.paddingOf(context).bottom + NovaSpacing.xl,
+        child: Semantics(
+          label: t.pages.home.title,
+          container: true,
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              children: [
+                _NovaHeader(
+                  addProfileLabel: t.pages.profiles.add,
+                  settingsLabel: t.pages.settings.title,
+                  onAddProfile: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
+                  onSettings: () => context.goNamed('settings'),
+                ),
+                Expanded(
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: CustomScrollView(
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: NovaRitualHero(
+                              state: ritualState,
+                              statusLabel: ritualStatus,
+                              callToActionLabel: isConnected ? t.connection.connected : null,
+                              child: const ConnectionButton(),
+                            ),
                           ),
-                          sliver: SliverList.list(
-                            children: [
-                              _NovaServerCard(
-                                profile: activeProfile,
-                                proxy: activeProxy,
-                                onTap: () {
-                                  switch (novaHomeServerAction(
-                                    hasProfile: activeProfile != null,
-                                    hasProxy: activeProxy != null,
-                                  )) {
-                                    case NovaHomeServerAction.addProfile:
-                                      ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
-                                    case NovaHomeServerAction.showProfiles:
-                                      ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
-                                    case NovaHomeServerAction.showProxies:
-                                      context.goNamed('proxies');
-                                  }
-                                },
-                              ),
-                              if (subscription != null) ...[
-                                const SizedBox(height: NovaSpacing.lg),
-                                _NovaSubscriptionCard(subscription),
-                              ],
-                              if (isConnected) ...[
-                                const SizedBox(height: NovaSpacing.lg),
-                                _NovaStatsGrid(stats: stats, delay: activeProxy?.urlTestDelay ?? 0),
-                              ],
-                              if (activeProfile != null) ...[
-                                const SizedBox(height: NovaSpacing.lg),
-                                _NovaQuickSettings(
-                                  label: t.pages.home.quickSettings,
-                                  onTap: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              NovaSpacing.gutter,
+                              NovaSpacing.xs,
+                              NovaSpacing.gutter,
+                              MediaQuery.paddingOf(context).bottom + NovaSpacing.xl,
+                            ),
+                            sliver: SliverList.list(
+                              children: [
+                                _NovaServerCard(
+                                  profile: activeProfile,
+                                  proxy: activeProxy,
+                                  addProfileLabel: t.pages.profiles.add,
+                                  profilesLabel: t.pages.profiles.title,
+                                  onTap: () {
+                                    switch (novaHomeServerAction(
+                                      hasProfile: activeProfile != null,
+                                      hasProxy: activeProxy != null,
+                                    )) {
+                                      case NovaHomeServerAction.addProfile:
+                                        ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
+                                      case NovaHomeServerAction.showProfiles:
+                                        ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
+                                      case NovaHomeServerAction.showProxies:
+                                        context.goNamed('proxies');
+                                    }
+                                  },
                                 ),
+                                if (subscription != null) ...[
+                                  const SizedBox(height: NovaSpacing.lg),
+                                  _NovaSubscriptionCard(
+                                    subscription,
+                                    expireDateLabel: t.components.subscriptionInfo.expireDate,
+                                  ),
+                                ],
+                                if (isConnected) ...[
+                                  const SizedBox(height: NovaSpacing.lg),
+                                  _NovaStatsGrid(
+                                    stats: stats,
+                                    delay: activeProxy?.urlTestDelay ?? 0,
+                                    downlinkLabel: t.components.stats.downlink,
+                                    uplinkLabel: t.components.stats.uplink,
+                                    delayLabel: t.pages.proxies.testDelay,
+                                    trafficLabel: t.components.stats.totalTransferred,
+                                  ),
+                                ],
+                                if (activeProfile != null) ...[
+                                  const SizedBox(height: NovaSpacing.lg),
+                                  _NovaQuickSettings(
+                                    label: t.pages.home.quickSettings,
+                                    onTap: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
+                                  ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -129,10 +156,18 @@ class HomePage extends HookConsumerWidget {
 }
 
 class _NovaServerCard extends StatelessWidget {
-  const _NovaServerCard({required this.profile, required this.proxy, required this.onTap});
+  const _NovaServerCard({
+    required this.profile,
+    required this.proxy,
+    required this.addProfileLabel,
+    required this.profilesLabel,
+    required this.onTap,
+  });
 
   final ProfileEntity? profile;
   final OutboundInfo? proxy;
+  final String addProfileLabel;
+  final String profilesLabel;
   final VoidCallback onTap;
 
   @override
@@ -145,8 +180,8 @@ class _NovaServerCard extends StatelessWidget {
         : proxyType.isNotEmpty
         ? proxyType
         : profile == null
-        ? 'Добавьте профиль'
-        : 'Активный профиль';
+        ? addProfileLabel
+        : profilesLabel;
 
     return _NovaCard(
       child: InkWell(
@@ -196,9 +231,10 @@ class _NovaServerCard extends StatelessWidget {
 }
 
 class _NovaSubscriptionCard extends StatelessWidget {
-  const _NovaSubscriptionCard(this.info);
+  const _NovaSubscriptionCard(this.info, {required this.expireDateLabel});
 
   final SubscriptionInfo info;
+  final String expireDateLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +261,7 @@ class _NovaSubscriptionCard extends StatelessWidget {
                           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                         ),
                         TextSpan(
-                          text: info.total > 0 ? ' из ${info.total.size()}' : '',
+                          text: info.total > 0 ? ' / ${info.total.size()}' : '',
                           style: TextStyle(color: nova.tertiaryText, fontSize: 12),
                         ),
                       ],
@@ -233,7 +269,7 @@ class _NovaSubscriptionCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  info.remaining.inDays > 365 ? '∞' : 'до ${info.expire.format()}',
+                  info.remaining.inDays > 365 ? '∞' : '$expireDateLabel: ${info.expire.format()}',
                   style: TextStyle(color: nova.secondaryText, fontFamily: 'monospace', fontSize: 12),
                 ),
               ],
@@ -256,18 +292,29 @@ class _NovaSubscriptionCard extends StatelessWidget {
 }
 
 class _NovaStatsGrid extends StatelessWidget {
-  const _NovaStatsGrid({required this.stats, required this.delay});
+  const _NovaStatsGrid({
+    required this.stats,
+    required this.delay,
+    required this.downlinkLabel,
+    required this.uplinkLabel,
+    required this.delayLabel,
+    required this.trafficLabel,
+  });
 
   final SystemInfo stats;
   final int delay;
+  final String downlinkLabel;
+  final String uplinkLabel;
+  final String delayLabel;
+  final String trafficLabel;
 
   @override
   Widget build(BuildContext context) {
     final items = <(String, String, Color?)>[
-      ('ПРИЁМ', '${stats.downlink.toInt().speed()} ↓', null),
-      ('ОТДАЧА', '${stats.uplink.toInt().speed()} ↑', null),
-      ('ЗАДЕРЖКА', delay > 0 && delay < 65000 ? '$delay ms' : '—', null),
-      ('ТРАФИК', (stats.downlinkTotal + stats.uplinkTotal).toInt().size(), null),
+      (downlinkLabel, '${stats.downlink.toInt().speed()} ↓', null),
+      (uplinkLabel, '${stats.uplink.toInt().speed()} ↑', null),
+      (delayLabel, delay > 0 && delay < 65000 ? '$delay ms' : '—', null),
+      (trafficLabel, (stats.downlinkTotal + stats.uplinkTotal).toInt().size(), null),
     ];
 
     return _NovaCard(

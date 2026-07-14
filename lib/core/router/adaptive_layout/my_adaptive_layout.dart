@@ -78,11 +78,11 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                       children: [
                         NovaGlassTabBar(
                           selected: currentNovaTab,
-                          labels: const {
-                            NovaTab.home: 'Главная',
-                            NovaTab.servers: 'Серверы',
-                            NovaTab.rules: 'Правила',
-                            NovaTab.settings: 'Настройки',
+                          labels: {
+                            NovaTab.home: t.pages.home.title,
+                            NovaTab.servers: t.pages.proxies.title,
+                            NovaTab.rules: t.pages.settings.routing.title,
+                            NovaTab.settings: t.pages.settings.title,
                           },
                           onSelected: (tab) => _onNovaTabTap(context, currentNovaTab, tab),
                         ),

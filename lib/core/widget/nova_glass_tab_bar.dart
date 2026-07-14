@@ -53,7 +53,7 @@ class NovaGlassTabBar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: reduceEffects ? nova.elevatedSurface : nova.glass,
                 borderRadius: BorderRadius.circular(NovaDockTokens.radius),
-                border: Border.all(color: highContrast ? nova.separator : nova.border),
+                border: Border.all(color: highContrast ? nova.separator : nova.border, width: highContrast ? 1.5 : 1),
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: NovaSpacing.sm),
@@ -67,6 +67,7 @@ class NovaGlassTabBar extends StatelessWidget {
                             icon: _icons[tab]!,
                             selected: tab == selected,
                             reduceMotion: reduceMotion,
+                            highContrast: highContrast,
                             onTap: () {
                               if (tab != selected) HapticFeedback.selectionClick();
                               onSelected(tab);
@@ -92,6 +93,7 @@ class _NovaTabItem extends StatelessWidget {
     required this.icon,
     required this.selected,
     required this.reduceMotion,
+    required this.highContrast,
     required this.onTap,
   });
 
@@ -100,12 +102,14 @@ class _NovaTabItem extends StatelessWidget {
   final IconData icon;
   final bool selected;
   final bool reduceMotion;
+  final bool highContrast;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final nova = NovaThemeData.of(context);
     final duration = reduceMotion ? Duration.zero : const Duration(milliseconds: 220);
+    final inactiveColor = highContrast ? nova.secondaryText : nova.tertiaryText;
 
     return Semantics(
       key: ValueKey('nova_tab_${tab.name}'),
@@ -134,7 +138,7 @@ class _NovaTabItem extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(icon, size: 20, color: selected ? nova.accentHover : nova.tertiaryText),
+                    Icon(icon, size: 20, color: selected ? nova.accentHover : inactiveColor),
                     const SizedBox(height: NovaSpacing.xxs),
                     Text(
                       label,
@@ -142,7 +146,7 @@ class _NovaTabItem extends StatelessWidget {
                       overflow: TextOverflow.fade,
                       softWrap: false,
                       style: TextStyle(
-                        color: selected ? nova.accentHover : nova.tertiaryText,
+                        color: selected ? nova.accentHover : inactiveColor,
                         fontSize: 11,
                         height: 1,
                         fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
