@@ -15,7 +15,7 @@ class NovaGroupedScaffold extends StatelessWidget {
     return Scaffold(
       backgroundColor: nova.groupedBackground,
       appBar: appBar,
-      body: body,
+      body: body == null ? null : SafeArea(top: false, left: false, right: false, child: body!),
       floatingActionButton: floatingActionButton,
     );
   }

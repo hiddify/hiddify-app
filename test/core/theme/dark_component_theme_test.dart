@@ -61,6 +61,30 @@ void main() {
     expect(tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor, groupedBackground);
   });
 
+  testWidgets('secondary route content clears the injected mobile dock inset', (tester) async {
+    const dockInset = 120.0;
+    const targetKey = ValueKey('bottom_route_control');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: theme,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(padding: const EdgeInsets.only(bottom: dockInset)),
+          child: child!,
+        ),
+        home: const NovaGroupedScaffold(
+          body: Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(key: targetKey, height: 44, child: Text('Bottom control')),
+          ),
+        ),
+      ),
+    );
+
+    final scaffoldHeight = tester.getSize(find.byType(NovaGroupedScaffold)).height;
+    expect(tester.getBottomRight(find.byKey(targetKey)).dy, lessThanOrEqualTo(scaffoldHeight - dockInset));
+  });
+
   test('all changed secondary routes use the grouped production scaffold', () {
     const paths = [
       'lib/features/proxy/overview/proxies_overview_page.dart',
