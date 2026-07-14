@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/core/theme/nova_tokens.dart';
+import 'package:hiddify/core/widget/nova_grouped_scaffold.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -17,7 +17,6 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final nova = NovaThemeData.of(context);
 
     final proxies = ref.watch(proxiesOverviewNotifierProvider);
     final sortBy = ref.watch(proxiesSortNotifierProvider);
@@ -26,8 +25,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
     //   initialOnFailure: (error) => CustomToast.error(t.presentShortError(error)).show(context),
     // );
 
-    return Scaffold(
-      backgroundColor: nova.groupedBackground,
+    return NovaGroupedScaffold(
       appBar: AppBar(
         title: Text(t.pages.proxies.title),
         actions: [

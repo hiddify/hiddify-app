@@ -101,9 +101,10 @@ class AppTheme {
         ),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected) ? Colors.white : NovaColors.secondaryText,
-        ),
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) return NovaColors.disabled;
+          return states.contains(WidgetState.selected) ? Colors.white : NovaColors.secondaryText;
+        }),
         trackColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected) ? NovaColors.ritualRed : NovaColors.pressedSurface,
         ),

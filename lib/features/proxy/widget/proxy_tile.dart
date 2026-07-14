@@ -46,15 +46,25 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: Column(
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          if (proxy.urlTestDelay != 0)
-            Text(
-              proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
-              style: TextStyle(color: delayColor(proxy.urlTestDelay)),
-            ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (proxy.urlTestDelay != 0)
+                Text(
+                  proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
+                  style: TextStyle(color: delayColor(proxy.urlTestDelay)),
+                ),
 
-          if (proxy.download > 0) Text("⬩", style: Theme.of(context).textTheme.bodySmall),
+              if (proxy.download > 0) Text("⬩", style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+          if (selected) ...[
+            const SizedBox(width: 8),
+            Icon(Icons.check_rounded, key: const ValueKey('proxy_selected_indicator'), size: 20, color: nova.accent),
+          ],
         ],
       ),
 

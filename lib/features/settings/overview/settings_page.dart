@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
-import 'package:hiddify/core/theme/nova_tokens.dart';
+import 'package:hiddify/core/widget/nova_grouped_scaffold.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/features/settings/notifier/reset_tunnel/reset_tunnel_notifier.dart';
@@ -33,7 +33,6 @@ class SettingsPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final nova = NovaThemeData.of(context);
     // final scrollController = useScrollController();
 
     // useMemoized(
@@ -57,8 +56,7 @@ class SettingsPage extends HookConsumerWidget {
     //   },
     // );
 
-    return Scaffold(
-      backgroundColor: nova.groupedBackground,
+    return NovaGroupedScaffold(
       appBar: AppBar(
         title: Text(t.pages.settings.title),
         actions: [

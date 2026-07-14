@@ -14,6 +14,29 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'bottom_sheets_notifier.g.dart';
 
+class ThemedBottomSheetSurface extends StatelessWidget {
+  const ThemedBottomSheetSurface({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ClipRRect(
+      borderRadius: BottomSheetConst.borderRadius,
+      child: Material(
+        key: const ValueKey('themed_bottom_sheet_material'),
+        color: theme.bottomSheetTheme.modalBackgroundColor ?? theme.colorScheme.surface,
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 @riverpod
 class BottomSheetsNotifier extends _$BottomSheetsNotifier {
   @override
@@ -28,19 +51,7 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
           ModalBottomSheetRoute(
             constraints: BottomSheetConst.boxConstraints,
             isScrollControlled: isScrollControlled,
-            builder: (context) {
-              final theme = Theme.of(context);
-              return ClipRRect(
-                borderRadius: BottomSheetConst.borderRadius,
-                child: Material(
-                  color: theme.bottomSheetTheme.modalBackgroundColor ?? theme.colorScheme.surface,
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-                    child: child,
-                  ),
-                ),
-              );
-            },
+            builder: (context) => ThemedBottomSheetSurface(child: child),
           ),
         )
         .then((value) {
