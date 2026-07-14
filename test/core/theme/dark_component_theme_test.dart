@@ -34,11 +34,15 @@ void main() {
     expect(theme.switchTheme.trackColor!.resolve({WidgetState.selected}), NovaColors.ritualRed);
   });
 
-  test('disabled switch thumb stays low emphasis even when selected', () {
-    final thumb = theme.switchTheme.thumbColor!.resolve({WidgetState.selected, WidgetState.disabled});
+  test('disabled switch thumb and track stay low emphasis even when selected', () {
+    const combinedState = {WidgetState.selected, WidgetState.disabled};
+    final thumb = theme.switchTheme.thumbColor!.resolve(combinedState);
+    final track = theme.switchTheme.trackColor!.resolve(combinedState);
 
     expect(thumb, NovaColors.disabled);
     expect(thumb, isNot(Colors.white));
+    expect(track, NovaColors.disabled);
+    expect(track, isNot(NovaColors.ritualRed));
   });
 
   testWidgets('secondary route scaffold uses inherited grouped background', (tester) async {

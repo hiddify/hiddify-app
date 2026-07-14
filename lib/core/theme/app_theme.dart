@@ -105,9 +105,10 @@ class AppTheme {
           if (states.contains(WidgetState.disabled)) return NovaColors.disabled;
           return states.contains(WidgetState.selected) ? Colors.white : NovaColors.secondaryText;
         }),
-        trackColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected) ? NovaColors.ritualRed : NovaColors.pressedSurface,
-        ),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) return NovaColors.disabled;
+          return states.contains(WidgetState.selected) ? NovaColors.ritualRed : NovaColors.pressedSurface;
+        }),
       ),
       checkboxTheme: CheckboxThemeData(fillColor: WidgetStateProperty.resolveWith(_selectionFill)),
       radioTheme: RadioThemeData(fillColor: WidgetStateProperty.resolveWith(_selectionFill)),
