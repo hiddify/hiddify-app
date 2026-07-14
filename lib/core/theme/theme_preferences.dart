@@ -9,7 +9,7 @@ class ThemePreferences extends _$ThemePreferences {
   @override
   AppThemeMode build() {
     final persisted = ref.watch(sharedPreferencesProvider).requireValue.getString("theme_mode");
-    if (persisted == null) return AppThemeMode.system;
+    if (persisted == null) return AppThemeMode.dark;
     return AppThemeMode.values.byName(persisted);
   }
 

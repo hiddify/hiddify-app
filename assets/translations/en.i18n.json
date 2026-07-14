@@ -1,6 +1,6 @@
 ﻿{
   "common": {
-    "appTitle": "Hiddify",
+    "appTitle": "Woman in Red",
     "start": "Start",
     "version": "Version",
     "ok": "OK",
@@ -93,14 +93,32 @@
     }
   },
   "intro": {
-    "banner": "All you need for an unrestricted internet",
+    "banner": "A private door to the open internet",
+    "accessPrompt": "Continue to add or restore VPN access already assigned to you.",
     "termsAndPolicyCaution(rich)": "By continuing you agree to ${tap(@:pages.about.termsAndConditions)}",
     "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open Source)} (${tap_license(License)})"
   },
   "pages": {
     "home": {
       "title": "Home",
-      "quickSettings": "Quick setting options"
+      "quickSettings": "Quick setting options",
+      "noAccessTitle": "VPN access is not configured",
+      "noAccessBody": "Add the private subscription URL or QR code provided by your service administrator.",
+      "addAccess": "Add VPN access"
+    },
+    "identity": {
+      "title": "Profile",
+      "email": "Email (optional)",
+      "emailHint": "name@example.com",
+      "emailHelp": "Email is stored on this device for profile recovery. It does not verify your identity or grant VPN access.",
+      "unverified": "Not verified",
+      "save": "Save",
+      "saved": "Saved",
+      "invalidEmail": "Enter a valid email address",
+      "saveFailed": "Could not save the profile. Try again.",
+      "chooseAvatar": "Choose photo",
+      "removeAvatar": "Remove photo",
+      "avatarFailed": "Choose a PNG, JPEG, WebP, or HEIC image up to 5 MB."
     },
     "proxies": {
       "title": "Proxies",

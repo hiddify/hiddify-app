@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -45,6 +45,8 @@
 		D703EE932B764EA3001D88B3 /* CommandClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D703EE922B764EA3001D88B3 /* CommandClient.swift */; };
 		D703EE962B765176001D88B3 /* ActiveGroupsEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D703EE952B765176001D88B3 /* ActiveGroupsEventHandler.swift */; };
 		D7CC50862B768C50006BC140 /* Outbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7CC50852B768C50006BC140 /* Outbound.swift */; };
+		F00D00012F00000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 68DCEB772BD7DA3F0081FF65 /* PrivacyInfo.xcprivacy */; };
+		F00D00022F00000000000002 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 68DCEB762BD7D7590081FF65 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -520,6 +522,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F00D00022F00000000000002 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -534,6 +537,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F00D00012F00000000000001 /* PrivacyInfo.xcprivacy in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,

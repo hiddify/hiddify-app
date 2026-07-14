@@ -8,6 +8,7 @@ import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
+import 'package:hiddify/features/proxy/model/auto_mode_selection.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 
@@ -217,7 +218,7 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     }
   }
 
-  Future<void> urlTest(String groupTag) async {
+  Future<AutoModeSelection?> urlTest(String groupTag) async {
     loggy.debug("testing group: [$groupTag]");
     if (state case AsyncData()) {
       await ref.read(hapticServiceProvider.notifier).lightImpact();
@@ -225,6 +226,14 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
         loggy.error("error testing group", err);
         throw err;
       }).run();
+      if (!state.hasValue || state.value == null) return null;
+      final selection = AutoModeSelector.select(state.value!.items);
+      final outboundTag = selection.outboundTag;
+      if (outboundTag != null && state.value!.selected != outboundTag) {
+        await changeProxy(state.value!.tag, outboundTag);
+      }
+      return selection;
     }
+    return null;
   }
 }

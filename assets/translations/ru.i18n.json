@@ -1,6 +1,6 @@
 {
   "common": {
-    "appTitle": "Hiddify",
+    "appTitle": "Woman in Red",
     "start": "Начать",
     "version": "Версия",
     "ok": "OK",
@@ -97,14 +97,32 @@
     }
   },
   "intro": {
-    "banner": "Все, что вам нужно для интернета без ограничений",
+    "banner": "Личная дверь в открытый интернет",
+    "accessPrompt": "Продолжите, чтобы добавить или восстановить уже выданный вам VPN-доступ.",
     "termsAndPolicyCaution(rich)": "Продолжая, вы соглашаетесь с ${tap(@:pages.about.termsAndConditions)}",
     "info(rich)": "Сделано с ❤️ Hiddify - ${tap_source(Открытый исходный код)} (${tap_license(Лицензия)})"
   },
   "pages": {
     "home": {
       "title": "Главная",
-      "quickSettings": "Опции быстрых настроек"
+      "quickSettings": "Опции быстрых настроек",
+      "noAccessTitle": "VPN-доступ не настроен",
+      "noAccessBody": "Добавьте приватную ссылку подписки или QR-код, полученные у администратора сервиса.",
+      "addAccess": "Добавить VPN-доступ"
+    },
+    "identity": {
+      "title": "Профиль",
+      "email": "Email (необязательно)",
+      "emailHint": "name@example.com",
+      "emailHelp": "Email хранится на этом устройстве для восстановления профиля. Он не подтверждает личность и не выдаёт VPN-доступ.",
+      "unverified": "Не подтверждён",
+      "save": "Сохранить",
+      "saved": "Сохранено",
+      "invalidEmail": "Введите корректный email",
+      "saveFailed": "Не удалось сохранить профиль. Попробуйте снова.",
+      "chooseAvatar": "Выбрать фото",
+      "removeAvatar": "Удалить фото",
+      "avatarFailed": "Выберите PNG, JPEG, WebP или HEIC до 5 МБ."
     },
     "proxies": {
       "title": "Прокси",

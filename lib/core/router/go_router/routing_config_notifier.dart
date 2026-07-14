@@ -10,6 +10,7 @@ import 'package:hiddify/core/router/go_router/helper/custom_transition.dart';
 import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/features/about/widget/about_page.dart';
 import 'package:hiddify/features/home/widget/home_page.dart';
+import 'package:hiddify/features/identity/overview/identity_profile_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
 import 'package:hiddify/features/log/overview/logs_page.dart';
 import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_page.dart';
@@ -69,15 +70,8 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
     return RoutingConfig(
       redirect: (context, state) {
         // fix path-parameters for deep link
-        String? url;
-        if (LinkParser.protocols.contains(state.uri.scheme)) {
-          // Android & iOS deep link
-          url = state.uri.toString();
-        } else if (PlatformUtils.isDesktop && newUrlFromAppLink.isNotEmpty) {
-          // Desktops deep link
-          url = newUrlFromAppLink;
-          newUrlFromAppLink = '';
-        } else if (state.uri.queryParameters['url'] != null) {
+        String? url = takeIncomingAppLink(state.uri);
+        if (url == null && state.uri.queryParameters['url'] != null) {
           // Get the configured URL for intro
           url = state.uri.queryParameters['url'];
         }
@@ -127,6 +121,12 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                   path: '/home',
                   builder: (_, _) => FocusScope(node: branchesScope['home'], child: const HomePage()),
                   routes: <GoRoute>[
+                    GoRoute(
+                      name: 'identityProfile',
+                      path: 'profile',
+                      pageBuilder: (_, state) =>
+                          customTransition(TransitionType.slide, state.pageKey, const IdentityProfilePage()),
+                    ),
                     GoRoute(
                       name: 'proxies',
                       path: 'proxies',

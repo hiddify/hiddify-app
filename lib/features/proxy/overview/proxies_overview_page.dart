@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/features/proxy/model/auto_mode_selection.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -41,7 +42,19 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest("select"),
+        onPressed: () async {
+          final result = await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest("select");
+          if (!context.mounted || result == null) return;
+          final message = switch (result.reason) {
+            AutoModeSelectionReason.lowestLatency =>
+              '${t.common.auto}: ${result.outboundTag} · ${result.latency!.inMilliseconds} ms',
+            AutoModeSelectionReason.deterministicFallback => '${t.common.auto}: ${result.outboundTag}',
+            AutoModeSelectionReason.latencyUnavailable =>
+              '${t.common.auto}: ${result.outboundTag} · ${t.pages.proxies.delay.timeout}',
+            AutoModeSelectionReason.noAuthorizedServers => t.pages.proxies.empty,
+          };
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+        },
         tooltip: t.pages.proxies.testDelay,
         child: const Icon(FluentIcons.flash_24_filled),
       ),

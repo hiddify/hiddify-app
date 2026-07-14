@@ -5,7 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class RiverpodObserver extends ProviderObserver {
   @override
   void didAddProvider(ProviderBase<Object?> provider, Object? value, ProviderContainer container) {
-    log('didAddProvider : ${provider.name ?? provider.runtimeType} : $value');
+    log('didAddProvider : ${provider.name ?? provider.runtimeType}');
   }
 
   @override
@@ -20,6 +20,6 @@ class RiverpodObserver extends ProviderObserver {
     Object? newValue,
     ProviderContainer container,
   ) {
-    log('didUpdateProvider : ${provider.name ?? provider.runtimeType} : $previousValue -> $newValue');
+    log('didUpdateProvider : ${provider.name ?? provider.runtimeType}');
   }
 }

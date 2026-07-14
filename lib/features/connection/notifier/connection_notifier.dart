@@ -151,7 +151,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
           .showCustomAlertFromErr(err.present(ref.read(translationsProvider).requireValue));
       loggy.warning(err);
       if (err.toString().contains("panic")) {
-        await Sentry.captureException(Exception(err.toString()));
+        await Sentry.captureMessage("Core panic while starting VPN", level: SentryLevel.fatal);
       }
       await ref.read(Preferences.startedByUser.notifier).update(false);
       state = AsyncError(err, StackTrace.current);

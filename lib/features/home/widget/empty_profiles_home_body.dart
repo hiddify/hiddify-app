@@ -16,12 +16,19 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(t.dialogs.noActiveProfile.msg),
+          const Icon(Icons.vpn_key_off_rounded, size: 48),
           const Gap(16),
-          ElevatedButton(
+          Text(t.pages.home.noAccessTitle, style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+          const Gap(8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(t.pages.home.noAccessBody, textAlign: TextAlign.center),
+          ),
+          const Gap(16),
+          FilledButton.icon(
             onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
-            // icon: const Icon(FluentIcons.add_24_regular),
-            child: Text(t.pages.profiles.add),
+            icon: const Icon(Icons.add_link_rounded),
+            label: Text(t.pages.home.addAccess),
           ),
         ],
       ),

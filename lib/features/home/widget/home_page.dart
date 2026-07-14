@@ -1,15 +1,20 @@
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/features/access/model/access_state.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
+import 'package:hiddify/features/home/widget/empty_profiles_home_body.dart';
+import 'package:hiddify/features/identity/data/identity_data_providers.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_card.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
-import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
@@ -22,6 +27,19 @@ class HomePage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     // final hasAnyProfile = ref.watch(hasAnyProfileProvider);
     final activeProfile = ref.watch(activeProfileProvider);
+    final accessState = switch (activeProfile) {
+      AsyncLoading() => AccessState.loading,
+      AsyncError() => AccessState.temporarilyUnavailable,
+      AsyncData(value: null) => AccessState.notConfigured,
+      AsyncData(value: RemoteProfileEntity(:final subInfo)) => AccessState.derive(
+        hasProfile: true,
+        now: DateTime.now(),
+        expiresAt: subInfo?.expire,
+      ),
+      AsyncData() => AccessState.activeMetadataUnavailable,
+      _ => AccessState.loading,
+    };
+    ref.watch(installationIdentityProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -34,12 +52,14 @@ class HomePage extends HookConsumerWidget {
         //     : null,
         title: Row(
           children: [
-            Assets.images.logo.svg(height: 24),
-            const Gap(8),
             Text.rich(
               TextSpan(
                 children: [
-                  TextSpan(text: t.common.appTitle),
+                  const TextSpan(text: 'Woman in '),
+                  TextSpan(
+                    text: 'Red',
+                    style: TextStyle(color: theme.colorScheme.primary),
+                  ),
                   const TextSpan(text: " "),
                   const WidgetSpan(child: AppVersionLabel(), alignment: PlaceholderAlignment.middle),
                 ],
@@ -68,6 +88,11 @@ class HomePage extends HookConsumerWidget {
               onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
             ),
           ),
+          IconButton(
+            tooltip: t.pages.identity.title,
+            onPressed: () => context.pushNamed('identityProfile'),
+            icon: const Icon(Icons.person_outline_rounded),
+          ),
           const Gap(8),
         ],
       ),
@@ -95,46 +120,63 @@ class HomePage extends HookConsumerWidget {
                 ),
                 child: CustomScrollView(
                   slivers: [
-                    // switch (activeProfile) {
-                    // AsyncData(value: final profile?) =>
-                    MultiSliver(
-                      children: [
-                        // const Gap(100),
-                        switch (activeProfile) {
-                          AsyncData(value: final profile?) => ProfileTile(
+                    switch (activeProfile) {
+                      AsyncData(value: null) => const EmptyProfilesHomeBody(),
+                      AsyncData(value: final profile?) => MultiSliver(
+                        children: [
+                          ProfileTile(
                             profile: profile,
                             isMain: true,
                             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             color: Theme.of(context).colorScheme.surfaceContainer,
                           ),
-                          _ => const Text(""),
-                        },
-                        const SliverFillRemaining(
-                          hasScrollBody: false,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [ConnectionButton(), ActiveProxyDelayIndicator()],
+                          if (accessState == AccessState.expired)
+                            SliverToBoxAdapter(
+                              child: Semantics(
+                                liveRegion: true,
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.errorContainer,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    t.components.subscriptionInfo.expired,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: theme.colorScheme.onErrorContainer),
+                                  ),
                                 ),
                               ),
-                              ActiveProxyFooter(),
-                              Gap(32),
-                            ],
+                            ),
+                          const SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [ConnectionButton(), ActiveProxyDelayIndicator()],
+                                  ),
+                                ),
+                                ActiveProxyFooter(),
+                                Gap(32),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    // AsyncData() => switch (hasAnyProfile) {
-                    //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                    //     _ => const EmptyProfilesHomeBody(),
-                    //   },
-                    // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
-                    // _ => const SliverToBoxAdapter(),
-                    // },
+                        ],
+                      ),
+                      AsyncError(:final error) => SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(child: Text(t.presentShortError(error), textAlign: TextAlign.center)),
+                      ),
+                      _ => const SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    },
                   ],
                 ),
               ),

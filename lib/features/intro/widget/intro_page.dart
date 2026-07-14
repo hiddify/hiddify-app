@@ -16,7 +16,6 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
-import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -80,17 +79,27 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                           ? IntroConst.maxwidth
                           : constraints.maxWidth;
                       final size = width * 0.4;
-                      return Assets.images.logo.svg(width: size, height: size);
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(size * 0.24),
+                        child: Image.asset(
+                          'design/assets/woman-in-red-app-icon-master.png',
+                          width: size,
+                          height: size,
+                          fit: BoxFit.cover,
+                          semanticLabel: t.common.appTitle,
+                        ),
+                      );
                     },
                   ),
                   const Gap(16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      t.intro.banner,
-                      style: theme.textTheme.bodyLarge,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      children: [
+                        Text(t.intro.banner, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
+                        const Gap(8),
+                        Text(t.intro.accessPrompt, style: theme.textTheme.bodyLarge, textAlign: TextAlign.center),
+                      ],
                     ),
                   ),
                   const Gap(24),
