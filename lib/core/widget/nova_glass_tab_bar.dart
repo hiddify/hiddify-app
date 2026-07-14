@@ -68,8 +68,7 @@ class NovaGlassTabBar extends StatelessWidget {
                             selected: tab == selected,
                             reduceMotion: reduceMotion,
                             onTap: () {
-                              if (tab == selected) return;
-                              HapticFeedback.selectionClick();
+                              if (tab != selected) HapticFeedback.selectionClick();
                               onSelected(tab);
                             },
                           ),
@@ -114,6 +113,7 @@ class _NovaTabItem extends StatelessWidget {
       button: true,
       selected: selected,
       container: true,
+      onTap: onTap,
       child: ExcludeSemantics(
         child: Material(
           color: Colors.transparent,

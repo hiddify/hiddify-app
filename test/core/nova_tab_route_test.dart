@@ -11,4 +11,9 @@ void main() {
     expect(novaTabForLocation('/settings'), NovaTab.settings);
     expect(novaTabForLocation('/settings/general'), NovaTab.settings);
   });
+
+  test('resets the current shell branch only when the selected Nova tab is reselected', () {
+    expect(shouldResetNovaBranch(current: NovaTab.home, requested: NovaTab.home), isTrue);
+    expect(shouldResetNovaBranch(current: NovaTab.home, requested: NovaTab.servers), isFalse);
+  });
 }

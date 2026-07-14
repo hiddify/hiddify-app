@@ -58,6 +58,7 @@ class MyAdaptiveLayout extends HookConsumerWidget {
     }, [isMobileBreakpoint, showProfilesAction, navigationShell.currentIndex]);
     final mediaQuery = MediaQuery.of(context);
     final currentLocation = GoRouterState.of(context).uri.path;
+    final currentNovaTab = novaTabForLocation(currentLocation);
     return Material(
       child: Scaffold(
         body: isMobileBreakpoint
@@ -71,15 +72,22 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                     ),
                     child: navigationShell,
                   ),
-                  NovaGlassTabBar(
-                    selected: novaTabForLocation(currentLocation),
-                    labels: const {
-                      NovaTab.home: 'Главная',
-                      NovaTab.servers: 'Серверы',
-                      NovaTab.rules: 'Правила',
-                      NovaTab.settings: 'Настройки',
-                    },
-                    onSelected: (tab) => _onNovaTabTap(context, tab),
+                  FocusScope(
+                    node: navScopeNode,
+                    child: Stack(
+                      children: [
+                        NovaGlassTabBar(
+                          selected: currentNovaTab,
+                          labels: const {
+                            NovaTab.home: 'Главная',
+                            NovaTab.servers: 'Серверы',
+                            NovaTab.rules: 'Правила',
+                            NovaTab.settings: 'Настройки',
+                          },
+                          onSelected: (tab) => _onNovaTabTap(context, currentNovaTab, tab),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               )
@@ -109,8 +117,12 @@ class MyAdaptiveLayout extends HookConsumerWidget {
     );
   }
 
-  void _onNovaTabTap(BuildContext context, NovaTab tab) {
-    switch (tab) {
+  void _onNovaTabTap(BuildContext context, NovaTab current, NovaTab requested) {
+    if (shouldResetNovaBranch(current: current, requested: requested)) {
+      navigationShell.goBranch(navigationShell.currentIndex, initialLocation: true);
+      return;
+    }
+    switch (requested) {
       case NovaTab.home:
         context.goNamed('home');
       case NovaTab.servers:

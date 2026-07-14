@@ -6,3 +6,5 @@ NovaTab novaTabForLocation(String location) {
   if (location.startsWith('/settings')) return NovaTab.settings;
   return NovaTab.home;
 }
+
+bool shouldResetNovaBranch({required NovaTab current, required NovaTab requested}) => current == requested;

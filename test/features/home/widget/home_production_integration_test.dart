@@ -14,6 +14,12 @@ void main() {
     expect(home, contains('child: const ConnectionButton()'));
     expect(connection, contains('return NovaConnectionControl('));
     expect(adaptive, contains('NovaGlassTabBar('));
+    expect(adaptive, contains(RegExp(r'FocusScope\(\s*node: navScopeNode,\s*child: Stack')));
+    expect(adaptive, contains('shouldResetNovaBranch('));
+    expect(
+      adaptive,
+      contains(RegExp(r'navigationShell\.goBranch\(\s*navigationShell\.currentIndex,\s*initialLocation: true')),
+    );
   });
 
   test('preserves Home server-card route decisions', () {

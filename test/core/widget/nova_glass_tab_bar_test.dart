@@ -26,6 +26,7 @@ const inheritedTheme = NovaThemeData(
 void main() {
   testWidgets('shows four labeled destinations and reports selection', (tester) async {
     var selected = NovaTab.home;
+    final selections = <NovaTab>[];
 
     await tester.pumpWidget(
       MaterialApp(
@@ -43,7 +44,10 @@ void main() {
                     NovaTab.rules: 'Правила',
                     NovaTab.settings: 'Настройки',
                   },
-                  onSelected: (value) => setState(() => selected = value),
+                  onSelected: (value) {
+                    selections.add(value);
+                    setState(() => selected = value);
+                  },
                 ),
               ],
             ),
@@ -64,6 +68,10 @@ void main() {
 
     expect(tester.getSemantics(find.bySemanticsLabel('Главная')).flagsCollection.isSelected, Tristate.isTrue);
     expect(tester.getSemantics(find.bySemanticsLabel('Серверы')).flagsCollection.isSelected, Tristate.isFalse);
+    expect(
+      tester.getSemantics(find.bySemanticsLabel('Главная')).getSemanticsData().hasAction(SemanticsAction.tap),
+      isTrue,
+    );
     expect(find.bySemanticsLabel('Правила'), findsOneWidget);
     expect(find.bySemanticsLabel('Настройки'), findsOneWidget);
 
@@ -71,7 +79,40 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(selected, NovaTab.servers);
+    expect(selections, [NovaTab.servers]);
     expect(tester.getSemantics(find.bySemanticsLabel('Серверы')).flagsCollection.isSelected, Tristate.isTrue);
+
+    tester.semantics.tap(
+      find.semantics.byPredicate(
+        (node) => node.label == 'Настройки' && node.getSemanticsData().hasAction(SemanticsAction.tap),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(selections, [NovaTab.servers, NovaTab.settings]);
+  });
+
+  testWidgets('reports a tap when the selected destination is reselected', (tester) async {
+    final selections = <NovaTab>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(extensions: const [inheritedTheme]),
+        home: Scaffold(
+          body: Stack(
+            children: [
+              NovaGlassTabBar(
+                selected: NovaTab.home,
+                labels: const {NovaTab.home: 'Главная'},
+                onSelected: selections.add,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.bySemanticsLabel('Главная'));
+    await tester.pump();
+    expect(selections, [NovaTab.home]);
   });
 
   testWidgets('uses opaque semantic dock treatment and no animation for accessibility', (tester) async {
