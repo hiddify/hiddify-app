@@ -119,7 +119,14 @@ class MyAdaptiveLayout extends HookConsumerWidget {
 
   void _onNovaTabTap(BuildContext context, NovaTab current, NovaTab requested) {
     if (shouldResetNovaBranch(current: current, requested: requested)) {
-      navigationShell.goBranch(navigationShell.currentIndex, initialLocation: true);
+      switch (novaTabReselectionAction(requested)) {
+        case NovaTabReselectionAction.resetShellBranch:
+          navigationShell.goBranch(navigationShell.currentIndex, initialLocation: true);
+        case NovaTabReselectionAction.goToProxiesRoot:
+          context.goNamed('proxies');
+        case NovaTabReselectionAction.goToRoutingOptionsRoot:
+          context.goNamed('routingOptions');
+      }
       return;
     }
     switch (requested) {

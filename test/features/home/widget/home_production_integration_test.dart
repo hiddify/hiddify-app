@@ -16,6 +16,9 @@ void main() {
     expect(adaptive, contains('NovaGlassTabBar('));
     expect(adaptive, contains(RegExp(r'FocusScope\(\s*node: navScopeNode,\s*child: Stack')));
     expect(adaptive, contains('shouldResetNovaBranch('));
+    expect(adaptive, contains('switch (novaTabReselectionAction(requested))'));
+    expect(adaptive, contains("context.goNamed('proxies')"));
+    expect(adaptive, contains("context.goNamed('routingOptions')"));
     expect(
       adaptive,
       contains(RegExp(r'navigationShell\.goBranch\(\s*navigationShell\.currentIndex,\s*initialLocation: true')),

@@ -110,7 +110,7 @@ This result predates both review-fix rounds and the later uncommitted Matrix tes
 - `test/features/home/widget/nova_ritual_hero_test.dart`
 - `.superpowers/sdd/task-3-report.md`
 
-Aggregate Task 3 scope is the 13 paths listed above. `ee7c1fe0` contained 8 paths; `de31714b` contained all 13 integration/review paths; the final focus/semantics follow-up contains 7 of those existing paths. Unrelated Matrix loading and dependency work remains outside every Task 3 commit.
+Aggregate Task 3 scope is the 13 paths listed above. `ee7c1fe0` contained 8 paths; `de31714b` contained all 13 integration/review paths; `808d7c9e` contained 7 focus/semantics paths; the destination-aware follow-up contains 5 existing paths. Unrelated Matrix loading and dependency work remains outside every Task 3 commit.
 
 ## Self-review
 
@@ -243,4 +243,43 @@ All tests except the unrelated uncommitted Matrix-loading paths:
 00:06 +52: All tests passed!
 ```
 
-The full command `fvm flutter test` was also rerun. Latest authoritative result: 59 tests passed and one unrelated uncommitted Matrix asset test failed because `ios/Runner/Base.lproj/LaunchScreen.storyboard` does not yet contain the expected `scaleAspectFill`. Task 3 does not modify that storyboard or Matrix test. A clean full-suite claim is intentionally not made while that external dirty-worktree mismatch remains.
+The full command `fvm flutter test` produced 59 passing tests and one unrelated uncommitted Matrix asset failure at this point in history. That result is superseded by the destination-aware verification below.
+
+## Destination-aware re-review fix after `808d7c9e`
+
+### RED evidence
+
+The route-unit test did not compile after adding the four required reselection expectations because `NovaTabReselectionAction` and `novaTabReselectionAction` did not yet exist. The production source contract also lacked a destination-aware reselection switch.
+
+### Implementation
+
+- Kept route-location mapping as the selected-dock source of truth, including nested `/home/proxies/...` routes.
+- Added an explicit reselection action for every Nova destination. Home and Settings reset their shell branch; Servers navigates to the `proxies` root; Rules navigates to the `routingOptions` root.
+- Preserved existing named-route behavior when selecting a different dock destination.
+
+### Latest authoritative verification
+
+Focused Task 3 command:
+
+```bash
+fvm flutter test test/core/nova_tab_route_test.dart test/core/widget/nova_glass_tab_bar_test.dart test/features/home/widget/home_production_integration_test.dart test/features/home/widget/nova_connection_control_test.dart test/features/home/widget/nova_ritual_hero_test.dart
+```
+
+```text
+00:13 +17: All tests passed!
+```
+
+Scoped analyzer:
+
+```text
+Analyzing 12 items...
+No issues found! (ran in 14.8s)
+```
+
+All tests except the unrelated uncommitted Matrix-loading paths:
+
+```text
+00:29 +53: All tests passed!
+```
+
+The full command `fvm flutter test` now passes all 60 tests. The previously recorded Matrix asset mismatch was resolved by concurrent Matrix changes already present in the shared worktree; this Task 3 follow-up did not modify or stage those files.
