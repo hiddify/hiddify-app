@@ -109,4 +109,29 @@ void main() {
       isTrue,
     );
   });
+
+  for (final media in const [
+    MediaQueryData(disableAnimations: true),
+    MediaQueryData(accessibleNavigation: true),
+    MediaQueryData(highContrast: true),
+  ]) {
+    testWidgets('uses an opaque dock for available reduced-effects signal $media', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: const [inheritedTheme]),
+          home: MediaQuery(
+            data: media,
+            child: Scaffold(
+              body: Stack(
+                children: [NovaGlassTabBar(selected: NovaTab.home, labels: const {}, onSelected: (_) {})],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final surface = tester.widget<DecoratedBox>(find.byKey(const ValueKey('nova_dock_surface')));
+      expect((surface.decoration as BoxDecoration).color, inheritedTheme.elevatedSurface);
+    });
+  }
 }

@@ -36,6 +36,7 @@ class NovaConnectionControl extends StatelessWidget {
           button: true,
           enabled: enabled,
           label: label,
+          onTap: enabled ? onTap : null,
           child: ExcludeSemantics(
             child: AnimatedContainer(
               duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 420),
@@ -58,7 +59,10 @@ class NovaConnectionControl extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
-                    colors: [if (connected) NovaColors.ritualRedContainer else nova.elevatedSurface, nova.background],
+                    colors: [
+                      if (connected) Color.alphaBlend(nova.accentFill, nova.surface) else nova.elevatedSurface,
+                      nova.background,
+                    ],
                   ),
                   border: Border.all(color: accent.withValues(alpha: connected ? 0.72 : 0.28)),
                 ),
@@ -78,7 +82,9 @@ class NovaConnectionControl extends StatelessWidget {
                           Icons.power_settings_new_rounded,
                           size: 58,
                           color: accent,
-                          shadows: connected ? const [Shadow(color: NovaColors.ritualRedGlow, blurRadius: 16)] : null,
+                          shadows: connected
+                              ? [Shadow(color: nova.accent.withValues(alpha: 0.45), blurRadius: 16)]
+                              : null,
                         ),
                         if (loading)
                           SizedBox(

@@ -23,6 +23,7 @@ class NovaGlassTabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nova = NovaThemeData.of(context);
+    final shadowColor = Theme.of(context).shadowColor;
     final media = MediaQuery.of(context);
     final reduceMotion = media.disableAnimations || media.accessibleNavigation;
     final highContrast = media.highContrast;
@@ -36,7 +37,9 @@ class NovaGlassTabBar extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(NovaDockTokens.radius),
-          boxShadow: const [BoxShadow(color: Color(0x57000000), blurRadius: 32, offset: Offset(0, 12))],
+          boxShadow: [
+            BoxShadow(color: shadowColor.withValues(alpha: 0.34), blurRadius: 32, offset: const Offset(0, 12)),
+          ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(NovaDockTokens.radius),

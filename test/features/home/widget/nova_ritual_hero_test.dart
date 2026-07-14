@@ -51,6 +51,8 @@ void main() {
 
     expect(find.text('С ВОЗВРАЩЕНИЕМ'), findsNothing);
     expect(find.text('Ты на виду · нажми кнопку'), findsOneWidget);
+    expect(find.bySemanticsLabel('ア'), findsNothing);
+    expect(find.bySemanticsLabel('0'), findsNothing);
     final status = tester.widget<Text>(find.text('Ты на виду · нажми кнопку'));
     expect(status.style?.color, inheritedTheme.tertiaryText);
   });

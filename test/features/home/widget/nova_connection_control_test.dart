@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/theme/nova_tokens.dart';
@@ -44,6 +46,7 @@ void main() {
     expect(control, findsOneWidget);
     expect(tester.getSemantics(control).flagsCollection.isButton, isTrue);
     expect(tester.getSemantics(control).label, contains('Подключиться'));
+    expect(tester.getSemantics(control).getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
     expect(tester.getSize(control).shortestSide, greaterThanOrEqualTo(44));
     final icon = tester.widget<Icon>(find.byIcon(Icons.power_settings_new_rounded));
     expect(icon.color, inheritedTheme.secondaryText);
@@ -58,6 +61,14 @@ void main() {
     await tester.tap(control);
     await tester.pump();
     expect(taps, 1);
+
+    tester.semantics.tap(
+      find.semantics.byPredicate(
+        (node) => node.label == 'Подключиться' && node.getSemanticsData().hasAction(SemanticsAction.tap),
+      ),
+    );
+    await tester.pump();
+    expect(taps, 2);
   });
 
   testWidgets('uses disabled semantics and no animation for accessibility', (tester) async {
@@ -82,6 +93,8 @@ void main() {
     final icon = tester.widget<Icon>(find.byIcon(Icons.power_settings_new_rounded));
     expect(icon.color, inheritedTheme.disabled);
     expect(tester.widget<AnimatedContainer>(find.byType(AnimatedContainer)).duration, Duration.zero);
+    final control = find.byKey(const ValueKey('home_connection_button'));
+    expect(tester.getSemantics(control).getSemanticsData().hasAction(SemanticsAction.tap), isFalse);
   });
 }
 

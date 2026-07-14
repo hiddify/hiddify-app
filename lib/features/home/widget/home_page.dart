@@ -16,6 +16,14 @@ import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+enum NovaHomeServerAction { addProfile, showProfiles, showProxies }
+
+NovaHomeServerAction novaHomeServerAction({required bool hasProfile, required bool hasProxy}) {
+  if (!hasProfile) return NovaHomeServerAction.addProfile;
+  if (!hasProxy) return NovaHomeServerAction.showProfiles;
+  return NovaHomeServerAction.showProxies;
+}
+
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
@@ -76,12 +84,16 @@ class HomePage extends HookConsumerWidget {
                                 profile: activeProfile,
                                 proxy: activeProxy,
                                 onTap: () {
-                                  if (activeProfile == null) {
-                                    ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
-                                  } else if (activeProxy == null) {
-                                    ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
-                                  } else {
-                                    context.goNamed('proxies');
+                                  switch (novaHomeServerAction(
+                                    hasProfile: activeProfile != null,
+                                    hasProxy: activeProxy != null,
+                                  )) {
+                                    case NovaHomeServerAction.addProfile:
+                                      ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
+                                    case NovaHomeServerAction.showProfiles:
+                                      ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
+                                    case NovaHomeServerAction.showProxies:
+                                      context.goNamed('proxies');
                                   }
                                 },
                               ),
@@ -251,10 +263,9 @@ class _NovaStatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final nova = NovaThemeData.of(context);
     final items = <(String, String, Color?)>[
-      ('ПРИЁМ', '${stats.downlink.toInt().speed()} ↓', nova.accentHover),
-      ('ОТДАЧА', '${stats.uplink.toInt().speed()} ↑', NovaColors.signalGood),
+      ('ПРИЁМ', '${stats.downlink.toInt().speed()} ↓', null),
+      ('ОТДАЧА', '${stats.uplink.toInt().speed()} ↑', null),
       ('ЗАДЕРЖКА', delay > 0 && delay < 65000 ? '$delay ms' : '—', null),
       ('ТРАФИК', (stats.downlinkTotal + stats.uplinkTotal).toInt().size(), null),
     ];
@@ -339,12 +350,15 @@ class _NovaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nova = NovaThemeData.of(context);
+    final shadowColor = Theme.of(context).shadowColor;
     return DecoratedBox(
       decoration: BoxDecoration(
         color: elevated ? nova.elevatedSurface : nova.surface,
         borderRadius: BorderRadius.circular(NovaRadii.large),
         border: Border.all(color: nova.border),
-        boxShadow: elevated ? const [BoxShadow(color: Color(0x3D000000), blurRadius: 18, offset: Offset(0, 8))] : null,
+        boxShadow: elevated
+            ? [BoxShadow(color: shadowColor.withValues(alpha: 0.24), blurRadius: 18, offset: const Offset(0, 8))]
+            : null,
       ),
       child: child,
     );
@@ -387,13 +401,7 @@ class _NovaHeader extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.2,
                 ),
-                children: [
-                  const TextSpan(text: 'Woman in '),
-                  TextSpan(
-                    text: 'Red',
-                    style: TextStyle(color: nova.accentHover),
-                  ),
-                ],
+                children: const [TextSpan(text: 'Woman in Red')],
               ),
             ),
           ),

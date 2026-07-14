@@ -44,19 +44,21 @@ class NovaRitualHero extends StatelessWidget {
             (glyph) => Positioned(
               left: glyph.x,
               top: glyph.y,
-              child: AnimatedOpacity(
-                duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 600),
-                opacity: connected ? 0.35 : 0.82,
-                child: Text(
-                  glyph.value,
-                  style: TextStyle(
-                    color: nova.tertiaryText.withValues(alpha: connected ? 0.35 : 0.82),
-                    fontFamily: 'monospace',
-                    fontSize: glyph.size,
-                    fontWeight: FontWeight.w600,
-                    shadows: connected
-                        ? null
-                        : [Shadow(color: nova.secondaryText.withValues(alpha: 0.45), blurRadius: 10)],
+              child: ExcludeSemantics(
+                child: AnimatedOpacity(
+                  duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 600),
+                  opacity: connected ? 0.35 : 0.82,
+                  child: Text(
+                    glyph.value,
+                    style: TextStyle(
+                      color: nova.tertiaryText.withValues(alpha: connected ? 0.35 : 0.82),
+                      fontFamily: 'monospace',
+                      fontSize: glyph.size,
+                      fontWeight: FontWeight.w600,
+                      shadows: connected
+                          ? null
+                          : [Shadow(color: nova.secondaryText.withValues(alpha: 0.45), blurRadius: 10)],
+                    ),
                   ),
                 ),
               ),
@@ -73,7 +75,7 @@ class NovaRitualHero extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 2.8,
-                  shadows: const [Shadow(color: NovaColors.ritualRedGlow, blurRadius: 12)],
+                  shadows: [Shadow(color: nova.accent.withValues(alpha: 0.45), blurRadius: 12)],
                 ),
               ),
             ),
@@ -89,7 +91,7 @@ class NovaRitualHero extends StatelessWidget {
                       Icons.pets_rounded,
                       color: nova.primaryText,
                       size: 34,
-                      shadows: const [Shadow(color: Colors.white, blurRadius: 10)],
+                      shadows: [Shadow(color: nova.primaryText.withValues(alpha: 0.7), blurRadius: 10)],
                     ),
                   ),
                 ),
