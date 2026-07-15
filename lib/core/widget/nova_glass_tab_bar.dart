@@ -2,9 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hiddify/core/router/adaptive_layout/nova_tab_route.dart';
 import 'package:hiddify/core/theme/nova_tokens.dart';
-
-enum NovaTab { home, servers, rules, settings }
 
 class NovaGlassTabBar extends StatelessWidget {
   const NovaGlassTabBar({super.key, required this.selected, required this.labels, required this.onSelected});
@@ -28,6 +27,37 @@ class NovaGlassTabBar extends StatelessWidget {
     final reduceMotion = media.disableAnimations || media.accessibleNavigation;
     final highContrast = media.highContrast;
     final reduceEffects = reduceMotion || highContrast;
+    final surface = DecoratedBox(
+      key: const ValueKey('nova_dock_surface'),
+      decoration: BoxDecoration(
+        color: reduceEffects ? nova.elevatedSurface : nova.glass,
+        borderRadius: BorderRadius.circular(NovaDockTokens.radius),
+        border: Border.all(color: highContrast ? nova.separator : nova.border, width: highContrast ? 1.5 : 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: NovaSpacing.sm),
+        child: Row(
+          children: NovaTab.values
+              .map(
+                (tab) => Expanded(
+                  child: _NovaTabItem(
+                    tab: tab,
+                    label: labels[tab] ?? tab.name,
+                    icon: _icons[tab]!,
+                    selected: tab == selected,
+                    reduceMotion: reduceMotion,
+                    highContrast: highContrast,
+                    onTap: () {
+                      if (tab != selected) HapticFeedback.selectionClick();
+                      onSelected(tab);
+                    },
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+    );
 
     return PositionedDirectional(
       start: NovaDockTokens.horizontalInset,
@@ -43,43 +73,12 @@ class NovaGlassTabBar extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(NovaDockTokens.radius),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: reduceEffects ? 0 : NovaDockTokens.blur,
-              sigmaY: reduceEffects ? 0 : NovaDockTokens.blur,
-            ),
-            child: DecoratedBox(
-              key: const ValueKey('nova_dock_surface'),
-              decoration: BoxDecoration(
-                color: reduceEffects ? nova.elevatedSurface : nova.glass,
-                borderRadius: BorderRadius.circular(NovaDockTokens.radius),
-                border: Border.all(color: highContrast ? nova.separator : nova.border, width: highContrast ? 1.5 : 1),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: NovaSpacing.sm),
-                child: Row(
-                  children: NovaTab.values
-                      .map(
-                        (tab) => Expanded(
-                          child: _NovaTabItem(
-                            tab: tab,
-                            label: labels[tab] ?? tab.name,
-                            icon: _icons[tab]!,
-                            selected: tab == selected,
-                            reduceMotion: reduceMotion,
-                            highContrast: highContrast,
-                            onTap: () {
-                              if (tab != selected) HapticFeedback.selectionClick();
-                              onSelected(tab);
-                            },
-                          ),
-                        ),
-                      )
-                      .toList(),
+          child: reduceEffects
+              ? surface
+              : BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: NovaDockTokens.blur, sigmaY: NovaDockTokens.blur),
+                  child: surface,
                 ),
-              ),
-            ),
-          ),
         ),
       ),
     );
@@ -128,7 +127,7 @@ class _NovaTabItem extends StatelessWidget {
               child: AnimatedContainer(
                 duration: duration,
                 curve: Curves.easeOutCubic,
-                constraints: const BoxConstraints(minWidth: NovaDockTokens.minimumTarget),
+                constraints: const BoxConstraints(minWidth: NovaAccessibilityTokens.minimumTapTarget),
                 padding: const EdgeInsets.symmetric(horizontal: NovaSpacing.md, vertical: NovaSpacing.xs),
                 decoration: BoxDecoration(
                   color: selected ? nova.accentFill : Colors.transparent,

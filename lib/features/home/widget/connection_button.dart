@@ -5,6 +5,7 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/home/widget/nova_connection_control.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
@@ -17,6 +18,7 @@ class ConnectionButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final connectionStatus = ref.watch(connectionNotifierProvider);
+    final activeProfileState = ref.watch(activeProfileProvider);
     final delay = ref.watch(activeProxyNotifierProvider).valueOrNull?.urlTestDelay ?? 0;
     final requiresReconnect = ref.watch(configOptionNotifierProvider).valueOrNull;
 
@@ -27,12 +29,17 @@ class ConnectionButton extends HookConsumerWidget {
           return ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
         },
         AsyncData(value: Disconnected()) || AsyncError() => () async {
-          if (ref.read(activeProfileProvider).valueOrNull == null) {
-            await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile();
-            ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
-          }
-          if (await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
-            return ref.read(connectionNotifierProvider.notifier).toggleConnection();
+          switch (activeProfileState) {
+            case AsyncData(value: null):
+              await ref.read(dialogNotifierProvider.notifier).showNoActiveProfile();
+              ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
+              return;
+            case AsyncData():
+              if (await ref.read(dialogNotifierProvider.notifier).showExperimentalFeatureNotice()) {
+                return ref.read(connectionNotifierProvider.notifier).toggleConnection();
+              }
+            case AsyncLoading() || AsyncError():
+              return;
           }
         },
         AsyncData(value: Connected()) => () async {
@@ -47,10 +54,13 @@ class ConnectionButton extends HookConsumerWidget {
         _ => () {},
       },
       enabled: switch (connectionStatus) {
-        AsyncData(value: Connected()) || AsyncData(value: Disconnected()) || AsyncError() => true,
+        AsyncData(value: Connected()) when requiresReconnect != true => true,
+        AsyncData(value: Connected()) ||
+        AsyncData(value: Disconnected()) ||
+        AsyncError() => activeProfileState is AsyncData<ProfileEntity?>,
         _ => false,
       },
-      connected: connectionStatus.valueOrNull is Connected,
+      connected: connectionStatus.valueOrNull?.isConnected ?? false,
       loading: connectionStatus.valueOrNull?.isSwitching ?? connectionStatus.isLoading,
       label: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => t.connection.reconnect,

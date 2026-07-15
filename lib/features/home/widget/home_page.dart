@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/theme/nova_tokens.dart';
+import 'package:hiddify/features/access/model/access_state.dart';
+import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
 import 'package:hiddify/features/home/widget/nova_ritual_hero.dart';
+import 'package:hiddify/features/identity/data/identity_data_providers.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
@@ -18,10 +22,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum NovaHomeServerAction { addProfile, showProfiles, showProxies }
 
-NovaHomeServerAction novaHomeServerAction({required bool hasProfile, required bool hasProxy}) {
-  if (!hasProfile) return NovaHomeServerAction.addProfile;
-  if (!hasProxy) return NovaHomeServerAction.showProfiles;
-  return NovaHomeServerAction.showProxies;
+NovaRitualState novaRitualStateForConnection(AsyncValue<ConnectionStatus> connection) {
+  return switch (connection) {
+    AsyncError() => NovaRitualState.error,
+    AsyncData(value: Disconnected(connectionFailure: ConnectionFailure())) => NovaRitualState.error,
+    AsyncData(value: Connected()) => NovaRitualState.connected,
+    AsyncData(value: Connecting()) || AsyncData(value: Disconnecting()) => NovaRitualState.connecting,
+    _ => NovaRitualState.disconnected,
+  };
+}
+
+NovaHomeServerAction? novaHomeServerActionForStates({
+  required AsyncValue<ProfileEntity?> profile,
+  required AsyncValue<OutboundInfo?> proxy,
+}) {
+  if (profile case AsyncData(value: null)) return NovaHomeServerAction.addProfile;
+  if (profile is! AsyncData<ProfileEntity?>) return null;
+  if (proxy is! AsyncData<OutboundInfo?>) return null;
+  return proxy.value == null ? NovaHomeServerAction.showProfiles : NovaHomeServerAction.showProxies;
 }
 
 class HomePage extends HookConsumerWidget {
@@ -31,17 +49,29 @@ class HomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final connection = ref.watch(connectionNotifierProvider);
-    final activeProfile = ref.watch(activeProfileProvider).valueOrNull;
-    final activeProxy = ref.watch(activeProxyNotifierProvider).valueOrNull;
-    final stats = ref.watch(statsNotifierProvider).valueOrNull ?? SystemInfo.create();
+    final activeProfileState = ref.watch(activeProfileProvider);
+    final activeProxyState = ref.watch(activeProxyNotifierProvider);
+    final activeProfile = activeProfileState.valueOrNull;
+    final activeProxy = activeProxyState.valueOrNull;
     final nova = NovaThemeData.of(context);
-    final isConnected = connection.valueOrNull is Connected;
-    final ritualState = switch (connection) {
-      AsyncError() => NovaRitualState.error,
-      AsyncData(value: Connected()) => NovaRitualState.connected,
-      AsyncData(value: Connecting()) || AsyncData(value: Disconnecting()) => NovaRitualState.connecting,
-      _ => NovaRitualState.disconnected,
+    final isConnected = connection.valueOrNull?.isConnected ?? false;
+    final ritualState = novaRitualStateForConnection(connection);
+    final serverAction = novaHomeServerActionForStates(profile: activeProfileState, proxy: activeProxyState);
+    final serverLoading = activeProfileState.isLoading || (activeProfile != null && activeProxyState.isLoading);
+    final serverError = activeProfileState.hasError || (activeProfile != null && activeProxyState.hasError);
+    final accessState = switch (activeProfileState) {
+      AsyncLoading() => AccessState.loading,
+      AsyncError() => AccessState.temporarilyUnavailable,
+      AsyncData(value: null) => AccessState.notConfigured,
+      AsyncData(value: RemoteProfileEntity(:final subInfo)) => AccessState.derive(
+        hasProfile: true,
+        now: DateTime.now(),
+        expiresAt: subInfo?.expire,
+      ),
+      AsyncData() => AccessState.activeMetadataUnavailable,
+      _ => AccessState.loading,
     };
+    ref.watch(installationIdentityProvider);
     final subscription = switch (activeProfile) {
       RemoteProfileEntity(:final subInfo) => subInfo,
       _ => null,
@@ -60,8 +90,10 @@ class HomePage extends HookConsumerWidget {
               children: [
                 _NovaHeader(
                   addProfileLabel: t.pages.profiles.add,
+                  identityLabel: t.pages.identity.title,
                   settingsLabel: t.pages.settings.title,
                   onAddProfile: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
+                  onIdentity: () => context.pushNamed('identityProfile'),
                   onSettings: () => context.goNamed('settings'),
                 ),
                 Expanded(
@@ -88,24 +120,26 @@ class HomePage extends HookConsumerWidget {
                             ),
                             sliver: SliverList.list(
                               children: [
-                                _NovaServerCard(
+                                NovaServerCard(
                                   profile: activeProfile,
                                   proxy: activeProxy,
                                   addProfileLabel: t.pages.profiles.add,
                                   profilesLabel: t.pages.profiles.title,
-                                  onTap: () {
-                                    switch (novaHomeServerAction(
-                                      hasProfile: activeProfile != null,
-                                      hasProxy: activeProxy != null,
-                                    )) {
-                                      case NovaHomeServerAction.addProfile:
-                                        ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
-                                      case NovaHomeServerAction.showProfiles:
-                                        ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
-                                      case NovaHomeServerAction.showProxies:
-                                        context.goNamed('proxies');
-                                    }
-                                  },
+                                  errorLabel: t.pages.profiles.failedToLoad,
+                                  isLoading: serverLoading,
+                                  hasError: serverError,
+                                  onTap: serverAction == null
+                                      ? null
+                                      : () {
+                                          switch (serverAction) {
+                                            case NovaHomeServerAction.addProfile:
+                                              ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
+                                            case NovaHomeServerAction.showProfiles:
+                                              ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview();
+                                            case NovaHomeServerAction.showProxies:
+                                              context.goNamed('proxies');
+                                          }
+                                        },
                                 ),
                                 if (subscription != null) ...[
                                   const SizedBox(height: NovaSpacing.lg),
@@ -114,10 +148,13 @@ class HomePage extends HookConsumerWidget {
                                     expireDateLabel: t.components.subscriptionInfo.expireDate,
                                   ),
                                 ],
+                                if (accessState == AccessState.expired) ...[
+                                  const SizedBox(height: NovaSpacing.lg),
+                                  _NovaAccessWarning(label: t.components.subscriptionInfo.expired),
+                                ],
                                 if (isConnected) ...[
                                   const SizedBox(height: NovaSpacing.lg),
-                                  _NovaStatsGrid(
-                                    stats: stats,
+                                  _NovaStatsSection(
                                     delay: activeProxy?.urlTestDelay ?? 0,
                                     downlinkLabel: t.components.stats.downlink,
                                     uplinkLabel: t.components.stats.uplink,
@@ -149,12 +186,15 @@ class HomePage extends HookConsumerWidget {
   }
 }
 
-class _NovaServerCard extends StatelessWidget {
-  const _NovaServerCard({
+class NovaServerCard extends StatelessWidget {
+  const NovaServerCard({
     required this.profile,
     required this.proxy,
     required this.addProfileLabel,
     required this.profilesLabel,
+    required this.errorLabel,
+    required this.isLoading,
+    required this.hasError,
     required this.onTap,
   });
 
@@ -162,20 +202,24 @@ class _NovaServerCard extends StatelessWidget {
   final OutboundInfo? proxy;
   final String addProfileLabel;
   final String profilesLabel;
-  final VoidCallback onTap;
+  final String errorLabel;
+  final bool isLoading;
+  final bool hasError;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final nova = NovaThemeData.of(context);
     final proxyCity = proxy?.ipinfo.city ?? '';
     final proxyType = proxy?.type ?? '';
-    final subtitle = proxyCity.isNotEmpty
+    final resolvedSubtitle = proxyCity.isNotEmpty
         ? proxyCity
         : proxyType.isNotEmpty
         ? proxyType
         : profile == null
         ? addProfileLabel
         : profilesLabel;
+    final subtitle = hasError ? errorLabel : resolvedSubtitle;
 
     return _NovaCard(
       child: InkWell(
@@ -200,7 +244,7 @@ class _NovaServerCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      proxy?.tagDisplay ?? profile?.name ?? 'Woman in Red',
+                      proxy?.tagDisplay ?? profile?.name ?? Constants.appName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: nova.primaryText, fontSize: 17, fontWeight: FontWeight.w600),
@@ -215,9 +259,38 @@ class _NovaServerCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: nova.tertiaryText),
+              if (isLoading)
+                SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2, color: nova.accent))
+              else if (hasError)
+                Icon(Icons.error_outline_rounded, color: Theme.of(context).colorScheme.error)
+              else
+                Icon(Icons.chevron_right_rounded, color: nova.tertiaryText),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NovaAccessWarning extends StatelessWidget {
+  const _NovaAccessWarning({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Semantics(
+      liveRegion: true,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(NovaSpacing.md),
+        decoration: BoxDecoration(color: colors.errorContainer, borderRadius: BorderRadius.circular(NovaRadii.large)),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: colors.onErrorContainer),
         ),
       ),
     );
@@ -285,6 +358,35 @@ class _NovaSubscriptionCard extends StatelessWidget {
   }
 }
 
+class _NovaStatsSection extends ConsumerWidget {
+  const _NovaStatsSection({
+    required this.delay,
+    required this.downlinkLabel,
+    required this.uplinkLabel,
+    required this.delayLabel,
+    required this.trafficLabel,
+  });
+
+  final int delay;
+  final String downlinkLabel;
+  final String uplinkLabel;
+  final String delayLabel;
+  final String trafficLabel;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stats = ref.watch(statsNotifierProvider).valueOrNull ?? SystemInfo.create();
+    return _NovaStatsGrid(
+      stats: stats,
+      delay: delay,
+      downlinkLabel: downlinkLabel,
+      uplinkLabel: uplinkLabel,
+      delayLabel: delayLabel,
+      trafficLabel: trafficLabel,
+    );
+  }
+}
+
 class _NovaStatsGrid extends StatelessWidget {
   const _NovaStatsGrid({
     required this.stats,
@@ -304,11 +406,11 @@ class _NovaStatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = <(String, String, Color?)>[
-      (downlinkLabel, '${stats.downlink.toInt().speed()} ↓', null),
-      (uplinkLabel, '${stats.uplink.toInt().speed()} ↑', null),
-      (delayLabel, delay > 0 && delay < 65000 ? '$delay ms' : '—', null),
-      (trafficLabel, (stats.downlinkTotal + stats.uplinkTotal).toInt().size(), null),
+    final items = <(String, String)>[
+      (downlinkLabel, '${stats.downlink.toInt().speed()} ↓'),
+      (uplinkLabel, '${stats.uplink.toInt().speed()} ↑'),
+      (delayLabel, delay > 0 && delay < 65000 ? '$delay ms' : '—'),
+      (trafficLabel, (stats.downlinkTotal + stats.uplinkTotal).toInt().size()),
     ];
 
     return _NovaCard(
@@ -321,7 +423,7 @@ class _NovaStatsGrid extends StatelessWidget {
           childAspectRatio: 2.25,
           mainAxisSpacing: NovaSpacing.lg,
           crossAxisSpacing: NovaSpacing.md,
-          children: items.map((item) => _NovaStat(label: item.$1, value: item.$2, color: item.$3)).toList(),
+          children: items.map((item) => _NovaStat(label: item.$1, value: item.$2)).toList(),
         ),
       ),
     );
@@ -329,11 +431,10 @@ class _NovaStatsGrid extends StatelessWidget {
 }
 
 class _NovaStat extends StatelessWidget {
-  const _NovaStat({required this.label, required this.value, required this.color});
+  const _NovaStat({required this.label, required this.value});
 
   final String label;
   final String value;
-  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -350,12 +451,7 @@ class _NovaStat extends StatelessWidget {
           value,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: color ?? nova.primaryText,
-            fontFamily: 'monospace',
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: nova.primaryText, fontFamily: 'monospace', fontSize: 15, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -409,14 +505,18 @@ class _NovaCard extends StatelessWidget {
 class _NovaHeader extends StatelessWidget {
   const _NovaHeader({
     required this.addProfileLabel,
+    required this.identityLabel,
     required this.settingsLabel,
     required this.onAddProfile,
+    required this.onIdentity,
     required this.onSettings,
   });
 
   final String addProfileLabel;
+  final String identityLabel;
   final String settingsLabel;
   final VoidCallback onAddProfile;
+  final VoidCallback onIdentity;
   final VoidCallback onSettings;
 
   @override
@@ -433,18 +533,16 @@ class _NovaHeader extends StatelessWidget {
             icon: Icon(Icons.add_circle_outline_rounded, color: nova.secondaryText),
           ),
           Expanded(
-            child: Text.rich(
+            child: Text(
+              Constants.appName,
               textAlign: TextAlign.center,
-              TextSpan(
-                style: TextStyle(
-                  color: nova.primaryText,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
-                ),
-                children: const [TextSpan(text: 'Woman in Red')],
-              ),
+              style: TextStyle(color: nova.primaryText, fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: -0.2),
             ),
+          ),
+          IconButton(
+            tooltip: identityLabel,
+            onPressed: onIdentity,
+            icon: Icon(Icons.person_outline_rounded, color: nova.secondaryText),
           ),
           IconButton(
             tooltip: settingsLabel,

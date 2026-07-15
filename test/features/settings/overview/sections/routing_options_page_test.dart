@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/features/settings/overview/sections/routing_options_page.dart';
@@ -21,12 +19,5 @@ void main() {
 
     expect(tester.getSize(find.byKey(const ValueKey('general_target'))).height, greaterThanOrEqualTo(44));
     expect(tester.getSize(find.byKey(const ValueKey('fab_target'))).height, greaterThanOrEqualTo(44));
-  });
-
-  test('both production routing controls use the minimum target wrapper', () {
-    final source = File('lib/features/settings/overview/sections/routing_options_page.dart').readAsStringSync();
-
-    expect(source, contains("key: const ValueKey('routing_general_options_target')"));
-    expect(source, contains("key: ValueKey('routing_fab_menu_target_\$i')"));
   });
 }

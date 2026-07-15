@@ -26,7 +26,7 @@ void main() {
 
   test('keeps the dock accessibility contract', () {
     expect(NovaDockTokens.height, 64);
-    expect(NovaDockTokens.minimumTarget, 44);
+    expect(NovaAccessibilityTokens.minimumTapTarget, 44);
     expect(NovaDockTokens.horizontalInset, 12);
     expect(NovaDockTokens.bottomGap, 8);
   });

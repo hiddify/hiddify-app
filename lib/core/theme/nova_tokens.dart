@@ -54,10 +54,13 @@ abstract final class NovaDockTokens {
   static const height = 64.0;
   static const horizontalInset = 12.0;
   static const bottomGap = 8.0;
-  static const minimumTarget = 44.0;
   static const blur = 28.0;
   static const radius = height / 2;
   static const contentClearance = height + bottomGap + 24;
+}
+
+abstract final class NovaAccessibilityTokens {
+  static const minimumTapTarget = 44.0;
 }
 
 @immutable

@@ -3,27 +3,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/theme/nova_tokens.dart';
+import 'package:hiddify/core/router/adaptive_layout/nova_tab_route.dart';
 import 'package:hiddify/core/widget/nova_glass_tab_bar.dart';
+import 'package:hiddify/gen/translations_ru.g.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-const inheritedTheme = NovaThemeData(
-  background: Color(0xFF010203),
-  groupedBackground: Color(0xFF020304),
-  surface: Color(0xFF030405),
-  elevatedSurface: Color(0xFF040506),
-  pressedSurface: Color(0xFF050607),
-  glass: Color(0xEE060708),
-  border: Color(0xFF070809),
-  separator: Color(0xFF08090A),
-  primaryText: Color(0xFFFAFAFA),
-  secondaryText: Color(0xFFB0B0B0),
-  tertiaryText: Color(0xFF909090),
-  disabled: Color(0xFF505050),
-  accent: Color(0xFFAA1122),
-  accentHover: Color(0xFFBB2233),
-  accentFill: Color(0x33AA1122),
-);
+import '../../helpers/nova_theme_fixture.dart';
 
 void main() {
   testWidgets('shows English provider labels visibly and in semantics', (tester) async {
@@ -62,6 +47,35 @@ void main() {
       expect(find.text(label), findsOneWidget);
       expect(find.bySemanticsLabel(label), findsOneWidget);
     }
+  });
+
+  testWidgets('keeps the Russian rules destination concise and fully visible', (tester) async {
+    final translations = TranslationsRu();
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(extensions: const [inheritedTheme]),
+        home: Scaffold(
+          body: Stack(
+            children: [
+              NovaGlassTabBar(
+                selected: NovaTab.rules,
+                labels: {
+                  NovaTab.home: translations.pages.home.title,
+                  NovaTab.servers: translations.pages.proxies.title,
+                  NovaTab.rules: translations.pages.settings.routing.title,
+                  NovaTab.settings: translations.pages.settings.title,
+                },
+                onSelected: (_) {},
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(translations.pages.settings.routing.title, 'Правила');
+    expect(find.text('Правила'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('shows four labeled destinations and reports selection', (tester) async {
@@ -103,6 +117,7 @@ void main() {
 
     final homeIcon = tester.widget<Icon>(find.byIcon(Icons.home_rounded));
     expect(homeIcon.color, inheritedTheme.accentHover);
+    expect(find.byType(BackdropFilter), findsOneWidget);
     final dockSurface = tester.widget<DecoratedBox>(find.byKey(const ValueKey('nova_dock_surface')));
     expect((dockSurface.decoration as BoxDecoration).color, inheritedTheme.glass);
 
@@ -218,6 +233,7 @@ void main() {
 
       final surface = tester.widget<DecoratedBox>(find.byKey(const ValueKey('nova_dock_surface')));
       expect((surface.decoration as BoxDecoration).color, inheritedTheme.elevatedSurface);
+      expect(find.byType(BackdropFilter), findsNothing);
     });
   }
 }

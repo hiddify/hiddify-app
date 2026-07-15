@@ -456,8 +456,8 @@ class RoutingTapTarget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints(
-        minWidth: NovaDockTokens.minimumTarget,
-        minHeight: NovaDockTokens.minimumTarget,
+        minWidth: NovaAccessibilityTokens.minimumTapTarget,
+        minHeight: NovaAccessibilityTokens.minimumTapTarget,
       ),
       child: width == null ? child : SizedBox(width: width, child: child),
     );

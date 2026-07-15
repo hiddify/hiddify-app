@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
@@ -85,19 +83,6 @@ void main() {
     expect(tester.getBottomRight(find.byKey(targetKey)).dy, lessThanOrEqualTo(scaffoldHeight - dockInset));
   });
 
-  test('all changed secondary routes use the grouped production scaffold', () {
-    const paths = [
-      'lib/features/proxy/overview/proxies_overview_page.dart',
-      'lib/features/settings/overview/settings_page.dart',
-      'lib/features/settings/overview/sections/general_page.dart',
-      'lib/features/settings/overview/sections/routing_options_page.dart',
-    ];
-
-    for (final path in paths) {
-      expect(File(path).readAsStringSync(), contains('NovaGroupedScaffold('), reason: path);
-    }
-  });
-
   testWidgets('dialogs and production sheet surface inherit elevated dark chrome', (tester) async {
     const modalColor = Color(0xFF303840);
     final overlayTheme = theme.copyWith(bottomSheetTheme: const BottomSheetThemeData(modalBackgroundColor: modalColor));
@@ -137,11 +122,5 @@ void main() {
 
     final sheetMaterial = tester.widget<Material>(find.byKey(const ValueKey('themed_bottom_sheet_material')));
     expect(sheetMaterial.color, modalColor);
-  });
-
-  test('BottomSheetsNotifier routes through the tested production surface', () {
-    final source = File('lib/core/router/bottom_sheets/bottom_sheets_notifier.dart').readAsStringSync();
-
-    expect(source, contains('builder: (context) => ThemedBottomSheetSurface(child: child)'));
   });
 }

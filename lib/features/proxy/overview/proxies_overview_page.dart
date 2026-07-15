@@ -6,10 +6,26 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/widget/nova_grouped_scaffold.dart';
+import 'package:hiddify/features/proxy/model/auto_mode_selection.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+String autoModeSelectionFeedback(
+  AutoModeSelection selection, {
+  required String autoLabel,
+  required String timeoutLabel,
+  required String emptyLabel,
+}) {
+  return switch (selection.reason) {
+    AutoModeSelectionReason.lowestLatency =>
+      '$autoLabel: ${selection.outboundTag} · ${selection.latency!.inMilliseconds} ms',
+    AutoModeSelectionReason.deterministicFallback => '$autoLabel: ${selection.outboundTag}',
+    AutoModeSelectionReason.latencyUnavailable => '$autoLabel: ${selection.outboundTag} · $timeoutLabel',
+    AutoModeSelectionReason.noAuthorizedServers => emptyLabel,
+  };
+}
 
 class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
   const ProxiesOverviewPage({super.key});
@@ -42,7 +58,17 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest("select"),
+        onPressed: () async {
+          final result = await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest("select");
+          if (!context.mounted || result == null) return;
+          final message = autoModeSelectionFeedback(
+            result,
+            autoLabel: t.common.auto,
+            timeoutLabel: t.pages.proxies.delay.timeout,
+            emptyLabel: t.pages.proxies.empty,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+        },
         tooltip: t.pages.proxies.testDelay,
         child: const Icon(FluentIcons.flash_24_filled),
       ),

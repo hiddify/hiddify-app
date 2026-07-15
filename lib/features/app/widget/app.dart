@@ -11,7 +11,6 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/theme/app_theme.dart';
-import 'package:hiddify/core/theme/app_theme_mode.dart';
 import 'package:hiddify/core/theme/app_theme_policy.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
@@ -57,7 +56,9 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     setupStateListener(ref);
     final router = ref.watch(goRouterNotiferProvider);
     final locale = ref.watch(localePreferencesProvider);
-    final theme = AppTheme(AppThemeMode.dark, locale.preferredFontFamily);
+    final theme = useMemoized(() => AppTheme(AppThemePolicy.appThemeMode, locale.preferredFontFamily).darkTheme(null), [
+      locale.preferredFontFamily,
+    ]);
     final upgrader = ref.watch(upgraderProvider);
     final activeBreakpoint = Breakpoint(context).activeBreakpoint;
 
@@ -83,8 +84,8 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
               localizationsDelegates: GlobalMaterialLocalizations.delegates,
               debugShowCheckedModeBanner: false,
               themeMode: AppThemePolicy.themeMode,
-              theme: theme.darkTheme(null),
-              darkTheme: theme.darkTheme(null),
+              theme: theme,
+              darkTheme: theme,
               title: Constants.appName,
               builder: (context, child) {
                 final activeTheme = Theme.of(context);
@@ -94,13 +95,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                   child: child ?? const SizedBox(),
                 );
                 return AnnotatedRegion<SystemUiOverlayStyle>(
-                  value: SystemUiOverlayStyle(
-                    statusBarColor: activeTheme.scaffoldBackgroundColor,
-                    statusBarBrightness: Brightness.dark,
-                    statusBarIconBrightness: Brightness.light,
-                    systemNavigationBarColor: activeTheme.scaffoldBackgroundColor,
-                    systemNavigationBarIconBrightness: Brightness.light,
-                  ),
+                  value: AppThemePolicy.systemUiOverlayStyle(activeTheme.scaffoldBackgroundColor),
                   child: kDebugMode && _debugAccessibility
                       ? AccessibilityTools(checkFontOverflows: true, child: content)
                       : content,

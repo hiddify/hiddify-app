@@ -1,4 +1,4 @@
-import 'package:hiddify/core/widget/nova_glass_tab_bar.dart';
+enum NovaTab { home, servers, rules, settings }
 
 enum NovaTabReselectionAction { resetShellBranch, goToProxiesRoot, goToRoutingOptionsRoot }
 
