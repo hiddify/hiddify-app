@@ -28,6 +28,8 @@
     "help": "Aide",
     "save": "Enregistrer",
     "update": "Mettre à jour",
+    "pin": "Épingler",
+    "unpin": "Désépingler",
     "share": "Partager",
     "edit": "Modifier",
     "delete": "Supprimer",

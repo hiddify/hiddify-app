@@ -28,6 +28,8 @@
     "help": "說明",
     "save": "儲存",
     "update": "更新",
+    "pin": "置頂",
+    "unpin": "取消置頂",
     "share": "分享",
     "edit": "編輯",
     "delete": "刪除",

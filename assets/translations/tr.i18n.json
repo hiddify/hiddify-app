@@ -28,6 +28,8 @@
     "help": "Yardım",
     "save": "Kaydet",
     "update": "Güncelle",
+    "pin": "Sabitle",
+    "unpin": "Sabitlemeyi kaldır",
     "share": "Paylaş",
     "edit": "Düzenle",
     "delete": "Sil",

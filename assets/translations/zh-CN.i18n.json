@@ -28,6 +28,8 @@
     "help": "帮助",
     "save": "保存",
     "update": "更新",
+    "pin": "置顶",
+    "unpin": "取消置顶",
     "share": "分享",
     "edit": "编辑",
     "delete": "删除",
