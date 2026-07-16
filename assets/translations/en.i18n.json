@@ -28,6 +28,8 @@
     "help": "Help",
     "save": "Save",
     "update": "Update",
+    "pin": "Pin",
+    "unpin": "Unpin",
     "share": "Share",
     "edit": "Edit",
     "delete": "Delete",
