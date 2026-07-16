@@ -65,6 +65,7 @@ class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogge
   Stream<List<ProfileEntry>> watchAll({required ProfilesSort sort, required SortMode sortMode}) {
     return (profileEntries.select()..orderBy([
           (tbl) => OrderingTerm(expression: tbl.active, mode: OrderingMode.desc),
+          (tbl) => OrderingTerm(expression: tbl.pinned, mode: OrderingMode.desc),
           (tbl) {
             final trafficRatio = (tbl.download + tbl.upload) / tbl.total;
             final isExpired = tbl.expire.isSmallerOrEqualValue(DateTime.now());

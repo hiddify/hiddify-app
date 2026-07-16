@@ -24,6 +24,7 @@ sealed class ProfileEntity with _$ProfileEntity {
     SubscriptionInfo? subInfo,
     Map<String, dynamic>? populatedHeaders,
     UserOverride? userOverride,
+    @Default(false) bool pinned,
   }) = RemoteProfileEntity;
 
   const factory ProfileEntity.local({
@@ -33,6 +34,7 @@ sealed class ProfileEntity with _$ProfileEntity {
     required DateTime lastUpdate,
     Map<String, dynamic>? populatedHeaders,
     UserOverride? userOverride,
+    @Default(false) bool pinned,
   }) = LocalProfileEntity;
 
   String profileOverride() =>

@@ -22,6 +22,7 @@ extension ProfileEntityMapper on ProfileEntity {
       expire: Value(rp.subInfo?.expire),
       webPageUrl: Value(rp.subInfo?.webPageUrl),
       supportUrl: Value(rp.subInfo?.supportUrl),
+      pinned: Value(rp.pinned),
     ),
     local: (lp) => ProfileEntriesCompanion.insert(
       id: lp.id,
@@ -31,9 +32,12 @@ extension ProfileEntityMapper on ProfileEntity {
       lastUpdate: lp.lastUpdate,
       populatedHeaders: Value(jsonEncode(lp.populatedHeaders)),
       userOverride: Value(lp.userOverride?.toStr()),
+      pinned: Value(lp.pinned),
     ),
   );
 
+  /// Note: `pinned` is intentionally omitted here so a subscription refresh
+  /// never clobbers the user's pin; pinning is changed via a dedicated update.
   ProfileEntriesCompanion toUpdateEntry() => map(
     remote: (rp) => ProfileEntriesCompanion(
       name: Value(rp.name),
@@ -93,6 +97,7 @@ extension ProfileEntryMapper on ProfileEntry {
         subInfo: subInfo,
         populatedHeaders: mPopulatedHeaders,
         userOverride: UserOverride.fromStr(userOverride),
+        pinned: pinned,
       ),
       ProfileType.local => LocalProfileEntity(
         id: id,
@@ -101,6 +106,7 @@ extension ProfileEntryMapper on ProfileEntry {
         lastUpdate: lastUpdate,
         populatedHeaders: mPopulatedHeaders,
         userOverride: UserOverride.fromStr(userOverride),
+        pinned: pinned,
       ),
     };
   }

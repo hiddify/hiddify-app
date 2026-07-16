@@ -61,6 +61,14 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
     }).run();
   }
 
+  Future<void> togglePin(ProfileEntity profile) async {
+    loggy.debug('toggling pin for profile: [${profile.id}] -> ${!profile.pinned}');
+    await _profilesRepo.setPinned(profile.id, !profile.pinned).getOrElse((err) {
+      loggy.warning('failed to toggle pin for [${profile.id}]', err);
+      throw err;
+    }).run();
+  }
+
   Future<void> deleteProfile(ProfileEntity profile) async {
     loggy.debug('deleting profile: ${profile.name}');
 

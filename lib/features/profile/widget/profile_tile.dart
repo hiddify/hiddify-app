@@ -138,7 +138,8 @@ class ProfileTile extends HookConsumerWidget {
     );
   }
 
-  /// Profile name. On the main card it is wrapped with a dropdown affordance.
+  /// Profile name with a trailing affordance: a dropdown on the main card, or a
+  /// pin badge on list rows when the profile is pinned.
   Widget _title(TranslationsEn t, ThemeData theme) {
     final nameText = Text(
       profile.name,
@@ -150,23 +151,24 @@ class ProfileTile extends HookConsumerWidget {
           : t.pages.profiles.nonActiveProfileName(name: profile.name),
     );
 
-    if (!isMain) return nameText;
+    final Widget? trailing = isMain
+        ? const Icon(Icons.arrow_drop_down_rounded)
+        : profile.pinned
+        ? Icon(Icons.push_pin, size: 16, color: theme.colorScheme.onSurfaceVariant)
+        : null;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Material(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.transparent,
-        clipBehavior: Clip.antiAlias,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(child: nameText),
-            const Icon(Icons.arrow_drop_down_rounded),
-          ],
-        ),
-      ),
+    if (trailing == null) return nameText;
+
+    final row = Row(
+      children: [
+        Expanded(child: nameText),
+        Padding(padding: const EdgeInsetsDirectional.only(start: 8), child: trailing),
+      ],
     );
+    if (!isMain) return row;
+
+    // On the main card the title is wrapped so it reads as a single affordance.
+    return Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: row);
   }
 }
 
@@ -313,6 +315,11 @@ class ProfileActionsMenu extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
 
     final menuItems = [
+      AdaptiveMenuItem(
+        title: profile.pinned ? t.common.unpin : t.common.pin,
+        leadingIcon: Icon(profile.pinned ? Icons.push_pin : Icons.push_pin_outlined),
+        onTap: () => ref.read(profilesNotifierProvider.notifier).togglePin(profile),
+      ),
       if (profile case RemoteProfileEntity())
         AdaptiveMenuItem(
           title: t.common.update,

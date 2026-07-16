@@ -13,8 +13,11 @@ part 'db.g.dart';
 class Db extends _$Db with InfraLogger {
   Db([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
+  // Changing the schema? Bump `schemaVersion`, add a matching `stepByStep` step
+  // below, and regenerate — full checklist in `README.md` next to this file.
+  // Migrations run on every user's device on update; a wrong one can lose data.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   static QueryExecutor _openConnection() {
     return LazyDatabase(
@@ -65,6 +68,9 @@ class Db extends _$Db with InfraLogger {
         from5To6: (m, schema) async {
           await m.dropColumn(schema.profileEntries, 'profile_override');
         },
+        from6To7: (m, schema) async {
+          await m.addColumn(schema.profileEntries, schema.profileEntries.pinned);
+        },
       ),
     );
   }
@@ -92,6 +98,7 @@ class ProfileEntries extends Table {
   TextColumn get supportUrl => text().nullable()();
   TextColumn get populatedHeaders => text().nullable()();
   TextColumn get userOverride => text().nullable()();
+  BoolColumn get pinned => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};

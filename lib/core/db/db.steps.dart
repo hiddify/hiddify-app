@@ -569,12 +569,108 @@ class Shape5 extends i0.VersionedTable {
       columnsByName['user_override']! as i1.GeneratedColumn<String>;
 }
 
+final class Schema7 extends i0.VersionedSchema {
+  Schema7({required super.database}) : super(version: 7);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    profileEntries,
+    appProxyEntries,
+  ];
+  late final Shape6 profileEntries = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'profile_entries',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_17,
+        _column_19,
+        _column_23,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 appProxyEntries = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'app_proxy_entries',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(mode, pkg_name)'],
+      columns: [_column_20, _column_21, _column_22],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+}
+
+class Shape6 extends i0.VersionedTable {
+  Shape6({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get type =>
+      columnsByName['type']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<bool> get active =>
+      columnsByName['active']! as i1.GeneratedColumn<bool>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get url =>
+      columnsByName['url']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<DateTime> get lastUpdate =>
+      columnsByName['last_update']! as i1.GeneratedColumn<DateTime>;
+  i1.GeneratedColumn<int> get updateInterval =>
+      columnsByName['update_interval']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get upload =>
+      columnsByName['upload']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get download =>
+      columnsByName['download']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get total =>
+      columnsByName['total']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<DateTime> get expire =>
+      columnsByName['expire']! as i1.GeneratedColumn<DateTime>;
+  i1.GeneratedColumn<String> get webPageUrl =>
+      columnsByName['web_page_url']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get supportUrl =>
+      columnsByName['support_url']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get populatedHeaders =>
+      columnsByName['populated_headers']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get userOverride =>
+      columnsByName['user_override']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<bool> get pinned =>
+      columnsByName['pinned']! as i1.GeneratedColumn<bool>;
+}
+
+i1.GeneratedColumn<bool> _column_23(String aliasedName) =>
+    i1.GeneratedColumn<bool>(
+      'pinned',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.bool,
+      defaultConstraints: i1.GeneratedColumn.constraintIsAlways(
+        'CHECK ("pinned" IN (0, 1))',
+      ),
+      defaultValue: const CustomExpression('0'),
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
+  required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -603,6 +699,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from5To6(migrator, schema);
         return 6;
+      case 6:
+        final schema = Schema7(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from6To7(migrator, schema);
+        return 7;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -615,6 +716,7 @@ i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
+  required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
 }) => i0.VersionedSchema.stepByStepHelper(
   step: migrationSteps(
     from1To2: from1To2,
@@ -622,5 +724,6 @@ i1.OnUpgrade stepByStep({
     from3To4: from3To4,
     from4To5: from4To5,
     from5To6: from5To6,
+    from6To7: from6To7,
   ),
 );
