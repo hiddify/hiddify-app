@@ -313,7 +313,14 @@ class ProfileParser {
 
         if (headers['profile-title'] case final String titleHeader when name.isEmpty) {
           if (titleHeader.startsWith("base64:")) {
-            name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            // The `base64:` prefix asserts the payload is base64. When it is not, the value is
+            // garbage rather than plain text, so leave the name unset and let the sources below
+            // supply it, exactly as an absent header would.
+            try {
+              name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            } on FormatException {
+              // Not base64, or not UTF-8 once decoded.
+            }
           } else {
             name = titleHeader.trim();
           }
@@ -352,8 +359,11 @@ class ProfileParser {
         }
         if (headers['profile-update-interval'] case final String updateIntervalStr
             when options == null && !isAutoUpdateDisable) {
-          final updateInterval = Duration(hours: int.parse(updateIntervalStr));
-          options = ProfileOptions(updateInterval: updateInterval);
+          // A panel can put anything here ("12.5", "24h", an empty value). An unusable interval
+          // means no auto-update, which is what an absent header already does.
+          if (int.tryParse(updateIntervalStr) case final int hours) {
+            options = ProfileOptions(updateInterval: Duration(hours: hours));
+          }
         }
 
         SubscriptionInfo? subInfo;

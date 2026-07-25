@@ -162,5 +162,77 @@ void main() {
         });
       });
     });
+
+    test("Should fall back to the next name source when the base64 title is malformed", () {
+      final headers = <String, List<String>>{
+        "profile-title": ["base64:not valid base64!!"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: ProfileEntity.remote(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.name, equals("filename"));
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
+
+    test("Should ignore a profile-update-interval that is not an integer", () {
+      final headers = <String, List<String>>{
+        "profile-title": ["title"],
+        "profile-update-interval": ["12.5"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: ProfileEntity.remote(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.name, equals("title"));
+              expect(rp.options, isNull);
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
   });
 }
