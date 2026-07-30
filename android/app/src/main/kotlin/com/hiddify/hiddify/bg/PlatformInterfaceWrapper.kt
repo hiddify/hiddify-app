@@ -31,20 +31,6 @@ import java.security.KeyStore
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-val packages = Application.packageManager.getPackagesForUid(uid)
-owner.userName = packages?.firstOrNull() ?: ""
-
-// 尝试设置 androidPackageName 字段（某些 libbox 版本可能不存在，使用反射兼容）
-try {
-    val field = owner::class.java.getDeclaredField("androidPackageName")
-    field.isAccessible = true
-    field.set(owner, owner.userName)
-} catch (e: NoSuchFieldException) {
-    // 该版本没有 androidPackageName 字段，忽略
-} catch (e: Exception) {
-    Log.w("PlatformInterface", "failed to set androidPackageName via reflection", e)
-}
-
 interface PlatformInterfaceWrapper : PlatformInterface {
     override fun usePlatformAutoDetectInterfaceControl(): Boolean = true
 

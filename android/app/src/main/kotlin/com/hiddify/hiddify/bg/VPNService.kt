@@ -16,6 +16,7 @@ import com.hiddify.core.libbox.TunOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import com.hiddify.core.libbox.NeighborUpdateListener
 
 class VPNService : VpnService(), PlatformInterfaceWrapper {
 
@@ -112,7 +113,10 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
         }
 
         if (options.autoRoute) {
-            builder.addDnsServer(options.dnsServerAddress.value)
+            val dnsIter = options.dnsServerAddress
+            while (dnsIter.hasNext()) {
+                builder.addDnsServer(dnsIter.next())
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val inet4RouteAddress = options.inet4RouteAddress
@@ -218,7 +222,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 //        service.sendNotification(notification)
     }
         // 新增实现：关闭 neighbor monitor（接口要求）
-    override fun closeNeighborMonitor() {
+    override fun closeNeighborMonitor(listener: NeighborUpdateListener) {
         // 如果你在其它位置启动了 neighbor monitor，请在这里停止并释放资源
     }
 }
