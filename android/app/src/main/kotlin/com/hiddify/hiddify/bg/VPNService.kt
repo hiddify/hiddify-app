@@ -217,4 +217,8 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     override fun sendNotification(notification: Notification) {
 //        service.sendNotification(notification)
     }
+        // 新增实现：关闭 neighbor monitor（接口要求）
+    override fun closeNeighborMonitor() {
+        // 如果你在其它位置启动了 neighbor monitor，请在这里停止并释放资源
+    }
 }
