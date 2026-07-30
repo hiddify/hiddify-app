@@ -16,4 +16,8 @@ class ProxyService :
     override fun onDestroy() = service.onDestroy()
 
     override fun sendNotification(notification: Notification) = service.sendNotification(notification)
+        // 新增：实现接口要求的 closeNeighborMonitor，当前实现为空
+    override fun closeNeighborMonitor() {
+        // 如果有 neighbor monitor 资源，在这里释放；否则保持 no-op
+    }
 }
