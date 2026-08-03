@@ -569,7 +569,11 @@
       "noTraffic": "Out of quota",
       "remainingDuration": "${duration} days remaining",
       "remainingTrafficSemanticLabel": "${consumed} of ${total} traffic consumed",
-      "remainingTraffic": "Remaining traffic"
+      "remainingTraffic": "Remaining traffic",
+      "openWebPage": "Open web page",
+      "support": "Support",
+      "openLinkTitle": "Open this link?",
+      "openLinkAction": "Open"
     }
   },
   "dialogs": {
@@ -649,9 +653,12 @@
       }
     },
     "unknownDomainsWarning": {
-      "title": "External link warning",
-      "youAreAboutToVisit": "You are about to visit :",
-      "thisWebsiteIsNotInOurTrustedList": "This website is not in our trusted list. Please proceed with caution."
+      "title": "Warning",
+      "cannotVerify": "We can't verify this link",
+      "avoidIfUnsure": "If you're not fully sure, don't pay or share sensitive information",
+      "ownResponsibility": "Any loss from misuse is your own responsibility",
+      "open": "Open",
+      "openIn": "Open (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "Full tag:",
