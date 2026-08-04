@@ -361,17 +361,25 @@ class ProfileParser {
           subInfo = _parseSubscriptionInfo(subInfoStr);
         }
 
-        if (subInfo != null) {
-          if (headers['profile-web-page-url'] case final String profileWebPageUrl when isUrl(profileWebPageUrl)) {
-            subInfo = subInfo.copyWith(webPageUrl: profileWebPageUrl);
-          }
-          if (headers['support-url'] case final String profileSupportUrl when isUrl(profileSupportUrl)) {
-            subInfo = subInfo.copyWith(supportUrl: profileSupportUrl);
-          }
+        // Standalone headers: valid with or without `subscription-userinfo`.
+        String? webPageUrl;
+        if (headers['profile-web-page-url'] case final String profileWebPageUrl when isUrl(profileWebPageUrl)) {
+          webPageUrl = profileWebPageUrl;
+        }
+        String? supportUrl;
+        if (headers['support-url'] case final String profileSupportUrl when isUrl(profileSupportUrl)) {
+          supportUrl = profileSupportUrl;
         }
 
         return profile.map(
-          remote: (rp) => rp.copyWith(name: name, lastUpdate: DateTime.now(), options: options, subInfo: subInfo),
+          remote: (rp) => rp.copyWith(
+            name: name,
+            lastUpdate: DateTime.now(),
+            options: options,
+            subInfo: subInfo,
+            webPageUrl: webPageUrl,
+            supportUrl: supportUrl,
+          ),
           local: (lp) => lp.copyWith(name: name, lastUpdate: DateTime.now()),
         );
       }, ProfileFailure.unexpected);

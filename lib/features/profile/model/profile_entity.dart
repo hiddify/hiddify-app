@@ -22,6 +22,10 @@ sealed class ProfileEntity with _$ProfileEntity {
     required DateTime lastUpdate,
     ProfileOptions? options,
     SubscriptionInfo? subInfo,
+    // `profile-web-page-url` / `support-url` headers; independent of subInfo,
+    // which only exists when the `subscription-userinfo` header is present.
+    String? webPageUrl,
+    String? supportUrl,
     Map<String, dynamic>? populatedHeaders,
     UserOverride? userOverride,
     @Default(false) bool pinned,
@@ -55,8 +59,6 @@ class SubscriptionInfo with _$SubscriptionInfo {
     required int download,
     required int total,
     required DateTime expire,
-    String? webPageUrl,
-    String? supportUrl,
   }) = _SubscriptionInfo;
 
   bool get isExpired => expire <= DateTime.now();
