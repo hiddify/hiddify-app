@@ -315,4 +315,38 @@ void main() {
       );
     });
   });
+
+  group("profile-update-interval robustness (#11)", () {
+    test("valid integer sets the update interval", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "6"}),
+        (rp) => expect(rp.options, equals(const ProfileOptions(updateInterval: Duration(hours: 6)))),
+      );
+    });
+
+    test("non-integer is ignored and the profile still parses (previously threw)", () {
+      expectRemote(parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "abc"}), (rp) {
+        expect(rp.options, isNull);
+        expect(rp.name, equals("p"));
+      });
+    });
+
+    test("decimal is ignored (integer-hours convention)", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "1.5"}),
+        (rp) => expect(rp.options, isNull),
+      );
+    });
+
+    test("zero or negative is ignored", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "0"}),
+        (rp) => expect(rp.options, isNull),
+      );
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "-3"}),
+        (rp) => expect(rp.options, isNull),
+      );
+    });
+  });
 }

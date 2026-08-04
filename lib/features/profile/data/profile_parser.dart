@@ -366,8 +366,11 @@ class ProfileParser {
         }
         if (headers['profile-update-interval'] case final String updateIntervalStr
             when options == null && !isAutoUpdateDisable) {
-          final updateInterval = Duration(hours: int.parse(updateIntervalStr));
-          options = ProfileOptions(updateInterval: updateInterval);
+          // Convention: a positive integer number of hours. Ignore anything else
+          // (a decimal, garbage, or <= 0) instead of failing the whole parse.
+          if (int.tryParse(updateIntervalStr.trim()) case final hours? when hours > 0) {
+            options = ProfileOptions(updateInterval: Duration(hours: hours));
+          }
         }
 
         SubscriptionInfo? subInfo;
