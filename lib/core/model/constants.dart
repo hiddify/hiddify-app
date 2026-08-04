@@ -44,14 +44,33 @@ abstract class BottomSheetConst {
 }
 
 abstract class ProfileTileConst {
+  /// Temporarily hides the provider link chips (`profile-web-page-url` /
+  /// `support-url`) below the main profile card, pending a decision from the
+  /// project manager. Set back to `true` to restore them — the chip, its
+  /// carousel and the trusted-link warning are all still in place.
+  static const showProviderLinks = false;
+
   static const radius = Radius.circular(16);
   static const cardBorderRadius = BorderRadius.all(radius);
+  static const topOnlyBorderRadius = BorderRadius.vertical(top: radius);
   static const borderRadiusRight = BorderRadius.horizontal(right: radius);
   static const borderRadiusLeft = BorderRadius.horizontal(left: radius);
-  static BorderRadius startBorderRadius(TextDirection direction) =>
-      direction == TextDirection.ltr ? borderRadiusLeft : borderRadiusRight;
-  static BorderRadius endBorderRadius(TextDirection direction) =>
-      direction == TextDirection.ltr ? borderRadiusRight : borderRadiusLeft;
+  static const topRightOnly = BorderRadius.only(topRight: radius);
+  static const topLeftOnly = BorderRadius.only(topLeft: radius);
+
+  /// [squareBottom] zeroes this side's bottom corner — used when a chip
+  /// (profile-web-page-url / support-url) is attached flush below the card.
+  static BorderRadius startBorderRadius(TextDirection direction, {bool squareBottom = false}) {
+    final ltr = direction == TextDirection.ltr;
+    if (squareBottom) return ltr ? topLeftOnly : topRightOnly;
+    return ltr ? borderRadiusLeft : borderRadiusRight;
+  }
+
+  static BorderRadius endBorderRadius(TextDirection direction, {bool squareBottom = false}) {
+    final ltr = direction == TextDirection.ltr;
+    if (squareBottom) return ltr ? topRightOnly : topLeftOnly;
+    return ltr ? borderRadiusRight : borderRadiusLeft;
+  }
 }
 
 abstract class IntroConst {
