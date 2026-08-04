@@ -286,9 +286,23 @@ class ProfileParser {
     return headers;
   }
 
+  /// Parse a `subscription-userinfo` header, e.g.
+  /// `upload=0; download=1024; total=10240; expire=1704054600`.
+  ///
+  /// Tolerant of real-world noise: a segment without a `key=value` pair (a
+  /// stray `;;`, a trailing `;`, or a malformed token) is skipped instead of
+  /// throwing and failing the whole profile parse. Values may be decimals and
+  /// are truncated to int. `upload` and `download` are required; a missing or
+  /// `0` `total`/`expire` is treated as "unlimited".
   static SubscriptionInfo? _parseSubscriptionInfo(String subInfoStr) {
-    final values = subInfoStr.split(';');
-    final map = {for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt()};
+    final map = <String, int?>{};
+    for (final segment in subInfoStr.split(';')) {
+      final parts = segment.split('=');
+      if (parts.length < 2) continue;
+      final key = parts.first.trim();
+      if (key.isEmpty) continue;
+      map[key] = num.tryParse(parts[1].trim())?.toInt();
+    }
     if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
       final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
       expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;

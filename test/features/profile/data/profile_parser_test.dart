@@ -1,7 +1,41 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:uuid/uuid.dart';
+
+/// Runs the real download → populate → parse flow for a remote profile from a
+/// map of raw single-value response headers.
+Either<ProfileFailure, ProfileEntity> parseRemoteWithHeaders(
+  Map<String, String> rawHeaders, {
+  String url = "https://example.com/",
+  UserOverride? userOverride,
+}) {
+  return ProfileParser.populateHeaders(content: '', remoteHeaders: rawHeaders).flatMap(
+    (headers) => ProfileParser.parse(
+      tempFilePath: '',
+      profile: ProfileEntity.remote(
+        id: const Uuid().v4(),
+        active: true,
+        name: '',
+        url: url,
+        lastUpdate: DateTime.now(),
+        userOverride: userOverride,
+        populatedHeaders: headers,
+      ),
+    ),
+  );
+}
+
+/// Assert [either] is a parsed remote profile and hand it to [check].
+void expectRemote(Either<ProfileFailure, ProfileEntity> either, void Function(RemoteProfileEntity rp) check) {
+  expect(either.isRight(), true);
+  either.match((l) => fail('parse failed: $l'), (r) {
+    expect(r is RemoteProfileEntity, true);
+    check(r as RemoteProfileEntity);
+  });
+}
 
 void main() {
   const validBaseUrl = "https://example.com/configurations/user1/filename.yaml";
@@ -199,6 +233,86 @@ void main() {
           );
         });
       });
+    });
+  });
+
+  group("subscription-userinfo robustness (#10)", () {
+    test("parses a normal header", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=100;download=200;total=1000;expire=1704054600",
+        }),
+        (rp) {
+          expect(rp.subInfo!.upload, equals(100));
+          expect(rp.subInfo!.download, equals(200));
+          expect(rp.subInfo!.total, equals(1000));
+          expect(rp.subInfo!.expire, equals(DateTime.fromMillisecondsSinceEpoch(1704054600 * 1000)));
+        },
+      );
+    });
+
+    test("tolerates a trailing semicolon (previously threw)", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=100;download=200;total=1000;expire=1704054600;",
+        }),
+        (rp) => expect(rp.subInfo!.total, equals(1000)),
+      );
+    });
+
+    test("skips a segment without '=' (previously threw)", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=100;garbage;download=200;total=1000;expire=1704054600",
+        }),
+        (rp) {
+          expect(rp.subInfo!.upload, equals(100));
+          expect(rp.subInfo!.download, equals(200));
+        },
+      );
+    });
+
+    test("tolerates spaces around separators", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=100; download=200; total=1000; expire=1704054600",
+        }),
+        (rp) => expect(rp.subInfo!.download, equals(200)),
+      );
+    });
+
+    test("missing upload/download yields null subInfo but still parses", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "p", "subscription-userinfo": "total=1000;expire=1704054600"}),
+        (rp) {
+          expect(rp.subInfo, isNull);
+          expect(rp.name, equals("p"));
+        },
+      );
+    });
+
+    test("empty header yields null subInfo but still parses", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "p", "subscription-userinfo": ";"}),
+        (rp) => expect(rp.subInfo, isNull),
+      );
+    });
+
+    test("decimals are truncated to int", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=0;download=1024;total=10240.5;expire=1704054600.55",
+        }),
+        (rp) {
+          expect(rp.subInfo!.total, equals(10240));
+          expect(rp.subInfo!.expire, equals(DateTime.fromMillisecondsSinceEpoch(1704054600 * 1000)));
+        },
+      );
     });
   });
 }
