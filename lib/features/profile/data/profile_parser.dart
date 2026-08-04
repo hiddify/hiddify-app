@@ -21,11 +21,15 @@ import 'package:meta/meta.dart';
 /// - UserOverride.name
 /// - `profile-title` header
 /// - `content-disposition` header
-/// - url fragment (example: `https://example.com/config#user`) -> name=`user`
-/// - url filename extension (example: `https://example.com/config.json`) -> name=`config`
+/// - url fragment (remote only, example: `https://example.com/config#user`) -> name=`user`
+/// - url filename extension (remote only, example: `https://example.com/config.json`) -> name=`config`
 /// - if none of these methods return a non-blank string, switch(profileType)
 /// - remote:  fallback to `Remote Profile`
 /// - local: fallback to protocol, extracted from content by protocol()
+///
+/// Note: the url-based steps (fragment, filename) apply to remote profiles only,
+/// since local profiles have no url. Every step treats a whitespace-only result
+/// as blank, so it falls through to the next step.
 
 class ProfileParser {
   // Synthetic sentinel assigned to `total` for "unlimited" traffic (subscription-userinfo total=0 or
@@ -316,34 +320,56 @@ class ProfileParser {
     return null;
   }
 
+  /// Extract a filename from a `content-disposition` header.
+  ///
+  /// Prefers the RFC 5987 extended form `filename*=UTF-8''<percent-encoded>`,
+  /// which is how servers send non-ASCII names (Persian, Chinese, emoji …),
+  /// and falls back to the plain quoted form `filename="name.txt"`. Returns ''
+  /// when neither is present or the extended value can't be decoded.
+  @visibleForTesting
+  static String filenameFromContentDisposition(String header) {
+    // filename*=charset'lang'<percent-encoded-value>; charset'lang' is optional here to
+    // also accept servers that omit it (filename*=%D9%BE...).
+    if (RegExp(r"filename\*\s*=\s*(?:[^']*'[^']*')?([^;]+)", caseSensitive: false).firstMatch(header) case final m?) {
+      final raw = m.group(1)?.trim() ?? '';
+      if (raw.isNotEmpty) {
+        try {
+          return Uri.decodeComponent(raw);
+        } catch (_) {
+          // Malformed percent-encoding → fall back to the quoted form below.
+        }
+      }
+    }
+    if (RegExp('filename="([^"]*)"').firstMatch(header) case final m?) {
+      return m.group(1) ?? '';
+    }
+    return '';
+  }
+
   @visibleForTesting
   static Either<ProfileFailure, ProfileEntity> parse({required String tempFilePath, required ProfileEntity profile}) =>
       Either.tryCatch(() {
         final headers = Map<String, dynamic>.from(profile.populatedHeaders ?? {});
         var name = '';
-        if (profile.userOverride?.name case final String oName when oName.isNotEmpty) {
+        if (profile.userOverride?.name case final String oName when oName.isNotBlank) {
           name = oName;
         }
 
-        if (headers['profile-title'] case final String titleHeader when name.isEmpty) {
+        if (headers['profile-title'] case final String titleHeader when name.isBlank) {
           if (titleHeader.startsWith("base64:")) {
             name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
           } else {
             name = titleHeader.trim();
           }
         }
-        if (headers['content-disposition'] case final String contentDispositionHeader when name.isEmpty) {
-          final regExp = RegExp('filename="([^"]*)"');
-          final match = regExp.firstMatch(contentDispositionHeader);
-          if (match != null && match.groupCount >= 1) {
-            name = match.group(1) ?? '';
-          }
+        if (headers['content-disposition'] case final String contentDispositionHeader when name.isBlank) {
+          name = filenameFromContentDisposition(contentDispositionHeader);
         }
         if (profile case RemoteProfileEntity(:final url)) {
-          if (Uri.parse(url).fragment case final fragment when name.isEmpty) {
+          if (Uri.parse(url).fragment case final fragment when name.isBlank) {
             name = fragment;
           }
-          if (url.split("/").lastOrNull case final part? when name.isEmpty) {
+          if (url.split("/").lastOrNull case final part? when name.isBlank) {
             final pattern = RegExp(r"\.(json|yaml|yml|txt)[\s\S]*");
             name = part.replaceFirst(pattern, "");
           }

@@ -236,6 +236,49 @@ void main() {
     });
   });
 
+  group("content-disposition (#6)", () {
+    test("reads the quoted ASCII form", () {
+      expect(ProfileParser.filenameFromContentDisposition('attachment; filename="MyProfile.txt"'), equals("MyProfile.txt"));
+    });
+
+    test("decodes the RFC 5987 extended form (non-ASCII)", () {
+      const persian = "پروفایل";
+      final header = "attachment; filename*=UTF-8''${Uri.encodeComponent(persian)}";
+      expect(ProfileParser.filenameFromContentDisposition(header), equals(persian));
+    });
+
+    test("prefers the extended form when both are present", () {
+      const persian = "پروفایل";
+      final header = "attachment; filename=\"fallback.txt\"; filename*=UTF-8''${Uri.encodeComponent(persian)}";
+      expect(ProfileParser.filenameFromContentDisposition(header), equals(persian));
+    });
+
+    test("falls back to the quoted form on malformed percent-encoding", () {
+      expect(
+        ProfileParser.filenameFromContentDisposition("attachment; filename=\"safe.txt\"; filename*=UTF-8''%zz%zz"),
+        equals("safe.txt"),
+      );
+    });
+
+    test("accepts the extended form without a charset prefix", () {
+      const persian = "پروفایل";
+      final header = "attachment; filename*=${Uri.encodeComponent(persian)}";
+      expect(ProfileParser.filenameFromContentDisposition(header), equals(persian));
+    });
+
+    test("returns empty when no filename is present", () {
+      expect(ProfileParser.filenameFromContentDisposition("attachment"), equals(""));
+    });
+
+    test("parse() uses the decoded content-disposition name", () {
+      const persian = "پروفایل";
+      final header = "attachment; filename*=UTF-8''${Uri.encodeComponent(persian)}";
+      expectRemote(parseRemoteWithHeaders({"content-disposition": header}), (rp) {
+        expect(rp.name, equals(persian));
+      });
+    });
+  });
+
   group("subscription-userinfo robustness (#10)", () {
     test("parses a normal header", () {
       expectRemote(
@@ -346,6 +389,45 @@ void main() {
       expectRemote(
         parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "-3"}),
         (rp) => expect(rp.options, isNull),
+      );
+    });
+  });
+
+  group("name hierarchy blank-consistency (#C)", () {
+    // %20%20 decodes to two spaces, i.e. a whitespace-only content-disposition name.
+    const whitespaceContentDisposition = "attachment; filename*=UTF-8''%20%20";
+
+    test("whitespace content-disposition falls through to the url fragment", () {
+      expectRemote(
+        parseRemoteWithHeaders(
+          {"content-disposition": whitespaceContentDisposition},
+          url: "https://example.com/config#RealName",
+        ),
+        (rp) => expect(rp.name, equals("RealName")),
+      );
+    });
+
+    test("whitespace content-disposition falls through to the url filename", () {
+      expectRemote(
+        parseRemoteWithHeaders(
+          {"content-disposition": whitespaceContentDisposition},
+          url: "https://example.com/myconfig.json",
+        ),
+        (rp) => expect(rp.name, equals("myconfig")),
+      );
+    });
+
+    test("whitespace userOverride name falls through to profile-title", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "RealTitle"}, userOverride: const UserOverride(name: "   ")),
+        (rp) => expect(rp.name, equals("RealTitle")),
+      );
+    });
+
+    test("all-blank sources fall back to Remote Profile", () {
+      expectRemote(
+        parseRemoteWithHeaders({"content-disposition": whitespaceContentDisposition}),
+        (rp) => expect(rp.name, equals("Remote Profile")),
       );
     });
   });
