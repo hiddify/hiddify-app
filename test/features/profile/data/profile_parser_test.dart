@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
@@ -35,6 +37,12 @@ void expectRemote(Either<ProfileFailure, ProfileEntity> either, void Function(Re
     expect(r is RemoteProfileEntity, true);
     check(r as RemoteProfileEntity);
   });
+}
+
+/// Build and decode the profile-override JSON from raw headers / user override.
+Map<String, dynamic> decodeOverride({Map<String, dynamic>? headers, UserOverride? userOverride}) {
+  return jsonDecode(ProfileParser.profileOverride(populatedHeaders: headers, userOverride: userOverride))
+      as Map<String, dynamic>;
 }
 
 void main() {
@@ -429,6 +437,60 @@ void main() {
         parseRemoteWithHeaders({"content-disposition": whitespaceContentDisposition}),
         (rp) => expect(rp.name, equals("Remote Profile")),
       );
+    });
+  });
+
+  group("profileOverride - fragment header", () {
+    test("empty fragment does not enable fragmentation", () {
+      expect(decodeOverride(headers: {"fragment": ""}).containsKey("tls-tricks"), isFalse);
+    });
+
+    test("a full size,sleep,method triplet is applied", () {
+      final tls = decodeOverride(headers: {"fragment": "2-4,10-20,tlshello"})["tls-tricks"] as Map;
+      expect(tls["enable-fragment"], isTrue);
+      expect(tls["fragment-size"], equals("2-4"));
+      expect(tls["fragment-sleep"], equals("10-20"));
+    });
+
+    test("a leading tlshello token shifts size and sleep", () {
+      final tls = decodeOverride(headers: {"fragment": "tlshello,2-4,10-20"})["tls-tricks"] as Map;
+      expect(tls["fragment-size"], equals("2-4"));
+      expect(tls["fragment-sleep"], equals("10-20"));
+    });
+
+    test("an incomplete value is ignored, exactly like a proxy link", () {
+      // size and sleep only — the proxy parser needs a third part too.
+      expect(decodeOverride(headers: {"fragment": "2-4,10-20"}).containsKey("tls-tricks"), isFalse);
+      // size only
+      expect(decodeOverride(headers: {"fragment": "2-4"}).containsKey("tls-tricks"), isFalse);
+    });
+
+    test("a malformed size or sleep is ignored", () {
+      expect(decodeOverride(headers: {"fragment": "abc,def,tlshello"}).containsKey("tls-tricks"), isFalse);
+      expect(decodeOverride(headers: {"fragment": "2-4,def,tlshello"}).containsKey("tls-tricks"), isFalse);
+    });
+
+    test("UserOverride enables fragmentation with the user's own settings", () {
+      final tls = decodeOverride(userOverride: const UserOverride(enableFragment: true))["tls-tricks"] as Map;
+      expect(tls["enable-fragment"], isTrue);
+      // no size/sleep: the user's configured values apply
+      expect(tls.containsKey("fragment-size"), isFalse);
+      expect(tls.containsKey("fragment-sleep"), isFalse);
+    });
+
+    test("UserOverride takes precedence over the header", () {
+      final tls =
+          decodeOverride(
+                headers: {"fragment": "2-4,10-20,tlshello"},
+                userOverride: const UserOverride(enableFragment: true),
+              )["tls-tricks"]
+              as Map;
+      expect(tls["enable-fragment"], isTrue);
+      expect(tls.containsKey("fragment-size"), isFalse);
+    });
+
+    test("no fragment source leaves tls-tricks unset", () {
+      expect(decodeOverride(headers: {}).containsKey("tls-tricks"), isFalse);
     });
   });
 }

@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
+import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
@@ -56,7 +57,7 @@ class ProfileParser {
     'profile-web-page-url',
     'enable-warp',
     'enable-psiphon',
-    'enable-fragment',
+    'fragment',
   ];
 
   final Ref _ref;
@@ -473,11 +474,34 @@ class ProfileParser {
     );
   }
 
+  /// Build the `tls-tricks` map from a subscription `fragment` header.
+  ///
+  /// Mirrors the per-proxy `fragment` parameter, which needs a full triplet —
+  /// `size,sleep,method` or `tlshello,size,sleep`. Anything shorter, or a size
+  /// or sleep that isn't a valid range, is incomplete and turns fragmentation
+  /// off entirely rather than enabling it with half the values. Returns null
+  /// when the header can't be used.
+  @visibleForTesting
+  static Map<String, dynamic>? fragmentTricks(String? value) {
+    if (value == null) return null;
+    final parts = value.split(',').map((e) => e.trim()).toList();
+    if (parts.length < 3) return null;
+    final leadingMethod = parts.first.toLowerCase() == 'tlshello';
+    final size = leadingMethod ? parts[1] : parts[0];
+    final sleep = leadingMethod ? parts[2] : parts[1];
+    if (OptionalRange.tryParse(size) == null || OptionalRange.tryParse(sleep) == null) return null;
+    return {'enable-fragment': true, 'fragment-size': size, 'fragment-sleep': sleep};
+  }
+
   static String profileOverride({
     required Map<String, dynamic>? populatedHeaders,
     required UserOverride? userOverride,
   }) {
     final headers = Map<String, dynamic>.from(populatedHeaders ?? {});
+
+    // Consume the raw subscription input; the output config uses a structured
+    // key, so this string value must not leak through unchanged.
+    final fragmentInput = headers.remove('fragment')?.toString();
 
     if (headers['enable-warp'].toString() == 'true' || userOverride?.enableWarp == true) {
       headers['chain-status'] = 'extra_security';
@@ -489,8 +513,14 @@ class ProfileParser {
       headers['extra-security'] = {'mode': 'psiphon'};
     }
 
-    if (headers['enable-fragment'].toString() == 'true' || userOverride?.enableFragment == true) {
+    // fragment: the app's own setting wins and enables fragmentation with the
+    // user's configured size/sleep. Otherwise the subscription header is read
+    // exactly like a proxy link's `fragment` parameter — a complete triplet or
+    // nothing at all.
+    if (userOverride?.enableFragment == true) {
       headers['tls-tricks'] = {'enable-fragment': true};
+    } else if (fragmentTricks(fragmentInput) case final tricks?) {
+      headers['tls-tricks'] = tricks;
     }
 
     headers.removeWhere(
