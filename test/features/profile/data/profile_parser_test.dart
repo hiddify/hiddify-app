@@ -440,6 +440,60 @@ void main() {
     });
   });
 
+  group("profileOverride - extra-security header", () {
+    test("warp header sets extra_security + warp mode", () {
+      final o = decodeOverride(headers: {"extra-security": "warp"});
+      expect(o["chain-status"], equals("extra_security"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+    });
+
+    test("psiphon header sets psiphon mode", () {
+      final o = decodeOverride(headers: {"extra-security": "psiphon"});
+      expect((o["extra-security"] as Map)["mode"], equals("psiphon"));
+    });
+
+    test("a list of modes is not the documented format, so it is ignored", () {
+      final o = decodeOverride(headers: {"extra-security": "warp,psiphon"});
+      expect(o.containsKey("chain-status"), isFalse);
+      expect(o.containsKey("extra-security"), isFalse);
+    });
+
+    test("wrong case is not the documented format, so it is ignored", () {
+      expect(decodeOverride(headers: {"extra-security": "WARP"}).containsKey("extra-security"), isFalse);
+    });
+
+    test("profile mode is never accepted from a subscription", () {
+      expect(decodeOverride(headers: {"extra-security": "profile"}).containsKey("extra-security"), isFalse);
+    });
+
+    test("invalid value is ignored (no chain-status, no raw leak)", () {
+      final o = decodeOverride(headers: {"extra-security": "garbage"});
+      expect(o.containsKey("chain-status"), isFalse);
+      expect(o.containsKey("extra-security"), isFalse);
+    });
+
+    test("UserOverride enables warp without a header", () {
+      final o = decodeOverride(userOverride: const UserOverride(extraSecurity: "warp"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+    });
+
+    test("UserOverride takes precedence over the header", () {
+      final o = decodeOverride(
+        headers: {"extra-security": "warp"},
+        userOverride: const UserOverride(extraSecurity: "psiphon"),
+      );
+      expect((o["extra-security"] as Map)["mode"], equals("psiphon"));
+    });
+
+    test("invalid UserOverride value falls back to the header", () {
+      final o = decodeOverride(
+        headers: {"extra-security": "warp"},
+        userOverride: const UserOverride(extraSecurity: "garbage"),
+      );
+      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+    });
+  });
+
   group("profileOverride - fragment header", () {
     test("empty fragment does not enable fragmentation", () {
       expect(decodeOverride(headers: {"fragment": ""}).containsKey("tls-tricks"), isFalse);
@@ -491,6 +545,39 @@ void main() {
 
     test("no fragment source leaves tls-tricks unset", () {
       expect(decodeOverride(headers: {}).containsKey("tls-tricks"), isFalse);
+    });
+  });
+
+  group("profileOverride - old boolean headers are dropped", () {
+    test("enable-warp is ignored", () {
+      expect(decodeOverride(headers: {"enable-warp": "true"}).containsKey("chain-status"), isFalse);
+    });
+
+    test("enable-fragment is ignored", () {
+      expect(decodeOverride(headers: {"enable-fragment": "true"}).containsKey("tls-tricks"), isFalse);
+    });
+  });
+
+  group("populateHeaders - fragment/extra-security intake", () {
+    Map<String, dynamic> populate(Map<String, dynamic> remoteHeaders) => ProfileParser.populateHeaders(
+      content: '',
+      remoteHeaders: remoteHeaders,
+    ).getOrElse((_) => <String, dynamic>{});
+
+    test("empty fragment header is dropped", () {
+      expect(populate({"fragment": ""}).containsKey("fragment"), isFalse);
+    });
+
+    test("extra-security header is kept", () {
+      expect(populate({"extra-security": "warp"})["extra-security"], equals("warp"));
+    });
+
+    test("old enable-warp header is not kept", () {
+      expect(populate({"enable-warp": "true"}).containsKey("enable-warp"), isFalse);
+    });
+
+    test("empty non-fragment header is dropped", () {
+      expect(populate({"profile-title": ""}).containsKey("profile-title"), isFalse);
     });
   });
 }

@@ -11,6 +11,7 @@ import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -55,8 +56,7 @@ class ProfileParser {
     'profile-update-interval',
     'support-url',
     'profile-web-page-url',
-    'enable-warp',
-    'enable-psiphon',
+    'extra-security',
     'fragment',
   ];
 
@@ -474,6 +474,22 @@ class ProfileParser {
     );
   }
 
+  /// Resolve an `extra-security` value to a chain mode.
+  ///
+  /// Strict on purpose: the value must equal a documented mode key exactly, or
+  /// it is ignored. `profile` is not accepted — chaining to another profile is a
+  /// user choice, not something a subscription may impose.
+  @visibleForTesting
+  static ChainMode? extraSecurityMode(String? value) {
+    if (value == null) return null;
+    final trimmed = value.trim();
+    for (final mode in ChainMode.values) {
+      if (mode.isProfile()) continue;
+      if (mode.key == trimmed) return mode;
+    }
+    return null;
+  }
+
   /// Build the `tls-tricks` map from a subscription `fragment` header.
   ///
   /// Mirrors the per-proxy `fragment` parameter, which needs a full triplet —
@@ -499,18 +515,17 @@ class ProfileParser {
   }) {
     final headers = Map<String, dynamic>.from(populatedHeaders ?? {});
 
-    // Consume the raw subscription input; the output config uses a structured
-    // key, so this string value must not leak through unchanged.
+    // Consume the raw subscription inputs; the output config uses structured
+    // keys, so these string values must not leak through unchanged.
     final fragmentInput = headers.remove('fragment')?.toString();
+    final extraSecurityInput = headers.remove('extra-security')?.toString();
 
-    if (headers['enable-warp'].toString() == 'true' || userOverride?.enableWarp == true) {
-      headers['chain-status'] = 'extra_security';
-      headers['extra-security'] = {'mode': 'warp'};
-    }
-
-    if (headers['enable-psiphon'].toString() == 'true' || userOverride?.enablePsiphon == true) {
-      headers['chain-status'] = 'extra_security';
-      headers['extra-security'] = {'mode': 'psiphon'};
+    // extra-security: exactly one documented mode. The app's own setting takes
+    // precedence over the subscription; an unrecognised value is ignored.
+    final mode = extraSecurityMode(userOverride?.extraSecurity) ?? extraSecurityMode(extraSecurityInput);
+    if (mode != null) {
+      headers['chain-status'] = ChainStatus.extraSecurity.key;
+      headers['extra-security'] = {'mode': mode.key};
     }
 
     // fragment: the app's own setting wins and enables fragmentation with the
