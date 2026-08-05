@@ -1,4 +1,4 @@
-﻿{
+{
   "common": {
     "appTitle": "Hiddify",
     "start": "Start",
@@ -441,9 +441,7 @@
         "tproxyPort": "Transparent proxy port",
         "directPort": "Direct port",
         "redirectPort": "Redirect port",
-        "lanSharing": "VPN sharing",
-        "lanSharingPasswordNotSet": "Password not set",
-        "lanSharingPassword": "VPN sharing password",
+        "lanSharing": "Secure VPN sharing",
         "copyLink": "Copy link",
         "qrCode": "QR Code",
         "lanIPError": "Failed to get local IP address"
