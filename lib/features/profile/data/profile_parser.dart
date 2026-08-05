@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
+import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
@@ -54,9 +55,8 @@ class ProfileParser {
     'profile-update-interval',
     'support-url',
     'profile-web-page-url',
-    'enable-warp',
-    'enable-psiphon',
-    'enable-fragment',
+    'extra-security',
+    'fragment',
   ];
 
   final Ref _ref;
@@ -479,18 +479,52 @@ class ProfileParser {
   }) {
     final headers = Map<String, dynamic>.from(populatedHeaders ?? {});
 
-    if (headers['enable-warp'].toString() == 'true' || userOverride?.enableWarp == true) {
+    // Consume the raw subscription inputs; the output config uses structured
+    // keys, so these string values must not leak through unchanged.
+    final fragmentInput = headers.remove('fragment')?.toString() ?? '';
+    final extraSecurityInput = headers.remove('extra-security')?.toString();
+
+    // extra-security: a single mode (`warp` or `psiphon`) — they share one key,
+    // so if several are listed (comma-separated) the last valid one wins. The
+    // app's own toggles (UserOverride) take precedence over the subscription.
+    String? mode;
+    if (extraSecurityInput != null) {
+      for (final token in extraSecurityInput.split(',')) {
+        final value = token.trim().toLowerCase();
+        if (value == 'warp' || value == 'psiphon') mode = value;
+      }
+    }
+    final userMode = userOverride?.extraSecurity?.trim().toLowerCase();
+    if (userMode == 'warp' || userMode == 'psiphon') mode = userMode;
+    if (mode != null) {
       headers['chain-status'] = 'extra_security';
-      headers['extra-security'] = {'mode': 'warp'};
+      headers['extra-security'] = {'mode': mode};
     }
 
-    if (headers['enable-psiphon'].toString() == 'true' || userOverride?.enablePsiphon == true) {
-      headers['chain-status'] = 'extra_security';
-      headers['extra-security'] = {'mode': 'psiphon'};
+    // fragment: mirrors the per-proxy link format `size,sleep` (optionally
+    // prefixed with a method token). Exactly like proxy links, the header
+    // enables fragmentation only when a valid size is present — an empty or
+    // invalid value does nothing. The app's own setting wins over the header,
+    // and being set at all is enough to enable it (empty = config defaults).
+    final userFragment = userOverride?.fragment;
+    String? fragmentSize;
+    String? fragmentSleep;
+    var fragmentParts = (userFragment ?? fragmentInput).split(',').map((e) => e.trim()).toList();
+    if (fragmentParts.isNotEmpty && fragmentParts.first.toLowerCase() == 'tlshello') {
+      fragmentParts = fragmentParts.sublist(1);
     }
-
-    if (headers['enable-fragment'].toString() == 'true' || userOverride?.enableFragment == true) {
-      headers['tls-tricks'] = {'enable-fragment': true};
+    if (fragmentParts.isNotEmpty && OptionalRange.tryParse(fragmentParts[0]) != null) {
+      fragmentSize = fragmentParts[0];
+    }
+    if (fragmentParts.length >= 2 && OptionalRange.tryParse(fragmentParts[1]) != null) {
+      fragmentSleep = fragmentParts[1];
+    }
+    if (fragmentSize != null || userFragment != null) {
+      headers['tls-tricks'] = {
+        'enable-fragment': true,
+        if (fragmentSize != null) 'fragment-size': fragmentSize,
+        if (fragmentSleep != null) 'fragment-sleep': fragmentSleep,
+      };
     }
 
     headers.removeWhere(

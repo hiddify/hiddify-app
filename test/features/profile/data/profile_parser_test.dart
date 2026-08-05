@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
@@ -35,6 +37,12 @@ void expectRemote(Either<ProfileFailure, ProfileEntity> either, void Function(Re
     expect(r is RemoteProfileEntity, true);
     check(r as RemoteProfileEntity);
   });
+}
+
+/// Build and decode the profile-override JSON from raw headers / user override.
+Map<String, dynamic> decodeOverride({Map<String, dynamic>? headers, UserOverride? userOverride}) {
+  return jsonDecode(ProfileParser.profileOverride(populatedHeaders: headers, userOverride: userOverride))
+      as Map<String, dynamic>;
 }
 
 void main() {
@@ -429,6 +437,146 @@ void main() {
         parseRemoteWithHeaders({"content-disposition": whitespaceContentDisposition}),
         (rp) => expect(rp.name, equals("Remote Profile")),
       );
+    });
+  });
+
+  group("profileOverride - extra-security header", () {
+    test("warp header sets extra_security + warp mode", () {
+      final o = decodeOverride(headers: {"extra-security": "warp"});
+      expect(o["chain-status"], equals("extra_security"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+    });
+
+    test("psiphon header sets psiphon mode", () {
+      final o = decodeOverride(headers: {"extra-security": "psiphon"});
+      expect((o["extra-security"] as Map)["mode"], equals("psiphon"));
+    });
+
+    test("multiple values: last valid wins", () {
+      final o = decodeOverride(headers: {"extra-security": "warp,psiphon"});
+      expect((o["extra-security"] as Map)["mode"], equals("psiphon"));
+    });
+
+    test("value is case-insensitive", () {
+      final o = decodeOverride(headers: {"extra-security": "WARP"});
+      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+    });
+
+    test("invalid value is ignored (no chain-status, no raw leak)", () {
+      final o = decodeOverride(headers: {"extra-security": "garbage"});
+      expect(o.containsKey("chain-status"), isFalse);
+      expect(o.containsKey("extra-security"), isFalse);
+    });
+
+    test("UserOverride enables warp without a header", () {
+      final o = decodeOverride(userOverride: const UserOverride(extraSecurity: "warp"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+    });
+
+    test("UserOverride takes precedence over the header", () {
+      final o = decodeOverride(
+        headers: {"extra-security": "warp"},
+        userOverride: const UserOverride(extraSecurity: "psiphon"),
+      );
+      expect((o["extra-security"] as Map)["mode"], equals("psiphon"));
+    });
+
+    test("invalid UserOverride value falls back to the header", () {
+      final o = decodeOverride(
+        headers: {"extra-security": "warp"},
+        userOverride: const UserOverride(extraSecurity: "garbage"),
+      );
+      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+    });
+  });
+
+  group("profileOverride - fragment header", () {
+    test("empty fragment does not enable fragmentation", () {
+      expect(decodeOverride(headers: {"fragment": ""}).containsKey("tls-tricks"), isFalse);
+    });
+
+    test("size,sleep sets fragment-size and fragment-sleep", () {
+      final tls = decodeOverride(headers: {"fragment": "2-4,10-20"})["tls-tricks"] as Map;
+      expect(tls["enable-fragment"], isTrue);
+      expect(tls["fragment-size"], equals("2-4"));
+      expect(tls["fragment-sleep"], equals("10-20"));
+    });
+
+    test("size only enables fragmentation with default sleep", () {
+      final tls = decodeOverride(headers: {"fragment": "2-4"})["tls-tricks"] as Map;
+      expect(tls["enable-fragment"], isTrue);
+      expect(tls["fragment-size"], equals("2-4"));
+      expect(tls.containsKey("fragment-sleep"), isFalse);
+    });
+
+    test("leading method token (tlshello) is skipped", () {
+      final tls = decodeOverride(headers: {"fragment": "tlshello,2-4,10-20"})["tls-tricks"] as Map;
+      expect(tls["fragment-size"], equals("2-4"));
+      expect(tls["fragment-sleep"], equals("10-20"));
+    });
+
+    test("malformed value does not enable fragmentation", () {
+      expect(decodeOverride(headers: {"fragment": "abc,def"}).containsKey("tls-tricks"), isFalse);
+    });
+
+    test("UserOverride with an empty value enables with defaults", () {
+      final tls = decodeOverride(userOverride: const UserOverride(fragment: ""))["tls-tricks"] as Map;
+      expect(tls["enable-fragment"], isTrue);
+      expect(tls.containsKey("fragment-size"), isFalse);
+    });
+
+    test("UserOverride can carry size,sleep", () {
+      final tls = decodeOverride(userOverride: const UserOverride(fragment: "5-10,20-30"))["tls-tricks"] as Map;
+      expect(tls["fragment-size"], equals("5-10"));
+      expect(tls["fragment-sleep"], equals("20-30"));
+    });
+
+    test("UserOverride takes precedence over the header", () {
+      final tls =
+          decodeOverride(
+                headers: {"fragment": "2-4,10-20"},
+                userOverride: const UserOverride(fragment: "5-10,20-30"),
+              )["tls-tricks"]
+              as Map;
+      expect(tls["fragment-size"], equals("5-10"));
+      expect(tls["fragment-sleep"], equals("20-30"));
+    });
+
+    test("no fragment source leaves tls-tricks unset", () {
+      expect(decodeOverride(headers: {}).containsKey("tls-tricks"), isFalse);
+    });
+  });
+
+  group("profileOverride - old boolean headers are dropped", () {
+    test("enable-warp is ignored", () {
+      expect(decodeOverride(headers: {"enable-warp": "true"}).containsKey("chain-status"), isFalse);
+    });
+
+    test("enable-fragment is ignored", () {
+      expect(decodeOverride(headers: {"enable-fragment": "true"}).containsKey("tls-tricks"), isFalse);
+    });
+  });
+
+  group("populateHeaders - fragment/extra-security intake", () {
+    Map<String, dynamic> populate(Map<String, dynamic> remoteHeaders) => ProfileParser.populateHeaders(
+      content: '',
+      remoteHeaders: remoteHeaders,
+    ).getOrElse((_) => <String, dynamic>{});
+
+    test("empty fragment header is dropped", () {
+      expect(populate({"fragment": ""}).containsKey("fragment"), isFalse);
+    });
+
+    test("extra-security header is kept", () {
+      expect(populate({"extra-security": "warp"})["extra-security"], equals("warp"));
+    });
+
+    test("old enable-warp header is not kept", () {
+      expect(populate({"enable-warp": "true"}).containsKey("enable-warp"), isFalse);
+    });
+
+    test("empty non-fragment header is dropped", () {
+      expect(populate({"profile-title": ""}).containsKey("profile-title"), isFalse);
     });
   });
 }

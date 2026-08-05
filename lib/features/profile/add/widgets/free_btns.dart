@@ -57,9 +57,12 @@ class FreeBtns extends ConsumerWidget {
                               userOverride: UserOverride(
                                 name: title,
                                 updateInterval: 12,
-                                enableWarp: profile.neededFeatures?.contains('warp_over_proxies'),
-                                enablePsiphon: profile.neededFeatures?.contains('psiphon_over_proxies'),
-                                enableFragment: profile.neededFeatures?.contains('fragment'),
+                                extraSecurity: switch (profile.neededFeatures) {
+                                  final f? when f.contains('psiphon_over_proxies') => 'psiphon',
+                                  final f? when f.contains('warp_over_proxies') => 'warp',
+                                  _ => null,
+                                },
+                                fragment: (profile.neededFeatures?.contains('fragment') ?? false) ? '' : null,
                               ),
                             );
                       }
