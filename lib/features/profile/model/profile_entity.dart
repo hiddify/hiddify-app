@@ -85,12 +85,6 @@ abstract class UserOverride with _$UserOverride {
     // hours
     int? updateInterval,
 
-    // Superseded by `extraSecurity` / `fragment` below; kept until every caller
-    // has moved over, so migrated records still work for code reading them.
-    bool? enableWarp,
-    bool? enablePsiphon,
-    bool? enableFragment,
-
     /// Single extra-security mode — `warp` or `psiphon`. They share one slot
     /// because the core runs one chain mode at a time, mirroring the
     /// `extra-security` subscription header.
@@ -121,11 +115,10 @@ abstract class UserOverride with _$UserOverride {
       // v1 -> v2: the `enableWarp` / `enablePsiphon` booleans become a single
       // `extraSecurity` mode, and `enableFragment` becomes `fragment` (which can
       // also carry `size,sleep`). Psiphon wins when both were on, matching v1
-      // behaviour where it overrode warp. The old keys are left in place until
-      // every caller has moved over.
-      if (json['enableWarp'] == true) json['extraSecurity'] = 'warp';
-      if (json['enablePsiphon'] == true) json['extraSecurity'] = 'psiphon';
-      if (json['enableFragment'] == true) json['fragment'] = '';
+      // behaviour where it overrode warp.
+      if (json.remove('enableWarp') == true) json['extraSecurity'] = 'warp';
+      if (json.remove('enablePsiphon') == true) json['extraSecurity'] = 'psiphon';
+      if (json.remove('enableFragment') == true) json['fragment'] = '';
     }
     json['version'] = latestUserOverrideVersion;
     return json;
