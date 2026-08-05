@@ -442,8 +442,6 @@
         "directPort": "Direct portu",
         "redirectPort": "Yönlendirme portu",
         "lanSharing": "VPN paylaşımı",
-        "lanSharingPasswordNotSet": "Şifre ayarlanmamış",
-        "lanSharingPassword": "VPN paylaşım şifresi",
         "copyLink": "Bağlantıyı kopyala",
         "qrCode": "QR Kod",
         "lanIPError": "Yerel IP adresi alınamadı"

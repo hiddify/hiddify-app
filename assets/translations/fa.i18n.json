@@ -442,8 +442,6 @@
         "directPort": "پورت مستقیم",
         "redirectPort": "پورت تغییر مسیر",
         "lanSharing": "اشتراک VPN",
-        "lanSharingPasswordNotSet": "رمز عبور تنظیم نشده",
-        "lanSharingPassword": "رمز عبور اشتراک VPN",
         "copyLink": "کپی لینک",
         "qrCode": "کد QR",
         "lanIPError": "خطا در دریافت آدرس IP محلی"

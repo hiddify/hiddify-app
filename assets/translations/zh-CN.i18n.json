@@ -442,8 +442,6 @@
         "directPort": "本地 Direct 端口",
         "redirectPort": "重定向端口",
         "lanSharing": "VPN 共享",
-        "lanSharingPasswordNotSet": "密码未设置",
-        "lanSharingPassword": "VPN 共享密码",
         "copyLink": "复制链接",
         "qrCode": "二维码",
         "lanIPError": "获取本地 IP 地址失败"

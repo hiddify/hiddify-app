@@ -442,8 +442,6 @@
         "directPort": "Porta direta",
         "redirectPort": "Porta de redirecionamento",
         "lanSharing": "Compartilhamento de VPN",
-        "lanSharingPasswordNotSet": "Senha não definida",
-        "lanSharingPassword": "Senha de compartilhamento de VPN",
         "copyLink": "Copiar link",
         "qrCode": "Código QR",
         "lanIPError": "Falha ao obter endereço IP local"

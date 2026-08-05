@@ -446,8 +446,6 @@
         "directPort": "Локальный порт direct",
         "redirectPort": "Порт перенаправления",
         "lanSharing": "Общий доступ к VPN",
-        "lanSharingPasswordNotSet": "Пароль не установлен",
-        "lanSharingPassword": "Пароль общего доступа VPN",
         "copyLink": "Копировать ссылку",
         "qrCode": "QR-код",
         "lanIPError": "Не удалось получить локальный IP-адрес"

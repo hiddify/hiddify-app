@@ -448,8 +448,6 @@
         "directPort": "منفذ مباشر",
         "redirectPort": "منفذ إعادة التوجيه",
         "lanSharing": "مشاركة VPN",
-        "lanSharingPasswordNotSet": "كلمة المرور غير محددة",
-        "lanSharingPassword": "كلمة مرور مشاركة VPN",
         "copyLink": "نسخ الرابط",
         "qrCode": "رمز QR",
         "lanIPError": "فشل في الحصول على عنوان IP المحلي"
