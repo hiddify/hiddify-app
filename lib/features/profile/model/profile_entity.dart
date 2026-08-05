@@ -72,7 +72,7 @@ class SubscriptionInfo with _$SubscriptionInfo {
   double get remainingRatio => min(remaining.inDays, 30) / 30;
 }
 
-const int latestUserOverrideVersion = 1;
+const int latestUserOverrideVersion = 2;
 
 @freezed
 abstract class UserOverride with _$UserOverride {
@@ -84,9 +84,22 @@ abstract class UserOverride with _$UserOverride {
     @Default(false) bool isAutoUpdateDisable,
     // hours
     int? updateInterval,
+
+    // Superseded by `extraSecurity` / `fragment` below; kept until every caller
+    // has moved over, so migrated records still work for code reading them.
     bool? enableWarp,
     bool? enablePsiphon,
     bool? enableFragment,
+
+    /// Single extra-security mode — `warp` or `psiphon`. They share one slot
+    /// because the core runs one chain mode at a time, mirroring the
+    /// `extra-security` subscription header.
+    String? extraSecurity,
+
+    /// Non-null enables TLS fragmentation. The value mirrors the `fragment`
+    /// header / proxy-link format `size,sleep`; an empty string means "enable
+    /// with the config defaults".
+    String? fragment,
   }) = _UserOverride;
 
   factory UserOverride.fromJson(Map<String, Object?> json) => _$UserOverrideFromJson(json);
@@ -105,7 +118,14 @@ abstract class UserOverride with _$UserOverride {
     final version = json['version'] as int? ?? 1;
 
     if (version < 2) {
-      // Migration 1 to 2
+      // v1 -> v2: the `enableWarp` / `enablePsiphon` booleans become a single
+      // `extraSecurity` mode, and `enableFragment` becomes `fragment` (which can
+      // also carry `size,sleep`). Psiphon wins when both were on, matching v1
+      // behaviour where it overrode warp. The old keys are left in place until
+      // every caller has moved over.
+      if (json['enableWarp'] == true) json['extraSecurity'] = 'warp';
+      if (json['enablePsiphon'] == true) json['extraSecurity'] = 'psiphon';
+      if (json['enableFragment'] == true) json['fragment'] = '';
     }
     json['version'] = latestUserOverrideVersion;
     return json;
