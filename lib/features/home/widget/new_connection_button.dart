@@ -50,16 +50,12 @@ class _CircleDesignWidgetState extends State<CircleDesignWidget> with SingleTick
         switch (_currentState) {
           case ConnectionStateStatus.disconnected:
             changeState(ConnectionStateStatus.connecting);
-            break;
           case ConnectionStateStatus.connecting:
             changeState(ConnectionStateStatus.connected);
-            break;
           case ConnectionStateStatus.connected:
             changeState(ConnectionStateStatus.error);
-            break;
           case ConnectionStateStatus.error:
             changeState(ConnectionStateStatus.disconnected);
-            break;
         }
       },
       child: CustomPaint(
@@ -129,7 +125,7 @@ class CirclePainter extends CustomPainter {
         end: Alignment.bottomCenter,
         colors: innerCircleColor,
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 36));
-    final double innerRadius = 36; //* (currentState == ConnectionStateStatus.connecting ? animationValue : 1);
+    const double innerRadius = 36; //* (currentState == ConnectionStateStatus.connecting ? animationValue : 1);
     canvas.drawCircle(Offset(cx, cy), innerRadius, innerCirclePaint);
     final Paint pathPaint = Paint()
       ..color = Colors.white
