@@ -15,6 +15,8 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_migration.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/app/widget/app.dart';
+import 'package:hiddify/features/auth/data/auth_data_providers.dart';
+import 'package:hiddify/features/auth/notifier/auth_notifier.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/notifier/chain_profile_notifier.dart';
@@ -120,6 +122,14 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
       });
     }
   }
+
+  // Restore a persisted auth session (tokens from secure storage) before the
+  // app builds so returning users land on the home screen instead of /login.
+  // The auth interceptor on the Cabinet Dio is installed here as well.
+  await _init("auth session", () async {
+    container.read(authInterceptorProvider);
+    await container.read(authNotifierProvider.notifier).restoreSession();
+  });
 
   Logger.bootstrap.info("bootstrap took [${stopWatch.elapsedMilliseconds}ms]");
   stopWatch.stop();

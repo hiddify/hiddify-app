@@ -9,6 +9,8 @@ import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.
 import 'package:hiddify/core/router/go_router/helper/custom_transition.dart';
 import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/features/about/widget/about_page.dart';
+import 'package:hiddify/features/auth/notifier/auth_notifier.dart';
+import 'package:hiddify/features/auth/widgets/login_page.dart';
 import 'package:hiddify/features/home/widget/home_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
 import 'package:hiddify/features/log/overview/logs_page.dart';
@@ -109,6 +111,30 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
             (ref.watch(hasAnyProfileProvider).value == false)) {
           // Prevent showing chainOptions while hasAnyProfile == false
           return '/settings';
+        }
+
+        // Auth gate: protect the main screens from unauthenticated users.
+        // While session restore is in flight, do not redirect yet (avoids a
+        // flash of the login page for returning users).
+        switch (ref.watch(authNotifierProvider)) {
+          case AuthLoading():
+            // Keep the current location while the session is being restored.
+            break;
+          case AuthLoggedOut():
+            if (state.matchedLocation != '/login' && state.matchedLocation != '/intro') {
+              return '/login';
+            }
+            break;
+          case AuthLoggedIn():
+            if (state.matchedLocation == '/login') {
+              return '/home';
+            }
+            break;
+          case AuthError():
+            if (state.matchedLocation != '/login' && state.matchedLocation != '/intro') {
+              return '/login';
+            }
+            break;
         }
         return null;
       },
@@ -309,6 +335,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
           ],
         ),
         GoRoute(name: 'intro', path: '/intro', builder: (_, _) => const IntroPage()),
+        GoRoute(name: 'login', path: '/login', builder: (_, _) => const LoginPage()),
       ],
     );
   }

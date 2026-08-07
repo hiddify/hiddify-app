@@ -98,6 +98,12 @@
     "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open Source)} (${tap_license(License)})"
   },
   "pages": {
+    "auth": {
+      "title": "Sign in",
+      "subtitle": "Sign in with Telegram to access the service",
+      "signIn": "Sign in with Telegram",
+      "signingIn": "Signing in..."
+    },
     "home": {
       "title": "Home",
       "quickSettings": "Quick setting options"
@@ -688,9 +694,18 @@
     "reconnect": "Reconnect",
     "reconnectMsg": "Reconnecting for taking into account the changes..."
   },
-  "errors": {
-    "unexpected": "Unexpected error",
-    "connection": {
+"errors": {
+  "unexpected": "Unexpected error",
+  "auth": {
+    "unexpected": "Sign-in is temporarily unavailable, please try again later",
+    "notConfigured": "Sign-in is temporarily unavailable, please try again later",
+    "invalidToken": "Could not sign in, please try again",
+    "telegramLogin": "Could not sign in, please try again",
+    "accountBlocked": "Your account has been blocked, please contact support",
+    "rateLimited": "Too many attempts, please wait a minute",
+    "sessionExpired": "Session expired, please sign in again"
+  },
+  "connection": {
       "unexpected": "Unexpected connection error",
       "timeout": "Connection timeout",
       "badResponse": "Bad response",
