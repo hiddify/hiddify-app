@@ -357,7 +357,11 @@ class ProfileParser {
 
         if (headers['profile-title'] case final String titleHeader when name.isBlank) {
           if (titleHeader.startsWith("base64:")) {
-            name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            try {
+              name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            } on FormatException {
+              // Ignore malformed optional metadata and continue through the fallback hierarchy.
+            }
           } else {
             name = titleHeader.trim();
           }

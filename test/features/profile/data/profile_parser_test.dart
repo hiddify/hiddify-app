@@ -160,6 +160,26 @@ void main() {
       });
     });
 
+    test("Should fall back when the base64 title is malformed", () {
+      expectRemote(
+        parseRemoteWithHeaders(
+          {"profile-title": "base64:not valid base64!!"},
+          url: "https://example.com/config#fallback",
+        ),
+        (rp) => expect(rp.name, equals("fallback")),
+      );
+    });
+
+    test("Should fall back when the base64 title is invalid UTF-8", () {
+      expectRemote(
+        parseRemoteWithHeaders(
+          {"profile-title": "base64:/w=="},
+          url: "https://example.com/config#fallback",
+        ),
+        (rp) => expect(rp.name, equals("fallback")),
+      );
+    });
+
     test("Should keep web page and support urls without subscription-userinfo", () {
       final headers = <String, List<String>>{
         "profile-title": ["title"],
