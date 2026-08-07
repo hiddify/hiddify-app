@@ -152,7 +152,7 @@ class SettingDetailChip<T extends Object> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Container(
-      decoration: BoxDecoration(color: theme.colorScheme.surfaceVariant, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerHighest, borderRadius: BorderRadius.circular(8)),
       child: isPackageName
           ? AndroidAppInfo(packageName: '$value')
           : Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: valueByType(value, theme)),

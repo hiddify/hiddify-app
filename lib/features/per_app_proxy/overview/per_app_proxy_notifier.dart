@@ -54,7 +54,7 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
     final rs = await ref.watch(autoSelectionRepoProvider).getByAppProxyMode(mode: _mode);
     switch (rs.$2) {
       case AutoSelectionResult.success:
-        final autoList = rs.$1!;
+        final autoList = rs.$1;
         await ref.read(appProxyDataSourceProvider).applyAutoSelection(autoList: autoList, mode: _mode!);
         await ref.read(Preferences.autoAppsSelectionRegion.notifier).update(region);
         await ref.read(Preferences.autoAppsSelectionLastUpdate.notifier).update(DateTime.now());
@@ -175,11 +175,11 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
   Future<bool> shareOnGithub() async {
     final t = ref.watch(translationsProvider).requireValue;
     final region = ref.watch(ConfigOptions.region);
-    final mode = ref.watch(Preferences.perAppProxyMode).toAppProxy()!;
+    final mode = ref.watch(Preferences.perAppProxyMode).toAppProxy();
     assert(region != Region.other);
     final rs = await ref.read(autoSelectionRepoProvider).getByAppProxyMode(mode: mode, region: region);
     if (rs.$2 != AutoSelectionResult.success) return false;
-    final autoList = rs.$1!;
+    final autoList = rs.$1;
     final userSelected =
         (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode, flag: PkgFlag.userSelection))
           ..removeWhere((pkg) => autoList.contains(pkg));

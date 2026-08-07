@@ -32,7 +32,7 @@ class ConnectionStatsCard extends HookConsumerWidget {
           AsyncData(value: final proxy) when proxy.ipinfo.ip.isNotEmpty => (
             label: Row(
               children: [
-                IPCountryFlag(countryCode: proxy.ipinfo.countryCode, size: 16),
+                IPCountryFlag(countryCode: proxy.ipinfo.countryCode),
                 // const Gap(4),
                 // OrganisationFlag(organization: proxy.ipinfo.org, size: 16),
               ],

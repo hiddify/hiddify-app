@@ -20,7 +20,7 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
       return const SizedBox(); // Avoid building widget if data is not available
     }
 
-    final proxy = activeProxy.value!;
+    final proxy = activeProxy.value;
     final delay = proxy.urlTestDelay;
     final timeout = delay > 65000;
 

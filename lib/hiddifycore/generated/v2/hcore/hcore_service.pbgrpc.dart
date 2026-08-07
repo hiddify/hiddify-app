@@ -14,10 +14,9 @@ import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
+import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart' as $1;
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart' as $0;
 import 'package:protobuf/protobuf.dart' as $pb;
-
-import '../hcommon/common.pb.dart' as $1;
-import 'hcore.pb.dart' as $0;
 
 export 'hcore_service.pb.dart';
 

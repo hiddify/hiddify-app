@@ -14,9 +14,8 @@ import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
+import 'package:hiddify/hiddifycore/generated/v2/ezytel/ezytel.pb.dart' as $0;
 import 'package:protobuf/protobuf.dart' as $pb;
-
-import 'ezytel.pb.dart' as $0;
 
 export 'ezytel_service.pb.dart';
 

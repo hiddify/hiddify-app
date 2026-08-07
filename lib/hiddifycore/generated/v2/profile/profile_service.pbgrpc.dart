@@ -14,11 +14,10 @@ import 'dart:async' as $async;
 import 'dart:core' as $core;
 
 import 'package:grpc/service_api.dart' as $grpc;
+import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart' as $2;
+import 'package:hiddify/hiddifycore/generated/v2/profile/profile.pb.dart' as $1;
+import 'package:hiddify/hiddifycore/generated/v2/profile/profile_service.pb.dart' as $0;
 import 'package:protobuf/protobuf.dart' as $pb;
-
-import '../hcommon/common.pb.dart' as $2;
-import 'profile.pb.dart' as $1;
-import 'profile_service.pb.dart' as $0;
 
 export 'profile_service.pb.dart';
 

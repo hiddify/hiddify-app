@@ -102,7 +102,7 @@ class ChainLicenseDialog extends HookConsumerWidget {
           );
 
     return AlertDialog(
-      title: Text(title),
+      title: Text(headline6),
       content: ConstrainedBox(
         constraints: AlertDialogConst.boxConstraints,
         child: SingleChildScrollView(
