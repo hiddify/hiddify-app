@@ -34,7 +34,7 @@ class AuthRateLimitedException extends AuthException {
 }
 
 class AuthUnexpectedException extends AuthException {
-  const AuthUnexpectedException([Object? error, StackTrace? stackTrace])
+  AuthUnexpectedException([Object? error, StackTrace? stackTrace])
       : super(AuthFailure.unexpected(error, stackTrace));
 }
 

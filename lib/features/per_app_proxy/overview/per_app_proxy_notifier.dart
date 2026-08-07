@@ -55,7 +55,7 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
     switch (rs.$2) {
       case AutoSelectionResult.success:
         final autoList = rs.$1;
-        await ref.read(appProxyDataSourceProvider).applyAutoSelection(autoList: autoList, mode: _mode!);
+        await ref.read(appProxyDataSourceProvider).applyAutoSelection(autoList: autoList!, mode: _mode!);
         await ref.read(Preferences.autoAppsSelectionRegion.notifier).update(region);
         await ref.read(Preferences.autoAppsSelectionLastUpdate.notifier).update(DateTime.now());
         return true;
@@ -181,11 +181,11 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
     if (rs.$2 != AutoSelectionResult.success) return false;
     final autoList = rs.$1;
     final userSelected =
-        (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode, flag: PkgFlag.userSelection))
-          ..removeWhere((pkg) => autoList.contains(pkg));
+        (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode!, flag: PkgFlag.userSelection))
+          ..removeWhere((pkg) => autoList!.contains(pkg));
     final forceDeselected =
-        (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode, flag: PkgFlag.forceDeselection))
-          ..removeWhere((pkg) => !autoList.contains(pkg));
+        (await ref.read(appProxyDataSourceProvider).getPkgsByFlag(mode: mode!, flag: PkgFlag.forceDeselection))
+          ..removeWhere((pkg) => !autoList!.contains(pkg));
 
     if (userSelected.isNotEmpty || forceDeselected.isNotEmpty) {
       final agree = await ref
@@ -196,7 +196,7 @@ class PerAppProxy extends _$PerAppProxy with AppLogger {
             positiveBtnTxt: t.common.kContinue,
           );
       if (agree != true) return false;
-      final title = '${region.name} | ${mode.present(t).title}';
+      final title = '${region.name} | ${mode!.present(t).title}';
       var body = const JsonEncoder.withIndent(
         '  ',
       ).convert({'addedPkgs': userSelected.toList(), 'removedPkgs': forceDeselected.toList()});

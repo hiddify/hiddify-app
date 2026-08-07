@@ -90,11 +90,10 @@ class AuthInterceptor extends Interceptor with InfraLogger {
         method: opts.method,
         headers: opts.headers,
         extra: opts.extra,
-        baseUrl: opts.baseUrl,
         responseType: opts.responseType,
         contentType: opts.contentType,
         validateStatus: (_) => true,
-      ),
+      )..baseUrl = opts.baseUrl,
     );
   }
 }

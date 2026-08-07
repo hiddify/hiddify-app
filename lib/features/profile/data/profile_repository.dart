@@ -71,7 +71,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   @override
   TaskEither<ProfileFailure, ProfileEntity?> getById(String id) {
     return TaskEither.tryCatch(
-      () => _profileDataSource.getById(id).then((value) => value.toEntity()),
+      () => _profileDataSource.getById(id).then((value) => value?.toEntity()),
       ProfileUnexpectedFailure.new,
     );
   }
@@ -95,7 +95,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
 
   @override
   Stream<Either<ProfileFailure, ProfileEntity?>> watchActiveProfile() {
-    return _profileDataSource.watchActiveProfile().map((event) => event.toEntity()).handleExceptions((
+    return _profileDataSource.watchActiveProfile().map((event) => event?.toEntity()).handleExceptions((
       error,
       stackTrace,
     ) {
@@ -126,7 +126,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   @override
   TaskEither<ProfileFailure, Unit> upsertRemote(String url, {UserOverride? userOverride, CancelToken? cancelToken}) =>
       TaskEither.tryCatch(
-        () async => await _profileDataSource.getByUrl(url).then((profEntry) => profEntry.toEntity()),
+        () async => await _profileDataSource.getByUrl(url).then((profEntry) => profEntry?.toEntity()),
         ProfileFailure.unexpected,
       ).flatMap((profEntity) {
         // if profile is null, generate id
@@ -218,7 +218,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   @override
   TaskEither<ProfileFailure, Unit> offlineUpdate(ProfileEntity profile, String nContent) =>
       TaskEither.tryCatch(
-        () async => await _profileDataSource.getById(profile.id).then((profEntry) => profEntry.toEntity()),
+        () async => await _profileDataSource.getById(profile.id).then((profEntry) => profEntry?.toEntity()),
         ProfileFailure.unexpected,
       ).flatMap((oProfile) {
         if (oProfile == null || oProfile.runtimeType != profile.runtimeType) throw const ProfileFailure.notFound();
