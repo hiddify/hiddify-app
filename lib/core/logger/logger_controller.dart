@@ -25,6 +25,8 @@ class LoggerController extends LoggyPrinter with InfraLogger {
   }
 
   static Future<void> postInit(bool debugMode) async {
+    // `&& false` added upstream in b5f6a06f: LogLevel.all hurt iOS stability.
+    // ignore: dead_code
     final logLevel = debugMode && false ? LogLevel.all : LogLevel.info;
     final logToFile = debugMode || (!Platform.isAndroid && !Platform.isIOS);
 

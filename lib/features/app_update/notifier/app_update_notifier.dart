@@ -15,8 +15,6 @@ import 'package:version/version.dart';
 
 part 'app_update_notifier.g.dart';
 
-const _debugUpgrader = true;
-
 @riverpod
 Upgrader upgrader(Ref ref) => Upgrader(
   storeController: UpgraderStoreController(
