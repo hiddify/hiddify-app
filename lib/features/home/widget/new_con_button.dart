@@ -57,7 +57,7 @@ class CircleDesignWidget extends StatelessWidget {
               child: InkWell(
                 onTap: onTap,
                 child: Padding(
-                  padding: const EdgeInsets.all(0),
+                  padding: EdgeInsets.zero,
                   child: TweenAnimationBuilder(
                     tween: ColorTween(end: color),
                     duration: const Duration(milliseconds: 250),

@@ -562,12 +562,18 @@ class HiddifyCoreService with InfraLogger {
     if (!core.isSingleChannel()) {
       await stopListenSingle("fg");
       await stopListenSingle("bg");
+      // Only one of the two modes matches how the channel was opened, so the
+      // other one always throws. Both are attempted and the failure is logged.
       try {
         await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL_INSECURE));
-      } catch (e) {}
+      } catch (e) {
+        loggy.debug("closing fg client in insecure mode failed: $e");
+      }
       try {
         await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL));
-      } catch (e) {}
+      } catch (e) {
+        loggy.debug("closing fg client in normal mode failed: $e");
+      }
     }
   }
 

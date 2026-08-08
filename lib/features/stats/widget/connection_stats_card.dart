@@ -39,7 +39,7 @@ class ConnectionStatsCard extends HookConsumerWidget {
             ),
             data: IPText(
               ip: proxy.ipinfo.ip,
-              onLongPress: () async {
+              onLongPress: () {
                 ref.read(ipInfoNotifierProvider.notifier).refresh();
               },
               constrained: true,
