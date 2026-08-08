@@ -96,7 +96,7 @@ class CirclePainter extends CustomPainter {
 
     // Outer circle (pulsing animation for connecting state)
     final Paint outerCirclePaint = Paint()
-      ..color = baseColor.withOpacity(0.15)
+      ..color = baseColor.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
     // double outerRadius = (size.width / 2) * (currentState == ConnectionStateStatus.connecting ? animationValue : 1);
     final double outerRadius =
@@ -109,7 +109,7 @@ class CirclePainter extends CustomPainter {
 
     // Middle circle
     final Paint middleCirclePaint = Paint()
-      ..color = baseColor.withOpacity(.3)
+      ..color = baseColor.withValues(alpha: .3)
       ..style = PaintingStyle.fill;
     final double middleRadius =
         60 *
