@@ -77,7 +77,7 @@
         "clipboard": {
           "success": "Añadido al portapapeles con éxito",
           "failure": "Error al copiar al portapapeles",
-          "contentTooLarge": "Contenido demasiado grande. Use la exportación a archivo en su lugar"
+          "contentTooLarge": "Contenido demasiado grande. Usa la exportación a archivo en su lugar"
         },
         "file": {
           "success": "Archivo JSON creado con éxito",
@@ -97,7 +97,7 @@
   "intro": {
     "banner": "Todo lo que necesitas para un internet sin restricciones",
     "termsAndPolicyCaution(rich)": "Al continuar, aceptas los ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Hecho con ❤️ por Hiddify - ${tap_source(Código Abierto)} (${tap_license(Licencia)})"
+    "info(rich)": "Hecho con ❤️ por Hiddify - ${tap_source(Código abierto)} (${tap_license(Licencia)})"
   },
   "pages": {
     "home": {
@@ -133,7 +133,7 @@
       "add": "Añadir perfil",
       "update": "Actualizar perfil",
       "viewAllProfiles": "Ver todos los perfiles",
-      "activeProfileName": "Nombre del perfil activo: \"${name}\".",
+      "activeProfileName": "Nombre del perfil activo: \"${name}\"",
       "nonActiveProfileName": "Seleccionar \"${name}\" como perfil activo",
       "freeSubNotFound": "No se encontró ninguna suscripción gratuita",
       "freeSubNotFoundForRegion": "No se encontró ninguna suscripción gratuita para la región \"${region}\"",
@@ -156,7 +156,6 @@
           "success": "Perfil actualizado con éxito",
           "failure": "Error al actualizar el perfil",
           "failureNamed": "Error al actualizar \"${name}\"",
-          "bulkSuccess": "${count} perfiles actualizados",
           "bulkPartial": "${success} correctos\n${failed} fallidos: ${names}"
         },
         "delete": {
@@ -318,7 +317,7 @@
             "addNew": "Añadir nuevo valor",
             "update": "Actualizar valor",
             "clearList": "Limpiar lista",
-            "clearListMsg": "Todos los elementos han sido eliminados"
+            "clearListMsg": "Se eliminarán todos los elementos"
           }
         },
         "generalOptions": {
@@ -439,9 +438,9 @@
         },
         "mixedPort": "Puerto mixto",
         "tproxyPort": "Puerto de proxy transparente",
-        "directPort": "Puerto de Directo",
+        "directPort": "Puerto directo",
         "redirectPort": "Puerto de redirección",
-        "lanSharing": "Compartir VPN",
+        "lanSharing": "Compartir VPN de forma segura",
         "copyLink": "Copiar enlace",
         "qrCode": "Código QR",
         "lanIPError": "Error al obtener la IP local"
@@ -449,7 +448,7 @@
       "tlsTricks": {
         "title": "Trucos de TLS",
         "enable": "Habilitar Fragment",
-        "packets": "Paquetes de fragmentación",
+        "packets": "Paquetes de Fragment",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
         "packets1_2": "1-2",
@@ -462,18 +461,18 @@
           "enable": "Habilitar mayúsculas/minúsculas mixtas en SNI"
         },
         "padding": {
-          "enable": "Habilitar relleno",
-          "size": "Tamaño de relleno"
+          "enable": "Habilitar padding",
+          "size": "Tamaño de padding"
         }
       },
       "chain": {
         "title": "Cadena",
-        "subtitle": "Seguridad extra y Desbloqueador",
+        "subtitle": "Seguridad extra y desbloqueador",
         "finalIp": "IP final",
         "levels": {
           "app": {
             "title": "App",
-            "msg": "Punto de inicio: El tráfico de tu app entra en la cadena aquí y pasa por las siguientes capas para prepararse para el bypass final"
+            "msg": "Punto de inicio: el tráfico de tu app entra en la cadena aquí y pasa por las siguientes capas para prepararse para el bypass final"
           },
           "extraSecurity": {
             "title": "Seguridad extra",
@@ -488,7 +487,7 @@
           },
           "filtering": {
             "title": "Filtrado",
-            "msg": "Salida final: Después de pasar por las capas activas (Seguridad extra, Perfil principal o Desbloqueador) y aplicar sus efectos, tu tráfico es finalmente enrutado para evitar el filtrado de la red local"
+            "msg": "Salida final: después de pasar por las capas activas (Seguridad extra, Perfil principal o Desbloqueador) y aplicar sus efectos, tu tráfico es finalmente enrutado para evitar el filtrado de la red local"
           }
         },
         "warp": {
@@ -565,7 +564,6 @@
       "expireDate": "Fecha de caducidad",
       "expired": "Caducado",
       "noTraffic": "Cuota agotada",
-      "remainingDuration": "${duration} días restantes",
       "remainingTrafficSemanticLabel": "${consumed} de ${total} de tráfico consumido",
       "remainingTraffic": "Tráfico restante"
     }
@@ -630,7 +628,7 @@
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "¿Importar regla de enrutamiento?",
-        "message": "Importar reglas de enrutamiento desde fuentes no confiables puede ser un riesgo de seguridad\nSolo continúe si confía en este enlace"
+        "message": "Importar reglas de enrutamiento desde fuentes no confiables puede ser un riesgo de seguridad\nSolo continúa si confías en este enlace"
       }
     },
     "experimentalNotice": {

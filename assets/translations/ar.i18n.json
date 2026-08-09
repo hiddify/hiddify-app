@@ -139,7 +139,7 @@
       "add": "إضافة ملف شخصي",
       "update": "تحديث الملف الشخصي",
       "viewAllProfiles": "عرض جميع الملفات الشخصية",
-      "activeProfileName": "اسم الملف النشط: \"${name}\".",
+      "activeProfileName": "اسم الملف النشط: \"${name}\"",
       "nonActiveProfileName": "تحديد \"${name}\" كملف نشط",
       "freeSubNotFound": "لم يتم العثور على اشتراك مجاني",
       "freeSubNotFoundForRegion": "لم يتم العثور على اشتراك مجاني لمنطقة \"${region}\"",
@@ -162,7 +162,6 @@
           "success": "تم تحديث الملف الشخصي بنجاح",
           "failure": "فشل تحديث الملف الشخصي",
           "failureNamed": "فشل تحديث \"${name}\"",
-          "bulkSuccess": "تم تحديث ${count} ملف شخصي",
           "bulkPartial": "${success} ناجح\n${failed} فاشل: ${names}"
         },
         "delete": {
@@ -194,7 +193,7 @@
       "checkForUpdate": "التحقق من وجود تحديثات",
       "openWorkingDir": "فتح مجلد العمل",
       "sourceCode": "الكود المصدري",
-      "telegramChannel": "قناة التيليجرام",
+      "telegramChannel": "قناة Telegram",
       "termsAndConditions": "الشروط والأحكام",
       "privacyPolicy": "سياسة الخصوصية"
     },
@@ -273,7 +272,7 @@
             "validProcessName": "\"اسم العملية\" صالح مثل\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
             "validProcessPath": "\"مسار العملية\" صالح مثل\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
-            "validPortRangeEx": "80 or 1-65000",
+            "validPortRangeEx": "80 or 1:65000",
             "validPortRange": "\"منفذ\" أو \"نطاق منافذ\" صالح مثل\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 or 10.0.0.0/24",
             "validIpCidr": "IP CIDR صالح مثل\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
@@ -324,7 +323,7 @@
             "addNew": "إضافة قيمة جديدة",
             "update": "تحديث القيمة",
             "clearList": "مسح القائمة",
-            "clearListMsg": "تم حذف جميع العناصر"
+            "clearListMsg": "سيتم حذف جميع العناصر"
           }
         },
         "generalOptions": {
@@ -437,7 +436,7 @@
           "tun": "VPN"
         },
         "strictRoute": "توجيه صارم",
-        "tunImplementation": "تنفيذ Tun",
+        "tunImplementation": "تنفيذ TUN",
         "tunImplementations": {
           "mixed": "مختلط",
           "system": "النظام",
@@ -447,23 +446,23 @@
         "tproxyPort": "منفذ البروكسي الشفاف",
         "directPort": "منفذ مباشر",
         "redirectPort": "منفذ إعادة التوجيه",
-        "lanSharing": "مشاركة VPN",
+        "lanSharing": "مشاركة VPN آمنة",
         "copyLink": "نسخ الرابط",
         "qrCode": "رمز QR",
         "lanIPError": "فشل في الحصول على عنوان IP المحلي"
       },
       "tlsTricks": {
         "title": "حيل TLS",
-        "enable": "تفعيل fragment",
-        "packets": "حزم التجزئة",
+        "enable": "تفعيل Fragment",
+        "packets": "حزم Fragment",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
         "packets1_2": "1-2",
         "packets1_3": "1-3",
         "packets1_4": "1-4",
         "packets1_5": "1-5",
-        "size": "حجم fragment",
-        "sleep": "تأخير fragment",
+        "size": "حجم Fragment",
+        "sleep": "تأخير Fragment",
         "mixedSniCase": {
           "enable": "تفعيل الأحرف المختلطة لـ SNI"
         },
@@ -498,7 +497,7 @@
           }
         },
         "warp": {
-          "missingConfig": "تكوين وارب مفقود",
+          "missingConfig": "تكوين WARP مفقود",
           "licenseKey": "مفتاح الترخيص",
           "cleanIp": "IP نظيف",
           "port": "المنفذ",
@@ -571,7 +570,6 @@
       "expireDate": "تاريخ الانتهاء",
       "expired": "منتهي الصلاحية",
       "noTraffic": "نفدت الباقة",
-      "remainingDuration": "متبقٍ ${duration} يوم",
       "remainingTrafficSemanticLabel": "تم استهلاك ${consumed} من ${total}",
       "remainingTraffic": "البيانات المتبقية"
     }

@@ -133,7 +133,7 @@
       "add": "Ajouter un profil",
       "update": "Mettre à jour le profil",
       "viewAllProfiles": "Voir tous les profils",
-      "activeProfileName": "Nom du profil actif : \"${name}\".",
+      "activeProfileName": "Nom du profil actif : \"${name}\"",
       "nonActiveProfileName": "Sélectionner \"${name}\" comme profil actif",
       "freeSubNotFound": "Aucun abonnement gratuit trouvé",
       "freeSubNotFoundForRegion": "Aucun abonnement gratuit trouvé pour la région \"${region}\"",
@@ -156,7 +156,6 @@
           "success": "Profil mis à jour avec succès",
           "failure": "Échec de la mise à jour du profil",
           "failureNamed": "Échec de la mise à jour de \"${name}\"",
-          "bulkSuccess": "${count} profils mis à jour",
           "bulkPartial": "${success} réussis\n${failed} échoués : ${names}"
         },
         "delete": {
@@ -318,7 +317,7 @@
             "addNew": "Ajouter une nouvelle valeur",
             "update": "Mettre à jour la valeur",
             "clearList": "Vider la liste",
-            "clearListMsg": "Tous les éléments ont été supprimés"
+            "clearListMsg": "Tous les éléments seront supprimés"
           }
         },
         "generalOptions": {
@@ -441,7 +440,7 @@
         "tproxyPort": "Port de proxy transparent",
         "directPort": "Port direct local",
         "redirectPort": "Port de redirection",
-        "lanSharing": "Partage VPN",
+        "lanSharing": "Partage VPN sécurisé",
         "copyLink": "Copier le lien",
         "qrCode": "Code QR",
         "lanIPError": "Échec de l'obtention de l'adresse IP locale"
@@ -462,13 +461,13 @@
           "enable": "Activer la casse mixte pour SNI"
         },
         "padding": {
-          "enable": "Activer le remplissage",
-          "size": "Taille du remplissage"
+          "enable": "Activer le padding",
+          "size": "Taille du padding"
         }
       },
       "chain": {
         "title": "Chaîne",
-        "subtitle": "Sécurité supplémentaire & Débloqueur",
+        "subtitle": "Sécurité supplémentaire & débloqueur",
         "finalIp": "IP finale",
         "levels": {
           "app": {
@@ -513,7 +512,7 @@
             "bg": "Bulgarie (bg)",
             "ca": "Canada (ca)",
             "ch": "Suisse (ch)",
-            "cz": "République Tchèque (cz)",
+            "cz": "République tchèque (cz)",
             "de": "Allemagne (de)",
             "dk": "Danemark (dk)",
             "ee": "Estonie (ee)",
@@ -565,7 +564,6 @@
       "expireDate": "Date d'expiration",
       "expired": "Expiré",
       "noTraffic": "Quota épuisé",
-      "remainingDuration": "${duration} jours restants",
       "remainingTrafficSemanticLabel": "${consumed} sur ${total} de trafic consommé",
       "remainingTraffic": "Trafic restant"
     }
@@ -678,7 +676,7 @@
     "disconnect": "Déconnecter",
     "disconnecting": "Déconnexion en cours...",
     "reconnect": "Reconnecter",
-    "reconnectMsg": "Reconnexion pour prendre en compte les changements..."
+    "reconnectMsg": "Reconnexion pour appliquer les modifications..."
   },
   "errors": {
     "unexpected": "Erreur inattendue",

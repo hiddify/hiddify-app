@@ -21,7 +21,7 @@
     "add": "Ekle",
     "clipboard": "Pano",
     "addToClipboard": "Panoya ekle",
-    "scanQr": "QR Tara",
+    "scanQr": "QR tara",
     "free": "Ücretsiz",
     "warp": "WARP",
     "fragment": "Fragment",
@@ -51,7 +51,7 @@
     "hidden": "Gizli",
     "timeout": "Zaman aşımı",
     "sort": "Sırala",
-    "dashboard": "Gösterge Paneli",
+    "dashboard": "Gösterge paneli",
     "disable": "Devre dışı bırak",
     "psiphon": "Psiphon",
     "profile": "Profil",
@@ -97,11 +97,11 @@
   "intro": {
     "banner": "Sınırsız bir internet için ihtiyacınız olan her şey",
     "termsAndPolicyCaution(rich)": "Devam ederek ${tap(@:pages.about.termsAndConditions)} kabul etmiş olursunuz",
-    "info(rich)": "Hiddify tarafından ❤️ ile yapıldı - ${tap_source(Açık Kaynak)} (${tap_license(Licence)})"
+    "info(rich)": "Hiddify tarafından ❤️ ile yapıldı - ${tap_source(Açık kaynak)} (${tap_license(Lisans)})"
   },
   "pages": {
     "home": {
-      "title": "Ana Sayfa",
+      "title": "Ana sayfa",
       "quickSettings": "Hızlı ayar seçenekleri"
     },
     "proxies": {
@@ -133,7 +133,7 @@
       "add": "Profil ekle",
       "update": "Profili güncelle",
       "viewAllProfiles": "Tüm profilleri görüntüle",
-      "activeProfileName": "Aktif profil adı: \"${name}\".",
+      "activeProfileName": "Aktif profil adı: \"${name}\"",
       "nonActiveProfileName": "Aktif profil olarak \"${name}\" seçin",
       "freeSubNotFound": "Ücretsiz abonelik bulunamadı",
       "freeSubNotFoundForRegion": "\"${region}\" bölgesi için ücretsiz abonelik bulunamadı",
@@ -156,7 +156,6 @@
           "success": "Profil başarıyla güncellendi",
           "failure": "Profil güncellenemedi",
           "failureNamed": "\"${name}\" güncellenemedi",
-          "bulkSuccess": "${count} profil güncellendi",
           "bulkPartial": "${success} başarılı\n${failed} başarısız: ${names}"
         },
         "delete": {
@@ -189,8 +188,8 @@
       "openWorkingDir": "Çalışma dizinini aç",
       "sourceCode": "Kaynak kodu",
       "telegramChannel": "Telegram kanalı",
-      "termsAndConditions": "Şartlar ve Koşullar",
-      "privacyPolicy": "Gizlilik Politikası"
+      "termsAndConditions": "Şartlar ve koşullar",
+      "privacyPolicy": "Gizlilik politikası"
     },
     "settings": {
       "title": "Ayarlar",
@@ -228,7 +227,7 @@
         "silentStart": "Simge durumunda başlat",
         "ignoreBatteryOptimizations": "Pil optimizasyonunu devre dışı bırak",
         "ignoreBatteryOptimizationsMsg": "Optimum VPN performansı için kısıtlamaları kaldırın",
-        "memoryLimit": "Memory limit",
+        "memoryLimit": "Bellek sınırı",
         "memoryLimitMsg": "Bellek yetersizliği hataları veya sık uygulama çökmeleri yaşıyorsanız etkinleştirin",
         "debugMode": "Hata ayıklama modu",
         "debugModeMsg": "Bu değişikliği uygulamak için uygulamayı yeniden başlatın",
@@ -318,7 +317,7 @@
             "addNew": "Yeni değer ekle",
             "update": "Değeri güncelle",
             "clearList": "Listeyi temizle",
-            "clearListMsg": "Tüm öğeler silindi"
+            "clearListMsg": "Tüm öğeler silinecek"
           }
         },
         "generalOptions": {
@@ -336,9 +335,9 @@
           },
           "balancerStrategy": {
             "title": "Balancer stratejisi",
-            "roundRobin": "Round Robin",
-            "consistentHash": "Consistent Hash",
-            "stickySession": "Sticky Session"
+            "roundRobin": "Round robin",
+            "consistentHash": "Consistent hash",
+            "stickySession": "Sticky session"
           },
           "resolveDestination": "Hedefi çözümle",
           "ipv6Route": "IPv6 rotası",
@@ -441,15 +440,15 @@
         "tproxyPort": "Şeffaf proxy portu",
         "directPort": "Direct portu",
         "redirectPort": "Yönlendirme portu",
-        "lanSharing": "VPN paylaşımı",
+        "lanSharing": "Güvenli VPN paylaşımı",
         "copyLink": "Bağlantıyı kopyala",
-        "qrCode": "QR Kod",
+        "qrCode": "QR kod",
         "lanIPError": "Yerel IP adresi alınamadı"
       },
       "tlsTricks": {
         "title": "TLS hileleri",
         "enable": "Fragment'ı etkinleştir",
-        "packets": "Fragmentation Paketleri",
+        "packets": "Fragmentation paketleri",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
         "packets1_2": "1-2",
@@ -462,13 +461,13 @@
           "enable": "Karışık SNI harf durumunu etkinleştir"
         },
         "padding": {
-          "enable": "Dolguyu etkinleştir",
-          "size": "Dolgu boyutu"
+          "enable": "Padding'i etkinleştir",
+          "size": "Padding boyutu"
         }
       },
       "chain": {
         "title": "Zincir",
-        "subtitle": "Ekstra güvenlik ve Engel kaldırıcı",
+        "subtitle": "Ekstra güvenlik ve engel kaldırıcı",
         "finalIp": "Nihai IP",
         "levels": {
           "app": {
@@ -565,7 +564,6 @@
       "expireDate": "Bitiş tarihi",
       "expired": "Süresi doldu",
       "noTraffic": "Kota doldu",
-      "remainingDuration": "kalan ${duration} gün",
       "remainingTrafficSemanticLabel": "${consumed} / ${total} trafik kullanıldı",
       "remainingTraffic": "Kalan trafik"
     }
@@ -584,11 +582,11 @@
     },
     "warpLicense": {
       "title": "Cloudflare WARP onayı",
-      "description(rich)": "Cloudflare WARP ücretsiz bir WireGuard VPN sağlayıcısıdır. Bu seçeneği etkinleştirerek Cloudflare WARP'ın ${tos(Hizmet Şartları)}'nı ve ${privacy(Gizlilik Politikası)}'nı kabul etmiş olursunuz."
+      "description(rich)": "Cloudflare WARP ücretsiz bir WireGuard VPN sağlayıcısıdır. Bu seçeneği etkinleştirerek Cloudflare WARP'ın ${tos(Hizmet şartları)}'nı ve ${privacy(Gizlilik politikası)}'nı kabul etmiş olursunuz."
     },
     "psiphonLicense": {
-      "title": "Psiphon Lisans Sözleşmesi",
-      "description(rich)": "Psiphon'u kullanarak, ${tos(Hizmet Şartları)}'nı kabul etmiş olursunuz ve ${privacy(Gizlilik Politikası)}'nı onaylamış olursunuz. Lütfen devam etmeden önce bunları dikkatle okuyun."
+      "title": "Psiphon lisans sözleşmesi",
+      "description(rich)": "Psiphon'u kullanarak, ${tos(Hizmet şartları)}'nı kabul etmiş olursunuz ve ${privacy(Gizlilik politikası)}'nı onaylamış olursunuz. Lütfen devam etmeden önce bunları dikkatle okuyun."
     },
     "newVersion": {
       "title": "Güncelleme mevcut",

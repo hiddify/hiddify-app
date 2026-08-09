@@ -156,7 +156,6 @@
           "success": "配置文件更新成功",
           "failure": "更新配置文件失败",
           "failureNamed": "更新 \"${name}\" 失败",
-          "bulkSuccess": "已更新 ${count} 个配置文件",
           "bulkPartial": "${success} 个成功\n${failed} 个失败：${names}"
         },
         "delete": {
@@ -267,7 +266,7 @@
             "validProcessName": "有效的 \"进程名\"，例如\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
             "validProcessPath": "有效的 \"进程路径\"，例如\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
-            "validPortRangeEx": "80 或 1-65000",
+            "validPortRangeEx": "80 或 1:65000",
             "validPortRange": "有效的 \"端口\" 或 \"端口范围\"，例如\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 或 10.0.0.0/24",
             "validIpCidr": "有效的 IP CIDR，例如\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
@@ -318,7 +317,7 @@
             "addNew": "添加新值",
             "update": "更新值",
             "clearList": "清空列表",
-            "clearListMsg": "所有项目已删除"
+            "clearListMsg": "所有项目将被删除"
           }
         },
         "generalOptions": {
@@ -439,9 +438,9 @@
         },
         "mixedPort": "混合端口",
         "tproxyPort": "透明代理端口",
-        "directPort": "本地 Direct 端口",
+        "directPort": "本地直连端口",
         "redirectPort": "重定向端口",
-        "lanSharing": "VPN 共享",
+        "lanSharing": "安全 VPN 共享",
         "copyLink": "复制链接",
         "qrCode": "二维码",
         "lanIPError": "获取本地 IP 地址失败"
@@ -565,7 +564,6 @@
       "expireDate": "到期日期",
       "expired": "已过期",
       "noTraffic": "流量已用尽",
-      "remainingDuration": "剩余 ${duration} 天",
       "remainingTrafficSemanticLabel": "已使用 ${consumed} / ${total} 流量",
       "remainingTraffic": "剩余流量"
     }

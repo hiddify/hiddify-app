@@ -156,7 +156,6 @@
           "success": "設定檔更新成功",
           "failure": "更新設定檔失敗",
           "failureNamed": "更新「${name}」失敗",
-          "bulkSuccess": "已更新 ${count} 個設定檔",
           "bulkPartial": "${success} 個成功\n${failed} 個失敗：${names}"
         },
         "delete": {
@@ -219,7 +218,7 @@
           "black": "純黑模式"
         },
         "enableAnalytics": "啟用分析",
-        "enableAnalyticsMsg": "允許收集分析資料 and 傳送崩潰報告以改進應用程式",
+        "enableAnalyticsMsg": "允許收集分析資料和傳送崩潰報告以改進應用程式",
         "autoIpCheck": "自動檢查連線 IP",
         "dynamicNotification": "在通知中顯示速度",
         "hapticFeedback": "觸覺回饋",
@@ -267,7 +266,7 @@
             "validProcessName": "有效的「處理程序名稱」，例如\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
             "validProcessPath": "有效的「處理程序路徑」，例如\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
-            "validPortRangeEx": "80 或 1-65000",
+            "validPortRangeEx": "80 或 1:65000",
             "validPortRange": "有效的「連接埠」或「連接埠範圍」，例如\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 或 10.0.0.0/24",
             "validIpCidr": "有效的 IP CIDR，例如\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
@@ -318,7 +317,7 @@
             "addNew": "新增值",
             "update": "更新值",
             "clearList": "清除清單",
-            "clearListMsg": "所有項目已刪除"
+            "clearListMsg": "所有項目將被刪除"
           }
         },
         "generalOptions": {
@@ -336,9 +335,9 @@
           },
           "balancerStrategy": {
             "title": "Balancer 策略",
-            "roundRobin": "Round Robin",
-            "consistentHash": "Consistent Hash",
-            "stickySession": "Sticky Session"
+            "roundRobin": "Round robin",
+            "consistentHash": "Consistent hash",
+            "stickySession": "Sticky session"
           },
           "resolveDestination": "解析目的地",
           "ipv6Route": "IPv6 路由",
@@ -439,9 +438,9 @@
         },
         "mixedPort": "混合連接埠",
         "tproxyPort": "透明代理連接埠",
-        "directPort": "本地 Direct 連接埠",
+        "directPort": "本機直連連接埠",
         "redirectPort": "重新導向連接埠",
-        "lanSharing": "VPN 共享",
+        "lanSharing": "安全 VPN 共享",
         "copyLink": "複製連結",
         "qrCode": "QR Code",
         "lanIPError": "取得本機 IP 位址失敗"
@@ -477,7 +476,7 @@
           },
           "extraSecurity": {
             "title": "額外安全",
-            "msg": "增加一個額外的防护層以保護您的數據隱私，即使您的主設定檔不可信"
+            "msg": "增加一個額外的防護層以保護您的數據隱私，即使您的主設定檔不可信"
           },
           "mainProfile": {
             "title": "主設定檔"
@@ -488,7 +487,7 @@
           },
           "filtering": {
             "title": "過濾",
-            "msg": "最終出口：通過活動層（額外安全、主設定檔或解鎖器）並應用其效果後，您的流量最終被路由以繞过本地網路過濾"
+            "msg": "最終出口：通過活動層（額外安全、主設定檔或解鎖器）並應用其效果後，您的流量最終被路由以繞過本地網路過濾"
           }
         },
         "warp": {
@@ -565,7 +564,6 @@
       "expireDate": "到期日期",
       "expired": "已到期",
       "noTraffic": "流量已用盡",
-      "remainingDuration": "剩餘 ${duration} 天",
       "remainingTrafficSemanticLabel": "已使用 ${consumed} / ${total} 流量",
       "remainingTraffic": "剩餘流量"
     }
@@ -625,12 +623,12 @@
         }
       },
       "addProfileByDeepLinkWarning": {
-        "title": "添加配置？",
-        "message": "來自 \"${host}\" 的外部連結請求添加新配置。您想要匯入嗎？"
+        "title": "新增設定檔？",
+        "message": "來自「${host}」的外部連結請求新增設定檔。您想要匯入嗎？"
       },
       "importRouteRuleByDeepLinkWarning": {
-        "title": "匯入路由规则？",
-        "message": "從不受信任的來源匯入路由规则可能會有安全風險\n只有在您信任此連結的情況下才繼續"
+        "title": "匯入路由規則？",
+        "message": "從不受信任的來源匯入路由規則可能會有安全風險\n只有在您信任此連結的情況下才繼續"
       }
     },
     "experimentalNotice": {

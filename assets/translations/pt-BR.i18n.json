@@ -97,7 +97,7 @@
   "intro": {
     "banner": "Tudo o que você precisa para uma internet sem restrições",
     "termsAndPolicyCaution(rich)": "Ao continuar, você concorda com os ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Feito com ❤️ por Hiddify - ${tap_source(Código Aberto)} (${tap_license(Licença)})"
+    "info(rich)": "Feito com ❤️ por Hiddify - ${tap_source(Código aberto)} (${tap_license(Licença)})"
   },
   "pages": {
     "home": {
@@ -133,7 +133,7 @@
       "add": "Adicionar perfil",
       "update": "Atualizar perfil",
       "viewAllProfiles": "Ver todos os perfis",
-      "activeProfileName": "Nome do perfil ativo: \"${name}\".",
+      "activeProfileName": "Nome do perfil ativo: \"${name}\"",
       "nonActiveProfileName": "Selecionar \"${name}\" como perfil ativo",
       "freeSubNotFound": "Nenhuma assinatura gratuita encontrada",
       "freeSubNotFoundForRegion": "Nenhuma assinatura gratuita encontrada para a região \"${region}\"",
@@ -156,7 +156,6 @@
           "success": "Perfil atualizado com sucesso",
           "failure": "Falha ao atualizar perfil",
           "failureNamed": "Falha ao atualizar \"${name}\"",
-          "bulkSuccess": "${count} perfis atualizados",
           "bulkPartial": "${success} com sucesso\n${failed} com falha: ${names}"
         },
         "delete": {
@@ -189,8 +188,8 @@
       "openWorkingDir": "Abrir diretório de trabalho",
       "sourceCode": "Código-fonte",
       "telegramChannel": "Canal do Telegram",
-      "termsAndConditions": "Termos e Condições",
-      "privacyPolicy": "Política de Privacidade"
+      "termsAndConditions": "Termos e condições",
+      "privacyPolicy": "Política de privacidade"
     },
     "settings": {
       "title": "Configurações",
@@ -267,7 +266,7 @@
             "validProcessName": "\"Nome do Processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
             "validProcessPath": "\"Caminho do Processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
-            "validPortRangeEx": "80 ou 1-65000",
+            "validPortRangeEx": "80 ou 1:65000",
             "validPortRange": "\"Porta\" ou \"Intervalo de Portas\" válido como\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 ou 10.0.0.0/24",
             "validIpCidr": "IP CIDR válido como\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
@@ -318,7 +317,7 @@
             "addNew": "Adicionar novo valor",
             "update": "Atualizar valor",
             "clearList": "Limpar lista",
-            "clearListMsg": "Todos os itens foram excluídos"
+            "clearListMsg": "Todos os itens serão excluídos"
           }
         },
         "generalOptions": {
@@ -441,7 +440,7 @@
         "tproxyPort": "Porta de proxy transparente",
         "directPort": "Porta direta",
         "redirectPort": "Porta de redirecionamento",
-        "lanSharing": "Compartilhamento de VPN",
+        "lanSharing": "Compartilhamento seguro de VPN",
         "copyLink": "Copiar link",
         "qrCode": "Código QR",
         "lanIPError": "Falha ao obter endereço IP local"
@@ -449,7 +448,7 @@
       "tlsTricks": {
         "title": "Truques de TLS",
         "enable": "Ativar fragmento",
-        "packets": "Pacotes de Fragmentação",
+        "packets": "Pacotes de fragmentação",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
         "packets1_2": "1-2",
@@ -462,18 +461,18 @@
           "enable": "Ativar maiúsculas/minúsculas mistas no SNI"
         },
         "padding": {
-          "enable": "Ativar preenchimento",
-          "size": "Tamanho do preenchimento"
+          "enable": "Ativar padding",
+          "size": "Tamanho do padding"
         }
       },
       "chain": {
         "title": "Cadeia",
-        "subtitle": "Segurança extra & Desbloqueador",
+        "subtitle": "Segurança extra & desbloqueador",
         "finalIp": "IP final",
         "levels": {
           "app": {
             "title": "App",
-            "msg": "Ponto de início: O tráfego do seu app entra na cadeia aqui e passa pelas camadas seguintes para se preparar para o bypass final"
+            "msg": "Ponto de início: o tráfego do seu app entra na cadeia aqui e passa pelas camadas seguintes para se preparar para o bypass final"
           },
           "extraSecurity": {
             "title": "Segurança extra",
@@ -488,7 +487,7 @@
           },
           "filtering": {
             "title": "Filtragem",
-            "msg": "Saída final: Após passar pelas camadas ativas (Segurança extra, Perfil principal ou Desbloqueador) e aplicar seus efeitos, seu tráfego é finalmente roteado para contornar a filtragem da rede local"
+            "msg": "Saída final: após passar pelas camadas ativas (Segurança extra, Perfil principal ou Desbloqueador) e aplicar seus efeitos, seu tráfego é finalmente roteado para contornar a filtragem da rede local"
           }
         },
         "warp": {
@@ -565,7 +564,6 @@
       "expireDate": "Data de validade",
       "expired": "Expirado",
       "noTraffic": "Cota esgotada",
-      "remainingDuration": "${duration} dias restantes",
       "remainingTrafficSemanticLabel": "${consumed} de ${total} de tráfego consumido",
       "remainingTraffic": "Tráfego restante"
     }
@@ -584,11 +582,11 @@
     },
     "warpLicense": {
       "title": "Consentimento do Cloudflare WARP",
-      "description(rich)": "O Cloudflare WARP é um provedor de VPN WireGuard gratuito. Ao ativar esta opção, você concorda com os ${tos(Termos de Serviço)} e a ${privacy(Política de Privacidade)} do Cloudflare WARP."
+      "description(rich)": "O Cloudflare WARP é um provedor de VPN WireGuard gratuito. Ao ativar esta opção, você concorda com os ${tos(Termos de serviço)} e a ${privacy(Política de privacidade)} do Cloudflare WARP."
     },
     "psiphonLicense": {
       "title": "Contrato de licença do Psiphon",
-      "description(rich)": "Ao usar o Psiphon, você concorda com os ${tos(Termos de Serviço)} e reconhece a ${privacy(Política de Privacidade)}. Por favor, leia-os atentamente antes de continuar."
+      "description(rich)": "Ao usar o Psiphon, você concorda com os ${tos(Termos de serviço)} e reconhece a ${privacy(Política de privacidade)}. Por favor, leia-os atentamente antes de continuar."
     },
     "newVersion": {
       "title": "Atualização disponível",

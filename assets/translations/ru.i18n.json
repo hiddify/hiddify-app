@@ -137,7 +137,7 @@
       "add": "Добавить профиль",
       "update": "Обновить профиль",
       "viewAllProfiles": "Посмотреть все профили",
-      "activeProfileName": "Имя активного профиля: \"${name}\".",
+      "activeProfileName": "Имя активного профиля: \"${name}\"",
       "nonActiveProfileName": "Выбрать \"${name}\" как активный профиль",
       "freeSubNotFound": "Бесплатная подписка не найдена",
       "freeSubNotFoundForRegion": "Бесплатная подписка для региона \"${region}\" не найдена",
@@ -160,7 +160,6 @@
           "success": "Профиль успешно обновлен",
           "failure": "Не удалось обновить профиль",
           "failureNamed": "Не удалось обновить \"${name}\"",
-          "bulkSuccess": "Обновлено профилей: ${count}",
           "bulkPartial": "${success} успешно\n${failed} с ошибкой: ${names}"
         },
         "delete": {
@@ -271,7 +270,7 @@
             "validProcessName": "Валидное \"Имя процесса\", например\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
             "validProcessPath": "Валидный \"Путь к процессу\", например\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
-            "validPortRangeEx": "80 или 1-65000",
+            "validPortRangeEx": "80 или 1:65000",
             "validPortRange": "Валидный \"Порт\" или \"Диапазон портов\", например\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 или 10.0.0.0/24",
             "validIpCidr": "Валидный IP CIDR, например\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
@@ -322,7 +321,7 @@
             "addNew": "Добавить новое значение",
             "update": "Обновить значение",
             "clearList": "Очистить список",
-            "clearListMsg": "Все элементы удалены"
+            "clearListMsg": "Все элементы будут удалены"
           }
         },
         "generalOptions": {
@@ -445,7 +444,7 @@
         "tproxyPort": "Порт прозрачного прокси",
         "directPort": "Локальный порт direct",
         "redirectPort": "Порт перенаправления",
-        "lanSharing": "Общий доступ к VPN",
+        "lanSharing": "Безопасный общий доступ к VPN",
         "copyLink": "Копировать ссылку",
         "qrCode": "QR-код",
         "lanIPError": "Не удалось получить локальный IP-адрес"
@@ -466,13 +465,13 @@
           "enable": "Включить смешанный регистр SNI"
         },
         "padding": {
-          "enable": "Включить дополнение",
-          "size": "Размер дополнения"
+          "enable": "Включить padding",
+          "size": "Размер padding"
         }
       },
       "chain": {
         "title": "Цепь",
-        "subtitle": "Дополнительная безопасность и Разблокировщик",
+        "subtitle": "Дополнительная безопасность и разблокировщик",
         "finalIp": "Конечный IP",
         "levels": {
           "app": {
@@ -569,7 +568,6 @@
       "expireDate": "Дата окончания",
       "expired": "Истек",
       "noTraffic": "Квота исчерпана",
-      "remainingDuration": "осталось ${duration} дней",
       "remainingTrafficSemanticLabel": "израсходовано ${consumed} из ${total} трафика",
       "remainingTraffic": "Оставшийся трафик"
     }
@@ -690,7 +688,7 @@
     "disconnect": "Отключить",
     "disconnecting": "Отключение...",
     "reconnect": "Переподключить",
-    "reconnectMsg": "Переподключение для учета изменений..."
+    "reconnectMsg": "Переподключение для применения изменений..."
   },
   "errors": {
     "unexpected": "Непредвиденная ошибка",
@@ -722,7 +720,7 @@
       "invalidConfig": "Неверная конфигурация"
     },
     "warp": {
-      "missingLicense": "Отсутствует лицензия Warp",
+      "missingLicense": "Отсутствует лицензия WARP",
       "missingLicenseMsg": "Выбранный профиль использует функцию WARP; для использования этой функции необходимо принять лицензию WARP"
     },
     "psiphon": {

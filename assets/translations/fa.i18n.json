@@ -53,7 +53,7 @@
     "sort": "مرتب‌سازی",
     "dashboard": "داشبورد",
     "disable": "غیرفعال",
-    "psiphon": "سایفون",
+    "psiphon": "Psiphon",
     "profile": "پروفایل",
     "configuration": "پیکربندی",
     "file": "فایل",
@@ -124,7 +124,7 @@
       },
       "delay": {
         "result": "تأخیر: ${delay} میلی‌ثانیه",
-        "timeout": "تست تأخیر ناموفق بود",
+        "timeout": "عدم پاسخ در تست تأخیر",
         "testing": "تأخیر: در حال تست..."
       }
     },
@@ -156,7 +156,6 @@
           "success": "پروفایل با موفقیت به‌روز شد",
           "failure": "به‌روزرسانی پروفایل ناموفق بود",
           "failureNamed": "به‌روزرسانی «${name}» ناموفق بود",
-          "bulkSuccess": "${count} پروفایل به‌روزرسانی شد",
           "bulkPartial": "${success} موفق\n${failed} ناموفق: ${names}"
         },
         "delete": {
@@ -296,7 +295,7 @@
             "outbound(map)": {
               "proxy": "پروکسی",
               "direct": "مستقیم",
-              "direct_with_fragment": "مستقیم با فرگمنت",
+              "direct_with_fragment": "مستقیم با Fragment",
               "block": "مسدود"
             },
             "network(map)": {
@@ -318,7 +317,7 @@
             "addNew": "افزودن مقدار جدید",
             "update": "به‌روزرسانی مقدار",
             "clearList": "پاک کردن لیست",
-            "clearListMsg": "تمام موارد حذف شدند"
+            "clearListMsg": "تمام موارد حذف خواهند شد"
           }
         },
         "generalOptions": {
@@ -431,7 +430,7 @@
           "tun": "VPN"
         },
         "strictRoute": "مسیربندی سخت‌گیرانه",
-        "tunImplementation": "پیاده‌سازی Tun",
+        "tunImplementation": "پیاده‌سازی TUN",
         "tunImplementations": {
           "mixed": "ترکیبی",
           "system": "سیستم",
@@ -441,7 +440,7 @@
         "tproxyPort": "پورت پروکسی شفاف",
         "directPort": "پورت مستقیم",
         "redirectPort": "پورت تغییر مسیر",
-        "lanSharing": "اشتراک VPN",
+        "lanSharing": "اشتراک امن VPN",
         "copyLink": "کپی لینک",
         "qrCode": "کد QR",
         "lanIPError": "خطا در دریافت آدرس IP محلی"
@@ -469,11 +468,11 @@
       "chain": {
         "title": "زنجیره",
         "subtitle": "امنیت بیشتر و رفع مسدودیت",
-        "finalIp": "آی‌پی نهایی",
+        "finalIp": "IP نهایی",
         "levels": {
           "app": {
-            "title": "اپلیکیشن",
-            "msg": "نقطه شروع: ترافیک اپلیکیشن شما از اینجا وارد زنجیره شده و از لایه‌های بعدی عبور می‌کند تا برای میان‌بر نهایی آماده شود"
+            "title": "برنامه",
+            "msg": "نقطه شروع: ترافیک برنامه شما از اینجا وارد زنجیره شده و از لایه‌های بعدی عبور می‌کند تا برای میان‌بر نهایی آماده شود"
           },
           "extraSecurity": {
             "title": "امنیت بیشتر",
@@ -494,7 +493,7 @@
         "warp": {
           "missingConfig": "کانفیگ WARP موجود نیست",
           "licenseKey": "کلید لایسنس",
-          "cleanIp": "آی‌پی تمیز",
+          "cleanIp": "IP تمیز",
           "port": "پورت",
           "noise": {
             "count": "تعداد نویز",
@@ -565,7 +564,6 @@
       "expireDate": "تاریخ انقضا",
       "expired": "منقضی شده",
       "noTraffic": "حجم تمام شده",
-      "remainingDuration": "${duration} روز باقی‌مانده",
       "remainingTrafficSemanticLabel": "${consumed} از ${total} ترافیک مصرف شده",
       "remainingTraffic": "ترافیک باقی‌مانده"
     }

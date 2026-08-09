@@ -24,7 +24,7 @@
     "scanQr": "Pindai QR",
     "free": "Gratis",
     "warp": "WARP",
-    "fragment": "Fragmen",
+    "fragment": "Fragment",
     "help": "Bantuan",
     "save": "Simpan",
     "update": "Perbarui",
@@ -97,7 +97,7 @@
   "intro": {
     "banner": "Semua yang Anda butuhkan untuk internet tanpa batasan",
     "termsAndPolicyCaution(rich)": "Dengan melanjutkan, Anda menyetujui ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Dibuat dengan ❤️ oleh Hiddify - ${tap_source(Sumber Terbuka)} (${tap_license(Lisensi)})"
+    "info(rich)": "Dibuat dengan ❤️ oleh Hiddify - ${tap_source(Sumber terbuka)} (${tap_license(Lisensi)})"
   },
   "pages": {
     "home": {
@@ -106,10 +106,10 @@
     },
     "proxies": {
       "title": "Proxy",
-      "sort": "Urutkan proksi",
+      "sort": "Urutkan proxy",
       "testDelay": "Uji latensi",
-      "empty": "Tidak ada proksi yang tersedia",
-      "activeProxy": "Proksi aktif",
+      "empty": "Tidak ada proxy yang tersedia",
+      "activeProxy": "Proxy aktif",
       "unknownIp": "IP tidak dikenal",
       "sortOptions": {
         "unsorted": "Default",
@@ -133,7 +133,7 @@
       "add": "Tambah profil",
       "update": "Perbarui profil",
       "viewAllProfiles": "Lihat semua profil",
-      "activeProfileName": "Nama profil aktif: \"${name}\".",
+      "activeProfileName": "Nama profil aktif: \"${name}\"",
       "nonActiveProfileName": "Pilih \"${name}\" sebagai profil aktif",
       "freeSubNotFound": "Tidak ada langganan gratis yang ditemukan",
       "freeSubNotFoundForRegion": "Tidak ada langganan gratis yang ditemukan untuk wilayah \"${region}\"",
@@ -156,7 +156,6 @@
           "success": "Profil berhasil diperbarui",
           "failure": "Gagal memperbarui profil",
           "failureNamed": "Gagal memperbarui \"${name}\"",
-          "bulkSuccess": "${count} profil diperbarui",
           "bulkPartial": "${success} berhasil\n${failed} gagal: ${names}"
         },
         "delete": {
@@ -189,8 +188,8 @@
       "openWorkingDir": "Buka direktori kerja",
       "sourceCode": "Kode sumber",
       "telegramChannel": "Saluran Telegram",
-      "termsAndConditions": "Syarat dan Ketentuan",
-      "privacyPolicy": "Kebijakan Privasi"
+      "termsAndConditions": "Syarat dan ketentuan",
+      "privacyPolicy": "Kebijakan privasi"
     },
     "settings": {
       "title": "Pengaturan",
@@ -296,7 +295,7 @@
             "outbound(map)": {
               "proxy": "Proxy",
               "direct": "Langsung",
-              "direct_with_fragment": "Langsung dengan fragmen",
+              "direct_with_fragment": "Langsung dengan Fragment",
               "block": "Blokir"
             },
             "network(map)": {
@@ -318,7 +317,7 @@
             "addNew": "Tambah nilai baru",
             "update": "Perbarui nilai",
             "clearList": "Bersihkan daftar",
-            "clearListMsg": "Semua item dihapus"
+            "clearListMsg": "Semua item akan dihapus"
           }
         },
         "generalOptions": {
@@ -421,8 +420,8 @@
         "title": "Masuk",
         "serviceMode": "Mode layanan",
         "serviceModes": {
-          "proxy": "Hanya layanan proksi",
-          "systemProxy": "Atur proksi sistem",
+          "proxy": "Hanya layanan proxy",
+          "systemProxy": "Atur proxy sistem",
           "tun": "VPN"
         },
         "shortServiceModes": {
@@ -438,28 +437,28 @@
           "gvisor": "gVisor"
         },
         "mixedPort": "Port campuran",
-        "tproxyPort": "Port proksi transparan",
-        "directPort": "Port direct",
+        "tproxyPort": "Port proxy transparan",
+        "directPort": "Port langsung",
         "redirectPort": "Port pengalihan",
-        "lanSharing": "Berbagi VPN",
+        "lanSharing": "Berbagi VPN yang aman",
         "copyLink": "Salin tautan",
         "qrCode": "Kode QR",
         "lanIPError": "Gagal mendapatkan alamat IP lokal"
       },
       "tlsTricks": {
         "title": "Trik TLS",
-        "enable": "Aktifkan fragmen",
-        "packets": "Paket Fragmentasi",
+        "enable": "Aktifkan Fragment",
+        "packets": "Paket Fragment",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
         "packets1_2": "1-2",
         "packets1_3": "1-3",
         "packets1_4": "1-4",
         "packets1_5": "1-5",
-        "size": "Ukuran fragmen",
-        "sleep": "Jeda fragmen",
+        "size": "Ukuran Fragment",
+        "sleep": "Jeda Fragment",
         "mixedSniCase": {
-          "enable": "Aktifkan kasus SNI campuran"
+          "enable": "Aktifkan huruf campuran SNI"
         },
         "padding": {
           "enable": "Aktifkan padding",
@@ -468,7 +467,7 @@
       },
       "chain": {
         "title": "Rantai",
-        "subtitle": "Keamanan tambahan & Pembuka blokir",
+        "subtitle": "Keamanan tambahan & pembuka blokir",
         "finalIp": "IP akhir",
         "levels": {
           "app": {
@@ -565,7 +564,6 @@
       "expireDate": "Tanggal kedaluwarsa",
       "expired": "Kedaluwarsa",
       "noTraffic": "Kuota habis",
-      "remainingDuration": "tersisa ${duration} hari",
       "remainingTrafficSemanticLabel": "${consumed} dari ${total} lalu lintas terpakai",
       "remainingTraffic": "Sisa lalu lintas"
     }
@@ -584,11 +582,11 @@
     },
     "warpLicense": {
       "title": "Persetujuan Cloudflare WARP",
-      "description(rich)": "Cloudflare WARP adalah penyedia VPN WireGuard gratis. Dengan mengaktifkan opsi ini, Anda menyetujui ${tos(Ketentuan Layanan)} dan ${privacy(Kebijakan Privasi)} Cloudflare WARP."
+      "description(rich)": "Cloudflare WARP adalah penyedia VPN WireGuard gratis. Dengan mengaktifkan opsi ini, Anda menyetujui ${tos(Ketentuan layanan)} dan ${privacy(Kebijakan privasi)} Cloudflare WARP."
     },
     "psiphonLicense": {
-      "title": "Perjanjian Lisensi Psiphon",
-      "description(rich)": "Dengan menggunakan Psiphon, Anda menyetujui ${tos(Syarat Layanan)} dan mengakui ${privacy(Kebijakan Privasi)}. Harap baca dengan teliti sebelum melanjutkan."
+      "title": "Perjanjian lisensi Psiphon",
+      "description(rich)": "Dengan menggunakan Psiphon, Anda menyetujui ${tos(Ketentuan layanan)} dan mengakui ${privacy(Kebijakan privasi)}. Harap baca dengan teliti sebelum melanjutkan."
     },
     "newVersion": {
       "title": "Pembaruan tersedia",
@@ -615,7 +613,7 @@
           "msg": "Dengan membagikan aplikasi yang dipilih, Anda membantu melengkapi daftar \"pilihan otomatis\""
         },
         "import": {
-          "msg": "Ini akan menggantikan semua pilihan proksi per aplikasi Anda saat ini. Anda yakin ingin melanjutkan?"
+          "msg": "Ini akan menggantikan semua pilihan proxy per aplikasi Anda saat ini. Anda yakin ingin melanjutkan?"
         }
       },
       "routeRule": {
@@ -625,7 +623,7 @@
         }
       },
       "addProfileByDeepLinkWarning": {
-        "title": "Tambah Profil?",
+        "title": "Tambah profil?",
         "message": "Tautan eksternal dari \"${host}\" meminta untuk menambahkan profil baru. Apakah Anda ingin mengimpornya?"
       },
       "importRouteRuleByDeepLinkWarning": {
