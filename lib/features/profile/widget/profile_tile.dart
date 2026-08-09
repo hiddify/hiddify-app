@@ -639,9 +639,9 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
     } else if (subInfo.ratio >= 1) {
       return (t.components.subscriptionInfo.noTraffic, theme.colorScheme.error);
     } else if (subInfo.remaining.inDays > 365) {
-      return (t.components.subscriptionInfo.remainingDuration(duration: "∞"), null);
+      return (t.components.subscriptionInfo.remainingUnlimited, null);
     } else {
-      return (t.components.subscriptionInfo.remainingDuration(duration: subInfo.remaining.inDays), null);
+      return (t.components.subscriptionInfo.remainingDuration(days: subInfo.remaining.inDays), null);
     }
   }
 
