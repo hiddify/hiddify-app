@@ -20,8 +20,8 @@
     "url": "URL",
     "add": "Add",
     "clipboard": "Clipboard",
-    "addToClipboard": "Add to clipboard",
-    "scanQr": "Scan QR",
+    "addToClipboard": "Copy to clipboard",
+    "scanQr": "Scan QR code",
     "free": "Free",
     "warp": "WARP",
     "fragment": "Fragment",
@@ -75,34 +75,34 @@
       },
       "export": {
         "clipboard": {
-          "success": "Added to clipboard successfully",
+          "success": "Copied to clipboard",
           "failure": "Failed to copy to clipboard",
           "contentTooLarge": "Content too large. Use export file instead"
         },
         "file": {
-          "success": "JSON file created successfully",
+          "success": "JSON file created",
           "failure": "Failed to create file"
         }
       },
       "import": {
         "confirm": "Confirm import",
-        "success": "Imported successfully",
+        "success": "Imported",
         "failure": "Failed to import"
       },
       "autoSave": {
-        "success": "Changes auto-saved successfully"
+        "success": "Changes saved automatically"
       }
     }
   },
   "intro": {
     "banner": "All you need for an unrestricted internet",
     "termsAndPolicyCaution(rich)": "By continuing you agree to ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open Source)} (${tap_license(License)})"
+    "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open source)} (${tap_license(License)})"
   },
   "pages": {
     "home": {
       "title": "Home",
-      "quickSettings": "Quick setting options"
+      "quickSettings": "Quick settings"
     },
     "proxies": {
       "title": "Proxies",
@@ -135,25 +135,25 @@
       "viewAllProfiles": "View all profiles",
       "activeProfileName": "Active profile name: \"${name}\"",
       "nonActiveProfileName": "Select \"${name}\" as active profile",
-      "freeSubNotFound": "No free subscription was found",
+      "freeSubNotFound": "No free subscription found",
       "freeSubNotFoundForRegion": "No free subscription found for \"${region}\"",
       "failedToLoad": "Failed to load",
       "updateSubscriptions": "Update subscriptions",
       "share": {
-        "urlToClipboard": "URL to clipboard",
-        "showUrlQr": "Show URL QR",
-        "jsonToClipboard": "JSON to clipboard"
+        "urlToClipboard": "Copy URL",
+        "showUrlQr": "Show QR code",
+        "jsonToClipboard": "Copy JSON"
       },
       "msg": {
         "save": {
-          "success": "Profile saved successfully"
+          "success": "Profile saved"
         },
         "invalidUrl": "Invalid URL",
         "add": {
           "failure": "Failed to add profile"
         },
         "update": {
-          "success": "Profile updated successfully",
+          "success": "Profile updated",
           "failure": "Failed to update profile",
           "failureNamed": "Failed to update \"${name}\"",
           "bulkSuccess(plural, param=count)": {
@@ -163,7 +163,7 @@
           "bulkPartial": "${success} success\n${failed} failed: ${names}"
         },
         "delete": {
-          "success": "Profile deleted successfully"
+          "success": "Profile deleted"
         }
       }
     },
@@ -226,13 +226,13 @@
         "autoIpCheck": "Automatically check connection IP",
         "dynamicNotification": "Display speed in notification",
         "hapticFeedback": "Haptic feedback",
-        "actionAtClosing": "Action at closing",
+        "actionAtClosing": "When closing the window",
         "autoStart": "Start at login",
         "silentStart": "Start minimized",
         "ignoreBatteryOptimizations": "Disable battery optimization",
         "ignoreBatteryOptimizationsMsg": "Remove restrictions for optimal VPN performance",
         "memoryLimit": "Memory limit",
-        "memoryLimitMsg": "Enable if you're experiencing out of memory errors or frequent app crashes",
+        "memoryLimitMsg": "Enable if you're experiencing out-of-memory errors or frequent app crashes",
         "debugMode": "Debug mode",
         "debugModeMsg": "Restart the app to apply this change",
         "logLevel": "Log level",
@@ -267,17 +267,17 @@
             "validUrlEx": "https://example.com",
             "validUrl": "Valid \"URL\" like\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe or google chrome or chrome",
-            "validProcessName": "Valid \"Process Name\" like\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "Valid \"Process name\" like\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "Valid \"Process Path\" like\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "Valid \"Process path\" like\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 or 1:65000",
-            "validPortRange": "Valid \"Port\" or \"Port Range\" like\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "Valid \"Port\" or \"Port range\" like\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 or 10.0.0.0/24",
             "validIpCidr": "Valid IP CIDR like\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com or dl.google.com",
             "validDomain": "Valid \"Domain\" like\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com or .ir",
-            "validDomainSuffix": "Valid \"Domain Suffix\" like\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "Valid \"Domain suffix\" like\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Name",
               "outbound": "Outbound if match",
@@ -325,7 +325,7 @@
           }
         },
         "generalOptions": {
-          "title": "Route general options",
+          "title": "General routing options",
           "region": "Region",
           "regions": {
             "ir": "Iran (ir)",
@@ -381,7 +381,7 @@
               "resetToDefault": "Reset to default",
               "autoUpdateInterval": "Auto update interval",
               "toast": {
-                "success": "Auto apps selection completed successfully",
+                "success": "Auto selection complete",
                 "failure": "Auto selection failed",
                 "regionNotFound": "Auto selection not found, region \"${region}\"",
                 "alreadyInAuto": "Your selections are already in the auto-list"
@@ -565,7 +565,7 @@
       "upload": "Upload",
       "download": "Download",
       "total": "Total traffic",
-      "expireDate": "Expire date",
+      "expireDate": "Expiry date",
       "expired": "Expired",
       "noTraffic": "Out of quota",
       "remainingDuration(plural, param=days)": {
@@ -611,7 +611,7 @@
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "This will rewrite all config options with provided values. Are you sure?"
+          "msg": "This will overwrite all config options with provided values. Are you sure?"
         }
       },
       "profile": {
@@ -640,18 +640,18 @@
         "message": "An external link from \"${host}\" is requesting to add a new profile. Do you want to import it?"
       },
       "importRouteRuleByDeepLinkWarning": {
-        "title": "Import route-rule?",
-        "message": "Importing route rules from untrusted sources can be a security risk\nOnly proceed if you trust this link"
+        "title": "Import route rule?",
+        "message": "Route rules decide where your traffic goes.\nOnly import them from a source you trust."
       }
     },
     "experimentalNotice": {
       "title": "Experimental features in use",
-      "msg": "You've enabled some experimental features which might affect connection quality and cause unexpected errors. You can always change or reset these options from config options page.",
+      "msg": "You've enabled some experimental features which might affect connection quality and cause unexpected errors. You can always change or reset these options in Settings.",
       "disable": "Don't show again"
     },
     "noActiveProfile": {
       "title": "Choose a profile",
-      "msg": "Let's get started by adding a connection profile that includes your VPN connection details.\n\nDon’t have a VPN server yet? No worries—just follow the tutorial below to set one up quickly and for free.",
+      "msg": "Add a profile with your VPN connection details to get started.\n\nNo VPN server yet? The tutorial below shows how to set one up for free.",
       "helpBtn": {
         "label": "Show me how",
         "url": "https://hiddify.com/manager/"
@@ -661,7 +661,7 @@
       "title": "Warning",
       "cannotVerify": "We can't verify this link",
       "avoidIfUnsure": "If you're not fully sure, don't pay or share sensitive information",
-      "ownResponsibility": "Any loss from misuse is your own responsibility",
+      "ownResponsibility": "You continue at your own risk",
       "open": "Open",
       "openIn": "Open (${seconds})"
     },
@@ -670,9 +670,9 @@
       "type": "Type:",
       "testTime": "Test time:",
       "testDelay": "Test delay:",
-      "isSelected": "Is selected:",
-      "isGroup": "Is group",
-      "isSecure": "Is secure:",
+      "isSelected": "Selected:",
+      "isGroup": "Group:",
+      "isSecure": "Secure:",
       "port": "Port:",
       "host": "Host:",
       "ip": "IP:",
@@ -688,7 +688,7 @@
     },
     "windowClosing": {
       "askEachTime": "Ask each time",
-      "alertMessage": "Hide or exit the application?",
+      "alertMessage": "Hide or exit the app?",
       "remember": "Remember my choice"
     }
   },
@@ -707,14 +707,14 @@
     "connection": {
       "unexpected": "Unexpected connection error",
       "timeout": "Connection timeout",
-      "badResponse": "Bad response",
+      "badResponse": "Invalid server response",
       "connectionError": "Connection error",
-      "badCertificate": "Bad certificate"
+      "badCertificate": "Invalid certificate"
     },
     "profiles": {
       "unexpected": "Unexpected error",
       "notFound": "Profile not found",
-      "invalidConfig": "Invalid configs",
+      "invalidConfig": "Invalid config",
       "invalidUrl": "Invalid URL",
       "canceledByUser": "Canceled by user"
     },
@@ -733,11 +733,11 @@
     },
     "warp": {
       "missingLicense": "WARP license required",
-      "missingLicenseMsg": "The selected profile uses the WARP feature; to use this feature, the WARP license must be agreed to"
+      "missingLicenseMsg": "This profile uses WARP. Accept the WARP license to continue."
     },
     "psiphon": {
       "missingLicense": "Psiphon license required",
-      "missingLicenseMsg": "The selected profile uses the Psiphon feature; to use this feature, the Psiphon license must be agreed to"
+      "missingLicenseMsg": "This profile uses Psiphon. Accept the Psiphon license to continue."
     }
   }
 }
