@@ -651,7 +651,7 @@
     },
     "noActiveProfile": {
       "title": "Choose a profile",
-      "msg": "Add a profile with your VPN connection details to get started.\n\nNo VPN server yet? The tutorial below shows how to set one up for free.",
+      "msg": "Let's get started. Add a connection profile with your VPN server details.\n\nNo server yet? No problem — the guide below shows how to set one up for free.",
       "helpBtn": {
         "label": "Show me how",
         "url": "https://hiddify.com/manager/"
