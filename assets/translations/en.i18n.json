@@ -133,10 +133,10 @@
       "add": "Add profile",
       "update": "Update profile",
       "viewAllProfiles": "View all profiles",
-      "activeProfileName": "Active profile name: \"${name}\".",
+      "activeProfileName": "Active profile name: \"${name}\"",
       "nonActiveProfileName": "Select \"${name}\" as active profile",
       "freeSubNotFound": "No free subscription was found",
-      "freeSubNotFoundForRegion": "No free subscription was found for \"${region}\" region.",
+      "freeSubNotFoundForRegion": "No free subscription found for \"${region}\"",
       "failedToLoad": "Failed to load",
       "updateSubscriptions": "Update subscriptions",
       "share": {
@@ -156,7 +156,10 @@
           "success": "Profile updated successfully",
           "failure": "Failed to update profile",
           "failureNamed": "Failed to update \"${name}\"",
-          "bulkSuccess": "${count} profiles updated",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profile updated",
+            "other": "$count profiles updated"
+          },
           "bulkPartial": "${success} success\n${failed} failed: ${names}"
         },
         "delete": {
@@ -231,13 +234,13 @@
         "memoryLimit": "Memory limit",
         "memoryLimitMsg": "Enable if you're experiencing out of memory errors or frequent app crashes",
         "debugMode": "Debug mode",
-        "debugModeMsg": "Restart the app for applying this change",
+        "debugModeMsg": "Restart the app to apply this change",
         "logLevel": "Log level",
         "connectionTestUrl": "Connection test URL",
         "urlTestInterval": "URL test interval",
         "clashApiPort": "Clash API port",
         "useXrayCoreWhenPossible": "Use xray-core when possible",
-        "useXrayCoreWhenPossibleMsg": "Use xray-core during parsing sub links. You need to reimport the sub link to enable this option."
+        "useXrayCoreWhenPossibleMsg": "Use xray-core when parsing subscription links. Reimport the subscription to enable this."
       },
       "routing": {
         "title": "Routing",
@@ -258,9 +261,9 @@
           },
           "rule": {
             "title": "Rule",
-            "onlyTunMode": "Available only in tun mode",
-            "notAvailabeInThisPlatform": "Not available in this platform",
-            "canNotBeEmpty": "Can not be empty",
+            "onlyTunMode": "Available only in TUN mode",
+            "notAvailabeInThisPlatform": "Not available on this platform",
+            "canNotBeEmpty": "Cannot be empty",
             "validUrlEx": "https://example.com",
             "validUrl": "Valid \"URL\" like\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe or google chrome or chrome",
@@ -318,7 +321,7 @@
             "addNew": "Add new value",
             "update": "Update value",
             "clearList": "Clear list",
-            "clearListMsg": "All items are deleted"
+            "clearListMsg": "All items will be deleted"
           }
         },
         "generalOptions": {
@@ -431,7 +434,7 @@
           "tun": "VPN"
         },
         "strictRoute": "Strict route",
-        "tunImplementation": "Tun implementation",
+        "tunImplementation": "TUN implementation",
         "tunImplementations": {
           "mixed": "Mixed",
           "system": "System",
@@ -443,13 +446,13 @@
         "redirectPort": "Redirect port",
         "lanSharing": "Secure VPN sharing",
         "copyLink": "Copy link",
-        "qrCode": "QR Code",
+        "qrCode": "QR code",
         "lanIPError": "Failed to get local IP address"
       },
       "tlsTricks": {
         "title": "TLS tricks",
         "enable": "Enable fragment",
-        "packets": "Fragmentation Packets",
+        "packets": "Fragmentation packets",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
         "packets1_2": "1-2",
@@ -468,7 +471,7 @@
       },
       "chain": {
         "title": "Chain",
-        "subtitle": "Extra security & Unblocker",
+        "subtitle": "Extra security & unblocker",
         "finalIp": "Final IP",
         "levels": {
           "app": {
@@ -488,7 +491,7 @@
           },
           "filtering": {
             "title": "Filtering",
-            "msg": "Final exit: After passing through the active layers (Extra Security, Main Profile, or Unblocker) and applying their effects, your traffic is finally routed to bypass local network filtering"
+            "msg": "Final exit: After passing through the active layers (Extra security, Main profile, or Unblocker) and applying their effects, your traffic is finally routed to bypass local network filtering"
           }
         },
         "warp": {
@@ -565,7 +568,11 @@
       "expireDate": "Expire date",
       "expired": "Expired",
       "noTraffic": "Out of quota",
-      "remainingDuration": "${duration} days remaining",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days day remaining",
+        "other": "$days days remaining"
+      },
+      "remainingUnlimited": "Unlimited",
       "remainingTrafficSemanticLabel": "${consumed} of ${total} traffic consumed",
       "remainingTraffic": "Remaining traffic",
       "openWebPage": "Open web page",
@@ -591,8 +598,8 @@
       "description(rich)": "Cloudflare WARP is a free WireGuard VPN provider. By enabling this option you are agreeing to the Cloudflare WARP's ${tos(Terms of service)} and ${privacy(Privacy policy)}."
     },
     "psiphonLicense": {
-      "title": "Psiphon License Agreement",
-      "description(rich)": "By using Psiphon, you agree to the ${tos(Terms of Service)} and acknowledge the ${privacy(Privacy Policy)}. Please read them carefully before proceeding."
+      "title": "Psiphon license agreement",
+      "description(rich)": "By using Psiphon, you agree to the ${tos(Terms of service)} and acknowledge the ${privacy(Privacy policy)}. Please read them carefully before proceeding."
     },
     "newVersion": {
       "title": "Update available",
@@ -693,7 +700,7 @@
     "disconnect": "Disconnect",
     "disconnecting": "Disconnecting...",
     "reconnect": "Reconnect",
-    "reconnectMsg": "Reconnecting for taking into account the changes..."
+    "reconnectMsg": "Reconnecting to apply changes..."
   },
   "errors": {
     "unexpected": "Unexpected error",
@@ -725,7 +732,7 @@
       "invalidConfig": "Invalid configuration"
     },
     "warp": {
-      "missingLicense": "Warp license required",
+      "missingLicense": "WARP license required",
       "missingLicenseMsg": "The selected profile uses the WARP feature; to use this feature, the WARP license must be agreed to"
     },
     "psiphon": {
