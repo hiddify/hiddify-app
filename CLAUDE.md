@@ -23,9 +23,56 @@ slang also has `edit add/delete/move/copy`, `clean`, `normalize`, `outdated`, an
 
 ### Translation principles (priority order)
 
-1. **Material Design 3 (top priority):** sentence case, concise, no trailing period on short UI strings, action-oriented.
+1. **Material Design 3 (top priority):** the full rule set is in the next section. It governs every string.
 2. **Context-based:** Hiddify is a **v2ray / VPN client**. Keep technical terms in **English** — VPN, proxy, DNS, TUN, WARP, Psiphon, VLESS, VMess, Trojan, Shadowsocks, Reality, XTLS, sing-box, inbound / outbound, TLS, ping, etc.
 3. **Preserve non-text exactly:** placeholders (`$name`, `${host}`), links, plural / context blocks, modifiers. Translate values only, never keys. Keep valid JSON.
+
+### Material Design 3 writing rules
+
+Sources: [Material writing style](https://m1.material.io/style/writing.html) · [M3 grammar and punctuation](https://m3.material.io/foundations/content-design/style-guide/grammar-and-punctuation) · [Material error patterns](https://m1.material.io/patterns/errors.html)
+
+**Capitalization**
+- Sentence case everywhere — titles, headings, labels, menu items, buttons. Only the first word and proper nouns are capitalized.
+- No all-caps.
+
+**Punctuation**
+- **Period** — none after a *single* sentence in a label, tooltip, list item or dialog body. Required when a string holds **two or more sentences**, and when a sentence is followed by a link (the period goes *before* the link).
+- **Colon** — skip after a label. Use one only to introduce a list.
+- **Exclamation point** — avoid; it reads as shouting. Only for a greeting or congratulation.
+- **Ellipsis** — the single character `…`, no space before it, for an action in progress (`Downloading…`). Never on a menu item or button that opens a dialog.
+- **Dashes** — en dash `–` for ranges, no spaces (`3–5 kg`). Hyphen for compounds and negative numbers.
+- **Quotes** — curly `“ ”` and `’`, not straight. A comma goes inside the quotes.
+
+**Voice and tone**
+- Second person (`you`, `your`). Never mix with `me` / `my`. Avoid `we` unless a real person is acting for the user.
+- Active voice, present tense — what the product does, not what it will do.
+- Friendly, humble, positive, essential. Say only what the user needs to decide or act.
+
+**Word choice**
+- Short sentences, common words, objective first.
+- Contractions when they read easier (`it's`, `can't`, `don't`). Not `it'll`, `should've`.
+- No jargon: `Preparing video…`, not `Buffering…`.
+- `Turn on` / `Turn off`, not `Enable` / `Disable`.
+- Numerals, not words: `1, 2, 3`.
+- Drop `please`, `sorry`, filler intros, and absolutes like `never`.
+- Name a UI element by its label, not its widget type.
+- Gender-neutral `they`; never `his/her`.
+
+**Errors**
+- Say what happened *and* how to fix it — give the user an action.
+- Never blame the user or imply fault.
+- Don't offer a retry that is known to fail.
+
+**Buttons and actions**
+- Prefer the standard set where it fits: `Cancel`, `Done`, `Next`, `Back`, `OK`, `Skip`, `Got it`, `Learn more`, `No thanks`, `Not now`.
+- Same action, same verb, everywhere.
+
+**How this applies to the other 10 locales.** All of it, except where a language genuinely differs:
+- Capitalization rules bind Latin, Cyrillic and Greek scripts only — Arabic, Persian and CJK have no letter case.
+- Contractions and singular `they` are English-only.
+- Each language keeps its own quotation marks (`« »`, `「 」`, `„ “`, `» «`) and its own spacing (French keeps a space before `: ; ? !`).
+- Follow the target language's own orthography where it conflicts: Spanish and Portuguese continue lowercase after a colon, Turkish capitalizes a full sentence after one.
+- Plurals use that language's real CLDR forms, not a copy of English's two.
 
 ### During development — English only
 
