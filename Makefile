@@ -304,7 +304,7 @@ windows-zip-release:
 	mkdir -p Hiddify; \
 	unzip -q "$$ZIP_FILE" -d Hiddify/; \
 	rm "$$ZIP_FILE"; \
-	tar -a -cf "$$FILE_NAME.zip" Hiddify; \
+	7z a -tzip "$$FILE_NAME.zip" Hiddify; \
 	rm -rf Hiddify; \
 	$(GREEN)Successful$(DONE)
 
