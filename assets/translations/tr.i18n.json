@@ -20,8 +20,8 @@
     "url": "URL",
     "add": "Ekle",
     "clipboard": "Pano",
-    "addToClipboard": "Panoya ekle",
-    "scanQr": "QR tara",
+    "addToClipboard": "Panoya kopyala",
+    "scanQr": "QR kod tara",
     "free": "Ücretsiz",
     "warp": "WARP",
     "fragment": "Fragment",
@@ -75,18 +75,18 @@
       },
       "export": {
         "clipboard": {
-          "success": "Panoya başarıyla eklendi",
+          "success": "Panoya kopyalandı",
           "failure": "Panoya kopyalanamadı",
           "contentTooLarge": "İçerik çok büyük. Bunun yerine dosyaya aktarmayı kullanın"
         },
         "file": {
-          "success": "JSON dosyası başarıyla oluşturuldu",
+          "success": "JSON dosyası oluşturuldu",
           "failure": "Dosya oluşturulamadı"
         }
       },
       "import": {
         "confirm": "İçe aktarmayı onayla",
-        "success": "Başarıyla içe aktarıldı",
+        "success": "İçe aktarıldı",
         "failure": "İçe aktarılamadı"
       },
       "autoSave": {
@@ -102,7 +102,7 @@
   "pages": {
     "home": {
       "title": "Ana sayfa",
-      "quickSettings": "Hızlı ayar seçenekleri"
+      "quickSettings": "Hızlı ayarlar"
     },
     "proxies": {
       "title": "Proxy'ler",
@@ -140,26 +140,29 @@
       "failedToLoad": "Yüklenemedi",
       "updateSubscriptions": "Abonelikleri güncelle",
       "share": {
-        "urlToClipboard": "URL'yi panoya kopyala",
-        "showUrlQr": "URL QR kodunu göster",
-        "jsonToClipboard": "JSON'u panoya kopyala"
+        "urlToClipboard": "URL'yi kopyala",
+        "showUrlQr": "QR kodu göster",
+        "jsonToClipboard": "JSON'u kopyala"
       },
       "msg": {
         "save": {
-          "success": "Profil başarıyla kaydedildi"
+          "success": "Profil kaydedildi"
         },
         "invalidUrl": "Geçersiz URL",
         "add": {
           "failure": "Profil eklenemedi"
         },
         "update": {
-          "success": "Profil başarıyla güncellendi",
+          "success": "Profil güncellendi",
+          "bulkSuccess(plural, param=count)": {
+            "other": "$count profil güncellendi"
+          },
           "failure": "Profil güncellenemedi",
           "failureNamed": "\"${name}\" güncellenemedi",
           "bulkPartial": "${success} başarılı\n${failed} başarısız: ${names}"
         },
         "delete": {
-          "success": "Profil başarıyla silindi"
+          "success": "Profil silindi"
         }
       }
     },
@@ -222,7 +225,7 @@
         "autoIpCheck": "Bağlantı IP'sini otomatik kontrol et",
         "dynamicNotification": "Hızı bildirimde göster",
         "hapticFeedback": "Dokunsal geri bildirim",
-        "actionAtClosing": "Kapatma eylemi",
+        "actionAtClosing": "Pencere kapatılırken",
         "autoStart": "Oturum açılışında başlat",
         "silentStart": "Simge durumunda başlat",
         "ignoreBatteryOptimizations": "Pil optimizasyonunu devre dışı bırak",
@@ -263,17 +266,17 @@
             "validUrlEx": "https://example.com",
             "validUrl": "Geçerli \"URL\", örn.\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe veya google chrome veya chrome",
-            "validProcessName": "Geçerli \"İşlem Adı\", örn.\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "Geçerli \"İşlem adı\", örn.\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "Geçerli \"İşlem Yolu\", örn.\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "Geçerli \"İşlem yolu\", örn.\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 veya 1:65000",
-            "validPortRange": "Geçerli \"Port\" veya \"Port Aralığı\", örn.\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "Geçerli \"Port\" veya \"Port aralığı\", örn.\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 veya 10.0.0.0/24",
             "validIpCidr": "Geçerli IP CIDR, örn.\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com veya dl.google.com",
-            "validDomain": "Geçerli \"Alan Adı\", örn.\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "Geçerli \"Alan adı\", örn.\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com veya .tr",
-            "validDomainSuffix": "Geçerli \"Alan Adı Son Eki\", örn.\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "Geçerli \"Alan adı son eki\", örn.\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "İsim",
               "outbound": "Eşleşirse giden",
@@ -377,7 +380,7 @@
               "resetToDefault": "Varsayılana sıfırla",
               "autoUpdateInterval": "Otomatik güncelleme aralığı",
               "toast": {
-                "success": "Otomatik uygulama seçimi başarıyla tamamlandı",
+                "success": "Otomatik seçim tamamlandı",
                 "failure": "Otomatik seçim başarısız oldu",
                 "regionNotFound": "\"${region}\" bölgesi için otomatik seçim bulunamadı",
                 "alreadyInAuto": "Seçimleriniz zaten otomatik listede"
@@ -564,8 +567,16 @@
       "expireDate": "Bitiş tarihi",
       "expired": "Süresi doldu",
       "noTraffic": "Kota doldu",
+      "remainingDuration(plural, param=days)": {
+        "other": "$days gün kaldı"
+      },
+      "remainingUnlimited": "Sınırsız",
       "remainingTrafficSemanticLabel": "${consumed} / ${total} trafik kullanıldı",
-      "remainingTraffic": "Kalan trafik"
+      "remainingTraffic": "Kalan trafik",
+      "openWebPage": "Web sayfasını aç",
+      "support": "Destek",
+      "openLinkTitle": "Bu bağlantı açılsın mı?",
+      "openLinkAction": "Aç"
     }
   },
   "dialogs": {
@@ -628,26 +639,29 @@
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Rota kuralını içe aktar?",
-        "message": "Güvenilmeyen kaynaklardan rota kurallarını içe aktarmak bir güvenlik riski olabilir\nYalnızca bu bağlantıya güveniyorsanız devam edin"
+        "message": "Rota kuralları trafiğinizin nereye gideceğini belirler.\nYalnızca güvendiğiniz bir kaynaktan içe aktarın."
       }
     },
     "experimentalNotice": {
       "title": "Deneysel özellikler kullanılıyor",
-      "msg": "Bağlantı kalitesini etkileyebilecek ve beklenmedik hatalara neden olabilecek bazı deneysel özellikleri etkinleştirdiniz. Bu seçenekleri istediğiniz zaman yapılandırma sayfasından değiştirebilir veya sıfırlayabilirsiniz.",
+      "msg": "Bağlantı kalitesini etkileyebilecek ve beklenmedik hatalara neden olabilecek bazı deneysel özellikleri etkinleştirdiniz. Bu seçenekleri istediğiniz zaman Ayarlar'dan değiştirebilir veya sıfırlayabilirsiniz.",
       "disable": "Tekrar gösterme"
     },
     "noActiveProfile": {
       "title": "Bir profil seçin",
-      "msg": "VPN bağlantı ayrıntılarınızı içeren bir bağlantı profili ekleyerek başlayalım.\n\nHenüz bir VPN sunucunuz yok mu? Endişelenmeyin, hızlı ve ücretsiz bir şekilde kurmak için aşağıdaki eğitimi takip edin.",
+      "msg": "Başlayalım. VPN sunucu bilgilerinizle bir bağlantı profili ekleyin.\n\nHenüz sunucunuz yok mu? Sorun değil — aşağıdaki rehber ücretsiz bir tane kurmayı gösteriyor.",
       "helpBtn": {
         "label": "Nasıl yapıldığını göster",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Dış bağlantı uyarısı",
-      "youAreAboutToVisit": "Şu adresi ziyaret etmek üzeresiniz:",
-      "thisWebsiteIsNotInOurTrustedList": "Bu web sitesi güvenilir listemizde değil. Lütfen dikkatli devam edin."
+      "title": "Uyarı",
+      "cannotVerify": "Bu bağlantıyı doğrulayamıyoruz",
+      "avoidIfUnsure": "Tamamen emin değilseniz ödeme yapmayın ve hassas bilgi paylaşmayın",
+      "ownResponsibility": "Devam ederseniz sorumluluk size aittir",
+      "open": "Aç",
+      "openIn": "Aç (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "Tam etiket:",
@@ -655,7 +669,7 @@
       "testTime": "Test zamanı:",
       "testDelay": "Test gecikmesi:",
       "isSelected": "Seçili:",
-      "isGroup": "Grup",
+      "isGroup": "Grup:",
       "isSecure": "Güvenli:",
       "port": "Port:",
       "host": "Sunucu:",
@@ -691,14 +705,14 @@
     "connection": {
       "unexpected": "Beklenmeyen bağlantı hatası",
       "timeout": "Bağlantı zaman aşımına uğradı",
-      "badResponse": "Hatalı yanıt",
+      "badResponse": "Geçersiz sunucu yanıtı",
       "connectionError": "Bağlantı hatası",
       "badCertificate": "Geçersiz sertifika"
     },
     "profiles": {
       "unexpected": "Beklenmeyen hata",
       "notFound": "Profil bulunamadı",
-      "invalidConfig": "Geçersiz yapılandırmalar",
+      "invalidConfig": "Geçersiz yapılandırma",
       "invalidUrl": "Geçersiz URL",
       "canceledByUser": "Kullanıcı tarafından iptal edildi"
     },
@@ -717,11 +731,11 @@
     },
     "warp": {
       "missingLicense": "WARP lisansı gerekli",
-      "missingLicenseMsg": "Seçili profil WARP özelliğini kullanıyor. Bu özelliği kullanmak için WARP lisansını kabul etmeniz gerekir"
+      "missingLicenseMsg": "Bu profil WARP kullanıyor. Devam etmek için WARP lisansını kabul edin."
     },
     "psiphon": {
       "missingLicense": "Psiphon lisansı gerekli",
-      "missingLicenseMsg": "Seçili profil Psiphon özelliğini kullanıyor; bu özelliği kullanmak için Psiphon lisansı kabul edilmelidir"
+      "missingLicenseMsg": "Bu profil Psiphon kullanıyor. Devam etmek için Psiphon lisansını kabul edin."
     }
   }
 }

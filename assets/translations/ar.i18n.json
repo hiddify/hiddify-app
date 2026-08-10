@@ -20,7 +20,7 @@
     "url": "الرابط",
     "add": "إضافة",
     "clipboard": "الحافظة",
-    "addToClipboard": "إضافة إلى الحافظة",
+    "addToClipboard": "نسخ إلى الحافظة",
     "scanQr": "مسح رمز QR",
     "free": "مجاني",
     "warp": "WARP",
@@ -81,22 +81,22 @@
       },
       "export": {
         "clipboard": {
-          "success": "تمت الإضافة إلى الحافظة بنجاح",
+          "success": "تم النسخ إلى الحافظة",
           "failure": "فشل النسخ إلى الحافظة",
           "contentTooLarge": "المحتوى كبير جدًا. استخدم تصدير الملف بدلاً من ذلك"
         },
         "file": {
-          "success": "تم إنشاء ملف JSON بنجاح",
+          "success": "تم إنشاء ملف JSON",
           "failure": "فشل إنشاء الملف"
         }
       },
       "import": {
         "confirm": "تأكيد الاستيراد",
-        "success": "تم الاستيراد بنجاح",
+        "success": "تم الاستيراد",
         "failure": "فشل الاستيراد"
       },
       "autoSave": {
-        "success": "تم حفظ التغييرات تلقائيًا بنجاح"
+        "success": "تم حفظ التغييرات تلقائيًا"
       }
     }
   },
@@ -108,7 +108,7 @@
   "pages": {
     "home": {
       "title": "الرئيسية",
-      "quickSettings": "خيارات الإعدادات السريعة"
+      "quickSettings": "الإعدادات السريعة"
     },
     "proxies": {
       "title": "البروكسيات",
@@ -146,26 +146,34 @@
       "failedToLoad": "فشل التحميل",
       "updateSubscriptions": "تحديث الاشتراكات",
       "share": {
-        "urlToClipboard": "رابط URL إلى الحافظة",
-        "showUrlQr": "عرض رمز QR للرابط",
-        "jsonToClipboard": "JSON إلى الحافظة"
+        "urlToClipboard": "نسخ الرابط",
+        "showUrlQr": "عرض رمز QR",
+        "jsonToClipboard": "نسخ JSON"
       },
       "msg": {
         "save": {
-          "success": "تم حفظ الملف الشخصي بنجاح"
+          "success": "تم حفظ الملف الشخصي"
         },
         "invalidUrl": "رابط غير صالح",
         "add": {
           "failure": "فشل إضافة الملف الشخصي"
         },
         "update": {
-          "success": "تم تحديث الملف الشخصي بنجاح",
+          "success": "تم تحديث الملف الشخصي",
           "failure": "فشل تحديث الملف الشخصي",
           "failureNamed": "فشل تحديث \"${name}\"",
+          "bulkSuccess(plural, param=count)": {
+            "zero": "لم يتم تحديث أي ملف شخصي",
+            "one": "تم تحديث ملف شخصي واحد",
+            "two": "تم تحديث ملفين شخصيين",
+            "few": "تم تحديث $count ملفات شخصية",
+            "many": "تم تحديث $count ملفًا شخصيًا",
+            "other": "تم تحديث $count ملف شخصي"
+          },
           "bulkPartial": "${success} ناجح\n${failed} فاشل: ${names}"
         },
         "delete": {
-          "success": "تم حذف الملف الشخصي بنجاح"
+          "success": "تم حذف الملف الشخصي"
         }
       }
     },
@@ -228,7 +236,7 @@
         "autoIpCheck": "التحقق التلقائي من IP الاتصال",
         "dynamicNotification": "عرض السرعة في الإشعار",
         "hapticFeedback": "ردود الفعل اللمسية",
-        "actionAtClosing": "الإجراء عند الإغلاق",
+        "actionAtClosing": "عند إغلاق النافذة",
         "autoStart": "البدء عند تسجيل الدخول",
         "silentStart": "البدء في الخلفية",
         "ignoreBatteryOptimizations": "تجاهل تحسينات البطارية",
@@ -383,7 +391,7 @@
               "resetToDefault": "إعادة التعيين إلى الافتراضي",
               "autoUpdateInterval": "فاصل التحديث التلقائي",
               "toast": {
-                "success": "اكتمل الاختيار التلقائي للتطبيقات بنجاح",
+                "success": "اكتمل الاختيار التلقائي",
                 "failure": "فشل الاختيار التلقائي",
                 "regionNotFound": "لم يتم العثور على اختيار تلقائي لمنطقة \"${region}\"",
                 "alreadyInAuto": "اختياراتك موجودة بالفعل في القائمة التلقائية"
@@ -570,8 +578,21 @@
       "expireDate": "تاريخ الانتهاء",
       "expired": "منتهي الصلاحية",
       "noTraffic": "نفدت الباقة",
+      "remainingDuration(plural, param=days)": {
+        "zero": "لم يتبق أي يوم",
+        "one": "يتبقى يوم واحد",
+        "two": "يتبقى يومان",
+        "few": "تتبقى $days أيام",
+        "many": "يتبقى $days يومًا",
+        "other": "يتبقى $days يوم"
+      },
+      "remainingUnlimited": "غير محدود",
       "remainingTrafficSemanticLabel": "تم استهلاك ${consumed} من ${total}",
-      "remainingTraffic": "البيانات المتبقية"
+      "remainingTraffic": "البيانات المتبقية",
+      "openWebPage": "فتح صفحة الويب",
+      "support": "الدعم",
+      "openLinkTitle": "فتح هذا الرابط؟",
+      "openLinkAction": "فتح"
     }
   },
   "dialogs": {
@@ -633,8 +654,8 @@
         "message": "رابط خارجي من \"${host}\" يطلب إضافة ملف شخصي جديد. هل تريد استيراده؟"
       },
       "importRouteRuleByDeepLinkWarning": {
-        "title": "استيراد قاعدة التوجيه؟",
-        "message": "قد يشكل استيراد قواعد التوجيه من مصادر غير موثوقة خطراً أمنياً\nتابع فقط إذا كنت تثق في هذا الرابط"
+        "title": "استيراد قاعدة توجيه؟",
+        "message": "قواعد التوجيه تحدد وجهة بياناتك.\nلا تستوردها إلا من مصدر تثق به."
       }
     },
     "experimentalNotice": {
@@ -644,16 +665,19 @@
     },
     "noActiveProfile": {
       "title": "اختر ملفًا شخصيًا",
-      "msg": "للبدء، قم بإضافة ملف اتصال يحتوي على تفاصيل اتصال VPN الخاصة بك.\n\nأليس لديك خادم VPN بعد؟ لا تقلق، اتبع الدليل أدناه لإعداد واحد بسرعة ومجانًا.",
+      "msg": "لنبدأ. أضف ملف اتصال يحتوي على تفاصيل خادم VPN الخاص بك.\n\nليس لديك خادم بعد؟ لا مشكلة — يوضح لك الدليل أدناه كيفية إعداد واحد مجانًا.",
       "helpBtn": {
         "label": "أرني كيف",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "تحذير من رابط خارجي",
-      "youAreAboutToVisit": "أنت على وشك زيارة:",
-      "thisWebsiteIsNotInOurTrustedList": "هذا الموقع ليس ضمن قائمة المواقع الموثوقة لدينا. يرجى المتابعة بحذر."
+      "title": "تحذير",
+      "cannotVerify": "لا يمكننا التحقق من هذا الرابط",
+      "avoidIfUnsure": "إذا لم تكن متأكدًا تمامًا، لا تدفع ولا تشارك معلومات حساسة",
+      "ownResponsibility": "أنت تتابع على مسؤوليتك الخاصة",
+      "open": "فتح",
+      "openIn": "فتح (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "العلامة الكاملة:",
@@ -661,7 +685,7 @@
       "testTime": "وقت الاختبار:",
       "testDelay": "تأخير الاختبار:",
       "isSelected": "محدد:",
-      "isGroup": "مجموعة",
+      "isGroup": "مجموعة:",
       "isSecure": "آمن:",
       "port": "المنفذ:",
       "host": "المضيف:",
@@ -697,14 +721,14 @@
     "connection": {
       "unexpected": "خطأ اتصال غير متوقع",
       "timeout": "انتهى وقت الاتصال",
-      "badResponse": "استجابة غير صالحة",
+      "badResponse": "استجابة خادم غير صالحة",
       "connectionError": "خطأ في الاتصال",
       "badCertificate": "شهادة غير صالحة"
     },
     "profiles": {
       "unexpected": "خطأ غير متوقع",
       "notFound": "لم يتم العثور على الملف الشخصي",
-      "invalidConfig": "تكوينات غير صالحة",
+      "invalidConfig": "تكوين غير صالح",
       "invalidUrl": "رابط غير صالح",
       "canceledByUser": "تم الإلغاء من قبل المستخدم"
     },
@@ -723,11 +747,11 @@
     },
     "warp": {
       "missingLicense": "رخصة WARP مفقودة",
-      "missingLicenseMsg": "الملف الشخصي المحدد يستخدم ميزة WARP؛ لاستخدام هذه الميزة، يجب الموافقة على رخصة WARP"
+      "missingLicenseMsg": "يستخدم هذا الملف الشخصي WARP. وافق على رخصة WARP للمتابعة."
     },
     "psiphon": {
       "missingLicense": "رخصة Psiphon مطلوبة",
-      "missingLicenseMsg": "الملف الشخصي المحدد يستخدم ميزة Psiphon؛ لاستخدام هذه الميزة، يجب الموافقة على رخصة Psiphon"
+      "missingLicenseMsg": "يستخدم هذا الملف الشخصي Psiphon. وافق على رخصة Psiphon للمتابعة."
     }
   }
 }

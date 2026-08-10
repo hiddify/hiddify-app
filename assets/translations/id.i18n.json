@@ -20,8 +20,8 @@
     "url": "URL",
     "add": "Tambah",
     "clipboard": "Papan klip",
-    "addToClipboard": "Tambah ke papan klip",
-    "scanQr": "Pindai QR",
+    "addToClipboard": "Salin ke papan klip",
+    "scanQr": "Pindai kode QR",
     "free": "Gratis",
     "warp": "WARP",
     "fragment": "Fragment",
@@ -75,22 +75,22 @@
       },
       "export": {
         "clipboard": {
-          "success": "Berhasil ditambahkan ke papan klip",
+          "success": "Disalin ke papan klip",
           "failure": "Gagal menyalin ke papan klip",
           "contentTooLarge": "Konten terlalu besar. Gunakan ekspor file saja"
         },
         "file": {
-          "success": "File JSON berhasil dibuat",
+          "success": "File JSON dibuat",
           "failure": "Gagal membuat file"
         }
       },
       "import": {
         "confirm": "Konfirmasi impor",
-        "success": "Berhasil diimpor",
+        "success": "Diimpor",
         "failure": "Gagal mengimpor"
       },
       "autoSave": {
-        "success": "Perubahan berhasil disimpan secara otomatis"
+        "success": "Perubahan disimpan secara otomatis"
       }
     }
   },
@@ -102,7 +102,7 @@
   "pages": {
     "home": {
       "title": "Beranda",
-      "quickSettings": "Opsi pengaturan cepat"
+      "quickSettings": "Pengaturan cepat"
     },
     "proxies": {
       "title": "Proxy",
@@ -140,26 +140,29 @@
       "failedToLoad": "Gagal memuat",
       "updateSubscriptions": "Perbarui langganan",
       "share": {
-        "urlToClipboard": "URL ke papan klip",
-        "showUrlQr": "Tampilkan QR URL",
-        "jsonToClipboard": "JSON ke papan klip"
+        "urlToClipboard": "Salin URL",
+        "showUrlQr": "Tampilkan kode QR",
+        "jsonToClipboard": "Salin JSON"
       },
       "msg": {
         "save": {
-          "success": "Profil berhasil disimpan"
+          "success": "Profil disimpan"
         },
         "invalidUrl": "URL tidak valid",
         "add": {
           "failure": "Gagal menambahkan profil"
         },
         "update": {
-          "success": "Profil berhasil diperbarui",
+          "success": "Profil diperbarui",
           "failure": "Gagal memperbarui profil",
           "failureNamed": "Gagal memperbarui \"${name}\"",
+          "bulkSuccess(plural, param=count)": {
+            "other": "$count profil diperbarui"
+          },
           "bulkPartial": "${success} berhasil\n${failed} gagal: ${names}"
         },
         "delete": {
-          "success": "Profil berhasil dihapus"
+          "success": "Profil dihapus"
         }
       }
     },
@@ -222,7 +225,7 @@
         "autoIpCheck": "Periksa IP koneksi secara otomatis",
         "dynamicNotification": "Tampilkan kecepatan di notifikasi",
         "hapticFeedback": "Umpan balik haptik",
-        "actionAtClosing": "Tindakan saat menutup",
+        "actionAtClosing": "Saat menutup jendela",
         "autoStart": "Mulai saat masuk",
         "silentStart": "Mulai diminimalkan",
         "ignoreBatteryOptimizations": "Nonaktifkan optimasi baterai",
@@ -263,17 +266,17 @@
             "validUrlEx": "https://example.com",
             "validUrl": "\"URL\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe atau google chrome atau chrome",
-            "validProcessName": "\"Nama Proses\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "\"Nama proses\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "\"Jalur Proses\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "\"Jalur proses\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 atau 1:65000",
-            "validPortRange": "\"Port\" atau \"Rentang Port\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "\"Port\" atau \"Rentang port\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 atau 10.0.0.0/24",
             "validIpCidr": "IP CIDR yang valid seperti\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com atau dl.google.com",
             "validDomain": "\"Domain\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com atau .ir",
-            "validDomainSuffix": "\"Sufiks Domain\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "\"Sufiks domain\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Nama",
               "outbound": "Keluar jika cocok",
@@ -377,7 +380,7 @@
               "resetToDefault": "Setel ulang ke default",
               "autoUpdateInterval": "Interval pembaruan otomatis",
               "toast": {
-                "success": "Pilihan aplikasi otomatis berhasil diselesaikan",
+                "success": "Pilihan otomatis selesai",
                 "failure": "Pilihan otomatis gagal",
                 "regionNotFound": "Pilihan otomatis tidak ditemukan untuk wilayah \"${region}\"",
                 "alreadyInAuto": "Pilihan Anda sudah ada dalam daftar otomatis"
@@ -564,8 +567,16 @@
       "expireDate": "Tanggal kedaluwarsa",
       "expired": "Kedaluwarsa",
       "noTraffic": "Kuota habis",
+      "remainingDuration(plural, param=days)": {
+        "other": "Sisa $days hari"
+      },
+      "remainingUnlimited": "Tanpa batas",
       "remainingTrafficSemanticLabel": "${consumed} dari ${total} lalu lintas terpakai",
-      "remainingTraffic": "Sisa lalu lintas"
+      "remainingTraffic": "Sisa lalu lintas",
+      "openWebPage": "Buka halaman web",
+      "support": "Dukungan",
+      "openLinkTitle": "Buka tautan ini?",
+      "openLinkAction": "Buka"
     }
   },
   "dialogs": {
@@ -628,26 +639,29 @@
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Impor aturan rute?",
-        "message": "Mengimpor aturan rute dari sumber yang tidak tepercaya dapat menjadi risiko keamanan\nLanjutkan hanya jika Anda mempercayai tautan ini"
+        "message": "Aturan rute menentukan ke mana lalu lintas Anda pergi.\nHanya impor dari sumber yang Anda percayai."
       }
     },
     "experimentalNotice": {
       "title": "Fitur eksperimental sedang digunakan",
-      "msg": "Anda telah mengaktifkan beberapa fitur eksperimental yang mungkin memengaruhi kualitas koneksi dan menyebabkan kesalahan tak terduga. Anda selalu dapat mengubah atau menyetel ulang opsi ini dari halaman konfigurasi.",
+      "msg": "Anda telah mengaktifkan beberapa fitur eksperimental yang mungkin memengaruhi kualitas koneksi dan menyebabkan kesalahan tak terduga. Anda selalu dapat mengubah atau menyetel ulang opsi ini di Pengaturan.",
       "disable": "Jangan tampilkan lagi"
     },
     "noActiveProfile": {
       "title": "Pilih profil",
-      "msg": "Mari kita mulai dengan menambahkan profil koneksi yang berisi detail koneksi VPN Anda.\n\nBelum punya server VPN? Jangan khawatir, ikuti tutorial di bawah ini untuk mengaturnya dengan cepat dan gratis.",
+      "msg": "Mari mulai. Tambahkan profil koneksi dengan detail server VPN Anda.\n\nBelum punya server? Tidak masalah — panduan di bawah ini menunjukkan cara membuatnya secara gratis.",
       "helpBtn": {
         "label": "Tunjukkan caranya",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Peringatan tautan eksternal",
-      "youAreAboutToVisit": "Anda akan mengunjungi:",
-      "thisWebsiteIsNotInOurTrustedList": "Situs web ini tidak ada dalam daftar tepercaya kami. Harap lanjutkan dengan hati-hati."
+      "title": "Peringatan",
+      "cannotVerify": "Kami tidak dapat memverifikasi tautan ini",
+      "avoidIfUnsure": "Jika Anda tidak sepenuhnya yakin, jangan membayar atau membagikan informasi sensitif",
+      "ownResponsibility": "Anda melanjutkan dengan risiko sendiri",
+      "open": "Buka",
+      "openIn": "Buka (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "Tag lengkap:",
@@ -655,7 +669,7 @@
       "testTime": "Waktu uji:",
       "testDelay": "Jeda uji:",
       "isSelected": "Dipilih:",
-      "isGroup": "Grup",
+      "isGroup": "Grup:",
       "isSecure": "Aman:",
       "port": "Port:",
       "host": "Host:",
@@ -691,7 +705,7 @@
     "connection": {
       "unexpected": "Kesalahan koneksi tak terduga",
       "timeout": "Waktu koneksi habis",
-      "badResponse": "Respons buruk",
+      "badResponse": "Respons server tidak valid",
       "connectionError": "Kesalahan koneksi",
       "badCertificate": "Sertifikat rusak"
     },
@@ -717,11 +731,11 @@
     },
     "warp": {
       "missingLicense": "Lisensi WARP hilang",
-      "missingLicenseMsg": "Profil yang dipilih menggunakan fitur WARP; untuk menggunakan fitur ini, Anda harus menyetujui lisensi WARP"
+      "missingLicenseMsg": "Profil ini menggunakan WARP. Setujui lisensi WARP untuk melanjutkan."
     },
     "psiphon": {
       "missingLicense": "Lisensi Psiphon diperlukan",
-      "missingLicenseMsg": "Profil yang dipilih menggunakan fitur Psiphon; untuk menggunakan fitur ini, Anda harus menyetujui lisensi Psiphon"
+      "missingLicenseMsg": "Profil ini menggunakan Psiphon. Setujui lisensi Psiphon untuk melanjutkan."
     }
   }
 }

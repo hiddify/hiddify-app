@@ -20,7 +20,7 @@
     "url": "URL",
     "add": "新增",
     "clipboard": "剪貼簿",
-    "addToClipboard": "新增至剪貼簿",
+    "addToClipboard": "複製到剪貼簿",
     "scanQr": "掃描 QR Code",
     "free": "免費",
     "warp": "WARP",
@@ -75,18 +75,18 @@
       },
       "export": {
         "clipboard": {
-          "success": "已成功新增至剪貼簿",
+          "success": "已複製到剪貼簿",
           "failure": "複製到剪貼簿失敗",
           "contentTooLarge": "內容過大，請改用匯出檔案"
         },
         "file": {
-          "success": "JSON 檔案建立成功",
+          "success": "已建立 JSON 檔案",
           "failure": "建立檔案失敗"
         }
       },
       "import": {
         "confirm": "確認匯入",
-        "success": "匯入成功",
+        "success": "已匯入",
         "failure": "匯入失敗"
       },
       "autoSave": {
@@ -102,7 +102,7 @@
   "pages": {
     "home": {
       "title": "首頁",
-      "quickSettings": "快速設定選項"
+      "quickSettings": "快速設定"
     },
     "proxies": {
       "title": "代理",
@@ -140,26 +140,29 @@
       "failedToLoad": "載入失敗",
       "updateSubscriptions": "更新訂閱",
       "share": {
-        "urlToClipboard": "URL 到剪貼簿",
-        "showUrlQr": "顯示 URL QR Code",
-        "jsonToClipboard": "JSON 到剪貼簿"
+        "urlToClipboard": "複製 URL",
+        "showUrlQr": "顯示 QR Code",
+        "jsonToClipboard": "複製 JSON"
       },
       "msg": {
         "save": {
-          "success": "設定檔儲存成功"
+          "success": "設定檔已儲存"
         },
         "invalidUrl": "無效的 URL",
         "add": {
           "failure": "新增設定檔失敗"
         },
         "update": {
-          "success": "設定檔更新成功",
+          "success": "設定檔已更新",
+          "bulkSuccess(plural, param=count)": {
+            "other": "已更新 $count 個設定檔"
+          },
           "failure": "更新設定檔失敗",
           "failureNamed": "更新「${name}」失敗",
           "bulkPartial": "${success} 個成功\n${failed} 個失敗：${names}"
         },
         "delete": {
-          "success": "設定檔刪除成功"
+          "success": "設定檔已刪除"
         }
       }
     },
@@ -222,7 +225,7 @@
         "autoIpCheck": "自動檢查連線 IP",
         "dynamicNotification": "在通知中顯示速度",
         "hapticFeedback": "觸覺回饋",
-        "actionAtClosing": "關閉時操作",
+        "actionAtClosing": "關閉視窗時",
         "autoStart": "開機自啟",
         "silentStart": "靜默啟動",
         "ignoreBatteryOptimizations": "忽略電池最佳化",
@@ -377,7 +380,7 @@
               "resetToDefault": "重設為預設",
               "autoUpdateInterval": "自動更新間隔",
               "toast": {
-                "success": "自動選擇應用程式成功完成",
+                "success": "自動選擇已完成",
                 "failure": "自動選擇失敗",
                 "regionNotFound": "未找到「${region}」地區的自動選擇",
                 "alreadyInAuto": "您的選擇已在自動清單中"
@@ -564,8 +567,16 @@
       "expireDate": "到期日期",
       "expired": "已到期",
       "noTraffic": "流量已用盡",
+      "remainingDuration(plural, param=days)": {
+        "other": "剩餘 $days 天"
+      },
+      "remainingUnlimited": "無限制",
       "remainingTrafficSemanticLabel": "已使用 ${consumed} / ${total} 流量",
-      "remainingTraffic": "剩餘流量"
+      "remainingTraffic": "剩餘流量",
+      "openWebPage": "開啟網頁",
+      "support": "支援",
+      "openLinkTitle": "開啟此連結？",
+      "openLinkAction": "開啟"
     }
   },
   "dialogs": {
@@ -628,26 +639,29 @@
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "匯入路由規則？",
-        "message": "從不受信任的來源匯入路由規則可能會有安全風險\n只有在您信任此連結的情況下才繼續"
+        "message": "路由規則決定您的流量走向。\n請僅從您信任的來源匯入。"
       }
     },
     "experimentalNotice": {
       "title": "正在使用實驗性功能",
-      "msg": "您已啟用了一些實驗性功能，這可能會影響連線品質並導致意外錯誤。您可以隨時在設定選項頁面變更或重設這些選項。",
+      "msg": "您已啟用了一些實驗性功能，這可能會影響連線品質並導致意外錯誤。您可以隨時在設定中變更或重設這些選項。",
       "disable": "不再顯示"
     },
     "noActiveProfile": {
       "title": "選擇一個設定檔",
-      "msg": "讓我們從新增一個包含您 VPN 連線詳細資訊的設定檔開始。\n\n還沒有 VPN 伺服器？別擔心，按照下面的教學，您可以快速免費地設定一個。",
+      "msg": "讓我們開始吧。新增一個包含您 VPN 伺服器資訊的連線設定檔。\n\n還沒有伺服器？沒關係 — 下面的指南會告訴您如何免費建立一個。",
       "helpBtn": {
         "label": "告訴我如何操作",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "外部連結警告",
-      "youAreAboutToVisit": "您即將造訪：",
-      "thisWebsiteIsNotInOurTrustedList": "此網站不在我們的信任清單中。請謹慎操作。"
+      "title": "警告",
+      "cannotVerify": "我們無法驗證此連結",
+      "avoidIfUnsure": "如果您無法完全確定，請勿付款或分享敏感資訊",
+      "ownResponsibility": "繼續操作的風險由您自行承擔",
+      "open": "開啟",
+      "openIn": "開啟 (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "完整標籤：",
@@ -655,7 +669,7 @@
       "testTime": "測試時間：",
       "testDelay": "測試延遲：",
       "isSelected": "已選擇：",
-      "isGroup": "是群組",
+      "isGroup": "群組：",
       "isSecure": "安全：",
       "port": "連接埠：",
       "host": "主機：",
@@ -691,7 +705,7 @@
     "connection": {
       "unexpected": "意外連線錯誤",
       "timeout": "連線超時",
-      "badResponse": "回應錯誤",
+      "badResponse": "伺服器回應無效",
       "connectionError": "連線錯誤",
       "badCertificate": "憑證無效"
     },
@@ -717,11 +731,11 @@
     },
     "warp": {
       "missingLicense": "WARP 授權缺失",
-      "missingLicenseMsg": "所選設定檔使用 WARP 功能；要使用此功能，必須同意 WARP 授權條款"
+      "missingLicenseMsg": "此設定檔使用 WARP。請同意 WARP 授權條款以繼續。"
     },
     "psiphon": {
       "missingLicense": "需要 Psiphon 授權",
-      "missingLicenseMsg": "所選設定檔使用 Psiphon 功能；要使用此功能，必須同意 Psiphon 授權條款"
+      "missingLicenseMsg": "此設定檔使用 Psiphon。請同意 Psiphon 授權條款以繼續。"
     }
   }
 }

@@ -20,7 +20,7 @@
     "url": "URL",
     "add": "Ajouter",
     "clipboard": "Presse-papiers",
-    "addToClipboard": "Ajouter au presse-papiers",
+    "addToClipboard": "Copier dans le presse-papiers",
     "scanQr": "Scanner le QR code",
     "free": "Gratuit",
     "warp": "WARP",
@@ -75,22 +75,22 @@
       },
       "export": {
         "clipboard": {
-          "success": "Ajouté au presse-papiers avec succès",
+          "success": "Copié dans le presse-papiers",
           "failure": "Échec de la copie dans le presse-papiers",
           "contentTooLarge": "Contenu trop volumineux. Utilisez plutôt l'exportation de fichier"
         },
         "file": {
-          "success": "Fichier JSON créé avec succès",
+          "success": "Fichier JSON créé",
           "failure": "Échec de la création du fichier"
         }
       },
       "import": {
         "confirm": "Confirmer l'importation",
-        "success": "Importé avec succès",
+        "success": "Importé",
         "failure": "Échec de l'importation"
       },
       "autoSave": {
-        "success": "Modifications enregistrées automatiquement avec succès"
+        "success": "Modifications enregistrées automatiquement"
       }
     }
   },
@@ -102,7 +102,7 @@
   "pages": {
     "home": {
       "title": "Accueil",
-      "quickSettings": "Options de réglages rapides"
+      "quickSettings": "Réglages rapides"
     },
     "proxies": {
       "title": "Proxys",
@@ -140,26 +140,30 @@
       "failedToLoad": "Échec du chargement",
       "updateSubscriptions": "Mettre à jour les abonnements",
       "share": {
-        "urlToClipboard": "URL dans le presse-papiers",
-        "showUrlQr": "Afficher le QR code de l'URL",
-        "jsonToClipboard": "JSON dans le presse-papiers"
+        "urlToClipboard": "Copier l'URL",
+        "showUrlQr": "Afficher le QR code",
+        "jsonToClipboard": "Copier le JSON"
       },
       "msg": {
         "save": {
-          "success": "Profil enregistré avec succès"
+          "success": "Profil enregistré"
         },
         "invalidUrl": "URL invalide",
         "add": {
           "failure": "Échec de l'ajout du profil"
         },
         "update": {
-          "success": "Profil mis à jour avec succès",
+          "success": "Profil mis à jour",
           "failure": "Échec de la mise à jour du profil",
           "failureNamed": "Échec de la mise à jour de \"${name}\"",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profil mis à jour",
+            "other": "$count profils mis à jour"
+          },
           "bulkPartial": "${success} réussis\n${failed} échoués : ${names}"
         },
         "delete": {
-          "success": "Profil supprimé avec succès"
+          "success": "Profil supprimé"
         }
       }
     },
@@ -222,7 +226,7 @@
         "autoIpCheck": "Vérifier automatiquement l'IP de connexion",
         "dynamicNotification": "Afficher la vitesse dans la notification",
         "hapticFeedback": "Retour haptique",
-        "actionAtClosing": "Action à la fermeture",
+        "actionAtClosing": "À la fermeture de la fenêtre",
         "autoStart": "Lancer au démarrage",
         "silentStart": "Démarrer réduit",
         "ignoreBatteryOptimizations": "Désactiver l'optimisation de la batterie",
@@ -377,7 +381,7 @@
               "resetToDefault": "Réinitialiser par défaut",
               "autoUpdateInterval": "Intervalle de mise à jour automatique",
               "toast": {
-                "success": "Sélection automatique des applications terminée avec succès",
+                "success": "Sélection automatique terminée",
                 "failure": "Échec de la sélection automatique",
                 "regionNotFound": "Sélection automatique non trouvée pour la région \"${region}\"",
                 "alreadyInAuto": "Vos sélections sont déjà dans la liste automatique"
@@ -564,8 +568,17 @@
       "expireDate": "Date d'expiration",
       "expired": "Expiré",
       "noTraffic": "Quota épuisé",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days jour restant",
+        "other": "$days jours restants"
+      },
+      "remainingUnlimited": "Illimité",
       "remainingTrafficSemanticLabel": "${consumed} sur ${total} de trafic consommé",
-      "remainingTraffic": "Trafic restant"
+      "remainingTraffic": "Trafic restant",
+      "openWebPage": "Ouvrir la page web",
+      "support": "Assistance",
+      "openLinkTitle": "Ouvrir ce lien ?",
+      "openLinkAction": "Ouvrir"
     }
   },
   "dialogs": {
@@ -621,25 +634,36 @@
           "title": "Supprimer la règle",
           "msg": "Êtes-vous sûr de vouloir supprimer la règle \"$rulename\" ?"
         }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "Ajouter un profil ?",
+        "message": "Un lien externe de \"${host}\" demande à ajouter un nouveau profil. Voulez-vous l'importer ?"
+      },
+      "importRouteRuleByDeepLinkWarning": {
+        "title": "Importer une règle de routage ?",
+        "message": "Les règles de routage déterminent où va votre trafic.\nNe les importez que depuis une source de confiance."
       }
     },
     "experimentalNotice": {
       "title": "Fonctionnalités expérimentales en cours d'utilisation",
-      "msg": "Vous avez activé des fonctionnalités expérimentales qui pourraient affecter la qualité de la connexion et causer des erreurs inattendues. Vous pouvez toujours modifier ou réinitialiser ces options depuis la page de configuration.",
+      "msg": "Vous avez activé des fonctionnalités expérimentales qui pourraient affecter la qualité de la connexion et causer des erreurs inattendues. Vous pouvez toujours modifier ou réinitialiser ces options dans les Paramètres.",
       "disable": "Ne plus afficher"
     },
     "noActiveProfile": {
       "title": "Choisissez un profil",
-      "msg": "Pour commencer, ajoutez un profil de connexion qui inclut les détails de votre connexion VPN.\n\nVous n'avez pas encore de serveur VPN ? Pas de problème, suivez le tutoriel ci-dessous pour en configurer un rapidement et gratuitement.",
+      "msg": "Commençons. Ajoutez un profil de connexion avec les détails de votre serveur VPN.\n\nPas encore de serveur ? Pas de problème — le guide ci-dessous vous montre comment en créer un gratuitement.",
       "helpBtn": {
         "label": "Montrez-moi comment",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Avertissement de lien externe",
-      "youAreAboutToVisit": "Vous êtes sur le point de visiter :",
-      "thisWebsiteIsNotInOurTrustedList": "Ce site web ne figure pas dans notre liste de confiance. Veuillez procéder avec prudence."
+      "title": "Avertissement",
+      "cannotVerify": "Nous ne pouvons pas vérifier ce lien",
+      "avoidIfUnsure": "Si vous n'êtes pas totalement sûr, ne payez pas et ne partagez pas d'informations sensibles",
+      "ownResponsibility": "Vous continuez à vos propres risques",
+      "open": "Ouvrir",
+      "openIn": "Ouvrir (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "Tag complet :",
@@ -647,8 +671,8 @@
       "testTime": "Heure du test :",
       "testDelay": "Délai du test :",
       "isSelected": "Sélectionné :",
-      "isGroup": "Est un groupe",
-      "isSecure": "Est sécurisé :",
+      "isGroup": "Groupe :",
+      "isSecure": "Sécurisé :",
       "port": "Port :",
       "host": "Hôte :",
       "ip": "IP :",
@@ -664,7 +688,7 @@
     },
     "windowClosing": {
       "askEachTime": "Demander à chaque fois",
-      "alertMessage": "Masquer ou quitter l'application ?",
+      "alertMessage": "Masquer ou quitter l'app ?",
       "remember": "Mémoriser mon choix"
     }
   },
@@ -683,14 +707,14 @@
     "connection": {
       "unexpected": "Erreur de connexion inattendue",
       "timeout": "Délai de connexion expiré",
-      "badResponse": "Mauvaise réponse",
+      "badResponse": "Réponse du serveur invalide",
       "connectionError": "Erreur de connexion",
       "badCertificate": "Certificat invalide"
     },
     "profiles": {
       "unexpected": "Erreur inattendue",
       "notFound": "Profil non trouvé",
-      "invalidConfig": "Configurations invalides",
+      "invalidConfig": "Configuration invalide",
       "invalidUrl": "URL invalide",
       "canceledByUser": "Annulé par l'utilisateur"
     },
@@ -709,11 +733,11 @@
     },
     "warp": {
       "missingLicense": "Licence WARP manquante",
-      "missingLicenseMsg": "Le profil sélectionné utilise la fonctionnalité WARP ; pour utiliser cette fonctionnalité, vous devez accepter la licence WARP"
+      "missingLicenseMsg": "Ce profil utilise WARP. Acceptez la licence WARP pour continuer."
     },
     "psiphon": {
       "missingLicense": "Licence Psiphon requise",
-      "missingLicenseMsg": "Le profil sélectionné utilise la fonctionnalité Psiphon ; pour utiliser cette fonctionnalité, vous devez accepter la licence Psiphon"
+      "missingLicenseMsg": "Ce profil utilise Psiphon. Acceptez la licence Psiphon pour continuer."
     }
   }
 }

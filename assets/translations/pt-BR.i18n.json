@@ -20,8 +20,8 @@
     "url": "URL",
     "add": "Adicionar",
     "clipboard": "Área de transferência",
-    "addToClipboard": "Adicionar à área de transferência",
-    "scanQr": "Escanear QR",
+    "addToClipboard": "Copiar para a área de transferência",
+    "scanQr": "Escanear QR code",
     "free": "Grátis",
     "warp": "WARP",
     "fragment": "Fragmento",
@@ -75,22 +75,22 @@
       },
       "export": {
         "clipboard": {
-          "success": "Adicionado à área de transferência com sucesso",
+          "success": "Copiado para a área de transferência",
           "failure": "Falha ao copiar para a área de transferência",
           "contentTooLarge": "Conteúdo muito grande. Use a exportação para arquivo"
         },
         "file": {
-          "success": "Arquivo JSON criado com sucesso",
+          "success": "Arquivo JSON criado",
           "failure": "Falha ao criar o arquivo"
         }
       },
       "import": {
         "confirm": "Confirmar importação",
-        "success": "Importado com sucesso",
+        "success": "Importado",
         "failure": "Falha ao importar"
       },
       "autoSave": {
-        "success": "Alterações salvas automaticamente com sucesso"
+        "success": "Alterações salvas automaticamente"
       }
     }
   },
@@ -102,7 +102,7 @@
   "pages": {
     "home": {
       "title": "Início",
-      "quickSettings": "Opções de configurações rápidas"
+      "quickSettings": "Configurações rápidas"
     },
     "proxies": {
       "title": "Proxies",
@@ -140,26 +140,30 @@
       "failedToLoad": "Falha ao carregar",
       "updateSubscriptions": "Atualizar assinaturas",
       "share": {
-        "urlToClipboard": "URL para a área de transferência",
-        "showUrlQr": "Mostrar QR code da URL",
-        "jsonToClipboard": "JSON para a área de transferência"
+        "urlToClipboard": "Copiar URL",
+        "showUrlQr": "Mostrar QR code",
+        "jsonToClipboard": "Copiar JSON"
       },
       "msg": {
         "save": {
-          "success": "Perfil salvo com sucesso"
+          "success": "Perfil salvo"
         },
         "invalidUrl": "URL inválida",
         "add": {
           "failure": "Falha ao adicionar perfil"
         },
         "update": {
-          "success": "Perfil atualizado com sucesso",
+          "success": "Perfil atualizado",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count perfil atualizado",
+            "other": "$count perfis atualizados"
+          },
           "failure": "Falha ao atualizar perfil",
           "failureNamed": "Falha ao atualizar \"${name}\"",
           "bulkPartial": "${success} com sucesso\n${failed} com falha: ${names}"
         },
         "delete": {
-          "success": "Perfil excluído com sucesso"
+          "success": "Perfil excluído"
         }
       }
     },
@@ -222,7 +226,7 @@
         "autoIpCheck": "Verificar IP da conexão automaticamente",
         "dynamicNotification": "Exibir velocidade na notificação",
         "hapticFeedback": "Feedback tátil",
-        "actionAtClosing": "Ação ao fechar",
+        "actionAtClosing": "Ao fechar a janela",
         "autoStart": "Iniciar com o sistema",
         "silentStart": "Iniciar minimizado",
         "ignoreBatteryOptimizations": "Desativar otimização de bateria",
@@ -263,17 +267,17 @@
             "validUrlEx": "https://example.com",
             "validUrl": "\"URL\" válido como\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe ou google chrome ou chrome",
-            "validProcessName": "\"Nome do Processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "\"Nome do processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "\"Caminho do Processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "\"Caminho do processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 ou 1:65000",
-            "validPortRange": "\"Porta\" ou \"Intervalo de Portas\" válido como\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "\"Porta\" ou \"Intervalo de portas\" válido como\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 ou 10.0.0.0/24",
             "validIpCidr": "IP CIDR válido como\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com ou dl.google.com",
             "validDomain": "\"Domínio\" válido como\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com ou .ir",
-            "validDomainSuffix": "\"Sufixo de Domínio\" válido como\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "\"Sufixo de domínio\" válido como\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Nome",
               "outbound": "Saída se corresponder",
@@ -377,7 +381,7 @@
               "resetToDefault": "Redefinir para o padrão",
               "autoUpdateInterval": "Intervalo de atualização automática",
               "toast": {
-                "success": "Seleção automática de aplicativos concluída com sucesso",
+                "success": "Seleção automática concluída",
                 "failure": "Falha na seleção automática",
                 "regionNotFound": "Seleção automática não encontrada para a região \"${region}\"",
                 "alreadyInAuto": "Suas seleções já estão na lista automática"
@@ -564,8 +568,17 @@
       "expireDate": "Data de validade",
       "expired": "Expirado",
       "noTraffic": "Cota esgotada",
+      "remainingDuration(plural, param=days)": {
+        "one": "Resta $days dia",
+        "other": "Restam $days dias"
+      },
+      "remainingUnlimited": "Ilimitado",
       "remainingTrafficSemanticLabel": "${consumed} de ${total} de tráfego consumido",
-      "remainingTraffic": "Tráfego restante"
+      "remainingTraffic": "Tráfego restante",
+      "openWebPage": "Abrir página web",
+      "support": "Suporte",
+      "openLinkTitle": "Abrir este link?",
+      "openLinkAction": "Abrir"
     }
   },
   "dialogs": {
@@ -598,7 +611,7 @@
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "Isso substituirá todas as opções de configuração pelos valores fornecidos. Você tem certeza?"
+          "msg": "Isso sobrescreverá todas as opções de configuração pelos valores fornecidos. Você tem certeza?"
         }
       },
       "profile": {
@@ -628,26 +641,29 @@
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Importar regra de roteamento?",
-        "message": "Importar regras de roteamento de fontes não confiáveis pode ser um risco de segurança\nProssiga apenas se você confiar neste link"
+        "message": "As regras de roteamento decidem por onde o seu tráfego passa.\nSó importe de uma fonte em que você confia."
       }
     },
     "experimentalNotice": {
       "title": "Recursos experimentais em uso",
-      "msg": "Você ativou alguns recursos experimentais que podem afetar a qualidade da conexão e causar erros inesperados. Você sempre pode alterar ou redefinir essas opções na página de configurações.",
+      "msg": "Você ativou alguns recursos experimentais que podem afetar a qualidade da conexão e causar erros inesperados. Você sempre pode alterar ou redefinir essas opções nas Configurações.",
       "disable": "Não mostrar novamente"
     },
     "noActiveProfile": {
       "title": "Escolha um perfil",
-      "msg": "Para começar, adicione um perfil de conexão que inclua os detalhes da sua conexão VPN.\n\nAinda não tem um servidor VPN? Não se preocupe, siga o tutorial abaixo para configurar um rapidamente e de graça.",
+      "msg": "Vamos começar. Adicione um perfil de conexão com os detalhes do seu servidor VPN.\n\nAinda não tem servidor? Sem problema — o guia abaixo mostra como criar um de graça.",
       "helpBtn": {
         "label": "Mostre-me como",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Aviso de link externo",
-      "youAreAboutToVisit": "Você está prestes a visitar:",
-      "thisWebsiteIsNotInOurTrustedList": "Este site não está na nossa lista de confiança. Prossiga com cautela."
+      "title": "Aviso",
+      "cannotVerify": "Não conseguimos verificar este link",
+      "avoidIfUnsure": "Se você não tiver total certeza, não pague nem compartilhe informações sensíveis",
+      "ownResponsibility": "Você continua por sua própria conta e risco",
+      "open": "Abrir",
+      "openIn": "Abrir (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "Tag completa:",
@@ -655,8 +671,8 @@
       "testTime": "Hora do teste:",
       "testDelay": "Latência do teste:",
       "isSelected": "Selecionado:",
-      "isGroup": "É um grupo",
-      "isSecure": "É seguro:",
+      "isGroup": "Grupo:",
+      "isSecure": "Seguro:",
       "port": "Porta:",
       "host": "Host:",
       "ip": "IP:",
@@ -691,14 +707,14 @@
     "connection": {
       "unexpected": "Erro de conexão inesperado",
       "timeout": "Tempo limite de conexão esgotado",
-      "badResponse": "Resposta inválida",
+      "badResponse": "Resposta inválida do servidor",
       "connectionError": "Erro de conexão",
       "badCertificate": "Certificado inválido"
     },
     "profiles": {
       "unexpected": "Erro inesperado",
       "notFound": "Perfil não encontrado",
-      "invalidConfig": "Configurações inválidas",
+      "invalidConfig": "Configuração inválida",
       "invalidUrl": "URL inválida",
       "canceledByUser": "Cancelado pelo usuário"
     },
@@ -717,11 +733,11 @@
     },
     "warp": {
       "missingLicense": "Licença do WARP ausente",
-      "missingLicenseMsg": "O perfil selecionado usa o recurso WARP; para usar este recurso, você deve concordar com a licença do WARP"
+      "missingLicenseMsg": "Este perfil usa WARP. Aceite a licença do WARP para continuar."
     },
     "psiphon": {
       "missingLicense": "Licença do Psiphon necessária",
-      "missingLicenseMsg": "O perfil selecionado usa o recurso Psiphon; para usar este recurso, você deve concordar com a licença do Psiphon"
+      "missingLicenseMsg": "Este perfil usa Psiphon. Aceite a licença do Psiphon para continuar."
     }
   }
 }

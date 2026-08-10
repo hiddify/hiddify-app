@@ -20,7 +20,7 @@
     "url": "URL",
     "add": "添加",
     "clipboard": "剪贴板",
-    "addToClipboard": "添加到剪贴板",
+    "addToClipboard": "复制到剪贴板",
     "scanQr": "扫描二维码",
     "free": "免费",
     "warp": "WARP",
@@ -75,18 +75,18 @@
       },
       "export": {
         "clipboard": {
-          "success": "已成功添加到剪贴板",
+          "success": "已复制到剪贴板",
           "failure": "复制到剪贴板失败",
           "contentTooLarge": "内容过大，请使用导出文件"
         },
         "file": {
-          "success": "JSON 文件创建成功",
+          "success": "已创建 JSON 文件",
           "failure": "创建文件失败"
         }
       },
       "import": {
         "confirm": "确认导入",
-        "success": "导入成功",
+        "success": "已导入",
         "failure": "导入失败"
       },
       "autoSave": {
@@ -102,7 +102,7 @@
   "pages": {
     "home": {
       "title": "主页",
-      "quickSettings": "快速设置选项"
+      "quickSettings": "快速设置"
     },
     "proxies": {
       "title": "代理",
@@ -140,26 +140,29 @@
       "failedToLoad": "加载失败",
       "updateSubscriptions": "更新订阅",
       "share": {
-        "urlToClipboard": "URL 到剪贴板",
-        "showUrlQr": "显示 URL 二维码",
-        "jsonToClipboard": "JSON 到剪贴板"
+        "urlToClipboard": "复制 URL",
+        "showUrlQr": "显示二维码",
+        "jsonToClipboard": "复制 JSON"
       },
       "msg": {
         "save": {
-          "success": "配置文件保存成功"
+          "success": "配置文件已保存"
         },
         "invalidUrl": "无效的 URL",
         "add": {
           "failure": "添加配置文件失败"
         },
         "update": {
-          "success": "配置文件更新成功",
+          "success": "配置文件已更新",
+          "bulkSuccess(plural, param=count)": {
+            "other": "已更新 $count 个配置文件"
+          },
           "failure": "更新配置文件失败",
           "failureNamed": "更新 \"${name}\" 失败",
           "bulkPartial": "${success} 个成功\n${failed} 个失败：${names}"
         },
         "delete": {
-          "success": "配置文件删除成功"
+          "success": "配置文件已删除"
         }
       }
     },
@@ -222,7 +225,7 @@
         "autoIpCheck": "自动检查连接 IP",
         "dynamicNotification": "在通知中显示速度",
         "hapticFeedback": "触觉反馈",
-        "actionAtClosing": "关闭时操作",
+        "actionAtClosing": "关闭窗口时",
         "autoStart": "开机自启",
         "silentStart": "静默启动",
         "ignoreBatteryOptimizations": "忽略电池优化",
@@ -377,7 +380,7 @@
               "resetToDefault": "重置为默认",
               "autoUpdateInterval": "自动更新间隔",
               "toast": {
-                "success": "自动选择应用成功完成",
+                "success": "自动选择已完成",
                 "failure": "自动选择失败",
                 "regionNotFound": "未找到 \"${region}\" 地区的自动选择",
                 "alreadyInAuto": "您的选择已在自动列表中"
@@ -564,8 +567,16 @@
       "expireDate": "到期日期",
       "expired": "已过期",
       "noTraffic": "流量已用尽",
+      "remainingDuration(plural, param=days)": {
+        "other": "剩余 $days 天"
+      },
+      "remainingUnlimited": "无限制",
       "remainingTrafficSemanticLabel": "已使用 ${consumed} / ${total} 流量",
-      "remainingTraffic": "剩余流量"
+      "remainingTraffic": "剩余流量",
+      "openWebPage": "打开网页",
+      "support": "支持",
+      "openLinkTitle": "打开此链接？",
+      "openLinkAction": "打开"
     }
   },
   "dialogs": {
@@ -628,26 +639,29 @@
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "导入路由规则？",
-        "message": "从不受信任的来源导入路由规则可能会存在安全风险\n仅当您信任此链接时才继续"
+        "message": "路由规则决定您的流量走向。\n请仅从您信任的来源导入。"
       }
     },
     "experimentalNotice": {
       "title": "正在使用实验性功能",
-      "msg": "您已启用了一些实验性功能，这可能会影响连接质量并导致意外错误。您可以随时在配置选项页面更改或重置这些选项。",
+      "msg": "您已启用了一些实验性功能，这可能会影响连接质量并导致意外错误。您可以随时在设置中更改或重置这些选项。",
       "disable": "不再显示"
     },
     "noActiveProfile": {
       "title": "选择一个配置文件",
-      "msg": "让我们从添加一个包含您 VPN 连接详细信息的配置文件开始。\n\n还没有 VPN 服务器？别担心，按照下面的教程，您可以快速免费地设置一个。",
+      "msg": "让我们开始吧。添加一个包含您 VPN 服务器信息的连接配置文件。\n\n还没有服务器？没关系 — 下面的指南会告诉您如何免费搭建一个。",
       "helpBtn": {
         "label": "告诉我如何操作",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "外部链接警告",
-      "youAreAboutToVisit": "您即将访问：",
-      "thisWebsiteIsNotInOurTrustedList": "此网站不在我们的信任列表中。请谨慎操作。"
+      "title": "警告",
+      "cannotVerify": "我们无法验证此链接",
+      "avoidIfUnsure": "如果您不能完全确定，请勿付款或分享敏感信息",
+      "ownResponsibility": "继续操作的风险由您自行承担",
+      "open": "打开",
+      "openIn": "打开 (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "完整标签：",
@@ -655,7 +669,7 @@
       "testTime": "测试时间：",
       "testDelay": "测试延迟：",
       "isSelected": "已选择：",
-      "isGroup": "是组",
+      "isGroup": "组：",
       "isSecure": "安全：",
       "port": "端口：",
       "host": "主机：",
@@ -672,7 +686,7 @@
     },
     "windowClosing": {
       "askEachTime": "每次询问",
-      "alertMessage": "隐藏还是退出应用程序？",
+      "alertMessage": "隐藏还是退出应用？",
       "remember": "记住我的选择"
     }
   },
@@ -691,7 +705,7 @@
     "connection": {
       "unexpected": "意外连接错误",
       "timeout": "连接超时",
-      "badResponse": "响应错误",
+      "badResponse": "服务器响应无效",
       "connectionError": "连接错误",
       "badCertificate": "证书无效"
     },
@@ -717,11 +731,11 @@
     },
     "warp": {
       "missingLicense": "WARP 许可证缺失",
-      "missingLicenseMsg": "所选配置文件使用 WARP 功能；要使用此功能，必须同意 WARP 许可证"
+      "missingLicenseMsg": "此配置文件使用 WARP。请同意 WARP 许可证以继续。"
     },
     "psiphon": {
       "missingLicense": "需要 Psiphon 许可证",
-      "missingLicenseMsg": "所选配置文件使用 Psiphon 功能；要使用此功能，必须同意 Psiphon 许可证"
+      "missingLicenseMsg": "此配置文件使用 Psiphon。请同意 Psiphon 许可证以继续。"
     }
   }
 }

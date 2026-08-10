@@ -20,8 +20,8 @@
     "url": "URL",
     "add": "افزودن",
     "clipboard": "کلیپ‌بورد",
-    "addToClipboard": "افزودن به کلیپ‌بورد",
-    "scanQr": "اسکن QR",
+    "addToClipboard": "کپی در کلیپ‌بورد",
+    "scanQr": "اسکن کد QR",
     "free": "رایگان",
     "warp": "WARP",
     "fragment": "Fragment",
@@ -75,22 +75,22 @@
       },
       "export": {
         "clipboard": {
-          "success": "با موفقیت در کلیپ‌بورد کپی شد",
+          "success": "در کلیپ‌بورد کپی شد",
           "failure": "کپی در کلیپ‌بورد ناموفق بود",
           "contentTooLarge": "محتوا بیش از حد بزرگ است. به جای آن از خروجی فایل استفاده کنید"
         },
         "file": {
-          "success": "فایل JSON با موفقیت ایجاد شد",
+          "success": "فایل JSON ایجاد شد",
           "failure": "ایجاد فایل ناموفق بود"
         }
       },
       "import": {
         "confirm": "تأیید ورود اطلاعات",
-        "success": "با موفقیت وارد شد",
+        "success": "وارد شد",
         "failure": "وارد کردن ناموفق بود"
       },
       "autoSave": {
-        "success": "تغییرات با موفقیت به‌طور خودکار ذخیره شد"
+        "success": "تغییرات به‌طور خودکار ذخیره شد"
       }
     }
   },
@@ -102,7 +102,7 @@
   "pages": {
     "home": {
       "title": "خانه",
-      "quickSettings": "گزینه‌های تنظیمات سریع"
+      "quickSettings": "تنظیمات سریع"
     },
     "proxies": {
       "title": "پروکسی‌ها",
@@ -140,26 +140,30 @@
       "failedToLoad": "بارگذاری ناموفق بود",
       "updateSubscriptions": "به‌روزرسانی اشتراک‌ها",
       "share": {
-        "urlToClipboard": "URL به کلیپ‌بورد",
-        "showUrlQr": "نمایش QR کد URL",
-        "jsonToClipboard": "JSON به کلیپ‌بورد"
+        "urlToClipboard": "کپی URL",
+        "showUrlQr": "نمایش کد QR",
+        "jsonToClipboard": "کپی JSON"
       },
       "msg": {
         "save": {
-          "success": "پروفایل با موفقیت ذخیره شد"
+          "success": "پروفایل ذخیره شد"
         },
         "invalidUrl": "URL نامعتبر است",
         "add": {
           "failure": "افزودن پروفایل ناموفق بود"
         },
         "update": {
-          "success": "پروفایل با موفقیت به‌روز شد",
+          "success": "پروفایل به‌روز شد",
           "failure": "به‌روزرسانی پروفایل ناموفق بود",
           "failureNamed": "به‌روزرسانی «${name}» ناموفق بود",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count پروفایل به‌روزرسانی شد",
+            "other": "$count پروفایل به‌روزرسانی شد"
+          },
           "bulkPartial": "${success} موفق\n${failed} ناموفق: ${names}"
         },
         "delete": {
-          "success": "پروفایل با موفقیت حذف شد"
+          "success": "پروفایل حذف شد"
         }
       }
     },
@@ -222,7 +226,7 @@
         "autoIpCheck": "بررسی خودکار IP اتصال",
         "dynamicNotification": "نمایش سرعت در اعلان",
         "hapticFeedback": "بازخورد لرزشی",
-        "actionAtClosing": "اقدام هنگام بستن",
+        "actionAtClosing": "هنگام بستن پنجره",
         "autoStart": "شروع هنگام ورود به سیستم",
         "silentStart": "شروع در حالت کمینه",
         "ignoreBatteryOptimizations": "غیرفعال کردن بهینه‌سازی باتری",
@@ -377,7 +381,7 @@
               "resetToDefault": "بازنشانی به پیش‌فرض",
               "autoUpdateInterval": "فاصله زمانی به‌روزرسانی خودکار",
               "toast": {
-                "success": "انتخاب خودکار برنامه‌ها با موفقیت انجام شد",
+                "success": "انتخاب خودکار انجام شد",
                 "failure": "انتخاب خودکار ناموفق بود",
                 "regionNotFound": "انتخاب خودکار برای منطقه \"${region}\" یافت نشد",
                 "alreadyInAuto": "انتخاب‌های شما از قبل در لیست خودکار موجود است"
@@ -564,8 +568,17 @@
       "expireDate": "تاریخ انقضا",
       "expired": "منقضی شده",
       "noTraffic": "حجم تمام شده",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days روز باقی‌مانده",
+        "other": "$days روز باقی‌مانده"
+      },
+      "remainingUnlimited": "نامحدود",
       "remainingTrafficSemanticLabel": "${consumed} از ${total} ترافیک مصرف شده",
-      "remainingTraffic": "ترافیک باقی‌مانده"
+      "remainingTraffic": "ترافیک باقی‌مانده",
+      "openWebPage": "باز کردن صفحه وب",
+      "support": "پشتیبانی",
+      "openLinkTitle": "این لینک باز شود؟",
+      "openLinkAction": "باز کردن"
     }
   },
   "dialogs": {
@@ -628,7 +641,7 @@
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "وارد کردن قانون مسیریابی؟",
-        "message": "وارد کردن قوانین مسیریابی از منابع غیرقابل اعتماد می‌تواند ریسک امنیتی باشد\nفقط در صورتی که به این لینک اعتماد دارید ادامه دهید"
+        "message": "قوانین مسیریابی تعیین می‌کنند ترافیک شما از کجا عبور کند.\nفقط از منبعی که به آن اعتماد دارید وارد کنید."
       }
     },
     "experimentalNotice": {
@@ -638,16 +651,19 @@
     },
     "noActiveProfile": {
       "title": "یک پروفایل انتخاب کنید",
-      "msg": "بیایید با افزودن یک پروفایل اتصال که شامل جزئیات اتصال VPN شماست، شروع کنیم.\n\nهنوز سرور VPN ندارید؟ نگران نباشید، با دنبال کردن راهنمای زیر می‌توانید به سرعت و رایگان یکی برای خودتان بسازید.",
+      "msg": "بیایید شروع کنیم. یک پروفایل اتصال با جزئیات سرور VPN خود اضافه کنید.\n\nهنوز سرور ندارید؟ مشکلی نیست — راهنمای زیر نشان می‌دهد چطور رایگان یکی بسازید.",
       "helpBtn": {
         "label": "راهنمایی کن",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "هشدار لینک خارجی",
-      "youAreAboutToVisit": "شما در حال بازدید از این آدرس هستید:",
-      "thisWebsiteIsNotInOurTrustedList": "این وب‌سایت در لیست مورد اعتماد ما نیست. لطفاً با احتیاط ادامه دهید."
+      "title": "هشدار",
+      "cannotVerify": "نمی‌توانیم این لینک را تأیید کنیم",
+      "avoidIfUnsure": "اگر کاملاً مطمئن نیستید، پرداخت نکنید و اطلاعات حساس به اشتراک نگذارید",
+      "ownResponsibility": "ادامه دادن با مسئولیت خودتان است",
+      "open": "باز کردن",
+      "openIn": "باز کردن (${seconds})"
     },
     "proxyInfo": {
       "fullTag": "تگ کامل:",
@@ -655,8 +671,8 @@
       "testTime": "زمان تست:",
       "testDelay": "تأخیر تست:",
       "isSelected": "انتخاب شده:",
-      "isGroup": "گروه است",
-      "isSecure": "امن است:",
+      "isGroup": "گروه:",
+      "isSecure": "امن:",
       "port": "پورت:",
       "host": "میزبان:",
       "ip": "IP:",
@@ -691,14 +707,14 @@
     "connection": {
       "unexpected": "خطای غیرمنتظره در اتصال",
       "timeout": "اتصال با وقفه زمانی مواجه شد",
-      "badResponse": "پاسخ نامعتبر",
+      "badResponse": "پاسخ نامعتبر سرور",
       "connectionError": "خطای اتصال",
       "badCertificate": "گواهی‌نامه نامعتبر"
     },
     "profiles": {
       "unexpected": "خطای غیرمنتظره",
       "notFound": "پروفایل یافت نشد",
-      "invalidConfig": "کانفیگ‌های نامعتبر",
+      "invalidConfig": "کانفیگ نامعتبر",
       "invalidUrl": "URL نامعتبر",
       "canceledByUser": "توسط کاربر لغو شد"
     },
@@ -717,11 +733,11 @@
     },
     "warp": {
       "missingLicense": "لایسنس WARP لازم است",
-      "missingLicenseMsg": "پروفایل انتخاب‌شده از ویژگی WARP استفاده می‌کند؛ برای استفاده از این قابلیت، باید با لایسنس WARP موافقت شود"
+      "missingLicenseMsg": "این پروفایل از WARP استفاده می‌کند. برای ادامه، لایسنس WARP را بپذیرید."
     },
     "psiphon": {
       "missingLicense": "لایسنس Psiphon لازم است",
-      "missingLicenseMsg": "پروفایل انتخاب‌شده از ویژگی Psiphon استفاده می‌کند؛ برای استفاده از این قابلیت، باید با لایسنس Psiphon موافقت شود"
+      "missingLicenseMsg": "این پروفایل از Psiphon استفاده می‌کند. برای ادامه، لایسنس Psiphon را بپذیرید."
     }
   }
 }
