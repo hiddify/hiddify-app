@@ -659,7 +659,7 @@
     },
     "unknownDomainsWarning": {
       "title": "Warning",
-      "cannotVerify": "We can’t verify this link",
+      "cannotVerify": "This link isn’t verified",
       "avoidIfUnsure": "If you’re not fully sure, don’t pay or share sensitive information",
       "ownResponsibility": "You continue at your own risk",
       "open": "Open",
