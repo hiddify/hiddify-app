@@ -77,7 +77,7 @@
         "clipboard": {
           "success": "Disalin ke papan klip",
           "failure": "Gagal menyalin ke papan klip",
-          "contentTooLarge": "Konten terlalu besar. Gunakan ekspor file saja"
+          "contentTooLarge": "Konten terlalu besar. Ekspor ke file saja."
         },
         "file": {
           "success": "File JSON dibuat",
@@ -125,7 +125,7 @@
       "delay": {
         "result": "Latensi: ${delay}ms",
         "timeout": "Waktu tes latensi habis",
-        "testing": "Latensi: sedang menguji..."
+        "testing": "Latensi: sedang menguji…"
       }
     },
     "profiles": {
@@ -133,10 +133,10 @@
       "add": "Tambah profil",
       "update": "Perbarui profil",
       "viewAllProfiles": "Lihat semua profil",
-      "activeProfileName": "Nama profil aktif: \"${name}\"",
-      "nonActiveProfileName": "Pilih \"${name}\" sebagai profil aktif",
+      "activeProfileName": "Nama profil aktif: “${name}”",
+      "nonActiveProfileName": "Pilih “${name}” sebagai profil aktif",
       "freeSubNotFound": "Tidak ada langganan gratis yang ditemukan",
-      "freeSubNotFoundForRegion": "Tidak ada langganan gratis yang ditemukan untuk wilayah \"${region}\"",
+      "freeSubNotFoundForRegion": "Tidak ada langganan gratis yang ditemukan untuk wilayah “${region}”",
       "failedToLoad": "Gagal memuat",
       "updateSubscriptions": "Perbarui langganan",
       "share": {
@@ -155,7 +155,7 @@
         "update": {
           "success": "Profil diperbarui",
           "failure": "Gagal memperbarui profil",
-          "failureNamed": "Gagal memperbarui \"${name}\"",
+          "failureNamed": "Gagal memperbarui “${name}”",
           "bulkSuccess(plural, param=count)": {
             "other": "$count profil diperbarui"
           },
@@ -176,7 +176,7 @@
         "urlHint": "URL konfigurasi lengkap",
         "disableAutoUpdate": "Nonaktifkan pembaruan otomatis",
         "autoUpdateInterval": "Interval pembaruan otomatis",
-        "loading": "Menambahkan profil..."
+        "loading": "Menambahkan profil…"
       }
     },
     "logs": {
@@ -264,19 +264,19 @@
             "notAvailabeInThisPlatform": "Tidak tersedia di platform ini",
             "canNotBeEmpty": "Tidak boleh kosong",
             "validUrlEx": "https://example.com",
-            "validUrl": "\"URL\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "“URL” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe atau google chrome atau chrome",
-            "validProcessName": "\"Nama proses\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "“Nama proses” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "\"Jalur proses\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "“Jalur proses” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 atau 1:65000",
-            "validPortRange": "\"Port\" atau \"Rentang port\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "“Port” atau “Rentang port” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 atau 10.0.0.0/24",
             "validIpCidr": "IP CIDR yang valid seperti\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com atau dl.google.com",
-            "validDomain": "\"Domain\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "“Domain” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com atau .ir",
-            "validDomainSuffix": "\"Sufiks domain\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "“Sufiks domain” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Nama",
               "outbound": "Keluar jika cocok",
@@ -345,8 +345,8 @@
           "resolveDestination": "Resolusi tujuan",
           "ipv6Route": "Rute IPv6",
           "ipv6Modes": {
-            "disable": "Nonaktifkan",
-            "enable": "Aktifkan",
+            "disable": "Nonaktif",
+            "enable": "Aktif",
             "prefer": "Prioritaskan",
             "only": "Eksklusif"
           },
@@ -382,12 +382,12 @@
               "toast": {
                 "success": "Pilihan otomatis selesai",
                 "failure": "Pilihan otomatis gagal",
-                "regionNotFound": "Pilihan otomatis tidak ditemukan untuk wilayah \"${region}\"",
+                "regionNotFound": "Pilihan otomatis tidak ditemukan untuk wilayah “${region}”",
                 "alreadyInAuto": "Pilihan Anda sudah ada dalam daftar otomatis"
               },
               "dialog": {
                 "title": "Pilihan aplikasi otomatis",
-                "msg": "Fitur pilihan otomatis untuk proxy per aplikasi dinonaktifkan karena perubahan wilayah menjadi \"${region}\""
+                "msg": "Pilihan otomatis proxy per aplikasi dinonaktifkan karena wilayah berubah menjadi “${region}”"
               }
             }
           }
@@ -486,7 +486,7 @@
           },
           "unblocker": {
             "title": "Pembuka blokir",
-            "msg": "Membantu melewati batasan jaringan. Jika pembantu terhubung, profil utama Anda tetap dapat bekerja meskipun saat ini sedang diblokir"
+            "msg": "Membantu melewati batasan jaringan. Jika pembantu terhubung, profil utama Anda tetap dapat bekerja meskipun saat ini sedang diblokir."
           },
           "filtering": {
             "title": "Pemfilteran",
@@ -597,7 +597,7 @@
     },
     "psiphonLicense": {
       "title": "Perjanjian lisensi Psiphon",
-      "description(rich)": "Dengan menggunakan Psiphon, Anda menyetujui ${tos(Ketentuan layanan)} dan mengakui ${privacy(Kebijakan privasi)}. Harap baca dengan teliti sebelum melanjutkan."
+      "description(rich)": "Dengan menggunakan Psiphon, Anda menyetujui ${tos(Ketentuan layanan)} dan mengakui ${privacy(Kebijakan privasi)}. Baca dengan teliti sebelum melanjutkan."
     },
     "newVersion": {
       "title": "Pembaruan tersedia",
@@ -621,7 +621,7 @@
       "perAppProxy": {
         "shareOnGithub": {
           "title": "Meningkatkan pilihan otomatis",
-          "msg": "Dengan membagikan aplikasi yang dipilih, Anda membantu melengkapi daftar \"pilihan otomatis\""
+          "msg": "Dengan membagikan aplikasi yang dipilih, Anda membantu melengkapi daftar “pilihan otomatis”"
         },
         "import": {
           "msg": "Ini akan menggantikan semua pilihan proxy per aplikasi Anda saat ini. Anda yakin ingin melanjutkan?"
@@ -630,12 +630,12 @@
       "routeRule": {
         "delete": {
           "title": "Hapus aturan",
-          "msg": "Anda yakin ingin menghapus aturan \"$rulename\"?"
+          "msg": "Anda yakin ingin menghapus aturan “$rulename”?"
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Tambah profil?",
-        "message": "Tautan eksternal dari \"${host}\" meminta untuk menambahkan profil baru. Apakah Anda ingin mengimpornya?"
+        "message": "Tautan eksternal dari “${host}” meminta untuk menambahkan profil baru. Apakah Anda ingin mengimpornya?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Impor aturan rute?",
@@ -657,32 +657,32 @@
     },
     "unknownDomainsWarning": {
       "title": "Peringatan",
-      "cannotVerify": "Kami tidak dapat memverifikasi tautan ini",
+      "cannotVerify": "Tautan ini belum diverifikasi",
       "avoidIfUnsure": "Jika Anda tidak sepenuhnya yakin, jangan membayar atau membagikan informasi sensitif",
       "ownResponsibility": "Anda melanjutkan dengan risiko sendiri",
       "open": "Buka",
       "openIn": "Buka (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "Tag lengkap:",
-      "type": "Tipe:",
-      "testTime": "Waktu uji:",
-      "testDelay": "Jeda uji:",
-      "isSelected": "Dipilih:",
-      "isGroup": "Grup:",
-      "isSecure": "Aman:",
-      "port": "Port:",
-      "host": "Host:",
-      "ip": "IP:",
-      "countryCode": "Kode negara:",
-      "region": "Wilayah:",
-      "city": "Kota:",
-      "asn": "ASN:",
-      "organization": "Organisasi:",
-      "location": "Lokasi:",
-      "postalCode": "Kode pos:",
-      "download": "Unduh:",
-      "upload": "Unggah:"
+      "fullTag": "Tag lengkap",
+      "type": "Tipe",
+      "testTime": "Waktu uji",
+      "testDelay": "Jeda uji",
+      "isSelected": "Dipilih",
+      "isGroup": "Grup",
+      "isSecure": "Aman",
+      "port": "Port",
+      "host": "Host",
+      "ip": "IP",
+      "countryCode": "Kode negara",
+      "region": "Wilayah",
+      "city": "Kota",
+      "asn": "ASN",
+      "organization": "Organisasi",
+      "location": "Lokasi",
+      "postalCode": "Kode pos",
+      "download": "Unduh",
+      "upload": "Unggah"
     },
     "windowClosing": {
       "askEachTime": "Tanyakan setiap kali",
@@ -693,12 +693,12 @@
   "connection": {
     "tapToConnect": "Ketuk untuk menyambungkan",
     "connect": "Sambungkan",
-    "connecting": "Menyambungkan...",
+    "connecting": "Menyambungkan…",
     "connected": "Tersambung",
     "disconnect": "Putuskan",
-    "disconnecting": "Memutuskan...",
+    "disconnecting": "Memutuskan…",
     "reconnect": "Sambungkan kembali",
-    "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan..."
+    "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan…"
   },
   "errors": {
     "unexpected": "Kesalahan tak terduga",

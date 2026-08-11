@@ -77,7 +77,7 @@
         "clipboard": {
           "success": "Copiado para a área de transferência",
           "failure": "Falha ao copiar para a área de transferência",
-          "contentTooLarge": "Conteúdo muito grande. Use a exportação para arquivo"
+          "contentTooLarge": "Conteúdo muito grande. Exporte para um arquivo."
         },
         "file": {
           "success": "Arquivo JSON criado",
@@ -125,7 +125,7 @@
       "delay": {
         "result": "Latência: ${delay}ms",
         "timeout": "Tempo limite do teste de latência esgotado",
-        "testing": "Latência: testando..."
+        "testing": "Latência: testando…"
       }
     },
     "profiles": {
@@ -133,10 +133,10 @@
       "add": "Adicionar perfil",
       "update": "Atualizar perfil",
       "viewAllProfiles": "Ver todos os perfis",
-      "activeProfileName": "Nome do perfil ativo: \"${name}\"",
-      "nonActiveProfileName": "Selecionar \"${name}\" como perfil ativo",
+      "activeProfileName": "Nome do perfil ativo: “${name}”",
+      "nonActiveProfileName": "Selecionar “${name}” como perfil ativo",
       "freeSubNotFound": "Nenhuma assinatura gratuita encontrada",
-      "freeSubNotFoundForRegion": "Nenhuma assinatura gratuita encontrada para a região \"${region}\"",
+      "freeSubNotFoundForRegion": "Nenhuma assinatura gratuita encontrada para a região “${region}”",
       "failedToLoad": "Falha ao carregar",
       "updateSubscriptions": "Atualizar assinaturas",
       "share": {
@@ -159,7 +159,7 @@
             "other": "$count perfis atualizados"
           },
           "failure": "Falha ao atualizar perfil",
-          "failureNamed": "Falha ao atualizar \"${name}\"",
+          "failureNamed": "Falha ao atualizar “${name}”",
           "bulkPartial": "${success} com sucesso\n${failed} com falha: ${names}"
         },
         "delete": {
@@ -177,7 +177,7 @@
         "urlHint": "URL de configuração completa",
         "disableAutoUpdate": "Desativar atualização automática",
         "autoUpdateInterval": "Intervalo de atualização automática",
-        "loading": "Adicionando perfil..."
+        "loading": "Adicionando perfil…"
       }
     },
     "logs": {
@@ -240,7 +240,7 @@
         "urlTestInterval": "Intervalo de teste de URL",
         "clashApiPort": "Porta da API do Clash",
         "useXrayCoreWhenPossible": "Usar xray-core quando possível",
-        "useXrayCoreWhenPossibleMsg": "Use o xray-core ao analisar links de assinatura. Você precisa reimportar o link para ativar esta opção"
+        "useXrayCoreWhenPossibleMsg": "Use o xray-core ao analisar links de assinatura. Você precisa reimportar o link para ativar esta opção."
       },
       "routing": {
         "title": "Roteamento",
@@ -265,19 +265,19 @@
             "notAvailabeInThisPlatform": "Não disponível nesta plataforma",
             "canNotBeEmpty": "Não pode estar vazio",
             "validUrlEx": "https://example.com",
-            "validUrl": "\"URL\" válido como\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "“URL” válido como\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe ou google chrome ou chrome",
-            "validProcessName": "\"Nome do processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "“Nome do processo” válido como\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "\"Caminho do processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "“Caminho do processo” válido como\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 ou 1:65000",
-            "validPortRange": "\"Porta\" ou \"Intervalo de portas\" válido como\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "“Porta” ou “Intervalo de portas” válido como\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 ou 10.0.0.0/24",
             "validIpCidr": "IP CIDR válido como\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com ou dl.google.com",
-            "validDomain": "\"Domínio\" válido como\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "“Domínio” válido como\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com ou .ir",
-            "validDomainSuffix": "\"Sufixo de domínio\" válido como\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "“Sufixo de domínio” válido como\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Nome",
               "outbound": "Saída se corresponder",
@@ -346,8 +346,8 @@
           "resolveDestination": "Resolver destino",
           "ipv6Route": "Rota IPv6",
           "ipv6Modes": {
-            "disable": "Desativar",
-            "enable": "Ativar",
+            "disable": "Desativado",
+            "enable": "Ativado",
             "prefer": "Preferencial",
             "only": "Exclusivo"
           },
@@ -383,12 +383,12 @@
               "toast": {
                 "success": "Seleção automática concluída",
                 "failure": "Falha na seleção automática",
-                "regionNotFound": "Seleção automática não encontrada para a região \"${region}\"",
+                "regionNotFound": "Seleção automática não encontrada para a região “${region}”",
                 "alreadyInAuto": "Suas seleções já estão na lista automática"
               },
               "dialog": {
                 "title": "Seleção automática de aplicativos",
-                "msg": "A função de seleção automática para o proxy por aplicativo foi desativada devido à mudança de região para \"${region}\""
+                "msg": "A seleção automática do proxy por aplicativo foi desativada porque a região mudou para “${region}”"
               }
             }
           }
@@ -487,7 +487,7 @@
           },
           "unblocker": {
             "title": "Desbloqueador",
-            "msg": "Ajuda a contornar restrições de rede. Se o ajudante se conectar, seu perfil principal ainda poderá funcionar mesmo que esteja bloqueado no momento"
+            "msg": "Ajuda a contornar restrições de rede. Se o auxiliar conectar, seu perfil principal ainda pode funcionar mesmo que esteja bloqueado no momento."
           },
           "filtering": {
             "title": "Filtragem",
@@ -599,7 +599,7 @@
     },
     "psiphonLicense": {
       "title": "Contrato de licença do Psiphon",
-      "description(rich)": "Ao usar o Psiphon, você concorda com os ${tos(Termos de serviço)} e reconhece a ${privacy(Política de privacidade)}. Por favor, leia-os atentamente antes de continuar."
+      "description(rich)": "Ao usar o Psiphon, você concorda com os ${tos(Termos de serviço)} e reconhece a ${privacy(Política de privacidade)}. Leia com atenção antes de continuar."
     },
     "newVersion": {
       "title": "Atualização disponível",
@@ -623,7 +623,7 @@
       "perAppProxy": {
         "shareOnGithub": {
           "title": "Melhorando a seleção automática",
-          "msg": "Ao compartilhar os aplicativos selecionados, você ajuda a completar a lista de \"seleção automática\""
+          "msg": "Ao compartilhar os aplicativos selecionados, você ajuda a completar a lista de “seleção automática”"
         },
         "import": {
           "msg": "Isso substituirá todas as suas seleções atuais de proxy por aplicativo. Tem certeza de que deseja continuar?"
@@ -632,12 +632,12 @@
       "routeRule": {
         "delete": {
           "title": "Excluir regra",
-          "msg": "Tem certeza de que deseja excluir a regra \"$rulename\"?"
+          "msg": "Tem certeza de que deseja excluir a regra “$rulename”?"
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Adicionar perfil?",
-        "message": "Um link externo de \"${host}\" está solicitando adicionar um novo perfil. Deseja importá-lo?"
+        "message": "Um link externo de “${host}” está solicitando adicionar um novo perfil. Deseja importá-lo?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Importar regra de roteamento?",
@@ -659,32 +659,32 @@
     },
     "unknownDomainsWarning": {
       "title": "Aviso",
-      "cannotVerify": "Não conseguimos verificar este link",
+      "cannotVerify": "Este link não está verificado",
       "avoidIfUnsure": "Se você não tiver total certeza, não pague nem compartilhe informações sensíveis",
       "ownResponsibility": "Você continua por sua própria conta e risco",
       "open": "Abrir",
       "openIn": "Abrir (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "Tag completa:",
-      "type": "Tipo:",
-      "testTime": "Hora do teste:",
-      "testDelay": "Latência do teste:",
-      "isSelected": "Selecionado:",
-      "isGroup": "Grupo:",
-      "isSecure": "Seguro:",
-      "port": "Porta:",
-      "host": "Host:",
-      "ip": "IP:",
-      "countryCode": "Código do país:",
-      "region": "Região:",
-      "city": "Cidade:",
-      "asn": "ASN:",
-      "organization": "Organização:",
-      "location": "Localização:",
-      "postalCode": "Código postal:",
-      "download": "Download:",
-      "upload": "Upload:"
+      "fullTag": "Tag completa",
+      "type": "Tipo",
+      "testTime": "Hora do teste",
+      "testDelay": "Latência do teste",
+      "isSelected": "Selecionado",
+      "isGroup": "Grupo",
+      "isSecure": "Seguro",
+      "port": "Porta",
+      "host": "Host",
+      "ip": "IP",
+      "countryCode": "Código do país",
+      "region": "Região",
+      "city": "Cidade",
+      "asn": "ASN",
+      "organization": "Organização",
+      "location": "Localização",
+      "postalCode": "Código postal",
+      "download": "Download",
+      "upload": "Upload"
     },
     "windowClosing": {
       "askEachTime": "Perguntar sempre",
@@ -695,12 +695,12 @@
   "connection": {
     "tapToConnect": "Toque para conectar",
     "connect": "Conectar",
-    "connecting": "Conectando...",
+    "connecting": "Conectando…",
     "connected": "Conectado",
     "disconnect": "Desconectar",
-    "disconnecting": "Desconectando...",
+    "disconnecting": "Desconectando…",
     "reconnect": "Reconectar",
-    "reconnectMsg": "Reconectando para aplicar as alterações..."
+    "reconnectMsg": "Reconectando para aplicar as alterações…"
   },
   "errors": {
     "unexpected": "Erro inesperado",

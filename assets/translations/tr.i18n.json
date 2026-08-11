@@ -52,7 +52,7 @@
     "timeout": "Zaman aşımı",
     "sort": "Sırala",
     "dashboard": "Gösterge paneli",
-    "disable": "Devre dışı bırak",
+    "disable": "Kapat",
     "psiphon": "Psiphon",
     "profile": "Profil",
     "configuration": "Yapılandırma",
@@ -77,7 +77,7 @@
         "clipboard": {
           "success": "Panoya kopyalandı",
           "failure": "Panoya kopyalanamadı",
-          "contentTooLarge": "İçerik çok büyük. Bunun yerine dosyaya aktarmayı kullanın"
+          "contentTooLarge": "İçerik çok büyük. Bunun yerine dosyaya aktarın."
         },
         "file": {
           "success": "JSON dosyası oluşturuldu",
@@ -125,7 +125,7 @@
       "delay": {
         "result": "Gecikme: ${delay}ms",
         "timeout": "Gecikme testi zaman aşımına uğradı",
-        "testing": "Gecikme: test ediliyor..."
+        "testing": "Gecikme: test ediliyor…"
       }
     },
     "profiles": {
@@ -133,10 +133,10 @@
       "add": "Profil ekle",
       "update": "Profili güncelle",
       "viewAllProfiles": "Tüm profilleri görüntüle",
-      "activeProfileName": "Aktif profil adı: \"${name}\"",
-      "nonActiveProfileName": "Aktif profil olarak \"${name}\" seçin",
+      "activeProfileName": "Aktif profil adı: “${name}”",
+      "nonActiveProfileName": "Aktif profil olarak “${name}” seçin",
       "freeSubNotFound": "Ücretsiz abonelik bulunamadı",
-      "freeSubNotFoundForRegion": "\"${region}\" bölgesi için ücretsiz abonelik bulunamadı",
+      "freeSubNotFoundForRegion": "“${region}” bölgesi için ücretsiz abonelik bulunamadı",
       "failedToLoad": "Yüklenemedi",
       "updateSubscriptions": "Abonelikleri güncelle",
       "share": {
@@ -158,7 +158,7 @@
             "other": "$count profil güncellendi"
           },
           "failure": "Profil güncellenemedi",
-          "failureNamed": "\"${name}\" güncellenemedi",
+          "failureNamed": "“${name}” güncellenemedi",
           "bulkPartial": "${success} başarılı\n${failed} başarısız: ${names}"
         },
         "delete": {
@@ -174,9 +174,9 @@
         "emptyName": "İsim gerekli",
         "invalidUrl": "Geçersiz URL",
         "urlHint": "Tam yapılandırma URL'si",
-        "disableAutoUpdate": "Otomatik güncellemeyi devre dışı bırak",
+        "disableAutoUpdate": "Otomatik güncellemeyi kapat",
         "autoUpdateInterval": "Otomatik güncelleme aralığı",
-        "loading": "Profil ekleniyor..."
+        "loading": "Profil ekleniyor…"
       }
     },
     "logs": {
@@ -220,7 +220,7 @@
           "light": "Açık mod",
           "black": "Siyah mod"
         },
-        "enableAnalytics": "Analizi etkinleştir",
+        "enableAnalytics": "Analizi aç",
         "enableAnalyticsMsg": "Uygulamayı iyileştirmek için analiz ve kilitlenme raporları toplanmasına izin verin",
         "autoIpCheck": "Bağlantı IP'sini otomatik kontrol et",
         "dynamicNotification": "Hızı bildirimde göster",
@@ -228,10 +228,10 @@
         "actionAtClosing": "Pencere kapatılırken",
         "autoStart": "Oturum açılışında başlat",
         "silentStart": "Simge durumunda başlat",
-        "ignoreBatteryOptimizations": "Pil optimizasyonunu devre dışı bırak",
+        "ignoreBatteryOptimizations": "Pil optimizasyonunu kapat",
         "ignoreBatteryOptimizationsMsg": "Optimum VPN performansı için kısıtlamaları kaldırın",
         "memoryLimit": "Bellek sınırı",
-        "memoryLimitMsg": "Bellek yetersizliği hataları veya sık uygulama çökmeleri yaşıyorsanız etkinleştirin",
+        "memoryLimitMsg": "Bellek yetersizliği hataları veya sık uygulama çökmeleri yaşıyorsanız açın",
         "debugMode": "Hata ayıklama modu",
         "debugModeMsg": "Bu değişikliği uygulamak için uygulamayı yeniden başlatın",
         "logLevel": "Log seviyesi",
@@ -264,19 +264,19 @@
             "notAvailabeInThisPlatform": "Bu platformda mevcut değil",
             "canNotBeEmpty": "Boş olamaz",
             "validUrlEx": "https://example.com",
-            "validUrl": "Geçerli \"URL\", örn.\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "Geçerli “URL”, örn.\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe veya google chrome veya chrome",
-            "validProcessName": "Geçerli \"İşlem adı\", örn.\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "Geçerli “İşlem adı”, örn.\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "Geçerli \"İşlem yolu\", örn.\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "Geçerli “İşlem yolu”, örn.\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 veya 1:65000",
-            "validPortRange": "Geçerli \"Port\" veya \"Port aralığı\", örn.\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "Geçerli “Port” veya “Port aralığı”, örn.\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 veya 10.0.0.0/24",
             "validIpCidr": "Geçerli IP CIDR, örn.\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com veya dl.google.com",
-            "validDomain": "Geçerli \"Alan adı\", örn.\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "Geçerli “Alan adı”, örn.\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com veya .tr",
-            "validDomainSuffix": "Geçerli \"Alan adı son eki\", örn.\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "Geçerli “Alan adı son eki”, örn.\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "İsim",
               "outbound": "Eşleşirse giden",
@@ -345,8 +345,8 @@
           "resolveDestination": "Hedefi çözümle",
           "ipv6Route": "IPv6 rotası",
           "ipv6Modes": {
-            "disable": "Devre dışı bırak",
-            "enable": "Etkinleştir",
+            "disable": "Kapalı",
+            "enable": "Açık",
             "prefer": "Tercih edilen",
             "only": "Özel"
           },
@@ -382,12 +382,12 @@
               "toast": {
                 "success": "Otomatik seçim tamamlandı",
                 "failure": "Otomatik seçim başarısız oldu",
-                "regionNotFound": "\"${region}\" bölgesi için otomatik seçim bulunamadı",
+                "regionNotFound": "“${region}” bölgesi için otomatik seçim bulunamadı",
                 "alreadyInAuto": "Seçimleriniz zaten otomatik listede"
               },
               "dialog": {
                 "title": "Otomatik uygulama seçimi",
-                "msg": "Uygulama bazlı proxy için otomatik seçim özelliği, bölge \"${region}\" olarak değiştirildiği için devre dışı bırakıldı"
+                "msg": "Uygulama bazlı proxy için otomatik seçim kapatıldı, çünkü bölge “${region}” olarak değişti"
               }
             }
           }
@@ -410,7 +410,7 @@
         "remoteDnsDomainStrategy": "Uzak DNS alan adı stratejisi",
         "directDns": "Giden sunucu çözümleyicisi (doğrudan)",
         "directDnsDomainStrategy": "Giden alan adı stratejisi",
-        "enableFakeDns": "Sahte DNS'i etkinleştir",
+        "enableFakeDns": "Sahte DNS’i aç",
         "domainStrategy": {
           "auto": "Otomatik",
           "preferIpv6": "IPv6 tercih et",
@@ -450,7 +450,7 @@
       },
       "tlsTricks": {
         "title": "TLS hileleri",
-        "enable": "Fragment'ı etkinleştir",
+        "enable": "Fragment’ı aç",
         "packets": "Fragmentation paketleri",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
@@ -461,10 +461,10 @@
         "size": "Fragment boyutu",
         "sleep": "Fragment gecikmesi",
         "mixedSniCase": {
-          "enable": "Karışık SNI harf durumunu etkinleştir"
+          "enable": "Karışık SNI harf durumunu aç"
         },
         "padding": {
-          "enable": "Padding'i etkinleştir",
+          "enable": "Padding’i aç",
           "size": "Padding boyutu"
         }
       },
@@ -486,7 +486,7 @@
           },
           "unblocker": {
             "title": "Engel kaldırıcı",
-            "msg": "Ağ kısıtlamalarını aşmaya yardımcı olur. Yardımcı bağlanırsa, ana profiliniz şu anda engellenmiş olsa bile çalışmaya devam edebilir"
+            "msg": "Ağ kısıtlamalarını aşmaya yardımcı olur. Yardımcı bağlanırsa, ana profiliniz şu anda engellenmiş olsa bile çalışmaya devam edebilir."
           },
           "filtering": {
             "title": "Filtreleme",
@@ -597,7 +597,7 @@
     },
     "psiphonLicense": {
       "title": "Psiphon lisans sözleşmesi",
-      "description(rich)": "Psiphon'u kullanarak, ${tos(Hizmet şartları)}'nı kabul etmiş olursunuz ve ${privacy(Gizlilik politikası)}'nı onaylamış olursunuz. Lütfen devam etmeden önce bunları dikkatle okuyun."
+      "description(rich)": "Psiphon’u kullanarak, ${tos(Hizmet şartları)}’nı kabul etmiş olursunuz ve ${privacy(Gizlilik politikası)}’nı onaylamış olursunuz. Devam etmeden önce bunları dikkatle okuyun."
     },
     "newVersion": {
       "title": "Güncelleme mevcut",
@@ -621,7 +621,7 @@
       "perAppProxy": {
         "shareOnGithub": {
           "title": "Otomatik seçimi iyileştirme",
-          "msg": "Seçili uygulamaları paylaşarak \"otomatik seçim\" listesini tamamlamaya yardımcı olursunuz"
+          "msg": "Seçili uygulamaları paylaşarak “otomatik seçim” listesini tamamlamaya yardımcı olursunuz"
         },
         "import": {
           "msg": "Bu işlem mevcut tüm uygulama bazlı proxy seçimlerinizi değiştirecektir. Devam etmek istediğinizden emin misiniz?"
@@ -630,12 +630,12 @@
       "routeRule": {
         "delete": {
           "title": "Kuralı sil",
-          "msg": "\"$rulename\" kuralını silmek istediğinizden emin misiniz?"
+          "msg": "“$rulename” kuralını silmek istediğinizden emin misiniz?"
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Profil ekle?",
-        "message": "\"${host}\" adresinden bir dış bağlantı yeni bir profil eklemek istiyor. İçe aktarmak ister misiniz?"
+        "message": "“${host}” adresinden bir dış bağlantı yeni bir profil eklemek istiyor. İçe aktarmak ister misiniz?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Rota kuralını içe aktar?",
@@ -657,32 +657,32 @@
     },
     "unknownDomainsWarning": {
       "title": "Uyarı",
-      "cannotVerify": "Bu bağlantıyı doğrulayamıyoruz",
+      "cannotVerify": "Bu bağlantı doğrulanmamış",
       "avoidIfUnsure": "Tamamen emin değilseniz ödeme yapmayın ve hassas bilgi paylaşmayın",
       "ownResponsibility": "Devam ederseniz sorumluluk size aittir",
       "open": "Aç",
       "openIn": "Aç (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "Tam etiket:",
-      "type": "Tür:",
-      "testTime": "Test zamanı:",
-      "testDelay": "Test gecikmesi:",
-      "isSelected": "Seçili:",
-      "isGroup": "Grup:",
-      "isSecure": "Güvenli:",
-      "port": "Port:",
-      "host": "Sunucu:",
-      "ip": "IP:",
-      "countryCode": "Ülke kodu:",
-      "region": "Bölge:",
-      "city": "Şehir:",
-      "asn": "ASN:",
-      "organization": "Kuruluş:",
-      "location": "Konum:",
-      "postalCode": "Posta kodu:",
-      "download": "İndirme:",
-      "upload": "Yükleme:"
+      "fullTag": "Tam etiket",
+      "type": "Tür",
+      "testTime": "Test zamanı",
+      "testDelay": "Test gecikmesi",
+      "isSelected": "Seçili",
+      "isGroup": "Grup",
+      "isSecure": "Güvenli",
+      "port": "Port",
+      "host": "Sunucu",
+      "ip": "IP",
+      "countryCode": "Ülke kodu",
+      "region": "Bölge",
+      "city": "Şehir",
+      "asn": "ASN",
+      "organization": "Kuruluş",
+      "location": "Konum",
+      "postalCode": "Posta kodu",
+      "download": "İndirme",
+      "upload": "Yükleme"
     },
     "windowClosing": {
       "askEachTime": "Her seferinde sor",
@@ -693,12 +693,12 @@
   "connection": {
     "tapToConnect": "Bağlanmak için dokunun",
     "connect": "Bağlan",
-    "connecting": "Bağlanıyor...",
+    "connecting": "Bağlanıyor…",
     "connected": "Bağlı",
     "disconnect": "Bağlantıyı kes",
-    "disconnecting": "Bağlantı kesiliyor...",
+    "disconnecting": "Bağlantı kesiliyor…",
     "reconnect": "Yeniden bağlan",
-    "reconnectMsg": "Değişiklikleri uygulamak için yeniden bağlanılıyor..."
+    "reconnectMsg": "Değişiklikleri uygulamak için yeniden bağlanılıyor…"
   },
   "errors": {
     "unexpected": "Beklenmeyen hata",

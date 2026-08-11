@@ -83,7 +83,7 @@
         "clipboard": {
           "success": "تم النسخ إلى الحافظة",
           "failure": "فشل النسخ إلى الحافظة",
-          "contentTooLarge": "المحتوى كبير جدًا. استخدم تصدير الملف بدلاً من ذلك"
+          "contentTooLarge": "المحتوى كبير جدًا. صدّره إلى ملف بدلاً من ذلك."
         },
         "file": {
           "success": "تم إنشاء ملف JSON",
@@ -131,7 +131,7 @@
       "delay": {
         "result": "التأخير: ${delay} مللي ثانية",
         "timeout": "انتهى وقت اختبار التأخير",
-        "testing": "التأخير: قيد الاختبار..."
+        "testing": "التأخير: قيد الاختبار…"
       }
     },
     "profiles": {
@@ -139,10 +139,10 @@
       "add": "إضافة ملف شخصي",
       "update": "تحديث الملف الشخصي",
       "viewAllProfiles": "عرض جميع الملفات الشخصية",
-      "activeProfileName": "اسم الملف النشط: \"${name}\"",
-      "nonActiveProfileName": "تحديد \"${name}\" كملف نشط",
+      "activeProfileName": "اسم الملف النشط: «${name}»",
+      "nonActiveProfileName": "تحديد «${name}» كملف نشط",
       "freeSubNotFound": "لم يتم العثور على اشتراك مجاني",
-      "freeSubNotFoundForRegion": "لم يتم العثور على اشتراك مجاني لمنطقة \"${region}\"",
+      "freeSubNotFoundForRegion": "لم يتم العثور على اشتراك مجاني لمنطقة «${region}»",
       "failedToLoad": "فشل التحميل",
       "updateSubscriptions": "تحديث الاشتراكات",
       "share": {
@@ -161,7 +161,7 @@
         "update": {
           "success": "تم تحديث الملف الشخصي",
           "failure": "فشل تحديث الملف الشخصي",
-          "failureNamed": "فشل تحديث \"${name}\"",
+          "failureNamed": "فشل تحديث «${name}»",
           "bulkSuccess(plural, param=count)": {
             "zero": "لم يتم تحديث أي ملف شخصي",
             "one": "تم تحديث ملف شخصي واحد",
@@ -187,7 +187,7 @@
         "urlHint": "رابط الإعدادات الكامل",
         "disableAutoUpdate": "تعطيل التحديث التلقائي",
         "autoUpdateInterval": "فاصل التحديث التلقائي",
-        "loading": "جاري إضافة الملف الشخصي..."
+        "loading": "جاري إضافة الملف الشخصي…"
       }
     },
     "logs": {
@@ -250,7 +250,7 @@
         "urlTestInterval": "فاصل اختبار الرابط",
         "clashApiPort": "منفذ Clash API",
         "useXrayCoreWhenPossible": "استخدام xray-core عند الإمكان",
-        "useXrayCoreWhenPossibleMsg": "استخدم xray-core عند تحليل روابط الاشتراك. تحتاج إلى إعادة استيراد الرابط لتفعيل هذا الخيار"
+        "useXrayCoreWhenPossibleMsg": "استخدم xray-core عند تحليل روابط الاشتراك. تحتاج إلى إعادة استيراد الرابط لتفعيل هذا الخيار."
       },
       "routing": {
         "title": "التوجيه",
@@ -275,19 +275,19 @@
             "notAvailabeInThisPlatform": "غير متوفر على هذا النظام",
             "canNotBeEmpty": "لا يمكن أن يكون فارغًا",
             "validUrlEx": "https://example.com",
-            "validUrl": "\"URL\" صالح مثل\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "«URL» صالح مثل\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe or google chrome or chrome",
-            "validProcessName": "\"اسم العملية\" صالح مثل\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "«اسم العملية» صالح مثل\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "\"مسار العملية\" صالح مثل\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "«مسار العملية» صالح مثل\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 or 1:65000",
-            "validPortRange": "\"منفذ\" أو \"نطاق منافذ\" صالح مثل\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "«منفذ» أو «نطاق منافذ» صالح مثل\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 or 10.0.0.0/24",
             "validIpCidr": "IP CIDR صالح مثل\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com or dl.google.com",
-            "validDomain": "\"نطاق\" صالح مثل\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "«نطاق» صالح مثل\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com or .ir",
-            "validDomainSuffix": "\"لاحقة نطاق\" صالحة مثل\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "«لاحقة نطاق» صالحة مثل\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "الاسم",
               "outbound": "التوجيه عند التطابق",
@@ -356,8 +356,8 @@
           "resolveDestination": "تحديد وجهة الاتصال",
           "ipv6Route": "توجيه IPv6",
           "ipv6Modes": {
-            "disable": "تعطيل",
-            "enable": "تفعيل",
+            "disable": "إيقاف",
+            "enable": "تشغيل",
             "prefer": "مفضل",
             "only": "حصري"
           },
@@ -393,12 +393,12 @@
               "toast": {
                 "success": "اكتمل الاختيار التلقائي",
                 "failure": "فشل الاختيار التلقائي",
-                "regionNotFound": "لم يتم العثور على اختيار تلقائي لمنطقة \"${region}\"",
+                "regionNotFound": "لم يتم العثور على اختيار تلقائي لمنطقة «${region}»",
                 "alreadyInAuto": "اختياراتك موجودة بالفعل في القائمة التلقائية"
               },
               "dialog": {
                 "title": "الاختيار التلقائي للتطبيقات",
-                "msg": "تم تعطيل ميزة الاختيار التلقائي للبروكسي بسبب تغيير المنطقة إلى \"${region}\""
+                "msg": "تم إيقاف الاختيار التلقائي لبروكسي التطبيقات لأن المنطقة تغيّرت إلى «${region}»"
               }
             }
           }
@@ -497,7 +497,7 @@
           },
           "unblocker": {
             "title": "أداة فك الحظر",
-            "msg": "يساعد في تجاوز قيود الشبكة. إذا اتصل المساعد، فيمكن لملفك الشخصي الرئيسي الاستمرار في العمل حتى لو كان محظورًا حاليًا"
+            "msg": "يساعد في تجاوز قيود الشبكة. إذا اتصل المساعد، فيمكن لملفك الشخصي الرئيسي الاستمرار في العمل حتى لو كان محظورًا حاليًا."
           },
           "filtering": {
             "title": "التصفية",
@@ -609,11 +609,11 @@
     },
     "warpLicense": {
       "title": "موافقة Cloudflare WARP",
-      "description(rich)": "Cloudflare WARP هو مزود VPN مجاني لـ WireGuard. بتفعيل هذا الخيار، فإنك توافق على ${tos(شروط الخدمة)} و ${privacy(سياسة الخصوصية)} الخاصة بـ Cloudflare WARP."
+      "description(rich)": "Cloudflare WARP هو مزود VPN مجاني لـ WireGuard. بتشغيل هذا الخيار، فإنك توافق على ${tos(شروط الخدمة)} و ${privacy(سياسة الخصوصية)} الخاصة بـ Cloudflare WARP."
     },
     "psiphonLicense": {
       "title": "اتفاقية رخصة Psiphon",
-      "description(rich)": "باستخدام Psiphon، أنت توافق على ${tos(شروط الخدمة)} وتقر بـ ${privacy(سياسة الخصوصية)}. يرجى قراءتها بعناية قبل المتابعة."
+      "description(rich)": "باستخدام Psiphon، أنت توافق على ${tos(شروط الخدمة)} وتقر بـ ${privacy(سياسة الخصوصية)}. اقرأها بعناية قبل المتابعة."
     },
     "newVersion": {
       "title": "تحديث متاح",
@@ -637,7 +637,7 @@
       "perAppProxy": {
         "shareOnGithub": {
           "title": "تحسين الاختيار التلقائي",
-          "msg": "بمشاركة التطبيقات التي اخترتها، فإنك تساعد في إكمال قائمة \"الاختيار التلقائي\""
+          "msg": "بمشاركة التطبيقات التي اخترتها، فإنك تساعد في إكمال قائمة «الاختيار التلقائي»"
         },
         "import": {
           "msg": "سيؤدي هذا إلى استبدال جميع تحديداتك الحالية لبروكسي التطبيقات. هل أنت متأكد من رغبتك في المتابعة؟"
@@ -646,12 +646,12 @@
       "routeRule": {
         "delete": {
           "title": "حذف القاعدة",
-          "msg": "هل أنت متأكد من رغبتك في حذف قاعدة \"$rulename\"؟"
+          "msg": "هل أنت متأكد من رغبتك في حذف قاعدة «$rulename»؟"
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "إضافة ملف شخصي؟",
-        "message": "رابط خارجي من \"${host}\" يطلب إضافة ملف شخصي جديد. هل تريد استيراده؟"
+        "message": "رابط خارجي من «${host}» يطلب إضافة ملف شخصي جديد. هل تريد استيراده؟"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "استيراد قاعدة توجيه؟",
@@ -673,32 +673,32 @@
     },
     "unknownDomainsWarning": {
       "title": "تحذير",
-      "cannotVerify": "لا يمكننا التحقق من هذا الرابط",
+      "cannotVerify": "لم يتم التحقق من هذا الرابط",
       "avoidIfUnsure": "إذا لم تكن متأكدًا تمامًا، لا تدفع ولا تشارك معلومات حساسة",
       "ownResponsibility": "أنت تتابع على مسؤوليتك الخاصة",
       "open": "فتح",
       "openIn": "فتح (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "العلامة الكاملة:",
-      "type": "النوع:",
-      "testTime": "وقت الاختبار:",
-      "testDelay": "تأخير الاختبار:",
-      "isSelected": "محدد:",
-      "isGroup": "مجموعة:",
-      "isSecure": "آمن:",
-      "port": "المنفذ:",
-      "host": "المضيف:",
-      "ip": "IP:",
-      "countryCode": "رمز الدولة:",
-      "region": "المنطقة:",
-      "city": "المدينة:",
-      "asn": "ASN:",
-      "organization": "المُنظمة:",
-      "location": "الموقع:",
-      "postalCode": "الرمز البريدي:",
-      "download": "تنزيل:",
-      "upload": "رفع:"
+      "fullTag": "العلامة الكاملة",
+      "type": "النوع",
+      "testTime": "وقت الاختبار",
+      "testDelay": "تأخير الاختبار",
+      "isSelected": "محدد",
+      "isGroup": "مجموعة",
+      "isSecure": "آمن",
+      "port": "المنفذ",
+      "host": "المضيف",
+      "ip": "IP",
+      "countryCode": "رمز الدولة",
+      "region": "المنطقة",
+      "city": "المدينة",
+      "asn": "ASN",
+      "organization": "المُنظمة",
+      "location": "الموقع",
+      "postalCode": "الرمز البريدي",
+      "download": "تنزيل",
+      "upload": "رفع"
     },
     "windowClosing": {
       "askEachTime": "السؤال كل مرة",
@@ -709,12 +709,12 @@
   "connection": {
     "tapToConnect": "انقر للاتصال",
     "connect": "اتصال",
-    "connecting": "جار الاتصال...",
+    "connecting": "جار الاتصال…",
     "connected": "متصل",
     "disconnect": "قطع الاتصال",
-    "disconnecting": "جاري قطع الاتصال...",
+    "disconnecting": "جاري قطع الاتصال…",
     "reconnect": "إعادة الاتصال",
-    "reconnectMsg": "جاري إعادة الاتصال لتطبيق التغييرات..."
+    "reconnectMsg": "جاري إعادة الاتصال لتطبيق التغييرات…"
   },
   "errors": {
     "unexpected": "خطأ غير متوقع",

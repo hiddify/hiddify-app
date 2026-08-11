@@ -52,7 +52,7 @@
     "timeout": "超时",
     "sort": "排序",
     "dashboard": "仪表盘",
-    "disable": "禁用",
+    "disable": "关闭",
     "psiphon": "Psiphon",
     "profile": "配置",
     "configuration": "配置",
@@ -77,7 +77,7 @@
         "clipboard": {
           "success": "已复制到剪贴板",
           "failure": "复制到剪贴板失败",
-          "contentTooLarge": "内容过大，请使用导出文件"
+          "contentTooLarge": "内容过大。请改为导出到文件。"
         },
         "file": {
           "success": "已创建 JSON 文件",
@@ -125,7 +125,7 @@
       "delay": {
         "result": "延迟：${delay}毫秒",
         "timeout": "延迟测试超时",
-        "testing": "延迟：测试中..."
+        "testing": "延迟：测试中…"
       }
     },
     "profiles": {
@@ -133,10 +133,10 @@
       "add": "添加配置文件",
       "update": "更新配置文件",
       "viewAllProfiles": "查看所有配置文件",
-      "activeProfileName": "当前配置文件：\"${name}\"",
-      "nonActiveProfileName": "选择 \"${name}\" 作为当前配置文件",
+      "activeProfileName": "当前配置文件：“${name}”",
+      "nonActiveProfileName": "选择“${name}”作为当前配置文件",
       "freeSubNotFound": "未找到免费订阅",
-      "freeSubNotFoundForRegion": "未找到 \"${region}\" 地区的免费订阅",
+      "freeSubNotFoundForRegion": "未找到“${region}”地区的免费订阅",
       "failedToLoad": "加载失败",
       "updateSubscriptions": "更新订阅",
       "share": {
@@ -158,7 +158,7 @@
             "other": "已更新 $count 个配置文件"
           },
           "failure": "更新配置文件失败",
-          "failureNamed": "更新 \"${name}\" 失败",
+          "failureNamed": "更新“${name}”失败",
           "bulkPartial": "${success} 个成功\n${failed} 个失败：${names}"
         },
         "delete": {
@@ -174,9 +174,9 @@
         "emptyName": "名称为必填项",
         "invalidUrl": "无效的 URL",
         "urlHint": "完整的配置 URL",
-        "disableAutoUpdate": "禁用自动更新",
+        "disableAutoUpdate": "关闭自动更新",
         "autoUpdateInterval": "自动更新间隔",
-        "loading": "正在添加配置文件..."
+        "loading": "正在添加配置文件…"
       }
     },
     "logs": {
@@ -220,7 +220,7 @@
           "light": "浅色模式",
           "black": "纯黑模式"
         },
-        "enableAnalytics": "启用分析",
+        "enableAnalytics": "开启分析",
         "enableAnalyticsMsg": "允许收集分析数据和发送崩溃报告以改进应用",
         "autoIpCheck": "自动检查连接 IP",
         "dynamicNotification": "在通知中显示速度",
@@ -228,10 +228,10 @@
         "actionAtClosing": "关闭窗口时",
         "autoStart": "开机自启",
         "silentStart": "静默启动",
-        "ignoreBatteryOptimizations": "忽略电池优化",
+        "ignoreBatteryOptimizations": "关闭电池优化",
         "ignoreBatteryOptimizationsMsg": "移除限制以获得最佳 VPN 性能",
         "memoryLimit": "内存限制",
-        "memoryLimitMsg": "如果您遇到内存不足错误或应用频繁崩溃，请启用此选项",
+        "memoryLimitMsg": "如果您遇到内存不足错误或应用频繁崩溃，请开启此选项",
         "debugMode": "调试模式",
         "debugModeMsg": "重启应用以应用此更改",
         "logLevel": "日志级别",
@@ -239,7 +239,7 @@
         "urlTestInterval": "URL 测试间隔",
         "clashApiPort": "Clash API 端口",
         "useXrayCoreWhenPossible": "尽可能使用 xray-core",
-        "useXrayCoreWhenPossibleMsg": "解析订阅链接时使用 xray-core。您需要重新导入订阅链接才能启用此选项"
+        "useXrayCoreWhenPossibleMsg": "解析订阅链接时使用 xray-core。您需要重新导入订阅链接才能启用此选项。"
       },
       "routing": {
         "title": "路由",
@@ -264,19 +264,19 @@
             "notAvailabeInThisPlatform": "在此平台上不可用",
             "canNotBeEmpty": "不能为空",
             "validUrlEx": "https://example.com",
-            "validUrl": "有效的 \"URL\"，例如\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "有效的“URL”，例如\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe 或 google chrome 或 chrome",
-            "validProcessName": "有效的 \"进程名\"，例如\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "有效的“进程名”，例如\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "有效的 \"进程路径\"，例如\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "有效的“进程路径”，例如\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 或 1:65000",
-            "validPortRange": "有效的 \"端口\" 或 \"端口范围\"，例如\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "有效的“端口”或“端口范围”，例如\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 或 10.0.0.0/24",
             "validIpCidr": "有效的 IP CIDR，例如\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com 或 dl.google.com",
-            "validDomain": "有效的 \"域名\"，例如\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "有效的“域名”，例如\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com 或 .ir",
-            "validDomainSuffix": "有效的 \"域名后缀\"，例如\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "有效的“域名后缀”，例如\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "名称",
               "outbound": "匹配时出站",
@@ -345,8 +345,8 @@
           "resolveDestination": "解析目的地",
           "ipv6Route": "IPv6 路由",
           "ipv6Modes": {
-            "disable": "禁用",
-            "enable": "启用",
+            "disable": "关闭",
+            "enable": "开启",
             "prefer": "首选",
             "only": "专享"
           },
@@ -382,12 +382,12 @@
               "toast": {
                 "success": "自动选择已完成",
                 "failure": "自动选择失败",
-                "regionNotFound": "未找到 \"${region}\" 地区的自动选择",
+                "regionNotFound": "未找到“${region}”地区的自动选择",
                 "alreadyInAuto": "您的选择已在自动列表中"
               },
               "dialog": {
                 "title": "自动选择应用",
-                "msg": "由于地区更改为 \"${region}\"，分应用代理的自动选择功能已被禁用"
+                "msg": "分应用代理的自动选择已关闭，因为地区更改为“${region}”"
               }
             }
           }
@@ -410,7 +410,7 @@
         "remoteDnsDomainStrategy": "远程 DNS 域名策略",
         "directDns": "出站服务器解析器（直连）",
         "directDnsDomainStrategy": "出站域名策略",
-        "enableFakeDns": "启用伪造 DNS",
+        "enableFakeDns": "开启伪造 DNS",
         "domainStrategy": {
           "auto": "自动",
           "preferIpv6": "偏好 IPv6",
@@ -450,7 +450,7 @@
       },
       "tlsTricks": {
         "title": "TLS 技巧",
-        "enable": "启用分片",
+        "enable": "开启分片",
         "packets": "分片数据包",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
@@ -461,10 +461,10 @@
         "size": "分片大小",
         "sleep": "分片延迟",
         "mixedSniCase": {
-          "enable": "启用混合大小写 SNI"
+          "enable": "开启混合大小写 SNI"
         },
         "padding": {
-          "enable": "启用填充",
+          "enable": "开启填充",
           "size": "填充大小"
         }
       },
@@ -486,7 +486,7 @@
           },
           "unblocker": {
             "title": "解锁器",
-            "msg": "帮助绕过网络限制。如果辅助程序连接成功，即使您的主配置当前被封锁，它仍可继续工作"
+            "msg": "帮助绕过网络限制。如果辅助程序连接成功，即使您的主配置当前被封锁，它仍可继续工作。"
           },
           "filtering": {
             "title": "分流",
@@ -597,7 +597,7 @@
     },
     "psiphonLicense": {
       "title": "Psiphon 许可协议",
-      "description(rich)": "使用 Psiphon 即表示您同意 ${tos(服务条款)} 并确认 ${privacy(隐私政策)}。请在继续之前仔细阅读它们。"
+      "description(rich)": "使用 Psiphon 即表示您同意 ${tos(服务条款)} 并确认 ${privacy(隐私政策)}。继续前请仔细阅读。"
     },
     "newVersion": {
       "title": "有可用更新",
@@ -630,12 +630,12 @@
       "routeRule": {
         "delete": {
           "title": "删除规则",
-          "msg": "您确定要删除规则 \"$rulename\" 吗？"
+          "msg": "您确定要删除规则“$rulename”吗？"
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "添加配置？",
-        "message": "来自 \"${host}\" 的外部链接请求添加新配置。您想要导入吗？"
+        "message": "来自“${host}”的外部链接请求添加新配置。您想要导入吗？"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "导入路由规则？",
@@ -644,7 +644,7 @@
     },
     "experimentalNotice": {
       "title": "正在使用实验性功能",
-      "msg": "您已启用了一些实验性功能，这可能会影响连接质量并导致意外错误。您可以随时在设置中更改或重置这些选项。",
+      "msg": "您已开启了一些实验性功能，这可能会影响连接质量并导致意外错误。您可以随时在设置中更改或重置这些选项。",
       "disable": "不再显示"
     },
     "noActiveProfile": {
@@ -657,32 +657,32 @@
     },
     "unknownDomainsWarning": {
       "title": "警告",
-      "cannotVerify": "我们无法验证此链接",
+      "cannotVerify": "此链接未经验证",
       "avoidIfUnsure": "如果您不能完全确定，请勿付款或分享敏感信息",
       "ownResponsibility": "继续操作的风险由您自行承担",
       "open": "打开",
       "openIn": "打开 (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "完整标签：",
-      "type": "类型：",
-      "testTime": "测试时间：",
-      "testDelay": "测试延迟：",
-      "isSelected": "已选择：",
-      "isGroup": "组：",
-      "isSecure": "安全：",
-      "port": "端口：",
-      "host": "主机：",
-      "ip": "IP：",
-      "countryCode": "国家代码：",
-      "region": "地区：",
-      "city": "城市：",
-      "asn": "ASN：",
-      "organization": "组织：",
-      "location": "位置：",
-      "postalCode": "邮政编码：",
-      "download": "下载：",
-      "upload": "上传："
+      "fullTag": "完整标签",
+      "type": "类型",
+      "testTime": "测试时间",
+      "testDelay": "测试延迟",
+      "isSelected": "已选择",
+      "isGroup": "组",
+      "isSecure": "安全",
+      "port": "端口",
+      "host": "主机",
+      "ip": "IP",
+      "countryCode": "国家代码",
+      "region": "地区",
+      "city": "城市",
+      "asn": "ASN",
+      "organization": "组织",
+      "location": "位置",
+      "postalCode": "邮政编码",
+      "download": "下载",
+      "upload": "上传"
     },
     "windowClosing": {
       "askEachTime": "每次询问",
@@ -693,12 +693,12 @@
   "connection": {
     "tapToConnect": "点击连接",
     "connect": "连接",
-    "connecting": "连接中...",
+    "connecting": "连接中…",
     "connected": "已连接",
     "disconnect": "断开连接",
-    "disconnecting": "断开连接中...",
+    "disconnecting": "断开连接中…",
     "reconnect": "重新连接",
-    "reconnectMsg": "正在重新连接以应用更改..."
+    "reconnectMsg": "正在重新连接以应用更改…"
   },
   "errors": {
     "unexpected": "意外错误",
