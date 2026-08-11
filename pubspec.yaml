@@ -36,6 +36,8 @@ dependencies:
   shared_preferences: ^2.5.2
   # shared_preferences_android: ^2.4.8
   dio: ^5.4.1
+  flutter_secure_storage: ^9.2.2
+  webview_flutter: ^4.10.0
   ffi: ^2.1.2
   path_provider: ^2.1.1
   mobile_scanner: ^7.2.0

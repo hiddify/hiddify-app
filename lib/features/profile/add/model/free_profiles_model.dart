@@ -1,5 +1,4 @@
 // This file is "main.dart"
-import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'free_profiles_model.freezed.dart';

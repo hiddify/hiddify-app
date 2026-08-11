@@ -5,7 +5,7 @@ import 'package:basic_utils/basic_utils.dart';
 import 'package:grpc/grpc.dart';
 
 class MTLSChannelCredentials extends ChannelCredentials {
-  final SecurityContext ctx = SecurityContext(withTrustedRoots: false);
+  final SecurityContext ctx = SecurityContext();
 
   MTLSChannelCredentials({
     required Uint8List serverPublicKey,

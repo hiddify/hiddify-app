@@ -203,7 +203,8 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   Future<void> changeProxy(String groupTag, String outboundTag) async {
     loggy.debug("changing proxy, group: [$groupTag] - outbound: [$outboundTag]");
     if (!state.hasValue) return;
-    final outbounds = state.value!;
+    final outbounds = state.value;
+    if (outbounds == null) return;
     await ref.read(hapticServiceProvider.notifier).lightImpact();
     await ref.read(proxyRepositoryProvider).selectProxy(groupTag, outboundTag).getOrElse((err) {
       loggy.warning("error selecting outbound", err);

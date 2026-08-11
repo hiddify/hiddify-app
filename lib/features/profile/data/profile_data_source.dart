@@ -58,7 +58,7 @@ class ProfileDao extends DatabaseAccessor<Db> with _$ProfileDaoMixin, InfraLogge
   @override
   Stream<int> watchProfilesCount() {
     final count = profileEntries.id.count();
-    return (profileEntries.selectOnly()..addColumns([count])).map((exp) => exp.read(count)!).watchSingle().distinct();
+    return (profileEntries.selectOnly()..addColumns([count])).map((exp) => exp.read(count) ?? 0).watchSingle().distinct();
   }
 
   @override

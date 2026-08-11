@@ -44,10 +44,10 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.background.withOpacity(1),
+        color: theme.colorScheme.surface.withValues(alpha: 1),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: theme.colorScheme.secondary.withOpacity(.21), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: theme.colorScheme.secondary.withValues(alpha: .21), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: InkWell(

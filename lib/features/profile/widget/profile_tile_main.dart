@@ -76,7 +76,7 @@ class ProfileTileMain extends HookConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withOpacity(0.1),
+                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(FluentIcons.arrow_sync_24_filled, color: theme.colorScheme.primary, size: 20),
@@ -93,7 +93,7 @@ class ProfileTileMain extends HookConsumerWidget {
             ),
           ),
           if (subInfo != null)
-            Container(
+            SizedBox(
               width: 350,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -125,7 +125,7 @@ class ProfileTileMain extends HookConsumerWidget {
                       ],
                     ),
                   ),
-                  if ((subInfo.webPageUrl != null || subInfo.supportUrl != null))
+                  if (subInfo.webPageUrl != null || subInfo.supportUrl != null)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Row(
@@ -255,7 +255,7 @@ class _UsageRow extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                       valueColor: AlwaysStoppedAnimation<Color>(color),
                       minHeight: 4,
                     ),
@@ -298,7 +298,7 @@ class _InfoItem extends StatelessWidget {
                 Text(
                   label,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                   ),
                 ),
                 Text(value, style: theme.textTheme.bodyMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
