@@ -55,15 +55,30 @@ class Db extends _$Db with InfraLogger {
           }
         },
         from4To5: (m, schema) async {
-          await m.deleteTable('geo_asset_entries');
-          await m.renameColumn(schema.profileEntries, 'test_url', schema.profileEntries.profileOverride);
-          await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
-          await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
+          if (await _tableExists('geo_asset_entries')) {
+            await m.deleteTable('geo_asset_entries');
+          }
 
-          await m.createTable(schema.appProxyEntries);
+          final profileTable = schema.profileEntries.actualTableName;
+          final hasTestUrl = await _columnExists(profileTable, 'test_url');
+          final hasProfileOverride = await _columnExists(profileTable, 'profile_override');
+          if (hasTestUrl && !hasProfileOverride) {
+            await m.renameColumn(schema.profileEntries, 'test_url', schema.profileEntries.profileOverride);
+          }
+          if (!await _columnExists(profileTable, 'user_override')) {
+            await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
+          }
+          if (!await _columnExists(profileTable, 'populated_headers')) {
+            await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
+          }
+          if (!await _tableExists(schema.appProxyEntries.actualTableName)) {
+            await m.createTable(schema.appProxyEntries);
+          }
         },
         from5To6: (m, schema) async {
-          await m.dropColumn(schema.profileEntries, 'profile_override');
+          if (await _columnExists(schema.profileEntries.actualTableName, 'profile_override')) {
+            await m.dropColumn(schema.profileEntries, 'profile_override');
+          }
         },
       ),
     );
@@ -72,6 +87,14 @@ class Db extends _$Db with InfraLogger {
   Future<bool> _columnExists(String table, String column) async {
     final result = await customSelect('PRAGMA table_info($table);').get();
     return result.any((row) => row.data['name'] == column);
+  }
+
+  Future<bool> _tableExists(String table) async {
+    final result = await customSelect(
+      'SELECT 1 FROM sqlite_master WHERE type = ? AND name = ?',
+      variables: [Variable.withString('table'), Variable.withString(table)],
+    ).get();
+    return result.isNotEmpty;
   }
 }
 
