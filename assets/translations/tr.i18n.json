@@ -97,7 +97,7 @@
   "intro": {
     "banner": "Sınırsız bir internet için ihtiyacınız olan her şey",
     "termsAndPolicyCaution(rich)": "Devam ederek ${tap(@:pages.about.termsAndConditions)} kabul etmiş olursunuz",
-    "info(rich)": "Hiddify tarafından ❤️ ile yapıldı - ${tap_source(Açık kaynak)} (${tap_license(Lisans)})"
+    "info(rich)": "Hiddify tarafından ❤️ ile yapıldı. ${tap_source(Açık kaynak)} ve ${tap_license(Lisans)}"
   },
   "pages": {
     "home": {
@@ -159,7 +159,7 @@
           },
           "failure": "Profil güncellenemedi",
           "failureNamed": "“${name}” güncellenemedi",
-          "bulkPartial": "${success} başarılı\n${failed} başarısız: ${names}"
+          "bulkPartial": "${success} güncellendi\n${failed} başarısız: ${names}"
         },
         "delete": {
           "success": "Profil silindi"
@@ -186,7 +186,7 @@
     },
     "about": {
       "title": "Hakkında",
-      "notAvailableMsg": "Zaten en son sürümü kullanıyorsunuz",
+      "notAvailableMsg": "En son sürümü kullanıyorsunuz",
       "checkForUpdate": "Güncellemeleri kontrol et",
       "openWorkingDir": "Çalışma dizinini aç",
       "sourceCode": "Kaynak kodu",
@@ -221,7 +221,7 @@
           "black": "Siyah mod"
         },
         "enableAnalytics": "Analizi aç",
-        "enableAnalyticsMsg": "Uygulamayı iyileştirmek için analiz ve kilitlenme raporları toplanmasına izin verin",
+        "enableAnalyticsMsg": "Uygulamayı iyileştirmeye yardımcı olmak için cihazınızdan analiz ve kilitlenme raporları gönderin",
         "autoIpCheck": "Bağlantı IP'sini otomatik kontrol et",
         "dynamicNotification": "Hızı bildirimde göster",
         "hapticFeedback": "Dokunsal geri bildirim",
@@ -239,7 +239,7 @@
         "urlTestInterval": "URL testi aralığı",
         "clashApiPort": "Clash API portu",
         "useXrayCoreWhenPossible": "Mümkün olduğunda xray-core kullan",
-        "useXrayCoreWhenPossibleMsg": "Abonelik bağlantılarını ayrıştırırken xray-core kullanın. Bu seçeneği etkinleştirmek için bağlantıyı yeniden içe aktarmanız gerekir."
+        "useXrayCoreWhenPossibleMsg": "Abonelik bağlantılarını ayrıştırırken xray-core kullanın. Bu seçeneği açmak için aboneliği yeniden içe aktarın."
       },
       "routing": {
         "title": "Yönlendirme",
@@ -357,7 +357,7 @@
               "import": {
                 "clipboard": "Seçimi panodan içe aktar",
                 "file": "Seçimi dosyadan içe aktar",
-                "msg": "İçe aktarma mevcut seçimlerinizin üzerine yazacaktır. Devam etmek istediğinizden emin misiniz?"
+                "msg": "İçe aktarma mevcut seçimlerinizi değiştirir. Devam edilsin mi?"
               },
               "export": {
                 "clipboard": "Seçimi panoya kopyala",
@@ -382,7 +382,7 @@
               "toast": {
                 "success": "Otomatik seçim tamamlandı",
                 "failure": "Otomatik seçim başarısız oldu",
-                "regionNotFound": "“${region}” bölgesi için otomatik seçim bulunamadı",
+                "regionNotFound": "“${region}” için otomatik seçim yok",
                 "alreadyInAuto": "Seçimleriniz zaten otomatik listede"
               },
               "dialog": {
@@ -490,7 +490,7 @@
           },
           "filtering": {
             "title": "Filtreleme",
-            "msg": "Son çıkış: Aktif katmanlardan (Ekstra güvenlik, Ana profil veya Engel kaldırıcı) geçtikten ve etkilerini uyguladıktan sonra, trafiğiniz nihayet yerel ağ filtrelemesini aşacak şekilde yönlendirilir"
+            "msg": "Son çıkış: Trafiğiniz aktif katmanlardan geçer. Bunlar Ekstra güvenlik, Ana profil veya Engel kaldırıcı olabilir. Etkileri uygulandıktan sonra trafik, yerel ağ filtrelemesini aşacak şekilde yönlendirilir."
           }
         },
         "warp": {
@@ -601,21 +601,21 @@
     },
     "newVersion": {
       "title": "Güncelleme mevcut",
-      "msg": "@:common.appTitle'ın yeni bir sürümü mevcut. Şimdi güncellemek ister misiniz?",
-      "currentVersion": "Mevcut sürüm: ",
-      "newVersion": "Yeni sürüm: ",
+      "msg": "@:common.appTitle'ın yeni bir sürümü mevcut. Şimdi güncellensin mi?",
+      "currentVersion": "Mevcut sürüm",
+      "newVersion": "Yeni sürüm",
       "updateNow": "Şimdi güncelle"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "Bu işlem tüm yapılandırma seçeneklerini verilen değerlerle yeniden yazacaktır. Emin misiniz?"
+          "msg": "Bu işlem tüm yapılandırma seçeneklerinin üzerine içe aktarılan değerleri yazar. Devam edilsin mi?"
         }
       },
       "profile": {
         "delete": {
           "title": "Profili sil",
-          "msg": "Bu profili kalıcı olarak silmek istediğinizden emin misiniz?"
+          "msg": "Bu profil silinsin mi? Bu işlem geri alınamaz."
         }
       },
       "perAppProxy": {
@@ -624,18 +624,18 @@
           "msg": "Seçili uygulamaları paylaşarak “otomatik seçim” listesini tamamlamaya yardımcı olursunuz"
         },
         "import": {
-          "msg": "Bu işlem mevcut tüm uygulama bazlı proxy seçimlerinizi değiştirecektir. Devam etmek istediğinizden emin misiniz?"
+          "msg": "Bu işlem mevcut tüm uygulama bazlı proxy seçimlerinizi değiştirir. Devam edilsin mi?"
         }
       },
       "routeRule": {
         "delete": {
           "title": "Kuralı sil",
-          "msg": "“$rulename” kuralını silmek istediğinizden emin misiniz?"
+          "msg": "“$rulename” kuralı silinsin mi? Bu işlem geri alınamaz."
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Profil ekle?",
-        "message": "“${host}” adresinden bir dış bağlantı yeni bir profil eklemek istiyor. İçe aktarmak ister misiniz?"
+        "message": "“${host}” adresinden bir dış bağlantı yeni bir profil eklemek istiyor. İçe aktarılsın mı?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Rota kuralını içe aktar?",
@@ -649,14 +649,14 @@
     },
     "noActiveProfile": {
       "title": "Bir profil seçin",
-      "msg": "Başlayalım. VPN sunucu bilgilerinizle bir bağlantı profili ekleyin.\n\nHenüz sunucunuz yok mu? Sorun değil — aşağıdaki rehber ücretsiz bir tane kurmayı gösteriyor.",
+      "msg": "Başlayalım. VPN sunucu bilgilerinizle bir bağlantı profili ekleyin.\n\nHenüz sunucunuz yok mu? Sorun değil. Aşağıdaki rehber ücretsiz bir tane kurmayı gösteriyor.",
       "helpBtn": {
         "label": "Nasıl yapıldığını göster",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Uyarı",
+      "title": "Önce bu bağlantıyı kontrol edin",
       "cannotVerify": "Bu bağlantı doğrulanmamış",
       "avoidIfUnsure": "Tamamen emin değilseniz ödeme yapmayın ve hassas bilgi paylaşmayın",
       "ownResponsibility": "Devam ederseniz sorumluluk size aittir",

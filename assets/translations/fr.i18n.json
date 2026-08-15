@@ -97,7 +97,7 @@
   "intro": {
     "banner": "Tout ce dont vous avez besoin pour un internet sans restrictions",
     "termsAndPolicyCaution(rich)": "En continuant, vous acceptez les ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Fait avec ❤️ par Hiddify - ${tap_source(Open Source)} (${tap_license(Licence)})"
+    "info(rich)": "Fait avec ❤️ par Hiddify. ${tap_source(Open source)} et ${tap_license(Licence)}"
   },
   "pages": {
     "home": {
@@ -160,7 +160,7 @@
             "one": "$count profil mis à jour",
             "other": "$count profils mis à jour"
           },
-          "bulkPartial": "${success} réussis\n${failed} échoués : ${names}"
+          "bulkPartial": "${success} mis à jour\n${failed} échoués : ${names}"
         },
         "delete": {
           "success": "Profil supprimé"
@@ -187,7 +187,7 @@
     },
     "about": {
       "title": "À propos",
-      "notAvailableMsg": "Vous utilisez déjà la dernière version",
+      "notAvailableMsg": "Vous utilisez la dernière version",
       "checkForUpdate": "Vérifier les mises à jour",
       "openWorkingDir": "Ouvrir le répertoire de travail",
       "sourceCode": "Code source",
@@ -222,7 +222,7 @@
           "black": "Mode noir"
         },
         "enableAnalytics": "Activer les statistiques",
-        "enableAnalyticsMsg": "Autoriser la collecte de statistiques et de rapports d'erreurs pour améliorer l'application",
+        "enableAnalyticsMsg": "Envoyez des statistiques et des rapports d'erreurs depuis votre appareil pour aider à améliorer l'application",
         "autoIpCheck": "Vérifier automatiquement l'IP de connexion",
         "dynamicNotification": "Afficher la vitesse dans la notification",
         "hapticFeedback": "Retour haptique",
@@ -240,7 +240,7 @@
         "urlTestInterval": "Intervalle de test de l'URL",
         "clashApiPort": "Port de l'API Clash",
         "useXrayCoreWhenPossible": "Utiliser xray-core si possible",
-        "useXrayCoreWhenPossibleMsg": "Utilisez xray-core lors de l'analyse des liens d'abonnement. Vous devez réimporter le lien pour activer cette option."
+        "useXrayCoreWhenPossibleMsg": "Utilisez xray-core lors de l'analyse des liens d'abonnement. Réimportez l'abonnement pour activer cette option."
       },
       "routing": {
         "title": "Routage",
@@ -358,7 +358,7 @@
               "import": {
                 "clipboard": "Importer la sélection depuis le presse-papiers",
                 "file": "Importer la sélection depuis un fichier",
-                "msg": "L'importation remplacera vos sélections actuelles. Êtes-vous sûr de vouloir continuer ?"
+                "msg": "L'importation remplace vos sélections actuelles. Continuer ?"
               },
               "export": {
                 "clipboard": "Copier la sélection dans le presse-papiers",
@@ -383,7 +383,7 @@
               "toast": {
                 "success": "Sélection automatique terminée",
                 "failure": "Échec de la sélection automatique",
-                "regionNotFound": "Sélection automatique non trouvée pour la région « ${region} »",
+                "regionNotFound": "Aucune sélection automatique pour « ${region} »",
                 "alreadyInAuto": "Vos sélections sont déjà dans la liste automatique"
               },
               "dialog": {
@@ -491,7 +491,7 @@
           },
           "filtering": {
             "title": "Filtrage",
-            "msg": "Sortie finale : après avoir traversé les couches actives (Sécurité supplémentaire, Profil principal ou Débloqueur) et appliqué leurs effets, votre trafic est finalement acheminé pour contourner le filtrage du réseau local"
+            "msg": "Sortie finale : votre trafic traverse les couches actives, à savoir Sécurité supplémentaire, Profil principal ou Débloqueur. Une fois leurs effets appliqués, il est acheminé pour contourner le filtrage du réseau local."
           }
         },
         "warp": {
@@ -603,21 +603,21 @@
     },
     "newVersion": {
       "title": "Mise à jour disponible",
-      "msg": "Une nouvelle version de @:common.appTitle est disponible. Voulez-vous mettre à jour maintenant ?",
-      "currentVersion": "Version actuelle : ",
-      "newVersion": "Nouvelle version : ",
+      "msg": "Une nouvelle version de @:common.appTitle est disponible. Mettre à jour maintenant ?",
+      "currentVersion": "Version actuelle",
+      "newVersion": "Nouvelle version",
       "updateNow": "Mettre à jour"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "Cette action remplacera toutes les options de configuration par les valeurs fournies. Êtes-vous sûr ?"
+          "msg": "Cette action écrase toutes les options de configuration avec les valeurs importées. Continuer ?"
         }
       },
       "profile": {
         "delete": {
           "title": "Supprimer le profil",
-          "msg": "Êtes-vous sûr de vouloir supprimer ce profil définitivement ?"
+          "msg": "Supprimer ce profil ? Cette action est irréversible."
         }
       },
       "perAppProxy": {
@@ -626,18 +626,18 @@
           "msg": "En partageant les applications sélectionnées, vous aidez à compléter la liste de « sélection automatique »"
         },
         "import": {
-          "msg": "Cette action remplacera toutes vos sélections actuelles de proxy par application. Êtes-vous sûr de vouloir continuer ?"
+          "msg": "Cette action remplace toutes vos sélections actuelles de proxy par application. Continuer ?"
         }
       },
       "routeRule": {
         "delete": {
           "title": "Supprimer la règle",
-          "msg": "Êtes-vous sûr de vouloir supprimer la règle « $rulename » ?"
+          "msg": "Supprimer la règle « $rulename » ? Cette action est irréversible."
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Ajouter un profil ?",
-        "message": "Un lien externe de « ${host} » demande à ajouter un nouveau profil. Voulez-vous l'importer ?"
+        "message": "Un lien externe de « ${host} » veut ajouter un nouveau profil. L'importer ?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Importer une règle de routage ?",
@@ -651,14 +651,14 @@
     },
     "noActiveProfile": {
       "title": "Choisissez un profil",
-      "msg": "Commençons. Ajoutez un profil de connexion avec les détails de votre serveur VPN.\n\nPas encore de serveur ? Pas de problème — le guide ci-dessous vous montre comment en créer un gratuitement.",
+      "msg": "Commençons. Ajoutez un profil de connexion avec les détails de votre serveur VPN.\n\nPas encore de serveur ? Pas de problème. Le guide ci-dessous vous montre comment en créer un gratuitement.",
       "helpBtn": {
         "label": "Montrez-moi comment",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Avertissement",
+      "title": "Vérifiez d'abord ce lien",
       "cannotVerify": "Ce lien n’est pas vérifié",
       "avoidIfUnsure": "Si vous n'êtes pas totalement sûr, ne payez pas et ne partagez pas d'informations sensibles",
       "ownResponsibility": "Vous continuez à vos propres risques",

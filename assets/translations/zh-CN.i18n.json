@@ -97,7 +97,7 @@
   "intro": {
     "banner": "畅享无限制网络的所需一切",
     "termsAndPolicyCaution(rich)": "继续即表示您同意 ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "由 Hiddify 用 ❤️ 制作 - ${tap_source(开源)} (${tap_license(许可证)})"
+    "info(rich)": "由 Hiddify 用 ❤️ 制作。${tap_source(开源)} 和 ${tap_license(许可证)}"
   },
   "pages": {
     "home": {
@@ -159,7 +159,7 @@
           },
           "failure": "更新配置文件失败",
           "failureNamed": "更新“${name}”失败",
-          "bulkPartial": "${success} 个成功\n${failed} 个失败：${names}"
+          "bulkPartial": "${success} 个已更新\n${failed} 个失败：${names}"
         },
         "delete": {
           "success": "配置文件已删除"
@@ -186,7 +186,7 @@
     },
     "about": {
       "title": "关于",
-      "notAvailableMsg": "已是最新版本",
+      "notAvailableMsg": "您正在使用最新版本",
       "checkForUpdate": "检查更新",
       "openWorkingDir": "打开工作目录",
       "sourceCode": "源代码",
@@ -221,7 +221,7 @@
           "black": "纯黑模式"
         },
         "enableAnalytics": "开启分析",
-        "enableAnalyticsMsg": "允许收集分析数据和发送崩溃报告以改进应用",
+        "enableAnalyticsMsg": "从您的设备发送分析数据和崩溃报告，帮助改进应用",
         "autoIpCheck": "自动检查连接 IP",
         "dynamicNotification": "在通知中显示速度",
         "hapticFeedback": "触觉反馈",
@@ -239,7 +239,7 @@
         "urlTestInterval": "URL 测试间隔",
         "clashApiPort": "Clash API 端口",
         "useXrayCoreWhenPossible": "尽可能使用 xray-core",
-        "useXrayCoreWhenPossibleMsg": "解析订阅链接时使用 xray-core。您需要重新导入订阅链接才能启用此选项。"
+        "useXrayCoreWhenPossibleMsg": "解析订阅链接时使用 xray-core。重新导入订阅即可开启此选项。"
       },
       "routing": {
         "title": "路由",
@@ -357,7 +357,7 @@
               "import": {
                 "clipboard": "从剪贴板导入选择",
                 "file": "从文件导入选择",
-                "msg": "导入将替换您当前的选择。确定要继续吗？"
+                "msg": "导入会替换您当前的选择。要继续吗？"
               },
               "export": {
                 "clipboard": "复制选择到剪贴板",
@@ -382,7 +382,7 @@
               "toast": {
                 "success": "自动选择已完成",
                 "failure": "自动选择失败",
-                "regionNotFound": "未找到“${region}”地区的自动选择",
+                "regionNotFound": "没有“${region}”的自动选择",
                 "alreadyInAuto": "您的选择已在自动列表中"
               },
               "dialog": {
@@ -490,7 +490,7 @@
           },
           "filtering": {
             "title": "分流",
-            "msg": "最终出口：通过活动层（额外安全、主配置或解锁器）并应用其效果后，您的流量最终被路由以绕过本地网络过滤"
+            "msg": "最终出口：您的流量会通过活动层，即额外安全、主配置或解锁器。应用其效果后，流量将被路由以绕过本地网络过滤。"
           }
         },
         "warp": {
@@ -601,21 +601,21 @@
     },
     "newVersion": {
       "title": "有可用更新",
-      "msg": "@:common.appTitle 的新版本已发布。您想现在更新吗？",
-      "currentVersion": "当前版本：",
-      "newVersion": "新版本：",
+      "msg": "@:common.appTitle 的新版本已发布。现在更新吗？",
+      "currentVersion": "当前版本",
+      "newVersion": "新版本",
       "updateNow": "立即更新"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "这将用提供的值覆盖所有配置选项。您确定吗？"
+          "msg": "这会用导入的值覆盖所有配置选项。要继续吗？"
         }
       },
       "profile": {
         "delete": {
           "title": "删除配置文件",
-          "msg": "您确定要永久删除此配置文件吗？"
+          "msg": "删除此配置文件吗？此操作无法撤销。"
         }
       },
       "perAppProxy": {
@@ -624,18 +624,18 @@
           "msg": "通过分享您选择的应用，可以帮助完善“自动选择”列表"
         },
         "import": {
-          "msg": "这将替换您当前所有的分应用代理选择。您确定要继续吗？"
+          "msg": "这会替换您当前所有的分应用代理选择。要继续吗？"
         }
       },
       "routeRule": {
         "delete": {
           "title": "删除规则",
-          "msg": "您确定要删除规则“$rulename”吗？"
+          "msg": "删除规则“$rulename”吗？此操作无法撤销。"
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "添加配置？",
-        "message": "来自“${host}”的外部链接请求添加新配置。您想要导入吗？"
+        "message": "来自“${host}”的外部链接想要添加新配置。要导入吗？"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "导入路由规则？",
@@ -649,14 +649,14 @@
     },
     "noActiveProfile": {
       "title": "选择一个配置文件",
-      "msg": "让我们开始吧。添加一个包含您 VPN 服务器信息的连接配置文件。\n\n还没有服务器？没关系 — 下面的指南会告诉您如何免费搭建一个。",
+      "msg": "让我们开始吧。添加一个包含您 VPN 服务器信息的连接配置文件。\n\n还没有服务器？没关系。下面的指南会告诉您如何免费搭建一个。",
       "helpBtn": {
         "label": "告诉我如何操作",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "警告",
+      "title": "请先检查此链接",
       "cannotVerify": "此链接未经验证",
       "avoidIfUnsure": "如果您不能完全确定，请勿付款或分享敏感信息",
       "ownResponsibility": "继续操作的风险由您自行承担",

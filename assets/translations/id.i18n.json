@@ -97,7 +97,7 @@
   "intro": {
     "banner": "Semua yang Anda butuhkan untuk internet tanpa batasan",
     "termsAndPolicyCaution(rich)": "Dengan melanjutkan, Anda menyetujui ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Dibuat dengan ❤️ oleh Hiddify - ${tap_source(Sumber terbuka)} (${tap_license(Lisensi)})"
+    "info(rich)": "Dibuat dengan ❤️ oleh Hiddify. ${tap_source(Sumber terbuka)} dan ${tap_license(Lisensi)}"
   },
   "pages": {
     "home": {
@@ -159,7 +159,7 @@
           "bulkSuccess(plural, param=count)": {
             "other": "$count profil diperbarui"
           },
-          "bulkPartial": "${success} berhasil\n${failed} gagal: ${names}"
+          "bulkPartial": "${success} diperbarui\n${failed} gagal: ${names}"
         },
         "delete": {
           "success": "Profil dihapus"
@@ -186,7 +186,7 @@
     },
     "about": {
       "title": "Tentang",
-      "notAvailableMsg": "Anda sudah menggunakan versi terbaru",
+      "notAvailableMsg": "Anda menggunakan versi terbaru",
       "checkForUpdate": "Periksa pembaruan",
       "openWorkingDir": "Buka direktori kerja",
       "sourceCode": "Kode sumber",
@@ -221,7 +221,7 @@
           "black": "Mode hitam"
         },
         "enableAnalytics": "Aktifkan analitik",
-        "enableAnalyticsMsg": "Berikan izin untuk mengumpulkan analitik dan mengirim laporan kerusakan untuk meningkatkan aplikasi",
+        "enableAnalyticsMsg": "Kirim analitik dan laporan kerusakan dari perangkat Anda untuk membantu meningkatkan aplikasi",
         "autoIpCheck": "Periksa IP koneksi secara otomatis",
         "dynamicNotification": "Tampilkan kecepatan di notifikasi",
         "hapticFeedback": "Umpan balik haptik",
@@ -239,7 +239,7 @@
         "urlTestInterval": "Interval uji URL",
         "clashApiPort": "Port API Clash",
         "useXrayCoreWhenPossible": "Gunakan xray-core jika memungkinkan",
-        "useXrayCoreWhenPossibleMsg": "Gunakan xray-core saat mengurai tautan langganan. Anda perlu mengimpor ulang tautan untuk mengaktifkan opsi ini."
+        "useXrayCoreWhenPossibleMsg": "Gunakan xray-core saat mengurai tautan langganan. Impor ulang langganan untuk mengaktifkan opsi ini."
       },
       "routing": {
         "title": "Perutean",
@@ -357,7 +357,7 @@
               "import": {
                 "clipboard": "Impor pilihan dari papan klip",
                 "file": "Impor pilihan dari file",
-                "msg": "Mengimpor akan menggantikan pilihan Anda saat ini. Anda yakin ingin melanjutkan?"
+                "msg": "Mengimpor menggantikan pilihan Anda saat ini. Lanjutkan?"
               },
               "export": {
                 "clipboard": "Salin pilihan ke papan klip",
@@ -382,7 +382,7 @@
               "toast": {
                 "success": "Pilihan otomatis selesai",
                 "failure": "Pilihan otomatis gagal",
-                "regionNotFound": "Pilihan otomatis tidak ditemukan untuk wilayah “${region}”",
+                "regionNotFound": "Tidak ada pilihan otomatis untuk “${region}”",
                 "alreadyInAuto": "Pilihan Anda sudah ada dalam daftar otomatis"
               },
               "dialog": {
@@ -490,7 +490,7 @@
           },
           "filtering": {
             "title": "Pemfilteran",
-            "msg": "Keluar akhir: Setelah melewati lapisan aktif (Keamanan tambahan, Profil utama, atau Pembuka blokir) dan menerapkan efeknya, lalu lintas Anda akhirnya dirutekan untuk melewati pemfilteran jaringan lokal"
+            "msg": "Keluar akhir: Lalu lintas Anda melewati lapisan aktif, yaitu Keamanan tambahan, Profil utama, atau Pembuka blokir. Setelah efeknya diterapkan, lalu lintas dirutekan untuk melewati pemfilteran jaringan lokal."
           }
         },
         "warp": {
@@ -601,21 +601,21 @@
     },
     "newVersion": {
       "title": "Pembaruan tersedia",
-      "msg": "Versi baru @:common.appTitle tersedia. Apakah Anda ingin memperbarui sekarang?",
-      "currentVersion": "Versi saat ini: ",
-      "newVersion": "Versi baru: ",
+      "msg": "Versi baru @:common.appTitle tersedia. Perbarui sekarang?",
+      "currentVersion": "Versi saat ini",
+      "newVersion": "Versi baru",
       "updateNow": "Perbarui sekarang"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "Ini akan menimpa semua opsi konfigurasi dengan nilai yang diberikan. Anda yakin?"
+          "msg": "Ini menimpa semua opsi konfigurasi dengan nilai yang diimpor. Lanjutkan?"
         }
       },
       "profile": {
         "delete": {
           "title": "Hapus profil",
-          "msg": "Anda yakin ingin menghapus profil ini secara permanen?"
+          "msg": "Hapus profil ini? Tindakan ini tidak dapat dibatalkan."
         }
       },
       "perAppProxy": {
@@ -624,18 +624,18 @@
           "msg": "Dengan membagikan aplikasi yang dipilih, Anda membantu melengkapi daftar “pilihan otomatis”"
         },
         "import": {
-          "msg": "Ini akan menggantikan semua pilihan proxy per aplikasi Anda saat ini. Anda yakin ingin melanjutkan?"
+          "msg": "Ini menggantikan semua pilihan proxy per aplikasi Anda saat ini. Lanjutkan?"
         }
       },
       "routeRule": {
         "delete": {
           "title": "Hapus aturan",
-          "msg": "Anda yakin ingin menghapus aturan “$rulename”?"
+          "msg": "Hapus aturan “$rulename”? Tindakan ini tidak dapat dibatalkan."
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Tambah profil?",
-        "message": "Tautan eksternal dari “${host}” meminta untuk menambahkan profil baru. Apakah Anda ingin mengimpornya?"
+        "message": "Tautan eksternal dari “${host}” ingin menambahkan profil baru. Impor?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Impor aturan rute?",
@@ -649,14 +649,14 @@
     },
     "noActiveProfile": {
       "title": "Pilih profil",
-      "msg": "Mari mulai. Tambahkan profil koneksi dengan detail server VPN Anda.\n\nBelum punya server? Tidak masalah — panduan di bawah ini menunjukkan cara membuatnya secara gratis.",
+      "msg": "Mari mulai. Tambahkan profil koneksi dengan detail server VPN Anda.\n\nBelum punya server? Tidak masalah. Panduan di bawah ini menunjukkan cara membuatnya secara gratis.",
       "helpBtn": {
         "label": "Tunjukkan caranya",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Peringatan",
+      "title": "Periksa tautan ini dulu",
       "cannotVerify": "Tautan ini belum diverifikasi",
       "avoidIfUnsure": "Jika Anda tidak sepenuhnya yakin, jangan membayar atau membagikan informasi sensitif",
       "ownResponsibility": "Anda melanjutkan dengan risiko sendiri",
