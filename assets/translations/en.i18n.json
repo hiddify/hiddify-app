@@ -97,7 +97,7 @@
   "intro": {
     "banner": "All you need for an unrestricted internet",
     "termsAndPolicyCaution(rich)": "By continuing you agree to ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open source)} (${tap_license(License)})"
+    "info(rich)": "Made with ❤️ by Hiddify. ${tap_source(Open source)} and ${tap_license(License)}"
   },
   "pages": {
     "home": {
@@ -160,7 +160,7 @@
             "one": "$count profile updated",
             "other": "$count profiles updated"
           },
-          "bulkPartial": "${success} success\n${failed} failed: ${names}"
+          "bulkPartial": "${success} updated\n${failed} failed: ${names}"
         },
         "delete": {
           "success": "Profile deleted"
@@ -174,7 +174,7 @@
         "nameHint": "Profile name",
         "emptyName": "Name is required",
         "invalidUrl": "Invalid URL",
-        "urlHint": "Full config URL",
+        "urlHint": "Full configuration URL",
         "disableAutoUpdate": "Turn off auto update",
         "autoUpdateInterval": "Auto update interval",
         "loading": "Adding profile…"
@@ -187,7 +187,7 @@
     },
     "about": {
       "title": "About",
-      "notAvailableMsg": "Already using the latest version",
+      "notAvailableMsg": "You’re using the latest version",
       "checkForUpdate": "Check for update",
       "openWorkingDir": "Open working directory",
       "sourceCode": "Source code",
@@ -222,7 +222,7 @@
           "black": "Black mode"
         },
         "enableAnalytics": "Turn on analytics",
-        "enableAnalyticsMsg": "Give permission to collect analytics and send crash reports to improve the app",
+        "enableAnalyticsMsg": "Send analytics and crash reports from your device to help improve the app",
         "autoIpCheck": "Automatically check connection IP",
         "dynamicNotification": "Display speed in notification",
         "hapticFeedback": "Haptic feedback",
@@ -240,7 +240,7 @@
         "urlTestInterval": "URL test interval",
         "clashApiPort": "Clash API port",
         "useXrayCoreWhenPossible": "Use xray-core when possible",
-        "useXrayCoreWhenPossibleMsg": "Use xray-core when parsing subscription links. Reimport the subscription to enable this."
+        "useXrayCoreWhenPossibleMsg": "Use xray-core when parsing subscription links. Reimport the subscription to turn this on."
       },
       "routing": {
         "title": "Routing",
@@ -358,7 +358,7 @@
               "import": {
                 "clipboard": "Import selection from clipboard",
                 "file": "Import selection from file",
-                "msg": "Importing will replace your current selections. Are you sure you want to continue?"
+                "msg": "Importing replaces your current selections. Continue?"
               },
               "export": {
                 "clipboard": "Copy selection to clipboard",
@@ -383,7 +383,7 @@
               "toast": {
                 "success": "Auto selection complete",
                 "failure": "Auto selection failed",
-                "regionNotFound": "Auto selection not found, region “${region}”",
+                "regionNotFound": "No auto selection for “${region}”",
                 "alreadyInAuto": "Your selections are already in the auto-list"
               },
               "dialog": {
@@ -491,7 +491,7 @@
           },
           "filtering": {
             "title": "Filtering",
-            "msg": "Final exit: After passing through the active layers (Extra security, Main profile, or Unblocker) and applying their effects, your traffic is finally routed to bypass local network filtering"
+            "msg": "Final exit: Your traffic passes through the active layers, which can be Extra security, Main profile, or Unblocker. Once their effects are applied, it is routed to bypass local network filtering."
           }
         },
         "warp": {
@@ -603,21 +603,21 @@
     },
     "newVersion": {
       "title": "Update available",
-      "msg": "A new version of @:common.appTitle is available. Would you like to update now?",
-      "currentVersion": "Current version: ",
-      "newVersion": "New version: ",
+      "msg": "A new version of @:common.appTitle is available. Update now?",
+      "currentVersion": "Current version",
+      "newVersion": "New version",
       "updateNow": "Update now"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "This will overwrite all config options with provided values. Are you sure?"
+          "msg": "This overwrites all configuration options with the imported values. Continue?"
         }
       },
       "profile": {
         "delete": {
           "title": "Delete profile",
-          "msg": "Are you sure you want to permanently delete this profile?"
+          "msg": "Delete this profile? You can’t undo this."
         }
       },
       "perAppProxy": {
@@ -626,18 +626,18 @@
           "msg": "By sharing selected apps, you help complete the “auto selection” list"
         },
         "import": {
-          "msg": "This will replace all your current per-app proxy selections. Are you sure you want to continue?"
+          "msg": "This replaces all your current per-app proxy selections. Continue?"
         }
       },
       "routeRule": {
         "delete": {
           "title": "Delete rule",
-          "msg": "Are you sure you want to delete the “$rulename” rule?"
+          "msg": "Delete the “$rulename” rule? You can’t undo this."
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Add profile?",
-        "message": "An external link from “${host}” is requesting to add a new profile. Do you want to import it?"
+        "message": "An external link from “${host}” wants to add a new profile. Import it?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Import route rule?",
@@ -646,21 +646,21 @@
     },
     "experimentalNotice": {
       "title": "Experimental features in use",
-      "msg": "You’ve turned on some experimental features which might affect connection quality and cause unexpected errors. You can always change or reset these options in Settings.",
+      "msg": "You’ve turned on some experimental features that might affect connection quality and cause unexpected errors. You can always change or reset these options in Settings.",
       "disable": "Don’t show again"
     },
     "noActiveProfile": {
       "title": "Choose a profile",
-      "msg": "Let’s get started. Add a connection profile with your VPN server details.\n\nNo server yet? No problem — the guide below shows how to set one up for free.",
+      "msg": "Let’s get started. Add a connection profile with your VPN server details.\n\nNo server yet? No problem. The guide below shows how to set one up for free.",
       "helpBtn": {
         "label": "Show me how",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Warning",
+      "title": "Check this link first",
       "cannotVerify": "This link isn’t verified",
-      "avoidIfUnsure": "If you’re not fully sure, don’t pay or share sensitive information",
+      "avoidIfUnsure": "If you’re not fully sure, do not pay or share sensitive information",
       "ownResponsibility": "You continue at your own risk",
       "open": "Open",
       "openIn": "Open (${seconds})"
@@ -689,7 +689,7 @@
     "windowClosing": {
       "askEachTime": "Ask each time",
       "alertMessage": "Hide or exit the app?",
-      "remember": "Remember my choice"
+      "remember": "Remember this choice"
     }
   },
   "connection": {
@@ -714,7 +714,7 @@
     "profiles": {
       "unexpected": "Unexpected error",
       "notFound": "Profile not found",
-      "invalidConfig": "Invalid config",
+      "invalidConfig": "Invalid configuration",
       "invalidUrl": "Invalid URL",
       "canceledByUser": "Canceled by user"
     },
