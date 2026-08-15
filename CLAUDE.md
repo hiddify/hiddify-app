@@ -53,18 +53,18 @@ that is.
 The M3 rules live in three local files, taken from the M3 style guide. **Read all three before you
 write or translate any string** — they are short:
 
-- [Grammar and punctuation](docs/writing/m3-grammar-and-punctuation.md) — periods, contractions, commas, colons, exclamation points, ellipses, parentheses, ampersands, dashes, hyphens, italics, caps.
-- [UX writing best practices](docs/writing/m3-ux-writing-best-practices.md) — consequences, scannable text, sentence case, abbreviations.
-- [Word choice](docs/writing/m3-word-choice.md) — pronouns.
+- [Grammar and punctuation](.claude/writing/m3-grammar-and-punctuation.md) — periods, contractions, commas, colons, exclamation points, ellipses, parentheses, ampersands, dashes, hyphens, italics, caps.
+- [UX writing best practices](.claude/writing/m3-ux-writing-best-practices.md) — consequences, scannable text, sentence case, abbreviations.
+- [Word choice](.claude/writing/m3-word-choice.md) — pronouns.
 
 Each file carries its source URL and capture date, so it can be refreshed from the site later.
 
 The M3 style guide has only those three pages. Six more subjects come from the older Material site,
 captured the same way. Read the one that matches the string you are writing:
 
-- [Writing style](docs/writing/m1-writing.md) — voice and tone, word choice, present tense, no jargon, writing for translation.
-- [Errors](docs/writing/m1-errors.md) — what an error must say, blame, retry, form fields, offline.
-- [Confirmation and acknowledgement](docs/writing/m1-confirmation-and-acknowledgement.md) — when to confirm, dialog titles.
-- [Permissions](docs/writing/m1-permissions.md) — when to ask, how to explain, what to do on refusal.
-- [Empty states](docs/writing/m1-empty-states.md) — the tagline, and what to show instead of nothing.
-- [Data formats](docs/writing/m1-data-formats.md) — dates, times, ranges, durations, numbers.
+- [Writing style](.claude/writing/m1-writing.md) — voice and tone, word choice, present tense, no jargon, writing for translation.
+- [Errors](.claude/writing/m1-errors.md) — what an error must say, blame, retry, form fields, offline.
+- [Confirmation and acknowledgement](.claude/writing/m1-confirmation-and-acknowledgement.md) — when to confirm, dialog titles.
+- [Permissions](.claude/writing/m1-permissions.md) — when to ask, how to explain, what to do on refusal.
+- [Empty states](.claude/writing/m1-empty-states.md) — the tagline, and what to show instead of nothing.
+- [Data formats](.claude/writing/m1-data-formats.md) — dates, times, ranges, durations, numbers.
