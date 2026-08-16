@@ -244,7 +244,8 @@
       "routing": {
         "title": "Perutean",
         "routeRule": {
-          "empty": "Belum ada aturan yang ditambahkan\n\nKetuk tombol + untuk membuat aturan baru atau pilih dari aturan yang telah ditentukan sebelumnya",
+          "empty": "Belum ada aturan perutean\n\nBuat aturan baru atau pilih dari aturan yang telah ditentukan sebelumnya",
+          "add": "Tambah aturan",
           "delete": "Hapus aturan",
           "create": "Buat aturan baru",
           "options": {

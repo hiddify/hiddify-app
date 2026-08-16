@@ -245,7 +245,8 @@
       "routing": {
         "title": "Routage",
         "routeRule": {
-          "empty": "Aucune règle ajoutée pour le moment\n\nAppuyez sur le bouton + pour créer une nouvelle règle ou choisissez parmi les règles prédéfinies",
+          "empty": "Aucune règle de routage pour le moment\n\nCréez une nouvelle règle ou choisissez parmi les règles prédéfinies",
+          "add": "Ajouter une règle",
           "delete": "Supprimer la règle",
           "create": "Créer une nouvelle règle",
           "options": {

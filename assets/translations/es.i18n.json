@@ -245,7 +245,8 @@
       "routing": {
         "title": "Enrutamiento",
         "routeRule": {
-          "empty": "No se han añadido reglas todavía\n\nToca el botón + para crear una nueva regla o elige de las reglas predefinidas",
+          "empty": "Aún no hay reglas de enrutamiento\n\nCrea una nueva regla o elige de las reglas predefinidas",
+          "add": "Añadir regla",
           "delete": "Eliminar regla",
           "create": "Crear nueva regla",
           "options": {

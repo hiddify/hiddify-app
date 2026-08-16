@@ -244,7 +244,8 @@
       "routing": {
         "title": "Yönlendirme",
         "routeRule": {
-          "empty": "Henüz kural eklenmedi\n\nYeni bir kural oluşturmak için + düğmesine dokunun veya önceden tanımlanmış kurallardan birini seçin",
+          "empty": "Henüz yönlendirme kuralı yok\n\nYeni bir kural oluşturun veya önceden tanımlanmış kurallardan birini seçin",
+          "add": "Kural ekle",
           "delete": "Kuralı sil",
           "create": "Yeni kural oluştur",
           "options": {

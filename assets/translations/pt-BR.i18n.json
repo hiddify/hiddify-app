@@ -245,7 +245,8 @@
       "routing": {
         "title": "Roteamento",
         "routeRule": {
-          "empty": "Nenhuma regra adicionada ainda\n\nToque no botão + para criar uma nova regra ou escolha a partir de regras predefinidas",
+          "empty": "Ainda não há regras de roteamento\n\nCrie uma nova regra ou escolha entre as regras predefinidas",
+          "add": "Adicionar regra",
           "delete": "Excluir regra",
           "create": "Criar nova regra",
           "options": {
