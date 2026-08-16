@@ -245,7 +245,8 @@
       "routing": {
         "title": "Routing",
         "routeRule": {
-          "empty": "No rules added yet\n\nTap the + button to create a new rule or choose from predefined rules",
+          "empty": "No routing rules yet\n\nCreate a new rule or choose from the predefined rules",
+          "add": "Add rule",
           "delete": "Delete rule",
           "create": "Create new rule",
           "options": {
