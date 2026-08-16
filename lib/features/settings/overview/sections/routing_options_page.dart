@@ -114,6 +114,8 @@ class RoutingOptionsPage extends HookConsumerWidget {
                     ),
                   ),
                 _ExpandableFab(
+                  tooltip: t.pages.settings.routing.routeRule.add,
+                  closeTooltip: t.common.close,
                   children: [
                     _FabMenuItem(
                       icon: Icons.rule_rounded,
@@ -264,11 +266,20 @@ class _FabMenuItem {
 }
 
 class _ExpandableFab extends StatefulWidget {
-  // ignore: unused_element_parameter
-  const _ExpandableFab({this.isExtended = false, this.extendedLabel = '', required this.children});
+  const _ExpandableFab({
+    // ignore: unused_element_parameter
+    this.isExtended = false,
+    // ignore: unused_element_parameter
+    this.extendedLabel = '',
+    required this.tooltip,
+    required this.closeTooltip,
+    required this.children,
+  });
 
   final bool isExtended;
   final String extendedLabel;
+  final String tooltip;
+  final String closeTooltip;
   final List<_FabMenuItem> children;
 
   @override
@@ -338,6 +349,7 @@ class _ExpandableFabState extends State<_ExpandableFab> with SingleTickerProvide
             child: widget.isExtended
                 ? FloatingActionButton.extended(
                     onPressed: _toggle,
+                    tooltip: _isOpen ? widget.closeTooltip : widget.tooltip,
                     label: AnimatedBuilder(
                       animation: _controller,
                       builder: (context, _) =>
@@ -353,6 +365,7 @@ class _ExpandableFabState extends State<_ExpandableFab> with SingleTickerProvide
                   )
                 : FloatingActionButton(
                     onPressed: _toggle,
+                    tooltip: _isOpen ? widget.closeTooltip : widget.tooltip,
                     child: AnimatedBuilder(
                       animation: _controller,
                       builder: (context, _) => Transform.rotate(
@@ -388,36 +401,44 @@ class _ExpandableFabState extends State<_ExpandableFab> with SingleTickerProvide
           child: AnimatedBuilder(
             animation: animation,
             builder: (context, _) {
-              return Opacity(
-                opacity: animation.value,
-                child: Transform.translate(
-                  offset: Offset(0, 20 * (1 - animation.value)),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (!isRtl) _buildLabel(theme, child.label, animation),
-                      if (!isRtl) const Gap(12),
-                      SizedBox(
-                        width: 48,
-                        height: 40,
-                        child: Material(
-                          color: theme.colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                          elevation: 3,
-                          shadowColor: theme.colorScheme.shadow,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(12),
-                            onTap: () {
-                              _close();
-                              child.onTap();
-                            },
-                            child: Icon(child.icon, color: theme.colorScheme.onPrimaryContainer),
-                          ),
+              return IgnorePointer(
+                ignoring: !_isOpen,
+                child: ExcludeSemantics(
+                  excluding: !_isOpen,
+                  child: Opacity(
+                    opacity: animation.value,
+                    child: Transform.translate(
+                      offset: Offset(0, 20 * (1 - animation.value)),
+                      child: MergeSemantics(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (!isRtl) _buildLabel(theme, child.label, animation),
+                            if (!isRtl) const Gap(12),
+                            SizedBox(
+                              width: 48,
+                              height: 40,
+                              child: Material(
+                                color: theme.colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(12),
+                                elevation: 3,
+                                shadowColor: theme.colorScheme.shadow,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: () {
+                                    _close();
+                                    child.onTap();
+                                  },
+                                  child: Icon(child.icon, color: theme.colorScheme.onPrimaryContainer),
+                                ),
+                              ),
+                            ),
+                            if (isRtl) const Gap(12),
+                            if (isRtl) _buildLabel(theme, child.label, animation),
+                          ],
                         ),
                       ),
-                      if (isRtl) const Gap(12),
-                      if (isRtl) _buildLabel(theme, child.label, animation),
-                    ],
+                    ),
                   ),
                 ),
               );
