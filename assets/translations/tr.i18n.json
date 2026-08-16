@@ -262,7 +262,7 @@
           "rule": {
             "title": "Kural",
             "onlyTunMode": "Yalnızca TUN modunda kullanılabilir",
-            "notAvailabeInThisPlatform": "Bu platformda mevcut değil",
+            "notAvailableInThisPlatform": "Bu platformda mevcut değil",
             "canNotBeEmpty": "Boş olamaz",
             "validUrlEx": "https://example.com",
             "validUrl": "Geçerli “URL”, örn.\n@:pages.settings.routing.routeRule.rule.validUrlEx",

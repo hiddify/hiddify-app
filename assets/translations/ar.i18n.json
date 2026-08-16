@@ -273,7 +273,7 @@
           "rule": {
             "title": "قاعدة",
             "onlyTunMode": "متوفر فقط في وضع TUN",
-            "notAvailabeInThisPlatform": "غير متوفر على هذا النظام",
+            "notAvailableInThisPlatform": "غير متوفر على هذا النظام",
             "canNotBeEmpty": "لا يمكن أن يكون فارغًا",
             "validUrlEx": "https://example.com",
             "validUrl": "«URL» صالح مثل\n@:pages.settings.routing.routeRule.rule.validUrlEx",

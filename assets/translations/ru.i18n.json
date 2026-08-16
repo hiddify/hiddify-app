@@ -269,7 +269,7 @@
           "rule": {
             "title": "Правило",
             "onlyTunMode": "Доступно только в режиме TUN",
-            "notAvailabeInThisPlatform": "Недоступно на этой платформе",
+            "notAvailableInThisPlatform": "Недоступно на этой платформе",
             "canNotBeEmpty": "Не может быть пустым",
             "validUrlEx": "https://example.com",
             "validUrl": "Валидный «URL», например\n@:pages.settings.routing.routeRule.rule.validUrlEx",

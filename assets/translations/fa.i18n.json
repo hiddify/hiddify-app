@@ -263,7 +263,7 @@
           "rule": {
             "title": "قانون",
             "onlyTunMode": "فقط در حالت TUN در دسترس است",
-            "notAvailabeInThisPlatform": "در این پلتفرم در دسترس نیست",
+            "notAvailableInThisPlatform": "در این پلتفرم در دسترس نیست",
             "canNotBeEmpty": "نمی‌تواند خالی باشد",
             "validUrlEx": "https://example.com",
             "validUrl": "«URL» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validUrlEx",

@@ -262,7 +262,7 @@
           "rule": {
             "title": "規則",
             "onlyTunMode": "僅在 TUN 模式下可用",
-            "notAvailabeInThisPlatform": "在此平台上不可用",
+            "notAvailableInThisPlatform": "在此平台上不可用",
             "canNotBeEmpty": "不能為空",
             "validUrlEx": "https://example.com",
             "validUrl": "有效的「URL」，例如\n@:pages.settings.routing.routeRule.rule.validUrlEx",

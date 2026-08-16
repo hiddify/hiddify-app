@@ -263,7 +263,7 @@
           "rule": {
             "title": "Regra",
             "onlyTunMode": "Disponível apenas no modo TUN",
-            "notAvailabeInThisPlatform": "Não disponível nesta plataforma",
+            "notAvailableInThisPlatform": "Não disponível nesta plataforma",
             "canNotBeEmpty": "Não pode estar vazio",
             "validUrlEx": "https://example.com",
             "validUrl": "“URL” válido como\n@:pages.settings.routing.routeRule.rule.validUrlEx",

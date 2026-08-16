@@ -262,7 +262,7 @@
           "rule": {
             "title": "Aturan",
             "onlyTunMode": "Hanya tersedia dalam mode TUN",
-            "notAvailabeInThisPlatform": "Tidak tersedia di platform ini",
+            "notAvailableInThisPlatform": "Tidak tersedia di platform ini",
             "canNotBeEmpty": "Tidak boleh kosong",
             "validUrlEx": "https://example.com",
             "validUrl": "“URL” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validUrlEx",
