@@ -14,6 +14,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Debug-only, like accessibility_tools: the two lib/main*.dart entrypoints
+  # gate it behind kDebugMode, so release builds tree-shake it away.
+  flutter_driver:
+    sdk: flutter
   flutter_localizations:
     sdk: flutter
   intl: ^0.20.2

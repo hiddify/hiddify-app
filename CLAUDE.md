@@ -1,5 +1,9 @@
 # Hiddify App — Claude project instructions
 
+## Controlling the app
+
+flutter_driver can be used to control the running app. It is available in debug builds only.
+
 ## Localization / translations (slang)
 
 The app uses **slang** (v4.8.1) for i18n — a type-safe framework that turns the JSON translation files into Dart code, with tooling for analysis, applying translations, and structural key edits. Config is in `build.yaml` under `slang_build_runner`.
