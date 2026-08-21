@@ -162,5 +162,68 @@ void main() {
         });
       });
     });
+    test("Should fall back to the name hierarchy when the base64 title is malformed", () {
+      final allHeaders = ProfileParser.populateHeaders(
+        content: '',
+        remoteHeaders: <String, dynamic>{"profile-title": "base64:not valid base64!!"},
+      );
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: ProfileEntity.remote(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validExtendedUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              // The url fragment, the next entry in the name hierarchy after profile-title.
+              expect(rp.name, equals("b"));
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
+
+    test("Should fall back to the name hierarchy when the base64 title is not valid UTF-8", () {
+      final allHeaders = ProfileParser.populateHeaders(
+        content: '',
+        remoteHeaders: <String, dynamic>{"profile-title": "base64:/w=="},
+      );
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: ProfileEntity.remote(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validExtendedUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              // The url fragment, the next entry in the name hierarchy after profile-title.
+              expect(rp.name, equals("b"));
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
   });
 }
