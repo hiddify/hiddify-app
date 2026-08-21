@@ -313,7 +313,13 @@ class ProfileParser {
 
         if (headers['profile-title'] case final String titleHeader when name.isEmpty) {
           if (titleHeader.startsWith("base64:")) {
-            name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            try {
+              name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            } on FormatException {
+              // `profile-title` is optional, so a payload that is not valid base64 or not valid
+              // UTF-8 must not fail the whole import. Leaving the name empty lets the documented
+              // fallback chain (content-disposition, url fragment, url filename, default) apply.
+            }
           } else {
             name = titleHeader.trim();
           }
