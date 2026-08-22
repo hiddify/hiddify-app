@@ -1,6 +1,7 @@
 // Dev channel entrypoint. Twin file: lib/main_prod.dart, the prod channel one.
 // The Makefile picks between the two through CHANNEL, so keep them in sync.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
