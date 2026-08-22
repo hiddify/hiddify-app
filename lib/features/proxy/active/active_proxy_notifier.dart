@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/utils/throttler.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -14,6 +15,7 @@ import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'active_proxy_notifier.g.dart';
 
@@ -78,16 +80,37 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
   Stream<OutboundInfo> build() {
     // ref.disposeDelay(const Duration(seconds: 20));
     final serviceRunning = ref.watch(serviceRunningProvider);
+    _wasConnectionValid = false;
     if (!serviceRunning) {
       return Stream.error(const ServiceNotRunning());
     }
     return _proxyRepo
         .watchActiveProxies()
         .map((event) => event.getOrElse((l) => List<OutboundGroup>.empty()))
-        .map((event) => event.firstOrNull?.items.first ?? OutboundInfo());
+        .map((event) => event.firstOrNull?.items.first ?? OutboundInfo())
+        .doOnData((info) => _handleConnectionHaptic(info.urlTestDelay));
   }
 
   ProxyRepository get _proxyRepo => ref.read(proxyRepositoryProvider);
+
+  /// Whether the tunnel currently has a valid ping. Tracked so haptics fire only
+  /// on real transitions (connect / timeout / recover), not on every ping update.
+  bool _wasConnectionValid = false;
+
+  void _handleConnectionHaptic(int urlTestDelay) {
+    final isValid = ConnectionConst.isValidDelay(urlTestDelay);
+    if (isValid == _wasConnectionValid) return;
+    _wasConnectionValid = isValid;
+    final haptic = ref.read(hapticServiceProvider.notifier);
+    if (isValid) {
+      // connected successfully, or recovered after a timeout
+      haptic.heavyImpact();
+    } else {
+      // still connected but the ping timed out → medium then heavy
+      haptic.mediumImpact();
+      Future.delayed(const Duration(milliseconds: 150), haptic.heavyImpact);
+    }
+  }
 
   final _urlTestThrottler = Throttler(const Duration(seconds: 1));
 

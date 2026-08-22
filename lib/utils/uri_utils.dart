@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 abstract class UriUtils {
   static final loggy = Loggy<InfraLogger>("UriUtils");
 
-  static Future<bool> tryShareOrLaunchFile(Uri uri, {Uri? fileOrDir}) async {
+  static Future<bool> tryShareOrLaunchFile(Uri uri, {Uri? fileOrDir}) {
     if (Platform.isWindows || Platform.isLinux) {
       return tryLaunch(fileOrDir ?? uri);
     }

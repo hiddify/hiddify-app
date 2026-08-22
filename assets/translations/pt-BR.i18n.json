@@ -20,14 +20,16 @@
     "url": "URL",
     "add": "Adicionar",
     "clipboard": "Área de transferência",
-    "addToClipboard": "Adicionar à área de transferência",
-    "scanQr": "Escanear QR",
+    "addToClipboard": "Copiar para a área de transferência",
+    "scanQr": "Escanear QR code",
     "free": "Grátis",
     "warp": "WARP",
     "fragment": "Fragmento",
     "help": "Ajuda",
     "save": "Salvar",
     "update": "Atualizar",
+    "pin": "Fixar",
+    "unpin": "Desafixar",
     "share": "Compartilhar",
     "edit": "Editar",
     "delete": "Excluir",
@@ -73,34 +75,34 @@
       },
       "export": {
         "clipboard": {
-          "success": "Adicionado à área de transferência com sucesso",
+          "success": "Copiado para a área de transferência",
           "failure": "Falha ao copiar para a área de transferência",
-          "contentTooLarge": "Conteúdo muito grande. Use a exportação para arquivo"
+          "contentTooLarge": "Conteúdo muito grande. Exporte para um arquivo."
         },
         "file": {
-          "success": "Arquivo JSON criado com sucesso",
+          "success": "Arquivo JSON criado",
           "failure": "Falha ao criar o arquivo"
         }
       },
       "import": {
         "confirm": "Confirmar importação",
-        "success": "Importado com sucesso",
+        "success": "Importado",
         "failure": "Falha ao importar"
       },
       "autoSave": {
-        "success": "Alterações salvas automaticamente com sucesso"
+        "success": "Alterações salvas automaticamente"
       }
     }
   },
   "intro": {
     "banner": "Tudo o que você precisa para uma internet sem restrições",
     "termsAndPolicyCaution(rich)": "Ao continuar, você concorda com os ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Feito com ❤️ por Hiddify - ${tap_source(Código Aberto)} (${tap_license(Licença)})"
+    "info(rich)": "Feito com ❤️ por Hiddify. ${tap_source(Código aberto)} e ${tap_license(Licença)}"
   },
   "pages": {
     "home": {
       "title": "Início",
-      "quickSettings": "Opções de configurações rápidas"
+      "quickSettings": "Configurações rápidas"
     },
     "proxies": {
       "title": "Proxies",
@@ -123,7 +125,7 @@
       "delay": {
         "result": "Latência: ${delay}ms",
         "timeout": "Tempo limite do teste de latência esgotado",
-        "testing": "Latência: testando..."
+        "testing": "Latência: testando…"
       }
     },
     "profiles": {
@@ -131,33 +133,37 @@
       "add": "Adicionar perfil",
       "update": "Atualizar perfil",
       "viewAllProfiles": "Ver todos os perfis",
-      "activeProfileName": "Nome do perfil ativo: \"${name}\".",
-      "nonActiveProfileName": "Selecionar \"${name}\" como perfil ativo",
+      "activeProfileName": "Nome do perfil ativo: “${name}”",
+      "nonActiveProfileName": "Selecionar “${name}” como perfil ativo",
       "freeSubNotFound": "Nenhuma assinatura gratuita encontrada",
-      "freeSubNotFoundForRegion": "Nenhuma assinatura gratuita encontrada para a região \"${region}\"",
+      "freeSubNotFoundForRegion": "Nenhuma assinatura gratuita encontrada para a região “${region}”",
       "failedToLoad": "Falha ao carregar",
       "updateSubscriptions": "Atualizar assinaturas",
       "share": {
-        "urlToClipboard": "URL para a área de transferência",
-        "showUrlQr": "Mostrar QR code da URL",
-        "jsonToClipboard": "JSON para a área de transferência"
+        "urlToClipboard": "Copiar URL",
+        "showUrlQr": "Mostrar QR code",
+        "jsonToClipboard": "Copiar JSON"
       },
       "msg": {
         "save": {
-          "success": "Perfil salvo com sucesso"
+          "success": "Perfil salvo"
         },
         "invalidUrl": "URL inválida",
         "add": {
           "failure": "Falha ao adicionar perfil"
         },
         "update": {
-          "success": "Perfil atualizado com sucesso",
-          "successNamed": "\"${name}\" atualizado com sucesso",
+          "success": "Perfil atualizado",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count perfil atualizado",
+            "other": "$count perfis atualizados"
+          },
           "failure": "Falha ao atualizar perfil",
-          "failureNamed": "Falha ao atualizar \"${name}\""
+          "failureNamed": "Falha ao atualizar “${name}”",
+          "bulkPartial": "${success} atualizados\n${failed} com falha: ${names}"
         },
         "delete": {
-          "success": "Perfil excluído com sucesso"
+          "success": "Perfil excluído"
         }
       }
     },
@@ -171,7 +177,7 @@
         "urlHint": "URL de configuração completa",
         "disableAutoUpdate": "Desativar atualização automática",
         "autoUpdateInterval": "Intervalo de atualização automática",
-        "loading": "Adicionando perfil..."
+        "loading": "Adicionando perfil…"
       }
     },
     "logs": {
@@ -181,13 +187,13 @@
     },
     "about": {
       "title": "Sobre",
-      "notAvailableMsg": "Você já está usando a versão mais recente",
+      "notAvailableMsg": "Você está usando a versão mais recente",
       "checkForUpdate": "Verificar atualizações",
       "openWorkingDir": "Abrir diretório de trabalho",
       "sourceCode": "Código-fonte",
       "telegramChannel": "Canal do Telegram",
-      "termsAndConditions": "Termos e Condições",
-      "privacyPolicy": "Política de Privacidade"
+      "termsAndConditions": "Termos e condições",
+      "privacyPolicy": "Política de privacidade"
     },
     "settings": {
       "title": "Configurações",
@@ -216,11 +222,11 @@
           "black": "Modo preto"
         },
         "enableAnalytics": "Ativar análise de dados",
-        "enableAnalyticsMsg": "Permitir a coleta de dados de análise e relatórios de falhas para melhorar o aplicativo",
+        "enableAnalyticsMsg": "Envie dados de análise e relatórios de falhas do seu dispositivo para ajudar a melhorar o aplicativo",
         "autoIpCheck": "Verificar IP da conexão automaticamente",
         "dynamicNotification": "Exibir velocidade na notificação",
         "hapticFeedback": "Feedback tátil",
-        "actionAtClosing": "Ação ao fechar",
+        "actionAtClosing": "Ao fechar a janela",
         "autoStart": "Iniciar com o sistema",
         "silentStart": "Iniciar minimizado",
         "ignoreBatteryOptimizations": "Desativar otimização de bateria",
@@ -234,12 +240,13 @@
         "urlTestInterval": "Intervalo de teste de URL",
         "clashApiPort": "Porta da API do Clash",
         "useXrayCoreWhenPossible": "Usar xray-core quando possível",
-        "useXrayCoreWhenPossibleMsg": "Use o xray-core ao analisar links de assinatura. Você precisa reimportar o link para ativar esta opção"
+        "useXrayCoreWhenPossibleMsg": "Use o xray-core ao analisar links de assinatura. Reimporte a assinatura para ativar esta opção."
       },
       "routing": {
         "title": "Roteamento",
         "routeRule": {
-          "empty": "Nenhuma regra adicionada ainda\n\nToque no botão + para criar uma nova regra ou escolha a partir de regras predefinidas",
+          "empty": "Ainda não há regras de roteamento\n\nCrie uma nova regra ou escolha entre as regras predefinidas",
+          "add": "Adicionar regra",
           "delete": "Excluir regra",
           "create": "Criar nova regra",
           "options": {
@@ -256,22 +263,22 @@
           "rule": {
             "title": "Regra",
             "onlyTunMode": "Disponível apenas no modo TUN",
-            "notAvailabeInThisPlatform": "Não disponível nesta plataforma",
+            "notAvailableInThisPlatform": "Não disponível nesta plataforma",
             "canNotBeEmpty": "Não pode estar vazio",
             "validUrlEx": "https://example.com",
-            "validUrl": "\"URL\" válido como\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "“URL” válido como\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe ou google chrome ou chrome",
-            "validProcessName": "\"Nome do Processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "“Nome do processo” válido como\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "\"Caminho do Processo\" válido como\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
-            "validPortRangeEx": "80 ou 1-65000",
-            "validPortRange": "\"Porta\" ou \"Intervalo de Portas\" válido como\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validProcessPath": "“Caminho do processo” válido como\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 ou 1:65000",
+            "validPortRange": "“Porta” ou “Intervalo de portas” válido como\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 ou 10.0.0.0/24",
             "validIpCidr": "IP CIDR válido como\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com ou dl.google.com",
-            "validDomain": "\"Domínio\" válido como\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "“Domínio” válido como\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com ou .ir",
-            "validDomainSuffix": "\"Sufixo de Domínio\" válido como\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "“Sufixo de domínio” válido como\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Nome",
               "outbound": "Saída se corresponder",
@@ -315,7 +322,7 @@
             "addNew": "Adicionar novo valor",
             "update": "Atualizar valor",
             "clearList": "Limpar lista",
-            "clearListMsg": "Todos os itens foram excluídos"
+            "clearListMsg": "Todos os itens serão excluídos"
           }
         },
         "generalOptions": {
@@ -340,8 +347,8 @@
           "resolveDestination": "Resolver destino",
           "ipv6Route": "Rota IPv6",
           "ipv6Modes": {
-            "disable": "Desativar",
-            "enable": "Ativar",
+            "disable": "Desativado",
+            "enable": "Ativado",
             "prefer": "Preferencial",
             "only": "Exclusivo"
           },
@@ -352,7 +359,7 @@
               "import": {
                 "clipboard": "Importar seleção da área de transferência",
                 "file": "Importar seleção de um arquivo",
-                "msg": "A importação substituirá suas seleções atuais. Tem certeza de que deseja continuar?"
+                "msg": "A importação substitui suas seleções atuais. Continuar?"
               },
               "export": {
                 "clipboard": "Copiar seleção para a área de transferência",
@@ -375,14 +382,14 @@
               "resetToDefault": "Redefinir para o padrão",
               "autoUpdateInterval": "Intervalo de atualização automática",
               "toast": {
-                "success": "Seleção automática de aplicativos concluída com sucesso",
+                "success": "Seleção automática concluída",
                 "failure": "Falha na seleção automática",
-                "regionNotFound": "Seleção automática não encontrada para a região \"${region}\"",
+                "regionNotFound": "Nenhuma seleção automática para “${region}”",
                 "alreadyInAuto": "Suas seleções já estão na lista automática"
               },
               "dialog": {
                 "title": "Seleção automática de aplicativos",
-                "msg": "A função de seleção automática para o proxy por aplicativo foi desativada devido à mudança de região para \"${region}\""
+                "msg": "A seleção automática do proxy por aplicativo foi desativada porque a região mudou para “${region}”"
               }
             }
           }
@@ -438,9 +445,7 @@
         "tproxyPort": "Porta de proxy transparente",
         "directPort": "Porta direta",
         "redirectPort": "Porta de redirecionamento",
-        "lanSharing": "Compartilhamento de VPN",
-        "lanSharingPasswordNotSet": "Senha não definida",
-        "lanSharingPassword": "Senha de compartilhamento de VPN",
+        "lanSharing": "Compartilhamento seguro de VPN",
         "copyLink": "Copiar link",
         "qrCode": "Código QR",
         "lanIPError": "Falha ao obter endereço IP local"
@@ -448,7 +453,7 @@
       "tlsTricks": {
         "title": "Truques de TLS",
         "enable": "Ativar fragmento",
-        "packets": "Pacotes de Fragmentação",
+        "packets": "Pacotes de fragmentação",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
         "packets1_2": "1-2",
@@ -461,18 +466,18 @@
           "enable": "Ativar maiúsculas/minúsculas mistas no SNI"
         },
         "padding": {
-          "enable": "Ativar preenchimento",
-          "size": "Tamanho do preenchimento"
+          "enable": "Ativar padding",
+          "size": "Tamanho do padding"
         }
       },
       "chain": {
         "title": "Cadeia",
-        "subtitle": "Segurança extra & Desbloqueador",
+        "subtitle": "Segurança extra & desbloqueador",
         "finalIp": "IP final",
         "levels": {
           "app": {
             "title": "App",
-            "msg": "Ponto de início: O tráfego do seu app entra na cadeia aqui e passa pelas camadas seguintes para se preparar para o bypass final"
+            "msg": "Ponto de início: o tráfego do seu app entra na cadeia aqui e passa pelas camadas seguintes para se preparar para o bypass final"
           },
           "extraSecurity": {
             "title": "Segurança extra",
@@ -483,11 +488,11 @@
           },
           "unblocker": {
             "title": "Desbloqueador",
-            "msg": "Ajuda a contornar restrições de rede. Se o ajudante se conectar, seu perfil principal ainda poderá funcionar mesmo que esteja bloqueado no momento"
+            "msg": "Ajuda a contornar restrições de rede. Se o auxiliar conectar, seu perfil principal ainda pode funcionar mesmo que esteja bloqueado no momento."
           },
           "filtering": {
             "title": "Filtragem",
-            "msg": "Saída final: Após passar pelas camadas ativas (Segurança extra, Perfil principal ou Desbloqueador) e aplicar seus efeitos, seu tráfego é finalmente roteado para contornar a filtragem da rede local"
+            "msg": "Saída final: seu tráfego passa pelas camadas ativas, que podem ser Segurança extra, Perfil principal ou Desbloqueador. Depois que os efeitos são aplicados, ele é roteado para contornar a filtragem da rede local."
           }
         },
         "warp": {
@@ -564,14 +569,17 @@
       "expireDate": "Data de validade",
       "expired": "Expirado",
       "noTraffic": "Cota esgotada",
-      "remainingTime": "Tempo restante",
-      "remainingDuration": "${duration} dias restantes",
-      "remainingDurationNew": "${duration} dias",
+      "remainingDuration(plural, param=days)": {
+        "one": "Resta $days dia",
+        "other": "Restam $days dias"
+      },
+      "remainingUnlimited": "Ilimitado",
       "remainingTrafficSemanticLabel": "${consumed} de ${total} de tráfego consumido",
       "remainingTraffic": "Tráfego restante",
-      "remainingUsage": "Restante",
-      "profileSite": "Provedor",
-      "profileSupport": "Suporte"
+      "openWebPage": "Abrir página web",
+      "support": "Suporte",
+      "openLinkTitle": "Abrir este link?",
+      "openLinkAction": "Abrir"
     }
   },
   "dialogs": {
@@ -580,97 +588,104 @@
       "sort": {
         "name": "Alfabeticamente",
         "lastUpdate": "Última atualização"
+      },
+      "direction": {
+        "newestFirst": "Mais recentes primeiro",
+        "oldestFirst": "Mais antigos primeiro"
       }
     },
     "warpLicense": {
       "title": "Consentimento do Cloudflare WARP",
-      "description(rich)": "O Cloudflare WARP é um provedor de VPN WireGuard gratuito. Ao ativar esta opção, você concorda com os ${tos(Termos de Serviço)} e a ${privacy(Política de Privacidade)} do Cloudflare WARP."
+      "description(rich)": "O Cloudflare WARP é um provedor de VPN WireGuard gratuito. Ao ativar esta opção, você concorda com os ${tos(Termos de serviço)} e a ${privacy(Política de privacidade)} do Cloudflare WARP."
     },
     "psiphonLicense": {
       "title": "Contrato de licença do Psiphon",
-      "description(rich)": "Ao usar o Psiphon, você concorda com os ${tos(Termos de Serviço)} e reconhece a ${privacy(Política de Privacidade)}. Por favor, leia-os atentamente antes de continuar."
+      "description(rich)": "Ao usar o Psiphon, você concorda com os ${tos(Termos de serviço)} e reconhece a ${privacy(Política de privacidade)}. Leia com atenção antes de continuar."
     },
     "newVersion": {
       "title": "Atualização disponível",
-      "msg": "Uma nova versão do @:common.appTitle está disponível. Deseja atualizar agora?",
-      "currentVersion": "Versão atual: ",
-      "newVersion": "Nova versão: ",
+      "msg": "Uma nova versão do @:common.appTitle está disponível. Atualizar agora?",
+      "currentVersion": "Versão atual",
+      "newVersion": "Nova versão",
       "updateNow": "Atualizar agora"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "Isso substituirá todas as opções de configuração pelos valores fornecidos. Você tem certeza?"
+          "msg": "Isso sobrescreve todas as opções de configuração com os valores importados. Continuar?"
         }
       },
       "profile": {
         "delete": {
           "title": "Excluir perfil",
-          "msg": "Tem certeza de que deseja excluir este perfil permanentemente?"
+          "msg": "Excluir este perfil? Não é possível desfazer."
         }
       },
       "perAppProxy": {
         "shareOnGithub": {
           "title": "Melhorando a seleção automática",
-          "msg": "Ao compartilhar os aplicativos selecionados, você ajuda a completar a lista de \"seleção automática\""
+          "msg": "Ao compartilhar os aplicativos selecionados, você ajuda a completar a lista de “seleção automática”"
         },
         "import": {
-          "msg": "Isso substituirá todas as suas seleções atuais de proxy por aplicativo. Tem certeza de que deseja continuar?"
+          "msg": "Isso substitui todas as suas seleções atuais de proxy por aplicativo. Continuar?"
         }
       },
       "routeRule": {
         "delete": {
           "title": "Excluir regra",
-          "msg": "Tem certeza de que deseja excluir a regra \"$rulename\"?"
+          "msg": "Excluir a regra “$rulename”? Não é possível desfazer."
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Adicionar perfil?",
-        "message": "Um link externo de \"${host}\" está solicitando adicionar um novo perfil. Deseja importá-lo?"
+        "message": "Um link externo de “${host}” quer adicionar um novo perfil. Importar?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Importar regra de roteamento?",
-        "message": "Importar regras de roteamento de fontes não confiáveis pode ser um risco de segurança\nProssiga apenas se você confiar neste link"
+        "message": "As regras de roteamento decidem por onde o seu tráfego passa.\nSó importe de uma fonte em que você confia."
       }
     },
     "experimentalNotice": {
       "title": "Recursos experimentais em uso",
-      "msg": "Você ativou alguns recursos experimentais que podem afetar a qualidade da conexão e causar erros inesperados. Você sempre pode alterar ou redefinir essas opções na página de configurações.",
+      "msg": "Você ativou alguns recursos experimentais que podem afetar a qualidade da conexão e causar erros inesperados. Você sempre pode alterar ou redefinir essas opções nas Configurações.",
       "disable": "Não mostrar novamente"
     },
     "noActiveProfile": {
       "title": "Escolha um perfil",
-      "msg": "Para começar, adicione um perfil de conexão que inclua os detalhes da sua conexão VPN.\n\nAinda não tem um servidor VPN? Não se preocupe, siga o tutorial abaixo para configurar um rapidamente e de graça.",
+      "msg": "Vamos começar. Adicione um perfil de conexão com os detalhes do seu servidor VPN.\n\nAinda não tem servidor? Sem problema. O guia abaixo mostra como criar um de graça.",
       "helpBtn": {
         "label": "Mostre-me como",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Aviso de link externo",
-      "youAreAboutToVisit": "Você está prestes a visitar:",
-      "thisWebsiteIsNotInOurTrustedList": "Este site não está na nossa lista de confiança. Prossiga com cautela."
+      "title": "Verifique este link primeiro",
+      "cannotVerify": "Este link não está verificado",
+      "avoidIfUnsure": "Se você não tiver total certeza, não pague nem compartilhe informações sensíveis",
+      "ownResponsibility": "Você continua por sua própria conta e risco",
+      "open": "Abrir",
+      "openIn": "Abrir (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "Tag completa:",
-      "type": "Tipo:",
-      "testTime": "Hora do teste:",
-      "testDelay": "Latência do teste:",
-      "isSelected": "Selecionado:",
-      "isGroup": "É um grupo",
-      "isSecure": "É seguro:",
-      "port": "Porta:",
-      "host": "Host:",
-      "ip": "IP:",
-      "countryCode": "Código do país:",
-      "region": "Região:",
-      "city": "Cidade:",
-      "asn": "ASN:",
-      "organization": "Organização:",
-      "location": "Localização:",
-      "postalCode": "Código postal:",
-      "download": "Download:",
-      "upload": "Upload:"
+      "fullTag": "Tag completa",
+      "type": "Tipo",
+      "testTime": "Hora do teste",
+      "testDelay": "Latência do teste",
+      "isSelected": "Selecionado",
+      "isGroup": "Grupo",
+      "isSecure": "Seguro",
+      "port": "Porta",
+      "host": "Host",
+      "ip": "IP",
+      "countryCode": "Código do país",
+      "region": "Região",
+      "city": "Cidade",
+      "asn": "ASN",
+      "organization": "Organização",
+      "location": "Localização",
+      "postalCode": "Código postal",
+      "download": "Download",
+      "upload": "Upload"
     },
     "windowClosing": {
       "askEachTime": "Perguntar sempre",
@@ -681,26 +696,26 @@
   "connection": {
     "tapToConnect": "Toque para conectar",
     "connect": "Conectar",
-    "connecting": "Conectando...",
+    "connecting": "Conectando…",
     "connected": "Conectado",
     "disconnect": "Desconectar",
-    "disconnecting": "Desconectando...",
+    "disconnecting": "Desconectando…",
     "reconnect": "Reconectar",
-    "reconnectMsg": "Reconectando para aplicar as alterações..."
+    "reconnectMsg": "Reconectando para aplicar as alterações…"
   },
   "errors": {
     "unexpected": "Erro inesperado",
     "connection": {
       "unexpected": "Erro de conexão inesperado",
       "timeout": "Tempo limite de conexão esgotado",
-      "badResponse": "Resposta inválida",
+      "badResponse": "Resposta inválida do servidor",
       "connectionError": "Erro de conexão",
       "badCertificate": "Certificado inválido"
     },
     "profiles": {
       "unexpected": "Erro inesperado",
       "notFound": "Perfil não encontrado",
-      "invalidConfig": "Configurações inválidas",
+      "invalidConfig": "Configuração inválida",
       "invalidUrl": "URL inválida",
       "canceledByUser": "Cancelado pelo usuário"
     },
@@ -719,11 +734,11 @@
     },
     "warp": {
       "missingLicense": "Licença do WARP ausente",
-      "missingLicenseMsg": "O perfil selecionado usa o recurso WARP; para usar este recurso, você deve concordar com a licença do WARP"
+      "missingLicenseMsg": "Este perfil usa WARP. Aceite a licença do WARP para continuar."
     },
     "psiphon": {
       "missingLicense": "Licença do Psiphon necessária",
-      "missingLicenseMsg": "O perfil selecionado usa o recurso Psiphon; para usar este recurso, você deve concordar com a licença do Psiphon"
+      "missingLicenseMsg": "Este perfil usa Psiphon. Aceite a licença do Psiphon para continuar."
     }
   }
 }

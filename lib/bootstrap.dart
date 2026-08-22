@@ -41,7 +41,10 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
 
   final stopWatch = Stopwatch()..start();
 
-  final container = ProviderContainer(overrides: [environmentProvider.overrideWithValue(env)]);
+  final container = ProviderContainer(
+    overrides: [environmentProvider.overrideWithValue(env)],
+    observers: [RiverpodObserver()],
+  );
 
   await _init("directories", () => container.read(appDirectoriesProvider.future));
   LoggerController.init(container.read(logPathResolverProvider).appFile().path);
@@ -125,9 +128,8 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   stopWatch.stop();
 
   runApp(
-    ProviderScope(
-      parent: container,
-      observers: [RiverpodObserver()],
+    UncontrolledProviderScope(
+      container: container,
       child: SentryUserInteractionWidget(child: const App()),
     ),
   );

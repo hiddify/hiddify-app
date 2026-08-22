@@ -117,7 +117,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
 
   ConnectionStatus _modifyConnectionStatus(ConnectionStatus connection, int urlTestDelay) {
     if (connection is Connected) {
-      return urlTestDelay > 0 && urlTestDelay < 65000 ? const Connected() : const Connecting();
+      return ConnectionConst.isValidDelay(urlTestDelay) ? const Connected() : const Connecting();
     } else {
       return connection;
     }

@@ -8,6 +8,7 @@ import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -116,6 +117,16 @@ abstract class Preferences {
   static final psiphonConsentGiven = PreferencesNotifier.create<bool, bool>("psiphon-consent-given", false);
 
   static final showRouteGeneralOptions = PreferencesNotifier.create<bool, bool>("show-route-general-options", true);
+
+  static final profilesSort = PreferencesNotifier.create<({ProfilesSort by, SortMode mode}), String>(
+    "profiles_sort",
+    (by: ProfilesSort.lastUpdate, mode: SortMode.descending),
+    mapFrom: (value) {
+      final parts = value.split(":");
+      return (by: ProfilesSort.values.byName(parts.first), mode: SortMode.values.byName(parts.last));
+    },
+    mapTo: (value) => "${value.by.name}:${value.mode.name}",
+  );
 }
 
 @Riverpod(keepAlive: true)

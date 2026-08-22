@@ -5,6 +5,8 @@ import 'package:basic_utils/basic_utils.dart';
 import 'package:grpc/grpc.dart';
 
 class MTLSChannelCredentials extends ChannelCredentials {
+  // Trust only the pinned server certificate below, never the OS root store.
+  // ignore: avoid_redundant_argument_values
   final SecurityContext ctx = SecurityContext(withTrustedRoots: false);
 
   MTLSChannelCredentials({

@@ -20,14 +20,16 @@
     "url": "URL",
     "add": "Tambah",
     "clipboard": "Papan klip",
-    "addToClipboard": "Tambah ke papan klip",
-    "scanQr": "Pindai QR",
+    "addToClipboard": "Salin ke papan klip",
+    "scanQr": "Pindai kode QR",
     "free": "Gratis",
     "warp": "WARP",
-    "fragment": "Fragmen",
+    "fragment": "Fragment",
     "help": "Bantuan",
     "save": "Simpan",
     "update": "Perbarui",
+    "pin": "Sematkan",
+    "unpin": "Lepas sematan",
     "share": "Bagikan",
     "edit": "Edit",
     "delete": "Hapus",
@@ -73,41 +75,41 @@
       },
       "export": {
         "clipboard": {
-          "success": "Berhasil ditambahkan ke papan klip",
+          "success": "Disalin ke papan klip",
           "failure": "Gagal menyalin ke papan klip",
-          "contentTooLarge": "Konten terlalu besar. Gunakan ekspor file saja"
+          "contentTooLarge": "Konten terlalu besar. Ekspor ke file saja."
         },
         "file": {
-          "success": "File JSON berhasil dibuat",
+          "success": "File JSON dibuat",
           "failure": "Gagal membuat file"
         }
       },
       "import": {
         "confirm": "Konfirmasi impor",
-        "success": "Berhasil diimpor",
+        "success": "Diimpor",
         "failure": "Gagal mengimpor"
       },
       "autoSave": {
-        "success": "Perubahan berhasil disimpan secara otomatis"
+        "success": "Perubahan disimpan secara otomatis"
       }
     }
   },
   "intro": {
     "banner": "Semua yang Anda butuhkan untuk internet tanpa batasan",
     "termsAndPolicyCaution(rich)": "Dengan melanjutkan, Anda menyetujui ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Dibuat dengan ❤️ oleh Hiddify - ${tap_source(Sumber Terbuka)} (${tap_license(Lisensi)})"
+    "info(rich)": "Dibuat dengan ❤️ oleh Hiddify. ${tap_source(Sumber terbuka)} dan ${tap_license(Lisensi)}"
   },
   "pages": {
     "home": {
       "title": "Beranda",
-      "quickSettings": "Opsi pengaturan cepat"
+      "quickSettings": "Pengaturan cepat"
     },
     "proxies": {
       "title": "Proxy",
-      "sort": "Urutkan proksi",
+      "sort": "Urutkan proxy",
       "testDelay": "Uji latensi",
-      "empty": "Tidak ada proksi yang tersedia",
-      "activeProxy": "Proksi aktif",
+      "empty": "Tidak ada proxy yang tersedia",
+      "activeProxy": "Proxy aktif",
       "unknownIp": "IP tidak dikenal",
       "sortOptions": {
         "unsorted": "Default",
@@ -123,7 +125,7 @@
       "delay": {
         "result": "Latensi: ${delay}ms",
         "timeout": "Waktu tes latensi habis",
-        "testing": "Latensi: sedang menguji..."
+        "testing": "Latensi: sedang menguji…"
       }
     },
     "profiles": {
@@ -131,33 +133,36 @@
       "add": "Tambah profil",
       "update": "Perbarui profil",
       "viewAllProfiles": "Lihat semua profil",
-      "activeProfileName": "Nama profil aktif: \"${name}\".",
-      "nonActiveProfileName": "Pilih \"${name}\" sebagai profil aktif",
+      "activeProfileName": "Nama profil aktif: “${name}”",
+      "nonActiveProfileName": "Pilih “${name}” sebagai profil aktif",
       "freeSubNotFound": "Tidak ada langganan gratis yang ditemukan",
-      "freeSubNotFoundForRegion": "Tidak ada langganan gratis yang ditemukan untuk wilayah \"${region}\"",
+      "freeSubNotFoundForRegion": "Tidak ada langganan gratis yang ditemukan untuk wilayah “${region}”",
       "failedToLoad": "Gagal memuat",
       "updateSubscriptions": "Perbarui langganan",
       "share": {
-        "urlToClipboard": "URL ke papan klip",
-        "showUrlQr": "Tampilkan QR URL",
-        "jsonToClipboard": "JSON ke papan klip"
+        "urlToClipboard": "Salin URL",
+        "showUrlQr": "Tampilkan kode QR",
+        "jsonToClipboard": "Salin JSON"
       },
       "msg": {
         "save": {
-          "success": "Profil berhasil disimpan"
+          "success": "Profil disimpan"
         },
         "invalidUrl": "URL tidak valid",
         "add": {
           "failure": "Gagal menambahkan profil"
         },
         "update": {
-          "success": "Profil berhasil diperbarui",
-          "successNamed": "\"${name}\" berhasil diperbarui",
+          "success": "Profil diperbarui",
           "failure": "Gagal memperbarui profil",
-          "failureNamed": "Gagal memperbarui \"${name}\""
+          "failureNamed": "Gagal memperbarui “${name}”",
+          "bulkSuccess(plural, param=count)": {
+            "other": "$count profil diperbarui"
+          },
+          "bulkPartial": "${success} diperbarui\n${failed} gagal: ${names}"
         },
         "delete": {
-          "success": "Profil berhasil dihapus"
+          "success": "Profil dihapus"
         }
       }
     },
@@ -171,7 +176,7 @@
         "urlHint": "URL konfigurasi lengkap",
         "disableAutoUpdate": "Nonaktifkan pembaruan otomatis",
         "autoUpdateInterval": "Interval pembaruan otomatis",
-        "loading": "Menambahkan profil..."
+        "loading": "Menambahkan profil…"
       }
     },
     "logs": {
@@ -181,13 +186,13 @@
     },
     "about": {
       "title": "Tentang",
-      "notAvailableMsg": "Anda sudah menggunakan versi terbaru",
+      "notAvailableMsg": "Anda menggunakan versi terbaru",
       "checkForUpdate": "Periksa pembaruan",
       "openWorkingDir": "Buka direktori kerja",
       "sourceCode": "Kode sumber",
       "telegramChannel": "Saluran Telegram",
-      "termsAndConditions": "Syarat dan Ketentuan",
-      "privacyPolicy": "Kebijakan Privasi"
+      "termsAndConditions": "Syarat dan ketentuan",
+      "privacyPolicy": "Kebijakan privasi"
     },
     "settings": {
       "title": "Pengaturan",
@@ -216,11 +221,11 @@
           "black": "Mode hitam"
         },
         "enableAnalytics": "Aktifkan analitik",
-        "enableAnalyticsMsg": "Berikan izin untuk mengumpulkan analitik dan mengirim laporan kerusakan untuk meningkatkan aplikasi",
+        "enableAnalyticsMsg": "Kirim analitik dan laporan kerusakan dari perangkat Anda untuk membantu meningkatkan aplikasi",
         "autoIpCheck": "Periksa IP koneksi secara otomatis",
         "dynamicNotification": "Tampilkan kecepatan di notifikasi",
         "hapticFeedback": "Umpan balik haptik",
-        "actionAtClosing": "Tindakan saat menutup",
+        "actionAtClosing": "Saat menutup jendela",
         "autoStart": "Mulai saat masuk",
         "silentStart": "Mulai diminimalkan",
         "ignoreBatteryOptimizations": "Nonaktifkan optimasi baterai",
@@ -234,12 +239,13 @@
         "urlTestInterval": "Interval uji URL",
         "clashApiPort": "Port API Clash",
         "useXrayCoreWhenPossible": "Gunakan xray-core jika memungkinkan",
-        "useXrayCoreWhenPossibleMsg": "Gunakan xray-core saat mengurai tautan langganan. Anda perlu mengimpor ulang tautan untuk mengaktifkan opsi ini."
+        "useXrayCoreWhenPossibleMsg": "Gunakan xray-core saat mengurai tautan langganan. Impor ulang langganan untuk mengaktifkan opsi ini."
       },
       "routing": {
         "title": "Perutean",
         "routeRule": {
-          "empty": "Belum ada aturan yang ditambahkan\n\nKetuk tombol + untuk membuat aturan baru atau pilih dari aturan yang telah ditentukan sebelumnya",
+          "empty": "Belum ada aturan perutean\n\nBuat aturan baru atau pilih dari aturan yang telah ditentukan sebelumnya",
+          "add": "Tambah aturan",
           "delete": "Hapus aturan",
           "create": "Buat aturan baru",
           "options": {
@@ -256,22 +262,22 @@
           "rule": {
             "title": "Aturan",
             "onlyTunMode": "Hanya tersedia dalam mode TUN",
-            "notAvailabeInThisPlatform": "Tidak tersedia di platform ini",
+            "notAvailableInThisPlatform": "Tidak tersedia di platform ini",
             "canNotBeEmpty": "Tidak boleh kosong",
             "validUrlEx": "https://example.com",
-            "validUrl": "\"URL\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "“URL” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe atau google chrome atau chrome",
-            "validProcessName": "\"Nama Proses\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "“Nama proses” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "\"Jalur Proses\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "“Jalur proses” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 atau 1:65000",
-            "validPortRange": "\"Port\" atau \"Rentang Port\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "“Port” atau “Rentang port” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 atau 10.0.0.0/24",
             "validIpCidr": "IP CIDR yang valid seperti\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com atau dl.google.com",
-            "validDomain": "\"Domain\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "“Domain” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com atau .ir",
-            "validDomainSuffix": "\"Sufiks Domain\" yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "“Sufiks domain” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Nama",
               "outbound": "Keluar jika cocok",
@@ -293,7 +299,7 @@
             "outbound(map)": {
               "proxy": "Proxy",
               "direct": "Langsung",
-              "direct_with_fragment": "Langsung dengan fragmen",
+              "direct_with_fragment": "Langsung dengan Fragment",
               "block": "Blokir"
             },
             "network(map)": {
@@ -315,7 +321,7 @@
             "addNew": "Tambah nilai baru",
             "update": "Perbarui nilai",
             "clearList": "Bersihkan daftar",
-            "clearListMsg": "Semua item dihapus"
+            "clearListMsg": "Semua item akan dihapus"
           }
         },
         "generalOptions": {
@@ -340,8 +346,8 @@
           "resolveDestination": "Resolusi tujuan",
           "ipv6Route": "Rute IPv6",
           "ipv6Modes": {
-            "disable": "Nonaktifkan",
-            "enable": "Aktifkan",
+            "disable": "Nonaktif",
+            "enable": "Aktif",
             "prefer": "Prioritaskan",
             "only": "Eksklusif"
           },
@@ -352,7 +358,7 @@
               "import": {
                 "clipboard": "Impor pilihan dari papan klip",
                 "file": "Impor pilihan dari file",
-                "msg": "Mengimpor akan menggantikan pilihan Anda saat ini. Anda yakin ingin melanjutkan?"
+                "msg": "Mengimpor menggantikan pilihan Anda saat ini. Lanjutkan?"
               },
               "export": {
                 "clipboard": "Salin pilihan ke papan klip",
@@ -375,14 +381,14 @@
               "resetToDefault": "Setel ulang ke default",
               "autoUpdateInterval": "Interval pembaruan otomatis",
               "toast": {
-                "success": "Pilihan aplikasi otomatis berhasil diselesaikan",
+                "success": "Pilihan otomatis selesai",
                 "failure": "Pilihan otomatis gagal",
-                "regionNotFound": "Pilihan otomatis tidak ditemukan untuk wilayah \"${region}\"",
+                "regionNotFound": "Tidak ada pilihan otomatis untuk “${region}”",
                 "alreadyInAuto": "Pilihan Anda sudah ada dalam daftar otomatis"
               },
               "dialog": {
                 "title": "Pilihan aplikasi otomatis",
-                "msg": "Fitur pilihan otomatis untuk proxy per aplikasi dinonaktifkan karena perubahan wilayah menjadi \"${region}\""
+                "msg": "Pilihan otomatis proxy per aplikasi dinonaktifkan karena wilayah berubah menjadi “${region}”"
               }
             }
           }
@@ -418,8 +424,8 @@
         "title": "Masuk",
         "serviceMode": "Mode layanan",
         "serviceModes": {
-          "proxy": "Hanya layanan proksi",
-          "systemProxy": "Atur proksi sistem",
+          "proxy": "Hanya layanan proxy",
+          "systemProxy": "Atur proxy sistem",
           "tun": "VPN"
         },
         "shortServiceModes": {
@@ -435,30 +441,28 @@
           "gvisor": "gVisor"
         },
         "mixedPort": "Port campuran",
-        "tproxyPort": "Port proksi transparan",
-        "directPort": "Port direct",
+        "tproxyPort": "Port proxy transparan",
+        "directPort": "Port langsung",
         "redirectPort": "Port pengalihan",
-        "lanSharing": "Berbagi VPN",
-        "lanSharingPasswordNotSet": "Kata sandi belum diatur",
-        "lanSharingPassword": "Kata sandi berbagi VPN",
+        "lanSharing": "Berbagi VPN yang aman",
         "copyLink": "Salin tautan",
         "qrCode": "Kode QR",
         "lanIPError": "Gagal mendapatkan alamat IP lokal"
       },
       "tlsTricks": {
         "title": "Trik TLS",
-        "enable": "Aktifkan fragmen",
-        "packets": "Paket Fragmentasi",
+        "enable": "Aktifkan Fragment",
+        "packets": "Paket Fragment",
         "packetsTlsHello": "TLS Hello",
         "packets1_1": "1-1",
         "packets1_2": "1-2",
         "packets1_3": "1-3",
         "packets1_4": "1-4",
         "packets1_5": "1-5",
-        "size": "Ukuran fragmen",
-        "sleep": "Jeda fragmen",
+        "size": "Ukuran Fragment",
+        "sleep": "Jeda Fragment",
         "mixedSniCase": {
-          "enable": "Aktifkan kasus SNI campuran"
+          "enable": "Aktifkan huruf campuran SNI"
         },
         "padding": {
           "enable": "Aktifkan padding",
@@ -467,7 +471,7 @@
       },
       "chain": {
         "title": "Rantai",
-        "subtitle": "Keamanan tambahan & Pembuka blokir",
+        "subtitle": "Keamanan tambahan & pembuka blokir",
         "finalIp": "IP akhir",
         "levels": {
           "app": {
@@ -483,11 +487,11 @@
           },
           "unblocker": {
             "title": "Pembuka blokir",
-            "msg": "Membantu melewati batasan jaringan. Jika pembantu terhubung, profil utama Anda tetap dapat bekerja meskipun saat ini sedang diblokir"
+            "msg": "Membantu melewati batasan jaringan. Jika pembantu terhubung, profil utama Anda tetap dapat bekerja meskipun saat ini sedang diblokir."
           },
           "filtering": {
             "title": "Pemfilteran",
-            "msg": "Keluar akhir: Setelah melewati lapisan aktif (Keamanan tambahan, Profil utama, atau Pembuka blokir) dan menerapkan efeknya, lalu lintas Anda akhirnya dirutekan untuk melewati pemfilteran jaringan lokal"
+            "msg": "Keluar akhir: Lalu lintas Anda melewati lapisan aktif, yaitu Keamanan tambahan, Profil utama, atau Pembuka blokir. Setelah efeknya diterapkan, lalu lintas dirutekan untuk melewati pemfilteran jaringan lokal."
           }
         },
         "warp": {
@@ -564,14 +568,16 @@
       "expireDate": "Tanggal kedaluwarsa",
       "expired": "Kedaluwarsa",
       "noTraffic": "Kuota habis",
-      "remainingTime": "Sisa waktu",
-      "remainingDuration": "tersisa ${duration} hari",
-      "remainingDurationNew": "${duration} hari",
+      "remainingDuration(plural, param=days)": {
+        "other": "Sisa $days hari"
+      },
+      "remainingUnlimited": "Tanpa batas",
       "remainingTrafficSemanticLabel": "${consumed} dari ${total} lalu lintas terpakai",
       "remainingTraffic": "Sisa lalu lintas",
-      "remainingUsage": "Sisa",
-      "profileSite": "Penyedia",
-      "profileSupport": "Dukungan"
+      "openWebPage": "Buka halaman web",
+      "support": "Dukungan",
+      "openLinkTitle": "Buka tautan ini?",
+      "openLinkAction": "Buka"
     }
   },
   "dialogs": {
@@ -580,97 +586,104 @@
       "sort": {
         "name": "Menurut abjad",
         "lastUpdate": "Terakhir diperbarui"
+      },
+      "direction": {
+        "newestFirst": "Terbaru dulu",
+        "oldestFirst": "Terlama dulu"
       }
     },
     "warpLicense": {
       "title": "Persetujuan Cloudflare WARP",
-      "description(rich)": "Cloudflare WARP adalah penyedia VPN WireGuard gratis. Dengan mengaktifkan opsi ini, Anda menyetujui ${tos(Ketentuan Layanan)} dan ${privacy(Kebijakan Privasi)} Cloudflare WARP."
+      "description(rich)": "Cloudflare WARP adalah penyedia VPN WireGuard gratis. Dengan mengaktifkan opsi ini, Anda menyetujui ${tos(Ketentuan layanan)} dan ${privacy(Kebijakan privasi)} Cloudflare WARP."
     },
     "psiphonLicense": {
-      "title": "Perjanjian Lisensi Psiphon",
-      "description(rich)": "Dengan menggunakan Psiphon, Anda menyetujui ${tos(Syarat Layanan)} dan mengakui ${privacy(Kebijakan Privasi)}. Harap baca dengan teliti sebelum melanjutkan."
+      "title": "Perjanjian lisensi Psiphon",
+      "description(rich)": "Dengan menggunakan Psiphon, Anda menyetujui ${tos(Ketentuan layanan)} dan mengakui ${privacy(Kebijakan privasi)}. Baca dengan teliti sebelum melanjutkan."
     },
     "newVersion": {
       "title": "Pembaruan tersedia",
-      "msg": "Versi baru @:common.appTitle tersedia. Apakah Anda ingin memperbarui sekarang?",
-      "currentVersion": "Versi saat ini: ",
-      "newVersion": "Versi baru: ",
+      "msg": "Versi baru @:common.appTitle tersedia. Perbarui sekarang?",
+      "currentVersion": "Versi saat ini",
+      "newVersion": "Versi baru",
       "updateNow": "Perbarui sekarang"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "Ini akan menimpa semua opsi konfigurasi dengan nilai yang diberikan. Anda yakin?"
+          "msg": "Ini menimpa semua opsi konfigurasi dengan nilai yang diimpor. Lanjutkan?"
         }
       },
       "profile": {
         "delete": {
           "title": "Hapus profil",
-          "msg": "Anda yakin ingin menghapus profil ini secara permanen?"
+          "msg": "Hapus profil ini? Tindakan ini tidak dapat dibatalkan."
         }
       },
       "perAppProxy": {
         "shareOnGithub": {
           "title": "Meningkatkan pilihan otomatis",
-          "msg": "Dengan membagikan aplikasi yang dipilih, Anda membantu melengkapi daftar \"pilihan otomatis\""
+          "msg": "Dengan membagikan aplikasi yang dipilih, Anda membantu melengkapi daftar “pilihan otomatis”"
         },
         "import": {
-          "msg": "Ini akan menggantikan semua pilihan proksi per aplikasi Anda saat ini. Anda yakin ingin melanjutkan?"
+          "msg": "Ini menggantikan semua pilihan proxy per aplikasi Anda saat ini. Lanjutkan?"
         }
       },
       "routeRule": {
         "delete": {
           "title": "Hapus aturan",
-          "msg": "Anda yakin ingin menghapus aturan \"$rulename\"?"
+          "msg": "Hapus aturan “$rulename”? Tindakan ini tidak dapat dibatalkan."
         }
       },
       "addProfileByDeepLinkWarning": {
-        "title": "Tambah Profil?",
-        "message": "Tautan eksternal dari \"${host}\" meminta untuk menambahkan profil baru. Apakah Anda ingin mengimpornya?"
+        "title": "Tambah profil?",
+        "message": "Tautan eksternal dari “${host}” ingin menambahkan profil baru. Impor?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Impor aturan rute?",
-        "message": "Mengimpor aturan rute dari sumber yang tidak tepercaya dapat menjadi risiko keamanan\nLanjutkan hanya jika Anda mempercayai tautan ini"
+        "message": "Aturan rute menentukan ke mana lalu lintas Anda pergi.\nHanya impor dari sumber yang Anda percayai."
       }
     },
     "experimentalNotice": {
       "title": "Fitur eksperimental sedang digunakan",
-      "msg": "Anda telah mengaktifkan beberapa fitur eksperimental yang mungkin memengaruhi kualitas koneksi dan menyebabkan kesalahan tak terduga. Anda selalu dapat mengubah atau menyetel ulang opsi ini dari halaman konfigurasi.",
+      "msg": "Anda telah mengaktifkan beberapa fitur eksperimental yang mungkin memengaruhi kualitas koneksi dan menyebabkan kesalahan tak terduga. Anda selalu dapat mengubah atau menyetel ulang opsi ini di Pengaturan.",
       "disable": "Jangan tampilkan lagi"
     },
     "noActiveProfile": {
       "title": "Pilih profil",
-      "msg": "Mari kita mulai dengan menambahkan profil koneksi yang berisi detail koneksi VPN Anda.\n\nBelum punya server VPN? Jangan khawatir, ikuti tutorial di bawah ini untuk mengaturnya dengan cepat dan gratis.",
+      "msg": "Mari mulai. Tambahkan profil koneksi dengan detail server VPN Anda.\n\nBelum punya server? Tidak masalah. Panduan di bawah ini menunjukkan cara membuatnya secara gratis.",
       "helpBtn": {
         "label": "Tunjukkan caranya",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Peringatan tautan eksternal",
-      "youAreAboutToVisit": "Anda akan mengunjungi:",
-      "thisWebsiteIsNotInOurTrustedList": "Situs web ini tidak ada dalam daftar tepercaya kami. Harap lanjutkan dengan hati-hati."
+      "title": "Periksa tautan ini dulu",
+      "cannotVerify": "Tautan ini belum diverifikasi",
+      "avoidIfUnsure": "Jika Anda tidak sepenuhnya yakin, jangan membayar atau membagikan informasi sensitif",
+      "ownResponsibility": "Anda melanjutkan dengan risiko sendiri",
+      "open": "Buka",
+      "openIn": "Buka (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "Tag lengkap:",
-      "type": "Tipe:",
-      "testTime": "Waktu uji:",
-      "testDelay": "Jeda uji:",
-      "isSelected": "Dipilih:",
+      "fullTag": "Tag lengkap",
+      "type": "Tipe",
+      "testTime": "Waktu uji",
+      "testDelay": "Jeda uji",
+      "isSelected": "Dipilih",
       "isGroup": "Grup",
-      "isSecure": "Aman:",
-      "port": "Port:",
-      "host": "Host:",
-      "ip": "IP:",
-      "countryCode": "Kode negara:",
-      "region": "Wilayah:",
-      "city": "Kota:",
-      "asn": "ASN:",
-      "organization": "Organisasi:",
-      "location": "Lokasi:",
-      "postalCode": "Kode pos:",
-      "download": "Unduh:",
-      "upload": "Unggah:"
+      "isSecure": "Aman",
+      "port": "Port",
+      "host": "Host",
+      "ip": "IP",
+      "countryCode": "Kode negara",
+      "region": "Wilayah",
+      "city": "Kota",
+      "asn": "ASN",
+      "organization": "Organisasi",
+      "location": "Lokasi",
+      "postalCode": "Kode pos",
+      "download": "Unduh",
+      "upload": "Unggah"
     },
     "windowClosing": {
       "askEachTime": "Tanyakan setiap kali",
@@ -681,19 +694,19 @@
   "connection": {
     "tapToConnect": "Ketuk untuk menyambungkan",
     "connect": "Sambungkan",
-    "connecting": "Menyambungkan...",
+    "connecting": "Menyambungkan…",
     "connected": "Tersambung",
     "disconnect": "Putuskan",
-    "disconnecting": "Memutuskan...",
+    "disconnecting": "Memutuskan…",
     "reconnect": "Sambungkan kembali",
-    "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan..."
+    "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan…"
   },
   "errors": {
     "unexpected": "Kesalahan tak terduga",
     "connection": {
       "unexpected": "Kesalahan koneksi tak terduga",
       "timeout": "Waktu koneksi habis",
-      "badResponse": "Respons buruk",
+      "badResponse": "Respons server tidak valid",
       "connectionError": "Kesalahan koneksi",
       "badCertificate": "Sertifikat rusak"
     },
@@ -719,11 +732,11 @@
     },
     "warp": {
       "missingLicense": "Lisensi WARP hilang",
-      "missingLicenseMsg": "Profil yang dipilih menggunakan fitur WARP; untuk menggunakan fitur ini, Anda harus menyetujui lisensi WARP"
+      "missingLicenseMsg": "Profil ini menggunakan WARP. Setujui lisensi WARP untuk melanjutkan."
     },
     "psiphon": {
       "missingLicense": "Lisensi Psiphon diperlukan",
-      "missingLicenseMsg": "Profil yang dipilih menggunakan fitur Psiphon; untuk menggunakan fitur ini, Anda harus menyetujui lisensi Psiphon"
+      "missingLicenseMsg": "Profil ini menggunakan Psiphon. Setujui lisensi Psiphon untuk melanjutkan."
     }
   }
 }
