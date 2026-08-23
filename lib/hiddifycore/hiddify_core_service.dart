@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:fpdart/fpdart.dart';
 import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
+import 'package:hiddify/core/logger/core_logger.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
@@ -20,6 +21,7 @@ import 'package:hiddify/singbox/model/singbox_config_option.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logging/logging.dart' as logging;
 import 'package:loggy/loggy.dart' as loggyl;
 import 'package:rxdart/rxdart.dart';
 
@@ -480,10 +482,10 @@ class HiddifyCoreService with InfraLogger {
           logBuffer.removeAt(0);
         }
         logController.add(logBuffer);
-        // loggy.log(getLogLevel(event.level), event.message);
-        event.message.split('\n').forEach((line) {
-          loggy.log(getLogLevel(event.level), line);
-        });
+        // One message becomes one record. The old code split on newlines
+        // first, but the engine already sends one line per message, so the
+        // split only allocated a list and multiplied the work per burst.
+        coreLog.log(getLogLevel(event.level), event.message);
         return event;
       });
     });
@@ -530,14 +532,21 @@ class HiddifyCoreService with InfraLogger {
     return subscriptions[key] as StreamSubscription<T>?;
   }
 
-  loggyl.LogLevel getLogLevel(LogLevel level) {
+  /// Six engine levels onto six logging levels, nothing merged.
+  ///
+  /// TRACE used to have no case here and fell into the default, so trace lines
+  /// arrived looking as important as info and could not be filtered out. FATAL
+  /// used to collapse into error because loggy had nothing above it.
+  logging.Level getLogLevel(LogLevel level) {
     return switch (level) {
-      LogLevel.DEBUG => loggyl.LogLevel.debug,
-      LogLevel.INFO => loggyl.LogLevel.info,
-      LogLevel.WARNING => loggyl.LogLevel.warning,
-      LogLevel.ERROR => loggyl.LogLevel.error,
-      LogLevel.FATAL => loggyl.LogLevel.error,
-      _ => loggyl.LogLevel.info, // Default case
+      LogLevel.TRACE => logging.Level.FINEST,
+      LogLevel.DEBUG => logging.Level.FINE,
+      LogLevel.INFO => logging.Level.INFO,
+      LogLevel.WARNING => logging.Level.WARNING,
+      LogLevel.ERROR => logging.Level.SEVERE,
+      LogLevel.FATAL => logging.Level.SHOUT,
+      // the proto enum is a generated class, so a default is unavoidable
+      _ => logging.Level.INFO,
     };
   }
 
