@@ -10,6 +10,7 @@ import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/logger/logger_controller.dart';
+import 'package:hiddify/core/logger/logger_setup.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_migration.dart';
@@ -36,6 +37,10 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
   LoggerController.preInit();
+  // The replacement pipeline, running alongside loggy. Nothing writes to it
+  // yet, so it costs nothing; the file sink is attached later, once loggy's
+  // own file printer is gone and app.log has a single writer again.
+  logStart();
   FlutterError.onError = Logger.logFlutterError;
   WidgetsBinding.instance.platformDispatcher.onError = Logger.logPlatformDispatcherError;
 
