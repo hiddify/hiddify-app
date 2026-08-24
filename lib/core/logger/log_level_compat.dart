@@ -21,10 +21,14 @@ extension LogLevelCompat on Logger {
       fine(message, error, stackTrace);
 
   /// SEVERE — engine ERROR, and anything that failed and mattered.
+  ///
+  /// Captures the call site when the caller does not pass a stack, so the log
+  /// line can say which method and line it came from. An error with no location
+  /// is the hardest kind to chase, and errors are rare enough to afford it.
   void error(Object? message, [Object? err, StackTrace? stackTrace]) =>
-      severe(message, err, stackTrace);
+      severe(message, err, stackTrace ?? StackTrace.current);
 
   /// SHOUT — engine FATAL. Above error, for the engine giving up.
   void fatal(Object? message, [Object? error, StackTrace? stackTrace]) =>
-      shout(message, error, stackTrace);
+      shout(message, error, stackTrace ?? StackTrace.current);
 }
