@@ -22,7 +22,6 @@ import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logging/logging.dart' as logging;
-import 'package:loggy/loggy.dart' as loggyl;
 import 'package:rxdart/rxdart.dart';
 
 class HiddifyCoreService with InfraLogger {
@@ -523,7 +522,7 @@ class HiddifyCoreService with InfraLogger {
       },
       cancelOnError: true,
       onError: (error) {
-        loggy.log(loggyl.LogLevel.error, 'Stream error: $error');
+        loggy.error('Stream error: $error');
         onError?.call(error);
         subscriptions[key]?.cancel();
         subscriptions.remove(key);
