@@ -2,10 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/logger/log_level_compat.dart';
 import 'package:logging/logging.dart' as logging;
 
-// Re-exported so every file that already imports this one also gets the
-// debug() and error() aliases in scope. A Dart extension is only visible
-// where it is imported, so without this each call site would need its own
-// import.
+// Re-exported so every file that already imports this one also gets the short
+// level names in scope. A Dart extension is only visible where it is imported,
+// so without this each call site would need its own import.
 export 'package:hiddify/core/logger/log_level_compat.dart';
 
 /// The two loggers that belong to no class, so no mixin can name them, plus the
@@ -21,13 +20,27 @@ class Logger {
   /// Errors thrown while Flutter itself was working — building, laying out,
   /// painting, or running one of its callbacks.
   static void logFlutterError(FlutterErrorDetails details) {
+    // FlutterError.onError defaults to presentError, which prints the full
+    // formatted report. Assigning this handler replaced it, which is why
+    // crashes used to arrive as one terse line. Keep the report in debug.
+    if (kDebugMode) {
+      FlutterError.presentError(details);
+    }
+
     if (details.silent) {
       return;
     }
 
-    final description = details.exceptionAsString();
+    // library and context are what exceptionAsString() leaves out: which part
+    // of Flutter failed, and what it was doing at the time.
+    final library = details.library ?? 'unknown library';
+    final context = details.context == null ? '' : ' ${details.context}';
 
-    app.error('Flutter Error: $description', details.exception, details.stack);
+    app.error(
+      'Flutter error in $library$context: ${details.exceptionAsString()}',
+      details.exception,
+      details.stack,
+    );
   }
 
   /// Errors that never touched a widget — an unawaited future, a timer, a
