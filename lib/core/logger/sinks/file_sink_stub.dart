@@ -8,3 +8,5 @@ bool get isLogFileOpen => false;
 Future<void> closeLogFile() async {}
 
 Future<void> flushLogFile() async {}
+
+Future<void> writeLinesToFile(String path, Iterable<String> lines) async {}

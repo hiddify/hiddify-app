@@ -18,3 +18,10 @@ Future<void> closeLogFile() async {
 }
 
 Future<void> flushLogFile() async => _sink?.flush();
+
+/// Writes [lines] to [path] in one go, replacing whatever was there.
+///
+/// Used to hand the in-memory history to the share sheet on platforms that
+/// keep no log file of their own.
+Future<void> writeLinesToFile(String path, Iterable<String> lines) =>
+    File(path).writeAsString(lines.join('\n'));

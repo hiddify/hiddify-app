@@ -158,6 +158,14 @@ void logSetFileEnabled(bool on) {
 
 void _toRing(LogRecord r) => logRing.add(r);
 
+/// Writes the in-memory history to [path], for sharing.
+///
+/// A phone in release keeps no log file — writing one continuously costs
+/// storage nobody reads. The history is in memory anyway, so it is written out
+/// only when the user actually asks to share it.
+Future<void> exportLogRing(String path) =>
+    writeLinesToFile(path, logRing.records.map(formatRecord));
+
 // ------------------------------------------------ handles we may cancel later
 
 StreamSubscription<LogRecord>? _consoleSub;

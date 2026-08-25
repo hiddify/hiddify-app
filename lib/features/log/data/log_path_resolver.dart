@@ -16,4 +16,11 @@ class LogPathResolver {
   File appFile() {
     return File(p.join(directory.path, "app.log"));
   }
+
+  /// Where the in-memory history is written when the user shares it. A
+  /// separate name, so it never collides with the app.log the sink is still
+  /// writing to on desktop.
+  File appExportFile() {
+    return File(p.join(directory.path, "app-logs.txt"));
+  }
 }

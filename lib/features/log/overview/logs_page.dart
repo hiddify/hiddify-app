@@ -1,11 +1,12 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/logger/logger_setup.dart';
 import 'package:hiddify/core/model/failures.dart';
-import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
@@ -23,13 +24,16 @@ class LogsPage extends HookConsumerWidget with PresLogger {
     final state = ref.watch(logsOverviewNotifierProvider);
     final notifier = ref.watch(logsOverviewNotifierProvider.notifier);
 
-    final debug = ref.watch(debugModeNotifierProvider);
     final pathResolver = ref.watch(logPathResolverProvider);
 
     final filterController = useTextEditingController(text: state.filter);
 
-    final List<PopupMenuEntry> popupButtons = debug || PlatformUtils.isDesktop
-        ? [
+    // Sharing used to be hidden unless debugging or on desktop, because a phone
+    // in release keeps no app.log to share. The history lives in memory now, so
+    // it can be written out on demand and the menu is useful everywhere.
+    final List<PopupMenuEntry> popupButtons = kIsWeb
+        ? []
+        : [
             PopupMenuItem(
               child: Text(t.pages.logs.shareCoreLogs),
               onTap: () async {
@@ -42,14 +46,17 @@ class LogsPage extends HookConsumerWidget with PresLogger {
             PopupMenuItem(
               child: Text(t.pages.logs.shareAppLogs),
               onTap: () async {
+                // written from memory at this moment, so it exists even where
+                // no log file is kept
+                final file = pathResolver.appExportFile();
+                await exportLogRing(file.path);
                 await UriUtils.tryShareOrLaunchFile(
-                  Uri.parse(pathResolver.appFile().path),
+                  Uri.parse(file.path),
                   fileOrDir: pathResolver.directory.uri,
                 );
               },
             ),
-          ]
-        : [];
+          ];
 
     return Scaffold(
       appBar: AppBar(
