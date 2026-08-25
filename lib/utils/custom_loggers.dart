@@ -51,6 +51,6 @@ Logger infraLogger(String name) => Logger('infra.$name');
 
 Logger coreLogger(String name) => Logger('core.$name');
 
-/// Startup, before anything else exists. Read first when the app fails to
-/// start, so it is worth keeping out of the other categories.
+/// Boot, before anything else exists. Read first when the app fails to start,
+/// so it is worth keeping out of the other categories.
 Logger bootLogger(String name) => Logger('boot.$name');

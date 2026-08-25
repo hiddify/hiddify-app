@@ -484,7 +484,7 @@ class HiddifyCoreService with InfraLogger {
         // One message becomes one record. The old code split on newlines
         // first, but the engine already sends one line per message, so the
         // split only allocated a list and multiplied the work per burst.
-        coreLog.log(getLogLevel(event.level), event.message);
+        coreLogFor(event.type).log(getLogLevel(event.level), event.message);
         return event;
       });
     });

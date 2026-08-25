@@ -15,7 +15,7 @@ export 'package:hiddify/core/logger/log_level_compat.dart';
 /// every other logger.
 class Logger {
   static final app = appLogger('uncaught');
-  static final bootstrap = bootLogger('startup');
+  static final bootstrap = bootLogger('bootstrap');
 
   /// Errors thrown while Flutter itself was working — building, laying out,
   /// painting, or running one of its callbacks.
