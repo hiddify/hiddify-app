@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:hiddify/core/logger/log_level_compat.dart';
-import 'package:logging/logging.dart' as logging;
+import 'package:hiddify/utils/custom_loggers.dart';
 
 // Re-exported so every file that already imports this one also gets the short
 // level names in scope. A Dart extension is only visible where it is imported,
@@ -10,12 +9,13 @@ export 'package:hiddify/core/logger/log_level_compat.dart';
 /// The two loggers that belong to no class, so no mixin can name them, plus the
 /// handlers for errors nobody caught.
 ///
-/// The class name stays `Logger` so the existing `Logger.bootstrap.info(...)`
-/// call sites keep working; package:logging's own Logger is aliased to avoid
-/// the clash.
+/// The class name stays `Logger` because the existing
+/// `Logger.bootstrap.info(...)` call sites say it. Both loggers come from the
+/// factories in custom_loggers.dart, so their names carry a category like
+/// every other logger.
 class Logger {
-  static final app = logging.Logger('app');
-  static final bootstrap = logging.Logger('bootstrap');
+  static final app = appLogger('uncaught');
+  static final bootstrap = bootLogger('startup');
 
   /// Errors thrown while Flutter itself was working — building, laying out,
   /// painting, or running one of its callbacks.

@@ -13,11 +13,9 @@ import 'package:hiddify/hiddifycore/generated/v2/hello/hello.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hello/hello_service.pbgrpc.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
-import 'package:logging/logging.dart';
-
 import 'package:path/path.dart' as p;
 
-final _logger = Logger('infra.HiddifyCoreFFI');
+final _logger = infraLogger('HiddifyCoreFFI');
 typedef StopFunc = Pointer<Utf8> Function();
 typedef StopFuncDart = Pointer<Utf8> Function();
 

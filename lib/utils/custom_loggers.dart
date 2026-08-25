@@ -6,36 +6,51 @@ import 'package:logging/logging.dart';
 // own import.
 export 'package:hiddify/core/logger/log_level_compat.dart';
 
-/// The layer a log line came from is decided by which mixin the class uses, and
-/// becomes a prefix on the logger name: `ui.`, `app.` or `infra.`. Engine lines
-/// use `core`, see core/logger/core_logger.dart.
+/// Every logger name starts with the layer it came from, and nothing outside
+/// this file is allowed to build a `Logger` directly. That is what keeps the
+/// category filter on the logs page honest — a name can only be wrong if it is
+/// created here.
 ///
-/// The prefix is what makes the logs page able to filter a whole layer in or
-/// out, and the `$runtimeType` part means a renamed class cannot leave a stale
-/// name behind.
+/// Classes use a mixin. Static and top level code cannot, since a mixin needs
+/// an instance, so it uses the matching factory instead.
 ///
-/// The getter is called `loggy` for one reason: it is what the call sites
-/// already say. Renaming it would touch every class that writes a log.
+/// The getter is called `loggy` because that is what the call sites already
+/// say. Renaming it would touch every class that writes a log.
+
+// ------------------------------------------------------------------- mixins
 
 /// presentation layer — widgets and pages
 mixin PresLogger {
-  Logger get loggy => Logger('ui.$runtimeType');
+  Logger get loggy => uiLogger('$runtimeType');
 }
 
 /// application layer — notifiers and controllers
 mixin AppLogger {
-  Logger get loggy => Logger('app.$runtimeType');
+  Logger get loggy => appLogger('$runtimeType');
 }
 
 /// data layer — repositories, data sources, services
 mixin InfraLogger {
-  Logger get loggy => Logger('infra.$runtimeType');
+  Logger get loggy => infraLogger('$runtimeType');
 }
 
-/// Implemented by anything that already holds a logger, so a mixin like
-/// [ExceptionHandler] can use it without demanding a particular layer.
-abstract class LoggerMixin {
-  LoggerMixin(this.loggy);
-
-  final Logger loggy;
+/// anything bridging the Go engine into Dart
+mixin CoreLogger {
+  Logger get loggy => coreLogger('$runtimeType');
 }
+
+// ----------------------------------------------------------------- factories
+
+/// For static members and top level code, where there is no instance for a
+/// mixin to take a name from. Pass the class or subsystem name.
+Logger uiLogger(String name) => Logger('ui.$name');
+
+Logger appLogger(String name) => Logger('app.$name');
+
+Logger infraLogger(String name) => Logger('infra.$name');
+
+Logger coreLogger(String name) => Logger('core.$name');
+
+/// Startup, before anything else exists. Read first when the app fails to
+/// start, so it is worth keeping out of the other categories.
+Logger bootLogger(String name) => Logger('boot.$name');
