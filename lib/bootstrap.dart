@@ -9,7 +9,6 @@ import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/logger/logger.dart';
-import 'package:hiddify/core/logger/logger_controller.dart';
 import 'package:hiddify/core/logger/logger_setup.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
@@ -36,10 +35,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   if (!kIsWeb) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
-  LoggerController.preInit();
-  // The replacement pipeline, running alongside loggy. Nothing writes to it
-  // yet, so it costs nothing; the file sink is attached later, once loggy's
-  // own file printer is gone and app.log has a single writer again.
+  // phase 1 — console and the in-memory history, before the folders are known
   logStart();
   FlutterError.onError = Logger.logFlutterError;
   WidgetsBinding.instance.platformDispatcher.onError = Logger.logPlatformDispatcherError;
@@ -52,7 +48,8 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   );
 
   await _init("directories", () => container.read(appDirectoriesProvider.future));
-  LoggerController.init(container.read(logPathResolverProvider).appFile().path);
+  // phase 2 — the folders exist, so app.log can be opened
+  logAddFile(container.read(logPathResolverProvider).appFile().path);
 
   final appInfo = await _init("app info", () => container.read(appInfoProvider.future));
   await _init("preferences", () => container.read(sharedPreferencesProvider.future));
@@ -88,7 +85,12 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     await _init("auto start service", () => container.read(autoStartNotifierProvider.future));
   }
   await _init("logs repository", () => container.read(logRepositoryProvider.future));
-  await _init("logger controller", () => LoggerController.postInit(debug));
+  // phase 3 — a log file is worth its cost on desktop, or while debugging.
+  // On a phone in release it only burns storage nobody reads.
+  await _init(
+    "logging",
+    () async => logFinish(keepFile: debug || PlatformUtils.isDesktop),
+  );
 
   Logger.bootstrap.info(appInfo.format());
 
