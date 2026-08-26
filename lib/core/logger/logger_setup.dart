@@ -10,7 +10,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:flutter/foundation.dart' show kReleaseMode;
+import 'package:flutter/foundation.dart' show debugPrint, kReleaseMode;
 import 'package:hiddify/core/logger/ring/log_ring.dart';
 import 'package:hiddify/core/logger/sinks/file_sink.dart';
 import 'package:logging/logging.dart';
@@ -74,6 +74,14 @@ String ownPackagePrefix = 'package:hiddify/';
 /// how many of our own frames to keep
 int errorFrames = 4;
 
+/// The logging code's own frames. error() captures StackTrace.current inside
+/// the extension, so without this the origin would point at the logger rather
+/// than at whoever called it.
+const _loggerInternals = 'package:hiddify/core/logger/';
+
+bool _isOurs(String frame) =>
+    frame.contains(ownPackagePrefix) && !frame.contains(_loggerInternals);
+
 /// Turns the first frame from our own code into `Class.method (file.dart:line)`.
 ///
 /// A raw frame looks like:
@@ -83,14 +91,20 @@ String? originOf(StackTrace? stack) {
   if (stack == null) return null;
 
   for (final frame in stack.toString().split('\n')) {
-    if (!frame.contains(ownPackagePrefix)) continue;
+    if (!_isOurs(frame)) continue;
 
     final open = frame.indexOf('(');
     final close = frame.lastIndexOf(')');
     if (open == -1 || close <= open) continue;
 
     // '#0      ProfileRepository.save ' -> 'ProfileRepository.save'
-    final method = frame.substring(0, open).trim().split(RegExp(r'\s+')).last;
+    // The anonymous-closure suffix is dropped: it says nothing the file and
+    // line do not already say, and splitting on it used to leave 'closure>'.
+    final method = frame
+        .substring(0, open)
+        .replaceFirst(RegExp(r'^#\d+\s+'), '')
+        .replaceAll('.<anonymous closure>', '')
+        .trim();
 
     // 'package:log_bench/data/repo.dart:88:12' -> ['...repo.dart', '88', '12']
     final parts = frame.substring(open + 1, close).split(':');
@@ -114,7 +128,7 @@ StackTrace? _ownFrames(StackTrace? stack) {
   final mine = stack
       .toString()
       .split('\n')
-      .where((line) => line.contains(ownPackagePrefix))
+      .where(_isOurs)
       .take(errorFrames)
       .toList();
 
@@ -173,12 +187,30 @@ StreamSubscription<LogRecord>? _fileSub;
 
 // -------------------------------------------------------------------- phases
 
+/// Printed once, to stdout, because that is the one place records do not go.
+///
+/// dev.log reaches the VM service, so DevTools and an IDE console show every
+/// record with its level and source. A terminal sees none of it. Printing each
+/// record here as well would fix the terminal but show everything twice in the
+/// IDE, so the terminal is told where to look instead.
+void _printWhereTheLogsAre() {
+  debugPrint('');
+  debugPrint('  !!! app logs are printed in these three places only:');
+  debugPrint('        1. Flutter DevTools  >  Logging');
+  debugPrint('        2. the Debug Console in VS Code');
+  debugPrint('        3. the Logs page inside the app');
+  debugPrint('');
+}
+
 /// phase 1 — before the folders are known
 void logStart() {
   // ALL on purpose: this is the only gate before the sinks, and each sink
   // applies its own threshold. Anything dropped here is gone for good.
   Logger.root.level = Level.ALL;
-  if (_consoleEnabled) _consoleSub = Logger.root.onRecord.listen(_toConsole);
+  if (_consoleEnabled) {
+    _consoleSub = Logger.root.onRecord.listen(_toConsole);
+    _printWhereTheLogsAre();
+  }
   // the ring is never detached — it is the history the page reads
   Logger.root.onRecord.listen(_toRing);
 }
