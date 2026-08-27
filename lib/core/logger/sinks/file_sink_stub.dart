@@ -1,4 +1,6 @@
 /// web build — there is no file system, so every call does nothing
+const maxBytes = 0;
+
 void openLogFile(String path) {}
 
 void writeLogLine(String line) {}

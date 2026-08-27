@@ -27,14 +27,11 @@ class LogRepositoryImpl with ExceptionHandler, InfraLogger implements LogReposit
         if (!await logPathResolver.directory.exists()) {
           await logPathResolver.directory.create(recursive: true);
         }
-        if (await logPathResolver.coreFile().exists()) {
-          await logPathResolver.coreFile().writeAsString("");
-        } else {
-          await logPathResolver.coreFile().create(recursive: true);
-        }
-        if (await logPathResolver.appFile().exists()) {
-          await logPathResolver.appFile().writeAsString("");
-        } else {
+        // The files are no longer emptied at startup. A crash leaves its
+        // evidence in the previous run's lines, and wiping on launch threw
+        // exactly that away. Growth is bounded by the size cap in the sink
+        // instead. The engine creates and manages its own file.
+        if (!await logPathResolver.appFile().exists()) {
           await logPathResolver.appFile().create(recursive: true);
         }
       }

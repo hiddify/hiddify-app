@@ -151,7 +151,24 @@ void _toConsole(LogRecord r) {
 
 // ---------------------------------------------------------------------- file
 
-void _toFile(LogRecord r) => writeLogLine(formatRecord(r));
+/// The engine keeps its own complete log in data/box.log, so repeating its
+/// routine chatter here would only flood the file and eat the size cap. Its
+/// warnings and errors are kept, so a failure still sits next to the app line
+/// that led to it.
+bool _worthWritingToFile(LogRecord r) =>
+    !r.loggerName.startsWith('core.') || r.level >= Level.WARNING;
+
+void _toFile(LogRecord r) {
+  if (!_worthWritingToFile(r)) return;
+  writeLogLine(formatRecord(r));
+}
+
+/// Marks where a run begins, since the file now spans several of them.
+void logMarkRun(String appVersion) {
+  final now = DateTime.now().toIso8601String().split('.').first;
+  writeLogLine('');
+  writeLogLine('---- run started $now  ·  $appVersion ${'-' * 20}');
+}
 
 bool get fileEnabled => _fileSub != null;
 

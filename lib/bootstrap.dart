@@ -92,6 +92,8 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     () async => logFinish(keepFile: debug || PlatformUtils.isDesktop),
   );
 
+  // marks where this run begins, since the file now spans several
+  logMarkRun(appInfo.format());
   Logger.bootstrap.info(appInfo.format());
 
   await _init("profile repository", () => container.read(profileRepositoryProvider.future));
