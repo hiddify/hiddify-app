@@ -2,7 +2,12 @@
 
 ## Controlling the app
 
-flutter_driver can be used to control the running app. It is available in debug builds only.
+flutter_driver can drive the running app, but only when the `driver` flag is set. Debug builds only.
+While it is on the app cannot accept a real keyboard, so leave the flag off for anything else.
+
+```bash
+flutter run -d windows --dart-define=driver=true
+```
 
 ## Localization / translations (slang)
 
