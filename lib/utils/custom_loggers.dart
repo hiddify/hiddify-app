@@ -20,8 +20,12 @@ export 'package:hiddify/core/logger/log_level_compat.dart';
 // ------------------------------------------------------------------- mixins
 
 /// presentation layer — widgets and pages
+///
+/// Names its loggers `app`, same as [AppLogger]. The layers still differ in the
+/// code, which is why both mixins exist, but on the logs page the distinction
+/// was noise: a name like `HomePage` already says it is a widget.
 mixin PresLogger {
-  Logger get loggy => uiLogger('$runtimeType');
+  Logger get loggy => appLogger('$runtimeType');
 }
 
 /// application layer — notifiers and controllers
@@ -43,10 +47,10 @@ mixin CoreLogger {
 
 /// For static members and top level code, where there is no instance for a
 /// mixin to take a name from. Pass the class or subsystem name.
-Logger uiLogger(String name) => Logger('ui.$name');
-
 Logger appLogger(String name) => Logger('app.$name');
 
+/// `infra` keeps a prefix of its own, because "the network layer said this" is
+/// worth seeing at a glance.
 Logger infraLogger(String name) => Logger('infra.$name');
 
 Logger coreLogger(String name) => Logger('core.$name');

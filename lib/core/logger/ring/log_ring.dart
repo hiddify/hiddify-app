@@ -2,6 +2,30 @@ import 'dart:collection';
 
 import 'package:logging/logging.dart';
 
+/// The groups the page filters by.
+///
+/// A group is not the same as a layer. Widgets and notifiers both write `app.`
+/// because telling them apart on screen never helped — the class name already
+/// does. `infra` keeps its own prefix, since "the network layer said this" is
+/// worth seeing, but it answers the same question as `app`: was this the app or
+/// the engine?
+enum LogCategory {
+  boot,
+  app,
+  core;
+
+  bool matches(String loggerName) => switch (this) {
+    LogCategory.boot => loggerName.startsWith('boot.'),
+    LogCategory.core => loggerName.startsWith('core.'),
+    // Everything the other two do not claim, which includes loggers from
+    // packages that never heard of our naming — neat_periodic_task and the
+    // like. They are still the app talking, so they belong somewhere rather
+    // than nowhere.
+    LogCategory.app =>
+      !loggerName.startsWith('boot.') && !loggerName.startsWith('core.'),
+  };
+}
+
 /// The in-memory history the logs page reads from.
 ///
 /// Stores the records themselves, never formatted strings — formatting 5000
@@ -50,44 +74,22 @@ class LogRing {
     }
   }
 
-  /// newest first, which is how the page shows them
+  /// Oldest first, which is how a log reads — on the page, in the clipboard
+  /// and in a file.
   ///
-  /// [category] is a logger name prefix — 'core', 'ui', 'app', 'infra'.
-  /// Both filters only hide rows; nothing is removed from the ring.
-  /// [limit] keeps only the newest N matches, so drawing 8 rows never
-  /// allocates a list of the whole buffer.
+  /// Every filter only hides rows; nothing is removed from the ring.
   List<LogRecord> view({
     Level? minLevel,
-    String? category,
+    LogCategory? category,
     String? text,
-    int? limit,
   }) {
     final out = <LogRecord>[];
     for (final r in _records) {
       if (minLevel != null && r.level < minLevel) continue;
-      if (category != null && !r.loggerName.startsWith('$category.')) continue;
+      if (category != null && !category.matches(r.loggerName)) continue;
       if (text != null && text.isNotEmpty && !r.message.contains(text)) continue;
       out.add(r);
-      if (limit != null && out.length > limit) out.removeAt(0);
     }
-    return out.reversed.toList(growable: false);
-  }
-
-  int _countsRevision = -1;
-  Map<String, int> _counts = const {};
-
-  /// how many records each category holds right now — recomputed only when
-  /// the ring actually changed, not on every rebuild
-  Map<String, int> countByCategory() {
-    if (_countsRevision == revision) return _counts;
-    final counts = <String, int>{};
-    for (final r in _records) {
-      final dot = r.loggerName.indexOf('.');
-      final key = dot == -1 ? r.loggerName : r.loggerName.substring(0, dot);
-      counts[key] = (counts[key] ?? 0) + 1;
-    }
-    _counts = counts;
-    _countsRevision = revision;
-    return counts;
+    return out;
   }
 }
