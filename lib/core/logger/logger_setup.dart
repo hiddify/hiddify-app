@@ -152,15 +152,15 @@ void _toConsole(LogRecord r) {
 
 // ---------------------------------------------------------------------- file
 
-/// The engine keeps its own complete log in data/box.log, so repeating its
-/// routine chatter here would only flood the file and eat the size cap. Its
-/// warnings and errors are kept, so a failure still sits next to the app line
-/// that led to it.
-bool _worthWritingToFile(LogRecord r) =>
-    !r.loggerName.startsWith('core.') || r.level >= Level.WARNING;
-
+/// Errors only.
+///
+/// The file exists to survive a crash, and everything quieter than an error is
+/// already somewhere better: the page reads the in-memory ring, and the engine
+/// keeps its own complete log in data/box.log. Narrowing it to errors is also
+/// what lets the file stay unbounded — it grows by the handful, not by the
+/// thousand.
 void _toFile(LogRecord r) {
-  if (!_worthWritingToFile(r)) return;
+  if (r.level < Level.SEVERE) return;
   writeLogLine(formatRecord(r));
 }
 
