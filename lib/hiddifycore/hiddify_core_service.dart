@@ -33,7 +33,6 @@ class HiddifyCoreService with InfraLogger {
 
   CoreStatus currentState = const CoreStatus.stopped();
   final statusController = BehaviorSubject<CoreStatus>();
-  final logController = BehaviorSubject<List<LogMessage>>();
   final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 10000));
   final Map<String, StreamSubscription?> subscriptions = {};
   List<OutboundGroup> latest = [];
@@ -140,6 +139,12 @@ class HiddifyCoreService with InfraLogger {
         statusController.add(currentState = const CoreStatus.stopped());
         return left(background.getCoreAlert() ?? const ConnectionFailure.unexpected("failed to start core"));
       }
+      // Armed again on every connect, not only when there are two channels.
+      // listenSingle drops a subscription for good when its stream errors, and
+      // a gRPC connection being terminated does exactly that, so a listener
+      // armed once at setup does not survive the engine restarting. Re-listening
+      // is idempotent: listenSingle cancels the previous one for the same key.
+      await startListeningLogs("fg", core.fgClient);
       if (!core.isSingleChannel()) {
         await startListeningLogs("bg", core.bgClient);
         await startListeningStatus("bg", core.bgClient);
@@ -356,51 +361,10 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  List<LogMessage> logBuffer = [];
-
-  // SingboxConfigOption? latestOptions;
-
-  Stream<List<LogMessage>> watchLogs(String path) async* {
-    if (!core.isInitialized()) {
-      loggy.debug("core is not initialized, returning empty log stream");
-      return;
-    }
-    await startListeningLogs("bg", core.bgClient);
-    await startListeningLogs("fg", core.fgClient);
-    try {
-      yield* logController.stream;
-    } catch (e) {
-      loggy.error("error watching logs: $e");
-      rethrow;
-    }
-    // Stream<List<String>> logStream(CoreClient coreClient) {
-    //   return coreClient.logListener(Empty()).asBroadcastStream().map((event) => [event.message]).onErrorResume((error, stackTrace) {
-    //     loggy.debug('Error in $coreClient: $error, retrying...');
-    //     final delay = (currentState == const SingboxStatus.stopped()) ? 5 : 1;
-    //     return const Stream<List<String>>.empty().delay(Duration(seconds: delay)).concatWith([logStream(coreClient)]);
-    //   });
-    // }
-
-    // // Create streams for both fg and bg clients with retry logic
-    // final fgLogStream = logStream(core.fgClient);
-
-    // if (core.bgClient == core.fgClient) {
-    //   yield* fgLogStream;
-    //   return;
-    // }
-    // final bgLogStream = logStream(core.bgClient);
-    // yield* MergeStream([bgLogStream, fgLogStream]);
-  }
-
-  TaskEither<String, Unit> clearLogs() {
-    return TaskEither(() async {
-      loggy.debug("clearing logs");
-      logBuffer.clear();
-      // final res = await core.bgClient(Empty());
-      // if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
-      return right(unit);
-    });
-  }
+  // The 300-message buffer and its BehaviorSubject are gone. They existed so
+  // the logs page could show history when it opened, and only ever held the
+  // engine's lines. The in-memory ring in core/logger does that for every
+  // category, so the page reads it instead.
 
   // TaskEither<String, WarpResponse> generateWarpConfig({
   //   required String licenseKey,
@@ -476,11 +440,6 @@ class HiddifyCoreService with InfraLogger {
     await listenSingle<LogMessage>(listenKey, () {
       return cc.logListener(LogRequest(level: coreLogLevel), options: grpcOptions).map((event) {
         // Handle incoming event
-        logBuffer.add(event);
-        if (logBuffer.length > 300) {
-          logBuffer.removeAt(0);
-        }
-        logController.add(logBuffer);
         // One message becomes one record. The old code split on newlines
         // first, but the engine already sends one line per message, so the
         // split only allocated a list and multiplied the work per burst.

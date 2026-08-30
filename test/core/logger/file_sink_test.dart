@@ -37,8 +37,19 @@ void main() {
     expect(file.readAsStringSync(), 'first run\nsecond run\n');
   });
 
+  test('a missing folder is created rather than refused', () {
+    openLogFile('${dir.path}/nested/deeper/app.log');
+    writeLogLine('made it');
+
+    expect(File('${dir.path}/nested/deeper/app.log').readAsStringSync(), 'made it\n');
+  });
+
   test('an unwritable path leaves the sink closed instead of throwing', () {
-    expect(() => openLogFile('${dir.path}/nope/deeper/app.log'), returnsNormally);
+    // A file where a folder should be: the only way to make a path unusable
+    // that behaves the same on Windows and POSIX.
+    final blocker = File('${dir.path}/blocker')..writeAsStringSync('x');
+
+    expect(() => openLogFile('${blocker.path}/app.log'), returnsNormally);
     expect(isLogFileOpen, isFalse);
     expect(() => writeLogLine('dropped'), returnsNormally);
   });

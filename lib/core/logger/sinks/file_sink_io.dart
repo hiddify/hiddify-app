@@ -4,11 +4,13 @@ String? _path;
 
 bool get isLogFileOpen => _path != null;
 
-/// Opens by proving the path is writable, so a bad path is known now rather
-/// than silently swallowed at the first error worth recording.
+/// Opens by creating the file and proving it is writable, so a bad path is
+/// known now rather than silently swallowed at the first error worth recording.
 void openLogFile(String path) {
   try {
-    File(path).writeAsStringSync('', mode: FileMode.append);
+    final file = File(path);
+    file.parent.createSync(recursive: true);
+    file.writeAsStringSync('', mode: FileMode.append);
     _path = path;
   } catch (_) {
     _path = null;

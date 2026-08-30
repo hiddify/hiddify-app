@@ -90,7 +90,6 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     }
     await _init("auto start service", () => container.read(autoStartNotifierProvider.future));
   }
-  await _init("logs repository", () => container.read(logRepositoryProvider.future));
   // phase 3 — a log file is worth its cost on desktop, or while debugging.
   // On a phone in release it only burns storage nobody reads.
   await _init(

@@ -15,10 +15,27 @@ class LogPathResolver {
     return File(p.join(directory.path, "data", "box.log"));
   }
 
-  /// A dump of every goroutine, written by the engine. Not a log — a snapshot
-  /// of what its threads were doing, which is what a hang needs.
-  File coreHangFile() {
-    return File(p.join(directory.path, "data", "goroutine-start.log"));
+  /// The engine's last crash, or null when it has not crashed.
+  ///
+  /// Go's runtime writes its fatal traceback to `CrashReport-.log`
+  /// (`debug.SetCrashOutput`). On the next launch the engine moves that file
+  /// into `crash_reports/<UTC timestamp>/go.log` and deletes the original, so
+  /// crashes pile up as one folder each. The newest archived one is what is
+  /// wanted; the live file only still exists when the app has not restarted
+  /// since the crash.
+  File? coreCrashFile() {
+    final archive = Directory(p.join(directory.path, "crash_reports"));
+    if (archive.existsSync()) {
+      final reports = archive.listSync().whereType<Directory>().toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
+      for (final report in reports.reversed) {
+        final log = File(p.join(report.path, "go.log"));
+        if (log.existsSync()) return log;
+      }
+    }
+
+    final live = File(p.join(directory.path, "CrashReport-.log"));
+    return live.existsSync() && live.lengthSync() > 0 ? live : null;
   }
 
   File appFile() {
