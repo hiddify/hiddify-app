@@ -17,6 +17,12 @@ enum LogLevel {
   /// [LogLevel] selectable by user as preference
   static List<LogLevel> get choices => values.takeFirst(4);
 
+  /// The core switches itself into debug mode at these levels — see
+  /// `static.debug = static.debug || static.logLevel <= LogLevel_DEBUG` in
+  /// hiddify-core's buildconfighelper.go. Reading the same rule here keeps the
+  /// app's own debug decisions in step with the core's, from one setting.
+  bool get isVerbose => index <= LogLevel.debug.index;
+
   Color? get color => switch (this) {
     trace => Colors.lightBlueAccent,
     debug => Colors.grey,

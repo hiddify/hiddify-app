@@ -23,6 +23,7 @@ import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
@@ -53,6 +54,9 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
 
   final appInfo = await _init("app info", () => container.read(appInfoProvider.future));
   await _init("preferences", () => container.read(sharedPreferencesProvider.future));
+  // The ring starts at a safe default and only now learns the size the user
+  // picked, since nothing could be read from disk before this point.
+  logRing.capacity = container.read(Preferences.logBufferSize);
 
   final enableAnalytics = await container.read(analyticsControllerProvider.future);
   if (enableAnalytics) {
@@ -70,7 +74,9 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     }
   });
 
-  final debug = container.read(debugModeNotifierProvider) || kDebugMode;
+  // The log level decides this now. There is no second debug switch to keep in
+  // sync, and the core reaches the same conclusion from the same value.
+  final debug = kDebugMode || container.read(ConfigOptions.logLevel).isVerbose;
 
   if (PlatformUtils.isDesktop) {
     await _init("window controller", () => container.read(windowNotifierProvider.future));
