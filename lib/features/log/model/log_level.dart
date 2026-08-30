@@ -14,8 +14,10 @@ enum LogLevel {
   fatal,
   panic;
 
-  /// [LogLevel] selectable by user as preference
-  static List<LogLevel> get choices => values.takeFirst(4);
+  /// [LogLevel] selectable by user as preference. Stops at error: fatal and
+  /// panic are what the core says on its way down, so choosing them as a floor
+  /// would mean asking to be told nothing until it is already too late.
+  static List<LogLevel> get choices => values.takeFirst(5);
 
   /// The core switches itself into debug mode at these levels — see
   /// `static.debug = static.debug || static.logLevel <= LogLevel_DEBUG` in

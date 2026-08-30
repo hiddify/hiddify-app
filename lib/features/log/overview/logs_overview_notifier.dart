@@ -1,130 +1,116 @@
 import 'dart:async';
 
-import 'package:hiddify/features/log/data/log_data_providers.dart';
-import 'package:hiddify/features/log/model/log_entity.dart';
-import 'package:hiddify/features/log/model/log_level.dart';
+import 'package:hiddify/core/logger/logger_setup.dart';
+import 'package:hiddify/core/logger/ring/log_ring.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/log/overview/logs_overview_state.dart';
-import 'package:hiddify/hiddifycore/init_signal.dart';
-import 'package:hiddify/utils/riverpod_utils.dart';
-import 'package:hiddify/utils/utils.dart';
+import 'package:hiddify/utils/custom_loggers.dart';
+import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:rxdart/rxdart.dart';
 
 part 'logs_overview_notifier.g.dart';
 
+/// Reads the in-memory ring rather than the engine's gRPC stream.
+///
+/// The ring holds every category — core, app, boot — so the page shows the
+/// whole picture instead of only what the engine said, and it has history the
+/// moment it opens.
+///
+/// Nothing is pushed here. The ring bumps a revision counter as records
+/// arrive and this polls it, so one log line never costs one rebuild.
 @riverpod
 class LogsOverviewNotifier extends _$LogsOverviewNotifier with AppLogger {
+  Timer? _poll;
+  int _drawn = -1;
+  bool _visible = true;
+
   @override
   LogsOverviewState build() {
-    ref.disposeDelay(const Duration(seconds: 20));
-    state = const LogsOverviewState();
     ref.onDispose(() {
-      loggy.debug("disposing");
-      _listener?.cancel();
-      _listener = null;
+      _poll?.cancel();
+      _poll = null;
     });
-    ref.onCancel(() {
-      if (_listener?.isPaused != true) {
-        loggy.debug("pausing");
-        _listener?.pause();
-      }
-    });
-    ref.onResume(() {
-      if (!state.paused && (_listener?.isPaused ?? false)) {
-        loggy.debug("resuming");
-        _listener?.resume();
-      }
-    });
+    _startPolling();
 
-    _addListeners();
-    return const LogsOverviewState();
+    // Deliberately not _view(): that reads `state`, which does not exist until
+    // this method returns. A bare instance carries the same defaults, so the
+    // first view is filtered the same way every later one is.
+    _drawn = logRing.revision;
+    const initial = LogsOverviewState();
+    return initial.copyWith(
+      logs: logRing.view(
+        minLevel: initial.minLevel,
+        category: initial.category,
+      ),
+    );
   }
 
-  StreamSubscription? _listener;
-
-  Future<void> _addListeners() async {
-    loggy.debug("adding listeners");
-    ref.watch(coreRestartSignalProvider);
-    await _listener?.cancel();
-    _listener = ref
-        .read(logRepositoryProvider)
-        .requireValue
-        .watchLogs()
-        // throttle only reads the timing of this stream, never its value
-        // ignore: void_checks
-        .throttle((_) => Stream.value(_listener?.isPaused ?? false), leading: false, trailing: true)
-        .throttleTime(const Duration(milliseconds: 250), leading: false, trailing: true)
-        .asyncMap((event) async {
-          await event.fold(
-            (f) {
-              _logs = [];
-              state = state.copyWith(logs: AsyncError(f, StackTrace.current));
-            },
-            (a) async {
-              _logs = a.reversed;
-              state = state.copyWith(logs: AsyncData(await _computeLogs()));
-            },
-          );
-        })
-        .listen((event) {});
+  void _startPolling() {
+    _poll?.cancel();
+    _poll = Timer.periodic(const Duration(milliseconds: 400), (_) {
+      if (!_visible || state.paused) return;
+      if (logRing.revision == _drawn) return;
+      state = state.copyWith(logs: _view());
+    });
   }
 
-  Iterable<LogEntity> _logs = [];
-  final _debouncer = CallbackDebouncer(const Duration(milliseconds: 200));
-  LogLevel? _levelFilter;
-  String _filter = "";
+  List<LogRecord> _view() {
+    _drawn = logRing.revision;
+    return logRing.view(
+      minLevel: state.minLevel,
+      category: state.category,
+      text: state.text,
+    );
+  }
 
-  Future<List<LogEntity>> _computeLogs() async {
-    if (_levelFilter == null && _filter.isEmpty) return _logs.toList();
-    return _logs.where((e) {
-      return (_filter.isEmpty || e.message.contains(_filter)) &&
-          (_levelFilter == null || e.level == null || e.level!.index >= _levelFilter!.index);
-    }).toList();
+  /// Called from TickerMode, so a shell route that keeps this page mounted off
+  /// screen stops paying for refreshes it cannot show.
+  void setVisible(bool visible) {
+    if (visible == _visible) return;
+    _visible = visible;
+    if (visible) state = state.copyWith(logs: _view());
   }
 
   void pause() {
     loggy.debug("pausing");
-    _listener?.pause();
     state = state.copyWith(paused: true);
   }
 
   void resume() {
     loggy.debug("resuming");
-    _listener?.resume();
-    state = state.copyWith(paused: false);
+    state = state.copyWith(paused: false, logs: _view());
   }
 
-  Future<void> clear() async {
+  /// Clears the history everything reads from, not only this view.
+  void clear() {
     loggy.debug("clearing");
-    await ref
-        .read(logRepositoryProvider)
-        .requireValue
-        .clearLogs()
-        .match(
-          (l) {
-            loggy.warning("error clearing logs", l);
-          },
-          (_) {
-            _logs = [];
-            state = state.copyWith(logs: const AsyncData([]));
-          },
-        )
-        .run();
+    logRing.clear();
+    state = state.copyWith(logs: _view());
   }
 
-  void filterMessage(String? filter) {
-    _filter = filter ?? '';
-    _debouncer(() async {
-      if (state.logs case AsyncData()) {
-        state = state.copyWith(filter: _filter, logs: AsyncData(await _computeLogs()));
-      }
-    });
+  void filterText(String? text) {
+    state = state.copyWith(text: text ?? '');
+    state = state.copyWith(logs: _view());
   }
 
-  Future<void> filterLevel(LogLevel? level) async {
-    _levelFilter = level;
-    if (state.logs case AsyncData()) {
-      state = state.copyWith(levelFilter: _levelFilter, logs: AsyncData(await _computeLogs()));
-    }
+  void filterLevel(Level level) {
+    state = state.copyWith(minLevel: level);
+    state = state.copyWith(logs: _view());
+  }
+
+  void filterCategory(LogCategory? category) {
+    state = category == null
+        ? state.copyWith(clearCategory: true)
+        : state.copyWith(category: category);
+    state = state.copyWith(logs: _view());
+  }
+
+  /// How many records the ring keeps. Saved, so the size survives a restart —
+  /// the ring itself is a plain object with no idea preferences exist, so the
+  /// two are set together here.
+  Future<void> setCapacity(int capacity) async {
+    logRing.capacity = capacity;
+    state = state.copyWith(logs: _view());
+    await ref.read(Preferences.logBufferSize.notifier).update(capacity);
   }
 }
