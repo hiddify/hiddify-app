@@ -11,6 +11,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart' show debugPrint, kReleaseMode;
+import 'package:hiddify/core/logger/log_level_compat.dart';
 import 'package:hiddify/core/logger/ring/log_ring.dart';
 import 'package:hiddify/core/logger/sinks/file_sink.dart';
 import 'package:logging/logging.dart';
@@ -18,7 +19,7 @@ import 'package:logging/logging.dart';
 /// one place that turns a record into one line of text
 String formatRecord(LogRecord r) {
   final time = r.time.toIso8601String().split('T')[1];
-  return '$time [${r.level.name}] [${r.loggerName}] ${messageOf(r)}';
+  return '$time [${r.level.shortName.toUpperCase()}] [${r.loggerName}] ${messageOf(r)}';
 }
 
 /// The message, with the origin appended when the record carries a stack.

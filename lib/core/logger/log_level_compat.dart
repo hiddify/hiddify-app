@@ -32,3 +32,31 @@ extension LogLevelCompat on Logger {
   void fatal(Object? message, [Object? error, StackTrace? stackTrace]) =>
       shout(message, error, stackTrace ?? StackTrace.current);
 }
+
+/// The engine's words for a level, which is the vocabulary the whole app shows.
+///
+/// package:logging spells them FINEST, FINE, INFO, WARNING, SEVERE. The engine
+/// says trace, debug, info, warn, error. Two names for one idea is one too many
+/// when the log level setting and the level filter sit on the same page, so the
+/// engine's win: they are the ones the user already picks from.
+extension LevelNaming on Level {
+  String get shortName => switch (this) {
+    Level.FINEST || Level.FINER => 'trace',
+    Level.FINE || Level.CONFIG => 'debug',
+    Level.INFO => 'info',
+    Level.WARNING => 'warn',
+    Level.SEVERE => 'error',
+    Level.SHOUT => 'fatal',
+    _ => name.toLowerCase(),
+  };
+}
+
+/// The levels worth offering as a filter. FINER, CONFIG and SHOUT are never
+/// produced by anything here, so listing them would only be noise.
+const uiLevels = <Level>[
+  Level.FINEST,
+  Level.FINE,
+  Level.INFO,
+  Level.WARNING,
+  Level.SEVERE,
+];
