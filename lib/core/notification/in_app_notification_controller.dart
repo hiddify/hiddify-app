@@ -25,7 +25,7 @@ class InAppNotificationController with AppLogger {
     try {
       toastification.dismissAll();
       return toastification.show(
-        title: Text(message),
+        title: Text(message, maxLines: 6, softWrap: true, overflow: TextOverflow.ellipsis),
         type: type._toastificationType,
         alignment: AlignmentDirectional.bottomCenter,
         margin: const EdgeInsets.only(bottom: 64 + 16, right: 16, left: 16),
@@ -43,8 +43,8 @@ class InAppNotificationController with AppLogger {
     }
   }
 
-  ToastificationItem? showErrorToast(String message) =>
-      _show(message, type: NotificationType.error, duration: const Duration(seconds: 5));
+  ToastificationItem? showErrorToast(String message, {Duration duration = const Duration(seconds: 5)}) =>
+      _show(message, type: NotificationType.error, duration: duration);
 
   ToastificationItem? showSuccessToast(String message) => _show(message, type: NotificationType.success);
 

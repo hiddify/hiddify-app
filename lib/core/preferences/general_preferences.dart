@@ -1,18 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hiddify/core/app_info/app_info_provider.dart';
-import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
-
-import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/utils/platform_utils.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'general_preferences.g.dart';
 
 bool _debugIntroPage = false;
 
@@ -116,21 +110,18 @@ abstract class Preferences {
   static final psiphonConsentGiven = PreferencesNotifier.create<bool, bool>("psiphon-consent-given", false);
 
   static final showRouteGeneralOptions = PreferencesNotifier.create<bool, bool>("show-route-general-options", true);
-}
 
-@Riverpod(keepAlive: true)
-class DebugModeNotifier extends _$DebugModeNotifier {
-  late final _pref = PreferencesEntry(
-    preferences: ref.watch(sharedPreferencesProvider).requireValue,
-    key: "debug_mode",
-    defaultValue: ref.read(environmentProvider) == Environment.dev,
+  /// How many records the in-memory log ring keeps. Saved, so a size picked
+  /// once while chasing a bug is still there on the next run.
+  static final logBufferSize = PreferencesNotifier.create<int, int>("log-buffer-size", 1000);
+
+  static final profilesSort = PreferencesNotifier.create<({ProfilesSort by, SortMode mode}), String>(
+    "profiles_sort",
+    (by: ProfilesSort.lastUpdate, mode: SortMode.descending),
+    mapFrom: (value) {
+      final parts = value.split(":");
+      return (by: ProfilesSort.values.byName(parts.first), mode: SortMode.values.byName(parts.last));
+    },
+    mapTo: (value) => "${value.by.name}:${value.mode.name}",
   );
-
-  @override
-  bool build() => _pref.read();
-
-  Future<void> update(bool value) {
-    state = value;
-    return _pref.write(value);
-  }
 }

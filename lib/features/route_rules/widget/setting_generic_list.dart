@@ -42,7 +42,7 @@ class SettingGenericList<T extends Object> extends ConsumerWidget {
                             const Icon(size: 16, Icons.warning_rounded, color: Colors.amber),
                             const Gap(2),
                             Text(
-                              t.pages.settings.routing.routeRule.rule.notAvailabeInThisPlatform,
+                              t.pages.settings.routing.routeRule.rule.notAvailableInThisPlatform,
                               style: theme.textTheme.labelSmall!.copyWith(color: theme.colorScheme.onSurfaceVariant),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,

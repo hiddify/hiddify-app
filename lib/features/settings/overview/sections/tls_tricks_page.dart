@@ -35,7 +35,7 @@ class TlsTricksPage extends HookConsumerWidget {
           ChoicePreferenceWidget(
             selected: ref.watch(ConfigOptions.fragmentPackets),
             preferences: ref.watch(ConfigOptions.fragmentPackets.notifier),
-            choices: ["tlshello", "1-1", "1-2", "1-3", "1-4", "1-5"],
+            choices: const ["tlshello", "1-1", "1-2", "1-3", "1-4", "1-5"],
             title: t.pages.settings.tlsTricks.packets,
             icon: Icons.layers_rounded,
             presentChoice: (value) => _presentFragmentPackets(t, value),

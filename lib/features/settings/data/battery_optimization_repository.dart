@@ -1,7 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:hiddify/core/utils/exception_handler.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
-import 'package:loggy/loggy.dart';
 
 abstract interface class BatteryOptimizationRepository {
   Future<bool?> isIgnoringBatteryOptimizations();
@@ -19,7 +18,7 @@ class BatteryOptimizationRepositoryImpl with ExceptionHandler, InfraLogger imple
       result = await _methodChannel.invokeMethod<bool>("is_ignoring_battery_optimizations");
       loggy.debug("is ignoring battery optimizations? [$result]");
     } catch (e) {
-      loggy.log(LogLevel.error, e.toString());
+      loggy.error(e.toString());
     }
     return result;
   }
@@ -32,7 +31,7 @@ class BatteryOptimizationRepositoryImpl with ExceptionHandler, InfraLogger imple
       result = await _methodChannel.invokeMethod<bool>("request_ignore_battery_optimizations");
       loggy.debug("ignore battery optimization result: [$result]");
     } catch (e) {
-      loggy.log(LogLevel.error, e.toString());
+      loggy.error(e.toString());
     }
     return result;
   }

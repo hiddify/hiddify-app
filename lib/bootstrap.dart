@@ -9,7 +9,7 @@ import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/logger/logger.dart';
-import 'package:hiddify/core/logger/logger_controller.dart';
+import 'package:hiddify/core/logger/logger_setup.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_migration.dart';
@@ -23,6 +23,7 @@ import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
@@ -35,19 +36,27 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   if (!kIsWeb) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
-  LoggerController.preInit();
+  // phase 1 — console and the in-memory history, before the folders are known
+  logStart();
   FlutterError.onError = Logger.logFlutterError;
   WidgetsBinding.instance.platformDispatcher.onError = Logger.logPlatformDispatcherError;
 
   final stopWatch = Stopwatch()..start();
 
-  final container = ProviderContainer(overrides: [environmentProvider.overrideWithValue(env)]);
+  final container = ProviderContainer(
+    overrides: [environmentProvider.overrideWithValue(env)],
+    observers: [RiverpodObserver()],
+  );
 
   await _init("directories", () => container.read(appDirectoriesProvider.future));
-  LoggerController.init(container.read(logPathResolverProvider).appFile().path);
+  // phase 2 — the folders exist, so app.log can be opened
+  logAddFile(container.read(logPathResolverProvider).appFile().path);
 
   final appInfo = await _init("app info", () => container.read(appInfoProvider.future));
   await _init("preferences", () => container.read(sharedPreferencesProvider.future));
+  // The ring starts at a safe default and only now learns the size the user
+  // picked, since nothing could be read from disk before this point.
+  logRing.capacity = container.read(Preferences.logBufferSize);
 
   final enableAnalytics = await container.read(analyticsControllerProvider.future);
   if (enableAnalytics) {
@@ -65,7 +74,9 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     }
   });
 
-  final debug = container.read(debugModeNotifierProvider) || kDebugMode;
+  // The log level decides this now. There is no second debug switch to keep in
+  // sync, and the core reaches the same conclusion from the same value.
+  final debug = kDebugMode || container.read(ConfigOptions.logLevel).isVerbose;
 
   if (PlatformUtils.isDesktop) {
     await _init("window controller", () => container.read(windowNotifierProvider.future));
@@ -79,9 +90,15 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     }
     await _init("auto start service", () => container.read(autoStartNotifierProvider.future));
   }
-  await _init("logs repository", () => container.read(logRepositoryProvider.future));
-  await _init("logger controller", () => LoggerController.postInit(debug));
+  // phase 3 — a log file is worth its cost on desktop, or while debugging.
+  // On a phone in release it only burns storage nobody reads.
+  await _init(
+    "logging",
+    () async => logFinish(keepFile: debug || PlatformUtils.isDesktop),
+  );
 
+  // marks where this run begins, since the file now spans several
+  logMarkRun(appInfo.format());
   Logger.bootstrap.info(appInfo.format());
 
   await _init("profile repository", () => container.read(profileRepositoryProvider.future));
@@ -125,9 +142,8 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   stopWatch.stop();
 
   runApp(
-    ProviderScope(
-      parent: container,
-      observers: [RiverpodObserver()],
+    UncontrolledProviderScope(
+      container: container,
       child: SentryUserInteractionWidget(child: const App()),
     ),
   );

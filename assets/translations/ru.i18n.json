@@ -20,14 +20,16 @@
     "url": "URL",
     "add": "Добавить",
     "clipboard": "Буфер обмена",
-    "addToClipboard": "Добавить в буфер обмена",
-    "scanQr": "Сканировать QR",
+    "addToClipboard": "Копировать в буфер обмена",
+    "scanQr": "Сканировать QR-код",
     "free": "Бесплатно",
     "warp": "WARP",
     "fragment": "Фрагмент",
     "help": "Справка",
     "save": "Сохранить",
     "update": "Обновить",
+    "pin": "Закрепить",
+    "unpin": "Открепить",
     "share": "Поделиться",
     "edit": "Изменить",
     "delete": "Удалить",
@@ -77,18 +79,18 @@
       },
       "export": {
         "clipboard": {
-          "success": "Успешно добавлено в буфер обмена",
+          "success": "Скопировано в буфер обмена",
           "failure": "Не удалось скопировать в буфер обмена",
-          "contentTooLarge": "Слишком большой контент. Используйте экспорт в файл"
+          "contentTooLarge": "Слишком большой контент. Экспортируйте его в файл."
         },
         "file": {
-          "success": "Файл JSON успешно создан",
+          "success": "Файл JSON создан",
           "failure": "Не удалось создать файл"
         }
       },
       "import": {
         "confirm": "Подтвердить импорт",
-        "success": "Успешно импортировано",
+        "success": "Импортировано",
         "failure": "Не удалось импортировать"
       },
       "autoSave": {
@@ -99,12 +101,12 @@
   "intro": {
     "banner": "Все, что вам нужно для интернета без ограничений",
     "termsAndPolicyCaution(rich)": "Продолжая, вы соглашаетесь с ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Сделано с ❤️ Hiddify - ${tap_source(Открытый исходный код)} (${tap_license(Лицензия)})"
+    "info(rich)": "Сделано с ❤️ Hiddify. ${tap_source(Открытый исходный код)} и ${tap_license(Лицензия)}"
   },
   "pages": {
     "home": {
       "title": "Главная",
-      "quickSettings": "Опции быстрых настроек"
+      "quickSettings": "Быстрые настройки"
     },
     "proxies": {
       "title": "Прокси",
@@ -127,7 +129,7 @@
       "delay": {
         "result": "Задержка: ${delay} мс",
         "timeout": "Тайм-аут теста задержки",
-        "testing": "Задержка: тестирование..."
+        "testing": "Задержка: тестирование…"
       }
     },
     "profiles": {
@@ -135,33 +137,39 @@
       "add": "Добавить профиль",
       "update": "Обновить профиль",
       "viewAllProfiles": "Посмотреть все профили",
-      "activeProfileName": "Имя активного профиля: \"${name}\".",
-      "nonActiveProfileName": "Выбрать \"${name}\" как активный профиль",
+      "activeProfileName": "Имя активного профиля: «${name}»",
+      "nonActiveProfileName": "Выбрать «${name}» как активный профиль",
       "freeSubNotFound": "Бесплатная подписка не найдена",
-      "freeSubNotFoundForRegion": "Бесплатная подписка для региона \"${region}\" не найдена",
+      "freeSubNotFoundForRegion": "Бесплатная подписка для региона «${region}» не найдена",
       "failedToLoad": "Не удалось загрузить",
       "updateSubscriptions": "Обновить подписки",
       "share": {
-        "urlToClipboard": "URL в буфер обмена",
-        "showUrlQr": "Показать QR-код URL",
-        "jsonToClipboard": "JSON в буфер обмена"
+        "urlToClipboard": "Копировать URL",
+        "showUrlQr": "Показать QR-код",
+        "jsonToClipboard": "Копировать JSON"
       },
       "msg": {
         "save": {
-          "success": "Профиль успешно сохранен"
+          "success": "Профиль сохранен"
         },
         "invalidUrl": "Неверный URL",
         "add": {
           "failure": "Не удалось добавить профиль"
         },
         "update": {
-          "success": "Профиль успешно обновлен",
-          "successNamed": "\"${name}\" успешно обновлен",
+          "success": "Профиль обновлен",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count профиль обновлен",
+            "few": "$count профиля обновлено",
+            "many": "$count профилей обновлено",
+            "other": "$count профиля обновлено"
+          },
           "failure": "Не удалось обновить профиль",
-          "failureNamed": "Не удалось обновить \"${name}\""
+          "failureNamed": "Не удалось обновить «${name}»",
+          "bulkPartial": "${success} обновлено\n${failed} с ошибкой: ${names}"
         },
         "delete": {
-          "success": "Профиль успешно удален"
+          "success": "Профиль удален"
         }
       }
     },
@@ -175,17 +183,32 @@
         "urlHint": "Полный URL конфигурации",
         "disableAutoUpdate": "Отключить автообновление",
         "autoUpdateInterval": "Интервал автообновления",
-        "loading": "Добавление профиля..."
+        "loading": "Добавление профиля…"
       }
     },
     "logs": {
       "title": "Логи",
-      "shareCoreLogs": "Поделиться логами ядра",
-      "shareAppLogs": "Поделиться логами приложения"
+      "category": "Категория",
+      "level": "Уровень",
+      "recentLogs": "Недавние логи",
+      "recentLogsMsg": "То, что вы видите на этой странице",
+      "errorLog": "Логи приложения и ядра",
+      "errorLogMsg": "Ошибки обоих, за все запуски",
+      "coreLog": "Логи ядра",
+      "coreLogMsg": "Всё, что записало ядро",
+      "coreCrash": "Сбой ядра",
+      "coreCrashMsg": "Чем занималось ядро при последнем сбое",
+      "exportToFile": "Экспорт в файл",
+      "linesMatch": "Совпадений: $count",
+      "fileSaved": "Файл сохранён",
+      "fileSaveFailed": "Не удалось сохранить файл",
+      "coreLogLevel": "Уровень ядра",
+      "coreLogLevelMsg": "Применится после переподключения",
+      "buffer": "Буфер"
     },
     "about": {
       "title": "О программе",
-      "notAvailableMsg": "Вы уже используете последнюю версию",
+      "notAvailableMsg": "Вы используете последнюю версию",
       "checkForUpdate": "Проверить обновления",
       "openWorkingDir": "Открыть рабочую папку",
       "sourceCode": "Исходный код",
@@ -220,30 +243,28 @@
           "black": "Черная"
         },
         "enableAnalytics": "Включить аналитику",
-        "enableAnalyticsMsg": "Разрешить сбор аналитики и отправку отчетов о сбоях для улучшения приложения",
+        "enableAnalyticsMsg": "Отправлять аналитику и отчеты о сбоях с вашего устройства, чтобы помочь улучшить приложение",
         "autoIpCheck": "Автоматически проверять IP-адрес",
         "dynamicNotification": "Отображать скорость в уведомлении",
         "hapticFeedback": "Тактильный отклик",
-        "actionAtClosing": "Действие при закрытии",
+        "actionAtClosing": "При закрытии окна",
         "autoStart": "Запускать при входе в систему",
         "silentStart": "Запускать свернутым",
         "ignoreBatteryOptimizations": "Отключить оптимизацию батареи",
         "ignoreBatteryOptimizationsMsg": "Снять ограничения для оптимальной работы VPN",
         "memoryLimit": "Ограничение памяти",
         "memoryLimitMsg": "Включите, если вы сталкиваетесь с ошибками нехватки памяти или частыми сбоями приложения",
-        "debugMode": "Режим отладки",
-        "debugModeMsg": "Перезапустите приложение, чтобы применить это изменение",
-        "logLevel": "Уровень логирования",
         "connectionTestUrl": "URL для теста соединения",
         "urlTestInterval": "Интервал теста URL",
         "clashApiPort": "Порт Clash API",
         "useXrayCoreWhenPossible": "Использовать xray-core, если возможно",
-        "useXrayCoreWhenPossibleMsg": "Использовать xray-core при обработке ссылок на подписку. Необходимо повторно импортировать ссылку, чтобы включить эту опцию."
+        "useXrayCoreWhenPossibleMsg": "Использовать xray-core при обработке ссылок на подписку. Повторно импортируйте подписку, чтобы включить эту опцию."
       },
       "routing": {
         "title": "Маршрутизация",
         "routeRule": {
-          "empty": "Пока нет добавленных правил\n\nНажмите кнопку +, чтобы создать новое правило или выбрать из предопределенных",
+          "empty": "Пока нет правил маршрутизации\n\nСоздайте новое правило или выберите из предопределенных правил",
+          "add": "Добавить правило",
           "delete": "Удалить правило",
           "create": "Создать новое правило",
           "options": {
@@ -260,22 +281,22 @@
           "rule": {
             "title": "Правило",
             "onlyTunMode": "Доступно только в режиме TUN",
-            "notAvailabeInThisPlatform": "Недоступно на этой платформе",
+            "notAvailableInThisPlatform": "Недоступно на этой платформе",
             "canNotBeEmpty": "Не может быть пустым",
             "validUrlEx": "https://example.com",
-            "validUrl": "Валидный \"URL\", например\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "Валидный «URL», например\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe или google chrome или chrome",
-            "validProcessName": "Валидное \"Имя процесса\", например\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "Валидное «Имя процесса», например\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "Валидный \"Путь к процессу\", например\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
-            "validPortRangeEx": "80 или 1-65000",
-            "validPortRange": "Валидный \"Порт\" или \"Диапазон портов\", например\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validProcessPath": "Валидный «Путь к процессу», например\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 или 1:65000",
+            "validPortRange": "Валидный «Порт» или «Диапазон портов», например\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 или 10.0.0.0/24",
             "validIpCidr": "Валидный IP CIDR, например\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com или dl.google.com",
-            "validDomain": "Валидный \"Домен\", например\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "Валидный «Домен», например\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com или .ru",
-            "validDomainSuffix": "Валидный \"Суффикс домена\", например\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "Валидный «Суффикс домена», например\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "Имя",
               "outbound": "Исходящий при совпадении",
@@ -319,7 +340,7 @@
             "addNew": "Добавить новое значение",
             "update": "Обновить значение",
             "clearList": "Очистить список",
-            "clearListMsg": "Все элементы удалены"
+            "clearListMsg": "Все элементы будут удалены"
           }
         },
         "generalOptions": {
@@ -344,8 +365,8 @@
           "resolveDestination": "Определять адрес назначения",
           "ipv6Route": "Маршрут IPv6",
           "ipv6Modes": {
-            "disable": "Отключить",
-            "enable": "Включить",
+            "disable": "Выключено",
+            "enable": "Включено",
             "prefer": "Предпочтительно",
             "only": "Только"
           },
@@ -356,7 +377,7 @@
               "import": {
                 "clipboard": "Импортировать выбор из буфера обмена",
                 "file": "Импортировать выбор из файла",
-                "msg": "Импорт заменит ваш текущий выбор. Вы уверены, что хотите продолжить?"
+                "msg": "Импорт заменяет ваш текущий выбор. Продолжить?"
               },
               "export": {
                 "clipboard": "Копировать выбор в буфер обмена",
@@ -379,14 +400,14 @@
               "resetToDefault": "Сбросить по умолчанию",
               "autoUpdateInterval": "Интервал автообновления",
               "toast": {
-                "success": "Автовыбор приложений успешно завершен",
+                "success": "Автовыбор завершен",
                 "failure": "Ошибка автовыбора",
-                "regionNotFound": "Автовыбор для региона \"${region}\" не найден",
+                "regionNotFound": "Нет автовыбора для «${region}»",
                 "alreadyInAuto": "Ваш выбор уже находится в списке автовыбора"
               },
               "dialog": {
                 "title": "Автовыбор приложений",
-                "msg": "Функция автовыбора для прокси приложений была отключена из-за смены региона на \"${region}\""
+                "msg": "Автовыбор прокси для приложений выключен, потому что регион изменился на «${region}»"
               }
             }
           }
@@ -442,9 +463,7 @@
         "tproxyPort": "Порт прозрачного прокси",
         "directPort": "Локальный порт direct",
         "redirectPort": "Порт перенаправления",
-        "lanSharing": "Общий доступ к VPN",
-        "lanSharingPasswordNotSet": "Пароль не установлен",
-        "lanSharingPassword": "Пароль общего доступа VPN",
+        "lanSharing": "Безопасный общий доступ к VPN",
         "copyLink": "Копировать ссылку",
         "qrCode": "QR-код",
         "lanIPError": "Не удалось получить локальный IP-адрес"
@@ -465,13 +484,13 @@
           "enable": "Включить смешанный регистр SNI"
         },
         "padding": {
-          "enable": "Включить дополнение",
-          "size": "Размер дополнения"
+          "enable": "Включить padding",
+          "size": "Размер padding"
         }
       },
       "chain": {
         "title": "Цепь",
-        "subtitle": "Дополнительная безопасность и Разблокировщик",
+        "subtitle": "Дополнительная безопасность и разблокировщик",
         "finalIp": "Конечный IP",
         "levels": {
           "app": {
@@ -487,11 +506,11 @@
           },
           "unblocker": {
             "title": "Разблокировщик",
-            "msg": "Помогает обходить сетевые ограничения. Если помощник подключается, ваш основной профиль может продолжать работать, даже если он заблокирован в данный момент"
+            "msg": "Помогает обходить сетевые ограничения. Если помощник подключается, ваш основной профиль может продолжать работать, даже если он заблокирован в данный момент."
           },
           "filtering": {
             "title": "Фильтрация",
-            "msg": "Финальный выход: после прохождения через активные слои (Дополнительная безопасность, Основной профиль или Разблокировщик) и применения их эффектов, ваш трафик наконец направляется в обход фильтрации локальной сети"
+            "msg": "Финальный выход: ваш трафик проходит через активные слои, то есть Дополнительная безопасность, Основной профиль или Разблокировщик. После применения их эффектов он направляется в обход фильтрации локальной сети."
           }
         },
         "warp": {
@@ -568,14 +587,19 @@
       "expireDate": "Дата окончания",
       "expired": "Истек",
       "noTraffic": "Квота исчерпана",
-      "remainingTime": "Оставшееся время",
-      "remainingDuration": "осталось ${duration} дней",
-      "remainingDurationNew": "${duration} дней",
+      "remainingDuration(plural, param=days)": {
+        "one": "Остался $days день",
+        "few": "Осталось $days дня",
+        "many": "Осталось $days дней",
+        "other": "Осталось $days дня"
+      },
+      "remainingUnlimited": "Безлимитно",
       "remainingTrafficSemanticLabel": "израсходовано ${consumed} из ${total} трафика",
       "remainingTraffic": "Оставшийся трафик",
-      "remainingUsage": "Осталось",
-      "profileSite": "Провайдер",
-      "profileSupport": "Поддержка"
+      "openWebPage": "Открыть веб-страницу",
+      "support": "Поддержка",
+      "openLinkTitle": "Открыть эту ссылку?",
+      "openLinkAction": "Открыть"
     }
   },
   "dialogs": {
@@ -584,6 +608,10 @@
       "sort": {
         "name": "По алфавиту",
         "lastUpdate": "Последнему обновлению"
+      },
+      "direction": {
+        "newestFirst": "Сначала новые",
+        "oldestFirst": "Сначала старые"
       }
     },
     "warpLicense": {
@@ -592,89 +620,92 @@
     },
     "psiphonLicense": {
       "title": "Лицензионное соглашение Psiphon",
-      "description(rich)": "Используя Psiphon, вы соглашаетесь с ${tos(Условиями обслуживания)} и подтверждаете ${privacy(Политику конфиденциальности)}. Пожалуйста, внимательно прочитайте их перед продолжением."
+      "description(rich)": "Используя Psiphon, вы соглашаетесь с ${tos(Условиями обслуживания)} и подтверждаете ${privacy(Политику конфиденциальности)}. Внимательно прочитайте их перед продолжением."
     },
     "newVersion": {
       "title": "Доступно обновление",
-      "msg": "Доступна новая версия @:common.appTitle. Хотите обновить сейчас?",
-      "currentVersion": "Текущая версия: ",
-      "newVersion": "Новая версия: ",
+      "msg": "Доступна новая версия @:common.appTitle. Обновить сейчас?",
+      "currentVersion": "Текущая версия",
+      "newVersion": "Новая версия",
       "updateNow": "Обновить сейчас"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "Это перезапишет все параметры конфигурации предоставленными значениями. Вы уверены?"
+          "msg": "Это перезапишет все параметры конфигурации импортированными значениями. Продолжить?"
         }
       },
       "profile": {
         "delete": {
           "title": "Удалить профиль",
-          "msg": "Вы уверены, что хотите навсегда удалить этот профиль?"
+          "msg": "Удалить этот профиль? Это действие нельзя отменить."
         }
       },
       "perAppProxy": {
         "shareOnGithub": {
           "title": "Улучшение автовыбора",
-          "msg": "Делясь выбранными приложениями, вы помогаете пополнить список \"автовыбора\""
+          "msg": "Делясь выбранными приложениями, вы помогаете пополнить список «автовыбора»"
         },
         "import": {
-          "msg": "Это заменит все ваши текущие настройки прокси для приложений. Вы уверены, что хотите продолжить?"
+          "msg": "Это заменит все ваши текущие настройки прокси для приложений. Продолжить?"
         }
       },
       "routeRule": {
         "delete": {
           "title": "Удалить правило",
-          "msg": "Вы уверены, что хотите удалить правило \"$rulename\"?"
+          "msg": "Удалить правило «$rulename»? Это действие нельзя отменить."
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "Добавить профиль?",
-        "message": "Внешняя ссылка от \"${host}\" запрашивает добавление нового профиля. Хотите импортировать его?"
+        "message": "Внешняя ссылка от «${host}» хочет добавить новый профиль. Импортировать?"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "Импортировать правило маршрутизации?",
-        "message": "Импорт правил маршрутизации из ненадежных источников может быть риском для безопасности\nПродолжайте только если вы доверяете этой ссылке"
+        "message": "Правила маршрутизации определяют, куда идет ваш трафик.\nИмпортируйте их только из источника, которому доверяете."
       }
     },
     "experimentalNotice": {
       "title": "Используются экспериментальные функции",
-      "msg": "Вы включили некоторые экспериментальные функции, которые могут повлиять на качество соединения и вызвать непредвиденные ошибки. Вы всегда можете изменить или сбросить эти параметры на странице настроек.",
+      "msg": "Вы включили некоторые экспериментальные функции, которые могут повлиять на качество соединения и вызвать непредвиденные ошибки. Вы всегда можете изменить или сбросить эти параметры в Настройках.",
       "disable": "Больше не показывать"
     },
     "noActiveProfile": {
       "title": "Выберите профиль",
-      "msg": "Давайте начнем с добавления профиля подключения, который содержит данные вашего VPN-соединения.\n\nЕще нет VPN-сервера? Не беспокойтесь — просто следуйте руководству ниже, чтобы быстро и бесплатно настроить его.",
+      "msg": "Начнем. Добавьте профиль подключения с данными вашего VPN-сервера.\n\nЕще нет сервера? Не проблема. Руководство ниже покажет, как бесплатно его настроить.",
       "helpBtn": {
         "label": "Покажите, как",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "Предупреждение о внешней ссылке",
-      "youAreAboutToVisit": "Вы собираетесь перейти на сайт:",
-      "thisWebsiteIsNotInOurTrustedList": "Этот сайт не входит в наш список доверенных. Пожалуйста, действуйте с осторожностью."
+      "title": "Сначала проверьте эту ссылку",
+      "cannotVerify": "Эта ссылка не проверена",
+      "avoidIfUnsure": "Если вы не полностью уверены, не платите и не передавайте конфиденциальные данные",
+      "ownResponsibility": "Вы продолжаете на свой страх и риск",
+      "open": "Открыть",
+      "openIn": "Открыть (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "Полный тег:",
-      "type": "Тип:",
-      "testTime": "Время теста:",
-      "testDelay": "Задержка теста:",
-      "isSelected": "Выбран:",
-      "isGroup": "Это группа",
-      "isSecure": "Защищено:",
-      "port": "Порт:",
-      "host": "Хост:",
-      "ip": "IP:",
-      "countryCode": "Код страны:",
-      "region": "Регион:",
-      "city": "Город:",
-      "asn": "ASN:",
-      "organization": "Организация:",
-      "location": "Местоположение:",
-      "postalCode": "Почтовый индекс:",
-      "download": "Получено:",
-      "upload": "Отправлено:"
+      "fullTag": "Полный тег",
+      "type": "Тип",
+      "testTime": "Время теста",
+      "testDelay": "Задержка теста",
+      "isSelected": "Выбран",
+      "isGroup": "Группа",
+      "isSecure": "Защищено",
+      "port": "Порт",
+      "host": "Хост",
+      "ip": "IP",
+      "countryCode": "Код страны",
+      "region": "Регион",
+      "city": "Город",
+      "asn": "ASN",
+      "organization": "Организация",
+      "location": "Местоположение",
+      "postalCode": "Почтовый индекс",
+      "download": "Получено",
+      "upload": "Отправлено"
     },
     "windowClosing": {
       "askEachTime": "Спрашивать каждый раз",
@@ -685,19 +716,19 @@
   "connection": {
     "tapToConnect": "Нажмите для подключения",
     "connect": "Подключить",
-    "connecting": "Подключение...",
+    "connecting": "Подключение…",
     "connected": "Подключено",
     "disconnect": "Отключить",
-    "disconnecting": "Отключение...",
+    "disconnecting": "Отключение…",
     "reconnect": "Переподключить",
-    "reconnectMsg": "Переподключение для учета изменений..."
+    "reconnectMsg": "Переподключение для применения изменений…"
   },
   "errors": {
     "unexpected": "Непредвиденная ошибка",
     "connection": {
       "unexpected": "Непредвиденная ошибка подключения",
       "timeout": "Тайм-аут подключения",
-      "badResponse": "Неверный ответ",
+      "badResponse": "Неверный ответ сервера",
       "connectionError": "Ошибка подключения",
       "badCertificate": "Недействительный сертификат"
     },
@@ -722,12 +753,12 @@
       "invalidConfig": "Неверная конфигурация"
     },
     "warp": {
-      "missingLicense": "Отсутствует лицензия Warp",
-      "missingLicenseMsg": "Выбранный профиль использует функцию WARP; для использования этой функции необходимо принять лицензию WARP"
+      "missingLicense": "Отсутствует лицензия WARP",
+      "missingLicenseMsg": "Этот профиль использует WARP. Примите лицензию WARP, чтобы продолжить."
     },
     "psiphon": {
       "missingLicense": "Требуется лицензия Psiphon",
-      "missingLicenseMsg": "Выбранный профиль использует функцию Psiphon; для использования этой функции необходимо принять лицензию Psiphon"
+      "missingLicenseMsg": "Этот профиль использует Psiphon. Примите лицензию Psiphon, чтобы продолжить."
     }
   }
 }

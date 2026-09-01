@@ -6,7 +6,6 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
-import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -71,26 +70,9 @@ class GeneralPage extends HookConsumerWidget {
             value: !ref.watch(Preferences.disableMemoryLimit),
             onChanged: (value) async => await ref.read(Preferences.disableMemoryLimit.notifier).update(!value),
           ),
-          SwitchListTile.adaptive(
-            title: Text(t.pages.settings.general.debugMode),
-            secondary: const Icon(Icons.bug_report_rounded),
-            value: ref.watch(debugModeNotifierProvider),
-            onChanged: (value) async {
-              if (value)
-                await ref
-                    .read(dialogNotifierProvider.notifier)
-                    .showOk(t.pages.settings.general.debugMode, t.pages.settings.general.debugModeMsg);
-              await ref.read(debugModeNotifierProvider.notifier).update(value);
-            },
-          ),
-          ChoicePreferenceWidget(
-            selected: ref.watch(ConfigOptions.logLevel),
-            preferences: ref.watch(ConfigOptions.logLevel.notifier),
-            choices: LogLevel.choices,
-            title: t.pages.settings.general.logLevel,
-            icon: Icons.description_rounded,
-            presentChoice: (value) => value.name.toUpperCase(),
-          ),
+          // Debug mode and log level moved to the Logs page. Both decide how
+          // much is recorded, which is only meaningful next to the logs
+          // themselves — and next to the filters that decide what is shown.
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.connectionTestUrl),
             preferences: ref.watch(ConfigOptions.connectionTestUrl.notifier),
