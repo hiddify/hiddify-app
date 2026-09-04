@@ -2,6 +2,7 @@ import 'package:dartx/dartx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/utils/platform_utils.dart';
 
 part 'core_status.freezed.dart';
 
@@ -79,7 +80,11 @@ sealed class CoreStatus with _$CoreStatus {
 
         CoreAlert.requestNotificationPermission => ConnectionFailure.missingNotificationPermission(message),
 
-        CoreAlert.requestVPNPermission => ConnectionFailure.missingVpnPermission(message),
+        // On desktop the tunnel needs administrator/root rights rather than a
+        // VPN permission grant, so report the actionable privilege error instead.
+        CoreAlert.requestVPNPermission => PlatformUtils.isDesktop
+            ? const ConnectionFailure.missingPrivilege()
+            : ConnectionFailure.missingVpnPermission(message),
 
         CoreAlert.startCommandServer ||
         CoreAlert.createService ||
