@@ -284,6 +284,20 @@ class ProfileActionsMenu extends HookConsumerWidget {
           ),
         ],
       ),
+      if (profile case RemoteProfileEntity(:final subInfo?)) ...[
+        if (subInfo.webPageUrl != null)
+          AdaptiveMenuItem(
+            leadingIcon: const Icon(FluentIcons.globe_24_regular),
+            title: t.components.subscriptionInfo.profileSite,
+            onTap: () => _launchProfileLink(context, ref, subInfo.webPageUrl!),
+          ),
+        if (subInfo.supportUrl != null)
+          AdaptiveMenuItem(
+            leadingIcon: const Icon(FluentIcons.chat_help_24_regular),
+            title: t.components.subscriptionInfo.profileSupport,
+            onTap: () => _launchProfileLink(context, ref, subInfo.supportUrl!),
+          ),
+      ],
       AdaptiveMenuItem(
         leadingIcon: const Icon(Icons.edit_rounded),
         title: t.common.edit,
@@ -310,6 +324,16 @@ class ProfileActionsMenu extends HookConsumerWidget {
     ];
 
     return AdaptiveMenu(builder: builder, items: menuItems, child: child);
+  }
+
+  // profile-supplied urls are untrusted, so confirm with the user before opening them
+  Future<void> _launchProfileLink(BuildContext context, WidgetRef ref, String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    final shouldLaunch = await ref.read(dialogNotifierProvider.notifier).showUnknownDomainsWarning(url: url);
+    if (shouldLaunch && context.mounted) {
+      await launchUrl(uri);
+    }
   }
 }
 
