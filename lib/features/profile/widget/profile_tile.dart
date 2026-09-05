@@ -405,36 +405,34 @@ class ProfileLinksRow extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
 
-    Widget buildLink(IconData icon, String label, String url) => Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: () => _launchProfileLink(context, ref, url),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 16, color: theme.colorScheme.primary),
-              const Gap(4),
-              Flexible(
-                child: Text(
-                  label,
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
+    Widget buildChip(IconData icon, String label, String url) => InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () => _launchProfileLink(context, ref, url),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primaryContainer.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(label, style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary)),
+            const Gap(6),
+            Icon(icon, size: 14, color: theme.colorScheme.primary),
+          ],
         ),
       ),
     );
 
-    return Row(
+    return Wrap(
+      spacing: 8,
+      runSpacing: 4,
       children: [
         if (subInfo.webPageUrl != null)
-          buildLink(FluentIcons.globe_24_regular, t.components.subscriptionInfo.profileSite, subInfo.webPageUrl!),
+          buildChip(FluentIcons.open_24_regular, t.components.subscriptionInfo.profileSite, subInfo.webPageUrl!),
         if (subInfo.supportUrl != null)
-          buildLink(FluentIcons.chat_help_24_regular, t.components.subscriptionInfo.profileSupport, subInfo.supportUrl!),
+          buildChip(FluentIcons.open_24_regular, t.components.subscriptionInfo.profileSupport, subInfo.supportUrl!),
       ],
     );
   }
