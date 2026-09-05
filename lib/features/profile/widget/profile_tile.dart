@@ -22,6 +22,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
+// profile-supplied urls are untrusted, so confirm with the user before opening them
+Future<void> _launchProfileLink(BuildContext context, WidgetRef ref, String url) async {
+  final uri = Uri.tryParse(url);
+  if (uri == null) return;
+  final shouldLaunch = await ref.read(dialogNotifierProvider.notifier).showUnknownDomainsWarning(url: url);
+  if (shouldLaunch && context.mounted) {
+    await launchUrl(uri);
+  }
+}
+
 class ProfileTile extends HookConsumerWidget {
   const ProfileTile({super.key, required this.profile, this.isMain = false, this.margin = EdgeInsets.zero, this.color});
 
@@ -164,6 +174,8 @@ class ProfileTile extends HookConsumerWidget {
                             const Gap(4),
                             ProfileSubscriptionInfo(subInfo),
                             const Gap(4),
+                            if (isMain && (subInfo.webPageUrl != null || subInfo.supportUrl != null))
+                              ProfileLinksRow(subInfo),
                           ],
                         ],
                       ),
@@ -284,6 +296,20 @@ class ProfileActionsMenu extends HookConsumerWidget {
           ),
         ],
       ),
+      if (profile case RemoteProfileEntity(:final subInfo?)) ...[
+        if (subInfo.webPageUrl != null)
+          AdaptiveMenuItem(
+            leadingIcon: const Icon(FluentIcons.globe_24_regular),
+            title: t.components.subscriptionInfo.profileSite,
+            onTap: () => _launchProfileLink(context, ref, subInfo.webPageUrl!),
+          ),
+        if (subInfo.supportUrl != null)
+          AdaptiveMenuItem(
+            leadingIcon: const Icon(FluentIcons.chat_help_24_regular),
+            title: t.components.subscriptionInfo.profileSupport,
+            onTap: () => _launchProfileLink(context, ref, subInfo.supportUrl!),
+          ),
+      ],
       AdaptiveMenuItem(
         leadingIcon: const Icon(Icons.edit_rounded),
         title: t.common.edit,
@@ -313,7 +339,6 @@ class ProfileActionsMenu extends HookConsumerWidget {
   }
 }
 
-// TODO add support url
 class ProfileSubscriptionInfo extends HookConsumerWidget {
   const ProfileSubscriptionInfo(this.subInfo, {super.key});
 
@@ -365,6 +390,49 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+      ],
+    );
+  }
+}
+
+class ProfileLinksRow extends HookConsumerWidget {
+  const ProfileLinksRow(this.subInfo, {super.key});
+
+  final SubscriptionInfo subInfo;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+
+    Widget buildChip(IconData icon, String label, String url) => InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () => _launchProfileLink(context, ref, url),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primaryContainer.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(label, style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary)),
+            const Gap(6),
+            Icon(icon, size: 14, color: theme.colorScheme.primary),
+          ],
+        ),
+      ),
+    );
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 4,
+      children: [
+        if (subInfo.webPageUrl != null)
+          buildChip(FluentIcons.open_24_regular, t.components.subscriptionInfo.profileSite, subInfo.webPageUrl!),
+        if (subInfo.supportUrl != null)
+          buildChip(FluentIcons.open_24_regular, t.components.subscriptionInfo.profileSupport, subInfo.supportUrl!),
       ],
     );
   }
