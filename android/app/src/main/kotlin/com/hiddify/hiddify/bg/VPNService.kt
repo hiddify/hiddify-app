@@ -149,6 +149,8 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                         val address = inet4RouteAddress.next()
                         builder.addRoute(address.address(), address.prefix())
                     }
+                } else {
+                    builder.addRoute("0.0.0.0", 0)
                 }
 
                 val inet6RouteAddress = options.inet6RouteRange
@@ -157,6 +159,8 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
                         val address = inet6RouteAddress.next()
                         builder.addRoute(address.address(), address.prefix())
                     }
+                } else {
+                    builder.addRoute("::", 0)
                 }
             }
 
