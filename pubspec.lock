@@ -661,7 +661,7 @@ packages:
     source: hosted
     version: "2.0.17"
   flutter_test:
-    dependency: transitive
+    dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"

@@ -17,6 +17,11 @@ enum ExtensionActivationState {
     case failed(String)
 }
 
+private enum VPNErrorCode: Int {
+    case failure = 1
+    case approvalRequired = 2
+}
+
 final class SystemExtensionController:
     NSObject,
     OSSystemExtensionRequestDelegate {
@@ -41,7 +46,7 @@ final class SystemExtensionController:
         onStateChanged?()
         let callback = completion
         completion = nil
-        callback?(vpnError("Approve the Hiddify system extension in System Settings, then connect again."))
+        callback?(vpnError("Allow the Hiddify VPN extension in System Settings, then return to Hiddify and connect again.", code: .approvalRequired))
     }
     
     func request(
@@ -80,7 +85,7 @@ final class SystemExtensionController:
             return
         }
         if case .waitingForApproval = activationState {
-            completion(vpnError("Approve the pending Hiddify system extension in System Settings, then connect again."))
+            completion(vpnError("Allow the Hiddify VPN extension in System Settings, then return to Hiddify and connect again.", code: .approvalRequired))
             return
         }
         guard self.completion == nil else {
@@ -424,7 +429,7 @@ final class MacOSVPNController: NSObject, FlutterStreamHandler {
         case .activating: result["activation"] = "activating"
         case .waitingForApproval:
             result["activation"] = "waitingForApproval"
-            result["message"] = "Approve the Hiddify system extension in System Settings, then connect again."
+            result["message"] = "Allow the Hiddify VPN extension in System Settings, then return to Hiddify and connect again."
         case .activated: result["activation"] = "activated"
         case .requiresReboot: result["activation"] = "requiresReboot"
         case .failed(let message): result["activation"] = "failed"; result["message"] = message
@@ -446,7 +451,11 @@ final class MacOSVPNController: NSObject, FlutterStreamHandler {
 
     private func emitStatus() { eventSink?(status()) }
     private static func flutterError(_ error: Error) -> FlutterError {
-        FlutterError(code: "MACOS_VPN", message: error.localizedDescription, details: nil)
+        let nativeError = error as NSError
+        let needsApproval = nativeError.domain == "app.hiddify.macos-vpn"
+            && nativeError.code == VPNErrorCode.approvalRequired.rawValue
+        return FlutterError(code: needsApproval ? "MACOS_VPN_APPROVAL_REQUIRED" : "MACOS_VPN",
+                            message: error.localizedDescription, details: nil)
     }
     private func randomSecret() throws -> String {
         var bytes = [UInt8](repeating: 0, count: 32)
@@ -457,6 +466,6 @@ final class MacOSVPNController: NSObject, FlutterStreamHandler {
     }
 }
 
-private func vpnError(_ message: String) -> NSError {
-    NSError(domain: "app.hiddify.macos-vpn", code: 1, userInfo: [NSLocalizedDescriptionKey: message])
+private func vpnError(_ message: String, code: VPNErrorCode = .failure) -> NSError {
+    NSError(domain: "app.hiddify.macos-vpn", code: code.rawValue, userInfo: [NSLocalizedDescriptionKey: message])
 }

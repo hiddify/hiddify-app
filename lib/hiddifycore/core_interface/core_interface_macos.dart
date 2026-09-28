@@ -80,6 +80,10 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
       _usingVPN = true;
     }
     if (!_usingVPN) return;
+    if (state['activation'] == 'waitingForApproval' && _nativeStatus == 'disconnected') {
+      _status.add(CoreStatus.stopped(message: state['message'] as String?));
+      return;
+    }
     if (_startingVPN &&
         _nativeStatus == 'disconnected' &&
         state['activation'] != 'failed' &&
@@ -168,7 +172,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
       _status.add(const CoreStatus.started());
     } catch (error) {
       _startingVPN = false;
-      _status.add(CoreStatus.stopped(message: error.toString()));
+      _status.add(CoreStatus.stopped(message: error is PlatformException ? error.message : error.toString()));
       rethrow;
     }
   }

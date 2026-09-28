@@ -156,9 +156,10 @@ class HiddifyCoreService with InfraLogger {
           await startListeningLogs('bg', core.bgClient);
           ref.read(coreRestartSignalProvider.notifier).restart();
           return right(unit);
-        } catch (error) {
-          statusController.add(currentState = CoreStatus.stopped(message: error.toString()));
-          return left(ConnectionFailure.unexpected(error));
+        } catch (error, stackTrace) {
+          final failure = ConnectionFailure.fromError(error, stackTrace);
+          statusController.add(currentState = const CoreStatus.stopped());
+          return left(failure);
         }
       }
       final background = await core.setupBackground(path, name);
