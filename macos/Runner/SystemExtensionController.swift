@@ -4,10 +4,6 @@ import NetworkExtension
 import Security
 import SystemExtensions
 
-#if HIDDIFY_LOCAL_NETWORK_EXTENSION && !DEBUG
-#error("Local Network Extension signing is only available in Debug builds.")
-#endif
-
 enum ExtensionActivationState {
     case idle
     case activating
@@ -158,7 +154,7 @@ final class MacOSVPNController: NSObject, FlutterStreamHandler {
             return
         }
         guard enabled else {
-            result(Self.flutterError(vpnError("VPN is unavailable in the local Debug build. Build with an authorized Apple team and enable HIDDIFY_NETWORK_EXTENSION_ENABLED to use the system extension. Proxy modes are available.")))
+            result(Self.flutterError(vpnError("VPN is unavailable in this Debug build. Build with an authorized Apple team and enable HIDDIFY_NETWORK_EXTENSION_ENABLED to use the system extension. Proxy modes are available.")))
             return
         }
         if busy && call.method == "stop" {
@@ -247,20 +243,9 @@ final class MacOSVPNController: NSObject, FlutterStreamHandler {
             throw vpnError("This build is not signed for Network Extension. Select an authorized Apple Developer team for Runner and HiddifyPacketTunnel.")
         }
         let hasTeam = info[kSecCodeInfoTeamIdentifier as String] as? String != nil
-        #if DEBUG && HIDDIFY_LOCAL_NETWORK_EXTENSION
-        // Only the explicit local build accepts ad hoc signing. macOS still
-        // validates activation; this does not bypass SIP, AMFI or OS approval.
-        let signatureFlags = (info[kSecCodeInfoFlags as String] as? NSNumber)?.uint32Value ?? 0
-        let localAdHoc = Bundle.main.object(forInfoDictionaryKey: "HiddifyLocalNetworkExtensionBuild") as? String == "YES"
-            && SecCodeSignatureFlags(rawValue: signatureFlags).contains(.adhoc)
-        guard hasTeam || localAdHoc else {
-            throw vpnError("Use the local VPN build script or an authorized Apple Developer team.")
-        }
-        #else
         guard hasTeam else {
             throw vpnError("This build is not signed for Network Extension. Select an authorized Apple Developer team for Runner and HiddifyPacketTunnel.")
         }
-        #endif
         let extensionURL = Bundle.main.bundleURL.appendingPathComponent("Contents/Library/SystemExtensions/\(activation.extensionIdentifier).systemextension")
         guard FileManager.default.fileExists(atPath: extensionURL.path) else {
             throw vpnError("The packet tunnel system extension is missing from this app bundle.")

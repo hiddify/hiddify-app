@@ -11,7 +11,11 @@ HIDDIFY_VPN_APP_GROUP = $(TeamIdentifierPrefix)app.hiddify.com.vpn
 // Apple Development profiles use the standard value; Developer ID uses the suffix.
 HIDDIFY_NETWORK_EXTENSION_ENTITLEMENT = packet-tunnel-provider-systemextension
 HIDDIFY_NETWORK_EXTENSION_ENTITLEMENT[config=Debug] = packet-tunnel-provider
-HIDDIFY_LOCAL_NETWORK_EXTENSION_BUILD = NO
+HIDDIFY_CODE_SIGN_STYLE = Automatic
+HIDDIFY_CODE_SIGN_IDENTITY = Developer ID Application
+HIDDIFY_CODE_SIGN_IDENTITY[config=Debug] = -
+HIDDIFY_HOST_PROVISIONING_PROFILE =
+HIDDIFY_TUNNEL_PROVISIONING_PROFILE =
 MACOSX_DEPLOYMENT_TARGET = 12.0
 
 // Optional machine-specific team/signing overrides; see NETWORK_EXTENSION.md.

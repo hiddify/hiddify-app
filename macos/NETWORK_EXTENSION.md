@@ -34,7 +34,7 @@ Go 1.25.6, independently of the development core checkout. To upgrade it, update
 the commits in `scripts/prepare-tunnel-source.sh`, its revision marker, the wrapper
 Go dependencies/toolchain and `dependencies.properties` together.
 
-## Local development without a paid Apple team
+## Development without VPN entitlements
 
 Debug defaults to `HIDDIFY_NETWORK_EXTENSION_ENABLED=NO`. It compiles the
 extension but omits it from Runner and signs Runner with Developer.entitlements,
@@ -59,8 +59,7 @@ xcodebuild -workspace macos/Runner.xcworkspace -scheme Runner \
 
 With normal macOS security enabled, Network Extension activation requires an
 authorized Apple Developer Program team. An ad hoc signature or Personal Team
-cannot authorize this system extension. The experimental local build below is
-separate from this supported signing path.
+cannot authorize this system extension.
 
 1. Copy `Runner/Configs/NetworkExtension.local.xcconfig.example` to
    `Runner/Configs/NetworkExtension.local.xcconfig`, enter your team, and enable
@@ -88,95 +87,30 @@ HiddifyPacketTunnel. Do not log providerConfiguration: it contains credentials.
 An unsigned compilation with `CODE_SIGNING_ALLOWED=NO` verifies compilation and
 packaging only; it does not authorize installation or a live VPN connection.
 
-## Experimental local VPN testing without a paid team
+## CI and release signing
 
-`scripts/local-vpn.sh` builds a separate ad hoc signed Debug app with the provider
-embedded and restricted entitlements present. It uses app identifier
-`app.hiddify.com.local`, extension identifier
-`app.hiddify.com.local.HiddifyPacketTunnel` and group
-`group.app.hiddify.com.local.vpn`. Your ordinary Hiddify installation and VPN
-configuration have different identifiers. Import a test profile into this app.
+PR builds compile and embed the extension with `CODE_SIGNING_ALLOWED=NO`.
+They check compilation and packaging, and cannot activate a VPN.
+The workflow installs the pinned Go toolchain before building the tunnel core.
 
-The Swift signing exception requires the explicit
-`HIDDIFY_LOCAL_NETWORK_EXTENSION` compilation flag, `DEBUG`, a local-build
-marker and an ad hoc signature. A non-Debug build with that flag fails to compile.
-An ordinary Debug, Profile or Release build keeps the team requirement.
-No local machine xcconfig is created or modified by the script.
+Published macOS builds require the existing certificate/profile secrets plus
+`APPLE_MACOS_SIGNING_XCCONFIG`, containing the release settings for both targets:
 
-This is an experiment, not a verified replacement for Apple provisioning. It
-requires relaxing validation on the test Mac. SIP being disabled does not promise
-that NetworkExtension or AMFI will accept an ad hoc provider on every macOS
-version. Apple documents development validation switches in
-[Debugging and testing system extensions](https://developer.apple.com/documentation/driverkit/debugging-and-testing-system-extensions).
-The script never changes SIP, AMFI, boot arguments or developer mode, and never
-launches the app.
+```xcconfig
+DEVELOPMENT_TEAM = YOURTEAMID
+HIDDIFY_CODE_SIGN_STYLE = Manual
+HIDDIFY_CODE_SIGN_IDENTITY = Developer ID Application
+HIDDIFY_HOST_PROVISIONING_PROFILE = YOUR_HOST_PROFILE_NAME
+HIDDIFY_TUNNEL_PROVISIONING_PROFILE = YOUR_TUNNEL_PROFILE_NAME
+```
 
-1. Prepare the app while normal security is still enabled:
-
-   ```sh
-   bash macos/scripts/local-vpn.sh --build
-   ```
-
-   It prepares Flutter/Pods and the tunnel framework, compiles into an isolated
-   DerivedData directory, signs nested code and verifies the bundle. Output:
-   `build/macos/local-vpn/HiddifyLocalVPN.app`. Build log:
-   `build/macos/local-vpn/build.log`. Signing does not authorize activation.
-
-2. On an Apple silicon test Mac, shut down, hold the power button until startup
-   options appear, select Options and enter Recovery. Open Utilities > Terminal,
-   run `csrutil disable`, follow its prompts, then restart. On Intel, use
-   Command-R to enter Recovery. These are temporary system security changes;
-   use a disposable machine or VM where possible. Recovery can reject this
-   change on some OS/security configurations; stop if it does.
-
-3. Back in macOS, from the repository root:
-
-   ```sh
-   bash macos/scripts/local-vpn.sh --check
-   sudo systemextensionsctl developer on
-   bash macos/scripts/local-vpn.sh --install
-   open /Applications/HiddifyLocalVPN.app
-   ```
-
-   Developer mode permits activation outside `/Applications` and simplifies
-   development updates; it does not grant Network Extension entitlements.
-   The install step requires SIP to be disabled, verifies the build and copies
-   only the test app. It backs up a previous installation of this same test app.
-   Launch the app as your user, without sudo. Approve the system extension in
-   System Settings, connect again, and approve the VPN configuration prompt.
-   Settings locations vary by macOS version; follow the activation prompt.
-
-4. Verify actual VPN behavior. In VPN mode, `systemextensionsctl list` should
-   show `app.hiddify.com.local.HiddifyPacketTunnel` activated and enabled.
-   Confirm traffic follows your profile, DNS works, and the tunnel stays
-   connected after quitting the app. Reopen it to check status restoration,
-   disconnect, then reconnect. Record the OS version and observed results in
-   your PR. Do not describe compilation alone as live VPN validation.
-
-5. If macOS refuses to launch or activate the provider, do not assume the VPN
-   engine is broken. Collect the signing/activation error before making further
-   system changes:
-
-   ```sh
-   log show --last 5m --style compact \
-     --predicate 'process == "sysextd" OR process == "amfid" OR process == "taskgated-helper" OR process == "nesessionmanager" OR subsystem == "com.apple.networkextension"'
-   ```
-
-   Review logs for private network information before attaching them to a PR.
-   A signature/provisioning rejection means the local experiment has not
-   reached the provider. The script does not disable AMFI to work around it.
-
-6. When finished, disconnect the test VPN and remove its VPN configuration and
-   test network extension in System Settings. Turn off development mode with
-   `sudo systemextensionsctl developer off`, remove only
-   `/Applications/HiddifyLocalVPN.app`, then return to Recovery, run
-   `csrutil enable` and restart. Confirm `csrutil status` reports enabled.
-   Remove the test provider before restoring security because its ad hoc
-   signature is not valid for ordinary deployment.
-
-Upstream users still require valid signing/provisioning. The local signing
-exception is not enabled by the default project configuration; production
-validation must use a signed installation with normal macOS security enabled.
+Both profiles must authorize the entitlements and bundle IDs above, and match
+the imported Developer ID identity. The workflow fails explicitly if the signing
+configuration is absent. Signing credentials and personal overrides belong in
+CI secrets or the ignored local xcconfig, never in the repository. Release owners
+must notarize the signed app before distributing it; the existing packaging
+workflow does not perform notarization. iOS certificates and profiles do not
+establish authorization for a native macOS system extension.
 
 ## Implementation boundaries
 

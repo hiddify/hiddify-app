@@ -138,7 +138,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
     if (options == null) throw StateError('Apply connection options before starting the core.');
     if (options.enableTun && !_vpnAvailable) {
       throw StateError(
-        'VPN requires an authorized Apple Developer team and a build with Network Extension enabled. Proxy modes are available in the local Debug build.',
+        'VPN requires an authorized Apple Developer team and a build with Network Extension enabled. Proxy modes are available in Debug builds without Network Extension enabled.',
       );
     }
     await stop();
