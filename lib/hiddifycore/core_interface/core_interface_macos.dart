@@ -20,8 +20,13 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   CoreInterfaceMacOS() : super(port: 17080);
 
   @visibleForTesting
-  CoreInterfaceMacOS.withForegroundClient(CoreClient client, Map<String, dynamic> nativeState) : super(port: 17080) {
+  CoreInterfaceMacOS.withForegroundClient(
+    CoreClient client,
+    Map<String, dynamic> nativeState, {
+    Directory? workingDirectory,
+  }) : super(port: 17080) {
     fgClient = bgClient = client;
+    _workingDirectory = workingDirectory?.absolute;
     _receiveState(nativeState);
   }
 
@@ -34,6 +39,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   ClientChannel? _extensionChannel;
   int? _extensionPort;
   String? _extensionSecret;
+  Directory? _workingDirectory;
   SingboxConfigOption? _options;
   bool _usingVPN = false;
   bool _startingVPN = false;
@@ -52,8 +58,10 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
     if (_nativeSubscription != null) return '';
+    final workingDirectory = directories.workingDir.absolute;
     final error = await super.setup(directories, debug, mode);
     if (error.isNotEmpty) return error;
+    _workingDirectory = workingDirectory;
     // Restore an existing system VPN before reporting the foreground state.
     final state = await _methods.invokeMapMethod<String, dynamic>('initialize');
     if (state != null) _receiveState(state);
@@ -156,7 +164,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
         _startingVPN = true;
         // Save content rather than the app's profile path. The extension must be
         // able to connect with the app closed and in its own sandbox/container.
-        final snapshot = await _snapshotConfiguration(path);
+        final snapshot = await snapshotConfiguration(path);
         final state = await _methods.invokeMapMethod<String, dynamic>('start', {
           'configContent': snapshot.$1,
           'resources': snapshot.$2,
@@ -192,7 +200,10 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
     }
   }
 
-  Future<(String, Map<String, Uint8List>)> _snapshotConfiguration(String path) async {
+  @visibleForTesting
+  Future<(String, Map<String, Uint8List>)> snapshotConfiguration(String path) async {
+    final workingDirectory = _workingDirectory;
+    if (workingDirectory == null) throw StateError('Set up the core before snapshotting a VPN configuration.');
     final content = await File(path).readAsString();
     final resources = <String, Uint8List>{};
     final document = jsonDecode(content);
@@ -215,7 +226,9 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
               }.contains(key) ||
               (key == 'path' && (value['type'] == 'local' || parent == 'geoip' || parent == 'geosite'));
           if (isFile && item is String && item.isNotEmpty) {
-            final source = File(p.isAbsolute(item) ? item : p.join(p.dirname(path), item));
+            // Match the core's setup working directory, even when the profile
+            // lives in configs/ or elsewhere. Absolute resource paths stay intact.
+            final source = File(p.isAbsolute(item) ? item : p.join(workingDirectory.path, item));
             final bytes = await source.readAsBytes();
             totalBytes += bytes.length;
             if (totalBytes > 32 * 1024 * 1024) {
