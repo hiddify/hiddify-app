@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>HiddifyNetworkExtensionEnabled</key>
+	<string>$(HIDDIFY_NETWORK_EXTENSION_ENABLED)</string>
+	<key>HiddifyTunnelBundleIdentifier</key>
+	<string>$(HIDDIFY_TUNNEL_BUNDLE_IDENTIFIER)</string>
+	<key>NSSystemExtensionUsageDescription</key>
+	<string>Hiddify uses a packet tunnel extension to provide VPN connectivity while the app is closed.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

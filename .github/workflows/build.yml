@@ -154,6 +154,33 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Set up packet tunnel Go toolchain
+        if: matrix.platform == 'macos'
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.6'
+          cache-dependency-path: macos/NetworkExtensionCore/go.sum
+
+      - name: Configure macOS signing
+        if: matrix.platform == 'macos'
+        env:
+          MACOS_SIGNING_XCCONFIG: ${{ secrets.APPLE_MACOS_SIGNING_XCCONFIG }}
+          SIGN_RELEASE: ${{ inputs.upload-artifact }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          signing_config="$RUNNER_TEMP/hiddify-macos-signing.xcconfig"
+          if [[ "$SIGN_RELEASE" == 'true' ]]; then
+            if [[ -z "$MACOS_SIGNING_XCCONFIG" ]]; then
+              echo '::error::Set APPLE_MACOS_SIGNING_XCCONFIG with DEVELOPMENT_TEAM, HIDDIFY_CODE_SIGN_IDENTITY = Developer ID Application, and provisioning profile settings for Runner and HiddifyPacketTunnel. Import the matching Developer ID certificates and profiles before building a signed release.'
+              exit 1
+            fi
+            printf '%s\n' "$MACOS_SIGNING_XCCONFIG" > "$signing_config"
+          else
+            printf '%s\n' 'CODE_SIGNING_ALLOWED = NO' > "$signing_config"
+          fi
+          echo "XCODE_XCCONFIG_FILE=$signing_config" >> "$GITHUB_ENV"
+
       - name: Clean up disk space
         if: startsWith(matrix.platform,'android')
         run: |
@@ -348,6 +375,17 @@ jobs:
               cd ..
             fi
           done
+
+      - name: Sign installer and notarize macOS packages
+        if: ${{ inputs.upload-artifact && matrix.platform == 'macos' }}
+        env:
+          APPLE_MACOS_INSTALLER_SIGN_IDENTITY: ${{ secrets.APPLE_MACOS_INSTALLER_SIGN_IDENTITY }}
+          APPLE_NOTARIZATION_APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
+          APPLE_NOTARIZATION_TEAM_ID: ${{ secrets.APPLE_NOTARIZATION_TEAM_ID }}
+          APPLE_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+        shell: bash
+        run: |
+          bash macos/scripts/notarize-release.sh "out/${TARGET_NAME_dmg}.dmg" "out/${TARGET_NAME_pkg}.pkg"
 
       - name: Upload Artifact
         if: env.UPLOAD_ARTIFACT == 'true'
