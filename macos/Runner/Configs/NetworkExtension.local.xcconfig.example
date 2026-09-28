@@ -1,0 +1,6 @@
+// Copy to NetworkExtension.local.xcconfig and select your paid Apple team.
+DEVELOPMENT_TEAM = YOURTEAMID
+CODE_SIGN_IDENTITY = Apple Development
+HIDDIFY_NETWORK_EXTENSION_ENABLED[config=Debug] = YES
+HIDDIFY_HOST_ENTITLEMENTS[config=Debug] = Runner/DebugProfile.entitlements
+HIDDIFY_EXTENSION_CODE_SIGN_ALLOWED[config=Debug] = YES

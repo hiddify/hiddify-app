@@ -5,3 +5,5 @@
 # Xcode-related
 **/dgph
 **/xcuserdata/
+Runner/Configs/NetworkExtension.local.xcconfig
+/build/

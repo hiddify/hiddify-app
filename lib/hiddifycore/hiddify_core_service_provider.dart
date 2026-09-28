@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
@@ -9,5 +11,7 @@ part 'hiddify_core_service_provider.g.dart';
 
 @Riverpod(keepAlive: true, dependencies: [AppDirectories, DebugModeNotifier, inAppNotificationController])
 HiddifyCoreService hiddifyCoreService(Ref ref) {
-  return HiddifyCoreService(ref);
+  final service = HiddifyCoreService(ref);
+  ref.onDispose(() => unawaited(service.core.dispose()));
+  return service;
 }

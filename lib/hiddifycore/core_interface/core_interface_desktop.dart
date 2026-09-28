@@ -23,6 +23,7 @@ typedef StopFunc = Pointer<Utf8> Function();
 typedef StopFuncDart = Pointer<Utf8> Function();
 
 class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
+  CoreInterfaceDesktop({this.port = 17078});
   static final HiddifyCoreNativeLibrary _box = _gen();
 
   static HiddifyCoreNativeLibrary _gen() {
@@ -56,7 +57,7 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
     }
   }
 
-  final port = 17078;
+  final int port;
   static String generateRandomPassword(int length) {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     final random = Random();

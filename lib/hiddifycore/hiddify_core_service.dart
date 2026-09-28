@@ -98,6 +98,12 @@ class HiddifyCoreService with InfraLogger {
         }
 
         await startListeningLogs("fg", core.fgClient);
+        if (core.clientChanges != null && !subscriptions.containsKey('managedClients')) {
+          subscriptions['managedClients'] = core.clientChanges!.listen((_) async {
+            await startListeningLogs('bg', core.bgClient);
+            ref.read(coreRestartSignalProvider.notifier).restart();
+          });
+        }
         // await startListeningStatus("fg", core.fgClient);
         if (!core.isSingleChannel()) {
           await startListeningLogs("bg", core.bgClient);
@@ -117,6 +123,10 @@ class HiddifyCoreService with InfraLogger {
       loggy.debug("changing options");
       // latestOptions = options;
       try {
+        if (core.managesLifecycle) {
+          await core.setOptions(options);
+          return right(unit);
+        }
         final res = await core.fgClient.changeHiddifySettings(
           ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
         );
@@ -140,6 +150,17 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(() async {
       statusController.add(currentState = const CoreStatus.starting());
       loggy.debug("starting");
+      if (core.managesLifecycle) {
+        try {
+          await core.startManaged(path, name, disableMemoryLimit);
+          await startListeningLogs('bg', core.bgClient);
+          ref.read(coreRestartSignalProvider.notifier).restart();
+          return right(unit);
+        } catch (error) {
+          statusController.add(currentState = CoreStatus.stopped(message: error.toString()));
+          return left(ConnectionFailure.unexpected(error));
+        }
+      }
       final background = await core.setupBackground(path, name);
       if (background != const CoreStatus.started()) {
         statusController.add(currentState = const CoreStatus.stopped());
@@ -204,6 +225,15 @@ class HiddifyCoreService with InfraLogger {
   TaskEither<String, Unit> stop() {
     return TaskEither(() async {
       loggy.debug("stopping");
+      if (core.managesLifecycle) {
+        try {
+          await core.stop();
+          statusController.add(currentState = const CoreStatus.stopped());
+          return right(unit);
+        } catch (error) {
+          return left(error.toString());
+        }
+      }
       var errMsg = "";
       try {
         final res = await core.bgClient.stop(Empty());
@@ -227,6 +257,17 @@ class HiddifyCoreService with InfraLogger {
   TaskEither<String, Unit> restart(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
       loggy.debug("restarting");
+      if (core.managesLifecycle) {
+        try {
+          await core.startManaged(path, name, disableMemoryLimit);
+          await startListeningLogs('bg', core.bgClient);
+          ref.read(coreRestartSignalProvider.notifier).restart();
+          return right(unit);
+        } catch (error) {
+          statusController.add(currentState = CoreStatus.stopped(message: error.toString()));
+          return left(error.toString());
+        }
+      }
       // if (!await core.restart(path, name)) {
       try {
         final res = await core.bgClient.restart(
@@ -254,8 +295,7 @@ class HiddifyCoreService with InfraLogger {
 
   TaskEither<String, Unit> resetTunnel() {
     return TaskEither(() async {
-      // only available on iOS (and macOS later)
-      if (!PlatformUtils.isIOS) {
+      if (!PlatformUtils.isIOS && !PlatformUtils.isMacOS) {
         throw UnimplementedError("reset tunnel function unavailable on platform");
       }
 
@@ -439,6 +479,13 @@ class HiddifyCoreService with InfraLogger {
   }
 
   Future<void> startListeningStatus(String key, CoreClient cc) async {
+    if (core.managedStatus != null) {
+      if (subscriptions.containsKey('managedStatus')) return;
+      subscriptions['managedStatus'] = core.managedStatus!.listen((status) {
+        statusController.add(currentState = status);
+      });
+      return;
+    }
     await listenSingle<CoreStatus>(
       "${key}StatusListener",
       () => cc
