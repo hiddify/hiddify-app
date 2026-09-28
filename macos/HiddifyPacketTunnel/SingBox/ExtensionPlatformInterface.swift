@@ -1,24 +1,38 @@
+//
+//  ExtensionPlatformInterface.swift
+//  HiddifyPacketTunnel
+//
+
 import Darwin
 import Foundation
 import HiddifyTunnelCore
 import Network
 import NetworkExtension
 
-// Go calls openTun synchronously on the engine queue. Waiting for Apple's
-// asynchronous settings callback never blocks the app or provider main queue.
+/// Implements libbox's platform callbacks using macOS NetworkExtension APIs.
+/// Go invokes these callbacks synchronously from its worker threads.
 final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtocol {
-    private unowned let tunnel: PacketTunnelProvider
+    private unowned let tunnel: ExtensionProvider
     private let monitorQueue = DispatchQueue(label: "app.hiddify.packet-tunnel.path")
+    // Network snapshots are shared by the monitor queue and Go callbacks.
     private let pathLock = NSLock()
+    // Serialize settings installation, DNS resets, and clearing cached settings.
+    private let settingsLock = NSLock()
     private var monitor: NWPathMonitor?
     private var path: Network.NWPath?
+    private var networkSettings: NEPacketTunnelNetworkSettings?
 
-    init(_ tunnel: PacketTunnelProvider) { self.tunnel = tunnel }
+    init(_ tunnel: ExtensionProvider) { self.tunnel = tunnel }
 
+    // MARK: - Tunnel configuration
+
+    /// Applies the core's routes and DNS settings, then returns its utun descriptor.
     func openTun(_ options: LibboxTunOptionsProtocol?, ret0_: UnsafeMutablePointer<Int32>?) throws {
         guard let options = options, let descriptor = ret0_ else {
             throw tunnelError("Missing tunnel options.")
         }
+        // NetworkExtension requires a remote address even though libbox handles
+        // the transport to the actual proxy server.
         let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "127.0.0.1")
         settings.mtu = NSNumber(value: options.getMTU())
         let v4 = prefixes(options.getInet4Address())
@@ -27,6 +41,7 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
             let ipv4 = NEIPv4Settings(addresses: v4.map { $0.address() }, subnetMasks: v4.map { $0.mask() })
             if options.getAutoRoute() {
                 let routes = prefixes(options.getInet4RouteRange())
+                // Use the default route when the core supplies no explicit IPv4 ranges.
                 ipv4.includedRoutes = routes.isEmpty ? [NEIPv4Route.default()] : routes.map {
                     NEIPv4Route(destinationAddress: $0.address(), subnetMask: $0.mask())
                 }
@@ -54,25 +69,27 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
         if options.getAutoRoute() {
             let dns = try options.getDNSServerAddress()
             let dnsSettings = NEDNSSettings(servers: [dns.value])
+            // The empty match domain makes this resolver apply to all DNS queries.
             dnsSettings.matchDomains = [""]
             dnsSettings.matchDomainsNoSearch = true
             settings.dnsSettings = dnsSettings
         }
-        let applied = DispatchSemaphore(value: 0)
-        var settingsError: Error?
-        tunnel.setTunnelNetworkSettings(settings) { error in
-            settingsError = error
-            applied.signal()
-        }
-        guard applied.wait(timeout: .now() + 30) == .success else {
-            throw tunnelError("macOS timed out while applying the VPN network settings.")
-        }
-        if let error = settingsError { throw error }
-        // This is the same libbox utun integration used by the iOS provider.
+        settingsLock.lock()
+        defer { settingsLock.unlock() }
+        try applyNetworkSettings(settings)
+        networkSettings = settings
+        // The core reads the utun socket directly. Fall back to libbox's lookup
+        // if packetFlow does not expose the descriptor.
         let fd = (tunnel.packetFlow.value(forKeyPath: "socket.fileDescriptor") as? NSNumber)?.int32Value
             ?? LibboxGetTunnelFileDescriptor()
         guard fd >= 0 else { throw tunnelError("macOS did not provide a tunnel descriptor.") }
         descriptor.pointee = fd
+    }
+
+    private func applyNetworkSettings(_ settings: NEPacketTunnelNetworkSettings?) throws {
+        try runBlocking(timeoutMessage: "macOS timed out while applying the VPN network settings.") { [self] in
+            try await tunnel.setTunnelNetworkSettings(settings)
+        }
     }
 
     private func prefixes(_ iterator: LibboxRoutePrefixIteratorProtocol?) -> [LibboxRoutePrefix] {
@@ -83,6 +100,8 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
         return result
     }
 
+    // MARK: - Platform capabilities
+
     func localDNSTransport() -> LibboxLocalDNSTransportProtocol? { nil }
     func usePlatformAutoDetectControl() -> Bool { false }
     func autoDetectControl(_ fd: Int32) throws {}
@@ -91,8 +110,32 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
     func includeAllNetworks() -> Bool { false }
     func readWIFIState() -> LibboxWIFIState? { nil }
     func systemCertificates() -> LibboxStringIteratorProtocol? { nil }
-    func clearDNSCache() {}
+
+    // MARK: - DNS cache
+
+    func clearDNSCache() {
+        settingsLock.lock()
+        defer { settingsLock.unlock() }
+        guard let networkSettings = networkSettings else { return }
+        tunnel.reasserting = true
+        defer { tunnel.reasserting = false }
+        do {
+            // The core clears its own DNS cache before this callback. Reapplying
+            // the tunnel settings refreshes macOS's resolver state as well.
+            try applyNetworkSettings(nil)
+            try applyNetworkSettings(networkSettings)
+        } catch {
+            // A failed reset can leave network settings removed; stop the tunnel.
+            tunnel.writeFatalError("(packet-tunnel) DNS cache reset failed: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Notifications
+
+    // User notification delivery is not provided by this system extension.
     func send(_ notification: LibboxNotification?) throws {}
+
+    // MARK: - Process lookup
 
     func findConnectionOwner(_ ipProtocol: Int32, sourceAddress: String?, sourcePort: Int32,
                              destinationAddress: String?, destinationPort: Int32) throws -> LibboxConnectionOwner {
@@ -100,12 +143,16 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
             throw tunnelError("Missing source address for process lookup.")
         }
         var error: NSError?
+        // Use the core's macOS process lookup; this platform does not provide procfs.
         guard let owner = TunnelFindConnectionOwner(ipProtocol, sourceAddress, sourcePort, &error) else {
             throw error ?? tunnelError("macOS could not identify the connection's process.")
         }
         return owner
     }
 
+    // MARK: - Network interfaces
+
+    /// Starts path monitoring and waits for the initial network-state report.
     func startDefaultInterfaceMonitor(_ listener: LibboxInterfaceUpdateListenerProtocol?) throws {
         guard let listener = listener else { return }
         closeMonitor()
@@ -116,6 +163,8 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
             self.pathLock.lock()
             self.path = path
             self.pathLock.unlock()
+            // Choosing utun as the upstream interface would route the engine's
+            // outbound traffic back into the VPN.
             if path.status == .satisfied,
                let interface = path.availableInterfaces.first(where: {
                    !$0.name.hasPrefix("utun") && path.usesInterfaceType($0.type)
@@ -144,10 +193,22 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
         pathLock.unlock()
     }
 
+    /// Drops cached settings and monitoring state during provider cleanup.
+    func reset() {
+        // Coordinate with a DNS reset already holding the lock. Later DNS cache
+        // callbacks see nil settings and return without starting another reset.
+        settingsLock.lock()
+        networkSettings = nil
+        settingsLock.unlock()
+        closeMonitor()
+    }
+
     func getInterfaces() throws -> LibboxNetworkInterfaceIteratorProtocol {
         pathLock.lock()
         let interfaces = path?.availableInterfaces ?? []
         pathLock.unlock()
+        // NWPath supplies interface names and types; getifaddrs supplies their
+        // addresses, subnet masks, and flags.
         var addresses: [String: [String]] = [:]
         var flags: [String: Int32] = [:]
         var first: UnsafeMutablePointer<ifaddrs>?
@@ -163,6 +224,8 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
                 var host = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                 if getnameinfo(addr, socklen_t(addr.pointee.sa_len), &host, socklen_t(host.count), nil, 0, NI_NUMERICHOST) == 0 {
                     let address = String(cString: host).components(separatedBy: "%")[0]
+                    // libbox expects CIDR addresses, so convert each netmask
+                    // into an IPv4 or IPv6 prefix length.
                     var prefix = addr.pointee.sa_family == AF_INET ? 32 : 128
                     if let mask = entry.pointee.ifa_netmask {
                         if addr.pointee.sa_family == AF_INET {
@@ -182,7 +245,7 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
             let result = LibboxNetworkInterface()
             result.name = interface.name
             result.index = Int32(interface.index)
-            result.mtu = 1500
+            result.mtu = 1500 // Fallback MTU for interface metadata.
             result.flags = flags[interface.name] ?? 0
             result.addresses = StringIterator(addresses[interface.name] ?? [])
             switch interface.type {
@@ -197,6 +260,9 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
     }
 }
 
+// MARK: - Libbox iterators
+
+// Bridge Swift arrays to the iterator protocols exposed by the Go bindings.
 private final class StringIterator: NSObject, LibboxStringIteratorProtocol {
     private var items: [String]
     private var index = 0

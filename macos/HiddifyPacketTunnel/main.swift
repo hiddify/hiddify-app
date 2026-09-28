@@ -9,7 +9,9 @@ import Foundation
 import NetworkExtension
 
 autoreleasepool {
+    // Register this process with NetworkExtension before handling provider events.
     NEProvider.startSystemExtensionMode()
 }
 
+// Keep the system extension alive to receive tunnel lifecycle callbacks.
 dispatchMain()
