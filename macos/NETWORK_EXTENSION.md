@@ -105,12 +105,58 @@ HIDDIFY_TUNNEL_PROVISIONING_PROFILE = YOUR_TUNNEL_PROFILE_NAME
 ```
 
 Both profiles must authorize the entitlements and bundle IDs above, and match
-the imported Developer ID identity. The workflow fails explicitly if the signing
-configuration is absent. Signing credentials and personal overrides belong in
-CI secrets or the ignored local xcconfig, never in the repository. Release owners
-must notarize the signed app before distributing it; the existing packaging
-workflow does not perform notarization. iOS certificates and profiles do not
-establish authorization for a native macOS system extension.
+the imported Developer ID identity. Profile and Release enable hardened runtime
+for Runner and the extension and disable injected development entitlements.
+Debug keeps hardened runtime disabled for ordinary local development.
+
+### Maintainer setup for published releases
+
+The repository contains build settings and release automation. The Hiddify
+release maintainers must supply their team's certificates, private keys,
+provisioning profiles and notarization credentials; contributors do not need
+access to these to build or submit a PR.
+
+Configure these GitHub Actions secrets before publishing macOS artifacts:
+
+| Secret | Required value |
+| --- | --- |
+| `APPLE_CERTIFICATE_P12` | Base64 PKCS#12 export containing the team's Developer ID Application and Developer ID Installer certificates **with their private keys**. |
+| `APPLE_CERTIFICATE_P12_PASSWORD` | Password protecting that PKCS#12 export. |
+| `APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64` | Existing base64 tar.gz secret, including the native macOS Developer ID profiles for both Runner and HiddifyPacketTunnel. |
+| `APPLE_MACOS_SIGNING_XCCONFIG` | The team, manual signing and profile settings shown above. |
+| `APPLE_MACOS_INSTALLER_SIGN_IDENTITY` | Full installer identity, for example `Developer ID Installer: YOUR ORGANIZATION (YOURTEAMID)`. |
+| `APPLE_NOTARIZATION_APPLE_ID` | Apple ID authorized to notarize for the release team. |
+| `APPLE_NOTARIZATION_TEAM_ID` | The same team ID used for signing. |
+| `APPLE_NOTARIZATION_PASSWORD` | An app-specific password for that Apple ID, generated through the Apple Account site. |
+
+Register both App IDs and their shared app group for that team. The Runner
+profile needs Network Extensions and System Extension installation; the tunnel
+profile needs Network Extensions. Both must authorize the same team-prefixed
+`app.hiddify.com.vpn` group and `packet-tunnel-provider-systemextension` value.
+iOS certificates and profiles do not authorize a native macOS system extension.
+
+The workflow signs the installer with Developer ID Installer, submits both DMG
+and PKG to Apple's notary service, requires an `Accepted` result, then staples and
+validates their tickets before uploading the macOS artifact. A missing secret,
+signing failure, rejected submission or timeout fails that macOS build and prevents
+uploading its packages. PR builds skip signing and notarization and need no secrets.
+
+For a local maintainer release, build with the ignored local signing xcconfig,
+set the four installer/notarization environment variables listed above, and run:
+
+```sh
+bash macos/scripts/notarize-release.sh path/to/Hiddify-MacOS.dmg path/to/Hiddify-MacOS-Installer.pkg
+```
+
+Keep credentials in CI secrets, a password manager or the ignored local xcconfig.
+Do not commit certificates, private keys, passwords or provisioning profiles.
+Before distributing a release, maintainers must verify the signed app on a Mac
+with normal security settings: install in `/Applications`, approve the extension
+and VPN configuration, connect, disconnect, change modes and reopen the app.
+Unsigned compilation cannot verify signing, OS approval or live tunnel behavior.
+
+Apple documents the requirements in [Notarizing macOS software before distribution](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)
+and [Network Extensions entitlement](https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.developer.networking.networkextension).
 
 ## Implementation boundaries
 

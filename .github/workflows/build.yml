@@ -376,6 +376,17 @@ jobs:
             fi
           done
 
+      - name: Sign installer and notarize macOS packages
+        if: ${{ inputs.upload-artifact && matrix.platform == 'macos' }}
+        env:
+          APPLE_MACOS_INSTALLER_SIGN_IDENTITY: ${{ secrets.APPLE_MACOS_INSTALLER_SIGN_IDENTITY }}
+          APPLE_NOTARIZATION_APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
+          APPLE_NOTARIZATION_TEAM_ID: ${{ secrets.APPLE_NOTARIZATION_TEAM_ID }}
+          APPLE_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+        shell: bash
+        run: |
+          bash macos/scripts/notarize-release.sh "out/${TARGET_NAME_dmg}.dmg" "out/${TARGET_NAME_pkg}.pkg"
+
       - name: Upload Artifact
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@v6

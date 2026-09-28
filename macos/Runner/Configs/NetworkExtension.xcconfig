@@ -16,6 +16,11 @@ HIDDIFY_CODE_SIGN_IDENTITY = Developer ID Application
 HIDDIFY_CODE_SIGN_IDENTITY[config=Debug] = -
 HIDDIFY_HOST_PROVISIONING_PROFILE =
 HIDDIFY_TUNNEL_PROVISIONING_PROFILE =
+// Developer ID distribution requires hardened runtime on both executables.
+ENABLE_HARDENED_RUNTIME = YES
+ENABLE_HARDENED_RUNTIME[config=Debug] = NO
+CODE_SIGN_INJECT_BASE_ENTITLEMENTS[config=Release] = NO
+CODE_SIGN_INJECT_BASE_ENTITLEMENTS[config=Profile] = NO
 MACOSX_DEPLOYMENT_TARGET = 12.0
 
 // Optional machine-specific team/signing overrides; see NETWORK_EXTENSION.md.
