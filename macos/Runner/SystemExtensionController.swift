@@ -32,11 +32,11 @@ final class SystemExtensionController:
             forExtensionWithIdentifier: extensionIdentifier,
             queue: DispatchQueue.main
         )
-        
+
         request.delegate = self
         return request
     }
-    
+
     func requestNeedsUserApproval(_ request: OSSystemExtensionRequest) {
         activationState = .waitingForApproval
         onStateChanged?()
@@ -44,14 +44,14 @@ final class SystemExtensionController:
         completion = nil
         callback?(vpnError("Allow the Hiddify VPN extension in System Settings, then return to Hiddify and connect again.", code: .approvalRequired))
     }
-    
+
     func request(
         _ request: OSSystemExtensionRequest,
         didFailWithError error: Error
     ) {
         finish(.failed(error.localizedDescription), error: error)
     }
-    
+
     func request(
         _ request: OSSystemExtensionRequest,
         didFinishWithResult result: OSSystemExtensionRequest.Result
@@ -65,7 +65,7 @@ final class SystemExtensionController:
                 finish(.failed("Unknown activation result"), error: vpnError("macOS returned an unknown extension activation result."))
         }
     }
-    
+
     func request(
         _ request: OSSystemExtensionRequest,
         actionForReplacingExtension existing: OSSystemExtensionProperties,
@@ -73,7 +73,7 @@ final class SystemExtensionController:
     ) -> OSSystemExtensionRequest.ReplacementAction {
         return .replace
     }
-    
+
     func activate(completion: @escaping (Error?) -> Void) {
         if case .activated = activationState { completion(nil); return }
         if case .activating = activationState {

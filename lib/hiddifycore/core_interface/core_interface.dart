@@ -14,9 +14,8 @@ class CoreInterface {
 
   Future<void> setOptions(SingboxConfigOption options) async {}
   Future<void> dispose() async {}
-  Future<void> startManaged(String path, String name, bool disableMemoryLimit) async {
-    throw UnimplementedError();
-  }
+  Future<void> startManaged(String path, String name, bool disableMemoryLimit) =>
+      Future<void>.error(UnimplementedError());
 
   Future<String> setup(Directories directories, bool debug, int mode) async {
     return "";
@@ -57,7 +56,7 @@ class CoreInterface {
 
   bool isInitialized() {
     try {
-      bgClient; // touch it
+      final _ = bgClient; // Check whether the late client field has been initialized.
       return true;
     } catch (_) {
       return false;
