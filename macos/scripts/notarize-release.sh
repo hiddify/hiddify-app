@@ -5,7 +5,13 @@ set -euo pipefail
 for task_variable in APPLE_MACOS_INSTALLER_SIGN_IDENTITY APPLE_NOTARIZATION_APPLE_ID \
   APPLE_NOTARIZATION_TEAM_ID APPLE_NOTARIZATION_PASSWORD; do
   if [[ -z "${!task_variable:-}" ]]; then
-    echo "error: Set $task_variable before distributing macOS releases. See macos/NETWORK_EXTENSION.md." >&2
+    case "$task_variable" in
+      APPLE_MACOS_INSTALLER_SIGN_IDENTITY) task_value='the name of an imported Developer ID Installer certificate' ;;
+      APPLE_NOTARIZATION_APPLE_ID) task_value='the Apple ID used for notarization' ;;
+      APPLE_NOTARIZATION_TEAM_ID) task_value='your Apple Developer team ID' ;;
+      APPLE_NOTARIZATION_PASSWORD) task_value='an app-specific password for the notarization Apple ID' ;;
+    esac
+    echo "error: Set $task_variable to $task_value before distributing macOS releases. Export it locally or configure the matching CI secret." >&2
     exit 1
   fi
 done

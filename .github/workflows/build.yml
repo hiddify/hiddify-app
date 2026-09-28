@@ -172,7 +172,7 @@ jobs:
           signing_config="$RUNNER_TEMP/hiddify-macos-signing.xcconfig"
           if [[ "$SIGN_RELEASE" == 'true' ]]; then
             if [[ -z "$MACOS_SIGNING_XCCONFIG" ]]; then
-              echo '::error::Set APPLE_MACOS_SIGNING_XCCONFIG for the host and packet tunnel Developer ID signing settings. See macos/NETWORK_EXTENSION.md.'
+              echo '::error::Set APPLE_MACOS_SIGNING_XCCONFIG with DEVELOPMENT_TEAM, HIDDIFY_CODE_SIGN_IDENTITY = Developer ID Application, and provisioning profile settings for Runner and HiddifyPacketTunnel. Import the matching Developer ID certificates and profiles before building a signed release.'
               exit 1
             fi
             printf '%s\n' "$MACOS_SIGNING_XCCONFIG" > "$signing_config"

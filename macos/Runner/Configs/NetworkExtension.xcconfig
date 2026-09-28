@@ -23,5 +23,5 @@ CODE_SIGN_INJECT_BASE_ENTITLEMENTS[config=Release] = NO
 CODE_SIGN_INJECT_BASE_ENTITLEMENTS[config=Profile] = NO
 MACOSX_DEPLOYMENT_TARGET = 12.0
 
-// Optional machine-specific team/signing overrides; see NETWORK_EXTENSION.md.
+// Copy NetworkExtension.local.xcconfig.example to NetworkExtension.local.xcconfig for local team/signing overrides.
 #include? "NetworkExtension.local.xcconfig"
