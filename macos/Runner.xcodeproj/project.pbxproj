@@ -662,7 +662,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HiddifyPacketTunnel/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = HiddifyPacketTunnel;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hiddify Network Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -718,7 +718,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HiddifyPacketTunnel/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = HiddifyPacketTunnel;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hiddify Network Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -772,7 +772,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = HiddifyPacketTunnel/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = HiddifyPacketTunnel;
+				INFOPLIST_KEY_CFBundleDisplayName = "Hiddify Network Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
