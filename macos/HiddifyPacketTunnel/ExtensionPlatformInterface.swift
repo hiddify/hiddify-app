@@ -96,7 +96,14 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
 
     func findConnectionOwner(_ ipProtocol: Int32, sourceAddress: String?, sourcePort: Int32,
                              destinationAddress: String?, destinationPort: Int32) throws -> LibboxConnectionOwner {
-        throw tunnelError("Process ownership rules are unavailable in the macOS packet tunnel.")
+        guard let sourceAddress = sourceAddress else {
+            throw tunnelError("Missing source address for process lookup.")
+        }
+        var error: NSError?
+        guard let owner = TunnelFindConnectionOwner(ipProtocol, sourceAddress, sourcePort, &error) else {
+            throw error ?? tunnelError("macOS could not identify the connection's process.")
+        }
+        return owner
     }
 
     func startDefaultInterfaceMonitor(_ listener: LibboxInterfaceUpdateListenerProtocol?) throws {
