@@ -11,12 +11,19 @@ import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 import 'package:rxdart/rxdart.dart';
 
 class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   // Keep the app's parser/proxy service separate from iOS-on-Mac's 17078/17079.
   CoreInterfaceMacOS() : super(port: 17080);
+
+  @visibleForTesting
+  CoreInterfaceMacOS.withForegroundClient(CoreClient client, Map<String, dynamic> nativeState) : super(port: 17080) {
+    fgClient = bgClient = client;
+    _receiveState(nativeState);
+  }
 
   static const _methods = MethodChannel('com.hiddify.app/macos-vpn');
   static const _events = EventChannel('com.hiddify.app/macos-vpn-status');
@@ -233,13 +240,15 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   @override
   Future<bool> stop() async {
     _startingVPN = false;
-    if (_usingVPN && _vpnAvailable) {
+    // A saved on-demand VPN can be disconnected when the app reopens. Stop its
+    // native configuration even when this app instance has never used the VPN.
+    if (_vpnAvailable) {
       final state = await _methods.invokeMapMethod<String, dynamic>('stop');
       if (state != null) _receiveState(state);
-      final oldChannel = _extensionChannel;
-      _extensionChannel = null;
-      if (oldChannel != null) await oldChannel.shutdown();
     }
+    final oldChannel = _extensionChannel;
+    _extensionChannel = null;
+    if (oldChannel != null) await oldChannel.shutdown();
     _usingVPN = false;
     bgClient = fgClient;
     _clientChanges.add(null);
