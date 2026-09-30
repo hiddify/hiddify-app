@@ -162,5 +162,118 @@ void main() {
         });
       });
     });
+    test("Should treat a non-instant expire as unlimited instead of expired", () {
+      final headers = <String, List<String>>{
+        "subscription-userinfo": ["upload=0; download=0; total=5368709120; expire=7"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: RemoteProfileEntity(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.subInfo, isNotNull);
+              expect(rp.subInfo!.isExpired, isFalse);
+              expect(
+                rp.subInfo!.expire,
+                equals(DateTime.fromMillisecondsSinceEpoch(ProfileParser.infiniteTimeThreshold * 1000)),
+              );
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
+
+    test("Should keep a real future timestamp as the expiry", () {
+      final inSevenDays = DateTime.now().add(const Duration(days: 7)).millisecondsSinceEpoch ~/ 1000;
+      final headers = <String, List<String>>{
+        "subscription-userinfo": ["upload=0; download=0; total=5368709120; expire=$inSevenDays"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: RemoteProfileEntity(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.subInfo!.isExpired, isFalse);
+              expect(rp.subInfo!.expire, equals(DateTime.fromMillisecondsSinceEpoch(inSevenDays * 1000)));
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
+
+    test("Should not discard the profile when a segment has no equals sign", () {
+      final inSevenDays = DateTime.now().add(const Duration(days: 7)).millisecondsSinceEpoch ~/ 1000;
+      final headers = <String, List<String>>{
+        "subscription-userinfo": ["upload=0; download=0; total=5368709120; expire=$inSevenDays;"],
+      };
+      final fixedHeaders = headers.map((key, value) {
+        if (value.length == 1) return MapEntry(key, value.first);
+        return MapEntry(key, value);
+      });
+      final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
+      expect(allHeaders.isRight(), true);
+      allHeaders.match((l) {}, (r) {
+        final profile = ProfileParser.parse(
+          tempFilePath: '',
+          profile: RemoteProfileEntity(
+            id: const Uuid().v4(),
+            active: true,
+            name: '',
+            url: validBaseUrl,
+            lastUpdate: DateTime.now(),
+            populatedHeaders: r,
+          ),
+        );
+        expect(profile.isRight(), true);
+        profile.match((l) {}, (r) {
+          expect(r is RemoteProfileEntity, true);
+          r.map(
+            remote: (rp) {
+              expect(rp.subInfo, isNotNull);
+              expect(rp.subInfo!.expire, equals(DateTime.fromMillisecondsSinceEpoch(inSevenDays * 1000)));
+            },
+            local: (lp) {},
+          );
+        });
+      });
+    });
   });
 }
