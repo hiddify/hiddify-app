@@ -295,7 +295,7 @@ class ProfileParser {
     final values = subInfoStr.split(';');
     final map = <String, int?>{
       for (final v in values)
-        if (v.split('=').length == 2) v.split('=').first.trim(): num.tryParse(v.split('=').last.trim())?.toInt(),
+        if (v.contains('=')) v.split('=').first.trim(): num.tryParse(v.split('=').last.trim())?.toInt(),
     };
     if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
       final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
