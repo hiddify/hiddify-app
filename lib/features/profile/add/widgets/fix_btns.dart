@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -44,14 +43,19 @@ class FixBtns extends ConsumerWidget {
           onTap: () async {
             final result = await FilePicker.platform.pickFiles(
               type: FileType.custom,
-              allowedExtensions: ['txt', 'json'],
+              allowedExtensions: ['txt', 'json', 'yaml', 'yml', 'conf', 'ovpn'],
             );
             if (result == null) return;
-            final file = File(result.files.single.path!);
-            if (!await file.exists()) return;
-            final bytes = await file.readAsBytes();
-            final content = utf8.decode(bytes);
-            ref.read(addProfileNotifierProvider.notifier).addClipboard(content);
+            final picked = result.files.single;
+            var bytes = picked.bytes;
+            if (bytes == null) {
+              final path = picked.path;
+              if (path == null) return;
+              final file = File(path);
+              if (!await file.exists()) return;
+              bytes = await file.readAsBytes();
+            }
+            ref.read(addProfileNotifierProvider.notifier).addClipboard(decodeTextBytes(bytes));
           },
         ),
         if (!isDesktop) ...[

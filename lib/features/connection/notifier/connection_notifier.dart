@@ -34,8 +34,6 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       if (previous == next) return;
       if (previous case AsyncData(:final value) when !value.isConnected) {
         if (next case AsyncData(value: final Connected _)) {
-          await ref.read(hapticServiceProvider.notifier).heavyImpact();
-
           if (Platform.isAndroid && !ref.read(Preferences.storeReviewedByUser)) {
             if (await InAppReview.instance.isAvailable()) {
               InAppReview.instance.requestReview();
@@ -59,7 +57,15 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       if (event case Disconnected(connectionFailure: final _?) when PlatformUtils.isDesktop) {
         Future.microtask(() => ref.read(Preferences.startedByUser.notifier).update(false));
       }
-      loggy.info("connection status: ${event.format()}");
+      // One call for every status buried failures at info, next to the ordinary
+      // comings and goings. A failure carries the core's own panic text, which
+      // is the last thing that should need hunting for.
+      final status = "connection status: ${event.format()}";
+      if (event case Disconnected(connectionFailure: final _?)) {
+        loggy.error(status);
+      } else {
+        loggy.info(status);
+      }
     });
   }
 

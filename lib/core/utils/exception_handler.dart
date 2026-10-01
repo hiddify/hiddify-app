@@ -1,8 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:hiddify/utils/utils.dart';
 import 'package:rxdart/rxdart.dart';
 
-mixin ExceptionHandler implements LoggerMixin {
+mixin ExceptionHandler {
   TaskEither<F, R> exceptionHandler<F, R>(
     Future<Either<F, R>> Function() run,
     F Function(Object error, StackTrace stackTrace) onError,

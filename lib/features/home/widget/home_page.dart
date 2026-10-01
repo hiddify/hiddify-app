@@ -105,7 +105,6 @@ class HomePage extends HookConsumerWidget {
                             profile: profile,
                             isMain: true,
                             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            color: Theme.of(context).colorScheme.surfaceContainer,
                           ),
                           _ => const Text(""),
                         },

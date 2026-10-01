@@ -41,6 +41,10 @@ migrate_working_dir/
 **/*.freezed.dart
 **/*.mapper.dart
 **/*.gen.dart
+
+# slang analysis reports (dart run slang analyze)
+_missing_translations*.json
+_unused_translations*.json
 **/*.dll
 **/*.dylib
 **/*.xcframework
@@ -68,6 +72,3 @@ app.*.map.json
 # Windows Self-Signed for msix
 windows/sign.pfx
 windows/sign.cer
-.aider.input.history
-.aider.chat.history.md
-.aider.tags.cache.v4

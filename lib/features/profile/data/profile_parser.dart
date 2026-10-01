@@ -6,10 +6,12 @@ import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
+import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -21,11 +23,15 @@ import 'package:meta/meta.dart';
 /// - UserOverride.name
 /// - `profile-title` header
 /// - `content-disposition` header
-/// - url fragment (example: `https://example.com/config#user`) -> name=`user`
-/// - url filename extension (example: `https://example.com/config.json`) -> name=`config`
+/// - url fragment (remote only, example: `https://example.com/config#user`) -> name=`user`
+/// - url filename extension (remote only, example: `https://example.com/config.json`) -> name=`config`
 /// - if none of these methods return a non-blank string, switch(profileType)
 /// - remote:  fallback to `Remote Profile`
 /// - local: fallback to protocol, extracted from content by protocol()
+///
+/// Note: the url-based steps (fragment, filename) apply to remote profiles only,
+/// since local profiles have no url. Every step treats a whitespace-only result
+/// as blank, so it falls through to the next step.
 
 class ProfileParser {
   // Synthetic sentinel assigned to `total` for "unlimited" traffic (subscription-userinfo total=0 or
@@ -50,9 +56,8 @@ class ProfileParser {
     'profile-update-interval',
     'support-url',
     'profile-web-page-url',
-    'enable-warp',
-    'enable-psiphon',
-    'enable-fragment',
+    'extra-security',
+    'fragment',
   ];
 
   final Ref _ref;
@@ -286,9 +291,23 @@ class ProfileParser {
     return headers;
   }
 
+  /// Parse a `subscription-userinfo` header, e.g.
+  /// `upload=0; download=1024; total=10240; expire=1704054600`.
+  ///
+  /// Tolerant of real-world noise: a segment without a `key=value` pair (a
+  /// stray `;;`, a trailing `;`, or a malformed token) is skipped instead of
+  /// throwing and failing the whole profile parse. Values may be decimals and
+  /// are truncated to int. `upload` and `download` are required; a missing or
+  /// `0` `total`/`expire` is treated as "unlimited".
   static SubscriptionInfo? _parseSubscriptionInfo(String subInfoStr) {
-    final values = subInfoStr.split(';');
-    final map = {for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt()};
+    final map = <String, int?>{};
+    for (final segment in subInfoStr.split(';')) {
+      final parts = segment.split('=');
+      if (parts.length < 2) continue;
+      final key = parts.first.trim();
+      if (key.isEmpty) continue;
+      map[key] = num.tryParse(parts[1].trim())?.toInt();
+    }
     if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
       final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
       expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
@@ -302,34 +321,56 @@ class ProfileParser {
     return null;
   }
 
+  /// Extract a filename from a `content-disposition` header.
+  ///
+  /// Prefers the RFC 5987 extended form `filename*=UTF-8''<percent-encoded>`,
+  /// which is how servers send non-ASCII names (Persian, Chinese, emoji …),
+  /// and falls back to the plain quoted form `filename="name.txt"`. Returns ''
+  /// when neither is present or the extended value can't be decoded.
+  @visibleForTesting
+  static String filenameFromContentDisposition(String header) {
+    // filename*=charset'lang'<percent-encoded-value>; charset'lang' is optional here to
+    // also accept servers that omit it (filename*=%D9%BE...).
+    if (RegExp(r"filename\*\s*=\s*(?:[^']*'[^']*')?([^;]+)", caseSensitive: false).firstMatch(header) case final m?) {
+      final raw = m.group(1)?.trim() ?? '';
+      if (raw.isNotEmpty) {
+        try {
+          return Uri.decodeComponent(raw);
+        } catch (_) {
+          // Malformed percent-encoding → fall back to the quoted form below.
+        }
+      }
+    }
+    if (RegExp('filename="([^"]*)"').firstMatch(header) case final m?) {
+      return m.group(1) ?? '';
+    }
+    return '';
+  }
+
   @visibleForTesting
   static Either<ProfileFailure, ProfileEntity> parse({required String tempFilePath, required ProfileEntity profile}) =>
       Either.tryCatch(() {
         final headers = Map<String, dynamic>.from(profile.populatedHeaders ?? {});
         var name = '';
-        if (profile.userOverride?.name case final String oName when oName.isNotEmpty) {
+        if (profile.userOverride?.name case final String oName when oName.isNotBlank) {
           name = oName;
         }
 
-        if (headers['profile-title'] case final String titleHeader when name.isEmpty) {
+        if (headers['profile-title'] case final String titleHeader when name.isBlank) {
           if (titleHeader.startsWith("base64:")) {
             name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
           } else {
             name = titleHeader.trim();
           }
         }
-        if (headers['content-disposition'] case final String contentDispositionHeader when name.isEmpty) {
-          final regExp = RegExp('filename="([^"]*)"');
-          final match = regExp.firstMatch(contentDispositionHeader);
-          if (match != null && match.groupCount >= 1) {
-            name = match.group(1) ?? '';
-          }
+        if (headers['content-disposition'] case final String contentDispositionHeader when name.isBlank) {
+          name = filenameFromContentDisposition(contentDispositionHeader);
         }
         if (profile case RemoteProfileEntity(:final url)) {
-          if (Uri.parse(url).fragment case final fragment when name.isEmpty) {
+          if (Uri.parse(url).fragment case final fragment when name.isBlank) {
             name = fragment;
           }
-          if (url.split("/").lastOrNull case final part? when name.isEmpty) {
+          if (url.split("/").lastOrNull case final part? when name.isBlank) {
             final pattern = RegExp(r"\.(json|yaml|yml|txt)[\s\S]*");
             name = part.replaceFirst(pattern, "");
           }
@@ -352,8 +393,11 @@ class ProfileParser {
         }
         if (headers['profile-update-interval'] case final String updateIntervalStr
             when options == null && !isAutoUpdateDisable) {
-          final updateInterval = Duration(hours: int.parse(updateIntervalStr));
-          options = ProfileOptions(updateInterval: updateInterval);
+          // Convention: a positive integer number of hours. Ignore anything else
+          // (a decimal, garbage, or <= 0) instead of failing the whole parse.
+          if (int.tryParse(updateIntervalStr.trim()) case final hours? when hours > 0) {
+            options = ProfileOptions(updateInterval: Duration(hours: hours));
+          }
         }
 
         SubscriptionInfo? subInfo;
@@ -361,17 +405,25 @@ class ProfileParser {
           subInfo = _parseSubscriptionInfo(subInfoStr);
         }
 
-        if (subInfo != null) {
-          if (headers['profile-web-page-url'] case final String profileWebPageUrl when isUrl(profileWebPageUrl)) {
-            subInfo = subInfo.copyWith(webPageUrl: profileWebPageUrl);
-          }
-          if (headers['support-url'] case final String profileSupportUrl when isUrl(profileSupportUrl)) {
-            subInfo = subInfo.copyWith(supportUrl: profileSupportUrl);
-          }
+        // Standalone headers: valid with or without `subscription-userinfo`.
+        String? webPageUrl;
+        if (headers['profile-web-page-url'] case final String profileWebPageUrl when isUrl(profileWebPageUrl)) {
+          webPageUrl = profileWebPageUrl;
+        }
+        String? supportUrl;
+        if (headers['support-url'] case final String profileSupportUrl when isUrl(profileSupportUrl)) {
+          supportUrl = profileSupportUrl;
         }
 
         return profile.map(
-          remote: (rp) => rp.copyWith(name: name, lastUpdate: DateTime.now(), options: options, subInfo: subInfo),
+          remote: (rp) => rp.copyWith(
+            name: name,
+            lastUpdate: DateTime.now(),
+            options: options,
+            subInfo: subInfo,
+            webPageUrl: webPageUrl,
+            supportUrl: supportUrl,
+          ),
           local: (lp) => lp.copyWith(name: name, lastUpdate: DateTime.now()),
         );
       }, ProfileFailure.unexpected);
@@ -422,24 +474,68 @@ class ProfileParser {
     );
   }
 
+  /// Resolve an `extra-security` value to a chain mode.
+  ///
+  /// Strict on purpose: the value must equal a documented mode key exactly, or
+  /// it is ignored. `profile` is not accepted — chaining to another profile is a
+  /// user choice, not something a subscription may impose.
+  @visibleForTesting
+  static ChainMode? extraSecurityMode(String? value) {
+    if (value == null) return null;
+    final trimmed = value.trim();
+    for (final mode in ChainMode.values) {
+      if (mode.isProfile()) continue;
+      if (mode.key == trimmed) return mode;
+    }
+    return null;
+  }
+
+  /// Build the `tls-tricks` map from a subscription `fragment` header.
+  ///
+  /// Mirrors the per-proxy `fragment` parameter, which needs a full triplet —
+  /// `size,sleep,method` or `tlshello,size,sleep`. Anything shorter, or a size
+  /// or sleep that isn't a valid range, is incomplete and turns fragmentation
+  /// off entirely rather than enabling it with half the values. Returns null
+  /// when the header can't be used.
+  @visibleForTesting
+  static Map<String, dynamic>? fragmentTricks(String? value) {
+    if (value == null) return null;
+    final parts = value.split(',').map((e) => e.trim()).toList();
+    if (parts.length < 3) return null;
+    final leadingMethod = parts.first.toLowerCase() == 'tlshello';
+    final size = leadingMethod ? parts[1] : parts[0];
+    final sleep = leadingMethod ? parts[2] : parts[1];
+    if (OptionalRange.tryParse(size) == null || OptionalRange.tryParse(sleep) == null) return null;
+    return {'enable-fragment': true, 'fragment-size': size, 'fragment-sleep': sleep};
+  }
+
   static String profileOverride({
     required Map<String, dynamic>? populatedHeaders,
     required UserOverride? userOverride,
   }) {
     final headers = Map<String, dynamic>.from(populatedHeaders ?? {});
 
-    if (headers['enable-warp'].toString() == 'true' || userOverride?.enableWarp == true) {
-      headers['chain-status'] = 'extra_security';
-      headers['extra-security'] = {'mode': 'warp'};
+    // Consume the raw subscription inputs; the output config uses structured
+    // keys, so these string values must not leak through unchanged.
+    final fragmentInput = headers.remove('fragment')?.toString();
+    final extraSecurityInput = headers.remove('extra-security')?.toString();
+
+    // extra-security: exactly one documented mode. The app's own setting takes
+    // precedence over the subscription; an unrecognised value is ignored.
+    final mode = extraSecurityMode(userOverride?.extraSecurity) ?? extraSecurityMode(extraSecurityInput);
+    if (mode != null) {
+      headers['chain-status'] = ChainStatus.extraSecurity.key;
+      headers['extra-security'] = {'mode': mode.key};
     }
 
-    if (headers['enable-psiphon'].toString() == 'true' || userOverride?.enablePsiphon == true) {
-      headers['chain-status'] = 'extra_security';
-      headers['extra-security'] = {'mode': 'psiphon'};
-    }
-
-    if (headers['enable-fragment'].toString() == 'true' || userOverride?.enableFragment == true) {
+    // fragment: the app's own setting wins and enables fragmentation with the
+    // user's configured size/sleep. Otherwise the subscription header is read
+    // exactly like a proxy link's `fragment` parameter — a complete triplet or
+    // nothing at all.
+    if (userOverride?.enableFragment == true) {
       headers['tls-tricks'] = {'enable-fragment': true};
+    } else if (fragmentTricks(fragmentInput) case final tricks?) {
+      headers['tls-tricks'] = tricks;
     }
 
     headers.removeWhere(

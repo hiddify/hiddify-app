@@ -5,10 +5,12 @@ import 'package:hiddify/core/router/bottom_sheets/widgets/auto_apps_selection_mo
 import 'package:hiddify/core/router/bottom_sheets/widgets/quick_settings_modal.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
+import 'package:hiddify/features/log/overview/logs_modals.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/overview/profiles_modal.dart';
 import 'package:hiddify/features/route_rules/overview/predefined_rules_modal.dart';
+import 'package:hiddify/utils/link_parsers.dart';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -45,6 +47,15 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
         });
   }
 
+  /// The host the deep link would actually fetch from, for the confirmation
+  /// message. [url] is the deep link itself (`hiddify://import/?url=...`), so
+  /// its own host is always `import` — unwrap it to the subscription link first.
+  String _deepLinkHost(String url) {
+    final target = LinkParser.parse(url)?.url ?? url;
+    final host = Uri.tryParse(target)?.host ?? '';
+    return host.isNotEmpty ? host : target;
+  }
+
   Future<void> showAddProfile({String? url, bool triggeredByDeepLink = false}) async {
     if (url != null && triggeredByDeepLink) {
       // Preventing Zero-click SSRF
@@ -53,7 +64,7 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
           .read(dialogNotifierProvider.notifier)
           .showConfirmation(
             title: t.dialogs.confirmation.addProfileByDeepLinkWarning.title,
-            message: t.dialogs.confirmation.addProfileByDeepLinkWarning.message(host: Uri.parse(url).host),
+            message: t.dialogs.confirmation.addProfileByDeepLinkWarning.message(host: _deepLinkHost(url)),
           );
       if (isConfirmed) {
         await _show(isScrollControlled: true, child: AddProfileModal(url: url));
@@ -72,4 +83,8 @@ class BottomSheetsNotifier extends _$BottomSheetsNotifier {
 
   Future<void> showPredefinedRules() async =>
       await _show(isScrollControlled: true, child: const PredefinedRulesModal());
+
+  Future<void> showLogsShare() async => await _show(isScrollControlled: false, child: const LogsShareModal());
+
+  Future<void> showLogsRecent() async => await _show(isScrollControlled: false, child: const LogsRecentModal());
 }

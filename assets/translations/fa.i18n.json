@@ -20,14 +20,16 @@
     "url": "URL",
     "add": "افزودن",
     "clipboard": "کلیپ‌بورد",
-    "addToClipboard": "افزودن به کلیپ‌بورد",
-    "scanQr": "اسکن QR",
+    "addToClipboard": "کپی در کلیپ‌بورد",
+    "scanQr": "اسکن کد QR",
     "free": "رایگان",
     "warp": "WARP",
     "fragment": "Fragment",
     "help": "راهنما",
     "save": "ذخیره",
     "update": "به‌روزرسانی",
+    "pin": "سنجاق کردن",
+    "unpin": "برداشتن سنجاق",
     "share": "اشتراک‌گذاری",
     "edit": "ویرایش",
     "delete": "حذف",
@@ -51,7 +53,7 @@
     "sort": "مرتب‌سازی",
     "dashboard": "داشبورد",
     "disable": "غیرفعال",
-    "psiphon": "سایفون",
+    "psiphon": "Psiphon",
     "profile": "پروفایل",
     "configuration": "پیکربندی",
     "file": "فایل",
@@ -73,34 +75,34 @@
       },
       "export": {
         "clipboard": {
-          "success": "با موفقیت در کلیپ‌بورد کپی شد",
+          "success": "در کلیپ‌بورد کپی شد",
           "failure": "کپی در کلیپ‌بورد ناموفق بود",
-          "contentTooLarge": "محتوا بیش از حد بزرگ است. به جای آن از خروجی فایل استفاده کنید"
+          "contentTooLarge": "محتوا بیش از حد بزرگ است. به جای آن در یک فایل ذخیره کنید."
         },
         "file": {
-          "success": "فایل JSON با موفقیت ایجاد شد",
+          "success": "فایل JSON ایجاد شد",
           "failure": "ایجاد فایل ناموفق بود"
         }
       },
       "import": {
         "confirm": "تأیید ورود اطلاعات",
-        "success": "با موفقیت وارد شد",
+        "success": "وارد شد",
         "failure": "وارد کردن ناموفق بود"
       },
       "autoSave": {
-        "success": "تغییرات با موفقیت به‌طور خودکار ذخیره شد"
+        "success": "تغییرات به‌طور خودکار ذخیره شد"
       }
     }
   },
   "intro": {
     "banner": "هرآنچه برای اینترنت بدون محدودیت نیاز دارید",
     "termsAndPolicyCaution(rich)": "با ادامه، شما با ${tap(@:pages.about.termsAndConditions)} موافقت می‌کنید",
-    "info(rich)": "ساخته شده با ❤️ توسط هیدیفای - ${tap_source(متن‌باز)} (${tap_license(مجوز)})"
+    "info(rich)": "ساخته شده با ❤️ توسط هیدیفای. ${tap_source(متن‌باز)} و ${tap_license(مجوز)}"
   },
   "pages": {
     "home": {
       "title": "خانه",
-      "quickSettings": "گزینه‌های تنظیمات سریع"
+      "quickSettings": "تنظیمات سریع"
     },
     "proxies": {
       "title": "پروکسی‌ها",
@@ -122,8 +124,8 @@
       },
       "delay": {
         "result": "تأخیر: ${delay} میلی‌ثانیه",
-        "timeout": "تست تأخیر ناموفق بود",
-        "testing": "تأخیر: در حال تست..."
+        "timeout": "عدم پاسخ در تست تأخیر",
+        "testing": "تأخیر: در حال تست…"
       }
     },
     "profiles": {
@@ -138,26 +140,30 @@
       "failedToLoad": "بارگذاری ناموفق بود",
       "updateSubscriptions": "به‌روزرسانی اشتراک‌ها",
       "share": {
-        "urlToClipboard": "URL به کلیپ‌بورد",
-        "showUrlQr": "نمایش QR کد URL",
-        "jsonToClipboard": "JSON به کلیپ‌بورد"
+        "urlToClipboard": "کپی URL",
+        "showUrlQr": "نمایش کد QR",
+        "jsonToClipboard": "کپی JSON"
       },
       "msg": {
         "save": {
-          "success": "پروفایل با موفقیت ذخیره شد"
+          "success": "پروفایل ذخیره شد"
         },
         "invalidUrl": "URL نامعتبر است",
         "add": {
           "failure": "افزودن پروفایل ناموفق بود"
         },
         "update": {
-          "success": "پروفایل با موفقیت به‌روز شد",
-          "successNamed": "«${name}» با موفقیت به‌روز شد",
+          "success": "پروفایل به‌روز شد",
           "failure": "به‌روزرسانی پروفایل ناموفق بود",
-          "failureNamed": "به‌روزرسانی «${name}» ناموفق بود"
+          "failureNamed": "به‌روزرسانی «${name}» ناموفق بود",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count پروفایل به‌روزرسانی شد",
+            "other": "$count پروفایل به‌روزرسانی شد"
+          },
+          "bulkPartial": "${success} به‌روزرسانی شد\n${failed} ناموفق: ${names}"
         },
         "delete": {
-          "success": "پروفایل با موفقیت حذف شد"
+          "success": "پروفایل حذف شد"
         }
       }
     },
@@ -168,16 +174,31 @@
         "nameHint": "نام پروفایل",
         "emptyName": "نام الزامی است",
         "invalidUrl": "URL نامعتبر است",
-        "urlHint": "URL کامل کانفیگ",
+        "urlHint": "URL کامل پیکربندی",
         "disableAutoUpdate": "غیرفعال کردن به‌روزرسانی خودکار",
         "autoUpdateInterval": "فاصله زمانی به‌روزرسانی خودکار",
-        "loading": "در حال افزودن پروفایل..."
+        "loading": "در حال افزودن پروفایل…"
       }
     },
     "logs": {
       "title": "گزارش‌ها",
-      "shareCoreLogs": "اشتراک‌گذاری گزارش‌های هسته",
-      "shareAppLogs": "اشتراک‌گذاری گزارش‌های برنامه"
+      "category": "دسته",
+      "level": "سطح",
+      "recentLogs": "گزارش‌های اخیر",
+      "recentLogsMsg": "آنچه در این صفحه می‌بینید",
+      "errorLog": "گزارش برنامه و هسته",
+      "errorLogMsg": "خطاهای هر دو، در همه اجراها",
+      "coreLog": "گزارش هسته",
+      "coreLogMsg": "هر چه هسته ثبت کرده",
+      "coreCrash": "کرش هسته",
+      "coreCrashMsg": "آنچه هسته هنگام آخرین کرش انجام می‌داد",
+      "exportToFile": "خروجی در فایل",
+      "linesMatch": "$count خط مطابق",
+      "fileSaved": "فایل ذخیره شد",
+      "fileSaveFailed": "ذخیره فایل ممکن نشد",
+      "coreLogLevel": "سطح هسته",
+      "coreLogLevelMsg": "پس از اتصال مجدد اعمال می‌شود",
+      "buffer": "بافر"
     },
     "about": {
       "title": "درباره",
@@ -216,30 +237,28 @@
           "black": "حالت مشکی"
         },
         "enableAnalytics": "فعال‌سازی آمار",
-        "enableAnalyticsMsg": "اجازه جمع‌آوری آمار و ارسال گزارش‌های خطا برای بهبود برنامه",
+        "enableAnalyticsMsg": "ارسال آمار و گزارش‌های خطا از دستگاه شما برای کمک به بهبود برنامه",
         "autoIpCheck": "بررسی خودکار IP اتصال",
         "dynamicNotification": "نمایش سرعت در اعلان",
         "hapticFeedback": "بازخورد لرزشی",
-        "actionAtClosing": "اقدام هنگام بستن",
+        "actionAtClosing": "هنگام بستن پنجره",
         "autoStart": "شروع هنگام ورود به سیستم",
         "silentStart": "شروع در حالت کمینه",
         "ignoreBatteryOptimizations": "غیرفعال کردن بهینه‌سازی باتری",
         "ignoreBatteryOptimizationsMsg": "حذف محدودیت‌ها برای عملکرد بهینه VPN",
         "memoryLimit": "محدودیت حافظه",
         "memoryLimitMsg": "در صورت مواجهه با خطای کمبود حافظه یا بسته‌شدن‌های مکرر برنامه، این گزینه را فعال کنید",
-        "debugMode": "حالت اشکال‌زدایی",
-        "debugModeMsg": "برای اعمال این تغییر، برنامه را مجدداً راه‌اندازی کنید",
-        "logLevel": "سطح گزارش‌گیری",
         "connectionTestUrl": "URL تست اتصال",
         "urlTestInterval": "فاصله زمانی تست URL",
         "clashApiPort": "پورت Clash API",
         "useXrayCoreWhenPossible": "استفاده از xray-core در صورت امکان",
-        "useXrayCoreWhenPossibleMsg": "هنگام پردازش لینک‌های اشتراک از xray-core استفاده شود. برای فعال‌سازی این گزینه باید لینک اشتراک را مجدداً وارد کنید."
+        "useXrayCoreWhenPossibleMsg": "هنگام پردازش لینک‌های اشتراک از xray-core استفاده شود. برای روشن کردن این گزینه، اشتراک را دوباره وارد کنید."
       },
       "routing": {
         "title": "مسیریابی",
         "routeRule": {
-          "empty": "هنوز هیچ قانونی اضافه نشده است\n\nبرای ایجاد قانون جدید یا انتخاب از قوانین پیش‌فرض، روی دکمه + ضربه بزنید",
+          "empty": "هنوز قانون مسیریابی وجود ندارد\n\nقانون جدیدی ایجاد کنید یا از قوانین پیش‌فرض انتخاب کنید",
+          "add": "افزودن قانون",
           "delete": "حذف قانون",
           "create": "ایجاد قانون جدید",
           "options": {
@@ -256,22 +275,22 @@
           "rule": {
             "title": "قانون",
             "onlyTunMode": "فقط در حالت TUN در دسترس است",
-            "notAvailabeInThisPlatform": "در این پلتفرم در دسترس نیست",
+            "notAvailableInThisPlatform": "در این پلتفرم در دسترس نیست",
             "canNotBeEmpty": "نمی‌تواند خالی باشد",
             "validUrlEx": "https://example.com",
-            "validUrl": "\"URL\" معتبر مانند\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validUrl": "«URL» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validUrlEx",
             "validProcessNameEx": "Chrome.exe یا google chrome یا chrome",
-            "validProcessName": "\"نام فرآیند\" معتبر مانند\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessName": "«نام فرآیند» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
             "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
-            "validProcessPath": "\"مسیر فرآیند\" معتبر مانند\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validProcessPath": "«مسیر فرآیند» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
             "validPortRangeEx": "80 یا 1:65000",
-            "validPortRange": "\"پورت\" یا \"محدوده پورت\" معتبر مانند\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validPortRange": "«پورت» یا «محدوده پورت» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
             "validIpCidrEx": "8.8.8.8 یا 10.0.0.0/24",
             "validIpCidr": "IP CIDR معتبر مانند\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
             "validDomainEx": "Google.com یا dl.google.com",
-            "validDomain": "\"دامنه\" معتبر مانند\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomain": "«دامنه» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com یا .ir",
-            "validDomainSuffix": "\"پسوند دامنه\" معتبر مانند\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "validDomainSuffix": "«پسوند دامنه» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
             "tileTitle(map)": {
               "name": "نام",
               "outbound": "خروجی در صورت تطابق",
@@ -293,7 +312,7 @@
             "outbound(map)": {
               "proxy": "پروکسی",
               "direct": "مستقیم",
-              "direct_with_fragment": "مستقیم با فرگمنت",
+              "direct_with_fragment": "مستقیم با Fragment",
               "block": "مسدود"
             },
             "network(map)": {
@@ -315,7 +334,7 @@
             "addNew": "افزودن مقدار جدید",
             "update": "به‌روزرسانی مقدار",
             "clearList": "پاک کردن لیست",
-            "clearListMsg": "تمام موارد حذف شدند"
+            "clearListMsg": "تمام موارد حذف خواهند شد"
           }
         },
         "generalOptions": {
@@ -352,7 +371,7 @@
               "import": {
                 "clipboard": "وارد کردن انتخاب‌ها از کلیپ‌بورد",
                 "file": "وارد کردن انتخاب‌ها از فایل",
-                "msg": "وارد کردن، انتخاب‌های فعلی شما را جایگزین خواهد کرد. آیا مطمئن هستید که می‌خواهید ادامه دهید؟"
+                "msg": "وارد کردن، انتخاب‌های فعلی شما را جایگزین می‌کند. ادامه می‌دهید؟"
               },
               "export": {
                 "clipboard": "کپی انتخاب‌ها به کلیپ‌بورد",
@@ -375,14 +394,14 @@
               "resetToDefault": "بازنشانی به پیش‌فرض",
               "autoUpdateInterval": "فاصله زمانی به‌روزرسانی خودکار",
               "toast": {
-                "success": "انتخاب خودکار برنامه‌ها با موفقیت انجام شد",
+                "success": "انتخاب خودکار انجام شد",
                 "failure": "انتخاب خودکار ناموفق بود",
-                "regionNotFound": "انتخاب خودکار برای منطقه \"${region}\" یافت نشد",
+                "regionNotFound": "انتخاب خودکاری برای «${region}» وجود ندارد",
                 "alreadyInAuto": "انتخاب‌های شما از قبل در لیست خودکار موجود است"
               },
               "dialog": {
                 "title": "انتخاب خودکار برنامه‌ها",
-                "msg": "قابلیت انتخاب خودکار برای پروکسی هر برنامه به دلیل تغییر منطقه به \"${region}\" غیرفعال شد"
+                "msg": "انتخاب خودکار پروکسی هر برنامه غیرفعال شد، چون منطقه به «${region}» تغییر کرد"
               }
             }
           }
@@ -428,7 +447,7 @@
           "tun": "VPN"
         },
         "strictRoute": "مسیربندی سخت‌گیرانه",
-        "tunImplementation": "پیاده‌سازی Tun",
+        "tunImplementation": "پیاده‌سازی TUN",
         "tunImplementations": {
           "mixed": "ترکیبی",
           "system": "سیستم",
@@ -438,9 +457,7 @@
         "tproxyPort": "پورت پروکسی شفاف",
         "directPort": "پورت مستقیم",
         "redirectPort": "پورت تغییر مسیر",
-        "lanSharing": "اشتراک VPN",
-        "lanSharingPasswordNotSet": "رمز عبور تنظیم نشده",
-        "lanSharingPassword": "رمز عبور اشتراک VPN",
+        "lanSharing": "اشتراک امن VPN",
         "copyLink": "کپی لینک",
         "qrCode": "کد QR",
         "lanIPError": "خطا در دریافت آدرس IP محلی"
@@ -468,11 +485,11 @@
       "chain": {
         "title": "زنجیره",
         "subtitle": "امنیت بیشتر و رفع مسدودیت",
-        "finalIp": "آی‌پی نهایی",
+        "finalIp": "IP نهایی",
         "levels": {
           "app": {
-            "title": "اپلیکیشن",
-            "msg": "نقطه شروع: ترافیک اپلیکیشن شما از اینجا وارد زنجیره شده و از لایه‌های بعدی عبور می‌کند تا برای میان‌بر نهایی آماده شود"
+            "title": "برنامه",
+            "msg": "نقطه شروع: ترافیک برنامه شما از اینجا وارد زنجیره شده و از لایه‌های بعدی عبور می‌کند تا برای میان‌بر نهایی آماده شود"
           },
           "extraSecurity": {
             "title": "امنیت بیشتر",
@@ -483,17 +500,17 @@
           },
           "unblocker": {
             "title": "رفع مسدودیت",
-            "msg": "به دور زدن محدودیت‌های شبکه کمک می‌کند. اگر این کمکی متصل شود، پروفایل اصلی شما حتی در صورت مسدود بودن همچنان کار می‌کند"
+            "msg": "به دور زدن محدودیت‌های شبکه کمک می‌کند. اگر این کمکی متصل شود، پروفایل اصلی شما حتی در صورت مسدود بودن همچنان کار می‌کند."
           },
           "filtering": {
             "title": "فیلترینگ",
-            "msg": "خروجی نهایی: پس از عبور از لایه‌های فعال (امنیت اضافی، پروفایل اصلی یا رفع مسدودیت) و اعمال اثرات آن‌ها، ترافیک شما در نهایت برای عبور از فیلترینگ شبکه محلی مسیریابی می‌شود"
+            "msg": "خروجی نهایی: ترافیک شما از لایه‌های فعال عبور می‌کند، یعنی امنیت اضافی، پروفایل اصلی یا رفع مسدودیت. پس از اعمال اثرات آن‌ها، برای عبور از فیلترینگ شبکه محلی مسیریابی می‌شود."
           }
         },
         "warp": {
           "missingConfig": "کانفیگ WARP موجود نیست",
           "licenseKey": "کلید لایسنس",
-          "cleanIp": "آی‌پی تمیز",
+          "cleanIp": "IP تمیز",
           "port": "پورت",
           "noise": {
             "count": "تعداد نویز",
@@ -564,14 +581,17 @@
       "expireDate": "تاریخ انقضا",
       "expired": "منقضی شده",
       "noTraffic": "حجم تمام شده",
-      "remainingTime": "زمان باقی‌مانده",
-      "remainingDuration": "${duration} روز باقی‌مانده",
-      "remainingDurationNew": "${duration} روز",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days روز باقی‌مانده",
+        "other": "$days روز باقی‌مانده"
+      },
+      "remainingUnlimited": "نامحدود",
       "remainingTrafficSemanticLabel": "${consumed} از ${total} ترافیک مصرف شده",
       "remainingTraffic": "ترافیک باقی‌مانده",
-      "remainingUsage": "باقی‌مانده",
-      "profileSite": "سرویس‌دهنده",
-      "profileSupport": "پشتیبانی"
+      "openWebPage": "باز کردن صفحه وب",
+      "support": "پشتیبانی",
+      "openLinkTitle": "این لینک باز شود؟",
+      "openLinkAction": "باز کردن"
     }
   },
   "dialogs": {
@@ -580,6 +600,10 @@
       "sort": {
         "name": "بر اساس نام",
         "lastUpdate": "آخرین به‌روزرسانی"
+      },
+      "direction": {
+        "newestFirst": "جدیدترین اول",
+        "oldestFirst": "قدیمی‌ترین اول"
       }
     },
     "warpLicense": {
@@ -588,25 +612,25 @@
     },
     "psiphonLicense": {
       "title": "قرارداد لایسنس Psiphon",
-      "description(rich)": "با استفاده از Psiphon، شما با ${tos(شرایط خدمات)} موافقت کرده و ${privacy(سیاست حفظ حریم خصوصی)} را تایید می‌کنید. لطفاً پیش از ادامه، آن‌ها را با دقت بخوانید."
+      "description(rich)": "با استفاده از Psiphon، شما با ${tos(شرایط خدمات)} موافقت کرده و ${privacy(سیاست حفظ حریم خصوصی)} را تایید می‌کنید. پیش از ادامه، آن‌ها را با دقت بخوانید."
     },
     "newVersion": {
       "title": "به‌روزرسانی موجود است",
-      "msg": "نسخه جدیدی از @:common.appTitle در دسترس است. آیا مایل به به‌روزرسانی هستید؟",
-      "currentVersion": "نسخه فعلی: ",
-      "newVersion": "نسخه جدید: ",
+      "msg": "نسخه جدیدی از @:common.appTitle در دسترس است. هم‌اکنون به‌روزرسانی شود؟",
+      "currentVersion": "نسخه فعلی",
+      "newVersion": "نسخه جدید",
       "updateNow": "اکنون به‌روزرسانی کن"
     },
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "این عمل تمام تنظیمات فعلی شما را بازنویسی خواهد کرد. آیا مطمئن هستید؟"
+          "msg": "این کار تمام گزینه‌های پیکربندی را با مقادیر وارد شده بازنویسی می‌کند. ادامه می‌دهید؟"
         }
       },
       "profile": {
         "delete": {
           "title": "حذف پروفایل",
-          "msg": "آیا از حذف دائمی این پروفایل مطمئن هستید؟"
+          "msg": "این پروفایل حذف شود؟ این کار قابل بازگشت نیست."
         }
       },
       "perAppProxy": {
@@ -615,22 +639,22 @@
           "msg": "با اشتراک‌گذاری برنامه‌های انتخاب‌شده، به تکمیل لیست «انتخاب خودکار» کمک می‌کنید"
         },
         "import": {
-          "msg": "این عمل تمام انتخاب‌های فعلی شما برای پروکسی برنامه‌ها را جایگزین خواهد کرد. آیا مطمئن هستید؟"
+          "msg": "این کار تمام انتخاب‌های فعلی پروکسی هر برنامه را جایگزین می‌کند. ادامه می‌دهید؟"
         }
       },
       "routeRule": {
         "delete": {
           "title": "حذف قانون",
-          "msg": "آیا از حذف قانون «$rulename» مطمئن هستید؟"
+          "msg": "قانون «$rulename» حذف شود؟ این کار قابل بازگشت نیست."
         }
       },
       "addProfileByDeepLinkWarning": {
         "title": "افزودن پروفایل؟",
-        "message": "یک لینک خارجی از «${host}» درخواست افزودن پروفایل جدید دارد. آیا می‌خواهید آن را وارد کنید؟"
+        "message": "یک لینک خارجی از «${host}» می‌خواهد پروفایل جدیدی اضافه کند. وارد شود؟"
       },
       "importRouteRuleByDeepLinkWarning": {
         "title": "وارد کردن قانون مسیریابی؟",
-        "message": "وارد کردن قوانین مسیریابی از منابع غیرقابل اعتماد می‌تواند ریسک امنیتی باشد\nفقط در صورتی که به این لینک اعتماد دارید ادامه دهید"
+        "message": "قوانین مسیریابی تعیین می‌کنند ترافیک شما از کجا عبور کند.\nفقط از منبعی که به آن اعتماد دارید وارد کنید."
       }
     },
     "experimentalNotice": {
@@ -640,37 +664,40 @@
     },
     "noActiveProfile": {
       "title": "یک پروفایل انتخاب کنید",
-      "msg": "بیایید با افزودن یک پروفایل اتصال که شامل جزئیات اتصال VPN شماست، شروع کنیم.\n\nهنوز سرور VPN ندارید؟ نگران نباشید، با دنبال کردن راهنمای زیر می‌توانید به سرعت و رایگان یکی برای خودتان بسازید.",
+      "msg": "بیایید شروع کنیم. یک پروفایل اتصال با جزئیات سرور VPN خود اضافه کنید.\n\nهنوز سرور ندارید؟ مشکلی نیست. راهنمای زیر نشان می‌دهد چطور رایگان یکی بسازید.",
       "helpBtn": {
         "label": "راهنمایی کن",
         "url": "https://hiddify.com/manager/"
       }
     },
     "unknownDomainsWarning": {
-      "title": "هشدار لینک خارجی",
-      "youAreAboutToVisit": "شما در حال بازدید از این آدرس هستید:",
-      "thisWebsiteIsNotInOurTrustedList": "این وب‌سایت در لیست مورد اعتماد ما نیست. لطفاً با احتیاط ادامه دهید."
+      "title": "ابتدا این لینک را بررسی کنید",
+      "cannotVerify": "این لینک تأیید نشده است",
+      "avoidIfUnsure": "اگر کاملاً مطمئن نیستید، پرداخت نکنید و اطلاعات حساس به اشتراک نگذارید",
+      "ownResponsibility": "ادامه دادن با مسئولیت خودتان است",
+      "open": "باز کردن",
+      "openIn": "باز کردن (${seconds})"
     },
     "proxyInfo": {
-      "fullTag": "تگ کامل:",
-      "type": "نوع:",
-      "testTime": "زمان تست:",
-      "testDelay": "تأخیر تست:",
-      "isSelected": "انتخاب شده:",
-      "isGroup": "گروه است",
-      "isSecure": "امن است:",
-      "port": "پورت:",
-      "host": "میزبان:",
-      "ip": "IP:",
-      "countryCode": "کد کشور:",
-      "region": "منطقه:",
-      "city": "شهر:",
-      "asn": "ASN:",
-      "organization": "سازمان:",
-      "location": "مکان:",
-      "postalCode": "کد پستی:",
-      "download": "دانلود:",
-      "upload": "آپلود:"
+      "fullTag": "تگ کامل",
+      "type": "نوع",
+      "testTime": "زمان تست",
+      "testDelay": "تأخیر تست",
+      "isSelected": "انتخاب شده",
+      "isGroup": "گروه",
+      "isSecure": "امن",
+      "port": "پورت",
+      "host": "میزبان",
+      "ip": "IP",
+      "countryCode": "کد کشور",
+      "region": "منطقه",
+      "city": "شهر",
+      "asn": "ASN",
+      "organization": "سازمان",
+      "location": "مکان",
+      "postalCode": "کد پستی",
+      "download": "دانلود",
+      "upload": "آپلود"
     },
     "windowClosing": {
       "askEachTime": "هر بار بپرس",
@@ -681,26 +708,26 @@
   "connection": {
     "tapToConnect": "برای اتصال ضربه بزنید",
     "connect": "اتصال",
-    "connecting": "در حال اتصال...",
+    "connecting": "در حال اتصال…",
     "connected": "متصل شد",
     "disconnect": "قطع اتصال",
-    "disconnecting": "در حال قطع اتصال...",
+    "disconnecting": "در حال قطع اتصال…",
     "reconnect": "اتصال مجدد",
-    "reconnectMsg": "در حال اتصال مجدد برای اعمال تغییرات..."
+    "reconnectMsg": "در حال اتصال مجدد برای اعمال تغییرات…"
   },
   "errors": {
     "unexpected": "خطای غیرمنتظره",
     "connection": {
       "unexpected": "خطای غیرمنتظره در اتصال",
       "timeout": "اتصال با وقفه زمانی مواجه شد",
-      "badResponse": "پاسخ نامعتبر",
+      "badResponse": "پاسخ نامعتبر سرور",
       "connectionError": "خطای اتصال",
       "badCertificate": "گواهی‌نامه نامعتبر"
     },
     "profiles": {
       "unexpected": "خطای غیرمنتظره",
       "notFound": "پروفایل یافت نشد",
-      "invalidConfig": "کانفیگ‌های نامعتبر",
+      "invalidConfig": "پیکربندی نامعتبر",
       "invalidUrl": "URL نامعتبر",
       "canceledByUser": "توسط کاربر لغو شد"
     },
@@ -719,11 +746,11 @@
     },
     "warp": {
       "missingLicense": "لایسنس WARP لازم است",
-      "missingLicenseMsg": "پروفایل انتخاب‌شده از ویژگی WARP استفاده می‌کند؛ برای استفاده از این قابلیت، باید با لایسنس WARP موافقت شود"
+      "missingLicenseMsg": "این پروفایل از WARP استفاده می‌کند. برای ادامه، لایسنس WARP را بپذیرید."
     },
     "psiphon": {
       "missingLicense": "لایسنس Psiphon لازم است",
-      "missingLicenseMsg": "پروفایل انتخاب‌شده از ویژگی Psiphon استفاده می‌کند؛ برای استفاده از این قابلیت، باید با لایسنس Psiphon موافقت شود"
+      "missingLicenseMsg": "این پروفایل از Psiphon استفاده می‌کند. برای ادامه، لایسنس Psiphon را بپذیرید."
     }
   }
 }

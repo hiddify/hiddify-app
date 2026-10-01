@@ -1,32 +1,27 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
-import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/core/logger/core_logger.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
-import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
+import 'package:hiddify/features/log/model/log_level.dart' as config_log_level;
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
-import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
+import 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper_stub.dart'
+    if (dart.library.io) 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
-import 'package:hiddify/singbox/model/singbox_config_option.dart';
-import 'package:hiddify/features/log/model/log_level.dart' as config_log_level;
 import 'package:hiddify/singbox/model/core_status.dart';
-import 'package:hiddify/singbox/model/warp_account.dart';
-
-import 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper_stub.dart'
-    if (dart.library.io) 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper.dart';
+import 'package:hiddify/singbox/model/singbox_config_option.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:loggy/loggy.dart' as loggyl;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:logging/logging.dart' as logging;
 import 'package:rxdart/rxdart.dart';
 
 class HiddifyCoreService with InfraLogger {
@@ -38,7 +33,6 @@ class HiddifyCoreService with InfraLogger {
 
   CoreStatus currentState = const CoreStatus.stopped();
   final statusController = BehaviorSubject<CoreStatus>();
-  final logController = BehaviorSubject<List<LogMessage>>();
   final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 10000));
   final Map<String, StreamSubscription?> subscriptions = {};
   List<OutboundGroup> latest = [];
@@ -90,7 +84,7 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(() async {
       try {
         final directories = ref.read(appDirectoriesProvider).requireValue;
-        final debug = ref.read(debugModeNotifierProvider);
+        final debug = kDebugMode || ref.read(ConfigOptions.logLevel).isVerbose;
         final setupResponse = await core.setup(directories, debug, 3);
 
         if (setupResponse.isNotEmpty) {
@@ -145,6 +139,12 @@ class HiddifyCoreService with InfraLogger {
         statusController.add(currentState = const CoreStatus.stopped());
         return left(background.getCoreAlert() ?? const ConnectionFailure.unexpected("failed to start core"));
       }
+      // Armed again on every connect, not only when there are two channels.
+      // listenSingle drops a subscription for good when its stream errors, and
+      // a gRPC connection being terminated does exactly that, so a listener
+      // armed once at setup does not survive the engine restarting. Re-listening
+      // is idempotent: listenSingle cancels the previous one for the same key.
+      await startListeningLogs("fg", core.fgClient);
       if (!core.isSingleChannel()) {
         await startListeningLogs("bg", core.bgClient);
         await startListeningStatus("bg", core.bgClient);
@@ -206,7 +206,7 @@ class HiddifyCoreService with InfraLogger {
       loggy.debug("stopping");
       var errMsg = "";
       try {
-        final res = await core.bgClient.stop(Empty());
+        await core.bgClient.stop(Empty());
       } on GrpcError catch (e) {
         if (e.code == StatusCode.unknown && !(e.message?.contains("HTTP/2") ?? false)) {
           errMsg = e.message ?? "failed to stop core: $e";
@@ -361,51 +361,10 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  List<LogMessage> logBuffer = [];
-
-  // SingboxConfigOption? latestOptions;
-
-  Stream<List<LogMessage>> watchLogs(String path) async* {
-    if (!core.isInitialized()) {
-      loggy.debug("core is not initialized, returning empty log stream");
-      return;
-    }
-    await startListeningLogs("bg", core.bgClient);
-    await startListeningLogs("fg", core.fgClient);
-    try {
-      yield* logController.stream;
-    } catch (e) {
-      loggy.error("error watching logs: $e");
-      rethrow;
-    }
-    // Stream<List<String>> logStream(CoreClient coreClient) {
-    //   return coreClient.logListener(Empty()).asBroadcastStream().map((event) => [event.message]).onErrorResume((error, stackTrace) {
-    //     loggy.debug('Error in $coreClient: $error, retrying...');
-    //     final delay = (currentState == const SingboxStatus.stopped()) ? 5 : 1;
-    //     return const Stream<List<String>>.empty().delay(Duration(seconds: delay)).concatWith([logStream(coreClient)]);
-    //   });
-    // }
-
-    // // Create streams for both fg and bg clients with retry logic
-    // final fgLogStream = logStream(core.fgClient);
-
-    // if (core.bgClient == core.fgClient) {
-    //   yield* fgLogStream;
-    //   return;
-    // }
-    // final bgLogStream = logStream(core.bgClient);
-    // yield* MergeStream([bgLogStream, fgLogStream]);
-  }
-
-  TaskEither<String, Unit> clearLogs() {
-    return TaskEither(() async {
-      loggy.debug("clearing logs");
-      logBuffer.clear();
-      // final res = await core.bgClient(Empty());
-      // if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
-      return right(unit);
-    });
-  }
+  // The 300-message buffer and its BehaviorSubject are gone. They existed so
+  // the logs page could show history when it opened, and only ever held the
+  // engine's lines. The in-memory ring in core/logger does that for every
+  // category, so the page reads it instead.
 
   // TaskEither<String, WarpResponse> generateWarpConfig({
   //   required String licenseKey,
@@ -481,15 +440,10 @@ class HiddifyCoreService with InfraLogger {
     await listenSingle<LogMessage>(listenKey, () {
       return cc.logListener(LogRequest(level: coreLogLevel), options: grpcOptions).map((event) {
         // Handle incoming event
-        logBuffer.add(event);
-        if (logBuffer.length > 300) {
-          logBuffer.removeAt(0);
-        }
-        logController.add(logBuffer);
-        // loggy.log(getLogLevel(event.level), event.message);
-        event.message.split('\n').forEach((line) {
-          loggy.log(getLogLevel(event.level), line);
-        });
+        // One message becomes one record. The old code split on newlines
+        // first, but the engine already sends one line per message, so the
+        // split only allocated a list and multiplied the work per burst.
+        coreLogFor(event.type).log(getLogLevel(event.level), event.message);
         return event;
       });
     });
@@ -527,7 +481,7 @@ class HiddifyCoreService with InfraLogger {
       },
       cancelOnError: true,
       onError: (error) {
-        loggy.log(loggyl.LogLevel.error, 'Stream error: $error');
+        loggy.error('Stream error: $error');
         onError?.call(error);
         subscriptions[key]?.cancel();
         subscriptions.remove(key);
@@ -536,14 +490,21 @@ class HiddifyCoreService with InfraLogger {
     return subscriptions[key] as StreamSubscription<T>?;
   }
 
-  loggyl.LogLevel getLogLevel(LogLevel level) {
+  /// Six engine levels onto six logging levels, nothing merged.
+  ///
+  /// TRACE used to have no case here and fell into the default, so trace lines
+  /// arrived looking as important as info and could not be filtered out. FATAL
+  /// used to collapse into error because loggy had nothing above it.
+  logging.Level getLogLevel(LogLevel level) {
     return switch (level) {
-      LogLevel.DEBUG => loggyl.LogLevel.debug,
-      LogLevel.INFO => loggyl.LogLevel.info,
-      LogLevel.WARNING => loggyl.LogLevel.warning,
-      LogLevel.ERROR => loggyl.LogLevel.error,
-      LogLevel.FATAL => loggyl.LogLevel.error,
-      _ => loggyl.LogLevel.info, // Default case
+      LogLevel.TRACE => logging.Level.FINEST,
+      LogLevel.DEBUG => logging.Level.FINE,
+      LogLevel.INFO => logging.Level.INFO,
+      LogLevel.WARNING => logging.Level.WARNING,
+      LogLevel.ERROR => logging.Level.SEVERE,
+      LogLevel.FATAL => logging.Level.SHOUT,
+      // the proto enum is a generated class, so a default is unavoidable
+      _ => logging.Level.INFO,
     };
   }
 
@@ -556,6 +517,7 @@ class HiddifyCoreService with InfraLogger {
       config_log_level.LogLevel.error => LogLevel.ERROR,
       config_log_level.LogLevel.fatal => LogLevel.FATAL,
       config_log_level.LogLevel.panic => LogLevel.FATAL,
+      // ignore: unreachable_switch_case
       _ => LogLevel.INFO, // Default case
     };
   }
@@ -567,12 +529,18 @@ class HiddifyCoreService with InfraLogger {
     if (!core.isSingleChannel()) {
       await stopListenSingle("fg");
       await stopListenSingle("bg");
+      // Only one of the two modes matches how the channel was opened, so the
+      // other one always throws. Both are attempted and the failure is logged.
       try {
         await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL_INSECURE));
-      } catch (e) {}
+      } catch (e) {
+        loggy.debug("closing fg client in insecure mode failed: $e");
+      }
       try {
         await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL));
-      } catch (e) {}
+      } catch (e) {
+        loggy.debug("closing fg client in normal mode failed: $e");
+      }
     }
   }
 

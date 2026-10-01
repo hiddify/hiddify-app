@@ -5,6 +5,7 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:meta/meta.dart';
 import 'package:neat_periodic_task/neat_periodic_task.dart';
@@ -84,32 +85,46 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
           )
           .first;
 
-      await for (final profile in Stream.fromIterable(remoteProfiles)) {
+      final toUpdate = remoteProfiles.where((profile) {
         final updateInterval = profile.options?.updateInterval;
-        if (force || updateInterval != null && updateInterval <= DateTime.now().difference(profile.lastUpdate)) {
-          final t = ref.read(translationsProvider).requireValue;
-          await ref
-              .read(profileRepositoryProvider)
-              .requireValue
-              .upsertRemote(profile.url)
-              .mapLeft((l) {
-                loggy.debug("error updating profile [${profile.id}]", l);
-                ref
-                    .read(inAppNotificationControllerProvider)
-                    .showErrorToast(t.pages.profiles.msg.update.failureNamed(name: profile.name));
-                state = AsyncData((name: profile.name, success: false));
-              })
-              .map((_) {
-                loggy.debug("profile [${profile.id}] updated successfully");
-                ref
-                    .read(inAppNotificationControllerProvider)
-                    .showSuccessToast(t.pages.profiles.msg.update.successNamed(name: profile.name));
-                state = AsyncData((name: profile.name, success: true));
-              })
-              .run();
-        } else {
+        final shouldUpdate =
+            force || updateInterval != null && updateInterval <= DateTime.now().difference(profile.lastUpdate);
+        if (!shouldUpdate) {
           loggy.debug(
             "skipping profile [${profile.id}] update. last successful update: [${profile.lastUpdate}] - interval: [${profile.options?.updateInterval}]",
+          );
+        }
+        return shouldUpdate;
+      }).toList();
+
+      var successCount = 0;
+      final failedNames = <String>[];
+      // Sequential on purpose: validation and the active-profile reconnect share
+      // one native core that is not safe to call concurrently (it can hang).
+      for (final profile in toUpdate) {
+        await ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile, isBulk: true);
+        if (ref.read(updateProfileNotifierProvider(profile.id)).hasError) {
+          failedNames.add(profile.name);
+        } else {
+          successCount++;
+        }
+      }
+
+      if (successCount > 0 || failedNames.isNotEmpty) {
+        final t = ref.read(translationsProvider).requireValue;
+        final notification = ref.read(inAppNotificationControllerProvider);
+        if (failedNames.isEmpty) {
+          notification.showSuccessToast(t.pages.profiles.msg.update.bulkSuccess(count: successCount));
+        } else {
+          // Longer duration so the user has time to read the failed names.
+          final seconds = failedNames.length >= 5 ? 15 : 5 + failedNames.length * 2;
+          notification.showErrorToast(
+            t.pages.profiles.msg.update.bulkPartial(
+              success: successCount,
+              failed: failedNames.length,
+              names: failedNames.join(", "),
+            ),
+            duration: Duration(seconds: seconds),
           );
         }
       }
