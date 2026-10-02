@@ -112,7 +112,7 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
         }
 
         if (options.autoRoute) {
-            builder.addDnsServer(options.dnsServerAddress.value)
+            builder.addDnsServer(options.dnsServerAddress)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val inet4RouteAddress = options.inet4RouteAddress
@@ -216,5 +216,8 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
     override fun sendNotification(notification: Notification) {
 //        service.sendNotification(notification)
+    }
+
+    override fun cancelNotification(identifier: String?, typeID: Int) {
     }
 }
