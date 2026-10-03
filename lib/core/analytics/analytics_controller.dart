@@ -16,11 +16,15 @@ const String enableAnalyticsPrefKey = "enable_analytics";
 
 bool _testCrashReport = false;
 
+bool readAnalyticsEnabled(SharedPreferences preferences) {
+  return preferences.getBool(enableAnalyticsPrefKey) ?? false;
+}
+
 @Riverpod(keepAlive: true)
 class AnalyticsController extends _$AnalyticsController with AppLogger {
   @override
   Future<bool> build() async {
-    return _preferences.getBool(enableAnalyticsPrefKey) ?? true;
+    return readAnalyticsEnabled(_preferences);
   }
 
   SharedPreferences get _preferences => ref.read(sharedPreferencesProvider).requireValue;

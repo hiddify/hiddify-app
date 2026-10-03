@@ -13,7 +13,9 @@ jobs:
   build-release:
     uses: ./.github/workflows/build.yml
     secrets: inherit
-    permissions: write-all
+    permissions:
+      actions: read
+      contents: write
     with:
       upload-artifact: true
       tag-name: "${{ github.ref_name }}"

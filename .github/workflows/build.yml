@@ -35,6 +35,8 @@ env:
 
 jobs:
   test:
+    permissions:
+      contents: read
     outputs:
       draftBuildCode: ${{ steps.draftBuildCode.outputs.datetime }}
     runs-on: ubuntu-latest
@@ -45,9 +47,16 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
           cache: true
-          
+
+      - name: Validate iOS release configuration
+        run: python3 .github/scripts/validate_ios_release_config.py
+
       - name: Prepare
         run: make linux-amd64-prepare
+
+      - name: Analyze Dart and Flutter sources
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
       - name: Test
         run: flutter test
 
@@ -58,8 +67,9 @@ jobs:
 
   build:
     needs: test
-    permissions: write-all
-    continue-on-error: true
+    permissions:
+      contents: read
+    continue-on-error: ${{ matrix.platform != 'ios' }}
 
     strategy:
       fail-fast: false
@@ -108,11 +118,11 @@ jobs:
             aarch: universal
             targets: dmg,pkg
             
-          # - platform: ios
-          #   os: macos-15
-          #   aarch: universal
-          #   filename: hiddify-ios
-          #   targets: ipa
+          - platform: ios
+            os: macos-26
+            aarch: universal
+            filename: hiddify-ios
+            targets: ipa
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
@@ -251,14 +261,34 @@ jobs:
 
 
       - name: Build ${{ matrix.platform }}
+        if: (matrix.platform != 'ios' && matrix.platform != 'windows') || inputs.upload-artifact
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           make ${{ matrix.platform }}-release
 
+      - name: Validate iOS without code signing
+        if: matrix.platform == 'ios' && !inputs.upload-artifact
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make ios-validate
+
+      - name: Smoke test production app in iOS Simulator
+        if: matrix.platform == 'ios' && !inputs.upload-artifact
+        timeout-minutes: 30
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: bash .github/scripts/smoke_test_ios_simulator.sh
+
+      - name: Validate Windows without code signing
+        if: matrix.platform == 'windows' && !inputs.upload-artifact
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make windows-validate
+
       - name: Code Sign
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
-        uses: hiddify/signtool-code-sign-sha256@main
+        uses: hiddify/signtool-code-sign-sha256@edf131ad76c36ab1a9b468cdfa02acafd8a2a499
         with:
           certificate: '${{ secrets.WINDOWS_SIGNING_KEY }}'
           cert-password: '${{ secrets.WINDOWS_SIGNING_PASSWORD }}'
@@ -269,7 +299,7 @@ jobs:
           description: 'Hiddify'
 
       - name: Copy to out Windows
-        if: matrix.platform == 'windows'
+        if: matrix.platform == 'windows' && inputs.upload-artifact
         shell: pwsh
         run: |
           Get-ChildItem -Path dist -Recurse | Select-Object FullName
@@ -321,7 +351,7 @@ jobs:
           cp ./build/app/outputs/bundle/release/app-release.aab out/hiddify-android-market.aab || echo "no aab"
 
       - name: Copy to out unix
-        if: startsWith(matrix.platform,'linux') || matrix.platform == 'macos' || matrix.platform == 'ios'
+        if: startsWith(matrix.platform,'linux') || matrix.platform == 'macos' || (matrix.platform == 'ios' && inputs.upload-artifact)
         run: |
           ls -R dist/
           mkdir out
@@ -352,6 +382,10 @@ jobs:
             fi
           done
 
+      - name: Verify signed iOS IPA
+        if: ${{ inputs.upload-artifact && matrix.platform == 'ios' }}
+        run: python3 .github/scripts/verify_signed_ipa.py out/Hiddify-iOS.ipa
+
       - name: Upload Artifact
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@v6
@@ -366,7 +400,6 @@ jobs:
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db ||echo ok
           rm ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision ||echo ok
   update-draft:
-    permissions: write-all
     if: ${{ inputs.upload-artifact }}
     needs: [build]
     runs-on: ubuntu-latest
@@ -390,7 +423,7 @@ jobs:
         working-directory: ./out
 
       - name: Delete Current Release Assets
-        uses: 8Mi-Tech/delete-release-assets-action@main
+        uses: 8Mi-Tech/delete-release-assets-action@71a740cf4364bc69448e0294b8abadffadfb3288
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tag: 'draft'
@@ -402,7 +435,7 @@ jobs:
           set +e 
           sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md > release.md
           pip install gitchangelog pystache mustache markdown
-          prelease=$(curl --silent "https://api.github.com/repos/hiddify/hiddify-app/releases/latest" | grep -Po '"tag_name": "\K([^"]*)') 
+          prelease=$(curl --silent "${{ github.api_url }}/repos/${{ github.repository }}/releases/latest" | grep -Po '"tag_name": "\K([^"]*)')
           echo -e "\n\n<details markdown=1><summary>All changes from $current to the latest commit:</summary>\n\n">>release.md
           gitchangelog "${prelease}.." >> release.md  2>&1 || echo "Error in gitchangelog"
           echo -e "\n\n</details>">>release.md
@@ -417,22 +450,7 @@ jobs:
           body_path: './release.md'
           prerelease: true
 
-      - name: Create or Update Draft Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_FOR_HIDDIFY_APP_REPO }}
-          GITHUB_REPOSITORY: hiddify/hiddify-app
-        with:
-          files: ./out/*
-          name: 'draft'
-          tag_name: 'draft'
-          body_path: './release.md'
-          target_commitish: '530bf77839a74d4f13847ba244a20734ac7ab119'
-          prerelease: true
-          repository: hiddify/hiddify-app
-
   upload-release:
-    permissions: write-all
     if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
     needs: [build]
     runs-on: ubuntu-latest
@@ -485,9 +503,12 @@ jobs:
 
   upload-to-testflight:
     needs: [build]
+    permissions:
+      actions: read
+      contents: read
     if: ${{ inputs.upload-artifact &&  inputs.tag-name != 'draft' }}
     #if: ${{ inputs.upload-artifact }}
-    runs-on: macOS-latest
+    runs-on: macos-26
     timeout-minutes: 30
     steps:
       - name: Download Artifact
@@ -496,32 +517,6 @@ jobs:
           merge-multiple: true
           pattern: "*ios*"
           path: ./out/
-
-      - uses: Apple-Actions/import-codesign-certs@v6
-        with:
-          p12-file-base64: ${{ secrets.APPLE_UPLOAD_CERTIFICATE_P12 }}
-          p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
-
-      - uses: Apple-Actions/download-provisioning-profiles@v1
-        with:
-          bundle-id: app.hiddify.com
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-      - uses: Apple-Actions/download-provisioning-profiles@v1
-        with:
-          bundle-id: app.hiddify.com.SingBoxPacketTunnel
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-  
-
-
-      - name: Import Apple Mobile Provisioning Profile
-        run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{secrets.APPLE_DIST_PROVISIONING_PROFILES_TARGZ_BASE64}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
-        #echo "${{secrets.NEW_APPLE_STORE_PROVISIONING_PROFILES_TARXZ_BASE64}}"|base64 --decode | tar xJ -C ~/Library/MobileDevice/Provisioning\ Profiles
 
       - uses: Apple-Actions/upload-testflight-build@v4
         with:

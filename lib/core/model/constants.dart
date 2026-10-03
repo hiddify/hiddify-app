@@ -57,10 +57,12 @@ abstract class ProfileTileConst {
 abstract class IntroConst {
   static const maxwidth = 620;
   static const termsAndConditionsKey = 'terms-and-conditions';
+  static const privacyPolicyKey = 'privacy-policy';
   static const githubKey = 'github';
   static const licenseKey = 'license';
   static const url = <String, String>{
     IntroConst.termsAndConditionsKey: Constants.termsAndConditionsUrl,
+    IntroConst.privacyPolicyKey: Constants.privacyPolicyUrl,
     IntroConst.githubKey: Constants.githubUrl,
     IntroConst.licenseKey: Constants.licenseUrl,
   };

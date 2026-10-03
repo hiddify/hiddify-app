@@ -27,8 +27,14 @@ jobs:
   run:
     uses: ./.github/workflows/build.yml
     secrets: inherit
-    permissions: write-all
+    permissions:
+      actions: read
+      contents: read
     if: "${{!contains(github.event.head_commit.message, 'release: version')}}"
     with:
-      upload-artifact: ${{ github.event_name == 'push' }}
+      # Signing credentials are only exposed to tag-triggered release builds.
+      # CI compiles the same pinned production core and entry point as a stable
+      # release, but without signing.
+      upload-artifact: false
+      channel: prod
       
