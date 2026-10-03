@@ -1,7 +1,6 @@
 <div dir="ltr" align=center>
-
-[**![Lang_farsi](https://user-images.githubusercontent.com/125398461/234186932-52f1fa82-52c6-417f-8b37-08fe9250a55f.png) فارسی**](README_fa.md) / [**Русский 🇷🇺**](README_ru.md) / [**简体中文 🇨🇳**](README_cn.md) / [**English 🇺🇸**](README.md) / [**Portugês-BR 🇧🇷**](README_br.md) / [**ไทย 🇹🇭**](README_th.md)
-
+    
+[**![Lang_farsi](https://user-images.githubusercontent.com/125398461/234186932-52f1fa82-52c6-417f-8b37-08fe9250a55f.png) فارسی**](README_fa.md) / [**English 🇺🇸**](README.md) / [**Русский 🇷🇺**](README_ru.md) / [**简体中文 🇨🇳**](README_cn.md) / [**日本語 🇯🇵**](README_ja.md) / [**Portugês-BR 🇧🇷**](README_br.md)
 
 </div>
 <br>
@@ -14,7 +13,7 @@
 <!--
 ![Hiddify logo + text](https://github.com/hiddify/hiddify-app/assets/125398461/d821cfe0-b4c4-441f-be4e-eb9209f59542)
     -->
-
+    
 [![GP-Intalls](https://img.shields.io/endpoint?color=green&logo=google-play&logoColor=green&url=https%3A%2F%2Fplay.cuzi.workers.dev%2Fplay%3Fi%3Dapp.hiddify.com%26l%3DGoogle%2520Play%26m%3D%24shortinstalls&style=flat-square)](https://play.google.com/store/apps/details?id=app.hiddify.com) [![Downloads](https://img.shields.io/github/downloads/hiddify/hiddify-next/total?style=flat-square&logo=github)](https://github.com/hiddify/hiddify-app/releases/)[![Last Version](https://img.shields.io/github/release/hiddify/hiddify-next/all.svg?style=flat-square)](https://github.com/hiddify/hiddify-app/releases/)[![Last Release Date](https://img.shields.io/github/release-date/hiddify/hiddify-next.svg?style=flat-square)](https://github.com/hiddify/hiddify-app/releases/)[![commits](https://img.shields.io/github/commit-activity/m/hiddify/hiddify-next?style=flat-square)](https://github.com/hiddify/hiddify-app/)
 [![Youtube](https://img.shields.io/youtube/channel/views/UCxrmeMvVryNfB4XL35lXQNg?label=Youtube&style=flat-square&logo=youtube)](https://www.youtube.com/@hiddify)[![Telegram Channel](https://img.shields.io/endpoint?label=Channel&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fhiddify&color=blue)](https://telegram.dog/hiddify)[![Telegram Group](https://img.shields.io/endpoint?color=neon&label=Support%20Group&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fhiddify_board)](https://telegram.dog/hiddify_board/5)
 
@@ -23,62 +22,59 @@
 
 
 
-## Hiddify app とは？
+## Hiddify คืออะไร?
 
-<p dir="ltr" style="font-size: 16px"><a href="https://github.com/SagerNet/sing-box">Sing-box</a> ユニバーサルプロキシツールチェーンに基づくマルチプラットフォームプロキシクライアントです。Hiddify は、自動ノード選択、TUN モード、リモートプロファイルなど、幅広い機能を提供します。Hiddify は無料でオープンソースです。幅広いプロトコルをサポートし、無料インターネットにアクセスするための安全でプライベートな方法を提供します。</p>
+<p dir="ltr" style="font-size: 16px">โปรแกรมพร็อกซีไคลเอนต์ที่ใช้งานได้หลายแพลตฟอร์ม พัฒนาบนชุดเครื่องมือพร็อกซีอเนกประสงค์ <a href="https://github.com/SagerNet/sing-box">Sing-box</a> Hiddify มีความสามารถหลากหลาย เช่น การเลือกโหนดอัตโนมัติ โหมด TUN โปรไฟล์ระยะไกล ฯลฯ Hiddify ไม่มีโฆษณาและเป็นโอเพนซอร์ส รองรับโปรโตคอลที่หลากหลาย ช่วยให้คุณเข้าถึงอินเทอร์เน็ตอย่างเสรีได้อย่างปลอดภัยและเป็นส่วนตัว</p>
 
 <div align=center>
 <img width=90% alt="English Demo" src="https://github.com/hiddify/hiddify-app/assets/125398461/ffe5346d-3404-470f-b5e0-4364e23743d2">
 
 </div>
 
-## 🚀 主な特徴
+## 🚀 ฟีเจอร์หลัก
 
-✈️ マルチプラットフォーム: Android、iOS、Windows、macOS 及び Linux
+✈️ รองรับหลายแพลตฟอร์ม: Android, iOS, Windows, macOS และ Linux
 
-⭐ 直感的でアクセシブルな UI
+⭐ หน้าจอใช้งานง่ายและเข้าถึงได้สะดวก
 
-🔍 遅延に基づいたノード選択
+🔍 เลือกโหนดตามความหน่วง (Delay)
 
-🟡 幅広いプロトコル:
-Vless、Vmess、Reality、TUIC、Hysteria、Wireguard、SSH など。
+🟡 รองรับโปรโตคอลหลากหลาย:
+Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH ฯลฯ
 
-🟡 サブスクリプションのリンクと設定フォーマット
+🟡 รองรับลิงก์การสมัครใช้งานและรูปแบบการกำหนดค่า: Sing-box, V2ray, Clash, Clash meta
 
-🔄 サブスクリプションの自動更新
+🔄 อัปเดตการสมัครใช้งานอัตโนมัติ
 
-🔎 残り日数やトラフィック使用量などのプロフィール情報を表示
+🔎 แสดงข้อมูลโปรไฟล์ รวมถึงจำนวนวันที่เหลือและปริมาณการใช้ทราฟฟิก
 
-🛡 オープンソース、セキュア、そしてコミュニティドリブン
+🛡 โอเพนซอร์ส ปลอดภัย และขับเคลื่อนโดยชุมชน
 
-🌙 ダークモードとライトモード
+🌙 รองรับโหมดมืดและโหมดสว่าง
 
-⚙ 全てのプロキシ管理パネルに対応
+⚙ ใช้งานร่วมกับแผงจัดการพร็อกซีได้ทุกรูปแบบ
 
-⭐ イラン、中国、ロシア、その他の国に適した構成
+⭐ มีการกำหนดค่าที่เหมาะสมสำหรับอิหร่าน จีน รัสเซีย และประเทศอื่นๆ
 
-📱公式ストアで購入可能
+📱 มีให้ดาวน์โหลดบนสโตร์อย่างเป็นทางการ
 
-## 🛍️ 店舗で入手
-
-<a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone"><img height=50px src="https://github.com/user-attachments/assets/a7c62126-07ce-4f18-8197-bbb672f6d8be"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://play.google.com/store/apps/details?id=app.hiddify.com"><img height=50px src="https://github.com/hiddify/hiddify-next/blob/main/docs/google-play-badge.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://apps.microsoft.com/detail/Hiddify/9pdfnl3qv2s5?mode=mini" target="_blank"><img height=50px src="https://github.com/hiddify/hiddify-next/assets/125398461/620750bb-4459-41b5-9f86-ba82119345b8" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+## 🛍️ ดาวน์โหลดจากสโตร์
+<a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone"><img height=50px src="https://github.com/user-attachments/assets/a7c62126-07ce-4f18-8197-bbb672f6d8be"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=app.hiddify.com"><img height=50px src="https://github.com/hiddify/hiddify-next/blob/main/docs/google-play-badge.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://apps.microsoft.com/detail/Hiddify/9pdfnl3qv2s5?mode=mini" target="_blank"><img height=50px src="https://github.com/hiddify/hiddify-next/assets/125398461/620750bb-4459-41b5-9f86-ba82119345b8" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 
-## 📥 直接ダウンロード
+## 📥 ดาวน์โหลดโดยตรง
 
 <div align=left>
 <table>
     <thead align=left>
         <tr>
-            <th>OS</th>
-            <th>ダウンロード</th>
+            <th>ระบบปฏิบัติการ</th>
+            <th>ดาวน์โหลด</th>
         </tr>
     </thead>
     <tbody align=left>
         <tr>
-            <td>iOS</td>
+        <td>iOS</td>
             <td>
                 <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-iOS.ipa"><img src="https://img.shields.io/badge/IPA-Universal-c0c0c0.svg?logo=ios"></a>
             </td>
@@ -122,9 +118,9 @@ Vless、Vmess、Reality、TUIC、Hysteria、Wireguard、SSH など。
 
 </div>
 
-## ⚙️ インストールとチュートリアル
+## ⚙️ การติดตั้งและคู่มือการใช้งาน
 
-**チュートリアル情報は、下の画像をクリックしてウィキのページをご覧ください。**
+**ดูคู่มือการใช้งานได้ที่หน้า Wiki ของเราโดยคลิกที่รูปภาพด้านล่าง**
 
 <div align="center">
 
@@ -133,13 +129,15 @@ Vless、Vmess、Reality、TUIC、Hysteria、Wireguard、SSH など。
 
 </div>
 
-## 🌎 翻訳
+## 🌎 การแปลภาษา
 
-インストールとチュートリアル `/assets/translations` にある JSON ファイルを手動で編集するか、[Inlang オンラインエディタ](https://fink.inlang.com/editor/github.com/hiddify/hiddify-app)を使って、既存の言語を改良したり、新しい言語を追加したりすることができます。
+    
+คุณสามารถช่วยปรับปรุงภาษาที่มีอยู่หรือเพิ่มภาษาใหม่ได้ โดยแก้ไขไฟล์ JSON ใน `/assets/translations` หรือ [![Translate with Inlang](https://img.shields.io/badge/%20-%20-3ECF8E?logo=i18next&logoColor=white)](https://fink.inlang.com/github.com/hiddify/hiddify-app) ใช้ [Inlang online editor](https://fink.inlang.com/github.com/hiddify/hiddify-app)    
 
-## ✏️ 謝辞
 
-堅牢な基盤と革新的な機能により、このプロジェクトの成功と機能性を大幅に向上させた、以下のプロジェクトのコントリビューターに心から感謝の意を表します。
+## ✏️ กิตติกรรมประกาศ
+
+เราขอขอบคุณผู้มีส่วนร่วมในโปรเจคต่อไปนี้อย่างจริงใจ ซึ่งรากฐานที่แข็งแกร่งและฟีเจอร์ที่เป็นนวัตกรรมของโปรเจคเหล่านี้ได้ช่วยเสริมให้โปรเจคนี้ประสบความสำเร็จและมีความสามารถมากยิ่งขึ้น
 
 - [Sing-box](https://github.com/SagerNet/sing-box)
 - [Sing-box for Android](https://github.com/SagerNet/sing-box-for-android)
@@ -147,15 +145,15 @@ Vless、Vmess、Reality、TUIC、Hysteria、Wireguard、SSH など。
 - [Clash](https://github.com/Dreamacro/clash)
 - [Clash Meta](https://github.com/MetaCubeX/Clash.Meta)
 - [FClash](https://github.com/Fclash/Fclash)
-- [Saber Rastikerdar による Vazirmatn フォント](https://github.com/rastikerdar/vazirmatn)
-- [その他](./pubspec.yaml)
+- [Vazirmatn Font by Saber Rastikerdar](https://github.com/rastikerdar/vazirmatn)
+- [อื่นๆ](./pubspec.yaml)
 
-## 🎯 寄付とサポート
+## 🎯 การบริจาคและการสนับสนุน
 
-最も簡単な支援方法は、このページの上部にある star（⭐）をクリックすることです。
+วิธีที่ง่ายที่สุดในการสนับสนุนเราคือกดดาว (⭐) ที่ด้านบนของหน้านี้
 
 <div align=center>
-
+    
 <a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=643504282" target="_blank" style="display: block" align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=dark" width="721" height="auto">
@@ -165,11 +163,11 @@ Vless、Vmess、Reality、TUIC、Hysteria、Wireguard、SSH など。
 
 </div>
 
-また、私たちのサービスには財政的な支援も必要です。私たちの活動はすべて自発的に行われており、経済的支援はプロジェクトの発展に費やされます。私たちのサポートアドレスは[こちら](https://hiddify.com/donation-and-support/)からご覧いただけます。
+เรายังต้องการการสนับสนุนทางการเงินสำหรับบริการของเรา กิจกรรมทั้งหมดของเราทำด้วยความสมัครใจ และเงินสนับสนุนจะนำไปใช้ในการพัฒนาโปรเจค คุณสามารถดูช่องทางการสนับสนุนได้[ที่นี่](https://hiddify.com/donation-and-support/)
 
-## 👩‍🏫 コラボレーションおよび連絡先
+## 👩‍🏫 การร่วมพัฒนาและช่องทางการติดต่อ
 
-Hiddify はコミュニティドリブンのプロジェクトです。コントリビュートすることに興味がある方は、[コントリビューションガイドライン](./CONTRIBUTING.md)をお読みください。私たちは特に以下の分野において、どのような協力でもいただけるとありがたいです: **Flutter、Go、iOS開発（Swift）、Androi d開発（Kotlin）。**
+Hiddify เป็นโปรเจคที่ขับเคลื่อนโดยชุมชน หากคุณสนใจร่วมพัฒนา โปรดอ่าน[แนวทางการร่วมพัฒนา](./CONTRIBUTING.md) เรายินดีเป็นอย่างยิ่งหากได้รับความช่วยเหลือในด้านต่อไปนี้: **Flutter, Go, การพัฒนา iOS (Swift), การพัฒนา Android (Kotlin)**
 
 <div align=center>
 
@@ -184,14 +182,21 @@ Hiddify はコミュニティドリブンのプロジェクトです。コント
 </div>
 
 <p align=center>
- このプロジェクトに参加してくれているすべての人に感謝しております。ここにいる人たちもいるし、GitHub の外にもたくさんいます。それは私たちにとって大きな意味があります。 ♥
+ เราขอขอบคุณทุกคนที่มีส่วนร่วมในโปรเจคนี้ ทั้งผู้ที่อยู่ที่นี่และอีกมากมายนอก GitHub ซึ่งมีความหมายกับเรามาก ♥
  </p>
-
-<p align=center>
+ 
+<p align=center> 
 <a href="https://github.com/hiddify/hiddify-app/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=hiddify/hiddify-next" />
 </a>
 </p>
 <p align=center>
- <a rel="" target="_blank" href="https://contrib.rocks">Contrib.Rocks</a> で作成。
+ สร้างด้วย <a rel="" target="_blank" href="https://contrib.rocks">Contrib.Rocks</a> 
 </p>
+
+
+
+
+
+
+
