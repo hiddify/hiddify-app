@@ -35,6 +35,11 @@ class ProfileParser {
   // See https://github.com/hiddify/hiddify-app/issues/1974 . 1000 TiB.
   static const infiniteTrafficThreshold = 1_099_511_627_776_000;
   static const infiniteTimeThreshold = 92_233_720_368;
+
+  // 2001-09-09. Panels that report a relative duration (days/hours) produce values far below this,
+  // and anything above the upper bound overflows the millisecond arithmetic below.
+  static const minimumExpireTimestamp = 1_000_000_000;
+  static const maximumExpireTimestamp = 253_402_300_799;
   static const allowedOverrideConfigs = [
     'connection-test-url',
     'direct-dns-address',
@@ -288,10 +293,13 @@ class ProfileParser {
 
   static SubscriptionInfo? _parseSubscriptionInfo(String subInfoStr) {
     final values = subInfoStr.split(';');
-    final map = {for (final v in values) v.split('=').first.trim(): num.tryParse(v.split('=').second.trim())?.toInt()};
+    final map = <String, int?>{
+      for (final v in values)
+        if (v.contains('=')) v.split('=').first.trim(): num.tryParse(v.split('=').last.trim())?.toInt(),
+    };
     if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
       final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
-      expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
+      expire = (expire == null || !_isPlausibleExpire(expire)) ? infiniteTimeThreshold : expire;
       return SubscriptionInfo(
         upload: upload,
         download: download,
@@ -300,6 +308,18 @@ class ProfileParser {
       );
     }
     return null;
+  }
+
+  /// The convention defines `expire` as a UNIX timestamp in seconds, but panels in the wild also send
+  /// `0` (never), a negative sentinel, or a duration in days/hours instead of an absolute instant.
+  /// Feeding a days value to `fromMillisecondsSinceEpoch` yields a 1970 date, so a perfectly valid
+  /// subscription renders as "Expired". Treat anything that cannot be an absolute instant as "never".
+  static bool _isPlausibleExpire(int seconds) {
+    if (seconds <= 0) return false;
+    // Smallest timestamp any client is deployed with; anything below is a relative value, not an instant.
+    if (seconds < minimumExpireTimestamp) return false;
+    // `expire * 1000` must stay inside the millisecond range DateTime can represent.
+    return seconds <= maximumExpireTimestamp;
   }
 
   @visibleForTesting
