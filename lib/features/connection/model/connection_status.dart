@@ -23,6 +23,11 @@ sealed class ConnectionStatus with _$ConnectionStatus {
     _ => false,
   };
 
+  bool get canRestoreConnection => switch (this) {
+    Disconnected(connectionFailure: null) => true,
+    _ => false,
+  };
+
   bool get isSwitching => switch (this) {
     Connecting() => true,
     Disconnecting() => true,
