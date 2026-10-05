@@ -69,9 +69,9 @@ jobs:
             os: ubuntu-latest
             targets: apk
 
-          - platform: android-aab
-            os: ubuntu-latest
-            targets: aab
+          # - platform: android-aab
+          #   os: ubuntu-latest
+          #   targets: aab
 
           - platform: windows
             os: windows-latest
@@ -190,6 +190,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         if: startsWith(matrix.platform,'android')
+        with:
+          # default also installs the legacy 'tools' package, which no longer exists
+          packages: platform-tools
       # - name: Cache Android SDK
       #   uses: actions/cache@v5
       #   if: startsWith(matrix.platform,'android')
@@ -230,7 +233,13 @@ jobs:
         run: |
             [IO.File]::WriteAllBytes("windows\sign.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_SIGNING_KEY }}"))
             (Get-Content "windows\packaging\msix\make_config.yaml") -replace '^certificate_password:.*$', 'certificate_password: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}' | Set-Content "windows\packaging\msix\make_config.yaml"
-        
+            # Fail early with a readable reason instead of SignTool's "No certificates were found"
+            $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("windows\sign.pfx", "${{ secrets.WINDOWS_SIGNING_PASSWORD }}")
+            Write-Host "Signing cert: $($cert.Subject) thumbprint=$($cert.Thumbprint) valid $($cert.NotBefore) -> $($cert.NotAfter)"
+            if (-not $cert.HasPrivateKey) { throw "WINDOWS_SIGNING_KEY has no private key" }
+            if ($cert.NotAfter -lt (Get-Date)) { throw "Windows signing certificate expired on $($cert.NotAfter); update WINDOWS_SIGNING_KEY / WINDOWS_SIGNING_PASSWORD / WINDOWS_SIGNING_SHA1" }
+            if ("${{ secrets.WINDOWS_SIGNING_SHA1 }}" -and $cert.Thumbprint -ne "${{ secrets.WINDOWS_SIGNING_SHA1 }}".ToUpper()) { Write-Warning "WINDOWS_SIGNING_SHA1 does not match the certificate thumbprint" }
+
       # - name: Temporary disable Permission Handler for windows due to its issue in permission
       #   if: ${{ startsWith(matrix.platform,'windows') }}
       #   run: |
@@ -255,15 +264,28 @@ jobs:
 
       - name: Code Sign
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
-        uses: hiddify/signtool-code-sign-sha256@main
-        with:
-          certificate: '${{ secrets.WINDOWS_SIGNING_KEY }}'
-          cert-password: '${{ secrets.WINDOWS_SIGNING_PASSWORD }}'
-          cert-sha1: '${{ secrets.WINDOWS_SIGNING_SHA1 }}'
-          folder: 'dist'
-          timestamp-server: 'http://timestamp.digicert.com'
-          recursive: true
-          description: 'Hiddify'
+        # signtool-code-sign actions hardcode an SDK path (10.0.17763.0) missing on current runners,
+        # so locate signtool from whichever Windows SDK is installed.
+        env:
+          SIGN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+        run: |
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
+            Sort-Object { [version]$_.Directory.Parent.Name } -Descending | Select-Object -First 1
+          if (-not $signtool) { throw "signtool.exe not found" }
+          Write-Host "Using $($signtool.FullName)"
+          $pfx = Resolve-Path "windows\sign.pfx"
+          $exts = '.dll','.exe','.sys','.msix','.msixbundle','.appx','.appxbundle','.msi','.msp','.msm','.cab','.ps1','.psm1'
+          $files = Get-ChildItem dist -Recurse -File | Where-Object { $exts -contains $_.Extension.ToLower() }
+          foreach ($file in $files) {
+            Write-Host "Signing $($file.FullName)"
+            $ok = $false
+            foreach ($attempt in 1..5) {
+              & $signtool.FullName sign /fd SHA256 /td SHA256 /tr http://timestamp.digicert.com /d Hiddify /f $pfx /p $env:SIGN_PASSWORD $file.FullName
+              if ($LASTEXITCODE -eq 0) { $ok = $true; break }
+              Start-Sleep -Seconds $attempt
+            }
+            if (-not $ok) { throw "failed to sign $($file.FullName)" }
+          }
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows'
@@ -415,18 +437,21 @@ jobs:
           prerelease: true
 
       - name: Create or Update Draft Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_FOR_HIDDIFY_APP_REPO }}
-          GITHUB_REPOSITORY: hiddify/hiddify-app
+        uses: softprops/action-gh-release@v3
+        # env:
+          #GITHUB_TOKEN: ${{ secrets.TOKEN_FOR_HIDDIFY_APP_REPO }}
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#          GITHUB_REPOSITORY: hiddify/hiddify-app
         with:
           files: ./out/*
           name: 'draft'
           tag_name: 'draft'
           body_path: './release.md'
-          target_commitish: '530bf77839a74d4f13847ba244a20734ac7ab119'
+          target_commitish: ${{ github.sha }}
+          # target_commitish: '530bf77839a74d4f13847ba244a20734ac7ab119'
           prerelease: true
-          repository: hiddify/hiddify-app
+          # repository: hiddify/hiddify-app
 
   upload-release:
     permissions: write-all

@@ -1,12 +1,12 @@
 name: CI
 on:
-  pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'test.configs/**'
-      - '.vscode/'
-      - 'appcast.xml'
+  # pull_request:
+  #   paths-ignore:
+  #     - '**.md'
+  #     - 'docs/**'
+  #     - 'test.configs/**'
+  #     - '.vscode/'
+  #     - 'appcast.xml'
   push:
     branches:
        - main

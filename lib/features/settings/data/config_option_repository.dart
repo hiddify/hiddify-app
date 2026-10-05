@@ -528,7 +528,7 @@ abstract class ConfigOptions {
         profile: SingboxExtraSecurityProfileOption(id: ref.watch(extraSecurityProfileId)),
       ),
       unblocker: SingboxUnblockerOption(
-        mode: ref.watch(extraSecurityMode),
+        mode: ref.watch(unblockerMode),
         warp: SingboxUnblockerWarpOption(
           licenseKey: ref.watch(unblockerWarpLicenseKey),
           cleanIp: ref.watch(unblockerWarpCleanIp),

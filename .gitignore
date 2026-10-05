@@ -71,3 +71,8 @@ windows/sign.cer
 .aider.input.history
 .aider.chat.history.md
 .aider.tags.cache.v4
+
+# local signing material
+/cert.pem
+/key.pem
+/sign.pfx

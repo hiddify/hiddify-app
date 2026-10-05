@@ -421,10 +421,22 @@ class ProfileParser {
         'shadowtls' => fragment ?? ProxyType.shadowtls.label,
         'mieru' => fragment ?? ProxyType.mieru.label,
         'warp' => fragment ?? ProxyType.warp.label,
+        // any other link (psiphon://, anytls://, naive+https://, ...): its name, else its scheme
+        final scheme when scheme.isNotEmpty && line.trimLeft().startsWith('$scheme://') =>
+          fragment ?? _schemeLabel(scheme),
         _ => null,
       };
     }
     return name ?? ProxyType.unknown.label;
+  }
+
+  /// Display label for a link scheme: the matching [ProxyType] label (naive+https -> Naive),
+  /// otherwise the capitalized scheme (psiphon -> Psiphon).
+  static String _schemeLabel(String scheme) {
+    final base = scheme.split('+').first;
+    final type = ProxyType.fromJson(base);
+    if (type != ProxyType.unknown) return type.label;
+    return base[0].toUpperCase() + base.substring(1);
   }
 
   static String profileOverrideHelper({required ProfileEntriesCompanion profile}) {

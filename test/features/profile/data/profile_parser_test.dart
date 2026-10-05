@@ -276,4 +276,27 @@ void main() {
       });
     });
   });
+
+  group('ProfileParser.protocol', () {
+    test('known schemes keep their labels', () {
+      expect(ProfileParser.protocol('vless://uuid@1.2.3.4:443'), 'VLESS');
+      expect(ProfileParser.protocol('vless://uuid@1.2.3.4:443#My%20Server'), 'My Server');
+    });
+
+    test('other link schemes use the scheme instead of Unknown', () {
+      expect(ProfileParser.protocol('psiphon://'), 'Psiphon');
+      expect(ProfileParser.protocol('anytls://pass@1.2.3.4:443'), 'Anytls');
+      expect(ProfileParser.protocol('naive+https://u:p@1.2.3.4:443'), 'Naive');
+      expect(ProfileParser.protocol('socks://u:p@1.2.3.4:1080'), 'SOCKS');
+    });
+
+    test('other link schemes prefer the link name', () {
+      expect(ProfileParser.protocol('psiphon://#Iran%20Psiphon'), 'Iran Psiphon');
+    });
+
+    test('non-link content stays Unknown', () {
+      expect(ProfileParser.protocol('proxies:\n  - name: a'), 'Unknown');
+      expect(ProfileParser.protocol('just some text'), 'Unknown');
+    });
+  });
 }

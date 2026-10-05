@@ -397,7 +397,13 @@ class BoxService(
                     ),
                 )
             }
-            Application.notification.notify(notification.typeID, builder.build())
+            Application.notification.notify(notification.identifier, notification.typeID, builder.build())
+        }
+    }
+
+    internal fun cancelNotification(identifier: String, typeID: Int) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Application.notification.cancel(identifier, typeID)
         }
     }
 

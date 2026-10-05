@@ -120,8 +120,8 @@ class ChainOptionsPage extends HookConsumerWidget {
                     ],
                     ChainMode.warp => [
                       ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.extraSecurityWarpLicenseKey),
-                        preferences: ref.watch(ConfigOptions.extraSecurityWarpLicenseKey.notifier),
+                        value: ref.watch(ConfigOptions.unblockerWarpLicenseKey),
+                        preferences: ref.watch(ConfigOptions.unblockerWarpLicenseKey.notifier),
                         title: t.pages.settings.chain.warp.licenseKey,
                         icon: Icons.key_rounded,
                         presentValue: (value) => value.isEmpty ? t.common.notSet : value,

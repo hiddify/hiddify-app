@@ -8,6 +8,7 @@ import 'package:hiddify/features/connection/data/connection_data_providers.dart'
 import 'package:hiddify/features/connection/data/connection_repository.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
+import 'package:hiddify/features/connection/model/startup_connection.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
@@ -69,6 +70,25 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     if (state case AsyncData(:final value)) {
       if (value case Disconnected()) return _connect();
     }
+  }
+
+  /// Restores the tunnel on desktop start when the user had it running before quitting,
+  /// so a session started manually survives a reboot or an autostart login.
+  Future<void> restoreConnectionOnStartup() async {
+    final startedByUser = ref.read(Preferences.startedByUser);
+    final activeProfile = await ref.read(activeProfileProvider.future);
+    final shouldRestore = shouldRestoreConnectionOnStartup(
+      isDesktop: PlatformUtils.isDesktop,
+      startedByUser: startedByUser,
+      hasActiveProfile: activeProfile != null,
+    );
+    if (!shouldRestore) {
+      loggy.debug("no previous connection to restore");
+      return;
+    }
+    loggy.info("restoring previous connection on startup");
+    await ref.read(Preferences.startedByUser.notifier).update(true);
+    await _connect();
   }
 
   Future<void> toggleConnection() async {

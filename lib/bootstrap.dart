@@ -19,6 +19,7 @@ import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/notifier/chain_profile_notifier.dart';
 
+import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -104,13 +105,12 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   container.listen(activeProxyNotifierProvider, (previous, next) {});
 
   if (!kIsWeb) {
-    // await _safeInit(
-    //   "deep link service",
-    //   () => container.read(deepLinkNotifierProvider.future),
-    //   timeout: 1000,
-    // );
-
     if (PlatformUtils.isDesktop) {
+      await _safeInit(
+        "restore previous connection",
+        () => container.read(connectionNotifierProvider.notifier).restoreConnectionOnStartup(),
+        timeout: 5000,
+      );
       await _safeInit("system tray", () => container.read(systemTrayNotifierProvider.future), timeout: 1000);
     }
 

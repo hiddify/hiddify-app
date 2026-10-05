@@ -1,12 +1,14 @@
 include: package:lint/strict.yaml
 
 analyzer:
-  plugins:
-    - custom_lint
   exclude:
     - "hiddify-core/**"
-    - "**.g.dart"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mapper.dart"
     - "lib/gen/**"
+    - "build/**"
+    - "dist/**"
   errors:
     invalid_annotation_target: ignore
 
@@ -18,8 +20,3 @@ linter:
     sort_pub_dependencies: false
     sort_unnamed_constructors_first: false
     avoid_classes_with_only_static_members: false
-
-custom_lint:
-  rules:
-    # Enable one rule
-    - provider_parameters
