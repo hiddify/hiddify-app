@@ -143,9 +143,9 @@ class _CredentialTiles extends HookConsumerWidget {
         tooltip: revealed.value ? t.dialogs.qrCode.hidePassword : t.dialogs.qrCode.showPassword,
         onPressed: () => revealed.value = !revealed.value,
         icon: Icon(revealed.value ? Icons.visibility_off_outlined : Icons.visibility_outlined),
-        iconSize: 18,
+        iconSize: 20,
         padding: EdgeInsets.zero,
-        constraints: const BoxConstraints.tightFor(width: 32, height: 24),
+        constraints: const BoxConstraints.tightFor(width: 40, height: 40),
         style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
       ),
     );
@@ -210,20 +210,21 @@ class _CopyTile extends HookWidget {
           copied.show();
         },
         child: Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(12, 6, 8, 6),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // The action's own padding stands in for the end padding.
+          padding: EdgeInsetsDirectional.fromSTEB(12, 6, action == null ? 12 : 2, 6),
+          child: Row(
             children: [
-              _CopiedSwap(
-                label: label,
-                copied: copied.value,
-                style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-              ),
-              const Gap(2),
-              Row(
-                children: [
-                  Flexible(
-                    child: Text(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _CopiedSwap(
+                      label: label,
+                      copied: copied.value,
+                      style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                    const Gap(2),
+                    Text(
                       value,
                       // Addresses and passwords read left to right in every language.
                       textDirection: TextDirection.ltr,
@@ -231,10 +232,10 @@ class _CopyTile extends HookWidget {
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodyLarge,
                     ),
-                  ),
-                  ?action,
-                ],
+                  ],
+                ),
               ),
+              ?action,
             ],
           ),
         ),
