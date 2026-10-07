@@ -270,24 +270,33 @@ void main() {
       lastUpdate: DateTime.now(),
     );
 
-    test("preserves the imported VLESS name after editing as JSON", () {
-      configFile.writeAsStringSync('vless://uuid@1.2.3.4:443#My%20Server');
-      final imported = parseLocal(newProfile());
-      expect(imported.name, 'My Server');
+    for (final (scheme, outboundType) in [
+      ('vless', 'vless'),
+      ('trojan', 'trojan'),
+      ('ss', 'shadowsocks'),
+      ('hy2', 'hysteria2'),
+      ('tuic', 'tuic'),
+      ('socks', 'socks'),
+    ]) {
+      test("preserves the imported profile name after editing as JSON ($scheme)", () {
+        configFile.writeAsStringSync('$scheme://credential@1.2.3.4:443#My%20Server');
+        final imported = parseLocal(newProfile());
+        expect(imported.name, 'My Server');
 
-      configFile.writeAsStringSync(
-        jsonEncode({
-          'outbounds': [
-            {'type': 'vless', 'tag': 'My Server', 'server': '1.2.3.4', 'server_port': 8443},
-          ],
-          'endpoints': [],
-        }),
-      );
-      final saved = parseLocal(imported);
-      expect(saved.name, 'My Server');
-      expect(saved.userOverride, isNull);
-      expect(parseLocal(saved).name, 'My Server');
-    });
+        configFile.writeAsStringSync(
+          jsonEncode({
+            'outbounds': [
+              {'type': outboundType, 'tag': 'My Server', 'server': '1.2.3.4', 'server_port': 8443},
+            ],
+            'endpoints': [],
+          }),
+        );
+        final saved = parseLocal(imported);
+        expect(saved.name, 'My Server');
+        expect(saved.userOverride, isNull);
+        expect(parseLocal(saved).name, 'My Server');
+      });
+    }
 
     test("explicit rename takes precedence over the existing name", () {
       configFile.writeAsStringSync('{"outbounds": []}');
