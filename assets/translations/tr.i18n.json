@@ -720,6 +720,7 @@
     },
     "qrCode": {
       "copyFullLink": "Tam bağlantıyı kopyala",
+      "copied": "Kopyalandı",
       "ip": "IP",
       "port": "Port",
       "username": "Kullanıcı adı",

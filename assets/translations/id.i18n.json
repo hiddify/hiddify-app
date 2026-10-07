@@ -720,6 +720,7 @@
     },
     "qrCode": {
       "copyFullLink": "Salin tautan lengkap",
+      "copied": "Disalin",
       "ip": "IP",
       "port": "Port",
       "username": "Nama pengguna",

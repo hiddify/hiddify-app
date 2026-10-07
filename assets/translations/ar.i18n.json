@@ -757,6 +757,7 @@
     },
     "qrCode": {
       "copyFullLink": "نسخ الرابط الكامل",
+      "copied": "تم النسخ",
       "ip": "IP",
       "port": "المنفذ",
       "username": "اسم المستخدم",

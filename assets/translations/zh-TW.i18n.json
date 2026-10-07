@@ -720,6 +720,7 @@
     },
     "qrCode": {
       "copyFullLink": "複製完整連結",
+      "copied": "已複製",
       "ip": "IP",
       "port": "連接埠",
       "username": "使用者名稱",

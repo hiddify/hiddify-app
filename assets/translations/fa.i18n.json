@@ -722,6 +722,7 @@
     },
     "qrCode": {
       "copyFullLink": "کپی لینک کامل",
+      "copied": "کپی شد",
       "ip": "IP",
       "port": "پورت",
       "username": "نام کاربری",

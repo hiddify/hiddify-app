@@ -722,6 +722,7 @@
     },
     "qrCode": {
       "copyFullLink": "Copiar enlace completo",
+      "copied": "Copiado",
       "ip": "IP",
       "port": "Puerto",
       "username": "Nombre de usuario",
