@@ -85,26 +85,31 @@ class RuleTile extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              title: Text.rich(
-                TextSpan(
-                  text: t.pages.settings.routing.routeRule.rule.outbound[rule.outbound.name] ?? rule.outbound.name,
-                  children: [
-                    if (builtin != null) ...[
-                      const TextSpan(text: ' · '),
-                      TextSpan(
-                        text: t.pages.settings.routing.builtinRules.tag,
-                        style: TextStyle(color: theme.colorScheme.primary),
-                      ),
-                    ],
-                  ],
-                ),
-                style: Theme.of(context).textTheme.labelMedium,
+              title: Text(
+                t.pages.settings.routing.routeRule.rule.outbound[rule.outbound.name] ?? rule.outbound.name,
+                style: theme.textTheme.labelMedium,
               ),
-              subtitle: Text(
-                builtin?.present(t, region) ?? rule.name,
-                style: Theme.of(context).textTheme.bodyLarge,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              // one line: a long name ends in "…", and the built-in tag always shows whole after it
+              subtitle: Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      builtin?.present(t, region) ?? rule.name,
+                      style: theme.textTheme.bodyLarge,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (builtin != null) ...[
+                    const SizedBox(width: 6),
+                    Icon(Icons.lock_outline_rounded, size: 14, color: theme.colorScheme.primary),
+                    const SizedBox(width: 2),
+                    Text(
+                      t.pages.settings.routing.builtinRules.tag,
+                      style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary),
+                    ),
+                  ],
+                ],
               ),
               leading: ReorderableDragStartListener(index: index, child: const Icon(Icons.drag_handle_rounded)),
               trailing: Switch(
