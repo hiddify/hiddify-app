@@ -1,9 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -29,11 +30,7 @@ class QrCodeDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
-
-    Future<void> copy(String value) async {
-      await Clipboard.setData(ClipboardData(text: value));
-      ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
-    }
+    final linkCopied = _useCopiedFlag();
 
     return Dialog(
       child: SizedBox(
@@ -54,11 +51,21 @@ class QrCodeDialog extends HookConsumerWidget {
                   textAlign: TextAlign.center,
                 ),
               ],
-              if (credentials != null) ...[const Gap(16), _CredentialTiles(credentials!, onCopy: copy)],
+              if (credentials != null) ...[const Gap(16), _CredentialTiles(credentials!)],
               const Gap(12),
               Align(
                 alignment: AlignmentDirectional.centerEnd,
-                child: TextButton(onPressed: () => copy(link), child: Text(t.dialogs.qrCode.copyFullLink)),
+                child: TextButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: link));
+                    linkCopied.show();
+                  },
+                  child: _CopiedSwap(
+                    label: t.dialogs.qrCode.copyFullLink,
+                    copied: linkCopied.value,
+                    alignment: Alignment.center,
+                  ),
+                ),
               ),
             ],
           ),
@@ -113,10 +120,9 @@ class _QrCode extends StatelessWidget {
 }
 
 class _CredentialTiles extends HookConsumerWidget {
-  const _CredentialTiles(this.credentials, {required this.onCopy});
+  const _CredentialTiles(this.credentials);
 
   final ProxyCredentials credentials;
-  final ValueChanged<String> onCopy;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -126,13 +132,13 @@ class _CredentialTiles extends HookConsumerWidget {
     final username = _CopyTile(
       label: t.dialogs.qrCode.username,
       value: credentials.username,
-      onTap: () => onCopy(credentials.username),
+      copyText: credentials.username,
     );
     final password = _CopyTile(
       label: t.dialogs.qrCode.password,
       // Groups of four are easier to read and type by hand; the copy keeps the raw password.
       value: revealed.value ? RegExp('.{1,4}').allMatches(credentials.password).map((m) => m[0]).join(' ') : '••••••••',
-      onTap: () => onCopy(credentials.password),
+      copyText: credentials.password,
       action: IconButton(
         tooltip: revealed.value ? t.dialogs.qrCode.hidePassword : t.dialogs.qrCode.showPassword,
         onPressed: () => revealed.value = !revealed.value,
@@ -149,14 +155,14 @@ class _CredentialTiles extends HookConsumerWidget {
         Row(
           children: [
             Expanded(
-              child: _CopyTile(label: t.dialogs.qrCode.ip, value: credentials.ip, onTap: () => onCopy(credentials.ip)),
+              child: _CopyTile(label: t.dialogs.qrCode.ip, value: credentials.ip, copyText: credentials.ip),
             ),
             const Gap(8),
             IntrinsicWidth(
               child: _CopyTile(
                 label: t.dialogs.qrCode.port,
                 value: '${credentials.port}',
-                onTap: () => onCopy('${credentials.port}'),
+                copyText: '${credentials.port}',
               ),
             ),
           ],
@@ -180,34 +186,37 @@ class _CredentialTiles extends HookConsumerWidget {
   }
 }
 
-/// A labelled value that copies itself when tapped.
-class _CopyTile extends StatelessWidget {
-  const _CopyTile({required this.label, required this.value, required this.onTap, this.action});
+/// A labelled value that copies [copyText] when tapped.
+class _CopyTile extends HookWidget {
+  const _CopyTile({required this.label, required this.value, required this.copyText, this.action});
 
   final String label;
   final String value;
-  final VoidCallback onTap;
+  final String copyText;
   final Widget? action;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final copied = _useCopiedFlag();
 
     return Material(
       color: theme.colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(12),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          Clipboard.setData(ClipboardData(text: copyText));
+          copied.show();
+        },
         child: Padding(
           padding: const EdgeInsetsDirectional.fromSTEB(12, 6, 8, 6),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              _CopiedSwap(
+                label: label,
+                copied: copied.value,
                 style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
               ),
               const Gap(2),
@@ -230,6 +239,86 @@ class _CopyTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A flag that turns itself off a moment after each [show], for a short "copied" confirmation.
+({bool value, VoidCallback show}) _useCopiedFlag() {
+  final copied = useState(false);
+  final timer = useRef<Timer?>(null);
+  useEffect(
+    () =>
+        () => timer.value?.cancel(),
+    const [],
+  );
+  return (
+    value: copied.value,
+    show: () {
+      copied.value = true;
+      timer.value?.cancel();
+      timer.value = Timer(const Duration(milliseconds: 1400), () => copied.value = false);
+    },
+  );
+}
+
+/// Shows [label], or a green "Copied" in its place while [copied] is true. Keeps the size of
+/// the wider of the two so nothing around it shifts.
+class _CopiedSwap extends ConsumerWidget {
+  const _CopiedSwap({
+    required this.label,
+    required this.copied,
+    this.style,
+    this.alignment = AlignmentDirectional.centerStart,
+  });
+
+  final String label;
+  final bool copied;
+  final TextStyle? style;
+  final AlignmentGeometry alignment;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    // M3 has no success color role; these greens stay readable on light and dark surfaces.
+    final green = theme.brightness == Brightness.dark ? Colors.green.shade300 : Colors.green.shade800;
+    const duration = Duration(milliseconds: 200);
+
+    // The hidden text is still laid out to hold the size, so keep it out of hit tests and semantics.
+    Widget slot(Widget child, {required bool visible, required Offset hiddenOffset}) => IgnorePointer(
+      ignoring: !visible,
+      child: ExcludeSemantics(
+        excluding: !visible,
+        child: AnimatedSlide(
+          offset: visible ? Offset.zero : hiddenOffset,
+          duration: duration,
+          child: AnimatedOpacity(opacity: visible ? 1 : 0, duration: duration, child: child),
+        ),
+      ),
+    );
+
+    return Stack(
+      alignment: alignment,
+      children: [
+        slot(
+          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: style),
+          visible: !copied,
+          hiddenOffset: const Offset(0, -0.4),
+        ),
+        slot(
+          Semantics(
+            liveRegion: true,
+            child: Text(
+              t.dialogs.qrCode.copied,
+              maxLines: 1,
+              style: (style ?? DefaultTextStyle.of(context).style).copyWith(color: green),
+            ),
+          ),
+          visible: copied,
+          hiddenOffset: const Offset(0, 0.4),
+        ),
+      ],
     );
   }
 }
