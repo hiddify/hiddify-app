@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
@@ -241,6 +242,68 @@ void main() {
           );
         });
       });
+    });
+  });
+
+  group("local profile names", () {
+    late Directory tempDirectory;
+    late File configFile;
+
+    setUp(() {
+      tempDirectory = Directory.systemTemp.createTempSync('profile-name-test-');
+      configFile = File('${tempDirectory.path}/config');
+    });
+
+    tearDown(() {
+      tempDirectory.deleteSync(recursive: true);
+    });
+
+    ProfileEntity parseLocal(ProfileEntity profile) => ProfileParser.parse(
+      tempFilePath: configFile.path,
+      profile: profile,
+    ).match((failure) => throw failure, (parsed) => parsed);
+
+    ProfileEntity newProfile({String name = ''}) => ProfileEntity.local(
+      id: const Uuid().v4(),
+      active: true,
+      name: name,
+      lastUpdate: DateTime.now(),
+    );
+
+    test("preserves the imported VLESS name after editing as JSON", () {
+      configFile.writeAsStringSync('vless://uuid@1.2.3.4:443#My%20Server');
+      final imported = parseLocal(newProfile());
+      expect(imported.name, 'My Server');
+
+      configFile.writeAsStringSync(
+        jsonEncode({
+          'outbounds': [
+            {'type': 'vless', 'tag': 'My Server', 'server': '1.2.3.4', 'server_port': 8443},
+          ],
+          'endpoints': [],
+        }),
+      );
+      final saved = parseLocal(imported);
+      expect(saved.name, 'My Server');
+      expect(saved.userOverride, isNull);
+      expect(parseLocal(saved).name, 'My Server');
+    });
+
+    test("explicit rename takes precedence over the existing name", () {
+      configFile.writeAsStringSync('{"outbounds": []}');
+      final profile = newProfile(name: 'My Server').copyWith(userOverride: const UserOverride(name: 'Renamed'));
+      expect(parseLocal(profile).name, 'Renamed');
+    });
+
+    test("profile title takes precedence over the existing name", () {
+      configFile.writeAsStringSync('{"outbounds": []}');
+      final profile = newProfile(name: 'My Server').copyWith(populatedHeaders: {'profile-title': 'Profile Title'});
+      expect(parseLocal(profile).name, 'Profile Title');
+    });
+
+    test("a blank existing name still uses the link fragment", () {
+      configFile.writeAsStringSync('vless://uuid@1.2.3.4:443#My%20Server');
+      expect(parseLocal(newProfile(name: '   ')).name, 'My Server');
     });
   });
 
