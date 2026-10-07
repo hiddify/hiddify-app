@@ -34,7 +34,7 @@ abstract class Preferences {
   );
 
   // Set when the user turns auto selection off by hand. Until then it comes on by itself when App-based routing
-  // is turned on or its mode changes.
+  // is turned on.
   static final autoAppsSelectionOffByUser = PreferencesNotifier.create<bool, bool>(
     "auto_apps_selection_off_by_user",
     false,
