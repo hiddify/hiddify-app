@@ -738,6 +738,8 @@
     "connected": "Connecté",
     "disconnect": "Déconnecter",
     "disconnecting": "Déconnexion en cours…",
+    "failed": "Connexion impossible",
+    "tapToRetry": "Appuyez pour réessayer",
     "reconnect": "Reconnecter",
     "reconnectMsg": "Reconnexion pour appliquer les modifications…"
   },

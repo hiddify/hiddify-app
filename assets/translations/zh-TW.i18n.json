@@ -736,6 +736,8 @@
     "connected": "已連線",
     "disconnect": "中斷連線",
     "disconnecting": "中斷連線中…",
+    "failed": "無法連線",
+    "tapToRetry": "點擊重試",
     "reconnect": "重新連線",
     "reconnectMsg": "正在重新連線以套用變更…"
   },

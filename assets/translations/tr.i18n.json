@@ -736,6 +736,8 @@
     "connected": "Bağlı",
     "disconnect": "Bağlantıyı kes",
     "disconnecting": "Bağlantı kesiliyor…",
+    "failed": "Bağlanılamadı",
+    "tapToRetry": "Tekrar denemek için dokunun",
     "reconnect": "Yeniden bağlan",
     "reconnectMsg": "Değişiklikleri uygulamak için yeniden bağlanılıyor…"
   },

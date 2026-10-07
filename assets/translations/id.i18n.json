@@ -736,6 +736,8 @@
     "connected": "Tersambung",
     "disconnect": "Putuskan",
     "disconnecting": "Memutuskan…",
+    "failed": "Tidak dapat tersambung",
+    "tapToRetry": "Ketuk untuk mencoba lagi",
     "reconnect": "Sambungkan kembali",
     "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan…"
   },

@@ -736,6 +736,8 @@
     "connected": "已连接",
     "disconnect": "断开连接",
     "disconnecting": "断开连接中…",
+    "failed": "无法连接",
+    "tapToRetry": "点击重试",
     "reconnect": "重新连接",
     "reconnectMsg": "正在重新连接以应用更改…"
   },
