@@ -478,8 +478,8 @@
         "directPort": "پورت مستقیم",
         "redirectPort": "پورت تغییر مسیر",
         "lanSharing": "اشتراک امن VPN",
-        "copyLink": "کپی لینک",
         "qrCode": "کد QR",
+        "lanQrSubtitle": "پروکسی SOCKS5 برای همین وای‌فای",
         "lanIPError": "خطا در دریافت آدرس IP محلی"
       },
       "tlsTricks": {
@@ -719,6 +719,15 @@
       "askEachTime": "هر بار بپرس",
       "alertMessage": "پنهان کردن یا خروج از برنامه؟",
       "remember": "انتخابم را به خاطر بسپار"
+    },
+    "qrCode": {
+      "copyFullLink": "کپی لینک کامل",
+      "ip": "IP",
+      "port": "پورت",
+      "username": "نام کاربری",
+      "password": "رمز عبور",
+      "showPassword": "نمایش رمز عبور",
+      "hidePassword": "پنهان کردن رمز عبور"
     }
   },
   "connection": {

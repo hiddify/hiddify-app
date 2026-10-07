@@ -478,8 +478,8 @@
         "directPort": "Puerto directo",
         "redirectPort": "Puerto de redirección",
         "lanSharing": "Compartir VPN de forma segura",
-        "copyLink": "Copiar enlace",
         "qrCode": "Código QR",
+        "lanQrSubtitle": "Proxy SOCKS5 para esta red Wi-Fi",
         "lanIPError": "Error al obtener la IP local"
       },
       "tlsTricks": {
@@ -719,6 +719,15 @@
       "askEachTime": "Preguntar cada vez",
       "alertMessage": "¿Ocultar o salir de la app?",
       "remember": "Recordar mi elección"
+    },
+    "qrCode": {
+      "copyFullLink": "Copiar enlace completo",
+      "ip": "IP",
+      "port": "Puerto",
+      "username": "Nombre de usuario",
+      "password": "Contraseña",
+      "showPassword": "Mostrar contraseña",
+      "hidePassword": "Ocultar contraseña"
     }
   },
   "connection": {

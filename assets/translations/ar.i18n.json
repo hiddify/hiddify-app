@@ -509,8 +509,8 @@
         "directPort": "منفذ مباشر",
         "redirectPort": "منفذ إعادة التوجيه",
         "lanSharing": "مشاركة VPN آمنة",
-        "copyLink": "نسخ الرابط",
         "qrCode": "رمز QR",
+        "lanQrSubtitle": "وكيل SOCKS5 لشبكة Wi-Fi هذه",
         "lanIPError": "فشل في الحصول على عنوان IP المحلي"
       },
       "tlsTricks": {
@@ -754,6 +754,15 @@
       "askEachTime": "السؤال كل مرة",
       "alertMessage": "هل تريد إخفاء التطبيق أم الخروج منه؟",
       "remember": "تذكر خياري"
+    },
+    "qrCode": {
+      "copyFullLink": "نسخ الرابط الكامل",
+      "ip": "IP",
+      "port": "المنفذ",
+      "username": "اسم المستخدم",
+      "password": "كلمة المرور",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور"
     }
   },
   "connection": {

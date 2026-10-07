@@ -477,8 +477,8 @@
         "directPort": "Direct portu",
         "redirectPort": "Yönlendirme portu",
         "lanSharing": "Güvenli VPN paylaşımı",
-        "copyLink": "Bağlantıyı kopyala",
         "qrCode": "QR kod",
+        "lanQrSubtitle": "Bu Wi-Fi için SOCKS5 proxy",
         "lanIPError": "Yerel IP adresi alınamadı"
       },
       "tlsTricks": {
@@ -717,6 +717,15 @@
       "askEachTime": "Her seferinde sor",
       "alertMessage": "Uygulama gizlensin mi, kapatılsın mı?",
       "remember": "Seçimimi hatırla"
+    },
+    "qrCode": {
+      "copyFullLink": "Tam bağlantıyı kopyala",
+      "ip": "IP",
+      "port": "Port",
+      "username": "Kullanıcı adı",
+      "password": "Şifre",
+      "showPassword": "Şifreyi göster",
+      "hidePassword": "Şifreyi gizle"
     }
   },
   "connection": {

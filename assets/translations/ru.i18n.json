@@ -498,8 +498,8 @@
         "directPort": "Локальный порт direct",
         "redirectPort": "Порт перенаправления",
         "lanSharing": "Безопасный общий доступ к VPN",
-        "copyLink": "Копировать ссылку",
         "qrCode": "QR-код",
+        "lanQrSubtitle": "SOCKS5-прокси для этой сети Wi-Fi",
         "lanIPError": "Не удалось получить локальный IP-адрес"
       },
       "tlsTricks": {
@@ -741,6 +741,15 @@
       "askEachTime": "Спрашивать каждый раз",
       "alertMessage": "Скрыть или выйти из приложения?",
       "remember": "Запомнить мой выбор"
+    },
+    "qrCode": {
+      "copyFullLink": "Копировать полную ссылку",
+      "ip": "IP",
+      "port": "Порт",
+      "username": "Имя пользователя",
+      "password": "Пароль",
+      "showPassword": "Показать пароль",
+      "hidePassword": "Скрыть пароль"
     }
   },
   "connection": {

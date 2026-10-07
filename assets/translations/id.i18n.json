@@ -477,8 +477,8 @@
         "directPort": "Port langsung",
         "redirectPort": "Port pengalihan",
         "lanSharing": "Berbagi VPN yang aman",
-        "copyLink": "Salin tautan",
         "qrCode": "Kode QR",
+        "lanQrSubtitle": "Proxy SOCKS5 untuk Wi-Fi ini",
         "lanIPError": "Gagal mendapatkan alamat IP lokal"
       },
       "tlsTricks": {
@@ -717,6 +717,15 @@
       "askEachTime": "Tanyakan setiap kali",
       "alertMessage": "Sembunyikan atau keluar dari aplikasi?",
       "remember": "Ingat pilihan saya"
+    },
+    "qrCode": {
+      "copyFullLink": "Salin tautan lengkap",
+      "ip": "IP",
+      "port": "Port",
+      "username": "Nama pengguna",
+      "password": "Kata sandi",
+      "showPassword": "Tampilkan kata sandi",
+      "hidePassword": "Sembunyikan kata sandi"
     }
   },
   "connection": {

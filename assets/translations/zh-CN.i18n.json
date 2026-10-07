@@ -477,8 +477,8 @@
         "directPort": "本地直连端口",
         "redirectPort": "重定向端口",
         "lanSharing": "安全 VPN 共享",
-        "copyLink": "复制链接",
         "qrCode": "二维码",
+        "lanQrSubtitle": "适用于此 Wi-Fi 的 SOCKS5 代理",
         "lanIPError": "获取本地 IP 地址失败"
       },
       "tlsTricks": {
@@ -717,6 +717,15 @@
       "askEachTime": "每次询问",
       "alertMessage": "隐藏还是退出应用？",
       "remember": "记住我的选择"
+    },
+    "qrCode": {
+      "copyFullLink": "复制完整链接",
+      "ip": "IP",
+      "port": "端口",
+      "username": "用户名",
+      "password": "密码",
+      "showPassword": "显示密码",
+      "hidePassword": "隐藏密码"
     }
   },
   "connection": {

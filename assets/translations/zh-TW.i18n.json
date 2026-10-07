@@ -477,8 +477,8 @@
         "directPort": "本機直連連接埠",
         "redirectPort": "重新導向連接埠",
         "lanSharing": "安全 VPN 共享",
-        "copyLink": "複製連結",
         "qrCode": "QR Code",
+        "lanQrSubtitle": "適用於此 Wi-Fi 的 SOCKS5 代理",
         "lanIPError": "取得本機 IP 位址失敗"
       },
       "tlsTricks": {
@@ -717,6 +717,15 @@
       "askEachTime": "每次詢問",
       "alertMessage": "隱藏還是退出應用程式？",
       "remember": "記住我的選擇"
+    },
+    "qrCode": {
+      "copyFullLink": "複製完整連結",
+      "ip": "IP",
+      "port": "連接埠",
+      "username": "使用者名稱",
+      "password": "密碼",
+      "showPassword": "顯示密碼",
+      "hidePassword": "隱藏密碼"
     }
   },
   "connection": {
