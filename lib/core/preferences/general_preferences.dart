@@ -1,18 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:hiddify/core/app_info/app_info_provider.dart';
-import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
-
-import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
-import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/app_based_routing/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/utils/platform_utils.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-part 'general_preferences.g.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 bool _debugIntroPage = false;
 
@@ -31,16 +26,18 @@ abstract class Preferences {
     mapTo: (value) => value == null ? '' : value.name,
   );
 
-  static final autoAppsSelectionUpdateInterval = PreferencesNotifier.create<double, double>(
-    "auto_apps_selection_update_interval",
-    1.0,
-  );
-
   static final autoAppsSelectionLastUpdate = PreferencesNotifier.create<DateTime?, String?>(
     "auto_apps_selection_last_update",
     null,
     mapFrom: (value) => value == null ? null : DateTime.tryParse(value),
     mapTo: (value) => value?.toIso8601String(),
+  );
+
+  // Set when the user turns auto selection off by hand. Until then it comes on by itself when App-based routing
+  // is turned on or its mode changes.
+  static final autoAppsSelectionOffByUser = PreferencesNotifier.create<bool, bool>(
+    "auto_apps_selection_off_by_user",
+    false,
   );
 
   static final includeApps = PreferencesNotifier.create<List<String>, List<String>>(
@@ -87,11 +84,19 @@ abstract class Preferences {
     PlatformUtils.isDesktop,
   );
 
-  static final perAppProxyMode = PreferencesNotifier.create<PerAppProxyMode, String>(
+  static final perAppProxyEnabled = PreferencesNotifier.create<bool, bool>("per_app_proxy_enabled", false);
+
+  // Kept while App-based routing is off, for when it is turned on again.
+  static final perAppProxyMode = PreferencesNotifier.create<AppProxyMode, String>(
     "per_app_proxy_mode",
-    PerAppProxyMode.off,
-    mapFrom: PerAppProxyMode.values.byName,
+    AppProxyMode.exclude,
+    mapFrom: AppProxyMode.values.byName,
     mapTo: (value) => value.name,
+  );
+
+  // The mode in use, or null while App-based routing is off.
+  static final perAppProxyModeInUse = Provider<AppProxyMode?>(
+    (ref) => ref.watch(perAppProxyEnabled) ? ref.watch(perAppProxyMode) : null,
   );
 
   static final markNewProfileActive = PreferencesNotifier.create<bool, bool>("mark_new_profile_active", true);
@@ -115,22 +120,17 @@ abstract class Preferences {
 
   static final psiphonConsentGiven = PreferencesNotifier.create<bool, bool>("psiphon-consent-given", false);
 
-  static final showRouteGeneralOptions = PreferencesNotifier.create<bool, bool>("show-route-general-options", true);
-}
+  /// How many records the in-memory log ring keeps. Saved, so a size picked
+  /// once while chasing a bug is still there on the next run.
+  static final logBufferSize = PreferencesNotifier.create<int, int>("log-buffer-size", 1000);
 
-@Riverpod(keepAlive: true)
-class DebugModeNotifier extends _$DebugModeNotifier {
-  late final _pref = PreferencesEntry(
-    preferences: ref.watch(sharedPreferencesProvider).requireValue,
-    key: "debug_mode",
-    defaultValue: ref.read(environmentProvider) == Environment.dev,
+  static final profilesSort = PreferencesNotifier.create<({ProfilesSort by, SortMode mode}), String>(
+    "profiles_sort",
+    (by: ProfilesSort.lastUpdate, mode: SortMode.descending),
+    mapFrom: (value) {
+      final parts = value.split(":");
+      return (by: ProfilesSort.values.byName(parts.first), mode: SortMode.values.byName(parts.last));
+    },
+    mapTo: (value) => "${value.by.name}:${value.mode.name}",
   );
-
-  @override
-  bool build() => _pref.read();
-
-  Future<void> update(bool value) {
-    state = value;
-    return _pref.write(value);
-  }
 }

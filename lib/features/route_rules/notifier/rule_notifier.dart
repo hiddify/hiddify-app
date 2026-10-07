@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -77,7 +78,9 @@ class RuleNotifier extends _$RuleNotifier {
   Rule build(int? listOrder) {
     if (listOrder == null) {
       final t = ref.read(translationsProvider).requireValue;
-      return Rule(name: t.pages.settings.routing.routeRule.rule.title, outbound: Outbound.direct, network: Network.all);
+      // a number tells new rules apart
+      final name = '${t.pages.settings.routing.routeRule.rule.title} ${1000 + Random().nextInt(9000)}';
+      return Rule(name: name, outbound: Outbound.direct, network: Network.all);
     } else {
       isEditMode = true;
       return ref.read(rulesNotifierProvider).where((rule) => rule.listOrder == listOrder).first;

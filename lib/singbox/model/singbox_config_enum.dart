@@ -63,9 +63,9 @@ enum BalancerStrategy {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-    roundRobin => t.pages.settings.routing.generalOptions.balancerStrategy.roundRobin,
-    consistentHash => t.pages.settings.routing.generalOptions.balancerStrategy.consistentHash,
-    stickySession => t.pages.settings.routing.generalOptions.balancerStrategy.stickySession,
+    roundRobin => t.pages.settings.routing.balancerStrategy.roundRobin,
+    consistentHash => t.pages.settings.routing.balancerStrategy.consistentHash,
+    stickySession => t.pages.settings.routing.balancerStrategy.stickySession,
   };
 }
 
@@ -81,10 +81,10 @@ enum IPv6Mode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-    disable => t.pages.settings.routing.generalOptions.ipv6Modes.disable,
-    enable => t.pages.settings.routing.generalOptions.ipv6Modes.enable,
-    prefer => t.pages.settings.routing.generalOptions.ipv6Modes.prefer,
-    only => t.pages.settings.routing.generalOptions.ipv6Modes.only,
+    disable => t.pages.settings.routing.ipv6Modes.disable,
+    enable => t.pages.settings.routing.ipv6Modes.enable,
+    prefer => t.pages.settings.routing.ipv6Modes.prefer,
+    only => t.pages.settings.routing.ipv6Modes.only,
   };
 }
 
@@ -145,6 +145,16 @@ enum ChainMode {
   const ChainMode(this.key);
 
   final String key;
+
+  // Modes offered in the UI. Using another profile as a chain hop is not supported by the core
+  // yet (it refuses "profile"), so it is hidden until then.
+  static const selectable = [psiphon, warp];
+
+  // A stored mode that is no longer selectable falls back to [fallback].
+  static ChainMode fromStored(String name, ChainMode fallback) {
+    final mode = ChainMode.values.asNameMap()[name];
+    return mode != null && selectable.contains(mode) ? mode : fallback;
+  }
 
   String present(Translations t) => switch (this) {
     psiphon => t.common.psiphon,

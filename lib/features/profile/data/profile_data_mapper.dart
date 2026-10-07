@@ -20,8 +20,9 @@ extension ProfileEntityMapper on ProfileEntity {
       download: Value(rp.subInfo?.download),
       total: Value(rp.subInfo?.total),
       expire: Value(rp.subInfo?.expire),
-      webPageUrl: Value(rp.subInfo?.webPageUrl),
-      supportUrl: Value(rp.subInfo?.supportUrl),
+      webPageUrl: Value(rp.webPageUrl),
+      supportUrl: Value(rp.supportUrl),
+      pinned: Value(rp.pinned),
     ),
     local: (lp) => ProfileEntriesCompanion.insert(
       id: lp.id,
@@ -31,9 +32,12 @@ extension ProfileEntityMapper on ProfileEntity {
       lastUpdate: lp.lastUpdate,
       populatedHeaders: Value(jsonEncode(lp.populatedHeaders)),
       userOverride: Value(lp.userOverride?.toStr()),
+      pinned: Value(lp.pinned),
     ),
   );
 
+  /// Note: `pinned` is intentionally omitted here so a subscription refresh
+  /// never clobbers the user's pin; pinning is changed via a dedicated update.
   ProfileEntriesCompanion toUpdateEntry() => map(
     remote: (rp) => ProfileEntriesCompanion(
       name: Value(rp.name),
@@ -45,8 +49,8 @@ extension ProfileEntityMapper on ProfileEntity {
       download: Value(rp.subInfo?.download),
       total: Value(rp.subInfo?.total),
       expire: Value(rp.subInfo?.expire),
-      webPageUrl: Value(rp.subInfo?.webPageUrl),
-      supportUrl: Value(rp.subInfo?.supportUrl),
+      webPageUrl: Value(rp.webPageUrl),
+      supportUrl: Value(rp.supportUrl),
     ),
     local: (lp) => ProfileEntriesCompanion(
       name: Value(lp.name),
@@ -66,14 +70,7 @@ extension ProfileEntryMapper on ProfileEntry {
 
     SubscriptionInfo? subInfo;
     if (upload != null && download != null && total != null && expire != null) {
-      subInfo = SubscriptionInfo(
-        upload: upload!,
-        download: download!,
-        total: total!,
-        expire: expire!,
-        webPageUrl: webPageUrl,
-        supportUrl: supportUrl,
-      );
+      subInfo = SubscriptionInfo(upload: upload!, download: download!, total: total!, expire: expire!);
     }
     Map<String, dynamic>? mPopulatedHeaders;
 
@@ -91,8 +88,11 @@ extension ProfileEntryMapper on ProfileEntry {
         lastUpdate: lastUpdate,
         options: options,
         subInfo: subInfo,
+        webPageUrl: webPageUrl,
+        supportUrl: supportUrl,
         populatedHeaders: mPopulatedHeaders,
         userOverride: UserOverride.fromStr(userOverride),
+        pinned: pinned,
       ),
       ProfileType.local => LocalProfileEntity(
         id: id,
@@ -101,6 +101,7 @@ extension ProfileEntryMapper on ProfileEntry {
         lastUpdate: lastUpdate,
         populatedHeaders: mPopulatedHeaders,
         userOverride: UserOverride.fromStr(userOverride),
+        pinned: pinned,
       ),
     };
   }

@@ -29,11 +29,11 @@ class ChainModeMenu extends HookConsumerWidget {
           if (type.isEnable(status)) await ref.read(ConfigOptions.chainStatus.notifier).update(ChainStatus.off);
         },
       ),
-      ...ChainMode.values.map((e) {
+      ...ChainMode.selectable.map((e) {
         return AdaptiveMenuItem(
           leadingIcon: ChainModeIcon(mode: e),
           title: e.present(t),
-          divider: e == ChainMode.profile && showConfiguration,
+          divider: e == ChainMode.selectable.last && showConfiguration,
           onTap: () async {
             switch (type) {
               case ChainType.extraSecurity:

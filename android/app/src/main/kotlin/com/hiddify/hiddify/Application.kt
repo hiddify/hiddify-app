@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
-import android.net.wifi.WifiManager
 import android.os.PowerManager
 import androidx.core.content.getSystemService
 import com.hiddify.hiddify.bg.AppChangeReceiver
@@ -39,7 +38,6 @@ class Application : Application() {
         val powerManager by lazy { application.getSystemService<PowerManager>()!! }
         val notificationManager by lazy { application.getSystemService<NotificationManager>()!! }
 
-        val wifiManager by lazy { application.getSystemService<WifiManager>()!! }
 
     }
 

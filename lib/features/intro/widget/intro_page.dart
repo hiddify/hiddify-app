@@ -99,7 +99,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     selected: ref.watch(ConfigOptions.region),
                     preferences: ref.watch(ConfigOptions.region.notifier),
                     choices: Region.values,
-                    title: t.pages.settings.routing.generalOptions.region,
+                    title: t.pages.settings.routing.region,
                     showFlag: true,
                     icon: Icons.place_rounded,
                     presentChoice: (value) => value.present(t),

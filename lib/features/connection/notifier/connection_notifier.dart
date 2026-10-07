@@ -8,9 +8,12 @@ import 'package:hiddify/features/connection/data/connection_data_providers.dart'
 import 'package:hiddify/features/connection/data/connection_repository.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
+import 'package:hiddify/features/connection/model/startup_connection.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
+import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -34,8 +37,6 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       if (previous == next) return;
       if (previous case AsyncData(:final value) when !value.isConnected) {
         if (next case AsyncData(value: final Connected _)) {
-          await ref.read(hapticServiceProvider.notifier).heavyImpact();
-
           if (Platform.isAndroid && !ref.read(Preferences.storeReviewedByUser)) {
             if (await InAppReview.instance.isAvailable()) {
               InAppReview.instance.requestReview();
@@ -59,7 +60,15 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       if (event case Disconnected(connectionFailure: final _?) when PlatformUtils.isDesktop) {
         Future.microtask(() => ref.read(Preferences.startedByUser.notifier).update(false));
       }
-      loggy.info("connection status: ${event.format()}");
+      // One call for every status buried failures at info, next to the ordinary
+      // comings and goings. A failure carries the core's own panic text, which
+      // is the last thing that should need hunting for.
+      final status = "connection status: ${event.format()}";
+      if (event case Disconnected(connectionFailure: final _?)) {
+        loggy.error(status);
+      } else {
+        loggy.info(status);
+      }
     });
   }
 
@@ -69,6 +78,29 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     if (state case AsyncData(:final value)) {
       if (value case Disconnected()) return _connect();
     }
+  }
+
+  /// Restores the tunnel on desktop start when the user had it running before quitting,
+  /// so a session started manually survives a reboot or an autostart login.
+  Future<void> restoreConnectionOnStartup() async {
+    final startedByUser = ref.read(Preferences.startedByUser);
+    final activeProfile = await ref.read(activeProfileProvider.future);
+    // macOS can restore a running system VPN during core setup. Reconnecting
+    // it here would unnecessarily stop and restart that tunnel.
+    final coreStatus = ref.read(hiddifyCoreServiceProvider).currentState;
+    final shouldRestore = shouldRestoreConnectionOnStartup(
+      isDesktop: PlatformUtils.isDesktop,
+      startedByUser: startedByUser,
+      hasActiveProfile: activeProfile != null,
+      isAlreadyRunning: coreStatus is CoreStarted || coreStatus is CoreStarting,
+    );
+    if (!shouldRestore) {
+      loggy.debug("no previous connection to restore");
+      return;
+    }
+    loggy.info("restoring previous connection on startup");
+    await ref.read(Preferences.startedByUser.notifier).update(true);
+    await _connect();
   }
 
   Future<void> toggleConnection() async {

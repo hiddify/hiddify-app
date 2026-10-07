@@ -121,6 +121,14 @@ android {
         aidl true
     }
 
+    packaging {
+        jniLibs {
+            // store native libs (mainly the Go core) compressed in the APK; Android extracts them
+            // at install. Much smaller download, slightly larger installed size and install time.
+            useLegacyPackaging = true
+        }
+    }
+
 }
 
 android.applicationVariants.all { variant ->

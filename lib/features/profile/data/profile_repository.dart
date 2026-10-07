@@ -21,6 +21,7 @@ abstract interface class ProfileRepository {
   TaskEither<ProfileFailure, Unit> init();
   TaskEither<ProfileFailure, ProfileEntity?> getById(String id);
   TaskEither<ProfileFailure, Unit> setAsActive(String id);
+  TaskEither<ProfileFailure, Unit> setPinned(String id, bool pinned);
   TaskEither<ProfileFailure, Unit> deleteById(String id, bool isActive);
   Stream<Either<ProfileFailure, ProfileEntity?>> watchActiveProfile();
   Stream<Either<ProfileFailure, bool>> watchHasAnyProfile();
@@ -80,6 +81,14 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   TaskEither<ProfileFailure, Unit> setAsActive(String id) {
     return TaskEither.tryCatch(() async {
       await _profileDataSource.edit(id, const ProfileEntriesCompanion(active: Value(true)));
+      return unit;
+    }, ProfileUnexpectedFailure.new);
+  }
+
+  @override
+  TaskEither<ProfileFailure, Unit> setPinned(String id, bool pinned) {
+    return TaskEither.tryCatch(() async {
+      await _profileDataSource.edit(id, ProfileEntriesCompanion(pinned: Value(pinned)));
       return unit;
     }, ProfileUnexpectedFailure.new);
   }

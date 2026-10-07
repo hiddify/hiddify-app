@@ -15,20 +15,15 @@ enum AlertType {
 }
 
 class CustomToast extends StatelessWidget {
-  const CustomToast(this.message, {this.type = AlertType.info, this.icon, this.duration = const Duration(seconds: 3)});
+  const CustomToast(this.message, {this.type = AlertType.info, this.icon});
 
-  const CustomToast.error(this.message, {this.duration = const Duration(seconds: 5)})
-    : type = AlertType.error,
-      icon = FluentIcons.error_circle_24_regular;
+  const CustomToast.error(this.message) : type = AlertType.error, icon = FluentIcons.error_circle_24_regular;
 
-  const CustomToast.success(this.message, {this.duration = const Duration(seconds: 3)})
-    : type = AlertType.success,
-      icon = FluentIcons.checkmark_24_regular;
+  const CustomToast.success(this.message) : type = AlertType.success, icon = FluentIcons.checkmark_24_regular;
 
   final String message;
   final AlertType type;
   final IconData? icon;
-  final Duration duration;
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +55,15 @@ class CustomToast extends StatelessWidget {
       context: context,
       title: Text(message),
       type: type._toastificationType,
-      alignment: Alignment.bottomLeft,
-      autoCloseDuration: duration,
-      style: ToastificationStyle.fillColored,
+      alignment: AlignmentDirectional.bottomStart,
+      // a Material 3 snackbar's time
+      autoCloseDuration: const Duration(seconds: 4),
+      style: ToastificationStyle.flat,
       pauseOnHover: true,
       showProgressBar: false,
       dragToClose: true,
       closeOnClick: true,
-      closeButtonShowType: CloseButtonShowType.onHover,
+      closeButton: const ToastCloseButton(showType: CloseButtonShowType.onHover),
     );
   }
 }

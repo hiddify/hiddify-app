@@ -11,7 +11,10 @@ class PreferencesMigration with InfraLogger {
   Future<void> migrate() async {
     final currentVersion = sharedPreferences.getInt(versionKey) ?? 0;
 
-    final migrationSteps = [PreferencesVersion1Migration(sharedPreferences)];
+    final migrationSteps = <PreferencesMigrationStep>[
+      PreferencesVersion1Migration(sharedPreferences),
+      PreferencesVersion2Migration(sharedPreferences),
+    ];
 
     if (currentVersion == migrationSteps.length) {
       loggy.debug("already using the latest version (v$currentVersion)");
@@ -106,4 +109,23 @@ class PreferencesVersion1Migration extends PreferencesMigrationStep with InfraLo
     "ipv6Only" => "ipv6_only",
     _ => "",
   };
+}
+
+/// App-based routing's switch gets its own key. Its mode used to be "off" while it was off, which is now taken as
+/// never turned on.
+class PreferencesVersion2Migration extends PreferencesMigrationStep with InfraLogger {
+  PreferencesVersion2Migration(super.sharedPreferences);
+
+  @override
+  Future<void> migrate() async {
+    if (sharedPreferences.getString("per_app_proxy_mode") case final String mode) {
+      if (mode == "off") {
+        loggy.debug("removing [per_app_proxy_mode] = [off]");
+        await sharedPreferences.remove("per_app_proxy_mode");
+      } else {
+        loggy.debug("setting [per_app_proxy_enabled] for [per_app_proxy_mode] = [$mode]");
+        await sharedPreferences.setBool("per_app_proxy_enabled", true);
+      }
+    }
+  }
 }

@@ -7,3 +7,4 @@
 **/xcuserdata/
 Runner/Configs/NetworkExtension.local.xcconfig
 /build/
+/NetworkExtensionCore/build/

@@ -53,7 +53,8 @@ sealed class CoreStatus with _$CoreStatus {
           MessageType.ERROR_PARSING_CONFIG => CoreAlert.emptyConfiguration,
           MessageType.ERROR_BUILDING_CONFIG => CoreAlert.emptyConfiguration,
           MessageType.EMPTY_CONFIGURATION => CoreAlert.emptyConfiguration,
-          MessageType.ALREADY_STOPPED => CoreAlert.createService,
+          // a repeated stop (app + VPN service both stop the core) is a normal stop, not a failure
+          MessageType.ALREADY_STOPPED => null,
           MessageType.ALREADY_STARTED => CoreAlert.startService,
 
           // MessageType.REQUEST_VPN_PERMISSION => SingboxAlert.requestVPNPermission,

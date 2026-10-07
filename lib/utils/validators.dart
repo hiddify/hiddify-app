@@ -37,9 +37,7 @@ final _portOrPortRangeRegex = RegExp(
   r'^(65000|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3})(:(65000|6[0-4]\d{3}|[1-5]\d{4}|[1-9]\d{0,3}))?$',
 );
 
-final _ipCidrRegex = RegExp(
-  r'^(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})\.(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})\.(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2}).(25[0-5]|2[0-4]\d|1\d{2}|\d{1,2})(/(3[0-2]|[1-2]\d|\d))?$',
-);
+final _cidrPrefixRegex = RegExp(r'^(0|[1-9]\d{0,2})$');
 
 final _domainRegex = RegExp(r'^([a-zA-Z\d\-]+\.)+[a-zA-Z\d\-]{2,}$', caseSensitive: false);
 
@@ -78,8 +76,22 @@ bool isPortOrPortRange(String input) {
   return _portOrPortRangeRegex.hasMatch(input);
 }
 
+/// An IPv4 or IPv6 address, with an optional prefix length.
 bool isIpCidr(String input) {
-  return _ipCidrRegex.hasMatch(input);
+  final parts = input.split('/');
+  if (parts.length > 2) return false;
+  final isIPv6 = parts.first.contains(':');
+  try {
+    if (isIPv6) {
+      Uri.parseIPv6Address(parts.first);
+    } else {
+      Uri.parseIPv4Address(parts.first);
+    }
+  } on FormatException {
+    return false;
+  }
+  if (parts.length == 1) return true;
+  return _cidrPrefixRegex.hasMatch(parts.last) && int.parse(parts.last) <= (isIPv6 ? 128 : 32);
 }
 
 bool isDomain(String input) {
