@@ -478,8 +478,8 @@
         "directPort": "Direct port",
         "redirectPort": "Redirect port",
         "lanSharing": "Secure VPN sharing",
-        "copyLink": "Copy link",
         "qrCode": "QR code",
+        "lanQrSubtitle": "SOCKS5 proxy for this Wi-Fi",
         "lanIPError": "Failed to get local IP address"
       },
       "tlsTricks": {
@@ -719,6 +719,15 @@
       "askEachTime": "Ask each time",
       "alertMessage": "Hide or exit the app?",
       "remember": "Remember this choice"
+    },
+    "qrCode": {
+      "copyFullLink": "Copy full link",
+      "ip": "IP",
+      "port": "Port",
+      "username": "Username",
+      "password": "Password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
     }
   },
   "connection": {
