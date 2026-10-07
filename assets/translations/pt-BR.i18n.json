@@ -338,8 +338,8 @@
         },
         "builtinRules": {
           "tag": "Integrada",
-          "bypassLan": "Ignorar rede local",
-          "blockAds": "Bloquear anúncios e sites nocivos",
+          "bypassLan": "Ignorar LAN",
+          "blockAds": "Bloquear anúncios e malware",
           "bypassRegion": "Ignorar sites da região $region"
         },
         "appBasedRouting": {

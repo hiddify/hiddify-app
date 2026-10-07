@@ -338,7 +338,7 @@
         "builtinRules": {
           "tag": "內建",
           "bypassLan": "繞過區域網路",
-          "blockAds": "攔截廣告和有害網站",
+          "blockAds": "攔截廣告和惡意軟體",
           "bypassRegion": "繞過${region}的網站"
         },
         "appBasedRouting": {

@@ -344,8 +344,8 @@
         },
         "builtinRules": {
           "tag": "Встроенное",
-          "bypassLan": "Обход локальной сети",
-          "blockAds": "Блокировать рекламу и вредные сайты",
+          "bypassLan": "Обход LAN",
+          "blockAds": "Блокировка рекламы и вирусов",
           "bypassRegion": "Обход сайтов региона $region"
         },
         "appBasedRouting": {

@@ -348,8 +348,8 @@
         },
         "builtinRules": {
           "tag": "مدمجة",
-          "bypassLan": "تجاوز الشبكة المحلية",
-          "blockAds": "حظر الإعلانات والمواقع الضارة",
+          "bypassLan": "تجاوز LAN",
+          "blockAds": "حظر الإعلانات والبرامج الضارة",
           "bypassRegion": "تجاوز المواقع في $region"
         },
         "appBasedRouting": {

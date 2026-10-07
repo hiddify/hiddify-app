@@ -337,8 +337,8 @@
         },
         "builtinRules": {
           "tag": "Bawaan",
-          "bypassLan": "Lewati jaringan lokal",
-          "blockAds": "Blokir iklan dan situs berbahaya",
+          "bypassLan": "Lewati LAN",
+          "blockAds": "Blokir iklan dan malware",
           "bypassRegion": "Lewati situs di $region"
         },
         "appBasedRouting": {

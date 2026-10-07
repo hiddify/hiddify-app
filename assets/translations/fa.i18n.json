@@ -338,8 +338,8 @@
         },
         "builtinRules": {
           "tag": "توکار",
-          "bypassLan": "دور زدن شبکه محلی",
-          "blockAds": "مسدودسازی تبلیغات و سایت‌های مخرب",
+          "bypassLan": "دور زدن LAN",
+          "blockAds": "مسدودسازی تبلیغات و بدافزار",
           "bypassRegion": "دور زدن سایت‌های $region"
         },
         "appBasedRouting": {

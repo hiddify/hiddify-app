@@ -337,8 +337,8 @@
         },
         "builtinRules": {
           "tag": "Yerleşik",
-          "bypassLan": "Yerel ağı atla",
-          "blockAds": "Reklamları ve zararlı siteleri engelle",
+          "bypassLan": "LAN'ı atla",
+          "blockAds": "Reklam ve zararlı yazılımı engelle",
           "bypassRegion": "$region sitelerini atla"
         },
         "appBasedRouting": {
