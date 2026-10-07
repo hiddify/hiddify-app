@@ -82,6 +82,7 @@ class ConnectionButton extends HookConsumerWidget {
     if (ref.read(activeProfileProvider).valueOrNull == null) {
       await dialogs.showNoActiveProfile();
       ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile();
+      return;
     }
     if (await dialogs.showExperimentalFeatureNotice()) {
       await ref.read(connectionNotifierProvider.notifier).toggleConnection();
