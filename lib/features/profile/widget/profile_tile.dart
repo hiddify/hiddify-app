@@ -388,7 +388,7 @@ class ProfileActionsMenu extends HookConsumerWidget {
               onTap: () async {
                 final link = LinkParser.generateSubShareLink(url, name);
                 if (link.isNotEmpty) {
-                  await ref.read(dialogNotifierProvider.notifier).showQrCode(link, message: name);
+                  await ref.read(dialogNotifierProvider.notifier).showQrCode(link, title: name);
                 }
               },
             ),
