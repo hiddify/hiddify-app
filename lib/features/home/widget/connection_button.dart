@@ -22,9 +22,11 @@ enum _Look { loading, disconnected, connecting, connected, noPing, disconnecting
 /// A delay of 0 is a ping not measured yet; any other invalid delay timed out.
 ///
 /// The status reloads after every core start; until the new stream answers,
-/// the last status holds.
+/// the last status holds. A failed start comes back as disconnected with the
+/// failure attached.
 _Look _lookOf(AsyncValue<ConnectionStatus> status, int delay) => switch (status) {
   AsyncError() => _Look.failed,
+  AsyncValue(valueOrNull: Disconnected(connectionFailure: _?)) => _Look.failed,
   AsyncValue(valueOrNull: Disconnected()) => _Look.disconnected,
   AsyncValue(valueOrNull: Connecting()) => _Look.connecting,
   AsyncValue(valueOrNull: Connected()) when delay == 0 => _Look.connecting,
