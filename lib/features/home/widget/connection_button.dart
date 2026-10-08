@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
@@ -59,14 +59,17 @@ class ConnectionButton extends HookConsumerWidget {
     const buttonTheme = ConnectionButtonTheme.light;
     final today = DateTime.now();
     return _ConnectionButton(
+      look: look,
       onTap: onTap,
       label: switch (look) {
-        _Look.loading || _Look.failed => "",
+        _Look.loading => "",
         _Look.disconnected => t.connection.tapToConnect,
         _Look.connecting => t.connection.connecting,
         _Look.connected || _Look.noPing => t.connection.connected,
         _Look.disconnecting => t.connection.disconnecting,
+        _Look.failed => t.connection.failed,
       },
+      hint: look == _Look.failed ? t.connection.tapToRetry : null,
       buttonColor: switch (look) {
         _Look.connected => buttonTheme.connectedColor!,
         _Look.noPing => const Color.fromARGB(255, 185, 176, 103),
@@ -95,66 +98,147 @@ class ConnectionButton extends HookConsumerWidget {
   }
 }
 
-class _ConnectionButton extends StatelessWidget {
+class _ConnectionButton extends HookWidget {
   const _ConnectionButton({
+    required this.look,
     required this.onTap,
     required this.label,
+    required this.hint,
     required this.buttonColor,
     required this.image,
     required this.useImage,
   });
 
+  final _Look look;
   final VoidCallback? onTap;
   final String label;
+  final String? hint;
   final Color buttonColor;
   final AssetGenImage image;
   final bool useImage;
 
   @override
   Widget build(BuildContext context) {
-    final enabled = onTap != null;
+    final theme = Theme.of(context);
+    final busy = look == _Look.connecting || look == _Look.disconnecting;
+
+    // One ripple when a wait the user watched ends connected, not when the
+    // app opens on a tunnel that is already up or a timed-out ping recovers.
+    final ripple = useAnimationController(duration: const Duration(milliseconds: 900));
+    final previousLook = usePrevious(look);
+    useEffect(() {
+      if (look == _Look.connected && previousLook == _Look.connecting) ripple.forward(from: 0);
+      return null;
+    }, [look]);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Semantics(
           button: true,
-          enabled: enabled,
+          enabled: onTap != null,
           label: label,
-          child: Container(
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(blurRadius: 16, color: buttonColor.withValues(alpha: .5))],
-            ),
-            width: 148,
-            height: 148,
-            child: Material(
-              key: const ValueKey("home_connection_button"),
-              shape: const CircleBorder(),
-              color: Colors.white,
-              child: InkWell(
-                focusColor: Colors.grey,
-                onTap: onTap,
-                child: Padding(
-                  padding: const EdgeInsets.all(36),
-                  child: TweenAnimationBuilder(
-                    tween: ColorTween(end: buttonColor),
-                    duration: const Duration(milliseconds: 250),
-                    builder: (context, value, child) {
-                      if (useImage) {
-                        return image.image();
-                      } else {
-                        return Assets.images.logo.svg(colorFilter: ColorFilter.mode(value!, BlendMode.srcIn));
-                      }
-                    },
+          hint: hint,
+          child: SizedBox.square(
+            dimension: 148,
+            child: Stack(
+              fit: StackFit.expand,
+              clipBehavior: Clip.none,
+              children: [
+                AnimatedBuilder(
+                  animation: ripple,
+                  builder: (context, _) => ripple.isAnimating
+                      ? Transform.scale(
+                          scale: 1 + .4 * ripple.value,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: buttonColor.withValues(alpha: .7 * (1 - ripple.value)),
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                Positioned.fill(
+                  left: -10,
+                  top: -10,
+                  right: -10,
+                  bottom: -10,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: busy
+                        ? SizedBox.expand(
+                            key: ValueKey(look),
+                            child: Transform.flip(
+                              // Disconnecting spins the other way.
+                              flipX: look == _Look.disconnecting,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 4,
+                                strokeCap: StrokeCap.round,
+                                color: buttonColor,
+                                backgroundColor: buttonColor.withValues(alpha: .2),
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ),
-              ),
-            ).animate(target: enabled ? 0 : 1).blurXY(end: 1),
-          ).animate(target: enabled ? 0 : 1).scaleXY(end: .88, curve: Curves.easeIn),
+                Material(
+                  key: const ValueKey("home_connection_button"),
+                  shape: const CircleBorder(),
+                  color: Colors.white,
+                  elevation: 3,
+                  shadowColor: Colors.black,
+                  surfaceTintColor: Colors.transparent,
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    focusColor: Colors.grey,
+                    onTap: onTap,
+                    child: Padding(
+                      padding: const EdgeInsets.all(36),
+                      child: AnimatedOpacity(
+                        opacity: look == _Look.loading ? .38 : 1,
+                        duration: const Duration(milliseconds: 300),
+                        child: TweenAnimationBuilder(
+                          tween: ColorTween(end: buttonColor),
+                          duration: const Duration(milliseconds: 250),
+                          builder: (context, value, child) {
+                            if (useImage) {
+                              return image.image();
+                            } else {
+                              return Assets.images.logo.svg(colorFilter: ColorFilter.mode(value!, BlendMode.srcIn));
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        const Gap(16),
-        ExcludeSemantics(child: AnimatedText(label, style: Theme.of(context).textTheme.titleMedium)),
+        const Gap(24),
+        ExcludeSemantics(
+          child: Column(
+            children: [
+              AnimatedText(label, style: theme.textTheme.titleMedium),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: hint == null
+                    ? const SizedBox.shrink()
+                    : Text(
+                        hint!,
+                        key: ValueKey(hint),
+                        style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
