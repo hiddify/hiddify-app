@@ -167,6 +167,9 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       loggy.info("no active profile, not connecting");
       return;
     }
+    // The core reports Starting only once the config is built, about a second
+    // later; the app is connecting from here on.
+    state = const AsyncData(Connecting());
     await _connectionRepo.connect(activeProfile, ref.read(Preferences.disableMemoryLimit)).mapLeft((
       ConnectionFailure err,
     ) async {
