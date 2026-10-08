@@ -20,14 +20,17 @@ enum _Look { loading, disconnected, connecting, connected, noPing, disconnecting
 /// The core reports the tunnel as up before the first ping answers, so a tunnel
 /// with no ping yet still looks like connecting: the user waits once, not twice.
 /// A delay of 0 is a ping not measured yet; any other invalid delay timed out.
+///
+/// The status reloads after every core start; until the new stream answers,
+/// the last status holds.
 _Look _lookOf(AsyncValue<ConnectionStatus> status, int delay) => switch (status) {
-  AsyncData(value: Disconnected()) => _Look.disconnected,
-  AsyncData(value: Connecting()) => _Look.connecting,
-  AsyncData(value: Connected()) when delay == 0 => _Look.connecting,
-  AsyncData(value: Connected()) when !ConnectionConst.isValidDelay(delay) => _Look.noPing,
-  AsyncData(value: Connected()) => _Look.connected,
-  AsyncData(value: Disconnecting()) => _Look.disconnecting,
   AsyncError() => _Look.failed,
+  AsyncValue(valueOrNull: Disconnected()) => _Look.disconnected,
+  AsyncValue(valueOrNull: Connecting()) => _Look.connecting,
+  AsyncValue(valueOrNull: Connected()) when delay == 0 => _Look.connecting,
+  AsyncValue(valueOrNull: Connected()) when !ConnectionConst.isValidDelay(delay) => _Look.noPing,
+  AsyncValue(valueOrNull: Connected()) => _Look.connected,
+  AsyncValue(valueOrNull: Disconnecting()) => _Look.disconnecting,
   _ => _Look.loading,
 };
 
