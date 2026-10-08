@@ -174,6 +174,9 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       ConnectionFailure err,
     ) async {
       loggy.warning("error connecting", err);
+      // Before the dialog: a status the core sends while it is open, such as a
+      // late Started, must win over this error, not be overwritten by it.
+      state = AsyncError(err, StackTrace.current);
       //Go err is not normal object to see the go errors are string and need to be dumped
       await ref
           .read(dialogNotifierProvider.notifier)
@@ -183,7 +186,6 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
         await Sentry.captureException(Exception(err.toString()));
       }
       await ref.read(Preferences.startedByUser.notifier).update(false);
-      state = AsyncError(err, StackTrace.current);
     }).run();
   }
 
