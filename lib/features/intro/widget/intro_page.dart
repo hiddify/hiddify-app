@@ -13,10 +13,13 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/region.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/widget/cat/cat_face.dart';
+import 'package:hiddify/core/widget/cat/cat_gaze.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
+import 'package:hiddify/core/widget/cat/tappable_cat.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
-import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -65,115 +68,122 @@ class IntroPage extends HookConsumerWidget with PresLogger {
     }, []);
 
     return Scaffold(
-      body: Center(
-        child: ScrollConfiguration(
-          behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-          child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 620),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = constraints.maxWidth > IntroConst.maxwidth
-                          ? IntroConst.maxwidth
-                          : constraints.maxWidth;
-                      final size = width * 0.4;
-                      return Assets.images.logo.svg(width: size, height: size);
-                    },
-                  ),
-                  const Gap(16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      t.intro.banner,
-                      style: theme.textTheme.bodyLarge,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+      // the welcoming cat follows the pointer all over the page
+      body: CatGazeRegion(
+        child: Center(
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 620),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final width = constraints.maxWidth > IntroConst.maxwidth
+                            ? IntroConst.maxwidth
+                            : constraints.maxWidth;
+                        final size = width * 0.4;
+                        return TappableCat(
+                          mood: CatMood.purring,
+                          size: size,
+                          meow: t.cat.meow,
+                          followPointer: true,
+                          pettable: true,
+                        );
+                      },
                     ),
-                  ),
-                  const Gap(24),
-                  const LocalePrefTile(),
-                  ChoicePreferenceWidget(
-                    selected: ref.watch(ConfigOptions.region),
-                    preferences: ref.watch(ConfigOptions.region.notifier),
-                    choices: Region.values,
-                    title: t.pages.settings.routing.region,
-                    showFlag: true,
-                    icon: Icons.place_rounded,
-                    presentChoice: (value) => value.present(t),
-                    onChanged: (val) async {
-                      await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
-                    },
-                  ),
-                  const EnableAnalyticsPrefTile(),
-                  const Gap(24),
-                  Focus(
-                    focusNode: focusNodes[IntroConst.termsAndConditionsKey],
-                    onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.termsAndConditionsKey),
-                    child: Text.rich(
-                      t.intro.termsAndPolicyCaution(
-                        tap: (text) => TextSpan(
-                          text: text,
-                          style: TextStyle(
-                            color: focusStates[IntroConst.termsAndConditionsKey]!.value ? Colors.green : Colors.blue,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await UriUtils.tryLaunch(Uri.parse(Constants.termsAndConditionsUrl));
-                            },
-                        ),
+                    const Gap(16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(
+                        t.intro.banner,
+                        style: theme.textTheme.bodyLarge,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      style: theme.textTheme.bodySmall,
                     ),
-                  ),
-                  const Gap(8),
-                  Focus(
-                    focusNode: focusNodes[IntroConst.githubKey],
-                    onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.githubKey),
-                    child: Text.rich(
-                      t.intro.info(
-                        tap_source: (text) => TextSpan(
-                          text: text,
-                          style: TextStyle(
-                            color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue,
+                    const Gap(24),
+                    const LocalePrefTile(),
+                    ChoicePreferenceWidget(
+                      selected: ref.watch(ConfigOptions.region),
+                      preferences: ref.watch(ConfigOptions.region.notifier),
+                      choices: Region.values,
+                      title: t.pages.settings.routing.region,
+                      showFlag: true,
+                      icon: Icons.place_rounded,
+                      presentChoice: (value) => value.present(t),
+                      onChanged: (val) async {
+                        await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
+                      },
+                    ),
+                    const EnableAnalyticsPrefTile(),
+                    const Gap(24),
+                    Focus(
+                      focusNode: focusNodes[IntroConst.termsAndConditionsKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.termsAndConditionsKey),
+                      child: Text.rich(
+                        t.intro.termsAndPolicyCaution(
+                          tap: (text) => TextSpan(
+                            text: text,
+                            style: TextStyle(
+                              color: focusStates[IntroConst.termsAndConditionsKey]!.value ? Colors.green : Colors.blue,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                await UriUtils.tryLaunch(Uri.parse(Constants.termsAndConditionsUrl));
+                              },
                           ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await UriUtils.tryLaunch(Uri.parse(Constants.githubUrl));
-                            },
                         ),
-                        tap_license: (text) => TextSpan(
-                          text: text,
-                          style: TextStyle(
-                            color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue,
-                          ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await UriUtils.tryLaunch(Uri.parse(Constants.licenseUrl));
-                            },
-                        ),
+                        style: theme.textTheme.bodySmall,
                       ),
-                      style: theme.textTheme.bodySmall,
                     ),
-                  ),
-                  // only for managing license node focus
-                  Focus(
-                    focusNode: focusNodes[IntroConst.licenseKey],
-                    onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.licenseKey),
-                    child: const Gap(88),
-                  ),
-                ],
+                    const Gap(8),
+                    Focus(
+                      focusNode: focusNodes[IntroConst.githubKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.githubKey),
+                      child: Text.rich(
+                        t.intro.info(
+                          tap_source: (text) => TextSpan(
+                            text: text,
+                            style: TextStyle(
+                              color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                await UriUtils.tryLaunch(Uri.parse(Constants.githubUrl));
+                              },
+                          ),
+                          tap_license: (text) => TextSpan(
+                            text: text,
+                            style: TextStyle(
+                              color: focusStates[IntroConst.githubKey]!.value ? Colors.green : Colors.blue,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () async {
+                                await UriUtils.tryLaunch(Uri.parse(Constants.licenseUrl));
+                              },
+                          ),
+                        ),
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ),
+                    // only for managing license node focus
+                    Focus(
+                      focusNode: focusNodes[IntroConst.licenseKey],
+                      onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.licenseKey),
+                      child: const Gap(88),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        icon: isStarting.value
-            ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator())
-            : const Icon(Icons.rocket_launch),
+        icon: isStarting.value ? const PawSpinner(size: 24) : const Icon(Icons.rocket_launch),
         label: Text(t.common.start, style: theme.textTheme.titleMedium),
         onPressed: () async {
           if (isStarting.value) return;

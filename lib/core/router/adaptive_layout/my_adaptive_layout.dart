@@ -1,12 +1,16 @@
+import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/adaptive_layout/shell_route_action.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
+import 'package:hiddify/core/widget/cat/loafing_cat.dart';
 import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -25,6 +29,8 @@ class MyAdaptiveLayout extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    Widget loafingCat(double width) =>
+        LoafingCat(width: width, meow: t.cat.meow, onWake: ref.read(hapticServiceProvider.notifier).lightImpact);
     // focus switch management
     final primaryFocusHash = useState<int?>(null);
     final navScopeNode = useFocusScopeNode();
@@ -94,7 +100,14 @@ class MyAdaptiveLayout extends HookConsumerWidget {
         child: Material(
           child: Scaffold(
             body: isMobileBreakpoint
-                ? navigationShell
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      navigationShell,
+                      // a cat loafing on the navigation bar
+                      PositionedDirectional(start: 10, bottom: 0, child: _AwayFromKeyboard(loafingCat(60))),
+                    ],
+                  )
                 : Row(
                     children: [
                       FocusScope(
@@ -104,14 +117,18 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                           destinations: _navRailDests(_actions(t, showProfilesAction, isMobileBreakpoint)),
                           selectedIndex: navigationShell.currentIndex,
                           onDestinationSelected: (index) => _onTap(context, index),
-                          trailing: Breakpoint(context).isDesktop()
-                              ? const Expanded(
-                                  child: Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: SizedBox(width: 220, child: SideBarStatsOverview()),
-                                  ),
-                                )
-                              : null,
+                          // the cat loafs on top of the stats, or alone at the bottom of a narrow rail
+                          trailing: Expanded(
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: Breakpoint(context).isDesktop()
+                                    ? [loafingCat(84), const SizedBox(width: 220, child: SideBarStatsOverview())]
+                                    : [loafingCat(60), const SizedBox(height: 16)],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       Expanded(child: navigationShell),
@@ -139,15 +156,50 @@ class MyAdaptiveLayout extends HookConsumerWidget {
   }
 
   List<ShellRouteAction> _actions(Translations t, bool showProfilesAction, bool isMobileBreakpoint) => [
-    ShellRouteAction(Icons.power_settings_new_rounded, t.pages.home.title),
-    if (showProfilesAction && !isMobileBreakpoint) ShellRouteAction(Icons.view_list_rounded, t.pages.profiles.title),
-    ShellRouteAction(Icons.settings_rounded, t.pages.settings.title),
-    if (!isMobileBreakpoint) ShellRouteAction(Icons.description_rounded, t.pages.logs.title),
-    if (!isMobileBreakpoint) ShellRouteAction(Icons.info_rounded, t.pages.about.title),
+    ShellRouteAction(
+      FluentIcons.animal_cat_24_regular,
+      t.pages.home.title,
+      selectedIcon: FluentIcons.animal_cat_24_filled,
+    ),
+    if (showProfilesAction && !isMobileBreakpoint)
+      ShellRouteAction(
+        FluentIcons.animal_paw_print_24_regular,
+        t.pages.profiles.title,
+        selectedIcon: FluentIcons.animal_paw_print_24_filled,
+      ),
+    ShellRouteAction(Icons.settings_outlined, t.pages.settings.title, selectedIcon: Icons.settings_rounded),
+    if (!isMobileBreakpoint)
+      ShellRouteAction(Icons.description_outlined, t.pages.logs.title, selectedIcon: Icons.description_rounded),
+    if (!isMobileBreakpoint) ShellRouteAction(FontAwesomeIcons.shieldCat, t.pages.about.title),
   ];
 
-  List<NavigationDestination> _navDests(List<ShellRouteAction> actions) =>
-      actions.map((e) => NavigationDestination(icon: Icon(e.icon), label: e.title)).toList();
-  List<NavigationRailDestination> _navRailDests(List<ShellRouteAction> actions) =>
-      actions.map((e) => NavigationRailDestination(icon: Icon(e.icon), label: Text(e.title))).toList();
+  List<NavigationDestination> _navDests(List<ShellRouteAction> actions) => actions
+      .map(
+        (e) => NavigationDestination(
+          icon: Icon(e.icon),
+          selectedIcon: e.selectedIcon == null ? null : Icon(e.selectedIcon),
+          label: e.title,
+        ),
+      )
+      .toList();
+  List<NavigationRailDestination> _navRailDests(List<ShellRouteAction> actions) => actions
+      .map(
+        (e) => NavigationRailDestination(
+          icon: Icon(e.icon),
+          selectedIcon: e.selectedIcon == null ? null : Icon(e.selectedIcon),
+          label: Text(e.title),
+        ),
+      )
+      .toList();
+}
+
+/// Hides [child] while the keyboard is up, rebuilding only itself as the
+/// keyboard moves.
+class _AwayFromKeyboard extends StatelessWidget {
+  const _AwayFromKeyboard(this.child);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => MediaQuery.viewInsetsOf(context).bottom == 0 ? child : const SizedBox.shrink();
 }

@@ -12,8 +12,11 @@ import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
+import 'package:hiddify/core/theme/cat/cat_ears_border.dart';
+import 'package:hiddify/core/theme/cat/cat_theme.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
+import 'package:hiddify/core/widget/cat/cat_progress_bar.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
@@ -81,9 +84,15 @@ class ProfileTile extends HookConsumerWidget {
 
     final card = Card(
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
+      // the active profile pricks up its ears
+      shape: CatEarsBorder(
         side: profile.active ? BorderSide(color: theme.colorScheme.outline) : BorderSide.none,
         borderRadius: showLinks ? ProfileTileConst.topOnlyBorderRadius : ProfileTileConst.cardBorderRadius,
+        earHeight: profile.active ? 9 : 6,
+        earWidth: profile.active ? 14 : 10,
+        earInset: 26,
+        earTilt: profile.active ? -.06 : .2,
+        innerEarColor: CatTheme.of(context).innerEar.withValues(alpha: profile.active ? .85 : .5),
       ),
       elevation: profile.active ? 0 : 1,
       child: IntrinsicHeight(
@@ -684,7 +693,8 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
   }
 }
 
-// TODO change colors
+/// How much of the traffic is used: the cat walks along the bar, and the bar
+/// turns to the error color once nine tenths are gone.
 class RemainingTrafficIndicator extends StatelessWidget {
   const RemainingTrafficIndicator(this.ratio, {super.key});
 
@@ -692,6 +702,6 @@ class RemainingTrafficIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LinearProgressIndicator(value: ratio, borderRadius: BorderRadius.circular(16), minHeight: 6);
+    return CatProgressBar(value: ratio, color: ratio >= .9 ? Theme.of(context).colorScheme.error : null);
   }
 }

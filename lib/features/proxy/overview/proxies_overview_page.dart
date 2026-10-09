@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -76,7 +77,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
               )
             : Center(child: Text(t.pages.proxies.empty)),
         error: (error, stackTrace) => Center(child: Text(t.presentShortError(error))),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: PawSpinner()),
       ),
     );
   }

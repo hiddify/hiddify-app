@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -187,7 +188,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 //     //   ),
 //     //   builder: (context, snapshot) {
 //     //     if (snapshot.connectionState == ConnectionState.waiting) {
-//     //       return const Center(child: CircularProgressIndicator());
+//     //       return const Center(child: PawSpinner());
 //     //     }
 
 //     //     if (snapshot.data == true) {
@@ -411,7 +412,7 @@ class QrCodeScannerDialog extends ConsumerWidget {
           alignment: Alignment.center,
           children: [
             MobileScanner(
-              placeholderBuilder: (context) => const Center(child: CircularProgressIndicator()),
+              placeholderBuilder: (context) => const Center(child: PawSpinner()),
               overlayBuilder: (context, constraints) => Container(
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.width * 0.7,
