@@ -11,7 +11,9 @@ import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/model/startup_connection.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
+import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_review/in_app_review.dart';
@@ -83,10 +85,14 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   Future<void> restoreConnectionOnStartup() async {
     final startedByUser = ref.read(Preferences.startedByUser);
     final activeProfile = await ref.read(activeProfileProvider.future);
+    // macOS can restore a running system VPN during core setup. Reconnecting
+    // it here would unnecessarily stop and restart that tunnel.
+    final coreStatus = ref.read(hiddifyCoreServiceProvider).currentState;
     final shouldRestore = shouldRestoreConnectionOnStartup(
       isDesktop: PlatformUtils.isDesktop,
       startedByUser: startedByUser,
       hasActiveProfile: activeProfile != null,
+      isAlreadyRunning: coreStatus is CoreStarted || coreStatus is CoreStarting,
     );
     if (!shouldRestore) {
       loggy.debug("no previous connection to restore");

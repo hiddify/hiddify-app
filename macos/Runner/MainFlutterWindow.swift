@@ -4,11 +4,13 @@ import window_manager
 import LaunchAtLogin
 
 class MainFlutterWindow: NSWindow {
+  private var vpnController: MacOSVPNController?
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController()
     let windowFrame = self.frame
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)
+    vpnController = MacOSVPNController(messenger: flutterViewController.engine.binaryMessenger)
 
 
  // Add FlutterMethodChannel platform code

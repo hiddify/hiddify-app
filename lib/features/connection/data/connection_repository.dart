@@ -139,7 +139,8 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
               }
 
               _configOptionsSnapshot = overridedOptions;
-              await singbox.changeOptions(overridedOptions).run();
+              final optionsResult = await singbox.changeOptions(overridedOptions).run();
+              optionsResult.match((error) => throw ConnectionFailure.unexpected(error), (_) {});
               return unit;
             }, (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st)),
           );
