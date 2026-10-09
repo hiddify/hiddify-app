@@ -1,0 +1,9 @@
+https://github.com/google/fonts/tree/main/ofl/nunito
+License: SIL Open Font License 1.1, see Nunito-OFL.txt
+
+The static weights are cut from the variable font Nunito[wght].ttf with fontTools:
+
+from fontTools.ttLib import TTFont
+from fontTools.varLib import instancer
+for weight, name in {400: "Regular", 500: "Medium", 600: "SemiBold", 700: "Bold", 800: "ExtraBold"}.items():
+    instancer.instantiateVariableFont(TTFont("Nunito[wght].ttf"), {"wght": weight}, updateFontNames=True).save(f"Nunito-{name}.ttf")

@@ -1,34 +1,31 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/theme/app_theme_mode.dart';
-import 'package:hiddify/core/theme/theme_extensions.dart';
+import 'package:hiddify/core/theme/cat/cat_theme_data.dart';
+import 'package:hiddify/gen/fonts.gen.dart';
 
 class AppTheme {
   AppTheme(this.mode, this.fontFamily);
   final AppThemeMode mode;
   final String fontFamily;
 
-  ThemeData lightTheme(ColorScheme? lightColorScheme) {
-    final ColorScheme scheme = lightColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0));
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: scheme,
-      fontFamily: fontFamily,
-      extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.light},
-    );
-  }
+  /// Windows has no color emoji for flags; the bundled subset fills in for the
+  /// rounded font, which has none either.
+  List<String>? get _fontFamilyFallback =>
+      fontFamily == FontFamily.nunito && !kIsWeb && Platform.isWindows ? const [FontFamily.emoji] : null;
 
-  ThemeData darkTheme(ColorScheme? darkColorScheme) {
-    final ColorScheme scheme =
-        darkColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0), brightness: Brightness.dark);
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: scheme,
-      scaffoldBackgroundColor: mode.trueBlack ? Colors.black : scheme.surface,
-      fontFamily: fontFamily,
-      extensions: const <ThemeExtension<dynamic>>{ConnectionButtonTheme.light},
-    );
-  }
+  // The cat palettes replace the system's dynamic colors: the cat is the theme.
+  ThemeData lightTheme(ColorScheme? lightColorScheme) =>
+      buildCatTheme(CatBreed.ginger, fontFamily: fontFamily, fontFamilyFallback: _fontFamilyFallback);
+
+  ThemeData darkTheme(ColorScheme? darkColorScheme) => buildCatTheme(
+    mode.trueBlack ? CatBreed.black : CatBreed.night,
+    fontFamily: fontFamily,
+    fontFamilyFallback: _fontFamilyFallback,
+  );
 
   CupertinoThemeData cupertinoThemeData(bool sysDark, ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
     final bool isDark = switch (mode) {
