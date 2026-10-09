@@ -3,7 +3,7 @@
     android:height="108dp"
     android:viewportWidth="2048"
     android:viewportHeight="2048">
-  <!-- the cat theme's head, see the cat icon generator -->
+  <!-- the cat theme's head, drawn by scripts/cat_icons/make_icons.py -->
   <path
       android:pathData="M688.5,958 L721.61,688.75 Q734.48,584.03 798.61,688.75 L963.5,958 Z"
       android:fillColor="#F5A35C"
