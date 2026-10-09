@@ -27,7 +27,7 @@ import 'package:meta/meta.dart';
 /// - url filename extension (remote only, example: `https://example.com/config.json`) -> name=`config`
 /// - if none of these methods return a non-blank string, switch(profileType)
 /// - remote:  fallback to `Remote Profile`
-/// - local: fallback to protocol, extracted from content by protocol()
+/// - local: keep the existing name, otherwise extract it from content by protocol()
 ///
 /// Note: the url-based steps (fragment, filename) apply to remote profiles only,
 /// since local profiles have no url. Every step treats a whitespace-only result
@@ -381,7 +381,10 @@ class ProfileParser {
               name = "Remote Profile";
 
             case LocalProfileEntity():
-              name = protocol(File(tempFilePath).readAsStringSync());
+              // The editor saves generated JSON, so the original link fragment
+              // is no longer available. Keep the profile name independently of
+              // outbound tags unless an override or header supplies a new name.
+              name = profile.name.isNotBlank ? profile.name : protocol(File(tempFilePath).readAsStringSync());
           }
         }
 

@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:hiddify/core/db/db.dart';
+import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
@@ -241,6 +245,103 @@ void main() {
           );
         });
       });
+    });
+  });
+
+  group("local profile names", () {
+    late Directory tempDirectory;
+    late File configFile;
+
+    setUp(() {
+      tempDirectory = Directory.systemTemp.createTempSync('profile-name-test-');
+      configFile = File('${tempDirectory.path}/config');
+    });
+
+    tearDown(() {
+      tempDirectory.deleteSync(recursive: true);
+    });
+
+    ProfileEntity parseLocal(ProfileEntity profile) => ProfileParser.parse(
+      tempFilePath: configFile.path,
+      profile: profile,
+    ).match((failure) => throw failure, (parsed) => parsed);
+
+    ProfileEntity newProfile({String name = ''}) =>
+        ProfileEntity.local(id: const Uuid().v4(), active: true, name: name, lastUpdate: DateTime.now());
+
+    for (final (scheme, outboundType) in [
+      ('vless', 'vless'),
+      ('trojan', 'trojan'),
+      ('ss', 'shadowsocks'),
+      ('hy2', 'hysteria2'),
+      ('tuic', 'tuic'),
+      ('socks', 'socks'),
+    ]) {
+      test("preserves the imported profile name after editing as JSON ($scheme)", () {
+        configFile.writeAsStringSync('$scheme://credential@1.2.3.4:443#My%20Server');
+        final imported = parseLocal(newProfile());
+        expect(imported.name, 'My Server');
+
+        configFile.writeAsStringSync(
+          jsonEncode({
+            'outbounds': [
+              {'type': outboundType, 'tag': 'My Server', 'server': '1.2.3.4', 'server_port': 8443},
+            ],
+            'endpoints': [],
+          }),
+        );
+        final saved = parseLocal(imported);
+        expect(saved.name, 'My Server');
+        expect(saved.userOverride, isNull);
+        expect(parseLocal(saved).name, 'My Server');
+      });
+    }
+
+    test("explicit rename takes precedence over the existing name", () {
+      configFile.writeAsStringSync('{"outbounds": []}');
+      final profile = newProfile(name: 'My Server').copyWith(userOverride: const UserOverride(name: 'Renamed'));
+      expect(parseLocal(profile).name, 'Renamed');
+    });
+
+    for (final hasNameOverride in [false, true]) {
+      test("keeps a manually renamed profile after saving and reloading (override: $hasNameOverride)", () async {
+        final db = Db(NativeDatabase.memory());
+        addTearDown(db.close);
+        final profile = newProfile(name: 'My Custom Name').copyWith(
+          populatedHeaders: const {},
+          userOverride: hasNameOverride ? const UserOverride(name: 'My Custom Name') : null,
+        );
+        await db.into(db.profileEntries).insert(profile.toInsertEntry());
+
+        for (final port in [8443, 9443]) {
+          final stored = (await db.select(db.profileEntries).getSingle()).toEntity();
+          expect(stored.name, 'My Custom Name');
+          configFile.writeAsStringSync(
+            jsonEncode({
+              'outbounds': [
+                {'type': 'trojan', 'tag': 'Original Server Name', 'server': '1.2.3.4', 'server_port': port},
+              ],
+              'endpoints': [],
+            }),
+          );
+          final saved = parseLocal(stored);
+          await db.update(db.profileEntries).write(saved.toUpdateEntry());
+          final reloaded = (await db.select(db.profileEntries).getSingle()).toEntity();
+          expect(reloaded.name, 'My Custom Name');
+          expect(reloaded.userOverride?.name, hasNameOverride ? 'My Custom Name' : null);
+        }
+      });
+    }
+
+    test("profile title takes precedence over the existing name", () {
+      configFile.writeAsStringSync('{"outbounds": []}');
+      final profile = newProfile(name: 'My Server').copyWith(populatedHeaders: {'profile-title': 'Profile Title'});
+      expect(parseLocal(profile).name, 'Profile Title');
+    });
+
+    test("a blank existing name still uses the link fragment", () {
+      configFile.writeAsStringSync('vless://uuid@1.2.3.4:443#My%20Server');
+      expect(parseLocal(newProfile(name: '   ')).name, 'My Server');
     });
   });
 
