@@ -766,5 +766,17 @@
       "missingLicense": "需要 Psiphon 许可证",
       "missingLicenseMsg": "此配置文件使用 Psiphon。请同意 Psiphon 许可证以继续。"
     }
+  },
+  "cat": {
+    "meow": "喵",
+    "mood": {
+      "napping": "打盹中",
+      "wakingUp": "醒来中",
+      "purring": "呼噜中",
+      "dozingOff": "犯困中",
+      "hissing": "哈气中",
+      "curious": "好奇中",
+      "grooming": "理毛中"
+    }
   }
 }

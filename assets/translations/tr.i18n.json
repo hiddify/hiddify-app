@@ -766,5 +766,17 @@
       "missingLicense": "Psiphon lisansı gerekli",
       "missingLicenseMsg": "Bu profil Psiphon kullanıyor. Devam etmek için Psiphon lisansını kabul edin."
     }
+  },
+  "cat": {
+    "meow": "Miyav",
+    "mood": {
+      "napping": "Kestiriyor",
+      "wakingUp": "Uyanıyor",
+      "purring": "Mırlıyor",
+      "dozingOff": "Uyukluyor",
+      "hissing": "Tıslıyor",
+      "curious": "Meraklı",
+      "grooming": "Yalanıyor"
+    }
   }
 }

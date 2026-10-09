@@ -790,5 +790,17 @@
       "missingLicense": "Требуется лицензия Psiphon",
       "missingLicenseMsg": "Этот профиль использует Psiphon. Примите лицензию Psiphon, чтобы продолжить."
     }
+  },
+  "cat": {
+    "meow": "Мяу",
+    "mood": {
+      "napping": "Дремлет",
+      "wakingUp": "Просыпается",
+      "purring": "Мурлычет",
+      "dozingOff": "Засыпает",
+      "hissing": "Шипит",
+      "curious": "Любопытствует",
+      "grooming": "Умывается"
+    }
   }
 }

@@ -803,5 +803,17 @@
       "missingLicense": "رخصة Psiphon مطلوبة",
       "missingLicenseMsg": "يستخدم هذا الملف الشخصي Psiphon. وافق على رخصة Psiphon للمتابعة."
     }
+  },
+  "cat": {
+    "meow": "مياو",
+    "mood": {
+      "napping": "يأخذ قيلولة",
+      "wakingUp": "يستيقظ",
+      "purring": "يخرخر",
+      "dozingOff": "يغفو",
+      "hissing": "يفحّ",
+      "curious": "فضولي",
+      "grooming": "يتنظّف"
+    }
   }
 }
