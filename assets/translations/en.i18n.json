@@ -769,5 +769,17 @@
       "missingLicense": "Psiphon license required",
       "missingLicenseMsg": "This profile uses Psiphon. Accept the Psiphon license to continue."
     }
+  },
+  "cat": {
+    "meow": "Meow",
+    "mood": {
+      "napping": "Napping",
+      "wakingUp": "Waking up",
+      "purring": "Purring",
+      "dozingOff": "Dozing off",
+      "hissing": "Hissing",
+      "curious": "Curious",
+      "grooming": "Grooming"
+    }
   }
 }
