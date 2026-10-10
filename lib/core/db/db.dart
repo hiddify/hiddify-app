@@ -3,7 +3,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:hiddify/core/db/converters/duration_converter.dart';
 import 'package:hiddify/core/db/db.steps.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
-import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
+import 'package:hiddify/features/app_based_routing/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
@@ -13,8 +13,11 @@ part 'db.g.dart';
 class Db extends _$Db with InfraLogger {
   Db([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
+  // Changing the schema? Bump `schemaVersion`, add a matching `stepByStep` step
+  // below, and regenerate — full checklist in `README.md` next to this file.
+  // Migrations run on every user's device on update; a wrong one can lose data.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   static QueryExecutor _openConnection() {
     return LazyDatabase(
@@ -71,6 +74,9 @@ class Db extends _$Db with InfraLogger {
             await m.dropColumn(schema.profileEntries, 'profile_override');
           }
         },
+        from6To7: (m, schema) async {
+          await m.addColumn(schema.profileEntries, schema.profileEntries.pinned);
+        },
       ),
     );
   }
@@ -98,6 +104,7 @@ class ProfileEntries extends Table {
   TextColumn get supportUrl => text().nullable()();
   TextColumn get populatedHeaders => text().nullable()();
   TextColumn get userOverride => text().nullable()();
+  BoolColumn get pinned => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};

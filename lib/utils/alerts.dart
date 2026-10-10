@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:hiddify/core/notification/toast_hover_pause.dart';
 import 'package:toastification/toastification.dart';
 
 enum AlertType {
@@ -15,20 +16,15 @@ enum AlertType {
 }
 
 class CustomToast extends StatelessWidget {
-  const CustomToast(this.message, {this.type = AlertType.info, this.icon, this.duration = const Duration(seconds: 3)});
+  const CustomToast(this.message, {this.type = AlertType.info, this.icon});
 
-  const CustomToast.error(this.message, {this.duration = const Duration(seconds: 5)})
-    : type = AlertType.error,
-      icon = FluentIcons.error_circle_24_regular;
+  const CustomToast.error(this.message) : type = AlertType.error, icon = FluentIcons.error_circle_24_regular;
 
-  const CustomToast.success(this.message, {this.duration = const Duration(seconds: 3)})
-    : type = AlertType.success,
-      icon = FluentIcons.checkmark_24_regular;
+  const CustomToast.success(this.message) : type = AlertType.success, icon = FluentIcons.checkmark_24_regular;
 
   final String message;
   final AlertType type;
   final IconData? icon;
-  final Duration duration;
 
   @override
   Widget build(BuildContext context) {
@@ -56,18 +52,21 @@ class CustomToast extends StatelessWidget {
   }
 
   void show(BuildContext context) {
-    toastification.show(
+    late final ToastificationItem item;
+    item = toastification.show(
       context: context,
-      title: Text(message),
+      title: ToastHoverPause(item: () => item, child: Text(message)),
       type: type._toastificationType,
-      alignment: Alignment.bottomLeft,
-      autoCloseDuration: duration,
-      style: ToastificationStyle.fillColored,
-      pauseOnHover: true,
+      alignment: AlignmentDirectional.bottomStart,
+      // a Material 3 snackbar's time
+      autoCloseDuration: const Duration(seconds: 4),
+      style: ToastificationStyle.flat,
+      // see ToastHoverPause
+      pauseOnHover: false,
       showProgressBar: false,
       dragToClose: true,
       closeOnClick: true,
-      closeButtonShowType: CloseButtonShowType.onHover,
+      closeButton: const ToastCloseButton(showType: CloseButtonShowType.onHover),
     );
   }
 }

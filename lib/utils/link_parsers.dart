@@ -40,7 +40,10 @@ abstract class LinkParser {
     switch (uri.scheme) {
       case 'hiddify':
         if (queryParams.containsKey('url')) {
-          return (url: queryParams['url']!, name: queryParams['name'] ?? '');
+          // Doc form: hiddify://install-config?url=<uri>#<name> — the name lives
+          // in the fragment. Prefer an explicit `name=` param, else the fragment.
+          final name = (queryParams['name']?.isNotEmpty ?? false) ? queryParams['name']! : uri.fragment;
+          return (url: queryParams['url']!, name: name);
         } else {
           return (url: uri.path.substring(1) + (uri.hasQuery ? "?${uri.query}" : ""), name: uri.fragment);
         }

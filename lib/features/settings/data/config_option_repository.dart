@@ -270,14 +270,14 @@ abstract class ConfigOptions {
   static final extraSecurityMode = PreferencesNotifier.create<ChainMode, String>(
     "extra-security-mode",
     ChainMode.warp,
-    mapFrom: ChainMode.values.byName,
+    mapFrom: (value) => ChainMode.fromStored(value, ChainMode.warp),
     mapTo: (value) => value.name,
   );
 
   static final unblockerMode = PreferencesNotifier.create<ChainMode, String>(
     "unblocker-mode",
     ChainMode.psiphon,
-    mapFrom: ChainMode.values.byName,
+    mapFrom: (value) => ChainMode.fromStored(value, ChainMode.psiphon),
     mapTo: (value) => value.name,
   );
 

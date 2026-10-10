@@ -18,5 +18,12 @@ void main() {
       );
       expect(status.getCoreAlert(), isNotNull);
     });
+
+    test('hot reloading is its own state, without an alert', () {
+      final status = CoreStatus.fromCoreInfo(CoreInfoResponse(coreState: CoreStates.HOT_RELOADING));
+      expect(status, isA<CoreHotReloading>());
+      expect(status.getCoreAlert(), isNull);
+      expect(CoreStatus.fromEvent({'status': 'HotReloading'}), isA<CoreHotReloading>());
+    });
   });
 }

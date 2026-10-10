@@ -5,6 +5,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/route_rules/notifier/rules_notifier.dart';
 import 'package:hiddify/features/route_rules/widget/setting_detail_chips.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/config/route_rule.pb.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 
@@ -51,17 +52,21 @@ class RuleTile extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    final builtin = BuiltinRule.of(rule);
+    final region = ref.watch(ConfigOptions.region);
     final scrollController = useScrollController();
     ref.listen(rulesNotifierProvider, (_, _) {
       if (scrollController.offset > 0) scrollController.jumpTo(0);
     });
     return Material(
       child: InkWell(
-        onTap: () {
-          context.goNamed('rule', pathParameters: {'orderId': rule.listOrder.toString()});
-        },
-        onLongPress: () async => await handleDelete(context, ref),
-        onSecondaryTapUp: PlatformUtils.isDesktop
+        // a built-in rule can only be switched and moved
+        onTap: builtin != null
+            ? null
+            : () => context.goNamed('rule', pathParameters: {'orderId': rule.listOrder.toString()}),
+        onLongPress: builtin != null ? null : () async => await handleDelete(context, ref),
+        onSecondaryTapUp: builtin == null && PlatformUtils.isDesktop
             ? (details) {
                 final offset = details.globalPosition;
                 showMenu(
@@ -80,11 +85,22 @@ class RuleTile extends HookConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              title: Text(
-                t.pages.settings.routing.routeRule.rule.outbound[rule.outbound.name] ?? rule.outbound.name,
+              title: Text.rich(
+                TextSpan(
+                  text: t.pages.settings.routing.routeRule.rule.outbound[rule.outbound.name] ?? rule.outbound.name,
+                  children: [
+                    if (builtin != null) ...[
+                      const TextSpan(text: ' · '),
+                      TextSpan(
+                        text: t.pages.settings.routing.builtinRules.tag,
+                        style: TextStyle(color: theme.colorScheme.primary),
+                      ),
+                    ],
+                  ],
+                ),
                 style: Theme.of(context).textTheme.labelMedium,
               ),
-              subtitle: Text(rule.name, style: Theme.of(context).textTheme.bodyLarge),
+              subtitle: Text(builtin?.present(t, region) ?? rule.name, style: Theme.of(context).textTheme.bodyLarge),
               leading: ReorderableDragStartListener(index: index, child: const Icon(Icons.drag_handle_rounded)),
               trailing: Switch(
                 value: rule.enabled,

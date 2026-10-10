@@ -12,9 +12,18 @@ class ActionsAtClosingDialog extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     return SimpleDialog(
       title: Text(t.pages.settings.general.actionAtClosing),
-      children: ActionsAtClosing.values
-          .map((e) => RadioListTile(title: Text(e.present(t)), value: e, groupValue: selected, onChanged: context.pop))
-          .toList(),
+      children: [
+        RadioGroup<ActionsAtClosing>(
+          groupValue: selected,
+          onChanged: context.pop,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ActionsAtClosing.values
+                .map((e) => RadioListTile<ActionsAtClosing>(title: Text(e.present(t)), value: e))
+                .toList(),
+          ),
+        ),
+      ],
     );
   }
 }

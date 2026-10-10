@@ -7,6 +7,10 @@ analyzer:
     - "**/*.freezed.dart"
     - "**/*.mapper.dart"
     - "lib/gen/**"
+    # protobuf / gRPC output — regenerated from .proto, never hand-edited
+    - "lib/hiddifycore/generated/**"
+    # vendored copy of the json_editor_flutter package
+    - "lib/features/profile/details/json_editor.dart"
     - "build/**"
     - "dist/**"
   errors:

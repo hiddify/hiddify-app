@@ -126,6 +126,17 @@ class CoreClient extends $grpc.Client {
     return $createUnaryCall(_$restart, request, options: options);
   }
 
+  /// Apply the config to the running core without restarting it: outbounds, endpoints, inbounds
+  /// (not TUN), DNS servers/rules/final and route rules/rule sets/final may change. Anything else,
+  /// or a changed TUN inbound, returns HOT_RELOAD_FAILED and leaves the core running unchanged.
+  /// When the core is stopped, it is started like Start.
+  $grpc.ResponseFuture<$0.CoreInfoResponse> hotReload(
+    $0.StartRequest request, {
+    $grpc.CallOptions? options,
+  }) {
+    return $createUnaryCall(_$hotReload, request, options: options);
+  }
+
   $grpc.ResponseFuture<$1.Response> selectOutbound(
     $0.SelectOutboundRequest request, {
     $grpc.CallOptions? options,
@@ -247,6 +258,11 @@ class CoreClient extends $grpc.Client {
   static final _$restart =
       $grpc.ClientMethod<$0.StartRequest, $0.CoreInfoResponse>(
           '/hcore.Core/Restart',
+          ($0.StartRequest value) => value.writeToBuffer(),
+          $0.CoreInfoResponse.fromBuffer);
+  static final _$hotReload =
+      $grpc.ClientMethod<$0.StartRequest, $0.CoreInfoResponse>(
+          '/hcore.Core/HotReload',
           ($0.StartRequest value) => value.writeToBuffer(),
           $0.CoreInfoResponse.fromBuffer);
   static final _$selectOutbound =
@@ -378,6 +394,13 @@ abstract class CoreServiceBase extends $grpc.Service {
     $addMethod($grpc.ServiceMethod<$0.StartRequest, $0.CoreInfoResponse>(
         'Restart',
         restart_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.StartRequest.fromBuffer(value),
+        ($0.CoreInfoResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.StartRequest, $0.CoreInfoResponse>(
+        'HotReload',
+        hotReload_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.StartRequest.fromBuffer(value),
@@ -547,6 +570,14 @@ abstract class CoreServiceBase extends $grpc.Service {
   }
 
   $async.Future<$0.CoreInfoResponse> restart(
+      $grpc.ServiceCall call, $0.StartRequest request);
+
+  $async.Future<$0.CoreInfoResponse> hotReload_Pre(
+      $grpc.ServiceCall $call, $async.Future<$0.StartRequest> $request) async {
+    return hotReload($call, await $request);
+  }
+
+  $async.Future<$0.CoreInfoResponse> hotReload(
       $grpc.ServiceCall call, $0.StartRequest request);
 
   $async.Future<$1.Response> selectOutbound_Pre($grpc.ServiceCall $call,
