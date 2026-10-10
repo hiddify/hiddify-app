@@ -768,7 +768,7 @@
     "singbox": {
       "serviceNotRunning": "Service is not running",
       "missingPrivilege": "Missing privilege",
-      "missingPrivilegeMsg": "VPN mode requires administrator privileges. Either relaunch the app as administrator or change service mode.",
+      "missingPrivilegeMsg": "VPN mode can’t start. Relaunch the app as administrator or change service mode.",
       "tunAddressInUse": "Another VPN is active",
       "tunAddressInUseMsg": "VPN mode can’t start. Turn off the other VPN or change service mode.",
       "invalidConfigOptions": "Invalid configuration options",
