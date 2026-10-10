@@ -5,6 +5,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hiddify/features/app_based_routing/model/app_package_info.dart';
 import 'package:hiddify/features/app_based_routing/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/route_rules/notifier/rule_notifier.dart';
@@ -156,7 +157,7 @@ class PackageNamesPage extends HookConsumerWidget {
               bottom: chips,
             ),
       body: shownRows == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: PawSpinner())
           : ListView.builder(
               itemCount: shownRows.length,
               itemBuilder: (context, index) {

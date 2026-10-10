@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/theme/cat/cat_ears_border.dart';
+import 'package:hiddify/core/theme/cat/cat_theme.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
@@ -43,10 +45,16 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       padding: const EdgeInsets.symmetric(vertical: 12),
-      decoration: BoxDecoration(
+      decoration: ShapeDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
+        shape: CatEarsBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          earHeight: 9,
+          earWidth: 14,
+          earInset: 30,
+          innerEarColor: CatTheme.of(context).innerEar,
+        ),
+        shadows: [
           BoxShadow(
             color: theme.colorScheme.secondary.withValues(alpha: .21),
             blurRadius: 10,
@@ -109,9 +117,9 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                 ],
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Icon(Icons.arrow_forward_ios, color: Colors.blue),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Icon(Icons.arrow_forward_ios, color: theme.colorScheme.primary),
             ),
           ],
         ),

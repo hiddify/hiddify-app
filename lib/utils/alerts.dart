@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/notification/toast_hover_pause.dart';
+import 'package:hiddify/core/widget/cat/cat_face.dart';
 import 'package:toastification/toastification.dart';
 
 enum AlertType {
@@ -12,6 +13,13 @@ enum AlertType {
     success => ToastificationType.success,
     error => ToastificationType.error,
     info => ToastificationType.info,
+  };
+
+  /// The little cat at the start of the toast.
+  CatMood get _catMood => switch (this) {
+    success => CatMood.purring,
+    error => CatMood.hissing,
+    info => CatMood.curious,
   };
 }
 
@@ -57,6 +65,7 @@ class CustomToast extends StatelessWidget {
       context: context,
       title: ToastHoverPause(item: () => item, child: Text(message)),
       type: type._toastificationType,
+      icon: CatFace(mood: type._catMood, size: 32),
       alignment: AlignmentDirectional.bottomStart,
       // a Material 3 snackbar's time
       autoCloseDuration: const Duration(seconds: 4),

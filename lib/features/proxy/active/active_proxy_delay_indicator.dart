@@ -41,7 +41,7 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(FluentIcons.wifi_1_24_regular),
+              Icon(FluentIcons.animal_paw_print_24_regular, color: theme.colorScheme.primary),
               const Gap(8),
               if (delay > 0)
                 Text.rich(

@@ -766,5 +766,17 @@
       "missingLicense": "Lisensi Psiphon diperlukan",
       "missingLicenseMsg": "Profil ini menggunakan Psiphon. Setujui lisensi Psiphon untuk melanjutkan."
     }
+  },
+  "cat": {
+    "meow": "Meong",
+    "mood": {
+      "napping": "Tidur siang",
+      "wakingUp": "Bangun tidur",
+      "purring": "Mendengkur",
+      "dozingOff": "Mengantuk",
+      "hissing": "Mendesis",
+      "curious": "Penasaran",
+      "grooming": "Merapikan bulu"
+    }
   }
 }

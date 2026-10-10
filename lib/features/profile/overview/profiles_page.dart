@@ -5,6 +5,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
@@ -54,7 +55,7 @@ class ProfilesPage extends HookConsumerWidget {
           itemBuilder: (context, index) => ProfileTile(key: ValueKey(data[index].id), profile: data[index]),
           itemCount: data.length,
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: PawSpinner()),
         error: (error, stackTrace) => Text(t.presentShortError(error)),
       ),
     );

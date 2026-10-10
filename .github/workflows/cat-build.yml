@@ -1,0 +1,160 @@
+name: Cat build
+
+# Builds the cat edition from this repository alone: no Hiddify secrets, no
+# releases, no store uploads. The packages are attached to the run.
+on:
+  push:
+    branches:
+      - main
+      - "claude/**"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: "3.38.5"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: Generate code
+        run: make common-prepare
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+      - name: Test
+        run: flutter test
+
+  android:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache/CodeQL
+          df -h
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 17
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: Cache Gradle
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+      # Without a keystore the APK is signed with the debug key. Keeping that key
+      # from one build to the next lets a new build install over the last one.
+      - name: Keep the signing key
+        uses: actions/cache@v5
+        with:
+          path: ~/.android/debug.keystore
+          key: cat-android-debug-keystore
+      - name: Install packaging tools
+        run: |
+          make android-install-deps
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+      - name: Prepare
+        run: make android-prepare
+      - name: Build
+        run: make android-apk-release
+      - name: Collect
+        run: |
+          mkdir out
+          apks=build/app/outputs/flutter-apk
+          cp "$apks/app-release.apk" out/Hiddify-Cat-Android-universal.apk
+          # the per-processor builds are smaller; the universal one runs everywhere
+          cp $apks/*arm64-v8a*.apk out/Hiddify-Cat-Android-arm64.apk || echo "no arm64 apk"
+          cp $apks/*armeabi-v7a*.apk out/Hiddify-Cat-Android-arm7.apk || echo "no arm7 apk"
+          cp $apks/*x86_64*.apk out/Hiddify-Cat-Android-x86_64.apk || echo "no x86_64 apk"
+          ls -l out
+      - uses: actions/upload-artifact@v6
+        with:
+          name: Hiddify-Cat-Android
+          path: out/
+          if-no-files-found: error
+          retention-days: 30
+
+  windows:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: Install packaging tools
+        run: make windows-install-deps
+      - name: Prepare
+        run: make windows-prepare
+      # only the portable zip: the installer and the MSIX share Hiddify's app id
+      # and would replace an installed Hiddify
+      - name: Build
+        run: make windows-zip-release
+      - name: Collect
+        shell: bash
+        run: |
+          mkdir out
+          cp dist/*/*.zip out/Hiddify-Cat-Windows-Portable-x64.zip
+          ls -l out
+      - uses: actions/upload-artifact@v6
+        with:
+          name: Hiddify-Cat-Windows
+          path: out/
+          if-no-files-found: error
+          retention-days: 30
+
+  linux:
+    needs: test
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: Install packaging tools
+        run: |
+          make linux-install-deps
+          echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+      - name: Prepare
+        run: make linux-prepare
+      # the AppImage, packed with its own home folder so it keeps its data apart
+      - name: Build
+        run: make linux-appimage-release
+      - name: Collect
+        run: |
+          mkdir out
+          cp dist/*/*.tar.gz out/Hiddify-Cat-Linux-x64-AppImage.tar.gz
+          ls -l out
+      - uses: actions/upload-artifact@v6
+        with:
+          name: Hiddify-Cat-Linux
+          path: out/
+          if-no-files-found: error
+          retention-days: 30

@@ -768,5 +768,17 @@
       "missingLicense": "Licence Psiphon requise",
       "missingLicenseMsg": "Ce profil utilise Psiphon. Acceptez la licence Psiphon pour continuer."
     }
+  },
+  "cat": {
+    "meow": "Miaou",
+    "mood": {
+      "napping": "Fait la sieste",
+      "wakingUp": "Se réveille",
+      "purring": "Ronronne",
+      "dozingOff": "S’endort",
+      "hissing": "Crache",
+      "curious": "Curieux",
+      "grooming": "Fait sa toilette"
+    }
   }
 }

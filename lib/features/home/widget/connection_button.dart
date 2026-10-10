@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
+import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
-import 'package:hiddify/core/theme/theme_extensions.dart';
+import 'package:hiddify/core/theme/cat/cat_theme.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
+import 'package:hiddify/core/widget/cat/cat_face.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
-import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // TODO: rewrite
@@ -29,7 +30,6 @@ class ConnectionButton extends HookConsumerWidget {
 
     final requiresReconnect = ref.watch(configOptionNotifierProvider).valueOrNull;
     final hotReloading = ref.watch(hotReloadingProvider).valueOrNull ?? false;
-    final today = DateTime.now();
     // final animationController = useAnimationController(
     //   duration: const Duration(seconds: 1),
     // )..repeat(reverse: true); // Ensure the animation loops indefinitely
@@ -59,8 +59,6 @@ class ConnectionButton extends HookConsumerWidget {
     //   //     }
     //   //   },
     //   // );
-
-    const buttonTheme = ConnectionButtonTheme.light;
 
     //   // return CircleDesignWidget(
     //   //   onTap: switch (connectionStatus) {
@@ -152,129 +150,117 @@ class ConnectionButton extends HookConsumerWidget {
         AsyncData(value: final status) => status.present(t),
         _ => "",
       },
-      buttonColor: switch (connectionStatus) {
-        AsyncData(value: Connected()) when hotReloading => const Color.fromARGB(255, 185, 176, 103),
-        AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
-        AsyncData(value: Connected()) when !ConnectionConst.isValidDelay(delay) => const Color.fromARGB(255, 185, 176, 103),
-        AsyncData(value: Connected()) => buttonTheme.connectedColor!,
-        AsyncData(value: _) => buttonTheme.idleColor!,
-        _ => Colors.red,
+      mood: switch (connectionStatus) {
+        AsyncData(value: Connected()) when hotReloading => CatMood.grooming,
+        AsyncData(value: Connected()) when requiresReconnect == true => CatMood.curious,
+        AsyncData(value: Connected()) when !ConnectionConst.isValidDelay(delay) => CatMood.wakingUp,
+        AsyncData(value: Connected()) => CatMood.purring,
+        AsyncData(value: Connecting()) => CatMood.wakingUp,
+        AsyncData(value: Disconnecting()) => CatMood.dozingOff,
+        AsyncData(value: Disconnected(connectionFailure: _?)) || AsyncError() => CatMood.hissing,
+        _ => CatMood.napping,
       },
-      image: switch (connectionStatus) {
-        AsyncData(value: Connected()) when requiresReconnect == true => Assets.images.disconnectNorouz,
-        AsyncData(value: Connected()) => Assets.images.connectNorouz,
-        AsyncData(value: _) => Assets.images.disconnectNorouz,
-        _ => Assets.images.disconnectNorouz,
-      },
-      newButtonColor: switch (connectionStatus) {
-        AsyncData(value: Connected()) when hotReloading => const Color.fromARGB(255, 185, 176, 103),
-        AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
-        AsyncData(value: Connected()) when !ConnectionConst.isValidDelay(delay) => const Color.fromARGB(255, 185, 176, 103),
-        AsyncData(value: Connected()) => buttonTheme.connectedColor!,
-        AsyncData(value: _) => buttonTheme.idleColor!,
-        _ => Colors.red,
-      },
-      animated: switch (connectionStatus) {
-        AsyncData(value: Connected()) when hotReloading => false,
-        AsyncData(value: Connected()) when requiresReconnect == true => false,
-        AsyncData(value: Connected()) when !ConnectionConst.isValidDelay(delay) => false,
-        AsyncData(value: Connected()) => true,
-        AsyncData(value: _) => true,
-        _ => false,
-      },
-      useImage: today.day >= 19 && today.day <= 23 && today.month == 3,
       secureLabel: secureLabel,
     );
   }
 }
 
-class _ConnectionButton extends StatelessWidget {
+/// The home cat: asleep while disconnected, waking up while connecting,
+/// purring once connected, hissing on failure. Tap it to connect or
+/// disconnect; long-press it to pet it.
+class _ConnectionButton extends HookConsumerWidget {
   const _ConnectionButton({
     required this.onTap,
     required this.enabled,
     required this.label,
-    required this.buttonColor,
-    required this.image,
-    required this.useImage,
-    required this.newButtonColor,
-    required this.animated,
+    required this.mood,
     required this.secureLabel,
   });
 
   final VoidCallback onTap;
   final bool enabled;
   final String label;
-  final Color buttonColor;
-  final AssetGenImage image;
-  final bool useImage;
+  final CatMood mood;
   final String secureLabel;
 
-  final Color newButtonColor;
-
-  final bool animated;
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    final cat = CatTheme.of(context);
+    final face = useMemoized(GlobalKey<CatFaceState>.new);
+    final aura = switch (mood) {
+      CatMood.purring => cat.auraConnected,
+      CatMood.hissing => cat.auraError,
+      CatMood.curious => cat.auraCurious,
+      CatMood.napping => cat.auraIdle,
+      CatMood.wakingUp || CatMood.dozingOff || CatMood.grooming => cat.auraBusy,
+    };
+    final muted = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // CircleDesignWidget(newButtonColor: newButtonColor, onTap: onTap, animated: animated),
         Semantics(
           button: true,
           enabled: enabled,
           label: label,
-          child: Container(
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(blurRadius: 16, color: buttonColor.withValues(alpha: .5))],
-            ),
-            width: 148,
-            height: 148,
+          child: AnimatedScale(
+            scale: enabled ? 1 : .94,
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOut,
             child: Material(
               key: const ValueKey("home_connection_button"),
-              shape: const CircleBorder(),
-              color: Colors.white,
+              type: MaterialType.transparency,
               child: InkWell(
-                focusColor: Colors.grey,
-                onTap: onTap,
-                child: Padding(
-                  padding: const EdgeInsets.all(36),
-                  child: TweenAnimationBuilder(
-                    tween: ColorTween(end: buttonColor),
-                    duration: const Duration(milliseconds: 250),
-                    builder: (context, value, child) {
-                      if (useImage) {
-                        return image.image();
-                      } else {
-                        return Assets.images.logo.svg(colorFilter: ColorFilter.mode(value!, BlendMode.srcIn));
-                      }
-                    },
-                  ),
+                customBorder: const CircleBorder(),
+                splashColor: aura.withValues(alpha: .18),
+                highlightColor: aura.withValues(alpha: .08),
+                hoverColor: aura.withValues(alpha: .06),
+                focusColor: aura.withValues(alpha: .24),
+                onTap: () {
+                  face.currentState?.boop();
+                  onTap();
+                },
+                child: CatFace(
+                  key: face,
+                  mood: mood,
+                  size: 196,
+                  aura: aura,
+                  collar: aura,
+                  followPointer: true,
+                  pettable: true,
+                  onPurr: ref.read(hapticServiceProvider.notifier).lightImpact,
                 ),
               ),
-            ).animate(target: enabled ? 0 : 1).blurXY(end: 1),
-          ).animate(target: enabled ? 0 : 1).scaleXY(end: .88, curve: Curves.easeIn),
+            ),
+          ),
         ),
-        const Gap(16),
+        const Gap(8),
         ExcludeSemantics(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AnimatedText(label, style: Theme.of(context).textTheme.titleMedium),
+              AnimatedText(label, style: theme.textTheme.titleMedium),
+              const Gap(2),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.pets_rounded, size: 12, color: muted?.color),
+                  const Gap(6),
+                  AnimatedText(mood.present(t), style: muted),
+                  const Gap(6),
+                  Icon(Icons.pets_rounded, size: 12, color: muted?.color),
+                ],
+              ),
               if (secureLabel.isNotEmpty) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // const Gap(8),
-                    Icon(FontAwesomeIcons.shieldHalved, size: 16, color: Theme.of(context).colorScheme.secondary),
+                    Icon(FontAwesomeIcons.shieldCat, size: 16, color: theme.colorScheme.secondary),
                     const Gap(4),
-                    Text(
-                      secureLabel,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleSmall?.copyWith(color: Theme.of(context).colorScheme.secondary),
-                    ),
+                    Text(secureLabel, style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.secondary)),
                   ],
                 ),
               ],
@@ -284,4 +270,16 @@ class _ConnectionButton extends StatelessWidget {
       ],
     );
   }
+}
+
+extension on CatMood {
+  String present(TranslationsEn t) => switch (this) {
+    CatMood.napping => t.cat.mood.napping,
+    CatMood.wakingUp => t.cat.mood.wakingUp,
+    CatMood.purring => t.cat.mood.purring,
+    CatMood.dozingOff => t.cat.mood.dozingOff,
+    CatMood.hissing => t.cat.mood.hissing,
+    CatMood.curious => t.cat.mood.curious,
+    CatMood.grooming => t.cat.mood.grooming,
+  };
 }

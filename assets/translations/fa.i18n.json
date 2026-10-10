@@ -769,5 +769,17 @@
       "missingLicense": "لایسنس Psiphon لازم است",
       "missingLicenseMsg": "این پروفایل از Psiphon استفاده می‌کند. برای ادامه، لایسنس Psiphon را بپذیرید."
     }
+  },
+  "cat": {
+    "meow": "میو",
+    "mood": {
+      "napping": "چرت می‌زند",
+      "wakingUp": "بیدار می‌شود",
+      "purring": "خرخر می‌کند",
+      "dozingOff": "خوابش می‌برد",
+      "hissing": "فیس می‌کند",
+      "curious": "کنجکاو است",
+      "grooming": "خودش را تمیز می‌کند"
+    }
   }
 }

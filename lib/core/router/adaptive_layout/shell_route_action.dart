@@ -5,5 +5,8 @@ class ShellRouteAction {
   final IconData icon;
   final String title;
 
-  ShellRouteAction(this.icon, this.title);
+  /// The icon of the selected destination. Defaults to [icon].
+  final IconData? selectedIcon;
+
+  ShellRouteAction(this.icon, this.title, {this.selectedIcon});
 }

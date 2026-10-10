@@ -8,6 +8,7 @@ import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hiddify/features/app_based_routing/data/selected_data_provider.dart';
 import 'package:hiddify/features/app_based_routing/model/app_package_info.dart';
 import 'package:hiddify/features/app_based_routing/model/pkg_flag.dart';
@@ -350,7 +351,7 @@ class AppListPage extends HookConsumerWidget with PresLogger {
           itemCount: packages.length,
         ),
         error: (error, _) => SliverErrorBodyPlaceholder(error.toString()),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: PawSpinner()),
       ),
     );
   }

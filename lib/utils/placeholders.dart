@@ -1,6 +1,8 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hiddify/core/widget/cat/cat_face.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 // TODO: improve
@@ -25,7 +27,7 @@ class SliverLoadingBodyPlaceholder extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return const SliverFillRemaining(
       hasScrollBody: false,
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [CircularProgressIndicator()]),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [PawSpinner()]),
     );
   }
 }
@@ -43,7 +45,14 @@ class SliverErrorBodyPlaceholder extends HookConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (icon != null) ...[Icon(icon), const Gap(16)],
+          // the default error icon is a hissing cat
+          if (icon == FluentIcons.error_circle_24_regular) ...[
+            const CatFace(mood: CatMood.hissing, size: 96),
+            const Gap(8),
+          ] else if (icon != null) ...[
+            Icon(icon),
+            const Gap(16),
+          ],
           Text(msg),
         ],
       ),

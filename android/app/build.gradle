@@ -71,7 +71,8 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.hiddify.com"
+        // the cat edition installs next to the regular Hiddify instead of over it
+        applicationId "app.hiddify.com.cat"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()

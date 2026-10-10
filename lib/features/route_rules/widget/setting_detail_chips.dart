@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:installed_apps/app_info.dart';
@@ -203,7 +204,7 @@ class AndroidAppInfo extends HookConsumerWidget {
     } else {
       return const Padding(
         padding: EdgeInsets.all(4),
-        child: AspectRatio(aspectRatio: 1.0, child: CircularProgressIndicator()),
+        child: AspectRatio(aspectRatio: 1.0, child: PawSpinner()),
       );
     }
   }

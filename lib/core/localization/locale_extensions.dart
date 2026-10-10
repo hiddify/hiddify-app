@@ -5,8 +5,12 @@ import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/gen/translations.g.dart';
 
 extension AppLocaleX on AppLocale {
-  String get preferredFontFamily =>
-      this == AppLocale.fa ? FontFamily.shabnam : (kIsWeb || !Platform.isWindows ? "" : FontFamily.emoji);
+  String get preferredFontFamily => switch (this) {
+    AppLocale.fa => FontFamily.shabnam,
+    // scripts the cat theme's rounded font doesn't draw keep the platform's own
+    AppLocale.ar || AppLocale.zhCn || AppLocale.zhTw => kIsWeb || !Platform.isWindows ? "" : FontFamily.emoji,
+    _ => FontFamily.nunito,
+  };
 
   String get localeName => switch (flutterLocale.toString()) {
     "ar" => "العربية",

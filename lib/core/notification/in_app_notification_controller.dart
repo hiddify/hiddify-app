@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/notification/toast_hover_pause.dart';
+import 'package:hiddify/core/widget/cat/cat_face.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -49,6 +50,7 @@ class InAppNotificationController with AppLogger {
         // the button's own padding stands in for the toast's at the end
         padding: action == null ? null : const EdgeInsetsDirectional.fromSTEB(20, 16, 4, 16),
         type: type._toastificationType,
+        icon: CatFace(mood: type._catMood, size: 32),
         alignment: AlignmentDirectional.bottomCenter,
         margin: const EdgeInsets.only(bottom: 64 + 16, right: 16, left: 16),
         // 4 s, a Material 3 snackbar's time; 8 s with a button, to read it and reach the button
@@ -83,5 +85,12 @@ extension NotificationTypeX on NotificationType {
     NotificationType.success => ToastificationType.success,
     NotificationType.error => ToastificationType.error,
     NotificationType.info => ToastificationType.info,
+  };
+
+  /// The little cat at the start of the toast.
+  CatMood get _catMood => switch (this) {
+    NotificationType.success => CatMood.purring,
+    NotificationType.error => CatMood.hissing,
+    NotificationType.info => CatMood.curious,
   };
 }

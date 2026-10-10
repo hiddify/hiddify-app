@@ -3,6 +3,7 @@ import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hiddify/features/profile/add/widgets/free_btn.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
@@ -85,7 +86,7 @@ class FreeBtns extends ConsumerWidget {
           style: theme.textTheme.bodyMedium!.copyWith(color: theme.colorScheme.onSurface),
         ),
       ),
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => const Center(child: PawSpinner()),
     );
   }
 }

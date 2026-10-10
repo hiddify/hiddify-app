@@ -10,6 +10,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/widget/cat/paw_spinner.dart';
 import 'package:hiddify/features/profile/details/json_editor.dart';
 import 'package:hiddify/features/profile/details/profile_details_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
@@ -296,7 +297,7 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
           ),
           loading: () => Scaffold(
             appBar: AppBar(title: Text(t.pages.profileDetails.title)),
-            body: const Center(child: CircularProgressIndicator()),
+            body: const Center(child: PawSpinner()),
           ),
         );
   }
