@@ -188,6 +188,12 @@ class HiddifyCoreService with InfraLogger {
         if (e.code == StatusCode.unavailable) {
           return left(const ConnectionFailure.unexpected("background core is not started yet!"));
         }
+        // Windows refuses the TUN adapter to a process that is not elevated, and Go always
+        // words that error in English.
+        final message = e.message ?? "";
+        if (message.contains("start inbound/tun[tun-in]: configure tun interface: Access is denied.")) {
+          return left(const ConnectionFailure.missingPrivilege());
+        }
         // throw InvalidConfig(e.message);
         // throw DioException.connectionError(requestOptions: RequestOptions(), reason: e.codeName, error: e);
 
