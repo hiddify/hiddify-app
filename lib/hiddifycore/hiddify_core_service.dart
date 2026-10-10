@@ -194,6 +194,12 @@ class HiddifyCoreService with InfraLogger {
         if (message.contains("start inbound/tun[tun-in]: configure tun interface: Access is denied.")) {
           return left(const ConnectionFailure.missingPrivilege());
         }
+        // Another adapter already has the address the core gives its TUN (172.19.0.1).
+        if (message.contains(
+          "start inbound/tun[tun-in]: configure tun interface: set ipv4 address: The object already exists.",
+        )) {
+          return left(const ConnectionFailure.tunAddressInUse());
+        }
         // throw InvalidConfig(e.message);
         // throw DioException.connectionError(requestOptions: RequestOptions(), reason: e.codeName, error: e);
 
