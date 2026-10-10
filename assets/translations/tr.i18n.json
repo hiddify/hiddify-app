@@ -766,7 +766,9 @@
     "singbox": {
       "serviceNotRunning": "Servis çalışmıyor",
       "missingPrivilege": "Eksik yetki",
-      "missingPrivilegeMsg": "VPN modu yönetici yetkisi gerektirir. Lütfen uygulamayı yönetici olarak yeniden başlatın veya servis modunu değiştirin.",
+      "missingPrivilegeMsg": "VPN modu başlatılamıyor. Uygulamayı yönetici olarak yeniden başlatın veya servis modunu değiştirin.",
+      "tunAddressInUse": "Başka bir VPN etkin",
+      "tunAddressInUseMsg": "VPN modu başlatılamıyor. Diğer VPN'i kapatın veya servis modunu değiştirin.",
       "invalidConfigOptions": "Geçersiz yapılandırma seçenekleri",
       "invalidConfig": "Geçersiz yapılandırma"
     },

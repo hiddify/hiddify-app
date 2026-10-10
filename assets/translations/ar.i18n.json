@@ -803,7 +803,9 @@
     "singbox": {
       "serviceNotRunning": "الخدمة لا تعمل",
       "missingPrivilege": "صلاحيات مطلوبة",
-      "missingPrivilegeMsg": "وضع الـ VPN يتطلب صلاحيات المسؤول. يرجى إعادة تشغيل التطبيق كمسؤول أو تغيير وضع الخدمة.",
+      "missingPrivilegeMsg": "لا يمكن بدء وضع الـ VPN. أعد تشغيل التطبيق كمسؤول أو غيّر وضع الخدمة.",
+      "tunAddressInUse": "يوجد VPN آخر نشط",
+      "tunAddressInUseMsg": "لا يمكن بدء وضع الـ VPN. أوقف تشغيل الـ VPN الآخر أو غيّر وضع الخدمة.",
       "invalidConfigOptions": "خيارات تكوين غير صالحة",
       "invalidConfig": "تكوين غير صالح"
     },

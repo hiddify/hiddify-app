@@ -768,7 +768,9 @@
     "singbox": {
       "serviceNotRunning": "O serviço não está em execução",
       "missingPrivilege": "Permissão ausente",
-      "missingPrivilegeMsg": "O modo VPN requer privilégios de administrador. Reinicie o aplicativo como administrador ou altere o modo de serviço.",
+      "missingPrivilegeMsg": "O modo VPN não pode iniciar. Reinicie o aplicativo como administrador ou altere o modo de serviço.",
+      "tunAddressInUse": "Outra VPN está ativa",
+      "tunAddressInUseMsg": "O modo VPN não pode iniciar. Desative a outra VPN ou altere o modo de serviço.",
       "invalidConfigOptions": "Opções de configuração inválidas",
       "invalidConfig": "Configuração inválida"
     },

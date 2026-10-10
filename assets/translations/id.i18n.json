@@ -766,7 +766,9 @@
     "singbox": {
       "serviceNotRunning": "Layanan tidak berjalan",
       "missingPrivilege": "Izin hilang",
-      "missingPrivilegeMsg": "Mode VPN memerlukan izin administrator. Harap mulai ulang aplikasi sebagai administrator atau ubah mode layanan.",
+      "missingPrivilegeMsg": "Mode VPN tidak dapat dimulai. Mulai ulang aplikasi sebagai administrator atau ubah mode layanan.",
+      "tunAddressInUse": "VPN lain sedang aktif",
+      "tunAddressInUseMsg": "Mode VPN tidak dapat dimulai. Matikan VPN lain atau ubah mode layanan.",
       "invalidConfigOptions": "Opsi konfigurasi tidak valid",
       "invalidConfig": "Konfigurasi tidak valid"
     },
