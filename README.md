@@ -1,202 +1,116 @@
-<div dir="ltr" align=center>
-    
-[**![Lang_farsi](https://user-images.githubusercontent.com/125398461/234186932-52f1fa82-52c6-417f-8b37-08fe9250a55f.png) فارسی**](README_fa.md) / [**Русский 🇷🇺**](README_ru.md) / [**简体中文 🇨🇳**](README_cn.md) / [**日本語 🇯🇵**](README_ja.md) / [**Portugês-BR 🇧🇷**](README_br.md)
-
-</div>
-<br>
-
-<p align="center"><img src="https://github.com/hiddify/hiddify.com/blob/main/docs/assets/hiddify-app-logo.svg" width=56% /></p>
-<br>
-
 <div align="center">
 
-<!--
-![Hiddify logo + text](https://github.com/hiddify/hiddify-app/assets/125398461/d821cfe0-b4c4-441f-be4e-eb9209f59542)
-    -->
-    
-[![GP-Intalls](https://img.shields.io/endpoint?color=green&logo=google-play&logoColor=green&url=https%3A%2F%2Fplay.cuzi.workers.dev%2Fplay%3Fi%3Dapp.hiddify.com%26l%3DGoogle%2520Play%26m%3D%24shortinstalls&style=flat-square)](https://play.google.com/store/apps/details?id=app.hiddify.com) [![Downloads](https://img.shields.io/github/downloads/hiddify/hiddify-next/total?style=flat-square&logo=github)](https://github.com/hiddify/hiddify-app/releases/)[![Last Version](https://img.shields.io/github/release/hiddify/hiddify-next/all.svg?style=flat-square)](https://github.com/hiddify/hiddify-app/releases/)[![Last Release Date](https://img.shields.io/github/release-date/hiddify/hiddify-next.svg?style=flat-square)](https://github.com/hiddify/hiddify-app/releases/)[![commits](https://img.shields.io/github/commit-activity/m/hiddify/hiddify-next?style=flat-square)](https://github.com/hiddify/hiddify-app/)
-[![Youtube](https://img.shields.io/youtube/channel/views/UCxrmeMvVryNfB4XL35lXQNg?label=Youtube&style=flat-square&logo=youtube)](https://www.youtube.com/@hiddify)[![Telegram Channel](https://img.shields.io/endpoint?label=Channel&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fhiddify&color=blue)](https://telegram.dog/hiddify)[![Telegram Group](https://img.shields.io/endpoint?color=neon&label=Support%20Group&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fhiddify_board)](https://telegram.dog/hiddify_board/5)
+<img src="assets/images/logo.svg" width="112" alt="" />
 
-</div>
+# Hiddify Cat Edition
 
+**An unofficial fork of [Hiddify](https://github.com/hiddify/hiddify-app), dressed as a cat.**<br>
+The same proxy client, core and features. What changed is how it looks and feels.
 
-
-
-## What is Hiddify app?
-
-<p dir="ltr" style="font-size: 16px">A multi-platform proxy client based on <a href="https://github.com/SagerNet/sing-box">Sing-box</a> universal proxy tool-chain. Hiddify offers a wide range of capabilities, like automatic node selection, TUN mode, remote profiles etc. Hiddify is ad-free and open-source. With support for a wide range of protocols, it provides a secure and private way for accessing free internet.</p>
-
-<div align=center>
-<img width=90% alt="English Demo" src="https://github.com/hiddify/hiddify-app/assets/125398461/ffe5346d-3404-470f-b5e0-4364e23743d2">
-
-</div>
-
-## 🚀 Main features
-
-✈️ Multi-platform: Android, iOS, Windows, macOS and Linux
-
-⭐ Intuitive and accessible UI
-
-🔍 Delay based node selection
-
-🟡 Wide range of protocols:
-Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH etc.
-
-🟡 Subscription link and configuration formats: Sing-box, V2ray, Clash, Clash meta
-
-🔄 Automatic subscription update
-
-🔎 Display profile information including remaining days and traffic usage
-
-🛡 Open source, secure and community driven
-
-🌙 Dark and light modes
-
-⚙ Compatible with all proxy management panels
-
-⭐ Appropriate configuration for Iran, China, Russia and other countries
-
-📱 Available on official stores
-
-## 🛍️ Get It On Stores
-<a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532?platform=iphone"><img height=50px src="https://github.com/user-attachments/assets/a7c62126-07ce-4f18-8197-bbb672f6d8be"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://play.google.com/store/apps/details?id=app.hiddify.com"><img height=50px src="docs/google-play-badge.png"></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://apps.microsoft.com/detail/Hiddify/9pdfnl3qv2s5?mode=mini" target="_blank"><img height=50px src="https://github.com/hiddify/hiddify-next/assets/125398461/620750bb-4459-41b5-9f86-ba82119345b8" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-
-## 📥 Direct Download
-
-<div align=left>
-<table>
-    <thead align=left>
-        <tr>
-            <th>OS</th>
-            <th>Download</th>
-        </tr>
-    </thead>
-    <tbody align=left>
-        <tr>
-        <td>iOS</td>
-            <td>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-iOS.ipa"><img src="https://img.shields.io/badge/IPA-Universal-c0c0c0.svg?logo=ios"></a>
-            </td>
-        </tr>
-        <tr>
-        <td>Android</td>
-            <td>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Android-universal.apk"><img src="https://img.shields.io/badge/APK-Universal-044d29.svg?logo=android"></a><br>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Android-arm64.apk"><img src="https://img.shields.io/badge/APK-ARMv8-168039.svg?logo=android"></a><br>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Android-arm7.apk"><img src="https://img.shields.io/badge/APK-ARMv7-45bf55.svg?logo=android"></a><br>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Android-x86_64.apk"><img src="https://img.shields.io/badge/APK-x64-96ed89.svg?logo=android"></a>
-            </td>
-        </tr>
-        <tr>
-            <td>Windows</td>
-            <td>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Windows-Setup-x64.Msix"><img src="https://img.shields.io/badge/OfficialSetup-x64-0078d7.svg?logo=windows"></a><br>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Windows-Setup-x64.exe"><img src="https://img.shields.io/badge/Setup-x64-2d7d9a.svg?logo=windows"></a><br>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Windows-Portable-x64.zip"><img src="https://img.shields.io/badge/Portable-x64-67b7d1.svg?logo=windows"></a>
-            </td>
-        </tr>
-        <tr>
-            <td>macOS</td>
-            <td>
-                <a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532"><img src="https://img.shields.io/badge/IPA-ARM-D33A54.svg?logo=apple"></a><br>
-                <a href="https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-MacOS.dmg"><img src="https://img.shields.io/badge/DMG-Universal-ea005e.svg?logo=apple"></a><br>
-                <a href="https://github.com/hiddify/hiddify-next/releases/latest/download/Hiddify-MacOS-Installer.pkg"><img src="https://img.shields.io/badge/PKG-Universal-bc544b.svg?logo=apple" /></a>
-            </td>
-        </tr>
-        <tr>
-            <td>Linux</td>
-            <td>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Linux-x64.AppImage"><img src="https://img.shields.io/badge/AppImage-x64-f84e29.svg?logo=linux"> </a><br>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-Debian-x64.deb"><img src="https://img.shields.io/badge/DebPackage-x64-FF9966.svg?logo=debian"> </a><br>
-                <a href="https://github.com/hiddify/hiddify-app/releases/latest/download/Hiddify-rpm-x64.rpm"><img src="https://img.shields.io/badge/RpmPackage-x64-F1B42F.svg?logo=redhat"> </a>
-            </td>
-        </tr>
-    </tbody>
-</table>
-
-
-</div>
-
-## ⚙️ Installation and tutorials
-
-**Find tutorial information on our wiki page by clicking on image below.**
-
-<div align="center">
-
-[![Tutorials on Wiki](https://github.com/hiddify/hiddify-app/assets/125398461/95bb5cf8-c143-4934-87d6-b9d4c31e035e)](https://hiddify.com/app/)
-
-
-</div>
-
-## 🌎 Translations
-
-    
-You can improve existing languages or contribute new ones either by editing the JSON files in `/assets/translations` or [![Translate with Inlang](https://img.shields.io/badge/%20-%20-3ECF8E?logo=i18next&logoColor=white)](https://fink.inlang.com/github.com/hiddify/hiddify-app) by using [Inlang online editor](https://fink.inlang.com/github.com/hiddify/hiddify-app).    
-
-
-## ✏️ Acknowledgements
-
-We would like to express our sincere appreciation to the contributors of the following projects, whose robust foundation and innovative features have significantly enhanced the success and functionality of this project.
-
-- [Sing-box](https://github.com/SagerNet/sing-box)
-- [Sing-box for Android](https://github.com/SagerNet/sing-box-for-android)
-- [Sing-box for Apple](https://github.com/SagerNet/sing-box-for-apple)
-- [Clash](https://github.com/Dreamacro/clash)
-- [Clash Meta](https://github.com/MetaCubeX/Clash.Meta)
-- [FClash](https://github.com/Fclash/Fclash)
-- [Vazirmatn Font by Saber Rastikerdar](https://github.com/rastikerdar/vazirmatn)
-- [Others](./pubspec.yaml)
-
-## 🎯 Donation and Support
-
-The easiest way to support us is to click on the star (⭐) at the top of this page.
-
-<div align=center>
-    
-<a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=643504282" target="_blank" style="display: block" align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=dark" width="721" height="auto">
-    <img alt="Star History of hiddify/hiddify-app" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=643504282&image_size=auto&color_scheme=light" width="721" height="auto">
-  </picture>
-</a>
-
-</div>
-
-We also need financial support for our services. All of our activities are done voluntarily and financial support will be spent on the development of the project. You can view our support addresses [here](https://hiddify.com/donation-and-support/).
-
-## 👩‍🏫 Collaboration and Contact Information
-
-Hiddify is a community driven project. If you're interested in contributing, please read the [contribution guidelines](./CONTRIBUTING.md). We would specially appreciate any help we can get in these areas: **Flutter, Go, iOS development (Swift), Android development (Kotlin).**
-
-<div align=center>
+**English** · [Русский](README_ru.md)
 
 <br>
 
-[![Email](https://img.shields.io/badge/Email-contribute@hiddify.com-005FF9?style=flat-square&logo=mail.ru)](mailto:contribute@hiddify.com)
-[![Telegram Channel](https://img.shields.io/endpoint?label=Channel&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fhiddify&color=blue)](https://telegram.dog/hiddify)
-[![Telegram Group](https://img.shields.io/endpoint?color=neon&label=Support%20Group&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fhiddify_board)](https://telegram.dog/hiddify_board)
-[![Youtube](https://img.shields.io/youtube/channel/views/UCxrmeMvVryNfB4XL35lXQNg?label=Youtube&style=flat-square&logo=youtube)](https://www.youtube.com/@hiddify)
-[![Twitter](https://img.shields.io/twitter/follow/hiddify_com?color=%231DA1F2&logo=twitter&logoColor=1DA1F2&style=flat-square)](https://twitter.com/intent/follow?screen_name=hiddify_com)
+<img src="docs/cat/home-en.png" width="100%" alt="The home screen in the light, dark and true black themes" />
 
 </div>
 
-<p align=center>
- We appreciate all people who are participating in this project. Some people here and many many more outside of Github. It means a lot to us. ♥
- </p>
- 
-<p align=center> 
-<a href="https://github.com/hiddify/hiddify-app/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=hiddify/hiddify-next" />
-</a>
-</p>
-<p align=center>
- Made with <a rel="" target="_blank" href="https://contrib.rocks">Contrib.Rocks</a> 
-</p>
+## 🐾 What's different
 
+### The connect button is a cat
 
+The big button on the home screen is a cat, and its mood follows the connection.
 
+<p align="center"><img src="docs/cat/moods.png" width="100%" alt="The seven moods, in the order of the table below" /></p>
 
+| Mood | When |
+| --- | --- |
+| Napping | Disconnected |
+| Waking up | Connecting, or connected while the first ping is on its way |
+| Purring | Connected |
+| Dozing off | Disconnecting |
+| Hissing | The connection failed |
+| Curious | Changed settings wait for a reconnect |
+| Grooming | A hot reload applies new settings |
 
+- Tap the cat to connect or disconnect, as before. It also gets a boop on the nose.
+- Long-press it to pet it: its eyes close, hearts float up and the phone purrs with haptic feedback.
+- Its eyes follow your finger, or the mouse pointer, anywhere on the home screen.
+- The glow around it and its collar take the color of the connection: lavender, amber, green, teal or red. A new connection gets a burst of hearts.
+- A short line under the status names its mood.
 
+### A cat for every theme
 
+| Light | Dark | True black |
+| --- | --- | --- |
+| A ginger tabby on cream | A grey cat with amber eyes on a night-purple page | A black cat with glowing lime eyes |
+
+The cat palettes replace the system's Material You colors.
+
+### Ears and paws everywhere
+
+<p align="center"><img src="docs/cat/details-en.png" width="100%" alt="Buttons, a dialog, a bottom sheet, switches, a slider, a toast and the loafing cat" /></p>
+
+- **Ears** on buttons, floating buttons, cards, menus, tooltips, chips, bottom sheets and the navigation indicator. On buttons they perk up when pressed, lift on hover and droop when the button is disabled. The active profile card pricks its ears up.
+- **A cat peeks over every dialog**, holding the edge with its paws and reading along.
+- **Paws** on slider and switch thumbs and next to the ping. Loading spinners are paw prints walking in a circle. The traffic bar of a profile ends in a toe bean, and turns red once 90% of the traffic is used.
+- **Paw-print trails** cross the home screen, and a fresh print appears wherever you touch it.
+- **A cat loafs on the navigation bar**, or on the stats panel on desktop. Tap it and it wakes up and meows. It steps aside while the keyboard is open.
+- **Toasts** start with a small cat: purring on success, hissing on an error, curious otherwise. A page that fails to load shows a hissing cat too.
+- **Cats replace the logo** in the app bar, in About and on the first-run screen. Tap one and it says "Meow".
+- **Navigation icons**: a cat for Home, a paw for Profiles, a cat with a shield for About.
+- **Nunito**, a rounded font, for Latin and Cyrillic. Persian, Arabic and Chinese keep their fonts.
+
+### Icons
+
+<p align="center"><img src="docs/cat/icons.png" width="80%" alt="The app icon, its round Android variant, and the tray icon asleep, half awake and awake" /></p>
+
+The ginger cat is the app icon on every platform, on the launch screens and in notifications. The tray icon shows the connection with its eyes: shut while disconnected, half open while connecting, wide open once connected. That still works on macOS, where the menu bar drops the colors.
+
+### Good to know
+
+- When the system asks for fewer animations, every cat keeps still.
+- The home cat moves only while the home screen is open, never in the background. The cat on the navigation bar moves in short bursts and keeps still in between.
+- The Nowruz image of the connect button is gone.
+- Eight new strings, the "Meow" and the seven moods, are translated into all 11 languages of the app.
+
+## 📥 Get it
+
+There are no releases of the cat edition yet, so build it from source. The [Hiddify releases](https://github.com/hiddify/hiddify-app/releases) are the regular app, without the cats.
+
+## 🛠 Build
+
+The cat edition builds like Hiddify, with Flutter 3.38.5. Prepare the platform, then run the app:
+
+```bash
+make android-prepare   # or windows-, linux-, macos-, ios-prepare
+flutter run
+```
+
+[CONTRIBUTING.md](CONTRIBUTING.md) has the details; the `make *-release` targets build the release packages.
+
+The cats are drawn in code, in [`lib/core/theme/cat`](lib/core/theme/cat) and [`lib/core/widget/cat`](lib/core/widget/cat). The icons are drawn from the same shapes. After changing them, redraw every icon with:
+
+```bash
+pip install pillow
+python3 scripts/cat_icons/make_icons.py .
+```
+
+## ✨ Everything else is Hiddify
+
+Hiddify is a multi-platform proxy client built on [Sing-box](https://github.com/SagerNet/sing-box), ad-free and open source:
+
+- Android, iOS, Windows, macOS and Linux
+- Vless, Vmess, Reality, TUIC, Hysteria, Wireguard, SSH and more
+- Sing-box, V2ray, Clash and Clash Meta subscriptions, updated automatically
+- Node selection by delay, TUN mode, the remaining days and traffic of a subscription
+- Settings suited to Iran, China, Russia and other countries
+
+The [Hiddify wiki](https://hiddify.com/app/) has the guides.
+
+## ❤️ Credits and license
+
+- All of the proxy client is [Hiddify](https://github.com/hiddify/hiddify-app), by the Hiddify team and its contributors. Hiddify's own README is [upstream](https://github.com/hiddify/hiddify-app#readme), and its translations are in this repository: [فارسی](README_fa.md), [简体中文](README_cn.md), [日本語](README_ja.md), [Português](README_br.md).
+- Hiddify builds on [Sing-box](https://github.com/SagerNet/sing-box), [Sing-box for Android](https://github.com/SagerNet/sing-box-for-android), [Sing-box for Apple](https://github.com/SagerNet/sing-box-for-apple), [Clash](https://github.com/Dreamacro/clash), [Clash Meta](https://github.com/MetaCubeX/Clash.Meta), [FClash](https://github.com/Fclash/Fclash), the [Vazirmatn font](https://github.com/rastikerdar/vazirmatn) by Saber Rastikerdar and [more](pubspec.yaml).
+- The cat edition's font is [Nunito](https://github.com/googlefonts/nunito), under the [SIL Open Font License 1.1](assets/fonts/Nunito-OFL.txt).
+- The cat edition is licensed like Hiddify, under the [Hiddify Extended GNU GPL v3](LICENSE.md) ([original](https://github.com/hiddify/hiddify-app/blob/main/LICENSE.md)). Its additional conditions apply, among them: noncommercial use only, releases built with GitHub Actions, and no app store release with a name or interface close to Hiddify's.
