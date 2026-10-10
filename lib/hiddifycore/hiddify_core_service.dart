@@ -198,7 +198,7 @@ class HiddifyCoreService with InfraLogger {
         // throw DioException.connectionError(requestOptions: RequestOptions(), reason: e.codeName, error: e);
 
         // throw DioException(requestOptions: RequestOptions(), error: e);
-        return left(const ConnectionFailure.unexpected("failed to start background core"));
+        return left(ConnectionFailure.unexpected(message.isEmpty ? "failed to start background core" : message));
       }
 
       // if (res.messageType != MessageType.EMPTY) return left(res);
