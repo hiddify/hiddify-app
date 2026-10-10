@@ -76,7 +76,18 @@ The ginger cat is the app icon on every platform, on the launch screens and in n
 
 ## 📥 Get it
 
-There are no releases of the cat edition yet, so build it from source. The [Hiddify releases](https://github.com/hiddify/hiddify-app/releases) are the regular app, without the cats.
+GitHub Actions builds the cat edition on every push to `main` and to the `claude/` branches. Open the latest [Cat build](https://github.com/ai-misha/hiddify-app/actions/workflows/cat-build.yml) run and download its artifacts; GitHub asks you to sign in. They stay there for 30 days.
+
+| Artifact | Inside |
+| --- | --- |
+| `Hiddify-Cat-Android` | A universal APK, and smaller ones for arm64, armv7 and x86_64 |
+| `Hiddify-Cat-Windows` | A portable zip |
+| `Hiddify-Cat-Linux` | An AppImage with its own home folder |
+
+- On Android the cat edition is a separate app, "Hiddify Cat", so it installs next to the regular Hiddify, with its own profiles and settings.
+- The APK is signed with a debug key that the builds keep from one to the next, so a new build installs over the last one. If one doesn't, uninstall the cat edition first: the key changes between branches, and when GitHub drops it after a week without builds.
+- There are no iOS or macOS builds: those need Apple's signing.
+- There are no releases of the cat edition yet. The [Hiddify releases](https://github.com/hiddify/hiddify-app/releases) are the regular app, without the cats.
 
 ## 🛠 Build
 
