@@ -780,6 +780,15 @@
       "hissing": "Hissing",
       "curious": "Curious",
       "grooming": "Grooming"
+    },
+    "game": {
+      "play": "Play while you wait",
+      "title": "Yarn breaker",
+      "launch": "Tap to launch the yarn",
+      "score": "Score",
+      "won": "All blocks cleared",
+      "lost": "Out of yarn",
+      "again": "Play again"
     }
   }
 }
