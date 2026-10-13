@@ -12,6 +12,7 @@ import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/core/widget/cat/cat_face.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/home/widget/yarn_breaker_page.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
@@ -252,6 +253,21 @@ class _ConnectionButton extends HookConsumerWidget {
                   const Gap(6),
                   Icon(Icons.pets_rounded, size: 12, color: muted?.color),
                 ],
+              ),
+              // connecting can take a while: offer a game to pass it
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOut,
+                child: mood == CatMood.wakingUp
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: TextButton.icon(
+                          onPressed: () => YarnBreakerPage.show(context),
+                          icon: const Icon(Icons.sports_esports_rounded),
+                          label: Text(t.cat.game.play),
+                        ),
+                      )
+                    : const SizedBox(width: double.infinity),
               ),
               if (secureLabel.isNotEmpty) ...[
                 Row(
