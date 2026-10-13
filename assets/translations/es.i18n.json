@@ -779,6 +779,15 @@
       "hissing": "Bufando",
       "curious": "Curioso",
       "grooming": "Acicalándose"
+    },
+    "game": {
+      "play": "Juega mientras esperas",
+      "title": "Rompebloques de lana",
+      "launch": "Toca para lanzar el ovillo",
+      "score": "Puntos",
+      "won": "Todos los bloques destruidos",
+      "lost": "Te quedaste sin ovillos",
+      "again": "Jugar de nuevo"
     }
   }
 }

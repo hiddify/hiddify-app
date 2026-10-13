@@ -777,6 +777,15 @@
       "hissing": "Mendesis",
       "curious": "Penasaran",
       "grooming": "Merapikan bulu"
+    },
+    "game": {
+      "play": "Main sambil menunggu",
+      "title": "Pemecah balok benang",
+      "launch": "Ketuk untuk meluncurkan benang",
+      "score": "Skor",
+      "won": "Semua balok hancur",
+      "lost": "Benang habis",
+      "again": "Main lagi"
     }
   }
 }

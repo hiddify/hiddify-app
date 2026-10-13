@@ -779,6 +779,15 @@
       "hissing": "Crache",
       "curious": "Curieux",
       "grooming": "Fait sa toilette"
+    },
+    "game": {
+      "play": "Jouez en attendant",
+      "title": "Casse-blocs à la pelote",
+      "launch": "Appuyez pour lancer la pelote",
+      "score": "Score",
+      "won": "Tous les blocs sont cassés",
+      "lost": "Plus de pelotes",
+      "again": "Rejouer"
     }
   }
 }

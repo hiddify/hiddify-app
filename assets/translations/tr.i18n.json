@@ -777,6 +777,15 @@
       "hissing": "Tıslıyor",
       "curious": "Meraklı",
       "grooming": "Yalanıyor"
+    },
+    "game": {
+      "play": "Beklerken oynayın",
+      "title": "Yumak kırıcı",
+      "launch": "Yumağı fırlatmak için dokunun",
+      "score": "Puan",
+      "won": "Tüm bloklar kırıldı",
+      "lost": "Yumak kalmadı",
+      "again": "Tekrar oynayın"
     }
   }
 }

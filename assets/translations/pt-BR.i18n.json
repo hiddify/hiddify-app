@@ -779,6 +779,15 @@
       "hissing": "Chiando",
       "curious": "Curioso",
       "grooming": "Se lambendo"
+    },
+    "game": {
+      "play": "Jogue enquanto espera",
+      "title": "Quebra-blocos de novelo",
+      "launch": "Toque para lançar o novelo",
+      "score": "Pontos",
+      "won": "Todos os blocos quebrados",
+      "lost": "Acabaram os novelos",
+      "again": "Jogar de novo"
     }
   }
 }
