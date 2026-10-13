@@ -52,6 +52,17 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
+      # Gradle downloads a missing NDK itself and fails the whole build when
+      # the download comes back broken; installing it first allows retries
+      - name: Install the NDK
+        run: |
+          for i in 1 2 3; do
+            sdkmanager --install "ndk;28.2.13676358" > /dev/null && exit 0
+            echo "NDK install failed, retrying"
+            rm -rf "$ANDROID_HOME/ndk/28.2.13676358"
+            sleep 15
+          done
+          exit 1
       - uses: subosito/flutter-action@v2.21.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
