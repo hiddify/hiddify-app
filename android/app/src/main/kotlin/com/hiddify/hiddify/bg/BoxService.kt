@@ -56,6 +56,12 @@ class BoxService(
     companion object {
         private const val TAG = "A/BoxService"
 
+        // The running service's platform interface. The core keeps one per process, and the front
+        // core's setup would replace it with null, so MethodHandler passes this one instead.
+        @Volatile
+        var activePlatformInterface: PlatformInterface? = null
+            private set
+
         private var initializeOnce = false
         private lateinit var workingDir: File
         private fun initialize() {
@@ -161,6 +167,7 @@ class BoxService(
 
             DefaultNetworkMonitor.start()
             Libbox.setMemoryLimit(!Settings.disableMemoryLimit)
+            activePlatformInterface = platformInterface
             val newService = try {
                 Mobile.setup(
                     SetupOptions().also {
@@ -295,6 +302,7 @@ class BoxService(
 //            commandServer = null
             Settings.startedByUser = false
             withContext(Dispatchers.Main) {
+                if (activePlatformInterface === platformInterface) activePlatformInterface = null
                 Mobile.close(4L)
                 status.value = Status.Stopped
                 service.stopSelf()
@@ -353,6 +361,7 @@ class BoxService(
     }
 
     fun onDestroy() {
+        if (activePlatformInterface === platformInterface) activePlatformInterface = null
         binder.close()
     }
 

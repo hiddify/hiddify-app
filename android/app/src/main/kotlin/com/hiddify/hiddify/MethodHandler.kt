@@ -95,7 +95,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                                     it.listen= "127.0.0.1:" + grpcPort
                                     it.secret=""
                                     it.debug = Settings.debugMode
-                                },null)
+                                }, BoxService.activePlatformInterface)
 
 //                            Libbox.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir, false)
                             Libbox.redirectStderr(File(Settings.workingDir, "stderr2.log").path)
