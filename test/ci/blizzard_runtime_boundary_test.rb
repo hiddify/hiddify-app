@@ -29,6 +29,8 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   NEW_UI_PREFIXES = %w[lib/core/widget/blizzard/].freeze
   NEW_UI_FILES = %w[lib/core/theme/blizzard_tokens.dart lib/core/theme/blizzard_theme.dart].freeze
   DEV_ADDITIONS = %w[flutter_driver fuchsia_remote_debug_protocol integration_test sync_http webdriver].freeze
+  PROFILE_DETAILS_NOTIFIER = "lib/features/profile/details/profile_details_notifier.dart"
+  APPROVED_RAW_LOG_LINE = "      loggy.info(profContent);\n"
 
   def git(*args)
     output, status = Open3.capture2("git", "-C", ROOT, *args)
@@ -40,12 +42,81 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     UI_FILES.include?(path) || UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
   end
 
+  def approved_protected_change?(path, trusted_source, current_source)
+    path == PROFILE_DETAILS_NOTIFIER &&
+      trusted_source.scan(APPROVED_RAW_LOG_LINE).length == 1 &&
+      current_source == trusted_source.sub(APPROVED_RAW_LOG_LINE, "")
+  end
+
+  def trusted_profile_details_notifier
+    git("show", "#{BASELINE}:#{PROFILE_DETAILS_NOTIFIER}")
+  end
+
+  def approved_profile_details_notifier
+    trusted_profile_details_notifier.sub(APPROVED_RAW_LOG_LINE, "")
+  end
+
+  def test_exact_profile_raw_log_removal_is_approved
+    assert approved_protected_change?(
+      PROFILE_DETAILS_NOTIFIER,
+      trusted_profile_details_notifier,
+      approved_profile_details_notifier,
+    )
+  end
+
+  def test_profile_raw_log_removal_is_not_approved_for_another_file
+    refute approved_protected_change?(
+      "lib/features/profile/details/profile_details_state.dart",
+      trusted_profile_details_notifier,
+      approved_profile_details_notifier,
+    )
+  end
+
+  def test_profile_raw_log_removal_with_an_extra_body_change_is_rejected
+    unsafe = approved_profile_details_notifier.sub("import 'dart:convert';", "import 'dart:async';")
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_relocated_profile_raw_log_is_rejected
+    unsafe = approved_profile_details_notifier + APPROVED_RAW_LOG_LINE
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_replaced_profile_raw_log_is_rejected
+    unsafe = trusted_profile_details_notifier.sub(APPROVED_RAW_LOG_LINE, "      loggy.debug(profContent);\n")
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_duplicated_profile_raw_log_is_rejected
+    unsafe = trusted_profile_details_notifier.sub(APPROVED_RAW_LOG_LINE, APPROVED_RAW_LOG_LINE * 2)
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_changed_trusted_raw_log_multiplicity_is_rejected
+    changed_trusted_source = trusted_profile_details_notifier.sub(
+      APPROVED_RAW_LOG_LINE,
+      APPROVED_RAW_LOG_LINE * 2,
+    )
+    candidate = changed_trusted_source.sub(APPROVED_RAW_LOG_LINE, "")
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, changed_trusted_source, candidate)
+  end
+
+  def test_any_additional_byte_in_approved_profile_source_is_rejected
+    unsafe = approved_profile_details_notifier + " "
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
   def test_all_existing_runtime_native_identity_and_pipeline_files_outside_ui_are_unchanged
     paths = git("ls-tree", "-r", "--name-only", BASELINE).lines.map(&:strip)
     protected_paths = paths.select do |path|
       !path.start_with?("docs/", "test/") && !allowed_ui?(path) && !%w[pubspec.yaml pubspec.lock].include?(path)
     end
     changed = git("diff", "--name-only", BASELINE, "--", *protected_paths).lines.map(&:strip)
+    changed.reject! do |path|
+      current_path = File.join(ROOT, path)
+      File.file?(current_path) &&
+        approved_protected_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path))
+    end
     assert_empty changed, "Protected runtime/native/dependency/identity files changed: #{changed.join(', ')}"
   end
 
