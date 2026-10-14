@@ -31,6 +31,9 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   DEV_ADDITIONS = %w[flutter_driver fuchsia_remote_debug_protocol integration_test sync_http webdriver].freeze
   PROFILE_DETAILS_NOTIFIER = "lib/features/profile/details/profile_details_notifier.dart"
   APPROVED_RAW_LOG_LINE = "      loggy.info(profContent);\n"
+  TRUSTED_PARSE_ERROR_LINE = "      loggy.error('Error parsing profile-content JSON', e, st);\n"
+  APPROVED_PARSE_ERROR_LINE =
+    "      loggy.error('Error parsing profile-content JSON (${e.runtimeType})', null, st);\n"
 
   def git(*args)
     output, status = Open3.capture2("git", "-C", ROOT, *args)
@@ -43,9 +46,14 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   end
 
   def approved_protected_change?(path, trusted_source, current_source)
+    approved_log_removal = trusted_source.sub(APPROVED_RAW_LOG_LINE, "")
     path == PROFILE_DETAILS_NOTIFIER &&
       trusted_source.scan(APPROVED_RAW_LOG_LINE).length == 1 &&
-      current_source == trusted_source.sub(APPROVED_RAW_LOG_LINE, "")
+      trusted_source.scan(TRUSTED_PARSE_ERROR_LINE).length == 1 &&
+      [
+        approved_log_removal,
+        approved_log_removal.sub(TRUSTED_PARSE_ERROR_LINE, APPROVED_PARSE_ERROR_LINE),
+      ].include?(current_source)
   end
 
   def trusted_profile_details_notifier
@@ -56,11 +64,23 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     trusted_profile_details_notifier.sub(APPROVED_RAW_LOG_LINE, "")
   end
 
+  def approved_private_profile_details_notifier
+    approved_profile_details_notifier.sub(TRUSTED_PARSE_ERROR_LINE, APPROVED_PARSE_ERROR_LINE)
+  end
+
   def test_exact_profile_raw_log_removal_is_approved
     assert approved_protected_change?(
       PROFILE_DETAILS_NOTIFIER,
       trusted_profile_details_notifier,
       approved_profile_details_notifier,
+    )
+  end
+
+  def test_exact_profile_raw_log_removal_and_safe_parse_error_replacement_is_approved
+    assert approved_protected_change?(
+      PROFILE_DETAILS_NOTIFIER,
+      trusted_profile_details_notifier,
+      approved_private_profile_details_notifier,
     )
   end
 
@@ -75,6 +95,19 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   def test_profile_raw_log_removal_with_an_extra_body_change_is_rejected
     unsafe = approved_profile_details_notifier.sub("import 'dart:convert';", "import 'dart:async';")
     refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_safe_parse_error_replacement_with_an_extra_body_change_is_rejected
+    unsafe = approved_private_profile_details_notifier.sub("import 'dart:convert';", "import 'dart:async';")
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_original_profile_raw_log_is_rejected
+    refute approved_protected_change?(
+      PROFILE_DETAILS_NOTIFIER,
+      trusted_profile_details_notifier,
+      trusted_profile_details_notifier,
+    )
   end
 
   def test_relocated_profile_raw_log_is_rejected
@@ -92,10 +125,72 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
   end
 
+  def test_reintroduced_raw_parse_error_is_rejected_from_safe_variant
+    unsafe = approved_private_profile_details_notifier + TRUSTED_PARSE_ERROR_LINE
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_parse_error_to_string_is_rejected
+    unsafe = approved_profile_details_notifier.sub(
+      TRUSTED_PARSE_ERROR_LINE,
+      "      loggy.error('Error parsing profile-content JSON (${e.toString()})', null, st);\n",
+    )
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_parse_error_message_is_rejected
+    unsafe = approved_profile_details_notifier.sub(
+      TRUSTED_PARSE_ERROR_LINE,
+      "      loggy.error('Error parsing profile-content JSON (${e.message})', null, st);\n",
+    )
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_safe_parse_error_with_altered_stack_is_rejected
+    unsafe = approved_profile_details_notifier.sub(
+      TRUSTED_PARSE_ERROR_LINE,
+      "      loggy.error('Error parsing profile-content JSON (${e.runtimeType})', null, StackTrace.current);\n",
+    )
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_safe_parse_error_without_stack_is_rejected
+    unsafe = approved_profile_details_notifier.sub(
+      TRUSTED_PARSE_ERROR_LINE,
+      "      loggy.error('Error parsing profile-content JSON (${e.runtimeType})', null);\n",
+    )
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_relocated_safe_parse_error_is_rejected
+    unsafe = approved_profile_details_notifier.sub(TRUSTED_PARSE_ERROR_LINE, "") + APPROVED_PARSE_ERROR_LINE
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
+  def test_duplicated_safe_parse_error_is_rejected
+    unsafe = approved_profile_details_notifier.sub(TRUSTED_PARSE_ERROR_LINE, APPROVED_PARSE_ERROR_LINE * 2)
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, trusted_profile_details_notifier, unsafe)
+  end
+
   def test_changed_trusted_raw_log_multiplicity_is_rejected
     changed_trusted_source = trusted_profile_details_notifier.sub(
       APPROVED_RAW_LOG_LINE,
       APPROVED_RAW_LOG_LINE * 2,
+    )
+    candidate = changed_trusted_source.sub(APPROVED_RAW_LOG_LINE, "")
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, changed_trusted_source, candidate)
+  end
+
+  def test_missing_trusted_parse_error_line_is_rejected
+    changed_trusted_source = trusted_profile_details_notifier.sub(TRUSTED_PARSE_ERROR_LINE, "")
+    candidate = changed_trusted_source.sub(APPROVED_RAW_LOG_LINE, "")
+    refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, changed_trusted_source, candidate)
+  end
+
+  def test_repeated_trusted_parse_error_line_is_rejected
+    changed_trusted_source = trusted_profile_details_notifier.sub(
+      TRUSTED_PARSE_ERROR_LINE,
+      TRUSTED_PARSE_ERROR_LINE * 2,
     )
     candidate = changed_trusted_source.sub(APPROVED_RAW_LOG_LINE, "")
     refute approved_protected_change?(PROFILE_DETAILS_NOTIFIER, changed_trusted_source, candidate)

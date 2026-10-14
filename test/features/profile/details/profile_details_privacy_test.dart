@@ -18,7 +18,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:toastification/toastification.dart';
 
 // Artificial markers only; the repository/core boundary never reads user files.
-const _canaries = ['fixture-vless-credential', 'fixture-proxy-password', 'fixture-endpoint-private-key'];
+const _canaries = ['fixture-vless-credential', 'fixture-proxy-password', 'fixture-endpoint-private-key', '8140275963'];
 const _safeDiagnostic = 'synthetic profile diagnostic probe';
 final _outbounds = [
   {'type': 'vless', 'tag': 'fixture-vless', 'server': 'vpn.example.invalid', 'uuid': _canaries[0]},
@@ -167,6 +167,28 @@ void _expectNoConfigurationInDiagnostics(_OfflineDiagnostics diagnostics) {
   }
 }
 
+void _expectSafeParseDiagnostic(_OfflineDiagnostics diagnostics, {String? type}) {
+  const prefix = 'Error parsing profile-content JSON';
+  final record = diagnostics.printer.records.where((record) => record.message.startsWith(prefix)).single;
+  expect(
+    record.message,
+    type == null ? matches(r'^Error parsing profile-content JSON \([A-Za-z_][A-Za-z_0-9]*\)$') : '$prefix ($type)',
+  );
+  expect(record.error, isNull);
+  expect(record.stackTrace, isNotNull);
+  expect(record.stackTrace.toString(), contains('ProfileDetailsNotifier.build'));
+  final events = diagnostics.transport.payloads.map((payload) => jsonDecode(payload) as Map<String, dynamic>).toList();
+  expect(events.any((event) => (event['message'] as Map<String, dynamic>)['formatted'] == record.message), isTrue);
+  final probe = events.singleWhere(
+    (event) => (event['message'] as Map<String, dynamic>)['formatted'] == _safeDiagnostic,
+  );
+  final breadcrumbs = (probe['breadcrumbs'] as List).cast<Map<String, dynamic>>();
+  final breadcrumb = breadcrumbs.singleWhere((item) => item['message'] == record.message);
+  final data = breadcrumb['data'] as Map<String, dynamic>;
+  expect(data.containsKey('LogRecord.error'), isFalse);
+  expect(data['LogRecord.stackTrace'], contains('ProfileDetailsNotifier.build'));
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late _OfflineDiagnostics diagnostics;
@@ -274,14 +296,76 @@ void main() {
       final details = container.read(profileDetailsNotifierProvider(repository.profile.id)).requireValue;
       expect(details.configContent, malformed);
       expect(repository.rawReads, 0);
-      expect(
-        diagnostics.printer.records.any(
-          (record) => record.message == 'Error parsing profile-content JSON' && record.error is FormatException,
-        ),
-        isTrue,
-      );
       await diagnostics.captureSafeProbe();
-      expect(diagnostics.transport.payloads.join('\n'), contains('Error parsing profile-content JSON'));
+      _expectSafeParseDiagnostic(diagnostics, type: 'FormatException');
     });
   });
+
+  for (final fallback in [false, true]) {
+    final path = fallback ? 'raw fallback' : 'generated';
+    for (final entry in {'uuid': _canaries[0], 'password': _canaries[1], 'private_key': _canaries[2]}.entries) {
+      test('$path malformed JSON keeps ${entry.key} in the editor and out of parse diagnostics', () async {
+        await offline(() async {
+          final malformed = '{"${entry.key}":"${entry.value}",}';
+          final repository = _SyntheticProfiles(generationFails: fallback, content: malformed);
+          await open(repository);
+          final details = container.read(profileDetailsNotifierProvider(repository.profile.id)).requireValue;
+          expect(details.configContent, malformed);
+          expect(details.profile, repository.profile);
+          expect(details.isDetailsChanged, isFalse);
+          expect(details.isLoading, isFalse);
+          expect(repository.rawReads, fallback ? 1 : 0);
+          await diagnostics.captureSafeProbe();
+          _expectNoConfigurationInDiagnostics(diagnostics);
+          _expectSafeParseDiagnostic(diagnostics, type: 'FormatException');
+        });
+      });
+    }
+
+    final invalidShapes = {
+      'numeric scalar': _canaries[3],
+      'null scalar': 'null',
+      'endpoint object': jsonEncode({'endpoints': _endpoints.single, 'outbounds': _outbounds}),
+    };
+    for (final entry in invalidShapes.entries) {
+      test('$path ${entry.key} preserves content without exposing the parse error receiver', () async {
+        await offline(() async {
+          final repository = _SyntheticProfiles(generationFails: fallback, content: entry.value);
+          await open(repository);
+          final details = container.read(profileDetailsNotifierProvider(repository.profile.id)).requireValue;
+          expect(details.configContent, entry.value);
+          expect(details.profile, repository.profile);
+          expect(details.isDetailsChanged, isFalse);
+          expect(details.isLoading, isFalse);
+          expect(repository.rawReads, fallback ? 1 : 0);
+          await diagnostics.captureSafeProbe();
+          _expectNoConfigurationInDiagnostics(diagnostics);
+          _expectSafeParseDiagnostic(diagnostics);
+        });
+      });
+    }
+
+    test('$path parse failure can be corrected and saved once without diagnostic credentials', () async {
+      await offline(() async {
+        final malformed = '{"uuid":"${_canaries[0]}",}';
+        final repository = _SyntheticProfiles(generationFails: fallback, content: malformed);
+        await open(repository);
+        final notifier = container.read(profileDetailsNotifierProvider(repository.profile.id).notifier);
+        final draft = jsonEncode({'outbounds': _outbounds, 'endpoints': _endpoints});
+        notifier.setContent(draft);
+        expect(await notifier.save(), isTrue);
+        expect(repository.saved, [(repository.profile, draft)]);
+        expect(notifications.messages, hasLength(1));
+        final details = container.read(profileDetailsNotifierProvider(repository.profile.id)).requireValue;
+        expect(details.configContent, draft);
+        expect(details.profile, repository.profile);
+        expect(details.isDetailsChanged, isTrue);
+        expect(details.isLoading, isFalse);
+        expect(repository.rawReads, fallback ? 1 : 0);
+        await diagnostics.captureSafeProbe();
+        _expectNoConfigurationInDiagnostics(diagnostics);
+        _expectSafeParseDiagnostic(diagnostics, type: 'FormatException');
+      });
+    });
+  }
 }

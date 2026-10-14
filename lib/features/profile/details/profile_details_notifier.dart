@@ -58,7 +58,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
       final endpoints = jsonObject['endpoints'] as List? ?? [];
       profContent = '{"outbounds": ${json.encode(outbounds)},"endpoints":${json.encode(endpoints)} }';
     } catch (e, st) {
-      loggy.error('Error parsing profile-content JSON', e, st);
+      loggy.error('Error parsing profile-content JSON (${e.runtimeType})', null, st);
       // rethrow;
     }
     return ProfileDetailsState(
