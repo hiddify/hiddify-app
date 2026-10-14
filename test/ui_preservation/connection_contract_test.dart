@@ -94,12 +94,26 @@ void main() {
       expect(find.text(t.connection.secure), delay > 0 && delay <= 65000 ? findsOneWidget : findsNothing);
     });
   }
-  testWidgets('baseline error with valid latency throws while reading secure label', (tester) async {
-    final failure = StateError('synthetic');
-    await mount(tester, AsyncError(failure, StackTrace.empty));
-    expect(tester.takeException(), same(failure));
-    expect(find.byType(ErrorWidget), findsOneWidget);
-  });
+  for (final warpEnabled in [true, false]) {
+    testWidgets('error with valid latency keeps retry usable with WARP $warpEnabled', (tester) async {
+      await prefs.setBool('enable-warp', warpEnabled);
+      final failure = StateError('synthetic');
+      final (_, _, events) = await mount(tester, AsyncError(failure, StackTrace.empty));
+      expect(tester.takeException(), isNull);
+      expect(find.byType(ErrorWidget), findsNothing);
+      expect(button(), findsOneWidget);
+      expect(find.text(t.connection.secure), findsNothing);
+      final semantics = tester
+          .widgetList<Semantics>(find.byType(Semantics))
+          .singleWhere((s) => s.properties.button == true && s.properties.enabled != null);
+      expect(semantics.properties.label, '');
+      expect(semantics.properties.enabled, true);
+      await tester.tap(button());
+      await tester.pump();
+      expect(events, ['notice', 'toggle']);
+      expect(tester.takeException(), isNull);
+    });
+  }
   testWidgets('WARP disabled hides secure label', (tester) async {
     await prefs.setBool('enable-warp', false);
     await mount(tester, const AsyncData(Connected()));

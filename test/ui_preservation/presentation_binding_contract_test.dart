@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _baseline = '0830294eff5b8cd86324545ed00689648c70bd23';
+const _connectionButtonPath = 'lib/features/home/widget/connection_button.dart';
 // Existing presentation surfaces explicitly enumerated in the migration plan.
 const _files = <String>[
   'lib/core/theme/app_theme.dart',
@@ -64,8 +65,12 @@ String _tokens(AstNode node) {
 }
 
 class _Bindings extends GeneralizingAstVisitor<void> {
+  _Bindings(this.path);
+
+  final String path;
   final exact = <String, int>{};
   final predicates = <String, int>{};
+  final ifStatements = <IfStatement>[];
   void add(Map<String, int> into, String kind, AstNode node) {
     final key = '$kind:${_tokens(node)}';
     into.update(key, (count) => count + 1, ifAbsent: () => 1);
@@ -94,7 +99,10 @@ class _Bindings extends GeneralizingAstVisitor<void> {
     if (node is SwitchCase) add(exact, 'switch-case', node.expression);
     if (node is SwitchExpression) add(exact, 'switch-value', node.expression);
     if (node is SwitchStatement) add(exact, 'switch-value', node.expression);
-    if (node is IfStatement) add(predicates, 'if', node.expression);
+    if (node is IfStatement) {
+      add(predicates, 'if', node.expression);
+      ifStatements.add(node);
+    }
     if (node is IfElement) add(predicates, 'if', node.expression);
     if (node is ConditionalExpression) add(predicates, 'conditional', node.condition);
     super.visitNode(node);
@@ -106,9 +114,41 @@ _Bindings _inventory(String source, String path) {
   if (parsed.errors.isNotEmpty) {
     throw StateError('AST parse diagnostics in $path: ${parsed.errors}');
   }
-  final inventory = _Bindings();
+  final inventory = _Bindings(path);
   parsed.unit.accept(inventory);
   return inventory;
+}
+
+String _secureLabelPredicate(String accessor) =>
+    'if:${jsonEncode(['delay', '<=', '0', '||', 'delay', '>', '65000', '||', 'connectionStatus', '.', accessor, '!=', 'const', 'Connected', '(', ')'])}';
+
+String _recoveryContext(IfStatement node) {
+  final parts = [
+    _tokens(node.thenStatement),
+    if (node.elseStatement == null) 'no-else' else _tokens(node.elseStatement!),
+  ];
+  AstNode current = node;
+  while (current.parent != null) {
+    final parent = current.parent!;
+    if (parent is ClassDeclaration) {
+      parts.add('class:${parent.name.lexeme}');
+      break;
+    }
+    if (parent is MethodDeclaration) parts.add('method:${parent.name.lexeme}');
+    parts.add('${parent.runtimeType}:${parent.childEntities.toList().indexOf(current)}');
+    current = parent;
+  }
+  return jsonEncode(parts);
+}
+
+bool _sameRecoverySite(_Bindings baseline, _Bindings live) {
+  final before = baseline.ifStatements
+      .where((node) => 'if:${_tokens(node.expression)}' == _secureLabelPredicate('value'))
+      .toList();
+  final after = live.ifStatements
+      .where((node) => 'if:${_tokens(node.expression)}' == _secureLabelPredicate('valueOrNull'))
+      .toList();
+  return before.length == 1 && after.length == 1 && _recoveryContext(before.single) == _recoveryContext(after.single);
 }
 
 List<String> _differences(_Bindings baseline, _Bindings live) {
@@ -116,8 +156,19 @@ List<String> _differences(_Bindings baseline, _Bindings live) {
   for (final key in {...baseline.exact.keys, ...live.exact.keys}) {
     if (baseline.exact[key] != live.exact[key]) issues.add('binding multiplicity changed: $key');
   }
-  // Added appearance predicates are allowed; every existing condition remains.
+  // Added appearance predicates are allowed; only the approved recovery getter may replace an existing condition.
   for (final key in baseline.predicates.keys) {
+    if (baseline.path == 'baseline/$_connectionButtonPath' &&
+        live.path == _connectionButtonPath &&
+        key == _secureLabelPredicate('value')) {
+      if (baseline.predicates[key] != 1 ||
+          (live.predicates[key] ?? 0) != 0 ||
+          live.predicates[_secureLabelPredicate('valueOrNull')] != 1 ||
+          !_sameRecoverySite(baseline, live)) {
+        issues.add('approved connection-button recovery predicate changed: $key');
+      }
+      continue;
+    }
     if ((live.predicates[key] ?? 0) < baseline.predicates[key]!) {
       issues.add('existing predicate removed or changed: $key');
     }
@@ -184,6 +235,67 @@ void main() {
     final callback = finder.expression!;
     final mutated = source.replaceRange(callback.offset, callback.end, 'null');
     expect(_differences(_inventory(source, path), _inventory(mutated, 'disposable/$path')), isNotEmpty);
+  });
+
+  group('approved connection-button error recovery', () {
+    const path = 'lib/features/home/widget/connection_button.dart';
+    const predicate = 'delay <= 0 || delay > 65000 || connectionStatus.value != const Connected()';
+    late String source;
+
+    setUp(() {
+      final original = Process.runSync('git', ['show', '$_baseline:$path']);
+      expect(original.exitCode, 0);
+      source = original.stdout as String;
+      expect(predicate.allMatches(source).length, 1);
+    });
+
+    test('guard accepts only the approved null-safe predicate', () {
+      final corrected = source.replaceFirst(predicate, predicate.replaceFirst('.value ', '.valueOrNull '));
+      expect(_differences(_inventory(source, 'baseline/$path'), _inventory(corrected, path)), isEmpty);
+    });
+
+    for (final mutation in <String, String>{
+      'unsafe error getter': predicate,
+      'changed latency boundary': predicate.replaceFirst('.value ', '.valueOrNull ').replaceFirst('65000', '64999'),
+    }.entries) {
+      test('guard rejects ${mutation.key} after approving recovery', () {
+        final mutated = source.replaceFirst(predicate, mutation.value);
+        expect(_differences(_inventory(source, 'baseline/$path'), _inventory(mutated, path)), isNotEmpty);
+      });
+    }
+
+    test('guard does not allow the recovery substitution in another file', () {
+      const otherPath = 'lib/features/proxy/widget/proxy_tile.dart';
+      final corrected = source.replaceFirst(predicate, predicate.replaceFirst('.value ', '.valueOrNull '));
+      expect(_differences(_inventory(source, 'baseline/$otherPath'), _inventory(corrected, otherPath)), isNotEmpty);
+    });
+
+    test('guard rejects a duplicated approved predicate', () {
+      final correctedPredicate = predicate.replaceFirst('.value ', '.valueOrNull ');
+      final duplicated = source.replaceFirst(
+        predicate,
+        '$correctedPredicate) { secureLabel = ""; } if ($correctedPredicate',
+      );
+      expect(_differences(_inventory(source, 'baseline/$path'), _inventory(duplicated, path)), isNotEmpty);
+    });
+
+    test('guard rejects relocating the approved predicate within the same file', () {
+      final correctedPredicate = predicate.replaceFirst('.value ', '.valueOrNull ');
+      final relocated = source
+          .replaceFirst(predicate, 'true')
+          .replaceFirst(
+            'return _ConnectionButton(',
+            'if ($correctedPredicate) { secureLabel = ""; } return _ConnectionButton(',
+          );
+      expect(_differences(_inventory(source, 'baseline/$path'), _inventory(relocated, path)), isNotEmpty);
+    });
+
+    test('guard rejects changing the approved recovery body', () {
+      final changedBody = source
+          .replaceFirst(predicate, predicate.replaceFirst('.value ', '.valueOrNull '))
+          .replaceFirst('secureLabel = "";', 'secureLabel = "unexpected";');
+      expect(_differences(_inventory(source, 'baseline/$path'), _inventory(changedBody, path)), isNotEmpty);
+    });
   });
 
   const sample = '''

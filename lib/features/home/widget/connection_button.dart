@@ -116,7 +116,7 @@ class ConnectionButton extends HookConsumerWidget {
         (ref.watch(ConfigOptions.enableWarp) && ref.watch(ConfigOptions.warpDetourMode) == WarpDetourMode.warpOverProxy)
         ? t.connection.secure
         : "";
-    if (delay <= 0 || delay > 65000 || connectionStatus.value != const Connected()) {
+    if (delay <= 0 || delay > 65000 || connectionStatus.valueOrNull != const Connected()) {
       secureLabel = "";
     }
     return _ConnectionButton(
