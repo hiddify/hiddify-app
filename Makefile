@@ -502,6 +502,7 @@ linux-arm64-musl-libs:
 macos-libs:
 	mkdir -p  $(DESKTOP_OUT) 
 	curl -L $(CORE_URL)/$(CORE_NAME)-macos.tar.gz | tar xz -C $(DESKTOP_OUT)
+	bash macos/scripts/build-tunnel-core.sh
 
 ios-libs: #not tested
 	mkdir -p $(IOS_OUT)
@@ -528,6 +529,7 @@ build-linux-libs:
 
 build-macos-libs:
 	make -C hiddify-core -f Makefile macos
+	bash macos/scripts/build-tunnel-core.sh
 
 build-ios-libs: 
 	rm -rf $(IOS_OUT)/HiddifyCore.xcframework 
@@ -544,4 +546,4 @@ ios-temp-prepare:
 	flutter build ios-framework
 	cd ios
 	pod install
-	
+

@@ -174,7 +174,7 @@ class SettingsPage extends HookConsumerWidget {
             icon: Icons.content_cut_rounded,
             namedLocation: context.namedLocation('tlsTricks'),
           ),
-          if (PlatformUtils.isIOS)
+          if (PlatformUtils.isIOS || PlatformUtils.isMacOS)
             Material(
               child: ListTile(
                 title: Text(t.pages.settings.resetTunnel),

@@ -1,0 +1,27 @@
+// Debug supports local development without restricted Apple entitlements.
+HIDDIFY_NETWORK_EXTENSION_ENABLED = YES
+HIDDIFY_NETWORK_EXTENSION_ENABLED[config=Debug] = NO
+HIDDIFY_HOST_ENTITLEMENTS = Runner/Release.entitlements
+HIDDIFY_HOST_ENTITLEMENTS[config=Debug] = Runner/Developer.entitlements
+HIDDIFY_EXTENSION_CODE_SIGN_ALLOWED = YES
+HIDDIFY_EXTENSION_CODE_SIGN_ALLOWED[config=Debug] = NO
+HIDDIFY_TUNNEL_BUNDLE_IDENTIFIER = app.hiddify.com.HiddifyPacketTunnel
+HIDDIFY_APP_BUNDLE_IDENTIFIER = app.hiddify.com
+HIDDIFY_VPN_APP_GROUP = $(TeamIdentifierPrefix)app.hiddify.com.vpn
+// Apple Development profiles use the standard value; Developer ID uses the suffix.
+HIDDIFY_NETWORK_EXTENSION_ENTITLEMENT = packet-tunnel-provider-systemextension
+HIDDIFY_NETWORK_EXTENSION_ENTITLEMENT[config=Debug] = packet-tunnel-provider
+HIDDIFY_CODE_SIGN_STYLE = Automatic
+HIDDIFY_CODE_SIGN_IDENTITY = Developer ID Application
+HIDDIFY_CODE_SIGN_IDENTITY[config=Debug] = -
+HIDDIFY_HOST_PROVISIONING_PROFILE =
+HIDDIFY_TUNNEL_PROVISIONING_PROFILE =
+// Developer ID distribution requires hardened runtime on both executables.
+ENABLE_HARDENED_RUNTIME = YES
+ENABLE_HARDENED_RUNTIME[config=Debug] = NO
+CODE_SIGN_INJECT_BASE_ENTITLEMENTS[config=Release] = NO
+CODE_SIGN_INJECT_BASE_ENTITLEMENTS[config=Profile] = NO
+MACOSX_DEPLOYMENT_TARGET = 12.0
+
+// Copy NetworkExtension.local.xcconfig.example to NetworkExtension.local.xcconfig for local team/signing overrides.
+#include? "NetworkExtension.local.xcconfig"

@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
@@ -36,6 +37,15 @@ sealed class ConnectionFailure with _$ConnectionFailure, Failure {
 
   @With<ExpectedMeasuredFailure>()
   const factory ConnectionFailure.missingPsiphonLicense() = MissingPsiphonLicense;
+
+  factory ConnectionFailure.fromError(Object error, [StackTrace? stackTrace]) => switch (error) {
+    ConnectionFailure() => error,
+    PlatformException(code: 'MACOS_VPN_APPROVAL_REQUIRED', :final message) => ConnectionFailure.missingVpnPermission(
+      message,
+    ),
+    PlatformException(code: 'MACOS_VPN', message: final message?) => ConnectionFailure.unexpected(message, stackTrace),
+    _ => ConnectionFailure.unexpected(error, stackTrace),
+  };
 
   @override
   ({String type, String? message}) present(TranslationsEn t) {
