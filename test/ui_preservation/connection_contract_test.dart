@@ -11,6 +11,8 @@ import 'package:hiddify/features/connection/data/connection_data_providers.dart'
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/diagnostics/observed_connection_repository.dart';
+import 'package:hiddify/features/diagnostics/safe_diagnostic_journal.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
@@ -149,111 +151,118 @@ void main() {
     expect(events, ['notice']);
   });
 
-  group('real ConnectionNotifier with repository boundary fake', () {
-    late ProviderContainer container;
-    late RecordingConnectionRepository repo;
-    Future<void> flush() async {
-      for (var i = 0; i < 8; i++) {
-        await Future<void>.delayed(Duration.zero);
+  for (final observe in [false, true]) {
+    group('real ConnectionNotifier with repository boundary fake (diagnostics=$observe)', () {
+      late ProviderContainer container;
+      late RecordingConnectionRepository repo;
+      late SafeDiagnosticJournal journal;
+      Future<void> flush() async {
+        for (var i = 0; i < 8; i++) {
+          await Future<void>.delayed(Duration.zero);
+        }
       }
-    }
 
-    Future<ConnectionNotifier> initialize({bool profile = true}) async {
-      repo = RecordingConnectionRepository();
-      container = ProviderContainer(
-        overrides: [
-          sharedPreferencesProvider.overrideWith((ref) => prefs),
-          translationsProvider.overrideWith((ref) => t),
-          connectionRepositoryProvider.overrideWithValue(repo),
-          activeProfileProvider.overrideWith(() => FixtureProfile(profile ? connectionProfile : null)),
-          dialogNotifierProvider.overrideWith(() => FixtureDialogs([])),
-        ],
-      );
-      final notifier = container.read(connectionNotifierProvider.notifier);
-      await flush();
-      return notifier;
-    }
+      Future<ConnectionNotifier> initialize({bool profile = true}) async {
+        repo = RecordingConnectionRepository();
+        journal = SafeDiagnosticJournal();
+        container = ProviderContainer(
+          overrides: [
+            sharedPreferencesProvider.overrideWith((ref) => prefs),
+            translationsProvider.overrideWith((ref) => t),
+            connectionRepositoryProvider.overrideWithValue(
+              observe ? ObservedConnectionRepository(repo, journal) : repo,
+            ),
+            activeProfileProvider.overrideWith(() => FixtureProfile(profile ? connectionProfile : null)),
+            dialogNotifierProvider.overrideWith(() => FixtureDialogs([])),
+          ],
+        );
+        final notifier = container.read(connectionNotifierProvider.notifier);
+        await flush();
+        return notifier;
+      }
 
-    tearDown(() async {
-      container.dispose();
-      await repo.statuses.close();
-    });
-    test('OFF starts once while pending with exact profile/memory arguments', () async {
-      final notifier = await initialize();
-      repo.statuses.add(const Disconnected());
-      await flush();
-      repo.connectGate = Completer<void>();
-      await notifier.toggleConnection();
-      await flush();
-      await notifier.toggleConnection();
-      await flush();
-      expect(repo.calls, ['connect']);
-      expect(repo.args, [(connectionProfile, false)]);
-      expect(container.read(Preferences.startedByUser), true);
-      repo.connectGate!.complete();
-      await flush();
-    });
-    test('ON disconnects once and clears started-by-user', () async {
-      final notifier = await initialize();
-      repo.statuses.add(const Connected());
-      await flush();
-      await notifier.toggleConnection();
-      expect(repo.calls, ['disconnect']);
-      expect(container.read(Preferences.startedByUser), false);
-    });
-    for (final status in [const Connecting(), const Disconnecting()]) {
-      test('$status ignores toggle and reconnect', () async {
+      tearDown(() async {
+        container.dispose();
+        await repo.statuses.close();
+        journal.dispose();
+      });
+      test('OFF starts once while pending with exact profile/memory arguments', () async {
         final notifier = await initialize();
-        repo.statuses.add(status);
+        repo.statuses.add(const Disconnected());
+        await flush();
+        repo.connectGate = Completer<void>();
+        await notifier.toggleConnection();
         await flush();
         await notifier.toggleConnection();
-        await notifier.reconnect(connectionProfile);
+        await flush();
+        expect(repo.calls, ['connect']);
+        expect(repo.args, [(connectionProfile, false)]);
+        expect(container.read(Preferences.startedByUser), true);
+        repo.connectGate!.complete();
+        await flush();
+      });
+      test('ON disconnects once and clears started-by-user', () async {
+        final notifier = await initialize();
+        repo.statuses.add(const Connected());
+        await flush();
+        await notifier.toggleConnection();
+        expect(repo.calls, ['disconnect']);
+        expect(container.read(Preferences.startedByUser), false);
+      });
+      for (final status in [const Connecting(), const Disconnecting()]) {
+        test('$status ignores toggle and reconnect', () async {
+          final notifier = await initialize();
+          repo.statuses.add(status);
+          await flush();
+          await notifier.toggleConnection();
+          await notifier.reconnect(connectionProfile);
+          expect(repo.calls, isEmpty);
+        });
+      }
+      test('loading ignores toggle', () async {
+        final notifier = await initialize();
+        await notifier.toggleConnection();
         expect(repo.calls, isEmpty);
       });
-    }
-    test('loading ignores toggle', () async {
-      final notifier = await initialize();
-      await notifier.toggleConnection();
-      expect(repo.calls, isEmpty);
+      test('no profile never invokes repository start', () async {
+        final notifier = await initialize(profile: false);
+        repo.statuses.add(const Disconnected());
+        await flush();
+        await notifier.toggleConnection();
+        await flush();
+        expect(repo.calls, isEmpty);
+      });
+      test('connected reconnect passes exact arguments, null profile disconnects', () async {
+        final notifier = await initialize();
+        repo.statuses.add(const Connected());
+        await flush();
+        await notifier.reconnect(connectionProfile);
+        expect(repo.calls, ['reconnect']);
+        expect(repo.args, [(connectionProfile, false)]);
+        await notifier.reconnect(null);
+        expect(repo.calls, ['reconnect', 'disconnect']);
+      });
+      test('repository failure becomes error and clears started flag', () async {
+        final notifier = await initialize();
+        repo.statuses.add(const Disconnected());
+        await flush();
+        repo.failure = const MissingVpnPermission();
+        await notifier.toggleConnection();
+        await flush();
+        expect(repo.calls, ['connect']);
+        expect(container.read(connectionNotifierProvider).error, const MissingVpnPermission());
+        expect(container.read(Preferences.startedByUser), false);
+      });
+      test('stream error retries connection', () async {
+        final notifier = await initialize();
+        repo.statuses.addError(StateError('synthetic'));
+        await flush();
+        expect(container.read(connectionNotifierProvider), isA<AsyncError<ConnectionStatus>>());
+        await notifier.toggleConnection();
+        await flush();
+        expect(repo.calls, ['connect']);
+        expect(repo.args, [(connectionProfile, false)]);
+      });
     });
-    test('no profile never invokes repository start', () async {
-      final notifier = await initialize(profile: false);
-      repo.statuses.add(const Disconnected());
-      await flush();
-      await notifier.toggleConnection();
-      await flush();
-      expect(repo.calls, isEmpty);
-    });
-    test('connected reconnect passes exact arguments, null profile disconnects', () async {
-      final notifier = await initialize();
-      repo.statuses.add(const Connected());
-      await flush();
-      await notifier.reconnect(connectionProfile);
-      expect(repo.calls, ['reconnect']);
-      expect(repo.args, [(connectionProfile, false)]);
-      await notifier.reconnect(null);
-      expect(repo.calls, ['reconnect', 'disconnect']);
-    });
-    test('repository failure becomes error and clears started flag', () async {
-      final notifier = await initialize();
-      repo.statuses.add(const Disconnected());
-      await flush();
-      repo.failure = const MissingVpnPermission();
-      await notifier.toggleConnection();
-      await flush();
-      expect(repo.calls, ['connect']);
-      expect(container.read(connectionNotifierProvider).error, const MissingVpnPermission());
-      expect(container.read(Preferences.startedByUser), false);
-    });
-    test('stream error retries connection', () async {
-      final notifier = await initialize();
-      repo.statuses.addError(StateError('synthetic'));
-      await flush();
-      expect(container.read(connectionNotifierProvider), isA<AsyncError<ConnectionStatus>>());
-      await notifier.toggleConnection();
-      await flush();
-      expect(repo.calls, ['connect']);
-      expect(repo.args, [(connectionProfile, false)]);
-    });
-  });
+  }
 }

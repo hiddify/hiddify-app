@@ -35,6 +35,92 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   APPROVED_PARSE_ERROR_LINE =
     "      loggy.error('Error parsing profile-content JSON (${e.runtimeType})', null, st);\n"
 
+  # Exact source fingerprints for the independently reviewed diagnostics batch.
+  # Keep this list narrow; the VPN repository, notifier, core and bridge remain protected.
+  DIAGNOSTIC_EXISTING_FILES = %w[
+    assets/translations/en.i18n.json assets/translations/ru.i18n.json
+    ios/HiddifyPacketTunnel/Logger.swift
+    ios/HiddifyPacketTunnel/SingBox/ExtensionProvider.swift
+    ios/Runner/VPN/VPNManager.swift
+    lib/core/analytics/analytics_controller.dart lib/core/analytics/analytics_filter.dart
+    lib/core/logger/logger_controller.dart
+    lib/features/connection/data/connection_data_providers.dart
+    lib/features/log/overview/logs_page.dart
+  ].freeze
+  DIAGNOSTIC_SOURCE_SHA256 = {
+    "assets/translations/en.i18n.json" => ["d1bdfe06b016b0e72828f4a5c980d8e1ae4146983ddd3d7630a1861bfd448acc", "9feb87b6ba90df93815f65f801cd84625954876da6d0c3174cc45af4600a4514"],
+    "assets/translations/ru.i18n.json" => ["218e2472e8eeca970a0ff160e612e87904f09cc8f4fba7ca4f351df47a0c35c5", "11c8fd4330e7a755cc727b26d058d99c2bc6c0a85833bdb0c4688880f22da283"],
+    "ios/HiddifyPacketTunnel/Logger.swift" => ["197a03eb1212f113e934b913525a6d329e2ec5538b97bf71a3296571c07499a7", "dd25284df008b05268740bbd720969eb337982eece068819002a20b8a58a8964"],
+    "ios/HiddifyPacketTunnel/SingBox/ExtensionProvider.swift" => ["5d34a57ef76d904bece6462519d340c7ff217b57ff3237bb82e69d82b1a28848", "8876aae20b2e98c0cef2abf66b82080461f770e5b007d0eba9ff547e9880f4aa"],
+    "ios/Runner/VPN/VPNManager.swift" => ["9f207ded470097e274e1cdb4d238fe1734d57ac4ae452e9844de0a89dfa86dff", "c3280f57717125360da2045537a95aa68a9d841e1b099809fc0d5f1648de9ae4"],
+    "lib/core/analytics/analytics_controller.dart" => ["2a84ad1b04bd809c2641605c070c9c2baae0bcb67c896e02604d8c35d9d02498", "88529f0bdebb1f5e770599b08b085bafae252efb48d7740e8769392a30f70c42"],
+    "lib/core/analytics/analytics_filter.dart" => ["3395f98c9c53da22017b48b657a29d725c3cbbd7ef6cc205a3506332ab5c4e59", "537bd175fa6172c7ac621b1c150f81f2fe2bfa388f205f42c954c43f1f89090a"],
+    "lib/core/logger/logger_controller.dart" => ["d78b51210488b4d967c2aee9efbc42d1e6f50b325dc42319d535569c17902e5c", "887355613fb31ae023c1582fc8c7b9e98f0424da1567a6465831514991f900b8"],
+    "lib/features/connection/data/connection_data_providers.dart" => ["08624ce007644a397effdeaa42da18d4381195c0feda55e4fe7d7faa2587483d", "aea92301c08f51c603a3917f17c95c0d42b7c54936757545936df5e3ab31abe3"],
+    "lib/features/log/overview/logs_page.dart" => ["492d35c4ea6cf24f86dc1b1114ecbdb2713ed6657b8c8d6053d077e6bb2be66b", "8683fc35beb7940ddbef4423166b0440e79bef23f697b8d247f98b6fd9cabee5"],
+  }.freeze
+
+  DIAGNOSTIC_NEW_FILES = %w[
+    lib/core/logger/safe_log_record.dart
+    lib/features/diagnostics/safe_diagnostic_event.dart
+    lib/features/diagnostics/safe_diagnostic_journal.dart
+    lib/features/diagnostics/observed_connection_repository.dart
+    lib/features/diagnostics/diagnostic_providers.dart
+    lib/features/diagnostics/safe_diagnostics_page.dart
+  ].freeze
+  DIAGNOSTIC_NEW_SHA256 = {
+    "lib/core/logger/safe_log_record.dart" => "57137aee501d92bd54129bc3ce34814efabb2a96f6dd5deab5c48040019b183a",
+    "lib/features/diagnostics/safe_diagnostic_event.dart" => "867a3fc3c57f729b0de11787f130e18ed2cabc66cbfd36a3344a3a9f1e7a66a6",
+    "lib/features/diagnostics/safe_diagnostic_journal.dart" => "d86314bd6ccd1042a5112f1cd682fdcfc209f1e72d79aa93ce72cdf3ccf9e026",
+    "lib/features/diagnostics/observed_connection_repository.dart" => "8bd1bdcc05099863f93641b08a16a21e3d3b209f0736ea1cb9df35fc922e8cb1",
+    "lib/features/diagnostics/diagnostic_providers.dart" => "b8757034cb108efe7be93b1f1eabf46b5be89a0e725653c82294b3d7ba9144d4",
+    "lib/features/diagnostics/safe_diagnostics_page.dart" => "252e61b5d853eb84355ca50644f5e30b688d39ef9b3d7e0d94811099f3b3446d",
+  }.freeze
+
+  def test_new_diagnostic_sources_match_reviewed_fingerprints
+    assert_equal DIAGNOSTIC_NEW_FILES.sort, DIAGNOSTIC_NEW_SHA256.keys.sort
+    DIAGNOSTIC_NEW_SHA256.each do |path, expected|
+      assert_equal expected, Digest::SHA256.file(File.join(ROOT, path)).hexdigest, path
+    end
+  end
+
+  def approved_diagnostic_change?(path, trusted_source, current_source)
+    fingerprints = DIAGNOSTIC_SOURCE_SHA256[path]
+    fingerprints &&
+      Digest::SHA256.hexdigest(trusted_source) == fingerprints.fetch(0) &&
+      Digest::SHA256.hexdigest(current_source) == fingerprints.fetch(1)
+  end
+
+  def test_diagnostic_fingerprints_reject_unreviewed_bytes_and_paths
+    assert_equal DIAGNOSTIC_EXISTING_FILES.sort, DIAGNOSTIC_SOURCE_SHA256.keys.sort
+    DIAGNOSTIC_SOURCE_SHA256.each do |path, _|
+      trusted = git("show", "#{BASELINE}:#{path}")
+      current = File.binread(File.join(ROOT, path))
+      assert approved_diagnostic_change?(path, trusted, current), path
+      refute approved_diagnostic_change?(path, trusted, current + " "), path
+      refute approved_diagnostic_change?(path, trusted + " ", current), path
+      refute approved_diagnostic_change?("ios/Runner/Unapproved.swift", trusted, current)
+    end
+  end
+
+  def test_diagnostics_do_not_allow_vpn_policy_identity_or_pipeline_changes
+    %w[
+      lib/features/connection/data/connection_repository.dart
+      lib/features/connection/notifier/connection_notifier.dart
+      lib/hiddifycore/hiddify_core_service.dart
+      ios/Runner/VPN/MethodHandler.swift
+      ios/Runner/Info.plist
+      ios/Runner/Runner.entitlements
+      .github/workflows/ios-baseline.yml
+      pubspec.yaml pubspec.lock
+    ].each do |path|
+      refute DIAGNOSTIC_SOURCE_SHA256.key?(path), path
+      refute DIAGNOSTIC_NEW_FILES.include?(path), path
+      refute approved_diagnostic_change?(path, "old", "new"), path
+    end
+    refute allowed_addition?("lib/features/diagnostics/unreviewed.dart")
+  end
+
   def git(*args)
     output, status = Open3.capture2("git", "-C", ROOT, *args)
     assert status.success?, "Git read failed: #{args.first}"
@@ -210,7 +296,8 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     changed.reject! do |path|
       current_path = File.join(ROOT, path)
       File.file?(current_path) &&
-        approved_protected_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path))
+        (approved_protected_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
+         approved_diagnostic_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)))
     end
     assert_empty changed, "Protected runtime/native/dependency/identity files changed: #{changed.join(', ')}"
   end
@@ -222,7 +309,7 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
 
   def allowed_addition?(path)
     path.start_with?("test/", "docs/") || NEW_TOOL_FILES.include?(path) ||
-      NEW_UI_FILES.include?(path) || NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
+      DIAGNOSTIC_NEW_FILES.include?(path) || NEW_UI_FILES.include?(path) || NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
   end
 
   def unexpected_additions(current, baseline)

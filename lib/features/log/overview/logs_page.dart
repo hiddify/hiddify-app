@@ -9,6 +9,7 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
+import 'package:hiddify/features/diagnostics/safe_diagnostics_page.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/model/log_level.dart';
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
@@ -17,10 +18,16 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 class LogsPage extends HookConsumerWidget with PresLogger {
-  const LogsPage({super.key});
+  const LogsPage({super.key, this.isIos});
+
+  final bool? isIos;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (isIos ?? PlatformUtils.isIOS) {
+      return const SafeDiagnosticsPage();
+    }
+
     final t = ref.watch(translationsProvider).requireValue;
     final state = ref.watch(logsOverviewNotifierProvider);
     final notifier = ref.watch(logsOverviewNotifierProvider.notifier);

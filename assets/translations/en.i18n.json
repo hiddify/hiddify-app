@@ -170,7 +170,18 @@
     "logs": {
       "title": "Logs",
       "shareCoreLogs": "Share core logs",
-      "shareAppLogs": "Share app logs"
+      "shareAppLogs": "Share app logs",
+      "safeDiagnostics": {
+        "title": "Safe diagnostics",
+        "description": "This report contains app operation stages and error codes. Server addresses, profile contents, and raw error text are not included. The report alone does not confirm that internet traffic is going through the VPN.",
+        "empty": "No diagnostic events yet.",
+        "preview": "Report preview",
+        "copy": "Copy report",
+        "clear": "Clear report",
+        "copySuccess": "Safe report copied",
+        "copyError": "Could not copy the safe report",
+        "storageError": "The safe report could not be saved on this device"
+      }
     },
     "about": {
       "title": "About",
