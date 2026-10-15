@@ -1,9 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:hiddify/core/logger/custom_logger.dart';
+import 'package:hiddify/core/logger/safe_log_record.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:loggy/loggy.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class LoggerController extends LoggyPrinter with InfraLogger {
   LoggerController(this.consolePrinter, this.otherPrinters);
@@ -15,12 +16,17 @@ class LoggerController extends LoggyPrinter with InfraLogger {
 
   static late LoggerController _instance;
 
+  static bool get _useSafeSinkBoundary => !kIsWeb && Platform.isIOS;
+
   static void preInit() {
-    Loggy.initLoggy(logPrinter: const ConsolePrinter());
+    const consolePrinter = ConsolePrinter();
+    Loggy.initLoggy(logPrinter: _useSafeSinkBoundary ? const SafeLoggyPrinter(consolePrinter) : consolePrinter);
   }
 
   static void init(String appLogPath) {
-    _instance = LoggerController(const ConsolePrinter(), {"app": kIsWeb ? const ConsolePrinter() : FileLogPrinter(appLogPath)});
+    _instance = LoggerController(const ConsolePrinter(), {
+      "app": kIsWeb ? const ConsolePrinter() : FileLogPrinter(appLogPath),
+    });
     Loggy.initLoggy(logPrinter: _instance);
   }
 
@@ -49,9 +55,10 @@ class LoggerController extends LoggyPrinter with InfraLogger {
 
   @override
   void onLog(LogRecord record) {
-    consolePrinter.onLog(record);
+    final sinkRecord = _useSafeSinkBoundary ? safeLogRecord(record) : record;
+    consolePrinter.onLog(sinkRecord);
     for (final printer in otherPrinters.values) {
-      printer.onLog(record);
+      printer.onLog(sinkRecord);
     }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/analytics/analytics_filter.dart';
 import 'package:hiddify/core/analytics/analytics_logger.dart';
@@ -54,6 +56,9 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
         options.enableUserInteractionTracing = true;
         options.addIntegration(sentryLogger);
         options.beforeSend = sentryBeforeSend;
+        if (!kIsWeb && Platform.isIOS) {
+          configureIosSafeSentryOptions(options);
+        }
       });
 
       state = const AsyncData(true);
