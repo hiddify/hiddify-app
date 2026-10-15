@@ -6,6 +6,7 @@ import os.log
 open class ExtensionProvider: NEPacketTunnelProvider {
     public static let errorFile = FilePath.workingDirectory.appendingPathComponent("network_extension_error.log")
     private let logger = Logger(subsystem: "apple.hiddify.com.HiddifyPacketTunnel", category: "PacketTunnel")
+    private lazy var diagnosticLog = NativeDiagnosticLog(fileURL: ExtensionProvider.errorFile)
     
 //    private var commandServer: LibboxCommandServer!
     private var systemProxyAvailable = false
@@ -15,7 +16,7 @@ open class ExtensionProvider: NEPacketTunnelProvider {
 
     override open func startTunnel(options: [String: NSObject]?) async throws {
         // Clear previous logs
-        try? FileManager.default.removeItem(at: ExtensionProvider.errorFile)
+        diagnosticLog.reset()
         try? FileManager.default.removeItem(at: FilePath.workingDirectory.appendingPathComponent("TestLog"))
         
         do {
@@ -81,7 +82,9 @@ open class ExtensionProvider: NEPacketTunnelProvider {
 
             
         } catch {
-            logger.error("Tunnel setup failed: \(error.localizedDescription)")
+            logger.error(
+                "Native diagnostic: \(NativeDiagnosticLog.Code.nativeFailure.rawValue, privacy: .public)"
+            )
             writeFatalError("(packet-tunnel) setup failed: \(error.localizedDescription)")
             throw error
         }
@@ -118,40 +121,24 @@ open class ExtensionProvider: NEPacketTunnelProvider {
                     attributes: nil
                 )
             } catch {
-                logger.error("Failed to create directory at \(directory.path): \(error.localizedDescription)")
+                logger.error(
+                    "Native diagnostic: \(NativeDiagnosticLog.Code.ioFailure.rawValue, privacy: .public)"
+                )
                 throw error
             }
         }
     }
     
     func writeMessage(_ message: String) {
-        logger.debug("\(message)")
-        writeError(message)
-    }
-    
-    func writeError(_ message: String) {
-        let messageWithNewline = "[\(Date())] \(message)\n"
-        do {
-            if FileManager.default.fileExists(atPath: ExtensionProvider.errorFile.path) {
-                if let fileHandle = try? FileHandle(forWritingTo: ExtensionProvider.errorFile) {
-                    defer { fileHandle.closeFile() }
-                    fileHandle.seekToEndOfFile()
-                    if let data = messageWithNewline.data(using: .utf8) {
-                        fileHandle.write(data)
-                    }
-                }
-            } else {
-                try messageWithNewline.write(to: ExtensionProvider.errorFile, atomically: true, encoding: .utf8)
-            }
-        } catch {
-            logger.error("Failed to write to error file: \(error.localizedDescription)")
-        }
+        let code = diagnosticLog.write(message: message, severity: .info)
+        logger.debug("Native diagnostic: \(code.rawValue, privacy: .public)")
     }
     
     public func writeFatalError(_ message: String) {
-        logger.fault("Fatal error: \(message)")
-        writeError("FATAL: \(message)")
-        cancelTunnelWithError(NSError(domain: "ExtensionProvider", code: 0, userInfo: [NSLocalizedDescriptionKey: message]))
+        let code = diagnosticLog.write(message: message, severity: .fault)
+        logger.fault("Fatal native diagnostic: \(code.rawValue, privacy: .public)")
+        let description = "Packet tunnel failed (\(code.rawValue))"
+        cancelTunnelWithError(NSError(domain: "ExtensionProvider", code: 0, userInfo: [NSLocalizedDescriptionKey: description]))
     }
     
     override open func stopTunnel(with reason: NEProviderStopReason) async {

@@ -86,7 +86,7 @@ class VPNManager: ObservableObject {
         do {
             try await loadVPNPreference()
         } catch {
-            print(error.localizedDescription)
+            print("stage=vpn_setup code=preferences_load_failed")
         }
     }
     
@@ -107,7 +107,7 @@ class VPNManager: ObservableObject {
             try await newManager.loadFromPreferences()
             self.manager = newManager
         } catch {
-            print(error.localizedDescription)	
+            print("stage=vpn_preferences_load code=load_failed")
         }
     }
     
@@ -123,7 +123,7 @@ class VPNManager: ObservableObject {
             try await manager.saveToPreferences()
             try await manager.loadFromPreferences()
         } catch {
-            print(error.localizedDescription)
+            print("stage=vpn_preferences_enable code=save_or_load_failed")
         }
     }
     
@@ -163,7 +163,7 @@ class VPNManager: ObservableObject {
                     }
                     try await self?.loadVPNPreference()
                 } catch {
-                    print(error.localizedDescription)
+                    print("stage=vpn_reset code=preferences_reset_failed")
                 }
             }
         }.store(in: &cancelBag)
@@ -195,7 +195,7 @@ class VPNManager: ObservableObject {
                 }
             }
         } catch {
-            print(error.localizedDescription)
+            print("stage=vpn_stats code=provider_message_failed")
         }
     }
     
@@ -212,7 +212,7 @@ class VPNManager: ObservableObject {
             ])
             
         } catch {
-            print(error.localizedDescription)
+            print("stage=vpn_connect code=start_failed")
         }
         connectTime = .now
     }
@@ -224,7 +224,7 @@ class VPNManager: ObservableObject {
             
             manager.saveToPreferences { error in
                 if let error = error {
-                    print("save error:", error)
+                    print("stage=vpn_disconnect code=preferences_save_failed")
                     return
                 }
             }
