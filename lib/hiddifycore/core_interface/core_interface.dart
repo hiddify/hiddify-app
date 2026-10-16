@@ -10,6 +10,8 @@ class CoreInterface {
     return "";
   }
 
+  Future<CoreStatus?> getSystemStatus() async => null;
+
   Future<CoreStatus> setupBackground(String path, String name) async {
     return const CoreStarted();
   }

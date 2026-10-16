@@ -87,14 +87,25 @@ class VPNManager: ObservableObject {
             try await loadVPNPreference()
         } catch {
             print("stage=vpn_setup code=preferences_load_failed")
+            throw error
         }
     }
     
-    private func loadVPNPreference() async throws {
+    func refreshStatus() async throws -> NEVPNStatus {
+        try await loadVPNPreference(createIfMissing: false)
+        return state
+    }
+
+    private func loadVPNPreference(createIfMissing: Bool = true) async throws {
         do {
             let managers = try await NETunnelProviderManager.loadAllFromPreferences()
             if let manager = managers.first {
                 self.manager = manager
+                state = manager.connection.status
+                return
+            }
+            guard createIfMissing else {
+                state = .invalid
                 return
             }
             let newManager = NETunnelProviderManager()
@@ -106,8 +117,10 @@ class VPNManager: ObservableObject {
             try await newManager.saveToPreferences()
             try await newManager.loadFromPreferences()
             self.manager = newManager
+            state = newManager.connection.status
         } catch {
             print("stage=vpn_preferences_load code=load_failed")
+            throw error
         }
     }
     
@@ -121,6 +134,7 @@ class VPNManager: ObservableObject {
             try await manager.loadFromPreferences()
         } catch {
             print("stage=vpn_preferences_enable code=save_or_load_failed")
+            throw error
         }
     }
     
@@ -210,6 +224,7 @@ class VPNManager: ObservableObject {
             
         } catch {
             print("stage=vpn_connect code=start_failed")
+            throw error
         }
         connectTime = .now
     }

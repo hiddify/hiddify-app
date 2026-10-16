@@ -40,6 +40,7 @@ open class NEVPNConnection: NSObject {
         FakeNetworkExtensionState.events.append("start")
         FakeNetworkExtensionState.startCount += 1
         FakeNetworkExtensionState.lastStartOptions = options
+        if let error = FakeNetworkExtensionState.startError { throw error }
         status = .connected
     }
 
@@ -82,15 +83,18 @@ open class NEVPNManager: NSObject {
 
     open class func loadAllFromPreferences() async throws -> [NETunnelProviderManager] {
         FakeNetworkExtensionState.events.append("load-all")
+        if let error = FakeNetworkExtensionState.loadAllError { throw error }
         return FakeNetworkExtensionState.loadedManagers
     }
 
     open func saveToPreferences() async throws {
         FakeNetworkExtensionState.recordSave(self)
+        if let error = FakeNetworkExtensionState.saveError { throw error }
     }
 
     open func loadFromPreferences() async throws {
         FakeNetworkExtensionState.events.append("load")
+        if let error = FakeNetworkExtensionState.loadError { throw error }
     }
 
     open func removeFromPreferences() async throws {
@@ -119,6 +123,10 @@ public enum FakeNetworkExtensionState {
     public static var startCount = 0
     public static var stopCount = 0
     public static var lastStartOptions: [String: NSObject]?
+    public static var loadAllError: Error?
+    public static var saveError: Error?
+    public static var loadError: Error?
+    public static var startError: Error?
 
     public static func reset(loadedManagers managers: [NETunnelProviderManager] = []) {
         loadedManagers = managers
@@ -127,6 +135,10 @@ public enum FakeNetworkExtensionState {
         startCount = 0
         stopCount = 0
         lastStartOptions = nil
+        loadAllError = nil
+        saveError = nil
+        loadError = nil
+        startError = nil
     }
 
     fileprivate static func recordSave(_ manager: NEVPNManager) {

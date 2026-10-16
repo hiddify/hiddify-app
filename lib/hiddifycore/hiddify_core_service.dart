@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/services.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
@@ -42,6 +43,19 @@ class HiddifyCoreService with InfraLogger {
   final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 10000));
   final Map<String, StreamSubscription?> subscriptions = {};
   List<OutboundGroup> latest = [];
+
+  Future<void> _lifecycle = Future.value();
+
+  Future<void> pause() => _queueLifecycle(closeFront);
+
+  Future<void> resume() => _queueLifecycle(init);
+
+  Future<void> _queueLifecycle(Future<void> Function() operation) {
+    final next = _lifecycle.then((_) => operation());
+    // A failed request must not prevent a later resume from retrying.
+    _lifecycle = next.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+    return next;
+  }
 
   Future<void> init() async {
     await setup()
@@ -97,6 +111,14 @@ class HiddifyCoreService with InfraLogger {
           return left(setupResponse);
         }
 
+        try {
+          final systemStatus = await core.getSystemStatus();
+          if (systemStatus != null) currentState = systemStatus;
+        } catch (error, stackTrace) {
+          statusController.addError(error, stackTrace);
+          rethrow;
+        }
+
         await startListeningLogs("fg", core.fgClient);
         // await startListeningStatus("fg", core.fgClient);
         if (!core.isSingleChannel()) {
@@ -140,7 +162,13 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(() async {
       statusController.add(currentState = const CoreStatus.starting());
       loggy.debug("starting");
-      final background = await core.setupBackground(path, name);
+      final CoreStatus background;
+      try {
+        background = await core.setupBackground(path, name);
+      } on PlatformException catch (error) {
+        statusController.add(currentState = const CoreStatus.stopped());
+        return left(ConnectionFailure.unexpected(error));
+      }
       if (background != const CoreStatus.started()) {
         statusController.add(currentState = const CoreStatus.stopped());
         return left(background.getCoreAlert() ?? const ConnectionFailure.unexpected("failed to start core"));
@@ -445,7 +473,6 @@ class HiddifyCoreService with InfraLogger {
           .coreInfoListener(Empty(), options: grpcOptions)
           .doOnCancel(() {
             loggy.error("status", "Canceld");
-            if (currentState == const CoreStatus.started()) currentState = const CoreStatus.stopped();
           })
           .doOnData((event) {
             loggy.debug("status", event);

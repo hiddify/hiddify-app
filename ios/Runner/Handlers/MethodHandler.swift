@@ -32,6 +32,15 @@ public class MethodHandler: NSObject, FlutterPlugin {
         }
         
         switch call.method {
+        case "get_vpn_status":
+            Task {
+                do {
+                    let status = try await VPNManager.shared.refreshStatus()
+                    await mainResult(status.rawValue)
+                } catch {
+                    await mainResult(FlutterError(code: "VPN_STATUS", message: nil, details: nil))
+                }
+            }
         case "get_grpc_server_public_key":
             result("")
         case "add_grpc_client_public_key":

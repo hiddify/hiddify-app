@@ -41,12 +41,12 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   void onPause(WidgetRef ref) {
     if (PlatformUtils.isDesktop) return;
     isOnPauseCalled = true;
-    ref.read(hiddifyCoreServiceProvider).closeFront();
+    ref.read(hiddifyCoreServiceProvider).pause();
   }
 
   void onResume(WidgetRef ref) {
     // if (PlatformUtils.isDesktop) return;
-    ref.read(hiddifyCoreServiceProvider).init();
+    ref.read(hiddifyCoreServiceProvider).resume();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (isOnPauseCalled && PlatformUtils.isAndroid) ref.invalidate(perAppProxyServiceProvider);

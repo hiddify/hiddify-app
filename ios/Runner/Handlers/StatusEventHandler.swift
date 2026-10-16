@@ -22,7 +22,7 @@ public class StatusEventHandler: NSObject, FlutterPlugin, FlutterStreamHandler {
     }
     
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        cancellable = VPNManager.shared.$state.sink { [events] status in
+        cancellable = VPNManager.shared.$state.receive(on: DispatchQueue.main).sink { [events] status in
             switch status {
             case .reasserting, .connecting:
                 events(["status": "Starting"])

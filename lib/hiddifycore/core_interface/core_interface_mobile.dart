@@ -101,6 +101,19 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   }
 
   @override
+  Future<CoreStatus?> getSystemStatus() async {
+    if (!Platform.isIOS) return null;
+    final status = await methodChannel.invokeMethod<int>("get_vpn_status");
+    return switch (status) {
+      0 || 1 => const CoreStatus.stopped(),
+      2 || 4 => const CoreStatus.starting(),
+      3 => const CoreStatus.started(),
+      5 => const CoreStatus.stopping(),
+      _ => throw StateError("Unexpected iOS VPN status"),
+    };
+  }
+
+  @override
   Future<CoreStatus> setupBackground(String path, String name) async {
     // if (!await waitUntilPort(portBack, false, stop)) return const CoreStatus.stopped(alert: CoreAlert.createService);
     if (!await stop()) return const CoreStatus.stopped(alert: CoreAlert.createService);
