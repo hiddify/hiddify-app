@@ -101,6 +101,7 @@ jobs:
           git diff --exit-code -- lib pubspec.lock
       - name: Run release and signed-artifact contract tests
         run: |
+          bash test/ios/vpn_manager_manual_policy_test.sh
           ruby test/ci/ios_baseline_identity_inventory_test.rb
           ruby test/ci/ios_baseline_signed_entitlements_test.rb
           ruby test/ci/ios_baseline_release_test.rb

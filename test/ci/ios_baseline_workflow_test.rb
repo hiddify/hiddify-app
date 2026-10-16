@@ -275,6 +275,32 @@ class IOSBaselineWorkflowTest < Minitest::Test
     end
   end
 
+  def test_manual_vpn_policy_harness_runs_before_credentials_and_signing
+    test_job_name, test_job = jobs.find do |_job_name, job|
+      text = steps(job).map { |step| step.fetch("run", "").to_s }.join("\n")
+      text.include?("ios_baseline_release_test.rb") && text.include?("flutter test")
+    end
+    refute_nil test_job, "trusted source test gate is missing"
+
+    harness_steps = steps(test_job).select do |step|
+      step.fetch("run", "").to_s.match?(%r{\bbash\s+test/ios/vpn_manager_manual_policy_test\.sh\b})
+    end
+    assert_equal 1, harness_steps.length,
+      "test-source must run the native VPN manual-policy harness exactly once"
+    assert_nil environment_name(test_job)
+    refute job_uses_secrets?(test_job)
+
+    credential_or_signing_jobs = jobs.select do |_job_name, job|
+      steps(job).any? do |step|
+        %w[preflight upload].any? { |operation| release_helper_command(step, operation) }
+      end || environment_name(job) == "release-signing"
+    end
+    credential_or_signing_jobs.each_key do |job_name|
+      assert job_depends_on?(job_name, test_job_name),
+        "#{job_name} must depend on the native VPN manual-policy source gate"
+    end
+  end
+
   def test_full_source_tests_run_only_for_upload
     job_name, job = jobs.find do |_candidate_name, candidate|
       text = steps(candidate).map { |step| step.fetch("run", "").to_s }.join("\n")
