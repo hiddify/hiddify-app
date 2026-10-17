@@ -44,14 +44,39 @@ void main() {
   // (e.g. by alterating their type or constraints). Migrations that only add
   // tables or columns typically don't need these advanced tests. For more
   // information, see https://drift.simonbinder.eu/migrations/tests/#verifying-data-integrity
-  // TODO: This generated template shows how these tests could be written. Adopt
-  // it to your own needs when testing migrations with data integrity.
   test('migration from v1 to v2 does not corrupt data', () async {
-    // Add data to insert into the old database, and the expected rows after the
-    // migration.
-    // TODO: Fill these lists
-    final oldProfileEntriesData = <v1.ProfileEntriesData>[];
-    final expectedNewProfileEntriesData = <v2.ProfileEntriesData>[];
+    final oldProfile = v1.ProfileEntriesData(
+      id: 'migration-v1-active',
+      active: true,
+      name: 'Migration sentinel',
+      url: 'https://profile.invalid/subscription/v1',
+      lastUpdate: DateTime.utc(2024, 1, 2, 3, 4, 5),
+      updateInterval: 21600,
+      upload: 11,
+      download: 22,
+      total: 1000,
+      expire: DateTime.utc(2030, 1, 2, 3, 4, 5),
+      webPageUrl: 'https://profile.invalid/info',
+      supportUrl: 'https://support.invalid/help',
+    );
+    final oldProfileEntriesData = [oldProfile];
+    final expectedNewProfileEntriesData = [
+      v2.ProfileEntriesData(
+        id: oldProfile.id,
+        type: 'remote',
+        active: oldProfile.active,
+        name: oldProfile.name,
+        url: oldProfile.url,
+        lastUpdate: oldProfile.lastUpdate,
+        updateInterval: oldProfile.updateInterval,
+        upload: oldProfile.upload,
+        download: oldProfile.download,
+        total: oldProfile.total,
+        expire: oldProfile.expire,
+        webPageUrl: oldProfile.webPageUrl,
+        supportUrl: oldProfile.supportUrl,
+      ),
+    ];
 
     await verifier.testWithDataIntegrity(
       oldVersion: 1,
