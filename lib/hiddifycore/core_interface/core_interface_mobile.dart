@@ -34,7 +34,16 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   bool _isBgClientAvailable = false;
   bool _debug = false;
 
-  late LastStream<CoreStatus> _status;
+  late final Stream<CoreStatus> _nativeStatus = statusChannel.receiveBroadcastStream().map(CoreStatus.fromEvent);
+  late final Stream<CoreStatus> _nativeAlerts = alertsChannel.receiveBroadcastStream().map(CoreStatus.fromEvent);
+  late final LastStream<CoreStatus> _status = LastStream(Rx.merge([_nativeStatus, _nativeAlerts]));
+
+  @override
+  bool get supportsSystemStatus => Platform.isIOS;
+
+  @override
+  Stream<CoreStatus> get systemStatusStream => _nativeStatus;
+
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
     final channelOption = [1, 2].contains(mode)
@@ -48,10 +57,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
         options: ChannelOptions(credentials: channelOption),
       ),
     );
-    final status = statusChannel.receiveBroadcastStream().map(CoreStatus.fromEvent);
-    final alerts = alertsChannel.receiveBroadcastStream().map(CoreStatus.fromEvent);
-
-    _status = LastStream(ValueConnectableStream(Rx.merge([status, alerts])).autoConnect());
+    _status.clean();
     try {
       await helloClient.sayHello(HelloRequest(name: "test"));
       loggy.info("core is already started!");

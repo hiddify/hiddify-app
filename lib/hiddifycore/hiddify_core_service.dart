@@ -45,8 +45,17 @@ class HiddifyCoreService with InfraLogger {
   List<OutboundGroup> latest = [];
 
   Future<void> _lifecycle = Future.value();
+  StreamSubscription<CoreStatus>? _systemStatusSubscription;
+  int _systemStatusRevision = 0;
+  bool _systemStatusAuthoritative = false;
+  bool _appStartInProgress = false;
+  CoreStatus? _deferredSystemStatus;
+  CoreStopped? _appStartCoreFailure;
 
-  Future<void> pause() => _queueLifecycle(closeFront);
+  Future<void> pause() => _queueLifecycle(() async {
+    await _stopSystemStatusSync();
+    await closeFront();
+  });
 
   Future<void> resume() => _queueLifecycle(init);
 
@@ -55,6 +64,63 @@ class HiddifyCoreService with InfraLogger {
     // A failed request must not prevent a later resume from retrying.
     _lifecycle = next.then<void>((_) {}, onError: (Object _, StackTrace _) {});
     return next;
+  }
+
+  void _startSystemStatusSync() {
+    if (!core.supportsSystemStatus || _systemStatusSubscription != null) return;
+    _systemStatusSubscription = core.systemStatusStream.listen(
+      _handleSystemStatus,
+      onError: (Object error, StackTrace stackTrace) {
+        loggy.error("System status stream error: $error");
+      },
+    );
+  }
+
+  Future<void> _stopSystemStatusSync() async {
+    await _systemStatusSubscription?.cancel();
+    _systemStatusSubscription = null;
+    _systemStatusAuthoritative = false;
+    _deferredSystemStatus = null;
+  }
+
+  void _handleSystemStatus(CoreStatus status) {
+    _systemStatusRevision++;
+    _systemStatusAuthoritative = true;
+    if (_appStartInProgress) {
+      _deferredSystemStatus = status;
+      return;
+    }
+    currentState = status;
+    statusController.add(status);
+  }
+
+  Future<void> _finishAppStart(bool succeeded) async {
+    CoreStatus? resolvedStatus = _deferredSystemStatus;
+    if (succeeded && core.supportsSystemStatus && resolvedStatus == null) {
+      final refreshRevision = _systemStatusRevision;
+      try {
+        final refreshedStatus = await core.getSystemStatus();
+        if (_systemStatusRevision == refreshRevision && _deferredSystemStatus == null) {
+          resolvedStatus = refreshedStatus;
+        }
+      } catch (error, stackTrace) {
+        loggy.error("System status refresh after start failed: $error");
+        if (_appStartCoreFailure == null) statusController.addError(error, stackTrace);
+      }
+    }
+    resolvedStatus = _deferredSystemStatus ?? resolvedStatus;
+    final coreFailure = _appStartCoreFailure;
+    _appStartInProgress = false;
+    _deferredSystemStatus = null;
+    _appStartCoreFailure = null;
+    if (coreFailure != null) {
+      currentState = coreFailure;
+    } else if (succeeded && resolvedStatus != null) {
+      currentState = resolvedStatus;
+      statusController.add(resolvedStatus);
+    } else if (!succeeded && core.supportsSystemStatus && currentState is! CoreStopped) {
+      statusController.add(currentState = const CoreStatus.stopped());
+    }
   }
 
   Future<void> init() async {
@@ -105,6 +171,8 @@ class HiddifyCoreService with InfraLogger {
       try {
         final directories = ref.read(appDirectoriesProvider).requireValue;
         final debug = ref.read(debugModeNotifierProvider);
+        final snapshotRevision = _systemStatusRevision;
+        _startSystemStatusSync();
         final setupResponse = await core.setup(directories, debug, 3);
 
         if (setupResponse.isNotEmpty) {
@@ -113,7 +181,10 @@ class HiddifyCoreService with InfraLogger {
 
         try {
           final systemStatus = await core.getSystemStatus();
-          if (systemStatus != null) currentState = systemStatus;
+          if (systemStatus != null) {
+            if (core.supportsSystemStatus) _systemStatusAuthoritative = true;
+            if (_systemStatusRevision == snapshotRevision) currentState = systemStatus;
+          }
         } catch (error, stackTrace) {
           statusController.addError(error, stackTrace);
           rethrow;
@@ -160,72 +231,81 @@ class HiddifyCoreService with InfraLogger {
 
   TaskEither<ConnectionFailure, Unit> start(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
+      var succeeded = false;
+      _appStartInProgress = true;
+      _deferredSystemStatus = null;
+      _appStartCoreFailure = null;
       statusController.add(currentState = const CoreStatus.starting());
       loggy.debug("starting");
-      final CoreStatus background;
       try {
-        background = await core.setupBackground(path, name);
-      } on PlatformException catch (error) {
-        statusController.add(currentState = const CoreStatus.stopped());
-        return left(ConnectionFailure.unexpected(error));
-      }
-      if (background != const CoreStatus.started()) {
-        statusController.add(currentState = const CoreStatus.stopped());
-        return left(background.getCoreAlert() ?? const ConnectionFailure.unexpected("failed to start core"));
-      }
-      if (!core.isSingleChannel()) {
-        await startListeningLogs("bg", core.bgClient);
-        await startListeningStatus("bg", core.bgClient);
-      }
-      // if (latestOptions != null) {
-      //   await core.bgClient.changeHiddifySettings(
-      //     ChangeHiddifySettingsRequest(
-      //       hiddifySettingsJson: jsonEncode(latestOptions!.toJson()),
-      //     ),
-      //   );
-      // }
-      // final content = await File(path).readAsString();
-      // loggy.debug("starting with content: $content");
-      try {
-        final res = await core.bgClient.start(
-          StartRequest(
-            configPath: path,
-            configName: name,
-            // configContent: content,
-            disableMemoryLimit: disableMemoryLimit,
-          ),
-        );
-        ref.read(coreRestartSignalProvider.notifier).restart();
-        if (res.messageType != MessageType.ALREADY_STARTED && res.messageType != MessageType.EMPTY) {
-          final alert = res.message.contains("denied") ? CoreAlert.requestVPNPermission : CoreAlert.startFailed;
-          currentState = CoreStatus.stopped(
-            alert: alert,
-            message: "failed to start core ${res.messageType} ${res.message}",
-          );
-
-          statusController.add(currentState);
-
-          return left(
-            currentState.getCoreAlert() ??
-                ConnectionFailure.unexpected("failed to start core ${res.messageType} ${res.message}"),
-          );
+        final CoreStatus background;
+        try {
+          background = await core.setupBackground(path, name);
+        } on PlatformException catch (error) {
+          statusController.add(currentState = const CoreStatus.stopped());
+          return left(ConnectionFailure.unexpected(error));
         }
-      } on GrpcError catch (e) {
-        loggy.error("failed to start bg core: $e");
-        ref.read(coreRestartSignalProvider.notifier).restart();
-        if (e.code == StatusCode.unavailable) {
-          return left(const ConnectionFailure.unexpected("background core is not started yet!"));
+        if (background != const CoreStatus.started()) {
+          statusController.add(currentState = const CoreStatus.stopped());
+          return left(background.getCoreAlert() ?? const ConnectionFailure.unexpected("failed to start core"));
         }
-        // throw InvalidConfig(e.message);
-        // throw DioException.connectionError(requestOptions: RequestOptions(), reason: e.codeName, error: e);
+        if (!core.isSingleChannel()) {
+          await startListeningLogs("bg", core.bgClient);
+          await startListeningStatus("bg", core.bgClient);
+        }
+        // if (latestOptions != null) {
+        //   await core.bgClient.changeHiddifySettings(
+        //     ChangeHiddifySettingsRequest(
+        //       hiddifySettingsJson: jsonEncode(latestOptions!.toJson()),
+        //     ),
+        //   );
+        // }
+        // final content = await File(path).readAsString();
+        // loggy.debug("starting with content: $content");
+        try {
+          final res = await core.bgClient.start(
+            StartRequest(
+              configPath: path,
+              configName: name,
+              // configContent: content,
+              disableMemoryLimit: disableMemoryLimit,
+            ),
+          );
+          ref.read(coreRestartSignalProvider.notifier).restart();
+          if (res.messageType != MessageType.ALREADY_STARTED && res.messageType != MessageType.EMPTY) {
+            final alert = res.message.contains("denied") ? CoreAlert.requestVPNPermission : CoreAlert.startFailed;
+            currentState = CoreStatus.stopped(
+              alert: alert,
+              message: "failed to start core ${res.messageType} ${res.message}",
+            );
 
-        // throw DioException(requestOptions: RequestOptions(), error: e);
-        return left(const ConnectionFailure.unexpected("failed to start background core"));
+            statusController.add(currentState);
+
+            return left(
+              currentState.getCoreAlert() ??
+                  ConnectionFailure.unexpected("failed to start core ${res.messageType} ${res.message}"),
+            );
+          }
+        } on GrpcError catch (e) {
+          loggy.error("failed to start bg core: $e");
+          ref.read(coreRestartSignalProvider.notifier).restart();
+          if (e.code == StatusCode.unavailable) {
+            return left(const ConnectionFailure.unexpected("background core is not started yet!"));
+          }
+          // throw InvalidConfig(e.message);
+          // throw DioException.connectionError(requestOptions: RequestOptions(), reason: e.codeName, error: e);
+
+          // throw DioException(requestOptions: RequestOptions(), error: e);
+          return left(const ConnectionFailure.unexpected("failed to start background core"));
+        }
+
+        // if (res.messageType != MessageType.EMPTY) return left(res);
+
+        succeeded = true;
+        return right(unit);
+      } finally {
+        await _finishAppStart(succeeded);
       }
-
-      // if (res.messageType != MessageType.EMPTY) return left(res);
-
-      return right(unit);
     });
   }
 
@@ -476,16 +556,27 @@ class HiddifyCoreService with InfraLogger {
           })
           .doOnData((event) {
             loggy.debug("status", event);
-            if (currentState == const CoreStatus.started()) currentState = const CoreStatus.stopped();
+            if (!_systemStatusAuthoritative && currentState == const CoreStatus.started()) {
+              currentState = const CoreStatus.stopped();
+            }
           })
           .doOnDone(() {
             loggy.error("status", "done");
-            if (currentState == const CoreStatus.started()) currentState = const CoreStatus.stopped();
+            if (!_systemStatusAuthoritative && currentState == const CoreStatus.started()) {
+              currentState = const CoreStatus.stopped();
+            }
           })
           .endWith(CoreInfoResponse(coreState: CoreStates.STOPPED))
           .map((event) {
-            currentState = CoreStatus.fromCoreInfo(event);
-            statusController.add(currentState);
+            final nextState = CoreStatus.fromCoreInfo(event);
+            final isCoreFailure = nextState is CoreStopped && nextState.alert != null;
+            if (core.supportsSystemStatus && _appStartInProgress && isCoreFailure) {
+              _appStartCoreFailure = nextState;
+            }
+            if (!_systemStatusAuthoritative || isCoreFailure) {
+              currentState = nextState;
+              statusController.add(currentState);
+            }
             return currentState;
           }),
       // .endWith(const CoreStatus.stopped())

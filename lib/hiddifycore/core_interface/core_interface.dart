@@ -12,6 +12,10 @@ class CoreInterface {
 
   Future<CoreStatus?> getSystemStatus() async => null;
 
+  bool get supportsSystemStatus => false;
+
+  Stream<CoreStatus> get systemStatusStream => const Stream.empty();
+
   Future<CoreStatus> setupBackground(String path, String name) async {
     return const CoreStarted();
   }
