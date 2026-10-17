@@ -17,6 +17,7 @@ extension AppLocaleX on AppLocale {
     "id" => "Indonesian",
     "pt_BR" => "Portuguese (Brazil)",
     "ru" => "Русский",
+    "th" => "ไทย",
     "tr" => "Türkçe",
     "zh" || "zh_CN" => "中文 (中国)",
     "zh_TW" => "中文 (台湾)",
