@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:hiddify/features/diagnostics/home_presentation_snapshot.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 
 typedef SafeDiagnosticPersist = Future<void> Function(String snapshot);
@@ -19,7 +20,7 @@ final class SafeDiagnosticJournal {
   static const int maxEncodedBytes = 64 * 1024;
   static const String schema = 'blizzard-safe-diagnostics/v1';
   static const Set<String> _requiredDocumentKeys = {'schema', 'platform', 'reachability', 'events'};
-  static const Set<String> _optionalDocumentKeys = {'version', 'build_number'};
+  static const Set<String> _optionalDocumentKeys = {'version', 'build_number', 'home_presentation'};
   static final RegExp _versionPattern = RegExp(r'^\d{1,3}\.\d{1,3}\.\d{1,3}$');
   static final RegExp _buildPattern = RegExp(r'^\d{1,9}$');
 
@@ -89,8 +90,13 @@ final class SafeDiagnosticJournal {
     _changes.close();
   }
 
-  String exportJson({String? version, String? buildNumber}) =>
-      _encodeDocument(events: _events, version: _safeVersion(version), buildNumber: _safeBuildNumber(buildNumber));
+  String exportJson({String? version, String? buildNumber, HomePresentationSnapshot? homePresentation}) =>
+      _encodeDocument(
+        events: _events,
+        version: _safeVersion(version),
+        buildNumber: _safeBuildNumber(buildNumber),
+        homePresentation: homePresentation,
+      );
 
   void _restore(String restored) {
     try {
@@ -107,6 +113,11 @@ final class SafeDiagnosticJournal {
       }
       if (decoded.containsKey('version') && !_isSafeMetadata(decoded['version'], _versionPattern)) return;
       if (decoded.containsKey('build_number') && !_isSafeMetadata(decoded['build_number'], _buildPattern)) return;
+      if (decoded.containsKey('home_presentation')) {
+        final rawHomePresentation = decoded['home_presentation'];
+        if (rawHomePresentation is! Map) return;
+        HomePresentationSnapshot.fromJson(Map<String, Object?>.from(rawHomePresentation));
+      }
       final rawEvents = decoded['events'];
       if (rawEvents is! List) return;
       final parsed = <SafeDiagnosticEvent>[];
@@ -164,7 +175,12 @@ final class SafeDiagnosticJournal {
     _persistenceRunning = false;
   }
 
-  String _encodeDocument({required Iterable<SafeDiagnosticEvent> events, String? version, String? buildNumber}) {
+  String _encodeDocument({
+    required Iterable<SafeDiagnosticEvent> events,
+    String? version,
+    String? buildNumber,
+    HomePresentationSnapshot? homePresentation,
+  }) {
     final encodedEvents = events.map((event) => event.toJson()).toList(growable: true);
     String encode() => jsonEncode({
       'schema': schema,
@@ -172,6 +188,7 @@ final class SafeDiagnosticJournal {
       'reachability': 'not_checked',
       if (version != null) 'version': version,
       if (buildNumber != null) 'build_number': buildNumber,
+      if (homePresentation != null) 'home_presentation': homePresentation.toJson(),
       'events': encodedEvents,
     });
 

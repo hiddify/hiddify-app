@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
+import 'package:hiddify/features/diagnostics/home_presentation_snapshot.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_journal.dart';
 
@@ -272,6 +273,32 @@ void main() {
       expect(journal.events.last.sequence, 131);
     });
 
+    test('validates but discards an optional Home presentation snapshot during restore', () {
+      final restored = jsonEncode({
+        'schema': 'blizzard-safe-diagnostics/v1',
+        'platform': 'ios',
+        'reachability': 'not_checked',
+        'home_presentation': {
+          'async_variant': 'data',
+          'connection_value': 'connected',
+          'label_choice': 'connecting',
+          'theme_platform': 'android',
+          'runtime_ios': true,
+          'reconnect': 'false',
+          'latency_band': 'non_positive',
+          'tickers_enabled': true,
+          'lifecycle_state': 'resumed',
+        },
+        'events': [_eventJson(sequence: 1, operationId: 1, code: 'started')],
+      });
+
+      final journal = SafeDiagnosticJournal(restored: restored);
+      addTearDown(journal.dispose);
+
+      expect(journal.events, hasLength(1));
+      expect((jsonDecode(journal.exportJson()) as Map<String, dynamic>), isNot(contains('home_presentation')));
+    });
+
     test('rejects malformed, oversized, raw and extra restored payloads', () {
       final validEvent = _eventJson(sequence: 1, operationId: 1);
       final payloads = <String>[
@@ -295,6 +322,59 @@ void main() {
         expect(journal.nextOperationId(), 1);
         journal.dispose();
       }
+    });
+
+    test('rejects an unknown Home presentation enum during restore', () {
+      final journal = SafeDiagnosticJournal(
+        restored: jsonEncode({
+          'schema': 'blizzard-safe-diagnostics/v1',
+          'platform': 'ios',
+          'reachability': 'not_checked',
+          'home_presentation': {
+            'async_variant': 'data',
+            'connection_value': 'started',
+            'label_choice': 'connected',
+            'theme_platform': 'iOS',
+            'runtime_ios': true,
+            'reconnect': 'false',
+            'latency_band': 'valid',
+            'tickers_enabled': true,
+            'lifecycle_state': 'resumed',
+          },
+          'events': [_eventJson(sequence: 1, operationId: 1)],
+        }),
+      );
+      addTearDown(journal.dispose);
+
+      expect(journal.events, isEmpty);
+    });
+
+    test('exports Home presentation only when explicitly supplied and never persists it', () async {
+      final persisted = <String>[];
+      final journal = SafeDiagnosticJournal(persist: (value) async => persisted.add(value));
+      addTearDown(journal.dispose);
+      const snapshot = HomePresentationSnapshot(
+        asyncVariant: HomeAsyncVariant.data,
+        connectionValue: HomeConnectionValue.connected,
+        labelChoice: HomeLabelChoice.connected,
+        themePlatform: HomeThemePlatform.iOS,
+        runtimeIos: true,
+        reconnect: HomeReconnectValue.falseValue,
+        latencyBand: HomeLatencyBand.valid,
+        tickersEnabled: true,
+        lifecycleState: HomeLifecycleState.resumed,
+      );
+
+      journal.record(
+        operation: DiagnosticOperation.tunnel,
+        stage: DiagnosticStage.state,
+        code: DiagnosticCode.started,
+        operationId: journal.nextOperationId(),
+      );
+      await journal.flush();
+
+      expect(jsonDecode(journal.exportJson(homePresentation: snapshot)), contains('home_presentation'));
+      expect(jsonDecode(persisted.single), isNot(contains('home_presentation')));
     });
 
     test('coalesces a stalled persistence backlog to the latest snapshot', () async {

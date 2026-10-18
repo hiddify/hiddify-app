@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
+import 'package:hiddify/features/diagnostics/home_presentation_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef SafeDiagnosticCopy = Future<void> Function(String text);
@@ -18,10 +19,15 @@ class SafeDiagnosticsPage extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue.pages.logs.safeDiagnostics;
     final journal = ref.watch(safeDiagnosticJournalProvider);
     final metadata = ref.watch(safeDiagnosticMetadataProvider);
+    final homePresentation = ref.watch(homePresentationSnapshotProvider);
     final events = useStream(journal.changes, initialData: journal.events).data ?? journal.events;
     final message = useState<String?>(null);
     final refresh = useState(0);
-    final preview = journal.exportJson(version: metadata.version, buildNumber: metadata.buildNumber);
+    final preview = journal.exportJson(
+      version: metadata.version,
+      buildNumber: metadata.buildNumber,
+      homePresentation: homePresentation,
+    );
 
     useEffect(() {
       var cancelled = false;

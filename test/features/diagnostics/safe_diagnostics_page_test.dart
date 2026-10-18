@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
+import 'package:hiddify/features/diagnostics/home_presentation_providers.dart';
+import 'package:hiddify/features/diagnostics/home_presentation_snapshot.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_journal.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostics_page.dart';
@@ -48,6 +50,7 @@ void main() {
     Widget? child,
     List<ProviderObserver> observers = const [],
     double textScale = 1,
+    HomePresentationSnapshot? homePresentation,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -56,6 +59,7 @@ void main() {
           translationsProvider.overrideWith((ref) => AppLocale.en.buildSync()),
           safeDiagnosticJournalProvider.overrideWithValue(journal),
           safeDiagnosticMetadataProvider.overrideWithValue((version: '0.0.1', buildNumber: '5')),
+          homePresentationSnapshotProvider.overrideWith((ref) => homePresentation),
         ],
         child: MaterialApp(
           builder: (context, child) => MediaQuery(
@@ -73,7 +77,22 @@ void main() {
     final journal = journalWithEvent();
     addTearDown(journal.dispose);
     String? copied;
-    await pumpPage(tester, journal, copyText: (value) async => copied = value);
+    await pumpPage(
+      tester,
+      journal,
+      copyText: (value) async => copied = value,
+      homePresentation: const HomePresentationSnapshot(
+        asyncVariant: HomeAsyncVariant.loading,
+        connectionValue: HomeConnectionValue.connected,
+        labelChoice: HomeLabelChoice.empty,
+        themePlatform: HomeThemePlatform.android,
+        runtimeIos: true,
+        reconnect: HomeReconnectValue.unknown,
+        latencyBand: HomeLatencyBand.nonPositive,
+        tickersEnabled: true,
+        lifecycleState: HomeLifecycleState.resumed,
+      ),
+    );
 
     final preview = tester.widget<SelectableText>(find.byKey(const Key('safe-diagnostics-preview'))).data!;
     await tester.tap(find.byKey(const Key('safe-diagnostics-copy')));
@@ -86,6 +105,17 @@ void main() {
       'reachability': 'not_checked',
       'version': '0.0.1',
       'build_number': '5',
+      'home_presentation': {
+        'async_variant': 'loading',
+        'connection_value': 'connected',
+        'label_choice': 'empty',
+        'theme_platform': 'android',
+        'runtime_ios': true,
+        'reconnect': 'unknown',
+        'latency_band': 'non_positive',
+        'tickers_enabled': true,
+        'lifecycle_state': 'resumed',
+      },
       'events': [
         {
           'sequence': 1,
@@ -99,6 +129,15 @@ void main() {
       ],
     });
     expect(find.text('Safe report copied'), findsOneWidget);
+  });
+
+  testWidgets('omits Home presentation before the first Home snapshot', (tester) async {
+    final journal = journalWithEvent();
+    addTearDown(journal.dispose);
+    await pumpPage(tester, journal);
+
+    final preview = tester.widget<SelectableText>(find.byKey(const Key('safe-diagnostics-preview'))).data!;
+    expect(jsonDecode(preview), isNot(contains('home_presentation')));
   });
 
   testWidgets('clear persists an empty report and shows the empty state', (tester) async {

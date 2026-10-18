@@ -64,6 +64,9 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     lib/core/logger/safe_log_record.dart
     lib/features/diagnostics/safe_diagnostic_event.dart
     lib/features/diagnostics/safe_diagnostic_journal.dart
+    lib/features/diagnostics/home_presentation_snapshot.dart
+    lib/features/diagnostics/home_presentation_providers.dart
+    lib/features/diagnostics/home_presentation_probe.dart
     lib/features/diagnostics/observed_connection_repository.dart
     lib/features/diagnostics/diagnostic_providers.dart
     lib/features/diagnostics/safe_diagnostics_page.dart
@@ -71,10 +74,13 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   DIAGNOSTIC_NEW_SHA256 = {
     "lib/core/logger/safe_log_record.dart" => "57137aee501d92bd54129bc3ce34814efabb2a96f6dd5deab5c48040019b183a",
     "lib/features/diagnostics/safe_diagnostic_event.dart" => "867a3fc3c57f729b0de11787f130e18ed2cabc66cbfd36a3344a3a9f1e7a66a6",
-    "lib/features/diagnostics/safe_diagnostic_journal.dart" => "d86314bd6ccd1042a5112f1cd682fdcfc209f1e72d79aa93ce72cdf3ccf9e026",
+    "lib/features/diagnostics/safe_diagnostic_journal.dart" => "3de4fcbb9856734766436b743717fc5be19b14a9da142f94d680ea1106773c85",
+    "lib/features/diagnostics/home_presentation_snapshot.dart" => "2e816bf1093b990599747c3860138d489f1a520667c0bbb093ca930289913ded",
+    "lib/features/diagnostics/home_presentation_providers.dart" => "43cb56211b4055a2ebf41abb2097d754be3f589d56b377f06c3450b6f3433602",
+    "lib/features/diagnostics/home_presentation_probe.dart" => "f51164d3f3433f0ff3c9ebffdc82de291cc38382f93e7200c28f938bec5bc728",
     "lib/features/diagnostics/observed_connection_repository.dart" => "8bd1bdcc05099863f93641b08a16a21e3d3b209f0736ea1cb9df35fc922e8cb1",
     "lib/features/diagnostics/diagnostic_providers.dart" => "b8757034cb108efe7be93b1f1eabf46b5be89a0e725653c82294b3d7ba9144d4",
-    "lib/features/diagnostics/safe_diagnostics_page.dart" => "252e61b5d853eb84355ca50644f5e30b688d39ef9b3d7e0d94811099f3b3446d",
+    "lib/features/diagnostics/safe_diagnostics_page.dart" => "c1604dd46656c39a8c38e5b3cf5b5d9ed343a08c41f23c9133c75aa5ac093d9c",
   }.freeze
 
   def test_new_diagnostic_sources_match_reviewed_fingerprints

@@ -15,6 +15,7 @@ import 'package:hiddify/core/widget/blizzard/blizzard_glass.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/diagnostics/home_presentation_probe.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
@@ -119,7 +120,18 @@ class ConnectionButton extends HookConsumerWidget {
     if (delay <= 0 || delay > 65000 || connectionStatus.valueOrNull != const Connected()) {
       secureLabel = "";
     }
-    return _ConnectionButton(
+    final label =
+        Theme.of(context).platform == TargetPlatform.iOS &&
+            connectionStatus.asData?.value is Connected &&
+            requiresReconnect != true
+        ? t.connection.connected
+        : switch (connectionStatus) {
+            AsyncData(value: Connected()) when requiresReconnect == true => t.connection.reconnect,
+            AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => t.connection.connecting,
+            AsyncData(value: final status) => status.present(t),
+            _ => "",
+          };
+    final button = _ConnectionButton(
       onTap: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => () async {
           final activeProfile = await ref.read(activeProfileProvider.future);
@@ -149,17 +161,7 @@ class ConnectionButton extends HookConsumerWidget {
         AsyncData(value: Connected()) || AsyncData(value: Disconnected()) || AsyncError() => true,
         _ => false,
       },
-      label:
-          Theme.of(context).platform == TargetPlatform.iOS &&
-              connectionStatus.asData?.value is Connected &&
-              requiresReconnect != true
-          ? t.connection.connected
-          : switch (connectionStatus) {
-              AsyncData(value: Connected()) when requiresReconnect == true => t.connection.reconnect,
-              AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => t.connection.connecting,
-              AsyncData(value: final status) => status.present(t),
-              _ => "",
-            },
+      label: label,
       buttonColor: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
         AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => const Color.fromARGB(255, 185, 176, 103),
@@ -192,6 +194,16 @@ class ConnectionButton extends HookConsumerWidget {
       },
       useImage: today.day >= 19 && today.day <= 23 && today.month == 3,
       secureLabel: secureLabel,
+    );
+    return HomePresentationProbe(
+      connectionStatus: connectionStatus,
+      label: label,
+      translations: t,
+      requiresReconnect: requiresReconnect,
+      delay: delay,
+      themePlatform: Theme.of(context).platform,
+      tickersEnabled: TickerMode.of(context),
+      child: button,
     );
   }
 }

@@ -11,6 +11,8 @@ import 'package:hiddify/features/connection/data/connection_data_providers.dart'
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/diagnostics/home_presentation_providers.dart';
+import 'package:hiddify/features/diagnostics/home_presentation_snapshot.dart';
 import 'package:hiddify/features/diagnostics/observed_connection_repository.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_journal.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
@@ -45,12 +47,15 @@ void main() {
     TargetPlatform platform = TargetPlatform.android,
     Stream<OutboundInfo>? proxyStream,
     ButtonConnectionSpy Function(List<String> events)? spyFactory,
+    List<ProviderObserver> observers = const [],
   }) async {
     final events = <String>[];
     final spy = spyFactory?.call(events) ?? ButtonConnectionSpy(status, events);
     final dialogs = FixtureDialogs(events);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await tester.pumpWidget(
       ProviderScope(
+        observers: observers,
         overrides: [
           sharedPreferencesProvider.overrideWith((ref) => prefs),
           translationsProvider.overrideWith((ref) => t),
@@ -62,6 +67,8 @@ void main() {
           configOptionNotifierProvider.overrideWith(() => FixtureConfig(reconnect)),
           dialogNotifierProvider.overrideWith(() => dialogs),
           bottomSheetsNotifierProvider.overrideWith(() => FixtureSheets(events)),
+          homePresentationDiagnosticsEnabledProvider.overrideWithValue(true),
+          homePresentationRuntimeIosProvider.overrideWithValue(true),
         ],
         child: MaterialApp(
           theme: ThemeData(platform: platform),
@@ -76,6 +83,8 @@ void main() {
   }
 
   Finder button() => find.byKey(const ValueKey('home_connection_button'));
+  HomePresentationSnapshot snapshot(WidgetTester tester) =>
+      ProviderScope.containerOf(tester.element(find.byType(ConnectionButton))).read(homePresentationSnapshotProvider)!;
   for (final entry in <(AsyncValue<ConnectionStatus>, String, bool)>[
     (const AsyncData(Disconnected()), t.connection.tapToConnect, true),
     (const AsyncData(Connecting()), t.connection.connecting, false),
@@ -101,6 +110,32 @@ void main() {
       await mount(tester, const AsyncData(Connected()), delay: delay);
       expect(find.text(delay <= 0 || delay >= 65000 ? t.connection.connecting : t.connection.connected), findsWidgets);
       expect(find.text(t.connection.secure), delay > 0 && delay <= 65000 ? findsOneWidget : findsNothing);
+    });
+  }
+  for (final entry in <(int, HomeLatencyBand, HomeLabelChoice)>[
+    (0, HomeLatencyBand.nonPositive, HomeLabelChoice.connecting),
+    (1, HomeLatencyBand.valid, HomeLabelChoice.connected),
+    (64999, HomeLatencyBand.valid, HomeLabelChoice.connected),
+    (65000, HomeLatencyBand.atLimit, HomeLabelChoice.connecting),
+    (65001, HomeLatencyBand.aboveLimit, HomeLabelChoice.connecting),
+  ]) {
+    testWidgets('probe records the actual Android-theme label branch at latency ${entry.$1}', (tester) async {
+      await mount(tester, const AsyncData(Connected()), delay: entry.$1);
+
+      expect(
+        snapshot(tester),
+        HomePresentationSnapshot(
+          asyncVariant: HomeAsyncVariant.data,
+          connectionValue: HomeConnectionValue.connected,
+          labelChoice: entry.$3,
+          themePlatform: HomeThemePlatform.android,
+          runtimeIos: true,
+          reconnect: HomeReconnectValue.falseValue,
+          latencyBand: entry.$2,
+          tickersEnabled: true,
+          lifecycleState: HomeLifecycleState.resumed,
+        ),
+      );
     });
   }
   for (final delay in [0, 1, 64999, 65000, 65001]) {
@@ -226,6 +261,9 @@ void main() {
       await tester.tap(button());
       await tester.pump();
       expect(metadataSpy.events, entry.$5);
+      expect(snapshot(tester).asyncVariant, entry.$1 == 'error' ? HomeAsyncVariant.error : HomeAsyncVariant.loading);
+      expect(snapshot(tester).connectionValue, HomeConnectionValue.connected);
+      expect(snapshot(tester).labelChoice, HomeLabelChoice.empty);
     });
   }
   for (final warpEnabled in [true, false]) {
@@ -260,6 +298,21 @@ void main() {
     await tester.pump();
     expect(events, ['reconnect']);
     expect(spy.reconnectedProfile, connectionProfile);
+    expect(snapshot(tester).labelChoice, HomeLabelChoice.reconnect);
+    expect(snapshot(tester).reconnect, HomeReconnectValue.trueValue);
+  });
+  testWidgets('probe publishes one deduplicated snapshot without a frame loop', (tester) async {
+    final observer = _HomePresentationObserver();
+    await mount(tester, const AsyncData(Connected()), observers: [observer]);
+    final updatesAfterSettling = observer.updates;
+    expect(updatesAfterSettling, greaterThanOrEqualTo(1));
+
+    for (var index = 0; index < 8; index++) {
+      await tester.pump();
+    }
+
+    expect(observer.updates, updatesAfterSettling);
+    expect(tester.takeException(), isNull);
   });
   testWidgets('iOS reconnect takes priority over Connected label and disconnect action', (tester) async {
     final (spy, _, events) = await mount(
@@ -437,4 +490,18 @@ class _MetadataConnectionSpy extends ButtonConnectionSpy {
 
   @override
   Stream<ConnectionStatus> build() => Stream.value(const Connected());
+}
+
+class _HomePresentationObserver extends ProviderObserver {
+  int updates = 0;
+
+  @override
+  void didUpdateProvider(
+    ProviderBase<Object?> provider,
+    Object? previousValue,
+    Object? newValue,
+    ProviderContainer container,
+  ) {
+    if (provider == homePresentationSnapshotProvider) updates++;
+  }
 }
