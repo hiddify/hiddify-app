@@ -458,7 +458,10 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(() async {
       loggy.debug("url test");
       try {
-        final res = await core.bgClient.urlTest(UrlTestRequest(tag: tag));
+        final res = await core.bgClient.urlTest(
+          UrlTestRequest(tag: tag),
+          options: core.supportsSystemStatus ? CallOptions(timeout: const Duration(seconds: 15)) : null,
+        );
         if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
 
         return right(unit);

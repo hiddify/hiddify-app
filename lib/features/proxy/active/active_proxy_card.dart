@@ -7,6 +7,7 @@ import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement_providers.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
@@ -21,7 +22,9 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
       connectionNotifierProvider.select((value) => value.valueOrNull ?? const Disconnected()),
     );
 
-    final activeProxy = ref.watch(activeProxyNotifierProvider.select((value) => value.valueOrNull));
+    final legacyProxy = ref.watch(activeProxyNotifierProvider.select((value) => value.valueOrNull));
+    final ios = Theme.of(context).platform == TargetPlatform.iOS && ref.watch(iosActiveProxyMeasurementEnabledProvider);
+    final activeProxy = ios ? ref.watch(iosActiveProxyMeasurementStateProvider).asData?.value.proxy : legacyProxy;
     final t = ref.watch(translationsProvider).requireValue;
 
     // Early return if required data is not available

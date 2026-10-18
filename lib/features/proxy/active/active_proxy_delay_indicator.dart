@@ -4,6 +4,8 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/proxy/active/ios_active_proxy_delay_indicator.dart';
+import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement_providers.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,6 +17,10 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
     final t = ref.watch(translationsProvider).requireValue;
     final activeProxy = ref.watch(activeProxyNotifierProvider);
     final theme = Theme.of(context);
+
+    if (theme.platform == TargetPlatform.iOS && ref.watch(iosActiveProxyMeasurementEnabledProvider)) {
+      return const IosActiveProxyDelayIndicator();
+    }
 
     if (activeProxy is! AsyncData) {
       return const SizedBox(); // Avoid building widget if data is not available

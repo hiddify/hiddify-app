@@ -64,16 +64,75 @@ String _tokens(AstNode node) {
   return jsonEncode(result);
 }
 
+String _providerBindingKey(String accessor, String provider) =>
+    'state:${jsonEncode(['ref', '.', accessor, '(', provider, ')'])}';
+
+class _ApprovedStateAddition {
+  const _ApprovedStateAddition({
+    required this.path,
+    required this.className,
+    required this.methodName,
+    required this.provider,
+  });
+
+  final String path;
+  final String className;
+  final String methodName;
+  final String provider;
+
+  String get expression => 'ref.watch($provider)';
+  String get bindingKey => _providerBindingKey('watch', provider);
+  String get siteKey => '$className::$methodName::$bindingKey';
+}
+
+const _approvedStateAdditions = <_ApprovedStateAddition>[
+  _ApprovedStateAddition(
+    path: 'lib/features/proxy/active/active_proxy_delay_indicator.dart',
+    className: 'ActiveProxyDelayIndicator',
+    methodName: 'build',
+    provider: 'iosActiveProxyMeasurementEnabledProvider',
+  ),
+  _ApprovedStateAddition(
+    path: 'lib/features/proxy/active/active_proxy_card.dart',
+    className: 'ActiveProxyFooter',
+    methodName: 'build',
+    provider: 'iosActiveProxyMeasurementEnabledProvider',
+  ),
+  _ApprovedStateAddition(
+    path: 'lib/features/proxy/active/active_proxy_card.dart',
+    className: 'ActiveProxyFooter',
+    methodName: 'build',
+    provider: 'iosActiveProxyMeasurementStateProvider',
+  ),
+];
+
 class _Bindings extends GeneralizingAstVisitor<void> {
   _Bindings(this.path);
 
   final String path;
   final exact = <String, int>{};
+  final stateSites = <String, int>{};
   final predicates = <String, int>{};
   final ifStatements = <IfStatement>[];
   void add(Map<String, int> into, String kind, AstNode node) {
     final key = '$kind:${_tokens(node)}';
     into.update(key, (count) => count + 1, ifAbsent: () => 1);
+  }
+
+  void addStateSite(AstNode node) {
+    String? className;
+    String? methodName;
+    for (AstNode? current = node.parent; current != null; current = current.parent) {
+      if (current is FunctionExpression || current is FunctionDeclaration) return;
+      if (methodName == null && current is MethodDeclaration) methodName = current.name.lexeme;
+      if (current is ClassDeclaration) {
+        className = current.name.lexeme;
+        break;
+      }
+    }
+    if (className == null || methodName == null) return;
+    final key = '$className::$methodName::state:${_tokens(node)}';
+    stateSites.update(key, (count) => count + 1, ifAbsent: () => 1);
   }
 
   @override
@@ -90,6 +149,7 @@ class _Bindings extends GeneralizingAstVisitor<void> {
           (const {'watch', 'read', 'listen', 'listenManual'}.contains(name) &&
               RegExp(r'\bref\b').hasMatch(node.target?.toSource() ?? ''))) {
         add(exact, 'state', node);
+        addStateSite(node);
       }
     }
     if (node is FunctionExpressionInvocation && RegExp('^use[A-Z]').hasMatch(node.function.toSource())) {
@@ -151,10 +211,21 @@ bool _sameRecoverySite(_Bindings baseline, _Bindings live) {
   return before.length == 1 && after.length == 1 && _recoveryContext(before.single) == _recoveryContext(after.single);
 }
 
+bool _isApprovedStateAddition(_Bindings baseline, _Bindings live, String key) {
+  final additions = _approvedStateAdditions.where(
+    (addition) => addition.path == live.path && addition.bindingKey == key,
+  );
+  if (additions.length != 1) return false;
+  final addition = additions.single;
+  return (baseline.exact[key] ?? 0) == 0 && live.exact[key] == 1 && live.stateSites[addition.siteKey] == 1;
+}
+
 List<String> _differences(_Bindings baseline, _Bindings live) {
   final issues = <String>[];
   for (final key in {...baseline.exact.keys, ...live.exact.keys}) {
-    if (baseline.exact[key] != live.exact[key]) issues.add('binding multiplicity changed: $key');
+    if (baseline.exact[key] != live.exact[key] && !_isApprovedStateAddition(baseline, live, key)) {
+      issues.add('binding multiplicity changed: $key');
+    }
   }
   // Added appearance predicates are allowed; only the approved recovery getter may replace an existing condition.
   for (final key in baseline.predicates.keys) {
@@ -295,6 +366,112 @@ void main() {
           .replaceFirst(predicate, predicate.replaceFirst('.value ', '.valueOrNull '))
           .replaceFirst('secureLabel = "";', 'secureLabel = "unexpected";');
       expect(_differences(_inventory(source, 'baseline/$path'), _inventory(changedBody, path)), isNotEmpty);
+    });
+  });
+
+  group('approved iOS active-proxy provider watches', () {
+    String fixture(
+      _ApprovedStateAddition addition,
+      List<String> expressions, {
+      String? className,
+      String? methodName,
+    }) =>
+        '''
+class ${className ?? addition.className} {
+  void ${methodName ?? addition.methodName}(dynamic ref) {
+    ${expressions.map((expression) => '$expression;').join('\n    ')}
+  }
+}
+''';
+
+    test('guard accepts each exact additive watch once at its approved site', () {
+      for (final addition in _approvedStateAdditions) {
+        final baseline = fixture(addition, const []);
+        final live = fixture(addition, [addition.expression]);
+        expect(
+          _differences(_inventory(baseline, 'baseline/${addition.path}'), _inventory(live, addition.path)),
+          isEmpty,
+          reason: addition.expression,
+        );
+      }
+    });
+
+    test('guard rejects a duplicate approved watch', () {
+      final addition = _approvedStateAdditions.first;
+      final baseline = fixture(addition, const []);
+      final live = fixture(addition, [addition.expression, addition.expression]);
+      expect(
+        _differences(_inventory(baseline, 'baseline/${addition.path}'), _inventory(live, addition.path)),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects the wrong provider', () {
+      final addition = _approvedStateAdditions.first;
+      final baseline = fixture(addition, const []);
+      final live = fixture(addition, const ['ref.watch(unapprovedProvider)']);
+      expect(
+        _differences(_inventory(baseline, 'baseline/${addition.path}'), _inventory(live, addition.path)),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects read instead of watch', () {
+      final addition = _approvedStateAdditions.first;
+      final baseline = fixture(addition, const []);
+      final live = fixture(addition, ['ref.read(${addition.provider})']);
+      expect(
+        _differences(_inventory(baseline, 'baseline/${addition.path}'), _inventory(live, addition.path)),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects the approved watch in the wrong class', () {
+      final addition = _approvedStateAdditions.first;
+      final baseline = fixture(addition, const []);
+      final live = fixture(addition, [addition.expression], className: 'OtherPresentation');
+      expect(
+        _differences(_inventory(baseline, 'baseline/${addition.path}'), _inventory(live, addition.path)),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects the approved watch in the wrong method', () {
+      final addition = _approvedStateAdditions.first;
+      final baseline = fixture(addition, const []);
+      final live = fixture(addition, [addition.expression], methodName: 'other');
+      expect(
+        _differences(_inventory(baseline, 'baseline/${addition.path}'), _inventory(live, addition.path)),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects the approved watch inside an unused closure', () {
+      final addition = _approvedStateAdditions.first;
+      final baseline = fixture(addition, const []);
+      final live = fixture(addition, ['final unused = () { ${addition.expression}; }']);
+      expect(
+        _differences(_inventory(baseline, 'baseline/${addition.path}'), _inventory(live, addition.path)),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects the approved watch inside an unused local function', () {
+      final addition = _approvedStateAdditions.first;
+      final baseline = fixture(addition, const []);
+      final live = fixture(addition, ['void unused() { ${addition.expression}; }']);
+      expect(
+        _differences(_inventory(baseline, 'baseline/${addition.path}'), _inventory(live, addition.path)),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects the approved watch in the wrong file', () {
+      final addition = _approvedStateAdditions.first;
+      final baseline = fixture(addition, const []);
+      final live = fixture(addition, [addition.expression]);
+      const wrongPath = 'lib/features/proxy/widget/proxy_tile.dart';
+      expect(_differences(_inventory(baseline, 'baseline/$wrongPath'), _inventory(live, wrongPath)), isNotEmpty);
     });
   });
 

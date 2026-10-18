@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/utils/throttler.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement_providers.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/model/ip_info_entity.dart' as oldipinfo;
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
@@ -73,8 +75,20 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
 
 @Riverpod(keepAlive: true)
 class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
+  int _iosGeneration = 0;
+
   @override
   Stream<OutboundInfo> build() async* {
+    if (ref.watch(iosActiveProxyMeasurementEnabledProvider)) {
+      _iosGeneration++;
+      ref.onDispose(() => _iosGeneration++);
+      yield* ref.watch(iosActiveProxyMeasurementProvider).states.map((snapshot) {
+        final proxy = snapshot.proxy;
+        if (proxy == null) throw const UnknownIp();
+        return proxy;
+      });
+      return;
+    }
     // ref.disposeDelay(const Duration(seconds: 20));
     ref.watch(coreRestartSignalProvider);
     final serviceRunning = await ref.watch(serviceRunningProvider.future);
@@ -92,6 +106,22 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
 
   Future<void> urlTest(String? groupTag_) async {
     final groupTag = groupTag_ ?? "";
+    if (ref.read(iosActiveProxyMeasurementEnabledProvider) && groupTag.isEmpty) {
+      if (ref.read(serviceRunningProvider).asData?.value != true) return;
+      final lifecycle = WidgetsBinding.instance.lifecycleState;
+      if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
+      final generation = _iosGeneration;
+      final measurement = ref.read(iosActiveProxyMeasurementProvider);
+      if (!measurement.canRefresh) return;
+      await ref.read(hapticServiceProvider.notifier).lightImpact();
+      if (generation != _iosGeneration) return;
+      if (ref.read(serviceRunningProvider).asData?.value != true) return;
+      final currentLifecycle = WidgetsBinding.instance.lifecycleState;
+      if (currentLifecycle != null && currentLifecycle != AppLifecycleState.resumed) return;
+      if (!identical(measurement, ref.read(iosActiveProxyMeasurementProvider)) || !measurement.canRefresh) return;
+      await measurement.refresh();
+      return;
+    }
     _urlTestThrottler(() async {
       if (state case AsyncData()) {
         await ref.read(hapticServiceProvider.notifier).lightImpact();

@@ -83,6 +83,52 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     "lib/features/diagnostics/safe_diagnostics_page.dart" => "c1604dd46656c39a8c38e5b3cf5b5d9ed343a08c41f23c9133c75aa5ac093d9c",
   }.freeze
 
+  # Exact reviewed iOS active-proxy measurement sources; no directory allowance.
+  IOS_MEASUREMENT_SOURCE_SHA256 = {
+    "lib/features/proxy/active/active_proxy_notifier.dart" => ["d1c13a0efac2e778de8e7a3d74bdfb97518aeba4cf1ed036c70051d44f9d1529", "1f8299fb97d475961ee189cfd2b86844d054fd68dea3f7d171995300d7fdfab4"],
+    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "aa852a4f295459786f958e008ccfcd274b412ee3399277a2a3559260a81dd64c"],
+  }.freeze
+  IOS_MEASUREMENT_NEW_SHA256 = {
+    "lib/features/proxy/active/ios_active_proxy_measurement.dart" => "bf00d4020cf0b994d0dc253f48244c3e56bc28488e10a76b2fbb6607548abccd",
+    "lib/features/proxy/active/ios_active_proxy_measurement_providers.dart" => "17adb5c99a441aab29538568d7a2e06f2c39975016779e9729bc1145b2b218ea",
+    "lib/features/proxy/active/ios_active_proxy_delay_indicator.dart" => "56fbe46ef0810eb8f55cdc967b5e1515944d59336ed7bef188d8c88d6717c542",
+  }.freeze
+
+  def approved_ios_measurement_change?(path, trusted_source, current_source)
+    fingerprints = IOS_MEASUREMENT_SOURCE_SHA256[path]
+    fingerprints &&
+      Digest::SHA256.hexdigest(trusted_source) == fingerprints.fetch(0) &&
+      Digest::SHA256.hexdigest(current_source) == fingerprints.fetch(1)
+  end
+
+  def approved_ios_measurement_addition?(path, current_source)
+    fingerprint = IOS_MEASUREMENT_NEW_SHA256[path]
+    fingerprint && Digest::SHA256.hexdigest(current_source) == fingerprint
+  end
+
+  def test_ios_measurement_existing_fingerprints_reject_unreviewed_bytes_and_paths
+    IOS_MEASUREMENT_SOURCE_SHA256.each_key do |path|
+      trusted = git("show", "#{BASELINE}:#{path}")
+      current = File.binread(File.join(ROOT, path))
+      assert approved_ios_measurement_change?(path, trusted, current), path
+      refute approved_ios_measurement_change?(path, trusted + " ", current), path
+      refute approved_ios_measurement_change?(path, trusted, current + " "), path
+      refute approved_ios_measurement_change?("lib/features/proxy/active/unreviewed.dart", trusted, current)
+    end
+  end
+
+  def test_ios_measurement_new_fingerprints_reject_unreviewed_bytes_and_paths
+    IOS_MEASUREMENT_NEW_SHA256.each_key do |path|
+      current = File.binread(File.join(ROOT, path))
+      assert approved_ios_measurement_addition?(path, current), path
+      refute approved_ios_measurement_addition?(path, current + " "), path
+      refute approved_ios_measurement_addition?("lib/features/proxy/active/unreviewed.dart", current)
+    end
+    refute allowed_addition?("lib/features/proxy/active/unreviewed.dart")
+    refute allowed_addition?("lib/features/proxy/active/ios_active_proxy_measurement_extra.dart")
+    refute allowed_addition?("lib/features/proxy/active/ios_active_proxy_measurement.dart/extra.dart")
+  end
+
   def test_new_diagnostic_sources_match_reviewed_fingerprints
     assert_equal DIAGNOSTIC_NEW_FILES.sort, DIAGNOSTIC_NEW_SHA256.keys.sort
     DIAGNOSTIC_NEW_SHA256.each do |path, expected|
@@ -303,7 +349,8 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
       current_path = File.join(ROOT, path)
       File.file?(current_path) &&
         (approved_protected_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
-         approved_diagnostic_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)))
+         approved_diagnostic_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
+         approved_ios_measurement_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)))
     end
     assert_empty changed, "Protected runtime/native/dependency/identity files changed: #{changed.join(', ')}"
   end
@@ -315,7 +362,7 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
 
   def allowed_addition?(path)
     path.start_with?("test/", "docs/") || NEW_TOOL_FILES.include?(path) ||
-      DIAGNOSTIC_NEW_FILES.include?(path) || NEW_UI_FILES.include?(path) || NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
+      DIAGNOSTIC_NEW_FILES.include?(path) || IOS_MEASUREMENT_NEW_SHA256.key?(path) || NEW_UI_FILES.include?(path) || NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
   end
 
   def unexpected_additions(current, baseline)
