@@ -314,11 +314,14 @@ class _ConnectionButton extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AnimatedText(
-                label,
-                duration: reduceMotion ? Duration.zero : kAnimationDuration,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              if (Theme.of(context).platform == TargetPlatform.iOS)
+                Text(label, style: Theme.of(context).textTheme.titleMedium)
+              else
+                AnimatedText(
+                  label,
+                  duration: reduceMotion ? Duration.zero : kAnimationDuration,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               if (secureLabel.isNotEmpty) ...[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

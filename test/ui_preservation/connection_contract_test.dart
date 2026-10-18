@@ -7,6 +7,7 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/features/connection/data/connection_data_providers.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
@@ -48,6 +49,7 @@ void main() {
     Stream<OutboundInfo>? proxyStream,
     ButtonConnectionSpy Function(List<String> events)? spyFactory,
     List<ProviderObserver> observers = const [],
+    ValueNotifier<bool>? tickerMode,
   }) async {
     final events = <String>[];
     final spy = spyFactory?.call(events) ?? ButtonConnectionSpy(status, events);
@@ -72,7 +74,15 @@ void main() {
         ],
         child: MaterialApp(
           theme: ThemeData(platform: platform),
-          home: const Scaffold(body: Center(child: ConnectionButton())),
+          home: Scaffold(
+            body: tickerMode == null
+                ? const Center(child: ConnectionButton())
+                : ValueListenableBuilder<bool>(
+                    valueListenable: tickerMode,
+                    child: const Center(child: ConnectionButton()),
+                    builder: (context, enabled, child) => TickerMode(enabled: enabled, child: child!),
+                  ),
+          ),
         ),
       ),
     );
@@ -85,6 +95,47 @@ void main() {
   Finder button() => find.byKey(const ValueKey('home_connection_button'));
   HomePresentationSnapshot snapshot(WidgetTester tester) =>
       ProviderScope.containerOf(tester.element(find.byType(ConnectionButton))).read(homePresentationSnapshotProvider)!;
+  for (final status in [const Connected(), const Disconnected(), const Disconnecting()]) {
+    testWidgets('iOS painted $status replaces Connecting without animation ticks', (tester) async {
+      final tickerMode = ValueNotifier(true);
+      addTearDown(tickerMode.dispose);
+      final (spy, _, _) = await mount(
+        tester,
+        const AsyncData(Connecting()),
+        delay: 0,
+        platform: TargetPlatform.iOS,
+        tickerMode: tickerMode,
+      );
+      final initial = tester.widgetList<RichText>(
+        find.descendant(of: find.byType(ConnectionButton), matching: find.byType(RichText)),
+      ).map((text) => text.text.toPlainText()).toList();
+      expect(initial, [t.connection.connecting]);
+      tickerMode.value = false;
+      await tester.pump();
+      spy.state = AsyncData(status);
+      await tester.pump();
+      final painted = tester.widgetList<RichText>(
+        find.descendant(of: find.byType(ConnectionButton), matching: find.byType(RichText)),
+      ).map((text) => text.text.toPlainText()).toList();
+      expect(painted, [status.present(t)]);
+      expect(find.byType(AnimatedText), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  }
+  testWidgets('Android status retains its existing animated transition', (tester) async {
+    final tickerMode = ValueNotifier(true);
+    addTearDown(tickerMode.dispose);
+    final (spy, _, _) = await mount(tester, const AsyncData(Connecting()), tickerMode: tickerMode);
+    tickerMode.value = false;
+    await tester.pump();
+    spy.state = const AsyncData(Connected());
+    await tester.pump();
+    final painted = tester.widgetList<RichText>(
+      find.descendant(of: find.byType(ConnectionButton), matching: find.byType(RichText)),
+    ).map((text) => text.text.toPlainText()).toList();
+    expect(painted, containsAll([t.connection.connecting, t.connection.connected]));
+    expect(find.byType(AnimatedText), findsOneWidget);
+  });
   for (final entry in <(AsyncValue<ConnectionStatus>, String, bool)>[
     (const AsyncData(Disconnected()), t.connection.tapToConnect, true),
     (const AsyncData(Connecting()), t.connection.connecting, false),
