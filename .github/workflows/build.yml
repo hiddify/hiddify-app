@@ -37,9 +37,11 @@ jobs:
   test:
     outputs:
       draftBuildCode: ${{ steps.draftBuildCode.outputs.datetime }}
-    runs-on: ubuntu-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: subosito/flutter-action@v2.21.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -47,7 +49,7 @@ jobs:
           cache: true
           
       - name: Prepare
-        run: make linux-amd64-prepare
+        run: make macos-prepare
       - name: Test
         run: flutter test
 
