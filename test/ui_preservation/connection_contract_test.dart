@@ -17,6 +17,7 @@ import 'package:hiddify/features/home/widget/connection_button.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -41,9 +42,12 @@ void main() {
     int delay = 1,
     bool reconnect = false,
     bool profile = true,
+    TargetPlatform platform = TargetPlatform.android,
+    Stream<OutboundInfo>? proxyStream,
+    ButtonConnectionSpy Function(List<String> events)? spyFactory,
   }) async {
     final events = <String>[];
-    final spy = ButtonConnectionSpy(status, events);
+    final spy = spyFactory?.call(events) ?? ButtonConnectionSpy(status, events);
     final dialogs = FixtureDialogs(events);
     await tester.pumpWidget(
       ProviderScope(
@@ -52,13 +56,16 @@ void main() {
           translationsProvider.overrideWith((ref) => t),
           connectionNotifierProvider.overrideWith(() => spy),
           activeProfileProvider.overrideWith(() => FixtureProfile(profile ? connectionProfile : null)),
-          activeProxyNotifierProvider.overrideWith(() => FixtureProxy(delay)),
+          activeProxyNotifierProvider.overrideWith(
+            () => proxyStream == null ? FixtureProxy(delay) : _ProxyStreamFixture(proxyStream),
+          ),
           configOptionNotifierProvider.overrideWith(() => FixtureConfig(reconnect)),
           dialogNotifierProvider.overrideWith(() => dialogs),
           bottomSheetsNotifierProvider.overrideWith(() => FixtureSheets(events)),
         ],
-        child: const MaterialApp(
-          home: Scaffold(body: Center(child: ConnectionButton())),
+        child: MaterialApp(
+          theme: ThemeData(platform: platform),
+          home: const Scaffold(body: Center(child: ConnectionButton())),
         ),
       ),
     );
@@ -96,6 +103,131 @@ void main() {
       expect(find.text(t.connection.secure), delay > 0 && delay <= 65000 ? findsOneWidget : findsNothing);
     });
   }
+  for (final delay in [0, 1, 64999, 65000, 65001]) {
+    testWidgets('iOS Connected label and disconnect action ignore latency $delay', (tester) async {
+      final (_, _, events) = await mount(
+        tester,
+        const AsyncData(Connected()),
+        delay: delay,
+        platform: TargetPlatform.iOS,
+      );
+      final semantics = tester
+          .widgetList<Semantics>(find.byType(Semantics))
+          .singleWhere((s) => s.properties.button == true && s.properties.enabled != null);
+      expect(semantics.properties.label, t.connection.connected);
+      expect(semantics.properties.enabled, true);
+      await tester.tap(button());
+      await tester.pump();
+      expect(events, ['toggle']);
+    });
+  }
+  for (final entry in <(String, Stream<OutboundInfo>)>[
+    ('loading', const Stream<OutboundInfo>.empty()),
+    ('missing', Stream<OutboundInfo>.value(OutboundInfo())),
+    ('error', Stream<OutboundInfo>.error(StateError('synthetic'), StackTrace.empty)),
+  ]) {
+    testWidgets('iOS Connected stays actionable with proxy ${entry.$1}', (tester) async {
+      final (_, _, events) = await mount(
+        tester,
+        const AsyncData(Connected()),
+        platform: TargetPlatform.iOS,
+        proxyStream: entry.$2,
+      );
+      final semantics = tester
+          .widgetList<Semantics>(find.byType(Semantics))
+          .singleWhere((s) => s.properties.button == true && s.properties.enabled != null);
+      expect(semantics.properties.label, t.connection.connected);
+      expect(semantics.properties.enabled, true);
+      await tester.tap(button());
+      await tester.pump();
+      expect(events, ['toggle']);
+      expect(tester.takeException(), isNull);
+    });
+  }
+  testWidgets('iOS actual Connecting remains disabled regardless of proxy latency', (tester) async {
+    final (_, _, events) = await mount(
+      tester,
+      const AsyncData(Connecting()),
+      delay: 0,
+      platform: TargetPlatform.iOS,
+    );
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
+        .singleWhere((s) => s.properties.button == true && s.properties.enabled != null);
+    expect(semantics.properties.label, t.connection.connecting);
+    expect(semantics.properties.enabled, false);
+    await tester.tap(button());
+    await tester.pump();
+    expect(events, isEmpty);
+  });
+  testWidgets('iOS connection error remains enabled and retryable', (tester) async {
+    final (_, _, events) = await mount(
+      tester,
+      AsyncError(StateError('synthetic'), StackTrace.empty),
+      delay: 0,
+      platform: TargetPlatform.iOS,
+    );
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
+        .singleWhere((s) => s.properties.button == true && s.properties.enabled != null);
+    expect(semantics.properties.label, '');
+    expect(semantics.properties.enabled, true);
+    await tester.tap(button());
+    await tester.pump();
+    expect(events, ['notice', 'toggle']);
+  });
+  for (final entry in <(String, AsyncValue<ConnectionStatus>, String, bool, List<String>)>[
+    (
+      'error',
+      AsyncError<ConnectionStatus>(StateError('synthetic'), StackTrace.empty)
+          .copyWithPrevious(const AsyncData(Connected())),
+      '',
+      true,
+      ['notice', 'toggle'],
+    ),
+    (
+      'loading',
+      const AsyncLoading<ConnectionStatus>().copyWithPrevious(
+        const AsyncData(Connected()),
+        isRefresh: false,
+      ),
+      '',
+      false,
+      <String>[],
+    ),
+  ]) {
+    testWidgets('iOS ${entry.$1} with previous Connected preserves label and action', (tester) async {
+      late _MetadataConnectionSpy metadataSpy;
+      await mount(
+        tester,
+        const AsyncData(Disconnected()),
+        delay: 0,
+        platform: TargetPlatform.iOS,
+        spyFactory: (events) => metadataSpy = _MetadataConnectionSpy(events),
+      );
+      metadataSpy.restoredStatus = entry.$2;
+      await tester.pump();
+
+      final actual = ProviderScope.containerOf(tester.element(find.byType(ConnectionButton))).read(
+        connectionNotifierProvider,
+      );
+      expect(actual.valueOrNull, const Connected());
+      expect(
+        actual,
+        entry.$1 == 'error'
+            ? isA<AsyncError<ConnectionStatus>>()
+            : isA<AsyncLoading<ConnectionStatus>>(),
+      );
+      final semantics = tester
+          .widgetList<Semantics>(find.byType(Semantics))
+          .singleWhere((s) => s.properties.button == true && s.properties.enabled != null);
+      expect(semantics.properties.label, entry.$3);
+      expect(semantics.properties.enabled, entry.$4);
+      await tester.tap(button());
+      await tester.pump();
+      expect(metadataSpy.events, entry.$5);
+    });
+  }
   for (final warpEnabled in [true, false]) {
     testWidgets('error with valid latency keeps retry usable with WARP $warpEnabled', (tester) async {
       await prefs.setBool('enable-warp', warpEnabled);
@@ -124,6 +256,24 @@ void main() {
   testWidgets('reconnect takes priority over invalid latency and notice', (tester) async {
     final (spy, _, events) = await mount(tester, const AsyncData(Connected()), delay: 0, reconnect: true);
     expect(find.text(t.connection.reconnect), findsWidgets);
+    await tester.tap(button());
+    await tester.pump();
+    expect(events, ['reconnect']);
+    expect(spy.reconnectedProfile, connectionProfile);
+  });
+  testWidgets('iOS reconnect takes priority over Connected label and disconnect action', (tester) async {
+    final (spy, _, events) = await mount(
+      tester,
+      const AsyncData(Connected()),
+      delay: 0,
+      reconnect: true,
+      platform: TargetPlatform.iOS,
+    );
+    final semantics = tester
+        .widgetList<Semantics>(find.byType(Semantics))
+        .singleWhere((s) => s.properties.button == true && s.properties.enabled != null);
+    expect(semantics.properties.label, t.connection.reconnect);
+    expect(semantics.properties.enabled, true);
     await tester.tap(button());
     await tester.pump();
     expect(events, ['reconnect']);
@@ -265,4 +415,26 @@ void main() {
       });
     });
   }
+}
+
+class _ProxyStreamFixture extends ActiveProxyNotifier {
+  _ProxyStreamFixture(this.stream);
+
+  final Stream<OutboundInfo> stream;
+
+  @override
+  Stream<OutboundInfo> build() => stream;
+}
+
+class _MetadataConnectionSpy extends ButtonConnectionSpy {
+  _MetadataConnectionSpy(List<String> events) : super(const AsyncLoading(), events);
+
+  AsyncValue<ConnectionStatus> get restoredStatus => state;
+
+  set restoredStatus(AsyncValue<ConnectionStatus> next) {
+    state = next;
+  }
+
+  @override
+  Stream<ConnectionStatus> build() => Stream.value(const Connected());
 }
