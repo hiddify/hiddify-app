@@ -149,12 +149,17 @@ class ConnectionButton extends HookConsumerWidget {
         AsyncData(value: Connected()) || AsyncData(value: Disconnected()) || AsyncError() => true,
         _ => false,
       },
-      label: switch (connectionStatus) {
-        AsyncData(value: Connected()) when requiresReconnect == true => t.connection.reconnect,
-        AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => t.connection.connecting,
-        AsyncData(value: final status) => status.present(t),
-        _ => "",
-      },
+      label:
+          Theme.of(context).platform == TargetPlatform.iOS &&
+              connectionStatus.asData?.value is Connected &&
+              requiresReconnect != true
+          ? t.connection.connected
+          : switch (connectionStatus) {
+              AsyncData(value: Connected()) when requiresReconnect == true => t.connection.reconnect,
+              AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => t.connection.connecting,
+              AsyncData(value: final status) => status.present(t),
+              _ => "",
+            },
       buttonColor: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
         AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => const Color.fromARGB(255, 185, 176, 103),

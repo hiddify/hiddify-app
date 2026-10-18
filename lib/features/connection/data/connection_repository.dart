@@ -113,9 +113,13 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
                   throw const MissingWarpLicense();
                 }
               }
-              _configOptionsSnapshot = overridedOptions;
-              await singbox.changeOptions(overridedOptions).run();
-              return unit;
+              return (await singbox.changeOptions(overridedOptions).run()).match(
+                (failure) => throw ConnectionFailure.invalidConfigOption(failure),
+                (_) {
+                  _configOptionsSnapshot = overridedOptions;
+                  return unit;
+                },
+              );
             }, (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st)),
           );
 }
