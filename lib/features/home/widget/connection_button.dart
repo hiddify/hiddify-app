@@ -177,7 +177,7 @@ class _ConnectionButton extends HookWidget {
                 child: InkWell(
                   onTap: onTap,
                   child: Padding(
-                    padding: const EdgeInsets.all(48),
+                    padding: const EdgeInsets.all(40),
                     child: TweenAnimationBuilder(
                       tween: ColorTween(end: logoColor),
                       duration: const Duration(milliseconds: 250),
