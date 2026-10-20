@@ -52,8 +52,8 @@ def flutterVersionCode = localProperties.getProperty('flutter.versionCode')?: '1
 def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
 
 android {
-    namespace 'com.hiddify.hiddify'
-    testNamespace "test.com.hiddify.hiddify"
+    namespace 'com.spritenet.vpn'
+    testNamespace "test.com.spritenet.vpn"
     compileSdkVersion 36
     ndkVersion "28.2.13676358"
 
@@ -71,8 +71,8 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.hiddify.com"
-        minSdkVersion flutter.minSdkVersion
+        applicationId "com.spritenet.vpn"
+        minSdkVersion 26
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

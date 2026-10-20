@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="stop">Отключить</string>
+    <string name="quick_toggle">VPN вкл/выкл</string>
+    <string name="status_starting">Подключение…</string>
+    <string name="status_started">Подключено</string>
+</resources>
