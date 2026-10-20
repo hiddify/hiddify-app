@@ -19,7 +19,24 @@ import 'package:rxdart/rxdart.dart';
 
 final _logger = Loggy('FFIHiddifyCoreService');
 
+enum IosCoreSetupCode { helloTimedOut, nativeSetupTimedOut, nativeSetupFailed, helloFailed }
+
+class IosCoreSetupException implements Exception {
+  const IosCoreSetupException(this.code);
+
+  final IosCoreSetupCode code;
+
+  @override
+  String toString() => 'IosCoreSetupException(${code.name})';
+}
+
 class CoreInterfaceMobile extends CoreInterface with InfraLogger {
+  CoreInterfaceMobile({this.iosSetupDeadline = const Duration(seconds: 5)});
+
+  final Duration iosSetupDeadline;
+  Future<String>? _iosSetupInFlight;
+  Future<void>? _pendingNativeSetup;
+
   static const channelPrefix = "com.hiddify.app";
   static const methodChannel = MethodChannel("$channelPrefix/method");
   static const statusChannel = EventChannel("$channelPrefix/service.status", JSONMethodCodec());
@@ -45,7 +62,97 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   Stream<CoreStatus> get systemStatusStream => _nativeStatus;
 
   @override
-  Future<String> setup(Directories directories, bool debug, int mode) async {
+  Future<String> setup(Directories directories, bool debug, int mode) {
+    if (!supportsSystemStatus) return _setupLegacy(directories, debug, mode);
+    // One attempt owns client publication. A retry cannot race an older attempt.
+    return _iosSetupInFlight ??= _setupIos(directories, debug, mode).whenComplete(() => _iosSetupInFlight = null);
+  }
+
+  Future<String> _setupIos(Directories directories, bool debug, int mode) async {
+    final credentials = [1, 2].contains(mode)
+        ? MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientKey: cert)
+        : const ChannelCredentials.insecure();
+    final helloChannel = ClientChannel(
+      '127.0.0.1',
+      port: portFront,
+      options: ChannelOptions(credentials: credentials),
+    );
+    final hello = HelloClient(helloChannel);
+    _status.clean();
+    try {
+      // A timed-out native callback is still executing. Wait for that same
+      // operation before probing readiness or issuing another native setup.
+      if (_pendingNativeSetup case final pending?) await _waitForNativeSetup(pending);
+      try {
+        await hello.sayHello(
+          HelloRequest(name: 'test'),
+          options: CallOptions(timeout: iosSetupDeadline),
+        );
+      } on GrpcError catch (error) {
+        if (error.code == StatusCode.deadlineExceeded) {
+          throw const IosCoreSetupException(IosCoreSetupCode.helloTimedOut);
+        }
+        if (error.code != StatusCode.unavailable) {
+          throw const IosCoreSetupException(IosCoreSetupCode.helloFailed);
+        }
+        final pending = methodChannel.invokeMethod<void>('setup', {
+          'baseDir': directories.baseDir.path,
+          'workingDir': directories.workingDir.path,
+          'tempDir': directories.tempDir.path,
+          'grpcPort': portFront,
+          'mode': mode,
+          'debug': debug,
+        });
+        _pendingNativeSetup = pending;
+        void clearPending() {
+          if (identical(_pendingNativeSetup, pending)) _pendingNativeSetup = null;
+        }
+
+        unawaited(pending.then<void>((_) => clearPending(), onError: (Object _, StackTrace _) => clearPending()));
+        await _waitForNativeSetup(pending);
+        await hello.sayHello(
+          HelloRequest(name: 'test'),
+          options: CallOptions(timeout: iosSetupDeadline),
+        );
+      }
+      _debug = debug;
+      fgClient = CoreClient(
+        ClientChannel(
+          '127.0.0.1',
+          port: portFront,
+          options: ChannelOptions(credentials: credentials),
+        ),
+      );
+      bgClient = CoreClient(
+        ClientChannel(
+          '127.0.0.1',
+          port: portBack,
+          options: ChannelOptions(credentials: credentials),
+        ),
+      );
+      return '';
+    } on IosCoreSetupException {
+      rethrow;
+    } on GrpcError catch (error) {
+      throw IosCoreSetupException(
+        error.code == StatusCode.deadlineExceeded ? IosCoreSetupCode.helloTimedOut : IosCoreSetupCode.helloFailed,
+      );
+    } finally {
+      await helloChannel.terminate();
+    }
+  }
+
+  Future<void> _waitForNativeSetup(Future<void> pending) async {
+    try {
+      await pending.timeout(iosSetupDeadline);
+    } on TimeoutException {
+      throw const IosCoreSetupException(IosCoreSetupCode.nativeSetupTimedOut);
+    } catch (_) {
+      throw const IosCoreSetupException(IosCoreSetupCode.nativeSetupFailed);
+    }
+  }
+
+  Future<String> _setupLegacy(Directories directories, bool debug, int mode) async {
     final channelOption = [1, 2].contains(mode)
         ? MTLSChannelCredentials(serverPublicKey: serverPublicKey, clientKey: cert)
         : const ChannelCredentials.insecure();

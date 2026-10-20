@@ -34,6 +34,9 @@ bool isOnPauseCalled = false;
 class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   const App({super.key});
 
+  @protected
+  bool get useDirectAppLifecycleObserver => PlatformUtils.isIOS;
+
   void onInactive(WidgetRef ref) {
     onPause(ref);
   }
@@ -184,19 +187,45 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   // }
 
   void setupStateListener(WidgetRef ref) {
+    if (useDirectAppLifecycleObserver) {
+      final callback = useRef<void Function(AppLifecycleState)>((_) {});
+      callback.value = (state) => _handleAppLifecycleState(ref, state);
+      useEffect(() {
+        final observer = _AppLifecycleObserver((state) => callback.value(state));
+        WidgetsBinding.instance.addObserver(observer);
+        final initialState = WidgetsBinding.instance.lifecycleState;
+        if (initialState != null) observer.didChangeAppLifecycleState(initialState);
+        return () => WidgetsBinding.instance.removeObserver(observer);
+      }, const []);
+      return;
+    }
+
     final appLifecycleState = useAppLifecycleState();
 
     useEffect(() {
-      loggy.info("current app state");
-      loggy.info(appLifecycleState);
-      if (appLifecycleState == AppLifecycleState.paused) {
-        onPause(ref);
-      } else if (appLifecycleState == AppLifecycleState.inactive) {
-        onInactive(ref);
-      } else if (appLifecycleState == AppLifecycleState.resumed) {
-        onResume(ref);
-      }
+      if (appLifecycleState != null) _handleAppLifecycleState(ref, appLifecycleState);
       return null;
     }, [appLifecycleState]);
   }
+
+  void _handleAppLifecycleState(WidgetRef ref, AppLifecycleState state) {
+    loggy.info("current app state");
+    loggy.info(state);
+    if (state == AppLifecycleState.paused) {
+      onPause(ref);
+    } else if (state == AppLifecycleState.inactive) {
+      onInactive(ref);
+    } else if (state == AppLifecycleState.resumed) {
+      onResume(ref);
+    }
+  }
+}
+
+class _AppLifecycleObserver extends WidgetsBindingObserver {
+  _AppLifecycleObserver(this.onChanged);
+
+  final void Function(AppLifecycleState state) onChanged;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) => onChanged(state);
 }

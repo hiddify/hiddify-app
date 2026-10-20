@@ -86,13 +86,60 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   # Exact reviewed iOS active-proxy measurement sources; no directory allowance.
   IOS_MEASUREMENT_SOURCE_SHA256 = {
     "lib/features/proxy/active/active_proxy_notifier.dart" => ["d1c13a0efac2e778de8e7a3d74bdfb97518aeba4cf1ed036c70051d44f9d1529", "1f8299fb97d475961ee189cfd2b86844d054fd68dea3f7d171995300d7fdfab4"],
-    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "aa852a4f295459786f958e008ccfcd274b412ee3399277a2a3559260a81dd64c"],
+    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "38b4aa7651974ef820d84a72122d38964801ed4d5e6ef0f89e65ae39f8edc1c0"],
   }.freeze
   IOS_MEASUREMENT_NEW_SHA256 = {
     "lib/features/proxy/active/ios_active_proxy_measurement.dart" => "bf00d4020cf0b994d0dc253f48244c3e56bc28488e10a76b2fbb6607548abccd",
     "lib/features/proxy/active/ios_active_proxy_measurement_providers.dart" => "17adb5c99a441aab29538568d7a2e06f2c39975016779e9729bc1145b2b218ea",
     "lib/features/proxy/active/ios_active_proxy_delay_indicator.dart" => "56fbe46ef0810eb8f55cdc967b5e1515944d59336ed7bef188d8c88d6717c542",
   }.freeze
+
+  # Exact iOS startup recovery sources; no lifecycle/core directory allowance.
+  IOS_STARTUP_SOURCE_SHA256 = {
+    "lib/bootstrap.dart" => ["d035a1bec3386d5f1320cfc7ef7eec9f260621f5d2868706670efe71fcfb24e9", "c7c92337c2f9ece8f392ae851df0f15f8269a8c8367b0a4fafaa7ff9a2901fda"],
+    "lib/features/app/widget/app.dart" => ["f3907fa99dcbe37c300f9c1c856d1ae18943754019193eda1a01dc6df3532390", "c3923577ee27bfa100cb2f1a3fdf687f611b988186eabc0dd2f758675c093b67"],
+    "lib/hiddifycore/core_interface/core_interface_mobile.dart" => ["e0672d710ce7341cde00e6543458e2ed6ab5a6948c389ff45dcc7788c19baf26", "51d7b3daf49b4b531a980290aaa7d9ff2ebc36b9c5b9924f29610d390da28b5d"],
+  }.freeze
+  IOS_STARTUP_NEW_SHA256 = {
+    "lib/features/app/startup/ios_startup_gate.dart" => "9073defe1819cc9801ea3e3a5495947970c40ea60df175a664206c715a6a87db",
+  }.freeze
+
+  def approved_ios_startup_change?(path, trusted_source, current_source)
+    fingerprints = IOS_STARTUP_SOURCE_SHA256[path]
+    fingerprints &&
+      Digest::SHA256.hexdigest(trusted_source) == fingerprints.fetch(0) &&
+      Digest::SHA256.hexdigest(current_source) == fingerprints.fetch(1)
+  end
+
+  def approved_ios_startup_addition?(path, current_source)
+    fingerprint = IOS_STARTUP_NEW_SHA256[path]
+    fingerprint && Digest::SHA256.hexdigest(current_source) == fingerprint
+  end
+
+  def test_ios_startup_existing_fingerprints_reject_unreviewed_bytes_and_paths
+    IOS_STARTUP_SOURCE_SHA256.each_key do |path|
+      trusted = git("show", "#{BASELINE}:#{path}")
+      current = File.binread(File.join(ROOT, path))
+      assert approved_ios_startup_change?(path, trusted, current), path
+      refute approved_ios_startup_change?(path, trusted + " ", current), path
+      refute approved_ios_startup_change?(path, trusted, current + " "), path
+      refute approved_ios_startup_change?("#{path}.unreviewed", trusted, current), path
+      refute approved_ios_startup_change?("lib/hiddifycore/unreviewed.dart", trusted, current), path
+    end
+  end
+
+  def test_ios_startup_new_fingerprints_reject_unreviewed_bytes_and_paths
+    IOS_STARTUP_NEW_SHA256.each_key do |path|
+      current = File.binread(File.join(ROOT, path))
+      assert approved_ios_startup_addition?(path, current), path
+      refute approved_ios_startup_addition?(path, current + " "), path
+      refute approved_ios_startup_addition?("#{path}.unreviewed", current), path
+      refute allowed_addition?("#{path}/extra.dart"), path
+    end
+    refute allowed_addition?("lib/features/app/startup/unreviewed.dart")
+    refute allowed_addition?("lib/features/app/startup/ios_startup_gate_extra.dart")
+    refute approved_ios_startup_addition?("lib/features/app/startup/unreviewed.dart", "")
+  end
 
   def approved_ios_measurement_change?(path, trusted_source, current_source)
     fingerprints = IOS_MEASUREMENT_SOURCE_SHA256[path]
@@ -350,7 +397,8 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
       File.file?(current_path) &&
         (approved_protected_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
          approved_diagnostic_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
-         approved_ios_measurement_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)))
+         approved_ios_measurement_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
+         approved_ios_startup_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)))
     end
     assert_empty changed, "Protected runtime/native/dependency/identity files changed: #{changed.join(', ')}"
   end
@@ -362,7 +410,7 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
 
   def allowed_addition?(path)
     path.start_with?("test/", "docs/") || NEW_TOOL_FILES.include?(path) ||
-      DIAGNOSTIC_NEW_FILES.include?(path) || IOS_MEASUREMENT_NEW_SHA256.key?(path) || NEW_UI_FILES.include?(path) || NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
+      DIAGNOSTIC_NEW_FILES.include?(path) || IOS_MEASUREMENT_NEW_SHA256.key?(path) || IOS_STARTUP_NEW_SHA256.key?(path) || NEW_UI_FILES.include?(path) || NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
   end
 
   def unexpected_additions(current, baseline)

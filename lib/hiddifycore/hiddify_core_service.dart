@@ -30,6 +30,13 @@ import 'package:loggy/loggy.dart' as loggyl;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
+final class HiddifyCoreInitializationException implements Exception {
+  const HiddifyCoreInitializationException();
+
+  @override
+  String toString() => 'HiddifyCoreInitializationException';
+}
+
 class HiddifyCoreService with InfraLogger {
   HiddifyCoreService(this.ref);
   final Ref ref;
@@ -123,10 +130,11 @@ class HiddifyCoreService with InfraLogger {
     }
   }
 
-  Future<void> init() async {
+  Future<void> init({bool requireSuccess = false}) async {
     await setup()
         .mapLeft((e) {
           loggy.error(e);
+          if (requireSuccess) throw const HiddifyCoreInitializationException();
           if (PlatformUtils.isIOS) return;
           statusController.add(const CoreStatus.stopped());
           ref.read(inAppNotificationControllerProvider).showErrorToast(e);
