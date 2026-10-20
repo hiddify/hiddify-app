@@ -6,7 +6,7 @@ the app only imports the subscription, keeps it up to date and holds the tunnel.
 
 ## Based on Hiddify
 
-SpriteNet is a fork of [Hiddify](https://github.com/hiddify/hiddify-app) (tag `v4.1.2`) and is distributed
+SpriteNet is a fork of [Hiddify](https://github.com/hiddify/hiddify-app) (upstream `main` after `v4.1.2`) and is distributed
 under the same [Hiddify Extended GNU General Public License v3](LICENSE.md). All credit for the core client,
 the sing-box integration and the original UI goes to the Hiddify team.
 

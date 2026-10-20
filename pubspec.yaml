@@ -1,4 +1,7 @@
-name: spritenet
+# Internal Dart package name. It must stay "hiddify": every import in lib/ and test/ is
+# `package:hiddify/...`, and keeping it makes merging upstream Hiddify updates painless.
+# Users never see it; the app name comes from AndroidManifest/Info.plist and translations.
+name: hiddify
 description: "SpriteNet VPN Client"
 publish_to: "none"
 version: 4.1.2+40102
