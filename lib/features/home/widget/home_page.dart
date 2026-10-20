@@ -5,10 +5,10 @@ import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
+import 'package:hiddify/features/home/widget/home_status_panel.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_card.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -77,12 +77,7 @@ class HomePage extends HookConsumerWidget {
             image: const AssetImage('assets/images/world_map.png'), // Replace with your image path
             fit: BoxFit.cover,
             opacity: 0.09,
-            colorFilter: theme.brightness == Brightness.dark
-                ? ColorFilter.mode(Colors.white.withValues(alpha: .15), BlendMode.srcIn) //
-                : ColorFilter.mode(
-                    Colors.grey.withValues(alpha: 1),
-                    BlendMode.srcATop,
-                  ), // Apply white tint in dark mode
+            colorFilter: ColorFilter.mode(theme.colorScheme.primary.withValues(alpha: .5), BlendMode.srcIn),
           ),
         ),
         child: Stack(
@@ -118,11 +113,12 @@ class HomePage extends HookConsumerWidget {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [ConnectionButton(), ActiveProxyDelayIndicator()],
+                                  children: [ConnectionButton(), Gap(12), HomeTrafficMonitor()],
                                 ),
                               ),
                               ActiveProxyFooter(),
-                              Gap(32),
+                              TelegramSupportButton(),
+                              Gap(44), // room for the quick settings tab below
                             ],
                           ),
                         ),

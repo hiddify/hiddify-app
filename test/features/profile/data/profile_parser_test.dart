@@ -27,7 +27,8 @@ void main() {
           remote: (rp) {
             expect(rp.name, equals("filename"));
             expect(rp.url, equals(validBaseUrl));
-            expect(rp.options, isNull);
+            // SpriteNet default: refresh subscriptions every 12h when the panel sends no interval.
+            expect(rp.options, equals(const ProfileOptions(updateInterval: Duration(hours: 12))));
             expect(rp.subInfo, isNull);
           },
           local: (lp) {},
@@ -53,7 +54,8 @@ void main() {
           remote: (rp) {
             expect(rp.name, equals("b"));
             expect(rp.url, equals(validExtendedUrl));
-            expect(rp.options, isNull);
+            // SpriteNet default: refresh subscriptions every 12h when the panel sends no interval.
+            expect(rp.options, equals(const ProfileOptions(updateInterval: Duration(hours: 12))));
             expect(rp.subInfo, isNull);
           },
           local: (lp) {},

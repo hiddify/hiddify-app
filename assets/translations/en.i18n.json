@@ -1,6 +1,6 @@
 ﻿{
   "common": {
-    "appTitle": "Hiddify",
+    "appTitle": "SpriteNet",
     "start": "Start",
     "version": "Version",
     "ok": "OK",
@@ -95,12 +95,14 @@
   "intro": {
     "banner": "All you need for an unrestricted internet",
     "termsAndPolicyCaution(rich)": "By continuing you agree to ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Made with ❤️ by Hiddify - ${tap_source(Open Source)} (${tap_license(License)})"
+    "info(rich)": "SpriteNet is based on Hiddify - ${tap_source(Open Source)} (${tap_license(License)})"
   },
   "pages": {
     "home": {
       "title": "Home",
-      "quickSettings": "Quick setting options"
+      "quickSettings": "Quick setting options",
+      "support": "Support",
+      "supportHint": "Keys, payment and help in our Telegram bot"
     },
     "proxies": {
       "title": "Proxies",

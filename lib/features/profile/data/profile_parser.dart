@@ -355,6 +355,10 @@ class ProfileParser {
           final updateInterval = Duration(hours: int.parse(updateIntervalStr));
           options = ProfileOptions(updateInterval: updateInterval);
         }
+        // SpriteNet: 3X-UI subscriptions refresh every 12h unless the panel or the user says otherwise.
+        if (options == null && !isAutoUpdateDisable) {
+          options = const ProfileOptions(updateInterval: Duration(hours: 12));
+        }
 
         SubscriptionInfo? subInfo;
         if (headers['subscription-userinfo'] case final String subInfoStr) {

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appTitle": "Hiddify",
+    "appTitle": "SpriteNet",
     "start": "Начать",
     "version": "Версия",
     "ok": "OK",
@@ -99,12 +99,14 @@
   "intro": {
     "banner": "Все, что вам нужно для интернета без ограничений",
     "termsAndPolicyCaution(rich)": "Продолжая, вы соглашаетесь с ${tap(@:pages.about.termsAndConditions)}",
-    "info(rich)": "Сделано с ❤️ Hiddify - ${tap_source(Открытый исходный код)} (${tap_license(Лицензия)})"
+    "info(rich)": "SpriteNet основан на Hiddify - ${tap_source(Открытый исходный код)} (${tap_license(Лицензия)})"
   },
   "pages": {
     "home": {
       "title": "Главная",
-      "quickSettings": "Опции быстрых настроек"
+      "quickSettings": "Опции быстрых настроек",
+      "support": "Поддержка",
+      "supportHint": "Ключи, оплата и помощь в нашем Telegram-боте"
     },
     "proxies": {
       "title": "Прокси",

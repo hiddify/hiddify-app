@@ -18,7 +18,8 @@ enum Release {
 
   final String key;
 
-  bool get allowCustomUpdateChecker => this == general;
+  // Upstream checks Hiddify's GitHub releases; SpriteNet updates come from the Telegram bot.
+  bool get allowCustomUpdateChecker => false;
 
   static Release read() =>
       Release.values.firstOrNullWhere((e) => e.key == const String.fromEnvironment("release")) ?? Release.general;
