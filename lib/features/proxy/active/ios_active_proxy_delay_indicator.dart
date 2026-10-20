@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
@@ -9,16 +10,19 @@ import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement.dart'
 import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement_providers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class IosActiveProxyDelayIndicator extends ConsumerWidget {
+class IosActiveProxyDelayIndicator extends HookConsumerWidget {
   const IosActiveProxyDelayIndicator({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final refreshPending = useState(false);
+    final refreshFailed = useState(false);
+
     if (ref.watch(serviceRunningProvider).asData?.value != true) return const SizedBox.shrink();
     final t = ref.watch(translationsProvider).requireValue;
     final snapshot = ref.watch(iosActiveProxyMeasurementStateProvider).asData?.value;
     final phase = snapshot?.phase ?? IosProxyMeasurementPhase.idle;
-    final checking = phase == IosProxyMeasurementPhase.checking;
+    final checking = phase == IosProxyMeasurementPhase.checking || refreshPending.value;
     final delay = snapshot?.proxy?.urlTestDelay;
     final available = phase == IosProxyMeasurementPhase.available && delay != null && delay > 0 && delay <= 65000;
     final timedOut = phase == IosProxyMeasurementPhase.timedOut;
@@ -26,15 +30,25 @@ class IosActiveProxyDelayIndicator extends ConsumerWidget {
         ? t.pages.proxies.delay.testing
         : available
         ? t.pages.proxies.delay.result(delay: delay)
+        : refreshFailed.value
+        ? t.errors.unexpected
         : timedOut
         ? t.pages.proxies.delay.timeout
         : t.common.unknown;
 
     Future<void> refresh() async {
+      if (refreshPending.value) return;
+      refreshPending.value = true;
+      refreshFailed.value = false;
       try {
         await ref.read(activeProxyNotifierProvider.notifier).urlTest('');
       } on Object {
-        // The measurement state already exposes a closed failure or timeout.
+        if (!context.mounted) return;
+        refreshFailed.value = true;
+      } finally {
+        if (context.mounted) {
+          refreshPending.value = false;
+        }
       }
     }
 
@@ -63,6 +77,8 @@ class IosActiveProxyDelayIndicator extends ConsumerWidget {
                       Text(
                         available
                             ? '$delay ms'
+                            : refreshFailed.value
+                            ? t.errors.unexpected
                             : timedOut
                             ? t.common.timeout
                             : t.common.unknown,

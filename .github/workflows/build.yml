@@ -59,6 +59,7 @@ jobs:
 
 
   build:
+    if: ${{ false }} # WIR is scoped to iOS; retain the full source test job.
     needs: test
     permissions: write-all
     continue-on-error: true

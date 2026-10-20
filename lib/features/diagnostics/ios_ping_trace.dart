@@ -23,6 +23,13 @@ enum IosPingEvent {
   coreSetupListenersRequested,
   coreSetupCompleted,
   coreSetupFailed,
+  coreSetupFirstHelloFailed,
+  coreSetupNativeFailed,
+  coreSetupSecondHelloFailed,
+  coreSetupPreferencesFailed,
+  coreSetupHelloTimedOut,
+  coreSetupNativeTimedOut,
+  coreSetupHelloFailed,
   coreRestarted,
   measurementCreated,
   measurementReady,
@@ -42,6 +49,7 @@ enum IosPingEvent {
   refreshInvalidated,
   refreshIssued,
   refreshCompleted,
+  refreshRecoveryCompleted,
   refreshFailed,
   probeStreamEmpty,
   probeStreamUsable,
@@ -79,8 +87,7 @@ final class IosPingTraceEntry {
 }
 
 final class IosPingTraceSnapshot {
-  IosPingTraceSnapshot(Iterable<IosPingTraceEntry> entries)
-    : events = _freezeEntries(entries);
+  IosPingTraceSnapshot(Iterable<IosPingTraceEntry> entries) : events = _freezeEntries(entries);
 
   final List<IosPingTraceEntry> events;
 

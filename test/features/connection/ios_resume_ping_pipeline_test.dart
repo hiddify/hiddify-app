@@ -1,5 +1,5 @@
-// Diagnostic regression: distinguish external failure stages in the closed trace.
-// This does not claim which synthetic failure occurred on a physical device.
+// Recovery regression: exercise readiness, manual retry and closed failure stages.
+// Synthetic boundaries do not establish the physical device failure cause.
 // Uses the real HiddifyCoreService queue/setup/init, repository, measurement and
 // manual action. Only the external core and loopback RPC endpoints are synthetic.
 // Lifecycle events plus explicit pause/resume model App dispatch; App is not mounted.
@@ -26,6 +26,7 @@ import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement_provi
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/data/proxy_repository.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
+import 'package:hiddify/hiddifycore/core_interface/core_interface_mobile.dart';
 import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -101,6 +102,8 @@ class _Endpoint extends CoreServiceBase {
 class _ExternalCore extends CoreInterface {
   int setups = 0;
   String setupResult = '';
+  Object? setupError;
+  Completer<void>? setupGate;
   Completer<CoreStatus?>? statusGate;
   final statusEntered = Completer<void>();
   @override
@@ -108,6 +111,8 @@ class _ExternalCore extends CoreInterface {
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
     setups++;
+    await setupGate?.future;
+    if (setupError case final error?) throw error;
     return setupResult;
   }
 
@@ -135,7 +140,17 @@ Future<void> _until(bool Function() ready) async {
 
 void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
-  for (final scenario in ['close stalls', 'setup rejects', 'status stalls', 'success']) {
+  for (final scenario in [
+    'close stalls',
+    'setup rejects',
+    'classified rejection',
+    'status stalls',
+    'success',
+    'manual recovery',
+    'manual concurrent',
+    'manual interrupted',
+    'manual disconnected',
+  ]) {
     test('diagnostic real service resume pipeline: $scenario', () async {
       binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       SharedPreferences.setMockInitialValues({'haptic_feedback': false});
@@ -156,6 +171,7 @@ void main() {
       final external = _ExternalCore()
         ..fgClient = CoreClient(front)
         ..bgClient = CoreClient(back);
+      final connected = StateProvider<bool>((ref) => true);
       final container = ProviderContainer(
         overrides: [
           environmentProvider.overrideWithValue(Environment.prod),
@@ -164,7 +180,7 @@ void main() {
           inAppNotificationControllerProvider.overrideWith((ref) => _Notifications()),
           hiddifyCoreServiceProvider.overrideWith((ref) => _Service(ref, external)),
           iosActiveProxyMeasurementEnabledProvider.overrideWithValue(true),
-          serviceRunningProvider.overrideWith((ref) => true),
+          serviceRunningProvider.overrideWith((ref) => ref.watch(connected)),
           proxyRepositoryProvider.overrideWith(
             (ref) => ProxyRepositoryImpl(
               singbox: ref.watch(hiddifyCoreServiceProvider),
@@ -176,6 +192,7 @@ void main() {
       final service = container.read(hiddifyCoreServiceProvider);
       Future<void>? pendingResume;
       addTearDown(() async {
+        if (external.setupGate?.isCompleted == false) external.setupGate!.complete();
         if (endpoint.closeGate?.isCompleted == false) endpoint.closeGate!.complete(Empty());
         if (external.statusGate?.isCompleted == false) external.statusGate!.complete(const CoreStatus.started());
         if (pendingResume != null) await pendingResume.timeout(const Duration(seconds: 3));
@@ -205,7 +222,15 @@ void main() {
       expect(original.state.proxy!.urlTestDelay, 84, reason: 'Numeric ping exists BEFORE lock');
       final generation = container.read(coreRestartSignalProvider);
       if (scenario == 'close stalls') endpoint.closeGate = Completer<Empty>();
-      if (scenario == 'setup rejects') external.setupResult = 'synthetic setup failure';
+      if (scenario == 'setup rejects' || scenario.startsWith('manual ')) {
+        external.setupResult = 'synthetic setup failure';
+      }
+      if (scenario == 'classified rejection') {
+        external.setupError = const IosCoreSetupException(
+          IosCoreSetupCode.vpnPreferencesFailed,
+          stage: IosCoreSetupStage.nativeSetup,
+        );
+      }
       if (scenario == 'status stalls') external.statusGate = Completer<CoreStatus?>();
       binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
       final inactivePause = service.pause();
@@ -236,13 +261,16 @@ void main() {
           reason: 'Trace identifies the external close boundary holding the queue',
         );
         expect(names, isNot(contains('coreResumeStarted')));
-      } else if (scenario == 'setup rejects') {
+      } else if (scenario == 'setup rejects' || scenario == 'classified rejection') {
         expect(
           names,
-          containsAllInOrder(['coreResumeStarted', 'coreSetupFailed', 'coreResumeCompleted']),
-          reason: 'Trace distinguishes a swallowed setup failure from a hanging queue',
+          containsAllInOrder(['coreResumeStarted', 'coreSetupFailed', 'coreResumeFailed']),
+          reason: 'Trace reports a failed recovery rather than successful completion',
         );
         expect(names, isNot(contains('coreRestarted')));
+        if (scenario == 'classified rejection') {
+          expect(names, containsAllInOrder(['coreSetupNativeFailed', 'coreSetupPreferencesFailed', 'coreSetupFailed']));
+        }
       } else if (scenario == 'status stalls') {
         expect(
           names,
@@ -251,6 +279,9 @@ void main() {
         );
         expect(names, isNot(contains('coreSetupStatusReady')));
         expect(names, isNot(contains('coreResumeCompleted')));
+      } else if (scenario.startsWith('manual ')) {
+        expect(names, contains('coreSetupFailed'));
+        expect(names, isNot(contains('coreRestarted')));
       } else {
         expect(
           names,
@@ -274,7 +305,62 @@ void main() {
         expect(event['operation_id'], resumeId, reason: 'Queue lifecycle stages correlate to one operation');
       }
 
-      if (scenario == 'success') {
+      if (scenario == 'manual concurrent' || scenario == 'manual interrupted' || scenario == 'manual disconnected') {
+        external.setupResult = '';
+        external.setupGate = Completer<void>();
+        final first = container.read(activeProxyNotifierProvider.notifier).urlTest('');
+        final outcome = first.then<Object?>((_) => null, onError: (Object error, StackTrace _) => error);
+        final second = scenario == 'manual concurrent'
+            ? container.read(activeProxyNotifierProvider.notifier).urlTest('')
+            : Future<void>.value();
+        await _until(() => external.setups == 2);
+        Future<void>? paused;
+        if (scenario == 'manual interrupted') {
+          binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+          paused = service.pause();
+        } else if (scenario == 'manual disconnected') {
+          container.read(connected.notifier).state = false;
+          await Future<void>.delayed(Duration.zero);
+        }
+        external.setupGate!.complete();
+        final error = await outcome;
+        await second;
+        if (paused != null) await paused;
+        if (scenario == 'manual concurrent') {
+          expect(error, isNull);
+          expect(external.setups, 2, reason: 'Concurrent taps share one recovery');
+          await _until(() => endpoint.requests == 2 && endpoint.listeners == 2);
+          endpoint.publish();
+          await _until(
+            () => container.read(iosActiveProxyMeasurementProvider).state.phase == IosProxyMeasurementPhase.available,
+          );
+          expect(endpoint.requests, 2, reason: 'Concurrent recovery starts exactly one measurement');
+        } else {
+          expect(error, scenario == 'manual interrupted' ? isA<HiddifyCoreInitializationException>() : isNull);
+          await Future<void>.delayed(Duration.zero);
+          expect(endpoint.requests, 1, reason: 'Interrupted/disconnected recovery cannot start a measurement');
+        }
+      } else if (scenario == 'manual recovery') {
+        external.setupResult = '';
+        await container.read(activeProxyNotifierProvider.notifier).urlTest('');
+        expect(external.setups, 2, reason: 'Tap must retry failed foreground setup');
+        final recoveredEvents = container.read(iosPingTraceProvider).snapshot.events.map((entry) => entry.event.name);
+        expect(recoveredEvents, contains('refreshRecoveryCompleted'));
+        expect(
+          recoveredEvents,
+          isNot(contains('refreshCompleted')),
+          reason: 'Recovered readiness is distinct from a completed ping',
+        );
+        await _until(() => endpoint.requests == 2 && endpoint.listeners == 2);
+        expect(container.read(coreRestartSignalProvider), generation + 1);
+        expect(identical(original, container.read(iosActiveProxyMeasurementProvider)), false);
+        endpoint.publish();
+        await _until(
+          () => container.read(iosActiveProxyMeasurementProvider).state.phase == IosProxyMeasurementPhase.available,
+        );
+        expect(container.read(iosActiveProxyMeasurementProvider).state.proxy!.urlTestDelay, 84);
+        expect(endpoint.requests, 2, reason: 'Recovery produces exactly one measurement');
+      } else if (scenario == 'success') {
         await _until(() => endpoint.requests == 2 && endpoint.listeners == 2);
         expect(container.read(coreRestartSignalProvider), generation + 1);
         expect(identical(original, container.read(iosActiveProxyMeasurementProvider)), false);
@@ -288,10 +374,17 @@ void main() {
         expect(original.canRefresh, false);
         expect(original.state.phase, IosProxyMeasurementPhase.idle);
         final requests = endpoint.requests;
-        await container.read(activeProxyNotifierProvider.notifier).urlTest('');
-        expect(endpoint.requests, requests, reason: 'Tap returned without issuing a request');
-        expect(completed, scenario == 'setup rejects');
-        expect(external.setups, scenario == 'close stalls' ? 0 : 1);
+        if (scenario == 'setup rejects' || scenario == 'classified rejection') {
+          await expectLater(
+            container.read(activeProxyNotifierProvider.notifier).urlTest(''),
+            throwsA(isA<HiddifyCoreInitializationException>()),
+          );
+          expect(external.setups, 2, reason: 'Manual retry attempts setup once more');
+        } else {
+          expect(external.setups, scenario == 'close stalls' ? 0 : 1);
+        }
+        expect(endpoint.requests, requests, reason: 'No measurement request before foreground readiness');
+        expect(completed, scenario == 'setup rejects' || scenario == 'classified rejection');
       }
     });
   }

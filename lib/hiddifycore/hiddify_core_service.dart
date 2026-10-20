@@ -14,6 +14,7 @@ import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
 import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
+import 'package:hiddify/hiddifycore/core_interface/core_interface_mobile.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
@@ -39,6 +40,10 @@ final class HiddifyCoreInitializationException implements Exception {
   String toString() => 'HiddifyCoreInitializationException';
 }
 
+final class _ForegroundReadinessException implements Exception {
+  const _ForegroundReadinessException();
+}
+
 class HiddifyCoreService with InfraLogger {
   HiddifyCoreService(this.ref);
   final Ref ref;
@@ -54,6 +59,9 @@ class HiddifyCoreService with InfraLogger {
   List<OutboundGroup> latest = [];
 
   Future<void> _lifecycle = Future.value();
+  int _foregroundGeneration = 0;
+  Future<bool>? _foregroundReadiness;
+  int? _foregroundReadinessGeneration;
   int _pauseTraceOperationId = 0;
   StreamSubscription<CoreStatus>? _systemStatusSubscription;
   int _systemStatusRevision = 0;
@@ -62,14 +70,49 @@ class HiddifyCoreService with InfraLogger {
   CoreStatus? _deferredSystemStatus;
   CoreStopped? _appStartCoreFailure;
 
-  Future<void> pause() => _queueLifecycle(() async {
-    _recordPingTrace(IosPingEvent.corePauseStatusCancel, operationId: _pauseTraceOperationId);
-    await _stopSystemStatusSync();
-    _recordPingTrace(IosPingEvent.corePauseCloseFront, operationId: _pauseTraceOperationId);
-    await closeFront();
-  }, pausing: true);
+  Future<void> pause() {
+    _foregroundGeneration++;
+    return _queueLifecycle(() async {
+      _recordPingTrace(IosPingEvent.corePauseStatusCancel, operationId: _pauseTraceOperationId);
+      await _stopSystemStatusSync();
+      _recordPingTrace(IosPingEvent.corePauseCloseFront, operationId: _pauseTraceOperationId);
+      await closeFront();
+    }, pausing: true);
+  }
 
-  Future<void> resume() => _queueLifecycle(init);
+  Future<void> resume() async {
+    if (!core.supportsSystemStatus) return _queueLifecycle(init);
+    await ensureForegroundReady();
+  }
+
+  Future<bool> ensureForegroundReady() {
+    if (!core.supportsSystemStatus) {
+      return _queueLifecycle(init).then((_) => true);
+    }
+
+    final generation = _foregroundGeneration;
+    final current = _foregroundReadiness;
+    if (current != null && _foregroundReadinessGeneration == generation) return current;
+
+    late final Future<bool> readiness;
+    readiness =
+        _queueLifecycle(() async {
+          if (generation != _foregroundGeneration) throw const _ForegroundReadinessException();
+          final result = await setup().run();
+          if (result.isLeft() || generation != _foregroundGeneration) {
+            throw const _ForegroundReadinessException();
+          }
+          _publishCoreRestart();
+        }).then((_) => true, onError: (Object _, StackTrace _) => false).whenComplete(() {
+          if (identical(_foregroundReadiness, readiness)) {
+            _foregroundReadiness = null;
+            _foregroundReadinessGeneration = null;
+          }
+        });
+    _foregroundReadiness = readiness;
+    _foregroundReadinessGeneration = generation;
+    return readiness;
+  }
 
   Future<void> _queueLifecycle(Future<void> Function() operation, {bool pausing = false}) {
     final next = core.supportsSystemStatus
@@ -170,11 +213,15 @@ class HiddifyCoreService with InfraLogger {
           ref.read(inAppNotificationControllerProvider).showErrorToast(e);
         })
         .map((_) {
-          loggy.info("Hiddify-core setup done");
-          ref.read(coreRestartSignalProvider.notifier).restart();
-          _recordPingTrace(IosPingEvent.coreRestarted);
+          _publishCoreRestart();
         })
         .run();
+  }
+
+  void _publishCoreRestart() {
+    loggy.info("Hiddify-core setup done");
+    ref.read(coreRestartSignalProvider.notifier).restart();
+    _recordPingTrace(IosPingEvent.coreRestarted);
   }
 
   /// validates config by path and save it
@@ -247,6 +294,23 @@ class HiddifyCoreService with InfraLogger {
         // ref.read(coreRestartSignalProvider.notifier).restart();
         return right(unit);
       } catch (e) {
+        if (e is IosCoreSetupException) {
+          final stageEvent = switch (e.stage) {
+            IosCoreSetupStage.firstHello => IosPingEvent.coreSetupFirstHelloFailed,
+            IosCoreSetupStage.nativeSetup => IosPingEvent.coreSetupNativeFailed,
+            IosCoreSetupStage.secondHello => IosPingEvent.coreSetupSecondHelloFailed,
+            IosCoreSetupStage.unknown => null,
+          };
+          if (stageEvent != null) _recordPingTrace(stageEvent, operationId: traceId);
+          final codeEvent = switch (e.code) {
+            IosCoreSetupCode.helloTimedOut => IosPingEvent.coreSetupHelloTimedOut,
+            IosCoreSetupCode.nativeSetupTimedOut => IosPingEvent.coreSetupNativeTimedOut,
+            IosCoreSetupCode.nativeSetupFailed => IosPingEvent.coreSetupNativeFailed,
+            IosCoreSetupCode.vpnPreferencesFailed => IosPingEvent.coreSetupPreferencesFailed,
+            IosCoreSetupCode.helloFailed => IosPingEvent.coreSetupHelloFailed,
+          };
+          if (codeEvent != stageEvent) _recordPingTrace(codeEvent, operationId: traceId);
+        }
         _recordPingTrace(IosPingEvent.coreSetupFailed, operationId: traceId);
         return left(e.toString());
       }

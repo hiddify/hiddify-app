@@ -82,25 +82,26 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     "lib/features/diagnostics/observed_connection_repository.dart" => "8bd1bdcc05099863f93641b08a16a21e3d3b209f0736ea1cb9df35fc922e8cb1",
     "lib/features/diagnostics/diagnostic_providers.dart" => "ccbd9164f42ef63602b640de0ce0c5e35f81bf2f3dcaafca07351ccd16a2be75",
     "lib/features/diagnostics/safe_diagnostics_page.dart" => "c37098445c7695843663ed5514055f388092348a56fad4b9c48e12427bd23d72",
-    "lib/features/diagnostics/ios_ping_trace.dart" => "097eb76527001544c46fd74eb6b94132e27ef857245e300c2adc6fe7dfb73ab4",
+    "lib/features/diagnostics/ios_ping_trace.dart" => "50e1f79431184b8bfb5ade227f99650383a495836f1eb2ba8c7d7fe44b01e0ad",
   }.freeze
 
   # Exact reviewed iOS active-proxy measurement sources; no directory allowance.
   IOS_MEASUREMENT_SOURCE_SHA256 = {
-    "lib/features/proxy/active/active_proxy_notifier.dart" => ["d1c13a0efac2e778de8e7a3d74bdfb97518aeba4cf1ed036c70051d44f9d1529", "edf963a79fc55c445066287ee32b468fce29c200a5adfbdce93241a420314198"],
-    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "d0ed5bf538234010f4f68f2e5786c2edee92fbfb50fe7655ae1e74240f9fe9bd"],
+    "lib/features/proxy/active/active_proxy_notifier.dart" => ["d1c13a0efac2e778de8e7a3d74bdfb97518aeba4cf1ed036c70051d44f9d1529", "9a6b08f9ca02a6c997f445a4309a7de13190f9508915870bcb1f0206c4807290"],
+    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "bcab8cc4435e264908e1412da2c605f8c29c3d779269fc64149dde8622e62856"],
   }.freeze
   IOS_MEASUREMENT_NEW_SHA256 = {
     "lib/features/proxy/active/ios_active_proxy_measurement.dart" => "0d9ff5032920c61d11081a5dac2726d4f3ce1ee764e6c3b71e5b3493e0913708",
-    "lib/features/proxy/active/ios_active_proxy_measurement_providers.dart" => "c976dcc172dd599ce0349189ee1a2c20dc752abd9a3d91c45faf1f3afd578f33",
-    "lib/features/proxy/active/ios_active_proxy_delay_indicator.dart" => "56fbe46ef0810eb8f55cdc967b5e1515944d59336ed7bef188d8c88d6717c542",
+    "lib/features/proxy/active/ios_active_proxy_measurement_providers.dart" => "2fd3bfbe42f72594054ba06e3922acdaad08cf352712f6d41f393fc617a35e50",
+    "lib/features/proxy/active/ios_active_proxy_delay_indicator.dart" => "cf36861f1884a4fe209d4f91744295f93332330394171721d4c8ad46c10bb61b",
   }.freeze
 
   # Exact iOS startup recovery sources; no lifecycle/core directory allowance.
   IOS_STARTUP_SOURCE_SHA256 = {
     "lib/bootstrap.dart" => ["d035a1bec3386d5f1320cfc7ef7eec9f260621f5d2868706670efe71fcfb24e9", "c7c92337c2f9ece8f392ae851df0f15f8269a8c8367b0a4fafaa7ff9a2901fda"],
     "lib/features/app/widget/app.dart" => ["f3907fa99dcbe37c300f9c1c856d1ae18943754019193eda1a01dc6df3532390", "c3923577ee27bfa100cb2f1a3fdf687f611b988186eabc0dd2f758675c093b67"],
-    "lib/hiddifycore/core_interface/core_interface_mobile.dart" => ["e0672d710ce7341cde00e6543458e2ed6ab5a6948c389ff45dcc7788c19baf26", "51d7b3daf49b4b531a980290aaa7d9ff2ebc36b9c5b9924f29610d390da28b5d"],
+    "lib/hiddifycore/core_interface/core_interface_mobile.dart" => ["e0672d710ce7341cde00e6543458e2ed6ab5a6948c389ff45dcc7788c19baf26", "b264659ecd3744bc267d323a75a23615922ba36ea8e96bc5b7c6448105ebbfb2"],
+    "ios/Runner/Handlers/MethodHandler.swift" => ["288bcd062d01bd336e97346a0b160e5e45f772956380c1c7392b04a6771e0006", "0b31cee80b348c6e3cbf31bf0abc9187d58d0665ccbbde81758fd03813ae1195"],
   }.freeze
   IOS_STARTUP_NEW_SHA256 = {
     "lib/features/app/startup/ios_startup_gate.dart" => "9073defe1819cc9801ea3e3a5495947970c40ea60df175a664206c715a6a87db",

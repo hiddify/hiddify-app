@@ -123,7 +123,7 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
       final measurement = ref.read(iosActiveProxyMeasurementProvider);
       if (!measurement.canRefresh) {
         recordIosPingEvent(ref, IosPingEvent.refreshCoreNotReady, operationId: operationId);
-        return;
+        return ref.read(iosForegroundRefreshRecoveryProvider)(operationId);
       }
       recordIosPingEvent(ref, IosPingEvent.hapticRequested, operationId: operationId);
       try {

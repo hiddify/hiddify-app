@@ -15,13 +15,15 @@ import 'package:hiddify/features/proxy/data/proxy_repository.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('post-resume closed refresh records core-not-ready without issuing a request', (tester) async {
+  testWidgets('failed foreground recovery is observable without issuing a measurement', (tester) async {
     final fixture = await _Fixture.mount(tester);
     await fixture.completeInitialMeasurement(tester);
     expect(fixture.measurement.state.phase, IosProxyMeasurementPhase.available);
@@ -33,10 +35,17 @@ void main() {
     expect(fixture.measurement.state.phase, IosProxyMeasurementPhase.idle);
     expect(fixture.measurement.canRefresh, false);
 
-    await fixture.container.read(activeProxyNotifierProvider.notifier).urlTest('');
+    await expectLater(
+      fixture.container.read(activeProxyNotifierProvider.notifier).urlTest(''),
+      throwsA(isA<HiddifyCoreInitializationException>()),
+    );
 
     final operation = fixture.operationEvents;
-    expect(operation.map((entry) => entry.event), [IosPingEvent.refreshTapped, IosPingEvent.refreshCoreNotReady]);
+    expect(operation.map((entry) => entry.event), [
+      IosPingEvent.refreshTapped,
+      IosPingEvent.refreshCoreNotReady,
+      IosPingEvent.refreshFailed,
+    ]);
     expect(operation.map((entry) => entry.operationId).toSet(), hasLength(1));
     expect(operation.first.operationId, greaterThan(0));
     expect(fixture.repository.requests, 1);
@@ -273,6 +282,14 @@ final class _Fixture {
         serviceRunningProvider.overrideWith((ref) => true),
         proxyRepositoryProvider.overrideWithValue(repository),
         hapticServiceProvider.overrideWith(_NoopHaptic.new),
+        hiddifyCoreServiceProvider.overrideWith((ref) {
+          final service = _UnavailableForeground(ref);
+          ref.onDispose(() {
+            unawaited(service.statusController.close());
+            unawaited(service.logController.close());
+          });
+          return service;
+        }),
         iosPingTraceProvider.overrideWithValue(trace),
       ],
     );
@@ -311,6 +328,13 @@ final class _Fixture {
     trace.dispose();
     await repository.events.close();
   }
+}
+
+final class _UnavailableForeground extends HiddifyCoreService {
+  _UnavailableForeground(super.ref);
+
+  @override
+  Future<bool> ensureForegroundReady() async => false;
 }
 
 final class _NoopHaptic extends HapticService {
