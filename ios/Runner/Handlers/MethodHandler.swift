@@ -93,7 +93,7 @@ public class MethodHandler: NSObject, FlutterPlugin {
                     opts.listen = "127.0.0.1:\(grpcPort)"
                     opts.secret = ""
                     opts.debug = false
-                    opts.mode = 4
+                    opts.mode = mode
                     opts.fixAndroidStack = false
                     MobileSetup(opts,
                         nil,

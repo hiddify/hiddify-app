@@ -19,15 +19,18 @@ import 'package:rxdart/rxdart.dart';
 
 final _logger = Loggy('FFIHiddifyCoreService');
 
-enum IosCoreSetupCode { helloTimedOut, nativeSetupTimedOut, nativeSetupFailed, helloFailed }
+enum IosCoreSetupCode { helloTimedOut, nativeSetupTimedOut, nativeSetupFailed, vpnPreferencesFailed, helloFailed }
+
+enum IosCoreSetupStage { unknown, firstHello, nativeSetup, secondHello }
 
 class IosCoreSetupException implements Exception {
-  const IosCoreSetupException(this.code);
+  const IosCoreSetupException(this.code, {this.stage = IosCoreSetupStage.unknown});
 
   final IosCoreSetupCode code;
+  final IosCoreSetupStage stage;
 
   @override
-  String toString() => 'IosCoreSetupException(${code.name})';
+  String toString() => 'IosCoreSetupException(${code.name},${stage.name})';
 }
 
 class CoreInterfaceMobile extends CoreInterface with InfraLogger {
@@ -78,11 +81,16 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
       options: ChannelOptions(credentials: credentials),
     );
     final hello = HelloClient(helloChannel);
+    var stage = IosCoreSetupStage.firstHello;
     _status.clean();
     try {
       // A timed-out native callback is still executing. Wait for that same
       // operation before probing readiness or issuing another native setup.
-      if (_pendingNativeSetup case final pending?) await _waitForNativeSetup(pending);
+      if (_pendingNativeSetup case final pending?) {
+        stage = IosCoreSetupStage.nativeSetup;
+        await _waitForNativeSetup(pending);
+        stage = IosCoreSetupStage.firstHello;
+      }
       try {
         await hello.sayHello(
           HelloRequest(name: 'test'),
@@ -90,11 +98,12 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
         );
       } on GrpcError catch (error) {
         if (error.code == StatusCode.deadlineExceeded) {
-          throw const IosCoreSetupException(IosCoreSetupCode.helloTimedOut);
+          throw IosCoreSetupException(IosCoreSetupCode.helloTimedOut, stage: stage);
         }
         if (error.code != StatusCode.unavailable) {
-          throw const IosCoreSetupException(IosCoreSetupCode.helloFailed);
+          throw IosCoreSetupException(IosCoreSetupCode.helloFailed, stage: stage);
         }
+        stage = IosCoreSetupStage.nativeSetup;
         final pending = methodChannel.invokeMethod<void>('setup', {
           'baseDir': directories.baseDir.path,
           'workingDir': directories.workingDir.path,
@@ -110,6 +119,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 
         unawaited(pending.then<void>((_) => clearPending(), onError: (Object _, StackTrace _) => clearPending()));
         await _waitForNativeSetup(pending);
+        stage = IosCoreSetupStage.secondHello;
         await hello.sayHello(
           HelloRequest(name: 'test'),
           options: CallOptions(timeout: iosSetupDeadline),
@@ -136,6 +146,7 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     } on GrpcError catch (error) {
       throw IosCoreSetupException(
         error.code == StatusCode.deadlineExceeded ? IosCoreSetupCode.helloTimedOut : IosCoreSetupCode.helloFailed,
+        stage: stage,
       );
     } finally {
       await helloChannel.terminate();
@@ -146,9 +157,14 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     try {
       await pending.timeout(iosSetupDeadline);
     } on TimeoutException {
-      throw const IosCoreSetupException(IosCoreSetupCode.nativeSetupTimedOut);
+      throw const IosCoreSetupException(IosCoreSetupCode.nativeSetupTimedOut, stage: IosCoreSetupStage.nativeSetup);
+    } on PlatformException catch (error) {
+      throw IosCoreSetupException(
+        error.code == 'SETUP' ? IosCoreSetupCode.vpnPreferencesFailed : IosCoreSetupCode.nativeSetupFailed,
+        stage: IosCoreSetupStage.nativeSetup,
+      );
     } catch (_) {
-      throw const IosCoreSetupException(IosCoreSetupCode.nativeSetupFailed);
+      throw const IosCoreSetupException(IosCoreSetupCode.nativeSetupFailed, stage: IosCoreSetupStage.nativeSetup);
     }
   }
 
