@@ -10,6 +10,8 @@ import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
+import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
+import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
@@ -52,6 +54,7 @@ class HiddifyCoreService with InfraLogger {
   List<OutboundGroup> latest = [];
 
   Future<void> _lifecycle = Future.value();
+  int _pauseTraceOperationId = 0;
   StreamSubscription<CoreStatus>? _systemStatusSubscription;
   int _systemStatusRevision = 0;
   bool _systemStatusAuthoritative = false;
@@ -60,17 +63,44 @@ class HiddifyCoreService with InfraLogger {
   CoreStopped? _appStartCoreFailure;
 
   Future<void> pause() => _queueLifecycle(() async {
+    _recordPingTrace(IosPingEvent.corePauseStatusCancel, operationId: _pauseTraceOperationId);
     await _stopSystemStatusSync();
+    _recordPingTrace(IosPingEvent.corePauseCloseFront, operationId: _pauseTraceOperationId);
     await closeFront();
-  });
+  }, pausing: true);
 
   Future<void> resume() => _queueLifecycle(init);
 
-  Future<void> _queueLifecycle(Future<void> Function() operation) {
-    final next = _lifecycle.then((_) => operation());
+  Future<void> _queueLifecycle(Future<void> Function() operation, {bool pausing = false}) {
+    final next = core.supportsSystemStatus
+        ? _tracedLifecycleOperation(operation, pausing: pausing)
+        : _lifecycle.then((_) => operation());
     // A failed request must not prevent a later resume from retrying.
     _lifecycle = next.then<void>((_) {}, onError: (Object _, StackTrace _) {});
     return next;
+  }
+
+  Future<void> _tracedLifecycleOperation(Future<void> Function() operation, {required bool pausing}) {
+    final id = _beginPingTrace(pausing ? IosPingEvent.corePauseQueued : IosPingEvent.coreResumeQueued);
+    return _lifecycle.then((_) async {
+      if (pausing) _pauseTraceOperationId = id;
+      _recordPingTrace(pausing ? IosPingEvent.corePauseStarted : IosPingEvent.coreResumeStarted, operationId: id);
+      try {
+        await operation();
+        _recordPingTrace(pausing ? IosPingEvent.corePauseCompleted : IosPingEvent.coreResumeCompleted, operationId: id);
+      } on Object {
+        _recordPingTrace(pausing ? IosPingEvent.corePauseFailed : IosPingEvent.coreResumeFailed, operationId: id);
+        rethrow;
+      } finally {
+        if (pausing) _pauseTraceOperationId = 0;
+      }
+    });
+  }
+
+  int _beginPingTrace(IosPingEvent event) => core.supportsSystemStatus ? beginIosPingOperation(ref, event) : 0;
+
+  void _recordPingTrace(IosPingEvent event, {int operationId = 0}) {
+    if (core.supportsSystemStatus) recordIosPingEvent(ref, event, operationId: operationId);
   }
 
   void _startSystemStatusSync() {
@@ -142,6 +172,7 @@ class HiddifyCoreService with InfraLogger {
         .map((_) {
           loggy.info("Hiddify-core setup done");
           ref.read(coreRestartSignalProvider.notifier).restart();
+          _recordPingTrace(IosPingEvent.coreRestarted);
         })
         .run();
   }
@@ -176,19 +207,25 @@ class HiddifyCoreService with InfraLogger {
 
   TaskEither<String, Unit> setup() {
     return TaskEither(() async {
+      final traceId = _beginPingTrace(IosPingEvent.coreSetupStarted);
       try {
         final directories = ref.read(appDirectoriesProvider).requireValue;
         final debug = ref.read(debugModeNotifierProvider);
         final snapshotRevision = _systemStatusRevision;
         _startSystemStatusSync();
+        _recordPingTrace(IosPingEvent.coreSetupFrontRequested, operationId: traceId);
         final setupResponse = await core.setup(directories, debug, 3);
 
         if (setupResponse.isNotEmpty) {
+          _recordPingTrace(IosPingEvent.coreSetupFailed, operationId: traceId);
           return left(setupResponse);
         }
+        _recordPingTrace(IosPingEvent.coreSetupFrontReady, operationId: traceId);
 
         try {
+          _recordPingTrace(IosPingEvent.coreSetupStatusRequested, operationId: traceId);
           final systemStatus = await core.getSystemStatus();
+          _recordPingTrace(IosPingEvent.coreSetupStatusReady, operationId: traceId);
           if (systemStatus != null) {
             if (core.supportsSystemStatus) _systemStatusAuthoritative = true;
             if (_systemStatusRevision == snapshotRevision) currentState = systemStatus;
@@ -198,6 +235,7 @@ class HiddifyCoreService with InfraLogger {
           rethrow;
         }
 
+        _recordPingTrace(IosPingEvent.coreSetupListenersRequested, operationId: traceId);
         await startListeningLogs("fg", core.fgClient);
         // await startListeningStatus("fg", core.fgClient);
         if (!core.isSingleChannel()) {
@@ -205,9 +243,11 @@ class HiddifyCoreService with InfraLogger {
         }
         statusController.add(currentState);
         await startListeningStatus("bg", core.bgClient);
+        _recordPingTrace(IosPingEvent.coreSetupCompleted, operationId: traceId);
         // ref.read(coreRestartSignalProvider.notifier).restart();
         return right(unit);
       } catch (e) {
+        _recordPingTrace(IosPingEvent.coreSetupFailed, operationId: traceId);
         return left(e.toString());
       }
     });
@@ -694,12 +734,16 @@ class HiddifyCoreService with InfraLogger {
       return;
     }
     if (!core.isSingleChannel()) {
+      _recordPingTrace(IosPingEvent.corePauseCancelFg, operationId: _pauseTraceOperationId);
       await stopListenSingle("fg");
+      _recordPingTrace(IosPingEvent.corePauseCancelBg, operationId: _pauseTraceOperationId);
       await stopListenSingle("bg");
       try {
+        _recordPingTrace(IosPingEvent.corePauseCloseNormal, operationId: _pauseTraceOperationId);
         await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL_INSECURE));
       } catch (e) {}
       try {
+        _recordPingTrace(IosPingEvent.corePauseCloseFfi, operationId: _pauseTraceOperationId);
         await core.fgClient.close(CloseRequest(mode: SetupMode.GRPC_NORMAL));
       } catch (e) {}
     }

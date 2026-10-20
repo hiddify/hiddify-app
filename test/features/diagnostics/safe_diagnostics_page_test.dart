@@ -116,6 +116,7 @@ void main() {
         'tickers_enabled': true,
         'lifecycle_state': 'resumed',
       },
+      'ios_ping': {'schema': 'wir-ios-ping-trace/v1', 'events': []},
       'events': [
         {
           'sequence': 1,

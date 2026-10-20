@@ -70,27 +70,29 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     lib/features/diagnostics/observed_connection_repository.dart
     lib/features/diagnostics/diagnostic_providers.dart
     lib/features/diagnostics/safe_diagnostics_page.dart
+    lib/features/diagnostics/ios_ping_trace.dart
   ].freeze
   DIAGNOSTIC_NEW_SHA256 = {
     "lib/core/logger/safe_log_record.dart" => "57137aee501d92bd54129bc3ce34814efabb2a96f6dd5deab5c48040019b183a",
     "lib/features/diagnostics/safe_diagnostic_event.dart" => "867a3fc3c57f729b0de11787f130e18ed2cabc66cbfd36a3344a3a9f1e7a66a6",
-    "lib/features/diagnostics/safe_diagnostic_journal.dart" => "3de4fcbb9856734766436b743717fc5be19b14a9da142f94d680ea1106773c85",
+    "lib/features/diagnostics/safe_diagnostic_journal.dart" => "2c7f158fc932b8310ea7e21228b4b44183aba6d5132c5759fde71f91db086078",
     "lib/features/diagnostics/home_presentation_snapshot.dart" => "2e816bf1093b990599747c3860138d489f1a520667c0bbb093ca930289913ded",
     "lib/features/diagnostics/home_presentation_providers.dart" => "43cb56211b4055a2ebf41abb2097d754be3f589d56b377f06c3450b6f3433602",
     "lib/features/diagnostics/home_presentation_probe.dart" => "f51164d3f3433f0ff3c9ebffdc82de291cc38382f93e7200c28f938bec5bc728",
     "lib/features/diagnostics/observed_connection_repository.dart" => "8bd1bdcc05099863f93641b08a16a21e3d3b209f0736ea1cb9df35fc922e8cb1",
-    "lib/features/diagnostics/diagnostic_providers.dart" => "b8757034cb108efe7be93b1f1eabf46b5be89a0e725653c82294b3d7ba9144d4",
-    "lib/features/diagnostics/safe_diagnostics_page.dart" => "c1604dd46656c39a8c38e5b3cf5b5d9ed343a08c41f23c9133c75aa5ac093d9c",
+    "lib/features/diagnostics/diagnostic_providers.dart" => "ccbd9164f42ef63602b640de0ce0c5e35f81bf2f3dcaafca07351ccd16a2be75",
+    "lib/features/diagnostics/safe_diagnostics_page.dart" => "c37098445c7695843663ed5514055f388092348a56fad4b9c48e12427bd23d72",
+    "lib/features/diagnostics/ios_ping_trace.dart" => "097eb76527001544c46fd74eb6b94132e27ef857245e300c2adc6fe7dfb73ab4",
   }.freeze
 
   # Exact reviewed iOS active-proxy measurement sources; no directory allowance.
   IOS_MEASUREMENT_SOURCE_SHA256 = {
-    "lib/features/proxy/active/active_proxy_notifier.dart" => ["d1c13a0efac2e778de8e7a3d74bdfb97518aeba4cf1ed036c70051d44f9d1529", "1f8299fb97d475961ee189cfd2b86844d054fd68dea3f7d171995300d7fdfab4"],
-    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "38b4aa7651974ef820d84a72122d38964801ed4d5e6ef0f89e65ae39f8edc1c0"],
+    "lib/features/proxy/active/active_proxy_notifier.dart" => ["d1c13a0efac2e778de8e7a3d74bdfb97518aeba4cf1ed036c70051d44f9d1529", "edf963a79fc55c445066287ee32b468fce29c200a5adfbdce93241a420314198"],
+    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "d0ed5bf538234010f4f68f2e5786c2edee92fbfb50fe7655ae1e74240f9fe9bd"],
   }.freeze
   IOS_MEASUREMENT_NEW_SHA256 = {
-    "lib/features/proxy/active/ios_active_proxy_measurement.dart" => "bf00d4020cf0b994d0dc253f48244c3e56bc28488e10a76b2fbb6607548abccd",
-    "lib/features/proxy/active/ios_active_proxy_measurement_providers.dart" => "17adb5c99a441aab29538568d7a2e06f2c39975016779e9729bc1145b2b218ea",
+    "lib/features/proxy/active/ios_active_proxy_measurement.dart" => "0d9ff5032920c61d11081a5dac2726d4f3ce1ee764e6c3b71e5b3493e0913708",
+    "lib/features/proxy/active/ios_active_proxy_measurement_providers.dart" => "c976dcc172dd599ce0349189ee1a2c20dc752abd9a3d91c45faf1f3afd578f33",
     "lib/features/proxy/active/ios_active_proxy_delay_indicator.dart" => "56fbe46ef0810eb8f55cdc967b5e1515944d59336ed7bef188d8c88d6717c542",
   }.freeze
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
+import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:rxdart/rxdart.dart';
@@ -8,6 +9,8 @@ import 'package:rxdart/rxdart.dart';
 enum IosProxyMeasurementPhase { idle, checking, available, unavailable, failed, timedOut }
 
 enum IosProxyMeasurementCode { requestFailed, streamFailed, timedOut, cancelled }
+
+typedef IosPingMeasurementObserver = void Function(IosPingEvent event, int operationId);
 
 class IosProxyMeasurementException implements Exception {
   const IosProxyMeasurementException(this.code);
@@ -32,16 +35,19 @@ class IosActiveProxyMeasurement {
     this.deadline = const Duration(seconds: 15),
     DateTime Function()? now,
     bool Function()? canRefresh,
+    IosPingMeasurementObserver? observer,
   }) : _watch = watch,
        _request = request,
        _now = now ?? DateTime.now,
-       _canRefresh = canRefresh;
+       _canRefresh = canRefresh,
+       _observer = observer;
 
   final Stream<Either<ProxyFailure, List<OutboundGroup>>> Function() _watch;
   final Future<void> Function() _request;
   final Duration deadline;
   final DateTime Function() _now;
   final bool Function()? _canRefresh;
+  final IosPingMeasurementObserver? _observer;
 
   final BehaviorSubject<IosProxyMeasurementState> _states = BehaviorSubject.seeded(
     const IosProxyMeasurementState(IosProxyMeasurementPhase.idle),
@@ -55,9 +61,11 @@ class IosActiveProxyMeasurement {
   OutboundInfo? _candidate;
   OutboundInfo? _attemptIdentity;
   DateTime? _requestStartedAt;
+  final Set<IosPingEvent> _observedStreamEvents = {};
   var _requestIssued = false;
   var _requestCompleted = false;
   var _epoch = 0;
+  var _operationId = 0;
   var _disposed = false;
 
   IosProxyMeasurementState get state => _states.value;
@@ -66,7 +74,7 @@ class IosActiveProxyMeasurement {
 
   bool get canRefresh => !_disposed && (_canRefresh?.call() ?? true);
 
-  Future<void> refresh() {
+  Future<void> refresh({int operationId = 0}) {
     if (!canRefresh) {
       return Future<void>.error(const IosProxyMeasurementException(IosProxyMeasurementCode.cancelled));
     }
@@ -74,6 +82,7 @@ class IosActiveProxyMeasurement {
     if (current != null) return current;
 
     _cancelResources();
+    _operationId = operationId;
     final epoch = ++_epoch;
     final completion = Completer<void>();
     _completion = completion;
@@ -82,6 +91,7 @@ class IosActiveProxyMeasurement {
     _candidate = null;
     _attemptIdentity = null;
     _requestStartedAt = null;
+    _observedStreamEvents.clear();
     _requestIssued = false;
     _requestCompleted = false;
     _emit(const IosProxyMeasurementState(IosProxyMeasurementPhase.checking));
@@ -92,6 +102,7 @@ class IosActiveProxyMeasurement {
         onError: (Object _, StackTrace _) => _onStreamError(epoch),
       );
     } catch (_) {
+      _observe(IosPingEvent.probeStreamFailed);
       _failAttempt(
         epoch,
         const IosProxyMeasurementException(IosProxyMeasurementCode.streamFailed),
@@ -131,11 +142,14 @@ class IosActiveProxyMeasurement {
 
   Future<void> _issueRequest(int epoch) async {
     if (!_isCurrent(epoch)) return;
+    final operationId = _operationId;
+    _observe(IosPingEvent.probeRequestIssued, operationId: operationId);
     _requestIssued = true;
     _requestStartedAt = _now();
     try {
       await _request();
     } catch (_) {
+      _observe(IosPingEvent.probeRequestFailed, operationId: operationId);
       _failAttempt(
         epoch,
         const IosProxyMeasurementException(IosProxyMeasurementCode.requestFailed),
@@ -143,6 +157,7 @@ class IosActiveProxyMeasurement {
       );
       return;
     }
+    _observe(IosPingEvent.probeRequestCompleted, operationId: operationId);
     if (!_isCurrent(epoch)) return;
     _requestCompleted = true;
     _tryComplete(epoch);
@@ -152,6 +167,7 @@ class IosActiveProxyMeasurement {
     if (!_isEpochCurrent(epoch)) return;
     event.match(
       (_) {
+        _observeStreamOnce(IosPingEvent.probeStreamFailed);
         if (_isCurrent(epoch)) {
           _failAttempt(
             epoch,
@@ -165,11 +181,13 @@ class IosActiveProxyMeasurement {
       (groups) {
         final proxy = _activeProxy(groups);
         if (proxy == null) {
+          _observeStreamOnce(IosPingEvent.probeStreamEmpty);
           if (state.phase == IosProxyMeasurementPhase.available) {
             _invalidatePassive(epoch, IosProxyMeasurementPhase.unavailable);
           }
           return;
         }
+        _observeStreamOnce(IosPingEvent.probeStreamUsable);
         if (!_requestIssued) {
           _baseline = proxy;
           _attemptIdentity = proxy;
@@ -187,6 +205,7 @@ class IosActiveProxyMeasurement {
           return;
         }
         if (!_isFresh(proxy)) return;
+        _observeStreamOnce(IosPingEvent.probeSnapshotFresh);
         _candidate = proxy;
         _tryComplete(epoch);
       },
@@ -195,6 +214,7 @@ class IosActiveProxyMeasurement {
 
   void _onStreamError(int epoch) {
     if (!_isEpochCurrent(epoch)) return;
+    _observeStreamOnce(IosPingEvent.probeStreamFailed);
     if (_isCurrent(epoch)) {
       _failAttempt(
         epoch,
@@ -343,6 +363,26 @@ class IosActiveProxyMeasurement {
   bool _isEpochCurrent(int epoch) => !_disposed && epoch == _epoch;
 
   void _emit(IosProxyMeasurementState next) {
-    if (!_disposed && !_states.isClosed) _states.add(next);
+    if (_disposed || _states.isClosed) return;
+    _states.add(next);
+    final event = switch (next.phase) {
+      IosProxyMeasurementPhase.checking => IosPingEvent.measurementChecking,
+      IosProxyMeasurementPhase.available => IosPingEvent.measurementAvailable,
+      IosProxyMeasurementPhase.unavailable => IosPingEvent.measurementUnavailable,
+      IosProxyMeasurementPhase.failed => IosPingEvent.measurementFailed,
+      IosProxyMeasurementPhase.timedOut => IosPingEvent.measurementTimedOut,
+      IosProxyMeasurementPhase.idle => null,
+    };
+    if (event != null) _observe(event);
+  }
+
+  void _observeStreamOnce(IosPingEvent event) {
+    if (_observedStreamEvents.add(event)) _observe(event);
+  }
+
+  void _observe(IosPingEvent event, {int? operationId}) {
+    try {
+      _observer?.call(event, operationId ?? _operationId);
+    } catch (_) {}
   }
 }

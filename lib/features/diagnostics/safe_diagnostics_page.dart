@@ -20,6 +20,8 @@ class SafeDiagnosticsPage extends HookConsumerWidget {
     final journal = ref.watch(safeDiagnosticJournalProvider);
     final metadata = ref.watch(safeDiagnosticMetadataProvider);
     final homePresentation = ref.watch(homePresentationSnapshotProvider);
+    final pingTrace = ref.watch(iosPingTraceProvider);
+    final pingSnapshot = useStream(pingTrace.changes, initialData: pingTrace.snapshot).data ?? pingTrace.snapshot;
     final events = useStream(journal.changes, initialData: journal.events).data ?? journal.events;
     final message = useState<String?>(null);
     final refresh = useState(0);
@@ -27,6 +29,7 @@ class SafeDiagnosticsPage extends HookConsumerWidget {
       version: metadata.version,
       buildNumber: metadata.buildNumber,
       homePresentation: homePresentation,
+      iosPing: pingSnapshot,
     );
 
     useEffect(() {
@@ -51,6 +54,7 @@ class SafeDiagnosticsPage extends HookConsumerWidget {
 
     Future<void> clearReport() async {
       journal.clear();
+      pingTrace.clear();
       await journal.flush();
       if (context.mounted) refresh.value++;
     }
@@ -80,7 +84,7 @@ class SafeDiagnosticsPage extends HookConsumerWidget {
             padding: const EdgeInsets.all(16),
             children: [
               Text(t.description),
-              if (events.isEmpty) ...[const SizedBox(height: 16), Text(t.empty)],
+              if (events.isEmpty && pingSnapshot.events.isEmpty) ...[const SizedBox(height: 16), Text(t.empty)],
               if (journal.persistenceFailed) ...[
                 const SizedBox(height: 16),
                 Text(t.storageError, style: TextStyle(color: Theme.of(context).colorScheme.error)),

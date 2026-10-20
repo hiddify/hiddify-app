@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
+import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
@@ -21,6 +23,7 @@ final iosActiveProxyMeasurementProvider = Provider<IosActiveProxyMeasurement>((r
   ref.watch(coreRestartSignalProvider);
   final running = ref.watch(serviceRunningProvider).asData?.value == true;
   final repository = ref.watch(proxyRepositoryProvider);
+  final operationId = beginIosPingOperation(ref, IosPingEvent.measurementCreated);
   var coreReady = running && _foreground;
   final measurement = IosActiveProxyMeasurement(
     canRefresh: () => coreReady,
@@ -28,15 +31,24 @@ final iosActiveProxyMeasurementProvider = Provider<IosActiveProxyMeasurement>((r
     request: () async {
       await repository.urlTest('').getOrElse((failure) => throw failure).run();
     },
+    observer: (event, operationId) => recordIosPingEvent(ref, event, operationId: operationId),
   );
-  final lifecycle = _MeasurementLifecycle(measurement, () => coreReady = false);
+  recordIosPingEvent(
+    ref,
+    coreReady ? IosPingEvent.measurementReady : IosPingEvent.measurementBlocked,
+    operationId: operationId,
+  );
+  final lifecycle = _MeasurementLifecycle(measurement, () {
+    coreReady = false;
+    recordIosPingEvent(ref, IosPingEvent.measurementSuspended, operationId: operationId);
+  });
   WidgetsBinding.instance.addObserver(lifecycle);
   ref.onDispose(() {
     WidgetsBinding.instance.removeObserver(lifecycle);
     measurement.dispose();
   });
   if (running && _foreground) {
-    unawaited(measurement.refresh().catchError((Object _) {}));
+    unawaited(measurement.refresh(operationId: operationId).catchError((Object _) {}));
   }
   return measurement;
 });
