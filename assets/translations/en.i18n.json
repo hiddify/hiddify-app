@@ -641,11 +641,11 @@
       "disable": "Don't show again"
     },
     "noActiveProfile": {
-      "title": "Choose a profile",
-      "msg": "Let's get started by adding a connection profile that includes your VPN connection details.\n\nDon’t have a VPN server yet? No worries—just follow the tutorial below to set one up quickly and for free.",
+      "title": "Add your subscription",
+      "msg": "Get your personal SpriteNet key in our Telegram bot, then open the link from the bot or paste the key here.",
       "helpBtn": {
-        "label": "Show me how",
-        "url": "https://hiddify.com/manager/"
+        "label": "Open Telegram bot",
+        "url": "https://t.me/DsitWork"
       }
     },
     "unknownDomainsWarning": {

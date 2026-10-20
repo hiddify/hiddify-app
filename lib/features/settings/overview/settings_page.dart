@@ -164,16 +164,8 @@ class SettingsPage extends HookConsumerWidget {
             icon: Icons.dns_rounded,
             namedLocation: context.namedLocation('dnsOptions'),
           ),
-          SettingsSection(
-            title: t.pages.settings.inbound.title,
-            icon: Icons.input_rounded,
-            namedLocation: context.namedLocation('inboundOptions'),
-          ),
-          SettingsSection(
-            title: t.pages.settings.tlsTricks.title,
-            icon: Icons.content_cut_rounded,
-            namedLocation: context.namedLocation('tlsTricks'),
-          ),
+          // SpriteNet: inbound, TLS tricks and WARP sections are hidden to keep the app simple for end users.
+          // Their routes still exist, so they can be brought back by re-adding the sections here.
           if (PlatformUtils.isIOS)
             Material(
               child: ListTile(
@@ -184,12 +176,8 @@ class SettingsPage extends HookConsumerWidget {
                 },
               ),
             ),
+          // SpriteNet: the system logs page is not shown to end users.
           if (Breakpoint(context).isMobile()) ...[
-            SettingsSection(
-              title: t.pages.logs.title,
-              icon: Icons.description_rounded,
-              namedLocation: context.namedLocation('logs'),
-            ),
             SettingsSection(
               title: t.pages.about.title,
               icon: Icons.info_rounded,
