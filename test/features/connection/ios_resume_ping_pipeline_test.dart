@@ -144,6 +144,8 @@ void main() {
     'close stalls',
     'setup rejects',
     'classified rejection',
+    'second hello unavailable',
+    'second hello denied',
     'status stalls',
     'success',
     'manual recovery',
@@ -231,6 +233,14 @@ void main() {
           stage: IosCoreSetupStage.nativeSetup,
         );
       }
+      if (scenario.startsWith('second hello ')) {
+        external.setupError = IosCoreSetupException(
+          IosCoreSetupCode.helloFailed,
+          stage: IosCoreSetupStage.secondHello,
+          grpcStatusCode: scenario.endsWith('unavailable') ? StatusCode.unavailable : StatusCode.permissionDenied,
+          foregroundListenerReachable: scenario.endsWith('denied'),
+        );
+      }
       if (scenario == 'status stalls') external.statusGate = Completer<CoreStatus?>();
       binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
       final inactivePause = service.pause();
@@ -261,7 +271,9 @@ void main() {
           reason: 'Trace identifies the external close boundary holding the queue',
         );
         expect(names, isNot(contains('coreResumeStarted')));
-      } else if (scenario == 'setup rejects' || scenario == 'classified rejection') {
+      } else if (scenario == 'setup rejects' ||
+          scenario == 'classified rejection' ||
+          scenario.startsWith('second hello ')) {
         expect(
           names,
           containsAllInOrder(['coreResumeStarted', 'coreSetupFailed', 'coreResumeFailed']),
@@ -270,6 +282,18 @@ void main() {
         expect(names, isNot(contains('coreRestarted')));
         if (scenario == 'classified rejection') {
           expect(names, containsAllInOrder(['coreSetupNativeFailed', 'coreSetupPreferencesFailed', 'coreSetupFailed']));
+        }
+        if (scenario.startsWith('second hello ')) {
+          expect(
+            names,
+            containsAllInOrder([
+              'coreSetupSecondHelloFailed',
+              'coreSetupHelloFailed',
+              scenario.endsWith('unavailable') ? 'coreSetupGrpcUnavailable' : 'coreSetupGrpcPermissionDenied',
+              scenario.endsWith('denied') ? 'coreSetupLoopbackReachable' : 'coreSetupLoopbackUnreachable',
+              'coreSetupFailed',
+            ]),
+          );
         }
       } else if (scenario == 'status stalls') {
         expect(
@@ -374,7 +398,7 @@ void main() {
         expect(original.canRefresh, false);
         expect(original.state.phase, IosProxyMeasurementPhase.idle);
         final requests = endpoint.requests;
-        if (scenario == 'setup rejects' || scenario == 'classified rejection') {
+        if (scenario == 'setup rejects' || scenario == 'classified rejection' || scenario.startsWith('second hello ')) {
           await expectLater(
             container.read(activeProxyNotifierProvider.notifier).urlTest(''),
             throwsA(isA<HiddifyCoreInitializationException>()),
@@ -384,7 +408,10 @@ void main() {
           expect(external.setups, scenario == 'close stalls' ? 0 : 1);
         }
         expect(endpoint.requests, requests, reason: 'No measurement request before foreground readiness');
-        expect(completed, scenario == 'setup rejects' || scenario == 'classified rejection');
+        expect(
+          completed,
+          scenario == 'setup rejects' || scenario == 'classified rejection' || scenario.startsWith('second hello '),
+        );
       }
     });
   }

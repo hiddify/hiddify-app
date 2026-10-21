@@ -24,10 +24,17 @@ enum IosCoreSetupCode { helloTimedOut, nativeSetupTimedOut, nativeSetupFailed, v
 enum IosCoreSetupStage { unknown, firstHello, nativeSetup, secondHello }
 
 class IosCoreSetupException implements Exception {
-  const IosCoreSetupException(this.code, {this.stage = IosCoreSetupStage.unknown});
+  const IosCoreSetupException(
+    this.code, {
+    this.stage = IosCoreSetupStage.unknown,
+    int? grpcStatusCode,
+    this.foregroundListenerReachable,
+  }) : grpcStatusCode = grpcStatusCode != null && grpcStatusCode >= 0 && grpcStatusCode <= 16 ? grpcStatusCode : null;
 
   final IosCoreSetupCode code;
   final IosCoreSetupStage stage;
+  final int? grpcStatusCode;
+  final bool? foregroundListenerReachable;
 
   @override
   String toString() => 'IosCoreSetupException(${code.name},${stage.name})';
@@ -98,10 +105,10 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
         );
       } on GrpcError catch (error) {
         if (error.code == StatusCode.deadlineExceeded) {
-          throw IosCoreSetupException(IosCoreSetupCode.helloTimedOut, stage: stage);
+          throw IosCoreSetupException(IosCoreSetupCode.helloTimedOut, stage: stage, grpcStatusCode: error.code);
         }
         if (error.code != StatusCode.unavailable) {
-          throw IosCoreSetupException(IosCoreSetupCode.helloFailed, stage: stage);
+          throw IosCoreSetupException(IosCoreSetupCode.helloFailed, stage: stage, grpcStatusCode: error.code);
         }
         stage = IosCoreSetupStage.nativeSetup;
         final pending = methodChannel.invokeMethod<void>('setup', {
@@ -147,6 +154,11 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
       throw IosCoreSetupException(
         error.code == StatusCode.deadlineExceeded ? IosCoreSetupCode.helloTimedOut : IosCoreSetupCode.helloFailed,
         stage: stage,
+        grpcStatusCode: error.code,
+        // TCP reachability is diagnostic context, not proof of gRPC readiness.
+        foregroundListenerReachable: stage == IosCoreSetupStage.secondHello
+            ? await isPortOpen('127.0.0.1', portFront, timeout: const Duration(milliseconds: 300))
+            : null,
       );
     } finally {
       await helloChannel.terminate();

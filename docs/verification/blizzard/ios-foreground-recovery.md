@@ -31,3 +31,17 @@ Behavioral RED preceded native mode forwarding, manual retry and failure classif
 Independent source review found no substantiated P1/P2 issues. Synthetic tests do not establish the physical failure cause or actual tunnel traffic. Existing unbounded foreground Close RPC behavior is retained; the diagnostic stalled-close scenario remains distinguishable and is not claimed fixed by this change. Three historical standalone runtime-guard failures remain separate (VPNManager baseline fingerprint, unavailable baseline framework and aggregate protected diff); exact current-source negative controls remain strict.
 
 After the next exact TestFlight build, repeat the prolonged-lock duration that reproduced the bug several times, verify fresh numeric ping and manual retry, and capture the safe trace on any failure. Do not close the device defect after one short successful run.
+
+## Build 16 — preliminary physical feedback
+
+In response to the build 16 prolonged-lock acceptance request, the user reported “Пока вроде все работает”. No exact duration, repeat count or fresh safe report accompanied that response. This is preliminary improvement, not completed long-lock or network acceptance.
+
+The current iOS network protocol and results ledger are maintained in [2026-10-20-2214-ios-build16-network-acceptance-plan](../../plans/2026-10-20-2214-ios-build16-network-acceptance-plan.md).
+
+## Build 16 — failure reported 2026-10-21
+
+The user subsequently reported “Непредвиденная ошибка” in the ping indicator during connection and no internet. The safe report confirms build 16. Foreground setup operations 114/119/124 fail at second Hello (`coreSetupSecondHelloFailed`, `coreSetupHelloFailed`, `coreSetupFailed`), followed by `coreResumeFailed`. Native setup therefore returned before the failed second probe; the exact gRPC status is absent. All displayed elapsed_ms are saturated at 3600000 and provide no duration measurement. Home connected/valid-latency and final tunnel started are not traffic proof. The relation between foreground recovery failure and reported internet loss remains unproven. Network scenario N02 is blocked by this P1 investigation; the prior short OFF result remains scoped to its original run.
+
+System OFF restored internet, but a cold WIR restart and new connection did not clear the error. The user also reported missing country selection and clarified that Russian destinations remain accessible. This is partial connectivity evidence, not proof that every destination fails or that subscription data was deleted.
+
+The next patch rejects foreground settings UNAVAILABLE on iOS instead of misclassifying it as acceptable background absence. A real RPC RED test reproduced the false Right; background-before-start and non-iOS tolerance controls remain green. It also records canonical gRPC statuses as closed events and a bounded TCP reachability observation only after second-Hello failure. No private gRPC messages or metadata are included. The true refused-socket-to-native-start regression passes without changing channel reuse, so that hypothesis is not presented as the cause. Full Flutter regression: 663 passed; native setup-mode, manual policy and diagnostic privacy scripts passed. Physical recovery and traffic remain unverified.
