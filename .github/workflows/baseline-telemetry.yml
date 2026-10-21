@@ -1,0 +1,52 @@
+name: Baseline telemetry source checks
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  test:
+    runs-on: macos-15
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e
+        with:
+          flutter-version: 3.38.5
+          channel: stable
+          cache: true
+      - name: Generate prerequisites
+        run: |
+          flutter pub get --enforce-lockfile
+          dart --suppress-analytics run build_runner build --delete-conflicting-outputs
+          dart --suppress-analytics run slang
+          git diff --exit-code -- lib pubspec.lock
+      - name: Verify native Baseline privacy and lifecycle
+        run: |
+          bash test/ios/vpn_manager_manual_policy_test.sh
+          bash test/ios/foreground_setup_mode_test.sh
+          bash test/security/native_diagnostics_privacy_test.sh
+          ruby test/ci/ios_source_ci_scope_test.rb
+          ruby test/ci/ios_baseline_identity_inventory_test.rb
+          ruby test/ci/ios_baseline_signed_entitlements_test.rb
+          ruby test/ci/ios_baseline_release_test.rb
+          ruby test/ci/ios_baseline_workflow_test.rb
+      - name: Analyze telemetry changes
+        run: >-
+          flutter analyze --no-pub
+          lib/core/analytics/analytics_controller.dart
+          lib/core/model/environment.dart
+          lib/core/observability
+          lib/features/diagnostics/remote_diagnostic_subscription.dart
+          lib/features/diagnostics/safe_diagnostics_page.dart
+          test/core/observability
+          test/features/diagnostics/remote_diagnostic_subscription_test.dart
+      - name: Test complete Baseline application
+        run: flutter test

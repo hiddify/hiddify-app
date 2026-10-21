@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
 import 'package:hiddify/features/diagnostics/home_presentation_providers.dart';
@@ -64,6 +65,19 @@ class SafeDiagnosticsPage extends HookConsumerWidget {
         appBar: AppBar(
           title: Text(t.title),
           actions: [
+            IconButton(
+              key: const Key('safe-diagnostics-send-test'),
+              icon: const Icon(Icons.cloud_upload_outlined),
+              tooltip: Localizations.localeOf(context).languageCode == 'ru'
+                  ? 'Отправить тестовое событие' : 'Send test event',
+              onPressed: () {
+                final queued = ref.read(analyticsControllerProvider.notifier).sendTestEvent();
+                final russian = Localizations.localeOf(context).languageCode == 'ru';
+                message.value = queued
+                    ? (russian ? 'Событие поставлено в очередь отправки.' : 'Test event queued for delivery.')
+                    : (russian ? 'Удалённая диагностика выключена.' : 'Remote diagnostics are disabled.');
+              },
+            ),
             IconButton(
               key: const Key('safe-diagnostics-copy'),
               onPressed: copyReport,

@@ -4,6 +4,10 @@ enum Environment {
   prod,
   dev;
 
+  static const telemetryBeta = bool.fromEnvironment("telemetry_beta");
+  static const betterStackLogsURL = String.fromEnvironment("betterstack_logs_url");
+  static const betterStackSourceToken = String.fromEnvironment("betterstack_source_token");
+
   static const sentryDSN = String.fromEnvironment("sentry_dsn");
   // This environment variable is set in the 'windows-release-zip' command
   static const isPortable = bool.fromEnvironment("portable");
