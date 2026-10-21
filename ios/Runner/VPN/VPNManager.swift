@@ -111,14 +111,14 @@ class VPNManager: ObservableObject {
         }
     }
     
+    /// Enables the tunnel configuration so `startVPNTunnel` is allowed to run.
+    ///
+    /// On-Demand is intentionally not touched here: it is the user's choice, made
+    /// in the iOS Settings. Setting `isOnDemandEnabled = true` on every connect
+    /// overwrote the flag the user had just turned off.
     private func enableVPNManager() async throws {
         manager.isEnabled = true
-        let rule = NEOnDemandRuleConnect()
-        rule.interfaceTypeMatch = .any
-        rule.probeURL = URL(string: "http://captive.apple.com")
-        manager.onDemandRules = [rule]
-        manager.isOnDemandEnabled = true
-        
+
         do {
             try await manager.saveToPreferences()
             try await manager.loadFromPreferences()
@@ -217,19 +217,13 @@ class VPNManager: ObservableObject {
         connectTime = .now
     }
     
+    /// Stops the tunnel without touching the On-Demand configuration.
+    ///
+    /// The app never writes `isOnDemandEnabled` or `onDemandRules`: they belong to
+    /// the user and are edited in the iOS Settings. While On-Demand is on, keeping
+    /// the tunnel up is the system's job, so it may bring the tunnel back after this
+    /// call — that is the user's choice being honoured, not a failure.
     func disconnect() {
-        if manager.isOnDemandEnabled {
-            manager.isOnDemandEnabled = false
-            manager.onDemandRules = []
-            
-            manager.saveToPreferences { error in
-                if let error = error {
-                    print("save error:", error)
-                    return
-                }
-            }
-        }
-
 //        guard state == .connected else { return }
         manager.connection.stopVPNTunnel()
     }
