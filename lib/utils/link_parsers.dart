@@ -9,15 +9,8 @@ abstract class LinkParser {
   static String generateSubShareLink(String url, [String? name]) {
     final uri = Uri.tryParse(url);
     if (uri == null) return '';
-    final modifiedUri = Uri(
-      scheme: uri.scheme,
-      host: uri.host,
-      path: uri.path,
-      query: uri.query,
-      fragment: name ?? uri.fragment,
-    );
-    // return 'hiddify://import/$modifiedUri';
-    return '$modifiedUri';
+    // replace keeps port and userinfo, which the Uri constructor drops
+    return uri.replace(fragment: name).toString();
   }
 
   // protocols schemas
@@ -40,7 +33,10 @@ abstract class LinkParser {
     switch (uri.scheme) {
       case 'hiddify':
         if (queryParams.containsKey('url')) {
-          return (url: queryParams['url']!, name: queryParams['name'] ?? '');
+          // Doc form: hiddify://install-config?url=<uri>#<name> — the name lives
+          // in the fragment. Prefer an explicit `name=` param, else the fragment.
+          final name = (queryParams['name']?.isNotEmpty ?? false) ? queryParams['name']! : uri.fragment;
+          return (url: queryParams['url']!, name: name);
         } else {
           return (url: uri.path.substring(1) + (uri.hasQuery ? "?${uri.query}" : ""), name: uri.fragment);
         }

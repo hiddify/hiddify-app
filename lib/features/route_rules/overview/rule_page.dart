@@ -70,18 +70,22 @@ class RulePage extends HookConsumerWidget {
               ),
             ),
             SettingDivider(title: t.pages.settings.routing.routeRule.rule.onlyTunMode),
-            // SettingGenericList<String>(
-            //   title: RuleEnum.packageName.present(t),
-            //   values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.packageNames)),
-            //   onTap: () => Navigator.of(context).push(
-            //     MaterialPageRoute(
-            //       builder: (context) => AndroidAppsPage(ruleListOrder: ruleListOrder),
-            //       fullscreenDialog: true,
-            //     ),
-            //   ),
-            //   isPackageName: true,
-            //   showPlatformWarning: !PlatformUtils.isAndroid,
-            // ),
+            SettingGenericList<String>(
+              title: RuleEnum.packageName.present(t),
+              values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.packageNames)),
+              // other platforms can't list the installed apps, so they edit the names as text
+              onTap: () => PlatformUtils.isAndroid
+                  ? context.pushNamed('packageNames', pathParameters: {'orderId': ruleListOrder?.toString() ?? 'new'})
+                  : context.pushNamed(
+                      'genericList',
+                      pathParameters: {
+                        'orderId': ruleListOrder?.toString() ?? 'new',
+                        'ruleEnum': RuleEnum.packageName.name,
+                      },
+                    ),
+              isPackageName: true,
+              showPlatformWarning: !PlatformUtils.isAndroid,
+            ),
             SettingGenericList<String>(
               title: RuleEnum.processName.present(t),
               values: ref.watch(ruleNotifierProvider(ruleListOrder).select((value) => value.processNames)),

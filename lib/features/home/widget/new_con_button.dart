@@ -11,13 +11,13 @@ class CircleDesignWidget extends StatelessWidget {
   final String label;
 
   const CircleDesignWidget({
-    Key? key,
+    super.key,
     required this.animationValue,
     required this.color,
     required this.onTap,
     required this.enabled,
     required this.label,
-  }) : super(key: key);
+  });
   // GestureDetector(
   //       onTap: onTap,
   //       child: CustomPaint(
@@ -57,7 +57,7 @@ class CircleDesignWidget extends StatelessWidget {
               child: InkWell(
                 onTap: onTap,
                 child: Padding(
-                  padding: const EdgeInsets.all(0),
+                  padding: EdgeInsets.zero,
                   child: TweenAnimationBuilder(
                     tween: ColorTween(end: color),
                     duration: const Duration(milliseconds: 250),
@@ -100,7 +100,7 @@ class CirclePainter extends CustomPainter {
 
     // Outer circle (pulsing animation for connecting state)
     final Paint outerCirclePaint = Paint()
-      ..color = baseColor.withOpacity(0.15)
+      ..color = baseColor.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
     final double outerRadius = 84 * animationValue;
 
@@ -108,7 +108,7 @@ class CirclePainter extends CustomPainter {
 
     // Middle circle
     final Paint middleCirclePaint = Paint()
-      ..color = baseColor.withOpacity(.3)
+      ..color = baseColor.withValues(alpha: .3)
       ..style = PaintingStyle.fill;
     final double middleRadius = 60 * animationValue + (1 - animationValue) / 3;
     canvas.drawCircle(Offset(cx, cy), middleRadius, middleCirclePaint);
@@ -120,7 +120,7 @@ class CirclePainter extends CustomPainter {
         end: Alignment.bottomCenter,
         colors: innerCircleColor,
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: 36));
-    final double innerRadius = 36;
+    const double innerRadius = 36;
     canvas.drawCircle(Offset(cx, cy), innerRadius, innerCirclePaint);
 
     // Draw path and vertical line (same as original)

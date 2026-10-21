@@ -7,7 +7,9 @@
 
 import Foundation
 import HiddifyCore
+import Network
 import NetworkExtension
+import UserNotifications
 
 public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtocol {
     
@@ -20,7 +22,6 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
     }
 
     public func openTun(_ options: LibboxTunOptionsProtocol?, ret0_: UnsafeMutablePointer<Int32>?) throws {
-        NSLog("H?A1")
         try runBlocking { [self] in
             try await openTun0(options, ret0_)
         }
@@ -34,22 +35,26 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
             throw NSError(domain: "ExtensionPlatformInterface", code: 0, userInfo: [NSLocalizedDescriptionKey: String(localized: "Nil return pointer")])
         }
 
-//        let prefs = tunnel.overridePreferences ?? ExtensionProvider.OverridePreferences()
-        let autoRouteUseSubRangesByDefault = true//prefs.autoRouteUseSubRangesByDefault // await SharedPreferences.autoRouteUseSubRangesByDefault.get()
-        let excludeAPNs = false//prefs.excludeAPNsRoute //await SharedPreferences.excludeAPNsRoute.get()
-        let excludeDefaultRoute = false// prefs.excludeDefaultRoute
-        let systemProxyEnabled = false//prefs.systemProxyEnabled
+        let prefs = tunnel.overridePreferences ?? ExtensionProvider.OverridePreferences()
+        let autoRouteUseSubRangesByDefault = prefs.autoRouteUseSubRangesByDefault
+        let excludeAPNs = prefs.excludeAPNsRoute
+        let excludeDefaultRoute = prefs.excludeDefaultRoute
+        let systemProxyEnabled = prefs.systemProxyEnabled
 
         
         let settings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: "::1")
         if options.getAutoRoute() {
             settings.mtu = NSNumber(value: options.getMTU())
 
-           let dnsServer = try options.getDNSServerAddress()
-            let dnsSettings = NEDNSSettings(servers: [dnsServer.value,"fdfe:dcba:9876::1"])
-            dnsSettings.matchDomains = [""]
-            dnsSettings.matchDomainsNoSearch = true
-            settings.dnsSettings = dnsSettings
+            // the DNS servers of the TUN (none when its DNS mode is disabled), as sing-box-for-apple
+            let dnsEnabled = options.getDNSMode()?.value != LibboxDNSModeDisabled
+            var dnsServers: [String] = []
+            if dnsEnabled {
+                let dnsServerIterator = try options.getDNSServerAddress()
+                while dnsServerIterator.hasNext() {
+                    dnsServers.append(dnsServerIterator.next())
+                }
+            }
             
             var ipv4Address: [String] = []
             var ipv4Mask: [String] = []
@@ -153,6 +158,23 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
             ipv6Settings.includedRoutes = ipv6Routes
             ipv6Settings.excludedRoutes = ipv6ExcludeRoutes
             settings.ipv6Settings = ipv6Settings
+
+            // Hiddify's IPv6 fix: with an IPv6 TUN address, also offer an IPv6 DNS server (the TUN
+            // address; DNS to it is hijacked) when the core gave none, for IPv6-only networks
+            if dnsEnabled, let tunIPv6 = ipv6Address.first, !dnsServers.contains(where: { $0.contains(":") }) {
+                dnsServers.append(tunIPv6)
+            }
+            let dnsSettings: NEDNSSettings? = dnsServers.isEmpty ? nil : NEDNSSettings(servers: dnsServers)
+
+            // without a default route, the TUN's DNS must still answer every domain
+            let hasDefaultRoute = ipv4Routes.contains(where: {
+                $0.destinationAddress == "0.0.0.0" && $0.destinationSubnetMask == "0.0.0.0"
+            })
+            if !hasDefaultRoute {
+                dnsSettings?.matchDomains = [""]
+                dnsSettings?.matchDomainsNoSearch = true
+            }
+            settings.dnsSettings = dnsSettings
         }
 
         if options.isHTTPProxyEnabled() {
@@ -253,9 +275,11 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
     }
 
     private var nwMonitor: NWPathMonitor?
+    private var lastNetworkPath: String?
 
+    // the core needs the current physical interface (Wi-Fi/cellular) to bind its connections to,
+    // as sing-box-for-apple; it waits for the first update
     public func startDefaultInterfaceMonitor(_ listener: LibboxInterfaceUpdateListenerProtocol?) throws {
-        return
         guard let listener else {
             return
         }
@@ -274,7 +298,12 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
     }
 
     private func onUpdateDefaultInterface(_ listener: LibboxInterfaceUpdateListenerProtocol, _ path: Network.NWPath) {
-        return
+        let networkPath = describeNetworkPath(path)
+        listener.updateNetworkPath(networkPath)
+        if networkPath == lastNetworkPath {
+            return
+        }
+        lastNetworkPath = networkPath
         guard path.status != .unsatisfied,
               let defaultInterface = path.availableInterfaces.first
         else {
@@ -284,13 +313,49 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
         listener.updateDefaultInterface(defaultInterface.name, interfaceIndex: Int32(defaultInterface.index), isExpensive: path.isExpensive, isConstrained: path.isConstrained)
     }
 
+    private func describeNetworkPath(_ path: Network.NWPath) -> String {
+        var components: [String] = []
+        switch path.status {
+        case .satisfied:
+            components.append("satisfied")
+        case .unsatisfied:
+            components.append("unsatisfied(\(path.unsatisfiedReason))")
+        case .requiresConnection:
+            components.append("requiresConnection")
+        @unknown default:
+            components.append("unknown")
+        }
+        if !path.availableInterfaces.isEmpty {
+            components.append("interfaces=" + path.availableInterfaces.map { "\($0.name)#\($0.index)/\($0.type)" }.joined(separator: ","))
+        }
+        if !path.gateways.isEmpty {
+            components.append("gateways=" + path.gateways.map { "\($0)" }.sorted().joined(separator: ","))
+        }
+        if path.supportsIPv4 {
+            components.append("ipv4")
+        }
+        if path.supportsIPv6 {
+            components.append("ipv6")
+        }
+        if path.supportsDNS {
+            components.append("dns")
+        }
+        if path.isExpensive {
+            components.append("expensive")
+        }
+        if path.isConstrained {
+            components.append("constrained")
+        }
+        return components.joined(separator: " ")
+    }
+
     public func closeDefaultInterfaceMonitor(_: LibboxInterfaceUpdateListenerProtocol?) throws {
         nwMonitor?.cancel()
         nwMonitor = nil
+        lastNetworkPath = nil
     }
 
     public func getInterfaces() throws -> LibboxNetworkInterfaceIteratorProtocol {
-        throw NSError(domain: "not implemented", code: 0)
         guard let nwMonitor else {
             throw NSError(domain: "ExtensionPlatformInterface", code: 0, userInfo: [NSLocalizedDescriptionKey: String(localized: "NWMonitor not started")])
         }
@@ -344,8 +409,7 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
         #if os(tvOS)
             return false
         #else
-            return false
-//            return tunnel.overridePreferences?.includeAllNetworks ?? false
+            return tunnel.overridePreferences?.includeAllNetworks ?? false
         #endif
     }
 
@@ -460,13 +524,14 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
         guard let message else {
             return
         }
-//        tunnel.writeMessage(message)
+        NSLog("%@", message)
     }
 
     func reset() {
         networkSettings = nil
         nwMonitor?.cancel()
         nwMonitor = nil
+        lastNetworkPath = nil
     }
 
     public func send(_ notification: LibboxNotification?) throws {
@@ -474,28 +539,21 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
             guard let notification else {
                 return
             }
-            #if os(macOS)
-                if Variant.useSystemExtension {
-                    try UserServiceClient.shared.sendNotification(notification)
-                    return
-                }
-            #endif
-//            let center = UNUserNotificationCenter.current()
-//            let content = UNMutableNotificationContent()
-//
-//            content.title = notification.title
-//            content.subtitle = notification.subtitle
-//            content.body = notification.body
-//            if !notification.openURL.isEmpty {
-//                content.userInfo["OPEN_URL"] = notification.openURL
-//                content.categoryIdentifier = "OPEN_URL"
-//            }
-//            content.interruptionLevel = .active
-//            let request = UNNotificationRequest(identifier: notification.identifier, content: content, trigger: nil)
-//            try runBlocking {
-//                try await center.requestAuthorization(options: [.alert])
-//                try await center.add(request)
-//            }
+            let center = UNUserNotificationCenter.current()
+            let content = UNMutableNotificationContent()
+            content.title = notification.title
+            content.subtitle = notification.subtitle
+            content.body = notification.body
+            if !notification.openURL.isEmpty {
+                content.userInfo["OPEN_URL"] = notification.openURL
+                content.categoryIdentifier = "OPEN_URL"
+            }
+            content.interruptionLevel = .active
+            let request = UNNotificationRequest(identifier: notification.identifier, content: content, trigger: nil)
+            try runBlocking {
+                try await center.requestAuthorization(options: [.alert])
+                try await center.add(request)
+            }
         #endif
     }
 
@@ -508,4 +566,70 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
     }
     public func autoDetectControl(_: Int32) throws {}
 
+    // MARK: - not available in the packet tunnel extension
+
+    private func notSupported(_ feature: String) -> NSError {
+        NSError(domain: "ExtensionPlatformInterface", code: 0, userInfo: [NSLocalizedDescriptionKey: "\(feature) is not supported in the packet tunnel"])
+    }
+
+    public func usePlatformShell() -> Bool {
+        false
+    }
+
+    public func checkPlatformShell() throws {
+        throw notSupported("Platform shell")
+    }
+
+    public func lookupUser(_: String?) throws -> LibboxPlatformUser {
+        throw notSupported("User lookup")
+    }
+
+    public func openShellSession(_: LibboxPlatformUser?, command _: String?, environ _: (any LibboxStringIteratorProtocol)?, term _: String?, rows _: Int32, cols _: Int32) throws -> any LibboxShellSessionProtocol {
+        throw notSupported("Shell session")
+    }
+
+    public func lookupSFTPServer() throws -> LibboxStringBox {
+        throw notSupported("SFTP server")
+    }
+
+    public func readSystemSSHHostKey() throws -> LibboxStringBox {
+        throw notSupported("System SSH host key")
+    }
+
+    public func usePlatformBridge() -> Bool {
+        false
+    }
+
+    public func createBridge(_: LibboxBridgeOptions?) throws -> any LibboxBridgeSessionProtocol {
+        throw notSupported("Platform bridge")
+    }
+
+    public func usePlatformAutoRedirect() -> Bool {
+        false
+    }
+
+    public func createAutoRedirect(_: Data?, handler _: (any LibboxAutoRedirectHandlerProtocol)?) throws -> any LibboxAutoRedirectSessionProtocol {
+        throw notSupported("Auto redirect")
+    }
+
+    public func startNeighborMonitor(_: (any LibboxNeighborUpdateListenerProtocol)?) throws {}
+
+    public func closeNeighborMonitor(_: (any LibboxNeighborUpdateListenerProtocol)?) throws {}
+
+    public func registerMyInterface(_: String?) {}
+
+    public func cancelNotification(_ identifier: String?, typeID _: Int32) throws {
+        #if !os(tvOS)
+            guard let identifier else {
+                return
+            }
+            let center = UNUserNotificationCenter.current()
+            center.removePendingNotificationRequests(withIdentifiers: [identifier])
+            center.removeDeliveredNotifications(withIdentifiers: [identifier])
+        #endif
+    }
+
+    public func tailscaleHostname() -> String {
+        ProcessInfo.processInfo.hostName
+    }
 }

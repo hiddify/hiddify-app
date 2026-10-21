@@ -31,7 +31,7 @@ class ProfilesPage extends HookConsumerWidget {
         actions: [
           IconButton(
             onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
-            icon: const Icon(Icons.update_rounded),
+            icon: const Icon(Icons.sync_rounded),
             tooltip: t.pages.profiles.updateSubscriptions,
           ),
           IconButton(
@@ -51,7 +51,7 @@ class ProfilesPage extends HookConsumerWidget {
         data: (data) => ListView.separated(
           padding: const EdgeInsets.all(12).copyWith(bottom: 84),
           separatorBuilder: (context, index) => const Gap(12),
-          itemBuilder: (context, index) => ProfileTile(profile: data[index]),
+          itemBuilder: (context, index) => ProfileTile(key: ValueKey(data[index].id), profile: data[index]),
           itemCount: data.length,
         ),
         loading: () => const Center(child: CircularProgressIndicator()),

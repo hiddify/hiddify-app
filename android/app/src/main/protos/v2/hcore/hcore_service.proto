@@ -20,6 +20,11 @@ service Core {
   rpc StartService (StartRequest) returns (CoreInfoResponse);
   rpc Stop (hcommon.Empty) returns (CoreInfoResponse);
   rpc Restart (StartRequest) returns (CoreInfoResponse);
+  // Apply the config to the running core without restarting it: outbounds, endpoints, inbounds
+  // (not TUN), DNS servers/rules/final and route rules/rule sets/final may change. Anything else,
+  // or a changed TUN inbound, returns HOT_RELOAD_FAILED and leaves the core running unchanged.
+  // When the core is stopped, it is started like Start.
+  rpc HotReload (StartRequest) returns (CoreInfoResponse);
   rpc SelectOutbound (SelectOutboundRequest) returns (hcommon.Response);
   rpc UrlTest (UrlTestRequest) returns (hcommon.Response);
   rpc UrlTestActive (hcommon.Empty) returns (hcommon.Response);

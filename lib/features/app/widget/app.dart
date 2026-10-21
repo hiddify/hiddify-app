@@ -9,13 +9,14 @@ import 'package:hiddify/core/localization/locale_extensions.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/theme/app_theme.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
+import 'package:hiddify/features/app_based_routing/overview/app_based_routing_notifier.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
-import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_service_notifier.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/shortcut/shortcut_wrapper.dart';
 import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
@@ -23,7 +24,6 @@ import 'package:hiddify/features/window/widget/window_wrapper.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:toastification/toastification.dart';
 import 'package:upgrader/upgrader.dart';
 
 bool _debugAccessibility = false;
@@ -31,10 +31,6 @@ bool isOnPauseCalled = false;
 
 class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   const App({super.key});
-
-  void onInactive(WidgetRef ref) {
-    onPause(ref);
-  }
 
   void onPause(WidgetRef ref) {
     if (PlatformUtils.isDesktop) return;
@@ -47,7 +43,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     ref.read(hiddifyCoreServiceProvider).init();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (isOnPauseCalled && PlatformUtils.isAndroid) ref.invalidate(perAppProxyServiceProvider);
+      if (isOnPauseCalled && PlatformUtils.isAndroid) ref.invalidate(appBasedRoutingProvider);
       isOnPauseCalled = false;
     });
   }
@@ -63,7 +59,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     final activeBreakpoint = Breakpoint(context).activeBreakpoint;
 
     ref.listen(foregroundProfilesUpdateNotifierProvider, (_, _) {});
-    if (PlatformUtils.isAndroid) ref.listen(perAppProxyServiceProvider, (_, _) {});
+    if (PlatformUtils.isAndroid) ref.listen(appBasedRoutingProvider, (_, _) {});
     if (PlatformUtils.isDesktop) ref.listen(systemTrayNotifierProvider, (_, _) {});
 
     // updating ActiveBreakpointNotifier value
@@ -75,44 +71,45 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     }, [activeBreakpoint]);
     return WindowWrapper(
       ShortcutWrapper(
-        ToastificationWrapper(
-          child: ConnectionWrapper(
-            DynamicColorBuilder(
-              builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
-                return MaterialApp.router(
-                  routerConfig: router,
-                  locale: locale.flutterLocale,
-                  supportedLocales: AppLocaleUtils.supportedLocales,
-                  localizationsDelegates: GlobalMaterialLocalizations.delegates,
-                  debugShowCheckedModeBanner: false,
-                  themeMode: themeMode.flutterThemeMode,
-                  theme: theme.lightTheme(lightColorScheme),
-                  darkTheme: theme.darkTheme(darkColorScheme),
-                  title: Constants.appName,
-                  builder: (context, child) {
-                    final theme = Theme.of(context);
-                    child = UpgradeAlert(
+        ConnectionWrapper(
+          DynamicColorBuilder(
+            builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
+              return MaterialApp.router(
+                routerConfig: router,
+                scaffoldMessengerKey: appScaffoldMessengerKey,
+                locale: locale.flutterLocale,
+                supportedLocales: AppLocaleUtils.supportedLocales,
+                localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                debugShowCheckedModeBanner: false,
+                themeMode: themeMode.flutterThemeMode,
+                theme: theme.lightTheme(lightColorScheme),
+                darkTheme: theme.darkTheme(darkColorScheme),
+                title: Constants.appName,
+                builder: (context, child) {
+                  final theme = Theme.of(context);
+                  child = SnackBarHost(
+                    child: UpgradeAlert(
                       upgrader: upgrader,
                       navigatorKey: router.routerDelegate.navigatorKey,
                       child: child ?? const SizedBox(),
-                    );
-                    if (kDebugMode && _debugAccessibility) {
-                      return AccessibilityTools(checkFontOverflows: true, child: child);
-                    }
-                    return AnnotatedRegion<SystemUiOverlayStyle>(
-                      value: SystemUiOverlayStyle(
-                        statusBarColor: theme.scaffoldBackgroundColor,
-                        systemNavigationBarColor: theme.scaffoldBackgroundColor,
-                        systemNavigationBarIconBrightness: theme.brightness == Brightness.dark
-                            ? Brightness.light
-                            : Brightness.dark,
-                      ),
-                      child: child,
-                    );
-                  },
-                );
-              },
-            ),
+                    ),
+                  );
+                  if (kDebugMode && _debugAccessibility) {
+                    return AccessibilityTools(checkFontOverflows: true, child: child);
+                  }
+                  return AnnotatedRegion<SystemUiOverlayStyle>(
+                    value: SystemUiOverlayStyle(
+                      statusBarColor: theme.scaffoldBackgroundColor,
+                      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+                      systemNavigationBarIconBrightness: theme.brightness == Brightness.dark
+                          ? Brightness.light
+                          : Brightness.dark,
+                    ),
+                    child: child,
+                  );
+                },
+              );
+            },
           ),
         ),
       ),
@@ -182,19 +179,19 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   // }
 
   void setupStateListener(WidgetRef ref) {
-    final appLifecycleState = useAppLifecycleState();
-
     useEffect(() {
-      loggy.info("current app state");
-      loggy.info(appLifecycleState);
-      if (appLifecycleState == AppLifecycleState.paused) {
-        onPause(ref);
-      } else if (appLifecycleState == AppLifecycleState.inactive) {
-        onInactive(ref);
-      } else if (appLifecycleState == AppLifecycleState.resumed) {
-        onResume(ref);
+      // The engine calls the listener directly, so a pause is seen even when no frame is drawn in the
+      // background. Inactive (a dialog, the notification shade) is not a pause and closes nothing.
+      void handle(AppLifecycleState state) {
+        loggy.info("app state: $state");
+        if (state == AppLifecycleState.paused) onPause(ref);
+        if (state == AppLifecycleState.resumed) onResume(ref);
       }
-      return null;
-    }, [appLifecycleState]);
+
+      final initial = WidgetsBinding.instance.lifecycleState;
+      if (initial != null) handle(initial);
+      final listener = AppLifecycleListener(onStateChange: handle);
+      return listener.dispose;
+    }, const []);
   }
 }

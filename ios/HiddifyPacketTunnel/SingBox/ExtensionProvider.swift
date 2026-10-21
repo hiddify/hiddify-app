@@ -3,231 +3,148 @@ import HiddifyCore
 import NetworkExtension
 import os.log
 
+// Packet tunnel provider, following sing-box-for-apple's Library/Network/ExtensionProvider.swift,
+// adapted to Hiddify's model: the extension only sets up hiddify-core with its gRPC server
+// (MobileSetup); the app then starts the core through gRPC. The extension never starts the core
+// itself.
 open class ExtensionProvider: NEPacketTunnelProvider {
     public static let errorFile = FilePath.workingDirectory.appendingPathComponent("network_extension_error.log")
     private let logger = Logger(subsystem: "apple.hiddify.com.HiddifyPacketTunnel", category: "PacketTunnel")
-    
-//    private var commandServer: LibboxCommandServer!
-    private var systemProxyAvailable = false
-    private var systemProxyEnabled = false
+
     private var platformInterface: ExtensionPlatformInterface!
-    private var config: String!
+    public var tunnelOptions: [String: NSObject]?
+
+    // as sing-box-for-apple, with Hiddify's defaults; the app may override them in the start options
+    public struct OverridePreferences {
+        public var includeAllNetworks: Bool = false
+        public var systemProxyEnabled: Bool = false
+        public var excludeDefaultRoute: Bool = false
+        public var autoRouteUseSubRangesByDefault: Bool = true
+        public var excludeAPNsRoute: Bool = false
+    }
+
+    public var overridePreferences: OverridePreferences?
+
+    override public init() {
+        LibboxPrepareCrashSignalHandlers()
+        LibboxReinstallCrashSignalHandlers()
+        super.init()
+    }
+
+    private func applyStartOptions(_ options: [String: NSObject]?) {
+        tunnelOptions = options
+        let defaults = OverridePreferences()
+        func flag(_ key: String, _ fallback: Bool) -> Bool {
+            (options?[key] as? NSNumber)?.boolValue ?? fallback
+        }
+        overridePreferences = OverridePreferences(
+            includeAllNetworks: flag("includeAllNetworks", defaults.includeAllNetworks),
+            systemProxyEnabled: flag("systemProxyEnabled", defaults.systemProxyEnabled),
+            excludeDefaultRoute: flag("excludeDefaultRoute", defaults.excludeDefaultRoute),
+            autoRouteUseSubRangesByDefault: flag("autoRouteUseSubRangesByDefault", defaults.autoRouteUseSubRangesByDefault),
+            excludeAPNsRoute: flag("excludeAPNsRoute", defaults.excludeAPNsRoute)
+        )
+    }
 
     override open func startTunnel(options: [String: NSObject]?) async throws {
-        // Clear previous logs
         try? FileManager.default.removeItem(at: ExtensionProvider.errorFile)
-        try? FileManager.default.removeItem(at: FilePath.workingDirectory.appendingPathComponent("TestLog"))
-        
-        do {
-            writeMessage("(packet-tunnel) starting")
-            
-            // Extract options with better error handling
-            let disableMemoryLimit = false && (options?["DisableMemoryLimit"] as? NSString as? String ?? "NO") == "YES" 
-            let grpcServiceModePort = (options?["GrpcServiceModePort"] as? NSNumber)?.intValue ?? 17079
-            
-            let config = options?["Config"] as? NSString as? String ?? ""
-            
-            // guard let config = SingBox.setupConfig(config: config2) else {
-            //             writeFatalError("(packet-tunnel) error: config is invalid")
-            //             return
-            // }
-//            self.config = config
+        writeMessage("(packet-tunnel) starting")
+        applyStartOptions(options)
 
-            do {
-                try FileManager.default.createDirectory(at: FilePath.workingDirectory, withIntermediateDirectories: true)
-            } catch {
-                writeFatalError("(packet-tunnel) error: create working directory: \(error.localizedDescription)")
-                return
-            }
-            
-            // Ensure directories exist
+        let disableMemoryLimit = (options?["DisableMemoryLimit"] as? NSString as? String ?? "NO") == "YES"
+        let grpcServiceModePort = (options?["GrpcServiceModePort"] as? NSNumber)?.intValue ?? 17079
+
+        do {
             try createRequiredDirectories()
-            
-            // Log directory paths for debugging
-            let sharedDir = FilePath.sharedDirectory.relativePath
-            let workDir = FilePath.workingDirectory.relativePath
-            let cacheDir = FilePath.cacheDirectory.relativePath
-            if platformInterface == nil {
-                platformInterface = ExtensionPlatformInterface(self)
-            }
-            // Initialize mobile setup with error handling
-            var setupError: NSError?
-            let opts = MobileSetupOptions()
-            opts.basePath = sharedDir
-            opts.workingDir = workDir
-            opts.tempDir = cacheDir
-            opts.listen = "127.0.0.1:\(grpcServiceModePort)"
-            opts.secret = ""
-            opts.debug = false
-            opts.mode = 4
-            opts.fixAndroidStack = false
-
-            MobileSetup(opts,
-                platformInterface,
-                &setupError
-            )
-            
-            if let setupError = setupError {
-                throw setupError
-            }
-            
-            
-            LibboxSetMemoryLimit(!disableMemoryLimit)
-            
-            writeMessage("(packet-tunnel) setup completed successfully")
-            if (config==""){
-                try await startService1(config)
-            }
-
-            
         } catch {
-            logger.error("Tunnel setup failed: \(error.localizedDescription)")
-            writeFatalError("(packet-tunnel) setup failed: \(error.localizedDescription)")
-            throw error
+            throw startupError("(packet-tunnel) error: create directories: \(error.localizedDescription)")
         }
-    }
-    
-    private func startService1(_ config: String) async throws {
-        writeMessage("Starting service")
-        var error: NSError?
-//        
-        do {
-            try MobileStart(config, "", &error)
-            if let error = error {
-                throw error
-            }
-            writeMessage("(packet-tunnel) service started successfully")
-        } catch {
-            writeFatalError("(packet-tunnel) error: start service: \(error.localizedDescription)")
-            throw error
+
+        if platformInterface == nil {
+            platformInterface = ExtensionPlatformInterface(self)
         }
+
+        // hiddify-core with its gRPC server: the app starts the core through it
+        let setupOptions = MobileSetupOptions()
+        setupOptions.basePath = FilePath.sharedDirectory.relativePath
+        setupOptions.workingDir = FilePath.workingDirectory.relativePath
+        setupOptions.tempDir = FilePath.cacheDirectory.relativePath
+        setupOptions.listen = "127.0.0.1:\(grpcServiceModePort)"
+        setupOptions.secret = ""
+        setupOptions.debug = false
+        setupOptions.mode = 4 // GRPC_BACKGROUND_INSECURE
+        setupOptions.fixAndroidStack = false
+        var setupError: NSError?
+        MobileSetup(setupOptions, platformInterface, &setupError)
+        if let setupError {
+            throw startupError("(packet-tunnel) error: setup service: \(setupError.localizedDescription)")
+        }
+        LibboxSetMemoryLimit(!disableMemoryLimit)
+        writeMessage("(packet-tunnel) gRPC server ready on port \(grpcServiceModePort), waiting for the app to start the core")
     }
-    
+
     private func createRequiredDirectories() throws {
-        let directories = [
-            FilePath.workingDirectory,
-            FilePath.sharedDirectory,
-            FilePath.cacheDirectory
-        ]
-        
-        for directory in directories {
-            do {
-                try FileManager.default.createDirectory(
-                    at: directory,
-                    withIntermediateDirectories: true,
-                    attributes: nil
-                )
-            } catch {
-                logger.error("Failed to create directory at \(directory.path): \(error.localizedDescription)")
-                throw error
-            }
+        for directory in [FilePath.sharedDirectory, FilePath.workingDirectory, FilePath.cacheDirectory] {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
         }
     }
-    
+
+    private func startupError(_ message: String) -> NSError {
+        writeMessage(message)
+        logger.fault("\(message, privacy: .public)")
+        return NSError(domain: "ExtensionProvider", code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+    }
+
     func writeMessage(_ message: String) {
-        logger.debug("\(message)")
-        writeError(message)
-    }
-    
-    func writeError(_ message: String) {
-        let messageWithNewline = "[\(Date())] \(message)\n"
-        do {
-            if FileManager.default.fileExists(atPath: ExtensionProvider.errorFile.path) {
-                if let fileHandle = try? FileHandle(forWritingTo: ExtensionProvider.errorFile) {
-                    defer { fileHandle.closeFile() }
-                    fileHandle.seekToEndOfFile()
-                    if let data = messageWithNewline.data(using: .utf8) {
-                        fileHandle.write(data)
-                    }
-                }
-            } else {
-                try messageWithNewline.write(to: ExtensionProvider.errorFile, atomically: true, encoding: .utf8)
-            }
-        } catch {
-            logger.error("Failed to write to error file: \(error.localizedDescription)")
+        logger.debug("\(message, privacy: .public)")
+        let line = "[\(Date())] \(message)\n"
+        guard let data = line.data(using: .utf8) else {
+            return
+        }
+        if let fileHandle = try? FileHandle(forWritingTo: ExtensionProvider.errorFile) {
+            defer { fileHandle.closeFile() }
+            fileHandle.seekToEndOfFile()
+            fileHandle.write(data)
+        } else {
+            try? data.write(to: ExtensionProvider.errorFile, options: .atomic)
         }
     }
-    
+
     public func writeFatalError(_ message: String) {
-        logger.fault("Fatal error: \(message)")
-        writeError("FATAL: \(message)")
+        writeMessage("FATAL: \(message)")
         cancelTunnelWithError(NSError(domain: "ExtensionProvider", code: 0, userInfo: [NSLocalizedDescriptionKey: message]))
     }
-    
-    override open func stopTunnel(with reason: NEProviderStopReason) async {
-//        logger.debug("Stopping tunnel with reason: \(reason)")
-        writeMessage("(packet-tunnel) stopping, reason: \(reason)")
-        stopService()
-        
-//        // Allow time for cleanup
-//        try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
-//        
-//        if let server = commandServer {
-//            try? server.close()
-//            commandServer = nil
-//        }
-    }
-    
-    private func stopService() {
-        logger.debug("Stopping service")
-        MobileClose(4)
-        if let platformInterface {
-            platformInterface.reset()
-        }
-    }
-    
-    func reloadService() async {
-        logger.debug("Reloading service")
-        writeMessage("(packet-tunnel) reloading service")
-//        reasserting = true
-//        defer { reasserting = false }
-//        
-//        stopService()
-//        do {
-//            guard let config = try? String(contentsOf: FilePath.configFile) else {
-//                writeFatalError("(packet-tunnel) error: cannot read config file")
-//                return
-//            }
-//            try await startService(config)
-//        } catch {
-//            writeFatalError("(packet-tunnel) error: reload service: \(error.localizedDescription)")
-//        }
-    }
-    
-    override open func handleAppMessage(_ messageData: Data) async -> Data? {
-        logger.debug("Handling app message")
-        return messageData
-    }
-    
-    override open func sleep() async {
-        logger.debug("Entering sleep mode")
-//        MobilePause()
-        // Add any sleep mode handling if needed
-    }
-    
-    override open func wake() {
-        logger.debug("Waking from sleep")
-        MobileWake()
-        // Add any wake handling if needed
-    }
-}
 
-// Extension to support error handling
-extension ExtensionProvider {
-    enum ExtensionError: Error {
-        case configurationMissing
-        case directoryCreationFailed
-        case serviceStartFailed
-        
-        var localizedDescription: String {
-            switch self {
-            case .configurationMissing:
-                return "Configuration not provided"
-            case .directoryCreationFailed:
-                return "Failed to create required directories"
-            case .serviceStartFailed:
-                return "Failed to start the service"
-            }
+    func stopService() {
+        MobileClose(4)
+        platformInterface?.reset()
+    }
+
+    // called by the core (platform interface serviceReload); the app restarts the core through gRPC
+    func reloadService() async throws {
+        writeMessage("(packet-tunnel) reloading service")
+        reasserting = true
+        defer {
+            reasserting = false
         }
+    }
+
+    override open func stopTunnel(with reason: NEProviderStopReason) async {
+        writeMessage("(packet-tunnel) stopping, reason: \(reason.rawValue)")
+        stopService()
+        // as sing-box-for-apple: let the core finish closing before the extension goes away
+        try? await Task.sleep(nanoseconds: 100 * NSEC_PER_MSEC)
+    }
+
+    override open func handleAppMessage(_ messageData: Data) async -> Data? {
+        messageData
+    }
+
+    override open func sleep() async {
+        // the core is not paused on sleep (pausing broke reconnecting after wake)
+    }
+
+    override open func wake() {
+        MobileWake()
     }
 }

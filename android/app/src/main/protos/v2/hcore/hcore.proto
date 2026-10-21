@@ -12,6 +12,8 @@ enum CoreStates {
   STARTING = 1;
   STARTED = 2;
   STOPPING = 3;
+  // the running core is applying a new config (HotReload); traffic keeps flowing
+  HOT_RELOADING = 4;
 }
 
 enum MessageType {
@@ -30,6 +32,9 @@ enum MessageType {
   ERROR_PARSING_CONFIG = 12;
   ERROR_READING_CONFIG = 13;
   ERROR_EXTENSION = 14;
+  // HotReload could not apply the config (e.g. the TUN inbound changed); the running core is
+  // unchanged, restart it to apply the config
+  HOT_RELOAD_FAILED = 15;
 }
 
 message CoreInfoResponse {

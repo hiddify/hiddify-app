@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/analytics/analytics_filter.dart';
-import 'package:hiddify/core/analytics/analytics_logger.dart';
+import 'package:hiddify/core/logger/sinks/sentry_sink.dart';
 
-import 'package:hiddify/core/logger/logger_controller.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
@@ -36,8 +35,7 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
       // final env = ref.read(environmentProvider);
       // final appInfo = await ref.read(appInfoProvider.future);
       final dsn = !kDebugMode || _testCrashReport ? Environment.sentryDSN : "";
-      final sentryLogger = SentryLoggyIntegration();
-      LoggerController.instance.addPrinter("analytics", sentryLogger);
+      logEnableSentry();
 
       await SentryFlutter.init((options) {
         options.dsn = dsn;
@@ -52,7 +50,7 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
         options.attachThreads = true;
         options.tracesSampleRate = 0.20;
         options.enableUserInteractionTracing = true;
-        options.addIntegration(sentryLogger);
+        options.addIntegration(SentryLogIntegration());
         options.beforeSend = sentryBeforeSend;
       });
 
@@ -66,7 +64,7 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
       state = const AsyncLoading();
       await _preferences.setBool(enableAnalyticsPrefKey, false);
       await Sentry.close();
-      LoggerController.instance.removePrinter("analytics");
+      logDisableSentry();
       state = const AsyncData(false);
     }
   }

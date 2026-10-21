@@ -12,6 +12,41 @@
         "editor.wordBasedSuggestions": "off"
 	},
 
-    "html.format.wrapLineLength": 250
-	
+    "html.format.wrapLineLength": 250,
+
+    // Keep VS Code from watching/indexing multi-GB build output and the core submodule.
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.dart_tool/**": true,
+        "**/build/**": true,
+        "**/dist/**": true,
+        "**/node_modules/**": true,
+        "**/.venv/**": true,
+        "**/ios/Pods/**": true,
+        "**/macos/Pods/**": true,
+        "**/android/.gradle/**": true,
+        "hiddify-core/**": true
+    },
+    "search.exclude": {
+        "**/.dart_tool": true,
+        "**/build": true,
+        "**/dist": true,
+        "**/node_modules": true,
+        "**/.venv": true,
+        "**/ios/Pods": true,
+        "**/macos/Pods": true,
+        "**/android/.gradle": true,
+        "hiddify-core": true
+    },
+    "search.followSymlinks": false,
+    "files.exclude": {
+        "**/.dart_tool": true
+    },
+
+    // hiddify-core contains several nested git repos; don't scan them all.
+    "git.detectSubmodules": false,
+    "git.repositoryScanMaxDepth": 1,
+    "git.autoRepositoryDetection": "openEditors",
+
+    "dart.analysisExcludedFolders": ["hiddify-core", "build", "dist", ".dart_tool"]
 }

@@ -23,11 +23,15 @@ object Settings {
     private const val LIST_IDENTIFIER = "VGhpcyBpcyB0aGUgcHJlZml4IGZvciBhIGxpc3Qu"
 
     var perAppProxyMode: String
-        get() = preferences.getString(SettingsKey.PER_APP_PROXY_MODE, PerAppProxyMode.OFF)!!
+        get() = preferences.getString(SettingsKey.PER_APP_PROXY_MODE, PerAppProxyMode.EXCLUDE)!!
         set(value) = preferences.edit().putString(SettingsKey.PER_APP_PROXY_MODE, value).apply()
 
+    // Older versions saved it as the mode's "off". The tile can start the VPN before the app moves it.
     val perAppProxyEnabled: Boolean
-        get() = perAppProxyMode != PerAppProxyMode.OFF
+        get() = preferences.getBoolean(
+            SettingsKey.PER_APP_PROXY_ENABLED,
+            preferences.getString(SettingsKey.PER_APP_PROXY_MODE, PerAppProxyMode.OFF) != PerAppProxyMode.OFF
+        )
 
     val perAppProxyList: List<String>
         get() {

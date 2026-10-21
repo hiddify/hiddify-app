@@ -54,6 +54,7 @@ class ProfileDetailsNotifier extends _$ProfileDetailsNotifier with AppLogger {
       } else {
         // print('No outbounds found in the config');
       }
+      // ignore: avoid_dynamic_calls
       final endpoints = jsonObject['endpoints'] as List? ?? [];
       profContent = '{"outbounds": ${json.encode(outbounds)},"endpoints":${json.encode(endpoints)} }';
       loggy.info(profContent);

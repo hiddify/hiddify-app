@@ -22,13 +22,14 @@ const CoreStates$json = {
     {'1': 'STARTING', '2': 1},
     {'1': 'STARTED', '2': 2},
     {'1': 'STOPPING', '2': 3},
+    {'1': 'HOT_RELOADING', '2': 4},
   ],
 };
 
 /// Descriptor for `CoreStates`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List coreStatesDescriptor = $convert.base64Decode(
     'CgpDb3JlU3RhdGVzEgsKB1NUT1BQRUQQABIMCghTVEFSVElORxABEgsKB1NUQVJURUQQAhIMCg'
-    'hTVE9QUElORxAD');
+    'hTVE9QUElORxADEhEKDUhPVF9SRUxPQURJTkcQBA==');
 
 @$core.Deprecated('Use messageTypeDescriptor instead')
 const MessageType$json = {
@@ -49,6 +50,7 @@ const MessageType$json = {
     {'1': 'ERROR_PARSING_CONFIG', '2': 12},
     {'1': 'ERROR_READING_CONFIG', '2': 13},
     {'1': 'ERROR_EXTENSION', '2': 14},
+    {'1': 'HOT_RELOAD_FAILED', '2': 15},
   ],
 };
 
@@ -60,7 +62,7 @@ final $typed_data.Uint8List messageTypeDescriptor = $convert.base64Decode(
     'RZX1NUT1BQRUQQBxIWChJJTlNUQU5DRV9OT1RfRk9VTkQQCBIYChRJTlNUQU5DRV9OT1RfU1RP'
     'UFBFRBAJEhgKFElOU1RBTkNFX05PVF9TVEFSVEVEEAoSGQoVRVJST1JfQlVJTERJTkdfQ09ORk'
     'lHEAsSGAoURVJST1JfUEFSU0lOR19DT05GSUcQDBIYChRFUlJPUl9SRUFESU5HX0NPTkZJRxAN'
-    'EhMKD0VSUk9SX0VYVEVOU0lPThAO');
+    'EhMKD0VSUk9SX0VYVEVOU0lPThAOEhUKEUhPVF9SRUxPQURfRkFJTEVEEA8=');
 
 @$core.Deprecated('Use setupModeDescriptor instead')
 const SetupMode$json = {

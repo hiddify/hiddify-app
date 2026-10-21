@@ -2,6 +2,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
@@ -22,7 +23,7 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
 
     final proxy = activeProxy.value!;
     final delay = proxy.urlTestDelay;
-    final timeout = delay > 65000;
+    final isValid = ConnectionConst.isValidDelay(delay);
 
     return Center(
       child: InkWell(
@@ -44,24 +45,23 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
               const Gap(8),
               if (delay > 0)
                 Text.rich(
-                  semanticsLabel: timeout ? t.pages.proxies.delay.timeout : t.pages.proxies.delay.result(delay: delay),
+                  semanticsLabel: isValid ? t.pages.proxies.delay.result(delay: delay) : t.pages.proxies.delay.timeout,
                   TextSpan(
                     children: [
-                      if (timeout)
+                      if (isValid) ...[
+                        TextSpan(
+                          text: delay.toString(),
+                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const TextSpan(text: " ms"),
+                      ] else
                         TextSpan(
                           text: t.common.timeout,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: theme.colorScheme.error,
                           ),
-                        )
-                      else ...[
-                        TextSpan(
-                          text: delay.toString(),
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        const TextSpan(text: " ms"),
-                      ],
                     ],
                   ),
                 )

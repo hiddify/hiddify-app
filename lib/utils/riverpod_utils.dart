@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-extension RefLifeCycle<T> on AutoDisposeRef<T> {
+extension RefLifeCycle<T> on Ref<T> {
   void disposeDelay(Duration duration) {
     final link = keepAlive();
     Timer? timer;

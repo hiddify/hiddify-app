@@ -22,10 +22,12 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
   @override
   Future<bool> build() async {
     final serviceRunning = ref.watch(serviceRunningProvider);
-    final serviceSingboxOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
 
     ref.listen(ConfigOptions.singboxConfigOptions, (previous, next) async {
       if (!serviceRunning || previous == null) return;
+      // Read on every change: a hot reload keeps the status connected, so this
+      // notifier is not rebuilt, and a snapshot taken in build would go stale.
+      final serviceSingboxOptions = ref.read(connectionRepositoryProvider).configOptionsSnapshot;
       if (next != previous && next != serviceSingboxOptions) {
         if (_lastUpdate == null || DateTime.now().difference(_lastUpdate!) > const Duration(milliseconds: 100)) {
           _lastUpdate = DateTime.now();
@@ -76,9 +78,7 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
       ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
       return true;
     } on PlatformException {
-      ref
-          .read(inAppNotificationControllerProvider)
-          .showInfoToast(t.common.msg.export.clipboard.contentTooLarge, duration: const Duration(seconds: 5));
+      ref.read(inAppNotificationControllerProvider).showInfoToast(t.common.msg.export.clipboard.contentTooLarge);
       return false;
     } catch (e, st) {
       loggy.warning("error exporting config options to clipboard", e, st);

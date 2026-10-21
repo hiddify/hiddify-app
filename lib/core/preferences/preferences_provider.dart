@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:hiddify/core/model/environment.dart';
+import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:loggy/loggy.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,7 +13,7 @@ part 'preferences_provider.g.dart';
 
 @Riverpod(keepAlive: true)
 Future<SharedPreferences> sharedPreferences(Ref ref) async {
-  final logger = Loggy("preferences");
+  final logger = appLogger('preferences');
   SharedPreferences? sharedPreferences;
 
   logger.debug("initializing preferences");

@@ -269,7 +269,6 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                               ref.read(provider.notifier).setContent(value);
                             },
                             maxLines: null,
-                            minLines: null,
                             expands: true,
                             textAlignVertical: TextAlignVertical.top,
                             decoration: const InputDecoration(

@@ -5,6 +5,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
@@ -20,14 +21,25 @@ part 'profiles_notifier.g.dart';
 @riverpod
 class ProfilesSortNotifier extends _$ProfilesSortNotifier with AppLogger {
   @override
-  ({ProfilesSort by, SortMode mode}) build() {
-    return (by: ProfilesSort.lastUpdate, mode: SortMode.descending);
+  ({ProfilesSort by, SortMode mode}) build() => ref.watch(Preferences.profilesSort);
+
+  void changeSort(ProfilesSort sortBy) {
+    ref.read(Preferences.profilesSort.notifier).update((
+      by: sortBy,
+      mode: switch (sortBy) {
+        ProfilesSort.name => SortMode.ascending, // A → Z
+        ProfilesSort.lastUpdate => SortMode.descending, // newest first
+      },
+    ));
   }
 
-  void changeSort(ProfilesSort sortBy) => state = (by: sortBy, mode: state.mode);
-
-  void toggleMode() =>
-      state = (by: state.by, mode: state.mode == SortMode.ascending ? SortMode.descending : SortMode.ascending);
+  void toggleMode() {
+    final current = ref.read(Preferences.profilesSort);
+    ref.read(Preferences.profilesSort.notifier).update((
+      by: current.by,
+      mode: current.mode == SortMode.ascending ? SortMode.descending : SortMode.ascending,
+    ));
+  }
 }
 
 @riverpod
@@ -45,6 +57,14 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
     await ref.read(hapticServiceProvider.notifier).lightImpact();
     return _profilesRepo.setAsActive(id).getOrElse((err) {
       loggy.warning('failed to set [$id] as active profile', err);
+      throw err;
+    }).run();
+  }
+
+  Future<void> togglePin(ProfileEntity profile) async {
+    loggy.debug('toggling pin for profile: [${profile.id}] -> ${!profile.pinned}');
+    await _profilesRepo.setPinned(profile.id, !profile.pinned).getOrElse((err) {
+      loggy.warning('failed to toggle pin for [${profile.id}]', err);
       throw err;
     }).run();
   }

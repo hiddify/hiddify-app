@@ -26,6 +26,14 @@ import com.hiddify.core.libbox.NetworkInterface as LibboxNetworkInterface
 
 import android.system.OsConstants
 import com.hiddify.core.libbox.ConnectionOwner
+import com.hiddify.core.libbox.AutoRedirectHandler
+import com.hiddify.core.libbox.AutoRedirectSession
+import com.hiddify.core.libbox.BridgeOptions
+import com.hiddify.core.libbox.BridgeSession
+import com.hiddify.core.libbox.NeighborUpdateListener
+import com.hiddify.core.libbox.PlatformUser
+import com.hiddify.core.libbox.ShellSession
+import com.hiddify.core.libbox.StringBox
 import com.hiddify.core.libbox.LocalDNSTransport
 import java.security.KeyStore
 import kotlin.io.encoding.Base64
@@ -65,7 +73,7 @@ interface PlatformInterfaceWrapper : PlatformInterface {
             if (uid!=Process.INVALID_UID) {
                 val packages = Application.packageManager.getPackagesForUid(uid)
                 owner.userName = packages?.firstOrNull() ?: ""
-                owner.androidPackageName = owner.userName
+                owner.setAndroidPackageNames(StringArray(packages.orEmpty().iterator()))
             }
             return owner
         } catch (e: Exception) {
@@ -147,37 +155,90 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     override fun clearDNSCache() {
     }
 
-    override fun readWIFIState(): WIFIState? {
-        @Suppress("DEPRECATION")
-        val wifiInfo =
-            Application.wifiManager.connectionInfo ?: return null
-        var ssid = wifiInfo.ssid
-        if (ssid == "<unknown ssid>") {
-            return WIFIState("", "")
-        }
-        if (ssid.startsWith("\"") && ssid.endsWith("\"")) {
-            ssid = ssid.substring(1, ssid.length - 1)
-        }
-        return WIFIState(ssid, wifiInfo.bssid)
-    }
+    // WiFi state (SSID/BSSID for wifi_ssid rules) is not read: it needs ACCESS_WIFI_STATE and, on newer
+    // Android, location permission; a SecurityException here would abort the process from the Go core.
+    override fun readWIFIState(): WIFIState? = null
 
     override fun localDNSTransport(): LocalDNSTransport? = LocalResolver
 
     @OptIn(ExperimentalEncodingApi::class)
     override fun systemCertificates(): StringIterator {
         val certificates = mutableListOf<String>()
-        val keyStore = KeyStore.getInstance("AndroidCAStore")
-        if (keyStore != null) {
-            keyStore.load(null, null)
-            val aliases = keyStore.aliases()
-            while (aliases.hasMoreElements()) {
-                val cert = keyStore.getCertificate(aliases.nextElement())
-                certificates.add(
-                    "-----BEGIN CERTIFICATE-----\n" + Base64.encode(cert.encoded) + "\n-----END CERTIFICATE-----",
-                )
+        // Called from the Go core without an error return: must not throw.
+        try {
+            val keyStore = KeyStore.getInstance("AndroidCAStore")
+            if (keyStore != null) {
+                keyStore.load(null, null)
+                val aliases = keyStore.aliases()
+                while (aliases.hasMoreElements()) {
+                    val cert = keyStore.getCertificate(aliases.nextElement()) ?: continue
+                    certificates.add(
+                        "-----BEGIN CERTIFICATE-----\n" + Base64.encode(cert.encoded) + "\n-----END CERTIFICATE-----",
+                    )
+                }
             }
+        } catch (e: Exception) {
+            Log.w("PlatformInterface", "systemCertificates", e)
         }
         return StringArray(certificates.iterator())
+    }
+
+    // Neighbor monitor, platform shell, bridge and auto-redirect need root helpers
+    // (RootClient in sing-box-for-android) which Hiddify does not ship; keep them disabled.
+    override fun startNeighborMonitor(listener: NeighborUpdateListener?) {
+    }
+
+    override fun closeNeighborMonitor(listener: NeighborUpdateListener?) {
+    }
+
+    override fun registerMyInterface(name: String?) {
+    }
+
+    override fun usePlatformShell(): Boolean = false
+
+    override fun checkPlatformShell() {
+        error("platform shell not supported")
+    }
+
+    override fun openShellSession(
+        user: PlatformUser?,
+        command: String?,
+        environ: StringIterator?,
+        term: String?,
+        rows: Int,
+        cols: Int,
+    ): ShellSession {
+        error("platform shell not supported")
+    }
+
+    override fun lookupUser(username: String?): PlatformUser {
+        error("platform shell not supported")
+    }
+
+    override fun lookupSFTPServer(): StringBox {
+        error("not supported")
+    }
+
+    override fun readSystemSSHHostKey(): StringBox {
+        error("not supported")
+    }
+
+    override fun tailscaleHostname(): String = android.provider.Settings.Global.getString(
+        Application.application.contentResolver,
+        android.provider.Settings.Global.DEVICE_NAME,
+    )?.takeIf { it.isNotBlank() }
+        ?: "${Build.MANUFACTURER} ${Build.MODEL}"
+
+    override fun usePlatformBridge(): Boolean = false
+
+    override fun createBridge(options: BridgeOptions?): BridgeSession {
+        error("platform bridge not supported")
+    }
+
+    override fun usePlatformAutoRedirect(): Boolean = false
+
+    override fun createAutoRedirect(options: ByteArray?, handler: AutoRedirectHandler?): AutoRedirectSession {
+        error("platform auto redirect not supported")
     }
 
     private class InterfaceArray(private val iterator: Iterator<LibboxNetworkInterface>) : NetworkInterfaceIterator {

@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:dartx/dartx.dart';
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -59,6 +61,7 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   @override
   Stream<OutboundGroup?> build() {
     ref.disposeDelay(const Duration(seconds: 15));
+    _pinned = null;
     final serviceRunning = ref.watch(serviceRunningProvider);
     if (!serviceRunning) {
       return Stream.error(const ServiceNotRunning());
@@ -136,6 +139,9 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   //   return sortedProxies;
   // }
 
+  /// The proxy picked on this page and the row it was in. Cleared by a new connection or sort.
+  ({String tag, int index})? _pinned;
+
   Future<OutboundGroup?> _sortOutbounds(OutboundGroup? proxies, ProxiesSort sortBy) async {
     if (proxies == null) return null;
 
@@ -163,13 +169,13 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
         return (b.upload + b.download).compareTo(a.upload + a.download);
       }),
     };
-    final items = <OutboundInfo>[];
-    for (final item in sortedItems) {
-      // if (groupWithSelected.keys.contains(item.tag)) {
-      //   items.add(item.copyWith(selectedTag: groupWithSelected[item.tag]));
-      // } else {
-      items.add(item);
-      // }
+    // a copy: sortedItems reads proxies.items, which is cleared below
+    final items = sortedItems.toList();
+    // The proxy the user picked stays in the row they tapped, and the rest sorts around it. A new
+    // ping used to move it, often to the end of the list, right after the tap.
+    if (_pinned case (:final tag, :final index) when proxies.selected == tag) {
+      final picked = items.indexWhere((item) => item.tag == tag);
+      if (picked != -1) items.insert(min(index, items.length - 1), items.removeAt(picked));
     }
     proxies.items.clear();
     proxies.items.addAll(items);
@@ -205,10 +211,21 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     if (!state.hasValue) return;
     final outbounds = state.value!;
     await ref.read(hapticServiceProvider.notifier).lightImpact();
-    await ref.read(proxyRepositoryProvider).selectProxy(groupTag, outboundTag).getOrElse((err) {
-      loggy.warning("error selecting outbound", err);
-      throw err;
-    }).run();
+    final selected = await ref
+        .read(proxyRepositoryProvider)
+        .selectProxy(groupTag, outboundTag)
+        .map((_) => true)
+        .getOrElse((err) {
+          loggy.warning("error selecting outbound", err);
+          // thrown from a tap, the error reached no one and the tap seemed ignored
+          final t = ref.read(translationsProvider).requireValue;
+          ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.switchFailed);
+          return false;
+        })
+        .run();
+    if (!selected) return;
+    final row = outbounds.items.indexWhere((e) => e.tag == outboundTag);
+    if (row != -1) _pinned = (tag: outboundTag, index: row);
     final newselected = outbounds.items.where((e) => e.tag == outboundTag).firstOrNull;
     if (newselected != null) {
       newselected.isSelected = true;

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
@@ -7,18 +8,15 @@ import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/gen/hiddify_core_generated_bindings.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
-import 'package:hiddify/hiddifycore/core_interface/mtls_channel_cred.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hello/hello.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hello/hello_service.pbgrpc.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
-import 'package:loggy/loggy.dart';
-
 import 'package:path/path.dart' as p;
 
-final _logger = Loggy('HiddifyCoreFFI');
+final _logger = infraLogger('HiddifyCoreFFI');
 typedef StopFunc = Pointer<Utf8> Function();
 typedef StopFuncDart = Pointer<Utf8> Function();
 
@@ -65,6 +63,8 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
 
   static final String secret = generateRandomPassword(100);
 
+  ClientChannel? _channel;
+
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
     // Generate a random password for the grpc service
@@ -72,13 +72,12 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
     // final err = errPtr2.cast<Utf8>().toDartString();
     // throw Exception('stop: $err');
     const channelOption = ChannelCredentials.insecure();
-    final helloClient = HelloClient(
-      ClientChannel(
-        '127.0.0.1',
-        port: port,
-        options: const ChannelOptions(credentials: channelOption),
-      ),
+    final helloChannel = ClientChannel(
+      '127.0.0.1',
+      port: port,
+      options: const ChannelOptions(credentials: channelOption),
     );
+    final helloClient = HelloClient(helloChannel);
 
     try {
       await helloClient.sayHello(HelloRequest(name: "test"));
@@ -103,20 +102,26 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
       }
       final res = await helloClient.sayHello(HelloRequest(name: "test"));
       loggy.info(res.toString());
+    } finally {
+      unawaited(helloChannel.shutdown());
     }
-    bgClient = fgClient = CoreClient(
-      ClientChannel(
-        'localhost',
-        port: port,
-        options: const ChannelOptions(
-          credentials: ChannelCredentials.insecure(),
-          // credentials: ChannelCredentials.secure(
-          //   password: secret,
-          //   onBadCertificate: (certificate, host) => true,
-          // ),
-        ),
+    // setup runs again every time the app is resumed. The channel it replaces
+    // used to stay open until its idle timeout, one more connection per resume.
+    // shutdown is graceful: calls still running on it finish first.
+    final previousChannel = _channel;
+    _channel = ClientChannel(
+      'localhost',
+      port: port,
+      options: const ChannelOptions(
+        credentials: ChannelCredentials.insecure(),
+        // credentials: ChannelCredentials.secure(
+        //   password: secret,
+        //   onBadCertificate: (certificate, host) => true,
+        // ),
       ),
     );
+    bgClient = fgClient = CoreClient(_channel!);
+    unawaited(previousChannel?.shutdown());
 
     return "";
   }

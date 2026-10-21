@@ -1,14 +1,13 @@
 import 'dart:io';
 
 import 'package:hiddify/utils/custom_loggers.dart';
-import 'package:loggy/loggy.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 abstract class UriUtils {
-  static final loggy = Loggy<InfraLogger>("UriUtils");
+  static final loggy = infraLogger('UriUtils');
 
-  static Future<bool> tryShareOrLaunchFile(Uri uri, {Uri? fileOrDir}) async {
+  static Future<bool> tryShareOrLaunchFile(Uri uri, {Uri? fileOrDir}) {
     if (Platform.isWindows || Platform.isLinux) {
       return tryLaunch(fileOrDir ?? uri);
     }

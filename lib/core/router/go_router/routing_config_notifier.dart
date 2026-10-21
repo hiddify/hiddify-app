@@ -9,16 +9,17 @@ import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.
 import 'package:hiddify/core/router/go_router/helper/custom_transition.dart';
 import 'package:hiddify/core/router/go_router/refresh_listenable.dart';
 import 'package:hiddify/features/about/widget/about_page.dart';
+import 'package:hiddify/features/app_based_routing/overview/app_list_page.dart';
 import 'package:hiddify/features/home/widget/home_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
 import 'package:hiddify/features/log/overview/logs_page.dart';
-import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_page.dart';
 import 'package:hiddify/features/profile/details/profile_details_page.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_page.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/route_rules/notifier/rule_notifier.dart';
 import 'package:hiddify/features/route_rules/overview/generic_list_page.dart';
+import 'package:hiddify/features/route_rules/overview/package_names_page.dart';
 import 'package:hiddify/features/route_rules/overview/rule_page.dart';
 import 'package:hiddify/features/settings/overview/sections/chain_options_page.dart';
 import 'package:hiddify/features/settings/overview/sections/dns_options_page.dart';
@@ -173,14 +174,7 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                 GoRoute(
                   name: 'settings',
                   path: '/settings',
-                  builder: (context, _) => FocusScope(
-                    node: branchesScope['settings'],
-                    child: PopScope(
-                      canPop: false,
-                      onPopInvokedWithResult: (_, _) => context.goNamed('home'),
-                      child: SettingsPage(),
-                    ),
-                  ),
+                  builder: (_, _) => FocusScope(node: branchesScope['settings'], child: SettingsPage()),
                   routes: <GoRoute>[
                     GoRoute(
                       name: 'general',
@@ -234,13 +228,22 @@ class RoutingConfigNotifier extends _$RoutingConfigNotifier {
                                 );
                               },
                             ),
+                            GoRoute(
+                              name: 'packageNames',
+                              path: 'package-names',
+                              pageBuilder: (_, state) => customTransition(
+                                TransitionType.slide,
+                                state.pageKey,
+                                PackageNamesPage(ruleListOrder: int.tryParse(state.pathParameters['orderId']!)),
+                              ),
+                            ),
                           ],
                         ),
                         GoRoute(
-                          name: 'perAppProxy',
-                          path: 'per-app-proxy',
+                          name: 'appList',
+                          path: 'app-list',
                           pageBuilder: (_, state) =>
-                              customTransition(TransitionType.slide, state.pageKey, const PerAppProxyPage()),
+                              customTransition(TransitionType.slide, state.pageKey, const AppListPage()),
                         ),
                       ],
                     ),

@@ -24,15 +24,20 @@ class CoreStates extends $pb.ProtobufEnum {
   static const CoreStates STOPPING =
       CoreStates._(3, _omitEnumNames ? '' : 'STOPPING');
 
+  /// the running core is applying a new config (HotReload); traffic keeps flowing
+  static const CoreStates HOT_RELOADING =
+      CoreStates._(4, _omitEnumNames ? '' : 'HOT_RELOADING');
+
   static const $core.List<CoreStates> values = <CoreStates>[
     STOPPED,
     STARTING,
     STARTED,
     STOPPING,
+    HOT_RELOADING,
   ];
 
   static final $core.List<CoreStates?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 3);
+      $pb.ProtobufEnum.$_initByValueList(values, 4);
   static CoreStates? valueOf($core.int value) =>
       value < 0 || value >= _byValue.length ? null : _byValue[value];
 
@@ -71,6 +76,11 @@ class MessageType extends $pb.ProtobufEnum {
   static const MessageType ERROR_EXTENSION =
       MessageType._(14, _omitEnumNames ? '' : 'ERROR_EXTENSION');
 
+  /// HotReload could not apply the config (e.g. the TUN inbound changed); the running core is
+  /// unchanged, restart it to apply the config
+  static const MessageType HOT_RELOAD_FAILED =
+      MessageType._(15, _omitEnumNames ? '' : 'HOT_RELOAD_FAILED');
+
   static const $core.List<MessageType> values = <MessageType>[
     EMPTY,
     EMPTY_CONFIGURATION,
@@ -87,10 +97,11 @@ class MessageType extends $pb.ProtobufEnum {
     ERROR_PARSING_CONFIG,
     ERROR_READING_CONFIG,
     ERROR_EXTENSION,
+    HOT_RELOAD_FAILED,
   ];
 
   static final $core.List<MessageType?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 14);
+      $pb.ProtobufEnum.$_initByValueList(values, 15);
   static MessageType? valueOf($core.int value) =>
       value < 0 || value >= _byValue.length ? null : _byValue[value];
 

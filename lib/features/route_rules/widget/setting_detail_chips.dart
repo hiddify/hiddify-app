@@ -152,6 +152,9 @@ class SettingDetailChip<T extends Object> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Container(
+      // TEMPORARY until the Flutter upgrade: dynamic_color 1.7 leaves surfaceContainerHighest unset, so it falls
+      // back to the page color and the chip disappears; surfaceVariant is the same tone it does set
+      // ignore: deprecated_member_use
       decoration: BoxDecoration(color: theme.colorScheme.surfaceVariant, borderRadius: BorderRadius.circular(8)),
       child: isPackageName
           ? AndroidAppInfo(packageName: '$value')
