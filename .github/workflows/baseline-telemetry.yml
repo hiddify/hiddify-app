@@ -28,13 +28,6 @@ jobs:
           dart --suppress-analytics run build_runner build --delete-conflicting-outputs
           dart --suppress-analytics run slang
           git diff --exit-code -- lib pubspec.lock
-      - name: Verify Baseline release contracts
-        run: |
-          ruby test/ci/ios_source_ci_scope_test.rb
-          ruby test/ci/ios_baseline_identity_inventory_test.rb
-          ruby test/ci/ios_baseline_signed_entitlements_test.rb
-          ruby test/ci/ios_baseline_release_test.rb
-          ruby test/ci/ios_baseline_workflow_test.rb
       - name: Analyze telemetry changes
         run: >-
           flutter analyze --no-pub
@@ -46,6 +39,7 @@ jobs:
           test/core/observability
           test/features/diagnostics/remote_diagnostic_subscription_test.dart
       - name: Test complete Baseline application
+        if: ${{ !cancelled() }}
         run: flutter test
 
   native:
@@ -62,3 +56,10 @@ jobs:
           bash test/ios/vpn_manager_manual_policy_test.sh
           bash test/ios/foreground_setup_mode_test.sh
           bash test/security/native_diagnostics_privacy_test.sh
+      - name: Verify Baseline release contracts
+        run: |
+          ruby test/ci/ios_source_ci_scope_test.rb
+          ruby test/ci/ios_baseline_identity_inventory_test.rb
+          ruby test/ci/ios_baseline_signed_entitlements_test.rb
+          ruby test/ci/ios_baseline_release_test.rb
+          ruby test/ci/ios_baseline_workflow_test.rb
