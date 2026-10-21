@@ -37,14 +37,15 @@ void main() {
     record();
     await Future<void>.delayed(Duration.zero);
     await remote.flush();
-    final events = jsonDecode(sent.single) as List;
+    final events = (jsonDecode(sent.single) as List).cast<Map<String, dynamic>>();
     expect(events.map((e) => e['sequence']), [2, 3]);
     expect(sent.single, isNot(contains('PRIVATE_CANARY')));
     journal.clear();
     record();
     await Future<void>.delayed(Duration.zero);
     await remote.flush();
-    expect((jsonDecode(sent.last) as List).single['sequence'], 4);
+    final last = (jsonDecode(sent.last) as List).single as Map<String, dynamic>;
+    expect(last['sequence'], 4);
     subscription.dispose();
     await remote.dispose();
     record();

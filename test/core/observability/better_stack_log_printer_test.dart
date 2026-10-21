@@ -3,8 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/observability/better_stack_log_printer.dart';
-import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 import 'package:hiddify/core/observability/telemetry_budget.dart';
+import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 
 void main() {
   late String? stored;
