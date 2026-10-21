@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 const _baseline = '0830294eff5b8cd86324545ed00689648c70bd23';
 const _connectionButtonPath = 'lib/features/home/widget/connection_button.dart';
+const _activeProxyCardPath = 'lib/features/proxy/active/active_proxy_card.dart';
 // Existing presentation surfaces explicitly enumerated in the migration plan.
 const _files = <String>[
   'lib/core/theme/app_theme.dart',
@@ -114,6 +115,8 @@ class _Bindings extends GeneralizingAstVisitor<void> {
   final stateSites = <String, int>{};
   final predicates = <String, int>{};
   final ifStatements = <IfStatement>[];
+  final directStatements = <String, List<String>>{};
+  final localInitializers = <String, List<String>>{};
   void add(Map<String, int> into, String kind, AstNode node) {
     final key = '$kind:${_tokens(node)}';
     into.update(key, (count) => count + 1, ifAbsent: () => 1);
@@ -135,8 +138,41 @@ class _Bindings extends GeneralizingAstVisitor<void> {
     stateSites.update(key, (count) => count + 1, ifAbsent: () => 1);
   }
 
+  String? directMethodSite(AstNode node) {
+    final parent = node.parent;
+    if (node is! Statement || parent is! Block || parent.parent is! BlockFunctionBody) return null;
+    final method = parent.parent!.parent;
+    if (method is! MethodDeclaration || method.parent is! ClassDeclaration) return null;
+    return '${(method.parent! as ClassDeclaration).name.lexeme}::${method.name.lexeme}';
+  }
+
+  String? localVariableSite(VariableDeclaration node) {
+    String? methodName;
+    String? className;
+    for (AstNode? current = node.parent; current != null; current = current.parent) {
+      if (current is FunctionExpression || current is FunctionDeclaration) return null;
+      if (methodName == null && current is MethodDeclaration) methodName = current.name.lexeme;
+      if (current is ClassDeclaration) {
+        className = current.name.lexeme;
+        break;
+      }
+    }
+    if (className == null || methodName == null) return null;
+    return '$className::$methodName::${node.name.lexeme}';
+  }
+
   @override
   void visitNode(AstNode node) {
+    final directSite = directMethodSite(node);
+    if (directSite != null) {
+      directStatements.putIfAbsent(directSite, () => <String>[]).add(_tokens(node));
+    }
+    if (node is VariableDeclaration && node.initializer != null) {
+      final variableSite = localVariableSite(node);
+      if (variableSite != null) {
+        localInitializers.putIfAbsent(variableSite, () => <String>[]).add(_tokens(node.initializer!));
+      }
+    }
     if (node is NamedExpression && _callbacks.contains(node.name.label.name)) {
       add(exact, node.name.label.name, node.expression);
     }
@@ -220,15 +256,88 @@ bool _isApprovedStateAddition(_Bindings baseline, _Bindings live, String key) {
   return (baseline.exact[key] ?? 0) == 0 && live.exact[key] == 1 && live.stateSites[addition.siteKey] == 1;
 }
 
+String _statementTokens(String source) {
+  final parsed = parseString(content: 'class Fixture { void build() { $source } }');
+  final inventory = _Bindings('fixture');
+  parsed.unit.accept(inventory);
+  return inventory.directStatements['Fixture::build']!.single;
+}
+
+String _initializerTokens(String source) {
+  final parsed = parseString(content: 'class Fixture { void build() { final value = $source; } }');
+  final inventory = _Bindings('fixture');
+  parsed.unit.accept(inventory);
+  return inventory.localInitializers['Fixture::build::value']!.single;
+}
+
+String? _singleInitializer(_Bindings bindings, String key) {
+  final values = bindings.localInitializers[key];
+  return values?.length == 1 ? values!.single : null;
+}
+
+String get _serverChoiceCallbackKey =>
+    'onPressed:${jsonEncode(['(', ')', '=>', 'context', '.', 'goNamed', '(', "'proxies'", ')'])}';
+
+String get _combinedActiveProxyGuard =>
+    'if:${jsonEncode(['connectionState', '!=', 'const', 'Connected', '(', ')', '||', 'activeProxy', '==', 'null'])}';
+
+bool _isApprovedServerChoiceFallback(_Bindings baseline, _Bindings live) {
+  if (baseline.path != 'baseline/$_activeProxyCardPath' || live.path != _activeProxyCardPath) return false;
+  if (baseline.predicates[_combinedActiveProxyGuard] != 1 || (live.predicates[_combinedActiveProxyGuard] ?? 0) != 0) {
+    return false;
+  }
+  if ((baseline.exact[_serverChoiceCallbackKey] ?? 0) != 0 || live.exact[_serverChoiceCallbackKey] != 1) return false;
+
+  final statements = live.directStatements['ActiveProxyFooter::build'];
+  if (statements == null) return false;
+  final connectedGuard = _statementTokens('''
+if (connectionState != const Connected()) {
+  return const SizedBox.shrink();
+}
+''');
+  final fallback = _statementTokens('''
+if (activeProxy == null) {
+  if (!ios) return const SizedBox.shrink();
+  return Padding(
+    padding: const EdgeInsets.all(16),
+    child: OutlinedButton.icon(
+      onPressed: () => context.goNamed('proxies'),
+      icon: const Icon(Icons.public),
+      label: Text(t.pages.proxies.title),
+    ),
+  );
+}
+''');
+  final connectedIndex = statements.indexOf(connectedGuard);
+  if (connectedIndex < 0 || statements.where((statement) => statement == connectedGuard).length != 1) return false;
+  if (connectedIndex + 1 >= statements.length || statements[connectedIndex + 1] != fallback) return false;
+  if (statements.where((statement) => statement == fallback).length != 1) return false;
+
+  return _singleInitializer(live, 'ActiveProxyFooter::build::legacyProxy') ==
+          _initializerTokens('ref.watch(activeProxyNotifierProvider.select((value) => value.valueOrNull))') &&
+      _singleInitializer(live, 'ActiveProxyFooter::build::ios') ==
+          _initializerTokens(
+            'Theme.of(context).platform == TargetPlatform.iOS && ref.watch(iosActiveProxyMeasurementEnabledProvider)',
+          ) &&
+      _singleInitializer(live, 'ActiveProxyFooter::build::activeProxy') ==
+          _initializerTokens(
+            'ios ? ref.watch(iosActiveProxyMeasurementStateProvider).asData?.value.proxy : legacyProxy',
+          );
+}
+
 List<String> _differences(_Bindings baseline, _Bindings live) {
   final issues = <String>[];
+  final approvedServerChoiceFallback = _isApprovedServerChoiceFallback(baseline, live);
   for (final key in {...baseline.exact.keys, ...live.exact.keys}) {
-    if (baseline.exact[key] != live.exact[key] && !_isApprovedStateAddition(baseline, live, key)) {
+    if (baseline.exact[key] != live.exact[key] &&
+        !_isApprovedStateAddition(baseline, live, key) &&
+        !(approvedServerChoiceFallback && key == _serverChoiceCallbackKey)) {
       issues.add('binding multiplicity changed: $key');
     }
   }
   // Added appearance predicates are allowed; only the approved recovery getter may replace an existing condition.
   for (final key in baseline.predicates.keys) {
+    if (approvedServerChoiceFallback && key == _combinedActiveProxyGuard) continue;
     if (baseline.path == 'baseline/$_connectionButtonPath' &&
         live.path == _connectionButtonPath &&
         key == _secureLabelPredicate('value')) {
@@ -473,6 +582,45 @@ class ${className ?? addition.className} {
       const wrongPath = 'lib/features/proxy/widget/proxy_tile.dart';
       expect(_differences(_inventory(baseline, 'baseline/$wrongPath'), _inventory(live, wrongPath)), isNotEmpty);
     });
+  });
+
+  group('approved iOS server-choice fallback', () {
+    const path = 'lib/features/proxy/active/active_proxy_card.dart';
+    late String baseline;
+    late String live;
+
+    setUp(() {
+      final original = Process.runSync('git', ['show', '$_baseline:$path']);
+      expect(original.exitCode, 0);
+      baseline = original.stdout as String;
+      live = File(path).readAsStringSync();
+    });
+
+    test('guard accepts only the exact connected iOS null-proxy fallback', () {
+      expect(_differences(_inventory(baseline, 'baseline/$path'), _inventory(live, path)), isEmpty);
+    });
+
+    for (final mutation in <String, String Function(String)>{
+      'wrong destination': (source) => source.replaceFirst("goNamed('proxies')", "goNamed('profiles')"),
+      'missing iOS gate leaks to non-iOS': (source) => source.replaceFirst(
+        'if (!ios) return const SizedBox.shrink();',
+        'if (false) return const SizedBox.shrink();',
+      ),
+      'disconnected exposure': (source) =>
+          source.replaceFirst('if (connectionState != const Connected())', 'if (false)'),
+      'legacy proxy substitution': (source) => source.replaceFirst(
+        'ios ? ref.watch(iosActiveProxyMeasurementStateProvider).asData?.value.proxy : legacyProxy',
+        'legacyProxy',
+      ),
+      'real metadata route bypass': (source) =>
+          source.replaceFirst('if (activeProxy == null)', 'if (activeProxy != null)'),
+    }.entries) {
+      test('guard rejects ${mutation.key}', () {
+        final mutated = mutation.value(live);
+        expect(mutated, isNot(live), reason: 'Mutation fixture must alter the production source.');
+        expect(_differences(_inventory(baseline, 'baseline/$path'), _inventory(mutated, path)), isNotEmpty);
+      });
+    }
   });
 
   const sample = '''

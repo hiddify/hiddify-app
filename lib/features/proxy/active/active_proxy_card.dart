@@ -27,9 +27,19 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     final activeProxy = ios ? ref.watch(iosActiveProxyMeasurementStateProvider).asData?.value.proxy : legacyProxy;
     final t = ref.watch(translationsProvider).requireValue;
 
-    // Early return if required data is not available
-    if (connectionState != const Connected() || activeProxy == null) {
+    if (connectionState != const Connected()) {
       return const SizedBox.shrink();
+    }
+    if (activeProxy == null) {
+      if (!ios) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: OutlinedButton.icon(
+          onPressed: () => context.goNamed('proxies'),
+          icon: const Icon(Icons.public),
+          label: Text(t.pages.proxies.title),
+        ),
+      );
     }
 
     final theme = Theme.of(context);

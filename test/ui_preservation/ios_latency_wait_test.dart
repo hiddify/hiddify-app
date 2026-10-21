@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
@@ -30,6 +31,20 @@ void main() {
     bool running = true,
   }) async {
     final proxy = _RetryProxy(measurement);
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (_, _) => const Scaffold(body: Column(children: [ActiveProxyDelayIndicator(), ActiveProxyFooter()])),
+        ),
+        GoRoute(
+          path: '/proxies',
+          name: 'proxies',
+          builder: (_, _) => const Scaffold(body: Text('Server selection opened')),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -48,9 +63,9 @@ void main() {
             return Stream.value(snapshot);
           }),
         ],
-        child: MaterialApp(
+        child: MaterialApp.router(
           theme: ThemeData(platform: TargetPlatform.iOS),
-          home: const Scaffold(body: Column(children: [ActiveProxyDelayIndicator(), ActiveProxyFooter()])),
+          routerConfig: router,
         ),
       ),
     );
@@ -107,6 +122,25 @@ void main() {
         }
       },
     );
+  }
+
+  for (final phase in [
+    IosProxyMeasurementPhase.idle,
+    IosProxyMeasurementPhase.checking,
+    IosProxyMeasurementPhase.timedOut,
+    IosProxyMeasurementPhase.failed,
+    IosProxyMeasurementPhase.unavailable,
+  ]) {
+    testWidgets('$phase keeps server selection reachable without inventing outbound data', (tester) async {
+      await mount(tester, snapshot: IosProxyMeasurementState(phase));
+      expect(find.byType(IPCountryFlag), findsNothing);
+      expect(find.byType(IPText), findsNothing);
+      expect(find.text(t.pages.proxies.title), findsOneWidget);
+      await tester.tap(find.text(t.pages.proxies.title));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.text('Server selection opened'), findsOneWidget);
+    });
   }
 
   for (final phase in [
@@ -171,6 +205,7 @@ void main() {
     expect(find.byIcon(Icons.refresh), findsNothing);
     expect(find.byType(IPCountryFlag), findsNothing);
     expect(find.text(t.common.unknown), findsNothing);
+    expect(find.text(t.pages.proxies.title), findsNothing);
   });
 }
 
