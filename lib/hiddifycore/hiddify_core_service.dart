@@ -44,6 +44,27 @@ final class _ForegroundReadinessException implements Exception {
   const _ForegroundReadinessException();
 }
 
+// Canonical gRPC status numbers, without message, metadata or private details.
+const _grpcSetupEvents = [
+  IosPingEvent.coreSetupGrpcOk,
+  IosPingEvent.coreSetupGrpcCancelled,
+  IosPingEvent.coreSetupGrpcUnknown,
+  IosPingEvent.coreSetupGrpcInvalidArgument,
+  IosPingEvent.coreSetupGrpcDeadlineExceeded,
+  IosPingEvent.coreSetupGrpcNotFound,
+  IosPingEvent.coreSetupGrpcAlreadyExists,
+  IosPingEvent.coreSetupGrpcPermissionDenied,
+  IosPingEvent.coreSetupGrpcResourceExhausted,
+  IosPingEvent.coreSetupGrpcFailedPrecondition,
+  IosPingEvent.coreSetupGrpcAborted,
+  IosPingEvent.coreSetupGrpcOutOfRange,
+  IosPingEvent.coreSetupGrpcUnimplemented,
+  IosPingEvent.coreSetupGrpcInternal,
+  IosPingEvent.coreSetupGrpcUnavailable,
+  IosPingEvent.coreSetupGrpcDataLoss,
+  IosPingEvent.coreSetupGrpcUnauthenticated,
+];
+
 class HiddifyCoreService with InfraLogger {
   HiddifyCoreService(this.ref);
   final Ref ref;
@@ -310,6 +331,16 @@ class HiddifyCoreService with InfraLogger {
             IosCoreSetupCode.helloFailed => IosPingEvent.coreSetupHelloFailed,
           };
           if (codeEvent != stageEvent) _recordPingTrace(codeEvent, operationId: traceId);
+          final grpcCode = e.grpcStatusCode;
+          if (grpcCode != null && grpcCode >= 0 && grpcCode < _grpcSetupEvents.length) {
+            _recordPingTrace(_grpcSetupEvents[grpcCode], operationId: traceId);
+          }
+          if (e.foregroundListenerReachable case final reachable?) {
+            _recordPingTrace(
+              reachable ? IosPingEvent.coreSetupLoopbackReachable : IosPingEvent.coreSetupLoopbackUnreachable,
+              operationId: traceId,
+            );
+          }
         }
         _recordPingTrace(IosPingEvent.coreSetupFailed, operationId: traceId);
         return left(e.toString());
@@ -321,16 +352,19 @@ class HiddifyCoreService with InfraLogger {
     return TaskEither(() async {
       loggy.debug("changing options");
       // latestOptions = options;
+      var foregroundConfigured = false;
       try {
         final res = await core.fgClient.changeHiddifySettings(
           ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
         );
         if (res.messageType != MessageType.EMPTY) return left("${res.messageType} ${res.message}");
+        foregroundConfigured = true;
         await core.bgClient.changeHiddifySettings(
           ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
         );
       } on GrpcError catch (e) {
         if (e.code == StatusCode.unavailable) {
+          if (core.supportsSystemStatus && !foregroundConfigured) return left('foreground_settings_unavailable');
           loggy.debug("background core is not started yet! $e");
         } else {
           rethrow;
