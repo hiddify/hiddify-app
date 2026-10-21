@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
+import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
 import 'package:hiddify/features/diagnostics/home_presentation_providers.dart';

@@ -3,9 +3,8 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 import 'package:hiddify/core/observability/telemetry_budget.dart';
-
+import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 
 typedef BetterStackPost = Future<int> Function(Uri endpoint, String token, String body);
 
@@ -37,7 +36,8 @@ final class BetterStackLogPrinter {
        _budget = budget,
        _post = post,
        _now = now ?? DateTime.now,
-       _active = token.isNotEmpty && isBetterStackLogsEndpoint(endpoint);
+       _active = token.isNotEmpty && isBetterStackLogsEndpoint(endpoint) &&
+           RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$').hasMatch(sessionId);
 
   static const maxQueueLength = 100;
   static const maxBatchLength = 20;
