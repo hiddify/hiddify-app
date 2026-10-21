@@ -329,7 +329,7 @@ void main() {
         await server.shutdown();
         messenger.setMockMethodCallHandler(CoreInterfaceMobile.methodChannel, null);
       });
-      final core = _IosCore();
+      final core = _IosCore(deadline: const Duration(seconds: 5));
       final dir = Directory.systemTemp;
       try {
         await core.setup((baseDir: dir, workingDir: dir, tempDir: dir), false, 3);
