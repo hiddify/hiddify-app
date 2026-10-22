@@ -27,7 +27,7 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   ].freeze
   UI_PREFIXES = %w[lib/core/router/dialog/widgets/ lib/features/settings/overview/].freeze
   NEW_UI_PREFIXES = %w[lib/core/widget/blizzard/].freeze
-  NEW_UI_FILES = %w[lib/core/theme/blizzard_tokens.dart lib/core/theme/blizzard_theme.dart].freeze
+  NEW_UI_FILES = %w[lib/core/theme/blizzard_tokens.dart lib/core/theme/blizzard_theme.dart lib/core/router/adaptive_layout/blizzard_dock.dart].freeze
   NATIVE_GLASS_FILE = "ios/Runner/BlizzardNativeGlass.swift"
   NATIVE_GLASS_SHA256 = "6375fa6fe9aa7d1e1377c69842149b703e69f32ffa08093bb26d9b5fd40f02ca"
   NATIVE_GLASS_HOST_SHA256 = {
@@ -68,7 +68,7 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   RELEASE_NEW_SHA256 = {
     ".github/workflows/baseline-telemetry.yml" => "afd597ef89b7cdfe37b7f8a951787a29b80c776560d26d66e0f20efca3a06128",
     "lib/core/analytics/telemetry_delivery_provider.dart" => "b81e932c072452710203e57cb92cd76e285d07113f3f45248eb1f2d15218b83e",
-    "lib/core/observability/better_stack_log_printer.dart" => "b47162f2df9969b39e25e6601daebd9a45be2edbede4aa5b236e609e5f6243ea",
+    "lib/core/observability/better_stack_log_printer.dart" => "8955fd3587c047dec4e23af21feedcb18fda4100910b854c06e4a2cc69089162",
     "lib/core/observability/telemetry_budget.dart" => "b5251021276928c3927e5026d60f0e22cadfb07aa8aae42f4771c38287676777",
     "lib/core/observability/telemetry_delivery_status.dart" => "c774f10e3f011fd98987ae2278cb0647d212577dd4d0c018fb1c1661b6602af1",
     "lib/features/diagnostics/remote_diagnostic_subscription.dart" => "d9d386c45564403e69be4a43163388f3189caab4da5b86518bf6c99bc23a3e5c",
@@ -504,10 +504,10 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   # Test hosts are created outside the repository; only their reviewed runners
   # and integration entry point may be added here. No blanket scripts allowance.
   NEW_TOOL_FILES = %w[scripts/blizzard_prepare_test_host.py scripts/blizzard_simulator_run.py
-                     scripts/ui_test_simulator_id.py integration_test/blizzard_preservation_test.dart].freeze
+                     scripts/ui_test_simulator_id.py integration_test/blizzard_preservation_test.dart integration_test/blizzard_v3_geometry_test.dart].freeze
 
   def allowed_addition?(path)
-    path.start_with?("test/", "docs/") || NEW_TOOL_FILES.include?(path) || path == NATIVE_GLASS_FILE ||
+    path == "assets/images/blizzard_wave_envelope.png" || path.start_with?("test/", "docs/") || NEW_TOOL_FILES.include?(path) || path == NATIVE_GLASS_FILE ||
       DIAGNOSTIC_NEW_FILES.include?(path) || RELEASE_NEW_SHA256.key?(path) ||
       IOS_MEASUREMENT_NEW_SHA256.key?(path) || IOS_STARTUP_NEW_SHA256.key?(path) || NEW_UI_FILES.include?(path) ||
       NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
@@ -540,7 +540,10 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     %w[name environment dependencies dependency_overrides].each do |key|
       assert_equal before[key], after[key], "Changed runtime manifest field: #{key}"
     end
-    assert_equal before.fetch("flutter"), after.fetch("flutter"), "Assets/fonts require an explicit reviewed allowance"
+    expected_flutter = Marshal.load(Marshal.dump(before.fetch("flutter")))
+    expected_flutter.fetch("assets").unshift("assets/images/blizzard_wave_envelope.png")
+    assert_equal expected_flutter, after.fetch("flutter"), "Only the reviewed v3 wave asset may be added"
+    assert_equal "5bca6e7c672919e0bc63f30e5048816f6285869b97a5b92e382e00f16bf6d3ea", Digest::SHA256.file(File.join(ROOT, "assets/images/blizzard_wave_envelope.png")).hexdigest
     delta = after.fetch("dev_dependencies").keys - before.fetch("dev_dependencies").keys
     assert_equal %w[flutter_test integration_test], delta.sort
     before.fetch("dev_dependencies").each do |key, value|

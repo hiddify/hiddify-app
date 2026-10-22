@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 const _baseline = '0830294eff5b8cd86324545ed00689648c70bd23';
 const _connectionButtonPath = 'lib/features/home/widget/connection_button.dart';
+const _homePagePath = 'lib/features/home/widget/home_page.dart';
 const _activeProxyCardPath = 'lib/features/proxy/active/active_proxy_card.dart';
 // Existing presentation surfaces explicitly enumerated in the migration plan.
 const _files = <String>[
@@ -115,6 +116,7 @@ class _Bindings extends GeneralizingAstVisitor<void> {
   final stateSites = <String, int>{};
   final predicates = <String, int>{};
   final ifStatements = <IfStatement>[];
+  final switchExpressions = <SwitchExpression>[];
   final directStatements = <String, List<String>>{};
   final localInitializers = <String, List<String>>{};
   void add(Map<String, int> into, String kind, AstNode node) {
@@ -193,7 +195,10 @@ class _Bindings extends GeneralizingAstVisitor<void> {
     }
     if (node is GuardedPattern) add(exact, 'switch-pattern', node);
     if (node is SwitchCase) add(exact, 'switch-case', node.expression);
-    if (node is SwitchExpression) add(exact, 'switch-value', node.expression);
+    if (node is SwitchExpression) {
+      add(exact, 'switch-value', node.expression);
+      switchExpressions.add(node);
+    }
     if (node is SwitchStatement) add(exact, 'switch-value', node.expression);
     if (node is IfStatement) {
       add(predicates, 'if', node.expression);
@@ -275,6 +280,100 @@ String? _singleInitializer(_Bindings bindings, String key) {
   return values?.length == 1 ? values!.single : null;
 }
 
+const _actionLabelInitializerSource = '''
+switch (connectionStatus) {
+  AsyncData(value: Connected()) when requiresReconnect == true => t.connection.reconnect,
+  AsyncData(value: Connected()) => t.connection.disconnect,
+  AsyncData(value: Disconnected()) || AsyncError() => t.connection.connect,
+  AsyncData(value: final status) => status.present(t),
+  _ => '',
+}
+''';
+
+String _actionLabelFixture(String initializer, {bool duplicate = false}) =>
+    '''
+class ConnectionButton {
+  void build() {
+    final actionLabel = $initializer;
+    ${duplicate ? 'final duplicateActionLabel = $initializer;' : ''}
+  }
+}
+''';
+
+Map<String, int> get _approvedActionLabelBindings =>
+    _inventory(_actionLabelFixture(_actionLabelInitializerSource), 'approved-action-label').exact;
+
+bool _isApprovedActionLabelAddition(_Bindings baseline, _Bindings live, String key) {
+  if (baseline.path != 'baseline/$_connectionButtonPath' || live.path != _connectionButtonPath) return false;
+  if (_singleInitializer(baseline, 'ConnectionButton::build::actionLabel') != null ||
+      _singleInitializer(live, 'ConnectionButton::build::actionLabel') !=
+          _initializerTokens(_actionLabelInitializerSource)) {
+    return false;
+  }
+  final approvedCount = _approvedActionLabelBindings[key];
+  return approvedCount != null && live.exact[key] == (baseline.exact[key] ?? 0) + approvedCount;
+}
+
+const _homeProfileSwitchSource = '''
+switch (activeProfile) {
+  AsyncData(value: final profile?) => ConstrainedBox(
+    constraints: const BoxConstraints(minHeight: 76),
+    child: ProfileTile(
+      profile: profile,
+      isMain: true,
+      color: Theme.of(context).colorScheme.surfaceContainer,
+    ),
+  ),
+  _ => const SizedBox.shrink(),
+}
+''';
+
+String _homeProfileSwitchFixture(String? expression, {bool duplicate = false}) =>
+    '''
+class HomePage {
+  void build() {
+    Widget(slivers: blizzard ? [${expression ?? ''}${duplicate ? ', $expression' : ''}] : const []);
+  }
+}
+''';
+
+Map<String, int> get _approvedHomeProfileBindings =>
+    _inventory(_homeProfileSwitchFixture(_homeProfileSwitchSource), 'approved-home-profile').exact;
+
+bool _isInBlizzardSliversBranch(SwitchExpression node) {
+  String? className;
+  String? methodName;
+  var inApprovedBranch = false;
+  for (AstNode? current = node.parent; current != null; current = current.parent) {
+    if (current is ConditionalExpression &&
+        _tokens(current.condition) == jsonEncode(['blizzard']) &&
+        current.parent is NamedExpression &&
+        (current.parent! as NamedExpression).name.label.name == 'slivers' &&
+        node.offset >= current.thenExpression.offset &&
+        node.end <= current.thenExpression.end) {
+      inApprovedBranch = true;
+    }
+    if (methodName == null && current is MethodDeclaration) methodName = current.name.lexeme;
+    if (current is ClassDeclaration) {
+      className = current.name.lexeme;
+      break;
+    }
+  }
+  return className == 'HomePage' && methodName == 'build' && inApprovedBranch;
+}
+
+bool _isApprovedHomeProfileAddition(_Bindings baseline, _Bindings live, String key) {
+  if (baseline.path != 'baseline/$_homePagePath' || live.path != _homePagePath) return false;
+  final expectedTokens = _initializerTokens(_homeProfileSwitchSource);
+  final baselineMatches = baseline.switchExpressions.where((node) => _tokens(node) == expectedTokens).length;
+  final liveMatches = live.switchExpressions
+      .where((node) => _tokens(node) == expectedTokens && _isInBlizzardSliversBranch(node))
+      .length;
+  if (baselineMatches != 0 || liveMatches != 1) return false;
+  final approvedCount = _approvedHomeProfileBindings[key];
+  return approvedCount != null && live.exact[key] == (baseline.exact[key] ?? 0) + approvedCount;
+}
+
 String get _serverChoiceCallbackKey =>
     'onPressed:${jsonEncode(['(', ')', '=>', 'context', '.', 'goNamed', '(', "'proxies'", ')'])}';
 
@@ -331,6 +430,8 @@ List<String> _differences(_Bindings baseline, _Bindings live) {
   for (final key in {...baseline.exact.keys, ...live.exact.keys}) {
     if (baseline.exact[key] != live.exact[key] &&
         !_isApprovedStateAddition(baseline, live, key) &&
+        !_isApprovedActionLabelAddition(baseline, live, key) &&
+        !_isApprovedHomeProfileAddition(baseline, live, key) &&
         !(approvedServerChoiceFallback && key == _serverChoiceCallbackKey)) {
       issues.add('binding multiplicity changed: $key');
     }
@@ -475,6 +576,91 @@ void main() {
           .replaceFirst(predicate, predicate.replaceFirst('.value ', '.valueOrNull '))
           .replaceFirst('secureLabel = "";', 'secureLabel = "unexpected";');
       expect(_differences(_inventory(source, 'baseline/$path'), _inventory(changedBody, path)), isNotEmpty);
+    });
+  });
+
+  group('approved connection-button action label', () {
+    const baseline = 'class ConnectionButton { void build() {} }';
+
+    test('guard accepts only the exact presentation mapping at the approved site', () {
+      final live = _actionLabelFixture(_actionLabelInitializerSource);
+      expect(
+        _differences(_inventory(baseline, 'baseline/$_connectionButtonPath'), _inventory(live, _connectionButtonPath)),
+        isEmpty,
+      );
+    });
+
+    test('guard rejects changing the connected action mapping', () {
+      final changed = _actionLabelInitializerSource.replaceFirst('t.connection.disconnect', 't.connection.connect');
+      expect(
+        _differences(
+          _inventory(baseline, 'baseline/$_connectionButtonPath'),
+          _inventory(_actionLabelFixture(changed), _connectionButtonPath),
+        ),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects duplicating the approved switch', () {
+      expect(
+        _differences(
+          _inventory(baseline, 'baseline/$_connectionButtonPath'),
+          _inventory(_actionLabelFixture(_actionLabelInitializerSource, duplicate: true), _connectionButtonPath),
+        ),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects the exact mapping in another file', () {
+      const otherPath = 'lib/features/proxy/widget/proxy_tile.dart';
+      expect(
+        _differences(
+          _inventory(baseline, 'baseline/$otherPath'),
+          _inventory(_actionLabelFixture(_actionLabelInitializerSource), otherPath),
+        ),
+        isNotEmpty,
+      );
+    });
+  });
+
+  group('approved Blizzard home profile presentation', () {
+    final baseline = _homeProfileSwitchFixture(null);
+
+    test('guard accepts only the exact profile switch in the Blizzard slivers branch', () {
+      final live = _homeProfileSwitchFixture(_homeProfileSwitchSource);
+      expect(_differences(_inventory(baseline, 'baseline/$_homePagePath'), _inventory(live, _homePagePath)), isEmpty);
+    });
+
+    test('guard rejects changing the empty-profile presentation', () {
+      final changed = _homeProfileSwitchSource.replaceFirst('const SizedBox.shrink()', "const Text('')");
+      expect(
+        _differences(
+          _inventory(baseline, 'baseline/$_homePagePath'),
+          _inventory(_homeProfileSwitchFixture(changed), _homePagePath),
+        ),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects duplicating the approved profile switch', () {
+      expect(
+        _differences(
+          _inventory(baseline, 'baseline/$_homePagePath'),
+          _inventory(_homeProfileSwitchFixture(_homeProfileSwitchSource, duplicate: true), _homePagePath),
+        ),
+        isNotEmpty,
+      );
+    });
+
+    test('guard rejects the exact profile switch in another file', () {
+      const otherPath = 'lib/features/profile/widget/profile_tile.dart';
+      expect(
+        _differences(
+          _inventory(baseline, 'baseline/$otherPath'),
+          _inventory(_homeProfileSwitchFixture(_homeProfileSwitchSource), otherPath),
+        ),
+        isNotEmpty,
+      );
     });
   });
 

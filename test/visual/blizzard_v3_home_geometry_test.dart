@@ -22,7 +22,7 @@ void main() {
   });
 
   testWidgets('v3 Home follows the shared anchors and preserves the real surfaces', (tester) async {
-    final fixture = await mountHomeFixture(tester, width: 393);
+    final fixture = await mountHomeFixture(tester);
 
     final status = find.byKey(const ValueKey('blizzard_home_status_slot'));
     final wave = find.byKey(const ValueKey('blizzard_home_wave_envelope'));
@@ -44,10 +44,7 @@ void main() {
     expect(tester.getSize(dock), const Size(320, 64));
     expect(tester.getSize(selectedTab), const Size(152, 52));
     expect(tester.getSize(settingsTab), const Size(152, 52));
-    expect(
-      tester.widget<Icon>(find.descendant(of: selectedTab, matching: find.byType(Icon))).icon,
-      Icons.home_rounded,
-    );
+    expect(tester.widget<Icon>(find.descendant(of: selectedTab, matching: find.byType(Icon))).icon, Icons.home_rounded);
 
     final footer = tester.getRect(find.byType(ActiveProxyFooter));
     final profile = tester.getRect(find.byType(ProfileTile));
@@ -73,4 +70,11 @@ void main() {
       await fixture.close(tester);
     }, skip: !Platform.isIOS);
   }
+  testWidgets('v3 hero expands text slots for large accessibility text', (tester) async {
+    final fixture = await mountHomeFixture(tester, width: 320, height: 568, scale: 2, disableAnimations: true);
+    expect(tester.getSize(find.byKey(const ValueKey('blizzard_home_status_slot'))).height, greaterThan(98));
+    expect(tester.getSize(find.byKey(const ValueKey('blizzard_home_action_label'))).height, greaterThan(22));
+    expect(tester.takeException(), isNull);
+    await fixture.close(tester);
+  }, skip: !Platform.isIOS);
 }

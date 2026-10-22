@@ -28,7 +28,7 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     final t = ref.watch(translationsProvider).requireValue;
     final blizzard = BlizzardPresentation.isActive(context);
 
-    if (!blizzard && connectionState != const Connected()) {
+    if (connectionState != const Connected()) {
       return const SizedBox.shrink();
     }
     if (activeProxy == null) {

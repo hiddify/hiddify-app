@@ -47,6 +47,8 @@ final class BetterStackLogPrinter {
     if (_active && readOutbox != null) _restore(readOutbox);
     if (!_active) {
       _state = TelemetryDeliveryState.disabled;
+    } else if (_state == TelemetryDeliveryState.outboxStorageFailed) {
+      // Keep a restore failure visible until a later event is durably saved.
     } else if (_lastTestOutcome == TelemetryTestOutcome.droppedExpired) {
       _state = TelemetryDeliveryState.droppedExpired;
     } else if (_budgetBlockedDay != null && _isBudgetBlockedToday()) {
@@ -134,6 +136,7 @@ final class BetterStackLogPrinter {
   HttpClient? _client;
   Timer? _timer;
   Future<void>? _inFlight;
+  Future<TelemetryTestResult>? _testEventInFlight;
   Future<void> _storagePending = Future.value();
   bool _active;
   bool _storageBlocked = false;
@@ -233,7 +236,18 @@ final class BetterStackLogPrinter {
     return retained;
   }
 
-  Future<TelemetryTestResult> sendTestEvent() async {
+  Future<TelemetryTestResult> sendTestEvent() {
+    final running = _testEventInFlight;
+    if (running != null) return running;
+    late final Future<TelemetryTestResult> completed;
+    completed = _sendTestEvent().whenComplete(() {
+      if (identical(_testEventInFlight, completed)) _testEventInFlight = null;
+    });
+    _testEventInFlight = completed;
+    return completed;
+  }
+
+  Future<TelemetryTestResult> _sendTestEvent() async {
     if (!addTestEvent()) {
       return TelemetryTestResult(outcome: _active ? TelemetryTestOutcome.rejected : TelemetryTestOutcome.disabled);
     }
@@ -625,8 +639,8 @@ final class BetterStackLogPrinter {
         _state == TelemetryDeliveryState.pending) {
       _lastTestOutcome = TelemetryTestOutcome.persisted;
     }
-    if (_state == TelemetryDeliveryState.outboxStorageFailed) {
-      _state = _queue.isEmpty ? TelemetryDeliveryState.idle : TelemetryDeliveryState.pending;
+    if (_state == TelemetryDeliveryState.outboxStorageFailed && _queue.isNotEmpty) {
+      _state = TelemetryDeliveryState.pending;
     }
     _emitStatus();
   }

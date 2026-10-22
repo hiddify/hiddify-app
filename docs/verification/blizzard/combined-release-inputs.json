@@ -50,5 +50,20 @@
       "path": "design-exports/blizzard-v3-all-screens-2026-10-22/coverage.md",
       "sha256": "34fade0c38a84d53dcd696fc0fbf4bf8733792b5a484e13dbd374e00eab65d75"
     }
-  ]
+  ],
+  "runtime_wave": {
+    "pencil_node": "BiRLT",
+    "export_scale": 3,
+    "pixel_size": [
+      1059,
+      780
+    ],
+    "logical_size": [
+      353,
+      260
+    ],
+    "runtime_path": "assets/images/blizzard_wave_envelope.png",
+    "sha256": "5bca6e7c672919e0bc63f30e5048816f6285869b97a5b92e382e00f16bf6d3ea",
+    "motion": "12s shared lifecycle-aware clock; +/-2deg, 3px x and 2px y drift; accessibility freezes centered image"
+  }
 }

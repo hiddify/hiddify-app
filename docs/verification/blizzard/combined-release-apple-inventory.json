@@ -1,0 +1,127 @@
+{
+  "schema": "ios-baseline-build-inventory/v1",
+  "observedAt": "2026-10-22T12:51:17Z",
+  "candidateSHA": "b7e6f59a20a85a48e2ae02dc72c8b889014ccebf",
+  "helperSHA": "3fb04c73f94c1174a668842ec3e50190abef6e6a",
+  "version": "0.0.1",
+  "platform": "IOS",
+  "builds": [
+    {
+      "buildNumber": 1,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 2,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 3,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 4,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 5,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 6,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 7,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 8,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 9,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 10,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 11,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 12,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 13,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 14,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 15,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 16,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 17,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 18,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 19,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 20,
+      "processingState": "VALID",
+      "expired": false
+    },
+    {
+      "buildNumber": 21,
+      "processingState": "VALID",
+      "expired": false
+    }
+  ],
+  "count": 21,
+  "candidate": 22,
+  "delivery": {
+    "buildNumber": 21,
+    "processingState": "VALID",
+    "internalBuildState": "IN_BETA_TESTING",
+    "isInternalGroup": true,
+    "hasAccessToAllBuilds": true,
+    "appMatches": true,
+    "assignedViaBuilds": true,
+    "assignedViaRelationship": true
+  }
+}

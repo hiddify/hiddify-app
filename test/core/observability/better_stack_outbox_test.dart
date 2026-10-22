@@ -28,6 +28,7 @@ void main() {
   BetterStackLogPrinter printer({
     BetterStackPost? post,
     TelemetryBudget? telemetryBudget,
+    RemoteOutboxRead? readOutbox,
     Future<bool> Function(String)? writeOutbox,
     bool autoFlush = false,
   }) => BetterStackLogPrinter(
@@ -40,7 +41,7 @@ void main() {
     now: () => now,
     autoFlush: autoFlush,
     flushInterval: Duration.zero,
-    readOutbox: () => outbox,
+    readOutbox: readOutbox ?? () => outbox,
     writeOutbox:
         writeOutbox ??
         (value) async {
@@ -307,6 +308,23 @@ void main() {
     }
   });
 
+  test('restore failures stay observable through empty repair and recover after a real save', () async {
+    for (final readOutbox in <RemoteOutboxRead>[() => '{invalid', () => throw StateError('PRIVATE_STORAGE_ERROR')]) {
+      final remote = printer(readOutbox: readOutbox);
+      expect(remote.deliveryStatus.state, TelemetryDeliveryState.outboxStorageFailed);
+
+      await Future<void>.delayed(Duration.zero);
+      expect(remote.deliveryStatus.state, TelemetryDeliveryState.outboxStorageFailed);
+
+      remote.addDiagnostic(diagnostic(1));
+      await remote.flush();
+      expect(remote.deliveryStatus.state, TelemetryDeliveryState.accepted);
+      expect(sent, hasLength(1));
+      await remote.dispose();
+      sent.clear();
+    }
+  });
+
   test('expired events are dropped and queue document stays within both caps', () async {
     var remote = printer();
     for (var i = 1; i <= 150; i++) {
@@ -379,6 +397,33 @@ void main() {
     expect(remote.deliveryStatus.state, TelemetryDeliveryState.accepted);
     expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
     expect(sent, hasLength(2));
+    await remote.dispose();
+  });
+
+  test('overlapping manual test requests share one exact result and one event', () async {
+    final response = Completer<int>();
+    final requestStarted = Completer<void>();
+    final remote = printer(
+      post: (_, _, body) {
+        sent.add(body);
+        requestStarted.complete();
+        return response.future;
+      },
+    );
+
+    final first = remote.sendTestEvent();
+    await requestStarted.future;
+    final second = remote.sendTestEvent();
+
+    expect(identical(first, second), isTrue);
+    expect(remote.queuedCount, 1);
+    response.complete(202);
+    final firstResult = await first;
+    final secondResult = await second;
+    expect(firstResult.outcome, TelemetryTestOutcome.accepted);
+    expect(secondResult.outcome, TelemetryTestOutcome.accepted);
+    expect(sent, hasLength(1));
+    expect(jsonDecode(sent.single) as List, hasLength(1));
     await remote.dispose();
   });
 
