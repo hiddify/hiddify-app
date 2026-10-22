@@ -122,7 +122,10 @@ void main() {
           find.byKey(const ValueKey('blizzard_bottom_dock')).evaluate().isNotEmpty,
       isTrue,
     );
-    await tester.tap(find.byIcon(Icons.settings_rounded));
+    final blizzardSettings = find.byKey(const ValueKey('blizzard_bottom_dock_tab_1'));
+    await tester.tap(
+      blizzardSettings.evaluate().isNotEmpty ? blizzardSettings : find.byIcon(Icons.settings_rounded),
+    );
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('settings-draft')), findsOneWidget);
     expect(tester.takeException(), isNull);

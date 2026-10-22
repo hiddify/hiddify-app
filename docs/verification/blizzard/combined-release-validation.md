@@ -1,5 +1,7 @@
 # Combined release validation — 2026-10-22
 
+Post-delivery correction: build 22 is delivered to TestFlight, but **visual acceptance is FAIL** after the user's device screenshots and comparison with the actual v3 designs. The checks below establish only their stated code/runtime properties; they do not establish complete visual fidelity. See [the visual acceptance contract](visual-acceptance-contract.md). Remote receipt of a build-22 device event remains unconfirmed; live source queries on 22 October returned no events in the recent two-hour window.
+
 Source base: `3092d6e0644996b2d219f63774aca897eade9ebd`. Candidate release: 0.0.1 (22), selected from live Apple inventory observed 2026-10-22T12:51:17Z (builds 1–21 occupied).
 
 ## Executed checks

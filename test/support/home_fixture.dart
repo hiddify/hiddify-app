@@ -71,6 +71,8 @@ class HomeFixture {
 Future<HomeFixture> mountHomeFixture(
   WidgetTester tester, {
   Widget child = const HomePage(),
+  Widget? settingsChild,
+  Widget? proxiesChild,
   ProfileEntity? profile,
   List<Override> extraOverrides = const [],
   AppThemeMode mode = AppThemeMode.dark,
@@ -82,9 +84,12 @@ Future<HomeFixture> mountHomeFixture(
   AppLocale locale = AppLocale.en,
   bool highContrast = false,
   bool disableAnimations = false,
+  bool nativeViewport = false,
 }) async {
-  await tester.binding.setSurfaceSize(Size(width, height + 148));
-  addTearDown(() => tester.binding.setSurfaceSize(null));
+  if (!nativeViewport) {
+    await tester.binding.setSurfaceSize(Size(width, height + 148));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+  }
   // Widget/renderer fixture only; native persistence has a separate integration host.
   SharedPreferences.setMockInitialValues({'haptic_feedback': false, 'theme_mode': mode.name});
   final prefs = await SharedPreferences.getInstance();
@@ -135,7 +140,8 @@ Future<HomeFixture> mountHomeFixture(
         GoRoute(
           path: "/$name",
           name: name,
-          builder: (context, state) => Scaffold(body: Text(name)),
+          builder: (context, state) =>
+              Scaffold(body: name == 'proxies' && proxiesChild != null ? proxiesChild : Text(name)),
         ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => MyAdaptiveLayout(
@@ -153,7 +159,13 @@ Future<HomeFixture> mountHomeFixture(
                     builder: (context, state) => Builder(
                       builder: (context) {
                         fixture.innerTheme = Theme.of(context);
-                        return Scaffold(body: name == 'home' ? child : Text(name));
+                        return Scaffold(
+                          body: name == 'home'
+                              ? child
+                              : name == 'settings' && settingsChild != null
+                              ? settingsChild
+                              : Text(name),
+                        );
                       },
                     ),
                   ),
