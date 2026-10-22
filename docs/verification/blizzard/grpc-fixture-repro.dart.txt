@@ -1,0 +1,209 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:grpc/grpc.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
+
+class _BackgroundCore extends CoreServiceBase {
+  _BackgroundCore({this.emptyLogs = false});
+
+  final bool emptyLogs;
+  final statusEvents = StreamController<CoreInfoResponse>.broadcast();
+  final logEvents = StreamController<LogMessage>.broadcast();
+  final startEntered = Completer<void>();
+  final startResponse = Completer<CoreInfoResponse>();
+  final _statusEntered = <int, Completer<void>>{};
+  final _logEntered = <int, Completer<void>>{};
+  int _statusCalls = 0;
+  int _logCalls = 0;
+
+  Future<void> statusEntered(int call) => _statusEntered.putIfAbsent(call, Completer<void>.new).future;
+
+  Future<void> logEntered(int call) => _logEntered.putIfAbsent(call, Completer<void>.new).future;
+
+  @override
+  Stream<CoreInfoResponse> coreInfoListener(ServiceCall call, Empty request) {
+    final entered = _statusEntered.putIfAbsent(++_statusCalls, Completer<void>.new);
+    if (!entered.isCompleted) entered.complete();
+    return statusEvents.stream;
+  }
+
+  @override
+  Stream<LogMessage> logListener(ServiceCall call, LogRequest request) {
+    final entered = _logEntered.putIfAbsent(++_logCalls, Completer<void>.new);
+    if (!entered.isCompleted) entered.complete();
+    return emptyLogs ? const Stream.empty() : logEvents.stream;
+  }
+
+  @override
+  Future<CoreInfoResponse> start(ServiceCall call, StartRequest request) {
+    if (!startEntered.isCompleted) startEntered.complete();
+    return startResponse.future;
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _Fixture {
+  _Fixture._(this.service, this.server, this.channel, this.client);
+
+  final _BackgroundCore service;
+  final Server server;
+  final ClientChannel channel;
+  final CoreClient client;
+
+  static Future<_Fixture> open({bool emptyLogs = false}) async {
+    final service = _BackgroundCore(emptyLogs: emptyLogs);
+    final server = Server.create(services: [service]);
+    await server.serve(address: InternetAddress.loopbackIPv4, port: 0);
+    final channel = ClientChannel(
+      '127.0.0.1',
+      port: server.port!,
+      options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+    );
+    return _Fixture._(service, server, channel, CoreClient(channel));
+  }
+
+  Future<void> close() async {
+    if (!service.startResponse.isCompleted) {
+      service.startResponse.complete(CoreInfoResponse(messageType: MessageType.EMPTY));
+    }
+    await service.statusEvents.close();
+    await service.logEvents.close();
+    await channel.shutdown();
+    await server.shutdown();
+  }
+}
+
+Future<CoreInfoResponse> _completeStart(_Fixture fixture) async {
+  final response = fixture.client.start(StartRequest(configPath: '/fixture/config.json', configName: 'Fixture'));
+  await fixture.service.startEntered.future.timeout(const Duration(seconds: 3));
+  fixture.service.startResponse.complete(CoreInfoResponse(messageType: MessageType.EMPTY));
+  return _expectStartResponse(response);
+}
+
+Future<CoreInfoResponse> _expectStartResponse(Future<CoreInfoResponse> response) async {
+  try {
+    return await response;
+  } on GrpcError catch (error) {
+    fail('gRPC code: ${error.code}; transport: ${error.message ?? 'none'}');
+  }
+}
+
+void main() {
+  test('deferred unary start succeeds without streams', () async {
+    final fixture = await _Fixture.open();
+    addTearDown(fixture.close);
+
+    final response = await _completeStart(fixture);
+
+    expect(response.messageType, MessageType.EMPTY);
+  });
+
+  test('deferred unary start succeeds after status stream replacement', () async {
+    final fixture = await _Fixture.open();
+    addTearDown(fixture.close);
+    final firstEntered = fixture.service.statusEntered(1);
+    final first = fixture.client.coreInfoListener(Empty()).listen((_) {});
+    await firstEntered.timeout(const Duration(seconds: 3));
+    await first.cancel();
+    final secondEntered = fixture.service.statusEntered(2);
+    final second = fixture.client.coreInfoListener(Empty()).listen((_) {});
+    addTearDown(second.cancel);
+    await secondEntered.timeout(const Duration(seconds: 3));
+
+    final response = await _completeStart(fixture);
+
+    expect(response.messageType, MessageType.EMPTY);
+  });
+
+  test('deferred unary start succeeds after log and status stream replacement', () async {
+    final fixture = await _Fixture.open();
+    addTearDown(fixture.close);
+
+    final firstLogEntered = fixture.service.logEntered(1);
+    final firstLog = fixture.client.logListener(LogRequest()).listen((_) {});
+    await firstLogEntered.timeout(const Duration(seconds: 3));
+    await firstLog.cancel();
+    final secondLogEntered = fixture.service.logEntered(2);
+    final secondLog = fixture.client.logListener(LogRequest()).listen((_) {});
+    addTearDown(secondLog.cancel);
+    await secondLogEntered.timeout(const Duration(seconds: 3));
+
+    final firstStatusEntered = fixture.service.statusEntered(1);
+    final firstStatus = fixture.client.coreInfoListener(Empty()).listen((_) {});
+    await firstStatusEntered.timeout(const Duration(seconds: 3));
+    await firstStatus.cancel();
+    final secondStatusEntered = fixture.service.statusEntered(2);
+    final secondStatus = fixture.client.coreInfoListener(Empty()).listen((_) {});
+    addTearDown(secondStatus.cancel);
+    await secondStatusEntered.timeout(const Duration(seconds: 3));
+
+    final response = await _completeStart(fixture);
+
+    expect(response.messageType, MessageType.EMPTY);
+  });
+
+  test('deferred unary start succeeds after immediately empty log stream replacement', () async {
+    final fixture = await _Fixture.open(emptyLogs: true);
+    addTearDown(fixture.close);
+    final streamErrors = <GrpcError>[];
+    void captureStreamError(Object error) {
+      if (error is GrpcError) streamErrors.add(error);
+    }
+
+    final firstLogEntered = fixture.service.logEntered(1);
+    final firstLog = fixture.client.logListener(LogRequest()).listen((_) {}, onError: captureStreamError);
+    await firstLogEntered.timeout(const Duration(seconds: 3));
+    final firstStatusEntered = fixture.service.statusEntered(1);
+    final firstStatus = fixture.client.coreInfoListener(Empty()).listen((_) {}, onError: captureStreamError);
+    await firstStatusEntered.timeout(const Duration(seconds: 3));
+
+    await firstLog.cancel();
+    final secondLogEntered = fixture.service.logEntered(2);
+    final secondLog = fixture.client.logListener(LogRequest()).listen((_) {}, onError: captureStreamError);
+    addTearDown(secondLog.cancel);
+    await firstStatus.cancel();
+    final secondStatusEntered = fixture.service.statusEntered(2);
+    final secondStatus = fixture.client.coreInfoListener(Empty()).listen((_) {}, onError: captureStreamError);
+    addTearDown(secondStatus.cancel);
+    final response = fixture.client.start(StartRequest(configPath: '/fixture/config.json', configName: 'Fixture'));
+    await Future.wait([
+      secondLogEntered,
+      secondStatusEntered,
+      fixture.service.startEntered.future,
+    ]).timeout(const Duration(seconds: 3));
+    fixture.service.startResponse.complete(CoreInfoResponse(messageType: MessageType.EMPTY));
+
+    final result = await _expectStartResponse(response);
+    expect(result.messageType, MessageType.EMPTY);
+    expect(
+      streamErrors,
+      isEmpty,
+      reason: streamErrors.map((error) => 'gRPC ${error.code}: ${error.message}').join('; '),
+    );
+  });
+
+  test('deferred unary start succeeds while replacement status stream is being accepted', () async {
+    final fixture = await _Fixture.open();
+    addTearDown(fixture.close);
+    final firstEntered = fixture.service.statusEntered(1);
+    final first = fixture.client.coreInfoListener(Empty()).listen((_) {});
+    await firstEntered.timeout(const Duration(seconds: 3));
+    await first.cancel();
+
+    final secondEntered = fixture.service.statusEntered(2);
+    final second = fixture.client.coreInfoListener(Empty()).listen((_) {});
+    addTearDown(second.cancel);
+    final response = fixture.client.start(StartRequest(configPath: '/fixture/config.json', configName: 'Fixture'));
+    await Future.wait([secondEntered, fixture.service.startEntered.future]).timeout(const Duration(seconds: 3));
+    fixture.service.startResponse.complete(CoreInfoResponse(messageType: MessageType.EMPTY));
+
+    final result = await _expectStartResponse(response);
+    expect(result.messageType, MessageType.EMPTY);
+  });
+}

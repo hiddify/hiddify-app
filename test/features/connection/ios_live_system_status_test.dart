@@ -34,16 +34,30 @@ class _HelloService extends HelloServiceBase {
   Stream<HelloResponse> sayHelloStream(ServiceCall call, Stream<HelloRequest> request) => const Stream.empty();
 }
 
+class _ForegroundCore extends CoreServiceBase {
+  @override
+  Stream<LogMessage> logListener(ServiceCall call, LogRequest request) => const Stream.empty();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _BackgroundCore extends CoreServiceBase {
   final events = StreamController<CoreInfoResponse>.broadcast();
+  final logEvents = StreamController<LogMessage>.broadcast();
+  final _streamCompletions = <Future<void>>[];
   final startEntered = Completer<void>();
   final statusListening = Completer<void>();
+  final secondStatusListening = Completer<void>();
+  int statusListenCount = 0;
   Future<CoreInfoResponse> Function()? onStart;
 
   @override
   Stream<CoreInfoResponse> coreInfoListener(ServiceCall call, Empty request) {
+    statusListenCount++;
     if (!statusListening.isCompleted) statusListening.complete();
-    return events.stream;
+    if (statusListenCount >= 2 && !secondStatusListening.isCompleted) secondStatusListening.complete();
+    return _track(events.stream);
   }
 
   @override
@@ -53,7 +67,25 @@ class _BackgroundCore extends CoreServiceBase {
   }
 
   @override
-  Stream<LogMessage> logListener(ServiceCall call, LogRequest request) => const Stream.empty();
+  Stream<LogMessage> logListener(ServiceCall call, LogRequest request) => _track(logEvents.stream);
+
+  Stream<T> _track<T>(Stream<T> source) {
+    final completed = Completer<void>();
+    _streamCompletions.add(completed.future);
+    return (() async* {
+      try {
+        yield* source;
+      } finally {
+        if (!completed.isCompleted) completed.complete();
+      }
+    })();
+  }
+
+  Future<void> closeFixtureStreams() async {
+    if (!events.isClosed) await events.close();
+    if (!logEvents.isClosed) await logEvents.close();
+    await Future.wait(_streamCompletions);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -66,9 +98,48 @@ class _MobileCore extends CoreInterfaceMobile {
   int snapshotReads = 0;
   Object? refreshError;
   bool systemStatusSupported = true;
+  final nativeEventsProcessed = Completer<void>();
+  bool _nativeStoppedProcessed = false;
+  final _fixtureChannels = <ClientChannel>[];
 
   @override
   bool get supportsSystemStatus => systemStatusSupported;
+
+  @override
+  Future<String> setup(Directories directories, bool debug, int mode) async {
+    final result = await super.setup(directories, debug, mode);
+    if (result.isEmpty) {
+      final foreground = ClientChannel(
+        '127.0.0.1',
+        port: CoreInterfaceMobile.portFront,
+        options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+      );
+      final background = ClientChannel(
+        '127.0.0.1',
+        port: CoreInterfaceMobile.portBack,
+        options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+      );
+      _fixtureChannels.addAll([foreground, background]);
+      fgClient = CoreClient(foreground);
+      bgClient = CoreClient(background);
+    }
+    return result;
+  }
+
+  Future<void> closeFixtureChannels() async {
+    await Future.wait(_fixtureChannels.map((channel) => channel.terminate()));
+    _fixtureChannels.clear();
+  }
+
+  @override
+  Stream<CoreStatus> get systemStatusStream => super.systemStatusStream.map((status) {
+    if (status == const CoreStatus.stopped()) {
+      _nativeStoppedProcessed = true;
+    } else if (_nativeStoppedProcessed && status == const CoreStatus.started() && !nativeEventsProcessed.isCompleted) {
+      nativeEventsProcessed.complete();
+    }
+    return status;
+  });
 
   @override
   Future<CoreStatus?> getSystemStatus() async {
@@ -87,10 +158,12 @@ class _MobileCore extends CoreInterfaceMobile {
 class _MobileService extends HiddifyCoreService {
   _MobileService(super.ref, this.mobileCore);
 
-  final CoreInterfaceMobile mobileCore;
+  final _MobileCore mobileCore;
 
   @override
   CoreInterface get core => mobileCore;
+
+  Future<void> closeFixtureChannels() => mobileCore.closeFixtureChannels();
 }
 
 class _NativeStatusHarness {
@@ -159,7 +232,7 @@ Future<ProviderContainer> _container() async {
 }
 
 Future<Server> _serveHello() async {
-  final server = Server.create(services: [_HelloService(), _BackgroundCore()]);
+  final server = Server.create(services: [_HelloService(), _ForegroundCore()]);
   await server.serve(address: InternetAddress.loopbackIPv4, port: CoreInterfaceMobile.portFront);
   return server;
 }
@@ -191,6 +264,7 @@ void main() {
       await statusSubscription?.cancel();
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
       await service.statusController.close();
       await service.logController.close();
       await helloServer.shutdown();
@@ -223,6 +297,7 @@ void main() {
     addTearDown(() async {
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
       await service.statusController.close();
       await service.logController.close();
       await helloServer.shutdown();
@@ -255,6 +330,7 @@ void main() {
     addTearDown(() async {
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
       await service.statusController.close();
       await service.logController.close();
       await helloServer.shutdown();
@@ -279,9 +355,10 @@ void main() {
     addTearDown(() async {
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();
@@ -310,9 +387,10 @@ void main() {
     addTearDown(() async {
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      if (!background.events.isClosed) await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();
@@ -348,9 +426,10 @@ void main() {
     addTearDown(() async {
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();
@@ -390,11 +469,14 @@ void main() {
       ..onSetupBackground = () => setupBackground.future;
     final service = container.read(Provider((ref) => _MobileService(ref, core)));
     addTearDown(() async {
+      if (!setupBackground.isCompleted) setupBackground.complete(const CoreStatus.started());
+      if (!startResponse.isCompleted) startResponse.complete(CoreInfoResponse(messageType: MessageType.EMPTY));
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();
@@ -403,18 +485,30 @@ void main() {
 
     expect((await service.setup().run()).isRight(), isTrue);
     await native.listening.future.timeout(const Duration(seconds: 3));
+    await background.statusListening.future.timeout(const Duration(seconds: 3));
     final started = service.start('/fixture/config.json', 'Fixture', false).run();
+    var startCompletion = 'pending';
+    unawaited(
+      started.then((result) {
+        startCompletion = result.fold((failure) => 'left:${failure.runtimeType}', (_) => 'right');
+      }),
+    );
     await _waitUntil(() => service.currentState == const CoreStatus.starting());
     native.send('Stopped');
     native.send('Started');
-    await Future<void>.delayed(const Duration(milliseconds: 50));
+    await core.nativeEventsProcessed.future.timeout(const Duration(seconds: 3));
     expect(service.currentState, const CoreStatus.starting());
 
     setupBackground.complete(const CoreStatus.started());
-    await background.startEntered.future.timeout(const Duration(seconds: 3));
+    await Future.wait([
+      background.secondStatusListening.future,
+      background.startEntered.future,
+    ]).timeout(const Duration(seconds: 3));
+    expect(startCompletion, 'pending', reason: 'client start completion: $startCompletion');
     expect(service.currentState, const CoreStatus.starting());
     startResponse.complete(CoreInfoResponse(messageType: MessageType.EMPTY));
-    expect((await started).isRight(), isTrue);
+    final startResult = await started;
+    expect(startResult.isRight(), isTrue, reason: 'client start completion: $startCompletion');
     expect(service.currentState, const CoreStatus.started());
   });
 
@@ -430,9 +524,10 @@ void main() {
     addTearDown(() async {
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();
@@ -464,9 +559,10 @@ void main() {
     addTearDown(() async {
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();
@@ -498,9 +594,10 @@ void main() {
       if (!startResponse.isCompleted) startResponse.complete(CoreInfoResponse(messageType: MessageType.EMPTY));
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();
@@ -548,9 +645,10 @@ void main() {
       if (!startResponse.isCompleted) startResponse.complete(CoreInfoResponse(messageType: MessageType.EMPTY));
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();
@@ -594,9 +692,10 @@ void main() {
     addTearDown(() async {
       await service.stopListenSingle('fg');
       await service.stopListenSingle('bg');
+      await service.closeFixtureChannels();
+      await background.closeFixtureStreams();
       await service.statusController.close();
       await service.logController.close();
-      await background.events.close();
       await backgroundServer.shutdown();
       await helloServer.shutdown();
       native.close();

@@ -22,3 +22,15 @@ Canonical config-only preparation hydrated the unchanged native core; CocoaPods 
 ## Remaining acceptance
 
 Actual iPhone traffic after unlock, VoiceOver gestures, native material on older physical iOS, and fresh Better Stack receipt for build 22 require the delivered build and device scenario. The root cause of absent build-21 events was not established; the new sender exposes storage/budget/retry/request outcomes instead of claiming queueing proves delivery. Free caps remain 64 KiB/install/UTC day including retries and Sentry 10/install/month; no paid settings changed.
+
+## Release-run fixture failure and isolated diagnosis
+
+Upload workflow `39784317705` failed before preflight/sign/upload twice on the same source, with 775 passed / 1 failed / 4 skipped. `ios_live_system_status_test.dart` expected Starting while its Start RPC remained under fixture control, but the client RPC had already failed. No binary was uploaded and build 22 was not consumed by these attempts.
+
+The native/start runtime and the test were unchanged from build-21 source. A focused local test initially passed; replacing time-based waiting with real native-event and server-listener barriers made the failure reproducible locally. Closed diagnostic evidence: gRPC UNKNOWN (2), HTTP/2 connection terminated with PROTOCOL_ERROR (1).
+
+A pure gRPC reproduction removed HiddifyCoreService, native channels and UI. With the same cancel/resubscribe/concurrent-Start ordering, an immediately empty LogListener reproduced the protocol error; an open broadcast log stream passed. The fixture returned `const Stream.empty()` for a stream the real core keeps open. grpc 4.0.1 can send its empty completion as a headers/trailers-only frame after cancellation; http2 2.3.1 rejects late headers for the removed stream and terminates the shared connection. Adding an initial status event did not fix the reproducer, ruling out that proposed workaround.
+
+The correction is confined to the test fixture: keep the log stream open until explicit cleanup and await actual native-event/listener barriers. Preserve Starting-before-response and successful-result assertions. No VPN runtime, transport dependency, route or identity change is part of this correction. Scratch protocol probes are retained outside the release test suite.
+
+Final fixture cleanup owns explicit test ClientChannels, terminates them after subscription cancellation, then closes and awaits tracked server streams. Target test: 1/1 passed; complete live status file: 12/12 passed; final full local suite: 776 passed / 4 host-only skips. Independent followup review found no weakened assertions or production changes.
