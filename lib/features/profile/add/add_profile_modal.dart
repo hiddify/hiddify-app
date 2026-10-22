@@ -74,7 +74,10 @@ class AddProfileOptions extends HookConsumerWidget {
             : (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * AddProfileModalConst.fixBtnsGapCount) /
                   AddProfileModalConst.fixBtnsItemCount;
         final fullHeight = fixBtnsHeight + AddProfileModalConst.navBarHeight + 32;
-        final initial = blizzard && !freeSwitch ? 245.0 : (!freeSwitch ? fullHeight : fullHeight + 180);
+        final largeText = MediaQuery.textScalerOf(context).scale(16) > 20;
+        final initial = blizzard && !freeSwitch
+            ? (largeText ? constraints.maxHeight * .85 : 245.0)
+            : (!freeSwitch ? fullHeight : fullHeight + 180);
         var min = blizzard && !freeSwitch ? 245.0 : (!freeSwitch ? fullHeight : fullHeight + 100);
         var max = !freeSwitch ? (blizzard ? initial : fullHeight) / constraints.maxHeight : 0.85;
         if (isDesktop) {
@@ -86,14 +89,28 @@ class AddProfileOptions extends HookConsumerWidget {
           minChildSize: min / constraints.maxHeight,
           maxChildSize: max,
           expand: false,
-          builder: (context, scrollController) => Column(
-            children: [
-              const Gap(AddProfileModalConst.fixBtnsGap),
-              FixBtns(height: fixBtnsHeight),
-              if (freeSwitch) Expanded(child: FreeBtns(scrollController: scrollController)) else const Spacer(),
-              const NavBar(),
-            ],
-          ),
+          builder: (context, scrollController) => blizzard && !freeSwitch
+              ? ListView(
+                  controller: scrollController,
+                  padding: EdgeInsets.zero,
+                  children: [
+                    const Gap(AddProfileModalConst.fixBtnsGap),
+                    FixBtns(height: fixBtnsHeight, blizzardPresentation: true),
+                    Gap(largeText ? 16 : 62),
+                    const NavBar(blizzardPresentation: true),
+                  ],
+                )
+              : Column(
+                  children: [
+                    const Gap(AddProfileModalConst.fixBtnsGap),
+                    if (blizzard)
+                      FixBtns(height: fixBtnsHeight, blizzardPresentation: true)
+                    else
+                      FixBtns(height: fixBtnsHeight),
+                    if (freeSwitch) Expanded(child: FreeBtns(scrollController: scrollController)) else const Spacer(),
+                    NavBar(blizzardPresentation: blizzard),
+                  ],
+                ),
         );
       },
     );

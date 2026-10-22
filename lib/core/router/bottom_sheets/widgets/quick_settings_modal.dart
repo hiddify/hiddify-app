@@ -32,10 +32,7 @@ class QuickSettingsModal extends HookConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
                     child: Align(
                       alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        t.$meta.locale == AppLocale.ru ? 'Быстрые настройки' : 'Quick Settings',
-                        style: theme.textTheme.titleLarge,
-                      ),
+                      child: Text(t.pages.home.quickSettings, style: theme.textTheme.titleLarge),
                     ),
                   ),
                 Padding(
@@ -44,6 +41,14 @@ class QuickSettingsModal extends HookConsumerWidget {
                     height: blizzard ? 44 : null,
                     child: SegmentedButton(
                       showSelectedIcon: false,
+                      // A non-null zero inset opts into equal-width expanded segments.
+                      expandedInsets: blizzard ? EdgeInsets.zero : null,
+                      style: blizzard
+                          ? ButtonStyle(
+                              shape: const WidgetStatePropertyAll(RoundedRectangleBorder()),
+                              side: WidgetStatePropertyAll(BorderSide(color: theme.colorScheme.outline)),
+                            )
+                          : null,
                       segments: ServiceMode.choices
                           .map(
                             (e) => ButtonSegment(

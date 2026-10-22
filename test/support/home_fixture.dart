@@ -129,7 +129,6 @@ Future<HomeFixture> mountHomeFixture(
       ),
       for (final name in [
         "profiles",
-        "proxies",
         "general",
         "routeOptions",
         "dnsOptions",
@@ -140,8 +139,7 @@ Future<HomeFixture> mountHomeFixture(
         GoRoute(
           path: "/$name",
           name: name,
-          builder: (context, state) =>
-              Scaffold(body: name == 'proxies' && proxiesChild != null ? proxiesChild : Text(name)),
+          builder: (context, state) => Scaffold(body: Text(name)),
         ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => MyAdaptiveLayout(
@@ -168,6 +166,15 @@ Future<HomeFixture> mountHomeFixture(
                         );
                       },
                     ),
+                    routes: name == 'home'
+                        ? [
+                            GoRoute(
+                              path: '/proxies',
+                              name: 'proxies',
+                              builder: (context, state) => Scaffold(body: proxiesChild ?? const Text('proxies')),
+                            ),
+                          ]
+                        : const [],
                   ),
                 ],
               ),

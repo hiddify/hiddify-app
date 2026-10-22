@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/theme/blizzard_theme.dart';
+import 'package:hiddify/core/theme/blizzard_tokens.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
@@ -35,6 +36,7 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
     final timeout = delay > 65000;
 
     return Center(
+      heightFactor: blizzard ? 1 : null,
       child: InkWell(
         onTap: () async {
           try {
@@ -46,7 +48,9 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
         },
         borderRadius: BorderRadius.circular(24),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          padding: blizzard
+              ? const EdgeInsets.fromLTRB(16, 2, 16, 22)
+              : const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -62,8 +66,10 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
                                   ? t.common.timeout
                                   : t.pages.proxies.delay.result(delay: delay).replaceFirst(': ', ' '),
                               style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: timeout ? theme.colorScheme.error : null,
+                                fontSize: 15,
+                                height: 20 / 15,
+                                fontWeight: FontWeight.w400,
+                                color: timeout ? theme.colorScheme.error : BlizzardPalette.muted,
                               ),
                             ),
                           ]

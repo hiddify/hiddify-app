@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/theme/blizzard_theme.dart';
+import 'package:hiddify/core/theme/blizzard_tokens.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -231,6 +232,7 @@ class _IosActiveProxyDelayIndicatorState extends ConsumerState<IosActiveProxyDel
         : t.common.unknown;
 
     return Center(
+      heightFactor: blizzard ? 1 : null,
       child: Semantics(
         button: true,
         enabled: enabled,
@@ -243,7 +245,9 @@ class _IosActiveProxyDelayIndicatorState extends ConsumerState<IosActiveProxyDel
               onTap: enabled ? _refresh : null,
               borderRadius: BorderRadius.circular(24),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                padding: blizzard
+                    ? const EdgeInsets.fromLTRB(16, 2, 16, 22)
+                    : const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -263,7 +267,14 @@ class _IosActiveProxyDelayIndicatorState extends ConsumerState<IosActiveProxyDel
                             : timedOut
                             ? t.common.timeout
                             : t.common.unknown,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: blizzard
+                            ? Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontSize: 15,
+                                height: 20 / 15,
+                                fontWeight: FontWeight.w400,
+                                color: BlizzardPalette.muted,
+                              )
+                            : Theme.of(context).textTheme.titleMedium,
                       ),
                     if (!blizzard && !checking && !updating) ...[const Gap(8), const Icon(Icons.refresh, size: 16)],
                   ],

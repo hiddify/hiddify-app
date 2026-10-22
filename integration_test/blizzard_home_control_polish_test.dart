@@ -7,6 +7,7 @@ import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:integration_test/integration_test.dart';
 
 import '../test/support/blizzard_visual_fixture.dart';
+import '../test/visual/blizzard_native_home_refinement_test.dart' as refinement;
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,8 @@ void main() {
     await binding.endOfFrame;
     await Future<void>.delayed(const Duration(seconds: 1));
   });
+
+  refinement.main();
 
   testWidgets('eligible iOS Home uses the approved Blizzard power control', (tester) async {
     expect(Platform.isIOS, isTrue, reason: 'Requires an actual iOS process; host overrides are not valid evidence');

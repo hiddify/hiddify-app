@@ -5,6 +5,7 @@ import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/theme/blizzard_theme.dart';
+import 'package:hiddify/core/theme/blizzard_tokens.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_scene.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
@@ -75,7 +76,7 @@ class HomePage extends HookConsumerWidget {
               key: const ValueKey("profile_quick_settings"),
               label: t.pages.home.quickSettings,
               child: IconButton(
-                icon: Icon(Icons.tune_rounded, color: theme.colorScheme.primary),
+                icon: Icon(Icons.tune_rounded, color: blizzard ? BlizzardPalette.muted : theme.colorScheme.primary),
                 onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
               ),
             ),
@@ -84,7 +85,7 @@ class HomePage extends HookConsumerWidget {
               key: const ValueKey("profile_add_button"),
               label: t.pages.profiles.add,
               child: IconButton(
-                icon: Icon(Icons.add_rounded, color: theme.colorScheme.primary),
+                icon: Icon(Icons.add_rounded, color: blizzard ? BlizzardPalette.muted : theme.colorScheme.primary),
                 onPressed: () => ref.read(bottomSheetsNotifierProvider.notifier).showAddProfile(),
               ),
             ),

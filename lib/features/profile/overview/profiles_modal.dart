@@ -110,7 +110,7 @@ class _ProfilesSheetContent extends ConsumerWidget {
           ),
         Expanded(
           child: ListView.separated(
-            padding: blizzard ? const EdgeInsets.fromLTRB(16, 4, 16, 18) : const EdgeInsets.all(12),
+            padding: blizzard ? const EdgeInsets.fromLTRB(32, 8, 32, 18) : const EdgeInsets.all(12),
             separatorBuilder: (context, index) => Gap(blizzard ? 8 : 12),
             controller: scrollController,
             itemBuilder: (context, index) => ProfileTile(profile: data[index]),

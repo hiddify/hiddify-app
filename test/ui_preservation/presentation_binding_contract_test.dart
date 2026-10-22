@@ -33,6 +33,9 @@ const _files = <String>[
   'lib/features/settings/widget/preference_tile.dart',
   'lib/features/common/general_pref_tiles.dart',
   'lib/features/profile/add/add_profile_modal.dart',
+  'lib/features/profile/add/widgets/fix_btn.dart',
+  'lib/features/profile/add/widgets/fix_btns.dart',
+  'lib/features/profile/add/widgets/nav_bar.dart',
   'lib/features/profile/overview/profiles_modal.dart',
   'lib/core/router/bottom_sheets/widgets/quick_settings_modal.dart',
   'lib/features/profile/details/profile_details_page.dart',
@@ -90,6 +93,12 @@ class _ApprovedStateAddition {
 }
 
 const _approvedStateAdditions = <_ApprovedStateAddition>[
+  _ApprovedStateAddition(
+    path: 'lib/features/proxy/overview/proxies_overview_page.dart',
+    className: 'ProxiesOverviewPage',
+    methodName: 'build',
+    provider: 'activeProfileProvider',
+  ),
   _ApprovedStateAddition(
     path: 'lib/features/proxy/active/active_proxy_delay_indicator.dart',
     className: 'ActiveProxyDelayIndicator',
@@ -692,6 +701,39 @@ List<String> _differences(_Bindings baseline, _Bindings live) {
 }
 
 void main() {
+  group('approved server-header profile name read', () {
+    const path = 'lib/features/proxy/overview/proxies_overview_page.dart';
+    const baseline = 'class ProxiesOverviewPage { void build() {} }';
+    const live = '''
+class ProxiesOverviewPage {
+  void build() {
+    final profileName = ref.watch(activeProfileProvider).valueOrNull?.name;
+    Text(profileName);
+  }
+}
+''';
+    test('accepts one exact additive watch at the server header build site', () {
+      expect(_differences(_inventory(baseline, 'baseline/$path'), _inventory(live, path)), isEmpty);
+    });
+    for (final mutation in <String, String Function(String)>{
+      'wrong provider': (source) => source.replaceFirst('activeProfileProvider', 'otherProvider'),
+      'wrong method': (source) => source.replaceFirst('void build()', 'void other()'),
+      'wrong class': (source) => source.replaceFirst('class ProxiesOverviewPage', 'class OtherPage'),
+      'duplicate read': (source) =>
+          source.replaceFirst('Text(profileName);', 'ref.watch(activeProfileProvider); Text(profileName);'),
+      'moved into closure': (source) => source.replaceFirst(
+        'final profileName = ref.watch(activeProfileProvider).valueOrNull?.name;',
+        'final profileName = () => ref.watch(activeProfileProvider).valueOrNull?.name;',
+      ),
+    }.entries) {
+      test('rejects ${mutation.key}', () {
+        expect(
+          _differences(_inventory(baseline, 'baseline/$path'), _inventory(mutation.value(live), path)),
+          isNotEmpty,
+        );
+      });
+    }
+  });
   group('approved Profiles toolbar callback forwarding', () {
     const baseline = '''
 class ProfilesModal {

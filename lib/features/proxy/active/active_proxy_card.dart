@@ -12,6 +12,7 @@ import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement_providers.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
+import 'package:hiddify/features/proxy/widget/country_iso_badge.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -52,12 +53,7 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     final theme = Theme.of(context);
     final materials = BlizzardMaterials(highContrast: MediaQuery.highContrastOf(context));
     final textScaler = MediaQuery.textScalerOf(context);
-    final selectedServer = activeProxy.groupSelectedTagDisplay.trim().isNotEmpty
-        ? activeProxy.groupSelectedTagDisplay.trim()
-        : activeProxy.tagDisplay.trim().isNotEmpty
-        ? activeProxy.tagDisplay.trim()
-        : activeProxy.tag.trim();
-    final serverSubtitle = [selectedServer, activeProxy.type.trim()].where((value) => value.isNotEmpty).join(' · ');
+    final serverSubtitle = proxyServerSubtitle(activeProxy);
     double scaledLineHeight(TextStyle? style) => textScaler.scale(style?.fontSize ?? 0) * (style?.height ?? 1);
     final blizzardHeight = math.max(
       84.0,
@@ -107,11 +103,16 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: IPCountryFlag(
-                  countryCode: activeProxy.ipinfo.countryCode,
-                  organization: activeProxy.ipinfo.org,
-                  size: 48,
-                ),
+                child: blizzard
+                    ? CountryIsoBadge(
+                        key: const ValueKey('country_iso_badge'),
+                        countryCode: activeProxy.ipinfo.countryCode,
+                      )
+                    : IPCountryFlag(
+                        countryCode: activeProxy.ipinfo.countryCode,
+                        organization: activeProxy.ipinfo.org,
+                        size: 48,
+                      ),
               ),
             ),
             Expanded(
@@ -123,7 +124,7 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                     label: t.pages.proxies.activeProxy,
                     child: Text(
                       // getRealOutboundTag(activeProxy),
-                      activeProxy.tagDisplay,
+                      proxyDisplayName(activeProxy),
                       style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

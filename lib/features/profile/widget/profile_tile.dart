@@ -81,7 +81,7 @@ class ProfileTile extends HookConsumerWidget {
         // shadowColor: Colors.transparent,
         child: IntrinsicHeight(
           child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: blizzard && isMain ? 76 : 48),
+            constraints: BoxConstraints(minHeight: blizzard ? (isMain ? 76 : 96) : 48),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -134,7 +134,10 @@ class ProfileTile extends HookConsumerWidget {
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: blizzard && isMain ? 16 : 12, vertical: 4),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: blizzard && isMain ? 16 : 12,
+                                vertical: blizzard && !isMain ? 8 : 4,
+                              ),
                               child: Column(
                                 // mainAxisSize: MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -184,9 +187,8 @@ class ProfileTile extends HookConsumerWidget {
                                       profile.name,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
-                                      ),
+                                      style: (blizzard ? theme.textTheme.bodyLarge : theme.textTheme.titleMedium)
+                                          ?.copyWith(fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null),
                                       semanticsLabel: profile.active
                                           ? t.pages.profiles.activeProfileName(name: profile.name)
                                           : t.pages.profiles.nonActiveProfileName(name: profile.name),
@@ -197,7 +199,7 @@ class ProfileTile extends HookConsumerWidget {
                                       RemainingTrafficIndicator(subInfo.ratio),
                                     ],
                                     const Gap(4),
-                                    ProfileSubscriptionInfo(subInfo, inline: blizzard && isMain),
+                                    ProfileSubscriptionInfo(subInfo, inline: blizzard),
                                     if (!(blizzard && isMain)) const Gap(4),
                                   ],
                                 ],
@@ -216,6 +218,11 @@ class ProfileTile extends HookConsumerWidget {
                             const Padding(
                               padding: EdgeInsetsDirectional.only(end: 12),
                               child: Icon(Icons.arrow_forward_ios, size: 16),
+                            ),
+                          if (blizzard && !isMain)
+                            const Padding(
+                              padding: EdgeInsetsDirectional.only(end: 12),
+                              child: Icon(Icons.arrow_drop_down_rounded, size: 20),
                             ),
                         ],
                       ),
@@ -240,6 +247,9 @@ class ProfileActionButton extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final theme = BlizzardPresentation.themeOf(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) || (theme.extension<BlizzardEligibility>()?.applied ?? false);
 
     if (profile case RemoteProfileEntity() when !showAllActions) {
       return Semantics(
@@ -278,7 +288,10 @@ class ProfileActionButton extends HookConsumerWidget {
                   ).resolve(Directionality.of(context))
                 : ProfileTileConst.startBorderRadius(Directionality.of(context)),
             onTap: toggleVisibility,
-            child: Icon(AdaptiveIcon(context).more),
+            child: Icon(
+              blizzard ? Icons.more_vert_rounded : AdaptiveIcon(context).more,
+              color: blizzard ? theme.colorScheme.onSurfaceVariant : null,
+            ),
           ),
         ),
       );
