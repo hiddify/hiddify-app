@@ -82,7 +82,9 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
             const Gap(8),
           ],
         ),
-        floatingActionButton: blizzard ? null : delayTestAction,
+        floatingActionButton: blizzard && (proxies.whenOrNull(data: (group) => group != null) ?? false)
+            ? null
+            : delayTestAction,
         body: BlizzardBackdrop(
           child: proxies.when(
             data: (group) => group != null

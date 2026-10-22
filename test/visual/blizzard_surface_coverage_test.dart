@@ -5,12 +5,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/dialog/widgets/setting_input_dialog.dart';
 import 'package:hiddify/core/theme/app_theme.dart';
 import 'package:hiddify/core/theme/app_theme_mode.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/features/about/widget/about_page.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/common/qr_code_dialog.dart';
+import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
+import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
+import 'package:hiddify/features/diagnostics/safe_diagnostic_journal.dart';
+import 'package:hiddify/features/diagnostics/safe_diagnostics_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/data/log_path_resolver.dart';
@@ -46,6 +52,10 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   registerBlizzardSurfaceCoverage();
 }
+
+Widget _appliedBlizzard(Widget child) => Builder(
+  builder: (context) => Theme(data: BlizzardTheme.from(Theme.of(context)), child: child),
+);
 
 void registerBlizzardSurfaceCoverage() {
   for (final editor in Editors.values) {
@@ -232,60 +242,156 @@ void registerBlizzardSurfaceCoverage() {
     });
   }
   for (final state in ['loading', 'empty', 'error', 'data']) {
-    testWidgets('real logs $state retains visible noncolor state and controls', (tester) async {
+    final logsDescription = Platform.isIOS
+        ? 'iOS safe diagnostics controls with legacy log override $state'
+        : 'real logs $state retains visible noncolor state and controls';
+    testWidgets(logsDescription, (tester) async {
       final logs = switch (state) {
         'loading' => const AsyncLoading<List<LogEntity>>(),
         'empty' => const AsyncData(<LogEntity>[]),
         'error' => AsyncError<List<LogEntity>>(StateError('Synthetic log error'), StackTrace.current),
         _ => const AsyncData([LogEntity(message: '00:00 INFO Synthetic diagnostic message')]),
       };
+      final journal = Platform.isIOS ? SafeDiagnosticJournal() : null;
+      if (journal != null) {
+        journal.record(
+          operation: DiagnosticOperation.connect,
+          stage: DiagnosticStage.accepted,
+          code: DiagnosticCode.started,
+          operationId: journal.nextOperationId(),
+        );
+        addTearDown(journal.dispose);
+      }
       final f = await home.mountHomeFixture(
         tester,
         child: const LogsPage(),
         extraOverrides: [
           logsOverviewNotifierProvider.overrideWith(() => SurfaceLogs(LogsOverviewState(logs: logs))),
           logPathResolverProvider.overrideWith((ref) => LogPathResolver(Directory.systemTemp)),
+          if (journal != null) safeDiagnosticJournalProvider.overrideWithValue(journal),
         ],
       );
       expect(find.byType(AppBar), findsOneWidget);
       expect(find.byType(IconButton), findsWidgets);
-      final dropdown = find.byWidgetPredicate((w) => w is DropdownButton);
-      expect(dropdown, findsOneWidget);
-      await tester.tap(dropdown);
-      await tester.pump(const Duration(milliseconds: 300));
-      expect(find.byWidgetPredicate((w) => w is DropdownMenuItem), findsWidgets);
-      await tester.binding.handlePopRoute();
-      await tester.pump(const Duration(milliseconds: 400));
-      if (state == 'data') expect(find.textContaining('Synthetic diagnostic', findRichText: true), findsOneWidget);
-      if (state == 'loading') expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      if (state == 'error') expect(find.byType(SliverErrorBodyPlaceholder), findsOneWidget);
-      if (state == 'empty') {
-        expect(f.container.read(logsOverviewNotifierProvider).logs.requireValue, isEmpty);
-        expect(find.textContaining('Synthetic diagnostic', findRichText: true), findsNothing);
-        expect(find.byType(SliverErrorBodyPlaceholder), findsNothing);
-        expect(find.byType(CircularProgressIndicator), findsNothing);
+      if (Platform.isIOS) {
+        expect(find.byType(SafeDiagnosticsPage), findsOneWidget);
+        expect(find.text('Safe diagnostics'), findsOneWidget);
+        for (final key in const [
+          Key('safe-diagnostics-send-test'),
+          Key('safe-diagnostics-copy'),
+          Key('safe-diagnostics-clear'),
+        ]) {
+          final action = find.byKey(key);
+          expect(action, findsOneWidget);
+          expect(action.hitTestable(), findsOneWidget);
+          expect(tester.getSize(action).shortestSide, greaterThanOrEqualTo(44));
+        }
+        expect(journal!.events, isNotEmpty);
+        await tester.tap(find.byKey(const Key('safe-diagnostics-clear')));
+        await tester.pump();
+        await journal.flush();
+        expect(journal.events, isEmpty);
+        expect(find.text('No diagnostic events yet.'), findsOneWidget);
+      } else {
+        final dropdown = find.byWidgetPredicate((w) => w is DropdownButton);
+        expect(dropdown, findsOneWidget);
+        await tester.tap(dropdown);
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(find.byWidgetPredicate((w) => w is DropdownMenuItem), findsWidgets);
+        await tester.binding.handlePopRoute();
+        await tester.pump(const Duration(milliseconds: 400));
+        if (state == 'data') expect(find.textContaining('Synthetic diagnostic', findRichText: true), findsOneWidget);
+        if (state == 'loading') expect(find.byType(CircularProgressIndicator), findsOneWidget);
+        if (state == 'error') expect(find.byType(SliverErrorBodyPlaceholder), findsOneWidget);
+        if (state == 'empty') {
+          expect(f.container.read(logsOverviewNotifierProvider).logs.requireValue, isEmpty);
+          expect(find.textContaining('Synthetic diagnostic', findRichText: true), findsNothing);
+          expect(find.byType(SliverErrorBodyPlaceholder), findsNothing);
+          expect(find.byType(CircularProgressIndicator), findsNothing);
+        }
       }
       expect(tester.takeException(), isNull);
       await f.close(tester);
     });
     testWidgets('real proxies $state retains sort and test actions', (tester) async {
+      final error = StateError('Synthetic proxy error');
       final value = switch (state) {
         'loading' => const AsyncLoading<OutboundGroup?>(),
         'empty' => const AsyncData<OutboundGroup?>(null),
-        'error' => AsyncError<OutboundGroup?>(StateError('Synthetic proxy error'), StackTrace.current),
+        'error' => AsyncError<OutboundGroup?>(error, StackTrace.current),
         _ => AsyncData<OutboundGroup?>(OutboundGroup(tag: 'select', items: [])),
       };
+      final proxies = _SurfaceProxiesSpy(value);
       final f = await home.mountHomeFixture(
         tester,
         child: const ProxiesOverviewPage(),
-        extraOverrides: [proxiesOverviewNotifierProvider.overrideWith(() => SurfaceProxies(value))],
+        extraOverrides: [proxiesOverviewNotifierProvider.overrideWith(() => proxies)],
       );
-      expect(find.byType(FloatingActionButton), findsOneWidget);
-      expect(tester.getSize(find.byType(FloatingActionButton)).shortestSide, greaterThanOrEqualTo(44));
+      final blizzard = home.expectsBlizzard(AppThemeMode.dark, Brightness.dark, 393);
+      final delayAction = find.byKey(const ValueKey('servers_test_delay_button'));
+      if (blizzard) {
+        expect(delayAction, findsOneWidget);
+        expect(tester.getSize(delayAction).shortestSide, greaterThanOrEqualTo(44));
+        if (state == 'data') {
+          expect(find.text('Servers'), findsOneWidget);
+          expect(find.textContaining('0 servers'), findsOneWidget);
+          await tester.ensureVisible(delayAction);
+        }
+        expect(delayAction.hitTestable(), findsOneWidget);
+        await tester.tap(delayAction);
+        await tester.pump();
+        expect(proxies.delayTests, ['select']);
+      } else {
+        final legacyAction = find.byType(FloatingActionButton);
+        expect(legacyAction, findsOneWidget);
+        expect(tester.getSize(legacyAction).shortestSide, greaterThanOrEqualTo(44));
+        await tester.tap(legacyAction);
+        await tester.pump();
+        expect(proxies.delayTests, ['select']);
+      }
+      if (state == 'loading') expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      if (state == 'empty') {
+        expect(find.text(f.container.read(translationsProvider).requireValue.pages.proxies.empty), findsOneWidget);
+      }
+      if (state == 'error') {
+        expect(find.text(f.container.read(translationsProvider).requireValue.presentShortError(error)), findsOneWidget);
+      }
       expect(find.byType(PopupMenuButton<ProxiesSort>), findsOneWidget);
       await tester.tap(find.byType(PopupMenuButton<ProxiesSort>));
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.byType(PopupMenuItem<ProxiesSort>), findsNWidgets(ProxiesSort.values.length));
+      expect(tester.takeException(), isNull);
+      await f.close(tester);
+    });
+  }
+  for (final state in ['loading', 'empty', 'error']) {
+    testWidgets('Blizzard proxies $state keeps the delay action reachable', (tester) async {
+      final error = StateError('Synthetic proxy error');
+      final value = switch (state) {
+        'loading' => const AsyncLoading<OutboundGroup?>(),
+        'empty' => const AsyncData<OutboundGroup?>(null),
+        _ => AsyncError<OutboundGroup?>(error, StackTrace.current),
+      };
+      final proxies = _SurfaceProxiesSpy(value);
+      final f = await home.mountHomeFixture(
+        tester,
+        child: _appliedBlizzard(const ProxiesOverviewPage()),
+        extraOverrides: [proxiesOverviewNotifierProvider.overrideWith(() => proxies)],
+      );
+      final delayAction = find.byKey(const ValueKey('servers_test_delay_button'));
+      expect(delayAction, findsOneWidget);
+      expect(tester.getSize(delayAction).shortestSide, greaterThanOrEqualTo(44));
+      expect(delayAction.hitTestable(), findsOneWidget);
+      await tester.tap(delayAction);
+      await tester.pump();
+      expect(proxies.delayTests, ['select']);
+      if (state == 'loading') expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      if (state == 'empty') {
+        expect(find.text(f.container.read(translationsProvider).requireValue.pages.proxies.empty), findsOneWidget);
+      }
+      if (state == 'error') {
+        expect(find.text(f.container.read(translationsProvider).requireValue.presentShortError(error)), findsOneWidget);
+      }
       expect(tester.takeException(), isNull);
       await f.close(tester);
     });
@@ -514,4 +620,15 @@ void registerBlizzardSurfaceCoverage() {
     }
     await accessible.close(tester);
   });
+}
+
+class _SurfaceProxiesSpy extends SurfaceProxies {
+  _SurfaceProxiesSpy(super.initial);
+
+  final delayTests = <String>[];
+
+  @override
+  Future<void> urlTest(String groupTag) async {
+    delayTests.add(groupTag);
+  }
 }

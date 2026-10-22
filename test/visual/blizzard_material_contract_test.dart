@@ -165,7 +165,22 @@ void registerBlizzardMaterialContracts() {
         extraOverrides: [resetTunnelNotifierProvider.overrideWith(() => spy)],
       );
       final resetIcon = find.byIcon(Icons.autorenew_rounded);
-      if (PlatformUtils.isIOS) {
+      if (expectsBlizzard(mode, Brightness.dark, 393)) {
+        final resetAction = find.byKey(const ValueKey('settings-reset-tunnel'));
+        expect(resetAction, findsOneWidget);
+        expect(resetIcon, findsNothing);
+        final backing = tester.widget<Material>(resetAction);
+        expect(backing.borderRadius, BorderRadius.circular(16));
+        expect(backing.clipBehavior, Clip.antiAlias);
+        final tile = find.descendant(of: resetAction, matching: find.byType(ListTile));
+        final resetTile = tester.widget<ListTile>(tile);
+        expect(resetTile.leading, isNull);
+        expect(resetTile.onTap, isNotNull);
+        expect(tester.getSize(resetAction).height, greaterThanOrEqualTo(48));
+        await tester.tap(find.descendant(of: resetAction, matching: find.byType(Text)));
+        await tester.pump();
+        expect(spy.calls, 1);
+      } else if (PlatformUtils.isIOS) {
         expect(resetIcon, findsOneWidget);
         final tile = find.ancestor(of: resetIcon, matching: find.byType(ListTile)).first;
         final backing = tester.widget<Material>(find.ancestor(of: tile, matching: find.byType(Material)).first);
