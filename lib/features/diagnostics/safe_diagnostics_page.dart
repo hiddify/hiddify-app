@@ -5,6 +5,7 @@ import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/analytics/telemetry_delivery_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
+import 'package:hiddify/core/observability/telemetry_transport_attempt.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
 import 'package:hiddify/features/diagnostics/home_presentation_providers.dart';
@@ -189,6 +190,34 @@ class _DeliveryCard extends StatelessWidget {
             if (status.lastAttemptAt case final date?)
               Text('${text('Last request', 'Последний запрос')}: ${time(date)}'),
             if (status.lastHttpCode case final code?) Text('HTTP: $code'),
+            if (status.attemptStorageState != TelemetryAttemptStorageState.unconfigured)
+              Text(
+                '${text('Receipt', 'Квитанция')}: ${attemptStorageLabel(status.attemptStorageState, russian: russian)}',
+              ),
+            if (status.lastAttempt case final attempt?) ...[
+              Text('${text('Attempt build', 'Сборка запроса')}: ${attempt.appVersion} (${attempt.buildNumber})'),
+              Text(
+                '${text('Request stage', 'Стадия запроса')}: ${attempt.stage == TelemetryTransportStage.beforeRequest ? text('Started', 'Начат') : text('Completed', 'Завершён')}',
+              ),
+              if (attempt.outcome case final outcome?)
+                Text(
+                  '${text('Request result', 'Результат запроса')}: ${transportOutcomeLabel(outcome, russian: russian)}',
+                ),
+            ],
+            if (status.testAttemptStorageState != TelemetryAttemptStorageState.unconfigured)
+              Text(
+                '${text('Test receipt', 'Квитанция теста')}: ${attemptStorageLabel(status.testAttemptStorageState, russian: russian)}',
+              ),
+            if (status.lastTestAttempt case final attempt?) ...[
+              Text('${text('Test event', 'Тестовое событие')}: ${attempt.testEventId}'),
+              Text('${text('Test request', 'Запрос теста')}: ${time(attempt.attemptedAt)}'),
+              if (attempt.outcome case final outcome?)
+                Text('${text('Test result', 'Результат теста')}: ${transportOutcomeLabel(outcome, russian: russian)}'),
+              if (attempt.httpCode case final code?) Text('HTTP (${text('test', 'тест')}): $code'),
+              Text(
+                '${text('Test event accepted', 'Тестовое событие принято')}: ${attempt.ackOwnEvent == true ? text('Yes', 'Да') : text('No', 'Нет')}',
+              ),
+            ],
           ],
         ),
       ),

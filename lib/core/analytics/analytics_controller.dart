@@ -10,6 +10,7 @@ import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/observability/better_stack_log_printer.dart';
 import 'package:hiddify/core/observability/telemetry_budget.dart';
 import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
+import 'package:hiddify/core/observability/telemetry_transport_attempt.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
 import 'package:hiddify/features/diagnostics/remote_diagnostic_subscription.dart';
@@ -59,7 +60,11 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
     _deliverySubscription = null;
     _publishDelivery(const TelemetryDeliveryStatus.disabled());
     if (remote != null) await remote.dispose(clearPending: clearPending);
-    if (clearPending) await _preferences.remove(BetterStackLogPrinter.preferenceKey);
+    if (clearPending) {
+      await _preferences.remove(BetterStackLogPrinter.preferenceKey);
+      await _preferences.remove(TelemetryTransportAttempt.preferenceKey);
+      await _preferences.remove(TelemetryTransportAttempt.lastTestPreferenceKey);
+    }
   }
 
   Future<void> enableAnalytics() async {
@@ -106,6 +111,11 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
             buildNumber: metadata.buildNumber,
             readOutbox: () => preferences.getString(BetterStackLogPrinter.preferenceKey),
             writeOutbox: (value) => preferences.setString(BetterStackLogPrinter.preferenceKey, value),
+            readLastAttempt: () => preferences.getString(TelemetryTransportAttempt.preferenceKey),
+            writeLastAttempt: (value) => preferences.setString(TelemetryTransportAttempt.preferenceKey, value),
+            readLastTestAttempt: () => preferences.getString(TelemetryTransportAttempt.lastTestPreferenceKey),
+            writeLastTestAttempt: (value) =>
+                preferences.setString(TelemetryTransportAttempt.lastTestPreferenceKey, value),
           );
           _remote = remote;
           _deliverySubscription = remote.deliveryStatuses.listen(_publishDelivery);

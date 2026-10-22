@@ -1,3 +1,5 @@
+import 'package:hiddify/core/observability/telemetry_transport_attempt.dart';
+
 enum TelemetryDeliveryState {
   disabled,
   idle,
@@ -28,6 +30,8 @@ enum TelemetryTestOutcome {
   droppedOverflow,
 }
 
+enum TelemetryAttemptStorageState { unconfigured, pending, persisted, failed }
+
 final class TelemetryTestResult {
   const TelemetryTestResult({required this.outcome});
 
@@ -47,13 +51,17 @@ final class TelemetryDeliveryStatus {
     this.lastAttemptAt,
     this.lastHttpCode,
     this.lastTestOutcome,
+    this.lastAttempt,
+    this.attemptStorageState = TelemetryAttemptStorageState.unconfigured,
+    this.lastTestAttempt,
+    this.testAttemptStorageState = TelemetryAttemptStorageState.unconfigured,
   });
 
   const TelemetryDeliveryStatus.disabled() : this();
 
-  static const schema = 'blizzard-telemetry-delivery/v1';
+  static const schema = 'blizzard-telemetry-delivery/v2';
   static const _maxSafeInteger = 9007199254740991;
-  static const _keys = {
+  static const _v1Keys = {
     'schema',
     'state',
     'pending_count',
@@ -65,6 +73,13 @@ final class TelemetryDeliveryStatus {
     'last_http_code',
     'last_test_outcome',
   };
+  static const _v2Keys = {
+    ..._v1Keys,
+    'last_attempt',
+    'attempt_storage_state',
+    'last_test_attempt',
+    'test_attempt_storage_state',
+  };
 
   final TelemetryDeliveryState state;
   final int pendingCount;
@@ -75,6 +90,10 @@ final class TelemetryDeliveryStatus {
   final DateTime? lastAttemptAt;
   final int? lastHttpCode;
   final TelemetryTestOutcome? lastTestOutcome;
+  final TelemetryTransportAttempt? lastAttempt;
+  final TelemetryAttemptStorageState attemptStorageState;
+  final TelemetryTransportAttempt? lastTestAttempt;
+  final TelemetryAttemptStorageState testAttemptStorageState;
 
   Map<String, Object?> toJson() => {
     'schema': schema,
@@ -87,22 +106,38 @@ final class TelemetryDeliveryStatus {
     'last_attempt_at': lastAttemptAt?.toUtc().toIso8601String(),
     'last_http_code': lastHttpCode,
     'last_test_outcome': lastTestOutcome?.name,
+    'last_attempt': lastAttempt?.toJson(),
+    'attempt_storage_state': attemptStorageState.name,
+    'last_test_attempt': lastTestAttempt?.toJson(),
+    'test_attempt_storage_state': testAttemptStorageState.name,
   };
 
   factory TelemetryDeliveryStatus.fromJson(Map<String, Object?> json) {
-    if (json.length != _keys.length || !json.keys.every(_keys.contains) || json['schema'] != schema) {
+    final isV1 = json['schema'] == 'blizzard-telemetry-delivery/v1';
+    final expectedKeys = isV1 ? _v1Keys : _v2Keys;
+    if (json.length != expectedKeys.length ||
+        !json.keys.every(expectedKeys.contains) ||
+        (!isV1 && json['schema'] != schema)) {
       throw const FormatException('invalid telemetry delivery status fields');
     }
     final state = _enumByName(TelemetryDeliveryState.values, json['state']);
     final testOutcome = json['last_test_outcome'] == null
         ? null
         : _enumByName(TelemetryTestOutcome.values, json['last_test_outcome']);
+    final attemptStorageState = isV1
+        ? TelemetryAttemptStorageState.unconfigured
+        : _enumByName(TelemetryAttemptStorageState.values, json['attempt_storage_state']);
+    final lastAttemptReceipt = isV1 ? null : _optionalAttempt(json['last_attempt'], requireTestEvent: false);
+    final testAttemptStorageState = isV1
+        ? TelemetryAttemptStorageState.unconfigured
+        : _enumByName(TelemetryAttemptStorageState.values, json['test_attempt_storage_state']);
+    final lastTestAttempt = isV1 ? null : _optionalAttempt(json['last_test_attempt'], requireTestEvent: true);
     final pendingCount = _boundedInt(json['pending_count'], max: 100);
     final oldestAge = _optionalBoundedInt(json['oldest_pending_age_seconds'], max: 24 * 60 * 60);
     final usedBytes = _boundedInt(json['budget_used_bytes'], max: _maxSafeInteger);
     final remainingBytes = _boundedInt(json['budget_remaining_bytes'], max: _maxSafeInteger);
     final nextAttempt = _optionalUtcDateTime(json['next_attempt_at']);
-    final lastAttempt = _optionalUtcDateTime(json['last_attempt_at']);
+    final lastAttemptAt = _optionalUtcDateTime(json['last_attempt_at']);
     final httpCode = _optionalBoundedInt(json['last_http_code'], min: 100, max: 599);
     return TelemetryDeliveryStatus(
       state: state,
@@ -111,9 +146,13 @@ final class TelemetryDeliveryStatus {
       budgetUsedBytes: usedBytes,
       budgetRemainingBytes: remainingBytes,
       nextAttemptAt: nextAttempt,
-      lastAttemptAt: lastAttempt,
+      lastAttemptAt: lastAttemptAt,
       lastHttpCode: httpCode,
       lastTestOutcome: testOutcome,
+      lastAttempt: lastAttemptReceipt,
+      attemptStorageState: attemptStorageState,
+      lastTestAttempt: lastTestAttempt,
+      testAttemptStorageState: testAttemptStorageState,
     );
   }
 
@@ -123,6 +162,22 @@ final class TelemetryDeliveryStatus {
       if (value.name == raw) return value;
     }
     throw const FormatException('unknown telemetry delivery status enum');
+  }
+
+  static TelemetryTransportAttempt? _optionalAttempt(Object? raw, {required bool requireTestEvent}) {
+    if (raw == null) return null;
+    if (raw is! Map) throw const FormatException('invalid telemetry transport attempt');
+    try {
+      final attempt = TelemetryTransportAttempt.fromJson(Map<String, Object?>.from(raw));
+      if (requireTestEvent && attempt.testEventId == null) {
+        throw const FormatException('invalid telemetry test attempt');
+      }
+      return attempt;
+    } on FormatException {
+      rethrow;
+    } catch (_) {
+      throw const FormatException('invalid telemetry transport attempt');
+    }
   }
 
   static int _boundedInt(Object? raw, {int min = 0, required int max}) {
@@ -155,7 +210,11 @@ final class TelemetryDeliveryStatus {
           nextAttemptAt == other.nextAttemptAt &&
           lastAttemptAt == other.lastAttemptAt &&
           lastHttpCode == other.lastHttpCode &&
-          lastTestOutcome == other.lastTestOutcome;
+          lastTestOutcome == other.lastTestOutcome &&
+          lastAttempt == other.lastAttempt &&
+          attemptStorageState == other.attemptStorageState &&
+          lastTestAttempt == other.lastTestAttempt &&
+          testAttemptStorageState == other.testAttemptStorageState;
 
   @override
   int get hashCode => Object.hash(
@@ -168,5 +227,9 @@ final class TelemetryDeliveryStatus {
     lastAttemptAt,
     lastHttpCode,
     lastTestOutcome,
+    lastAttempt,
+    attemptStorageState,
+    lastTestAttempt,
+    testAttemptStorageState,
   );
 }

@@ -100,9 +100,33 @@ void main() {
 
   test('default caps are conservative for free telemetry quotas', () {
     final client = TelemetryBudget(read: () => null, write: (_) async => true);
-    expect(client.maxLogBytes, 64 * 1024);
+    expect(client.maxLogBytes, 256 * 1024);
     expect(client.maxExceptions, 1);
     expect(client.maxMonthlyExceptions, 10);
+  });
+
+  test('256 KiB default preserves inherited usage and enforces the new boundary', () async {
+    stored = jsonEncode({
+      'day': '2026-10-22',
+      'log_bytes': 74880,
+      'exceptions': 0,
+      'month': '2026-10',
+      'monthly_exceptions': 0,
+    });
+    now = DateTime.utc(2026, 10, 22, 17);
+    final client = TelemetryBudget(
+      read: () => stored,
+      write: (value) async {
+        stored = value;
+        return true;
+      },
+      now: () => now,
+    );
+    expect(client.maxLogBytes, 256 * 1024);
+    expect(client.logSnapshot.usedLogBytes, 74880);
+    expect(client.logSnapshot.remainingLogBytes, 187264);
+    expect((await client.reserveLogs(187264)).outcome, TelemetryBudgetReserveOutcome.reserved);
+    expect((await client.reserveLogs(1)).outcome, TelemetryBudgetReserveOutcome.limitExceeded);
   });
 
   test('corrupt storage and failed persistence reject sending', () async {

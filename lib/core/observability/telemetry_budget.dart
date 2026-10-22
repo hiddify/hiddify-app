@@ -48,7 +48,7 @@ final class TelemetryBudget {
     required String? Function() read,
     required Future<bool> Function(String) write,
     DateTime Function()? now,
-    this.maxLogBytes = 64 * 1024,
+    this.maxLogBytes = 256 * 1024,
     this.maxExceptions = 1,
     this.maxMonthlyExceptions = 10,
   }) : _read = read,

@@ -6,6 +6,7 @@ import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/analytics/telemetry_delivery_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
+import 'package:hiddify/core/observability/telemetry_transport_attempt.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
 import 'package:hiddify/features/diagnostics/home_presentation_providers.dart';
@@ -148,7 +149,7 @@ void main() {
       },
       'ios_ping': {'schema': 'wir-ios-ping-trace/v1', 'events': []},
       'telemetry_delivery': {
-        'schema': 'blizzard-telemetry-delivery/v1',
+        'schema': 'blizzard-telemetry-delivery/v2',
         'state': 'disabled',
         'pending_count': 0,
         'oldest_pending_age_seconds': null,
@@ -158,6 +159,10 @@ void main() {
         'last_attempt_at': null,
         'last_http_code': null,
         'last_test_outcome': null,
+        'last_attempt': null,
+        'attempt_storage_state': 'unconfigured',
+        'last_test_attempt': null,
+        'test_attempt_storage_state': 'unconfigured',
       },
       'events': [
         {
@@ -264,6 +269,60 @@ void main() {
     await tester.pump();
     expect(find.text('Local storage unavailable'), findsOneWidget);
     expect(find.text('Daily limit reached'), findsNothing);
+  });
+
+  testWidgets('shows the persisted closed network result and own-event ACK separately', (tester) async {
+    final journal = journalWithEvent();
+    addTearDown(journal.dispose);
+    final attempt = TelemetryTransportAttempt(
+      attemptedAt: DateTime.utc(2026, 10, 22, 17),
+      testEventId: '0123456789abcdef',
+      appVersion: '0.0.1',
+      buildNumber: '23',
+      stage: TelemetryTransportStage.afterRequest,
+      outcome: TelemetryTransportOutcome.timeout,
+      ackOwnEvent: false,
+    );
+    await pumpPage(
+      tester,
+      journal,
+      analytics: _DeliveryAnalytics(
+        status: TelemetryDeliveryStatus(
+          state: TelemetryDeliveryState.retryWaiting,
+          lastAttempt: attempt,
+          lastTestAttempt: attempt,
+          testAttemptStorageState: TelemetryAttemptStorageState.persisted,
+          attemptStorageState: TelemetryAttemptStorageState.persisted,
+        ),
+      ),
+    );
+    expect(find.text('Request result: Timed out'), findsOneWidget);
+    expect(find.text('Test event: 0123456789abcdef'), findsOneWidget);
+    expect(find.text('Test event accepted: No'), findsOneWidget);
+    expect(find.text('Request stage: Completed'), findsOneWidget);
+    expect(find.text('Receipt: Saved on this device'), findsOneWidget);
+    expect(find.text('Attempt build: 0.0.1 (23)'), findsOneWidget);
+    final preview = tester.widget<SelectableText>(find.byKey(const Key('safe-diagnostics-preview'))).data!;
+    final delivery = (jsonDecode(preview) as Map)['telemetry_delivery'] as Map;
+    expect(delivery['last_attempt'], attempt.toJson());
+    expect(delivery['attempt_storage_state'], 'persisted');
+  });
+
+  testWidgets('shows receipt storage failure even without a completed request', (tester) async {
+    final journal = journalWithEvent();
+    addTearDown(journal.dispose);
+    await pumpPage(
+      tester,
+      journal,
+      analytics: _DeliveryAnalytics(
+        status: const TelemetryDeliveryStatus(
+          state: TelemetryDeliveryState.pending,
+          attemptStorageState: TelemetryAttemptStorageState.failed,
+        ),
+      ),
+    );
+    expect(find.text('Receipt: Could not save on this device'), findsOneWidget);
+    expect(find.textContaining('Test event accepted:'), findsNothing);
   });
 
   testWidgets('test button reports ingest acceptance only from its completed result', (tester) async {

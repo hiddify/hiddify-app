@@ -5,12 +5,16 @@ import 'dart:io';
 
 import 'package:hiddify/core/observability/telemetry_budget.dart';
 import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
+import 'package:hiddify/core/observability/telemetry_transport_attempt.dart';
 import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 
 typedef BetterStackPost = Future<int> Function(Uri endpoint, String token, String body);
 typedef RemoteOutboxRead = String? Function();
 typedef RemoteOutboxWrite = Future<bool> Function(String value);
+typedef RemoteAttemptRead = String? Function();
+typedef RemoteAttemptWrite = Future<bool> Function(String value);
+typedef BetterStackTimerFactory = Timer Function(Duration delay, void Function() callback);
 
 bool isBetterStackLogsEndpoint(Uri endpoint) =>
     endpoint.scheme == 'https' &&
@@ -36,6 +40,11 @@ final class BetterStackLogPrinter {
     this.autoFlush = true,
     RemoteOutboxRead? readOutbox,
     RemoteOutboxWrite? writeOutbox,
+    RemoteAttemptRead? readLastAttempt,
+    RemoteAttemptWrite? writeLastAttempt,
+    RemoteAttemptRead? readLastTestAttempt,
+    RemoteAttemptWrite? writeLastTestAttempt,
+    BetterStackTimerFactory? createTimer,
   }) : _version = _safeMetadata(version, _versionPattern),
        _buildNumber = _safeMetadata(buildNumber, _buildPattern),
        _token = token,
@@ -43,16 +52,23 @@ final class BetterStackLogPrinter {
        _post = post,
        _now = now ?? DateTime.now,
        _writeOutbox = writeOutbox,
+       _writeLastAttempt = writeLastAttempt,
+       _writeLastTestAttempt = writeLastTestAttempt,
+       _createTimer = createTimer ?? Timer.new,
        _active = token.isNotEmpty && isBetterStackLogsEndpoint(endpoint) && _sessionPattern.hasMatch(sessionId) {
     if (_active && readOutbox != null) _restore(readOutbox);
+    if (_active) _restoreLastAttempt(readLastAttempt);
+    if (_active) _restoreLastTestAttempt(readLastTestAttempt);
     if (!_active) {
       _state = TelemetryDeliveryState.disabled;
     } else if (_state == TelemetryDeliveryState.outboxStorageFailed) {
       // Keep a restore failure visible until a later event is durably saved.
     } else if (_lastTestOutcome == TelemetryTestOutcome.droppedExpired) {
       _state = TelemetryDeliveryState.droppedExpired;
-    } else if (_budgetBlockedDay != null && _isBudgetBlockedToday()) {
+    } else if (_budgetBlockedDay != null && _isBudgetBlockActive()) {
       _state = TelemetryDeliveryState.budgetLimited;
+    } else if (_budgetFailureBlocked) {
+      // Keep the closed budget storage/format failure set during re-evaluation.
     } else if (_attempts > 0) {
       _state = TelemetryDeliveryState.retryWaiting;
     } else {
@@ -126,6 +142,9 @@ final class BetterStackLogPrinter {
   final BetterStackPost? _post;
   final DateTime Function() _now;
   final RemoteOutboxWrite? _writeOutbox;
+  final RemoteAttemptWrite? _writeLastAttempt;
+  final RemoteAttemptWrite? _writeLastTestAttempt;
+  final BetterStackTimerFactory _createTimer;
   final Duration flushInterval;
   final bool autoFlush;
   final Queue<Map<String, Object>> _queue = Queue();
@@ -138,6 +157,8 @@ final class BetterStackLogPrinter {
   Future<void>? _inFlight;
   Future<TelemetryTestResult>? _testEventInFlight;
   Future<void> _storagePending = Future.value();
+  Future<void> _attemptStoragePending = Future.value();
+  Future<void> _testAttemptStoragePending = Future.value();
   bool _active;
   bool _storageBlocked = false;
   bool _budgetFailureBlocked = false;
@@ -152,6 +173,12 @@ final class BetterStackLogPrinter {
   int? _lastHttpCode;
   String? _trackedTestEventId;
   TelemetryTestOutcome? _lastTestOutcome;
+  TelemetryTransportAttempt? _lastAttempt;
+  TelemetryAttemptStorageState _attemptStorageState = TelemetryAttemptStorageState.unconfigured;
+  TelemetryTransportAttempt? _lastTestAttempt;
+  TelemetryAttemptStorageState _testAttemptStorageState = TelemetryAttemptStorageState.unconfigured;
+  int _attemptStorageGeneration = 0;
+  int _testAttemptStorageGeneration = 0;
   TelemetryDeliveryStatus? _lastEmittedStatus;
 
   bool get active => _active;
@@ -164,7 +191,7 @@ final class BetterStackLogPrinter {
         ? null
         : _now().toUtc().difference(oldest.toUtc()).inSeconds.clamp(0, _ttl.inSeconds);
     final nextAttempt = _state == TelemetryDeliveryState.budgetLimited
-        ? DateTime.utc(_now().toUtc().year, _now().toUtc().month, _now().toUtc().day + 1)
+        ? _budgetResumeAt()
         : _state == TelemetryDeliveryState.retryWaiting
         ? (_pausedUntil ?? _scheduledAt)
         : null;
@@ -178,6 +205,10 @@ final class BetterStackLogPrinter {
       lastAttemptAt: _lastAttemptAt,
       lastHttpCode: _lastHttpCode,
       lastTestOutcome: _lastTestOutcome,
+      lastAttempt: _lastAttempt,
+      attemptStorageState: _attemptStorageState,
+      lastTestAttempt: _lastTestAttempt,
+      testAttemptStorageState: _testAttemptStorageState,
     );
   }
 
@@ -229,8 +260,18 @@ final class BetterStackLogPrinter {
     );
     if (retained) {
       _trackedTestEventId = eventId;
-      _lastTestOutcome = TelemetryTestOutcome.pending;
-      _state = TelemetryDeliveryState.pending;
+      _lastTestOutcome = switch (_state) {
+        TelemetryDeliveryState.budgetLimited => TelemetryTestOutcome.budgetLimited,
+        TelemetryDeliveryState.budgetStateInvalid => TelemetryTestOutcome.budgetStateInvalid,
+        TelemetryDeliveryState.budgetStorageFailed => TelemetryTestOutcome.budgetStorageFailed,
+        _ => TelemetryTestOutcome.pending,
+      };
+      if (_state != TelemetryDeliveryState.retryWaiting &&
+          _state != TelemetryDeliveryState.budgetLimited &&
+          _state != TelemetryDeliveryState.budgetStateInvalid &&
+          _state != TelemetryDeliveryState.budgetStorageFailed) {
+        _state = TelemetryDeliveryState.pending;
+      }
       _emitStatus();
     }
     return retained;
@@ -313,18 +354,35 @@ final class BetterStackLogPrinter {
         _timer != null ||
         _inFlight != null ||
         _storageBlocked ||
-        _budgetFailureBlocked ||
-        _attempts >= 3 ||
-        _isBudgetBlockedToday()) {
+        _budgetFailureBlocked) {
       return;
     }
-    _timer = Timer(delay, () {
+    final now = _now().toUtc();
+    var scheduledDelay = delay;
+    if (_attempts >= 3) {
+      final pausedUntil = _pausedUntil;
+      if (pausedUntil == null) return;
+      if (now.isBefore(pausedUntil)) {
+        scheduledDelay = pausedUntil.difference(now);
+      } else {
+        _attempts = 0;
+        _pausedUntil = null;
+        unawaited(_persist());
+      }
+    }
+    final budgetBlockActive = _isBudgetBlockActive();
+    if (_budgetFailureBlocked) return;
+    if (budgetBlockActive) {
+      final resumeAt = _budgetResumeAt();
+      scheduledDelay = now.isBefore(resumeAt) ? resumeAt.difference(now) : Duration.zero;
+    }
+    _scheduledAt = now.add(scheduledDelay);
+    _timer = _createTimer(scheduledDelay, () {
       _timer = null;
       _scheduledAt = null;
       unawaited(flush());
     });
-    if (_state == TelemetryDeliveryState.retryWaiting) {
-      _scheduledAt = _now().toUtc().add(delay);
+    if (_state == TelemetryDeliveryState.retryWaiting || _state == TelemetryDeliveryState.budgetLimited) {
       _emitStatus();
     }
   }
@@ -332,8 +390,16 @@ final class BetterStackLogPrinter {
   Future<void> flush() {
     final running = _inFlight;
     if (running != null) return running;
-    if (!_active || _queue.isEmpty || _budgetFailureBlocked || _attempts >= 3 || _isBudgetBlockedToday()) {
+    _refreshRetryCooldown();
+    if (!_active || _queue.isEmpty || _budgetFailureBlocked || _attempts >= 3) {
       _emitStatus();
+      _schedule(flushInterval);
+      return Future.value();
+    }
+    final budgetBlockActive = _isBudgetBlockActive();
+    if (_budgetFailureBlocked || budgetBlockActive) {
+      _emitStatus();
+      _schedule(flushInterval);
       return Future.value();
     }
     _timer?.cancel();
@@ -352,15 +418,30 @@ final class BetterStackLogPrinter {
 
   Future<void> resumePending() async {
     if (!_active || _queue.isEmpty) return;
-    _attempts = 0;
-    _pausedUntil = null;
     _scheduledAt = null;
-    _budgetBlockedDay = null;
     _budgetFailureBlocked = false;
     if (!await _persist()) return;
+    _refreshRetryCooldown();
+    if (_attempts >= 3 || _isBudgetBlockActive()) {
+      _emitStatus();
+      _schedule(Duration.zero);
+      return;
+    }
     _state = TelemetryDeliveryState.pending;
     _emitStatus();
     await flush();
+  }
+
+  void _refreshRetryCooldown() {
+    final pausedUntil = _pausedUntil;
+    if (_attempts < 3 || pausedUntil == null || _now().toUtc().isBefore(pausedUntil)) return;
+    _attempts = 0;
+    _pausedUntil = null;
+    _scheduledAt = null;
+    if (_state == TelemetryDeliveryState.retryWaiting) {
+      _state = _queue.isEmpty ? TelemetryDeliveryState.idle : TelemetryDeliveryState.pending;
+    }
+    unawaited(_persist());
   }
 
   Future<void> _sendBatch() async {
@@ -434,10 +515,24 @@ final class BetterStackLogPrinter {
       return;
     }
     _state = TelemetryDeliveryState.sending;
-    _lastAttemptAt = _now().toUtc();
+    final attemptedAt = _now().toUtc();
+    final tracked = _trackedTestEventId;
+    final testEventId = tracked != null && batch.any((event) => event['event_id'] == tracked) ? tracked : null;
+    _lastAttemptAt = attemptedAt;
     _lastHttpCode = null;
+    _recordLastAttempt(
+      TelemetryTransportAttempt(
+        attemptedAt: attemptedAt,
+        testEventId: testEventId,
+        appVersion: _version,
+        buildNumber: _buildNumber,
+        stage: TelemetryTransportStage.beforeRequest,
+        ackOwnEvent: testEventId == null ? null : false,
+      ),
+    );
     _emitStatus();
     int? status;
+    TelemetryTransportOutcome? transportFailure;
     try {
       status = await (_post ?? _httpPost)(endpoint, _token, body).timeout(
         const Duration(seconds: 5),
@@ -447,7 +542,14 @@ final class BetterStackLogPrinter {
           throw TimeoutException('Telemetry request timed out');
         },
       );
+    } on TimeoutException {
+      transportFailure = TelemetryTransportOutcome.timeout;
+    } on TlsException {
+      transportFailure = TelemetryTransportOutcome.tls;
+    } on SocketException {
+      transportFailure = TelemetryTransportOutcome.network;
     } catch (_) {
+      transportFailure = TelemetryTransportOutcome.other;
       // No recursive logger call: the transport's own failures remain silent.
     }
     if (!_active) {
@@ -455,6 +557,18 @@ final class BetterStackLogPrinter {
       return;
     }
     _lastHttpCode = status;
+    _recordLastAttempt(
+      TelemetryTransportAttempt(
+        attemptedAt: attemptedAt,
+        testEventId: testEventId,
+        appVersion: _version,
+        buildNumber: _buildNumber,
+        stage: TelemetryTransportStage.afterRequest,
+        outcome: status == null ? transportFailure ?? TelemetryTransportOutcome.other : TelemetryTransportOutcome.http,
+        httpCode: status,
+        ackOwnEvent: testEventId == null ? null : status != null && status >= 200 && status < 300,
+      ),
+    );
     if (status != null && status >= 200 && status < 300) {
       _setTrackedTestOutcome(TelemetryTestOutcome.accepted, batch);
       _removeAcknowledged(batch);
@@ -572,11 +686,22 @@ final class BetterStackLogPrinter {
     }
   }
 
-  bool _isBudgetBlockedToday() {
+  bool _isBudgetBlockActive() {
     final blocked = _budgetBlockedDay;
     if (blocked == null) return false;
     final today = _today();
-    if (blocked.compareTo(today) >= 0) return true;
+    if (blocked.compareTo(today) >= 0) {
+      final snapshot = _budget.logSnapshot;
+      if (snapshot.outcome == TelemetryBudgetReserveOutcome.invalidStoredState) {
+        _setBudgetFailure(TelemetryDeliveryState.budgetStateInvalid, TelemetryTestOutcome.budgetStateInvalid);
+        return false;
+      }
+      if (snapshot.outcome == TelemetryBudgetReserveOutcome.storageReadFailed) {
+        _setBudgetFailure(TelemetryDeliveryState.budgetStorageFailed, TelemetryTestOutcome.budgetStorageFailed);
+        return false;
+      }
+      if (_fittingPrefix(snapshot.remainingLogBytes).isEmpty) return true;
+    }
     _budgetBlockedDay = null;
     if (_state == TelemetryDeliveryState.budgetLimited) {
       _state = _queue.isEmpty ? TelemetryDeliveryState.idle : TelemetryDeliveryState.pending;
@@ -589,6 +714,16 @@ final class BetterStackLogPrinter {
     return false;
   }
 
+  DateTime _budgetResumeAt() {
+    final blocked = _budgetBlockedDay;
+    if (blocked != null) {
+      final start = DateTime.tryParse('${blocked}T00:00:00.000Z');
+      if (start != null) return start.add(const Duration(days: 1));
+    }
+    final now = _now().toUtc();
+    return DateTime.utc(now.year, now.month, now.day + 1);
+  }
+
   String _today() => _now().toUtc().toIso8601String().substring(0, 10);
 
   void _emitStatus() {
@@ -597,6 +732,150 @@ final class BetterStackLogPrinter {
     if (status == _lastEmittedStatus) return;
     _lastEmittedStatus = status;
     _statusController.add(status);
+  }
+
+  void _restoreLastAttempt(RemoteAttemptRead? reader) {
+    if (reader == null && _writeLastAttempt == null) return;
+    _attemptStorageState = TelemetryAttemptStorageState.persisted;
+    if (reader == null) return;
+    try {
+      final stored = reader();
+      if (stored == null) return;
+      final restored = TelemetryTransportAttempt.decode(stored);
+      _lastAttempt = restored;
+      _lastAttemptAt = restored.attemptedAt;
+      _lastHttpCode = restored.httpCode;
+      if (restored.testEventId != null) {
+        _lastTestAttempt = restored;
+        _restoreTestOutcome(restored);
+      }
+    } catch (_) {
+      _lastAttempt = null;
+      _lastAttemptAt = null;
+      _lastHttpCode = null;
+      _attemptStorageState = TelemetryAttemptStorageState.failed;
+    }
+  }
+
+  void _restoreLastTestAttempt(RemoteAttemptRead? reader) {
+    if (reader == null && _writeLastTestAttempt == null) return;
+    _testAttemptStorageState = TelemetryAttemptStorageState.persisted;
+    final fallback = _lastTestAttempt;
+    if (reader == null) {
+      if (fallback != null) _repairLastTestAttempt(fallback);
+      return;
+    }
+    try {
+      final stored = reader();
+      if (stored == null) {
+        if (fallback != null) {
+          _repairLastTestAttempt(fallback);
+        } else {
+          _testAttemptStorageState = TelemetryAttemptStorageState.failed;
+        }
+        return;
+      }
+      final restored = TelemetryTransportAttempt.decode(stored);
+      if (restored.testEventId == null) throw const FormatException('missing test event');
+      if (fallback != null && !_shouldReplaceRestoredTestAttempt(restored, fallback)) {
+        if (restored != fallback) _repairLastTestAttempt(fallback);
+        return;
+      }
+      _lastTestAttempt = restored;
+      _restoreTestOutcome(restored);
+    } catch (_) {
+      if (fallback != null) {
+        _repairLastTestAttempt(fallback);
+      } else {
+        _testAttemptStorageState = TelemetryAttemptStorageState.failed;
+      }
+    }
+  }
+
+  bool _shouldReplaceRestoredTestAttempt(TelemetryTransportAttempt candidate, TelemetryTransportAttempt current) {
+    final timestampOrder = candidate.attemptedAt.compareTo(current.attemptedAt);
+    if (timestampOrder != 0) return timestampOrder > 0;
+    if (candidate.testEventId != current.testEventId) return false;
+    return candidate.stage == TelemetryTransportStage.afterRequest &&
+        current.stage == TelemetryTransportStage.beforeRequest;
+  }
+
+  void _repairLastTestAttempt(TelemetryTransportAttempt fallback) {
+    if (_writeLastTestAttempt == null) {
+      _testAttemptStorageState = TelemetryAttemptStorageState.failed;
+      return;
+    }
+    _recordLastTestAttempt(fallback);
+  }
+
+  void _restoreTestOutcome(TelemetryTransportAttempt restored) {
+    if (_trackedTestEventId != null) return;
+    _lastTestOutcome = restored.ackOwnEvent == true
+        ? TelemetryTestOutcome.accepted
+        : restored.outcome == TelemetryTransportOutcome.http &&
+              restored.httpCode != null &&
+              restored.httpCode! >= 400 &&
+              restored.httpCode! < 500 &&
+              restored.httpCode != 408 &&
+              restored.httpCode != 429
+        ? TelemetryTestOutcome.rejected
+        : TelemetryTestOutcome.pending;
+  }
+
+  void _recordLastAttempt(TelemetryTransportAttempt attempt) {
+    _lastAttempt = attempt;
+    _lastAttemptAt = attempt.attemptedAt;
+    _lastHttpCode = attempt.httpCode;
+    if (attempt.testEventId != null) _recordLastTestAttempt(attempt);
+    final writer = _writeLastAttempt;
+    if (writer == null) {
+      _attemptStorageState = TelemetryAttemptStorageState.unconfigured;
+      _emitStatus();
+      return;
+    }
+    final generation = ++_attemptStorageGeneration;
+    _attemptStorageState = TelemetryAttemptStorageState.pending;
+    _emitStatus();
+    final operation = _attemptStoragePending.then((_) async {
+      var saved = false;
+      try {
+        saved = await writer(attempt.encode());
+      } catch (_) {
+        // The closed receipt is diagnostic only and never logs recursively.
+      }
+      if (generation == _attemptStorageGeneration) {
+        _attemptStorageState = saved ? TelemetryAttemptStorageState.persisted : TelemetryAttemptStorageState.failed;
+        _emitStatus();
+      }
+    });
+    _attemptStoragePending = operation;
+  }
+
+  void _recordLastTestAttempt(TelemetryTransportAttempt attempt) {
+    if (attempt.testEventId == null) return;
+    _lastTestAttempt = attempt;
+    final writer = _writeLastTestAttempt;
+    if (writer == null) {
+      _testAttemptStorageState = TelemetryAttemptStorageState.unconfigured;
+      _emitStatus();
+      return;
+    }
+    final generation = ++_testAttemptStorageGeneration;
+    _testAttemptStorageState = TelemetryAttemptStorageState.pending;
+    _emitStatus();
+    final operation = _testAttemptStoragePending.then((_) async {
+      var saved = false;
+      try {
+        saved = await writer(attempt.encode());
+      } catch (_) {
+        // The closed test receipt is diagnostic only and never logs recursively.
+      }
+      if (generation == _testAttemptStorageGeneration) {
+        _testAttemptStorageState = saved ? TelemetryAttemptStorageState.persisted : TelemetryAttemptStorageState.failed;
+        _emitStatus();
+      }
+    });
+    _testAttemptStoragePending = operation;
   }
 
   Future<bool> _persist() {
@@ -871,6 +1150,7 @@ final class BetterStackLogPrinter {
     _scheduledAt = null;
     final inFlight = _inFlight;
     if (inFlight != null) await inFlight;
+    await Future.wait([_attemptStoragePending, _testAttemptStoragePending]);
     _repeated.clear();
     _sendingEventIds.clear();
     if (clearPending) {

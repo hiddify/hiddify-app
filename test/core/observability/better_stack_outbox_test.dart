@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/observability/better_stack_log_printer.dart';
 import 'package:hiddify/core/observability/telemetry_budget.dart';
 import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
+import 'package:hiddify/core/observability/telemetry_transport_attempt.dart';
 import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 
@@ -12,6 +14,8 @@ void main() {
   const session = '123e4567-e89b-42d3-a456-426614174000';
   late String? outbox;
   late String? budgetState;
+  late String? attemptReceipt;
+  late String? testAttemptReceipt;
   late DateTime now;
   late List<String> sent;
 
@@ -30,10 +34,16 @@ void main() {
     TelemetryBudget? telemetryBudget,
     RemoteOutboxRead? readOutbox,
     Future<bool> Function(String)? writeOutbox,
+    RemoteAttemptRead? readLastAttempt,
+    RemoteAttemptWrite? writeLastAttempt,
+    RemoteAttemptRead? readLastTestAttempt,
+    RemoteAttemptWrite? writeLastTestAttempt,
+    BetterStackTimerFactory? createTimer,
+    String sessionId = session,
     bool autoFlush = false,
   }) => BetterStackLogPrinter(
     endpoint: Uri.parse('https://s1.betterstackdata.com'),
-    sessionId: session,
+    sessionId: sessionId,
     token: 'test',
     version: '0.0.1',
     buildNumber: '19',
@@ -48,6 +58,21 @@ void main() {
           outbox = value;
           return true;
         },
+    readLastAttempt: readLastAttempt ?? () => attemptReceipt,
+    writeLastAttempt:
+        writeLastAttempt ??
+        (value) async {
+          attemptReceipt = value;
+          return true;
+        },
+    readLastTestAttempt: readLastTestAttempt ?? () => testAttemptReceipt,
+    writeLastTestAttempt:
+        writeLastTestAttempt ??
+        (value) async {
+          testAttemptReceipt = value;
+          return true;
+        },
+    createTimer: createTimer,
     post:
         post ??
         (_, _, body) async {
@@ -69,6 +94,8 @@ void main() {
   setUp(() {
     outbox = null;
     budgetState = null;
+    attemptReceipt = null;
+    testAttemptReceipt = null;
     now = DateTime.utc(2026, 10, 22, 9);
     sent = [];
   });
@@ -221,6 +248,74 @@ void main() {
     await remote.dispose();
   });
 
+  test('three failures wake once after cooldown without a new enqueue', () async {
+    var requests = 0;
+    final timers = <_ManualTimer>[];
+    final remote = printer(
+      autoFlush: true,
+      createTimer: (delay, callback) {
+        final timer = _ManualTimer(delay, callback);
+        timers.add(timer);
+        return timer;
+      },
+      post: (_, _, _) async {
+        requests++;
+        return 503;
+      },
+    );
+    remote.addDiagnostic(diagnostic(1));
+    for (var i = 0; i < 3; i++) {
+      await remote.flush();
+    }
+    final cooldown = timers.last;
+    expect(requests, 3);
+    expect(cooldown.delay, const Duration(minutes: 5));
+    expect(remote.deliveryStatus.nextAttemptAt, now.add(const Duration(minutes: 5)));
+
+    now = now.add(const Duration(minutes: 5));
+    cooldown.fire();
+    await Future<void>.delayed(Duration.zero);
+    await Future<void>.delayed(Duration.zero);
+    expect(requests, 4);
+    await remote.dispose();
+  });
+
+  test('manual test preserves exhausted retry cooldown without another request', () async {
+    var requests = 0;
+    final remote = printer(
+      post: (_, _, _) async {
+        requests++;
+        return 503;
+      },
+    );
+    remote.addDiagnostic(diagnostic(1));
+    for (var i = 0; i < 3; i++) {
+      await remote.flush();
+    }
+    final nextAttempt = remote.deliveryStatus.nextAttemptAt;
+    final result = await remote.sendTestEvent();
+    expect(requests, 3);
+    expect(result.outcome, TelemetryTestOutcome.pending);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.retryWaiting);
+    expect(remote.deliveryStatus.nextAttemptAt, nextAttempt);
+    await remote.dispose();
+  });
+
+  test('manual test preserves an existing daily budget block', () async {
+    final dailyBudget = budget(bytes: 1000);
+    await dailyBudget.reserveLogs(1000);
+    final remote = printer(telemetryBudget: dailyBudget);
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    final result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.budgetLimited);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetLimited);
+    expect(remote.deliveryStatus.nextAttemptAt, DateTime.utc(2026, 10, 23));
+    expect(sent, isEmpty);
+    expect(remote.deliveryStatus.budgetUsedBytes, 1000);
+    await remote.dispose();
+  });
+
   test('budget refusal persists without retry spin until next UTC day', () async {
     final dailyBudget = budget(bytes: 1000);
     expect((await dailyBudget.reserveLogs(1000)).outcome, TelemetryBudgetReserveOutcome.reserved);
@@ -233,6 +328,119 @@ void main() {
     now = now.add(const Duration(days: 1));
     await remote.flush();
     expect(sent, hasLength(1));
+    await remote.dispose();
+  });
+
+  test('persisted same-day budget blocker is removed when upgraded remainder fits FIFO', () async {
+    var remote = printer(telemetryBudget: budget(bytes: 1));
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    await remote.dispose();
+    expect((jsonDecode(outbox!) as Map)['budget_blocked_day'], '2026-10-22');
+
+    budgetState = jsonEncode({
+      'day': '2026-10-22',
+      'log_bytes': 74880,
+      'exceptions': 0,
+      'month': '2026-10',
+      'monthly_exceptions': 0,
+    });
+    remote = printer(
+      telemetryBudget: TelemetryBudget(
+        read: () => budgetState,
+        write: (value) async {
+          budgetState = value;
+          return true;
+        },
+        now: () => now,
+      ),
+    );
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.pending);
+    await remote.flush();
+    expect(sent, hasLength(1));
+    expect((jsonDecode(budgetState!) as Map)['log_bytes'], 74880 + utf8.encode(sent.single).length);
+    await remote.dispose();
+  });
+
+  test('persisted same-day budget blocker remains when first FIFO event does not fit', () async {
+    var remote = printer(telemetryBudget: budget(bytes: 1));
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    await remote.dispose();
+
+    budgetState = jsonEncode({
+      'day': '2026-10-22',
+      'log_bytes': 256 * 1024 - 1,
+      'exceptions': 0,
+      'month': '2026-10',
+      'monthly_exceptions': 0,
+    });
+    remote = printer(
+      telemetryBudget: TelemetryBudget(
+        read: () => budgetState,
+        write: (value) async {
+          budgetState = value;
+          return true;
+        },
+        now: () => now,
+      ),
+    );
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetLimited);
+    await remote.flush();
+    expect(sent, isEmpty);
+    expect((jsonDecode(budgetState!) as Map)['log_bytes'], 256 * 1024 - 1);
+    await remote.dispose();
+  });
+
+  test('UTC rollover timer resumes a budget-blocked queue without a new enqueue', () async {
+    final dailyBudget = budget(bytes: 1000);
+    expect((await dailyBudget.reserveLogs(1000)).outcome, TelemetryBudgetReserveOutcome.reserved);
+    var remote = printer(telemetryBudget: dailyBudget);
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    await remote.dispose();
+
+    final timers = <_ManualTimer>[];
+    remote = printer(
+      telemetryBudget: budget(bytes: 1000),
+      autoFlush: true,
+      createTimer: (delay, callback) {
+        final timer = _ManualTimer(delay, callback);
+        timers.add(timer);
+        return timer;
+      },
+    );
+    final rollover = timers.single;
+    expect(rollover.delay, const Duration(hours: 15));
+    now = DateTime.utc(2026, 10, 23);
+    rollover.fire();
+    await Future<void>.delayed(Duration.zero);
+    await Future<void>.delayed(Duration.zero);
+    expect(sent, hasLength(1));
+    await remote.dispose();
+  });
+
+  test('clock rollback keeps future budget blocker and schedules its next UTC boundary', () async {
+    var remote = printer(telemetryBudget: budget(bytes: 1));
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    await remote.dispose();
+
+    now = DateTime.utc(2026, 10, 21, 9);
+    final timers = <_ManualTimer>[];
+    remote = printer(
+      telemetryBudget: budget(bytes: 1),
+      autoFlush: true,
+      createTimer: (delay, callback) {
+        final timer = _ManualTimer(delay, callback);
+        timers.add(timer);
+        return timer;
+      },
+    );
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetLimited);
+    expect(remote.deliveryStatus.nextAttemptAt, DateTime.utc(2026, 10, 23));
+    expect(timers.single.delay, const Duration(hours: 39));
+    expect(sent, isEmpty);
     await remote.dispose();
   });
 
@@ -251,6 +459,7 @@ void main() {
         return true;
       },
       now: () => now,
+      maxLogBytes: 64 * 1024,
     );
     final remote = printer(telemetryBudget: dailyBudget);
     remote.addDiagnostic(diagnostic(1));
@@ -392,12 +601,313 @@ void main() {
     await firstFlush;
     expect((await testResult).outcome, TelemetryTestOutcome.persisted);
     expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.persisted);
+    expect(remote.deliveryStatus.lastAttempt?.testEventId, isNull);
+    expect(remote.deliveryStatus.lastAttempt?.ackOwnEvent, isNull);
 
     await remote.flush();
     expect(remote.deliveryStatus.state, TelemetryDeliveryState.accepted);
     expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
+    expect(remote.deliveryStatus.lastAttempt?.testEventId, isNotNull);
+    expect(remote.deliveryStatus.lastAttempt?.ackOwnEvent, isTrue);
     expect(sent, hasLength(2));
     await remote.dispose();
+  });
+
+  test('accepted test receipt survives an ordinary send and restart', () async {
+    var remote = printer();
+    final result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.accepted);
+    await Future<void>.delayed(Duration.zero);
+    final saved = TelemetryTransportAttempt.decode(testAttemptReceipt!);
+    expect(saved.outcome, TelemetryTransportOutcome.http);
+    expect(saved.httpCode, 202);
+    expect(saved.ackOwnEvent, isTrue);
+    expect(saved.appVersion, '0.0.1');
+    expect(saved.buildNumber, '19');
+    expect(saved.toJson().keys, isNot(contains('hostname')));
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    await Future<void>.delayed(Duration.zero);
+    expect(TelemetryTransportAttempt.decode(attemptReceipt!).testEventId, isNull);
+    expect(TelemetryTransportAttempt.decode(testAttemptReceipt!), saved);
+    await remote.dispose();
+
+    remote = printer(sessionId: '223e4567-e89b-42d3-a456-426614174000');
+    expect(remote.deliveryStatus.lastAttempt?.testEventId, isNull);
+    expect(remote.deliveryStatus.lastTestAttempt, saved);
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
+    expect(remote.deliveryStatus.pendingCount, 0);
+    expect(remote.deliveryStatus.testAttemptStorageState, TelemetryAttemptStorageState.persisted);
+    await remote.dispose();
+  });
+
+  test('rejected test receipt survives an ordinary send and restart', () async {
+    var requests = 0;
+    var remote = printer(post: (_, _, _) async => requests++ == 0 ? 422 : 202);
+    final result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.rejected);
+    await Future<void>.delayed(Duration.zero);
+    final saved = TelemetryTransportAttempt.decode(testAttemptReceipt!);
+    expect(saved.httpCode, 422);
+    expect(saved.ackOwnEvent, isFalse);
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    await Future<void>.delayed(Duration.zero);
+    expect(TelemetryTransportAttempt.decode(attemptReceipt!).testEventId, isNull);
+    expect(TelemetryTransportAttempt.decode(testAttemptReceipt!), saved);
+    await remote.dispose();
+
+    remote = printer(sessionId: '223e4567-e89b-42d3-a456-426614174000');
+    expect(remote.deliveryStatus.lastTestAttempt, saved);
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.rejected);
+    await remote.dispose();
+  });
+
+  test('attempt storage failures are visible but never block the network', () async {
+    final remote = printer(writeLastAttempt: (_) async => false);
+    final result = await remote.sendTestEvent();
+    await Future<void>.delayed(Duration.zero);
+    expect(result.outcome, TelemetryTestOutcome.accepted);
+    expect(sent, hasLength(1));
+    expect(remote.deliveryStatus.attemptStorageState, TelemetryAttemptStorageState.failed);
+    await remote.dispose();
+  });
+
+  test('test receipt storage failure remains visible after an ordinary successful send', () async {
+    final remote = printer(writeLastTestAttempt: (_) async => false);
+    expect((await remote.sendTestEvent()).outcome, TelemetryTestOutcome.accepted);
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    await Future<void>.delayed(Duration.zero);
+    expect(sent, hasLength(2));
+    expect(remote.deliveryStatus.attemptStorageState, TelemetryAttemptStorageState.persisted);
+    expect(remote.deliveryStatus.testAttemptStorageState, TelemetryAttemptStorageState.failed);
+    expect(remote.deliveryStatus.lastTestAttempt?.testEventId, isNotNull);
+    await remote.dispose();
+  });
+
+  test('newer general own-test receipt wins when dedicated test storage is stale', () async {
+    var rejectNext = false;
+    var failTestWrites = false;
+    Future<bool> writeTestAttempt(String value) async {
+      if (failTestWrites) return false;
+      testAttemptReceipt = value;
+      return true;
+    }
+
+    var remote = printer(writeLastTestAttempt: writeTestAttempt, post: (_, _, _) async => rejectNext ? 422 : 202);
+    expect((await remote.sendTestEvent()).outcome, TelemetryTestOutcome.accepted);
+    await Future<void>.delayed(Duration.zero);
+    final accepted = TelemetryTransportAttempt.decode(testAttemptReceipt!);
+
+    now = now.add(const Duration(minutes: 1));
+    rejectNext = true;
+    failTestWrites = true;
+    expect((await remote.sendTestEvent()).outcome, TelemetryTestOutcome.rejected);
+    await Future<void>.delayed(Duration.zero);
+    final rejected = TelemetryTransportAttempt.decode(attemptReceipt!);
+    expect(rejected.testEventId, isNot(accepted.testEventId));
+    expect(rejected.httpCode, 422);
+    expect(TelemetryTransportAttempt.decode(testAttemptReceipt!), accepted);
+    await remote.dispose();
+
+    remote = printer(sessionId: '223e4567-e89b-42d3-a456-426614174000', writeLastTestAttempt: writeTestAttempt);
+    await Future<void>.delayed(Duration.zero);
+    expect(remote.deliveryStatus.lastTestAttempt, rejected);
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.rejected);
+    expect(remote.deliveryStatus.testAttemptStorageState, TelemetryAttemptStorageState.failed);
+    await remote.dispose();
+  });
+
+  test('after-request general receipt wins over stale before-request test receipt', () async {
+    var testWrites = 0;
+    Future<bool> writeTestAttempt(String value) async {
+      testWrites++;
+      if (testWrites > 1) return false;
+      testAttemptReceipt = value;
+      return true;
+    }
+
+    var remote = printer(writeLastTestAttempt: writeTestAttempt);
+    expect((await remote.sendTestEvent()).outcome, TelemetryTestOutcome.accepted);
+    await Future<void>.delayed(Duration.zero);
+    final completed = TelemetryTransportAttempt.decode(attemptReceipt!);
+    final stale = TelemetryTransportAttempt.decode(testAttemptReceipt!);
+    expect(completed.testEventId, stale.testEventId);
+    expect(completed.stage, TelemetryTransportStage.afterRequest);
+    expect(stale.stage, TelemetryTransportStage.beforeRequest);
+    await remote.dispose();
+
+    remote = printer(sessionId: '223e4567-e89b-42d3-a456-426614174000', writeLastTestAttempt: (_) async => false);
+    await Future<void>.delayed(Duration.zero);
+    expect(remote.deliveryStatus.lastTestAttempt, completed);
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
+    expect(remote.deliveryStatus.testAttemptStorageState, TelemetryAttemptStorageState.failed);
+    await remote.dispose();
+  });
+
+  test('equal-time different test IDs keep and repair the general receipt', () async {
+    final general = TelemetryTransportAttempt(
+      attemptedAt: now,
+      testEventId: '1111111111111111',
+      appVersion: '0.0.1',
+      buildNumber: '19',
+      stage: TelemetryTransportStage.afterRequest,
+      outcome: TelemetryTransportOutcome.http,
+      httpCode: 202,
+      ackOwnEvent: true,
+    );
+    final dedicated = TelemetryTransportAttempt(
+      attemptedAt: now,
+      testEventId: '2222222222222222',
+      appVersion: '0.0.1',
+      buildNumber: '19',
+      stage: TelemetryTransportStage.afterRequest,
+      outcome: TelemetryTransportOutcome.http,
+      httpCode: 422,
+      ackOwnEvent: false,
+    );
+    attemptReceipt = general.encode();
+    testAttemptReceipt = dedicated.encode();
+
+    final remote = printer();
+    expect(remote.deliveryStatus.lastTestAttempt, general);
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
+    expect(remote.deliveryStatus.testAttemptStorageState, TelemetryAttemptStorageState.pending);
+    await Future<void>.delayed(Duration.zero);
+    expect(TelemetryTransportAttempt.decode(testAttemptReceipt!), general);
+    expect(remote.deliveryStatus.testAttemptStorageState, TelemetryAttemptStorageState.persisted);
+    await remote.dispose();
+  });
+
+  test('missing or corrupt dedicated receipt is repaired from the general receipt', () async {
+    final general = TelemetryTransportAttempt(
+      attemptedAt: now,
+      testEventId: '1111111111111111',
+      appVersion: '0.0.1',
+      buildNumber: '19',
+      stage: TelemetryTransportStage.afterRequest,
+      outcome: TelemetryTransportOutcome.http,
+      httpCode: 202,
+      ackOwnEvent: true,
+    );
+    attemptReceipt = general.encode();
+
+    for (final stored in <String?>[null, '{bad']) {
+      testAttemptReceipt = stored;
+      final remote = printer();
+      expect(remote.deliveryStatus.lastTestAttempt, general);
+      expect(remote.deliveryStatus.testAttemptStorageState, TelemetryAttemptStorageState.pending);
+      await Future<void>.delayed(Duration.zero);
+      expect(TelemetryTransportAttempt.decode(testAttemptReceipt!), general);
+      expect(remote.deliveryStatus.testAttemptStorageState, TelemetryAttemptStorageState.persisted);
+      await remote.dispose();
+    }
+  });
+
+  test('hanging attempt storage leaves a pending warning without blocking HTTP', () async {
+    final hangingWrite = Completer<bool>();
+    final remote = printer(writeLastAttempt: (_) => hangingWrite.future);
+    final result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.accepted);
+    expect(sent, hasLength(1));
+    expect(remote.deliveryStatus.attemptStorageState, TelemetryAttemptStorageState.pending);
+    var disposeCompleted = false;
+    final disposing = remote.dispose().whenComplete(() => disposeCompleted = true);
+    await Future<void>.delayed(Duration.zero);
+    expect(disposeCompleted, isFalse);
+    hangingWrite.complete(true);
+    await disposing;
+  });
+
+  test('dispose drains receipt writes before the caller clears their keys', () async {
+    final releaseWrites = Completer<void>();
+    Future<bool> writeAttempt(String value) async {
+      await releaseWrites.future;
+      attemptReceipt = value;
+      return true;
+    }
+
+    Future<bool> writeTestAttempt(String value) async {
+      await releaseWrites.future;
+      testAttemptReceipt = value;
+      return true;
+    }
+
+    final remote = printer(writeLastAttempt: writeAttempt, writeLastTestAttempt: writeTestAttempt);
+    expect((await remote.sendTestEvent()).outcome, TelemetryTestOutcome.accepted);
+    expect(sent, hasLength(1));
+
+    var disposeCompleted = false;
+    final cleared = remote.dispose(clearPending: true).then((_) {
+      disposeCompleted = true;
+      attemptReceipt = null;
+      testAttemptReceipt = null;
+    });
+    await Future<void>.delayed(Duration.zero);
+    expect(disposeCompleted, isFalse);
+
+    releaseWrites.complete();
+    await cleared;
+    await Future<void>.delayed(Duration.zero);
+    expect(attemptReceipt, isNull);
+    expect(testAttemptReceipt, isNull);
+  });
+
+  test('bad attempt storage is isolated from compatible old outbox restore', () async {
+    var remote = printer();
+    remote.addDiagnostic(diagnostic(1));
+    await remote.dispose();
+
+    remote = printer(readLastAttempt: () => '{bad');
+    expect(remote.queuedCount, 1);
+    expect(remote.deliveryStatus.attemptStorageState, TelemetryAttemptStorageState.failed);
+    await remote.flush();
+    expect(sent, hasLength(1));
+    await remote.dispose();
+  });
+
+  test('transport failures persist only their closed category', () async {
+    final cases = <(Object, TelemetryTransportOutcome)>[
+      (TimeoutException('PRIVATE_TIMEOUT'), TelemetryTransportOutcome.timeout),
+      (SocketException('PRIVATE_NETWORK'), TelemetryTransportOutcome.network),
+      (HandshakeException('PRIVATE_TLS'), TelemetryTransportOutcome.tls),
+      (StateError('PRIVATE_OTHER'), TelemetryTransportOutcome.other),
+    ];
+    for (final (error, expected) in cases) {
+      outbox = null;
+      budgetState = null;
+      attemptReceipt = null;
+      final remote = printer(post: (_, _, _) => Future<int>.error(error));
+      final result = await remote.sendTestEvent();
+      await Future<void>.delayed(Duration.zero);
+      expect(result.outcome, TelemetryTestOutcome.pending);
+      final receipt = TelemetryTransportAttempt.decode(attemptReceipt!);
+      expect(receipt.outcome, expected);
+      expect(receipt.httpCode, isNull);
+      expect(receipt.ackOwnEvent, isFalse);
+      expect(attemptReceipt, isNot(contains('PRIVATE_')));
+      await remote.dispose();
+    }
+  });
+
+  test('dispose cancels the single pending wake timer', () async {
+    final timers = <_ManualTimer>[];
+    final remote = printer(
+      autoFlush: true,
+      createTimer: (delay, callback) {
+        final timer = _ManualTimer(delay, callback);
+        timers.add(timer);
+        return timer;
+      },
+    );
+    remote.addDiagnostic(diagnostic(1));
+    expect(timers.single.isActive, isTrue);
+    await remote.dispose();
+    expect(timers.single.isActive, isFalse);
+    timers.single.fire();
+    await Future<void>.delayed(Duration.zero);
+    expect(sent, isEmpty);
   });
 
   test('overlapping manual test requests share one exact result and one event', () async {
@@ -459,6 +969,9 @@ void main() {
     expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetStateInvalid);
     expect(remote.deliveryStatus.nextAttemptAt, isNull);
     expect(sent, isEmpty);
+    result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.budgetStateInvalid);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetStateInvalid);
     await remote.dispose();
 
     budgetState = null;
@@ -480,10 +993,35 @@ void main() {
     expect(remote.deliveryStatus.nextAttemptAt, isNull);
     expect(sent, isEmpty);
 
+    result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.budgetStorageFailed);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetStorageFailed);
+    expect(sent, isEmpty);
+
     failBudgetWrite = false;
     await remote.resumePending();
     expect(sent, hasLength(1));
     expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
+    await remote.dispose();
+  });
+
+  test('manual test preserves an existing budget write failure without another write', () async {
+    var writes = 0;
+    final failingBudget = TelemetryBudget(
+      read: () => null,
+      write: (_) async {
+        writes++;
+        return false;
+      },
+      now: () => now,
+    );
+    final remote = printer(telemetryBudget: failingBudget);
+    await remote.sendTestEvent();
+    final result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.budgetStorageFailed);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetStorageFailed);
+    expect(writes, 1);
+    expect(sent, isEmpty);
     await remote.dispose();
   });
 
@@ -578,4 +1116,29 @@ void main() {
     expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
     await remote.dispose();
   });
+}
+
+final class _ManualTimer implements Timer {
+  _ManualTimer(this.delay, this._callback);
+
+  final Duration delay;
+  final void Function() _callback;
+  bool _active = true;
+  int _tick = 0;
+
+  void fire() {
+    if (!_active) return;
+    _active = false;
+    _tick = 1;
+    _callback();
+  }
+
+  @override
+  void cancel() => _active = false;
+
+  @override
+  bool get isActive => _active;
+
+  @override
+  int get tick => _tick;
 }
