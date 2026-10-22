@@ -6,7 +6,7 @@ import 'package:hiddify/core/observability/telemetry_budget.dart';
 void main() {
   late String? stored;
   late DateTime now;
-  TelemetryBudget budget({int bytes = 100, int exceptions = 2}) => TelemetryBudget(
+  TelemetryBudget budget({int bytes = 100, int exceptions = 2, int monthlyExceptions = 10}) => TelemetryBudget(
     read: () => stored,
     write: (value) async {
       stored = value;
@@ -15,6 +15,7 @@ void main() {
     now: () => now,
     maxLogBytes: bytes,
     maxExceptions: exceptions,
+    maxMonthlyExceptions: monthlyExceptions,
   );
 
   setUp(() {
@@ -42,6 +43,62 @@ void main() {
     expect(await client.reserveLogs(100), isTrue);
   });
 
+  test('UTC month cap survives daily rollovers and resets in a new month', () async {
+    final client = budget(exceptions: 1, monthlyExceptions: 3);
+    expect(await client.reserveException(), isTrue);
+    now = DateTime.utc(2026, 10, 22);
+    expect(await client.reserveException(), isTrue);
+    now = DateTime.utc(2026, 10, 23);
+    expect(await client.reserveException(), isTrue);
+    now = DateTime.utc(2026, 10, 24);
+    expect(await client.reserveException(), isFalse);
+    now = DateTime.utc(2026, 11);
+    expect(await client.reserveException(), isTrue);
+    final value = jsonDecode(stored!) as Map<String, dynamic>;
+    expect(value['month'], '2026-11');
+    expect(value['monthly_exceptions'], 1);
+  });
+
+  test('original day-only document migrates without granting extra exceptions', () async {
+    stored = jsonEncode({'day': '2026-10-21', 'log_bytes': 10, 'exceptions': 1});
+    final client = budget(monthlyExceptions: 3);
+    expect(await client.reserveException(), isTrue);
+    final value = jsonDecode(stored!) as Map<String, dynamic>;
+    expect(value, {'day': '2026-10-21', 'log_bytes': 10, 'exceptions': 2, 'month': '2026-10', 'monthly_exceptions': 2});
+  });
+
+  test('legacy exception overage does not block the independent log budget', () async {
+    stored = jsonEncode({'day': '2026-10-21', 'log_bytes': 10, 'exceptions': 50});
+    final client = budget();
+    expect(await client.reserveLogs(1), isTrue);
+    final value = jsonDecode(stored!) as Map<String, dynamic>;
+    expect(value['log_bytes'], 11);
+    expect(value['monthly_exceptions'], 50);
+  });
+
+  test('legacy log overage does not block the independent exception budget', () async {
+    stored = jsonEncode({'day': '2026-10-21', 'log_bytes': 256 * 1024, 'exceptions': 0});
+    final client = budget();
+    expect(await client.reserveException(), isTrue);
+    final value = jsonDecode(stored!) as Map<String, dynamic>;
+    expect(value['log_bytes'], 256 * 1024);
+    expect(value['exceptions'], 1);
+  });
+
+  test('clock rollback cannot reset the monthly exception counter', () async {
+    final client = budget(monthlyExceptions: 1);
+    expect(await client.reserveException(), isTrue);
+    now = DateTime.utc(2026, 9, 30);
+    expect(await client.reserveException(), isFalse);
+  });
+
+  test('default caps are conservative for free telemetry quotas', () {
+    final client = TelemetryBudget(read: () => null, write: (_) async => true);
+    expect(client.maxLogBytes, 64 * 1024);
+    expect(client.maxExceptions, 1);
+    expect(client.maxMonthlyExceptions, 10);
+  });
+
   test('corrupt storage and failed persistence reject sending', () async {
     stored = '{invalid';
     expect(await budget().reserveLogs(1), isFalse);
@@ -54,6 +111,9 @@ void main() {
 
   test('no private events or credentials are persisted with counters', () async {
     await budget().reserveLogs(50);
-    expect((jsonDecode(stored!) as Map).keys, unorderedEquals(['day', 'log_bytes', 'exceptions']));
+    expect(
+      (jsonDecode(stored!) as Map).keys,
+      unorderedEquals(['day', 'log_bytes', 'exceptions', 'month', 'monthly_exceptions']),
+    );
   });
 }

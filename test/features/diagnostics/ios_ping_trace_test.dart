@@ -2,6 +2,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 
 void main() {
+  test('keeps distinguishable monotonic timing after an hour of uptime', () {
+    var elapsed = const Duration(hours: 2).inMilliseconds;
+    final trace = IosPingTrace(elapsedMilliseconds: () => elapsed);
+    addTearDown(trace.dispose);
+    trace.record(IosPingEvent.probeRequestIssued, operationId: 1);
+    elapsed += 15000;
+    trace.record(IosPingEvent.measurementTimedOut, operationId: 1);
+    final events = trace.snapshot.events;
+    expect(events.last.elapsedMilliseconds - events.first.elapsedMilliseconds, 15000);
+  });
+
   test('uses a bounded ring and keeps the configured capacity within limits', () {
     final trace = IosPingTrace(capacity: 2, elapsedMilliseconds: () => 10);
     addTearDown(trace.dispose);

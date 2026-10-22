@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/observability/better_stack_log_printer.dart';
 import 'package:hiddify/core/observability/telemetry_budget.dart';
+import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 
 void main() {
@@ -13,9 +14,9 @@ void main() {
   late BetterStackLogPrinter printer;
   late int response;
 
-  SafeDiagnosticEvent record({bool failed = false}) => SafeDiagnosticEvent(
-    sequence: 1,
-    operationId: 1,
+  SafeDiagnosticEvent record({bool failed = false, int sequence = 1}) => SafeDiagnosticEvent(
+    sequence: sequence,
+    operationId: sequence,
     operation: DiagnosticOperation.connect,
     stage: failed ? DiagnosticStage.failed : DiagnosticStage.accepted,
     code: failed ? DiagnosticCode.coreUnavailable : DiagnosticCode.started,
@@ -62,9 +63,23 @@ void main() {
     expect(decoded['schema'], 'blizzard-remote-diagnostics/v1');
     expect(decoded['app_version'], 'unknown');
     expect(decoded.keys.toSet(), {
-      'sequence', 'operation_id', 'operation', 'stage', 'code', 'duration_ms',
-      'reachability', 'schema', 'platform', 'environment', 'app_version',
-      'build_number', 'session_id', 'dt', 'level', 'message',
+      'sequence',
+      'operation_id',
+      'operation',
+      'stage',
+      'code',
+      'duration_ms',
+      'reachability',
+      'schema',
+      'platform',
+      'environment',
+      'app_version',
+      'build_number',
+      'session_id',
+      'dt',
+      'event_id',
+      'level',
+      'message',
     });
   });
 
@@ -74,6 +89,60 @@ void main() {
     final decoded = (jsonDecode(sent.single) as List).single as Map;
     expect(decoded['event'], 'test_event');
     expect(decoded['message'], 'test_event');
+    expect(decoded['event_id'], matches(RegExp(r'^[0-9a-f]{16}$')));
+  });
+
+  test('exports typed iOS ping events without throttling distinct causal failures', () async {
+    expect(
+      printer.addIosPingEvent(
+        IosPingTraceEntry(
+          sequence: 2,
+          event: IosPingEvent.measurementTimedOut,
+          operationId: 7,
+          elapsedMilliseconds: 3600000,
+        ),
+      ),
+      isTrue,
+    );
+    expect(
+      printer.addIosPingEvent(
+        IosPingTraceEntry(
+          sequence: 3,
+          event: IosPingEvent.measurementTimedOut,
+          operationId: 7,
+          elapsedMilliseconds: 3600000,
+        ),
+      ),
+      isTrue,
+    );
+    await printer.flush();
+    final events = (jsonDecode(sent.single) as List).cast<Map<String, dynamic>>();
+    expect(events, hasLength(2));
+    expect(events.first['operation'], 'ios_ping');
+    expect(events.first['stage'], 'failed');
+    expect(events.first['code'], 'measurementTimedOut');
+    expect(events.first['elapsed_ms'], 3600000);
+    expect(events.first['reachability'], 'not_checked');
+    expect(events.first['level'], 'error');
+    expect(events.first.keys.toSet(), {
+      'sequence',
+      'operation_id',
+      'operation',
+      'stage',
+      'code',
+      'elapsed_ms',
+      'reachability',
+      'schema',
+      'platform',
+      'environment',
+      'app_version',
+      'build_number',
+      'session_id',
+      'dt',
+      'event_id',
+      'level',
+      'message',
+    });
   });
 
   test('quota and credential responses disable sending and clear pending data', () async {
@@ -87,7 +156,7 @@ void main() {
     expect(printer.queuedCount, 0);
   });
 
-  test('retryable responses have a bounded retry count and consume byte budget', () async {
+  test('retryable responses pause after three attempts and retain the batch', () async {
     response = 503;
     printer.addDiagnostic(record());
     await printer.flush();
@@ -95,11 +164,11 @@ void main() {
     await printer.flush();
     await printer.flush();
     expect(sent.length, 3);
-    expect(printer.queuedCount, 0);
+    expect(printer.queuedCount, 1);
     expect((jsonDecode(stored!) as Map<String, dynamic>)['log_bytes'], utf8.encode(sent.join()).length);
   });
 
-  test('transport exceptions stay isolated and eventually discard the failed batch', () async {
+  test('transport exceptions stay isolated and pause with the failed batch retained', () async {
     await printer.dispose();
     var attempts = 0;
     printer = BetterStackLogPrinter(
@@ -118,7 +187,7 @@ void main() {
       await printer.flush();
     }
     expect(attempts, 3);
-    expect(printer.queuedCount, 0);
+    expect(printer.queuedCount, 1);
   });
 
   test('repeated errors are throttled without using operation IDs as deduplication keys', () async {
@@ -134,7 +203,7 @@ void main() {
 
   test('offline queue and outgoing batches are bounded', () async {
     for (var i = 0; i < 150; i++) {
-      printer.addDiagnostic(record());
+      printer.addDiagnostic(record(sequence: i + 1));
     }
     expect(printer.queuedCount, BetterStackLogPrinter.maxQueueLength);
     await printer.flush();
@@ -158,7 +227,7 @@ void main() {
     printer.addDiagnostic(record());
     await printer.flush();
     expect(sent, isEmpty);
-    expect(printer.queuedCount, 0);
+    expect(printer.queuedCount, 1);
   });
 
   test('overlapping flushes send once and disposal stops future requests', () async {

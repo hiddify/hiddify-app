@@ -6,8 +6,114 @@ import 'package:hiddify/features/proxy/active/ios_active_proxy_measurement.dart'
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:rxdart/rxdart.dart';
 
 void main() {
+  test('records unchanged baseline timestamp once without accepting cached latency', () async {
+    final observed = <String>[];
+    final clock = DateTime.utc(2026, 10, 18, 12);
+    final baseline = OutboundInfo(
+      tag: 'synthetic',
+      urlTestDelay: 84,
+      urlTestTime: Timestamp.fromDateTime(clock.add(const Duration(seconds: 1))),
+    );
+    final stream = BehaviorSubject<Either<ProxyFailure, List<OutboundGroup>>>.seeded(
+      right([OutboundGroup(items: [baseline])]),
+    );
+    final probe = IosActiveProxyMeasurement(
+      watch: () => stream.stream,
+      request: () async {
+        for (var i = 0; i < 3; i++) {
+          stream.add(right([OutboundGroup(items: [baseline])]));
+        }
+      },
+      now: () => clock,
+      deadline: const Duration(milliseconds: 40),
+      observer: (event, _) => observed.add(event.name),
+    );
+    addTearDown(() async {
+      probe.dispose();
+      await stream.close();
+    });
+    await _expectFailure(probe.refresh(), IosProxyMeasurementCode.timedOut);
+    expect(observed.where((event) => event == 'probeSnapshotUnchanged'), hasLength(1));
+  });
+
+  test('records out-of-range latency without changing unavailable outcome', () async {
+    final observed = <String>[];
+    final probe = _Probe(observer: (event, _) => observed.add(event.name));
+    addTearDown(probe.dispose);
+    probe.requestAction = () async {};
+    final refresh = probe.measurement.refresh();
+    await probe.requestStarted.future;
+    probe.events.add(right([OutboundGroup(items: [probe.validProxy(delay: 65001)])]));
+    await refresh;
+    expect(observed, contains('probeSnapshotOutOfRange'));
+    expect(probe.measurement.state.phase, IosProxyMeasurementPhase.unavailable);
+  });
+
+  for (final reason in ['probeSnapshotTimeMissing', 'probeSnapshotBeforeRequest', 'probeSnapshotNoDelay']) {
+    test('records $reason once while preserving the timeout outcome', () async {
+      final observed = <String>[];
+      final probe = _Probe(observer: (event, _) => observed.add(event.name));
+      addTearDown(probe.dispose);
+      probe.requestAction = () async {};
+      final refresh = probe.measurement.refresh(operationId: 4);
+      await probe.requestStarted.future;
+      final proxy = switch (reason) {
+        'probeSnapshotTimeMissing' => probe.validProxy()..clearUrlTestTime(),
+        'probeSnapshotBeforeRequest' => probe.validProxy(timestamp: probe.clock.subtract(const Duration(seconds: 1))),
+        _ => probe.validProxy(delay: 0),
+      };
+      for (var i = 0; i < 3; i++) {
+        probe.events.add(
+          right([
+            OutboundGroup(items: [proxy]),
+          ]),
+        );
+      }
+      await _expectFailure(refresh, IosProxyMeasurementCode.timedOut);
+      expect(observed.where((event) => event == reason), hasLength(1));
+      expect(probe.measurement.state.phase, IosProxyMeasurementPhase.timedOut);
+    });
+  }
+
+  test('records normal stream closure independently of stream failure', () async {
+    final observed = <String>[];
+    final probe = _Probe(observer: (event, _) => observed.add(event.name));
+    addTearDown(probe.dispose);
+    probe.requestAction = () async {};
+    final refresh = probe.measurement.refresh();
+    await probe.requestStarted.future;
+    await probe.events.close();
+    await _expectFailure(refresh, IosProxyMeasurementCode.timedOut);
+    expect(observed, contains('probeStreamClosed'));
+    expect(observed, isNot(contains('probeStreamFailed')));
+  });
+
+  test('records identity change without exposing outbound names', () async {
+    final observed = <String>[];
+    final probe = _Probe(observer: (event, _) => observed.add(event.name));
+    addTearDown(probe.dispose);
+    final refresh = probe.measurement.refresh();
+    await probe.requestStarted.future;
+    probe.events.add(
+      right([
+        OutboundGroup(items: [probe.validProxy(tag: 'PRIVATE_CANARY_A')]),
+      ]),
+    );
+    probe.events.add(
+      right([
+        OutboundGroup(items: [probe.validProxy(tag: 'PRIVATE_CANARY_B')]),
+      ]),
+    );
+    await refresh;
+    expect(observed, contains('probeIdentityChanged'));
+    expect(observed.join(), isNot(contains('PRIVATE_CANARY')));
+    expect(probe.measurement.state.phase, IosProxyMeasurementPhase.unavailable);
+    probe.requestGate.complete();
+  });
+
   test('starts idle and states replays the current snapshot', () async {
     final probe = _Probe();
     addTearDown(probe.dispose);
@@ -576,7 +682,11 @@ Future<void> _refresh(IosActiveProxyMeasurement measurement) async {
 }
 
 class _Probe {
-  _Probe({Duration deadline = const Duration(milliseconds: 40), this.watchFactory}) {
+  _Probe({
+    Duration deadline = const Duration(milliseconds: 40),
+    this.watchFactory,
+    IosPingMeasurementObserver? observer,
+  }) {
     measurement = IosActiveProxyMeasurement(
       watch: () {
         watchCalls++;
@@ -594,6 +704,7 @@ class _Probe {
       },
       deadline: deadline,
       now: () => clock,
+      observer: observer,
     );
   }
 

@@ -100,6 +100,9 @@ class IosActiveProxyMeasurement {
       _subscription = _watch().listen(
         (event) => _onEvent(epoch, event),
         onError: (Object _, StackTrace _) => _onStreamError(epoch),
+        onDone: () {
+          if (_isEpochCurrent(epoch)) _observeStreamOnce(IosPingEvent.probeStreamClosed);
+        },
       );
     } catch (_) {
       _observe(IosPingEvent.probeStreamFailed);
@@ -201,6 +204,7 @@ class IosActiveProxyMeasurement {
         if (identity == null) {
           _attemptIdentity = proxy;
         } else if (!_sameIdentity(identity, proxy)) {
+          _observeStreamOnce(IosPingEvent.probeIdentityChanged);
           _completeUnavailable(epoch);
           return;
         }
@@ -230,6 +234,7 @@ class IosActiveProxyMeasurement {
     final current = state.proxy;
     if (current == null) return;
     if (!_sameIdentity(current, proxy)) {
+      _observeStreamOnce(IosPingEvent.probeIdentityChanged);
       _invalidatePassive(epoch, IosProxyMeasurementPhase.unavailable);
       return;
     }
@@ -266,14 +271,28 @@ class IosActiveProxyMeasurement {
 
   bool _isFresh(OutboundInfo proxy) {
     final startedAt = _requestStartedAt;
-    if (startedAt == null || !proxy.hasUrlTestTime()) return false;
+    if (startedAt == null) return false;
+    if (!proxy.hasUrlTestTime()) {
+      _observeStreamOnce(IosPingEvent.probeSnapshotTimeMissing);
+      return false;
+    }
     final measuredAt = proxy.urlTestTime.toDateTime().toUtc();
-    if (measuredAt.isBefore(startedAt.toUtc())) return false;
+    if (measuredAt.isBefore(startedAt.toUtc())) {
+      _observeStreamOnce(IosPingEvent.probeSnapshotBeforeRequest);
+      return false;
+    }
     final baseline = _baseline;
     if (baseline != null && _sameIdentity(baseline, proxy) && baseline.hasUrlTestTime()) {
-      if (!measuredAt.isAfter(baseline.urlTestTime.toDateTime().toUtc())) return false;
+      if (!measuredAt.isAfter(baseline.urlTestTime.toDateTime().toUtc())) {
+        _observeStreamOnce(IosPingEvent.probeSnapshotUnchanged);
+        return false;
+      }
     }
-    return proxy.urlTestDelay > 0;
+    if (proxy.urlTestDelay <= 0) {
+      _observeStreamOnce(IosPingEvent.probeSnapshotNoDelay);
+      return false;
+    }
+    return true;
   }
 
   void _tryComplete(int epoch) {
@@ -281,6 +300,7 @@ class IosActiveProxyMeasurement {
     final proxy = _candidate;
     if (proxy == null) return;
     if (proxy.urlTestDelay > 65000) {
+      _observeStreamOnce(IosPingEvent.probeSnapshotOutOfRange);
       _completeUnavailable(epoch);
       return;
     }

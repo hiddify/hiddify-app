@@ -7,8 +7,9 @@ final class TelemetryBudget {
     required String? Function() read,
     required Future<bool> Function(String) write,
     DateTime Function()? now,
-    this.maxLogBytes = 256 * 1024,
-    this.maxExceptions = 50,
+    this.maxLogBytes = 64 * 1024,
+    this.maxExceptions = 1,
+    this.maxMonthlyExceptions = 10,
   }) : _read = read,
        _write = write,
        _now = now ?? DateTime.now;
@@ -19,6 +20,7 @@ final class TelemetryBudget {
   final DateTime Function() _now;
   final int maxLogBytes;
   final int maxExceptions;
+  final int maxMonthlyExceptions;
   Future<void> _pending = Future.value();
 
   Future<bool> reserveLogs(int bytes) => _reserve(bytes, 0);
@@ -29,13 +31,17 @@ final class TelemetryBudget {
       try {
         if (bytes < 0 || exceptions < 0) return false;
         final today = _now().toUtc().toIso8601String().substring(0, 10);
+        final thisMonth = today.substring(0, 7);
         final stored = _read();
         var day = today;
+        var month = thisMonth;
         var usedBytes = 0;
         var usedExceptions = 0;
+        var usedMonthlyExceptions = 0;
         if (stored != null) {
           final value = jsonDecode(stored);
           if (value is! Map<String, dynamic> ||
+              (value.length != 3 && value.length != 5) ||
               value['day'] is! String ||
               !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value['day'] as String) ||
               value['log_bytes'] is! int ||
@@ -43,18 +49,42 @@ final class TelemetryBudget {
             return false;
           }
           final previousDay = value['day'] as String;
+          final hasMonthlyCounters = value.length == 5;
+          final previousMonth = hasMonthlyCounters ? value['month'] : previousDay.substring(0, 7);
+          final previousMonthlyExceptions = hasMonthlyCounters ? value['monthly_exceptions'] : value['exceptions'];
+          if (previousMonth is! String ||
+              !RegExp(r'^\d{4}-\d{2}$').hasMatch(previousMonth) ||
+              previousMonthlyExceptions is! int) {
+            return false;
+          }
           // A clock rollback must not grant another daily allowance.
           if (previousDay.compareTo(today) >= 0) {
             day = previousDay;
             usedBytes = value['log_bytes'] as int;
             usedExceptions = value['exceptions'] as int;
           }
-          if (usedBytes < 0 || usedExceptions < 0) return false;
+          // The same fail-closed rule applies to monthly counters.
+          if (previousMonth.compareTo(thisMonth) >= 0) {
+            month = previousMonth;
+            usedMonthlyExceptions = previousMonthlyExceptions;
+          }
+          if (usedBytes < 0 || usedExceptions < 0 || usedMonthlyExceptions < 0) return false;
         }
-        if (usedBytes + bytes > maxLogBytes || usedExceptions + exceptions > maxExceptions) return false;
+        if (bytes > 0 && usedBytes + bytes > maxLogBytes ||
+            exceptions > 0 &&
+                (usedExceptions + exceptions > maxExceptions ||
+                    usedMonthlyExceptions + exceptions > maxMonthlyExceptions)) {
+          return false;
+        }
         // Persist before network I/O; failures and retries consume the budget too.
         return await _write(
-          jsonEncode({'day': day, 'log_bytes': usedBytes + bytes, 'exceptions': usedExceptions + exceptions}),
+          jsonEncode({
+            'day': day,
+            'log_bytes': usedBytes + bytes,
+            'exceptions': usedExceptions + exceptions,
+            'month': month,
+            'monthly_exceptions': usedMonthlyExceptions + exceptions,
+          }),
         );
       } catch (_) {
         // Storage failure must neither flood telemetry nor affect the app.

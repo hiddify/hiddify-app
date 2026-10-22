@@ -1,6 +1,11 @@
 import 'dart:async';
 
 enum IosPingEvent {
+  appInactive,
+  appHidden,
+  appPaused,
+  appResumed,
+  appDetached,
   corePauseQueued,
   corePauseStarted,
   corePauseStatusCancel,
@@ -73,6 +78,13 @@ enum IosPingEvent {
   probeStreamEmpty,
   probeStreamUsable,
   probeSnapshotFresh,
+  probeSnapshotTimeMissing,
+  probeSnapshotBeforeRequest,
+  probeSnapshotUnchanged,
+  probeSnapshotNoDelay,
+  probeSnapshotOutOfRange,
+  probeIdentityChanged,
+  probeStreamClosed,
   probeRequestIssued,
   probeRequestCompleted,
   probeRequestFailed,
@@ -113,7 +125,7 @@ final class IosPingTraceSnapshot {
   static const String schema = 'wir-ios-ping-trace/v1';
   static const int maxCapacity = 128;
   static const int maxCounter = 9007199254740991;
-  static const int maxElapsedMilliseconds = 3600000;
+  static const int maxElapsedMilliseconds = 2592000000;
   static const Set<String> _documentKeys = {'schema', 'events'};
   static const Set<String> _entryKeys = {'sequence', 'event', 'operation_id', 'elapsed_ms'};
 
@@ -197,7 +209,7 @@ final class IosPingTrace {
   static const int defaultCapacity = 96;
   static const int maxCapacity = 128;
   static const int maxCounter = 9007199254740991;
-  static const int maxElapsedMilliseconds = 3600000;
+  static const int maxElapsedMilliseconds = IosPingTraceSnapshot.maxElapsedMilliseconds;
 
   final int Function()? _elapsedMilliseconds;
   final int capacity;
