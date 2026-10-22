@@ -24,6 +24,9 @@ class ProfilesModal extends HookConsumerWidget {
     final theme = BlizzardPresentation.themeOf(context);
     final blizzard =
         BlizzardPresentation.isActive(context) || (theme.extension<BlizzardEligibility>()?.applied ?? false);
+    Widget protectFallback(Widget child) => blizzard
+        ? SafeArea(left: false, top: false, right: false, child: child)
+        : child;
 
     ref.listen(profilesNotifierProvider, (_, next) {
       if (next.hasValue && next.value!.isEmpty) {
@@ -39,6 +42,7 @@ class ProfilesModal extends HookConsumerWidget {
     return Theme(
       data: theme,
       child: SafeArea(
+        bottom: !blizzard,
         child: asyncProfiles.when(
           data: (data) => DraggableScrollableSheet(
             initialChildSize: initialSize,
@@ -49,11 +53,16 @@ class ProfilesModal extends HookConsumerWidget {
               child: blizzard
                   ? ColoredBox(
                       color: theme.colorScheme.surface,
-                      child: _ProfilesSheetContent(
-                        data: data,
-                        scrollController: scrollController,
-                        blizzard: true,
-                        t: t,
+                      child: SafeArea(
+                        left: false,
+                        top: false,
+                        right: false,
+                        child: _ProfilesSheetContent(
+                          data: data,
+                          scrollController: scrollController,
+                          blizzard: true,
+                          t: t,
+                        ),
                       ),
                     )
                   : BlizzardBackdrop(
@@ -66,8 +75,8 @@ class ProfilesModal extends HookConsumerWidget {
                     ),
             ),
           ),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stackTrace) => Text(t.presentShortError(error)),
+          loading: () => protectFallback(const Center(child: CircularProgressIndicator())),
+          error: (error, stackTrace) => protectFallback(Text(t.presentShortError(error))),
         ),
       ),
     );

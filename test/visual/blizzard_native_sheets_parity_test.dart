@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
@@ -11,11 +14,24 @@ import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 
+import '../support/blizzard_capture.dart';
 import '../support/home_fixture.dart';
 
 Widget _applied(Widget child) => Builder(
   builder: (context) => Theme(data: BlizzardTheme.from(Theme.of(context)), child: child),
 );
+
+class _ControlledProfiles extends ProfilesNotifier {
+  final _controller = StreamController<List<ProfileEntity>>();
+
+  @override
+  Stream<List<ProfileEntity>> build() {
+    ref.onDispose(_controller.close);
+    return _controller.stream;
+  }
+
+  void fail() => _controller.addError(StateError('profiles unavailable'));
+}
 
 void main() {
   testWidgets('Add Profile keeps complete wrapping labels and grows for large text at 320pt', (tester) async {
@@ -180,6 +196,146 @@ void main() {
       findsOneWidget,
     );
     expect(tester.takeException(), isNull);
+    await fixture.close(tester);
+  });
+
+  testWidgets('Profiles modal paints the Blizzard surface through the 34pt bottom safe area', (tester) async {
+    tester.view.physicalSize = const Size(393, 852);
+    tester.view.devicePixelRatio = 1;
+    tester.view.viewPadding = const FakeViewPadding(bottom: 34);
+    tester.view.padding = const FakeViewPadding(bottom: 34);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewPadding);
+    addTearDown(tester.view.resetPadding);
+    final profile = ProfileEntity.local(
+      id: 'safe-area-profile',
+      active: true,
+      name: 'Safe area profile',
+      lastUpdate: DateTime.utc(2026),
+    );
+    final profiles = TileProfilesSpy()..profiles = [profile];
+    Future<void>? shown;
+    final fixture = await mountHomeFixture(
+      tester,
+      nativeViewport: true,
+      locale: AppLocale.ru,
+      extraOverrides: [profilesNotifierProvider.overrideWith(() => profiles)],
+      child: Builder(
+        builder: (context) => TextButton(
+          key: const ValueKey('open_profiles_modal'),
+          onPressed: () {
+            shown = showModalBottomSheet<void>(
+              context: context,
+              useRootNavigator: true,
+              constraints: BottomSheetConst.boxConstraints,
+              isScrollControlled: true,
+              builder: (context) => ClipRRect(
+                borderRadius: BottomSheetConst.borderRadius,
+                child: Material(
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+                    child: _applied(const ProfilesModal()),
+                  ),
+                ),
+              ),
+            ).then((_) {});
+          },
+          child: const Text('open profiles'),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('open_profiles_modal')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.byType(ProfilesModal), findsOneWidget);
+    expect(MediaQuery.viewPaddingOf(tester.element(find.byType(ProfilesModal))).bottom, 34);
+    final boundary = tester.renderObject<RenderRepaintBoundary>(find.byKey(blizzardFixtureCanvas));
+    final capture = (await tester.runAsync(() async {
+      final image = await boundary.toImage();
+      final data = (await image.toByteData())!;
+      final result = (width: image.width, pixels: data.buffer.asUint8List());
+      image.dispose();
+      return result;
+    }))!;
+    int pixelArgb(int x, int y) {
+      final offset = (y * capture.width + x) * 4;
+      return capture.pixels[offset + 3] << 24 |
+          capture.pixels[offset] << 16 |
+          capture.pixels[offset + 1] << 8 |
+          capture.pixels[offset + 2];
+    }
+
+    final sheetSurface = find.descendant(of: find.byType(ProfilesModal), matching: find.byType(ColoredBox)).first;
+    final surface = tester.widget<ColoredBox>(sheetSurface).color;
+    expect(pixelArgb(8, 817), surface.toARGB32(), reason: 'fixture must sample the painted Profiles surface');
+    expect(
+      pixelArgb(8, 851),
+      surface.toARGB32(),
+      reason: 'the physical bottom inset must continue the same Profiles sheet surface',
+    );
+    expect(tester.getSize(sheetSurface).height, closeTo(223, 0.01));
+    Navigator.of(tester.element(find.byType(ProfilesModal))).pop();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await shown;
+    await fixture.close(tester);
+  });
+
+  testWidgets('Profiles loading and error states respect the 34pt bottom safe area', (tester) async {
+    tester.view.physicalSize = const Size(393, 852);
+    tester.view.devicePixelRatio = 1;
+    tester.view.viewPadding = const FakeViewPadding(bottom: 34);
+    tester.view.padding = const FakeViewPadding(bottom: 34);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewPadding);
+    addTearDown(tester.view.resetPadding);
+    final profiles = _ControlledProfiles();
+    Future<void>? shown;
+    final fixture = await mountHomeFixture(
+      tester,
+      nativeViewport: true,
+      locale: AppLocale.ru,
+      extraOverrides: [profilesNotifierProvider.overrideWith(() => profiles)],
+      child: Builder(
+        builder: (context) => TextButton(
+          key: const ValueKey('open_profiles_fallback_modal'),
+          onPressed: () {
+            shown = showModalBottomSheet<void>(
+              context: context,
+              useRootNavigator: true,
+              constraints: BottomSheetConst.boxConstraints,
+              isScrollControlled: true,
+              builder: (context) => ClipRRect(
+                borderRadius: BottomSheetConst.borderRadius,
+                child: Material(child: _applied(const ProfilesModal())),
+              ),
+            ).then((_) {});
+          },
+          child: const Text('open profile fallback'),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('open_profiles_fallback_modal')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    const safeCenterY = (852 - 34) / 2;
+    expect(tester.getCenter(find.byType(CircularProgressIndicator)).dy, closeTo(safeCenterY, 0.01));
+
+    profiles.fail();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    final errorText = find.descendant(of: find.byType(ProfilesModal), matching: find.byType(Text));
+    expect(errorText, findsOneWidget);
+    expect(tester.getRect(errorText).bottom, closeTo(852 - 34, 0.01));
+
+    Navigator.of(tester.element(find.byType(ProfilesModal))).pop();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    await shown;
     await fixture.close(tester);
   });
 
