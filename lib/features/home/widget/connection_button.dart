@@ -13,11 +13,13 @@ import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_glass.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
+import 'package:hiddify/core/widget/blizzard/blizzard_scene.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/diagnostics/home_presentation_probe.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/proxy/active/active_proxy_delay_indicator.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
@@ -131,6 +133,13 @@ class ConnectionButton extends HookConsumerWidget {
             AsyncData(value: final status) => status.present(t),
             _ => "",
           };
+    final actionLabel = switch (connectionStatus) {
+      AsyncData(value: Connected()) when requiresReconnect == true => t.connection.reconnect,
+      AsyncData(value: Connected()) => t.connection.disconnect,
+      AsyncData(value: Disconnected()) || AsyncError() => t.connection.connect,
+      AsyncData(value: final status) => status.present(t),
+      _ => '',
+    };
     final button = _ConnectionButton(
       onTap: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => () async {
@@ -162,6 +171,7 @@ class ConnectionButton extends HookConsumerWidget {
         _ => false,
       },
       label: label,
+      actionLabel: actionLabel,
       buttonColor: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => Colors.teal,
         AsyncData(value: Connected()) when delay <= 0 || delay >= 65000 => const Color.fromARGB(255, 185, 176, 103),
@@ -203,7 +213,14 @@ class ConnectionButton extends HookConsumerWidget {
       delay: delay,
       themePlatform: Theme.of(context).platform,
       tickersEnabled: TickerMode.of(context),
-      child: button,
+      child: BlizzardPresentation.isActive(context)
+          ? _BlizzardConnectionHero(
+              statusLabel: label,
+              actionLabel: actionLabel,
+              secureLabel: secureLabel,
+              control: button,
+            )
+          : button,
     );
   }
 }
@@ -213,6 +230,7 @@ class _ConnectionButton extends StatelessWidget {
     required this.onTap,
     required this.enabled,
     required this.label,
+    required this.actionLabel,
     required this.buttonColor,
     required this.image,
     required this.useImage,
@@ -224,6 +242,7 @@ class _ConnectionButton extends StatelessWidget {
   final VoidCallback onTap;
   final bool enabled;
   final String label;
+  final String actionLabel;
   final Color buttonColor;
   final AssetGenImage image;
   final bool useImage;
@@ -239,11 +258,7 @@ class _ConnectionButton extends StatelessWidget {
     final media = MediaQuery.of(context);
     final reduceMotion = blizzard && (media.disableAnimations || media.accessibleNavigation);
     final materials = BlizzardMaterials(highContrast: media.highContrast);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // CircleDesignWidget(newButtonColor: newButtonColor, onTap: onTap, animated: animated),
-        Semantics(
+    final control = Semantics(
           button: true,
           enabled: enabled,
           label: label,
@@ -308,17 +323,22 @@ class _ConnectionButton extends StatelessWidget {
                   )
                   .animate(target: enabled ? 0 : 1)
                   .scaleXY(end: .88, curve: Curves.easeIn, duration: reduceMotion ? Duration.zero : null),
-        ),
+        );
+    if (blizzard) return control;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        control,
         const Gap(16),
         ExcludeSemantics(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (Theme.of(context).platform == TargetPlatform.iOS)
-                Text(label, style: Theme.of(context).textTheme.titleMedium)
+                Text(actionLabel, style: Theme.of(context).textTheme.titleMedium)
               else
                 AnimatedText(
-                  label,
+                  actionLabel,
                   duration: reduceMotion ? Duration.zero : kAnimationDuration,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
@@ -342,6 +362,116 @@ class _ConnectionButton extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _BlizzardConnectionHero extends StatelessWidget {
+  const _BlizzardConnectionHero({
+    required this.statusLabel,
+    required this.actionLabel,
+    required this.secureLabel,
+    required this.control,
+  });
+
+  final String statusLabel;
+  final String actionLabel;
+  final String secureLabel;
+  final Widget control;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth.clamp(0, BlizzardMetrics.waveSize.width).toDouble();
+        return SizedBox(
+          width: width,
+          height: 336,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+          Positioned(
+            top: 0,
+            left: 0,
+            child: SizedBox(
+              key: const ValueKey('blizzard_home_status_slot'),
+              width: width,
+              height: BlizzardMetrics.connectionStatusHeight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    statusLabel,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 6),
+                  Flexible(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Flexible(child: ActiveProxyDelayIndicator()),
+                        if (secureLabel.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Icon(FontAwesomeIcons.shieldHalved, size: 14, color: theme.colorScheme.onSurfaceVariant),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              secureLabel,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: BlizzardMetrics.waveTopFromStatus,
+            left: 0,
+            child: SizedBox.fromSize(
+              key: const ValueKey('blizzard_home_wave_envelope'),
+              size: Size(width, BlizzardMetrics.waveSize.height),
+              child: const BlizzardScene(preset: BlizzardParticlePreset.hero),
+            ),
+          ),
+          Positioned(
+            top: BlizzardMetrics.controlTopFromStatus,
+            left: 0,
+            child: SizedBox(
+              key: const ValueKey('blizzard_home_control_group'),
+              width: width,
+              height: BlizzardMetrics.connectionControlGroupHeight,
+              child: Column(
+                children: [
+                  const SizedBox(height: 23),
+                  SizedBox.square(dimension: BlizzardMetrics.connectionButton, child: control),
+                  const SizedBox(height: BlizzardMetrics.connectionLabelGap),
+                  SizedBox(
+                    height: 22,
+                    child: Text(
+                      actionLabel,
+                      key: const ValueKey('blizzard_home_action_label'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

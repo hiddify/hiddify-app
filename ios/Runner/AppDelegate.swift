@@ -12,6 +12,9 @@ import Sentry
         setupFileManager()
         registerHandlers()
         GeneratedPluginRegistrant.register(with: self)
+        registrar(forPlugin: "BlizzardNativeGlass")?.register(
+            BlizzardNativeGlassFactory(), withId: "app.blizzard/native-liquid-glass"
+        )
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
     

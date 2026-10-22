@@ -117,7 +117,11 @@ void main() {
     final shell = shellRouter();
     await tester.pumpWidget(UncontrolledProviderScope(container: nav, child: ContractApp(shell)));
     await tester.pumpAndSettle();
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(
+      find.byType(NavigationBar).evaluate().isNotEmpty ||
+          find.byKey(const ValueKey('blizzard_bottom_dock')).evaluate().isNotEmpty,
+      isTrue,
+    );
     await tester.tap(find.byIcon(Icons.settings_rounded));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('settings-draft')), findsOneWidget);

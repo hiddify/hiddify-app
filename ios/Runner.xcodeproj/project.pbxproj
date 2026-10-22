@@ -38,6 +38,7 @@
 		59E8864FB99B37076B22F32B /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30560DB3EFDF5E86AAD00AB8 /* Pods_RunnerTests.framework */; };
 		68885DD72B4EF33400D214BA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 03E392B72ADDA00E000ADF15 /* NetworkExtension.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		B117A4D71026200000000002 /* BlizzardNativeGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = B117A4D71026200000000001 /* BlizzardNativeGlass.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -146,6 +147,7 @@
 		68DCEB772BD7DA3F0081FF65 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		B117A4D71026200000000001 /* BlizzardNativeGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlizzardNativeGlass.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		7CA62594950187FCFE36B54C /* Pods-Runner-HiddifyPacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner-HiddifyPacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-Runner-HiddifyPacketTunnel/Pods-Runner-HiddifyPacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
 		808A94F72872B54716770416 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -347,6 +349,7 @@
 				03B5166E2AE7325D00EA47E2 /* Handlers */,
 				032158B62ADDF8AF008D943B /* VPN */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+				B117A4D71026200000000001 /* BlizzardNativeGlass.swift */,
 				03E392C72ADDA26A000ADF15 /* Runner.entitlements */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -667,6 +670,7 @@
 				03B5167B2AE79DB400EA47E2 /* FileMethodHandler.swift in Sources */,
 				03B516772AE7634400EA47E2 /* Logger.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				B117A4D71026200000000002 /* BlizzardNativeGlass.swift in Sources */,
 				D703EE962B765176001D88B3 /* ActiveGroupsEventHandler.swift in Sources */,
 				03B516712AE74CCD00EA47E2 /* VPNConfig.swift in Sources */,
 				03B5166B2AE7315E00EA47E2 /* AlertsEventHandler.swift in Sources */,

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
 import 'package:hiddify/features/diagnostics/home_presentation_snapshot.dart';
 import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
@@ -21,7 +22,13 @@ final class SafeDiagnosticJournal {
   static const int maxEncodedBytes = 64 * 1024;
   static const String schema = 'blizzard-safe-diagnostics/v1';
   static const Set<String> _requiredDocumentKeys = {'schema', 'platform', 'reachability', 'events'};
-  static const Set<String> _optionalDocumentKeys = {'version', 'build_number', 'home_presentation', 'ios_ping'};
+  static const Set<String> _optionalDocumentKeys = {
+    'version',
+    'build_number',
+    'home_presentation',
+    'ios_ping',
+    'telemetry_delivery',
+  };
   static final RegExp _versionPattern = RegExp(r'^\d{1,3}\.\d{1,3}\.\d{1,3}$');
   static final RegExp _buildPattern = RegExp(r'^\d{1,9}$');
 
@@ -96,12 +103,14 @@ final class SafeDiagnosticJournal {
     String? buildNumber,
     HomePresentationSnapshot? homePresentation,
     IosPingTraceSnapshot? iosPing,
+    TelemetryDeliveryStatus? telemetryDelivery,
   }) => _encodeDocument(
     events: _events,
     version: _safeVersion(version),
     buildNumber: _safeBuildNumber(buildNumber),
     homePresentation: homePresentation,
     iosPing: iosPing,
+    telemetryDelivery: telemetryDelivery,
   );
 
   void _restore(String restored) {
@@ -128,6 +137,11 @@ final class SafeDiagnosticJournal {
         final rawPing = decoded['ios_ping'];
         if (rawPing is! Map) return;
         IosPingTraceSnapshot.fromJson(Map<String, Object?>.from(rawPing));
+      }
+      if (decoded.containsKey('telemetry_delivery')) {
+        final rawDelivery = decoded['telemetry_delivery'];
+        if (rawDelivery is! Map) return;
+        TelemetryDeliveryStatus.fromJson(Map<String, Object?>.from(rawDelivery));
       }
       final rawEvents = decoded['events'];
       if (rawEvents is! List) return;
@@ -192,6 +206,7 @@ final class SafeDiagnosticJournal {
     String? buildNumber,
     HomePresentationSnapshot? homePresentation,
     IosPingTraceSnapshot? iosPing,
+    TelemetryDeliveryStatus? telemetryDelivery,
   }) {
     final encodedEvents = events.map((event) => event.toJson()).toList(growable: true);
     String encode() => jsonEncode({
@@ -202,6 +217,7 @@ final class SafeDiagnosticJournal {
       if (buildNumber != null) 'build_number': buildNumber,
       if (homePresentation != null) 'home_presentation': homePresentation.toJson(),
       if (iosPing != null) 'ios_ping': iosPing.toJson(),
+      if (telemetryDelivery != null) 'telemetry_delivery': telemetryDelivery.toJson(),
       'events': encodedEvents,
     });
 

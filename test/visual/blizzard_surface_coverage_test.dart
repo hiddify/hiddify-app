@@ -506,7 +506,11 @@ void registerBlizzardSurfaceCoverage() {
       // Material's internal AnimatedDefaultTextStyle retains its framework
       // theme duration even when destination selection is instantaneous.
       // Connection and destination transitions are exercised separately.
-      expect(tester.widget<NavigationBar>(find.byType(NavigationBar)).animationDuration, Duration.zero);
+      final tab = find.byKey(const ValueKey('blizzard_bottom_dock_tab_0'));
+      expect(
+        tester.widget<AnimatedContainer>(find.descendant(of: tab, matching: find.byType(AnimatedContainer))),
+        isA<AnimatedContainer>().having((widget) => widget.duration, 'duration', Duration.zero),
+      );
     }
     await accessible.close(tester);
   });

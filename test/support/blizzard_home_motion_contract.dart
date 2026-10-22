@@ -100,9 +100,7 @@ void registerBlizzardHomeMotionContracts() {
       expect(find.byType(ConnectionButton), findsNothing);
       expect(find.text('settings'), findsOneWidget);
       expect(tester.binding.hasScheduledFrame, isFalse, reason: 'Offstage Home must release the ambient clock');
-      await tester.tap(
-        find.descendant(of: find.byType(NavigationBar), matching: find.byIcon(Icons.power_settings_new_rounded)),
-      );
+      await tester.tap(find.byKey(const ValueKey('blizzard_bottom_dock_tab_0')));
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
       expect(find.byType(ConnectionButton), findsOneWidget);

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/diagnostics/home_presentation_snapshot.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
@@ -172,6 +173,31 @@ void main() {
   });
 
   group('SafeDiagnosticJournal', () {
+    test('exports and restores closed local delivery status without requiring remote ingress', () {
+      final journal = SafeDiagnosticJournal(restored: _persisted([_eventJson(sequence: 1, operationId: 1)]));
+      addTearDown(journal.dispose);
+      final exported = journal.exportJson(
+        telemetryDelivery: const TelemetryDeliveryStatus(
+          state: TelemetryDeliveryState.budgetLimited,
+          pendingCount: 1,
+          budgetUsedBytes: 65536,
+        ),
+      );
+      final document = jsonDecode(exported) as Map<String, dynamic>;
+      final delivery = Map<String, Object?>.from(document['telemetry_delivery'] as Map);
+      expect(delivery['state'], 'budgetLimited');
+      final restored = SafeDiagnosticJournal(restored: exported);
+      addTearDown(restored.dispose);
+      expect(restored.events, hasLength(1));
+
+      delivery['endpoint'] = _rawCanary;
+      document['telemetry_delivery'] = delivery;
+      final poisoned = SafeDiagnosticJournal(restored: jsonEncode(document));
+      addTearDown(poisoned.dispose);
+      expect(poisoned.events, isEmpty);
+      expect(poisoned.exportJson(), isNot(contains(_rawCanary)));
+    });
+
     test('assigns sequences, bounds capacity and exposes immutable snapshots', () {
       final journal = SafeDiagnosticJournal(capacity: 2);
       addTearDown(journal.dispose);

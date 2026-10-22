@@ -28,6 +28,53 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   UI_PREFIXES = %w[lib/core/router/dialog/widgets/ lib/features/settings/overview/].freeze
   NEW_UI_PREFIXES = %w[lib/core/widget/blizzard/].freeze
   NEW_UI_FILES = %w[lib/core/theme/blizzard_tokens.dart lib/core/theme/blizzard_theme.dart].freeze
+  NATIVE_GLASS_FILE = "ios/Runner/BlizzardNativeGlass.swift"
+  NATIVE_GLASS_SHA256 = "6375fa6fe9aa7d1e1377c69842149b703e69f32ffa08093bb26d9b5fd40f02ca"
+  NATIVE_GLASS_HOST_SHA256 = {
+    "ios/Runner/AppDelegate.swift" => [
+      "cd1c79e1b3320c6e6fd01d08df8ebd7d310c55adbd548a5a3397d7454b88bf04",
+      "b18922b8c1ee98e4100a3cb5ba4fac0fded931b89d64202c7f2aa39ec62b18f6",
+    ],
+    "ios/Runner.xcodeproj/project.pbxproj" => [
+      "11423d2e5f5c60edf42587fc9797d6c3948437d2acd47fbaa7959a54b7928f69",
+      "221630aace49cfa805c367e231bed8fc86318a17060e4f53efd8398f9c3edf51",
+    ],
+    "ios/RunnerTests/RunnerTests.swift" => [
+      "5e8f4908dacea6f29b2a790e4d38bf5fded69096063f9a27a2f21584d62b30c0",
+      "793aba1f25915236e8efbe516c4a42109cd7fc77533c34fdda44924627ed24aa",
+    ],
+  }.freeze
+  # Exact build-21 source additions carried forward from the trusted release
+  # line. These paths are protected from incidental runtime drift just like
+  # the older diagnostics fingerprints below.
+  RELEASE_SOURCE_SHA256 = {
+    ".github/workflows/build.yml" => ["a2eb32f3a0bf0d30f3b31a51ea92a0b32d4fa9973b726eee383caf15656f69e6", "d49a02606bfc045fae46448e8a7dcb514ab78fd51fca979f95546453cbde559d"],
+    ".github/workflows/ci.yml" => ["6bcc935cb7841475f50748cd5d8b5be391af3a347857fbfa08920e6bd963f80b", "8f606970df6b5abb03b1b25b1253d15e4d15c66497994bb68220703b35479606"],
+    ".github/workflows/ios-baseline.yml" => ["8ff1f9100e5d6d19747c251b23afc8e931082151c38a34960671da86f7c276d0", "85a85c2c223ed4e062a6b19709fc519d63ea3cfca9476cbdbb02b6f7af921054"],
+    "assets/translations/en.i18n.json" => ["d1bdfe06b016b0e72828f4a5c980d8e1ae4146983ddd3d7630a1861bfd448acc", "c8620bce25da968f9af9d6ee5c2433487556032a754638331673b35c6e482dfa"],
+    "assets/translations/ru.i18n.json" => ["218e2472e8eeca970a0ff160e612e87904f09cc8f4fba7ca4f351df47a0c35c5", "214b34c544c0135d90a252b36b525a15ebcabe654b28861a6ebf38ff7fcba1c6"],
+    "ios/Runner/Handlers/StatusEventHandler.swift" => ["7dc456b95a10a459017a957a2146c0df3581a6df790d57b4dc75c9d041b3816d", "8910e6c427a204102d8261cc2594d9a293084e4c44c32f2c765e41637ef65655"],
+    "ios/Runner/Info.plist" => ["3b43eb43ba3f09383810c8d231a8e5c0b67cd8f5bb19d23053e30289ee850b7d", "e470873245ee919499c8b57d4ff6b46014467ad4a8009056c0347158a3e86c2e"],
+    "ios/Runner/VPN/VPNManager.swift" => ["9f207ded470097e274e1cdb4d238fe1734d57ac4ae452e9844de0a89dfa86dff", "9b69434490e99cb68c93d55c1d3ffcedb2da08f5007a8de94cd390651789aa1d"],
+    "lib/core/analytics/analytics_controller.dart" => ["2a84ad1b04bd809c2641605c070c9c2baae0bcb67c896e02604d8c35d9d02498", "c7e09f00d20b504d350c890850231bd2e44ec6a5ad0c81ebbc1d696ec51cad6a"],
+    "lib/core/model/app_info_entity.dart" => ["89e024c6f3041e18540e8a78cfec49529020d36ba70cd7b27b45f70416a999bb", "7207abcabc9dc7e676a9524f5f08985a28350d0b195fbb92e36d6d04611fbd5b"],
+    "lib/core/model/constants.dart" => ["cb46da835e646341f79f41f53da2b1c665cb159ef10c61dbea5d72f55382b369", "da33cdb4b668428371bf8749d718d132571b175d79324e98b1f3fad9ef6895d8"],
+    "lib/core/model/environment.dart" => ["5c932e3d18573ca445ca1acf6dd2c7179cb9b971d1710d9003afaa6382fc63b5", "7b8ce7a0f3ac9b3d820f64a39e3984db4ff791766d53c6b72d4aaaa12b384260"],
+    "lib/features/connection/data/connection_repository.dart" => ["4317bad18edde90be73228303e8cbf9a779c6b8a80c53d0539d296b1f9602d4c", "b8247270dd21d92df1fefa23ea856c3ca7d4529e8ecc8fba08884aedbc76ccfb"],
+    "lib/hiddifycore/core_interface/core_interface.dart" => ["0576c4eb9a35f0d8302c13f193da05079c9ba7b311026c7b328b5707889b4280", "660445286fc44d4ba38256c5dee154f5f09c188368601a77f5e7d7531db801ff"],
+    "lib/hiddifycore/core_interface/core_interface_mobile.dart" => ["e0672d710ce7341cde00e6543458e2ed6ab5a6948c389ff45dcc7788c19baf26", "76460b9358ab9099288d162199ae97544efe9689dc2f080bb3eda0973a03c6b0"],
+    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "b6b1be09d437eab148d494dfb5e784896493f1d4fc71ea1e64ce699cab06aee4"],
+  }.freeze
+  RELEASE_NEW_SHA256 = {
+    ".github/workflows/baseline-telemetry.yml" => "afd597ef89b7cdfe37b7f8a951787a29b80c776560d26d66e0f20efca3a06128",
+    "lib/core/analytics/telemetry_delivery_provider.dart" => "b81e932c072452710203e57cb92cd76e285d07113f3f45248eb1f2d15218b83e",
+    "lib/core/observability/better_stack_log_printer.dart" => "b47162f2df9969b39e25e6601daebd9a45be2edbede4aa5b236e609e5f6243ea",
+    "lib/core/observability/telemetry_budget.dart" => "b5251021276928c3927e5026d60f0e22cadfb07aa8aae42f4771c38287676777",
+    "lib/core/observability/telemetry_delivery_status.dart" => "c774f10e3f011fd98987ae2278cb0647d212577dd4d0c018fb1c1661b6602af1",
+    "lib/features/diagnostics/remote_diagnostic_subscription.dart" => "d9d386c45564403e69be4a43163388f3189caab4da5b86518bf6c99bc23a3e5c",
+    "lib/features/diagnostics/remote_ios_ping_subscription.dart" => "3462df29c7779f0d3623442f4a9d3e1bae5d33ecbc797c5b68b9580a765649eb",
+    "lib/features/diagnostics/telemetry_delivery_labels.dart" => "c86eb93a4f04e500bb9846b5d2117e5344d62e9c0a3ab4a2dd3623d34ec7e989",
+  }.freeze
   DEV_ADDITIONS = %w[flutter_driver fuchsia_remote_debug_protocol integration_test sync_http webdriver].freeze
   PROFILE_DETAILS_NOTIFIER = "lib/features/profile/details/profile_details_notifier.dart"
   APPROVED_RAW_LOG_LINE = "      loggy.info(profContent);\n"
@@ -48,12 +95,12 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     lib/features/log/overview/logs_page.dart
   ].freeze
   DIAGNOSTIC_SOURCE_SHA256 = {
-    "assets/translations/en.i18n.json" => ["d1bdfe06b016b0e72828f4a5c980d8e1ae4146983ddd3d7630a1861bfd448acc", "9feb87b6ba90df93815f65f801cd84625954876da6d0c3174cc45af4600a4514"],
-    "assets/translations/ru.i18n.json" => ["218e2472e8eeca970a0ff160e612e87904f09cc8f4fba7ca4f351df47a0c35c5", "11c8fd4330e7a755cc727b26d058d99c2bc6c0a85833bdb0c4688880f22da283"],
+    "assets/translations/en.i18n.json" => ["d1bdfe06b016b0e72828f4a5c980d8e1ae4146983ddd3d7630a1861bfd448acc", "c8620bce25da968f9af9d6ee5c2433487556032a754638331673b35c6e482dfa"],
+    "assets/translations/ru.i18n.json" => ["218e2472e8eeca970a0ff160e612e87904f09cc8f4fba7ca4f351df47a0c35c5", "214b34c544c0135d90a252b36b525a15ebcabe654b28861a6ebf38ff7fcba1c6"],
     "ios/HiddifyPacketTunnel/Logger.swift" => ["197a03eb1212f113e934b913525a6d329e2ec5538b97bf71a3296571c07499a7", "dd25284df008b05268740bbd720969eb337982eece068819002a20b8a58a8964"],
     "ios/HiddifyPacketTunnel/SingBox/ExtensionProvider.swift" => ["5d34a57ef76d904bece6462519d340c7ff217b57ff3237bb82e69d82b1a28848", "8876aae20b2e98c0cef2abf66b82080461f770e5b007d0eba9ff547e9880f4aa"],
-    "ios/Runner/VPN/VPNManager.swift" => ["9f207ded470097e274e1cdb4d238fe1734d57ac4ae452e9844de0a89dfa86dff", "c3280f57717125360da2045537a95aa68a9d841e1b099809fc0d5f1648de9ae4"],
-    "lib/core/analytics/analytics_controller.dart" => ["2a84ad1b04bd809c2641605c070c9c2baae0bcb67c896e02604d8c35d9d02498", "88529f0bdebb1f5e770599b08b085bafae252efb48d7740e8769392a30f70c42"],
+    "ios/Runner/VPN/VPNManager.swift" => ["9f207ded470097e274e1cdb4d238fe1734d57ac4ae452e9844de0a89dfa86dff", "9b69434490e99cb68c93d55c1d3ffcedb2da08f5007a8de94cd390651789aa1d"],
+    "lib/core/analytics/analytics_controller.dart" => ["2a84ad1b04bd809c2641605c070c9c2baae0bcb67c896e02604d8c35d9d02498", "c7e09f00d20b504d350c890850231bd2e44ec6a5ad0c81ebbc1d696ec51cad6a"],
     "lib/core/analytics/analytics_filter.dart" => ["3395f98c9c53da22017b48b657a29d725c3cbbd7ef6cc205a3506332ab5c4e59", "537bd175fa6172c7ac621b1c150f81f2fe2bfa388f205f42c954c43f1f89090a"],
     "lib/core/logger/logger_controller.dart" => ["d78b51210488b4d967c2aee9efbc42d1e6f50b325dc42319d535569c17902e5c", "887355613fb31ae023c1582fc8c7b9e98f0424da1567a6465831514991f900b8"],
     "lib/features/connection/data/connection_data_providers.dart" => ["08624ce007644a397effdeaa42da18d4381195c0feda55e4fe7d7faa2587483d", "aea92301c08f51c603a3917f17c95c0d42b7c54936757545936df5e3ab31abe3"],
@@ -75,32 +122,32 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
   DIAGNOSTIC_NEW_SHA256 = {
     "lib/core/logger/safe_log_record.dart" => "57137aee501d92bd54129bc3ce34814efabb2a96f6dd5deab5c48040019b183a",
     "lib/features/diagnostics/safe_diagnostic_event.dart" => "867a3fc3c57f729b0de11787f130e18ed2cabc66cbfd36a3344a3a9f1e7a66a6",
-    "lib/features/diagnostics/safe_diagnostic_journal.dart" => "2c7f158fc932b8310ea7e21228b4b44183aba6d5132c5759fde71f91db086078",
+    "lib/features/diagnostics/safe_diagnostic_journal.dart" => "b84f1dca5f57aee57a7cc2658306038909a48c7eb2b71a00a5c427dcd346f364",
     "lib/features/diagnostics/home_presentation_snapshot.dart" => "2e816bf1093b990599747c3860138d489f1a520667c0bbb093ca930289913ded",
     "lib/features/diagnostics/home_presentation_providers.dart" => "43cb56211b4055a2ebf41abb2097d754be3f589d56b377f06c3450b6f3433602",
     "lib/features/diagnostics/home_presentation_probe.dart" => "f51164d3f3433f0ff3c9ebffdc82de291cc38382f93e7200c28f938bec5bc728",
     "lib/features/diagnostics/observed_connection_repository.dart" => "8bd1bdcc05099863f93641b08a16a21e3d3b209f0736ea1cb9df35fc922e8cb1",
     "lib/features/diagnostics/diagnostic_providers.dart" => "ccbd9164f42ef63602b640de0ce0c5e35f81bf2f3dcaafca07351ccd16a2be75",
-    "lib/features/diagnostics/safe_diagnostics_page.dart" => "c37098445c7695843663ed5514055f388092348a56fad4b9c48e12427bd23d72",
-    "lib/features/diagnostics/ios_ping_trace.dart" => "50e1f79431184b8bfb5ade227f99650383a495836f1eb2ba8c7d7fe44b01e0ad",
+    "lib/features/diagnostics/safe_diagnostics_page.dart" => "9d46c9744651164f99572c80dbe8a932dab89f73d05c3b02c5058d2904151067",
+    "lib/features/diagnostics/ios_ping_trace.dart" => "7b0818f4d26fdddd5c59dcafc9decb6f90e54244edf8722ba96a058b4a0b9292",
   }.freeze
 
   # Exact reviewed iOS active-proxy measurement sources; no directory allowance.
   IOS_MEASUREMENT_SOURCE_SHA256 = {
     "lib/features/proxy/active/active_proxy_notifier.dart" => ["d1c13a0efac2e778de8e7a3d74bdfb97518aeba4cf1ed036c70051d44f9d1529", "9a6b08f9ca02a6c997f445a4309a7de13190f9508915870bcb1f0206c4807290"],
-    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "bcab8cc4435e264908e1412da2c605f8c29c3d779269fc64149dde8622e62856"],
+    "lib/hiddifycore/hiddify_core_service.dart" => ["d55abf280b332358e89a6ee932929616e711b7c923ee60caf08413de9b781ac3", "b6b1be09d437eab148d494dfb5e784896493f1d4fc71ea1e64ce699cab06aee4"],
   }.freeze
   IOS_MEASUREMENT_NEW_SHA256 = {
-    "lib/features/proxy/active/ios_active_proxy_measurement.dart" => "0d9ff5032920c61d11081a5dac2726d4f3ce1ee764e6c3b71e5b3493e0913708",
+    "lib/features/proxy/active/ios_active_proxy_measurement.dart" => "71d35a6282bb85980bfc91f9a3c128af028a10d20e82f0f2a6d7ee1cd9b4ce1e",
     "lib/features/proxy/active/ios_active_proxy_measurement_providers.dart" => "2fd3bfbe42f72594054ba06e3922acdaad08cf352712f6d41f393fc617a35e50",
-    "lib/features/proxy/active/ios_active_proxy_delay_indicator.dart" => "cf36861f1884a4fe209d4f91744295f93332330394171721d4c8ad46c10bb61b",
+    "lib/features/proxy/active/ios_active_proxy_delay_indicator.dart" => "b68b3d61ad632bbe1d2b46ce5ecbe0094ee4b693107fd36a0b4da03027bb7d91",
   }.freeze
 
   # Exact iOS startup recovery sources; no lifecycle/core directory allowance.
   IOS_STARTUP_SOURCE_SHA256 = {
     "lib/bootstrap.dart" => ["d035a1bec3386d5f1320cfc7ef7eec9f260621f5d2868706670efe71fcfb24e9", "c7c92337c2f9ece8f392ae851df0f15f8269a8c8367b0a4fafaa7ff9a2901fda"],
     "lib/features/app/widget/app.dart" => ["f3907fa99dcbe37c300f9c1c856d1ae18943754019193eda1a01dc6df3532390", "c3923577ee27bfa100cb2f1a3fdf687f611b988186eabc0dd2f758675c093b67"],
-    "lib/hiddifycore/core_interface/core_interface_mobile.dart" => ["e0672d710ce7341cde00e6543458e2ed6ab5a6948c389ff45dcc7788c19baf26", "b264659ecd3744bc267d323a75a23615922ba36ea8e96bc5b7c6448105ebbfb2"],
+    "lib/hiddifycore/core_interface/core_interface_mobile.dart" => ["e0672d710ce7341cde00e6543458e2ed6ab5a6948c389ff45dcc7788c19baf26", "76460b9358ab9099288d162199ae97544efe9689dc2f080bb3eda0973a03c6b0"],
     "ios/Runner/Handlers/MethodHandler.swift" => ["288bcd062d01bd336e97346a0b160e5e45f772956380c1c7392b04a6771e0006", "0b31cee80b348c6e3cbf31bf0abc9187d58d0665ccbbde81758fd03813ae1195"],
   }.freeze
   IOS_STARTUP_NEW_SHA256 = {
@@ -112,6 +159,52 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
     fingerprints &&
       Digest::SHA256.hexdigest(trusted_source) == fingerprints.fetch(0) &&
       Digest::SHA256.hexdigest(current_source) == fingerprints.fetch(1)
+  end
+
+  def approved_native_glass_host_change?(path, trusted_source, current_source)
+    fingerprints = NATIVE_GLASS_HOST_SHA256[path]
+    fingerprints &&
+      Digest::SHA256.hexdigest(trusted_source) == fingerprints.fetch(0) &&
+      Digest::SHA256.hexdigest(current_source) == fingerprints.fetch(1)
+  end
+
+  def approved_release_change?(path, trusted_source, current_source)
+    fingerprints = RELEASE_SOURCE_SHA256[path]
+    fingerprints &&
+      Digest::SHA256.hexdigest(trusted_source) == fingerprints.fetch(0) &&
+      Digest::SHA256.hexdigest(current_source) == fingerprints.fetch(1)
+  end
+
+  def test_release_fingerprints_reject_unreviewed_bytes_and_paths
+    RELEASE_SOURCE_SHA256.each do |path, _|
+      trusted = git("show", "#{BASELINE}:#{path}")
+      current = File.binread(File.join(ROOT, path))
+      assert approved_release_change?(path, trusted, current), path
+      refute approved_release_change?(path, trusted + " ", current), path
+      refute approved_release_change?(path, trusted, current + " "), path
+      refute approved_release_change?("#{path}.unreviewed", trusted, current), path
+    end
+  end
+
+  def test_release_additions_match_reviewed_fingerprints
+    RELEASE_NEW_SHA256.each do |path, expected|
+      assert_equal expected, Digest::SHA256.file(File.join(ROOT, path)).hexdigest, path
+      refute_equal expected, Digest::SHA256.hexdigest(File.binread(File.join(ROOT, path)) + " "), path
+      refute RELEASE_NEW_SHA256.key?("#{path}.unreviewed"), path
+    end
+  end
+
+  def test_native_glass_allowlist_accepts_only_the_frozen_host_changes
+    NATIVE_GLASS_HOST_SHA256.each_key do |path|
+      trusted = git("show", "#{BASELINE}:#{path}")
+      current = File.binread(File.join(ROOT, path))
+      assert approved_native_glass_host_change?(path, trusted, current), path
+      refute approved_native_glass_host_change?(path, trusted + " ", current), path
+      refute approved_native_glass_host_change?(path, trusted, current + " "), path
+      refute approved_native_glass_host_change?("ios/Runner/Unapproved.swift", trusted, current), path
+    end
+    assert_equal NATIVE_GLASS_SHA256, Digest::SHA256.file(File.join(ROOT, NATIVE_GLASS_FILE)).hexdigest
+    refute_equal NATIVE_GLASS_SHA256, Digest::SHA256.hexdigest(File.binread(File.join(ROOT, NATIVE_GLASS_FILE)) + " ")
   end
 
   def approved_ios_startup_addition?(path, current_source)
@@ -401,7 +494,9 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
         (approved_protected_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
          approved_diagnostic_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
          approved_ios_measurement_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
-         approved_ios_startup_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)))
+         approved_ios_startup_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
+         approved_native_glass_host_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)) ||
+         approved_release_change?(path, git("show", "#{BASELINE}:#{path}"), File.binread(current_path)))
     end
     assert_empty changed, "Protected runtime/native/dependency/identity files changed: #{changed.join(', ')}"
   end
@@ -412,8 +507,10 @@ class BlizzardRuntimeBoundaryTest < Minitest::Test
                      scripts/ui_test_simulator_id.py integration_test/blizzard_preservation_test.dart].freeze
 
   def allowed_addition?(path)
-    path.start_with?("test/", "docs/") || NEW_TOOL_FILES.include?(path) ||
-      DIAGNOSTIC_NEW_FILES.include?(path) || IOS_MEASUREMENT_NEW_SHA256.key?(path) || IOS_STARTUP_NEW_SHA256.key?(path) || NEW_UI_FILES.include?(path) || NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
+    path.start_with?("test/", "docs/") || NEW_TOOL_FILES.include?(path) || path == NATIVE_GLASS_FILE ||
+      DIAGNOSTIC_NEW_FILES.include?(path) || RELEASE_NEW_SHA256.key?(path) ||
+      IOS_MEASUREMENT_NEW_SHA256.key?(path) || IOS_STARTUP_NEW_SHA256.key?(path) || NEW_UI_FILES.include?(path) ||
+      NEW_UI_PREFIXES.any? { |prefix| path.start_with?(prefix) }
   end
 
   def unexpected_additions(current, baseline)

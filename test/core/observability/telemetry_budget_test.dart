@@ -25,10 +25,16 @@ void main() {
 
   test('byte and exception caps survive a new client and concurrent reservations', () async {
     final first = budget();
-    expect(await Future.wait([first.reserveLogs(60), first.reserveLogs(60)]), [true, false]);
+    final reservations = await Future.wait([first.reserveLogs(60), first.reserveLogs(60)]);
+    expect(reservations.map((result) => result.outcome), [
+      TelemetryBudgetReserveOutcome.reserved,
+      TelemetryBudgetReserveOutcome.limitExceeded,
+    ]);
+    expect(reservations.first.remainingLogBytes, 40);
+    expect(reservations.last.remainingLogBytes, 40);
     expect(await first.reserveException(), isTrue);
     final restarted = budget();
-    expect(await restarted.reserveLogs(41), isFalse);
+    expect((await restarted.reserveLogs(41)).outcome, TelemetryBudgetReserveOutcome.limitExceeded);
     expect(await restarted.reserveException(), isTrue);
     expect(await restarted.reserveException(), isFalse);
     expect((jsonDecode(stored!) as Map<String, dynamic>)['log_bytes'], 60);
@@ -36,11 +42,11 @@ void main() {
 
   test('UTC day rollover resets allowances but clock rollback does not', () async {
     final client = budget();
-    expect(await client.reserveLogs(100), isTrue);
+    expect((await client.reserveLogs(100)).outcome, TelemetryBudgetReserveOutcome.reserved);
     now = DateTime.utc(2026, 10, 20);
-    expect(await client.reserveLogs(1), isFalse);
+    expect((await client.reserveLogs(1)).outcome, TelemetryBudgetReserveOutcome.limitExceeded);
     now = DateTime.utc(2026, 10, 22);
-    expect(await client.reserveLogs(100), isTrue);
+    expect((await client.reserveLogs(100)).outcome, TelemetryBudgetReserveOutcome.reserved);
   });
 
   test('UTC month cap survives daily rollovers and resets in a new month', () async {
@@ -70,7 +76,7 @@ void main() {
   test('legacy exception overage does not block the independent log budget', () async {
     stored = jsonEncode({'day': '2026-10-21', 'log_bytes': 10, 'exceptions': 50});
     final client = budget();
-    expect(await client.reserveLogs(1), isTrue);
+    expect((await client.reserveLogs(1)).outcome, TelemetryBudgetReserveOutcome.reserved);
     final value = jsonDecode(stored!) as Map<String, dynamic>;
     expect(value['log_bytes'], 11);
     expect(value['monthly_exceptions'], 50);
@@ -101,12 +107,37 @@ void main() {
 
   test('corrupt storage and failed persistence reject sending', () async {
     stored = '{invalid';
-    expect(await budget().reserveLogs(1), isFalse);
+    expect((await budget().reserveLogs(1)).outcome, TelemetryBudgetReserveOutcome.invalidStoredState);
     stored = null;
     final failed = TelemetryBudget(read: () => null, write: (_) async => false);
-    expect(await failed.reserveLogs(1), isFalse);
+    expect((await failed.reserveLogs(1)).outcome, TelemetryBudgetReserveOutcome.storageWriteFailed);
     final throwing = TelemetryBudget(read: () => throw StateError('unavailable'), write: (_) async => true);
     expect(await throwing.reserveException(), isFalse);
+  });
+
+  test('read-only log snapshot preserves legacy use without resetting it', () {
+    stored = jsonEncode({
+      'day': '2026-10-21',
+      'log_bytes': 90 * 1024,
+      'exceptions': 0,
+      'month': '2026-10',
+      'monthly_exceptions': 0,
+    });
+    final client = budget(bytes: 64 * 1024);
+    expect(client.logSnapshot.usedLogBytes, 90 * 1024);
+    expect(client.logSnapshot.remainingLogBytes, 0);
+    expect(client.logSnapshot.outcome, TelemetryBudgetReserveOutcome.limitExceeded);
+    expect((jsonDecode(stored!) as Map)['log_bytes'], 90 * 1024);
+    now = DateTime.utc(2026, 10, 22);
+    expect(client.logSnapshot.usedLogBytes, 0);
+    expect(client.logSnapshot.remainingLogBytes, 64 * 1024);
+  });
+
+  test('read-only snapshot distinguishes corrupt and unavailable storage', () {
+    stored = '{invalid';
+    expect(budget().logSnapshot.outcome, TelemetryBudgetReserveOutcome.invalidStoredState);
+    final unavailable = TelemetryBudget(read: () => throw StateError('unavailable'), write: (_) async => true);
+    expect(unavailable.logSnapshot.outcome, TelemetryBudgetReserveOutcome.storageReadFailed);
   });
 
   test('no private events or credentials are persisted with counters', () async {

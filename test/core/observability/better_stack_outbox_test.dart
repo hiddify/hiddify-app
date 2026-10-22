@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/observability/better_stack_log_printer.dart';
 import 'package:hiddify/core/observability/telemetry_budget.dart';
+import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
 import 'package:hiddify/features/diagnostics/ios_ping_trace.dart';
 import 'package:hiddify/features/diagnostics/safe_diagnostic_event.dart';
 
@@ -196,9 +197,13 @@ void main() {
     await remote.flush();
     await remote.flush();
     expect(attempts, 3);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.retryWaiting);
+    expect(remote.deliveryStatus.nextAttemptAt, now.add(const Duration(minutes: 5)));
     await remote.dispose();
 
     remote = printer(post: unavailable);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.retryWaiting);
+    expect(remote.deliveryStatus.nextAttemptAt, now.add(const Duration(minutes: 5)));
     await remote.flush();
     remote.addDiagnostic(diagnostic(2));
     await remote.flush();
@@ -217,7 +222,7 @@ void main() {
 
   test('budget refusal persists without retry spin until next UTC day', () async {
     final dailyBudget = budget(bytes: 1000);
-    expect(await dailyBudget.reserveLogs(1000), isTrue);
+    expect((await dailyBudget.reserveLogs(1000)).outcome, TelemetryBudgetReserveOutcome.reserved);
     final remote = printer(telemetryBudget: dailyBudget, autoFlush: true);
     remote.addDiagnostic(diagnostic(1));
     await remote.flush();
@@ -227,6 +232,36 @@ void main() {
     now = now.add(const Duration(days: 1));
     await remote.flush();
     expect(sent, hasLength(1));
+    await remote.dispose();
+  });
+
+  test('legacy same-day 90 KiB use waits without reset then resumes next UTC day', () async {
+    budgetState = jsonEncode({
+      'day': '2026-10-22',
+      'log_bytes': 90 * 1024,
+      'exceptions': 0,
+      'month': '2026-10',
+      'monthly_exceptions': 0,
+    });
+    final dailyBudget = TelemetryBudget(
+      read: () => budgetState,
+      write: (value) async {
+        budgetState = value;
+        return true;
+      },
+      now: () => now,
+    );
+    final remote = printer(telemetryBudget: dailyBudget);
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    expect(sent, isEmpty);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetLimited);
+    expect((jsonDecode(budgetState!) as Map)['log_bytes'], 90 * 1024);
+
+    now = now.add(const Duration(days: 1));
+    await remote.flush();
+    expect(sent, hasLength(1));
+    expect((jsonDecode(budgetState!) as Map)['log_bytes'], utf8.encode(sent.single).length);
     await remote.dispose();
   });
 
@@ -318,6 +353,184 @@ void main() {
     expect(remote.active, isFalse);
     expect(remote.queuedCount, 0);
     expect(persistedEvents(), isEmpty);
+    await remote.dispose();
+  });
+
+  test('async test result is accepted only for its exact 2xx batch', () async {
+    final firstResponse = Completer<int>();
+    final remote = printer(
+      post: (_, _, body) {
+        sent.add(body);
+        return sent.length == 1 ? firstResponse.future : Future.value(202);
+      },
+    );
+    remote.addDiagnostic(diagnostic(1));
+    final firstFlush = remote.flush();
+    await Future<void>.delayed(Duration.zero);
+
+    final testResult = remote.sendTestEvent();
+    await Future<void>.delayed(Duration.zero);
+    firstResponse.complete(202);
+    await firstFlush;
+    expect((await testResult).outcome, TelemetryTestOutcome.persisted);
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.persisted);
+
+    await remote.flush();
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.accepted);
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
+    expect(sent, hasLength(2));
+    await remote.dispose();
+  });
+
+  test('status stream exposes queue budget retry and safe request outcomes', () async {
+    final updates = <TelemetryDeliveryStatus>[];
+    final remote = printer(
+      post: (_, _, body) async {
+        sent.add(body);
+        return 503;
+      },
+    );
+    final subscription = remote.deliveryStatuses.listen(updates.add);
+    final result = await remote.sendTestEvent();
+
+    expect(result.outcome, TelemetryTestOutcome.pending);
+    expect(remote.deliveryStatus.pendingCount, 1);
+    expect(remote.deliveryStatus.oldestPendingAgeSeconds, 0);
+    expect(remote.deliveryStatus.budgetUsedBytes, greaterThan(0));
+    expect(remote.deliveryStatus.budgetRemainingBytes, lessThan(1024 * 1024));
+    expect(remote.deliveryStatus.lastAttemptAt, now);
+    expect(remote.deliveryStatus.lastHttpCode, 503);
+    expect(updates.map((status) => status.state), contains(TelemetryDeliveryState.sending));
+    expect(updates.map((status) => status.state), contains(TelemetryDeliveryState.retryWaiting));
+    await subscription.cancel();
+    await remote.dispose();
+  });
+
+  test('budget corruption and budget persistence failure are not day-cap pauses', () async {
+    budgetState = '{invalid';
+    var remote = printer();
+    var result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.budgetStateInvalid);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetStateInvalid);
+    expect(remote.deliveryStatus.nextAttemptAt, isNull);
+    expect(sent, isEmpty);
+    await remote.dispose();
+
+    budgetState = null;
+    var failBudgetWrite = true;
+    final failingBudget = TelemetryBudget(
+      read: () => budgetState,
+      write: (value) async {
+        if (failBudgetWrite) return false;
+        budgetState = value;
+        return true;
+      },
+      now: () => now,
+      maxLogBytes: 1024 * 1024,
+    );
+    remote = printer(telemetryBudget: failingBudget);
+    result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.budgetStorageFailed);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetStorageFailed);
+    expect(remote.deliveryStatus.nextAttemptAt, isNull);
+    expect(sent, isEmpty);
+
+    failBudgetWrite = false;
+    await remote.resumePending();
+    expect(sent, hasLength(1));
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
+    await remote.dispose();
+  });
+
+  test('near the daily cap sends the exact serialized FIFO prefix that fits', () async {
+    var remote = printer();
+    remote.addDiagnostic(diagnostic(1));
+    await remote.flush();
+    final oneEventBytes = utf8.encode(sent.single).length;
+    await remote.dispose();
+
+    outbox = null;
+    budgetState = null;
+    sent = [];
+    remote = printer(telemetryBudget: budget(bytes: oneEventBytes));
+    remote.addDiagnostic(diagnostic(1));
+    remote.addDiagnostic(diagnostic(2));
+    await remote.flush();
+
+    final delivered = (jsonDecode(sent.single) as List).cast<Map<String, dynamic>>();
+    expect(delivered.map((event) => event['sequence']), [1]);
+    expect(utf8.encode(sent.single).length, oneEventBytes);
+    expect(remote.queuedCount, 1);
+    expect(remote.deliveryStatus.budgetRemainingBytes, 0);
+    await remote.dispose();
+  });
+
+  test('too-small daily remainder retains the FIFO event without HTTP', () async {
+    final remote = printer(telemetryBudget: budget(bytes: 1));
+    final result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.budgetLimited);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.budgetLimited);
+    expect(remote.deliveryStatus.pendingCount, 1);
+    expect(remote.deliveryStatus.nextAttemptAt, DateTime.utc(2026, 10, 23));
+    expect(sent, isEmpty);
+    await remote.dispose();
+  });
+
+  test('other 4xx is a terminal rejected test outcome, never accepted', () async {
+    final remote = printer(
+      post: (_, _, body) async {
+        sent.add(body);
+        return 422;
+      },
+    );
+    final result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.rejected);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.rejected);
+    expect(remote.deliveryStatus.lastHttpCode, 422);
+    expect(remote.queuedCount, 0);
+    await remote.dispose();
+  });
+
+  test('tracked test ends as dropped when TTL or queue bounds remove it', () async {
+    var remote = printer(telemetryBudget: budget(bytes: 1));
+    expect(remote.addTestEvent(), isTrue);
+    now = now.add(const Duration(hours: 25));
+    await remote.flush();
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.droppedExpired);
+    await remote.dispose();
+
+    now = DateTime.utc(2026, 10, 22, 9);
+    outbox = null;
+    budgetState = null;
+    remote = printer(telemetryBudget: budget(bytes: 1));
+    expect(remote.addTestEvent(), isTrue);
+    for (var sequence = 1; sequence <= BetterStackLogPrinter.maxQueueLength; sequence++) {
+      remote.addDiagnostic(diagnostic(sequence));
+    }
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.droppedOverflow);
+    expect(remote.queuedCount, BetterStackLogPrinter.maxQueueLength);
+    await remote.dispose();
+  });
+
+  test('outbox storage failure recovers on explicit resume without a day pause', () async {
+    var failOutboxWrite = true;
+    final remote = printer(
+      writeOutbox: (value) async {
+        if (failOutboxWrite) return false;
+        outbox = value;
+        return true;
+      },
+    );
+    final result = await remote.sendTestEvent();
+    expect(result.outcome, TelemetryTestOutcome.outboxStorageFailed);
+    expect(remote.deliveryStatus.state, TelemetryDeliveryState.outboxStorageFailed);
+    expect(remote.deliveryStatus.nextAttemptAt, isNull);
+    expect(sent, isEmpty);
+
+    failOutboxWrite = false;
+    await remote.resumePending();
+    expect(sent, hasLength(1));
+    expect(remote.deliveryStatus.lastTestOutcome, TelemetryTestOutcome.accepted);
     await remote.dispose();
   });
 }

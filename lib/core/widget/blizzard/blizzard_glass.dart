@@ -1,10 +1,12 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hiddify/core/theme/blizzard_tokens.dart';
 
-/// Flutter optical treatment for existing controls, inspired by Clear Liquid
-/// Glass. This is not UIKit's native material. It owns no gestures or clock.
+/// Uses Apple's material on iOS and the existing optical treatment elsewhere.
+/// The material owns no gestures or clock; the child remains the action.
 class BlizzardGlass extends StatelessWidget {
   const BlizzardGlass({super.key, required this.child, required this.active, required this.radius, this.lens = false});
   final Widget child;
@@ -16,6 +18,7 @@ class BlizzardGlass extends StatelessWidget {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final opaque = media.highContrast || media.accessibleNavigation || media.disableAnimations;
+    final native = !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: Stack(
@@ -28,6 +31,14 @@ class BlizzardGlass extends StatelessWidget {
                   builder: (context, constraints) {
                     if (!active) return const SizedBox.shrink();
                     if (opaque) return const ColoredBox(color: BlizzardPalette.elevated);
+                    if (native) {
+                      return UiKitView(
+                        key: ValueKey((radius, lens)),
+                        viewType: 'app.blizzard/native-liquid-glass',
+                        creationParams: {'radius': radius, 'lens': lens},
+                        creationParamsCodec: const StandardMessageCodec(),
+                      );
+                    }
                     final size = constraints.biggest;
                     final transform = Matrix4.identity()
                       ..translateByDouble(size.width / 2, size.height / 2, 0, 1)
@@ -81,7 +92,7 @@ class BlizzardGlass extends StatelessWidget {
             ),
           ),
           child,
-          if (active)
+          if (active && (!native || opaque))
             Positioned.fill(
               child: IgnorePointer(
                 child: ExcludeSemantics(

@@ -108,7 +108,7 @@ class HomePage extends HookConsumerWidget {
             alignment: Alignment.center,
             children: [
               Positioned.fill(
-                child: blizzard ? const BlizzardScene(preset: BlizzardParticlePreset.hero) : const SizedBox.shrink(),
+                child: blizzard ? const BlizzardScene() : const SizedBox.shrink(),
               ),
               Center(
                 child: ConstrainedBox(
@@ -116,47 +116,64 @@ class HomePage extends HookConsumerWidget {
                     maxWidth: 600, // Set the maximum width here
                   ),
                   child: CustomScrollView(
-                    slivers: [
-                      // switch (activeProfile) {
-                      // AsyncData(value: final profile?) =>
-                      MultiSliver(
-                        children: [
-                          // const Gap(100),
-                          switch (activeProfile) {
-                            AsyncData(value: final profile?) => ProfileTile(
-                              profile: profile,
-                              isMain: true,
-                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              color: Theme.of(context).colorScheme.surfaceContainer,
+                    slivers: blizzard
+                        ? [
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(20, 56, 20, 24),
+                              sliver: SliverToBoxAdapter(
+                                child: Column(
+                                  children: [
+                                    const ConnectionButton(),
+                                    const SizedBox(height: 8),
+                                    const ActiveProxyFooter(),
+                                    const SizedBox(height: 18),
+                                    switch (activeProfile) {
+                                      AsyncData(value: final profile?) => ConstrainedBox(
+                                        constraints: const BoxConstraints(minHeight: 76),
+                                        child: ProfileTile(
+                                          profile: profile,
+                                          isMain: true,
+                                          color: Theme.of(context).colorScheme.surfaceContainer,
+                                        ),
+                                      ),
+                                      _ => const SizedBox.shrink(),
+                                    },
+                                  ],
+                                ),
+                              ),
                             ),
-                            _ => const Text(""),
-                          },
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          ]
+                        : [
+                            MultiSliver(
                               children: [
-                                Expanded(
+                                switch (activeProfile) {
+                                  AsyncData(value: final profile?) => ProfileTile(
+                                    profile: profile,
+                                    isMain: true,
+                                    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    color: Theme.of(context).colorScheme.surfaceContainer,
+                                  ),
+                                  _ => const Text(""),
+                                },
+                                const SliverFillRemaining(
+                                  hasScrollBody: false,
                                   child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [ConnectionButton(), ActiveProxyDelayIndicator()],
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [ConnectionButton(), ActiveProxyDelayIndicator()],
+                                        ),
+                                      ),
+                                      ActiveProxyFooter(),
+                                    ],
                                   ),
                                 ),
-                                ActiveProxyFooter(),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                      // AsyncData() => switch (hasAnyProfile) {
-                      //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                      //     _ => const EmptyProfilesHomeBody(),
-                      //   },
-                      // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
-                      // _ => const SliverToBoxAdapter(),
-                      // },
-                    ],
+                          ],
                   ),
                 ),
               ),

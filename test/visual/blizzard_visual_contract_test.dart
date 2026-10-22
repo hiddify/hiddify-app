@@ -48,12 +48,16 @@ void registerBlizzardVisualContracts() {
       final fixture = await mountVisualFixture(tester, mode: mode);
       final eligible = expectsBlizzard(mode, Brightness.dark, 393);
       final navFinder = find.byType(NavigationBar);
-      expect(tester.getSize(navFinder).height, eligible ? 66 : 114);
-      final navContext = tester.element(navFinder);
-      expect(MediaQuery.paddingOf(navContext).top, 0);
-      expect(MediaQuery.paddingOf(navContext).bottom, eligible ? 0 : 34);
-      final panel = find.ancestor(of: navFinder, matching: find.byType(ClipRRect)).first;
-      expect(tester.getSize(panel).height, eligible ? 66 : 114);
+      if (eligible) {
+        final dock = find.byKey(const ValueKey('blizzard_bottom_dock'));
+        expect(tester.getSize(dock), const Size(320, 64));
+        expect(MediaQuery.paddingOf(tester.element(dock)).top, 0);
+      } else {
+        expect(tester.getSize(navFinder).height, 114);
+        final navContext = tester.element(navFinder);
+        expect(MediaQuery.paddingOf(navContext).top, 0);
+        expect(MediaQuery.paddingOf(navContext).bottom, 34);
+      }
       expect(fixture.events, isEmpty);
       expect(tester.takeException(), isNull);
       await fixture.close(tester);
@@ -65,9 +69,7 @@ void registerBlizzardVisualContracts() {
     if (expectsBlizzard(AppThemeMode.dark, Brightness.dark, 393)) {
       expect(material.shape, isA<RoundedRectangleBorder>());
       expect((material.shape! as RoundedRectangleBorder).borderRadius, BorderRadius.circular(44));
-      final nav = tester.widget<NavigationBar>(find.byType(NavigationBar));
-      expect(nav.height, 66);
-      expect(tester.getSize(find.byType(NavigationBar)).height, 66);
+      expect(tester.getSize(find.byKey(const ValueKey('blizzard_bottom_dock'))), const Size(320, 64));
       expect(fixture.innerTheme!.colorScheme.primary, const Color(0xFF72D1FF));
     } else {
       expect(material.shape, isA<CircleBorder>());

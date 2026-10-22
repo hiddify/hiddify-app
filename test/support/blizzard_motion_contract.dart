@@ -68,7 +68,7 @@ void registerBlizzardMotionContracts() {
       expect(
         painters.single.preset,
         media.disableAnimations || media.accessibleNavigation || media.highContrast
-            ? BlizzardParticlePreset.off
+            ? BlizzardParticlePreset.staticHero
             : BlizzardParticlePreset.hero,
       );
       expect(tester.takeException(), isNull);

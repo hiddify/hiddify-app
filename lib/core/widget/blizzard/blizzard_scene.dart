@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/theme/blizzard_tokens.dart';
 
-enum BlizzardParticlePreset { hero, quiet, off }
+enum BlizzardParticlePreset { hero, staticHero, quiet, off }
 
 /// Decoration has no semantics, gestures, or application state. Only the Home
 /// hero owns an ambient clock; quieter surfaces keep their static decoration.
@@ -28,7 +28,7 @@ class _BlizzardSceneState extends State<BlizzardScene> with SingleTickerProvider
   void initState() {
     super.initState();
     _lifecycle = WidgetsBinding.instance.lifecycleState ?? AppLifecycleState.resumed;
-    _drift = AnimationController(vsync: this, duration: const Duration(seconds: 48));
+    _drift = AnimationController(vsync: this, duration: BlizzardMetrics.waveDuration);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -78,8 +78,11 @@ class _BlizzardSceneState extends State<BlizzardScene> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final effective = _reduced ? BlizzardParticlePreset.off : widget.preset;
-    if (effective != BlizzardParticlePreset.hero) _ribbon.dispose();
+    final effective = _reduced && widget.preset == BlizzardParticlePreset.hero
+        ? BlizzardParticlePreset.staticHero
+        : widget.preset;
+    final showsRibbon = effective == BlizzardParticlePreset.hero || effective == BlizzardParticlePreset.staticHero;
+    if (!showsRibbon) _ribbon.dispose();
     final scene = RepaintBoundary(
       child: CustomPaint(
         painter: BlizzardScenePainter(preset: effective),
@@ -90,7 +93,7 @@ class _BlizzardSceneState extends State<BlizzardScene> with SingleTickerProvider
     return IgnorePointer(
       child: ExcludeSemantics(
         child: ClipRect(
-          child: effective == BlizzardParticlePreset.hero
+          child: showsRibbon
               ? ColoredBox(
                   color: BlizzardPalette.background,
                   child: Stack(
@@ -107,7 +110,8 @@ class _BlizzardSceneState extends State<BlizzardScene> with SingleTickerProvider
                           );
                         },
                       ),
-                      RepaintBoundary(child: CustomPaint(painter: _BlizzardSnowPainter(_drift), willChange: true)),
+                      if (effective == BlizzardParticlePreset.hero)
+                        RepaintBoundary(child: CustomPaint(painter: _BlizzardSnowPainter(_drift), willChange: true)),
                     ],
                   ),
                 )
@@ -127,7 +131,7 @@ class BlizzardScenePainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, Paint()..color = BlizzardPalette.background);
     if (preset == BlizzardParticlePreset.off) return;
     final paint = Paint();
-    if (preset == BlizzardParticlePreset.hero) return;
+    if (preset == BlizzardParticlePreset.hero || preset == BlizzardParticlePreset.staticHero) return;
     // Sparse, quiet ambient points retain depth without crossing readable text.
     const count = 80;
     for (var i = 0; i < count; i++) {

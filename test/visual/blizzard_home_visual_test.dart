@@ -51,7 +51,7 @@ void registerHomeVisualContracts() {
             expect(f.innerTheme!.colorScheme.primary, const Color(0xFF72D1FF));
             expect(control.shape, isA<RoundedRectangleBorder>());
             expect((control.shape! as RoundedRectangleBorder).borderRadius, BorderRadius.circular(44));
-            expect(tester.widget<NavigationBar>(find.byType(NavigationBar)).height, 66);
+            expect(tester.getSize(find.byKey(const ValueKey('blizzard_bottom_dock'))), const Size(320, 64));
           } else {
             expect(control.shape, isA<CircleBorder>());
             expect(tester.getSize(find.byKey(const ValueKey('home_connection_button'))), const Size(148, 148));

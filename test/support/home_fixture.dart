@@ -76,13 +76,14 @@ Future<HomeFixture> mountHomeFixture(
   AppThemeMode mode = AppThemeMode.dark,
   Brightness systemBrightness = Brightness.dark,
   double width = 393,
+  double height = 852,
   double scale = 1,
   TextDirection direction = TextDirection.ltr,
   AppLocale locale = AppLocale.en,
   bool highContrast = false,
   bool disableAnimations = false,
 }) async {
-  await tester.binding.setSurfaceSize(Size(width, 1000));
+  await tester.binding.setSurfaceSize(Size(width, height + 148));
   addTearDown(() => tester.binding.setSurfaceSize(null));
   // Widget/renderer fixture only; native persistence has a separate integration host.
   SharedPreferences.setMockInitialValues({'haptic_feedback': false, 'theme_mode': mode.name});
@@ -184,12 +185,12 @@ Future<HomeFixture> mountHomeFixture(
         builder: (context, child) => Center(
           child: SizedBox(
             width: width,
-            height: 852,
+            height: height,
             child: RepaintBoundary(
               key: blizzardFixtureCanvas,
               child: MediaQuery(
                 data: MediaQuery.of(context).copyWith(
-                  size: Size(width, 852),
+                  size: Size(width, height),
                   textScaler: TextScaler.linear(scale),
                   platformBrightness: systemBrightness,
                   highContrast: highContrast,
@@ -205,7 +206,7 @@ Future<HomeFixture> mountHomeFixture(
   );
   await tester.pump();
   await tester.pump(const Duration(seconds: 1));
-  expect(tester.getSize(find.byKey(blizzardFixtureCanvas)), Size(width, 852));
+  expect(tester.getSize(find.byKey(blizzardFixtureCanvas)), Size(width, height));
   return fixture;
 }
 

@@ -88,38 +88,17 @@ class MyAdaptiveLayout extends HookConsumerWidget {
               ? Builder(
                   builder: (dockContext) => FocusScope(
                     node: navScopeNode,
-                    child: Padding(
-                      padding: blizzard
-                          ? EdgeInsets.fromLTRB(16, 8, 16, MediaQuery.paddingOf(dockContext).bottom + 12)
-                          : EdgeInsets.zero,
-                      child: BlizzardGlass(
-                        active: blizzard,
-                        radius: blizzard ? BlizzardRadii.dock : 0,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(blizzard ? BlizzardRadii.dock : 0),
-                          child: MediaQuery(
-                            data: MediaQuery.of(dockContext).copyWith(
-                              padding: blizzard
-                                  ? MediaQuery.paddingOf(dockContext).copyWith(bottom: 0)
-                                  : MediaQuery.paddingOf(dockContext),
-                            ),
-                            child: NavigationBar(
-                              backgroundColor: blizzard ? Colors.transparent : null,
-                              height: blizzard ? BlizzardMetrics.dockHeight : null,
-                              animationDuration:
-                                  blizzard &&
-                                      (MediaQuery.disableAnimationsOf(dockContext) ||
-                                          MediaQuery.accessibleNavigationOf(dockContext))
-                                  ? Duration.zero
-                                  : null,
-                              selectedIndex: navigationShell.currentIndex <= 1 ? navigationShell.currentIndex : 0,
-                              destinations: _navDests(_actions(t, showProfilesAction, isMobileBreakpoint)),
-                              onDestinationSelected: (index) => _onTap(context, index),
-                            ),
+                    child: blizzard
+                        ? _BlizzardDock(
+                            actions: _actions(t, showProfilesAction, isMobileBreakpoint),
+                            selectedIndex: navigationShell.currentIndex <= 1 ? navigationShell.currentIndex : 0,
+                            onSelected: (index) => _onTap(context, index),
+                          )
+                        : NavigationBar(
+                            selectedIndex: navigationShell.currentIndex <= 1 ? navigationShell.currentIndex : 0,
+                            destinations: _navDests(_actions(t, showProfilesAction, isMobileBreakpoint)),
+                            onDestinationSelected: (index) => _onTap(context, index),
                           ),
-                        ),
-                      ),
-                    ),
                   ),
                 )
               : null,
@@ -145,4 +124,111 @@ class MyAdaptiveLayout extends HookConsumerWidget {
       actions.map((e) => NavigationDestination(icon: Icon(e.icon), label: e.title)).toList();
   List<NavigationRailDestination> _navRailDests(List<ShellRouteAction> actions) =>
       actions.map((e) => NavigationRailDestination(icon: Icon(e.icon), label: Text(e.title))).toList();
+}
+
+class _BlizzardDock extends StatelessWidget {
+  const _BlizzardDock({required this.actions, required this.selectedIndex, required this.onSelected});
+
+  final List<ShellRouteAction> actions;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final reduceMotion = MediaQuery.disableAnimationsOf(context) || MediaQuery.accessibleNavigationOf(context);
+    return SafeArea(
+      top: false,
+      minimum: const EdgeInsets.only(bottom: 12),
+      child: Center(
+        child: SizedBox(
+          key: const ValueKey('blizzard_bottom_dock'),
+          width: BlizzardMetrics.dockWidth,
+          height: BlizzardMetrics.dockHeight,
+          child: BlizzardGlass(
+            active: true,
+            radius: BlizzardRadii.dock,
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (var index = 0; index < actions.length; index++) ...[
+                    if (index > 0) const SizedBox(width: 4),
+                    _BlizzardDockTab(
+                      key: ValueKey('blizzard_bottom_dock_tab_$index'),
+                      action: actions[index],
+                      icon: index == 0 ? Icons.home_rounded : actions[index].icon,
+                      selected: index == selectedIndex,
+                      reduceMotion: reduceMotion,
+                      onTap: () => onSelected(index),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BlizzardDockTab extends StatelessWidget {
+  const _BlizzardDockTab({
+    super.key,
+    required this.action,
+    required this.icon,
+    required this.selected,
+    required this.reduceMotion,
+    required this.onTap,
+  });
+
+  final ShellRouteAction action;
+  final IconData icon;
+  final bool selected;
+  final bool reduceMotion;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = selected ? BlizzardPalette.accent : theme.colorScheme.onSurfaceVariant;
+    return Semantics(
+      selected: selected,
+      button: true,
+      label: action.title,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(BlizzardRadii.tab),
+          child: AnimatedContainer(
+            duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 250),
+            width: BlizzardMetrics.dockTabWidth,
+            height: BlizzardMetrics.dockTabHeight,
+            decoration: BoxDecoration(
+              color: selected ? BlizzardPalette.selected.withValues(alpha: 0.72) : Colors.transparent,
+              borderRadius: BorderRadius.circular(BlizzardRadii.tab),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 24, color: color),
+                const SizedBox(height: 2),
+                Text(
+                  action.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: color,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

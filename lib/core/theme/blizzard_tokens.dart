@@ -38,14 +38,25 @@ abstract final class BlizzardRadii {
   static const sheet = 24.0;
   static const dialog = 24.0;
   static const tab = 26.0;
-  static const dock = 33.0;
+  static const dock = 32.0;
   static const connection = 44.0;
   static const pill = 999.0;
 }
 
 abstract final class BlizzardMetrics {
   static const minimumTarget = 44.0;
-  static const dockHeight = 66.0;
+  static const dockWidth = 320.0;
+  static const dockHeight = 64.0;
+  static const dockTabWidth = 152.0;
+  static const dockTabHeight = 52.0;
+  static const connectionButton = 148.0;
+  static const connectionStatusHeight = 98.0;
+  static const connectionControlGroupHeight = 210.0;
+  static const connectionLabelGap = 16.0;
+  static const waveSize = Size(353, 260);
+  static const waveDuration = Duration(seconds: 12);
+  static const waveTopFromStatus = 76.0;
+  static const controlTopFromStatus = 116.0;
 }
 
 /// Optical controls transmit the scene; content surfaces remain opaque.

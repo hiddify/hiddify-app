@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hiddify/core/theme/blizzard_tokens.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_scene.dart';
 
 const _canvas = ValueKey('snow-canvas');
@@ -205,7 +206,7 @@ void main() {
     await _mount(tester, _scene());
     await tester.pump();
     final initial = await _pixels(tester);
-    await tester.pump(const Duration(seconds: 48));
+    await tester.pump(BlizzardMetrics.waveDuration);
     expect(
       listEquals(await _pixels(tester), initial),
       isTrue,
@@ -279,6 +280,11 @@ void main() {
       await _mount(tester, _scene(media: media));
       await tester.pump();
       final reduced = await _pixels(tester);
+      expect(
+        _ribbonLightProfile(reduced).reduce((a, b) => a + b),
+        greaterThan(3000),
+        reason: 'Reduce Motion keeps the approved static wave instead of removing it',
+      );
       await tester.pump(const Duration(seconds: 2));
       expect(listEquals(await _pixels(tester), reduced), isTrue);
       expect(tester.binding.hasScheduledFrame, isFalse);

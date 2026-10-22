@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hiddify/core/analytics/analytics_controller.dart';
+import 'package:hiddify/core/analytics/telemetry_delivery_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
 import 'package:hiddify/features/diagnostics/home_presentation_providers.dart';
@@ -14,6 +17,28 @@ import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
 import 'package:hiddify/features/log/overview/logs_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class _DeliveryAnalytics extends AnalyticsController {
+  _DeliveryAnalytics({
+    TelemetryDeliveryStatus status = const TelemetryDeliveryStatus.disabled(),
+    this.outcome = TelemetryTestOutcome.disabled,
+  }) {
+    monitor.update(status);
+  }
+
+  final monitor = TelemetryDeliveryMonitor();
+  TelemetryDeliveryStatus get status => monitor.status;
+  set status(TelemetryDeliveryStatus value) => monitor.update(value);
+  final TelemetryTestOutcome outcome;
+
+  @override
+  Future<bool> build() async {
+    return false;
+  }
+
+  @override
+  Future<TelemetryTestResult> sendTestEvent() async => TelemetryTestResult(outcome: outcome);
+}
 
 class _RawLogReadObserver extends ProviderObserver {
   final rawProvidersRead = <ProviderBase<Object?>>[];
@@ -51,7 +76,10 @@ void main() {
     List<ProviderObserver> observers = const [],
     double textScale = 1,
     HomePresentationSnapshot? homePresentation,
+    _DeliveryAnalytics? analytics,
   }) async {
+    final deliveryAnalytics = analytics ?? _DeliveryAnalytics();
+    addTearDown(deliveryAnalytics.monitor.dispose);
     await tester.pumpWidget(
       ProviderScope(
         observers: observers,
@@ -60,6 +88,8 @@ void main() {
           safeDiagnosticJournalProvider.overrideWithValue(journal),
           safeDiagnosticMetadataProvider.overrideWithValue((version: '0.0.1', buildNumber: '5')),
           homePresentationSnapshotProvider.overrideWith((ref) => homePresentation),
+          analyticsControllerProvider.overrideWith(() => deliveryAnalytics),
+          telemetryDeliveryMonitorProvider.overrideWithValue(deliveryAnalytics.monitor),
         ],
         child: MaterialApp(
           builder: (context, child) => MediaQuery(
@@ -117,6 +147,18 @@ void main() {
         'lifecycle_state': 'resumed',
       },
       'ios_ping': {'schema': 'wir-ios-ping-trace/v1', 'events': []},
+      'telemetry_delivery': {
+        'schema': 'blizzard-telemetry-delivery/v1',
+        'state': 'disabled',
+        'pending_count': 0,
+        'oldest_pending_age_seconds': null,
+        'budget_used_bytes': 0,
+        'budget_remaining_bytes': 0,
+        'next_attempt_at': null,
+        'last_attempt_at': null,
+        'last_http_code': null,
+        'last_test_outcome': null,
+      },
       'events': [
         {
           'sequence': 1,
@@ -188,6 +230,70 @@ void main() {
     await pumpPage(tester, journal);
 
     expect(find.text('No diagnostic events yet.'), findsOneWidget);
+  });
+
+  testWidgets('shows local remote-delivery status even before any diagnostic events', (tester) async {
+    final journal = SafeDiagnosticJournal();
+    addTearDown(journal.dispose);
+    await pumpPage(tester, journal);
+
+    expect(find.text('Remote delivery'), findsOneWidget);
+    expect(find.byKey(const Key('telemetry-delivery-status')), findsOneWidget);
+  });
+
+  testWidgets('distinguishes the daily limit from local storage failures without cloud access', (tester) async {
+    final journal = journalWithEvent();
+    addTearDown(journal.dispose);
+    final analytics = _DeliveryAnalytics(
+      status: const TelemetryDeliveryStatus(
+        state: TelemetryDeliveryState.budgetLimited,
+        pendingCount: 2,
+        budgetUsedBytes: 65536,
+      ),
+    );
+    await pumpPage(tester, journal, analytics: analytics);
+    await tester.pump();
+    expect(find.text('Daily limit reached'), findsOneWidget);
+    final preview = tester.widget<SelectableText>(find.byKey(const Key('safe-diagnostics-preview'))).data!;
+    final document = jsonDecode(preview) as Map<String, Object?>;
+    final delivery = Map<String, Object?>.from(document['telemetry_delivery']! as Map);
+    expect(delivery['state'], 'budgetLimited');
+
+    analytics.status = const TelemetryDeliveryStatus(state: TelemetryDeliveryState.outboxStorageFailed);
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Local storage unavailable'), findsOneWidget);
+    expect(find.text('Daily limit reached'), findsNothing);
+  });
+
+  testWidgets('test button reports ingest acceptance only from its completed result', (tester) async {
+    final journal = journalWithEvent();
+    addTearDown(journal.dispose);
+    await pumpPage(tester, journal, analytics: _DeliveryAnalytics(outcome: TelemetryTestOutcome.accepted));
+    await tester.tap(find.byKey(const Key('safe-diagnostics-send-test')));
+    await tester.pump();
+    expect(find.text('Ingest server accepted the test event'), findsOneWidget);
+    expect(find.textContaining('queued for delivery'), findsNothing);
+  });
+
+  testWidgets('test button preserves pending result without claiming acceptance', (tester) async {
+    final journal = journalWithEvent();
+    addTearDown(journal.dispose);
+    final analytics = _DeliveryAnalytics(outcome: TelemetryTestOutcome.pending);
+    await pumpPage(tester, journal, analytics: analytics);
+    await tester.tap(find.byKey(const Key('safe-diagnostics-send-test')));
+    await tester.pump();
+    expect(find.text('Saved locally; waiting to send'), findsOneWidget);
+    expect(find.text('Ingest server accepted the test event'), findsNothing);
+
+    analytics.status = const TelemetryDeliveryStatus(
+      state: TelemetryDeliveryState.accepted,
+      lastTestOutcome: TelemetryTestOutcome.accepted,
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(find.text('Saved locally; waiting to send'), findsNothing);
+    expect(find.text('Ingest server accepted the test event'), findsOneWidget);
   });
 
   testWidgets('copy and clear remain immediately reachable for a full report with large text', (tester) async {

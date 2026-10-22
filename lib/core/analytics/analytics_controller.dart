@@ -4,10 +4,12 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:hiddify/core/analytics/analytics_filter.dart';
 import 'package:hiddify/core/analytics/analytics_logger.dart';
+import 'package:hiddify/core/analytics/telemetry_delivery_provider.dart';
 import 'package:hiddify/core/logger/logger_controller.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/observability/better_stack_log_printer.dart';
 import 'package:hiddify/core/observability/telemetry_budget.dart';
+import 'package:hiddify/core/observability/telemetry_delivery_status.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/diagnostics/diagnostic_providers.dart';
 import 'package:hiddify/features/diagnostics/remote_diagnostic_subscription.dart';
@@ -27,11 +29,20 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
   BetterStackLogPrinter? _remote;
   RemoteDiagnosticSubscription? _journalSubscription;
   RemoteIosPingSubscription? _pingSubscription;
+  StreamSubscription<TelemetryDeliveryStatus>? _deliverySubscription;
+  TelemetryDeliveryMonitor? _deliveryMonitor;
   int? _lastPingSequence;
+
+  void _publishDelivery(TelemetryDeliveryStatus status) {
+    _deliveryMonitor?.update(status);
+  }
 
   @override
   Future<bool> build() async {
-    ref.onDispose(() => unawaited(_stopRemote()));
+    _deliveryMonitor = ref.read(telemetryDeliveryMonitorProvider);
+    ref.onDispose(() {
+      unawaited(_stopRemote());
+    });
     return _preferences.getBool(enableAnalyticsPrefKey) ?? Environment.telemetryBeta;
   }
 
@@ -44,6 +55,9 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
     _journalSubscription = null;
     final remote = _remote;
     _remote = null;
+    await _deliverySubscription?.cancel();
+    _deliverySubscription = null;
+    _publishDelivery(const TelemetryDeliveryStatus.disabled());
     if (remote != null) await remote.dispose(clearPending: clearPending);
     if (clearPending) await _preferences.remove(BetterStackLogPrinter.preferenceKey);
   }
@@ -94,6 +108,8 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
             writeOutbox: (value) => preferences.setString(BetterStackLogPrinter.preferenceKey, value),
           );
           _remote = remote;
+          _deliverySubscription = remote.deliveryStatuses.listen(_publishDelivery);
+          _publishDelivery(remote.deliveryStatus);
           _journalSubscription = RemoteDiagnosticSubscription(ref.read(safeDiagnosticJournalProvider), remote);
           final trace = ref.read(iosPingTraceProvider);
           final events = trace.snapshot.events;
@@ -111,12 +127,11 @@ class AnalyticsController extends _$AnalyticsController with AppLogger {
     }
   }
 
-  /// Queuing is not a delivery acknowledgement; verify ingestion in Better Stack.
-  bool sendTestEvent() {
+  /// A server acknowledgement remains separate from visibility in Better Stack search.
+  Future<TelemetryTestResult> sendTestEvent() async {
     final remote = _remote;
-    if (remote == null || !remote.addTestEvent()) return false;
-    unawaited(remote.flush());
-    return true;
+    if (remote == null) return const TelemetryTestResult(outcome: TelemetryTestOutcome.disabled);
+    return remote.sendTestEvent();
   }
 
   Future<void> disableAnalytics() async {

@@ -19,17 +19,30 @@ never uploaded. Existing native/iOS Sentry transport sanitization is preserved.
 Beta enables telemetry unless the user has already disabled analytics. Debug
 builds do not send. Builds without `telemetry_beta` default analytics off.
 Disabling analytics cancels the journal listener and disposes the HTTP client,
-queue and timers. A queued request is not evidence of server acceptance.
+queue and timers. A queued request is not evidence of server acceptance. The
+safe diagnostics page reads a local closed status snapshot: pending count and
+age, attempted-byte usage and remainder, next permitted attempt, last HTTP
+status code, and closed delivery/test outcomes. It never includes the request,
+response, exception, token, endpoint, headers, profile, or visited resources.
 
-Free-tier limits per installation per UTC day are 256 KiB of attempted JSON log
-bodies, including retries, and 50 Sentry events. Reservations persist before
-sending; storage failure stops transmission. A clock rollback grants no extra
-budget. Queue capacity is 100 events, each up to 2 KiB; batches contain at most 20.
+Free-tier limits per installation per UTC day are 64 KiB of attempted JSON log
+bodies, including retries, and 1 Sentry event per day / 10 per month. Reservations
+persist before sending; storage failure stops transmission. A clock rollback or
+application update grants no extra budget. A legacy same-day counter above the
+new limit waits for the next UTC day rather than being reset. Queue capacity is
+100 events and 64 KiB for at most 24 hours, each event is up to 2 KiB, and batches
+contain at most 20. Near the daily cap the sender takes the largest serialized
+FIFO prefix that fits; it never raises or bypasses the cap for a manual test.
 Flushes run after 10 seconds or when the app backgrounds. Requests time out after
-5 seconds; transient failures have at most three attempts. Repeated failed
-operation/stage/code signatures are limited to one per minute. HTTP 401/402/403
-stops this session's exporter. Only HTTPS Better Stack ingestion hosts are
-accepted and redirects are not followed with the credential.
+5 seconds; transient failures have at most three attempts before a persisted
+cooldown. Budget exhaustion, corrupt budget state, budget storage failure, outbox
+storage failure, retry wait, terminal rejection, expiry, and overflow remain
+distinct local outcomes. Only budget exhaustion creates the persisted UTC-day
+pause. Repeated failed operation/stage/code signatures are limited to one per
+minute. HTTP 401/402/403 stops this session's exporter; other 4xx responses are
+terminal rejections for that batch. Only an exact 2xx batch containing the tracked
+manual event marks that test accepted. Only HTTPS Better Stack ingestion hosts
+are accepted and redirects are not followed with the credential.
 
 These device caps complement the account-wide free quota; they cannot guarantee
 it for unlimited installations. Keep Better Stack on Free and watch aggregate
@@ -38,8 +51,11 @@ usage during the controlled beta. This change does not enable paid services.
 ## Device acceptance after the new build is installed
 
 1. Open Safe Diagnostics and select **Send test event** (cloud upload icon).
-2. The page reports that the event was queued, or that remote diagnostics are off.
-3. Verify `test_event` in Better Stack Logs with the installed version/build.
+2. Confirm the page advances from local persistence/waiting to server acceptance,
+   or shows the specific closed reason it cannot proceed. "Accepted" requires a
+   2xx acknowledgement for the batch containing that exact test event.
+3. Separately verify `test_event` in Better Stack Logs with the installed
+   version/build; local 2xx acceptance does not prove remote query visibility.
 4. Connect and disconnect; verify typed operation events with the same session.
 5. Disable analytics and verify that subsequent local journal events are not sent.
 6. Exercise startup and VPN use without network; telemetry must not block them.

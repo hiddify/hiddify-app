@@ -26,8 +26,9 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     final ios = Theme.of(context).platform == TargetPlatform.iOS && ref.watch(iosActiveProxyMeasurementEnabledProvider);
     final activeProxy = ios ? ref.watch(iosActiveProxyMeasurementStateProvider).asData?.value.proxy : legacyProxy;
     final t = ref.watch(translationsProvider).requireValue;
+    final blizzard = BlizzardPresentation.isActive(context);
 
-    if (connectionState != const Connected()) {
+    if (!blizzard && connectionState != const Connected()) {
       return const SizedBox.shrink();
     }
     if (activeProxy == null) {
@@ -43,7 +44,6 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     }
 
     final theme = Theme.of(context);
-    final blizzard = BlizzardPresentation.isActive(context);
     final materials = BlizzardMaterials(highContrast: MediaQuery.highContrastOf(context));
 
     // Handle URL test in a way that won't trigger during build
@@ -58,7 +58,8 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      constraints: blizzard ? const BoxConstraints(minHeight: 84) : null,
+      margin: blizzard ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: blizzard ? materials.content : theme.colorScheme.background.withOpacity(1),
