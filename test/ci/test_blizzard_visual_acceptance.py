@@ -462,6 +462,19 @@ class BlizzardVisualAcceptanceTest(unittest.TestCase):
         self.module.prepare_regular_host(candidate, template, destination)
         self.assertEqual((destination / "ios" / "Runner" / "BlizzardNativeGlass.swift").read_text(), "candidate-native-glass")
 
+    def test_bundle_identifier_falls_back_to_main_runner_xcode_project(self):
+        host = self.root / "bundle-host"
+        project = host / "ios" / "Runner.xcodeproj" / "project.pbxproj"
+        project.parent.mkdir(parents=True)
+        project.write_text(
+            """
+            PRODUCT_BUNDLE_IDENTIFIER = dev.blizzard.v3qa.hiddify;
+            PRODUCT_BUNDLE_IDENTIFIER = dev.blizzard.v3qa.hiddify.RunnerTests;
+            PRODUCT_BUNDLE_IDENTIFIER = dev.blizzard.v3qa.hiddify;
+            """
+        )
+        self.assertEqual(self.module._bundle_identifier(host), "dev.blizzard.v3qa.hiddify")
+
     def test_receipt_json_round_trip_keeps_external_expectations_outside(self):
         receipt = self.valid_receipt()
         path = self.root / "receipt.json"

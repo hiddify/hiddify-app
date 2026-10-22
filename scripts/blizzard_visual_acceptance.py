@@ -162,11 +162,22 @@ def validate_capture_ack_path(
 
 
 def _bundle_identifier(run_root: pathlib.Path) -> str:
-    for line in (run_root / "ios" / "Base.xcconfig").read_text().splitlines():
-        key, separator, value = line.partition("=")
-        if separator and key.strip() == "BASE_BUNDLE_IDENTIFIER" and value.strip():
-            return value.strip()
-    raise AcceptanceError("native host is missing BASE_BUNDLE_IDENTIFIER")
+    base_config = run_root / "ios" / "Base.xcconfig"
+    if base_config.is_file():
+        for line in base_config.read_text().splitlines():
+            key, separator, value = line.partition("=")
+            if separator and key.strip() == "BASE_BUNDLE_IDENTIFIER" and value.strip():
+                return value.strip()
+    project = run_root / "ios" / "Runner.xcodeproj" / "project.pbxproj"
+    if project.is_file():
+        candidates = {
+            match.group(1)
+            for match in re.finditer(r"^\s*PRODUCT_BUNDLE_IDENTIFIER\s*=\s*([A-Za-z0-9.-]+)\s*;", project.read_text(), re.MULTILINE)
+            if not match.group(1).endswith(".RunnerTests")
+        }
+        if len(candidates) == 1:
+            return candidates.pop()
+    raise AcceptanceError("native host is missing an unambiguous Runner bundle identifier")
 
 
 def sha256_file(path: pathlib.Path) -> str:
