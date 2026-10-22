@@ -42,14 +42,13 @@ class HomePage extends HookConsumerWidget {
               // ignore: prefer_if_elements_to_conditional_expressions
               blizzard ? const Icon(Icons.power_settings_new_rounded, size: 24) : Assets.images.logo.svg(height: 24),
               const Gap(8),
-              Flexible(
-                flex: blizzard ? 1 : 0,
+              const Flexible(
                 child: Text.rich(
                   TextSpan(
                     children: [
-                      TextSpan(text: blizzard ? "VPN" : t.common.appTitle),
-                      const TextSpan(text: " "),
-                      const WidgetSpan(child: AppVersionLabel(), alignment: PlaceholderAlignment.middle),
+                      TextSpan(text: "Blizzard"),
+                      TextSpan(text: " "),
+                      WidgetSpan(child: AppVersionLabel(), alignment: PlaceholderAlignment.middle),
                     ],
                   ),
                 ),
@@ -177,7 +176,7 @@ class AppVersionLabel extends HookConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
 
-    final version = ref.watch(appInfoProvider).requireValue.presentVersion;
+    final version = ref.watch(appInfoProvider).requireValue.presentVersionWithBuild;
     if (version.isBlank) return const SizedBox();
 
     return Semantics(

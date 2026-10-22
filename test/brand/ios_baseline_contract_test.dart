@@ -23,9 +23,9 @@ void main() {
       expect(baseConfiguration['DEVELOPMENT_TEAM'], _developmentTeam);
     });
 
-    test('uses the local baseline display name', () async {
+    test('uses the Blizzard VPN display name', () async {
       final runnerInfo = await _readPlist('ios/Runner/Info.plist');
-      expect(runnerInfo['CFBundleDisplayName'], 'WIR Baseline');
+      expect(runnerInfo['CFBundleDisplayName'], 'Blizzard VPN');
     });
 
     test('keeps the real Dart and Swift service channel compatible', () {

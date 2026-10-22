@@ -21,6 +21,13 @@ class AppInfoEntity with _$AppInfoEntity {
 
   String get presentVersion => environment == Environment.prod ? version : "$version ${environment.name}";
 
+  String get presentVersionWithBuild {
+    if (version.trim().isEmpty) return version;
+    if (buildNumber.trim().isEmpty) return presentVersion;
+    final versionWithBuild = "$version ($buildNumber)";
+    return environment == Environment.prod ? versionWithBuild : "$versionWithBuild ${environment.name}";
+  }
+
   /// formats app info for sharing
   String format() =>
       '''
