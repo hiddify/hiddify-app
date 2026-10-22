@@ -96,7 +96,7 @@ class AddProfileOptions extends HookConsumerWidget {
                   children: [
                     const Gap(AddProfileModalConst.fixBtnsGap),
                     FixBtns(height: fixBtnsHeight, blizzardPresentation: true),
-                    Gap(largeText ? 16 : 62),
+                    Gap(largeText ? 16 : 20),
                     const NavBar(blizzardPresentation: true),
                   ],
                 )

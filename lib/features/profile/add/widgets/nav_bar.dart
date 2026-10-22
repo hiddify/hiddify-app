@@ -49,12 +49,9 @@ class NavBar extends ConsumerWidget {
         AddProfileModalConst.navBarGap,
       ).copyWith(bottom: AddProfileModalConst.navBarBottomGap),
       child: blizzardPresentation
-          ? Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 16,
-              runSpacing: 12,
-              children: [freeControl, help],
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [Flexible(child: freeControl), const Gap(16), help],
             )
           : Row(children: [freeControl, const Spacer(), help]),
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/bottom_sheets/widgets/quick_settings_modal.dart';
 import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/features/profile/add/add_profile_modal.dart';
@@ -23,7 +24,7 @@ void main() {
       width: 320,
       scale: 2,
       locale: AppLocale.ru,
-      child: _applied(const AddProfileOptions()),
+      child: Center(child: SizedBox(height: 300, child: _applied(const AddProfileOptions()))),
     );
 
     for (final label in ['Сканировать QR', 'Буфер обмена', 'Вручную']) {
@@ -34,7 +35,97 @@ void main() {
     expect(tester.getSize(find.byKey(const ValueKey('add_by_qr_code_button'))).height, greaterThan(115));
     expect(find.byIcon(Icons.qr_code_scanner_outlined), findsOneWidget);
     expect(find.byIcon(Icons.content_paste_outlined), findsOneWidget);
+    final scrollable = find.descendant(of: find.byType(AddProfileOptions), matching: find.byType(Scrollable));
+    expect(scrollable, findsOneWidget);
+    expect(tester.state<ScrollableState>(scrollable).position.maxScrollExtent, greaterThan(0));
+    await tester.drag(scrollable, const Offset(0, -1000));
+    await tester.pumpAndSettle();
+    final freeSwitch = find.descendant(of: find.byKey(const ValueKey('free')), matching: find.byType(Switch));
+    final help = find.byKey(const ValueKey('help'));
+    expect(freeSwitch, findsOneWidget);
+    expect(help, findsOneWidget);
+    expect(freeSwitch.hitTestable(), findsOneWidget);
+    expect(help.hitTestable(), findsOneWidget);
     expect(tester.takeException(), isNull);
+    await fixture.close(tester);
+  });
+
+  testWidgets('Add Profile modal keeps every default action inside the 34pt safe viewport', (tester) async {
+    tester.view.physicalSize = const Size(393, 852);
+    tester.view.devicePixelRatio = 1;
+    tester.view.viewPadding = const FakeViewPadding(bottom: 34);
+    tester.view.padding = const FakeViewPadding(bottom: 34);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewPadding);
+    addTearDown(tester.view.resetPadding);
+    final viewportSize = tester.view.physicalSize / tester.view.devicePixelRatio;
+    Future<void>? shown;
+    final fixture = await mountHomeFixture(
+      tester,
+      width: viewportSize.width,
+      height: viewportSize.height,
+      nativeViewport: true,
+      locale: AppLocale.ru,
+      child: Builder(
+        builder: (context) => TextButton(
+          key: const ValueKey('open_add_profile_modal'),
+          onPressed: () {
+            shown = Navigator.of(context, rootNavigator: true).push<void>(
+              ModalBottomSheetRoute(
+                constraints: BottomSheetConst.boxConstraints,
+                isScrollControlled: true,
+                builder: (context) => ClipRRect(
+                  borderRadius: BottomSheetConst.borderRadius,
+                  child: Material(
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+                      child: _applied(const AddProfileModal()),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+          child: const Text('open add profile'),
+        ),
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('open_add_profile_modal')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(AddProfileModal), findsOneWidget);
+    expect(MediaQuery.viewPaddingOf(tester.element(find.byType(AddProfileModal))).bottom, 34);
+    final scrollable = find.descendant(of: find.byType(AddProfileModal), matching: find.byType(Scrollable));
+    final viewport = find.descendant(of: find.byType(AddProfileModal), matching: find.byType(ListView));
+    expect(scrollable, findsOneWidget);
+    expect(viewport, findsOneWidget);
+    expect(tester.state<ScrollableState>(scrollable).position.pixels, 0);
+    final viewportRect = tester.getRect(viewport);
+    final controls = <String, Finder>{
+      'QR': find.byKey(const ValueKey('add_by_qr_code_button')),
+      'clipboard': find.byKey(const ValueKey('add_from_clipboard_button')),
+      'manual': find.byKey(const ValueKey('add_manually_button')),
+      'free switch': find.descendant(of: find.byKey(const ValueKey('free')), matching: find.byType(Switch)),
+      'help': find.byKey(const ValueKey('help')),
+    };
+    for (final MapEntry(key: label, value: control) in controls.entries) {
+      expect(control, findsOneWidget, reason: '$label action must remain mounted');
+      final rect = tester.getRect(control);
+      expect(rect.top, greaterThanOrEqualTo(viewportRect.top), reason: '$label top must be painted in the viewport');
+      expect(
+        rect.bottom,
+        lessThanOrEqualTo(viewportRect.bottom),
+        reason: '$label bottom must be painted in the viewport without scrolling',
+      );
+      expect(rect.shortestSide, greaterThanOrEqualTo(44), reason: '$label hit target must remain at least 44pt');
+      expect(control.hitTestable(), findsOneWidget, reason: '$label must be hittable without scrolling');
+    }
+    expect(tester.takeException(), isNull);
+
+    Navigator.of(tester.element(find.byType(AddProfileModal))).pop();
+    await tester.pumpAndSettle();
+    await shown!;
     await fixture.close(tester);
   });
 

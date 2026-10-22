@@ -13,7 +13,6 @@ import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
 import 'package:hiddify/features/settings/overview/settings_page.dart';
-import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -152,92 +151,7 @@ void main() {
       await _capture(tester, 'settings');
       await _close(fixture, tester);
 
-      final group = OutboundGroup(
-        tag: 'select',
-        selected: 'finland-vless',
-        items: [
-          OutboundInfo(
-            tag: 'finland-vless',
-            tagDisplay: 'Финляндия',
-            groupSelectedTagDisplay: 'Вьюга 1G',
-            type: 'VLESS',
-            urlTestDelay: 84,
-            ipinfo: IpInfo(ip: '192.0.2.84', countryCode: 'FI'),
-          ),
-          OutboundInfo(
-            tag: 'germany-vless',
-            tagDisplay: 'Германия',
-            groupSelectedTagDisplay: 'Хёллентэлер',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.2', countryCode: 'DE'),
-          ),
-          OutboundInfo(
-            tag: 'netherlands-harmonic-vless',
-            tagDisplay: 'Нидерланды',
-            groupSelectedTagDisplay: 'Хармоник',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.3', countryCode: 'NL'),
-          ),
-          OutboundInfo(
-            tag: 'estonia-vless',
-            tagDisplay: 'Эстония',
-            groupSelectedTagDisplay: 'Рао',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.4', countryCode: 'EE'),
-          ),
-          OutboundInfo(
-            tag: 'usa-vless',
-            tagDisplay: 'США',
-            groupSelectedTagDisplay: 'Виливав',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.5', countryCode: 'US'),
-          ),
-          OutboundInfo(
-            tag: 'japan-vless',
-            tagDisplay: 'Япония',
-            groupSelectedTagDisplay: 'Ямасэ',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.6', countryCode: 'JP'),
-          ),
-          OutboundInfo(
-            tag: 'turkey-vless',
-            tagDisplay: 'Турция',
-            groupSelectedTagDisplay: 'Лодос',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.7', countryCode: 'TR'),
-          ),
-          OutboundInfo(
-            tag: 'netherlands-favonius-vless',
-            tagDisplay: 'Нидерланды',
-            groupSelectedTagDisplay: 'Фавоний',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.8', countryCode: 'NL'),
-          ),
-          OutboundInfo(
-            tag: 'poland-vless',
-            tagDisplay: 'Польша',
-            groupSelectedTagDisplay: 'Хальны',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.9', countryCode: 'PL'),
-          ),
-          OutboundInfo(
-            tag: 'switzerland-vless',
-            tagDisplay: 'Швейцария',
-            groupSelectedTagDisplay: 'Тивано',
-            type: 'VLESS',
-            urlTestDelay: 65001,
-            ipinfo: IpInfo(ip: '192.0.2.10', countryCode: 'CH'),
-          ),
-        ],
-      );
+      final group = blizzardVisualAcceptanceServerGroup;
       expect(group.items, hasLength(10));
       expect(group.selected, 'finland-vless');
       expect(group.items.first.groupSelectedTagDisplay, 'Вьюга 1G');
