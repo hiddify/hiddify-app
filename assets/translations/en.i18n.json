@@ -116,7 +116,8 @@
       "delay": {
         "result": "Delay: ${delay}ms",
         "timeout": "Delay test timeout",
-        "testing": "Delay: testing..."
+        "testing": "Delay: testing...",
+        "updating": "Updating…"
       }
     },
     "profiles": {
