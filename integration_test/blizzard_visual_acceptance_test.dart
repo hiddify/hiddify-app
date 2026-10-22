@@ -109,7 +109,14 @@ void main() {
     expect(tester.getSize(find.byKey(blizzardFixtureCanvas)), viewport);
     expect(find.text('0.0.1 (22)'), findsOneWidget);
     expect(find.text('Akonit Premium'), findsWidgets);
-    expect(find.text('∞ GiB · осталось 169 дней'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Text &&
+            widget.data?.replaceAll(RegExp('[\u2066\u2069]'), '') == '∞ GiB · осталось 169 дней',
+      ),
+      findsOneWidget,
+    );
     expect(find.text('VPN подключён'), findsOneWidget);
     expect(find.text('Задержка 84 мс'), findsOneWidget);
     expect(find.text('Финляндия'), findsOneWidget);
