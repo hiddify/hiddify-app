@@ -1,0 +1,54 @@
+{
+  "release_base": "3092d6e0644996b2d219f63774aca897eade9ebd",
+  "donor_head": "30f89298f37e25dee35595dbe0536b3bddee5421",
+  "donor_status": [
+    " M ios/Runner.xcodeproj/project.pbxproj",
+    " M ios/Runner/AppDelegate.swift",
+    " M ios/RunnerTests/RunnerTests.swift",
+    " M lib/core/widget/blizzard/blizzard_glass.dart",
+    " M test/ci/blizzard_runtime_boundary_test.rb",
+    "?? docs/verification/blizzard/native-liquid-glass.md",
+    "?? docs/verification/blizzard/native-liquid-glass/",
+    "?? ios/Runner/BlizzardNativeGlass.swift",
+    "?? test/visual/blizzard_native_glass_test.dart"
+  ],
+  "design_thread": "01a16010-8b6a-7c13-8ac4-91bd8dadafcf",
+  "files": [
+    {
+      "path": "ios/Runner.xcodeproj/project.pbxproj",
+      "sha256": "221630aace49cfa805c367e231bed8fc86318a17060e4f53efd8398f9c3edf51"
+    },
+    {
+      "path": "ios/Runner/AppDelegate.swift",
+      "sha256": "b18922b8c1ee98e4100a3cb5ba4fac0fded931b89d64202c7f2aa39ec62b18f6"
+    },
+    {
+      "path": "ios/RunnerTests/RunnerTests.swift",
+      "sha256": "793aba1f25915236e8efbe516c4a42109cd7fc77533c34fdda44924627ed24aa"
+    },
+    {
+      "path": "lib/core/widget/blizzard/blizzard_glass.dart",
+      "sha256": "77bc53d3086ff7934709614f9fb4d18203fb4980cf2c0f361f129cde561d17f8"
+    },
+    {
+      "path": "test/ci/blizzard_runtime_boundary_test.rb",
+      "sha256": "4acd73185646de96ff865f82f2d3965530b13b44fdf5a0970a8e6288e8bc1618"
+    },
+    {
+      "path": "ios/Runner/BlizzardNativeGlass.swift",
+      "sha256": "6375fa6fe9aa7d1e1377c69842149b703e69f32ffa08093bb26d9b5fd40f02ca"
+    },
+    {
+      "path": "test/visual/blizzard_native_glass_test.dart",
+      "sha256": "e6fea9accd4d47166ff4933cf45f62822c0180a47834d9556d9834380e30266b"
+    },
+    {
+      "path": "design-assets/blizzard-v3/blizzard-wave-envelope.glsl",
+      "sha256": "cf81c085ea43524e2cb66d4f44af66f73ba0c1007b76cf6115b48a3cddf67df6"
+    },
+    {
+      "path": "design-exports/blizzard-v3-all-screens-2026-10-22/coverage.md",
+      "sha256": "34fade0c38a84d53dcd696fc0fbf4bf8733792b5a484e13dbd374e00eab65d75"
+    }
+  ]
+}
