@@ -17,7 +17,9 @@ class BlizzardGlass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final opaque = media.highContrast || media.accessibleNavigation || media.disableAnimations;
+    // Motion preferences freeze decoration; UIKit observes Reduce Transparency
+    // independently, so stopping animation must not replace glass with a fill.
+    final opaque = media.highContrast;
     final native = !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
@@ -91,13 +93,31 @@ class BlizzardGlass extends StatelessWidget {
               ),
             ),
           ),
+          if (active && native && !lens && !opaque)
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: ExcludeSemantics(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0x2EEFF7FD), Color(0x0AEFF7FD)],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           child,
-          if (active && (!native || opaque))
+          if (active && (!native || opaque || !lens))
             Positioned.fill(
               child: IgnorePointer(
                 child: ExcludeSemantics(
                   child: RepaintBoundary(
-                    child: CustomPaint(painter: _GlassEdgePainter(radius, opaque, soft: lens)),
+                    child: CustomPaint(
+                      painter: _GlassEdgePainter(radius, opaque, soft: lens, nativeDock: native && !lens),
+                    ),
                   ),
                 ),
               ),
@@ -109,10 +129,11 @@ class BlizzardGlass extends StatelessWidget {
 }
 
 class _GlassEdgePainter extends CustomPainter {
-  const _GlassEdgePainter(this.radius, this.opaque, {required this.soft});
+  const _GlassEdgePainter(this.radius, this.opaque, {required this.soft, this.nativeDock = false});
   final double radius;
   final bool opaque;
   final bool soft;
+  final bool nativeDock;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -123,6 +144,15 @@ class _GlassEdgePainter extends CustomPainter {
     if (opaque) {
       paint.color = BlizzardPalette.secondary;
       canvas.drawRRect(shape, paint);
+      return;
+    }
+    if (nativeDock) {
+      paint.shader = ui.Gradient.linear(Offset(size.width / 2, 0), Offset(size.width / 2, size.height), [
+        BlizzardPalette.primary.withValues(alpha: 0.48),
+        BlizzardPalette.primary.withValues(alpha: 0.18),
+      ]);
+      canvas.drawRRect(shape, paint);
+      paint.shader!.dispose();
       return;
     }
     if (soft) {
@@ -174,5 +204,8 @@ class _GlassEdgePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _GlassEdgePainter oldDelegate) =>
-      oldDelegate.radius != radius || oldDelegate.opaque != opaque || oldDelegate.soft != soft;
+      oldDelegate.radius != radius ||
+      oldDelegate.opaque != opaque ||
+      oldDelegate.soft != soft ||
+      oldDelegate.nativeDock != nativeDock;
 }

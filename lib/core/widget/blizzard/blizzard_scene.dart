@@ -82,16 +82,24 @@ class _BlizzardSceneState extends State<BlizzardScene> with SingleTickerProvider
       return IgnorePointer(
         child: ExcludeSemantics(
           child: ClipRect(
-            child: AnimatedBuilder(
-              animation: _drift,
-              child: Image.asset('assets/images/blizzard_wave_envelope.png', fit: BoxFit.contain),
-              builder: (context, child) {
-                final phase = _reduced ? 0.0 : math.sin(_drift.value * math.pi * 2);
-                return Transform.translate(
-                  offset: Offset(phase * 3, phase * 2),
-                  child: Transform.rotate(angle: phase * math.pi / 90, child: child),
-                );
-              },
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                RepaintBoundary(
+                  child: CustomPaint(painter: _BlizzardEnvelopeSnowPainter(_drift), willChange: !_reduced),
+                ),
+                AnimatedBuilder(
+                  animation: _drift,
+                  child: Image.asset('assets/images/blizzard_wave_envelope.png', fit: BoxFit.contain),
+                  builder: (context, child) {
+                    final phase = _reduced ? 0.0 : math.sin(_drift.value * math.pi * 2);
+                    return Transform.translate(
+                      offset: Offset(phase * 3, phase * 2),
+                      child: Transform.rotate(angle: phase * math.pi / 90, child: child),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -139,6 +147,65 @@ class _BlizzardSceneState extends State<BlizzardScene> with SingleTickerProvider
       ),
     );
   }
+}
+
+class _BlizzardEnvelopeSnowPainter extends CustomPainter {
+  _BlizzardEnvelopeSnowPainter(this.drift) : super(repaint: drift);
+
+  final Animation<double> drift;
+  static final _seeds = _snowSeeds();
+
+  static List<({double x, double y, double phase, double radius})> _snowSeeds() {
+    final random = math.Random(0xE11E10FE);
+    return List.generate(
+      520,
+      (_) => (
+        x: random.nextDouble(),
+        y: random.nextDouble(),
+        phase: random.nextDouble() * math.pi * 2,
+        radius: random.nextDouble(),
+      ),
+    );
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..strokeCap = StrokeCap.round;
+    final angle = drift.value * math.pi * 2;
+    for (var i = 0; i < _seeds.length; i++) {
+      final layer = i < 330 ? 0 : (i < 470 ? 1 : 2);
+      final seed = _seeds[i];
+      final travel = (seed.y + drift.value * (layer + 1)) % 1;
+      final y = -0.035 + travel * 1.07;
+      final gust = math.sin(angle * 5 + seed.phase) + math.sin(angle * 11 - seed.phase * 0.7) * 0.34;
+      final x = (seed.x + travel * (0.1 + layer * 0.055) + gust * (0.018 + layer * 0.013)) % 1;
+      final wrapFade = math.min(travel / 0.055, (1 - travel) / 0.055).clamp(0.0, 1.0);
+      final horizontalFade = math.min(x / 0.025, (1 - x) / 0.025).clamp(0.0, 1.0);
+      // The action label occupies the lower center of this exact envelope.
+      // Keep that strip quiet while snow remains visible through the button.
+      final labelQuiet = y > 0.82 && x > 0.18 && x < 0.82 ? 0.12 : 1.0;
+      final opacity = wrapFade * horizontalFade * labelQuiet;
+      if (opacity == 0) continue;
+
+      final position = Offset(x * size.width, y * size.height);
+      if (layer == 2) {
+        paint
+          ..color = BlizzardPalette.particleNear.withValues(alpha: 0.16 * opacity)
+          ..strokeWidth = 0.75 + seed.radius * 0.55;
+        canvas.drawLine(position - Offset(5 + gust.abs() * 3, 2.5 + seed.radius * 2), position, paint);
+        paint.color = BlizzardPalette.particleNear.withValues(alpha: 0.045 * opacity);
+        canvas.drawCircle(position, 3.2 + seed.radius * 1.5, paint);
+      }
+      final radius = layer == 0 ? 0.5 : (layer == 1 ? 0.9 : 1.35 + seed.radius * 0.35);
+      paint.color = (layer == 2 ? BlizzardPalette.particleNear : BlizzardPalette.particleFar).withValues(
+        alpha: (layer == 0 ? 0.18 : (layer == 1 ? 0.3 : 0.5)) * opacity,
+      );
+      canvas.drawCircle(position, radius, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BlizzardEnvelopeSnowPainter oldDelegate) => oldDelegate.drift != drift;
 }
 
 class BlizzardScenePainter extends CustomPainter {

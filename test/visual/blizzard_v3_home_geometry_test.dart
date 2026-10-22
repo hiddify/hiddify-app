@@ -44,7 +44,11 @@ void main() {
     expect(tester.getSize(dock), const Size(320, 64));
     expect(tester.getSize(selectedTab), const Size(152, 52));
     expect(tester.getSize(settingsTab), const Size(152, 52));
-    expect(tester.widget<Icon>(find.descendant(of: selectedTab, matching: find.byType(Icon))).icon, Icons.home_rounded);
+    expect(tester.widget<Icon>(find.descendant(of: selectedTab, matching: find.byType(Icon))).icon, Icons.home_outlined);
+    expect(
+      tester.widget<Icon>(find.descendant(of: settingsTab, matching: find.byType(Icon))).icon,
+      Icons.settings_outlined,
+    );
 
     final footer = tester.getRect(find.byType(ActiveProxyFooter));
     final profile = tester.getRect(find.byType(ProfileTile));

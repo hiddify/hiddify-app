@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
+import 'package:hiddify/core/theme/blizzard_tokens.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
@@ -18,9 +20,13 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = BlizzardPresentation.themeOf(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) || (theme.extension<BlizzardEligibility>()?.applied ?? false);
 
     return BlizzardPresentation(
       child: ListTile(
+        minTileHeight: blizzard ? 74 : null,
+        contentPadding: blizzard ? const EdgeInsets.symmetric(horizontal: 14) : null,
         // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           proxy.tagDisplay,
@@ -30,8 +36,8 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
         leading: IPCountryFlag(
           countryCode: proxy.ipinfo.countryCode,
           organization: proxy.ipinfo.org,
-          size: 40,
-          padding: const EdgeInsetsDirectional.only(end: 8),
+          size: blizzard ? 40 : 40,
+          padding: blizzard ? EdgeInsets.zero : const EdgeInsetsDirectional.only(end: 8),
         ),
         subtitle: Text.rich(
           TextSpan(
@@ -47,23 +53,28 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: Column(
-          children: [
-            if (proxy.urlTestDelay != 0)
-              Text(
-                proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
-                style: TextStyle(color: delayColor(context, proxy.urlTestDelay)),
+        trailing: blizzard && selected
+            ? const Icon(Icons.check_rounded, size: 20, color: BlizzardPalette.accent)
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (proxy.urlTestDelay != 0)
+                    Text(
+                      proxy.urlTestDelay > 65000 ? "×" : proxy.urlTestDelay.toString(),
+                      style: TextStyle(color: delayColor(context, proxy.urlTestDelay)),
+                    )
+                  else if (blizzard)
+                    const Text('—', style: TextStyle(color: BlizzardPalette.muted)),
+
+                  if (proxy.download > 0) Text("⬩", style: BlizzardPresentation.themeOf(context).textTheme.bodySmall),
+                ],
               ),
 
-            if (proxy.download > 0) Text("⬩", style: BlizzardPresentation.themeOf(context).textTheme.bodySmall),
-          ],
-        ),
-
         selected: selected,
-        selectedTileColor: theme.colorScheme.primaryContainer,
+        selectedTileColor: blizzard ? const Color(0x1272D1FF) : theme.colorScheme.primaryContainer,
         onTap: onTap,
         onLongPress: () async => await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: proxy),
-        horizontalTitleGap: 4,
+        horizontalTitleGap: blizzard ? 8 : 4,
       ),
     );
   }

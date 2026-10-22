@@ -12,8 +12,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 const _baseline = '0830294eff5b8cd86324545ed00689648c70bd23';
 const _connectionButtonPath = 'lib/features/home/widget/connection_button.dart';
+const _settingsPagePath = 'lib/features/settings/overview/settings_page.dart';
 const _homePagePath = 'lib/features/home/widget/home_page.dart';
 const _activeProxyCardPath = 'lib/features/proxy/active/active_proxy_card.dart';
+const _profilesModalPath = 'lib/features/profile/overview/profiles_modal.dart';
 // Existing presentation surfaces explicitly enumerated in the migration plan.
 const _files = <String>[
   'lib/core/theme/app_theme.dart',
@@ -112,6 +114,10 @@ class _Bindings extends GeneralizingAstVisitor<void> {
   _Bindings(this.path);
 
   final String path;
+  final classes = <ClassDeclaration>[];
+  final creations = <InstanceCreationExpression>[];
+  final invocations = <MethodInvocation>[];
+  final namedExpressions = <NamedExpression>[];
   final exact = <String, int>{};
   final stateSites = <String, int>{};
   final predicates = <String, int>{};
@@ -165,6 +171,10 @@ class _Bindings extends GeneralizingAstVisitor<void> {
 
   @override
   void visitNode(AstNode node) {
+    if (node is ClassDeclaration) classes.add(node);
+    if (node is InstanceCreationExpression) creations.add(node);
+    if (node is MethodInvocation) invocations.add(node);
+    if (node is NamedExpression) namedExpressions.add(node);
     final directSite = directMethodSite(node);
     if (directSite != null) {
       directStatements.putIfAbsent(directSite, () => <String>[]).add(_tokens(node));
@@ -374,6 +384,95 @@ bool _isApprovedHomeProfileAddition(_Bindings baseline, _Bindings live, String k
   return approvedCount != null && live.exact[key] == (baseline.exact[key] ?? 0) + approvedCount;
 }
 
+const _settingsResetSource = "() async { await ref.read(resetTunnelNotifierProvider.notifier).run(); }";
+
+String _settingsMenuFixture() =>
+    '''
+class BlizzardSettingsMenu {
+  Widget build() {
+    final t = ref.watch(translationsProvider).requireValue;
+    return ListView(children: [ListTile(onTap: $_settingsResetSource)]);
+  }
+}
+''';
+
+bool _isApprovedSettingsAddition(_Bindings baseline, _Bindings live, String key) {
+  if (baseline.path != 'baseline/$_settingsPagePath' || live.path != _settingsPagePath) return false;
+  if (baseline.classes.any((node) => node.name.lexeme == 'BlizzardSettingsMenu')) return false;
+  final menus = live.classes.where((node) => node.name.lexeme == 'BlizzardSettingsMenu').toList();
+  if (menus.length != 1) return false;
+  final builds = menus.single.members
+      .whereType<MethodDeclaration>()
+      .where((node) => node.name.lexeme == 'build')
+      .toList();
+  if (builds.length != 1 || builds.single.body is! BlockFunctionBody) return false;
+  final statements = (builds.single.body as BlockFunctionBody).block.statements;
+  if (statements.length != 2 ||
+      _tokens(statements.first) != _statementTokens('final t = ref.watch(translationsProvider).requireValue;') ||
+      statements.last is! ReturnStatement)
+    return false;
+  final expected = _inventory(_settingsMenuFixture(), 'expected-settings').exact;
+  final actual = _inventory('class Check { ${builds.single.toSource()} }', 'actual-settings').exact;
+  if (actual.length != expected.length || expected.keys.any((binding) => actual[binding] != expected[binding]))
+    return false;
+
+  // The reset must remain a ListTile callback in the returned widget tree.
+  final tiles = live.invocations
+      .where(
+        (node) =>
+            node.methodName.name == 'ListTile' &&
+            node.offset >= statements.last.offset &&
+            node.end <= statements.last.end,
+      )
+      .toList();
+  final resets = tiles
+      .expand((tile) => tile.argumentList.arguments.whereType<NamedExpression>())
+      .where(
+        (argument) =>
+            argument.name.label.name == 'onTap' &&
+            _tokens(argument.expression) == _initializerTokens(_settingsResetSource),
+      )
+      .toList();
+  if (resets.length != 1) return false;
+  for (AstNode? node = resets.single.parent; node != statements.last; node = node.parent) {
+    if (node == null ||
+        node is FunctionExpression ||
+        node is FunctionDeclaration ||
+        node is ConditionalExpression ||
+        node is IfElement)
+      return false;
+  }
+
+  // Exactly one construction, directly selected by the presentation gate in SettingsPage.build.
+  final uses = live.creations.where((node) => node.constructorName.type.toSource() == 'BlizzardSettingsMenu').toList();
+  if (uses.length != 1 || _tokens(uses.single) != _initializerTokens('const BlizzardSettingsMenu()')) return false;
+  final gate = uses.single.parent;
+  if (gate is! ConditionalExpression ||
+      gate.thenExpression != uses.single ||
+      _tokens(gate.condition) != _initializerTokens('BlizzardPresentation.isActive(context)') ||
+      gate.elseExpression is! MethodInvocation ||
+      (gate.elseExpression as MethodInvocation).methodName.name != 'ListView')
+    return false;
+  final argument = gate.parent;
+  if (argument is! NamedExpression ||
+      argument.name.label.name != 'child' ||
+      argument.parent?.parent is! MethodInvocation ||
+      (argument.parent!.parent! as MethodInvocation).methodName.name != 'BlizzardBackdrop')
+    return false;
+  AstNode? ancestor = argument;
+  while (ancestor != null && ancestor is! MethodDeclaration) {
+    if (ancestor is FunctionExpression || ancestor is FunctionDeclaration) return false;
+    ancestor = ancestor.parent;
+  }
+  if (ancestor is! MethodDeclaration ||
+      ancestor.name.lexeme != 'build' ||
+      ancestor.parent is! ClassDeclaration ||
+      (ancestor.parent! as ClassDeclaration).name.lexeme != 'SettingsPage')
+    return false;
+  final count = expected[key];
+  return count != null && live.exact[key] == (baseline.exact[key] ?? 0) + count;
+}
+
 String get _serverChoiceCallbackKey =>
     'onPressed:${jsonEncode(['(', ')', '=>', 'context', '.', 'goNamed', '(', "'proxies'", ')'])}';
 
@@ -424,6 +523,139 @@ if (activeProxy == null) {
           );
 }
 
+String _callbackKey(String expression) => 'onPressed:${_initializerTokens(expression)}';
+
+bool _isInClassMethod(
+  AstNode node, {
+  required String className,
+  required String methodName,
+  bool allowFunctionExpression = false,
+}) {
+  for (AstNode? current = node.parent; current != null; current = current.parent) {
+    if (!allowFunctionExpression && (current is FunctionExpression || current is FunctionDeclaration)) return false;
+    if (current is MethodDeclaration) {
+      return current.name.lexeme == methodName &&
+          current.parent is ClassDeclaration &&
+          (current.parent! as ClassDeclaration).name.lexeme == className;
+    }
+  }
+  return false;
+}
+
+int _callbackSiteCount(
+  _Bindings bindings,
+  String expression, {
+  required String className,
+  required String methodName,
+  bool allowFunctionExpression = false,
+}) => bindings.namedExpressions
+    .where(
+      (node) =>
+          node.name.label.name == 'onPressed' &&
+          _tokens(node.expression) == _initializerTokens(expression) &&
+          _isInClassMethod(
+            node,
+            className: className,
+            methodName: methodName,
+            allowFunctionExpression: allowFunctionExpression,
+          ),
+    )
+    .length;
+
+bool _isInReturnedToolbarBranch(NamedExpression node, String expectedCondition) {
+  String? actualCondition;
+  var insideReturnedTree = false;
+  for (AstNode? current = node.parent; current != null; current = current.parent) {
+    if (current is FunctionExpression || current is FunctionDeclaration) return false;
+    if (current is IfElement) {
+      final condition = _tokens(current.expression);
+      if (condition != _initializerTokens('blizzard') && condition != _initializerTokens('!blizzard')) return false;
+      if (node.offset < current.thenElement.offset || node.end > current.thenElement.end) return false;
+      if (actualCondition != null) return false;
+      actualCondition = condition;
+    }
+    if (current is ReturnStatement) insideReturnedTree = true;
+    if (current is MethodDeclaration) {
+      return insideReturnedTree &&
+          actualCondition == _initializerTokens(expectedCondition) &&
+          current.name.lexeme == 'build' &&
+          current.parent is ClassDeclaration &&
+          (current.parent! as ClassDeclaration).name.lexeme == '_ProfilesSheetContent';
+    }
+  }
+  return false;
+}
+
+int _returnedToolbarCallbackCount(_Bindings bindings, String expression, String condition) => bindings.namedExpressions
+    .where(
+      (node) =>
+          node.name.label.name == 'onPressed' &&
+          _tokens(node.expression) == _initializerTokens(expression) &&
+          _isInReturnedToolbarBranch(node, condition),
+    )
+    .length;
+
+bool _isApprovedProfilesToolbarTransformation(_Bindings baseline, _Bindings live, String key) {
+  if (baseline.path != 'baseline/$_profilesModalPath' || live.path != _profilesModalPath) return false;
+
+  const sortLambda = '() => ref.read(dialogNotifierProvider.notifier).showSortProfiles()';
+  const updateLambda = '() => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger()';
+  const sortCallback = 'showSortProfiles';
+  const updateCallback = 'updateSubscriptions';
+  final changedKeys = {
+    _callbackKey(sortLambda),
+    _callbackKey(updateLambda),
+    _callbackKey(sortCallback),
+    _callbackKey(updateCallback),
+  };
+  if (!changedKeys.contains(key)) return false;
+
+  if (_callbackSiteCount(
+            baseline,
+            sortLambda,
+            className: 'ProfilesModal',
+            methodName: 'build',
+            allowFunctionExpression: true,
+          ) !=
+          1 ||
+      _callbackSiteCount(
+            baseline,
+            updateLambda,
+            className: 'ProfilesModal',
+            methodName: 'build',
+            allowFunctionExpression: true,
+          ) !=
+          1 ||
+      _returnedToolbarCallbackCount(live, sortCallback, 'blizzard') != 1 ||
+      _returnedToolbarCallbackCount(live, sortCallback, '!blizzard') != 1 ||
+      _returnedToolbarCallbackCount(live, updateCallback, 'blizzard') != 1 ||
+      _returnedToolbarCallbackCount(live, updateCallback, '!blizzard') != 1) {
+    return false;
+  }
+
+  final statements = live.directStatements['_ProfilesSheetContent::build'];
+  if (statements == null) return false;
+  final sortDeclaration = _statementTokens(
+    'void showSortProfiles() => ref.read(dialogNotifierProvider.notifier).showSortProfiles();',
+  );
+  final updateDeclaration = _statementTokens(
+    'void updateSubscriptions() => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger();',
+  );
+  if (statements.where((statement) => statement == sortDeclaration).length != 1 ||
+      statements.where((statement) => statement == updateDeclaration).length != 1) {
+    return false;
+  }
+
+  return baseline.exact[_callbackKey(sortLambda)] == 1 &&
+      baseline.exact[_callbackKey(updateLambda)] == 1 &&
+      (baseline.exact[_callbackKey(sortCallback)] ?? 0) == 0 &&
+      (baseline.exact[_callbackKey(updateCallback)] ?? 0) == 0 &&
+      (live.exact[_callbackKey(sortLambda)] ?? 0) == 0 &&
+      (live.exact[_callbackKey(updateLambda)] ?? 0) == 0 &&
+      live.exact[_callbackKey(sortCallback)] == 2 &&
+      live.exact[_callbackKey(updateCallback)] == 2;
+}
+
 List<String> _differences(_Bindings baseline, _Bindings live) {
   final issues = <String>[];
   final approvedServerChoiceFallback = _isApprovedServerChoiceFallback(baseline, live);
@@ -432,6 +664,8 @@ List<String> _differences(_Bindings baseline, _Bindings live) {
         !_isApprovedStateAddition(baseline, live, key) &&
         !_isApprovedActionLabelAddition(baseline, live, key) &&
         !_isApprovedHomeProfileAddition(baseline, live, key) &&
+        !_isApprovedSettingsAddition(baseline, live, key) &&
+        !_isApprovedProfilesToolbarTransformation(baseline, live, key) &&
         !(approvedServerChoiceFallback && key == _serverChoiceCallbackKey)) {
       issues.add('binding multiplicity changed: $key');
     }
@@ -458,6 +692,148 @@ List<String> _differences(_Bindings baseline, _Bindings live) {
 }
 
 void main() {
+  group('approved Profiles toolbar callback forwarding', () {
+    const baseline = '''
+class ProfilesModal {
+  void build() {
+    Widget(onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles());
+    Widget(onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger());
+  }
+}
+''';
+    const live = '''
+class _ProfilesSheetContent {
+  void build() {
+    void showSortProfiles() => ref.read(dialogNotifierProvider.notifier).showSortProfiles();
+    void updateSubscriptions() => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger();
+    return Widget(children: [
+      if (blizzard) Widget(children: [
+        Widget(onPressed: showSortProfiles),
+        Widget(onPressed: updateSubscriptions),
+      ]),
+      if (!blizzard) Widget(children: [
+        Widget(onPressed: showSortProfiles),
+        Widget(onPressed: updateSubscriptions),
+      ]),
+    ]);
+  }
+}
+''';
+
+    test('accepts one provider call and two forwarding sites per action', () {
+      expect(
+        _differences(_inventory(baseline, 'baseline/$_profilesModalPath'), _inventory(live, _profilesModalPath)),
+        isEmpty,
+      );
+    });
+
+    for (final mutation in <String, String Function(String)>{
+      'dropped forwarding site': (source) => source.replaceFirst('Widget(onPressed: showSortProfiles),', ''),
+      'duplicated forwarding site': (source) => source.replaceFirst(
+        'Widget(onPressed: showSortProfiles),',
+        'Widget(onPressed: showSortProfiles), Widget(onPressed: showSortProfiles),',
+      ),
+      'renamed callback': (source) => source.replaceFirst('void showSortProfiles()', 'void renamedSortProfiles()'),
+      'unused callback': (source) => source.replaceAll('onPressed: updateSubscriptions', 'onPressed: null'),
+      'both actions on the Blizzard branch': (source) => source.replaceFirst('if (!blizzard)', 'if (blizzard)'),
+      'both branches unconditional': (source) => source.replaceAll(RegExp(r'if \(!?blizzard\) '), ''),
+      'legacy actions unreachable': (source) => source.replaceFirst('if (!blizzard)', 'if (false)'),
+      'legacy actions nested under false': (source) => source.replaceFirst(
+        '''if (!blizzard) Widget(children: [
+        Widget(onPressed: showSortProfiles),
+        Widget(onPressed: updateSubscriptions),
+      ]),''',
+        '''if (!blizzard) Widget(children: [
+        if (false) Widget(children: [
+          Widget(onPressed: showSortProfiles),
+          Widget(onPressed: updateSubscriptions),
+        ]),
+      ]),''',
+      ),
+      'legacy actions in the opposite else branch': (source) => source.replaceFirst(
+        '''if (!blizzard) Widget(children: [
+        Widget(onPressed: showSortProfiles),
+        Widget(onPressed: updateSubscriptions),
+      ]),''',
+        '''if (!blizzard) Widget() else Widget(children: [
+        Widget(onPressed: showSortProfiles),
+        Widget(onPressed: updateSubscriptions),
+      ]),''',
+      ),
+      'unattached widget expressions': (source) => source
+          .replaceFirst('return Widget(children: [', '''Widget(onPressed: showSortProfiles);
+    Widget(onPressed: updateSubscriptions);
+    return Widget(children: [''')
+          .replaceFirst('''if (!blizzard) Widget(children: [
+        Widget(onPressed: showSortProfiles),
+        Widget(onPressed: updateSubscriptions),
+      ]),''', ''),
+      'duplicated provider call': (source) => source.replaceFirst(
+        'void showSortProfiles() => ref.read(dialogNotifierProvider.notifier).showSortProfiles();',
+        '''
+        void showSortProfiles() {
+          ref.read(dialogNotifierProvider.notifier).showSortProfiles();
+          ref.read(dialogNotifierProvider.notifier).showSortProfiles();
+        }''',
+      ),
+    }.entries) {
+      test('rejects ${mutation.key}', () {
+        expect(
+          _differences(
+            _inventory(baseline, 'baseline/$_profilesModalPath'),
+            _inventory(mutation.value(live), _profilesModalPath),
+          ),
+          isNotEmpty,
+        );
+      });
+    }
+  });
+
+  group('approved Blizzard settings presentation', () {
+    const baseline = 'class SettingsPage { Widget build() { return ListView(); } }';
+    final live =
+        '''
+class SettingsPage {
+ Widget build() { return BlizzardBackdrop(child: BlizzardPresentation.isActive(context) ? const BlizzardSettingsMenu() : ListView()); }
+}
+${_settingsMenuFixture()}
+''';
+    test('accepts exact reset and translation bindings only in the gated menu', () {
+      expect(
+        _differences(_inventory(baseline, 'baseline/$_settingsPagePath'), _inventory(live, _settingsPagePath)),
+        isEmpty,
+      );
+    });
+    for (final mutation in <String, String Function(String)>{
+      'wrong provider': (s) => s.replaceFirst('resetTunnelNotifierProvider', 'otherProvider'),
+      'wrong action': (s) => s.replaceFirst('.run()', '.reset()'),
+      'duplicate callback': (s) =>
+          s.replaceFirst('ListTile(onTap:', 'ListTile(onLongPress: $_settingsResetSource, onTap:'),
+      'duplicate watch': (s) =>
+          s.replaceFirst('return ListView(children:', 'ref.watch(translationsProvider); return ListView(children:'),
+      'moved method': (s) => s.replaceFirst('Widget build() {\n    final t', 'Widget other() {\n    final t'),
+      'ungated branch': (s) => s.replaceFirst('BlizzardPresentation.isActive(context)', 'true'),
+      'reversed gate': (s) =>
+          s.replaceFirst('BlizzardPresentation.isActive(context)', '!BlizzardPresentation.isActive(context)'),
+      'wrong page': (s) => s.replaceFirst('class SettingsPage', 'class OtherPage'),
+      'duplicate menu use': (s) => s.replaceFirst(': ListView()', ': const BlizzardSettingsMenu()'),
+      'reset moved into closure': (s) => s.replaceFirst(
+        'ListView(children: [ListTile(onTap: $_settingsResetSource)])',
+        'Builder(builder: () => ListTile(onTap: $_settingsResetSource))',
+      ),
+    }.entries) {
+      test('rejects ${mutation.key}', () {
+        expect(
+          _differences(
+            _inventory(baseline, 'baseline/$_settingsPagePath'),
+            _inventory(mutation.value(live), _settingsPagePath),
+          ),
+          isNotEmpty,
+        );
+      });
+    }
+  });
+
   test('all allowed presentation files preserve shipped state/action bindings', () {
     final listed = Process.runSync('git', ['ls-tree', '-r', '--name-only', _baseline, 'lib']);
     expect(listed.exitCode, 0, reason: '${listed.stderr}');

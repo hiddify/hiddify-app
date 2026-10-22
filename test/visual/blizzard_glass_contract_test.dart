@@ -93,8 +93,6 @@ void main() {
 
   for (final media in [
     const MediaQueryData(highContrast: true),
-    const MediaQueryData(accessibleNavigation: true),
-    const MediaQueryData(disableAnimations: true),
   ]) {
     testWidgets('glass has an opaque unfiltered accessible fallback: $media', (tester) async {
       await tester.pumpWidget(_fixture(media: media));
@@ -104,6 +102,21 @@ void main() {
       expect(pixels.sublist(left, left + 4), pixels.sublist(right, right + 4));
       expect(find.byType(BackdropFilter), findsNothing);
       expect(tester.getSize(find.byKey(const ValueKey('glass-control'))), const Size(148, 148));
+      expect(tester.binding.hasScheduledFrame, isFalse);
+    });
+  }
+
+  for (final media in [
+    const MediaQueryData(accessibleNavigation: true),
+    const MediaQueryData(disableAnimations: true),
+  ]) {
+    testWidgets('motion preferences keep background transmission without a ticker: $media', (tester) async {
+      await tester.pumpWidget(_fixture(media: media));
+      final pixels = await _pixels(tester);
+      const left = (120 * 240 + 85) * 4;
+      const right = (120 * 240 + 155) * 4;
+      expect(pixels[left] - pixels[left + 1], greaterThan(40));
+      expect(pixels[right + 1] - pixels[right], greaterThan(40));
       expect(tester.binding.hasScheduledFrame, isFalse);
     });
   }

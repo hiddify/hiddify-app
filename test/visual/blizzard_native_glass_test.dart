@@ -5,6 +5,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_glass.dart';
 
 void main() {
+  for (final media in [
+    const MediaQueryData(disableAnimations: true),
+    const MediaQueryData(accessibleNavigation: true),
+  ]) {
+    testWidgets('motion preferences retain native glass: $media', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: media,
+            child: const BlizzardGlass(active: true, radius: 32, child: SizedBox(width: 320, height: 64)),
+          ),
+        ),
+      );
+      expect(find.byType(UiKitView), findsOneWidget,
+          reason: 'Reduced motion and screen-reader navigation do not request reduced transparency');
+      await tester.pumpAndSettle();
+      expect(tester.binding.hasScheduledFrame, isFalse);
+      await tester.pumpWidget(const SizedBox.shrink());
+      debugDefaultTargetPlatformOverride = null;
+    });
+  }
   testWidgets('native glass is decoration below the only Flutter action and semantics node', (tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);

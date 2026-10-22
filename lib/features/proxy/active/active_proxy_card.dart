@@ -1,7 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/core/theme/blizzard_tokens.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
@@ -26,7 +29,10 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     final ios = Theme.of(context).platform == TargetPlatform.iOS && ref.watch(iosActiveProxyMeasurementEnabledProvider);
     final activeProxy = ios ? ref.watch(iosActiveProxyMeasurementStateProvider).asData?.value.proxy : legacyProxy;
     final t = ref.watch(translationsProvider).requireValue;
-    final blizzard = BlizzardPresentation.isActive(context);
+    final presentationTheme = BlizzardPresentation.themeOf(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) ||
+        (presentationTheme.extension<BlizzardEligibility>()?.applied ?? false);
 
     if (connectionState != const Connected()) {
       return const SizedBox.shrink();
@@ -45,6 +51,18 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
 
     final theme = Theme.of(context);
     final materials = BlizzardMaterials(highContrast: MediaQuery.highContrastOf(context));
+    final textScaler = MediaQuery.textScalerOf(context);
+    final selectedServer = activeProxy.groupSelectedTagDisplay.trim().isNotEmpty
+        ? activeProxy.groupSelectedTagDisplay.trim()
+        : activeProxy.tagDisplay.trim().isNotEmpty
+        ? activeProxy.tagDisplay.trim()
+        : activeProxy.tag.trim();
+    final serverSubtitle = [selectedServer, activeProxy.type.trim()].where((value) => value.isNotEmpty).join(' · ');
+    double scaledLineHeight(TextStyle? style) => textScaler.scale(style?.fontSize ?? 0) * (style?.height ?? 1);
+    final blizzardHeight = math.max(
+      84.0,
+      (28 + scaledLineHeight(theme.textTheme.bodyLarge) + scaledLineHeight(theme.textTheme.bodySmall)).ceilToDouble(),
+    );
 
     // Handle URL test in a way that won't trigger during build
     Future<void> handleUrlTest() async {
@@ -58,16 +76,23 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     }
 
     return Container(
+      height: blizzard ? blizzardHeight : null,
       constraints: blizzard ? const BoxConstraints(minHeight: 84) : null,
       margin: blizzard ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: blizzard ? materials.content : theme.colorScheme.background.withOpacity(1),
-        border: blizzard ? Border.all(color: materials.edge) : null,
+        border: null,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: theme.colorScheme.secondary.withOpacity(.21), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
+        boxShadow: blizzard
+            ? const []
+            : [
+                BoxShadow(
+                  color: theme.colorScheme.secondary.withOpacity(.21),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: InkWell(
         onTap: () {
@@ -105,39 +130,46 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: blizzard ? 3 : 0,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (activeProxy.ipinfo.ip.isNotEmpty)
-                              Flexible(
-                                flex: blizzard ? 1 : 0,
-                                child: IPText(ip: activeProxy.ipinfo.ip, onLongPress: handleUrlTest, constrained: true),
-                              )
-                            else
-                              Flexible(
-                                flex: blizzard ? 1 : 0,
-                                child: UnknownIPText(text: t.pages.proxies.unknownIp, onTap: handleUrlTest),
-                              ),
-                          ],
+                  if (blizzard)
+                    Text(serverSubtitle, style: theme.textTheme.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis)
+                  else
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 0,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (activeProxy.ipinfo.ip.isNotEmpty)
+                                Flexible(
+                                  flex: 0,
+                                  child: IPText(
+                                    ip: activeProxy.ipinfo.ip,
+                                    onLongPress: handleUrlTest,
+                                    constrained: true,
+                                  ),
+                                )
+                              else
+                                Flexible(
+                                  flex: 0,
+                                  child: UnknownIPText(text: t.pages.proxies.unknownIp, onTap: handleUrlTest),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const Spacer(),
-                      Flexible(
-                        flex: blizzard ? 1 : 0,
-                        child: Text(
-                          // getRealOutboundTag(activeProxy),
-                          activeProxy.type,
-                          style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        const Spacer(),
+                        Flexible(
+                          flex: 0,
+                          child: Text(
+                            // getRealOutboundTag(activeProxy),
+                            activeProxy.type,
+                            style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                 ],
               ),
             ),

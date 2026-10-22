@@ -6,6 +6,28 @@ import 'package:hiddify/core/theme/blizzard_tokens.dart';
 import 'package:hiddify/core/theme/blizzard_theme.dart';
 
 void main() {
+  testWidgets('v3 dock uses the outlined Home and Settings symbols', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: BlizzardDock(
+            actions: [
+              ShellRouteAction(Icons.home_rounded, 'Home'),
+              ShellRouteAction(Icons.settings_rounded, 'Settings'),
+            ],
+            selectedIndex: 0,
+            onDestinationSelected: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.home_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.home_rounded), findsNothing);
+    expect(find.byIcon(Icons.settings_rounded), findsNothing);
+  });
+
   testWidgets('dock accommodates live text scaling throughout the transition', (tester) async {
     final scale = ValueNotifier<double>(1);
     addTearDown(scale.dispose);

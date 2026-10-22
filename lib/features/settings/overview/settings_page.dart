@@ -144,87 +144,262 @@ class SettingsPage extends HookConsumerWidget {
           ],
         ),
         body: BlizzardBackdrop(
-          child: ListView(
-            padding: BlizzardPresentation.isActive(context) ? const EdgeInsets.all(16) : null,
-            children: [
-              // TipCard(message: t.settings.experimentalMsg),
-              SettingsSection(
-                title: t.pages.settings.general.title,
-                icon: Icons.layers_rounded,
-                namedLocation: context.namedLocation('general'),
-              ),
-              SettingsSection(
-                title: t.pages.settings.routing.title,
-                icon: Icons.route_rounded,
-                namedLocation: context.namedLocation('routeOptions'),
-              ),
-              SettingsSection(
-                title: t.pages.settings.dns.title,
-                icon: Icons.dns_rounded,
-                namedLocation: context.namedLocation('dnsOptions'),
-              ),
-              SettingsSection(
-                title: t.pages.settings.inbound.title,
-                icon: Icons.input_rounded,
-                namedLocation: context.namedLocation('inboundOptions'),
-              ),
-              SettingsSection(
-                title: t.pages.settings.tlsTricks.title,
-                icon: Icons.content_cut_rounded,
-                namedLocation: context.namedLocation('tlsTricks'),
-              ),
-              SettingsSection(
-                title: t.pages.settings.warp.title,
-                icon: Icons.cloud_rounded,
-                namedLocation: context.namedLocation('warpOptions'),
-              ),
-              if (PlatformUtils.isIOS)
-                Material(
-                  borderRadius: BlizzardPresentation.isActive(context)
-                      ? BorderRadius.circular(BlizzardRadii.row)
-                      : null,
-                  clipBehavior: BlizzardPresentation.isActive(context) ? Clip.antiAlias : Clip.none,
-                  child: ListTile(
-                    title: Text(t.pages.settings.resetTunnel),
-                    leading: const Icon(Icons.autorenew_rounded),
-                    onTap: () async {
-                      await ref.read(resetTunnelNotifierProvider.notifier).run();
-                    },
-                  ),
+          child: BlizzardPresentation.isActive(context)
+              ? const BlizzardSettingsMenu()
+              : ListView(
+                  children: [
+                    // TipCard(message: t.settings.experimentalMsg),
+                    SettingsSection(
+                      title: t.pages.settings.general.title,
+                      icon: Icons.layers_rounded,
+                      namedLocation: context.namedLocation('general'),
+                    ),
+                    SettingsSection(
+                      title: t.pages.settings.routing.title,
+                      icon: Icons.route_rounded,
+                      namedLocation: context.namedLocation('routeOptions'),
+                    ),
+                    SettingsSection(
+                      title: t.pages.settings.dns.title,
+                      icon: Icons.dns_rounded,
+                      namedLocation: context.namedLocation('dnsOptions'),
+                    ),
+                    SettingsSection(
+                      title: t.pages.settings.inbound.title,
+                      icon: Icons.input_rounded,
+                      namedLocation: context.namedLocation('inboundOptions'),
+                    ),
+                    SettingsSection(
+                      title: t.pages.settings.tlsTricks.title,
+                      icon: Icons.content_cut_rounded,
+                      namedLocation: context.namedLocation('tlsTricks'),
+                    ),
+                    SettingsSection(
+                      title: t.pages.settings.warp.title,
+                      icon: Icons.cloud_rounded,
+                      namedLocation: context.namedLocation('warpOptions'),
+                    ),
+                    if (PlatformUtils.isIOS)
+                      Material(
+                        borderRadius: BlizzardPresentation.isActive(context)
+                            ? BorderRadius.circular(BlizzardRadii.row)
+                            : null,
+                        clipBehavior: BlizzardPresentation.isActive(context) ? Clip.antiAlias : Clip.none,
+                        child: ListTile(
+                          title: Text(t.pages.settings.resetTunnel),
+                          leading: const Icon(Icons.autorenew_rounded),
+                          onTap: () async {
+                            await ref.read(resetTunnelNotifierProvider.notifier).run();
+                          },
+                        ),
+                      ),
+                    if (Breakpoint(context).isMobile()) ...[
+                      SettingsSection(
+                        title: t.pages.logs.title,
+                        icon: Icons.description_rounded,
+                        namedLocation: context.namedLocation('logs'),
+                      ),
+                      SettingsSection(
+                        title: t.pages.about.title,
+                        icon: Icons.info_rounded,
+                        namedLocation: context.namedLocation('about'),
+                      ),
+                    ],
+                  ],
                 ),
-              if (Breakpoint(context).isMobile()) ...[
-                SettingsSection(
-                  title: t.pages.logs.title,
-                  icon: Icons.description_rounded,
-                  namedLocation: context.namedLocation('logs'),
-                ),
-                SettingsSection(
-                  title: t.pages.about.title,
-                  icon: Icons.info_rounded,
-                  namedLocation: context.namedLocation('about'),
-                ),
-              ],
-            ],
-          ),
         ),
       ),
     );
   }
 }
 
+class BlizzardSettingsMenu extends ConsumerWidget {
+  const BlizzardSettingsMenu({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      children: [
+        _BlizzardSettingsGroup(
+          groupKey: const ValueKey('settings-group-application'),
+          title: t.$meta.locale == AppLocale.ru ? 'Приложение' : 'Application',
+          children: [
+            SettingsSection(
+              title: t.pages.settings.general.title,
+              icon: Icons.tune_outlined,
+              namedLocation: context.namedLocation('general'),
+              blizzardStyle: true,
+            ),
+            SettingsSection(
+              title: t.pages.about.title,
+              icon: Icons.info_outline_rounded,
+              namedLocation: context.namedLocation('about'),
+              blizzardStyle: true,
+            ),
+          ],
+        ),
+        const Gap(16),
+        _BlizzardSettingsGroup(
+          groupKey: const ValueKey('settings-group-connection'),
+          title: t.$meta.locale == AppLocale.ru ? 'Подключение' : t.components.stats.connection,
+          children: [
+            SettingsSection(
+              title: t.pages.settings.routing.title,
+              icon: Icons.alt_route_rounded,
+              namedLocation: context.namedLocation('routeOptions'),
+              blizzardStyle: true,
+            ),
+            SettingsSection(
+              title: t.pages.settings.dns.title,
+              icon: Icons.dns_outlined,
+              namedLocation: context.namedLocation('dnsOptions'),
+              blizzardStyle: true,
+            ),
+            SettingsSection(
+              title: t.pages.settings.inbound.title,
+              icon: Icons.input_outlined,
+              namedLocation: context.namedLocation('inboundOptions'),
+              blizzardStyle: true,
+            ),
+            SettingsSection(
+              title: t.pages.settings.tlsTricks.title,
+              icon: Icons.build_outlined,
+              namedLocation: context.namedLocation('tlsTricks'),
+              blizzardStyle: true,
+            ),
+            SettingsSection(
+              title: t.pages.settings.warp.title,
+              icon: Icons.bolt_outlined,
+              namedLocation: context.namedLocation('warpOptions'),
+              blizzardStyle: true,
+            ),
+          ],
+        ),
+        const Gap(16),
+        _BlizzardSettingsGroup(
+          groupKey: const ValueKey('settings-group-diagnostics'),
+          title: t.$meta.locale == AppLocale.ru ? 'Диагностика' : 'Diagnostics',
+          children: [
+            SettingsSection(
+              title: t.pages.logs.title,
+              icon: Icons.article_outlined,
+              namedLocation: context.namedLocation('logs'),
+              blizzardStyle: true,
+            ),
+          ],
+        ),
+        const Gap(16),
+        Material(
+          key: const ValueKey('settings-reset-tunnel'),
+          borderRadius: BorderRadius.circular(16),
+          clipBehavior: Clip.antiAlias,
+          child: ListTileTheme.merge(
+            shape: const RoundedRectangleBorder(),
+            minVerticalPadding: 0,
+            minTileHeight: 48,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+              title: Text(
+                t.pages.settings.resetTunnel,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: BlizzardPalette.error, fontSize: 17),
+              ),
+              onTap: () async {
+                await ref.read(resetTunnelNotifierProvider.notifier).run();
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BlizzardSettingsGroup extends StatelessWidget {
+  const _BlizzardSettingsGroup({required this.groupKey, required this.title, required this.children});
+
+  final Key groupKey;
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontSize: 13,
+            height: 1.3,
+          ),
+        ),
+        const Gap(8),
+        Material(
+          key: groupKey,
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(18),
+          clipBehavior: Clip.antiAlias,
+          child: ListTileTheme.merge(
+            shape: const RoundedRectangleBorder(),
+            minVerticalPadding: 0,
+            minTileHeight: 48,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (var index = 0; index < children.length; index++) ...[
+                  Stack(
+                    children: [
+                      ConstrainedBox(constraints: const BoxConstraints(minHeight: 48), child: children[index]),
+                      if (index != children.length - 1)
+                        const Positioned(
+                          left: 46,
+                          right: 0,
+                          bottom: 0,
+                          child: Divider(height: 1, thickness: 1, color: Color(0x12BACDDB)),
+                        ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class SettingsSection extends HookConsumerWidget {
-  const SettingsSection({super.key, required this.title, required this.icon, required this.namedLocation});
+  const SettingsSection({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.namedLocation,
+    this.blizzardStyle = false,
+  });
 
   final String title;
   final IconData icon;
   final String namedLocation;
+  final bool blizzardStyle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-      leading: Icon(icon),
+      contentPadding: blizzardStyle ? const EdgeInsets.symmetric(horizontal: 14) : null,
+      minLeadingWidth: blizzardStyle ? 20 : null,
+      horizontalTitleGap: blizzardStyle ? 12 : null,
+      leading: Icon(icon, size: blizzardStyle ? 20 : null, color: blizzardStyle ? BlizzardPalette.secondary : null),
       title: Text(title),
-      trailing: const Icon(Icons.chevron_right_rounded),
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        size: blizzardStyle ? 20 : null,
+        color: blizzardStyle ? BlizzardPalette.secondary : null,
+      ),
       onTap: () => context.go(namedLocation),
     );
   }

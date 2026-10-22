@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_scene.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
@@ -20,7 +21,9 @@ class HomePage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final blizzard = BlizzardPresentation.isActive(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) ||
+        (Theme.of(context).extension<BlizzardEligibility>()?.applied ?? false);
     final theme = BlizzardPresentation.themeOf(context);
     final t = ref.watch(translationsProvider).requireValue;
     // final hasAnyProfile = ref.watch(hasAnyProfileProvider);
@@ -40,8 +43,8 @@ class HomePage extends HookConsumerWidget {
             children: [
               // Keep this decorative slot stable across appearance changes.
               // ignore: prefer_if_elements_to_conditional_expressions
-              blizzard ? const Icon(Icons.power_settings_new_rounded, size: 24) : Assets.images.logo.svg(height: 24),
-              const Gap(8),
+              blizzard ? const SizedBox.shrink() : Assets.images.logo.svg(height: 24),
+              blizzard ? const SizedBox.shrink() : const Gap(8),
               const Flexible(
                 child: Text.rich(
                   TextSpan(

@@ -5,6 +5,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/features/profile/add/widgets/free_btns.dart';
 import 'package:hiddify/features/profile/add/widgets/widgets.dart';
@@ -62,16 +63,20 @@ class AddProfileOptions extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // final isLoadingProfile = ref.watch(addProfileNotifierProvider).isLoading;
     final freeSwitch = ref.watch(freeSwitchNotifierProvider);
-    final isDesktop = PlatformUtils.isDesktop;
+    final theme = BlizzardPresentation.themeOf(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) || (theme.extension<BlizzardEligibility>()?.applied ?? false);
+    final isDesktop = PlatformUtils.isDesktop && !blizzard;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final fixBtnsHeight =
-            (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * AddProfileModalConst.fixBtnsGapCount) /
-            AddProfileModalConst.fixBtnsItemCount;
+        final fixBtnsHeight = blizzard
+            ? 115.0
+            : (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * AddProfileModalConst.fixBtnsGapCount) /
+                  AddProfileModalConst.fixBtnsItemCount;
         final fullHeight = fixBtnsHeight + AddProfileModalConst.navBarHeight + 32;
-        final initial = !freeSwitch ? fullHeight : fullHeight + 180;
-        var min = !freeSwitch ? fullHeight : fullHeight + 100;
-        var max = !freeSwitch ? fullHeight / constraints.maxHeight : 0.85;
+        final initial = blizzard && !freeSwitch ? 245.0 : (!freeSwitch ? fullHeight : fullHeight + 180);
+        var min = blizzard && !freeSwitch ? 245.0 : (!freeSwitch ? fullHeight : fullHeight + 100);
+        var max = !freeSwitch ? (blizzard ? initial : fullHeight) / constraints.maxHeight : 0.85;
         if (isDesktop) {
           min = initial;
           max = initial / constraints.maxHeight;

@@ -11,6 +11,7 @@ import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/core/theme/blizzard_tokens.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
@@ -21,7 +22,6 @@ import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileTile extends HookConsumerWidget {
@@ -38,7 +38,8 @@ class ProfileTile extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = BlizzardPresentation.themeOf(context);
-    final blizzard = BlizzardPresentation.isActive(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) || (theme.extension<BlizzardEligibility>()?.applied ?? false);
 
     final selectActiveMutation = useMutation(
       initialOnFailure: (err) {
@@ -66,7 +67,9 @@ class ProfileTile extends HookConsumerWidget {
         // elevation: effectiveElevation,
         margin: margin,
         shape: RoundedRectangleBorder(
-          side: profile.active
+          side: blizzard && isMain
+              ? BorderSide.none
+              : profile.active
               ? BorderSide(color: blizzard ? BlizzardPalette.glassEdge : theme.colorScheme.outline)
               : BorderSide.none,
           borderRadius: blizzard ? BorderRadius.circular(BlizzardRadii.card) : ProfileTileConst.cardBorderRadius,
@@ -78,16 +81,18 @@ class ProfileTile extends HookConsumerWidget {
         // shadowColor: Colors.transparent,
         child: IntrinsicHeight(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 48),
+            constraints: BoxConstraints(minHeight: blizzard && isMain ? 76 : 48),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (showActionButton) ...[
-                  SizedBox(
-                    width: 48,
-                    child: Semantics(sortKey: const OrdinalSortKey(1), child: ProfileActionButton(profile, !isMain)),
-                  ),
-                  if (profile.active) VerticalDivider(width: 1, color: theme.colorScheme.outline) else const Gap(1),
+                  if (!(blizzard && isMain)) ...[
+                    SizedBox(
+                      width: 48,
+                      child: Semantics(sortKey: const OrdinalSortKey(1), child: ProfileActionButton(profile, !isMain)),
+                    ),
+                    if (profile.active) VerticalDivider(width: 1, color: theme.colorScheme.outline) else const Gap(1),
+                  ],
                 ],
                 Expanded(
                   child: Semantics(
@@ -125,60 +130,94 @@ class ProfileTile extends HookConsumerWidget {
                           }
                         }
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        child: Column(
-                          // mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (isMain)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                child: Material(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.transparent,
-                                  clipBehavior: Clip.antiAlias,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          profile.name,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: theme.textTheme.titleMedium?.copyWith(
-                                            fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
-                                          ),
-                                          semanticsLabel: t.pages.profiles.activeProfileName(name: profile.name),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: blizzard && isMain ? 16 : 12, vertical: 4),
+                              child: Column(
+                                // mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isMain)
+                                    if (blizzard)
+                                      Text(
+                                        profile.name,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: theme.textTheme.titleMedium?.copyWith(
+                                          fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
                                         ),
+                                        semanticsLabel: t.pages.profiles.activeProfileName(name: profile.name),
+                                      )
+                                    else
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 4),
+                                        child: Material(
+                                          borderRadius: BorderRadius.circular(8),
+                                          color: Colors.transparent,
+                                          clipBehavior: Clip.antiAlias,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  profile.name,
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: theme.textTheme.titleMedium?.copyWith(
+                                                    fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
+                                                  ),
+                                                  semanticsLabel: t.pages.profiles.activeProfileName(
+                                                    name: profile.name,
+                                                  ),
+                                                ),
+                                              ),
+                                              const Icon(Icons.arrow_drop_down_rounded),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                  else
+                                    Text(
+                                      profile.name,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.titleMedium?.copyWith(
+                                        fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
                                       ),
-                                      const Icon(Icons.arrow_drop_down_rounded),
+                                      semanticsLabel: profile.active
+                                          ? t.pages.profiles.activeProfileName(name: profile.name)
+                                          : t.pages.profiles.nonActiveProfileName(name: profile.name),
+                                    ),
+                                  if (subInfo != null) ...[
+                                    if (!(blizzard && isMain)) ...[
+                                      const Gap(4),
+                                      RemainingTrafficIndicator(subInfo.ratio),
                                     ],
-                                  ),
-                                ),
-                              )
-                            else
-                              Text(
-                                profile.name,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontFamily: PlatformUtils.isWindows ? FontFamily.emoji : null,
-                                ),
-                                semanticsLabel: profile.active
-                                    ? t.pages.profiles.activeProfileName(name: profile.name)
-                                    : t.pages.profiles.nonActiveProfileName(name: profile.name),
+                                    const Gap(4),
+                                    ProfileSubscriptionInfo(subInfo, inline: blizzard && isMain),
+                                    if (!(blizzard && isMain)) const Gap(4),
+                                  ],
+                                ],
                               ),
-                            if (subInfo != null) ...[
-                              const Gap(4),
-                              RemainingTrafficIndicator(subInfo.ratio),
-                              const Gap(4),
-                              ProfileSubscriptionInfo(subInfo),
-                              const Gap(4),
-                            ],
-                          ],
-                        ),
+                            ),
+                          ),
+                          if (showActionButton && blizzard && isMain)
+                            SizedBox(
+                              width: 40,
+                              child: Semantics(
+                                sortKey: const OrdinalSortKey(1),
+                                child: ProfileActionButton(profile, !isMain),
+                              ),
+                            ),
+                          if (blizzard && isMain)
+                            const Padding(
+                              padding: EdgeInsetsDirectional.only(end: 12),
+                              child: Icon(Icons.arrow_forward_ios, size: 16),
+                            ),
+                        ],
                       ),
                     ),
                   ),
@@ -336,9 +375,10 @@ class ProfileActionsMenu extends HookConsumerWidget {
 
 // TODO add support url
 class ProfileSubscriptionInfo extends HookConsumerWidget {
-  const ProfileSubscriptionInfo(this.subInfo, {super.key});
+  const ProfileSubscriptionInfo(this.subInfo, {super.key, this.inline = false});
 
   final SubscriptionInfo subInfo;
+  final bool inline;
 
   (String, Color?) remainingText(TranslationsEn t, ThemeData theme) {
     if (subInfo.isExpired) {
@@ -358,6 +398,17 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final remaining = remainingText(t, theme);
+    final traffic = subInfo.total > 10 * 1099511627776 ? '∞ GiB' : subInfo.consumption.sizeOf(subInfo.total);
+    if (inline) {
+      return Text(
+        '\u2066$traffic\u2069 · ${remaining.$1}',
+        semanticsLabel:
+            '${t.components.subscriptionInfo.remainingTrafficSemanticLabel(consumed: subInfo.consumption.sizeGB(), total: subInfo.total.sizeGB())}, ${remaining.$1}',
+        style: theme.textTheme.bodySmall?.copyWith(color: remaining.$2),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -365,11 +416,7 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
           textDirection: TextDirection.ltr,
           child: Flexible(
             child: Text(
-              subInfo.total >
-                      10 *
-                          1099511627776 //10TB
-                  ? "∞ GiB"
-                  : subInfo.consumption.sizeOf(subInfo.total),
+              traffic,
               semanticsLabel: t.components.subscriptionInfo.remainingTrafficSemanticLabel(
                 consumed: subInfo.consumption.sizeGB(),
                 total: subInfo.total.sizeGB(),

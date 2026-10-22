@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_backdrop.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
@@ -19,6 +21,9 @@ class ProfilesModal extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final asyncProfiles = ref.watch(profilesNotifierProvider);
+    final theme = BlizzardPresentation.themeOf(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) || (theme.extension<BlizzardEligibility>()?.applied ?? false);
 
     ref.listen(profilesNotifierProvider, (_, next) {
       if (next.hasValue && next.value!.isEmpty) {
@@ -26,9 +31,13 @@ class ProfilesModal extends HookConsumerWidget {
       }
     });
 
-    final initialSize = PlatformUtils.isDesktop ? .60 : .35;
+    final initialSize = blizzard
+        ? (223 / MediaQuery.sizeOf(context).height).clamp(.20, .85)
+        : PlatformUtils.isDesktop
+        ? .60
+        : .35;
     return Theme(
-      data: BlizzardPresentation.themeOf(context),
+      data: theme,
       child: SafeArea(
         child: asyncProfiles.when(
           data: (data) => DraggableScrollableSheet(
@@ -37,53 +46,100 @@ class ProfilesModal extends HookConsumerWidget {
             expand: false,
             builder: (context, scrollController) => ScrollConfiguration(
               behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-              child: BlizzardBackdrop(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ListView.separated(
-                        padding: const EdgeInsets.all(12),
-                        separatorBuilder: (context, index) => const Gap(12),
-                        // shrinkWrap: true,
-                        controller: scrollController,
-                        itemBuilder: (context, index) => ProfileTile(profile: data[index]),
-                        itemCount: data.length,
+              child: blizzard
+                  ? ColoredBox(
+                      color: theme.colorScheme.surface,
+                      child: _ProfilesSheetContent(
+                        data: data,
+                        scrollController: scrollController,
+                        blizzard: true,
+                        t: t,
+                      ),
+                    )
+                  : BlizzardBackdrop(
+                      child: _ProfilesSheetContent(
+                        data: data,
+                        scrollController: scrollController,
+                        blizzard: false,
+                        t: t,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
-                      child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          FilledButton.icon(
-                            label: Text(t.common.sort, maxLines: 1, overflow: TextOverflow.ellipsis),
-                            icon: const Icon(Icons.sort_rounded),
-                            onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),
-                          ),
-                          FilledButton.icon(
-                            label: Text(
-                              t.pages.profiles.updateSubscriptions,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            icon: const Icon(Icons.update_rounded),
-                            onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stackTrace) => Text(t.presentShortError(error)),
         ),
       ),
+    );
+  }
+}
+
+class _ProfilesSheetContent extends ConsumerWidget {
+  const _ProfilesSheetContent({
+    required this.data,
+    required this.scrollController,
+    required this.blizzard,
+    required this.t,
+  });
+
+  final List<ProfileEntity> data;
+  final ScrollController scrollController;
+  final bool blizzard;
+  final Translations t;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    void showSortProfiles() => ref.read(dialogNotifierProvider.notifier).showSortProfiles();
+    void updateSubscriptions() => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger();
+    return Column(
+      children: [
+        if (blizzard)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 8, 0),
+            child: Row(
+              children: [
+                Expanded(child: Text(t.pages.profiles.title, style: Theme.of(context).textTheme.titleLarge)),
+                IconButton(tooltip: t.common.sort, icon: const Icon(Icons.sort_rounded), onPressed: showSortProfiles),
+                IconButton(
+                  tooltip: t.pages.profiles.updateSubscriptions,
+                  icon: const Icon(Icons.update_rounded),
+                  onPressed: updateSubscriptions,
+                ),
+              ],
+            ),
+          ),
+        Expanded(
+          child: ListView.separated(
+            padding: blizzard ? const EdgeInsets.fromLTRB(16, 4, 16, 18) : const EdgeInsets.all(12),
+            separatorBuilder: (context, index) => Gap(blizzard ? 8 : 12),
+            controller: scrollController,
+            itemBuilder: (context, index) => ProfileTile(profile: data[index]),
+            itemCount: data.length,
+          ),
+        ),
+        if (!blizzard)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                FilledButton.icon(
+                  label: Text(t.common.sort, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  icon: const Icon(Icons.sort_rounded),
+                  onPressed: showSortProfiles,
+                ),
+                FilledButton.icon(
+                  label: Text(t.pages.profiles.updateSubscriptions, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  icon: const Icon(Icons.update_rounded),
+                  onPressed: updateSubscriptions,
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

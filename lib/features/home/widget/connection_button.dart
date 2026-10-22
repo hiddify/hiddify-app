@@ -9,6 +9,7 @@ import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/dialog/widgets/custom_alert_dialog.dart';
 import 'package:hiddify/core/theme/blizzard_tokens.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/core/widget/blizzard/blizzard_glass.dart';
@@ -140,6 +141,9 @@ class ConnectionButton extends HookConsumerWidget {
       AsyncData(value: final status) => status.present(t),
       _ => '',
     };
+    final blizzardStatusLabel = connectionStatus.asData?.value is Connected && requiresReconnect != true
+        ? (t.$meta.locale == AppLocale.ru ? 'VPN подключён' : 'VPN ${t.connection.connected}')
+        : label;
     final button = _ConnectionButton(
       onTap: switch (connectionStatus) {
         AsyncData(value: Connected()) when requiresReconnect == true => () async {
@@ -204,6 +208,9 @@ class ConnectionButton extends HookConsumerWidget {
       useImage: today.day >= 19 && today.day <= 23 && today.month == 3,
       secureLabel: secureLabel,
     );
+    final blizzard =
+        BlizzardPresentation.isActive(context) ||
+        (Theme.of(context).extension<BlizzardEligibility>()?.applied ?? false);
     return HomePresentationProbe(
       connectionStatus: connectionStatus,
       label: label,
@@ -212,9 +219,9 @@ class ConnectionButton extends HookConsumerWidget {
       delay: delay,
       themePlatform: Theme.of(context).platform,
       tickersEnabled: TickerMode.of(context),
-      child: BlizzardPresentation.isActive(context)
+      child: blizzard
           ? _BlizzardConnectionHero(
-              statusLabel: label,
+              statusLabel: blizzardStatusLabel,
               actionLabel: actionLabel,
               secureLabel: secureLabel,
               control: button,
@@ -251,7 +258,9 @@ class _ConnectionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blizzard = BlizzardPresentation.isActive(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) ||
+        (Theme.of(context).extension<BlizzardEligibility>()?.applied ?? false);
     final media = MediaQuery.of(context);
     final reduceMotion = blizzard && (media.disableAnimations || media.accessibleNavigation);
     final materials = BlizzardMaterials(highContrast: media.highContrast);
@@ -300,6 +309,13 @@ class _ConnectionButton extends StatelessWidget {
                             tween: ColorTween(end: buttonColor),
                             duration: reduceMotion ? Duration.zero : const Duration(milliseconds: 250),
                             builder: (context, value, child) {
+                              if (blizzard) {
+                                return const Icon(
+                                  Icons.power_settings_new_rounded,
+                                  size: 48,
+                                  color: BlizzardPalette.accent,
+                                );
+                              }
                               if (useImage) {
                                 return image.image();
                               } else {
@@ -384,7 +400,10 @@ class _BlizzardConnectionHero extends StatelessWidget {
         final width = constraints.maxWidth.clamp(0, BlizzardMetrics.waveSize.width).toDouble();
         final scaler = MediaQuery.textScalerOf(context);
         final statusStyle = theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w600);
-        final actionStyle = theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w500);
+        final actionStyle = theme.textTheme.titleMedium?.copyWith(
+          color: BlizzardPalette.accent,
+          fontWeight: FontWeight.w500,
+        );
         double textHeight(String text, TextStyle? style) {
           final painter = TextPainter(
             text: TextSpan(text: text, style: style),

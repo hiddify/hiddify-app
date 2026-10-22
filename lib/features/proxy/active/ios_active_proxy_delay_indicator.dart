@@ -4,6 +4,8 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
+import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
@@ -201,6 +203,9 @@ class _IosActiveProxyDelayIndicatorState extends ConsumerState<IosActiveProxyDel
     if (!_serviceConfirmedRunning) return const SizedBox.shrink();
 
     final t = ref.watch(translationsProvider).requireValue;
+    final blizzard =
+        BlizzardPresentation.isActive(context) ||
+        (Theme.of(context).extension<BlizzardEligibility>()?.applied ?? false);
     final phase = _snapshot?.phase ?? IosProxyMeasurementPhase.idle;
     final updating = _lifecycle == AppLifecycleState.resumed && _awaitingFreshAfterResume;
     final checking =
@@ -242,13 +247,14 @@ class _IosActiveProxyDelayIndicatorState extends ConsumerState<IosActiveProxyDel
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(FluentIcons.wifi_1_24_regular),
-                    const Gap(8),
+                    if (!blizzard) ...[const Icon(FluentIcons.wifi_1_24_regular), const Gap(8)],
                     if (checking)
                       const ShimmerSkeleton(width: 48, height: 18)
                     else
                       Text(
-                        updating
+                        blizzard && available
+                            ? t.pages.proxies.delay.result(delay: delay).replaceFirst(': ', ' ')
+                            : updating
                             ? t.pages.proxies.delay.updating
                             : available
                             ? '$delay ms'
@@ -259,7 +265,7 @@ class _IosActiveProxyDelayIndicatorState extends ConsumerState<IosActiveProxyDel
                             : t.common.unknown,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
-                    if (!checking && !updating) ...[const Gap(8), const Icon(Icons.refresh, size: 16)],
+                    if (!blizzard && !checking && !updating) ...[const Gap(8), const Icon(Icons.refresh, size: 16)],
                   ],
                 ),
               ),

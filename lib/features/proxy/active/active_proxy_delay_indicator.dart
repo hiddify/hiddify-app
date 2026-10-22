@@ -2,6 +2,8 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/theme/blizzard_theme.dart';
+import 'package:hiddify/core/widget/blizzard/blizzard_presentation.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ios_active_proxy_delay_indicator.dart';
@@ -17,6 +19,8 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
     final t = ref.watch(translationsProvider).requireValue;
     final activeProxy = ref.watch(activeProxyNotifierProvider);
     final theme = Theme.of(context);
+    final blizzard =
+        BlizzardPresentation.isActive(context) || (theme.extension<BlizzardEligibility>()?.applied ?? false);
 
     if (theme.platform == TargetPlatform.iOS && ref.watch(iosActiveProxyMeasurementEnabledProvider)) {
       return const IosActiveProxyDelayIndicator();
@@ -46,29 +50,40 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(FluentIcons.wifi_1_24_regular),
-              const Gap(8),
+              if (!blizzard) ...[const Icon(FluentIcons.wifi_1_24_regular), const Gap(8)],
               if (delay > 0)
                 Text.rich(
                   semanticsLabel: timeout ? t.pages.proxies.delay.timeout : t.pages.proxies.delay.result(delay: delay),
                   TextSpan(
-                    children: [
-                      if (timeout)
-                        TextSpan(
-                          text: t.common.timeout,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.error,
-                          ),
-                        )
-                      else ...[
-                        TextSpan(
-                          text: delay.toString(),
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const TextSpan(text: " ms"),
-                      ],
-                    ],
+                    children: blizzard
+                        ? [
+                            TextSpan(
+                              text: timeout
+                                  ? t.common.timeout
+                                  : t.pages.proxies.delay.result(delay: delay).replaceFirst(': ', ' '),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: timeout ? theme.colorScheme.error : null,
+                              ),
+                            ),
+                          ]
+                        : [
+                            if (timeout)
+                              TextSpan(
+                                text: t.common.timeout,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.error,
+                                ),
+                              )
+                            else ...[
+                              TextSpan(
+                                text: delay.toString(),
+                                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const TextSpan(text: " ms"),
+                            ],
+                          ],
                   ),
                 )
               else

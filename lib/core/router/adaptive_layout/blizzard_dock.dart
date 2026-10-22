@@ -41,7 +41,11 @@ class BlizzardDock extends StatelessWidget {
                     _BlizzardDockTab(
                       key: ValueKey('blizzard_bottom_dock_tab_$index'),
                       action: actions[index],
-                      icon: index == 0 ? Icons.home_rounded : actions[index].icon,
+                      icon: switch (index) {
+                        0 => Icons.home_outlined,
+                        1 => Icons.settings_outlined,
+                        _ => actions[index].icon,
+                      },
                       selected: index == selectedIndex,
                       reduceMotion: reduceMotion,
                       onTap: () => onDestinationSelected(index),
