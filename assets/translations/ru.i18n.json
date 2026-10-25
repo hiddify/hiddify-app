@@ -186,6 +186,11 @@
         "disableAutoUpdate": "Отключить автообновление",
         "autoUpdateInterval": "Интервал автообновления",
         "loading": "Добавление профиля…"
+        "adminPreference": "Предпочтение прав администратора",
+        "adminPreferenceAskEachTime": "Спрашивать каждый раз",
+        "adminPreferencePreferAdmin": "Всегда использовать права администратора",
+        "adminPreferencePreferNoAdmin": "Всегда продолжать без прав администратора",
+        "adminPreferenceReset": "Спрашивать каждый раз о разрешении администратора"
       }
     },
     "logs": {
@@ -249,6 +254,7 @@
         "autoIpCheck": "Автоматически проверять IP-адрес",
         "dynamicNotification": "Отображать скорость в уведомлении",
         "hapticFeedback": "Тактильный отклик",
+        "alwaysOnVpn": "Постоянно включенный VPN",
         "actionAtClosing": "При закрытии окна",
         "autoStart": "Запускать при входе в систему",
         "silentStart": "Запускать свернутым",
@@ -770,6 +776,7 @@
     "disconnecting": "Отключение…",
     "failed": "Не удалось подключиться",
     "tapToRetry": "Нажмите, чтобы повторить",
+    "errorDetails": "Подробности ошибки",
     "reconnect": "Переподключить",
     "reconnectMsg": "Переподключение для применения изменений…"
   },
