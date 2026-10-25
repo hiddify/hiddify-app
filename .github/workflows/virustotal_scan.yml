@@ -1,0 +1,104 @@
+# Upload release assets to VirusTotal for scanning, then bust badge image cache
+# in the release notes (&v=random) so GitHub does not keep a stale Error 404.
+# Pattern based on https://github.com/yuliskov/SmartTube/.github/workflows/virustotal_scan.yml
+# API: https://docs.virustotal.com/reference/overview
+name: VirusTotal Scan
+
+on:
+  workflow_call:
+    inputs:
+      release_tag:
+        description: 'Release tag to scan (e.g. draft, v1.2.3)'
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to scan'
+        required: true
+        type: string
+
+jobs:
+  virustotal_scan:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      HAS_VT_KEY: ${{ secrets.VIRUS_TOTAL_API_KEY != '' }}
+
+    steps:
+      - name: Set tag variable
+        run: echo "TAG_NAME=${{ inputs.release_tag }}" >> $GITHUB_ENV
+
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Download Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p release_assets
+          gh release download "$TAG_NAME" --dir release_assets \
+            --pattern "Hiddify-*.apk" \
+            --pattern "Hiddify-*.exe" \
+            --pattern "Hiddify-*.Msix" \
+            --pattern "Hiddify-*.msix" \
+            --pattern "Hiddify-*.zip" \
+            --pattern "Hiddify-*.dmg" \
+            --pattern "Hiddify-*.pkg" \
+            --pattern "Hiddify-*.ipa" \
+            --pattern "Hiddify-*.AppImage" \
+            --pattern "Hiddify-*.deb" \
+            --pattern "Hiddify-*.rpm"
+          ls -la release_assets
+
+      - name: VirusTotal Scan
+        if: ${{ env.HAS_VT_KEY == 'true' }}
+        id: vt
+        uses: crazy-max/ghaction-virustotal@v5
+        with:
+          vt_api_key: ${{ secrets.VIRUS_TOTAL_API_KEY }}
+          files: |
+            release_assets/*
+          request_rate: 4
+
+      - name: Refresh VirusTotal badge cache
+        if: steps.vt.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Waiting 150s for VirusTotal engines to report..."
+          sleep 150
+
+          gh release view "$TAG_NAME" --json body -q .body > release_notes.md || echo "" > release_notes.md
+          bust=$(date +%s)$RANDOM
+
+          for file in release_assets/*; do
+            [ -f "$file" ] || continue
+            filename=$(basename "$file")
+            sha256=$(sha256sum "$file" | awk '{print $1}')
+            badge="https://badges.cssnr.com/vt/id/${sha256}?start=green&end=red&n=8"
+            echo "Purging badge cache for $filename ($sha256) bust=$bust"
+            curl -s -X POST "${badge}&v=${bust}" || true
+
+            python3 - "$sha256" "$bust" <<'PY'
+          import pathlib, re, sys
+          sha256, bust = sys.argv[1:3]
+          path = pathlib.Path("release_notes.md")
+          text = path.read_text()
+          # Replace any existing vt badge src for this hash with a fresh &v= random.
+          text = re.sub(
+              rf'src="https://badges\.cssnr\.com/vt/id/{re.escape(sha256)}\?[^"]*"',
+              f'src="https://badges.cssnr.com/vt/id/{sha256}?start=green&end=red&n=8&v={bust}"',
+              text,
+          )
+          path.write_text(text)
+          PY
+          done
+
+          # Keep the body short (download + VT only); never re-append changelogs.
+          if [ "$(wc -c < release_notes.md)" -gt 120000 ]; then
+            echo "Release notes still too long; skipping notes edit" >&2
+            exit 0
+          fi
+          gh release edit "$TAG_NAME" --notes-file release_notes.md

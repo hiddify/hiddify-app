@@ -43,6 +43,7 @@ class ProfileParser with InfraLogger {
   static const infiniteTimeThreshold = 92_233_720_368;
   static const allowedOverrideConfigs = [
     'connection-test-url',
+    'ipinfo-url',
     'direct-dns-address',
     'remote-dns-address',
     'tls-tricks',
@@ -56,6 +57,7 @@ class ProfileParser with InfraLogger {
     'profile-update-interval',
     'support-url',
     'profile-web-page-url',
+    'ipinfo-url',
     'extra-security',
     'fragment',
   ];
@@ -419,6 +421,7 @@ class ProfileParser with InfraLogger {
         if (headers['support-url'] case final String profileSupportUrl when isUrl(profileSupportUrl)) {
           supportUrl = profileSupportUrl;
         }
+        // `ipinfo-url` stays in populatedHeaders only (not a dedicated column).
 
         return profile.map(
           remote: (rp) => rp.copyWith(

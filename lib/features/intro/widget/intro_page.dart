@@ -49,11 +49,13 @@ class IntroPage extends HookConsumerWidget with PresLogger {
     // for focus management
     final focusStates = <String, ValueNotifier<bool>>{
       IntroConst.termsAndConditionsKey: useState<bool>(false),
+      IntroConst.privacyPolicyKey: useState<bool>(false),
       IntroConst.githubKey: useState<bool>(false),
       IntroConst.licenseKey: useState<bool>(false),
     };
     final focusNodes = <String, FocusNode>{
       IntroConst.termsAndConditionsKey: useFocusNode(),
+      IntroConst.privacyPolicyKey: useFocusNode(),
       IntroConst.githubKey: useFocusNode(),
       IntroConst.licenseKey: useFocusNode(),
     };
@@ -126,6 +128,18 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                         ),
                       ),
                       style: theme.textTheme.bodySmall,
+                    ),
+                  ),
+                  const Gap(8),
+                  Focus(
+                    focusNode: focusNodes[IntroConst.privacyPolicyKey],
+                    onKeyEvent: (node, event) => _handleKeyEvent(event, IntroConst.privacyPolicyKey),
+                    child: TextButton.icon(
+                      onPressed: () async {
+                        await UriUtils.tryLaunch(Uri.parse(Constants.privacyPolicyUrl));
+                      },
+                      icon: const Icon(Icons.privacy_tip_outlined),
+                      label: Text(t.pages.about.privacyPolicy),
                     ),
                   ),
                   const Gap(8),

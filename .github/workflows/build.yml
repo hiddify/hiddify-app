@@ -30,11 +30,15 @@ env:
   TARGET_NAME_zip: "Hiddify-Windows-Portable-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
+  TARGET_NAME_macos_appstore_pkg: "Hiddify-MacOS-AppStore"
+  TARGET_NAME_macos_appstore_dmg: "Hiddify-MacOS-AppStore"
   TARGET_NAME_ipa: "Hiddify-iOS"
   
 
 jobs:
   test:
+    permissions:
+      contents: read
     outputs:
       draftBuildCode: ${{ steps.draftBuildCode.outputs.datetime }}
     runs-on: ubuntu-latest
@@ -45,9 +49,16 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
           cache: true
-          
+
+      - name: Validate iOS release configuration
+        run: python3 .github/scripts/validate_ios_release_config.py
+
       - name: Prepare
         run: make linux-amd64-prepare
+
+      - name: Analyze Dart and Flutter sources
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
       - name: Test
         run: flutter test
 
@@ -58,86 +69,63 @@ jobs:
 
   build:
     needs: test
-    permissions: write-all
-    continue-on-error: true
+    permissions:
+      contents: read
+    continue-on-error: ${{ matrix.platform != 'ios' }}
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: android-apk
-            os: ubuntu-latest
-            targets: apk
-
-          # - platform: android-aab
-          #   os: ubuntu-latest
-          #   targets: aab
-
-          - platform: windows
-            os: windows-latest
-            aarch: amd64
-            targets: exe,msix,zip
-
-          - platform: linux
-            os: ubuntu-22.04
-            aarch: amd64
-            targets: deb,gz,AppImage
-
-          # - platform: linux-amd64
-          #   os: ubuntu-22.04
-          #   aarch: amd64
-          #   targets: deb,gz
-
-          # - platform: linux-arm64
-          #   os: ubuntu-24.04-arm
-          #   aarch: arm64
-          #   targets: deb,gz
-
-          # - platform: linux-amd64-musl
-          #   os: ubuntu-22.04
-          #   aarch: amd64
-          #   targets: deb,gz
-
-          # - platform: linux-arm64-musl
-          #   os: ubuntu-24.04-arm
-          #   aarch: arm64
-          #   targets: deb,gz
-            
-          - platform: macos
-            os: macos-15
-            aarch: universal
-            targets: dmg,pkg
-            
-          # - platform: ios
-          #   os: macos-15
-          #   aarch: universal
-          #   filename: hiddify-ios
-          #   targets: ipa
+          - { platform: android-apk,       os: ubuntu-latest,  targets: apk }
+          # - { platform: android-aab,       os: ubuntu-latest,  targets: aab }
+          - { platform: windows,          os: windows-latest, aarch: amd64,     targets: exe,msix,zip }
+          - { platform: linux,            os: ubuntu-22.04,   aarch: amd64,     targets: deb,gz,AppImage }
+          # - { platform: linux-amd64,      os: ubuntu-22.04,   aarch: amd64,     targets: deb,gz }
+          # - { platform: linux-arm64,      os: ubuntu-24.04-arm, aarch: arm64,   targets: deb,gz }
+          # - { platform: linux-amd64-musl, os: ubuntu-22.04,   aarch: amd64,     targets: deb,gz }
+          # - { platform: linux-arm64-musl, os: ubuntu-24.04-arm, aarch: arm64,   targets: deb,gz }
+          - { platform: macos,            os: macos-15,       aarch: universal, targets: dmg,pkg }
+          # - { platform: macos-appstore,   os: macos-26,       aarch: universal, targets: pkg,dmg }
+          # - { platform: ios,              os: macos-26,       aarch: universal, filename: hiddify-ios, targets: ipa }
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
         uses: actions/checkout@v6
 
+      # Explicit keychain password (not a repo secret): v6's auto-generated
+      # keychain-password output is often empty in the next step, which makes
+      # `security unlock-keychain` fail with "passphrase is not correct".
       - name: Import Apple Codesign Certificates
+        id: apple-certs
         if: ${{ inputs.upload-artifact && startsWith(matrix.os,'macos') }}
         uses: apple-actions/import-codesign-certs@v6
-        with: 
-            p12-file-base64: "${{ secrets.APPLE_CERTIFICATE_P12 }}"
-            p12-password: "${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}"
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
+          keychain-password: hiddify-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Import Apple Mobile Provisioning Profile
         if: ${{ inputs.upload-artifact && startsWith(matrix.os,'macos') }}
+        env:
+          KEYCHAIN_PASSWORD: hiddify-${{ github.run_id }}-${{ github.run_attempt }}
         run: |
-           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-           echo "${{secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
-           ls ~/Library/MobileDevice/Provisioning\ Profiles
-           security unlock-keychain -p "" signing_temp.keychain
-           security find-identity -v -p codesigning
-        #   ls ~/Library/MobileDevice/Provisioning\ Profiles
-        #   echo "${{secrets.NEW_APPLE_MOBILE_PROVISIONING_PROFILES_TARXZ_BASE64}}"|base64 --decode | tar xJ -C ~/Library/MobileDevice/Provisioning\ Profiles
-        #   # echo "${{secrets.NEW_APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64_2}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
-          
-
+          set -euo pipefail
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64 }}" | base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
+          ls ~/Library/MobileDevice/Provisioning\ Profiles
+          # Xcode 16+ also reads this folder.
+          mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/* ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" signing_temp.keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" signing_temp.keychain
+          security find-identity -v -p codesigning
+          # Fail early: a broken APPLE_CERTIFICATE_P12 imports certs but no private keys.
+          identities="$(security find-identity -v -p codesigning | grep -c 'Apple Distribution' || true)"
+          if [[ "$identities" -lt 1 ]]; then
+            echo '::error::No Apple Distribution identity after importing APPLE_CERTIFICATE_P12. Re-export the .p12 from Keychain Access → My Certificates (must include the private key), base64 it, and update the secret.'
+            exit 1
+          fi
 
       # - name: Setup Flutter for arm64
       #   if: ${{ startsWith(matrix.platform,'linux-arm64') }}
@@ -153,6 +141,32 @@ jobs:
           # flutter-version-file: pubspec.yaml
           channel: 'stable'
           cache: true
+
+      # macOS tunnel xcframework comes from hiddify-lib-macos.tar.gz via `make macos-libs`
+      # (built in hiddify-core CI); no submodule / Go bind on the app runner.
+
+      - name: Configure macOS signing
+        if: matrix.platform == 'macos'
+        env:
+          MACOS_SIGNING_XCCONFIG: ${{ secrets.APPLE_MACOS_SIGNING_XCCONFIG }}
+          SIGN_RELEASE: ${{ inputs.upload-artifact }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          signing_config="$RUNNER_TEMP/hiddify-macos-signing.xcconfig"
+          # With a Developer ID the VPN runs in the packet tunnel system extension. Without one, the
+          # build is signed ad hoc and its VPN runs in the root helper the user installs.
+          if [[ "$SIGN_RELEASE" == 'true' && -n "$MACOS_SIGNING_XCCONFIG" ]]; then
+            printf '%s\n' "$MACOS_SIGNING_XCCONFIG" > "$signing_config"
+            echo 'MACOS_DEVELOPER_ID=true' >> "$GITHUB_ENV"
+          else
+            if [[ "$SIGN_RELEASE" == 'true' ]]; then
+              echo '::warning::APPLE_MACOS_SIGNING_XCCONFIG is not set, so the macOS release is built without a Developer ID.'
+            fi
+            cp macos/Runner/Configs/Unsigned.xcconfig "$signing_config"
+            echo 'MACOS_DEVELOPER_ID=false' >> "$GITHUB_ENV"
+          fi
+          echo "XCODE_XCCONFIG_FILE=$signing_config" >> "$GITHUB_ENV"
 
       - name: Clean up disk space
         if: startsWith(matrix.platform,'android')
@@ -252,15 +266,43 @@ jobs:
 
 
       - name: Prepare for ${{ matrix.platform }}
+        if: matrix.platform != 'macos-appstore' || inputs.upload-artifact
         run: |
           make ${{ matrix.platform }}-prepare
 
 
       - name: Build ${{ matrix.platform }}
+        if: matrix.platform != 'macos-appstore' && ((matrix.platform != 'ios' && matrix.platform != 'windows') || inputs.upload-artifact)
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           make ${{ matrix.platform }}-release
+
+      - name: Build the Mac App Store version
+        if: matrix.platform == 'macos-appstore' && inputs.upload-artifact
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        # Upload is a separate step so a bad APPSTORE_* secret still leaves pkg/dmg artifacts.
+        run: make macos-appstore-release
+
+      - name: Validate iOS without code signing
+        if: matrix.platform == 'ios' && !inputs.upload-artifact
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make ios-validate
+
+      - name: Smoke test production app in iOS Simulator
+        if: matrix.platform == 'ios' && !inputs.upload-artifact
+        timeout-minutes: 30
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: bash .github/scripts/smoke_test_ios_simulator.sh
+
+      - name: Validate Windows without code signing
+        if: matrix.platform == 'windows' && !inputs.upload-artifact
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make windows-validate
 
       - name: Code Sign
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
@@ -288,7 +330,7 @@ jobs:
           }
 
       - name: Copy to out Windows
-        if: matrix.platform == 'windows'
+        if: matrix.platform == 'windows' && inputs.upload-artifact
         shell: pwsh
         run: |
           Get-ChildItem -Path dist -Recurse | Select-Object FullName
@@ -339,8 +381,28 @@ jobs:
           ls -R ./build/app/outputs
           cp ./build/app/outputs/bundle/release/app-release.aab out/hiddify-android-market.aab || echo "no aab"
 
+      - name: Copy to out macOS App Store
+        if: matrix.platform == 'macos-appstore' && inputs.upload-artifact
+        id: macos-appstore-out
+        run: |
+          ls -R dist/
+          mkdir -p out
+          pkg="$(find dist -name '*-macos-appstore.pkg' -type f | head -1)"
+          dmg="$(find dist -name '*-macos-appstore.dmg' -type f | head -1)"
+          if [[ -z "$pkg" ]]; then
+            echo '::error::macos-appstore pkg not found under dist/'
+            exit 1
+          fi
+          if [[ -z "$dmg" ]]; then
+            echo '::error::macos-appstore dmg not found under dist/'
+            exit 1
+          fi
+          cp "$pkg" "out/${TARGET_NAME_macos_appstore_pkg}.pkg"
+          cp "$dmg" "out/${TARGET_NAME_macos_appstore_dmg}.dmg"
+          ls -la out/
+
       - name: Copy to out unix
-        if: startsWith(matrix.platform,'linux') || matrix.platform == 'macos' || matrix.platform == 'ios'
+        if: startsWith(matrix.platform,'linux') || matrix.platform == 'macos' || (matrix.platform == 'ios' && inputs.upload-artifact)
         run: |
           ls -R dist/
           mkdir out
@@ -371,6 +433,20 @@ jobs:
             fi
           done
 
+      - name: Sign installer and notarize macOS packages
+        if: ${{ inputs.upload-artifact && matrix.platform == 'macos' && env.MACOS_DEVELOPER_ID == 'true' }}
+        env:
+          APPLE_MACOS_INSTALLER_SIGN_IDENTITY: ${{ secrets.APPLE_MACOS_INSTALLER_SIGN_IDENTITY }}
+          APPLE_NOTARIZATION_APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
+          APPLE_NOTARIZATION_TEAM_ID: ${{ secrets.APPLE_NOTARIZATION_TEAM_ID }}
+          APPLE_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+        shell: bash
+        run: |
+          bash macos/scripts/notarize-release.sh "out/${TARGET_NAME_dmg}.dmg" "out/${TARGET_NAME_pkg}.pkg"
+      - name: Verify signed iOS IPA
+        if: ${{ inputs.upload-artifact && matrix.platform == 'ios' }}
+        run: python3 .github/scripts/verify_signed_ipa.py out/Hiddify-iOS.ipa
+
       - name: Upload Artifact
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@v6
@@ -379,82 +455,82 @@ jobs:
           path: ./out
           retention-days: 1
 
-      - name: Clean up keychain and provisioning profile
-        if: ${{ always() && startsWith(matrix.os,'macos')}}
+      # Profiles only — leave signing_temp.keychain for import-codesign-certs post cleanup.
+      - name: Clean up provisioning profiles
+        if: ${{ always() && startsWith(matrix.os,'macos') }}
         run: |
-          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db ||echo ok
-          rm ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision ||echo ok
+          rm -f ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision || true
+          rm -rf ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
   update-draft:
-    permissions: write-all
+    # Always refresh the moving `draft` tag/release to this build's commit and assets.
     if: ${{ inputs.upload-artifact }}
     needs: [build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: checkout
         uses: actions/checkout@v6
         with:
-          # by default, it uses a depth of 1
-          # this fetches all history so that we can read each commit
           fetch-depth: 0
+
       - name: Download Artifact
         uses: actions/download-artifact@v7
         with:
           merge-multiple: true
           pattern: "*"
           path: ./out/
-          
 
       - name: Display Files Structure
         run: ls -R
         working-directory: ./out
 
-      - name: Delete Current Release Assets
-        uses: 8Mi-Tech/delete-release-assets-action@main
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: 'draft'
-          deleteOnlyFromDrafts: false
-          
-      - name: prepare_release_message
-        continue-on-error: true
+      - name: Remove old draft release and tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set +e 
-          sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md > release.md
-          pip install gitchangelog pystache mustache markdown
-          prelease=$(curl --silent "https://api.github.com/repos/hiddify/hiddify-app/releases/latest" | grep -Po '"tag_name": "\K([^"]*)') 
-          echo -e "\n\n<details markdown=1><summary>All changes from $current to the latest commit:</summary>\n\n">>release.md
-          gitchangelog "${prelease}.." >> release.md  2>&1 || echo "Error in gitchangelog"
-          echo -e "\n\n</details>">>release.md
-      - name: Create or Update Draft Release
+          set -euo pipefail
+          # Drop the previous draft release + tag so the new upload can retag
+          # github.sha as `draft` (softprops alone will not move an existing tag).
+          if gh release view draft >/dev/null 2>&1; then
+            gh release delete draft --yes --cleanup-tag
+          elif git ls-remote --tags origin refs/tags/draft | grep -q .; then
+            git push origin :refs/tags/draft
+          fi
+
+      - name: prepare_release_message
+        run: |
+          set -euo pipefail
+          # Draft release download URLs always use the `draft` tag, even when this
+          # workflow was also invoked for a versioned tag-name.
+          cp ./.github/release_message.md release.md
+          python3 ./.github/scripts/prepare_release_notes.py release.md ./out draft
+
+      - name: Create draft release on current commit
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: ./out/*
-          name: 'draft'
-          tag_name: 'draft'
-          body_path: './release.md'
-          prerelease: true
-
-      - name: Create or Update Draft Release
-        uses: softprops/action-gh-release@v3
-        # env:
-          #GITHUB_TOKEN: ${{ secrets.TOKEN_FOR_HIDDIFY_APP_REPO }}
-          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-#          GITHUB_REPOSITORY: hiddify/hiddify-app
-        with:
-          files: ./out/*
-          name: 'draft'
-          tag_name: 'draft'
-          body_path: './release.md'
+          name: draft
+          tag_name: draft
           target_commitish: ${{ github.sha }}
-          # target_commitish: '530bf77839a74d4f13847ba244a20734ac7ab119'
+          body_path: ./release.md
           prerelease: true
-          # repository: hiddify/hiddify-app
+          make_latest: false
+          fail_on_unmatched_files: false
+
+  virustotal-draft:
+    if: ${{ inputs.upload-artifact }}
+    needs: [update-draft]
+    uses: ./.github/workflows/virustotal_scan.yml
+    secrets: inherit
+    permissions:
+      contents: write
+    with:
+      release_tag: draft
 
   upload-release:
-    permissions: write-all
     if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
     needs: [build]
     runs-on: ubuntu-latest
@@ -478,7 +554,9 @@ jobs:
 
       - name: prepare_release_message
         run: |
-          sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md >> release.md
+          set -euo pipefail
+          cp ./.github/release_message.md release.md
+          python3 ./.github/scripts/prepare_release_notes.py release.md ./out "${{ env.TAG_NAME }}"
 
       - name: Upload Release
         uses: softprops/action-gh-release@v2
@@ -504,50 +582,81 @@ jobs:
           releaseFiles: ./hiddify-android-market.aab
           track: 'beta'
 
+  virustotal-release:
+    if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
+    needs: [upload-release]
+    uses: ./.github/workflows/virustotal_scan.yml
+    secrets: inherit
+    permissions:
+      contents: write
+    with:
+      release_tag: ${{ inputs.tag-name }}
 
+  # After the draft release is published: same App Store Connect API key for iOS + macOS.
   upload-to-testflight:
-    needs: [build]
-    if: ${{ inputs.upload-artifact &&  inputs.tag-name != 'draft' }}
-    #if: ${{ inputs.upload-artifact }}
-    runs-on: macOS-latest
-    timeout-minutes: 30
+    needs: [update-draft]
+    permissions:
+      actions: read
+      contents: read
+    if: ${{ inputs.upload-artifact }}
+    runs-on: macos-26
+    timeout-minutes: 60
     steps:
-      - name: Download Artifact
+      - name: Download iOS artifact
+        continue-on-error: true
+        id: dl-ios
         uses: actions/download-artifact@v7
         with:
-          merge-multiple: true
-          pattern: "*ios*"
+          name: ios
           path: ./out/
 
-      - uses: Apple-Actions/import-codesign-certs@v6
-        with:
-          p12-file-base64: ${{ secrets.APPLE_UPLOAD_CERTIFICATE_P12 }}
-          p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
-
-      - uses: Apple-Actions/download-provisioning-profiles@v1
-        with:
-          bundle-id: app.hiddify.com
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-      - uses: Apple-Actions/download-provisioning-profiles@v1
-        with:
-          bundle-id: app.hiddify.com.SingBoxPacketTunnel
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-  
-
-
-      - name: Import Apple Mobile Provisioning Profile
+      - name: Check iOS IPA
+        id: ios
         run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{secrets.APPLE_DIST_PROVISIONING_PROFILES_TARGZ_BASE64}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
-        #echo "${{secrets.NEW_APPLE_STORE_PROVISIONING_PROFILES_TARXZ_BASE64}}"|base64 --decode | tar xJ -C ~/Library/MobileDevice/Provisioning\ Profiles
+          if [[ -f out/Hiddify-iOS.ipa ]]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+            ls -la out/Hiddify-iOS.ipa
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No iOS IPA artifact; skipping TestFlight upload."
+          fi
 
-      - uses: Apple-Actions/upload-testflight-build@v4
+      - name: Upload iOS IPA to TestFlight
+        if: steps.ios.outputs.present == 'true'
+        uses: Apple-Actions/upload-testflight-build@v5
         with:
-          app-path: 'out/Hiddify-iOS.ipa' 
+          app-path: out/Hiddify-iOS.ipa
+          app-type: ios
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
+      - name: Download macOS App Store artifact
+        continue-on-error: true
+        id: dl-macos
+        uses: actions/download-artifact@v7
+        with:
+          name: macos-appstore
+          path: ./out/
+
+      - name: Check macOS App Store pkg
+        id: macos
+        run: |
+          if [[ -f out/Hiddify-MacOS-AppStore.pkg ]]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+            ls -la out/Hiddify-MacOS-AppStore.pkg
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No macOS App Store pkg artifact; skipping TestFlight upload."
+          fi
+
+      - name: Upload macOS App Store pkg to TestFlight
+        if: steps.macos.outputs.present == 'true'
+        uses: Apple-Actions/upload-testflight-build@v5
+        with:
+          app-path: out/Hiddify-MacOS-AppStore.pkg
+          app-type: macos
+          backend: altool
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}

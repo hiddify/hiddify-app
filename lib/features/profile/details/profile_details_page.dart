@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -186,6 +187,29 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                           ),
                           const Divider(indent: 16, endIndent: 16),
                         ],
+                        if (Platform.isWindows || Platform.isLinux)
+                          ListTile(
+                            title: Text(t.pages.profileDetails.form.adminPreference),
+                            subtitle: Text(switch (userOverride.adminPreference) {
+                              UserAdminPreference.unset => t.pages.profileDetails.form.adminPreferenceAskEachTime,
+                              UserAdminPreference.preferAdmin =>
+                                t.pages.profileDetails.form.adminPreferencePreferAdmin,
+                              UserAdminPreference.preferNoAdmin =>
+                                t.pages.profileDetails.form.adminPreferencePreferNoAdmin,
+                            }),
+                            trailing: userOverride.adminPreference == UserAdminPreference.unset
+                                ? null
+                                : TextButton(
+                                    onPressed: () => ref
+                                        .read(ProfileDetailsNotifierProvider(id).notifier)
+                                        .setUserOverride(
+                                          userOverride.copyWith(adminPreference: UserAdminPreference.unset),
+                                        ),
+                                    child: Text(t.pages.profileDetails.form.adminPreferenceReset),
+                                  ),
+                            dense: true,
+                          ),
+                        if (Platform.isWindows || Platform.isLinux) const Divider(indent: 16, endIndent: 16),
                         ListTile(
                           title: Text(t.pages.profileDetails.lastUpdate),
                           leading: const Icon(FluentIcons.history_24_regular),

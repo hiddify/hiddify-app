@@ -53,21 +53,22 @@ class ConnectionButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final status = ref.watch(connectionNotifierProvider);
-    // After a disconnect Riverpod keeps the last ping as the previous value,
-    // which would show the next connection as up before its own ping answers.
-    final measured = ref.watch(activeProxyNotifierProvider).unwrapPrevious().valueOrNull?.urlTestDelay ?? 0;
-    // The proxy list also reloads whenever the app comes back to the front (the
-    // core gets a new channel), and while it does it has no ping. The tunnel
-    // never went down, so the last ping of this connection holds until then:
-    // otherwise the button would go back to waiting and blink on every focus.
+    // Only use a ping while Connected. After disconnect Riverpod can keep the
+    // previous OutboundInfo on the proxy provider; feeding that into the next
+    // reconnect showed green Connected before the new tunnel's own ping (Windows VPN).
+    // lastDelay still covers focus/channel reloads that briefly have no ping
+    // while the tunnel stays up.
     final connected = status.valueOrNull is Connected;
+    final rawDelay = connected
+        ? (ref.watch(activeProxyNotifierProvider).valueOrNull?.urlTestDelay ?? 0)
+        : 0;
     final lastDelay = useRef(0);
     if (!connected) {
       lastDelay.value = 0;
-    } else if (measured != 0) {
-      lastDelay.value = measured;
+    } else if (rawDelay != 0) {
+      lastDelay.value = rawDelay;
     }
-    final delay = connected && measured == 0 ? lastDelay.value : measured;
+    final delay = connected && rawDelay == 0 ? lastDelay.value : rawDelay;
     final hotReloading = ref.watch(hotReloadingProvider).valueOrNull ?? false;
     final look = _held(_lookOf(status, delay, hotReloading));
 
@@ -275,9 +276,11 @@ class _ConnectionButton extends HookWidget {
     target.value = EclipseTraffic(down: EclipseTraffic.level(download), up: EclipseTraffic.level(upload));
     final traffic = useRef(const EclipseTraffic());
 
-    // repaints about 30 times a second, and only while something moves
+    // Timer (not useSingleTickerProvider): that hook only allows one createTicker
+    // for the State's life, so look/still changes crashed after disconnect→connect.
     final time = useValueNotifier(0.0);
     useEffect(() {
+      if (still) return null;
       var last = now();
       final timer = Timer.periodic(const Duration(milliseconds: 33), (_) {
         final at = now();
@@ -292,7 +295,7 @@ class _ConnectionButton extends HookWidget {
         if (!settled) time.value = at;
       });
       return timer.cancel;
-    }, const []);
+    }, [still]);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -314,28 +317,32 @@ class _ConnectionButton extends HookWidget {
                   right: -_glow,
                   bottom: -_glow,
                   child: IgnorePointer(
-                    child: ValueListenableBuilder(
-                      valueListenable: time,
-                      builder: (context, t, _) {
-                        final c = change.value;
-                        return CustomPaint(
-                          painter: EclipseButtonPainter(
-                            frame: EclipseFrame(
-                              look: c.look,
-                              previous: c.previous,
-                              since: still ? 10 : now() - c.at,
-                              time: still ? 0 : now(),
-                              color: c.color,
-                              previousColor: c.previousColor,
+                    child: RepaintBoundary(
+                      child: ValueListenableBuilder(
+                        valueListenable: time,
+                        builder: (context, t, _) {
+                          final c = change.value;
+                          return CustomPaint(
+                            isComplex: true,
+                            willChange: true,
+                            painter: EclipseButtonPainter(
+                              frame: EclipseFrame(
+                                look: c.look,
+                                previous: c.previous,
+                                since: still ? 10 : now() - c.at,
+                                time: still ? 0 : now(),
+                                color: c.color,
+                                previousColor: c.previousColor,
+                              ),
+                              radius: _size / 2,
+                              traffic: traffic.value,
+                              dark: theme.brightness == Brightness.dark,
+                              drawLogo: !useImage,
+                              logoOpacity: look == _Look.loading ? .38 : 1,
                             ),
-                            radius: _size / 2,
-                            traffic: traffic.value,
-                            dark: theme.brightness == Brightness.dark,
-                            drawLogo: !useImage,
-                            logoOpacity: look == _Look.loading ? .38 : 1,
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),

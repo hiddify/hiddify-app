@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/router/dialog/widgets/action_at_closing_dialog.dart';
+import 'package:hiddify/core/router/dialog/widgets/admin_bg_service_dialogs.dart';
 import 'package:hiddify/core/router/dialog/widgets/chain_license_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/confirmation_dialog.dart';
 import 'package:hiddify/core/router/dialog/widgets/custom_alert_dialog.dart';
@@ -256,5 +257,55 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<void> showCustomAlertFromErr(({String type, String? message}) err) async {
     return await _show<void>(CustomAlertDialog.fromErr(err));
+  }
+
+  /// Mode B: VPN needs elevated admin_bgservice.
+  Future<VpnAdminBgDialogResult> showVpnAdminBgService({bool waiting = false}) async {
+    return await _show<VpnAdminBgDialogResult?>(VpnAdminBgServiceDialog(waiting: waiting)) ??
+        VpnAdminBgDialogResult.cancel;
+  }
+
+  /// Shows the Mode B waiting dialog while [work] runs.
+  /// Returns `true` when [work] finishes, `false` when the user taps Stop.
+  Future<bool> runWhileVpnAdminWaiting(Future<void> work) async {
+    final context = rootNavKey.currentContext;
+    if (context == null) {
+      await work;
+      return true;
+    }
+
+    final navigator = Navigator.of(context);
+    final route = DialogRoute<VpnAdminBgDialogResult>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const VpnAdminBgServiceDialog(waiting: true),
+    );
+    final dialogFuture = navigator.push<VpnAdminBgDialogResult>(route);
+
+    try {
+      final stopped = await Future.any<bool>([
+        work.then((_) => false),
+        dialogFuture.then((_) => true),
+      ]);
+      if (!stopped && navigator.canPop()) {
+        navigator.removeRoute(route);
+      }
+      return !stopped;
+    } catch (error) {
+      if (navigator.canPop()) navigator.removeRoute(route);
+      rethrow;
+    }
+  }
+
+  /// Mode C: proxy features that optionally need admin_bgservice.
+  /// Returns (choice, neverAskAgain).
+  Future<(ProxyAdminBgDialogResult, bool)> showProxyAdminBgService({
+    required List<AdminNeededProxy> proxies,
+    bool elevationFailed = false,
+  }) async {
+    final result = await _show<(ProxyAdminBgDialogResult, bool)?>(
+      ProxyAdminBgServiceDialog(proxies: proxies, elevationFailed: elevationFailed),
+    );
+    return result ?? (ProxyAdminBgDialogResult.cancel, false);
   }
 }

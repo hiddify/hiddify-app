@@ -29,9 +29,8 @@ class VPNConfig: ObservableObject {
     @Stored(key: "VPN.baseDir")
     var baseDir: String = ""
     
-//    @Stored(key: "VPN.grpcFlutterPublicKey")
-//    var grpcFlutterPublicKey: String = ""
-    
+    /// Client certificate PEM bytes for mTLS with the packet-tunnel gRPC server.
+    var grpcFlutterPublicKey: Data = Data()
     
     @Stored(key: "VPN.ConfigOptions")
     var configOptions: String = ""

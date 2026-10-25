@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
@@ -10,8 +13,12 @@ import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
+class ActiveProxyFooter extends HookConsumerWidget with InfraLogger {
   const ActiveProxyFooter({super.key});
+
+  /// Same window as ConnectionButton's held connected look: a brief Disconnected
+  /// blip on resume must not collapse this footer or the connect button jumps.
+  static const _hold = Duration(milliseconds: 1500);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,8 +29,40 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
     final activeProxy = ref.watch(activeProxyNotifierProvider.select((value) => value.valueOrNull));
     final t = ref.watch(translationsProvider).requireValue;
 
-    // Early return if required data is not available
-    if (connectionState != const Connected() || activeProxy == null) {
+    final heldProxy = useRef<OutboundInfo?>(null);
+    final until = useRef<DateTime?>(null);
+    final rebuild = useState(0);
+
+    // Intentional disconnect must clear immediately (and clear the held ping).
+    // Only hold across a Connected→Disconnected blip (e.g. resume), not Disconnecting.
+    final intentionalStop = connectionState is Disconnecting || connectionState is Disconnected;
+    final live = connectionState is Connected && activeProxy != null;
+    OutboundInfo? proxy;
+    if (live) {
+      heldProxy.value = activeProxy;
+      until.value = null;
+      proxy = activeProxy;
+    } else if (intentionalStop) {
+      heldProxy.value = null;
+      until.value = null;
+      proxy = null;
+    } else if (heldProxy.value != null) {
+      until.value ??= DateTime.now().add(_hold);
+      if (DateTime.now().isBefore(until.value!)) {
+        proxy = heldProxy.value;
+      } else {
+        heldProxy.value = null;
+        until.value = null;
+      }
+    }
+    useEffect(() {
+      final end = until.value;
+      if (end == null) return null;
+      final timer = Timer(end.difference(DateTime.now()), () => rebuild.value++);
+      return timer.cancel;
+    }, [until.value]);
+
+    if (proxy == null) {
       return const SizedBox.shrink();
     }
 
@@ -63,13 +102,13 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
             InkWell(
               onTap: () async {
                 await handleUrlTest();
-                await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: activeProxy);
+                await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: proxy!);
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: IPCountryFlag(
-                  countryCode: activeProxy.ipinfo.countryCode,
-                  organization: activeProxy.ipinfo.org,
+                  countryCode: proxy.ipinfo.countryCode,
+                  organization: proxy.ipinfo.org,
                   size: 48,
                 ),
               ),
@@ -82,8 +121,8 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                   Semantics(
                     label: t.pages.proxies.activeProxy,
                     child: Text(
-                      // getRealOutboundTag(activeProxy),
-                      activeProxy.tagDisplay,
+                      // getRealOutboundTag(proxy),
+                      proxy.tagDisplay,
                       style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -92,15 +131,15 @@ class ActiveProxyFooter extends ConsumerWidget with InfraLogger {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      if (activeProxy.ipinfo.ip.isNotEmpty)
-                        IPText(ip: activeProxy.ipinfo.ip, onLongPress: handleUrlTest, constrained: true)
+                      if (proxy.ipinfo.ip.isNotEmpty)
+                        IPText(ip: proxy.ipinfo.ip, onLongPress: handleUrlTest, constrained: true)
                       else
                         UnknownIPText(text: t.pages.proxies.unknownIp, onTap: handleUrlTest),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          // getRealOutboundTag(activeProxy),
-                          activeProxy.type,
+                          // getRealOutboundTag(proxy),
+                          proxy.type,
                           style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

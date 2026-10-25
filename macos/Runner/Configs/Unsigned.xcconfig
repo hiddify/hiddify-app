@@ -1,0 +1,13 @@
+// A build without a Developer ID, for GitHub releases until one is available. Pass it as
+// XCODE_XCCONFIG_FILE: macOS runs a Network Extension only with a Developer ID, so the VPN runs in
+// hiddify-core's tunnel service, `Hiddify --tunnel run` as root (macos/TunnelService), and the app is
+// signed ad hoc.
+HIDDIFY_NETWORK_EXTENSION_ENABLED = NO
+HIDDIFY_EXTENSION_CODE_SIGN_ALLOWED = NO
+HIDDIFY_HOST_ENTITLEMENTS = Runner/Developer.entitlements
+HIDDIFY_CODE_SIGN_STYLE = Manual
+HIDDIFY_CODE_SIGN_IDENTITY = -
+HIDDIFY_HOST_PROVISIONING_PROFILE =
+HIDDIFY_TUNNEL_PROVISIONING_PROFILE =
+DEVELOPMENT_TEAM =
+ENABLE_HARDENED_RUNTIME = NO

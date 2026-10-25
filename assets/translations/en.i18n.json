@@ -179,7 +179,12 @@
         "urlHint": "Full configuration URL",
         "disableAutoUpdate": "Turn off auto update",
         "autoUpdateInterval": "Auto update interval",
-        "loading": "Adding profile…"
+        "loading": "Adding profile…",
+        "adminPreference": "Administrator preference",
+        "adminPreferenceAskEachTime": "Ask each time",
+        "adminPreferencePreferAdmin": "Always use admin",
+        "adminPreferencePreferNoAdmin": "Always continue without admin",
+        "adminPreferenceReset": "Ask each time about administrator permission"
       }
     },
     "logs": {
@@ -676,6 +681,28 @@
       "importRouteRuleByDeepLinkWarning": {
         "title": "Import route rule?",
         "message": "Route rules decide where your traffic goes.\nOnly import them from a source you trust."
+      }
+    },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Administrator permission needed",
+        "msg": "VPN mode needs a one-time administrator permission to install the Hiddify background service. After that, you can connect without another prompt.",
+        "connectWithAdmin": "Connect with admin permission",
+        "waitingTitle": "Waiting for administrator permission",
+        "waitingMsg": "Allow the administrator prompt to continue. You can stop and try again later.",
+        "stop": "Stop"
+      },
+      "proxyNeedsAdmin": {
+        "title": "Administrator permission recommended",
+        "msg": "Some settings in this profile work better with administrator permission. You can run with admin permission, or continue without it (those settings will be turned off for this connection).",
+        "seeConfigs": "See configs",
+        "hideConfigs": "Hide configs",
+        "neverAskAgain": "Don’t ask again for this profile",
+        "runAsAdmin": "Run as admin",
+        "continueWithoutAdmin": "Continue without admin",
+        "elevationFailedTitle": "Couldn’t get administrator permission",
+        "elevationFailedMsg": "The administrator prompt was denied or failed. Try again, or continue without admin for this connection.",
+        "tryAgain": "Try again"
       }
     },
     "experimentalNotice": {

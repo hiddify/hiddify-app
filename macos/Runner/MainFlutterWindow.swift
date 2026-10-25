@@ -4,11 +4,13 @@ import window_manager
 import LaunchAtLogin
 
 class MainFlutterWindow: NSWindow {
+  private var vpnController: MacOSVPNController?
   override func awakeFromNib() {
     let flutterViewController = FlutterViewController()
     let windowFrame = self.frame
     self.contentViewController = flutterViewController
     self.setFrame(windowFrame, display: true)
+    vpnController = MacOSVPNController(messenger: flutterViewController.engine.binaryMessenger)
 
 
  // Add FlutterMethodChannel platform code
@@ -23,6 +25,25 @@ class MainFlutterWindow: NSWindow {
         if let arguments = call.arguments as? [String: Any] {
           LaunchAtLogin.isEnabled = arguments["setEnabledValue"] as! Bool
         }
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+
+    FlutterMethodChannel(
+      name: "com.hiddify.app/desktop_status",
+      binaryMessenger: flutterViewController.engine.binaryMessenger
+    ).setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
+      switch call.method {
+      case "setStatus":
+        let status = (call.arguments as? [String: Any])?["status"] as? String ?? "none"
+        DesktopStatusBadge.setStatus(status)
+        result(nil)
+      case "setConnected":
+        // Older Dart builds; prefer setStatus.
+        let connected = (call.arguments as? [String: Any])?["connected"] as? Bool ?? false
+        DesktopStatusBadge.setConnected(connected)
         result(nil)
       default:
         result(FlutterMethodNotImplemented)

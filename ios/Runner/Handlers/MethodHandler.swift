@@ -33,8 +33,36 @@ public class MethodHandler: NSObject, FlutterPlugin {
         
         switch call.method {
         case "get_grpc_server_public_key":
-            result("")
+            let key = MobileGetServerPublicKey()
+            result(FlutterStandardTypedData(bytes: key ?? Data()))
         case "add_grpc_client_public_key":
+            guard
+                let args = call.arguments as? [String: Any?],
+                let clientKey = args["clientPublicKey"] as? FlutterStandardTypedData
+            else {
+                result(FlutterError(code: "INVALID_ARGS", message: nil, details: nil))
+                return
+            }
+            VPNConfig.shared.grpcFlutterPublicKey = clientKey.data
+            let toExtension = (args["toExtension"] as? Bool) ?? false
+            if toExtension {
+                // Running packet tunnel has its own process; register via IPC.
+                Task {
+                    do {
+                        try await VPNManager.shared.addGrpcClientPublicKeyToExtension(clientKey.data)
+                        await mainResult("")
+                    } catch {
+                        await mainResult(FlutterError(code: "EXTENSION_MTLS", message: error.localizedDescription, details: nil))
+                    }
+                }
+                return
+            }
+            var addError: NSError?
+            MobileAddGrpcClientPublicKey(clientKey.data, &addError)
+            if let addError {
+                result(FlutterError(code: String(addError.code), message: addError.localizedDescription, details: nil))
+                return
+            }
             result("")
         case "parse_config":
             guard
@@ -84,7 +112,7 @@ public class MethodHandler: NSObject, FlutterPlugin {
                     opts.listen = "127.0.0.1:\(grpcPort)"
                     opts.secret = ""
                     opts.debug = false
-                    opts.mode = 4
+                    opts.mode = mode // 1 = mTLS, 3/4 = insecure
                     opts.fixAndroidStack = false
                     MobileSetup(opts,
                         nil,
@@ -101,8 +129,18 @@ public class MethodHandler: NSObject, FlutterPlugin {
                         result(FlutterError(code: "SETUP", message: error.localizedDescription, details: nil))
                         return
                     }
-                    result(true)
+                    await mainResult(VPNManager.shared.statusPayload())
                 }
+        case "setup_vpn":
+            // Reload NE preferences and publish the live tunnel status (app relaunch / resume).
+            Task {
+                do {
+                    try await VPNManager.shared.setup()
+                    await mainResult(VPNManager.shared.statusPayload())
+                } catch {
+                    await mainResult(FlutterError(code: "SETUP", message: error.localizedDescription, details: nil))
+                }
+            }
         case "start":
             Task {
                 guard
@@ -117,6 +155,9 @@ public class MethodHandler: NSObject, FlutterPlugin {
                 VPNConfig.shared.activeConfigPath = path
                 VPNConfig.shared.activeProfileName = name
                 VPNConfig.shared.grpcServiceModePort=grpcPort
+                if let clientKey = args["clientPublicKey"] as? FlutterStandardTypedData {
+                    VPNConfig.shared.grpcFlutterPublicKey = clientKey.data
+                }
                 
                 var error: NSError?
                 //let configstr=MobileBuildConfig(path,&error) as String
@@ -126,7 +167,12 @@ public class MethodHandler: NSObject, FlutterPlugin {
                 }
                 do {
                     try await VPNManager.shared.setup()
-                    try await VPNManager.shared.connect(with: path, grpcServiceModePort: grpcPort, disableMemoryLimit: VPNConfig.shared.disableMemoryLimit)
+                    try await VPNManager.shared.connect(
+                        with: path,
+                        grpcServiceModePort: grpcPort,
+                        clientPublicKey: VPNConfig.shared.grpcFlutterPublicKey,
+                        disableMemoryLimit: VPNConfig.shared.disableMemoryLimit
+                    )
                 } catch {
                     await mainResult(FlutterError(code: "SETUP_CONNECTION", message: error.localizedDescription, details: nil))
                     return

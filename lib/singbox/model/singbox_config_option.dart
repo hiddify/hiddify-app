@@ -39,6 +39,8 @@ class SingboxConfigOption with _$SingboxConfigOption {
     required int mtu,
     required bool strictRoute,
     required String connectionTestUrl,
+    /// Subscription `ipinfo-url` override — custom ipapi-compatible geolocation endpoint.
+    String? ipinfoUrl,
     @IntervalInSecondsConverter() required Duration urlTestInterval,
     required bool enableClashApi,
     required int clashApiPort,
