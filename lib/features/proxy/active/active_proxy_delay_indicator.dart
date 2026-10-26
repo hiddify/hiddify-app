@@ -20,7 +20,10 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final connected = ref.watch(connectionNotifierProvider.select((s) => s.valueOrNull is Connected));
+    // a ping the core found, or the timeout it found on the proxy the user selected
+    final connected = ref.watch(
+      connectionNotifierProvider.select((s) => s.valueOrNull is Connected || s.valueOrNull is NoAvailableProxies),
+    );
     // Stale OutboundInfo can linger in valueOrNull after disconnect; never show then.
     if (!connected) return const SizedBox.shrink();
 

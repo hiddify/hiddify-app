@@ -53,6 +53,19 @@ void main() {
     expect(await core!.managedStatus.first, const CoreStatus.stopped());
   });
 
+  test('quiet stop skips native stop when already disconnected', () async {
+    core = CoreInterfaceMacOS.withForegroundClient(CoreClient(channel), {
+      'available': true,
+      'tunnelService': true,
+      'status': 'disconnected',
+    });
+
+    expect(await core!.stop(quiet: true), isTrue);
+
+    expect(operations, ['foreground.stop']);
+    expect(await core!.managedStatus.first, const CoreStatus.stopped());
+  });
+
   test('stop remains available in Debug builds without the VPN extension', () async {
     core = CoreInterfaceMacOS.withForegroundClient(CoreClient(channel), {'available': false, 'status': 'disconnected'});
 

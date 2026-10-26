@@ -22,13 +22,16 @@ const CoreStates$json = {
     {'1': 'STARTED', '2': 2},
     {'1': 'STOPPING', '2': 3},
     {'1': 'HOT_RELOADING', '2': 4},
+    {'1': 'WAITING', '2': 5},
+    {'1': 'NO_AVAILABLE_PROXIES', '2': 6},
   ],
 };
 
 /// Descriptor for `CoreStates`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List coreStatesDescriptor = $convert.base64Decode(
     'CgpDb3JlU3RhdGVzEgsKB1NUT1BQRUQQABIMCghTVEFSVElORxABEgsKB1NUQVJURUQQAhIMCg'
-    'hTVE9QUElORxADEhEKDUhPVF9SRUxPQURJTkcQBA==');
+    'hTVE9QUElORxADEhEKDUhPVF9SRUxPQURJTkcQBBILCgdXQUlUSU5HEAUSGAoUTk9fQVZBSUxB'
+    'QkxFX1BST1hJRVMQBg==');
 
 @$core.Deprecated('Use messageTypeDescriptor instead')
 const MessageType$json = {

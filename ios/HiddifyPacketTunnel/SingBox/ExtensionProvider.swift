@@ -65,8 +65,11 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         }
 
         // hiddify-core with its gRPC server: the app starts the core through it
-        let clientPublicKey = options?["GrpcClientPublicKey"] as? Data ?? Data()
-        let useMtls = !clientPublicKey.isEmpty
+        // The app keeps its client identity in the shared folder exactly while it runs the core with
+        // mTLS, and the core reads the certificate from there itself: nothing is passed in.
+        let useMtls = FileManager.default.fileExists(
+            atPath: FilePath.sharedDirectory.appendingPathComponent("grpc/client.crt").path
+        )
         let setupOptions = MobileSetupOptions()
         setupOptions.basePath = FilePath.sharedDirectory.relativePath
         setupOptions.workingDir = FilePath.workingDirectory.relativePath
@@ -80,13 +83,6 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         MobileSetup(setupOptions, platformInterface, &setupError)
         if let setupError {
             throw startupError("(packet-tunnel) error: setup service: \(setupError.localizedDescription)")
-        }
-        if useMtls {
-            var addError: NSError?
-            MobileAddGrpcClientPublicKey(clientPublicKey, &addError)
-            if let addError {
-                throw startupError("(packet-tunnel) error: add client cert: \(addError.localizedDescription)")
-            }
         }
         LibboxSetMemoryLimit(!disableMemoryLimit)
 
@@ -159,17 +155,6 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     }
 
     override open func handleAppMessage(_ messageData: Data) async -> Data? {
-        let prefix = Data("add_grpc_client_public_key:".utf8)
-        if messageData.starts(with: prefix) {
-            let clientPublicKey = messageData.dropFirst(prefix.count)
-            var addError: NSError?
-            MobileAddGrpcClientPublicKey(Data(clientPublicKey), &addError)
-            if let addError {
-                writeMessage("(packet-tunnel) add client cert failed: \(addError.localizedDescription)")
-                return Data("error:\(addError.localizedDescription)".utf8)
-            }
-            return Data("ok".utf8)
-        }
         // Legacy echo (e.g. stats probes that the app still sends).
         return messageData
     }

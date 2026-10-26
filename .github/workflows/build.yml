@@ -26,7 +26,8 @@ env:
   TARGET_NAME_apk: "Hiddify-Android"
   TARGET_NAME_aab: "Hiddify-Android"
   TARGET_NAME_exe: "Hiddify-Windows-Setup-x64"
-  TARGET_NAME_msix: "Hiddify-Windows-x64"
+  # Must match prepare_release_notes.py / README asset names (Setup-x64.Msix).
+  TARGET_NAME_msix: "Hiddify-Windows-Setup-x64"
   TARGET_NAME_zip: "Hiddify-Windows-Portable-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
@@ -77,16 +78,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Quote multi-target lists: in YAML flow maps, commas start a new key
+          # (`targets: exe,msix,zip` was parsed as targets=exe only).
           - { platform: android-apk,       os: ubuntu-latest,  targets: apk }
           # - { platform: android-aab,       os: ubuntu-latest,  targets: aab }
-          - { platform: windows,          os: windows-latest, aarch: amd64,     targets: exe,msix,zip }
-          - { platform: linux,            os: ubuntu-22.04,   aarch: amd64,     targets: deb,gz,AppImage }
-          # - { platform: linux-amd64,      os: ubuntu-22.04,   aarch: amd64,     targets: deb,gz }
-          # - { platform: linux-arm64,      os: ubuntu-24.04-arm, aarch: arm64,   targets: deb,gz }
-          # - { platform: linux-amd64-musl, os: ubuntu-22.04,   aarch: amd64,     targets: deb,gz }
-          # - { platform: linux-arm64-musl, os: ubuntu-24.04-arm, aarch: arm64,   targets: deb,gz }
-          - { platform: macos,            os: macos-15,       aarch: universal, targets: dmg,pkg }
-          # - { platform: macos-appstore,   os: macos-26,       aarch: universal, targets: pkg,dmg }
+          - { platform: windows,          os: windows-latest, aarch: amd64,     targets: "exe,msix,zip" }
+          - { platform: linux,            os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz,AppImage" }
+          # - { platform: linux-amd64,      os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
+          # - { platform: linux-arm64,      os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
+          # - { platform: linux-amd64-musl, os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
+          # - { platform: linux-arm64-musl, os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
+          - { platform: macos,            os: macos-15,       aarch: universal, targets: "dmg,pkg" }
+          # - { platform: macos-appstore,   os: macos-26,       aarch: universal, targets: "pkg,dmg" }
           # - { platform: ios,              os: macos-26,       aarch: universal, filename: hiddify-ios, targets: ipa }
     runs-on: ${{ matrix.os }}
     steps:
@@ -335,17 +338,27 @@ jobs:
         run: |
           Get-ChildItem -Path dist -Recurse | Select-Object FullName
           New-Item -ItemType Directory -Path "out" -Force | Out-Null
-          $targets = "${{ matrix.targets }}".Split(',')
+          $targets = "${{ matrix.targets }}".Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+          Write-Host "Windows copy targets: $($targets -join ', ')"
           foreach ($ext in $targets) {
-            $ext = $ext.Trim()
             $key = "TARGET_NAME_$ext"
-            $targetName = (Get-Item "env:$key").Value
-            
-            $files = Get-ChildItem -Path dist -Recurse -Filter "*.$ext"
-            
+            $targetName = [Environment]::GetEnvironmentVariable($key)
+            if (-not $targetName) { throw "Missing env $key for extension .$ext" }
+
+            # Case-insensitive match: dist may use .Msix / .msix / .zip / .exe
+            $files = Get-ChildItem -Path dist -Recurse -File | Where-Object {
+              $_.Extension.TrimStart('.').ToLowerInvariant() -eq $ext.ToLowerInvariant()
+            }
+            if (-not $files) {
+              Write-Warning "No *.$ext under dist for $targetName"
+              continue
+            }
             foreach ($file in $files) {
-                $destination = Join-Path -Path "out" -ChildPath "$targetName.$ext"
-                Move-Item -Path $file.FullName -Destination $destination -Force
+              # Preserve catalog casing for msix (Hiddify-Windows-Setup-x64.Msix).
+              $outExt = if ($ext -eq 'msix') { 'Msix' } else { $ext }
+              $destination = Join-Path -Path "out" -ChildPath "$targetName.$outExt"
+              Write-Host "Moving $($file.FullName) -> $destination"
+              Move-Item -Path $file.FullName -Destination $destination -Force
             }
           }
           Get-ChildItem -Path out

@@ -15,18 +15,18 @@ class MTLSChannelCredentials extends ChannelCredentials {
     required this.clientCertificatePem,
     required Uint8List serverCertificateDer,
     required String serverPemBody,
-  })  : _ctx = context,
-        super.secure(
-          authority: '127.0.0.1',
-          onBadCertificate: (X509Certificate cert, String host) {
-            if (!_isLoopbackHost(host)) return false;
-            // Prefer exact DER pin; fall back to PEM body match (macOS sometimes
-            // re-encodes the presented cert so raw DER bytes differ).
-            if (_bytesEqual(cert.der, serverCertificateDer)) return true;
-            final presented = _pemBody(cert.pem);
-            return presented.isNotEmpty && presented == serverPemBody;
-          },
-        );
+  }) : _ctx = context,
+       super.secure(
+         authority: '127.0.0.1',
+         onBadCertificate: (X509Certificate cert, String host) {
+           if (!_isLoopbackHost(host)) return false;
+           // Prefer exact DER pin; fall back to PEM body match (macOS sometimes
+           // re-encodes the presented cert so raw DER bytes differ).
+           if (_bytesEqual(cert.der, serverCertificateDer)) return true;
+           final presented = _pemBody(cert.pem);
+           return presented.isNotEmpty && presented == serverPemBody;
+         },
+       );
 
   final SecurityContext _ctx;
 
@@ -38,11 +38,6 @@ class MTLSChannelCredentials extends ChannelCredentials {
     required Uint8List serverCertificatePem,
     required AsymmetricKeyPair<PublicKey, PrivateKey> clientKey,
   }) {
-    final serverPem = utf8.decode(serverCertificatePem);
-    if (!serverPem.contains('-----BEGIN CERTIFICATE-----')) {
-      throw ArgumentError('Server certificate must be PEM.');
-    }
-
     final String privateKeyPem;
     final String clientCertPem;
     if (clientKey.privateKey is RSAPrivateKey && clientKey.publicKey is RSAPublicKey) {
@@ -70,9 +65,25 @@ class MTLSChannelCredentials extends ChannelCredentials {
     } else {
       throw ArgumentError('Unsupported private key type.');
     }
+    return MTLSChannelCredentials.fromPem(
+      serverCertificatePem: serverCertificatePem,
+      clientCertificatePem: clientCertPem,
+      clientPrivateKeyPem: privateKeyPem,
+    );
+  }
 
-    if (!clientCertPem.contains('-----BEGIN CERTIFICATE-----')) {
-      throw StateError('Failed to generate client certificate PEM.');
+  /// Credentials for a client identity that already exists (see GrpcClientIdentity).
+  factory MTLSChannelCredentials.fromPem({
+    required Uint8List serverCertificatePem,
+    required String clientCertificatePem,
+    required String clientPrivateKeyPem,
+  }) {
+    final serverPem = utf8.decode(serverCertificatePem);
+    if (!serverPem.contains('-----BEGIN CERTIFICATE-----')) {
+      throw ArgumentError('Server certificate must be PEM.');
+    }
+    if (!clientCertificatePem.contains('-----BEGIN CERTIFICATE-----')) {
+      throw ArgumentError('Client certificate must be PEM.');
     }
 
     final serverDer = _pemToDer(serverPem);
@@ -82,12 +93,12 @@ class MTLSChannelCredentials extends ChannelCredentials {
     ctx.setAlpnProtocols(supportedAlpnProtocols, false);
     // PEM works across Android/desktop; DER triggers BAD_PKCS12_DATA on macOS desktop.
     ctx.setTrustedCertificatesBytes(utf8.encode(serverPem));
-    ctx.useCertificateChainBytes(utf8.encode(clientCertPem));
-    ctx.usePrivateKeyBytes(utf8.encode(privateKeyPem));
+    ctx.useCertificateChainBytes(utf8.encode(clientCertificatePem));
+    ctx.usePrivateKeyBytes(utf8.encode(clientPrivateKeyPem));
 
     return MTLSChannelCredentials._(
       context: ctx,
-      clientCertificatePem: clientCertPem,
+      clientCertificatePem: clientCertificatePem,
       serverCertificateDer: serverDer,
       serverPemBody: serverPemBody,
     );

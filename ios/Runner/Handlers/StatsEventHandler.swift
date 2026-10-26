@@ -25,7 +25,7 @@ public class StatsEventHandler: NSObject, FlutterPlugin, FlutterStreamHandler {
         self.events = events
         commandClient = CommandClient(.status)
         commandClient?.connect()
-        cancellable =  commandClient?.$status.sink{ [self] status in
+        cancellable =  commandClient?.$status.receive(on: DispatchQueue.main).sink{ [self] status in
             self.writeStatus(status)
         }
         return nil

@@ -22,7 +22,13 @@ public class AlertsEventHandler: NSObject, FlutterPlugin, FlutterStreamHandler {
     }
     
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        cancellable = VPNManager.shared.$alert.sink { [events] alert in
+        // A published value is sent when the stream is listened to, and the empty one reads as
+        // "Stopped" on the Flutter side: every return to the foreground showed a disconnect.
+        // Only real alerts are sent.
+        cancellable = VPNManager.shared.$alert
+            .filter { $0.alert != nil }
+            .receive(on: DispatchQueue.main)
+            .sink { [events] alert in
             var data = [
                 "status": "Stopped",
                 "alert": alert.alert?.rawValue,

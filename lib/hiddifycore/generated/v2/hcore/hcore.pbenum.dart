@@ -13,12 +13,17 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+/// The lifecycle is owned by the core: STOPPED -> STARTING -> WAITING -> STARTED, and STOPPING
+/// from any running state. A start is accepted only from STOPPED. While the core runs, its
+/// monitoring moves it between WAITING, STARTED and NO_AVAILABLE_PROXIES.
 class CoreStates extends $pb.ProtobufEnum {
   static const CoreStates STOPPED = CoreStates._(0, _omitEnumNames ? '' : 'STOPPED');
   static const CoreStates STARTING = CoreStates._(1, _omitEnumNames ? '' : 'STARTING');
   static const CoreStates STARTED = CoreStates._(2, _omitEnumNames ? '' : 'STARTED');
   static const CoreStates STOPPING = CoreStates._(3, _omitEnumNames ? '' : 'STOPPING');
   static const CoreStates HOT_RELOADING = CoreStates._(4, _omitEnumNames ? '' : 'HOT_RELOADING');
+  static const CoreStates WAITING = CoreStates._(5, _omitEnumNames ? '' : 'WAITING');
+  static const CoreStates NO_AVAILABLE_PROXIES = CoreStates._(6, _omitEnumNames ? '' : 'NO_AVAILABLE_PROXIES');
 
   static const $core.List<CoreStates> values = <CoreStates> [
     STOPPED,
@@ -26,6 +31,8 @@ class CoreStates extends $pb.ProtobufEnum {
     STARTED,
     STOPPING,
     HOT_RELOADING,
+    WAITING,
+    NO_AVAILABLE_PROXIES,
   ];
 
   static final $core.Map<$core.int, CoreStates> _byValue = $pb.ProtobufEnum.initByValue(values);

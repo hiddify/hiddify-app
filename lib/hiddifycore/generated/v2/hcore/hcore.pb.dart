@@ -14,8 +14,8 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../../google/protobuf/timestamp.pb.dart' as $8;
-import '../hcommon/common.pbenum.dart' as $2;
+import '../../google/protobuf/timestamp.pb.dart' as $0;
+import '../hcommon/common.pbenum.dart' as $1;
 import 'hcore.pbenum.dart';
 
 export 'hcore.pbenum.dart';
@@ -639,7 +639,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   factory OutboundInfo({
     $core.String? tag,
     $core.String? type,
-    $8.Timestamp? urlTestTime,
+    $0.Timestamp? urlTestTime,
     $core.int? urlTestDelay,
     IpInfo? ipinfo,
     $core.bool? isSelected,
@@ -716,7 +716,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'OutboundInfo', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'tag')
     ..aOS(2, _omitFieldNames ? '' : 'type')
-    ..aOM<$8.Timestamp>(3, _omitFieldNames ? '' : 'urlTestTime', subBuilder: $8.Timestamp.create)
+    ..aOM<$0.Timestamp>(3, _omitFieldNames ? '' : 'urlTestTime', subBuilder: $0.Timestamp.create)
     ..a<$core.int>(4, _omitFieldNames ? '' : 'urlTestDelay', $pb.PbFieldType.O3)
     ..aOM<IpInfo>(5, _omitFieldNames ? '' : 'ipinfo', subBuilder: IpInfo.create)
     ..aOB(6, _omitFieldNames ? '' : 'isSelected')
@@ -774,15 +774,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   void clearType() => clearField(2);
 
   @$pb.TagNumber(3)
-  $8.Timestamp get urlTestTime => $_getN(2);
+  $0.Timestamp get urlTestTime => $_getN(2);
   @$pb.TagNumber(3)
-  set urlTestTime($8.Timestamp v) { setField(3, v); }
+  set urlTestTime($0.Timestamp v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasUrlTestTime() => $_has(2);
   @$pb.TagNumber(3)
   void clearUrlTestTime() => clearField(3);
   @$pb.TagNumber(3)
-  $8.Timestamp ensureUrlTestTime() => $_ensure(2);
+  $0.Timestamp ensureUrlTestTime() => $_ensure(2);
 
   @$pb.TagNumber(4)
   $core.int get urlTestDelay => $_getIZ(3);
@@ -1643,7 +1643,7 @@ class ParseRequest extends $pb.GeneratedMessage {
 
 class ParseResponse extends $pb.GeneratedMessage {
   factory ParseResponse({
-    $2.ResponseCode? responseCode,
+    $1.ResponseCode? responseCode,
     $core.String? content,
     $core.String? message,
   }) {
@@ -1664,7 +1664,7 @@ class ParseResponse extends $pb.GeneratedMessage {
   factory ParseResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ParseResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
-    ..e<$2.ResponseCode>(1, _omitFieldNames ? '' : 'responseCode', $pb.PbFieldType.OE, defaultOrMaker: $2.ResponseCode.OK, valueOf: $2.ResponseCode.valueOf, enumValues: $2.ResponseCode.values)
+    ..e<$1.ResponseCode>(1, _omitFieldNames ? '' : 'responseCode', $pb.PbFieldType.OE, defaultOrMaker: $1.ResponseCode.OK, valueOf: $1.ResponseCode.valueOf, enumValues: $1.ResponseCode.values)
     ..aOS(2, _omitFieldNames ? '' : 'content')
     ..aOS(3, _omitFieldNames ? '' : 'message')
     ..hasRequiredFields = false
@@ -1692,9 +1692,9 @@ class ParseResponse extends $pb.GeneratedMessage {
   static ParseResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $2.ResponseCode get responseCode => $_getN(0);
+  $1.ResponseCode get responseCode => $_getN(0);
   @$pb.TagNumber(1)
-  set responseCode($2.ResponseCode v) { setField(1, v); }
+  set responseCode($1.ResponseCode v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasResponseCode() => $_has(0);
   @$pb.TagNumber(1)
@@ -2144,7 +2144,7 @@ class LogMessage extends $pb.GeneratedMessage {
     LogLevel? level,
     LogType? type,
     $core.String? message,
-    $8.Timestamp? time,
+    $0.Timestamp? time,
   }) {
     final $result = create();
     if (level != null) {
@@ -2169,7 +2169,7 @@ class LogMessage extends $pb.GeneratedMessage {
     ..e<LogLevel>(1, _omitFieldNames ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.TRACE, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
     ..e<LogType>(2, _omitFieldNames ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: LogType.CORE, valueOf: LogType.valueOf, enumValues: LogType.values)
     ..aOS(3, _omitFieldNames ? '' : 'message')
-    ..aOM<$8.Timestamp>(4, _omitFieldNames ? '' : 'time', subBuilder: $8.Timestamp.create)
+    ..aOM<$0.Timestamp>(4, _omitFieldNames ? '' : 'time', subBuilder: $0.Timestamp.create)
     ..hasRequiredFields = false
   ;
 
@@ -2222,15 +2222,15 @@ class LogMessage extends $pb.GeneratedMessage {
   void clearMessage() => clearField(3);
 
   @$pb.TagNumber(4)
-  $8.Timestamp get time => $_getN(3);
+  $0.Timestamp get time => $_getN(3);
   @$pb.TagNumber(4)
-  set time($8.Timestamp v) { setField(4, v); }
+  set time($0.Timestamp v) { setField(4, v); }
   @$pb.TagNumber(4)
   $core.bool hasTime() => $_has(3);
   @$pb.TagNumber(4)
   void clearTime() => clearField(4);
   @$pb.TagNumber(4)
-  $8.Timestamp ensureTime() => $_ensure(3);
+  $0.Timestamp ensureTime() => $_ensure(3);
 }
 
 class LogRequest extends $pb.GeneratedMessage {

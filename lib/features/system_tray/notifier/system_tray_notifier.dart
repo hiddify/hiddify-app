@@ -35,16 +35,15 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     // Watch AsyncValues directly (not .future): after disconnect the proxy
     // provider used to error while still holding a previous delay, and awaiting
     // .future could leave the tray on the old green/error mark.
-    final connection =
-        ref.watch(connectionNotifierProvider).valueOrNull ?? const ConnectionStatus.disconnected();
+    final connection = ref.watch(connectionNotifierProvider).valueOrNull ?? const ConnectionStatus.disconnected();
     final urlTestDelay = connection is Connected
         ? (ref.watch(activeProxyNotifierProvider).valueOrNull?.urlTestDelay ?? 0)
         : 0;
-    // Dock/taskbar/tray mark: none when disconnected, error when connected
-    // without a usable ping, green when Connected with a real ping.
+    // Dock/taskbar/tray mark: none when disconnected, error while the core waits for a ping,
+    // green once the core reports connected.
     final badge = switch (connection) {
-      Connected() when ConnectionConst.isValidDelay(urlTestDelay) => DesktopBadgeStatus.ok,
-      Connected() => DesktopBadgeStatus.error,
+      Connected() => DesktopBadgeStatus.ok,
+      Waiting() || NoAvailableProxies() => DesktopBadgeStatus.error,
       _ => DesktopBadgeStatus.none,
     };
     // Update the Dock/taskbar mark before any other await so a cancelled rebuild
@@ -52,7 +51,6 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     await DesktopStatusBadge.setStatus(badge);
 
     final t = await ref.watch(translationsProvider.future);
-    final menuStatus = _modifyConnectionStatus(connection, urlTestDelay);
     final serviceMode = ref.watch(ConfigOptions.serviceMode);
 
     await trayManager.setIcon(
@@ -67,7 +65,7 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
       }
       await trayManager.setToolTip(_trayTooltip(connection, urlTestDelay, t, badge: badge));
     }
-    await trayManager.setContextMenu(_trayMenu(menuStatus, serviceMode, t));
+    await trayManager.setContextMenu(_trayMenu(connection, serviceMode, t));
   }
 
   Menu _trayMenu(ConnectionStatus connection, ServiceMode serviceMode, Translations t) => Menu(
@@ -78,8 +76,9 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
         label: switch (connection) {
           Disconnected() => t.connection.connect,
           Connecting() => t.connection.connecting,
-          Connected() => t.connection.disconnect,
+          Connected() || Waiting() || NoAvailableProxies() => t.connection.disconnect,
           Disconnecting() => t.connection.disconnecting,
+          HotReloading() => t.connection.hotReloading,
         },
         disabled: connection.isSwitching,
       ),
@@ -117,9 +116,12 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     }
     switch (status) {
       case Connecting():
+      case Waiting():
+      case NoAvailableProxies():
       case Disconnecting():
         return isWindows ? images.trayIconDisconnectedIco : images.trayIconDisconnectedPng.path;
       case Connected():
+      case HotReloading():
       case Disconnected():
         // Light bar → darker glyph; dark bar → lighter glyph.
         return isWindows
@@ -143,14 +145,6 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
       return '$r : ${urlTestDelay}ms';
     }
     return r;
-  }
-
-  ConnectionStatus _modifyConnectionStatus(ConnectionStatus connection, int urlTestDelay) {
-    if (connection is Connected) {
-      return ConnectionConst.isValidDelay(urlTestDelay) ? const Connected() : const Connecting();
-    } else {
-      return connection;
-    }
   }
 
   @override

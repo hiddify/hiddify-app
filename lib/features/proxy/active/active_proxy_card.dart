@@ -33,16 +33,18 @@ class ActiveProxyFooter extends HookConsumerWidget with InfraLogger {
     final until = useRef<DateTime?>(null);
     final rebuild = useState(0);
 
-    // Intentional disconnect must clear immediately (and clear the held ping).
-    // Only hold across a Connected→Disconnected blip (e.g. resume), not Disconnecting.
-    final intentionalStop = connectionState is Disconnecting || connectionState is Disconnected;
-    final live = connectionState is Connected && activeProxy != null;
+    // Intentional disconnect and a new Connecting must clear immediately — otherwise
+    // a held outbound with an empty IP shows "Unknown IP" under Connecting… (#2395).
+    // Only hold across a Connected→Disconnected blip (e.g. resume).
+    final clearProxy =
+        connectionState is Disconnecting || connectionState is Disconnected || connectionState is Connecting;
+    final live = connectionState.isRunning && activeProxy != null;
     OutboundInfo? proxy;
     if (live) {
       heldProxy.value = activeProxy;
       until.value = null;
       proxy = activeProxy;
-    } else if (intentionalStop) {
+    } else if (clearProxy) {
       heldProxy.value = null;
       until.value = null;
       proxy = null;
@@ -106,11 +108,7 @@ class ActiveProxyFooter extends HookConsumerWidget with InfraLogger {
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: IPCountryFlag(
-                  countryCode: proxy.ipinfo.countryCode,
-                  organization: proxy.ipinfo.org,
-                  size: 48,
-                ),
+                child: IPCountryFlag(countryCode: proxy.ipinfo.countryCode, organization: proxy.ipinfo.org, size: 48),
               ),
             ),
             Expanded(
@@ -134,7 +132,7 @@ class ActiveProxyFooter extends HookConsumerWidget with InfraLogger {
                       if (proxy.ipinfo.ip.isNotEmpty)
                         IPText(ip: proxy.ipinfo.ip, onLongPress: handleUrlTest, constrained: true)
                       else
-                        UnknownIPText(text: t.pages.proxies.unknownIp, onTap: handleUrlTest),
+                        UnknownIPText(text: t.pages.proxies.checkingIp, onTap: handleUrlTest),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(

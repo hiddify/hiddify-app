@@ -230,20 +230,17 @@ class VPNManager: ObservableObject {
         }
     }
     
-    func connect(with config: String, grpcServiceModePort: Int, clientPublicKey: Data = Data(), disableMemoryLimit: Bool = false) async throws {
+    func connect(with config: String, grpcServiceModePort: Int, disableMemoryLimit: Bool = false) async throws {
         
         await set(upload: 0, download: 0)
 //        guard state == .disconnected else { return }
         do {
             try await enableVPNManager()
-            var options: [String: NSObject] = [
+            let options: [String: NSObject] = [
                 "Config": config as NSString,
                 "GrpcServiceModePort": NSNumber(value: grpcServiceModePort),
                 "DisableMemoryLimit": (disableMemoryLimit ? "YES" : "NO") as NSString,
             ]
-            if !clientPublicKey.isEmpty {
-                options["GrpcClientPublicKey"] = clientPublicKey as NSData
-            }
             try manager.connection.startVPNTunnel(options: options)
             
         } catch {
@@ -285,35 +282,4 @@ class VPNManager: ObservableObject {
         }
     }
 
-    /// Registers a Flutter-session client cert with the already-running packet tunnel (IPC).
-    func addGrpcClientPublicKeyToExtension(_ clientPublicKey: Data) async throws {
-        guard state == .connected || state == .reasserting else { return }
-        guard let session = manager.connection as? NETunnelProviderSession else { return }
-        var message = Data("add_grpc_client_public_key:".utf8)
-        message.append(clientPublicKey)
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            do {
-                try session.sendProviderMessage(message) { response in
-                    if let response, let text = String(data: response, encoding: .utf8), text.hasPrefix("ok") {
-                        continuation.resume()
-                    } else if response == nil {
-                        continuation.resume(throwing: NSError(
-                            domain: "VPNManager",
-                            code: 1,
-                            userInfo: [NSLocalizedDescriptionKey: "No response from packet tunnel"]
-                        ))
-                    } else {
-                        let detail = response.flatMap { String(data: $0, encoding: .utf8) } ?? "unknown"
-                        continuation.resume(throwing: NSError(
-                            domain: "VPNManager",
-                            code: 2,
-                            userInfo: [NSLocalizedDescriptionKey: "Packet tunnel rejected client cert: \(detail)"]
-                        ))
-                    }
-                }
-            } catch {
-                continuation.resume(throwing: error)
-            }
-        }
-    }
 }

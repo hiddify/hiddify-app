@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/utils/laststeam.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
+import 'package:hiddify/hiddifycore/core_interface/grpc_client_identity.dart';
 import 'package:hiddify/hiddifycore/core_interface/mtls_channel_cred.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hello/hello.pb.dart';
@@ -24,8 +23,9 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   static const statusChannel = EventChannel("$channelPrefix/service.status", JSONMethodCodec());
   static const alertsChannel = EventChannel("$channelPrefix/service.alerts", JSONMethodCodec());
 
-  // RSA matches the Go server crypto stack and avoids EC PKCS#8 quirks on iOS.
-  static final _clientKey = CryptoUtils.generateRSAKeyPair();
+  /// Made once and kept in the app's private folder, then reused by every launch and by the
+  /// platform service (see GrpcClientIdentity).
+  late GrpcClientIdentity _identity;
 
   static const portBack = 17079;
   static const portFront = 17078;
@@ -34,7 +34,6 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   bool _debug = false;
   bool _useMtls = false;
   ChannelCredentials _credentials = const ChannelCredentials.insecure();
-  MTLSChannelCredentials? _mtls;
 
   late LastStream<CoreStatus> _status;
   StreamSubscription<CoreStatus>? _nativeStatusSubscription;
@@ -52,6 +51,15 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   Future<String> setup(Directories directories, bool debug, int mode) async {
     _debug = debug;
     _useMtls = _isMtlsMode(mode);
+    // The identity is kept in the private base folder only while the core runs with mTLS: the
+    // core and the platform service take its presence as the switch, and trust it by reading the
+    // file, so nothing is passed over the method channel.
+    final identityDirectory = Directory('${directories.baseDir.path}/grpc');
+    if (_useMtls) {
+      _identity = await GrpcClientIdentity.loadOrCreate(identityDirectory);
+    } else if (await identityDirectory.exists()) {
+      await identityDirectory.delete(recursive: true);
+    }
 
     final status = statusChannel.receiveBroadcastStream().map(CoreStatus.fromEvent);
     final alerts = alertsChannel.receiveBroadcastStream().map(CoreStatus.fromEvent);
@@ -128,22 +136,8 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     // Tunnel can outlive the Flutter process; treat a live bg port as available.
     if (await isPortOpen('127.0.0.1', portBack)) {
       _isBgClientAvailable = true;
-      await _registerClientCertWithExtension();
     }
     return '';
-  }
-
-  /// Best-effort: trust this session's client cert in a tunnel that was started earlier.
-  Future<void> _registerClientCertWithExtension() async {
-    if (_mtls == null) return;
-    try {
-      await methodChannel.invokeMethod('add_grpc_client_public_key', {
-        'clientPublicKey': Uint8List.fromList(utf8.encode(_mtls!.clientCertificatePem)),
-        'toExtension': true,
-      });
-    } catch (e) {
-      loggy.warning('extension mTLS client cert registration: $e');
-    }
   }
 
   void _applyNativeStatusPayload(dynamic payload) {
@@ -157,7 +151,6 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 
   Future<ChannelCredentials> _buildCredentials() async {
     if (!_useMtls) {
-      _mtls = null;
       return const ChannelCredentials.insecure();
     }
 
@@ -166,14 +159,13 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
       throw StateError('empty gRPC server certificate');
     }
 
-    final mtls = MTLSChannelCredentials(
+    final mtls = MTLSChannelCredentials.fromPem(
       serverCertificatePem: serverCert,
-      clientKey: _clientKey,
+      clientCertificatePem: _identity.certificatePem,
+      clientPrivateKeyPem: _identity.privateKeyPem,
     );
-    await methodChannel.invokeMethod('add_grpc_client_public_key', {
-      'clientPublicKey': Uint8List.fromList(utf8.encode(mtls.clientCertificatePem)),
-    });
-    _mtls = mtls;
+    // nothing is passed to the platform: the core and the platform service read the same identity
+    // from the private storage
     return mtls;
   }
 
@@ -191,18 +183,20 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
       'grpcPort': portBack,
       'startBg': true,
       'debug': _debug,
-      if (_mtls != null) 'clientPublicKey': Uint8List.fromList(utf8.encode(_mtls!.clientCertificatePem)),
     });
 
     _isBgClientAvailable = true;
     loggy.info('Waiting for starting core');
+    final waitingSince = DateTime.now();
+    waitForStart:
     for (var i = 0; i < 20; i++) {
       try {
         final res = await _status.get(timeout: const Duration(seconds: 1));
 
         switch (res) {
-          case CoreStarted() || CoreHotReloading():
-            break;
+          // the platform service is up: the core's own status takes over from here
+          case CoreStarted() || CoreWaiting() || CoreNoAvailableProxies() || CoreHotReloading():
+            break waitForStart;
           case CoreStopped():
             if (res.alert != null) {
               return res;
@@ -216,15 +210,13 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
         // just retry
       }
     }
-    loggy.info('Waiting for starting core finished');
+    loggy.info('Waiting for starting core finished after ${DateTime.now().difference(waitingSince).inMilliseconds}ms');
 
     if (!await waitUntilPort(portBack, true, null)) {
       await stopMethodChannel();
       return const CoreStatus.stopped(alert: CoreAlert.startService, message: 'starting background core...');
     }
 
-    // Re-register the client cert with the extension (separate address space).
-    await _registerClientCertWithExtension();
     return const CoreStarted();
   }
 
@@ -233,16 +225,18 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
     // Always ask the platform to stop: on iOS the tunnel can be up while the
     // extension gRPC port is unreachable (new app process / mTLS key), and
     // skipping disconnect left the VPN stuck in Settings.
+    // MethodChannel stop already waits until the VPN service reports Stopped
+    // (after Mobile.close), so only briefly poll the gRPC port.
     await stopMethodChannel();
     if (!await isPortOpen('127.0.0.1', portBack)) {
       _isBgClientAvailable = false;
       return true;
     }
-    // Port should drop once Mobile.close uses the same setup mode as start
-    // (mTLS background is mode 2; insecure is 4).
-    if (!await waitUntilPort(portBack, false, null, maxTry: 50)) {
+    if (!await waitUntilPort(portBack, false, null, maxTry: 10)) {
       loggy.warning('background port $portBack still open after stop');
-      return false;
+      // Platform stop finished; do not leave Disconnecting forever (#2395).
+      _isBgClientAvailable = false;
+      return true;
     }
 
     _isBgClientAvailable = false;

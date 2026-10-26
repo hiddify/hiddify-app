@@ -4,7 +4,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -65,17 +65,37 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                         selected: group.selected == proxy.tag,
                         onTap: () async {
                           await ref.read(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag);
-                          // if (selectActiveProxyMutation.state.isInProgress) return;
-                          // selectActiveProxyMutation.setFuture(
-                          // );
                         },
                       );
                     },
                   );
                 },
               )
-            : Center(child: Text(t.pages.proxies.empty)),
-        error: (error, stackTrace) => Center(child: Text(t.presentShortError(error))),
+            : Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    ref.watch(serviceRunningProvider) ? t.pages.proxies.empty : t.pages.proxies.connectToSeeProxies,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+        error: (error, stackTrace) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(t.pages.proxies.loadFailed, textAlign: TextAlign.center),
+                const Gap(12),
+                TextButton(
+                  onPressed: () => ref.invalidate(proxiesOverviewNotifierProvider),
+                  child: Text(t.connection.tapToRetry),
+                ),
+              ],
+            ),
+          ),
+        ),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
@@ -15,32 +14,29 @@ import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/home/widget/eclipse_button_painter.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
-import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/stats/notifier/stats_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// What the button shows, one value per look.
-enum _Look { loading, disconnected, connecting, waiting, connected, noPing, hotReloading, disconnecting, failed }
+enum _Look { loading, disconnected, connecting, waiting, noProxies, connected, hotReloading, disconnecting, failed }
 
-/// The core reports the tunnel as up before the first ping answers, so a tunnel
-/// with no ping yet is still waiting: the user waits once, not twice.
-/// A delay of 0 is a ping not measured yet; any other invalid delay timed out.
+/// One look per status the core reports. The core decides when the tunnel is waiting for a ping
+/// and when it is connected; the button only shows it.
 ///
 /// The status reloads after every core start; until the new stream answers,
 /// the last status holds. A failed start comes back as disconnected with the
 /// failure attached.
 ///
-/// A hot reload keeps the tunnel up, and the status stays connected through it.
-/// It comes before the ping checks, so a reload never looks like a ping problem.
-_Look _lookOf(AsyncValue<ConnectionStatus> status, int delay, bool hotReloading) => switch (status) {
+/// A hot reload keeps the tunnel up and has a look of its own.
+_Look _lookOf(AsyncValue<ConnectionStatus> status) => switch (status) {
   AsyncError() => _Look.failed,
   AsyncValue(valueOrNull: Disconnected(connectionFailure: _?)) => _Look.failed,
   AsyncValue(valueOrNull: Disconnected()) => _Look.disconnected,
   AsyncValue(valueOrNull: Connecting()) => _Look.connecting,
-  AsyncValue(valueOrNull: Connected()) when hotReloading => _Look.hotReloading,
-  AsyncValue(valueOrNull: Connected()) when delay == 0 => _Look.waiting,
-  AsyncValue(valueOrNull: Connected()) when !ConnectionConst.isValidDelay(delay) => _Look.noPing,
+  AsyncValue(valueOrNull: Waiting()) => _Look.waiting,
+  AsyncValue(valueOrNull: NoAvailableProxies()) => _Look.noProxies,
+  AsyncValue(valueOrNull: HotReloading()) => _Look.hotReloading,
   AsyncValue(valueOrNull: Connected()) => _Look.connected,
   AsyncValue(valueOrNull: Disconnecting()) => _Look.disconnecting,
   _ => _Look.loading,
@@ -53,45 +49,14 @@ class ConnectionButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final status = ref.watch(connectionNotifierProvider);
-    // Only use a ping while Connected. After disconnect Riverpod can keep the
-    // previous OutboundInfo on the proxy provider; feeding that into the next
-    // reconnect showed green Connected before the new tunnel's own ping (Windows VPN).
-    // lastDelay still covers focus/channel reloads that briefly have no ping
-    // while the tunnel stays up.
-    final connected = status.valueOrNull is Connected;
-    final rawDelay = connected
-        ? (ref.watch(activeProxyNotifierProvider).valueOrNull?.urlTestDelay ?? 0)
-        : 0;
-    final lastDelay = useRef(0);
-    if (!connected) {
-      lastDelay.value = 0;
-    } else if (rawDelay != 0) {
-      lastDelay.value = rawDelay;
-    }
-    final delay = connected && rawDelay == 0 ? lastDelay.value : rawDelay;
-    final hotReloading = ref.watch(hotReloadingProvider).valueOrNull ?? false;
-    final look = _held(_lookOf(status, delay, hotReloading));
+    final look = _held(_lookOf(status));
 
-    // A connect can be cancelled only a second after it began, so a double tap
-    // on connect doesn't cancel the connect its first tap started.
-    final connecting = status.valueOrNull is Connecting;
-    final cancellable = useState(false);
-    useEffect(() {
-      cancellable.value = false;
-      if (!connecting) return null;
-      final timer = Timer(const Duration(seconds: 1), () => cancellable.value = true);
-      return timer.cancel;
-    }, [connecting]);
-
-    // What a tap does follows the core alone: a tunnel that is up can be
-    // turned off even while it still looks like connecting, and so can a
-    // start, which the core cancels. The core is busy while it hot reloads,
-    // so the tap is off until that ends.
+    // What a tap does follows the core alone, and the core can be stopped whatever it is doing: a
+    // tunnel that is up, a start in progress, and a hot reload all turn off at once, and the core
+    // cancels what it was busy with.
     final onTap = switch (status) {
-      AsyncData(value: Connected()) when hotReloading => null,
-      AsyncData(value: Connecting()) when !cancellable.value => null,
       AsyncData(value: Disconnected()) || AsyncError() => () => _connect(ref),
-      AsyncData(value: Connected() || Connecting()) =>
+      AsyncData(value: Connected() || Waiting() || NoAvailableProxies() || Connecting() || HotReloading()) =>
         () => ref.read(connectionNotifierProvider.notifier).toggleConnection(),
       _ => null,
     };
@@ -118,8 +83,10 @@ class ConnectionButton extends HookConsumerWidget {
       label: switch (look) {
         _Look.loading => "",
         _Look.disconnected => t.connection.tapToConnect,
-        _Look.connecting || _Look.waiting => t.connection.connecting,
-        _Look.connected || _Look.noPing => t.connection.connected,
+        _Look.connecting => t.connection.connecting,
+        _Look.waiting => t.connection.waiting,
+        _Look.noProxies => t.connection.noAvailableProxies,
+        _Look.connected => t.connection.connected,
         _Look.hotReloading => t.connection.hotReloading,
         _Look.disconnecting => t.connection.disconnecting,
         _Look.failed => t.connection.failed,
@@ -127,14 +94,14 @@ class ConnectionButton extends HookConsumerWidget {
       hint: look == _Look.failed ? t.connection.tapToRetry : null,
       buttonColor: switch (look) {
         _Look.connected => buttonTheme.connectedColor!,
-        _Look.noPing || _Look.hotReloading => const Color.fromARGB(255, 185, 176, 103),
+        _Look.noProxies => const Color.fromARGB(255, 185, 176, 103),
         _Look.failed => Colors.red,
         // the logo's own blue while the connection is on its way
-        _Look.connecting || _Look.waiting || _Look.disconnecting => const Color(0xFF455FE9),
+        _Look.connecting || _Look.waiting || _Look.hotReloading || _Look.disconnecting => const Color(0xFF455FE9),
         _ => buttonTheme.idleColor!,
       },
       image: switch (look) {
-        _Look.connected || _Look.noPing || _Look.hotReloading => Assets.images.connectNorouz,
+        _Look.connected || _Look.noProxies || _Look.hotReloading => Assets.images.connectNorouz,
         _ => Assets.images.disconnectNorouz,
       },
       useImage: today.day >= 19 && today.day <= 23 && today.month == 3,
@@ -143,15 +110,19 @@ class ConnectionButton extends HookConsumerWidget {
 
   /// Coming back from the background, the app sets the core up again, and for a moment the status
   /// can read as not connected though the tunnel never went down. So leaving connected for
-  /// [_Look.loading], [_Look.disconnected] or [_Look.waiting] waits [_hold] before it shows, and
-  /// nothing changes if connected is back by then. A disconnect passes through disconnecting and a
-  /// failure is failed, so both still show at once.
+  /// [_Look.loading] waits [_hold] before it shows, and nothing changes if
+  /// connected is back by then.
+  ///
+  /// Intentional disconnect must not keep the Connected label: it goes through
+  /// [_Look.disconnecting], and a bare Connected→Disconnected jump (no Stopping event) must
+  /// also clear immediately — holding disconnected made disconnect feel multi-second slow.
+  /// A failure is failed, so it still shows at once.
   _Look _held(_Look look) {
     final shown = useRef(look);
     final until = useRef<DateTime?>(null);
     final rebuild = useState(0);
-    final steady = {_Look.connected, _Look.noPing, _Look.hotReloading}.contains(shown.value);
-    final blip = {_Look.loading, _Look.disconnected, _Look.waiting}.contains(look);
+    final steady = {_Look.connected, _Look.noProxies}.contains(shown.value);
+    final blip = {_Look.loading}.contains(look);
     var result = look;
     if (steady && blip) {
       until.value ??= DateTime.now().add(_hold);
@@ -231,7 +202,7 @@ class _ConnectionButton extends HookWidget {
     _Look.connecting => EclipseLook.starting,
     _Look.disconnecting => EclipseLook.stopping,
     _Look.waiting || _Look.hotReloading => EclipseLook.waiting,
-    _Look.connected || _Look.noPing => EclipseLook.connected,
+    _Look.connected || _Look.noProxies => EclipseLook.connected,
     _Look.failed => EclipseLook.error,
   };
 

@@ -32,7 +32,6 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Start("start"),
             Stop("stop"),
             Restart("restart"),
-            AddGrpcClientPublicKey("add_grpc_client_public_key"),
             GetGrpcServerPublicKey("get_grpc_server_public_key"),
 
         }
@@ -52,18 +51,6 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            Trigger.AddGrpcClientPublicKey.method -> {
-                GlobalScope.launch {
-                    result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        val clientPub = args["clientPublicKey"] as ByteArray
-                        Settings.grpcFlutterPublicKey = clientPub
-                        Mobile.addGrpcClientPublicKey(clientPub)
-                        success("")
-                    }
-                }
-            }
-
             Trigger.GetGrpcServerPublicKey.method -> {
                 GlobalScope.launch {
                     result.runCatching {

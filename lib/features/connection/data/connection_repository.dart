@@ -31,7 +31,6 @@ abstract interface class ConnectionRepository {
 
   /// Whether the core is applying a new config without a restart; the connection stays up
   /// (watchConnectionStatus keeps reporting it as connected).
-  Stream<bool> watchHotReloading();
   TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit);
   TaskEither<ConnectionFailure, Unit> disconnect();
   TaskEither<ConnectionFailure, Unit> reconnect(ProfileEntity activeProfile, bool disableMemoryLimit);
@@ -83,25 +82,27 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
       (event) => switch (event) {
         CoreStopped() => Disconnected(event.getCoreAlert()),
         CoreStarting() => const Connecting(),
+        CoreWaiting() => const Waiting(),
+        CoreNoAvailableProxies() => const NoAvailableProxies(),
         CoreStarted() => const Connected(),
         CoreStopping() => const Disconnecting(),
-        CoreHotReloading() => const Connected(),
+        CoreHotReloading() => const HotReloading(),
       },
     );
   }
 
   @override
-  Stream<bool> watchHotReloading() => singbox.watchStatus().map((event) => event is CoreHotReloading).distinct();
-
   @override
   TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit) => setup().flatMap(
     (_) => applyConfigOption(activeProfile).flatMap(
-      (_) => TaskEither.tryCatch(() async {
-        await _prepareAdminBgService(activeProfile);
-        return unit;
-      }, (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st)).flatMap(
-        (_) => singbox.start(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit),
-      ),
+      (_) =>
+          TaskEither.tryCatch(() async {
+            await _prepareAdminBgService(activeProfile);
+            return unit;
+          }, (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st)).flatMap(
+            (_) =>
+                singbox.start(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit),
+          ),
     ),
   );
 
@@ -119,9 +120,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     if (core is! CoreInterfaceDesktopTun) return;
 
     final pref = profile.userOverride?.adminPreference ?? UserAdminPreference.unset;
-    final serviceMode = options.enableTun
-        ? 'vpn'
-        : (options.setSystemProxy ? 'system-proxy' : 'proxy');
+    final serviceMode = options.enableTun ? 'vpn' : (options.setSystemProxy ? 'system-proxy' : 'proxy');
 
     final decision = await core.needAdminBgService(
       serviceMode: serviceMode,
@@ -157,9 +156,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
         useAdminBg = true;
         needsElevation = true;
       case hcore.AdminBgServiceDecision.ADMIN_BG_SERVICE_OPTIONAL_PROXY_NEED_ADMIN:
-        final (choice, neverAsk) = await dialogs.showProxyAdminBgService(
-          proxies: decision.adminNeededProxies,
-        );
+        final (choice, neverAsk) = await dialogs.showProxyAdminBgService(proxies: decision.adminNeededProxies);
         if (choice == ProxyAdminBgDialogResult.cancel) {
           throw const ConnectionFailure.missingPrivilege();
         }
@@ -183,9 +180,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     core.wrapAdminElevation = needsElevation ? dialogs.runWhileVpnAdminWaiting : null;
 
     if (stripPrivileged) {
-      final stripped = options.copyWith(
-        tlsTricks: options.tlsTricks.copyWith(mixedSniCase: false),
-      );
+      final stripped = options.copyWith(tlsTricks: options.tlsTricks.copyWith(mixedSniCase: false));
       _configOptionsSnapshot = stripped;
       final optionsResult = await singbox.changeOptions(stripped).run();
       optionsResult.match((error) => throw ConnectionFailure.unexpected(error), (_) {});
@@ -245,10 +240,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
       },
       (content) async {
         final result = await profiles.offlineUpdate(updated, content).run();
-        result.match(
-          (l) => loggy.warning('could not persist admin preference: $l'),
-          (_) {},
-        );
+        result.match((l) => loggy.warning('could not persist admin preference: $l'), (_) {});
       },
     );
   }

@@ -24,6 +24,7 @@ import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Action
 import com.hiddify.hiddify.constant.Alert
 import com.hiddify.hiddify.constant.Status
+import com.hiddify.hiddify.utils.GrpcClientProvider
 import com.hiddify.core.mobile.SetupOptions
 
 import go.Seq
@@ -132,7 +133,8 @@ class BoxService(
 
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        serviceUpdateIdleMode()
+                        // a receiver runs on the main thread, and waking the core is a call into it
+                        GlobalScope.launch(Dispatchers.IO) { serviceUpdateIdleMode() }
                     }
                 }
             }
@@ -173,7 +175,7 @@ class BoxService(
             Libbox.setMemoryLimit(!Settings.disableMemoryLimit)
             activePlatformInterface = platformInterface
             // 2 = GRPC_BACKGROUND (mTLS), 4 = GRPC_BACKGROUND_INSECURE. Must match Mobile.close.
-            grpcSetupMode = if (Settings.grpcFlutterPublicKey.isNotEmpty()) 2L else 4L
+            grpcSetupMode = if (GrpcClientProvider.usesMutualTls) 2L else 4L
             try {
                 Mobile.setup(
                     SetupOptions().also {
@@ -188,9 +190,7 @@ class BoxService(
                     },
                     platformInterface,
                 )
-                if (Settings.grpcFlutterPublicKey.isNotEmpty()) {
-                    Mobile.addGrpcClientPublicKey(Settings.grpcFlutterPublicKey)
-                }
+                // the core trusts the client certificate stored in the base folder by itself
             } catch (e: Exception) {
                 Log.e(TAG, "Mobile.setup failed", e)
                 stopAndAlert(Alert.CreateService, e.message ?: e.toString())
@@ -309,14 +309,18 @@ class BoxService(
 //            }
 //            commandServer = null
             Settings.startedByUser = false
+            if (activePlatformInterface === platformInterface) activePlatformInterface = null
+            // Close the mode we actually started. Old code always closed 4 (insecure), so
+            // mTLS background (mode 2) left :17079 listening and reconnect failed with
+            // "background service did not stop".
+            // Closing stops the core, which can take seconds: never on the main thread, or the
+            // app freezes while it disconnects.
+            val closeStart = System.currentTimeMillis()
+            for (mode in linkedSetOf(grpcSetupMode, 2L, 4L)) {
+                Mobile.close(mode)
+            }
+            Log.i(TAG, "core closed in ${System.currentTimeMillis() - closeStart}ms")
             withContext(Dispatchers.Main) {
-                if (activePlatformInterface === platformInterface) activePlatformInterface = null
-                // Close the mode we actually started. Old code always closed 4 (insecure), so
-                // mTLS background (mode 2) left :17079 listening and reconnect failed with
-                // "background service did not stop".
-                Mobile.close(grpcSetupMode)
-                Mobile.close(2L)
-                Mobile.close(4L)
                 status.value = Status.Stopped
                 service.stopSelf()
             }
