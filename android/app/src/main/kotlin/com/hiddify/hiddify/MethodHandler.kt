@@ -130,8 +130,9 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         }
                         Settings.startCoreAfterStartingService = false
 
-                        mainActivity.startService()
-                        success(true)
+                        // Answers after the permission dialogs, so the caller's wait for the
+                        // service starts only once it can start.
+                        success(mainActivity.startService())
                     }
                 }
             }

@@ -39,7 +39,7 @@ class GrpcClientIdentity {
       // unreadable: made again below
     }
     // RSA key generation is slow, and far slower in debug builds on a phone: not on the UI thread
-    final identity = await Isolate.run(generate);
+    final identity = await Isolate.run(GrpcClientIdentity.generate);
     await directory.create(recursive: true);
     await _write(privateKey, identity.privateKeyPem);
     await _write(certificate, identity.certificatePem);
@@ -47,7 +47,7 @@ class GrpcClientIdentity {
   }
 
   /// A new RSA identity: RSA matches the Go server's crypto and avoids EC PKCS#8 quirks on iOS.
-  static GrpcClientIdentity generate() {
+  factory GrpcClientIdentity.generate() {
     final pair = CryptoUtils.generateRSAKeyPair();
     final privateKey = pair.privateKey as RSAPrivateKey;
     final publicKey = pair.publicKey as RSAPublicKey;

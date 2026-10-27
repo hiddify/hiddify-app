@@ -13,7 +13,7 @@
 
 namespace {
 
-// 16x16 status overlay for the Windows taskbar button (white ring + fill).
+// 16x16 status overlay for the Windows taskbar button (thin white ring + fill).
 HICON CreateStatusOverlayIcon(UINT32 fill_argb) {
   const int size = 16;
   BITMAPINFO bmi = {};
@@ -33,23 +33,20 @@ HICON CreateStatusOverlayIcon(UINT32 fill_argb) {
   }
 
   auto* pixels = static_cast<UINT32*>(bits);
-  const float cx = (size - 1) * 0.5f;
-  const float cy = (size - 1) * 0.5f;
-  const float outer_r = size * 0.48f;
-  const float inner_r = size * 0.34f;
+  const float r = size * 0.28f;
+  // Pinned to the top-right corner, where Windows 11 draws the overlay, so the
+  // smaller dot stays on the icon's edge and covers less of it.
+  const float cx = size - 0.5f - r;
+  const float cy = r - 0.5f;
   for (int y = 0; y < size; ++y) {
     for (int x = 0; x < size; ++x) {
       const float dx = x - cx;
       const float dy = y - cy;
       const float d = sqrtf(dx * dx + dy * dy);
-      UINT32 px = 0x00000000;
-      if (d <= outer_r) {
-        // White ring + fill — readable on light and dark taskbars.
-        if (d >= inner_r) {
-          px = 0xFFFFFFFFu;
-        } else {
-          px = fill_argb;
-        }
+      UINT32 px = 0x00000000u;
+      if (d <= r) {
+        // Thin white ring keeps the dot readable on light and dark taskbars.
+        px = d >= r - 1.0f ? 0xFFFFFFFFu : fill_argb;
       }
       pixels[y * size + x] = px;
     }

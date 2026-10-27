@@ -653,9 +653,8 @@ class HiddifyCoreService with InfraLogger {
   }
 
   void _stopFollowingCore() {
-    final subscription = _coreInfoSubscription;
+    unawaited(_coreInfoSubscription?.cancel());
     _coreInfoSubscription = null;
-    unawaited(subscription?.cancel());
   }
 
   Future<void> startListeningLogs(String key, CoreClient cc) async {

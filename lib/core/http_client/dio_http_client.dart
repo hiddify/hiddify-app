@@ -31,7 +31,7 @@ class DioHttpClient with InfraLogger {
                 .firstOrNull;
             if (current == null || current.trim().isEmpty || current.startsWith('Dart')) {
               options.headers.removeWhere((key, _) => key.toLowerCase() == 'user-agent');
-              options.headers['User-Agent'] = this.userAgent;
+              options.headers['User-Agent'] = userAgent;
             }
             handler.next(options);
           },
@@ -50,7 +50,7 @@ class DioHttpClient with InfraLogger {
       _dio[mode]!.httpClientAdapter = IOHttpClientAdapter(
         createHttpClient: () {
           // what dart:io sends when a request has no user agent of its own, a redirect for one
-          final client = HttpClient()..userAgent = this.userAgent;
+          final client = HttpClient()..userAgent = userAgent;
           client.findProxy = (url) {
             if (mode == "proxy") {
               return "PROXY localhost:$port";

@@ -89,7 +89,7 @@ class MTLSChannelCredentials extends ChannelCredentials {
     final serverDer = _pemToDer(serverPem);
     final serverPemBody = _pemBody(serverPem);
 
-    final ctx = SecurityContext(withTrustedRoots: false);
+    final ctx = SecurityContext();
     ctx.setAlpnProtocols(supportedAlpnProtocols, false);
     // PEM works across Android/desktop; DER triggers BAD_PKCS12_DATA on macOS desktop.
     ctx.setTrustedCertificatesBytes(utf8.encode(serverPem));

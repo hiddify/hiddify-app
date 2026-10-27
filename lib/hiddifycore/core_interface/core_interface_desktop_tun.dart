@@ -27,7 +27,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   SingboxConfigOption? _options;
   bool _usingAdminBg = false;
   bool? _privileged;
-  String? _secret;
+  late String _secret;
 
   /// When true, start via admin_bgservice even in proxy mode (Mode C prefer-admin).
   bool useAdminBgService = false;
@@ -224,7 +224,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     }
 
     _secret = (await File(_secretPath).readAsString()).trim();
-    if (_secret!.length < 32) {
+    if (_secret.length < 32) {
       throw StateError('The VPN service secret is missing. Reinstall the VPN service.');
     }
     final old = _serviceChannel;
@@ -233,7 +233,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       port: _servicePort,
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     );
-    bgClient = CoreClient(_serviceChannel!, options: CallOptions(metadata: {'x-hiddify-secret': _secret!}));
+    bgClient = CoreClient(_serviceChannel!, options: CallOptions(metadata: {'x-hiddify-secret': _secret}));
     if (old != null) unawaited(old.shutdown());
     _usingAdminBg = true;
     _clientChanges.add(null);

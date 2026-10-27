@@ -291,7 +291,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   }
 
   @visibleForTesting
-  Future<(String, Map<String, Uint8List>)> snapshotConfiguration(String path) async {
+  Future<(String, Map<String, Uint8List>)> snapshotConfiguration(String path) {
     final workingDirectory = _workingDirectory;
     if (workingDirectory == null) throw StateError('Set up the core before snapshotting a VPN configuration.');
     return snapshotVpnConfiguration(path, workingDirectory);

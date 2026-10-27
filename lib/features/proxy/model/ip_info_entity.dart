@@ -26,11 +26,11 @@ class IpInfo with IpInfoMappable {
   /// endpoints (and as a last-resort fallback for built-in sources).
   static IpInfo parseFlexible(Map<String, dynamic> json) {
     final parsers = <IpInfo Function(Map<String, dynamic>)>[
-      fromIpApiJson,
-      fromIpInfoIoJson,
-      fromIpSbJson,
-      fromIpwhoIsJson,
-      fromIfconfigCoJson,
+      IpInfo.fromIpApiJson,
+      IpInfo.fromIpInfoIoJson,
+      IpInfo.fromIpSbJson,
+      IpInfo.fromIpwhoIsJson,
+      IpInfo.fromIfconfigCoJson,
     ];
     Object? lastError;
     for (final parse in parsers) {
@@ -46,7 +46,7 @@ class IpInfo with IpInfoMappable {
   /// ipapi.co / custom panel schema, e.g.
   /// `{ "ip", "city", "region", "country_code", "timezone", "asn": "AS1234", "org", ... }`.
   /// Optional fields may be missing or null; only `ip` + a country code are required.
-  static IpInfo fromIpApiJson(Map<String, dynamic> json) {
+  factory IpInfo.fromIpApiJson(Map<String, dynamic> json) {
     final ip = _string(json['ip']);
     final countryCode = _countryCode(json);
     if (ip == null || countryCode == null) {
@@ -64,9 +64,9 @@ class IpInfo with IpInfoMappable {
   }
 
   /// @Deprecated Use [fromIpApiJson].
-  static IpInfo fromIpApiCoJson(Map<String, dynamic> json) => fromIpApiJson(json);
+  factory IpInfo.fromIpApiCoJson(Map<String, dynamic> json) => IpInfo.fromIpApiJson(json);
 
-  static IpInfo fromIpInfoIoJson(Map<String, dynamic> json) {
+  factory IpInfo.fromIpInfoIoJson(Map<String, dynamic> json) {
     final ip = _string(json['ip']);
     // ipinfo.io uses `country` (ISO alpha-2), not `country_code`.
     final countryCode = _string(json['country']) ?? _string(json['country_code']);
@@ -95,7 +95,7 @@ class IpInfo with IpInfoMappable {
     );
   }
 
-  static IpInfo fromIpSbJson(Map<String, dynamic> json) {
+  factory IpInfo.fromIpSbJson(Map<String, dynamic> json) {
     final ip = _string(json['ip']);
     final countryCode = _string(json['country_code']);
     if (ip == null || countryCode == null) {
@@ -112,7 +112,7 @@ class IpInfo with IpInfoMappable {
     );
   }
 
-  static IpInfo fromIpwhoIsJson(Map<String, dynamic> json) {
+  factory IpInfo.fromIpwhoIsJson(Map<String, dynamic> json) {
     if (json['success'] == false) {
       throw FormatException('ipwho.is error: ${json['message']}');
     }
@@ -149,7 +149,7 @@ class IpInfo with IpInfoMappable {
     );
   }
 
-  static IpInfo fromIfconfigCoJson(Map<String, dynamic> json) {
+  factory IpInfo.fromIfconfigCoJson(Map<String, dynamic> json) {
     final ip = _string(json['ip']);
     final countryCode = _string(json['country_iso']) ?? _string(json['country_code']);
     if (ip == null || countryCode == null) {

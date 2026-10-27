@@ -178,12 +178,27 @@ void _paintLook(_Ctx x) {
 /// The bars brighten one after another, left to right; [backwards], as while disconnecting, from the
 /// i back to the short bar, the starting wave played in reverse.
 void _barsWave(_Ctx x, {bool backwards = false}) {
-  final p = (x.f.time % 1.6) / 1.6;
+  if (!x.p.drawLogo) return;
+  final color = _alpha(x.col, x.p.logoOpacity);
   double rank(int part) => backwards ? _HiLogo.rank.last - _HiLogo.rank[part] : _HiLogo.rank[part];
-  x.logo(parts: _each((i) => _Part(opacity: .4 + .6 * _bump(p * 1.6 - rank(i) * .3))));
+  final shade = [for (var i = 0; i < 4; i++) _alpha(color, .4 + .6 * _bump((x.f.time - rank(i) * .3) % 1.6))];
+  x.logoSpace((c) {
+    // the H stays one piece: its crossbar fades from the short bar's shade into the tall bar's
+    c.drawPath(
+      _HiLogo.h,
+      Paint()
+        ..shader = ui.Gradient.linear(
+          const Offset(16.84, 0),
+          const Offset(23.58, 0),
+          [shade[0], shade[1]],
+        ),
+    );
+    c.drawPath(_HiLogo.stem, Paint()..color = shade[2]);
+    c.drawPath(_HiLogo.dot, Paint()..color = shade[3]);
+  });
 }
 
-/// A soft sweep turning inside the button, over two faint guide circles.
+/// A soft sweep turning inside the button, over two faint guide circles, kept out of the logo.
 void _radar(_Ctx x) {
   final c = x.c;
   c.save();
@@ -208,6 +223,8 @@ void _radar(_Ctx x) {
     );
   }
   c.restore();
+  // the logo keeps the button's white under it, so a faded bar doesn't show the radar through it
+  if (x.p.drawLogo) x.logoSpace((c) => c.drawPaint(Paint()..color = Colors.white));
 }
 
 /// The signal steps down to weak, then keeps searching, and the error badge breathes, sending out a
