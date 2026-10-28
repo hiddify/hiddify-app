@@ -485,8 +485,7 @@
         "redirectPort": "Yönlendirme portu",
         "lanSharing": "Güvenli VPN paylaşımı",
         "qrCode": "QR kod",
-        "lanQrSubtitle": "Bu Wi-Fi için SOCKS5 proxy",
-        "lanIPError": "Yerel IP adresi alınamadı"
+        "lanQrSubtitle": "SOCKS5 proxy"
       },
       "tlsTricks": {
         "title": "TLS hileleri",
@@ -728,6 +727,8 @@
     "qrCode": {
       "copyFullLink": "Tam bağlantıyı kopyala",
       "copied": "Kopyalandı",
+      "localOnlyTitle": "Yalnızca bu cihaz",
+      "localOnlyMessage": "Diğer cihazlar 127.0.0.1 adresine erişemez",
       "ip": "IP",
       "port": "Port",
       "username": "Kullanıcı adı",

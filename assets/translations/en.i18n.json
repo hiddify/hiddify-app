@@ -492,8 +492,7 @@
         "redirectPort": "Redirect port",
         "lanSharing": "Secure VPN sharing",
         "qrCode": "QR code",
-        "lanQrSubtitle": "SOCKS5 proxy for this Wi-Fi",
-        "lanIPError": "Failed to get local IP address"
+        "lanQrSubtitle": "SOCKS5 proxy"
       },
       "tlsTricks": {
         "title": "TLS tricks",
@@ -758,6 +757,8 @@
     "qrCode": {
       "copyFullLink": "Copy full link",
       "copied": "Copied",
+      "localOnlyTitle": "This device only",
+      "localOnlyMessage": "Other devices can’t reach 127.0.0.1",
       "ip": "IP",
       "port": "Port",
       "username": "Username",

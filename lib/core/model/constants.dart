@@ -37,6 +37,16 @@ abstract class AlertDialogConst {
   static const boxConstraints = BoxConstraints(minWidth: minWidth, maxWidth: maxWidth);
 }
 
+abstract class QrCodeDialogConst {
+  static const qrBoxSize = 208.0;
+
+  /// The shared proxy's name, carried in its link and QR code, also the dialog's title.
+  static const lanProfileName = 'LAN only';
+
+  /// The shared proxy's name when it falls back to 127.0.0.1.
+  static const localhostProfileName = 'Localhost only';
+}
+
 abstract class BottomSheetConst {
   static const maxWidth = 456.0;
   static const boxConstraints = BoxConstraints(maxWidth: maxWidth);

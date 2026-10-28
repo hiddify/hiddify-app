@@ -550,7 +550,7 @@ void main() {
     test("warp header sets extra_security + warp mode", () {
       final o = decodeOverride(headers: {"extra-security": "warp"});
       expect(o["chain-status"], equals("extra_security"));
-      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp_auto"));
     });
 
     test("psiphon header sets psiphon mode", () {
@@ -580,7 +580,7 @@ void main() {
 
     test("UserOverride enables warp without a header", () {
       final o = decodeOverride(userOverride: const UserOverride(extraSecurity: "warp"));
-      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp_auto"));
     });
 
     test("UserOverride takes precedence over the header", () {
@@ -596,7 +596,7 @@ void main() {
         headers: {"extra-security": "warp"},
         userOverride: const UserOverride(extraSecurity: "garbage"),
       );
-      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp_auto"));
     });
   });
 

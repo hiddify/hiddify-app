@@ -145,7 +145,9 @@ enum ChainStatus {
 @JsonEnum(valueField: 'key')
 enum ChainMode {
   psiphon('psiphon'),
-  warp('warp'),
+  // WARP races WireGuard, AmneziaWG and MASQUE in the core and keeps the fastest. The core's own
+  // "warp" is WireGuard only, so this sends "warp_auto".
+  warp('warp_auto'),
   profile('profile');
 
   const ChainMode(this.key);

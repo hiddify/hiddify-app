@@ -485,8 +485,7 @@
         "redirectPort": "重新導向連接埠",
         "lanSharing": "安全 VPN 共享",
         "qrCode": "QR Code",
-        "lanQrSubtitle": "適用於此 Wi-Fi 的 SOCKS5 代理",
-        "lanIPError": "取得本機 IP 位址失敗"
+        "lanQrSubtitle": "SOCKS5 代理"
       },
       "tlsTricks": {
         "title": "TLS 技巧",
@@ -728,6 +727,8 @@
     "qrCode": {
       "copyFullLink": "複製完整連結",
       "copied": "已複製",
+      "localOnlyTitle": "僅限此裝置",
+      "localOnlyMessage": "其他裝置無法連線到 127.0.0.1",
       "ip": "IP",
       "port": "連接埠",
       "username": "使用者名稱",

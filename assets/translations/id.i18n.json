@@ -485,8 +485,7 @@
         "redirectPort": "Port pengalihan",
         "lanSharing": "Berbagi VPN yang aman",
         "qrCode": "Kode QR",
-        "lanQrSubtitle": "Proxy SOCKS5 untuk Wi-Fi ini",
-        "lanIPError": "Gagal mendapatkan alamat IP lokal"
+        "lanQrSubtitle": "Proxy SOCKS5"
       },
       "tlsTricks": {
         "title": "Trik TLS",
@@ -728,6 +727,8 @@
     "qrCode": {
       "copyFullLink": "Salin tautan lengkap",
       "copied": "Disalin",
+      "localOnlyTitle": "Hanya perangkat ini",
+      "localOnlyMessage": "Perangkat lain tidak bisa menjangkau 127.0.0.1",
       "ip": "IP",
       "port": "Port",
       "username": "Nama pengguna",

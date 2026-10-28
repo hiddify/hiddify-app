@@ -66,17 +66,13 @@ class DialogNotifier extends _$DialogNotifier {
     return await _show<bool?>(const ChainLicenseDialog(mode: ChainMode.psiphon)) ?? false;
   }
 
-  /// Shows [data] as a QR code. [link] is what the copy button copies, which defaults to [data].
-  Future<void> showQrCode(
-    String data, {
-    required String title,
-    String? subtitle,
-    String? link,
-    ProxyCredentials? credentials,
-  }) async {
-    return await _show<void>(
-      QrCodeDialog(data, title: title, subtitle: subtitle, link: link ?? data, credentials: credentials),
-    );
+  /// Shows [link] as a QR code that the copy button also copies.
+  Future<void> showQrCode(String link, {required String title}) async {
+    return await _show<void>(QrCodeDialog(link, title: title, link: link));
+  }
+
+  Future<void> showLanSharingQr() async {
+    return await _show<void>(const LanSharingQrDialog());
   }
 
   Future<void> showOk(String title, String description) async {

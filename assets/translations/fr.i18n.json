@@ -486,8 +486,7 @@
         "redirectPort": "Port de redirection",
         "lanSharing": "Partage VPN sécurisé",
         "qrCode": "Code QR",
-        "lanQrSubtitle": "Proxy SOCKS5 pour ce Wi-Fi",
-        "lanIPError": "Échec de l'obtention de l'adresse IP locale"
+        "lanQrSubtitle": "Proxy SOCKS5"
       },
       "tlsTricks": {
         "title": "Astuces TLS",
@@ -730,6 +729,8 @@
     "qrCode": {
       "copyFullLink": "Copier le lien complet",
       "copied": "Copié",
+      "localOnlyTitle": "Cet appareil uniquement",
+      "localOnlyMessage": "Les autres appareils ne peuvent pas joindre 127.0.0.1",
       "ip": "IP",
       "port": "Port",
       "username": "Nom d'utilisateur",

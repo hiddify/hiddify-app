@@ -505,7 +505,8 @@ class ProfileParser with InfraLogger {
     final trimmed = value.trim();
     for (final mode in ChainMode.values) {
       if (mode.isProfile()) continue;
-      if (mode.key == trimmed) return mode;
+      // a subscription calls it "warp"; the core's key for it is "warp_auto"
+      if (mode.key == trimmed || (mode.isWarp() && trimmed == 'warp')) return mode;
     }
     return null;
   }

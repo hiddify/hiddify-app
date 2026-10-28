@@ -492,8 +492,7 @@
         "redirectPort": "پورت تغییر مسیر",
         "lanSharing": "اشتراک امن VPN",
         "qrCode": "کد QR",
-        "lanQrSubtitle": "پروکسی SOCKS5 برای همین وای‌فای",
-        "lanIPError": "خطا در دریافت آدرس IP محلی"
+        "lanQrSubtitle": "پروکسی SOCKS5"
       },
       "tlsTricks": {
         "title": "ترفندهای TLS",
@@ -758,6 +757,8 @@
     "qrCode": {
       "copyFullLink": "کپی لینک کامل",
       "copied": "کپی شد",
+      "localOnlyTitle": "فقط همین دستگاه",
+      "localOnlyMessage": "دستگاه‌های دیگر به 127.0.0.1 دسترسی ندارند",
       "ip": "IP",
       "port": "پورت",
       "username": "نام کاربری",

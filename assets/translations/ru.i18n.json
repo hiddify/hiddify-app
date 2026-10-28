@@ -512,8 +512,7 @@
         "redirectPort": "Порт перенаправления",
         "lanSharing": "Безопасный общий доступ к VPN",
         "qrCode": "QR-код",
-        "lanQrSubtitle": "SOCKS5-прокси для этой сети Wi-Fi",
-        "lanIPError": "Не удалось получить локальный IP-адрес"
+        "lanQrSubtitle": "SOCKS5-прокси"
       },
       "tlsTricks": {
         "title": "Хитрости TLS",
@@ -780,6 +779,8 @@
     "qrCode": {
       "copyFullLink": "Копировать полную ссылку",
       "copied": "Скопировано",
+      "localOnlyTitle": "Только это устройство",
+      "localOnlyMessage": "Другие устройства не могут подключиться к 127.0.0.1",
       "ip": "IP",
       "port": "Порт",
       "username": "Имя пользователя",

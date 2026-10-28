@@ -517,8 +517,7 @@
         "redirectPort": "منفذ إعادة التوجيه",
         "lanSharing": "مشاركة VPN آمنة",
         "qrCode": "رمز QR",
-        "lanQrSubtitle": "وكيل SOCKS5 لشبكة Wi-Fi هذه",
-        "lanIPError": "فشل في الحصول على عنوان IP المحلي"
+        "lanQrSubtitle": "وكيل SOCKS5"
       },
       "tlsTricks": {
         "title": "حيل TLS",
@@ -765,6 +764,8 @@
     "qrCode": {
       "copyFullLink": "نسخ الرابط الكامل",
       "copied": "تم النسخ",
+      "localOnlyTitle": "هذا الجهاز فقط",
+      "localOnlyMessage": "لا يمكن للأجهزة الأخرى الوصول إلى 127.0.0.1",
       "ip": "IP",
       "port": "المنفذ",
       "username": "اسم المستخدم",
