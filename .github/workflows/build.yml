@@ -275,11 +275,60 @@ jobs:
 
 
       - name: Build ${{ matrix.platform }}
-        if: matrix.platform != 'macos-appstore' && ((matrix.platform != 'ios' && matrix.platform != 'windows') || inputs.upload-artifact)
+        if: matrix.platform != 'macos-appstore' && matrix.platform != 'windows' && (matrix.platform != 'ios' || inputs.upload-artifact)
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           make ${{ matrix.platform }}-release
+
+      # Portable zip uses portable=true (separate build). Setup/MSIX need a non-portable
+      # Release tree that is Authenticode-signed *before* Inno/MSIX pack so dropped PE
+      # files during install are signed (reduces Sysmon/AV "unsigned dropper" noise).
+      - name: Build Windows portable zip
+        if: matrix.platform == 'windows' && inputs.upload-artifact
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make windows-zip-release
+
+      - name: Build Windows Setup/MSIX binaries
+        if: matrix.platform == 'windows' && inputs.upload-artifact
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make windows-validate
+
+      - name: Code Sign Windows Release tree
+        if: matrix.platform == 'windows' && inputs.upload-artifact
+        env:
+          SIGN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+        shell: pwsh
+        run: |
+          & .\windows\scripts\sign_windows_artifacts.ps1 `
+            -PfxPath windows\sign.pfx `
+            -Password $env:SIGN_PASSWORD `
+            -Path build\windows\x64\runner\Release `
+            -Description Hiddify
+
+      - name: Package Windows Setup and MSIX
+        if: matrix.platform == 'windows' && inputs.upload-artifact
+        # Re-sign Release immediately before each packager: fastforge may run
+        # `flutter build` again; when that is a no-op, signatures are kept and
+        # Inno/MSIX embed signed PE (better than unsigned drops in %TEMP%).
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SIGN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+        shell: pwsh
+        run: |
+          function Sign-Release {
+            & .\windows\scripts\sign_windows_artifacts.ps1 `
+              -PfxPath windows\sign.pfx `
+              -Password $env:SIGN_PASSWORD `
+              -Path build\windows\x64\runner\Release `
+              -Description Hiddify
+          }
+          Sign-Release
+          make windows-exe-release
+          Sign-Release
+          make windows-msix-release
 
       - name: Build the Mac App Store version
         if: matrix.platform == 'macos-appstore' && inputs.upload-artifact
@@ -307,30 +356,19 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: make windows-validate
 
-      - name: Code Sign
+      - name: Code Sign Windows packages
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
-        # signtool-code-sign actions hardcode an SDK path (10.0.17763.0) missing on current runners,
-        # so locate signtool from whichever Windows SDK is installed.
+        # Signs Setup.exe / MSIX and PE files inside the portable .zip.
+        # Skips files that already verify as signed (MSVC runtimes; pre-signed Release PE).
         env:
           SIGN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+        shell: pwsh
         run: |
-          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
-            Sort-Object { [version]$_.Directory.Parent.Name } -Descending | Select-Object -First 1
-          if (-not $signtool) { throw "signtool.exe not found" }
-          Write-Host "Using $($signtool.FullName)"
-          $pfx = Resolve-Path "windows\sign.pfx"
-          $exts = '.dll','.exe','.sys','.msix','.msixbundle','.appx','.appxbundle','.msi','.msp','.msm','.cab','.ps1','.psm1'
-          $files = Get-ChildItem dist -Recurse -File | Where-Object { $exts -contains $_.Extension.ToLower() }
-          foreach ($file in $files) {
-            Write-Host "Signing $($file.FullName)"
-            $ok = $false
-            foreach ($attempt in 1..5) {
-              & $signtool.FullName sign /fd SHA256 /td SHA256 /tr http://timestamp.digicert.com /d Hiddify /f $pfx /p $env:SIGN_PASSWORD $file.FullName
-              if ($LASTEXITCODE -eq 0) { $ok = $true; break }
-              Start-Sleep -Seconds $attempt
-            }
-            if (-not $ok) { throw "failed to sign $($file.FullName)" }
-          }
+          & .\windows\scripts\sign_windows_artifacts.ps1 `
+            -PfxPath windows\sign.pfx `
+            -Password $env:SIGN_PASSWORD `
+            -Path dist `
+            -Description Hiddify
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows' && inputs.upload-artifact

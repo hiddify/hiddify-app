@@ -33,7 +33,6 @@ import com.hiddify.core.libbox.BridgeSession
 import com.hiddify.core.libbox.NeighborUpdateListener
 import com.hiddify.core.libbox.PlatformUser
 import com.hiddify.core.libbox.ShellSession
-import com.hiddify.core.libbox.StringBox
 import com.hiddify.core.libbox.LocalDNSTransport
 import java.security.KeyStore
 import kotlin.io.encoding.Base64
@@ -48,8 +47,6 @@ interface PlatformInterfaceWrapper : PlatformInterface {
     override fun openTun(options: TunOptions): Int {
         error("invalid argument")
     }
-
-    override fun useProcFS(): Boolean =  Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun findConnectionOwner(
@@ -215,11 +212,11 @@ interface PlatformInterfaceWrapper : PlatformInterface {
         error("platform shell not supported")
     }
 
-    override fun lookupSFTPServer(): StringBox {
+    override fun lookupSFTPServer(): String {
         error("not supported")
     }
 
-    override fun readSystemSSHHostKey(): StringBox {
+    override fun readSystemSSHHostKey(): String {
         error("not supported")
     }
 

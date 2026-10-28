@@ -11,12 +11,14 @@ DisableProgramGroupPage=yes
 OutputDir=.
 OutputBaseFilename={{OUTPUT_BASE_FILENAME}}
 Compression=lzma
-SolidCompression=yes
+; Non-solid: slightly larger, but less "packed dropper" heuristic noise on AV/VT.
+SolidCompression=no
 SetupIconFile={{SETUP_ICON_FILE}}
 WizardStyle=modern
 PrivilegesRequired={{PRIVILEGES_REQUIRED}}
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
+; Closes locked app binaries before file replace — prefer this over taskkill.exe heuristics.
 CloseApplications=force
 
 [Languages]
@@ -66,12 +68,70 @@ Filename: "{app}\\{{EXECUTABLE_NAME}}"; Description: "{cm:LaunchProgram,{{DISPLA
 Type: filesandordirs; Name: "{userappdata}\Hiddify"
 
 [Code]
-function InitializeSetup(): Boolean;
+// Stop/remove services via the Service Control Manager API.
+// Do not shell out to net.exe / taskkill.exe / sc.exe — those command lines match
+// common Sigma rules and drive VirusTotal sandbox false positives.
+
+type
+  TServiceStatus = record
+    dwServiceType: DWORD;
+    dwCurrentState: DWORD;
+    dwControlsAccepted: DWORD;
+    dwWin32ExitCode: DWORD;
+    dwServiceSpecificExitCode: DWORD;
+    dwCheckPoint: DWORD;
+    dwWaitHint: DWORD;
+  end;
+
+const
+  SC_MANAGER_CONNECT = $0001;
+  SERVICE_QUERY_STATUS = $0004;
+  SERVICE_STOP = $0020;
+  SERVICE_CONTROL_STOP = $0001;
+  DELETE_ACCESS = $10000;
+
+function OpenSCManager(lpMachineName, lpDatabaseName: string; dwDesiredAccess: DWORD): THandle;
+  external 'OpenSCManagerW@advapi32.dll stdcall';
+function OpenService(hSCManager: THandle; lpServiceName: string; dwDesiredAccess: DWORD): THandle;
+  external 'OpenServiceW@advapi32.dll stdcall';
+function ControlService(hService: THandle; dwControl: DWORD; var lpServiceStatus: TServiceStatus): Boolean;
+  external 'ControlService@advapi32.dll stdcall';
+function DeleteService(hService: THandle): Boolean;
+  external 'DeleteService@advapi32.dll stdcall';
+function CloseServiceHandle(hSCObject: THandle): Boolean;
+  external 'CloseServiceHandle@advapi32.dll stdcall';
+
+procedure StopServiceByName(const ServiceName: string; const Remove: Boolean);
 var
-  ResultCode: Integer;
+  hSCM, hService: THandle;
+  Access: DWORD;
+  Status: TServiceStatus;
 begin
-  Exec('taskkill', '/F /IM hiddify.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
-  Exec('net', 'stop "HiddifyTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
-  Exec('sc.exe', 'delete "HiddifyTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
+  hSCM := OpenSCManager('', '', SC_MANAGER_CONNECT);
+  if hSCM = 0 then
+    Exit;
+
+  Access := SERVICE_STOP or SERVICE_QUERY_STATUS;
+  if Remove then
+    Access := Access or DELETE_ACCESS;
+
+  hService := OpenService(hSCM, ServiceName, Access);
+  if hService <> 0 then
+  begin
+    ControlService(hService, SERVICE_CONTROL_STOP, Status);
+    if Remove then
+      DeleteService(hService);
+    CloseServiceHandle(hService);
+  end;
+
+  CloseServiceHandle(hSCM);
+end;
+
+function InitializeSetup(): Boolean;
+begin
+  // Current elevated core service — stop only so binaries can be replaced on upgrade.
+  StopServiceByName('HiddifyAdminBG', False);
+  // Legacy name from older builds — stop and remove if still present.
+  StopServiceByName('HiddifyTunnelService', True);
   Result := True;
 end;
