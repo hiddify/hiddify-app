@@ -17,6 +17,7 @@ import 'package:hiddify/core/theme/theme_preferences.dart';
 import 'package:hiddify/features/app_based_routing/overview/app_based_routing_notifier.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
+import 'package:hiddify/features/home/widget/orca/orca_background.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/shortcut/shortcut_wrapper.dart';
 import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
@@ -94,6 +95,13 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                       child: child ?? const SizedBox(),
                     ),
                   );
+                  // liquid-glass look: aurora background behind every page (dark mode, not true black)
+                  if (theme.brightness == Brightness.dark && !themeMode.trueBlack) {
+                    child = Stack(
+                      fit: StackFit.expand,
+                      children: [const Positioned.fill(child: OrcaAmbientBackground()), child],
+                    );
+                  }
                   if (kDebugMode && _debugAccessibility) {
                     return AccessibilityTools(checkFontOverflows: true, child: child);
                   }
