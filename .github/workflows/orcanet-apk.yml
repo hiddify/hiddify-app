@@ -14,9 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Use exactly the Flutter version Hiddify's own CI uses, so this stays correct after every upstream sync.
+      - name: Read Flutter version
+        id: fv
+        run: |
+          v=$(grep -m1 "FLUTTER_VERSION:" .github/workflows/build.yml | sed -E "s/.*'([^']+)'.*/\1/")
+          echo "Using Flutter $v"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.5' # same version Hiddify's own CI uses
+          flutter-version: ${{ steps.fv.outputs.version }}
           channel: stable
           cache: true
 
