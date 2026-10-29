@@ -50,11 +50,15 @@ object GrpcClientProvider {
     val grpcClient: GrpcClient
         get() = buildClient()
 
-    private fun buildClient(): GrpcClient {
+    // Metadata streams can be idle indefinitely. Keep unary calls bounded as before.
+    val streamingGrpcClient: GrpcClient
+        get() = buildClient(streaming = true)
+
+    private fun buildClient(streaming: Boolean = false): GrpcClient {
         val port = Settings.grpcServiceModePort
         val builder = OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(if (streaming) 0 else 10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
 
         if (!usesMutualTls) {

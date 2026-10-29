@@ -34,6 +34,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 class ServiceNotification(private val status: MutableLiveData<Status>, private val service: Service) : BroadcastReceiver() {
     companion object {
         private const val notificationId = 1
@@ -53,6 +57,8 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
     private val lifecycleVersion = AtomicLong()
     private var staticContentTextId = R.string.status_started
     private var screenOn = true
+    private var outboundText: String? = null
+    private var lastNotification: Pair<String, String>? = null
     private var coreClient: CoreClient? = null
     private val clientLock = Any()
     private val refreshController = NotificationRefreshController(
@@ -70,6 +76,35 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
             synchronized(clientLock) { coreClient = null }
             Log.d("notification", "SystemInfo not available: ${error.message}")
         },
+    )
+
+    private val metadataObserver = NotificationMetadataObserver(
+        scope = scope,
+        source = {
+            flow {
+                coroutineScope {
+                    val call = GrpcClientProvider.streamingGrpcClient.create(CoreClient::class).MainOutboundsInfo()
+                    val (requests, responses) = call.executeIn(this)
+                    try {
+                        requests.send(Empty())
+                        requests.close()
+                        for (snapshot in responses) emit(snapshot)
+                    } finally {
+                        call.cancel()
+                        requests.close()
+                        responses.cancel()
+                    }
+                }
+            }.map(::notificationOutboundText).distinctUntilChanged()
+        },
+        publish = { text: String? ->
+            if (text != null && outboundText != text) {
+                outboundText = text
+                // Fetch the actual profile too; selection/URL-test events need no Flutter hook.
+                refreshController.refresh(periodic = Settings.dynamicNotification && screenOn)
+            }
+        },
+        onError = { error -> Log.d("notification", "Outbound metadata not available: ${error.message}") },
     )
 
     private val notificationBuilder by lazy {
@@ -127,6 +162,9 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
 
     suspend fun start() = withContext(Dispatchers.Main.immediate) {
         refreshController.start()
+        outboundText = null
+        lastNotification = null
+        metadataObserver.start()
         screenOn = (service.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
         if (!receiverRegistered) {
             ContextCompat.registerReceiver(service, this@ServiceNotification, IntentFilter().apply {
@@ -142,17 +180,23 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
     }
 
     private fun updateStatus(previous: SystemInfo?, current: SystemInfo) {
+        val outbound = outboundText ?: current.current_outbound.takeIf { it.isNotBlank() }
+            ?: service.getString(staticContentTextId)
         val content = if (Settings.dynamicNotification) {
             val uplink = previous?.let { (current.uplink_total - it.uplink_total).coerceAtLeast(0) } ?: 0L
             val downlink = previous?.let { (current.downlink_total - it.downlink_total).coerceAtLeast(0) } ?: 0L
-            "${Libbox.formatBytes(uplink)}/s ↑\t${Libbox.formatBytes(downlink)}/s ↓ \n${current.current_outbound}"
+            "${Libbox.formatBytes(uplink)}/s ↑\t${Libbox.formatBytes(downlink)}/s ↓ \n${outbound}"
         } else {
-            service.getString(staticContentTextId)
+            outbound
         }
+        val title = current.current_profile.takeIf { it.isNotBlank() } ?: "Hiddify"
+        val rendered = title to content
+        if (lastNotification == rendered) return
+        lastNotification = rendered
         Application.notificationManager.notify(
             notificationId,
             notificationBuilder
-                .setContentTitle(current.current_profile.takeIf { it.isNotBlank() } ?: "Hiddify")
+                .setContentTitle(title)
                 .setContentText(content).build()
         )
     }
@@ -169,6 +213,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
             }
             Action.SERVICE_REFRESH_NOTIFICATION -> {
                 if (checkPermission()) {
+                    metadataObserver.start()
                     refreshController.refresh(periodic = Settings.dynamicNotification && screenOn)
                 }
             }
@@ -179,6 +224,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         // Invalidate work immediately, even when BoxService closes from its IO dispatcher.
         val closingVersion = lifecycleVersion.incrementAndGet()
         refreshController.close()
+        metadataObserver.close()
         synchronized(clientLock) { coreClient = null }
         scope.launch {
             if (lifecycleVersion.get() != closingVersion) return@launch

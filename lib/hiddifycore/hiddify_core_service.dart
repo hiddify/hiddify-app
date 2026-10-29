@@ -376,6 +376,8 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
+  Future<void> refreshServiceNotification() => _refreshServiceNotification(_stopRequests.value);
+
   // Presentation must never turn a successful core operation into a failure/restart.
   Future<void> _refreshServiceNotification(int stops) async {
     if (_stopRequests.value != stops) return;
