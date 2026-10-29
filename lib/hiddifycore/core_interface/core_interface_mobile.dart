@@ -47,6 +47,13 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   Stream<CoreStatus>? get managedStatus => _managedStatus.stream;
 
   @override
+  Future<void> refreshServiceNotification() async {
+    if (Platform.isAndroid) {
+      await methodChannel.invokeMethod<void>('refresh_service_notification');
+    }
+  }
+
+  @override
   Future<void> dispose() async {
     await _nativeStatusSubscription?.cancel();
     _nativeStatusSubscription = null;

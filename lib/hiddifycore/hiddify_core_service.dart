@@ -10,6 +10,7 @@ import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/log/model/log_level.dart' as config_log_level;
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper_stub.dart'
     if (dart.library.io) 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
@@ -25,11 +26,11 @@ import 'package:logging/logging.dart' as logging;
 import 'package:rxdart/rxdart.dart';
 
 class HiddifyCoreService with InfraLogger {
-  HiddifyCoreService(this.ref);
+  HiddifyCoreService(this.ref, {CoreInterface? core}) : core = core ?? getCoreInterface();
   final Ref ref;
 
   // CoreHiddifyCoreService() {}
-  final core = getCoreInterface();
+  final CoreInterface core;
 
   CoreStatus currentState = const CoreStatus.stopped();
   final statusController = BehaviorSubject<CoreStatus>();
@@ -352,12 +353,21 @@ class HiddifyCoreService with InfraLogger {
   /// changed) or the hot reload fails, the core is restarted instead.
   TaskEither<String, Unit> reload(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
+      final stops = _stopRequests.value;
       loggy.debug("hot reloading");
       try {
         final res = await core.bgClient.hotReload(
           StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
         );
-        if (res.messageType == MessageType.EMPTY) return right(unit);
+        if (res.messageType == MessageType.EMPTY) {
+          if (res.coreState == CoreStates.STARTED ||
+              res.coreState == CoreStates.WAITING ||
+              res.coreState == CoreStates.NO_AVAILABLE_PROXIES ||
+              res.coreState == CoreStates.HOT_RELOADING) {
+            await _refreshServiceNotification(stops);
+          }
+          return right(unit);
+        }
         loggy.info("hot reload not applied, restarting: ${res.messageType} ${res.message}");
       } on GrpcError catch (e) {
         loggy.warning("hot reload failed, restarting: $e");
@@ -366,14 +376,26 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
+  // Presentation must never turn a successful core operation into a failure/restart.
+  Future<void> _refreshServiceNotification(int stops) async {
+    if (_stopRequests.value != stops) return;
+    try {
+      await core.refreshServiceNotification();
+    } catch (error, stackTrace) {
+      loggy.warning('could not refresh service notification', error, stackTrace);
+    }
+  }
+
   TaskEither<String, Unit> restart(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
+      final stops = _stopRequests.value;
       loggy.debug("restarting");
       if (core.managesLifecycle) {
         try {
           await core.startManaged(path, name, disableMemoryLimit);
           await startListeningLogs('bg', core.bgClient);
           ref.read(coreRestartSignalProvider.notifier).restart();
+          await _refreshServiceNotification(stops);
           return right(unit);
         } catch (error) {
           statusController.add(currentState = CoreStatus.stopped(message: error.toString()));
@@ -383,12 +405,15 @@ class HiddifyCoreService with InfraLogger {
       // if (!await core.restart(path, name)) {
       try {
         final outcome = await _startAndWait(
-          _stopRequests.value,
+          stops,
           () => core.bgClient.restart(
             StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit, delayStart: true),
           ),
         );
         if (outcome case CoreStopped(alert: _?, :final message)) return left(message ?? "failed to restart core");
+        if (outcome is CoreStarted || outcome is CoreWaiting || outcome is CoreNoAvailableProxies) {
+          await _refreshServiceNotification(stops);
+        }
       } on GrpcError catch (e) {
         loggy.error("failed to restart bg core: $e");
         if (e.code == StatusCode.unknown && !(e.message?.contains("HTTP/2 error") ?? false)) {

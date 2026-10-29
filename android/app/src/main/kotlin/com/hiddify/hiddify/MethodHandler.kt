@@ -1,5 +1,8 @@
 package com.hiddify.hiddify
 
+import android.content.Intent
+import com.hiddify.hiddify.constant.Action
+
 import android.util.Log
 import com.hiddify.hiddify.bg.BoxService
 //import com.hiddify.hiddify.bg.BoxService.Companion.workingDir
@@ -32,6 +35,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Start("start"),
             Stop("stop"),
             Restart("restart"),
+            RefreshServiceNotification("refresh_service_notification"),
             GetGrpcServerPublicKey("get_grpc_server_public_key"),
 
         }
@@ -51,6 +55,13 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            Trigger.RefreshServiceNotification.method -> {
+                Application.application.sendBroadcast(
+                    Intent(Action.SERVICE_REFRESH_NOTIFICATION)
+                        .setPackage(Application.application.packageName)
+                )
+                result.success(null)
+            }
             Trigger.GetGrpcServerPublicKey.method -> {
                 GlobalScope.launch {
                     result.runCatching {
