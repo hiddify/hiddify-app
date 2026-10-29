@@ -161,6 +161,8 @@ flutter:
     - assets/images/tray_icon_dark.png
     - assets/images/tray_icon_connected.ico
     - assets/images/tray_icon_connected.png
+    - assets/images/tray_icon_connected_light.png
+    - assets/images/tray_icon_connected_dark.png
     - assets/images/tray_icon_disconnected.ico
     - assets/images/tray_icon_disconnected.png
     - assets/images/connect_norouz.PNG

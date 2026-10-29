@@ -1,0 +1,15 @@
+syntax = "proto3";
+import "v2/hcommon/common.proto";
+package adminbgservice;
+
+option go_package = "github.com/hiddify/hiddify-core/v2/hcore/adminbgservice";
+option java_package = "com.hiddify.core.api.v2.hcore.adminbgservice";
+import "v2/hcore/adminbgservice/admin_bg.proto";
+
+// Elevated background core control API (Windows/Linux OS service, macOS root daemon).
+service HiddifyAdminBG {
+    rpc Start(AdminBgStartRequest) returns (AdminBgResponse);
+    rpc Stop(hcommon.Empty) returns (AdminBgResponse);
+    rpc Status(hcommon.Empty) returns (AdminBgResponse);
+    rpc Exit(hcommon.Empty) returns (AdminBgResponse);
+}

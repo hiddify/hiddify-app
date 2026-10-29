@@ -110,6 +110,9 @@
       "sort": "排序代理",
       "testDelay": "测试延迟",
       "empty": "无可用代理",
+      "connectToSeeProxies": "连接后可查看代理",
+      "loadFailed": "无法加载代理。点按重试。",
+      "checkingIp": "正在检查 IP…",
       "activeProxy": "当前代理",
       "unknownIp": "未知 IP",
       "switchFailed": "无法切换到此代理。请重试。",
@@ -482,8 +485,7 @@
         "redirectPort": "重定向端口",
         "lanSharing": "安全 VPN 共享",
         "qrCode": "二维码",
-        "lanQrSubtitle": "适用于此 Wi-Fi 的 SOCKS5 代理",
-        "lanIPError": "获取本地 IP 地址失败"
+        "lanQrSubtitle": "SOCKS5 代理"
       },
       "tlsTricks": {
         "title": "TLS 技巧",
@@ -725,6 +727,8 @@
     "qrCode": {
       "copyFullLink": "复制完整链接",
       "copied": "已复制",
+      "localOnlyTitle": "仅限此设备",
+      "localOnlyMessage": "其他设备无法访问 127.0.0.1",
       "ip": "IP",
       "port": "端口",
       "username": "用户名",
@@ -740,6 +744,8 @@
     "tapToConnect": "点击连接",
     "connect": "连接",
     "connecting": "连接中…",
+    "waiting": "正在寻找自由…",
+    "noAvailableProxies": "连接失败",
     "hotReloading": "应用更改中…",
     "connected": "已连接",
     "disconnect": "断开连接",

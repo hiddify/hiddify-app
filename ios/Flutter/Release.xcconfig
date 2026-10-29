@@ -2,3 +2,8 @@
 #include "Generated.xcconfig"
 
 #include "Base.xcconfig"
+
+// CI / App Store: manual signing (no Apple ID on the runner).
+CODE_SIGN_STYLE=Manual
+CODE_SIGN_IDENTITY=Apple Distribution
+PROVISIONING_PROFILE_SPECIFIER=dist.apple.apple.hiddify.com

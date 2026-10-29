@@ -37,11 +37,17 @@
 		41E9FF962D1C82BA003780C1 /* HiddifyCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 413270682C8A9BA2003A1E9B /* HiddifyCore.xcframework */; };
 		59E8864FB99B37076B22F32B /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30560DB3EFDF5E86AAD00AB8 /* Pods_RunnerTests.framework */; };
 		68885DD72B4EF33400D214BA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 03E392B72ADDA00E000ADF15 /* NetworkExtension.framework */; };
+		68DCEB782BD7D7590081FF65 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 68DCEB762BD7D7590081FF65 /* PrivacyInfo.xcprivacy */; };
+		68DCEB792BD7DA3F0081FF65 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 68DCEB772BD7DA3F0081FF65 /* PrivacyInfo.xcprivacy */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		8C5573542F9E453100531E9D /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 8C5573532F9E453100531E9D /* AppIcon.icon */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		A11F1501294A63AB00263BE1 /* MtlsGrpcSmokeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11F1511294A618700263BE1 /* MtlsGrpcSmokeTest.swift */; };
+		A11F1502294A63AB00263BE2 /* mtls_client.crt in Resources */ = {isa = PBXBuildFile; fileRef = A11F1512294A618700263BE2 /* mtls_client.crt */; };
+		A11F1503294A63AB00263BE3 /* mtls_client.p12 in Resources */ = {isa = PBXBuildFile; fileRef = A11F1513294A618700263BE3 /* mtls_client.p12 */; };
+		A11F1504294A63AB00263BE4 /* HiddifyCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 413270682C8A9BA2003A1E9B /* HiddifyCore.xcframework */; };
 		D703EE932B764EA3001D88B3 /* CommandClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = D703EE922B764EA3001D88B3 /* CommandClient.swift */; };
 		D703EE962B765176001D88B3 /* ActiveGroupsEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D703EE952B765176001D88B3 /* ActiveGroupsEventHandler.swift */; };
 		D7CC50862B768C50006BC140 /* Outbound.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7CC50852B768C50006BC140 /* Outbound.swift */; };
@@ -148,7 +154,6 @@
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
-		B12D089C9529CC6B13D0D593 /* Profile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Profile.xcconfig; path = Flutter/Profile.xcconfig; sourceTree = "<group>"; };
 		7CA62594950187FCFE36B54C /* Pods-Runner-HiddifyPacketTunnel.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner-HiddifyPacketTunnel.debug.xcconfig"; path = "Target Support Files/Pods-Runner-HiddifyPacketTunnel/Pods-Runner-HiddifyPacketTunnel.debug.xcconfig"; sourceTree = "<group>"; };
 		808A94F72872B54716770416 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
 		8C5573532F9E453100531E9D /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
@@ -161,6 +166,10 @@
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AC67B4DCF829F5B6F63AA7D /* Pods-Runner-HiddifyPacketTunnel.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner-HiddifyPacketTunnel.release.xcconfig"; path = "Target Support Files/Pods-Runner-HiddifyPacketTunnel/Pods-Runner-HiddifyPacketTunnel.release.xcconfig"; sourceTree = "<group>"; };
+		A11F1511294A618700263BE1 /* MtlsGrpcSmokeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MtlsGrpcSmokeTest.swift; sourceTree = "<group>"; };
+		A11F1512294A618700263BE2 /* mtls_client.crt */ = {isa = PBXFileReference; lastKnownFileType = text; path = mtls_client.crt; sourceTree = "<group>"; };
+		A11F1513294A618700263BE3 /* mtls_client.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = mtls_client.p12; sourceTree = "<group>"; };
+		B12D089C9529CC6B13D0D593 /* Profile.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Profile.xcconfig; path = Flutter/Profile.xcconfig; sourceTree = "<group>"; };
 		C20A211B58CE31B2738D133C /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		D703EE922B764EA3001D88B3 /* CommandClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandClient.swift; sourceTree = "<group>"; };
 		D703EE952B765176001D88B3 /* ActiveGroupsEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveGroupsEventHandler.swift; sourceTree = "<group>"; };
@@ -181,6 +190,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A11F1504294A63AB00263BE4 /* HiddifyCore.xcframework in Frameworks */,
 				59E8864FB99B37076B22F32B /* Pods_RunnerTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -294,6 +304,8 @@
 			isa = PBXGroup;
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
+				A11F1511294A618700263BE1 /* MtlsGrpcSmokeTest.swift */,
+				A11F1514294A618700263BE4 /* Fixtures */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -363,6 +375,15 @@
 				8C5573532F9E453100531E9D /* AppIcon.icon */,
 			);
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		A11F1514294A618700263BE4 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				A11F1512294A618700263BE2 /* mtls_client.crt */,
+				A11F1513294A618700263BE3 /* mtls_client.p12 */,
+			);
+			path = Fixtures;
 			sourceTree = "<group>";
 		};
 		B8133545EEE13EDD5549E6A3 /* Frameworks */ = {
@@ -522,6 +543,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68DCEB782BD7D7590081FF65 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,6 +551,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A11F1502294A63AB00263BE2 /* mtls_client.crt in Resources */,
+				A11F1503294A63AB00263BE3 /* mtls_client.p12 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -540,6 +564,7 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				68DCEB792BD7DA3F0081FF65 /* PrivacyInfo.xcprivacy in Resources */,
 				8C5573542F9E453100531E9D /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -662,6 +687,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
+				A11F1501294A63AB00263BE1 /* MtlsGrpcSmokeTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -738,6 +764,7 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = HiddifyPacketTunnel/HiddifyPacketTunnel.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 50000;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
@@ -793,7 +820,8 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = HiddifyPacketTunnel/HiddifyPacketTunnel.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 50000;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -824,6 +852,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER).HiddifyPacketTunnel";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = dist.apple.apple.hiddify.com.hiddifypackettunnel;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -846,7 +875,8 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = HiddifyPacketTunnel/HiddifyPacketTunnel.entitlements;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 50000;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -877,6 +907,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER).HiddifyPacketTunnel";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = dist.apple.apple.hiddify.com.hiddifypackettunnel;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -917,7 +948,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -954,6 +985,8 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				ENABLE_BITCODE = NO;
@@ -983,6 +1016,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = dist.apple.apple.hiddify.com;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -1000,8 +1034,21 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 50000;
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Frameworks",
+				);
 				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MARKETING_VERSION = 5.0.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lresolv",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hiddify.ios.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -1137,7 +1184,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1225,6 +1272,8 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = M7Q8ASP66Z;
 				ENABLE_BITCODE = NO;
@@ -1254,6 +1303,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = dist.apple.apple.hiddify.com;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

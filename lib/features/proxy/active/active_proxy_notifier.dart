@@ -6,11 +6,12 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/utils/throttler.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/data/proxy_repository.dart';
-import 'package:hiddify/features/proxy/model/ip_info_entity.dart' as oldipinfo;
+import 'package:hiddify/features/proxy/model/ip_info_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
-import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart' hide IpInfo;
 import 'package:hiddify/hiddifycore/init_signal.dart';
 
 import 'package:hiddify/utils/riverpod_utils.dart';
@@ -20,10 +21,17 @@ import 'package:rxdart/rxdart.dart';
 
 part 'active_proxy_notifier.g.dart';
 
+String? _ipinfoUrlFromHeaders(Map<String, dynamic>? headers) {
+  final value = headers?['ipinfo-url'];
+  if (value is! String) return null;
+  final url = value.trim();
+  return isUrl(url) ? url : null;
+}
+
 @riverpod
 class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
   @override
-  Future<oldipinfo.IpInfo> build() async {
+  Future<IpInfo> build() async {
     ref.disposeDelay(const Duration(seconds: 20));
     final cancelToken = CancelToken();
     Timer? timer;
@@ -47,11 +55,18 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
     }
 
     _forceCheck = false;
-    final info = await ref.watch(proxyRepositoryProvider).getCurrentIpInfo(cancelToken).getOrElse((err) {
-      loggy.warning("error getting proxy ip info", err, StackTrace.current);
-      // throw err; //hiddify: remove exception to be logged
-      throw const UnknownIp();
-    }).run();
+    final customIpInfoUrl = _ipinfoUrlFromHeaders(
+      ref.watch(activeProfileProvider).valueOrNull?.populatedHeaders,
+    );
+    final info = await ref
+        .watch(proxyRepositoryProvider)
+        .getCurrentIpInfo(cancelToken, customIpInfoUrl: customIpInfoUrl)
+        .getOrElse((err) {
+          loggy.warning("error getting proxy ip info", err, StackTrace.current);
+          // throw err; //hiddify: remove exception to be logged
+          throw const UnknownIp();
+        })
+        .run();
 
     timer = Timer(const Duration(seconds: 10), () {
       loggy.debug("entering idle mode");
@@ -91,7 +106,10 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
       _resubscribeDelay = _minResubscribeDelay;
     }
     if (!serviceRunning) {
-      return Stream.error(const ServiceNotRunning());
+      // Emit an empty outbound (delay 0) so disconnect clears the last ping.
+      // Stream.error alone kept the previous AsyncData via copyWithPrevious, so
+      // the tray/dock stayed green and the UI still showed the old ms value.
+      return Stream.value(OutboundInfo());
     }
     Timer? resubscribe;
     ref.onDispose(() => resubscribe?.cancel());

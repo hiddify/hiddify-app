@@ -68,6 +68,7 @@ void main() {
       expect(restored.enableFragment, isTrue);
       expect(restored.name, equals('p'));
       expect(restored.updateInterval, equals(6));
+      expect(restored.adminPreference, equals(UserAdminPreference.unset));
     });
 
     test("a v2 record is not migrated again", () {
@@ -79,6 +80,30 @@ void main() {
 
     test("null input returns null", () {
       expect(UserOverride.fromStr(null), isNull);
+    });
+  });
+
+  group("UserOverride v2 -> v3 migration", () {
+    test("missing adminPreference defaults to unset", () {
+      final o = UserOverride.fromStr(
+        jsonEncode({'version': 2, 'extraSecurity': 'warp'}),
+      )!;
+      expect(o.adminPreference, equals(UserAdminPreference.unset));
+      expect(o.extraSecurity, equals('warp'));
+      expect(o.version, equals(latestUserOverrideVersion));
+    });
+
+    test("stored preferAdmin survives", () {
+      final o = UserOverride.fromStr(
+        jsonEncode({'version': 3, 'adminPreference': 'preferAdmin'}),
+      )!;
+      expect(o.adminPreference, equals(UserAdminPreference.preferAdmin));
+    });
+
+    test("v1 record also gets unset adminPreference", () {
+      final o = UserOverride.fromStr(v1({'enableWarp': true}))!;
+      expect(o.adminPreference, equals(UserAdminPreference.unset));
+      expect(o.version, equals(latestUserOverrideVersion));
     });
   });
 }

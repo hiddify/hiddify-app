@@ -25,5 +25,17 @@ void main() {
       expect(status.getCoreAlert(), isNull);
       expect(CoreStatus.fromEvent({'status': 'HotReloading'}), isA<CoreHotReloading>());
     });
+
+    test('waiting is the core up without a ping, started comes with a ping', () {
+      expect(CoreStatus.fromCoreInfo(CoreInfoResponse(coreState: CoreStates.WAITING)), isA<CoreWaiting>());
+      expect(CoreStatus.fromCoreInfo(CoreInfoResponse(coreState: CoreStates.STARTED)), isA<CoreStarted>());
+      expect(CoreStatus.fromEvent({'status': 'Waiting'}), isA<CoreWaiting>());
+    });
+
+    test('every proxy timing out is its own state, not an alert', () {
+      final status = CoreStatus.fromCoreInfo(CoreInfoResponse(coreState: CoreStates.NO_AVAILABLE_PROXIES));
+      expect(status, isA<CoreNoAvailableProxies>());
+      expect(status.getCoreAlert(), isNull);
+    });
   });
 }

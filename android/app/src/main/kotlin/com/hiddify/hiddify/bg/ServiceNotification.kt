@@ -183,22 +183,27 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
 
             val coreClient = GrpcClientProvider.grpcClient.create(CoreClient::class)
 
-            try {
-                var previous = coreClient.GetSystemInfo().executeBlocking(Empty())
+            // The service reports Started before the core listens, so the first calls can fail
+            // (connection reset). Retry until it answers instead of giving up for the session.
+            while (isActive) {
+                try {
+                    var previous = coreClient.GetSystemInfo().executeBlocking(Empty())
 
-                while (isActive) {
-                    delay(1_000) // ✅ coroutine-friendly
-                    val current = coreClient.GetSystemInfo().executeBlocking(Empty())
-                    updateStatus(previous,current)
-                    previous = current
+                    while (isActive) {
+                        delay(1_000) // ✅ coroutine-friendly
+                        val current = coreClient.GetSystemInfo().executeBlocking(Empty())
+                        updateStatus(previous,current)
+                        previous = current
+                    }
+                } catch (e: CancellationException) {
+                    // coroutine cancelled normally
+                    Log.d("notification", "SystemInfo polling cancelled")
+                    notification.cancel(notificationId)
+                    return@launch
+                } catch (e: Exception) {
+                    Log.d("notification", "SystemInfo not available yet, retrying: ${e.message}")
+                    delay(1_000)
                 }
-            } catch (e: CancellationException) {
-                // coroutine cancelled normally
-                Log.d("notification", "SystemInfo polling cancelled")
-                notification.cancel(notificationId)
-            } catch (e: Exception) {
-                Log.e("notification", "SystemInfo polling failed", e)
-                notification.cancel(notificationId)
             }
         }
     }

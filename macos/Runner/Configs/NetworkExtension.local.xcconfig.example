@@ -1,0 +1,15 @@
+// Copy to NetworkExtension.local.xcconfig and select your paid Apple team.
+DEVELOPMENT_TEAM = YOURTEAMID
+
+// Debug (flutter run -d macos) runs the VPN like a build without a Developer ID: in hiddify-core's
+// tunnel service, `Hiddify --tunnel run` as root, installed from the app with an administrator
+// password. To debug the packet tunnel system extension instead, uncomment these lines and run the
+// app from /Applications (make macos-run-dev).
+// HIDDIFY_CODE_SIGN_IDENTITY[config=Debug] = Apple Development
+// HIDDIFY_NETWORK_EXTENSION_ENABLED[config=Debug] = YES
+// HIDDIFY_HOST_ENTITLEMENTS[config=Debug] = Runner/DebugProfile.entitlements
+// HIDDIFY_EXTENSION_CODE_SIGN_ALLOWED[config=Debug] = YES
+
+// For `make macos-dist-developer-id`: the Developer ID profiles for the app and its packet tunnel.
+// HIDDIFY_HOST_PROVISIONING_PROFILE = Hiddify macOS Developer ID
+// HIDDIFY_TUNNEL_PROVISIONING_PROFILE = Hiddify macOS Tunnel Developer ID

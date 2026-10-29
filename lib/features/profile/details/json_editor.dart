@@ -219,14 +219,16 @@ const Map<String, Map<String, Map<String, dynamic>>> exampleSchemaValues = {
     },
   },
   "config.outbounds.tls": {
-    "fragment": {
-      "tls_fragment": {"enabled": true, "size": "1-10", "sleep": "1-10"},
-    },
+    "fragment": {"fragment": true},
     "utls": {
       "utls": {"enabled": true, "fingerprint": "chrome"},
     },
   },
   "config.outbounds": {
+    "tls fragment (dialer)": {
+      "tcp_fast_open": false,
+      "tls_fragment": {"enabled": true, "size": "1-10", "sleep": "1-10"},
+    },
     "multiplex": {
       "multiplex": {
         "enabled": true,
@@ -258,7 +260,7 @@ const Map<String, Map<String, Map<String, dynamic>>> exampleSchemaValues = {
         "alpn": [],
         "min_version": "",
         "max_version": "",
-        "tls_fragment": {"enabled": false, "size": "1-10", "sleep": "1-10"},
+        "fragment": false,
       },
     },
     "websocket": {

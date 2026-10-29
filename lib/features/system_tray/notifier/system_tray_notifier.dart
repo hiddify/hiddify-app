@@ -7,9 +7,9 @@ import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/features/system_tray/desktop_status_badge.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
-import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -32,25 +32,39 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
   }
 
   Future<void> _initializeTray() async {
+    // Watch AsyncValues directly (not .future): after disconnect the proxy
+    // provider used to error while still holding a previous delay, and awaiting
+    // .future could leave the tray on the old green/error mark.
+    final connection = ref.watch(connectionNotifierProvider).valueOrNull ?? const ConnectionStatus.disconnected();
+    final urlTestDelay = connection is Connected
+        ? (ref.watch(activeProxyNotifierProvider).valueOrNull?.urlTestDelay ?? 0)
+        : 0;
+    // Dock/taskbar/tray mark: none when disconnected, error while the core waits for a ping,
+    // green once the core reports connected.
+    final badge = switch (connection) {
+      Connected() => DesktopBadgeStatus.ok,
+      Waiting() || NoAvailableProxies() => DesktopBadgeStatus.error,
+      _ => DesktopBadgeStatus.none,
+    };
+    // Update the Dock/taskbar mark before any other await so a cancelled rebuild
+    // (or a slow tray API) cannot leave a green dot after disconnect.
+    await DesktopStatusBadge.setStatus(badge);
+
     final t = await ref.watch(translationsProvider.future);
-    final urlTestDelay = await ref
-        .watch(activeProxyNotifierProvider.future)
-        .catchError((e) {
-          loggy.warning("error getting active proxy", e);
-          return OutboundInfo(urlTestDelay: 0);
-        })
-        .then((connection) => connection.urlTestDelay);
-    final connection = await ref
-        .watch(connectionNotifierProvider.future)
-        .catchError((e) {
-          loggy.warning("error getting connection status", e);
-          return const ConnectionStatus.disconnected();
-        })
-        .then((connection) => _modifyConnectionStatus(connection, urlTestDelay));
     final serviceMode = ref.watch(ConfigOptions.serviceMode);
 
-    await trayManager.setIcon(_trayIconPath(connection), isTemplate: PlatformUtils.isMacOS);
-    if (!PlatformUtils.isLinux) await trayManager.setToolTip(_trayTooltip(connection, urlTestDelay, t));
+    await trayManager.setIcon(
+      _trayIconPath(connection, badge: badge),
+      // Template mode on macOS forces monochrome menu-bar tint and strips color.
+      // Only use it for the idle (disconnected) icon.
+      isTemplate: PlatformUtils.isMacOS && badge == DesktopBadgeStatus.none && connection is Disconnected,
+    );
+    if (!PlatformUtils.isLinux) {
+      if (Platform.isMacOS) {
+        windowManager.setBadgeLabel('');
+      }
+      await trayManager.setToolTip(_trayTooltip(connection, urlTestDelay, t, badge: badge));
+    }
     await trayManager.setContextMenu(_trayMenu(connection, serviceMode, t));
   }
 
@@ -62,8 +76,9 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
         label: switch (connection) {
           Disconnected() => t.connection.connect,
           Connecting() => t.connection.connecting,
-          Connected() => t.connection.disconnect,
+          Connected() || Waiting() || NoAvailableProxies() => t.connection.disconnect,
           Disconnecting() => t.connection.disconnecting,
+          HotReloading() => t.connection.hotReloading,
         },
         disabled: connection.isSwitching,
       ),
@@ -83,44 +98,53 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
     ],
   );
 
-  String _trayIconPath(ConnectionStatus status) {
+  /// Status-bar / system-tray icon for all desktops (macOS, Windows, Linux).
+  ///
+  /// Green Hi when [badge] is ok; red Hi when error (connected, no ping);
+  /// idle theme icon when disconnected; red transitional while switching.
+  String _trayIconPath(ConnectionStatus status, {required DesktopBadgeStatus badge}) {
     final isDarkMode = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
     const images = Assets.images;
     final isWindows = PlatformUtils.isWindows;
-    switch (status) {
-      case Connected():
+    switch (badge) {
+      case DesktopBadgeStatus.ok:
         return isWindows ? images.trayIconConnectedIco : images.trayIconConnectedPng.path;
+      case DesktopBadgeStatus.error:
+        return isWindows ? images.trayIconDisconnectedIco : images.trayIconDisconnectedPng.path;
+      case DesktopBadgeStatus.none:
+        break;
+    }
+    switch (status) {
       case Connecting():
+      case Waiting():
+      case NoAvailableProxies():
       case Disconnecting():
         return isWindows ? images.trayIconDisconnectedIco : images.trayIconDisconnectedPng.path;
+      case Connected():
+      case HotReloading():
       case Disconnected():
+        // Light bar → darker glyph; dark bar → lighter glyph.
         return isWindows
             ? isDarkMode
                   ? images.trayIconIco
                   : images.trayIconDarkIco
             : isDarkMode
-            ? images.trayIconDarkPng.path
-            : images.trayIconPng.path;
+            ? images.trayIconPng.path
+            : images.trayIconDarkPng.path;
     }
   }
 
-  String _trayTooltip(ConnectionStatus connection, int urlTestDelay, Translations t) {
+  String _trayTooltip(
+    ConnectionStatus connection,
+    int urlTestDelay,
+    Translations t, {
+    required DesktopBadgeStatus badge,
+  }) {
     final r = "${Constants.appName} - ${connection.present(t)}";
-    if (connection is Connected) {
-      if (Platform.isMacOS) windowManager.setBadgeLabel("${urlTestDelay}ms");
-      return '$r : ${urlTestDelay}ms"';
-    } else {
-      if (Platform.isMacOS) windowManager.setBadgeLabel("-ms");
-      return r;
+    if (badge == DesktopBadgeStatus.ok) {
+      return '$r : ${urlTestDelay}ms';
     }
-  }
-
-  ConnectionStatus _modifyConnectionStatus(ConnectionStatus connection, int urlTestDelay) {
-    if (connection is Connected) {
-      return ConnectionConst.isValidDelay(urlTestDelay) ? const Connected() : const Connecting();
-    } else {
-      return connection;
-    }
+    return r;
   }
 
   @override

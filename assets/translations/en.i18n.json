@@ -110,8 +110,11 @@
       "sort": "Sort proxies",
       "testDelay": "Test delay",
       "empty": "No proxies available",
+      "connectToSeeProxies": "Connect to see proxies",
+      "loadFailed": "Couldn’t load proxies. Tap to retry.",
       "activeProxy": "Active proxy",
       "unknownIp": "Unknown IP",
+      "checkingIp": "Checking IP…",
       "switchFailed": "Couldn’t switch to this proxy. Try again.",
       "sortOptions": {
         "unsorted": "Default",
@@ -179,7 +182,12 @@
         "urlHint": "Full configuration URL",
         "disableAutoUpdate": "Turn off auto update",
         "autoUpdateInterval": "Auto update interval",
-        "loading": "Adding profile…"
+        "loading": "Adding profile…",
+        "adminPreference": "Administrator preference",
+        "adminPreferenceAskEachTime": "Ask each time",
+        "adminPreferencePreferAdmin": "Always use admin",
+        "adminPreferencePreferNoAdmin": "Always continue without admin",
+        "adminPreferenceReset": "Ask each time about administrator permission"
       }
     },
     "logs": {
@@ -484,8 +492,7 @@
         "redirectPort": "Redirect port",
         "lanSharing": "Secure VPN sharing",
         "qrCode": "QR code",
-        "lanQrSubtitle": "SOCKS5 proxy for this Wi-Fi",
-        "lanIPError": "Failed to get local IP address"
+        "lanQrSubtitle": "SOCKS5 proxy"
       },
       "tlsTricks": {
         "title": "TLS tricks",
@@ -678,6 +685,28 @@
         "message": "Route rules decide where your traffic goes.\nOnly import them from a source you trust."
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Administrator permission needed",
+        "msg": "VPN mode needs a one-time administrator permission to install the Hiddify background service. After that, you can connect without another prompt.",
+        "connectWithAdmin": "Connect with admin permission",
+        "waitingTitle": "Waiting for administrator permission",
+        "waitingMsg": "Allow the administrator prompt to continue. You can stop and try again later.",
+        "stop": "Stop"
+      },
+      "proxyNeedsAdmin": {
+        "title": "Administrator permission recommended",
+        "msg": "Some settings in this profile work better with administrator permission. You can run with admin permission, or continue without it (those settings will be turned off for this connection).",
+        "seeConfigs": "See configs",
+        "hideConfigs": "Hide configs",
+        "neverAskAgain": "Don’t ask again for this profile",
+        "runAsAdmin": "Run as admin",
+        "continueWithoutAdmin": "Continue without admin",
+        "elevationFailedTitle": "Couldn’t get administrator permission",
+        "elevationFailedMsg": "The administrator prompt was denied or failed. Try again, or continue without admin for this connection.",
+        "tryAgain": "Try again"
+      }
+    },
     "experimentalNotice": {
       "title": "Experimental features in use",
       "msg": "You’ve turned on some experimental features that might affect connection quality and cause unexpected errors. You can always change or reset these options in Settings.",
@@ -728,6 +757,8 @@
     "qrCode": {
       "copyFullLink": "Copy full link",
       "copied": "Copied",
+      "localOnlyTitle": "This device only",
+      "localOnlyMessage": "Other devices can’t reach 127.0.0.1",
       "ip": "IP",
       "port": "Port",
       "username": "Username",
@@ -743,6 +774,8 @@
     "tapToConnect": "Tap to connect",
     "connect": "Connect",
     "connecting": "Connecting…",
+    "waiting": "Searching for freedom…",
+    "noAvailableProxies": "Connection failed",
     "hotReloading": "Applying changes…",
     "connected": "Connected",
     "disconnect": "Disconnect",

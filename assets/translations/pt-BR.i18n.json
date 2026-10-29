@@ -110,6 +110,9 @@
       "sort": "Ordenar proxies",
       "testDelay": "Testar latência",
       "empty": "Nenhum proxy disponível",
+      "connectToSeeProxies": "Conecte-se para ver os proxies",
+      "loadFailed": "Não foi possível carregar os proxies. Toque para tentar novamente.",
+      "checkingIp": "Verificando IP…",
       "activeProxy": "Proxy ativo",
       "unknownIp": "IP desconhecido",
       "switchFailed": "Não foi possível mudar para este proxy. Tente de novo.",
@@ -483,8 +486,7 @@
         "redirectPort": "Porta de redirecionamento",
         "lanSharing": "Compartilhamento seguro de VPN",
         "qrCode": "Código QR",
-        "lanQrSubtitle": "Proxy SOCKS5 para este Wi-Fi",
-        "lanIPError": "Falha ao obter endereço IP local"
+        "lanQrSubtitle": "Proxy SOCKS5"
       },
       "tlsTricks": {
         "title": "Truques de TLS",
@@ -727,6 +729,8 @@
     "qrCode": {
       "copyFullLink": "Copiar link completo",
       "copied": "Copiado",
+      "localOnlyTitle": "Somente este dispositivo",
+      "localOnlyMessage": "Outros dispositivos não alcançam 127.0.0.1",
       "ip": "IP",
       "port": "Porta",
       "username": "Nome de usuário",
@@ -742,6 +746,8 @@
     "tapToConnect": "Toque para conectar",
     "connect": "Conectar",
     "connecting": "Conectando…",
+    "waiting": "Buscando a liberdade…",
+    "noAvailableProxies": "Falha na conexão",
     "hotReloading": "Aplicando alterações…",
     "connected": "Conectado",
     "disconnect": "Desconectar",

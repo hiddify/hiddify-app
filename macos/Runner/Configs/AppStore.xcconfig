@@ -1,0 +1,20 @@
+// The Mac App Store build. Pass it as XCODE_XCCONFIG_FILE (macos/scripts/dist.sh app-store does).
+// The App Store accepts a sandboxed app whose packet tunnel is an app extension, not the system
+// extension the Developer ID build carries.
+HIDDIFY_TUNNEL_KIND = app-extension
+HIDDIFY_NETWORK_EXTENSION_ENABLED = YES
+HIDDIFY_NETWORK_EXTENSION_ENTITLEMENT = packet-tunnel-provider
+HIDDIFY_HOST_ENTITLEMENTS = Runner/AppStore.entitlements
+HIDDIFY_EXTENSION_CODE_SIGN_ALLOWED = NO
+HIDDIFY_APPEX_CODE_SIGN_ALLOWED = YES
+DEVELOPMENT_TEAM = M7Q8ASP66Z
+HIDDIFY_CODE_SIGN_STYLE = Manual
+HIDDIFY_CODE_SIGN_IDENTITY = Apple Distribution
+HIDDIFY_HOST_PROVISIONING_PROFILE = Hiddify macOS App Store
+HIDDIFY_TUNNEL_PROVISIONING_PROFILE = Hiddify macOS Tunnel App Store
+
+// Debug runs the same sandboxed app, signed for development.
+HIDDIFY_CODE_SIGN_STYLE[config=Debug] = Automatic
+HIDDIFY_CODE_SIGN_IDENTITY[config=Debug] = Apple Development
+HIDDIFY_HOST_PROVISIONING_PROFILE[config=Debug] =
+HIDDIFY_TUNNEL_PROVISIONING_PROFILE[config=Debug] =

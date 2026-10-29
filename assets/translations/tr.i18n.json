@@ -110,6 +110,9 @@
       "sort": "Proxy'leri sırala",
       "testDelay": "Gecikmeyi test et",
       "empty": "Kullanılabilir proxy yok",
+      "connectToSeeProxies": "Proxy’leri görmek için bağlanın",
+      "loadFailed": "Proxy’ler yüklenemedi. Yeniden denemek için dokunun.",
+      "checkingIp": "IP kontrol ediliyor…",
       "activeProxy": "Aktif proxy",
       "unknownIp": "Bilinmeyen IP",
       "switchFailed": "Bu proxy'ye geçilemedi. Tekrar deneyin.",
@@ -482,8 +485,7 @@
         "redirectPort": "Yönlendirme portu",
         "lanSharing": "Güvenli VPN paylaşımı",
         "qrCode": "QR kod",
-        "lanQrSubtitle": "Bu Wi-Fi için SOCKS5 proxy",
-        "lanIPError": "Yerel IP adresi alınamadı"
+        "lanQrSubtitle": "SOCKS5 proxy"
       },
       "tlsTricks": {
         "title": "TLS hileleri",
@@ -725,6 +727,8 @@
     "qrCode": {
       "copyFullLink": "Tam bağlantıyı kopyala",
       "copied": "Kopyalandı",
+      "localOnlyTitle": "Yalnızca bu cihaz",
+      "localOnlyMessage": "Diğer cihazlar 127.0.0.1 adresine erişemez",
       "ip": "IP",
       "port": "Port",
       "username": "Kullanıcı adı",
@@ -740,6 +744,8 @@
     "tapToConnect": "Bağlanmak için dokunun",
     "connect": "Bağlan",
     "connecting": "Bağlanıyor…",
+    "waiting": "Özgürlük aranıyor…",
+    "noAvailableProxies": "Bağlantı başarısız",
     "hotReloading": "Değişiklikler uygulanıyor…",
     "connected": "Bağlı",
     "disconnect": "Bağlantıyı kes",

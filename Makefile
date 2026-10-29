@@ -146,6 +146,7 @@ macos-install-deps:
 	brew install create-dmg tree 
 	npm install -g appdmg
 	dart pub global activate fastforge
+macos-appstore-install-deps: macos-install-deps
 
 ios-install-deps: 
 	if [ "$(flutter)" = "true" ]; then \
@@ -285,6 +286,9 @@ android-aab-release:
 	  --build-dart-define=release=google-play
 
 windows-release: windows-zip-release windows-exe-release windows-msix-release
+
+windows-validate:
+	flutter build windows --release --target $(TARGET) $(BUILD_ARGS)
 
 windows-zip-release:
 	fastforge package \
@@ -469,6 +473,12 @@ macos-release:
 ios-release: #not tested
 	fastforge package --platform ios --targets ipa --build-export-options-plist  ios/exportOptions.plist $(DISTRIBUTOR_ARGS)
 
+ios-validate:
+	flutter build ios --release --no-codesign --target $(TARGET) $(BUILD_ARGS)
+
+ios-simulator-validate:
+	flutter build ios --simulator --debug --target $(TARGET) $(BUILD_ARGS)
+
 android-libs:
 	$(MKDIR) $(ANDROID_OUT) || echo Folder already exists. Skipping...
 	curl -L $(CORE_URL)/$(CORE_NAME)-android.tar.gz | tar xz -C $(ANDROID_OUT)/
@@ -500,8 +510,13 @@ linux-arm64-musl-libs:
 
 
 macos-libs:
-	mkdir -p  $(DESKTOP_OUT) 
+	mkdir -p $(DESKTOP_OUT) macos/Frameworks
 	curl -L $(CORE_URL)/$(CORE_NAME)-macos.tar.gz | tar xz -C $(DESKTOP_OUT)
+	# Tunnel bind ships in the same tarball (built by hiddify-core `make macos`).
+	test -d $(DESKTOP_OUT)/HiddifyTunnelCore.xcframework
+	rm -rf macos/Frameworks/HiddifyTunnelCore.xcframework
+	mv $(DESKTOP_OUT)/HiddifyTunnelCore.xcframework macos/Frameworks/
+	touch macos/Frameworks/HiddifyTunnelCore.xcframework/.downloaded
 
 ios-libs: #not tested
 	mkdir -p $(IOS_OUT)
@@ -528,6 +543,37 @@ build-linux-libs:
 
 build-macos-libs:
 	make -C hiddify-core -f Makefile macos
+	test -d hiddify-core/bin/HiddifyTunnelCore.xcframework
+	mkdir -p macos/Frameworks
+	rm -rf macos/Frameworks/HiddifyTunnelCore.xcframework
+	cp -R hiddify-core/bin/HiddifyTunnelCore.xcframework macos/Frameworks/
+
+# Native arch only (no lipo, no HiddifyTunnelCore.xcframework).
+build-lite-macos-libs:
+	make -C hiddify-core -f Makefile macos-lite
+
+# Runs Debug from /Applications, where macOS allows the VPN system extension.
+macos-run-dev:
+	bash macos/scripts/run-dev.sh
+
+# macOS releases built on this Mac; see macos/scripts/dist.sh.
+macos-dist-unsigned:
+	bash macos/scripts/dist.sh unsigned $(DISTRIBUTOR_ARGS)
+
+macos-dist-developer-id:
+	bash macos/scripts/dist.sh developer-id $(DISTRIBUTOR_ARGS)
+
+macos-dist-appstore:
+	bash macos/scripts/dist.sh app-store
+
+macos-appstore-upload:
+	bash macos/scripts/dist.sh app-store --upload
+
+# CI builds the Mac App Store pkg + dmg; MACOS_APPSTORE_ARGS=--upload sends the pkg to TestFlight.
+macos-appstore-prepare: macos-prepare
+
+macos-appstore-release:
+	bash macos/scripts/dist.sh app-store $(MACOS_APPSTORE_ARGS)
 
 build-ios-libs: 
 	rm -rf $(IOS_OUT)/HiddifyCore.xcframework 
@@ -544,4 +590,4 @@ ios-temp-prepare:
 	flutter build ios-framework
 	cd ios
 	pod install
-	
+

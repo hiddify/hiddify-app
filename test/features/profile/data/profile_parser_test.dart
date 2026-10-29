@@ -53,6 +53,7 @@ void main() {
   const validBaseUrl = "https://example.com/configurations/user1/filename.yaml";
   const validExtendedUrl = "https://example.com/configurations/user1/filename.yaml?test#b";
   const validSupportUrl = "https://example.com/support";
+  const validIpinfoUrl = "https://example.com/ipapi/json";
 
   group("parse", () {
     test("Should use filename in url with no headers and fragment", () {
@@ -116,6 +117,7 @@ void main() {
         "subscription-userinfo": ["upload=0;download=1024;total=10240.5;expire=1704054600.55"],
         "profile-web-page-url": [validBaseUrl],
         "support-url": [validSupportUrl],
+        "ipinfo-url": [validIpinfoUrl],
       };
       // This fix occurs in the _downloadProfile method within ProfileParser, and the fixed headers are passed to populateHeaders
       final fixedHeaders = headers.map((key, value) {
@@ -125,6 +127,7 @@ void main() {
       final allHeaders = ProfileParser.populateHeaders(content: '', remoteHeaders: fixedHeaders);
       expect(allHeaders.isRight(), true);
       allHeaders.match((l) {}, (r) {
+        expect(r['ipinfo-url'], equals(validIpinfoUrl));
         final profile = ProfileParser.parse(
           tempFilePath: '',
           profile: ProfileEntity.remote(
@@ -157,6 +160,8 @@ void main() {
               );
               expect(rp.webPageUrl, equals(validBaseUrl));
               expect(rp.supportUrl, equals(validSupportUrl));
+              // Kept in populatedHeaders only — not a dedicated entity/DB field.
+              expect(rp.populatedHeaders?['ipinfo-url'], equals(validIpinfoUrl));
             },
             local: (lp) {},
           );
@@ -545,7 +550,7 @@ void main() {
     test("warp header sets extra_security + warp mode", () {
       final o = decodeOverride(headers: {"extra-security": "warp"});
       expect(o["chain-status"], equals("extra_security"));
-      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp_auto"));
     });
 
     test("psiphon header sets psiphon mode", () {
@@ -575,7 +580,7 @@ void main() {
 
     test("UserOverride enables warp without a header", () {
       final o = decodeOverride(userOverride: const UserOverride(extraSecurity: "warp"));
-      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp_auto"));
     });
 
     test("UserOverride takes precedence over the header", () {
@@ -591,7 +596,7 @@ void main() {
         headers: {"extra-security": "warp"},
         userOverride: const UserOverride(extraSecurity: "garbage"),
       );
-      expect((o["extra-security"] as Map)["mode"], equals("warp"));
+      expect((o["extra-security"] as Map)["mode"], equals("warp_auto"));
     });
   });
 

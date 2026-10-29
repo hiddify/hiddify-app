@@ -29,5 +29,4 @@ object SettingsKey {
     const val TMP_DIR = "tmp_dir"
 
     const val GRPC_PORT = "grpc_port"
-    const val GRPC_FLUTTER_PUBLIC_KEY = "grpc_flutter_public_key"
 }

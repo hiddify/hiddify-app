@@ -22,7 +22,7 @@ class LogsEventHandler: NSObject, FlutterPlugin, FlutterStreamHandler {
         self.events = events
         commandClient = CommandClient(.log)
         commandClient?.connect()
-        cancellable =  commandClient?.$logList.sink{ [self] logs in
+        cancellable =  commandClient?.$logList.receive(on: DispatchQueue.main).sink{ [self] logs in
             events(logs)
         }
         return nil

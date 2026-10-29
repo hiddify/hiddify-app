@@ -110,6 +110,9 @@
       "sort": "Urutkan proxy",
       "testDelay": "Uji latensi",
       "empty": "Tidak ada proxy yang tersedia",
+      "connectToSeeProxies": "Sambungkan untuk melihat proksi",
+      "loadFailed": "Tidak dapat memuat proksi. Ketuk untuk mencoba lagi.",
+      "checkingIp": "Memeriksa IP…",
       "activeProxy": "Proxy aktif",
       "unknownIp": "IP tidak dikenal",
       "switchFailed": "Tidak dapat beralih ke proxy ini. Coba lagi.",
@@ -482,8 +485,7 @@
         "redirectPort": "Port pengalihan",
         "lanSharing": "Berbagi VPN yang aman",
         "qrCode": "Kode QR",
-        "lanQrSubtitle": "Proxy SOCKS5 untuk Wi-Fi ini",
-        "lanIPError": "Gagal mendapatkan alamat IP lokal"
+        "lanQrSubtitle": "Proxy SOCKS5"
       },
       "tlsTricks": {
         "title": "Trik TLS",
@@ -725,6 +727,8 @@
     "qrCode": {
       "copyFullLink": "Salin tautan lengkap",
       "copied": "Disalin",
+      "localOnlyTitle": "Hanya perangkat ini",
+      "localOnlyMessage": "Perangkat lain tidak bisa menjangkau 127.0.0.1",
       "ip": "IP",
       "port": "Port",
       "username": "Nama pengguna",
@@ -740,6 +744,8 @@
     "tapToConnect": "Ketuk untuk menyambungkan",
     "connect": "Sambungkan",
     "connecting": "Menyambungkan…",
+    "waiting": "Mencari kebebasan…",
+    "noAvailableProxies": "Koneksi gagal",
     "hotReloading": "Menerapkan perubahan…",
     "connected": "Tersambung",
     "disconnect": "Putuskan",

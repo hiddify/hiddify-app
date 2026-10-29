@@ -6,4 +6,5 @@ bool shouldRestoreConnectionOnStartup({
   required bool isDesktop,
   required bool startedByUser,
   required bool hasActiveProfile,
-}) => isDesktop && startedByUser && hasActiveProfile;
+  bool isAlreadyRunning = false,
+}) => isDesktop && startedByUser && hasActiveProfile && !isAlreadyRunning;

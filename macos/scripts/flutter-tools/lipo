@@ -1,0 +1,17 @@
+#!/bin/bash
+set -euo pipefail
+
+task_lipo="$(xcrun --find lipo)"
+# Flutter verifies all requested slices in one call. Some Apple lipo versions
+# reject that argument list even when every slice is present in the binary.
+if [[ $# -ge 3 && "$2" == -verify_arch ]]; then
+  task_binary="$1"
+  shift 2
+  for task_arch in "$@"; do
+    "$task_lipo" "$task_binary" -verify_arch "$task_arch"
+  done
+  exit 0
+fi
+
+# Keep extraction, merging, and all other operations in the native tool.
+exec "$task_lipo" "$@"

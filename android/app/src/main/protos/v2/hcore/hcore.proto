@@ -238,3 +238,64 @@ message StopRequest{
 message LANIPResponse {
   string ip = 1;
 }
+
+// --- admin_bgservice (Windows/Linux elevated background core) ---
+
+enum AdminPreference {
+  ADMIN_PREFERENCE_UNSET = 0;
+  ADMIN_PREFERENCE_PREFER_ADMIN = 1;
+  ADMIN_PREFERENCE_PREFER_NO_ADMIN = 2;
+}
+
+enum AdminBgServiceDecision {
+  ADMIN_BG_SERVICE_NO = 0;
+  ADMIN_BG_SERVICE_ALREADY_CONNECTED = 1;
+  ADMIN_BG_SERVICE_NEEDS_ADMIN = 2;
+  ADMIN_BG_SERVICE_OPTIONAL_PROXY_NEED_ADMIN = 3;
+}
+
+enum EnsureAdminBgServiceProgress {
+  ENSURE_ADMIN_BG_WAITING_FOR_ELEVATION = 0;
+  ENSURE_ADMIN_BG_SERVICE_STARTING = 1;
+  ENSURE_ADMIN_BG_SERVICE_CONNECTED = 2;
+  ENSURE_ADMIN_BG_FAILED_PERMISSION_DENIED = 3;
+  ENSURE_ADMIN_BG_FAILED_OTHER = 4;
+}
+
+message AdminNeededProxy {
+  string tag = 1;
+  string summary = 2;
+  string detail = 3;
+}
+
+message NeedAdminBgServiceRequest {
+  // proxy | system-proxy | vpn
+  string service_mode = 1;
+  string hiddify_settings_json = 2;
+  AdminPreference admin_preference = 3;
+  // True after an in-process start failed with a privilege error.
+  bool privilege_error_remembered = 4;
+}
+
+message NeedAdminBgServiceResponse {
+  AdminBgServiceDecision decision = 1;
+  repeated AdminNeededProxy admin_needed_proxies = 2;
+}
+
+message EnsureAdminBgServiceRequest {
+  string config_content = 1;
+  string config_name = 2;
+  string settings_json = 3;
+  map<string, bytes> resources = 4;
+  bool disable_memory_limit = 5;
+  int32 owner_pid = 6;
+  // Absolute path to this app's HiddifyCli / HiddifyCli.exe (used for elevate install).
+  string cli_path = 7;
+  string owner_user = 8;
+}
+
+message EnsureAdminBgServiceEvent {
+  EnsureAdminBgServiceProgress progress = 1;
+  string message = 2;
+  uint32 service_port = 3;
+}

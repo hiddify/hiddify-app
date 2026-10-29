@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:screen_retriever/screen_retriever.dart';
@@ -119,13 +120,17 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
   }
 
   Future<void> exit() async {
-    await ref
-        .read(connectionNotifierProvider.notifier)
-        .abortConnection()
-        .timeout(const Duration(seconds: 2))
-        .catchError((e) {
-          loggy.warning("error aborting connection on quit", e);
-        });
+    // A system VPN belongs to macOS and remains connected after the UI quits.
+    // The Disconnect action still explicitly stops it and disables on demand.
+    if (!ref.read(hiddifyCoreServiceProvider).core.persistsAfterAppExit) {
+      await ref
+          .read(connectionNotifierProvider.notifier)
+          .abortConnection()
+          .timeout(const Duration(seconds: 2))
+          .catchError((e) {
+            loggy.warning("error aborting connection on quit", e);
+          });
+    }
     await trayManager.destroy();
     await windowManager.destroy();
   }

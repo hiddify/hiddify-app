@@ -65,6 +65,11 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         }
 
         // hiddify-core with its gRPC server: the app starts the core through it
+        // The app keeps its client identity in the shared folder exactly while it runs the core with
+        // mTLS, and the core reads the certificate from there itself: nothing is passed in.
+        let useMtls = FileManager.default.fileExists(
+            atPath: FilePath.sharedDirectory.appendingPathComponent("grpc/client.crt").path
+        )
         let setupOptions = MobileSetupOptions()
         setupOptions.basePath = FilePath.sharedDirectory.relativePath
         setupOptions.workingDir = FilePath.workingDirectory.relativePath
@@ -72,7 +77,7 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         setupOptions.listen = "127.0.0.1:\(grpcServiceModePort)"
         setupOptions.secret = ""
         setupOptions.debug = false
-        setupOptions.mode = 4 // GRPC_BACKGROUND_INSECURE
+        setupOptions.mode = useMtls ? 2 : 4 // GRPC_BACKGROUND or GRPC_BACKGROUND_INSECURE
         setupOptions.fixAndroidStack = false
         var setupError: NSError?
         MobileSetup(setupOptions, platformInterface, &setupError)
@@ -128,7 +133,8 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     }
 
     func stopService() {
-        MobileClose(4)
+        MobileClose(2) // GRPC_BACKGROUND (mTLS)
+        MobileClose(4) // GRPC_BACKGROUND_INSECURE
         platformInterface?.reset()
     }
 
@@ -149,7 +155,8 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     }
 
     override open func handleAppMessage(_ messageData: Data) async -> Data? {
-        messageData
+        // Legacy echo (e.g. stats probes that the app still sends).
+        return messageData
     }
 
     override open func sleep() async {

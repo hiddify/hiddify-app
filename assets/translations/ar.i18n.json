@@ -116,6 +116,9 @@
       "sort": "فرز البروكسيات",
       "testDelay": "اختبار التأخير",
       "empty": "لا توجد بروكسيات متاحة",
+      "connectToSeeProxies": "اتصل لعرض البروكسيات",
+      "loadFailed": "تعذّر تحميل البروكسيات. انقر لإعادة المحاولة.",
+      "checkingIp": "جارٍ التحقق من عنوان IP…",
       "activeProxy": "البروكسي النشط",
       "unknownIp": "IP غير معروف",
       "switchFailed": "تعذّر التبديل إلى هذا البروكسي. أعد المحاولة.",
@@ -514,8 +517,7 @@
         "redirectPort": "منفذ إعادة التوجيه",
         "lanSharing": "مشاركة VPN آمنة",
         "qrCode": "رمز QR",
-        "lanQrSubtitle": "وكيل SOCKS5 لشبكة Wi-Fi هذه",
-        "lanIPError": "فشل في الحصول على عنوان IP المحلي"
+        "lanQrSubtitle": "وكيل SOCKS5"
       },
       "tlsTricks": {
         "title": "حيل TLS",
@@ -762,6 +764,8 @@
     "qrCode": {
       "copyFullLink": "نسخ الرابط الكامل",
       "copied": "تم النسخ",
+      "localOnlyTitle": "هذا الجهاز فقط",
+      "localOnlyMessage": "لا يمكن للأجهزة الأخرى الوصول إلى 127.0.0.1",
       "ip": "IP",
       "port": "المنفذ",
       "username": "اسم المستخدم",
@@ -777,6 +781,8 @@
     "tapToConnect": "انقر للاتصال",
     "connect": "اتصال",
     "connecting": "جار الاتصال…",
+    "waiting": "البحث عن الحرية…",
+    "noAvailableProxies": "فشل الاتصال",
     "hotReloading": "جاري تطبيق التغييرات…",
     "connected": "متصل",
     "disconnect": "قطع الاتصال",

@@ -62,8 +62,11 @@ class VPNManager: ObservableObject {
     
     init() {
         observer = NotificationCenter.default.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil) { [weak self] notification in
+            guard let self else { return }
             guard let connection = notification.object as? NEVPNConnection else { return }
-            self?.state = connection.status
+            // Ignore other apps' VPN sessions; only mirror our loaded manager.
+            guard connection === self.manager.connection else { return }
+            self.state = connection.status
         }
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -95,6 +98,8 @@ class VPNManager: ObservableObject {
             let managers = try await NETunnelProviderManager.loadAllFromPreferences()
             if let manager = managers.first {
                 self.manager = manager
+                // After relaunch NEVPNStatusDidChange may not fire; read the live tunnel status.
+                self.state = manager.connection.status
                 return
             }
             let newManager = NETunnelProviderManager()
@@ -106,6 +111,7 @@ class VPNManager: ObservableObject {
             try await newManager.saveToPreferences()
             try await newManager.loadFromPreferences()
             self.manager = newManager
+            self.state = newManager.connection.status
         } catch {
             print(error.localizedDescription)	
         }
@@ -224,17 +230,18 @@ class VPNManager: ObservableObject {
         }
     }
     
-    func connect(with config: String, grpcServiceModePort:Int, disableMemoryLimit: Bool = false) async throws {
+    func connect(with config: String, grpcServiceModePort: Int, disableMemoryLimit: Bool = false) async throws {
         
         await set(upload: 0, download: 0)
 //        guard state == .disconnected else { return }
         do {
             try await enableVPNManager()
-            try manager.connection.startVPNTunnel(options: [
+            let options: [String: NSObject] = [
                 "Config": config as NSString,
-                "GrpcServiceModePort":NSNumber(value: grpcServiceModePort),
+                "GrpcServiceModePort": NSNumber(value: grpcServiceModePort),
                 "DisableMemoryLimit": (disableMemoryLimit ? "YES" : "NO") as NSString,
-            ])
+            ]
+            try manager.connection.startVPNTunnel(options: options)
             
         } catch {
             print(error.localizedDescription)
@@ -258,4 +265,21 @@ class VPNManager: ObservableObject {
 //        guard state == .connected else { return }
         manager.connection.stopVPNTunnel()
     }
+
+    /// Status map matching StatusEventHandler / Dart `CoreStatus.fromEvent`.
+    func statusPayload() -> [String: String] {
+        switch state {
+        case .reasserting, .connecting:
+            return ["status": "Starting"]
+        case .connected:
+            return ["status": "Started"]
+        case .disconnecting:
+            return ["status": "Stopping"]
+        case .disconnected, .invalid:
+            return ["status": "Stopped"]
+        @unknown default:
+            return ["status": "Stopped"]
+        }
+    }
+
 }

@@ -19,6 +19,7 @@ import com.hiddify.hiddify.constant.ServiceMode
 import com.hiddify.hiddify.constant.Status
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -58,13 +59,28 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         connection.reconnect()
     }
 
+    // The start that is still waiting on a permission dialog. Every path that ends a start
+    // completes it exactly once: true once the service is asked to start, false once it
+    // cannot start (the reason goes out separately as a service alert). Main thread only.
+    private var pendingStart: CompletableDeferred<Boolean>? = null
+
+    /** Returns only after the permission dialogs are answered: true if the service was asked to start. */
     @SuppressLint("NewApi")
-    fun startService() {
+    suspend fun startService(): Boolean = withContext(Dispatchers.Main) {
+        // A second start while the dialogs are open waits for them instead of opening more.
+        pendingStart?.let { return@withContext it.await() }
+        val start = CompletableDeferred<Boolean>().also { pendingStart = it }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !ServiceNotification.checkPermission()) {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            return
+        } else {
+            startService0()
         }
-        startService0()
+        start.await()
+    }
+
+    private fun finishStart(started: Boolean) {
+        pendingStart?.complete(started)
+        pendingStart = null
     }
 
     private fun startService0() {
@@ -79,12 +95,16 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
             }
             val intent = Intent(Application.application, Settings.serviceClass())
             withContext(Dispatchers.Main) {
-                ContextCompat.startForegroundService(this@MainActivity, intent)
+                val started = runCatching { ContextCompat.startForegroundService(this@MainActivity, intent) }
+                    .onFailure { onServiceAlert(Alert.StartService, it.message) }
+                    .isSuccess
+                if (started) Settings.startedByUser = true
+                finishStart(started)
             }
-            Settings.startedByUser = true
         }
     }
 
+    /** True when the start cannot go on now: the VPN dialog is open, or preparing failed. */
     private suspend fun prepare() = withContext(Dispatchers.Main) {
         try {
             val intent = VpnService.prepare(this@MainActivity)
@@ -96,6 +116,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
             }
         } catch (e: Exception) {
             onServiceAlert(Alert.RequestVPNPermission, e.message)
+            finishStart(false)
             true
         }
     }
@@ -105,6 +126,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
         ) { isGranted ->
             if (Settings.dynamicNotification && !isGranted) {
                 onServiceAlert(Alert.RequestNotificationPermission, null)
+                finishStart(false)
             } else {
                 startService0()
             }
@@ -118,6 +140,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
                 startService0()
             } else {
                 onServiceAlert(Alert.RequestVPNPermission, null)
+                finishStart(false)
             }
         }
 
@@ -155,7 +178,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     ) {
         if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startService()
+                lifecycleScope.launch { startService() }
             } else onServiceAlert(Alert.RequestNotificationPermission, null)
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -164,10 +187,10 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == VPN_PERMISSION_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) startService()
+            if (resultCode == RESULT_OK) lifecycleScope.launch { startService() }
             else onServiceAlert(Alert.RequestVPNPermission, null)
         } else if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) startService()
+            if (resultCode == RESULT_OK) lifecycleScope.launch { startService() }
             else onServiceAlert(Alert.RequestNotificationPermission, null)
         }
     }

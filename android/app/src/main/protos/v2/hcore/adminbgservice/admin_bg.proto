@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package adminbgservice;
+
+option go_package = "github.com/hiddify/hiddify-core/v2/hcore/adminbgservice";
+option java_package = "com.hiddify.core.api.v2.adminbgservice";
+
+message AdminBgStartRequest {
+    bool ipv6 = 1;
+    int32 server_port = 2;
+    string server_username = 3;
+    string server_password = 4;
+    bool strict_route = 5;
+    bool endpoint_independent_nat = 6;
+    string stack = 7;
+    // Full-core start (macOS root daemon): config snapshot, settings, and local resources.
+    string config_content = 8;
+    string config_name = 9;
+    string settings_json = 10;
+    map<string, bytes> resources = 11;
+    bool disable_memory_limit = 12;
+    // When set, the daemon stops once this process is gone (app quit or crash).
+    int32 owner_pid = 13;
+}
+
+message AdminBgResponse {
+    string message = 1;
+}

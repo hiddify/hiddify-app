@@ -51,6 +51,13 @@ class EclipseTraffic {
 
   double get total => math.max(down, up);
 
+  @override
+  bool operator ==(Object other) =>
+      other is EclipseTraffic && other.down == down && other.up == up;
+
+  @override
+  int get hashCode => Object.hash(down, up);
+
   /// Speeds in bytes a second and the level each reaches; between two, the level follows the speed
   /// on a log scale.
   static const _steps = [(200.0, .2), (500.0, .5), (1024.0, .65), (10 * 1024.0, .8), (100 * 1024.0, 1.0)];
@@ -75,6 +82,9 @@ class EclipseTraffic {
 /// its edge. While connected, the traffic is the sun's light round it: download in sun yellow close
 /// to the button, upload in plasma blue further out, both reaching further as more flows. A failed
 /// connection shows a weak signal and an error badge, whose place [errorBadgeRect] gives.
+///
+/// Soft glows are drawn sharp into a bounded [Canvas.saveLayer] and blurred once with
+/// [ui.ImageFilter.blur], not with a [MaskFilter] on every stroke. Same look, far cheaper.
 class EclipseButtonPainter extends CustomPainter {
   EclipseButtonPainter({
     required this.frame,
@@ -108,20 +118,32 @@ class EclipseButtonPainter extends CustomPainter {
     final f = frame;
     _Ctx ctx(EclipseFrame frame) => _Ctx(this, canvas, size.center(Offset.zero), frame);
     if (f.since >= _fade || f.previous == f.look) return _paintLook(ctx(f));
-    // the looks cross-fade, over a button that stays put
+    // the looks cross-fade, over a button that stays put; clip the layers to this
+    // painter so the offscreen buffers stay small
     final a = _easeInOut(f.since / _fade);
+    final bounds = Offset.zero & size;
     ctx(f).disc();
-    canvas.saveLayer(null, Paint()..color = Color.fromRGBO(0, 0, 0, 1 - a));
+    canvas.saveLayer(bounds, Paint()..color = Color.fromRGBO(0, 0, 0, 1 - a));
     _paintLook(ctx(f._before));
     canvas.restore();
-    canvas.saveLayer(null, Paint()..color = Color.fromRGBO(0, 0, 0, a));
+    canvas.saveLayer(bounds, Paint()..color = Color.fromRGBO(0, 0, 0, a));
     _paintLook(ctx(f));
     canvas.restore();
   }
 
   @override
   bool shouldRepaint(EclipseButtonPainter old) =>
-      old.frame != frame || old.traffic != traffic || old.dark != dark || old.radius != radius;
+      old.frame.look != frame.look ||
+      old.frame.previous != frame.previous ||
+      old.frame.since != frame.since ||
+      old.frame.time != frame.time ||
+      old.frame.color != frame.color ||
+      old.frame.previousColor != frame.previousColor ||
+      old.traffic != traffic ||
+      old.dark != dark ||
+      old.radius != radius ||
+      old.drawLogo != drawLogo ||
+      old.logoOpacity != logoOpacity;
 }
 
 void _paintLook(_Ctx x) {
@@ -156,12 +178,27 @@ void _paintLook(_Ctx x) {
 /// The bars brighten one after another, left to right; [backwards], as while disconnecting, from the
 /// i back to the short bar, the starting wave played in reverse.
 void _barsWave(_Ctx x, {bool backwards = false}) {
-  final p = (x.f.time % 1.6) / 1.6;
+  if (!x.p.drawLogo) return;
+  final color = _alpha(x.col, x.p.logoOpacity);
   double rank(int part) => backwards ? _HiLogo.rank.last - _HiLogo.rank[part] : _HiLogo.rank[part];
-  x.logo(parts: _each((i) => _Part(opacity: .4 + .6 * _bump(p * 1.6 - rank(i) * .3))));
+  final shade = [for (var i = 0; i < 4; i++) _alpha(color, .4 + .6 * _bump((x.f.time - rank(i) * .3) % 1.6))];
+  x.logoSpace((c) {
+    // the H stays one piece: its crossbar fades from the short bar's shade into the tall bar's
+    c.drawPath(
+      _HiLogo.h,
+      Paint()
+        ..shader = ui.Gradient.linear(
+          const Offset(16.84, 0),
+          const Offset(23.58, 0),
+          [shade[0], shade[1]],
+        ),
+    );
+    c.drawPath(_HiLogo.stem, Paint()..color = shade[2]);
+    c.drawPath(_HiLogo.dot, Paint()..color = shade[3]);
+  });
 }
 
-/// A soft sweep turning inside the button, over two faint guide circles.
+/// A soft sweep turning inside the button, over two faint guide circles, kept out of the logo.
 void _radar(_Ctx x) {
   final c = x.c;
   c.save();
@@ -186,6 +223,8 @@ void _radar(_Ctx x) {
     );
   }
   c.restore();
+  // the logo keeps the button's white under it, so a faded bar doesn't show the radar through it
+  if (x.p.drawLogo) x.logoSpace((c) => c.drawPaint(Paint()..color = Colors.white));
 }
 
 /// The signal steps down to weak, then keeps searching, and the error badge breathes, sending out a
@@ -297,6 +336,33 @@ void _connected(_Ctx x) {
   });
 }
 
+/// Soft glow at half resolution: blur cost scales with pixels, look stays the same once scaled up.
+void _blurredLayer(
+  Canvas c,
+  Rect bounds,
+  double sigma,
+  BlendMode blend,
+  void Function(Canvas c) paint,
+) {
+  const scale = 0.5;
+  final cx = bounds.center.dx;
+  final cy = bounds.center.dy;
+  c.save();
+  c.translate(cx, cy);
+  c.scale(scale);
+  c.translate(-cx, -cy);
+  // Layer is half the device pixels; sigma scales with it so the soft edge matches full-res.
+  c.saveLayer(
+    bounds,
+    Paint()
+      ..blendMode = blend
+      ..imageFilter = ui.ImageFilter.blur(sigmaX: sigma * scale, sigmaY: sigma * scale, tileMode: TileMode.decal),
+  );
+  paint(c);
+  c.restore();
+  c.restore();
+}
+
 /// A corona of [color] behind the button: a soft glow and [rays] that reach further out as [level]
 /// rises. [plasma] curls the rays like filaments; [hollow] moves the glow out into a ring.
 void _corona(
@@ -334,31 +400,33 @@ void _corona(
         stops: [edge, peak, peak + (1 - peak) * .35, 1],
       ).createShader(Rect.fromCircle(center: x.center, radius: outer)),
   );
-  for (var i = 0; i < rays; i++) {
-    final drift = time * (plasma ? .04 : .025) * (_hash(i, seed + 1) > .5 ? 1 : -1);
-    final dir = Offset.fromDirection(2 * math.pi * _hash(i, seed) + drift);
-    final len = x.r * reach * 1.2 * level * (.45 + .55 * _hash(i, seed + 2)) * (.7 + .3 * math.sin(time * .35 + i));
-    final from = x.center + dir * (x.r - 2 + hollow * x.r * .12);
-    final to = x.center + dir * (x.r + len);
-    final path = Path()..moveTo(from.dx, from.dy);
-    if (plasma) {
-      final bend = Offset(-dir.dy, dir.dx) * (len * .18 * math.sin(time * .5 + i * 1.7));
-      final mid = Offset.lerp(from, to, .5)! + bend;
-      path.quadraticBezierTo(mid.dx, mid.dy, to.dx, to.dy);
-    } else {
-      path.lineTo(to.dx, to.dy);
+  final sigma = plasma ? 2.5 : 4.0;
+  final bounds = Rect.fromCircle(center: x.center, radius: outer + sigma * 2);
+  _blurredLayer(c, bounds, sigma, blend, (layer) {
+    for (var i = 0; i < rays; i++) {
+      final drift = time * (plasma ? .04 : .025) * (_hash(i, seed + 1) > .5 ? 1 : -1);
+      final dir = Offset.fromDirection(2 * math.pi * _hash(i, seed) + drift);
+      final len = x.r * reach * 1.2 * level * (.45 + .55 * _hash(i, seed + 2)) * (.7 + .3 * math.sin(time * .35 + i));
+      final from = x.center + dir * (x.r - 2 + hollow * x.r * .12);
+      final to = x.center + dir * (x.r + len);
+      final path = Path()..moveTo(from.dx, from.dy);
+      if (plasma) {
+        final bend = Offset(-dir.dy, dir.dx) * (len * .18 * math.sin(time * .5 + i * 1.7));
+        final mid = Offset.lerp(from, to, .5)! + bend;
+        path.quadraticBezierTo(mid.dx, mid.dy, to.dx, to.dy);
+      } else {
+        path.lineTo(to.dx, to.dy);
+      }
+      layer.drawPath(
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = plasma ? 2.2 : 3.5
+          ..strokeCap = StrokeCap.round
+          ..shader = ui.Gradient.linear(from, to, [_alpha(color, .45 * level), _alpha(color, 0)]),
+      );
     }
-    c.drawPath(
-      path,
-      Paint()
-        ..blendMode = blend
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = plasma ? 2.2 : 3.5
-        ..strokeCap = StrokeCap.round
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, plasma ? 2.5 : 4)
-        ..shader = ui.Gradient.linear(from, to, [_alpha(color, .45 * level), _alpha(color, 0)]),
-    );
-  }
+  });
 }
 
 /// Flares of [color]: long streamers that rise from behind the button, each from a new place, curl a
@@ -376,6 +444,8 @@ void _flares(
   final time = x.f.time;
   final blend = additive && x.p.dark ? BlendMode.plus : BlendMode.srcOver;
   const life = 3.4;
+  // Halo + core in one half-res blur (same widths/alphas as the old dual MaskFilter passes).
+  final flares = <({Path path, Offset from, Offset to, double fade})>[];
   for (var k = 0; k < 7; k++) {
     final clock = time / life + _hash(k, seed);
     final p = clock % 1;
@@ -388,21 +458,34 @@ void _flares(
     final to = x.center + dir * (x.r + len);
     final bend = Offset(-dir.dy, dir.dx) * (len * .25 * (_hash(round, seed + 3) - .5));
     final mid = Offset.lerp(from, to, .55)! + bend;
-    final path = Path()
-      ..moveTo(from.dx, from.dy)
-      ..quadraticBezierTo(mid.dx, mid.dy, to.dx, to.dy);
-    for (final (width, blur, strength) in [(7.0, 6.0, .35), (2.4, 1.5, .7)]) {
-      c.drawPath(
-        path,
-        Paint()
-          ..blendMode = blend
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = width
-          ..strokeCap = StrokeCap.round
-          ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur)
-          ..shader = ui.Gradient.linear(from, to, [_alpha(color, strength * level * fade), _alpha(color, 0)]),
-      );
-    }
+    flares.add((
+      path: Path()
+        ..moveTo(from.dx, from.dy)
+        ..quadraticBezierTo(mid.dx, mid.dy, to.dx, to.dy),
+      from: from,
+      to: to,
+      fade: fade,
+    ));
+  }
+  if (flares.isNotEmpty) {
+    final bounds = Rect.fromCircle(center: x.center, radius: x.r * (1 + reach * level) + 20);
+    _blurredLayer(c, bounds, 4.0, blend, (layer) {
+      for (final f in flares) {
+        for (final (width, strength) in [(7.0, .35), (2.4, .7)]) {
+          layer.drawPath(
+            f.path,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = width
+              ..strokeCap = StrokeCap.round
+              ..shader = ui.Gradient.linear(f.from, f.to, [
+                _alpha(color, strength * level * f.fade),
+                _alpha(color, 0),
+              ]),
+          );
+        }
+      }
+    });
   }
   for (var i = 0; i < 16; i++) {
     final p = (time * (.18 + .1 * _hash(i, seed + 4)) + _hash(i, seed + 5)) % 1;
@@ -419,6 +502,69 @@ void _flares(
 
 // ---------------------------------------------------------------------------------------------
 // Painting helpers
+
+/// Soft disc + bevel, recorded once per (radius, dark) so every frame only draws a picture.
+ui.Picture? _bodyPicture;
+double? _bodyR;
+bool? _bodyDark;
+const _bodyPad = 24.0;
+
+ui.Picture _bodyFor(double r, bool dark) {
+  if (_bodyPicture != null && _bodyR == r && _bodyDark == dark) return _bodyPicture!;
+  final rec = ui.PictureRecorder();
+  final canvas = Canvas(rec);
+  final center = Offset(r + _bodyPad, r + _bodyPad);
+  final shadowColor = dark ? const Color(0x73000000) : const Color(0x2E000000);
+  canvas.drawCircle(
+    center.translate(0, 3),
+    r,
+    Paint()
+      ..color = shadowColor
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+  );
+  canvas.drawCircle(center, r, Paint()..color = Colors.white);
+  final rect = Rect.fromCircle(center: center, radius: r);
+  canvas.drawCircle(
+    center,
+    r,
+    Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.black.withValues(alpha: 0),
+          Colors.black.withValues(alpha: 0),
+          Colors.black.withValues(alpha: .07),
+        ],
+        stops: const [0, .8, 1],
+      ).createShader(rect),
+  );
+  canvas.drawArc(
+    Rect.fromCircle(center: center, radius: r - 4),
+    math.pi * .1,
+    math.pi * .55,
+    false,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..color = Colors.black.withValues(alpha: .045)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+  );
+  canvas.drawArc(
+    Rect.fromCircle(center: center, radius: r - 2.5),
+    math.pi * 1.1,
+    math.pi * .5,
+    false,
+    Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round
+      ..color = Colors.white.withValues(alpha: .8)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
+  );
+  _bodyPicture = rec.endRecording();
+  _bodyR = r;
+  _bodyDark = dark;
+  return _bodyPicture!;
+}
 
 class _Ctx {
   _Ctx(this.p, this.c, this.center, this.f) : r = p.radius;
@@ -439,58 +585,17 @@ class _Ctx {
 
   Offset toPx(Offset logoPoint) => logoRect.topLeft + logoPoint * k;
 
+  /// White disc, soft shadow and bevel (cached).
   void disc() {
-    c.drawCircle(
-      center.translate(0, 3),
-      r,
-      Paint()
-        ..color = p.dark ? const Color(0x73000000) : const Color(0x2E000000)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
-    );
-    c.drawCircle(center, r, Paint()..color = Colors.white);
+    final picture = _bodyFor(r, p.dark);
+    c.save();
+    c.translate(center.dx - r - _bodyPad, center.dy - r - _bodyPad);
+    c.drawPicture(picture);
+    c.restore();
   }
 
-  /// The edge curving away: a faint shade only in the outer part of the button, a little more at
-  /// the lower right, and a soft highlight along the upper left; the middle stays flat.
-  void bevel() {
-    final rect = Rect.fromCircle(center: center, radius: r);
-    c.drawCircle(
-      center,
-      r,
-      Paint()
-        ..shader = RadialGradient(
-          colors: [
-            Colors.black.withValues(alpha: 0),
-            Colors.black.withValues(alpha: 0),
-            Colors.black.withValues(alpha: .07),
-          ],
-          stops: const [0, .8, 1],
-        ).createShader(rect),
-    );
-    c.drawArc(
-      Rect.fromCircle(center: center, radius: r - 4),
-      math.pi * .1,
-      math.pi * .55,
-      false,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 6
-        ..color = Colors.black.withValues(alpha: .045)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
-    );
-    c.drawArc(
-      Rect.fromCircle(center: center, radius: r - 2.5),
-      math.pi * 1.1,
-      math.pi * .5,
-      false,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
-        ..strokeCap = StrokeCap.round
-        ..color = Colors.white.withValues(alpha: .8)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.5),
-    );
-  }
+  /// Bevel is baked into [disc]'s cached picture; kept so call sites stay readable.
+  void bevel() {}
 
   void logo({List<_Part>? parts, Color? ghost, double dx = 0}) {
     if (!p.drawLogo) return;

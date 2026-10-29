@@ -145,15 +145,6 @@ object Settings {
 
 
 
-    var grpcFlutterPublicKey: ByteArray
-        get() {
-            val encoded = preferences.getString(SettingsKey.GRPC_FLUTTER_PUBLIC_KEY, null)
-            return encoded?.let { Base64.decode(it, Base64.DEFAULT) } ?: ByteArray(0)
-        }
-        set(value) {
-            val encoded = Base64.encodeToString(value, Base64.DEFAULT)
-            preferences.edit().putString(SettingsKey.GRPC_FLUTTER_PUBLIC_KEY, encoded).apply()
-        }
     var grpcServiceModePort: Int
         get() = preferences.getInt(SettingsKey.GRPC_PORT, 17078)!!
         set(value) = preferences.edit().putInt(SettingsKey.GRPC_PORT, value).apply()

@@ -4,30 +4,23 @@
 <dict>
 	<key>com.apple.security.network.client</key>
 	<true/>
-	<!-- <key>com.apple.security.app-sandbox</key>
-	<true/> -->
 	<key>com.apple.security.app-sandbox</key>
 	<false/>
 	<key>com.apple.security.cs.allow-jit</key>
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
-		<!-- <key>com.apple.developer.system-extension.install</key>
-		<true/> -->
-<!-- 				
+	<key>com.apple.developer.system-extension.install</key>
+	<true/>
+
 	<key>com.apple.developer.networking.networkextension</key>
 	<array>
-				<string>packet-tunnel-provider-systemextension</string>
-				<string>app-proxy-provider-systemextension</string>
-				<string>content-filter-provider-systemextension</string>
-				<string>dns-proxy-systemextension</string> 
-				<string>dns-settings</string> 
-				<string>dns-proxy</string>
-				<string>app-proxy-provider</string>
-				<string>packet-tunnel-provider</string>
+		<string>$(HIDDIFY_NETWORK_EXTENSION_ENTITLEMENT)</string>
 	</array>
-	<key>com.apple.developer.networking.vpn.api</key>
-	<string>allow-vpn</string> -->
 
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>$(HIDDIFY_VPN_APP_GROUP)</string>
+	</array>
 </dict>
 </plist>

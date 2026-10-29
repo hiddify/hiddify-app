@@ -33,9 +33,11 @@ public class MethodHandler: NSObject, FlutterPlugin {
         
         switch call.method {
         case "get_grpc_server_public_key":
-            result("")
-        case "add_grpc_client_public_key":
-            result("")
+            // Flutter calls handlers on the main thread; a call into the core never runs there
+            DispatchQueue.global(qos: .userInitiated).async {
+                let key = MobileGetServerPublicKey()
+                DispatchQueue.main.async { result(FlutterStandardTypedData(bytes: key ?? Data())) }
+            }
         case "parse_config":
             guard
                 let args = call.arguments as? [String:Any?],
@@ -84,7 +86,7 @@ public class MethodHandler: NSObject, FlutterPlugin {
                     opts.listen = "127.0.0.1:\(grpcPort)"
                     opts.secret = ""
                     opts.debug = false
-                    opts.mode = 4
+                    opts.mode = mode // 1 = mTLS, 3/4 = insecure
                     opts.fixAndroidStack = false
                     MobileSetup(opts,
                         nil,
@@ -101,8 +103,18 @@ public class MethodHandler: NSObject, FlutterPlugin {
                         result(FlutterError(code: "SETUP", message: error.localizedDescription, details: nil))
                         return
                     }
-                    result(true)
+                    await mainResult(VPNManager.shared.statusPayload())
                 }
+        case "setup_vpn":
+            // Reload NE preferences and publish the live tunnel status (app relaunch / resume).
+            Task {
+                do {
+                    try await VPNManager.shared.setup()
+                    await mainResult(VPNManager.shared.statusPayload())
+                } catch {
+                    await mainResult(FlutterError(code: "SETUP", message: error.localizedDescription, details: nil))
+                }
+            }
         case "start":
             Task {
                 guard
@@ -126,7 +138,11 @@ public class MethodHandler: NSObject, FlutterPlugin {
                 }
                 do {
                     try await VPNManager.shared.setup()
-                    try await VPNManager.shared.connect(with: path, grpcServiceModePort: grpcPort, disableMemoryLimit: VPNConfig.shared.disableMemoryLimit)
+                    try await VPNManager.shared.connect(
+                        with: path,
+                        grpcServiceModePort: grpcPort,
+                        disableMemoryLimit: VPNConfig.shared.disableMemoryLimit
+                    )
                 } catch {
                     await mainResult(FlutterError(code: "SETUP_CONNECTION", message: error.localizedDescription, details: nil))
                     return
@@ -184,14 +200,18 @@ public class MethodHandler: NSObject, FlutterPlugin {
                 return
             }
             let group = args["groupTag"] as? String
-            FileManager.default.changeCurrentDirectoryPath(FilePath.sharedDirectory.path)
-            do {
-                try LibboxNewStandaloneCommandClient()?.urlTest(group)
-            } catch {
-                result(FlutterError(code: "URL_TEST", message: error.localizedDescription, details: nil))
-                return
+            // the command client talks to the tunnel: not on the main thread
+            DispatchQueue.global(qos: .userInitiated).async {
+                FileManager.default.changeCurrentDirectoryPath(FilePath.sharedDirectory.path)
+                do {
+                    try LibboxNewStandaloneCommandClient()?.urlTest(group)
+                    DispatchQueue.main.async { result(true) }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError(code: "URL_TEST", message: error.localizedDescription, details: nil))
+                    }
+                }
             }
-            result(true)
         case "select_outbound":
             guard
                 let args = call.arguments as? [String:Any?],
@@ -201,14 +221,18 @@ public class MethodHandler: NSObject, FlutterPlugin {
                 result(FlutterError(code: "INVALID_ARGS", message: nil, details: nil))
                 return
             }
-            FileManager.default.changeCurrentDirectoryPath(FilePath.sharedDirectory.path)
-            do {
-                try LibboxNewStandaloneCommandClient()?.selectOutbound(group, outboundTag: outbound)
-            } catch {
-                result(FlutterError(code: "SELECT_OUTBOUND", message: error.localizedDescription, details: nil))
-                return
+            // the command client talks to the tunnel: not on the main thread
+            DispatchQueue.global(qos: .userInitiated).async {
+                FileManager.default.changeCurrentDirectoryPath(FilePath.sharedDirectory.path)
+                do {
+                    try LibboxNewStandaloneCommandClient()?.selectOutbound(group, outboundTag: outbound)
+                    DispatchQueue.main.async { result(true) }
+                } catch {
+                    DispatchQueue.main.async {
+                        result(FlutterError(code: "SELECT_OUTBOUND", message: error.localizedDescription, details: nil))
+                    }
+                }
             }
-            result(true)
         case "generate_config":
             guard
                 let args = call.arguments as? [String:Any?],

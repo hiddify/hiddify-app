@@ -95,18 +95,30 @@ class HiddifyCoreService with InfraLogger {
       try {
         final directories = ref.read(appDirectoriesProvider).requireValue;
         final debug = kDebugMode || ref.read(ConfigOptions.logLevel).isVerbose;
-        final setupResponse = await core.setup(directories, debug, 3);
+        // 1 = GRPC_NORMAL (mTLS); 3 = GRPC_NORMAL_INSECURE
+        final setupResponse = await core.setup(directories, debug, 1);
 
         if (setupResponse.isNotEmpty) {
           return left(setupResponse);
         }
 
         await startListeningLogs("fg", core.fgClient);
+        if (core.clientChanges != null && !subscriptions.containsKey('managedClients')) {
+          subscriptions['managedClients'] = core.clientChanges!.listen((_) async {
+            await startListeningLogs('bg', core.bgClient);
+            ref.read(coreRestartSignalProvider.notifier).restart();
+          });
+        }
         // await startListeningStatus("fg", core.fgClient);
         if (!core.isSingleChannel()) {
           await startListeningLogs("bg", core.bgClient);
         }
-        statusController.add(currentState);
+        // Prefer managedStatus (already seeded from native VPN sync on mobile) over
+        // replaying a stale currentState; publishing Stopped here made the home
+        // connect button jump on resume from Recent Apps.
+        if (core.managedStatus == null) {
+          statusController.add(currentState);
+        }
         await startListeningStatus("bg", core.bgClient);
         // ref.read(coreRestartSignalProvider.notifier).restart();
         return right(unit);
@@ -121,6 +133,10 @@ class HiddifyCoreService with InfraLogger {
       loggy.debug("changing options");
       // latestOptions = options;
       try {
+        if (core.managesLifecycle) {
+          await core.setOptions(options);
+          return right(unit);
+        }
         final res = await core.fgClient.changeHiddifySettings(
           ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
         );
@@ -145,6 +161,18 @@ class HiddifyCoreService with InfraLogger {
       final stops = _stopRequests.value;
       statusController.add(currentState = const CoreStatus.starting());
       loggy.debug("starting");
+      if (core.managesLifecycle) {
+        try {
+          await core.startManaged(path, name, disableMemoryLimit);
+          await startListeningLogs('bg', core.bgClient);
+          ref.read(coreRestartSignalProvider.notifier).restart();
+          return right(unit);
+        } catch (error, stackTrace) {
+          final failure = ConnectionFailure.fromError(error, stackTrace);
+          statusController.add(currentState = const CoreStatus.stopped());
+          return left(failure);
+        }
+      }
       final background = await core.setupBackground(path, name);
       if (background != const CoreStatus.started()) {
         statusController.add(currentState = const CoreStatus.stopped());
@@ -202,13 +230,25 @@ class HiddifyCoreService with InfraLogger {
     // skips the status the subject replays: it is from before this request
     final statuses = statusController.stream.skip(statusController.hasValue ? 1 : 0).listen((status) {
       if (status is CoreStarting) starting = true;
-      if (status is CoreStarted || (starting && status is CoreStopped)) complete(status);
+      // the service is up once it is waiting for a ping; the core goes on to started by itself
+      if (status is CoreStarted ||
+          status is CoreWaiting ||
+          status is CoreNoAvailableProxies ||
+          (starting && status is CoreStopped)) {
+        complete(status);
+      }
     });
     final stopped = _stopRequests.where((n) => n != stops).listen((_) => complete(const CoreStatus.stopped()));
     try {
       final res = await send();
+      // the core is started only once it is stopped; the app asks again after it reports STOPPED
+      if (res.messageType == MessageType.INSTANCE_NOT_STOPPED) {
+        return CoreStatus.stopped(alert: CoreAlert.alreadyStarted, message: res.message);
+      }
       if (res.messageType == MessageType.ALREADY_STARTED) {
         if (res.coreState == CoreStates.STARTED) return const CoreStatus.started();
+        if (res.coreState == CoreStates.WAITING) return const CoreStatus.waiting();
+        if (res.coreState == CoreStates.NO_AVAILABLE_PROXIES) return const CoreStatus.noAvailableProxies();
         // a start queued earlier will report the outcome; its STARTING may have gone already
         starting = true;
       }
@@ -241,7 +281,28 @@ class HiddifyCoreService with InfraLogger {
   TaskEither<String, Unit> stop() {
     return TaskEither(() async {
       loggy.debug("stopping");
+      // a start still waiting gives up, whoever manages the core
       _stopRequests.add(_stopRequests.value + 1);
+      // Mobile (and macOS) publish status via managedStatus from the platform VPN
+      // service. Waiting on gRPC stop *before* the platform stop deadlocks: the
+      // EventChannel only emits Stopped after MethodChannel stop runs (#2395).
+      if (core.managesLifecycle || core.managedStatus != null) {
+        try {
+          // Bound like _stopAndWait: a hung VPN channel must not leave Disconnecting forever.
+          await core.stop().timeout(
+            const Duration(seconds: 12),
+            onTimeout: () {
+              loggy.warning("managed core stop timed out after 12s");
+              return false;
+            },
+          );
+          statusController.add(currentState = const CoreStatus.stopped());
+          return right(unit);
+        } catch (error) {
+          statusController.add(currentState = const CoreStatus.stopped());
+          return left(error.toString());
+        }
+      }
       var errMsg = "";
       try {
         await _stopAndWait();
@@ -266,7 +327,15 @@ class HiddifyCoreService with InfraLogger {
   /// The wait is bounded, so a core that stops reporting cannot leave the app disconnecting.
   Future<void> _stopAndWait() async {
     final stopped = statusController.stream.skip(statusController.hasValue ? 1 : 0).whereType<CoreStopped>().first;
-    final res = await core.bgClient.stop(Empty());
+    final res = await core.bgClient
+        .stop(Empty())
+        .timeout(
+          const Duration(seconds: 8),
+          onTimeout: () {
+            loggy.warning("gRPC stop timed out after 8s");
+            return CoreInfoResponse(messageType: MessageType.EMPTY, coreState: CoreStates.STOPPED);
+          },
+        );
     // ALREADY_STOPPED while a stop is still running: its STOPPED is yet to come
     if (res.messageType == MessageType.ALREADY_STOPPED && res.coreState == CoreStates.STOPPED) return;
     await stopped.timeout(
@@ -300,6 +369,17 @@ class HiddifyCoreService with InfraLogger {
   TaskEither<String, Unit> restart(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
       loggy.debug("restarting");
+      if (core.managesLifecycle) {
+        try {
+          await core.startManaged(path, name, disableMemoryLimit);
+          await startListeningLogs('bg', core.bgClient);
+          ref.read(coreRestartSignalProvider.notifier).restart();
+          return right(unit);
+        } catch (error) {
+          statusController.add(currentState = CoreStatus.stopped(message: error.toString()));
+          return left(error.toString());
+        }
+      }
       // if (!await core.restart(path, name)) {
       try {
         final outcome = await _startAndWait(
@@ -330,8 +410,7 @@ class HiddifyCoreService with InfraLogger {
 
   TaskEither<String, Unit> resetTunnel() {
     return TaskEither(() async {
-      // only available on iOS (and macOS later)
-      if (!PlatformUtils.isIOS) {
+      if (!PlatformUtils.isIOS && !PlatformUtils.isMacOS) {
         throw UnimplementedError("reset tunnel function unavailable on platform");
       }
 
@@ -474,6 +553,28 @@ class HiddifyCoreService with InfraLogger {
   }
 
   Future<void> startListeningStatus(String key, CoreClient cc) async {
+    if (core.managedStatus != null) {
+      if (subscriptions.containsKey('managedStatus')) return;
+      subscriptions['managedStatus'] = core.managedStatus!.listen((status) {
+        final wasStarted = _platformStatus is CoreStarted;
+        _platformStatus = status;
+        if (status is CoreStarted) {
+          // The platform knows only that its service is up; the core is starting until it says
+          // otherwise, then waiting for a ping, and so on. The core reports a state when it
+          // changes, so a stream that was open across a gap in the platform's status (the app
+          // coming back to the foreground re-reads the VPN) has nothing to tell: a new one
+          // answers with the state at once.
+          if (!wasStarted) _stopFollowingCore();
+          _followCoreWhilePlatformStarted();
+          status = _coreReported ?? const CoreStatus.starting();
+        } else {
+          _coreReported = null;
+          _stopFollowingCore();
+        }
+        statusController.add(currentState = status);
+      });
+      return;
+    }
     final listener = ++_statusListener;
     await listenSingle<CoreStatus>(
       "${key}StatusListener",
@@ -503,6 +604,57 @@ class HiddifyCoreService with InfraLogger {
         // startListeningStatus(key, cc);
       },
     );
+  }
+
+  /// What the platform says about the VPN it manages.
+  CoreStatus _platformStatus = const CoreStatus.stopped();
+
+  /// The last state the core reported while the platform said its service is up.
+  CoreStatus? _coreReported;
+  StreamSubscription<CoreInfoResponse>? _coreInfoSubscription;
+
+  /// The platform reports the tunnel up; waiting and started come from the core's own status
+  /// stream. It is opened again while the tunnel stays up, since the core may not listen yet, or
+  /// the client may be replaced.
+  void _followCoreWhilePlatformStarted() {
+    if (_coreInfoSubscription != null) return;
+    late final StreamSubscription<CoreInfoResponse> subscription;
+    void retry() {
+      // a stream that was replaced or stopped on purpose must not clear the one that replaced it
+      if (!identical(_coreInfoSubscription, subscription)) return;
+      _coreInfoSubscription = null;
+      if (_platformStatus is CoreStarted) Future.delayed(const Duration(seconds: 1), _followCoreWhilePlatformStarted);
+    }
+
+    _coreInfoSubscription = subscription = core.bgClient
+        .coreInfoListener(Empty(), options: grpcOptions)
+        .listen(
+          (event) {
+            if (_platformStatus is! CoreStarted) return;
+            switch (event.coreState) {
+              case CoreStates.STARTING:
+                statusController.add(currentState = _coreReported = const CoreStatus.starting());
+              case CoreStates.WAITING ||
+                  CoreStates.STARTED ||
+                  CoreStates.NO_AVAILABLE_PROXIES ||
+                  CoreStates.HOT_RELOADING:
+                statusController.add(currentState = _coreReported = CoreStatus.fromCoreInfo(event));
+              default:
+                // stopped and stopping are the platform's to report
+                break;
+            }
+          },
+          onError: (Object error) {
+            loggy.debug("core status stream error: $error");
+            retry();
+          },
+          onDone: retry,
+        );
+  }
+
+  void _stopFollowingCore() {
+    unawaited(_coreInfoSubscription?.cancel());
+    _coreInfoSubscription = null;
   }
 
   Future<void> startListeningLogs(String key, CoreClient cc) async {
@@ -595,8 +747,6 @@ class HiddifyCoreService with InfraLogger {
       config_log_level.LogLevel.error => LogLevel.ERROR,
       config_log_level.LogLevel.fatal => LogLevel.FATAL,
       config_log_level.LogLevel.panic => LogLevel.FATAL,
-      // ignore: unreachable_switch_case
-      _ => LogLevel.INFO, // Default case
     };
   }
 

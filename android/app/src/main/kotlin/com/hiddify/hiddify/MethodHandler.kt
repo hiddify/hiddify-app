@@ -32,7 +32,6 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Start("start"),
             Stop("stop"),
             Restart("restart"),
-            AddGrpcClientPublicKey("add_grpc_client_public_key"),
             GetGrpcServerPublicKey("get_grpc_server_public_key"),
 
         }
@@ -52,19 +51,6 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            Trigger.AddGrpcClientPublicKey.method -> {
-                GlobalScope.launch {
-                    result.runCatching {
-                        val args = call.arguments as Map<*, *>
-                        val clientPub = args["clientPublicKey"] as ByteArray
-//                        Mobile.addGrpcClientPublicKey(clientPub)
-                        Settings.grpcFlutterPublicKey = clientPub
-                        success("")
-
-                    }
-                }
-            }
-
             Trigger.GetGrpcServerPublicKey.method -> {
                 GlobalScope.launch {
                     result.runCatching {
@@ -120,15 +106,33 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         Settings.grpcServiceModePort = args["grpcPort"] as Int
 
                         val mainActivity = MainActivity.instance
-//                        val started = mainActivity.serviceStatus.value == Status.Started
-//                        if (started) {
-//                            Log.w(TAG, "service is already running")
-//                            return@launch success(true)
-//                        }
+                        // Quick disconnect→connect used to call start while status was still
+                        // Stopping; onStartCommand then no-ops and Mobile.setup races close.
+                        suspend fun awaitStatus(target: Status, maxTries: Int = 50): Boolean {
+                            var i = 0
+                            while (mainActivity.serviceStatus.value != target && i < maxTries) {
+                                delay(200)
+                                i++
+                            }
+                            return mainActivity.serviceStatus.value == target
+                        }
+                        when (val current = mainActivity.serviceStatus.value) {
+                            Status.Stopping, Status.Starting -> {
+                                Log.i(TAG, "waiting for service to settle before start: $current")
+                                awaitStatus(Status.Stopped)
+                            }
+                            Status.Started -> {
+                                Log.i(TAG, "stopping running service before start")
+                                BoxService.stop()
+                                awaitStatus(Status.Stopped)
+                            }
+                            Status.Stopped, null -> {}
+                        }
                         Settings.startCoreAfterStartingService = false
 
-                        mainActivity.startService()
-                        success(true)
+                        // Answers after the permission dialogs, so the caller's wait for the
+                        // service starts only once it can start.
+                        success(mainActivity.startService())
                     }
                 }
             }
@@ -137,12 +141,25 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                 scope.launch {
                     result.runCatching {
                         val mainActivity = MainActivity.instance
-                        val started = mainActivity.serviceStatus.value == Status.Started
-                        if (!started) {
-                            Log.w(TAG, "service is not running")
-                            //    return@launch success(true)
+                        when (mainActivity.serviceStatus.value) {
+                            Status.Stopped, null -> Log.w(TAG, "service is not running")
+                            Status.Stopping -> {
+                                Log.i(TAG, "stop already in progress, waiting")
+                                var i = 0
+                                while (mainActivity.serviceStatus.value == Status.Stopping && i < 50) {
+                                    delay(200)
+                                    i++
+                                }
+                            }
+                            else -> {
+                                BoxService.stop()
+                                var i = 0
+                                while (mainActivity.serviceStatus.value != Status.Stopped && i < 50) {
+                                    delay(200)
+                                    i++
+                                }
+                            }
                         }
-                        BoxService.stop()
                         success(true)
                     }
                 }

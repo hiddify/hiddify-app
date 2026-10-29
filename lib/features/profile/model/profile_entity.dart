@@ -24,6 +24,7 @@ sealed class ProfileEntity with _$ProfileEntity {
     SubscriptionInfo? subInfo,
     // `profile-web-page-url` / `support-url` headers; independent of subInfo,
     // which only exists when the `subscription-userinfo` header is present.
+    // Custom IP lookup uses `ipinfo-url` in [populatedHeaders] only.
     String? webPageUrl,
     String? supportUrl,
     Map<String, dynamic>? populatedHeaders,
@@ -72,7 +73,19 @@ class SubscriptionInfo with _$SubscriptionInfo {
   double get remainingRatio => min(remaining.inDays, 30) / 30;
 }
 
-const int latestUserOverrideVersion = 2;
+const int latestUserOverrideVersion = 3;
+
+/// Per-profile preference for elevated admin_bgservice on Windows/Linux.
+enum UserAdminPreference {
+  /// Ask when optional admin is needed (Mode C).
+  unset,
+
+  /// Skip the dialog and use admin_bgservice.
+  preferAdmin,
+
+  /// Skip the dialog and continue without admin (strip privileged features).
+  preferNoAdmin,
+}
 
 @freezed
 abstract class UserOverride with _$UserOverride {
@@ -94,6 +107,10 @@ abstract class UserOverride with _$UserOverride {
     /// Unlike the `fragment` subscription header it carries no values, since
     /// the user's settings already hold them.
     bool? enableFragment,
+
+    /// Windows/Linux: whether to prefer elevated admin_bgservice for privileged
+    /// proxy features. Subscription sync must not overwrite this field.
+    @Default(UserAdminPreference.unset) UserAdminPreference adminPreference,
   }) = _UserOverride;
 
   factory UserOverride.fromJson(Map<String, Object?> json) => _$UserOverrideFromJson(json);
@@ -118,6 +135,8 @@ abstract class UserOverride with _$UserOverride {
       if (json.remove('enableWarp') == true) json['extraSecurity'] = 'warp';
       if (json.remove('enablePsiphon') == true) json['extraSecurity'] = 'psiphon';
     }
+    // v2 -> v3: add adminPreference (defaults to unset).
+    json['adminPreference'] ??= 'unset';
     json['version'] = latestUserOverrideVersion;
     return json;
   }

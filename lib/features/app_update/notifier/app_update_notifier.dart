@@ -24,7 +24,9 @@ Upgrader upgrader(Ref ref) => Upgrader(
     oniOS: () => UpgraderAppStore(),
     onLinux: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
     onWindows: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
-    onMacOS: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
+    onMacOS: () => ref.read(appInfoProvider).requireValue.release.allowCustomUpdateChecker
+        ? UpgraderAppcastStore(appcastURL: Constants.appCastUrl)
+        : UpgraderAppStore(),
     onWeb: () => UpgraderAppcastStore(appcastURL: Constants.appCastUrl),
   ),
   // durationUntilAlertAgain: const Duration(hours: 12),

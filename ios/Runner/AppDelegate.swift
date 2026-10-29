@@ -21,11 +21,20 @@ import Sentry
     }
     
     func registerHandlers() {
-        MethodHandler.register(with: self.registrar(forPlugin: MethodHandler.name)!)
-        PlatformMethodHandler.register(with: self.registrar(forPlugin: PlatformMethodHandler.name)!)
-        FileMethodHandler.register(with: self.registrar(forPlugin: FileMethodHandler.name)!)
-        StatusEventHandler.register(with: self.registrar(forPlugin: StatusEventHandler.name)!)
-        AlertsEventHandler.register(with: self.registrar(forPlugin: AlertsEventHandler.name)!)
+        // The registrar is missing when iOS launches the app without a Flutter engine (a launch in
+        // the background, for one): skip the handlers instead of crashing the launch.
+        func register(_ name: String, _ register: (FlutterPluginRegistrar) -> Void) {
+            guard let registrar = self.registrar(forPlugin: name) else {
+                NSLog("hiddify: no Flutter registrar for \(name), handler not registered")
+                return
+            }
+            register(registrar)
+        }
+        register(MethodHandler.name) { MethodHandler.register(with: $0) }
+        register(PlatformMethodHandler.name) { PlatformMethodHandler.register(with: $0) }
+        register(FileMethodHandler.name) { FileMethodHandler.register(with: $0) }
+        register(StatusEventHandler.name) { StatusEventHandler.register(with: $0) }
+        register(AlertsEventHandler.name) { AlertsEventHandler.register(with: $0) }
 //        LogsEventHandler.register(with: self.registrar(forPlugin: LogsEventHandler.name)!)
 //        GroupsEventHandler.register(with: self.registrar(forPlugin: GroupsEventHandler.name)!)
 //        ActiveGroupsEventHandler.register(with: self.registrar(forPlugin: ActiveGroupsEventHandler.name)!)

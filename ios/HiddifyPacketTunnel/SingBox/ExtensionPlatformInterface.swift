@@ -238,6 +238,7 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
     public func usePlatformAutoDetectControl() -> Bool {
         false
     }
+
     public func findConnectionOwner(_ ipProtocol: Int32, sourceAddress: String?, sourcePort: Int32, destinationAddress: String?, destinationPort: Int32) throws -> LibboxConnectionOwner {
         #if os(macOS)
             if Variant.useSystemExtension {
@@ -261,10 +262,6 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
             }
         #endif
         throw NSError(domain: "ExtensionPlatformInterface", code: 0, userInfo: [NSLocalizedDescriptionKey: String(localized: "Not implemented")])
-    }
-
-    public func useProcFS() -> Bool {
-        false
     }
 
     public func writeLog(_ message: String?) {
@@ -594,6 +591,10 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
 
     public func readSystemSSHHostKey() throws -> LibboxStringBox {
         throw notSupported("System SSH host key")
+    }
+
+    public func useProcFS() -> Bool {
+        false
     }
 
     public func usePlatformBridge() -> Bool {

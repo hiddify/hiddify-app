@@ -22,7 +22,13 @@ public class StatusEventHandler: NSObject, FlutterPlugin, FlutterStreamHandler {
     }
     
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
-        cancellable = VPNManager.shared.$state.sink { [events] status in
+        // .invalid is the state before the VPN preferences are loaded, not a disconnected tunnel: sent
+        // as Stopped it shows a disconnect for a moment whenever the app comes back to a tunnel
+        // that is up. The loaded state follows at once.
+        cancellable = VPNManager.shared.$state
+            .filter { $0 != .invalid }
+            .receive(on: DispatchQueue.main)
+            .sink { [events] status in
             switch status {
             case .reasserting, .connecting:
                 events(["status": "Starting"])

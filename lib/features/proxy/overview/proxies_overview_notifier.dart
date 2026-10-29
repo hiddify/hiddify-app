@@ -10,7 +10,6 @@ import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
-import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
 
@@ -76,40 +75,23 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
       _resubscribeDelay = _minResubscribeDelay;
     }
     if (!serviceRunning) {
-      return Stream.error(const ServiceNotRunning());
+      // Empty data (not Stream.error / not loading): the page shows "Connect to see proxies".
+      return Stream.value(null);
     }
     Timer? resubscribe;
     ref.onDispose(() => resubscribe?.cancel());
-    // yield* ref
-    //     .watch(proxyRepositoryProvider)
-    //     .watchProxies()
-    //     .throttleTime(
-    //       const Duration(milliseconds: 100),
-    //       leading: false,
-    //       trailing: true,
-    //     )
-    //     .map(
-    //       (event) => event.getOrElse(
-    //         (err) {
-    //           loggy.warning("error receiving proxies", err);
-    //           throw err;
-    //         },
-    //       ),
-    //     )
-    //     .asyncMap((proxies) async => _sortOutbounds(proxies, sortBy));
     return ref
         .watch(proxyRepositoryProvider)
         .watchProxies()
-        // A failed stream used to become an error the page showed as "Unexpected error"
-        // for as long as it stayed open, while the tunnel itself kept working. The failure
-        // is logged, the last list stays on screen, and the stream is opened again below.
-        .where(
+        // Log failures but still emit null so the page leaves the spinner. Filtering them
+        // out left AsyncLoading forever when gRPC never delivered a good event.
+        .map(
           (event) => event.fold((err) {
             loggy.warning("error receiving proxies", err);
-            return false;
-          }, (_) => true),
+            return null;
+          }, (group) => group),
         )
-        .map((event) => event.getOrElse((_) => null))
+        .startWith(null)
         .doOnData((_) => _resubscribeDelay = _minResubscribeDelay)
         .doOnDone(() {
           // gRPC ends the stream when its connection drops, e.g. once iOS suspends the app.
