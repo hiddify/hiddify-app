@@ -34,6 +34,8 @@ service Core {
   rpc LogListener (LogRequest) returns (stream LogMessage); 
   rpc Close (CloseRequest) returns (hcommon.Empty);
   rpc GetLANIP (hcommon.Empty) returns (LANIPResponse);
+  // Whether this core process already has administrator/root rights (same token as the app).
+  rpc IsAdmin (hcommon.Empty) returns (IsAdminResponse);
   // Windows/Linux: whether elevated admin_bgservice is required for this connect.
   rpc NeedAdminBgService (NeedAdminBgServiceRequest) returns (NeedAdminBgServiceResponse);
   // Windows/Linux: install/start admin_bgservice if needed and start the bg core until STARTED.

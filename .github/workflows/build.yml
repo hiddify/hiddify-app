@@ -72,6 +72,9 @@ jobs:
     needs: test
     permissions:
       contents: read
+      # Azure Artifact Signing (azure/login OIDC) and actions/attest-build-provenance
+      id-token: write
+      attestations: write
     continue-on-error: ${{ matrix.platform != 'ios' }}
 
     strategy:
@@ -245,17 +248,33 @@ jobs:
           echo "keyPassword=${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}" >> android/key.properties
 
-      - name: Setup Windows Signing Properties
+      # Windows code signing. A publicly trusted certificate is what keeps the
+      # Go/Flutter binaries off the VirusTotal "trojan" heuristics; see
+      # docs/windows-code-signing.md for the secrets and the backend choice
+      # (Azure Artifact Signing preferred, CA-issued PFX as fallback).
+      - name: Configure Windows code signing
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
+        shell: pwsh
+        env:
+          AZURE_SIGNING_ENDPOINT: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          AZURE_SIGNING_CERT_PROFILE: ${{ secrets.AZURE_SIGNING_CERT_PROFILE }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          WINDOWS_SIGNING_PUBLISHER: ${{ secrets.WINDOWS_SIGNING_PUBLISHER }}
+          WINDOWS_SIGNING_KEY: ${{ secrets.WINDOWS_SIGNING_KEY }}
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          WINDOWS_SIGNING_SHA1: ${{ secrets.WINDOWS_SIGNING_SHA1 }}
         run: |
-            [IO.File]::WriteAllBytes("windows\sign.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_SIGNING_KEY }}"))
-            (Get-Content "windows\packaging\msix\make_config.yaml") -replace '^certificate_password:.*$', 'certificate_password: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}' | Set-Content "windows\packaging\msix\make_config.yaml"
-            # Fail early with a readable reason instead of SignTool's "No certificates were found"
-            $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("windows\sign.pfx", "${{ secrets.WINDOWS_SIGNING_PASSWORD }}")
-            Write-Host "Signing cert: $($cert.Subject) thumbprint=$($cert.Thumbprint) valid $($cert.NotBefore) -> $($cert.NotAfter)"
-            if (-not $cert.HasPrivateKey) { throw "WINDOWS_SIGNING_KEY has no private key" }
-            if ($cert.NotAfter -lt (Get-Date)) { throw "Windows signing certificate expired on $($cert.NotAfter); update WINDOWS_SIGNING_KEY / WINDOWS_SIGNING_PASSWORD / WINDOWS_SIGNING_SHA1" }
-            if ("${{ secrets.WINDOWS_SIGNING_SHA1 }}" -and $cert.Thumbprint -ne "${{ secrets.WINDOWS_SIGNING_SHA1 }}".ToUpper()) { Write-Warning "WINDOWS_SIGNING_SHA1 does not match the certificate thumbprint" }
+          & .\windows\scripts\configure_windows_signing.ps1
+
+      - name: Azure login (OIDC) for Artifact Signing
+        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') && env.WINDOWS_SIGN_BACKEND == 'ArtifactSigning' && env.AZURE_OIDC == 'true' }}
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       # - name: Temporary disable Permission Handler for windows due to its issue in permission
       #   if: ${{ startsWith(matrix.platform,'windows') }}
@@ -299,35 +318,30 @@ jobs:
       - name: Code Sign Windows Release tree
         if: matrix.platform == 'windows' && inputs.upload-artifact
         env:
-          SIGN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         shell: pwsh
         run: |
-          & .\windows\scripts\sign_windows_artifacts.ps1 `
-            -PfxPath windows\sign.pfx `
-            -Password $env:SIGN_PASSWORD `
-            -Path build\windows\x64\runner\Release `
-            -Description Hiddify
+          & .\windows\scripts\sign_windows_artifacts.ps1 -Path build\windows\x64\runner\Release
 
       - name: Package Windows Setup and MSIX
         if: matrix.platform == 'windows' && inputs.upload-artifact
-        # Re-sign Release immediately before each packager: fastforge may run
-        # `flutter build` again; when that is a no-op, signatures are kept and
-        # Inno/MSIX embed signed PE (better than unsigned drops in %TEMP%).
+        # fastforge runs `flutter build windows` again before packing, which re-copies
+        # unsigned plugin DLLs; the Makefile passes a fastforge pre-package hook
+        # (WINDOWS_PACKAGE_HOOK) that signs the Release tree right before Inno/MSIX
+        # read it. The Inno compiler then signs Setup.exe and the uninstaller through
+        # the "hiddifysign" Sign Tool (HIDDIFY_INNO_SIGNTOOL). Both need this env.
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          SIGN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         shell: pwsh
         run: |
-          function Sign-Release {
-            & .\windows\scripts\sign_windows_artifacts.ps1 `
-              -PfxPath windows\sign.pfx `
-              -Password $env:SIGN_PASSWORD `
-              -Path build\windows\x64\runner\Release `
-              -Description Hiddify
-          }
-          Sign-Release
           make windows-exe-release
-          Sign-Release
           make windows-msix-release
 
       - name: Build the Mac App Store version
@@ -361,14 +375,13 @@ jobs:
         # Signs Setup.exe / MSIX and PE files inside the portable .zip.
         # Skips files that already verify as signed (MSVC runtimes; pre-signed Release PE).
         env:
-          SIGN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         shell: pwsh
         run: |
-          & .\windows\scripts\sign_windows_artifacts.ps1 `
-            -PfxPath windows\sign.pfx `
-            -Password $env:SIGN_PASSWORD `
-            -Path dist `
-            -Description Hiddify
+          & .\windows\scripts\sign_windows_artifacts.ps1 -Path dist
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows' && inputs.upload-artifact
@@ -400,7 +413,18 @@ jobs:
             }
           }
           Get-ChildItem -Path out
-          
+
+      # SLSA build provenance for the Windows assets (verifiable with
+      # `gh attestation verify <file> --repo hiddify/hiddify-app`). Lets users and
+      # AV vendors confirm the files come from this public CI, which is what
+      # false-positive dispute forms ask for.
+      - name: Attest build provenance (Windows)
+        if: matrix.platform == 'windows' && inputs.upload-artifact
+        continue-on-error: true
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: out/*
+
       - name: Upload Debug Symbols
         if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
         env:

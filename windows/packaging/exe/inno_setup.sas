@@ -20,6 +20,22 @@ ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 ; Closes locked app binaries before file replace — prefer this over taskkill.exe heuristics.
 CloseApplications=force
+; VERSIONINFO for Setup.exe and the embedded uninstaller. PE files without a
+; CompanyName/ProductName resource are an "unknown dropper" signal for AV engines.
+VersionInfoCompany={{PUBLISHER_NAME}}
+VersionInfoDescription={{DISPLAY_NAME}} Setup
+VersionInfoProductName={{DISPLAY_NAME}}
+VersionInfoTextVersion={{APP_VERSION}}
+VersionInfoCopyright=Copyright (C) {{PUBLISHER_NAME}}
+AppCopyright=Copyright (C) {{PUBLISHER_NAME}}
+; CI (windows/scripts/configure_windows_signing.ps1) registers the "hiddifysign"
+; Sign Tool and sets HIDDIFY_INNO_SIGNTOOL, so the compiler signs Setup.exe *and*
+; unins000.exe. An unsigned uninstaller dropped into Program Files is one of the
+; VirusTotal sandbox hits ("Sysmon File Executable Creation" Sigma rule).
+#if GetEnv("HIDDIFY_INNO_SIGNTOOL") == "hiddifysign"
+SignTool=hiddifysign
+SignedUninstaller=yes
+#endif
 
 [Languages]
 {% for locale in LOCALES %}

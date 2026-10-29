@@ -16,6 +16,8 @@ jobs:
     permissions:
       actions: read
       contents: write
+      id-token: write
+      attestations: write
     with:
       upload-artifact: true
       tag-name: "${{ github.ref_name }}"

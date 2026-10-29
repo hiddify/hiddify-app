@@ -2,6 +2,8 @@
 <resources>
     <string name="stop">Stop</string>
     <string name="quick_toggle">Toggle</string>
-    <string name="status_starting">Service starting…</string>
-    <string name="status_started">Service started</string>
+    <string name="status_starting">Connecting…</string>
+    <string name="status_started">Connected</string>
+    <string name="mode_vpn">VPN</string>
+    <string name="mode_proxy">Proxy</string>
 </resources>

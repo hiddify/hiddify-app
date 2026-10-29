@@ -62,13 +62,25 @@ jobs:
             release_assets/*
           request_rate: 4
 
+      - name: Wait for VirusTotal engines
+        if: steps.vt.outcome == 'success'
+        run: |
+          echo "Waiting 150s for VirusTotal engines to report..."
+          sleep 150
+
+      # Per-file detection table in the job summary + a warning per flagged asset,
+      # so a new false positive is visible on the run instead of in the badge only.
+      - name: VirusTotal detection report
+        if: steps.vt.outcome == 'success'
+        env:
+          VIRUS_TOTAL_API_KEY: ${{ secrets.VIRUS_TOTAL_API_KEY }}
+        run: python3 .github/scripts/virustotal_report.py release_assets
+
       - name: Refresh VirusTotal badge cache
         if: steps.vt.outcome == 'success'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Waiting 150s for VirusTotal engines to report..."
-          sleep 150
 
           gh release view "$TAG_NAME" --json body -q .body > release_notes.md || echo "" > release_notes.md
           bust=$(date +%s)$RANDOM

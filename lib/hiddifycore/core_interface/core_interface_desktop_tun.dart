@@ -10,6 +10,7 @@ import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
+import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:path/path.dart' as p;
 import 'package:rxdart/rxdart.dart';
 
@@ -264,20 +265,18 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   Future<bool> _isPrivileged() async {
     final cached = _privileged;
     if (cached != null) return cached;
-    if (Platform.isLinux || Platform.isMacOS) {
-      final result = await Process.run('id', ['-u']);
-      _privileged = result.exitCode == 0 && result.stdout.toString().trim() == '0';
-    } else if (Platform.isWindows) {
-      final result = await Process.run('powershell', [
-        '-NoProfile',
-        '-Command',
-        '([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)',
-      ]);
-      _privileged = result.stdout.toString().trim().toLowerCase() == 'true';
-    } else {
-      _privileged = false;
+    // The in-process core checks its own token (hutils.IsAdmin): no `id -u` or
+    // PowerShell child process, which antivirus heuristics score against a GUI app.
+    try {
+      final privileged = (await fgClient.isAdmin(Empty())).isAdmin;
+      loggy.debug('core IsAdmin: $privileged');
+      _privileged = privileged;
+      return privileged;
+    } catch (e) {
+      // Not cached: the core may simply not be up yet.
+      loggy.warning('core IsAdmin failed, assuming unprivileged: $e');
+      return false;
     }
-    return _privileged!;
   }
 
   Future<void> _runCli(List<String> args) async {

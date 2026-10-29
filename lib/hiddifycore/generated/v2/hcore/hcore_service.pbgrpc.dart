@@ -110,6 +110,10 @@ class CoreClient extends $grpc.Client {
       '/hcore.Core/GetLANIP',
       ($2.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $1.LANIPResponse.fromBuffer(value));
+  static final _$isAdmin = $grpc.ClientMethod<$2.Empty, $1.IsAdminResponse>(
+      '/hcore.Core/IsAdmin',
+      ($2.Empty value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.IsAdminResponse.fromBuffer(value));
   static final _$needAdminBgService = $grpc.ClientMethod<$1.NeedAdminBgServiceRequest, $1.NeedAdminBgServiceResponse>(
       '/hcore.Core/NeedAdminBgService',
       ($1.NeedAdminBgServiceRequest value) => value.writeToBuffer(),
@@ -211,6 +215,10 @@ class CoreClient extends $grpc.Client {
 
   $grpc.ResponseFuture<$1.LANIPResponse> getLANIP($2.Empty request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$getLANIP, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$1.IsAdminResponse> isAdmin($2.Empty request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$isAdmin, request, options: options);
   }
 
   $grpc.ResponseFuture<$1.NeedAdminBgServiceResponse> needAdminBgService($1.NeedAdminBgServiceRequest request, {$grpc.CallOptions? options}) {
@@ -381,6 +389,13 @@ abstract class CoreServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $2.Empty.fromBuffer(value),
         ($1.LANIPResponse value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$2.Empty, $1.IsAdminResponse>(
+        'IsAdmin',
+        isAdmin_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $2.Empty.fromBuffer(value),
+        ($1.IsAdminResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$1.NeedAdminBgServiceRequest, $1.NeedAdminBgServiceResponse>(
         'NeedAdminBgService',
         needAdminBgService_Pre,
@@ -485,6 +500,10 @@ abstract class CoreServiceBase extends $grpc.Service {
     return getLANIP(call, await request);
   }
 
+  $async.Future<$1.IsAdminResponse> isAdmin_Pre($grpc.ServiceCall call, $async.Future<$2.Empty> request) async {
+    return isAdmin(call, await request);
+  }
+
   $async.Future<$1.NeedAdminBgServiceResponse> needAdminBgService_Pre($grpc.ServiceCall call, $async.Future<$1.NeedAdminBgServiceRequest> request) async {
     return needAdminBgService(call, await request);
   }
@@ -515,6 +534,7 @@ abstract class CoreServiceBase extends $grpc.Service {
   $async.Stream<$1.LogMessage> logListener($grpc.ServiceCall call, $1.LogRequest request);
   $async.Future<$2.Empty> close($grpc.ServiceCall call, $1.CloseRequest request);
   $async.Future<$1.LANIPResponse> getLANIP($grpc.ServiceCall call, $2.Empty request);
+  $async.Future<$1.IsAdminResponse> isAdmin($grpc.ServiceCall call, $2.Empty request);
   $async.Future<$1.NeedAdminBgServiceResponse> needAdminBgService($grpc.ServiceCall call, $1.NeedAdminBgServiceRequest request);
   $async.Stream<$1.EnsureAdminBgServiceEvent> ensureAdminBgService($grpc.ServiceCall call, $1.EnsureAdminBgServiceRequest request);
 }

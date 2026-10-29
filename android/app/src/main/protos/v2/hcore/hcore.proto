@@ -7,13 +7,26 @@ option go_package = "github.com/hiddify/hiddify-core/v2/hcore";
 option java_package = "com.hiddify.core.api.v2.hcore";
 
 
+// The lifecycle is owned by the core: STOPPED -> STARTING -> WAITING -> STARTED, and STOPPING
+// from any running state. A start is accepted only from STOPPED. While the core runs, its
+// monitoring moves it between WAITING, STARTED and NO_AVAILABLE_PROXIES.
 enum CoreStates {
   STOPPED = 0;
+  // the background core is starting up completely
   STARTING = 1;
+  // the core is up and at least one proxy has a positive ping; a lost ping moves it back to
+  // WAITING
   STARTED = 2;
+  // a stop was requested: reported at once, and every queued start is dropped
   STOPPING = 3;
   // the running core is applying a new config (HotReload); traffic keeps flowing
   HOT_RELOADING = 4;
+  // the core is up and no proxy has a ping yet (not tested, or the ping was lost); a positive
+  // ping moves it to STARTED
+  WAITING = 5;
+  // the core is up and every proxy was tested and timed out; not an error, a positive ping
+  // moves it to STARTED
+  NO_AVAILABLE_PROXIES = 6;
 }
 
 enum MessageType {
@@ -92,6 +105,16 @@ message SystemInfo {
   string current_profile = 11;
 }
 
+// Connection state of an outbound or endpoint (mirrors adapter.Status).
+enum Status {
+  READY = 0;
+  CONNECTING = 1;
+  RECONNECTING = 2;
+  SEARCHING = 3;
+  FAILED = 4;
+  REGISTERING = 5;
+}
+
 message OutboundInfo {
   string tag = 1;
   string type = 2;
@@ -110,6 +133,7 @@ message OutboundInfo {
   int64 upload = 15;
   int64 download = 16;
   string detour = 17;
+  Status status = 18; // ready / connecting / registering / … (outbound or endpoint)
 }
 
 message IpInfo {
@@ -237,6 +261,11 @@ message StopRequest{
 
 message LANIPResponse {
   string ip = 1;
+}
+
+message IsAdminResponse {
+  // True when the core process runs as Administrator (Windows) or root (Unix).
+  bool is_admin = 1;
 }
 
 // --- admin_bgservice (Windows/Linux elevated background core) ---
