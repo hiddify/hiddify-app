@@ -1,0 +1,55 @@
+name: Build OrcaNet APK
+
+# Manual trigger only: Actions tab -> "Build OrcaNet APK" -> Run workflow.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write # needed to attach the APKs to a release
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.5' # same version Hiddify's own CI uses
+          channel: stable
+          cache: true
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      # pub get + build_runner + slang + downloads the prebuilt Hiddify core (stable channel)
+      - name: Prepare
+        run: make android-apk-prepare CHANNEL=prod
+
+      # Non-fatal: only here so compile errors are easy to read in the log.
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings || true
+
+      # No keystore is configured, so Gradle signs with the debug key (installable on any phone).
+      - name: Build APK
+        run: flutter build apk --release --split-per-abi --target lib/main_prod.dart
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OrcaNet-apk
+          path: build/app/outputs/flutter-apk/*.apk
+
+      - name: Publish release with direct download links
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: orcanet-build-${{ github.run_number }}
+          name: OrcaNet build ${{ github.run_number }}
+          prerelease: true
+          files: build/app/outputs/flutter-apk/*.apk
