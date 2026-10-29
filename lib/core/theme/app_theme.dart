@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/theme/app_theme_mode.dart';
+import 'package:hiddify/core/theme/orca_glass_theme.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 
 class AppTheme {
@@ -19,6 +20,8 @@ class AppTheme {
   }
 
   ThemeData darkTheme(ColorScheme? darkColorScheme) {
+    // the liquid-glass look; "true black" keeps the plain black theme
+    if (!mode.trueBlack) return orcaGlassTheme(fontFamily);
     final ColorScheme scheme =
         darkColorScheme ?? ColorScheme.fromSeed(seedColor: const Color(0xFF293CA0), brightness: Brightness.dark);
     return ThemeData(

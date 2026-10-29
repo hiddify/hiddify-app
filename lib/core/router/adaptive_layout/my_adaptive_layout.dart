@@ -7,6 +7,8 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/adaptive_layout/shell_route_action.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/router/go_router/routing_config_notifier.dart';
+import 'package:hiddify/features/home/widget/orca/orca_nav_bar.dart';
+import 'package:hiddify/features/home/widget/orca/orca_stats_sheet.dart';
 import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -120,10 +122,9 @@ class MyAdaptiveLayout extends HookConsumerWidget {
             bottomNavigationBar: isMobileBreakpoint
                 ? FocusScope(
                     node: navScopeNode,
-                    child: NavigationBar(
-                      selectedIndex: navigationShell.currentIndex <= 1 ? navigationShell.currentIndex : 0,
-                      destinations: _navDests(_actions(t, showProfilesAction, isMobileBreakpoint)),
-                      onDestinationSelected: (index) => _onTap(context, index),
+                    child: OrcaNavBar(
+                      selected: _orcaTab(context),
+                      onTap: (tab) => _onOrcaTab(context, ref, tab),
                     ),
                   )
                 : null,
@@ -131,6 +132,29 @@ class MyAdaptiveLayout extends HookConsumerWidget {
         ),
       ),
     );
+  }
+
+  // ── glass nav bar (mobile) ──
+  OrcaTab _orcaTab(BuildContext context) {
+    final settingsIndex = getIndexOfBranch(true, showProfilesAction, 'settings');
+    if (navigationShell.currentIndex == settingsIndex) return OrcaTab.settings;
+    final location = GoRouterState.of(context).uri.path;
+    if (location.endsWith('/proxies')) return OrcaTab.servers;
+    return OrcaTab.home;
+  }
+
+  void _onOrcaTab(BuildContext context, WidgetRef ref, OrcaTab tab) {
+    switch (tab) {
+      case OrcaTab.home:
+        navigationShell.goBranch(0, initialLocation: true);
+      case OrcaTab.servers:
+        navigationShell.goBranch(0);
+        context.goNamed('proxies');
+      case OrcaTab.stats:
+        showOrcaStatsSheet(context);
+      case OrcaTab.settings:
+        navigationShell.goBranch(getIndexOfBranch(true, showProfilesAction, 'settings'));
+    }
   }
 
   // shell route action onTap
