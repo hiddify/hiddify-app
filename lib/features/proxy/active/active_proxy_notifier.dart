@@ -10,12 +10,16 @@ import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/data/proxy_repository.dart';
 import 'package:hiddify/features/proxy/model/ip_info_entity.dart';
+import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart' hide IpInfo;
 import 'package:hiddify/hiddifycore/init_signal.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -90,10 +94,12 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
   }
 }
 
+/// The core's main proxy list: each group with only the item it selected, and the active chain
+/// hop. The active proxy and the home proxy card share this one stream.
 @Riverpod(keepAlive: true)
-class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
+class MainOutboundsNotifier extends _$MainOutboundsNotifier with AppLogger {
   @override
-  Stream<OutboundInfo> build() {
+  Stream<OutboundGroupList> build() {
     // ref.disposeDelay(const Duration(seconds: 20));
     final serviceRunning = ref.watch(serviceRunningProvider);
     // The core is set up again when the app comes back from the background, on
@@ -106,10 +112,10 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
       _resubscribeDelay = _minResubscribeDelay;
     }
     if (!serviceRunning) {
-      // Emit an empty outbound (delay 0) so disconnect clears the last ping.
-      // Stream.error alone kept the previous AsyncData via copyWithPrevious, so
-      // the tray/dock stayed green and the UI still showed the old ms value.
-      return Stream.value(OutboundInfo());
+      // Emit an empty list, so the active proxy becomes an empty outbound (delay 0) and
+      // disconnect clears the last ping. Stream.error alone kept the previous AsyncData via
+      // copyWithPrevious, so the tray/dock stayed green and the UI still showed the old ms value.
+      return Stream.value(OutboundGroupList());
     }
     Timer? resubscribe;
     ref.onDispose(() => resubscribe?.cancel());
@@ -121,13 +127,12 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
         // tunnel itself is fine, so the last known outbound stays and the stream is
         // opened again below.
         .where((event) => event.isRight())
-        .map((event) => event.getOrElse((l) => List<OutboundGroup>.empty()))
-        .map((event) => event.firstOrNull?.items.first ?? OutboundInfo())
-        .doOnData((info) {
+        .map((event) => event.getOrElse((l) => OutboundGroupList()))
+        .doOnData((list) {
           // The first event is the core service's cached list, sent even when
           // the call fails; only a later one shows the stream really works.
           if (++received > 1) _resubscribeDelay = _minResubscribeDelay;
-          _handleConnectionHaptic(info.urlTestDelay);
+          _handleConnectionHaptic(_activeOf(list, ref.read(ConfigOptions.chainStatus)).urlTestDelay);
         })
         .doOnDone(() {
           // gRPC ends the stream when its connection drops, e.g. once iOS suspends
@@ -166,6 +171,23 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
       Future.delayed(const Duration(milliseconds: 150), haptic.heavyImpact);
     }
   }
+}
+
+/// The outbound the traffic leaves through, whose ping tells whether the whole path works: with
+/// extra security the hop (it dials through the user's pick), else the pick, the main group's only item.
+OutboundInfo _activeOf(OutboundGroupList list, ChainStatus chain) => chain.isExtraSecurity() && list.hasChainHop()
+    ? list.chainHop
+    : list.items.firstOrNull?.items.firstOrNull ?? OutboundInfo();
+
+@Riverpod(keepAlive: true)
+class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
+  // Follows the shared list state for state, loading and error alike, so readers see what
+  // they saw when this notifier owned the stream.
+  @override
+  AsyncValue<OutboundInfo> build() {
+    final chain = ref.watch(ConfigOptions.chainStatus);
+    return ref.watch(mainOutboundsNotifierProvider).whenData((list) => _activeOf(list, chain));
+  }
 
   final _urlTestThrottler = Throttler(const Duration(seconds: 1));
 
@@ -181,4 +203,17 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
       }
     });
   }
+}
+
+/// What the home proxy card shows; null until the core has sent a message.
+@Riverpod(keepAlive: true)
+ActiveProxyCardData? activeProxyCard(Ref ref) {
+  final list = ref.watch(mainOutboundsNotifierProvider).valueOrNull;
+  if (list == null) return null;
+  final chain = ref.watch(ConfigOptions.chainStatus);
+  return ActiveProxyCardData.from(
+    list,
+    chain: chain,
+    hopMode: ref.watch(chain.isUnblocker() ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode),
+  );
 }

@@ -4,6 +4,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/overview/chain_mode_button.dart';
+import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -16,6 +17,7 @@ class ChainTimelineHeader extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
+    final chain = ref.watch(ConfigOptions.chainStatus);
 
     return Container(
       margin: const EdgeInsetsDirectional.only(end: 16),
@@ -28,9 +30,25 @@ class ChainTimelineHeader extends HookConsumerWidget {
       ),
       child: Row(
         children: [
-          const Gap(4),
-          SizedBox(child: Icon(level.icon(), size: 20, color: theme.colorScheme.onSurfaceVariant)),
-          const Gap(12),
+          const Gap(3),
+          SizedBox.square(
+            dimension: 22,
+            // the chain icons as on the home card, moving only while their chain is on
+            child: switch (level) {
+              ChainTimelineLevel.extraSecurity => ChainTypeIcon(
+                type: ChainType.extraSecurity,
+                mode: ref.watch(ConfigOptions.extraSecurityMode),
+                animate: chain.isExtraSecurity(),
+              ),
+              ChainTimelineLevel.unblocker => ChainTypeIcon(
+                type: ChainType.unblocker,
+                mode: ref.watch(ConfigOptions.unblockerMode),
+                animate: chain.isUnblocker(),
+              ),
+              _ => Icon(level.icon(), size: 20, color: theme.colorScheme.onSurfaceVariant),
+            },
+          ),
+          const Gap(11),
           Expanded(
             child: Text(
               level.present(t).title,

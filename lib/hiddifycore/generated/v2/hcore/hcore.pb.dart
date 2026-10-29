@@ -14,7 +14,7 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../../google/protobuf/timestamp.pb.dart' as $0;
+import '../../google/protobuf/timestamp.pb.dart' as $2;
 import '../hcommon/common.pbenum.dart' as $1;
 import 'hcore.pbenum.dart';
 
@@ -639,7 +639,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   factory OutboundInfo({
     $core.String? tag,
     $core.String? type,
-    $0.Timestamp? urlTestTime,
+    $2.Timestamp? urlTestTime,
     $core.int? urlTestDelay,
     IpInfo? ipinfo,
     $core.bool? isSelected,
@@ -654,6 +654,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $fixnum.Int64? upload,
     $fixnum.Int64? download,
     $core.String? detour,
+    Status? status,
   }) {
     final $result = create();
     if (tag != null) {
@@ -707,6 +708,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (detour != null) {
       $result.detour = detour;
     }
+    if (status != null) {
+      $result.status = status;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -716,7 +720,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'OutboundInfo', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'tag')
     ..aOS(2, _omitFieldNames ? '' : 'type')
-    ..aOM<$0.Timestamp>(3, _omitFieldNames ? '' : 'urlTestTime', subBuilder: $0.Timestamp.create)
+    ..aOM<$2.Timestamp>(3, _omitFieldNames ? '' : 'urlTestTime', subBuilder: $2.Timestamp.create)
     ..a<$core.int>(4, _omitFieldNames ? '' : 'urlTestDelay', $pb.PbFieldType.O3)
     ..aOM<IpInfo>(5, _omitFieldNames ? '' : 'ipinfo', subBuilder: IpInfo.create)
     ..aOB(6, _omitFieldNames ? '' : 'isSelected')
@@ -731,6 +735,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aInt64(15, _omitFieldNames ? '' : 'upload')
     ..aInt64(16, _omitFieldNames ? '' : 'download')
     ..aOS(17, _omitFieldNames ? '' : 'detour')
+    ..e<Status>(18, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: Status.READY, valueOf: Status.valueOf, enumValues: Status.values)
     ..hasRequiredFields = false
   ;
 
@@ -774,15 +779,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   void clearType() => clearField(2);
 
   @$pb.TagNumber(3)
-  $0.Timestamp get urlTestTime => $_getN(2);
+  $2.Timestamp get urlTestTime => $_getN(2);
   @$pb.TagNumber(3)
-  set urlTestTime($0.Timestamp v) { setField(3, v); }
+  set urlTestTime($2.Timestamp v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasUrlTestTime() => $_has(2);
   @$pb.TagNumber(3)
   void clearUrlTestTime() => clearField(3);
   @$pb.TagNumber(3)
-  $0.Timestamp ensureUrlTestTime() => $_ensure(2);
+  $2.Timestamp ensureUrlTestTime() => $_ensure(2);
 
   @$pb.TagNumber(4)
   $core.int get urlTestDelay => $_getIZ(3);
@@ -911,6 +916,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasDetour() => $_has(16);
   @$pb.TagNumber(17)
   void clearDetour() => clearField(17);
+
+  @$pb.TagNumber(18)
+  Status get status => $_getN(17);
+  @$pb.TagNumber(18)
+  set status(Status v) { setField(18, v); }
+  @$pb.TagNumber(18)
+  $core.bool hasStatus() => $_has(17);
+  @$pb.TagNumber(18)
+  void clearStatus() => clearField(18);
 }
 
 class IpInfo extends $pb.GeneratedMessage {
@@ -1192,10 +1206,14 @@ class OutboundGroup extends $pb.GeneratedMessage {
 class OutboundGroupList extends $pb.GeneratedMessage {
   factory OutboundGroupList({
     $core.Iterable<OutboundGroup>? items,
+    OutboundInfo? chainHop,
   }) {
     final $result = create();
     if (items != null) {
       $result.items.addAll(items);
+    }
+    if (chainHop != null) {
+      $result.chainHop = chainHop;
     }
     return $result;
   }
@@ -1205,6 +1223,7 @@ class OutboundGroupList extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'OutboundGroupList', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..pc<OutboundGroup>(1, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM, subBuilder: OutboundGroup.create)
+    ..aOM<OutboundInfo>(2, _omitFieldNames ? '' : 'chainHop', subBuilder: OutboundInfo.create)
     ..hasRequiredFields = false
   ;
 
@@ -1231,6 +1250,17 @@ class OutboundGroupList extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(1)
   $core.List<OutboundGroup> get items => $_getList(0);
+
+  @$pb.TagNumber(2)
+  OutboundInfo get chainHop => $_getN(1);
+  @$pb.TagNumber(2)
+  set chainHop(OutboundInfo v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasChainHop() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearChainHop() => clearField(2);
+  @$pb.TagNumber(2)
+  OutboundInfo ensureChainHop() => $_ensure(1);
 }
 
 class WarpAccount extends $pb.GeneratedMessage {
@@ -2144,7 +2174,7 @@ class LogMessage extends $pb.GeneratedMessage {
     LogLevel? level,
     LogType? type,
     $core.String? message,
-    $0.Timestamp? time,
+    $2.Timestamp? time,
   }) {
     final $result = create();
     if (level != null) {
@@ -2169,7 +2199,7 @@ class LogMessage extends $pb.GeneratedMessage {
     ..e<LogLevel>(1, _omitFieldNames ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.TRACE, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
     ..e<LogType>(2, _omitFieldNames ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: LogType.CORE, valueOf: LogType.valueOf, enumValues: LogType.values)
     ..aOS(3, _omitFieldNames ? '' : 'message')
-    ..aOM<$0.Timestamp>(4, _omitFieldNames ? '' : 'time', subBuilder: $0.Timestamp.create)
+    ..aOM<$2.Timestamp>(4, _omitFieldNames ? '' : 'time', subBuilder: $2.Timestamp.create)
     ..hasRequiredFields = false
   ;
 
@@ -2222,15 +2252,15 @@ class LogMessage extends $pb.GeneratedMessage {
   void clearMessage() => clearField(3);
 
   @$pb.TagNumber(4)
-  $0.Timestamp get time => $_getN(3);
+  $2.Timestamp get time => $_getN(3);
   @$pb.TagNumber(4)
-  set time($0.Timestamp v) { setField(4, v); }
+  set time($2.Timestamp v) { setField(4, v); }
   @$pb.TagNumber(4)
   $core.bool hasTime() => $_has(3);
   @$pb.TagNumber(4)
   void clearTime() => clearField(4);
   @$pb.TagNumber(4)
-  $0.Timestamp ensureTime() => $_ensure(3);
+  $2.Timestamp ensureTime() => $_ensure(3);
 }
 
 class LogRequest extends $pb.GeneratedMessage {
@@ -2363,6 +2393,57 @@ class LANIPResponse extends $pb.GeneratedMessage {
   $core.bool hasIp() => $_has(0);
   @$pb.TagNumber(1)
   void clearIp() => clearField(1);
+}
+
+class IsAdminResponse extends $pb.GeneratedMessage {
+  factory IsAdminResponse({
+    $core.bool? isAdmin,
+  }) {
+    final $result = create();
+    if (isAdmin != null) {
+      $result.isAdmin = isAdmin;
+    }
+    return $result;
+  }
+  IsAdminResponse._() : super();
+  factory IsAdminResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory IsAdminResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'IsAdminResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOB(1, _omitFieldNames ? '' : 'isAdmin')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  IsAdminResponse clone() => IsAdminResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  IsAdminResponse copyWith(void Function(IsAdminResponse) updates) => super.copyWith((message) => updates(message as IsAdminResponse)) as IsAdminResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static IsAdminResponse create() => IsAdminResponse._();
+  IsAdminResponse createEmptyInstance() => create();
+  static $pb.PbList<IsAdminResponse> createRepeated() => $pb.PbList<IsAdminResponse>();
+  @$core.pragma('dart2js:noInline')
+  static IsAdminResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<IsAdminResponse>(create);
+  static IsAdminResponse? _defaultInstance;
+
+  /// True when the core process runs as Administrator (Windows) or root (Unix).
+  @$pb.TagNumber(1)
+  $core.bool get isAdmin => $_getBF(0);
+  @$pb.TagNumber(1)
+  set isAdmin($core.bool v) { $_setBool(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasIsAdmin() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearIsAdmin() => clearField(1);
 }
 
 class AdminNeededProxy extends $pb.GeneratedMessage {
