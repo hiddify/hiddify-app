@@ -14,6 +14,7 @@ class CoreInterface {
 
   Future<void> setOptions(SingboxConfigOption options) async {}
   Future<void> dispose() async {}
+  Future<void> refreshServiceNotification() async {}
   Future<void> startManaged(String path, String name, bool disableMemoryLimit) =>
       Future<void>.error(UnimplementedError());
 

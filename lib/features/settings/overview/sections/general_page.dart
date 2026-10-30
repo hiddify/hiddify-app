@@ -11,6 +11,7 @@ import 'package:hiddify/features/common/general_pref_tiles.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_mobile.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:humanizer/humanizer.dart';
@@ -39,7 +40,11 @@ class GeneralPage extends HookConsumerWidget {
               title: Text(t.pages.settings.general.dynamicNotification),
               secondary: const Icon(Icons.speed_rounded),
               value: ref.watch(Preferences.dynamicNotification),
-              onChanged: ref.read(Preferences.dynamicNotification.notifier).update,
+              onChanged: (value) async {
+                final core = ref.read(hiddifyCoreServiceProvider);
+                await ref.read(Preferences.dynamicNotification.notifier).update(value);
+                await core.refreshServiceNotification();
+              },
             ),
             SwitchListTile.adaptive(
               title: Text(t.pages.settings.general.hapticFeedback),

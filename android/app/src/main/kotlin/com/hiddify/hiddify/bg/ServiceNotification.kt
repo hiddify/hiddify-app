@@ -8,10 +8,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.PowerManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.MutableLiveData
 import com.hiddify.core.api.v2.hcommon.Empty
@@ -28,28 +30,19 @@ import com.hiddify.core.libbox.Libbox
 import com.hiddify.hiddify.utils.GrpcClientProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.CancellationException
-/**
- * The persistent notification of the running service.
- *
- * Title: the active profile. Text: the outbound in use, prefixed with the live speed when
- * "Display speed in notification" is on. Header: VPN or Proxy. Everything comes from the core
- * (SystemInfo), so a profile or outbound switched while connected shows up within one poll.
- * Polling stops while the screen is off and nothing is re-posted when nothing changed.
- */
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.distinctUntilChanged
 class ServiceNotification(private val status: MutableLiveData<Status>, private val service: Service) : BroadcastReceiver() {
     companion object {
         private const val notificationId = 1
         private const val notificationChannel = "service"
-        private const val speedInterval = 1_000L
-        private const val idleInterval = 5_000L
         val flags =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 
@@ -60,139 +53,191 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
             return Application.notification.areNotificationsEnabled()
         }
     }
-
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private var pollJob: Job? = null
+    private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
     private var receiverRegistered = false
-
-    /** What is on screen right now (title, text, header); an unchanged refresh is skipped. */
-    private var shown: Triple<String, String, String>? = null
-
+    private val lifecycleVersion = AtomicLong()
+    private var staticContentTextId = R.string.status_started
+    private var screenOn = true
+    private var outboundText: String? = null
+    private var lastNotification: Triple<String, String, String>? = null
     private val modeLabel: String
         get() = service.getString(
             if (Settings.serviceMode == ServiceMode.VPN) R.string.mode_vpn else R.string.mode_proxy
         )
+    private var coreClient: CoreClient? = null
+    private val clientLock = Any()
+    private val refreshController = NotificationRefreshController(
+        scope = scope,
+        fetch = {
+            withContext(Dispatchers.IO) {
+                val client = synchronized(clientLock) {
+                    coreClient ?: GrpcClientProvider.grpcClient.create(CoreClient::class).also { coreClient = it }
+                }
+                client.GetSystemInfo().executeBlocking(Empty())
+            }
+        },
+        publish = { previous: SystemInfo?, current: SystemInfo -> updateStatus(previous, current) },
+        onError = { error ->
+            synchronized(clientLock) { coreClient = null }
+            Log.d("notification", "SystemInfo not available: ${error.message}")
+        },
+    )
+
+    private val metadataObserver = NotificationMetadataObserver(
+        scope = scope,
+        source = {
+            flow {
+                coroutineScope {
+                    val call = GrpcClientProvider.streamingGrpcClient.create(CoreClient::class).MainOutboundsInfo()
+                    val (requests, responses) = call.executeIn(this)
+                    try {
+                        requests.send(Empty())
+                        requests.close()
+                        for (snapshot in responses) emit(snapshot)
+                    } finally {
+                        call.cancel()
+                        requests.close()
+                        responses.cancel()
+                    }
+                }
+            }.map(::notificationOutboundText).distinctUntilChanged()
+        },
+        publish = { text: String? ->
+            if (text != null && outboundText != text) {
+                outboundText = text
+                // Fetch the actual profile too; selection/URL-test events need no Flutter hook.
+                refreshController.refresh(periodic = Settings.dynamicNotification && screenOn)
+            }
+        },
+        onError = { error -> Log.d("notification", "Outbound metadata not available: ${error.message}") },
+    )
 
     private val notificationBuilder by lazy {
         NotificationCompat.Builder(service, notificationChannel)
-            .setShowWhen(false)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setSmallIcon(R.drawable.ic_stat_logo)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
-            .setContentIntent(
-                PendingIntent.getActivity(
-                    service,
-                    0,
-                    Intent(service, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT),
-                    flags
+                .setShowWhen(false)
+                .setOngoing(true)
+                .setContentTitle("Hiddify")
+                .setOnlyAlertOnce(true)
+                .setSmallIcon(R.drawable.ic_stat_logo)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setContentIntent(
+                        PendingIntent.getActivity(
+                                service,
+                                0,
+                                Intent(
+                                        service,
+                                        MainActivity::class.java
+                                ).setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT),
+                                flags
+                        )
                 )
-            )
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .addAction(
-                NotificationCompat.Action.Builder(
-                    0, service.getText(R.string.stop), PendingIntent.getBroadcast(
-                        service,
-                        0,
-                        Intent(Action.SERVICE_CLOSE).setPackage(Application.application.packageName),
-                        flags
+                .setPriority(NotificationCompat.PRIORITY_LOW).apply {
+                    addAction(
+                            NotificationCompat.Action.Builder(
+                                    0, service.getText(R.string.stop), PendingIntent.getBroadcast(
+                                    service,
+                                    0,
+                                    Intent(Action.SERVICE_CLOSE).setPackage(
+                                        Application.application.packageName
+                                    ),
+                                    flags
+                            )
+                            ).build()
                     )
-                ).build()
-            )
+                }
     }
 
-    /** Puts the service in the foreground with a static status line (starting / connected). */
     fun show(profileName: String, @StringRes contentTextId: Int) {
+        lifecycleVersion.incrementAndGet()
+        staticContentTextId = contentTextId
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Application.notification.createNotificationChannel(
-                NotificationChannel(notificationChannel, "hiddify service", NotificationManager.IMPORTANCE_LOW)
+                NotificationChannel(
+                    notificationChannel, "hiddify service", NotificationManager.IMPORTANCE_LOW
+                )
             )
         }
-        render(profileName, service.getString(contentTextId), modeLabel, foreground = true)
+        service.startForeground(
+            notificationId, notificationBuilder
+                .setContentTitle(profileName.takeIf { it.isNotBlank() } ?: "Hiddify")
+                .setContentText(service.getString(contentTextId)).setSubText(modeLabel).build()
+        )
     }
 
-    private fun render(profile: String, text: String, header: String, foreground: Boolean = false) {
-        val next = Triple(profile.ifBlank { "Hiddify" }, text, header)
-        if (!foreground && next == shown) return
-        shown = next
-        val built = notificationBuilder
-            .setContentTitle(next.first)
-            .setContentText(next.second)
-            .setSubText(next.third)
-            .build()
-        if (foreground) service.startForeground(notificationId, built)
-        else Application.notification.notify(notificationId, built)
+
+    suspend fun start() = withContext(Dispatchers.Main.immediate) {
+        refreshController.start()
+        outboundText = null
+        lastNotification = null
+        metadataObserver.start()
+        screenOn = (service.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
+        if (!receiverRegistered) {
+            ContextCompat.registerReceiver(service, this@ServiceNotification, IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Action.SERVICE_REFRESH_NOTIFICATION)
+            }, ContextCompat.RECEIVER_NOT_EXPORTED)
+            receiverRegistered = true
+        }
+        if (Settings.dynamicNotification && checkPermission() && screenOn) {
+            refreshController.refresh(periodic = true)
+        }
     }
 
-    suspend fun start() {
-        if (!checkPermission()) return
-        startPolling()
-        withContext(Dispatchers.Main) { registerReceiver() }
-    }
-
-    private fun registerReceiver() {
-        service.registerReceiver(this, IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-        })
-        receiverRegistered = true
+    private fun updateStatus(previous: SystemInfo?, current: SystemInfo) {
+        val outbound = outboundText ?: current.current_outbound.takeIf { it.isNotBlank() }
+            ?: service.getString(staticContentTextId)
+        val content = if (Settings.dynamicNotification) {
+            val uplink = previous?.let { (current.uplink_total - it.uplink_total).coerceAtLeast(0) } ?: 0L
+            val downlink = previous?.let { (current.downlink_total - it.downlink_total).coerceAtLeast(0) } ?: 0L
+            "$outbound  ·  ↑ ${Libbox.formatBytes(uplink)}/s  ↓ ${Libbox.formatBytes(downlink)}/s"
+        } else {
+            outbound
+        }
+        val title = current.current_profile.takeIf { it.isNotBlank() } ?: "Hiddify"
+        val rendered = Triple(title, content, modeLabel)
+        if (lastNotification == rendered) return
+        lastNotification = rendered
+        Application.notificationManager.notify(
+            notificationId,
+            notificationBuilder
+                .setContentTitle(title)
+                .setContentText(content).setSubText(rendered.third).build()
+        )
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            Intent.ACTION_SCREEN_ON -> startPolling()
-            Intent.ACTION_SCREEN_OFF -> stopPolling()
-        }
-    }
-
-    fun close() {
-        stopPolling()
-        shown = null
-        ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
-        if (receiverRegistered) {
-            service.unregisterReceiver(this)
-            receiverRegistered = false
-        }
-    }
-
-    private fun startPolling() {
-        pollJob?.cancel()
-        val showSpeed = Settings.dynamicNotification
-        val interval = if (showSpeed) speedInterval else idleInterval
-        pollJob = scope.launch {
-            val coreClient = GrpcClientProvider.grpcClient.create(CoreClient::class)
-            var previous: SystemInfo? = null
-            while (isActive) {
-                try {
-                    val info = coreClient.GetSystemInfo().executeBlocking(Empty())
-                    update(previous, info, showSpeed)
-                    previous = info
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    // The service reports Started before the core listens; keep trying.
-                    Log.d("notification", "SystemInfo not available yet: ${e.message}")
-                    previous = null
+            Intent.ACTION_SCREEN_ON -> {
+                screenOn = true
+                if (checkPermission()) refreshController.refresh(periodic = Settings.dynamicNotification)
+            }
+            Intent.ACTION_SCREEN_OFF -> {
+                screenOn = false
+                refreshController.pause()
+            }
+            Action.SERVICE_REFRESH_NOTIFICATION -> {
+                if (checkPermission()) {
+                    metadataObserver.start()
+                    refreshController.refresh(periodic = Settings.dynamicNotification && screenOn)
                 }
-                delay(interval)
             }
         }
     }
 
-    private fun stopPolling() {
-        pollJob?.cancel()
-        pollJob = null
-    }
-
-    private fun update(previous: SystemInfo?, info: SystemInfo, showSpeed: Boolean) {
-        val outbound = info.current_outbound.ifBlank { service.getString(R.string.status_started) }
-        val text = if (showSpeed && previous != null) {
-            val up = Libbox.formatBytes(info.uplink_total - previous.uplink_total)
-            val down = Libbox.formatBytes(info.downlink_total - previous.downlink_total)
-            "$outbound  ·  ↑ $up/s  ↓ $down/s"
-        } else {
-            outbound
+    fun close() {
+        // Invalidate work immediately, even when BoxService closes from its IO dispatcher.
+        val closingVersion = lifecycleVersion.incrementAndGet()
+        refreshController.close()
+        metadataObserver.close()
+        synchronized(clientLock) { coreClient = null }
+        scope.launch {
+            if (lifecycleVersion.get() != closingVersion) return@launch
+            ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
+            if (receiverRegistered) {
+                service.unregisterReceiver(this@ServiceNotification)
+                receiverRegistered = false
+            }
         }
-        render(info.current_profile, text, modeLabel)
     }
 }
