@@ -19,6 +19,7 @@ class SingboxConfigOption with _$SingboxConfigOption {
     required BalancerStrategy balancerStrategy,
     // required bool blockAds,
     required bool useXrayCoreWhenPossible,
+    @Default(true) bool useSystemTlsEngine,
     required bool executeConfigAsIs,
     required LogLevel logLevel,
     required bool resolveDestination,

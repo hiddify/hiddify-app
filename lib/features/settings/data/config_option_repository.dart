@@ -38,6 +38,7 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
   static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>("use-xray-core-when-possible", false);
+  static final useSystemTlsEngine = PreferencesNotifier.create<bool, bool>("use-system-tls-engine", true);
   // static final blockAds = PreferencesNotifier.create<bool, bool>("block-ads", false);
   static final logLevel = PreferencesNotifier.create<LogLevel, String>(
     "log-level",
@@ -355,6 +356,7 @@ abstract class ConfigOptions {
     "balancer-strategy": balancerStrategy,
     // "block-ads": blockAds,
     "use-xray-core-when-possible": useXrayCoreWhenPossible,
+    "use-system-tls-engine": useSystemTlsEngine,
     "service-mode": serviceMode,
     "log-level": logLevel,
     "resolve-destination": resolveDestination,
@@ -471,6 +473,7 @@ abstract class ConfigOptions {
       balancerStrategy: ref.watch(balancerStrategy),
       // blockAds: ref.watch(blockAds),
       useXrayCoreWhenPossible: ref.watch(useXrayCoreWhenPossible),
+      useSystemTlsEngine: ref.watch(useSystemTlsEngine),
       executeConfigAsIs: false,
       logLevel: ref.watch(logLevel),
       resolveDestination: ref.watch(resolveDestination),

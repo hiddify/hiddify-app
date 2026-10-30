@@ -263,7 +263,9 @@
         "urlTestInterval": "URL test interval",
         "clashApiPort": "Clash API port",
         "useXrayCoreWhenPossible": "Use xray-core when possible",
-        "useXrayCoreWhenPossibleMsg": "Use xray-core when parsing subscription links. Reimport the subscription to turn this on."
+        "useXrayCoreWhenPossibleMsg": "Use xray-core when parsing subscription links. Reimport the subscription to turn this on.",
+        "useSystemTlsEngine": "Use the system's TLS when available",
+        "useSystemTlsEngineMsg": "Connections without a TLS fingerprint use the TLS of macOS, iOS or Windows once it passed a check on this device; otherwise they look like Chrome."
       },
       "routing": {
         "title": "Routing",

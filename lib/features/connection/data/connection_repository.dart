@@ -120,7 +120,7 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     if (core is! CoreInterfaceDesktopTun) return;
 
     final pref = profile.userOverride?.adminPreference ?? UserAdminPreference.unset;
-    final serviceMode = options.enableTun ? 'vpn' : (options.setSystemProxy ? 'system-proxy' : 'proxy');
+    final serviceMode = _serviceMode(options);
 
     final decision = await core.needAdminBgService(
       serviceMode: serviceMode,
@@ -248,14 +248,31 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   @override
   TaskEither<ConnectionFailure, Unit> disconnect() => singbox.stop().mapLeft(UnexpectedConnectionFailure.new);
 
+  static String _serviceMode(SingboxConfigOption options) =>
+      options.enableTun ? 'vpn' : (options.setSystemProxy ? 'system-proxy' : 'proxy');
+
+  /// Windows and Linux: the core runs in this process for proxy modes and in admin_bgservice for
+  /// VPN, so a new service mode moves it. A hot reload would only change the core already running
+  /// (proxy → VPN removed the system proxy and started no TUN), so the connection is stopped and
+  /// made again, which also asks for admin consent.
   @override
-  TaskEither<ConnectionFailure, Unit> reconnect(ProfileEntity activeProfile, bool disableMemoryLimit) =>
-      applyConfigOption(activeProfile).flatMap(
-        // hot reload when possible, restart otherwise
-        (_) => singbox
-            .reload(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit)
-            .mapLeft(UnexpectedConnectionFailure.new),
-      );
+  TaskEither<ConnectionFailure, Unit> reconnect(ProfileEntity activeProfile, bool disableMemoryLimit) {
+    final before = _configOptionsSnapshot;
+    return applyConfigOption(activeProfile).flatMap((_) {
+      final after = _configOptionsSnapshot;
+      if (singbox.core is CoreInterfaceDesktopTun &&
+          before != null &&
+          after != null &&
+          _serviceMode(before) != _serviceMode(after)) {
+        loggy.info("service mode changed from ${_serviceMode(before)} to ${_serviceMode(after)}, reconnecting");
+        return disconnect().flatMap((_) => connect(activeProfile, disableMemoryLimit));
+      }
+      // hot reload when possible, restart otherwise
+      return singbox
+          .reload(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit)
+          .mapLeft(UnexpectedConnectionFailure.new);
+    });
+  }
 
   @visibleForTesting
   TaskEither<ConnectionFailure, Unit> applyConfigOption(ProfileEntity prof) =>

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartx/dartx.dart';
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
@@ -126,6 +128,14 @@ class GeneralPage extends HookConsumerWidget {
             value: ref.watch(ConfigOptions.useXrayCoreWhenPossible),
             onChanged: ref.read(ConfigOptions.useXrayCoreWhenPossible.notifier).update,
           ),
+          if (Platform.isMacOS || Platform.isIOS || Platform.isWindows)
+            SwitchListTile.adaptive(
+              title: Text(t.pages.settings.general.useSystemTlsEngine),
+              subtitle: Text(t.pages.settings.general.useSystemTlsEngineMsg),
+              secondary: const Icon(Icons.verified_user_rounded),
+              value: ref.watch(ConfigOptions.useSystemTlsEngine),
+              onChanged: ref.read(ConfigOptions.useSystemTlsEngine.notifier).update,
+            ),
         ],
       ),
     );

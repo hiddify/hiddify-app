@@ -92,8 +92,8 @@ jobs:
           # - { platform: linux-amd64-musl, os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
           # - { platform: linux-arm64-musl, os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
           - { platform: macos,            os: macos-15,       aarch: universal, targets: "dmg,pkg" }
-          # - { platform: macos-appstore,   os: macos-26,       aarch: universal, targets: "pkg,dmg" }
-          # - { platform: ios,              os: macos-26,       aarch: universal, filename: hiddify-ios, targets: ipa }
+          - { platform: macos-appstore,   os: macos-26,       aarch: universal, targets: "pkg,dmg" }
+          - { platform: ios,              os: macos-26,       aarch: universal, filename: hiddify-ios, targets: ipa }
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
@@ -305,8 +305,14 @@ jobs:
       # files during install are signed (reduces Sysmon/AV "unsigned dropper" noise).
       - name: Build Windows portable zip
         if: matrix.platform == 'windows' && inputs.upload-artifact
+        # fastforge runs the sign_release_tree.sh hook here, so the signing
+        # credentials must be in this step's environment too.
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         run: make windows-zip-release
 
       - name: Build Windows Setup/MSIX binaries

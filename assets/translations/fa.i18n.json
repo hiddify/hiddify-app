@@ -263,7 +263,9 @@
         "urlTestInterval": "فاصله زمانی تست URL",
         "clashApiPort": "پورت Clash API",
         "useXrayCoreWhenPossible": "استفاده از xray-core در صورت امکان",
-        "useXrayCoreWhenPossibleMsg": "هنگام پردازش لینک‌های اشتراک از xray-core استفاده شود. برای روشن کردن این گزینه، اشتراک را دوباره وارد کنید."
+        "useXrayCoreWhenPossibleMsg": "هنگام پردازش لینک‌های اشتراک از xray-core استفاده شود. برای روشن کردن این گزینه، اشتراک را دوباره وارد کنید.",
+        "useSystemTlsEngine": "استفاده از TLS سیستم در صورت امکان",
+        "useSystemTlsEngineMsg": "اتصال‌هایی که اثرانگشت TLS ندارند، پس از گذراندن یک آزمون روی این دستگاه، از TLS خود macOS، iOS یا Windows استفاده می‌کنند؛ وگرنه مانند Chrome دیده می‌شوند."
       },
       "routing": {
         "title": "مسیریابی",
