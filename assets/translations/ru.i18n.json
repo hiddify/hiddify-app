@@ -270,6 +270,8 @@
         "clashApiPort": "Порт Clash API",
         "useXrayCoreWhenPossible": "Использовать Xray-core, если возможно",
         "useXrayCoreWhenPossibleMsg": "Использовать Xray-core при обработке ссылок на подписку. Повторно импортируйте подписку, чтобы включить эту опцию."
+        "useSystemTlsEngine": "Использовать системный TLS, когда доступен",
+        "useSystemTlsEngineMsg": "Соединения без TLS-отпечатка используют TLS macOS, iOS или Windows после проверки на этом устройстве; в противном случае они выглядят как Chrome."
       },
       "routing": {
         "title": "Маршрутизация",
