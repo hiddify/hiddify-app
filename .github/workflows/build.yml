@@ -84,7 +84,7 @@ jobs:
           # Quote multi-target lists: in YAML flow maps, commas start a new key
           # (`targets: exe,msix,zip` was parsed as targets=exe only).
           - { platform: android-apk,       os: ubuntu-latest,  targets: apk }
-          # - { platform: android-aab,       os: ubuntu-latest,  targets: aab }
+          - { platform: android-aab,       os: ubuntu-latest,  targets: aab }
           - { platform: windows,          os: windows-latest, aarch: amd64,     targets: "exe,msix,zip" }
           - { platform: linux,            os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz,AppImage" }
           # - { platform: linux-amd64,      os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
