@@ -1,11 +1,18 @@
 name: Build OrcaNet APK
 
-# Manual trigger only: Actions tab -> "Build OrcaNet APK" -> Run workflow.
+# Runs by hand (Actions tab -> Run workflow) and on every push to the UI branch.
+# The build/analyze logs are also pushed to the `build-logs` branch so they can be read without opening GitHub.
 on:
   workflow_dispatch:
+  push:
+    branches: [orcanet-glass-ui-v3]
 
 permissions:
-  contents: write # needed to attach the APKs to a release
+  contents: write # attach APKs to a release + push the logs branch
+
+defaults:
+  run:
+    shell: bash # bash with pipefail, so `| tee` keeps a failing exit code
 
 jobs:
   apk:
@@ -37,17 +44,17 @@ jobs:
         with:
           packages: platform-tools
 
-      # pub get + build_runner + slang + downloads the prebuilt Hiddify core (stable channel)
+      # pub get + build_runner + slang + downloads the prebuilt Hiddify core
       - name: Prepare
         run: make android-apk-prepare CHANNEL=prod
 
-      # Non-fatal: only here so compile errors are easy to read in the log.
+      # Non-fatal: the full output goes to the logs branch.
       - name: Analyze
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings || true
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee "$RUNNER_TEMP/analyze.log" || true
 
       # No keystore is configured, so Gradle signs with the debug key (installable on any phone).
       - name: Build APK
-        run: flutter build apk --release --split-per-abi --target lib/main_prod.dart
+        run: flutter build apk --release --split-per-abi --target lib/main_prod.dart 2>&1 | tee "$RUNNER_TEMP/build.log"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -61,3 +68,26 @@ jobs:
           name: OrcaNet build ${{ github.run_number }}
           prerelease: true
           files: build/app/outputs/flutter-apk/*.apk
+
+      # Always runs, also when the build failed.
+      - name: Push logs to the build-logs branch
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/out"
+          {
+            echo "run: ${{ github.run_number }}  commit: ${{ github.sha }}  result: ${{ job.status }}"
+          } > "$RUNNER_TEMP/out/summary.txt"
+          [ -f "$RUNNER_TEMP/analyze.log" ] && cp "$RUNNER_TEMP/analyze.log" "$RUNNER_TEMP/out/analyze.log" || true
+          if [ -f "$RUNNER_TEMP/build.log" ]; then
+            cp "$RUNNER_TEMP/build.log" "$RUNNER_TEMP/out/build-full.log"
+            grep -nE "error|Error|FAILURE|What went wrong|Exception|Could not|failed|\.dart:[0-9]+" "$RUNNER_TEMP/build.log" | head -200 > "$RUNNER_TEMP/out/build-errors.log" || true
+            tail -n 120 "$RUNNER_TEMP/build.log" > "$RUNNER_TEMP/out/build-tail.log"
+          fi
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout --orphan build-logs-tmp
+          git rm -rf --cached . -q || true
+          cp "$RUNNER_TEMP"/out/* . 
+          git add -f summary.txt *.log
+          git commit -q -m "logs for run ${{ github.run_number }}"
+          git push -f origin HEAD:refs/heads/build-logs
