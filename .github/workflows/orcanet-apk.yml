@@ -44,9 +44,11 @@ jobs:
         with:
           packages: platform-tools
 
-      # pub get + build_runner + slang + downloads the prebuilt Hiddify core
+      # pub get + build_runner + slang + downloads the prebuilt Hiddify core.
+      # No CHANNEL=prod on purpose: this app code is newer than the last stable core (v4.1.0), so it needs the
+      # "draft" core, which is what Hiddify's own CI builds main against (the stable one fails in Kotlin).
       - name: Prepare
-        run: make android-apk-prepare CHANNEL=prod
+        run: make android-apk-prepare
 
       # Non-fatal: the full output goes to the logs branch.
       - name: Analyze
