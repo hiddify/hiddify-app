@@ -36,7 +36,7 @@ class HiddifyCoreService with InfraLogger {
   final statusController = BehaviorSubject<CoreStatus>();
   final CallOptions? grpcOptions = null; //CallOptions(timeout: const Duration(milliseconds: 10000));
   final Map<String, StreamSubscription?> subscriptions = {};
-  List<OutboundGroup> latest = [];
+  OutboundGroupList latest = OutboundGroupList();
 
   // Counts the stops the app sent, so a start knows when a stop came after it.
   final _stopRequests = BehaviorSubject<int>.seeded(0);
@@ -160,6 +160,8 @@ class HiddifyCoreService with InfraLogger {
   TaskEither<ConnectionFailure, Unit> start(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
       final stops = _stopRequests.value;
+      // the last connection's list, or a new one would first show its proxies and flags
+      latest = OutboundGroupList();
       statusController.add(currentState = const CoreStatus.starting());
       loggy.debug("starting");
       if (core.managesLifecycle) {
@@ -476,7 +478,7 @@ class HiddifyCoreService with InfraLogger {
     // yield* core.bgClient.outboundsInfo(Empty()).throttleTime(const Duration(seconds: 4), leading: false, trailing: true).map((event) => event.items.isEmpty ? null : event.items.first);
   }
 
-  Stream<List<OutboundGroup>> watchActiveGroups() async* {
+  Stream<OutboundGroupList> watchActiveGroups() async* {
     loggy.info("watching active groups");
 
     if (!core.isInitialized()) {
@@ -485,12 +487,7 @@ class HiddifyCoreService with InfraLogger {
     }
 
     try {
-      yield* core.bgClient
-          .mainOutboundsInfo(Empty())
-          .map((event) {
-            return latest = event.items.toList();
-          })
-          .startWith(latest);
+      yield* core.bgClient.mainOutboundsInfo(Empty()).map((event) => latest = event).startWith(latest);
     } catch (e) {
       loggy.error("error watching active groups: $e");
       rethrow;

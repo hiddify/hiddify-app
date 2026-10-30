@@ -105,6 +105,30 @@ class SetupMode extends $pb.ProtobufEnum {
   const SetupMode._($core.int v, $core.String n) : super(v, n);
 }
 
+/// Connection state of an outbound or endpoint (mirrors adapter.Status).
+class Status extends $pb.ProtobufEnum {
+  static const Status READY = Status._(0, _omitEnumNames ? '' : 'READY');
+  static const Status CONNECTING = Status._(1, _omitEnumNames ? '' : 'CONNECTING');
+  static const Status RECONNECTING = Status._(2, _omitEnumNames ? '' : 'RECONNECTING');
+  static const Status SEARCHING = Status._(3, _omitEnumNames ? '' : 'SEARCHING');
+  static const Status FAILED = Status._(4, _omitEnumNames ? '' : 'FAILED');
+  static const Status REGISTERING = Status._(5, _omitEnumNames ? '' : 'REGISTERING');
+
+  static const $core.List<Status> values = <Status> [
+    READY,
+    CONNECTING,
+    RECONNECTING,
+    SEARCHING,
+    FAILED,
+    REGISTERING,
+  ];
+
+  static final $core.Map<$core.int, Status> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static Status? valueOf($core.int value) => _byValue[value];
+
+  const Status._($core.int v, $core.String n) : super(v, n);
+}
+
 class LogLevel extends $pb.ProtobufEnum {
   static const LogLevel TRACE = LogLevel._(0, _omitEnumNames ? '' : 'TRACE');
   static const LogLevel DEBUG = LogLevel._(1, _omitEnumNames ? '' : 'DEBUG');

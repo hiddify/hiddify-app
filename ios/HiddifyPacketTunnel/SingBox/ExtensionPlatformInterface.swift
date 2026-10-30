@@ -585,16 +585,14 @@ public class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoc
         throw notSupported("Shell session")
     }
 
-    public func lookupSFTPServer() throws -> LibboxStringBox {
-        throw notSupported("SFTP server")
+    public func lookupSFTPServer(_ error: NSErrorPointer) -> String {
+        error?.pointee = notSupported("SFTP server")
+        return ""
     }
 
-    public func readSystemSSHHostKey() throws -> LibboxStringBox {
-        throw notSupported("System SSH host key")
-    }
-
-    public func useProcFS() -> Bool {
-        false
+    public func readSystemSSHHostKey(_ error: NSErrorPointer) -> String {
+        error?.pointee = notSupported("System SSH host key")
+        return ""
     }
 
     public func usePlatformBridge() -> Bool {

@@ -57,6 +57,7 @@ class PreferencesEntry<T, P> with InfraLogger {
         final int value => await preferences.setInt(key, value),
         final double value => await preferences.setDouble(key, value),
         final List<String> value => await preferences.setString(key, value.join(";")),
+        null => await preferences.remove(key), // a nullable preference cleared
         _ => throw const FormatException("Invalid Type"),
       };
     } catch (e, stackTrace) {

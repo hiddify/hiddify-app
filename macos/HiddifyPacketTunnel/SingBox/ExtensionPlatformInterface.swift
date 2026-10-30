@@ -161,9 +161,8 @@ final class ExtensionPlatformInterface: NSObject, LibboxPlatformInterfaceProtoco
                           term: String?, rows: Int32, cols: Int32) throws -> any LibboxShellSessionProtocol {
         throw notSupported("Shell session")
     }
-    func lookupSFTPServer() throws -> LibboxStringBox { throw notSupported("SFTP server") }
-    func readSystemSSHHostKey() throws -> LibboxStringBox { throw notSupported("System SSH host key") }
-    func useProcFS() -> Bool { false }
+    func lookupSFTPServer(_ error: NSErrorPointer) -> String { error?.pointee = notSupported("SFTP server"); return "" }
+    func readSystemSSHHostKey(_ error: NSErrorPointer) -> String { error?.pointee = notSupported("System SSH host key"); return "" }
     func usePlatformBridge() -> Bool { false }
     func createBridge(_ options: LibboxBridgeOptions?) throws -> any LibboxBridgeSessionProtocol {
         throw notSupported("Platform bridge")

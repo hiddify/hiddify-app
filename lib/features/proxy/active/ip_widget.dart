@@ -91,12 +91,16 @@ class IPCountryFlag extends HookConsumerWidget {
     required this.countryCode,
     this.organization,
     this.size = 16,
+    this.radius = 8,
     this.padding = EdgeInsets.zero,
     super.key,
   });
 
   final String? countryCode;
   final double size;
+
+  /// The flag's corner radius.
+  final double radius;
 
   final EdgeInsetsGeometry padding;
 
@@ -123,7 +127,7 @@ class IPCountryFlag extends HookConsumerWidget {
                       countryCode!.toLowerCase() == "ir" ? "ir-shir" : countryCode!,
                       size: size - 8,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8), // Rounded effect
+                        borderRadius: BorderRadius.circular(radius), // Rounded effect
                       ),
                     ),
                     if (organization != null)

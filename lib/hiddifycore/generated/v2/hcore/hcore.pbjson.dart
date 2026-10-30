@@ -84,6 +84,24 @@ final $typed_data.Uint8List setupModeDescriptor = $convert.base64Decode(
     'QQAhIYChRHUlBDX05PUk1BTF9JTlNFQ1VSRRADEhwKGEdSUENfQkFDS0dST1VORF9JTlNFQ1VS'
     'RRAE');
 
+@$core.Deprecated('Use statusDescriptor instead')
+const Status$json = {
+  '1': 'Status',
+  '2': [
+    {'1': 'READY', '2': 0},
+    {'1': 'CONNECTING', '2': 1},
+    {'1': 'RECONNECTING', '2': 2},
+    {'1': 'SEARCHING', '2': 3},
+    {'1': 'FAILED', '2': 4},
+    {'1': 'REGISTERING', '2': 5},
+  ],
+};
+
+/// Descriptor for `Status`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List statusDescriptor = $convert.base64Decode(
+    'CgZTdGF0dXMSCQoFUkVBRFkQABIOCgpDT05ORUNUSU5HEAESEAoMUkVDT05ORUNUSU5HEAISDQ'
+    'oJU0VBUkNISU5HEAMSCgoGRkFJTEVEEAQSDwoLUkVHSVNURVJJTkcQBQ==');
+
 @$core.Deprecated('Use logLevelDescriptor instead')
 const LogLevel$json = {
   '1': 'LogLevel',
@@ -296,6 +314,7 @@ const OutboundInfo$json = {
     {'1': 'upload', '3': 15, '4': 1, '5': 3, '10': 'upload'},
     {'1': 'download', '3': 16, '4': 1, '5': 3, '10': 'download'},
     {'1': 'detour', '3': 17, '4': 1, '5': 9, '10': 'detour'},
+    {'1': 'status', '3': 18, '4': 1, '5': 14, '6': '.hcore.Status', '10': 'status'},
   ],
   '8': [
     {'1': '_ipinfo'},
@@ -316,8 +335,9 @@ final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode(
     'gIIAEoCFIIaXNTZWN1cmUSHQoKaXNfdmlzaWJsZRgJIAEoCFIJaXNWaXNpYmxlEhIKBHBvcnQY'
     'CiABKA1SBHBvcnQSEgoEaG9zdBgLIAEoCVIEaG9zdBIfCgt0YWdfZGlzcGxheRgMIAEoCVIKdG'
     'FnRGlzcGxheRIWCgZ1cGxvYWQYDyABKANSBnVwbG9hZBIaCghkb3dubG9hZBgQIAEoA1IIZG93'
-    'bmxvYWQSFgoGZGV0b3VyGBEgASgJUgZkZXRvdXJCCQoHX2lwaW5mb0IVChNfZ3JvdXBfc2VsZW'
-    'N0ZWRfdGFnQh0KG19ncm91cF9zZWxlY3RlZF90YWdfZGlzcGxheQ==');
+    'bmxvYWQSFgoGZGV0b3VyGBEgASgJUgZkZXRvdXISJQoGc3RhdHVzGBIgASgOMg0uaGNvcmUuU3'
+    'RhdHVzUgZzdGF0dXNCCQoHX2lwaW5mb0IVChNfZ3JvdXBfc2VsZWN0ZWRfdGFnQh0KG19ncm91'
+    'cF9zZWxlY3RlZF90YWdfZGlzcGxheQ==');
 
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = {
@@ -368,13 +388,18 @@ const OutboundGroupList$json = {
   '1': 'OutboundGroupList',
   '2': [
     {'1': 'items', '3': 1, '4': 3, '5': 11, '6': '.hcore.OutboundGroup', '10': 'items'},
+    {'1': 'chain_hop', '3': 2, '4': 1, '5': 11, '6': '.hcore.OutboundInfo', '9': 0, '10': 'chainHop', '17': true},
+  ],
+  '8': [
+    {'1': '_chain_hop'},
   ],
 };
 
 /// Descriptor for `OutboundGroupList`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List outboundGroupListDescriptor = $convert.base64Decode(
     'ChFPdXRib3VuZEdyb3VwTGlzdBIqCgVpdGVtcxgBIAMoCzIULmhjb3JlLk91dGJvdW5kR3JvdX'
-    'BSBWl0ZW1z');
+    'BSBWl0ZW1zEjUKCWNoYWluX2hvcBgCIAEoCzITLmhjb3JlLk91dGJvdW5kSW5mb0gAUghjaGFp'
+    'bkhvcIgBAUIMCgpfY2hhaW5faG9w');
 
 @$core.Deprecated('Use warpAccountDescriptor instead')
 const WarpAccount$json = {
@@ -618,6 +643,18 @@ const LANIPResponse$json = {
 /// Descriptor for `LANIPResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List lANIPResponseDescriptor = $convert.base64Decode(
     'Cg1MQU5JUFJlc3BvbnNlEg4KAmlwGAEgASgJUgJpcA==');
+
+@$core.Deprecated('Use isAdminResponseDescriptor instead')
+const IsAdminResponse$json = {
+  '1': 'IsAdminResponse',
+  '2': [
+    {'1': 'is_admin', '3': 1, '4': 1, '5': 8, '10': 'isAdmin'},
+  ],
+};
+
+/// Descriptor for `IsAdminResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List isAdminResponseDescriptor = $convert.base64Decode(
+    'Cg9Jc0FkbWluUmVzcG9uc2USGQoIaXNfYWRtaW4YASABKAhSB2lzQWRtaW4=');
 
 @$core.Deprecated('Use adminNeededProxyDescriptor instead')
 const AdminNeededProxy$json = {

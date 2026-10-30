@@ -24,6 +24,7 @@ import com.hiddify.hiddify.MainActivity
 import com.hiddify.hiddify.R
 import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Action
+import com.hiddify.hiddify.constant.ServiceMode
 import com.hiddify.hiddify.constant.Status
 import com.hiddify.core.libbox.Libbox
 import com.hiddify.hiddify.utils.GrpcClientProvider
@@ -58,7 +59,11 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
     private var staticContentTextId = R.string.status_started
     private var screenOn = true
     private var outboundText: String? = null
-    private var lastNotification: Pair<String, String>? = null
+    private var lastNotification: Triple<String, String, String>? = null
+    private val modeLabel: String
+        get() = service.getString(
+            if (Settings.serviceMode == ServiceMode.VPN) R.string.mode_vpn else R.string.mode_proxy
+        )
     private var coreClient: CoreClient? = null
     private val clientLock = Any()
     private val refreshController = NotificationRefreshController(
@@ -155,7 +160,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         service.startForeground(
             notificationId, notificationBuilder
                 .setContentTitle(profileName.takeIf { it.isNotBlank() } ?: "Hiddify")
-                .setContentText(service.getString(contentTextId)).build()
+                .setContentText(service.getString(contentTextId)).setSubText(modeLabel).build()
         )
     }
 
@@ -185,19 +190,19 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         val content = if (Settings.dynamicNotification) {
             val uplink = previous?.let { (current.uplink_total - it.uplink_total).coerceAtLeast(0) } ?: 0L
             val downlink = previous?.let { (current.downlink_total - it.downlink_total).coerceAtLeast(0) } ?: 0L
-            "${Libbox.formatBytes(uplink)}/s ↑\t${Libbox.formatBytes(downlink)}/s ↓ \n${outbound}"
+            "$outbound  ·  ↑ ${Libbox.formatBytes(uplink)}/s  ↓ ${Libbox.formatBytes(downlink)}/s"
         } else {
             outbound
         }
         val title = current.current_profile.takeIf { it.isNotBlank() } ?: "Hiddify"
-        val rendered = title to content
+        val rendered = Triple(title, content, modeLabel)
         if (lastNotification == rendered) return
         lastNotification = rendered
         Application.notificationManager.notify(
             notificationId,
             notificationBuilder
                 .setContentTitle(title)
-                .setContentText(content).build()
+                .setContentText(content).setSubText(rendered.third).build()
         )
     }
 

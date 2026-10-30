@@ -61,7 +61,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   if (GetLastError() == ERROR_ALREADY_EXISTS)
   {
-    flutter::DartProject project(L"data");
+    // Explicit paths instead of DartProject(L"data"): the ICU table ships as
+  // data\icudtl.bin (not .dat), because antivirus sandboxes feed every *.dat in
+  // an archive to rundll32 and trip "DLL with spoofed extension" rules.
+  flutter::DartProject project(L"data\\flutter_assets", L"data\\icudtl.bin",
+                               L"data\\app.so");
     std::vector<std::string> command_line_arguments = GetCommandLineArguments();
     project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
     FlutterWindow window(project);
@@ -87,7 +91,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   // plugins.
   ::CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
-  flutter::DartProject project(L"data");
+  // Explicit paths instead of DartProject(L"data"): the ICU table ships as
+  // data\icudtl.bin (not .dat), because antivirus sandboxes feed every *.dat in
+  // an archive to rundll32 and trip "DLL with spoofed extension" rules.
+  flutter::DartProject project(L"data\\flutter_assets", L"data\\icudtl.bin",
+                               L"data\\app.so");
 
   std::vector<std::string> command_line_arguments =
       GetCommandLineArguments();
