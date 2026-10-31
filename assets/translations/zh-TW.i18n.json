@@ -112,9 +112,9 @@
       "empty": "無可用代理",
       "connectToSeeProxies": "連線後可查看代理",
       "loadFailed": "無法載入代理。點一下重試。",
-      "checkingIp": "正在檢查 IP…",
       "activeProxy": "當前代理",
       "unknownIp": "未知 IP",
+      "checkingIp": "正在檢查 IP…",
       "switchFailed": "無法切換到此代理。請重試。",
       "notResponding": "無回應",
       "noneResponding": "所有代理均無回應",
@@ -184,7 +184,12 @@
         "urlHint": "完整的設定 URL",
         "disableAutoUpdate": "關閉自動更新",
         "autoUpdateInterval": "自動更新間隔",
-        "loading": "正在新增設定檔…"
+        "loading": "正在新增設定檔…",
+        "adminPreference": "管理員權限偏好",
+        "adminPreferenceAskEachTime": "每次詢問",
+        "adminPreferencePreferAdmin": "一律使用管理員權限",
+        "adminPreferencePreferNoAdmin": "一律不使用管理員權限繼續",
+        "adminPreferenceReset": "每次詢問是否使用管理員權限"
       }
     },
     "logs": {
@@ -248,6 +253,7 @@
         "autoIpCheck": "自動檢查連線 IP",
         "dynamicNotification": "在通知中顯示速度",
         "hapticFeedback": "觸覺回饋",
+        "alwaysOnVpn": "永遠開啟 VPN",
         "actionAtClosing": "關閉視窗時",
         "autoStart": "開機自啟",
         "silentStart": "靜默啟動",
@@ -259,7 +265,9 @@
         "urlTestInterval": "URL 測試間隔",
         "clashApiPort": "Clash API 連接埠",
         "useXrayCoreWhenPossible": "盡可能使用 xray-core",
-        "useXrayCoreWhenPossibleMsg": "解析訂閱連結時使用 xray-core。重新匯入訂閱即可開啟此選項。"
+        "useXrayCoreWhenPossibleMsg": "解析訂閱連結時使用 xray-core。重新匯入訂閱即可開啟此選項。",
+        "useSystemTlsEngine": "可用時使用系統 TLS",
+        "useSystemTlsEngineMsg": "沒有 TLS 指紋的連線，會在系統 TLS 通過此裝置上的檢查後，使用 macOS、iOS 或 Windows 的 TLS；否則看起來會像 Chrome。"
       },
       "routing": {
         "title": "路由",
@@ -680,6 +688,28 @@
         "message": "路由規則決定您的流量走向。\n請僅從您信任的來源匯入。"
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "需要管理員權限",
+        "msg": "VPN 模式需要一次性的管理員權限來安裝 Hiddify 背景服務。之後無需再次授權即可連線。",
+        "connectWithAdmin": "使用管理員權限連線",
+        "waitingTitle": "正在等待管理員權限",
+        "waitingMsg": "請允許管理員權限要求以繼續。你可以停止並稍後重試。",
+        "stop": "停止"
+      },
+      "proxyNeedsAdmin": {
+        "title": "建議使用管理員權限",
+        "msg": "此設定檔中的部分設定在管理員權限下效果更好。你可以使用管理員權限執行，或不使用管理員權限繼續（這些設定將在本次連線中關閉）。",
+        "seeConfigs": "查看設定",
+        "hideConfigs": "隱藏設定",
+        "neverAskAgain": "不再為此設定檔詢問",
+        "runAsAdmin": "以管理員身份執行",
+        "continueWithoutAdmin": "不使用管理員權限繼續",
+        "elevationFailedTitle": "無法取得管理員權限",
+        "elevationFailedMsg": "管理員權限要求被拒絕或失敗。請重試，或在本次連線中不使用管理員權限繼續。",
+        "tryAgain": "重試"
+      }
+    },
     "experimentalNotice": {
       "title": "正在使用實驗性功能",
       "msg": "您已開啟了一些實驗性功能，這可能會影響連線品質並導致意外錯誤。您可以隨時在設定中變更或重設這些選項。",
@@ -756,6 +786,7 @@
     "failed": "無法連線",
     "slow": "耗時比平常更久…",
     "tapToRetry": "點擊重試",
+    "errorDetails": "錯誤詳細資料",
     "reconnect": "重新連線",
     "reconnectMsg": "正在重新連線以套用變更…"
   },

@@ -112,9 +112,9 @@
       "empty": "Kullanılabilir proxy yok",
       "connectToSeeProxies": "Proxy’leri görmek için bağlanın",
       "loadFailed": "Proxy’ler yüklenemedi. Yeniden denemek için dokunun.",
-      "checkingIp": "IP kontrol ediliyor…",
       "activeProxy": "Aktif proxy",
       "unknownIp": "Bilinmeyen IP",
+      "checkingIp": "IP kontrol ediliyor…",
       "switchFailed": "Bu proxy'ye geçilemedi. Tekrar deneyin.",
       "notResponding": "Yanıt vermiyor",
       "noneResponding": "Hiçbir proxy yanıt vermiyor",
@@ -184,7 +184,12 @@
         "urlHint": "Tam yapılandırma URL'si",
         "disableAutoUpdate": "Otomatik güncellemeyi kapat",
         "autoUpdateInterval": "Otomatik güncelleme aralığı",
-        "loading": "Profil ekleniyor…"
+        "loading": "Profil ekleniyor…",
+        "adminPreference": "Yönetici tercihi",
+        "adminPreferenceAskEachTime": "Her seferinde sor",
+        "adminPreferencePreferAdmin": "Her zaman yönetici kullan",
+        "adminPreferencePreferNoAdmin": "Her zaman yönetici olmadan devam et",
+        "adminPreferenceReset": "Yönetici izni için her seferinde sor"
       }
     },
     "logs": {
@@ -248,6 +253,7 @@
         "autoIpCheck": "Bağlantı IP'sini otomatik kontrol et",
         "dynamicNotification": "Hızı bildirimde göster",
         "hapticFeedback": "Dokunsal geri bildirim",
+        "alwaysOnVpn": "Her zaman açık VPN",
         "actionAtClosing": "Pencere kapatılırken",
         "autoStart": "Oturum açılışında başlat",
         "silentStart": "Simge durumunda başlat",
@@ -259,7 +265,9 @@
         "urlTestInterval": "URL testi aralığı",
         "clashApiPort": "Clash API portu",
         "useXrayCoreWhenPossible": "Mümkün olduğunda xray-core kullan",
-        "useXrayCoreWhenPossibleMsg": "Abonelik bağlantılarını ayrıştırırken xray-core kullanın. Bu seçeneği açmak için aboneliği yeniden içe aktarın."
+        "useXrayCoreWhenPossibleMsg": "Abonelik bağlantılarını ayrıştırırken xray-core kullanın. Bu seçeneği açmak için aboneliği yeniden içe aktarın.",
+        "useSystemTlsEngine": "Varsa sistemin TLS’ini kullan",
+        "useSystemTlsEngineMsg": "TLS parmak izi olmayan bağlantılar, bu cihazda bir denetimden geçtikten sonra macOS, iOS veya Windows’un TLS’ini kullanır; aksi hâlde Chrome gibi görünür."
       },
       "routing": {
         "title": "Yönlendirme",
@@ -680,6 +688,28 @@
         "message": "Rota kuralları trafiğinizin nereye gideceğini belirler.\nYalnızca güvendiğiniz bir kaynaktan içe aktarın."
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Yönetici izni gerekli",
+        "msg": "VPN modu, Hiddify arka plan hizmetini yüklemek için bir kerelik yönetici izni gerektirir. Bundan sonra başka bir istem olmadan bağlanabilirsiniz.",
+        "connectWithAdmin": "Yönetici izniyle bağlan",
+        "waitingTitle": "Yönetici izni bekleniyor",
+        "waitingMsg": "Devam etmek için yönetici istemini onaylayın. Durdurup daha sonra tekrar deneyebilirsiniz.",
+        "stop": "Durdur"
+      },
+      "proxyNeedsAdmin": {
+        "title": "Yönetici izni önerilir",
+        "msg": "Bu profildeki bazı ayarlar yönetici izniyle daha iyi çalışır. Yönetici izniyle çalıştırabilir veya izin olmadan devam edebilirsiniz (bu ayarlar bu bağlantı için kapatılır).",
+        "seeConfigs": "Yapılandırmaları göster",
+        "hideConfigs": "Yapılandırmaları gizle",
+        "neverAskAgain": "Bu profil için bir daha sorma",
+        "runAsAdmin": "Yönetici olarak çalıştır",
+        "continueWithoutAdmin": "Yönetici olmadan devam et",
+        "elevationFailedTitle": "Yönetici izni alınamadı",
+        "elevationFailedMsg": "Yönetici istemi reddedildi veya başarısız oldu. Tekrar deneyin veya bu bağlantı için yönetici olmadan devam edin.",
+        "tryAgain": "Tekrar dene"
+      }
+    },
     "experimentalNotice": {
       "title": "Deneysel özellikler kullanılıyor",
       "msg": "Bağlantı kalitesini etkileyebilecek ve beklenmedik hatalara neden olabilecek bazı deneysel özellikleri etkinleştirdiniz. Bu seçenekleri istediğiniz zaman Ayarlar'dan değiştirebilir veya sıfırlayabilirsiniz.",
@@ -756,6 +786,7 @@
     "failed": "Bağlanılamadı",
     "slow": "Normalden uzun sürüyor…",
     "tapToRetry": "Tekrar denemek için dokunun",
+    "errorDetails": "Hata ayrıntıları",
     "reconnect": "Yeniden bağlan",
     "reconnectMsg": "Değişiklikleri uygulamak için yeniden bağlanılıyor…"
   },

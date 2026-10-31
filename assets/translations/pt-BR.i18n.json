@@ -112,9 +112,9 @@
       "empty": "Nenhum proxy disponível",
       "connectToSeeProxies": "Conecte-se para ver os proxies",
       "loadFailed": "Não foi possível carregar os proxies. Toque para tentar novamente.",
-      "checkingIp": "Verificando IP…",
       "activeProxy": "Proxy ativo",
       "unknownIp": "IP desconhecido",
+      "checkingIp": "Verificando IP…",
       "switchFailed": "Não foi possível mudar para este proxy. Tente de novo.",
       "notResponding": "Não está respondendo",
       "noneResponding": "Nenhum proxy está respondendo",
@@ -185,7 +185,12 @@
         "urlHint": "URL de configuração completa",
         "disableAutoUpdate": "Desativar atualização automática",
         "autoUpdateInterval": "Intervalo de atualização automática",
-        "loading": "Adicionando perfil…"
+        "loading": "Adicionando perfil…",
+        "adminPreference": "Preferência de administrador",
+        "adminPreferenceAskEachTime": "Perguntar sempre",
+        "adminPreferencePreferAdmin": "Sempre usar administrador",
+        "adminPreferencePreferNoAdmin": "Sempre continuar sem administrador",
+        "adminPreferenceReset": "Perguntar sempre sobre a permissão de administrador"
       }
     },
     "logs": {
@@ -249,6 +254,7 @@
         "autoIpCheck": "Verificar IP da conexão automaticamente",
         "dynamicNotification": "Exibir velocidade na notificação",
         "hapticFeedback": "Feedback tátil",
+        "alwaysOnVpn": "VPN sempre ativa",
         "actionAtClosing": "Ao fechar a janela",
         "autoStart": "Iniciar com o sistema",
         "silentStart": "Iniciar minimizado",
@@ -260,7 +266,9 @@
         "urlTestInterval": "Intervalo de teste de URL",
         "clashApiPort": "Porta da API do Clash",
         "useXrayCoreWhenPossible": "Usar xray-core quando possível",
-        "useXrayCoreWhenPossibleMsg": "Use o xray-core ao analisar links de assinatura. Reimporte a assinatura para ativar esta opção."
+        "useXrayCoreWhenPossibleMsg": "Use o xray-core ao analisar links de assinatura. Reimporte a assinatura para ativar esta opção.",
+        "useSystemTlsEngine": "Usar o TLS do sistema quando disponível",
+        "useSystemTlsEngineMsg": "As conexões sem impressão digital TLS usam o TLS do macOS, iOS ou Windows depois que ele passa em uma verificação neste dispositivo; caso contrário, elas se parecem com o Chrome."
       },
       "routing": {
         "title": "Roteamento",
@@ -682,6 +690,28 @@
         "message": "As regras de roteamento decidem por onde o seu tráfego passa.\nSó importe de uma fonte em que você confia."
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Permissão de administrador necessária",
+        "msg": "O modo VPN precisa de uma permissão de administrador única para instalar o serviço em segundo plano do Hiddify. Depois disso, você pode se conectar sem outra solicitação.",
+        "connectWithAdmin": "Conectar com permissão de administrador",
+        "waitingTitle": "Aguardando permissão de administrador",
+        "waitingMsg": "Aceite a solicitação de administrador para continuar. Você pode parar e tentar de novo mais tarde.",
+        "stop": "Parar"
+      },
+      "proxyNeedsAdmin": {
+        "title": "Permissão de administrador recomendada",
+        "msg": "Algumas configurações deste perfil funcionam melhor com permissão de administrador. Você pode executar com permissão de administrador ou continuar sem ela (essas configurações serão desativadas para esta conexão).",
+        "seeConfigs": "Ver configurações",
+        "hideConfigs": "Ocultar configurações",
+        "neverAskAgain": "Não perguntar de novo para este perfil",
+        "runAsAdmin": "Executar como administrador",
+        "continueWithoutAdmin": "Continuar sem administrador",
+        "elevationFailedTitle": "Não foi possível obter a permissão de administrador",
+        "elevationFailedMsg": "A solicitação de administrador foi negada ou falhou. Tente de novo ou continue sem administrador para esta conexão.",
+        "tryAgain": "Tentar de novo"
+      }
+    },
     "experimentalNotice": {
       "title": "Recursos experimentais em uso",
       "msg": "Você ativou alguns recursos experimentais que podem afetar a qualidade da conexão e causar erros inesperados. Você sempre pode alterar ou redefinir essas opções nas Configurações.",
@@ -758,6 +788,7 @@
     "failed": "Não foi possível conectar",
     "slow": "Está demorando mais que o normal…",
     "tapToRetry": "Toque para tentar de novo",
+    "errorDetails": "Detalhes do erro",
     "reconnect": "Reconectar",
     "reconnectMsg": "Reconectando para aplicar as alterações…"
   },

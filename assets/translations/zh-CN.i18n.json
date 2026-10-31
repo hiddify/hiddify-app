@@ -112,9 +112,9 @@
       "empty": "无可用代理",
       "connectToSeeProxies": "连接后可查看代理",
       "loadFailed": "无法加载代理。点按重试。",
-      "checkingIp": "正在检查 IP…",
       "activeProxy": "当前代理",
       "unknownIp": "未知 IP",
+      "checkingIp": "正在检查 IP…",
       "switchFailed": "无法切换到此代理。请重试。",
       "notResponding": "无响应",
       "noneResponding": "所有代理均无响应",
@@ -184,7 +184,12 @@
         "urlHint": "完整的配置 URL",
         "disableAutoUpdate": "关闭自动更新",
         "autoUpdateInterval": "自动更新间隔",
-        "loading": "正在添加配置文件…"
+        "loading": "正在添加配置文件…",
+        "adminPreference": "管理员权限偏好",
+        "adminPreferenceAskEachTime": "每次询问",
+        "adminPreferencePreferAdmin": "始终使用管理员权限",
+        "adminPreferencePreferNoAdmin": "始终不使用管理员权限继续",
+        "adminPreferenceReset": "每次询问是否使用管理员权限"
       }
     },
     "logs": {
@@ -248,6 +253,7 @@
         "autoIpCheck": "自动检查连接 IP",
         "dynamicNotification": "在通知中显示速度",
         "hapticFeedback": "触觉反馈",
+        "alwaysOnVpn": "始终开启 VPN",
         "actionAtClosing": "关闭窗口时",
         "autoStart": "开机自启",
         "silentStart": "静默启动",
@@ -259,7 +265,9 @@
         "urlTestInterval": "URL 测试间隔",
         "clashApiPort": "Clash API 端口",
         "useXrayCoreWhenPossible": "尽可能使用 xray-core",
-        "useXrayCoreWhenPossibleMsg": "解析订阅链接时使用 xray-core。重新导入订阅即可开启此选项。"
+        "useXrayCoreWhenPossibleMsg": "解析订阅链接时使用 xray-core。重新导入订阅即可开启此选项。",
+        "useSystemTlsEngine": "可用时使用系统 TLS",
+        "useSystemTlsEngineMsg": "没有 TLS 指纹的连接，会在系统 TLS 通过本设备上的检查后，使用 macOS、iOS 或 Windows 的 TLS；否则看起来像 Chrome。"
       },
       "routing": {
         "title": "路由",
@@ -680,6 +688,28 @@
         "message": "路由规则决定您的流量走向。\n请仅从您信任的来源导入。"
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "需要管理员权限",
+        "msg": "VPN 模式需要一次性的管理员权限来安装 Hiddify 后台服务。之后无需再次授权即可连接。",
+        "connectWithAdmin": "使用管理员权限连接",
+        "waitingTitle": "正在等待管理员权限",
+        "waitingMsg": "请允许管理员权限请求以继续。你可以停止并稍后重试。",
+        "stop": "停止"
+      },
+      "proxyNeedsAdmin": {
+        "title": "建议使用管理员权限",
+        "msg": "此配置文件中的部分设置在管理员权限下效果更好。你可以使用管理员权限运行，或不使用管理员权限继续（这些设置将在本次连接中关闭）。",
+        "seeConfigs": "查看配置",
+        "hideConfigs": "隐藏配置",
+        "neverAskAgain": "不再为此配置文件询问",
+        "runAsAdmin": "以管理员身份运行",
+        "continueWithoutAdmin": "不使用管理员权限继续",
+        "elevationFailedTitle": "无法获取管理员权限",
+        "elevationFailedMsg": "管理员权限请求被拒绝或失败。请重试，或在本次连接中不使用管理员权限继续。",
+        "tryAgain": "重试"
+      }
+    },
     "experimentalNotice": {
       "title": "正在使用实验性功能",
       "msg": "您已开启了一些实验性功能，这可能会影响连接质量并导致意外错误。您可以随时在设置中更改或重置这些选项。",
@@ -756,6 +786,7 @@
     "failed": "无法连接",
     "slow": "耗时比平时更长…",
     "tapToRetry": "点击重试",
+    "errorDetails": "错误详情",
     "reconnect": "重新连接",
     "reconnectMsg": "正在重新连接以应用更改…"
   },

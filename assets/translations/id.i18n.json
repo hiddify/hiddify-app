@@ -112,9 +112,9 @@
       "empty": "Tidak ada proxy yang tersedia",
       "connectToSeeProxies": "Sambungkan untuk melihat proksi",
       "loadFailed": "Tidak dapat memuat proksi. Ketuk untuk mencoba lagi.",
-      "checkingIp": "Memeriksa IP…",
       "activeProxy": "Proxy aktif",
       "unknownIp": "IP tidak dikenal",
+      "checkingIp": "Memeriksa IP…",
       "switchFailed": "Tidak dapat beralih ke proxy ini. Coba lagi.",
       "notResponding": "Tidak merespons",
       "noneResponding": "Tidak ada proxy yang merespons",
@@ -184,7 +184,12 @@
         "urlHint": "URL konfigurasi lengkap",
         "disableAutoUpdate": "Nonaktifkan pembaruan otomatis",
         "autoUpdateInterval": "Interval pembaruan otomatis",
-        "loading": "Menambahkan profil…"
+        "loading": "Menambahkan profil…",
+        "adminPreference": "Preferensi administrator",
+        "adminPreferenceAskEachTime": "Tanya setiap kali",
+        "adminPreferencePreferAdmin": "Selalu gunakan admin",
+        "adminPreferencePreferNoAdmin": "Selalu lanjutkan tanpa admin",
+        "adminPreferenceReset": "Tanya setiap kali soal izin administrator"
       }
     },
     "logs": {
@@ -248,6 +253,7 @@
         "autoIpCheck": "Periksa IP koneksi secara otomatis",
         "dynamicNotification": "Tampilkan kecepatan di notifikasi",
         "hapticFeedback": "Umpan balik haptik",
+        "alwaysOnVpn": "VPN selalu aktif",
         "actionAtClosing": "Saat menutup jendela",
         "autoStart": "Mulai saat masuk",
         "silentStart": "Mulai diminimalkan",
@@ -259,7 +265,9 @@
         "urlTestInterval": "Interval uji URL",
         "clashApiPort": "Port API Clash",
         "useXrayCoreWhenPossible": "Gunakan xray-core jika memungkinkan",
-        "useXrayCoreWhenPossibleMsg": "Gunakan xray-core saat mengurai tautan langganan. Impor ulang langganan untuk mengaktifkan opsi ini."
+        "useXrayCoreWhenPossibleMsg": "Gunakan xray-core saat mengurai tautan langganan. Impor ulang langganan untuk mengaktifkan opsi ini.",
+        "useSystemTlsEngine": "Gunakan TLS sistem jika tersedia",
+        "useSystemTlsEngineMsg": "Koneksi tanpa sidik jari TLS menggunakan TLS macOS, iOS, atau Windows setelah lolos pemeriksaan di perangkat ini; jika tidak, koneksi akan terlihat seperti Chrome."
       },
       "routing": {
         "title": "Perutean",
@@ -680,6 +688,28 @@
         "message": "Aturan rute menentukan ke mana lalu lintas Anda pergi.\nHanya impor dari sumber yang Anda percayai."
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Izin administrator diperlukan",
+        "msg": "Mode VPN memerlukan izin administrator satu kali untuk memasang layanan latar belakang Hiddify. Setelah itu, Anda dapat terhubung tanpa permintaan lagi.",
+        "connectWithAdmin": "Hubungkan dengan izin admin",
+        "waitingTitle": "Menunggu izin administrator",
+        "waitingMsg": "Izinkan permintaan administrator untuk melanjutkan. Anda dapat berhenti dan mencoba lagi nanti.",
+        "stop": "Berhenti"
+      },
+      "proxyNeedsAdmin": {
+        "title": "Izin administrator disarankan",
+        "msg": "Beberapa pengaturan di profil ini bekerja lebih baik dengan izin administrator. Anda dapat menjalankan dengan izin admin, atau melanjutkan tanpanya (pengaturan tersebut akan dimatikan untuk koneksi ini).",
+        "seeConfigs": "Lihat konfigurasi",
+        "hideConfigs": "Sembunyikan konfigurasi",
+        "neverAskAgain": "Jangan tanya lagi untuk profil ini",
+        "runAsAdmin": "Jalankan sebagai admin",
+        "continueWithoutAdmin": "Lanjutkan tanpa admin",
+        "elevationFailedTitle": "Tidak dapat memperoleh izin administrator",
+        "elevationFailedMsg": "Permintaan administrator ditolak atau gagal. Coba lagi, atau lanjutkan tanpa admin untuk koneksi ini.",
+        "tryAgain": "Coba lagi"
+      }
+    },
     "experimentalNotice": {
       "title": "Fitur eksperimental sedang digunakan",
       "msg": "Anda telah mengaktifkan beberapa fitur eksperimental yang mungkin memengaruhi kualitas koneksi dan menyebabkan kesalahan tak terduga. Anda selalu dapat mengubah atau menyetel ulang opsi ini di Pengaturan.",
@@ -756,6 +786,7 @@
     "failed": "Tidak dapat tersambung",
     "slow": "Memakan waktu lebih lama dari biasanya…",
     "tapToRetry": "Ketuk untuk mencoba lagi",
+    "errorDetails": "Detail kesalahan",
     "reconnect": "Sambungkan kembali",
     "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan…"
   },
