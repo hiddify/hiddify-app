@@ -15,6 +15,7 @@ import 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper_stub.d
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
+import 'package:hiddify/hiddifycore/grpc_stream_cancel.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
@@ -440,7 +441,10 @@ class HiddifyCoreService with InfraLogger {
       return;
     }
     try {
-      yield* core.bgClient.outboundsInfo(Empty()).map((event) => event.items.isEmpty ? null : event.items.first);
+      yield* core.bgClient
+          .outboundsInfo(Empty())
+          .cancelOnUnsubscribe
+          .map((event) => event.items.isEmpty ? null : event.items.first);
     } catch (e) {
       loggy.error("error watching group: $e");
       rethrow;
@@ -460,7 +464,11 @@ class HiddifyCoreService with InfraLogger {
     }
 
     try {
-      yield* core.bgClient.mainOutboundsInfo(Empty()).map((event) => latest = event).startWith(latest);
+      yield* core.bgClient
+          .mainOutboundsInfo(Empty())
+          .cancelOnUnsubscribe
+          .map((event) => latest = event)
+          .startWith(latest);
     } catch (e) {
       loggy.error("error watching active groups: $e");
       rethrow;
@@ -470,10 +478,10 @@ class HiddifyCoreService with InfraLogger {
   //
   // Stream<SingboxStatus> watchStatus() => _status;
 
-  ResponseStream<SystemInfo> watchStats() {
+  Stream<SystemInfo> watchStats() {
     loggy.debug("watching stats");
     try {
-      return core.bgClient.getSystemInfoStream(Empty());
+      return core.bgClient.getSystemInfoStream(Empty()).cancelOnUnsubscribe;
     } catch (e) {
       loggy.error("error watching stats: $e");
       rethrow;
@@ -577,6 +585,7 @@ class HiddifyCoreService with InfraLogger {
       "${key}StatusListener",
       () => cc
           .coreInfoListener(Empty(), options: grpcOptions)
+          .cancelOnUnsubscribe
           .doOnCancel(() => loggy.debug("status listener cancelled"))
           .doOnData((event) => loggy.debug("status", event))
           .doOnDone(() => loggy.debug("status stream ended"))
@@ -625,6 +634,7 @@ class HiddifyCoreService with InfraLogger {
 
     _coreInfoSubscription = subscription = core.bgClient
         .coreInfoListener(Empty(), options: grpcOptions)
+        .cancelOnUnsubscribe
         .listen(
           (event) {
             if (_platformStatus is! CoreStarted) return;
@@ -658,9 +668,14 @@ class HiddifyCoreService with InfraLogger {
     final logLevel = ref.read(ConfigOptions.logLevel);
     final coreLogLevel = getCoreLogLevel(logLevel);
     final listenKey = "${key}LogListener";
-    // await stopListenSingle(listenKey);
+    // In macOS proxy mode the background client is the foreground one; a second listener on it
+    // only received and logged every core line twice.
+    if (key == "bg" && identical(cc, core.fgClient)) {
+      await stopListenSingle(listenKey);
+      return;
+    }
     await listenSingle<LogMessage>(listenKey, () {
-      return cc.logListener(LogRequest(level: coreLogLevel), options: grpcOptions).map((event) {
+      return cc.logListener(LogRequest(level: coreLogLevel), options: grpcOptions).cancelOnUnsubscribe.map((event) {
         // Handle incoming event
         // One message becomes one record. The old code split on newlines
         // first, but the engine already sends one line per message, so the

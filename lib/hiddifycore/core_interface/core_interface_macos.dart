@@ -11,6 +11,7 @@ import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/adminbgservice/admin_bg_service.pbgrpc.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
+import 'package:hiddify/hiddifycore/grpc_stream_cancel.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
@@ -92,6 +93,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
     );
     _foregroundSubscription = fgClient
         .coreInfoListener(Empty())
+        .cancelOnUnsubscribe
         .listen(
           (event) {
             if (!_usingVPN) {
@@ -382,7 +384,9 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
       if (quiet) {
         // Keep the channel for the immediate reconnect; detach only (bgClient already fg).
         final fgSw = Stopwatch()..start();
-        _checkResponse(await fgClient.stop(Empty()), allowStopped: true);
+        // Bounded like the stop below: connect waits on this, and a core that does not answer
+        // must end in an error, not in "connecting" forever.
+        _checkResponse(await fgClient.stop(Empty()).timeout(const Duration(seconds: 5)), allowStopped: true);
         loggy.warning(
           'macOS stop: quiet fg stop in ${fgSw.elapsedMilliseconds}ms; total ${total.elapsedMilliseconds}ms',
         );
