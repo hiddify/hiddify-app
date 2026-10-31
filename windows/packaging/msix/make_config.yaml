@@ -1,4 +1,5 @@
-display_name: Hiddify
+# Must equal a name reserved for the product in Partner Center (Product identity).
+display_name: Hiddify ProxyVPN
 publisher_display_name: Hiddify
 identity_name: Hiddify.App.Win
 msix_version: 5.2.1.0

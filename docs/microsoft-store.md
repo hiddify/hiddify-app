@@ -53,6 +53,7 @@ Product identity**, or the Store rejects the upload:
 | --- | --- |
 | Package/Identity/Name: `Hiddify.App.Win` | `identity_name` |
 | Package/Identity/Publisher | `publisher` (also the Subject of the signing certificate) |
+| Reserved app name: `Hiddify ProxyVPN` | `display_name` (Package/Properties/DisplayName) |
 
 The auto-start code in `lib/features/auto_start/notifier/auto_start_notifier.dart`
 uses the same name. Copy the product's **Store ID** (12 characters, starts with
