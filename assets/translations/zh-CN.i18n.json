@@ -116,6 +116,9 @@
       "activeProxy": "当前代理",
       "unknownIp": "未知 IP",
       "switchFailed": "无法切换到此代理。请重试。",
+      "notResponding": "无响应",
+      "noneResponding": "所有代理均无响应",
+      "switchTo": "切换到 ${name}",
       "sortOptions": {
         "unsorted": "默认",
         "name": "按名称",
@@ -751,6 +754,7 @@
     "disconnect": "断开连接",
     "disconnecting": "断开连接中…",
     "failed": "无法连接",
+    "slow": "耗时比平时更长…",
     "tapToRetry": "点击重试",
     "reconnect": "重新连接",
     "reconnectMsg": "正在重新连接以应用更改…"

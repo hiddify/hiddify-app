@@ -116,6 +116,9 @@
       "activeProxy": "當前代理",
       "unknownIp": "未知 IP",
       "switchFailed": "無法切換到此代理。請重試。",
+      "notResponding": "無回應",
+      "noneResponding": "所有代理均無回應",
+      "switchTo": "切換到 ${name}",
       "sortOptions": {
         "unsorted": "預設",
         "name": "按名稱",
@@ -751,6 +754,7 @@
     "disconnect": "中斷連線",
     "disconnecting": "中斷連線中…",
     "failed": "無法連線",
+    "slow": "耗時比平常更久…",
     "tapToRetry": "點擊重試",
     "reconnect": "重新連線",
     "reconnectMsg": "正在重新連線以套用變更…"

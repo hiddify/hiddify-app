@@ -116,6 +116,9 @@
       "activeProxy": "Aktif proxy",
       "unknownIp": "Bilinmeyen IP",
       "switchFailed": "Bu proxy'ye geçilemedi. Tekrar deneyin.",
+      "notResponding": "Yanıt vermiyor",
+      "noneResponding": "Hiçbir proxy yanıt vermiyor",
+      "switchTo": "${name} grubuna geç",
       "sortOptions": {
         "unsorted": "Varsayılan",
         "name": "Alfabetik",
@@ -751,6 +754,7 @@
     "disconnect": "Bağlantıyı kes",
     "disconnecting": "Bağlantı kesiliyor…",
     "failed": "Bağlanılamadı",
+    "slow": "Normalden uzun sürüyor…",
     "tapToRetry": "Tekrar denemek için dokunun",
     "reconnect": "Yeniden bağlan",
     "reconnectMsg": "Değişiklikleri uygulamak için yeniden bağlanılıyor…"

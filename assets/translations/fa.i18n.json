@@ -116,6 +116,9 @@
       "unknownIp": "IP ناشناخته",
       "checkingIp": "در حال بررسی IP…",
       "switchFailed": "تغییر به این پروکسی ممکن نشد. دوباره تلاش کنید.",
+      "notResponding": "پاسخ نمی‌دهد",
+      "noneResponding": "هیچ پروکسی‌ای پاسخ نمی‌دهد",
+      "switchTo": "تغییر به ${name}",
       "sortOptions": {
         "unsorted": "پیش‌فرض",
         "name": "بر اساس نام",
@@ -800,6 +803,7 @@
     "disconnect": "قطع اتصال",
     "disconnecting": "در حال قطع اتصال…",
     "failed": "اتصال برقرار نشد",
+    "slow": "بیشتر از معمول طول می‌کشد…",
     "tapToRetry": "برای تلاش دوباره ضربه بزنید",
     "errorDetails": "جزئیات خطا",
     "reconnect": "اتصال مجدد",

@@ -116,6 +116,9 @@
       "activeProxy": "Proxy aktif",
       "unknownIp": "IP tidak dikenal",
       "switchFailed": "Tidak dapat beralih ke proxy ini. Coba lagi.",
+      "notResponding": "Tidak merespons",
+      "noneResponding": "Tidak ada proxy yang merespons",
+      "switchTo": "Beralih ke ${name}",
       "sortOptions": {
         "unsorted": "Default",
         "name": "Berdasarkan abjad",
@@ -751,6 +754,7 @@
     "disconnect": "Putuskan",
     "disconnecting": "Memutuskan…",
     "failed": "Tidak dapat tersambung",
+    "slow": "Memakan waktu lebih lama dari biasanya…",
     "tapToRetry": "Ketuk untuk mencoba lagi",
     "reconnect": "Sambungkan kembali",
     "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan…"

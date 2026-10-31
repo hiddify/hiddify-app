@@ -116,6 +116,9 @@
       "activeProxy": "Proxy ativo",
       "unknownIp": "IP desconhecido",
       "switchFailed": "Não foi possível mudar para este proxy. Tente de novo.",
+      "notResponding": "Não está respondendo",
+      "noneResponding": "Nenhum proxy está respondendo",
+      "switchTo": "Mudar para ${name}",
       "sortOptions": {
         "unsorted": "Padrão",
         "name": "Alfabeticamente",
@@ -753,6 +756,7 @@
     "disconnect": "Desconectar",
     "disconnecting": "Desconectando…",
     "failed": "Não foi possível conectar",
+    "slow": "Está demorando mais que o normal…",
     "tapToRetry": "Toque para tentar de novo",
     "reconnect": "Reconectar",
     "reconnectMsg": "Reconectando para aplicar as alterações…"

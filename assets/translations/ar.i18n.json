@@ -122,6 +122,9 @@
       "activeProxy": "البروكسي النشط",
       "unknownIp": "IP غير معروف",
       "switchFailed": "تعذّر التبديل إلى هذا البروكسي. أعد المحاولة.",
+      "notResponding": "لا يستجيب",
+      "noneResponding": "لا يستجيب أي بروكسي",
+      "switchTo": "التبديل إلى ${name}",
       "sortOptions": {
         "unsorted": "الافتراضي",
         "name": "أبجديًا",
@@ -788,6 +791,7 @@
     "disconnect": "قطع الاتصال",
     "disconnecting": "جاري قطع الاتصال…",
     "failed": "تعذّر الاتصال",
+    "slow": "يستغرق وقتًا أطول من المعتاد…",
     "tapToRetry": "انقر لإعادة المحاولة",
     "reconnect": "إعادة الاتصال",
     "reconnectMsg": "جاري إعادة الاتصال لتطبيق التغييرات…"
