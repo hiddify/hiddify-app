@@ -116,6 +116,9 @@
       "unknownIp": "Unknown IP",
       "checkingIp": "Checking IP…",
       "switchFailed": "Couldn’t switch to this proxy. Try again.",
+      "notResponding": "Not responding",
+      "noneResponding": "No proxy is responding",
+      "switchTo": "Switch to ${name}",
       "sortOptions": {
         "unsorted": "Default",
         "name": "Alphabetically",
@@ -800,6 +803,7 @@
     "disconnect": "Disconnect",
     "disconnecting": "Disconnecting…",
     "failed": "Couldn't connect",
+    "slow": "Taking longer than usual…",
     "tapToRetry": "Tap to try again",
     "errorDetails": "Error details",
     "reconnect": "Reconnect",
