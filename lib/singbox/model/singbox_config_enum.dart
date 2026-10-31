@@ -145,9 +145,16 @@ enum ChainStatus {
 @JsonEnum(valueField: 'key')
 enum ChainMode {
   psiphon('psiphon'),
-  // WARP races WireGuard, AmneziaWG and MASQUE in the core and keeps the fastest. The core's own
-  // "warp" is WireGuard only, so this sends "warp_auto".
-  warp('warp_auto'),
+  // WARP over WireGuard, the classic endpoint. Named warpWireGuard, not warp: a stored "warp"
+  // predates the split and meant "race every tunnel", so it falls through to the caller's
+  // fallback (warpAuto) instead of silently becoming WireGuard.
+  warpWireGuard('warp'),
+  // WARP over MASQUE: HTTP/2 by default, which survives a line that drops WireGuard's UDP.
+  warpMasque('warp_masque'),
+  // WARP over AmneziaWG: WireGuard with the junk packets that get past a DPI fingerprint.
+  warpAwg('warp_awg'),
+  // WARP races WireGuard, AmneziaWG and MASQUE in the core and keeps the fastest.
+  warpAuto('warp_auto'),
   profile('profile');
 
   const ChainMode(this.key);
@@ -156,7 +163,10 @@ enum ChainMode {
 
   // Modes offered in the UI. Using another profile as a chain hop is not supported by the core
   // yet (it refuses "profile"), so it is hidden until then.
-  static const selectable = [psiphon, warp];
+  static const selectable = [psiphon, warpWireGuard, warpMasque, warpAwg, warpAuto];
+
+  // Every WARP mode.
+  static const warpModes = [warpWireGuard, warpMasque, warpAwg, warpAuto];
 
   // A stored mode that is no longer selectable falls back to [fallback].
   static ChainMode fromStored(String name, ChainMode fallback) {
@@ -164,27 +174,67 @@ enum ChainMode {
     return mode != null && selectable.contains(mode) ? mode : fallback;
   }
 
+  // A subscription link says "warp" for any WARP hop. That used to mean "race every tunnel", and
+  // still does: a link that wants one tunnel names it, e.g. "warp_masque". Null when the link
+  // names a mode this app does not know.
+  static ChainMode? tryFromLink(String value) {
+    final name = value.trim().toLowerCase();
+    if (name.isEmpty) return null;
+    if (name == 'warp') return warpAuto;
+    for (final mode in ChainMode.values) {
+      if (mode.isProfile()) continue;
+      if (mode.key == name) return mode;
+    }
+    return null;
+  }
+
   String present(Translations t) => switch (this) {
     psiphon => t.common.psiphon,
-    warp => t.common.warp,
+    warpWireGuard => t.pages.settings.chain.warp.modes.wireguard,
+    warpMasque => t.pages.settings.chain.warp.modes.masque,
+    warpAwg => t.pages.settings.chain.warp.modes.awg,
+    warpAuto => t.pages.settings.chain.warp.modes.auto,
     profile => t.common.profile,
   };
 
   IconData icon() => switch (this) {
     psiphon => Icons.local_parking,
-    warp => Icons.cloud,
     profile => Icons.link,
+    _ => Icons.cloud,
   };
 
   Color color() => switch (this) {
     psiphon => ChainConst.psiphonColor,
-    warp => ChainConst.warpColor,
     profile => ChainConst.profileColor,
+    _ => ChainConst.warpColor,
   };
 
   bool isPsiphon() => this == psiphon;
-  bool isWarp() => this == warp;
+  bool isWarp() => warpModes.contains(this);
   bool isProfile() => this == profile;
+}
+
+@JsonEnum(valueField: 'key')
+enum WarpEndpointSource {
+  // The endpoint Cloudflare assigned to the device.
+  profile('profile'),
+  // Found by the scanner, which remembers what answered on this network.
+  scan('scan'),
+  // The address the user typed.
+  custom('custom');
+
+  const WarpEndpointSource(this.key);
+
+  final String key;
+
+  static const selectable = [profile, scan, custom];
+
+  static WarpEndpointSource fromStored(String name, WarpEndpointSource fallback) =>
+      WarpEndpointSource.values.asNameMap()[name] ?? fallback;
+
+  bool isProfile() => this == profile;
+  bool isScan() => this == scan;
+  bool isCustom() => this == custom;
 }
 
 @JsonEnum(valueField: 'key')
