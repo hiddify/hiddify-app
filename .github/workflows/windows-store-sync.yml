@@ -1,0 +1,108 @@
+# Replaces the CI-signed MSIX of a GitHub release with the Store-signed one once the
+# Microsoft Store has certified and published the version uploaded by hand in
+# Partner Center. The CI certificate is not trusted on user machines; the Store
+# signature is. The replaced asset gets the label below, which marks it as done. See docs/microsoft-store.md.
+name: Windows Store Sync
+
+on:
+  schedule:
+    - cron: '23 */4 * * *'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (default: newest prod release whose MSIX is not Store-signed yet)'
+        required: false
+        type: string
+
+concurrency:
+  group: windows-store-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: ${{ vars.MSSTORE_PRODUCT_ID != '' }}
+    runs-on: windows-latest
+    outputs:
+      tag: ${{ steps.target.outputs.tag }}
+      uploaded: ${{ steps.attach.outputs.uploaded }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MSSTORE_PRODUCT_ID: ${{ vars.MSSTORE_PRODUCT_ID }}
+      MSIX_NAME: Hiddify-Windows-Setup-x64.Msix
+      MSIX_LABEL: Hiddify-Windows-Setup-x64.Msix (Store-signed)
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Pick the release waiting for its Store-signed MSIX
+        id: target
+        shell: pwsh
+        run: |
+          $tag = '${{ inputs.tag }}'
+          if (-not $tag) {
+            # Newest prod (non-dev) release whose MSIX is not the Store-signed one yet.
+            # Older ones are skipped: the Store only serves the version that is live now.
+            $releases = gh release list --limit 15 --exclude-drafts --json tagName,createdAt | ConvertFrom-Json
+            $latest = $releases | Where-Object { $_.tagName -match '^v\d+\.\d+\.\d+' -and $_.tagName -notmatch 'dev$' } |
+              Sort-Object createdAt -Descending | Select-Object -First 1
+            if ($latest) {
+              $msix = (gh api "repos/${{ github.repository }}/releases/tags/$($latest.tagName)" | ConvertFrom-Json).assets |
+                Where-Object { $_.name -eq $env:MSIX_NAME }
+              if (-not $msix -or $msix.label -ne $env:MSIX_LABEL) { $tag = $latest.tagName }
+            }
+          }
+          if (-not $tag) { "Nothing to do: the newest prod release already has the Store-signed MSIX."; exit 0 }
+          # The Store version is msix_version from the packaging config at that tag.
+          $config = git show "${tag}:windows/packaging/msix/make_config.yaml"
+          $version = ([regex]::Match(($config -join "`n"), '(?m)^msix_version:\s*"?([0-9.]+)')).Groups[1].Value
+          if (-not $version) { throw "No msix_version in make_config.yaml at $tag" }
+          "Release $tag waits for Store version $version"
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Download the Store-signed MSIX
+        id: fetch
+        if: steps.target.outputs.tag != ''
+        shell: pwsh
+        run: |
+          & ./windows/scripts/fetch_store_msix.ps1 -ProductId $env:MSSTORE_PRODUCT_ID `
+            -Version '${{ steps.target.outputs.version }}' -OutDir store -OutName $env:MSIX_NAME
+          if ($LASTEXITCODE -eq 3) {
+            "::notice::Store does not serve ${{ steps.target.outputs.version }} yet (certification or publishing in progress). Next scheduled run tries again."
+            "ready=false" >> $env:GITHUB_OUTPUT
+            exit 0
+          }
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          "ready=true" >> $env:GITHUB_OUTPUT
+
+      - name: Replace the release MSIX and refresh the download table
+        id: attach
+        if: steps.fetch.outputs.ready == 'true'
+        shell: pwsh
+        run: |
+          $tag = '${{ steps.target.outputs.tag }}'
+          # "file#label" sets the display label that marks the asset as Store-signed.
+          gh release upload $tag "store/$($env:MSIX_NAME)#$($env:MSIX_LABEL)" --clobber
+          if ($LASTEXITCODE) { throw 'gh release upload failed' }
+          gh api "repos/${{ github.repository }}/releases/tags/$tag" > release.json
+          gh release view $tag --json body -q .body > body.md
+          python .github/scripts/prepare_release_notes.py body.md --release-json release.json $tag
+          if ($LASTEXITCODE) { throw 'prepare_release_notes.py failed' }
+          gh release edit $tag --notes-file body.md
+          "uploaded=true" >> $env:GITHUB_OUTPUT
+          "### CI-signed MSIX of $tag replaced by the Store-signed one" >> $env:GITHUB_STEP_SUMMARY
+
+  virustotal:
+    needs: [sync]
+    if: ${{ needs.sync.outputs.uploaded == 'true' }}
+    uses: ./.github/workflows/virustotal_scan.yml
+    secrets: inherit
+    permissions:
+      contents: write
+    with:
+      release_tag: ${{ needs.sync.outputs.tag }}
+      asset_pattern: 'Hiddify-*.Msix'

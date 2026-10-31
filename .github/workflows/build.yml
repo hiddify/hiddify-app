@@ -634,6 +634,8 @@ jobs:
           ls -R ./.github/
           ls -R ./.git/
           mv out/hiddify-android-market.aab  hiddify-android-market.aab
+          # The MSIX ships CI-signed; windows-store-sync.yml replaces it with the
+          # Store-signed copy once the version uploaded in Partner Center is live.
 
       - name: prepare_release_message
         run: |

@@ -28,6 +28,10 @@ VersionInfoProductName={{DISPLAY_NAME}}
 VersionInfoTextVersion={{APP_VERSION}}
 VersionInfoCopyright=Copyright (C) {{PUBLISHER_NAME}}
 AppCopyright=Copyright (C) {{PUBLISHER_NAME}}
+; Settings > Apps / Add or Remove Programs entry: plain name + the app icon
+; (Store policy 10.2.7 rejects a blank or unrelated name or publisher).
+UninstallDisplayName={{DISPLAY_NAME}}
+UninstallDisplayIcon={app}\{{EXECUTABLE_NAME}}
 ; CI (windows/scripts/configure_windows_signing.ps1) registers the "hiddifysign"
 ; Sign Tool and sets HIDDIFY_INNO_SIGNTOOL, so the compiler signs Setup.exe *and*
 ; unins000.exe. An unsigned uninstaller dropped into Program Files is one of the

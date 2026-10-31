@@ -3,8 +3,13 @@
 
 Usage:
   prepare_release_notes.py <release.md> <assets-dir> [tag]
+  prepare_release_notes.py <body.md> --release-json <release.json> <tag>
 
-Fills <!-- ASSET_LINKS --> with rows only for files that exist under assets-dir.
+The first form fills <!-- ASSET_LINKS --> in the template with rows only for files
+that exist under assets-dir. The second form rewrites only the download table of an
+already published body (between the ASSETS markers), taking names and sha256 digests
+from the GitHub API release JSON, so nothing needs to be downloaded and manual edits
+to the rest of the notes survive.
 VirusTotal badge <img> URLs include a random &v=… query so GitHub / CDN caches
 do not keep a stale “Error 404” after a new scan.
 """
@@ -12,6 +17,7 @@ do not keep a stale “Error 404” after a new scan.
 from __future__ import annotations
 
 import hashlib
+import json
 import random
 import re
 import sys
@@ -24,7 +30,8 @@ ASSET_CATALOG: list[tuple[str, str, str]] = [
     ("Android", "Hiddify-Android-arm64.apk", "APK ARMv8"),
     ("Android", "Hiddify-Android-arm7.apk", "APK ARMv7"),
     ("Android", "Hiddify-Android-x86_64.apk", "APK x64"),
-    ("Windows", "Hiddify-Windows-Setup-x64.Msix", "OfficialSetup x64"),
+    # Attached by windows-store-sync.yml once the Microsoft Store has signed it.
+    ("Windows", "Hiddify-Windows-Setup-x64.Msix", "MSIX x64"),
     ("Windows", "Hiddify-Windows-Setup-x64.exe", "Setup x64"),
     ("Windows", "Hiddify-Windows-Portable-x64.zip", "Portable x64"),
     ("macOS (v10.15+)", "Hiddify-MacOS.dmg", "DMG Universal"),
@@ -39,6 +46,8 @@ ASSET_CATALOG: list[tuple[str, str, str]] = [
 ]
 
 ASSET_MARKER = "<!-- ASSET_LINKS -->"
+TABLE_BEGIN = "<!-- ASSETS:BEGIN -->"
+TABLE_END = "<!-- ASSETS:END -->"
 REPO = "hiddify/hiddify-app"
 
 
@@ -62,7 +71,7 @@ def collect_assets(assets_dir: Path) -> dict[str, Path]:
     return by_name
 
 
-def find_asset(assets: dict[str, Path], name: str) -> Path | None:
+def find_asset(assets: dict, name: str):
     if name in assets:
         return assets[name]
     lower = name.lower()
@@ -93,7 +102,8 @@ def vt_badge_img(sha256: str, bust: str) -> str:
     return f'<a href="{href}"><img src="{src}" alt="VirusTotal"></a>'
 
 
-def render_links(tag: str, assets: dict[str, Path], bust: str) -> str:
+def render_links(tag: str, assets: dict[str, "Path | str"], bust: str) -> str:
+    """assets maps file name -> local Path (hashed here) or a known sha256 hex string."""
     rowspan_pending: dict[str, int] = {}
     for os_name, filename, _ in ASSET_CATALOG:
         if find_asset(assets, filename) is None:
@@ -106,7 +116,7 @@ def render_links(tag: str, assets: dict[str, Path], bust: str) -> str:
         path = find_asset(assets, filename)
         if path is None:
             continue
-        digest = sha256_file(path)
+        digest = path if isinstance(path, str) else sha256_file(path)
         print(f"{filename}: {digest}")
         url = f"https://github.com/{REPO}/releases/download/{tag}/{filename}"
         download = f'<a href="{url}">{label}</a>'
@@ -143,17 +153,59 @@ def render_links(tag: str, assets: dict[str, Path], bust: str) -> str:
     )
 
 
+def wrap_table(links: str) -> str:
+    return f"{TABLE_BEGIN}\n{links.rstrip()}\n{TABLE_END}\n"
+
+
+def assets_from_release_json(path: Path) -> dict[str, str]:
+    """name -> sha256 from `gh api repos/{repo}/releases/tags/{tag}` output."""
+    data = json.loads(path.read_text())
+    assets: dict[str, str] = {}
+    for asset in data.get("assets", []):
+        digest = asset.get("digest") or ""
+        if digest.startswith("sha256:"):
+            assets[asset["name"]] = digest.split(":", 1)[1]
+        else:
+            print(f"warning: no sha256 digest for {asset['name']}", file=sys.stderr)
+    return assets
+
+
+def replace_table(body: str, links: str) -> str:
+    block = wrap_table(links)
+    pattern = re.compile(re.escape(TABLE_BEGIN) + r".*?" + re.escape(TABLE_END) + r"\n?", re.DOTALL)
+    if pattern.search(body):
+        return pattern.sub(lambda _: block, body, count=1)
+    # Bodies published before the markers existed: replace the first table.
+    table = re.compile(r"<table>.*?</table>\n?", re.DOTALL)
+    if table.search(body):
+        return table.sub(lambda _: block, body, count=1)
+    return body.rstrip() + "\n\n## Downloads\n\n" + block
+
+
 def main() -> int:
-    if len(sys.argv) < 3:
+    args = sys.argv[1:]
+    if len(args) >= 3 and args[1] == "--release-json":
+        notes_path, release_json, tag = Path(args[0]), Path(args[2]), (args[3] if len(args) > 3 else "")
+        if not tag:
+            tag = json.loads(release_json.read_text())["tag_name"]
+        assets = assets_from_release_json(release_json)
+        links = render_links(tag, assets, cache_bust())
+        notes_path.write_text(replace_table(notes_path.read_text(), links).strip() + "\n")
+        present = sum(1 for _, name, _ in ASSET_CATALOG if find_asset(assets, name))
+        print(f"rewrote download table with {present} rows for tag {tag}")
+        return 0
+
+    if len(args) < 2:
         print(
-            f"usage: {sys.argv[0]} <release.md> <assets-dir> [tag]",
+            f"usage: {sys.argv[0]} <release.md> <assets-dir> [tag]\n"
+            f"       {sys.argv[0]} <body.md> --release-json <release.json> [tag]",
             file=sys.stderr,
         )
         return 2
 
-    notes_path = Path(sys.argv[1])
-    assets_dir = Path(sys.argv[2])
-    tag = sys.argv[3] if len(sys.argv) > 3 else "RELEASE_TAG"
+    notes_path = Path(args[0])
+    assets_dir = Path(args[1])
+    tag = args[2] if len(args) > 2 else "RELEASE_TAG"
 
     if not notes_path.is_file():
         print(f"error: {notes_path} does not exist", file=sys.stderr)
@@ -169,12 +221,14 @@ def main() -> int:
     text = notes_path.read_text()
     text = text.replace("RELEASE_TAG", tag)
     links = render_links(tag, assets, bust)
+    # Strip the template's own comments first; the ASSETS markers are added after
+    # and stay in the body so the table can be rewritten later.
+    text = re.sub(r"<!--(?!.*?ASSET_LINKS).*?-->\n?", "", text, flags=re.DOTALL)
     if ASSET_MARKER in text:
-        text = text.replace(ASSET_MARKER, links)
+        text = text.replace(ASSET_MARKER, wrap_table(links))
     else:
-        text = text.rstrip() + "\n\n## Downloads\n\n" + links
+        text = text.rstrip() + "\n\n## Downloads\n\n" + wrap_table(links)
 
-    text = re.sub(r"<!--.*?-->\n?", "", text, flags=re.DOTALL)
     notes_path.write_text(text.strip() + "\n")
     present = sum(1 for _, name, _ in ASSET_CATALOG if find_asset(assets, name))
     print(f"wrote {present} download rows for tag {tag}")

@@ -1,12 +1,15 @@
 display_name: Hiddify
 publisher_display_name: Hiddify
-identity_name: Hiddify.HiddifyNext
+identity_name: Hiddify.App.Win
 msix_version: 5.2.1.0
 logo_path: windows\runner\resources\app_icon.ico
 capabilities: internetClient, internetClientServer, privateNetworkClientServer
 languages: ar, en-us, es-es, fa-ir, fr-fr, id-id, pt-br, ru-ru, tr-tr, zh-cn, zh-tw
 protocol_activation: hiddify, v2ray, v2rayn, v2rayng, clash, clashmeta, sing-box
 execution_alias: hiddify
+# identity_name and publisher must equal Partner Center > Product identity. CI keeps
+# both as they are and signs the MSIX with a certificate whose Subject equals
+# `publisher` (windows/scripts/configure_windows_signing.ps1 checks it).
 certificate_path: windows\sign.pfx
 certificate_password:
 publisher: CN=8CB43675-F44B-4AA5-9372-E8727781BDC4

@@ -6,8 +6,9 @@
 #                                trusted Microsoft-issued certificate, no PFX secret).
 #        PFX                     when WINDOWS_SIGNING_KEY (base64 PFX) is set.
 #   2. Validates the material and warns loudly when the PFX is self-signed.
-#   3. Patches windows/packaging/msix/make_config.yaml so the MSIX Publisher equals
-#      the certificate Subject (otherwise msix signing / sideloading fails).
+#   3. Points windows/packaging/msix/make_config.yaml at the signing certificate. The
+#      MSIX Publisher is the Partner Center one and is never changed: the build fails
+#      when the certificate Subject differs, because the Store rejects the package then.
 #   4. Registers the "hiddifysign" Inno Setup Sign Tool (HKCU, read by ISCC) so
 #      Setup.exe and its embedded uninstaller are signed by the Inno compiler.
 #   5. Exports WINDOWS_SIGN_BACKEND, WINDOWS_SIGN_PFX, HIDDIFY_INNO_SIGNTOOL,
@@ -82,7 +83,7 @@ if ($env:AZURE_SIGNING_ENDPOINT -and $env:AZURE_SIGNING_ACCOUNT -and $env:AZURE_
     $backend = 'ArtifactSigning'
     $publisher = $env:WINDOWS_SIGNING_PUBLISHER
     if (-not $publisher) {
-        throw 'WINDOWS_SIGNING_PUBLISHER is required with Azure Artifact Signing: the exact certificate Subject of the certificate profile (e.g. "CN=Hiddify, O=Hiddify, L=City, S=State, C=US"), used as the MSIX Publisher.'
+        throw 'WINDOWS_SIGNING_PUBLISHER is required with Azure Artifact Signing: the exact certificate Subject of the certificate profile, compared with the MSIX Publisher.'
     }
     $certDescription = "Azure Artifact Signing account '$($env:AZURE_SIGNING_ACCOUNT)', profile '$($env:AZURE_SIGNING_CERT_PROFILE)'"
     if ($env:AZURE_CLIENT_SECRET) {
@@ -118,9 +119,12 @@ else {
 
 Set-CiEnv 'WINDOWS_SIGN_BACKEND' $backend
 
-# --- MSIX: Publisher must equal the certificate Subject --------------------------
+# --- MSIX: signed, Publisher stays the Partner Center one ---------------------------
 if (Test-Path -LiteralPath $MsixConfig) {
-    Set-YamlScalar -File $MsixConfig -Key 'publisher' -Value (Format-YamlString $publisher)
+    $msixPublisher = ([regex]::Match((Get-Content -LiteralPath $MsixConfig -Raw), '(?m)^publisher:\s*"?([^"\r\n]+)"?')).Groups[1].Value.Trim()
+    if ($msixPublisher -ne $publisher) {
+        throw "MSIX publisher '$msixPublisher' (Partner Center identity) differs from the signing certificate Subject '$publisher'. The Microsoft Store rejects a package whose signature does not match its Publisher; sign with a certificate whose Subject is exactly '$msixPublisher'."
+    }
     if ($backend -eq 'ArtifactSigning') {
         # The msix tool only signs with a PFX; with sign_msix=false it keeps our Publisher
         # untouched and the .msix is signed afterwards by sign_windows_artifacts.ps1.
@@ -134,7 +138,7 @@ if (Test-Path -LiteralPath $MsixConfig) {
         Set-YamlScalar -File $MsixConfig -Key 'certificate_path' -Value (Format-YamlString $PfxOut)
         Set-YamlScalar -File $MsixConfig -Key 'certificate_password' -Value (Format-YamlString $env:WINDOWS_SIGNING_PASSWORD)
     }
-    Write-Host "MSIX config patched: publisher=$publisher sign_msix=$($backend -ne 'ArtifactSigning')"
+    Write-Host "MSIX config patched: publisher=$msixPublisher (unchanged) sign_msix=$($backend -ne 'ArtifactSigning')"
 }
 else {
     Write-Warning "MSIX config not found: $MsixConfig"

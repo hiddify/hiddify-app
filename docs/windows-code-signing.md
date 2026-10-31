@@ -21,7 +21,7 @@ app does:
 | Authenticode signature | **Self-signed certificate** (issuer = subject `CN=8CB43675-…`). Zero reputation for AV and SmartScreen; self-signing is itself a malware trait. | Signed with a publicly trusted certificate once the secrets below are set. The pipeline warns on every run that still uses a self-signed PFX. |
 | Go PE files (`hiddify-core.dll`, `HiddifyCli.exe`) | Fully stripped (`-s -w`), no VERSIONINFO, no manifest: looks like a packed dropper. | Symbol table kept (`-w` only, DWARF still dropped), VERSIONINFO (CompanyName, ProductName, FileDescription, versions) and manifest embedded with go-winres. |
 | Inno Setup uninstaller | `unins000.exe` written unsigned into Program Files (the Sigma hit). | Inno compiler signs `Setup.exe` and the uninstaller itself through the registered `hiddifysign` Sign Tool. Setup VERSIONINFO added. |
-| MSIX | Signed with the self-signed PFX; Publisher pinned by hand. | Publisher is patched from the signing certificate automatically; signed with the trusted certificate. The Store-signed MSIX still replaces the asset after a release. |
+| MSIX | Signed with the PFX; published on GitHub and uploaded to the Store, then replaced on GitHub by the Store-signed copy ([microsoft-store.md](microsoft-store.md)). | Same. The certificate Subject must equal the Partner Center publisher, or the build stops. |
 | Provenance | None. | SLSA build provenance attestation for the Windows assets (`gh attestation verify <file> --repo hiddify/hiddify-app`). |
 | Monitoring | Badge in the release notes only. | The VirusTotal workflow writes a per-file detection table to the job summary and annotates flagged assets. |
 
@@ -100,7 +100,7 @@ Steps in the Azure portal:
 | `AZURE_SIGNING_ENDPOINT` | e.g. `https://eus.codesigning.azure.net/` |
 | `AZURE_SIGNING_ACCOUNT` | Artifact Signing account name |
 | `AZURE_SIGNING_CERT_PROFILE` | certificate profile name |
-| `WINDOWS_SIGNING_PUBLISHER` | exact certificate Subject from step 3 (becomes the MSIX `Publisher`) |
+| `WINDOWS_SIGNING_PUBLISHER` | exact certificate Subject from step 3; must equal the MSIX `publisher` (Partner Center identity) |
 | `AZURE_TENANT_ID`, `AZURE_CLIENT_ID` | from the app registration |
 | `AZURE_SUBSCRIPTION_ID` | required for OIDC (`azure/login`) |
 | `AZURE_CLIENT_SECRET` | only when not using OIDC |
@@ -133,9 +133,9 @@ files, then replace the assets.
 
 ## Microsoft Store
 
-`.github/workflows/add_signed_microsft.yml` already replaces the release MSIX
-with the Store-signed package after a release is published. Keep it; the Store
-signature is the best possible one for the MSIX.
+The CI-signed MSIX is uploaded to the Store by hand, and
+`.github/workflows/windows-store-sync.yml` replaces the release's CI-signed MSIX
+with the Store-signed package once certification passes. See [microsoft-store.md](microsoft-store.md).
 
 ## Sandbox "Sigma" matches (Behavior tab)
 
@@ -308,10 +308,10 @@ gh attestation verify Hiddify-Windows-Setup-x64.exe --repo hiddify/hiddify-app
 
 ## Troubleshooting
 
-- `msix` fails with *publisher mismatch*: the `publisher` in
-  `windows/packaging/msix/make_config.yaml` must equal the certificate Subject.
-  The configure script patches it; with Azure set `WINDOWS_SIGNING_PUBLISHER`
-  to the exact Subject of the certificate profile.
+- The configure step fails with *MSIX publisher ... differs from the signing
+  certificate Subject*: the `publisher` in `windows/packaging/msix/make_config.yaml`
+  is the Partner Center identity and is never changed. Sign with a certificate
+  whose Subject is exactly that value.
 - ISCC fails with *Sign Tool "hiddifysign" not found*: the configure script
   could not write `HKCU\Software\Jordan Russell\Inno Setup\SignTools`. The
   template only enables signing when `HIDDIFY_INNO_SIGNTOOL=hiddifysign`.

@@ -11,6 +11,11 @@ on:
         description: 'Release tag to scan (e.g. draft, v1.2.3)'
         required: true
         type: string
+      asset_pattern:
+        description: 'Scan only assets matching this pattern (default: all Hiddify-* packages)'
+        required: false
+        type: string
+        default: ''
   workflow_dispatch:
     inputs:
       release_tag:
@@ -36,8 +41,14 @@ jobs:
       - name: Download Release Assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ASSET_PATTERN: ${{ inputs.asset_pattern }}
         run: |
           mkdir -p release_assets
+          if [ -n "$ASSET_PATTERN" ]; then
+            gh release download "$TAG_NAME" --dir release_assets --pattern "$ASSET_PATTERN"
+            ls -la release_assets
+            exit 0
+          fi
           gh release download "$TAG_NAME" --dir release_assets \
             --pattern "Hiddify-*.apk" \
             --pattern "Hiddify-*.exe" \
