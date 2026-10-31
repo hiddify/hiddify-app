@@ -146,6 +146,7 @@ message IpInfo {
     double latitude = 7 [json_name = "latitude"];            // The latitude (optional).
     double longitude = 8 [json_name = "longitude"];          // The longitude (optional).
     string postal_code = 9 [json_name = "postal_code"];      // The postal code (optional).
+    bool from_cache = 10 [json_name = "from_cache"];         // Of a previous run, not looked up in this one yet; it may have changed.
 }
 message OutboundGroup {
   string tag = 1;
@@ -158,6 +159,7 @@ message OutboundGroup {
 }
 message OutboundGroupList{
   repeated OutboundGroup items = 1;
+  optional OutboundInfo chain_hop = 2; // main list only: the extra security / unblocker hop the traffic goes through now
 }
 
 message WarpAccount {
