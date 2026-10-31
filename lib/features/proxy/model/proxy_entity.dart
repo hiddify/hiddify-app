@@ -42,6 +42,18 @@ String _sanitizedTag(String tag) => tag.replaceFirst(RegExp(r"\§[^]*"), "").tri
 const lowestGroupTag = 'lowest';
 const balanceGroupTag = 'balance';
 
+/// Where one step of the connection (the server, or the chain hop) stands.
+enum StepStatus {
+  /// The step it dials through has not connected yet.
+  waiting,
+  connecting,
+
+  /// The hop is still connecting after [ActiveProxyCardData.hopSlowAfter].
+  slow,
+  connected,
+  failed,
+}
+
 /// What the home proxy card shows, taken from one message of the core's main list.
 class ActiveProxyCardData {
   const ActiveProxyCardData({
@@ -50,23 +62,81 @@ class ActiveProxyCardData {
     required this.hop,
     required this.chain,
     required this.hopMode,
+    required this.serverStatus,
+    required this.hopStatus,
+    required this.mainGroup,
+    required this.offerLowest,
   });
+
+  /// How long the hop may connect before it counts as slow, then as failed. Psiphon gives up a
+  /// round of tries after 60 s, then starts another.
+  static const hopSlowAfter = Duration(seconds: 15);
+  static const hopFailAfter = Duration(seconds: 60);
 
   /// Null while the main group has no selection.
   static ActiveProxyCardData? from(OutboundGroupList list, {required ChainStatus chain, required ChainMode hopMode}) {
     // The main group lists only the user's pick.
-    final picked = list.items.firstOrNull?.items.firstOrNull;
-    if (picked == null) return null;
+    final main = list.items.firstOrNull;
+    final picked = main?.items.firstOrNull;
+    if (main == null || picked == null) return null;
     // When the pick is a group, its own entry in the list holds the server it chose.
     final chosen = list.items.where((g) => g.tag == picked.tag).firstOrNull?.items.firstOrNull;
+    final server = chosen ?? picked;
+    final hop = !chain.isOff() && list.hasChainHop() ? list.chainHop : null;
+
+    var serverStatus = _serverStatusOf(server);
+    var hopStatus = chain.isOff() ? null : _hopStatusOf(hop);
+    // A step dials through the one before it: extra security through the server, the server
+    // through the unblocker. Until that one connects, the step's own results mean nothing.
+    if (chain.isExtraSecurity() && serverStatus != StepStatus.connected) hopStatus = StepStatus.waiting;
+    if (chain.isUnblocker() && hopStatus != StepStatus.connected) serverStatus = StepStatus.waiting;
+
+    final lowest = list.items.where((g) => g.tag == lowestGroupTag).firstOrNull?.items.firstOrNull;
     return ActiveProxyCardData(
-      server: chosen ?? picked,
+      server: server,
       group: picked.isGroup ? picked.name : null,
-      hop: !chain.isOff() && list.hasChainHop() ? list.chainHop : null,
+      hop: hop,
       chain: chain,
       hopMode: hopMode,
+      serverStatus: serverStatus,
+      hopStatus: hopStatus,
+      mainGroup: main.tag,
+      offerLowest:
+          serverStatus == StepStatus.failed &&
+          main.selectable &&
+          lowest != null &&
+          ConnectionConst.isValidDelay(lowest.urlTestDelay),
     );
   }
+
+  static StepStatus _serverStatusOf(OutboundInfo server) => switch (server.urlTestDelay) {
+    final delay when ConnectionConst.isValidDelay(delay) => StepStatus.connected,
+    0 => StepStatus.connecting, // not tested yet
+    _ => StepStatus.failed, // the test timed out
+  };
+
+  static StepStatus _hopStatusOf(OutboundInfo? hop) => switch (hop) {
+    OutboundInfo(status: Status.FAILED) => StepStatus.failed,
+    OutboundInfo(status: Status.READY, :final urlTestDelay) when ConnectionConst.isValidDelay(urlTestDelay) =>
+      StepStatus.connected,
+    // not listed yet, connecting, or not tested since it got ready
+    _ => StepStatus.connecting,
+  };
+
+  /// This card once the hop has been connecting for [waited]: slow, then failed.
+  ActiveProxyCardData hopWaited(Duration waited) => hopStatus != StepStatus.connecting || waited < hopSlowAfter
+      ? this
+      : ActiveProxyCardData(
+          server: server,
+          group: group,
+          hop: hop,
+          chain: chain,
+          hopMode: hopMode,
+          serverStatus: serverStatus,
+          hopStatus: waited < hopFailAfter ? StepStatus.slow : StepStatus.failed,
+          mainGroup: mainGroup,
+          offerLowest: offerLowest,
+        );
 
   /// The server that carries the traffic: the config the user picked, or the one its group chose.
   final OutboundInfo server;
@@ -82,6 +152,17 @@ class ActiveProxyCardData {
 
   /// The hop's mode, from the chain settings.
   final ChainMode hopMode;
+
+  final StepStatus serverStatus;
+
+  /// Null when the chain is off.
+  final StepStatus? hopStatus;
+
+  /// The main group's tag: "switch to lowest" changes its selection.
+  final String mainGroup;
+
+  /// The server failed while lowest's choice answers, so one tap moves the main group to lowest.
+  final bool offerLowest;
 }
 
 extension OutboundInfoCard on OutboundInfo {
