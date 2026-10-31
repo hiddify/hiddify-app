@@ -23,6 +23,7 @@ import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:meta/meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -219,19 +220,44 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
       }
     });
   }
+
 }
 
 /// What the home proxy card shows; null until the core has sent a message.
 @Riverpod(keepAlive: true)
-ActiveProxyCardData? activeProxyCard(Ref ref) {
-  final list = ref.watch(mainOutboundsNotifierProvider).valueOrNull;
-  if (list == null) return null;
-  final chain = ref.watch(ConfigOptions.chainStatus);
-  return ActiveProxyCardData.from(
-    list,
-    chain: chain,
-    hopMode: ref.watch(chain.isUnblocker() ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode),
-  );
+class ActiveProxyCard extends _$ActiveProxyCard {
+  /// The chain and mode whose hop is connecting, and since when.
+  ({String hop, DateTime since})? _connecting;
+
+  @visibleForTesting
+  DateTime now() => DateTime.now();
+
+  @override
+  ActiveProxyCardData? build() {
+    final list = ref.watch(mainOutboundsNotifierProvider).valueOrNull;
+    if (list == null) return null;
+    final chain = ref.watch(ConfigOptions.chainStatus);
+    final card = ActiveProxyCardData.from(
+      list,
+      chain: chain,
+      hopMode: ref.watch(chain.isUnblocker() ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode),
+    );
+    if (card == null || card.hopStatus != StepStatus.connecting) {
+      _connecting = null;
+      return card;
+    }
+    // Another chain or mode is another hop: its wait starts over.
+    final hop = '${chain.name}/${card.hopMode.name}';
+    if (_connecting?.hop != hop) _connecting = (hop: hop, since: now());
+    final waited = now().difference(_connecting!.since);
+    // build again when the hop turns slow, then failed
+    final next = [ActiveProxyCardData.hopSlowAfter, ActiveProxyCardData.hopFailAfter].where((d) => d > waited).firstOrNull;
+    if (next != null) {
+      final timer = Timer(next - waited, ref.invalidateSelf);
+      ref.onDispose(timer.cancel);
+    }
+    return card.hopWaited(waited);
+  }
 }
 
 /// Each step of the path the traffic takes; null while the core is not running or has not sent

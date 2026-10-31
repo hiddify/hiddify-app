@@ -1,7 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hiddify/core/preferences/preferences_provider.dart';
+import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 OutboundInfo _info(
   String tag, {
@@ -196,4 +202,86 @@ void main() {
       ])!.offerLowest, isFalse, reason: 'the server waits for the unblocker, so it has not failed');
     });
   });
+
+  group("the hop's wait", () {
+    late StreamController<OutboundGroupList> core;
+    late ProviderContainer container;
+    var clock = DateTime(2026, 10, 31, 12);
+    var sent = 0;
+
+    setUp(() async {
+      core = StreamController<OutboundGroupList>();
+      container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWith(
+            (ref) => _Prefs({'chain-status': 'extraSecurity', 'extra-security-mode': 'psiphon'}),
+          ),
+          mainOutboundsNotifierProvider.overrideWith(() => _Main(core.stream)),
+          activeProxyCardProvider.overrideWith(() => _Card(() => clock)),
+        ],
+      );
+      await container.read(sharedPreferencesProvider.future);
+      container.listen(activeProxyCardProvider, (_, _) {});
+    });
+
+    tearDown(() async {
+      container.dispose();
+      await core.close();
+    });
+
+    /// One message of the core, with the server answering; each differs, like the hop's live type.
+    Future<StepStatus?> hopAfter(Duration time, {Status status = Status.CONNECTING, int delay = 0}) async {
+      clock = clock.add(time);
+      core.add(
+        OutboundGroupList(
+          items: [
+            _group('select', [_info('M-NL', delay: 150)]),
+          ],
+          chainHop: _info('🔒 Extra Security · Psiphon §hide§', type: 'Psiphon ${sent++}', status: status, delay: delay),
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      return container.read(activeProxyCardProvider)?.hopStatus;
+    }
+
+    test('counts from when the hop started connecting, and starts over after it connects', () async {
+      expect(await hopAfter(Duration.zero), StepStatus.connecting);
+      expect(await hopAfter(const Duration(seconds: 14)), StepStatus.connecting);
+      expect(await hopAfter(const Duration(seconds: 6)), StepStatus.slow);
+      expect(await hopAfter(const Duration(seconds: 45)), StepStatus.failed);
+      expect(await hopAfter(const Duration(seconds: 5), status: Status.READY, delay: 230), StepStatus.connected);
+      expect(await hopAfter(const Duration(minutes: 5), status: Status.RECONNECTING), StepStatus.connecting);
+      expect(await hopAfter(const Duration(seconds: 16), status: Status.RECONNECTING), StepStatus.slow);
+    });
+  });
+}
+
+class _Prefs implements SharedPreferences {
+  _Prefs(this._values);
+  final Map<String, Object> _values;
+
+  @override
+  Object? get(String key) => _values[key];
+
+  @override
+  String? getString(String key) => _values[key] as String?;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+class _Main extends MainOutboundsNotifier {
+  _Main(this._stream);
+  final Stream<OutboundGroupList> _stream;
+
+  @override
+  Stream<OutboundGroupList> build() => _stream;
+}
+
+class _Card extends ActiveProxyCard {
+  _Card(this._clock);
+  final DateTime Function() _clock;
+
+  @override
+  DateTime now() => _clock();
 }
