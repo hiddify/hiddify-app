@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -9,13 +10,18 @@ import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
+import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/home/widget/eclipse_button_painter.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
+import 'package:hiddify/features/proxy/model/connection_health.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/stats/notifier/stats_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// What the button shows, one value per look.
@@ -69,6 +75,15 @@ class ConnectionButton extends HookConsumerWidget {
     // the speeds the button's light follows while connected
     final stats = ref.watch(statsNotifierProvider).valueOrNull;
 
+    // Connected means some server answers; the user's pick or the chain hop can still be down.
+    final health = ref.watch(connectionHealthProvider);
+    final h = t.connection.health;
+    final chainName = health?.chain?.present(t) ?? '';
+    final degraded = look == _Look.connected && (health?.degraded ?? false);
+    final hopPending = look == _Look.connected && (health?.hopPending ?? false);
+    final chainType = health?.chain;
+    final showHealth = ref.read(bottomSheetsNotifierProvider.notifier).showConnectionHealth;
+
     const buttonTheme = ConnectionButtonTheme.light;
     final today = DateTime.now();
     return _ConnectionButton(
@@ -86,13 +101,30 @@ class ConnectionButton extends HookConsumerWidget {
         _Look.connecting => t.connection.connecting,
         _Look.waiting => t.connection.waiting,
         _Look.noProxies => t.connection.noAvailableProxies,
+        // connected says the traffic gets through; when it does not, say what stops it
+        _Look.connected when degraded =>
+          health!.pick == HealthState.failed ? h.pickDead : h.hopFailed(chain: chainName),
+        _Look.connected when hopPending => h.hopPending(chain: chainName),
         _Look.connected => t.connection.connected,
         _Look.hotReloading => t.connection.hotReloading,
         _Look.disconnecting => t.connection.disconnecting,
         _Look.failed => t.connection.failed,
       },
       hint: look == _Look.failed ? t.connection.tapToRetry : null,
+      chain: chainType != null && {_Look.connected, _Look.noProxies, _Look.waiting}.contains(look)
+          ? (
+              type: chainType,
+              mode: ref.watch(chainType.isUnblocker() ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode),
+              state: health!.hopState,
+              label: '$chainName: ${_hopLabel(h, health)}',
+            )
+          : null,
+      onChain: showHealth,
+      onLabel: degraded || hopPending ? showHealth : null,
       buttonColor: switch (look) {
+        _Look.connected when degraded => _degradedColor,
+        // the traffic waits for the chain hop: still on its way
+        _Look.connected when hopPending => const Color(0xFF455FE9),
         _Look.connected => buttonTheme.connectedColor!,
         _Look.noProxies => const Color.fromARGB(255, 185, 176, 103),
         _Look.failed => Colors.red,
@@ -147,6 +179,16 @@ class ConnectionButton extends HookConsumerWidget {
 
   static const _hold = Duration(milliseconds: 1500);
 
+  /// Connected, but the traffic does not get through: amber, between connected and failed.
+  static const _degradedColor = Color(0xFFE3A63A);
+
+  static String _hopLabel(TranslationsConnectionHealthEn h, ConnectionHealth health) => switch (health.hopState) {
+    HealthState.ok => h.hopReady,
+    HealthState.pending => h.hopConnecting,
+    HealthState.blocked => h.hopBlocked,
+    HealthState.failed => health.hopNoReply ? h.hopNoReply : h.hopBroken,
+  };
+
   /// Connects, or sends the user to add a profile when there is none.
   Future<void> _connect(WidgetRef ref) async {
     final dialogs = ref.read(dialogNotifierProvider.notifier);
@@ -171,6 +213,9 @@ class _ConnectionButton extends HookWidget {
     required this.upload,
     required this.label,
     required this.hint,
+    required this.chain,
+    required this.onChain,
+    required this.onLabel,
     required this.buttonColor,
     required this.image,
     required this.useImage,
@@ -188,6 +233,13 @@ class _ConnectionButton extends HookWidget {
   final int upload;
   final String label;
   final String? hint;
+
+  /// The chain hop as a badge on the button; null with the chain off.
+  final ({ChainType type, ChainMode mode, HealthState state, String label})? chain;
+  final VoidCallback onChain;
+
+  /// Opens the connection check from a label that names a problem; null otherwise.
+  final VoidCallback? onLabel;
   final Color buttonColor;
   final AssetGenImage image;
   final bool useImage;
@@ -338,15 +390,48 @@ class _ConnectionButton extends HookWidget {
                       child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: onErrorDetails),
                     ),
                   ),
+                // the chain hop sits on the rim at the top left, half on the button
+                if (chain case final chain? when look != _Look.failed)
+                  Positioned.fromRect(
+                    rect: Rect.fromCircle(
+                      center: const Offset(_size / 2, _size / 2) + Offset.fromDirection(5 * math.pi / 4, _size / 2),
+                      radius: _ChainBadge.size / 2,
+                    ),
+                    child: _ChainBadge(
+                      type: chain.type,
+                      mode: chain.mode,
+                      state: chain.state,
+                      label: chain.label,
+                      onTap: onChain,
+                    ),
+                  ),
               ],
             ),
           ),
         ),
         const Gap(24),
         ExcludeSemantics(
+          excluding: onLabel == null,
           child: Column(
             children: [
-              AnimatedText(label, style: theme.textTheme.titleMedium),
+              if (onLabel case final onLabel?)
+                // the label names what stops the traffic; tapping it shows the whole path
+                InkWell(
+                  onTap: onLabel,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(child: AnimatedText(label, style: theme.textTheme.titleMedium)),
+                        Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.onSurfaceVariant),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                AnimatedText(label, style: theme.textTheme.titleMedium),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 250),
                 child: hint == null
@@ -361,6 +446,113 @@ class _ConnectionButton extends HookWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// The chain hop on the button: its glyph alone, outlined in the button's face color so it reads
+/// on the button and on the page. Filled with a check once up, an outline that breathes while it
+/// connects, red with a cross when it fails, grey while it waits for the selected proxy. Opens the
+/// connection check.
+class _ChainBadge extends StatelessWidget {
+  const _ChainBadge({
+    required this.type,
+    required this.mode,
+    required this.state,
+    required this.label,
+    required this.onTap,
+  });
+  final ChainType type;
+  final ChainMode mode;
+  final HealthState state;
+  final String label;
+  final VoidCallback onTap;
+
+  static const size = 56.0;
+
+  IconData get _glyph => switch ((type, state)) {
+    (ChainType.extraSecurity, HealthState.ok) => Icons.gpp_good_rounded,
+    (ChainType.extraSecurity, HealthState.failed) => Icons.gpp_bad_rounded,
+    (ChainType.extraSecurity, _) => Icons.shield_outlined,
+    (ChainType.unblocker, HealthState.ok) => Icons.lock_open_rounded,
+    (ChainType.unblocker, HealthState.failed) => Icons.lock_rounded,
+    (ChainType.unblocker, _) => Icons.lock_open_outlined,
+  };
+
+  /// The solid shape under the glyph: the white seal that strokes it and fills its cut-outs.
+  IconData get _seal => type == ChainType.extraSecurity ? Icons.shield_rounded : Icons.lock_rounded;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final (main, accent) = type.colors(mode);
+    // a gradient in the chain's own colors; red when it fails, grey while it waits
+    final (from, to) = switch (state) {
+      HealthState.failed => (const Color(0xFFFF6B6B), theme.colorScheme.error),
+      HealthState.blocked => (theme.colorScheme.outline, theme.colorScheme.outlineVariant),
+      _ => (main, accent),
+    };
+    const face = Color(0xFFF7F7F9);
+    Widget glyph = SizedBox.square(
+      dimension: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // the seal: a little larger than the glyph, so it reads as a white stroke, with a soft
+          // glow in the state's color
+          Icon(
+            _seal,
+            size: 50,
+            color: face,
+            shadows: [
+              Shadow(color: from.withValues(alpha: state == HealthState.blocked ? .2 : .55), blurRadius: 14),
+              Shadow(color: Colors.black.withValues(alpha: .25), blurRadius: 4, offset: const Offset(0, 2)),
+            ],
+          ),
+          ShaderMask(
+            blendMode: BlendMode.srcIn,
+            shaderCallback: (rect) => LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [from, to],
+            ).createShader(rect),
+            child: Icon(_glyph, size: 40, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+    glyph = switch (state) {
+      // once up, a light sweeps across it now and then
+      HealthState.ok =>
+        glyph
+            .animate(onPlay: (c) => c.repeat())
+            .shimmer(delay: 2500.ms, duration: 1200.ms, color: Colors.white.withValues(alpha: .7)),
+      // on its way: it breathes
+      HealthState.pending =>
+        glyph
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .scaleXY(begin: .92, end: 1.04, duration: 900.ms, curve: Curves.easeInOut),
+      // failed: one short shake to catch the eye
+      HealthState.failed => glyph.animate().shake(hz: 4, rotation: .06, duration: 500.ms),
+      HealthState.blocked => glyph,
+    };
+    return Semantics(
+      button: true,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Center(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (child, a) => ScaleTransition(scale: a, child: child),
+              child: KeyedSubtree(key: ValueKey(_glyph), child: glyph),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -37,6 +37,7 @@ class ActiveProxyFooter extends HookConsumerWidget with InfraLogger {
     );
 
     final activeCard = ref.watch(activeProxyCardProvider);
+    final health = ref.watch(connectionHealthProvider);
 
     final heldCard = useRef<ActiveProxyCardData?>(null);
     final until = useRef<DateTime?>(null);
@@ -81,7 +82,10 @@ class ActiveProxyFooter extends HookConsumerWidget with InfraLogger {
       clipBehavior: Clip.antiAlias,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [if (!card.chain.isOff()) _ChainBand(card), _ProxyRow(card)],
+        children: [
+          if (!card.chain.isOff()) _ChainBand(card),
+          _ProxyRow(card, dead: health?.canSwitchToFastest ?? false),
+        ],
       ),
     );
   }
@@ -273,8 +277,11 @@ class _HopState extends StatelessWidget {
 // ---------- the proxy row: how the server was picked, its name, IP and protocol ----------
 
 class _ProxyRow extends ConsumerWidget {
-  const _ProxyRow(this.card);
+  const _ProxyRow(this.card, {this.dead = false});
   final ActiveProxyCardData card;
+
+  /// The pick does not answer; it shows faded, with a "not responding" note.
+  final bool dead;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -296,7 +303,11 @@ class _ProxyRow extends ConsumerWidget {
           await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: server);
         },
         borderRadius: BorderRadius.circular(8),
-        child: _FlagSlot(server, size: 40),
+        child: AnimatedOpacity(
+          opacity: dead ? .45 : 1,
+          duration: const Duration(milliseconds: 300),
+          child: _FlagSlot(server, size: 40),
+        ),
       ),
       title: Semantics(
         label: t.pages.proxies.activeProxy,
@@ -326,6 +337,12 @@ class _ProxyRow extends ConsumerWidget {
       ),
       subtitle: Row(
         children: [
+          if (dead) ...[
+            Icon(Icons.wifi_off_rounded, size: 14, color: s.error),
+            const Gap(4),
+            Text(t.connection.health.notResponding, style: muted?.copyWith(color: s.error)),
+            Text('  ·  ', style: muted),
+          ],
           // The config's IP is the final one only with unblocker; with no chain it is the only one.
           _IpSlot(server, boneWidth: 64, isFinal: card.chain.isUnblocker(), onLongPress: urlTest),
           Flexible(

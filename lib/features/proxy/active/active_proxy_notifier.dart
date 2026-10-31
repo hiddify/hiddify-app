@@ -2,13 +2,16 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
+import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/utils/throttler.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/data/proxy_repository.dart';
+import 'package:hiddify/features/proxy/model/connection_health.dart';
 import 'package:hiddify/features/proxy/model/ip_info_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
@@ -189,6 +192,19 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
     return ref.watch(mainOutboundsNotifierProvider).whenData((list) => _activeOf(list, chain));
   }
 
+  /// Selects "lowest" in the main selector, for a pick that stopped answering.
+  Future<void> switchToFastest() async {
+    final group = ref.read(mainOutboundsNotifierProvider).valueOrNull?.items.firstOrNull?.tag;
+    if (group == null) return;
+    await ref.read(hapticServiceProvider.notifier).lightImpact();
+    final switched = await ref.read(proxyRepositoryProvider).selectProxy(group, lowestGroupTag).run();
+    switched.match((err) {
+      loggy.warning("error switching to the fastest proxy", err);
+      final t = ref.read(translationsProvider).requireValue;
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.switchFailed);
+    }, (_) {});
+  }
+
   final _urlTestThrottler = Throttler(const Duration(seconds: 1));
 
   Future<void> urlTest(String? groupTag_) async {
@@ -216,4 +232,15 @@ ActiveProxyCardData? activeProxyCard(Ref ref) {
     chain: chain,
     hopMode: ref.watch(chain.isUnblocker() ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode),
   );
+}
+
+/// Each step of the path the traffic takes; null while the core is not running or has not sent
+/// its list yet.
+@Riverpod(keepAlive: true)
+ConnectionHealth? connectionHealth(Ref ref) {
+  final status = ref.watch(connectionNotifierProvider).valueOrNull;
+  if (status == null || !status.isRunning) return null;
+  final list = ref.watch(mainOutboundsNotifierProvider).valueOrNull;
+  if (list == null) return null;
+  return ConnectionHealth.from(status, list, ref.watch(ConfigOptions.chainStatus));
 }
