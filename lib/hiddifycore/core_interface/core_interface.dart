@@ -42,6 +42,9 @@ class CoreInterface {
     return fgClient == bgClient;
   }
 
+  /// Whether the system keeps a VPN profile for the app that [resetTunnel] can remove.
+  bool get hasVpnProfile => false;
+
   Future<bool> resetTunnel() async {
     return false;
   }

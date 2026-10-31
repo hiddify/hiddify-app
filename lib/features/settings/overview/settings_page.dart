@@ -7,6 +7,7 @@ import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/settings/notifier/config_option/config_option_notifier.dart';
 import 'package:hiddify/features/settings/notifier/reset_tunnel/reset_tunnel_notifier.dart';
+import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -174,7 +175,8 @@ class SettingsPage extends HookConsumerWidget {
             icon: Icons.content_cut_rounded,
             namedLocation: context.namedLocation('tlsTricks'),
           ),
-          if (PlatformUtils.isIOS || PlatformUtils.isMacOS)
+          if ((PlatformUtils.isIOS || PlatformUtils.isMacOS) &&
+              ref.watch(hiddifyCoreServiceProvider).core.hasVpnProfile)
             Material(
               child: ListTile(
                 title: Text(t.pages.settings.resetTunnel),

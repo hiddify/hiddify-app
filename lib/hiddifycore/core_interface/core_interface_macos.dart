@@ -425,6 +425,10 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   @override
   Future<bool> isBgClientAvailable() async => !_usingVPN || _nativeStatus == 'connected';
 
+  // The tunnel service build reports itself as available too, but has no profile in System Settings.
+  @override
+  bool get hasVpnProfile => _vpnAvailable && !_tunnelServiceAvailable;
+
   @override
   Future<bool> resetTunnel() async {
     await stop();

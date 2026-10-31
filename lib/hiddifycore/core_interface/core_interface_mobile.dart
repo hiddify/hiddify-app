@@ -256,6 +256,9 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
   }
 
   @override
+  bool get hasVpnProfile => true;
+
+  @override
   Future<bool> resetTunnel() async {
     await methodChannel.invokeMethod('reset');
     return true;
