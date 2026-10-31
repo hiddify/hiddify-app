@@ -82,226 +82,248 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
                   const Gap(8),
                 ],
               ),
-              body: ListView(
-                children: [
-                  Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          child: CustomTextFormField(
-                            maxLines: 1,
-                            initialValue: userOverride.name ?? data.profile.name,
-                            validator: (value) =>
-                                (value?.isEmpty ?? true) ? t.pages.profileDetails.form.emptyName : null,
-                            onChanged: (value) => ref
-                                .read(ProfileDetailsNotifierProvider(id).notifier)
-                                .setUserOverride(userOverride.copyWith(name: value)),
-                            label: t.common.name,
-                            hint: t.pages.profileDetails.form.nameHint,
-                          ),
-                        ),
-                        if (data.profile case RemoteProfileEntity(:final url))
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  t.common.url,
-                                  style: theme.textTheme.labelMedium!.copyWith(color: theme.colorScheme.onSurface),
+              // The editor takes the room the details leave, so all of it is on screen: inside a page
+              // that scrolled, the wheel over the editor scrolled only the editor and its end stayed
+              // below the window. The details scroll on their own past half the height.
+              body: LayoutBuilder(
+                builder: (context, box) => Column(
+                  children: [
+                    ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: box.maxHeight / 2),
+                      child: SingleChildScrollView(
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                child: CustomTextFormField(
                                   maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  initialValue: userOverride.name ?? data.profile.name,
+                                  validator: (value) =>
+                                      (value?.isEmpty ?? true) ? t.pages.profileDetails.form.emptyName : null,
+                                  onChanged: (value) => ref
+                                      .read(ProfileDetailsNotifierProvider(id).notifier)
+                                      .setUserOverride(userOverride.copyWith(name: value)),
+                                  label: t.common.name,
+                                  hint: t.pages.profileDetails.form.nameHint,
                                 ),
-                                const Gap(4),
-                                SelectableText(
-                                  url,
-                                  style: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                                ),
-                              ],
-                            ),
-                          ),
-                        const Divider(indent: 16, endIndent: 16),
-                        if (data.profile case RemoteProfileEntity(:final options)) ...[
-                          SwitchListTile.adaptive(
-                            title: Text(
-                              t.pages.profileDetails.form.disableAutoUpdate,
-                              style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface),
-                            ),
-                            value: userOverride.isAutoUpdateDisable,
-                            onChanged: (value) => ref
-                                .read(ProfileDetailsNotifierProvider(id).notifier)
-                                .setUserOverride(userOverride.copyWith(isAutoUpdateDisable: value)),
-                          ),
-                          AnimatedSize(
-                            alignment: Alignment.topCenter,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            child: !userOverride.isAutoUpdateDisable
-                                ? Column(
+                              ),
+                              if (data.profile case RemoteProfileEntity(:final url))
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Divider(indent: 16, endIndent: 16),
-                                      const Gap(12),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                t.pages.profileDetails.form.autoUpdateInterval,
-                                                style: theme.textTheme.titleSmall!.copyWith(
-                                                  color: theme.colorScheme.onSurface,
-                                                ),
-                                              ),
-                                            ),
-                                            Text(
-                                              _genSliderText(t, userOverride.updateInterval ?? 0),
-                                              style: theme.textTheme.labelSmall!.copyWith(
-                                                color: theme.colorScheme.onSurfaceVariant,
-                                              ),
-                                            ),
-                                          ],
+                                      Text(
+                                        t.common.url,
+                                        style: theme.textTheme.labelMedium!.copyWith(
+                                          color: theme.colorScheme.onSurface,
                                         ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       const Gap(4),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                                        child: Slider(
-                                          focusNode: sliderFocusNode,
-                                          value:
-                                              userOverride.updateInterval?.toDouble() ??
-                                              options?.updateInterval.inHours.toDouble() ??
-                                              0.0,
-                                          max: 96,
-                                          divisions: 96,
-                                          label: (userOverride.updateInterval ?? 0).toString(),
-                                          onChanged: (double value) => ref
-                                              .read(ProfileDetailsNotifierProvider(id).notifier)
-                                              .setUserOverride(userOverride.copyWith(updateInterval: value.toInt())),
+                                      SelectableText(
+                                        url,
+                                        style: theme.textTheme.bodySmall!.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
                                         ),
                                       ),
                                     ],
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                          const Divider(indent: 16, endIndent: 16),
-                        ],
-                        if (Platform.isWindows || Platform.isLinux)
-                          ListTile(
-                            title: Text(t.pages.profileDetails.form.adminPreference),
-                            subtitle: Text(switch (userOverride.adminPreference) {
-                              UserAdminPreference.unset => t.pages.profileDetails.form.adminPreferenceAskEachTime,
-                              UserAdminPreference.preferAdmin =>
-                                t.pages.profileDetails.form.adminPreferencePreferAdmin,
-                              UserAdminPreference.preferNoAdmin =>
-                                t.pages.profileDetails.form.adminPreferencePreferNoAdmin,
-                            }),
-                            trailing: userOverride.adminPreference == UserAdminPreference.unset
-                                ? null
-                                : TextButton(
-                                    onPressed: () => ref
-                                        .read(ProfileDetailsNotifierProvider(id).notifier)
-                                        .setUserOverride(
-                                          userOverride.copyWith(adminPreference: UserAdminPreference.unset),
-                                        ),
-                                    child: Text(t.pages.profileDetails.form.adminPreferenceReset),
                                   ),
-                            dense: true,
-                          ),
-                        if (Platform.isWindows || Platform.isLinux) const Divider(indent: 16, endIndent: 16),
-                        ListTile(
-                          title: Text(t.pages.profileDetails.lastUpdate),
-                          leading: const Icon(FluentIcons.history_24_regular),
-                          subtitle: Text(data.profile.lastUpdate.format()),
-                          dense: true,
-                        ),
-                        if (data.profile case RemoteProfileEntity(:final subInfo?)) ...[
-                          const Divider(indent: 16, endIndent: 16),
-                          Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text.rich(
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                    TextSpan(
-                                      children: [
-                                        _buildSubProp(
-                                          FluentIcons.arrow_upload_16_regular,
-                                          subInfo.upload.size(),
-                                          t.components.subscriptionInfo.upload,
-                                        ),
-                                        const TextSpan(text: "     "),
-                                        _buildSubProp(
-                                          FluentIcons.arrow_download_16_regular,
-                                          subInfo.download.size(),
-                                          t.components.subscriptionInfo.download,
-                                        ),
-                                        const TextSpan(text: "     "),
-                                        _buildSubProp(
-                                          FluentIcons.arrow_bidirectional_up_down_16_regular,
-                                          subInfo.total.size(),
-                                          t.components.subscriptionInfo.total,
-                                        ),
-                                      ],
-                                    ),
+                                ),
+                              const Divider(indent: 16, endIndent: 16),
+                              if (data.profile case RemoteProfileEntity(:final options)) ...[
+                                SwitchListTile.adaptive(
+                                  title: Text(
+                                    t.pages.profileDetails.form.disableAutoUpdate,
+                                    style: theme.textTheme.titleSmall!.copyWith(color: theme.colorScheme.onSurface),
                                   ),
-                                  const Gap(12),
-                                  Text.rich(
-                                    style: Theme.of(context).textTheme.bodySmall,
-                                    TextSpan(
-                                      children: [
-                                        _buildSubProp(
-                                          FluentIcons.clock_dismiss_20_regular,
-                                          subInfo.expire.format(),
-                                          t.components.subscriptionInfo.expireDate,
+                                  value: userOverride.isAutoUpdateDisable,
+                                  onChanged: (value) => ref
+                                      .read(ProfileDetailsNotifierProvider(id).notifier)
+                                      .setUserOverride(userOverride.copyWith(isAutoUpdateDisable: value)),
+                                ),
+                                AnimatedSize(
+                                  alignment: Alignment.topCenter,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                  child: !userOverride.isAutoUpdateDisable
+                                      ? Column(
+                                          children: [
+                                            const Divider(indent: 16, endIndent: 16),
+                                            const Gap(12),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      t.pages.profileDetails.form.autoUpdateInterval,
+                                                      style: theme.textTheme.titleSmall!.copyWith(
+                                                        color: theme.colorScheme.onSurface,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    _genSliderText(t, userOverride.updateInterval ?? 0),
+                                                    style: theme.textTheme.labelSmall!.copyWith(
+                                                      color: theme.colorScheme.onSurfaceVariant,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const Gap(4),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                                              child: Slider(
+                                                focusNode: sliderFocusNode,
+                                                value:
+                                                    userOverride.updateInterval?.toDouble() ??
+                                                    options?.updateInterval.inHours.toDouble() ??
+                                                    0.0,
+                                                max: 96,
+                                                divisions: 96,
+                                                label: (userOverride.updateInterval ?? 0).toString(),
+                                                onChanged: (double value) => ref
+                                                    .read(ProfileDetailsNotifierProvider(id).notifier)
+                                                    .setUserOverride(
+                                                      userOverride.copyWith(updateInterval: value.toInt()),
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : const SizedBox.shrink(),
+                                ),
+                                const Divider(indent: 16, endIndent: 16),
+                              ],
+                              if (Platform.isWindows || Platform.isLinux)
+                                ListTile(
+                                  title: Text(t.pages.profileDetails.form.adminPreference),
+                                  subtitle: Text(switch (userOverride.adminPreference) {
+                                    UserAdminPreference.unset => t.pages.profileDetails.form.adminPreferenceAskEachTime,
+                                    UserAdminPreference.preferAdmin =>
+                                      t.pages.profileDetails.form.adminPreferencePreferAdmin,
+                                    UserAdminPreference.preferNoAdmin =>
+                                      t.pages.profileDetails.form.adminPreferencePreferNoAdmin,
+                                  }),
+                                  trailing: userOverride.adminPreference == UserAdminPreference.unset
+                                      ? null
+                                      : TextButton(
+                                          onPressed: () => ref
+                                              .read(ProfileDetailsNotifierProvider(id).notifier)
+                                              .setUserOverride(
+                                                userOverride.copyWith(adminPreference: UserAdminPreference.unset),
+                                              ),
+                                          child: Text(t.pages.profileDetails.form.adminPreferenceReset),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                  dense: true,
+                                ),
+                              if (Platform.isWindows || Platform.isLinux) const Divider(indent: 16, endIndent: 16),
+                              ListTile(
+                                title: Text(t.pages.profileDetails.lastUpdate),
+                                leading: const Icon(FluentIcons.history_24_regular),
+                                subtitle: Text(data.profile.lastUpdate.format()),
+                                dense: true,
                               ),
-                            ),
+                              if (data.profile case RemoteProfileEntity(:final subInfo?)) ...[
+                                const Divider(indent: 16, endIndent: 16),
+                                Align(
+                                  alignment: AlignmentDirectional.centerStart,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text.rich(
+                                          style: Theme.of(context).textTheme.bodySmall,
+                                          TextSpan(
+                                            children: [
+                                              _buildSubProp(
+                                                FluentIcons.arrow_upload_16_regular,
+                                                subInfo.upload.size(),
+                                                t.components.subscriptionInfo.upload,
+                                              ),
+                                              const TextSpan(text: "     "),
+                                              _buildSubProp(
+                                                FluentIcons.arrow_download_16_regular,
+                                                subInfo.download.size(),
+                                                t.components.subscriptionInfo.download,
+                                              ),
+                                              const TextSpan(text: "     "),
+                                              _buildSubProp(
+                                                FluentIcons.arrow_bidirectional_up_down_16_regular,
+                                                subInfo.total.size(),
+                                                t.components.subscriptionInfo.total,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Gap(12),
+                                        Text.rich(
+                                          style: Theme.of(context).textTheme.bodySmall,
+                                          TextSpan(
+                                            children: [
+                                              _buildSubProp(
+                                                FluentIcons.clock_dismiss_20_regular,
+                                                subInfo.expire.format(),
+                                                t.components.subscriptionInfo.expireDate,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              const Divider(),
+                            ],
                           ),
-                        ],
-                        const Divider(),
-                      ],
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    child: isJson(data.configContent)
-                        ? JsonEditor(
-                            expandedObjects: const ["outbounds", "endpoints"],
-                            onChanged: (value) {
-                              if (value == null) return;
-                              try {
-                                const encoder = JsonEncoder.withIndent('  ');
-                                ref.read(provider.notifier).setContent(encoder.convert(value));
-                              } catch (e) {
-                                ref.read(provider.notifier).setContent("$value");
-                              }
-                            },
-                            enableHorizontalScroll: true,
-                            json: data.configContent,
-                          )
-                        : TextFormField(
-                            onChanged: (value) {
-                              ref.read(provider.notifier).setContent(value);
-                            },
-                            maxLines: null,
-                            expands: true,
-                            textAlignVertical: TextAlignVertical.top,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.only(left: 5, top: 8, bottom: 8),
-                            ),
-                          ),
-                  ),
-                ],
+                    Expanded(
+                      child: switch (data.config) {
+                        AsyncData(value: final config) =>
+                          config.isJson
+                              ? JsonEditor(
+                                  expandedObjects: const ["outbounds", "endpoints"],
+                                  onChanged: (value) {
+                                    if (value == null) return;
+                                    try {
+                                      const encoder = JsonEncoder.withIndent('  ');
+                                      ref.read(provider.notifier).setContent(encoder.convert(value));
+                                    } catch (e) {
+                                      ref.read(provider.notifier).setContent("$value");
+                                    }
+                                  },
+                                  enableHorizontalScroll: true,
+                                  json: config.text,
+                                )
+                              : TextFormField(
+                                  initialValue: config.text,
+                                  onChanged: (value) {
+                                    ref.read(provider.notifier).setContent(value);
+                                  },
+                                  maxLines: null,
+                                  expands: true,
+                                  textAlignVertical: TextAlignVertical.top,
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.only(left: 5, top: 8, bottom: 8),
+                                  ),
+                                ),
+                        AsyncError(:final error) => Center(child: Text(t.presentShortError(error))),
+                        // only the editor waits for a large config; the details above can be edited
+                        _ => const Center(child: CircularProgressIndicator()),
+                      },
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -333,14 +355,5 @@ class ProfileDetailsPage extends HookConsumerWidget with PresLogger {
         TextSpan(text: text),
       ],
     );
-  }
-}
-
-bool isJson(String value) {
-  try {
-    jsonDecode(value);
-    return true;
-  } catch (_) {
-    return false;
   }
 }
