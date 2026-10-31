@@ -27,7 +27,7 @@ ActiveProxyCardData? _card(List<OutboundGroup> groups, {ChainStatus chain = Chai
     ActiveProxyCardData.from(
       OutboundGroupList(items: groups, chainHop: hop),
       chain: chain,
-      hopMode: ChainMode.warp,
+      hopMode: ChainMode.warpWireGuard,
     );
 
 void main() {
