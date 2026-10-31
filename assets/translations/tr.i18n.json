@@ -185,10 +185,10 @@
         "disableAutoUpdate": "Otomatik güncellemeyi kapat",
         "autoUpdateInterval": "Otomatik güncelleme aralığı",
         "loading": "Profil ekleniyor…",
-        "adminPreference": "Yönetici tercihi",
+        "adminPreference": "Yönetici izni",
         "adminPreferenceAskEachTime": "Her seferinde sor",
-        "adminPreferencePreferAdmin": "Her zaman yönetici kullan",
-        "adminPreferencePreferNoAdmin": "Her zaman yönetici olmadan devam et",
+        "adminPreferencePreferAdmin": "Her zaman yönetici izni kullan",
+        "adminPreferencePreferNoAdmin": "Her zaman yönetici izni olmadan devam et",
         "adminPreferenceReset": "Yönetici izni için her seferinde sor"
       }
     },
@@ -699,14 +699,14 @@
       },
       "proxyNeedsAdmin": {
         "title": "Yönetici izni önerilir",
-        "msg": "Bu profildeki bazı ayarlar yönetici izniyle daha iyi çalışır. Yönetici izniyle çalıştırabilir veya izin olmadan devam edebilirsiniz (bu ayarlar bu bağlantı için kapatılır).",
+        "msg": "Bu profildeki bazı ayarlar yönetici izniyle daha iyi çalışır. Yönetici izniyle çalıştırabilir veya izin olmadan devam edip bu ayarları bu bağlantı için kapatabilirsiniz.",
         "seeConfigs": "Yapılandırmaları göster",
         "hideConfigs": "Yapılandırmaları gizle",
         "neverAskAgain": "Bu profil için bir daha sorma",
         "runAsAdmin": "Yönetici olarak çalıştır",
-        "continueWithoutAdmin": "Yönetici olmadan devam et",
+        "continueWithoutAdmin": "Yönetici izni olmadan devam et",
         "elevationFailedTitle": "Yönetici izni alınamadı",
-        "elevationFailedMsg": "Yönetici istemi reddedildi veya başarısız oldu. Tekrar deneyin veya bu bağlantı için yönetici olmadan devam edin.",
+        "elevationFailedMsg": "Yönetici istemi reddedildi veya başarısız oldu. Tekrar deneyin veya bu bağlantı için yönetici izni olmadan devam edin.",
         "tryAgain": "Tekrar dene"
       }
     },

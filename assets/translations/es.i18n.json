@@ -186,10 +186,10 @@
         "disableAutoUpdate": "Desactivar actualización automática",
         "autoUpdateInterval": "Intervalo de actualización automática",
         "loading": "Añadiendo perfil…",
-        "adminPreference": "Preferencia de administrador",
+        "adminPreference": "Permiso de administrador",
         "adminPreferenceAskEachTime": "Preguntar cada vez",
-        "adminPreferencePreferAdmin": "Usar siempre administrador",
-        "adminPreferencePreferNoAdmin": "Continuar siempre sin administrador",
+        "adminPreferencePreferAdmin": "Usar siempre el permiso de administrador",
+        "adminPreferencePreferNoAdmin": "Continuar siempre sin permiso de administrador",
         "adminPreferenceReset": "Preguntar cada vez por el permiso de administrador"
       }
     },
@@ -701,14 +701,14 @@
       },
       "proxyNeedsAdmin": {
         "title": "Se recomienda permiso de administrador",
-        "msg": "Algunos ajustes de este perfil funcionan mejor con permiso de administrador. Puedes ejecutar con permiso de administrador o continuar sin él (esos ajustes se desactivarán para esta conexión).",
-        "seeConfigs": "Ver configuraciones",
+        "msg": "Algunos ajustes de este perfil funcionan mejor con permiso de administrador. Puedes ejecutar con permiso de administrador, o continuar sin él y desactivar esos ajustes para esta conexión.",
+        "seeConfigs": "Mostrar configuraciones",
         "hideConfigs": "Ocultar configuraciones",
         "neverAskAgain": "No volver a preguntar para este perfil",
         "runAsAdmin": "Ejecutar como administrador",
-        "continueWithoutAdmin": "Continuar sin administrador",
+        "continueWithoutAdmin": "Continuar sin permiso de administrador",
         "elevationFailedTitle": "No se pudo obtener el permiso de administrador",
-        "elevationFailedMsg": "La solicitud de administrador se rechazó o falló. Vuelve a intentarlo o continúa sin administrador para esta conexión.",
+        "elevationFailedMsg": "La solicitud de administrador se rechazó o falló. Vuelve a intentarlo o continúa sin permiso de administrador para esta conexión.",
         "tryAgain": "Volver a intentarlo"
       }
     },

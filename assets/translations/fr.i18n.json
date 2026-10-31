@@ -186,10 +186,10 @@
         "disableAutoUpdate": "Désactiver la mise à jour automatique",
         "autoUpdateInterval": "Intervalle de mise à jour automatique",
         "loading": "Ajout du profil…",
-        "adminPreference": "Préférence administrateur",
+        "adminPreference": "Autorisation administrateur",
         "adminPreferenceAskEachTime": "Demander à chaque fois",
-        "adminPreferencePreferAdmin": "Toujours utiliser l’administrateur",
-        "adminPreferencePreferNoAdmin": "Toujours continuer sans administrateur",
+        "adminPreferencePreferAdmin": "Toujours utiliser l’autorisation administrateur",
+        "adminPreferencePreferNoAdmin": "Toujours continuer sans autorisation administrateur",
         "adminPreferenceReset": "Demander à chaque fois l’autorisation administrateur"
       }
     },
@@ -701,14 +701,14 @@
       },
       "proxyNeedsAdmin": {
         "title": "Autorisation administrateur recommandée",
-        "msg": "Certains paramètres de ce profil fonctionnent mieux avec l’autorisation administrateur. Vous pouvez lancer avec l’autorisation administrateur ou continuer sans (ces paramètres seront désactivés pour cette connexion).",
-        "seeConfigs": "Voir les configurations",
+        "msg": "Certains paramètres de ce profil fonctionnent mieux avec l’autorisation administrateur. Vous pouvez lancer avec l’autorisation administrateur, ou continuer sans et désactiver ces paramètres pour cette connexion.",
+        "seeConfigs": "Afficher les configurations",
         "hideConfigs": "Masquer les configurations",
         "neverAskAgain": "Ne plus demander pour ce profil",
         "runAsAdmin": "Exécuter en tant qu’administrateur",
-        "continueWithoutAdmin": "Continuer sans administrateur",
+        "continueWithoutAdmin": "Continuer sans autorisation administrateur",
         "elevationFailedTitle": "Impossible d’obtenir l’autorisation administrateur",
-        "elevationFailedMsg": "La demande administrateur a été refusée ou a échoué. Réessayez, ou continuez sans administrateur pour cette connexion.",
+        "elevationFailedMsg": "La demande administrateur a été refusée ou a échoué. Réessayez, ou continuez sans autorisation administrateur pour cette connexion.",
         "tryAgain": "Réessayer"
       }
     },

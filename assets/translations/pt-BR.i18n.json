@@ -186,10 +186,10 @@
         "disableAutoUpdate": "Desativar atualização automática",
         "autoUpdateInterval": "Intervalo de atualização automática",
         "loading": "Adicionando perfil…",
-        "adminPreference": "Preferência de administrador",
+        "adminPreference": "Permissão de administrador",
         "adminPreferenceAskEachTime": "Perguntar sempre",
-        "adminPreferencePreferAdmin": "Sempre usar administrador",
-        "adminPreferencePreferNoAdmin": "Sempre continuar sem administrador",
+        "adminPreferencePreferAdmin": "Sempre usar a permissão de administrador",
+        "adminPreferencePreferNoAdmin": "Sempre continuar sem permissão de administrador",
         "adminPreferenceReset": "Perguntar sempre sobre a permissão de administrador"
       }
     },
@@ -701,14 +701,14 @@
       },
       "proxyNeedsAdmin": {
         "title": "Permissão de administrador recomendada",
-        "msg": "Algumas configurações deste perfil funcionam melhor com permissão de administrador. Você pode executar com permissão de administrador ou continuar sem ela (essas configurações serão desativadas para esta conexão).",
-        "seeConfigs": "Ver configurações",
+        "msg": "Algumas configurações deste perfil funcionam melhor com permissão de administrador. Você pode executar com permissão de administrador, ou continuar sem ela e desativar essas configurações para esta conexão.",
+        "seeConfigs": "Mostrar configurações",
         "hideConfigs": "Ocultar configurações",
         "neverAskAgain": "Não perguntar de novo para este perfil",
         "runAsAdmin": "Executar como administrador",
-        "continueWithoutAdmin": "Continuar sem administrador",
+        "continueWithoutAdmin": "Continuar sem permissão de administrador",
         "elevationFailedTitle": "Não foi possível obter a permissão de administrador",
-        "elevationFailedMsg": "A solicitação de administrador foi negada ou falhou. Tente de novo ou continue sem administrador para esta conexão.",
+        "elevationFailedMsg": "A solicitação de administrador foi negada ou falhou. Tente de novo ou continue sem permissão de administrador para esta conexão.",
         "tryAgain": "Tentar de novo"
       }
     },

@@ -185,10 +185,10 @@
         "disableAutoUpdate": "Nonaktifkan pembaruan otomatis",
         "autoUpdateInterval": "Interval pembaruan otomatis",
         "loading": "Menambahkan profil…",
-        "adminPreference": "Preferensi administrator",
+        "adminPreference": "Izin administrator",
         "adminPreferenceAskEachTime": "Tanya setiap kali",
-        "adminPreferencePreferAdmin": "Selalu gunakan admin",
-        "adminPreferencePreferNoAdmin": "Selalu lanjutkan tanpa admin",
+        "adminPreferencePreferAdmin": "Selalu gunakan izin administrator",
+        "adminPreferencePreferNoAdmin": "Selalu lanjutkan tanpa izin administrator",
         "adminPreferenceReset": "Tanya setiap kali soal izin administrator"
       }
     },
@@ -692,21 +692,21 @@
       "vpnNeedsAdmin": {
         "title": "Izin administrator diperlukan",
         "msg": "Mode VPN memerlukan izin administrator satu kali untuk memasang layanan latar belakang Hiddify. Setelah itu, Anda dapat terhubung tanpa permintaan lagi.",
-        "connectWithAdmin": "Hubungkan dengan izin admin",
+        "connectWithAdmin": "Hubungkan dengan izin administrator",
         "waitingTitle": "Menunggu izin administrator",
         "waitingMsg": "Izinkan permintaan administrator untuk melanjutkan. Anda dapat berhenti dan mencoba lagi nanti.",
         "stop": "Berhenti"
       },
       "proxyNeedsAdmin": {
         "title": "Izin administrator disarankan",
-        "msg": "Beberapa pengaturan di profil ini bekerja lebih baik dengan izin administrator. Anda dapat menjalankan dengan izin admin, atau melanjutkan tanpanya (pengaturan tersebut akan dimatikan untuk koneksi ini).",
-        "seeConfigs": "Lihat konfigurasi",
+        "msg": "Beberapa pengaturan di profil ini bekerja lebih baik dengan izin administrator. Anda dapat menjalankan dengan izin administrator, atau melanjutkan tanpanya dan mematikan pengaturan tersebut untuk koneksi ini.",
+        "seeConfigs": "Tampilkan konfigurasi",
         "hideConfigs": "Sembunyikan konfigurasi",
         "neverAskAgain": "Jangan tanya lagi untuk profil ini",
-        "runAsAdmin": "Jalankan sebagai admin",
-        "continueWithoutAdmin": "Lanjutkan tanpa admin",
+        "runAsAdmin": "Jalankan sebagai administrator",
+        "continueWithoutAdmin": "Lanjutkan tanpa izin administrator",
         "elevationFailedTitle": "Tidak dapat memperoleh izin administrator",
-        "elevationFailedMsg": "Permintaan administrator ditolak atau gagal. Coba lagi, atau lanjutkan tanpa admin untuk koneksi ini.",
+        "elevationFailedMsg": "Permintaan administrator ditolak atau gagal. Coba lagi, atau lanjutkan tanpa izin administrator untuk koneksi ini.",
         "tryAgain": "Coba lagi"
       }
     },
