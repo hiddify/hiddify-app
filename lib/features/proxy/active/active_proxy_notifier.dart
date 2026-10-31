@@ -221,6 +221,21 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
     });
   }
 
+  /// Hands [mainGroup]'s choice to the lowest-delay group.
+  Future<void> switchToLowest(String mainGroup) async {
+    await ref.read(hapticServiceProvider.notifier).lightImpact();
+    await ref
+        .read(proxyRepositoryProvider)
+        .selectProxy(mainGroup, lowestGroupTag)
+        .map((_) => true)
+        .getOrElse((err) {
+          loggy.warning("error switching to lowest", err);
+          final t = ref.read(translationsProvider).requireValue;
+          ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.switchFailed);
+          return false;
+        })
+        .run();
+  }
 }
 
 /// What the home proxy card shows; null until the core has sent a message.
