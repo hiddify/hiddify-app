@@ -150,11 +150,14 @@ class ChainOptionsPage extends HookConsumerWidget {
                         presentValue: (value) => value.present(t),
                         formatInputValue: (value) => value.format(),
                       ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.unblockerWarpNoiseMode),
+                      ChoicePreferenceWidget<String>(
+                        selected: ref.watch(ConfigOptions.unblockerWarpNoiseMode),
                         preferences: ref.watch(ConfigOptions.unblockerWarpNoiseMode.notifier),
+                        // the core's named noise presets; a mode typed in before stays choosable
+                        choices: {..._noiseModes, ref.watch(ConfigOptions.unblockerWarpNoiseMode)}.toList(),
                         title: t.pages.settings.chain.warp.noise.mode,
                         icon: Icons.mode_standby_rounded,
+                        presentChoice: (mode) => _presentNoiseMode(t, mode),
                       ),
                       ValuePreferenceWidget(
                         value: ref.watch(ConfigOptions.unblockerWarpNoiseSize),
@@ -240,3 +243,21 @@ class ChainOptionsPage extends HookConsumerWidget {
 //   icon: Icons.alt_route_rounded,
 //   presentChoice: (value) => value.present(t),
 // ),
+
+/// The noise modes the core knows by name (hiddify.NoisePresets), and its default packets (m4).
+const _noiseModes = ['m4', 'random', 'quic', 'quic-mimic', 'dns', 'dns-cloudflare', 'sip', 'stun'];
+
+String _presentNoiseMode(Translations t, String mode) {
+  final m = t.pages.settings.chain.warp.noise.modes;
+  return switch (mode) {
+    'm4' => m.standard,
+    'random' => m.random,
+    'quic' => m.quic,
+    'quic-mimic' => m.quicMimic,
+    'dns' => m.dns,
+    'dns-cloudflare' => m.dnsCloudflare,
+    'sip' => m.sip,
+    'stun' => m.stun,
+    _ => mode,
+  };
+}

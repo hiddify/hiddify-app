@@ -550,7 +550,17 @@
             "count": "تعداد نویز",
             "mode": "حالت نویز",
             "size": "اندازه نویز",
-            "delay": "تأخیر نویز"
+            "delay": "تأخیر نویز",
+            "modes": {
+              "standard": "استاندارد",
+              "random": "تصادفی",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "دست‌دهی QUIC",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (تماس اینترنتی)",
+              "stun": "STUN (تماس تصویری)"
+            }
           }
         },
         "psiphon": {

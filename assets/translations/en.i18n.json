@@ -550,7 +550,17 @@
             "count": "Noise count",
             "mode": "Noise mode",
             "size": "Noise size",
-            "delay": "Noise delay"
+            "delay": "Noise delay",
+            "modes": {
+              "standard": "Standard",
+              "random": "Random",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "QUIC handshake",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (VoIP call)",
+              "stun": "STUN (video call)"
+            }
           }
         },
         "psiphon": {
