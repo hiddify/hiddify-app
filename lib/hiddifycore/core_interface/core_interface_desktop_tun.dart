@@ -111,8 +111,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     final wantAdminBg = useAdminBgService || options.enableTun;
     if (!wantAdminBg) {
       _usingAdminBg = false;
-      bgClient = fgClient;
-      _clientChanges.add(null);
+      _useBgClient(fgClient);
       _checkResponse(
         await fgClient.start(StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit)),
       );
@@ -125,8 +124,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       _status.add(const CoreStatus.starting());
       try {
         _usingAdminBg = false;
-        bgClient = fgClient;
-        _clientChanges.add(null);
+        _useBgClient(fgClient);
         _checkResponse(
           await fgClient.changeHiddifySettings(
             ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
@@ -245,8 +243,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     final failedChannel = _serviceChannel;
     _serviceChannel = null;
     _usingAdminBg = false;
-    bgClient = fgClient;
-    _clientChanges.add(null);
+    _useBgClient(fgClient);
     if (failedChannel != null) {
       unawaited(() async {
         try {
@@ -260,6 +257,14 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     final message = error.toString();
     _status.add(CoreStatus.stopped(alert: CoreAlert.startFailed, message: message));
     loggy.warning('VPN start failed: $message');
+  }
+
+  /// Re-arms the background listeners only when the client really changes. Every event reopens
+  /// the bg log stream, and a stop followed by a proxy-mode start sent two for the same client.
+  void _useBgClient(CoreClient client) {
+    if (identical(bgClient, client)) return;
+    bgClient = client;
+    _clientChanges.add(null);
   }
 
   Future<bool> _isPrivileged() async {
@@ -304,8 +309,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     _usingAdminBg = false;
     useAdminBgService = false;
     wrapAdminElevation = null;
-    bgClient = fgClient;
-    _clientChanges.add(null);
+    _useBgClient(fgClient);
     if (old != null) {
       unawaited(() async {
         try {
@@ -323,7 +327,8 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       }
     }
     try {
-      _checkResponse(await fgClient.stop(Empty()), allowStopped: true);
+      // Bounded: a stalled channel must fail the stop, not leave the next connect stuck on connecting.
+      _checkResponse(await fgClient.stop(Empty()).timeout(const Duration(seconds: 5)), allowStopped: true);
     } catch (error) {
       loggy.warning('stopping the in-process core failed: $error');
     }
