@@ -91,7 +91,7 @@ jobs:
           # - { platform: linux-arm64,      os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
           # - { platform: linux-amd64-musl, os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
           # - { platform: linux-arm64-musl, os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
-          - { platform: macos,            os: macos-15,       aarch: universal, targets: "dmg,pkg" }
+          - { platform: macos,            os: macos-26,       aarch: universal, targets: "dmg,pkg" }
           - { platform: macos-appstore,   os: macos-26,       aarch: universal, targets: "pkg,dmg" }
           - { platform: ios,              os: macos-26,       aarch: universal, filename: hiddify-ios, targets: ipa }
     runs-on: ${{ matrix.os }}
@@ -461,6 +461,17 @@ jobs:
           mkdir out
           ls -R ./build/app/outputs
           cp ./build/app/outputs/bundle/release/app-release.aab out/hiddify-android-market.aab || echo "no aab"
+
+      - name: Check the macOS app icon
+        if: startsWith(matrix.platform, 'macos') && inputs.upload-artifact
+        # AppIcon.icon (Icon Composer) needs Xcode 26; older Xcode builds the app without any icon.
+        run: |
+          app=build/macos/Build/Products/Release/Hiddify.app
+          xcodebuild -version
+          for f in Assets.car AppIcon.icns; do
+            [[ -s "$app/Contents/Resources/$f" ]] || { echo "::error::$app has no Contents/Resources/$f (app icon)"; exit 1; }
+          done
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIconName" "$app/Contents/Info.plist"
 
       - name: Copy to out macOS App Store
         if: matrix.platform == 'macos-appstore' && inputs.upload-artifact
