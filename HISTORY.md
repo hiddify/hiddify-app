@@ -1,7 +1,104 @@
 # Changelog
 
 
-## 5.2.1 (2026-10-31)
+## 5.3.0 (2026-10-31)
+
+#### Other
+
+* Build(dependencies): update core version to 5.3.0 and sync subproject commit. 
+
+* Docs: add agent guide for pull requests in hiddify-app. 
+
+* Fix(profile): open the profile editor at once and show the whole config editor. 
+  _The page waited for the whole config before showing anything: it generated
+it through the core, decoded and re-encoded the JSON and logged all of it,
+and re-checked it was JSON on every rebuild. Renaming a large profile meant
+waiting for all of that. The profile now shows at once and only the editor
+waits, with the JSON work in an isolate; a save made before the config
+loads waits for it, so the config is never saved empty.
+
+The editor was a box of 70% of the screen inside a scrolling page: the
+wheel over it scrolled only the editor, so its end stayed below the window.
+It now fills the room the details leave, and the details scroll on their
+own past half the height. A non-JSON config is shown in the text editor
+instead of an empty field that overwrote it._
+
+* Feat(settings): choose the WARP noise mode from named presets. 
+  _The noise mode was a free-text field defaulting to m4. It is now a list of
+the modes the core knows by name, with readable labels in English and
+Persian: Standard, Random, QUIC (HTTPS), QUIC handshake, DNS, SIP (VoIP
+call), STUN (video call). A mode typed in before stays in the list._
+
+* Build(core): bump hiddify-core for named noise presets. 
+  _Includes the wireguard-go fix that kept the WARP reserved bytes out of noise packets, and noise presets (sip, dns, stun, ...) named in WireGuard noise mode and the AmneziaWG ip._
+
+* Feat(home): explain a connection whose selected proxy or extra security is down. 
+  _The core is connected as soon as any proxy answers, so "Connected" hid a
+dead hand-picked proxy or a chain hop that never came up.
+
+- The button turns amber and its label names the problem ("Selected
+  proxy isn't responding", "Extra security couldn't connect"); while the
+  hop connects it says so. Tapping the label opens the connection check.
+- "Use fastest available" next to the ping selects lowest in one tap.
+- The chain hop is a shield (lock for unblocker) on the button's rim:
+  check when up, breathing outline while connecting, red cross on
+  failure, grey while it waits for the selected proxy.
+- The connection check sheet walks the path step by step: core, fastest
+  proxy, selected proxy, chain hop, each with its fix._
+
+* Fix(macos): hide Reset VPN profile when there is no Network Extension. 
+  _The tunnel service build has no VPN profile in System Settings, so the
+option only stopped the service and seemed to do nothing. Show it only
+when the system keeps a profile for the app._
+
+* Ci(macos): build the Developer ID app with Xcode 26 so it has an icon. 
+  _The app icon is an Icon Composer AppIcon.icon, which Xcode 16 cannot
+compile: the macos-15 build shipped without Assets.car or AppIcon.icns
+and showed the blank placeholder icon. Build on macos-26 like the App
+Store and iOS jobs, and fail the build when the icon is missing._
+
+* Fix(core): stop re-arming bg listeners twice per connect on Windows and Linux. 
+  _A stop followed by a proxy-mode start announced the same background client
+twice, and each announcement reopened the bg log stream and rebuilt the proxy
+and stats listeners, leaving cancelled-before-ready gRPC streams behind on the
+only core channel. Announce a client change only when the client changes, and
+bound the in-process stop so a stalled channel cannot leave the next connect
+stuck on connecting._
+
+* Fix(core): stop orphaned gRPC streams from stalling the core channel in macOS proxy mode. 
+  _grpc-dart leaves a streaming call open when its subscription is cancelled
+before the call is ready. The macOS "bg" log listener was re-armed twice per
+connect, so one log stream stayed open unread and filled the shared 64 KB
+HTTP/2 window. Every later RPC then stalled: the proxy list never appeared,
+stop timed out and the next connect hung.
+
+- Cancel the gRPC call itself when a stream subscription is cancelled.
+- Skip the bg log listener when the bg client is the fg client.
+- Time out the quiet stop before start after 5 s.
+- Add a regression test that reproduces the stall in-process._
+
+* Fix(windows): use the reserved Store name Hiddify ProxyVPN for the MSIX. 
+  _Partner Center rejected the package because Package/Properties/DisplayName
+"Hiddify" is not a name reserved for the product._
+
+* Fix(ci): upload to TestFlight with an Apple ID and fix the Mac App Store pkg. 
+  _The TestFlight job now authenticates with a dedicated Apple ID and an
+app-specific password (APPLE_UPLOAD_APPLE_ID, APPLE_UPLOAD_APP_PASSWORD)
+when those secrets are set, and falls back to the App Store Connect API
+key otherwise. Unlike an API key, the Apple ID can be limited to the
+Hiddify apps.
+
+App Store Connect rejected the Mac App Store pkg with ITMS-90255: the
+LaunchAtLogin helper's Info.plist was owner-only, and its quarantine
+attribute shipped as a ._Info.plist file. Both come from the helper's
+`defaults write`; the build now fixes the mode and strips the
+attributes, and dist.sh refuses to pack such files._
+
+* Refactor Microsoft Store release pipeline. 
+
+
+
+## v5.2.1 (2026-10-31)
 
 #### Other
 
