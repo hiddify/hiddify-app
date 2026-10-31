@@ -35,5 +35,5 @@ git commit -m "release: version ${TAG}"
 echo "creating git tag : v${TAG}" 
 git push 
 git tag v${TAG} 
-git push -u origin HEAD --tags 
+git push --tags 
 echo "Github Actions will detect the new tag and release the new version."
