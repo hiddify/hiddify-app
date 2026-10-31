@@ -17,6 +17,13 @@ task_migration="$task_resources/container-migration.plist"
 # name. That fails without a name (ad hoc) or when two certificates share it, leaving a signature
 # that no longer matches. Sign it again by the identity's hash before Xcode signs the app around it.
 task_login_helper="$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Library/LoginItems/LaunchAtLoginHelper.app"
+# Its `defaults write` also leaves the helper's Info.plist owner-only (0600) with extended
+# attributes. App Store Connect rejects that pkg (ITMS-90255: files only readable by root),
+# and productbuild ships the attributes as a ._Info.plist file. Fix both before signing.
+if [[ -d "$task_login_helper" ]]; then
+  chmod -R u+rwX,go+rX "$task_login_helper"
+  xattr -cr "$task_login_helper" 2>/dev/null || true
+fi
 if [[ -n "${EXPANDED_CODE_SIGN_IDENTITY:-}" && -d "$task_login_helper" ]]; then
   task_login_entitlements="$BUILT_PRODUCTS_DIR/LaunchAtLogin_LaunchAtLogin.bundle/Contents/Resources/LaunchAtLogin.entitlements"
   if [[ -f "$task_login_entitlements" ]]; then

@@ -58,6 +58,15 @@ case "$task_mode" in
     mkdir -p "$task_out"
     task_pkg="$task_out/hiddify-$task_version-macos-appstore.pkg"
     task_dmg="$task_out/hiddify-$task_version-macos-appstore.dmg"
+    # App Store Connect rejects files non-root users cannot read (ITMS-90255) and
+    # AppleDouble ._ files; catch both here instead of after a long upload.
+    task_unreadable="$(find "$task_app" ! -perm -o=r -print)"
+    task_appledouble="$(find "$task_app" -name '._*' -print)"
+    if [[ -n "$task_unreadable$task_appledouble" ]]; then
+      echo "error: $task_app has files App Store Connect rejects:" >&2
+      printf '%s\n' $task_unreadable $task_appledouble >&2
+      exit 1
+    fi
     productbuild --component "$task_app" /Applications --sign "$task_identity" "$task_pkg"
     task_stage="$(mktemp -d)"
     trap 'rm -rf "$task_stage"' EXIT

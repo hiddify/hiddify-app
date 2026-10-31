@@ -354,7 +354,7 @@ jobs:
         if: matrix.platform == 'macos-appstore' && inputs.upload-artifact
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        # Upload is a separate step so a bad APPSTORE_* secret still leaves pkg/dmg artifacts.
+        # Upload is a separate job so bad upload credentials still leave pkg/dmg artifacts.
         run: make macos-appstore-release
 
       - name: Validate iOS without code signing
@@ -680,7 +680,13 @@ jobs:
     with:
       release_tag: ${{ inputs.tag-name }}
 
-  # Needs only the build artifacts: same App Store Connect API key for iOS + macOS.
+  # Needs only the build artifacts. Two ways to authenticate, chosen by which secrets
+  # are set:
+  #  - APPLE_UPLOAD_APPLE_ID + APPLE_UPLOAD_APP_PASSWORD: a dedicated Apple ID with an
+  #    app-specific password (.github/scripts/upload_testflight.sh). That user can be
+  #    limited to the Hiddify apps. Preferred when both are configured.
+  #  - APPSTORE_ISSUER_ID + APPSTORE_API_KEY_ID + APPSTORE_API_PRIVATE_KEY: an App
+  #    Store Connect Team API key, which reaches every app of the team.
   upload-to-testflight:
     needs: [build]
     permissions:
@@ -689,7 +695,27 @@ jobs:
     if: ${{ inputs.upload-artifact }}
     runs-on: macos-26
     timeout-minutes: 60
+    env:
+      APPLE_UPLOAD_APPLE_ID: ${{ secrets.APPLE_UPLOAD_APPLE_ID }}
+      APPLE_UPLOAD_APP_PASSWORD: ${{ secrets.APPLE_UPLOAD_APP_PASSWORD }}
+      APPLE_UPLOAD_ASC_PROVIDER: ${{ secrets.APPLE_UPLOAD_ASC_PROVIDER }}
+      # apple-id | api-key | none
+      UPLOAD_AUTH: ${{ (secrets.APPLE_UPLOAD_APPLE_ID != '' && secrets.APPLE_UPLOAD_APP_PASSWORD != '') && 'apple-id' || (secrets.APPSTORE_ISSUER_ID != '' && secrets.APPSTORE_API_KEY_ID != '' && secrets.APPSTORE_API_PRIVATE_KEY != '') && 'api-key' || 'none' }}
     steps:
+      - name: Explain skipped TestFlight upload
+        if: env.UPLOAD_AUTH == 'none'
+        run: echo "::notice::TestFlight upload skipped - set APPLE_UPLOAD_APPLE_ID + APPLE_UPLOAD_APP_PASSWORD, or the APPSTORE_* API key secrets."
+
+      - name: Show TestFlight authentication
+        if: env.UPLOAD_AUTH != 'none'
+        run: echo "TestFlight upload authenticates with ${UPLOAD_AUTH}"
+
+      - name: checkout
+        if: env.UPLOAD_AUTH == 'apple-id'
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: .github/scripts
+
       - name: Download iOS artifact
         continue-on-error: true
         id: dl-ios
@@ -709,8 +735,12 @@ jobs:
             echo "No iOS IPA artifact; skipping TestFlight upload."
           fi
 
-      - name: Upload iOS IPA to TestFlight
-        if: steps.ios.outputs.present == 'true'
+      - name: Upload iOS IPA to TestFlight (Apple ID)
+        if: steps.ios.outputs.present == 'true' && env.UPLOAD_AUTH == 'apple-id'
+        run: bash .github/scripts/upload_testflight.sh ios out/Hiddify-iOS.ipa
+
+      - name: Upload iOS IPA to TestFlight (API key)
+        if: steps.ios.outputs.present == 'true' && env.UPLOAD_AUTH == 'api-key'
         uses: Apple-Actions/upload-testflight-build@v5
         with:
           app-path: out/Hiddify-iOS.ipa
@@ -738,8 +768,12 @@ jobs:
             echo "No macOS App Store pkg artifact; skipping TestFlight upload."
           fi
 
-      - name: Upload macOS App Store pkg to TestFlight
-        if: steps.macos.outputs.present == 'true'
+      - name: Upload macOS App Store pkg to TestFlight (Apple ID)
+        if: steps.macos.outputs.present == 'true' && env.UPLOAD_AUTH == 'apple-id'
+        run: bash .github/scripts/upload_testflight.sh macos out/Hiddify-MacOS-AppStore.pkg
+
+      - name: Upload macOS App Store pkg to TestFlight (API key)
+        if: steps.macos.outputs.present == 'true' && env.UPLOAD_AUTH == 'api-key'
         uses: Apple-Actions/upload-testflight-build@v5
         with:
           app-path: out/Hiddify-MacOS-AppStore.pkg
