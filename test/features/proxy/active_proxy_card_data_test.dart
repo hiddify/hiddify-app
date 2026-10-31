@@ -111,6 +111,12 @@ void main() {
     expect(_info('M-NL', delay: 150, ip: '45.12.3.9').ipLookupFailed, isFalse);
   });
 
+  test("the last run's IP does not count until this run looks it up", () {
+    final cached = _info('M-NL', delay: 150)..ipinfo = IpInfo(ip: '45.12.3.9', fromCache: true);
+    expect(cached.hasIp, isFalse);
+    expect(cached.ipLookupFailed, isTrue);
+  });
+
   group('connection steps', () {
     StepStatus? server(int delay, {ChainStatus chain = ChainStatus.off, OutboundInfo? hop}) => _card(
       chain: chain,
