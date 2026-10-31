@@ -97,9 +97,90 @@ class SingboxUnblockerOption with _$SingboxUnblockerOption {
 }
 
 @freezed
+class SingboxWarpScannerOption with _$SingboxWarpScannerOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxWarpScannerOption({
+    @Default(true) bool searchNoise,
+    // Milliseconds and counts; 0 keeps the scanner's default.
+    @Default(0) int maxRtt,
+    @Default(0) int timeout,
+    @Default(0) int count,
+    @Default(0) int concurrency,
+    // Empty keeps the protocol's own ports and Cloudflare's ranges.
+    @Default(<int>[]) List<int> ports,
+    @Default(<String>[]) List<String> cidrs,
+    @Default(<String>[]) List<String> noisePresets,
+  }) = _SingboxWarpScannerOption;
+
+  factory SingboxWarpScannerOption.fromJson(Map<String, dynamic> json) => _$SingboxWarpScannerOptionFromJson(json);
+}
+
+@freezed
+class SingboxWarpMasqueOption with _$SingboxWarpMasqueOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxWarpMasqueOption({
+    // auto (HTTP/3, falling back to HTTP/2), h3 or h2. A hop behind a detour runs h2 anyway.
+    @Default('auto') String vhttp,
+    @Default('') String serverName,
+    @Default(false) bool useIpv6,
+    // Seconds.
+    @Default(0) int udpTimeout,
+    @Default(0) int udpKeepalive,
+    @Default(0) int udpInitialPacketSize,
+    @Default(0) int reconnectDelay,
+    @Default(false) bool tlsInsecure,
+    @Default(false) bool tlsFragment,
+    // Milliseconds.
+    @Default(0) int tlsFragmentFallbackDelay,
+    @Default(false) bool tlsRecordFragment,
+    @Default(false) bool echEnabled,
+    @Default('') String echConfig,
+    @Default('') String echQueryServerName,
+  }) = _SingboxWarpMasqueOption;
+
+  factory SingboxWarpMasqueOption.fromJson(Map<String, dynamic> json) => _$SingboxWarpMasqueOptionFromJson(json);
+}
+
+@freezed
+class SingboxWarpAwgOption with _$SingboxWarpAwgOption {
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxWarpAwgOption({
+    // All zero keeps the core's AmneziaWG preset, which is what makes the tunnel look like
+    // something other than AmneziaWG.
+    @Default(0) int jc,
+    @Default(0) int jmin,
+    @Default(0) int jmax,
+    @Default(0) int s1,
+    @Default(0) int s2,
+    @Default(0) int s3,
+    @Default(0) int s4,
+    @Default('') String h1,
+    @Default('') String h2,
+    @Default('') String h3,
+    @Default('') String h4,
+    @Default('') String i1,
+    @Default('') String i2,
+    @Default('') String i3,
+    @Default('') String i4,
+    @Default('') String i5,
+  }) = _SingboxWarpAwgOption;
+
+  factory SingboxWarpAwgOption.fromJson(Map<String, dynamic> json) => _$SingboxWarpAwgOptionFromJson(json);
+}
+
+@freezed
 class SingboxExtraSecurityWarpOption with _$SingboxExtraSecurityWarpOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
-  const factory SingboxExtraSecurityWarpOption({required String licenseKey}) = _SingboxExtraSecurityWarpOption;
+  const factory SingboxExtraSecurityWarpOption({
+    required String licenseKey,
+    @Default(WarpEndpointSource.profile) WarpEndpointSource endpoint,
+    @Default('') String cleanIp,
+    @Default(0) int cleanPort,
+    @Default(0) int mtu,
+    @Default(SingboxWarpScannerOption()) SingboxWarpScannerOption scanner,
+    @Default(SingboxWarpMasqueOption()) SingboxWarpMasqueOption masque,
+    @Default(SingboxWarpAwgOption()) SingboxWarpAwgOption awg,
+  }) = _SingboxExtraSecurityWarpOption;
 
   factory SingboxExtraSecurityWarpOption.fromJson(Map<String, dynamic> json) =>
       _$SingboxExtraSecurityWarpOptionFromJson(json);
@@ -110,8 +191,13 @@ class SingboxUnblockerWarpOption with _$SingboxUnblockerWarpOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory SingboxUnblockerWarpOption({
     required String licenseKey,
+    @Default(WarpEndpointSource.scan) WarpEndpointSource endpoint,
     required String cleanIp,
     required int cleanPort,
+    @Default(0) int mtu,
+    @Default(SingboxWarpScannerOption()) SingboxWarpScannerOption scanner,
+    @Default(SingboxWarpMasqueOption()) SingboxWarpMasqueOption masque,
+    @Default(SingboxWarpAwgOption()) SingboxWarpAwgOption awg,
     @OptionalRangeJsonConverter() required OptionalRange noise,
     @OptionalRangeJsonConverter() required OptionalRange noiseSize,
     @OptionalRangeJsonConverter() required OptionalRange noiseDelay,

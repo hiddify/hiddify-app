@@ -503,12 +503,9 @@ class ProfileParser with InfraLogger {
   static ChainMode? extraSecurityMode(String? value) {
     if (value == null) return null;
     final trimmed = value.trim();
-    for (final mode in ChainMode.values) {
-      if (mode.isProfile()) continue;
-      // a subscription calls it "warp"; the core's key for it is "warp_auto"
-      if (mode.key == trimmed || (mode.isWarp() && trimmed == 'warp')) return mode;
-    }
-    return null;
+    // a subscription calls it "warp"; that names the mode that races every tunnel, unless it
+    // names one of the newer modes instead (warp_masque, warp_awg, warp_auto)
+    return ChainMode.tryFromLink(trimmed);
   }
 
   /// Build the `tls-tricks` map from a subscription `fragment` header.

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hiddify/core/localization/translations.dart';
-import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/notifier/chain_profile_notifier.dart';
 import 'package:hiddify/features/chain/overview/chain_timeline.dart';
@@ -9,8 +8,8 @@ import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
+import 'package:hiddify/features/settings/widget/warp_chain_options.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
-import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ChainOptionsPage extends HookConsumerWidget {
@@ -51,13 +50,10 @@ class ChainOptionsPage extends HookConsumerWidget {
                         presentValue: (value) => value.isEmpty ? t.common.notSet : value,
                       ),
                     ],
-                    ChainMode.warp => [
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.extraSecurityWarpLicenseKey),
-                        preferences: ref.watch(ConfigOptions.extraSecurityWarpLicenseKey.notifier),
-                        title: t.pages.settings.chain.warp.licenseKey,
-                        icon: Icons.key_rounded,
-                        presentValue: (value) => value.isEmpty ? t.common.notSet : value,
+                    ChainMode.warpWireGuard || ChainMode.warpMasque || ChainMode.warpAwg || ChainMode.warpAuto => [
+                      WarpChainOptions(
+                        mode: ref.watch(ConfigOptions.extraSecurityMode),
+                        preferences: ConfigOptions.extraSecurityWarp,
                       ),
                     ],
                     ChainMode.profile => [
@@ -118,61 +114,10 @@ class ChainOptionsPage extends HookConsumerWidget {
                         presentValue: (value) => value.isEmpty ? t.common.notSet : value,
                       ),
                     ],
-                    ChainMode.warp => [
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.unblockerWarpLicenseKey),
-                        preferences: ref.watch(ConfigOptions.unblockerWarpLicenseKey.notifier),
-                        title: t.pages.settings.chain.warp.licenseKey,
-                        icon: Icons.key_rounded,
-                        presentValue: (value) => value.isEmpty ? t.common.notSet : value,
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.unblockerWarpCleanIp),
-                        preferences: ref.watch(ConfigOptions.unblockerWarpCleanIp.notifier),
-                        title: t.pages.settings.chain.warp.cleanIp,
-                        icon: Icons.auto_awesome_rounded,
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.unblockerWarpPort),
-                        preferences: ref.watch(ConfigOptions.unblockerWarpPort.notifier),
-                        title: t.pages.settings.chain.warp.port,
-                        icon: Icons.device_hub_rounded,
-                        inputToValue: int.tryParse,
-                        validateInput: isPort,
-                        digitsOnly: true,
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.unblockerWarpNoise),
-                        preferences: ref.watch(ConfigOptions.unblockerWarpNoise.notifier),
-                        title: t.pages.settings.chain.warp.noise.count,
-                        icon: Icons.web_stories_rounded,
-                        inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
-                        presentValue: (value) => value.present(t),
-                        formatInputValue: (value) => value.format(),
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.unblockerWarpNoiseMode),
-                        preferences: ref.watch(ConfigOptions.unblockerWarpNoiseMode.notifier),
-                        title: t.pages.settings.chain.warp.noise.mode,
-                        icon: Icons.mode_standby_rounded,
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.unblockerWarpNoiseSize),
-                        preferences: ref.watch(ConfigOptions.unblockerWarpNoiseSize.notifier),
-                        title: t.pages.settings.chain.warp.noise.size,
-                        icon: Icons.settings_ethernet_rounded,
-                        inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
-                        presentValue: (value) => value.present(t),
-                        formatInputValue: (value) => value.format(),
-                      ),
-                      ValuePreferenceWidget(
-                        value: ref.watch(ConfigOptions.unblockerWarpNoiseDelay),
-                        preferences: ref.watch(ConfigOptions.unblockerWarpNoiseDelay.notifier),
-                        title: t.pages.settings.chain.warp.noise.delay,
-                        icon: Icons.schedule_rounded,
-                        inputToValue: (input) => OptionalRange.tryParse(input, allowEmpty: true),
-                        presentValue: (value) => value.present(t),
-                        formatInputValue: (value) => value.format(),
+                    ChainMode.warpWireGuard || ChainMode.warpMasque || ChainMode.warpAwg || ChainMode.warpAuto => [
+                      WarpChainOptions(
+                        mode: ref.watch(ConfigOptions.unblockerMode),
+                        preferences: ConfigOptions.unblockerWarp,
                       ),
                     ],
                     ChainMode.profile => [

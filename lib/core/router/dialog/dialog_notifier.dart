@@ -59,7 +59,7 @@ class DialogNotifier extends _$DialogNotifier {
   }
 
   Future<bool> showWarpLicense() async {
-    return await _show<bool?>(const ChainLicenseDialog(mode: ChainMode.warp)) ?? false;
+    return await _show<bool?>(const ChainLicenseDialog(mode: ChainMode.warpWireGuard)) ?? false;
   }
 
   Future<bool> showPsiphonLicense() async {

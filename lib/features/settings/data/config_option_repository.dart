@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dartx/dartx.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/optional_range.dart';
@@ -270,8 +272,8 @@ abstract class ConfigOptions {
 
   static final extraSecurityMode = PreferencesNotifier.create<ChainMode, String>(
     "extra-security-mode",
-    ChainMode.warp,
-    mapFrom: (value) => ChainMode.fromStored(value, ChainMode.warp),
+    ChainMode.warpAuto,
+    mapFrom: (value) => ChainMode.fromStored(value, ChainMode.warpAuto),
     mapTo: (value) => value.name,
   );
 
@@ -302,7 +304,79 @@ abstract class ConfigOptions {
 
   static final unblockerWarpLicenseKey = PreferencesNotifier.create<String, String>("unblocker-warp-license-key", "");
 
-  static final unblockerWarpCleanIp = PreferencesNotifier.create<String, String>("unblocker-warp-clean-ip", "auto");
+  static final unblockerWarpCleanIp = PreferencesNotifier.create<String, String>("unblocker-warp-clean-ip", "");
+
+  // Where the WARP peer comes from. Extra security sits in front of the profile, so it takes the
+  // endpoint Cloudflare assigned; the unblocker carries the public address and scans for one.
+  static final extraSecurityWarpEndpoint = PreferencesNotifier.create<WarpEndpointSource, String>(
+    "extra-security-warp-endpoint",
+    WarpEndpointSource.profile,
+    mapFrom: (value) => WarpEndpointSource.fromStored(value, WarpEndpointSource.profile),
+    mapTo: (value) => value.name,
+  );
+
+  static final unblockerWarpEndpoint = PreferencesNotifier.create<WarpEndpointSource, String>(
+    "unblocker-warp-endpoint",
+    WarpEndpointSource.scan,
+    mapFrom: (value) => WarpEndpointSource.fromStored(value, WarpEndpointSource.scan),
+    mapTo: (value) => value.name,
+  );
+
+  static final extraSecurityWarpCleanIp = PreferencesNotifier.create<String, String>("extra-security-warp-clean-ip", "");
+
+  static final extraSecurityWarpCleanPort = PreferencesNotifier.create<int, int>(
+    "extra-security-warp-clean-port",
+    0,
+    validator: (value) => isPort(value.toString()),
+  );
+
+  static final extraSecurityWarpMtu = PreferencesNotifier.create<int, int>("extra-security-warp-mtu", 0);
+
+  static final unblockerWarpMtu = PreferencesNotifier.create<int, int>("unblocker-warp-mtu", 0);
+
+  // The blocks are stored as JSON: every field the core accepts stays editable without a
+  // preference per field, and the panel edits them through copyWith on the freezed model.
+  static final extraSecurityWarpScanner = PreferencesNotifier.create<SingboxWarpScannerOption, String>(
+    "extra-security-warp-scanner",
+    const SingboxWarpScannerOption(),
+    mapFrom: (value) => _warpBlock(value, SingboxWarpScannerOption.fromJson, const SingboxWarpScannerOption()),
+    mapTo: (value) => jsonEncode(value.toJson()),
+  );
+
+  static final unblockerWarpScanner = PreferencesNotifier.create<SingboxWarpScannerOption, String>(
+    "unblocker-warp-scanner",
+    const SingboxWarpScannerOption(),
+    mapFrom: (value) => _warpBlock(value, SingboxWarpScannerOption.fromJson, const SingboxWarpScannerOption()),
+    mapTo: (value) => jsonEncode(value.toJson()),
+  );
+
+  static final extraSecurityWarpMasque = PreferencesNotifier.create<SingboxWarpMasqueOption, String>(
+    "extra-security-warp-masque",
+    const SingboxWarpMasqueOption(),
+    mapFrom: (value) => _warpBlock(value, SingboxWarpMasqueOption.fromJson, const SingboxWarpMasqueOption()),
+    mapTo: (value) => jsonEncode(value.toJson()),
+  );
+
+  static final unblockerWarpMasque = PreferencesNotifier.create<SingboxWarpMasqueOption, String>(
+    "unblocker-warp-masque",
+    const SingboxWarpMasqueOption(),
+    mapFrom: (value) => _warpBlock(value, SingboxWarpMasqueOption.fromJson, const SingboxWarpMasqueOption()),
+    mapTo: (value) => jsonEncode(value.toJson()),
+  );
+
+  static final extraSecurityWarpAwg = PreferencesNotifier.create<SingboxWarpAwgOption, String>(
+    "extra-security-warp-awg",
+    const SingboxWarpAwgOption(),
+    mapFrom: (value) => _warpBlock(value, SingboxWarpAwgOption.fromJson, const SingboxWarpAwgOption()),
+    mapTo: (value) => jsonEncode(value.toJson()),
+  );
+
+  static final unblockerWarpAwg = PreferencesNotifier.create<SingboxWarpAwgOption, String>(
+    "unblocker-warp-awg",
+    const SingboxWarpAwgOption(),
+    mapFrom: (value) => _warpBlock(value, SingboxWarpAwgOption.fromJson, const SingboxWarpAwgOption()),
+    mapTo: (value) => jsonEncode(value.toJson()),
+  );
 
   static final unblockerWarpPort = PreferencesNotifier.create<int, int>(
     "unblocker-warp-port",
@@ -330,6 +404,33 @@ abstract class ConfigOptions {
     const OptionalRange(min: 10, max: 30),
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
+  );
+
+  // One bundle per chain level, so the settings page renders both hops from one widget.
+  static final extraSecurityWarp = WarpChainPreferences(
+    licenseKey: extraSecurityWarpLicenseKey,
+    endpoint: extraSecurityWarpEndpoint,
+    cleanIp: extraSecurityWarpCleanIp,
+    cleanPort: extraSecurityWarpCleanPort,
+    mtu: extraSecurityWarpMtu,
+    scanner: extraSecurityWarpScanner,
+    masque: extraSecurityWarpMasque,
+    awg: extraSecurityWarpAwg,
+  );
+
+  static final unblockerWarp = WarpChainPreferences(
+    licenseKey: unblockerWarpLicenseKey,
+    endpoint: unblockerWarpEndpoint,
+    cleanIp: unblockerWarpCleanIp,
+    cleanPort: unblockerWarpPort,
+    mtu: unblockerWarpMtu,
+    scanner: unblockerWarpScanner,
+    masque: unblockerWarpMasque,
+    awg: unblockerWarpAwg,
+    noise: unblockerWarpNoise,
+    noiseSize: unblockerWarpNoiseSize,
+    noiseDelay: unblockerWarpNoiseDelay,
+    noiseMode: unblockerWarpNoiseMode,
   );
 
   static final hasExperimentalFeatures = Provider.autoDispose<bool>((ref) {
@@ -523,7 +624,16 @@ abstract class ConfigOptions {
       chainStatus: ref.watch(chainStatus),
       extraSecurity: SingboxExtraSecurityOption(
         mode: ref.watch(extraSecurityMode),
-        warp: SingboxExtraSecurityWarpOption(licenseKey: ref.watch(extraSecurityWarpLicenseKey)),
+        warp: SingboxExtraSecurityWarpOption(
+          licenseKey: ref.watch(extraSecurityWarpLicenseKey),
+          endpoint: ref.watch(extraSecurityWarpEndpoint),
+          cleanIp: ref.watch(extraSecurityWarpCleanIp),
+          cleanPort: ref.watch(extraSecurityWarpCleanPort),
+          mtu: ref.watch(extraSecurityWarpMtu),
+          scanner: ref.watch(extraSecurityWarpScanner),
+          masque: ref.watch(extraSecurityWarpMasque),
+          awg: ref.watch(extraSecurityWarpAwg),
+        ),
         psiphon: SingboxExtraSecurityPsiphonOption(
           region: ref.watch(extraSecurityPsiphonRegion),
           conduitPairingId: ref.watch(extraSecurityPsiphonConduitPairingId),
@@ -534,8 +644,13 @@ abstract class ConfigOptions {
         mode: ref.watch(unblockerMode),
         warp: SingboxUnblockerWarpOption(
           licenseKey: ref.watch(unblockerWarpLicenseKey),
+          endpoint: ref.watch(unblockerWarpEndpoint),
           cleanIp: ref.watch(unblockerWarpCleanIp),
           cleanPort: ref.watch(unblockerWarpPort),
+          mtu: ref.watch(unblockerWarpMtu),
+          scanner: ref.watch(unblockerWarpScanner),
+          masque: ref.watch(unblockerWarpMasque),
+          awg: ref.watch(unblockerWarpAwg),
           noise: ref.watch(unblockerWarpNoise),
           noiseMode: ref.watch(unblockerWarpNoiseMode),
           noiseSize: ref.watch(unblockerWarpNoiseSize),
@@ -569,4 +684,48 @@ class ConfigOptionRepository with ExceptionHandler, InfraLogger {
           return SingboxConfigOption.fromJson(json);
         }, ConfigOptionFailure.unexpected),
       );
+}
+
+
+/// Reads a WARP block stored as JSON. An empty, unreadable or older value falls back to the
+/// default, so a preference written by an earlier build never fails the settings page.
+T _warpBlock<T>(String raw, T Function(Map<String, dynamic>) fromJson, T fallback) {
+  if (raw.isEmpty) return fallback;
+  try {
+    return fromJson(jsonDecode(raw) as Map<String, dynamic>);
+  } catch (_) {
+    return fallback;
+  }
+}
+
+/// The preferences of one WARP chain hop. The mode stays the hop's own preference: it selects
+/// which tunnel the core runs, not a field of the WARP block.
+class WarpChainPreferences {
+  const WarpChainPreferences({
+    required this.licenseKey,
+    required this.endpoint,
+    required this.cleanIp,
+    required this.cleanPort,
+    required this.mtu,
+    required this.scanner,
+    required this.masque,
+    required this.awg,
+    this.noise,
+    this.noiseSize,
+    this.noiseDelay,
+    this.noiseMode,
+  });
+
+  final StateNotifierProvider<PreferencesNotifier<String, String>, String> licenseKey;
+  final StateNotifierProvider<PreferencesNotifier<WarpEndpointSource, String>, WarpEndpointSource> endpoint;
+  final StateNotifierProvider<PreferencesNotifier<String, String>, String> cleanIp;
+  final StateNotifierProvider<PreferencesNotifier<int, int>, int> cleanPort;
+  final StateNotifierProvider<PreferencesNotifier<int, int>, int> mtu;
+  final StateNotifierProvider<PreferencesNotifier<SingboxWarpScannerOption, String>, SingboxWarpScannerOption> scanner;
+  final StateNotifierProvider<PreferencesNotifier<SingboxWarpMasqueOption, String>, SingboxWarpMasqueOption> masque;
+  final StateNotifierProvider<PreferencesNotifier<SingboxWarpAwgOption, String>, SingboxWarpAwgOption> awg;
+  final StateNotifierProvider<PreferencesNotifier<OptionalRange, String>, OptionalRange>? noise;
+  final StateNotifierProvider<PreferencesNotifier<OptionalRange, String>, OptionalRange>? noiseSize;
+  final StateNotifierProvider<PreferencesNotifier<OptionalRange, String>, OptionalRange>? noiseDelay;
+  final StateNotifierProvider<PreferencesNotifier<String, String>, String>? noiseMode;
 }
