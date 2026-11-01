@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
+import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/model/connection_health.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
@@ -54,30 +55,80 @@ class ConnectionHealthSheet extends ConsumerWidget {
     final chainName = chain?.present(t) ?? '';
     final active = ref.read(activeProxyNotifierProvider.notifier);
 
+    // The hop's state as the proxy card shows it: slow after 15 s, failed after 60 s.
+    final card = ref.watch(activeProxyCardProvider);
+    final hop = card?.hopStatus;
+    final hopState = switch (hop) {
+      StepStatus.connected => HealthState.ok,
+      StepStatus.failed => HealthState.failed,
+      StepStatus.waiting => HealthState.blocked,
+      _ => health.hopState == HealthState.failed ? HealthState.failed : HealthState.pending,
+    };
+    final unblocker = chain == ChainType.unblocker;
+    // the group the user picked, such as balance; null for a single proxy
+    final group = card?.group;
+    // the same offer as the ping row: a dead proxy picked by hand while lowest answers
+    final offer = card?.offerLowest ?? false;
+
+    // the first thing that stops the traffic, in the order the steps connect
     final (summaryState, summary) = switch (health) {
       _ when health.core != HealthState.ok => (
         health.core,
         health.core == HealthState.failed ? h.coreNone : h.coreTesting,
       ),
+      _ when unblocker && hopState == HealthState.failed => (HealthState.failed, h.hopFailed(chain: chainName)),
+      _ when unblocker && hopState == HealthState.pending => (HealthState.pending, h.hopPending(chain: chainName)),
       _ when health.pick == HealthState.failed => (HealthState.failed, h.pickDead),
-      _ when health.degraded => (HealthState.failed, h.hopFailed(chain: chainName)),
-      _ when health.hopPending => (HealthState.pending, h.hopPending(chain: chainName)),
       _ when health.pick == HealthState.pending => (HealthState.pending, h.testing),
+      _ when hopState == HealthState.failed => (HealthState.failed, h.hopFailed(chain: chainName)),
+      _ when hopState == HealthState.pending => (HealthState.pending, h.hopPending(chain: chainName)),
       _ => (HealthState.ok, h.allGood),
     };
 
+    final hopStep = chain == null
+        ? null
+        : _Step(
+            state: hopState,
+            icon: chainIcon(chain),
+            glyph: SizedBox.square(
+              dimension: 22,
+              child: FittedBox(
+                child: ChainTypeIcon(
+                  type: chain,
+                  mode: card?.hopMode ?? ChainMode.psiphon,
+                  animate: hopState != HealthState.blocked && hopState != HealthState.failed,
+                ),
+              ),
+            ),
+            title: chainName,
+            detail: switch (hopState) {
+              HealthState.ok => h.hopReady,
+              HealthState.pending => hop == StepStatus.slow ? t.connection.slow : h.hopConnecting,
+              HealthState.blocked => h.hopBlocked,
+              HealthState.failed => health.hopNoReply ? h.hopNoReply : h.hopBroken,
+            },
+            actions: [
+              if (hopState == HealthState.failed) ...[
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.goNamed('chainOptions');
+                  },
+                  child: Text(h.change),
+                ),
+                TextButton(
+                  onPressed: () => ref.read(ConfigOptions.chainStatus.notifier).update(ChainStatus.off),
+                  child: Text(h.turnOff),
+                ),
+              ],
+            ],
+          );
+
+    // the steps in the order they connect: the unblocker before the servers, extra security after
     final steps = <_Step>[
-      _Step(
-        state: health.core,
-        icon: Icons.hub_rounded,
-        title: h.core,
-        detail: switch (health.core) {
-          HealthState.ok => h.coreOk,
-          HealthState.failed => h.coreNone,
-          _ => h.coreTesting,
-        },
-      ),
-      if (health.fastest != null)
+      if (unblocker && hopStep != null) hopStep,
+      // the fastest server is the pick itself with lowest, and the way out when the picked proxy is dead
+      if (health.fastest != null && (!health.pickedByHand || offer))
         _Step(
           state: health.fastestState,
           icon: Icons.bolt_rounded,
@@ -91,50 +142,29 @@ class ConnectionHealthSheet extends ConsumerWidget {
       if (health.pickedByHand)
         _Step(
           state: health.pick,
-          icon: Icons.touch_app_rounded,
-          title: h.yourServer,
+          icon: switch (group) {
+            null => Icons.touch_app_rounded,
+            balanceGroupTag => Icons.call_split_rounded,
+            _ => Icons.layers_outlined,
+          },
+          title: group ?? h.yourServer,
           detail: switch (health.pick) {
+            HealthState.ok when group == balanceGroupTag => ref.watch(ConfigOptions.balancerStrategy).present(t),
             HealthState.ok => _serverDetail(health.server!),
+            HealthState.failed when group != null => h.notResponding,
             HealthState.failed => '${health.server?.name ?? ''}  ·  ${h.notResponding}',
             _ => h.testing,
           },
           actions: [
-            if (health.canSwitchToFastest)
+            if (offer)
               FilledButton.tonalIcon(
-                onPressed: active.switchToFastest,
+                onPressed: () => active.switchToLowest(health.mainGroup!),
                 icon: const Icon(Icons.bolt_rounded, size: 18),
                 label: Text(h.useFastest),
               ),
           ],
         ),
-      if (chain != null)
-        _Step(
-          state: health.hopState,
-          icon: chainIcon(chain),
-          title: chainName,
-          detail: switch (health.hopState) {
-            HealthState.ok => h.hopReady,
-            HealthState.pending => h.hopConnecting,
-            HealthState.blocked => h.hopBlocked,
-            HealthState.failed => health.hopNoReply ? h.hopNoReply : h.hopBroken,
-          },
-          actions: [
-            if (health.hopState == HealthState.failed) ...[
-              OutlinedButton(onPressed: () => active.urlTest(""), child: Text(h.retry)),
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  context.goNamed('chainOptions');
-                },
-                child: Text(h.change),
-              ),
-              TextButton(
-                onPressed: () => ref.read(ConfigOptions.chainStatus.notifier).update(ChainStatus.off),
-                child: Text(h.turnOff),
-              ),
-            ],
-          ],
-        ),
+      if (!unblocker && hopStep != null) hopStep,
     ];
 
     return SafeArea(
@@ -248,9 +278,19 @@ class _StateGlyph extends StatelessWidget {
 
 /// One step of the path, drawn as a station on a rail; [_Rail] draws the line to the next.
 class _Step extends StatelessWidget {
-  const _Step({required this.state, required this.icon, required this.title, required this.detail, this.actions});
+  const _Step({
+    required this.state,
+    required this.icon,
+    this.glyph,
+    required this.title,
+    required this.detail,
+    this.actions,
+  });
   final HealthState state;
   final IconData icon;
+
+  /// Drawn in place of [icon], such as the chain's own animated icon.
+  final Widget? glyph;
   final String title;
   final String detail;
   final List<Widget>? actions;
@@ -279,7 +319,7 @@ class _Step extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: color.withValues(alpha: .6), width: 1.5),
                   ),
-                  child: Icon(icon, size: 18, color: color),
+                  child: Center(child: glyph ?? Icon(icon, size: 18, color: color)),
                 ),
                 PositionedDirectional(
                   end: -4,

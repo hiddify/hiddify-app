@@ -23,6 +23,7 @@ import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:meta/meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -62,9 +63,7 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
     }
 
     _forceCheck = false;
-    final customIpInfoUrl = _ipinfoUrlFromHeaders(
-      ref.watch(activeProfileProvider).valueOrNull?.populatedHeaders,
-    );
+    final customIpInfoUrl = _ipinfoUrlFromHeaders(ref.watch(activeProfileProvider).valueOrNull?.populatedHeaders);
     final info = await ref
         .watch(proxyRepositoryProvider)
         .getCurrentIpInfo(cancelToken, customIpInfoUrl: customIpInfoUrl)
@@ -192,19 +191,6 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
     return ref.watch(mainOutboundsNotifierProvider).whenData((list) => _activeOf(list, chain));
   }
 
-  /// Selects "lowest" in the main selector, for a pick that stopped answering.
-  Future<void> switchToFastest() async {
-    final group = ref.read(mainOutboundsNotifierProvider).valueOrNull?.items.firstOrNull?.tag;
-    if (group == null) return;
-    await ref.read(hapticServiceProvider.notifier).lightImpact();
-    final switched = await ref.read(proxyRepositoryProvider).selectProxy(group, lowestGroupTag).run();
-    switched.match((err) {
-      loggy.warning("error switching to the fastest proxy", err);
-      final t = ref.read(translationsProvider).requireValue;
-      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.switchFailed);
-    }, (_) {});
-  }
-
   final _urlTestThrottler = Throttler(const Duration(seconds: 1));
 
   Future<void> urlTest(String? groupTag_) async {
@@ -219,19 +205,57 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
       }
     });
   }
+
+  /// Hands [mainGroup]'s choice to the lowest-delay group.
+  Future<void> switchToLowest(String mainGroup) async {
+    await ref.read(hapticServiceProvider.notifier).lightImpact();
+    await ref.read(proxyRepositoryProvider).selectProxy(mainGroup, lowestGroupTag).map((_) => true).getOrElse((err) {
+      loggy.warning("error switching to lowest", err);
+      final t = ref.read(translationsProvider).requireValue;
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.switchFailed);
+      return false;
+    }).run();
+  }
 }
 
 /// What the home proxy card shows; null until the core has sent a message.
 @Riverpod(keepAlive: true)
-ActiveProxyCardData? activeProxyCard(Ref ref) {
-  final list = ref.watch(mainOutboundsNotifierProvider).valueOrNull;
-  if (list == null) return null;
-  final chain = ref.watch(ConfigOptions.chainStatus);
-  return ActiveProxyCardData.from(
-    list,
-    chain: chain,
-    hopMode: ref.watch(chain.isUnblocker() ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode),
-  );
+class ActiveProxyCard extends _$ActiveProxyCard {
+  /// The chain and mode whose hop is connecting, and since when.
+  ({String hop, DateTime since})? _connecting;
+
+  @visibleForTesting
+  DateTime now() => DateTime.now();
+
+  @override
+  ActiveProxyCardData? build() {
+    final list = ref.watch(mainOutboundsNotifierProvider).valueOrNull;
+    if (list == null) return null;
+    final chain = ref.watch(ConfigOptions.chainStatus);
+    final card = ActiveProxyCardData.from(
+      list,
+      chain: chain,
+      hopMode: ref.watch(chain.isUnblocker() ? ConfigOptions.unblockerMode : ConfigOptions.extraSecurityMode),
+    );
+    if (card == null || card.hopStatus != StepStatus.connecting) {
+      _connecting = null;
+      return card;
+    }
+    // Another chain or mode is another hop: its wait starts over.
+    final hop = '${chain.name}/${card.hopMode.name}';
+    if (_connecting?.hop != hop) _connecting = (hop: hop, since: now());
+    final waited = now().difference(_connecting!.since);
+    // build again when the hop turns slow, then failed
+    final next = [
+      ActiveProxyCardData.hopSlowAfter,
+      ActiveProxyCardData.hopFailAfter,
+    ].where((d) => d > waited).firstOrNull;
+    if (next != null) {
+      final timer = Timer(next - waited, ref.invalidateSelf);
+      ref.onDispose(timer.cancel);
+    }
+    return card.hopWaited(waited);
+  }
 }
 
 /// Each step of the path the traffic takes; null while the core is not running or has not sent

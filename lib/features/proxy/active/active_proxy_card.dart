@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -37,7 +36,6 @@ class ActiveProxyFooter extends HookConsumerWidget with InfraLogger {
     );
 
     final activeCard = ref.watch(activeProxyCardProvider);
-    final health = ref.watch(connectionHealthProvider);
 
     final heldCard = useRef<ActiveProxyCardData?>(null);
     final until = useRef<DateTime?>(null);
@@ -77,211 +75,170 @@ class ActiveProxyFooter extends HookConsumerWidget with InfraLogger {
     if (card == null) {
       return const SizedBox.shrink();
     }
-    return Card(
-      margin: const EdgeInsets.all(16),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (!card.chain.isOff()) _ChainBand(card),
-          _ProxyRow(card, dead: health?.canSwitchToFastest ?? false),
-        ],
-      ),
-    );
+    return Card(margin: const EdgeInsets.all(16), clipBehavior: Clip.antiAlias, child: _Steps(card));
   }
 }
 
-// ---------- the chain band: chain type at the start, the hop at the end ----------
+// ---------- the steps: one row each, in the order they connect, joined by a rail ----------
 
-/// The band shows only while the chain is on, so its type is one of the two.
-ChainType _typeOf(ActiveProxyCardData card) => card.chain.isUnblocker() ? ChainType.unblocker : ChainType.extraSecurity;
+/// One row's height, and the column its flag sits in; the flags are the rail's nodes.
+const _rowHeight = 76.0;
+const _railWidth = 56.0;
+const _flagSize = 36.0;
 
-class _ChainBand extends StatelessWidget {
-  const _ChainBand(this.card);
+/// The hop row: one line, so shorter, with a smaller and squarer flag.
+const _hopRowHeight = 44.0;
+const _hopFlagSize = 30.0;
+const _hopFlagRadius = 4.0;
+
+Color _green(BuildContext context) => Theme.of(context).extension<ConnectionButtonTheme>()!.connectedColor!;
+
+class _Steps extends StatelessWidget {
+  const _Steps(this.card);
   final ActiveProxyCardData card;
 
   @override
   Widget build(BuildContext context) {
-    final s = Theme.of(context).colorScheme;
-    final (main, _) = _typeOf(card).colors(card.hopMode);
-    final background = Color.alphaBlend(main.withValues(alpha: .16), s.surfaceContainerHigh);
+    final hopStatus = card.hopStatus;
+    if (hopStatus == null) return _ProxyRow(card);
+    // unblocker carries the server's traffic, extra security dials through the server
+    final unblocker = card.chain.isUnblocker();
+    // the rail stops this far from each flag, which draws 8 px smaller than its box
+    const gap = 5.0;
+    final (h1, f1, h2, f2) = unblocker
+        ? (_hopRowHeight, _hopFlagSize, _rowHeight, _flagSize)
+        : (_rowHeight, _flagSize, _hopRowHeight, _hopFlagSize);
+    final top = h1 / 2 + (f1 - 8) / 2 + gap;
+    final bottom = h1 + h2 / 2 - (f2 - 8) / 2 - gap;
+    return Stack(
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: unblocker ? [_HopRow(card), _ProxyRow(card)] : [_ProxyRow(card), _HopRow(card)],
+        ),
+        PositionedDirectional(
+          start: _railWidth / 2 - 1.5,
+          width: 3,
+          top: top,
+          height: bottom - top,
+          child: _Rail(unblocker ? card.serverStatus : hopStatus),
+        ),
+      ],
+    );
+  }
+}
+
+/// A step's row: its flag with the state badge, two lines of text, and a chevron; or, with
+/// [trailing], [title] alone on one line and the trailing widget in place of the chevron.
+class _StepRow extends StatelessWidget {
+  const _StepRow({
+    required this.color,
+    required this.onTap,
+    required this.flag,
+    required this.status,
+    required this.title,
+    this.subtitle = const SizedBox.shrink(),
+    this.height = _rowHeight,
+    this.trailing,
+  });
+
+  final double height;
+  final Widget? trailing;
+  final Color color;
+  final VoidCallback onTap;
+  final Widget flag;
+  final StepStatus status;
+  final Widget title;
+  final Widget subtitle;
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
-      color: background,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(4, 4, 16, 4),
+      color: color,
+      child: InkWell(
+        onTap: onTap,
         child: SizedBox(
-          // one height for every chain and hop
-          height: 40,
-          // On narrow screens the hop first drops its name (the flag's badge still shows it), then
-          // the pill's label shortens. The IP shortens only once the pill is down to its icon.
-          child: LayoutBuilder(
-            builder: (context, box) => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(child: _ChainPill(card)),
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: max(0, box.maxWidth - _ChainPill.iconOnlyWidth)),
-                  child: _HopChip(card, background: background, showName: box.maxWidth >= 360),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The chain type with its animated icon; opens the chain settings.
-class _ChainPill extends ConsumerWidget {
-  const _ChainPill(this.card);
-  final ActiveProxyCardData card;
-
-  /// Its width with no room left for the label: its paddings, icon and gap.
-  static const iconOnlyWidth = 8.0 + 12 + 22 + 6 + 8;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-    final theme = Theme.of(context);
-    final s = theme.colorScheme;
-    final type = _typeOf(card);
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(start: 8),
-      child: Material(
-        color: s.onSurface.withValues(alpha: .10),
-        borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          onTap: () => context.goNamed('chainOptions'),
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsetsDirectional.fromSTEB(12, 6, 8, 6),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ChainTypeIcon(type: type, mode: card.hopMode),
-                const Gap(6),
-                Flexible(
-                  child: Text(
-                    type.present(t),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.labelLarge?.copyWith(color: s.onSurface),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// The hop: its exit flag with the mode as a badge, its name, its IP and its state.
-class _HopChip extends ConsumerWidget {
-  const _HopChip(this.card, {required this.background, required this.showName});
-  final ActiveProxyCardData card;
-  final Color background;
-  final bool showName;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-    final theme = Theme.of(context);
-    final s = theme.colorScheme;
-    // the chip's own color, so the badge's ring cuts cleanly into the flag
-    final chipColor = Color.alphaBlend(s.onSurface.withValues(alpha: .10), background);
-    // centred on the flag's bottom-end corner: the 28 px slot draws a 20 px flag, inset 4 px
-    const badge = 14.0;
-    return Container(
-      padding: const EdgeInsetsDirectional.fromSTEB(6, 2, 10, 2),
-      // its start keeps it apart from the pill
-      margin: const EdgeInsetsDirectional.fromSTEB(8, 4, 0, 4),
-      decoration: BoxDecoration(color: chipColor, borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
+          height: height,
+          child: Row(
             children: [
-              _FlagSlot(card.hop, size: 28, radius: 4),
-              PositionedDirectional(
-                end: 4 - badge / 2,
-                bottom: 4 - badge / 2,
-                child: Container(
-                  width: badge,
-                  height: badge,
-                  decoration: BoxDecoration(
-                    color: chipColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: chipColor, width: 1.5),
+              SizedBox(
+                width: _railWidth,
+                child: Center(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      flag,
+                      if (trailing == null)
+                        PositionedDirectional(end: -3, top: -3, child: _StateBadge(status, ring: color))
+                      else
+                        PositionedDirectional(
+                          end: -5,
+                          top: -5,
+                          child: Transform.scale(scale: .8, child: _StateBadge(status, ring: color)),
+                        ),
+                    ],
                   ),
-                  child: ChainModeIcon(mode: card.hopMode, size: 10),
                 ),
               ),
+              Expanded(
+                child: trailing == null
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [title, const Gap(2), subtitle],
+                      )
+                    : Align(alignment: AlignmentDirectional.centerStart, child: title),
+              ),
+              if (trailing case final trailing?) ...[
+                const Gap(8),
+                trailing,
+                // room for the trailing widget's badge, clear of the card's rounded corner
+                const Gap(24),
+              ] else ...[
+                Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                const Gap(12),
+              ],
             ],
           ),
-          if (showName) ...[
-            const Gap(6),
-            Text(card.hopMode.present(t), style: theme.textTheme.labelLarge?.copyWith(color: s.onSurface)),
-          ],
-          const Gap(10),
-          Flexible(child: _IpSlot(card.hop, boneWidth: 52, isFinal: card.chain.isExtraSecurity())),
-          const Gap(8),
-          _HopState(card.hop?.status),
-        ],
+        ),
       ),
     );
   }
 }
 
-/// The hop's state in a fixed slot as wide as the check, so the text before it never moves.
-class _HopState extends StatelessWidget {
-  const _HopState(this.status);
+/// A step's problem, in place of its second line.
+class _Problem extends StatelessWidget {
+  const _Problem(this.message, {this.error = true});
+  final String message;
 
-  /// Null before the core lists the hop.
-  final Status? status;
-
-  static const size = 16.0;
+  /// False while it is only slow.
+  final bool error;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return SizedBox.square(
-      dimension: size,
-      child: switch (status) {
-        Status.READY => Icon(
-          Icons.check_circle_rounded,
-          size: size,
-          color: theme.extension<ConnectionButtonTheme>()!.connectedColor,
-        ),
-        Status.FAILED => Icon(Icons.error_rounded, size: size, color: theme.colorScheme.error),
-        // not listed yet, connecting, reconnecting, searching, registering
-        _ => Center(
-          child: SizedBox(
-            // as wide as the check's circle, which fills 20 of an icon's 24 units
-            width: size * 20 / 24,
-            child: LinearProgressIndicator(
-              minHeight: 4,
-              borderRadius: BorderRadius.circular(2),
-              backgroundColor: theme.colorScheme.onSurface.withValues(alpha: .25),
-            ),
-          ),
-        ),
-      },
+    return Text(
+      message,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: theme.textTheme.labelMedium?.copyWith(
+        color: error ? theme.colorScheme.error : theme.colorScheme.onSurfaceVariant,
+      ),
     );
   }
 }
+
+TextStyle? _nameStyle(BuildContext context, StepStatus status) => Theme.of(context).textTheme.titleMedium?.copyWith(
+  fontSize: 14,
+  // a step that waits for the one before it is dimmed
+  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: status == StepStatus.waiting ? .45 : 1),
+);
 
 // ---------- the proxy row: how the server was picked, its name, IP and protocol ----------
 
 class _ProxyRow extends ConsumerWidget {
-  const _ProxyRow(this.card, {this.dead = false});
+  const _ProxyRow(this.card);
   final ActiveProxyCardData card;
-
-  /// The pick does not answer; it shows faded, with a "not responding" note.
-  final bool dead;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -289,26 +246,30 @@ class _ProxyRow extends ConsumerWidget {
     final theme = Theme.of(context);
     final s = theme.colorScheme;
     final server = card.server;
+    final status = card.serverStatus;
+    final connected = status == StepStatus.connected;
     final muted = theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant);
-    final nameStyle = theme.textTheme.titleMedium?.copyWith(fontSize: 14);
+    final nameStyle = _nameStyle(context, status);
     final group = card.group;
 
     Future<void> urlTest() => ref.read(activeProxyNotifierProvider.notifier).urlTest("");
 
-    return ListTile(
+    return _StepRow(
+      color: theme.cardTheme.color ?? s.surfaceContainerLow,
       onTap: () => context.goNamed('proxies'),
-      leading: InkWell(
+      flag: InkWell(
         onTap: () async {
           await urlTest();
           await ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: server);
         },
         borderRadius: BorderRadius.circular(8),
-        child: AnimatedOpacity(
-          opacity: dead ? .45 : 1,
-          duration: const Duration(milliseconds: 300),
-          child: _FlagSlot(server, size: 40),
+        child: _FlagSlot(
+          connected ? server : null,
+          size: _flagSize,
+          dim: status == StepStatus.waiting || status == StepStatus.failed,
         ),
       ),
+      status: status,
       title: Semantics(
         label: t.pages.proxies.activeProxy,
         child: group == null
@@ -335,29 +296,252 @@ class _ProxyRow extends ConsumerWidget {
                 ],
               ),
       ),
-      subtitle: Row(
-        children: [
-          if (dead) ...[
-            Icon(Icons.wifi_off_rounded, size: 14, color: s.error),
-            const Gap(4),
-            Text(t.connection.health.notResponding, style: muted?.copyWith(color: s.error)),
-            Text('  ·  ', style: muted),
+      subtitle: switch (status) {
+        // lowest picks the best server, so lowest failing means none answers
+        StepStatus.failed => _Problem(
+          group == lowestGroupTag ? t.pages.proxies.noneResponding : t.pages.proxies.notResponding,
+        ),
+        StepStatus.waiting => Text(server.type, maxLines: 1, overflow: TextOverflow.ellipsis, style: muted),
+        _ => Row(
+          children: [
+            // The config's IP is the final one only with unblocker; with no chain it is the only one.
+            _IpSlot(connected ? server : null, boneWidth: 64, isFinal: card.chain.isUnblocker(), onLongPress: urlTest),
+            Flexible(
+              child: Text('  ·  ${server.type}', maxLines: 1, overflow: TextOverflow.ellipsis, style: muted),
+            ),
           ],
-          // The config's IP is the final one only with unblocker; with no chain it is the only one.
-          _IpSlot(server, boneWidth: 64, isFinal: card.chain.isUnblocker(), onLongPress: urlTest),
-          Flexible(
-            child: Text(
-              server.ipLookupFailed ? server.type : '  ·  ${server.type}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: muted,
+        ),
+      },
+    );
+  }
+}
+
+// ---------- the hop row: its IP, then the chain type in a chip with its mode as a badge ----------
+
+class _HopRow extends ConsumerWidget {
+  const _HopRow(this.card);
+  final ActiveProxyCardData card;
+
+  static const _chipHeight = 28.0;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    final status = card.hopStatus!;
+    final type = card.chain.isUnblocker() ? ChainType.unblocker : ChainType.extraSecurity;
+    final (main, _) = type.colors(card.hopMode);
+    final color = Color.alphaBlend(main.withValues(alpha: .16), s.surfaceContainerHigh);
+    final down = status == StepStatus.waiting || status == StepStatus.failed;
+    return _StepRow(
+      color: color,
+      onTap: () => context.goNamed('chainOptions'),
+      height: _hopRowHeight,
+      flag: _FlagSlot(
+        status == StepStatus.connected ? card.hop : null,
+        size: _hopFlagSize,
+        radius: _hopFlagRadius,
+        dim: down,
+      ),
+      status: status,
+      title: switch (status) {
+        StepStatus.waiting => const SizedBox.shrink(),
+        StepStatus.slow => _Problem(t.connection.slow, error: false),
+        StepStatus.failed => _Problem(t.connection.failed),
+        _ => _IpSlot(
+          status == StepStatus.connected ? card.hop : null,
+          boneWidth: 64,
+          isFinal: card.chain.isExtraSecurity(),
+        ),
+      },
+      trailing: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            height: _chipHeight,
+            padding: const EdgeInsetsDirectional.only(start: 6, end: 10),
+            decoration: BoxDecoration(
+              color: main.withValues(alpha: .18),
+              borderRadius: BorderRadius.circular(_chipHeight / 2),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox.square(
+                  dimension: _chipHeight - 10,
+                  child: FittedBox(
+                    child: ChainTypeIcon(type: type, mode: card.hopMode, animate: !down),
+                  ),
+                ),
+                const Gap(4),
+                Text(type.present(t), style: theme.textTheme.labelMedium?.copyWith(color: main, letterSpacing: .3)),
+              ],
+            ),
+          ),
+          // the mode, as a badge on the chip's top end
+          PositionedDirectional(
+            top: -5,
+            end: -5,
+            child: Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: s.surfaceContainerHighest,
+                shape: BoxShape.circle,
+                border: Border.all(color: color, width: 1.5),
+              ),
+              child: Center(child: ChainModeIcon(mode: card.hopMode, size: 10)),
             ),
           ),
         ],
       ),
-      trailing: const Icon(Icons.chevron_right_rounded),
     );
   }
+}
+
+// ---------- a step's state: a badge on its flag, and the rail to the next step ----------
+
+/// Waiting: an empty circle; connecting: a spinner; connected: a check; failed: an error icon.
+/// Ringed in the row's color, so it cuts cleanly into the flag.
+class _StateBadge extends StatelessWidget {
+  const _StateBadge(this.status, {required this.ring});
+  final StepStatus status;
+  final Color ring;
+
+  static const size = 15.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(1.5),
+      decoration: BoxDecoration(color: ring, shape: BoxShape.circle),
+      child: SizedBox.square(
+        dimension: size,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: switch (status) {
+            StepStatus.waiting => Container(
+              key: const ValueKey('waiting'),
+              margin: const EdgeInsets.all(size * 2 / 24),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: s.onSurface.withValues(alpha: .35), width: 1.5),
+              ),
+            ),
+            StepStatus.connecting || StepStatus.slow => Padding(
+              key: const ValueKey('connecting'),
+              padding: const EdgeInsets.all(size * 2 / 24),
+              child: CircularProgressIndicator(strokeWidth: 2, backgroundColor: s.onSurface.withValues(alpha: .2)),
+            ),
+            StepStatus.connected => Icon(
+              Icons.check_circle_rounded,
+              key: const ValueKey('connected'),
+              size: size,
+              color: _green(context),
+            ).animate().scaleXY(begin: .4, end: 1, duration: 400.ms, curve: Curves.easeOutBack),
+            StepStatus.failed => Icon(Icons.error_rounded, key: const ValueKey('failed'), size: size, color: s.error),
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// The line between the two flags, showing the second step: grey while it waits, dashes marching
+/// down while it connects, filling green from the top once it connects, red-tinted if it failed.
+class _Rail extends HookWidget {
+  const _Rail(this.next);
+  final StepStatus next;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final moving = next == StepStatus.connecting || next == StepStatus.slow;
+    final connected = next == StepStatus.connected;
+    // one dash and its gap per loop
+    final march = useAnimationController(duration: const Duration(milliseconds: 360));
+    // a card that shows up already connected starts full
+    final fill = useAnimationController(duration: const Duration(milliseconds: 400), initialValue: connected ? 1 : 0);
+    useEffect(() {
+      if (moving) {
+        march.repeat();
+      } else {
+        march.stop();
+      }
+      return null;
+    }, [moving]);
+    useEffect(() {
+      if (connected) {
+        fill.forward();
+      } else {
+        fill.value = 0;
+      }
+      return null;
+    }, [connected]);
+    return CustomPaint(
+      painter: _RailPainter(
+        next: next,
+        march: march,
+        fill: fill,
+        track: s.onSurface.withValues(alpha: .15),
+        dash: s.primary,
+        green: _green(context),
+        error: s.error.withValues(alpha: .5),
+      ),
+    );
+  }
+}
+
+class _RailPainter extends CustomPainter {
+  _RailPainter({
+    required this.next,
+    required this.march,
+    required this.fill,
+    required this.track,
+    required this.dash,
+    required this.green,
+    required this.error,
+  }) : super(repaint: Listenable.merge([march, fill]));
+
+  final StepStatus next;
+  final Animation<double> march;
+  final Animation<double> fill;
+  final Color track;
+  final Color dash;
+  final Color green;
+  final Color error;
+
+  static const _dash = 5.0;
+  static const _space = 4.0;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final radius = Radius.circular(size.width / 2);
+    final rail = RRect.fromRectAndRadius(Offset.zero & size, radius);
+    canvas
+      ..save()
+      ..clipRRect(rail)
+      ..drawRRect(rail, Paint()..color = next == StepStatus.failed ? error : track);
+    switch (next) {
+      case StepStatus.connecting || StepStatus.slow:
+        final paint = Paint()..color = dash;
+        for (var y = march.value * (_dash + _space) - _dash - _space; y < size.height; y += _dash + _space) {
+          canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(0, y, size.width, _dash), radius), paint);
+        }
+      case StepStatus.connected:
+        final height = size.height * Curves.easeOutCubic.transform(fill.value);
+        canvas.drawRect(Rect.fromLTWH(0, 0, size.width, height), Paint()..color = green);
+      case StepStatus.waiting || StepStatus.failed:
+        break;
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_RailPainter old) =>
+      old.next != next || old.track != track || old.dash != dash || old.green != green || old.error != error;
 }
 
 /// Balance's strategy as a small button; its menu switches the strategy.
@@ -428,8 +612,8 @@ class _Bone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
-    // both loops repaint the bone alone, not the card round it
     return RepaintBoundary(
+      // both loops repaint the bone alone, not the card round it
       child:
           Container(
                 width: width,
@@ -447,12 +631,15 @@ class _Bone extends StatelessWidget {
   }
 }
 
-/// The flag of [info]'s IP: a placeholder while it loads, a question mark if the lookup failed.
-/// On arrival it pops in and sends out one ring.
+/// The flag of [info]'s IP: a placeholder until this run's IP arrives (a failed lookup is retried
+/// with the next ping), a faint square while [dim] (its step waits or failed). On arrival it pops in
+/// and sends out a ring.
 class _FlagSlot extends StatelessWidget {
-  const _FlagSlot(this.info, {required this.size, this.radius = 8});
+  const _FlagSlot(this.info, {required this.size, this.dim = false, this.radius = 8});
   final OutboundInfo? info;
   final double size;
+  final bool dim;
+
   final double radius;
 
   @override
@@ -462,8 +649,8 @@ class _FlagSlot extends StatelessWidget {
     final inner = size - 8; // IPCountryFlag draws the flag 8 px smaller than its box
     return SizedBox.square(
       dimension: size,
-      // the pop and the ring repaint the slot alone
       child: RepaintBoundary(
+        // the pop and the ring repaint the slot alone
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
           child: switch (info) {
@@ -476,12 +663,12 @@ class _FlagSlot extends StatelessWidget {
                       height: inner,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(radius),
-                        border: Border.all(color: s.primary, width: 2),
+                        border: Border.all(color: _green(context), width: 2),
                       ),
                     )
                     .animate()
-                    .scaleXY(begin: 1, end: 1.7, duration: 600.ms, curve: Curves.easeOut)
-                    .fadeOut(duration: 600.ms),
+                    .scaleXY(begin: 1, end: 1.7, duration: 700.ms, curve: Curves.easeOut)
+                    .fadeOut(duration: 700.ms),
                 IPCountryFlag(
                       countryCode: info.ipinfo.countryCode,
                       organization: info.ipinfo.org,
@@ -493,12 +680,19 @@ class _FlagSlot extends StatelessWidget {
                     .fadeIn(duration: 200.ms),
               ],
             ),
-            OutboundInfo(ipLookupFailed: true) => IPCountryFlag(
-              key: const ValueKey('unknown'),
-              countryCode: '',
-              size: size,
+            _ when dim => Center(
+              key: const ValueKey('dim'),
+              child: Container(
+                width: inner,
+                height: inner,
+                decoration: BoxDecoration(
+                  color: s.onSurface.withValues(alpha: .07),
+                  borderRadius: BorderRadius.circular(radius),
+                ),
+              ),
             ),
             _ => Center(
+              key: const ValueKey('bone'),
               child: _Bone(width: inner, height: inner, radius: inner / 4),
             ),
           },
@@ -508,8 +702,8 @@ class _FlagSlot extends StatelessWidget {
   }
 }
 
-/// [info]'s IP: a placeholder while it loads, nothing if the lookup failed. On arrival it slides
-/// up; the final IP is green and first shows "Final IP" in its place.
+/// [info]'s IP: a placeholder until this run's IP arrives. On arrival it slides up; the final IP is
+/// green and first shows "Final IP" in its place.
 class _IpSlot extends StatelessWidget {
   const _IpSlot(this.info, {required this.boneWidth, required this.isFinal, this.onLongPress});
   final OutboundInfo? info;
@@ -535,7 +729,6 @@ class _IpSlot extends StatelessWidget {
               .animate(delay: 120.ms)
               .fadeIn(duration: 300.ms)
               .slideY(begin: .6, end: 0, duration: 350.ms, curve: Curves.easeOutCubic),
-        OutboundInfo(ipLookupFailed: true) => const SizedBox.shrink(key: ValueKey('unknown')),
         _ => Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: _Bone(width: boneWidth, height: 9, radius: 4.5),
