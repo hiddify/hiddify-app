@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:share_plus/share_plus.dart';
@@ -32,12 +33,24 @@ abstract class UriUtils {
     try {
       loggy.debug("sharing [$uri]");
       final file = XFile(uri.path, mimeType: mimeType);
-      final result = await Share.shareXFiles([file]);
+      final result = await Share.shareXFiles([file], sharePositionOrigin: _shareOrigin());
       loggy.debug("share result: ${result.raw}");
       return result.status == ShareResultStatus.success;
     } catch (e, stackTrace) {
-      loggy.warning("error sharing file [$uri]", e, stackTrace);
+      // the error is in the message: the logs page shows only the message
+      loggy.warning("error sharing file [$uri]: $e", e, stackTrace);
       return false;
     }
+  }
+
+  /// Where the share sheet is anchored: the middle of the screen. iOS refuses to present the
+  /// sheet without an anchor inside the view when it presents it as a popover (iPad, and
+  /// iPhone on recent iOS), and the sheet is not opened from a widget here.
+  static Rect? _shareOrigin() {
+    if (!Platform.isIOS && !Platform.isMacOS) return null;
+    final view = PlatformDispatcher.instance.implicitView;
+    if (view == null) return null;
+    final size = view.physicalSize / view.devicePixelRatio;
+    return Rect.fromCenter(center: Offset(size.width / 2, size.height / 2), width: 2, height: 2);
   }
 }
