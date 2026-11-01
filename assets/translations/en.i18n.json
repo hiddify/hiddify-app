@@ -809,30 +809,10 @@
     "reconnect": "Reconnect",
     "reconnectMsg": "Reconnecting to apply changes…",
     "health": {
-      "title": "Connection check",
-      "details": "Details",
-      "allGood": "Your traffic gets through",
-      "pickDead": "Selected proxy isn't responding",
+      "pickDead": "Selected proxy isn’t responding",
       "hopPending": "${chain} is connecting…",
-      "hopFailed": "${chain} couldn't connect",
-      "core": "Hiddify",
-      "coreOk": "Connected: a working server was found",
-      "coreTesting": "Testing the servers…",
-      "coreNone": "None of the servers respond",
-      "fastest": "Fastest server",
-      "yourServer": "Selected proxy",
-      "notResponding": "Not responding",
-      "testing": "Testing…",
-      "useFastest": "Use fastest",
-      "unavailable": "Unavailable",
-      "hopReady": "Connected",
-      "hopConnecting": "Connecting…",
-      "hopBroken": "Couldn't connect",
-      "hopNoReply": "Connected, but it does not answer",
-      "hopBlocked": "Waits for the selected proxy to respond",
-      "retry": "Test again",
-      "change": "Change",
-      "turnOff": "Turn off"
+      "hopFailed": "${chain} couldn’t connect",
+      "useFastest": "Use fastest available"
     }
   },
   "errors": {
