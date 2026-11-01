@@ -86,6 +86,11 @@ const _rowHeight = 76.0;
 const _railWidth = 56.0;
 const _flagSize = 36.0;
 
+/// The hop row: one line, so shorter, with a smaller and squarer flag.
+const _hopRowHeight = 44.0;
+const _hopFlagSize = 30.0;
+const _hopFlagRadius = 4.0;
+
 Color _green(BuildContext context) => Theme.of(context).extension<ConnectionButtonTheme>()!.connectedColor!;
 
 class _Steps extends StatelessWidget {
@@ -98,7 +103,13 @@ class _Steps extends StatelessWidget {
     if (hopStatus == null) return _ProxyRow(card);
     // unblocker carries the server's traffic, extra security dials through the server
     final unblocker = card.chain.isUnblocker();
-    const gap = 4.0;
+    // the rail stops this far from each flag, which draws 8 px smaller than its box
+    const gap = 5.0;
+    final (h1, f1, h2, f2) = unblocker
+        ? (_hopRowHeight, _hopFlagSize, _rowHeight, _flagSize)
+        : (_rowHeight, _flagSize, _hopRowHeight, _hopFlagSize);
+    final top = h1 / 2 + (f1 - 8) / 2 + gap;
+    final bottom = h1 + h2 / 2 - (f2 - 8) / 2 - gap;
     return Stack(
       children: [
         Column(
@@ -108,8 +119,8 @@ class _Steps extends StatelessWidget {
         PositionedDirectional(
           start: _railWidth / 2 - 1.5,
           width: 3,
-          top: _rowHeight / 2 + _flagSize / 2 + gap,
-          height: _rowHeight - _flagSize - gap * 2,
+          top: top,
+          height: bottom - top,
           child: _Rail(unblocker ? card.serverStatus : hopStatus),
         ),
       ],
@@ -117,7 +128,8 @@ class _Steps extends StatelessWidget {
   }
 }
 
-/// A step's row: its flag with the state badge, two lines of text, and a chevron.
+/// A step's row: its flag with the state badge, two lines of text, and a chevron; or, with
+/// [trailing], [title] alone on one line and the trailing widget in place of the chevron.
 class _StepRow extends StatelessWidget {
   const _StepRow({
     required this.color,
@@ -125,9 +137,13 @@ class _StepRow extends StatelessWidget {
     required this.flag,
     required this.status,
     required this.title,
-    required this.subtitle,
+    this.subtitle = const SizedBox.shrink(),
+    this.height = _rowHeight,
+    this.trailing,
   });
 
+  final double height;
+  final Widget? trailing;
   final Color color;
   final VoidCallback onTap;
   final Widget flag;
@@ -142,7 +158,7 @@ class _StepRow extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: SizedBox(
-          height: _rowHeight,
+          height: height,
           child: Row(
             children: [
               SizedBox(
@@ -152,20 +168,36 @@ class _StepRow extends StatelessWidget {
                     clipBehavior: Clip.none,
                     children: [
                       flag,
-                      PositionedDirectional(end: -3, top: -3, child: _StateBadge(status, ring: color)),
+                      if (trailing == null)
+                        PositionedDirectional(end: -3, top: -3, child: _StateBadge(status, ring: color))
+                      else
+                        PositionedDirectional(
+                          end: -5,
+                          top: -5,
+                          child: Transform.scale(scale: .8, child: _StateBadge(status, ring: color)),
+                        ),
                     ],
                   ),
                 ),
               ),
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [title, const Gap(2), subtitle],
-                ),
+                child: trailing == null
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [title, const Gap(2), subtitle],
+                      )
+                    : Align(alignment: AlignmentDirectional.centerStart, child: title),
               ),
-              Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
-              const Gap(12),
+              if (trailing case final trailing?) ...[
+                const Gap(8),
+                trailing,
+                // room for the trailing widget's badge, clear of the card's rounded corner
+                const Gap(24),
+              ] else ...[
+                Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                const Gap(12),
+              ],
             ],
           ),
         ),
@@ -284,11 +316,13 @@ class _ProxyRow extends ConsumerWidget {
   }
 }
 
-// ---------- the hop row: the chain type and its mode; opens the chain settings ----------
+// ---------- the hop row: its IP, then the chain type in a chip with its mode as a badge ----------
 
 class _HopRow extends ConsumerWidget {
   const _HopRow(this.card);
   final ActiveProxyCardData card;
+
+  static const _chipHeight = 28.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -298,40 +332,20 @@ class _HopRow extends ConsumerWidget {
     final status = card.hopStatus!;
     final type = card.chain.isUnblocker() ? ChainType.unblocker : ChainType.extraSecurity;
     final (main, _) = type.colors(card.hopMode);
+    final color = Color.alphaBlend(main.withValues(alpha: .16), s.surfaceContainerHigh);
+    final down = status == StepStatus.waiting || status == StepStatus.failed;
     return _StepRow(
-      color: Color.alphaBlend(main.withValues(alpha: .16), s.surfaceContainerHigh),
+      color: color,
       onTap: () => context.goNamed('chainOptions'),
+      height: _hopRowHeight,
       flag: _FlagSlot(
         status == StepStatus.connected ? card.hop : null,
-        size: _flagSize,
-        dim: status == StepStatus.waiting || status == StepStatus.failed,
+        size: _hopFlagSize,
+        radius: _hopFlagRadius,
+        dim: down,
       ),
       status: status,
-      // like "⚡ lowest · M-NL": the chain type as an accent label, then the hop's name
-      title: Row(
-        children: [
-          SizedBox.square(
-            dimension: 18,
-            child: FittedBox(
-              child: ChainTypeIcon(type: type, mode: card.hopMode),
-            ),
-          ),
-          const Gap(3),
-          Text(type.present(t), style: theme.textTheme.labelMedium?.copyWith(color: main, letterSpacing: .3)),
-          Text('  ·  ', style: theme.textTheme.labelMedium?.copyWith(color: s.outline)),
-          ChainModeIcon(mode: card.hopMode, size: 12),
-          const Gap(4),
-          Flexible(
-            child: Text(
-              card.hopMode.present(t),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: _nameStyle(context, status),
-            ),
-          ),
-        ],
-      ),
-      subtitle: switch (status) {
+      title: switch (status) {
         StepStatus.waiting => const SizedBox.shrink(),
         StepStatus.slow => _Problem(t.connection.slow, error: false),
         StepStatus.failed => _Problem(t.connection.failed),
@@ -341,6 +355,47 @@ class _HopRow extends ConsumerWidget {
           isFinal: card.chain.isExtraSecurity(),
         ),
       },
+      trailing: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            height: _chipHeight,
+            padding: const EdgeInsetsDirectional.only(start: 6, end: 10),
+            decoration: BoxDecoration(
+              color: main.withValues(alpha: .18),
+              borderRadius: BorderRadius.circular(_chipHeight / 2),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox.square(
+                  dimension: _chipHeight - 10,
+                  child: FittedBox(
+                    child: ChainTypeIcon(type: type, mode: card.hopMode, animate: !down),
+                  ),
+                ),
+                const Gap(4),
+                Text(type.present(t), style: theme.textTheme.labelMedium?.copyWith(color: main, letterSpacing: .3)),
+              ],
+            ),
+          ),
+          // the mode, as a badge on the chip's top end
+          PositionedDirectional(
+            top: -5,
+            end: -5,
+            child: Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: s.surfaceContainerHighest,
+                shape: BoxShape.circle,
+                border: Border.all(color: color, width: 1.5),
+              ),
+              child: Center(child: ChainModeIcon(mode: card.hopMode, size: 10)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -580,12 +635,12 @@ class _Bone extends StatelessWidget {
 /// with the next ping), a faint square while [dim] (its step waits or failed). On arrival it pops in
 /// and sends out a ring.
 class _FlagSlot extends StatelessWidget {
-  const _FlagSlot(this.info, {required this.size, this.dim = false});
+  const _FlagSlot(this.info, {required this.size, this.dim = false, this.radius = 8});
   final OutboundInfo? info;
   final double size;
   final bool dim;
 
-  static const radius = 8.0;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
@@ -614,7 +669,12 @@ class _FlagSlot extends StatelessWidget {
                     .animate()
                     .scaleXY(begin: 1, end: 1.7, duration: 700.ms, curve: Curves.easeOut)
                     .fadeOut(duration: 700.ms),
-                IPCountryFlag(countryCode: info.ipinfo.countryCode, organization: info.ipinfo.org, size: size)
+                IPCountryFlag(
+                      countryCode: info.ipinfo.countryCode,
+                      organization: info.ipinfo.org,
+                      size: size,
+                      radius: radius,
+                    )
                     .animate()
                     .scaleXY(begin: .4, end: 1, duration: 500.ms, curve: Curves.easeOutBack)
                     .fadeIn(duration: 200.ms),
