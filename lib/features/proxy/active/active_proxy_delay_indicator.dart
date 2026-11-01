@@ -1,17 +1,12 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
-import 'package:hiddify/features/chain/model/chain_enum.dart';
-import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -49,7 +44,6 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
 
     final delay = proxy.urlTestDelay;
     final isValid = ConnectionConst.isValidDelay(delay);
-    final card = ref.watch(activeProxyCardProvider);
 
     return SizedBox(
       height: _slotHeight,
@@ -57,7 +51,6 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (card?.hopStatus case final status?) _ChainPill(card!, status),
             InkWell(
               onTap: () async {
                 try {
@@ -109,89 +102,6 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// The chain hop beside the ping: its icon and its state in a pill.
-/// The icon breathes while the hop connects and turns grey while it waits or has failed.
-class _ChainPill extends HookWidget {
-  const _ChainPill(this.card, this.status);
-  final ActiveProxyCardData card;
-  final StepStatus status;
-
-  static const _iconSize = 17.0;
-  static const _stateSize = 12.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = Theme.of(context).colorScheme;
-    final connecting = status == StepStatus.connecting || status == StepStatus.slow;
-    final breath = useAnimationController(duration: const Duration(milliseconds: 1300));
-    useEffect(() {
-      connecting ? breath.repeat(reverse: true) : breath.value = 1;
-      return null;
-    }, [connecting]);
-
-    final type = card.chain.isUnblocker() ? ChainType.unblocker : ChainType.extraSecurity;
-    Widget icon = SizedBox.square(
-      dimension: _iconSize,
-      child: FittedBox(
-        child: ChainTypeIcon(type: type, mode: card.hopMode),
-      ),
-    );
-    if (status == StepStatus.waiting || status == StepStatus.failed) {
-      icon = ColorFiltered(
-        colorFilter: ColorFilter.mode(s.onSurface.withValues(alpha: .35), BlendMode.srcIn),
-        child: icon,
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: s.surfaceContainerHigh, borderRadius: BorderRadius.circular(20)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FadeTransition(
-            opacity: CurvedAnimation(parent: breath, curve: Curves.easeInOut).drive(Tween(begin: .35, end: 1)),
-            child: icon,
-          ),
-          const Gap(5),
-          SizedBox.square(
-            dimension: _stateSize,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              child: switch (status) {
-                StepStatus.connecting || StepStatus.slow => CircularProgressIndicator(
-                  key: const ValueKey('connecting'),
-                  strokeWidth: 1.6,
-                  backgroundColor: s.onSurface.withValues(alpha: .2),
-                ),
-                StepStatus.connected => Icon(
-                  Icons.check_circle_rounded,
-                  key: const ValueKey('connected'),
-                  size: _stateSize,
-                  color: Theme.of(context).extension<ConnectionButtonTheme>()!.connectedColor,
-                ),
-                StepStatus.failed => Icon(
-                  Icons.error_rounded,
-                  key: const ValueKey('failed'),
-                  size: _stateSize,
-                  color: s.error,
-                ),
-                StepStatus.waiting => Container(
-                  key: const ValueKey('waiting'),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: s.onSurface.withValues(alpha: .28), width: 1.4),
-                  ),
-                ),
-              },
-            ),
-          ),
-        ],
       ),
     );
   }
