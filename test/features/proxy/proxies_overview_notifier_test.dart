@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -10,6 +11,7 @@ import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
 import 'package:hiddify/features/proxy/data/proxy_repository.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
+import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -19,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class _Repository implements ProxyRepository {
   final updates = StreamController<Either<ProxyFailure, OutboundGroup?>>.broadcast();
   bool selectFails = false;
+  final tested = <String>[];
 
   @override
   Stream<Either<ProxyFailure, OutboundGroup?>> watchProxies() => updates.stream;
@@ -28,7 +31,10 @@ class _Repository implements ProxyRepository {
       selectFails ? TaskEither.left(const ProxyFailure.unexpected()) : TaskEither.right(unit);
 
   @override
-  TaskEither<ProxyFailure, Unit> urlTest(String groupTag) => TaskEither.right(unit);
+  TaskEither<ProxyFailure, Unit> urlTest(String groupTag) {
+    tested.add(groupTag);
+    return TaskEither.right(unit);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => throw UnimplementedError();
@@ -131,5 +137,56 @@ void main() {
       proxy('b', 150),
     ];
     expect(await stream(tester, after, selected: 'lowest'), ['balance', 'lowest', 'b', 'a']);
+  });
+
+  group('proxy row', () {
+    /// One row of the page, for [info].
+    Future<void> row(WidgetTester tester, OutboundInfo info) async {
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(body: ProxyTile(info, selected: false, onTap: () {})),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 500));
+    }
+
+    // the ping's own tap area, inside the row's
+    Finder ping() => find.descendant(of: find.byType(ListTile), matching: find.byType(InkWell)).last;
+
+    testWidgets('a tap on the ping tests only that proxy', (tester) async {
+      await open(tester);
+      await stream(tester, [proxy('a', 300), proxy('b', 100)]);
+      await row(tester, proxy('b', 100));
+      await tester.tap(ping());
+      await tester.pump();
+      expect(repository.tested, ['b']);
+    });
+
+    testWidgets('a long press on the ping switches number and signal, and keeps the choice', (tester) async {
+      await open(tester);
+      await row(tester, proxy('a', 182));
+      expect(container.read(proxyPingStyleNotifierProvider), ProxyPingStyle.number);
+      expect(find.text('182'), findsOneWidget);
+      await tester.longPress(ping());
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(container.read(proxyPingStyleNotifierProvider), ProxyPingStyle.signal);
+      expect(find.text('182'), findsNothing);
+      final saved = await tester.runAsync(SharedPreferences.getInstance);
+      expect(saved!.getString('proxies_ping_style'), 'signal');
+    });
+
+    testWidgets('a proxy that gave up says so; a waiting one shows its status, not the core mark', (tester) async {
+      await open(tester);
+      final t = container.read(translationsProvider).requireValue;
+      await row(tester, OutboundInfo(tag: 'd', type: 'DNSTT ❌ Failed', status: Status.FAILED));
+      expect(find.text(t.pages.proxies.status.failed), findsOneWidget);
+      await row(tester, OutboundInfo(tag: 'w', type: 'WARP ⏳ Connecting...', status: Status.CONNECTING));
+      expect(find.text('WARP'), findsOneWidget);
+      expect(find.textContaining(t.pages.proxies.status.connecting), findsOneWidget);
+      expect(find.textContaining('⏳'), findsNothing);
+    });
   });
 }
