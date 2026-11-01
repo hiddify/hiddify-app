@@ -447,12 +447,12 @@
           "stickySessionDescription": "هر سایت تا اتصال دوباره، یک سرور تصادفی را نگه می‌دارد"
         },
         "resolveDestination": "تحلیل آدرس مقصد",
-        "ipv6Route": "مسیریابی IPv6",
+        "ipv6Route": "IPv6",
         "ipv6Modes": {
-          "disable": "غیرفعال",
-          "enable": "فعال",
-          "prefer": "ترجیحی",
-          "only": "انحصاری"
+          "preferIpv4": "اول IPv4",
+          "preferIpv6": "اول IPv6",
+          "preferIpv4Description": "نام‌ها اول به IPv4 حل می‌شوند. IPv6 فقط از پراکسی‌ای که آن را دارد استفاده می‌شود. هر دو از VPN می‌گذرند.",
+          "preferIpv6Description": "نام‌ها از پراکسی‌ای که IPv6 دارد اول به IPv6 و در غیر این صورت به IPv4 حل می‌شوند. هر دو از VPN می‌گذرند."
         }
       },
       "dns": {

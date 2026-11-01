@@ -468,12 +468,10 @@
           "stickySessionDescription": "كل موقع يحتفظ بخادم عشوائي حتى تعيد الاتصال"
         },
         "resolveDestination": "تحديد وجهة الاتصال",
-        "ipv6Route": "توجيه IPv6",
+        "ipv6Route": "IPv6",
         "ipv6Modes": {
-          "disable": "إيقاف",
-          "enable": "تشغيل",
-          "prefer": "مفضل",
-          "only": "حصري"
+          "preferIpv4": "IPv4 أولاً",
+          "preferIpv6": "IPv6 أولاً"
         }
       },
       "dns": {

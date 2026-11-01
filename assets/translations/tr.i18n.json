@@ -436,12 +436,10 @@
           "stickySessionDescription": "Her site, yeniden bağlanana kadar rastgele bir sunucuda kalır"
         },
         "resolveDestination": "Hedefi çözümle",
-        "ipv6Route": "IPv6 rotası",
+        "ipv6Route": "IPv6",
         "ipv6Modes": {
-          "disable": "Kapalı",
-          "enable": "Açık",
-          "prefer": "Tercih edilen",
-          "only": "Özel"
+          "preferIpv4": "Önce IPv4",
+          "preferIpv6": "Önce IPv6"
         }
       },
       "dns": {

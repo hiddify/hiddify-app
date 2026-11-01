@@ -519,6 +519,7 @@ class _PinnedOptions extends ConsumerWidget {
           choices: IPv6Mode.values,
           present: (value) => value.present(t),
           onSelected: ref.read(ConfigOptions.ipv6Mode.notifier).update,
+          describe: (value) => value.describe(t),
         ),
         const Divider(height: 3, thickness: 3),
       ],

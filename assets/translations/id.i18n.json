@@ -436,12 +436,10 @@
           "stickySessionDescription": "Setiap situs memakai server acak sampai Anda menyambung ulang"
         },
         "resolveDestination": "Resolusi tujuan",
-        "ipv6Route": "Rute IPv6",
+        "ipv6Route": "IPv6",
         "ipv6Modes": {
-          "disable": "Nonaktif",
-          "enable": "Aktif",
-          "prefer": "Prioritaskan",
-          "only": "Eksklusif"
+          "preferIpv4": "IPv4 dulu",
+          "preferIpv6": "IPv6 dulu"
         }
       },
       "dns": {

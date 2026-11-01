@@ -457,12 +457,10 @@
           "stickySessionDescription": "Каждый сайт закрепляется за случайным сервером до переподключения"
         },
         "resolveDestination": "Определять адрес назначения",
-        "ipv6Route": "Маршрут IPv6",
+        "ipv6Route": "IPv6",
         "ipv6Modes": {
-          "disable": "Выключено",
-          "enable": "Включено",
-          "prefer": "Предпочтительно",
-          "only": "Только"
+          "preferIpv4": "Сначала IPv4",
+          "preferIpv6": "Сначала IPv6"
         }
       },
       "dns": {

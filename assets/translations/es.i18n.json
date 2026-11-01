@@ -437,12 +437,10 @@
           "stickySessionDescription": "Cada sitio mantiene un servidor aleatorio hasta que te vuelvas a conectar"
         },
         "resolveDestination": "Resolver destino",
-        "ipv6Route": "Ruta IPv6",
+        "ipv6Route": "IPv6",
         "ipv6Modes": {
-          "disable": "Desactivado",
-          "enable": "Activado",
-          "prefer": "Preferido",
-          "only": "Exclusivo"
+          "preferIpv4": "IPv4 primero",
+          "preferIpv6": "IPv6 primero"
         }
       },
       "dns": {

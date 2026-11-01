@@ -75,22 +75,32 @@ enum BalancerStrategy {
   };
 }
 
+/// Which address family the core resolves first. Both families always go through the VPN and
+/// IPv6 is used only through a proxy the core found carrying it, so there is no "off": IPv6 that
+/// is not routed leaks past the VPN (#2307, #2420).
 @JsonEnum(valueField: 'key')
 enum IPv6Mode {
-  disable("ipv4_only"),
-  enable("prefer_ipv4"),
-  prefer("prefer_ipv6"),
-  only("ipv6_only");
+  preferIPv4("prefer_ipv4"),
+  preferIPv6("prefer_ipv6");
 
   const IPv6Mode(this.key);
 
   final String key;
 
+  /// The stored value; the retired ipv4_only and ipv6_only count as the preference nearest them.
+  static IPv6Mode fromKey(String? key) => switch (key) {
+    "prefer_ipv6" || "ipv6_only" => preferIPv6,
+    _ => preferIPv4,
+  };
+
   String present(TranslationsEn t) => switch (this) {
-    disable => t.pages.settings.routing.ipv6Modes.disable,
-    enable => t.pages.settings.routing.ipv6Modes.enable,
-    prefer => t.pages.settings.routing.ipv6Modes.prefer,
-    only => t.pages.settings.routing.ipv6Modes.only,
+    preferIPv4 => t.pages.settings.routing.ipv6Modes.preferIpv4,
+    preferIPv6 => t.pages.settings.routing.ipv6Modes.preferIpv6,
+  };
+
+  String describe(TranslationsEn t) => switch (this) {
+    preferIPv4 => t.pages.settings.routing.ipv6Modes.preferIpv4Description,
+    preferIPv6 => t.pages.settings.routing.ipv6Modes.preferIpv6Description,
   };
 }
 

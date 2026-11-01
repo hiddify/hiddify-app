@@ -52,8 +52,8 @@ abstract class ConfigOptions {
 
   static final ipv6Mode = PreferencesNotifier.create<IPv6Mode, String>(
     "ipv6-mode",
-    IPv6Mode.disable,
-    mapFrom: (value) => IPv6Mode.values.firstWhere((e) => e.key == value),
+    IPv6Mode.preferIPv4,
+    mapFrom: IPv6Mode.fromKey,
     mapTo: (value) => value.key,
   );
 

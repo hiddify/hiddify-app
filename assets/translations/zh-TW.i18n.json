@@ -436,12 +436,10 @@
           "stickySessionDescription": "每個網站使用一個隨機伺服器，直到您重新連線"
         },
         "resolveDestination": "解析目的地",
-        "ipv6Route": "IPv6 路由",
+        "ipv6Route": "IPv6",
         "ipv6Modes": {
-          "disable": "關閉",
-          "enable": "開啟",
-          "prefer": "首選",
-          "only": "僅"
+          "preferIpv4": "IPv4 優先",
+          "preferIpv6": "IPv6 優先"
         }
       },
       "dns": {
