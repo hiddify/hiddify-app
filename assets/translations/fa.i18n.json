@@ -136,10 +136,14 @@
         "testing": "تأخیر: در حال تست…"
       },
       "status": {
+        "connecting": "در حال اتصال",
+        "registering": "در حال ثبت‌نام",
+        "failed": "ناموفق",
         "ready": "آماده",
         "searching": "در حال جستجو",
         "reconnecting": "در حال اتصال دوباره"
-      }
+      },
+      "signalStyle": "سبک سیگنال"
     },
     "profiles": {
       "title": "پروفایل‌ها",

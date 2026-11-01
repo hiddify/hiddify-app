@@ -142,10 +142,14 @@
         "testing": "التأخير: قيد الاختبار…"
       },
       "status": {
+        "connecting": "جارٍ الاتصال",
+        "registering": "جارٍ التسجيل",
+        "failed": "فشل",
         "ready": "جاهز",
         "searching": "جارٍ البحث",
         "reconnecting": "جارٍ إعادة الاتصال"
-      }
+      },
+      "signalStyle": "نمط الإشارة"
     },
     "profiles": {
       "title": "الملفات الشخصية",

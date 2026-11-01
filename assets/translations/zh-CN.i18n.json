@@ -136,10 +136,14 @@
         "testing": "延迟：测试中…"
       },
       "status": {
+        "connecting": "正在连接",
+        "registering": "正在注册",
+        "failed": "失败",
         "ready": "就绪",
         "searching": "正在搜索",
         "reconnecting": "正在重新连接"
-      }
+      },
+      "signalStyle": "信号样式"
     },
     "profiles": {
       "title": "配置文件",

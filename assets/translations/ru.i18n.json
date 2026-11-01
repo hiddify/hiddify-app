@@ -140,10 +140,14 @@
         "testing": "Задержка: тестирование…"
       },
       "status": {
+        "connecting": "Подключение",
+        "registering": "Регистрация",
+        "failed": "Ошибка",
         "ready": "Готов",
         "searching": "Поиск",
         "reconnecting": "Переподключение"
-      }
+      },
+      "signalStyle": "Стиль сигнала"
     },
     "profiles": {
       "title": "Профили",

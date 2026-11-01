@@ -136,10 +136,14 @@
         "testing": "Latence : test en cours…"
       },
       "status": {
+        "connecting": "Connexion",
+        "registering": "Inscription",
+        "failed": "Échec",
         "ready": "Prêt",
         "searching": "Recherche",
         "reconnecting": "Reconnexion"
-      }
+      },
+      "signalStyle": "Style signal"
     },
     "profiles": {
       "title": "Profils",

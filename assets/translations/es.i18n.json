@@ -136,10 +136,14 @@
         "testing": "Latencia: probando…"
       },
       "status": {
+        "connecting": "Conectando",
+        "registering": "Registrando",
+        "failed": "Falló",
         "ready": "Listo",
         "searching": "Buscando",
         "reconnecting": "Reconectando"
-      }
+      },
+      "signalStyle": "Estilo de señal"
     },
     "profiles": {
       "title": "Perfiles",

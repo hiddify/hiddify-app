@@ -136,10 +136,14 @@
         "testing": "Latensi: sedang menguji…"
       },
       "status": {
+        "connecting": "Menghubungkan",
+        "registering": "Mendaftar",
+        "failed": "Gagal",
         "ready": "Siap",
         "searching": "Mencari",
         "reconnecting": "Menghubungkan ulang"
-      }
+      },
+      "signalStyle": "Gaya sinyal"
     },
     "profiles": {
       "title": "Profil",

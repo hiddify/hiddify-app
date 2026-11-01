@@ -136,10 +136,14 @@
         "testing": "Gecikme: test ediliyor…"
       },
       "status": {
+        "connecting": "Bağlanıyor",
+        "registering": "Kaydediliyor",
+        "failed": "Başarısız",
         "ready": "Hazır",
         "searching": "Aranıyor",
         "reconnecting": "Yeniden bağlanıyor"
-      }
+      },
+      "signalStyle": "Sinyal stili"
     },
     "profiles": {
       "title": "Profiller",

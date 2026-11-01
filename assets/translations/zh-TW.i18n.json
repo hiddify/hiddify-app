@@ -136,10 +136,14 @@
         "testing": "延遲：測試中…"
       },
       "status": {
+        "connecting": "正在連線",
+        "registering": "正在註冊",
+        "failed": "失敗",
         "ready": "就緒",
         "searching": "正在搜尋",
         "reconnecting": "正在重新連線"
-      }
+      },
+      "signalStyle": "訊號樣式"
     },
     "profiles": {
       "title": "設定檔",
