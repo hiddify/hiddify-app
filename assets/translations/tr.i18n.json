@@ -132,6 +132,7 @@
       "delay": {
         "result": "Gecikme: ${delay}ms",
         "timeout": "Gecikme testi zaman aşımına uğradı",
+        "unavailable": "Kullanılamıyor",
         "testing": "Gecikme: test ediliyor…"
       }
     },

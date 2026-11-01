@@ -132,6 +132,7 @@
       "delay": {
         "result": "Latência: ${delay}ms",
         "timeout": "Tempo limite do teste de latência esgotado",
+        "unavailable": "Indisponível",
         "testing": "Latência: testando…"
       }
     },

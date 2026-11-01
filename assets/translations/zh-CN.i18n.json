@@ -132,6 +132,7 @@
       "delay": {
         "result": "延迟：${delay}毫秒",
         "timeout": "延迟测试超时",
+        "unavailable": "不可用",
         "testing": "延迟：测试中…"
       }
     },

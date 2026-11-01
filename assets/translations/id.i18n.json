@@ -132,6 +132,7 @@
       "delay": {
         "result": "Latensi: ${delay}ms",
         "timeout": "Waktu tes latensi habis",
+        "unavailable": "Tidak tersedia",
         "testing": "Latensi: sedang menguji…"
       }
     },
