@@ -179,4 +179,29 @@ extension OutboundInfoCard on OutboundInfo {
   /// An IP looked up in this run. The core sends the last run's IP, marked, until a lookup
   /// replaces it; it may have changed since, so it does not count.
   bool get hasIp => ipinfo.ip.isNotEmpty && !ipinfo.fromCache;
+
+  /// What a proxies-page row shows: the core's [status] first, then for a ready proxy its ping.
+  ProxyRowState get rowState => switch (status) {
+    Status.CONNECTING => ProxyRowState.connecting,
+    Status.REGISTERING => ProxyRowState.registering,
+    Status.SEARCHING => ProxyRowState.searching,
+    Status.RECONNECTING => ProxyRowState.reconnecting,
+    Status.FAILED => ProxyRowState.failed,
+    _ => switch (urlTestDelay) {
+      final delay when ConnectionConst.isValidDelay(delay) => ProxyRowState.ready,
+      0 => ProxyRowState.untested,
+      _ => ProxyRowState.pingFailed,
+    },
+  };
+
+  /// [type] without the status mark the core adds while the proxy is not ready
+  /// ("WARP ⏳ Connecting..."); the row shows the status its own way.
+  String get typeWithoutStatus => status == Status.READY ? type : type.replaceFirst(_statusMark, '');
 }
+
+/// The core's status mark: a space, one of its emoji, then the word (hiddify-sing-box adapter/h_status.go).
+final _statusMark = RegExp(r'\s+(⏳|⌛|🔍|❌|🔑)\s.*$');
+
+/// A proxies-page row's state. [untested] waits for its first ping; [pingFailed] is ready but its
+/// ping got no answer; [failed] is the core's FAILED, the proxy gave up.
+enum ProxyRowState { ready, untested, pingFailed, connecting, registering, searching, reconnecting, failed }

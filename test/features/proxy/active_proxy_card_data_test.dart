@@ -262,6 +262,32 @@ void main() {
       expect(await hopAfter(const Duration(seconds: 16), status: Status.RECONNECTING), StepStatus.slow);
     });
   });
+
+  group('proxies page row', () {
+    test("the core's status comes first, then a ready proxy's ping", () {
+      expect(_info('a', status: Status.CONNECTING, delay: 200).rowState, ProxyRowState.connecting);
+      expect(_info('a', status: Status.REGISTERING).rowState, ProxyRowState.registering);
+      expect(_info('a', status: Status.SEARCHING).rowState, ProxyRowState.searching);
+      expect(_info('a', status: Status.RECONNECTING, delay: 200).rowState, ProxyRowState.reconnecting);
+      expect(_info('a', status: Status.FAILED).rowState, ProxyRowState.failed);
+      expect(_info('a', delay: 200).rowState, ProxyRowState.ready);
+      expect(_info('a').rowState, ProxyRowState.untested);
+      expect(_info('a', delay: 65535).rowState, ProxyRowState.pingFailed);
+    });
+
+    test("the type loses only the core's status mark", () {
+      expect(_info('a', type: 'WARP ⏳ Connecting...', status: Status.CONNECTING).typeWithoutStatus, 'WARP');
+      expect(_info('a', type: 'WARP ⌛ Reconnecting...', status: Status.RECONNECTING).typeWithoutStatus, 'WARP');
+      expect(
+        _info('a', type: 'WARP · Auto 🔍 Searching...', status: Status.SEARCHING).typeWithoutStatus,
+        'WARP · Auto',
+      );
+      expect(_info('a', type: 'DNSTT ❌ Failed', status: Status.FAILED).typeWithoutStatus, 'DNSTT');
+      expect(_info('a', type: 'WARP 🔑 Registering...', status: Status.REGISTERING).typeWithoutStatus, 'WARP');
+      // a ready proxy's type is left alone, even if it holds one of the emoji
+      expect(_info('a', type: 'VLESS ❌ x').typeWithoutStatus, 'VLESS ❌ x');
+    });
+  });
 }
 
 class _Prefs implements SharedPreferences {
