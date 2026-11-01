@@ -136,10 +136,14 @@
         "testing": "Delay: testing…"
       },
       "status": {
+        "connecting": "Connecting",
+        "registering": "Registering",
+        "failed": "Failed",
         "ready": "Ready",
         "searching": "Searching",
         "reconnecting": "Reconnecting"
-      }
+      },
+      "signalStyle": "Signal style"
     },
     "profiles": {
       "title": "Profiles",
