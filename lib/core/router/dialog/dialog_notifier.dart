@@ -25,6 +25,7 @@ import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/common/qr_code_scanner_screen.dart';
+import 'package:hiddify/features/crash_report/widget/crash_report_dialog.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -52,6 +53,10 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<String?> showQrScanner() async {
     return await _show<String?>(const QrCodeScannerDialog());
+  }
+
+  Future<void> showCrashReport() async {
+    return await _show<void>(const CrashReportDialog());
   }
 
   Future<void> showSortProfiles() async {
@@ -279,10 +284,7 @@ class DialogNotifier extends _$DialogNotifier {
     final dialogFuture = navigator.push<VpnAdminBgDialogResult>(route);
 
     try {
-      final stopped = await Future.any<bool>([
-        work.then((_) => false),
-        dialogFuture.then((_) => true),
-      ]);
+      final stopped = await Future.any<bool>([work.then((_) => false), dialogFuture.then((_) => true)]);
       if (!stopped && navigator.canPop()) {
         navigator.removeRoute(route);
       }
