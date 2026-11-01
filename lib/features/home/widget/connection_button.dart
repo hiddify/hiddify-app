@@ -122,6 +122,7 @@ class ConnectionButton extends HookConsumerWidget {
           : null,
       onChain: showHealth,
       onLabel: degraded || hopPending ? showHealth : null,
+      searching: hopPending,
       buttonColor: switch (look) {
         _Look.connected when degraded => _degradedColor,
         // the traffic waits for the chain hop: still on its way
@@ -217,6 +218,7 @@ class _ConnectionButton extends HookWidget {
     required this.chain,
     required this.onChain,
     required this.onLabel,
+    required this.searching,
     required this.buttonColor,
     required this.image,
     required this.useImage,
@@ -241,6 +243,9 @@ class _ConnectionButton extends HookWidget {
 
   /// Opens the connection check from a label that names a problem; null otherwise.
   final VoidCallback? onLabel;
+
+  /// Connected, but the traffic still waits for the chain hop: the radar keeps searching.
+  final bool searching;
   final Color buttonColor;
   final AssetGenImage image;
   final bool useImage;
@@ -255,6 +260,7 @@ class _ConnectionButton extends HookWidget {
     _Look.connecting => EclipseLook.starting,
     _Look.disconnecting => EclipseLook.stopping,
     _Look.waiting || _Look.hotReloading => EclipseLook.waiting,
+    _Look.connected when searching => EclipseLook.waiting,
     _Look.connected || _Look.noProxies => EclipseLook.connected,
     _Look.failed => EclipseLook.error,
   };
