@@ -118,10 +118,12 @@
       "empty": "لا توجد بروكسيات متاحة",
       "connectToSeeProxies": "اتصل لعرض البروكسيات",
       "loadFailed": "تعذّر تحميل البروكسيات. انقر لإعادة المحاولة.",
-      "checkingIp": "جارٍ التحقق من عنوان IP…",
       "activeProxy": "البروكسي النشط",
       "unknownIp": "IP غير معروف",
+      "checkingIp": "جارٍ التحقق من عنوان IP…",
       "switchFailed": "تعذّر التبديل إلى هذا البروكسي. أعد المحاولة.",
+      "notResponding": "لا يستجيب",
+      "noneResponding": "لا يستجيب أي بروكسي",
       "sortOptions": {
         "unsorted": "الافتراضي",
         "name": "أبجديًا",
@@ -136,8 +138,18 @@
       "delay": {
         "result": "التأخير: ${delay} مللي ثانية",
         "timeout": "انتهى وقت اختبار التأخير",
+        "unavailable": "غير متاح",
         "testing": "التأخير: قيد الاختبار…"
-      }
+      },
+      "status": {
+        "connecting": "جارٍ الاتصال",
+        "registering": "جارٍ التسجيل",
+        "failed": "فشل",
+        "ready": "جاهز",
+        "searching": "جارٍ البحث",
+        "reconnecting": "جارٍ إعادة الاتصال"
+      },
+      "signalStyle": "نمط الإشارة"
     },
     "profiles": {
       "title": "الملفات الشخصية",
@@ -192,7 +204,12 @@
         "urlHint": "رابط الإعدادات الكامل",
         "disableAutoUpdate": "تعطيل التحديث التلقائي",
         "autoUpdateInterval": "فاصل التحديث التلقائي",
-        "loading": "جاري إضافة الملف الشخصي…"
+        "loading": "جاري إضافة الملف الشخصي…",
+        "adminPreference": "صلاحية المسؤول",
+        "adminPreferenceAskEachTime": "اسأل في كل مرة",
+        "adminPreferencePreferAdmin": "استخدم صلاحية المسؤول دائمًا",
+        "adminPreferencePreferNoAdmin": "تابع دائمًا دون صلاحية المسؤول",
+        "adminPreferenceReset": "اسأل في كل مرة عن صلاحية المسؤول"
       }
     },
     "logs": {
@@ -256,6 +273,7 @@
         "autoIpCheck": "التحقق التلقائي من IP الاتصال",
         "dynamicNotification": "عرض السرعة في الإشعار",
         "hapticFeedback": "ردود الفعل اللمسية",
+        "alwaysOnVpn": "VPN قيد التشغيل دائمًا",
         "actionAtClosing": "عند إغلاق النافذة",
         "autoStart": "البدء عند تسجيل الدخول",
         "silentStart": "البدء في الخلفية",
@@ -267,7 +285,9 @@
         "urlTestInterval": "فاصل اختبار الرابط",
         "clashApiPort": "منفذ Clash API",
         "useXrayCoreWhenPossible": "استخدام xray-core عند الإمكان",
-        "useXrayCoreWhenPossibleMsg": "استخدم xray-core عند تحليل روابط الاشتراك. أعد استيراد الاشتراك لتشغيل هذا الخيار."
+        "useXrayCoreWhenPossibleMsg": "استخدم xray-core عند تحليل روابط الاشتراك. أعد استيراد الاشتراك لتشغيل هذا الخيار.",
+        "useSystemTlsEngine": "استخدام TLS الخاص بالنظام عند توفره",
+        "useSystemTlsEngineMsg": "تستخدم الاتصالات التي ليس لها بصمة TLS بروتوكول TLS الخاص بـ macOS أو iOS أو Windows بعد اجتيازه فحصًا على هذا الجهاز؛ وإلا فإنها تبدو مثل Chrome."
       },
       "routing": {
         "title": "التوجيه",
@@ -573,7 +593,17 @@
             "count": "عدد الضوضاء",
             "mode": "وضع الضوضاء",
             "size": "حجم الضوضاء",
-            "delay": "تأخير الضوضاء"
+            "delay": "تأخير الضوضاء",
+            "modes": {
+              "standard": "قياسي",
+              "random": "عشوائي",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "مصافحة QUIC",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (مكالمة VoIP)",
+              "stun": "STUN (مكالمة فيديو)"
+            }
           }
         },
         "psiphon": {
@@ -714,6 +744,28 @@
         "message": "قواعد التوجيه تحدد وجهة بياناتك.\nلا تستوردها إلا من مصدر تثق به."
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "صلاحية المسؤول مطلوبة",
+        "msg": "يحتاج وضع VPN إلى صلاحية المسؤول لمرة واحدة لتثبيت خدمة Hiddify في الخلفية. بعد ذلك، يمكنك الاتصال دون طلب آخر.",
+        "connectWithAdmin": "الاتصال بصلاحية المسؤول",
+        "waitingTitle": "في انتظار صلاحية المسؤول",
+        "waitingMsg": "وافق على طلب صلاحية المسؤول للمتابعة. يمكنك الإيقاف والمحاولة لاحقًا.",
+        "stop": "إيقاف"
+      },
+      "proxyNeedsAdmin": {
+        "title": "يُنصح بصلاحية المسؤول",
+        "msg": "تعمل بعض الإعدادات في هذا الملف الشخصي بشكل أفضل مع صلاحية المسؤول. يمكنك التشغيل بصلاحية المسؤول، أو المتابعة دونها وإيقاف تلك الإعدادات لهذا الاتصال.",
+        "seeConfigs": "عرض التكوينات",
+        "hideConfigs": "إخفاء التكوينات",
+        "neverAskAgain": "لا تسأل مرة أخرى لهذا الملف الشخصي",
+        "runAsAdmin": "التشغيل كمسؤول",
+        "continueWithoutAdmin": "المتابعة دون صلاحية المسؤول",
+        "elevationFailedTitle": "تعذّر الحصول على صلاحية المسؤول",
+        "elevationFailedMsg": "تم رفض طلب صلاحية المسؤول أو فشل. أعد المحاولة، أو تابع دون صلاحية المسؤول لهذا الاتصال.",
+        "tryAgain": "أعد المحاولة"
+      }
+    },
     "experimentalNotice": {
       "title": "ميزات تجريبية قيد الاستخدام",
       "msg": "لقد فعّلت ميزات تجريبية قد تؤثر على جودة الاتصال وتسبب أخطاء غير متوقعة. يمكنك دائمًا تغيير هذه الخيارات أو إعادة تعيينها من صفحة الإعدادات.",
@@ -738,6 +790,7 @@
     "proxyInfo": {
       "fullTag": "العلامة الكاملة",
       "type": "النوع",
+      "status": "الحالة",
       "testTime": "وقت الاختبار",
       "testDelay": "تأخير الاختبار",
       "isSelected": "محدد",
@@ -788,9 +841,33 @@
     "disconnect": "قطع الاتصال",
     "disconnecting": "جاري قطع الاتصال…",
     "failed": "تعذّر الاتصال",
+    "slow": "يستغرق وقتًا أطول من المعتاد…",
     "tapToRetry": "انقر لإعادة المحاولة",
+    "errorDetails": "تفاصيل الخطأ",
     "reconnect": "إعادة الاتصال",
-    "reconnectMsg": "جاري إعادة الاتصال لتطبيق التغييرات…"
+    "reconnectMsg": "جاري إعادة الاتصال لتطبيق التغييرات…",
+    "health": {
+      "title": "فحص الاتصال",
+      "allGood": "حركة مرورك تمر",
+      "pickDead": "البروكسي المحدد لا يستجيب",
+      "hopPending": "${chain} قيد الاتصال…",
+      "hopFailed": "تعذّر اتصال ${chain}",
+      "coreTesting": "جارٍ اختبار الخوادم…",
+      "coreNone": "لا يستجيب أي خادم",
+      "fastest": "أسرع خادم",
+      "yourServer": "الوكيل المحدد",
+      "notResponding": "لا يستجيب",
+      "testing": "جارٍ الاختبار…",
+      "useFastest": "التبديل إلى الأسرع",
+      "hopReady": "متصل",
+      "hopConnecting": "جارٍ الاتصال…",
+      "hopBroken": "تعذّر الاتصال",
+      "hopNoReply": "متصل، لكنه لا يستجيب",
+      "hopBlocked": "ينتظر استجابة الوكيل المحدد",
+      "retry": "اختبار مجددًا",
+      "change": "تغيير",
+      "turnOff": "إيقاف"
+    }
   },
   "errors": {
     "unexpected": "خطأ غير متوقع",

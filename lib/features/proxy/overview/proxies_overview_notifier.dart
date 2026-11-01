@@ -57,6 +57,31 @@ class ProxiesSortNotifier extends _$ProxiesSortNotifier with AppLogger {
   }
 }
 
+/// How a proxy row shows its ping: the bare number, or the signal (the logo, lit by the ping).
+enum ProxyPingStyle { number, signal }
+
+@Riverpod(keepAlive: true)
+class ProxyPingStyleNotifier extends _$ProxyPingStyleNotifier {
+  late final _pref = PreferencesEntry(
+    preferences: ref.watch(sharedPreferencesProvider).requireValue,
+    key: "proxies_ping_style",
+    defaultValue: ProxyPingStyle.number,
+    mapFrom: ProxyPingStyle.values.byName,
+    mapTo: (value) => value.name,
+  );
+
+  @override
+  ProxyPingStyle build() => _pref.read();
+
+  Future<void> update(ProxyPingStyle value) {
+    state = value;
+    return _pref.write(value);
+  }
+
+  /// The long press on a ping: number ↔ signal.
+  Future<void> toggle() => update(state == ProxyPingStyle.number ? ProxyPingStyle.signal : ProxyPingStyle.number);
+}
+
 @riverpod
 class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   @override
@@ -249,6 +274,7 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     }
   }
 
+  /// Tests [groupTag]'s proxies, or only the one proxy when given a proxy's tag (a tap on its ping).
   Future<void> urlTest(String groupTag) async {
     loggy.debug("testing group: [$groupTag]");
     if (state case AsyncData()) {

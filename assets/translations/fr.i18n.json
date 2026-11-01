@@ -112,10 +112,12 @@
       "empty": "Aucun proxy disponible",
       "connectToSeeProxies": "Connectez-vous pour voir les proxies",
       "loadFailed": "Impossible de charger les proxies. Appuyez pour réessayer.",
-      "checkingIp": "Vérification de l’IP…",
       "activeProxy": "Proxy actif",
       "unknownIp": "IP inconnue",
+      "checkingIp": "Vérification de l’IP…",
       "switchFailed": "Impossible de passer à ce proxy. Réessayez.",
+      "notResponding": "Ne répond pas",
+      "noneResponding": "Aucun proxy ne répond",
       "sortOptions": {
         "unsorted": "Par défaut",
         "name": "Alphabétiquement",
@@ -130,8 +132,18 @@
       "delay": {
         "result": "Latence : ${delay} ms",
         "timeout": "Délai du test de latence expiré",
+        "unavailable": "Indisponible",
         "testing": "Latence : test en cours…"
-      }
+      },
+      "status": {
+        "connecting": "Connexion",
+        "registering": "Inscription",
+        "failed": "Échec",
+        "ready": "Prêt",
+        "searching": "Recherche",
+        "reconnecting": "Reconnexion"
+      },
+      "signalStyle": "Style signal"
     },
     "profiles": {
       "title": "Profils",
@@ -182,7 +194,12 @@
         "urlHint": "URL complète de la configuration",
         "disableAutoUpdate": "Désactiver la mise à jour automatique",
         "autoUpdateInterval": "Intervalle de mise à jour automatique",
-        "loading": "Ajout du profil…"
+        "loading": "Ajout du profil…",
+        "adminPreference": "Autorisation administrateur",
+        "adminPreferenceAskEachTime": "Demander à chaque fois",
+        "adminPreferencePreferAdmin": "Toujours utiliser l’autorisation administrateur",
+        "adminPreferencePreferNoAdmin": "Toujours continuer sans autorisation administrateur",
+        "adminPreferenceReset": "Demander à chaque fois l’autorisation administrateur"
       }
     },
     "logs": {
@@ -246,6 +263,7 @@
         "autoIpCheck": "Vérifier automatiquement l'IP de connexion",
         "dynamicNotification": "Afficher la vitesse dans la notification",
         "hapticFeedback": "Retour haptique",
+        "alwaysOnVpn": "VPN toujours activé",
         "actionAtClosing": "À la fermeture de la fenêtre",
         "autoStart": "Lancer au démarrage",
         "silentStart": "Démarrer réduit",
@@ -257,7 +275,9 @@
         "urlTestInterval": "Intervalle de test de l'URL",
         "clashApiPort": "Port de l'API Clash",
         "useXrayCoreWhenPossible": "Utiliser xray-core si possible",
-        "useXrayCoreWhenPossibleMsg": "Utilisez xray-core lors de l'analyse des liens d'abonnement. Réimportez l'abonnement pour activer cette option."
+        "useXrayCoreWhenPossibleMsg": "Utilisez xray-core lors de l'analyse des liens d'abonnement. Réimportez l'abonnement pour activer cette option.",
+        "useSystemTlsEngine": "Utiliser le TLS du système si disponible",
+        "useSystemTlsEngineMsg": "Les connexions sans empreinte TLS utilisent le TLS de macOS, iOS ou Windows une fois qu’il a réussi une vérification sur cet appareil ; sinon, elles ressemblent à Chrome."
       },
       "routing": {
         "title": "Routage",
@@ -542,7 +562,17 @@
             "count": "Nombre de bruits",
             "mode": "Mode bruit",
             "size": "Taille du bruit",
-            "delay": "Délai du bruit"
+            "delay": "Délai du bruit",
+            "modes": {
+              "standard": "Standard",
+              "random": "Aléatoire",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "Handshake QUIC",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (appel VoIP)",
+              "stun": "STUN (appel vidéo)"
+            }
           }
         },
         "psiphon": {
@@ -679,6 +709,28 @@
         "message": "Les règles de routage déterminent où va votre trafic.\nNe les importez que depuis une source de confiance."
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Autorisation administrateur requise",
+        "msg": "Le mode VPN a besoin d’une autorisation administrateur unique pour installer le service d’arrière-plan de Hiddify. Ensuite, vous pourrez vous connecter sans autre demande.",
+        "connectWithAdmin": "Se connecter avec l’autorisation administrateur",
+        "waitingTitle": "En attente de l’autorisation administrateur",
+        "waitingMsg": "Acceptez la demande administrateur pour continuer. Vous pouvez arrêter et réessayer plus tard.",
+        "stop": "Arrêter"
+      },
+      "proxyNeedsAdmin": {
+        "title": "Autorisation administrateur recommandée",
+        "msg": "Certains paramètres de ce profil fonctionnent mieux avec l’autorisation administrateur. Vous pouvez lancer avec l’autorisation administrateur, ou continuer sans et désactiver ces paramètres pour cette connexion.",
+        "seeConfigs": "Afficher les configurations",
+        "hideConfigs": "Masquer les configurations",
+        "neverAskAgain": "Ne plus demander pour ce profil",
+        "runAsAdmin": "Exécuter en tant qu’administrateur",
+        "continueWithoutAdmin": "Continuer sans autorisation administrateur",
+        "elevationFailedTitle": "Impossible d’obtenir l’autorisation administrateur",
+        "elevationFailedMsg": "La demande administrateur a été refusée ou a échoué. Réessayez, ou continuez sans autorisation administrateur pour cette connexion.",
+        "tryAgain": "Réessayer"
+      }
+    },
     "experimentalNotice": {
       "title": "Fonctionnalités expérimentales en cours d'utilisation",
       "msg": "Vous avez activé des fonctionnalités expérimentales qui pourraient affecter la qualité de la connexion et causer des erreurs inattendues. Vous pouvez toujours modifier ou réinitialiser ces options dans les Paramètres.",
@@ -703,6 +755,7 @@
     "proxyInfo": {
       "fullTag": "Tag complet ",
       "type": "Type ",
+      "status": "État",
       "testTime": "Heure du test ",
       "testDelay": "Délai du test ",
       "isSelected": "Sélectionné ",
@@ -753,9 +806,33 @@
     "disconnect": "Déconnecter",
     "disconnecting": "Déconnexion en cours…",
     "failed": "Connexion impossible",
+    "slow": "Cela prend plus de temps que d’habitude…",
     "tapToRetry": "Appuyez pour réessayer",
+    "errorDetails": "Détails de l’erreur",
     "reconnect": "Reconnecter",
-    "reconnectMsg": "Reconnexion pour appliquer les modifications…"
+    "reconnectMsg": "Reconnexion pour appliquer les modifications…",
+    "health": {
+      "title": "Vérification de la connexion",
+      "allGood": "Votre trafic passe",
+      "pickDead": "Le proxy sélectionné ne répond pas",
+      "hopPending": "${chain} est en cours de connexion…",
+      "hopFailed": "${chain} n’a pas pu se connecter",
+      "coreTesting": "Test des serveurs…",
+      "coreNone": "Aucun serveur ne répond",
+      "fastest": "Serveur le plus rapide",
+      "yourServer": "Proxy sélectionné",
+      "notResponding": "Ne répond pas",
+      "testing": "Test en cours…",
+      "useFastest": "Passer au plus rapide",
+      "hopReady": "Connecté",
+      "hopConnecting": "Connexion…",
+      "hopBroken": "Connexion impossible",
+      "hopNoReply": "Connecté, mais ne répond pas",
+      "hopBlocked": "Attend la réponse du proxy sélectionné",
+      "retry": "Tester à nouveau",
+      "change": "Modifier",
+      "turnOff": "Désactiver"
+    }
   },
   "errors": {
     "unexpected": "Erreur inattendue",

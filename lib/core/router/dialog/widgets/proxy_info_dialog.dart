@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -39,7 +40,8 @@ class OutboundInfoWidget extends HookConsumerWidget {
         children: [
           // SizedBox(height: 16.0),
           _buildInfoRow(t.dialogs.proxyInfo.fullTag, outboundInfo.tag),
-          _buildInfoRow(t.dialogs.proxyInfo.type, outboundInfo.type),
+          _buildInfoRow(t.dialogs.proxyInfo.type, outboundInfo.typeWithoutStatus),
+          _buildInfoRow(t.dialogs.proxyInfo.status, _statusText(t)),
           _buildInfoRow(
             t.dialogs.proxyInfo.testTime,
             DateFormat('yyyy-MM-dd HH:mm:ss').format(outboundInfo.urlTestTime.toDateTime().toLocal()),
@@ -58,6 +60,15 @@ class OutboundInfoWidget extends HookConsumerWidget {
       ),
     );
   }
+
+  String _statusText(Translations t) => switch (outboundInfo.status) {
+    Status.CONNECTING => t.pages.proxies.status.connecting,
+    Status.REGISTERING => t.pages.proxies.status.registering,
+    Status.SEARCHING => t.pages.proxies.status.searching,
+    Status.RECONNECTING => t.pages.proxies.status.reconnecting,
+    Status.FAILED => t.pages.proxies.status.failed,
+    _ => t.pages.proxies.status.ready,
+  };
 
   String formatBytes(int bytes, {int decimals = 3}) {
     if (bytes <= 0) return '0 B';

@@ -112,10 +112,12 @@
       "empty": "Kullanılabilir proxy yok",
       "connectToSeeProxies": "Proxy’leri görmek için bağlanın",
       "loadFailed": "Proxy’ler yüklenemedi. Yeniden denemek için dokunun.",
-      "checkingIp": "IP kontrol ediliyor…",
       "activeProxy": "Aktif proxy",
       "unknownIp": "Bilinmeyen IP",
+      "checkingIp": "IP kontrol ediliyor…",
       "switchFailed": "Bu proxy'ye geçilemedi. Tekrar deneyin.",
+      "notResponding": "Yanıt vermiyor",
+      "noneResponding": "Hiçbir proxy yanıt vermiyor",
       "sortOptions": {
         "unsorted": "Varsayılan",
         "name": "Alfabetik",
@@ -130,8 +132,18 @@
       "delay": {
         "result": "Gecikme: ${delay}ms",
         "timeout": "Gecikme testi zaman aşımına uğradı",
+        "unavailable": "Kullanılamıyor",
         "testing": "Gecikme: test ediliyor…"
-      }
+      },
+      "status": {
+        "connecting": "Bağlanıyor",
+        "registering": "Kaydediliyor",
+        "failed": "Başarısız",
+        "ready": "Hazır",
+        "searching": "Aranıyor",
+        "reconnecting": "Yeniden bağlanıyor"
+      },
+      "signalStyle": "Sinyal stili"
     },
     "profiles": {
       "title": "Profiller",
@@ -181,7 +193,12 @@
         "urlHint": "Tam yapılandırma URL'si",
         "disableAutoUpdate": "Otomatik güncellemeyi kapat",
         "autoUpdateInterval": "Otomatik güncelleme aralığı",
-        "loading": "Profil ekleniyor…"
+        "loading": "Profil ekleniyor…",
+        "adminPreference": "Yönetici izni",
+        "adminPreferenceAskEachTime": "Her seferinde sor",
+        "adminPreferencePreferAdmin": "Her zaman yönetici izni kullan",
+        "adminPreferencePreferNoAdmin": "Her zaman yönetici izni olmadan devam et",
+        "adminPreferenceReset": "Yönetici izni için her seferinde sor"
       }
     },
     "logs": {
@@ -245,6 +262,7 @@
         "autoIpCheck": "Bağlantı IP'sini otomatik kontrol et",
         "dynamicNotification": "Hızı bildirimde göster",
         "hapticFeedback": "Dokunsal geri bildirim",
+        "alwaysOnVpn": "Her zaman açık VPN",
         "actionAtClosing": "Pencere kapatılırken",
         "autoStart": "Oturum açılışında başlat",
         "silentStart": "Simge durumunda başlat",
@@ -256,7 +274,9 @@
         "urlTestInterval": "URL testi aralığı",
         "clashApiPort": "Clash API portu",
         "useXrayCoreWhenPossible": "Mümkün olduğunda xray-core kullan",
-        "useXrayCoreWhenPossibleMsg": "Abonelik bağlantılarını ayrıştırırken xray-core kullanın. Bu seçeneği açmak için aboneliği yeniden içe aktarın."
+        "useXrayCoreWhenPossibleMsg": "Abonelik bağlantılarını ayrıştırırken xray-core kullanın. Bu seçeneği açmak için aboneliği yeniden içe aktarın.",
+        "useSystemTlsEngine": "Varsa sistemin TLS’ini kullan",
+        "useSystemTlsEngineMsg": "TLS parmak izi olmayan bağlantılar, bu cihazda bir denetimden geçtikten sonra macOS, iOS veya Windows’un TLS’ini kullanır; aksi hâlde Chrome gibi görünür."
       },
       "routing": {
         "title": "Yönlendirme",
@@ -541,7 +561,17 @@
             "count": "Gürültü sayısı",
             "mode": "Gürültü modu",
             "size": "Gürültü boyutu",
-            "delay": "Gürültü gecikmesi"
+            "delay": "Gürültü gecikmesi",
+            "modes": {
+              "standard": "Standart",
+              "random": "Rastgele",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "QUIC el sıkışması",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (VoIP araması)",
+              "stun": "STUN (görüntülü arama)"
+            }
           }
         },
         "psiphon": {
@@ -677,6 +707,28 @@
         "message": "Rota kuralları trafiğinizin nereye gideceğini belirler.\nYalnızca güvendiğiniz bir kaynaktan içe aktarın."
       }
     },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Yönetici izni gerekli",
+        "msg": "VPN modu, Hiddify arka plan hizmetini yüklemek için bir kerelik yönetici izni gerektirir. Bundan sonra başka bir istem olmadan bağlanabilirsiniz.",
+        "connectWithAdmin": "Yönetici izniyle bağlan",
+        "waitingTitle": "Yönetici izni bekleniyor",
+        "waitingMsg": "Devam etmek için yönetici istemini onaylayın. Durdurup daha sonra tekrar deneyebilirsiniz.",
+        "stop": "Durdur"
+      },
+      "proxyNeedsAdmin": {
+        "title": "Yönetici izni önerilir",
+        "msg": "Bu profildeki bazı ayarlar yönetici izniyle daha iyi çalışır. Yönetici izniyle çalıştırabilir veya izin olmadan devam edip bu ayarları bu bağlantı için kapatabilirsiniz.",
+        "seeConfigs": "Yapılandırmaları göster",
+        "hideConfigs": "Yapılandırmaları gizle",
+        "neverAskAgain": "Bu profil için bir daha sorma",
+        "runAsAdmin": "Yönetici olarak çalıştır",
+        "continueWithoutAdmin": "Yönetici izni olmadan devam et",
+        "elevationFailedTitle": "Yönetici izni alınamadı",
+        "elevationFailedMsg": "Yönetici istemi reddedildi veya başarısız oldu. Tekrar deneyin veya bu bağlantı için yönetici izni olmadan devam edin.",
+        "tryAgain": "Tekrar dene"
+      }
+    },
     "experimentalNotice": {
       "title": "Deneysel özellikler kullanılıyor",
       "msg": "Bağlantı kalitesini etkileyebilecek ve beklenmedik hatalara neden olabilecek bazı deneysel özellikleri etkinleştirdiniz. Bu seçenekleri istediğiniz zaman Ayarlar'dan değiştirebilir veya sıfırlayabilirsiniz.",
@@ -701,6 +753,7 @@
     "proxyInfo": {
       "fullTag": "Tam etiket",
       "type": "Tür",
+      "status": "Durum",
       "testTime": "Test zamanı",
       "testDelay": "Test gecikmesi",
       "isSelected": "Seçili",
@@ -751,9 +804,33 @@
     "disconnect": "Bağlantıyı kes",
     "disconnecting": "Bağlantı kesiliyor…",
     "failed": "Bağlanılamadı",
+    "slow": "Normalden uzun sürüyor…",
     "tapToRetry": "Tekrar denemek için dokunun",
+    "errorDetails": "Hata ayrıntıları",
     "reconnect": "Yeniden bağlan",
-    "reconnectMsg": "Değişiklikleri uygulamak için yeniden bağlanılıyor…"
+    "reconnectMsg": "Değişiklikleri uygulamak için yeniden bağlanılıyor…",
+    "health": {
+      "title": "Bağlantı kontrolü",
+      "allGood": "Trafiğiniz geçiyor",
+      "pickDead": "Seçilen proxy yanıt vermiyor",
+      "hopPending": "${chain} bağlanıyor…",
+      "hopFailed": "${chain} bağlanamadı",
+      "coreTesting": "Sunucular test ediliyor…",
+      "coreNone": "Hiçbir sunucu yanıt vermiyor",
+      "fastest": "En hızlı sunucu",
+      "yourServer": "Seçili proxy",
+      "notResponding": "Yanıt vermiyor",
+      "testing": "Test ediliyor…",
+      "useFastest": "En hızlısına geç",
+      "hopReady": "Bağlandı",
+      "hopConnecting": "Bağlanıyor…",
+      "hopBroken": "Bağlanamadı",
+      "hopNoReply": "Bağlandı ama yanıt vermiyor",
+      "hopBlocked": "Seçili proxy’nin yanıt vermesini bekliyor",
+      "retry": "Yeniden test et",
+      "change": "Değiştir",
+      "turnOff": "Kapat"
+    }
   },
   "errors": {
     "unexpected": "Beklenmeyen hata",

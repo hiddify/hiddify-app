@@ -19,7 +19,7 @@ class ChainModeIcon extends HookConsumerWidget {
 }
 
 /// A chain type's icon, as on the home proxy card: extra security's shield with an orbiting light,
-/// unblocker's turning key. Still and grey while [animate] is false.
+/// unblocker's rocking key. Still and grey while [animate] is false.
 class ChainTypeIcon extends StatelessWidget {
   const ChainTypeIcon({super.key, required this.type, required this.mode, this.animate = true});
 
@@ -36,7 +36,7 @@ class ChainTypeIcon extends StatelessWidget {
       child: switch (type) {
         ChainType.extraSecurity =>
           animate ? _OrbitShield(main, accent) : Icon(Icons.shield_rounded, size: 17, color: still),
-        ChainType.unblocker => animate ? _TurningKey(main, accent) : Icon(Icons.key_rounded, size: 18, color: still),
+        ChainType.unblocker => animate ? _RockingKey(main) : Icon(Icons.key_rounded, size: 18, color: still),
       },
     );
     // the loop repaints these 22 px alone, not the card or the page round them
@@ -44,8 +44,8 @@ class ChainTypeIcon extends StatelessWidget {
   }
 }
 
-/// Extra security: a light orbits the shield on a tilted path, with a short comet tail. It passes
-/// behind the shield (dimmer, smaller) and in front of it, and the shield glints as it crosses.
+/// Extra security: a soft light circles the shield every 8 s on a faint tilted ring, with a short
+/// tail. Behind the shield it dims and shrinks gradually, so nothing jumps.
 class _OrbitShield extends StatelessWidget {
   const _OrbitShield(this.main, this.light);
   final Color main;
@@ -56,39 +56,18 @@ class _OrbitShield extends StatelessWidget {
     onPlay: (c) => c.repeat(),
     effects: [
       CustomEffect(
-        duration: 2400.ms,
+        duration: 8000.ms,
         builder: (context, v, child) {
-          Widget dot(double lag, {required bool front}) {
-            final angle = (v - lag) * 2 * pi;
-            final depth = sin(angle); // > 0: in front of the shield
-            if ((depth > 0) != front) return const SizedBox.shrink();
-            final fade = 1 - lag * 3.2;
-            final size = (lag == 0 ? 4.5 : 3.2 - lag * 6) * (front ? 1 : .75);
-            return Transform.translate(
-              offset: Offset(cos(angle) * 10, depth * 3.5),
-              child: Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: light.withValues(alpha: (front ? 1 : .45) * fade),
-                  boxShadow: lag == 0
-                      ? [BoxShadow(color: light.withValues(alpha: front ? .9 : .4), blurRadius: 5)]
-                      : null,
-                ),
-              ),
-            );
-          }
-
-          // the glint: strongest when the light crosses in front of the shield's middle
-          final glint = pow(max(0.0, cos((v - .25) * 2 * pi)), 6).toDouble();
-          const lags = [.24, .16, .08, 0.0];
+          Widget half({required bool front}) => CustomPaint(
+            size: const Size.square(22),
+            painter: _OrbitPainter(angle: v * 2 * pi, front: front, light: light),
+          );
           return Stack(
             alignment: Alignment.center,
             children: [
-              for (final lag in lags) dot(lag, front: false),
-              Icon(Icons.shield_rounded, size: 17, color: Color.lerp(main, Colors.white, glint * .55)),
-              for (final lag in lags) dot(lag, front: true),
+              half(front: false),
+              Icon(Icons.shield_rounded, size: 17, color: main),
+              half(front: true),
             ],
           );
         },
@@ -98,51 +77,84 @@ class _OrbitShield extends StatelessWidget {
   );
 }
 
-/// Unblocker: a key slides in, turns a quarter with a bounce, sparks once, rests, then turns back out.
-class _TurningKey extends StatelessWidget {
-  const _TurningKey(this.main, this.turned);
+/// One half of the orbit, the one behind the shield or the one in front of it: the ring and the
+/// light at [angle], with its tail.
+class _OrbitPainter extends CustomPainter {
+  _OrbitPainter({required this.angle, required this.front, required this.light});
+  final double angle;
+  final bool front;
+  final Color light;
+
+  static const _tilt = -.22;
+  static const _tail = .6;
+  static const _ring = .22;
+
+  /// A point of the ellipse, tilted, in the 22 px box.
+  Offset _at(Size size, double a) {
+    final x = cos(a) * 10;
+    final y = sin(a) * 3.5;
+    return size.center(Offset(x * cos(_tilt) - y * sin(_tilt), x * sin(_tilt) + y * cos(_tilt)));
+  }
+
+  /// 0 at the back of the orbit, 1 at the front.
+  double _near(double a) => (sin(a) + 1) / 2;
+
+  bool _inFront(double a) => sin(a) > 0;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final ring = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = .8;
+    const segments = 64;
+    for (var i = 0; i < segments; i++) {
+      final a = i / segments * 2 * pi;
+      final b = (i + 1) / segments * 2 * pi;
+      if (_inFront((a + b) / 2) != front) continue;
+      ring.color = light.withValues(alpha: _ring * (.45 + .55 * _near((a + b) / 2)));
+      canvas.drawLine(_at(size, a), _at(size, b), ring);
+    }
+    // the tail: dots that thin and fade away from the light, drawn from its end to the light
+    const steps = 18;
+    for (var i = steps; i >= 0; i--) {
+      final k = i / steps; // 0: the light, 1: the tail's end
+      final a = angle - k * _tail;
+      if (_inFront(a) != front) continue;
+      final alpha = (1 - k) * (.3 + .5 * _near(a));
+      final radius = (i == 0 ? 1.6 : 1.3 * (1 - k * .7)) * (.78 + .22 * _near(a));
+      final at = _at(size, a);
+      if (i == 0) {
+        canvas.drawCircle(
+          at,
+          radius * 2.2,
+          Paint()
+            ..color = light.withValues(alpha: alpha * .35)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
+        );
+      }
+      canvas.drawCircle(at, radius, Paint()..color = light.withValues(alpha: alpha));
+    }
+  }
+
+  @override
+  bool shouldRepaint(_OrbitPainter old) => old.angle != angle || old.front != front || old.light != light;
+}
+
+/// Unblocker: the key rocks gently back and forth, never stopping, once every 6 s.
+class _RockingKey extends StatelessWidget {
+  const _RockingKey(this.main);
   final Color main;
-  final Color turned;
 
   @override
   Widget build(BuildContext context) => Animate(
     onPlay: (c) => c.repeat(),
     effects: [
       CustomEffect(
-        duration: 3000.ms,
-        builder: (context, v, child) {
-          double part(double from, double to) => ((v - from) / (to - from)).clamp(0.0, 1.0);
-          final slideIn = Curves.easeOutCubic.transform(part(0, .12));
-          final turn = Curves.easeOutBack.transform(part(.14, .34));
-          final back = Curves.easeInCubic.transform(part(.82, .94));
-          final slideOut = Curves.easeInCubic.transform(part(.94, 1));
-          final spark = part(.32, .5);
-          return Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.center,
-            children: [
-              Transform.translate(
-                offset: Offset(-4 * (1 - slideIn) + 4 * slideOut, 0),
-                child: Transform.rotate(
-                  angle: (-turn + back) * pi / 2,
-                  child: Icon(Icons.key_rounded, size: 18, color: Color.lerp(main, turned, turn - back)),
-                ),
-              ),
-              if (spark > 0 && spark < 1)
-                PositionedDirectional(
-                  end: -1,
-                  top: -1,
-                  child: Opacity(
-                    opacity: 1 - spark,
-                    child: Transform.scale(
-                      scale: .4 + spark,
-                      child: const Icon(Icons.auto_awesome_rounded, size: 10, color: Colors.white),
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
+        duration: 6000.ms,
+        builder: (context, v, child) => Transform.rotate(
+          angle: -sin(v * 2 * pi) * .22,
+          child: Icon(Icons.key_rounded, size: 18, color: main),
+        ),
       ),
     ],
     child: const SizedBox.square(dimension: 22),
