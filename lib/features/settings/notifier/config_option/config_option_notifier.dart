@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/features/connection/data/connection_data_providers.dart';
+import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
@@ -33,8 +34,14 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
           _lastUpdate = DateTime.now();
           if (serviceSingboxOptions?.enableTun != next.enableTun) {
             loggy.debug("tun option changed, reconnecting");
-            await ref.read(connectionNotifierProvider.notifier).toggleConnection();
-            await ref.read(connectionNotifierProvider.notifier).toggleConnection();
+            final connection = ref.read(connectionNotifierProvider.notifier);
+            await connection.toggleConnection();
+            // The first toggle returns when the stop is sent; the status becomes Disconnected a
+            // little later, through the status stream. A toggle before that finds Disconnecting
+            // and does nothing, so the connection never came back: on Windows and Linux, where
+            // the stop also tears down the admin service, VPN ↔ proxy modes always lost that race.
+            await _untilDisconnected();
+            await connection.toggleConnection();
           } else {
             final activeProfile = await ref.read(activeProfileProvider.future);
             return await ref.read(connectionNotifierProvider.notifier).reconnect(activeProfile);
@@ -47,6 +54,21 @@ class ConfigOptionNotifier extends _$ConfigOptionNotifier with AppLogger {
   }
 
   DateTime? _lastUpdate;
+
+  /// Waits for the connection to report Disconnected (or a failure), at most [_stopWait].
+  Future<void> _untilDisconnected() async {
+    final deadline = DateTime.now().add(_stopWait);
+    while (DateTime.now().isBefore(deadline)) {
+      final status = ref.read(connectionNotifierProvider);
+      if (status is AsyncError || status.valueOrNull is Disconnected) return;
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+    loggy.warning("the core did not report disconnected within $_stopWait; connecting anyway");
+  }
+
+  /// Longer than the stop's own bounds (12 s for a managed core), so a stop that gives up still
+  /// reports first.
+  static const _stopWait = Duration(seconds: 15);
 
   Future<String?> _exportJson(bool excludePrivate) async {
     try {
