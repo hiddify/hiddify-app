@@ -177,8 +177,4 @@ extension OutboundInfoCard on OutboundInfo {
   /// An IP looked up in this run. The core sends the last run's IP, marked, until a lookup
   /// replaces it; it may have changed since, so it does not count.
   bool get hasIp => ipinfo.ip.isNotEmpty && !ipinfo.fromCache;
-
-  /// The core looks the IP up right after a good ping and sends both together, so a good ping
-  /// without an IP of this run means the lookup failed (until the next ping round).
-  bool get ipLookupFailed => !hasIp && ConnectionConst.isValidDelay(urlTestDelay);
 }

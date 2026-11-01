@@ -279,12 +279,7 @@ class _ProxyRow extends ConsumerWidget {
             // The config's IP is the final one only with unblocker; with no chain it is the only one.
             _IpSlot(connected ? server : null, boneWidth: 64, isFinal: card.chain.isUnblocker(), onLongPress: urlTest),
             Flexible(
-              child: Text(
-                connected && server.ipLookupFailed ? server.type : '  ·  ${server.type}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: muted,
-              ),
+              child: Text('  ·  ${server.type}', maxLines: 1, overflow: TextOverflow.ellipsis, style: muted),
             ),
           ],
         ),
@@ -579,8 +574,8 @@ class _Bone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
-    // both loops repaint the bone alone, not the card round it
     return RepaintBoundary(
+      // both loops repaint the bone alone, not the card round it
       child:
           Container(
                 width: width,
@@ -598,8 +593,9 @@ class _Bone extends StatelessWidget {
   }
 }
 
-/// The flag of [info]'s IP: a placeholder while it loads, a question mark if the lookup failed, a
-/// faint square while [dim] (its step waits or failed). On arrival it pops in and sends out a ring.
+/// The flag of [info]'s IP: a placeholder until this run's IP arrives (a failed lookup is retried
+/// with the next ping), a faint square while [dim] (its step waits or failed). On arrival it pops in
+/// and sends out a ring.
 class _FlagSlot extends StatelessWidget {
   const _FlagSlot(this.info, {required this.size, this.dim = false});
   final OutboundInfo? info;
@@ -615,8 +611,8 @@ class _FlagSlot extends StatelessWidget {
     final inner = size - 8; // IPCountryFlag draws the flag 8 px smaller than its box
     return SizedBox.square(
       dimension: size,
-      // the pop and the ring repaint the slot alone
       child: RepaintBoundary(
+        // the pop and the ring repaint the slot alone
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
           child: switch (info) {
@@ -641,11 +637,6 @@ class _FlagSlot extends StatelessWidget {
                     .fadeIn(duration: 200.ms),
               ],
             ),
-            OutboundInfo(ipLookupFailed: true) => IPCountryFlag(
-              key: const ValueKey('unknown'),
-              countryCode: '',
-              size: size,
-            ),
             _ when dim => Center(
               key: const ValueKey('dim'),
               child: Container(
@@ -668,8 +659,8 @@ class _FlagSlot extends StatelessWidget {
   }
 }
 
-/// [info]'s IP: a placeholder while it loads, nothing if the lookup failed. On arrival it slides
-/// up; the final IP is green and first shows "Final IP" in its place.
+/// [info]'s IP: a placeholder until this run's IP arrives. On arrival it slides up; the final IP is
+/// green and first shows "Final IP" in its place.
 class _IpSlot extends StatelessWidget {
   const _IpSlot(this.info, {required this.boneWidth, required this.isFinal, this.onLongPress});
   final OutboundInfo? info;
@@ -695,7 +686,6 @@ class _IpSlot extends StatelessWidget {
               .animate(delay: 120.ms)
               .fadeIn(duration: 300.ms)
               .slideY(begin: .6, end: 0, duration: 350.ms, curve: Curves.easeOutCubic),
-        OutboundInfo(ipLookupFailed: true) => const SizedBox.shrink(key: ValueKey('unknown')),
         _ => Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: _Bone(width: boneWidth, height: 9, radius: 4.5),
