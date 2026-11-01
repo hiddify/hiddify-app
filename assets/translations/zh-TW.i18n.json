@@ -118,7 +118,6 @@
       "switchFailed": "無法切換到此代理。請重試。",
       "notResponding": "無回應",
       "noneResponding": "所有代理均無回應",
-      "switchTo": "切換到 ${name}",
       "sortOptions": {
         "unsorted": "預設",
         "name": "按名稱",
@@ -803,7 +802,7 @@
       "pickDead": "所選代理無回應",
       "hopPending": "${chain} 正在連線…",
       "hopFailed": "${chain} 無法連線",
-      "useFastest": "使用最快的可用代理"
+      "useFastest": "切換到最快"
     }
   },
   "errors": {

@@ -118,7 +118,6 @@
       "switchFailed": "Impossible de passer à ce proxy. Réessayez.",
       "notResponding": "Ne répond pas",
       "noneResponding": "Aucun proxy ne répond",
-      "switchTo": "Passer à ${name}",
       "sortOptions": {
         "unsorted": "Par défaut",
         "name": "Alphabétiquement",
@@ -805,7 +804,7 @@
       "pickDead": "Le proxy sélectionné ne répond pas",
       "hopPending": "${chain} est en cours de connexion…",
       "hopFailed": "${chain} n’a pas pu se connecter",
-      "useFastest": "Utiliser le plus rapide disponible"
+      "useFastest": "Passer au plus rapide"
     }
   },
   "errors": {

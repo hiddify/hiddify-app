@@ -124,7 +124,6 @@
       "switchFailed": "تعذّر التبديل إلى هذا البروكسي. أعد المحاولة.",
       "notResponding": "لا يستجيب",
       "noneResponding": "لا يستجيب أي بروكسي",
-      "switchTo": "التبديل إلى ${name}",
       "sortOptions": {
         "unsorted": "الافتراضي",
         "name": "أبجديًا",
@@ -840,7 +839,7 @@
       "pickDead": "البروكسي المحدد لا يستجيب",
       "hopPending": "${chain} قيد الاتصال…",
       "hopFailed": "تعذّر اتصال ${chain}",
-      "useFastest": "استخدم الأسرع المتاح"
+      "useFastest": "التبديل إلى الأسرع"
     }
   },
   "errors": {

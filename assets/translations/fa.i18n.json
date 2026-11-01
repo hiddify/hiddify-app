@@ -118,7 +118,6 @@
       "switchFailed": "تغییر به این پروکسی ممکن نشد. دوباره تلاش کنید.",
       "notResponding": "پاسخ نمی‌دهد",
       "noneResponding": "هیچ پروکسی‌ای پاسخ نمی‌دهد",
-      "switchTo": "تغییر به ${name}",
       "sortOptions": {
         "unsorted": "پیش‌فرض",
         "name": "بر اساس نام",
@@ -812,7 +811,7 @@
       "pickDead": "پروکسی انتخاب‌شده پاسخ نمی‌دهد",
       "hopPending": "${chain} در حال اتصال است…",
       "hopFailed": "${chain} وصل نشد",
-      "useFastest": "استفاده از سریع‌ترین پروکسی در دسترس"
+      "useFastest": "تغییر به سریع‌ترین"
     }
   },
   "errors": {

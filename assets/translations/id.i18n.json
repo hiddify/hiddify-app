@@ -118,7 +118,6 @@
       "switchFailed": "Tidak dapat beralih ke proxy ini. Coba lagi.",
       "notResponding": "Tidak merespons",
       "noneResponding": "Tidak ada proxy yang merespons",
-      "switchTo": "Beralih ke ${name}",
       "sortOptions": {
         "unsorted": "Default",
         "name": "Berdasarkan abjad",
@@ -803,7 +802,7 @@
       "pickDead": "Proxy yang dipilih tidak merespons",
       "hopPending": "${chain} sedang terhubung…",
       "hopFailed": "${chain} tidak dapat terhubung",
-      "useFastest": "Gunakan yang tercepat"
+      "useFastest": "Beralih ke yang tercepat"
     }
   },
   "errors": {

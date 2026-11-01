@@ -118,7 +118,6 @@
       "switchFailed": "Bu proxy'ye geçilemedi. Tekrar deneyin.",
       "notResponding": "Yanıt vermiyor",
       "noneResponding": "Hiçbir proxy yanıt vermiyor",
-      "switchTo": "${name} grubuna geç",
       "sortOptions": {
         "unsorted": "Varsayılan",
         "name": "Alfabetik",
@@ -803,7 +802,7 @@
       "pickDead": "Seçilen proxy yanıt vermiyor",
       "hopPending": "${chain} bağlanıyor…",
       "hopFailed": "${chain} bağlanamadı",
-      "useFastest": "En hızlısını kullan"
+      "useFastest": "En hızlısına geç"
     }
   },
   "errors": {
