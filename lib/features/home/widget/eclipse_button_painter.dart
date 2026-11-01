@@ -52,8 +52,7 @@ class EclipseTraffic {
   double get total => math.max(down, up);
 
   @override
-  bool operator ==(Object other) =>
-      other is EclipseTraffic && other.down == down && other.up == up;
+  bool operator ==(Object other) => other is EclipseTraffic && other.down == down && other.up == up;
 
   @override
   int get hashCode => Object.hash(down, up);
@@ -186,12 +185,7 @@ void _barsWave(_Ctx x, {bool backwards = false}) {
     // the H stays one piece: its crossbar fades from the short bar's shade into the tall bar's
     c.drawPath(
       _HiLogo.h,
-      Paint()
-        ..shader = ui.Gradient.linear(
-          const Offset(16.84, 0),
-          const Offset(23.58, 0),
-          [shade[0], shade[1]],
-        ),
+      Paint()..shader = ui.Gradient.linear(const Offset(16.84, 0), const Offset(23.58, 0), [shade[0], shade[1]]),
     );
     c.drawPath(_HiLogo.stem, Paint()..color = shade[2]);
     c.drawPath(_HiLogo.dot, Paint()..color = shade[3]);
@@ -336,30 +330,17 @@ void _connected(_Ctx x) {
   });
 }
 
-/// Soft glow at half resolution: blur cost scales with pixels, look stays the same once scaled up.
-void _blurredLayer(
-  Canvas c,
-  Rect bounds,
-  double sigma,
-  BlendMode blend,
-  void Function(Canvas c) paint,
-) {
-  const scale = 0.5;
-  final cx = bounds.center.dx;
-  final cy = bounds.center.dy;
-  c.save();
-  c.translate(cx, cy);
-  c.scale(scale);
-  c.translate(-cx, -cy);
-  // Layer is half the device pixels; sigma scales with it so the soft edge matches full-res.
+/// Soft glow: drawn sharp into one bounded layer and blurred once. The layer is at full size, so
+/// the rays and flares reach as far as they are drawn; the cost is kept down by the bounds, by the
+/// single blur, and by the button's own frame rate, not by shrinking them.
+void _blurredLayer(Canvas c, Rect bounds, double sigma, BlendMode blend, void Function(Canvas c) paint) {
   c.saveLayer(
     bounds,
     Paint()
       ..blendMode = blend
-      ..imageFilter = ui.ImageFilter.blur(sigmaX: sigma * scale, sigmaY: sigma * scale, tileMode: TileMode.decal),
+      ..imageFilter = ui.ImageFilter.blur(sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
   );
   paint(c);
-  c.restore();
   c.restore();
 }
 
@@ -478,10 +459,7 @@ void _flares(
               ..style = PaintingStyle.stroke
               ..strokeWidth = width
               ..strokeCap = StrokeCap.round
-              ..shader = ui.Gradient.linear(f.from, f.to, [
-                _alpha(color, strength * level * f.fade),
-                _alpha(color, 0),
-              ]),
+              ..shader = ui.Gradient.linear(f.from, f.to, [_alpha(color, strength * level * f.fade), _alpha(color, 0)]),
           );
         }
       }
