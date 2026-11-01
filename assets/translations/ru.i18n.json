@@ -138,6 +138,11 @@
         "timeout": "Тайм-аут теста задержки",
         "unavailable": "Недоступен",
         "testing": "Задержка: тестирование…"
+      },
+      "status": {
+        "ready": "Готов",
+        "searching": "Поиск",
+        "reconnecting": "Переподключение"
       }
     },
     "profiles": {
@@ -768,6 +773,7 @@
     "proxyInfo": {
       "fullTag": "Полный тег",
       "type": "Тип",
+      "status": "Статус",
       "testTime": "Время теста",
       "testDelay": "Задержка теста",
       "isSelected": "Выбран",

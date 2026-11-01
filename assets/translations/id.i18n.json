@@ -134,6 +134,11 @@
         "timeout": "Waktu tes latensi habis",
         "unavailable": "Tidak tersedia",
         "testing": "Latensi: sedang menguji…"
+      },
+      "status": {
+        "ready": "Siap",
+        "searching": "Mencari",
+        "reconnecting": "Menghubungkan ulang"
       }
     },
     "profiles": {
@@ -744,6 +749,7 @@
     "proxyInfo": {
       "fullTag": "Tag lengkap",
       "type": "Tipe",
+      "status": "Status",
       "testTime": "Waktu uji",
       "testDelay": "Jeda uji",
       "isSelected": "Dipilih",

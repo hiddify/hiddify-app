@@ -134,6 +134,11 @@
         "timeout": "延遲測試超時",
         "unavailable": "無法使用",
         "testing": "延遲：測試中…"
+      },
+      "status": {
+        "ready": "就緒",
+        "searching": "正在搜尋",
+        "reconnecting": "正在重新連線"
       }
     },
     "profiles": {
@@ -744,6 +749,7 @@
     "proxyInfo": {
       "fullTag": "完整標籤",
       "type": "類型",
+      "status": "狀態",
       "testTime": "測試時間",
       "testDelay": "測試延遲",
       "isSelected": "已選擇",

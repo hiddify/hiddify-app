@@ -134,6 +134,11 @@
         "timeout": "Tiempo de prueba de latencia agotado",
         "unavailable": "No disponible",
         "testing": "Latencia: probando…"
+      },
+      "status": {
+        "ready": "Listo",
+        "searching": "Buscando",
+        "reconnecting": "Reconectando"
       }
     },
     "profiles": {
@@ -746,6 +751,7 @@
     "proxyInfo": {
       "fullTag": "Etiqueta completa",
       "type": "Tipo",
+      "status": "Estado",
       "testTime": "Hora de la prueba",
       "testDelay": "Latencia de la prueba",
       "isSelected": "Seleccionado",

@@ -134,6 +134,11 @@
         "timeout": "Gecikme testi zaman aşımına uğradı",
         "unavailable": "Kullanılamıyor",
         "testing": "Gecikme: test ediliyor…"
+      },
+      "status": {
+        "ready": "Hazır",
+        "searching": "Aranıyor",
+        "reconnecting": "Yeniden bağlanıyor"
       }
     },
     "profiles": {
@@ -744,6 +749,7 @@
     "proxyInfo": {
       "fullTag": "Tam etiket",
       "type": "Tür",
+      "status": "Durum",
       "testTime": "Test zamanı",
       "testDelay": "Test gecikmesi",
       "isSelected": "Seçili",

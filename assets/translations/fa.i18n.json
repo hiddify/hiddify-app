@@ -134,6 +134,11 @@
         "timeout": "عدم پاسخ در تست تأخیر",
         "unavailable": "در دسترس نیست",
         "testing": "تأخیر: در حال تست…"
+      },
+      "status": {
+        "ready": "آماده",
+        "searching": "در حال جستجو",
+        "reconnecting": "در حال اتصال دوباره"
       }
     },
     "profiles": {
@@ -748,6 +753,7 @@
     "proxyInfo": {
       "fullTag": "تگ کامل",
       "type": "نوع",
+      "status": "وضعیت",
       "testTime": "زمان تست",
       "testDelay": "تأخیر تست",
       "isSelected": "انتخاب شده",

@@ -140,6 +140,11 @@
         "timeout": "انتهى وقت اختبار التأخير",
         "unavailable": "غير متاح",
         "testing": "التأخير: قيد الاختبار…"
+      },
+      "status": {
+        "ready": "جاهز",
+        "searching": "جارٍ البحث",
+        "reconnecting": "جارٍ إعادة الاتصال"
       }
     },
     "profiles": {
@@ -781,6 +786,7 @@
     "proxyInfo": {
       "fullTag": "العلامة الكاملة",
       "type": "النوع",
+      "status": "الحالة",
       "testTime": "وقت الاختبار",
       "testDelay": "تأخير الاختبار",
       "isSelected": "محدد",

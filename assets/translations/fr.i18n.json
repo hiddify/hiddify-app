@@ -134,6 +134,11 @@
         "timeout": "Délai du test de latence expiré",
         "unavailable": "Indisponible",
         "testing": "Latence : test en cours…"
+      },
+      "status": {
+        "ready": "Prêt",
+        "searching": "Recherche",
+        "reconnecting": "Reconnexion"
       }
     },
     "profiles": {
@@ -746,6 +751,7 @@
     "proxyInfo": {
       "fullTag": "Tag complet ",
       "type": "Type ",
+      "status": "État",
       "testTime": "Heure du test ",
       "testDelay": "Délai du test ",
       "isSelected": "Sélectionné ",
