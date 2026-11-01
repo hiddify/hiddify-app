@@ -10,6 +10,8 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/core/widget/frame_load.dart';
+import 'package:hiddify/features/chain/model/chain_enum.dart';
+import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -17,6 +19,7 @@ import 'package:hiddify/features/home/widget/eclipse_button_painter.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/model/connection_health.dart';
+import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/stats/notifier/stats_notifier.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -107,6 +110,11 @@ class ConnectionButton extends HookConsumerWidget {
       },
       hint: look == _Look.failed ? t.connection.tapToRetry : null,
       searching: hopPending,
+      // the chain hop, while the core runs with the chain on
+      hop: {_Look.connected, _Look.noProxies, _Look.waiting}.contains(look)
+          ? ref.watch(activeProxyCardProvider.select((card) => card?.hopStatus == null ? null : card))
+          : null,
+      onHop: ref.read(bottomSheetsNotifierProvider.notifier).showConnectionHealth,
       buttonColor: switch (look) {
         _Look.connected when degraded => _degradedColor,
         // the traffic waits for the chain hop: still on its way
@@ -193,6 +201,8 @@ class _ConnectionButton extends HookWidget {
     required this.label,
     required this.hint,
     required this.searching,
+    required this.hop,
+    required this.onHop,
     required this.buttonColor,
     required this.image,
     required this.useImage,
@@ -213,6 +223,12 @@ class _ConnectionButton extends HookWidget {
 
   /// Connected, but the traffic still waits for the chain hop: the radar keeps searching.
   final bool searching;
+
+  /// The chain hop as a badge on the button; null with the chain off.
+  final ActiveProxyCardData? hop;
+
+  /// Opens the connection check.
+  final VoidCallback onHop;
   final Color buttonColor;
   final AssetGenImage image;
   final bool useImage;
@@ -383,6 +399,15 @@ class _ConnectionButton extends HookWidget {
                       child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: onErrorDetails),
                     ),
                   ),
+                // the chain hop sits on the rim at the top left, half on the button
+                if (hop case final hop?)
+                  Positioned.fromRect(
+                    rect: Rect.fromCircle(
+                      center: const Offset(_size / 2, _size / 2) + Offset.fromDirection(5 * math.pi / 4, _size / 2),
+                      radius: _ChainBadge.size / 2,
+                    ),
+                    child: _ChainBadge(hop, onTap: onHop),
+                  ),
               ],
             ),
           ),
@@ -404,6 +429,76 @@ class _ConnectionButton extends HookWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// The chain hop on the button: its animated icon on a white disc, ringed by its state. A ring
+/// that turns while it connects, green once up, red when it fails, grey while it waits for the
+/// selected proxy; the icon stops and turns grey then. Opens the connection check.
+class _ChainBadge extends StatelessWidget {
+  const _ChainBadge(this.card, {required this.onTap});
+  final ActiveProxyCardData card;
+  final VoidCallback onTap;
+
+  static const size = 46.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final status = card.hopStatus!;
+    final type = card.chain.isUnblocker() ? ChainType.unblocker : ChainType.extraSecurity;
+    final down = status == StepStatus.waiting || status == StepStatus.failed;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF7F7F9),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(color: Colors.black.withValues(alpha: .25), blurRadius: 6, offset: const Offset(0, 2)),
+              ],
+            ),
+            child: Center(
+              child: SizedBox.square(
+                dimension: 30,
+                child: FittedBox(
+                  child: ChainTypeIcon(type: type, mode: card.hopMode, animate: !down),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: switch (status) {
+                StepStatus.connecting || StepStatus.slow => CircularProgressIndicator(
+                  key: const ValueKey('connecting'),
+                  strokeWidth: 3,
+                  color: theme.colorScheme.primary,
+                ),
+                _ => Container(
+                  key: ValueKey(status),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      width: 3,
+                      color: switch (status) {
+                        StepStatus.connected => theme.extension<ConnectionButtonTheme>()!.connectedColor!,
+                        StepStatus.failed => theme.colorScheme.error,
+                        _ => theme.colorScheme.outline,
+                      },
+                    ),
+                  ),
+                ),
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
