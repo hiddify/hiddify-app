@@ -1,7 +1,271 @@
 # Changelog
 
 
-## 5.3.0 (2026-10-31)
+## 5.4.0 (2026-11-01)
+
+#### Other
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Merge pull request #2426 from veto9292/fix/next-release. 
+  _feat(proxy): show the proxy and the chain hop as separate steps_
+
+* Feat(i18n): translate the proxy row's status and signal style texts. 
+
+* Feat(proxy): add a Signal style switch to the proxies page menu. 
+  _A checkbox in the app bar's more menu, the same switch as a long press on a ping. Each row is keyed by its proxy, so a pop follows its proxy when the list re-sorts._
+
+* Feat(proxy): redesign the proxy row with animated status and a logo signal. 
+  _Each state has its own look: loading, ping, failed ping, connecting, registering, searching, reconnecting, and a proxy that gave up. The ping shows as a number or as the Hiddify logo lit like signal bars; a tap on it tests only that proxy and a long press switches the style. A cached IP shows its flag faded; this run's flag and ping pop in only when they arrive._
+
+* Feat(i18n): add the proxy row's status and signal style texts. 
+
+* Feat(proxy): remember whether pings show as numbers or as a signal. 
+  _Saved like the sort choice; numbers by default. A URL test with one proxy's tag tests only that proxy._
+
+* Feat(proxy): tell each proxy row's state from the core's status. 
+  _A row reads the core's status first (connecting, registering, searching, reconnecting, failed), and only a ready proxy is judged by its ping. The type loses the status mark the core adds while not ready, since the row shows the status itself._
+
+* Feat(proxy): show the proxy's status in the proxy info dialog. 
+
+* Feat(i18n): translate the proxy info dialog's status texts. 
+
+* Feat(i18n): add the proxy info dialog's status texts. 
+
+* Feat(proxy): make the card's chain row one short line. 
+  _The hop row drops to 44 px: a smaller, squarer flag, the IP or the state,
+then the chain type in a chip with its mode as a badge. The rail stops
+5 px from each flag._
+
+* Feat(home): show the chain hop as a badge on the connect button. 
+  _Its animated icon on a disc on the rim, ringed by the hop's state; shown
+only with the chain on and the core running. A tap opens the connection
+check._
+
+* Feat(connection): bring back the connection check sheet, fixed. 
+  _The summary names the first step that is stuck, in connection order; the
+unblocker's row comes first; the hop follows the card's slow and failed
+clock; one "Test again"; no Hiddify row; the chain's own icon; a picked
+group shows as on the card; the fastest row shows only with lowest or as
+the way out of a dead proxy._
+
+* Fix(proxy): offer "Switch to fastest" only for a proxy picked by hand. 
+  _A picked group such as balance is never offered the switch._
+
+* Feat(i18n): translate the connection check texts. 
+
+* Feat(i18n): bring back the English texts of the connection check. 
+
+* Feat(home): offer "Switch to fastest" in the ping row. 
+  _The ping sits in a pill. When the selected proxy is dead and the fastest
+answers, the pill turns green with a crossed WiFi icon and "Switch to
+fastest"; a tap moves the main group to lowest. With no live proxy it
+turns red and says "Unavailable"._
+
+* Feat(i18n): translate the text for an unavailable proxy. 
+
+* Feat(i18n): add the English text for an unavailable proxy. 
+
+* Refactor(proxy): remove the switch button from the card. 
+  _"Switch to fastest" moves to the ping row under the connect button._
+
+* Refactor(home): remove the chain pill beside the ping. 
+  _The proxy card already shows the hop's state._
+
+* Feat(home): show the chain hop's state beside the ping. 
+  _A small pill with the chain icon and its state: a spinner while the hop
+connects, a check once it is up, an empty circle while it waits for the
+proxy, an error icon when it fails. It only shows the state; it has no tap._
+
+* Refactor(home): remove the switch button next to the ping. 
+  _The proxy card already offers "Switch to fastest" in the dead proxy's
+row, so the second button by the ping is gone, with its unused action._
+
+* Fix(proxy): keep the card's flag loading until this run's IP arrives. 
+  _A failed IP lookup no longer turns the flag into a question mark and
+empties the IP; both keep the loading look, and the core retries the
+lookup with the next ping._
+
+* Feat(home): change the connect button's label with a calm fade through. 
+  _The old text fades out first, then the new one fades in, growing
+slightly, instead of dropping in from above while the old one fades.
+AnimatedText is shared, so the stats sidebar's show more/less label
+changes the same way._
+
+* Fix(i18n): match "Switch to fastest" in the other locales. 
+
+* Fix(i18n): say "Switch to fastest" on both switch buttons. 
+  _One wording for one action; "lowest" is the core's internal name. The
+card's own "Switch to ${name}" text is no longer used._
+
+* Refactor(proxy): label the card's switch button like the one by the ping. 
+  _Both buttons select lowest, so the card now uses the same text instead
+of naming the core's "lowest" group._
+
+* Feat(i18n): translate the button's connection texts and WARP noise modes. 
+  _Persian drops the connection check texts like English; the other 9
+locales get the button's 4 connection texts and the 8 noise mode names._
+
+* Fix(i18n): drop the connection check texts and fix two apostrophes. 
+  _The connection check sheet is gone, so its texts are removed. The
+button's "isn’t responding" and "couldn’t connect" use the curly
+apostrophe._
+
+* Refactor(home): remove the chain badge and the connection check sheet. 
+  _The connect button no longer carries the chain hop's shield, and its
+label and the ping no longer open the connection check sheet. The
+button's color and status text stay._
+
+* Fix(home): keep the radar while the chain hop is still connecting. 
+  _The core reports connected once any proxy answers, but with extra
+security or unblocker the traffic still waits for the hop. The button
+now keeps searching until the hop is up, then shows connected._
+
+* Fix(i18n): match the reworded admin and system TLS texts. 
+
+* Fix(i18n): follow the writing rules in the admin and system TLS texts. 
+  _Spell out "administrator", use the curly apostrophe and the present
+tense, put the settings note in the sentence instead of parentheses,
+"Show configurations" instead of "See configs", and the goal first in
+the waiting message._
+
+* Feat(i18n): translate the admin, always-on VPN and system TLS texts. 
+  _These 25 texts were only in English and Persian: the profile's
+administrator preference, the admin background service dialogs,
+always-on VPN, the system TLS setting and "Error details"._
+
+* Feat(chain): calm the chain type icons' animations. 
+  _Extra security's light now circles the shield slowly (8 s) on a faint
+tilted ring, with a short tail; behind the shield it dims and shrinks
+gradually instead of jumping. Unblocker's key rocks gently back and
+forth (6 s) instead of sliding, turning with a bounce and sparking._
+
+* Feat(proxy): show the card's connection as steps on a rail. 
+  _The card lists its steps in the order they connect (proxy then extra
+security, unblocker then proxy), each a row with its flag as a node.
+A badge on the flag shows the step's state, and the line between the
+flags shows the next step: dashes while it connects, a green fill once
+it connects, red if it failed. A slow or failed hop says so in its
+row; a dead pick offers "Switch to lowest" when lowest answers. The
+hop row shows the chain and its mode on one line and opens the chain
+settings. Replaces the chain band._
+
+* Feat(i18n): translate the proxy card's connection step texts. 
+
+* Feat(i18n): add English texts for the proxy card's connection steps. 
+
+* Feat(proxy): add an action that switches the main group to lowest. 
+  _Selects lowest in the main group with a light haptic; on failure it
+shows the existing "Couldn't switch to this proxy" toast._
+
+* Feat(proxy): mark a hop that keeps connecting as slow, then failed. 
+  _The card's provider remembers when the hop started connecting: after
+15 s it is slow, after 60 s failed. A timer rebuilds the card at each
+mark, and the wait starts over once the hop connects or the chain or
+its mode changes._
+
+* Fix(proxy): don't count the last run's IP as the current one. 
+  _The core sends the IP it cached from the last run, marked from_cache,
+until a new lookup replaces it. It may have changed since, so the card
+now treats it as not looked up yet._
+
+* Feat(proxy): give the card's server and hop a connection state each. 
+  _Waiting, connecting, slow, connected or failed. A step waits while the
+step it dials through has not connected: extra security's hop waits for
+the server, the server waits for the unblocker. The hop counts as
+connected only when it is ready and its ping answers. Also tells when a
+dead pick can switch to lowest._
+
+* Chore(core): add IpInfo.from_cache to the app's protos. 
+  _The core now marks the IP information of a previous run; the generated Dart
+model gains the field, and the Android proto copy also gets chain_hop._
+
+* Feat(settings): IPv6 is a preference, never off. 
+  _The routing page offered "IPv6 route: Off" and "Exclusive". Off never
+stopped IPv6 from being routed (that would leak it past the VPN) and only
+left the local listeners without ::1, while sites with AAAA records still
+failed through proxies without IPv6 (#2307, #2420). The core now answers
+AAAA by the proxy in use, so the setting is a preference between the
+families: "IPv4 first" (default) and "IPv6 first", each with a line that
+says what it does. A stored ipv4_only or ipv6_only becomes the
+preference nearest it, in the migration and when the value is read._
+
+* Chore(deps): hiddify-core with IPv6 by outbound. 
+  _DNS answers and IPv6 connections follow what the proxy in use can carry (3594cd9)._
+
+* Feat(config_option_notifier): improve connection toggle logic and add disconnection wait. 
+
+* Merge pull request #2427 from hiddify/feat/crash-report. 
+  _Feat/crash report_
+
+* Fix(home): an unavailable proxy reads like a ping and a tap tests it again. 
+  _The capsule under the connect button did not match the ping row it replaces
+and a tap opened the connection check. It now reads like the ping row: a
+wifi-off icon and "Unavailable" in the error colour, in the ping's own type,
+and a tap tests the proxy again; the label above still opens the check. The
+green "Use fastest" chip stays beside it._
+
+* Feat(settings): keep the user's remote DNS behind extra security. 
+  _A profile's remote DNS (a subscription header or a per-profile override) was
+applied whatever the chain. Behind extra security the remote DNS answers
+through the hop, which a profile's own resolver was never meant for, so when
+extra security is on at connect time, from the settings or from the profile
+itself, the user's own remote DNS stays. The core adds DoH through the
+profile alone as the remote group's last resort (hiddify-core)._
+
+* Feat(home): one capsule for an unavailable proxy and the way out. 
+  _Under the connect button a dead selected proxy showed a wifi icon, "Timeout"
+and a separate button. It is now one capsule: "Unavailable" in the error
+colour, which opens the connection check, and beside it, when a working
+server exists, "Use fastest" in the connected green. "Use fastest available"
+is shortened to keep the capsule short in both languages._
+
+* Perf(home): keep the animations from repainting the page on weak phones. 
+  _The connect button's timer ran under other tabs, sheets, dialogs and in the
+background; it now follows TickerMode and the app lifecycle. Its frame rate
+follows measured frame cost (30, 20 or 15 fps of the same frames), so a phone
+that cannot keep up gets a steady rate instead of dropped frames and a phone
+that can sees no change. The chain icon, chain badge, loading bones, shimmer
+skeletons and update spinner get repaint boundaries, so their loops no longer
+repaint the whole viewport; the home background is drawn into its own layer;
+flags use a rounded-rect clip instead of a path clip._
+
+* Fix(home): draw the connect button's rays and flares at full size. 
+  _Since d7426e49 the glow's blurred layer was drawn at half scale round the
+button's centre, meant as half resolution. The rays and flares start at the
+button's radius, so at half scale they began under the white disc and only
+the longest tips ever showed. The layer is at full size again: one bounded
+layer, blurred once, which both renderers downsample on their own._
+
+* Feat(logs): offer a crash report on the run after a crash. 
+  _When a core crashed, the next run shows a dialog: send a report, or
+later. The report is one zip the core builds (hiddify-core
+ExportDiagnostics): the crash, OOM and power reports, the stderr and
+core log files of both cores, the goroutines of each, the config with
+servers, keys and passwords removed, and the app's own logs. The
+background core, when it runs in another process, adds its goroutines
+and its own zip. The same zip is in the logs share menu as "Diagnostics
+report". A crash is offered once: the newest report's name is kept.
+
+Needs the hiddify-core with ListCrashReports, DumpGoroutines and
+ExportDiagnostics (the generated stubs are included)._
+
+* Fix(core): a core that is not running is not a stream error. 
+  _With the VPN off there is no background core to reach, and every listener
+armed on it logged a red "Stream error: ... Connection refused", which
+users read as a bug. An unavailable core is logged at debug level; other
+stream errors stay errors._
+
+* Fix(logs): anchor the iOS share sheet so exporting a log file works. 
+  _Share.shareXFiles was called without sharePositionOrigin. iOS presents the
+sheet as a popover and refuses it without an anchor inside the view, so
+exporting a log file logged "error sharing file" and showed nothing. The
+sheet is now anchored at the middle of the screen, and the error text is
+in the log message so the logs page shows it._
+
+
+
+## v5.3.0 (2026-10-31)
 
 #### Other
 
