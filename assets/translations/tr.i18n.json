@@ -800,10 +800,26 @@
     "reconnect": "Yeniden bağlan",
     "reconnectMsg": "Değişiklikleri uygulamak için yeniden bağlanılıyor…",
     "health": {
+      "title": "Bağlantı kontrolü",
+      "allGood": "Trafiğiniz geçiyor",
       "pickDead": "Seçilen proxy yanıt vermiyor",
       "hopPending": "${chain} bağlanıyor…",
       "hopFailed": "${chain} bağlanamadı",
-      "useFastest": "En hızlısına geç"
+      "coreTesting": "Sunucular test ediliyor…",
+      "coreNone": "Hiçbir sunucu yanıt vermiyor",
+      "fastest": "En hızlı sunucu",
+      "yourServer": "Seçili proxy",
+      "notResponding": "Yanıt vermiyor",
+      "testing": "Test ediliyor…",
+      "useFastest": "En hızlısına geç",
+      "hopReady": "Bağlandı",
+      "hopConnecting": "Bağlanıyor…",
+      "hopBroken": "Bağlanamadı",
+      "hopNoReply": "Bağlandı ama yanıt vermiyor",
+      "hopBlocked": "Seçili proxy’nin yanıt vermesini bekliyor",
+      "retry": "Yeniden test et",
+      "change": "Değiştir",
+      "turnOff": "Kapat"
     }
   },
   "errors": {

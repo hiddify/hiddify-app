@@ -802,10 +802,26 @@
     "reconnect": "Reconectar",
     "reconnectMsg": "Reconectando para aplicar los cambios…",
     "health": {
+      "title": "Comprobación de conexión",
+      "allGood": "Tu tráfico pasa",
       "pickDead": "El proxy seleccionado no responde",
       "hopPending": "${chain} se está conectando…",
       "hopFailed": "${chain} no pudo conectarse",
-      "useFastest": "Cambiar al más rápido"
+      "coreTesting": "Probando los servidores…",
+      "coreNone": "Ningún servidor responde",
+      "fastest": "Servidor más rápido",
+      "yourServer": "Proxy seleccionado",
+      "notResponding": "No responde",
+      "testing": "Probando…",
+      "useFastest": "Cambiar al más rápido",
+      "hopReady": "Conectado",
+      "hopConnecting": "Conectando…",
+      "hopBroken": "No se pudo conectar",
+      "hopNoReply": "Conectado, pero no responde",
+      "hopBlocked": "Espera a que responda el proxy seleccionado",
+      "retry": "Probar de nuevo",
+      "change": "Cambiar",
+      "turnOff": "Desactivar"
     }
   },
   "errors": {

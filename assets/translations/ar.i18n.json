@@ -837,10 +837,26 @@
     "reconnect": "إعادة الاتصال",
     "reconnectMsg": "جاري إعادة الاتصال لتطبيق التغييرات…",
     "health": {
+      "title": "فحص الاتصال",
+      "allGood": "حركة مرورك تمر",
       "pickDead": "البروكسي المحدد لا يستجيب",
       "hopPending": "${chain} قيد الاتصال…",
       "hopFailed": "تعذّر اتصال ${chain}",
-      "useFastest": "التبديل إلى الأسرع"
+      "coreTesting": "جارٍ اختبار الخوادم…",
+      "coreNone": "لا يستجيب أي خادم",
+      "fastest": "أسرع خادم",
+      "yourServer": "الوكيل المحدد",
+      "notResponding": "لا يستجيب",
+      "testing": "جارٍ الاختبار…",
+      "useFastest": "التبديل إلى الأسرع",
+      "hopReady": "متصل",
+      "hopConnecting": "جارٍ الاتصال…",
+      "hopBroken": "تعذّر الاتصال",
+      "hopNoReply": "متصل، لكنه لا يستجيب",
+      "hopBlocked": "ينتظر استجابة الوكيل المحدد",
+      "retry": "اختبار مجددًا",
+      "change": "تغيير",
+      "turnOff": "إيقاف"
     }
   },
   "errors": {

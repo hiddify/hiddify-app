@@ -800,10 +800,26 @@
     "reconnect": "重新连接",
     "reconnectMsg": "正在重新连接以应用更改…",
     "health": {
+      "title": "连接检查",
+      "allGood": "流量畅通",
       "pickDead": "所选代理无响应",
       "hopPending": "${chain} 正在连接…",
       "hopFailed": "${chain} 无法连接",
-      "useFastest": "切换到最快"
+      "coreTesting": "正在测试服务器…",
+      "coreNone": "没有服务器响应",
+      "fastest": "最快服务器",
+      "yourServer": "所选代理",
+      "notResponding": "无响应",
+      "testing": "正在测试…",
+      "useFastest": "切换到最快",
+      "hopReady": "已连接",
+      "hopConnecting": "正在连接…",
+      "hopBroken": "无法连接",
+      "hopNoReply": "已连接，但无响应",
+      "hopBlocked": "等待所选代理响应",
+      "retry": "重新测试",
+      "change": "更改",
+      "turnOff": "关闭"
     }
   },
   "errors": {

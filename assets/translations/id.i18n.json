@@ -800,10 +800,26 @@
     "reconnect": "Sambungkan kembali",
     "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan…",
     "health": {
+      "title": "Pemeriksaan koneksi",
+      "allGood": "Lalu lintas Anda tersambung",
       "pickDead": "Proxy yang dipilih tidak merespons",
       "hopPending": "${chain} sedang terhubung…",
       "hopFailed": "${chain} tidak dapat terhubung",
-      "useFastest": "Beralih ke yang tercepat"
+      "coreTesting": "Menguji server…",
+      "coreNone": "Tidak ada server yang merespons",
+      "fastest": "Server tercepat",
+      "yourServer": "Proxy terpilih",
+      "notResponding": "Tidak merespons",
+      "testing": "Menguji…",
+      "useFastest": "Beralih ke yang tercepat",
+      "hopReady": "Terhubung",
+      "hopConnecting": "Menghubungkan…",
+      "hopBroken": "Tidak dapat terhubung",
+      "hopNoReply": "Terhubung, tetapi tidak merespons",
+      "hopBlocked": "Menunggu respons proxy terpilih",
+      "retry": "Uji lagi",
+      "change": "Ubah",
+      "turnOff": "Matikan"
     }
   },
   "errors": {

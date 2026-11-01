@@ -800,10 +800,26 @@
     "reconnect": "重新連線",
     "reconnectMsg": "正在重新連線以套用變更…",
     "health": {
+      "title": "連線檢查",
+      "allGood": "流量暢通",
       "pickDead": "所選代理無回應",
       "hopPending": "${chain} 正在連線…",
       "hopFailed": "${chain} 無法連線",
-      "useFastest": "切換到最快"
+      "coreTesting": "正在測試伺服器…",
+      "coreNone": "沒有伺服器回應",
+      "fastest": "最快伺服器",
+      "yourServer": "所選代理",
+      "notResponding": "無回應",
+      "testing": "正在測試…",
+      "useFastest": "切換到最快",
+      "hopReady": "已連線",
+      "hopConnecting": "正在連線…",
+      "hopBroken": "無法連線",
+      "hopNoReply": "已連線，但無回應",
+      "hopBlocked": "等待所選代理回應",
+      "retry": "重新測試",
+      "change": "變更",
+      "turnOff": "關閉"
     }
   },
   "errors": {

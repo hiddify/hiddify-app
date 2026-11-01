@@ -809,10 +809,26 @@
     "reconnect": "اتصال مجدد",
     "reconnectMsg": "در حال اتصال مجدد برای اعمال تغییرات…",
     "health": {
+      "title": "بررسی اتصال",
+      "allGood": "ترافیک شما برقرار است",
       "pickDead": "پروکسی انتخاب‌شده پاسخ نمی‌دهد",
       "hopPending": "${chain} در حال اتصال است…",
       "hopFailed": "${chain} وصل نشد",
-      "useFastest": "تغییر به سریع‌ترین"
+      "coreTesting": "در حال آزمایش سرورها…",
+      "coreNone": "هیچ سروری پاسخ نمی‌دهد",
+      "fastest": "سریع‌ترین سرور",
+      "yourServer": "پروکسی انتخاب‌شده",
+      "notResponding": "پاسخ نمی‌دهد",
+      "testing": "در حال آزمایش…",
+      "useFastest": "تغییر به سریع‌ترین",
+      "hopReady": "متصل",
+      "hopConnecting": "در حال اتصال…",
+      "hopBroken": "وصل نشد",
+      "hopNoReply": "متصل است اما پاسخ نمی‌دهد",
+      "hopBlocked": "منتظر پاسخ پروکسی انتخاب‌شده است",
+      "retry": "آزمایش دوباره",
+      "change": "تغییر",
+      "turnOff": "خاموش کردن"
     }
   },
   "errors": {
