@@ -117,7 +117,7 @@ class _Steps extends StatelessWidget {
   }
 }
 
-/// A step's row: its flag with the state badge, two lines of text, and a chevron or an action.
+/// A step's row: its flag with the state badge, two lines of text, and a chevron.
 class _StepRow extends StatelessWidget {
   const _StepRow({
     required this.color,
@@ -126,7 +126,6 @@ class _StepRow extends StatelessWidget {
     required this.status,
     required this.title,
     required this.subtitle,
-    this.action,
   });
 
   final Color color;
@@ -135,9 +134,6 @@ class _StepRow extends StatelessWidget {
   final StepStatus status;
   final Widget title;
   final Widget subtitle;
-
-  /// Shown in place of the chevron.
-  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +164,7 @@ class _StepRow extends StatelessWidget {
                   children: [title, const Gap(2), subtitle],
                 ),
               ),
-              action ?? Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
+              Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
               const Gap(12),
             ],
           ),
@@ -284,19 +280,6 @@ class _ProxyRow extends ConsumerWidget {
           ],
         ),
       },
-      action: card.offerLowest
-          ? FilledButton.tonalIcon(
-              onPressed: () => ref.read(activeProxyNotifierProvider.notifier).switchToLowest(card.mainGroup),
-              style: FilledButton.styleFrom(
-                visualDensity: VisualDensity.compact,
-                padding: const EdgeInsetsDirectional.fromSTEB(8, 0, 12, 0),
-                minimumSize: const Size(0, 32),
-                textStyle: theme.textTheme.labelLarge,
-              ),
-              icon: const Icon(Icons.bolt_rounded, size: 16),
-              label: Text(t.connection.health.useFastest),
-            )
-          : null,
     );
   }
 }
