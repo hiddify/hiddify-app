@@ -134,6 +134,11 @@
         "timeout": "Delay test timeout",
         "unavailable": "Unavailable",
         "testing": "Delay: testing…"
+      },
+      "status": {
+        "ready": "Ready",
+        "searching": "Searching",
+        "reconnecting": "Reconnecting"
       }
     },
     "profiles": {
@@ -748,6 +753,7 @@
     "proxyInfo": {
       "fullTag": "Full tag",
       "type": "Type",
+      "status": "Status",
       "testTime": "Test time",
       "testDelay": "Test delay",
       "isSelected": "Selected",
