@@ -31,7 +31,7 @@ class ChainTypeIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final (main, accent) = type.colors(mode);
     final still = Theme.of(context).colorScheme.onSurfaceVariant;
-    return SizedBox.square(
+    final icon = SizedBox.square(
       dimension: 22,
       child: switch (type) {
         ChainType.extraSecurity =>
@@ -39,6 +39,8 @@ class ChainTypeIcon extends StatelessWidget {
         ChainType.unblocker => animate ? _TurningKey(main, accent) : Icon(Icons.key_rounded, size: 18, color: still),
       },
     );
+    // the loop repaints these 22 px alone, not the card or the page round them
+    return animate ? RepaintBoundary(child: icon) : icon;
   }
 }
 
@@ -70,7 +72,9 @@ class _OrbitShield extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: light.withValues(alpha: (front ? 1 : .45) * fade),
-                  boxShadow: lag == 0 ? [BoxShadow(color: light.withValues(alpha: front ? .9 : .4), blurRadius: 5)] : null,
+                  boxShadow: lag == 0
+                      ? [BoxShadow(color: light.withValues(alpha: front ? .9 : .4), blurRadius: 5)]
+                      : null,
                 ),
               ),
             );
