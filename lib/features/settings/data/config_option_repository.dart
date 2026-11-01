@@ -1,4 +1,5 @@
 import 'package:dartx/dartx.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/core/model/region.dart';
@@ -562,11 +563,24 @@ class ConfigOptionRepository with ExceptionHandler, InfraLogger {
   Either<ConfigOptionFailure, SingboxConfigOption> fullOptions() =>
       Either.tryCatch(() => _getConfigOptions(), ConfigOptionFailure.unexpected);
 
+  /// The settings as the core gets them: the user's own, with the profile's override (its headers
+  /// and the user's per-profile choices) on top, except what extra security rules out.
   Either<ConfigOptionFailure, SingboxConfigOption> fullOptionsOverrided(String? profileOverride) =>
       Either.tryCatch(() => _getConfigOptions(), ConfigOptionFailure.unexpected).flatMap(
         (options) => Either.tryCatch(() {
-          final json = ProfileParser.applyProfileOverride(options.toJson(), profileOverride);
-          return SingboxConfigOption.fromJson(json);
+          final own = options.toJson();
+          final merged = ProfileParser.applyProfileOverride(options.toJson(), profileOverride);
+          return SingboxConfigOption.fromJson(keepOwnDnsBehindExtraSecurity(own, merged));
         }, ConfigOptionFailure.unexpected),
       );
+
+  /// Behind extra security the remote DNS answers through the hop, which a profile's own resolver
+  /// was never meant for. So whenever extra security is on when connecting, from the user's
+  /// settings or from the profile itself, the profile's remote DNS is not applied and the user's
+  /// own stays; the core adds DoH through the profile alone as the group's last resort.
+  @visibleForTesting
+  static Map<String, dynamic> keepOwnDnsBehindExtraSecurity(Map<String, dynamic> own, Map<String, dynamic> merged) {
+    if (merged['chain-status'] != ChainStatus.extraSecurity.key) return merged;
+    return {...merged, 'remote-dns-address': own['remote-dns-address']};
+  }
 }
