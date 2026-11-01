@@ -552,7 +552,17 @@
             "count": "噪音數量",
             "mode": "噪音模式",
             "size": "噪音大小",
-            "delay": "噪音延遲"
+            "delay": "噪音延遲",
+            "modes": {
+              "standard": "標準",
+              "random": "隨機",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "QUIC 交握",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (VoIP 通話)",
+              "stun": "STUN (視訊通話)"
+            }
           }
         },
         "psiphon": {
@@ -788,7 +798,13 @@
     "tapToRetry": "點擊重試",
     "errorDetails": "錯誤詳細資料",
     "reconnect": "重新連線",
-    "reconnectMsg": "正在重新連線以套用變更…"
+    "reconnectMsg": "正在重新連線以套用變更…",
+    "health": {
+      "pickDead": "所選代理無回應",
+      "hopPending": "${chain} 正在連線…",
+      "hopFailed": "${chain} 無法連線",
+      "useFastest": "使用最快的可用代理"
+    }
   },
   "errors": {
     "unexpected": "意外錯誤",

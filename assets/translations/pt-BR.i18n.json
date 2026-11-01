@@ -553,7 +553,17 @@
             "count": "Contagem de ruído",
             "mode": "Modo de ruído",
             "size": "Tamanho do ruído",
-            "delay": "Atraso do ruído"
+            "delay": "Atraso do ruído",
+            "modes": {
+              "standard": "Padrão",
+              "random": "Aleatório",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "Handshake QUIC",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (chamada VoIP)",
+              "stun": "STUN (chamada de vídeo)"
+            }
           }
         },
         "psiphon": {
@@ -790,7 +800,13 @@
     "tapToRetry": "Toque para tentar de novo",
     "errorDetails": "Detalhes do erro",
     "reconnect": "Reconectar",
-    "reconnectMsg": "Reconectando para aplicar as alterações…"
+    "reconnectMsg": "Reconectando para aplicar as alterações…",
+    "health": {
+      "pickDead": "O proxy selecionado não está respondendo",
+      "hopPending": "${chain} está conectando…",
+      "hopFailed": "${chain} não conseguiu se conectar",
+      "useFastest": "Usar o mais rápido disponível"
+    }
   },
   "errors": {
     "unexpected": "Erro inesperado",

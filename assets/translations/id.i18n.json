@@ -552,7 +552,17 @@
             "count": "Jumlah kebisingan",
             "mode": "Mode kebisingan",
             "size": "Ukuran kebisingan",
-            "delay": "Penundaan kebisingan"
+            "delay": "Penundaan kebisingan",
+            "modes": {
+              "standard": "Standar",
+              "random": "Acak",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "Handshake QUIC",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (panggilan VoIP)",
+              "stun": "STUN (panggilan video)"
+            }
           }
         },
         "psiphon": {
@@ -788,7 +798,13 @@
     "tapToRetry": "Ketuk untuk mencoba lagi",
     "errorDetails": "Detail kesalahan",
     "reconnect": "Sambungkan kembali",
-    "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan…"
+    "reconnectMsg": "Menyambungkan kembali untuk menerapkan perubahan…",
+    "health": {
+      "pickDead": "Proxy yang dipilih tidak merespons",
+      "hopPending": "${chain} sedang terhubung…",
+      "hopFailed": "${chain} tidak dapat terhubung",
+      "useFastest": "Gunakan yang tercepat"
+    }
   },
   "errors": {
     "unexpected": "Kesalahan tak terduga",

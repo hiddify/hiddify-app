@@ -584,7 +584,17 @@
             "count": "عدد الضوضاء",
             "mode": "وضع الضوضاء",
             "size": "حجم الضوضاء",
-            "delay": "تأخير الضوضاء"
+            "delay": "تأخير الضوضاء",
+            "modes": {
+              "standard": "قياسي",
+              "random": "عشوائي",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "مصافحة QUIC",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (مكالمة VoIP)",
+              "stun": "STUN (مكالمة فيديو)"
+            }
           }
         },
         "psiphon": {
@@ -825,7 +835,13 @@
     "tapToRetry": "انقر لإعادة المحاولة",
     "errorDetails": "تفاصيل الخطأ",
     "reconnect": "إعادة الاتصال",
-    "reconnectMsg": "جاري إعادة الاتصال لتطبيق التغييرات…"
+    "reconnectMsg": "جاري إعادة الاتصال لتطبيق التغييرات…",
+    "health": {
+      "pickDead": "البروكسي المحدد لا يستجيب",
+      "hopPending": "${chain} قيد الاتصال…",
+      "hopFailed": "تعذّر اتصال ${chain}",
+      "useFastest": "استخدم الأسرع المتاح"
+    }
   },
   "errors": {
     "unexpected": "خطأ غير متوقع",

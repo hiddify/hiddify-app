@@ -573,7 +573,17 @@
             "count": "Количество шума",
             "mode": "Режим шума",
             "size": "Размер шума",
-            "delay": "Задержка шума"
+            "delay": "Задержка шума",
+            "modes": {
+              "standard": "Стандартный",
+              "random": "Случайный",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "Рукопожатие QUIC",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (VoIP-звонок)",
+              "stun": "STUN (видеозвонок)"
+            }
           }
         },
         "psiphon": {
@@ -812,7 +822,13 @@
     "tapToRetry": "Нажмите, чтобы повторить",
     "errorDetails": "Подробности ошибки",
     "reconnect": "Переподключить",
-    "reconnectMsg": "Переподключение для применения изменений…"
+    "reconnectMsg": "Переподключение для применения изменений…",
+    "health": {
+      "pickDead": "Выбранный прокси не отвечает",
+      "hopPending": "${chain}: подключение…",
+      "hopFailed": "${chain}: не удалось подключиться",
+      "useFastest": "Использовать самый быстрый"
+    }
   },
   "errors": {
     "unexpected": "Непредвиденная ошибка",
