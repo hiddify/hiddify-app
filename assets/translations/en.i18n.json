@@ -132,6 +132,7 @@
       "delay": {
         "result": "Delay: ${delay}ms",
         "timeout": "Delay test timeout",
+        "unavailable": "Unavailable",
         "testing": "Delay: testing…"
       }
     },
