@@ -4,6 +4,7 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
@@ -37,6 +38,30 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
               return [...ProxiesSort.values.map((e) => PopupMenuItem(value: e, child: Text(e.present(t))))];
             },
           ),
+          // "Signal style" (off by default) shows pings as the signal instead of numbers; the same
+          // switch as a long press on a ping
+          PopupMenuButton<bool>(
+            onSelected: (_) => ref.read(proxyPingStyleNotifierProvider.notifier).toggle(),
+            icon: Icon(AdaptiveIcon(context).more),
+            tooltip: MaterialLocalizations.of(context).showMenuTooltip,
+            itemBuilder: (context) => [
+              // a null value would close the menu as cancelled
+              PopupMenuItem(
+                value: true,
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: ref.read(proxyPingStyleNotifierProvider) == ProxyPingStyle.signal,
+                      // a tap on the box itself does what a tap on the item does
+                      onChanged: (_) => Navigator.pop(context, true),
+                    ),
+                    const Gap(8),
+                    Text(t.pages.proxies.signalStyle),
+                  ],
+                ),
+              ),
+            ],
+          ),
           const Gap(8),
         ],
       ),
@@ -62,6 +87,8 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                       final proxy = group.items[index];
                       return ProxyTile(
                         proxy,
+                        // a row keeps its own proxy when the list re-sorts, so a pop plays only on arrival
+                        key: ValueKey(proxy.tag),
                         selected: group.selected == proxy.tag,
                         onTap: () async {
                           await ref.read(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag);
