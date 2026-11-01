@@ -10,6 +10,7 @@ import 'package:hiddify/core/logger/ring/log_ring.dart';
 import 'package:hiddify/core/logger/sinks/file_sink.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/features/crash_report/widget/crash_report_dialog.dart';
 import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/log/data/log_path_resolver.dart';
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
@@ -42,12 +43,10 @@ class LogsShareModal extends ConsumerWidget {
     final crash = paths.coreCrashFile();
 
     final files = <(String, String, File)>[
-      if (PlatformUtils.isDesktop)
-        (t.pages.logs.errorLog, t.pages.logs.errorLogMsg, paths.appFile()),
+      if (PlatformUtils.isDesktop) (t.pages.logs.errorLog, t.pages.logs.errorLogMsg, paths.appFile()),
       (t.pages.logs.coreLog, t.pages.logs.coreLogMsg, paths.coreFile()),
       // Absent until the core actually crashes, which is the point of it.
-      if (crash != null)
-        (t.pages.logs.coreCrash, t.pages.logs.coreCrashMsg, crash),
+      if (crash != null) (t.pages.logs.coreCrash, t.pages.logs.coreCrashMsg, crash),
     ].where(_worthOffering).toList();
 
     return SafeArea(
@@ -71,9 +70,20 @@ class LogsShareModal extends ConsumerWidget {
               subtitle: Text(subtitle),
               onTap: () async {
                 Navigator.of(context).pop();
-                await _saveFileAs(file, t: t, notifications: notifications);
+                await saveFileAs(file, t: t, notifications: notifications);
               },
             ),
+          // everything at once, as the crash dialog sends it: reports, logs, goroutines and the
+          // config without servers or secrets
+          ListTile(
+            leading: const Icon(FluentIcons.folder_zip_20_regular),
+            title: Text(t.pages.logs.diagnostics),
+            subtitle: Text(t.pages.logs.diagnosticsMsg),
+            onTap: () async {
+              Navigator.of(context).pop();
+              await shareDiagnostics(ref);
+            },
+          ),
         ],
       ),
     );
@@ -119,11 +129,7 @@ class _LogsRecentModalState extends ConsumerState<LogsRecentModal> {
     final t = ref.watch(translationsProvider).requireValue;
     final paths = ref.watch(logPathResolverProvider);
     final notifications = ref.watch(inAppNotificationControllerProvider);
-    final matches = logRing.view(
-      minLevel: _minLevel,
-      category: _category,
-      text: _text,
-    );
+    final matches = logRing.view(minLevel: _minLevel, category: _category, text: _text);
 
     return SafeArea(
       child: Padding(
@@ -134,10 +140,7 @@ class _LogsRecentModalState extends ConsumerState<LogsRecentModal> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                t.pages.logs.recentLogs,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              child: Text(t.pages.logs.recentLogs, style: Theme.of(context).textTheme.titleMedium),
             ),
             LogFilterBar(
               category: _category,
@@ -150,21 +153,14 @@ class _LogsRecentModalState extends ConsumerState<LogsRecentModal> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    t.pages.logs.linesMatch(count: matches.length),
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
+                  Text(t.pages.logs.linesMatch(count: matches.length), style: Theme.of(context).textTheme.labelMedium),
                   const SizedBox(height: 12),
                   Row(
                     children: [
                       FilledButton.icon(
                         onPressed: () async {
                           Navigator.of(context).pop();
-                          await _copyLines(
-                            matches,
-                            t: t,
-                            notifications: notifications,
-                          );
+                          await _copyLines(matches, t: t, notifications: notifications);
                         },
                         icon: const Icon(FluentIcons.copy_20_regular, size: 18),
                         label: Text(t.common.addToClipboard),
@@ -173,17 +169,9 @@ class _LogsRecentModalState extends ConsumerState<LogsRecentModal> {
                       OutlinedButton.icon(
                         onPressed: () async {
                           Navigator.of(context).pop();
-                          await _exportLines(
-                            matches,
-                            t: t,
-                            notifications: notifications,
-                            paths: paths,
-                          );
+                          await _exportLines(matches, t: t, notifications: notifications, paths: paths);
                         },
-                        icon: const Icon(
-                          FluentIcons.arrow_download_20_regular,
-                          size: 18,
-                        ),
+                        icon: const Icon(FluentIcons.arrow_download_20_regular, size: 18),
                         label: Text(t.pages.logs.exportToFile),
                       ),
                     ],
@@ -213,9 +201,7 @@ Future<void> _copyLines(
     notifications.showSuccessToast(t.common.msg.export.clipboard.success);
   } catch (e, stack) {
     _log.error('copying logs failed', e, stack);
-    notifications.showErrorToast(
-      t.common.msg.export.clipboard.contentTooLarge,
-    );
+    notifications.showErrorToast(t.common.msg.export.clipboard.contentTooLarge);
   }
 }
 
@@ -228,12 +214,12 @@ Future<void> _exportLines(
   final target = paths.appExportFile();
 
   await writeLinesToFile(target.path, records.map(formatRecord));
-  await _saveFileAs(target, t: t, notifications: notifications);
+  await saveFileAs(target, t: t, notifications: notifications);
 }
 
 /// Desktop gets a save dialog; a phone gets the share sheet, which is what
 /// "save this somewhere" means there.
-Future<void> _saveFileAs(
+Future<void> saveFileAs(
   File file, {
   required Translations t,
   required InAppNotificationController notifications,
@@ -246,9 +232,7 @@ Future<void> _saveFileAs(
   // saveFile only asks where to put it. On desktop it writes nothing and
   // ignores `bytes` — on macOS it throws when they are passed — so copying the
   // file over is ours to do. Reporting success without it was a lie.
-  final saveTo = await FilePicker.platform.saveFile(
-    fileName: file.uri.pathSegments.last,
-  );
+  final saveTo = await FilePicker.platform.saveFile(fileName: file.uri.pathSegments.last);
   if (saveTo == null) return;
 
   try {

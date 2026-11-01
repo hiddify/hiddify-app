@@ -352,6 +352,7 @@ const IpInfo$json = {
     {'1': 'latitude', '3': 7, '4': 1, '5': 1, '10': 'latitude'},
     {'1': 'longitude', '3': 8, '4': 1, '5': 1, '10': 'longitude'},
     {'1': 'postal_code', '3': 9, '4': 1, '5': 9, '10': 'postal_code'},
+    {'1': 'from_cache', '3': 10, '4': 1, '5': 8, '10': 'from_cache'},
   ],
 };
 
@@ -361,7 +362,7 @@ final $typed_data.Uint8List ipInfoDescriptor = $convert.base64Decode(
     '9jb2RlEhYKBnJlZ2lvbhgDIAEoCVIGcmVnaW9uEhIKBGNpdHkYBCABKAlSBGNpdHkSEAoDYXNu'
     'GAUgASgFUgNhc24SEAoDb3JnGAYgASgJUgNvcmcSGgoIbGF0aXR1ZGUYByABKAFSCGxhdGl0dW'
     'RlEhwKCWxvbmdpdHVkZRgIIAEoAVIJbG9uZ2l0dWRlEiAKC3Bvc3RhbF9jb2RlGAkgASgJUgtw'
-    'b3N0YWxfY29kZQ==');
+    'b3N0YWxfY29kZRIeCgpmcm9tX2NhY2hlGAogASgIUgpmcm9tX2NhY2hl');
 
 @$core.Deprecated('Use outboundGroupDescriptor instead')
 const OutboundGroup$json = {
@@ -631,6 +632,79 @@ const StopRequest$json = {
 /// Descriptor for `StopRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List stopRequestDescriptor = $convert.base64Decode(
     'CgtTdG9wUmVxdWVzdA==');
+
+@$core.Deprecated('Use crashReportDescriptor instead')
+const CrashReport$json = {
+  '1': 'CrashReport',
+  '2': [
+    {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'crashed_at', '3': 2, '4': 1, '5': 9, '10': 'crashedAt'},
+    {'1': 'source', '3': 3, '4': 1, '5': 9, '10': 'source'},
+    {'1': 'is_crash', '3': 4, '4': 1, '5': 8, '10': 'isCrash'},
+  ],
+};
+
+/// Descriptor for `CrashReport`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List crashReportDescriptor = $convert.base64Decode(
+    'CgtDcmFzaFJlcG9ydBISCgRuYW1lGAEgASgJUgRuYW1lEh0KCmNyYXNoZWRfYXQYAiABKAlSCW'
+    'NyYXNoZWRBdBIWCgZzb3VyY2UYAyABKAlSBnNvdXJjZRIZCghpc19jcmFzaBgEIAEoCFIHaXND'
+    'cmFzaA==');
+
+@$core.Deprecated('Use crashReportListDescriptor instead')
+const CrashReportList$json = {
+  '1': 'CrashReportList',
+  '2': [
+    {'1': 'reports', '3': 1, '4': 3, '5': 11, '6': '.hcore.CrashReport', '10': 'reports'},
+  ],
+};
+
+/// Descriptor for `CrashReportList`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List crashReportListDescriptor = $convert.base64Decode(
+    'Cg9DcmFzaFJlcG9ydExpc3QSLAoHcmVwb3J0cxgBIAMoCzISLmhjb3JlLkNyYXNoUmVwb3J0Ug'
+    'dyZXBvcnRz');
+
+@$core.Deprecated('Use exportDiagnosticsRequestDescriptor instead')
+const ExportDiagnosticsRequest$json = {
+  '1': 'ExportDiagnosticsRequest',
+  '2': [
+    {'1': 'destination_path', '3': 1, '4': 1, '5': 9, '10': 'destinationPath'},
+    {'1': 'extra_files', '3': 2, '4': 3, '5': 11, '6': '.hcore.ExportDiagnosticsRequest.ExtraFilesEntry', '10': 'extraFiles'},
+    {'1': 'inline', '3': 3, '4': 1, '5': 8, '10': 'inline'},
+  ],
+  '3': [ExportDiagnosticsRequest_ExtraFilesEntry$json],
+};
+
+@$core.Deprecated('Use exportDiagnosticsRequestDescriptor instead')
+const ExportDiagnosticsRequest_ExtraFilesEntry$json = {
+  '1': 'ExtraFilesEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    {'1': 'value', '3': 2, '4': 1, '5': 12, '10': 'value'},
+  ],
+  '7': {'7': true},
+};
+
+/// Descriptor for `ExportDiagnosticsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List exportDiagnosticsRequestDescriptor = $convert.base64Decode(
+    'ChhFeHBvcnREaWFnbm9zdGljc1JlcXVlc3QSKQoQZGVzdGluYXRpb25fcGF0aBgBIAEoCVIPZG'
+    'VzdGluYXRpb25QYXRoElAKC2V4dHJhX2ZpbGVzGAIgAygLMi8uaGNvcmUuRXhwb3J0RGlhZ25v'
+    'c3RpY3NSZXF1ZXN0LkV4dHJhRmlsZXNFbnRyeVIKZXh0cmFGaWxlcxIWCgZpbmxpbmUYAyABKA'
+    'hSBmlubGluZRo9Cg9FeHRyYUZpbGVzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUY'
+    'AiABKAxSBXZhbHVlOgI4AQ==');
+
+@$core.Deprecated('Use exportDiagnosticsResponseDescriptor instead')
+const ExportDiagnosticsResponse$json = {
+  '1': 'ExportDiagnosticsResponse',
+  '2': [
+    {'1': 'path', '3': 1, '4': 1, '5': 9, '10': 'path'},
+    {'1': 'content', '3': 2, '4': 1, '5': 12, '10': 'content'},
+  ],
+};
+
+/// Descriptor for `ExportDiagnosticsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List exportDiagnosticsResponseDescriptor = $convert.base64Decode(
+    'ChlFeHBvcnREaWFnbm9zdGljc1Jlc3BvbnNlEhIKBHBhdGgYASABKAlSBHBhdGgSGAoHY29udG'
+    'VudBgCIAEoDFIHY29udGVudA==');
 
 @$core.Deprecated('Use lANIPResponseDescriptor instead')
 const LANIPResponse$json = {

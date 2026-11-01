@@ -122,12 +122,14 @@ class IPCountryFlag extends HookConsumerWidget {
                   textDirection: Directionality.of(context),
                   alignment: Alignment.center,
                   children: [
-                    CircleFlag(
-                      // key: ValueKey(countryCode),
-                      countryCode!.toLowerCase() == "ir" ? "ir-shir" : countryCode!,
-                      size: size - 8,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(radius), // Rounded effect
+                    // a rounded-rect clip, not the package's path clip: the flag's raster is
+                    // shared by every tile, so the clip was what each one paid for
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(radius),
+                      child: CircleFlag(
+                        countryCode!.toLowerCase() == "ir" ? "ir-shir" : countryCode!,
+                        size: size - 8,
+                        shape: null,
                       ),
                     ),
                     if (organization != null)

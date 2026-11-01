@@ -54,6 +54,9 @@ abstract class Preferences {
 
   static final windowMaximized = PreferencesNotifier.create<bool, bool>("window_maximized", false);
 
+  /// The newest crash report the user was offered, by name, so each crash is offered once.
+  static final lastSeenCrashReport = PreferencesNotifier.create<String, String>("last_seen_crash_report", "");
+
   static final windowPosition = PreferencesNotifier.create<Offset?, String?>(
     "window_position",
     null,

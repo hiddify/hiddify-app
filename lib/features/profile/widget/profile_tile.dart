@@ -329,9 +329,12 @@ class _UpdatingIndicatorState extends State<_UpdatingIndicator> with SingleTicke
 
   @override
   Widget build(BuildContext context) {
-    return RotationTransition(
-      turns: ReverseAnimation(_controller),
-      child: Icon(Icons.sync_rounded, color: Theme.of(context).colorScheme.onSurface),
+    // the spin repaints the icon alone, not the tile
+    return RepaintBoundary(
+      child: RotationTransition(
+        turns: ReverseAnimation(_controller),
+        child: Icon(Icons.sync_rounded, color: Theme.of(context).colorScheme.onSurface),
+      ),
     );
   }
 }

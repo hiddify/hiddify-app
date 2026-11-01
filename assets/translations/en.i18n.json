@@ -208,7 +208,9 @@
       "fileSaveFailed": "Could not save the file",
       "coreLogLevel": "Core level",
       "coreLogLevelMsg": "Takes effect after reconnecting",
-      "buffer": "Buffer"
+      "buffer": "Buffer",
+      "diagnostics": "Diagnostics report",
+      "diagnosticsMsg": "Crash reports, logs and your settings without servers or passwords, as one zip"
     },
     "about": {
       "title": "About",
@@ -780,6 +782,11 @@
     },
     "qrScanner": {
       "notFound": "No QR code found in this image"
+    },
+    "crashReport": {
+      "title": "Hiddify crashed last time",
+      "msg": "Send a report to the developers so this gets fixed? It holds the crash details, the logs and your configuration with servers, keys and passwords removed, as one zip file you can look at before sending.",
+      "send": "Send report"
     }
   },
   "connection": {
@@ -812,7 +819,8 @@
       "yourServer": "Selected proxy",
       "notResponding": "Not responding",
       "testing": "Testing…",
-      "useFastest": "Use fastest available",
+      "useFastest": "Use fastest",
+      "unavailable": "Unavailable",
       "hopReady": "Connected",
       "hopConnecting": "Connecting…",
       "hopBroken": "Couldn't connect",

@@ -71,136 +71,145 @@ class HomePage extends HookConsumerWidget {
           const Gap(8),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          // A sky behind the connect button, as at an eclipse: in dark mode a touch lighter round
-          // the button, fading to the theme's own dark; in light mode brightest there, a touch
-          // darker towards the edges. Both barely there, centred on where the button sits.
-          gradient: theme.brightness == Brightness.dark
-              ? RadialGradient(
-                  center: const Alignment(0, -.15),
-                  radius: .85,
-                  colors: [
-                    Colors.white.withValues(alpha: .045),
-                    Colors.white.withValues(alpha: .015),
-                    Colors.white.withValues(alpha: 0),
-                  ],
-                  stops: const [0, .45, 1],
-                )
-              : RadialGradient(
-                  center: const Alignment(0, -.15),
-                  radius: 1.1,
-                  colors: [
-                    Colors.white.withValues(alpha: .55),
-                    Colors.white.withValues(alpha: 0),
-                    Colors.black.withValues(alpha: .045),
-                  ],
-                  stops: const [0, .5, 1],
-                ),
-          image: DecorationImage(
-            image: const AssetImage('assets/images/world_map.png'), // Replace with your image path
-            fit: BoxFit.cover,
-            opacity: 0.09,
-            colorFilter: theme.brightness == Brightness.dark
-                ? ColorFilter.mode(Colors.white.withValues(alpha: .15), BlendMode.srcIn) //
-                : ColorFilter.mode(
-                    Colors.grey.withValues(alpha: 1),
-                    BlendMode.srcATop,
-                  ), // Apply white tint in dark mode
-          ),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 600, // Set the maximum width here
-                ),
-                child: CustomScrollView(
-                  slivers: [
-                    // switch (activeProfile) {
-                    // AsyncData(value: final profile?) =>
-                    MultiSliver(
-                      children: [
-                        // const Gap(100),
-                        switch (activeProfile) {
-                          AsyncData(value: final profile?) => ProfileTile(
-                            profile: profile,
-                            isMain: true,
-                            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          ),
-                          _ => const Text(""),
-                        },
-                        const SliverFillRemaining(
-                          hasScrollBody: false,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [ConnectionButton(), ActiveProxyDelayIndicator()],
-                                ),
-                              ),
-                              ActiveProxyFooter(),
-                              Gap(32),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    // AsyncData() => switch (hasAnyProfile) {
-                    //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
-                    //     _ => const EmptyProfilesHomeBody(),
-                    //   },
-                    // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
-                    // _ => const SliverToBoxAdapter(),
-                    // },
-                  ],
+      // The sky and the map are drawn once into their own layer: a ripple or a label changing on
+      // the page no longer redraws the whole map image under it.
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          RepaintBoundary(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                // A sky behind the connect button, as at an eclipse: in dark mode a touch lighter round
+                // the button, fading to the theme's own dark; in light mode brightest there, a touch
+                // darker towards the edges. Both barely there, centred on where the button sits.
+                gradient: theme.brightness == Brightness.dark
+                    ? RadialGradient(
+                        center: const Alignment(0, -.15),
+                        radius: .85,
+                        colors: [
+                          Colors.white.withValues(alpha: .045),
+                          Colors.white.withValues(alpha: .015),
+                          Colors.white.withValues(alpha: 0),
+                        ],
+                        stops: const [0, .45, 1],
+                      )
+                    : RadialGradient(
+                        center: const Alignment(0, -.15),
+                        radius: 1.1,
+                        colors: [
+                          Colors.white.withValues(alpha: .55),
+                          Colors.white.withValues(alpha: 0),
+                          Colors.black.withValues(alpha: .045),
+                        ],
+                        stops: const [0, .5, 1],
+                      ),
+                image: DecorationImage(
+                  image: const AssetImage('assets/images/world_map.png'), // Replace with your image path
+                  fit: BoxFit.cover,
+                  opacity: 0.09,
+                  colorFilter: theme.brightness == Brightness.dark
+                      ? ColorFilter.mode(Colors.white.withValues(alpha: .15), BlendMode.srcIn) //
+                      : ColorFilter.mode(
+                          Colors.grey.withValues(alpha: 1),
+                          BlendMode.srcATop,
+                        ), // Apply white tint in dark mode
                 ),
               ),
             ),
-            if (ref.watch(hasAnyProfileProvider).value ?? false)
-              Positioned(
-                right: 0,
-                left: 0,
-                bottom: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Material(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
+          ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 600, // Set the maximum width here
+                  ),
+                  child: CustomScrollView(
+                    slivers: [
+                      // switch (activeProfile) {
+                      // AsyncData(value: final profile?) =>
+                      MultiSliver(
+                        children: [
+                          // const Gap(100),
+                          switch (activeProfile) {
+                            AsyncData(value: final profile?) => ProfileTile(
+                              profile: profile,
+                              isMain: true,
+                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            ),
+                            _ => const Text(""),
+                          },
+                          const SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [ConnectionButton(), ActiveProxyDelayIndicator()],
+                                  ),
+                                ),
+                                ActiveProxyFooter(),
+                                Gap(32),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      child: InkWell(
+                      // AsyncData() => switch (hasAnyProfile) {
+                      //     AsyncData(value: true) => const EmptyActiveProfileHomeBody(),
+                      //     _ => const EmptyProfilesHomeBody(),
+                      //   },
+                      // AsyncError(:final error) => SliverErrorBodyPlaceholder(t.presentShortError(error)),
+                      // _ => const SliverToBoxAdapter(),
+                      // },
+                    ],
+                  ),
+                ),
+              ),
+              if (ref.watch(hasAnyProfileProvider).value ?? false)
+                Positioned(
+                  right: 0,
+                  left: 0,
+                  bottom: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Material(
+                        color: theme.colorScheme.primaryContainer,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(16),
                           topRight: Radius.circular(16),
                         ),
-                        onTap: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
-                        child: Container(
-                          height: 32,
-                          padding: const EdgeInsetsDirectional.only(start: 16, end: 8),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(t.pages.home.quickSettings),
-                              const Gap(4),
-                              const Icon(Icons.arrow_drop_up_rounded, size: 16),
-                            ],
+                        child: InkWell(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
+                          ),
+                          onTap: () => ref.read(bottomSheetsNotifierProvider.notifier).showQuickSettings(),
+                          child: Container(
+                            height: 32,
+                            padding: const EdgeInsetsDirectional.only(start: 16, end: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(t.pages.home.quickSettings),
+                                const Gap(4),
+                                const Icon(Icons.arrow_drop_up_rounded, size: 16),
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

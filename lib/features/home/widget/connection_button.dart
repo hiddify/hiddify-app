@@ -10,6 +10,7 @@ import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
+import 'package:hiddify/core/widget/frame_load.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
@@ -301,11 +302,27 @@ class _ConnectionButton extends HookWidget {
 
     // Timer (not useSingleTickerProvider): that hook only allows one createTicker
     // for the State's life, so look/still changes crashed after disconnect→connect.
+    // A timer does not stop with its tickers, so it stops itself while the button cannot be
+    // seen: under another tab, sheet or route (TickerMode), or with the app in the background.
+    // Inactive stays on: on desktop that is only the window without focus.
+    final ticking = useValueListenable(TickerMode.getNotifier(context));
+    final shown = switch (useAppLifecycleState()) {
+      AppLifecycleState.paused || AppLifecycleState.hidden || AppLifecycleState.detached => false,
+      _ => true,
+    };
+    // A phone that cannot draw a frame in the 33 ms before the next one drops frames in bursts.
+    // Measured, not guessed from the model: such a phone gets a steady 20 or 15 fps of the same
+    // frames. A phone that keeps up sees nothing of this.
+    final load = useMemoized(
+      () => FrameLoad(const [Duration(milliseconds: 33), Duration(milliseconds: 50), Duration(milliseconds: 66)]),
+    );
+    final level = useValueListenable(load.level);
     final time = useValueNotifier(0.0);
     useEffect(() {
-      if (still) return null;
+      if (still || !ticking || !shown) return null;
+      load.watch();
       var last = now();
-      final timer = Timer.periodic(const Duration(milliseconds: 33), (_) {
+      final timer = Timer.periodic(load.interval, (_) {
         final at = now();
         // the light rises with the traffic in about a second, and fades more slowly, so the
         // stats reloading for a moment (coming back from the background) barely dims it
@@ -317,8 +334,11 @@ class _ConnectionButton extends HookWidget {
         final settled = change.value.look == EclipseLook.idle && at - change.value.at > 1;
         if (!settled) time.value = at;
       });
-      return timer.cancel;
-    }, [still]);
+      return () {
+        timer.cancel();
+        load.unwatch();
+      };
+    }, [still, ticking, shown, level]);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -544,11 +564,14 @@ class _ChainBadge extends StatelessWidget {
         child: GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
-          child: Center(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              transitionBuilder: (child, a) => ScaleTransition(scale: a, child: child),
-              child: KeyedSubtree(key: ValueKey(_glyph), child: glyph),
+          // its shimmer and breathing repaint the badge alone, not the button and the page
+          child: RepaintBoundary(
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                transitionBuilder: (child, a) => ScaleTransition(scale: a, child: child),
+                child: KeyedSubtree(key: ValueKey(_glyph), child: glyph),
+              ),
             ),
           ),
         ),

@@ -428,18 +428,22 @@ class _Bone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
-    return Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: s.onSurface.withValues(alpha: .12),
-            borderRadius: BorderRadius.circular(radius),
-          ),
-        )
-        .animate(onPlay: (c) => c.repeat())
-        .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
-        .animate(onPlay: (c) => c.repeat(reverse: true))
-        .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut);
+    // both loops repaint the bone alone, not the card round it
+    return RepaintBoundary(
+      child:
+          Container(
+                width: width,
+                height: height,
+                decoration: BoxDecoration(
+                  color: s.onSurface.withValues(alpha: .12),
+                  borderRadius: BorderRadius.circular(radius),
+                ),
+              )
+              .animate(onPlay: (c) => c.repeat())
+              .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut),
+    );
   }
 }
 
@@ -458,44 +462,47 @@ class _FlagSlot extends StatelessWidget {
     final inner = size - 8; // IPCountryFlag draws the flag 8 px smaller than its box
     return SizedBox.square(
       dimension: size,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        child: switch (info) {
-          OutboundInfo(hasIp: true) => Stack(
-            key: const ValueKey('flag'),
-            alignment: Alignment.center,
-            children: [
-              Container(
-                    width: inner,
-                    height: inner,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(radius),
-                      border: Border.all(color: s.primary, width: 2),
-                    ),
-                  )
-                  .animate()
-                  .scaleXY(begin: 1, end: 1.7, duration: 600.ms, curve: Curves.easeOut)
-                  .fadeOut(duration: 600.ms),
-              IPCountryFlag(
-                    countryCode: info.ipinfo.countryCode,
-                    organization: info.ipinfo.org,
-                    size: size,
-                    radius: radius,
-                  )
-                  .animate()
-                  .scaleXY(begin: .4, end: 1, duration: 500.ms, curve: Curves.easeOutBack)
-                  .fadeIn(duration: 200.ms),
-            ],
-          ),
-          OutboundInfo(ipLookupFailed: true) => IPCountryFlag(
-            key: const ValueKey('unknown'),
-            countryCode: '',
-            size: size,
-          ),
-          _ => Center(
-            child: _Bone(width: inner, height: inner, radius: inner / 4),
-          ),
-        },
+      // the pop and the ring repaint the slot alone
+      child: RepaintBoundary(
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: switch (info) {
+            OutboundInfo(hasIp: true) => Stack(
+              key: const ValueKey('flag'),
+              alignment: Alignment.center,
+              children: [
+                Container(
+                      width: inner,
+                      height: inner,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(radius),
+                        border: Border.all(color: s.primary, width: 2),
+                      ),
+                    )
+                    .animate()
+                    .scaleXY(begin: 1, end: 1.7, duration: 600.ms, curve: Curves.easeOut)
+                    .fadeOut(duration: 600.ms),
+                IPCountryFlag(
+                      countryCode: info.ipinfo.countryCode,
+                      organization: info.ipinfo.org,
+                      size: size,
+                      radius: radius,
+                    )
+                    .animate()
+                    .scaleXY(begin: .4, end: 1, duration: 500.ms, curve: Curves.easeOutBack)
+                    .fadeIn(duration: 200.ms),
+              ],
+            ),
+            OutboundInfo(ipLookupFailed: true) => IPCountryFlag(
+              key: const ValueKey('unknown'),
+              countryCode: '',
+              size: size,
+            ),
+            _ => Center(
+              child: _Bone(width: inner, height: inner, radius: inner / 4),
+            ),
+          },
+        ),
       ),
     );
   }
