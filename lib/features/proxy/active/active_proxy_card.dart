@@ -299,7 +299,7 @@ class _ProxyRow extends ConsumerWidget {
                 textStyle: theme.textTheme.labelLarge,
               ),
               icon: const Icon(Icons.bolt_rounded, size: 16),
-              label: Text(t.pages.proxies.switchTo(name: lowestGroupTag)),
+              label: Text(t.connection.health.useFastest),
             )
           : null,
     );
