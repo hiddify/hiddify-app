@@ -723,7 +723,13 @@ class HiddifyCoreService with InfraLogger {
       },
       cancelOnError: true,
       onError: (error) {
-        loggy.error('Stream error: $error');
+        // a core that is not running (the VPN is off, so there is no background core to reach)
+        // refuses the connection; that is its normal state, not an error of the app
+        if (error is GrpcError && error.code == StatusCode.unavailable) {
+          loggy.debug('Stream closed, the core is not reachable: ${error.message}');
+        } else {
+          loggy.error('Stream error: $error');
+        }
         onError?.call(error);
         subscriptions[key]?.cancel();
         subscriptions.remove(key);
