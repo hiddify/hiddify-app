@@ -117,20 +117,13 @@ void main() {
   });
 
   group('connection steps', () {
-    StepStatus? server(int delay, {ChainStatus chain = ChainStatus.off, OutboundInfo? hop}) => _card(
-      chain: chain,
-      hop: hop,
-      [
-        _group('select', [_info('M-NL', delay: delay)]),
-      ],
-    )!.serverStatus;
-    StepStatus? hop(OutboundInfo? hop, {int serverDelay = 150}) => _card(
-      chain: ChainStatus.extraSecurity,
-      hop: hop,
-      [
-        _group('select', [_info('M-NL', delay: serverDelay)]),
-      ],
-    )!.hopStatus;
+    StepStatus? server(int delay, {ChainStatus chain = ChainStatus.off, OutboundInfo? hop}) =>
+        _card(chain: chain, hop: hop, [
+          _group('select', [_info('M-NL', delay: delay)]),
+        ])!.serverStatus;
+    StepStatus? hop(OutboundInfo? hop, {int serverDelay = 150}) => _card(chain: ChainStatus.extraSecurity, hop: hop, [
+      _group('select', [_info('M-NL', delay: serverDelay)]),
+    ])!.hopStatus;
     OutboundInfo psiphon({Status status = Status.READY, int delay = 0}) =>
         _info('🔒 Extra Security · Psiphon §hide§', status: status, delay: delay);
 
@@ -138,7 +131,12 @@ void main() {
       expect(server(0), StepStatus.connecting);
       expect(server(150), StepStatus.connected);
       expect(server(65535), StepStatus.failed);
-      expect(_card([_group('select', [_info('M-NL')])])!.hopStatus, isNull);
+      expect(
+        _card([
+          _group('select', [_info('M-NL')]),
+        ])!.hopStatus,
+        isNull,
+      );
     });
 
     test('the hop is connected once it is ready and answers', () {
@@ -177,11 +175,10 @@ void main() {
     });
 
     test('switch to lowest is offered only for a dead pick while lowest answers', () {
-      bool offer({int pick = 65535, int lowest = 120, bool selectable = true, bool hasLowest = true}) =>
-          _card([
-            _group('select', [_info('M-NL', delay: pick)], selectable: selectable),
-            if (hasLowest) _group('lowest', [_info('M-DE', delay: lowest)]),
-          ])!.offerLowest;
+      bool offer({int pick = 65535, int lowest = 120, bool selectable = true, bool hasLowest = true}) => _card([
+        _group('select', [_info('M-NL', delay: pick)], selectable: selectable),
+        if (hasLowest) _group('lowest', [_info('M-DE', delay: lowest)]),
+      ])!.offerLowest;
       expect(offer(), isTrue);
       expect(offer(lowest: 65535), isFalse);
       expect(offer(lowest: 0), isFalse);
@@ -189,10 +186,23 @@ void main() {
       expect(offer(pick: 0), isFalse);
       expect(offer(selectable: false), isFalse);
       expect(offer(hasLowest: false), isFalse);
-      expect(_card(chain: ChainStatus.unblocker, [
-        _group('select', [_info('M-NL', delay: 65535)], selectable: true),
-        _group('lowest', [_info('M-DE', delay: 120)]),
-      ])!.offerLowest, isFalse, reason: 'the server waits for the unblocker, so it has not failed');
+      expect(
+        _card([
+          _group('select', [_info('balance', isGroup: true)], selectable: true),
+          _group('balance', [_info('M-NL', delay: 65535)]),
+          _group('lowest', [_info('M-DE', delay: 120)]),
+        ])!.offerLowest,
+        isFalse,
+        reason: 'a picked group is not offered the switch',
+      );
+      expect(
+        _card(chain: ChainStatus.unblocker, [
+          _group('select', [_info('M-NL', delay: 65535)], selectable: true),
+          _group('lowest', [_info('M-DE', delay: 120)]),
+        ])!.offerLowest,
+        isFalse,
+        reason: 'the server waits for the unblocker, so it has not failed',
+      );
     });
   });
 
@@ -230,7 +240,12 @@ void main() {
           items: [
             _group('select', [_info('M-NL', delay: 150)]),
           ],
-          chainHop: _info('🔒 Extra Security · Psiphon §hide§', type: 'Psiphon ${sent++}', status: status, delay: delay),
+          chainHop: _info(
+            '🔒 Extra Security · Psiphon §hide§',
+            type: 'Psiphon ${sent++}',
+            status: status,
+            delay: delay,
+          ),
         ),
       );
       await Future<void>.delayed(const Duration(milliseconds: 10));

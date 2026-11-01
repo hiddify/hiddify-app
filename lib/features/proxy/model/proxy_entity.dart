@@ -103,6 +103,7 @@ class ActiveProxyCardData {
       mainGroup: main.tag,
       offerLowest:
           serverStatus == StepStatus.failed &&
+          !picked.isGroup &&
           main.selectable &&
           lowest != null &&
           ConnectionConst.isValidDelay(lowest.urlTestDelay),
@@ -161,7 +162,8 @@ class ActiveProxyCardData {
   /// The main group's tag: "switch to lowest" changes its selection.
   final String mainGroup;
 
-  /// The server failed while lowest's choice answers, so one tap moves the main group to lowest.
+  /// The proxy the user picked failed while lowest's choice answers, so one tap moves the main group
+  /// to lowest. A picked group, such as balance, is never offered the switch.
   final bool offerLowest;
 }
 
