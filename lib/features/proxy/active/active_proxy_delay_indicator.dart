@@ -1,6 +1,5 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
@@ -50,17 +49,6 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
     // the selected proxy is down while another one works: one tap moves to it, beside its ping
     final canSwitch = ref.watch(connectionHealthProvider.select((h) => h?.canSwitchToFastest ?? false));
 
-    // a tap tests the selected proxy again, answering or not; the label above opens the check
-    Future<void> urlTest() async {
-      try {
-        await ref.read(activeProxyNotifierProvider.notifier).urlTest("");
-      } catch (e) {
-        loggy.error("Error during URL test: $e");
-      }
-    }
-
-    final s = theme.colorScheme;
-    final value = theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold);
     return SizedBox(
       height: _slotHeight,
       child: Center(
@@ -68,53 +56,72 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
           mainAxisSize: MainAxisSize.min,
           children: [
             InkWell(
-              onTap: urlTest,
+              onTap: () async {
+                try {
+                  await ref.read(activeProxyNotifierProvider.notifier).urlTest("");
+                } catch (e) {
+                  loggy.error("Error during URL test: $e");
+                }
+              },
               borderRadius: BorderRadius.circular(24),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (delay > 0 && !isValid) ...[
-                      // the same row as a ping, in the error colour: unavailable in place of the ms
-                      Icon(Icons.wifi_off_rounded, color: s.error),
-                      const Gap(8),
-                      Text(
-                        t.connection.health.unavailable,
-                        semanticsLabel: t.pages.proxies.delay.timeout,
-                        style: value?.copyWith(color: s.error),
-                      ),
-                    ] else ...[
-                      const Icon(FluentIcons.wifi_1_24_regular),
-                      const Gap(8),
-                      if (delay > 0)
-                        Text.rich(
-                          semanticsLabel: t.pages.proxies.delay.result(delay: delay),
-                          TextSpan(
-                            children: [
-                              TextSpan(text: delay.toString(), style: value),
+                    const Icon(FluentIcons.wifi_1_24_regular),
+                    const Gap(8),
+                    if (delay > 0)
+                      Text.rich(
+                        semanticsLabel: isValid
+                            ? t.pages.proxies.delay.result(delay: delay)
+                            : t.pages.proxies.delay.timeout,
+                        TextSpan(
+                          children: [
+                            if (isValid) ...[
+                              TextSpan(
+                                text: delay.toString(),
+                                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                              ),
                               const TextSpan(text: " ms"),
-                            ],
-                          ),
-                        )
-                      else
-                        Semantics(
-                          label: t.pages.proxies.delay.testing,
-                          child: const ShimmerSkeleton(width: 48, height: 18),
+                            ] else
+                              TextSpan(
+                                text: t.common.timeout,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.error,
+                                ),
+                              ),
+                          ],
                         ),
-                    ],
+                      )
+                    else
+                      Semantics(
+                        label: t.pages.proxies.delay.testing,
+                        child: const ShimmerSkeleton(width: 48, height: 18),
+                      ),
                   ],
                 ),
               ),
             ),
-            // the way out, in the connected green, grows in beside the ping when one appears
             AnimatedSize(
               duration: const Duration(milliseconds: 250),
               curve: Curves.easeOutCubic,
               child: canSwitch
                   ? Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 8),
-                      child: _UseFastest(onTap: ref.read(activeProxyNotifierProvider.notifier).switchToFastest),
+                      padding: const EdgeInsetsDirectional.only(start: 4),
+                      child: FilledButton.tonalIcon(
+                        onPressed: ref.read(activeProxyNotifierProvider.notifier).switchToFastest,
+                        style: FilledButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          foregroundColor: theme.extension<ConnectionButtonTheme>()!.connectedColor,
+                          backgroundColor: theme.extension<ConnectionButtonTheme>()!.connectedColor!.withValues(
+                            alpha: .14,
+                          ),
+                        ),
+                        icon: const Icon(Icons.bolt_rounded, size: 18),
+                        label: Text(t.connection.health.useFastest),
+                      ),
                     )
                   : const SizedBox.shrink(),
             ),
@@ -122,41 +129,5 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
         ),
       ),
     );
-  }
-}
-
-/// A short green chip: the fastest server answers, one tap moves to it.
-class _UseFastest extends ConsumerWidget {
-  const _UseFastest({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-    final theme = Theme.of(context);
-    final green = theme.extension<ConnectionButtonTheme>()!.connectedColor!;
-    return Material(
-      color: green.withValues(alpha: .16),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(8, 6, 12, 6),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.bolt_rounded, size: 18, color: green),
-              const Gap(4),
-              Text(
-                t.connection.health.useFastest,
-                style: theme.textTheme.labelLarge?.copyWith(color: green, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ).animate().fadeIn(duration: 250.ms).slideX(begin: -.2, end: 0, duration: 300.ms, curve: Curves.easeOutCubic);
   }
 }
