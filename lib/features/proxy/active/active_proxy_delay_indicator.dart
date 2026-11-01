@@ -1,5 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
@@ -50,90 +51,136 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
     // the selected proxy is down while another one works: one tap moves to it, beside its ping
     final canSwitch = ref.watch(connectionHealthProvider.select((h) => h?.canSwitchToFastest ?? false));
 
+    Future<void> onTap() async {
+      // a ping that fails while connected has a reason the connection check explains
+      final health = ref.read(connectionHealthProvider);
+      if (health != null && (health.degraded || health.hopPending)) {
+        return ref.read(bottomSheetsNotifierProvider.notifier).showConnectionHealth();
+      }
+      try {
+        await ref.read(activeProxyNotifierProvider.notifier).urlTest("");
+      } catch (e) {
+        loggy.error("Error during URL test: $e");
+      }
+    }
+
     return SizedBox(
       height: _slotHeight,
       child: Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            InkWell(
-              onTap: () async {
-                // a ping that fails while connected has a reason the connection check explains
-                final health = ref.read(connectionHealthProvider);
-                if (health != null && (health.degraded || health.hopPending)) {
-                  return ref.read(bottomSheetsNotifierProvider.notifier).showConnectionHealth();
-                }
-                try {
-                  await ref.read(activeProxyNotifierProvider.notifier).urlTest("");
-                } catch (e) {
-                  loggy.error("Error during URL test: $e");
-                }
-              },
-              borderRadius: BorderRadius.circular(24),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(FluentIcons.wifi_1_24_regular),
-                    const Gap(8),
-                    if (delay > 0)
-                      Text.rich(
-                        semanticsLabel: isValid
-                            ? t.pages.proxies.delay.result(delay: delay)
-                            : t.pages.proxies.delay.timeout,
-                        TextSpan(
-                          children: [
-                            if (isValid) ...[
+        child: delay > 0 && !isValid
+            ? _Unavailable(
+                canSwitch: canSwitch,
+                onTap: onTap,
+                onSwitch: ref.read(activeProxyNotifierProvider.notifier).switchToFastest,
+              )
+            : InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(24),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(FluentIcons.wifi_1_24_regular),
+                      const Gap(8),
+                      if (delay > 0)
+                        Text.rich(
+                          semanticsLabel: t.pages.proxies.delay.result(delay: delay),
+                          TextSpan(
+                            children: [
                               TextSpan(
                                 text: delay.toString(),
                                 style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                               ),
                               const TextSpan(text: " ms"),
-                            ] else
-                              TextSpan(
-                                text: t.common.timeout,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.error,
-                                ),
-                              ),
-                          ],
+                            ],
+                          ),
+                        )
+                      else
+                        Semantics(
+                          label: t.pages.proxies.delay.testing,
+                          child: const ShimmerSkeleton(width: 48, height: 18),
                         ),
-                      )
-                    else
-                      Semantics(
-                        label: t.pages.proxies.delay.testing,
-                        child: const ShimmerSkeleton(width: 48, height: 18),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              child: canSwitch
-                  ? Padding(
-                      padding: const EdgeInsetsDirectional.only(start: 4),
-                      child: FilledButton.tonalIcon(
-                        onPressed: ref.read(activeProxyNotifierProvider.notifier).switchToFastest,
-                        style: FilledButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                          foregroundColor: theme.extension<ConnectionButtonTheme>()!.connectedColor,
-                          backgroundColor: theme.extension<ConnectionButtonTheme>()!.connectedColor!.withValues(
-                            alpha: .14,
-                          ),
-                        ),
-                        icon: const Icon(Icons.bolt_rounded, size: 18),
-                        label: Text(t.connection.health.useFastest),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ],
-        ),
       ),
     );
+  }
+}
+
+/// The selected proxy does not answer: one capsule says so, in the error color, and offers the
+/// fastest server in its other half when one answers. The status half opens the connection check.
+class _Unavailable extends ConsumerWidget {
+  const _Unavailable({required this.canSwitch, required this.onTap, required this.onSwitch});
+
+  final bool canSwitch;
+  final VoidCallback onTap;
+  final VoidCallback onSwitch;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    final green = theme.extension<ConnectionButtonTheme>()!.connectedColor!;
+    final label = theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600);
+    return Material(
+          color: s.error.withValues(alpha: .10),
+          shape: StadiumBorder(side: BorderSide(color: s.error.withValues(alpha: .22))),
+          clipBehavior: Clip.antiAlias,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                button: true,
+                label: t.pages.proxies.delay.timeout,
+                child: InkWell(
+                  onTap: onTap,
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.fromSTEB(14, 8, 14, 8),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.wifi_off_rounded, size: 18, color: s.error),
+                        const Gap(6),
+                        Text(t.connection.health.unavailable, style: label?.copyWith(color: s.error)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // the way out, in the connected green, grows in beside the status when one appears
+              AnimatedSize(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                child: canSwitch
+                    ? Material(
+                        color: green.withValues(alpha: .16),
+                        child: InkWell(
+                          onTap: onSwitch,
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(12, 8, 14, 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.bolt_rounded, size: 18, color: green),
+                                const Gap(4),
+                                Text(t.connection.health.useFastest, style: label?.copyWith(color: green)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        )
+        // it arrives once, softly, under the label that names the problem
+        .animate()
+        .fadeIn(duration: 250.ms)
+        .slideY(begin: .4, end: 0, duration: 300.ms, curve: Curves.easeOutCubic);
   }
 }
