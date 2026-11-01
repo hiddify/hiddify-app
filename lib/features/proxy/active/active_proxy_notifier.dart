@@ -63,9 +63,7 @@ class IpInfoNotifier extends _$IpInfoNotifier with AppLogger {
     }
 
     _forceCheck = false;
-    final customIpInfoUrl = _ipinfoUrlFromHeaders(
-      ref.watch(activeProfileProvider).valueOrNull?.populatedHeaders,
-    );
+    final customIpInfoUrl = _ipinfoUrlFromHeaders(ref.watch(activeProfileProvider).valueOrNull?.populatedHeaders);
     final info = await ref
         .watch(proxyRepositoryProvider)
         .getCurrentIpInfo(cancelToken, customIpInfoUrl: customIpInfoUrl)
@@ -193,19 +191,6 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
     return ref.watch(mainOutboundsNotifierProvider).whenData((list) => _activeOf(list, chain));
   }
 
-  /// Selects "lowest" in the main selector, for a pick that stopped answering.
-  Future<void> switchToFastest() async {
-    final group = ref.read(mainOutboundsNotifierProvider).valueOrNull?.items.firstOrNull?.tag;
-    if (group == null) return;
-    await ref.read(hapticServiceProvider.notifier).lightImpact();
-    final switched = await ref.read(proxyRepositoryProvider).selectProxy(group, lowestGroupTag).run();
-    switched.match((err) {
-      loggy.warning("error switching to the fastest proxy", err);
-      final t = ref.read(translationsProvider).requireValue;
-      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.switchFailed);
-    }, (_) {});
-  }
-
   final _urlTestThrottler = Throttler(const Duration(seconds: 1));
 
   Future<void> urlTest(String? groupTag_) async {
@@ -224,17 +209,12 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
   /// Hands [mainGroup]'s choice to the lowest-delay group.
   Future<void> switchToLowest(String mainGroup) async {
     await ref.read(hapticServiceProvider.notifier).lightImpact();
-    await ref
-        .read(proxyRepositoryProvider)
-        .selectProxy(mainGroup, lowestGroupTag)
-        .map((_) => true)
-        .getOrElse((err) {
-          loggy.warning("error switching to lowest", err);
-          final t = ref.read(translationsProvider).requireValue;
-          ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.switchFailed);
-          return false;
-        })
-        .run();
+    await ref.read(proxyRepositoryProvider).selectProxy(mainGroup, lowestGroupTag).map((_) => true).getOrElse((err) {
+      loggy.warning("error switching to lowest", err);
+      final t = ref.read(translationsProvider).requireValue;
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.switchFailed);
+      return false;
+    }).run();
   }
 }
 
@@ -266,7 +246,10 @@ class ActiveProxyCard extends _$ActiveProxyCard {
     if (_connecting?.hop != hop) _connecting = (hop: hop, since: now());
     final waited = now().difference(_connecting!.since);
     // build again when the hop turns slow, then failed
-    final next = [ActiveProxyCardData.hopSlowAfter, ActiveProxyCardData.hopFailAfter].where((d) => d > waited).firstOrNull;
+    final next = [
+      ActiveProxyCardData.hopSlowAfter,
+      ActiveProxyCardData.hopFailAfter,
+    ].where((d) => d > waited).firstOrNull;
     if (next != null) {
       final timer = Timer(next - waited, ref.invalidateSelf);
       ref.onDispose(timer.cancel);

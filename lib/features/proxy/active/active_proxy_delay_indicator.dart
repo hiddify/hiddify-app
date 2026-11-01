@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
-import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -45,9 +44,6 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
 
     final delay = proxy.urlTestDelay;
     final isValid = ConnectionConst.isValidDelay(delay);
-
-    // the selected proxy is down while another one works: one tap moves to it, beside its ping
-    final canSwitch = ref.watch(connectionHealthProvider.select((h) => h?.canSwitchToFastest ?? false));
 
     return SizedBox(
       height: _slotHeight,
@@ -103,27 +99,6 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
                   ],
                 ),
               ),
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              child: canSwitch
-                  ? Padding(
-                      padding: const EdgeInsetsDirectional.only(start: 4),
-                      child: FilledButton.tonalIcon(
-                        onPressed: ref.read(activeProxyNotifierProvider.notifier).switchToFastest,
-                        style: FilledButton.styleFrom(
-                          visualDensity: VisualDensity.compact,
-                          foregroundColor: theme.extension<ConnectionButtonTheme>()!.connectedColor,
-                          backgroundColor: theme.extension<ConnectionButtonTheme>()!.connectedColor!.withValues(
-                            alpha: .14,
-                          ),
-                        ),
-                        icon: const Icon(Icons.bolt_rounded, size: 18),
-                        label: Text(t.connection.health.useFastest),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
             ),
           ],
         ),
