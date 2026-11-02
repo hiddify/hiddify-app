@@ -141,12 +141,14 @@ class _StepRow extends StatelessWidget {
     this.subtitle = const SizedBox.shrink(),
     this.height = _rowHeight,
     this.trailing,
+    this.onLongPress,
   });
 
   final double height;
   final Widget? trailing;
   final Color color;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
   final Widget flag;
   final StepStatus status;
   final Widget title;
@@ -158,6 +160,7 @@ class _StepRow extends StatelessWidget {
       color: color,
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         child: SizedBox(
           height: height,
           child: Row(
@@ -317,7 +320,8 @@ class _ProxyRow extends ConsumerWidget {
   }
 }
 
-// ---------- the hop row: its IP, then the chain type in a chip with its mode as a badge ----------
+// ---------- the hop row: its IP and what it runs, then the chain type in a chip with its mode as a
+// badge. A tap shows the hop's proxy info, a long press its configuration. ----------
 
 class _HopRow extends ConsumerWidget {
   const _HopRow(this.card);
@@ -335,9 +339,20 @@ class _HopRow extends ConsumerWidget {
     final (main, _) = type.colors(card.hopMode);
     final color = Color.alphaBlend(main.withValues(alpha: .16), s.surfaceContainerHigh);
     final down = status == StepStatus.waiting || status == StepStatus.failed;
+    final hop = card.hop;
+    // what the hop runs and what it is doing, as the core names it ("WARP · MASQUE 🔑 Registering...",
+    // "Psiphon ⏳ Connecting..."), or its mode until listed
+    final name = ProxyTypeLabel(
+      hop?.type ?? card.hopMode.present(t),
+      prefix: status == StepStatus.waiting ? '' : '  ·  ',
+      style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
+    );
     return _StepRow(
       color: color,
-      onTap: () => context.goNamed('chainOptions'),
+      onTap: hop == null
+          ? () => context.goNamed('chainOptions')
+          : () => ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: hop),
+      onLongPress: () => context.goNamed('chainOptions'),
       height: _hopRowHeight,
       flag: _FlagSlot(
         status == StepStatus.connected ? card.hop : null,
@@ -346,16 +361,21 @@ class _HopRow extends ConsumerWidget {
         dim: down,
       ),
       status: status,
-      title: switch (status) {
-        StepStatus.waiting => const SizedBox.shrink(),
-        StepStatus.slow => _Problem(t.connection.slow, error: false),
-        StepStatus.failed => _Problem(t.connection.failed),
-        _ => _IpSlot(
-          status == StepStatus.connected ? card.hop : null,
-          boneWidth: 64,
-          isFinal: card.chain.isExtraSecurity(),
-        ),
-      },
+      title: Row(
+        children: [
+          switch (status) {
+            StepStatus.waiting => const SizedBox.shrink(),
+            StepStatus.slow => _Problem(t.connection.slow, error: false),
+            StepStatus.failed => _Problem(t.connection.failed),
+            _ => _IpSlot(
+              status == StepStatus.connected ? hop : null,
+              boneWidth: 64,
+              isFinal: card.chain.isExtraSecurity(),
+            ),
+          },
+          Flexible(child: name),
+        ],
+      ),
       trailing: Stack(
         clipBehavior: Clip.none,
         children: [
