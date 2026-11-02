@@ -54,23 +54,20 @@ class _Platform extends MitVpnPlatform {
   Future<MitVpnEnvironment> environment() async => value;
 }
 class _Connections implements ConnectionRepository {
-  final events = StreamController<ConnectionStatus>.broadcast();
   final starts = <String>[];
   int stops = 0;
   Completer<void>? pausedStop;
   @override
-  Stream<ConnectionStatus> watchConnectionStatus() async* {
-    yield const Disconnected(); yield* events.stream;
-  }
+  Stream<ConnectionStatus> watchConnectionStatus() => Stream.value(const Disconnected());
   @override
   TaskEither<ConnectionFailure, Unit> connect(ProfileEntity profile, bool disableMemoryLimit) => TaskEither(() async {
     starts.add(profile.id);
     return left(const ConnectionFailure.unexpected('synthetic failure'));
-  });
+  }, timeout: const Timeout(Duration(seconds: 30)));
   @override
   TaskEither<ConnectionFailure, Unit> disconnect() => TaskEither(() async {
     stops++; await pausedStop?.future; return right(unit);
-  });
+  }, timeout: const Timeout(Duration(seconds: 30)));
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -83,14 +80,14 @@ class _Profiles implements ProfileRepository {
   @override
   TaskEither<ProfileFailure, Unit> setAsActive(String id) => TaskEither(() async {
     changes++; select(id == 'backup' ? _backup : _primary); return right(unit);
-  });
+  }, timeout: const Timeout(Duration(seconds: 30)));
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 void main() {
   Future<({ProviderContainer container, _Core core, _Connections connections, _Platform platform, _Profiles profiles})>
       setup(WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues({'mit_backup_profiles': ['backup']});
+    SharedPreferences.setMockInitialValues({'mit_backup_profiles': 'backup'});
     final prefs = await SharedPreferences.getInstance();
     final connections = _Connections(), platform = _Platform();
     late ProviderContainer c;
@@ -106,7 +103,7 @@ void main() {
       translationsProvider.overrideWith((ref) => AppLocale.ru.build()),
       mitVpnPlatformProvider.overrideWithValue(platform),
     ]);
-    addTearDown(() { c.dispose(); connections.events.close(); });
+    addTearDown(c.dispose);
     await tester.runAsync(() async {
       await c.read(sharedPreferencesProvider.future);
       await c.read(translationsProvider.future);
@@ -135,7 +132,7 @@ void main() {
     expect(s.profiles.changes, 1);
     expect((s.container.read(dialogNotifierProvider.notifier) as _Dialogs).alerts, 1);
     expect(s.container.read(mitRecoveryViewProvider).attempt, 3);
-  });
+  }, timeout: const Timeout(Duration(seconds: 30)));
 
   testWidgets('manual stop cancels a pending retry', (tester) async {
     final s = await setup(tester);
@@ -145,7 +142,7 @@ void main() {
     await tick(tester, s.core, 100);
     expect(s.connections.starts, ['primary']);
     expect(s.container.read(mitRecoveryViewProvider).active, false);
-  });
+  }, timeout: const Timeout(Duration(seconds: 30)));
 
   testWidgets('native user stop cancels recovery even if a network is available', (tester) async {
     final s = await setup(tester);
@@ -154,7 +151,7 @@ void main() {
     await tick(tester, s.core, 0); await tick(tester, s.core, 100);
     expect(s.connections.starts, ['primary']);
     expect(s.container.read(mitRecoveryViewProvider).active, false);
-  });
+  }, timeout: const Timeout(Duration(seconds: 30)));
 
   testWidgets('disabling recovery cancels a backup decision suspended in disconnect', (tester) async {
     final s = await setup(tester);
@@ -167,7 +164,7 @@ void main() {
     for (var i = 0; i < 8; i++) { await tester.pump(); }
     expect(s.profiles.changes, 0);
     expect(s.connections.starts, ['primary', 'primary', 'primary']);
-  });
+  }, timeout: const Timeout(Duration(seconds: 30)));
 
   testWidgets('manual profile action cancels a suspended automatic backup decision', (tester) async {
     final s = await setup(tester);
@@ -180,5 +177,5 @@ void main() {
     for (var i = 0; i < 8; i++) { await tester.pump(); }
     expect(s.profiles.changes, 0);
     expect(s.connections.starts, ['primary', 'primary', 'primary']);
-  });
+  }, timeout: const Timeout(Duration(seconds: 30)));
 }

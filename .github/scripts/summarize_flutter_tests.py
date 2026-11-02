@@ -47,7 +47,9 @@ def summarize(path):
             if not event.get("hidden"):
                 results["skipped" if event.get("skipped") else event["result"]] += 1
         elif kind == "error":
-            errors.append((event.get("testID"), event.get("error", "Unknown test error")))
+            error = event.get("error", "Unknown test error")
+            stack = '\n'.join(str(event.get('stackTrace', '')).splitlines()[:12])
+            errors.append((event.get("testID"), f'{error}\n{stack}' if stack else error))
         elif kind == "print" and "EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK" in str(event.get("message", "")):
             # Flutter emits assertion details as a print event, followed by an
             # otherwise unhelpful generic "Test failed" error. Publish only the

@@ -60,11 +60,11 @@ void main() {
 
   testWidgets('backup selection persists and is disabled while a tunnel is running', (tester) async {
     final container = await open(tester, _Platform());
-    await tester.ensureVisible(find.text('Backup private name'));
+    await tester.scrollUntilVisible(find.text('Backup private name'), 200);
     await tester.tap(find.text('Backup private name'));
     await tester.pumpAndSettle();
     expect(container.read(MitResiliencePreferences.backupProfiles), ['backup-private-id']);
-    expect(container.read(sharedPreferencesProvider).requireValue.getStringList('mit_backup_profiles'), ['backup-private-id']);
+    expect(container.read(sharedPreferencesProvider).requireValue.getString('mit_backup_profiles'), 'backup-private-id');
     await tester.pumpWidget(const SizedBox());
     await tester.pumpAndSettle();
     await open(tester, _Platform(), status: const Connected());
@@ -78,14 +78,14 @@ void main() {
     await open(tester, platform);
     await tester.scrollUntilVisible(find.text('Защита пока не подтверждена.'), 250);
     expect(find.text('Защита пока не подтверждена.'), findsOneWidget);
-    await tester.ensureVisible(find.text('Настройки VPN в Android'));
+    await tester.scrollUntilVisible(find.text('Настройки VPN в Android'), 200);
     await tester.tap(find.text('Настройки VPN в Android'));
     await tester.pumpAndSettle(); expect(platform.opens, 1);
     platform.value = const MitVpnEnvironment(protectionSupported: true, alwaysOn: true, lockdown: true);
-    await tester.ensureVisible(find.text('Обновить статус'));
+    await tester.scrollUntilVisible(find.text('Обновить статус'), 150);
     await tester.tap(find.text('Обновить статус'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Обе системные настройки включены.'));
+    await tester.scrollUntilVisible(find.text('Обе системные настройки включены.'), -150);
     expect(find.text('Обе системные настройки включены.'), findsOneWidget);
   });
 

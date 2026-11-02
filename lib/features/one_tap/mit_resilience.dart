@@ -8,7 +8,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 abstract class MitResiliencePreferences {
   static final autoRecovery = PreferencesNotifier.create<bool, bool>('mit_auto_recovery', true);
-  static final backupProfiles = PreferencesNotifier.create<List<String>, List<String>>('mit_backup_profiles', []);
+  static final backupProfiles = PreferencesNotifier.create<List<String>, String>('mit_backup_profiles', [],
+    mapFrom: (value) => value.split(';').where((id) => id.isNotEmpty).toSet().toList(),
+    mapTo: (value) => value.where((id) => id.isNotEmpty).toSet().join(';'));
 }
 
 class MitVpnEnvironment {
