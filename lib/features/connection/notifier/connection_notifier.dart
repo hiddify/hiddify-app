@@ -95,6 +95,8 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   bool get supportsAutomaticRecovery => oneTapVpnEnabled;
   @visibleForTesting
   DateTime get recoveryTime => DateTime.now();
+  @visibleForTesting
+  Future<void> pollRecoveryForTesting() => _pollRecovery();
 
   final _recovery = MitRecoveryPlan();
   bool _pollingRecovery = false;

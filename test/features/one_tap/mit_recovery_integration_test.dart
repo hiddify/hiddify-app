@@ -57,6 +57,7 @@ class _Connections implements ConnectionRepository {
   final starts = <String>[];
   int stops = 0;
   Completer<void>? pausedStop;
+  final enteredStop = Completer<void>();
   @override
   Stream<ConnectionStatus> watchConnectionStatus() => Stream.value(const Disconnected());
   @override
@@ -66,7 +67,8 @@ class _Connections implements ConnectionRepository {
   });
   @override
   TaskEither<ConnectionFailure, Unit> disconnect() => TaskEither(() async {
-    stops++; await pausedStop?.future; return right(unit);
+    stops++; if (!enteredStop.isCompleted) enteredStop.complete();
+    await pausedStop?.future; return right(unit);
   });
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -85,8 +87,9 @@ class _Profiles implements ProfileRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   Future<({ProviderContainer container, _Core core, _Connections connections, _Platform platform, _Profiles profiles})>
-      setup(WidgetTester tester) async {
+      setup() async {
     SharedPreferences.setMockInitialValues({'mit_backup_profiles': 'backup'});
     final prefs = await SharedPreferences.getInstance();
     final connections = _Connections(), platform = _Platform();
@@ -104,77 +107,76 @@ void main() {
       mitVpnPlatformProvider.overrideWithValue(platform),
     ]);
     addTearDown(c.dispose);
-    await tester.runAsync(() async {
-      await c.read(sharedPreferencesProvider.future);
-      await c.read(translationsProvider.future);
-      await c.read(activeProfileProvider.future);
-    });
+    await c.read(sharedPreferencesProvider.future);
+    await c.read(translationsProvider.future);
+    await c.read(activeProfileProvider.future);
     c.listen(connectionNotifierProvider, (_, __) {});
-    await tester.pump(); await tester.pump();
+    await c.read(connectionNotifierProvider.future);
     return (container: c, core: c.read(connectionNotifierProvider.notifier) as _Core,
       connections: connections, platform: platform, profiles: profiles);
   }
-  Future<void> tick(WidgetTester tester, _Core core, int seconds) async {
+  Future<void> tick(_Core core, int seconds) async {
     core.now = DateTime(2026).add(Duration(seconds: seconds));
-    await tester.pump(const Duration(seconds: 5));
-    for (var i = 0; i < 8; i++) { await tester.pump(); }
+    await core.pollRecoveryForTesting();
   }
 
-  testWidgets('real notifier retries and selects a backup without opening new error dialogs', (tester) async {
-    final s = await setup(tester);
+  test('real notifier retries and selects a backup without opening new error dialogs', () async {
+    final s = await setup();
     await s.core.toggleConnection();
     expect(s.connections.starts, ['primary']);
-    await tick(tester, s.core, 0);
-    await tick(tester, s.core, 3);
-    await tick(tester, s.core, 11);
-    await tick(tester, s.core, 31);
+    await tick(s.core, 0);
+    await tick(s.core, 3);
+    await tick(s.core, 11);
+    await tick(s.core, 31);
     expect(s.connections.starts, ['primary', 'primary', 'primary', 'backup']);
     expect(s.profiles.changes, 1);
     expect((s.container.read(dialogNotifierProvider.notifier) as _Dialogs).alerts, 1);
     expect(s.container.read(mitRecoveryViewProvider).attempt, 3);
   }, timeout: const Timeout(Duration(seconds: 30)));
 
-  testWidgets('manual stop cancels a pending retry', (tester) async {
-    final s = await setup(tester);
+  test('manual stop cancels a pending retry', () async {
+    final s = await setup();
     await s.core.toggleConnection();
-    await tick(tester, s.core, 0);
+    await tick(s.core, 0);
     await s.core.toggleConnection();
-    await tick(tester, s.core, 100);
+    await tick(s.core, 100);
     expect(s.connections.starts, ['primary']);
     expect(s.container.read(mitRecoveryViewProvider).active, false);
   }, timeout: const Timeout(Duration(seconds: 30)));
 
-  testWidgets('native user stop cancels recovery even if a network is available', (tester) async {
-    final s = await setup(tester);
+  test('native user stop cancels recovery even if a network is available', () async {
+    final s = await setup();
     await s.core.toggleConnection();
     s.platform.value = const MitVpnEnvironment(networkAvailable: true, permissionGranted: true, stopEpoch: 3);
-    await tick(tester, s.core, 0); await tick(tester, s.core, 100);
+    await tick(s.core, 0); await tick(s.core, 100);
     expect(s.connections.starts, ['primary']);
     expect(s.container.read(mitRecoveryViewProvider).active, false);
   }, timeout: const Timeout(Duration(seconds: 30)));
 
-  testWidgets('disabling recovery cancels a backup decision suspended in disconnect', (tester) async {
-    final s = await setup(tester);
+  test('disabling recovery cancels a backup decision suspended in disconnect', () async {
+    final s = await setup();
     await s.core.toggleConnection();
-    await tick(tester, s.core, 0); await tick(tester, s.core, 3); await tick(tester, s.core, 11);
+    await tick(s.core, 0); await tick(s.core, 3); await tick(s.core, 11);
     s.connections.pausedStop = Completer<void>();
-    await tick(tester, s.core, 31);
+    final pending = tick(s.core, 31);
+    await s.connections.enteredStop.future;
     await s.container.read(MitResiliencePreferences.autoRecovery.notifier).update(false);
     s.connections.pausedStop!.complete();
-    for (var i = 0; i < 8; i++) { await tester.pump(); }
+    await pending;
     expect(s.profiles.changes, 0);
     expect(s.connections.starts, ['primary', 'primary', 'primary']);
   }, timeout: const Timeout(Duration(seconds: 30)));
 
-  testWidgets('manual profile action cancels a suspended automatic backup decision', (tester) async {
-    final s = await setup(tester);
+  test('manual profile action cancels a suspended automatic backup decision', () async {
+    final s = await setup();
     await s.core.toggleConnection();
-    await tick(tester, s.core, 0); await tick(tester, s.core, 3); await tick(tester, s.core, 11);
+    await tick(s.core, 0); await tick(s.core, 3); await tick(s.core, 11);
     s.connections.pausedStop = Completer<void>();
-    await tick(tester, s.core, 31);
+    final pending = tick(s.core, 31);
+    await s.connections.enteredStop.future;
     await s.core.reconnect(_backup);
     s.connections.pausedStop!.complete();
-    for (var i = 0; i < 8; i++) { await tester.pump(); }
+    await pending;
     expect(s.profiles.changes, 0);
     expect(s.connections.starts, ['primary', 'primary', 'primary']);
   }, timeout: const Timeout(Duration(seconds: 30)));
