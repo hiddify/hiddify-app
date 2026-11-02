@@ -148,6 +148,44 @@
     "profiles": {
       "title": "Perfiles",
       "add": "Añadir perfil",
+      "fromPhone": {
+        "title": "Añadir desde el teléfono",
+        "scan": "Escanea este código con la cámara del teléfono, pega un enlace de suscripción y envíalo.",
+        "sameNetwork": "Tu teléfono y este televisor deben estar en la misma red Wi-Fi.",
+        "noNetwork": "Este televisor no está en una red local. Conéctalo a una red Wi-Fi para añadir un enlace desde el teléfono.",
+        "locked": "Se probaron demasiados códigos incorrectos, así que se bloqueó. Ciérralo y vuelve a abrirlo para obtener un código nuevo.",
+        "received": "Recibido desde tu teléfono",
+        "from": "Desde $address",
+        "page": {
+          "title": "Enviar a Hiddify en tu televisor",
+          "intro": "Añade una suscripción al televisor en cuatro pasos, sin escribirla con el mando.",
+          "steps": {
+            "network": {
+              "title": "Conéctate a la misma Wi-Fi",
+              "body": "El teléfono y el televisor deben estar en la misma red Wi-Fi; si no, esta página no llega al televisor."
+            },
+            "copy": {
+              "title": "Copia tu enlace",
+              "body": "Copia el enlace de suscripción de tu proveedor, o cualquier enlace de proxy o configuración."
+            },
+            "paste": {
+              "title": "Pégalo aquí",
+              "body": "Toca el cuadro de abajo, pega el enlace y toca «Enviar al televisor»."
+            },
+            "confirm": {
+              "title": "Confirma en el televisor",
+              "body": "El enlace aparece en el televisor. Pulsa Importar con el mando. No se añade nada hasta que lo hagas."
+            }
+          },
+          "label": "Enlace de suscripción",
+          "hint": "Pega un enlace de suscripción o una configuración",
+          "send": "Enviar al televisor",
+          "sentTitle": "Enviado a tu televisor",
+          "sent": "Ahora pulsa Importar en el televisor para añadirlo. Puedes enviar otro enlace abajo.",
+          "empty": "Primero pega un enlace.",
+          "footer": "Esta página solo funciona mientras «Añadir perfil» está abierto en el televisor y solo en tu red local."
+        }
+      },
       "update": "Actualizar perfil",
       "viewAllProfiles": "Ver todos los perfiles",
       "activeProfileName": "Nombre del perfil activo: “${name}”",

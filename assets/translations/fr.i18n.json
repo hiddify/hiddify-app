@@ -148,6 +148,44 @@
     "profiles": {
       "title": "Profils",
       "add": "Ajouter un profil",
+      "fromPhone": {
+        "title": "Ajouter depuis le téléphone",
+        "scan": "Scannez ce code avec l'appareil photo du téléphone, collez un lien d'abonnement et envoyez-le.",
+        "sameNetwork": "Votre téléphone et ce téléviseur doivent être sur le même réseau Wi-Fi.",
+        "noNetwork": "Ce téléviseur n'est pas sur un réseau local. Connectez-le au Wi-Fi pour ajouter un lien depuis votre téléphone.",
+        "locked": "Trop de codes erronés ont été essayés, l'accès est donc verrouillé. Fermez puis rouvrez pour obtenir un nouveau code.",
+        "received": "Reçu depuis votre téléphone",
+        "from": "Depuis $address",
+        "page": {
+          "title": "Envoyer à Hiddify sur votre téléviseur",
+          "intro": "Ajoutez un abonnement au téléviseur en quatre étapes, sans le saisir à la télécommande.",
+          "steps": {
+            "network": {
+              "title": "Rejoignez le même Wi-Fi",
+              "body": "Le téléphone et le téléviseur doivent être sur le même réseau Wi-Fi, sinon cette page ne peut pas joindre le téléviseur."
+            },
+            "copy": {
+              "title": "Copiez votre lien",
+              "body": "Copiez le lien d'abonnement de votre fournisseur, ou tout lien de proxy ou configuration."
+            },
+            "paste": {
+              "title": "Collez-le ici",
+              "body": "Touchez la zone ci-dessous, collez le lien, puis touchez « Envoyer au téléviseur »."
+            },
+            "confirm": {
+              "title": "Confirmez sur le téléviseur",
+              "body": "Le lien s'affiche sur le téléviseur. Appuyez sur Importer avec la télécommande. Rien n'est ajouté avant."
+            }
+          },
+          "label": "Lien d'abonnement",
+          "hint": "Collez un lien d'abonnement ou une configuration",
+          "send": "Envoyer au téléviseur",
+          "sentTitle": "Envoyé au téléviseur",
+          "sent": "Appuyez maintenant sur Importer sur le téléviseur pour l'ajouter. Vous pouvez envoyer un autre lien ci-dessous.",
+          "empty": "Collez d'abord un lien.",
+          "footer": "Cette page ne fonctionne que lorsque « Ajouter un profil » est ouvert sur le téléviseur, et seulement sur votre réseau local."
+        }
+      },
       "update": "Mettre à jour le profil",
       "viewAllProfiles": "Voir tous les profils",
       "activeProfileName": "Nom du profil actif : « ${name} »",

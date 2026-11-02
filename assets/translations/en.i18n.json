@@ -148,6 +148,44 @@
     "profiles": {
       "title": "Profiles",
       "add": "Add profile",
+      "fromPhone": {
+        "title": "Add from your phone",
+        "scan": "Scan this code with your phone's camera, paste a subscription link, and send it.",
+        "sameNetwork": "Your phone and this TV must be on the same Wi-Fi network.",
+        "noNetwork": "This TV is not on a local network. Connect it to Wi-Fi to add a link from your phone.",
+        "locked": "Too many wrong codes were tried, so this is locked. Close this and open it again for a new code.",
+        "received": "Received from your phone",
+        "from": "From $address",
+        "page": {
+          "title": "Send to Hiddify on your TV",
+          "intro": "Add a subscription to your TV in four quick steps, without typing it with the remote.",
+          "steps": {
+            "network": {
+              "title": "Join the same Wi-Fi",
+              "body": "Your phone and the TV must be on the same Wi-Fi network, or this page can't reach the TV."
+            },
+            "copy": {
+              "title": "Copy your link",
+              "body": "Copy the subscription link from your provider, or any proxy link or config."
+            },
+            "paste": {
+              "title": "Paste it here",
+              "body": "Tap the box below, paste the link, then tap “Send to TV”."
+            },
+            "confirm": {
+              "title": "Confirm on the TV",
+              "body": "The link shows up on the TV. Press Import with the remote. Nothing is added until you do."
+            }
+          },
+          "label": "Subscription link",
+          "hint": "Paste a subscription link or config",
+          "send": "Send to TV",
+          "sentTitle": "Sent to your TV",
+          "sent": "Now press Import on the TV to add it. You can send another link below.",
+          "empty": "Paste a link first.",
+          "footer": "This page works only while “Add profile” is open on the TV, and only on your local network."
+        }
+      },
       "update": "Update profile",
       "viewAllProfiles": "View all profiles",
       "activeProfileName": "Active profile name: “${name}”",

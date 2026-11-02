@@ -13,8 +13,11 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class FixBtns extends ConsumerWidget {
-  const FixBtns({super.key, required this.height});
+  const FixBtns({super.key, required this.height, this.canScan = true});
   final double height;
+
+  /// False on a device with no camera to scan a QR code with, such as a TV.
+  final bool canScan;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -63,7 +66,7 @@ class FixBtns extends ConsumerWidget {
             }
           },
         ),
-        if (!isDesktop) ...[
+        if (!isDesktop && canScan) ...[
           const Gap(AddProfileModalConst.fixBtnsGap),
           FixBtn(
             key: const ValueKey('add_by_qr_code_button'),

@@ -148,6 +148,44 @@
     "profiles": {
       "title": "Profil",
       "add": "Tambah profil",
+      "fromPhone": {
+        "title": "Tambah dari ponsel",
+        "scan": "Pindai kode ini dengan kamera ponsel, tempel tautan langganan, lalu kirim.",
+        "sameNetwork": "Ponsel dan TV ini harus terhubung ke jaringan Wi-Fi yang sama.",
+        "noNetwork": "TV ini tidak terhubung ke jaringan lokal. Hubungkan ke Wi-Fi untuk menambahkan tautan dari ponsel.",
+        "locked": "Terlalu banyak kode salah dicoba, jadi ini dikunci. Tutup lalu buka lagi untuk mendapatkan kode baru.",
+        "received": "Diterima dari ponsel",
+        "from": "Dari $address",
+        "page": {
+          "title": "Kirim ke Hiddify di TV",
+          "intro": "Tambahkan langganan ke TV dalam empat langkah cepat, tanpa mengetik dengan remote.",
+          "steps": {
+            "network": {
+              "title": "Gunakan Wi-Fi yang sama",
+              "body": "Ponsel dan TV harus terhubung ke jaringan Wi-Fi yang sama, jika tidak halaman ini tidak bisa menjangkau TV."
+            },
+            "copy": {
+              "title": "Salin tautan",
+              "body": "Salin tautan langganan dari penyedia, atau tautan proxy atau konfigurasi apa pun."
+            },
+            "paste": {
+              "title": "Tempel di sini",
+              "body": "Ketuk kotak di bawah, tempel tautan, lalu ketuk “Kirim ke TV”."
+            },
+            "confirm": {
+              "title": "Konfirmasi di TV",
+              "body": "Tautan muncul di TV. Tekan Impor dengan remote. Tidak ada yang ditambahkan sebelum Anda melakukannya."
+            }
+          },
+          "label": "Tautan langganan",
+          "hint": "Tempel tautan langganan atau konfigurasi",
+          "send": "Kirim ke TV",
+          "sentTitle": "Terkirim ke TV",
+          "sent": "Sekarang tekan Impor di TV untuk menambahkannya. Anda bisa mengirim tautan lain di bawah.",
+          "empty": "Tempel tautan terlebih dahulu.",
+          "footer": "Halaman ini hanya berfungsi saat “Tambah profil” terbuka di TV, dan hanya di jaringan lokal Anda."
+        }
+      },
       "update": "Perbarui profil",
       "viewAllProfiles": "Lihat semua profil",
       "activeProfileName": "Nama profil aktif: “${name}”",

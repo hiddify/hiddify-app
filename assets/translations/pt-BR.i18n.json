@@ -148,6 +148,44 @@
     "profiles": {
       "title": "Perfis",
       "add": "Adicionar perfil",
+      "fromPhone": {
+        "title": "Adicionar pelo celular",
+        "scan": "Escaneie este código com a câmera do celular, cole um link de assinatura e envie.",
+        "sameNetwork": "O celular e esta TV precisam estar na mesma rede Wi-Fi.",
+        "noNetwork": "Esta TV não está em uma rede local. Conecte-a ao Wi-Fi para adicionar um link pelo celular.",
+        "locked": "Muitos códigos errados foram tentados, então isto foi bloqueado. Feche e abra de novo para obter um novo código.",
+        "received": "Recebido do seu celular",
+        "from": "De $address",
+        "page": {
+          "title": "Enviar para o Hiddify na TV",
+          "intro": "Adicione uma assinatura à TV em quatro passos rápidos, sem digitar com o controle.",
+          "steps": {
+            "network": {
+              "title": "Use o mesmo Wi-Fi",
+              "body": "O celular e a TV precisam estar na mesma rede Wi-Fi; senão esta página não alcança a TV."
+            },
+            "copy": {
+              "title": "Copie seu link",
+              "body": "Copie o link de assinatura do seu provedor, ou qualquer link de proxy ou configuração."
+            },
+            "paste": {
+              "title": "Cole aqui",
+              "body": "Toque na caixa abaixo, cole o link e toque em “Enviar para a TV”."
+            },
+            "confirm": {
+              "title": "Confirme na TV",
+              "body": "O link aparece na TV. Pressione Importar no controle. Nada é adicionado até você fazer isso."
+            }
+          },
+          "label": "Link de assinatura",
+          "hint": "Cole um link de assinatura ou uma configuração",
+          "send": "Enviar para a TV",
+          "sentTitle": "Enviado para a TV",
+          "sent": "Agora pressione Importar na TV para adicionar. Você pode enviar outro link abaixo.",
+          "empty": "Cole um link primeiro.",
+          "footer": "Esta página só funciona enquanto “Adicionar perfil” está aberto na TV, e só na sua rede local."
+        }
+      },
       "update": "Atualizar perfil",
       "viewAllProfiles": "Ver todos os perfis",
       "activeProfileName": "Nome do perfil ativo: “${name}”",

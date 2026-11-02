@@ -148,6 +148,44 @@
     "profiles": {
       "title": "Profiller",
       "add": "Profil ekle",
+      "fromPhone": {
+        "title": "Telefonundan ekle",
+        "scan": "Bu kodu telefonunun kamerasıyla tara, bir abonelik bağlantısı yapıştır ve gönder.",
+        "sameNetwork": "Telefonun ve bu TV aynı Wi-Fi ağında olmalı.",
+        "noNetwork": "Bu TV yerel bir ağa bağlı değil. Telefonundan bağlantı eklemek için onu Wi-Fi'ye bağla.",
+        "locked": "Çok fazla yanlış kod denendi, bu yüzden kilitlendi. Yeni bir kod için kapatıp yeniden aç.",
+        "received": "Telefonundan alındı",
+        "from": "Gönderen: $address",
+        "page": {
+          "title": "TV'deki Hiddify'a gönder",
+          "intro": "Kumandayla yazmadan, dört kısa adımda TV'ye abonelik ekle.",
+          "steps": {
+            "network": {
+              "title": "Aynı Wi-Fi'ye bağlan",
+              "body": "Telefon ve TV aynı Wi-Fi ağında olmalı, yoksa bu sayfa TV'ye ulaşamaz."
+            },
+            "copy": {
+              "title": "Bağlantıyı kopyala",
+              "body": "Sağlayıcından abonelik bağlantısını ya da herhangi bir proxy bağlantısını veya yapılandırmayı kopyala."
+            },
+            "paste": {
+              "title": "Buraya yapıştır",
+              "body": "Aşağıdaki kutuya dokun, bağlantıyı yapıştır, sonra “TV'ye gönder”e dokun."
+            },
+            "confirm": {
+              "title": "TV'de onayla",
+              "body": "Bağlantı TV'de görünür. Kumandayla İçe aktar'a bas. Sen basmadan hiçbir şey eklenmez."
+            }
+          },
+          "label": "Abonelik bağlantısı",
+          "hint": "Abonelik bağlantısını veya yapılandırmayı yapıştır",
+          "send": "TV'ye gönder",
+          "sentTitle": "TV'ye gönderildi",
+          "sent": "Eklemek için şimdi TV'de İçe aktar'a bas. Aşağıdan başka bir bağlantı da gönderebilirsin.",
+          "empty": "Önce bir bağlantı yapıştır.",
+          "footer": "Bu sayfa yalnızca TV'de “Profil ekle” açıkken ve yalnızca yerel ağında çalışır."
+        }
+      },
       "update": "Profili güncelle",
       "viewAllProfiles": "Tüm profilleri görüntüle",
       "activeProfileName": "Aktif profil adı: “${name}”",
