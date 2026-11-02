@@ -8,6 +8,7 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
+import 'package:hiddify/features/proxy/widget/proxy_type_label.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -65,16 +66,12 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       subtitle: Row(
         children: [
           Flexible(
-            child: Text.rich(
-              TextSpan(
-                text: proxy.typeWithoutStatus,
-                children: [
-                  if (proxy.isGroup)
-                    TextSpan(text: ' (${proxy.groupSelectedTagDisplay.trim()})', style: theme.textTheme.bodySmall),
-                ],
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: ProxyTypeLabel(
+              proxy.typeWithoutStatus,
+              suffix: [
+                if (proxy.isGroup)
+                  TextSpan(text: ' (${proxy.groupSelectedTagDisplay.trim()})', style: theme.textTheme.bodySmall),
+              ],
               style: faded ? TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: _fadedAlpha)) : null,
             ),
           ),

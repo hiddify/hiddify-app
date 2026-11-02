@@ -16,6 +16,7 @@ import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
+import 'package:hiddify/features/proxy/widget/proxy_type_label.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -301,13 +302,13 @@ class _ProxyRow extends ConsumerWidget {
         StepStatus.failed => _Problem(
           group == lowestGroupTag ? t.pages.proxies.noneResponding : t.pages.proxies.notResponding,
         ),
-        StepStatus.waiting => Text(server.type, maxLines: 1, overflow: TextOverflow.ellipsis, style: muted),
+        StepStatus.waiting => ProxyTypeLabel(server.type, style: muted),
         _ => Row(
           children: [
             // The config's IP is the final one only with unblocker; with no chain it is the only one.
             _IpSlot(connected ? server : null, boneWidth: 64, isFinal: card.chain.isUnblocker(), onLongPress: urlTest),
             Flexible(
-              child: Text('  ·  ${server.type}', maxLines: 1, overflow: TextOverflow.ellipsis, style: muted),
+              child: ProxyTypeLabel(server.type, prefix: '  ·  ', style: muted),
             ),
           ],
         ),

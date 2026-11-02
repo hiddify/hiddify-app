@@ -199,6 +199,17 @@ extension OutboundInfoCard on OutboundInfo {
   String get typeWithoutStatus => status == Status.READY ? type : type.replaceFirst(_statusMark, '');
 }
 
+/// The endpoint the WARP scanner chose, as the core appends it to the display type
+/// (" · 🔍 162.159.192.1:2408", " · 🔍 [2606:4700:…]:443"; hiddify-sing-box hiddify/warpscan/status.go).
+final _scannerEndpoint = RegExp(r'^(.*?) · 🔍 (\[[0-9a-fA-F:]+\]:\d+|\d+\.\d+\.\d+\.\d+:\d+)(.*)$');
+
+/// [type] split round the WARP scanner's endpoint: what comes before it, the endpoint, and what
+/// follows it, such as the status mark. Null when the type has no endpoint.
+({String before, String endpoint, String after})? splitScannerEndpoint(String type) {
+  final m = _scannerEndpoint.firstMatch(type);
+  return m == null ? null : (before: m[1]!, endpoint: m[2]!, after: m[3]!);
+}
+
 /// The core's status mark: a space, one of its emoji, then the word (hiddify-sing-box adapter/h_status.go).
 final _statusMark = RegExp(r'\s+(⏳|⌛|🔍|❌|🔑)\s.*$');
 
