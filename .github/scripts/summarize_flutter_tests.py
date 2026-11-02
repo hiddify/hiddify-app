@@ -98,11 +98,26 @@ def summarize_analysis(path):
         print(f'::error title=Flutter analysis::{escaped}', file=sys.stderr)
 
 
+def summarize_prepare(path):
+    if not path.exists():
+        return
+    # Dependency/toolchain/generator failures occur before test reports exist.
+    # Keep public diagnostics bounded and use the same redaction as test output.
+    lines = path.read_text(errors='replace').splitlines()
+    selected = [line for line in lines if re.search(r'(?i)error|failed|exception|expected|could not|version solving', line)]
+    message = safe_text('\n'.join((selected or lines[-20:])[-20:]))
+    print(f'<h3>Preparation failure</h3><pre>{message}</pre>')
+    escaped = message.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+    print(f'::error title=Preparation::{escaped}', file=sys.stderr)
+
+
 if __name__ == "__main__":
     if sys.argv[1:2] == ['--flutter-analyze']:
         summarize_analysis(Path(sys.argv[2]))
     elif sys.argv[1:2] == ['--android-build']:
         summarize_build(Path(sys.argv[2]))
+    elif sys.argv[1:2] == ['--prepare']:
+        summarize_prepare(Path(sys.argv[2]))
     else:
         for argument in sys.argv[1:]:
             summarize(Path(argument))

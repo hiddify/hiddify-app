@@ -35,7 +35,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
         if (!enabled) _stopRecovery();
       });
       final timer = Timer.periodic(const Duration(seconds: 5), (_) => _pollRecovery());
-      ref.onDispose(() { timer.cancel(); _recovery.cancel(); });
+      ref.onDispose(() { timer.cancel(); _recovery.cancel(); _connectEpoch++; _singleStart.reset(); });
     }
     if (Platform.isIOS) {
       await _connectionRepo.setup().mapLeft((l) {
@@ -114,7 +114,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       if (!ref.read(MitResiliencePreferences.autoRecovery)) { _stopRecovery(); return; }
       final env = await ref.read(mitVpnPlatformProvider).environment();
       if (!_recovery.armed || generation != _recovery.generation) return;
-      final current = state.valueOrNull;
+      final current = state.valueOrNull ?? (state.hasError ? const Disconnected(UnexpectedConnectionFailure()) : null);
       if (current == null) return;
       if (env.stopEpoch != _recovery.stopEpoch) { _stopRecovery(); return; }
       // The first permission dialog belongs to the manual start; never retry it.

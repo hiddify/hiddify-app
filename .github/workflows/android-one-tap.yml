@@ -78,13 +78,26 @@ jobs:
           packages: platform-tools
 
       - name: Install pinned Android toolchain
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;28.2.13676358'
+        id: toolchain
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;28.2.13676358' 2>&1 | tee "$RUNNER_TEMP/mit-toolchain.log"
+
+      - name: Summarize toolchain failure
+        if: always() && steps.toolchain.outcome == 'failure'
+        run: python3 .github/scripts/summarize_flutter_tests.py --prepare "$RUNNER_TEMP/mit-toolchain.log" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Resolve locked dependencies and generate sources
+        id: prepare
         run: |
-          flutter pub get --enforce-lockfile
-          dart run build_runner build --delete-conflicting-outputs
-          dart run slang
+          set -euo pipefail
+          {
+            flutter pub get --enforce-lockfile
+            dart run build_runner build --delete-conflicting-outputs
+            dart run slang
+          } 2>&1 | tee "$RUNNER_TEMP/mit-prepare.log"
+
+      - name: Summarize preparation failure
+        if: always() && steps.prepare.outcome == 'failure'
+        run: python3 .github/scripts/summarize_flutter_tests.py --prepare "$RUNNER_TEMP/mit-prepare.log" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Prepare native libraries for Linux tests and Android
         run: make linux-amd64-libs android-libs SHELL=/bin/bash '.SHELLFLAGS=-euo pipefail -c'
