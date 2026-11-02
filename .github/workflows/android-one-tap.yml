@@ -20,6 +20,10 @@ concurrency:
 
 jobs:
   test-and-apk:
+    defaults:
+      run:
+        # Explicit bash enables -eo pipefail, including commands piped to tee.
+        shell: bash
     # SQLite 3.37 on 22.04 rejects ADD COLUMN CHECK with DQS disabled,
     # as used by Drift's SchemaVerifier. Keep strict migration checks enabled.
     runs-on: ubuntu-24.04
