@@ -24,7 +24,10 @@ sys.excepthook = report_error
 root = Path(__file__).resolve().parents[2]
 res = root / 'android/app/src/main/res'
 android = '{http://schemas.android.com/apk/res/android}'
-app = ET.parse(root / 'android/app/src/main/AndroidManifest.xml').getroot().find('application')
+manifest = ET.parse(root / 'android/app/src/main/AndroidManifest.xml').getroot()
+assert any(p.get(android + 'name') == 'android.permission.ACCESS_NETWORK_STATE'
+           for p in manifest.findall('uses-permission')), 'Network state permission required by recovery'
+app = manifest.find('application')
 assert app.get(android + 'label') == 'Mit’s VPN'
 assert app.get(android + 'icon') == '@mipmap/mit_launcher'
 assert app.get(android + 'roundIcon') == '@mipmap/mit_launcher'
@@ -62,5 +65,6 @@ if len(sys.argv) > 1:
     build_number = re.search(r'buildNumber = ([0-9]+)', alpha).group(1)
     assert f"versionName='{build_name}'" in badging, 'Android alpha version name mismatch'
     assert f"versionCode='{build_number}'" in badging, 'Android alpha version code mismatch'
+    assert "uses-permission: name='android.permission.ACCESS_NETWORK_STATE'" in badging, 'Recovery permission missing from APK'
     assert any('mit_launcher' in line or 'mit_icon_art' in line for line in badging.splitlines() if line.startswith('application-icon-'))
     print('Packaged APK application label, launcher identity, artwork and legal asset: PASS')
