@@ -38,6 +38,7 @@ void main() {
       'empty optional fields': amneziaTestLink(amneziaTestContainer(awgOptionalEmptyConfig())),
       'vpn file': decodeVpnProfileBytes(utf8.encode(jsonEncode(amneziaStructuredContainer()))),
       'Base64 header key and on flags': amneziaTestLink(amneziaTestContainer(awgBase64HeaderConfig())),
+      'Amnezia DNS tokens and keepalive range': amneziaTestLink(amneziaTestContainer(awgAmneziaPlaceholderConfig())),
     };
     for (final sample in samples.entries) {
       final version = sample.key;
@@ -50,6 +51,7 @@ void main() {
       final peer = (result['peers'] as List).single as Map;
       expect(peer['preshared_key'], testWgKey(33));
       expect(peer['allowed_ips'], ['0.0.0.0/0', '::/0']);
+      expect(peer['persistent_keepalive_interval'], jsonDecode(prepared.content)['endpoints'][0]['peers'][0]['persistent_keepalive_interval']);
       final expected = jsonDecode(prepared.content)['endpoints'][0]['awg'] as Map;
       final actual = result['awg'] as Map;
       for (final field in expected.entries) {

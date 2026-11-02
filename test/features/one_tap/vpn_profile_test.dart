@@ -106,6 +106,62 @@ void main() {
     });
   }
 
+  test('imports Amnezia DNS placeholders and keepalive range from links and files', () {
+    final config = awgAmneziaPlaceholderConfig();
+    final root = amneziaTestContainer(config);
+    root['containers'][0]['container'] = 'amnezia-awg2';
+    root['defaultContainer'] = 'amnezia-awg2';
+    final link = amneziaTestLink(root);
+    for (final text in [config, link, decodeVpnProfileBytes(utf8.encode(link)),
+      decodeVpnProfileBytes(utf8.encode(jsonEncode(root))), decodeVpnProfileBytes(utf8.encode(config))]) {
+      final out = endpoint(text);
+      expect(out['peers'][0]['persistent_keepalive_interval'], 30);
+      expect(out['awg']['random_trailers'], true);
+      expect(out['awg']['disable_cookies'], true);
+      expect(out['awg']['i1'], '<r 2><b 0x01020304>');
+      expect(jsonEncode(out), isNot(contains(r'$PRIMARY_DNS')));
+      expect(jsonEncode(out), isNot(contains(r'$SECONDARY_DNS')));
+    }
+  });
+
+  test('normalizes structured Amnezia keepalive ranges', () {
+    final root = amneziaStructuredContainer();
+    final awg = root['containers'][0]['awg'] as Map;
+    final client = jsonDecode(awg['last_config'] as String) as Map;
+    client['persistent_keep_alive'] = '25-35';
+    awg['last_config'] = jsonEncode(client);
+    expect(endpoint(amneziaTestLink(root))['peers'][0]['persistent_keepalive_interval'], 30);
+  });
+
+  for (final entry in {'0': 0, '25': 25, '25-25': 25, '25-35': 30,
+    '25-34': 29, '65535-65535': 65535}.entries) {
+    test('normalizes keepalive ${entry.key} to a native uint16', () {
+      final config = awgTestConfig().replaceFirst('PersistentKeepalive = 25', 'PersistentKeepalive = ${entry.key}');
+      expect(endpoint(config)['peers'][0]['persistent_keepalive_interval'], entry.value);
+    });
+  }
+
+  for (final value in ['35-25', '-1', '25-', '25-35-45', '1-65536', '65536', 'on']) {
+    test('rejects malformed or out-of-bounds keepalive $value', () {
+      final config = awgTestConfig().replaceFirst('PersistentKeepalive = 25', 'PersistentKeepalive = $value');
+      expect(() => prepareVpnProfile(config), throwsA(isA<VpnProfileException>()));
+    });
+  }
+
+  for (final value in [r'$PRIMARY_DNS', r'$SECONDARY_DNS', r'1.1.1.1, $SECONDARY_DNS']) {
+    test('accepts known Amnezia DNS tokens $value', () {
+      final config = awgTestConfig().replaceFirst('DNS = 1.1.1.1, 2606:4700:4700::1111', 'DNS = $value');
+      expect(endpoint(config)['type'], 'awg');
+    });
+  }
+
+  for (final value in [r'$UNKNOWN_DNS', r'$PRIMARY_DNS.evil', 'resolver.example.com', '1.1.1.999']) {
+    test('rejects unsupported DNS values $value', () {
+      final config = awgTestConfig().replaceFirst('DNS = 1.1.1.1, 2606:4700:4700::1111', 'DNS = $value');
+      expect(() => prepareVpnProfile(config), throwsA(isA<VpnProfileException>()));
+    });
+  }
+
   test('accepts legacy uncompressed JSON, CRLF, BOM and comments', () {
     final config = '\uFEFF# Name = private-name\r\n${awgTestConfig().replaceAll('\n', '\r\n')}';
     expect(endpoint(config)['tag'], 'Mit-AWG');

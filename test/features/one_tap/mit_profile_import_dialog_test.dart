@@ -48,13 +48,14 @@ void main() {
   testWidgets('explicit clipboard paste keeps complete conf while hiding credentials and never reads automatically', (tester) async {
     var reads = 0;
     String? imported;
-    final text = awgTestConfig();
+    final text = awgAmneziaPlaceholderConfig();
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
       if (call.method == 'Clipboard.getData') { reads++; return {'text': text}; }
       return null;
     });
     addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
     await open(tester, loader: () async => null, result: (value) => imported = value);
+    expect(find.textContaining('Диапазон keepalive'), findsOneWidget);
     expect(reads, 0);
     await tester.tap(find.byKey(const ValueKey('mit-paste-profile')));
     await tester.pumpAndSettle();

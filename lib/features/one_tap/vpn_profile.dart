@@ -294,7 +294,11 @@ Map<String, dynamic> _awgEndpoint(String text) {
       server.hasQuery || server.hasFragment || !_validHost(host)) throw _invalid;
   final port = _number('${server.port}', 1, 65535);
   if (local['DNS'] case final dns?) {
-    if (dns.split(',').any((s) => InternetAddress.tryParse(s.trim()) == null || s.contains('%'))) throw _invalid;
+    // Amnezia leaves these tokens in client exports. DNS is managed by Mit,
+    // so neither literal resolvers nor these known tokens enter the endpoint.
+    const placeholders = {r'$PRIMARY_DNS', r'$SECONDARY_DNS'};
+    if (dns.split(',').any((s) => !placeholders.contains(s.trim()) &&
+        (InternetAddress.tryParse(s.trim()) == null || s.contains('%')))) throw _invalid;
   }
   final awg = <String, dynamic>{};
   for (final entry in _awgFields.entries) {
@@ -332,7 +336,7 @@ Map<String, dynamic> _awgEndpoint(String text) {
       'public_key': _key(peer['PublicKey'] ?? ''),
       if (peer['PresharedKey'] case final psk?) 'preshared_key': _key(psk, allowZero: true),
       'allowed_ips': _prefixes(peer['AllowedIPs'] ?? '0.0.0.0/0,::/0'),
-      'persistent_keepalive_interval': _number(peer['PersistentKeepalive'] ?? '0', 0, 65535),
+      'persistent_keepalive_interval': _persistentKeepalive(peer['PersistentKeepalive'] ?? '0'),
     }],
   };
 }
@@ -381,6 +385,16 @@ String _key(String text, {bool allowZero = false}) {
   final canonical = base64.encode(bytes);
   if (base64.normalize(text) != canonical) throw _invalid;
   return canonical;
+}
+
+int _persistentKeepalive(String text) {
+  // Native AwgPeerOptions exposes uint16, not an AWG range. Use its midpoint
+  // once at import; the import dialog discloses this compatibility behavior.
+  _range(text, 65535);
+  final parts = text.split('-');
+  final min = int.parse(parts.first);
+  final max = int.parse(parts.last);
+  return min + (max - min) ~/ 2;
 }
 
 int _number(String text, int min, int max) {

@@ -99,6 +99,7 @@ class _MitProfileImportDialogState extends ConsumerState<MitProfileImportDialog>
       if (error != null) Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
       const SizedBox(height: 8),
       const Text('Ключ скрыт. Маршрутизация и DNS — по настройкам Mit’s VPN.', style: TextStyle(fontSize: 12)),
+      const Text('Диапазон keepalive AWG при импорте заменяется средним значением.', style: TextStyle(fontSize: 12)),
     ])),
     actions: [
       TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),

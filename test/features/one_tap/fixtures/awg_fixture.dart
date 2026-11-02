@@ -75,3 +75,10 @@ String awgBase64HeaderConfig() => awgTestConfig(version: 3)
     .replaceFirst(List.filled(64, '1').join(), testWgKey(0))
     .replaceFirst('RandomTrailers = 1', 'RandomTrailers = on')
     .replaceFirst('DisableCookies = 0', 'DisableCookies = on');
+
+// Reproduces the exported syntax that Alpha 1.2 rejected, using synthetic
+// credentials, a documentation endpoint and a synthetic packet constant.
+String awgAmneziaPlaceholderConfig() => awgBase64HeaderConfig()
+    .replaceFirst('DNS = 1.1.1.1, 2606:4700:4700::1111', r'DNS = $PRIMARY_DNS, $SECONDARY_DNS')
+    .replaceFirst('PersistentKeepalive = 25', 'PersistentKeepalive = 25-35')
+    .replaceFirst('<b 0x01020304>', '<r 2><b 0x01020304>');
