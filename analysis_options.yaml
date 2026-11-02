@@ -11,6 +11,8 @@ analyzer:
     - "lib/hiddifycore/generated/**"
     # vendored copy of the json_editor_flutter package
     - "lib/features/profile/details/json_editor.dart"
+    # vendored, patched packages (see third_party/*/HIDDIFY.md)
+    - "third_party/**"
     - "build/**"
     - "dist/**"
   errors:

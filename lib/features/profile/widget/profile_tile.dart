@@ -227,14 +227,13 @@ class ProfileActionButton extends HookConsumerWidget {
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
+      // drive(), not CurvedAnimation: the switcher calls this builder again on every rebuild,
+      // and a CurvedAnimation registers itself on the switcher's controller and is never
+      // disposed, so every rebuild of the tile leaked two of them for good.
       transitionBuilder: (child, animation) => FadeTransition(
-        opacity: CurvedAnimation(
-          parent: animation,
-          curve: const Interval(0, 0.6, curve: Curves.easeOut),
-          reverseCurve: Curves.easeIn,
-        ),
+        opacity: animation.drive(CurveTween(curve: const Interval(0, 0.6, curve: Curves.easeOut))),
         child: ScaleTransition(
-          scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack, reverseCurve: Curves.easeIn),
+          scale: animation.drive(CurveTween(curve: Curves.easeOutBack)),
           child: child,
         ),
       ),

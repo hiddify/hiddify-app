@@ -514,10 +514,9 @@ packages:
   flutter_animate:
     dependency: "direct main"
     description:
-      name: flutter_animate
-      sha256: "7befe2d3252728afb77aecaaea1dec88a89d35b9b1d2eea6d04479e8af9117b5"
-      url: "https://pub.dev"
-    source: hosted
+      path: "third_party/flutter_animate"
+      relative: true
+    source: path
     version: "4.5.2"
   flutter_displaymode:
     dependency: "direct main"

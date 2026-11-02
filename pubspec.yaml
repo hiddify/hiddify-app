@@ -148,6 +148,13 @@ dev_dependencies:
 # grpc allows http2 3.x.
 dependency_overrides:
   http2: ^3.1.0
+  # flutter_animate 4.5.2 builds a CurvedAnimation for every effect on every rebuild and never
+  # disposes it, so each one stays registered on the Animate controller for the widget's life
+  # (gskinner/flutter_animate#155). A proxy list re-rendering once a second grew the app by
+  # gigabytes per day. third_party/flutter_animate is 4.5.2 with the one-method fix of upstream
+  # PR #166 (drive(CurveTween)); drop the override once a release carries it.
+  flutter_animate:
+    path: third_party/flutter_animate
 
 flutter:
   uses-material-design: true

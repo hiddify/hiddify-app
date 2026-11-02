@@ -13,16 +13,20 @@ class AnimatedText extends Text {
       duration: duration,
       layoutBuilder: (current, previous) => Stack(alignment: Alignment.center, children: [...previous, ?current]),
       transitionBuilder: (child, animation) {
-        // the old text leaves in the first third, the new one comes in after it
-        final shown = CurvedAnimation(
-          parent: animation,
-          curve: child.key == ValueKey<String>(data!)
-              ? const Interval(.35, 1, curve: Curves.easeOut)
-              : const Interval(.65, 1, curve: Curves.easeIn),
+        // the old text leaves in the first third, the new one comes in after it.
+        // drive(), not CurvedAnimation: the switcher calls this builder again on every rebuild
+        // (the closure is new each time), and a CurvedAnimation registers itself on the
+        // switcher's controller and is never disposed, so each rebuild leaked one for good.
+        final shown = animation.drive(
+          CurveTween(
+            curve: child.key == ValueKey<String>(data!)
+                ? const Interval(.35, 1, curve: Curves.easeOut)
+                : const Interval(.65, 1, curve: Curves.easeIn),
+          ),
         );
         return FadeTransition(
           opacity: shown,
-          child: ScaleTransition(scale: Tween(begin: .94, end: 1.0).animate(shown), child: child),
+          child: ScaleTransition(scale: shown.drive(Tween(begin: .94, end: 1.0)), child: child),
         );
       },
       child: Text(data!, key: ValueKey<String>(data!), style: style),
