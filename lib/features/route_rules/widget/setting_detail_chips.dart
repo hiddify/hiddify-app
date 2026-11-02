@@ -112,6 +112,19 @@ class SettingDetailChips<T extends Object> extends HookConsumerWidget {
   }
 }
 
+/// `https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-apple.srs` → `raw.git…/geosite-apple`:
+/// the first characters of the host say where it comes from, the file name says what it is.
+String shortenRuleSetUrl(String value) {
+  final uri = Uri.tryParse(value);
+  if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
+    return value.length > 20 ? '${value.substring(0, 10)}…${value.substring(value.length - 10)}' : value;
+  }
+  var name = uri.pathSegments.where((s) => s.isNotEmpty).lastOrNull ?? '';
+  if (name.endsWith('.srs')) name = name.substring(0, name.length - 4);
+  final host = uri.host.length > 7 ? '${uri.host.substring(0, 7)}…' : uri.host;
+  return name.isEmpty ? host : '$host/$name';
+}
+
 class SettingDetailChip<T extends Object> extends ConsumerWidget {
   const SettingDetailChip({
     super.key,
@@ -141,10 +154,7 @@ class SettingDetailChip<T extends Object> extends ConsumerWidget {
   }
 
   Widget tText(String value, ThemeData theme) {
-    String text = value;
-    if (useEllipsis && value.length > 20) {
-      text = '${value.substring(0, 10)}...${value.substring(value.length - 10)}';
-    }
+    final text = useEllipsis ? shortenRuleSetUrl(value) : value;
     return Text(t == null ? text : t![text] ?? text, style: theme.textTheme.labelMedium);
   }
 

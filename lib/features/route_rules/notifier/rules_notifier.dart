@@ -22,6 +22,7 @@ const _geoUrl = 'https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set'
 /// only switch and move them, and their content comes from here, so an update can change it.
 enum BuiltinRule {
   bypassLan(enabledByDefault: true),
+  appleDirect(enabledByDefault: true),
   blockAds(enabledByDefault: false),
   bypassRegion(enabledByDefault: true);
 
@@ -36,6 +37,7 @@ enum BuiltinRule {
 
   String present(Translations t, Region region) => switch (this) {
     bypassLan => t.pages.settings.routing.builtinRules.bypassLan,
+    appleDirect => t.pages.settings.routing.builtinRules.appleDirect,
     blockAds => t.pages.settings.routing.builtinRules.blockAds,
     bypassRegion => t.pages.settings.routing.builtinRules.bypassRegion(region: region.presentName(t)),
   };
@@ -57,6 +59,26 @@ enum BuiltinRule {
         '::1/128',
         'ff00::/8',
         '::/128',
+      ],
+    ),
+    // Apple's services (App Store, iMessage, TestFlight, iCloud) are not filtered and move a lot of data, so
+    // they go direct instead of through the proxy. The rule set carries the full list; the suffixes cover
+    // the main services until it is downloaded, and if it never is.
+    appleDirect => Rule(
+      outbound: Outbound.direct,
+      ruleSets: ['https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-apple.srs'],
+      domainSuffixes: [
+        'apple.com',
+        'icloud.com',
+        'icloud-content.com',
+        'apple-dns.net',
+        'cdn-apple.com',
+        'mzstatic.com',
+        'aaplimg.com',
+        'itunes.com',
+        'apple-cloudkit.com',
+        'apple-mapkit.com',
+        'testflight.apple.com',
       ],
     ),
     blockAds => Rule(
@@ -124,6 +146,22 @@ class RulesNotifier extends _$RulesNotifier with AppLogger {
     rule.enabled = true;
     state = _updateListOrder([rule, ...state]);
     await _updateFile();
+  }
+
+  /// A copy of a rule, placed right after the original and open to any change: the way to tailor a
+  /// built-in rule, which itself cannot be edited. Returns the copy's list order.
+  Future<int> duplicateRule(int listOrder) async {
+    final current = state;
+    final index = current.indexWhere((element) => element.listOrder == listOrder);
+    if (index == -1) return listOrder;
+    final source = current[index];
+    final builtin = BuiltinRule.of(source);
+    final copy = source.deepCopy()
+      ..name = builtin == null ? '${source.name} (2)' : builtin.name
+      ..enabled = false;
+    state = _updateListOrder([...current.sublist(0, index + 1), copy, ...current.sublist(index + 1)]);
+    await _updateFile();
+    return index + 1;
   }
 
   Future<void> updateRule(Rule rule) async {
