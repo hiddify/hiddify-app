@@ -553,6 +553,7 @@
         "warp": {
           "missingConfig": "Konfigurasi WARP hilang",
           "licenseKey": "Kunci lisensi",
+          "tunnel": "Terowongan",
           "cleanIp": "IP bersih",
           "port": "Port",
           "noise": {

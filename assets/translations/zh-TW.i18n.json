@@ -553,6 +553,7 @@
         "warp": {
           "missingConfig": "WARP 設定缺失",
           "licenseKey": "授權金鑰",
+          "tunnel": "隧道",
           "cleanIp": "優選 IP",
           "port": "連接埠",
           "noise": {

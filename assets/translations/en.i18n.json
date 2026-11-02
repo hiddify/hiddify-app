@@ -589,6 +589,7 @@
         "warp": {
           "missingConfig": "Missing WARP config",
           "licenseKey": "License key",
+          "tunnel": "Tunnel",
           "cleanIp": "Clean IP",
           "port": "Port",
           "noise": {

@@ -585,6 +585,7 @@
         "warp": {
           "missingConfig": "تكوين WARP مفقود",
           "licenseKey": "مفتاح الترخيص",
+          "tunnel": "النفق",
           "cleanIp": "IP نظيف",
           "port": "المنفذ",
           "noise": {

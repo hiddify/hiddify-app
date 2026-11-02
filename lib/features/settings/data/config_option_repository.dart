@@ -301,8 +301,25 @@ abstract class ConfigOptions {
     "",
   );
 
+  static final extraSecurityWarpTunnel = PreferencesNotifier.create<WarpTunnel, String>(
+    "extra-security-warp-tunnel",
+    WarpTunnel.auto,
+    mapFrom: (value) => WarpTunnel.values.asNameMap()[value] ?? WarpTunnel.auto,
+    mapTo: (value) => value.name,
+  );
+
   static final unblockerWarpLicenseKey = PreferencesNotifier.create<String, String>("unblocker-warp-license-key", "");
 
+  static final unblockerWarpTunnel = PreferencesNotifier.create<WarpTunnel, String>(
+    "unblocker-warp-tunnel",
+    WarpTunnel.auto,
+    mapFrom: (value) => WarpTunnel.values.asNameMap()[value] ?? WarpTunnel.auto,
+    mapTo: (value) => value.name,
+  );
+
+  // The unblocker's WARP is all auto by default: the scanner finds an endpoint that answers, and
+  // with no noise set it also finds the noise that gets through, remembered per network. A value
+  // set here is used as given.
   static final unblockerWarpCleanIp = PreferencesNotifier.create<String, String>("unblocker-warp-clean-ip", "auto");
 
   static final unblockerWarpPort = PreferencesNotifier.create<int, int>(
@@ -313,22 +330,22 @@ abstract class ConfigOptions {
 
   static final unblockerWarpNoise = PreferencesNotifier.create<OptionalRange, String>(
     "unblocker-warp-noise",
-    const OptionalRange(min: 1, max: 3),
+    const OptionalRange(),
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final unblockerWarpNoiseMode = PreferencesNotifier.create<String, String>("unblocker-warp-noise-mode", "m4");
+  static final unblockerWarpNoiseMode = PreferencesNotifier.create<String, String>("unblocker-warp-noise-mode", "");
 
   static final unblockerWarpNoiseDelay = PreferencesNotifier.create<OptionalRange, String>(
     "unblocker-warp-noise-delay",
-    const OptionalRange(min: 10, max: 30),
+    const OptionalRange(),
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
   static final unblockerWarpNoiseSize = PreferencesNotifier.create<OptionalRange, String>(
     "unblocker-warp-noise-size",
-    const OptionalRange(min: 10, max: 30),
+    const OptionalRange(),
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
@@ -403,6 +420,7 @@ abstract class ConfigOptions {
     // EXTRA-SECURITY
     // warp
     "extra-security.warp.license-key": extraSecurityWarpLicenseKey,
+    "extra-security.warp.tunnel": extraSecurityWarpTunnel,
     // psiphon
     "extra-security.psiphon.region": extraSecurityPsiphonRegion,
     "extra-security.psiphon.conduit-pairing-id": extraSecurityPsiphonConduitPairingId,
@@ -412,6 +430,7 @@ abstract class ConfigOptions {
     // UNBLOCKER
     // warp
     "unblocker.warp.license-key": unblockerWarpLicenseKey,
+    "unblocker.warp.tunnel": unblockerWarpTunnel,
     "unblocker.warp.clean-ip": unblockerWarpCleanIp,
     "unblocker.warp.clean-port": unblockerWarpPort,
     "unblocker.warp.noise": unblockerWarpNoise,
@@ -523,7 +542,7 @@ abstract class ConfigOptions {
       ),
       chainStatus: ref.watch(chainStatus),
       extraSecurity: SingboxExtraSecurityOption(
-        mode: ref.watch(extraSecurityMode),
+        mode: ref.watch(extraSecurityMode).coreKey(ref.watch(extraSecurityWarpTunnel)),
         warp: SingboxExtraSecurityWarpOption(licenseKey: ref.watch(extraSecurityWarpLicenseKey)),
         psiphon: SingboxExtraSecurityPsiphonOption(
           region: ref.watch(extraSecurityPsiphonRegion),
@@ -532,7 +551,7 @@ abstract class ConfigOptions {
         profile: SingboxExtraSecurityProfileOption(id: ref.watch(extraSecurityProfileId)),
       ),
       unblocker: SingboxUnblockerOption(
-        mode: ref.watch(unblockerMode),
+        mode: ref.watch(unblockerMode).coreKey(ref.watch(unblockerWarpTunnel)),
         warp: SingboxUnblockerWarpOption(
           licenseKey: ref.watch(unblockerWarpLicenseKey),
           cleanIp: ref.watch(unblockerWarpCleanIp),

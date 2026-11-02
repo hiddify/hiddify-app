@@ -589,6 +589,7 @@
         "warp": {
           "missingConfig": "کانفیگ WARP موجود نیست",
           "licenseKey": "کلید لایسنس",
+          "tunnel": "تونل",
           "cleanIp": "IP تمیز",
           "port": "پورت",
           "noise": {

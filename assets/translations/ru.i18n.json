@@ -574,6 +574,7 @@
         "warp": {
           "missingConfig": "Отсутствует конфигурация WARP",
           "licenseKey": "Лицензионный ключ",
+          "tunnel": "Туннель",
           "cleanIp": "Чистый IP",
           "port": "Порт",
           "noise": {

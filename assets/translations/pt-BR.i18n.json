@@ -554,6 +554,7 @@
         "warp": {
           "missingConfig": "Configuração WARP ausente",
           "licenseKey": "Chave de licença",
+          "tunnel": "Túnel",
           "cleanIp": "IP limpo",
           "port": "Porta",
           "noise": {

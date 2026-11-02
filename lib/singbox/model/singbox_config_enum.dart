@@ -186,6 +186,13 @@ enum ChainMode {
     return mode != null && selectable.contains(mode) ? mode : fallback;
   }
 
+  /// The mode of a core mode key; every WARP tunnel's key is [warp].
+  static ChainMode? fromKey(String key) =>
+      WarpTunnel.values.any((e) => e.key == key) ? warp : values.where((e) => e.key == key).firstOrNull;
+
+  /// The key the core runs this mode by: WARP's says which tunnel.
+  String coreKey(WarpTunnel tunnel) => this == warp ? tunnel.key : key;
+
   String present(Translations t) => switch (this) {
     psiphon => t.common.psiphon,
     warp => t.common.warp,
@@ -207,6 +214,29 @@ enum ChainMode {
   bool isPsiphon() => this == psiphon;
   bool isWarp() => this == warp;
   bool isProfile() => this == profile;
+}
+
+/// The tunnel a WARP chain hop runs, by the core's chain mode key.
+enum WarpTunnel {
+  // races WireGuard, AmneziaWG and MASQUE and keeps the fastest
+  auto('warp_auto'),
+  wireguard('warp'),
+  amneziaWg('warp_awg'),
+  masque('warp_masque');
+
+  const WarpTunnel(this.key);
+
+  final String key;
+
+  String present(Translations t) => switch (this) {
+    auto => t.common.auto,
+    wireguard => 'WireGuard',
+    amneziaWg => 'AmneziaWG',
+    masque => 'MASQUE',
+  };
+
+  /// MASQUE has no WireGuard peer: the clean IP, port and noise do not apply to it.
+  bool get usesWireGuardPeer => this != masque;
 }
 
 @JsonEnum(valueField: 'key')

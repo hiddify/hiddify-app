@@ -74,7 +74,8 @@ class SingboxConfigOption with _$SingboxConfigOption {
 class SingboxExtraSecurityOption with _$SingboxExtraSecurityOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory SingboxExtraSecurityOption({
-    required ChainMode mode,
+    // the core's key (ChainMode.coreKey): a WARP hop's names its tunnel
+    required String mode,
     required SingboxExtraSecurityWarpOption warp,
     required SingboxExtraSecurityPsiphonOption psiphon,
     required SingboxExtraSecurityProfileOption profile,
@@ -87,7 +88,8 @@ class SingboxExtraSecurityOption with _$SingboxExtraSecurityOption {
 class SingboxUnblockerOption with _$SingboxUnblockerOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory SingboxUnblockerOption({
-    required ChainMode mode,
+    // the core's key (ChainMode.coreKey): a WARP hop's names its tunnel
+    required String mode,
     required SingboxUnblockerWarpOption warp,
     required SingboxUnblockerPsiphonOption psiphon,
     required SingboxUnblockerProfileOption profile,
