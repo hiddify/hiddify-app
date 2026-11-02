@@ -36,7 +36,7 @@ jobs:
       - name: Check Mit branding resources
         run: python3 .github/scripts/check_mit_branding.py
 
-      - name: Read Android alpha version
+      - name: Read Android version
         id: alpha
         run: |
           python3 - <<'PY'
@@ -47,7 +47,7 @@ jobs:
           number = re.search(r'buildNumber = ([0-9]+)', text).group(1)
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
               output.write(f'name={name}\nnumber={number}\n')
-          print(f'Android alpha: {name} ({number})')
+          print(f'Android version: {name} ({number})')
           PY
 
       - name: Check strict SQLite migration runtime
@@ -141,27 +141,74 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-      - name: Build pilot APK with a disposable debug signing key
+      - name: Build unsigned release preview (never used for installation)
         id: build
-        run: flutter build apk --debug --dart-define=ONE_TAP_VPN=true --build-name=${{ steps.alpha.outputs.name }} --build-number=${{ steps.alpha.outputs.number }} 2>&1 | tee "$RUNNER_TEMP/android-build.log"
+        run: MIT_UNSIGNED_BETA_BUILD=true flutter build apk --release --dart-define=ONE_TAP_VPN=true --build-name=${{ steps.alpha.outputs.name }} --build-number=${{ steps.alpha.outputs.number }} 2>&1 | tee "$RUNNER_TEMP/android-build.log"
 
       - name: Summarize build failure
         if: always() && steps.build.outcome == 'failure'
         run: python3 .github/scripts/summarize_flutter_tests.py --android-build "$RUNNER_TEMP/android-build.log" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Verify packaged Mit identity
-        run: python3 .github/scripts/check_mit_branding.py build/app/outputs/flutter-apk/app-debug.apk
+        run: python3 .github/scripts/check_mit_branding.py build/app/outputs/flutter-apk/app-release.apk
 
       - name: Prepare download and checksum
         run: |
           mkdir -p artifacts
-          cp build/app/outputs/flutter-apk/app-debug.apk artifacts/one-tap-vpn-debug.apk
+          cp build/app/outputs/flutter-apk/app-release.apk artifacts/mits-vpn-unsigned.apk
           cd artifacts
-          sha256sum one-tap-vpn-debug.apk > SHA256SUMS
+          sha256sum mits-vpn-unsigned.apk > SHA256SUMS
 
       - uses: actions/upload-artifact@v4
         with:
-          name: one-tap-vpn-debug-${{ github.sha }}
+          name: mits-vpn-unsigned-${{ github.sha }}
           path: artifacts/
           if-no-files-found: error
           retention-days: 14
+
+  publish-beta:
+    needs: test-and-apk
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/feat/android-one-tap-beta-1.5'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: mits-vpn-unsigned-${{ github.sha }}
+          path: unsigned
+      - name: Sign with the permanent private key and verify certificate
+        env:
+          ANDROID_SIGNING_KEY: ${{ secrets.ANDROID_SIGNING_KEY }}
+          ANDROID_SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+          ANDROID_SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+          ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+        run: python3 .github/scripts/sign_mit_beta.py
+      - name: Publish immutable Beta release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(python3 -c "import json; print('mit-beta-' + json.load(open('signed/mits-vpn-update.json'))['version'].removesuffix('-beta'))")
+          # gh release create fails if the tag already has a release. Never overwrite an update.
+          gh release create "$tag" signed/mits-vpn.apk signed/mits-vpn-update.json signed/SHA256SUMS \
+            --target "$GITHUB_SHA" --prerelease --title "Mit’s VPN Beta 1.5" \
+            --notes-file docs/releases/BETA_1_5_RU.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mits-vpn-signed-${{ github.sha }}
+          path: signed/
+          if-no-files-found: error
+          retention-days: 30

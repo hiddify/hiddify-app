@@ -1,6 +1,6 @@
-/// Android alpha numbering is independent of upstream iOS/Windows versions.
+/// Android Mit release numbering is independent of upstream iOS/Windows versions.
 abstract class MitRelease {
-  static const label = 'Alpha 1.4';
-  static const buildName = '1.4.0-alpha';
-  static const buildNumber = 50004;
+  static const label = 'Beta 1.5';
+  static const buildName = '1.5.0-beta';
+  static const buildNumber = 50005;
 }

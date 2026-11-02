@@ -107,7 +107,16 @@ android {
             if (hasKeyStore) {
                 signingConfig signingConfigs.release
             } else {
-                signingConfig signingConfigs.debug
+                if (System.getenv('MIT_UNSIGNED_BETA_BUILD') == 'true') {
+                    signingConfig null
+                } else {
+                    // Never ship a release with an ephemeral debug identity.
+                    gradle.taskGraph.whenReady { graph ->
+                        if (graph.allTasks.any { it.name.toLowerCase().contains('release') }) {
+                            throw new GradleException('Release signing required. CI may explicitly build an unsigned preview with MIT_UNSIGNED_BETA_BUILD=true.')
+                        }
+                    }
+                }
             }
             ndk {
                 //noinspection ChromeOsAbiSupport

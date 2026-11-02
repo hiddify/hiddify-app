@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/one_tap/mit_brand.dart';
 import 'package:hiddify/features/one_tap/mit_resilience.dart';
+import 'package:hiddify/features/one_tap/mit_profile_names.dart';
 import 'package:hiddify/features/one_tap/vpn_profile.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
@@ -70,6 +71,7 @@ class _MitResiliencePageState extends ConsumerState<MitResiliencePage> with Widg
   Widget build(BuildContext context) {
     final auto = ref.watch(MitResiliencePreferences.autoRecovery);
     final backups = ref.watch(MitResiliencePreferences.backupProfiles);
+    final names = ref.watch(mitProfileNamesProvider);
     final connection = ref.watch(connectionNotifierProvider).valueOrNull;
     final recovery = ref.watch(mitRecoveryViewProvider);
     final editable = connection?.isDisconnected == true && !recovery.active;
@@ -91,14 +93,22 @@ class _MitResiliencePageState extends ConsumerState<MitResiliencePage> with Widg
         if (profiles.isLoading) const LinearProgressIndicator(),
         if (profiles.hasError) const Text('Не удалось получить список профилей.'),
         for (final profile in profiles.valueOrNull ?? <ProfileEntity>[]) if (profile is LocalProfileEntity)
-          CheckboxListTile(value: backups.contains(profile.id),
-            title: Text(profile.name),
+          Column(children: [CheckboxListTile(value: backups.contains(profile.id),
+            title: Text(names[profile.id] ?? profile.name),
             subtitle: Text('${mitProfileProtocolLabel(profile.userOverride?.name)}${profile.active ? ' · активный' : ''}${backups.contains(profile.id) ? ' · резерв ${backups.indexOf(profile.id) + 1}' : ''}'),
             onChanged: !editable ? null : (value) async {
               final next = [...backups]..remove(profile.id);
               if (value == true) next.add(profile.id);
               await ref.read(MitResiliencePreferences.backupProfiles.notifier).update(next);
             }),
+            if (backups.contains(profile.id)) Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              const Text('Приоритет резерва'),
+              IconButton(tooltip: 'Выше', key: ValueKey('backup-up-${profile.id}'), icon: const Icon(Icons.arrow_upward),
+                onPressed: !editable || backups.indexOf(profile.id) == 0 ? null : () => ref.read(MitResiliencePreferences.backupProfiles.notifier).update(moveMitBackup(backups, profile.id, -1))),
+              IconButton(tooltip: 'Ниже', key: ValueKey('backup-down-${profile.id}'), icon: const Icon(Icons.arrow_downward),
+                onPressed: !editable || backups.indexOf(profile.id) == backups.length - 1 ? null : () => ref.read(MitResiliencePreferences.backupProfiles.notifier).update(moveMitBackup(backups, profile.id, 1))),
+            ]),
+          ]),
         if (profiles.hasValue && (profiles.valueOrNull ?? []).whereType<LocalProfileEntity>().isEmpty)
           const Text('Сначала добавьте локальный профиль через меню главного экрана.'),
         const Divider(),

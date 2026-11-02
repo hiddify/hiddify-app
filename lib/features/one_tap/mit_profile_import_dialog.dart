@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/features/one_tap/vpn_profile.dart';
+import 'package:hiddify/features/one_tap/mit_qr_scanner.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final mitProfileFileLoaderProvider = Provider<Future<String?> Function()>((ref) => pickVpnProfileFile);
@@ -94,6 +95,8 @@ class _MitProfileImportDialogState extends ConsumerState<MitProfileImportDialog>
           icon: const Icon(Icons.content_paste), label: const Text('Вставить')),
         TextButton.icon(key: const ValueKey('mit-pick-profile'), onPressed: reading ? null : () => load(ref.read(mitProfileFileLoaderProvider)),
           icon: const Icon(Icons.upload_file_outlined), label: const Text('Из файла')),
+        TextButton.icon(key: const ValueKey('mit-scan-profile'), onPressed: reading ? null : () => load(() => ref.read(mitQrLoaderProvider)(context)),
+          icon: const Icon(Icons.qr_code_scanner), label: const Text('QR-код')),
       ]),
       if (reading) const Text('Чтение профиля…'),
       if (error != null) Text(error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),

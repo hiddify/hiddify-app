@@ -11,6 +11,7 @@ import 'package:hiddify/features/one_tap/mit_connection_controls.dart';
 import 'package:hiddify/features/one_tap/mit_profile_import_dialog.dart';
 import 'package:hiddify/features/one_tap/vpn_profile.dart';
 import 'package:hiddify/features/one_tap/mit_resilience.dart';
+import 'package:hiddify/features/one_tap/mit_profile_names.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -24,6 +25,7 @@ class OneTapHomePage extends HookConsumerWidget {
     final active = ref.watch(activeProfileProvider);
     final status = ref.watch(connectionNotifierProvider);
     final recovery = ref.watch(mitRecoveryViewProvider);
+    final names = ref.watch(mitProfileNamesProvider);
     final busy = useState(false);
     final current = status.valueOrNull;
     final protocolLabel = active.valueOrNull == null ? 'VLESS / AWG'
@@ -166,7 +168,7 @@ class OneTapHomePage extends HookConsumerWidget {
                         onTap: canImport ? openProfiles : null,
                         leading: const Icon(Icons.language_rounded, color: mitGreen, size: 32),
                         title: const Text('Активный профиль', style: TextStyle(color: Color(0xFFADB9B0), fontSize: 12)),
-                        subtitle: Text(active.isLoading ? 'Загрузка…' : active.hasError ? 'Профиль недоступен' : active.valueOrNull == null ? 'Добавить профиль' : 'Основной профиль', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 17)),
+                        subtitle: Text(active.isLoading ? 'Загрузка…' : active.hasError ? 'Профиль недоступен' : active.valueOrNull == null ? 'Добавить профиль' : names[active.valueOrNull!.id] ?? 'Основной профиль', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 17)),
                         trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFFADB9B0)),
                       )),
                       const SizedBox(height: 14),

@@ -10,6 +10,8 @@ import 'package:hiddify/features/one_tap/mit_connection_controls.dart';
 import 'package:hiddify/features/one_tap/mit_release.dart';
 import 'package:hiddify/features/one_tap/mit_resilience_page.dart';
 import 'package:hiddify/features/one_tap/mit_resilience.dart';
+import 'package:hiddify/features/one_tap/mit_profile_names.dart';
+import 'package:hiddify/features/one_tap/mit_updates_page.dart';
 import 'package:hiddify/features/one_tap/vpn_profile.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
@@ -54,13 +56,16 @@ class MitSettingsPage extends ConsumerWidget {
     children: [
       const Center(child: MitLogo(size: 84)),
       const SizedBox(height: 20),
-      ListTile(leading: const Icon(Icons.folder_outlined, color: mitGreen), title: const Text('Мои профили'), subtitle: const Text('Выбор и удаление'),
+      ListTile(leading: const Icon(Icons.folder_outlined, color: mitGreen), title: const Text('Мои профили'), subtitle: const Text('Выбор, название и удаление'),
         onTap: () => ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview()),
       const Divider(),
       const ListTile(leading: Icon(Icons.alt_route, color: mitGreen), title: Text('Умный маршрут'), subtitle: Text('Россия и локальная сеть — напрямую. Остальной трафик — VPN.')),
       ListTile(leading: const Icon(Icons.shield_outlined, color: mitGreen), title: const Text('Защита и восстановление'),
         subtitle: const Text('Повторы, резервные профили и безопасный отчёт'),
         onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const MitResiliencePage()))),
+      ListTile(leading: const Icon(Icons.system_update_outlined, color: mitGreen), title: const Text('Обновления'),
+        subtitle: const Text('Проверка новой Beta и установка поверх'),
+        onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const MitUpdatesPage()))),
       const LocalePrefTile(),
       const EnableAnalyticsPrefTile(),
       const Divider(),
@@ -119,6 +124,7 @@ class MitProfilesSheet extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profiles = ref.watch(profilesNotifierProvider);
     final status = ref.watch(connectionNotifierProvider);
+    final names = ref.watch(mitProfileNamesProvider);
     final busy = useState(false);
     bool canEdit() => !busy.value && !ref.read(mitRecoveryViewProvider).active &&
         (ref.read(connectionNotifierProvider).valueOrNull?.isDisconnected ?? false);
@@ -150,11 +156,23 @@ class MitProfilesSheet extends HookConsumerWidget {
       busy.value = true;
       try {
         await ref.read(profilesNotifierProvider.notifier).deleteProfile(profile);
+        await ref.read(mitProfileNamesProvider.notifier).rename(profile.id, '');
+        final backups = ref.read(MitResiliencePreferences.backupProfiles);
+        await ref.read(MitResiliencePreferences.backupProfiles.notifier).update([...backups]..remove(profile.id));
       } catch (_) {
         if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Не удалось удалить профиль.')));
       } finally {
         if (context.mounted) busy.value = false;
       }
+    }
+
+    Future<void> rename(ProfileEntity profile) async {
+      if (!canEdit()) return;
+      final name = await showDialog<String>(context: context,
+        builder: (_) => _MitRenameDialog(initial: names[profile.id] ?? ''));
+      if (name == null || !context.mounted || !canEdit()) return;
+      try { await ref.read(mitProfileNamesProvider.notifier).rename(profile.id, name); }
+      catch (_) { if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Не удалось сохранить название.'))); }
     }
 
     final enabled = !busy.value && (status.valueOrNull?.isDisconnected ?? false);
@@ -170,10 +188,13 @@ class MitProfilesSheet extends HookConsumerWidget {
               final profile = items[index];
               return ListTile(
                 leading: Icon(profile.active ? Icons.check_circle : Icons.circle_outlined, color: profile.active ? mitGreen : Colors.white54),
-                title: Text('Профиль ${index + 1}'),
+                title: Text(names[profile.id] ?? 'Профиль ${index + 1}', maxLines: 2, overflow: TextOverflow.ellipsis),
                 subtitle: Text('${profile.active ? 'Выбран' : 'Нажмите для выбора'} · ${mitProfileProtocolLabel(profile.userOverride?.name)}'),
                 onTap: enabled ? () => select(profile) : null,
-                trailing: IconButton(tooltip: 'Удалить профиль', icon: const Icon(Icons.delete_outline), onPressed: enabled ? () => remove(profile) : null),
+                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                  IconButton(tooltip: 'Название профиля', icon: const Icon(Icons.edit_outlined), onPressed: enabled ? () => rename(profile) : null),
+                  IconButton(tooltip: 'Удалить профиль', icon: const Icon(Icons.delete_outline), onPressed: enabled ? () => remove(profile) : null),
+                ]),
               );
             },
           ),
@@ -183,4 +204,25 @@ class MitProfilesSheet extends HookConsumerWidget {
       ]),
     ))));
   }
+}
+
+class _MitRenameDialog extends StatefulWidget {
+  const _MitRenameDialog({required this.initial});
+  final String initial;
+  @override
+  State<_MitRenameDialog> createState() => _MitRenameDialogState();
+}
+class _MitRenameDialogState extends State<_MitRenameDialog> {
+  late final input = TextEditingController(text: widget.initial);
+  @override
+  void dispose() { input.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) => AlertDialog(title: const Text('Название профиля'),
+    content: TextField(controller: input, maxLength: 60, autofocus: true, autocorrect: false,
+      enableSuggestions: false, enableIMEPersonalizedLearning: false,
+      decoration: const InputDecoration(hintText: 'Например: Основной или Резерв')),
+    actions: [
+      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Отмена')),
+      TextButton(onPressed: () => Navigator.pop(context, input.text), child: const Text('Сохранить')),
+    ]);
 }

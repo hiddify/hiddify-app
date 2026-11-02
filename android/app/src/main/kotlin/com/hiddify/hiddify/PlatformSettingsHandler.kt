@@ -96,6 +96,8 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
     @SuppressLint("BatteryLife")
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            "mit_update_directory", "mit_verify_update", "mit_install_update", "mit_update_permission" ->
+                MitUpdateInstaller.handle(call, result, activity)
             "mit_vpn_environment" -> {
                 try {
                     val ctx = Application.application

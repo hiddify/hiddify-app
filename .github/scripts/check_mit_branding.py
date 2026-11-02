@@ -27,7 +27,12 @@ android = '{http://schemas.android.com/apk/res/android}'
 manifest = ET.parse(root / 'android/app/src/main/AndroidManifest.xml').getroot()
 assert any(p.get(android + 'name') == 'android.permission.ACCESS_NETWORK_STATE'
            for p in manifest.findall('uses-permission')), 'Network state permission required by recovery'
+assert any(p.get(android + 'name') == 'android.permission.REQUEST_INSTALL_PACKAGES'
+           for p in manifest.findall('uses-permission')), 'Update install permission missing'
 app = manifest.find('application')
+provider = next(p for p in app.findall('provider') if p.get(android + 'authorities') == '${applicationId}.updates')
+assert provider.get(android + 'exported') == 'false' and provider.get(android + 'grantUriPermissions') == 'true'
+assert re.fullmatch('[a-f0-9]{64}', (root / 'android/mit-signing-cert.sha256').read_text().strip())
 assert app.get(android + 'label') == 'Mit’s VPN'
 assert app.get(android + 'icon') == '@mipmap/mit_launcher'
 assert app.get(android + 'roundIcon') == '@mipmap/mit_launcher'
