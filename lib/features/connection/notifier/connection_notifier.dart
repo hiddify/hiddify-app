@@ -113,7 +113,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       final env = await ref.read(mitVpnPlatformProvider).environment();
       if (epoch != _connectEpoch) return;
       _recovery.start(env.stopEpoch);
-    } catch (_) { _stopRecovery(phase: 'blocked'); }
+    } catch (_) { if (epoch == _connectEpoch) _stopRecovery(phase: 'blocked'); }
   }
 
   Future<void> _pollRecovery() async {

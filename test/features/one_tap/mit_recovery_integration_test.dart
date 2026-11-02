@@ -107,9 +107,11 @@ void main() {
       mitVpnPlatformProvider.overrideWithValue(platform),
     ]);
     addTearDown(() { c.dispose(); connections.events.close(); });
-    await c.read(sharedPreferencesProvider.future);
-    await c.read(translationsProvider.future);
-    await c.read(activeProfileProvider.future);
+    await tester.runAsync(() async {
+      await c.read(sharedPreferencesProvider.future);
+      await c.read(translationsProvider.future);
+      await c.read(activeProfileProvider.future);
+    });
     c.listen(connectionNotifierProvider, (_, __) {});
     await tester.pump(); await tester.pump();
     return (container: c, core: c.read(connectionNotifierProvider.notifier) as _Core,

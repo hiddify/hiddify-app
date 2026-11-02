@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
-import 'package:hiddify/features/one_tap/mit_brand_pages.dart';
+import 'package:hiddify/features/one_tap/mit_brand.dart';
 import 'package:hiddify/features/one_tap/mit_resilience.dart';
 import 'package:hiddify/features/one_tap/vpn_profile.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
