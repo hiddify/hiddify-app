@@ -42,6 +42,70 @@ void main() {
     });
   }
 
+  test('imports Base64 header keys and on flags from conf, vpn links and files', () {
+    final config = awgBase64HeaderConfig();
+    final link = amneziaTestLink(amneziaTestContainer(config));
+    final expectedHex = List.generate(32, (i) => i.toRadixString(16).padLeft(2, '0')).join();
+    for (final input in [config, link, decodeVpnProfileBytes(utf8.encode(link)),
+      decodeVpnProfileBytes(utf8.encode(config))]) {
+      final awg = endpoint(input)['awg'] as Map;
+      expect(awg['header_protection_key'], expectedHex);
+      expect(awg['random_trailers'], true);
+      expect(awg['disable_cookies'], true);
+    }
+  });
+
+  test('normalizes Base64 header keys without losing leading or high bytes', () {
+    final bytes = [0, 0, 255, 254, ...List.generate(28, (i) => i)];
+    final expectedHex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    for (final encoded in [base64.encode(bytes), base64Url.encode(bytes),
+      base64.encode(bytes).replaceAll('=', ''), base64Url.encode(bytes).replaceAll('=', ''),
+      expectedHex, expectedHex.toUpperCase()]) {
+      final config = awgTestConfig(version: 3).replaceFirst(List.filled(64, '1').join(), encoded);
+      final actual = endpoint(config)['awg']['header_protection_key'] as String;
+      expect(actual.toLowerCase(), expectedHex);
+    }
+  });
+
+  test('inherits Base64 header keys and on/off flags from export metadata', () {
+    final root = amneziaTestContainer(awgTestConfig());
+    final awg = (root['containers'] as List).single['awg'] as Map;
+    awg['HeaderProtectionKey'] = testWgKey(0);
+    awg['RandomTrailers'] = 'on';
+    awg['DisableCookies'] = 'off';
+    final result = endpoint(amneziaTestLink(root))['awg'] as Map;
+    expect(result['header_protection_key'], List.generate(32, (i) => i.toRadixString(16).padLeft(2, '0')).join());
+    expect(result['random_trailers'], true);
+    expect(result['disable_cookies'], false);
+  });
+
+  for (final entry in {'on': true, 'ON': true, 'true': true, 'True': true, '1': true,
+    'off': false, 'OFF': false, 'false': false, 'False': false, '0': false}.entries) {
+    test('accepts AWG boolean ${entry.key} for both flags', () {
+      final config = awgTestConfig(version: 3)
+          .replaceFirst('RandomTrailers = 1', 'RandomTrailers = ${entry.key}')
+          .replaceFirst('DisableCookies = 0', 'DisableCookies = ${entry.key}');
+      final awg = endpoint(config)['awg'] as Map;
+      expect(awg['random_trailers'], entry.value);
+      expect(awg['disable_cookies'], entry.value);
+    });
+  }
+
+  for (final value in [base64.encode(List.filled(31, 1)), base64.encode(List.filled(33, 1)),
+    '${testWgKey(0)}=', 'not-a-key', '${'a' * 63}g', '${'A' * 42}B=']) {
+    test('rejects a malformed header key without exposing its value', () {
+      final config = awgTestConfig(version: 3).replaceFirst(List.filled(64, '1').join(), value);
+      try {
+        prepareVpnProfile(config);
+        fail('accepted invalid header key');
+      } on VpnProfileException catch (error) {
+        expect(error.message, contains('AWG-04'));
+        expect(error.source, isNull);
+        expect(error.toString(), isNot(contains(value)));
+      }
+    });
+  }
+
   test('accepts legacy uncompressed JSON, CRLF, BOM and comments', () {
     final config = '\uFEFF# Name = private-name\r\n${awgTestConfig().replaceAll('\n', '\r\n')}';
     expect(endpoint(config)['tag'], 'Mit-AWG');

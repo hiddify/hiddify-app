@@ -37,6 +37,7 @@ void main() {
       'structured export': amneziaTestLink(amneziaStructuredContainer()),
       'empty optional fields': amneziaTestLink(amneziaTestContainer(awgOptionalEmptyConfig())),
       'vpn file': decodeVpnProfileBytes(utf8.encode(jsonEncode(amneziaStructuredContainer()))),
+      'Base64 header key and on flags': amneziaTestLink(amneziaTestContainer(awgBase64HeaderConfig())),
     };
     for (final sample in samples.entries) {
       final version = sample.key;

@@ -304,11 +304,13 @@ Map<String, dynamic> _awgEndpoint(String text) {
       _validatePacketTemplate(value);
       awg[entry.value] = value;
     } else if (entry.key == 'HeaderProtectionKey') {
-      if (!RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(value)) throw _invalid;
-      awg[entry.value] = value;
+      awg[entry.value] = _headerProtectionKey(value);
     } else if (entry.key == 'RandomTrailers' || entry.key == 'DisableCookies') {
-      if (!{'true', 'false', '0', '1'}.contains(value.toLowerCase())) throw _invalid;
-      awg[entry.value] = value == '1' || value.toLowerCase() == 'true';
+      awg[entry.value] = switch (value.toLowerCase()) {
+        'true' || '1' || 'on' => true,
+        'false' || '0' || 'off' => false,
+        _ => throw _invalid,
+      };
     } else if (entry.key.startsWith('H') || entry.key.length > 4) {
       _range(value, entry.key == 'ContentPaddingAddition' ? 65507 : 0xFFFFFFFF);
       awg[entry.value] = value;
@@ -362,6 +364,14 @@ void _validatePacketTemplate(String value) {
     offset = tag.end;
   }
   if (offset == 0 || value.substring(offset).trim().isNotEmpty) throw _invalid;
+}
+
+String _headerProtectionKey(String text) {
+  if (RegExp(r'^[0-9a-fA-F]{64}$').hasMatch(text)) return text;
+  // Amnezia exports this 32-byte key as Base64; the native AWG endpoint
+  // expects hex. Reuse strict key validation before converting every byte.
+  final bytes = base64.decode(_key(text, allowZero: true));
+  return bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join();
 }
 
 String _key(String text, {bool allowZero = false}) {

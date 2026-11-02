@@ -70,3 +70,8 @@ Map<String, dynamic> amneziaStructuredContainer() {
 }
 
 String awgOptionalEmptyConfig() => awgTestConfig().replaceFirst('[Peer]', 'I2 = \nI3 = \nI4 = \nI5 = \nHeaderProtectionKey = \n[Peer]');
+
+String awgBase64HeaderConfig() => awgTestConfig(version: 3)
+    .replaceFirst(List.filled(64, '1').join(), testWgKey(0))
+    .replaceFirst('RandomTrailers = 1', 'RandomTrailers = on')
+    .replaceFirst('DisableCookies = 0', 'DisableCookies = on');
