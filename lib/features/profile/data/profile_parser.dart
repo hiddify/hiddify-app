@@ -42,6 +42,7 @@ class ProfileParser with InfraLogger {
   static const infiniteTrafficThreshold = 1_099_511_627_776_000;
   static const infiniteTimeThreshold = 92_233_720_368;
   static const allowedOverrideConfigs = [
+    'ipv6-mode',
     'connection-test-url',
     'ipinfo-url',
     'direct-dns-address',

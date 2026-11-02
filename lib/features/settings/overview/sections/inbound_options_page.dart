@@ -37,7 +37,7 @@ class InboundOptionsPage extends HookConsumerWidget with AppLogger {
             choices: TunImplementation.values,
             title: t.pages.settings.inbound.tunImplementation,
             icon: Icons.trip_origin_rounded,
-            presentChoice: (value) => value.name,
+            presentChoice: (value) => value.present(t),
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.mixedPort),

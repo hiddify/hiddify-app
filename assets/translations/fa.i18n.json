@@ -286,6 +286,9 @@
         "routeRule": {
           "add": "افزودن قانون",
           "delete": "حذف قانون",
+          "duplicate": "کپی قانون",
+          "duplicated": "یک نسخهٔ جدید ساخته شد: هر طور می‌خواهید تغییرش دهید",
+          "copyAll": "کپی همه",
           "options": {
             "import": {
               "clipboard": "وارد کردن قوانین از کلیپ‌بورد",
@@ -316,10 +319,11 @@
             "validDomain": "«دامنه» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com یا .ir",
             "validDomainSuffix": "«پسوند دامنه» معتبر مانند\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "قانون توکار قابل تغییر نیست. از آن کپی بگیرید و کپی را تغییر دهید.",
             "tileTitle(map)": {
               "name": "نام",
               "outbound": "خروجی در صورت تطابق",
-              "rule_set": "URL مجموعه قوانین",
+              "rule_set": "URLset",
               "package_name": "نام‌های بسته",
               "process_name": "نام‌های فرآیند",
               "process_path": "مسیرهای فرآیند",
@@ -335,8 +339,8 @@
               "domain_regex": "عبارت منظم دامنه"
             },
             "outbound(map)": {
-              "proxy": "پروکسی",
-              "direct": "مستقیم",
+              "proxy": "فیلترشکن",
+              "direct": "مستقیم (بدون فیلترشکن)",
               "direct_with_fragment": "مستقیم با Fragment",
               "block": "مسدود"
             },
@@ -363,10 +367,11 @@
           }
         },
         "builtinRules": {
-          "tag": "توکار",
+          "tag": "قانون توکار",
           "bypassLan": "دور زدن LAN",
-          "blockAds": "مسدودسازی تبلیغات و بدافزار",
-          "bypassRegion": "دور زدن سایت‌های $region"
+          "appleDirect": "سرویس‌های اپل",
+          "blockAds": "تبلیغات و بدافزار",
+          "bypassRegion": "سایت‌های $region"
         },
         "appBasedRouting": {
           "title": "مسیریابی بر اساس برنامه",
@@ -460,11 +465,17 @@
         },
         "resolveDestination": "تحلیل آدرس مقصد",
         "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "چرا IPv6 خاموش است؟",
+        "ipv6RouteTurnOnTitle": "IPv6 روشن شود؟",
+        "ipv6RouteTurnOn": "روشن کن",
+        "ipv6RouteHelp": "بیشتر پراکسی‌ها در خروجی IPv6 ندارند.\n\nاتصالی که پراکسی نتواند رد کند درست پس از باز شدن می‌میرد و مرورگرها هرگز آن را با IPv4 دوباره امتحان نمی‌کنند؛ برای همین گوگل و یوتیوب باز نمی‌شوند.\n\nوقتی روشن باشد، هر پراکسی یک بار در تست اتصال بررسی می‌شود. IPv6 فقط از پراکسی‌ای به کار می‌رود که آن را رد کند؛ بقیه بی‌سروصدا با IPv4 می‌رود.\n\nIPv6 همیشه درون VPN می‌رود، نه از کنار آن.",
         "ipv6Modes": {
-          "preferIpv4": "اول IPv4",
-          "preferIpv6": "اول IPv6",
-          "preferIpv4Description": "نام‌ها اول به IPv4 حل می‌شوند. IPv6 فقط از پراکسی‌ای که آن را دارد استفاده می‌شود. هر دو از VPN می‌گذرند.",
-          "preferIpv6Description": "نام‌ها از پراکسی‌ای که IPv6 دارد اول به IPv6 و در غیر این صورت به IPv4 حل می‌شوند. هر دو از VPN می‌گذرند."
+          "ipv4Only": "خاموش (فقط IPv4)",
+          "preferIpv4": "روشن، اول IPv4",
+          "preferIpv6": "روشن، اول IPv6",
+          "ipv4OnlyDescription": "برنامه‌ها فقط IPv4 به کار می‌برند. IPv6 بی‌درنگ رد می‌شود.",
+          "preferIpv4Description": "اول IPv4. ‏IPv6 فقط از پراکسی‌ای که بررسی نشان داده آن را رد می‌کند.",
+          "preferIpv6Description": "اول IPv6، فقط از پراکسی‌ای که بررسی نشان داده آن را رد می‌کند."
         }
       },
       "dns": {
@@ -498,6 +509,7 @@
         "strictRoute": "مسیربندی سخت‌گیرانه",
         "tunImplementation": "پیاده‌سازی TUN",
         "tunImplementations": {
+          "sing15": "Sing 15",
           "mixed": "ترکیبی",
           "system": "سیستم",
           "gvisor": "gVisor"

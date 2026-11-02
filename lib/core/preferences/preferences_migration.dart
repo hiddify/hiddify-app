@@ -91,12 +91,13 @@ class PreferencesVersion1Migration extends PreferencesMigrationStep with InfraLo
     await sharedPreferences.remove("cron_profiles_update");
   }
 
-  /// IPv6 is never off and never the only family: the retired "off"/ipv4_only and
-  /// "exclusive"/ipv6_only become the preference nearest them.
+  /// IPv6 for the apps is off (ipv4_only) unless turned on; the retired "exclusive"/ipv6_only
+  /// becomes the preference nearest it, and "enable" the IPv4-first one.
   String _ipv6Mapper(String persisted) => switch (persisted) {
-    "prefer_ipv4" || "prefer_ipv6" => persisted,
+    "ipv4_only" || "prefer_ipv4" || "prefer_ipv6" => persisted,
+    "enable" => "prefer_ipv4",
     "prefer" || "only" || "ipv6_only" => "prefer_ipv6",
-    _ => "prefer_ipv4",
+    _ => "ipv4_only",
   };
 
   String _domainStrategyMapper(String persisted) => switch (persisted) {

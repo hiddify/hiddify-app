@@ -52,7 +52,7 @@ abstract class ConfigOptions {
 
   static final ipv6Mode = PreferencesNotifier.create<IPv6Mode, String>(
     "ipv6-mode",
-    IPv6Mode.preferIPv4,
+    IPv6Mode.ipv4Only,
     mapFrom: IPv6Mode.fromKey,
     mapTo: (value) => value.key,
   );
@@ -134,7 +134,7 @@ abstract class ConfigOptions {
 
   static final tunImplementation = PreferencesNotifier.create<TunImplementation, String>(
     "tun-implementation",
-    TunImplementation.gvisor,
+    TunImplementation.sing15,
     mapFrom: TunImplementation.values.byName,
     mapTo: (value) => value.name,
   );

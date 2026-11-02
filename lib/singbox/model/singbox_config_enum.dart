@@ -75,11 +75,15 @@ enum BalancerStrategy {
   };
 }
 
-/// Which address family the core resolves first. Both families always go through the VPN and
-/// IPv6 is used only through a proxy the core found carrying it, so there is no "off": IPv6 that
-/// is not routed leaks past the VPN (#2307, #2420).
+/// IPv6 for the apps. Off by default ([ipv4Only]): most proxies have no IPv6 at their exit, and a
+/// connection the proxy cannot carry dies after it opened, which browsers never retry over IPv4
+/// (#2307, #2420). On ([preferIPv4], [preferIPv6]), the core verifies each proxy once at its URL
+/// test and uses IPv6 only through a proxy found carrying it, carrying the rest over IPv4. IPv6
+/// always routes into the VPN, so nothing leaks past it. A subscription may turn it on with an
+/// `ipv6-mode` header.
 @JsonEnum(valueField: 'key')
 enum IPv6Mode {
+  ipv4Only("ipv4_only"),
   preferIPv4("prefer_ipv4"),
   preferIPv6("prefer_ipv6");
 
@@ -87,18 +91,21 @@ enum IPv6Mode {
 
   final String key;
 
-  /// The stored value; the retired ipv4_only and ipv6_only count as the preference nearest them.
+  /// The stored value; the retired ipv6_only counts as the preference nearest it.
   static IPv6Mode fromKey(String? key) => switch (key) {
+    "prefer_ipv4" => preferIPv4,
     "prefer_ipv6" || "ipv6_only" => preferIPv6,
-    _ => preferIPv4,
+    _ => ipv4Only,
   };
 
   String present(TranslationsEn t) => switch (this) {
+    ipv4Only => t.pages.settings.routing.ipv6Modes.ipv4Only,
     preferIPv4 => t.pages.settings.routing.ipv6Modes.preferIpv4,
     preferIPv6 => t.pages.settings.routing.ipv6Modes.preferIpv6,
   };
 
   String describe(TranslationsEn t) => switch (this) {
+    ipv4Only => t.pages.settings.routing.ipv6Modes.ipv4OnlyDescription,
     preferIPv4 => t.pages.settings.routing.ipv6Modes.preferIpv4Description,
     preferIPv6 => t.pages.settings.routing.ipv6Modes.preferIpv6Description,
   };
@@ -125,12 +132,17 @@ enum DomainStrategy {
   };
 }
 
+/// The TUN's TCP/IP stack. [sing15] is sing-tun's own stack, the default since sing-box 1.15: the
+/// core then sends no `stack` option. The others are the legacy stacks, sent as chosen, kept for a
+/// user who needs one until sing-box 1.17 removes them.
 enum TunImplementation {
+  sing15,
   mixed,
   system,
   gvisor;
 
   String present(TranslationsEn t) => switch (this) {
+    sing15 => t.pages.settings.inbound.tunImplementations.sing15,
     mixed => t.pages.settings.inbound.tunImplementations.mixed,
     system => t.pages.settings.inbound.tunImplementations.system,
     gvisor => t.pages.settings.inbound.tunImplementations.gvisor,

@@ -515,11 +515,29 @@ class _PinnedOptions extends ConsumerWidget {
         divider,
         _MenuOption(
           title: routing.ipv6Route,
+          helpTitle: routing.ipv6RouteHelpTitle,
+          help: routing.ipv6RouteHelp,
           selected: ref.watch(ConfigOptions.ipv6Mode),
           choices: IPv6Mode.values,
           present: (value) => value.present(t),
           onSelected: ref.read(ConfigOptions.ipv6Mode.notifier).update,
           describe: (value) => value.describe(t),
+          // turning IPv6 on is the one choice that can break sites: say why first
+          confirm: (context, value) async {
+            if (value == IPv6Mode.ipv4Only || ref.read(ConfigOptions.ipv6Mode) != IPv6Mode.ipv4Only) return true;
+            final turnOn = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(routing.ipv6RouteTurnOnTitle),
+                content: SingleChildScrollView(child: Text(routing.ipv6RouteHelp)),
+                actions: [
+                  TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(MaterialLocalizations.of(context).cancelButtonLabel)),
+                  FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(routing.ipv6RouteTurnOn)),
+                ],
+              ),
+            );
+            return turnOn ?? false;
+          },
         ),
         const Divider(height: 3, thickness: 3),
       ],
@@ -536,9 +554,23 @@ class _MenuOption<T> extends HookWidget {
     required this.present,
     required this.onSelected,
     this.describe,
+    this.subtitle,
+    this.helpTitle,
+    this.help,
+    this.confirm,
   });
 
   final String title;
+
+  /// One short line under the title, shown whenever the picked choice's description is not.
+  final String? subtitle;
+
+  /// The longer story, behind a small info button next to the title.
+  final String? helpTitle;
+  final String? help;
+
+  /// Asked before a pick is applied; false leaves the setting as it was.
+  final Future<bool> Function(BuildContext context, T value)? confirm;
   final T selected;
   final List<T> choices;
   final String Function(T value) present;
@@ -558,8 +590,36 @@ class _MenuOption<T> extends HookWidget {
       return hide.cancel;
     }, [picked.value, selected]);
     return ListTile(
-      title: Text(title),
-      subtitle: describe != null && picked.value ? Text(describe!(selected)) : null,
+      title: help == null
+          ? Text(title)
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(title),
+                IconButton(
+                  icon: Icon(Icons.info_outline_rounded, size: 18, color: color),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  tooltip: helpTitle,
+                  onPressed: () => showDialog<void>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: helpTitle != null ? Text(helpTitle!) : null,
+                      content: SingleChildScrollView(child: Text(help!)),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(MaterialLocalizations.of(context).okButtonLabel)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+      subtitle: describe != null && picked.value
+          ? Text(describe!(selected))
+          : subtitle != null
+          ? Text(subtitle!, style: theme.textTheme.bodySmall?.copyWith(color: color))
+          : null,
       // the row takes the tap, so all of it ripples
       onTap: () => menu.currentState?.showButtonMenu(),
       trailing: IgnorePointer(
@@ -567,7 +627,9 @@ class _MenuOption<T> extends HookWidget {
         child: PopupMenuButton<T>(
           key: menu,
           position: PopupMenuPosition.under,
-          onSelected: (value) {
+          onSelected: (value) async {
+            if (confirm != null && !await confirm!(context, value)) return;
+            if (!context.mounted) return;
             picked.value = true;
             onSelected(value);
           },

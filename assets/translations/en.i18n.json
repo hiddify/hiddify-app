@@ -286,6 +286,9 @@
         "routeRule": {
           "add": "Add rule",
           "delete": "Delete rule",
+          "duplicate": "Duplicate rule",
+          "duplicated": "Copied as a new rule: edit it as you like",
+          "copyAll": "Copy all",
           "options": {
             "import": {
               "clipboard": "Import rules from clipboard",
@@ -316,10 +319,11 @@
             "validDomain": "Valid “Domain” like\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com or .ir",
             "validDomainSuffix": "Valid “Domain suffix” like\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "A built-in rule cannot be changed. Duplicate it and edit the copy.",
             "tileTitle(map)": {
               "name": "Name",
               "outbound": "Outbound if match",
-              "rule_set": "Rule set URL",
+              "rule_set": "URLset",
               "package_name": "Package names",
               "process_name": "Process names",
               "process_path": "Process paths",
@@ -363,10 +367,11 @@
           }
         },
         "builtinRules": {
-          "tag": "Built-in",
+          "tag": "Built-in rule",
           "bypassLan": "Bypass LAN",
-          "blockAds": "Block ads and malware",
-          "bypassRegion": "Bypass sites in $region"
+          "appleDirect": "Apple services",
+          "blockAds": "Ads and malware",
+          "bypassRegion": "Sites in $region"
         },
         "appBasedRouting": {
           "title": "App-based routing",
@@ -460,11 +465,17 @@
         },
         "resolveDestination": "Resolve destination",
         "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "Why is IPv6 off?",
+        "ipv6RouteTurnOnTitle": "Turn on IPv6?",
+        "ipv6RouteTurnOn": "Turn on",
+        "ipv6RouteHelp": "Most proxies have no IPv6 at their exit.\n\nA connection the proxy cannot carry dies right after it opens, and browsers never retry it over IPv4, so Google and YouTube fail to load.\n\nWhen on, every proxy is checked once at its connection test. IPv6 is used only through a proxy that carries it; everything else goes over IPv4, unnoticed.\n\nIPv6 always travels inside the VPN, never around it.",
         "ipv6Modes": {
-          "preferIpv4": "IPv4 first",
-          "preferIpv6": "IPv6 first",
-          "preferIpv4Description": "Names resolve to IPv4 first. IPv6 is used only through a proxy that carries it. Both go through the VPN.",
-          "preferIpv6Description": "Names resolve to IPv6 first through a proxy that carries it, else to IPv4. Both go through the VPN."
+          "ipv4Only": "Off (IPv4 only)",
+          "preferIpv4": "On, IPv4 first",
+          "preferIpv6": "On, IPv6 first",
+          "ipv4OnlyDescription": "Apps use IPv4 only. IPv6 is refused at once.",
+          "preferIpv4Description": "IPv4 first. IPv6 only through a proxy verified to carry it.",
+          "preferIpv6Description": "IPv6 first, only through a proxy verified to carry it."
         }
       },
       "dns": {
@@ -498,6 +509,7 @@
         "strictRoute": "Strict route",
         "tunImplementation": "TUN implementation",
         "tunImplementations": {
+          "sing15": "Sing 15",
           "mixed": "Mixed",
           "system": "System",
           "gvisor": "gVisor"
