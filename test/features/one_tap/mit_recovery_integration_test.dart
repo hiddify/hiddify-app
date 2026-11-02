@@ -63,11 +63,11 @@ class _Connections implements ConnectionRepository {
   TaskEither<ConnectionFailure, Unit> connect(ProfileEntity profile, bool disableMemoryLimit) => TaskEither(() async {
     starts.add(profile.id);
     return left(const ConnectionFailure.unexpected('synthetic failure'));
-  }, timeout: const Timeout(Duration(seconds: 30)));
+  });
   @override
   TaskEither<ConnectionFailure, Unit> disconnect() => TaskEither(() async {
     stops++; await pausedStop?.future; return right(unit);
-  }, timeout: const Timeout(Duration(seconds: 30)));
+  });
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -80,7 +80,7 @@ class _Profiles implements ProfileRepository {
   @override
   TaskEither<ProfileFailure, Unit> setAsActive(String id) => TaskEither(() async {
     changes++; select(id == 'backup' ? _backup : _primary); return right(unit);
-  }, timeout: const Timeout(Duration(seconds: 30)));
+  });
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
