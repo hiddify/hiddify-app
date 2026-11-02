@@ -78,6 +78,14 @@ const Map<String, Map<String, dynamic>> protocolSchemaValues = {
     "resolvers": ["8.8.8.8:53", "8.8.4.4:53"],
     "tunnel_per_resolver": 4,
   },
+  "masterdns": {
+    "type": "masterdns",
+    "tag": "masterdns-out",
+    "domains": ["v.example.com"],
+    "resolvers": ["8.8.8.8", "1.1.1.1"],
+    "encryption": "xor",
+    "key": "",
+  },
   "vless": {
     "type": "vless",
     "tag": "vless-out",
@@ -342,6 +350,7 @@ const Map<String, List<String>> possibleValues = {
   "config.outbounds.type": <String>[
     "vless",
     "dnstt",
+    "masterdns",
     "vmess",
     "trojan",
     "xray",
