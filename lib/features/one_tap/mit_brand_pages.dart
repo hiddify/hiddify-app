@@ -9,6 +9,7 @@ import 'package:hiddify/features/one_tap/mit_brand.dart';
 import 'package:hiddify/features/one_tap/mit_connection_controls.dart';
 import 'package:hiddify/features/one_tap/mit_release.dart';
 import 'package:hiddify/features/one_tap/mit_resilience_page.dart';
+import 'package:hiddify/features/one_tap/mit_resilience.dart';
 import 'package:hiddify/features/one_tap/vpn_profile.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
@@ -119,7 +120,8 @@ class MitProfilesSheet extends HookConsumerWidget {
     final profiles = ref.watch(profilesNotifierProvider);
     final status = ref.watch(connectionNotifierProvider);
     final busy = useState(false);
-    bool canEdit() => !busy.value && (ref.read(connectionNotifierProvider).valueOrNull?.isDisconnected ?? false);
+    bool canEdit() => !busy.value && !ref.read(mitRecoveryViewProvider).active &&
+        (ref.read(connectionNotifierProvider).valueOrNull?.isDisconnected ?? false);
 
     Future<void> select(ProfileEntity profile) async {
       if (!canEdit()) return;

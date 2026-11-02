@@ -97,7 +97,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   DateTime get recoveryTime => DateTime.now();
 
   final _recovery = MitRecoveryPlan();
-  bool _pollingRecovery = false, _recovering = false;
+  bool _pollingRecovery = false;
   String? _automaticProfileId;
 
   void _stopRecovery({String phase = 'idle'}) {
@@ -147,7 +147,6 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
           : !env.networkAvailable ? 'network' : current is Connected ? 'connected' : 'retry',
       );
       if (target == null || _singleStart.isRunning) return;
-      _recovering = true;
       var selected = profile;
       if (target != profile.id) {
         final repo = await ref.read(profileRepositoryProvider.future);
@@ -183,7 +182,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
         ref.read(mitRecoveryViewProvider.notifier).state = MitRecoveryView(
           active: true, phase: 'retry', attempt: _recovery.attempts);
       }
-    } finally { _recovering = false; _pollingRecovery = false; }
+    } finally { _pollingRecovery = false; }
   }
 
   Future<void> mayConnect() async {
@@ -260,7 +259,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   }
 
   Future<void> reconnect(ProfileEntity? profile) async {
-    if (supportsAutomaticRecovery && !_recovering) _stopRecovery();
+    if (supportsAutomaticRecovery) _stopRecovery();
     if (state case AsyncData(:final value) when value.isRunning) {
       if (profile == null) {
         loggy.info("no active profile, disconnecting");

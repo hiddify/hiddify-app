@@ -40,7 +40,7 @@ class OneTapHomePage extends HookConsumerWidget {
       if (busy.value || ref.read(mitRecoveryViewProvider).active || ref.read(connectionNotifierProvider).valueOrNull is! Disconnected) return;
       final input = await showDialog<String>(context: context, builder: (_) => const MitProfileImportDialog());
       if (input == null || !context.mounted) return;
-      if (ref.read(connectionNotifierProvider).valueOrNull is! Disconnected) return;
+      if (ref.read(mitRecoveryViewProvider).active || ref.read(connectionNotifierProvider).valueOrNull is! Disconnected) return;
       busy.value = true;
       try {
         final prepared = prepareVpnProfile(input);

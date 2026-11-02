@@ -168,4 +168,17 @@ void main() {
     expect(s.profiles.changes, 0);
     expect(s.connections.starts, ['primary', 'primary', 'primary']);
   });
+
+  testWidgets('manual profile action cancels a suspended automatic backup decision', (tester) async {
+    final s = await setup(tester);
+    await s.core.toggleConnection();
+    await tick(tester, s.core, 0); await tick(tester, s.core, 3); await tick(tester, s.core, 11);
+    s.connections.pausedStop = Completer<void>();
+    await tick(tester, s.core, 31);
+    await s.core.reconnect(_backup);
+    s.connections.pausedStop!.complete();
+    for (var i = 0; i < 8; i++) { await tester.pump(); }
+    expect(s.profiles.changes, 0);
+    expect(s.connections.starts, ['primary', 'primary', 'primary']);
+  });
 }
