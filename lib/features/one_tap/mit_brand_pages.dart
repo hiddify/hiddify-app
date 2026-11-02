@@ -125,6 +125,7 @@ class MitProfilesSheet extends HookConsumerWidget {
     final profiles = ref.watch(profilesNotifierProvider);
     final status = ref.watch(connectionNotifierProvider);
     final names = ref.watch(mitProfileNamesProvider);
+    final recovery = ref.watch(mitRecoveryViewProvider);
     final busy = useState(false);
     bool canEdit() => !busy.value && !ref.read(mitRecoveryViewProvider).active &&
         (ref.read(connectionNotifierProvider).valueOrNull?.isDisconnected ?? false);
@@ -171,11 +172,13 @@ class MitProfilesSheet extends HookConsumerWidget {
       final name = await showDialog<String>(context: context,
         builder: (_) => _MitRenameDialog(initial: names[profile.id] ?? ''));
       if (name == null || !context.mounted || !canEdit()) return;
+      busy.value = true;
       try { await ref.read(mitProfileNamesProvider.notifier).rename(profile.id, name); }
       catch (_) { if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Не удалось сохранить название.'))); }
+      finally { if (context.mounted) busy.value = false; }
     }
 
-    final enabled = !busy.value && (status.valueOrNull?.isDisconnected ?? false);
+    final enabled = !busy.value && !recovery.active && (status.valueOrNull?.isDisconnected ?? false);
     return Theme(data: mitTheme(), child: Material(color: mitBackground, child: SafeArea(child: SizedBox(
       height: MediaQuery.sizeOf(context).height * .65,
       child: Column(children: [

@@ -12,9 +12,11 @@ import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/one_tap/mit_brand.dart';
 import 'package:hiddify/features/one_tap/mit_release.dart';
 import 'package:hiddify/features/one_tap/mit_brand_pages.dart';
+import 'package:hiddify/features/one_tap/mit_profile_names.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class _LegalBundle extends CachingAssetBundle {
   @override
@@ -87,11 +89,12 @@ void main() {
     expect(tester.widget<SelectableText>(find.byType(SelectableText)).data, contains('Source Code Availability'));
   });
 
-  Future<void> openProfiles(WidgetTester tester, _Core core, _Profiles profiles) async {
+  Future<void> openProfiles(WidgetTester tester, _Core core, _Profiles profiles, {MitProfileNames? names}) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [
         connectionNotifierProvider.overrideWith(() => core),
         profilesNotifierProvider.overrideWith(() => profiles),
+        if (names != null) mitProfileNamesProvider.overrideWith((ref) => names),
       ],
       child: MaterialApp(home: Builder(builder: (context) => Scaffold(body: TextButton(
         onPressed: () => showModalBottomSheet<void>(context: context, isScrollControlled: true, builder: (_) => const MitProfilesSheet()),
@@ -109,6 +112,21 @@ void main() {
     await tester.tap(find.text('Профиль 1'));
     await tester.pumpAndSettle();
     expect(profiles.selections, 1);
+  });
+
+  testWidgets('rename persists an alias without changing profile or active selection', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final names = MitProfileNames(await SharedPreferences.getInstance());
+    final profiles = _Profiles(); final core = _Core(const Disconnected());
+    await openProfiles(tester, core, profiles, names: names);
+    await tester.tap(find.byTooltip('Название профиля')); await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Дом');
+    await tester.tap(find.text('Сохранить')); await tester.pumpAndSettle();
+    expect(names.state, {'synthetic': 'Дом'});
+    expect(find.text('Дом'), findsOneWidget);
+    expect(profiles.selections, 0); expect(profiles.deletions, 0);
+    core.emit(const Connected()); await tester.pumpAndSettle();
+    expect(tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.edit_outlined)).onPressed, isNull);
   });
 
   testWidgets('profile deletion requires confirmation and rechecks live VPN state', (tester) async {
