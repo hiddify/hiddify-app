@@ -231,6 +231,7 @@ class DialogNotifier extends _$DialogNotifier {
     required List<T> options,
     required String Function(T e) getTitle,
     VoidCallback? onReset,
+    Widget? Function(T e)? getSecondary,
   }) async {
     return await _show<T?>(
       SettingPickerDialog(
@@ -240,6 +241,7 @@ class DialogNotifier extends _$DialogNotifier {
         options: options,
         getTitle: getTitle,
         onReset: onReset,
+        getSecondary: getSecondary,
       ),
     );
   }

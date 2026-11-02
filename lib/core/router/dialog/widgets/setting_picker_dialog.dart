@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/widget/arrow_keys_move_focus.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -14,6 +15,7 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
     required this.options,
     required this.getTitle,
     this.onReset,
+    this.getSecondary,
   });
 
   final String title;
@@ -22,6 +24,9 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
   final List<T> options;
   final String Function(T e) getTitle;
   final VoidCallback? onReset;
+
+  /// A picture at the end of an option's row, such as a flag; [showFlag] reads one from the title.
+  final Widget? Function(T e)? getSecondary;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,16 +38,20 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
         child: RadioGroup<T>(
           groupValue: selected,
           onChanged: (value) => context.pop(value),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: options.map((e) {
-              final title = getTitle(e);
-              return RadioListTile<T>(
-                title: Text(title),
-                secondary: showFlag ? ChoicePreferenceWidget.flagByTitle(title) : null,
-                value: e,
-              );
-            }).toList(),
+          child: ArrowKeysMoveFocus(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: options.map((e) {
+                final title = getTitle(e);
+                return RadioListTile<T>(
+                  title: Text(title),
+                  secondary: getSecondary?.call(e) ?? (showFlag ? ChoicePreferenceWidget.flagByTitle(title) : null),
+                  value: e,
+                  // the remote starts on the current choice
+                  autofocus: e == selected,
+                );
+              }).toList(),
+            ),
           ),
         ),
       ),

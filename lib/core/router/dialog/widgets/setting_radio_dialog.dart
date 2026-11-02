@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/widget/arrow_keys_move_focus.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingRadioDialog<T> extends ConsumerWidget {
@@ -36,9 +37,13 @@ class SettingRadioDialog<T> extends ConsumerWidget {
           child: RadioGroup<T>(
             groupValue: value,
             onChanged: (selected) => context.pop(selected),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: values.map((e) => RadioListTile<T>(title: Text(textWithTranslation(e)), value: e)).toList(),
+            child: ArrowKeysMoveFocus(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: values
+                    .map((e) => RadioListTile<T>(title: Text(textWithTranslation(e)), value: e, autofocus: e == value))
+                    .toList(),
+              ),
             ),
           ),
         ),
