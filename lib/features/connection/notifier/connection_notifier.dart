@@ -2,6 +2,7 @@ import 'package:hiddify/features/one_tap/one_tap_policy.dart';
 import 'package:hiddify/features/one_tap/mit_resilience.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'dart:async';
+import 'package:meta/meta.dart';
 import 'dart:io';
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
@@ -30,7 +31,7 @@ part 'connection_notifier.g.dart';
 class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   @override
   Stream<ConnectionStatus> build() async* {
-    if (oneTapVpnEnabled) {
+    if (supportsAutomaticRecovery) {
       ref.listen(MitResiliencePreferences.autoRecovery, (_, enabled) {
         if (!enabled) _stopRecovery();
       });
@@ -59,7 +60,10 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
 
     ref.listen(activeProfileProvider.select((value) => value.asData?.value), (previous, next) async {
       if (previous == null) return;
-      if (oneTapVpnEnabled && _recovering) return;
+      if (supportsAutomaticRecovery && next?.id == _automaticProfileId && _automaticProfileId != null) {
+        _automaticProfileId = null;
+        return;
+      }
       final shouldReconnect = next == null || previous.id != next.id;
       if (shouldReconnect) {
         await reconnect(next);
@@ -87,17 +91,23 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
 
   ConnectionRepository get _connectionRepo => ref.read(connectionRepositoryProvider);
 
+  @visibleForTesting
+  bool get supportsAutomaticRecovery => oneTapVpnEnabled;
+  @visibleForTesting
+  DateTime get recoveryTime => DateTime.now();
+
   final _recovery = MitRecoveryPlan();
   bool _pollingRecovery = false, _recovering = false;
+  String? _automaticProfileId;
 
   void _stopRecovery({String phase = 'idle'}) {
-    if (!oneTapVpnEnabled) return;
+    if (!supportsAutomaticRecovery) return;
     _recovery.cancel();
     ref.read(mitRecoveryViewProvider.notifier).state = MitRecoveryView(phase: phase, attempt: _recovery.attempts);
   }
 
   Future<void> _armRecovery() async {
-    if (!oneTapVpnEnabled || !ref.read(MitResiliencePreferences.autoRecovery)) return;
+    if (!supportsAutomaticRecovery || !ref.read(MitResiliencePreferences.autoRecovery)) return;
     final epoch = _connectEpoch;
     try {
       final env = await ref.read(mitVpnPlatformProvider).environment();
@@ -128,7 +138,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       if (!_recovery.armed || generation != _recovery.generation) return;
       if (profile == null) { _stopRecovery(); return; }
       if (_singleStart.isRunning && current is! Connected) return;
-      final target = _recovery.next(now: DateTime.now(), status: current, environment: env,
+      final target = _recovery.next(now: recoveryTime, status: current, environment: env,
         currentProfile: profile.id, backups: ref.read(MitResiliencePreferences.backupProfiles));
       ref.read(mitRecoveryViewProvider.notifier).state = MitRecoveryView(
         active: _recovery.armed && (current is! Connected || !env.networkAvailable),
@@ -150,7 +160,9 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
         final stopped = await _connectionRepo.disconnect().run();
         if (stopped.isLeft()) { _stopRecovery(phase: 'blocked'); return; }
         if (!_recovery.armed || generation != _recovery.generation) return;
+        _automaticProfileId = backup.id;
         final changed = await repo.setAsActive(backup.id).run();
+        if (changed.isLeft()) _automaticProfileId = null;
         if (changed.isLeft() || !_recovery.armed || generation != _recovery.generation) return;
         selected = backup;
       } else if (current is! Disconnected) {
@@ -208,7 +220,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   }
 
   Future<void> toggleConnection() async {
-    if (oneTapVpnEnabled && _recovery.armed && state.valueOrNull is Disconnected) {
+    if (supportsAutomaticRecovery && _recovery.armed && state.valueOrNull is Disconnected) {
       _stopRecovery();
       await ref.read(Preferences.startedByUser.notifier).update(false);
       await _disconnect();
@@ -248,7 +260,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   }
 
   Future<void> reconnect(ProfileEntity? profile) async {
-    if (oneTapVpnEnabled && !_recovering) _stopRecovery();
+    if (supportsAutomaticRecovery && !_recovering) _stopRecovery();
     if (state case AsyncData(:final value) when value.isRunning) {
       if (profile == null) {
         loggy.info("no active profile, disconnecting");
@@ -330,7 +342,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       // Prefer Disconnected(failure) over AsyncError so the button shows failed + details,
       // and a late bare Disconnected from the status stream is less likely to erase it.
       state = AsyncData(Disconnected(err));
-      if (oneTapVpnEnabled && _recovery.armed) {
+      if (supportsAutomaticRecovery && _recovery.armed) {
         ref.read(mitRecoveryViewProvider.notifier).state = MitRecoveryView(active: true, phase: 'retry', attempt: _recovery.attempts);
       }
       if (!automatic) await dialogs.showCustomAlertFromErr(oneTapVpnEnabled ? (type: 'Ошибка VPN', message: 'Проверьте сеть, профиль и разрешение Android VPN.') : err.present(t));
@@ -338,7 +350,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       if (!oneTapVpnEnabled && err.toString().contains("panic")) {
         await Sentry.captureException(Exception(err.toString()));
       }
-      if (!oneTapVpnEnabled || !_recovery.armed) await startedByUser.update(false);
+      if (!supportsAutomaticRecovery || !_recovery.armed) await startedByUser.update(false);
     }).run();
   }
 
