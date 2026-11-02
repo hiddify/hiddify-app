@@ -27,7 +27,7 @@ Color healthColor(BuildContext context, HealthState state) {
 
 IconData chainIcon(ChainType type) => switch (type) {
   ChainType.extraSecurity => Icons.shield_rounded,
-  ChainType.unblocker => Icons.lock_open_rounded,
+  ChainType.unblocker => Icons.meeting_room_rounded,
 };
 
 /// What a working step shows: the server's name and its ping.

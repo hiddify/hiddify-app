@@ -19,7 +19,7 @@ class ChainModeIcon extends HookConsumerWidget {
 }
 
 /// A chain type's icon, as on the home proxy card: extra security's shield with an orbiting light,
-/// unblocker's rocking key. Still and grey while [animate] is false.
+/// unblocker's door, opening. Still and grey while [animate] is false.
 class ChainTypeIcon extends StatelessWidget {
   const ChainTypeIcon({super.key, required this.type, required this.mode, this.animate = true});
 
@@ -36,7 +36,8 @@ class ChainTypeIcon extends StatelessWidget {
       child: switch (type) {
         ChainType.extraSecurity =>
           animate ? _OrbitShield(main, accent) : Icon(Icons.shield_rounded, size: 17, color: still),
-        ChainType.unblocker => animate ? _RockingKey(main) : Icon(Icons.key_rounded, size: 18, color: still),
+        ChainType.unblocker =>
+          animate ? OpeningDoor(size: 18, color: main) : Icon(Icons.meeting_room_rounded, size: 18, color: still),
       },
     );
     // the loop repaints these 22 px alone, not the card or the page round them
@@ -140,23 +141,81 @@ class _OrbitPainter extends CustomPainter {
   bool shouldRepaint(_OrbitPainter old) => old.angle != angle || old.front != front || old.light != light;
 }
 
-/// Unblocker: the key rocks gently back and forth, never stopping, once every 6 s.
-class _RockingKey extends StatelessWidget {
-  const _RockingKey(this.main);
-  final Color main;
+/// The unblocker's door, swinging open on its left hinge toward the viewer, staying open a while,
+/// shutting and resting, over and over: the door gets through, where a lock would only guard.
+class OpeningDoor extends StatelessWidget {
+  const OpeningDoor({super.key, required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  /// How open the door is at [v] of a loop: opens in the first third, stays open, shuts, rests.
+  static double _loop(double v) => switch (v) {
+    < .3 => Curves.easeOutBack.transform(v / .3).clamp(0, 1.05),
+    < .7 => 1,
+    < .85 => 1 - Curves.easeInCubic.transform((v - .7) / .15),
+    _ => 0,
+  };
 
   @override
   Widget build(BuildContext context) => Animate(
     onPlay: (c) => c.repeat(),
     effects: [
       CustomEffect(
-        duration: 6000.ms,
-        builder: (context, v, child) => Transform.rotate(
-          angle: -sin(v * 2 * pi) * .22,
-          child: Icon(Icons.key_rounded, size: 18, color: main),
+        duration: 3600.ms,
+        builder: (context, v, child) => CustomPaint(
+          size: Size.square(size),
+          painter: _DoorPainter(open: _loop(v), color: color),
         ),
       ),
     ],
-    child: const SizedBox.square(dimension: 22),
+    child: SizedBox.square(dimension: size),
   );
+}
+
+/// The frame, and the door in it turned by [open] (0 shut, 1 about 63° open), on a 24 px grid.
+class _DoorPainter extends CustomPainter {
+  _DoorPainter({required this.open, required this.color});
+  final double open;
+  final Color color;
+
+  static const _frame = Rect.fromLTRB(5, 3, 19, 21);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.scale(size.width / 24);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(_frame, const Radius.circular(1)),
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.8,
+    );
+    // light through the doorway, brighter the wider it opens
+    canvas.drawRect(_frame.deflate(.9), Paint()..color = color.withValues(alpha: .3 * open.clamp(0, 1)));
+    // the door turns toward the viewer: narrower, and its free edge taller, as it opens
+    final angle = open * 1.1;
+    final edge = _frame.left + _frame.width * cos(angle);
+    final grow = 2.4 * sin(angle);
+    canvas.saveLayer(Offset.zero & const Size.square(24), Paint());
+    canvas.drawPath(
+      Path()
+        ..moveTo(_frame.left, _frame.top)
+        ..lineTo(edge, _frame.top - grow)
+        ..lineTo(edge, _frame.bottom + grow)
+        ..lineTo(_frame.left, _frame.bottom)
+        ..close(),
+      Paint()..color = color,
+    );
+    // the knob, cut out of the door near its free edge
+    canvas.drawCircle(
+      Offset(edge - 2.4 * cos(angle), _frame.center.dy),
+      1.2 * max(cos(angle), .45),
+      Paint()..blendMode = BlendMode.clear,
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_DoorPainter old) => old.open != open || old.color != color;
 }

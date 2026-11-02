@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -115,6 +116,7 @@ class ConnectionButton extends HookConsumerWidget {
           ? ref.watch(activeProxyCardProvider.select((card) => card?.hopStatus == null ? null : card))
           : null,
       onHop: ref.read(bottomSheetsNotifierProvider.notifier).showConnectionHealth,
+      hopLabel: health == null ? '' : '$chainName: ${_hopLabel(h, health)}',
       buttonColor: switch (look) {
         _Look.connected when degraded => _degradedColor,
         // the traffic waits for the chain hop: still on its way
@@ -176,6 +178,13 @@ class ConnectionButton extends HookConsumerWidget {
   /// Connected, but the traffic does not get through: amber, between connected and failed.
   static const _degradedColor = Color(0xFFE3A63A);
 
+  static String _hopLabel(TranslationsConnectionHealthEn h, ConnectionHealth health) => switch (health.hopState) {
+    HealthState.ok => h.hopReady,
+    HealthState.pending => h.hopConnecting,
+    HealthState.blocked => h.hopBlocked,
+    HealthState.failed => health.hopNoReply ? h.hopNoReply : h.hopBroken,
+  };
+
   /// Connects, or sends the user to add a profile when there is none.
   Future<void> _connect(WidgetRef ref) async {
     final dialogs = ref.read(dialogNotifierProvider.notifier);
@@ -203,6 +212,7 @@ class _ConnectionButton extends HookWidget {
     required this.searching,
     required this.hop,
     required this.onHop,
+    required this.hopLabel,
     required this.buttonColor,
     required this.image,
     required this.useImage,
@@ -229,6 +239,9 @@ class _ConnectionButton extends HookWidget {
 
   /// Opens the connection check.
   final VoidCallback onHop;
+
+  /// What the badge says to a screen reader and in its tooltip: the chain and its state.
+  final String hopLabel;
   final Color buttonColor;
   final AssetGenImage image;
   final bool useImage;
@@ -406,7 +419,7 @@ class _ConnectionButton extends HookWidget {
                       center: const Offset(_size / 2, _size / 2) + Offset.fromDirection(5 * math.pi / 4, _size / 2),
                       radius: _ChainBadge.size / 2,
                     ),
-                    child: _ChainBadge(hop, onTap: onHop),
+                    child: _ChainBadge(hop, label: hopLabel, onTap: onHop),
                   ),
               ],
             ),
@@ -433,71 +446,120 @@ class _ConnectionButton extends HookWidget {
   }
 }
 
-/// The chain hop on the button: its animated icon on a white disc, ringed by its state. A ring
-/// that turns while it connects, green once up, red when it fails, grey while it waits for the
-/// selected proxy; the icon stops and turns grey then. Opens the connection check.
+/// The chain hop on the button: its glyph alone, outlined in the button's face color so it reads
+/// on the button and on the page. Filled with a check once up, an outline that breathes while it
+/// connects, red with a cross when it fails, grey while it waits for the selected proxy. Opens the
+/// connection check.
 class _ChainBadge extends StatelessWidget {
-  const _ChainBadge(this.card, {required this.onTap});
+  const _ChainBadge(this.card, {required this.label, required this.onTap});
   final ActiveProxyCardData card;
+  final String label;
   final VoidCallback onTap;
 
-  static const size = 46.0;
+  static const size = 56.0;
+
+  ChainType get _type => card.chain.isUnblocker() ? ChainType.unblocker : ChainType.extraSecurity;
+
+  IconData get _glyph => switch ((_type, card.hopStatus!)) {
+    (ChainType.extraSecurity, StepStatus.connected) => Icons.gpp_good_rounded,
+    (ChainType.extraSecurity, StepStatus.failed) => Icons.gpp_bad_rounded,
+    (ChainType.extraSecurity, _) => Icons.shield_outlined,
+    // a door, not a lock: the unblocker gets the proxy through, it does not secure it. Open (drawn
+    // by OpeningDoor) on its way and once up, shut while it waits or fails.
+    (ChainType.unblocker, StepStatus.connected || StepStatus.connecting || StepStatus.slow) =>
+      Icons.meeting_room_rounded,
+    (ChainType.unblocker, _) => Icons.door_front_door_rounded,
+  };
+
+  Widget _glyphWidget(StepStatus status) => switch ((_type, status)) {
+    // the door keeps opening, as on the proxy card
+    (ChainType.unblocker, StepStatus.connecting || StepStatus.slow || StepStatus.connected) => OpeningDoor(
+      size: _glyphSize,
+      color: Colors.white,
+    ),
+    _ => Icon(_glyph, size: _glyphSize, color: Colors.white),
+  };
+
+  /// The solid shape under the glyph: the white seal that strokes it and fills its cut-outs. The
+  /// door sits on a disc, smaller to stay inside it.
+  IconData get _seal => _type == ChainType.extraSecurity ? Icons.shield_rounded : Icons.circle;
+  double get _glyphSize => _type == ChainType.extraSecurity ? 40 : 30;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final status = card.hopStatus!;
-    final type = card.chain.isUnblocker() ? ChainType.unblocker : ChainType.extraSecurity;
-    final down = status == StepStatus.waiting || status == StepStatus.failed;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+    final (main, accent) = _type.colors(card.hopMode);
+    // a gradient in the chain's own colors; red when it fails, grey while it waits
+    final (from, to) = switch (status) {
+      StepStatus.failed => (const Color(0xFFFF6B6B), theme.colorScheme.error),
+      StepStatus.waiting => (theme.colorScheme.outline, theme.colorScheme.outlineVariant),
+      _ => (main, accent),
+    };
+    const face = Color(0xFFF7F7F9);
+    Widget glyph = SizedBox.square(
+      dimension: size,
       child: Stack(
+        alignment: Alignment.center,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFFF7F7F9),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: .25), blurRadius: 6, offset: const Offset(0, 2)),
-              ],
-            ),
+          // the seal: a little larger than the glyph, so it reads as a white stroke, with a soft
+          // glow in the state's color
+          Icon(
+            _seal,
+            size: 50,
+            color: face,
+            shadows: [
+              Shadow(color: from.withValues(alpha: status == StepStatus.waiting ? .2 : .55), blurRadius: 14),
+              Shadow(color: Colors.black.withValues(alpha: .25), blurRadius: 4, offset: const Offset(0, 2)),
+            ],
+          ),
+          ShaderMask(
+            blendMode: BlendMode.srcIn,
+            shaderCallback: (rect) => LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [from, to],
+            ).createShader(rect),
+            child: _glyphWidget(status),
+          ),
+        ],
+      ),
+    );
+    glyph = switch (status) {
+      // once up, a light sweeps across it now and then
+      StepStatus.connected =>
+        glyph
+            .animate(onPlay: (c) => c.repeat())
+            .shimmer(delay: 2500.ms, duration: 1200.ms, color: Colors.white.withValues(alpha: .7)),
+      // on its way: the door opening says so; the shield breathes
+      StepStatus.connecting || StepStatus.slow when _type == ChainType.unblocker => glyph,
+      StepStatus.connecting || StepStatus.slow =>
+        glyph
+            .animate(onPlay: (c) => c.repeat(reverse: true))
+            .scaleXY(begin: .92, end: 1.04, duration: 900.ms, curve: Curves.easeInOut),
+      // failed: one short shake to catch the eye
+      StepStatus.failed => glyph.animate().shake(hz: 4, rotation: .06, duration: 500.ms),
+      StepStatus.waiting => glyph,
+    };
+    return Semantics(
+      button: true,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          // its shimmer and breathing repaint the badge alone, not the button and the page
+          child: RepaintBoundary(
             child: Center(
-              child: SizedBox.square(
-                dimension: 30,
-                child: FittedBox(
-                  child: ChainTypeIcon(type: type, mode: card.hopMode, animate: !down),
-                ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                transitionBuilder: (child, a) => ScaleTransition(scale: a, child: child),
+                child: KeyedSubtree(key: ValueKey(_glyph), child: glyph),
               ),
             ),
           ),
-          Positioned.fill(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: switch (status) {
-                StepStatus.connecting || StepStatus.slow => CircularProgressIndicator(
-                  key: const ValueKey('connecting'),
-                  strokeWidth: 3,
-                  color: theme.colorScheme.primary,
-                ),
-                _ => Container(
-                  key: ValueKey(status),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      width: 3,
-                      color: switch (status) {
-                        StepStatus.connected => theme.extension<ConnectionButtonTheme>()!.connectedColor!,
-                        StepStatus.failed => theme.colorScheme.error,
-                        _ => theme.colorScheme.outline,
-                      },
-                    ),
-                  ),
-                ),
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

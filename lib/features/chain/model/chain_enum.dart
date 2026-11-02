@@ -59,7 +59,7 @@ enum ChainTimelineLevel {
     ChainTimelineLevel.app => ChainConst.iconByPlatform(),
     ChainTimelineLevel.extraSecurity => Icons.security_rounded,
     ChainTimelineLevel.mainProfile => Icons.lan_rounded,
-    ChainTimelineLevel.unblocker => Icons.lock_open_rounded,
+    ChainTimelineLevel.unblocker => Icons.meeting_room_rounded,
     ChainTimelineLevel.filtering => Icons.wifi_rounded,
   };
 
