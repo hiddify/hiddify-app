@@ -55,7 +55,7 @@ class LanSharingPreferenceWidget extends HookConsumerWidget {
     }
 
     return ListTile(
-      leading: showLeading ? const Icon(Icons.share_rounded) : null,
+      leading: showLeading ? const Icon(Icons.share_rounded, size: 28) : null,
       title: Text(t.pages.settings.inbound.lanSharing),
       onTap: () => setEnabled(!enabled),
       trailing: Row(

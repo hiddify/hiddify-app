@@ -518,7 +518,7 @@
         "tproxyPort": "Transparent proxy port",
         "directPort": "Direct port",
         "redirectPort": "Redirect port",
-        "lanSharing": "Secure VPN sharing",
+        "lanSharing": "Share on local network",
         "qrCode": "QR code",
         "lanQrSubtitle": "SOCKS5 proxy"
       },
@@ -543,6 +543,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "Off",
+          "extraSecurity": {
+            "title": "Extra security",
+            "subtitle": "When you don't trust the proxy",
+            "ipBy": "Your IP is set by $mode",
+            "notTracked": "Your VPN provider can't see your traffic",
+            "forPublic": "Good for public and anonymous proxies",
+            "slower": "May reduce speed"
+          },
+          "unblocker": {
+            "title": "Proxy unblocker",
+            "subtitle": "Gets the proxy past filtering",
+            "mayConnect": "A filtered proxy may connect",
+            "personalOnly": "Only useful for a personal proxy",
+            "notForPublic": "Not suited to public proxies",
+            "slower": "The proxy gets a bit slower"
+          }
+        },
         "title": "Chain",
         "subtitle": "Extra security & unblocker",
         "finalIp": "Final IP",

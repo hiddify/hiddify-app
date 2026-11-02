@@ -518,7 +518,7 @@
         "tproxyPort": "پورت پروکسی شفاف",
         "directPort": "پورت مستقیم",
         "redirectPort": "پورت تغییر مسیر",
-        "lanSharing": "اشتراک امن VPN",
+        "lanSharing": "اشتراک در شبکهٔ محلی",
         "qrCode": "کد QR",
         "lanQrSubtitle": "پروکسی SOCKS5"
       },
@@ -543,6 +543,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "خاموش",
+          "extraSecurity": {
+            "title": "امنیت بیشتر",
+            "subtitle": "وقتی به پروکسی اعتماد نداری",
+            "ipBy": "IP شما را $mode تعیین می‌کند",
+            "notTracked": "ارائه‌دهندهٔ VPN شما را نمی‌بیند",
+            "forPublic": "مناسب پروکسی عمومی و ناشناس",
+            "slower": "ممکن است سرعت کم شود"
+          },
+          "unblocker": {
+            "title": "رفع فیلتر پروکسی",
+            "subtitle": "عبور از فیلترینگ پروکسی",
+            "mayConnect": "شاید پروکسی فیلترشده وصل شود",
+            "personalOnly": "فقط برای پروکسی شخصی مفید است",
+            "notForPublic": "مناسب پروکسی عمومی نیست",
+            "slower": "سرعت پروکسی کمی کم می‌شود"
+          }
+        },
         "title": "زنجیره",
         "subtitle": "امنیت بیشتر و رفع مسدودیت",
         "finalIp": "IP نهایی",
