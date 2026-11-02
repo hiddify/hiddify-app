@@ -130,6 +130,10 @@ class BoxService(
                 Action.SERVICE_CLOSE -> {
                     stopService()
                 }
+                Action.SERVICE_USER_CLOSE -> {
+                    com.hiddify.hiddify.MitVpnSession.stopEpoch.incrementAndGet()
+                    stopService()
+                }
 
                 PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -148,7 +152,7 @@ class BoxService(
     /// Mode last passed to Mobile.setup for the VPN gRPC server (2 mTLS / 4 insecure).
     private var grpcSetupMode: Long = 4L
 
-    private suspend fun startService() {
+    private suspend fun startService(startCore: Boolean = Settings.startCoreAfterStartingService) {
         try {
             status.postValue(Status.Starting)
             Log.d(TAG, "starting service")
@@ -198,7 +202,7 @@ class BoxService(
             }
             status.postValue(Status.Started)
 
-            if (Settings.startCoreAfterStartingService){
+            if (startCore){
                 Mobile.start("","")
                 }
 //            if (delayStart) {
@@ -345,7 +349,10 @@ class BoxService(
 
     @OptIn(DelicateCoroutinesApi::class)
     @Suppress("SameReturnValue")
-    internal fun onStartCommand(): Int {
+    internal fun onStartCommand(restoreCore: Boolean = false): Int {
+        // A system always-on start has no Flutter RPC caller to start the core.
+        // Mobile.start("", "") restores the last request and options from the core DB.
+        val shouldStartCore = restoreCore || Settings.startCoreAfterStartingService
         // Already up or starting: ignore duplicate start intents.
         if (status.value == Status.Started || status.value == Status.Starting) {
             return Service.START_NOT_STICKY
@@ -362,7 +369,8 @@ class BoxService(
                 if (status.value == Status.Stopped) {
                     ContextCompat.startForegroundService(
                         Application.application,
-                        Intent(Application.application, Settings.serviceClass()),
+                        Intent(Application.application, Settings.serviceClass())
+                            .putExtra("MIT_UI_SETUP", !shouldStartCore),
                     )
                 }
             }
@@ -373,6 +381,7 @@ class BoxService(
         if (!receiverRegistered) {
             ContextCompat.registerReceiver(service, receiver, IntentFilter().apply {
                 addAction(Action.SERVICE_CLOSE)
+                addAction(Action.SERVICE_USER_CLOSE)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
                 }
@@ -389,7 +398,7 @@ class BoxService(
 //                stopAndAlert(Alert.StartCommandServer, e.message)
 //                return@launch
 //            }
-            startService()
+            startService(startCore = shouldStartCore)
         }
         return Service.START_NOT_STICKY
     }

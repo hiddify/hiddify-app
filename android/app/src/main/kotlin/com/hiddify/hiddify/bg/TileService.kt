@@ -55,6 +55,7 @@ class TileService : TileService(), ServiceConnection.Callback {
                 }
             }
             Status.Started -> {
+                com.hiddify.hiddify.MitVpnSession.stopEpoch.incrementAndGet()
                 BoxService.stop()
                 qsTile?.apply {
                     state = Tile.STATE_INACTIVE

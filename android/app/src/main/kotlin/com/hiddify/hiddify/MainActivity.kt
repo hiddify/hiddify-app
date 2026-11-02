@@ -94,6 +94,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
                 }
             }
             val intent = Intent(Application.application, Settings.serviceClass())
+                .putExtra("MIT_UI_SETUP", true)
             withContext(Dispatchers.Main) {
                 val started = runCatching { ContextCompat.startForegroundService(this@MainActivity, intent) }
                     .onFailure { onServiceAlert(Alert.StartService, it.message) }

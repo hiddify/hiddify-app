@@ -8,6 +8,7 @@ import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/one_tap/mit_brand.dart';
 import 'package:hiddify/features/one_tap/mit_connection_controls.dart';
 import 'package:hiddify/features/one_tap/mit_release.dart';
+import 'package:hiddify/features/one_tap/mit_resilience_page.dart';
 import 'package:hiddify/features/one_tap/vpn_profile.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
@@ -56,6 +57,9 @@ class MitSettingsPage extends ConsumerWidget {
         onTap: () => ref.read(bottomSheetsNotifierProvider.notifier).showProfilesOverview()),
       const Divider(),
       const ListTile(leading: Icon(Icons.alt_route, color: mitGreen), title: Text('Умный маршрут'), subtitle: Text('Россия и локальная сеть — напрямую. Остальной трафик — VPN.')),
+      ListTile(leading: const Icon(Icons.shield_outlined, color: mitGreen), title: const Text('Защита и восстановление'),
+        subtitle: const Text('Повторы, резервные профили и безопасный отчёт'),
+        onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const MitResiliencePage()))),
       const LocalePrefTile(),
       const EnableAnalyticsPrefTile(),
       const Divider(),

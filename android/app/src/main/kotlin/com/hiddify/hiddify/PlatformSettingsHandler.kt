@@ -96,6 +96,45 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
     @SuppressLint("BatteryLife")
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            "mit_vpn_environment" -> {
+                try {
+                    val ctx = Application.application
+                    val cm = Application.connectivity
+                    val online = cm.allNetworks.any { network ->
+                        val caps = cm.getNetworkCapabilities(network)
+                        caps != null && caps.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                            !caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_VPN)
+                    }
+                    result.success(com.hiddify.hiddify.bg.VPNService.protectionStatus() + mapOf(
+                        "networkAvailable" to online,
+                        "permissionGranted" to (android.net.VpnService.prepare(ctx) == null),
+                        "stopEpoch" to MitVpnSession.stopEpoch.get(),
+                    ))
+                } catch (_: Exception) {
+                    result.error("MIT_VPN_STATE", "VPN state unavailable", null)
+                }
+            }
+            "mit_open_vpn_settings", "mit_open_battery_settings" -> {
+                val host = activity
+                if (host == null) {
+                    result.error("MIT_NO_ACTIVITY", "Settings unavailable", null)
+                } else {
+                    host.runOnUiThread {
+                        try {
+                            val intent = if (call.method == "mit_open_vpn_settings") {
+                                Intent(android.provider.Settings.ACTION_VPN_SETTINGS)
+                            } else {
+                                Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    Uri.parse("package:${Application.application.packageName}"))
+                            }
+                            host.startActivity(intent)
+                            result.success(null)
+                        } catch (_: Exception) {
+                            result.error("MIT_SETTINGS", "Settings unavailable", null)
+                        }
+                    }
+                }
+            }
             Trigger.IsIgnoringBatteryOptimizations.method -> {
                 result.runCatching {
                     success(

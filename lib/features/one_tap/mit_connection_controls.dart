@@ -15,6 +15,7 @@ class MitConnectionControls extends StatelessWidget {
     required this.hasError,
     required this.importing,
     required this.onPressed,
+    this.recoveryLabel,
   });
 
   final ConnectionStatus? status;
@@ -22,6 +23,7 @@ class MitConnectionControls extends StatelessWidget {
   final bool hasError;
   final bool importing;
   final VoidCallback? onPressed;
+  final String? recoveryLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +33,8 @@ class MitConnectionControls extends StatelessWidget {
     });
     final (label, action, color) = importing
         ? ('Проверка профиля…', 'Подождите', const Color(0xFFFFCA70))
+        : recoveryLabel != null
+        ? (recoveryLabel!, 'Отключить', const Color(0xFFFFCA70))
         : failed
         ? ('Не удалось подключиться', hasProfile ? 'Повторить' : 'Добавить профиль', const Color(0xFFFF8E8E))
         : switch (status) {

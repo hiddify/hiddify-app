@@ -94,7 +94,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
                     0, service.getText(R.string.stop), PendingIntent.getBroadcast(
                         service,
                         0,
-                        Intent(Action.SERVICE_CLOSE).setPackage(Application.application.packageName),
+                        Intent(Action.SERVICE_USER_CLOSE).setPackage(Application.application.packageName),
                         flags
                     )
                 ).build()

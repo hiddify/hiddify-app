@@ -10,6 +10,7 @@ import 'package:hiddify/features/one_tap/mit_connection_backdrop.dart';
 import 'package:hiddify/features/one_tap/mit_connection_controls.dart';
 import 'package:hiddify/features/one_tap/mit_profile_import_dialog.dart';
 import 'package:hiddify/features/one_tap/vpn_profile.dart';
+import 'package:hiddify/features/one_tap/mit_resilience.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -22,11 +23,12 @@ class OneTapHomePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final active = ref.watch(activeProfileProvider);
     final status = ref.watch(connectionNotifierProvider);
+    final recovery = ref.watch(mitRecoveryViewProvider);
     final busy = useState(false);
     final current = status.valueOrNull;
     final protocolLabel = active.valueOrNull == null ? 'VLESS / AWG'
         : mitProfileProtocolLabel(active.valueOrNull?.userOverride?.name);
-    final canImport = !busy.value && current is Disconnected;
+    final canImport = !busy.value && current is Disconnected && !recovery.active;
     final canStop = switch (current) {
       Connected() || Connecting() || Waiting() || NoAvailableProxies() || HotReloading() => true,
       _ => false,
@@ -35,7 +37,7 @@ class OneTapHomePage extends HookConsumerWidget {
         (active.hasValue && (current is Disconnected || (status.hasError && active.valueOrNull != null))));
 
     Future<void> importProfile() async {
-      if (busy.value || ref.read(connectionNotifierProvider).valueOrNull is! Disconnected) return;
+      if (busy.value || ref.read(mitRecoveryViewProvider).active || ref.read(connectionNotifierProvider).valueOrNull is! Disconnected) return;
       final input = await showDialog<String>(context: context, builder: (_) => const MitProfileImportDialog());
       if (input == null || !context.mounted) return;
       if (ref.read(connectionNotifierProvider).valueOrNull is! Disconnected) return;
@@ -65,7 +67,7 @@ class OneTapHomePage extends HookConsumerWidget {
     Future<void> powerPressed() async {
       final latest = ref.read(connectionNotifierProvider);
       if (busy.value || latest.valueOrNull is Disconnecting) return;
-      final stopping = switch (latest.valueOrNull) {
+      final stopping = ref.read(mitRecoveryViewProvider).active || switch (latest.valueOrNull) {
         Connected() || Connecting() || Waiting() || NoAvailableProxies() || HotReloading() => true,
         _ => false,
       };
@@ -134,7 +136,7 @@ class OneTapHomePage extends HookConsumerWidget {
           backgroundColor: mitBackground,
           body: Stack(
             children: [
-              Positioned.fill(child: MitConnectionBackdrop(connected: current is Connected && !status.hasError)),
+              Positioned.fill(child: MitConnectionBackdrop(connected: current is Connected && !status.hasError && !recovery.active)),
               SafeArea(
                 child: LayoutBuilder(builder: (context, constraints) => SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
@@ -152,9 +154,10 @@ class OneTapHomePage extends HookConsumerWidget {
                       MitConnectionControls(
                         status: current, hasProfile: active.valueOrNull != null, hasError: status.hasError,
                         importing: busy.value, onPressed: canToggle ? powerPressed : null,
+                        recoveryLabel: recovery.label,
                       ),
                       const SizedBox(height: 22),
-                      Icon(Icons.shield_outlined, color: current is Connected && !status.hasError ? mitGreen : mitIdle, size: 28),
+                      Icon(Icons.shield_outlined, color: current is Connected && !status.hasError && !recovery.active ? mitGreen : mitIdle, size: 28),
                       const SizedBox(height: 8),
                       const Text('Подключение под вашим контролем', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFB1BDB4), fontSize: 12)),
                       const SizedBox(height: 24),

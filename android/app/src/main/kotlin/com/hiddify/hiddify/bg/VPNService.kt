@@ -22,12 +22,28 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
 
     companion object {
         private const val TAG = "A/VPNService"
+        @Volatile private var current: VPNService? = null
+
+        fun protectionStatus(): Map<String, Any?> {
+            val active = current
+            val supported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+            return mapOf(
+                "protectionSupported" to supported,
+                "alwaysOn" to if (supported) active?.isAlwaysOn else null,
+                "lockdown" to if (supported) active?.isLockdownEnabled else null,
+            )
+        }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        current = this
     }
 
     private val service = BoxService(this, this)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) =
-        service.onStartCommand()
+        service.onStartCommand(restoreCore = intent?.getBooleanExtra("MIT_UI_SETUP", false) != true)
 
     override fun onBind(intent: Intent): IBinder {
         val binder = super.onBind(intent)
@@ -38,10 +54,13 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     }
 
     override fun onDestroy() {
+        if (current === this) current = null
         service.onDestroy()
+        super.onDestroy()
     }
 
     override fun onRevoke() {
+        com.hiddify.hiddify.MitVpnSession.stopEpoch.incrementAndGet()
         runBlocking {
             withContext(Dispatchers.Main) {
                 service.onRevoke()
