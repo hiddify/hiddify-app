@@ -251,6 +251,16 @@ class _ConnectionButton extends HookWidget {
   /// Room round the button for its light.
   static const _glow = 110.0;
 
+  /// The button and its light take most of a short screen (a TV, a phone held sideways, a small
+  /// window): full size from [_fullFrom] logical pixels of height, shrinking evenly to
+  /// [_smallest] at [_smallFrom] and below.
+  static const _fullFrom = 860.0;
+  static const _smallFrom = 640.0;
+  static const _smallest = .65;
+
+  static double _scaleFor(double height) =>
+      _smallest + (1 - _smallest) * ((height - _smallFrom) / (_fullFrom - _smallFrom)).clamp(0.0, 1.0);
+
   EclipseLook get _eclipseLook => switch (look) {
     _Look.loading || _Look.disconnected => EclipseLook.idle,
     _Look.connecting => EclipseLook.starting,
@@ -265,8 +275,11 @@ class _ConnectionButton extends HookWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final still = MediaQuery.disableAnimationsOf(context);
+    final scale = _scaleFor(MediaQuery.sizeOf(context).height);
     final clock = useMemoized(() => Stopwatch()..start());
     double now() => clock.elapsedMicroseconds / 1e6;
+    // keyboard / TV remote focus: a ring round the button, so the face and its logo stay visible
+    final focused = useState(false);
 
     // when the look last changed, and from what
     final eclipseLook = _eclipseLook;
@@ -350,82 +363,121 @@ class _ConnectionButton extends HookWidget {
           enabled: onTap != null,
           label: label,
           hint: hint,
+          // drawn at full size, then scaled as a whole (light and badges too) to fit short screens
           child: SizedBox.square(
-            dimension: _size,
-            child: Stack(
-              fit: StackFit.expand,
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  left: -_glow,
-                  top: -_glow,
-                  right: -_glow,
-                  bottom: -_glow,
-                  child: IgnorePointer(
-                    child: RepaintBoundary(
-                      child: ValueListenableBuilder(
-                        valueListenable: time,
-                        builder: (context, t, _) {
-                          final c = change.value;
-                          return CustomPaint(
-                            isComplex: true,
-                            willChange: true,
-                            painter: EclipseButtonPainter(
-                              frame: EclipseFrame(
-                                look: c.look,
-                                previous: c.previous,
-                                since: still ? 10 : now() - c.at,
-                                time: still ? 0 : now(),
-                                color: c.color,
-                                previousColor: c.previousColor,
-                              ),
-                              radius: _size / 2,
-                              traffic: traffic.value,
-                              dark: theme.brightness == Brightness.dark,
-                              drawLogo: !useImage,
-                              logoOpacity: look == _Look.loading ? .38 : 1,
+            dimension: _size * scale,
+            child: OverflowBox(
+              minWidth: _size,
+              maxWidth: _size,
+              minHeight: _size,
+              maxHeight: _size,
+              child: Transform.scale(
+                scale: scale,
+                child: SizedBox.square(
+                  dimension: _size,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    clipBehavior: Clip.none,
+                    children: [
+                      Positioned(
+                        left: -_glow,
+                        top: -_glow,
+                        right: -_glow,
+                        bottom: -_glow,
+                        child: IgnorePointer(
+                          child: RepaintBoundary(
+                            child: ValueListenableBuilder(
+                              valueListenable: time,
+                              builder: (context, t, _) {
+                                final c = change.value;
+                                return CustomPaint(
+                                  isComplex: true,
+                                  willChange: true,
+                                  painter: EclipseButtonPainter(
+                                    frame: EclipseFrame(
+                                      look: c.look,
+                                      previous: c.previous,
+                                      since: still ? 10 : now() - c.at,
+                                      time: still ? 0 : now(),
+                                      color: c.color,
+                                      previousColor: c.previousColor,
+                                    ),
+                                    radius: _size / 2,
+                                    traffic: traffic.value,
+                                    dark: theme.brightness == Brightness.dark,
+                                    drawLogo: !useImage,
+                                    logoOpacity: look == _Look.loading ? .38 : 1,
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                    ),
+                      // the ink only tints the face a little: a solid hover or focus color would hide the logo
+                      Material(
+                        key: const ValueKey("home_connection_button"),
+                        shape: const CircleBorder(),
+                        color: Colors.transparent,
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: onTap,
+                          onFocusChange: (value) => focused.value = value,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.black.withValues(alpha: .05),
+                          highlightColor: Colors.black.withValues(alpha: .06),
+                          splashColor: Colors.black.withValues(alpha: .08),
+                          child: useImage ? Padding(padding: const EdgeInsets.all(36), child: image.image()) : null,
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: AnimatedOpacity(
+                            opacity: focused.value ? 1 : 0,
+                            duration: const Duration(milliseconds: 180),
+                            child: Transform.scale(
+                              scale: 1.1,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: theme.colorScheme.primary, width: 3),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // the error badge opens what went wrong
+                      if (look == _Look.failed && onErrorDetails != null)
+                        Positioned.fromRect(
+                          rect: EclipseButtonPainter.errorBadgeRect(
+                            const Offset(_size / 2, _size / 2),
+                            _size / 2,
+                          ).inflate(8),
+                          child: Semantics(
+                            button: true,
+                            label: errorDetailsLabel,
+                            child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: onErrorDetails),
+                          ),
+                        ),
+                      // the chain hop sits on the rim at the top left, half on the button
+                      if (hop case final hop?)
+                        Positioned.fromRect(
+                          rect: Rect.fromCircle(
+                            center:
+                                const Offset(_size / 2, _size / 2) + Offset.fromDirection(5 * math.pi / 4, _size / 2),
+                            radius: _ChainBadge.size / 2,
+                          ),
+                          child: _ChainBadge(hop, label: hopLabel, onTap: onHop),
+                        ),
+                    ],
                   ),
                 ),
-                Material(
-                  key: const ValueKey("home_connection_button"),
-                  shape: const CircleBorder(),
-                  color: Colors.transparent,
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    focusColor: Colors.grey,
-                    onTap: onTap,
-                    child: useImage ? Padding(padding: const EdgeInsets.all(36), child: image.image()) : null,
-                  ),
-                ),
-                // the error badge opens what went wrong
-                if (look == _Look.failed && onErrorDetails != null)
-                  Positioned.fromRect(
-                    rect: EclipseButtonPainter.errorBadgeRect(const Offset(_size / 2, _size / 2), _size / 2).inflate(8),
-                    child: Semantics(
-                      button: true,
-                      label: errorDetailsLabel,
-                      child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: onErrorDetails),
-                    ),
-                  ),
-                // the chain hop sits on the rim at the top left, half on the button
-                if (hop case final hop?)
-                  Positioned.fromRect(
-                    rect: Rect.fromCircle(
-                      center: const Offset(_size / 2, _size / 2) + Offset.fromDirection(5 * math.pi / 4, _size / 2),
-                      radius: _ChainBadge.size / 2,
-                    ),
-                    child: _ChainBadge(hop, label: hopLabel, onTap: onHop),
-                  ),
-              ],
+              ),
             ),
           ),
         ),
-        const Gap(24),
+        Gap(24 * scale),
         Column(
           children: [
             AnimatedText(label, style: theme.textTheme.titleMedium),
