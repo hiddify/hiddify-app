@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
@@ -47,6 +48,13 @@ class _Repository implements ProxyRepository {
   }
 
   final downloaded = <(String, int)>[];
+  int cleared = 0;
+
+  @override
+  TaskEither<ProxyFailure, Unit> clearSpeedTests() {
+    cleared++;
+    return TaskEither.right(unit);
+  }
 
   @override
   TaskEither<ProxyFailure, Unit> downloadTest(String tag, int bytes) {
@@ -255,5 +263,41 @@ void main() {
     ];
     expect(fastestProxies(proxies, 2), ['fast', 'mid']);
     expect(fastestProxies(proxies, 10), ['fast', 'mid', 'slow']);
+  });
+
+  test('by upload speed: this run first, then the cached, then by download, then by ping', () {
+    OutboundInfo speeds(String tag, int up, int down, int delay, {bool cached = false}) => OutboundInfo(
+      tag: tag,
+      uploadSpeed: Int64(up),
+      uploadSpeedCached: cached,
+      downloadSpeed: Int64(down),
+      urlTestDelay: delay,
+    );
+    final proxies = [
+      speeds('untested', 0, 0, 90),
+      speeds('cached, fastest', 900, 0, 50, cached: true),
+      speeds('slow up', 100, 900, 50),
+      speeds('fast up, slow down', 500, 100, 300),
+      speeds('fast up, fast down, slow ping', 500, 800, 400),
+      speeds('fast up, fast down, fast ping', 500, 800, 120),
+      speeds('cached, slower', 300, 0, 50, cached: true),
+      speeds('failed up', -1, 900, 40),
+    ]..sort((a, b) => compareBySpeeds(a, b, uploadFirst: true));
+    expect(proxies.map((e) => e.tag), [
+      // this run's uploads, the fastest first
+      'fast up, fast down, fast ping',
+      'fast up, fast down, slow ping',
+      'fast up, slow down',
+      'slow up',
+      // then the earlier runs', the fastest first
+      'cached, fastest',
+      'cached, slower',
+      // no upload: by download, then ping
+      'failed up',
+      'untested',
+    ]);
+    // by download: equal downloads go by upload, a failed one after a measured one
+    proxies.sort((a, b) => compareBySpeeds(a, b, uploadFirst: false));
+    expect(proxies.take(2).map((e) => e.tag), ['slow up', 'failed up']);
   });
 }

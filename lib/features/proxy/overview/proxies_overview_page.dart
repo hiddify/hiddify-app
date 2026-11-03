@@ -11,8 +11,6 @@ import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
-import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -73,26 +71,19 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // the speed of the proxies listed, as the speed test is set; a long press sets it, and
-          // starts it
+          // the speed of the proxies listed: what it tests and the data it takes show first, and
+          // it starts from there
           if (proxies.valueOrNull case final group?)
-            GestureDetector(
-              onLongPress: () async {
+            FloatingActionButton.small(
+              heroTag: 'upload-test',
+              onPressed: () async {
                 final count = group.items.where((e) => !e.isGroup).length;
                 if (await ref.read(dialogNotifierProvider.notifier).showSpeedTest(count: count)) {
                   await ref.read(proxiesOverviewNotifierProvider.notifier).speedTestAll();
                 }
               },
-              child: FloatingActionButton.small(
-                heroTag: 'upload-test',
-                onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).speedTestAll(),
-                tooltip: switch (ref.watch(ConfigOptions.speedTestDirection)) {
-                  SpeedTestDirection.download => t.pages.proxies.speedTest.testDownload,
-                  SpeedTestDirection.upload => t.pages.proxies.upload.test,
-                  SpeedTestDirection.both => t.pages.proxies.speedTest.title,
-                },
-                child: const Icon(Icons.speed_rounded, size: 26),
-              ),
+              tooltip: t.pages.proxies.speedTest.title,
+              child: const Icon(Icons.speed_rounded, size: 26),
             ),
           const Gap(12),
           FloatingActionButton(
@@ -107,7 +98,8 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
             ? LayoutBuilder(
                 builder: (context, constraints) {
                   final width = constraints.maxWidth;
-                  final crossAxisCount = PlatformUtils.isMobile && width < 600 ? 1 : max(1, (width / 268).floor());
+                  // columns wide enough for a proxy's name: two on a usual window, more only when wider
+                  final crossAxisCount = PlatformUtils.isMobile && width < 600 ? 1 : max(1, (width / 420).floor());
                   final listed = group.items.where((e) => e.tag != lowestGroupTag && e.tag != balanceGroupTag).length;
                   return CustomScrollView(
                     slivers: [

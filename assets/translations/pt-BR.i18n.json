@@ -122,7 +122,9 @@
         "unsorted": "Padrão",
         "name": "Alfabeticamente",
         "delay": "Por latência",
-        "usage": "Por uso"
+        "usage": "Por uso",
+        "upload": "Por velocidade de upload",
+        "download": "Por velocidade de download"
       },
       "ipInfo": {
         "address": "Endereço de IP",
@@ -160,7 +162,8 @@
       "upload": {
         "test": "Testar velocidade de envio",
         "failed": "Não foi possível iniciar o teste de velocidade",
-        "hint": "Toque: velocidade de upload · Segure: velocidade de download"
+        "hint": "Toque: velocidade de upload · Segure: velocidade de download",
+        "hintBoth": "Toque: as duas velocidades · Segure: velocidade de download"
       },
       "speedTest": {
         "title": "Teste de velocidade",
@@ -180,6 +183,9 @@
         "testDownload": "Testar velocidade de download",
         "both": "Ambos",
         "bothWays": "download e upload",
+        "amountHint": "mais é mais preciso",
+        "clear": "Limpar resultados salvos",
+        "cleared": "Limpos",
         "which": "Quais proxies",
         "shown": "Exibidos ($n)",
         "chosen": "Escolhidos ($n)"
@@ -937,7 +943,7 @@
       "search": "Pesquisar",
       "all": "Selecionar tudo",
       "none": "Limpar",
-      "run": "Usar $n",
+      "run": "Usar estes $n",
       "sort": "Ordenar",
       "sortProfile": "Ordem do perfil",
       "sortPing": "Ping",
@@ -950,6 +956,7 @@
       "paused": "$n proxies estão pausados: não têm ping e não podem ser testados.",
       "wake": "Ativar todos para testar",
       "offline": "Conecte para ver o ping e testá-los.",
+      "offlineTitle": "Não conectado",
       "shown": "$n exibidos",
       "noMatch": "Nenhum proxy corresponde",
       "chosenHint": "Toque em um proxy acima para escolhê-lo",
@@ -958,7 +965,8 @@
       "protocol": "Protocolo",
       "country": "País",
       "anyProtocol": "Qualquer protocolo",
-      "anyCountry": "Qualquer país"
+      "anyCountry": "Qualquer país",
+      "otherCountries": "Outros"
     },
     "localProxy": {
       "title": "Proxy local",

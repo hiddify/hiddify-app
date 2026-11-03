@@ -122,7 +122,9 @@
         "unsorted": "Varsayılan",
         "name": "Alfabetik",
         "delay": "Gecikmeye göre",
-        "usage": "Kullanıma göre"
+        "usage": "Kullanıma göre",
+        "upload": "Yükleme hızına göre",
+        "download": "İndirme hızına göre"
       },
       "ipInfo": {
         "address": "IP adresi",
@@ -160,7 +162,8 @@
       "upload": {
         "test": "Yükleme hızını test et",
         "failed": "Hız testi başlatılamadı",
-        "hint": "Dokun: yükleme hızı · Basılı tut: indirme hızı"
+        "hint": "Dokun: yükleme hızı · Basılı tut: indirme hızı",
+        "hintBoth": "Dokun: iki hız · Basılı tut: indirme hızı"
       },
       "speedTest": {
         "title": "Hız testi",
@@ -180,6 +183,9 @@
         "testDownload": "İndirme hızını test et",
         "both": "İkisi",
         "bothWays": "indirme ve yükleme",
+        "amountHint": "daha fazlası daha doğru",
+        "clear": "Kayıtlı sonuçları temizle",
+        "cleared": "Temizlendi",
         "which": "Hangi proxy'ler",
         "shown": "Gösterilen ($n)",
         "chosen": "Seçilen ($n)"
@@ -935,7 +941,7 @@
       "search": "Ara",
       "all": "Tümünü seç",
       "none": "Temizle",
-      "run": "$n çalıştır",
+      "run": "Bu $n proxy'yi kullan",
       "sort": "Sırala",
       "sortProfile": "Profil sırası",
       "sortPing": "Ping",
@@ -948,6 +954,7 @@
       "paused": "$n proxy duraklatılmış: ping'leri yok ve test edilemezler.",
       "wake": "Test için hepsini çalıştır",
       "offline": "Ping'lerini görmek ve test etmek için bağlanın.",
+      "offlineTitle": "Bağlı değil",
       "shown": "$n gösteriliyor",
       "noMatch": "Eşleşen proxy yok",
       "chosenHint": "Seçmek için yukarıdan bir proxy'ye dokunun",
@@ -956,7 +963,8 @@
       "protocol": "Protokol",
       "country": "Ülke",
       "anyProtocol": "Herhangi bir protokol",
-      "anyCountry": "Herhangi bir ülke"
+      "anyCountry": "Herhangi bir ülke",
+      "otherCountries": "Diğerleri"
     },
     "localProxy": {
       "title": "Yerel proxy",

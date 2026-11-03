@@ -26,13 +26,17 @@ enum ProxiesSort {
   unsorted,
   name,
   delay,
-  usage;
+  usage,
+  upload,
+  download;
 
   String present(TranslationsEn t) => switch (this) {
     ProxiesSort.unsorted => t.pages.proxies.sortOptions.unsorted,
     ProxiesSort.name => t.pages.proxies.sortOptions.name,
     ProxiesSort.delay => t.pages.proxies.sortOptions.delay,
     ProxiesSort.usage => t.pages.proxies.sortOptions.usage,
+    ProxiesSort.upload => t.pages.proxies.sortOptions.upload,
+    ProxiesSort.download => t.pages.proxies.sortOptions.download,
   };
 }
 
@@ -210,6 +214,17 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
         if (!a.isGroup && b.isGroup) return 1;
         return (b.upload + b.download).compareTo(a.upload + a.download);
       }),
+      // the fastest first; untested and failed ones at the end
+      ProxiesSort.upload => proxies.items.sortedWith((a, b) {
+        if (a.isGroup && !b.isGroup) return -1;
+        if (!a.isGroup && b.isGroup) return 1;
+        return compareBySpeeds(a, b, uploadFirst: true);
+      }),
+      ProxiesSort.download => proxies.items.sortedWith((a, b) {
+        if (a.isGroup && !b.isGroup) return -1;
+        if (!a.isGroup && b.isGroup) return 1;
+        return compareBySpeeds(a, b, uploadFirst: false);
+      }),
     };
     // a copy: sortedItems reads proxies.items, which is cleared below
     final items = sortedItems.toList();
@@ -302,6 +317,14 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     }).run();
   }
 
+  /// Forgets every speed test result, of this run and the earlier ones kept.
+  Future<void> clearSpeedTests() async {
+    await ref.read(proxyRepositoryProvider).clearSpeedTests().getOrElse((err) {
+      loggy.warning("error clearing the speed tests", err);
+      return unit;
+    }).run();
+  }
+
   /// Tests the speed of [tag], a proxy, or each proxy of a group, as the speed test is set:
   /// download, upload, or both; the core tests one proxy's two in turn, never at once.
   Future<void> speedTest(String tag) async {
@@ -340,6 +363,29 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
       }).run();
     }
   }
+}
+
+/// Orders proxies by one speed, then by the other speed, then by ping: upload first when
+/// [uploadFirst], else download. For each speed, this run's results go first, the faster first, then
+/// the ones from an earlier run (cached), the faster first, then none (0) or a failure (-1); a ping
+/// that answered goes before one that did not, the lower first.
+int compareBySpeeds(OutboundInfo a, OutboundInfo b, {required bool uploadFirst}) {
+  // 0: measured in this run, 1: measured in an earlier run, 2: none or failed
+  int tier(int speed, bool cached) => speed <= 0 ? 2 : (cached ? 1 : 0);
+  int bySpeed(int x, bool xCached, int y, bool yCached) {
+    final byTier = tier(x, xCached).compareTo(tier(y, yCached));
+    return byTier != 0 ? byTier : (x > 0 ? y.compareTo(x) : 0);
+  }
+
+  final up = bySpeed(a.uploadSpeed.toInt(), a.uploadSpeedCached, b.uploadSpeed.toInt(), b.uploadSpeedCached);
+  final down = bySpeed(a.downloadSpeed.toInt(), a.downloadSpeedCached, b.downloadSpeed.toInt(), b.downloadSpeedCached);
+  final (first, second) = uploadFirst ? (up, down) : (down, up);
+  if (first != 0) return first;
+  if (second != 0) return second;
+  bool answers(int delay) => delay > 0 && delay < 65000;
+  final (x, y) = (a.urlTestDelay, b.urlTestDelay);
+  if (answers(x) != answers(y)) return answers(x) ? -1 : 1;
+  return answers(x) ? x.compareTo(y) : 0;
 }
 
 /// The tags of the [count] proxies with the lowest ping that answered.

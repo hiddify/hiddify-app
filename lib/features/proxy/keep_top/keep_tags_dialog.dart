@@ -6,6 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/features/connection/model/connection_status.dart';
+import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
@@ -29,6 +31,12 @@ enum _Facet { status, protocol, country }
 
 /// How many "the fastest" are, to test or to choose.
 const _fastest = 10;
+
+/// A country with fewer proxies than this is under "others" in the country filter.
+const _fewCountry = 5;
+
+/// The country filter's entry for the countries with few proxies, and the proxies with none.
+const _otherCountries = '*';
 
 /// The protocol a sing-box [type] is, as the core names it on the proxy page.
 String protocolName(String type) => switch (type) {
@@ -105,6 +113,22 @@ class KeepTagsDialog extends HookConsumerWidget {
     final query = useState('');
     final sort = useState(_Sort.profile);
     final countryFilter = useState(<String>{});
+    // the countries with few proxies, and the proxies with none, are one entry: the list stays short
+    final fewCountries = useMemoized(() {
+      final totals = <String, int>{};
+      for (final code in countries.values) {
+        totals[code] = (totals[code] ?? 0) + 1;
+      }
+      return {
+        for (final MapEntry(:key, :value) in totals.entries)
+          if (value < _fewCountry) key,
+      };
+    }, [countries]);
+    // the entry a proxy's country is under: its own, or the others'
+    String countryEntry(String tag) => switch (countries[tag]) {
+      final code? when !fewCountries.contains(code) => code,
+      _ => _otherCountries,
+    };
     final protocolFilter = useState(<String>{});
     // the proxies that answer first: those are the ones worth choosing
     final statusFilter = useState(<_Status>{_Status.answering});
@@ -138,7 +162,9 @@ class KeepTagsDialog extends HookConsumerWidget {
     // ticking it would show
     bool passes(String tag, {_Facet? skip}) {
       if (needle.isNotEmpty && !tag.toLowerCase().contains(needle)) return false;
-      if (skip != _Facet.country && countryFilter.value.isNotEmpty && !countryFilter.value.contains(countries[tag])) {
+      if (skip != _Facet.country &&
+          countryFilter.value.isNotEmpty &&
+          !countryFilter.value.contains(countryEntry(tag))) {
         return false;
       }
       if (skip != _Facet.protocol &&
@@ -159,7 +185,6 @@ class KeepTagsDialog extends HookConsumerWidget {
     // the profile's order breaks ties, so a sort never shuffles equal rows
     final order = {for (final (i, tag) in tags.indexed) tag: i};
     int byOrder(String a, String b) => order[a]!.compareTo(order[b]!);
-    int bySpeed(num a, num b) => (b > 0 ? b : -1).compareTo(a > 0 ? a : -1);
     switch (sort.value) {
       case _Sort.profile:
         break;
@@ -170,14 +195,15 @@ class KeepTagsDialog extends HookConsumerWidget {
           final delay = answers(x) ? x.urlTestDelay.compareTo(y.urlTestDelay) : 0;
           return delay != 0 ? delay : byOrder(a, b);
         });
+      // by the one speed, then the other, then ping, as on the proxy page
       case _Sort.download:
         shown.sort((a, b) {
-          final speed = bySpeed(info(a).downloadSpeed.toInt(), info(b).downloadSpeed.toInt());
+          final speed = compareBySpeeds(info(a), info(b), uploadFirst: false);
           return speed != 0 ? speed : byOrder(a, b);
         });
       case _Sort.upload:
         shown.sort((a, b) {
-          final speed = bySpeed(info(a).uploadSpeed.toInt(), info(b).uploadSpeed.toInt());
+          final speed = compareBySpeeds(info(a), info(b), uploadFirst: true);
           return speed != 0 ? speed : byOrder(a, b);
         });
     }
@@ -193,7 +219,7 @@ class KeepTagsDialog extends HookConsumerWidget {
     ], keep: protocolFilter.value);
     final countryCounts = _counts([
       for (final tag in tags)
-        if (passes(tag, skip: _Facet.country) && countries[tag] != null) countries[tag]!,
+        if (passes(tag, skip: _Facet.country)) countryEntry(tag),
     ], keep: countryFilter.value);
 
     void toggle(String tag) =>
@@ -243,6 +269,16 @@ class KeepTagsDialog extends HookConsumerWidget {
 
     final pausedCount = connected ? tags.where(paused).length : 0;
     final emoji = PlatformUtils.isWindows ? FontFamily.emoji : null;
+    // "Others: CN JP TR …", the most common of them first
+    String otherCountriesLabel(String others) {
+      final codes = _counts([
+        for (final code in countries.values)
+          if (fewCountries.contains(code)) code,
+      ]).map((e) => e.$1).toList();
+      if (codes.isEmpty) return others;
+      final shown = codes.take(6).join(' ');
+      return '$others: $shown${codes.length > 6 ? ' …' : ''}';
+    }
 
     return PopScope(
       // dismissed: the proxies run as they did before the picker woke them
@@ -369,7 +405,13 @@ class KeepTagsDialog extends HookConsumerWidget {
                       label: text.country,
                       any: text.anyCountry,
                       icon: Icons.public_rounded,
-                      options: [for (final (code, count) in countryCounts) (code, '${flagOf(code)}  $code', count)],
+                      options: [
+                        for (final (code, count) in countryCounts)
+                          if (code != _otherCountries) (code, '${flagOf(code)}  $code', count),
+                        // the others last, named by their codes
+                        for (final (code, count) in countryCounts)
+                          if (code == _otherCountries) (code, otherCountriesLabel(text.otherCountries), count),
+                      ],
                       selected: countryFilter.value,
                       onChanged: (value) => countryFilter.value = value,
                       style: TextStyle(fontFamily: emoji),
@@ -401,7 +443,7 @@ class KeepTagsDialog extends HookConsumerWidget {
               ),
               // why some rows have no ping
               if (!connected)
-                _Banner(icon: Icons.cloud_off_rounded, text: text.offline)
+                const _ConnectCard()
               else if (pausedCount > 0 && !woke.value)
                 _Banner(
                   icon: Icons.pause_circle_outline_rounded,
@@ -443,6 +485,7 @@ class KeepTagsDialog extends HookConsumerWidget {
                                       proxy: info(tag),
                                       checked: selected.value.contains(tag),
                                       paused: paused(tag),
+                                      live: live.containsKey(tag),
                                       onTap: () => toggle(tag),
                                     );
                                   },
@@ -606,11 +649,21 @@ class _FacetButton extends StatelessWidget {
 /// A proxy of the picker's list: the proxy page's row, lit and checked when chosen, dim while
 /// paused; a tap chooses it, or no more.
 class _PickRow extends StatelessWidget {
-  const _PickRow({super.key, required this.proxy, required this.checked, required this.paused, required this.onTap});
+  const _PickRow({
+    super.key,
+    required this.proxy,
+    required this.checked,
+    required this.paused,
+    required this.live,
+    required this.onTap,
+  });
 
   final OutboundInfo proxy;
   final bool checked;
   final bool paused;
+
+  /// The core runs it: its ping is or will be known.
+  final bool live;
   final VoidCallback onTap;
 
   @override
@@ -625,7 +678,8 @@ class _PickRow extends StatelessWidget {
           child: Material(
             type: MaterialType.transparency,
             // a tap anywhere chooses it; the tests are the buttons', never a stray tap's
-            child: ProxyTile(proxy, selected: checked, onTap: onTap, testable: false),
+            // not running (paused, or not connected): no ping is coming, so none shows
+            child: ProxyTile(proxy, selected: checked, onTap: onTap, testable: false, showPing: live),
           ),
         ),
         // the check, on the flag's corner
@@ -821,6 +875,76 @@ class _Chip extends StatelessWidget {
     shape: const StadiumBorder(),
     onSelected: (_) => onSelected(),
   );
+}
+
+/// Not connected: no ping, no speeds, no tests. A card big enough to say so, with the button that
+/// connects; a spinner while it connects.
+class _ConnectCard extends ConsumerWidget {
+  const _ConnectCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final text = t.dialogs.keepTags;
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    final status = ref.watch(connectionNotifierProvider).valueOrNull;
+    // connected, the proxies are on their way
+    final connecting = status != null && status is! Disconnected;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 6, 16, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: LinearGradient(
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
+          colors: [Color.alphaBlend(s.primary.withValues(alpha: .14), s.surfaceContainerHigh), s.surfaceContainerHigh],
+        ),
+        border: Border.all(color: s.primary.withValues(alpha: .2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(colors: [s.primary.withValues(alpha: .28), s.primary.withValues(alpha: .12)]),
+            ),
+            child: Icon(Icons.cloud_off_rounded, color: s.primary, size: 26),
+          ),
+          const Gap(14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(text.offlineTitle, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+                const Gap(2),
+                Text(text.offline, style: theme.textTheme.bodyMedium?.copyWith(color: s.onSurfaceVariant)),
+              ],
+            ),
+          ),
+          const Gap(12),
+          if (connecting)
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2)),
+                const Gap(10),
+                Text(t.connection.connecting, style: theme.textTheme.labelLarge?.copyWith(color: s.primary)),
+              ],
+            )
+          else
+            FilledButton.icon(
+              onPressed: () => ref.read(connectionNotifierProvider.notifier).toggleConnection(),
+              icon: const Icon(Icons.power_settings_new_rounded, size: 18),
+              label: Text(t.connection.connect),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 /// A note over the list, on a tinted card, with an [action] at its end.

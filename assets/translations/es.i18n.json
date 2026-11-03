@@ -122,7 +122,9 @@
         "unsorted": "Por defecto",
         "name": "Alfabéticamente",
         "delay": "Por latencia",
-        "usage": "Por uso"
+        "usage": "Por uso",
+        "upload": "Por velocidad de subida",
+        "download": "Por velocidad de descarga"
       },
       "ipInfo": {
         "address": "Dirección IP",
@@ -160,7 +162,8 @@
       "upload": {
         "test": "Probar velocidad de subida",
         "failed": "No se pudo iniciar la prueba de velocidad",
-        "hint": "Toca: velocidad de subida · Mantén: velocidad de descarga"
+        "hint": "Toca: velocidad de subida · Mantén: velocidad de descarga",
+        "hintBoth": "Toca: ambas velocidades · Mantén: velocidad de descarga"
       },
       "speedTest": {
         "title": "Prueba de velocidad",
@@ -180,6 +183,9 @@
         "testDownload": "Probar velocidad de descarga",
         "both": "Ambos",
         "bothWays": "de bajada y de subida",
+        "amountHint": "más es más preciso",
+        "clear": "Borrar resultados guardados",
+        "cleared": "Borrados",
         "which": "Qué proxies",
         "shown": "Mostrados ($n)",
         "chosen": "Elegidos ($n)"
@@ -937,7 +943,7 @@
       "search": "Buscar",
       "all": "Seleccionar todo",
       "none": "Borrar",
-      "run": "Usar $n",
+      "run": "Usar estos $n",
       "sort": "Ordenar",
       "sortProfile": "Orden del perfil",
       "sortPing": "Ping",
@@ -950,6 +956,7 @@
       "paused": "$n proxies están en pausa: no tienen ping y no se pueden probar.",
       "wake": "Activar todos para probar",
       "offline": "Conéctate para ver su ping y probarlos.",
+      "offlineTitle": "Sin conexión",
       "shown": "$n mostrados",
       "noMatch": "Ningún proxy coincide",
       "chosenHint": "Toca un proxy de arriba para elegirlo",
@@ -958,7 +965,8 @@
       "protocol": "Protocolo",
       "country": "País",
       "anyProtocol": "Cualquier protocolo",
-      "anyCountry": "Cualquier país"
+      "anyCountry": "Cualquier país",
+      "otherCountries": "Otros"
     },
     "localProxy": {
       "title": "Proxy local",

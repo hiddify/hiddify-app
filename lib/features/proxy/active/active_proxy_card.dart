@@ -268,12 +268,18 @@ class _ProxyRow extends ConsumerWidget {
     return _StepRow(
       color: theme.cardTheme.color ?? s.surfaceContainerLow,
       onTap: () => context.goNamed('proxies'),
-      // how fast the proxy in use uploads: a tap measures it, a long press on the ping does too
+      // how fast the proxy in use uploads and downloads: a tap measures the upload, a long press the
+      // download
       end: connected
           ? UploadSpeedChip(
               speed: server.uploadSpeed.toInt(),
               testing: server.uploadTesting,
+              cached: server.uploadSpeedCached,
               onTest: () => ref.read(activeProxyNotifierProvider.notifier).uploadTest(),
+              downloadSpeed: server.downloadSpeed.toInt(),
+              downloadTesting: server.downloadTesting,
+              downloadCached: server.downloadSpeedCached,
+              onDownloadTest: () => ref.read(activeProxyNotifierProvider.notifier).downloadTest(),
             )
           : null,
       flag: InkWell(

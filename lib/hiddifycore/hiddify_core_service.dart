@@ -525,6 +525,15 @@ class HiddifyCoreService with InfraLogger {
   /// Measures the upload ([download] false) or download speed of [tag], a proxy or each proxy of a
   /// group, moving [bytes] through each; the speeds come with the proxies (upload_speed,
   /// download_speed). No tag: the proxy the selection uses.
+  /// Forgets every speed test result, of this run and the earlier ones the core kept.
+  TaskEither<String, Unit> clearSpeedTests() {
+    return TaskEither(() async {
+      final res = await core.bgClient.clearSpeedTests(Empty());
+      if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
+      return right(unit);
+    });
+  }
+
   TaskEither<String, Unit> speedTest(String tag, int bytes, {required bool download}) {
     return TaskEither(() async {
       try {

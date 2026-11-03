@@ -47,29 +47,41 @@ Color uploadSpeedColor(BuildContext context, int bytesPerSecond) {
 }
 
 /// A proxy's upload speed ([speed] bytes a second; 0 untested, -1 failed), and its download speed
-/// ([downloadSpeed]) once tested, each with its arrow then: a spinner while one is [testing], the
-/// gauge alone before the first test. A tap tests the upload ([onTest]); a long press the download
-/// ([onDownloadTest]), or without it sets how much a test sends. [dense] fits it under a proxy
-/// row's ping; else it is a pill.
+/// ([downloadSpeed]) once tested: a spinner while one is [testing], the gauge alone before the first
+/// test, the gauge with one cross when both failed. A speed from an earlier run ([cached],
+/// [downloadCached]) shows faded until tested again. A tap tests the upload ([onTest]), or both when
+/// both show; a long press the download ([onDownloadTest]), or without it sets how much a test
+/// sends. [dense] fits it under
+/// a proxy row's ping; else it is a pill.
 class UploadSpeedChip extends ConsumerWidget {
   const UploadSpeedChip({
     super.key,
     required this.speed,
     required this.testing,
+    this.cached = false,
     this.onTest,
     this.dense = false,
     this.downloadSpeed = 0,
     this.downloadTesting = false,
+    this.downloadCached = false,
     this.onDownloadTest,
   });
 
   final int speed;
   final bool testing;
+  final bool cached;
   final VoidCallback? onTest;
   final bool dense;
   final int downloadSpeed;
   final bool downloadTesting;
+  final bool downloadCached;
   final VoidCallback? onDownloadTest;
+
+  /// How much a speed from an earlier run fades.
+  static const _cachedOpacity = .45;
+
+  /// Below this screen width, a pill with both speeds shows them one over the other.
+  static const _stackBelow = 480.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -79,6 +91,8 @@ class UploadSpeedChip extends ConsumerWidget {
     final showUp = speed != 0 || testing;
     final showDown = downloadSpeed != 0 || downloadTesting;
     final busy = testing || downloadTesting;
+    // both tested, both failed: one cross says it
+    final bothFailed = !busy && speed < 0 && downloadSpeed < 0;
     Color colorOf(int value, bool busy) => busy
         ? s.primary
         : value < 0
@@ -95,48 +109,113 @@ class UploadSpeedChip extends ConsumerWidget {
         ? theme.textTheme.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant, letterSpacing: .3)
         : theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant);
 
-    // both directions under a row's ping leave no room for the gauge: the arrows say it, and the
-    // unit gets smaller
-    final both = showUp && showDown;
-    final gauge = !(dense && both);
+    // once tested, the arrows say what each number is: the gauge shows only before the first test;
+    // both directions under a row's ping leave little room, so the unit gets smaller
+    final both = showUp && showDown && !bothFailed;
+    final gauge = !showUp && !showDown;
+    Widget faded(bool old, Widget child) => old ? Opacity(opacity: _cachedOpacity, child: child) : child;
 
-    // one direction: its arrow when both show, then its value, a spinner, or a cross
-    List<Widget> part(int value, bool partBusy, IconData? arrow, {required bool first}) {
+    // one direction: its arrow, then its value, a spinner, or a cross; faded when from an earlier run
+    Widget part(int value, bool partBusy, IconData arrow, bool old, {required bool first}) {
       final color = colorOf(value, partBusy);
-      return [
-        if (!first) Gap(dense ? 3 : 5),
-        if (arrow != null) Icon(arrow, size: iconSize - 3, color: color),
-        if (partBusy)
-          SizedBox.square(
-            dimension: iconSize - 4,
-            child: CircularProgressIndicator(strokeWidth: 1.5, color: color),
-          )
-        else if (value < 0)
-          Icon(Icons.close_rounded, size: iconSize - 1, color: color)
-        else if (value > 0)
-          Text(formatMbps(value), style: number?.copyWith(color: color)),
-      ];
+      return faded(
+        old && !partBusy,
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!first) Gap(dense ? 3 : 5),
+            Icon(arrow, size: iconSize - 3, color: color),
+            if (partBusy)
+              SizedBox.square(
+                dimension: iconSize - 4,
+                child: CircularProgressIndicator(strokeWidth: 1.5, color: color),
+              )
+            else if (value < 0)
+              Icon(Icons.close_rounded, size: iconSize - 1, color: color)
+            else if (value > 0)
+              Text(formatMbps(value), style: number?.copyWith(color: color)),
+          ],
+        ),
+      );
     }
 
-    final content = Row(
+    final allOld = (!showUp || cached) && (!showDown || downloadCached) && !busy;
+    // a pill on a small screen has no room for both on one line: the gauge, then a line each
+    final stacked = !dense && both && MediaQuery.sizeOf(context).width < _stackBelow;
+    Widget line(int value, bool lineBusy, IconData arrow, bool old) => Row(
       mainAxisSize: MainAxisSize.min,
-      textDirection: TextDirection.ltr,
       children: [
-        if (gauge)
-          Icon(
-            Icons.speed_rounded,
-            size: iconSize,
-            color: busy ? s.primary : colorOf(showUp ? speed : downloadSpeed, false),
-          ),
-        if (showUp) ...part(speed, testing, both ? Icons.arrow_upward_rounded : null, first: !gauge),
-        if (showDown) ...part(downloadSpeed, downloadTesting, Icons.arrow_downward_rounded, first: !gauge && !showUp),
-        if (speed > 0 || downloadSpeed > 0) Text(' Mbps', style: gauge ? unit : unit?.copyWith(fontSize: 8)),
+        part(value, lineBusy, arrow, old, first: true),
+        if (value > 0) faded(old, Text(' Mbps', style: unit?.copyWith(fontSize: 10))),
       ],
     );
+    final Widget content = stacked
+        ? Row(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  line(speed, testing, Icons.arrow_upward_rounded, cached),
+                  line(downloadSpeed, downloadTesting, Icons.arrow_downward_rounded, downloadCached),
+                ],
+              ),
+            ],
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            textDirection: TextDirection.ltr,
+            children: bothFailed
+                ? [
+                    faded(
+                      cached && downloadCached,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.speed_rounded, size: iconSize, color: s.error),
+                          const Gap(2),
+                          Icon(Icons.close_rounded, size: iconSize - 1, color: s.error),
+                        ],
+                      ),
+                    ),
+                  ]
+                : [
+                    if (gauge)
+                      faded(
+                        allOld && (showUp || showDown),
+                        Icon(
+                          Icons.speed_rounded,
+                          size: iconSize,
+                          color: busy ? s.primary : colorOf(showUp ? speed : downloadSpeed, false),
+                        ),
+                      ),
+                    if (showUp) part(speed, testing, Icons.arrow_upward_rounded, cached, first: !gauge),
+                    if (showDown)
+                      part(
+                        downloadSpeed,
+                        downloadTesting,
+                        Icons.arrow_downward_rounded,
+                        downloadCached,
+                        first: !gauge && !showUp,
+                      ),
+                    if (speed > 0 || downloadSpeed > 0)
+                      faded(allOld, Text(' Mbps', style: dense && both ? unit?.copyWith(fontSize: 8) : unit)),
+                  ],
+          );
 
     final chip = InkWell(
-      borderRadius: BorderRadius.circular(dense ? 6 : 16),
-      onTap: testing ? null : onTest,
+      borderRadius: BorderRadius.circular(dense ? 6 : (stacked ? 14 : 16)),
+      // with both speeds shown, a tap tests both again; the core tests one proxy's two in turn
+      onTap: testing
+          ? null
+          : both && onDownloadTest != null && !downloadTesting
+          ? () {
+              onDownloadTest!();
+              onTest?.call();
+            }
+          : onTest,
       onLongPress: onDownloadTest == null
           ? () => chooseUploadTestSize(ref)
           : downloadTesting
@@ -145,18 +224,29 @@ class UploadSpeedChip extends ConsumerWidget {
       child: Padding(
         padding: dense
             ? const EdgeInsets.symmetric(horizontal: 6, vertical: 2)
+            : stacked
+            ? const EdgeInsetsDirectional.fromSTEB(10, 4, 12, 4)
             : EdgeInsets.symmetric(horizontal: !showUp && !showDown ? 8 : 11),
         // a row's room is fixed: big numbers shrink rather than overflow
-        child: dense ? FittedBox(fit: BoxFit.scaleDown, child: content) : SizedBox(height: 32, child: content),
+        child: dense
+            ? FittedBox(fit: BoxFit.scaleDown, child: content)
+            : stacked
+            ? content
+            : SizedBox(height: 32, child: content),
       ),
     );
     return Tooltip(
-      message: onDownloadTest == null ? t.pages.proxies.upload.test : t.pages.proxies.upload.hint,
+      message: onDownloadTest == null
+          ? t.pages.proxies.upload.test
+          : both
+          ? t.pages.proxies.upload.hintBoth
+          : t.pages.proxies.upload.hint,
       child: dense
           ? chip
           : Material(
               color: s.onSurface.withValues(alpha: .06),
-              shape: const StadiumBorder(),
+              // two lines tall, a rounded card rather than a pill
+              shape: stacked ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)) : const StadiumBorder(),
               clipBehavior: Clip.antiAlias,
               child: AnimatedSize(duration: const Duration(milliseconds: 300), curve: Curves.easeOut, child: chip),
             ),

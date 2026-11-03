@@ -220,6 +220,18 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
     }).run();
   }
 
+  /// Tests the download speed of what the traffic leaves through.
+  Future<void> downloadTest() async {
+    final bytes = uploadTestBytes(ref);
+    await ref.read(hapticServiceProvider.notifier).lightImpact();
+    await ref.read(proxyRepositoryProvider).downloadTest("", bytes).getOrElse((err) {
+      loggy.warning("error testing download", err);
+      final t = ref.read(translationsProvider).requireValue;
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.upload.failed);
+      return unit;
+    }).run();
+  }
+
   /// Hands [mainGroup]'s choice to the lowest-delay group.
   Future<void> switchToLowest(String mainGroup) async {
     await ref.read(hapticServiceProvider.notifier).lightImpact();

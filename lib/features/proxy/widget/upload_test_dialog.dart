@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -36,6 +37,7 @@ class SpeedTestDialog extends HookConsumerWidget {
     final direction = useState(ref.read(ConfigOptions.speedTestDirection));
     final size = useState(ref.read(ConfigOptions.uploadTestSize));
     final target = useState(SpeedTestTarget.shown);
+    final cleared = useState(false);
     final count = target.value == SpeedTestTarget.chosen ? chosen : this.count;
     // 0: all of them
     final limit = useState(ref.read(ConfigOptions.uploadTestLimit));
@@ -121,6 +123,7 @@ class SpeedTestDialog extends HookConsumerWidget {
               const Gap(10),
               _Section(
                 label: text.amount,
+                hint: text.amountHint,
                 child: SegmentedButton<int>(
                   showSelectedIcon: false,
                   segments: [
@@ -205,6 +208,21 @@ class SpeedTestDialog extends HookConsumerWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+              // the results the rows keep, of this run and the earlier ones
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton.icon(
+                  onPressed: cleared.value
+                      ? null
+                      : () async {
+                          await ref.read(proxiesOverviewNotifierProvider.notifier).clearSpeedTests();
+                          cleared.value = true;
+                        },
+                  style: TextButton.styleFrom(foregroundColor: s.error, visualDensity: VisualDensity.compact),
+                  icon: Icon(cleared.value ? Icons.check_rounded : Icons.delete_sweep_outlined, size: 18),
+                  label: Text(cleared.value ? text.cleared : text.clear),
                 ),
               ),
             ],

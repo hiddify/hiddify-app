@@ -122,7 +122,9 @@
         "unsorted": "Default",
         "name": "Berdasarkan abjad",
         "delay": "Berdasarkan latensi",
-        "usage": "Berdasarkan penggunaan"
+        "usage": "Berdasarkan penggunaan",
+        "upload": "Menurut kecepatan unggah",
+        "download": "Menurut kecepatan unduh"
       },
       "ipInfo": {
         "address": "Alamat IP",
@@ -160,7 +162,8 @@
       "upload": {
         "test": "Uji kecepatan unggah",
         "failed": "Uji kecepatan tidak dapat dimulai",
-        "hint": "Ketuk: kecepatan unggah · Tahan: kecepatan unduh"
+        "hint": "Ketuk: kecepatan unggah · Tahan: kecepatan unduh",
+        "hintBoth": "Ketuk: kedua kecepatan · Tahan: kecepatan unduh"
       },
       "speedTest": {
         "title": "Tes kecepatan",
@@ -180,6 +183,9 @@
         "testDownload": "Tes kecepatan unduh",
         "both": "Keduanya",
         "bothWays": "unduh dan unggah",
+        "amountHint": "lebih banyak lebih akurat",
+        "clear": "Hapus hasil tersimpan",
+        "cleared": "Dihapus",
         "which": "Proksi mana",
         "shown": "Ditampilkan ($n)",
         "chosen": "Dipilih ($n)"
@@ -935,7 +941,7 @@
       "search": "Cari",
       "all": "Pilih semua",
       "none": "Hapus",
-      "run": "Jalankan $n",
+      "run": "Gunakan $n ini",
       "sort": "Urutkan",
       "sortProfile": "Urutan profil",
       "sortPing": "Ping",
@@ -948,6 +954,7 @@
       "paused": "$n proksi dijeda: tidak ada ping dan tidak bisa dites.",
       "wake": "Jalankan semua untuk dites",
       "offline": "Sambungkan untuk melihat ping dan mengetesnya.",
+      "offlineTitle": "Tidak tersambung",
       "shown": "$n ditampilkan",
       "noMatch": "Tidak ada proksi yang cocok",
       "chosenHint": "Ketuk proksi di atas untuk memilihnya",
@@ -956,7 +963,8 @@
       "protocol": "Protokol",
       "country": "Negara",
       "anyProtocol": "Protokol apa pun",
-      "anyCountry": "Negara apa pun"
+      "anyCountry": "Negara apa pun",
+      "otherCountries": "Lainnya"
     },
     "localProxy": {
       "title": "Proksi lokal",

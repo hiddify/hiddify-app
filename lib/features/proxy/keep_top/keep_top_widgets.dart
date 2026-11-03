@@ -248,6 +248,8 @@ class KeepTopFooter extends HookConsumerWidget {
     final theme = Theme.of(context);
     final s = theme.colorScheme;
     final busy = useState(false);
+    // how many "keep the fastest" keeps, picked beside its button
+    final keepCount = useState(keepTopDefault);
     final profile = ref.watch(activeProfileProvider).valueOrNull;
     if (profile == null) return const SizedBox.shrink();
     final total = ref.watch(profileProxyCountProvider(profile.id)).valueOrNull ?? 0;
@@ -278,38 +280,56 @@ class KeepTopFooter extends HookConsumerWidget {
       _ when chosen => (text.chosen(n: listed), text.keptBody(paused: max(0, total - listed))),
       (true, true) => (text.picking(keep: keepTop, count: total), text.pickingBody),
       (true, false) => (text.kept(n: listed), text.keptBody(paused: max(0, total - listed))),
-      _ => (text.big(count: total), text.bigBody(keep: keepTopDefault)),
+      _ => (text.big(count: total), text.bigBody(keep: keepCount.value)),
     };
     const compact = VisualDensity(horizontal: -1, vertical: -2);
-    final buttons = keeping
-        ? [
-            TextButton.icon(
+    // a big profile: one button keeps the fastest; the chevron at its end picks how many
+    final counts = [
+      for (final n in _keepCounts)
+        if (n < total) n,
+    ];
+    Widget keepButton({required bool expand}) => _KeepButton(
+      label: text.keep(keep: keepCount.value),
+      tooltip: t.dialogs.keepTop.howMany,
+      counts: counts,
+      count: keepCount.value,
+      onCount: (n) => keepCount.value = n,
+      onKeep: busy.value ? null : () => apply((notifier) => notifier.set(profile, keepCount.value)),
+      expand: expand,
+    );
+
+    // the buttons: side by side under the card, or one over the other filling its end column
+    List<Widget> buttonsFor({required bool wide}) {
+      // in a column, the second is outlined, as wide as the first
+      Widget secondary(VoidCallback? onPressed, IconData icon, String label) => wide
+          ? OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(visualDensity: compact, minimumSize: const Size(0, 40)),
+              onPressed: onPressed,
+              icon: Icon(icon, size: 18),
+              label: Text(label),
+            )
+          : TextButton.icon(
               style: TextButton.styleFrom(visualDensity: compact),
-              onPressed: busy.value ? null : choose,
-              icon: const Icon(Icons.tune_rounded, size: 18),
-              label: Text(text.change),
-            ),
-            FilledButton.tonalIcon(
-              style: FilledButton.styleFrom(visualDensity: compact),
-              onPressed: busy.value ? null : showAll,
-              icon: const Icon(Icons.unfold_more_rounded, size: 18),
-              label: Text(text.showAll(count: total)),
-            ),
-          ]
-        : [
-            TextButton.icon(
-              style: TextButton.styleFrom(visualDensity: compact),
-              onPressed: busy.value ? null : pick,
-              icon: const Icon(Icons.checklist_rounded, size: 18),
-              label: Text(text.choose),
-            ),
-            FilledButton.icon(
-              style: FilledButton.styleFrom(visualDensity: compact),
-              onPressed: busy.value ? null : choose,
-              icon: const Icon(Icons.bolt_rounded, size: 18),
-              label: Text(text.keep(keep: keepTopDefault)),
-            ),
-          ];
+              onPressed: onPressed,
+              icon: Icon(icon, size: 18),
+              label: Text(label),
+            );
+      if (keeping) {
+        return [
+          secondary(busy.value ? null : choose, Icons.tune_rounded, text.change),
+          FilledButton.tonalIcon(
+            // one over the other, the buttons are one height
+            style: FilledButton.styleFrom(visualDensity: compact, minimumSize: wide ? const Size(0, 40) : null),
+            onPressed: busy.value ? null : showAll,
+            icon: const Icon(Icons.unfold_more_rounded, size: 18),
+            label: Text(text.showAll(count: total)),
+          ),
+        ];
+      }
+      final chooseButton = secondary(busy.value ? null : pick, Icons.checklist_rounded, text.choose);
+      // in a column the main action leads; side by side, it ends the row
+      return wide ? [keepButton(expand: true), chooseButton] : [chooseButton, keepButton(expand: false)];
+    }
 
     Widget dots = KeepTopDots(key: ValueKey((keeping, picking)), running: picking ? 0 : running, total: total);
     if (picking) {
@@ -319,56 +339,297 @@ class KeepTopFooter extends HookConsumerWidget {
           .shimmer(duration: 1400.ms, color: s.primary.withValues(alpha: .6), angle: .4);
     }
 
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 520),
-        margin: const EdgeInsets.fromLTRB(12, 16, 12, 0),
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: AlignmentDirectional.topStart,
-            end: AlignmentDirectional.bottomEnd,
-            colors: [Color.alphaBlend(s.primary.withValues(alpha: .12), s.surfaceContainerLow), s.surfaceContainerLow],
+    final header = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _Badge(picking: picking || busy.value, chosen: chosen),
+        const Gap(12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+              const Gap(2),
+              Text(body, style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant, height: 1.35)),
+            ],
           ),
-          border: Border.all(color: s.primary.withValues(alpha: .16)),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _Badge(picking: picking || busy.value, chosen: chosen),
-                const Gap(12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        if (keeping) ...[const Gap(8), KeepTopCountPill(running: picking ? keepTop : listed, total: total)],
+      ],
+    );
+    // the proxies at a glance, on a track of their own
+    final track = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(color: s.onSurface.withValues(alpha: .04), borderRadius: BorderRadius.circular(14)),
+      child: FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerStart, child: dots),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // room for two columns: what runs on the start, what to do about it on the end
+        final wide = constraints.maxWidth >= _twoColumns;
+        return Center(
+          child: Container(
+            constraints: BoxConstraints(maxWidth: wide ? 860 : 520),
+            margin: const EdgeInsets.fromLTRB(12, 16, 12, 0),
+            padding: wide ? const EdgeInsets.all(16) : const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: LinearGradient(
+                begin: AlignmentDirectional.topStart,
+                end: AlignmentDirectional.bottomEnd,
+                colors: [
+                  Color.alphaBlend(s.primary.withValues(alpha: .12), s.surfaceContainerLow),
+                  s.surfaceContainerLow,
+                ],
+              ),
+              border: Border.all(color: s.primary.withValues(alpha: .16)),
+            ),
+            child: wide
+                ? IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [header, const Gap(14), track],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: VerticalDivider(width: 1, color: s.primary.withValues(alpha: .14)),
+                        ),
+                        // the buttons one over the other, filling the column
+                        SizedBox(
+                          width: 240,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              for (final (i, button) in buttonsFor(wide: true).indexed) ...[
+                                if (i > 0) const Gap(8),
+                                button,
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-                      const Gap(2),
-                      Text(body, style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant, height: 1.35)),
+                      header,
+                      const Gap(14),
+                      track,
+                      const Gap(10),
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: buttonsFor(wide: false)),
                     ],
                   ),
-                ),
-                if (keeping) ...[const Gap(8), KeepTopCountPill(running: picking ? keepTop : listed, total: total)],
-              ],
-            ),
-            const Gap(14),
-            // the proxies at a glance, on a track of their own
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-              decoration: BoxDecoration(
-                color: s.onSurface.withValues(alpha: .04),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerStart, child: dots),
-            ),
-            const Gap(10),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: buttons),
-          ],
+          ).animate().fadeIn(duration: 350.ms).slideY(begin: .06, duration: 350.ms, curve: Curves.easeOutCubic),
+        );
+      },
+    );
+  }
+}
+
+/// From this wide, the footer lays out in two columns.
+const _twoColumns = 640.0;
+
+/// The counts "keep the fastest" offers beside its button.
+const _keepCounts = [3, 5, 10, 20, 30, 50];
+
+/// "Keep the N fastest" as one pill: a tap keeps them; the round chevron at its end opens the counts
+/// to pick N from.
+class _KeepButton extends HookWidget {
+  const _KeepButton({
+    required this.label,
+    required this.tooltip,
+    required this.counts,
+    required this.count,
+    required this.onCount,
+    required this.onKeep,
+    this.expand = false,
+  });
+
+  final String label;
+  final String tooltip;
+  final List<int> counts;
+  final int count;
+  final ValueChanged<int> onCount;
+  final VoidCallback? onKeep;
+
+  /// Fills the width it is given.
+  final bool expand;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    final menu = useMemoized(MenuController.new);
+    final enabled = onKeep != null;
+    final on = enabled ? s.onPrimary : s.onSurface.withValues(alpha: .38);
+    return MenuAnchor(
+      controller: menu,
+      alignmentOffset: const Offset(0, 6),
+      style: MenuStyle(
+        shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+        padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+      ),
+      menuChildren: [
+        _CountPicker(
+          title: tooltip,
+          counts: counts,
+          count: count,
+          onCount: (n) {
+            onCount(n);
+            menu.close();
+          },
         ),
-      ).animate().fadeIn(duration: 350.ms).slideY(begin: .06, duration: 350.ms, curve: Curves.easeOutCubic),
+      ],
+      builder: (context, controller, _) => Material(
+        color: enabled ? s.primary : s.onSurface.withValues(alpha: .12),
+        shape: const StadiumBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onKeep,
+          child: SizedBox(
+            height: 40,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(start: 16, end: 4),
+              child: Row(
+                mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+                children: [
+                  Icon(Icons.bolt_rounded, size: 18, color: on),
+                  const Gap(8),
+                  Flexible(
+                    fit: expand ? FlexFit.tight : FlexFit.loose,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: expand ? TextAlign.center : TextAlign.start,
+                      style: theme.textTheme.labelLarge?.copyWith(color: on, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  const Gap(8),
+                  // how many: a round chevron inside the pill
+                  Tooltip(
+                    message: tooltip,
+                    child: Material(
+                      color: on.withValues(alpha: .16),
+                      shape: const CircleBorder(),
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: enabled ? () => controller.isOpen ? controller.close() : controller.open() : null,
+                        child: SizedBox.square(
+                          dimension: 32,
+                          child: Icon(Icons.expand_more_rounded, size: 20, color: on),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The counts "keep the fastest" offers, as round buttons in a row under [title]: the current one
+/// lit in the accent, a tap picks another.
+class _CountPicker extends StatelessWidget {
+  const _CountPicker({required this.title, required this.counts, required this.count, required this.onCount});
+
+  final String title;
+  final List<int> counts;
+  final int count;
+  final ValueChanged<int> onCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.bolt_rounded, size: 16, color: s.primary),
+              const Gap(6),
+              Text(title, style: theme.textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant)),
+            ],
+          ),
+          const Gap(12),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (final (i, n) in counts.indexed) ...[
+                if (i > 0) const Gap(8),
+                _CountBubble(n: n, chosen: n == count, onTap: () => onCount(n)),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One count of "keep the fastest": a circle, filled in the accent when chosen.
+class _CountBubble extends StatelessWidget {
+  const _CountBubble({required this.n, required this.chosen, required this.onTap});
+
+  final int n;
+  final bool chosen;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    return AnimatedScale(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutBack,
+      scale: chosen ? 1.08 : 1,
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: chosen ? s.primary : s.surfaceContainerHighest,
+              border: Border.all(color: chosen ? s.primary : s.outlineVariant.withValues(alpha: .6)),
+              boxShadow: chosen
+                  ? [BoxShadow(color: s.primary.withValues(alpha: .35), blurRadius: 10, offset: const Offset(0, 2))]
+                  : null,
+            ),
+            child: Text(
+              '$n',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: chosen ? s.onPrimary : s.onSurface,
+                fontWeight: FontWeight.w700,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

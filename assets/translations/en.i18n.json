@@ -122,7 +122,9 @@
         "unsorted": "Default",
         "name": "Alphabetically",
         "delay": "By delay",
-        "usage": "By usage"
+        "usage": "By usage",
+        "upload": "By upload speed",
+        "download": "By download speed"
       },
       "ipInfo": {
         "address": "IP address",
@@ -160,7 +162,8 @@
       "upload": {
         "test": "Test upload speed",
         "failed": "Could not start the speed test",
-        "hint": "Tap: upload speed · Hold: download speed"
+        "hint": "Tap: upload speed · Hold: download speed",
+        "hintBoth": "Tap: both speeds · Hold: download speed"
       },
       "speedTest": {
         "title": "Speed test",
@@ -180,6 +183,9 @@
         "testDownload": "Test download speed",
         "both": "Both",
         "bothWays": "down and up",
+        "amountHint": "more is more accurate",
+        "clear": "Clear saved results",
+        "cleared": "Cleared",
         "which": "Which proxies",
         "shown": "Shown ($n)",
         "chosen": "Chosen ($n)"
@@ -1001,7 +1007,7 @@
       "search": "Search",
       "all": "Select all",
       "none": "Clear",
-      "run": "Run $n",
+      "run": "Use these $n",
       "sort": "Sort",
       "sortProfile": "Profile order",
       "sortPing": "Ping",
@@ -1014,6 +1020,7 @@
       "paused": "$n proxies are paused: they have no ping and can't be tested.",
       "wake": "Run all to test",
       "offline": "Connect to see their ping and test them.",
+      "offlineTitle": "Not connected",
       "shown": "$n shown",
       "noMatch": "No proxy matches",
       "chosenHint": "Tap a proxy above to choose it",
@@ -1022,7 +1029,8 @@
       "protocol": "Protocol",
       "country": "Country",
       "anyProtocol": "Any protocol",
-      "anyCountry": "Any country"
+      "anyCountry": "Any country",
+      "otherCountries": "Others"
     },
     "localProxy": {
       "title": "Local proxy",

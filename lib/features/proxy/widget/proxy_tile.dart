@@ -19,7 +19,14 @@ import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProxyTile extends HookConsumerWidget with PresLogger {
-  const ProxyTile(this.proxy, {super.key, required this.selected, required this.onTap, this.testable = true});
+  const ProxyTile(
+    this.proxy, {
+    super.key,
+    required this.selected,
+    required this.onTap,
+    this.testable = true,
+    this.showPing = true,
+  });
 
   final OutboundInfo proxy;
   final bool selected;
@@ -27,6 +34,9 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
 
   /// Whether a tap on the ping or the speeds tests the proxy; else a tap anywhere is the row's.
   final bool testable;
+
+  /// Whether the ping shows: not for a proxy the core does not run, which no ping will reach.
+  final bool showPing;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,7 +52,16 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     // the proxy gave up: the row fades, only the red word stays bright
     final faded = state == ProxyRowState.failed;
     // tested for its upload or download speed, or being tested: the speeds show under the ping
-    final uploaded = proxy.uploadTesting || proxy.uploadSpeed != 0 || proxy.downloadTesting || proxy.downloadSpeed != 0;
+    // a proxy whose ping and both speeds failed shows the ping's cross alone
+    final allFailed =
+        state == ProxyRowState.pingFailed &&
+        proxy.uploadSpeed < 0 &&
+        proxy.downloadSpeed < 0 &&
+        !proxy.uploadTesting &&
+        !proxy.downloadTesting;
+    final uploaded =
+        !allFailed &&
+        (proxy.uploadTesting || proxy.uploadSpeed != 0 || proxy.downloadTesting || proxy.downloadSpeed != 0);
     final word = switch (state) {
       ProxyRowState.connecting => t.pages.proxies.status.connecting,
       ProxyRowState.registering => t.pages.proxies.status.registering,
@@ -109,7 +128,9 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
                     duration: const Duration(milliseconds: 250),
                     child: KeyedSubtree(
                       key: ValueKey((state, style)),
-                      child: _ping(context, state, style, colors, t, arrived: arrived),
+                      child: showPing
+                          ? _ping(context, state, style, colors, t, arrived: arrived)
+                          : const SizedBox.shrink(),
                     ),
                   ),
                 ),
@@ -122,9 +143,11 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
                 child: UploadSpeedChip(
                   speed: proxy.uploadSpeed.toInt(),
                   testing: proxy.uploadTesting,
+                  cached: proxy.uploadSpeedCached,
                   onTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag),
                   downloadSpeed: proxy.downloadSpeed.toInt(),
                   downloadTesting: proxy.downloadTesting,
+                  downloadCached: proxy.downloadSpeedCached,
                   onDownloadTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).downloadTest(proxy.tag),
                   dense: true,
                 ),

@@ -659,6 +659,8 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.bool? uploadTesting,
     $fixnum.Int64? downloadSpeed,
     $core.bool? downloadTesting,
+    $core.bool? uploadSpeedCached,
+    $core.bool? downloadSpeedCached,
   }) {
     final $result = create();
     if (tag != null) {
@@ -727,6 +729,12 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (downloadTesting != null) {
       $result.downloadTesting = downloadTesting;
     }
+    if (uploadSpeedCached != null) {
+      $result.uploadSpeedCached = uploadSpeedCached;
+    }
+    if (downloadSpeedCached != null) {
+      $result.downloadSpeedCached = downloadSpeedCached;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -756,6 +764,8 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aOB(20, _omitFieldNames ? '' : 'uploadTesting')
     ..aInt64(21, _omitFieldNames ? '' : 'downloadSpeed')
     ..aOB(22, _omitFieldNames ? '' : 'downloadTesting')
+    ..aOB(23, _omitFieldNames ? '' : 'uploadSpeedCached')
+    ..aOB(24, _omitFieldNames ? '' : 'downloadSpeedCached')
     ..hasRequiredFields = false
   ;
 
@@ -981,6 +991,24 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasDownloadTesting() => $_has(21);
   @$pb.TagNumber(22)
   void clearDownloadTesting() => clearField(22);
+
+  @$pb.TagNumber(23)
+  $core.bool get uploadSpeedCached => $_getBF(22);
+  @$pb.TagNumber(23)
+  set uploadSpeedCached($core.bool v) { $_setBool(22, v); }
+  @$pb.TagNumber(23)
+  $core.bool hasUploadSpeedCached() => $_has(22);
+  @$pb.TagNumber(23)
+  void clearUploadSpeedCached() => clearField(23);
+
+  @$pb.TagNumber(24)
+  $core.bool get downloadSpeedCached => $_getBF(23);
+  @$pb.TagNumber(24)
+  set downloadSpeedCached($core.bool v) { $_setBool(23, v); }
+  @$pb.TagNumber(24)
+  $core.bool hasDownloadSpeedCached() => $_has(23);
+  @$pb.TagNumber(24)
+  void clearDownloadSpeedCached() => clearField(24);
 }
 
 class IpInfo extends $pb.GeneratedMessage {

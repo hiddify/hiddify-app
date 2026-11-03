@@ -94,6 +94,10 @@ class CoreClient extends $grpc.Client {
       '/hcore.Core/DownloadTest',
       ($0.SpeedTestRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $1.Response.fromBuffer(value));
+  static final _$clearSpeedTests = $grpc.ClientMethod<$1.Empty, $1.Response>(
+      '/hcore.Core/ClearSpeedTests',
+      ($1.Empty value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $1.Response.fromBuffer(value));
   static final _$generateWarpConfig = $grpc.ClientMethod<$0.GenerateWarpConfigRequest, $0.WarpGenerationResponse>(
       '/hcore.Core/GenerateWarpConfig',
       ($0.GenerateWarpConfigRequest value) => value.writeToBuffer(),
@@ -215,6 +219,10 @@ class CoreClient extends $grpc.Client {
 
   $grpc.ResponseFuture<$1.Response> downloadTest($0.SpeedTestRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$downloadTest, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$1.Response> clearSpeedTests($1.Empty request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$clearSpeedTests, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.WarpGenerationResponse> generateWarpConfig($0.GenerateWarpConfigRequest request, {$grpc.CallOptions? options}) {
@@ -393,6 +401,13 @@ abstract class CoreServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.SpeedTestRequest.fromBuffer(value),
         ($1.Response value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$1.Empty, $1.Response>(
+        'ClearSpeedTests',
+        clearSpeedTests_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $1.Empty.fromBuffer(value),
+        ($1.Response value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.GenerateWarpConfigRequest, $0.WarpGenerationResponse>(
         'GenerateWarpConfig',
         generateWarpConfig_Pre,
@@ -544,6 +559,10 @@ abstract class CoreServiceBase extends $grpc.Service {
     return downloadTest(call, await request);
   }
 
+  $async.Future<$1.Response> clearSpeedTests_Pre($grpc.ServiceCall call, $async.Future<$1.Empty> request) async {
+    return clearSpeedTests(call, await request);
+  }
+
   $async.Future<$0.WarpGenerationResponse> generateWarpConfig_Pre($grpc.ServiceCall call, $async.Future<$0.GenerateWarpConfigRequest> request) async {
     return generateWarpConfig(call, await request);
   }
@@ -606,6 +625,7 @@ abstract class CoreServiceBase extends $grpc.Service {
   $async.Future<$1.Response> urlTestActive($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$1.Response> uploadTest($grpc.ServiceCall call, $0.SpeedTestRequest request);
   $async.Future<$1.Response> downloadTest($grpc.ServiceCall call, $0.SpeedTestRequest request);
+  $async.Future<$1.Response> clearSpeedTests($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$0.WarpGenerationResponse> generateWarpConfig($grpc.ServiceCall call, $0.GenerateWarpConfigRequest request);
   $async.Future<$0.SystemProxyStatus> getSystemProxyStatus($grpc.ServiceCall call, $1.Empty request);
   $async.Future<$1.Response> setSystemProxyEnabled($grpc.ServiceCall call, $0.SetSystemProxyEnabledRequest request);

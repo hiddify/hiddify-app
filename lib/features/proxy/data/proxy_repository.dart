@@ -16,6 +16,7 @@ abstract interface class ProxyRepository {
   TaskEither<ProxyFailure, Unit> urlTest(String groupTag);
   TaskEither<ProxyFailure, Unit> uploadTest(String tag, int bytes);
   TaskEither<ProxyFailure, Unit> downloadTest(String tag, int bytes);
+  TaskEither<ProxyFailure, Unit> clearSpeedTests();
 }
 
 class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRepository {
@@ -68,6 +69,14 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
   TaskEither<ProxyFailure, Unit> downloadTest(String tag, int bytes) {
     return exceptionHandler(
       () => singbox.speedTest(tag, bytes, download: true).mapLeft(ProxyUnexpectedFailure.new).run(),
+      ProxyUnexpectedFailure.new,
+    );
+  }
+
+  @override
+  TaskEither<ProxyFailure, Unit> clearSpeedTests() {
+    return exceptionHandler(
+      () => singbox.clearSpeedTests().mapLeft(ProxyUnexpectedFailure.new).run(),
       ProxyUnexpectedFailure.new,
     );
   }

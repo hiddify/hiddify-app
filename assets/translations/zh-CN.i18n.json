@@ -122,7 +122,9 @@
         "unsorted": "默认",
         "name": "按名称",
         "delay": "按延迟",
-        "usage": "按用量"
+        "usage": "按用量",
+        "upload": "按上传速度",
+        "download": "按下载速度"
       },
       "ipInfo": {
         "address": "IP 地址",
@@ -160,7 +162,8 @@
       "upload": {
         "test": "测试上传速度",
         "failed": "无法开始测速",
-        "hint": "点按：上传速度 · 长按：下载速度"
+        "hint": "点按：上传速度 · 长按：下载速度",
+        "hintBoth": "点按：两个速度 · 长按：下载速度"
       },
       "speedTest": {
         "title": "测速",
@@ -180,6 +183,9 @@
         "testDownload": "测试下载速度",
         "both": "两者",
         "bothWays": "下载和上传",
+        "amountHint": "越多越准确",
+        "clear": "清除已保存的结果",
+        "cleared": "已清除",
         "which": "哪些代理",
         "shown": "显示的 ($n)",
         "chosen": "已选 ($n)"
@@ -935,7 +941,7 @@
       "search": "搜索",
       "all": "全选",
       "none": "清除",
-      "run": "运行 $n 个",
+      "run": "使用这 $n 个",
       "sort": "排序",
       "sortProfile": "配置顺序",
       "sortPing": "延迟",
@@ -948,6 +954,7 @@
       "paused": "$n 个代理已暂停：没有延迟，也无法测试。",
       "wake": "全部运行以测试",
       "offline": "连接后可查看延迟并测试。",
+      "offlineTitle": "未连接",
       "shown": "显示 $n 个",
       "noMatch": "没有匹配的代理",
       "chosenHint": "点按上方的代理来选择",
@@ -956,7 +963,8 @@
       "protocol": "协议",
       "country": "国家",
       "anyProtocol": "任意协议",
-      "anyCountry": "任意国家"
+      "anyCountry": "任意国家",
+      "otherCountries": "其他"
     },
     "localProxy": {
       "title": "本地代理",
