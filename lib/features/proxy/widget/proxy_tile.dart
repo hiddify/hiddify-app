@@ -19,11 +19,14 @@ import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProxyTile extends HookConsumerWidget with PresLogger {
-  const ProxyTile(this.proxy, {super.key, required this.selected, required this.onTap});
+  const ProxyTile(this.proxy, {super.key, required this.selected, required this.onTap, this.testable = true});
 
   final OutboundInfo proxy;
   final bool selected;
   final GestureTapCallback? onTap;
+
+  /// Whether a tap on the ping or the speeds tests the proxy; else a tap anywhere is the row's.
+  final bool testable;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,8 +41,8 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     final colors = _RowColors.of(context);
     // the proxy gave up: the row fades, only the red word stays bright
     final faded = state == ProxyRowState.failed;
-    // tested for its upload speed, or being tested: the speed shows under the ping
-    final uploaded = proxy.uploadTesting || proxy.uploadSpeed != 0;
+    // tested for its upload or download speed, or being tested: the speeds show under the ping
+    final uploaded = proxy.uploadTesting || proxy.uploadSpeed != 0 || proxy.downloadTesting || proxy.downloadSpeed != 0;
     final word = switch (state) {
       ProxyRowState.connecting => t.pages.proxies.status.connecting,
       ProxyRowState.registering => t.pages.proxies.status.registering,
@@ -95,8 +98,10 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
               child: InkWell(
                 borderRadius: BorderRadius.circular(8),
                 // a tap tests this proxy's ping, a long press its upload speed
-                onTap: () => ref.read(proxiesOverviewNotifierProvider.notifier).urlTest(proxy.tag),
-                onLongPress: () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag),
+                onTap: testable ? () => ref.read(proxiesOverviewNotifierProvider.notifier).urlTest(proxy.tag) : null,
+                onLongPress: testable
+                    ? () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag)
+                    : null,
                 child: Padding(
                   padding: uploaded ? const EdgeInsets.symmetric(horizontal: 6, vertical: 2) : const EdgeInsets.all(6),
                   child: AnimatedSwitcher(
@@ -111,11 +116,18 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
               ),
             ),
             if (uploaded)
-              UploadSpeedChip(
-                speed: proxy.uploadSpeed.toInt(),
-                testing: proxy.uploadTesting,
-                onTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag),
-                dense: true,
+              // a tap tests the upload again, a long press the download
+              IgnorePointer(
+                ignoring: !testable,
+                child: UploadSpeedChip(
+                  speed: proxy.uploadSpeed.toInt(),
+                  testing: proxy.uploadTesting,
+                  onTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag),
+                  downloadSpeed: proxy.downloadSpeed.toInt(),
+                  downloadTesting: proxy.downloadTesting,
+                  onDownloadTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).downloadTest(proxy.tag),
+                  dense: true,
+                ),
               ),
           ],
         ),

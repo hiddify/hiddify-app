@@ -51,6 +51,7 @@ class ProfileParser with InfraLogger {
     'chain-status',
     'extra-security',
     'keep-top',
+    'keep-tags',
   ];
   static const allowedProfileHeaders = [
     'profile-title',
@@ -574,6 +575,10 @@ class ProfileParser with InfraLogger {
     // keep-top: the user's choice, else the subscription's; -1 (or none) runs every proxy
     if (userOverride?.keepTop ?? keepTopHeader(keepTopInput) case final keepTop?) {
       headers['keep-top'] = keepTop;
+    }
+    // keep-tags: the proxies the user chose run, and only them, while any is still in the profile
+    if (userOverride?.keepTags case final tags? when tags.isNotEmpty) {
+      headers['keep-tags'] = tags;
     }
 
     headers.removeWhere(

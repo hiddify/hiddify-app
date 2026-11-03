@@ -153,16 +153,36 @@
         "big": "$count proxy sedang berjalan",
         "bigBody": "Jalankan hanya $keep yang tercepat untuk menghemat baterai dan data.",
         "keep": "Pertahankan $keep tercepat",
-        "change": "Ubah jumlah"
+        "change": "Ubah jumlah",
+        "chosen": "$n proksi pilihan Anda sedang berjalan",
+        "choose": "Pilih"
       },
       "upload": {
         "test": "Uji kecepatan unggah",
         "failed": "Uji kecepatan tidak dapat dimulai",
-        "warnTitle": "Banyak data",
-        "perProxy": "$n MB melalui masing-masing dari $count proxy",
-        "warnBody": "Uji unggah semua proxy bisa memakai banyak data. Batasi daftar ke $limit yang tercepat dan uji hanya itu. Batasnya bisa diubah di pengaturan.",
-        "testAll": "Uji semua $count",
-        "testFastest": "Pertahankan dan uji $limit tercepat"
+        "hint": "Ketuk: kecepatan unggah · Tahan: kecepatan unduh"
+      },
+      "speedTest": {
+        "title": "Tes kecepatan",
+        "what": "Yang dites",
+        "download": "Unduh",
+        "upload": "Unggah",
+        "amount": "Jumlah per proksi",
+        "proxies": "Proksi yang dites",
+        "proxiesHint": "Tercepat menurut ping",
+        "all": "Semua",
+        "fastest": "$n tercepat",
+        "through": "$n MB lewat tiap $count tercepat",
+        "throughAll": "$n MB lewat tiap $count proksi",
+        "throughEach": "$n MB lewat tiap proksi",
+        "start": "Mulai tes",
+        "save": "Simpan",
+        "testDownload": "Tes kecepatan unduh",
+        "both": "Keduanya",
+        "bothWays": "unduh dan unggah",
+        "which": "Proksi mana",
+        "shown": "Ditampilkan ($n)",
+        "chosen": "Dipilih ($n)"
       }
     },
     "profiles": {
@@ -337,8 +357,7 @@
         "useSystemTlsEngineMsg": "Koneksi tanpa sidik jari TLS menggunakan TLS macOS, iOS, atau Windows setelah lolos pemeriksaan di perangkat ini; jika tidak, koneksi akan terlihat seperti Chrome.",
         "uploadTestSize": "Ukuran uji unggah",
         "megabytes": "$n MB",
-        "uploadTestLimit": "Batas proxy uji unggah",
-        "uploadTestLimitMsg": "Bertanya sebelum menguji lebih dari $n proxy"
+        "speedTest": "Tes kecepatan"
       },
       "routing": {
         "title": "Perutean",
@@ -907,7 +926,37 @@
       "all": "Semua $count berjalan",
       "keep": "Pertahankan $keep tercepat",
       "useAll": "Gunakan semua $count",
-      "howMany": "Berapa yang tetap berjalan"
+      "howMany": "Berapa yang tetap berjalan",
+      "pickByHand": "Pilih proksi sendiri"
+    },
+    "keepTags": {
+      "title": "Pilih proksi",
+      "hint": "Hanya ini yang berjalan, setiap kali tersambung.",
+      "search": "Cari",
+      "all": "Pilih semua",
+      "none": "Hapus",
+      "run": "Jalankan $n",
+      "sort": "Urutkan",
+      "sortProfile": "Urutan profil",
+      "sortPing": "Ping",
+      "sortDownload": "Unduh",
+      "sortUpload": "Unggah",
+      "selectFastest": "$n tercepat",
+      "statusChosen": "Dipilih",
+      "statusAnswering": "Merespons",
+      "statusPaused": "Dijeda",
+      "paused": "$n proksi dijeda: tidak ada ping dan tidak bisa dites.",
+      "wake": "Jalankan semua untuk dites",
+      "offline": "Sambungkan untuk melihat ping dan mengetesnya.",
+      "shown": "$n ditampilkan",
+      "noMatch": "Tidak ada proksi yang cocok",
+      "chosenHint": "Ketuk proksi di atas untuk memilihnya",
+      "allShown": "Semuanya ada di daftar di atas",
+      "notShown": "Tidak ditampilkan:",
+      "protocol": "Protokol",
+      "country": "Negara",
+      "anyProtocol": "Protokol apa pun",
+      "anyCountry": "Negara apa pun"
     },
     "localProxy": {
       "title": "Proksi lokal",

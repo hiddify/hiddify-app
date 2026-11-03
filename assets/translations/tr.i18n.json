@@ -153,16 +153,36 @@
         "big": "$count proxy çalışıyor",
         "bigBody": "Pil ve veri tasarrufu için yalnızca en hızlı $keep tanesini çalışır bırakın.",
         "keep": "En hızlı $keep taneyi tut",
-        "change": "Sayıyı değiştir"
+        "change": "Sayıyı değiştir",
+        "chosen": "Seçtiğiniz $n proxy çalışıyor",
+        "choose": "Seç"
       },
       "upload": {
         "test": "Yükleme hızını test et",
         "failed": "Hız testi başlatılamadı",
-        "warnTitle": "Çok fazla veri",
-        "perProxy": "$count proxy'nin her biri üzerinden $n MB",
-        "warnBody": "Tüm proxy'lerin yükleme testi çok veri kullanabilir. Listeyi en hızlı $limit taneyle sınırlayıp yalnızca onları test edin. Sınırı ayarlardan değiştirebilirsiniz.",
-        "testAll": "$count tanesini de test et",
-        "testFastest": "En hızlı $limit taneyi tut ve test et"
+        "hint": "Dokun: yükleme hızı · Basılı tut: indirme hızı"
+      },
+      "speedTest": {
+        "title": "Hız testi",
+        "what": "Ne test edilsin",
+        "download": "İndirme",
+        "upload": "Yükleme",
+        "amount": "Proxy başına miktar",
+        "proxies": "Test edilecek proxy'ler",
+        "proxiesHint": "Ping'e göre en hızlılar",
+        "all": "Tümü",
+        "fastest": "En hızlı $n",
+        "through": "En hızlı $count proxy'nin her birinden $n MB",
+        "throughAll": "$count proxy'nin her birinden $n MB",
+        "throughEach": "Her proxy'den $n MB",
+        "start": "Testi başlat",
+        "save": "Kaydet",
+        "testDownload": "İndirme hızını test et",
+        "both": "İkisi",
+        "bothWays": "indirme ve yükleme",
+        "which": "Hangi proxy'ler",
+        "shown": "Gösterilen ($n)",
+        "chosen": "Seçilen ($n)"
       }
     },
     "profiles": {
@@ -337,8 +357,7 @@
         "useSystemTlsEngineMsg": "TLS parmak izi olmayan bağlantılar, bu cihazda bir denetimden geçtikten sonra macOS, iOS veya Windows’un TLS’ini kullanır; aksi hâlde Chrome gibi görünür.",
         "uploadTestSize": "Yükleme testi boyutu",
         "megabytes": "$n MB",
-        "uploadTestLimit": "Yükleme testi proxy sınırı",
-        "uploadTestLimitMsg": "$n proxy'den fazlasını test etmeden önce sorar"
+        "speedTest": "Hız testi"
       },
       "routing": {
         "title": "Yönlendirme",
@@ -907,7 +926,37 @@
       "all": "$count tanesinin hepsi çalışır",
       "keep": "En hızlı $keep taneyi tut",
       "useAll": "$count tanesini de kullan",
-      "howMany": "Kaç tanesi çalışsın"
+      "howMany": "Kaç tanesi çalışsın",
+      "pickByHand": "Proxy'leri kendiniz seçin"
+    },
+    "keepTags": {
+      "title": "Proxy seç",
+      "hint": "Her bağlandığınızda yalnızca bunlar çalışır.",
+      "search": "Ara",
+      "all": "Tümünü seç",
+      "none": "Temizle",
+      "run": "$n çalıştır",
+      "sort": "Sırala",
+      "sortProfile": "Profil sırası",
+      "sortPing": "Ping",
+      "sortDownload": "İndirme",
+      "sortUpload": "Yükleme",
+      "selectFastest": "En hızlı $n",
+      "statusChosen": "Seçilen",
+      "statusAnswering": "Yanıt veren",
+      "statusPaused": "Duraklatılmış",
+      "paused": "$n proxy duraklatılmış: ping'leri yok ve test edilemezler.",
+      "wake": "Test için hepsini çalıştır",
+      "offline": "Ping'lerini görmek ve test etmek için bağlanın.",
+      "shown": "$n gösteriliyor",
+      "noMatch": "Eşleşen proxy yok",
+      "chosenHint": "Seçmek için yukarıdan bir proxy'ye dokunun",
+      "allShown": "Hepsi yukarıdaki listede",
+      "notShown": "Gösterilmeyen:",
+      "protocol": "Protokol",
+      "country": "Ülke",
+      "anyProtocol": "Herhangi bir protokol",
+      "anyCountry": "Herhangi bir ülke"
     },
     "localProxy": {
       "title": "Yerel proxy",

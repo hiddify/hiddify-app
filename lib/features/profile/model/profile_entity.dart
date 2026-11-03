@@ -113,6 +113,10 @@ abstract class UserOverride with _$UserOverride {
     /// header decides, or the user is asked when the profile is big (see keep_top.dart).
     int? keepTop,
 
+    /// The tags of the profile's proxies the user chose to run, and only them, whatever [keepTop]
+    /// says, while any of them is still in the profile. Null until the user chose some.
+    List<String>? keepTags,
+
     /// Windows/Linux: whether to prefer elevated admin_bgservice for privileged
     /// proxy features. Subscription sync must not overwrite this field.
     @Default(UserAdminPreference.unset) UserAdminPreference adminPreference,

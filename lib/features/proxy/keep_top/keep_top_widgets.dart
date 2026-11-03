@@ -111,12 +111,15 @@ class _Dot extends StatelessWidget {
 }
 
 /// Asks how many of a profile's [count] proxies run, the fastest, starting at [keep]. Pops that
-/// number, or -1 to run them all.
+/// number, -1 to run them all, or [pickByHand] to choose them one by one.
 class KeepTopDialog extends HookConsumerWidget {
   const KeepTopDialog({super.key, required this.count, required this.keep});
 
   final int count;
   final int keep;
+
+  /// Popped when the user chooses the proxies that run themselves.
+  static const pickByHand = 0;
 
   static const _choices = [3, 5, 10, 20, 30];
 
@@ -195,6 +198,15 @@ class KeepTopDialog extends HookConsumerWidget {
                   ),
                 ],
               ),
+              const Gap(12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.of(context).pop(pickByHand),
+                  icon: const Icon(Icons.checklist_rounded, size: 18),
+                  label: Text(t.dialogs.keepTop.pickByHand),
+                ),
+              ),
             ],
           ),
         ),
@@ -240,7 +252,9 @@ class KeepTopFooter extends HookConsumerWidget {
     if (profile == null) return const SizedBox.shrink();
     final total = ref.watch(profileProxyCountProvider(profile.id)).valueOrNull ?? 0;
     final keepTop = profile.keepTop;
-    final keeping = keepTop > 0 && total > keepTop;
+    // the proxies the user chose run, and only them; the core runs them all when none is left
+    final chosen = profile.keepTags.isNotEmpty && listed < total;
+    final keeping = chosen || (keepTop > 0 && total > keepTop);
     if (!keeping && total <= bigProfileProxies) return const SizedBox.shrink();
 
     Future<void> apply(Future<void> Function(KeepTopNotifier notifier) change) async {
@@ -254,12 +268,14 @@ class KeepTopFooter extends HookConsumerWidget {
 
     void showAll() => apply((notifier) => notifier.set(profile, -1));
     void choose() => apply((notifier) => notifier.choose(profile, total));
+    void pick() => apply((notifier) => notifier.pick(profile));
 
-    // the core runs them all until their first pings are in; the one the user chose stays as well
-    final picking = keeping && listed > keepTop + 1;
+    // the core runs them all until their first pings are in
+    final picking = keeping && !chosen && listed > keepTop;
     final running = keeping && !picking ? listed : total;
     final text = t.pages.proxies.keepTop;
     final (String title, String body) = switch ((keeping, picking)) {
+      _ when chosen => (text.chosen(n: listed), text.keptBody(paused: max(0, total - listed))),
       (true, true) => (text.picking(keep: keepTop, count: total), text.pickingBody),
       (true, false) => (text.kept(n: listed), text.keptBody(paused: max(0, total - listed))),
       _ => (text.big(count: total), text.bigBody(keep: keepTopDefault)),
@@ -281,7 +297,12 @@ class KeepTopFooter extends HookConsumerWidget {
             ),
           ]
         : [
-            const SizedBox.shrink(),
+            TextButton.icon(
+              style: TextButton.styleFrom(visualDensity: compact),
+              onPressed: busy.value ? null : pick,
+              icon: const Icon(Icons.checklist_rounded, size: 18),
+              label: Text(text.choose),
+            ),
             FilledButton.icon(
               style: FilledButton.styleFrom(visualDensity: compact),
               onPressed: busy.value ? null : choose,
@@ -318,7 +339,7 @@ class KeepTopFooter extends HookConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _Badge(picking: picking || busy.value),
+                _Badge(picking: picking || busy.value, chosen: chosen),
                 const Gap(12),
                 Expanded(
                   child: Column(
@@ -330,7 +351,7 @@ class KeepTopFooter extends HookConsumerWidget {
                     ],
                   ),
                 ),
-                if (keeping) ...[const Gap(8), _CountPill(running: picking ? keepTop : listed, total: total)],
+                if (keeping) ...[const Gap(8), KeepTopCountPill(running: picking ? keepTop : listed, total: total)],
               ],
             ),
             const Gap(14),
@@ -352,12 +373,13 @@ class KeepTopFooter extends HookConsumerWidget {
   }
 }
 
-/// The bolt of keep top, in the accent's circle; a ring turns around it while the fastest are
-/// being found.
+/// The bolt of keep top, in the accent's circle, or a checklist for the proxies the user chose; a
+/// ring turns around it while the fastest are being found.
 class _Badge extends StatelessWidget {
-  const _Badge({required this.picking});
+  const _Badge({required this.picking, this.chosen = false});
 
   final bool picking;
+  final bool chosen;
 
   static const _size = 40.0;
 
@@ -375,7 +397,7 @@ class _Badge extends StatelessWidget {
               gradient: RadialGradient(colors: [s.primary.withValues(alpha: .28), s.primary.withValues(alpha: .12)]),
             ),
           ),
-          Icon(Icons.bolt_rounded, size: 22, color: s.primary),
+          Icon(chosen ? Icons.checklist_rounded : Icons.bolt_rounded, size: 22, color: s.primary),
           if (picking)
             SizedBox.square(
               dimension: _size,
@@ -388,8 +410,8 @@ class _Badge extends StatelessWidget {
 }
 
 /// How many run of how many, as the app's chips show a count.
-class _CountPill extends StatelessWidget {
-  const _CountPill({required this.running, required this.total});
+class KeepTopCountPill extends StatelessWidget {
+  const KeepTopCountPill({super.key, required this.running, required this.total});
 
   final int running;
   final int total;

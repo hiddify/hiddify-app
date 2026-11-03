@@ -26,6 +26,9 @@ import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/common/qr_code_scanner_screen.dart';
 import 'package:hiddify/features/crash_report/widget/crash_report_dialog.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_tags_dialog.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
 import 'package:hiddify/features/proxy/widget/upload_test_dialog.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
@@ -164,14 +167,21 @@ class DialogNotifier extends _$DialogNotifier {
     return await _show<int?>(KeepTopDialog(count: count, keep: keep));
   }
 
-  /// Whether an upload test of [count] proxies, more than [limit], tests them all or the fastest;
-  /// null when dismissed.
-  Future<UploadTestChoice?> showUploadTestWarning({
-    required int count,
-    required int limit,
-    required int megabytes,
-  }) async {
-    return await _show<UploadTestChoice?>(UploadTestWarningDialog(count: count, limit: limit, megabytes: megabytes));
+  /// Which of [profile]'s [proxies] run, by their tags; null when dismissed.
+  Future<List<String>?> showKeepTags({required ProfileEntity profile, required List<ProfileProxy> proxies}) async {
+    return await _show<List<String>?>(KeepTagsDialog(profile: profile, proxies: proxies));
+  }
+
+  /// How a speed test of the proxy list runs, saved; true once saved. With [start], its button
+  /// starts the test. [count] is how many proxies the list has, when known.
+  Future<bool> showSpeedTest({int? count, bool start = true}) async {
+    return await _show<SpeedTestTarget?>(SpeedTestDialog(count: count, start: start)) != null;
+  }
+
+  /// The speed test of the proxy picker: of the [shown] proxies or the [chosen] ones; which, once
+  /// saved and to start, or null when dismissed.
+  Future<SpeedTestTarget?> showPickerSpeedTest({required int shown, required int chosen}) async {
+    return await _show<SpeedTestTarget?>(SpeedTestDialog(count: shown, chosen: chosen));
   }
 
   Future<void> showProxyInfo({required OutboundInfo outboundInfo}) async {

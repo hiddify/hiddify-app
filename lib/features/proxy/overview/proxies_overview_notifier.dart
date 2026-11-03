@@ -3,26 +3,20 @@ import 'dart:math';
 
 import 'package:dartx/dartx.dart';
 import 'package:fpdart/fpdart.dart' show unit;
-
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
-import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
-import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
-import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
-import 'package:hiddify/features/proxy/widget/upload_test_dialog.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
-
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
-import 'package:meta/meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -308,32 +302,30 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     }).run();
   }
 
-  /// Tests the upload speed of every proxy in the list. Above the settings' limit it asks first, as
-  /// that sends the test's megabytes through each of them: all of them, or the fastest by their
-  /// ping up to the limit, which then are all that run (keep top).
-  Future<void> uploadTestAll() async {
+  /// Tests the speed of [tag], a proxy, or each proxy of a group, as the speed test is set:
+  /// download, upload, or both; the core tests one proxy's two in turn, never at once.
+  Future<void> speedTest(String tag) async {
+    switch (ref.read(ConfigOptions.speedTestDirection)) {
+      case SpeedTestDirection.download:
+        await downloadTest(tag);
+      case SpeedTestDirection.upload:
+        await uploadTest(tag);
+      case SpeedTestDirection.both:
+        await downloadTest(tag);
+        await uploadTest(tag);
+    }
+  }
+
+  /// Tests the speed of the proxies in the list as the speed test is set: all of them, or the
+  /// fastest by their ping up to its limit, one after the other.
+  Future<void> speedTestAll() async {
     final group = state.valueOrNull;
     if (group == null) return;
     final proxies = group.items.where((e) => !e.isGroup).toList();
     final limit = ref.read(ConfigOptions.uploadTestLimit);
-    if (proxies.length <= limit) return uploadTest(group.tag);
-
-    final choice = await ref
-        .read(dialogNotifierProvider.notifier)
-        .showUploadTestWarning(count: proxies.length, limit: limit, megabytes: ref.read(ConfigOptions.uploadTestSize));
-    switch (choice) {
-      case null:
-        return;
-      case UploadTestChoice.all:
-        return uploadTest(group.tag);
-      case UploadTestChoice.fastest:
-        final fastest = fastestProxies(proxies, limit);
-        if (await ref.read(activeProfileProvider.future) case final profile?) {
-          unawaited(ref.read(keepTopNotifierProvider.notifier).set(profile, limit));
-        }
-        for (final tag in fastest) {
-          await uploadTest(tag);
-        }
+    if (limit <= 0 || proxies.length <= limit) return speedTest(group.tag);
+    for (final tag in fastestProxies(proxies, limit)) {
+      await speedTest(tag);
     }
   }
 
@@ -351,7 +343,6 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
 }
 
 /// The tags of the [count] proxies with the lowest ping that answered.
-@visibleForTesting
 List<String> fastestProxies(List<OutboundInfo> proxies, int count) {
   final answered = proxies.where((e) => e.urlTestDelay > 0 && e.urlTestDelay < 65000).toList()
     ..sort((a, b) => a.urlTestDelay.compareTo(b.urlTestDelay));

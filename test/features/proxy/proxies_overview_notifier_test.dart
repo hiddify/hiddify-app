@@ -15,6 +15,7 @@ import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,6 +43,14 @@ class _Repository implements ProxyRepository {
   @override
   TaskEither<ProxyFailure, Unit> uploadTest(String tag, int bytes) {
     uploaded.add((tag, bytes));
+    return TaskEither.right(unit);
+  }
+
+  final downloaded = <(String, int)>[];
+
+  @override
+  TaskEither<ProxyFailure, Unit> downloadTest(String tag, int bytes) {
+    downloaded.add((tag, bytes));
     return TaskEither.right(unit);
   }
 
@@ -208,12 +217,32 @@ void main() {
     });
   });
 
-  testWidgets('an upload test of a short list tests its group, with the megabytes of the settings', (tester) async {
+  testWidgets('a speed test of a short list tests its group, with the megabytes of the settings', (tester) async {
     await open(tester);
     await stream(tester, [proxy('lowest', 100, group: true), proxy('a', 100), proxy('b', 200)]);
     await tester.runAsync(() => container.read(ConfigOptions.uploadTestSize.notifier).update(2));
-    await notifier().uploadTestAll();
+    await notifier().speedTestAll();
     expect(repository.uploaded, [('select', 2 << 20)]);
+  });
+
+  testWidgets('a speed test of a long list tests only the fastest, one by one, the way it is set', (tester) async {
+    await open(tester);
+    await stream(tester, [proxy('a', 300), proxy('b', 100), proxy('c', 200), proxy('d', 65535)]);
+    await tester.runAsync(() async {
+      await container.read(ConfigOptions.uploadTestLimit.notifier).update(2);
+      await container.read(ConfigOptions.speedTestDirection.notifier).update(SpeedTestDirection.download);
+    });
+    await notifier().speedTestAll();
+    expect(repository.downloaded, [('b', 1 << 20), ('c', 1 << 20)]);
+    expect(repository.uploaded, isEmpty);
+  });
+
+  testWidgets('a speed test set to all of them tests the group', (tester) async {
+    await open(tester);
+    await stream(tester, [proxy('a', 300), proxy('b', 100), proxy('c', 200)]);
+    await tester.runAsync(() => container.read(ConfigOptions.uploadTestLimit.notifier).update(0));
+    await notifier().speedTestAll();
+    expect(repository.uploaded, [('select', 1 << 20)]);
   });
 
   test('the fastest proxies are those that answered, by their ping', () {

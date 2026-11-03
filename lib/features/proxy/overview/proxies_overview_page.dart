@@ -4,13 +4,15 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
-import 'package:hiddify/features/proxy/widget/upload_speed.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -71,15 +73,24 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          // the upload speed of every proxy listed; it asks first when they are many
-          // a long press sets how much each test sends
-          if (proxies.valueOrNull != null)
+          // the speed of the proxies listed, as the speed test is set; a long press sets it, and
+          // starts it
+          if (proxies.valueOrNull case final group?)
             GestureDetector(
-              onLongPress: () => chooseUploadTestSize(ref),
+              onLongPress: () async {
+                final count = group.items.where((e) => !e.isGroup).length;
+                if (await ref.read(dialogNotifierProvider.notifier).showSpeedTest(count: count)) {
+                  await ref.read(proxiesOverviewNotifierProvider.notifier).speedTestAll();
+                }
+              },
               child: FloatingActionButton.small(
                 heroTag: 'upload-test',
-                onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).uploadTestAll(),
-                tooltip: t.pages.proxies.upload.test,
+                onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).speedTestAll(),
+                tooltip: switch (ref.watch(ConfigOptions.speedTestDirection)) {
+                  SpeedTestDirection.download => t.pages.proxies.speedTest.testDownload,
+                  SpeedTestDirection.upload => t.pages.proxies.upload.test,
+                  SpeedTestDirection.both => t.pages.proxies.speedTest.title,
+                },
                 child: const Icon(Icons.speed_rounded, size: 26),
               ),
             ),

@@ -153,16 +153,36 @@
         "big": "$count proxys sont actifs",
         "bigBody": "Ne gardez actifs que les $keep plus rapides pour économiser batterie et données.",
         "keep": "Garder les $keep plus rapides",
-        "change": "Changer le nombre"
+        "change": "Changer le nombre",
+        "chosen": "Vos $n proxys choisis tournent",
+        "choose": "Choisir"
       },
       "upload": {
         "test": "Tester le débit montant",
         "failed": "Impossible de lancer le test de débit",
-        "warnTitle": "Beaucoup de données",
-        "perProxy": "$n Mo par chacun des $count proxys",
-        "warnBody": "Tester l'envoi de tous les proxys peut consommer beaucoup de données. Limitez la liste aux $limit plus rapides et testez seulement ceux-là. La limite se change dans les réglages.",
-        "testAll": "Tester les $count",
-        "testFastest": "Garder et tester les $limit plus rapides"
+        "hint": "Toucher : débit montant · Maintenir : débit descendant"
+      },
+      "speedTest": {
+        "title": "Test de débit",
+        "what": "Que tester",
+        "download": "Téléchargement",
+        "upload": "Envoi",
+        "amount": "Quantité par proxy",
+        "proxies": "Proxys à tester",
+        "proxiesHint": "Les plus rapides au ping",
+        "all": "Tous",
+        "fastest": "Les $n plus rapides",
+        "through": "$n Mo par chacun des $count plus rapides",
+        "throughAll": "$n Mo par chacun des $count proxys",
+        "throughEach": "$n Mo par proxy",
+        "start": "Lancer le test",
+        "save": "Enregistrer",
+        "testDownload": "Tester le débit descendant",
+        "both": "Les deux",
+        "bothWays": "en descente et en montée",
+        "which": "Quels proxys",
+        "shown": "Affichés ($n)",
+        "chosen": "Choisis ($n)"
       }
     },
     "profiles": {
@@ -338,8 +358,7 @@
         "useSystemTlsEngineMsg": "Les connexions sans empreinte TLS utilisent le TLS de macOS, iOS ou Windows une fois qu’il a réussi une vérification sur cet appareil ; sinon, elles ressemblent à Chrome.",
         "uploadTestSize": "Taille du test d'envoi",
         "megabytes": "$n Mo",
-        "uploadTestLimit": "Limite de proxys du test d'envoi",
-        "uploadTestLimitMsg": "Demande avant de tester plus de $n proxys"
+        "speedTest": "Test de débit"
       },
       "routing": {
         "title": "Routage",
@@ -909,7 +928,37 @@
       "all": "Les $count tournent",
       "keep": "Garder les $keep plus rapides",
       "useAll": "Utiliser les $count",
-      "howMany": "Combien garder actifs"
+      "howMany": "Combien garder actifs",
+      "pickByHand": "Choisir les proxys vous-même"
+    },
+    "keepTags": {
+      "title": "Choisir les proxys",
+      "hint": "Seuls ceux-ci tournent, à chaque connexion.",
+      "search": "Rechercher",
+      "all": "Tout sélectionner",
+      "none": "Effacer",
+      "run": "Lancer $n",
+      "sort": "Trier",
+      "sortProfile": "Ordre du profil",
+      "sortPing": "Ping",
+      "sortDownload": "Téléchargement",
+      "sortUpload": "Envoi",
+      "selectFastest": "Les $n plus rapides",
+      "statusChosen": "Choisis",
+      "statusAnswering": "Répondent",
+      "statusPaused": "En pause",
+      "paused": "$n proxys sont en pause : ils n'ont pas de ping et ne peuvent pas être testés.",
+      "wake": "Tout lancer pour tester",
+      "offline": "Connectez-vous pour voir leur ping et les tester.",
+      "shown": "$n affichés",
+      "noMatch": "Aucun proxy ne correspond",
+      "chosenHint": "Touchez un proxy ci-dessus pour le choisir",
+      "allShown": "Tous sont dans la liste ci-dessus",
+      "notShown": "Non affichés :",
+      "protocol": "Protocole",
+      "country": "Pays",
+      "anyProtocol": "Tout protocole",
+      "anyCountry": "Tout pays"
     },
     "localProxy": {
       "title": "Proxy local",

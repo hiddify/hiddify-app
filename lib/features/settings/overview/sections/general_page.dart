@@ -8,10 +8,10 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
-import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_mobile.dart';
+import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:humanizer/humanizer.dart';
@@ -115,31 +115,25 @@ class GeneralPage extends HookConsumerWidget {
                   await ref.read(ConfigOptions.urlTestInterval.notifier).update(Duration(minutes: value.toInt()));
                 }),
           ),
+          // how a speed test of the proxy list runs: download or upload, how much, how many proxies
           ListTile(
-            title: Text(t.pages.settings.general.uploadTestSize),
-            subtitle: Text(t.pages.settings.general.megabytes(n: ref.watch(ConfigOptions.uploadTestSize))),
+            title: Text(t.pages.settings.general.speedTest),
+            subtitle: Text(
+              [
+                switch (ref.watch(ConfigOptions.speedTestDirection)) {
+                  SpeedTestDirection.download => t.pages.proxies.speedTest.download,
+                  SpeedTestDirection.upload => t.pages.proxies.speedTest.upload,
+                  SpeedTestDirection.both => t.pages.proxies.speedTest.both,
+                },
+                t.pages.settings.general.megabytes(n: ref.watch(ConfigOptions.uploadTestSize)),
+                if (ref.watch(ConfigOptions.uploadTestLimit) case final limit when limit > 0)
+                  t.pages.proxies.speedTest.fastest(n: limit)
+                else
+                  t.pages.proxies.speedTest.all,
+              ].join(' · '),
+            ),
             leading: const Icon(Icons.speed_rounded),
-            onTap: () => chooseUploadTestSize(ref),
-          ),
-          ListTile(
-            title: Text(t.pages.settings.general.uploadTestLimit),
-            subtitle: Text(t.pages.settings.general.uploadTestLimitMsg(n: ref.watch(ConfigOptions.uploadTestLimit))),
-            leading: const Icon(Icons.data_usage_rounded),
-            onTap: () async => await ref
-                .read(dialogNotifierProvider.notifier)
-                .showSettingSlider(
-                  title: t.pages.settings.general.uploadTestLimit,
-                  initialValue: ref.read(ConfigOptions.uploadTestLimit).coerceIn(5, 100).toDouble(),
-                  onReset: ref.read(ConfigOptions.uploadTestLimit.notifier).reset,
-                  min: 5,
-                  max: 100,
-                  divisions: 19,
-                  labelGen: (value) => '${value.toInt()}',
-                )
-                .then((value) async {
-                  if (value == null) return;
-                  await ref.read(ConfigOptions.uploadTestLimit.notifier).update(value.toInt());
-                }),
+            onTap: () => ref.read(dialogNotifierProvider.notifier).showSpeedTest(start: false),
           ),
           ValuePreferenceWidget(
             value: ref.watch(ConfigOptions.clashApiPort),

@@ -176,9 +176,17 @@ abstract class ConfigOptions {
   /// How many megabytes an upload test sends through each proxy.
   static final uploadTestSize = PreferencesNotifier.create<int, int>("upload-test-size", 1);
 
-  /// Above this many proxies, an upload test of them all asks first: it sends that much through
-  /// each of them.
+  /// How many proxies a speed test of the list tests, the fastest by their ping; 0 for all of them.
   static final uploadTestLimit = PreferencesNotifier.create<int, int>("upload-test-limit", 20);
+
+  /// Whether a speed test measures download or upload.
+  static final speedTestDirection = PreferencesNotifier.create<SpeedTestDirection, String>(
+    "speed-test-direction",
+    SpeedTestDirection.upload,
+    mapFrom: (value) =>
+        SpeedTestDirection.values.firstWhere((e) => e.name == value, orElse: () => SpeedTestDirection.upload),
+    mapTo: (value) => value.name,
+  );
 
   static final enableClashApi = PreferencesNotifier.create<bool, bool>("enable-clash-api", true);
 
@@ -516,6 +524,7 @@ abstract class ConfigOptions {
     "url-test-interval": urlTestInterval,
     "upload-test-size": uploadTestSize,
     "upload-test-limit": uploadTestLimit,
+    "speed-test-direction": speedTestDirection,
     "clash-api-port": clashApiPort,
     // "bypass-lan": bypassLan,
     "allow-connection-from-lan": allowConnectionFromLan,

@@ -47,6 +47,9 @@ class SingboxConfigOption with _$SingboxConfigOption {
     /// The profile's `keep-top`: how many of its proxies the core keeps running, the fastest; -1
     /// for all of them.
     @Default(-1) int keepTop,
+
+    /// The profile's proxies the user chose to run, and only them (`keep-tags`).
+    @Default(<String>[]) List<String> keepTags,
     @IntervalInSecondsConverter() required Duration urlTestInterval,
     required bool enableClashApi,
     required int clashApiPort,

@@ -153,16 +153,36 @@
         "big": "$count proxies are running",
         "bigBody": "Keep only the $keep fastest running, to save battery and data.",
         "keep": "Keep the $keep fastest",
-        "change": "Change how many"
+        "change": "Change how many",
+        "chosen": "Your $n chosen proxies are running",
+        "choose": "Choose"
       },
       "upload": {
         "test": "Test upload speed",
         "failed": "Could not start the speed test",
-        "warnTitle": "A lot of data",
-        "perProxy": "$n MB through each of $count proxies",
-        "warnBody": "An upload test of every proxy can use a lot of bandwidth. Limit the list to the $limit fastest and test only those. You can change the limit in the settings.",
-        "testAll": "Test all $count",
-        "testFastest": "Keep and test the $limit fastest"
+        "hint": "Tap: upload speed · Hold: download speed"
+      },
+      "speedTest": {
+        "title": "Speed test",
+        "what": "What to test",
+        "download": "Download",
+        "upload": "Upload",
+        "amount": "Amount per proxy",
+        "proxies": "Proxies to test",
+        "proxiesHint": "The fastest by ping",
+        "all": "All",
+        "fastest": "$n fastest",
+        "through": "$n MB through each of the $count fastest",
+        "throughAll": "$n MB through each of $count proxies",
+        "throughEach": "$n MB through each proxy",
+        "start": "Start test",
+        "save": "Save",
+        "testDownload": "Test download speed",
+        "both": "Both",
+        "bothWays": "down and up",
+        "which": "Which proxies",
+        "shown": "Shown ($n)",
+        "chosen": "Chosen ($n)"
       }
     },
     "profiles": {
@@ -340,8 +360,7 @@
         "useSystemTlsEngineMsg": "Connections without a TLS fingerprint use the TLS of macOS, iOS, or Windows once it passes a check on this device; otherwise they look like Chrome.",
         "uploadTestSize": "Upload test size",
         "megabytes": "$n MB",
-        "uploadTestLimit": "Upload test proxy limit",
-        "uploadTestLimitMsg": "Asks before testing more than $n proxies"
+        "speedTest": "Speed test"
       },
       "routing": {
         "title": "Routing",
@@ -973,7 +992,37 @@
       "all": "All $count run",
       "keep": "Keep the $keep fastest",
       "useAll": "Use all $count",
-      "howMany": "How many to keep running"
+      "howMany": "How many to keep running",
+      "pickByHand": "Choose the proxies yourself"
+    },
+    "keepTags": {
+      "title": "Choose proxies",
+      "hint": "Only these run, every time you connect.",
+      "search": "Search",
+      "all": "Select all",
+      "none": "Clear",
+      "run": "Run $n",
+      "sort": "Sort",
+      "sortProfile": "Profile order",
+      "sortPing": "Ping",
+      "sortDownload": "Download",
+      "sortUpload": "Upload",
+      "selectFastest": "$n fastest",
+      "statusChosen": "Chosen",
+      "statusAnswering": "Answering",
+      "statusPaused": "Paused",
+      "paused": "$n proxies are paused: they have no ping and can't be tested.",
+      "wake": "Run all to test",
+      "offline": "Connect to see their ping and test them.",
+      "shown": "$n shown",
+      "noMatch": "No proxy matches",
+      "chosenHint": "Tap a proxy above to choose it",
+      "allShown": "All of them are in the list above",
+      "notShown": "Not shown:",
+      "protocol": "Protocol",
+      "country": "Country",
+      "anyProtocol": "Any protocol",
+      "anyCountry": "Any country"
     },
     "localProxy": {
       "title": "Local proxy",

@@ -46,33 +46,48 @@ Color uploadSpeedColor(BuildContext context, int bytesPerSecond) {
   };
 }
 
-/// A proxy's upload speed ([speed] bytes a second; 0 untested, -1 failed): a spinner while
-/// [testing], the arrow alone before the first test. A tap tests again ([onTest]), a long press
-/// sets how much a test sends. [dense] fits it under a proxy row's ping; else it is a pill.
+/// A proxy's upload speed ([speed] bytes a second; 0 untested, -1 failed), and its download speed
+/// ([downloadSpeed]) once tested, each with its arrow then: a spinner while one is [testing], the
+/// gauge alone before the first test. A tap tests the upload ([onTest]); a long press the download
+/// ([onDownloadTest]), or without it sets how much a test sends. [dense] fits it under a proxy
+/// row's ping; else it is a pill.
 class UploadSpeedChip extends ConsumerWidget {
-  const UploadSpeedChip({super.key, required this.speed, required this.testing, this.onTest, this.dense = false});
+  const UploadSpeedChip({
+    super.key,
+    required this.speed,
+    required this.testing,
+    this.onTest,
+    this.dense = false,
+    this.downloadSpeed = 0,
+    this.downloadTesting = false,
+    this.onDownloadTest,
+  });
 
   final int speed;
   final bool testing;
   final VoidCallback? onTest;
   final bool dense;
+  final int downloadSpeed;
+  final bool downloadTesting;
+  final VoidCallback? onDownloadTest;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
     final s = theme.colorScheme;
-    final failed = speed < 0 && !testing;
-    final color = testing
+    final showUp = speed != 0 || testing;
+    final showDown = downloadSpeed != 0 || downloadTesting;
+    final busy = testing || downloadTesting;
+    Color colorOf(int value, bool busy) => busy
         ? s.primary
-        : failed
+        : value < 0
         ? s.error
-        : speed == 0
+        : value == 0
         ? s.onSurfaceVariant
-        : uploadSpeedColor(context, speed);
+        : uploadSpeedColor(context, value);
     final iconSize = dense ? 13.0 : 17.0;
     final number = (dense ? theme.textTheme.labelSmall : theme.textTheme.titleSmall)?.copyWith(
-      color: testing ? s.onSurfaceVariant : color,
       fontWeight: dense ? FontWeight.w700 : FontWeight.w600,
       fontFeatures: const [FontFeature.tabularFigures()],
     );
@@ -80,41 +95,63 @@ class UploadSpeedChip extends ConsumerWidget {
         ? theme.textTheme.labelSmall?.copyWith(fontSize: 9, color: s.onSurfaceVariant, letterSpacing: .3)
         : theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant);
 
+    // both directions under a row's ping leave no room for the gauge: the arrows say it, and the
+    // unit gets smaller
+    final both = showUp && showDown;
+    final gauge = !(dense && both);
+
+    // one direction: its arrow when both show, then its value, a spinner, or a cross
+    List<Widget> part(int value, bool partBusy, IconData? arrow, {required bool first}) {
+      final color = colorOf(value, partBusy);
+      return [
+        if (!first) Gap(dense ? 3 : 5),
+        if (arrow != null) Icon(arrow, size: iconSize - 3, color: color),
+        if (partBusy)
+          SizedBox.square(
+            dimension: iconSize - 4,
+            child: CircularProgressIndicator(strokeWidth: 1.5, color: color),
+          )
+        else if (value < 0)
+          Icon(Icons.close_rounded, size: iconSize - 1, color: color)
+        else if (value > 0)
+          Text(formatMbps(value), style: number?.copyWith(color: color)),
+      ];
+    }
+
     final content = Row(
       mainAxisSize: MainAxisSize.min,
       textDirection: TextDirection.ltr,
       children: [
-        if (testing)
-          SizedBox.square(
-            dimension: iconSize - 3,
-            child: CircularProgressIndicator(strokeWidth: dense ? 1.5 : 2, color: color),
-          )
-        else
-          Icon(Icons.speed_rounded, size: iconSize, color: color),
-        if (failed) ...[
-          const Gap(3),
-          Icon(Icons.close_rounded, size: iconSize, color: color),
-        ] else if (speed > 0) ...[
-          Gap(dense ? 3 : 5),
-          Text(formatMbps(speed), style: number),
-          Text(' Mbps', style: unit),
-        ],
+        if (gauge)
+          Icon(
+            Icons.speed_rounded,
+            size: iconSize,
+            color: busy ? s.primary : colorOf(showUp ? speed : downloadSpeed, false),
+          ),
+        if (showUp) ...part(speed, testing, both ? Icons.arrow_upward_rounded : null, first: !gauge),
+        if (showDown) ...part(downloadSpeed, downloadTesting, Icons.arrow_downward_rounded, first: !gauge && !showUp),
+        if (speed > 0 || downloadSpeed > 0) Text(' Mbps', style: gauge ? unit : unit?.copyWith(fontSize: 8)),
       ],
     );
 
     final chip = InkWell(
       borderRadius: BorderRadius.circular(dense ? 6 : 16),
       onTap: testing ? null : onTest,
-      onLongPress: () => chooseUploadTestSize(ref),
+      onLongPress: onDownloadTest == null
+          ? () => chooseUploadTestSize(ref)
+          : downloadTesting
+          ? null
+          : onDownloadTest,
       child: Padding(
         padding: dense
             ? const EdgeInsets.symmetric(horizontal: 6, vertical: 2)
-            : EdgeInsets.symmetric(horizontal: speed == 0 && !testing ? 8 : 11),
-        child: dense ? content : SizedBox(height: 32, child: content),
+            : EdgeInsets.symmetric(horizontal: !showUp && !showDown ? 8 : 11),
+        // a row's room is fixed: big numbers shrink rather than overflow
+        child: dense ? FittedBox(fit: BoxFit.scaleDown, child: content) : SizedBox(height: 32, child: content),
       ),
     );
     return Tooltip(
-      message: t.pages.proxies.upload.test,
+      message: onDownloadTest == null ? t.pages.proxies.upload.test : t.pages.proxies.upload.hint,
       child: dense
           ? chip
           : Material(

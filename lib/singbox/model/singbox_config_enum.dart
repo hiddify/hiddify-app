@@ -142,6 +142,9 @@ enum DomainStrategy {
 /// The TUN's TCP/IP stack. [sing15] is sing-tun's own stack, the default since sing-box 1.15: the
 /// core then sends no `stack` option. The others are the legacy stacks, sent as chosen, kept for a
 /// user who needs one until sing-box 1.17 removes them.
+/// What a speed test of a proxy measures: its download, its upload, or both, one after the other.
+enum SpeedTestDirection { download, upload, both }
+
 enum TunImplementation {
   sing15,
   mixed,

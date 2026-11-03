@@ -153,16 +153,36 @@
         "big": "$count 个代理正在运行",
         "bigBody": "只保留最快的 $keep 个运行,以节省电量和流量。",
         "keep": "保留最快的 $keep 个",
-        "change": "更改数量"
+        "change": "更改数量",
+        "chosen": "你选择的 $n 个代理正在运行",
+        "choose": "选择"
       },
       "upload": {
         "test": "测试上传速度",
         "failed": "无法开始测速",
-        "warnTitle": "将消耗大量流量",
-        "perProxy": "$count 个代理,每个 $n MB",
-        "warnBody": "测试所有代理的上传速度可能消耗大量流量。将列表限制为最快的 $limit 个,只测试它们。可在设置中更改此数量。",
-        "testAll": "测试全部 $count 个",
-        "testFastest": "保留并测试最快的 $limit 个"
+        "hint": "点按：上传速度 · 长按：下载速度"
+      },
+      "speedTest": {
+        "title": "测速",
+        "what": "测试项目",
+        "download": "下载",
+        "upload": "上传",
+        "amount": "每个代理的数据量",
+        "proxies": "测试哪些代理",
+        "proxiesHint": "按延迟最快的",
+        "all": "全部",
+        "fastest": "最快的 $n 个",
+        "through": "最快的 $count 个代理各 $n MB",
+        "throughAll": "$count 个代理各 $n MB",
+        "throughEach": "每个代理 $n MB",
+        "start": "开始测试",
+        "save": "保存",
+        "testDownload": "测试下载速度",
+        "both": "两者",
+        "bothWays": "下载和上传",
+        "which": "哪些代理",
+        "shown": "显示的 ($n)",
+        "chosen": "已选 ($n)"
       }
     },
     "profiles": {
@@ -337,8 +357,7 @@
         "useSystemTlsEngineMsg": "没有 TLS 指纹的连接，会在系统 TLS 通过本设备上的检查后，使用 macOS、iOS 或 Windows 的 TLS；否则看起来像 Chrome。",
         "uploadTestSize": "上传测试大小",
         "megabytes": "$n MB",
-        "uploadTestLimit": "上传测试代理上限",
-        "uploadTestLimitMsg": "测试超过 $n 个代理前询问"
+        "speedTest": "测速"
       },
       "routing": {
         "title": "路由",
@@ -907,7 +926,37 @@
       "all": "全部 $count 个运行",
       "keep": "保留最快的 $keep 个",
       "useAll": "使用全部 $count 个",
-      "howMany": "保留运行的数量"
+      "howMany": "保留运行的数量",
+      "pickByHand": "自己选择代理"
+    },
+    "keepTags": {
+      "title": "选择代理",
+      "hint": "每次连接都只运行这些代理。",
+      "search": "搜索",
+      "all": "全选",
+      "none": "清除",
+      "run": "运行 $n 个",
+      "sort": "排序",
+      "sortProfile": "配置顺序",
+      "sortPing": "延迟",
+      "sortDownload": "下载",
+      "sortUpload": "上传",
+      "selectFastest": "最快的 $n 个",
+      "statusChosen": "已选",
+      "statusAnswering": "有响应",
+      "statusPaused": "已暂停",
+      "paused": "$n 个代理已暂停：没有延迟，也无法测试。",
+      "wake": "全部运行以测试",
+      "offline": "连接后可查看延迟并测试。",
+      "shown": "显示 $n 个",
+      "noMatch": "没有匹配的代理",
+      "chosenHint": "点按上方的代理来选择",
+      "allShown": "都在上方列表中",
+      "notShown": "未显示：",
+      "protocol": "协议",
+      "country": "国家",
+      "anyProtocol": "任意协议",
+      "anyCountry": "任意国家"
     },
     "localProxy": {
       "title": "本地代理",
