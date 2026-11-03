@@ -559,13 +559,29 @@
           "system": "系統",
           "gvisor": "gVisor"
         },
-        "mixedPort": "混合連接埠",
+        "mixedPort": "代理連接埠(SOCKS5/4、HTTP)",
         "tproxyPort": "透明代理連接埠",
         "directPort": "本機直連連接埠",
         "redirectPort": "重新導向連接埠",
         "lanSharing": "安全 VPN 共享",
         "qrCode": "QR Code",
-        "lanQrSubtitle": "SOCKS5 代理"
+        "lanQrSubtitle": "SOCKS5 代理",
+        "closedInVpn": "VPN 模式下關閉,除非共享",
+        "proxySecret": "代理密鑰",
+        "noSecret": "無密鑰:任何能連到該連接埠的應用程式或裝置都可使用",
+        "generateSecret": "產生新的",
+        "removeSecret": "移除密鑰?",
+        "removeSecretMsg": "沒有密鑰時,此裝置上的任何應用程式,以及共享時網路上的任何裝置,都能無需使用者名稱和密碼使用該代理。風險自負。",
+        "localProxy": "本機代理",
+        "localProxyInVpn": "在 VPN 模式下保持開啟",
+        "localProxyInVpnHint": "應用程式已經走 VPN；僅供設定了此代理的應用程式使用",
+        "localProxyAuth": "需要密碼",
+        "localProxyAuthHint": "部分應用程式（如瀏覽器）無法傳送 SOCKS 密碼",
+        "notAsSystemProxy": "作為系統代理時不要求密碼，因為系統代理無法傳送",
+        "lanGroup": "區域網路分享",
+        "lanSharingPort": "分享連接埠",
+        "otherPorts": "其他連接埠",
+        "closedInVpnLocal": "VPN 模式下關閉"
       },
       "tlsTricks": {
         "title": "TLS 技巧",
@@ -892,6 +908,21 @@
       "keep": "保留最快的 $keep 個",
       "useAll": "使用全部 $count 個",
       "howMany": "保留執行的數量"
+    },
+    "localProxy": {
+      "title": "本機代理",
+      "lead": "代理模式需要手動設定，你需要逐一設定應用程式：",
+      "steps": [
+        "開啟應用程式的代理設定",
+        "選擇 SOCKS5 或 HTTP",
+        "填入下方資訊",
+        "保持 Hiddify 連線"
+      ],
+      "changePassword": "變更密碼",
+      "hint": "代理模式 · 使用說明",
+      "setPassword": "設定密碼",
+      "manual": "手動",
+      "dontShowAgain": "不再顯示"
     }
   },
   "connection": {

@@ -1,3 +1,4 @@
+import 'package:hiddify/core/utils/proxy_secret.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +16,7 @@ class PreferencesMigration with InfraLogger {
       PreferencesVersion1Migration(sharedPreferences),
       PreferencesVersion2Migration(sharedPreferences),
       PreferencesVersion3Migration(sharedPreferences),
+      PreferencesVersion4Migration(sharedPreferences),
     ];
 
     if (currentVersion == migrationSteps.length) {
@@ -152,5 +154,19 @@ class PreferencesVersion3Migration extends PreferencesMigrationStep with InfraLo
       loggy.debug("unblocker WARP clean ip [$cleanIp] is its custom endpoint");
       await sharedPreferences.setString(endpointKey, "custom");
     }
+  }
+}
+
+/// The local SOCKS/HTTP port asks for a secret in proxy mode and from the local network, so every
+/// install gets one; it was made only once LAN sharing was turned on.
+class PreferencesVersion4Migration extends PreferencesMigrationStep with InfraLogger {
+  PreferencesVersion4Migration(super.sharedPreferences);
+
+  @override
+  Future<void> migrate() async {
+    const key = "lan_sharing_password";
+    if ((sharedPreferences.getString(key) ?? '').isNotEmpty) return;
+    loggy.debug("making the proxy secret");
+    await sharedPreferences.setString(key, generateProxySecret());
   }
 }

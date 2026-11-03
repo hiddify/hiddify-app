@@ -576,13 +576,29 @@
           "system": "System",
           "gvisor": "gVisor"
         },
-        "mixedPort": "Mixed port",
+        "mixedPort": "Proxy port (SOCKS5/4, HTTP)",
         "tproxyPort": "Transparent proxy port",
         "directPort": "Direct port",
         "redirectPort": "Redirect port",
         "lanSharing": "Share on local network",
         "qrCode": "QR code",
-        "lanQrSubtitle": "SOCKS5 proxy"
+        "lanQrSubtitle": "SOCKS5 proxy",
+        "closedInVpn": "closed in VPN mode, unless shared",
+        "proxySecret": "Proxy secret",
+        "noSecret": "No secret: any app or device that reaches the port can use it",
+        "generateSecret": "Generate new",
+        "removeSecret": "Remove the secret?",
+        "removeSecretMsg": "Without a secret, any app on this device, and any device on the network while sharing, can use the proxy with no user or password. Remove it at your own risk.",
+        "localProxy": "Local proxy",
+        "localProxyInVpn": "Keep open in VPN mode",
+        "localProxyInVpnHint": "Apps already use the VPN; only for apps set to use the proxy",
+        "localProxyAuth": "Require password",
+        "localProxyAuthHint": "Some apps, like browsers, can't send a SOCKS password",
+        "notAsSystemProxy": "Not asked as the system proxy, which can't send one",
+        "lanGroup": "Local network sharing",
+        "lanSharingPort": "Sharing port",
+        "otherPorts": "Other ports",
+        "closedInVpnLocal": "closed in VPN mode"
       },
       "tlsTricks": {
         "title": "TLS tricks",
@@ -958,6 +974,21 @@
       "keep": "Keep the $keep fastest",
       "useAll": "Use all $count",
       "howMany": "How many to keep running"
+    },
+    "localProxy": {
+      "title": "Local proxy",
+      "lead": "Proxy mode is manual, so you need to set up each app yourself:",
+      "steps": [
+        "Open the app's proxy settings",
+        "Pick SOCKS5 or HTTP",
+        "Enter the details below",
+        "Keep Hiddify connected"
+      ],
+      "changePassword": "Change password",
+      "hint": "Proxy mode · how to use",
+      "setPassword": "Set password",
+      "manual": "Manual",
+      "dontShowAgain": "Don't show again"
     }
   },
   "connection": {

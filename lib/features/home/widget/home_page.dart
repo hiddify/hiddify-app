@@ -5,6 +5,7 @@ import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/features/home/widget/connection_button.dart';
+import 'package:hiddify/features/home/widget/local_proxy_hint.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/profile/widget/profile_tile.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_card.dart';
@@ -177,7 +178,11 @@ class HomePage extends HookConsumerWidget {
                   bottom: 0,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    // tabs of either height stand on the bottom edge
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      // in proxy mode, a smaller tab beside this one on how to point apps at the proxy
+                      const Flexible(child: LocalProxyHint()),
                       Material(
                         color: theme.colorScheme.primaryContainer,
                         borderRadius: const BorderRadius.only(

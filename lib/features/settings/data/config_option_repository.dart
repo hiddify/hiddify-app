@@ -23,7 +23,9 @@ abstract class ConfigOptions {
   static final serviceMode = PreferencesNotifier.create<ServiceMode, String>(
     "service-mode",
     ServiceMode.defaultMode,
-    mapFrom: (value) => ServiceMode.choices.firstWhere((e) => e.key == value),
+    // a mode this build does not offer (system proxy, saved before the Mac App Store build) is
+    // the default again
+    mapFrom: (value) => ServiceMode.choices.firstWhere((e) => e.key == value, orElse: () => ServiceMode.defaultMode),
     mapTo: (value) => value.key,
   );
 
@@ -130,9 +132,10 @@ abstract class ConfigOptions {
   );
 
   static final enableMixedPort = PreferencesNotifier.create<bool, bool>("enable-mixed-port", true);
-  static final enableTproxyPort = PreferencesNotifier.create<bool, bool>("enable-tproxy-port", true);
-  static final enableRedirectPort = PreferencesNotifier.create<bool, bool>("enable-redirect-port", true);
-  static final enableDirectPort = PreferencesNotifier.create<bool, bool>("enable-direct-port", true);
+  // the transparent ports serve setups made by hand (a Linux gateway, pf rules): off until asked for
+  static final enableTproxyPort = PreferencesNotifier.create<bool, bool>("enable-tproxy-port", false);
+  static final enableRedirectPort = PreferencesNotifier.create<bool, bool>("enable-redirect-port", false);
+  static final enableDirectPort = PreferencesNotifier.create<bool, bool>("enable-direct-port", false);
 
   static final tunImplementation = PreferencesNotifier.create<TunImplementation, String>(
     "tun-implementation",
@@ -190,6 +193,25 @@ abstract class ConfigOptions {
   static final allowConnectionFromLan = PreferencesNotifier.create<bool, bool>("allow-connection-from-lan", false);
 
   static final lanSharingPassword = PreferencesNotifier.create<String, String>("lan_sharing_password", "");
+
+  /// The port the local network uses while the VPN is shared, apart from this device's own (the
+  /// mixed port), always asking for the secret.
+  static final lanSharingPort = PreferencesNotifier.create<int, int>(
+    "lan-sharing-port",
+    12338,
+    validator: (value) => isPort(value.toString()),
+  );
+
+  /// Whether the local port asks for the secret too; off by default, as browsers can not send a
+  /// SOCKS5 password. Never as the system proxy, which can not pass one.
+  static final localProxyAuth = PreferencesNotifier.create<bool, bool>("local-proxy-auth", false);
+
+  /// Whether the local port stays open in VPN mode, where every app already goes through the VPN.
+  static final localProxyInVpn = PreferencesNotifier.create<bool, bool>("local-proxy-in-vpn", false);
+
+  /// Whether picking proxy mode no longer shows how apps are pointed at it; the home page's Manual
+  /// tab still does.
+  static final hideLocalProxyOnPick = PreferencesNotifier.create<bool, bool>("hide-local-proxy-on-pick", false);
 
   static final enableFakeDns = PreferencesNotifier.create<bool, bool>("enable-fake-dns", false);
 
@@ -498,6 +520,9 @@ abstract class ConfigOptions {
     // "bypass-lan": bypassLan,
     "allow-connection-from-lan": allowConnectionFromLan,
     "lan-sharing-password": lanSharingPassword,
+    "lan-sharing-port": lanSharingPort,
+    "local-proxy-auth": localProxyAuth,
+    "local-proxy-in-vpn": localProxyInVpn,
     // "enable-dns-routing": enableDnsRouting,
 
     // mux
@@ -632,6 +657,9 @@ abstract class ConfigOptions {
       // bypassLan: ref.watch(bypassLan),
       allowConnectionFromLan: ref.watch(allowConnectionFromLan),
       lanSharingPassword: ref.watch(lanSharingPassword),
+      lanSharingPort: ref.watch(lanSharingPort),
+      localProxyAuth: ref.watch(localProxyAuth),
+      localProxyInVpn: ref.watch(localProxyInVpn),
       enableFakeDns: ref.watch(enableFakeDns),
       // enableDnsRouting: ref.watch(enableDnsRouting),
       independentDnsCache: ref.watch(independentDnsCache),

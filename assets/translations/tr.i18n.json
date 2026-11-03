@@ -559,13 +559,29 @@
           "system": "Sistem",
           "gvisor": "gVisor"
         },
-        "mixedPort": "Karışık port",
+        "mixedPort": "Proxy portu (SOCKS5/4, HTTP)",
         "tproxyPort": "Şeffaf proxy portu",
         "directPort": "Direct portu",
         "redirectPort": "Yönlendirme portu",
         "lanSharing": "Güvenli VPN paylaşımı",
         "qrCode": "QR kod",
-        "lanQrSubtitle": "SOCKS5 proxy"
+        "lanQrSubtitle": "SOCKS5 proxy",
+        "closedInVpn": "VPN modunda kapalı, paylaşılmadıkça",
+        "proxySecret": "Proxy parolası",
+        "noSecret": "Parola yok: porta erişen her uygulama veya cihaz kullanabilir",
+        "generateSecret": "Yeni oluştur",
+        "removeSecret": "Parola kaldırılsın mı?",
+        "removeSecretMsg": "Parola olmadan bu cihazdaki her uygulama ve paylaşım açıkken ağdaki her cihaz proxy'yi kullanıcı adı ve parola olmadan kullanabilir. Riski size aittir.",
+        "localProxy": "Yerel proxy",
+        "localProxyInVpn": "VPN modunda açık tut",
+        "localProxyInVpnHint": "Uygulamalar zaten VPN'i kullanır; yalnızca proxy'ye ayarlanmış uygulamalar için",
+        "localProxyAuth": "Parola iste",
+        "localProxyAuthHint": "Tarayıcılar gibi bazı uygulamalar SOCKS parolası gönderemez",
+        "notAsSystemProxy": "Sistem proxy'si için istenmez, çünkü onu gönderemez",
+        "lanGroup": "Yerel ağda paylaşım",
+        "lanSharingPort": "Paylaşım portu",
+        "otherPorts": "Diğer portlar",
+        "closedInVpnLocal": "VPN modunda kapalı"
       },
       "tlsTricks": {
         "title": "TLS hileleri",
@@ -892,6 +908,21 @@
       "keep": "En hızlı $keep taneyi tut",
       "useAll": "$count tanesini de kullan",
       "howMany": "Kaç tanesi çalışsın"
+    },
+    "localProxy": {
+      "title": "Yerel proxy",
+      "lead": "Proxy modu manueldir; her uygulamayı kendiniz ayarlamanız gerekir:",
+      "steps": [
+        "Uygulamanın proxy ayarlarını açın",
+        "SOCKS5 veya HTTP seçin",
+        "Aşağıdaki bilgileri girin",
+        "Hiddify'ı bağlı tutun"
+      ],
+      "changePassword": "Parolayı değiştir",
+      "hint": "Proxy modu · nasıl kullanılır",
+      "setPassword": "Parola belirle",
+      "manual": "Manuel",
+      "dontShowAgain": "Bir daha gösterme"
     }
   },
   "connection": {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 
 @JsonEnum(valueField: 'key')
@@ -18,12 +19,18 @@ enum ServiceMode {
 
   final String key;
 
-  static ServiceMode get defaultMode => PlatformUtils.isDesktop ? systemProxy : tun;
+  /// The Mac App Store build: its VPN is the Network Extension, and its sandbox can not set the
+  /// system proxy.
+  static bool get _macAppStore => Platform.isMacOS && Release.read() == Release.appStore;
+
+  static ServiceMode get defaultMode => PlatformUtils.isDesktop && !_macAppStore ? systemProxy : tun;
 
   /// supported service mode based on platform, use this instead of [values] in UI
   static List<ServiceMode> get choices {
     if (Platform.isWindows || Platform.isLinux) {
       return values;
+    } else if (_macAppStore) {
+      return [proxy, tun];
     } else if (Platform.isMacOS) {
       return [proxy, systemProxy, tun];
     }

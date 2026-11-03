@@ -560,13 +560,29 @@
           "system": "Sistema",
           "gvisor": "gVisor"
         },
-        "mixedPort": "Porta mista",
+        "mixedPort": "Porta do proxy (SOCKS5/4, HTTP)",
         "tproxyPort": "Porta de proxy transparente",
         "directPort": "Porta direta",
         "redirectPort": "Porta de redirecionamento",
         "lanSharing": "Compartilhamento seguro de VPN",
         "qrCode": "Código QR",
-        "lanQrSubtitle": "Proxy SOCKS5"
+        "lanQrSubtitle": "Proxy SOCKS5",
+        "closedInVpn": "fechado no modo VPN, a menos que compartilhado",
+        "proxySecret": "Segredo do proxy",
+        "noSecret": "Sem segredo: qualquer app ou dispositivo que alcance a porta pode usá-la",
+        "generateSecret": "Gerar novo",
+        "removeSecret": "Remover o segredo?",
+        "removeSecretMsg": "Sem segredo, qualquer app neste dispositivo, e qualquer dispositivo da rede ao compartilhar, pode usar o proxy sem usuário nem senha. Remova por sua conta e risco.",
+        "localProxy": "Proxy local",
+        "localProxyInVpn": "Manter aberto no modo VPN",
+        "localProxyInVpnHint": "Os apps já usam a VPN; só para apps configurados com o proxy",
+        "localProxyAuth": "Exigir senha",
+        "localProxyAuthHint": "Alguns apps, como navegadores, não conseguem enviar senha SOCKS",
+        "notAsSystemProxy": "Não é pedida como proxy do sistema, que não consegue enviá-la",
+        "lanGroup": "Compartilhar na rede local",
+        "lanSharingPort": "Porta de compartilhamento",
+        "otherPorts": "Outras portas",
+        "closedInVpnLocal": "fechada no modo VPN"
       },
       "tlsTricks": {
         "title": "Truques de TLS",
@@ -894,6 +910,21 @@
       "keep": "Manter os $keep mais rápidos",
       "useAll": "Usar todos os $count",
       "howMany": "Quantos manter ativos"
+    },
+    "localProxy": {
+      "title": "Proxy local",
+      "lead": "O modo proxy é manual, então você precisa configurar cada app:",
+      "steps": [
+        "Abra as configurações de proxy do app",
+        "Escolha SOCKS5 ou HTTP",
+        "Insira os dados abaixo",
+        "Mantenha o Hiddify conectado"
+      ],
+      "changePassword": "Alterar senha",
+      "hint": "Modo proxy · como usar",
+      "setPassword": "Definir senha",
+      "manual": "Manual",
+      "dontShowAgain": "Não mostrar novamente"
     }
   },
   "connection": {

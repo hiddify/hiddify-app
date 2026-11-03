@@ -107,4 +107,11 @@ void main() {
       const SingboxWarpScannerOption(maxRtt: 800, ports: [443, 2408]),
     );
   });
+
+  test('every install gets a proxy secret, and one set is kept', () async {
+    final fresh = await _migrated({});
+    expect(fresh.getString('lan_sharing_password'), matches(RegExp(r'^\w{4}-\w{4}$')));
+    final kept = await _migrated({'lan_sharing_password': 'mine-secret'});
+    expect(kept.getString('lan_sharing_password'), 'mine-secret');
+  });
 }
