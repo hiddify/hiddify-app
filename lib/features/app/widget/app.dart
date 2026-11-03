@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:accessibility_tools/accessibility_tools.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/foundation.dart';
@@ -5,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/localization/locale_extensions.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/theme/app_theme.dart';
@@ -68,7 +72,19 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(crashReportNotifierProvider.notifier).checkOnStart();
       });
-      return null;
+      // outside a store, a new release is offered once a day, a while after the start
+      final updateCheck = Timer(const Duration(seconds: 20), () async {
+        final release = await ref.read(appUpdateNotifierProvider.notifier).checkOnStart();
+        if (release == null) return;
+        await ref
+            .read(dialogNotifierProvider.notifier)
+            .showNewVersion(
+              currentVersion: ref.read(appInfoProvider).requireValue.presentVersion,
+              newVersion: release,
+              canIgnore: true,
+            );
+      });
+      return updateCheck.cancel;
     }, const []);
 
     // updating ActiveBreakpointNotifier value
@@ -97,11 +113,13 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                 builder: (context, child) {
                   final theme = Theme.of(context);
                   child = SnackBarHost(
-                    child: UpgradeAlert(
-                      upgrader: upgrader,
-                      navigatorKey: router.routerDelegate.navigatorKey,
-                      child: child ?? const SizedBox(),
-                    ),
+                    child: upgrader == null
+                        ? child ?? const SizedBox()
+                        : UpgradeAlert(
+                            upgrader: upgrader,
+                            navigatorKey: router.routerDelegate.navigatorKey,
+                            child: child ?? const SizedBox(),
+                          ),
                   );
                   if (kDebugMode && _debugAccessibility) {
                     return AccessibilityTools(checkFontOverflows: true, child: child);

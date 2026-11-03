@@ -753,7 +753,13 @@
       "msg": "Versi baru @:common.appTitle tersedia. Perbarui sekarang?",
       "currentVersion": "Versi saat ini",
       "newVersion": "Versi baru",
-      "updateNow": "Perbarui sekarang"
+      "updateNow": "Perbarui sekarang",
+      "downloading": "Mengunduh…",
+      "installing": "Memulai pemasang…",
+      "allowInstall": "Izinkan Hiddify memasang aplikasi di pengaturan yang terbuka, lalu coba lagi.",
+      "failed": "Pembaruan tidak dapat dipasang.",
+      "openPage": "Buka halaman rilis",
+      "tryAgain": "Coba lagi"
     },
     "confirmation": {
       "settings": {

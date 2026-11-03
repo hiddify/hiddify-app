@@ -131,6 +131,7 @@ class DioHttpClient with InfraLogger {
     String? userAgent,
     ({String username, String password})? credentials,
     bool proxyOnly = false,
+    ProgressCallback? onReceiveProgress,
   }) async {
     final mode = proxyOnly
         ? "proxy"
@@ -142,6 +143,7 @@ class DioHttpClient with InfraLogger {
       url,
       path,
       cancelToken: cancelToken,
+      onReceiveProgress: onReceiveProgress,
       options: _options(url, userAgent: userAgent, credentials: credentials),
     );
   }

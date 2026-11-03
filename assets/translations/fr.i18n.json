@@ -755,7 +755,13 @@
       "msg": "Une nouvelle version de @:common.appTitle est disponible. Mettre à jour maintenant ?",
       "currentVersion": "Version actuelle",
       "newVersion": "Nouvelle version",
-      "updateNow": "Mettre à jour"
+      "updateNow": "Mettre à jour",
+      "downloading": "Téléchargement…",
+      "installing": "Lancement de l'installateur…",
+      "allowInstall": "Autorisez Hiddify à installer des applications dans les réglages ouverts, puis réessayez.",
+      "failed": "La mise à jour n'a pas pu être installée.",
+      "openPage": "Ouvrir la page de la version",
+      "tryAgain": "Réessayer"
     },
     "confirmation": {
       "settings": {

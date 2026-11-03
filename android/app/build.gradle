@@ -47,6 +47,13 @@ if (keystorePropertiesFile.exists()) {
     println "+++"
 }
 
+// The --dart-define values of the build, which flutter hands to gradle base64 encoded.
+def dartDefines = (project.findProperty('dart-defines') ?: '').toString().split(',')
+        .findAll { it }
+        .collect { new String(it.decodeBase64(), 'UTF-8') }
+// Google Play updates the app itself, so its build does not ask to install packages.
+def isGooglePlay = dartDefines.contains('release=google-play')
+
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')?: '1'
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
@@ -77,6 +84,9 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        manifestPlaceholders += [
+            installPackagesPermission: isGooglePlay ? 'android.permission.INTERNET' : 'android.permission.REQUEST_INSTALL_PACKAGES'
+        ]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

@@ -23,6 +23,9 @@
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
+    <!-- Installs the updates the app downloads (app_update). The Google Play build gets INTERNET here
+         instead, merged with the one above: it is updated by the store, and asks for nothing more. -->
+    <uses-permission android:name="${installPackagesPermission}" />
 
     <application
         android:name=".Application"
@@ -36,6 +39,17 @@
         <meta-data
             android:name="flutter_deeplinking_enabled"
             android:value="true" />
+
+        <!-- Hands a downloaded update to the system installer. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/update_paths" />
+        </provider>
 
         <meta-data
             android:name="android.app.shortcuts"

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The downloaded updates the system installer may read (app_update). -->
+<paths>
+    <cache-path name="updates" path="updates/" />
+</paths>

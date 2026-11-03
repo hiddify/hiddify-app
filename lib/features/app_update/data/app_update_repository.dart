@@ -7,6 +7,7 @@ import 'package:hiddify/features/app_update/data/github_release_parser.dart';
 import 'package:hiddify/features/app_update/model/app_update_failure.dart';
 import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:version/version.dart';
 
 abstract interface class AppUpdateRepository {
   TaskEither<AppUpdateFailure, RemoteVersionEntity> getLatestVersion({
@@ -35,14 +36,17 @@ class AppUpdateRepositoryImpl with ExceptionHandler, InfraLogger implements AppU
         return left(const AppUpdateFailure.unexpected());
       }
 
-      final releases = response.data!.map((e) => GithubReleaseParser.parse(e as Map<String, dynamic>));
-      late RemoteVersionEntity latest;
-      if (includePreReleases) {
-        latest = releases.first;
-      } else {
-        latest = releases.firstWhere((e) => e.preRelease == false);
-      }
+      final releases = [
+        for (final json in response.data!)
+          if (GithubReleaseParser.parse((json as Map).cast<String, dynamic>()) case final parsed?)
+            if (includePreReleases || !parsed.preRelease) parsed,
+      ];
+      if (releases.isEmpty) return left(const AppUpdateFailure.unexpected());
+      // the newest by version, not by the order GitHub lists them in
+      final latest = releases.reduce((a, b) => _version(b) > _version(a) ? b : a);
       return right(latest);
     }, AppUpdateFailure.unexpected);
   }
+
+  static Version _version(RemoteVersionEntity release) => Version.parse(release.version);
 }

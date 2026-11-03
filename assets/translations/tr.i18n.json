@@ -753,7 +753,13 @@
       "msg": "@:common.appTitle'ın yeni bir sürümü mevcut. Şimdi güncellensin mi?",
       "currentVersion": "Mevcut sürüm",
       "newVersion": "Yeni sürüm",
-      "updateNow": "Şimdi güncelle"
+      "updateNow": "Şimdi güncelle",
+      "downloading": "İndiriliyor…",
+      "installing": "Yükleyici başlatılıyor…",
+      "allowInstall": "Açılan ayarlarda Hiddify'ın uygulama yüklemesine izin verin, sonra tekrar deneyin.",
+      "failed": "Güncelleme yüklenemedi.",
+      "openPage": "Sürüm sayfasını aç",
+      "tryAgain": "Tekrar dene"
     },
     "confirmation": {
       "settings": {

@@ -753,7 +753,13 @@
       "msg": "@:common.appTitle 的新版本已发布。现在更新吗？",
       "currentVersion": "当前版本",
       "newVersion": "新版本",
-      "updateNow": "立即更新"
+      "updateNow": "立即更新",
+      "downloading": "正在下载…",
+      "installing": "正在启动安装程序…",
+      "allowInstall": "请在打开的设置中允许 Hiddify 安装应用,然后重试。",
+      "failed": "无法安装更新。",
+      "openPage": "打开发布页面",
+      "tryAgain": "重试"
     },
     "confirmation": {
       "settings": {

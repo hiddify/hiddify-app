@@ -47,6 +47,8 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             GetInstalledPackages("get_installed_packages"),
             GetPackagesIcon("get_package_icon"),
             IsTelevision("is_television"),
+            SupportedAbis("supported_abis"),
+            InstallApk("install_apk"),
         }
     }
 
@@ -194,6 +196,43 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                         packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK) ||
                             uiMode?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
                     )
+                }
+            }
+
+            Trigger.SupportedAbis.method -> {
+                result.runCatching { success(Build.SUPPORTED_ABIS.toList()) }
+            }
+
+            // An update the app downloaded: the system installer asks the user to confirm it. Until
+            // the user allows this app to install apps, its settings page opens instead, and the
+            // answer is "permission" so the app can say why and offer to try again.
+            Trigger.InstallApk.method -> {
+                result.runCatching {
+                    val context = activity ?: Application.application
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                        !context.packageManager.canRequestPackageInstalls()
+                    ) {
+                        context.startActivity(
+                            Intent(
+                                android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                                Uri.parse("package:${context.packageName}")
+                            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        )
+                        success("permission")
+                        return@runCatching
+                    }
+                    val file = java.io.File(call.arguments as String)
+                    val uri = androidx.core.content.FileProvider.getUriForFile(
+                        context,
+                        "${context.packageName}.updates",
+                        file
+                    )
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setDataAndType(uri, "application/vnd.android.package-archive")
+                            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    )
+                    success("started")
                 }
             }
 

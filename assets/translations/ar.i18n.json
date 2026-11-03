@@ -790,7 +790,13 @@
       "msg": "إصدار جديد من @:common.appTitle متاح. تحديث الآن؟",
       "currentVersion": "الإصدار الحالي",
       "newVersion": "الإصدار الجديد",
-      "updateNow": "التحديث الآن"
+      "updateNow": "التحديث الآن",
+      "downloading": "جارٍ التنزيل…",
+      "installing": "جارٍ تشغيل المثبّت…",
+      "allowInstall": "اسمح لـ Hiddify بتثبيت التطبيقات في الإعدادات التي فُتحت، ثم أعد المحاولة.",
+      "failed": "تعذّر تثبيت التحديث.",
+      "openPage": "فتح صفحة الإصدار",
+      "tryAgain": "إعادة المحاولة"
     },
     "confirmation": {
       "settings": {
