@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/directories.dart';
@@ -102,7 +103,12 @@ void main() {
     fail('the list was not saved after the region change');
   }
 
-  const defaults = ['builtin:bypassLan on', 'builtin:blockAds off', 'builtin:bypassRegion on'];
+  const defaults = [
+    'builtin:bypassLan on',
+    'builtin:appleDirect on',
+    'builtin:blockAds off',
+    'builtin:bypassRegion on',
+  ];
 
   group('a new list', () {
     test('holds the built-in rules in their default order and state', () async {
@@ -113,7 +119,7 @@ void main() {
 
     test('leaves the region rule out while the region is Other', () async {
       final container = await open(region: Region.other);
-      expect(current(container), ['builtin:bypassLan on', 'builtin:blockAds off']);
+      expect(current(container), ['builtin:bypassLan on', 'builtin:appleDirect on', 'builtin:blockAds off']);
     });
   });
 
@@ -124,6 +130,7 @@ void main() {
         builtin(BuiltinRule.bypassRegion, enabled: false),
         builtin(BuiltinRule.bypassLan, enabled: false),
         custom('b', enabled: false),
+        builtin(BuiltinRule.appleDirect, enabled: false),
         builtin(BuiltinRule.blockAds, enabled: true),
       ]);
       final container = await open();
@@ -132,6 +139,7 @@ void main() {
         'builtin:bypassRegion off',
         'builtin:bypassLan off',
         'b off',
+        'builtin:appleDirect off',
         'builtin:blockAds on',
       ]);
     });
@@ -139,6 +147,7 @@ void main() {
     test("takes each built-in rule's content from the app", () async {
       save([
         Rule(name: 'builtin:bypassLan', enabled: true, outbound: Outbound.proxy, ipCidrs: ['1.2.3.4/32']),
+        Rule(name: 'builtin:appleDirect', outbound: Outbound.block, domainSuffixes: ['example.com']),
         Rule(name: 'builtin:blockAds', enabled: true, outbound: Outbound.direct, domains: ['example.com']),
         Rule(name: 'builtin:bypassRegion', outbound: Outbound.block, ruleSets: ['https://example.com/x.srs']),
       ]);
@@ -149,13 +158,24 @@ void main() {
           ..listOrder = rule.listOrder;
         expect(rule, expected, reason: rule.name);
       }
-      expect(current(container), ['builtin:bypassLan on', 'builtin:blockAds on', 'builtin:bypassRegion off']);
+      expect(current(container), [
+        'builtin:bypassLan on',
+        'builtin:appleDirect off',
+        'builtin:blockAds on',
+        'builtin:bypassRegion off',
+      ]);
     });
 
     test('gets the built-in rules it lacks first, in their default state', () async {
       save([custom('a'), builtin(BuiltinRule.blockAds, enabled: true)]);
       final container = await open();
-      expect(current(container), ['builtin:bypassLan on', 'builtin:bypassRegion on', 'a on', 'builtin:blockAds on']);
+      expect(current(container), [
+        'builtin:bypassLan on',
+        'builtin:appleDirect on',
+        'builtin:bypassRegion on',
+        'a on',
+        'builtin:blockAds on',
+      ]);
     });
 
     test('keeps a built-in rule saved twice once, at its first place', () async {
@@ -165,9 +185,16 @@ void main() {
         builtin(BuiltinRule.blockAds, enabled: false),
         builtin(BuiltinRule.bypassLan, enabled: true),
         builtin(BuiltinRule.bypassRegion, enabled: true),
+        builtin(BuiltinRule.appleDirect, enabled: true),
       ]);
       final container = await open();
-      expect(current(container), ['builtin:blockAds on', 'a on', 'builtin:bypassLan on', 'builtin:bypassRegion on']);
+      expect(current(container), [
+        'builtin:blockAds on',
+        'a on',
+        'builtin:bypassLan on',
+        'builtin:bypassRegion on',
+        'builtin:appleDirect on',
+      ]);
     });
 
     test('drops the region rule while the region is Other', () async {
@@ -176,9 +203,10 @@ void main() {
         builtin(BuiltinRule.bypassRegion, enabled: true),
         builtin(BuiltinRule.bypassLan, enabled: true),
         builtin(BuiltinRule.blockAds, enabled: false),
+        builtin(BuiltinRule.appleDirect, enabled: true),
       ]);
       final container = await open(region: Region.other);
-      expect(current(container), ['a on', 'builtin:bypassLan on', 'builtin:blockAds off']);
+      expect(current(container), ['a on', 'builtin:bypassLan on', 'builtin:blockAds off', 'builtin:appleDirect on']);
     });
   });
 
@@ -189,6 +217,7 @@ void main() {
         builtin(BuiltinRule.bypassRegion, enabled: false),
         builtin(BuiltinRule.bypassLan, enabled: true),
         builtin(BuiltinRule.blockAds, enabled: false),
+        builtin(BuiltinRule.appleDirect, enabled: true),
       ]);
       return open();
     }
@@ -197,16 +226,28 @@ void main() {
       final container = await openSaved();
 
       await changeRegion(container, Region.other);
-      expect(current(container), ['a on', 'builtin:bypassLan on', 'builtin:blockAds off']);
+      expect(current(container), ['a on', 'builtin:bypassLan on', 'builtin:blockAds off', 'builtin:appleDirect on']);
 
       await changeRegion(container, Region.cn);
-      expect(current(container), ['builtin:bypassRegion on', 'a on', 'builtin:bypassLan on', 'builtin:blockAds off']);
+      expect(current(container), [
+        'builtin:bypassRegion on',
+        'a on',
+        'builtin:bypassLan on',
+        'builtin:blockAds off',
+        'builtin:appleDirect on',
+      ]);
     });
 
     test("between regions keeps the region rule's place and switch", () async {
       final container = await openSaved();
       await changeRegion(container, Region.cn);
-      expect(current(container), ['a on', 'builtin:bypassRegion off', 'builtin:bypassLan on', 'builtin:blockAds off']);
+      expect(current(container), [
+        'a on',
+        'builtin:bypassRegion off',
+        'builtin:bypassLan on',
+        'builtin:blockAds off',
+        'builtin:appleDirect on',
+      ]);
     });
 
     test('on a list never saved keeps the default order', () async {
@@ -229,9 +270,14 @@ void main() {
     test("switches and moves a built-in rule, and the list keeps it", () async {
       final container = await open();
       final notifier = container.read(rulesNotifierProvider.notifier);
-      await notifier.updateEnabled(true, 1);
-      await notifier.reorder(1, 0);
-      final expected = ['builtin:blockAds on', 'builtin:bypassLan on', 'builtin:bypassRegion on'];
+      await notifier.updateEnabled(true, 2);
+      await notifier.reorder(2, 0);
+      final expected = [
+        'builtin:blockAds on',
+        'builtin:bypassLan on',
+        'builtin:appleDirect on',
+        'builtin:bypassRegion on',
+      ];
       expect(current(container), expected);
 
       expect(current(await open()), expected);
@@ -267,7 +313,13 @@ void main() {
       await container
           .read(rulesNotifierProvider.notifier)
           .importRules(base64.encode(utf8.encode(jsonEncode(imported.writeToJson()))));
-      expect(current(container), ['builtin:bypassLan on', 'builtin:bypassRegion on', 'a on', 'builtin:blockAds on']);
+      expect(current(container), [
+        'builtin:bypassLan on',
+        'builtin:appleDirect on',
+        'builtin:bypassRegion on',
+        'a on',
+        'builtin:blockAds on',
+      ]);
       final blockAds = container.read(rulesNotifierProvider).last;
       expect(blockAds.outbound, Outbound.block);
       expect(blockAds.ruleSets, BuiltinRule.blockAds.rule.ruleSets);
@@ -303,6 +355,26 @@ void main() {
         },
         {
           'list_order': 1,
+          'enabled': true,
+          'name': 'builtin:appleDirect',
+          'outbound': 'direct',
+          'rule_set': ['https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-apple.srs'],
+          'domain_suffix': [
+            'apple.com',
+            'icloud.com',
+            'icloud-content.com',
+            'apple-dns.net',
+            'cdn-apple.com',
+            'mzstatic.com',
+            'aaplimg.com',
+            'itunes.com',
+            'apple-cloudkit.com',
+            'apple-mapkit.com',
+            'testflight.apple.com',
+          ],
+        },
+        {
+          'list_order': 2,
           'enabled': false,
           'name': 'builtin:blockAds',
           'outbound': 'block',
@@ -316,7 +388,7 @@ void main() {
           ],
         },
         {
-          'list_order': 2,
+          'list_order': 3,
           'enabled': true,
           'name': 'builtin:bypassRegion',
           'outbound': 'direct',
@@ -328,39 +400,66 @@ void main() {
 
   group('the routing page', () {
     Future<ProviderContainer> show(WidgetTester tester) async {
+      // tall enough for every rule, so none is left unbuilt below the fold
+      tester.view.physicalSize = const Size(1000, 3000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       final container = (await tester.runAsync(open))!;
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const RoutingOptionsPage(routeRule: null),
+            routes: [
+              GoRoute(
+                path: 'rule/:orderId',
+                name: 'rule',
+                builder: (context, state) => Text('rule page ${state.pathParameters['orderId']}'),
+              ),
+            ],
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(home: RoutingOptionsPage(routeRule: null)),
+          child: MaterialApp.router(routerConfig: router),
         ),
       );
       await tester.pumpAndSettle();
       return container;
     }
 
+    final lock = find.byIcon(Icons.lock_outline_rounded);
+
     testWidgets('marks each built-in rule and names the region rule after the region', (tester) async {
       await show(tester);
-      expect(find.text('Built-in'), findsNWidgets(3));
-      expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(3));
+      expect(lock, findsNWidgets(4));
       expect(find.text('Bypass LAN'), findsOneWidget);
-      expect(find.text('Block ads and malware'), findsOneWidget);
-      expect(find.text('Bypass sites in Iran'), findsOneWidget);
+      expect(find.text('Apple services'), findsOneWidget);
+      expect(find.text('Ads and malware'), findsOneWidget);
+      expect(find.text('Sites in Iran'), findsOneWidget);
     });
 
-    testWidgets('opens nothing on a tap or long press of a built-in rule', (tester) async {
+    testWidgets('opens a built-in rule on a tap, to be read', (tester) async {
       await show(tester);
-      // without a router, an edit page or a delete dialog would throw
-      await tester.tap(find.text('Bypass LAN'));
-      await tester.longPress(find.text('Block ads and malware'));
+      await tester.tap(find.text('Ads and malware'));
       await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
-      expect(find.byType(Dialog), findsNothing);
+      expect(find.text('rule page 2'), findsOneWidget);
+    });
+
+    testWidgets('offers to duplicate a built-in rule on a long press, not to delete it', (tester) async {
+      await show(tester);
+      await tester.longPress(find.text('Bypass LAN'));
+      await tester.pumpAndSettle();
+      expect(find.text('Duplicate rule'), findsOneWidget);
+      expect(find.text('Delete rule'), findsNothing);
     });
 
     testWidgets("switches a built-in rule from its row's switch", (tester) async {
       final container = await show(tester);
-      final row = find.ancestor(of: find.text('Bypass sites in Iran'), matching: find.byType(ListTile));
+      final row = find.ancestor(of: find.text('Sites in Iran'), matching: find.byType(ListTile));
       await tester.tap(find.descendant(of: row, matching: find.byType(Switch)));
       await tester.pumpAndSettle();
       expect(container.read(rulesNotifierProvider).last.enabled, isFalse);
@@ -373,15 +472,15 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Other').last);
       await tester.pumpAndSettle();
-      expect(find.textContaining('Bypass sites in'), findsNothing);
-      expect(find.text('Built-in'), findsNWidgets(2));
+      expect(find.textContaining('Sites in'), findsNothing);
+      expect(lock, findsNWidgets(3));
 
       await tester.tap(find.text('Region'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('China').last);
       await tester.pumpAndSettle();
-      expect(find.text('Bypass sites in China'), findsOneWidget);
-      expect(find.text('Built-in'), findsNWidgets(3));
+      expect(find.text('Sites in China'), findsOneWidget);
+      expect(lock, findsNWidgets(4));
     });
   });
 }
