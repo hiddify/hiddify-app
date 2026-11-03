@@ -77,13 +77,15 @@ class GeneralPage extends HookConsumerWidget {
             ),
           ],
           if (PlatformUtils.isAndroid) const BatteryOptimizationWidget(),
-          SwitchListTile.adaptive(
-            title: Text(t.pages.settings.general.memoryLimit),
-            subtitle: Text(t.pages.settings.general.memoryLimitMsg),
-            secondary: const Icon(Icons.memory_rounded),
-            value: !ref.watch(Preferences.disableMemoryLimit),
-            onChanged: (value) async => await ref.read(Preferences.disableMemoryLimit.notifier).update(!value),
-          ),
+          // iOS ends a VPN that outgrows its memory budget: the limit is always on there
+          if (!PlatformUtils.isIOS)
+            SwitchListTile.adaptive(
+              title: Text(t.pages.settings.general.memoryLimit),
+              subtitle: Text(t.pages.settings.general.memoryLimitMsg),
+              secondary: const Icon(Icons.memory_rounded),
+              value: !ref.watch(Preferences.disableMemoryLimit),
+              onChanged: (value) async => await ref.read(Preferences.disableMemoryLimit.notifier).update(!value),
+            ),
           // Debug mode and log level moved to the Logs page. Both decide how
           // much is recorded, which is only meaningful next to the logs
           // themselves — and next to the filters that decide what is shown.

@@ -51,7 +51,6 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         writeMessage("(packet-tunnel) starting")
         applyStartOptions(options)
 
-        let disableMemoryLimit = (options?["DisableMemoryLimit"] as? NSString as? String ?? "NO") == "YES"
         let grpcServiceModePort = (options?["GrpcServiceModePort"] as? NSNumber)?.intValue ?? 17079
 
         do {
@@ -84,7 +83,9 @@ open class ExtensionProvider: NEPacketTunnelProvider {
         if let setupError {
             throw startupError("(packet-tunnel) error: setup service: \(setupError.localizedDescription)")
         }
-        LibboxSetMemoryLimit(!disableMemoryLimit)
+        // iOS ends a packet tunnel that outgrows its memory budget, so the limit is always on here,
+        // whatever the app's setting; the core turns it on at every start as well (hcore start.go)
+        LibboxSetMemoryLimit(true)
 
         // The app passes options; the system passes none, and no app is there to start the core.
         // An empty request makes the core start from the last one the app made, as on Android.
