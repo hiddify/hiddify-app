@@ -105,7 +105,7 @@ void main() {
 
   const defaults = [
     'builtin:bypassLan on',
-    'builtin:systemDirect on',
+    'builtin:systemDirect off',
     'builtin:blockAds off',
     'builtin:bypassRegion on',
   ];
@@ -119,7 +119,7 @@ void main() {
 
     test('leaves the region rule out while the region is Other', () async {
       final container = await open(region: Region.other);
-      expect(current(container), ['builtin:bypassLan on', 'builtin:systemDirect on', 'builtin:blockAds off']);
+      expect(current(container), ['builtin:bypassLan on', 'builtin:systemDirect off', 'builtin:blockAds off']);
     });
   });
 
@@ -172,7 +172,7 @@ void main() {
       final container = await open();
       expect(current(container), [
         'builtin:bypassLan on',
-        'builtin:systemDirect on',
+        'builtin:systemDirect off',
         'builtin:bypassRegion on',
         'a on',
         'builtin:blockAds on',
@@ -276,7 +276,7 @@ void main() {
       final expected = [
         'builtin:blockAds on',
         'builtin:bypassLan on',
-        'builtin:systemDirect on',
+        'builtin:systemDirect off',
         'builtin:bypassRegion on',
       ];
       expect(current(container), expected);
@@ -316,7 +316,7 @@ void main() {
           .importRules(base64.encode(utf8.encode(jsonEncode(imported.writeToJson()))));
       expect(current(container), [
         'builtin:bypassLan on',
-        'builtin:systemDirect on',
+        'builtin:systemDirect off',
         'builtin:bypassRegion on',
         'a on',
         'builtin:blockAds on',
@@ -358,7 +358,7 @@ void main() {
         },
         {
           'list_order': 1,
-          'enabled': true,
+          'enabled': false,
           'name': 'builtin:systemDirect',
           'outbound': 'direct',
           'rule_set': ['https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-apple.srs'],

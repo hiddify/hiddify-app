@@ -24,7 +24,7 @@ const _geositeUrl = 'https://raw.githubusercontent.com/SagerNet/sing-geosite/rul
 /// only switch and move them, and their content comes from here, so an update can change it.
 enum BuiltinRule {
   bypassLan(enabledByDefault: true),
-  systemDirect(enabledByDefault: true),
+  systemDirect(enabledByDefault: false),
   blockAds(enabledByDefault: false),
   bypassRegion(enabledByDefault: true);
 
