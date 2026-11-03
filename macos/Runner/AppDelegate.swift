@@ -8,6 +8,8 @@ class AppDelegate: FlutterAppDelegate {
   // root service uses and run parseCli from the bundled hiddify-core instead:
   //   Hiddify --tunnel … | Hiddify tunnel … | Hiddify admin_bgservice …
   static func main() {
+    #if !HIDDIFY_APP_STORE
+    // the App Store build has no root service to run for
     let arguments = CommandLine.arguments
     if arguments.count >= 2 {
       switch arguments[1] {
@@ -19,6 +21,7 @@ class AppDelegate: FlutterAppDelegate {
         break
       }
     }
+    #endif
     exit(NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv))
   }
 

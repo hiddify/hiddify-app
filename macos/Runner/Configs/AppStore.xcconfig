@@ -7,6 +7,9 @@ HIDDIFY_NETWORK_EXTENSION_ENTITLEMENT = packet-tunnel-provider
 HIDDIFY_HOST_ENTITLEMENTS = Runner/AppStore.entitlements
 HIDDIFY_EXTENSION_CODE_SIGN_ALLOWED = NO
 HIDDIFY_APPEX_CODE_SIGN_ALLOWED = YES
+// Leaves out of the build all that asks for root: the administrator prompt that installs the VPN
+// service, and the command line modes the root service runs the app in.
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) HIDDIFY_APP_STORE
 DEVELOPMENT_TEAM = M7Q8ASP66Z
 HIDDIFY_CODE_SIGN_STYLE = Manual
 HIDDIFY_CODE_SIGN_IDENTITY = Apple Distribution

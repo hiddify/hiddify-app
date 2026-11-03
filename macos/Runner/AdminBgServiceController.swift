@@ -312,6 +312,10 @@ final class TunnelServiceController {
     }
 
     private func install() -> String? {
+        #if HIDDIFY_APP_STORE
+        // the App Store build's tunnel is a sandboxed app extension: it never asks for root
+        return "The VPN service is not part of the App Store build."
+        #else
         guard let script = installScript?.path else { return "The VPN service is missing from this build." }
         let quote = { (text: String) in
             "\"" + text.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") + "\""
@@ -329,6 +333,7 @@ final class TunnelServiceController {
             return "Installing the VPN service was cancelled."
         }
         return "Couldn't install the VPN service: \(error[NSAppleScript.errorMessage] as? String ?? "unknown error")"
+        #endif
     }
 
     private static func flutterError(_ message: String) -> FlutterError {

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/dialog/widgets/admin_bg_service_dialogs.dart';
@@ -196,6 +197,8 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   Future<void> _prepareMacosAdminBgService(ProfileEntity profile, SingboxConfigOption options) async {
     final core = singbox.core;
     if (core is! CoreInterfaceMacOS) return;
+    // the App Store build never asks for root, whatever the native side reports
+    if (Release.read() == Release.appStore) return;
     // Network Extension builds do not use the admin password install path.
     if (!core.tunnelServiceAvailable || !options.enableTun) return;
 
