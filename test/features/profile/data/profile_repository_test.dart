@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/db/db.dart';
@@ -11,6 +12,7 @@ import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
+import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service.dart';
 
@@ -48,9 +50,14 @@ class _FakeParser implements ProfileParser {
 }
 
 class _FakeDataSource implements ProfileDataSource {
-  _FakeDataSource([this.entry]);
+  _FakeDataSource([this.entry, this.entries = const []]);
 
   final ProfileEntry? entry;
+  final List<ProfileEntry> entries;
+
+  @override
+  Stream<List<ProfileEntry>> watchAll({required ProfilesSort sort, required SortMode sortMode}) =>
+      Stream.value(entries);
 
   @override
   Future<ProfileEntry?> getById(String id) async => entry;
@@ -158,5 +165,19 @@ void main() {
       expect(repo.tempFileSeen, true);
       expect(leftTempFiles(), isEmpty);
     });
+  });
+
+  // hiddify-app#2422: one profile saved with data this version can not read failed the whole list
+  test("watchAll lists the profiles saved with data that can not be read", () async {
+    final entries = [
+      remoteEntry,
+      remoteEntry.copyWith(id: 'null-headers', populatedHeaders: const Value('null')),
+      remoteEntry.copyWith(id: 'bad-headers', populatedHeaders: const Value('{not json')),
+      remoteEntry.copyWith(id: 'bad-choices', userOverride: const Value('{not json')),
+      remoteEntry.copyWith(id: 'no-url', url: const Value(null)),
+    ];
+    final repo = _Repo(_FakeDataSource(null, entries), paths);
+    final result = await repo.watchAll().first;
+    expect(result.getOrElse((f) => throw f).map((p) => p.id), entries.map((e) => e.id));
   });
 }

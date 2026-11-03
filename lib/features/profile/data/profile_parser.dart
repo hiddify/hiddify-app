@@ -484,17 +484,9 @@ class ProfileParser with InfraLogger {
   }
 
   static String profileOverrideHelper({required ProfileEntriesCompanion profile}) {
-    final populatedHeaders = profile.populatedHeaders.value;
-
-    Map<String, dynamic>? mPopulatedHeaders;
-    if (populatedHeaders != null) {
-      final m = jsonDecode(populatedHeaders) as Map;
-      mPopulatedHeaders = m.cast<String, dynamic>();
-    }
-
     return ProfileParser.profileOverride(
-      populatedHeaders: mPopulatedHeaders,
-      userOverride: UserOverride.fromStr(profile.userOverride.value),
+      populatedHeaders: decodeProfileHeaders(profile.populatedHeaders.value),
+      userOverride: decodeUserOverride(profile.userOverride.value),
     );
   }
 

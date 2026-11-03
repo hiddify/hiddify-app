@@ -132,6 +132,16 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
         .handleExceptions(ProfileUnexpectedFailure.new);
   }
 
+  /// [entry] as a profile, or null when it can not be read, logged.
+  ProfileEntity? _readable(ProfileEntry entry) {
+    try {
+      return entry.toEntity();
+    } catch (error, stackTrace) {
+      loggy.warning("profile [${entry.id}] (${entry.name}) can not be read, left out of the list", error, stackTrace);
+      return null;
+    }
+  }
+
   @override
   Stream<Either<ProfileFailure, List<ProfileEntity>>> watchAll({
     ProfilesSort sort = ProfilesSort.lastUpdate,
@@ -139,7 +149,8 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   }) {
     return _profileDataSource
         .watchAll(sort: sort, sortMode: sortMode)
-        .map((event) => event.map((e) => e.toEntity()).toList())
+        // each profile on its own: one that can not be read is left out, not every profile with it
+        .map((event) => [for (final entry in event) ?_readable(entry)])
         .handleExceptions(ProfileUnexpectedFailure.new);
   }
 
