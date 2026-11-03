@@ -1,4 +1,3 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -91,7 +90,7 @@ class UploadSpeedChip extends ConsumerWidget {
             child: CircularProgressIndicator(strokeWidth: dense ? 1.5 : 2, color: color),
           )
         else
-          Icon(dense ? Icons.arrow_upward_rounded : FluentIcons.arrow_upload_24_regular, size: iconSize, color: color),
+          Icon(Icons.speed_rounded, size: iconSize, color: color),
         if (failed) ...[
           const Gap(3),
           Icon(Icons.close_rounded, size: iconSize, color: color),

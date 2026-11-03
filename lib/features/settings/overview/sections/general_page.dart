@@ -118,7 +118,7 @@ class GeneralPage extends HookConsumerWidget {
           ListTile(
             title: Text(t.pages.settings.general.uploadTestSize),
             subtitle: Text(t.pages.settings.general.megabytes(n: ref.watch(ConfigOptions.uploadTestSize))),
-            leading: const Icon(Icons.upload_rounded),
+            leading: const Icon(Icons.speed_rounded),
             onTap: () => chooseUploadTestSize(ref),
           ),
           ListTile(

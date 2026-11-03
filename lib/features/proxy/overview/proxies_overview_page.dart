@@ -80,7 +80,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                 heroTag: 'upload-test',
                 onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).uploadTestAll(),
                 tooltip: t.pages.proxies.upload.test,
-                child: const Icon(FluentIcons.arrow_upload_24_filled),
+                child: const Icon(Icons.speed_rounded, size: 26),
               ),
             ),
           const Gap(12),
