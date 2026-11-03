@@ -8,7 +8,11 @@ Authenticode signature. Flagged files also get a `::warning::` annotation.
 Never fails the job: the report is informational and feeds the false-positive
 dispute routine in docs/windows-code-signing.md.
 
-Usage: virustotal_report.py <assets-dir>   (env: VIRUS_TOTAL_API_KEY)
+With --json, also writes {sha256: {"count": n, "total": t}} (null while VirusTotal has
+no finished analysis), which prepare_release_notes.py --vt-results turns into the
+release badges.
+
+Usage: virustotal_report.py <assets-dir> [--json <results.json>]   (env: VIRUS_TOTAL_API_KEY)
 """
 from __future__ import annotations
 
@@ -24,6 +28,8 @@ import urllib.request
 API = "https://www.virustotal.com/api/v3/files/"
 # Public API quota is 4 requests/minute.
 REQUEST_INTERVAL_SECONDS = 16
+# Large files are still being analysed after the first pass; look once more.
+RETRY_DELAY_SECONDS = 180
 
 
 def sha256(path: pathlib.Path) -> str:
@@ -61,8 +67,24 @@ def signature_summary(attributes: dict) -> str:
     return text
 
 
+def stats_of(report: dict | None) -> tuple[dict, dict] | None:
+    """(last_analysis_stats, last_analysis_results), or None while no analysis has finished."""
+    if report is None:
+        return None
+    attributes = report.get("data", {}).get("attributes", {})
+    stats = attributes.get("last_analysis_stats") or {}
+    if not any(stats.get(key) for key in ("malicious", "suspicious", "undetected", "harmless")):
+        return None
+    return attributes, attributes.get("last_analysis_results") or {}
+
+
 def main() -> int:
-    if len(sys.argv) != 2:
+    args = sys.argv[1:]
+    json_path = None
+    if len(args) == 3 and args[1] == "--json":
+        json_path = pathlib.Path(args[2])
+        args = args[:1]
+    if len(args) != 1:
         print(__doc__)
         return 2
     api_key = os.environ.get("VIRUS_TOTAL_API_KEY", "")
@@ -70,36 +92,54 @@ def main() -> int:
         print("VIRUS_TOTAL_API_KEY not set; skipping VirusTotal report")
         return 0
 
-    files = sorted(p for p in pathlib.Path(sys.argv[1]).iterdir() if p.is_file())
-    rows: list[str] = ["| File | Detections | Flagged by | Signature (VT) | Report |", "|---|---|---|---|---|"]
-    flagged_total = 0
+    files = sorted(p for p in pathlib.Path(args[0]).iterdir() if p.is_file())
+    digests = {path: sha256(path) for path in files}
+    reports: dict[pathlib.Path, tuple[dict, dict] | None] = {}
+    requests = 0
+    for attempt in range(2):
+        pending = [path for path in files if reports.get(path) is None]
+        if not pending:
+            break
+        if attempt:
+            print(f"{len(pending)} files still being analysed; retrying in {RETRY_DELAY_SECONDS}s")
+            time.sleep(RETRY_DELAY_SECONDS)
+        for path in pending:
+            if requests:
+                time.sleep(REQUEST_INTERVAL_SECONDS)
+            requests += 1
+            reports[path] = stats_of(fetch(api_key, digests[path]))
 
-    for index, path in enumerate(files):
-        if index:
-            time.sleep(REQUEST_INTERVAL_SECONDS)
-        digest = sha256(path)
+    rows: list[str] = ["| File | Detections | Flagged by | Signature (VT) | Report |", "|---|---|---|---|---|"]
+    results: dict[str, dict | None] = {}
+    flagged_total = 0
+    for path in files:
+        digest = digests[path]
         link = f"https://www.virustotal.com/gui/file/{digest}/detection"
-        report = fetch(api_key, digest)
+        report = reports.get(path)
         if report is None:
+            results[digest] = None
             rows.append(f"| {path.name} | pending | | | [open]({link}) |")
             continue
 
-        attributes = report.get("data", {}).get("attributes", {})
+        attributes, analysis = report
         stats = attributes.get("last_analysis_stats", {})
-        results = attributes.get("last_analysis_results", {})
         flagged = [
             f"{engine} ({result.get('result') or result.get('category')})"
-            for engine, result in sorted(results.items())
+            for engine, result in sorted(analysis.items())
             if result.get("category") in ("malicious", "suspicious")
         ]
         total = sum(stats.get(key, 0) for key in ("malicious", "suspicious", "undetected", "harmless"))
         count = len(flagged)
         flagged_total += count
+        results[digest] = {"count": count, "total": total}
         rows.append(
             f"| {path.name} | {count}/{total} | {', '.join(flagged) or '-'} | {signature_summary(attributes)} | [open]({link}) |"
         )
         if count:
             print(f"::warning::{path.name}: {count}/{total} VirusTotal engines flag it: {', '.join(flagged)} -> {link}")
+
+    if json_path:
+        json_path.write_text(json.dumps(results, indent=2) + "\n")
 
     header = "### VirusTotal detections\n"
     footer = (
