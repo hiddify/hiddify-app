@@ -1,7 +1,26 @@
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/singbox/model/singbox_config_option.dart';
+
+/// Starts the core through [client] once it has stopped. A stop sent just before may still be under
+/// way, as the core answers a stop at once and stops in the background, and it refuses a start
+/// until then (INSTANCE_NOT_STOPPED); so it is asked again, for [patience] at most.
+Future<CoreInfoResponse> startOnceStopped(
+  CoreClient client,
+  StartRequest request, {
+  Duration patience = const Duration(seconds: 10),
+}) async {
+  final deadline = DateTime.now().add(patience);
+  while (true) {
+    final response = await client.start(request);
+    if (response.messageType != MessageType.INSTANCE_NOT_STOPPED || DateTime.now().isAfter(deadline)) {
+      return response;
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+  }
+}
 
 class CoreInterface {
   late CoreClient fgClient;

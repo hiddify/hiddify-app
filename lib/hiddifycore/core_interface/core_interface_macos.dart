@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop.dart';
 import 'package:hiddify/hiddifycore/core_interface/vpn_config_snapshot.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
@@ -46,6 +47,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   SingboxConfigOption? _options;
   bool _usingVPN = false;
   bool _startingVPN = false;
+
   /// Suppresses native "connected" events while stop() is in flight (app resume
   /// re-subscribes the EventChannel and would otherwise flash Connected again).
   bool _stoppingVPN = false;
@@ -57,6 +59,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   // the service exposes the same port/secret status fields as the extension.
   bool _tunnelServiceAvailable = false;
   bool _tunnelServiceReady = false;
+
   /// Suppresses [clientChanges] during stop-before-start so coreRestartSignal does not rebuild UI mid-connect.
   bool _suppressClientChanges = false;
   String _nativeStatus = 'disconnected';
@@ -165,10 +168,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
     final sameEndpoint = _extensionPort == controlPort && _extensionSecret == secret;
     if (sameEndpoint && _extensionChannel != null) {
       if (bgClient == fgClient) {
-        bgClient = CoreClient(
-          _extensionChannel!,
-          options: CallOptions(metadata: {'x-hiddify-secret': secret}),
-        );
+        bgClient = CoreClient(_extensionChannel!, options: CallOptions(metadata: {'x-hiddify-secret': secret}));
         _notifyClientChange();
       }
       return;
@@ -185,10 +185,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
         idleTimeout: Duration(seconds: 10),
       ),
     );
-    bgClient = CoreClient(
-      _extensionChannel!,
-      options: CallOptions(metadata: {'x-hiddify-secret': secret}),
-    );
+    bgClient = CoreClient(_extensionChannel!, options: CallOptions(metadata: {'x-hiddify-secret': secret}));
     if (oldChannel != null) unawaited(oldChannel.shutdown());
     _notifyClientChange();
   }
@@ -266,7 +263,9 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
       } else {
         _usingVPN = false;
         bgClient = fgClient;
-        final response = await fgClient.start(
+        // the quiet stop above may still be under way in the core
+        final response = await startOnceStopped(
+          fgClient,
           StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
         );
         _checkResponse(response);
@@ -303,10 +302,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
     final channel = _extensionChannel;
     final secret = _extensionSecret;
     if (channel == null || secret == null || secret.isEmpty) return null;
-    return HiddifyAdminBGClient(
-      channel,
-      options: CallOptions(metadata: {'x-hiddify-secret': secret}),
-    );
+    return HiddifyAdminBGClient(channel, options: CallOptions(metadata: {'x-hiddify-secret': secret}));
   }
 
   Future<bool> _adminBgEngineStarted() async {
@@ -371,12 +367,8 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
         (!quiet || _nativeStatus != 'disconnected' || _extensionChannel != null);
     if (needsNativeStop) {
       final nativeSw = Stopwatch()..start();
-      final state = await _methods.invokeMapMethod<String, dynamic>('stop', {
-        if (engineStopped) 'engineStopped': true,
-      });
-      loggy.warning(
-        'macOS stop: native stop in ${nativeSw.elapsedMilliseconds}ms (engineStopped=$engineStopped)',
-      );
+      final state = await _methods.invokeMapMethod<String, dynamic>('stop', {if (engineStopped) 'engineStopped': true});
+      loggy.warning('macOS stop: native stop in ${nativeSw.elapsedMilliseconds}ms (engineStopped=$engineStopped)');
       if (state != null) _receiveState(state);
     }
 
@@ -409,10 +401,7 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
         }
       }
       final fgSw = Stopwatch()..start();
-      _checkResponse(
-        await fgClient.stop(Empty()).timeout(const Duration(seconds: 2)),
-        allowStopped: true,
-      );
+      _checkResponse(await fgClient.stop(Empty()).timeout(const Duration(seconds: 2)), allowStopped: true);
       loggy.warning('macOS stop: fg stop in ${fgSw.elapsedMilliseconds}ms');
       _status.add(const CoreStatus.stopped());
       loggy.warning('macOS stop: TOTAL ${total.elapsedMilliseconds}ms');

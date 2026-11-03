@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop.dart';
 import 'package:hiddify/hiddifycore/core_interface/vpn_config_snapshot.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
@@ -112,8 +113,12 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     if (!wantAdminBg) {
       _usingAdminBg = false;
       _useBgClient(fgClient);
+      // the stop above may still be under way in the core
       _checkResponse(
-        await fgClient.start(StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit)),
+        await startOnceStopped(
+          fgClient,
+          StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
+        ),
       );
       _status.add(const CoreStatus.started());
       return;
@@ -131,7 +136,8 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
           ),
         );
         _checkResponse(
-          await fgClient.start(
+          await startOnceStopped(
+            fgClient,
             StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
           ),
         );
@@ -144,9 +150,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     }
 
     if (_isAppImage) {
-      throw StateError(
-        'VPN mode in the AppImage needs root. Quit and run: sudo ${Platform.environment['APPIMAGE']}',
-      );
+      throw StateError('VPN mode in the AppImage needs root. Quit and run: sudo ${Platform.environment['APPIMAGE']}');
     }
 
     _status.add(const CoreStatus.starting());
@@ -216,9 +220,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     }
     if (last != EnsureAdminBgServiceProgress.ENSURE_ADMIN_BG_SERVICE_CONNECTED) {
       throw StateError(
-        (lastMessage != null && lastMessage.isNotEmpty)
-            ? lastMessage
-            : 'The VPN service did not become ready.',
+        (lastMessage != null && lastMessage.isNotEmpty) ? lastMessage : 'The VPN service did not become ready.',
       );
     }
 
