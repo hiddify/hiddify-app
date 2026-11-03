@@ -143,7 +143,27 @@
         "searching": "正在搜尋",
         "reconnecting": "正在重新連線"
       },
-      "signalStyle": "訊號樣式"
+      "signalStyle": "訊號樣式",
+      "keepTop": {
+        "picking": "正在從 $count 個中尋找最快的 $keep 個…",
+        "pickingBody": "所有代理測試一次後,只有最快的繼續執行。",
+        "kept": "最快的 $n 個正在執行",
+        "keptBody": "其餘 $paused 個代理已暫停,以節省電量和流量。",
+        "showAll": "顯示全部 $count 個",
+        "big": "$count 個代理正在執行",
+        "bigBody": "只保留最快的 $keep 個執行,以節省電量和流量。",
+        "keep": "保留最快的 $keep 個",
+        "change": "變更數量"
+      },
+      "upload": {
+        "test": "測試上傳速度",
+        "failed": "無法開始測速",
+        "warnTitle": "將消耗大量流量",
+        "perProxy": "$count 個代理,每個 $n MB",
+        "warnBody": "測試所有代理的上傳速度可能消耗大量流量。將清單限制為最快的 $limit 個,只測試它們。可在設定中變更此數量。",
+        "testAll": "測試全部 $count 個",
+        "testFastest": "保留並測試最快的 $limit 個"
+      }
     },
     "profiles": {
       "title": "設定檔",
@@ -314,7 +334,11 @@
         "useXrayCoreWhenPossible": "盡可能使用 xray-core",
         "useXrayCoreWhenPossibleMsg": "解析訂閱連結時使用 xray-core。重新匯入訂閱即可開啟此選項。",
         "useSystemTlsEngine": "可用時使用系統 TLS",
-        "useSystemTlsEngineMsg": "沒有 TLS 指紋的連線，會在系統 TLS 通過此裝置上的檢查後，使用 macOS、iOS 或 Windows 的 TLS；否則看起來會像 Chrome。"
+        "useSystemTlsEngineMsg": "沒有 TLS 指紋的連線，會在系統 TLS 通過此裝置上的檢查後，使用 macOS、iOS 或 Windows 的 TLS；否則看起來會像 Chrome。",
+        "uploadTestSize": "上傳測試大小",
+        "megabytes": "$n MB",
+        "uploadTestLimit": "上傳測試代理上限",
+        "uploadTestLimitMsg": "測試超過 $n 個代理前詢問"
       },
       "routing": {
         "title": "路由",
@@ -807,7 +831,12 @@
       "location": "位置",
       "postalCode": "郵遞區號",
       "download": "下載",
-      "upload": "上傳"
+      "upload": "上傳",
+      "ping": "延遲",
+      "speed": "速度",
+      "server": "伺服器",
+      "country": "國家",
+      "tapToTest": "點擊測試"
     },
     "windowClosing": {
       "askEachTime": "每次詢問",
@@ -828,6 +857,16 @@
     },
     "qrScanner": {
       "notFound": "此圖片中找不到 QR Code"
+    },
+    "keepTop": {
+      "title": "大型訂閱",
+      "description": "此設定檔包含 $count 個代理。全部執行會消耗電量、流量和記憶體。Hiddify 可以先測試一次,只保留最快的 $keep 個執行,暫停其餘代理。",
+      "hint": "您隨時可以在代理清單末尾重新執行全部代理。",
+      "keeping": "最快的 $keep 個執行,其餘暫停",
+      "all": "全部 $count 個執行",
+      "keep": "保留最快的 $keep 個",
+      "useAll": "使用全部 $count 個",
+      "howMany": "保留執行的數量"
     }
   },
   "connection": {

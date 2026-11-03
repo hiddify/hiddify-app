@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:grpc/grpc.dart';
@@ -516,6 +517,23 @@ class HiddifyCoreService with InfraLogger {
         return right(unit);
       } catch (e) {
         loggy.error("error in url test: $e");
+        rethrow;
+      }
+    });
+  }
+
+  /// Measures the upload ([download] false) or download speed of [tag], a proxy or each proxy of a
+  /// group, moving [bytes] through each; the speeds come with the proxies (upload_speed,
+  /// download_speed). No tag: the proxy the selection uses.
+  TaskEither<String, Unit> speedTest(String tag, int bytes, {required bool download}) {
+    return TaskEither(() async {
+      try {
+        final request = SpeedTestRequest(tag: tag, size: Int64(bytes));
+        final res = await (download ? core.bgClient.downloadTest(request) : core.bgClient.uploadTest(request));
+        if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
+        return right(unit);
+      } catch (e) {
+        loggy.error("error in speed test: $e");
         rethrow;
       }
     });

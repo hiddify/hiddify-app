@@ -5,6 +5,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
+import 'package:hiddify/core/widget/unique_keys_layout.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
@@ -105,58 +106,61 @@ class ActiveProxyDelayIndicator extends HookConsumerWidget with InfraLogger {
       ),
     };
 
-    return SizedBox(
-      height: _slotHeight,
-      child: Center(
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeOut,
-          height: 36,
-          decoration: BoxDecoration(
-            color: offer
-                ? green.withValues(alpha: .16)
-                : dead
-                ? error.withValues(alpha: .14)
-                : theme.colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Material(
-            type: MaterialType.transparency,
-            child: InkWell(
-              onTap: () async {
-                final notifier = ref.read(activeProxyNotifierProvider.notifier);
-                try {
-                  if (offer) {
-                    await notifier.switchToLowest(card!.mainGroup);
-                  } else {
-                    await notifier.urlTest("");
-                  }
-                } catch (e) {
-                  loggy.error("Error during ${offer ? "switch to lowest" : "URL test"}: $e");
-                }
-              },
-              borderRadius: BorderRadius.circular(18),
-              child: AnimatedPadding(
-                duration: const Duration(milliseconds: 350),
-                curve: Curves.easeOut,
-                padding: EdgeInsets.only(left: offer ? 4 : 14, right: 14),
-                child: AnimatedSize(
-                  duration: const Duration(milliseconds: 350),
-                  curve: Curves.easeOut,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    transitionBuilder: (child, animation) => FadeTransition(
-                      opacity: animation,
-                      child: ScaleTransition(scale: Tween(begin: .94, end: 1.0).animate(animation), child: child),
-                    ),
-                    child: content,
-                  ),
+    final pingPill = AnimatedContainer(
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeOut,
+      height: 36,
+      decoration: BoxDecoration(
+        color: offer
+            ? green.withValues(alpha: .16)
+            : dead
+            ? error.withValues(alpha: .14)
+            : theme.colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          onTap: () async {
+            final notifier = ref.read(activeProxyNotifierProvider.notifier);
+            try {
+              if (offer) {
+                await notifier.switchToLowest(card!.mainGroup);
+              } else {
+                await notifier.urlTest("");
+              }
+            } catch (e) {
+              loggy.error("Error during ${offer ? "switch to lowest" : "URL test"}: $e");
+            }
+          },
+          // the upload speed of the proxy in use, shown on the proxy card
+          onLongPress: offer || dead ? null : () => ref.read(activeProxyNotifierProvider.notifier).uploadTest(),
+          borderRadius: BorderRadius.circular(18),
+          child: AnimatedPadding(
+            duration: const Duration(milliseconds: 350),
+            curve: Curves.easeOut,
+            padding: EdgeInsets.only(left: offer ? 4 : 14, right: 14),
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOut,
+              child: AnimatedSwitcher(
+                layoutBuilder: uniqueKeysLayout(),
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: ScaleTransition(scale: Tween(begin: .94, end: 1.0).animate(animation), child: child),
                 ),
+                child: content,
               ),
             ),
           ),
         ),
       ),
+    );
+
+    return SizedBox(
+      height: _slotHeight,
+      child: Center(child: pingPill),
     );
   }
 }

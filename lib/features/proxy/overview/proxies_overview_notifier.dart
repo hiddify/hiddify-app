@@ -2,19 +2,27 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:dartx/dartx.dart';
+import 'package:fpdart/fpdart.dart' show unit;
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/preferences_provider.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/utils/preferences_utils.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/data/proxy_data_providers.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
+import 'package:hiddify/features/proxy/widget/upload_speed.dart';
+import 'package:hiddify/features/proxy/widget/upload_test_dialog.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
 
 import 'package:hiddify/utils/riverpod_utils.dart';
 import 'package:hiddify/utils/utils.dart';
+import 'package:meta/meta.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -78,7 +86,7 @@ class ProxyPingStyleNotifier extends _$ProxyPingStyleNotifier {
     return _pref.write(value);
   }
 
-  /// The long press on a ping: number ↔ signal.
+  /// The "Signal style" menu item: number ↔ signal.
   Future<void> toggle() => update(state == ProxyPingStyle.number ? ProxyPingStyle.signal : ProxyPingStyle.number);
 }
 
@@ -274,6 +282,61 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
     }
   }
 
+  /// Tests the upload speed of [tag], a proxy, or each proxy of a group, sending the megabytes the
+  /// settings name through each.
+  Future<void> uploadTest(String tag) async {
+    final bytes = uploadTestBytes(ref);
+    await ref.read(hapticServiceProvider.notifier).lightImpact();
+    await ref.read(proxyRepositoryProvider).uploadTest(tag, bytes).getOrElse((err) {
+      loggy.warning("error testing upload", err);
+      final t = ref.read(translationsProvider).requireValue;
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.upload.failed);
+      return unit;
+    }).run();
+  }
+
+  /// Tests the download speed of [tag], a proxy, or each proxy of a group, receiving the megabytes
+  /// the settings name through each.
+  Future<void> downloadTest(String tag) async {
+    final bytes = uploadTestBytes(ref);
+    await ref.read(hapticServiceProvider.notifier).lightImpact();
+    await ref.read(proxyRepositoryProvider).downloadTest(tag, bytes).getOrElse((err) {
+      loggy.warning("error testing download", err);
+      final t = ref.read(translationsProvider).requireValue;
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.upload.failed);
+      return unit;
+    }).run();
+  }
+
+  /// Tests the upload speed of every proxy in the list. Above the settings' limit it asks first, as
+  /// that sends the test's megabytes through each of them: all of them, or the fastest by their
+  /// ping up to the limit, which then are all that run (keep top).
+  Future<void> uploadTestAll() async {
+    final group = state.valueOrNull;
+    if (group == null) return;
+    final proxies = group.items.where((e) => !e.isGroup).toList();
+    final limit = ref.read(ConfigOptions.uploadTestLimit);
+    if (proxies.length <= limit) return uploadTest(group.tag);
+
+    final choice = await ref
+        .read(dialogNotifierProvider.notifier)
+        .showUploadTestWarning(count: proxies.length, limit: limit, megabytes: ref.read(ConfigOptions.uploadTestSize));
+    switch (choice) {
+      case null:
+        return;
+      case UploadTestChoice.all:
+        return uploadTest(group.tag);
+      case UploadTestChoice.fastest:
+        final fastest = fastestProxies(proxies, limit);
+        if (await ref.read(activeProfileProvider.future) case final profile?) {
+          unawaited(ref.read(keepTopNotifierProvider.notifier).set(profile, limit));
+        }
+        for (final tag in fastest) {
+          await uploadTest(tag);
+        }
+    }
+  }
+
   /// Tests [groupTag]'s proxies, or only the one proxy when given a proxy's tag (a tap on its ping).
   Future<void> urlTest(String groupTag) async {
     loggy.debug("testing group: [$groupTag]");
@@ -285,4 +348,12 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
       }).run();
     }
   }
+}
+
+/// The tags of the [count] proxies with the lowest ping that answered.
+@visibleForTesting
+List<String> fastestProxies(List<OutboundInfo> proxies, int count) {
+  final answered = proxies.where((e) => e.urlTestDelay > 0 && e.urlTestDelay < 65000).toList()
+    ..sort((a, b) => a.urlTestDelay.compareTo(b.urlTestDelay));
+  return answered.take(count).map((e) => e.tag).toList();
 }

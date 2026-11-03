@@ -168,6 +168,13 @@ abstract class ConfigOptions {
     mapTo: const IntervalInSecondsConverter().toJson,
   );
 
+  /// How many megabytes an upload test sends through each proxy.
+  static final uploadTestSize = PreferencesNotifier.create<int, int>("upload-test-size", 1);
+
+  /// Above this many proxies, an upload test of them all asks first: it sends that much through
+  /// each of them.
+  static final uploadTestLimit = PreferencesNotifier.create<int, int>("upload-test-limit", 20);
+
   static final enableClashApi = PreferencesNotifier.create<bool, bool>("enable-clash-api", true);
 
   static final clashApiPort = PreferencesNotifier.create<int, int>(
@@ -396,6 +403,8 @@ abstract class ConfigOptions {
     "strict-route": strictRoute,
     "connection-test-url": connectionTestUrl,
     "url-test-interval": urlTestInterval,
+    "upload-test-size": uploadTestSize,
+    "upload-test-limit": uploadTestLimit,
     "clash-api-port": clashApiPort,
     // "bypass-lan": bypassLan,
     "allow-connection-from-lan": allowConnectionFromLan,

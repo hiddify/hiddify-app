@@ -14,6 +14,8 @@ abstract interface class ProxyRepository {
   TaskEither<ProxyFailure, IpInfo> getCurrentIpInfo(CancelToken cancelToken, {String? customIpInfoUrl});
   TaskEither<ProxyFailure, Unit> selectProxy(String groupTag, String outboundTag);
   TaskEither<ProxyFailure, Unit> urlTest(String groupTag);
+  TaskEither<ProxyFailure, Unit> uploadTest(String tag, int bytes);
+  TaskEither<ProxyFailure, Unit> downloadTest(String tag, int bytes);
 }
 
 class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRepository {
@@ -54,6 +56,22 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
     );
   }
 
+  @override
+  TaskEither<ProxyFailure, Unit> uploadTest(String tag, int bytes) {
+    return exceptionHandler(
+      () => singbox.speedTest(tag, bytes, download: false).mapLeft(ProxyUnexpectedFailure.new).run(),
+      ProxyUnexpectedFailure.new,
+    );
+  }
+
+  @override
+  TaskEither<ProxyFailure, Unit> downloadTest(String tag, int bytes) {
+    return exceptionHandler(
+      () => singbox.speedTest(tag, bytes, download: true).mapLeft(ProxyUnexpectedFailure.new).run(),
+      ProxyUnexpectedFailure.new,
+    );
+  }
+
   /// Built-in sources that currently return usable JSON. Custom `ipinfo-url`
   /// from the active subscription is tried first when provided.
   static final List<(String, IpInfo Function(Map<String, dynamic>))> _ipInfoSources = [
@@ -75,11 +93,7 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
       for (final (url, parse) in sources) {
         try {
           loggy.debug("getting current ip info using [$url]");
-          final response = await client.get<Map<String, dynamic>>(
-            url,
-            cancelToken: cancelToken,
-            proxyOnly: true,
-          );
+          final response = await client.get<Map<String, dynamic>>(url, cancelToken: cancelToken, proxyOnly: true);
           if (response.statusCode == 200 && response.data != null) {
             return parse(response.data!);
           }

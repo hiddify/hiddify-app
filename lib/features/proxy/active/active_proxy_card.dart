@@ -9,6 +9,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
+import 'package:hiddify/core/widget/unique_keys_layout.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
@@ -17,6 +18,7 @@ import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/widget/proxy_type_label.dart';
+import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -141,11 +143,15 @@ class _StepRow extends StatelessWidget {
     this.subtitle = const SizedBox.shrink(),
     this.height = _rowHeight,
     this.trailing,
+    this.end,
     this.onLongPress,
   });
 
   final double height;
   final Widget? trailing;
+
+  /// Before the chevron of a row without [trailing]: the upload speed of the proxy in use.
+  final Widget? end;
   final Color color;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
@@ -199,6 +205,7 @@ class _StepRow extends StatelessWidget {
                 // room for the trailing widget's badge, clear of the card's rounded corner
                 const Gap(24),
               ] else ...[
+                if (end case final end?) ...[const Gap(8), end, const Gap(4)],
                 Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 const Gap(12),
               ],
@@ -261,6 +268,14 @@ class _ProxyRow extends ConsumerWidget {
     return _StepRow(
       color: theme.cardTheme.color ?? s.surfaceContainerLow,
       onTap: () => context.goNamed('proxies'),
+      // how fast the proxy in use uploads: a tap measures it, a long press on the ping does too
+      end: connected
+          ? UploadSpeedChip(
+              speed: server.uploadSpeed.toInt(),
+              testing: server.uploadTesting,
+              onTest: () => ref.read(activeProxyNotifierProvider.notifier).uploadTest(),
+            )
+          : null,
       flag: InkWell(
         onTap: () async {
           await urlTest();
@@ -441,6 +456,7 @@ class _StateBadge extends StatelessWidget {
       child: SizedBox.square(
         dimension: size,
         child: AnimatedSwitcher(
+          layoutBuilder: uniqueKeysLayout(),
           duration: const Duration(milliseconds: 250),
           child: switch (status) {
             StepStatus.waiting => Container(
@@ -673,6 +689,7 @@ class _FlagSlot extends StatelessWidget {
       child: RepaintBoundary(
         // the pop and the ring repaint the slot alone
         child: AnimatedSwitcher(
+          layoutBuilder: uniqueKeysLayout(),
           duration: const Duration(milliseconds: 250),
           child: switch (info) {
             OutboundInfo(hasIp: true) => Stack(
@@ -737,8 +754,7 @@ class _IpSlot extends StatelessWidget {
     final info = this.info;
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 250),
-      layoutBuilder: (current, previous) =>
-          Stack(alignment: AlignmentDirectional.centerStart, children: [...previous, ?current]),
+      layoutBuilder: uniqueKeysLayout(AlignmentDirectional.centerStart),
       child: switch (info) {
         OutboundInfo(hasIp: true) =>
           KeyedSubtree(

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:fpdart/fpdart.dart' show unit;
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
@@ -15,6 +16,7 @@ import 'package:hiddify/features/proxy/model/connection_health.dart';
 import 'package:hiddify/features/proxy/model/ip_info_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
+import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart' hide IpInfo;
 import 'package:hiddify/hiddifycore/init_signal.dart';
@@ -204,6 +206,18 @@ class ActiveProxyNotifier extends _$ActiveProxyNotifier with AppLogger {
         }).run();
       }
     });
+  }
+
+  /// Tests the upload speed of what the traffic leaves through, as its ping does.
+  Future<void> uploadTest() async {
+    final bytes = uploadTestBytes(ref);
+    await ref.read(hapticServiceProvider.notifier).lightImpact();
+    await ref.read(proxyRepositoryProvider).uploadTest("", bytes).getOrElse((err) {
+      loggy.warning("error testing upload", err);
+      final t = ref.read(translationsProvider).requireValue;
+      ref.read(inAppNotificationControllerProvider).showErrorToast(t.pages.proxies.upload.failed);
+      return unit;
+    }).run();
   }
 
   /// Hands [mainGroup]'s choice to the lowest-delay group.

@@ -26,6 +26,8 @@ import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/common/qr_code_scanner_screen.dart';
 import 'package:hiddify/features/crash_report/widget/crash_report_dialog.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
+import 'package:hiddify/features/proxy/widget/upload_test_dialog.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
@@ -149,6 +151,22 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<bool> showUnknownDomainsWarning({required String url}) async {
     return await _show<bool?>(UnknownDomainsWarningDialog(url: url)) ?? false;
+  }
+
+  /// How many of a profile's [count] proxies run, the fastest, starting at [keep]: -1 for all of
+  /// them, null when dismissed.
+  Future<int?> showKeepTop({required int count, required int keep}) async {
+    return await _show<int?>(KeepTopDialog(count: count, keep: keep));
+  }
+
+  /// Whether an upload test of [count] proxies, more than [limit], tests them all or the fastest;
+  /// null when dismissed.
+  Future<UploadTestChoice?> showUploadTestWarning({
+    required int count,
+    required int limit,
+    required int megabytes,
+  }) async {
+    return await _show<UploadTestChoice?>(UploadTestWarningDialog(count: count, limit: limit, megabytes: megabytes));
   }
 
   Future<void> showProxyInfo({required OutboundInfo outboundInfo}) async {

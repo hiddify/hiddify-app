@@ -6,8 +6,11 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
+import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
+import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -38,8 +41,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
               return [...ProxiesSort.values.map((e) => PopupMenuItem(value: e, child: Text(e.present(t))))];
             },
           ),
-          // "Signal style" (off by default) shows pings as the signal instead of numbers; the same
-          // switch as a long press on a ping
+          // "Signal style" (off by default) shows pings as the signal instead of numbers
           PopupMenuButton<bool>(
             onSelected: (_) => ref.read(proxyPingStyleNotifierProvider.notifier).toggle(),
             icon: Icon(AdaptiveIcon(context).more),
@@ -65,10 +67,29 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
           const Gap(8),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest("select"),
-        tooltip: t.pages.proxies.testDelay,
-        child: const Icon(FluentIcons.flash_24_filled),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // the upload speed of every proxy listed; it asks first when they are many
+          // a long press sets how much each test sends
+          if (proxies.valueOrNull != null)
+            GestureDetector(
+              onLongPress: () => chooseUploadTestSize(ref),
+              child: FloatingActionButton.small(
+                heroTag: 'upload-test',
+                onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).uploadTestAll(),
+                tooltip: t.pages.proxies.upload.test,
+                child: const Icon(FluentIcons.arrow_upload_24_filled),
+              ),
+            ),
+          const Gap(12),
+          FloatingActionButton(
+            onPressed: () async => await ref.read(proxiesOverviewNotifierProvider.notifier).urlTest("select"),
+            tooltip: t.pages.proxies.testDelay,
+            child: const Icon(FluentIcons.flash_24_filled),
+          ),
+        ],
       ),
       body: proxies.when(
         data: (group) => group != null
@@ -76,25 +97,35 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                 builder: (context, constraints) {
                   final width = constraints.maxWidth;
                   final crossAxisCount = PlatformUtils.isMobile && width < 600 ? 1 : max(1, (width / 268).floor());
-                  return GridView.builder(
-                    padding: const EdgeInsets.only(bottom: 86),
-                    itemCount: group.items.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      mainAxisExtent: 72,
-                    ),
-                    itemBuilder: (context, index) {
-                      final proxy = group.items[index];
-                      return ProxyTile(
-                        proxy,
-                        // a row keeps its own proxy when the list re-sorts, so a pop plays only on arrival
-                        key: ValueKey(proxy.tag),
-                        selected: group.selected == proxy.tag,
-                        onTap: () async {
-                          await ref.read(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag);
+                  final listed = group.items.where((e) => e.tag != lowestGroupTag && e.tag != balanceGroupTag).length;
+                  return CustomScrollView(
+                    slivers: [
+                      SliverGrid.builder(
+                        itemCount: group.items.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          mainAxisExtent: 72,
+                        ),
+                        itemBuilder: (context, index) {
+                          final proxy = group.items[index];
+                          return ProxyTile(
+                            proxy,
+                            // a row keeps its own proxy when the list re-sorts, so a pop plays only on arrival
+                            key: ValueKey(proxy.tag),
+                            selected: group.selected == proxy.tag,
+                            onTap: () async {
+                              await ref
+                                  .read(proxiesOverviewNotifierProvider.notifier)
+                                  .changeProxy(group.tag, proxy.tag);
+                            },
+                          );
                         },
-                      );
-                    },
+                      ),
+                      // a big profile: how many of its proxies run, and the button to run all or the fastest
+                      SliverToBoxAdapter(child: KeepTopFooter(listed: listed)),
+                      // room for the buttons over the list's end
+                      const SliverPadding(padding: EdgeInsets.only(bottom: 140)),
+                    ],
                   );
                 },
               )

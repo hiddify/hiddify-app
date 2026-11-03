@@ -50,6 +50,7 @@ class ProfileParser with InfraLogger {
     'tls-tricks',
     'chain-status',
     'extra-security',
+    'keep-top',
   ];
   static const allowedProfileHeaders = [
     'profile-title',
@@ -61,6 +62,7 @@ class ProfileParser with InfraLogger {
     'ipinfo-url',
     'extra-security',
     'fragment',
+    'keep-top',
   ];
 
   final Ref _ref;
@@ -512,6 +514,14 @@ class ProfileParser with InfraLogger {
     return null;
   }
 
+  /// A `keep-top` header: how many proxies to keep running, or -1 for all. Anything else is no
+  /// header at all.
+  static int? keepTopHeader(String? value) {
+    final keepTop = int.tryParse(value?.trim() ?? '');
+    if (keepTop == null || (keepTop < 1 && keepTop != -1)) return null;
+    return keepTop;
+  }
+
   /// Build the `tls-tricks` map from a subscription `fragment` header.
   ///
   /// Mirrors the per-proxy `fragment` parameter, which needs a full triplet —
@@ -541,6 +551,7 @@ class ProfileParser with InfraLogger {
     // keys, so these string values must not leak through unchanged.
     final fragmentInput = headers.remove('fragment')?.toString();
     final extraSecurityInput = headers.remove('extra-security')?.toString();
+    final keepTopInput = headers.remove('keep-top')?.toString();
 
     // extra-security: exactly one documented mode. The app's own setting takes
     // precedence over the subscription; an unrecognised value is ignored.
@@ -558,6 +569,11 @@ class ProfileParser with InfraLogger {
       headers['tls-tricks'] = {'enable-fragment': true};
     } else if (fragmentTricks(fragmentInput) case final tricks?) {
       headers['tls-tricks'] = tricks;
+    }
+
+    // keep-top: the user's choice, else the subscription's; -1 (or none) runs every proxy
+    if (userOverride?.keepTop ?? keepTopHeader(keepTopInput) case final keepTop?) {
+      headers['keep-top'] = keepTop;
     }
 
     headers.removeWhere(

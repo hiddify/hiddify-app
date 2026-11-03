@@ -40,8 +40,13 @@ class SingboxConfigOption with _$SingboxConfigOption {
     required int mtu,
     required bool strictRoute,
     required String connectionTestUrl,
+
     /// Subscription `ipinfo-url` override — custom ipapi-compatible geolocation endpoint.
     String? ipinfoUrl,
+
+    /// The profile's `keep-top`: how many of its proxies the core keeps running, the fastest; -1
+    /// for all of them.
+    @Default(-1) int keepTop,
     @IntervalInSecondsConverter() required Duration urlTestInterval,
     required bool enableClashApi,
     required int clashApiPort,

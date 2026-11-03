@@ -108,6 +108,11 @@ abstract class UserOverride with _$UserOverride {
     /// the user's settings already hold them.
     bool? enableFragment,
 
+    /// How many of the profile's proxies run: the fastest of them by their first pings, the others
+    /// stopped; -1 runs them all. Null until the user chose, and then the subscription's `keep-top`
+    /// header decides, or the user is asked when the profile is big (see keep_top.dart).
+    int? keepTop,
+
     /// Windows/Linux: whether to prefer elevated admin_bgservice for privileged
     /// proxy features. Subscription sync must not overwrite this field.
     @Default(UserAdminPreference.unset) UserAdminPreference adminPreference,

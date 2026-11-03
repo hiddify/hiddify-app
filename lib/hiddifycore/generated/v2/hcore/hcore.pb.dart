@@ -655,6 +655,10 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $fixnum.Int64? download,
     $core.String? detour,
     Status? status,
+    $fixnum.Int64? uploadSpeed,
+    $core.bool? uploadTesting,
+    $fixnum.Int64? downloadSpeed,
+    $core.bool? downloadTesting,
   }) {
     final $result = create();
     if (tag != null) {
@@ -711,6 +715,18 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (status != null) {
       $result.status = status;
     }
+    if (uploadSpeed != null) {
+      $result.uploadSpeed = uploadSpeed;
+    }
+    if (uploadTesting != null) {
+      $result.uploadTesting = uploadTesting;
+    }
+    if (downloadSpeed != null) {
+      $result.downloadSpeed = downloadSpeed;
+    }
+    if (downloadTesting != null) {
+      $result.downloadTesting = downloadTesting;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -736,6 +752,10 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aInt64(16, _omitFieldNames ? '' : 'download')
     ..aOS(17, _omitFieldNames ? '' : 'detour')
     ..e<Status>(18, _omitFieldNames ? '' : 'status', $pb.PbFieldType.OE, defaultOrMaker: Status.READY, valueOf: Status.valueOf, enumValues: Status.values)
+    ..aInt64(19, _omitFieldNames ? '' : 'uploadSpeed')
+    ..aOB(20, _omitFieldNames ? '' : 'uploadTesting')
+    ..aInt64(21, _omitFieldNames ? '' : 'downloadSpeed')
+    ..aOB(22, _omitFieldNames ? '' : 'downloadTesting')
     ..hasRequiredFields = false
   ;
 
@@ -925,6 +945,42 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasStatus() => $_has(17);
   @$pb.TagNumber(18)
   void clearStatus() => clearField(18);
+
+  @$pb.TagNumber(19)
+  $fixnum.Int64 get uploadSpeed => $_getI64(18);
+  @$pb.TagNumber(19)
+  set uploadSpeed($fixnum.Int64 v) { $_setInt64(18, v); }
+  @$pb.TagNumber(19)
+  $core.bool hasUploadSpeed() => $_has(18);
+  @$pb.TagNumber(19)
+  void clearUploadSpeed() => clearField(19);
+
+  @$pb.TagNumber(20)
+  $core.bool get uploadTesting => $_getBF(19);
+  @$pb.TagNumber(20)
+  set uploadTesting($core.bool v) { $_setBool(19, v); }
+  @$pb.TagNumber(20)
+  $core.bool hasUploadTesting() => $_has(19);
+  @$pb.TagNumber(20)
+  void clearUploadTesting() => clearField(20);
+
+  @$pb.TagNumber(21)
+  $fixnum.Int64 get downloadSpeed => $_getI64(20);
+  @$pb.TagNumber(21)
+  set downloadSpeed($fixnum.Int64 v) { $_setInt64(20, v); }
+  @$pb.TagNumber(21)
+  $core.bool hasDownloadSpeed() => $_has(20);
+  @$pb.TagNumber(21)
+  void clearDownloadSpeed() => clearField(21);
+
+  @$pb.TagNumber(22)
+  $core.bool get downloadTesting => $_getBF(21);
+  @$pb.TagNumber(22)
+  set downloadTesting($core.bool v) { $_setBool(21, v); }
+  @$pb.TagNumber(22)
+  $core.bool hasDownloadTesting() => $_has(21);
+  @$pb.TagNumber(22)
+  void clearDownloadTesting() => clearField(22);
 }
 
 class IpInfo extends $pb.GeneratedMessage {
@@ -2053,6 +2109,70 @@ class UrlTestRequest extends $pb.GeneratedMessage {
   $core.bool hasTag() => $_has(0);
   @$pb.TagNumber(1)
   void clearTag() => clearField(1);
+}
+
+class SpeedTestRequest extends $pb.GeneratedMessage {
+  factory SpeedTestRequest({
+    $core.String? tag,
+    $fixnum.Int64? size,
+  }) {
+    final $result = create();
+    if (tag != null) {
+      $result.tag = tag;
+    }
+    if (size != null) {
+      $result.size = size;
+    }
+    return $result;
+  }
+  SpeedTestRequest._() : super();
+  factory SpeedTestRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SpeedTestRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SpeedTestRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'tag')
+    ..aInt64(2, _omitFieldNames ? '' : 'size')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  SpeedTestRequest clone() => SpeedTestRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  SpeedTestRequest copyWith(void Function(SpeedTestRequest) updates) => super.copyWith((message) => updates(message as SpeedTestRequest)) as SpeedTestRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static SpeedTestRequest create() => SpeedTestRequest._();
+  SpeedTestRequest createEmptyInstance() => create();
+  static $pb.PbList<SpeedTestRequest> createRepeated() => $pb.PbList<SpeedTestRequest>();
+  @$core.pragma('dart2js:noInline')
+  static SpeedTestRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SpeedTestRequest>(create);
+  static SpeedTestRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get tag => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set tag($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasTag() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTag() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $fixnum.Int64 get size => $_getI64(1);
+  @$pb.TagNumber(2)
+  set size($fixnum.Int64 v) { $_setInt64(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasSize() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearSize() => clearField(2);
 }
 
 class GenerateWarpConfigRequest extends $pb.GeneratedMessage {

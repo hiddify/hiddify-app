@@ -143,7 +143,27 @@
         "searching": "Searching",
         "reconnecting": "Reconnecting"
       },
-      "signalStyle": "Signal style"
+      "signalStyle": "Signal style",
+      "keepTop": {
+        "picking": "Finding the $keep fastest of $count…",
+        "pickingBody": "All the proxies are tested once; then only the fastest keep running.",
+        "kept": "The $n fastest are running",
+        "keptBody": "$paused other proxies are paused, to save battery and data.",
+        "showAll": "Show all $count",
+        "big": "$count proxies are running",
+        "bigBody": "Keep only the $keep fastest running, to save battery and data.",
+        "keep": "Keep the $keep fastest",
+        "change": "Change how many"
+      },
+      "upload": {
+        "test": "Test upload speed",
+        "failed": "Could not start the speed test",
+        "warnTitle": "A lot of data",
+        "perProxy": "$n MB through each of $count proxies",
+        "warnBody": "An upload test of every proxy can use a lot of bandwidth. Limit the list to the $limit fastest and test only those. You can change the limit in the settings.",
+        "testAll": "Test all $count",
+        "testFastest": "Keep and test the $limit fastest"
+      }
     },
     "profiles": {
       "title": "Profiles",
@@ -317,7 +337,11 @@
         "useXrayCoreWhenPossible": "Use xray-core when possible",
         "useXrayCoreWhenPossibleMsg": "Use xray-core when parsing subscription links. Reimport the subscription to turn this on.",
         "useSystemTlsEngine": "Use the system’s TLS when available",
-        "useSystemTlsEngineMsg": "Connections without a TLS fingerprint use the TLS of macOS, iOS, or Windows once it passes a check on this device; otherwise they look like Chrome."
+        "useSystemTlsEngineMsg": "Connections without a TLS fingerprint use the TLS of macOS, iOS, or Windows once it passes a check on this device; otherwise they look like Chrome.",
+        "uploadTestSize": "Upload test size",
+        "megabytes": "$n MB",
+        "uploadTestLimit": "Upload test proxy limit",
+        "uploadTestLimitMsg": "Asks before testing more than $n proxies"
       },
       "routing": {
         "title": "Routing",
@@ -844,7 +868,12 @@
       "location": "Location",
       "postalCode": "Postal code",
       "download": "Download",
-      "upload": "Upload"
+      "upload": "Upload",
+      "ping": "Ping",
+      "speed": "Speed",
+      "server": "Server",
+      "country": "Country",
+      "tapToTest": "Tap to test"
     },
     "windowClosing": {
       "askEachTime": "Ask each time",
@@ -870,6 +899,16 @@
       "title": "Hiddify crashed last time",
       "msg": "Send a report to the developers so this gets fixed? It holds the crash details, the logs and your configuration with servers, keys and passwords removed, as one zip file you can look at before sending.",
       "send": "Send report"
+    },
+    "keepTop": {
+      "title": "A big subscription",
+      "description": "This profile has $count proxies. Running all of them costs battery, data and memory. Hiddify can test them once, keep the $keep fastest running and pause the others.",
+      "hint": "You can run all of them again any time, from the end of the proxy list.",
+      "keeping": "The $keep fastest run, the others pause",
+      "all": "All $count run",
+      "keep": "Keep the $keep fastest",
+      "useAll": "Use all $count",
+      "howMany": "How many to keep running"
     }
   },
   "connection": {

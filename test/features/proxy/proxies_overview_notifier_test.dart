@@ -12,6 +12,7 @@ import 'package:hiddify/features/proxy/data/proxy_repository.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
+import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/hiddifycore/generated/google/protobuf/timestamp.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -33,6 +34,14 @@ class _Repository implements ProxyRepository {
   @override
   TaskEither<ProxyFailure, Unit> urlTest(String groupTag) {
     tested.add(groupTag);
+    return TaskEither.right(unit);
+  }
+
+  final uploaded = <(String, int)>[];
+
+  @override
+  TaskEither<ProxyFailure, Unit> uploadTest(String tag, int bytes) {
+    uploaded.add((tag, bytes));
     return TaskEither.right(unit);
   }
 
@@ -165,12 +174,21 @@ void main() {
       expect(repository.tested, ['b']);
     });
 
-    testWidgets('a long press on the ping switches number and signal, and keeps the choice', (tester) async {
+    testWidgets("a long press on the ping tests the proxy's upload speed", (tester) async {
       await open(tester);
       await row(tester, proxy('a', 182));
-      expect(container.read(proxyPingStyleNotifierProvider), ProxyPingStyle.number);
-      expect(find.text('182'), findsOneWidget);
       await tester.longPress(ping());
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(repository.uploaded, [('a', 1 << 20)]);
+      expect(repository.tested, isEmpty);
+    });
+
+    testWidgets('the signal style switch keeps the choice', (tester) async {
+      await open(tester);
+      await row(tester, proxy('a', 182));
+      expect(find.text('182'), findsOneWidget);
+      await tester.runAsync(() => container.read(proxyPingStyleNotifierProvider.notifier).toggle());
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
       expect(container.read(proxyPingStyleNotifierProvider), ProxyPingStyle.signal);
       expect(find.text('182'), findsNothing);
@@ -188,5 +206,25 @@ void main() {
       expect(find.textContaining(t.pages.proxies.status.connecting), findsOneWidget);
       expect(find.textContaining('⏳'), findsNothing);
     });
+  });
+
+  testWidgets('an upload test of a short list tests its group, with the megabytes of the settings', (tester) async {
+    await open(tester);
+    await stream(tester, [proxy('lowest', 100, group: true), proxy('a', 100), proxy('b', 200)]);
+    await tester.runAsync(() => container.read(ConfigOptions.uploadTestSize.notifier).update(2));
+    await notifier().uploadTestAll();
+    expect(repository.uploaded, [('select', 2 << 20)]);
+  });
+
+  test('the fastest proxies are those that answered, by their ping', () {
+    final proxies = [
+      proxy('slow', 900),
+      proxy('dead', 65535),
+      proxy('fast', 80),
+      proxy('untested', 0),
+      proxy('mid', 300),
+    ];
+    expect(fastestProxies(proxies, 2), ['fast', 'mid']);
+    expect(fastestProxies(proxies, 10), ['fast', 'mid', 'slow']);
   });
 }

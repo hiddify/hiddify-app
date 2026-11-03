@@ -8,6 +8,7 @@ import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/auto_start/notifier/auto_start_notifier.dart';
 import 'package:hiddify/features/common/general_pref_tiles.dart';
+import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/widget/preference_tile.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_mobile.dart';
@@ -110,6 +111,32 @@ class GeneralPage extends HookConsumerWidget {
                 .then((value) async {
                   if (value == null) return;
                   await ref.read(ConfigOptions.urlTestInterval.notifier).update(Duration(minutes: value.toInt()));
+                }),
+          ),
+          ListTile(
+            title: Text(t.pages.settings.general.uploadTestSize),
+            subtitle: Text(t.pages.settings.general.megabytes(n: ref.watch(ConfigOptions.uploadTestSize))),
+            leading: const Icon(Icons.upload_rounded),
+            onTap: () => chooseUploadTestSize(ref),
+          ),
+          ListTile(
+            title: Text(t.pages.settings.general.uploadTestLimit),
+            subtitle: Text(t.pages.settings.general.uploadTestLimitMsg(n: ref.watch(ConfigOptions.uploadTestLimit))),
+            leading: const Icon(Icons.data_usage_rounded),
+            onTap: () async => await ref
+                .read(dialogNotifierProvider.notifier)
+                .showSettingSlider(
+                  title: t.pages.settings.general.uploadTestLimit,
+                  initialValue: ref.read(ConfigOptions.uploadTestLimit).coerceIn(5, 100).toDouble(),
+                  onReset: ref.read(ConfigOptions.uploadTestLimit.notifier).reset,
+                  min: 5,
+                  max: 100,
+                  divisions: 19,
+                  labelGen: (value) => '${value.toInt()}',
+                )
+                .then((value) async {
+                  if (value == null) return;
+                  await ref.read(ConfigOptions.uploadTestLimit.notifier).update(value.toInt());
                 }),
           ),
           ValuePreferenceWidget(

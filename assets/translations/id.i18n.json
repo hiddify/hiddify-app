@@ -143,7 +143,27 @@
         "searching": "Mencari",
         "reconnecting": "Menghubungkan ulang"
       },
-      "signalStyle": "Gaya sinyal"
+      "signalStyle": "Gaya sinyal",
+      "keepTop": {
+        "picking": "Mencari $keep tercepat dari $count…",
+        "pickingBody": "Semua proxy diuji sekali; lalu hanya yang tercepat tetap berjalan.",
+        "kept": "$n proxy tercepat sedang berjalan",
+        "keptBody": "$paused proxy lainnya dijeda untuk menghemat baterai dan data.",
+        "showAll": "Tampilkan semua $count",
+        "big": "$count proxy sedang berjalan",
+        "bigBody": "Jalankan hanya $keep yang tercepat untuk menghemat baterai dan data.",
+        "keep": "Pertahankan $keep tercepat",
+        "change": "Ubah jumlah"
+      },
+      "upload": {
+        "test": "Uji kecepatan unggah",
+        "failed": "Uji kecepatan tidak dapat dimulai",
+        "warnTitle": "Banyak data",
+        "perProxy": "$n MB melalui masing-masing dari $count proxy",
+        "warnBody": "Uji unggah semua proxy bisa memakai banyak data. Batasi daftar ke $limit yang tercepat dan uji hanya itu. Batasnya bisa diubah di pengaturan.",
+        "testAll": "Uji semua $count",
+        "testFastest": "Pertahankan dan uji $limit tercepat"
+      }
     },
     "profiles": {
       "title": "Profil",
@@ -314,7 +334,11 @@
         "useXrayCoreWhenPossible": "Gunakan xray-core jika memungkinkan",
         "useXrayCoreWhenPossibleMsg": "Gunakan xray-core saat mengurai tautan langganan. Impor ulang langganan untuk mengaktifkan opsi ini.",
         "useSystemTlsEngine": "Gunakan TLS sistem jika tersedia",
-        "useSystemTlsEngineMsg": "Koneksi tanpa sidik jari TLS menggunakan TLS macOS, iOS, atau Windows setelah lolos pemeriksaan di perangkat ini; jika tidak, koneksi akan terlihat seperti Chrome."
+        "useSystemTlsEngineMsg": "Koneksi tanpa sidik jari TLS menggunakan TLS macOS, iOS, atau Windows setelah lolos pemeriksaan di perangkat ini; jika tidak, koneksi akan terlihat seperti Chrome.",
+        "uploadTestSize": "Ukuran uji unggah",
+        "megabytes": "$n MB",
+        "uploadTestLimit": "Batas proxy uji unggah",
+        "uploadTestLimitMsg": "Bertanya sebelum menguji lebih dari $n proxy"
       },
       "routing": {
         "title": "Perutean",
@@ -807,7 +831,12 @@
       "location": "Lokasi",
       "postalCode": "Kode pos",
       "download": "Unduh",
-      "upload": "Unggah"
+      "upload": "Unggah",
+      "ping": "Ping",
+      "speed": "Kecepatan",
+      "server": "Server",
+      "country": "Negara",
+      "tapToTest": "Ketuk untuk menguji"
     },
     "windowClosing": {
       "askEachTime": "Tanyakan setiap kali",
@@ -828,6 +857,16 @@
     },
     "qrScanner": {
       "notFound": "Tidak ada kode QR di gambar ini"
+    },
+    "keepTop": {
+      "title": "Langganan besar",
+      "description": "Profil ini berisi $count proxy. Menjalankan semuanya menghabiskan baterai, data, dan memori. Hiddify dapat mengujinya sekali, menjalankan $keep yang tercepat, dan menjeda sisanya.",
+      "hint": "Anda bisa menjalankan semuanya lagi kapan saja dari akhir daftar proxy.",
+      "keeping": "$keep tercepat berjalan, sisanya dijeda",
+      "all": "Semua $count berjalan",
+      "keep": "Pertahankan $keep tercepat",
+      "useAll": "Gunakan semua $count",
+      "howMany": "Berapa yang tetap berjalan"
     }
   },
   "connection": {

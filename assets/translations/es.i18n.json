@@ -143,7 +143,27 @@
         "searching": "Buscando",
         "reconnecting": "Reconectando"
       },
-      "signalStyle": "Estilo de señal"
+      "signalStyle": "Estilo de señal",
+      "keepTop": {
+        "picking": "Buscando los $keep más rápidos de $count…",
+        "pickingBody": "Todos los proxies se prueban una vez; después solo los más rápidos siguen activos.",
+        "kept": "Funcionan los $n más rápidos",
+        "keptBody": "Otros $paused proxies están en pausa para ahorrar batería y datos.",
+        "showAll": "Mostrar los $count",
+        "big": "Hay $count proxies activos",
+        "bigBody": "Deja activos solo los $keep más rápidos para ahorrar batería y datos.",
+        "keep": "Mantener los $keep más rápidos",
+        "change": "Cambiar cuántos"
+      },
+      "upload": {
+        "test": "Probar velocidad de subida",
+        "failed": "No se pudo iniciar la prueba de velocidad",
+        "warnTitle": "Muchos datos",
+        "perProxy": "$n MB por cada uno de $count proxies",
+        "warnBody": "Probar la subida de todos los proxies puede gastar muchos datos. Limita la lista a los $limit más rápidos y prueba solo esos. Puedes cambiar el límite en los ajustes.",
+        "testAll": "Probar los $count",
+        "testFastest": "Mantener y probar los $limit más rápidos"
+      }
     },
     "profiles": {
       "title": "Perfiles",
@@ -315,7 +335,11 @@
         "useXrayCoreWhenPossible": "Usar xray-core cuando sea posible",
         "useXrayCoreWhenPossibleMsg": "Usa xray-core al analizar enlaces de suscripción. Reimporta la suscripción para activar esta opción.",
         "useSystemTlsEngine": "Usar el TLS del sistema cuando esté disponible",
-        "useSystemTlsEngineMsg": "Las conexiones sin huella TLS usan el TLS de macOS, iOS o Windows una vez que supera una comprobación en este dispositivo; de lo contrario, se parecen a Chrome."
+        "useSystemTlsEngineMsg": "Las conexiones sin huella TLS usan el TLS de macOS, iOS o Windows una vez que supera una comprobación en este dispositivo; de lo contrario, se parecen a Chrome.",
+        "uploadTestSize": "Tamaño de la prueba de subida",
+        "megabytes": "$n MB",
+        "uploadTestLimit": "Límite de proxies para la prueba de subida",
+        "uploadTestLimitMsg": "Pregunta antes de probar más de $n proxies"
       },
       "routing": {
         "title": "Enrutamiento",
@@ -809,7 +833,12 @@
       "location": "Ubicación",
       "postalCode": "Código postal",
       "download": "Descarga",
-      "upload": "Subida"
+      "upload": "Subida",
+      "ping": "Ping",
+      "speed": "Velocidad",
+      "server": "Servidor",
+      "country": "País",
+      "tapToTest": "Toca para probar"
     },
     "windowClosing": {
       "askEachTime": "Preguntar cada vez",
@@ -830,6 +859,16 @@
     },
     "qrScanner": {
       "notFound": "No se encontró ningún código QR en esta imagen"
+    },
+    "keepTop": {
+      "title": "Una suscripción grande",
+      "description": "Este perfil tiene $count proxies. Mantenerlos todos activos gasta batería, datos y memoria. Hiddify puede probarlos una vez, dejar activos los $keep más rápidos y pausar el resto.",
+      "hint": "Puedes volver a activarlos todos cuando quieras, al final de la lista de proxies.",
+      "keeping": "Funcionan los $keep más rápidos, el resto en pausa",
+      "all": "Funcionan los $count",
+      "keep": "Mantener los $keep más rápidos",
+      "useAll": "Usar los $count",
+      "howMany": "Cuántos mantener activos"
     }
   },
   "connection": {

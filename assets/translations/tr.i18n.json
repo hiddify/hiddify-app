@@ -143,7 +143,27 @@
         "searching": "Aranıyor",
         "reconnecting": "Yeniden bağlanıyor"
       },
-      "signalStyle": "Sinyal stili"
+      "signalStyle": "Sinyal stili",
+      "keepTop": {
+        "picking": "$count proxy içinden en hızlı $keep tanesi aranıyor…",
+        "pickingBody": "Tüm proxy'ler bir kez test edilir; sonra yalnızca en hızlılar çalışmaya devam eder.",
+        "kept": "En hızlı $n tanesi çalışıyor",
+        "keptBody": "Pil ve veri tasarrufu için diğer $paused proxy duraklatıldı.",
+        "showAll": "$count tanesini de göster",
+        "big": "$count proxy çalışıyor",
+        "bigBody": "Pil ve veri tasarrufu için yalnızca en hızlı $keep tanesini çalışır bırakın.",
+        "keep": "En hızlı $keep taneyi tut",
+        "change": "Sayıyı değiştir"
+      },
+      "upload": {
+        "test": "Yükleme hızını test et",
+        "failed": "Hız testi başlatılamadı",
+        "warnTitle": "Çok fazla veri",
+        "perProxy": "$count proxy'nin her biri üzerinden $n MB",
+        "warnBody": "Tüm proxy'lerin yükleme testi çok veri kullanabilir. Listeyi en hızlı $limit taneyle sınırlayıp yalnızca onları test edin. Sınırı ayarlardan değiştirebilirsiniz.",
+        "testAll": "$count tanesini de test et",
+        "testFastest": "En hızlı $limit taneyi tut ve test et"
+      }
     },
     "profiles": {
       "title": "Profiller",
@@ -314,7 +334,11 @@
         "useXrayCoreWhenPossible": "Mümkün olduğunda xray-core kullan",
         "useXrayCoreWhenPossibleMsg": "Abonelik bağlantılarını ayrıştırırken xray-core kullanın. Bu seçeneği açmak için aboneliği yeniden içe aktarın.",
         "useSystemTlsEngine": "Varsa sistemin TLS’ini kullan",
-        "useSystemTlsEngineMsg": "TLS parmak izi olmayan bağlantılar, bu cihazda bir denetimden geçtikten sonra macOS, iOS veya Windows’un TLS’ini kullanır; aksi hâlde Chrome gibi görünür."
+        "useSystemTlsEngineMsg": "TLS parmak izi olmayan bağlantılar, bu cihazda bir denetimden geçtikten sonra macOS, iOS veya Windows’un TLS’ini kullanır; aksi hâlde Chrome gibi görünür.",
+        "uploadTestSize": "Yükleme testi boyutu",
+        "megabytes": "$n MB",
+        "uploadTestLimit": "Yükleme testi proxy sınırı",
+        "uploadTestLimitMsg": "$n proxy'den fazlasını test etmeden önce sorar"
       },
       "routing": {
         "title": "Yönlendirme",
@@ -807,7 +831,12 @@
       "location": "Konum",
       "postalCode": "Posta kodu",
       "download": "İndirme",
-      "upload": "Yükleme"
+      "upload": "Yükleme",
+      "ping": "Ping",
+      "speed": "Hız",
+      "server": "Sunucu",
+      "country": "Ülke",
+      "tapToTest": "Test için dokunun"
     },
     "windowClosing": {
       "askEachTime": "Her seferinde sor",
@@ -828,6 +857,16 @@
     },
     "qrScanner": {
       "notFound": "Bu görselde QR kod bulunamadı"
+    },
+    "keepTop": {
+      "title": "Büyük bir abonelik",
+      "description": "Bu profilde $count proxy var. Hepsini çalıştırmak pil, veri ve bellek harcar. Hiddify onları bir kez test edip en hızlı $keep tanesini çalışır bırakabilir, diğerlerini duraklatabilir.",
+      "hint": "İstediğiniz zaman proxy listesinin sonundan hepsini yeniden çalıştırabilirsiniz.",
+      "keeping": "En hızlı $keep çalışır, diğerleri durur",
+      "all": "$count tanesinin hepsi çalışır",
+      "keep": "En hızlı $keep taneyi tut",
+      "useAll": "$count tanesini de kullan",
+      "howMany": "Kaç tanesi çalışsın"
     }
   },
   "connection": {

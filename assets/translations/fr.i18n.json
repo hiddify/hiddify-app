@@ -143,7 +143,27 @@
         "searching": "Recherche",
         "reconnecting": "Reconnexion"
       },
-      "signalStyle": "Style signal"
+      "signalStyle": "Style signal",
+      "keepTop": {
+        "picking": "Recherche des $keep plus rapides parmi $count…",
+        "pickingBody": "Tous les proxys sont testés une fois ; ensuite seuls les plus rapides restent actifs.",
+        "kept": "Les $n plus rapides sont actifs",
+        "keptBody": "$paused autres proxys sont en pause pour économiser batterie et données.",
+        "showAll": "Afficher les $count",
+        "big": "$count proxys sont actifs",
+        "bigBody": "Ne gardez actifs que les $keep plus rapides pour économiser batterie et données.",
+        "keep": "Garder les $keep plus rapides",
+        "change": "Changer le nombre"
+      },
+      "upload": {
+        "test": "Tester le débit montant",
+        "failed": "Impossible de lancer le test de débit",
+        "warnTitle": "Beaucoup de données",
+        "perProxy": "$n Mo par chacun des $count proxys",
+        "warnBody": "Tester l'envoi de tous les proxys peut consommer beaucoup de données. Limitez la liste aux $limit plus rapides et testez seulement ceux-là. La limite se change dans les réglages.",
+        "testAll": "Tester les $count",
+        "testFastest": "Garder et tester les $limit plus rapides"
+      }
     },
     "profiles": {
       "title": "Profils",
@@ -315,7 +335,11 @@
         "useXrayCoreWhenPossible": "Utiliser xray-core si possible",
         "useXrayCoreWhenPossibleMsg": "Utilisez xray-core lors de l'analyse des liens d'abonnement. Réimportez l'abonnement pour activer cette option.",
         "useSystemTlsEngine": "Utiliser le TLS du système si disponible",
-        "useSystemTlsEngineMsg": "Les connexions sans empreinte TLS utilisent le TLS de macOS, iOS ou Windows une fois qu’il a réussi une vérification sur cet appareil ; sinon, elles ressemblent à Chrome."
+        "useSystemTlsEngineMsg": "Les connexions sans empreinte TLS utilisent le TLS de macOS, iOS ou Windows une fois qu’il a réussi une vérification sur cet appareil ; sinon, elles ressemblent à Chrome.",
+        "uploadTestSize": "Taille du test d'envoi",
+        "megabytes": "$n Mo",
+        "uploadTestLimit": "Limite de proxys du test d'envoi",
+        "uploadTestLimitMsg": "Demande avant de tester plus de $n proxys"
       },
       "routing": {
         "title": "Routage",
@@ -809,7 +833,12 @@
       "location": "Emplacement ",
       "postalCode": "Code postal ",
       "download": "Téléchargement ",
-      "upload": "Envoi "
+      "upload": "Envoi ",
+      "ping": "Ping",
+      "speed": "Débit",
+      "server": "Serveur",
+      "country": "Pays",
+      "tapToTest": "Touchez pour tester"
     },
     "windowClosing": {
       "askEachTime": "Demander à chaque fois",
@@ -830,6 +859,16 @@
     },
     "qrScanner": {
       "notFound": "Aucun code QR trouvé dans cette image"
+    },
+    "keepTop": {
+      "title": "Un gros abonnement",
+      "description": "Ce profil contient $count proxys. Les garder tous actifs consomme batterie, données et mémoire. Hiddify peut les tester une fois, garder les $keep plus rapides et mettre les autres en pause.",
+      "hint": "Vous pouvez tous les réactiver à tout moment, en bas de la liste des proxys.",
+      "keeping": "Les $keep plus rapides tournent, les autres en pause",
+      "all": "Les $count tournent",
+      "keep": "Garder les $keep plus rapides",
+      "useAll": "Utiliser les $count",
+      "howMany": "Combien garder actifs"
     }
   },
   "connection": {
