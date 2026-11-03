@@ -11,8 +11,9 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// The WARP settings of one chain hop: its tunnel, licence and peer first, then the scanner, the
-/// MASQUE and the AmneziaWG tunnels folded away. Only what the hop's tunnel and peer use is shown,
-/// and a value left empty is the core's default, shown as auto.
+/// MASQUE and the AmneziaWG tunnels folded away. Only what the hop offers and its tunnel and peer
+/// use is shown, and a value left empty is the core's default, shown as auto. Extra security offers
+/// the tunnel, the licence and the MTU only.
 class WarpHopOptions extends ConsumerWidget {
   const WarpHopOptions(this.hop, {super.key});
 
@@ -24,11 +25,17 @@ class WarpHopOptions extends ConsumerWidget {
     final warp = t.pages.settings.chain.warp;
     final tunnel = ref.watch(hop.tunnel);
     final sources = WarpEndpointSource.of(detour: hop.detour);
-    final stored = ref.watch(hop.endpoint);
-    final endpoint = sources.contains(stored) ? stored : sources.first;
+    final endpointPreference = hop.endpoint;
+    final stored = endpointPreference == null ? null : ref.watch(endpointPreference);
+    final endpoint = sources.contains(stored) ? stored! : sources.first;
+    final cleanIp = hop.cleanIp;
+    final cleanPort = hop.cleanPort;
     // the custom address is the WireGuard peer: the MASQUE tunnel reads its own
-    final custom = endpoint == WarpEndpointSource.custom && tunnel.usesWireGuardPeer;
+    final custom =
+        endpoint == WarpEndpointSource.custom && tunnel.usesWireGuardPeer && cleanIp != null && cleanPort != null;
     final scanner = hop.scanner;
+    final masque = hop.masque;
+    final awg = hop.awg;
     return Column(
       children: [
         ChoicePreferenceWidget(
@@ -46,25 +53,26 @@ class WarpHopOptions extends ConsumerWidget {
           icon: Icons.key_rounded,
           presentValue: (value) => value.isEmpty ? t.common.notSet : value,
         ),
-        ChoicePreferenceWidget<WarpEndpointSource>(
-          selected: endpoint,
-          preferences: ref.watch(hop.endpoint.notifier),
-          choices: sources,
-          title: warp.endpoint,
-          icon: Icons.travel_explore_rounded,
-          presentChoice: (value) => value.present(t),
-        ),
+        if (endpointPreference != null)
+          ChoicePreferenceWidget<WarpEndpointSource>(
+            selected: endpoint,
+            preferences: ref.watch(endpointPreference.notifier),
+            choices: sources,
+            title: warp.endpoint,
+            icon: Icons.travel_explore_rounded,
+            presentChoice: (value) => value.present(t),
+          ),
         if (custom) ...[
           ValuePreferenceWidget(
-            value: ref.watch(hop.cleanIp),
-            preferences: ref.watch(hop.cleanIp.notifier),
+            value: ref.watch(cleanIp),
+            preferences: ref.watch(cleanIp.notifier),
             title: warp.customServer,
             icon: Icons.dns_rounded,
             presentValue: (value) => value.isEmpty ? t.common.notSet : value,
           ),
           ValuePreferenceWidget(
-            value: ref.watch(hop.cleanPort),
-            preferences: ref.watch(hop.cleanPort.notifier),
+            value: ref.watch(cleanPort),
+            preferences: ref.watch(cleanPort.notifier),
             title: warp.port,
             icon: Icons.device_hub_rounded,
             inputToValue: int.tryParse,
@@ -84,8 +92,8 @@ class WarpHopOptions extends ConsumerWidget {
         ),
         if (scanner != null && endpoint == WarpEndpointSource.scan) _ScannerSection(scanner),
         if (tunnel.usesWireGuardPeer && hop.noise != null) _NoiseSection(hop),
-        if (tunnel == WarpTunnel.masque || tunnel == WarpTunnel.auto) _MasqueSection(hop.masque),
-        if (tunnel == WarpTunnel.amneziaWg || tunnel == WarpTunnel.auto) _AwgSection(hop.awg),
+        if (masque != null && (tunnel == WarpTunnel.masque || tunnel == WarpTunnel.auto)) _MasqueSection(masque),
+        if (awg != null && (tunnel == WarpTunnel.amneziaWg || tunnel == WarpTunnel.auto)) _AwgSection(awg),
       ],
     );
   }
