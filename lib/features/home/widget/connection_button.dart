@@ -11,6 +11,7 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/core/widget/frame_load.dart';
+import 'package:hiddify/core/widget/unique_keys_layout.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
@@ -482,6 +483,7 @@ class _ConnectionButton extends HookWidget {
           children: [
             AnimatedText(label, style: theme.textTheme.titleMedium),
             AnimatedSwitcher(
+              layoutBuilder: uniqueKeysLayout(),
               duration: const Duration(milliseconds: 250),
               child: hint == null
                   ? const SizedBox.shrink()
@@ -605,6 +607,7 @@ class _ChainBadge extends StatelessWidget {
           child: RepaintBoundary(
             child: Center(
               child: AnimatedSwitcher(
+                layoutBuilder: uniqueKeysLayout(),
                 duration: const Duration(milliseconds: 250),
                 transitionBuilder: (child, a) => ScaleTransition(scale: a, child: child),
                 child: KeyedSubtree(key: ValueKey(_glyph), child: glyph),
