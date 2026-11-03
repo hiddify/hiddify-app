@@ -963,7 +963,8 @@
       "speed": "سرعت",
       "server": "سرور",
       "country": "کشور",
-      "tapToTest": "برای سنجش ضربه بزنید"
+      "tapToTest": "برای سنجش ضربه بزنید",
+      "error": "چرا ناموفق شد"
     },
     "windowClosing": {
       "askEachTime": "هر بار بپرس",

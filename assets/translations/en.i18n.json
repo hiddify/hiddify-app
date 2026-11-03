@@ -963,7 +963,8 @@
       "speed": "Speed",
       "server": "Server",
       "country": "Country",
-      "tapToTest": "Tap to test"
+      "tapToTest": "Tap to test",
+      "error": "Why it failed"
     },
     "windowClosing": {
       "askEachTime": "Ask each time",

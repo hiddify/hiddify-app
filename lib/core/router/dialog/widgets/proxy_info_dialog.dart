@@ -118,7 +118,7 @@ class _Chip extends StatelessWidget {
   }
 }
 
-/// Where the proxy leads, then its speeds.
+/// Why the proxy failed, when the core says, then where it leads, then its speeds.
 class OutboundInfoWidget extends ConsumerWidget {
   const OutboundInfoWidget({super.key, required this.outboundInfo});
 
@@ -143,6 +143,7 @@ class OutboundInfoWidget extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (proxy.error.isNotEmpty) ...[_FailureReason(title: info.error, reason: proxy.error), const Gap(12)],
         if (rows.isNotEmpty) ...[
           DecoratedBox(
             decoration: BoxDecoration(
@@ -171,6 +172,45 @@ class OutboundInfoWidget extends ConsumerWidget {
         const Gap(8),
         _Speeds(proxy),
       ],
+    );
+  }
+}
+
+/// The error of the proxy's last URL test, or why it is not ready, as the core reports it.
+class _FailureReason extends StatelessWidget {
+  const _FailureReason({required this.title, required this.reason});
+
+  final String title;
+  final String reason;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(color: s.errorContainer.withValues(alpha: .6), borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(FluentIcons.error_circle_24_regular, size: 18, color: s.onErrorContainer),
+                const Gap(8),
+                Text(title, style: theme.textTheme.labelLarge?.copyWith(color: s.onErrorContainer)),
+              ],
+            ),
+            const Gap(6),
+            // the core's own words, left to right: they are English and full of addresses
+            SelectableText(
+              reason,
+              textDirection: TextDirection.ltr,
+              style: theme.textTheme.bodySmall?.copyWith(color: s.onErrorContainer, fontFamily: 'monospace'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

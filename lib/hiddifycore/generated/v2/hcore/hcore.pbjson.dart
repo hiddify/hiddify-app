@@ -321,6 +321,7 @@ const OutboundInfo$json = {
     {'1': 'download_testing', '3': 22, '4': 1, '5': 8, '10': 'downloadTesting'},
     {'1': 'upload_speed_cached', '3': 23, '4': 1, '5': 8, '10': 'uploadSpeedCached'},
     {'1': 'download_speed_cached', '3': 24, '4': 1, '5': 8, '10': 'downloadSpeedCached'},
+    {'1': 'error', '3': 25, '4': 1, '5': 9, '10': 'error'},
   ],
   '8': [
     {'1': '_ipinfo'},
@@ -346,9 +347,9 @@ final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode(
     'YWRfdGVzdGluZxgUIAEoCFINdXBsb2FkVGVzdGluZxIlCg5kb3dubG9hZF9zcGVlZBgVIAEoA1'
     'INZG93bmxvYWRTcGVlZBIpChBkb3dubG9hZF90ZXN0aW5nGBYgASgIUg9kb3dubG9hZFRlc3Rp'
     'bmcSLgoTdXBsb2FkX3NwZWVkX2NhY2hlZBgXIAEoCFIRdXBsb2FkU3BlZWRDYWNoZWQSMgoVZG'
-    '93bmxvYWRfc3BlZWRfY2FjaGVkGBggASgIUhNkb3dubG9hZFNwZWVkQ2FjaGVkQgkKB19pcGlu'
-    'Zm9CFQoTX2dyb3VwX3NlbGVjdGVkX3RhZ0IdChtfZ3JvdXBfc2VsZWN0ZWRfdGFnX2Rpc3BsYX'
-    'k=');
+    '93bmxvYWRfc3BlZWRfY2FjaGVkGBggASgIUhNkb3dubG9hZFNwZWVkQ2FjaGVkEhQKBWVycm9y'
+    'GBkgASgJUgVlcnJvckIJCgdfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dyb3'
+    'VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5');
 
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = {
