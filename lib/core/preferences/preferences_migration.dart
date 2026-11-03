@@ -14,6 +14,7 @@ class PreferencesMigration with InfraLogger {
     final migrationSteps = <PreferencesMigrationStep>[
       PreferencesVersion1Migration(sharedPreferences),
       PreferencesVersion2Migration(sharedPreferences),
+      PreferencesVersion3Migration(sharedPreferences),
     ];
 
     if (currentVersion == migrationSteps.length) {
@@ -126,6 +127,30 @@ class PreferencesVersion2Migration extends PreferencesMigrationStep with InfraLo
         loggy.debug("setting [per_app_proxy_enabled] for [per_app_proxy_mode] = [$mode]");
         await sharedPreferences.setBool("per_app_proxy_enabled", true);
       }
+    }
+  }
+}
+
+/// The unblocker's WARP clean IP chose the endpoint source as well: an address meant that address,
+/// the words auto/default/random (and auto4/auto6) a scan. The source is its own preference now,
+/// and the clean IP only the custom address.
+class PreferencesVersion3Migration extends PreferencesMigrationStep with InfraLogger {
+  PreferencesVersion3Migration(super.sharedPreferences);
+
+  @override
+  Future<void> migrate() async {
+    const cleanIpKey = "unblocker-warp-clean-ip";
+    const endpointKey = "unblocker-warp-endpoint";
+    if (sharedPreferences.containsKey(endpointKey)) return;
+    final cleanIp = sharedPreferences.getString(cleanIpKey)?.trim() ?? '';
+    if (cleanIp.isEmpty) return;
+    if (const ['auto', 'auto4', 'auto6', 'default', 'random'].contains(cleanIp.toLowerCase())) {
+      loggy.debug("unblocker WARP clean ip [$cleanIp] was a scan");
+      await sharedPreferences.setString(endpointKey, "scan");
+      await sharedPreferences.remove(cleanIpKey);
+    } else {
+      loggy.debug("unblocker WARP clean ip [$cleanIp] is its custom endpoint");
+      await sharedPreferences.setString(endpointKey, "custom");
     }
   }
 }

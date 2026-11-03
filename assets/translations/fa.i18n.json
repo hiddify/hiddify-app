@@ -668,7 +668,50 @@
               "dnsCloudflare": "DNS (cloudflare.com)",
               "sip": "SIP (تماس اینترنتی)",
               "stun": "STUN (تماس تصویری)"
-            }
+            },
+            "title": "نویز وایرگارد"
+          },
+          "endpoint": "نقطه‌ی اتصال",
+          "endpointSources": {
+            "profile": "تعیین‌شده توسط کلادفلر",
+            "scan": "جست‌وجو",
+            "custom": "دستی"
+          },
+          "customServer": "نشانی",
+          "mtu": "MTU",
+          "customized": "سفارشی",
+          "scanner": {
+            "title": "جست‌وجوگر",
+            "searchNoise": "یافتن نویز",
+            "maxRtt": "بیشینه‌ی RTT (میلی‌ثانیه)",
+            "timeout": "مهلت هر آزمایش (میلی‌ثانیه)",
+            "count": "تعداد نشانی‌ها برای آزمایش",
+            "concurrency": "آزمایش‌های هم‌زمان",
+            "ports": "پورت‌ها",
+            "cidrs": "بازه‌ها"
+          },
+          "masque": {
+            "title": "MASQUE",
+            "vhttp": "نسخه‌ی HTTP",
+            "serverName": "نام سرور",
+            "useIpv6": "ترجیح IPv6",
+            "udpTimeout": "مهلت UDP (ثانیه)",
+            "keepalive": "نگه‌داشت UDP (ثانیه)",
+            "packetSize": "اندازه‌ی بسته‌ی آغازین",
+            "reconnectDelay": "درنگ اتصال دوباره (ثانیه)",
+            "tlsInsecure": "رد شدن از بررسی TLS",
+            "fragment": "قطعه‌قطعه کردن TLS",
+            "fragmentDelay": "درنگ جایگزین قطعه‌سازی (میلی‌ثانیه)",
+            "recordFragment": "قطعه‌قطعه کردن رکوردهای TLS",
+            "ech": "Encrypted Client Hello",
+            "echConfig": "پیکربندی ECH",
+            "echQueryServerName": "نام پرس‌وجوی ECH"
+          },
+          "awg": {
+            "title": "AmneziaWG",
+            "jc": "بسته‌های بیهوده",
+            "jmin": "کمینه‌ی اندازه‌ی بیهوده",
+            "jmax": "بیشینه‌ی اندازه‌ی بیهوده"
           }
         },
         "psiphon": {

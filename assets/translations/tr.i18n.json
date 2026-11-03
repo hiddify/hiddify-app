@@ -632,7 +632,26 @@
               "dnsCloudflare": "DNS (cloudflare.com)",
               "sip": "SIP (VoIP araması)",
               "stun": "STUN (görüntülü arama)"
-            }
+            },
+            "title": "WireGuard gürültüsü"
+          },
+          "endpoint": "Uç nokta",
+          "endpointSources": {
+            "profile": "Cloudflare'in atadığı",
+            "scan": "Tarama",
+            "custom": "Özel"
+          },
+          "customServer": "Adres",
+          "mtu": "MTU",
+          "customized": "Özelleştirildi",
+          "scanner": {
+            "title": "Tarayıcı"
+          },
+          "masque": {
+            "title": "MASQUE"
+          },
+          "awg": {
+            "title": "AmneziaWG"
           }
         },
         "psiphon": {

@@ -239,6 +239,34 @@ enum WarpTunnel {
   bool get usesWireGuardPeer => this != masque;
 }
 
+/// Where a WARP chain hop finds its peer.
+@JsonEnum(valueField: 'key')
+enum WarpEndpointSource {
+  /// the endpoint Cloudflare assigned to the device
+  profile('profile'),
+
+  /// found by the scanner, which remembers what answered on this network
+  scan('scan'),
+
+  /// the address the user typed (the clean IP and port)
+  custom('custom');
+
+  const WarpEndpointSource(this.key);
+
+  final String key;
+
+  /// The sources a hop can use. A hop behind a detour (extra security dials through the user's
+  /// pick) never scans: probing endpoints through a proxy only measures the proxy, so the core
+  /// takes the assigned endpoint instead.
+  static List<WarpEndpointSource> of({required bool detour}) => detour ? const [profile, custom] : values;
+
+  String present(Translations t) => switch (this) {
+    profile => t.pages.settings.chain.warp.endpointSources.profile,
+    scan => t.pages.settings.chain.warp.endpointSources.scan,
+    custom => t.pages.settings.chain.warp.endpointSources.custom,
+  };
+}
+
 @JsonEnum(valueField: 'key')
 enum PsiphonRegion {
   auto('AUTO'),

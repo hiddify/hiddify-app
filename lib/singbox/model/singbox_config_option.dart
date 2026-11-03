@@ -103,10 +103,108 @@ class SingboxUnblockerOption with _$SingboxUnblockerOption {
   factory SingboxUnblockerOption.fromJson(Map<String, dynamic> json) => _$SingboxUnblockerOptionFromJson(json);
 }
 
+/// The endpoint scan of a WARP hop. Zero and empty keep the scanner's own defaults.
+@freezed
+class SingboxWarpScannerOption with _$SingboxWarpScannerOption {
+  const SingboxWarpScannerOption._();
+
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxWarpScannerOption({
+    // tries the noise presets until one gets through, and remembers it for the network
+    @Default(true) bool searchNoise,
+    // milliseconds
+    @Default(0) int maxRtt,
+    @Default(0) int timeout,
+    @Default(0) int count,
+    @Default(0) int concurrency,
+    // empty: the tunnel's own ports and Cloudflare's ranges
+    @Default(<int>[]) List<int> ports,
+    @Default(<String>[]) List<String> cidrs,
+  }) = _SingboxWarpScannerOption;
+
+  /// Null when it changes nothing, so the core keeps its own defaults.
+  SingboxWarpScannerOption? get orNull => this == const SingboxWarpScannerOption() ? null : this;
+
+  factory SingboxWarpScannerOption.fromJson(Map<String, dynamic> json) => _$SingboxWarpScannerOptionFromJson(json);
+}
+
+/// The MASQUE tunnel of a WARP hop (the masque and auto tunnels).
+@freezed
+class SingboxWarpMasqueOption with _$SingboxWarpMasqueOption {
+  const SingboxWarpMasqueOption._();
+
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxWarpMasqueOption({
+    // auto (HTTP/3, falling back to HTTP/2), h3 or h2; a hop behind a detour runs h2 anyway
+    @Default('auto') String vhttp,
+    @Default('') String serverName,
+    @Default(false) bool useIpv6,
+    // seconds
+    @Default(0) int udpTimeout,
+    @Default(0) int udpKeepalive,
+    @Default(0) int udpInitialPacketSize,
+    @Default(0) int reconnectDelay,
+    @Default(false) bool tlsInsecure,
+    @Default(false) bool tlsFragment,
+    // milliseconds
+    @Default(0) int tlsFragmentFallbackDelay,
+    @Default(false) bool tlsRecordFragment,
+    @Default(false) bool echEnabled,
+    @Default('') String echConfig,
+    @Default('') String echQueryServerName,
+  }) = _SingboxWarpMasqueOption;
+
+  /// Null when it changes nothing, so the core keeps its own defaults.
+  SingboxWarpMasqueOption? get orNull => this == const SingboxWarpMasqueOption() ? null : this;
+
+  factory SingboxWarpMasqueOption.fromJson(Map<String, dynamic> json) => _$SingboxWarpMasqueOptionFromJson(json);
+}
+
+/// The AmneziaWG tunnel of a WARP hop (the awg and auto tunnels). All zero keeps the core's preset.
+@freezed
+class SingboxWarpAwgOption with _$SingboxWarpAwgOption {
+  const SingboxWarpAwgOption._();
+
+  @JsonSerializable(fieldRename: FieldRename.kebab)
+  const factory SingboxWarpAwgOption({
+    @Default(0) int jc,
+    @Default(0) int jmin,
+    @Default(0) int jmax,
+    @Default(0) int s1,
+    @Default(0) int s2,
+    @Default(0) int s3,
+    @Default(0) int s4,
+    @Default('') String h1,
+    @Default('') String h2,
+    @Default('') String h3,
+    @Default('') String h4,
+    @Default('') String i1,
+    @Default('') String i2,
+    @Default('') String i3,
+    @Default('') String i4,
+    @Default('') String i5,
+  }) = _SingboxWarpAwgOption;
+
+  /// Null when it changes nothing, so the core keeps its own preset.
+  SingboxWarpAwgOption? get orNull => this == const SingboxWarpAwgOption() ? null : this;
+
+  factory SingboxWarpAwgOption.fromJson(Map<String, dynamic> json) => _$SingboxWarpAwgOptionFromJson(json);
+}
+
 @freezed
 class SingboxExtraSecurityWarpOption with _$SingboxExtraSecurityWarpOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
-  const factory SingboxExtraSecurityWarpOption({required String licenseKey}) = _SingboxExtraSecurityWarpOption;
+  const factory SingboxExtraSecurityWarpOption({
+    required String licenseKey,
+    // extra security dials through the user's pick, so it never scans (see WarpEndpointSource.of)
+    @Default(WarpEndpointSource.profile) WarpEndpointSource endpoint,
+    @Default('') String cleanIp,
+    @Default(0) int cleanPort,
+    // 0: the tunnel's own, smaller inside another proxy
+    @Default(0) int mtu,
+    SingboxWarpMasqueOption? masque,
+    SingboxWarpAwgOption? awg,
+  }) = _SingboxExtraSecurityWarpOption;
 
   factory SingboxExtraSecurityWarpOption.fromJson(Map<String, dynamic> json) =>
       _$SingboxExtraSecurityWarpOptionFromJson(json);
@@ -117,8 +215,14 @@ class SingboxUnblockerWarpOption with _$SingboxUnblockerWarpOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory SingboxUnblockerWarpOption({
     required String licenseKey,
+    @Default(WarpEndpointSource.scan) WarpEndpointSource endpoint,
     required String cleanIp,
     required int cleanPort,
+    // 0: the tunnel's own
+    @Default(0) int mtu,
+    SingboxWarpScannerOption? scanner,
+    SingboxWarpMasqueOption? masque,
+    SingboxWarpAwgOption? awg,
     @OptionalRangeJsonConverter() required OptionalRange noise,
     @OptionalRangeJsonConverter() required OptionalRange noiseSize,
     @OptionalRangeJsonConverter() required OptionalRange noiseDelay,

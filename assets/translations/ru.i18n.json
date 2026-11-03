@@ -653,7 +653,26 @@
               "dnsCloudflare": "DNS (cloudflare.com)",
               "sip": "SIP (VoIP-звонок)",
               "stun": "STUN (видеозвонок)"
-            }
+            },
+            "title": "Шум WireGuard"
+          },
+          "endpoint": "Точка подключения",
+          "endpointSources": {
+            "profile": "Назначенная Cloudflare",
+            "scan": "Сканирование",
+            "custom": "Вручную"
+          },
+          "customServer": "Адрес",
+          "mtu": "MTU",
+          "customized": "Настроено",
+          "scanner": {
+            "title": "Сканер"
+          },
+          "masque": {
+            "title": "MASQUE"
+          },
+          "awg": {
+            "title": "AmneziaWG"
           }
         },
         "psiphon": {

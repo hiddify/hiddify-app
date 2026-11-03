@@ -632,7 +632,26 @@
               "dnsCloudflare": "DNS (cloudflare.com)",
               "sip": "SIP (panggilan VoIP)",
               "stun": "STUN (panggilan video)"
-            }
+            },
+            "title": "Derau WireGuard"
+          },
+          "endpoint": "Titik akhir",
+          "endpointSources": {
+            "profile": "Ditetapkan Cloudflare",
+            "scan": "Pindai",
+            "custom": "Kustom"
+          },
+          "customServer": "Alamat",
+          "mtu": "MTU",
+          "customized": "Disesuaikan",
+          "scanner": {
+            "title": "Pemindai"
+          },
+          "masque": {
+            "title": "MASQUE"
+          },
+          "awg": {
+            "title": "AmneziaWG"
           }
         },
         "psiphon": {

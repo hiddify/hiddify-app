@@ -664,7 +664,26 @@
               "dnsCloudflare": "DNS (cloudflare.com)",
               "sip": "SIP (مكالمة VoIP)",
               "stun": "STUN (مكالمة فيديو)"
-            }
+            },
+            "title": "ضجيج WireGuard"
+          },
+          "endpoint": "نقطة الاتصال",
+          "endpointSources": {
+            "profile": "مخصّصة من Cloudflare",
+            "scan": "فحص",
+            "custom": "يدوي"
+          },
+          "customServer": "العنوان",
+          "mtu": "MTU",
+          "customized": "مخصّص",
+          "scanner": {
+            "title": "الفاحص"
+          },
+          "masque": {
+            "title": "MASQUE"
+          },
+          "awg": {
+            "title": "AmneziaWG"
           }
         },
         "psiphon": {

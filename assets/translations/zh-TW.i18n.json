@@ -632,7 +632,26 @@
               "dnsCloudflare": "DNS (cloudflare.com)",
               "sip": "SIP (VoIP 通話)",
               "stun": "STUN (視訊通話)"
-            }
+            },
+            "title": "WireGuard 雜訊"
+          },
+          "endpoint": "端點",
+          "endpointSources": {
+            "profile": "Cloudflare 指派",
+            "scan": "掃描",
+            "custom": "自訂"
+          },
+          "customServer": "位址",
+          "mtu": "MTU",
+          "customized": "已自訂",
+          "scanner": {
+            "title": "掃描器"
+          },
+          "masque": {
+            "title": "MASQUE"
+          },
+          "awg": {
+            "title": "AmneziaWG"
           }
         },
         "psiphon": {

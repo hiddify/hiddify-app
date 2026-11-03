@@ -633,7 +633,26 @@
               "dnsCloudflare": "DNS (cloudflare.com)",
               "sip": "SIP (chamada VoIP)",
               "stun": "STUN (chamada de vídeo)"
-            }
+            },
+            "title": "Ruído do WireGuard"
+          },
+          "endpoint": "Ponto de conexão",
+          "endpointSources": {
+            "profile": "Atribuído pela Cloudflare",
+            "scan": "Varredura",
+            "custom": "Personalizado"
+          },
+          "customServer": "Endereço",
+          "mtu": "MTU",
+          "customized": "Personalizado",
+          "scanner": {
+            "title": "Scanner"
+          },
+          "masque": {
+            "title": "MASQUE"
+          },
+          "awg": {
+            "title": "AmneziaWG"
           }
         },
         "psiphon": {

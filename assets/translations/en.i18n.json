@@ -668,7 +668,50 @@
               "dnsCloudflare": "DNS (cloudflare.com)",
               "sip": "SIP (VoIP call)",
               "stun": "STUN (video call)"
-            }
+            },
+            "title": "WireGuard noise"
+          },
+          "endpoint": "Endpoint",
+          "endpointSources": {
+            "profile": "Assigned by Cloudflare",
+            "scan": "Scan",
+            "custom": "Custom"
+          },
+          "customServer": "Address",
+          "mtu": "MTU",
+          "customized": "Customized",
+          "scanner": {
+            "title": "Scanner",
+            "searchNoise": "Search noise",
+            "maxRtt": "Max RTT (ms)",
+            "timeout": "Probe timeout (ms)",
+            "count": "Addresses to probe",
+            "concurrency": "Parallel probes",
+            "ports": "Ports",
+            "cidrs": "Ranges"
+          },
+          "masque": {
+            "title": "MASQUE",
+            "vhttp": "HTTP version",
+            "serverName": "Server name",
+            "useIpv6": "Prefer IPv6",
+            "udpTimeout": "UDP timeout (s)",
+            "keepalive": "UDP keepalive (s)",
+            "packetSize": "Initial packet size",
+            "reconnectDelay": "Reconnect delay (s)",
+            "tlsInsecure": "Skip TLS verification",
+            "fragment": "Fragment TLS",
+            "fragmentDelay": "Fragment fallback delay (ms)",
+            "recordFragment": "Fragment TLS records",
+            "ech": "Encrypted Client Hello",
+            "echConfig": "ECH config",
+            "echQueryServerName": "ECH query name"
+          },
+          "awg": {
+            "title": "AmneziaWG",
+            "jc": "Junk packets",
+            "jmin": "Min junk size",
+            "jmax": "Max junk size"
           }
         },
         "psiphon": {
