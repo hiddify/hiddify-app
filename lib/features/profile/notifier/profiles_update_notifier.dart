@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dartx/dartx.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
@@ -19,6 +21,13 @@ typedef ProfileUpdateStatus = ({String name, bool success});
 class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifier with AppLogger {
   static const prefKey = "profiles_update_check";
   static const interval = Duration(minutes: 15);
+
+  /// When each profile began to fail its updates, by id: until one succeeds.
+  static const failingKey = "profiles_update_failing_since";
+
+  /// A profile whose updates failed this long is no longer updated on its own; a manual update
+  /// still runs, and one that succeeds starts over.
+  static const giveUpAfter = Duration(days: 3);
 
   @override
   Stream<ProfileUpdateStatus?> build() {
@@ -56,6 +65,28 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
     await _scheduler?.trigger();
   }
 
+  /// Whether a profile failing since [since] is no longer updated on its own at [now].
+  @visibleForTesting
+  static bool gaveUp(DateTime? since, DateTime now) => since != null && now.difference(since) >= giveUpAfter;
+
+  Map<String, DateTime> _failingSince() {
+    final raw = ref.read(sharedPreferencesProvider).requireValue.getString(failingKey);
+    if (raw == null) return {};
+    try {
+      return {
+        for (final MapEntry(:key, :value) in (jsonDecode(raw) as Map).cast<String, String>().entries)
+          if (DateTime.tryParse(value) case final since?) key: since,
+      };
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> _saveFailing(Map<String, DateTime> failing) => ref
+      .read(sharedPreferencesProvider)
+      .requireValue
+      .setString(failingKey, jsonEncode({for (final e in failing.entries) e.key: e.value.toIso8601String()}));
+
   @visibleForTesting
   Future<void> updateProfiles() async {
     var force = false;
@@ -85,7 +116,19 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
           )
           .first;
 
+      final failing = _failingSince();
+      final now = DateTime.now();
+      // a profile updated since it began to fail works again (a manual update, say)
+      failing.removeWhere(
+        (id, since) =>
+            remoteProfiles.none((p) => p.id == id) ||
+            remoteProfiles.any((p) => p.id == id && p.lastUpdate.isAfter(since)),
+      );
       final toUpdate = remoteProfiles.where((profile) {
+        if (!force && gaveUp(failing[profile.id], now)) {
+          loggy.debug("skipping profile [${profile.id}] update: failing since [${failing[profile.id]}]");
+          return false;
+        }
         final updateInterval = profile.options?.updateInterval;
         final shouldUpdate =
             force || updateInterval != null && updateInterval <= DateTime.now().difference(profile.lastUpdate);
@@ -105,10 +148,13 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
         await ref.read(updateProfileNotifierProvider(profile.id).notifier).updateProfile(profile, isBulk: true);
         if (ref.read(updateProfileNotifierProvider(profile.id)).hasError) {
           failedNames.add(profile.name);
+          failing.putIfAbsent(profile.id, () => now);
         } else {
           successCount++;
+          failing.remove(profile.id);
         }
       }
+      await _saveFailing(failing);
 
       // Only a manual run (forced) reports; the periodic background run stays silent.
       if (force && (successCount > 0 || failedNames.isNotEmpty)) {
