@@ -16,6 +16,7 @@ import 'package:hiddify/hiddifycore/core_interface/core_interface_wrapper_stub.d
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
+import 'package:hiddify/hiddifycore/grpc_errors.dart';
 import 'package:hiddify/hiddifycore/grpc_stream_cancel.dart';
 import 'package:hiddify/hiddifycore/init_signal.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
@@ -750,10 +751,10 @@ class HiddifyCoreService with InfraLogger {
       },
       cancelOnError: true,
       onError: (error) {
-        // a core that is not running (the VPN is off, so there is no background core to reach)
-        // refuses the connection; that is its normal state, not an error of the app
-        if (error is GrpcError && error.code == StatusCode.unavailable) {
-          loggy.debug('Stream closed, the core is not reachable: ${error.message}');
+        // a core that is not running (the VPN is off) refuses the connection, and one that stops
+        // (every reconnect) closes it under the stream; neither is an error of the app
+        if (isCoreGoneError(error)) {
+          loggy.debug('Stream closed, the core is not reachable: ${(error as GrpcError).message}');
         } else {
           loggy.error('Stream error: $error');
         }
