@@ -456,7 +456,12 @@
         "builtinRules": {
           "tag": "قانون توکار",
           "bypassLan": "دور زدن LAN",
-          "appleDirect": "سرویس‌های اپل",
+          "systemDirect": {
+            "apple": "سرویس‌های اپل",
+            "microsoft": "سرویس‌های مایکروسافت",
+            "android": "سرویس‌های اندروید",
+            "linux": "به‌روزرسانی‌های لینوکس"
+          },
           "blockAds": "تبلیغات و بدافزار",
           "bypassRegion": "سایت‌های $region"
         },

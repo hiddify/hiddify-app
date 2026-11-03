@@ -105,7 +105,7 @@ void main() {
 
   const defaults = [
     'builtin:bypassLan on',
-    'builtin:appleDirect on',
+    'builtin:systemDirect on',
     'builtin:blockAds off',
     'builtin:bypassRegion on',
   ];
@@ -119,7 +119,7 @@ void main() {
 
     test('leaves the region rule out while the region is Other', () async {
       final container = await open(region: Region.other);
-      expect(current(container), ['builtin:bypassLan on', 'builtin:appleDirect on', 'builtin:blockAds off']);
+      expect(current(container), ['builtin:bypassLan on', 'builtin:systemDirect on', 'builtin:blockAds off']);
     });
   });
 
@@ -130,7 +130,7 @@ void main() {
         builtin(BuiltinRule.bypassRegion, enabled: false),
         builtin(BuiltinRule.bypassLan, enabled: false),
         custom('b', enabled: false),
-        builtin(BuiltinRule.appleDirect, enabled: false),
+        builtin(BuiltinRule.systemDirect, enabled: false),
         builtin(BuiltinRule.blockAds, enabled: true),
       ]);
       final container = await open();
@@ -139,7 +139,7 @@ void main() {
         'builtin:bypassRegion off',
         'builtin:bypassLan off',
         'b off',
-        'builtin:appleDirect off',
+        'builtin:systemDirect off',
         'builtin:blockAds on',
       ]);
     });
@@ -147,6 +147,7 @@ void main() {
     test("takes each built-in rule's content from the app", () async {
       save([
         Rule(name: 'builtin:bypassLan', enabled: true, outbound: Outbound.proxy, ipCidrs: ['1.2.3.4/32']),
+        // saved under the name the rule had when it only held Apple's services
         Rule(name: 'builtin:appleDirect', outbound: Outbound.block, domainSuffixes: ['example.com']),
         Rule(name: 'builtin:blockAds', enabled: true, outbound: Outbound.direct, domains: ['example.com']),
         Rule(name: 'builtin:bypassRegion', outbound: Outbound.block, ruleSets: ['https://example.com/x.srs']),
@@ -160,7 +161,7 @@ void main() {
       }
       expect(current(container), [
         'builtin:bypassLan on',
-        'builtin:appleDirect off',
+        'builtin:systemDirect off',
         'builtin:blockAds on',
         'builtin:bypassRegion off',
       ]);
@@ -171,7 +172,7 @@ void main() {
       final container = await open();
       expect(current(container), [
         'builtin:bypassLan on',
-        'builtin:appleDirect on',
+        'builtin:systemDirect on',
         'builtin:bypassRegion on',
         'a on',
         'builtin:blockAds on',
@@ -185,7 +186,7 @@ void main() {
         builtin(BuiltinRule.blockAds, enabled: false),
         builtin(BuiltinRule.bypassLan, enabled: true),
         builtin(BuiltinRule.bypassRegion, enabled: true),
-        builtin(BuiltinRule.appleDirect, enabled: true),
+        builtin(BuiltinRule.systemDirect, enabled: true),
       ]);
       final container = await open();
       expect(current(container), [
@@ -193,7 +194,7 @@ void main() {
         'a on',
         'builtin:bypassLan on',
         'builtin:bypassRegion on',
-        'builtin:appleDirect on',
+        'builtin:systemDirect on',
       ]);
     });
 
@@ -203,10 +204,10 @@ void main() {
         builtin(BuiltinRule.bypassRegion, enabled: true),
         builtin(BuiltinRule.bypassLan, enabled: true),
         builtin(BuiltinRule.blockAds, enabled: false),
-        builtin(BuiltinRule.appleDirect, enabled: true),
+        builtin(BuiltinRule.systemDirect, enabled: true),
       ]);
       final container = await open(region: Region.other);
-      expect(current(container), ['a on', 'builtin:bypassLan on', 'builtin:blockAds off', 'builtin:appleDirect on']);
+      expect(current(container), ['a on', 'builtin:bypassLan on', 'builtin:blockAds off', 'builtin:systemDirect on']);
     });
   });
 
@@ -217,7 +218,7 @@ void main() {
         builtin(BuiltinRule.bypassRegion, enabled: false),
         builtin(BuiltinRule.bypassLan, enabled: true),
         builtin(BuiltinRule.blockAds, enabled: false),
-        builtin(BuiltinRule.appleDirect, enabled: true),
+        builtin(BuiltinRule.systemDirect, enabled: true),
       ]);
       return open();
     }
@@ -226,7 +227,7 @@ void main() {
       final container = await openSaved();
 
       await changeRegion(container, Region.other);
-      expect(current(container), ['a on', 'builtin:bypassLan on', 'builtin:blockAds off', 'builtin:appleDirect on']);
+      expect(current(container), ['a on', 'builtin:bypassLan on', 'builtin:blockAds off', 'builtin:systemDirect on']);
 
       await changeRegion(container, Region.cn);
       expect(current(container), [
@@ -234,7 +235,7 @@ void main() {
         'a on',
         'builtin:bypassLan on',
         'builtin:blockAds off',
-        'builtin:appleDirect on',
+        'builtin:systemDirect on',
       ]);
     });
 
@@ -246,7 +247,7 @@ void main() {
         'builtin:bypassRegion off',
         'builtin:bypassLan on',
         'builtin:blockAds off',
-        'builtin:appleDirect on',
+        'builtin:systemDirect on',
       ]);
     });
 
@@ -275,7 +276,7 @@ void main() {
       final expected = [
         'builtin:blockAds on',
         'builtin:bypassLan on',
-        'builtin:appleDirect on',
+        'builtin:systemDirect on',
         'builtin:bypassRegion on',
       ];
       expect(current(container), expected);
@@ -315,7 +316,7 @@ void main() {
           .importRules(base64.encode(utf8.encode(jsonEncode(imported.writeToJson()))));
       expect(current(container), [
         'builtin:bypassLan on',
-        'builtin:appleDirect on',
+        'builtin:systemDirect on',
         'builtin:bypassRegion on',
         'a on',
         'builtin:blockAds on',
@@ -328,6 +329,8 @@ void main() {
   });
 
   test('the core gets each built-in rule in the shape it reads', () async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
     final container = await open();
     final json = RouteRule(rules: container.read(rulesNotifierProvider)).toProto3Json()! as Map<String, dynamic>;
     const geo = 'https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set';
@@ -356,7 +359,7 @@ void main() {
         {
           'list_order': 1,
           'enabled': true,
-          'name': 'builtin:appleDirect',
+          'name': 'builtin:systemDirect',
           'outbound': 'direct',
           'rule_set': ['https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-apple.srs'],
           'domain_suffix': [
@@ -398,6 +401,36 @@ void main() {
     });
   });
 
+  test("the system's services rule follows the platform", () async {
+    final t = await AppLocale.en.build();
+    const geosite = 'https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set';
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    final expected = {
+      TargetPlatform.iOS: ('Apple services', ['$geosite/geosite-apple.srs']),
+      TargetPlatform.macOS: ('Apple services', ['$geosite/geosite-apple.srs']),
+      TargetPlatform.windows: ('Microsoft services', ['$geosite/geosite-microsoft.srs']),
+      TargetPlatform.android: ('Android services', ['$geosite/geosite-android.srs', '$geosite/geosite-googlefcm.srs']),
+      TargetPlatform.linux: (
+        'Linux updates',
+        [
+          '$geosite/geosite-ubuntu.srs',
+          '$geosite/geosite-debian.srs',
+          '$geosite/geosite-fedora.srs',
+          '$geosite/geosite-archlinux.srs',
+        ],
+      ),
+    };
+    for (final MapEntry(key: platform, value: (name, ruleSets)) in expected.entries) {
+      debugDefaultTargetPlatformOverride = platform;
+      final rule = BuiltinRule.systemDirect.rule;
+      expect(BuiltinRule.systemDirect.present(t, Region.ir), name, reason: platform.name);
+      expect(rule.name, 'builtin:systemDirect', reason: platform.name);
+      expect(rule.outbound, Outbound.direct, reason: platform.name);
+      expect(rule.ruleSets, ruleSets, reason: platform.name);
+      expect(rule.domainSuffixes, isNotEmpty, reason: platform.name);
+    }
+  });
+
   group('the routing page', () {
     Future<ProviderContainer> show(WidgetTester tester) async {
       // tall enough for every rule, so none is left unbuilt below the fold
@@ -437,7 +470,7 @@ void main() {
       await show(tester);
       expect(lock, findsNWidgets(4));
       expect(find.text('Bypass LAN'), findsOneWidget);
-      expect(find.text('Apple services'), findsOneWidget);
+      expect(find.text('Android services'), findsOneWidget);
       expect(find.text('Ads and malware'), findsOneWidget);
       expect(find.text('Sites in Iran'), findsOneWidget);
     });

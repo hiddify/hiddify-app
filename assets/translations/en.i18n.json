@@ -456,7 +456,12 @@
         "builtinRules": {
           "tag": "Built-in rule",
           "bypassLan": "Bypass LAN",
-          "appleDirect": "Apple services",
+          "systemDirect": {
+            "apple": "Apple services",
+            "microsoft": "Microsoft services",
+            "android": "Android services",
+            "linux": "Linux updates"
+          },
           "blockAds": "Ads and malware",
           "bypassRegion": "Sites in $region"
         },
