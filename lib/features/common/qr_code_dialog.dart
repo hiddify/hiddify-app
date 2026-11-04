@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/utils/proxy_secret.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/settings/widget/proxy_secret_editor.dart';
@@ -33,7 +34,11 @@ class QrCodeDialog extends HookConsumerWidget {
     this.showCode = true,
     this.footer,
     this.onEditPassword,
+    this.header,
   });
+
+  /// At the top, over everything else.
+  final Widget? header;
 
   /// The text encoded in the QR code, or null when there's none.
   final String? data;
@@ -80,6 +85,7 @@ class QrCodeDialog extends HookConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (header case final header?) ...[header, const Gap(20)],
               if (showCode) ...[if (data != null) _QrCode(data) else _QrPlaceholder(loading: loading), const Gap(16)],
               if (icon case final icon? when !showCode) ...[
                 Container(
@@ -140,7 +146,9 @@ class QrCodeDialog extends HookConsumerWidget {
 
 /// The QR dialog for LAN sharing. It opens at once and looks up this device's local IP while open.
 class LanSharingQrDialog extends HookConsumerWidget {
-  const LanSharingQrDialog({super.key});
+  const LanSharingQrDialog({super.key, this.header});
+
+  final Widget? header;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -169,36 +177,328 @@ class LanSharingQrDialog extends HookConsumerWidget {
       credentials: (ip: ip, port: port, username: username, password: password),
       loading: ip == null,
       onEditPassword: () => editProxySecret(ref),
+      header: header,
     );
   }
 }
 
-/// What other apps on this device need to use the local proxy: proxy mode routes nothing by itself,
-/// each app is set to use it in its own settings. Shown when the user picks proxy mode ([onPick],
-/// which offers not to show it then again), and from the Manual tab on the home page.
-class LocalProxyDialog extends HookConsumerWidget {
-  const LocalProxyDialog({super.key, this.onPick = false});
+/// The local proxy for this device and for other devices on the network, one tab each. Shown when
+/// the user picks proxy mode ([onPick]), from the Manual tab on the home page, and from LAN sharing
+/// ([otherDevices]).
+class ProxyDialog extends HookWidget {
+  const ProxyDialog({super.key, this.onPick = false, this.otherDevices = false});
 
   final bool onPick;
+  final bool otherDevices;
+
+  @override
+  Widget build(BuildContext context) {
+    final other = useState(otherDevices);
+    final header = Consumer(
+      builder: (context, ref, _) {
+        final t = ref.watch(translationsProvider).requireValue;
+        return SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<bool>(
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(value: false, label: Text(t.dialogs.localProxy.thisDevice)),
+              ButtonSegment(value: true, label: Text(t.dialogs.localProxy.otherDevices)),
+            ],
+            selected: {other.value},
+            onSelectionChanged: (value) => other.value = value.first,
+          ),
+        );
+      },
+    );
+    return other.value ? LanSharingQrDialog(header: header) : LocalProxyDialog(onPick: onPick, header: header);
+  }
+}
+
+/// What other apps on this device need to use the local proxy: proxy mode routes nothing by itself,
+/// each app is set to use it in its own settings. The port and the password are edited in place.
+/// [onPick] offers not to show it again on picking proxy mode.
+class LocalProxyDialog extends HookConsumerWidget {
+  const LocalProxyDialog({super.key, this.onPick = false, this.header});
+
+  final bool onPick;
+  final Widget? header;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final text = t.dialogs.localProxy;
     final port = ref.watch(ConfigOptions.mixedPort);
+    final auth = ref.watch(ConfigOptions.localProxyAuth);
+    // the one secret of the user "hiddify", shared with the local network's port
+    final secret = ref.watch(ConfigOptions.lanSharingPassword);
+    final editing = useState<_Field?>(null);
+    final linkCopied = _useCopiedFlag();
+    const username = 'hiddify';
+
     // the local port asks for the secret only while the user has it ask
-    final secret = ref.watch(ConfigOptions.localProxyAuth) ? ref.watch(ConfigOptions.lanSharingPassword) : null;
-    final link = 'socks://${_userInfo(secret ?? '')}127.0.0.1:$port#${QrCodeDialogConst.localhostProfileName}';
-    return QrCodeDialog(
-      null,
-      title: t.dialogs.localProxy.title,
-      // the hand of the home page's Manual setup tab
-      icon: Icons.back_hand_outlined,
-      intro: _Steps(lead: t.dialogs.localProxy.lead, steps: t.dialogs.localProxy.steps),
-      link: link,
-      showCode: false,
-      credentials: (ip: InternetAddress.loopbackIPv4, port: port, username: 'hiddify', password: secret),
-      onEditPassword: secret == null ? null : () => editProxySecret(ref),
-      footer: onPick ? const _DontShowAgain() : null,
+    final asked = auth ? secret : '';
+    final link = 'socks://${_userInfo(asked)}127.0.0.1:$port#${QrCodeDialogConst.localhostProfileName}';
+    final telegram = Uri(
+      scheme: 'tg',
+      host: 'socks',
+      queryParameters: {
+        'server': '127.0.0.1',
+        'port': '$port',
+        if (asked.isNotEmpty) ...{'user': username, 'pass': asked},
+      },
+    ).toString();
+    void copyLink(String value) {
+      Clipboard.setData(ClipboardData(text: value));
+      linkCopied.show();
+    }
+
+    // A password that is asked must exist: one the user removed in the settings gets a new one.
+    Future<void> setPassword() async {
+      if (secret.isEmpty) await ref.read(ConfigOptions.lanSharingPassword.notifier).update(generateProxySecret());
+      await ref.read(ConfigOptions.localProxyAuth.notifier).update(true);
+    }
+
+    Widget editor(_Field field) => _FieldEditor(
+      label: field == _Field.port ? t.dialogs.qrCode.port : t.dialogs.qrCode.password,
+      initial: field == _Field.port ? '$port' : secret,
+      mono: field == _Field.password,
+      validate: (value) => switch (field) {
+        _Field.port => switch (int.tryParse(value)) {
+          final p? when p >= 1024 && p <= 65535 => null,
+          _ => text.portRange,
+        },
+        _Field.password => value.length < 4 ? text.passwordTooShort : null,
+      },
+      onSave: (value) async {
+        if (field == _Field.port) {
+          await ref.read(ConfigOptions.mixedPort.notifier).update(int.parse(value));
+        } else {
+          await ref.read(ConfigOptions.lanSharingPassword.notifier).update(value);
+        }
+        editing.value = null;
+      },
+      onCancel: () => editing.value = null,
+    );
+    Widget edit(_Field field) => _TileIcon(text.edit, Icons.edit_outlined, () => editing.value = field);
+
+    return Dialog(
+      child: SizedBox(
+        width: 360,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (header case final header?) ...[header, const Gap(20)],
+              _Steps(text.steps),
+              const Gap(16),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: Column(
+                  children: [
+                    if (editing.value == _Field.port)
+                      editor(_Field.port)
+                    else
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _CopyTile(
+                              label: text.server,
+                              value: const _Value('127.0.0.1'),
+                              copyText: '127.0.0.1',
+                            ),
+                          ),
+                          const Gap(8),
+                          IntrinsicWidth(
+                            child: _CopyTile(
+                              label: t.dialogs.qrCode.port,
+                              value: _Value('$port'),
+                              copyText: '$port',
+                              action: edit(_Field.port),
+                            ),
+                          ),
+                        ],
+                      ),
+                    const Gap(8),
+                    if (!auth)
+                      _NoPasswordBar(text.noPassword, action: text.setPassword, onAction: setPassword)
+                    else if (editing.value == _Field.password)
+                      editor(_Field.password)
+                    else
+                      Row(
+                        children: [
+                          IntrinsicWidth(
+                            child: _CopyTile(
+                              label: t.dialogs.qrCode.username,
+                              value: const _Value(username),
+                              copyText: username,
+                            ),
+                          ),
+                          const Gap(8),
+                          Expanded(
+                            child: _CopyTile(
+                              label: t.dialogs.qrCode.password,
+                              // seen only while edited
+                              value: const _Value('••••••••'),
+                              copyText: secret,
+                              action: edit(_Field.password),
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+              if (onPick) ...[const Gap(8), const _DontShowAgain()],
+              const Gap(4),
+              Row(
+                children: [
+                  MenuAnchor(
+                    menuChildren: [
+                      MenuItemButton(
+                        leadingIcon: const Icon(Icons.telegram, color: _telegramBlue),
+                        onPressed: () => copyLink(telegram),
+                        child: Text(text.telegramLink),
+                      ),
+                      MenuItemButton(
+                        leadingIcon: const Icon(Icons.link_rounded),
+                        onPressed: () => copyLink(link),
+                        child: Text(text.fullLink),
+                      ),
+                    ],
+                    builder: (context, menu, _) => TextButton(
+                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
+                      onPressed: () => menu.isOpen ? menu.close() : menu.open(),
+                      child: _CopiedSwap(label: text.copyLink, copied: linkCopied.value, alignment: Alignment.center),
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The values of the local proxy dialog that can be edited.
+enum _Field { port, password }
+
+/// Telegram's own blue, beside its link.
+const _telegramBlue = Color(0xFF2AABEE);
+
+/// A value while it is edited, in place of its tile. [validate] says what is wrong with the text, or
+/// null; only a valid text can be saved, and the error shows only for an invalid one.
+class _FieldEditor extends HookWidget {
+  const _FieldEditor({
+    required this.label,
+    required this.initial,
+    required this.validate,
+    required this.onSave,
+    required this.onCancel,
+    this.mono = false,
+  });
+
+  final String label;
+  final String initial;
+  final String? Function(String) validate;
+  final ValueChanged<String> onSave;
+  final VoidCallback onCancel;
+  final bool mono;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final controller = useTextEditingController(text: initial);
+    useListenable(controller);
+    final value = controller.text.trim();
+    final error = validate(value);
+    void save() {
+      if (error == null) onSave(value);
+    }
+
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: error != null ? theme.colorScheme.error : theme.colorScheme.primary, width: 2),
+    );
+    final style = theme.textTheme.bodyLarge;
+    return TextField(
+      controller: controller,
+      autofocus: true,
+      textDirection: TextDirection.ltr,
+      keyboardType: mono ? TextInputType.visiblePassword : TextInputType.number,
+      inputFormatters: mono ? null : [FilteringTextInputFormatter.digitsOnly],
+      style: mono ? ProxySecretText.styleOf(style) : style,
+      onSubmitted: (_) => save(),
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        errorText: error,
+        enabledBorder: border,
+        focusedBorder: border,
+        errorBorder: border,
+        focusedErrorBorder: border,
+        contentPadding: const EdgeInsetsDirectional.fromSTEB(12, 14, 4, 14),
+        suffixIcon: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              tooltip: MaterialLocalizations.of(context).cancelButtonLabel,
+              onPressed: onCancel,
+              icon: const Icon(Icons.close_rounded),
+              visualDensity: VisualDensity.compact,
+            ),
+            IconButton.filled(
+              tooltip: MaterialLocalizations.of(context).saveButtonLabel,
+              onPressed: error == null ? save : null,
+              // the app's icon theme would tint it like the surface around it
+              icon: Icon(Icons.check_rounded, color: error == null ? theme.colorScheme.onPrimary : null),
+              visualDensity: VisualDensity.compact,
+            ),
+            const Gap(10),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Under the local proxy's address while it asks for no password, with the action that turns it on.
+class _NoPasswordBar extends StatelessWidget {
+  const _NoPasswordBar(this.text, {required this.action, required this.onAction});
+
+  final String text;
+  final String action;
+  final VoidCallback onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final error = theme.colorScheme.error;
+    return Container(
+      padding: const EdgeInsetsDirectional.fromSTEB(14, 2, 4, 2),
+      decoration: BoxDecoration(color: error.withValues(alpha: .14), borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(text, style: theme.textTheme.bodyMedium?.copyWith(color: error)),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+            onPressed: onAction,
+            child: Text(action),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -236,11 +536,10 @@ class _DontShowAgain extends ConsumerWidget {
   }
 }
 
-/// A short lead, then the steps it asks for, each by its number.
+/// The steps of a setup, each by its number.
 class _Steps extends StatelessWidget {
-  const _Steps({required this.lead, required this.steps});
+  const _Steps(this.steps);
 
-  final String lead;
   final List<String> steps;
 
   @override
@@ -250,12 +549,6 @@ class _Steps extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          lead,
-          style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
-          textAlign: TextAlign.center,
-        ),
-        const Gap(12),
         for (final (i, step) in steps.indexed)
           Padding(
             padding: EdgeInsets.only(top: i == 0 ? 0 : 8),
@@ -542,16 +835,13 @@ class ProxySecretText extends StatelessWidget {
   final String secret;
   final TextStyle? style;
 
+  /// [base] in the monospace look of a secret.
+  static TextStyle? styleOf(TextStyle? base) =>
+      base?.copyWith(fontFamily: 'monospace', fontFeatures: const [FontFeature.tabularFigures()], letterSpacing: .5);
+
   @override
-  Widget build(BuildContext context) => Text(
-    secret,
-    textDirection: TextDirection.ltr,
-    style: (style ?? Theme.of(context).textTheme.bodyLarge)?.copyWith(
-      fontFamily: 'monospace',
-      fontFeatures: const [FontFeature.tabularFigures()],
-      letterSpacing: .5,
-    ),
-  );
+  Widget build(BuildContext context) =>
+      Text(secret, textDirection: TextDirection.ltr, style: styleOf(style ?? Theme.of(context).textTheme.bodyLarge));
 }
 
 /// An icon button of a credential tile.
