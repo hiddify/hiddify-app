@@ -130,24 +130,14 @@ class LanSharingQrDialog extends HookConsumerWidget {
     // the network has a port of its own, apart from this device's
     final port = ref.watch(ConfigOptions.lanSharingPort);
     final secret = ref.watch(ConfigOptions.lanSharingPassword);
-    // Showing it asks for it: sharing turns on whenever this side is shown. Out of the build, which
-    // must not change a provider.
-    useEffect(() {
-      Future.microtask(() async {
-        if (!ref.read(ConfigOptions.allowConnectionFromLan)) {
-          await ref.read(ConfigOptions.allowConnectionFromLan.notifier).update(true);
-        }
-      });
-      return null;
-    }, const []);
+    final shared = ref.watch(ConfigOptions.allowConnectionFromLan);
+    Future<void> share(bool value) => ref.read(ConfigOptions.allowConnectionFromLan.notifier).update(value);
     // The device that scans would reach itself at 127.0.0.1, so that gets no code and no link.
     final host = ip == null || ip.isLoopback ? null : ip.address;
     const name = QrCodeDialogConst.lanProfileName;
     final link = host == null ? null : 'socks://${_userInfo(secret)}$host:$port#$name';
 
-    return _ProxyDialogFrame(
-      header: header,
-      links: host == null ? null : (telegram: _telegramLink(host, port, secret), full: link!),
+    final content = Column(
       children: [
         if (link != null) _QrCode('#profile-title: $name\n$link') else _QrPlaceholder(loading: ip == null),
         const Gap(10),
@@ -166,6 +156,31 @@ class LanSharingQrDialog extends HookConsumerWidget {
           password: secret.isEmpty ? null : secret,
           onSetPassword: () => ref.read(ConfigOptions.lanSharingPassword.notifier).update(generateProxySecret()),
         ),
+      ],
+    );
+
+    return _ProxyDialogFrame(
+      header: header,
+      links: host == null ? null : (telegram: _telegramLink(host, port, secret), full: link!),
+      // while it is off there is no link to copy, and Turn off gives way to Turn on over the content
+      copyLink: shared,
+      action: shared ? TextButton(onPressed: () => share(false), child: Text(t.dialogs.localProxy.turnOff)) : null,
+      children: [
+        if (shared)
+          content
+        else
+          // what turning it on gives, faint and out of reach, under the button that does it
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Opacity(opacity: .25, child: IgnorePointer(child: content)),
+              FilledButton.icon(
+                onPressed: () => share(true),
+                icon: const Icon(Icons.power_settings_new_rounded, size: 18),
+                label: Text(t.dialogs.localProxy.turnOnSharing),
+              ),
+            ],
+          ),
       ],
     );
   }
@@ -222,14 +237,23 @@ class LocalProxyDialog extends ConsumerWidget {
 typedef _Links = ({String telegram, String full});
 
 /// A proxy dialog: [header] (the tabs), [children], [footer], then Copy link — off while [links]
-/// is null — and Close.
+/// is null, and left out unless [copyLink] — then [action], and Close.
 class _ProxyDialogFrame extends StatelessWidget {
-  const _ProxyDialogFrame({required this.header, required this.links, required this.children, this.footer});
+  const _ProxyDialogFrame({
+    required this.header,
+    required this.links,
+    required this.children,
+    this.footer,
+    this.copyLink = true,
+    this.action,
+  });
 
   final Widget? header;
   final _Links? links;
   final List<Widget> children;
   final Widget? footer;
+  final bool copyLink;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -247,8 +271,9 @@ class _ProxyDialogFrame extends StatelessWidget {
               const Gap(12),
               Row(
                 children: [
-                  _CopyLinkButton(links),
+                  if (copyLink) _CopyLinkButton(links),
                   const Spacer(),
+                  ?action,
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(MaterialLocalizations.of(context).closeButtonLabel),
