@@ -980,6 +980,8 @@
       "otherDevices": "Diğer cihazlar",
       "server": "Sunucu",
       "noPassword": "Parola ayarlanmadı",
+      "turnOnSharing": "Paylaşımı aç",
+      "turnOff": "Kapat",
       "copyLink": "Bağlantıyı kopyala",
       "telegramLink": "Telegram bağlantısı",
       "fullLink": "Tam bağlantı",
