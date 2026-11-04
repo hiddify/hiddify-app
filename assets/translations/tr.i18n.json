@@ -589,6 +589,7 @@
         "directPort": "Direct portu",
         "redirectPort": "Yönlendirme portu",
         "lanSharing": "Güvenli VPN paylaşımı",
+        "connectionSharing": "Bağlantı paylaşımı",
         "qrCode": "QR kod",
         "closedInVpn": "VPN modunda kapalı, paylaşılmadıkça",
         "proxySecret": "Proxy parolası",

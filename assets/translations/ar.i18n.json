@@ -621,6 +621,7 @@
         "directPort": "منفذ مباشر",
         "redirectPort": "منفذ إعادة التوجيه",
         "lanSharing": "مشاركة VPN آمنة",
+        "connectionSharing": "مشاركة الاتصال",
         "qrCode": "رمز QR",
         "closedInVpn": "مغلق في وضع VPN ما لم تتم المشاركة",
         "proxySecret": "كلمة سر الوكيل",

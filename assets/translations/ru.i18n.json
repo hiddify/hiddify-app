@@ -610,6 +610,7 @@
         "directPort": "Локальный порт direct",
         "redirectPort": "Порт перенаправления",
         "lanSharing": "Безопасный общий доступ к VPN",
+        "connectionSharing": "Общий доступ к подключению",
         "qrCode": "QR-код",
         "closedInVpn": "закрыт в режиме VPN, если не открыт для сети",
         "proxySecret": "Пароль прокси",

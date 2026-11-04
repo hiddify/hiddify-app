@@ -590,6 +590,7 @@
         "directPort": "Puerto directo",
         "redirectPort": "Puerto de redirección",
         "lanSharing": "Compartir VPN de forma segura",
+        "connectionSharing": "Compartir conexión",
         "qrCode": "Código QR",
         "closedInVpn": "cerrado en modo VPN, salvo si se comparte",
         "proxySecret": "Secreto del proxy",

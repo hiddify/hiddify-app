@@ -589,6 +589,7 @@
         "directPort": "本機直連連接埠",
         "redirectPort": "重新導向連接埠",
         "lanSharing": "安全 VPN 共享",
+        "connectionSharing": "連線分享",
         "qrCode": "QR Code",
         "closedInVpn": "VPN 模式下關閉,除非共享",
         "proxySecret": "代理密鑰",

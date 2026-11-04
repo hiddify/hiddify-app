@@ -589,6 +589,7 @@
         "directPort": "Port langsung",
         "redirectPort": "Port pengalihan",
         "lanSharing": "Berbagi VPN yang aman",
+        "connectionSharing": "Berbagi koneksi",
         "qrCode": "Kode QR",
         "closedInVpn": "tertutup di mode VPN, kecuali dibagikan",
         "proxySecret": "Rahasia proksi",

@@ -620,6 +620,7 @@
         "directPort": "پورت مستقیم",
         "redirectPort": "پورت تغییر مسیر",
         "lanSharing": "اشتراک در شبکهٔ محلی",
+        "connectionSharing": "اشتراک‌گذاری اتصال",
         "qrCode": "کد QR",
         "closedInVpn": "در حالت VPN بسته است، مگر در اشتراک‌گذاری",
         "proxySecret": "رمز پروکسی",
