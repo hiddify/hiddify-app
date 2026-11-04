@@ -1,19 +1,25 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/utils/proxy_secret.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
+import 'package:hiddify/utils/platform_utils.dart';
+import 'package:hiddify/utils/uri_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrCodeDialog extends HookConsumerWidget {
@@ -63,6 +69,284 @@ class QrCodeDialog extends HookConsumerWidget {
                     child: Text(MaterialLocalizations.of(context).closeButtonLabel),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// How a profile can be shared: its link as a QR code and to copy, when it has one (a remote
+/// profile), then its configuration to copy, share or save. The configuration is built when the
+/// dialog opens; copying is offered only when it fits the clipboard.
+class ShareProfileDialog extends HookConsumerWidget {
+  const ShareProfileDialog({super.key, required this.name, required this.loadConfig, this.link});
+
+  final String name;
+
+  /// The subscription link; null for a profile without one.
+  final String? link;
+
+  /// Builds the configuration JSON.
+  final Future<String> Function() loadConfig;
+
+  /// The most the clipboard takes. Android sends a copy through a binder transaction of at most
+  /// 1 MB, two bytes a character, shared with the rest of the call; other platforms take far more.
+  static int get maxClipboardChars => Platform.isAndroid ? 256 * 1024 : 4 * 1024 * 1024;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final share = t.pages.profiles.share;
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    final config = useFuture(useMemoized(loadConfig));
+    final link = this.link;
+
+    return Dialog(
+      child: SizedBox(
+        width: 380,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(color: s.primaryContainer, borderRadius: BorderRadius.circular(14)),
+                    child: Icon(Icons.ios_share_rounded, color: s.onPrimaryContainer),
+                  ),
+                  const Gap(14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(share.title, style: theme.textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant)),
+                        Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleLarge),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (link != null) ...[
+                const Gap(20),
+                Center(child: _QrCode(link)),
+                const Gap(10),
+                Text(
+                  share.scanHint,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                ),
+                const Gap(14),
+                _CopyTile(
+                  label: share.link,
+                  value: _Value(link),
+                  copyText: link,
+                  action: Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 8, end: 10),
+                    child: Icon(Icons.copy_rounded, size: 20, color: s.onSurfaceVariant),
+                  ),
+                ),
+              ],
+              const Gap(22),
+              Row(
+                children: [
+                  Icon(Icons.data_object_rounded, size: 18, color: s.primary),
+                  const Gap(8),
+                  Expanded(child: Text(share.config, style: theme.textTheme.titleSmall)),
+                  if (config.data case final json?)
+                    Text(
+                      _formatSize(utf8.encode(json).length),
+                      textDirection: TextDirection.ltr,
+                      style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
+                    ),
+                ],
+              ),
+              const Gap(4),
+              Text(share.configHint, style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant)),
+              const Gap(12),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                alignment: AlignmentDirectional.topCenter,
+                child: switch (config) {
+                  AsyncSnapshot(hasError: true) => Text(
+                    share.configFailed,
+                    style: theme.textTheme.bodyMedium?.copyWith(color: s.error),
+                  ),
+                  AsyncSnapshot(:final data?) => _ConfigActions(json: data, name: name),
+                  _ => const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 30),
+                    child: LinearProgressIndicator(borderRadius: BorderRadius.all(Radius.circular(4))),
+                  ),
+                },
+              ),
+              const Gap(8),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static String _formatSize(int bytes) => switch (bytes) {
+    < 1024 => '$bytes B',
+    < 1024 * 1024 => '${(bytes / 1024).toStringAsFixed(1)} KB',
+    _ => '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB',
+  };
+}
+
+/// The configuration's actions, side by side: copy (when it fits the clipboard), share (where the
+/// platform has a share sheet for files) and save.
+class _ConfigActions extends HookConsumerWidget {
+  const _ConfigActions({required this.json, required this.name});
+
+  final String json;
+  final String name;
+
+  /// Share sheets that take a file: Linux has none, and Windows' does not take files.
+  static bool get _canShareFiles => Platform.isAndroid || Platform.isIOS || Platform.isMacOS;
+
+  String get _fileName {
+    final safe = name.replaceAll(RegExp(r'[\\/:*?"<>|\x00-\x1f]'), '_').trim();
+    return '${safe.isEmpty ? 'profile' : safe}.json';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final share = t.pages.profiles.share;
+    final theme = Theme.of(context);
+    final copied = _useCopiedFlag();
+    final fits = json.length <= ShareProfileDialog.maxClipboardChars;
+    final notifications = ref.read(inAppNotificationControllerProvider);
+
+    Future<void> copy() async {
+      try {
+        await Clipboard.setData(ClipboardData(text: json));
+        copied.show();
+      } on PlatformException {
+        notifications.showInfoToast(t.common.msg.export.clipboard.contentTooLarge);
+      }
+    }
+
+    Future<void> shareFile() async {
+      final file = File('${(await getTemporaryDirectory()).path}/$_fileName');
+      await file.writeAsString(json);
+      // text/plain, not application/json: Android lists only the apps that take the type, and
+      // many (Telegram among them) do not take JSON
+      await UriUtils.tryShareFile(file.uri, mimeType: 'text/plain');
+    }
+
+    Future<void> save() async {
+      try {
+        final bytes = utf8.encode(json);
+        final path = await FilePicker.platform.saveFile(
+          fileName: _fileName,
+          type: FileType.custom,
+          allowedExtensions: ['json'],
+          bytes: bytes,
+        );
+        if (path == null) return;
+        // on desktop the picker only names the file
+        if (PlatformUtils.isDesktop) await File(path).writeAsBytes(bytes);
+        notifications.showSuccessToast(t.common.msg.export.file.success);
+      } catch (_) {
+        notifications.showErrorToast(t.common.msg.export.file.failure);
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            if (fits) ...[
+              Expanded(
+                child: _ActionTile(
+                  icon: copied.value ? Icons.check_rounded : Icons.content_copy_rounded,
+                  label: _CopiedSwap(label: share.copy, copied: copied.value, alignment: Alignment.center),
+                  onTap: copy,
+                ),
+              ),
+              const Gap(8),
+            ],
+            if (_canShareFiles) ...[
+              Expanded(
+                child: _ActionTile(icon: Icons.share_rounded, label: Text(share.shareFile), onTap: shareFile),
+              ),
+              const Gap(8),
+            ],
+            Expanded(
+              child: _ActionTile(icon: Icons.save_alt_rounded, label: Text(share.saveFile), onTap: save),
+            ),
+          ],
+        ),
+        if (!fits) ...[
+          const Gap(10),
+          Row(
+            children: [
+              Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.onSurfaceVariant),
+              const Gap(6),
+              Expanded(
+                child: Text(
+                  share.tooLargeToCopy,
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// A tonal square for one action: its icon over its label.
+class _ActionTile extends StatelessWidget {
+  const _ActionTile({required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final Widget label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    return Material(
+      color: s.secondaryContainer,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
+          child: Column(
+            children: [
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: Icon(icon, key: ValueKey(icon), color: s.onSecondaryContainer),
+              ),
+              const Gap(6),
+              DefaultTextStyle.merge(
+                style: theme.textTheme.labelLarge?.copyWith(color: s.onSecondaryContainer),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                child: label,
               ),
             ],
           ),

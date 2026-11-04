@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -99,20 +98,9 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
         .run();
   }
 
-  Future<void> exportConfigToClipboard(ProfileEntity profile) async {
-    await _profilesRepo
-        .generateConfig(profile.id)
-        .match(
-          (err) {
-            loggy.warning('error generating config', err);
-            throw err;
-          },
-          (configJson) async {
-            await Clipboard.setData(ClipboardData(text: configJson));
-            final t = ref.read(translationsProvider).requireValue;
-            ref.read(inAppNotificationControllerProvider).showSuccessToast(t.common.msg.export.clipboard.success);
-          },
-        )
-        .run();
-  }
+  /// The configuration JSON [profile] runs with, to share it.
+  Future<String> generateConfig(ProfileEntity profile) => _profilesRepo.generateConfig(profile.id).getOrElse((err) {
+    loggy.warning('error generating config', err);
+    throw err;
+  }).run();
 }

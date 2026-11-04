@@ -241,9 +241,16 @@
       "failedToLoad": "Failed to load",
       "updateSubscriptions": "Update subscriptions",
       "share": {
-        "urlToClipboard": "Copy URL",
-        "showUrlQr": "Show QR code",
-        "jsonToClipboard": "Copy JSON"
+        "title": "Share profile",
+        "scanHint": "Scan it with Hiddify on another device to add this profile",
+        "link": "Subscription link",
+        "config": "Configuration",
+        "configHint": "The full JSON this profile runs with, your settings included",
+        "configFailed": "Couldn't build the configuration",
+        "copy": "Copy",
+        "shareFile": "Share",
+        "saveFile": "Save",
+        "tooLargeToCopy": "Too large for the clipboard: share or save it as a file"
       },
       "msg": {
         "save": {
