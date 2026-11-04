@@ -967,19 +967,27 @@
       "otherCountries": "其他"
     },
     "localProxy": {
-      "title": "本機代理",
-      "lead": "代理模式需要手動設定，你需要逐一設定應用程式：",
       "steps": [
         "開啟應用程式的代理設定",
         "選擇 SOCKS5 或 HTTP",
-        "填入下方資訊",
+        "填入下方的值 · 點按即可複製",
         "保持 Hiddify 連線"
       ],
       "changePassword": "變更密碼",
       "hint": "代理模式 · 使用說明",
       "setPassword": "設定密碼",
       "manual": "手動",
-      "dontShowAgain": "不再顯示"
+      "dontShowAgain": "不再顯示",
+      "thisDevice": "本裝置",
+      "otherDevices": "其他裝置",
+      "server": "伺服器",
+      "noPassword": "未設定密碼",
+      "copyLink": "複製連結",
+      "telegramLink": "Telegram 連結",
+      "fullLink": "完整連結",
+      "portRange": "請使用 1024 到 65535 之間的連接埠",
+      "passwordTooShort": "至少 4 個字元",
+      "edit": "編輯"
     }
   },
   "connection": {

@@ -969,19 +969,27 @@
       "otherCountries": "Otros"
     },
     "localProxy": {
-      "title": "Proxy local",
-      "lead": "El modo proxy es manual, así que debes configurar cada app tú mismo:",
       "steps": [
         "Abre los ajustes de proxy de la app",
         "Elige SOCKS5 o HTTP",
-        "Introduce los datos de abajo",
+        "Introduce los valores de abajo · toca para copiar",
         "Mantén Hiddify conectado"
       ],
       "changePassword": "Cambiar contraseña",
       "hint": "Modo proxy · cómo usarlo",
       "setPassword": "Poner contraseña",
       "manual": "Manual",
-      "dontShowAgain": "No volver a mostrar"
+      "dontShowAgain": "No volver a mostrar",
+      "thisDevice": "Este dispositivo",
+      "otherDevices": "Otros dispositivos",
+      "server": "Servidor",
+      "noPassword": "Sin contraseña",
+      "copyLink": "Copiar enlace",
+      "telegramLink": "Enlace de Telegram",
+      "fullLink": "Enlace completo",
+      "portRange": "Usa un puerto entre 1024 y 65535",
+      "passwordTooShort": "Al menos 4 caracteres",
+      "edit": "Editar"
     }
   },
   "connection": {

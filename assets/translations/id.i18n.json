@@ -967,19 +967,27 @@
       "otherCountries": "Lainnya"
     },
     "localProxy": {
-      "title": "Proksi lokal",
-      "lead": "Mode proksi bersifat manual, jadi Anda perlu mengatur tiap aplikasi sendiri:",
       "steps": [
         "Buka pengaturan proksi aplikasi",
         "Pilih SOCKS5 atau HTTP",
-        "Isi detail di bawah",
+        "Masukkan nilai di bawah · ketuk untuk menyalin",
         "Biarkan Hiddify terhubung"
       ],
       "changePassword": "Ubah kata sandi",
       "hint": "Mode proksi · cara memakai",
       "setPassword": "Atur kata sandi",
       "manual": "Manual",
-      "dontShowAgain": "Jangan tampilkan lagi"
+      "dontShowAgain": "Jangan tampilkan lagi",
+      "thisDevice": "Perangkat ini",
+      "otherDevices": "Perangkat lain",
+      "server": "Server",
+      "noPassword": "Belum ada kata sandi",
+      "copyLink": "Salin tautan",
+      "telegramLink": "Tautan Telegram",
+      "fullLink": "Tautan lengkap",
+      "portRange": "Gunakan port 1024 sampai 65535",
+      "passwordTooShort": "Minimal 4 karakter",
+      "edit": "Edit"
     }
   },
   "connection": {
