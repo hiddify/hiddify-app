@@ -10,11 +10,9 @@ import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/utils.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meta/meta.dart';
 
 /// parse profile subscription url and headers for data
@@ -66,10 +64,9 @@ class ProfileParser with InfraLogger {
     'keep-top',
   ];
 
-  final Ref _ref;
   final DioHttpClient _httpClient;
 
-  ProfileParser({required Ref ref, required DioHttpClient httpClient}) : _ref = ref, _httpClient = httpClient;
+  ProfileParser({required DioHttpClient httpClient}) : _httpClient = httpClient;
   TaskEither<ProfileFailure, ProfileEntriesCompanion> addLocal({
     required String id,
     required String content,
@@ -168,9 +165,6 @@ class ProfileParser with InfraLogger {
           url.trim(),
           tempFilePath,
           cancelToken: cancelToken,
-          userAgent: _ref.read(ConfigOptions.useXrayCoreWhenPossible)
-              ? _httpClient.userAgent.replaceAll("HiddifyNext", "HiddifyNextX")
-              : null,
         )
         .catchError((err) {
           if (CancelToken.isCancel(err as DioException)) {
@@ -212,9 +206,6 @@ class ProfileParser with InfraLogger {
           final response = await _httpClient.get<String>(
             line.trimRight(),
             cancelToken: cancelToken,
-            userAgent: _ref.read(ConfigOptions.useXrayCoreWhenPossible)
-                ? _httpClient.userAgent.replaceAll('HiddifyNext', 'HiddifyNextX')
-                : null,
             responseType: ResponseType.plain,
           );
           results[currentIndex] = (response.data ?? '').trim();

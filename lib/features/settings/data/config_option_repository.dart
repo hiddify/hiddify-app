@@ -599,7 +599,7 @@ abstract class ConfigOptions {
       region: ref.watch(region).name,
       balancerStrategy: ref.watch(balancerStrategy),
       // blockAds: ref.watch(blockAds),
-      useXrayCoreWhenPossible: ref.watch(useXrayCoreWhenPossible),
+      useXrayCoreWhenPossible: false, // the option is off and hidden; a stored true is ignored
       useSystemTlsEngine: ref.watch(useSystemTlsEngine),
       executeConfigAsIs: false,
       logLevel: ref.watch(logLevel),
