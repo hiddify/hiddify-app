@@ -341,8 +341,8 @@ class _ProxyRow extends ConsumerWidget {
   }
 }
 
-// ---------- the hop row: its IP and what it runs, then the chain type in a chip with its mode as a
-// badge. A tap shows the hop's proxy info, a long press its configuration. ----------
+// ---------- the hop row: its IP, then the chain type in a chip with its mode as a badge. A tap
+// shows the hop's proxy info, a long press its configuration. ----------
 
 class _HopRow extends ConsumerWidget {
   const _HopRow(this.card);
@@ -361,13 +361,6 @@ class _HopRow extends ConsumerWidget {
     final color = Color.alphaBlend(main.withValues(alpha: .16), s.surfaceContainerHigh);
     final down = status == StepStatus.waiting || status == StepStatus.failed;
     final hop = card.hop;
-    // what the hop runs and what it is doing, as the core names it ("WARP · MASQUE 🔑 Registering...",
-    // "Psiphon ⏳ Connecting..."), or its mode until listed
-    final name = ProxyTypeLabel(
-      hop?.type ?? card.hopMode.present(t),
-      prefix: status == StepStatus.waiting ? '' : '  ·  ',
-      style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
-    );
     return _StepRow(
       color: color,
       onTap: hop == null
@@ -382,21 +375,12 @@ class _HopRow extends ConsumerWidget {
         dim: down,
       ),
       status: status,
-      title: Row(
-        children: [
-          switch (status) {
-            StepStatus.waiting => const SizedBox.shrink(),
-            StepStatus.slow => _Problem(t.connection.slow, error: false),
-            StepStatus.failed => _Problem(t.connection.failed),
-            _ => _IpSlot(
-              status == StepStatus.connected ? hop : null,
-              boneWidth: 64,
-              isFinal: card.chain.isExtraSecurity(),
-            ),
-          },
-          Flexible(child: name),
-        ],
-      ),
+      title: switch (status) {
+        StepStatus.waiting => const SizedBox.shrink(),
+        StepStatus.slow => _Problem(t.connection.slow, error: false),
+        StepStatus.failed => _Problem(t.connection.failed),
+        _ => _IpSlot(status == StepStatus.connected ? hop : null, boneWidth: 64, isFinal: card.chain.isExtraSecurity()),
+      },
       trailing: Stack(
         clipBehavior: Clip.none,
         children: [
