@@ -19,7 +19,7 @@ class ChainModeIcon extends HookConsumerWidget {
 }
 
 /// A chain type's icon, as on the home proxy card: extra security's shield with an orbiting light,
-/// unblocker's door, opening. Still and grey while [animate] is false.
+/// unblocker's door, letting the traffic through. Still and grey while [animate] is false.
 class ChainTypeIcon extends StatelessWidget {
   const ChainTypeIcon({super.key, required this.type, required this.mode, this.animate = true});
 
@@ -36,8 +36,7 @@ class ChainTypeIcon extends StatelessWidget {
       child: switch (type) {
         ChainType.extraSecurity =>
           animate ? _OrbitShield(main, accent) : Icon(Icons.shield_rounded, size: 17, color: still),
-        ChainType.unblocker =>
-          animate ? OpeningDoor(size: 18, color: main) : Icon(Icons.meeting_room_rounded, size: 18, color: still),
+        ChainType.unblocker => PassingDoor(size: 20, color: animate ? main : still, animate: animate),
       },
     );
     // the loop repaints these 22 px alone, not the card or the page round them
@@ -141,81 +140,143 @@ class _OrbitPainter extends CustomPainter {
   bool shouldRepaint(_OrbitPainter old) => old.angle != angle || old.front != front || old.light != light;
 }
 
-/// The unblocker's door, swinging open on its left hinge toward the viewer, staying open a while,
-/// shutting and resting, over and over: the door gets through, where a lock would only guard.
-class OpeningDoor extends StatelessWidget {
-  const OpeningDoor({super.key, required this.size, required this.color});
+/// The unblocker's double door, seen from above: three dots, the traffic, run into it while it is
+/// shut and wait; it opens, they drive through one after another, and it shuts again, over and over.
+/// The door gets the traffic through, where a lock would only guard it. With [animate] false, the
+/// door stands shut and empty.
+class PassingDoor extends StatelessWidget {
+  const PassingDoor({super.key, required this.size, required this.color, this.animate = true});
 
   final double size;
   final Color color;
+  final bool animate;
 
-  /// How open the door is at [v] of a loop: opens in the first third, stays open, shuts, rests.
-  static double _loop(double v) => switch (v) {
-    < .3 => Curves.easeOutBack.transform(v / .3).clamp(0, 1.05),
-    < .7 => 1,
-    < .85 => 1 - Curves.easeInCubic.transform((v - .7) / .15),
-    _ => 0,
-  };
+  static const _run = 6800;
 
   @override
-  Widget build(BuildContext context) => Animate(
-    onPlay: (c) => c.repeat(),
-    effects: [
-      CustomEffect(
-        duration: 3600.ms,
-        builder: (context, v, child) => CustomPaint(
-          size: Size.square(size),
-          painter: _DoorPainter(open: _loop(v), color: color),
+  Widget build(BuildContext context) {
+    if (!animate) {
+      return CustomPaint(
+        size: Size.square(size),
+        painter: _DoorPainter(t: null, color: color),
+      );
+    }
+    return Animate(
+      onPlay: (c) => c.repeat(),
+      effects: [
+        CustomEffect(
+          duration: _run.ms,
+          builder: (context, v, child) => CustomPaint(
+            size: Size.square(size),
+            painter: _DoorPainter(t: v * _run / 1000, color: color),
+          ),
         ),
-      ),
-    ],
-    child: SizedBox.square(dimension: size),
-  );
+      ],
+      child: SizedBox.square(dimension: size),
+    );
+  }
 }
 
-/// The frame, and the door in it turned by [open] (0 shut, 1 about 63° open), on a 24 px grid.
+/// The wall, its two leaves and the dots at [t] seconds into a run, on a 24 px grid; no dots and
+/// the door shut when [t] is null.
 class _DoorPainter extends CustomPainter {
-  _DoorPainter({required this.open, required this.color});
-  final double open;
+  _DoorPainter({required this.t, required this.color});
+  final double? t;
   final Color color;
 
-  static const _frame = Rect.fromLTRB(5, 3, 19, 21);
+  /// The first dot hits the door, the door opens, the first dot goes, the door shuts.
+  static const _impact = .8;
+  static const _opens = 2.5;
+  static const _goes = 2.9;
+  static const _shuts = 5.55;
+
+  static const _wall = 1.8;
+  static const _dot = 1.2;
+  static const _top = 7.0;
+  static const _bottom = 17.0;
+
+  /// Where the dots come in from, off the left edge.
+  static const _from = -2.0;
+
+  /// Where the first dot touches the shut door.
+  static const _touch = 12 - _wall / 2 - _dot;
+
+  /// Where each dot waits: the first a little back from the door, after bouncing off it, the others
+  /// behind it, with room between them.
+  static const _waits = [_touch - 1.6, _touch - 1.6 - 3.6, _touch - 1.6 - 7.2];
+
+  /// How open the door is: shut, pushed a little by the hit and springing back, open, shut again.
+  static double _open(double s) {
+    if (s < _impact) return 0;
+    if (s < _opens) return .1 * exp(-5 * (s - _impact)) * sin((s - _impact) * 2 * pi / .4);
+    if (s >= _shuts) return 1 - Curves.easeInOutCubic.transform(((s - _shuts) / .6).clamp(0, 1));
+    return Curves.easeInOutCubic.transform(((s - _opens) / .6).clamp(0, 1));
+  }
+
+  /// Dot [i]'s place, its squash (1 round, less flattened against the door) and how visible it is.
+  static (double x, double squash, double alpha) _dotAt(double s, int i) {
+    final wait = _waits[i];
+    double x;
+    var squash = 1.0;
+    if (i == 0) {
+      // drives straight into the door, bounces off it twice, less each time, and rolls back to wait
+      // a little away from it
+      final k = s - _impact;
+      x = k < 0
+          ? _from + (_touch - _from) * Curves.easeIn.transform(s / _impact)
+          : _touch -
+                (_touch - wait) * Curves.easeOut.transform((k / .5).clamp(0, 1)) -
+                .9 * exp(-6 * k) * sin(k * pi / .22).abs();
+      if (k >= 0) squash = 1 - .35 * exp(-25 * k);
+    } else {
+      // comes later, at speed, and brakes to a stop behind the one ahead, rocking forward a little,
+      // like a jam forming
+      final enter = .55 * i;
+      final arrive = enter + .9;
+      final k = s - arrive;
+      x = k < 0
+          ? _from + (wait - _from) * Curves.easeOutQuad.transform(((s - enter) / .9).clamp(0, 1))
+          : wait + .3 * exp(-8 * k) * sin(k * 2 * pi / .35);
+    }
+    // green: the first goes, then the next, each speeding up, like cars at a light
+    final go = ((s - (_goes + .3 * i)) / 1.1).clamp(0.0, 1.0);
+    x += (25 - wait) * go * go;
+    final alpha = (1 - ((x - 20) / 4).clamp(0.0, 1.0)) * ((x - _from) / 2).clamp(0.0, 1.0);
+    return (x, squash, alpha);
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
     canvas.scale(size.width / 24);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(_frame, const Radius.circular(1)),
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8,
-    );
-    // light through the doorway, brighter the wider it opens
-    canvas.drawRect(_frame.deflate(.9), Paint()..color = color.withValues(alpha: .3 * open.clamp(0, 1)));
-    // the door turns toward the viewer: narrower, and its free edge taller, as it opens
-    final angle = open * 1.1;
-    final edge = _frame.left + _frame.width * cos(angle);
-    final grow = 2.4 * sin(angle);
-    canvas.saveLayer(Offset.zero & const Size.square(24), Paint());
-    canvas.drawPath(
-      Path()
-        ..moveTo(_frame.left, _frame.top)
-        ..lineTo(edge, _frame.top - grow)
-        ..lineTo(edge, _frame.bottom + grow)
-        ..lineTo(_frame.left, _frame.bottom)
-        ..close(),
-      Paint()..color = color,
-    );
-    // the knob, cut out of the door near its free edge
-    canvas.drawCircle(
-      Offset(edge - 2.4 * cos(angle), _frame.center.dy),
-      1.2 * max(cos(angle), .45),
-      Paint()..blendMode = BlendMode.clear,
-    );
-    canvas.restore();
+    final stroke = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = _wall
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(const Offset(12, 2), const Offset(12, _top), stroke);
+    canvas.drawLine(const Offset(12, _bottom), const Offset(12, 22), stroke);
+    // the two leaves turn on their hinges, from along the wall to along the way through
+    final s = t;
+    final a = s == null ? 0.0 : _open(s) * pi / 2;
+    const half = (_bottom - _top) / 2;
+    for (final (hinge, sign) in [(const Offset(12, _top), 1.0), (const Offset(12, _bottom), -1.0)]) {
+      canvas.drawLine(hinge, hinge + Offset(sin(a), sign * cos(a)) * half, stroke);
+    }
+    if (s == null) return;
+    for (var i = 0; i < _waits.length; i++) {
+      final (x, squash, alpha) = _dotAt(s, i);
+      if (alpha <= 0) continue;
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: Offset(x + _dot * (1 - squash), 12),
+          width: 2 * _dot * squash,
+          height: 2 * _dot / sqrt(squash),
+        ),
+        Paint()..color = color.withValues(alpha: alpha),
+      );
+    }
   }
 
   @override
-  bool shouldRepaint(_DoorPainter old) => old.open != open || old.color != color;
+  bool shouldRepaint(_DoorPainter old) => old.t != t || old.color != color;
 }
