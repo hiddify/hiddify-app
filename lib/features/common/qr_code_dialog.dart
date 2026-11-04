@@ -74,16 +74,18 @@ class QrCodeDialog extends HookConsumerWidget {
 
 /// The local proxy for this device and for other devices on the network, one tab each. Shown when
 /// the user picks proxy mode ([onPick]), from the Manual tab on the home page, and from LAN sharing
-/// ([otherDevices]).
-class ProxyDialog extends HookWidget {
+/// ([otherDevices]). In VPN mode this device's apps already go through the VPN, so only other
+/// devices are shown, without the tabs.
+class ProxyDialog extends HookConsumerWidget {
   const ProxyDialog({super.key, this.onPick = false, this.otherDevices = false});
 
   final bool onPick;
   final bool otherDevices;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final other = useState(otherDevices);
+    if (ref.watch(ConfigOptions.serviceMode) == ServiceMode.tun) return const LanSharingQrDialog();
     final header = Consumer(
       builder: (context, ref, _) {
         final t = ref.watch(translationsProvider).requireValue;
@@ -179,14 +181,6 @@ class LocalProxyDialog extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final port = ref.watch(ConfigOptions.mixedPort);
-    // VPN mode closes the local port unless the user keeps it open
-    if (ref.watch(ConfigOptions.serviceMode) == ServiceMode.tun && !ref.watch(ConfigOptions.localProxyInVpn)) {
-      return _ProxyDialogFrame.off(
-        header: header,
-        icon: Icons.devices_rounded,
-        onTurnOn: () => ref.read(ConfigOptions.localProxyInVpn.notifier).update(true),
-      );
-    }
     final auth = ref.watch(ConfigOptions.localProxyAuth);
     // the one secret of the user "hiddify", shared with the local network's port
     final secret = ref.watch(ConfigOptions.lanSharingPassword);
@@ -225,7 +219,7 @@ class LocalProxyDialog extends ConsumerWidget {
 typedef _Links = ({String telegram, String full});
 
 /// A proxy dialog: [header] (the tabs), [children], [footer], then Copy link — off while [links]
-/// is null — and Close. [_ProxyDialogFrame.off] is a side that is off: what turns it on, and Close.
+/// is null — and Close. [_ProxyDialogFrame.off] is sharing that is off: what turns it on, and Close.
 class _ProxyDialogFrame extends StatelessWidget {
   const _ProxyDialogFrame({required this.header, required this.links, required this.children, this.footer})
     : copyLink = true;
@@ -525,7 +519,7 @@ class _FieldEditor extends HookWidget {
   }
 }
 
-/// A side of the proxy dialog that is off: its [icon], that it is off, and Turn on.
+/// Sharing with other devices while it is off: its [icon], that it is off, and Turn on.
 class _OffCard extends ConsumerWidget {
   const _OffCard({required this.icon, required this.onTurnOn});
 
