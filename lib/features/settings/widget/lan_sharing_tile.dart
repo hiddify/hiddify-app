@@ -9,7 +9,8 @@ class LanSharingPreferenceWidget extends ConsumerWidget {
 
   /// Whether to show the leading icon of the [ListTile].
   ///
-  /// Hidden when the widget is embedded in the quick settings modal.
+  /// Hidden when the widget is embedded in the quick settings modal, where it is titled Connection
+  /// sharing.
   final bool showLeading;
 
   @override
@@ -23,19 +24,18 @@ class LanSharingPreferenceWidget extends ConsumerWidget {
 
     return ListTile(
       leading: showLeading ? const Icon(Icons.share_rounded, size: 28) : null,
-      title: Text(t.pages.settings.inbound.lanSharing),
+      title: Text(showLeading ? t.pages.settings.inbound.lanSharing : t.pages.settings.inbound.connectionSharing),
       onTap: () => setEnabled(!enabled),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (enabled) ...[
-            IconButton(
-              tooltip: t.pages.settings.inbound.qrCode,
-              onPressed: () => ref.read(dialogNotifierProvider.notifier).showLanSharingQr(),
-              icon: const Icon(Icons.qr_code_rounded),
-            ),
-            SizedBox(height: 32, child: VerticalDivider(width: 16, color: theme.colorScheme.outlineVariant)),
-          ],
+          // on or off, it opens the dialog that turns sharing on and shows what other devices need
+          IconButton.filledTonal(
+            tooltip: t.pages.settings.inbound.qrCode,
+            onPressed: () => ref.read(dialogNotifierProvider.notifier).showLanSharingQr(),
+            icon: const Icon(Icons.qr_code_rounded),
+          ),
+          SizedBox(height: 32, child: VerticalDivider(width: 16, color: theme.colorScheme.outlineVariant)),
           Switch.adaptive(value: enabled, onChanged: setEnabled),
         ],
       ),
