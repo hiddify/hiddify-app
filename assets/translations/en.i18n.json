@@ -621,7 +621,6 @@
         "redirectPort": "Redirect port",
         "lanSharing": "Share on local network",
         "qrCode": "QR code",
-        "lanQrSubtitle": "SOCKS5 proxy",
         "closedInVpn": "closed in VPN mode, unless shared",
         "proxySecret": "Proxy secret",
         "noSecret": "No secret: any app or device that reaches the port can use it",
@@ -988,8 +987,8 @@
     "qrCode": {
       "copyFullLink": "Copy full link",
       "copied": "Copied",
-      "localOnlyTitle": "This device only",
-      "localOnlyMessage": "Other devices can’t reach 127.0.0.1",
+      "lanLine": "SOCKS5 · same network only",
+      "noLocalNetwork": "No local network found",
       "ip": "IP",
       "port": "Port",
       "username": "Username",
@@ -1054,7 +1053,6 @@
         "Enter the values below · tap to copy",
         "Keep Hiddify connected"
       ],
-      "changePassword": "Change password",
       "hint": "Proxy mode · how to use",
       "setPassword": "Set password",
       "manual": "Manual",
