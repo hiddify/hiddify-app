@@ -14,7 +14,7 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../../google/protobuf/timestamp.pb.dart' as $2;
+import '../../google/protobuf/timestamp.pb.dart' as $0;
 import '../hcommon/common.pbenum.dart' as $1;
 import 'hcore.pbenum.dart';
 
@@ -639,7 +639,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   factory OutboundInfo({
     $core.String? tag,
     $core.String? type,
-    $2.Timestamp? urlTestTime,
+    $0.Timestamp? urlTestTime,
     $core.int? urlTestDelay,
     IpInfo? ipinfo,
     $core.bool? isSelected,
@@ -661,6 +661,8 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.bool? downloadTesting,
     $core.bool? uploadSpeedCached,
     $core.bool? downloadSpeedCached,
+    $core.String? error,
+    $core.int? sortDelay,
   }) {
     final $result = create();
     if (tag != null) {
@@ -735,6 +737,12 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (downloadSpeedCached != null) {
       $result.downloadSpeedCached = downloadSpeedCached;
     }
+    if (error != null) {
+      $result.error = error;
+    }
+    if (sortDelay != null) {
+      $result.sortDelay = sortDelay;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -744,7 +752,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'OutboundInfo', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'tag')
     ..aOS(2, _omitFieldNames ? '' : 'type')
-    ..aOM<$2.Timestamp>(3, _omitFieldNames ? '' : 'urlTestTime', subBuilder: $2.Timestamp.create)
+    ..aOM<$0.Timestamp>(3, _omitFieldNames ? '' : 'urlTestTime', subBuilder: $0.Timestamp.create)
     ..a<$core.int>(4, _omitFieldNames ? '' : 'urlTestDelay', $pb.PbFieldType.O3)
     ..aOM<IpInfo>(5, _omitFieldNames ? '' : 'ipinfo', subBuilder: IpInfo.create)
     ..aOB(6, _omitFieldNames ? '' : 'isSelected')
@@ -766,6 +774,8 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aOB(22, _omitFieldNames ? '' : 'downloadTesting')
     ..aOB(23, _omitFieldNames ? '' : 'uploadSpeedCached')
     ..aOB(24, _omitFieldNames ? '' : 'downloadSpeedCached')
+    ..aOS(25, _omitFieldNames ? '' : 'error')
+    ..a<$core.int>(26, _omitFieldNames ? '' : 'sortDelay', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -809,15 +819,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   void clearType() => clearField(2);
 
   @$pb.TagNumber(3)
-  $2.Timestamp get urlTestTime => $_getN(2);
+  $0.Timestamp get urlTestTime => $_getN(2);
   @$pb.TagNumber(3)
-  set urlTestTime($2.Timestamp v) { setField(3, v); }
+  set urlTestTime($0.Timestamp v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasUrlTestTime() => $_has(2);
   @$pb.TagNumber(3)
   void clearUrlTestTime() => clearField(3);
   @$pb.TagNumber(3)
-  $2.Timestamp ensureUrlTestTime() => $_ensure(2);
+  $0.Timestamp ensureUrlTestTime() => $_ensure(2);
 
   @$pb.TagNumber(4)
   $core.int get urlTestDelay => $_getIZ(3);
@@ -1009,6 +1019,24 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasDownloadSpeedCached() => $_has(23);
   @$pb.TagNumber(24)
   void clearDownloadSpeedCached() => clearField(24);
+
+  @$pb.TagNumber(25)
+  $core.String get error => $_getSZ(24);
+  @$pb.TagNumber(25)
+  set error($core.String v) { $_setString(24, v); }
+  @$pb.TagNumber(25)
+  $core.bool hasError() => $_has(24);
+  @$pb.TagNumber(25)
+  void clearError() => clearField(25);
+
+  @$pb.TagNumber(26)
+  $core.int get sortDelay => $_getIZ(25);
+  @$pb.TagNumber(26)
+  set sortDelay($core.int v) { $_setSignedInt32(25, v); }
+  @$pb.TagNumber(26)
+  $core.bool hasSortDelay() => $_has(25);
+  @$pb.TagNumber(26)
+  void clearSortDelay() => clearField(26);
 }
 
 class IpInfo extends $pb.GeneratedMessage {
@@ -2336,7 +2364,7 @@ class LogMessage extends $pb.GeneratedMessage {
     LogLevel? level,
     LogType? type,
     $core.String? message,
-    $2.Timestamp? time,
+    $0.Timestamp? time,
   }) {
     final $result = create();
     if (level != null) {
@@ -2361,7 +2389,7 @@ class LogMessage extends $pb.GeneratedMessage {
     ..e<LogLevel>(1, _omitFieldNames ? '' : 'level', $pb.PbFieldType.OE, defaultOrMaker: LogLevel.TRACE, valueOf: LogLevel.valueOf, enumValues: LogLevel.values)
     ..e<LogType>(2, _omitFieldNames ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: LogType.CORE, valueOf: LogType.valueOf, enumValues: LogType.values)
     ..aOS(3, _omitFieldNames ? '' : 'message')
-    ..aOM<$2.Timestamp>(4, _omitFieldNames ? '' : 'time', subBuilder: $2.Timestamp.create)
+    ..aOM<$0.Timestamp>(4, _omitFieldNames ? '' : 'time', subBuilder: $0.Timestamp.create)
     ..hasRequiredFields = false
   ;
 
@@ -2414,15 +2442,15 @@ class LogMessage extends $pb.GeneratedMessage {
   void clearMessage() => clearField(3);
 
   @$pb.TagNumber(4)
-  $2.Timestamp get time => $_getN(3);
+  $0.Timestamp get time => $_getN(3);
   @$pb.TagNumber(4)
-  set time($2.Timestamp v) { setField(4, v); }
+  set time($0.Timestamp v) { setField(4, v); }
   @$pb.TagNumber(4)
   $core.bool hasTime() => $_has(3);
   @$pb.TagNumber(4)
   void clearTime() => clearField(4);
   @$pb.TagNumber(4)
-  $2.Timestamp ensureTime() => $_ensure(3);
+  $0.Timestamp ensureTime() => $_ensure(3);
 }
 
 class LogRequest extends $pb.GeneratedMessage {

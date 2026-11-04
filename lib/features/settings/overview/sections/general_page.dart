@@ -144,13 +144,6 @@ class GeneralPage extends HookConsumerWidget {
             digitsOnly: true,
             inputToValue: int.tryParse,
           ),
-          SwitchListTile.adaptive(
-            title: Text(t.pages.settings.general.useXrayCoreWhenPossible),
-            subtitle: Text(t.pages.settings.general.useXrayCoreWhenPossibleMsg),
-            secondary: const Icon(Icons.extension_rounded),
-            value: ref.watch(ConfigOptions.useXrayCoreWhenPossible),
-            onChanged: ref.read(ConfigOptions.useXrayCoreWhenPossible.notifier).update,
-          ),
           if (Platform.isMacOS || Platform.isIOS || Platform.isWindows)
             SwitchListTile.adaptive(
               title: Text(t.pages.settings.general.useSystemTlsEngine),

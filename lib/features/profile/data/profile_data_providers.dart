@@ -37,5 +37,5 @@ ProfilePathResolver profilePathResolver(Ref ref) {
 
 @Riverpod(keepAlive: true)
 ProfileParser profileParser(Ref ref) {
-  return ProfileParser(ref: ref, httpClient: ref.watch(httpClientProvider));
+  return ProfileParser(httpClient: ref.watch(httpClientProvider));
 }

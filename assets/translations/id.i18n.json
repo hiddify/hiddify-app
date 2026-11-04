@@ -589,8 +589,8 @@
         "directPort": "Port langsung",
         "redirectPort": "Port pengalihan",
         "lanSharing": "Berbagi VPN yang aman",
+        "connectionSharing": "Berbagi koneksi",
         "qrCode": "Kode QR",
-        "lanQrSubtitle": "Proxy SOCKS5",
         "closedInVpn": "tertutup di mode VPN, kecuali dibagikan",
         "proxySecret": "Rahasia proksi",
         "noSecret": "Tanpa rahasia: aplikasi atau perangkat apa pun yang mencapai port dapat memakainya",
@@ -912,8 +912,8 @@
     "qrCode": {
       "copyFullLink": "Salin tautan lengkap",
       "copied": "Disalin",
-      "localOnlyTitle": "Hanya perangkat ini",
-      "localOnlyMessage": "Perangkat lain tidak bisa menjangkau 127.0.0.1",
+      "lanLine": "SOCKS5 · hanya jaringan yang sama",
+      "noLocalNetwork": "Jaringan lokal tidak ditemukan",
       "ip": "IP",
       "port": "Port",
       "username": "Nama pengguna",
@@ -967,19 +967,27 @@
       "otherCountries": "Lainnya"
     },
     "localProxy": {
-      "title": "Proksi lokal",
-      "lead": "Mode proksi bersifat manual, jadi Anda perlu mengatur tiap aplikasi sendiri:",
       "steps": [
         "Buka pengaturan proksi aplikasi",
         "Pilih SOCKS5 atau HTTP",
-        "Isi detail di bawah",
+        "Masukkan nilai di bawah · ketuk untuk menyalin",
         "Biarkan Hiddify terhubung"
       ],
-      "changePassword": "Ubah kata sandi",
       "hint": "Mode proksi · cara memakai",
       "setPassword": "Atur kata sandi",
       "manual": "Manual",
-      "dontShowAgain": "Jangan tampilkan lagi"
+      "dontShowAgain": "Jangan tampilkan lagi",
+      "thisDevice": "Perangkat ini",
+      "otherDevices": "Perangkat lain",
+      "server": "Server",
+      "noPassword": "Belum ada kata sandi",
+      "turnOnSharing": "Aktifkan berbagi",
+      "copyLink": "Salin tautan",
+      "telegramLink": "Tautan Telegram",
+      "fullLink": "Tautan lengkap",
+      "portRange": "Gunakan port 1024 sampai 65535",
+      "passwordTooShort": "Minimal 4 karakter",
+      "edit": "Edit"
     }
   },
   "connection": {

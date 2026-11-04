@@ -36,6 +36,13 @@ abstract class ConfigOptions {
     mapTo: (value) => value.key,
   );
 
+  static final defaultProxy = PreferencesNotifier.create<DefaultProxy, String>(
+    "default-proxy",
+    DefaultProxy.balance,
+    mapFrom: (value) => DefaultProxy.values.firstWhere((e) => e.key == value, orElse: () => DefaultProxy.balance),
+    mapTo: (value) => value.key,
+  );
+
   static final region = PreferencesNotifier.create<Region, String>(
     "region",
     Region.other,
@@ -347,36 +354,7 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
 
-  // extra security dials through the user's pick: it takes the endpoint Cloudflare assigned, or
-  // one the user typed; it never scans (WarpEndpointSource.of)
-  static final extraSecurityWarpEndpoint = _warpEndpoint("extra-security-warp-endpoint", WarpEndpointSource.profile);
-
-  static final extraSecurityWarpCleanIp = PreferencesNotifier.create<String, String>(
-    "extra-security-warp-clean-ip",
-    "",
-  );
-
-  static final extraSecurityWarpCleanPort = PreferencesNotifier.create<int, int>(
-    "extra-security-warp-clean-port",
-    0,
-    validator: (value) => isPort(value.toString()),
-  );
-
   static final extraSecurityWarpMtu = PreferencesNotifier.create<int, int>("extra-security-warp-mtu", 0);
-
-  static final extraSecurityWarpMasque = _warpBlock(
-    "extra-security-warp-masque",
-    const SingboxWarpMasqueOption(),
-    SingboxWarpMasqueOption.fromJson,
-    (value) => value.toJson(),
-  );
-
-  static final extraSecurityWarpAwg = _warpBlock(
-    "extra-security-warp-awg",
-    const SingboxWarpAwgOption(),
-    SingboxWarpAwgOption.fromJson,
-    (value) => value.toJson(),
-  );
 
   static final unblockerWarpLicenseKey = PreferencesNotifier.create<String, String>("unblocker-warp-license-key", "");
 
@@ -447,16 +425,14 @@ abstract class ConfigOptions {
   );
 
   /// The WARP settings of each hop, so one panel edits either.
+  // Extra security is a privacy layer behind the user's pick, not a way past filtering: the tunnel,
+  // the licence and the MTU are all it offers. It takes the endpoint Cloudflare assigned (scanning
+  // through a proxy only measures the proxy) and the core's MASQUE and AmneziaWG defaults.
   static final extraSecurityWarp = WarpHopPreferences(
     detour: true,
     tunnel: extraSecurityWarpTunnel,
     licenseKey: extraSecurityWarpLicenseKey,
-    endpoint: extraSecurityWarpEndpoint,
-    cleanIp: extraSecurityWarpCleanIp,
-    cleanPort: extraSecurityWarpCleanPort,
     mtu: extraSecurityWarpMtu,
-    masque: extraSecurityWarpMasque,
-    awg: extraSecurityWarpAwg,
   );
 
   static final unblockerWarp = WarpHopPreferences(
@@ -498,6 +474,7 @@ abstract class ConfigOptions {
   static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>> preferences = {
     "region": region,
     "balancer-strategy": balancerStrategy,
+    "default-proxy": defaultProxy,
     // "block-ads": blockAds,
     "use-xray-core-when-possible": useXrayCoreWhenPossible,
     "use-system-tls-engine": useSystemTlsEngine,
@@ -553,12 +530,7 @@ abstract class ConfigOptions {
     // warp
     "extra-security.warp.license-key": extraSecurityWarpLicenseKey,
     "extra-security.warp.tunnel": extraSecurityWarpTunnel,
-    "extra-security.warp.endpoint": extraSecurityWarpEndpoint,
-    "extra-security.warp.clean-ip": extraSecurityWarpCleanIp,
-    "extra-security.warp.clean-port": extraSecurityWarpCleanPort,
     "extra-security.warp.mtu": extraSecurityWarpMtu,
-    "extra-security.warp.masque": extraSecurityWarpMasque,
-    "extra-security.warp.awg": extraSecurityWarpAwg,
     // psiphon
     "extra-security.psiphon.region": extraSecurityPsiphonRegion,
     "extra-security.psiphon.conduit-pairing-id": extraSecurityPsiphonConduitPairingId,
@@ -634,8 +606,9 @@ abstract class ConfigOptions {
     return SingboxConfigOption(
       region: ref.watch(region).name,
       balancerStrategy: ref.watch(balancerStrategy),
+      defaultProxy: ref.watch(defaultProxy),
       // blockAds: ref.watch(blockAds),
-      useXrayCoreWhenPossible: ref.watch(useXrayCoreWhenPossible),
+      useXrayCoreWhenPossible: false, // the option is off and hidden; a stored true is ignored
       useSystemTlsEngine: ref.watch(useSystemTlsEngine),
       executeConfigAsIs: false,
       logLevel: ref.watch(logLevel),
@@ -691,12 +664,7 @@ abstract class ConfigOptions {
         mode: ref.watch(extraSecurityMode).coreKey(ref.watch(extraSecurityWarpTunnel)),
         warp: SingboxExtraSecurityWarpOption(
           licenseKey: ref.watch(extraSecurityWarpLicenseKey),
-          endpoint: ref.watch(extraSecurityWarpEndpoint),
-          cleanIp: ref.watch(extraSecurityWarpCleanIp),
-          cleanPort: ref.watch(extraSecurityWarpCleanPort),
           mtu: ref.watch(extraSecurityWarpMtu),
-          masque: ref.watch(extraSecurityWarpMasque).orNull,
-          awg: ref.watch(extraSecurityWarpAwg).orNull,
         ),
         psiphon: SingboxExtraSecurityPsiphonOption(
           region: ref.watch(extraSecurityPsiphonRegion),
@@ -802,12 +770,12 @@ class WarpHopPreferences {
     required this.detour,
     required this.tunnel,
     required this.licenseKey,
-    required this.endpoint,
-    required this.cleanIp,
-    required this.cleanPort,
     required this.mtu,
-    required this.masque,
-    required this.awg,
+    this.endpoint,
+    this.cleanIp,
+    this.cleanPort,
+    this.masque,
+    this.awg,
     this.scanner,
     this.noise,
     this.noiseMode,
@@ -818,12 +786,13 @@ class WarpHopPreferences {
   final bool detour;
   final _Preference<WarpTunnel, String> tunnel;
   final _Preference<String, String> licenseKey;
-  final _Preference<WarpEndpointSource, String> endpoint;
-  final _Preference<String, String> cleanIp;
-  final _Preference<int, int> cleanPort;
   final _Preference<int, int> mtu;
-  final _Preference<SingboxWarpMasqueOption, String> masque;
-  final _Preference<SingboxWarpAwgOption, String> awg;
+  // null: the hop does not offer it, and the core's default applies
+  final _Preference<WarpEndpointSource, String>? endpoint;
+  final _Preference<String, String>? cleanIp;
+  final _Preference<int, int>? cleanPort;
+  final _Preference<SingboxWarpMasqueOption, String>? masque;
+  final _Preference<SingboxWarpAwgOption, String>? awg;
   final _Preference<SingboxWarpScannerOption, String>? scanner;
   final _Preference<OptionalRange, String>? noise;
   final _Preference<String, String>? noiseMode;

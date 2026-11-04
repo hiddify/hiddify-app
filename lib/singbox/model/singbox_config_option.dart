@@ -17,6 +17,7 @@ class SingboxConfigOption with _$SingboxConfigOption {
   const factory SingboxConfigOption({
     required String region,
     required BalancerStrategy balancerStrategy,
+    @Default(DefaultProxy.balance) DefaultProxy defaultProxy,
     // required bool blockAds,
     required bool useXrayCoreWhenPossible,
     @Default(true) bool useSystemTlsEngine,

@@ -590,8 +590,8 @@
         "directPort": "Puerto directo",
         "redirectPort": "Puerto de redirección",
         "lanSharing": "Compartir VPN de forma segura",
+        "connectionSharing": "Compartir conexión",
         "qrCode": "Código QR",
-        "lanQrSubtitle": "Proxy SOCKS5",
         "closedInVpn": "cerrado en modo VPN, salvo si se comparte",
         "proxySecret": "Secreto del proxy",
         "noSecret": "Sin secreto: cualquier app o dispositivo que llegue al puerto puede usarlo",
@@ -914,8 +914,8 @@
     "qrCode": {
       "copyFullLink": "Copiar enlace completo",
       "copied": "Copiado",
-      "localOnlyTitle": "Solo este dispositivo",
-      "localOnlyMessage": "Otros dispositivos no pueden acceder a 127.0.0.1",
+      "lanLine": "SOCKS5 · solo la misma red",
+      "noLocalNetwork": "No se encontró una red local",
       "ip": "IP",
       "port": "Puerto",
       "username": "Nombre de usuario",
@@ -969,19 +969,27 @@
       "otherCountries": "Otros"
     },
     "localProxy": {
-      "title": "Proxy local",
-      "lead": "El modo proxy es manual, así que debes configurar cada app tú mismo:",
       "steps": [
         "Abre los ajustes de proxy de la app",
         "Elige SOCKS5 o HTTP",
-        "Introduce los datos de abajo",
+        "Introduce los valores de abajo · toca para copiar",
         "Mantén Hiddify conectado"
       ],
-      "changePassword": "Cambiar contraseña",
       "hint": "Modo proxy · cómo usarlo",
       "setPassword": "Poner contraseña",
       "manual": "Manual",
-      "dontShowAgain": "No volver a mostrar"
+      "dontShowAgain": "No volver a mostrar",
+      "thisDevice": "Este dispositivo",
+      "otherDevices": "Otros dispositivos",
+      "server": "Servidor",
+      "noPassword": "Sin contraseña",
+      "turnOnSharing": "Activar el uso compartido",
+      "copyLink": "Copiar enlace",
+      "telegramLink": "Enlace de Telegram",
+      "fullLink": "Enlace completo",
+      "portRange": "Usa un puerto entre 1024 y 65535",
+      "passwordTooShort": "Al menos 4 caracteres",
+      "edit": "Editar"
     }
   },
   "connection": {

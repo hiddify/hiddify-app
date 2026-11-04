@@ -518,18 +518,20 @@ class _ChainBadge extends StatelessWidget {
     (ChainType.extraSecurity, StepStatus.connected) => Icons.gpp_good_rounded,
     (ChainType.extraSecurity, StepStatus.failed) => Icons.gpp_bad_rounded,
     (ChainType.extraSecurity, _) => Icons.shield_outlined,
-    // a door, not a lock: the unblocker gets the proxy through, it does not secure it. Open (drawn
-    // by OpeningDoor) on its way and once up, shut while it waits or fails.
+    // a door, not a lock: the unblocker gets the proxy through, it does not secure it. Drawn by
+    // PassingDoor; these only tell its running state from its shut one, to switch between them
     (ChainType.unblocker, StepStatus.connected || StepStatus.connecting || StepStatus.slow) =>
       Icons.meeting_room_rounded,
     (ChainType.unblocker, _) => Icons.door_front_door_rounded,
   };
 
   Widget _glyphWidget(StepStatus status) => switch ((_type, status)) {
-    // the door keeps opening, as on the proxy card
-    (ChainType.unblocker, StepStatus.connecting || StepStatus.slow || StepStatus.connected) => OpeningDoor(
+    // the traffic keeps getting through on its way and once up, as on the proxy card; shut while it
+    // waits or fails
+    (ChainType.unblocker, _) => PassingDoor(
       size: _glyphSize,
       color: Colors.white,
+      animate: status == StepStatus.connecting || status == StepStatus.slow || status == StepStatus.connected,
     ),
     _ => Icon(_glyph, size: _glyphSize, color: Colors.white),
   };

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dartx/dartx_io.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -17,12 +18,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'rules_notifier.g.dart';
 
 const _geoUrl = 'https://raw.githubusercontent.com/hiddify/hiddify-geo/rule-set';
+const _geositeUrl = 'https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set';
 
 /// Rules the app ships with, in the order a new list starts with. They are always in the list: the user can
 /// only switch and move them, and their content comes from here, so an update can change it.
 enum BuiltinRule {
   bypassLan(enabledByDefault: true),
-  appleDirect(enabledByDefault: true),
+  systemDirect(enabledByDefault: false),
   blockAds(enabledByDefault: false),
   bypassRegion(enabledByDefault: true);
 
@@ -33,11 +35,20 @@ enum BuiltinRule {
   /// Saved as the rule's name; the list shows [present] instead.
   String get key => 'builtin:$name';
 
-  static BuiltinRule? of(Rule rule) => values.where((builtin) => builtin.key == rule.name).firstOrNull;
+  /// The names built-in rules were saved under before, each with the rule it is now.
+  static const _formerKeys = {'builtin:appleDirect': systemDirect};
+
+  static BuiltinRule? of(Rule rule) =>
+      values.where((builtin) => builtin.key == rule.name).firstOrNull ?? _formerKeys[rule.name];
 
   String present(Translations t, Region region) => switch (this) {
     bypassLan => t.pages.settings.routing.builtinRules.bypassLan,
-    appleDirect => t.pages.settings.routing.builtinRules.appleDirect,
+    systemDirect => switch (defaultTargetPlatform) {
+      TargetPlatform.iOS || TargetPlatform.macOS => t.pages.settings.routing.builtinRules.systemDirect.apple,
+      TargetPlatform.windows => t.pages.settings.routing.builtinRules.systemDirect.microsoft,
+      TargetPlatform.android || TargetPlatform.fuchsia => t.pages.settings.routing.builtinRules.systemDirect.android,
+      TargetPlatform.linux => t.pages.settings.routing.builtinRules.systemDirect.linux,
+    },
     blockAds => t.pages.settings.routing.builtinRules.blockAds,
     bypassRegion => t.pages.settings.routing.builtinRules.bypassRegion(region: region.presentName(t)),
   };
@@ -61,26 +72,69 @@ enum BuiltinRule {
         '::/128',
       ],
     ),
-    // Apple's services (App Store, iMessage, TestFlight, iCloud) are not filtered and move a lot of data, so
-    // they go direct instead of through the proxy. The rule set carries the full list; the suffixes cover
-    // the main services until it is downloaded, and if it never is.
-    appleDirect => Rule(
-      outbound: Outbound.direct,
-      ruleSets: ['https://raw.githubusercontent.com/SagerNet/sing-geosite/rule-set/geosite-apple.srs'],
-      domainSuffixes: [
-        'apple.com',
-        'icloud.com',
-        'icloud-content.com',
-        'apple-dns.net',
-        'cdn-apple.com',
-        'mzstatic.com',
-        'aaplimg.com',
-        'itunes.com',
-        'apple-cloudkit.com',
-        'apple-mapkit.com',
-        'testflight.apple.com',
-      ],
-    ),
+    // The system's own services (updates, app store, push, cloud sync) are not filtered and move a lot of
+    // data, so they go direct instead of through the proxy. The rule set carries the full list; the suffixes
+    // cover the main services until it is downloaded, and if it never is.
+    systemDirect => switch (defaultTargetPlatform) {
+      TargetPlatform.iOS || TargetPlatform.macOS => Rule(
+        outbound: Outbound.direct,
+        ruleSets: ['$_geositeUrl/geosite-apple.srs'],
+        domainSuffixes: [
+          'apple.com',
+          'icloud.com',
+          'icloud-content.com',
+          'apple-dns.net',
+          'cdn-apple.com',
+          'mzstatic.com',
+          'aaplimg.com',
+          'itunes.com',
+          'apple-cloudkit.com',
+          'apple-mapkit.com',
+          'testflight.apple.com',
+        ],
+      ),
+      TargetPlatform.windows => Rule(
+        outbound: Outbound.direct,
+        ruleSets: ['$_geositeUrl/geosite-microsoft.srs'],
+        domainSuffixes: [
+          'microsoft.com',
+          'windows.com',
+          'windows.net',
+          'windowsupdate.com',
+          'msftconnecttest.com',
+          'msftncsi.com',
+          'live.com',
+          'office.com',
+          'office.net',
+          'microsoftonline.com',
+          'onedrive.com',
+          'msedge.net',
+        ],
+      ),
+      // Google Play is left out: it refuses some countries' addresses, so it only works through the proxy there.
+      TargetPlatform.android || TargetPlatform.fuchsia => Rule(
+        outbound: Outbound.direct,
+        ruleSets: ['$_geositeUrl/geosite-android.srs', '$_geositeUrl/geosite-googlefcm.srs'],
+        domainSuffixes: ['android.com', 'mtalk.google.com'],
+      ),
+      TargetPlatform.linux => Rule(
+        outbound: Outbound.direct,
+        ruleSets: [
+          '$_geositeUrl/geosite-ubuntu.srs',
+          '$_geositeUrl/geosite-debian.srs',
+          '$_geositeUrl/geosite-fedora.srs',
+          '$_geositeUrl/geosite-archlinux.srs',
+        ],
+        domainSuffixes: [
+          'ubuntu.com',
+          'debian.org',
+          'fedoraproject.org',
+          'archlinux.org',
+          'flathub.org',
+          'snapcraft.io',
+        ],
+      ),
+    },
     blockAds => Rule(
       outbound: Outbound.block,
       ruleSets: [

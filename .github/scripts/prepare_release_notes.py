@@ -4,14 +4,19 @@
 Usage:
   prepare_release_notes.py <release.md> <assets-dir> [tag]
   prepare_release_notes.py <body.md> --release-json <release.json> <tag>
+  prepare_release_notes.py <body.md> --vt-results <results.json>
 
 The first form fills <!-- ASSET_LINKS --> in the template with rows only for files
 that exist under assets-dir. The second form rewrites only the download table of an
 already published body (between the ASSETS markers), taking names and sha256 digests
 from the GitHub API release JSON, so nothing needs to be downloaded and manual edits
-to the rest of the notes survive.
-VirusTotal badge <img> URLs include a random &v=… query so GitHub / CDN caches
-do not keep a stale “Error 404” after a new scan.
+to the rest of the notes survive. A VirusTotal badge already in that body is kept.
+The third form writes the detection counts from virustotal_report.py --json into the
+VirusTotal badges of a published body.
+
+The VirusTotal badges are static shields.io images with the count baked in, set by CI
+with its own API key. Live badge services query VirusTotal with one shared key and show
+"Error 429" whenever that key is over its quota.
 """
 
 from __future__ import annotations
@@ -44,6 +49,10 @@ ASSET_CATALOG: list[tuple[str, str, str]] = [
     ("Linux", "Hiddify-Debian-x64.deb", "DebPackage x64"),
     ("Linux", "Hiddify-rpm-x64.rpm", "RpmPackage x64"),
 ]
+
+# Not sent to VirusTotal: it rejects the IPA upload (HTTP 409), and an iOS app cannot
+# run outside the App Store or a sideloading tool anyway.
+NO_VT_SCAN = {"Hiddify-iOS.ipa"}
 
 ASSET_MARKER = "<!-- ASSET_LINKS -->"
 TABLE_BEGIN = "<!-- ASSETS:BEGIN -->"
@@ -95,15 +104,43 @@ def downloads_badge_img(tag: str, filename: str, bust: str) -> str:
     return f'<img src="{src}" alt="downloads">'
 
 
-def vt_badge_img(sha256: str, bust: str) -> str:
-    # Random number at the end busts GitHub's cached badge image.
-    src = f"https://badges.cssnr.com/vt/id/{sha256}?start=green&end=red&n=8&v={bust}"
+def vt_badge_src(result: dict | None) -> str:
+    """Static badge for a virustotal_report.py result: {"count": n, "total": t} or None."""
+    if not result or not result.get("total"):
+        return "https://img.shields.io/badge/scanning-lightgrey"
+    count, total = result["count"], result["total"]
+    color = "brightgreen" if count == 0 else "yellow" if count <= 3 else "red"
+    return f"https://img.shields.io/badge/{count}%2F{total}-{color}"
+
+
+def vt_badge_img(sha256: str, src: str) -> str:
     href = f"https://www.virustotal.com/gui/file/{sha256}/detection"
     return f'<a href="{href}"><img src="{src}" alt="VirusTotal"></a>'
 
 
-def render_links(tag: str, assets: dict[str, "Path | str"], bust: str) -> str:
-    """assets maps file name -> local Path (hashed here) or a known sha256 hex string."""
+def vt_badge_pattern(sha256: str) -> re.Pattern:
+    href = re.escape(f"https://www.virustotal.com/gui/file/{sha256}/detection")
+    return re.compile(rf'<a href="{href}"><img src="([^"]*)" alt="VirusTotal"></a>')
+
+
+def existing_vt_src(body: str, sha256: str) -> str | None:
+    """The badge an earlier scan set for this file, unless it is a live-service badge."""
+    match = vt_badge_pattern(sha256).search(body)
+    if match and match.group(1).startswith("https://img.shields.io/"):
+        return match.group(1)
+    return None
+
+
+def apply_vt_results(body: str, results: dict[str, dict | None]) -> str:
+    for sha256, result in results.items():
+        body = vt_badge_pattern(sha256).sub(lambda _: vt_badge_img(sha256, vt_badge_src(result)), body)
+    return body
+
+
+def render_links(tag: str, assets: dict[str, "Path | str"], bust: str, old_body: str = "") -> str:
+    """assets maps file name -> local Path (hashed here) or a known sha256 hex string.
+
+    old_body: a published body whose VirusTotal badges are kept for unchanged files."""
     rowspan_pending: dict[str, int] = {}
     for os_name, filename, _ in ASSET_CATALOG:
         if find_asset(assets, filename) is None:
@@ -121,7 +158,10 @@ def render_links(tag: str, assets: dict[str, "Path | str"], bust: str) -> str:
         url = f"https://github.com/{REPO}/releases/download/{tag}/{filename}"
         download = f'<a href="{url}">{label}</a>'
         downloads = f'<a href="{url}">{downloads_badge_img(tag, filename, bust)}</a>'
-        vt = vt_badge_img(digest, bust)
+        if filename in NO_VT_SCAN:
+            vt = "-"
+        else:
+            vt = vt_badge_img(digest, existing_vt_src(old_body, digest) or vt_badge_src(None))
 
         cells: list[str] = []
         first = os_emitted.get(os_name, 0) == 0
@@ -189,16 +229,25 @@ def main() -> int:
         if not tag:
             tag = json.loads(release_json.read_text())["tag_name"]
         assets = assets_from_release_json(release_json)
-        links = render_links(tag, assets, cache_bust())
-        notes_path.write_text(replace_table(notes_path.read_text(), links).strip() + "\n")
+        body = notes_path.read_text()
+        links = render_links(tag, assets, cache_bust(), old_body=body)
+        notes_path.write_text(replace_table(body, links).strip() + "\n")
         present = sum(1 for _, name, _ in ASSET_CATALOG if find_asset(assets, name))
         print(f"rewrote download table with {present} rows for tag {tag}")
+        return 0
+
+    if len(args) == 3 and args[1] == "--vt-results":
+        notes_path, results_path = Path(args[0]), Path(args[2])
+        results = json.loads(results_path.read_text())
+        notes_path.write_text(apply_vt_results(notes_path.read_text(), results))
+        print(f"wrote VirusTotal results for {len(results)} files")
         return 0
 
     if len(args) < 2:
         print(
             f"usage: {sys.argv[0]} <release.md> <assets-dir> [tag]\n"
-            f"       {sys.argv[0]} <body.md> --release-json <release.json> [tag]",
+            f"       {sys.argv[0]} <body.md> --release-json <release.json> [tag]\n"
+            f"       {sys.argv[0]} <body.md> --vt-results <results.json>",
             file=sys.stderr,
         )
         return 2

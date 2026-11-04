@@ -68,6 +68,15 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
     /** What is on screen right now (title, text, header); an unchanged refresh is skipped. */
     private var shown: Triple<String, String, String>? = null
 
+    /**
+     * Whether the service notification is up: from [show] until [close]. A poll whose blocking
+     * SystemInfo call was already in flight when the service stopped returns after [close]; with
+     * this cleared, it is dropped instead of posting the notification again, which then stayed,
+     * ongoing, after the VPN was stopped. Guarded by [lock], with [shown].
+     */
+    private var active = false
+    private val lock = Any()
+
     private val modeLabel: String
         get() = service.getString(
             if (Settings.serviceMode == ServiceMode.VPN) R.string.mode_vpn else R.string.mode_proxy
@@ -108,20 +117,26 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
                 NotificationChannel(notificationChannel, "hiddify service", NotificationManager.IMPORTANCE_LOW)
             )
         }
-        render(profileName, service.getString(contentTextId), modeLabel, foreground = true)
+        synchronized(lock) {
+            active = true
+            render(profileName, service.getString(contentTextId), modeLabel, foreground = true)
+        }
     }
 
     private fun render(profile: String, text: String, header: String, foreground: Boolean = false) {
-        val next = Triple(profile.ifBlank { "Hiddify" }, text, header)
-        if (!foreground && next == shown) return
-        shown = next
-        val built = notificationBuilder
-            .setContentTitle(next.first)
-            .setContentText(next.second)
-            .setSubText(next.third)
-            .build()
-        if (foreground) service.startForeground(notificationId, built)
-        else Application.notification.notify(notificationId, built)
+        synchronized(lock) {
+            if (!active) return
+            val next = Triple(profile.ifBlank { "Hiddify" }, text, header)
+            if (!foreground && next == shown) return
+            shown = next
+            val built = notificationBuilder
+                .setContentTitle(next.first)
+                .setContentText(next.second)
+                .setSubText(next.third)
+                .build()
+            if (foreground) service.startForeground(notificationId, built)
+            else Application.notification.notify(notificationId, built)
+        }
     }
 
     suspend fun start() {
@@ -147,8 +162,13 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
 
     fun close() {
         stopPolling()
-        shown = null
-        ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        synchronized(lock) {
+            active = false
+            shown = null
+            ServiceCompat.stopForeground(service, ServiceCompat.STOP_FOREGROUND_REMOVE)
+            // and by its id, in case a refresh reposted it with notify()
+            Application.notification.cancel(notificationId)
+        }
         if (receiverRegistered) {
             service.unregisterReceiver(this)
             receiverRegistered = false
@@ -165,6 +185,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
             while (isActive) {
                 try {
                     val info = coreClient.GetSystemInfo().executeBlocking(Empty())
+                    if (!isActive) break // stopped while the call was in flight
                     update(previous, info, showSpeed)
                     previous = info
                 } catch (e: CancellationException) {

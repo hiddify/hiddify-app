@@ -142,6 +142,8 @@ dev_dependencies:
   dart_mappable_builder: ^4.2.1
   # protoc_builder: ^0.4.1
   # google_protobuf: ^3.20.1;
+  # the tests build the HTTP/2 errors grpc reports; the version is the override below
+  http2: any
 
 # grpc still allows only http2 2.x, but http2 3.1.0 fixes a cancelled call
 # taking down the whole connection (dart-lang/http#1799). Remove this once

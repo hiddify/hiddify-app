@@ -589,8 +589,8 @@
         "directPort": "Direct portu",
         "redirectPort": "Yönlendirme portu",
         "lanSharing": "Güvenli VPN paylaşımı",
+        "connectionSharing": "Bağlantı paylaşımı",
         "qrCode": "QR kod",
-        "lanQrSubtitle": "SOCKS5 proxy",
         "closedInVpn": "VPN modunda kapalı, paylaşılmadıkça",
         "proxySecret": "Proxy parolası",
         "noSecret": "Parola yok: porta erişen her uygulama veya cihaz kullanabilir",
@@ -912,8 +912,8 @@
     "qrCode": {
       "copyFullLink": "Tam bağlantıyı kopyala",
       "copied": "Kopyalandı",
-      "localOnlyTitle": "Yalnızca bu cihaz",
-      "localOnlyMessage": "Diğer cihazlar 127.0.0.1 adresine erişemez",
+      "lanLine": "SOCKS5 · yalnızca aynı ağ",
+      "noLocalNetwork": "Yerel ağ bulunamadı",
       "ip": "IP",
       "port": "Port",
       "username": "Kullanıcı adı",
@@ -967,19 +967,27 @@
       "otherCountries": "Diğerleri"
     },
     "localProxy": {
-      "title": "Yerel proxy",
-      "lead": "Proxy modu manueldir; her uygulamayı kendiniz ayarlamanız gerekir:",
       "steps": [
         "Uygulamanın proxy ayarlarını açın",
         "SOCKS5 veya HTTP seçin",
-        "Aşağıdaki bilgileri girin",
+        "Aşağıdaki değerleri girin · kopyalamak için dokunun",
         "Hiddify'ı bağlı tutun"
       ],
-      "changePassword": "Parolayı değiştir",
       "hint": "Proxy modu · nasıl kullanılır",
       "setPassword": "Parola belirle",
       "manual": "Manuel",
-      "dontShowAgain": "Bir daha gösterme"
+      "dontShowAgain": "Bir daha gösterme",
+      "thisDevice": "Bu cihaz",
+      "otherDevices": "Diğer cihazlar",
+      "server": "Sunucu",
+      "noPassword": "Parola ayarlanmadı",
+      "turnOnSharing": "Paylaşımı aç",
+      "copyLink": "Bağlantıyı kopyala",
+      "telegramLink": "Telegram bağlantısı",
+      "fullLink": "Tam bağlantı",
+      "portRange": "1024 ile 65535 arasında bir port kullanın",
+      "passwordTooShort": "En az 4 karakter",
+      "edit": "Düzenle"
     }
   },
   "connection": {

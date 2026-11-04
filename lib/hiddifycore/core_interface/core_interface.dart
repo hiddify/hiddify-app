@@ -61,6 +61,11 @@ class CoreInterface {
     return fgClient == bgClient;
   }
 
+  /// Whether the two channels reach one core process, so its log comes down both of them. On
+  /// Android the VPN service runs in the app's process (no android:process), and a listener on
+  /// each channel logged every core line twice.
+  bool get coreSharesProcess => false;
+
   /// Whether the system keeps a VPN profile for the app that [resetTunnel] can remove.
   bool get hasVpnProfile => false;
 

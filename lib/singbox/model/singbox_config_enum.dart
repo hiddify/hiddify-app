@@ -82,6 +82,30 @@ enum BalancerStrategy {
   };
 }
 
+/// What a profile's select group starts on until the user picks a proxy in it; their pick is kept.
+@JsonEnum(valueField: 'key')
+enum DefaultProxy {
+  lowest("lowest"),
+  balance("balance"),
+  first("first");
+
+  const DefaultProxy(this.key);
+
+  final String key;
+
+  String present(TranslationsEn t) => switch (this) {
+    lowest => t.pages.settings.routing.defaultProxy.lowest,
+    balance => t.pages.settings.routing.defaultProxy.balance,
+    first => t.pages.settings.routing.defaultProxy.first,
+  };
+
+  String describe(TranslationsEn t) => switch (this) {
+    lowest => t.pages.settings.routing.defaultProxy.lowestDescription,
+    balance => t.pages.settings.routing.defaultProxy.balanceDescription,
+    first => t.pages.settings.routing.defaultProxy.firstDescription,
+  };
+}
+
 /// IPv6 for the apps. Off by default ([ipv4Only]): most proxies have no IPv6 at their exit, and a
 /// connection the proxy cannot carry dies after it opened, which browsers never retry over IPv4
 /// (#2307, #2420). On ([preferIPv4], [preferIPv6]), the core verifies each proxy once at its URL
