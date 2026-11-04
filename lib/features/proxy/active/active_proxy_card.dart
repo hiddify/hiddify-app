@@ -395,8 +395,7 @@ class _HopRow extends ConsumerWidget {
         // while it connects, what the hop runs and what it is doing, as the core names it ("Psiphon ⏳
         // Connecting...", "WARP · Auto 🔑 Registering..."), in place of the IP's placeholder
         StepStatus.connecting when live => ProxyTypeLabel(
-          // the icon in the flag's place shows the state, so the core's emoji for it goes
-          (hop?.type ?? card.hopMode.present(t)).replaceFirst(_statusEmoji, ' '),
+          hop?.type ?? card.hopMode.present(t),
           style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
         ),
         _ => _IpSlot(status == StepStatus.connected ? hop : null, boneWidth: 64, isFinal: card.chain.isExtraSecurity()),
@@ -445,10 +444,6 @@ class _HopRow extends ConsumerWidget {
     );
   }
 }
-
-/// The core's emoji for a hop's state, before its word ("Psiphon ⏳ Connecting..."); not the
-/// scanner's magnifier, which is followed by an endpoint, not a word.
-final _statusEmoji = RegExp(r'\s*(⏳|⌛|🔍|🔑)\s(?=[A-Za-z][^·]*$)');
 
 /// A connecting hop's live state on a small tile: an hourglass that flips while it connects, a clock
 /// when it is slow, a pulsing fingerprint while WARP registers, a circling magnifier while it
