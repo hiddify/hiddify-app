@@ -164,7 +164,14 @@ class LanSharingQrDialog extends HookConsumerWidget {
       links: host == null ? null : (telegram: _telegramLink(host, port, secret), full: link!),
       // while it is off there is no link to copy, and Turn off gives way to Turn on over the content
       copyLink: shared,
-      action: shared ? TextButton(onPressed: () => share(false), child: Text(t.dialogs.localProxy.turnOff)) : null,
+      // Turn off in the look of Turn on
+      action: shared
+          ? FilledButton.icon(
+              onPressed: () => share(false),
+              icon: const Icon(Icons.power_settings_new_rounded, size: 18),
+              label: Text(t.dialogs.localProxy.turnOff),
+            )
+          : null,
       children: [
         if (shared)
           content
