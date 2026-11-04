@@ -10,72 +10,26 @@ import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/utils/proxy_secret.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
-import 'package:hiddify/features/settings/widget/proxy_secret_editor.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-/// What another device needs to use a shared proxy by hand. [ip] is null until it's known;
-/// [password] is null for a port that asks for none, and empty for one whose secret was removed.
-typedef ProxyCredentials = ({InternetAddress? ip, int port, String username, String? password});
-
 class QrCodeDialog extends HookConsumerWidget {
-  const QrCodeDialog(
-    this.data, {
-    super.key,
-    required this.title,
-    required this.link,
-    this.subtitle,
-    this.icon,
-    this.intro,
-    this.credentials,
-    this.loading = false,
-    this.showCode = true,
-    this.footer,
-    this.onEditPassword,
-    this.header,
-  });
+  const QrCodeDialog(this.data, {super.key, required this.title, required this.link});
 
-  /// At the top, over everything else.
-  final Widget? header;
-
-  /// The text encoded in the QR code, or null when there's none.
-  final String? data;
+  /// The text encoded in the QR code.
+  final String data;
   final String title;
-  final String? subtitle;
 
-  /// Above the title, when there is no code to show.
-  final IconData? icon;
-
-  /// Under the title, in place of [subtitle].
-  final Widget? intro;
-
-  /// Copied by the copy-full-link button, which is off while this is null.
-  final String? link;
-
-  /// Shown as copyable tiles under the title when set.
-  final ProxyCredentials? credentials;
-
-  /// Whether [data] is still on its way. A null [data] that isn't loading has no code to show.
-  final bool loading;
-
-  /// False for a proxy only this device can reach: there is no code to scan, nor its place.
-  final bool showCode;
-
-  /// Over the buttons.
-  final Widget? footer;
-
-  /// Changes the password, offered next to it once it is shown.
-  final VoidCallback? onEditPassword;
+  /// Copied by the copy-full-link button.
+  final String link;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
     final linkCopied = _useCopiedFlag();
-    final data = this.data;
-    final link = this.link;
 
     return Dialog(
       child: SizedBox(
@@ -85,44 +39,17 @@ class QrCodeDialog extends HookConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (header case final header?) ...[header, const Gap(20)],
-              if (showCode) ...[if (data != null) _QrCode(data) else _QrPlaceholder(loading: loading), const Gap(16)],
-              if (icon case final icon? when !showCode) ...[
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(color: theme.colorScheme.primaryContainer, shape: BoxShape.circle),
-                  child: Icon(icon, size: 28, color: theme.colorScheme.onPrimaryContainer),
-                ),
-                const Gap(12),
-              ],
+              _QrCode(data),
+              const Gap(16),
               Text(title, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
-              if (intro case final intro?) ...[
-                const Gap(8),
-                intro,
-              ] else if (subtitle != null) ...[
-                const Gap(4),
-                Text(
-                  subtitle!,
-                  style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              if (credentials != null) ...[
-                const Gap(16),
-                _CredentialTiles(credentials!, onEditPassword: onEditPassword),
-              ],
-              if (footer case final footer?) ...[const Gap(8), footer],
               const Gap(12),
               Row(
                 children: [
                   TextButton(
-                    onPressed: link == null
-                        ? null
-                        : () {
-                            Clipboard.setData(ClipboardData(text: link));
-                            linkCopied.show();
-                          },
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: link));
+                      linkCopied.show();
+                    },
                     child: _CopiedSwap(
                       label: t.dialogs.qrCode.copyFullLink,
                       copied: linkCopied.value,
@@ -140,44 +67,6 @@ class QrCodeDialog extends HookConsumerWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-/// The QR dialog for LAN sharing. It opens at once and looks up this device's local IP while open.
-class LanSharingQrDialog extends HookConsumerWidget {
-  const LanSharingQrDialog({super.key, this.header});
-
-  final Widget? header;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-    // One lookup per opening. The time limit keeps a core that never answers from leaving the
-    // dialog loading forever.
-    final lookup = useFuture(
-      useMemoized(() => _findLanIp(ref).timeout(const Duration(seconds: 10), onTimeout: () => null)),
-    );
-    // Null while the lookup runs. A lookup that ends without an address gets 127.0.0.1, the same
-    // answer the core gives when this device has no local network.
-    final ip = lookup.connectionState == ConnectionState.done ? (lookup.data ?? InternetAddress.loopbackIPv4) : null;
-    const username = 'hiddify';
-    // the network has a port of its own, apart from this device's
-    final port = ref.watch(ConfigOptions.lanSharingPort);
-    final password = ref.watch(ConfigOptions.lanSharingPassword);
-    final name = ip?.isLoopback ?? false ? QrCodeDialogConst.localhostProfileName : QrCodeDialogConst.lanProfileName;
-    final link = ip == null ? null : 'socks://${_userInfo(password)}${ip.address}:$port#$name';
-
-    return QrCodeDialog(
-      // The device that scans the code would reach itself at 127.0.0.1, so that gets no code.
-      ip == null || ip.isLoopback ? null : '#profile-title: $name\n$link',
-      title: name,
-      subtitle: t.pages.settings.inbound.lanQrSubtitle,
-      link: link,
-      credentials: (ip: ip, port: port, username: username, password: password),
-      loading: ip == null,
-      onEditPassword: () => editProxySecret(ref),
-      header: header,
     );
   }
 }
@@ -215,10 +104,64 @@ class ProxyDialog extends HookWidget {
   }
 }
 
+/// What another device on the local network needs to use the shared proxy: a code to scan, and the
+/// values to enter by hand. It opens at once and looks up this device's local IP while open. The
+/// network's port always asks for the password.
+class LanSharingQrDialog extends HookConsumerWidget {
+  const LanSharingQrDialog({super.key, this.header});
+
+  final Widget? header;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    // One lookup per opening. The time limit keeps a core that never answers from leaving the
+    // dialog loading forever.
+    final lookup = useFuture(
+      useMemoized(() => _findLanIp(ref).timeout(const Duration(seconds: 10), onTimeout: () => null)),
+    );
+    // Null while the lookup runs. A lookup that ends without an address gets 127.0.0.1, the same
+    // answer the core gives when this device has no local network.
+    final ip = lookup.connectionState == ConnectionState.done ? (lookup.data ?? InternetAddress.loopbackIPv4) : null;
+    // the network has a port of its own, apart from this device's
+    final port = ref.watch(ConfigOptions.lanSharingPort);
+    final secret = ref.watch(ConfigOptions.lanSharingPassword);
+    // The device that scans would reach itself at 127.0.0.1, so that gets no code and no link.
+    final host = ip == null || ip.isLoopback ? null : ip.address;
+    const name = QrCodeDialogConst.lanProfileName;
+    final link = host == null ? null : 'socks://${_userInfo(secret)}$host:$port#$name';
+
+    return _ProxyDialogFrame(
+      header: header,
+      links: host == null ? null : (telegram: _telegramLink(host, port, secret), full: link!),
+      children: [
+        if (link != null) _QrCode('#profile-title: $name\n$link') else _QrPlaceholder(loading: ip == null),
+        const Gap(10),
+        Text(
+          t.dialogs.qrCode.lanLine,
+          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          textAlign: TextAlign.center,
+        ),
+        const Gap(14),
+        _ProxyFields(
+          hostLabel: t.dialogs.qrCode.ip,
+          host: ip?.address,
+          port: port,
+          onPortSaved: ref.read(ConfigOptions.lanSharingPort.notifier).update,
+          // one the user removed in the settings leaves the port open to the whole network
+          password: secret.isEmpty ? null : secret,
+          onSetPassword: () => ref.read(ConfigOptions.lanSharingPassword.notifier).update(generateProxySecret()),
+        ),
+      ],
+    );
+  }
+}
+
 /// What other apps on this device need to use the local proxy: proxy mode routes nothing by itself,
-/// each app is set to use it in its own settings. The port and the password are edited in place.
-/// [onPick] offers not to show it again on picking proxy mode.
-class LocalProxyDialog extends HookConsumerWidget {
+/// each app is set to use it in its own settings. [onPick] offers not to show it again on picking
+/// proxy mode.
+class LocalProxyDialog extends ConsumerWidget {
   const LocalProxyDialog({super.key, this.onPick = false, this.header});
 
   final bool onPick;
@@ -227,31 +170,14 @@ class LocalProxyDialog extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    final text = t.dialogs.localProxy;
     final port = ref.watch(ConfigOptions.mixedPort);
     final auth = ref.watch(ConfigOptions.localProxyAuth);
     // the one secret of the user "hiddify", shared with the local network's port
     final secret = ref.watch(ConfigOptions.lanSharingPassword);
-    final editing = useState<_Field?>(null);
-    final linkCopied = _useCopiedFlag();
-    const username = 'hiddify';
-
     // the local port asks for the secret only while the user has it ask
     final asked = auth ? secret : '';
-    final link = 'socks://${_userInfo(asked)}127.0.0.1:$port#${QrCodeDialogConst.localhostProfileName}';
-    final telegram = Uri(
-      scheme: 'tg',
-      host: 'socks',
-      queryParameters: {
-        'server': '127.0.0.1',
-        'port': '$port',
-        if (asked.isNotEmpty) ...{'user': username, 'pass': asked},
-      },
-    ).toString();
-    void copyLink(String value) {
-      Clipboard.setData(ClipboardData(text: value));
-      linkCopied.show();
-    }
+    const host = '127.0.0.1';
+    final link = 'socks://${_userInfo(asked)}$host:$port#${QrCodeDialogConst.localhostProfileName}';
 
     // A password that is asked must exist: one the user removed in the settings gets a new one.
     Future<void> setPassword() async {
@@ -259,29 +185,41 @@ class LocalProxyDialog extends HookConsumerWidget {
       await ref.read(ConfigOptions.localProxyAuth.notifier).update(true);
     }
 
-    Widget editor(_Field field) => _FieldEditor(
-      label: field == _Field.port ? t.dialogs.qrCode.port : t.dialogs.qrCode.password,
-      initial: field == _Field.port ? '$port' : secret,
-      mono: field == _Field.password,
-      validate: (value) => switch (field) {
-        _Field.port => switch (int.tryParse(value)) {
-          final p? when p >= 1024 && p <= 65535 => null,
-          _ => text.portRange,
-        },
-        _Field.password => value.length < 4 ? text.passwordTooShort : null,
-      },
-      onSave: (value) async {
-        if (field == _Field.port) {
-          await ref.read(ConfigOptions.mixedPort.notifier).update(int.parse(value));
-        } else {
-          await ref.read(ConfigOptions.lanSharingPassword.notifier).update(value);
-        }
-        editing.value = null;
-      },
-      onCancel: () => editing.value = null,
+    return _ProxyDialogFrame(
+      header: header,
+      links: (telegram: _telegramLink(host, port, asked), full: link),
+      footer: onPick ? const _DontShowAgain() : null,
+      children: [
+        _Steps(t.dialogs.localProxy.steps),
+        const Gap(16),
+        _ProxyFields(
+          hostLabel: t.dialogs.localProxy.server,
+          host: host,
+          port: port,
+          onPortSaved: ref.read(ConfigOptions.mixedPort.notifier).update,
+          password: asked.isEmpty ? null : asked,
+          onSetPassword: setPassword,
+        ),
+      ],
     );
-    Widget edit(_Field field) => _TileIcon(text.edit, Icons.edit_outlined, () => editing.value = field);
+  }
+}
 
+/// The two links of a proxy dialog's Copy link menu.
+typedef _Links = ({String telegram, String full});
+
+/// A proxy dialog: [header] (the tabs), [children], [footer], then Copy link — off while [links]
+/// is null — and Close.
+class _ProxyDialogFrame extends StatelessWidget {
+  const _ProxyDialogFrame({required this.header, required this.links, required this.children, this.footer});
+
+  final Widget? header;
+  final _Links? links;
+  final List<Widget> children;
+  final Widget? footer;
+
+  @override
+  Widget build(BuildContext context) {
     return Dialog(
       child: SizedBox(
         width: 360,
@@ -291,89 +229,12 @@ class LocalProxyDialog extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (header case final header?) ...[header, const Gap(20)],
-              _Steps(text.steps),
-              const Gap(16),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
-                alignment: Alignment.topCenter,
-                child: Column(
-                  children: [
-                    if (editing.value == _Field.port)
-                      editor(_Field.port)
-                    else
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _CopyTile(
-                              label: text.server,
-                              value: const _Value('127.0.0.1'),
-                              copyText: '127.0.0.1',
-                            ),
-                          ),
-                          const Gap(8),
-                          IntrinsicWidth(
-                            child: _CopyTile(
-                              label: t.dialogs.qrCode.port,
-                              value: _Value('$port'),
-                              copyText: '$port',
-                              action: edit(_Field.port),
-                            ),
-                          ),
-                        ],
-                      ),
-                    const Gap(8),
-                    if (!auth)
-                      _NoPasswordBar(text.noPassword, action: text.setPassword, onAction: setPassword)
-                    else if (editing.value == _Field.password)
-                      editor(_Field.password)
-                    else
-                      Row(
-                        children: [
-                          IntrinsicWidth(
-                            child: _CopyTile(
-                              label: t.dialogs.qrCode.username,
-                              value: const _Value(username),
-                              copyText: username,
-                            ),
-                          ),
-                          const Gap(8),
-                          Expanded(
-                            child: _CopyTile(
-                              label: t.dialogs.qrCode.password,
-                              // seen only while edited
-                              value: const _Value('••••••••'),
-                              copyText: secret,
-                              action: edit(_Field.password),
-                            ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
-              ),
-              if (onPick) ...[const Gap(8), const _DontShowAgain()],
+              ...children,
+              if (footer case final footer?) ...[const Gap(8), footer],
               const Gap(12),
               Row(
                 children: [
-                  MenuAnchor(
-                    menuChildren: [
-                      MenuItemButton(
-                        leadingIcon: const Icon(Icons.telegram, color: _telegramBlue),
-                        onPressed: () => copyLink(telegram),
-                        child: Text(text.telegramLink),
-                      ),
-                      MenuItemButton(
-                        leadingIcon: const Icon(Icons.link_rounded),
-                        onPressed: () => copyLink(link),
-                        child: Text(text.fullLink),
-                      ),
-                    ],
-                    builder: (context, menu, _) => TextButton(
-                      onPressed: () => menu.isOpen ? menu.close() : menu.open(),
-                      child: _CopiedSwap(label: text.copyLink, copied: linkCopied.value, alignment: Alignment.center),
-                    ),
-                  ),
+                  _CopyLinkButton(links),
                   const Spacer(),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -388,6 +249,175 @@ class LocalProxyDialog extends HookConsumerWidget {
     );
   }
 }
+
+/// Copy link: a menu of the Telegram and the full link. Picking one closes it and the button says
+/// Copied for a moment.
+class _CopyLinkButton extends HookConsumerWidget {
+  const _CopyLinkButton(this.links);
+
+  final _Links? links;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final text = ref.watch(translationsProvider).requireValue.dialogs.localProxy;
+    final copied = _useCopiedFlag();
+    final links = this.links;
+    void copy(String value) {
+      Clipboard.setData(ClipboardData(text: value));
+      copied.show();
+    }
+
+    return MenuAnchor(
+      menuChildren: [
+        if (links != null) ...[
+          MenuItemButton(
+            leadingIcon: const Icon(Icons.telegram, color: _telegramBlue),
+            onPressed: () => copy(links.telegram),
+            child: Text(text.telegramLink),
+          ),
+          MenuItemButton(
+            leadingIcon: const Icon(Icons.link_rounded),
+            onPressed: () => copy(links.full),
+            child: Text(text.fullLink),
+          ),
+        ],
+      ],
+      builder: (context, menu, _) => TextButton(
+        onPressed: links == null ? null : () => menu.isOpen ? menu.close() : menu.open(),
+        child: _CopiedSwap(label: text.copyLink, copied: copied.value, alignment: Alignment.center),
+      ),
+    );
+  }
+}
+
+/// The copyable values of a proxy: [host] (null while it is looked up) and [port], then the user
+/// and [password], or, while no password is asked ([password] null), a warning with [onSetPassword].
+/// The port and the password are edited in place; the password is seen only while edited.
+class _ProxyFields extends HookConsumerWidget {
+  const _ProxyFields({
+    required this.hostLabel,
+    required this.host,
+    required this.port,
+    required this.onPortSaved,
+    required this.password,
+    required this.onSetPassword,
+  });
+
+  final String hostLabel;
+  final String? host;
+  final int port;
+  final Future<void> Function(int) onPortSaved;
+  final String? password;
+  final VoidCallback onSetPassword;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final text = t.dialogs.localProxy;
+    final editing = useState<_Field?>(null);
+    final host = this.host;
+    final password = this.password;
+    const username = 'hiddify';
+
+    Widget editor(_Field field) => _FieldEditor(
+      label: field == _Field.port ? t.dialogs.qrCode.port : t.dialogs.qrCode.password,
+      initial: field == _Field.port ? '$port' : password ?? '',
+      mono: field == _Field.password,
+      validate: (value) => switch (field) {
+        _Field.port => switch (int.tryParse(value)) {
+          final p? when p >= 1024 && p <= 65535 => null,
+          _ => text.portRange,
+        },
+        _Field.password => value.length < 4 ? text.passwordTooShort : null,
+      },
+      onSave: (value) async {
+        if (field == _Field.port) {
+          await onPortSaved(int.parse(value));
+        } else {
+          await ref.read(ConfigOptions.lanSharingPassword.notifier).update(value);
+        }
+        editing.value = null;
+      },
+      onCancel: () => editing.value = null,
+    );
+    Widget edit(_Field field) => _TileIcon(text.edit, Icons.edit_outlined, () => editing.value = field);
+
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOutCubic,
+      alignment: Alignment.topCenter,
+      child: Column(
+        children: [
+          if (editing.value == _Field.port)
+            editor(_Field.port)
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: _CopyTile(
+                    label: hostLabel,
+                    value: host != null
+                        ? _Value(host)
+                        // Held at the text's line height so the tile keeps its height once the IP lands.
+                        : const SizedBox(
+                            height: 24,
+                            child: Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: ShimmerSkeleton(width: 96, height: 16),
+                            ),
+                          ),
+                    copyText: host,
+                  ),
+                ),
+                const Gap(8),
+                IntrinsicWidth(
+                  child: _CopyTile(
+                    label: t.dialogs.qrCode.port,
+                    value: _Value('$port'),
+                    copyText: '$port',
+                    action: edit(_Field.port),
+                  ),
+                ),
+              ],
+            ),
+          const Gap(8),
+          if (password == null)
+            _NoPasswordBar(text.noPassword, action: text.setPassword, onAction: onSetPassword)
+          else if (editing.value == _Field.password)
+            editor(_Field.password)
+          else
+            Row(
+              children: [
+                IntrinsicWidth(
+                  child: _CopyTile(label: t.dialogs.qrCode.username, value: const _Value(username), copyText: username),
+                ),
+                const Gap(8),
+                Expanded(
+                  child: _CopyTile(
+                    label: t.dialogs.qrCode.password,
+                    value: const _Value('••••••••'),
+                    copyText: password,
+                    action: edit(_Field.password),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// A link that adds the proxy to Telegram, with the user and [secret] when there is one.
+String _telegramLink(String host, int port, String secret) => Uri(
+  scheme: 'tg',
+  host: 'socks',
+  queryParameters: {
+    'server': host,
+    'port': '$port',
+    if (secret.isNotEmpty) ...{'user': 'hiddify', 'pass': secret},
+  },
+).toString();
 
 /// The values of the local proxy dialog that can be edited.
 enum _Field { port, password }
@@ -632,8 +662,7 @@ class _QrCode extends StatelessWidget {
   }
 }
 
-/// Holds the QR code's place, at its size: loading, or saying why there's no code. The only
-/// dialog without a code is LAN sharing on 127.0.0.1.
+/// Holds the QR code's place, at its size: loading, or saying there's no local network to share on.
 class _QrPlaceholder extends ConsumerWidget {
   const _QrPlaceholder({required this.loading});
 
@@ -658,116 +687,11 @@ class _QrPlaceholder extends ConsumerWidget {
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.devices_rounded, size: 44, color: theme.colorScheme.onSurfaceVariant),
+                Icon(Icons.wifi_off_rounded, size: 44, color: theme.colorScheme.onSurfaceVariant),
                 const Gap(10),
-                Text(t.dialogs.qrCode.localOnlyTitle, style: theme.textTheme.titleSmall, textAlign: TextAlign.center),
-                const Gap(4),
-                Text(
-                  t.dialogs.qrCode.localOnlyMessage,
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                  textAlign: TextAlign.center,
-                ),
+                Text(t.dialogs.qrCode.noLocalNetwork, style: theme.textTheme.titleSmall, textAlign: TextAlign.center),
               ],
             ),
-    );
-  }
-}
-
-class _CredentialTiles extends HookConsumerWidget {
-  const _CredentialTiles(this.credentials, {this.onEditPassword});
-
-  final ProxyCredentials credentials;
-  final VoidCallback? onEditPassword;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider).requireValue;
-    final revealed = useState(false);
-    final ip = credentials.ip;
-    final secret = credentials.password;
-
-    final username = _CopyTile(
-      label: t.dialogs.qrCode.username,
-      value: _Value(credentials.username),
-      copyText: credentials.username,
-    );
-    final password = _CopyTile(
-      label: t.dialogs.qrCode.password,
-      value: revealed.value ? ProxySecretText(secret ?? '') : const _Value('••••••••'),
-      copyText: secret,
-      action: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (revealed.value && onEditPassword != null)
-            _TileIcon(t.dialogs.localProxy.changePassword, Icons.edit_outlined, onEditPassword!),
-          _TileIcon(
-            revealed.value ? t.dialogs.qrCode.hidePassword : t.dialogs.qrCode.showPassword,
-            revealed.value ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-            () => revealed.value = !revealed.value,
-          ),
-        ],
-      ),
-    );
-
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _CopyTile(
-                label: t.dialogs.qrCode.ip,
-                value: ip != null
-                    ? _Value(ip.address)
-                    // Held at the text's line height so the tile keeps its height once the IP lands.
-                    : const SizedBox(
-                        height: 24,
-                        child: Align(
-                          alignment: AlignmentDirectional.centerStart,
-                          child: ShimmerSkeleton(width: 96, height: 16),
-                        ),
-                      ),
-                copyText: ip?.address,
-              ),
-            ),
-            const Gap(8),
-            IntrinsicWidth(
-              child: _CopyTile(
-                label: t.dialogs.qrCode.port,
-                value: _Value('${credentials.port}'),
-                copyText: '${credentials.port}',
-              ),
-            ),
-          ],
-        ),
-        // a port that asks for nothing has nothing more to set
-        if (secret == null)
-          const SizedBox.shrink()
-        // no secret: anyone who reaches the port can use it, without a user or password
-        else if (secret.isEmpty) ...[
-          const Gap(8),
-          _NoSecretWarning(
-            t.pages.settings.inbound.noSecret,
-            onSet: onEditPassword,
-            setLabel: t.dialogs.localProxy.setPassword,
-          ),
-        ]
-        // A revealed password needs the full width to fit on one line.
-        else if (revealed.value) ...[
-          const Gap(8),
-          username,
-          const Gap(8),
-          password,
-        ] else ...[
-          const Gap(8),
-          Row(
-            children: [
-              Expanded(child: username),
-              const Gap(8),
-              Expanded(child: password),
-            ],
-          ),
-        ],
-      ],
     );
   }
 }
@@ -861,35 +785,6 @@ class _TileIcon extends StatelessWidget {
     constraints: const BoxConstraints.tightFor(width: 40, height: 40),
     style: IconButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
   );
-}
-
-class _NoSecretWarning extends StatelessWidget {
-  const _NoSecretWarning(this.text, {this.onSet, required this.setLabel});
-
-  final String text;
-  final VoidCallback? onSet;
-  final String setLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.errorContainer.withValues(alpha: .5),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.lock_open_rounded, size: 20, color: theme.colorScheme.error),
-          const Gap(10),
-          Expanded(child: Text(text, style: theme.textTheme.bodyMedium)),
-          if (onSet != null) TextButton(onPressed: onSet, child: Text(setLabel)),
-        ],
-      ),
-    );
-  }
 }
 
 /// A tile's value text.
