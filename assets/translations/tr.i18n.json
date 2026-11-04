@@ -590,7 +590,6 @@
         "redirectPort": "Yönlendirme portu",
         "lanSharing": "Güvenli VPN paylaşımı",
         "qrCode": "QR kod",
-        "lanQrSubtitle": "SOCKS5 proxy",
         "closedInVpn": "VPN modunda kapalı, paylaşılmadıkça",
         "proxySecret": "Proxy parolası",
         "noSecret": "Parola yok: porta erişen her uygulama veya cihaz kullanabilir",
@@ -912,8 +911,8 @@
     "qrCode": {
       "copyFullLink": "Tam bağlantıyı kopyala",
       "copied": "Kopyalandı",
-      "localOnlyTitle": "Yalnızca bu cihaz",
-      "localOnlyMessage": "Diğer cihazlar 127.0.0.1 adresine erişemez",
+      "lanLine": "SOCKS5 · yalnızca aynı ağ",
+      "noLocalNetwork": "Yerel ağ bulunamadı",
       "ip": "IP",
       "port": "Port",
       "username": "Kullanıcı adı",
@@ -973,7 +972,6 @@
         "Aşağıdaki değerleri girin · kopyalamak için dokunun",
         "Hiddify'ı bağlı tutun"
       ],
-      "changePassword": "Parolayı değiştir",
       "hint": "Proxy modu · nasıl kullanılır",
       "setPassword": "Parola belirle",
       "manual": "Manuel",

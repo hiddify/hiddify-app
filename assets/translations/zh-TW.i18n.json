@@ -590,7 +590,6 @@
         "redirectPort": "重新導向連接埠",
         "lanSharing": "安全 VPN 共享",
         "qrCode": "QR Code",
-        "lanQrSubtitle": "SOCKS5 代理",
         "closedInVpn": "VPN 模式下關閉,除非共享",
         "proxySecret": "代理密鑰",
         "noSecret": "無密鑰:任何能連到該連接埠的應用程式或裝置都可使用",
@@ -912,8 +911,8 @@
     "qrCode": {
       "copyFullLink": "複製完整連結",
       "copied": "已複製",
-      "localOnlyTitle": "僅限此裝置",
-      "localOnlyMessage": "其他裝置無法連線到 127.0.0.1",
+      "lanLine": "SOCKS5 · 僅限同一網路",
+      "noLocalNetwork": "找不到區域網路",
       "ip": "IP",
       "port": "連接埠",
       "username": "使用者名稱",
@@ -973,7 +972,6 @@
         "填入下方的值 · 點按即可複製",
         "保持 Hiddify 連線"
       ],
-      "changePassword": "變更密碼",
       "hint": "代理模式 · 使用說明",
       "setPassword": "設定密碼",
       "manual": "手動",

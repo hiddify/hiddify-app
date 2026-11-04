@@ -622,7 +622,6 @@
         "redirectPort": "منفذ إعادة التوجيه",
         "lanSharing": "مشاركة VPN آمنة",
         "qrCode": "رمز QR",
-        "lanQrSubtitle": "وكيل SOCKS5",
         "closedInVpn": "مغلق في وضع VPN ما لم تتم المشاركة",
         "proxySecret": "كلمة سر الوكيل",
         "noSecret": "بلا كلمة سر: يمكن لأي تطبيق أو جهاز يصل إلى المنفذ استخدامه",
@@ -949,8 +948,8 @@
     "qrCode": {
       "copyFullLink": "نسخ الرابط الكامل",
       "copied": "تم النسخ",
-      "localOnlyTitle": "هذا الجهاز فقط",
-      "localOnlyMessage": "لا يمكن للأجهزة الأخرى الوصول إلى 127.0.0.1",
+      "lanLine": "SOCKS5 · الشبكة نفسها فقط",
+      "noLocalNetwork": "لم يُعثر على شبكة محلية",
       "ip": "IP",
       "port": "المنفذ",
       "username": "اسم المستخدم",
@@ -1010,7 +1009,6 @@
         "أدخل القيم أدناه · انقر للنسخ",
         "أبقِ Hiddify متصلًا"
       ],
-      "changePassword": "تغيير كلمة السر",
       "hint": "وضع الوكيل · طريقة الاستخدام",
       "setPassword": "تعيين كلمة سر",
       "manual": "يدوي",
