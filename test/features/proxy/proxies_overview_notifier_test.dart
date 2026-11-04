@@ -73,11 +73,13 @@ class _Notifications extends InAppNotificationController {
   void showErrorToast(String message) => errors.add(message);
 }
 
-/// A proxy as the core reports it; [testedAt] is the second its ping was measured.
+/// A proxy as the core reports it; [testedAt] is the second its ping was measured. The core sends
+/// the ping again as sort_delay, which the list sorts by.
 OutboundInfo proxy(String tag, int delay, {int testedAt = 1, bool group = false}) => OutboundInfo(
   tag: tag,
   isGroup: group,
   urlTestDelay: delay,
+  sortDelay: delay,
   urlTestTime: Timestamp.fromDateTime(DateTime.fromMillisecondsSinceEpoch(testedAt * 1000, isUtc: true)),
 );
 

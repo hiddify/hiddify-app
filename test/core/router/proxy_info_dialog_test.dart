@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/widgets/proxy_info_dialog.dart';
+import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,12 +12,18 @@ class _NoProxies extends ProxiesOverviewNotifier {
   Stream<OutboundGroup?> build() => Stream.value(null);
 }
 
+class _NoMainOutbounds extends MainOutboundsNotifier {
+  @override
+  Stream<OutboundGroupList> build() => const Stream.empty();
+}
+
 void main() {
   Future<Translations> show(WidgetTester tester, OutboundInfo proxy) async {
     final container = ProviderContainer(
       overrides: [
         translationsProvider.overrideWith((ref) => AppLocale.en.build()),
         proxiesOverviewNotifierProvider.overrideWith(_NoProxies.new),
+        mainOutboundsNotifierProvider.overrideWith(_NoMainOutbounds.new),
       ],
     );
     addTearDown(container.dispose);
