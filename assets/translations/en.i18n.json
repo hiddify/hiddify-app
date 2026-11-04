@@ -620,6 +620,7 @@
         "directPort": "Direct port",
         "redirectPort": "Redirect port",
         "lanSharing": "Share on local network",
+        "connectionSharing": "Connection sharing",
         "qrCode": "QR code",
         "closedInVpn": "closed in VPN mode, unless shared",
         "proxySecret": "Proxy secret",
