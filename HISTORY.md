@@ -1,7 +1,217 @@
 # Changelog
 
 
-## 5.5.1 (2026-11-03)
+## 5.5.5 (2026-11-04)
+
+#### Other
+
+* Feat(proxy): the proxy details show the home card's proxies live and fade cached results. 
+  _The details of the home card's server or chain hop, which the proxies list may not
+hold, now follow the main list, so a test's result shows. A ping or speed from an
+earlier run is faded, as in the proxy list, until a test of this run replaces it._
+
+* Feat(profiles): a share dialog with the link's QR code and the config as a file. 
+  _The share menu becomes one dialog: the subscription link with its QR code, and the
+configuration JSON to copy, share or save. The file is shared as text/plain, so apps
+that do not take JSON, Telegram among them, are offered on Android. A file name with a
+space or a non-ASCII letter is shared from its real path._
+
+* Feat(proxy): add alternating display for slow connection status. 
+
+* Merge pull request #2440 from veto9292/fix/next-release. 
+  _feat(proxy): one sharing dialog, LAN sharing toggle, live chain hop state_
+
+* Feat(settings): a tap on the sharing row opens the proxy dialog. 
+  _The row no longer turns sharing on or off; its switch does._
+
+* Feat(proxy): no Turn off in the dialog, no QR button while sharing is off. 
+  _The dialog only turns LAN sharing on; turning it off is the sharing row's switch, whose QR
+button shows only while sharing is on._
+
+* Refactor(proxy): drop the translated Turn off text. 
+
+* Refactor(proxy): drop the Turn off text. 
+
+* Feat(settings): Connection sharing row in quick settings. 
+  _In quick settings the LAN sharing row is titled Connection sharing, with no leading icon.
+Its QR button, on a tonal background, shows whether sharing is on or off and opens the
+proxy dialog on Other devices; the switch turns sharing on or off._
+
+* Feat(settings): translate the Connection sharing row's text. 
+
+* Feat(settings): text for the Connection sharing row of quick settings. 
+
+* Style(proxy): Turn off in the look of Turn on sharing. 
+
+* Feat(proxy): turn LAN sharing on and off in the Other devices tab. 
+  _Showing Other devices no longer turns sharing on. While it is off the tab shows its content
+faint, under Turn on sharing; while it is on, Turn off sits beside Close._
+
+* Feat(proxy): translate the texts to turn LAN sharing on and off. 
+
+* Feat(proxy): texts to turn LAN sharing on and off in the proxy dialog. 
+
+* Refactor(home): show the hop's label as the core sends it. 
+  _The core now leaves out the state's emoji itself._
+
+* Feat(home): show the hop's live state while it sets up. 
+  _While the core still sets the hop up, the chain row shows what it runs and
+what it is doing in place of the IP's placeholder, and an animated icon in
+place of the flag's: an hourglass while it connects, a clock when it is
+slow, a fingerprint while WARP registers, a magnifier while it searches,
+arrows while it reconnects. Once the core says ready, the flag and the IP
+wait for the first ping as before._
+
+* Feat(proxy): turn LAN sharing on when Other devices is shown. 
+  _Opening the dialog on Other devices, or switching to it, turns sharing with other devices
+on, so the side is never off and its off card is gone._
+
+* Refactor(proxy): drop the translated texts of the sharing-off card. 
+
+* Refactor(proxy): drop the texts of the sharing-off card. 
+
+* Fix(proxy): in VPN mode show only Other devices, never This device off. 
+  _In VPN mode this device's apps already go through the VPN, so the dialog shows only the
+Other devices side, without the tabs. This device has no off state; only sharing with
+other devices can be off._
+
+* Feat(proxy): say a side of the proxy dialog is off, with Turn on. 
+  _This device is off in VPN mode while the local port is not kept open; Other devices is off
+while LAN sharing is. Such a tab shows only a card with Currently off and Turn on, and Close._
+
+* Feat(proxy): translate the texts for a side that is off. 
+
+* Feat(proxy): texts for a proxy dialog side that is off. 
+
+* Feat(proxy): the Other devices tab works like This device. 
+  _The LAN sharing tab gets what This device has: copyable IP, port, user and password, the port
+and the password edited in place, a warning with Set password while the network's port has no
+password, and Copy link with Telegram and full links. LAN only and SOCKS5 proxy become one line;
+on no local network the code's place says so. Both tabs share one frame and one set of fields,
+and the QR dialog keeps only what the profile share needs._
+
+* Feat(proxy): translate the Other devices tab texts. 
+
+* Feat(proxy): texts for the Other devices tab of the proxy dialog. 
+
+* Style(proxy): space the This device buttons like the Other devices tab. 
+
+* Feat(proxy): one dialog for this device and other devices. 
+  _The local proxy dialog becomes the This device tab: setup steps, copyable server, port and
+password, the port and password edited in place, a warning while no password is asked, and
+Copy link with Telegram and full links. LAN sharing is the Other devices tab, unchanged._
+
+* Feat(proxy): translate the This device tab texts. 
+
+* Feat(proxy): texts for the This device tab of the proxy dialog. 
+
+* Refactor(home): drop the hop's name after its IP in the chain row. 
+  _The row shows the IP or the state and the chain chip again; a tap still shows
+the hop's proxy info and a long press its configuration._
+
+* Feat(chain): the unblocker icon as a double door the traffic passes. 
+  _Seen from above: three dots run into the shut door and wait, it opens, they
+drive through one after another, and it shuts again. Replaces the opening
+door on the proxy card, the chain timeline, the connection check and the
+home badge; shut and empty while the unblocker is off, waits or fails._
+
+* Feat(notification): manage service notification lifecycle with active state and synchronization. 
+
+* Chore(core): hiddify-core with display types that show why a proxy failed. 
+
+* Feat(json-editor): a soar outbound template. 
+  _The JSON editor offers the soar outbound (Soar DNS tunnel) beside dnstt and
+masterdns, with "auto" resolvers, which run Soar's resolver discovery._
+
+* Chore(core): hiddify-core with Soar, soar:// links and shared resolver discovery. 
+
+* Feat(settings): a default proxy for the select group. 
+  _Until the user picks a proxy, the select group starts on the balancer;
+the routing options now offer the lowest ping and the profile's first
+proxy as well (default-proxy in hiddify-core)._
+
+* Feat(proxies): one ping per proxy, a steady lowest-delay pick, and cached pings that only sort. 
+  _hiddify-core with one URL test per proxy at a time, a lowest-delay pick
+that stays 30 s after a switch, a relative tolerance, stable proxy tags
+across subscription updates, and the MONITORING and LOWEST log lines.
+
+A ping cached from the previous run is not shown and decides nothing;
+the proxy list sorts by sort_delay, which carries it until the real
+ping arrives, while url_test_delay stays 0 for it.
+
+On Android the VPN service shares the app's process, so a log listener
+on each gRPC channel logged every core line twice; the second listener
+is skipped there.
+
+The Windows installer launches the app through the shell and clears a
+"run as administrator" compatibility layer left on its path, which made
+the launch at the end of Setup fail with error 740._
+
+* Feat(settings): "Use xray-core when possible" is off and hidden. 
+  _The switch is gone from the general settings. A value saved before is
+ignored: the core gets false, and subscriptions are downloaded with the
+plain HiddifyNext user agent, never HiddifyNextX. The preference stays
+stored so old backups still import._
+
+* Fix(routing): the system services rule is off by default. 
+  _Apple, Microsoft, Android and Linux services go through the proxy unless
+the user turns the rule on. A list already saved keeps its switch._
+
+* Feat(routing): the system services rule follows the platform. 
+  _Apple services on iOS and macOS, Microsoft services on Windows, Android
+services and push on Android, distro updates on Linux. A list saved under
+the old builtin:appleDirect name keeps its rule._
+
+* Chore(core): hiddify-core with Fake DNS, WARP and MASQUE fixes. 
+  _- fix(config): Fake DNS no longer stops the core at Connecting
+- fix(proxies): the main list shows a spreading balancer's fastest member
+- hiddify-sing-box: Fake DNS fall-through logged at debug, a WARP restart during a network change
+  no longer crashes, why a proxy failed is kept, the masque outbound no longer registers WARP
+  devices (the warp endpoint does, and takes a link's device)
+- ray2sing: masque:// links to WARP are warp endpoints with mode masque; h2=1 and publicKey read
+- feat(hcore): OutboundInfo.error_
+
+* Feat(proxy): the proxy details say why it failed. 
+  _A long press on a proxy shows its details; a failed proxy now has a "Why it failed" box with what
+the core reports (OutboundInfo.error, hiddify-core a5a5091): the error of its last test, or why it
+is not ready, such as a refused WARP registration or a MASQUE tunnel that does not connect. The
+text can be selected and copied.
+
+hcore.proto regenerated for the new field._
+
+* Feat(settings): Extra Security WARP offers its tunnel, licence and MTU only. 
+  _Extra Security is a privacy layer behind the user's pick, not a way past filtering. Its WARP no
+longer shows the endpoint, the custom server and port, MASQUE and AmneziaWG settings, and no
+longer sends them: it takes the endpoint Cloudflare assigned and the core's MASQUE and AmneziaWG
+defaults, so a value saved before does not stay in effect unseen. The Unblocker keeps them all._
+
+* Fix(core): a reconnect is not logged as a stream error. 
+  _Every disconnect and reconnect logged "Stream error: gRPC Error (code: 2) HTTP/2 error: Connection
+is being forcefully terminated (errorCode: 10)". Closing the VPN closes the core and its gRPC
+server, which cuts the log stream: the same normal end as a core that is not running, which was
+already logged at debug. Any other stream error is still an error, and the stream is armed again
+at the next start as before.
+
+Tested: grpc_errors_test with the error grpc-dart raises; on the Android emulator, a disconnect no
+longer logs it. http2 is a dev dependency for the test._
+
+* Ci(virustotal): skip the IPA and show the counts as static badges. 
+  _The release badges showed "Error 429": the live badge service asks VirusTotal with one shared key,
+which is over its quota for every file. The scan job reads each file's count with our key anyway;
+it now writes it into the notes as a static shields.io badge (green at 0, yellow up to 3, red
+above, "scanning" until VirusTotal has a result), and a rewrite of the download table keeps them.
+
+VirusTotal rejected the IPA with HTTP 409, which failed the whole scan step: it is no longer sent,
+and its row shows "-". The AppImage tar.gz is scanned now. One scan runs at a time (the draft and
+the release scan shared the key's quota), a rejected file no longer stops the report and the
+badges, and the report looks once more for files still being analysed.
+
+Tested: prepare_release_notes.py on the v5.5.1 body with sample counts, and the rewrite after the
+Store-signed MSIX keeps them._
+
+
+
+## v5.5.0 (2026-11-03)
 
 #### Other
 
