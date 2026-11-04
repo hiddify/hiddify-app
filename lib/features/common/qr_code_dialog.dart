@@ -286,7 +286,7 @@ class LocalProxyDialog extends HookConsumerWidget {
       child: SizedBox(
         width: 360,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -353,7 +353,7 @@ class LocalProxyDialog extends HookConsumerWidget {
                 ),
               ),
               if (onPick) ...[const Gap(8), const _DontShowAgain()],
-              const Gap(4),
+              const Gap(12),
               Row(
                 children: [
                   MenuAnchor(
@@ -370,7 +370,6 @@ class LocalProxyDialog extends HookConsumerWidget {
                       ),
                     ],
                     builder: (context, menu, _) => TextButton(
-                      style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8)),
                       onPressed: () => menu.isOpen ? menu.close() : menu.open(),
                       child: _CopiedSwap(label: text.copyLink, copied: linkCopied.value, alignment: Alignment.center),
                     ),
