@@ -81,6 +81,15 @@ class DialogNotifier extends _$DialogNotifier {
     return await _show<void>(QrCodeDialog(link, title: title, link: link));
   }
 
+  /// [link] only for a profile that has one; [loadConfig] builds its configuration JSON.
+  Future<void> showShareProfile({
+    required String name,
+    required Future<String> Function() loadConfig,
+    String? link,
+  }) async {
+    return await _show<void>(ShareProfileDialog(name: name, link: link, loadConfig: loadConfig));
+  }
+
   /// [onPick] when the user just picked proxy mode: the dialog then offers not to show again.
   Future<void> showLocalProxy({bool onPick = false}) async {
     return await _show<void>(ProxyDialog(onPick: onPick));

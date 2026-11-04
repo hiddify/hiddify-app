@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
@@ -20,12 +21,21 @@ class ProxyInfoDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
-    // the proxy as the core reports it now; a chain's hop is not in the list, so it stays as it was
+    // the proxy as the core reports it now, so a test's result shows: from the proxies list, or, for
+    // the home card's server and chain hop, which that list may not hold, from the main list
     final proxy =
         ref.watch(
           proxiesOverviewNotifierProvider.select(
             (list) => list.valueOrNull?.items.where((e) => e.tag == outboundInfo.tag).firstOrNull,
           ),
+        ) ??
+        ref.watch(
+          mainOutboundsNotifierProvider.select((list) {
+            final main = list.valueOrNull;
+            if (main == null) return null;
+            if (main.hasChainHop() && main.chainHop.tag == outboundInfo.tag) return main.chainHop;
+            return main.items.expand((group) => group.items).where((e) => e.tag == outboundInfo.tag).firstOrNull;
+          }),
         ) ??
         outboundInfo;
     return AlertDialog(
@@ -260,7 +270,9 @@ class _Speeds extends ConsumerWidget {
     final info = t.dialogs.proxyInfo;
     final notifier = ref.read(proxiesOverviewNotifierProvider.notifier);
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final delay = proxy.urlTestDelay;
+    // a ping from the previous run comes only as the sort delay until this run tests the proxy
+    final pingCached = proxy.urlTestDelay == 0 && proxy.sortDelay > 0;
+    final delay = pingCached ? proxy.sortDelay : proxy.urlTestDelay;
     final pingColor = switch (delay) {
       < 800 => dark ? Colors.lightGreen : Colors.green,
       < 1500 => dark ? Colors.orange : Colors.deepOrangeAccent,
@@ -276,6 +288,7 @@ class _Speeds extends ConsumerWidget {
         unit: 'Mbps',
         color: value > 0 ? uploadSpeedColor(context, value) : null,
         failed: value < 0,
+        cached: download ? proxy.downloadSpeedCached : proxy.uploadSpeedCached,
         testing: download ? proxy.downloadTesting : proxy.uploadTesting,
         hint: proxy.isGroup ? null : info.tapToTest,
         onTap: proxy.isGroup
@@ -294,7 +307,8 @@ class _Speeds extends ConsumerWidget {
             value: delay > 0 && delay < 65000 ? '$delay' : null,
             unit: 'ms',
             color: pingColor,
-            failed: delay >= 65000,
+            failed: delay >= 65000 && !pingCached,
+            cached: pingCached,
             hint: info.tapToTest,
             onTap: () => notifier.urlTest(proxy.tag),
           ),
@@ -309,7 +323,8 @@ class _Speeds extends ConsumerWidget {
 }
 
 /// One measure: its icon and name, then the value in its color, a spinner while it is tested, or
-/// what a tap does before the first test.
+/// what a tap does before the first test. A value from an earlier run ([cached]) is faded, as in the
+/// proxy list, until a test of this run replaces it.
 class _SpeedTile extends StatelessWidget {
   const _SpeedTile({
     required this.icon,
@@ -318,6 +333,7 @@ class _SpeedTile extends StatelessWidget {
     required this.unit,
     required this.color,
     required this.failed,
+    this.cached = false,
     this.testing = false,
     this.hint,
     this.onTap,
@@ -330,8 +346,11 @@ class _SpeedTile extends StatelessWidget {
   final String unit;
   final Color? color;
   final bool failed;
+  final bool cached;
   final bool testing;
   final String? hint;
+
+  static const _cachedOpacity = .45;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -340,6 +359,7 @@ class _SpeedTile extends StatelessWidget {
     final theme = Theme.of(context);
     final s = theme.colorScheme;
     final tint = failed ? s.error : (value != null ? color! : s.primary);
+    final old = cached && value != null;
     final Widget reading = switch ((testing, value, failed)) {
       (true, _, _) => SizedBox.square(
         key: const ValueKey('testing'),
@@ -347,27 +367,30 @@ class _SpeedTile extends StatelessWidget {
         child: CircularProgressIndicator(strokeWidth: 2.4, color: s.primary),
       ),
       // a long reading shrinks to fit the tile
-      (_, final value?, _) => FittedBox(
-        key: ValueKey(value),
-        fit: BoxFit.scaleDown,
-        child: Text.rich(
-          TextSpan(
-            children: [
-              TextSpan(
-                text: value,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: tint,
-                  fontWeight: FontWeight.w700,
-                  fontFeatures: const [FontFeature.tabularFigures()],
+      (_, final value?, _) => Opacity(
+        key: ValueKey((value, old)),
+        opacity: old ? _cachedOpacity : 1,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: value,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: tint,
+                    fontWeight: FontWeight.w700,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
-              ),
-              TextSpan(
-                text: ' $unit',
-                style: theme.textTheme.labelSmall?.copyWith(color: s.onSurfaceVariant),
-              ),
-            ],
+                TextSpan(
+                  text: ' $unit',
+                  style: theme.textTheme.labelSmall?.copyWith(color: s.onSurfaceVariant),
+                ),
+              ],
+            ),
+            textDirection: TextDirection.ltr,
           ),
-          textDirection: TextDirection.ltr,
         ),
       ),
       (_, _, true) => Icon(Icons.close_rounded, key: const ValueKey('failed'), size: 24, color: s.error),
@@ -379,7 +402,10 @@ class _SpeedTile extends StatelessWidget {
       ),
     };
     return Material(
-      color: Color.alphaBlend(tint.withValues(alpha: value != null || failed ? .12 : .06), s.surfaceContainerHigh),
+      color: Color.alphaBlend(
+        tint.withValues(alpha: old ? .06 : (value != null || failed ? .12 : .06)),
+        s.surfaceContainerHigh,
+      ),
       borderRadius: BorderRadius.circular(16),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -392,7 +418,7 @@ class _SpeedTile extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(icon, size: 15, color: tint),
+                  Icon(icon, size: 15, color: old ? tint.withValues(alpha: _cachedOpacity) : tint),
                   const Gap(4),
                   Flexible(
                     child: Text(

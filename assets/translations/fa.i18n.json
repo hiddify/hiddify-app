@@ -241,9 +241,16 @@
       "failedToLoad": "بارگذاری ناموفق بود",
       "updateSubscriptions": "به‌روزرسانی اشتراک‌ها",
       "share": {
-        "urlToClipboard": "کپی URL",
-        "showUrlQr": "نمایش کد QR",
-        "jsonToClipboard": "کپی JSON"
+        "title": "اشتراک‌گذاری پروفایل",
+        "scanHint": "برای افزودن این پروفایل، آن را با Hiddify در دستگاه دیگری اسکن کنید",
+        "link": "لینک اشتراک",
+        "config": "پیکربندی",
+        "configHint": "JSON کاملی که این پروفایل با آن اجرا می‌شود، همراه با تنظیمات شما",
+        "configFailed": "ساخت پیکربندی ممکن نشد",
+        "copy": "کپی",
+        "shareFile": "اشتراک",
+        "saveFile": "ذخیره",
+        "tooLargeToCopy": "برای کلیپ‌بورد بزرگ است: آن را به‌صورت فایل به اشتراک بگذارید یا ذخیره کنید"
       },
       "msg": {
         "save": {
