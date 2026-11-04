@@ -462,7 +462,12 @@
         "builtinRules": {
           "tag": "Встроенное",
           "bypassLan": "Обход LAN",
-          "appleDirect": "Сервисы Apple",
+          "systemDirect": {
+            "apple": "Сервисы Apple",
+            "microsoft": "Сервисы Microsoft",
+            "android": "Сервисы Android",
+            "linux": "Обновления Linux"
+          },
           "blockAds": "Блокировка рекламы и вирусов",
           "bypassRegion": "Обход сайтов региона $region"
         },
@@ -569,6 +574,15 @@
           "roundRobinDescription": "Каждое подключение идёт через следующий сервер, поэтому сайты могут видеть смену Вашего IP",
           "consistentHashDescription": "Каждый сайт всегда работает через один и тот же сервер",
           "stickySessionDescription": "Каждый сайт закрепляется за случайным сервером до переподключения"
+        },
+        "defaultProxy": {
+          "title": "Прокси по умолчанию",
+          "lowest": "Наименьший пинг",
+          "balance": "Balance",
+          "first": "Первый прокси",
+          "lowestDescription": "Пока Вы не выберете прокси, используется самый быстрый",
+          "balanceDescription": "Пока Вы не выберете прокси, соединения распределяются по всем",
+          "firstDescription": "Пока Вы не выберете прокси, используется первый в профиле"
         },
         "resolveDestination": "Определять адрес назначения",
         "ipv6Route": "IPv6",
@@ -986,6 +1000,7 @@
       "server": "Сервер",
       "country": "Страна",
       "tapToTest": "Нажмите для проверки"
+      "error": "Почему это не удалось"
     },
     "windowClosing": {
       "askEachTime": "Спрашивать каждый раз",
