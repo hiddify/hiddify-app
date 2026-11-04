@@ -507,6 +507,15 @@ class _PinnedOptions extends ConsumerWidget {
           describe: (value) => value.describe(t),
         ),
         divider,
+        _MenuOption(
+          title: routing.defaultProxy.title,
+          selected: ref.watch(ConfigOptions.defaultProxy),
+          choices: DefaultProxy.values,
+          present: (value) => value.present(t),
+          onSelected: ref.read(ConfigOptions.defaultProxy.notifier).update,
+          describe: (value) => value.describe(t),
+        ),
+        divider,
         SwitchListTile.adaptive(
           title: Text(routing.resolveDestination),
           value: ref.watch(ConfigOptions.resolveDestination),
@@ -531,7 +540,10 @@ class _PinnedOptions extends ConsumerWidget {
                 title: Text(routing.ipv6RouteTurnOnTitle),
                 content: SingleChildScrollView(child: Text(routing.ipv6RouteHelp)),
                 actions: [
-                  TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(MaterialLocalizations.of(context).cancelButtonLabel)),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
+                  ),
                   FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(routing.ipv6RouteTurnOn)),
                 ],
               ),
@@ -608,7 +620,10 @@ class _MenuOption<T> extends HookWidget {
                       title: helpTitle != null ? Text(helpTitle!) : null,
                       content: SingleChildScrollView(child: Text(help!)),
                       actions: [
-                        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text(MaterialLocalizations.of(context).okButtonLabel)),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text(MaterialLocalizations.of(context).okButtonLabel),
+                        ),
                       ],
                     ),
                   ),

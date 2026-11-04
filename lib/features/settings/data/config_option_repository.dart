@@ -36,6 +36,13 @@ abstract class ConfigOptions {
     mapTo: (value) => value.key,
   );
 
+  static final defaultProxy = PreferencesNotifier.create<DefaultProxy, String>(
+    "default-proxy",
+    DefaultProxy.balance,
+    mapFrom: (value) => DefaultProxy.values.firstWhere((e) => e.key == value, orElse: () => DefaultProxy.balance),
+    mapTo: (value) => value.key,
+  );
+
   static final region = PreferencesNotifier.create<Region, String>(
     "region",
     Region.other,
@@ -467,6 +474,7 @@ abstract class ConfigOptions {
   static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>> preferences = {
     "region": region,
     "balancer-strategy": balancerStrategy,
+    "default-proxy": defaultProxy,
     // "block-ads": blockAds,
     "use-xray-core-when-possible": useXrayCoreWhenPossible,
     "use-system-tls-engine": useSystemTlsEngine,
@@ -598,6 +606,7 @@ abstract class ConfigOptions {
     return SingboxConfigOption(
       region: ref.watch(region).name,
       balancerStrategy: ref.watch(balancerStrategy),
+      defaultProxy: ref.watch(defaultProxy),
       // blockAds: ref.watch(blockAds),
       useXrayCoreWhenPossible: false, // the option is off and hidden; a stored true is ignored
       useSystemTlsEngine: ref.watch(useSystemTlsEngine),

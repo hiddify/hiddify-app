@@ -555,6 +555,15 @@
           "consistentHashDescription": "Each site always uses the same server",
           "stickySessionDescription": "Each site keeps a random server until you reconnect"
         },
+        "defaultProxy": {
+          "title": "Default proxy",
+          "lowest": "Lowest ping",
+          "balance": "Balance",
+          "first": "First proxy",
+          "lowestDescription": "Until you pick a proxy, the fastest one is used",
+          "balanceDescription": "Until you pick a proxy, connections are spread over all of them",
+          "firstDescription": "Until you pick a proxy, the profile's first one is used"
+        },
         "resolveDestination": "Resolve destination",
         "ipv6Route": "IPv6",
         "ipv6RouteHelpTitle": "Why is IPv6 off?",

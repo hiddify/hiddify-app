@@ -555,6 +555,15 @@
           "consistentHashDescription": "هر سایت همیشه از همان سرور استفاده می‌کند",
           "stickySessionDescription": "هر سایت تا اتصال دوباره، یک سرور تصادفی را نگه می‌دارد"
         },
+        "defaultProxy": {
+          "title": "پروکسی پیش‌فرض",
+          "lowest": "کمترین پینگ",
+          "balance": "توزیع بار",
+          "first": "اولین پروکسی",
+          "lowestDescription": "تا وقتی پروکسی انتخاب نکرده‌اید، سریع‌ترین استفاده می‌شود",
+          "balanceDescription": "تا وقتی پروکسی انتخاب نکرده‌اید، اتصال‌ها بین همه پخش می‌شوند",
+          "firstDescription": "تا وقتی پروکسی انتخاب نکرده‌اید، اولین پروکسی پروفایل استفاده می‌شود"
+        },
         "resolveDestination": "تحلیل آدرس مقصد",
         "ipv6Route": "IPv6",
         "ipv6RouteHelpTitle": "چرا IPv6 خاموش است؟",
