@@ -980,6 +980,8 @@
       "otherDevices": "其他设备",
       "server": "服务器",
       "noPassword": "未设置密码",
+      "currentlyOff": "当前已关闭",
+      "turnOn": "开启",
       "copyLink": "复制链接",
       "telegramLink": "Telegram 链接",
       "fullLink": "完整链接",

@@ -982,6 +982,8 @@
       "otherDevices": "Autres appareils",
       "server": "Serveur",
       "noPassword": "Aucun mot de passe",
+      "currentlyOff": "Désactivé pour le moment",
+      "turnOn": "Activer",
       "copyLink": "Copier le lien",
       "telegramLink": "Lien Telegram",
       "fullLink": "Lien complet",

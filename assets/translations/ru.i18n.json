@@ -1004,6 +1004,8 @@
       "otherDevices": "Другие устройства",
       "server": "Сервер",
       "noPassword": "Пароль не задан",
+      "currentlyOff": "Сейчас выключено",
+      "turnOn": "Включить",
       "copyLink": "Копировать ссылку",
       "telegramLink": "Ссылка для Telegram",
       "fullLink": "Полная ссылка",
