@@ -131,7 +131,7 @@ class LanSharingQrDialog extends HookConsumerWidget {
     final port = ref.watch(ConfigOptions.lanSharingPort);
     final secret = ref.watch(ConfigOptions.lanSharingPassword);
     final shared = ref.watch(ConfigOptions.allowConnectionFromLan);
-    Future<void> share(bool value) => ref.read(ConfigOptions.allowConnectionFromLan.notifier).update(value);
+    Future<void> turnOn() => ref.read(ConfigOptions.allowConnectionFromLan.notifier).update(true);
     // The device that scans would reach itself at 127.0.0.1, so that gets no code and no link.
     final host = ip == null || ip.isLoopback ? null : ip.address;
     const name = QrCodeDialogConst.lanProfileName;
@@ -162,16 +162,8 @@ class LanSharingQrDialog extends HookConsumerWidget {
     return _ProxyDialogFrame(
       header: header,
       links: host == null ? null : (telegram: _telegramLink(host, port, secret), full: link!),
-      // while it is off there is no link to copy, and Turn off gives way to Turn on over the content
+      // while it is off there is no link to copy
       copyLink: shared,
-      // Turn off in the look of Turn on
-      action: shared
-          ? FilledButton.icon(
-              onPressed: () => share(false),
-              icon: const Icon(Icons.power_settings_new_rounded, size: 18),
-              label: Text(t.dialogs.localProxy.turnOff),
-            )
-          : null,
       children: [
         if (shared)
           content
@@ -182,7 +174,7 @@ class LanSharingQrDialog extends HookConsumerWidget {
             children: [
               Opacity(opacity: .25, child: IgnorePointer(child: content)),
               FilledButton.icon(
-                onPressed: () => share(true),
+                onPressed: turnOn,
                 icon: const Icon(Icons.power_settings_new_rounded, size: 18),
                 label: Text(t.dialogs.localProxy.turnOnSharing),
               ),
@@ -244,7 +236,7 @@ class LocalProxyDialog extends ConsumerWidget {
 typedef _Links = ({String telegram, String full});
 
 /// A proxy dialog: [header] (the tabs), [children], [footer], then Copy link — off while [links]
-/// is null, and left out unless [copyLink] — then [action], and Close.
+/// is null, and left out unless [copyLink] — and Close.
 class _ProxyDialogFrame extends StatelessWidget {
   const _ProxyDialogFrame({
     required this.header,
@@ -252,7 +244,6 @@ class _ProxyDialogFrame extends StatelessWidget {
     required this.children,
     this.footer,
     this.copyLink = true,
-    this.action,
   });
 
   final Widget? header;
@@ -260,7 +251,6 @@ class _ProxyDialogFrame extends StatelessWidget {
   final List<Widget> children;
   final Widget? footer;
   final bool copyLink;
-  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +270,6 @@ class _ProxyDialogFrame extends StatelessWidget {
                 children: [
                   if (copyLink) _CopyLinkButton(links),
                   const Spacer(),
-                  ?action,
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(MaterialLocalizations.of(context).closeButtonLabel),

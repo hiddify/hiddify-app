@@ -29,13 +29,15 @@ class LanSharingPreferenceWidget extends ConsumerWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // on or off, it opens the dialog that turns sharing on and shows what other devices need
-          IconButton.filledTonal(
-            tooltip: t.pages.settings.inbound.qrCode,
-            onPressed: () => ref.read(dialogNotifierProvider.notifier).showLanSharingQr(),
-            icon: const Icon(Icons.qr_code_rounded),
-          ),
-          SizedBox(height: 32, child: VerticalDivider(width: 16, color: theme.colorScheme.outlineVariant)),
+          if (enabled) ...[
+            // opens what other devices need to use the shared proxy
+            IconButton.filledTonal(
+              tooltip: t.pages.settings.inbound.qrCode,
+              onPressed: () => ref.read(dialogNotifierProvider.notifier).showLanSharingQr(),
+              icon: const Icon(Icons.qr_code_rounded),
+            ),
+            SizedBox(height: 32, child: VerticalDivider(width: 16, color: theme.colorScheme.outlineVariant)),
+          ],
           Switch.adaptive(value: enabled, onChanged: setEnabled),
         ],
       ),
