@@ -25,7 +25,8 @@ class LanSharingPreferenceWidget extends ConsumerWidget {
     return ListTile(
       leading: showLeading ? const Icon(Icons.share_rounded, size: 28) : null,
       title: Text(showLeading ? t.pages.settings.inbound.lanSharing : t.pages.settings.inbound.connectionSharing),
-      onTap: () => setEnabled(!enabled),
+      // the row opens the dialog; only the switch turns sharing on or off
+      onTap: () => ref.read(dialogNotifierProvider.notifier).showLanSharingQr(),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
