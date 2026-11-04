@@ -589,8 +589,8 @@
         "directPort": "本地直连端口",
         "redirectPort": "重定向端口",
         "lanSharing": "安全 VPN 共享",
+        "connectionSharing": "连接共享",
         "qrCode": "二维码",
-        "lanQrSubtitle": "SOCKS5 代理",
         "closedInVpn": "VPN 模式下关闭,除非共享",
         "proxySecret": "代理密钥",
         "noSecret": "无密钥:任何能访问该端口的应用或设备都可使用",
@@ -912,8 +912,8 @@
     "qrCode": {
       "copyFullLink": "复制完整链接",
       "copied": "已复制",
-      "localOnlyTitle": "仅限此设备",
-      "localOnlyMessage": "其他设备无法访问 127.0.0.1",
+      "lanLine": "SOCKS5 · 仅限同一网络",
+      "noLocalNetwork": "未找到局域网",
       "ip": "IP",
       "port": "端口",
       "username": "用户名",
@@ -967,19 +967,27 @@
       "otherCountries": "其他"
     },
     "localProxy": {
-      "title": "本地代理",
-      "lead": "代理模式需要手动设置，你需要逐个配置应用：",
       "steps": [
         "打开应用的代理设置",
         "选择 SOCKS5 或 HTTP",
-        "填入下方信息",
+        "填写下方的值 · 点按即可复制",
         "保持 Hiddify 连接"
       ],
-      "changePassword": "修改密码",
       "hint": "代理模式 · 使用说明",
       "setPassword": "设置密码",
       "manual": "手动",
-      "dontShowAgain": "不再显示"
+      "dontShowAgain": "不再显示",
+      "thisDevice": "本设备",
+      "otherDevices": "其他设备",
+      "server": "服务器",
+      "noPassword": "未设置密码",
+      "turnOnSharing": "开启共享",
+      "copyLink": "复制链接",
+      "telegramLink": "Telegram 链接",
+      "fullLink": "完整链接",
+      "portRange": "请使用 1024 到 65535 之间的端口",
+      "passwordTooShort": "至少 4 个字符",
+      "edit": "编辑"
     }
   },
   "connection": {

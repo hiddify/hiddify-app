@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -341,8 +342,8 @@ class _ProxyRow extends ConsumerWidget {
   }
 }
 
-// ---------- the hop row: its IP and what it runs, then the chain type in a chip with its mode as a
-// badge. A tap shows the hop's proxy info, a long press its configuration. ----------
+// ---------- the hop row: its IP, then the chain type in a chip with its mode as a badge. A tap
+// shows the hop's proxy info, a long press its configuration. ----------
 
 class _HopRow extends ConsumerWidget {
   const _HopRow(this.card);
@@ -361,13 +362,9 @@ class _HopRow extends ConsumerWidget {
     final color = Color.alphaBlend(main.withValues(alpha: .16), s.surfaceContainerHigh);
     final down = status == StepStatus.waiting || status == StepStatus.failed;
     final hop = card.hop;
-    // what the hop runs and what it is doing, as the core names it ("WARP · MASQUE 🔑 Registering...",
-    // "Psiphon ⏳ Connecting..."), or its mode until listed
-    final name = ProxyTypeLabel(
-      hop?.type ?? card.hopMode.present(t),
-      prefix: status == StepStatus.waiting ? '' : '  ·  ',
-      style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
-    );
+    // the core still setting the hop up (or not listing it yet): its live state in place of the flag
+    // and the IP; once the core says ready, the flag and the IP wait for the first ping as usual
+    final live = status == StepStatus.slow || (status == StepStatus.connecting && hop?.status != Status.READY);
     return _StepRow(
       color: color,
       onTap: hop == null
@@ -375,28 +372,34 @@ class _HopRow extends ConsumerWidget {
           : () => ref.read(dialogNotifierProvider.notifier).showProxyInfo(outboundInfo: hop),
       onLongPress: () => context.goNamed('chainOptions'),
       height: _hopRowHeight,
-      flag: _FlagSlot(
-        status == StepStatus.connected ? card.hop : null,
-        size: _hopFlagSize,
-        radius: _hopFlagRadius,
-        dim: down,
-      ),
+      // while the hop connects, its live state as a moving icon in the flag's place
+      flag: switch (status) {
+        _ when live => SizedBox.square(
+          dimension: _hopFlagSize,
+          child: Center(
+            child: _HopStateIcon(slow: status == StepStatus.slow, core: hop?.status, color: main),
+          ),
+        ),
+        _ => _FlagSlot(
+          status == StepStatus.connected ? card.hop : null,
+          size: _hopFlagSize,
+          radius: _hopFlagRadius,
+          dim: down,
+        ),
+      },
       status: status,
-      title: Row(
-        children: [
-          switch (status) {
-            StepStatus.waiting => const SizedBox.shrink(),
-            StepStatus.slow => _Problem(t.connection.slow, error: false),
-            StepStatus.failed => _Problem(t.connection.failed),
-            _ => _IpSlot(
-              status == StepStatus.connected ? hop : null,
-              boneWidth: 64,
-              isFinal: card.chain.isExtraSecurity(),
-            ),
-          },
-          Flexible(child: name),
-        ],
-      ),
+      title: switch (status) {
+        StepStatus.waiting => const SizedBox.shrink(),
+        StepStatus.slow => _Problem(t.connection.slow, error: false),
+        StepStatus.failed => _Problem(t.connection.failed),
+        // while it connects, what the hop runs and what it is doing, as the core names it ("Psiphon ⏳
+        // Connecting...", "WARP · Auto 🔑 Registering..."), in place of the IP's placeholder
+        StepStatus.connecting when live => ProxyTypeLabel(
+          hop?.type ?? card.hopMode.present(t),
+          style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
+        ),
+        _ => _IpSlot(status == StepStatus.connected ? hop : null, boneWidth: 64, isFinal: card.chain.isExtraSecurity()),
+      },
       trailing: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -440,6 +443,93 @@ class _HopRow extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// A connecting hop's live state on a small tile: an hourglass that flips while it connects, a clock
+/// when it is slow, a pulsing fingerprint while WARP registers, a circling magnifier while it
+/// searches, spinning arrows while it reconnects.
+class _HopStateIcon extends HookWidget {
+  const _HopStateIcon({required this.slow, required this.core, required this.color});
+  final bool slow;
+  final Status? core;
+  final Color color;
+
+  static const _tile = 22.0;
+
+  /// One loop holds every motion: the clock's hour hand takes the longest, 36 s.
+  static const _loop = 36.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final clock = useAnimationController(duration: const Duration(seconds: 36));
+    useEffect(() {
+      clock.repeat();
+      return null;
+    }, const []);
+    final amber = Colors.amber.shade300;
+    return RepaintBoundary(
+      child: Container(
+        width: _tile,
+        height: _tile,
+        decoration: BoxDecoration(color: s.onSurface.withValues(alpha: .08), borderRadius: BorderRadius.circular(4)),
+        child: Center(
+          child: AnimatedBuilder(
+            animation: clock,
+            builder: (context, _) {
+              final t = clock.value * _loop;
+              Icon icon(IconData data) => Icon(data, size: 15, color: color);
+              return switch (core) {
+                _ when slow => CustomPaint(size: const Size.square(15), painter: _ClockPainter(t, amber)),
+                Status.REGISTERING => Opacity(
+                  opacity: .55 + .45 * ((math.sin(t * 2 * math.pi / 1.6) + 1) / 2),
+                  child: Icon(Icons.fingerprint_rounded, size: 16, color: color),
+                ),
+                Status.SEARCHING => Transform.translate(
+                  offset: Offset(math.cos(t * 2 * math.pi / 1.6), math.sin(t * 2 * math.pi / 1.6)) * 3,
+                  child: icon(Icons.search_rounded),
+                ),
+                Status.RECONNECTING => Transform.rotate(angle: -t * 2 * math.pi / 1.2, child: icon(Icons.sync_rounded)),
+                // a half turn every 1.6 s: it turns in the first half, then rests
+                _ => Transform.rotate(
+                  angle:
+                      math.pi * (t ~/ 1.6) +
+                      math.pi * Curves.easeInOutCubic.transform(((t % 1.6) / 1.6 * 2).clamp(0.0, 1.0)),
+                  child: icon(Icons.hourglass_top_rounded),
+                ),
+              };
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A clock face with two hands: the minute hand goes round every 3 s, the hour hand twelve times
+/// slower. Both stay clear of the rim.
+class _ClockPainter extends CustomPainter {
+  _ClockPainter(this.t, this.color);
+  final double t;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    final r = size.width / 2 - 1;
+    final pen = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawCircle(c, r, pen..strokeWidth = 1.6);
+    Offset tip(double turns, double length) =>
+        c + Offset(math.sin(turns * 2 * math.pi), -math.cos(turns * 2 * math.pi)) * length;
+    canvas.drawLine(c, tip(t / 3, r * .55), pen..strokeWidth = 1.4);
+    canvas.drawLine(c, tip(.25 + t / 36, r * .38), pen..strokeWidth = 1.8);
+  }
+
+  @override
+  bool shouldRepaint(_ClockPainter old) => old.t != t || old.color != color;
 }
 
 // ---------- a step's state: a badge on its flag, and the rail to the next step ----------

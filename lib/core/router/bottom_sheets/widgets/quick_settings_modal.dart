@@ -43,7 +43,7 @@ class QuickSettingsModal extends HookConsumerWidget {
               ),
             ),
             const Divider(height: 2, thickness: 2),
-            const LanSharingPreferenceWidget(),
+            const LanSharingPreferenceWidget(showLeading: false),
             const Divider(height: 2, thickness: 2),
             if (_classicChainLayout) const ChainQuickSettings() else const ChainQuickToggles(),
             // const Gap(12),

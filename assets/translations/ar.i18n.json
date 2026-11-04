@@ -621,8 +621,8 @@
         "directPort": "منفذ مباشر",
         "redirectPort": "منفذ إعادة التوجيه",
         "lanSharing": "مشاركة VPN آمنة",
+        "connectionSharing": "مشاركة الاتصال",
         "qrCode": "رمز QR",
-        "lanQrSubtitle": "وكيل SOCKS5",
         "closedInVpn": "مغلق في وضع VPN ما لم تتم المشاركة",
         "proxySecret": "كلمة سر الوكيل",
         "noSecret": "بلا كلمة سر: يمكن لأي تطبيق أو جهاز يصل إلى المنفذ استخدامه",
@@ -949,8 +949,8 @@
     "qrCode": {
       "copyFullLink": "نسخ الرابط الكامل",
       "copied": "تم النسخ",
-      "localOnlyTitle": "هذا الجهاز فقط",
-      "localOnlyMessage": "لا يمكن للأجهزة الأخرى الوصول إلى 127.0.0.1",
+      "lanLine": "SOCKS5 · الشبكة نفسها فقط",
+      "noLocalNetwork": "لم يُعثر على شبكة محلية",
       "ip": "IP",
       "port": "المنفذ",
       "username": "اسم المستخدم",
@@ -1004,19 +1004,27 @@
       "otherCountries": "أخرى"
     },
     "localProxy": {
-      "title": "الوكيل المحلي",
-      "lead": "وضع الوكيل يدوي، لذا عليك ضبط كل تطبيق بنفسك:",
       "steps": [
         "افتح إعدادات الوكيل في التطبيق",
         "اختر SOCKS5 أو HTTP",
-        "أدخل البيانات أدناه",
+        "أدخل القيم أدناه · انقر للنسخ",
         "أبقِ Hiddify متصلًا"
       ],
-      "changePassword": "تغيير كلمة السر",
       "hint": "وضع الوكيل · طريقة الاستخدام",
       "setPassword": "تعيين كلمة سر",
       "manual": "يدوي",
-      "dontShowAgain": "لا تعرض هذا مجددًا"
+      "dontShowAgain": "لا تعرض هذا مجددًا",
+      "thisDevice": "هذا الجهاز",
+      "otherDevices": "أجهزة أخرى",
+      "server": "الخادم",
+      "noPassword": "لم تُعيَّن كلمة مرور",
+      "turnOnSharing": "تشغيل المشاركة",
+      "copyLink": "نسخ الرابط",
+      "telegramLink": "رابط Telegram",
+      "fullLink": "الرابط الكامل",
+      "portRange": "استخدم منفذًا من 1024 إلى 65535",
+      "passwordTooShort": "4 أحرف على الأقل",
+      "edit": "تعديل"
     }
   },
   "connection": {

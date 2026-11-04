@@ -83,11 +83,11 @@ class DialogNotifier extends _$DialogNotifier {
 
   /// [onPick] when the user just picked proxy mode: the dialog then offers not to show again.
   Future<void> showLocalProxy({bool onPick = false}) async {
-    return await _show<void>(LocalProxyDialog(onPick: onPick));
+    return await _show<void>(ProxyDialog(onPick: onPick));
   }
 
   Future<void> showLanSharingQr() async {
-    return await _show<void>(const LanSharingQrDialog());
+    return await _show<void>(const ProxyDialog(otherDevices: true));
   }
 
   Future<void> showOk(String title, String description) async {

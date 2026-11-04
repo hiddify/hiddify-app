@@ -620,8 +620,8 @@
         "directPort": "پورت مستقیم",
         "redirectPort": "پورت تغییر مسیر",
         "lanSharing": "اشتراک در شبکهٔ محلی",
+        "connectionSharing": "اشتراک‌گذاری اتصال",
         "qrCode": "کد QR",
-        "lanQrSubtitle": "پروکسی SOCKS5",
         "closedInVpn": "در حالت VPN بسته است، مگر در اشتراک‌گذاری",
         "proxySecret": "رمز پروکسی",
         "noSecret": "بدون رمز: هر برنامه یا دستگاهی که به این پورت برسد می‌تواند از آن استفاده کند",
@@ -988,8 +988,8 @@
     "qrCode": {
       "copyFullLink": "کپی لینک کامل",
       "copied": "کپی شد",
-      "localOnlyTitle": "فقط همین دستگاه",
-      "localOnlyMessage": "دستگاه‌های دیگر به 127.0.0.1 دسترسی ندارند",
+      "lanLine": "SOCKS5 · فقط همان شبکه",
+      "noLocalNetwork": "شبکه محلی پیدا نشد",
       "ip": "IP",
       "port": "پورت",
       "username": "نام کاربری",
@@ -1048,19 +1048,27 @@
       "otherCountries": "سایر"
     },
     "localProxy": {
-      "title": "پروکسی محلی",
-      "lead": "حالت پروکسی دستی است، پس باید هر برنامه را خودتان تنظیم کنید:",
       "steps": [
         "تنظیمات پروکسی برنامه را باز کنید",
         "SOCKS5 یا HTTP را انتخاب کنید",
-        "اطلاعات زیر را وارد کنید",
+        "مقادیر زیر را وارد کنید · برای کپی بزنید",
         "Hiddify را متصل نگه دارید"
       ],
-      "changePassword": "تغییر رمز",
       "hint": "حالت پروکسی · راهنما",
       "setPassword": "گذاشتن رمز",
       "manual": "دستی",
-      "dontShowAgain": "دیگر نشان نده"
+      "dontShowAgain": "دیگر نشان نده",
+      "thisDevice": "این دستگاه",
+      "otherDevices": "دستگاه‌های دیگر",
+      "server": "سرور",
+      "noPassword": "رمز تنظیم نشده",
+      "turnOnSharing": "روشن کردن اشتراک‌گذاری",
+      "copyLink": "کپی لینک",
+      "telegramLink": "لینک تلگرام",
+      "fullLink": "لینک کامل",
+      "portRange": "پورتی بین 1024 تا 65535 وارد کنید",
+      "passwordTooShort": "حداقل 4 کاراکتر",
+      "edit": "ویرایش"
     }
   },
   "connection": {
