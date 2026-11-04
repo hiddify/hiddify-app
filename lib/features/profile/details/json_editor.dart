@@ -86,6 +86,13 @@ const Map<String, Map<String, dynamic>> protocolSchemaValues = {
     "encryption": "xor",
     "key": "",
   },
+  "soar": {
+    "type": "soar",
+    "tag": "soar-out",
+    "domain": "t.example.com",
+    "public_key": "",
+    "resolvers": ["auto"],
+  },
   "vless": {
     "type": "vless",
     "tag": "vless-out",
@@ -351,6 +358,7 @@ const Map<String, List<String>> possibleValues = {
     "vless",
     "dnstt",
     "masterdns",
+    "soar",
     "vmess",
     "trojan",
     "xray",
