@@ -240,6 +240,32 @@ class _Problem extends StatelessWidget {
   }
 }
 
+/// Shows [first] and [second] in turn, a few seconds each, with a crossfade; it starts on [first].
+class _Alternating extends HookWidget {
+  const _Alternating(this.first, this.second);
+  final Widget first;
+  final Widget second;
+
+  static const _period = Duration(seconds: 3);
+
+  @override
+  Widget build(BuildContext context) {
+    final showFirst = useState(true);
+    useEffect(() {
+      final timer = Timer.periodic(_period, (_) => showFirst.value = !showFirst.value);
+      return timer.cancel;
+    }, const []);
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400),
+      layoutBuilder: (current, previous) => Stack(
+        alignment: AlignmentDirectional.centerStart,
+        children: [...previous, ?current],
+      ),
+      child: KeyedSubtree(key: ValueKey(showFirst.value), child: showFirst.value ? first : second),
+    );
+  }
+}
+
 TextStyle? _nameStyle(BuildContext context, StepStatus status) => Theme.of(context).textTheme.titleMedium?.copyWith(
   fontSize: 14,
   // a step that waits for the one before it is dimmed
@@ -390,7 +416,14 @@ class _HopRow extends ConsumerWidget {
       status: status,
       title: switch (status) {
         StepStatus.waiting => const SizedBox.shrink(),
-        StepStatus.slow => _Problem(t.connection.slow, error: false),
+        // slow: the warning comes and goes, and in between the row says what the hop is doing
+        StepStatus.slow => _Alternating(
+          _Problem(t.connection.slow, error: false),
+          ProxyTypeLabel(
+            hop?.type ?? card.hopMode.present(t),
+            style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
+          ),
+        ),
         StepStatus.failed => _Problem(t.connection.failed),
         // while it connects, what the hop runs and what it is doing, as the core names it ("Psiphon ⏳
         // Connecting...", "WARP · Auto 🔑 Registering..."), in place of the IP's placeholder
