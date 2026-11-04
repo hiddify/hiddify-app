@@ -696,9 +696,10 @@ class HiddifyCoreService with InfraLogger {
     final logLevel = ref.read(ConfigOptions.logLevel);
     final coreLogLevel = getCoreLogLevel(logLevel);
     final listenKey = "${key}LogListener";
-    // In macOS proxy mode the background client is the foreground one; a second listener on it
-    // only received and logged every core line twice.
-    if (key == "bg" && identical(cc, core.fgClient)) {
+    // In macOS proxy mode the background client is the foreground one, and on Android both
+    // channels reach the one core process; a second listener only received and logged every
+    // core line twice.
+    if (key == "bg" && (identical(cc, core.fgClient) || core.coreSharesProcess)) {
       await stopListenSingle(listenKey);
       return;
     }

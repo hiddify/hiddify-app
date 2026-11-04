@@ -662,6 +662,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.bool? uploadSpeedCached,
     $core.bool? downloadSpeedCached,
     $core.String? error,
+    $core.int? sortDelay,
   }) {
     final $result = create();
     if (tag != null) {
@@ -739,6 +740,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (error != null) {
       $result.error = error;
     }
+    if (sortDelay != null) {
+      $result.sortDelay = sortDelay;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -771,6 +775,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aOB(23, _omitFieldNames ? '' : 'uploadSpeedCached')
     ..aOB(24, _omitFieldNames ? '' : 'downloadSpeedCached')
     ..aOS(25, _omitFieldNames ? '' : 'error')
+    ..a<$core.int>(26, _omitFieldNames ? '' : 'sortDelay', $pb.PbFieldType.O3)
     ..hasRequiredFields = false
   ;
 
@@ -1023,6 +1028,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasError() => $_has(24);
   @$pb.TagNumber(25)
   void clearError() => clearField(25);
+
+  @$pb.TagNumber(26)
+  $core.int get sortDelay => $_getIZ(25);
+  @$pb.TagNumber(26)
+  set sortDelay($core.int v) { $_setSignedInt32(25, v); }
+  @$pb.TagNumber(26)
+  $core.bool hasSortDelay() => $_has(25);
+  @$pb.TagNumber(26)
+  void clearSortDelay() => clearField(26);
 }
 
 class IpInfo extends $pb.GeneratedMessage {

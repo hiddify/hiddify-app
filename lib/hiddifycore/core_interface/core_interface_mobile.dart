@@ -17,6 +17,9 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:rxdart/rxdart.dart';
 
 class CoreInterfaceMobile extends CoreInterface with InfraLogger {
+  @override
+  bool get coreSharesProcess => Platform.isAndroid;
+
   static const channelPrefix = "com.hiddify.app";
   static const methodChannel = MethodChannel("$channelPrefix/method");
   static const statusChannel = EventChannel("$channelPrefix/service.status", JSONMethodCodec());

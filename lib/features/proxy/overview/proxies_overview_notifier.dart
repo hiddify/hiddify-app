@@ -197,15 +197,17 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
         if (!a.isGroup && b.isGroup) return 1;
         return a.tag.compareTo(b.tag);
       }),
+      // by sortDelay: the real ping, or the one cached from the previous run, which is not shown
+      // and orders the untested ones until their real ping arrives; untested last
       ProxiesSort.delay => proxies.items.sortedWith((a, b) {
         if (a.isGroup && !b.isGroup) return -1;
         if (!a.isGroup && b.isGroup) return 1;
 
-        final ai = a.urlTestDelay;
-        final bi = b.urlTestDelay;
-        if (ai == 0 && bi == 0) return -1;
-        if (ai == 0 && bi > 0) return 1;
-        if (ai > 0 && bi == 0) return -1;
+        final ai = a.sortDelay;
+        final bi = b.sortDelay;
+        if (ai == 0 && bi == 0) return 0;
+        if (ai == 0) return 1;
+        if (bi == 0) return -1;
         return ai.compareTo(bi);
       }),
       ProxiesSort.unsorted => proxies.items,
