@@ -130,13 +130,16 @@ class LanSharingQrDialog extends HookConsumerWidget {
     // the network has a port of its own, apart from this device's
     final port = ref.watch(ConfigOptions.lanSharingPort);
     final secret = ref.watch(ConfigOptions.lanSharingPassword);
-    if (!ref.watch(ConfigOptions.allowConnectionFromLan)) {
-      return _ProxyDialogFrame.off(
-        header: header,
-        icon: Icons.wifi_tethering_rounded,
-        onTurnOn: () => ref.read(ConfigOptions.allowConnectionFromLan.notifier).update(true),
-      );
-    }
+    // Showing it asks for it: sharing turns on whenever this side is shown. Out of the build, which
+    // must not change a provider.
+    useEffect(() {
+      Future.microtask(() async {
+        if (!ref.read(ConfigOptions.allowConnectionFromLan)) {
+          await ref.read(ConfigOptions.allowConnectionFromLan.notifier).update(true);
+        }
+      });
+      return null;
+    }, const []);
     // The device that scans would reach itself at 127.0.0.1, so that gets no code and no link.
     final host = ip == null || ip.isLoopback ? null : ip.address;
     const name = QrCodeDialogConst.lanProfileName;
@@ -219,22 +222,14 @@ class LocalProxyDialog extends ConsumerWidget {
 typedef _Links = ({String telegram, String full});
 
 /// A proxy dialog: [header] (the tabs), [children], [footer], then Copy link — off while [links]
-/// is null — and Close. [_ProxyDialogFrame.off] is sharing that is off: what turns it on, and Close.
+/// is null — and Close.
 class _ProxyDialogFrame extends StatelessWidget {
-  const _ProxyDialogFrame({required this.header, required this.links, required this.children, this.footer})
-    : copyLink = true;
-
-  _ProxyDialogFrame.off({required this.header, required IconData icon, required VoidCallback onTurnOn})
-    : links = null,
-      children = [_OffCard(icon: icon, onTurnOn: onTurnOn)],
-      footer = null,
-      copyLink = false;
+  const _ProxyDialogFrame({required this.header, required this.links, required this.children, this.footer});
 
   final Widget? header;
   final _Links? links;
   final List<Widget> children;
   final Widget? footer;
-  final bool copyLink;
 
   @override
   Widget build(BuildContext context) {
@@ -252,7 +247,7 @@ class _ProxyDialogFrame extends StatelessWidget {
               const Gap(12),
               Row(
                 children: [
-                  if (copyLink) _CopyLinkButton(links),
+                  _CopyLinkButton(links),
                   const Spacer(),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -512,50 +507,6 @@ class _FieldEditor extends HookWidget {
               visualDensity: VisualDensity.compact,
             ),
             const Gap(10),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Sharing with other devices while it is off: its [icon], that it is off, and Turn on.
-class _OffCard extends ConsumerWidget {
-  const _OffCard({required this.icon, required this.onTurnOn});
-
-  final IconData icon;
-  final VoidCallback onTurnOn;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final text = ref.watch(translationsProvider).requireValue.dialogs.localProxy;
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Material(
-      color: colors.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 16, 12, 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(color: colors.secondaryContainer, shape: BoxShape.circle),
-                  child: Icon(icon, size: 22, color: colors.onSecondaryContainer),
-                ),
-                const Gap(14),
-                Expanded(child: Text(text.currentlyOff, style: theme.textTheme.titleSmall)),
-              ],
-            ),
-            const Gap(4),
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: FilledButton.tonal(onPressed: onTurnOn, child: Text(text.turnOn)),
-            ),
           ],
         ),
       ),
