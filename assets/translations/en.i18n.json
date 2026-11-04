@@ -1061,6 +1061,8 @@
       "otherDevices": "Other devices",
       "server": "Server",
       "noPassword": "No password set",
+      "turnOnSharing": "Turn on sharing",
+      "turnOff": "Turn off",
       "copyLink": "Copy link",
       "telegramLink": "Telegram link",
       "fullLink": "Full link",
