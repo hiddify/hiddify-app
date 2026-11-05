@@ -197,7 +197,13 @@ extension OutboundInfoCard on OutboundInfo {
   /// [type] without the status mark the core adds while the proxy is not ready
   /// ("WARP ⏳ Connecting..."); the row shows the status its own way.
   String get typeWithoutStatus => status == Status.READY ? type : type.replaceFirst(_statusMark, '');
+
+  /// A config the core could not read: it folds the reason into the type ("Invalid: bad uuid";
+  /// hiddify-sing-box adapter/h_display.go).
+  bool get isInvalid => _invalidType.hasMatch(typeWithoutStatus);
 }
+
+final _invalidType = RegExp(r'^Invalid:?\s+\S');
 
 /// The endpoint the WARP scanner chose, as the core appends it to the display type
 /// (" · 🔍 162.159.192.1:2408", " · 🔍 [2606:4700:…]:443"; hiddify-sing-box hiddify/warpscan/status.go).

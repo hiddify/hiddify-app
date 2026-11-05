@@ -1,8 +1,10 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
@@ -68,7 +70,8 @@ class _Header extends ConsumerWidget {
       Status.REGISTERING => (t.pages.proxies.status.registering, s.primary),
       Status.SEARCHING => (t.pages.proxies.status.searching, s.primary),
       Status.RECONNECTING => (t.pages.proxies.status.reconnecting, dark ? Colors.orange : Colors.deepOrange),
-      Status.FAILED => (t.pages.proxies.status.failed, s.error),
+      // an invalid config never carries traffic, though a core may still call it ready
+      _ when proxy.status == Status.FAILED || proxy.isInvalid => (t.pages.proxies.status.failed, s.error),
       _ => (t.pages.proxies.status.ready, dark ? Colors.lightGreen : Colors.green.shade700),
     };
     return Row(
@@ -121,7 +124,13 @@ class _Chip extends StatelessWidget {
             ),
             const Gap(5),
           ],
-          Text(text, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color, letterSpacing: .3)),
+          // a long type, such as why a config could not be read, wraps whole and can be copied
+          Flexible(
+            child: SelectableText(
+              text,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(color: color, letterSpacing: .3),
+            ),
+          ),
         ],
       ),
     );
@@ -187,20 +196,21 @@ class OutboundInfoWidget extends ConsumerWidget {
 }
 
 /// The error of the proxy's last URL test, or why it is not ready, as the core reports it.
-class _FailureReason extends StatelessWidget {
+class _FailureReason extends ConsumerWidget {
   const _FailureReason({required this.title, required this.reason});
 
   final String title;
   final String reason;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
     final theme = Theme.of(context);
     final s = theme.colorScheme;
     return DecoratedBox(
       decoration: BoxDecoration(color: s.errorContainer.withValues(alpha: .6), borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+        padding: const EdgeInsetsDirectional.fromSTEB(12, 4, 4, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -208,15 +218,32 @@ class _FailureReason extends StatelessWidget {
               children: [
                 Icon(FluentIcons.error_circle_24_regular, size: 18, color: s.onErrorContainer),
                 const Gap(8),
-                Text(title, style: theme.textTheme.labelLarge?.copyWith(color: s.onErrorContainer)),
+                Expanded(
+                  child: Text(title, style: theme.textTheme.labelLarge?.copyWith(color: s.onErrorContainer)),
+                ),
+                IconButton(
+                  tooltip: t.common.addToClipboard,
+                  visualDensity: VisualDensity.compact,
+                  iconSize: 18,
+                  color: s.onErrorContainer,
+                  icon: const Icon(FluentIcons.copy_24_regular),
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(text: reason));
+                    ref
+                        .read(inAppNotificationControllerProvider)
+                        .showSuccessToast(t.common.msg.export.clipboard.success);
+                  },
+                ),
               ],
             ),
-            const Gap(6),
             // the core's own words, left to right: they are English and full of addresses
-            SelectableText(
-              reason,
-              textDirection: TextDirection.ltr,
-              style: theme.textTheme.bodySmall?.copyWith(color: s.onErrorContainer, fontFamily: 'monospace'),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8),
+              child: SelectableText(
+                reason,
+                textDirection: TextDirection.ltr,
+                style: theme.textTheme.bodySmall?.copyWith(color: s.onErrorContainer, fontFamily: 'monospace'),
+              ),
             ),
           ],
         ),
