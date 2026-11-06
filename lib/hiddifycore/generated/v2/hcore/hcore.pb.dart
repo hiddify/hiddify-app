@@ -2312,10 +2312,18 @@ class GenerateWarpConfigRequest extends $pb.GeneratedMessage {
 class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
   factory SetSystemProxyEnabledRequest({
     $core.bool? isEnabled,
+    $core.String? address,
+    $core.bool? supportSocks,
   }) {
     final $result = create();
     if (isEnabled != null) {
       $result.isEnabled = isEnabled;
+    }
+    if (address != null) {
+      $result.address = address;
+    }
+    if (supportSocks != null) {
+      $result.supportSocks = supportSocks;
     }
     return $result;
   }
@@ -2325,6 +2333,8 @@ class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SetSystemProxyEnabledRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOB(1, _omitFieldNames ? '' : 'isEnabled')
+    ..aOS(2, _omitFieldNames ? '' : 'address')
+    ..aOB(3, _omitFieldNames ? '' : 'supportSocks')
     ..hasRequiredFields = false
   ;
 
@@ -2357,6 +2367,26 @@ class SetSystemProxyEnabledRequest extends $pb.GeneratedMessage {
   $core.bool hasIsEnabled() => $_has(0);
   @$pb.TagNumber(1)
   void clearIsEnabled() => clearField(1);
+
+  /// Where the system proxy points (host:port), when enabling: the local proxy of a core that runs
+  /// as root and cannot set the user's system proxy itself.
+  @$pb.TagNumber(2)
+  $core.String get address => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set address($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasAddress() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAddress() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.bool get supportSocks => $_getBF(2);
+  @$pb.TagNumber(3)
+  set supportSocks($core.bool v) { $_setBool(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasSupportSocks() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSupportSocks() => clearField(3);
 }
 
 class LogMessage extends $pb.GeneratedMessage {
@@ -3148,6 +3178,7 @@ class EnsureAdminBgServiceRequest extends $pb.GeneratedMessage {
     $core.int? ownerPid,
     $core.String? cliPath,
     $core.String? ownerUser,
+    $core.bool? proxyOnly,
   }) {
     final $result = create();
     if (configContent != null) {
@@ -3174,6 +3205,9 @@ class EnsureAdminBgServiceRequest extends $pb.GeneratedMessage {
     if (ownerUser != null) {
       $result.ownerUser = ownerUser;
     }
+    if (proxyOnly != null) {
+      $result.proxyOnly = proxyOnly;
+    }
     return $result;
   }
   EnsureAdminBgServiceRequest._() : super();
@@ -3189,6 +3223,7 @@ class EnsureAdminBgServiceRequest extends $pb.GeneratedMessage {
     ..a<$core.int>(6, _omitFieldNames ? '' : 'ownerPid', $pb.PbFieldType.O3)
     ..aOS(7, _omitFieldNames ? '' : 'cliPath')
     ..aOS(8, _omitFieldNames ? '' : 'ownerUser')
+    ..aOB(9, _omitFieldNames ? '' : 'proxyOnly')
     ..hasRequiredFields = false
   ;
 
@@ -3279,6 +3314,16 @@ class EnsureAdminBgServiceRequest extends $pb.GeneratedMessage {
   $core.bool hasOwnerUser() => $_has(7);
   @$pb.TagNumber(8)
   void clearOwnerUser() => clearField(8);
+
+  /// Runs the engine without its TUN: a proxy mode whose profile needs administrator rights.
+  @$pb.TagNumber(9)
+  $core.bool get proxyOnly => $_getBF(8);
+  @$pb.TagNumber(9)
+  set proxyOnly($core.bool v) { $_setBool(8, v); }
+  @$pb.TagNumber(9)
+  $core.bool hasProxyOnly() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearProxyOnly() => clearField(9);
 }
 
 class EnsureAdminBgServiceEvent extends $pb.GeneratedMessage {

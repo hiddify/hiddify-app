@@ -7,6 +7,7 @@ import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop.dart';
 import 'package:hiddify/hiddifycore/core_interface/vpn_config_snapshot.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/adminbgservice/admin_bg_service.pbgrpc.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
@@ -28,6 +29,8 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   Directory? _workingDirectory;
   SingboxConfigOption? _options;
   bool _usingAdminBg = false;
+  // The user's system proxy this app's core set for the service's engine (see _applyServiceSystemProxy).
+  bool _serviceSystemProxy = false;
   bool? _privileged;
   late String _secret;
 
@@ -212,6 +215,8 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
         ownerPid: pid,
         cliPath: _cliPath,
         ownerUser: _ownerUser,
+        // a proxy mode whose profile needs administrator rights runs without the TUN
+        proxyOnly: !options.enableTun,
       ),
     )) {
       last = event.progress;
@@ -245,10 +250,48 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     if (old != null) unawaited(old.shutdown());
     _usingAdminBg = true;
     _clientChanges.add(null);
+    await _applyServiceSystemProxy(options);
+  }
+
+  /// The service runs as root and cannot set the user's system proxy (the user's desktop session,
+  /// D-Bus and Wayland, is out of its reach), so it reports where its config wanted it: the system
+  /// proxy mode, or a profile's own proxy inbound beside the TUN. This app's core, which runs as the
+  /// user, points the system proxy there, and restores it on disconnect or when it exits.
+  Future<void> _applyServiceSystemProxy(SingboxConfigOption options) async {
+    final channel = _serviceChannel;
+    if (channel == null) return;
+    final status = await HiddifyAdminBGClient(
+      channel,
+      options: CallOptions(metadata: {'x-hiddify-secret': _secret}),
+    ).status(Empty()).timeout(const Duration(seconds: 5));
+    if (status.systemProxy.isEmpty) return;
+    final response = await fgClient.setSystemProxyEnabled(
+      SetSystemProxyEnabledRequest(isEnabled: true, address: status.systemProxy, supportSocks: status.systemProxySocks),
+    );
+    if (response.code != ResponseCode.OK) {
+      // the system proxy mode is pointless without it; beside a TUN it is only a convenience
+      if (!options.enableTun) throw StateError('Could not set the system proxy: ${response.message}');
+      loggy.warning('setting the system proxy failed: ${response.message}');
+      return;
+    }
+    _serviceSystemProxy = true;
+  }
+
+  Future<void> _restoreServiceSystemProxy() async {
+    if (!_serviceSystemProxy) return;
+    _serviceSystemProxy = false;
+    try {
+      await fgClient
+          .setSystemProxyEnabled(SetSystemProxyEnabledRequest(isEnabled: false))
+          .timeout(const Duration(seconds: 5));
+    } catch (error) {
+      loggy.warning('restoring the system proxy failed: $error');
+    }
   }
 
   /// Tears down a partial VPN connect so the UI never stays Connected/Starting.
   Future<void> _abandonVpnStart(Object error) async {
+    await _restoreServiceSystemProxy();
     final failedChannel = _serviceChannel;
     _serviceChannel = null;
     _usingAdminBg = false;
@@ -313,6 +356,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   Future<bool> stop() async {
     _status.add(const CoreStatus.stopping());
     final wasAdminBg = _usingAdminBg;
+    await _restoreServiceSystemProxy();
     final old = _serviceChannel;
     _serviceChannel = null;
     _usingAdminBg = false;

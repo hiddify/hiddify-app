@@ -30,6 +30,7 @@ const AdminBgStartRequest$json = {
     {'1': 'resources', '3': 11, '4': 3, '5': 11, '6': '.adminbgservice.AdminBgStartRequest.ResourcesEntry', '10': 'resources'},
     {'1': 'disable_memory_limit', '3': 12, '4': 1, '5': 8, '10': 'disableMemoryLimit'},
     {'1': 'owner_pid', '3': 13, '4': 1, '5': 5, '10': 'ownerPid'},
+    {'1': 'proxy_only', '3': 14, '4': 1, '5': 8, '10': 'proxyOnly'},
   ],
   '3': [AdminBgStartRequest_ResourcesEntry$json],
 };
@@ -55,18 +56,23 @@ final $typed_data.Uint8List adminBgStartRequestDescriptor = $convert.base64Decod
     'Y29uZmlnTmFtZRIjCg1zZXR0aW5nc19qc29uGAogASgJUgxzZXR0aW5nc0pzb24SUAoJcmVzb3'
     'VyY2VzGAsgAygLMjIuYWRtaW5iZ3NlcnZpY2UuQWRtaW5CZ1N0YXJ0UmVxdWVzdC5SZXNvdXJj'
     'ZXNFbnRyeVIJcmVzb3VyY2VzEjAKFGRpc2FibGVfbWVtb3J5X2xpbWl0GAwgASgIUhJkaXNhYm'
-    'xlTWVtb3J5TGltaXQSGwoJb3duZXJfcGlkGA0gASgFUghvd25lclBpZBo8Cg5SZXNvdXJjZXNF'
-    'bnRyeRIQCgNrZXkYASABKAlSA2tleRIUCgV2YWx1ZRgCIAEoDFIFdmFsdWU6AjgB');
+    'xlTWVtb3J5TGltaXQSGwoJb3duZXJfcGlkGA0gASgFUghvd25lclBpZBIdCgpwcm94eV9vbmx5'
+    'GA4gASgIUglwcm94eU9ubHkaPAoOUmVzb3VyY2VzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFA'
+    'oFdmFsdWUYAiABKAxSBXZhbHVlOgI4AQ==');
 
 @$core.Deprecated('Use adminBgResponseDescriptor instead')
 const AdminBgResponse$json = {
   '1': 'AdminBgResponse',
   '2': [
     {'1': 'message', '3': 1, '4': 1, '5': 9, '10': 'message'},
+    {'1': 'system_proxy', '3': 2, '4': 1, '5': 9, '10': 'systemProxy'},
+    {'1': 'system_proxy_socks', '3': 3, '4': 1, '5': 8, '10': 'systemProxySocks'},
   ],
 };
 
 /// Descriptor for `AdminBgResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List adminBgResponseDescriptor = $convert.base64Decode(
-    'Cg9BZG1pbkJnUmVzcG9uc2USGAoHbWVzc2FnZRgBIAEoCVIHbWVzc2FnZQ==');
+    'Cg9BZG1pbkJnUmVzcG9uc2USGAoHbWVzc2FnZRgBIAEoCVIHbWVzc2FnZRIhCgxzeXN0ZW1fcH'
+    'JveHkYAiABKAlSC3N5c3RlbVByb3h5EiwKEnN5c3RlbV9wcm94eV9zb2NrcxgDIAEoCFIQc3lz'
+    'dGVtUHJveHlTb2Nrcw==');
 

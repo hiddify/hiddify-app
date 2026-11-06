@@ -322,6 +322,7 @@ const OutboundInfo$json = {
     {'1': 'upload_speed_cached', '3': 23, '4': 1, '5': 8, '10': 'uploadSpeedCached'},
     {'1': 'download_speed_cached', '3': 24, '4': 1, '5': 8, '10': 'downloadSpeedCached'},
     {'1': 'error', '3': 25, '4': 1, '5': 9, '10': 'error'},
+    {'1': 'sort_delay', '3': 26, '4': 1, '5': 5, '10': 'sortDelay'},
   ],
   '8': [
     {'1': '_ipinfo'},
@@ -348,8 +349,8 @@ final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode(
     'INZG93bmxvYWRTcGVlZBIpChBkb3dubG9hZF90ZXN0aW5nGBYgASgIUg9kb3dubG9hZFRlc3Rp'
     'bmcSLgoTdXBsb2FkX3NwZWVkX2NhY2hlZBgXIAEoCFIRdXBsb2FkU3BlZWRDYWNoZWQSMgoVZG'
     '93bmxvYWRfc3BlZWRfY2FjaGVkGBggASgIUhNkb3dubG9hZFNwZWVkQ2FjaGVkEhQKBWVycm9y'
-    'GBkgASgJUgVlcnJvckIJCgdfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dyb3'
-    'VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5');
+    'GBkgASgJUgVlcnJvchIdCgpzb3J0X2RlbGF5GBogASgFUglzb3J0RGVsYXlCCQoHX2lwaW5mb0'
+    'IVChNfZ3JvdXBfc2VsZWN0ZWRfdGFnQh0KG19ncm91cF9zZWxlY3RlZF90YWdfZGlzcGxheQ==');
 
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = {
@@ -613,13 +614,16 @@ const SetSystemProxyEnabledRequest$json = {
   '1': 'SetSystemProxyEnabledRequest',
   '2': [
     {'1': 'is_enabled', '3': 1, '4': 1, '5': 8, '10': 'isEnabled'},
+    {'1': 'address', '3': 2, '4': 1, '5': 9, '10': 'address'},
+    {'1': 'support_socks', '3': 3, '4': 1, '5': 8, '10': 'supportSocks'},
   ],
 };
 
 /// Descriptor for `SetSystemProxyEnabledRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List setSystemProxyEnabledRequestDescriptor = $convert.base64Decode(
     'ChxTZXRTeXN0ZW1Qcm94eUVuYWJsZWRSZXF1ZXN0Eh0KCmlzX2VuYWJsZWQYASABKAhSCWlzRW'
-    '5hYmxlZA==');
+    '5hYmxlZBIYCgdhZGRyZXNzGAIgASgJUgdhZGRyZXNzEiMKDXN1cHBvcnRfc29ja3MYAyABKAhS'
+    'DHN1cHBvcnRTb2Nrcw==');
 
 @$core.Deprecated('Use logMessageDescriptor instead')
 const LogMessage$json = {
@@ -817,6 +821,7 @@ const EnsureAdminBgServiceRequest$json = {
     {'1': 'owner_pid', '3': 6, '4': 1, '5': 5, '10': 'ownerPid'},
     {'1': 'cli_path', '3': 7, '4': 1, '5': 9, '10': 'cliPath'},
     {'1': 'owner_user', '3': 8, '4': 1, '5': 9, '10': 'ownerUser'},
+    {'1': 'proxy_only', '3': 9, '4': 1, '5': 8, '10': 'proxyOnly'},
   ],
   '3': [EnsureAdminBgServiceRequest_ResourcesEntry$json],
 };
@@ -839,8 +844,9 @@ final $typed_data.Uint8List ensureAdminBgServiceRequestDescriptor = $convert.bas
     'Vuc3VyZUFkbWluQmdTZXJ2aWNlUmVxdWVzdC5SZXNvdXJjZXNFbnRyeVIJcmVzb3VyY2VzEjAK'
     'FGRpc2FibGVfbWVtb3J5X2xpbWl0GAUgASgIUhJkaXNhYmxlTWVtb3J5TGltaXQSGwoJb3duZX'
     'JfcGlkGAYgASgFUghvd25lclBpZBIZCghjbGlfcGF0aBgHIAEoCVIHY2xpUGF0aBIdCgpvd25l'
-    'cl91c2VyGAggASgJUglvd25lclVzZXIaPAoOUmVzb3VyY2VzRW50cnkSEAoDa2V5GAEgASgJUg'
-    'NrZXkSFAoFdmFsdWUYAiABKAxSBXZhbHVlOgI4AQ==');
+    'cl91c2VyGAggASgJUglvd25lclVzZXISHQoKcHJveHlfb25seRgJIAEoCFIJcHJveHlPbmx5Gj'
+    'wKDlJlc291cmNlc0VudHJ5EhAKA2tleRgBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgMUgV2YWx1'
+    'ZToCOAE=');
 
 @$core.Deprecated('Use ensureAdminBgServiceEventDescriptor instead')
 const EnsureAdminBgServiceEvent$json = {
