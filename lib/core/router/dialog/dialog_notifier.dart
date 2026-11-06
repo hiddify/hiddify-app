@@ -170,10 +170,18 @@ class DialogNotifier extends _$DialogNotifier {
     return await _show<bool?>(UnknownDomainsWarningDialog(url: url)) ?? false;
   }
 
-  /// How many of a profile's [count] proxies run, the fastest, starting at [keep]: -1 for all of
-  /// them, null when dismissed.
-  Future<int?> showKeepTop({required int count, required int keep}) async {
-    return await _show<int?>(KeepTopDialog(count: count, keep: keep));
+  /// How many of a profile's [count] proxies run, the fastest, starting at [keep], and whether a
+  /// quick test picks them, starting at [quick]: -1 for all of them, null when dismissed.
+  Future<KeepTopChoice?> showKeepTop({
+    required int count,
+    required int keep,
+    bool quick = true,
+    List<String> countries = const [],
+    List<(String, int)> available = const [],
+  }) async {
+    return await _show<KeepTopChoice?>(
+      KeepTopDialog(count: count, keep: keep, quick: quick, countries: countries, available: available),
+    );
   }
 
   /// Which of [profile]'s [proxies] run, by their tags; null when dismissed.

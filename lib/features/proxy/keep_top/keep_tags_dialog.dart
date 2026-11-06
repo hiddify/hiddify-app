@@ -9,6 +9,7 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/proxy/keep_top/country_names.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
@@ -32,10 +33,16 @@ enum _Facet { status, protocol, country }
 /// How many "the fastest" are, to test or to choose.
 const _fastest = 10;
 
-/// A country with fewer proxies than this is under "others" in the country filter.
-const _fewCountry = 5;
+/// A country with fewer proxies than this shares an entry of the country filter with other rare ones.
+const _fewCountry = 3;
 
-/// The country filter's entry for the countries with few proxies, and the proxies with none.
+/// The most rare countries one entry holds.
+const _mergedCountries = 4;
+
+/// The start of the entry of a group of rare countries: `+0`, `+1`, ...
+const _countryGroup = '+';
+
+/// The country filter's entry for the proxies of no known country.
 const _otherCountries = '*';
 
 /// The protocol a sing-box [type] is, as the core names it on the proxy page.
@@ -101,34 +108,11 @@ class KeepTagsDialog extends HookConsumerWidget {
 
     final tags = useMemoized(() => [for (final p in proxies) p.tag], [proxies]);
     final protocols = useMemoized(() => {for (final p in proxies) p.tag: protocolName(p.type)}, [proxies]);
-    final countries = useMemoized(
-      () => {
-        for (final p in proxies)
-          if (countryOf(p.tag) case final code?) p.tag: code,
-      },
-      [proxies],
-    );
 
     final selected = useState<Set<String>>({...profile.keepTags.where(tags.contains)});
     final query = useState('');
     final sort = useState(_Sort.profile);
     final countryFilter = useState(<String>{});
-    // the countries with few proxies, and the proxies with none, are one entry: the list stays short
-    final fewCountries = useMemoized(() {
-      final totals = <String, int>{};
-      for (final code in countries.values) {
-        totals[code] = (totals[code] ?? 0) + 1;
-      }
-      return {
-        for (final MapEntry(:key, :value) in totals.entries)
-          if (value < _fewCountry) key,
-      };
-    }, [countries]);
-    // the entry a proxy's country is under: its own, or the others'
-    String countryEntry(String tag) => switch (countries[tag]) {
-      final code? when !fewCountries.contains(code) => code,
-      _ => _otherCountries,
-    };
     final protocolFilter = useState(<String>{});
     // the proxies that answer first: those are the ones worth choosing
     final statusFilter = useState(<_Status>{_Status.answering});
@@ -144,6 +128,41 @@ class KeepTagsDialog extends HookConsumerWidget {
         if (!e.isGroup) e.tag: e,
     };
     final connected = group != null && live.isNotEmpty;
+
+    // a proxy's country: where its IP is, as the core looked it up, else the flag in its name
+    final countries = {
+      for (final tag in tags)
+        if (live[tag]?.ipinfo.countryCode.toUpperCase() ?? '' case final code when code.length == 2)
+          tag: code
+        else if (countryOf(tag) case final code?)
+          tag: code,
+    };
+    // a country of a proxy or two is not a row of its own: such countries share rows, up to
+    // _mergedCountries in one, the most common first, each row named by their flags
+    final countryTotals = <String, int>{};
+    for (final code in countries.values) {
+      countryTotals[code] = (countryTotals[code] ?? 0) + 1;
+    }
+    final rare =
+        [
+          for (final e in countryTotals.entries)
+            if (e.value < _fewCountry) e.key,
+        ]..sort(
+          (a, b) =>
+              countryTotals[a] != countryTotals[b] ? countryTotals[b]!.compareTo(countryTotals[a]!) : a.compareTo(b),
+        );
+    final countryGroups = <String, List<String>>{};
+    final groupOf = <String, String>{};
+    for (final (i, code) in rare.indexed) {
+      final group = '$_countryGroup${i ~/ _mergedCountries}';
+      (countryGroups[group] ??= []).add(code);
+      groupOf[code] = group;
+    }
+    // the entry a proxy's country is under: its own, its group's, or the others' when it has none
+    String countryEntry(String tag) => switch (countries[tag]) {
+      final code? => groupOf[code] ?? code,
+      _ => _otherCountries,
+    };
 
     // a paused proxy, as the core would show it: its tag without the core's mark, its protocol
     OutboundInfo info(String tag) =>
@@ -268,17 +287,15 @@ class KeepTagsDialog extends HookConsumerWidget {
     }
 
     final pausedCount = connected ? tags.where(paused).length : 0;
+    // the user decides among all the proxies: the paused ones run, and get a ping, while the picker
+    // is open
+    useEffect(() {
+      if (connected && pausedCount > 0 && !woke.value) unawaited(wake());
+      return null;
+    }, [connected]);
     final emoji = PlatformUtils.isWindows ? FontFamily.emoji : null;
-    // "Others: CN JP TR …", the most common of them first
-    String otherCountriesLabel(String others) {
-      final codes = _counts([
-        for (final code in countries.values)
-          if (fewCountries.contains(code)) code,
-      ]).map((e) => e.$1).toList();
-      if (codes.isEmpty) return others;
-      final shown = codes.take(6).join(' ');
-      return '$others: $shown${codes.length > 6 ? ' …' : ''}';
-    }
+    // a group of rare countries by their flags: "🇬🇧 🇹🇼 🇮🇹 🇰🇷"
+    String groupLabel(String group) => countryGroups[group]!.map(flagOf).join('  ');
 
     return PopScope(
       // dismissed: the proxies run as they did before the picker woke them
@@ -371,7 +388,7 @@ class KeepTagsDialog extends HookConsumerWidget {
                   ],
                 ),
               ),
-              // the quick filters, in one row
+              // the quick filters
               const Gap(10),
               _FilterRow(
                 children: [
@@ -407,14 +424,21 @@ class KeepTagsDialog extends HookConsumerWidget {
                       icon: Icons.public_rounded,
                       options: [
                         for (final (code, count) in countryCounts)
-                          if (code != _otherCountries) (code, '${flagOf(code)}  $code', count),
-                        // the others last, named by their codes
+                          if (!code.startsWith(_countryGroup) && code != _otherCountries)
+                            (code, '${flagOf(code)}  ${countryNames[code] ?? code}', count),
+                        // then the groups of rare countries, by their flags, and the proxies of no country
                         for (final (code, count) in countryCounts)
-                          if (code == _otherCountries) (code, otherCountriesLabel(text.otherCountries), count),
+                          if (code.startsWith(_countryGroup)) (code, groupLabel(code), count),
+                        for (final (code, count) in countryCounts)
+                          if (code == _otherCountries) (code, text.otherCountries, count),
                       ],
                       selected: countryFilter.value,
                       onChanged: (value) => countryFilter.value = value,
                       style: TextStyle(fontFamily: emoji),
+                      // a country by its code or name; a group by those of its countries
+                      searchTerms: (entry) => [
+                        for (final code in countryGroups[entry] ?? [entry]) '$code ${countryNames[code] ?? ''}',
+                      ].join(' '),
                     ),
                 ],
               ),
@@ -573,7 +597,7 @@ class KeepTagsDialog extends HookConsumerWidget {
 
 /// A filter of many values, as one chip: "Protocol", or what is ticked, opening the values with
 /// their counts to tick.
-class _FacetButton extends StatelessWidget {
+class _FacetButton extends HookWidget {
   const _FacetButton({
     required this.label,
     required this.any,
@@ -582,6 +606,7 @@ class _FacetButton extends StatelessWidget {
     required this.selected,
     required this.onChanged,
     this.style,
+    this.searchTerms,
   });
 
   final String label;
@@ -596,9 +621,15 @@ class _FacetButton extends StatelessWidget {
   final ValueChanged<Set<String>> onChanged;
   final TextStyle? style;
 
+  /// What a value is found by, typed in the field at the top of the values; no field when null.
+  final String Function(String value)? searchTerms;
+
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
+    final query = useTextEditingController();
+    useListenable(query);
+    final needle = query.text.trim().toLowerCase();
     final names = {for (final (value, name, _) in options) value: name};
     final title = switch (selected.length) {
       0 => label,
@@ -624,6 +655,22 @@ class _FacetButton extends StatelessWidget {
         onSelected: (_) => controller.isOpen ? controller.close() : controller.open(),
       ),
       menuChildren: [
+        if (searchTerms != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 4),
+            child: SizedBox(
+              width: 220,
+              child: TextField(
+                controller: query,
+                decoration: InputDecoration(
+                  isDense: true,
+                  prefixIcon: const Icon(Icons.search_rounded, size: 18),
+                  hintText: label,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ),
         MenuItemButton(
           leadingIcon: Icon(Icons.clear_all_rounded, size: 20, color: selected.isEmpty ? s.primary : null),
           onPressed: () => onChanged({}),
@@ -631,16 +678,18 @@ class _FacetButton extends StatelessWidget {
         ),
         const Divider(height: 1),
         for (final (value, name, count) in options)
-          CheckboxMenuButton(
-            value: selected.contains(value),
-            closeOnActivate: false,
-            onChanged: (checked) => onChanged(checked ?? false ? {...selected, value} : ({...selected}..remove(value))),
-            trailingIcon: Text(
-              '$count',
-              style: TextStyle(color: s.onSurfaceVariant, fontFeatures: const [FontFeature.tabularFigures()]),
+          if (needle.isEmpty || searchTerms!(value).toLowerCase().contains(needle))
+            CheckboxMenuButton(
+              value: selected.contains(value),
+              closeOnActivate: false,
+              onChanged: (checked) =>
+                  onChanged(checked ?? false ? {...selected, value} : ({...selected}..remove(value))),
+              trailingIcon: Text(
+                '$count',
+                style: TextStyle(color: s.onSurfaceVariant, fontFeatures: const [FontFeature.tabularFigures()]),
+              ),
+              child: Text(name, style: style),
             ),
-            child: Text(name, style: style),
-          ),
       ],
     );
   }
@@ -837,21 +886,19 @@ class _ChosenTray extends ConsumerWidget {
   }
 }
 
-/// One row of quick filters, scrolled sideways when they do not fit.
+/// The quick filters, on as many lines as they need: a row scrolled sideways hid the last ones
+/// past the edge, with nothing to show there were more.
 class _FilterRow extends StatelessWidget {
   const _FilterRow({required this.children});
 
   final List<Widget> children;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 36,
-    child: ListView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      children: [
-        for (final (i, child) in children.indexed) ...[if (i > 0) const Gap(6), child],
-      ],
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: SizedBox(
+      width: double.infinity,
+      child: Wrap(spacing: 6, runSpacing: 6, children: children),
     ),
   );
 }

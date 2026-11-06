@@ -49,6 +49,12 @@ class SingboxConfigOption with _$SingboxConfigOption {
     /// for all of them.
     @Default(-1) int keepTop,
 
+    /// Whether keep top may pick before every proxy is tested (`keep-top-quick`).
+    @Default(false) bool keepTopQuick,
+
+    /// The countries keep top keeps proxies of (`keep-top-countries`); empty for any.
+    @Default(<String>[]) List<String> keepTopCountries,
+
     /// The profile's proxies the user chose to run, and only them (`keep-tags`).
     @Default(<String>[]) List<String> keepTags,
     @IntervalInSecondsConverter() required Duration urlTestInterval,

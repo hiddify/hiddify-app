@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/profile/data/profile_parser.dart';
@@ -63,6 +64,29 @@ void main() {
     expect(_override(userOverride: const UserOverride(keepTop: 10))['keep-top'], 10);
   });
 
+  test('the core gets the quick test unless the user turned it off', () {
+    expect(_override(userOverride: const UserOverride(keepTop: 10, keepTopQuick: true))['keep-top-quick'], isTrue);
+    expect(
+      _override(userOverride: const UserOverride(keepTop: 10, keepTopQuick: false)).containsKey('keep-top-quick'),
+      isFalse,
+    );
+    expect(_override(userOverride: const UserOverride(keepTop: 10))['keep-top-quick'], isTrue, reason: 'on by default');
+    expect(
+      _override(headers: {'keep-top-quick': 'false'})['keep-top-quick'],
+      isTrue,
+      reason: 'a subscription can not turn it off',
+    );
+  });
+
+  test("the core gets the countries the user chose, never a subscription's", () {
+    expect(
+      _override(userOverride: const UserOverride(keepTop: 5, keepTopCountries: ['DE', 'FR']))['keep-top-countries'],
+      ['DE', 'FR'],
+    );
+    expect(_override(userOverride: const UserOverride(keepTop: 5)).containsKey('keep-top-countries'), isFalse);
+    expect(_override(headers: {'keep-top-countries': 'DE'}).containsKey('keep-top-countries'), isFalse);
+  });
+
   test('the user is asked only when nobody decided', () {
     expect(_profile().keepTopDecided, isFalse);
     expect(_profile().keepTop, -1);
@@ -79,17 +103,21 @@ void main() {
     expect(UserOverride.fromStr(const UserOverride(keepTop: 10).toStr())!.keepTop, 10);
   });
 
-  Future<int?> answer(WidgetTester tester, Future<void> Function() act) async {
-    int? result;
+  Future<KeepTopChoice?> answer(
+    WidgetTester tester,
+    Future<void> Function() act, {
+    List<(String, int)> available = const [],
+  }) async {
+    KeepTopChoice? result;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [translationsProvider.overrideWith((ref) => AppLocale.en.buildSync())],
         child: MaterialApp(
           home: Builder(
             builder: (context) => TextButton(
-              onPressed: () async => result = await showDialog<int>(
+              onPressed: () async => result = await showDialog<KeepTopChoice>(
                 context: context,
-                builder: (_) => const KeepTopDialog(count: 50, keep: 10),
+                builder: (_) => KeepTopDialog(count: 50, keep: 10, available: available),
               ),
               child: const Text('open'),
             ),
@@ -104,18 +132,101 @@ void main() {
     return result;
   }
 
+  // the chevron of the keep button opens the counts
+  Future<void> openCounts(WidgetTester tester) async {
+    await tester.tap(find.byIcon(Icons.expand_more_rounded));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('the dialog keeps the count the user picks', (tester) async {
     final result = await answer(tester, () async {
-      expect(find.text('30'), findsOneWidget);
+      await openCounts(tester);
+      expect(find.text('20'), findsOneWidget);
+      expect(find.text('100'), findsNothing, reason: 'not more than the profile has');
       await tester.tap(find.text('20'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Keep the 20 fastest'));
     });
-    expect(result, 20);
+    expect((result?.keep, result?.quick), (20, true));
   });
 
   testWidgets('the dialog can run them all', (tester) async {
-    expect(await answer(tester, () => tester.tap(find.text('Use all 50'))), -1);
+    final result = await answer(tester, () async {
+      await openCounts(tester);
+      await tester.tap(find.text('All'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Use all 50'));
+    });
+    expect((result?.keep, result?.quick), (-1, true));
+  });
+
+  testWidgets('the dialog can keep the ones that answer', (tester) async {
+    final result = await answer(tester, () async {
+      await openCounts(tester);
+      await tester.tap(find.text('Working'));
+      // its dots shimmer until the dialog closes
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.tap(find.text('Keep working ones'));
+    });
+    expect((result?.keep, result?.quick), (keepTopAnswering, true));
+  });
+
+  testWidgets('the dialog keeps the regions the user finds', (tester) async {
+    final result = await answer(tester, () async {
+      await openCounts(tester);
+      await tester.tap(find.text('Region'));
+      await tester.pumpAndSettle();
+      // the profile's own countries are listed at once, the most proxies first
+      expect(find.textContaining('Germany'), findsOneWidget);
+      await tester.tap(find.textContaining('Netherlands'));
+      await tester.pumpAndSettle();
+      // any other country by its name, or "uk"
+      final field = find.byType(TextField);
+      await tester.enterText(field, 'turk');
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Turkey'));
+      await tester.pumpAndSettle();
+      await tester.enterText(field, 'uk');
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('United Kingdom'));
+      await tester.pumpAndSettle();
+      // ticked again, it is off
+      await tester.enterText(field, '');
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.textContaining('Netherlands'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Netherlands'));
+      await tester.pumpAndSettle();
+      // the menus stayed open; closing them, the choice stays
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      if (find.byType(TextField).evaluate().isNotEmpty) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+      }
+      await tester.tap(find.textContaining('Keep the 10 fastest'));
+    }, available: const [('DE', 12), ('FR', 7), ('NL', 4)]);
+    expect(result?.countries, unorderedEquals(['TR', 'GB']));
+  });
+
+  testWidgets('the dialog hands over to choosing by hand', (tester) async {
+    final result = await answer(tester, () async {
+      await tester.ensureVisible(find.text('Choose the proxies yourself'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Choose the proxies yourself'));
+    });
+    expect(result?.keep, KeepTopDialog.pickByHand);
+  });
+
+  testWidgets('the quick test can be turned off', (tester) async {
+    final result = await answer(tester, () async {
+      await tester.ensureVisible(find.text('Quick test'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Quick test'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Keep the 10 fastest'));
+    });
+    expect((result?.keep, result?.quick), (10, false));
   });
 
   test('speeds read in Mbps: three decimals below 1, one below 10, none above', () {

@@ -32,6 +32,7 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
       appBar: AppBar(
         title: Text(t.pages.proxies.title),
         actions: [
+          const KeepTopAction(),
           PopupMenuButton<ProxiesSort>(
             initialValue: sortBy,
             onSelected: ref.read(proxiesSortNotifierProvider.notifier).update,

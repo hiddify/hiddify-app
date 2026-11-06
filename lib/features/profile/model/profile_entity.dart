@@ -113,6 +113,13 @@ abstract class UserOverride with _$UserOverride {
     /// header decides, or the user is asked when the profile is big (see keep_top.dart).
     int? keepTop,
 
+    /// Lets keep top pick the fastest before every proxy is tested: once the ones still to test
+    /// were slower last time, and every one not tested in the last day has been. Null is on.
+    bool? keepTopQuick,
+
+    /// The countries keep top keeps proxies of (two-letter codes); null or empty for any.
+    List<String>? keepTopCountries,
+
     /// The tags of the profile's proxies the user chose to run, and only them, whatever [keepTop]
     /// says, while any of them is still in the profile. Null until the user chose some.
     List<String>? keepTags,

@@ -6,7 +6,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/proxy/keep_top/country_names.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_tags_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
+import 'package:hiddify/gen/fonts.gen.dart';
+import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// The proxies as dots: the running ones lit, the paused ones dim, and how many more there are.
@@ -110,127 +114,181 @@ class _Dot extends StatelessWidget {
   );
 }
 
-/// Asks how many of a profile's [count] proxies run, the fastest, starting at [keep]. Pops that
-/// number, -1 to run them all, or [pickByHand] to choose them one by one.
+/// What the keep top dialog answers: how many run, the fastest (-1 for all of them, or
+/// [KeepTopDialog.pickByHand]), and whether they are picked by a quick test.
+typedef KeepTopChoice = ({int keep, bool quick, List<String> countries});
+
+/// Asks how many of a profile's [count] proxies run, the fastest, starting at [keep], and whether
+/// a quick test picks them, starting at [quick]. Pops the choice: -1 to run them all,
+/// [keepTopAnswering] for the ones that answer, or [pickByHand] to choose them one by one.
 class KeepTopDialog extends HookConsumerWidget {
-  const KeepTopDialog({super.key, required this.count, required this.keep});
+  const KeepTopDialog({
+    super.key,
+    required this.count,
+    required this.keep,
+    this.quick = true,
+    this.countries = const [],
+    this.available = const [],
+  });
 
   final int count;
   final int keep;
+  final bool quick;
+
+  /// The countries chosen to keep proxies of; none for any.
+  final List<String> countries;
+
+  /// The countries of the profile's proxies, with how many each has, in the order offered.
+  final List<(String, int)> available;
 
   /// Popped when the user chooses the proxies that run themselves.
   static const pickByHand = 0;
 
-  static const _choices = [3, 5, 10, 20, 30];
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
+    final text = t.dialogs.keepTop;
     final theme = Theme.of(context);
     final s = theme.colorScheme;
-    final choices = {..._choices.where((n) => n < count), if (keep < count) keep}.toList()..sort();
     final chosen = useState(keep);
-    // the dots show what the button in focus (or under the mouse) runs
-    final keepIt = useState(true);
+    final quickTest = useState(quick);
+    final chosenCountries = useState(<String>{...countries});
     final n = chosen.value;
+    // the counts the chevron offers, below the profile's proxy count
+    final counts = {..._keepCounts.where((c) => c < count), if (keep > 0 && keep < count) keep}.toList()..sort();
+    final button = switch (n) {
+      keepTopAnswering => text.keepAnswering,
+      < 0 => text.useAll(count: count),
+      _ => text.keep(keep: n),
+    };
+    Widget dots = KeepTopDots(key: ValueKey(n), running: n > 0 ? n : count, total: count);
+    if (n == keepTopAnswering) {
+      // which ones answer is known once they are tested
+      dots = dots
+          .animate(onPlay: (c) => c.repeat())
+          .shimmer(duration: 1400.ms, color: s.primary.withValues(alpha: .6), angle: .4);
+    }
+    void done(int keep) =>
+        Navigator.of(context).pop((keep: keep, quick: quickTest.value, countries: chosenCountries.value.toList()));
+
     return AlertDialog(
-      icon: const Icon(Icons.bolt_rounded),
-      title: Text(t.dialogs.keepTop.title),
+      contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
       content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
+        constraints: const BoxConstraints(maxWidth: 400),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(12, 16, 12, 14),
-                decoration: BoxDecoration(color: s.surfaceContainerHighest, borderRadius: BorderRadius.circular(16)),
-                child: Column(
-                  children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: KeepTopDots(running: keepIt.value ? n : count, total: count),
-                    ),
-                    const Gap(10),
-                    Text(
-                      keepIt.value ? t.dialogs.keepTop.keeping(keep: n) : t.dialogs.keepTop.all(count: count),
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.labelLarge?.copyWith(color: keepIt.value ? s.primary : s.onSurfaceVariant),
-                    ),
-                    const Gap(14),
-                    Text(
-                      t.dialogs.keepTop.howMany,
-                      style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
-                    ),
-                    const Gap(8),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: SegmentedButton<int>(
-                        showSelectedIcon: false,
-                        segments: [for (final c in choices) ButtonSegment(value: c, label: Text('$c'))],
-                        selected: {n},
-                        onSelectionChanged: (value) {
-                          chosen.value = value.first;
-                          keepIt.value = true;
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Gap(16),
-              Text(
-                t.dialogs.keepTop.description(count: count, keep: n),
-                style: theme.textTheme.bodyMedium,
-              ),
-              const Gap(12),
+              // what this is about
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.unfold_more_rounded, size: 18, color: s.onSurfaceVariant),
-                  const Gap(8),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: s.primaryContainer),
+                    child: Icon(Icons.filter_alt_rounded, size: 22, color: s.onPrimaryContainer),
+                  ),
+                  const Gap(14),
                   Expanded(
-                    child: Text(
-                      t.dialogs.keepTop.hint,
-                      style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(text.title, style: theme.textTheme.titleLarge),
+                        const Gap(2),
+                        Text(
+                          text.subtitle(count: count),
+                          style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              const Gap(12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.of(context).pop(pickByHand),
-                  icon: const Icon(Icons.checklist_rounded, size: 18),
-                  label: Text(t.dialogs.keepTop.pickByHand),
+              const Gap(24),
+              // what that answer runs
+              Row(
+                children: [
+                  Expanded(
+                    child: FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerStart, child: dots),
+                  ),
+                  const Gap(12),
+                  Text(
+                    n > 0 ? '$n / $count' : (n == keepTopAnswering ? '? / $count' : '$count / $count'),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: s.primary,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                ],
+              ),
+              // how they are picked; nothing is picked when all of them run
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                child: n == -1
+                    ? const SizedBox(width: double.infinity)
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: _QuickTestSwitch(value: quickTest.value, onChanged: (value) => quickTest.value = value),
+                      ),
+              ),
+              const Gap(24),
+              // the TV remote's center button keeps them; the chevron picks how many
+              _KeepButton(
+                label: chosenCountries.value.isEmpty
+                    ? button
+                    : '$button  ${chosenCountries.value.map(flagOf).join(' ')}',
+                tooltip: text.howMany,
+                counts: counts,
+                extras: [(value: keepTopAnswering, label: text.answering), (value: -1, label: text.everyOne)],
+                // where they are: between "working" and "all"
+                beforeLastExtra: _CountryPill(
+                  available: available,
+                  chosen: chosenCountries.value,
+                  onChanged: (value) => chosenCountries.value = value,
                 ),
+                count: n,
+                onCount: (value) => chosen.value = value,
+                onKeep: () => done(n),
+                autofocus: true,
+                expand: true,
+              ),
+              const Gap(4),
+              TextButton.icon(
+                style: TextButton.styleFrom(minimumSize: const Size.fromHeight(44)),
+                onPressed: () => done(pickByHand),
+                icon: const Icon(Icons.checklist_rounded, size: 18),
+                label: Text(text.pickByHand),
               ),
             ],
           ),
         ),
       ),
-      actions: [
-        Focus(
-          onFocusChange: (focused) => keepIt.value = !focused,
-          child: MouseRegion(
-            onEnter: (_) => keepIt.value = false,
-            onExit: (_) => keepIt.value = true,
-            child: TextButton(
-              onPressed: () => Navigator.of(context).pop(-1),
-              child: Text(t.dialogs.keepTop.useAll(count: count)),
-            ),
-          ),
-        ),
-        FilledButton.icon(
-          // the TV remote's center button keeps them
-          autofocus: true,
-          onPressed: () => Navigator.of(context).pop(n),
-          icon: const Icon(Icons.bolt_rounded),
-          label: Text(t.dialogs.keepTop.keep(keep: n)),
-        ),
-      ],
+    );
+  }
+}
+
+/// In the proxy list's action bar, of a big profile, or one that runs only some of its proxies:
+/// opens the keep top dialog.
+class KeepTopAction extends ConsumerWidget {
+  const KeepTopAction({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final profile = ref.watch(activeProfileProvider).valueOrNull;
+    if (profile == null) return const SizedBox.shrink();
+    final total = ref.watch(profileProxyCountProvider(profile.id)).valueOrNull ?? 0;
+    final keepTop = profile.keepTop;
+    final keeping = profile.keepTags.isNotEmpty || keepTop == keepTopAnswering || (keepTop > 0 && total > keepTop);
+    if (!keeping && total <= bigProfileProxies) return const SizedBox.shrink();
+    return IconButton(
+      tooltip: t.dialogs.keepTop.howMany,
+      isSelected: keeping,
+      icon: const Icon(Icons.filter_alt_outlined),
+      selectedIcon: const Icon(Icons.filter_alt_rounded),
+      onPressed: () => ref.read(keepTopNotifierProvider.notifier).choose(profile, total),
     );
   }
 }
@@ -248,15 +306,16 @@ class KeepTopFooter extends HookConsumerWidget {
     final theme = Theme.of(context);
     final s = theme.colorScheme;
     final busy = useState(false);
-    // how many "keep the fastest" keeps, picked beside its button
-    final keepCount = useState(keepTopDefault);
     final profile = ref.watch(activeProfileProvider).valueOrNull;
     if (profile == null) return const SizedBox.shrink();
     final total = ref.watch(profileProxyCountProvider(profile.id)).valueOrNull ?? 0;
     final keepTop = profile.keepTop;
     // the proxies the user chose run, and only them; the core runs them all when none is left
     final chosen = profile.keepTags.isNotEmpty && listed < total;
-    final keeping = chosen || (keepTop > 0 && total > keepTop);
+    final regions = profile.userOverride?.keepTopCountries ?? const <String>[];
+    // every one that answers, of the regions when there are: the count is known after the test
+    final answering = keepTop == keepTopAnswering || (keepTop <= 0 && regions.isNotEmpty);
+    final keeping = chosen || answering || (keepTop > 0 && total > keepTop);
     if (!keeping && total <= bigProfileProxies) return const SizedBox.shrink();
 
     Future<void> apply(Future<void> Function(KeepTopNotifier notifier) change) async {
@@ -268,68 +327,42 @@ class KeepTopFooter extends HookConsumerWidget {
       }
     }
 
-    void showAll() => apply((notifier) => notifier.set(profile, -1));
     void choose() => apply((notifier) => notifier.choose(profile, total));
-    void pick() => apply((notifier) => notifier.pick(profile));
 
     // the core runs them all until their first pings are in
-    final picking = keeping && !chosen && listed > keepTop;
+    final picking = keeping && !chosen && (answering ? listed >= total : listed > keepTop);
     final running = keeping && !picking ? listed : total;
     final text = t.pages.proxies.keepTop;
+    // what stays after the test: how many, or which, and where
+    final where = regions.isEmpty ? '' : text.inRegions(flags: regions.map(flagOf).join(' '));
+    final then = switch (keepTop) {
+      > 0 => text.thenFastest(keep: keepTop, where: where),
+      keepTopAnswering => text.thenWorking(where: where),
+      _ => text.thenAll(where: where),
+    };
     final (String title, String body) = switch ((keeping, picking)) {
       _ when chosen => (text.chosen(n: listed), text.keptBody(paused: max(0, total - listed))),
-      (true, true) => (text.picking(keep: keepTop, count: total), text.pickingBody),
-      (true, false) => (text.kept(n: listed), text.keptBody(paused: max(0, total - listed))),
-      _ => (text.big(count: total), text.bigBody(keep: keepCount.value)),
+      (true, true) when answering => (text.pickingAnswering(count: total), then),
+      (true, true) => (text.picking(keep: keepTop, count: total), then),
+      (true, false) when answering => (
+        text.keptAnswering(n: listed, where: where),
+        text.keptBody(paused: max(0, total - listed)),
+      ),
+      (true, false) => (text.keptFastest(n: listed, where: where), text.keptBody(paused: max(0, total - listed))),
+      _ => (text.big(count: total), text.bigBody(keep: keepTopDefault)),
     };
-    const compact = VisualDensity(horizontal: -1, vertical: -2);
-    // a big profile: one button keeps the fastest; the chevron at its end picks how many
-    final counts = [
-      for (final n in _keepCounts)
-        if (n < total) n,
+    // one button: the keep top dialog, where how many run, or which, is chosen
+    List<Widget> buttonsFor({required bool wide}) => [
+      FilledButton.tonalIcon(
+        style: FilledButton.styleFrom(
+          visualDensity: const VisualDensity(horizontal: -1, vertical: -2),
+          minimumSize: wide ? const Size(0, 40) : null,
+        ),
+        onPressed: busy.value ? null : choose,
+        icon: const Icon(Icons.filter_alt_rounded, size: 18),
+        label: Text(keeping ? text.change : t.dialogs.keepTop.howMany),
+      ),
     ];
-    Widget keepButton({required bool expand}) => _KeepButton(
-      label: text.keep(keep: keepCount.value),
-      tooltip: t.dialogs.keepTop.howMany,
-      counts: counts,
-      count: keepCount.value,
-      onCount: (n) => keepCount.value = n,
-      onKeep: busy.value ? null : () => apply((notifier) => notifier.set(profile, keepCount.value)),
-      expand: expand,
-    );
-
-    // the buttons: side by side under the card, or one over the other filling its end column
-    List<Widget> buttonsFor({required bool wide}) {
-      // in a column, the second is outlined, as wide as the first
-      Widget secondary(VoidCallback? onPressed, IconData icon, String label) => wide
-          ? OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(visualDensity: compact, minimumSize: const Size(0, 40)),
-              onPressed: onPressed,
-              icon: Icon(icon, size: 18),
-              label: Text(label),
-            )
-          : TextButton.icon(
-              style: TextButton.styleFrom(visualDensity: compact),
-              onPressed: onPressed,
-              icon: Icon(icon, size: 18),
-              label: Text(label),
-            );
-      if (keeping) {
-        return [
-          secondary(busy.value ? null : choose, Icons.tune_rounded, text.change),
-          FilledButton.tonalIcon(
-            // one over the other, the buttons are one height
-            style: FilledButton.styleFrom(visualDensity: compact, minimumSize: wide ? const Size(0, 40) : null),
-            onPressed: busy.value ? null : showAll,
-            icon: const Icon(Icons.unfold_more_rounded, size: 18),
-            label: Text(text.showAll(count: total)),
-          ),
-        ];
-      }
-      final chooseButton = secondary(busy.value ? null : pick, Icons.checklist_rounded, text.choose);
-      // in a column the main action leads; side by side, it ends the row
-      return wide ? [keepButton(expand: true), chooseButton] : [chooseButton, keepButton(expand: false)];
-    }
 
     Widget dots = KeepTopDots(key: ValueKey((keeping, picking)), running: picking ? 0 : running, total: total);
     if (picking) {
@@ -354,7 +387,10 @@ class KeepTopFooter extends HookConsumerWidget {
             ],
           ),
         ),
-        if (keeping) ...[const Gap(8), KeepTopCountPill(running: picking ? keepTop : listed, total: total)],
+        if (keeping) ...[
+          const Gap(8),
+          KeepTopCountPill(running: picking && !answering ? keepTop : listed, total: total),
+        ],
       ],
     );
     // the proxies at a glance, on a track of their own
@@ -425,7 +461,7 @@ class KeepTopFooter extends HookConsumerWidget {
                       const Gap(14),
                       track,
                       const Gap(10),
-                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: buttonsFor(wide: false)),
+                      Row(mainAxisAlignment: MainAxisAlignment.end, children: buttonsFor(wide: false)),
                     ],
                   ),
           ).animate().fadeIn(duration: 350.ms).slideY(begin: .06, duration: 350.ms, curve: Curves.easeOutCubic),
@@ -438,8 +474,8 @@ class KeepTopFooter extends HookConsumerWidget {
 /// From this wide, the footer lays out in two columns.
 const _twoColumns = 640.0;
 
-/// The counts "keep the fastest" offers beside its button.
-const _keepCounts = [3, 5, 10, 20, 30, 50];
+/// The counts the keep top dialog offers, those below the profile's proxy count.
+const _keepCounts = [3, 5, 10, 20, 50, 100];
 
 /// "Keep the N fastest" as one pill: a tap keeps them; the round chevron at its end opens the counts
 /// to pick N from.
@@ -451,15 +487,25 @@ class _KeepButton extends HookWidget {
     required this.count,
     required this.onCount,
     required this.onKeep,
+    this.extras = const [],
+    this.beforeLastExtra,
+    this.autofocus = false,
     this.expand = false,
   });
 
   final String label;
   final String tooltip;
   final List<int> counts;
+
+  /// Choices that are not a count, under the counts: their value and label.
+  final List<({int value, String label})> extras;
+
+  /// What the menu shows among the choices that are not a count, before the last of them.
+  final Widget? beforeLastExtra;
   final int count;
   final ValueChanged<int> onCount;
   final VoidCallback? onKeep;
+  final bool autofocus;
 
   /// Fills the width it is given.
   final bool expand;
@@ -482,6 +528,8 @@ class _KeepButton extends HookWidget {
         _CountPicker(
           title: tooltip,
           counts: counts,
+          extras: extras,
+          beforeLastExtra: beforeLastExtra,
           count: count,
           onCount: (n) {
             onCount(n);
@@ -494,6 +542,7 @@ class _KeepButton extends HookWidget {
         shape: const StadiumBorder(),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
+          autofocus: autofocus,
           onTap: onKeep,
           child: SizedBox(
             height: 40,
@@ -502,7 +551,7 @@ class _KeepButton extends HookWidget {
               child: Row(
                 mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
                 children: [
-                  Icon(Icons.bolt_rounded, size: 18, color: on),
+                  Icon(Icons.filter_alt_rounded, size: 18, color: on),
                   const Gap(8),
                   Flexible(
                     fit: expand ? FlexFit.tight : FlexFit.loose,
@@ -544,10 +593,19 @@ class _KeepButton extends HookWidget {
 /// The counts "keep the fastest" offers, as round buttons in a row under [title]: the current one
 /// lit in the accent, a tap picks another.
 class _CountPicker extends StatelessWidget {
-  const _CountPicker({required this.title, required this.counts, required this.count, required this.onCount});
+  const _CountPicker({
+    required this.title,
+    required this.counts,
+    this.extras = const [],
+    this.beforeLastExtra,
+    required this.count,
+    required this.onCount,
+  });
 
   final String title;
   final List<int> counts;
+  final List<({int value, String label})> extras;
+  final Widget? beforeLastExtra;
   final int count;
   final ValueChanged<int> onCount;
 
@@ -564,7 +622,7 @@ class _CountPicker extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.bolt_rounded, size: 16, color: s.primary),
+              Icon(Icons.filter_alt_rounded, size: 16, color: s.primary),
               const Gap(6),
               Text(title, style: theme.textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant)),
             ],
@@ -579,6 +637,25 @@ class _CountPicker extends StatelessWidget {
               ],
             ],
           ),
+          if (extras.isNotEmpty) ...[
+            const Gap(10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final (i, extra) in extras.indexed) ...[
+                  if (i == extras.length - 1 && beforeLastExtra != null) beforeLastExtra!,
+                  ChoiceChip(
+                    label: Text(extra.label),
+                    selected: extra.value == count,
+                    showCheckmark: false,
+                    shape: const StadiumBorder(),
+                    onSelected: (_) => onCount(extra.value),
+                  ),
+                ],
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -634,7 +711,7 @@ class _CountBubble extends StatelessWidget {
   }
 }
 
-/// The bolt of keep top, in the accent's circle, or a checklist for the proxies the user chose; a
+/// The funnel of keep top, in the accent's circle, or a checklist for the proxies the user chose; a
 /// ring turns around it while the fastest are being found.
 class _Badge extends StatelessWidget {
   const _Badge({required this.picking, this.chosen = false});
@@ -658,7 +735,7 @@ class _Badge extends StatelessWidget {
               gradient: RadialGradient(colors: [s.primary.withValues(alpha: .28), s.primary.withValues(alpha: .12)]),
             ),
           ),
-          Icon(chosen ? Icons.checklist_rounded : Icons.bolt_rounded, size: 22, color: s.primary),
+          Icon(chosen ? Icons.checklist_rounded : Icons.filter_alt_rounded, size: 22, color: s.primary),
           if (picking)
             SizedBox.square(
               dimension: _size,
@@ -707,6 +784,216 @@ class KeepTopCountPill extends StatelessWidget {
           ],
         ),
         textDirection: TextDirection.ltr,
+      ),
+    );
+  }
+}
+
+/// The quick test, on or off: the last row of the choice card. Its help button unfolds what it
+/// does, under it.
+class _QuickTestSwitch extends HookConsumerWidget {
+  const _QuickTestSwitch({required this.value, required this.onChanged});
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    final help = useState(false);
+    const duration = Duration(milliseconds: 200);
+    // a plain row: a small icon, the name with its help, the line under it, and the switch
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => onChanged(!value),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.fromSTEB(4, 2, 0, 2),
+            child: Row(
+              children: [
+                Icon(Icons.speed_rounded, size: 18, color: value ? s.primary : s.onSurfaceVariant),
+                const Gap(10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(child: Text(t.dialogs.keepTop.quick, style: theme.textTheme.labelLarge)),
+                          IconButton(
+                            tooltip: t.dialogs.keepTop.quickHelp,
+                            onPressed: () => help.value = !help.value,
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints.tightFor(width: 24, height: 24),
+                            iconSize: 15,
+                            color: help.value ? s.primary : s.onSurfaceVariant,
+                            icon: Icon(help.value ? Icons.help_rounded : Icons.help_outline_rounded),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        t.dialogs.keepTop.quickHint,
+                        style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+                Transform.scale(
+                  scale: .75,
+                  child: Switch(value: value, onChanged: onChanged),
+                ),
+              ],
+            ),
+          ),
+        ),
+        AnimatedSize(
+          duration: duration,
+          curve: Curves.easeOutCubic,
+          alignment: AlignmentDirectional.topStart,
+          child: help.value
+              ? Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                  decoration: BoxDecoration(
+                    color: s.primary.withValues(alpha: .08),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      for (final (i, (icon, point)) in [
+                        (Icons.history_rounded, t.dialogs.keepTop.quickFirst),
+                        (Icons.flag_rounded, t.dialogs.keepTop.quickStop),
+                        (Icons.fiber_new_rounded, t.dialogs.keepTop.quickNew),
+                      ].indexed) ...[
+                        if (i > 0) const Gap(8),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(icon, size: 16, color: s.primary),
+                            const Gap(10),
+                            Expanded(child: Text(point, style: theme.textTheme.bodySmall)),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
+      ],
+    );
+  }
+}
+
+/// The countries keep top keeps proxies of, as a pill among the choices of its menu: "Country",
+/// or the chosen flags. It opens the countries to tick, under a field that finds one by its name
+/// or code. With the field empty, the chosen and the profile's own countries are listed, with how
+/// many proxies each has; any other can be found by typing, as the profile's are not all known
+/// before the proxies are tested.
+class _CountryPill extends HookConsumerWidget {
+  const _CountryPill({required this.available, required this.chosen, required this.onChanged});
+
+  final List<(String, int)> available;
+  final Set<String> chosen;
+  final ValueChanged<Set<String>> onChanged;
+
+  /// The most countries listed for what is typed.
+  static const _found = 30;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final s = Theme.of(context).colorScheme;
+    final emoji = PlatformUtils.isWindows ? FontFamily.emoji : null;
+    final query = useTextEditingController();
+    useListenable(query);
+    final counts = {for (final (code, n) in available) code: n};
+    String nameOf(String code) => countryNames[code] ?? code;
+    final q = query.text.trim().toLowerCase();
+    // the profile's countries by how many proxies (as given), then the preferred ones, then every
+    // other by name
+    final preferred = preferredCountries.where((code) => !counts.containsKey(code));
+    final order = [
+      ...available.map((e) => e.$1),
+      ...preferred,
+      ...countryNames.keys.where((code) => !counts.containsKey(code) && !preferredCountries.contains(code)),
+    ];
+    // with the field empty: the chosen ones not otherwise listed, the profile's, and the preferred
+    final listed = q.isEmpty
+        ? {
+            ...chosen.where((code) => !counts.containsKey(code) && !preferredCountries.contains(code)),
+            ...available.map((e) => e.$1),
+            ...preferred,
+          }.toList()
+        : order
+              .where(
+                (code) =>
+                    code.toLowerCase() == q || nameOf(code).toLowerCase().contains(q) || (q == 'uk' && code == 'GB'),
+              )
+              .take(_found)
+              .toList();
+    final flags = TextStyle(fontFamily: emoji);
+
+    return MenuAnchor(
+      alignmentOffset: const Offset(0, 4),
+      // a short list, scrolled for the rest
+      style: const MenuStyle(maximumSize: WidgetStatePropertyAll(Size(300, 380))),
+      menuChildren: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 4),
+          child: SizedBox(
+            width: 240,
+            child: TextField(
+              controller: query,
+              decoration: InputDecoration(
+                isDense: true,
+                prefixIcon: const Icon(Icons.search_rounded, size: 18),
+                hintText: t.dialogs.keepTop.region,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+        ),
+        MenuItemButton(
+          leadingIcon: Icon(Icons.public_rounded, size: 20, color: chosen.isEmpty ? s.primary : null),
+          onPressed: () => onChanged({}),
+          child: Text(t.dialogs.keepTop.anyRegion),
+        ),
+        const Divider(height: 1),
+        for (final code in listed)
+          CheckboxMenuButton(
+            value: chosen.contains(code),
+            closeOnActivate: false,
+            onChanged: (checked) => onChanged(checked ?? false ? {...chosen, code} : ({...chosen}..remove(code))),
+            trailingIcon: counts.containsKey(code)
+                ? Text(
+                    '${counts[code]}',
+                    style: TextStyle(color: s.onSurfaceVariant, fontFeatures: const [FontFeature.tabularFigures()]),
+                  )
+                : null,
+            child: Text('${flagOf(code)}  ${nameOf(code)}', style: flags),
+          ),
+      ],
+      builder: (context, controller, _) => FilterChip(
+        avatar: chosen.isEmpty ? const Icon(Icons.public_rounded, size: 16) : null,
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(chosen.isEmpty ? t.dialogs.keepTop.region : chosen.map(flagOf).join(' '), style: flags),
+            const Gap(2),
+            const Icon(Icons.arrow_drop_down_rounded, size: 18),
+          ],
+        ),
+        selected: chosen.isNotEmpty,
+        showCheckmark: false,
+        shape: const StadiumBorder(),
+        onSelected: (_) => controller.isOpen ? controller.close() : controller.open(),
       ),
     );
   }

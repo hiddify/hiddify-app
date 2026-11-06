@@ -49,6 +49,8 @@ class ProfileParser with InfraLogger {
     'chain-status',
     'extra-security',
     'keep-top',
+    'keep-top-quick',
+    'keep-top-countries',
     'keep-tags',
   ];
   static const allowedProfileHeaders = [
@@ -160,18 +162,12 @@ class ProfileParser with InfraLogger {
     // if (url.startsWith("http://"))
     //   throw const ProfileFailure.invalidUrl('HTTP is not supported. Please use HTTPS for secure connection.');
 
-    final rs = await _httpClient
-        .download(
-          url.trim(),
-          tempFilePath,
-          cancelToken: cancelToken,
-        )
-        .catchError((err) {
-          if (CancelToken.isCancel(err as DioException)) {
-            throw const ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
-          }
-          throw err;
-        });
+    final rs = await _httpClient.download(url.trim(), tempFilePath, cancelToken: cancelToken).catchError((err) {
+      if (CancelToken.isCancel(err as DioException)) {
+        throw const ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
+      }
+      throw err;
+    });
     // fixing headers before return
     return rs.headers.map.map((key, value) {
       if (value.length == 1) return MapEntry(key, value.first);
@@ -536,6 +532,9 @@ class ProfileParser with InfraLogger {
     final fragmentInput = headers.remove('fragment')?.toString();
     final extraSecurityInput = headers.remove('extra-security')?.toString();
     final keepTopInput = headers.remove('keep-top')?.toString();
+    // the user's choices only, never a subscription's
+    headers.remove('keep-top-quick');
+    headers.remove('keep-top-countries');
 
     // extra-security: exactly one documented mode. The app's own setting takes
     // precedence over the subscription; an unrecognised value is ignored.
@@ -558,6 +557,14 @@ class ProfileParser with InfraLogger {
     // keep-top: the user's choice, else the subscription's; -1 (or none) runs every proxy
     if (userOverride?.keepTop ?? keepTopHeader(keepTopInput) case final keepTop?) {
       headers['keep-top'] = keepTop;
+    }
+    // keep-top-quick: picks the fastest without testing every proxy, unless the user turned it off
+    if (userOverride?.keepTopQuick ?? true) {
+      headers['keep-top-quick'] = true;
+    }
+    // keep-top-countries: only proxies of these countries are kept
+    if (userOverride?.keepTopCountries case final countries? when countries.isNotEmpty) {
+      headers['keep-top-countries'] = countries;
     }
     // keep-tags: the proxies the user chose run, and only them, while any is still in the profile
     if (userOverride?.keepTags case final tags? when tags.isNotEmpty) {
