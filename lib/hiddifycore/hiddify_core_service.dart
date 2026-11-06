@@ -597,12 +597,20 @@ class HiddifyCoreService with InfraLogger {
           // changes, so a stream that was open across a gap in the platform's status (the app
           // coming back to the foreground re-reads the VPN) has nothing to tell: a new one
           // answers with the state at once.
-          if (!wasStarted) _stopFollowingCore();
+          if (!wasStarted) {
+            _stopFollowingCore();
+            _coreFailure = null;
+          }
           _followCoreWhilePlatformStarted();
           status = _coreReported ?? const CoreStatus.starting();
         } else {
           _coreReported = null;
           _stopFollowingCore();
+          // the service stopped because the core failed: the failure is why, not a plain stop
+          if (_coreFailure case final failure? when status is CoreStopped && status.alert == null) {
+            status = failure;
+          }
+          if (status is CoreStopped) _coreFailure = null;
         }
         statusController.add(currentState = status);
       });
@@ -645,6 +653,10 @@ class HiddifyCoreService with InfraLogger {
 
   /// The last state the core reported while the platform said its service is up.
   CoreStatus? _coreReported;
+
+  /// The core stopped with an error while the platform's service was up: it failed to start, or
+  /// failed later. Reported in place of the plain stop of the service that follows.
+  CoreStopped? _coreFailure;
   StreamSubscription<CoreInfoResponse>? _coreInfoSubscription;
 
   /// The platform reports the tunnel up; waiting and started come from the core's own status
@@ -675,8 +687,15 @@ class HiddifyCoreService with InfraLogger {
                   CoreStates.HOT_RELOADING:
                 statusController.add(currentState = _coreReported = CoreStatus.fromCoreInfo(event));
               default:
-                // stopped and stopping are the platform's to report
-                break;
+                // stopped and stopping are the platform's to report, but the platform's service
+                // stays up when the core fails (a profile it can not start): the core's error is
+                // the outcome, and the service, carrying nothing, is taken down
+                if (CoreStatus.fromCoreInfo(event) case final CoreStopped failed when failed.alert != null) {
+                  loggy.warning("core stopped with an error while its service is up: ${failed.message}");
+                  _coreFailure = failed;
+                  statusController.add(currentState = failed);
+                  unawaited(core.stop());
+                }
             }
           },
           onError: (Object error) {
