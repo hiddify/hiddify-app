@@ -431,6 +431,10 @@ class ProfileParser with InfraLogger {
     if (content.contains("[Interface]")) {
       return ProxyType.wireguard.label;
     }
+    // a .ovpn file: its certificate inline, and the server it connects to
+    if (content.contains('<ca>') && RegExp(r'^\s*remote\s', multiLine: true).hasMatch(content)) {
+      return 'OpenVPN';
+    }
     final lines = content.split('\n');
     String? name;
     for (final line in lines) {
@@ -452,6 +456,7 @@ class ProfileParser with InfraLogger {
         'shadowtls' => fragment ?? ProxyType.shadowtls.label,
         'mieru' => fragment ?? ProxyType.mieru.label,
         'warp' => fragment ?? ProxyType.warp.label,
+        'ovpn' => fragment ?? 'OpenVPN',
         // any other link (psiphon://, anytls://, naive+https://, ...): its name, else its scheme
         final scheme when scheme.isNotEmpty && line.trimLeft().startsWith('$scheme://') =>
           fragment ?? _schemeLabel(scheme),
