@@ -94,6 +94,16 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
       (dynamic state) => _receiveState(Map<String, dynamic>.from(state as Map)),
       onError: (Object error) => loggy.error('macOS VPN status error: $error'),
     );
+    _listenForeground();
+    return '';
+  }
+
+  @override
+  void onCoreProcessRestarted() => _listenForeground();
+
+  /// Follows the app core's status while no VPN runs (proxy modes).
+  void _listenForeground() {
+    unawaited(_foregroundSubscription?.cancel());
     _foregroundSubscription = fgClient
         .coreInfoListener(Empty())
         .cancelOnUnsubscribe
@@ -111,7 +121,6 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
             if (!_usingVPN) _status.add(CoreStatus.stopped(message: error.toString()));
           },
         );
-    return '';
   }
 
   void _receiveState(Map<String, dynamic> state) {

@@ -33,6 +33,9 @@ class CoreInterface {
 
   Future<void> setOptions(SingboxConfigOption options) async {}
   Future<void> dispose() async {}
+
+  /// Stops the core's own process, when it has one, before the app quits (desktop).
+  Future<void> shutdown() async {}
   Future<void> startManaged(String path, String name, bool disableMemoryLimit) =>
       Future<void>.error(UnimplementedError());
 

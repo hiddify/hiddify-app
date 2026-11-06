@@ -512,7 +512,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "bash \"$PROJECT_DIR/scripts/embed-system-extension.sh\"\n";
+			shellScript = "bash \"$PROJECT_DIR/scripts/embed-system-extension.sh\" || exit 1\nbash \"$PROJECT_DIR/scripts/embed-core-helper.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		3399D490228B24CF009A79C7 /* ShellScript */ = {

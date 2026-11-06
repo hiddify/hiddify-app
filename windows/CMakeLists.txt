@@ -98,6 +98,11 @@ COMPONENT Runtime RENAME HiddifyCli.exe)
 install(FILES "../hiddify-core/bin/HiddifyAdmin.exe" DESTINATION "${CMAKE_INSTALL_PREFIX}"
 COMPONENT Runtime RENAME HiddifyAdmin.exe)
 
+# The app's core runs in a process of its own: core\Hiddify.exe, named Hiddify with the core icon.
+# Optional: without it (a core built before it existed) the app loads the core in its own process.
+install(FILES "../hiddify-core/bin/core/Hiddify.exe" DESTINATION "${CMAKE_INSTALL_PREFIX}/core"
+COMPONENT Runtime OPTIONAL)
+
 
 if(PLUGIN_BUNDLED_LIBRARIES)
   install(FILES "${PLUGIN_BUNDLED_LIBRARIES}"

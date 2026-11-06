@@ -76,6 +76,13 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   }
 
   @override
+  void onCoreProcessExited(String message) {
+    // In VPN mode the engine runs in the service; only a proxy-mode connection went with the core.
+    if (_usingAdminBg || _status.value is CoreStopped) return;
+    _status.add(CoreStatus.stopped(alert: CoreAlert.startFailed, message: message));
+  }
+
+  @override
   Future<void> setOptions(SingboxConfigOption options) async {
     _options = options;
     // When admin_bgservice will own TUN, fg must not enable TUN; full settings go in Ensure.

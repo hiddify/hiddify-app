@@ -131,6 +131,11 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
             loggy.warning("error aborting connection on quit", e);
           });
     }
+    // The core runs in a process of its own: it stops now, restoring the system proxy, instead of
+    // when it notices the app is gone (an AppImage's files vanish as soon as the app exits).
+    await ref.read(hiddifyCoreServiceProvider).core.shutdown().catchError((Object e) {
+      loggy.warning("error stopping the core on quit", e);
+    });
     await trayManager.destroy();
     await windowManager.destroy();
   }
