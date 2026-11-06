@@ -358,14 +358,26 @@ class HiddifyCoreService with InfraLogger {
   TaskEither<String, Unit> reload(String path, String name, bool disableMemoryLimit) {
     return TaskEither(() async {
       loggy.debug("hot reloading");
-      try {
-        final res = await core.bgClient.hotReload(
-          StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
-        );
-        if (res.messageType == MessageType.EMPTY) return right(unit);
-        loggy.info("hot reload not applied, restarting: ${res.messageType} ${res.message}");
-      } on GrpcError catch (e) {
-        loggy.warning("hot reload failed, restarting: $e");
+      // a connection in the VPN service or a Network Extension reloads there: their control port
+      // refuses the core's own hot reload
+      final managed = await core.reloadManaged(path, name, disableMemoryLimit);
+      if (managed == true) {
+        // as after a restart, but the connection stays up: the listeners on the engine follow the
+        // reloaded config (its outbounds, its status)
+        await startListeningLogs('bg', core.bgClient);
+        ref.read(coreRestartSignalProvider.notifier).restart();
+        return right(unit);
+      }
+      if (managed == null) {
+        try {
+          final res = await core.bgClient.hotReload(
+            StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
+          );
+          if (res.messageType == MessageType.EMPTY) return right(unit);
+          loggy.info("hot reload not applied, restarting: ${res.messageType} ${res.message}");
+        } on GrpcError catch (e) {
+          loggy.warning("hot reload failed, restarting: $e");
+        }
       }
       return restart(path, name, disableMemoryLimit).run();
     });
@@ -376,7 +388,11 @@ class HiddifyCoreService with InfraLogger {
       loggy.debug("restarting");
       if (core.managesLifecycle) {
         try {
-          await core.startManaged(path, name, disableMemoryLimit);
+          // a connection in the VPN service restarts there, without being torn down and installed
+          // again; otherwise (or moving out of it) it starts anew
+          if (await core.restartManaged(path, name, disableMemoryLimit) != true) {
+            await core.startManaged(path, name, disableMemoryLimit);
+          }
           await startListeningLogs('bg', core.bgClient);
           ref.read(coreRestartSignalProvider.notifier).restart();
           return right(unit);

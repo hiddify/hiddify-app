@@ -7,6 +7,7 @@ import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop.dart';
 import 'package:hiddify/hiddifycore/core_interface/vpn_config_snapshot.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/adminbgservice/admin_bg.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/adminbgservice/admin_bg_service.pbgrpc.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
@@ -264,7 +265,10 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       channel,
       options: CallOptions(metadata: {'x-hiddify-secret': _secret}),
     ).status(Empty()).timeout(const Duration(seconds: 5));
-    if (status.systemProxy.isEmpty) return;
+    if (status.systemProxy.isEmpty) {
+      await _restoreServiceSystemProxy();
+      return;
+    }
     final response = await fgClient.setSystemProxyEnabled(
       SetSystemProxyEnabledRequest(isEnabled: true, address: status.systemProxy, supportSocks: status.systemProxySocks),
     );
@@ -275,6 +279,57 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       return;
     }
     _serviceSystemProxy = true;
+  }
+
+  @override
+  Future<bool?> reloadManaged(String path, String name, bool disableMemoryLimit) async {
+    if (!_usingAdminBg) return null;
+    try {
+      return await _sendToService(path, name, disableMemoryLimit, restart: false);
+    } catch (error) {
+      loggy.info('the VPN service did not hot reload, restarting: $error');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool?> restartManaged(String path, String name, bool disableMemoryLimit) async {
+    final options = _options;
+    // a connection moving out of the service (a VPN switched to a proxy mode) starts anew
+    if (!_usingAdminBg || options == null || !(useAdminBgService || options.enableTun)) return null;
+    _status.add(const CoreStatus.starting());
+    try {
+      final restarted = await _sendToService(path, name, disableMemoryLimit, restart: true);
+      if (restarted) _status.add(const CoreStatus.started());
+      return restarted;
+    } catch (error) {
+      await _abandonVpnStart(error);
+      rethrow;
+    }
+  }
+
+  /// Sends the config to the running VPN service, as the start does (a snapshot without file
+  /// paths): a hot reload, or a restart of its engine. The system proxy hand-off follows the new
+  /// config, which may point it elsewhere or no longer want one.
+  Future<bool> _sendToService(String path, String name, bool disableMemoryLimit, {required bool restart}) async {
+    final options = _options;
+    final workingDirectory = _workingDirectory;
+    final channel = _serviceChannel;
+    if (options == null || workingDirectory == null || channel == null) return false;
+    final snapshot = await snapshotVpnConfiguration(path, workingDirectory);
+    final request = AdminBgStartRequest(
+      configContent: snapshot.$1,
+      configName: name,
+      settingsJson: jsonEncode(options.toJson()),
+      resources: snapshot.$2,
+      disableMemoryLimit: disableMemoryLimit,
+      ownerPid: pid,
+      proxyOnly: !options.enableTun,
+    );
+    final client = HiddifyAdminBGClient(channel, options: CallOptions(metadata: {'x-hiddify-secret': _secret}));
+    await (restart ? client.restart(request) : client.reload(request));
+    await _applyServiceSystemProxy(options);
+    return true;
   }
 
   Future<void> _restoreServiceSystemProxy() async {

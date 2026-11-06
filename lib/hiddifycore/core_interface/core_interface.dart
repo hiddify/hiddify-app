@@ -36,6 +36,17 @@ class CoreInterface {
 
   /// Stops the core's own process, when it has one, before the app quits (desktop).
   Future<void> shutdown() async {}
+
+  /// Applies a changed config to a connection that runs in a privileged engine (the VPN service, a
+  /// Network Extension), whose control port refuses the core's own hot reload: true when it was
+  /// applied, false when the connection must be started again. Null when the connection does not
+  /// run there, so the core's hot reload applies.
+  Future<bool?> reloadManaged(String path, String name, bool disableMemoryLimit) async => null;
+
+  /// Starts a connection that runs in the VPN service again with a changed config, in the service,
+  /// when the new settings still need it: true when it was restarted there. Null when it does not
+  /// run there or should move out of it (a VPN switched to a proxy mode); [startManaged] applies.
+  Future<bool?> restartManaged(String path, String name, bool disableMemoryLimit) async => null;
   Future<void> startManaged(String path, String name, bool disableMemoryLimit) =>
       Future<void>.error(UnimplementedError());
 

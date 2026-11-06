@@ -9,6 +9,7 @@ import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop.dart';
 import 'package:hiddify/hiddifycore/core_interface/vpn_config_snapshot.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/adminbgservice/admin_bg.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/adminbgservice/admin_bg_service.pbgrpc.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
@@ -322,6 +323,34 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
       return res.message == 'started';
     } catch (error) {
       loggy.warning('admin_bgservice status failed: $error');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool?> reloadManaged(String path, String name, bool disableMemoryLimit) async {
+    if (!_usingVPN) return null;
+    final client = _adminBgClientOrNull();
+    final options = _options;
+    // the Network Extension's control port has no reload: its connection is started again
+    if (!_tunnelServiceAvailable || client == null || options == null) return false;
+    try {
+      final snapshot = await snapshotConfiguration(path);
+      await client
+          .reload(
+            AdminBgStartRequest(
+              configContent: snapshot.$1,
+              configName: name,
+              settingsJson: jsonEncode(options.toJson()),
+              resources: snapshot.$2,
+              disableMemoryLimit: disableMemoryLimit,
+              ownerPid: pid,
+            ),
+          )
+          .timeout(const Duration(seconds: 30));
+      return true;
+    } catch (error) {
+      loggy.info('the VPN service did not hot reload, restarting: $error');
       return false;
     }
   }
