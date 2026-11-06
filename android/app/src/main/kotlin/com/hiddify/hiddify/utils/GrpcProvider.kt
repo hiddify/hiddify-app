@@ -1,5 +1,6 @@
 package com.hiddify.hiddify.utils
 
+import android.util.Base64
 import android.util.Log
 import com.hiddify.core.mobile.Mobile
 import com.hiddify.hiddify.Settings
@@ -13,7 +14,6 @@ import java.security.KeyStore
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.security.spec.PKCS8EncodedKeySpec
-import java.util.Base64
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
@@ -106,6 +106,7 @@ object GrpcClientProvider {
             .replace("-----BEGIN PRIVATE KEY-----", "")
             .replace("-----END PRIVATE KEY-----", "")
             .replace(Regex("\\s"), "")
-        return KeyFactory.getInstance("RSA").generatePrivate(PKCS8EncodedKeySpec(Base64.getDecoder().decode(body)))
+        // android.util.Base64: java.util.Base64 is Android 8.0 (API 26) on, and connecting crashed on 7
+        return KeyFactory.getInstance("RSA").generatePrivate(PKCS8EncodedKeySpec(Base64.decode(body, Base64.DEFAULT)))
     }
 }
