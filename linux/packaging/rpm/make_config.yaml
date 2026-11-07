@@ -1,50 +1,42 @@
+display_name: Hiddify
+url: https://github.com/hiddify/hiddify-app
+license: Other
+summary: A multi-platform proxy client based on Sing-box universal proxy tool-chain.
 
+packager: hiddify
+packagerEmail: linux@hiddify.com
 
-# <<<   RPM NOT SUPPORTED   >>>
-# We decided to remove RPM packaging for the following reasons:
-# - Flutter officially supports Debian-based systems only.
-# - Persistent issues with dependency linking.
-# - High maintenance overhead (requires Fedora environment setup).
-# - Successful builds do not guarantee runtime stability on Red Hat-based systems.
+icon: assets/images/source/ic_launcher_border.png
 
+keywords:
+  - Hiddify
+  - Proxy
+  - VPN
+  - V2ray
+  - Nekoray
+  - Xray
+  - Psiphon
+  - OpenVPN
 
-# display_name: Hiddify
-# url: https://github.com/hiddify/hiddify-app
-# license: Other
+generic_name: Hiddify
 
-# packager: hiddify
-# packagerEmail: linux@hiddify.com
+# Runtime libraries the bundle links that a minimal Fedora/RHEL install may lack (the tray icon).
+# Everything else (GTK 3, glibc) is part of any desktop install.
+requires:
+  - libayatana-appindicator-gtk3
 
-# icon: assets/images/source/ic_launcher_border.png
+categories:
+  - Network
 
-# keywords:
-#   - Hiddify
-#   - Proxy
-#   - VPN
-#   - V2ray
-#   - Nekoray
-#   - Xray
-#   - Psiphon
-#   - OpenVPN
+startup_notify: true
 
-# generic_name: Hiddify
-
-# requires:
-#   - libayatana-appindicator-gtk3
-#   # - libcurl
-#   # - openssl
-
-# categories:
-#   - Network
-
-# startup_notify: true
-# # app_links setup for Linux
-# # https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
-# supported_mime_type:
-#   - x-scheme-handler/hiddify
-#   - x-scheme-handler/v2ray
-#   - x-scheme-handler/v2rayn
-#   - x-scheme-handler/v2rayng
-#   - x-scheme-handler/clash
-#   - x-scheme-handler/clashmeta
-#   - x-scheme-handler/sing-box
+# app_links setup for Linux
+# https://github.com/llfbandit/app_links/blob/master/doc/README_linux.md
+supported_mime_type:
+  - x-scheme-handler/hiddify
+  - x-scheme-handler/v2ray
+  - x-scheme-handler/v2rayn
+  - x-scheme-handler/v2rayng
+  - x-scheme-handler/clash
+  - x-scheme-handler/clashmeta
+  - x-scheme-handler/sing-box

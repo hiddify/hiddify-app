@@ -337,7 +337,12 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
       port: port,
       options: ChannelOptions(credentials: _credentials),
     );
-    bgClient = fgClient = CoreClient(_channel!);
+    // setup runs again whenever the app comes back to the front: a connection that runs in the VPN
+    // service keeps its client there, or every stream of it (proxies, pings, status) would ask this
+    // app's own core, which runs nothing in VPN mode ("hiddify service not found")
+    final backgroundWasForeground = !isInitialized() || identical(bgClient, fgClient);
+    fgClient = CoreClient(_channel!);
+    if (backgroundWasForeground) bgClient = fgClient;
     unawaited(previousChannel?.shutdown());
 
     return '';

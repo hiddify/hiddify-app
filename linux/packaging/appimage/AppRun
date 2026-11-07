@@ -112,9 +112,18 @@ else
 
 # Processing arguments
     case $1 in
-        HiddifyCli)  
-            exec ./HiddifyCli ${@:3}
-            exit 0
+        HiddifyCli)
+            # everything after "HiddifyCli", as given: the app starts its root VPN this way,
+            # `pkexec "$APPIMAGE" HiddifyCli core-service ...`
+            if [[ "$2" == core-service ]]; then
+                # not exec'd: a service that crashed or was killed left its TUN's routing, and the
+                # host without network; undone here, while the image is still mounted
+                ./HiddifyCli "${@:2}"
+                code=$?
+                ./HiddifyCli core-service --cleanup
+                exit $code
+            fi
+            exec ./HiddifyCli "${@:2}"
             ;;
         h)
             show_help

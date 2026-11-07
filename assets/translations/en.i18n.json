@@ -927,6 +927,7 @@
       "vpnNeedsAdmin": {
         "title": "Administrator permission needed",
         "msg": "VPN mode needs a one-time administrator permission to install the Hiddify background service. After that, you can connect without another prompt.",
+        "msgAppImage": "VPN mode needs administrator permission. The AppImage runs its VPN as a copy of itself with administrator rights, so it asks once each time Hiddify starts.",
         "connectWithAdmin": "Connect with administrator permission",
         "waitingTitle": "Waiting for administrator permission",
         "waitingMsg": "To continue, allow the administrator prompt. You can stop and try again later.",

@@ -345,7 +345,7 @@ windows-msix-release:
 	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
 	  $(WINDOWS_PACKAGE_HOOK)
 
-linux-release: linux-deb-release linux-appimage-release
+linux-release: linux-deb-release linux-rpm-release linux-appimage-release
 
 linux-amd64-release: linux-release
 linux-arm64-release: linux-release
@@ -357,6 +357,21 @@ linux-deb-release:
 	fastforge package \
 	--platform linux \
 	--targets deb \
+	--skip-clean \
+	--build-target=$(TARGET) \
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
+
+# Fedora, RHEL, openSUSE. The bundle's libsentry links the build host's (Ubuntu's) libcurl, whose
+# symbols carry the CURL_OPENSSL_4 version that Fedora's libcurl lacks: rpmbuild would require it
+# and dnf refuse the package, though the library loads without it. So that requirement is left out
+# (rpmbuild reads ~/.rpmmacros). fastforge's spec needs rpm < 4.20 (ubuntu-22.04 has 4.17): newer
+# rpm runs %install from BUILD/<name>-build, where the spec's relative paths are not found.
+linux-rpm-release:
+	grep -qs 'CURL_OPENSSL_4' ~/.rpmmacros || \
+	  printf '%s\n' '%__requires_exclude ^libcurl\\.so\\.4\\(CURL_OPENSSL_4\\)' >> ~/.rpmmacros
+	fastforge package \
+	--platform linux \
+	--targets rpm \
 	--skip-clean \
 	--build-target=$(TARGET) \
 	--build-dart-define=sentry_dsn=$(SENTRY_DSN)

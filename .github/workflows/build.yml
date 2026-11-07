@@ -22,7 +22,7 @@ env:
   TARGET_NAME_gz: "Hiddify-Linux-x64-AppImage.tar"
   TARGET_NAME_AppImage: "Hiddify-Linux-x64-AppImage"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
-  # TARGET_NAME_rpm: "Hiddify-rpm-x64"
+  TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
   TARGET_NAME_aab: "Hiddify-Android"
   TARGET_NAME_exe: "Hiddify-Windows-Setup-x64"
@@ -86,7 +86,7 @@ jobs:
           - { platform: android-apk,       os: ubuntu-latest,  targets: apk }
           - { platform: android-aab,       os: ubuntu-latest,  targets: aab }
           - { platform: windows,          os: windows-latest, aarch: amd64,     targets: "exe,msix,zip" }
-          - { platform: linux,            os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz,AppImage" }
+          - { platform: linux,            os: ubuntu-22.04,   aarch: amd64,     targets: "deb,rpm,gz,AppImage" }
           # - { platform: linux-amd64,      os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
           # - { platform: linux-arm64,      os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
           # - { platform: linux-amd64-musl, os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }

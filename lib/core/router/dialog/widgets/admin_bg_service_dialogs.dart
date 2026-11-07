@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -9,6 +11,8 @@ enum VpnAdminBgDialogResult { connectWithAdmin, cancel }
 
 /// Result of the proxy (Mode C) optional-admin dialog.
 enum ProxyAdminBgDialogResult { runAsAdmin, continueWithout, cancel }
+
+bool get _isAppImage => Platform.isLinux && (Platform.environment['APPIMAGE'] ?? '').isNotEmpty;
 
 class VpnAdminBgServiceDialog extends ConsumerWidget {
   const VpnAdminBgServiceDialog({super.key, this.waiting = false});
@@ -30,7 +34,9 @@ class VpnAdminBgServiceDialog extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(waiting ? d.waitingMsg : d.msg),
+              // an AppImage installs no service: its VPN runs as a root copy of itself, asked for once
+              // each time the app starts
+              Text(waiting ? d.waitingMsg : (_isAppImage ? d.msgAppImage : d.msg)),
               if (waiting) ...[
                 const Gap(16),
                 const Center(child: CircularProgressIndicator()),
