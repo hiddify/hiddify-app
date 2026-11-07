@@ -346,6 +346,20 @@ class ProfileParser with InfraLogger {
     return '';
   }
 
+  /// Decode the value of a `profile-title: base64:<value>` header.
+  ///
+  /// Accepts the value without `=` padding, which some servers send. Returns ''
+  /// when it is not valid base64 or not UTF-8, so the name falls through to the
+  /// next source instead of failing the whole profile parse.
+  @visibleForTesting
+  static String decodeBase64Title(String value) {
+    try {
+      return utf8.decode(base64.decode(base64.normalize(value.trim()))).trim();
+    } on FormatException {
+      return '';
+    }
+  }
+
   @visibleForTesting
   static Either<ProfileFailure, ProfileEntity> parse({required String tempFilePath, required ProfileEntity profile}) =>
       Either.tryCatch(() {
@@ -357,7 +371,7 @@ class ProfileParser with InfraLogger {
 
         if (headers['profile-title'] case final String titleHeader when name.isBlank) {
           if (titleHeader.startsWith("base64:")) {
-            name = utf8.decode(base64.decode(titleHeader.replaceFirst("base64:", "")));
+            name = decodeBase64Title(titleHeader.replaceFirst("base64:", ""));
           } else {
             name = titleHeader.trim();
           }
