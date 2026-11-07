@@ -1,0 +1,729 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "เริ่ม",
+    "version": "เวอร์ชัน",
+    "ok": "ตกลง",
+    "cancel": "ยกเลิก",
+    "kContinue": "ดำเนินการต่อ",
+    "showMore": "แสดงเพิ่มเติม",
+    "showLess": "แสดงน้อยลง",
+    "filter": "ตัวกรอง",
+    "all": "ทั้งหมด",
+    "pause": "หยุดชั่วคราว",
+    "resume": "ทำต่อ",
+    "clear": "ล้าง",
+    "close": "ปิด",
+    "auto": "อัตโนมัติ",
+    "manually": "กำหนดเอง",
+    "name": "ชื่อ",
+    "url": "URL",
+    "add": "เพิ่ม",
+    "clipboard": "คลิปบอร์ด",
+    "addToClipboard": "คัดลอกไปยังคลิปบอร์ด",
+    "scanQr": "สแกน QR",
+    "free": "ฟรี",
+    "warp": "WARP",
+    "fragment": "Fragment",
+    "help": "ช่วยเหลือ",
+    "save": "บันทึก",
+    "update": "อัปเดต",
+    "share": "แชร์",
+    "edit": "แก้ไข",
+    "delete": "ลบ",
+    "discard": "ละทิ้ง",
+    "import": "นำเข้า",
+    "export": "ส่งออก",
+    "later": "ภายหลัง",
+    "ignore": "ไม่สนใจ",
+    "quit": "ออก",
+    "notSet": "ไม่ได้ตั้งค่า",
+    "hide": "ซ่อน",
+    "exit": "ออก",
+    "reset": "รีเซ็ต",
+    "done": "เสร็จสิ้น",
+    "decline": "ปฏิเสธ",
+    "agree": "ยอมรับ",
+    "empty": "ว่างเปล่า",
+    "unknown": "ไม่ทราบ",
+    "hidden": "ซ่อนอยู่",
+    "timeout": "หมดเวลา",
+    "sort": "เรียงลำดับ",
+    "dashboard": "แดชบอร์ด",
+    "disable": "ปิดใช้งาน",
+    "psiphon": "Psiphon",
+    "profile": "โปรไฟล์",
+    "configuration": "การกำหนดค่า",
+    "file": "ไฟล์",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n วัน",
+        "other": "$n วัน"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n ชั่วโมง",
+        "other": "$n ชั่วโมง"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "ไม่ได้รับอนุญาต"
+      },
+      "export": {
+        "clipboard": {
+          "success": "คัดลอกไปยังคลิปบอร์ดสำเร็จ",
+          "failure": "คัดลอกไปยังคลิปบอร์ดไม่สำเร็จ",
+          "contentTooLarge": "เนื้อหามีขนาดใหญ่เกินไป โปรดใช้การส่งออกเป็นไฟล์แทน"
+        },
+        "file": {
+          "success": "สร้างไฟล์ JSON สำเร็จ",
+          "failure": "สร้างไฟล์ไม่สำเร็จ"
+        }
+      },
+      "import": {
+        "confirm": "ยืนยันการนำเข้า",
+        "success": "นำเข้าสำเร็จ",
+        "failure": "นำเข้าไม่สำเร็จ"
+      },
+      "autoSave": {
+        "success": "บันทึกการเปลี่ยนแปลงอัตโนมัติสำเร็จ"
+      }
+    }
+  },
+  "intro": {
+    "banner": "ทุกสิ่งที่คุณต้องการสำหรับอินเทอร์เน็ตไร้ข้อจำกัด",
+    "termsAndPolicyCaution(rich)": "การดำเนินการต่อถือว่าคุณยอมรับ${tap(@:pages.about.termsAndConditions)}",
+    "info(rich)": "สร้างด้วย ❤️ โดย Hiddify - ${tap_source(โอเพนซอร์ส)} (${tap_license(สัญญาอนุญาต)})"
+  },
+  "pages": {
+    "home": {
+      "title": "หน้าหลัก",
+      "quickSettings": "ตัวเลือกการตั้งค่าด่วน"
+    },
+    "proxies": {
+      "title": "พร็อกซี",
+      "sort": "เรียงลำดับพร็อกซี",
+      "testDelay": "ทดสอบความหน่วง",
+      "empty": "ไม่มีพร็อกซีที่ใช้งานได้",
+      "activeProxy": "พร็อกซีที่ใช้งานอยู่",
+      "unknownIp": "ไม่ทราบ IP",
+      "sortOptions": {
+        "unsorted": "ค่าเริ่มต้น",
+        "name": "ตามตัวอักษร",
+        "delay": "ตามความหน่วง",
+        "usage": "ตามการใช้งาน"
+      },
+      "ipInfo": {
+        "address": "ที่อยู่ IP",
+        "country": "ประเทศ",
+        "organization": "องค์กร"
+      },
+      "delay": {
+        "result": "ความหน่วง: ${delay}ms",
+        "timeout": "ทดสอบความหน่วงหมดเวลา",
+        "testing": "ความหน่วง: กำลังทดสอบ..."
+      }
+    },
+    "profiles": {
+      "title": "โปรไฟล์",
+      "add": "เพิ่มโปรไฟล์",
+      "update": "อัปเดตโปรไฟล์",
+      "viewAllProfiles": "ดูโปรไฟล์ทั้งหมด",
+      "activeProfileName": "ชื่อโปรไฟล์ที่ใช้งานอยู่: \"${name}\"",
+      "nonActiveProfileName": "เลือก \"${name}\" เป็นโปรไฟล์ที่ใช้งาน",
+      "freeSubNotFound": "ไม่พบการสมัครใช้งานฟรี",
+      "freeSubNotFoundForRegion": "ไม่พบการสมัครใช้งานฟรีสำหรับภูมิภาค \"${region}\"",
+      "failedToLoad": "โหลดไม่สำเร็จ",
+      "updateSubscriptions": "อัปเดตการสมัครใช้งาน",
+      "share": {
+        "urlToClipboard": "คัดลอก URL ไปยังคลิปบอร์ด",
+        "showUrlQr": "แสดง QR ของ URL",
+        "jsonToClipboard": "คัดลอก JSON ไปยังคลิปบอร์ด"
+      },
+      "msg": {
+        "save": {
+          "success": "บันทึกโปรไฟล์สำเร็จ"
+        },
+        "invalidUrl": "URL ไม่ถูกต้อง",
+        "add": {
+          "failure": "เพิ่มโปรไฟล์ไม่สำเร็จ"
+        },
+        "update": {
+          "success": "อัปเดตโปรไฟล์สำเร็จ",
+          "successNamed": "อัปเดต \"${name}\" สำเร็จ",
+          "failure": "อัปเดตโปรไฟล์ไม่สำเร็จ",
+          "failureNamed": "อัปเดต \"${name}\" ไม่สำเร็จ"
+        },
+        "delete": {
+          "success": "ลบโปรไฟล์สำเร็จ"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "โปรไฟล์",
+      "lastUpdate": "อัปเดตล่าสุด",
+      "form": {
+        "nameHint": "ชื่อโปรไฟล์",
+        "emptyName": "ต้องระบุชื่อ",
+        "invalidUrl": "URL ไม่ถูกต้อง",
+        "urlHint": "URL การกำหนดค่าแบบเต็ม",
+        "disableAutoUpdate": "ปิดการอัปเดตอัตโนมัติ",
+        "autoUpdateInterval": "ช่วงเวลาอัปเดตอัตโนมัติ",
+        "loading": "กำลังเพิ่มโปรไฟล์..."
+      }
+    },
+    "logs": {
+      "title": "บันทึก",
+      "shareCoreLogs": "แชร์บันทึกของ Core",
+      "shareAppLogs": "แชร์บันทึกของแอป"
+    },
+    "about": {
+      "title": "เกี่ยวกับ",
+      "notAvailableMsg": "คุณใช้เวอร์ชันล่าสุดอยู่แล้ว",
+      "checkForUpdate": "ตรวจสอบการอัปเดต",
+      "openWorkingDir": "เปิดโฟลเดอร์ทำงาน",
+      "sourceCode": "ซอร์สโค้ด",
+      "telegramChannel": "ช่อง Telegram",
+      "termsAndConditions": "ข้อกำหนดและเงื่อนไข",
+      "privacyPolicy": "นโยบายความเป็นส่วนตัว"
+    },
+    "settings": {
+      "title": "การตั้งค่า",
+      "resetTunnel": "รีเซ็ตโปรไฟล์ VPN",
+      "options": {
+        "import": {
+          "clipboard": "นำเข้าตัวเลือกจากคลิปบอร์ด",
+          "file": "นำเข้าตัวเลือกจากไฟล์"
+        },
+        "export": {
+          "anonymousToClipboard": "คัดลอกตัวเลือกแบบไม่ระบุตัวตนไปยังคลิปบอร์ด",
+          "anonymousToFile": "ส่งออกตัวเลือกแบบไม่ระบุตัวตนเป็นไฟล์",
+          "allToClipboard": "คัดลอกตัวเลือกทั้งหมดไปยังคลิปบอร์ด",
+          "allToFile": "ส่งออกตัวเลือกทั้งหมดเป็นไฟล์"
+        },
+        "reset": "รีเซ็ตตัวเลือก"
+      },
+      "general": {
+        "title": "ทั่วไป",
+        "locale": "ภาษา",
+        "themeMode": "โหมดธีม",
+        "themeModes": {
+          "system": "ตามระบบ",
+          "dark": "โหมดมืด",
+          "light": "โหมดสว่าง",
+          "black": "โหมดดำ"
+        },
+        "enableAnalytics": "เปิดใช้งานการวิเคราะห์",
+        "enableAnalyticsMsg": "อนุญาตให้เก็บข้อมูลการวิเคราะห์และส่งรายงานข้อขัดข้องเพื่อปรับปรุงแอป",
+        "autoIpCheck": "ตรวจสอบ IP ของการเชื่อมต่อโดยอัตโนมัติ",
+        "dynamicNotification": "แสดงความเร็วในการแจ้งเตือน",
+        "hapticFeedback": "การตอบสนองแบบสั่น",
+        "actionAtClosing": "การทำงานเมื่อปิดแอป",
+        "autoStart": "เริ่มเมื่อเข้าสู่ระบบ",
+        "silentStart": "เริ่มแบบย่อหน้าต่าง",
+        "ignoreBatteryOptimizations": "ปิดการเพิ่มประสิทธิภาพแบตเตอรี่",
+        "ignoreBatteryOptimizationsMsg": "ยกเลิกข้อจำกัดเพื่อประสิทธิภาพ VPN ที่ดีที่สุด",
+        "memoryLimit": "จำกัดหน่วยความจำ",
+        "memoryLimitMsg": "เปิดใช้งานหากพบข้อผิดพลาดหน่วยความจำไม่เพียงพอหรือแอปขัดข้องบ่อย",
+        "debugMode": "โหมดดีบัก",
+        "debugModeMsg": "รีสตาร์ทแอปเพื่อให้การเปลี่ยนแปลงนี้มีผล",
+        "logLevel": "ระดับบันทึก",
+        "connectionTestUrl": "URL ทดสอบการเชื่อมต่อ",
+        "urlTestInterval": "ช่วงเวลาทดสอบ URL",
+        "clashApiPort": "พอร์ต Clash API",
+        "useXrayCoreWhenPossible": "ใช้ xray-core เมื่อเป็นไปได้",
+        "useXrayCoreWhenPossibleMsg": "ใช้ xray-core ระหว่างแยกวิเคราะห์ลิงก์การสมัครใช้งาน คุณต้องนำเข้าลิงก์การสมัครใช้งานใหม่เพื่อเปิดใช้ตัวเลือกนี้"
+      },
+      "routing": {
+        "title": "การกำหนดเส้นทาง",
+        "routeRule": {
+          "empty": "ยังไม่มีกฎ\n\nแตะปุ่ม + เพื่อสร้างกฎใหม่ หรือเลือกจากกฎที่กำหนดไว้ล่วงหน้า",
+          "delete": "ลบกฎ",
+          "create": "สร้างกฎใหม่",
+          "options": {
+            "import": {
+              "clipboard": "นำเข้ากฎจากคลิปบอร์ด",
+              "file": "นำเข้ากฎจากไฟล์"
+            },
+            "export": {
+              "clipboard": "คัดลอกกฎไปยังคลิปบอร์ด",
+              "file": "บันทึกกฎเป็นไฟล์"
+            },
+            "reset": "รีเซ็ตกฎ"
+          },
+          "rule": {
+            "title": "กฎ",
+            "onlyTunMode": "ใช้ได้เฉพาะในโหมด TUN",
+            "notAvailabeInThisPlatform": "ไม่พร้อมใช้งานบนแพลตฟอร์มนี้",
+            "canNotBeEmpty": "ต้องไม่เว้นว่าง",
+            "validUrlEx": "https://example.com",
+            "validUrl": "\"URL\" ที่ถูกต้อง เช่น\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe หรือ google chrome หรือ chrome",
+            "validProcessName": "\"ชื่อโปรเซส\" ที่ถูกต้อง เช่น\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "\"พาธโปรเซส\" ที่ถูกต้อง เช่น\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 หรือ 1:65000",
+            "validPortRange": "\"พอร์ต\" หรือ \"ช่วงพอร์ต\" ที่ถูกต้อง เช่น\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8 หรือ 10.0.0.0/24",
+            "validIpCidr": "IP CIDR ที่ถูกต้อง เช่น\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com หรือ dl.google.com",
+            "validDomain": "\"โดเมน\" ที่ถูกต้อง เช่น\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com หรือ .th",
+            "validDomainSuffix": "\"ส่วนท้ายโดเมน\" ที่ถูกต้อง เช่น\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "tileTitle(map)": {
+              "name": "ชื่อ",
+              "outbound": "ขาออกเมื่อตรงกับกฎ",
+              "rule_set": "URL ชุดกฎ",
+              "package_name": "ชื่อแพ็กเกจ",
+              "process_name": "ชื่อโปรเซส",
+              "process_path": "พาธโปรเซส",
+              "network": "เครือข่าย",
+              "port_range": "พอร์ตปลายทาง",
+              "source_port_range": "พอร์ตต้นทาง",
+              "protocol": "โปรโตคอล",
+              "ip_cidr": "IP CIDR ปลายทาง",
+              "source_ip_cidr": "IP CIDR ต้นทาง",
+              "domain": "โดเมน",
+              "domain_suffixe": "ส่วนท้ายโดเมน",
+              "domain_keyword": "คีย์เวิร์ดโดเมน",
+              "domain_regex": "Regex ของโดเมน"
+            },
+            "outbound(map)": {
+              "proxy": "พร็อกซี",
+              "direct": "เชื่อมต่อตรง",
+              "direct_with_fragment": "เชื่อมต่อตรงพร้อม Fragment",
+              "block": "บล็อก"
+            },
+            "network(map)": {
+              "all": "ทั้งหมด",
+              "tcp": "TCP",
+              "udp": "UDP"
+            },
+            "protocol(map)": {
+              "": "ทั้งหมด",
+              "tls": "TLS",
+              "http": "HTTP",
+              "quic": "QUIC",
+              "stun": "STUN",
+              "dns": "DNS",
+              "bittorrent": "BitTorrent"
+            }
+          },
+          "genericList": {
+            "addNew": "เพิ่มค่าใหม่",
+            "update": "อัปเดตค่า",
+            "clearList": "ล้างรายการ",
+            "clearListMsg": "ลบรายการทั้งหมดแล้ว"
+          }
+        },
+        "generalOptions": {
+          "title": "ตัวเลือกทั่วไปของการกำหนดเส้นทาง",
+          "region": "ภูมิภาค",
+          "regions": {
+            "ir": "อิหร่าน (ir)",
+            "cn": "จีน (cn)",
+            "ru": "รัสเซีย (ru)",
+            "af": "อัฟกานิสถาน (af)",
+            "id": "อินโดนีเซีย (id)",
+            "tr": "ตุรกี (tr)",
+            "br": "บราซิล (br)",
+            "other": "อื่นๆ"
+          },
+          "balancerStrategy": {
+            "title": "กลยุทธ์การกระจายโหลด",
+            "roundRobin": "Round robin",
+            "consistentHash": "Consistent hash",
+            "stickySession": "Sticky session"
+          },
+          "resolveDestination": "แปลงชื่อปลายทาง",
+          "ipv6Route": "เส้นทาง IPv6",
+          "ipv6Modes": {
+            "disable": "ปิดใช้งาน",
+            "enable": "เปิดใช้งาน",
+            "prefer": "ให้ความสำคัญก่อน",
+            "only": "ใช้เฉพาะ IPv6"
+          },
+          "perAppProxy": {
+            "title": "พร็อกซีรายแอป",
+            "hideSysApps": "ซ่อนแอประบบ",
+            "options": {
+              "import": {
+                "clipboard": "นำเข้าการเลือกจากคลิปบอร์ด",
+                "file": "นำเข้าการเลือกจากไฟล์",
+                "msg": "การนำเข้าจะแทนที่การเลือกปัจจุบันของคุณ คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?"
+              },
+              "export": {
+                "clipboard": "คัดลอกการเลือกไปยังคลิปบอร์ด",
+                "file": "ส่งออกการเลือกเป็นไฟล์"
+              },
+              "shareToAll": "แชร์ให้ทุกคน",
+              "clearAllSelections": "ล้างการเลือกทั้งหมด"
+            },
+            "modes": {
+              "all": "ทั้งหมด",
+              "proxy": "พร็อกซี",
+              "bypass": "ข้าม",
+              "allMsg": "ใช้พร็อกซีกับทุกแอป",
+              "proxyMsg": "ใช้พร็อกซีเฉพาะแอปที่เลือก",
+              "bypassMsg": "ไม่ใช้พร็อกซีกับแอปที่เลือก"
+            },
+            "autoSelection": {
+              "title": "เลือกอัตโนมัติ",
+              "performNow": "ดำเนินการทันที",
+              "resetToDefault": "รีเซ็ตเป็นค่าเริ่มต้น",
+              "autoUpdateInterval": "ช่วงเวลาอัปเดตอัตโนมัติ",
+              "toast": {
+                "success": "เลือกแอปอัตโนมัติสำเร็จ",
+                "failure": "การเลือกอัตโนมัติล้มเหลว",
+                "regionNotFound": "ไม่พบการเลือกอัตโนมัติสำหรับภูมิภาค \"${region}\"",
+                "alreadyInAuto": "การเลือกของคุณอยู่ในรายการอัตโนมัติแล้ว"
+              },
+              "dialog": {
+                "title": "เลือกแอปอัตโนมัติ",
+                "msg": "ฟีเจอร์เลือกอัตโนมัติสำหรับพร็อกซีรายแอปถูกปิดใช้งาน เนื่องจากภูมิภาคเปลี่ยนเป็น \"${region}\""
+              }
+            }
+          }
+        },
+        "predefinedRules": {
+          "title": "กฎที่กำหนดไว้ล่วงหน้า",
+          "ads": {
+            "name": "บล็อกโฆษณา",
+            "description": ""
+          },
+          "bypassLan": {
+            "name": "ข้าม LAN",
+            "description": ""
+          }
+        }
+      },
+      "dns": {
+        "title": "DNS",
+        "remoteDns": "DNS ระยะไกล",
+        "remoteDnsDomainStrategy": "กลยุทธ์โดเมนของ DNS ระยะไกล",
+        "directDns": "ตัวแปลงชื่อเซิร์ฟเวอร์ขาออก (เชื่อมต่อตรง)",
+        "directDnsDomainStrategy": "กลยุทธ์โดเมนขาออก",
+        "enableFakeDns": "เปิดใช้งาน Fake DNS",
+        "domainStrategy": {
+          "auto": "อัตโนมัติ",
+          "preferIpv6": "ให้ความสำคัญ IPv6",
+          "preferIpv4": "ให้ความสำคัญ IPv4",
+          "ipv4Only": "IPv4 เท่านั้น",
+          "ipv6Only": "IPv6 เท่านั้น"
+        }
+      },
+      "inbound": {
+        "title": "ขาเข้า",
+        "serviceMode": "โหมดบริการ",
+        "serviceModes": {
+          "proxy": "บริการพร็อกซีเท่านั้น",
+          "systemProxy": "ตั้งค่าพร็อกซีของระบบ",
+          "tun": "VPN"
+        },
+        "shortServiceModes": {
+          "proxy": "พร็อกซี",
+          "systemProxy": "พร็อกซีระบบ",
+          "tun": "VPN"
+        },
+        "strictRoute": "เส้นทางแบบเข้มงวด",
+        "tunImplementation": "การทำงานของ TUN",
+        "tunImplementations": {
+          "mixed": "ผสม",
+          "system": "ระบบ",
+          "gvisor": "gVisor"
+        },
+        "mixedPort": "พอร์ตผสม",
+        "tproxyPort": "พอร์ตพร็อกซีโปร่งใส",
+        "directPort": "พอร์ตเชื่อมต่อตรง",
+        "redirectPort": "พอร์ตเปลี่ยนเส้นทาง",
+        "lanSharing": "แชร์ VPN",
+        "lanSharingPasswordNotSet": "ยังไม่ได้ตั้งรหัสผ่าน",
+        "lanSharingPassword": "รหัสผ่านสำหรับแชร์ VPN",
+        "copyLink": "คัดลอกลิงก์",
+        "qrCode": "คิวอาร์โค้ด",
+        "lanIPError": "ไม่สามารถรับที่อยู่ IP ภายในได้"
+      },
+      "tlsTricks": {
+        "title": "เทคนิค TLS",
+        "enable": "เปิดใช้งาน Fragment",
+        "packets": "แพ็กเก็ตที่แบ่ง Fragment",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
+        "size": "ขนาด Fragment",
+        "sleep": "เวลาหน่วงของ Fragment",
+        "mixedSniCase": {
+          "enable": "เปิดใช้งาน SNI แบบตัวพิมพ์ผสม"
+        },
+        "padding": {
+          "enable": "เปิดใช้งาน Padding",
+          "size": "ขนาด Padding"
+        }
+      },
+      "chain": {
+        "title": "เชน",
+        "subtitle": "ความปลอดภัยเพิ่มเติมและตัวปลดบล็อก",
+        "finalIp": "IP ปลายทางสุดท้าย",
+        "levels": {
+          "app": {
+            "title": "แอป",
+            "msg": "จุดเริ่มต้น: ทราฟฟิกของแอปจะเข้าสู่เชนที่นี่ และผ่านเลเยอร์ถัดไปเพื่อเตรียมพร้อมสำหรับการหลบเลี่ยงขั้นสุดท้าย"
+          },
+          "extraSecurity": {
+            "title": "ความปลอดภัยเพิ่มเติม",
+            "msg": "เพิ่มเกราะป้องกันอีกชั้นเพื่อรักษาความเป็นส่วนตัวของข้อมูล แม้โปรไฟล์หลักจะไม่น่าเชื่อถือ"
+          },
+          "mainProfile": {
+            "title": "โปรไฟล์หลัก"
+          },
+          "unblocker": {
+            "title": "ตัวปลดบล็อก",
+            "msg": "ช่วยหลบเลี่ยงข้อจำกัดของเครือข่าย หากตัวช่วยเชื่อมต่อได้ โปรไฟล์หลักของคุณจะยังใช้งานได้แม้ขณะนี้จะถูกบล็อกอยู่"
+          },
+          "filtering": {
+            "title": "การกรอง",
+            "msg": "ทางออกสุดท้าย: หลังจากผ่านเลเยอร์ที่เปิดใช้งาน (ความปลอดภัยเพิ่มเติม, โปรไฟล์หลัก หรือตัวปลดบล็อก) และได้รับผลจากเลเยอร์เหล่านั้นแล้ว ทราฟฟิกของคุณจะถูกส่งออกไปเพื่อหลบเลี่ยงการกรองของเครือข่ายภายใน"
+          }
+        },
+        "warp": {
+          "missingConfig": "ไม่พบการกำหนดค่า WARP",
+          "licenseKey": "คีย์สัญญาอนุญาต",
+          "cleanIp": "Clean IP",
+          "port": "พอร์ต",
+          "noise": {
+            "count": "จำนวน Noise",
+            "mode": "โหมด Noise",
+            "size": "ขนาด Noise",
+            "delay": "ความหน่วงของ Noise"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "เลือกภูมิภาคของเซิร์ฟเวอร์",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "ออสเตรีย (at)",
+            "au": "ออสเตรเลีย (au)",
+            "be": "เบลเยียม (be)",
+            "bg": "บัลแกเรีย (bg)",
+            "ca": "แคนาดา (ca)",
+            "ch": "สวิตเซอร์แลนด์ (ch)",
+            "cz": "สาธารณรัฐเช็ก (cz)",
+            "de": "เยอรมนี (de)",
+            "dk": "เดนมาร์ก (dk)",
+            "ee": "เอสโตเนีย (ee)",
+            "es": "สเปน (es)",
+            "fi": "ฟินแลนด์ (fi)",
+            "fr": "ฝรั่งเศส (fr)",
+            "gb": "สหราชอาณาจักร (gb)",
+            "hr": "โครเอเชีย (hr)",
+            "hu": "ฮังการี (hu)",
+            "ie": "ไอร์แลนด์ (ie)",
+            "in": "อินเดีย (in)",
+            "it": "อิตาลี (it)",
+            "jp": "ญี่ปุ่น (jp)",
+            "lv": "ลัตเวีย (lv)",
+            "nl": "เนเธอร์แลนด์ (nl)",
+            "no": "นอร์เวย์ (no)",
+            "pl": "โปแลนด์ (pl)",
+            "pt": "โปรตุเกส (pt)",
+            "ro": "โรมาเนีย (ro)",
+            "rs": "เซอร์เบีย (rs)",
+            "se": "สวีเดน (se)",
+            "sg": "สิงคโปร์ (sg)",
+            "sk": "สโลวาเกีย (sk)",
+            "us": "สหรัฐอเมริกา (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "เลือกโปรไฟล์",
+          "conduitPairingId": "Conduit pairing ID"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "การเชื่อมต่อ",
+      "traffic": "ทราฟฟิก",
+      "trafficLive": "ทราฟฟิกขณะนี้",
+      "trafficTotal": "ทราฟฟิกทั้งหมด",
+      "uplink": "อัปลิงก์",
+      "downlink": "ดาวน์ลิงก์",
+      "speed": "ความเร็ว",
+      "totalTransferred": "ถ่ายโอนทั้งหมด"
+    },
+    "subscriptionInfo": {
+      "upload": "อัปโหลด",
+      "download": "ดาวน์โหลด",
+      "total": "ทราฟฟิกทั้งหมด",
+      "expireDate": "วันหมดอายุ",
+      "expired": "หมดอายุแล้ว",
+      "noTraffic": "โควตาหมดแล้ว",
+      "remainingTime": "เวลาที่เหลือ",
+      "remainingDuration": "เหลืออีก ${duration} วัน",
+      "remainingDurationNew": "${duration} วัน",
+      "remainingTrafficSemanticLabel": "ใช้ทราฟฟิกไปแล้ว ${consumed} จาก ${total}",
+      "remainingTraffic": "ทราฟฟิกที่เหลือ",
+      "remainingUsage": "คงเหลือ",
+      "profileSite": "ผู้ให้บริการ",
+      "profileSupport": "ฝ่ายสนับสนุน"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "เรียงตาม",
+      "sort": {
+        "name": "ตามตัวอักษร",
+        "lastUpdate": "อัปเดตล่าสุด"
+      }
+    },
+    "warpLicense": {
+      "title": "การยินยอม Cloudflare WARP",
+      "description(rich)": "Cloudflare WARP คือผู้ให้บริการ VPN แบบ WireGuard ฟรี การเปิดใช้ตัวเลือกนี้ถือว่าคุณยอมรับ${tos(ข้อกำหนดการให้บริการ)}และ${privacy(นโยบายความเป็นส่วนตัว)}ของ Cloudflare WARP"
+    },
+    "psiphonLicense": {
+      "title": "ข้อตกลงสัญญาอนุญาตของ Psiphon",
+      "description(rich)": "การใช้ Psiphon ถือว่าคุณยอมรับ${tos(ข้อกำหนดการให้บริการ)}และรับทราบ${privacy(นโยบายความเป็นส่วนตัว)} โปรดอ่านอย่างละเอียดก่อนดำเนินการต่อ"
+    },
+    "newVersion": {
+      "title": "มีอัปเดตใหม่",
+      "msg": "@:common.appTitle มีเวอร์ชันใหม่แล้ว คุณต้องการอัปเดตตอนนี้หรือไม่?",
+      "currentVersion": "เวอร์ชันปัจจุบัน: ",
+      "newVersion": "เวอร์ชันใหม่: ",
+      "updateNow": "อัปเดตทันที"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "การดำเนินการนี้จะเขียนทับตัวเลือกการกำหนดค่าทั้งหมดด้วยค่าที่ระบุ คุณแน่ใจหรือไม่?"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "ลบโปรไฟล์",
+          "msg": "คุณแน่ใจหรือไม่ว่าต้องการลบโปรไฟล์นี้อย่างถาวร?"
+        }
+      },
+      "perAppProxy": {
+        "shareOnGithub": {
+          "title": "ปรับปรุงการเลือกอัตโนมัติ",
+          "msg": "การแชร์แอปที่เลือกจะช่วยให้รายการ \"เลือกอัตโนมัติ\" สมบูรณ์ยิ่งขึ้น"
+        },
+        "import": {
+          "msg": "การดำเนินการนี้จะแทนที่การเลือกพร็อกซีรายแอปทั้งหมดของคุณ คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "ลบกฎ",
+          "msg": "คุณแน่ใจหรือไม่ว่าต้องการลบกฎ \"$rulename\"?"
+        }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "เพิ่มโปรไฟล์?",
+        "message": "ลิงก์ภายนอกจาก \"${host}\" กำลังขอเพิ่มโปรไฟล์ใหม่ คุณต้องการนำเข้าหรือไม่?"
+      },
+      "importRouteRuleByDeepLinkWarning": {
+        "title": "นำเข้ากฎการกำหนดเส้นทาง?",
+        "message": "การนำเข้ากฎการกำหนดเส้นทางจากแหล่งที่ไม่น่าเชื่อถืออาจมีความเสี่ยงด้านความปลอดภัย\nโปรดดำเนินการต่อเฉพาะเมื่อคุณเชื่อถือลิงก์นี้"
+      }
+    },
+    "experimentalNotice": {
+      "title": "กำลังใช้ฟีเจอร์ทดลอง",
+      "msg": "คุณได้เปิดใช้ฟีเจอร์ทดลองบางอย่าง ซึ่งอาจส่งผลต่อคุณภาพการเชื่อมต่อและทำให้เกิดข้อผิดพลาดที่ไม่คาดคิด คุณสามารถเปลี่ยนหรือรีเซ็ตตัวเลือกเหล่านี้ได้ตลอดเวลาจากหน้าตัวเลือกการกำหนดค่า",
+      "disable": "ไม่ต้องแสดงอีก"
+    },
+    "noActiveProfile": {
+      "title": "เลือกโปรไฟล์",
+      "msg": "เริ่มต้นด้วยการเพิ่มโปรไฟล์การเชื่อมต่อที่มีรายละเอียดการเชื่อมต่อ VPN ของคุณ\n\nยังไม่มีเซิร์ฟเวอร์ VPN ใช่ไหม? ไม่ต้องกังวล เพียงทำตามบทแนะนำด้านล่างเพื่อตั้งค่าได้อย่างรวดเร็วและฟรี",
+      "helpBtn": {
+        "label": "แสดงวิธีทำ",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "คำเตือนลิงก์ภายนอก",
+      "youAreAboutToVisit": "คุณกำลังจะเข้าชม:",
+      "thisWebsiteIsNotInOurTrustedList": "เว็บไซต์นี้ไม่อยู่ในรายการที่เชื่อถือได้ของเรา โปรดดำเนินการด้วยความระมัดระวัง"
+    },
+    "proxyInfo": {
+      "fullTag": "แท็กเต็ม:",
+      "type": "ประเภท:",
+      "testTime": "เวลาที่ทดสอบ:",
+      "testDelay": "ความหน่วงที่ทดสอบ:",
+      "isSelected": "ถูกเลือก:",
+      "isGroup": "เป็นกลุ่ม",
+      "isSecure": "ปลอดภัย:",
+      "port": "พอร์ต:",
+      "host": "โฮสต์:",
+      "ip": "IP:",
+      "countryCode": "รหัสประเทศ:",
+      "region": "ภูมิภาค:",
+      "city": "เมือง:",
+      "asn": "ASN:",
+      "organization": "องค์กร:",
+      "location": "ตำแหน่ง:",
+      "postalCode": "รหัสไปรษณีย์:",
+      "download": "ดาวน์โหลด:",
+      "upload": "อัปโหลด:"
+    },
+    "windowClosing": {
+      "askEachTime": "ถามทุกครั้ง",
+      "alertMessage": "ซ่อนหรือออกจากแอปพลิเคชัน?",
+      "remember": "จดจำตัวเลือกของฉัน"
+    }
+  },
+  "connection": {
+    "tapToConnect": "แตะเพื่อเชื่อมต่อ",
+    "connect": "เชื่อมต่อ",
+    "connecting": "กำลังเชื่อมต่อ...",
+    "connected": "เชื่อมต่อแล้ว",
+    "disconnect": "ยกเลิกการเชื่อมต่อ",
+    "disconnecting": "กำลังยกเลิกการเชื่อมต่อ...",
+    "reconnect": "เชื่อมต่อใหม่",
+    "reconnectMsg": "กำลังเชื่อมต่อใหม่เพื่อให้การเปลี่ยนแปลงมีผล..."
+  },
+  "errors": {
+    "unexpected": "ข้อผิดพลาดที่ไม่คาดคิด",
+    "connection": {
+      "unexpected": "ข้อผิดพลาดการเชื่อมต่อที่ไม่คาดคิด",
+      "timeout": "การเชื่อมต่อหมดเวลา",
+      "badResponse": "การตอบกลับไม่ถูกต้อง",
+      "connectionError": "ข้อผิดพลาดการเชื่อมต่อ",
+      "badCertificate": "ใบรับรองไม่ถูกต้อง"
+    },
+    "profiles": {
+      "unexpected": "ข้อผิดพลาดที่ไม่คาดคิด",
+      "notFound": "ไม่พบโปรไฟล์",
+      "invalidConfig": "การกำหนดค่าไม่ถูกต้อง",
+      "invalidUrl": "URL ไม่ถูกต้อง",
+      "canceledByUser": "ผู้ใช้ยกเลิก"
+    },
+    "connectivity": {
+      "unexpected": "ความล้มเหลวที่ไม่คาดคิด",
+      "missingVpnPermission": "ไม่ได้รับสิทธิ์ VPN",
+      "missingNotificationPermission": "ไม่ได้รับสิทธิ์การแจ้งเตือน",
+      "core": "ข้อผิดพลาดของ Core"
+    },
+    "singbox": {
+      "serviceNotRunning": "บริการไม่ได้ทำงาน",
+      "missingPrivilege": "สิทธิ์ไม่เพียงพอ",
+      "missingPrivilegeMsg": "โหมด VPN ต้องใช้สิทธิ์ผู้ดูแลระบบ โปรดเปิดแอปใหม่ในฐานะผู้ดูแลระบบ หรือเปลี่ยนโหมดบริการ",
+      "invalidConfigOptions": "ตัวเลือกการกำหนดค่าไม่ถูกต้อง",
+      "invalidConfig": "การกำหนดค่าไม่ถูกต้อง"
+    },
+    "warp": {
+      "missingLicense": "ต้องยอมรับสัญญาอนุญาต WARP",
+      "missingLicenseMsg": "โปรไฟล์ที่เลือกใช้ฟีเจอร์ WARP หากต้องการใช้ฟีเจอร์นี้ คุณต้องยอมรับสัญญาอนุญาตของ WARP"
+    },
+    "psiphon": {
+      "missingLicense": "ต้องยอมรับสัญญาอนุญาต Psiphon",
+      "missingLicenseMsg": "โปรไฟล์ที่เลือกใช้ฟีเจอร์ Psiphon หากต้องการใช้ฟีเจอร์นี้ คุณต้องยอมรับสัญญาอนุญาตของ Psiphon"
+    }
+  }
+}
