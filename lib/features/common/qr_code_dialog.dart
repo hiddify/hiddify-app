@@ -369,7 +369,8 @@ class ProxyDialog extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final other = useState(otherDevices);
-    if (ref.watch(ConfigOptions.serviceMode) == ServiceMode.tun) return const LanSharingQrDialog();
+    final mode = ref.watch(ConfigOptions.serviceMode);
+    if (mode == ServiceMode.tun || mode == ServiceMode.router) return const LanSharingQrDialog();
     final header = Consumer(
       builder: (context, ref, _) {
         final t = ref.watch(translationsProvider).requireValue;

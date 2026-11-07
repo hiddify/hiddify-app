@@ -614,12 +614,14 @@
         "serviceModes": {
           "proxy": "Proxy service only",
           "systemProxy": "Set system proxy",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Router (whole network)"
         },
         "shortServiceModes": {
           "proxy": "Proxy",
           "systemProxy": "System proxy",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Router"
         },
         "strictRoute": "Strict route",
         "tunImplementation": "TUN implementation",

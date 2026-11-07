@@ -614,12 +614,14 @@
         "serviceModes": {
           "proxy": "فقط سرویس پروکسی",
           "systemProxy": "تنظیم پروکسی سیستم",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "روتر (کل شبکه)"
         },
         "shortServiceModes": {
           "proxy": "پروکسی",
           "systemProxy": "پروکسی سیستم",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "روتر"
         },
         "strictRoute": "مسیربندی سخت‌گیرانه",
         "tunImplementation": "پیاده‌سازی TUN",

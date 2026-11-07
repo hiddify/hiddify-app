@@ -61,6 +61,9 @@ class SingboxConfigOption with _$SingboxConfigOption {
     required bool enableClashApi,
     required int clashApiPort,
     required bool enableTun,
+
+    /// Router mode (`router-mode`): the TUN, for the whole network this Linux device routes.
+    @Default(false) bool routerMode,
     // required bool enableTunService,
     required bool setSystemProxy,
     // required bool bypassLan,

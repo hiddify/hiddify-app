@@ -252,8 +252,9 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
   @override
   TaskEither<ConnectionFailure, Unit> disconnect() => singbox.stop().mapLeft(UnexpectedConnectionFailure.new);
 
-  static String _serviceMode(SingboxConfigOption options) =>
-      options.enableTun ? 'vpn' : (options.setSystemProxy ? 'system-proxy' : 'proxy');
+  static String _serviceMode(SingboxConfigOption options) => options.routerMode
+      ? 'router'
+      : (options.enableTun ? 'vpn' : (options.setSystemProxy ? 'system-proxy' : 'proxy'));
 
   /// Windows and Linux: the core runs in this process for proxy modes and in admin_bgservice for
   /// VPN, so a new service mode moves it. A hot reload would only change the core already running
