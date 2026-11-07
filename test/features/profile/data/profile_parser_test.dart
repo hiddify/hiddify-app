@@ -498,6 +498,32 @@ void main() {
         },
       );
     });
+
+    test("non-finite values do not reject the profile", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=100;download=200;total=1e999;expire=1704054600",
+        }),
+        (rp) {
+          expect(rp.subInfo, isNull);
+          expect(rp.name, equals("p"));
+        },
+      );
+    });
+
+    test("out-of-range expiry does not reject the profile", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=100;download=200;total=1000;expire=9999999999999",
+        }),
+        (rp) {
+          expect(rp.subInfo, isNull);
+          expect(rp.name, equals("p"));
+        },
+      );
+    });
   });
 
   group("profile-update-interval robustness (#11)", () {

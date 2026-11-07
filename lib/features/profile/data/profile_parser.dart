@@ -305,16 +305,20 @@ class ProfileParser with InfraLogger {
       if (parts.length < 2) continue;
       final key = parts.first.trim();
       if (key.isEmpty) continue;
-      map[key] = num.tryParse(parts[1].trim())?.toInt();
+      final value = num.tryParse(parts[1].trim());
+      if (value == null || !value.isFinite || value < 0) continue;
+      map[key] = value.toInt();
     }
     if (map case {"upload": final upload?, "download": final download?, "total": final total, "expire": var expire}) {
       final total1 = (total == null || total == 0) ? infiniteTrafficThreshold + 1 : total;
       expire = (expire == null || expire == 0) ? infiniteTimeThreshold : expire;
+      if (expire > 8_640_000_000_000) return null;
+      final expiration = DateTime.fromMillisecondsSinceEpoch(expire * 1000);
       return SubscriptionInfo(
         upload: upload,
         download: download,
         total: total1,
-        expire: DateTime.fromMillisecondsSinceEpoch(expire * 1000),
+        expire: expiration,
       );
     }
     return null;
