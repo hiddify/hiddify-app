@@ -7,17 +7,13 @@ on:
   #     - 'test.configs/**'
   #     - '.vscode/'
   #     - 'appcast.xml'
-  push:
-    branches:
-       - main
-       - dev
-       - android-fix-action-bug
-       - new-design-v2 
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - '.vscode/'
-      - 'appcast.xml'
+  # Run manually from the Actions tab (or `gh workflow run ci.yml --ref <branch>`).
+  workflow_dispatch:
+    inputs:
+      upload-artifact:
+        description: 'Sign the builds and upload them as artifacts'
+        type: boolean
+        default: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -30,5 +26,5 @@ jobs:
     permissions: write-all
     if: "${{!contains(github.event.head_commit.message, 'release: version')}}"
     with:
-      upload-artifact: ${{ github.event_name == 'push' }}
+      upload-artifact: ${{ inputs.upload-artifact }}
       
