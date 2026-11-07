@@ -393,6 +393,33 @@ void main() {
     });
   });
 
+  group("profile-title base64", () {
+    test("decodes a padded value", () {
+      expect(ProfileParser.decodeBase64Title(base64.encode(utf8.encode("My VPN"))), equals("My VPN"));
+    });
+
+    test("decodes a value without padding (previously threw)", () {
+      final padded = base64.encode(utf8.encode("Stockholm 1"));
+      expect(padded.endsWith("="), isTrue);
+      expect(ProfileParser.decodeBase64Title(padded.replaceAll("=", "")), equals("Stockholm 1"));
+    });
+
+    test("invalid base64 falls through to the next name source (previously threw)", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "base64:not base64!"}, url: "https://example.com/sub#Fallback"),
+        (rp) => expect(rp.name, equals("Fallback")),
+      );
+    });
+
+    test("parse() uses an unpadded base64 title (previously threw)", () {
+      final unpadded = base64.encode(utf8.encode("Stockholm 1")).replaceAll("=", "");
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "base64:$unpadded"}),
+        (rp) => expect(rp.name, equals("Stockholm 1")),
+      );
+    });
+  });
+
   group("subscription-userinfo robustness (#10)", () {
     test("parses a normal header", () {
       expectRemote(
