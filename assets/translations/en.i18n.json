@@ -470,7 +470,8 @@
             "linux": "Linux updates"
           },
           "blockAds": "Ads and malware",
-          "bypassRegion": "Sites in $region"
+          "bypassRegion": "Sites in $region",
+          "tailscale": "Bypass Tailscale"
         },
         "appBasedRouting": {
           "title": "App-based routing",
