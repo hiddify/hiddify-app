@@ -18,6 +18,9 @@ const defaultWindowSize = Size(868, 668);
 
 @Riverpod(keepAlive: true)
 class WindowNotifier extends _$WindowNotifier with AppLogger {
+  /// A silent start leaves the window hidden, so the saved maximized state waits for [show].
+  bool _maximizeOnShow = false;
+
   @override
   Future<void> build() async {
     if (!PlatformUtils.isDesktop) return;
@@ -65,8 +68,14 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
       loggy.debug("no previous position found, centering window");
     }
     if (isMaximized) {
-      await windowManager.maximize();
-      loggy.debug("restoring window to maximized state");
+      if (silentStart) {
+        // Maximizing shows a hidden window on Windows, which would undo the silent start.
+        _maximizeOnShow = true;
+        loggy.debug("window maximized once it is shown");
+      } else {
+        await windowManager.maximize();
+        loggy.debug("restoring window to maximized state");
+      }
     }
     if (!silentStart) {
       await ref.read(windowNotifierProvider.notifier).show(focus: false);
@@ -98,6 +107,10 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
 
   Future<void> show({bool focus = true}) async {
     await windowManager.show();
+    if (_maximizeOnShow) {
+      _maximizeOnShow = false;
+      await windowManager.maximize();
+    }
     if (focus) await windowManager.focus();
     if (Platform.isMacOS) {
       await windowManager.setSkipTaskbar(false);
