@@ -77,7 +77,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
         );
       } else {
         loggy.debug("adding profile, content");
-        task = _profilesRepo.addLocal(safeDecodeBase64(rawInput));
+        task = _profilesRepo.addLocal(safeDecodeBase64(rawInput)).map((_) => unit);
       }
       return await task
           .match(

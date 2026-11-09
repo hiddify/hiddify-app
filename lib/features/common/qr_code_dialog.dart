@@ -81,10 +81,34 @@ class QrCodeDialog extends HookConsumerWidget {
 /// How a profile can be shared: its link as a QR code and to copy, when it has one (a remote
 /// profile), then its configuration to copy, share or save. The configuration is built when the
 /// dialog opens; copying is offered only when it fits the clipboard.
+///
+/// Also shares a single proxy ([title] and [configHint] then say so): it has no link, so its
+/// configuration itself is the QR code when it is small enough to scan.
 class ShareProfileDialog extends HookConsumerWidget {
-  const ShareProfileDialog({super.key, required this.name, required this.loadConfig, this.link});
+  const ShareProfileDialog({
+    super.key,
+    required this.name,
+    required this.loadConfig,
+    this.link,
+    this.title,
+    this.configHint,
+    this.configQr = false,
+  });
 
   final String name;
+
+  /// Above [name]; "Share profile" when null.
+  final String? title;
+
+  /// Under the configuration's heading; says it is the profile's full JSON when null.
+  final String? configHint;
+
+  /// Shows the configuration as a QR code, without its indentation, when it is at most
+  /// [maxQrChars] long: Hiddify's scanner imports it like a pasted config.
+  final bool configQr;
+
+  /// The most a QR code holds that a phone camera still reads well.
+  static const maxQrChars = 1000;
 
   /// The subscription link; null for a profile without one.
   final String? link;
@@ -104,6 +128,15 @@ class ShareProfileDialog extends HookConsumerWidget {
     final s = theme.colorScheme;
     final config = useFuture(useMemoized(loadConfig));
     final link = this.link;
+    final qrConfig = useMemoized(() {
+      if (!configQr || config.data == null) return null;
+      try {
+        final compact = jsonEncode(jsonDecode(config.data!));
+        return compact.length <= maxQrChars ? compact : null;
+      } catch (_) {
+        return null;
+      }
+    }, [config.data]);
 
     return Dialog(
       child: SizedBox(
@@ -127,7 +160,10 @@ class ShareProfileDialog extends HookConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(share.title, style: theme.textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant)),
+                        Text(
+                          title ?? share.title,
+                          style: theme.textTheme.labelLarge?.copyWith(color: s.onSurfaceVariant),
+                        ),
                         Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleLarge),
                       ],
                     ),
@@ -154,6 +190,16 @@ class ShareProfileDialog extends HookConsumerWidget {
                   ),
                 ),
               ],
+              if (qrConfig != null) ...[
+                const Gap(20),
+                Center(child: _QrCode(qrConfig)),
+                const Gap(10),
+                Text(
+                  share.scanHint,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                ),
+              ],
               const Gap(22),
               Row(
                 children: [
@@ -169,7 +215,10 @@ class ShareProfileDialog extends HookConsumerWidget {
                 ],
               ),
               const Gap(4),
-              Text(share.configHint, style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant)),
+              Text(
+                configHint ?? share.configHint,
+                style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+              ),
               const Gap(12),
               AnimatedSize(
                 duration: const Duration(milliseconds: 200),

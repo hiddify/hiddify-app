@@ -196,6 +196,17 @@
         "which": "Which proxies",
         "shown": "Shown ($n)",
         "chosen": "Chosen ($n)"
+      },
+      "single": {
+        "share": "Share",
+        "edit": "Edit",
+        "shareTitle": "Share proxy",
+        "configHint": "This proxy alone, and any proxy it connects through. Hiddify imports it like any config.",
+        "editTitle": "Edit as a new profile",
+        "editMsg": "“${name}” is copied to a new profile that you can edit. The original stays as it is, since a subscription replaces its proxies on every update.",
+        "editConfirm": "Copy and edit",
+        "savedAsProfile": "Copied to the new profile “${name}”",
+        "failed": "Couldn't read this proxy's configuration"
       }
     },
     "profiles": {

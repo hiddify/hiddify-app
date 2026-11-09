@@ -83,6 +83,18 @@ class DialogNotifier extends _$DialogNotifier {
     return await _show<bool?>(const ChainLicenseDialog(mode: ChainMode.psiphon)) ?? false;
   }
 
+  /// One proxy's configuration, [loadConfig], to copy, share, save or scan.
+  Future<void> showShareProxy({
+    required String name,
+    required Future<String> Function() loadConfig,
+    required String title,
+    required String configHint,
+  }) async {
+    return await _show<void>(
+      ShareProfileDialog(name: name, loadConfig: loadConfig, title: title, configHint: configHint, configQr: true),
+    );
+  }
+
   /// Shows [link] as a QR code that the copy button also copies.
   Future<void> showQrCode(String link, {required String title}) async {
     return await _show<void>(QrCodeDialog(link, title: title, link: link));

@@ -33,7 +33,9 @@ abstract interface class ProfileRepository {
     SortMode sortMode = SortMode.ascending,
   });
   TaskEither<ProfileFailure, Unit> upsertRemote(String url, {UserOverride? userOverride, CancelToken? cancelToken});
-  TaskEither<ProfileFailure, Unit> addLocal(String content, {UserOverride? userOverride});
+
+  /// Adds [content] as a local profile; returns its id.
+  TaskEither<ProfileFailure, String> addLocal(String content, {UserOverride? userOverride});
   TaskEither<ProfileFailure, Unit> offlineUpdate(ProfileEntity nProfile, String nContent);
   TaskEither<ProfileFailure, Unit> validateConfig(String path, String tempPath, String? profileOverride, bool debug);
   TaskEither<ProfileFailure, String> generateConfig(String id);
@@ -222,7 +224,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
       });
 
   @override
-  TaskEither<ProfileFailure, Unit> addLocal(String content, {UserOverride? userOverride}) =>
+  TaskEither<ProfileFailure, String> addLocal(String content, {UserOverride? userOverride}) =>
       TaskEither.tryCatch(() async {
         final id = const Uuid().v4();
         final file = _profilePathResolver.file(id);
@@ -239,9 +241,9 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
                       ProfileParser.profileOverrideHelper(profile: profEntity),
                       false,
                     ).flatMap(
-                      (unit) => TaskEither.tryCatch(() async {
+                      (_) => TaskEither.tryCatch(() async {
                         await _profileDataSource.insert(profEntity);
-                        return unit;
+                        return id;
                       }, ProfileFailure.unexpected),
                     ),
               );

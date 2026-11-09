@@ -5,17 +5,23 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
+import 'package:hiddify/features/profile/data/profile_data_providers.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
+import 'package:hiddify/features/proxy/data/single_proxy_config.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
+import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// A proxy at a glance: who it is and where it leads, then its ping, upload and download speed,
 /// each tested on a tap. The values follow the core while the dialog is open.
-class ProxyInfoDialog extends ConsumerWidget {
+class ProxyInfoDialog extends ConsumerWidget with PresLogger {
   const ProxyInfoDialog({super.key, required this.outboundInfo});
 
   final OutboundInfo outboundInfo;
@@ -48,8 +54,94 @@ class ProxyInfoDialog extends ConsumerWidget {
         constraints: const BoxConstraints(maxWidth: 440),
         child: SingleChildScrollView(child: OutboundInfoWidget(outboundInfo: proxy)),
       ),
-      actions: [TextButton(onPressed: context.pop, child: Text(t.common.close))],
+      actions: [
+        if (_canShare(proxy)) ...[
+          TextButton.icon(
+            onPressed: () => _edit(context, ref, proxy),
+            icon: const Icon(Icons.edit_rounded, size: 18),
+            label: Text(t.pages.proxies.single.edit),
+          ),
+          TextButton.icon(
+            onPressed: () => _share(ref, proxy),
+            icon: const Icon(Icons.ios_share_rounded, size: 18),
+            label: Text(t.pages.proxies.single.share),
+          ),
+        ],
+        TextButton(onPressed: context.pop, child: Text(t.common.close)),
+      ],
     );
+  }
+
+  /// A proxy of the profile, not a group or one of the app's own outbounds.
+  static bool _canShare(OutboundInfo proxy) =>
+      !proxy.isGroup && !isHiddenTag(proxy.tag) && !const {'direct', 'block', 'dns'}.contains(proxy.type.toLowerCase());
+
+  static String _name(OutboundInfo proxy) => baseTag(proxy.tagDisplay.isNotEmpty ? proxy.tagDisplay : proxy.tag);
+
+  /// The config of [proxy] alone, from the active profile, which the running proxies come from.
+  static Future<String> _loadConfig(WidgetRef ref, OutboundInfo proxy) async {
+    final profile = await ref.read(activeProfileProvider.future);
+    if (profile == null) throw StateError('no active profile');
+    final repo = ref.read(profileRepositoryProvider).requireValue;
+    final raw = (await repo.getRawConfig(profile.id).run()).toNullable();
+    final config =
+        singleProxyConfig(proxy.tag, host: proxy.host, port: proxy.port, raw: raw) ??
+        singleProxyConfig(
+          proxy.tag,
+          host: proxy.host,
+          port: proxy.port,
+          generated: (await repo.generateConfig(profile.id).run()).toNullable(),
+        );
+    if (config == null) throw StateError('proxy [${proxy.tag}] not found in the profile');
+    return config;
+  }
+
+  Future<void> _share(WidgetRef ref, OutboundInfo proxy) async {
+    final t = ref.read(translationsProvider).requireValue;
+    await ref
+        .read(dialogNotifierProvider.notifier)
+        .showShareProxy(
+          name: _name(proxy),
+          loadConfig: () => _loadConfig(ref, proxy),
+          title: t.pages.proxies.single.shareTitle,
+          configHint: t.pages.proxies.single.configHint,
+        );
+  }
+
+  /// Copies [proxy] to a new local profile and opens it in the profile editor: a proxy of a
+  /// subscription is replaced on its next update, so it is not edited in place.
+  Future<void> _edit(BuildContext context, WidgetRef ref, OutboundInfo proxy) async {
+    final t = ref.read(translationsProvider).requireValue;
+    final strings = t.pages.proxies.single;
+    final notifications = ref.read(inAppNotificationControllerProvider);
+    final router = GoRouter.of(context);
+    final name = _name(proxy);
+    final confirmed = await ref
+        .read(dialogNotifierProvider.notifier)
+        .showConfirmation(
+          title: strings.editTitle,
+          message: strings.editMsg(name: name),
+          icon: Icons.edit_rounded,
+          positiveBtnTxt: strings.editConfirm,
+        );
+    if (!confirmed) return;
+    final String id;
+    try {
+      final config = await _loadConfig(ref, proxy);
+      id = await ref
+          .read(profileRepositoryProvider)
+          .requireValue
+          .addLocal(config, userOverride: UserOverride(name: name))
+          .getOrElse((failure) => throw failure)
+          .run();
+    } catch (e, stackTrace) {
+      loggy.warning('copying proxy [${proxy.tag}] to a profile failed', e, stackTrace);
+      notifications.showErrorToast(strings.failed);
+      return;
+    }
+    if (context.mounted) context.pop();
+    notifications.showSuccessToast(strings.savedAsProfile(name: name));
+    router.goNamed('profileDetails', pathParameters: {'id': id});
   }
 }
 
