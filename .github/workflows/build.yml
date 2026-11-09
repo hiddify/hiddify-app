@@ -304,6 +304,36 @@ jobs:
           make ${{ matrix.platform }}-prepare
 
 
+      # App Store Connect takes each build number of a version once, so a rebuild of the same version
+      # (a draft, a rerun) cannot reuse pubspec's. It gets one more than the highest build already
+      # uploaded for this version: a whole number one higher lets TestFlight give it to external
+      # testers without another review. The packet tunnel must carry the app's number.
+      - name: Give the iOS build the next build number
+        if: matrix.platform == 'ios' && inputs.upload-artifact
+        env:
+          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          name="$(sed -n 's/^version: *\([^+ ]*\)+[0-9][0-9]* *$/\1/p' pubspec.yaml)"
+          base="$(sed -n 's/^version: *[^+]*+\([0-9][0-9]*\) *$/\1/p' pubspec.yaml)"
+          test -n "$name" && test -n "$base"
+          # App Store Connect knows the version without a pre-release suffix (5.5.6, not 5.5.6.dev).
+          version="${name%%[-.][a-z]*}"
+          bundle_id="$(sed -n 's/^BASE_BUNDLE_IDENTIFIER *= *//p' ios/Base.xcconfig)"
+          if [ -z "$APPSTORE_ISSUER_ID" ] || [ -z "$APPSTORE_API_KEY_ID" ] || [ -z "$APPSTORE_API_PRIVATE_KEY" ]; then
+            echo "::warning::No App Store Connect API key: keeping pubspec's build number $base, which TestFlight rejects if it was uploaded already."
+            build="$base"
+          else
+            build="$(python3 .github/scripts/next_ios_build_number.py "$bundle_id" "$version" "$base")"
+          fi
+          perl -pi -e "s/^(version: *[^+]+)\+\d+ *\$/\${1}+$build/" pubspec.yaml
+          perl -pi -e "s/CURRENT_PROJECT_VERSION = \d+;/CURRENT_PROJECT_VERSION = $build;/" ios/Runner.xcodeproj/project.pbxproj
+          grep -n '^version:' pubspec.yaml
+          grep -c "CURRENT_PROJECT_VERSION = $build;" ios/Runner.xcodeproj/project.pbxproj
+          echo "iOS build number: $build"
+
       - name: Build ${{ matrix.platform }}
         if: matrix.platform != 'macos-appstore' && matrix.platform != 'windows' && (matrix.platform != 'ios' || inputs.upload-artifact)
         env:
@@ -442,6 +472,18 @@ jobs:
         with:
           subject-path: out/*
 
+      # sentry_dart_plugin does not recognize the arm64 Linux runner ("Host platform not supported:
+      # linux ARM64") and falls back to sentry-cli on PATH: install the build it would have used.
+      - name: Install sentry-cli for arm64 Linux
+        if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' && matrix.platform == 'linux-arm64' }}
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o "$HOME/.local/bin/sentry-cli" \
+            https://github.com/getsentry/sentry-cli/releases/download/2.58.6/sentry-cli-Linux-aarch64
+          echo "79e60095ab461eac70c23ce750499bff5c6bffb95d364ccf38d3259557403987  $HOME/.local/bin/sentry-cli" | sha256sum -c -
+          chmod +x "$HOME/.local/bin/sentry-cli"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Upload Debug Symbols
         if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
         env:
@@ -451,7 +493,7 @@ jobs:
           SENTRY_DIST: ${{ matrix.platform == 'android-aab' && 'google-play' || 'general' }}
         run: |
           dart pub global activate sentry_dart_plugin
-          dart run sentry_dart_plugin 
+          dart run sentry_dart_plugin
       
       
 
