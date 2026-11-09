@@ -1100,6 +1100,13 @@
       "portRange": "Use a port from 1024 to 65535",
       "passwordTooShort": "At least 4 characters",
       "edit": "Edit"
+    },
+    "dbNewerThanApp": {
+      "title": "Saved data is from a newer version",
+      "msg": "Your profiles and settings were saved by a newer version of Hiddify, and this older version cannot read them. Install the latest version to keep them, or delete them to use this version.",
+      "deleteData": "Delete data",
+      "deleteConfirm": "All profiles will be deleted. This cannot be undone.",
+      "downloadLatest": "Download latest version"
     }
   },
   "connection": {

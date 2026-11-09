@@ -6,7 +6,11 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hiddify/core/analytics/analytics_controller.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
+import 'package:hiddify/core/db/db.dart';
+import 'package:hiddify/core/db/db_newer_than_app_prompt.dart';
+import 'package:hiddify/core/db/provider/db_providers.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
+import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/logger/logger_setup.dart';
@@ -100,9 +104,11 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   logMarkRun(appInfo.format());
   Logger.bootstrap.info(appInfo.format());
 
-  await _init("profile repository", () => container.read(profileRepositoryProvider.future));
-
   await _init("translations", () => container.read(translationsProvider.future));
+
+  await _init("database", () => _openDatabase(container));
+
+  await _init("profile repository", () => container.read(profileRepositoryProvider.future));
 
   await _safeInit("active profile", () => container.read(activeProfileProvider.future), timeout: 1000);
   await _init(
@@ -150,6 +156,34 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     FlutterNativeSplash.remove();
   }
   // SentryFlutter.s(DateTime.now().toUtc());
+}
+
+/// Opens the database now, so a database the app cannot read is caught here and
+/// not by the first screen that lists profiles. A database written by a newer
+/// version (after a downgrade) is left alone unless the user deletes it.
+Future<void> _openDatabase(ProviderContainer container) async {
+  Future<void> open() => container.read(dbProvider).customSelect('SELECT 1').get();
+  try {
+    await open();
+  } on DbNewerThanAppException catch (e) {
+    Logger.bootstrap.warning("database is newer than this app: $e");
+    if (!kIsWeb) FlutterNativeSplash.remove();
+    if (PlatformUtils.isDesktop) await container.read(windowNotifierProvider.notifier).show();
+    await askDeleteDbNewerThanApp(
+      container.read(localePreferencesProvider),
+      container.read(translationsProvider).requireValue,
+      e,
+    );
+    Logger.bootstrap.info("deleting the database, as the user chose");
+    try {
+      await container.read(dbProvider).close().timeout(const Duration(seconds: 3));
+    } catch (e, stackTrace) {
+      Logger.bootstrap.warning("closing the database failed", e, stackTrace);
+    }
+    container.invalidate(dbProvider);
+    await Db.deleteFiles();
+    await open();
+  }
 }
 
 Future<T> _init<T>(String name, Future<T> Function() initializer, {int? timeout}) async {

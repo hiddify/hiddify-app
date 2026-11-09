@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:hiddify/core/db/converters/duration_converter.dart';
@@ -9,6 +11,18 @@ import 'package:hiddify/utils/custom_loggers.dart';
 
 part 'db.g.dart';
 
+/// The database on disk was written by a newer app version than this one, so
+/// its schema is unknown here. Thrown on open instead of running with it.
+class DbNewerThanAppException implements Exception {
+  const DbNewerThanAppException(this.dbVersion, this.appVersion);
+
+  final int dbVersion;
+  final int appVersion;
+
+  @override
+  String toString() => "DbNewerThanAppException(db schema v$dbVersion, app schema v$appVersion)";
+}
+
 @DriftDatabase(tables: [ProfileEntries, AppProxyEntries])
 class Db extends _$Db with InfraLogger {
   Db([QueryExecutor? executor]) : super(executor ?? _openConnection());
@@ -19,10 +33,12 @@ class Db extends _$Db with InfraLogger {
   @override
   int get schemaVersion => 7;
 
+  static const _name = "db";
+
   static QueryExecutor _openConnection() {
     return LazyDatabase(
       () => driftDatabase(
-        name: "db",
+        name: _name,
         native: const DriftNativeOptions(databaseDirectory: AppDirectories.getDatabaseDirectory),
         web: DriftWebOptions(sqlite3Wasm: Uri.parse('sqlite3.wasm'), driftWorker: Uri.parse('drift_worker.js')),
       ),
@@ -35,51 +51,76 @@ class Db extends _$Db with InfraLogger {
       onCreate: (Migrator m) async {
         await m.createAll();
       },
-      onUpgrade: stepByStep(
-        from1To2: (m, schema) async {
-          await m.alterTable(
-            TableMigration(
-              schema.profileEntries,
-              columnTransformer: {schema.profileEntries.type: const Constant<String>("remote")},
-              newColumns: [schema.profileEntries.type],
-            ),
-          );
-        },
-        from2To3: (m, schema) async {
-          await m.createTable(schema.geoAssetEntries);
-        },
-        from3To4: (m, schema) async {
-          final testUrlExists = await _columnExists(
-            schema.profileEntries.actualTableName,
-            schema.profileEntries.testUrl.name,
-          );
-          if (!testUrlExists) {
-            await m.addColumn(schema.profileEntries, schema.profileEntries.testUrl);
-          }
-        },
-        from4To5: (m, schema) async {
-          await m.deleteTable('geo_asset_entries');
-          await m.renameColumn(schema.profileEntries, 'test_url', schema.profileEntries.profileOverride);
-          await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
-          await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
-
-          await m.createTable(schema.appProxyEntries);
-        },
-        from5To6: (m, schema) async {
-          final profileOverrideExists = await _columnExists(
-            schema.profileEntries.actualTableName,
-            'profile_override',
-          );
-          if (profileOverrideExists) {
-            await m.dropColumn(schema.profileEntries, 'profile_override');
-          }
-        },
-        from6To7: (m, schema) async {
-          await m.addColumn(schema.profileEntries, schema.profileEntries.pinned);
-        },
-      ),
+      onUpgrade: (m, from, to) async {
+        // drift treats a downgrade like an upgrade: no step runs and the lower
+        // version is written over the newer one, so the app then fails on
+        // columns it does not know about. Refusing here aborts the open before
+        // that write, which leaves the database untouched for the newer app.
+        if (from > to) throw DbNewerThanAppException(from, to);
+        await _steps(m, from, to);
+      },
     );
   }
+
+  /// Deletes the database files, for when they cannot be opened. Close the
+  /// database first.
+  static Future<void> deleteFiles() async {
+    final dir = await AppDirectories.getDatabaseDirectory();
+    for (final suffix in const ["", "-wal", "-shm", "-journal"]) {
+      final file = File("${dir.path}${Platform.pathSeparator}$_name.sqlite$suffix");
+      if (await file.exists()) await file.delete();
+    }
+  }
+
+  // Each step must also work on a database that already has its changes: an
+  // older app that downgraded the database lowers the stored version but keeps
+  // the newer columns, and the steps then run again on the next upgrade.
+  OnUpgrade get _steps => stepByStep(
+    from1To2: (m, schema) async {
+      await m.alterTable(
+        TableMigration(
+          schema.profileEntries,
+          columnTransformer: {schema.profileEntries.type: const Constant<String>("remote")},
+          newColumns: [schema.profileEntries.type],
+        ),
+      );
+    },
+    from2To3: (m, schema) async {
+      await m.createTable(schema.geoAssetEntries);
+    },
+    from3To4: (m, schema) async {
+      final testUrlExists = await _columnExists(
+        schema.profileEntries.actualTableName,
+        schema.profileEntries.testUrl.name,
+      );
+      if (!testUrlExists) {
+        await m.addColumn(schema.profileEntries, schema.profileEntries.testUrl);
+      }
+    },
+    from4To5: (m, schema) async {
+      await m.deleteTable('geo_asset_entries');
+      await m.renameColumn(schema.profileEntries, 'test_url', schema.profileEntries.profileOverride);
+      await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
+      await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
+
+      await m.createTable(schema.appProxyEntries);
+    },
+    from5To6: (m, schema) async {
+      final profileOverrideExists = await _columnExists(schema.profileEntries.actualTableName, 'profile_override');
+      if (profileOverrideExists) {
+        await m.dropColumn(schema.profileEntries, 'profile_override');
+      }
+    },
+    from6To7: (m, schema) async {
+      final pinnedExists = await _columnExists(
+        schema.profileEntries.actualTableName,
+        schema.profileEntries.pinned.name,
+      );
+      if (!pinnedExists) {
+        await m.addColumn(schema.profileEntries, schema.profileEntries.pinned);
+      }
+    },
+  );
 
   Future<bool> _columnExists(String table, String column) async {
     final result = await customSelect('PRAGMA table_info($table);').get();

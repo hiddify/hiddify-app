@@ -1,6 +1,7 @@
 // dart format width=80
 // ignore_for_file: unused_local_variable, unused_import
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/db/db.dart';
@@ -17,6 +18,29 @@ void main() {
 
   setUpAll(() {
     verifier = SchemaVerifier(GeneratedHelper());
+  });
+
+  group('downgrade', () {
+    test('a database from a newer version is refused and left alone', () async {
+      final schema = await verifier.schemaAt(GeneratedHelper.versions.last);
+      schema.rawDatabase.userVersion = 99;
+
+      final db = Db(NativeDatabase.opened(schema.rawDatabase));
+      await expectLater(
+        db.customSelect('SELECT 1').get(),
+        throwsA(isA<DbNewerThanAppException>()),
+      );
+      expect(schema.rawDatabase.userVersion, 99);
+    });
+
+    test('upgrades again after an older app lowered the version', () async {
+      // An older app keeps the newer columns but writes its own lower version.
+      final schema = await verifier.schemaAt(GeneratedHelper.versions.last);
+      schema.rawDatabase.userVersion = 5;
+      final db = Db(schema.newConnection());
+      await verifier.migrateAndValidate(db, db.schemaVersion);
+      await db.close();
+    });
   });
 
   group('simple database migrations', () {
