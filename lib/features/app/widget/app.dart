@@ -147,9 +147,11 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                       return AccessibilityTools(checkFontOverflows: true, child: child);
                     }
                     return AnnotatedRegion<SystemUiOverlayStyle>(
+                      // Icons only: the bars are transparent and the page draws behind them.
                       value: SystemUiOverlayStyle(
-                        statusBarColor: theme.scaffoldBackgroundColor,
-                        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+                        statusBarIconBrightness: theme.brightness == Brightness.dark
+                            ? Brightness.light
+                            : Brightness.dark,
                         systemNavigationBarIconBrightness: theme.brightness == Brightness.dark
                             ? Brightness.light
                             : Brightness.dark,

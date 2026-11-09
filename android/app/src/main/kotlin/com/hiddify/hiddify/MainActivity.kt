@@ -6,7 +6,9 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -41,6 +43,14 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     var logCallback: ((Boolean) -> Unit)? = null
     val serviceStatus = MutableLiveData(Status.Stopped)
     val serviceAlerts = MutableLiveData<ServiceEvent?>(null)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Android 15 draws apps targeting SDK 35 edge-to-edge; this does the same on older
+        // versions, with transparent bars the Flutter UI draws behind. After super, which
+        // tints the status bar for its own fullscreen look.
+        enableEdgeToEdge()
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

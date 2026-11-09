@@ -25,10 +25,9 @@ Future<void> main() async {
   // final widgetsBinding = SentryWidgetsFlutterBinding.ensureInitialized();
   // debugPaintSizeEnabled = true;
 
+  // The bars stay transparent (MainActivity turns on edge-to-edge); setting their colors
+  // calls window APIs Android 15 deprecates and ignores.
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(statusBarColor: Colors.transparent, systemNavigationBarColor: Colors.transparent),
-  );
 
   return await lazyBootstrap(widgetsBinding, Environment.dev);
 }
