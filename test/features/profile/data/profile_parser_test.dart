@@ -489,6 +489,53 @@ void main() {
       );
     });
 
+    test("an infinite total is unlimited, not a rejected profile", () {
+      expectRemote(
+        parseRemoteWithHeaders({
+          "profile-title": "p",
+          "subscription-userinfo": "upload=100;download=200;total=1e999;expire=1704054600",
+        }),
+        (rp) {
+          expect(rp.subInfo!.download, equals(200));
+          expect(rp.subInfo!.total, equals(ProfileParser.infiniteTrafficThreshold + 1));
+          expect(rp.subInfo!.expire, equals(DateTime.fromMillisecondsSinceEpoch(1704054600 * 1000)));
+        },
+      );
+    });
+
+    test("NaN or negative upload yields null subInfo but still parses", () {
+      for (final upload in ["NaN", "-1", "-Infinity"]) {
+        expectRemote(
+          parseRemoteWithHeaders({
+            "profile-title": "p",
+            "subscription-userinfo": "upload=$upload;download=200;total=1000;expire=1704054600",
+          }),
+          (rp) {
+            expect(rp.subInfo, isNull);
+            expect(rp.name, equals("p"));
+          },
+        );
+      }
+    });
+
+    test("an expiry beyond DateTime's range is no expiry", () {
+      for (final expire in ["9999999999999", "99999999999999999999", "1e999"]) {
+        expectRemote(
+          parseRemoteWithHeaders({
+            "profile-title": "p",
+            "subscription-userinfo": "upload=100;download=200;total=1000;expire=$expire",
+          }),
+          (rp) {
+            expect(rp.subInfo!.total, equals(1000));
+            expect(
+              rp.subInfo!.expire,
+              equals(DateTime.fromMillisecondsSinceEpoch(ProfileParser.infiniteTimeThreshold * 1000)),
+            );
+          },
+        );
+      }
+    });
+
     test("decimals are truncated to int", () {
       expectRemote(
         parseRemoteWithHeaders({
