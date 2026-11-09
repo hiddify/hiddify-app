@@ -12,6 +12,7 @@ import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:meta/meta.dart';
 import 'package:neat_periodic_task/neat_periodic_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'profiles_update_notifier.g.dart';
 
@@ -66,7 +67,6 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
   }
 
   /// Whether a profile failing since [since] is no longer updated on its own at [now].
-  @visibleForTesting
   static bool gaveUp(DateTime? since, DateTime now) => since != null && now.difference(since) >= giveUpAfter;
 
   /// When a failing profile's update fell due: its last success plus its update interval. A
@@ -76,8 +76,11 @@ class ForegroundProfilesUpdateNotifier extends _$ForegroundProfilesUpdateNotifie
   static DateTime failingSince(DateTime lastSuccess, Duration? updateInterval) =>
       lastSuccess.add(updateInterval ?? Duration.zero);
 
-  Map<String, DateTime> _failingSince() {
-    final raw = ref.read(sharedPreferencesProvider).requireValue.getString(failingKey);
+  Map<String, DateTime> _failingSince() => readFailingSince(ref.read(sharedPreferencesProvider).requireValue);
+
+  /// When each failing profile's update fell due, by id, as the last update run saved it.
+  static Map<String, DateTime> readFailingSince(SharedPreferences prefs) {
+    final raw = prefs.getString(failingKey);
     if (raw == null) return {};
     try {
       return {

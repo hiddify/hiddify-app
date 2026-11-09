@@ -278,7 +278,29 @@
           "bulkPartial": "${success} به‌روزرسانی شد\n${failed} ناموفق: ${names}"
         },
         "delete": {
-          "success": "پروفایل حذف شد"
+          "success": "پروفایل حذف شد",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count پروفایل حذف شد",
+            "other": "$count پروفایل حذف شد"
+          },
+          "bulkPartial": "${deleted} از ${total} پروفایل حذف شد"
+        }
+      },
+      "removeInactive": {
+        "action": "حذف اشتراک‌های غیرفعال",
+        "title": "حذف اشتراک‌های غیرفعال",
+        "hint": "این اشتراک‌ها دیگر کار نمی‌کنند. موارد تیک‌خورده پاک می‌شوند؛ تیک هر کدام را که می‌خواهید نگه دارید بردارید.",
+        "none": "اشتراک غیرفعالی وجود ندارد",
+        "remove(plural, param=count)": {
+          "one": "حذف $count",
+          "other": "حذف $count"
+        },
+        "reason": {
+          "expired": "منقضی شده",
+          "expiredOn": "منقضی شده در ${date}",
+          "noTraffic": "حجم تمام شده",
+          "updateFailing": "به‌روزرسانی مدام ناموفق است",
+          "updateFailingSince": "به‌روزرسانی از ${date} ناموفق است"
         }
       }
     },

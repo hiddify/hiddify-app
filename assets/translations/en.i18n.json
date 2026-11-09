@@ -278,7 +278,29 @@
           "bulkPartial": "${success} updated\n${failed} failed: ${names}"
         },
         "delete": {
-          "success": "Profile deleted"
+          "success": "Profile deleted",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profile deleted",
+            "other": "$count profiles deleted"
+          },
+          "bulkPartial": "${deleted} of ${total} profiles deleted"
+        }
+      },
+      "removeInactive": {
+        "action": "Remove inactive subscriptions",
+        "title": "Remove inactive subscriptions",
+        "hint": "These subscriptions no longer work. The checked ones will be deleted; uncheck any you want to keep.",
+        "none": "No inactive subscriptions",
+        "remove(plural, param=count)": {
+          "one": "Delete $count",
+          "other": "Delete $count"
+        },
+        "reason": {
+          "expired": "Expired",
+          "expiredOn": "Expired on ${date}",
+          "noTraffic": "No traffic left",
+          "updateFailing": "Updates keep failing",
+          "updateFailingSince": "Updates failing since ${date}"
         }
       }
     },

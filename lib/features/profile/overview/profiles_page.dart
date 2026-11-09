@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/failures.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -13,6 +14,22 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ProfilesPage extends HookConsumerWidget {
   const ProfilesPage({super.key});
+
+  Future<void> _removeInactive(WidgetRef ref) async {
+    final notifier = ref.read(profilesNotifierProvider.notifier);
+    final inactive = await notifier.findInactive();
+    if (inactive.isEmpty) {
+      final t = ref.read(translationsProvider).requireValue;
+      ref.read(inAppNotificationControllerProvider).showInfoToast(t.pages.profiles.removeInactive.none);
+      return;
+    }
+    final ids = await ref.read(dialogNotifierProvider.notifier).showRemoveInactiveProfiles(inactive);
+    if (ids == null || ids.isEmpty) return;
+    await notifier.deleteProfiles([
+      for (final item in inactive)
+        if (ids.contains(item.profile.id)) item.profile,
+    ]);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,6 +50,11 @@ class ProfilesPage extends HookConsumerWidget {
             onPressed: () => ref.read(foregroundProfilesUpdateNotifierProvider.notifier).trigger(),
             icon: const Icon(Icons.sync_rounded),
             tooltip: t.pages.profiles.updateSubscriptions,
+          ),
+          IconButton(
+            onPressed: () => _removeInactive(ref),
+            icon: const Icon(Icons.delete_sweep_rounded),
+            tooltip: t.pages.profiles.removeInactive.action,
           ),
           IconButton(
             onPressed: () => ref.read(dialogNotifierProvider.notifier).showSortProfiles(),

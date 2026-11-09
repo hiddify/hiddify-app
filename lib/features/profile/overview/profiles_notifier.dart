@@ -5,12 +5,14 @@ import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
+import 'package:hiddify/core/preferences/preferences_provider.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_sort_enum.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -41,6 +43,32 @@ class ProfilesSortNotifier extends _$ProfilesSortNotifier with AppLogger {
   }
 }
 
+/// Why a subscription counts as inactive, most telling first.
+enum InactiveReason { expired, noTraffic, updateFailing }
+
+/// A subscription that no longer works, and since when, if known.
+typedef InactiveProfile = ({RemoteProfileEntity profile, InactiveReason reason, DateTime? since});
+
+/// The subscriptions in [profiles] that no longer work at [now]: expired, out of traffic, or
+/// failing to update long enough that they are no longer updated on their own ([failingSince]
+/// as the update run saves it). Local profiles never expire, so they are never listed.
+List<InactiveProfile> findInactiveProfiles(
+  Iterable<ProfileEntity> profiles,
+  Map<String, DateTime> failingSince,
+  DateTime now,
+) {
+  return [
+    for (final profile in profiles.whereType<RemoteProfileEntity>())
+      if (profile.subInfo case final info? when !info.expire.isAfter(now))
+        (profile: profile, reason: InactiveReason.expired, since: info.expire)
+      else if (profile.subInfo case final info? when info.consumption >= info.total)
+        (profile: profile, reason: InactiveReason.noTraffic, since: null)
+      else if (failingSince[profile.id] case final since?
+          when ForegroundProfilesUpdateNotifier.gaveUp(since, now) && !profile.lastUpdate.isAfter(since))
+        (profile: profile, reason: InactiveReason.updateFailing, since: since),
+  ];
+}
+
 @riverpod
 class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
   @override
@@ -68,7 +96,42 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
     }).run();
   }
 
+  /// The subscriptions that no longer work, to offer removing them.
+  Future<List<InactiveProfile>> findInactive() async {
+    final profiles = await _profilesRepo.watchAll().first.then((e) => e.getOrElse((l) => throw l));
+    final failing = ForegroundProfilesUpdateNotifier.readFailingSince(ref.read(sharedPreferencesProvider).requireValue);
+    return findInactiveProfiles(profiles, failing, DateTime.now());
+  }
+
   Future<void> deleteProfile(ProfileEntity profile) async {
+    await _delete(profile);
+    final t = ref.read(translationsProvider).requireValue;
+    ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.delete.success);
+  }
+
+  /// Deletes [profiles] with one toast at the end. The active one goes last: deleting it makes
+  /// another profile active, which must not be one still to be deleted.
+  Future<void> deleteProfiles(List<ProfileEntity> profiles) async {
+    final ordered = [...profiles.where((p) => !p.active), ...profiles.where((p) => p.active)];
+    var deleted = 0;
+    for (final profile in ordered) {
+      try {
+        await _delete(profile);
+        deleted++;
+      } catch (_) {
+        // logged in _delete; the rest are still deleted
+      }
+    }
+    final t = ref.read(translationsProvider).requireValue;
+    final notification = ref.read(inAppNotificationControllerProvider);
+    if (deleted == ordered.length) {
+      notification.showSuccessToast(t.pages.profiles.msg.delete.bulkSuccess(count: deleted));
+    } else {
+      notification.showErrorToast(t.pages.profiles.msg.delete.bulkPartial(deleted: deleted, total: ordered.length));
+    }
+  }
+
+  Future<void> _delete(ProfileEntity profile) async {
     loggy.debug('deleting profile: ${profile.name}');
 
     if (profile.active) await ref.read(connectionNotifierProvider.notifier).abortConnection();
@@ -81,8 +144,6 @@ class ProfilesNotifier extends _$ProfilesNotifier with AppLogger {
           },
           (_) async {
             loggy.info('successfully deleted profile, was active? [${profile.active}]');
-            final t = ref.read(translationsProvider).requireValue;
-            ref.read(inAppNotificationControllerProvider).showSuccessToast(t.pages.profiles.msg.delete.success);
 
             final activePrfile = await ref.read(activeProfileProvider.future);
             if (profile.id == ref.read(ConfigOptions.extraSecurityProfileId)) {

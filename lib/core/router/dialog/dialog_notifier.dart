@@ -27,6 +27,8 @@ import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/common/qr_code_scanner_screen.dart';
 import 'package:hiddify/features/crash_report/widget/crash_report_dialog.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
+import 'package:hiddify/features/profile/overview/remove_inactive_profiles_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_tags_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
@@ -66,6 +68,11 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<void> showSortProfiles() async {
     return await _show<void>(const SortProfilesDialog());
+  }
+
+  /// The ids of the [inactive] subscriptions the user chose to delete, or null.
+  Future<List<String>?> showRemoveInactiveProfiles(List<InactiveProfile> inactive) async {
+    return await _show<List<String>?>(RemoveInactiveProfilesDialog(inactive));
   }
 
   Future<bool> showWarpLicense() async {
