@@ -180,11 +180,15 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         val showSpeed = Settings.dynamicNotification
         val interval = if (showSpeed) speedInterval else idleInterval
         pollJob = scope.launch {
-            val coreClient = GrpcClientProvider.grpcClient.create(CoreClient::class)
+            // Made inside the loop: with mTLS the client needs the core's server certificate, which
+            // exists only once the core is set up, so building it early fails until then.
+            var coreClient: CoreClient? = null
             var previous: SystemInfo? = null
             while (isActive) {
                 try {
-                    val info = coreClient.GetSystemInfo().executeBlocking(Empty())
+                    val client = coreClient
+                        ?: GrpcClientProvider.grpcClient.create(CoreClient::class).also { coreClient = it }
+                    val info = client.GetSystemInfo().executeBlocking(Empty())
                     if (!isActive) break // stopped while the call was in flight
                     update(previous, info, showSpeed)
                     previous = info
@@ -194,6 +198,8 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
                     // The service reports Started before the core listens; keep trying.
                     Log.d("notification", "SystemInfo not available yet: ${e.message}")
                     previous = null
+                    coreClient = null // built again, in case the core changed its certificate
+
                 }
                 delay(interval)
             }

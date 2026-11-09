@@ -74,7 +74,10 @@ object GrpcClientProvider {
         val directory = identityDirectory()
         val clientCertificate = readCertificate(File(directory, CERTIFICATE_FILE).readBytes())
         val clientKey = readPrivateKey(File(directory, PRIVATE_KEY_FILE).readText())
-        val serverCertificate = readCertificate(Mobile.getServerPublicKey())
+        // null until the core has set up its server certificate
+        val serverCertificate = readCertificate(
+            Mobile.getServerPublicKey() ?: throw IllegalStateException("the core has no server certificate yet"),
+        )
 
         val password = CharArray(0)
         val identityStore = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
