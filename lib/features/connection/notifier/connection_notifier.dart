@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:hiddify/core/haptic/haptic_service.dart';
@@ -11,6 +12,7 @@ import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/model/startup_connection.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
+import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -77,7 +79,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
 
   Future<void> mayConnect() async {
     if (state case AsyncData(:final value)) {
-      if (value case Disconnected()) return _connect();
+      if (value case Disconnected()) await _connect();
     }
   }
 
@@ -105,7 +107,32 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     }
     loggy.info("restoring previous connection on startup");
     await ref.read(Preferences.startedByUser.notifier).update(true);
-    await _connect();
+    // Not awaited: the retries can take longer than bootstrap should wait.
+    unawaited(_restoreWithRetries());
+  }
+
+  /// Tries the startup connect up to [startupConnectAttempts] times. Only the last failure
+  /// is shown, with the window brought up first: an autostart launch runs in the tray, where
+  /// the error dialog would go unseen. A user disconnect or a tunnel already up ends the retries.
+  Future<void> _restoreWithRetries() async {
+    for (var attempt = 1; attempt <= startupConnectAttempts; attempt++) {
+      if (attempt > 1) {
+        await Future<void>.delayed(startupConnectRetryDelay(attempt));
+        if (!ref.read(Preferences.startedByUser)) {
+          loggy.info("startup connect: user stopped it, not retrying");
+          return;
+        }
+        if (state.valueOrNull case final value? when value is! Disconnected) {
+          loggy.info("startup connect: status is ${value.runtimeType}, not retrying");
+          return;
+        }
+        loggy.info("startup connect: attempt $attempt of $startupConnectAttempts");
+      }
+      final isLast = attempt == startupConnectAttempts;
+      final failure = await _connect(reportFailure: isLast, showWindowOnFailure: isLast);
+      if (failure == null) return;
+      if (!isLast) loggy.warning("startup connect attempt $attempt failed, retrying", failure);
+    }
   }
 
   Future<void> toggleConnection() async {
@@ -165,7 +192,10 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   /// Bumped on disconnect / stuck-retry so a superseded in-flight connect cannot overwrite UI.
   int _connectEpoch = 0;
 
-  Future<void> _connect() async {
+  /// Returns the failure when this call's connect failed, null otherwise. With [reportFailure]
+  /// off, a failure shows no dialog and keeps the user's intent to connect, so a retry can follow.
+  /// [showWindowOnFailure] brings the window to the front before the error dialog.
+  Future<ConnectionFailure?> _connect({bool reportFailure = true, bool showWindowOnFailure = false}) async {
     // UI can show Disconnected while a native start is still blocked on the macOS
     // serial queue. Stacking another start made that worse; cancel once, then retry.
     if (_singleStart.isRunning && (state.valueOrNull is Disconnected || _singleStart.isStale)) {
@@ -178,38 +208,55 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     }
 
     final epoch = _connectEpoch;
+    ConnectionFailure? failure;
     final ignored = await _singleStart.run(() async {
-      await _connectThrottled(epoch);
+      failure = await _connectThrottled(epoch, reportFailure: reportFailure, showWindowOnFailure: showWindowOnFailure);
       return false;
     }, onIgnored: true);
     if (ignored) {
       loggy.debug("connect called while another connect is still running, ignoring");
     }
+    return failure;
   }
 
-  Future<void> _connectThrottled(int epoch) async {
+  Future<ConnectionFailure?> _connectThrottled(
+    int epoch, {
+    required bool reportFailure,
+    bool showWindowOnFailure = false,
+  }) async {
     final activeProfile = await ref.read(activeProfileProvider.future);
     if (activeProfile == null) {
       loggy.info("no active profile, not connecting");
-      return;
+      return null;
     }
-    if (epoch != _connectEpoch) return;
+    if (epoch != _connectEpoch) return null;
     // Read before connecting: a failed start sends the core restart signal, which marks this
     // notifier out of date until the next frame, and debug builds refuse any ref call until then.
     final dialogs = ref.read(dialogNotifierProvider.notifier);
     final t = ref.read(translationsProvider).requireValue;
     final startedByUser = ref.read(Preferences.startedByUser.notifier);
+    final window = showWindowOnFailure ? ref.read(windowNotifierProvider.notifier) : null;
     // The core reports Starting only once the config is built, about a second
     // later; the app is connecting from here on.
     state = const AsyncData(Connecting());
+    ConnectionFailure? failure;
     await _connectionRepo.connect(activeProfile, ref.read(Preferences.disableMemoryLimit)).mapLeft((
       ConnectionFailure err,
     ) async {
       if (epoch != _connectEpoch) return;
+      failure = err;
+      if (!reportFailure) {
+        loggy.warning("error connecting, will retry", err);
+        state = const AsyncData(Disconnected());
+        return;
+      }
       loggy.warning("error connecting", err);
       // Prefer Disconnected(failure) over AsyncError so the button shows failed + details,
       // and a late bare Disconnected from the status stream is less likely to erase it.
       state = AsyncData(Disconnected(err));
+      if (window != null) {
+        await window.show().catchError((Object e) => loggy.warning("could not show the window", e));
+      }
       await dialogs.showCustomAlertFromErr(err.present(t));
       loggy.warning(err);
       if (err.toString().contains("panic")) {
@@ -217,6 +264,7 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
       }
       await startedByUser.update(false);
     }).run();
+    return failure;
   }
 
   Future<void> _disconnect() async {

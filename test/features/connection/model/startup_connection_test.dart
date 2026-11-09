@@ -31,4 +31,17 @@ void main() {
       );
     });
   });
+
+  group("startup connect retries", () {
+    test("tries at least three times", () {
+      expect(startupConnectAttempts, greaterThanOrEqualTo(3));
+    });
+
+    test("the first attempt is immediate and later ones wait longer", () {
+      expect(startupConnectRetryDelay(1), Duration.zero);
+      for (var attempt = 2; attempt <= startupConnectAttempts; attempt++) {
+        expect(startupConnectRetryDelay(attempt), greaterThan(startupConnectRetryDelay(attempt - 1)));
+      }
+    });
+  });
 }
