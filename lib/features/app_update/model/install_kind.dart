@@ -52,20 +52,22 @@ enum InstallKind {
   };
 
   /// The release file this kind installs from; for an APK, the one built for the device's first
-  /// supported ABI ([abis]), else the universal one.
-  ReleaseAsset? assetIn(RemoteVersionEntity release, {List<String> abis = const []}) => switch (this) {
-    androidApk =>
-      release.asset(switch (abis.firstOrNull) {
-            'arm64-v8a' => 'Hiddify-Android-arm64.apk',
-            'armeabi-v7a' => 'Hiddify-Android-arm7.apk',
-            'x86_64' => 'Hiddify-Android-x86_64.apk',
-            _ => 'Hiddify-Android-universal.apk',
-          }) ??
-          release.asset('Hiddify-Android-universal.apk'),
-    windowsSetup => release.asset('Hiddify-Windows-Setup-x64.exe'),
-    linuxAppImage => release.asset('Hiddify-Linux-x64-AppImage.AppImage'),
-    linuxDeb => release.asset('Hiddify-Debian-x64.deb'),
-    macOS => release.asset('Hiddify-MacOS.dmg'),
-    store || windowsPortable || linuxOther => null,
-  };
+  /// supported ABI ([abis]), else the universal one; on Linux, the one for the CPU ([arm64]), never
+  /// the other CPU's.
+  ReleaseAsset? assetIn(RemoteVersionEntity release, {List<String> abis = const [], bool arm64 = false}) =>
+      switch (this) {
+        androidApk =>
+          release.asset(switch (abis.firstOrNull) {
+                'arm64-v8a' => 'Hiddify-Android-arm64.apk',
+                'armeabi-v7a' => 'Hiddify-Android-arm7.apk',
+                'x86_64' => 'Hiddify-Android-x86_64.apk',
+                _ => 'Hiddify-Android-universal.apk',
+              }) ??
+              release.asset('Hiddify-Android-universal.apk'),
+        windowsSetup => release.asset('Hiddify-Windows-Setup-x64.exe'),
+        linuxAppImage => release.asset('Hiddify-Linux-${arm64 ? 'arm64' : 'x64'}-AppImage.AppImage'),
+        linuxDeb => release.asset('Hiddify-Debian-${arm64 ? 'arm64' : 'x64'}.deb'),
+        macOS => release.asset('Hiddify-MacOS.dmg'),
+        store || windowsPortable || linuxOther => null,
+      };
 }

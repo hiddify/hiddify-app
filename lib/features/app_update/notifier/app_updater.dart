@@ -1,3 +1,4 @@
+import 'dart:ffi' show Abi;
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -66,7 +67,9 @@ class AppUpdater extends _$AppUpdater with AppLogger {
     if (state is AppUpdaterDownloading) return true;
     final kind = ref.read(installKindProvider);
     final abis = kind == InstallKind.androidApk ? await _supportedAbis() : const <String>[];
-    final asset = kind.installsItself ? kind.assetIn(release, abis: abis) : null;
+    final asset = kind.installsItself
+        ? kind.assetIn(release, abis: abis, arm64: Abi.current() == Abi.linuxArm64)
+        : null;
     if (asset == null) return false;
     try {
       state = const AppUpdaterDownloading(null);

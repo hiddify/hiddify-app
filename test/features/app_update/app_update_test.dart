@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/model/environment.dart';
 import 'package:hiddify/features/app_update/data/github_release_parser.dart';
 import 'package:hiddify/features/app_update/model/install_kind.dart';
+import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 
 Map<String, dynamic> _release(String tag, {bool draft = false, List<String> assets = const []}) => {
   'tag_name': tag,
@@ -78,6 +79,26 @@ void main() {
       expect(asset(InstallKind.linuxAppImage), 'Hiddify-Linux-x64-AppImage.AppImage');
       expect(asset(InstallKind.linuxDeb), 'Hiddify-Debian-x64.deb');
       expect(asset(InstallKind.macOS), 'Hiddify-MacOS.dmg');
+    });
+
+    test('on an arm64 Linux the update is the arm64 build, never the x64 one', () {
+      final withArm = GithubReleaseParser.parse(
+        _release(
+          'v5.6.0',
+          assets: [
+            'Hiddify-Linux-x64-AppImage.AppImage',
+            'Hiddify-Debian-x64.deb',
+            'Hiddify-Linux-arm64-AppImage.AppImage',
+            'Hiddify-Debian-arm64.deb',
+          ],
+        ),
+      )!;
+      String? arm(InstallKind kind, RemoteVersionEntity r) => kind.assetIn(r, arm64: true)?.name;
+      expect(arm(InstallKind.linuxAppImage, withArm), 'Hiddify-Linux-arm64-AppImage.AppImage');
+      expect(arm(InstallKind.linuxDeb, withArm), 'Hiddify-Debian-arm64.deb');
+      // a release without arm64 Linux files opens the release page instead of installing x64
+      expect(arm(InstallKind.linuxAppImage, release), isNull);
+      expect(arm(InstallKind.linuxDeb, release), isNull);
     });
 
     test('a store install, the portable zip and other Linux installs download nothing', () {
