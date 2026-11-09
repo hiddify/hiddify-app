@@ -1,23 +1,23 @@
 #!/bin/sh
-# Installs Hiddify from this bundle (Hiddify-Linux.tar.gz): picks the build for this CPU
-# (x64 or arm64) and the package format this system uses.
+# Installs Hiddify from this download (Hiddify-Linux-@ARCH@.tar.gz) in the package format this
+# system uses.
 #
 #   ./install.sh             Debian/Ubuntu: the .deb, Fedora/RHEL/openSUSE: the .rpm, else the AppImage
 #   ./install.sh --appimage  the AppImage in ~/.local/bin (no root needed)
 #   ./install.sh --deb | --rpm
 set -eu
 
-here=$(cd "$(dirname "$0")" && pwd)
+dir=$(cd "$(dirname "$0")" && pwd)
+arch=@ARCH@
 say() { printf '%s\n' "$*"; }
 die() { say "error: $*" >&2; exit 1; }
 
 case "$(uname -m)" in
-  x86_64 | amd64) arch=x64 ;;
-  aarch64 | arm64) arch=arm64 ;;
+  x86_64 | amd64) cpu=x64 ;;
+  aarch64 | arm64) cpu=arm64 ;;
   *) die "no Hiddify build for this CPU ($(uname -m)); builds exist for x64 and arm64" ;;
 esac
-dir=$here/$arch
-[ -d "$dir" ] || die "this bundle has no $arch build"
+[ "$cpu" = "$arch" ] || die "this download is for $arch, but this computer is $cpu: download Hiddify-Linux-$cpu.tar.gz instead"
 
 sudo_() { if [ "$(id -u)" = 0 ]; then "$@"; else sudo "$@"; fi; }
 has() { command -v "$1" >/dev/null 2>&1; }
@@ -35,18 +35,18 @@ esac
 
 case "$mode" in
   --deb)
-    [ -f "$dir/hiddify.deb" ] || die "this bundle has no $arch .deb"
+    [ -f "$dir/hiddify.deb" ] || die "this download has no .deb"
     say "Installing the Debian package ($arch)..."
     # apt (not dpkg) so missing dependencies are installed too
     sudo_ apt-get install -y "$dir/hiddify.deb" ;;
   --rpm)
-    [ -f "$dir/hiddify.rpm" ] || die "this bundle has no $arch .rpm"
+    [ -f "$dir/hiddify.rpm" ] || die "this download has no .rpm"
     say "Installing the RPM package ($arch)..."
     if has dnf; then sudo_ dnf install -y "$dir/hiddify.rpm"
     elif has zypper; then sudo_ zypper --non-interactive install --allow-unsigned-rpm "$dir/hiddify.rpm"
     else sudo_ yum install -y "$dir/hiddify.rpm"; fi ;;
   --appimage)
-    [ -f "$dir/Hiddify.AppImage" ] || die "this bundle has no $arch AppImage"
+    [ -f "$dir/Hiddify.AppImage" ] || die "this download has no AppImage"
     bin=${XDG_BIN_HOME:-$HOME/.local/bin}
     mkdir -p "$bin"
     cp "$dir/Hiddify.AppImage" "$bin/Hiddify.AppImage"

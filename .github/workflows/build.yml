@@ -564,8 +564,9 @@ jobs:
         run: |
           rm -f ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision || true
           rm -rf ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
-  # One Linux download for both CPUs: Hiddify-Linux.tar.gz with the x64 and arm64 deb, rpm and
-  # AppImage and an install.sh that picks the right one (.github/scripts/make_linux_bundle.sh).
+  # One Linux download per CPU: Hiddify-Linux-x64.tar.gz and Hiddify-Linux-arm64.tar.gz, each with
+  # that CPU's deb, rpm and AppImage and an install.sh that picks the system's package format
+  # (.github/scripts/make_linux_bundle.sh).
   linux-bundle:
     if: ${{ !cancelled() && inputs.upload-artifact }}
     needs: [build]
@@ -580,7 +581,7 @@ jobs:
           pattern: "linux*"
           merge-multiple: true
           path: ./linux-builds/
-      - name: Pack Hiddify-Linux.tar.gz
+      - name: Pack Hiddify-Linux-x64.tar.gz and Hiddify-Linux-arm64.tar.gz
         run: bash .github/scripts/make_linux_bundle.sh ./linux-builds ./out
       - name: Upload Artifact
         uses: actions/upload-artifact@v6
