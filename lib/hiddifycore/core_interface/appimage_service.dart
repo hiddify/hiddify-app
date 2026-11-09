@@ -72,12 +72,14 @@ class AppImageService {
           _logger.warning('the AppImage VPN service exited ($code)');
           return;
         }
-        // pkexec: 126 when the user dismissed the prompt or is not allowed, 127 when it failed
+        // pkexec: 126 when the user dismissed the prompt, 127 both when authorization failed and when
+        // the program could not run (hiddify-app#2461); only its stderr tells the two apart
+        final detail = stderr.toString().trim();
         ready.completeError(
           StateError(
-            code == 126 || code == 127
+            code == 126 || (code == 127 && detail.isEmpty)
                 ? 'Administrator permission was not given, so VPN mode could not connect.'
-                : 'The VPN service did not start ($code): ${stderr.toString().trim()}',
+                : 'The VPN service did not start ($code): $detail',
           ),
         );
       }),
