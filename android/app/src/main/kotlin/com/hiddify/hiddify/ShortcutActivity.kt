@@ -18,6 +18,7 @@ class ShortcutActivity : Activity(), ServiceConnection.Callback {
     private val connection = ServiceConnection(this, this, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Application.initialize(this)
         super.onCreate(savedInstanceState)
         if (intent.action == Intent.ACTION_CREATE_SHORTCUT) {
             setResult(

@@ -45,6 +45,7 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     val serviceAlerts = MutableLiveData<ServiceEvent?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Application.initialize(this)
         super.onCreate(savedInstanceState)
         // Android 15 draws apps targeting SDK 35 edge-to-edge; this does the same on older
         // versions, with transparent bars the Flutter UI draws behind. After super, which

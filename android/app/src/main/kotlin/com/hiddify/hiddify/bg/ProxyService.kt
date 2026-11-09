@@ -1,6 +1,7 @@
 package com.hiddify.hiddify.bg
 
 import android.app.Service
+import com.hiddify.hiddify.Application
 import android.content.Intent
 import com.hiddify.core.libbox.Notification
 
@@ -8,6 +9,11 @@ class ProxyService :
     Service(),
     PlatformInterfaceWrapper {
     private val service = BoxService(this, this)
+
+    override fun onCreate() {
+        Application.initialize(this)
+        super.onCreate()
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) = service.onStartCommand()
 

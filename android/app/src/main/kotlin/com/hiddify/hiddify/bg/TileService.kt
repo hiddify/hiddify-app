@@ -35,6 +35,11 @@ class TileService : TileService(), ServiceConnection.Callback {
         }
     }
 
+    override fun onCreate() {
+        Application.initialize(this)
+        super.onCreate()
+    }
+
     override fun onStartListening() {
         super.onStartListening()
         connection.connect()

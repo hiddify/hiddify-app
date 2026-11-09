@@ -1,6 +1,7 @@
 package com.hiddify.hiddify.bg
 import android.util.Log
 
+import com.hiddify.hiddify.Application
 import com.hiddify.hiddify.Settings
 import android.content.Intent
 import android.content.pm.PackageManager.NameNotFoundException
@@ -25,6 +26,11 @@ class VPNService : VpnService(), PlatformInterfaceWrapper {
     }
 
     private val service = BoxService(this, this)
+
+    override fun onCreate() {
+        Application.initialize(this)
+        super.onCreate()
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) =
         service.onStartCommand()
