@@ -17,7 +17,9 @@ libgtk-3-0 libblkid1 liblzma5
 rpm patchelf
 
 # fastforge appimage https://fastforge.dev/makers/appimage
-locate
+# squashfs-tools: the AppImage is unpacked without running it (fastforge packs an x86_64
+# runtime even on arm64, which can not run there), then repacked for the build machine's CPU
+locate squashfs-tools
 
 # tray_manager https://pub.dev/packages/tray_manager
 libayatana-appindicator3-dev

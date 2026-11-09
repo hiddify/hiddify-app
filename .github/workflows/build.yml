@@ -87,8 +87,10 @@ jobs:
           - { platform: android-aab,       os: ubuntu-latest,  targets: aab }
           - { platform: windows,          os: windows-latest, aarch: amd64,     targets: "exe,msix,zip" }
           - { platform: linux,            os: ubuntu-22.04,   aarch: amd64,     targets: "deb,rpm,gz,AppImage" }
+          # Native arm64 runner (same Ubuntu, so the same glibc baseline as x64). Its files are
+          # named like the x64 ones with x64 -> arm64 (see "Copy to out unix").
+          - { platform: linux-arm64,      os: ubuntu-22.04-arm, aarch: arm64,   targets: "deb,rpm,gz,AppImage" }
           # - { platform: linux-amd64,      os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
-          # - { platform: linux-arm64,      os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
           # - { platform: linux-amd64-musl, os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
           # - { platform: linux-arm64-musl, os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
           - { platform: macos,            os: macos-26,       aarch: universal, targets: "dmg,pkg" }
@@ -140,7 +142,10 @@ jobs:
       #     channel: 'stable'
       #     flutter-version: ${{ env.FLUTTER_VERSION }}
 
+      # Flutter publishes no Linux arm64 SDK archive, so arm64 uses the SDK git checkout that
+      # `make linux-arm64-install-deps` makes in ~/develop/flutter (put on PATH in "Setup dependencies").
       - name: Setup Flutter
+        if: matrix.platform != 'linux-arm64'
         uses: subosito/flutter-action@v2.21.0 #issue with 2.13
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -236,8 +241,12 @@ jobs:
                   
       - name: Setup dependencies
         run: |
-          make ${{ matrix.platform }}-install-deps  
+          make ${{ matrix.platform }}-install-deps
           echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+          if [ "${{ matrix.platform }}" = "linux-arm64" ]; then
+            echo "$HOME/develop/flutter/bin" >> $GITHUB_PATH
+            "$HOME/develop/flutter/bin/flutter" --version
+          fi
 
       - name: Setup Android Signing Properties
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'android') }}
@@ -503,11 +512,13 @@ jobs:
           for EXT in $(echo ${{ matrix.targets }} | tr ',' '\n'); do
             KEY=TARGET_NAME_${EXT}
             FILENAME=${!KEY}
+            # arm64 Linux: Hiddify-Debian-x64 -> Hiddify-Debian-arm64, Hiddify-Linux-x64-AppImage -> ...-arm64-...
+            [[ "${{ matrix.aarch }}" == "arm64" ]] && FILENAME=${FILENAME//x64/arm64}
             echo "For $EXT ($KEY) filename is ${FILENAME}"
             mv dist/*/*.$EXT tmp_out/${FILENAME}.$EXT
             ls tmp_out
             [[ "$EXT" != "gz" ]] && chmod +x tmp_out/${FILENAME}.$EXT || echo "Skipping chmod for gz"
-            if [ "${{matrix.platform}}" == "linux" ];then
+            if [[ "${{matrix.platform}}" == linux* ]];then
               cp ./.github/help/linux/* tmp_out/
             else
               cp ./.github/help/mac-windows/* tmp_out/

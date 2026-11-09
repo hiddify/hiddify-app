@@ -415,7 +415,10 @@ linux-appimage-release:
 	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
 	@$(YELLOW)Post-processing AppImage$(DONE); \
 	$(BLUE)Extracting AppImage$(DONE); \
-	cd dist/* && ./*.AppImage --appimage-extract > /dev/null; \
+	cd dist/* && \
+	  APPIMG=$$(ls *.AppImage) && \
+	  OFFSET=$$(python3 -c "import struct,sys; h=open(sys.argv[1],'rb').read(64); print(struct.unpack_from('<Q',h,0x28)[0] + struct.unpack_from('<H',h,0x3A)[0]*struct.unpack_from('<H',h,0x3C)[0])" "$$APPIMG") && \
+	  unsquashfs -q -n -o "$$OFFSET" -d squashfs-root "$$APPIMG" > /dev/null || exit 1; \
 	$(BLUE)Replacing AppRun$(DONE); \
 	cp ../../linux/packaging/appimage/AppRun squashfs-root/AppRun; \
 	$(BLUE)Granting permissions$(DONE); \
@@ -427,7 +430,7 @@ linux-appimage-release:
 	$(BLUE)Deleting bundled libstdc++ to fix Arch Linux compatibility...$(DONE); \
 	find squashfs-root/usr/lib -name "libstdc++.so.6" -delete; \
 	$(BLUE)Rebuilding AppImage$(DONE); \
-	ARCH=x86_64 appimagetool --no-appstream squashfs-root Hiddify.AppImage > /dev/null || exit 1; \
+	ARCH=$$(uname -m) appimagetool --no-appstream squashfs-root Hiddify.AppImage > /dev/null || exit 1; \
 	$(BLUE)Cleaning up squashfs$(DONE); \
 	rm -rf squashfs-root; \
 	$(YELLOW)Creating Portable Package$(DONE); \
@@ -461,6 +464,8 @@ DOCKER_CMD := \
 	tar -cf - --exclude='build' --exclude='.dart_tool' --exclude='dist' --exclude='dist_docker' --exclude='android' --exclude='windows' --exclude='ios' --exclude='macos' --exclude='.git' -C /host . | tar -xf - -C /app; \
 	cd /app; \
 	make linux-flutter-sync; \
+	echo '** Re-activating fastforge for the synced Dart SDK...'; \
+	dart pub global activate fastforge > /dev/null; \
 	make linux-prepare; \
 	echo '** Building Release (linux-release)...'; \
 	make linux-release; \
