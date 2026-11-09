@@ -110,7 +110,26 @@ OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
 # It is a good idea to make OPTIND local if you process options in a function.
 
-# Filter out invalid environment arguments like %u before processing
+# Everything after "HiddifyCli" (and an optional "--") is passed as given, before the GUI's
+# field-code filtering: CLI arguments are literal values. The app starts its root VPN this way,
+# `pkexec "$APPIMAGE" HiddifyCli core-service ...`
+if [[ "${1-}" == "HiddifyCli" ]]; then
+    shift
+    if [[ "${1-}" == "--" ]]; then
+        shift
+    fi
+    if [[ "${1-}" == core-service ]]; then
+        # not exec'd: a service that crashed or was killed left its TUN's routing, and the
+        # host without network; undone here, while the image is still mounted
+        ./HiddifyCli "$@"
+        code=$?
+        ./HiddifyCli core-service --cleanup
+        exit $code
+    fi
+    exec ./HiddifyCli "$@"
+fi
+
+# Filter out invalid environment arguments like %u before processing GUI links
 CLEANED_ARGS=()
 for arg in "$@"; do
     case "$arg" in
@@ -128,19 +147,6 @@ else
 
 # Processing arguments
     case $1 in
-        HiddifyCli)
-            # everything after "HiddifyCli", as given: the app starts its root VPN this way,
-            # `pkexec "$APPIMAGE" HiddifyCli core-service ...`
-            if [[ "$2" == core-service ]]; then
-                # not exec'd: a service that crashed or was killed left its TUN's routing, and the
-                # host without network; undone here, while the image is still mounted
-                ./HiddifyCli "${@:2}"
-                code=$?
-                ./HiddifyCli core-service --cleanup
-                exit $code
-            fi
-            exec ./HiddifyCli "${@:2}"
-            ;;
         h)
             show_help
             exit 0
