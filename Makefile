@@ -413,39 +413,9 @@ linux-appimage-release:
 	--skip-clean \
 	--build-target=$(TARGET) \
 	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
-	@$(YELLOW)Post-processing AppImage$(DONE); \
-	$(BLUE)Extracting AppImage$(DONE); \
-	cd dist/* && \
-	  APPIMG=$$(ls *.AppImage) && \
-	  OFFSET=$$(python3 -c "import struct,sys; h=open(sys.argv[1],'rb').read(64); print(struct.unpack_from('<Q',h,0x28)[0] + struct.unpack_from('<H',h,0x3A)[0]*struct.unpack_from('<H',h,0x3C)[0])" "$$APPIMG") && \
-	  unsquashfs -q -n -o "$$OFFSET" -d squashfs-root "$$APPIMG" > /dev/null || exit 1; \
-	$(BLUE)Replacing AppRun$(DONE); \
-	cp ../../linux/packaging/appimage/AppRun squashfs-root/AppRun; \
-	$(BLUE)Granting permissions$(DONE); \
-	chmod -R a+rX squashfs-root && chmod a+rx squashfs-root/AppRun; \
-	$(BLUE)Adding StartupWMClass to hiddify.desktop$(DONE); \
-	sed -i '/^\[Desktop Entry\]/a StartupWMClass=app.hiddify.com' "squashfs-root/hiddify.desktop"; \
-	$(BLUE)Removing old AppImage$(DONE); \
-	rm *.AppImage; \
-	$(BLUE)Deleting bundled libstdc++ to fix Arch Linux compatibility...$(DONE); \
-	find squashfs-root/usr/lib -name "libstdc++.so.6" -delete; \
-	$(BLUE)Rebuilding AppImage$(DONE); \
-	ARCH=$$(uname -m) appimagetool --no-appstream squashfs-root Hiddify.AppImage > /dev/null || exit 1; \
-	$(BLUE)Cleaning up squashfs$(DONE); \
-	rm -rf squashfs-root; \
-	$(YELLOW)Creating Portable Package$(DONE); \
-	PKG_DIR_NAME="hiddify-linux-appimage"; \
-	$(BLUE)Creating dir: $$PKG_DIR_NAME$(DONE); \
-	mkdir -p "$$PKG_DIR_NAME"; \
-	$(BLUE)Moving Hiddify.AppImage$(DONE); \
-	cp -p "Hiddify.AppImage" "$$PKG_DIR_NAME/Hiddify.AppImage"; \
-	$(BLUE)Creating Portable Home directory$(DONE); \
-	mkdir -p "$$PKG_DIR_NAME/Hiddify.AppImage.home"; \
-	$(BLUE)Compressing to .tar.gz$(DONE); \
-	tar -czf "$$PKG_DIR_NAME.tar.gz" -C . "$$PKG_DIR_NAME"; \
-	$(BLUE)Removing intermediate directory$(DONE); \
-	rm -rf "$$PKG_DIR_NAME"; \
-	$(GREEN)Successful$(DONE)
+	@$(YELLOW)Post-processing AppImage$(DONE)
+	bash linux/packaging/appimage/repackage.sh dist
+	@$(GREEN)Successful$(DONE)
 
 DOCKER_IMAGE_NAME := hiddify-linux-builder
 DOCKER_FLUTTER_VOL := hiddify-flutter-sdk-cache
