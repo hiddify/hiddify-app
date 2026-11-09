@@ -246,6 +246,7 @@ bool serviceRunning(Ref ref) {
 class SingleCall {
   bool _running = false;
   DateTime? _started;
+  int _generation = 0;
 
   bool get isRunning => _running;
 
@@ -253,6 +254,7 @@ class SingleCall {
       _running && _started != null && DateTime.now().difference(_started!) > const Duration(seconds: 25);
 
   void reset() {
+    _generation++;
     _running = false;
     _started = null;
   }
@@ -260,13 +262,18 @@ class SingleCall {
   Future<T> run<T>(Future<T> Function() task, {required T onIgnored}) async {
     if (_running) return onIgnored;
 
+    final generation = _generation;
     _running = true;
     _started = DateTime.now();
     try {
       return await task();
     } finally {
-      _running = false;
-      _started = null;
+      // A reset can let another task start before this one completes.
+      // Only the task that still owns the gate may release it.
+      if (generation == _generation) {
+        _running = false;
+        _started = null;
+      }
     }
   }
 }
