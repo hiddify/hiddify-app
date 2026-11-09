@@ -17,7 +17,12 @@ abstract class GithubReleaseParser {
     final assets = [
       for (final asset in json['assets'] as List? ?? const [])
         if (asset case {'name': final String name, 'browser_download_url': final String url})
-          ReleaseAsset(name: name, url: url, size: (asset['size'] as num?)?.toInt() ?? 0),
+          ReleaseAsset(
+            name: name,
+            url: url,
+            size: (asset['size'] as num?)?.toInt() ?? 0,
+            digest: asset['digest'] is String ? asset['digest'] as String : null,
+          ),
     ];
     return RemoteVersionEntity(
       version: match.group(1)!,

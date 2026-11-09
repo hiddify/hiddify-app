@@ -1,6 +1,7 @@
 import 'dart:ffi' show Abi;
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
@@ -93,6 +94,10 @@ class AppUpdater extends _$AppUpdater with AppLogger {
   void reset() => state = const AppUpdaterIdle();
 
   Future<File> _download(ReleaseAsset asset) async {
+    final digest = asset.digest;
+    if (digest == null || digest.length != 71 || !RegExp(r'^sha256:[0-9a-fA-F]{64}$').hasMatch(digest)) {
+      throw StateError('${asset.name}: the release has no valid SHA-256 digest; the update was not downloaded.');
+    }
     // on Android the cache, which the installer may read (res/xml/update_paths.xml)
     final directory = Directory(p.join((await getTemporaryDirectory()).path, 'updates'));
     await directory.create(recursive: true);
@@ -113,6 +118,13 @@ class AppUpdater extends _$AppUpdater with AppLogger {
     final length = await file.length();
     if (asset.size > 0 && length != asset.size) {
       throw Exception("${asset.name}: got $length of ${asset.size} bytes");
+    }
+    // Stream the artifact so verifying an AppImage/APK does not load it all into memory.
+    final actualDigest = await sha256.bind(file.openRead()).first;
+    if (_cancel?.cancelError case final cancellation?) throw cancellation;
+    if (actualDigest.toString() != digest.substring(7).toLowerCase()) {
+      await file.delete();
+      throw StateError('${asset.name}: SHA-256 verification failed; the update was not installed.');
     }
     return file;
   }
