@@ -413,7 +413,9 @@ class QrCodeScannerDialog extends HookConsumerWidget {
 
     // reads the QR code from an image file instead of the camera
     Future<void> scanImage() async {
-      final result = await FilePicker.platform.pickFiles(type: FileType.image);
+      // No compression (file_picker's default is 30): it re-encodes the image into the public Pictures
+      // folder, which Android 10+ does not let the app write, and a blurred copy reads QR codes worse.
+      final result = await FilePicker.platform.pickFiles(type: FileType.image, compressionQuality: 0);
       final path = result?.files.single.path;
       if (path == null) return;
       final capture = await controller.analyzeImage(path).catchError((_) => null);
