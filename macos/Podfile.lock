@@ -146,7 +146,7 @@ SPEC CHECKSUMS:
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqlite3: 3c950dc86011117c307eb0b28c4a7bb449dce9f1
   sqlite3_flutter_libs: f8fc13346870e73fe35ebf6dbb997fbcd156b241
-  tray_manager: a104b5c81b578d83f3c3d0f40a997c8b10810166
+  tray_manager: 19c369010e59c073f13b82354d78a35f7972d609
   url_launcher_macos: 0fba8ddabfc33ce0a9afe7c5fef5aab3d8d2d673
   window_manager: b729e31d38fb04905235df9ea896128991cad99e
 
