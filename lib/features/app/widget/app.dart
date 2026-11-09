@@ -94,49 +94,63 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
       });
       return null;
     }, [activeBreakpoint]);
-    return WindowWrapper(
-      ShortcutWrapper(
-        ConnectionWrapper(
-          DynamicColorBuilder(
-            builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
-              return MaterialApp.router(
-                routerConfig: router,
-                scaffoldMessengerKey: appScaffoldMessengerKey,
-                locale: locale.flutterLocale,
-                supportedLocales: AppLocaleUtils.supportedLocales,
-                localizationsDelegates: GlobalMaterialLocalizations.delegates,
-                debugShowCheckedModeBanner: false,
-                themeMode: themeMode.flutterThemeMode,
-                theme: theme.lightTheme(lightColorScheme),
-                darkTheme: theme.darkTheme(darkColorScheme),
-                title: Constants.appName,
-                builder: (context, child) {
-                  final theme = Theme.of(context);
-                  child = SnackBarHost(
-                    child: upgrader == null
-                        ? child ?? const SizedBox()
-                        : UpgradeAlert(
-                            upgrader: upgrader,
-                            navigatorKey: router.routerDelegate.navigatorKey,
-                            child: child ?? const SizedBox(),
-                          ),
-                  );
-                  if (kDebugMode && _debugAccessibility) {
-                    return AccessibilityTools(checkFontOverflows: true, child: child);
-                  }
-                  return AnnotatedRegion<SystemUiOverlayStyle>(
-                    value: SystemUiOverlayStyle(
-                      statusBarColor: theme.scaffoldBackgroundColor,
-                      systemNavigationBarColor: theme.scaffoldBackgroundColor,
-                      systemNavigationBarIconBrightness: theme.brightness == Brightness.dark
-                          ? Brightness.light
-                          : Brightness.dark,
-                    ),
-                    child: child,
-                  );
-                },
-              );
-            },
+    // Animations stop while the app cannot be seen: they kept a CPU core busy
+    // and drained laptop batteries with the window in the background. Hidden
+    // and paused already stop the frames, but on Wayland a minimized window is
+    // only inactive (GTK is not told it was minimized), as is a window without
+    // focus, so on desktop inactive stops them too. On a phone inactive is a
+    // moment under the notification shade or a system dialog, still on screen.
+    final animate = switch (useAppLifecycleState()) {
+      null || AppLifecycleState.resumed => true,
+      AppLifecycleState.inactive => !PlatformUtils.isDesktop,
+      AppLifecycleState.hidden || AppLifecycleState.paused || AppLifecycleState.detached => false,
+    };
+    return TickerMode(
+      enabled: animate,
+      child: WindowWrapper(
+        ShortcutWrapper(
+          ConnectionWrapper(
+            DynamicColorBuilder(
+              builder: (ColorScheme? lightColorScheme, ColorScheme? darkColorScheme) {
+                return MaterialApp.router(
+                  routerConfig: router,
+                  scaffoldMessengerKey: appScaffoldMessengerKey,
+                  locale: locale.flutterLocale,
+                  supportedLocales: AppLocaleUtils.supportedLocales,
+                  localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                  debugShowCheckedModeBanner: false,
+                  themeMode: themeMode.flutterThemeMode,
+                  theme: theme.lightTheme(lightColorScheme),
+                  darkTheme: theme.darkTheme(darkColorScheme),
+                  title: Constants.appName,
+                  builder: (context, child) {
+                    final theme = Theme.of(context);
+                    child = SnackBarHost(
+                      child: upgrader == null
+                          ? child ?? const SizedBox()
+                          : UpgradeAlert(
+                              upgrader: upgrader,
+                              navigatorKey: router.routerDelegate.navigatorKey,
+                              child: child ?? const SizedBox(),
+                            ),
+                    );
+                    if (kDebugMode && _debugAccessibility) {
+                      return AccessibilityTools(checkFontOverflows: true, child: child);
+                    }
+                    return AnnotatedRegion<SystemUiOverlayStyle>(
+                      value: SystemUiOverlayStyle(
+                        statusBarColor: theme.scaffoldBackgroundColor,
+                        systemNavigationBarColor: theme.scaffoldBackgroundColor,
+                        systemNavigationBarIconBrightness: theme.brightness == Brightness.dark
+                            ? Brightness.light
+                            : Brightness.dark,
+                      ),
+                      child: child,
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),

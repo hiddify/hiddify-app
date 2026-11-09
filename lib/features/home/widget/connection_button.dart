@@ -319,13 +319,9 @@ class _ConnectionButton extends HookWidget {
     // Timer (not useSingleTickerProvider): that hook only allows one createTicker
     // for the State's life, so look/still changes crashed after disconnect→connect.
     // A timer does not stop with its tickers, so it stops itself while the button cannot be
-    // seen: under another tab, sheet or route (TickerMode), or with the app in the background.
-    // Inactive stays on: on desktop that is only the window without focus.
+    // seen: under another tab, sheet or route, or with the app not visible. TickerMode says
+    // both; App turns it off for the whole app when the app is not visible.
     final ticking = useValueListenable(TickerMode.getNotifier(context));
-    final shown = switch (useAppLifecycleState()) {
-      AppLifecycleState.paused || AppLifecycleState.hidden || AppLifecycleState.detached => false,
-      _ => true,
-    };
     // A phone that cannot draw a frame in the 33 ms before the next one drops frames in bursts.
     // Measured, not guessed from the model: such a phone gets a steady 20 or 15 fps of the same
     // frames. A phone that keeps up sees nothing of this.
@@ -335,7 +331,7 @@ class _ConnectionButton extends HookWidget {
     final level = useValueListenable(load.level);
     final time = useValueNotifier(0.0);
     useEffect(() {
-      if (still || !ticking || !shown) return null;
+      if (still || !ticking) return null;
       load.watch();
       var last = now();
       final timer = Timer.periodic(load.interval, (_) {
@@ -354,7 +350,7 @@ class _ConnectionButton extends HookWidget {
         timer.cancel();
         load.unwatch();
       };
-    }, [still, ticking, shown, level]);
+    }, [still, ticking, level]);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
