@@ -48,6 +48,7 @@ ASSET_CATALOG: list[tuple[str, str, str]] = [
     ("Linux", "Hiddify-Linux-x64-AppImage.tar.gz", "AppImage x64 (tar.gz)"),
     ("Linux", "Hiddify-Debian-x64.deb", "DebPackage x64"),
     ("Linux", "Hiddify-rpm-x64.rpm", "RpmPackage x64"),
+    ("Linux", "Hiddify-Linux.tar.gz", "All-in-one x64 + ARM64 (install.sh)"),
     ("Linux", "Hiddify-Linux-arm64-AppImage.AppImage", "AppImage ARM64"),
     ("Linux", "Hiddify-Linux-arm64-AppImage.tar.gz", "AppImage ARM64 (tar.gz)"),
     ("Linux", "Hiddify-Debian-arm64.deb", "DebPackage ARM64"),
