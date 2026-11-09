@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -71,6 +73,26 @@ class AddProfileModal extends HookConsumerWidget {
   }
 }
 
+/// The add profile sheet's sizes as fractions of [height]. [initial], [min]
+/// and [fullHeight] are in pixels, [max] is already a fraction.
+///
+/// On a low screen (a TV in landscape) the buttons alone can be taller than
+/// 85% of it, or than all of it, while DraggableScrollableSheet asserts
+/// min <= initial <= max <= 1. So the sheet may grow as far as the buttons
+/// need, and the other two sizes are kept inside that.
+@visibleForTesting
+({double initial, double min, double max}) addProfileSheetSizes({
+  required double initial,
+  required double min,
+  required double max,
+  required double fullHeight,
+  required double height,
+}) {
+  final maxSize = math.min(1.0, math.max(max, fullHeight / height));
+  final initialSize = math.min(initial / height, maxSize);
+  return (initial: initialSize, min: math.min(min / height, initialSize), max: maxSize);
+}
+
 class AddProfileOptions extends HookConsumerWidget {
   const AddProfileOptions({super.key});
   @override
@@ -97,10 +119,17 @@ class AddProfileOptions extends HookConsumerWidget {
           min = initial;
           max = initial / constraints.maxHeight;
         }
+        final sizes = addProfileSheetSizes(
+          initial: initial,
+          min: min,
+          max: max,
+          fullHeight: fullHeight,
+          height: constraints.maxHeight,
+        );
         return DraggableScrollableSheet(
-          initialChildSize: initial / constraints.maxHeight,
-          minChildSize: min / constraints.maxHeight,
-          maxChildSize: max,
+          initialChildSize: sizes.initial,
+          minChildSize: sizes.min,
+          maxChildSize: sizes.max,
           expand: false,
           builder: (context, scrollController) => Column(
             children: [
