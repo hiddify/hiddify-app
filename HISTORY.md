@@ -1,7 +1,400 @@
 # Changelog
 
 
-## 5.5.5 (2026-11-04)
+## (unreleased)
+
+#### Other
+
+* Chore(deps): update tray_manager to 0.5.3. 
+  _Same API, no Flutter or Dart change. On Windows the tray icon comes back
+after the PC wakes from sleep and after Explorer restarts, replaced icon
+handles are freed, and the plugin registers only once. 0.6 and later
+need a newer Flutter and Dart than the project uses._
+
+* Fix(profile): invalid subscription-userinfo values no longer reject the profile. 
+  _A NaN or infinite value threw in toInt(), and an expiry beyond what
+DateTime holds threw in fromMillisecondsSinceEpoch, so a valid
+subscription failed to import over its traffic header. NaN, infinite
+and negative values now count as unreadable: an unreadable total is
+unlimited, an unreadable upload or download leaves the traffic info out,
+and an expiry past infiniteTimeThreshold means no expiry.
+
+Based on #2470, which dropped the whole traffic info in these cases._
+
+* Fix(android): the Quick toggle shortcut starts the core, not only the service. 
+  _The app clears startCoreAfterStartingService because it starts the core
+over gRPC itself. The home screen shortcut never set it back, so after
+any in-app connect a tap only set up the service: it reported Started
+and showed "Connected" while no tunnel ran. The shortcut now sets the
+flag before starting, like the Quick Settings tile and the boot receiver.
+
+Closes #2445_
+
+* Fix(windows): keep a silent start hidden when the window was maximized. 
+  _With "Start minimized" on, startup still restored the saved maximized
+state, and maximizing a hidden window on Windows shows it, so the app
+opened in full instead of staying in the tray. The maximized state now
+waits until the window is first shown from the tray.
+
+Closes #2459_
+
+* Fix(settings): remove "Use xray-core when possible" completely. 
+  _The switch was already hidden and forced off; now the preference, the
+config field sent to the core and its translations are gone. A
+preferences migration drops the value older versions stored, so an
+in-place update keeps no trace of it. Old settings backups that still
+carry the key import fine: unknown keys are skipped.
+
+Closes #2462_
+
+* Fix(ios): add CoreTelephony framework to multiple build configurations. 
+
+* Fix(android): one gRPC certificate per process, low-memory mode on low-RAM TVs. 
+  _On a first run the VPN service's core could make a second server
+certificate, and the app, which pins the first, failed to reach it with
+"self signed certificate" (#2473). The core now keeps one per process.
+
+The core is also given the device's memory: the "Memory limit" setting
+now holds the Go runtime to three quarters of what an app may use here,
+and a low-RAM device (isLowRamDevice, or under 2.5 GiB as 2 GB TV boxes
+report) relays in sing's low-memory way.
+
+Fixes #2473_
+
+* Fix(linux): show the real error when pkexec exits 127. 
+  _pkexec exits 127 both when authorization fails and when the program could
+not run, so every 127 was reported as a refused admin prompt and hid the
+real error. A 127 with stderr output now shows that output instead.
+
+Refs #2461_
+
+* Fix(connection): retry the startup connect up to three times. 
+  _Right after a login autostart the network, the service or the core is often
+not ready, and a single failed try left the app disconnected with a red
+button. Restoring the previous connection now tries three times, 3s and 6s
+apart, silently; it stops early if the user disconnects or the tunnel comes
+up. Only the last failure is reported, and the window is brought to the
+front first so the error dialog is seen when the app started in the tray.
+
+Fixes #2482_
+
+* Fix(build): stop AppImage packaging on intermediate failures. 
+  _The AppImage recipe went on after a failed step, could repackage a stale
+squashfs-root, and deleted the input before the new image existed. It also
+took any AppImage under dist/*/, though dist/ keeps a folder per version,
+so an older build there stopped the release or was repackaged instead.
+
+Move the post-processing into repackage.sh: it works only in
+dist/<pubspec version>/, extracts into a new staging folder, stops at the
+first failure, and removes the input only once the rebuilt image and the
+portable archive both exist._
+
+* Fix(linux): pass HiddifyCli arguments before field-code filtering. 
+  _AppRun dropped CLI arguments that looked like desktop field codes, such as
+%u. Dispatch HiddifyCli first, skip an optional --, and keep the
+core-service cleanup._
+
+* Fix(linux): register AppImage import links. 
+  _The desktop entry written by AppRun named no URI schemes and passed no URL,
+so import links did not open Hiddify. Register the schemes the AppImage
+declares, forward the link with %u, and escape the AppImage path for the
+Exec key._
+
+* Fix(connection): preserve the active connect gate after reset. 
+  _A connect that finished after a reset cleared the gate of the newer one and
+let a third connect overlap it. Only the call that owns the current
+generation clears the gate._
+
+* Fix(update): verify release SHA-256 before installing downloads. 
+  _The updater checked only the byte count, so a modified payload of the same
+length was installed. Keep GitHub's release-asset digest, refuse an asset
+without a valid sha256 digest, and hash the download before installing it;
+a mismatch is deleted._
+
+* Feat(proxies): share or edit a single proxy from its details. 
+  _The proxy details dialog has Share and Edit for a proxy of the profile
+(not for groups or the app's own outbounds).
+
+Share builds a config of that proxy alone, plus any proxy it dials
+through, to copy, share as a file, save, or scan as a QR code when it is
+small enough. Hiddify imports it like any config. It comes from the
+profile as saved, so the app's own settings stay out.
+
+Edit copies the proxy to a new local profile and opens it in the
+profile editor, after saying why: a subscription replaces its proxies
+on every update, so the proxy is not edited in place.
+
+The proxy is found by its name without the core's numbering, and
+proxies of the same name are told apart by port and server. The
+generated config's exact tag is used only as a fallback and only when
+the port agrees, since the core can renumber tags on a reload.
+
+addLocal now returns the new profile's id.
+
+Closes #2451_
+
+* Feat(profiles): remove inactive subscriptions in one step. 
+  _A new action on the profiles page lists every subscription that no
+longer works, all checked, each with why: expired (with the date), no
+traffic left, or updates failing long enough that the app stopped
+updating it on its own (with the date). Unchecked ones are kept, and the
+checked ones are deleted with one toast at the end.
+
+Unlimited subscriptions, profiles without subscription info, and local
+profiles are never listed. The active profile is deleted last, so the
+profile that becomes active is never one still to be deleted.
+
+Closes #2449_
+
+* Fix(a11y): reaching a link with Tab no longer opens it. 
+  _Tab was one of the keys that open a link on the welcome screen and in the
+WARP and Psiphon license dialogs, and the link opened on key-up. Tab's
+key-down moves focus onto the link and its key-up then lands there, so
+moving through the screen with the keyboard opened the browser.
+
+Links now open on key-down of Enter, Space or Select only. The settings
+input dialog keeps Tab to move from the field to OK.
+
+Closes #2453_
+
+* Fix(android): draw edge-to-edge without setting bar colors. 
+  _Android 15 draws apps that target SDK 35 edge-to-edge and Play flags apps
+that do not handle it. MainActivity now calls enableEdgeToEdge(), so older
+Android versions get the same transparent bars, and the Flutter side sets
+only the bar icon brightness instead of the status and navigation bar
+colors, which went through the window APIs Android 15 deprecates.
+
+Refs #2471_
+
+* Fix(db): ask before using a database from a newer version. 
+  _After a downgrade, drift ran no migration and wrote the older schema
+version over the newer one, so the app failed on columns it did not know
+(#2464). The database is now refused on open and left untouched, and
+startup shows a prompt to download the latest version or delete the
+data.
+
+The 6 to 7 step also checks for the pinned column first, so a database
+an older release lowered to version 5 upgrades again without a
+duplicate column error.
+
+Closes #2464_
+
+* Style: format the logs, connection and phone import files at 120 columns. 
+
+* Ci: leave the Mac App Store build out of the release and the draft. 
+  _The App Store pkg and dmg are for TestFlight; a user cannot install them
+from a download. Remove them before the release and draft uploads, and
+from the release notes' download table. The build still uploads them as
+an artifact for the TestFlight job._
+
+* Build(linux): one all-in-one download per CPU. 
+  _Hiddify-Linux.tar.gz held both CPUs' packages, twice the size anyone
+needs. Make Hiddify-Linux-x64.tar.gz and Hiddify-Linux-arm64.tar.gz
+instead, each with that CPU's deb, rpm and AppImage. install.sh knows
+which CPU its files are for and names the right download when run on
+the other one._
+
+* Fix(update): install the arm64 Linux build on arm64. 
+  _The in-app update downloaded the x64 AppImage or deb on any Linux. Pick
+the file for the CPU, and on arm64 open the release page when a release
+has no arm64 Linux files, rather than install the x64 one._
+
+* Build(linux): one download for both CPUs. 
+  _Hiddify-Linux.tar.gz holds the x64 and arm64 deb, rpm and AppImage and an
+install.sh that picks the build for the CPU and the package format the
+system uses: the deb on Debian and Ubuntu, the rpm on Fedora, RHEL and
+openSUSE, else the AppImage in ~/.local/bin. A new job packs it from the
+Linux builds before the release and the draft are uploaded._
+
+* Build(linux): arm64 deb, rpm and AppImage. 
+  _Build Linux on the native ubuntu-22.04-arm runner too, with the same glibc
+baseline as x64. Flutter has no Linux arm64 SDK archive, so that job uses
+the SDK checkout its install-deps step makes. Its files are named like the
+x64 ones with arm64 in place of x64, and the release notes list them.
+
+fastforge packs an x86_64 AppImage runtime even on arm64, which cannot
+run there, so the AppImage is unpacked with unsquashfs instead of running
+it, and repacked with the appimagetool for the build machine's CPU. The
+Docker image fetches that tool for its own CPU, with the AppImage magic
+zeroed so qemu-user can run it in an arm64 build on an x64 host, and
+activates fastforge again for the synced Dart SDK._
+
+* Build: retry the core download and fail on an HTTP error. 
+  _curl -L piped a GitHub error page into tar, which failed with a message
+that did not say the download had failed, and a dropped connection
+failed the whole build. Fail on an HTTP error and retry five times._
+
+* Perf(ui): cheaper connect button light and a reduce animations setting. 
+  _The light round the connect button blurred four full-resolution layers on
+every frame, most of a CPU core on a laptop drawing in software. Draw the
+glow at half the screen's resolution, blur it there and scale it up, with
+the download's rays and flares sharing one image: 31 ms a frame at full
+traffic becomes 17 ms, with no visible change. Once a look has settled
+the button draws at 20 fps instead of 30.
+
+Add Reduce animations to the general settings. It sets reduce motion for
+the whole app, on top of the system's own: the connect button stays still
+and the decorative loops (loading shimmers, the chain badge, the shield's
+orbit, the door) stop. Indicators of work in progress keep moving.
+
+Refs #2468_
+
+* Fix(ui): stop animations while the app is not visible. 
+  _The home animation kept a CPU core busy with the window minimized. Flutter
+stops frames once the app is hidden, but on Wayland a minimized window is
+only inactive, like a window without focus, so nothing stopped. Turn
+TickerMode off for the whole app while it is hidden or paused, and on
+desktop while it is inactive too; on a phone inactive is still on screen.
+The connection button's timer already follows TickerMode, so it drops its
+own lifecycle check.
+
+Fixes #2468_
+
+* Fix(tv): add profile sheet crashed on low screens. 
+  _On Android TV in landscape the add profile buttons and the phone import
+panel can be taller than the 85% the sheet with free configs may grow to,
+so its initial size went past its maximum and DraggableScrollableSheet
+failed the 'initialChildSize <= maxChildSize' assertion. Let the sheet
+grow as far as the buttons need, capped at full height, and keep the
+initial and minimum sizes inside that.
+
+Fixes #2472_
+
+* Fix(ui): keep menus clear of the system bars. 
+  _The profile menu in the bottom sheet put its last item, Delete, under the
+Android navigation bar. MenuAnchor places the menu against the whole screen
+and only avoids display features, so report the status and navigation bars
+(and the keyboard) as display features: the menu now opens above the anchor
+when it does not fit below.
+
+Fixes #2477_
+
+* Feat(linux): router service mode for the whole network. 
+  _On Linux, the new Router service mode sends hiddify-core's `router-mode`:
+the VPN, for every device this machine routes, with incoming connections
+and port forwards still working (hiddify-core docs/router-mode.md).
+
+A change between VPN and router mode reconnects instead of hot reloading,
+as the core readies IP forwarding only when it starts. Windows, macOS and
+the tray menu offer only the modes their platform has._
+
+* Refactor(ci): update workflow to allow manual dispatch and simplify artifact upload logic. 
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Merge pull request #2465 from Dv2Corn/fix/profile-title-base64. 
+  _fix(profile): accept a base64 profile-title without padding_
+
+* Fix(profile): accept a base64 profile-title without padding. 
+
+* Update warp name to 🟠Warp & 🔴Psiphon. 
+
+* Feat(linux): AppImage VPN, RPM package and recovery from a crashed core. 
+  _- The AppImage connects VPN through a root copy of itself started with
+  pkexec (asked once per session) instead of refusing VPN mode; AppRun
+  undoes the routing that service left if it dies.
+- While a VPN runs in the service, the app checks the service every 2s
+  and reports a service that died or restarted instead of staying
+  Connected, and restores the system proxy.
+- Resuming the app no longer points the background client at the app's
+  own core during a VPN (the "hiddify service not found" errors).
+- RPM package: make_config.yaml, a linux-rpm-release target (leaving out
+  libsentry's Ubuntu-only libcurl symbol version), and rpm in the Linux
+  CI build.
+- File log lines carry the error of a log record._
+
+* Fix(vpn): a profile update keeps a VPN through the service connected. 
+  _On Windows and Linux (and macOS builds without a Developer ID) a VPN runs in the
+admin service, whose control port refuses the core's hot reload. A profile
+update or a changed option therefore disconnected the VPN and connected it again
+through the CLI.
+
+- A changed config is sent to the service as the start sends it, a snapshot
+  without file paths, and hot reloaded there: the TUN and the connections stay.
+- A change the hot reload cannot apply restarts the engine inside the service,
+  in one call; a VPN switched to a proxy mode still starts anew.
+- After either, the listeners follow the engine again, and the system proxy
+  hand-off follows the new config.
+- A Network Extension, which has no reload, restarts without trying the call it
+  refuses._
+
+* Fix(vpn): set the system proxy of the VPN service from the app's own core. 
+  _The VPN service runs as root and cannot set the user's system proxy on Windows
+and Linux (the user's D-Bus/Wayland session and registry are out of its reach).
+It now reports where its config wanted it, the system proxy mode or a profile's
+own proxy inbound beside the TUN, and the app's core, which runs as the user,
+points the system proxy there and restores it on disconnect.
+
+A proxy mode whose profile needs administrator rights now runs the service
+without its TUN instead of silently connecting the VPN._
+
+* Feat(desktop): run the core in a process of its own. 
+  _On desktop the core ran inside the UI process. macOS puts a background UI in
+App Nap, which also throttled the core and collapsed proxied throughput on
+long-RTT links (#2343). The app now starts the core as a separate process and
+talks to it over gRPC as before:
+
+- Windows: core\Hiddify.exe, macOS: Contents/Helpers/Hiddify Core.app, both
+  named Hiddify with their own icon; Linux: HiddifyCli, shown as hiddify-core.
+  Without the launcher (tests, an older core) the core still loads in-process.
+- The core stops cleanly, restoring the system proxy, when the app quits or
+  crashes; if the core crashes, the app starts it again.
+- macOS: the helper is built and signed by embed-core-helper.sh, inheriting the
+  sandbox only in the App Store build (the others are not sandboxed); it checks
+  in as a background app for its Activity Monitor icon and holds an activity
+  against App Nap.
+- Linux: the core starts in its own folder, which HiddifyCli from older cores
+  needs to find its library._
+
+* Fix(connection): a core that fails to start is a failed connect. 
+  _On Android and macOS the app follows the core's status while the
+platform's service is up, and left stopped to the platform. But the
+service stays up when the core fails, a config sing-box refuses for
+one, so the core's error was dropped and the app stayed connecting with
+nothing behind the VPN. A stop with an error is now the outcome of the
+connect: the error is shown, the service is taken down, and the plain
+stop it then reports does not replace the error._
+
+* Fix(grpc): use android.util.Base64 for decoding private key to support older Android versions. 
+
+* Feat(profiles): name an OpenVPN profile after it. 
+  _A .ovpn file is named OpenVPN, and an ovpn:// link by its name, else
+OpenVPN, instead of its first line or the scheme._
+
+* Feat(keep-top): a clearer dialog with the working ones, regions and a quick test. 
+  _The keep top dialog asks one question: how many of the fastest keep
+running, the working ones, or all of them, picked from the keep button's
+menu, with the regions to keep proxies of beside them, searchable by name.
+A quick test, on by default, picks before every proxy is tested. The
+dialog opens from the funnel in the proxy list's bar and from the end of
+the list, no longer by itself when a big profile connects. The end of the
+list says what stays after the test and what stayed.
+
+Choosing the proxies by hand runs them all while the picker is open, and
+its region filter groups the rare countries, names them and is
+searchable. The quick test and the regions reach the core: the settings
+model dropped what it had no field for._
+
+* Fix(profile): count a failing subscription's 3 days from its last success. 
+  _A subscription that broke before the app update, or while the app was
+closed, began its 3 days only at the first failure the app saw. It now
+counts from when its update fell due: the last success plus its update
+interval, so a long broken one stops updating after its first failed run._
+
+* Fix(proxy): the proxy details show an invalid config's whole reason, wrapped and copiable. 
+  _The core folds why a config could not be read into its type, which the
+header chip cut off past the dialog edge; the chip now wraps the whole
+text and can be selected, such a proxy reads as failed, and the failure
+box has a copy button._
+
+* Fix(windows): skip url protocol registration from temp folders and when unchanged. 
+  _A handler pointing into %TEMP% breaks once the folder is cleaned and is flagged
+by AV heuristics (Sigma: Suspicious Shell Open Command Registry Modification).
+Also skip the registry writes when the handler is already registered._
+
+
+
+## v5.5.5 (2026-11-04)
 
 #### Other
 

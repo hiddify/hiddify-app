@@ -243,10 +243,12 @@ jobs:
         run: |
           make ${{ matrix.platform }}-install-deps
           echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
-          if [ "${{ matrix.platform }}" = "linux-arm64" ]; then
-            echo "$HOME/develop/flutter/bin" >> $GITHUB_PATH
-            "$HOME/develop/flutter/bin/flutter" --version
-          fi
+
+      - name: Add arm64 Flutter to PATH
+        if: matrix.platform == 'linux-arm64'
+        run: |
+          echo "$HOME/develop/flutter/bin" >> $GITHUB_PATH
+          "$HOME/develop/flutter/bin/flutter" --version
 
       - name: Setup Android Signing Properties
         if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'android') }}
