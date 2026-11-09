@@ -4,6 +4,7 @@ import android.util.Log
 import com.hiddify.hiddify.bg.BoxService
 //import com.hiddify.hiddify.bg.BoxService.Companion.workingDir
 import com.hiddify.hiddify.constant.Status
+import com.hiddify.hiddify.utils.DeviceMemory
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -81,6 +82,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                                     it.listen= "127.0.0.1:" + grpcPort
                                     it.secret=""
                                     it.debug = Settings.debugMode
+                                    DeviceMemory.applyTo(it)
                                 }, BoxService.activePlatformInterface)
 
 //                            Libbox.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir, false)

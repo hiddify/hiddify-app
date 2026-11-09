@@ -24,6 +24,7 @@ import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Action
 import com.hiddify.hiddify.constant.Alert
 import com.hiddify.hiddify.constant.Status
+import com.hiddify.hiddify.utils.DeviceMemory
 import com.hiddify.hiddify.utils.GrpcClientProvider
 import com.hiddify.core.mobile.SetupOptions
 
@@ -187,6 +188,7 @@ class BoxService(
                         it.listen = "127.0.0.1:${Settings.grpcServiceModePort}"
                         it.secret = ""
                         it.debug = Settings.debugMode
+                        DeviceMemory.applyTo(it)
                     },
                     platformInterface,
                 )
