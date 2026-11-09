@@ -45,7 +45,8 @@ class SettingInputDialog<T> extends HookConsumerWidget with PresLogger {
     // focus management
     final okBtnFocusNode = useFocusNode();
     KeyEventResult handleKeyEvent(FocusNode node, KeyEvent event) {
-      if (KeyboardConst.select.contains(event.logicalKey) && event is KeyDownEvent) {
+      final key = event.logicalKey;
+      if ((KeyboardConst.select.contains(key) || key == LogicalKeyboardKey.tab) && event is KeyDownEvent) {
         okBtnFocusNode.requestFocus();
         return KeyEventResult.handled;
       }

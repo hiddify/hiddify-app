@@ -125,7 +125,12 @@ abstract class KeyboardConst {
   };
   static final horizontalArrows = {LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.arrowRight};
   static final verticalArrows = {LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.arrowDown};
-  static final select = {LogicalKeyboardKey.select, LogicalKeyboardKey.enter, LogicalKeyboardKey.tab};
+  static final select = {LogicalKeyboardKey.select, LogicalKeyboardKey.enter, LogicalKeyboardKey.numpadEnter};
+
+  /// Keys that open a focused link. Never Tab: its key-down moves focus onto the
+  /// link and its key-up then lands there, so a link would open just by being
+  /// reached with Tab.
+  static final activate = {...select, LogicalKeyboardKey.space};
 }
 
 abstract class ChainConst {

@@ -27,7 +27,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
 
   // for focus management
   KeyEventResult _handleKeyEvent(KeyEvent event, String key) {
-    if (KeyboardConst.select.contains(event.logicalKey) && event is KeyUpEvent) {
+    if (KeyboardConst.activate.contains(event.logicalKey) && event is KeyDownEvent) {
       UriUtils.tryLaunch(Uri.parse(IntroConst.url[key]!));
       return KeyEventResult.handled;
     }
