@@ -50,13 +50,29 @@ install_integration() {
     APP_VERSION=$(jq -r .version < "./data/flutter_assets/version.json" 2>/dev/null || grep -oP '"version":\s*"\K[^"]+' "./data/flutter_assets/version.json" 2>/dev/null || echo "1.0.0")
     mkdir -p "$(dirname "$TARGET_DESKTOP")"
 
+    # Exec quoting is decoded after desktop-entry string escapes. Escape both
+    # layers, and keep literal percent signs separate from the URI field code.
+    # Use env as the executable: GIO checks that path before expanding %%, so
+    # an AppImage name containing a percent sign must be passed as an argument.
+    local desktop_exec="$APPIMAGE"
+    desktop_exec=${desktop_exec//\\/\\\\}
+    desktop_exec=${desktop_exec//\"/\\\"}
+    desktop_exec=${desktop_exec//\`/\\\`}
+    desktop_exec=${desktop_exec//\$/\\\$}
+    desktop_exec=${desktop_exec//\\/\\\\}
+    desktop_exec=${desktop_exec//%/%%}
+    desktop_exec=${desktop_exec//$'\n'/\\n}
+    desktop_exec=${desktop_exec//$'\r'/\\r}
+    desktop_exec=${desktop_exec//$'\t'/\\t}
+
     cat > "$TARGET_DESKTOP" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Hiddify
 GenericName=Hiddify
 GenericName[fa]=هیدیفای
-Exec="$APPIMAGE"
+Exec=/usr/bin/env "$desktop_exec" %u
+MimeType=x-scheme-handler/hiddify;x-scheme-handler/v2ray;x-scheme-handler/v2rayn;x-scheme-handler/v2rayng;x-scheme-handler/clash;x-scheme-handler/clashmeta;x-scheme-handler/sing-box;
 Icon=hiddify
 Terminal=false
 StartupWMClass=app.hiddify.com
