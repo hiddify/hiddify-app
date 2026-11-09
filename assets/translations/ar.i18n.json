@@ -355,6 +355,8 @@
         "enableAnalytics": "تفعيل التحليلات",
         "enableAnalyticsMsg": "إرسال بيانات التحليل وتقارير الأعطال من جهازك للمساعدة في تحسين التطبيق",
         "autoIpCheck": "التحقق التلقائي من IP الاتصال",
+        "reduceAnimations": "تقليل الرسوم المتحركة",
+        "reduceAnimationsMsg": "إبقاء زر الاتصال ثابتًا وإيقاف المؤثرات المتكررة لتوفير البطارية",
         "dynamicNotification": "عرض السرعة في الإشعار",
         "hapticFeedback": "ردود الفعل اللمسية",
         "alwaysOnVpn": "VPN قيد التشغيل دائمًا",

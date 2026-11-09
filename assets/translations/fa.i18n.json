@@ -361,6 +361,8 @@
         "enableAnalytics": "فعال‌سازی آمار",
         "enableAnalyticsMsg": "ارسال آمار و گزارش‌های خطا از دستگاه شما برای کمک به بهبود برنامه",
         "autoIpCheck": "بررسی خودکار IP اتصال",
+        "reduceAnimations": "کاهش انیمیشن‌ها",
+        "reduceAnimationsMsg": "دکمه اتصال ثابت می‌ماند و جلوه‌های تکراری متوقف می‌شوند تا باتری کمتر مصرف شود",
         "dynamicNotification": "نمایش سرعت در اعلان",
         "hapticFeedback": "بازخورد لرزشی",
         "alwaysOnVpn": "VPN همیشه روشن",

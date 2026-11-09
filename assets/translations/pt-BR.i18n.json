@@ -345,6 +345,8 @@
         "enableAnalytics": "Ativar análise de dados",
         "enableAnalyticsMsg": "Envie dados de análise e relatórios de falhas do seu dispositivo para ajudar a melhorar o aplicativo",
         "autoIpCheck": "Verificar IP da conexão automaticamente",
+        "reduceAnimations": "Reduzir animações",
+        "reduceAnimationsMsg": "Mantém o botão de conexão parado e interrompe os efeitos em repetição para economizar bateria",
         "dynamicNotification": "Exibir velocidade na notificação",
         "hapticFeedback": "Feedback tátil",
         "alwaysOnVpn": "VPN sempre ativa",

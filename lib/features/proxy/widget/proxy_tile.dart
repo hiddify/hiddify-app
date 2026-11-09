@@ -425,6 +425,7 @@ class _FlagSlot extends StatelessWidget {
     final flag = IPCountryFlag(countryCode: ip.countryCode, organization: ip.org, size: size);
     final state = proxy.rowState;
     final gaveUp = state == ProxyRowState.pingFailed || state == ProxyRowState.failed;
+    final still = MediaQuery.disableAnimationsOf(context);
 
     final (Object key, Widget child) = switch (proxy) {
       _ when reconnectingBadge && ip.countryCode.isNotEmpty => (
@@ -464,6 +465,7 @@ class _FlagSlot extends StatelessWidget {
           ],
         ),
       ),
+      _ when ip.ip.isNotEmpty && still => ('cached', Opacity(opacity: .35, child: flag)),
       _ when ip.ip.isNotEmpty => (
         'cached',
         Opacity(opacity: .35, child: flag)
@@ -471,6 +473,7 @@ class _FlagSlot extends StatelessWidget {
             .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .5), angle: .6),
       ),
       _ when gaveUp => ('empty', _square(s.onSurface.withValues(alpha: .07))),
+      _ when still => ('bone', _square(s.onSurface.withValues(alpha: .12))),
       _ => (
         'bone',
         _square(s.onSurface.withValues(alpha: .12))

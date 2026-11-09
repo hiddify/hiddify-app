@@ -52,29 +52,31 @@ class _OrbitShield extends StatelessWidget {
   final Color light;
 
   @override
-  Widget build(BuildContext context) => Animate(
-    onPlay: (c) => c.repeat(),
-    effects: [
-      CustomEffect(
-        duration: 8000.ms,
-        builder: (context, v, child) {
-          Widget half({required bool front}) => CustomPaint(
-            size: const Size.square(22),
-            painter: _OrbitPainter(angle: v * 2 * pi, front: front, light: light),
-          );
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              half(front: false),
-              Icon(Icons.shield_rounded, size: 17, color: main),
-              half(front: true),
-            ],
-          );
-        },
-      ),
-    ],
-    child: const SizedBox.square(dimension: 22),
-  );
+  Widget build(BuildContext context) => MediaQuery.disableAnimationsOf(context)
+      ? Icon(Icons.shield_rounded, size: 17, color: main)
+      : Animate(
+          onPlay: (c) => c.repeat(),
+          effects: [
+            CustomEffect(
+              duration: 8000.ms,
+              builder: (context, v, child) {
+                Widget half({required bool front}) => CustomPaint(
+                  size: const Size.square(22),
+                  painter: _OrbitPainter(angle: v * 2 * pi, front: front, light: light),
+                );
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    half(front: false),
+                    Icon(Icons.shield_rounded, size: 17, color: main),
+                    half(front: true),
+                  ],
+                );
+              },
+            ),
+          ],
+          child: const SizedBox.square(dimension: 22),
+        );
 }
 
 /// One half of the orbit, the one behind the shield or the one in front of it: the ring and the
@@ -155,7 +157,7 @@ class PassingDoor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!animate) {
+    if (!animate || MediaQuery.disableAnimationsOf(context)) {
       return CustomPaint(
         size: Size.square(size),
         painter: _DoorPainter(t: null, color: color),

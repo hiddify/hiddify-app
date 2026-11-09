@@ -82,8 +82,10 @@ class EclipseTraffic {
 /// to the button, upload in plasma blue further out, both reaching further as more flows. A failed
 /// connection shows a weak signal and an error badge, whose place [errorBadgeRect] gives.
 ///
-/// Soft glows are drawn sharp into a bounded [Canvas.saveLayer] and blurred once with
-/// [ui.ImageFilter.blur], not with a [MaskFilter] on every stroke. Same look, far cheaper.
+/// Soft glows are drawn sharp into a small offscreen image at half the screen's resolution,
+/// blurred once there, and scaled up: a blur hides the lost detail, and it costs a quarter of
+/// one at full resolution. Blurring the full-size layers kept a CPU core busy on a laptop
+/// drawing in software.
 class EclipseButtonPainter extends CustomPainter {
   EclipseButtonPainter({
     required this.frame,
@@ -92,6 +94,7 @@ class EclipseButtonPainter extends CustomPainter {
     required this.dark,
     this.drawLogo = true,
     this.logoOpacity = 1,
+    this.pixelRatio = 1,
     super.repaint,
   });
 
@@ -105,6 +108,9 @@ class EclipseButtonPainter extends CustomPainter {
   /// False when something else, such as a seasonal image, takes the logo's place.
   final bool drawLogo;
   final double logoOpacity;
+
+  /// The screen's device pixels per logical pixel; the glow is drawn at half of it.
+  final double pixelRatio;
 
   static const _fade = .35;
 
@@ -142,7 +148,8 @@ class EclipseButtonPainter extends CustomPainter {
       old.dark != dark ||
       old.radius != radius ||
       old.drawLogo != drawLogo ||
-      old.logoOpacity != logoOpacity;
+      old.logoOpacity != logoOpacity ||
+      old.pixelRatio != pixelRatio;
 }
 
 void _paintLook(_Ctx x) {
@@ -267,10 +274,26 @@ void _connected(_Ctx x) {
 
   // the sun's yellow close to the button, the plasma's blue further out and on top, so the two
   // stay apart instead of mixing to grey
-  _corona(x, color: downColor, level: down, reach: .6, rays: 32, seed: 10, plasma: false);
-  _flares(x, color: downColor, level: down, seed: 60, reach: .75, additive: true);
-  _corona(x, color: upColor, level: up, reach: .95, rays: 52, seed: 40, plasma: true, additive: false, hollow: 1);
-  _flares(x, color: upColor, level: up, seed: 80, reach: 1.05, additive: false);
+  // the download's rays and flares have the same blur and blend, so they share one blurred image
+  final downRays = _corona(x, color: downColor, level: down, reach: .6, rays: 32, seed: 10, plasma: false);
+  final downFlares = _flares(x, color: downColor, level: down, seed: 60, reach: .75, additive: true);
+  _glow(x, 4, _blendOf(x, additive: true), [?downRays, ?downFlares]);
+  _sparks(x, color: downColor, level: down, seed: 60, reach: .75, additive: true);
+  final upRays = _corona(
+    x,
+    color: upColor,
+    level: up,
+    reach: .95,
+    rays: 52,
+    seed: 40,
+    plasma: true,
+    additive: false,
+    hollow: 1,
+  );
+  _glow(x, 2.5, _blendOf(x, additive: false), [?upRays]);
+  final upFlares = _flares(x, color: upColor, level: up, seed: 80, reach: 1.05, additive: false);
+  _glow(x, 4, _blendOf(x, additive: false), [?upFlares]);
+  _sparks(x, color: upColor, level: up, seed: 80, reach: 1.05, additive: false);
 
   x.ripple(s, x.col, duration: 1.4);
   x.disc();
@@ -330,23 +353,52 @@ void _connected(_Ctx x) {
   });
 }
 
-/// Soft glow: drawn sharp into one bounded layer and blurred once. The layer is at full size, so
-/// the rays and flares reach as far as they are drawn; the cost is kept down by the bounds, by the
-/// single blur, and by the button's own frame rate, not by shrinking them.
-void _blurredLayer(Canvas c, Rect bounds, double sigma, BlendMode blend, void Function(Canvas c) paint) {
-  c.saveLayer(
+/// Sharp strokes that [_glow] blurs, and the area they stay in.
+typedef _GlowPaint = ({Rect bounds, void Function(Canvas c) paint});
+
+/// Light adds up on a dark background, as real light does.
+BlendMode _blendOf(_Ctx x, {required bool additive}) => additive && x.p.dark ? BlendMode.plus : BlendMode.srcOver;
+
+/// Soft glow: [parts] drawn sharp into one offscreen image at half the screen's resolution,
+/// blurred by [sigma] there, and drawn back scaled up with [blend].
+void _glow(_Ctx x, double sigma, BlendMode blend, List<_GlowPaint> parts) {
+  if (parts.isEmpty) return;
+  final bounds = parts.map((p) => p.bounds).reduce((a, b) => a.expandToInclude(b)).inflate(sigma * 3);
+  final scale = x.p.pixelRatio / 2;
+  final width = (bounds.width * scale).ceil();
+  final height = (bounds.height * scale).ceil();
+  if (width <= 0 || height <= 0) return;
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder)
+    ..scale(scale)
+    ..translate(-bounds.left, -bounds.top);
+  canvas.saveLayer(
     bounds,
+    Paint()..imageFilter = ui.ImageFilter.blur(sigmaX: sigma * scale, sigmaY: sigma * scale, tileMode: TileMode.decal),
+  );
+  for (final part in parts) {
+    part.paint(canvas);
+  }
+  canvas.restore();
+  final picture = recorder.endRecording();
+  final image = picture.toImageSync(width, height);
+  picture.dispose();
+  x.c.drawImageRect(
+    image,
+    Rect.fromLTWH(0, 0, width.toDouble(), height.toDouble()),
+    Rect.fromLTWH(bounds.left, bounds.top, width / scale, height / scale),
     Paint()
       ..blendMode = blend
-      ..imageFilter = ui.ImageFilter.blur(sigmaX: sigma, sigmaY: sigma, tileMode: TileMode.decal),
+      ..filterQuality = FilterQuality.low,
   );
-  paint(c);
-  c.restore();
+  // the frame being recorded keeps its own reference to the image
+  image.dispose();
 }
 
-/// A corona of [color] behind the button: a soft glow and [rays] that reach further out as [level]
-/// rises. [plasma] curls the rays like filaments; [hollow] moves the glow out into a ring.
-void _corona(
+/// A corona of [color] behind the button: a soft glow, drawn here, and [rays] that reach further
+/// out as [level] rises, returned for [_glow] to blur. [plasma] curls the rays like filaments;
+/// [hollow] moves the glow out into a ring.
+_GlowPaint? _corona(
   _Ctx x, {
   required Color color,
   required double level,
@@ -357,11 +409,10 @@ void _corona(
   bool additive = true,
   double hollow = 0,
 }) {
-  if (level <= .01) return;
+  if (level <= .01) return null;
   final c = x.c;
   final time = x.f.time;
-  // light adds up on a dark background, as real light does
-  final blend = additive && x.p.dark ? BlendMode.plus : BlendMode.srcOver;
+  final blend = _blendOf(x, additive: additive);
   final outer = x.r * (1.04 + reach * level);
   final edge = x.r / outer * .98;
   final peak = edge + (1 - edge) * (.35 * hollow);
@@ -381,38 +432,39 @@ void _corona(
         stops: [edge, peak, peak + (1 - peak) * .35, 1],
       ).createShader(Rect.fromCircle(center: x.center, radius: outer)),
   );
-  final sigma = plasma ? 2.5 : 4.0;
-  final bounds = Rect.fromCircle(center: x.center, radius: outer + sigma * 2);
-  _blurredLayer(c, bounds, sigma, blend, (layer) {
-    for (var i = 0; i < rays; i++) {
-      final drift = time * (plasma ? .04 : .025) * (_hash(i, seed + 1) > .5 ? 1 : -1);
-      final dir = Offset.fromDirection(2 * math.pi * _hash(i, seed) + drift);
-      final len = x.r * reach * 1.2 * level * (.45 + .55 * _hash(i, seed + 2)) * (.7 + .3 * math.sin(time * .35 + i));
-      final from = x.center + dir * (x.r - 2 + hollow * x.r * .12);
-      final to = x.center + dir * (x.r + len);
-      final path = Path()..moveTo(from.dx, from.dy);
-      if (plasma) {
-        final bend = Offset(-dir.dy, dir.dx) * (len * .18 * math.sin(time * .5 + i * 1.7));
-        final mid = Offset.lerp(from, to, .5)! + bend;
-        path.quadraticBezierTo(mid.dx, mid.dy, to.dx, to.dy);
-      } else {
-        path.lineTo(to.dx, to.dy);
+  return (
+    bounds: Rect.fromCircle(center: x.center, radius: outer),
+    paint: (layer) {
+      for (var i = 0; i < rays; i++) {
+        final drift = time * (plasma ? .04 : .025) * (_hash(i, seed + 1) > .5 ? 1 : -1);
+        final dir = Offset.fromDirection(2 * math.pi * _hash(i, seed) + drift);
+        final len = x.r * reach * 1.2 * level * (.45 + .55 * _hash(i, seed + 2)) * (.7 + .3 * math.sin(time * .35 + i));
+        final from = x.center + dir * (x.r - 2 + hollow * x.r * .12);
+        final to = x.center + dir * (x.r + len);
+        final path = Path()..moveTo(from.dx, from.dy);
+        if (plasma) {
+          final bend = Offset(-dir.dy, dir.dx) * (len * .18 * math.sin(time * .5 + i * 1.7));
+          final mid = Offset.lerp(from, to, .5)! + bend;
+          path.quadraticBezierTo(mid.dx, mid.dy, to.dx, to.dy);
+        } else {
+          path.lineTo(to.dx, to.dy);
+        }
+        layer.drawPath(
+          path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = plasma ? 2.2 : 3.5
+            ..strokeCap = StrokeCap.round
+            ..shader = ui.Gradient.linear(from, to, [_alpha(color, .45 * level), _alpha(color, 0)]),
+        );
       }
-      layer.drawPath(
-        path,
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = plasma ? 2.2 : 3.5
-          ..strokeCap = StrokeCap.round
-          ..shader = ui.Gradient.linear(from, to, [_alpha(color, .45 * level), _alpha(color, 0)]),
-      );
-    }
-  });
+    },
+  );
 }
 
 /// Flares of [color]: long streamers that rise from behind the button, each from a new place, curl a
-/// little and fade, and small sparks drifting out; longer and brighter as [level] rises.
-void _flares(
+/// little and fade; longer and brighter as [level] rises. Returned for [_glow] to blur.
+_GlowPaint? _flares(
   _Ctx x, {
   required Color color,
   required double level,
@@ -420,12 +472,9 @@ void _flares(
   required double reach,
   required bool additive,
 }) {
-  if (level <= .01) return;
-  final c = x.c;
+  if (level <= .01) return null;
   final time = x.f.time;
-  final blend = additive && x.p.dark ? BlendMode.plus : BlendMode.srcOver;
   const life = 3.4;
-  // Halo + core in one half-res blur (same widths/alphas as the old dual MaskFilter passes).
   final flares = <({Path path, Offset from, Offset to, double fade})>[];
   for (var k = 0; k < 7; k++) {
     final clock = time / life + _hash(k, seed);
@@ -448,9 +497,11 @@ void _flares(
       fade: fade,
     ));
   }
-  if (flares.isNotEmpty) {
-    final bounds = Rect.fromCircle(center: x.center, radius: x.r * (1 + reach * level) + 20);
-    _blurredLayer(c, bounds, 4.0, blend, (layer) {
+  if (flares.isEmpty) return null;
+  return (
+    bounds: Rect.fromCircle(center: x.center, radius: x.r * (1 + reach * level) + 8),
+    paint: (layer) {
+      // a wide halo and a bright core in the same blur
       for (final f in flares) {
         for (final (width, strength) in [(7.0, .35), (2.4, .7)]) {
           layer.drawPath(
@@ -463,12 +514,26 @@ void _flares(
           );
         }
       }
-    });
-  }
+    },
+  );
+}
+
+/// Small sparks of [color] drifting out, sharp, over the flares.
+void _sparks(
+  _Ctx x, {
+  required Color color,
+  required double level,
+  required int seed,
+  required double reach,
+  required bool additive,
+}) {
+  if (level <= .01) return;
+  final time = x.f.time;
+  final blend = _blendOf(x, additive: additive);
   for (var i = 0; i < 16; i++) {
     final p = (time * (.18 + .1 * _hash(i, seed + 4)) + _hash(i, seed + 5)) % 1;
     final at = x.center + Offset.fromDirection(2 * math.pi * _hash(i, seed + 6), x.r + 3 + p * x.r * reach * level);
-    c.drawCircle(
+    x.c.drawCircle(
       at,
       1.6,
       Paint()

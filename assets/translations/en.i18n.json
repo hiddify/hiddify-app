@@ -361,6 +361,8 @@
         "enableAnalytics": "Turn on analytics",
         "enableAnalyticsMsg": "Send analytics and crash reports from your device to help improve the app",
         "autoIpCheck": "Automatically check connection IP",
+        "reduceAnimations": "Reduce animations",
+        "reduceAnimationsMsg": "Keep the connect button still and stop looping effects, to save battery",
         "dynamicNotification": "Display speed in notification",
         "hapticFeedback": "Haptic feedback",
         "alwaysOnVpn": "Always-on VPN",

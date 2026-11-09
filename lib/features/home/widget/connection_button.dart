@@ -259,6 +259,17 @@ class _ConnectionButton extends HookWidget {
   static const _smallFrom = 640.0;
   static const _smallest = .65;
 
+  /// The frame intervals once a look has settled, one per [FrameLoad] level.
+  static const _settledIntervals = [
+    Duration(milliseconds: 50),
+    Duration(milliseconds: 66),
+    Duration(milliseconds: 100),
+  ];
+
+  /// Seconds after a look begins until its own motion is over: the connected look's spring and
+  /// ripple, the error's shake. What follows only drifts.
+  static const _settleAfter = 3.0;
+
   static double _scaleFor(double height) =>
       _smallest + (1 - _smallest) * ((height - _smallFrom) / (_fullFrom - _smallFrom)).clamp(0.0, 1.0);
 
@@ -329,12 +340,18 @@ class _ConnectionButton extends HookWidget {
       () => FrameLoad(const [Duration(milliseconds: 33), Duration(milliseconds: 50), Duration(milliseconds: 66)]),
     );
     final level = useValueListenable(load.level);
+    // Once a look has settled, the light and the breathing move slowly enough for 20 fps; the
+    // changes between looks keep 30. Each frame of the light costs the most of anything on the
+    // page, so this is a third less of it for as long as the app stays connected.
+    final settled = useValueNotifier(false);
+    final calm = useValueListenable(settled);
+    final interval = calm ? _settledIntervals[level] : load.interval;
     final time = useValueNotifier(0.0);
     useEffect(() {
       if (still || !ticking) return null;
       load.watch();
       var last = now();
-      final timer = Timer.periodic(load.interval, (_) {
+      final timer = Timer.periodic(interval, (_) {
         final at = now();
         // the light rises with the traffic in about a second, and fades more slowly, so the
         // stats reloading for a moment (coming back from the background) barely dims it
@@ -343,14 +360,16 @@ class _ConnectionButton extends HookWidget {
         final t = traffic.value;
         traffic.value = EclipseTraffic(down: follow(t.down, target.value.down), up: follow(t.up, target.value.up));
         last = at;
-        final settled = change.value.look == EclipseLook.idle && at - change.value.at > 1;
-        if (!settled) time.value = at;
+        final since = at - change.value.at;
+        settled.value = since > _settleAfter;
+        final idle = change.value.look == EclipseLook.idle && since > 1;
+        if (!idle) time.value = at;
       });
       return () {
         timer.cancel();
         load.unwatch();
       };
-    }, [still, ticking, level]);
+    }, [still, ticking, interval]);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -404,6 +423,7 @@ class _ConnectionButton extends HookWidget {
                                     dark: theme.brightness == Brightness.dark,
                                     drawLogo: !useImage,
                                     logoOpacity: look == _Look.loading ? .38 : 1,
+                                    pixelRatio: MediaQuery.devicePixelRatioOf(context),
                                   ),
                                 );
                               },
@@ -578,6 +598,7 @@ class _ChainBadge extends StatelessWidget {
       ),
     );
     glyph = switch (status) {
+      _ when MediaQuery.disableAnimationsOf(context) => glyph,
       // once up, a light sweeps across it now and then
       StepStatus.connected =>
         glyph

@@ -257,10 +257,8 @@ class _Alternating extends HookWidget {
     }, const []);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 400),
-      layoutBuilder: (current, previous) => Stack(
-        alignment: AlignmentDirectional.centerStart,
-        children: [...previous, ?current],
-      ),
+      layoutBuilder: (current, previous) =>
+          Stack(alignment: AlignmentDirectional.centerStart, children: [...previous, ?current]),
       child: KeyedSubtree(key: ValueKey(showFirst.value), child: showFirst.value ? first : second),
     );
   }
@@ -778,21 +776,19 @@ class _Bone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
+    final bone = Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: s.onSurface.withValues(alpha: .12), borderRadius: BorderRadius.circular(radius)),
+    );
+    if (MediaQuery.disableAnimationsOf(context)) return bone;
     return RepaintBoundary(
       // both loops repaint the bone alone, not the card round it
-      child:
-          Container(
-                width: width,
-                height: height,
-                decoration: BoxDecoration(
-                  color: s.onSurface.withValues(alpha: .12),
-                  borderRadius: BorderRadius.circular(radius),
-                ),
-              )
-              .animate(onPlay: (c) => c.repeat())
-              .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
-              .animate(onPlay: (c) => c.repeat(reverse: true))
-              .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut),
+      child: bone
+          .animate(onPlay: (c) => c.repeat())
+          .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
+          .animate(onPlay: (c) => c.repeat(reverse: true))
+          .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut),
     );
   }
 }

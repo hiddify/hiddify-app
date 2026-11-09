@@ -344,6 +344,8 @@
         "enableAnalytics": "Aktifkan analitik",
         "enableAnalyticsMsg": "Kirim analitik dan laporan kerusakan dari perangkat Anda untuk membantu meningkatkan aplikasi",
         "autoIpCheck": "Periksa IP koneksi secara otomatis",
+        "reduceAnimations": "Kurangi animasi",
+        "reduceAnimationsMsg": "Tombol sambung tetap diam dan efek berulang dihentikan untuk menghemat baterai",
         "dynamicNotification": "Tampilkan kecepatan di notifikasi",
         "hapticFeedback": "Umpan balik haptik",
         "alwaysOnVpn": "VPN selalu aktif",

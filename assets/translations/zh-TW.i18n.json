@@ -344,6 +344,8 @@
         "enableAnalytics": "開啟分析",
         "enableAnalyticsMsg": "從您的裝置傳送分析資料和崩潰報告，協助改進應用程式",
         "autoIpCheck": "自動檢查連線 IP",
+        "reduceAnimations": "減少動畫",
+        "reduceAnimationsMsg": "連線按鈕保持靜止並停止循環效果，以節省電量",
         "dynamicNotification": "在通知中顯示速度",
         "hapticFeedback": "觸覺回饋",
         "alwaysOnVpn": "永遠開啟 VPN",

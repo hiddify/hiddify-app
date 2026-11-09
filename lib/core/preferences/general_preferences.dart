@@ -113,6 +113,10 @@ abstract class Preferences {
 
   static final autoCheckIp = PreferencesNotifier.create<bool, bool>("auto_check_ip", true);
 
+  /// Keeps the connect button still and stops the decorative loops, as the system's own reduce
+  /// motion setting does: less CPU, and so battery, on a laptop or an old phone.
+  static final reduceAnimations = PreferencesNotifier.create<bool, bool>("reduce_animations", false);
+
   static final startedByUser = PreferencesNotifier.create<bool, bool>("started_by_user", false);
 
   static final storeReviewedByUser = PreferencesNotifier.create<bool, bool>("store_reviewed_by_user", false);

@@ -344,6 +344,8 @@
         "enableAnalytics": "Analizi aç",
         "enableAnalyticsMsg": "Uygulamayı iyileştirmeye yardımcı olmak için cihazınızdan analiz ve kilitlenme raporları gönderin",
         "autoIpCheck": "Bağlantı IP'sini otomatik kontrol et",
+        "reduceAnimations": "Animasyonları azalt",
+        "reduceAnimationsMsg": "Bağlan düğmesini sabit tutar ve tekrar eden efektleri durdurarak pil tasarrufu sağlar",
         "dynamicNotification": "Hızı bildirimde göster",
         "hapticFeedback": "Dokunsal geri bildirim",
         "alwaysOnVpn": "Her zaman açık VPN",

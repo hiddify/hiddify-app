@@ -162,7 +162,7 @@ class KeepTopDialog extends HookConsumerWidget {
       _ => text.keep(keep: n),
     };
     Widget dots = KeepTopDots(key: ValueKey(n), running: n > 0 ? n : count, total: count);
-    if (n == keepTopAnswering) {
+    if (n == keepTopAnswering && !MediaQuery.disableAnimationsOf(context)) {
       // which ones answer is known once they are tested
       dots = dots
           .animate(onPlay: (c) => c.repeat())
@@ -365,7 +365,7 @@ class KeepTopFooter extends HookConsumerWidget {
     ];
 
     Widget dots = KeepTopDots(key: ValueKey((keeping, picking)), running: picking ? 0 : running, total: total);
-    if (picking) {
+    if (picking && !MediaQuery.disableAnimationsOf(context)) {
       // the first pings still come in
       dots = dots
           .animate(onPlay: (c) => c.repeat())
