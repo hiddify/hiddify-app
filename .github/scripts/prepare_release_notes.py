@@ -41,8 +41,6 @@ ASSET_CATALOG: list[tuple[str, str, str]] = [
     ("Windows", "Hiddify-Windows-Portable-x64.zip", "Portable x64"),
     ("macOS (v10.15+)", "Hiddify-MacOS.dmg", "DMG Universal"),
     ("macOS (v10.15+)", "Hiddify-MacOS-Installer.pkg", "PKG Universal"),
-    ("macOS (v10.15+)", "Hiddify-MacOS-AppStore.dmg", "App Store DMG Universal"),
-    ("macOS (v10.15+)", "Hiddify-MacOS-AppStore.pkg", "App Store PKG Universal"),
     ("iOS", "Hiddify-iOS.ipa", "IPA iOS"),
     ("Linux", "Hiddify-Linux-x64-AppImage.AppImage", "AppImage x64"),
     ("Linux", "Hiddify-Linux-x64-AppImage.tar.gz", "AppImage x64 (tar.gz)"),

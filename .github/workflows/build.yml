@@ -612,6 +612,10 @@ jobs:
           pattern: "*"
           path: ./out/
 
+      # The App Store build goes to TestFlight only: a user cannot install it from a download
+      - name: Leave out the Mac App Store build
+        run: rm -fv out/Hiddify-MacOS-AppStore.*
+
       - name: Display Files Structure
         run: ls -R
         working-directory: ./out
@@ -682,6 +686,8 @@ jobs:
           ls -R ./.github/
           ls -R ./.git/
           mv out/hiddify-android-market.aab  hiddify-android-market.aab
+          # The App Store build goes to TestFlight only: a user cannot install it from a download
+          rm -fv out/Hiddify-MacOS-AppStore.*
           # The MSIX ships CI-signed; windows-store-sync.yml replaces it with the
           # Store-signed copy once the version uploaded in Partner Center is live.
 
