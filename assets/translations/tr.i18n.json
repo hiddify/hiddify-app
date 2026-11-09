@@ -359,8 +359,6 @@
         "connectionTestUrl": "Bağlantı testi URL'si",
         "urlTestInterval": "URL testi aralığı",
         "clashApiPort": "Clash API portu",
-        "useXrayCoreWhenPossible": "Mümkün olduğunda xray-core kullan",
-        "useXrayCoreWhenPossibleMsg": "Abonelik bağlantılarını ayrıştırırken xray-core kullanın. Bu seçeneği açmak için aboneliği yeniden içe aktarın.",
         "useSystemTlsEngine": "Varsa sistemin TLS’ini kullan",
         "useSystemTlsEngineMsg": "TLS parmak izi olmayan bağlantılar, bu cihazda bir denetimden geçtikten sonra macOS, iOS veya Windows’un TLS’ini kullanır; aksi hâlde Chrome gibi görünür.",
         "uploadTestSize": "Yükleme testi boyutu",

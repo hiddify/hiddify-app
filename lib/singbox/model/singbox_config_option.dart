@@ -19,7 +19,6 @@ class SingboxConfigOption with _$SingboxConfigOption {
     required BalancerStrategy balancerStrategy,
     @Default(DefaultProxy.balance) DefaultProxy defaultProxy,
     // required bool blockAds,
-    required bool useXrayCoreWhenPossible,
     @Default(true) bool useSystemTlsEngine,
     required bool executeConfigAsIs,
     required LogLevel logLevel,

@@ -370,8 +370,6 @@
         "connectionTestUrl": "رابط اختبار الاتصال",
         "urlTestInterval": "فاصل اختبار الرابط",
         "clashApiPort": "منفذ Clash API",
-        "useXrayCoreWhenPossible": "استخدام xray-core عند الإمكان",
-        "useXrayCoreWhenPossibleMsg": "استخدم xray-core عند تحليل روابط الاشتراك. أعد استيراد الاشتراك لتشغيل هذا الخيار.",
         "useSystemTlsEngine": "استخدام TLS الخاص بالنظام عند توفره",
         "useSystemTlsEngineMsg": "تستخدم الاتصالات التي ليس لها بصمة TLS بروتوكول TLS الخاص بـ macOS أو iOS أو Windows بعد اجتيازه فحصًا على هذا الجهاز؛ وإلا فإنها تبدو مثل Chrome.",
         "uploadTestSize": "حجم اختبار الرفع",

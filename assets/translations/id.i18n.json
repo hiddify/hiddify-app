@@ -359,8 +359,6 @@
         "connectionTestUrl": "URL uji koneksi",
         "urlTestInterval": "Interval uji URL",
         "clashApiPort": "Port API Clash",
-        "useXrayCoreWhenPossible": "Gunakan xray-core jika memungkinkan",
-        "useXrayCoreWhenPossibleMsg": "Gunakan xray-core saat mengurai tautan langganan. Impor ulang langganan untuk mengaktifkan opsi ini.",
         "useSystemTlsEngine": "Gunakan TLS sistem jika tersedia",
         "useSystemTlsEngineMsg": "Koneksi tanpa sidik jari TLS menggunakan TLS macOS, iOS, atau Windows setelah lolos pemeriksaan di perangkat ini; jika tidak, koneksi akan terlihat seperti Chrome.",
         "uploadTestSize": "Ukuran uji unggah",

@@ -360,8 +360,6 @@
         "connectionTestUrl": "URL de teste de conexão",
         "urlTestInterval": "Intervalo de teste de URL",
         "clashApiPort": "Porta da API do Clash",
-        "useXrayCoreWhenPossible": "Usar xray-core quando possível",
-        "useXrayCoreWhenPossibleMsg": "Use o xray-core ao analisar links de assinatura. Reimporte a assinatura para ativar esta opção.",
         "useSystemTlsEngine": "Usar o TLS do sistema quando disponível",
         "useSystemTlsEngineMsg": "As conexões sem impressão digital TLS usam o TLS do macOS, iOS ou Windows depois que ele passa em uma verificação neste dispositivo; caso contrário, elas se parecem com o Chrome.",
         "uploadTestSize": "Tamanho do teste de envio",

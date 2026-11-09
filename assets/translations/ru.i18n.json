@@ -366,8 +366,6 @@
         "connectionTestUrl": "URL для теста соединения",
         "urlTestInterval": "Интервал теста URL",
         "clashApiPort": "Порт Clash API",
-        "useXrayCoreWhenPossible": "Использовать Xray-core, если возможно",
-        "useXrayCoreWhenPossibleMsg": "Использовать Xray-core при обработке ссылок на подписку. Повторно импортируйте подписку, чтобы включить эту опцию.",
         "useSystemTlsEngine": "Использовать TLS системы, если доступен",
         "useSystemTlsEngineMsg": "Подключения без отпечатка TLS используют TLS macOS, iOS или Windows, если он прошёл проверку на этом устройстве; иначе они выглядят как Chrome.",
         "uploadTestSize": "Объём проверки отдачи",

@@ -17,6 +17,7 @@ class PreferencesMigration with InfraLogger {
       PreferencesVersion2Migration(sharedPreferences),
       PreferencesVersion3Migration(sharedPreferences),
       PreferencesVersion4Migration(sharedPreferences),
+      PreferencesVersion5Migration(sharedPreferences),
     ];
 
     if (currentVersion == migrationSteps.length) {
@@ -168,5 +169,15 @@ class PreferencesVersion4Migration extends PreferencesMigrationStep with InfraLo
     if ((sharedPreferences.getString(key) ?? '').isNotEmpty) return;
     loggy.debug("making the proxy secret");
     await sharedPreferences.setString(key, generateProxySecret());
+  }
+}
+
+/// "Use xray-core when possible" is gone, so a value an older version saved is dropped.
+class PreferencesVersion5Migration extends PreferencesMigrationStep with InfraLogger {
+  PreferencesVersion5Migration(super.sharedPreferences);
+
+  @override
+  Future<void> migrate() async {
+    await sharedPreferences.remove("use-xray-core-when-possible");
   }
 }

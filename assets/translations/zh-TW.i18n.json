@@ -359,8 +359,6 @@
         "connectionTestUrl": "連線測試 URL",
         "urlTestInterval": "URL 測試間隔",
         "clashApiPort": "Clash API 連接埠",
-        "useXrayCoreWhenPossible": "盡可能使用 xray-core",
-        "useXrayCoreWhenPossibleMsg": "解析訂閱連結時使用 xray-core。重新匯入訂閱即可開啟此選項。",
         "useSystemTlsEngine": "可用時使用系統 TLS",
         "useSystemTlsEngineMsg": "沒有 TLS 指紋的連線，會在系統 TLS 通過此裝置上的檢查後，使用 macOS、iOS 或 Windows 的 TLS；否則看起來會像 Chrome。",
         "uploadTestSize": "上傳測試大小",
