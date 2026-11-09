@@ -914,12 +914,11 @@ packages:
   installed_apps:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "395d51876f9b5b4bc620d8549b05755c6f1966ba"
-      url: "https://github.com/VB10/installed_apps"
-    source: git
-    version: "1.5.2"
+      name: installed_apps
+      sha256: "742e1e1aa7a7f4b2ce9cdba76499559415213736acba0d4a0eaa5e958dac65f7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.1"
   intl:
     dependency: "direct main"
     description:

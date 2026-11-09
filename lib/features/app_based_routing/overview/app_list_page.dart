@@ -14,7 +14,7 @@ import 'package:hiddify/features/app_based_routing/model/pkg_flag.dart';
 import 'package:hiddify/features/app_based_routing/overview/app_list_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:installed_apps/index.dart';
+import 'package:installed_apps/installed_apps.dart';
 
 class AppListPage extends HookConsumerWidget with PresLogger {
   const AppListPage({super.key});
@@ -34,8 +34,10 @@ class AppListPage extends HookConsumerWidget with PresLogger {
   Future<Set<AppPackageInfo>> getApps(bool hideSystem) async {
     if (!PlatformUtils.isAndroid) return {};
     return (await InstalledApps.getInstalledApps(
-      hideSystem,
-      true,
+      excludeSystemApps: hideSystem,
+      excludeNonLaunchableApps: false,
+      withIcon: true,
+      detectPlatformType: false,
     )).map((e) => AppPackageInfo(packageName: e.packageName, name: e.name, icon: e.icon)).toSet();
   }
 

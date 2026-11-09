@@ -112,8 +112,7 @@ dependencies:
   file_picker: ^8.1.7
   # Used for reading the .zip files picked in the profile file import
   archive: ^4.0.4
-  installed_apps: # ^1.5.2
-    git: https://github.com/VB10/installed_apps
+  installed_apps: ^2.2.1
 
   # change case of text
   # for example camelCase to snake_case

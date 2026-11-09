@@ -9,7 +9,7 @@ import 'package:hiddify/features/app_based_routing/model/per_app_proxy_mode.dart
 import 'package:hiddify/features/app_based_routing/overview/auto_selection_notifier.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/utils/utils.dart';
-import 'package:installed_apps/index.dart';
+import 'package:installed_apps/installed_apps.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_based_routing_notifier.g.dart';
@@ -22,7 +22,7 @@ class AppBasedRouting extends _$AppBasedRouting with AppLogger {
   @override
   Future<void> build() async {
     ref.listen(ConfigOptions.region, (_, _) => _onRegionChanged());
-    final phonePkgs = (await InstalledApps.getInstalledApps(false)).map((e) => e.packageName).toSet();
+    final phonePkgs = (await InstalledApps.getInstalledApps(excludeSystemApps: false, excludeNonLaunchableApps: false, detectPlatformType: false)).map((e) => e.packageName).toSet();
     _includeSubscription = ref
         .read(appProxyDataSourceProvider)
         .watchActivePackages(phonePkgs: phonePkgs, mode: AppProxyMode.include)
