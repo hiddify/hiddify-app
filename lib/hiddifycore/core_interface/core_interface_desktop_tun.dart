@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:grpc/grpc.dart';
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/hiddifycore/core_interface/admin_permission_refused.dart';
 import 'package:hiddify/hiddifycore/core_interface/appimage_service.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop.dart';
@@ -55,7 +56,8 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   /// When true, start via admin_bgservice even in proxy mode (Mode C prefer-admin).
   bool useAdminBgService = false;
 
-  /// Optional UI wrapper around elevation (waiting dialog). Returns false if the user stops.
+  /// Optional UI wrapper around elevation (waiting dialog). Returns false if the user stops; the start
+  /// then fails with [AdminPermissionRefused], as when the prompt is refused.
   Future<bool> Function(Future<void> work)? wrapAdminElevation;
 
   /// AppImage payload lives under a user FUSE mount, so no system service can run it: its VPN runs
@@ -192,9 +194,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       if (wrap != null) {
         final ok = await wrap(ensure);
         wrapAdminElevation = null;
-        if (!ok) {
-          throw StateError('Administrator permission was not given, so VPN mode could not connect.');
-        }
+        if (!ok) throw const AdminPermissionRefused();
       } else {
         await ensure;
       }
@@ -238,8 +238,10 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     )) {
       last = event.progress;
       lastMessage = event.message;
-      if (event.progress == EnsureAdminBgServiceProgress.ENSURE_ADMIN_BG_FAILED_PERMISSION_DENIED ||
-          event.progress == EnsureAdminBgServiceProgress.ENSURE_ADMIN_BG_FAILED_OTHER) {
+      if (event.progress == EnsureAdminBgServiceProgress.ENSURE_ADMIN_BG_FAILED_PERMISSION_DENIED) {
+        throw const AdminPermissionRefused();
+      }
+      if (event.progress == EnsureAdminBgServiceProgress.ENSURE_ADMIN_BG_FAILED_OTHER) {
         throw StateError(
           (event.message.isNotEmpty)
               ? event.message

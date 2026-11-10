@@ -5,7 +5,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/environment.dart';
-import 'package:hiddify/utils/platform_utils.dart';
 
 @JsonEnum(valueField: 'key')
 enum ServiceMode {
@@ -27,7 +26,9 @@ enum ServiceMode {
   /// system proxy.
   static bool get _macAppStore => Platform.isMacOS && Release.read() == Release.appStore;
 
-  static ServiceMode get defaultMode => PlatformUtils.isDesktop && !_macAppStore ? systemProxy : tun;
+  /// VPN everywhere: on desktop it asks for administrator permission once when connecting, and
+  /// the user can switch to the system proxy from that prompt instead.
+  static ServiceMode get defaultMode => tun;
 
   /// supported service mode based on platform, use this instead of [values] in UI
   static List<ServiceMode> get choices {

@@ -969,13 +969,54 @@
     },
     "adminBgService": {
       "vpnNeedsAdmin": {
-        "title": "Administrator permission needed",
-        "msg": "VPN mode needs a one-time administrator permission to install the Hiddify background service. After that, you can connect without another prompt.",
-        "msgAppImage": "VPN mode needs administrator permission. The AppImage runs its VPN as a copy of itself with administrator rights, so it asks once each time Hiddify starts.",
-        "connectWithAdmin": "Connect with administrator permission",
+        "title": "Send all apps through the VPN?",
+        "vpnMode": "VPN mode",
+        "allApps": "All apps",
+        "recommended": "Recommended",
+        "systemProxyMode": "System proxy",
+        "someApps": "Browsers and most apps",
+        "switched": "Switched to system proxy mode. You can change it in Settings.",
         "waitingTitle": "Waiting for administrator permission",
-        "waitingMsg": "To continue, allow the administrator prompt. You can stop and try again later.",
-        "stop": "Stop"
+        "waitingMsg": "Hiddify is waiting for you to allow VPN mode.",
+        "waitingWhere": "In the window that opened:",
+        "waitingWindows": "Click “Yes”.",
+        "waitingMac": "Enter your Mac password and confirm.",
+        "waitingLinux": "Enter your password and confirm.",
+        "back": "Back",
+        "needsAdmin": "Needs admin, once",
+        "needsAdminAppImage": "Needs admin at each start",
+        "noAdmin": "No admin needed",
+        "someAppsExcept": "Telegram and a few apps are left out",
+        "useVpn": "Use VPN mode",
+        "useSystemProxy": "Use system proxy",
+        "helpTooltip": "What is this?",
+        "helpWhatTitle": "How it works",
+        "helpProsTitle": "Good points",
+        "helpConsTitle": "Keep in mind",
+        "helpVpn": {
+          "what": "Hiddify adds a virtual network to your computer, and every app's internet traffic goes through it on its own: browsers, Telegram, games, updates and the rest. Nothing has to be set up in each app.",
+          "pros": [
+            "Every app goes through Hiddify, with no settings in each app.",
+            "Apps that ignore proxy settings, such as Telegram and games, work too.",
+            "Name lookups (DNS) go through Hiddify as well, so sites blocked that way open too."
+          ],
+          "cons": [
+            "The first time, your computer asks for administrator permission, to install Hiddify's background service. After that it connects without asking.",
+            "Turn off other VPN apps while you use it: two at once get in each other's way."
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify changes your computer's proxy setting. Apps that follow that setting, such as web browsers, send their traffic through Hiddify; the rest connect directly, as if Hiddify were off.",
+          "pros": [
+            "No administrator permission needed.",
+            "Quick to turn on and off, and Hiddify puts the setting back when you disconnect.",
+            "Works next to other network tools on your computer."
+          ],
+          "cons": [
+            "Apps that ignore the system proxy, such as Telegram, many games and some update tools, are not protected.",
+            "If they stop working, choose VPN mode instead."
+          ]
+        }
       },
       "proxyNeedsAdmin": {
         "title": "Administrator permission recommended",

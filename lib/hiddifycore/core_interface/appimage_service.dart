@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:hiddify/hiddifycore/core_interface/admin_permission_refused.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
 final _logger = infraLogger('AppImageService');
@@ -76,11 +77,9 @@ class AppImageService {
         // the program could not run (hiddify-app#2461); only its stderr tells the two apart
         final detail = stderr.toString().trim();
         ready.completeError(
-          StateError(
-            code == 126 || (code == 127 && detail.isEmpty)
-                ? 'Administrator permission was not given, so VPN mode could not connect.'
-                : 'The VPN service did not start ($code): $detail',
-          ),
+          code == 126 || (code == 127 && detail.isEmpty)
+              ? const AdminPermissionRefused()
+              : StateError('The VPN service did not start ($code): $detail'),
         );
       }),
     );

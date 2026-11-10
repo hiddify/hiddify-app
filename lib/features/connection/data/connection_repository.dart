@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:fpdart/fpdart.dart';
+import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/directories.dart';
 import 'package:hiddify/core/model/environment.dart';
+import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/dialog/widgets/admin_bg_service_dialogs.dart';
@@ -14,6 +16,7 @@ import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
+import 'package:hiddify/hiddifycore/core_interface/admin_permission_refused.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_desktop_tun.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_interface_macos.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pbenum.dart' as hcore;
@@ -93,20 +96,41 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     );
   }
 
-  @override
+  /// Set while a connect runs: the VPN choice dialog was shown, and then the administrator prompt
+  /// was refused or the user stopped waiting for it.
+  var _vpnChoiceShown = false;
+  var _adminRefused = false;
+
+  /// Connects; when the user agreed to VPN mode in the choice dialog but then refused the
+  /// administrator prompt (or stopped waiting for it), the choice is offered again instead of an
+  /// error, so they can try again or switch to system proxy mode.
   @override
   TaskEither<ConnectionFailure, Unit> connect(ProfileEntity activeProfile, bool disableMemoryLimit) => setup().flatMap(
-    (_) => applyConfigOption(activeProfile).flatMap(
-      (_) =>
-          TaskEither.tryCatch(() async {
-            await _prepareAdminBgService(activeProfile);
-            return unit;
-          }, (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st)).flatMap(
-            (_) =>
-                singbox.start(profilePathResolver.file(activeProfile.id).path, activeProfile.name, disableMemoryLimit),
-          ),
-    ),
+    (_) => TaskEither(() async {
+      while (true) {
+        _vpnChoiceShown = false;
+        _adminRefused = false;
+        final result = await _connectOnce(activeProfile, disableMemoryLimit).run();
+        if (result.isRight() || !_vpnChoiceShown || !_adminRefused) return result;
+        loggy.info("administrator permission was not given, offering the choice again");
+      }
+    }),
   );
+
+  TaskEither<ConnectionFailure, Unit> _connectOnce(ProfileEntity activeProfile, bool disableMemoryLimit) =>
+      applyConfigOption(activeProfile).flatMap(
+        (_) =>
+            TaskEither.tryCatch(() async {
+              await _prepareAdminBgService(activeProfile);
+              return unit;
+            }, (err, st) => err is ConnectionFailure ? err : ConnectionFailure.unexpected(err, st)).flatMap(
+              (_) => singbox.start(
+                profilePathResolver.file(activeProfile.id).path,
+                activeProfile.name,
+                disableMemoryLimit,
+              ),
+            ),
+      );
 
   /// Modes A/B/C: ask fg core (Win/Linux) or native tunnel-service status (macOS), show consent.
   Future<void> _prepareAdminBgService(ProfileEntity profile) async {
@@ -151,6 +175,8 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
       case hcore.AdminBgServiceDecision.ADMIN_BG_SERVICE_NEEDS_ADMIN:
         if (options.enableTun && pref == UserAdminPreference.unset) {
           final choice = await dialogs.showVpnAdminBgService();
+          _vpnChoiceShown = true;
+          if (choice == VpnAdminBgDialogResult.switchToSystemProxy) return _switchToSystemProxy(profile);
           if (choice != VpnAdminBgDialogResult.connectWithAdmin) {
             throw const ConnectionFailure.missingPrivilege();
           }
@@ -179,7 +205,20 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
     }
 
     core.useAdminBgService = useAdminBg;
-    core.wrapAdminElevation = needsElevation ? dialogs.runWhileVpnAdminWaiting : null;
+    // the waiting dialog belongs to VPN mode only; a proxy mode that needs the service just shows
+    // the system's own prompt
+    core.wrapAdminElevation = needsElevation && options.enableTun
+        ? (work) async {
+            try {
+              final ok = await dialogs.runWhileVpnAdminWaiting(work);
+              if (!ok) _adminRefused = true;
+              return ok;
+            } on AdminPermissionRefused {
+              _adminRefused = true;
+              rethrow;
+            }
+          }
+        : null;
 
     if (stripPrivileged) {
       final stripped = options.copyWith(tlsTricks: options.tlsTricks.copyWith(mixedSniCase: false));
@@ -207,30 +246,48 @@ class ConnectionRepositoryImpl with ExceptionHandler, InfraLogger implements Con
 
     if (core.tunnelServiceReady) return;
 
-    if (pref == UserAdminPreference.unset) {
-      final choice = await dialogs.showVpnAdminBgService();
-      if (choice != VpnAdminBgDialogResult.connectWithAdmin) {
-        throw const ConnectionFailure.missingPrivilege();
+    // Refusing the password prompt, or stopping the wait for it, goes back to the choice.
+    while (true) {
+      if (pref == UserAdminPreference.unset) {
+        final choice = await dialogs.showVpnAdminBgService();
+        if (choice == VpnAdminBgDialogResult.switchToSystemProxy) return _switchToSystemProxy(profile);
+        if (choice != VpnAdminBgDialogResult.connectWithAdmin) {
+          throw const ConnectionFailure.missingPrivilege();
+        }
       }
+      if (await _installMacosAdminBgService(core, dialogs)) return;
+      // no choice to go back to: the profile always asks for administrator permission
+      if (pref != UserAdminPreference.unset) throw const ConnectionFailure.missingPrivilege();
+      loggy.info("administrator permission was not given, offering the choice again");
     }
+  }
 
+  /// Installs the macOS tunnel service behind the password prompt: true once installed, false when
+  /// the user refused the prompt or stopped waiting for it.
+  Future<bool> _installMacosAdminBgService(CoreInterfaceMacOS core, DialogNotifier dialogs) async {
     try {
-      final ok = await dialogs.runWhileVpnAdminWaiting(core.installAdminBgService());
-      if (!ok) {
-        try {
-          await core.stop();
-        } catch (_) {}
-        throw const ConnectionFailure.missingPrivilege();
-      }
-    } on ConnectionFailure {
-      rethrow;
+      if (await dialogs.runWhileVpnAdminWaiting(core.installAdminBgService())) return true;
+      try {
+        await core.stop();
+      } catch (_) {}
+      return false;
     } catch (error) {
       final message = error.toString().toLowerCase();
-      if (message.contains('cancel') || message.contains('permission') || message.contains('denied')) {
-        throw const ConnectionFailure.missingPrivilege();
-      }
+      if (message.contains('cancel') || message.contains('permission') || message.contains('denied')) return false;
       throw ConnectionFailure.unexpected(error);
     }
+  }
+
+  /// The user chose the system proxy over asking for an administrator: it becomes the service mode,
+  /// and this connect goes on in it. The connection is not running yet, so the change starts no
+  /// reconnect of its own.
+  Future<void> _switchToSystemProxy(ProfileEntity profile) async {
+    loggy.info("switching to system proxy mode instead of asking for administrator");
+    await ref.read(ConfigOptions.serviceMode.notifier).update(ServiceMode.systemProxy);
+    (await applyConfigOption(profile).run()).match((failure) => throw failure, (_) {});
+    final t = ref.read(translationsProvider).requireValue;
+    ref.read(inAppNotificationControllerProvider).showInfoToast(t.dialogs.adminBgService.vpnNeedsAdmin.switched);
+    await _prepareAdminBgService(profile);
   }
 
   Future<void> _persistAdminPreference(ProfileEntity profile, UserAdminPreference preference) async {
