@@ -59,6 +59,7 @@ dependencies:
   launch_at_startup: ^0.5.1
   sentry_flutter: ^8.14.0
   sentry_dart_plugin: ^2.4.1
+  sqlite3: ^2.7.5
   sqlite3_flutter_libs: ^0.5.28
 
   path: ^1.9.0

@@ -1144,9 +1144,16 @@
     "dbNewerThanApp": {
       "title": "Saved data is from a newer version",
       "msg": "Your profiles and settings were saved by a newer version of Hiddify, and this older version cannot read them. Install the latest version to keep them, or delete them to use this version.",
-      "deleteData": "Delete data",
-      "deleteConfirm": "All profiles will be deleted. This cannot be undone.",
+      "deleteData": "Wipe data",
+      "deleteConfirm": "The saved data is wiped. Your subscriptions and local profiles are added back where possible; anything else saved by the newer version is lost.",
       "downloadLatest": "Download latest version"
+    },
+    "dbBroken": {
+      "title": "Saved data can't be opened",
+      "msg": "Hiddify couldn't open its saved profiles. Wipe the saved data to start again: your subscriptions and local profiles are added back where possible, and your settings are kept.",
+      "wipeData": "Wipe data",
+      "wipeConfirm": "The saved data is wiped and Hiddify starts again. Profiles that can still be read are added back; the rest can't be recovered.",
+      "copyError": "Copy error"
     }
   },
   "connection": {

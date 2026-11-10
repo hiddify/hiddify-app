@@ -62,12 +62,24 @@ class Db extends _$Db with InfraLogger {
     );
   }
 
-  /// Deletes the database files, for when they cannot be opened. Close the
-  /// database first.
-  static Future<void> deleteFiles() async {
+  /// The database file on disk.
+  static Future<File> file() async {
     final dir = await AppDirectories.getDatabaseDirectory();
+    return File("${dir.path}${Platform.pathSeparator}$_name.sqlite");
+  }
+
+  /// Deletes the database files, for when they cannot be opened. Close the
+  /// database first. The last broken database is kept beside it as
+  /// `db.broken.sqlite`, for a bug report.
+  static Future<void> deleteFiles() async {
+    final main = await file();
+    if (await main.exists()) {
+      try {
+        await main.copy("${main.parent.path}${Platform.pathSeparator}$_name.broken.sqlite");
+      } catch (_) {}
+    }
     for (final suffix in const ["", "-wal", "-shm", "-journal"]) {
-      final file = File("${dir.path}${Platform.pathSeparator}$_name.sqlite$suffix");
+      final file = File("${main.path}$suffix");
       if (await file.exists()) await file.delete();
     }
   }
@@ -98,10 +110,23 @@ class Db extends _$Db with InfraLogger {
       }
     },
     from4To5: (m, schema) async {
+      final table = schema.profileEntries.actualTableName;
       await m.deleteTable('geo_asset_entries');
-      await m.renameColumn(schema.profileEntries, 'test_url', schema.profileEntries.profileOverride);
-      await m.addColumn(schema.profileEntries, schema.profileEntries.userOverride);
-      await m.addColumn(schema.profileEntries, schema.profileEntries.populatedHeaders);
+      // A database lowered back to v4 can already have profile_override, with or
+      // without test_url beside it (#2078): renaming onto it fails.
+      final hasTestUrl = await _columnExists(table, 'test_url');
+      if (!await _columnExists(table, schema.profileEntries.profileOverride.name)) {
+        if (hasTestUrl) {
+          await m.renameColumn(schema.profileEntries, 'test_url', schema.profileEntries.profileOverride);
+        } else {
+          await m.addColumn(schema.profileEntries, schema.profileEntries.profileOverride);
+        }
+      } else if (hasTestUrl) {
+        await m.dropColumn(schema.profileEntries, 'test_url');
+      }
+      for (final column in [schema.profileEntries.userOverride, schema.profileEntries.populatedHeaders]) {
+        if (!await _columnExists(table, column.name)) await m.addColumn(schema.profileEntries, column);
+      }
 
       await m.createTable(schema.appProxyEntries);
     },

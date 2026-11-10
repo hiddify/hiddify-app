@@ -41,6 +41,38 @@ void main() {
       await verifier.migrateAndValidate(db, db.schemaVersion);
       await db.close();
     });
+
+    // Whichever version an older app lowered it to, every step from there on
+    // must take the newer columns that are already in place.
+    for (final lowered in GeneratedHelper.versions.skip(1)) {
+      test('upgrades a current database lowered to v$lowered', () async {
+        final schema = await verifier.schemaAt(GeneratedHelper.versions.last);
+        schema.rawDatabase.userVersion = lowered;
+        final db = Db(schema.newConnection());
+        await verifier.migrateAndValidate(db, db.schemaVersion);
+        await db.close();
+      });
+    }
+
+    test('upgrades a v4 database that has both test_url and profile_override (#2078)', () async {
+      final schema = await verifier.schemaAt(4);
+      schema.rawDatabase.execute(
+        'ALTER TABLE profile_entries ADD COLUMN profile_override TEXT',
+      );
+      final db = Db(schema.newConnection());
+      await verifier.migrateAndValidate(db, db.schemaVersion);
+      await db.close();
+    });
+
+    test('upgrades a v4 database that has profile_override but no test_url', () async {
+      final schema = await verifier.schemaAt(4);
+      schema.rawDatabase.execute(
+        'ALTER TABLE profile_entries RENAME COLUMN test_url TO profile_override',
+      );
+      final db = Db(schema.newConnection());
+      await verifier.migrateAndValidate(db, db.schemaVersion);
+      await db.close();
+    });
   });
 
   group('simple database migrations', () {
