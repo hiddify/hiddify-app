@@ -28,30 +28,32 @@ import re
 import sys
 import time
 from pathlib import Path
+from urllib.parse import quote
 
-# (OS group, filename, link label) — only rows whose file exists are emitted.
-ASSET_CATALOG: list[tuple[str, str, str]] = [
-    ("Android", "Hiddify-Android-universal.apk", "APK Universal"),
-    ("Android", "Hiddify-Android-arm64.apk", "APK ARMv8"),
-    ("Android", "Hiddify-Android-arm7.apk", "APK ARMv7"),
-    ("Android", "Hiddify-Android-x86_64.apk", "APK x64"),
+# (OS group, filename, link label, badge color, badge logo) — only rows whose file exists
+# are emitted. The label's first word is the badge's left half, the rest its right half.
+ASSET_CATALOG: list[tuple[str, str, str, str, str]] = [
+    ("Android", "Hiddify-Android-universal.apk", "APK Universal", "044d29", "android"),
+    ("Android", "Hiddify-Android-arm64.apk", "APK ARMv8", "168039", "android"),
+    ("Android", "Hiddify-Android-arm7.apk", "APK ARMv7", "45bf55", "android"),
+    ("Android", "Hiddify-Android-x86_64.apk", "APK x64", "96ed89", "android"),
     # Attached by windows-store-sync.yml once the Microsoft Store has signed it.
-    ("Windows", "Hiddify-Windows-Setup-x64.Msix", "MSIX x64"),
-    ("Windows", "Hiddify-Windows-Setup-x64.exe", "Setup x64"),
-    ("Windows", "Hiddify-Windows-Portable-x64.zip", "Portable x64"),
-    ("macOS (v10.15+)", "Hiddify-MacOS.dmg", "DMG Universal"),
-    ("macOS (v10.15+)", "Hiddify-MacOS-Installer.pkg", "PKG Universal"),
-    ("iOS", "Hiddify-iOS.ipa", "IPA iOS"),
-    ("Linux", "Hiddify-Linux-x64-AppImage.AppImage", "AppImage x64"),
-    ("Linux", "Hiddify-Linux-x64-AppImage.tar.gz", "AppImage x64 (tar.gz)"),
-    ("Linux", "Hiddify-Debian-x64.deb", "DebPackage x64"),
-    ("Linux", "Hiddify-rpm-x64.rpm", "RpmPackage x64"),
-    ("Linux", "Hiddify-Linux-x64.tar.gz", "All-in-one x64 (install.sh)"),
-    ("Linux", "Hiddify-Linux-arm64-AppImage.AppImage", "AppImage ARM64"),
-    ("Linux", "Hiddify-Linux-arm64-AppImage.tar.gz", "AppImage ARM64 (tar.gz)"),
-    ("Linux", "Hiddify-Linux-arm64.tar.gz", "All-in-one ARM64 (install.sh)"),
-    ("Linux", "Hiddify-Debian-arm64.deb", "DebPackage ARM64"),
-    ("Linux", "Hiddify-rpm-arm64.rpm", "RpmPackage ARM64"),
+    ("Windows", "Hiddify-Windows-Setup-x64.Msix", "MSIX x64", "0078d7", "windows"),
+    ("Windows", "Hiddify-Windows-Setup-x64.exe", "Setup x64", "2d7d9a", "windows"),
+    ("Windows", "Hiddify-Windows-Portable-x64.zip", "Portable x64", "67b7d1", "windows"),
+    ("macOS (v10.15+)", "Hiddify-MacOS.dmg", "DMG Universal", "ea005e", "apple"),
+    ("macOS (v10.15+)", "Hiddify-MacOS-Installer.pkg", "PKG Universal", "bc544b", "apple"),
+    ("iOS", "Hiddify-iOS.ipa", "IPA iOS", "0a84ff", "apple"),
+    ("Linux", "Hiddify-Linux-x64-AppImage.AppImage", "AppImage x64", "f84e29", "linux"),
+    ("Linux", "Hiddify-Linux-x64-AppImage.tar.gz", "AppImage x64 (tar.gz)", "f84e29", "linux"),
+    ("Linux", "Hiddify-Debian-x64.deb", "DebPackage x64", "FF9966", "debian"),
+    ("Linux", "Hiddify-rpm-x64.rpm", "RpmPackage x64", "F1B42F", "redhat"),
+    ("Linux", "Hiddify-Linux-x64.tar.gz", "All-in-one x64 (install.sh)", "6e7781", "linux"),
+    ("Linux", "Hiddify-Linux-arm64-AppImage.AppImage", "AppImage ARM64", "f84e29", "linux"),
+    ("Linux", "Hiddify-Linux-arm64-AppImage.tar.gz", "AppImage ARM64 (tar.gz)", "f84e29", "linux"),
+    ("Linux", "Hiddify-Linux-arm64.tar.gz", "All-in-one ARM64 (install.sh)", "6e7781", "linux"),
+    ("Linux", "Hiddify-Debian-arm64.deb", "DebPackage ARM64", "FF9966", "debian"),
+    ("Linux", "Hiddify-rpm-arm64.rpm", "RpmPackage ARM64", "F1B42F", "redhat"),
 ]
 
 # Not sent to VirusTotal: it rejects the IPA upload (HTTP 409), and an iOS app cannot
@@ -108,13 +110,32 @@ def downloads_badge_img(tag: str, filename: str, bust: str) -> str:
     return f'<img src="{src}" alt="downloads">'
 
 
+def shield_text(text: str) -> str:
+    """Text for a shields.io static badge path: its own escapes, then URL encoding."""
+    return quote(text.replace("-", "--").replace("_", "__"), safe="")
+
+
+def shield_src(left: str, right: str, color: str, logo: str = "") -> str:
+    src = f"https://img.shields.io/badge/{shield_text(left)}-{shield_text(right)}-{color}"
+    return f"{src}?logo={logo}" if logo else src
+
+
+def download_badge_img(label: str, color: str, logo: str) -> str:
+    left, _, right = label.partition(" ")
+    return f'<img src="{shield_src(left, right, color, logo)}" alt="{label}">'
+
+
 def vt_badge_src(result: dict | None) -> str:
-    """Static badge for a virustotal_report.py result: {"count": n, "total": t} or None."""
+    """Static badge for a virustotal_report.py result: {"count": n, "total": t} or None.
+
+    Fewer than 2 engines is a clean result (one engine alone is routinely a false positive)."""
     if not result or not result.get("total"):
         return "https://img.shields.io/badge/scanning-lightgrey"
     count, total = result["count"], result["total"]
-    color = "brightgreen" if count == 0 else "yellow" if count <= 3 else "red"
-    return f"https://img.shields.io/badge/{count}%2F{total}-{color}"
+    if count < 2:
+        return f"https://img.shields.io/badge/{shield_text(f'✅ Safe: {count}/{total}')}-brightgreen"
+    color = "yellow" if count <= 3 else "red"
+    return f"https://img.shields.io/badge/{shield_text(f'{count}/{total}')}-{color}"
 
 
 def vt_badge_img(sha256: str, src: str) -> str:
@@ -146,21 +167,21 @@ def render_links(tag: str, assets: dict[str, "Path | str"], bust: str, old_body:
 
     old_body: a published body whose VirusTotal badges are kept for unchanged files."""
     rowspan_pending: dict[str, int] = {}
-    for os_name, filename, _ in ASSET_CATALOG:
+    for os_name, filename, *_ in ASSET_CATALOG:
         if find_asset(assets, filename) is None:
             continue
         rowspan_pending[os_name] = rowspan_pending.get(os_name, 0) + 1
 
     rows: list[str] = []
     os_emitted: dict[str, int] = {}
-    for os_name, filename, label in ASSET_CATALOG:
+    for os_name, filename, label, color, logo in ASSET_CATALOG:
         path = find_asset(assets, filename)
         if path is None:
             continue
         digest = path if isinstance(path, str) else sha256_file(path)
         print(f"{filename}: {digest}")
         url = f"https://github.com/{REPO}/releases/download/{tag}/{filename}"
-        download = f'<a href="{url}">{label}</a>'
+        download = f'<a href="{url}">{download_badge_img(label, color, logo)}</a>'
         downloads = f'<a href="{url}">{downloads_badge_img(tag, filename, bust)}</a>'
         if filename in NO_VT_SCAN:
             vt = "-"
@@ -236,7 +257,7 @@ def main() -> int:
         body = notes_path.read_text()
         links = render_links(tag, assets, cache_bust(), old_body=body)
         notes_path.write_text(replace_table(body, links).strip() + "\n")
-        present = sum(1 for _, name, _ in ASSET_CATALOG if find_asset(assets, name))
+        present = sum(1 for _, name, *_ in ASSET_CATALOG if find_asset(assets, name))
         print(f"rewrote download table with {present} rows for tag {tag}")
         return 0
 
@@ -283,7 +304,7 @@ def main() -> int:
         text = text.rstrip() + "\n\n## Downloads\n\n" + wrap_table(links)
 
     notes_path.write_text(text.strip() + "\n")
-    present = sum(1 for _, name, _ in ASSET_CATALOG if find_asset(assets, name))
+    present = sum(1 for _, name, *_ in ASSET_CATALOG if find_asset(assets, name))
     print(f"wrote {present} download rows for tag {tag}")
     return 0
 
