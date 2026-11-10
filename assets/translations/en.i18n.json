@@ -268,7 +268,16 @@
         "copy": "Copy",
         "shareFile": "Share",
         "saveFile": "Save",
-        "tooLargeToCopy": "Too large for the clipboard: share or save it as a file"
+        "tooLargeToCopy": "Too large for the clipboard: share or save it as a file",
+        "toTv": {
+          "button": "Send to TV",
+          "scanHint": "On the TV, open Hiddify and tap + to add a profile, then scan the code it shows. Both devices must be on the same Wi-Fi.",
+          "sent": "Sent. Press Import on the TV to add it.",
+          "notTvCode": "That is not a Hiddify TV code. On the TV, tap + to add a profile to show it.",
+          "expired": "The TV no longer takes links at this code. Open the add profile screen on the TV again and scan the new code.",
+          "busy": "The TV has too many links waiting. Import or discard them on the TV, then try again.",
+          "unreachable": "Couldn't reach the TV. Make sure the phone and TV are on the same Wi-Fi network."
+        }
       },
       "msg": {
         "save": {

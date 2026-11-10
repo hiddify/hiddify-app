@@ -403,7 +403,10 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 // }
 
 class QrCodeScannerDialog extends HookConsumerWidget {
-  const QrCodeScannerDialog({super.key});
+  const QrCodeScannerDialog({super.key, this.hint});
+
+  /// Says which code to scan, under the camera view.
+  final String? hint;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -461,6 +464,25 @@ class QrCodeScannerDialog extends HookConsumerWidget {
                 // }
               },
             ),
+            if (hint case final hint?)
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    hint,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer),
+                  ),
+                ),
+              ),
             Align(
               alignment: AlignmentDirectional.topStart,
               child: Container(

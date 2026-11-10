@@ -10,8 +10,11 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/utils/proxy_secret.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
+import 'package:hiddify/features/profile/add/phone_import/phone_import_notifier.dart';
+import 'package:hiddify/features/profile/add/phone_import/send_to_tv.dart';
 import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
@@ -189,6 +192,10 @@ class ShareProfileDialog extends HookConsumerWidget {
                     child: Icon(Icons.copy_rounded, size: 20, color: s.onSurfaceVariant),
                   ),
                 ),
+                if (_canSendToTv && ref.watch(isAndroidTvProvider).valueOrNull == false) ...[
+                  const Gap(8),
+                  _SendToTv(link),
+                ],
               ],
               if (qrConfig != null) ...[
                 const Gap(20),
@@ -250,11 +257,64 @@ class ShareProfileDialog extends HookConsumerWidget {
     );
   }
 
+  /// Phones only: they have the camera to scan the TV's code.
+  static bool get _canSendToTv => Platform.isAndroid || Platform.isIOS;
+
   static String _formatSize(int bytes) => switch (bytes) {
     < 1024 => '$bytes B',
     < 1024 * 1024 => '${(bytes / 1024).toStringAsFixed(1)} KB',
     _ => '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB',
   };
+}
+
+/// Sends [link] to Hiddify on a TV on the same network: scans the code the TV shows in its add
+/// profile sheet, then sends the link to it, where the TV user imports it.
+class _SendToTv extends HookConsumerWidget {
+  const _SendToTv(this.link);
+
+  final String link;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final text = t.pages.profiles.share.toTv;
+    final sending = useState(false);
+
+    Future<void> send() async {
+      if (sending.value) return;
+      final scanned = await ref.read(dialogNotifierProvider.notifier).showQrScanner(hint: text.scanHint);
+      if (scanned == null || !context.mounted) return;
+      sending.value = true;
+      final result = await sendLinkToTv(scanned, link);
+      if (!context.mounted) return;
+      sending.value = false;
+      final notifications = ref.read(inAppNotificationControllerProvider);
+      switch (result) {
+        case SendToTvResult.sent:
+          notifications.showSuccessToast(text.sent);
+        case SendToTvResult.notTvCode:
+          notifications.showErrorToast(text.notTvCode);
+        case SendToTvResult.expired:
+          notifications.showErrorToast(text.expired);
+        case SendToTvResult.busy:
+          notifications.showErrorToast(text.busy);
+        case SendToTvResult.unreachable:
+          notifications.showErrorToast(text.unreachable);
+      }
+    }
+
+    return FilledButton.tonalIcon(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size.fromHeight(48),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      onPressed: sending.value ? null : send,
+      icon: sending.value
+          ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+          : const Icon(Icons.tv_rounded),
+      label: Text(text.button),
+    );
+  }
 }
 
 /// The configuration's actions, side by side: copy (when it fits the clipboard), share (where the

@@ -58,8 +58,9 @@ class DialogNotifier extends _$DialogNotifier {
     });
   }
 
-  Future<String?> showQrScanner() async {
-    return await _show<String?>(const QrCodeScannerDialog());
+  /// [hint] says which code to scan.
+  Future<String?> showQrScanner({String? hint}) async {
+    return await _show<String?>(QrCodeScannerDialog(hint: hint));
   }
 
   Future<void> showCrashReport() async {
