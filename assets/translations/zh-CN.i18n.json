@@ -575,7 +575,8 @@
         "shortServiceModes": {
           "proxy": "代理",
           "systemProxy": "系统代理",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "路由器"
         },
         "strictRoute": "严格路由",
         "tunImplementation": "TUN 实现",
@@ -629,6 +630,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "关闭",
+          "extraSecurity": {
+            "title": "额外安全",
+            "subtitle": "当您不信任代理时",
+            "ipBy": "您的 IP 由 $mode 决定",
+            "notTracked": "您的 VPN 提供商无法看到您的流量",
+            "forPublic": "适合公共和匿名代理",
+            "slower": "可能降低速度"
+          },
+          "unblocker": {
+            "title": "代理解锁器",
+            "subtitle": "让代理绕过过滤",
+            "mayConnect": "被过滤的代理可能可以连接",
+            "personalOnly": "仅对个人代理有用",
+            "notForPublic": "不适合公共代理",
+            "slower": "代理会稍微变慢"
+          }
+        },
         "title": "链",
         "subtitle": "额外安全与解锁器",
         "finalIp": "最终 IP",

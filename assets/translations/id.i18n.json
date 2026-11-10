@@ -575,7 +575,8 @@
         "shortServiceModes": {
           "proxy": "Proxy",
           "systemProxy": "Proxy sistem",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Router"
         },
         "strictRoute": "Rute ketat",
         "tunImplementation": "Implementasi TUN",
@@ -629,6 +630,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "Mati",
+          "extraSecurity": {
+            "title": "Keamanan tambahan",
+            "subtitle": "Saat Anda tidak memercayai proxy",
+            "ipBy": "IP Anda ditentukan oleh $mode",
+            "notTracked": "Penyedia VPN Anda tidak dapat melihat lalu lintas Anda",
+            "forPublic": "Cocok untuk proxy publik dan anonim",
+            "slower": "Dapat mengurangi kecepatan"
+          },
+          "unblocker": {
+            "title": "Pembuka blokir proxy",
+            "subtitle": "Membantu proxy melewati penyaringan",
+            "mayConnect": "Proxy yang difilter mungkin bisa terhubung",
+            "personalOnly": "Hanya berguna untuk proxy pribadi",
+            "notForPublic": "Tidak cocok untuk proxy publik",
+            "slower": "Proxy menjadi sedikit lebih lambat"
+          }
+        },
         "title": "Rantai",
         "subtitle": "Keamanan tambahan & pembuka blokir",
         "finalIp": "IP akhir",
