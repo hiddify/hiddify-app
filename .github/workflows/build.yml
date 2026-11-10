@@ -914,3 +914,34 @@ jobs:
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
+  # Only the newest ios-build/<version>/<build> tag matters: the next iOS build of a new version
+  # starts from pubspec's number, and one of this version needs only the highest. After every
+  # upload run (draft or release) keep that tag and remove the rest. Runs after
+  # upload-to-testflight, so the number this run recorded is the one kept.
+  prune-ios-build-tags:
+    needs: [upload-to-testflight]
+    if: ${{ !cancelled() && inputs.upload-artifact }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Keep only the newest ios-build tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # "<version> <build>" per tag, highest version then highest build last
+          tags="$(gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/ios-build/" --jq '.[].ref' \
+            | sed -n 's|^refs/tags/ios-build/\([0-9][0-9.]*\)/\([0-9][0-9]*\)$|\1 \2|p' \
+            | sort -t' ' -k1,1V -k2,2n)"
+          if [ -z "$tags" ]; then
+            echo "No ios-build tags."
+            exit 0
+          fi
+          keep="$(tail -n 1 <<< "$tags")"
+          echo "Keeping ios-build/${keep% *}/${keep#* }"
+          head -n -1 <<< "$tags" | while read -r version build; do
+            gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/tags/ios-build/$version/$build" >/dev/null
+            echo "Removed ios-build/$version/$build"
+          done
