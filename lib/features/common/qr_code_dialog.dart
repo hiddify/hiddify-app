@@ -141,24 +141,21 @@ class ShareProfileDialog extends HookConsumerWidget {
       }
     }, [config.data]);
 
+    // Smaller on short phones, so the whole dialog fits without scrolling.
+    final qrSize = (MediaQuery.sizeOf(context).height * 0.28).clamp(160.0, QrCodeDialogConst.qrBoxSize);
+    final json = config.data;
+
     return Dialog(
       child: SizedBox(
         width: 380,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 12),
+          padding: const EdgeInsetsDirectional.fromSTEB(24, 16, 8, 20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(color: s.primaryContainer, borderRadius: BorderRadius.circular(14)),
-                    child: Icon(Icons.ios_share_rounded, color: s.onPrimaryContainer),
-                  ),
-                  const Gap(14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,83 +168,117 @@ class ShareProfileDialog extends HookConsumerWidget {
                       ],
                     ),
                   ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: MaterialLocalizations.of(context).closeButtonLabel,
+                    icon: const Icon(Icons.close_rounded),
+                  ),
                 ],
               ),
-              if (link != null) ...[
-                const Gap(20),
-                Center(child: _QrCode(link)),
-                const Gap(10),
-                Text(
-                  share.scanHint,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
-                ),
-                const Gap(14),
-                _CopyTile(
-                  label: share.link,
-                  value: _Value(link),
-                  copyText: link,
-                  action: Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 8, end: 10),
-                    child: Icon(Icons.copy_rounded, size: 20, color: s.onSurfaceVariant),
-                  ),
-                ),
-                if (_canSendToTv && ref.watch(isAndroidTvProvider).valueOrNull == false) ...[
-                  const Gap(8),
-                  _SendToTv(link),
-                ],
-              ],
-              if (qrConfig != null) ...[
-                const Gap(20),
-                Center(child: _QrCode(qrConfig)),
-                const Gap(10),
-                Text(
-                  share.scanHint,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
-                ),
-              ],
-              const Gap(22),
-              Row(
-                children: [
-                  Icon(Icons.data_object_rounded, size: 18, color: s.primary),
-                  const Gap(8),
-                  Expanded(child: Text(share.config, style: theme.textTheme.titleSmall)),
-                  if (config.data case final json?)
-                    Text(
-                      _formatSize(utf8.encode(json).length),
-                      textDirection: TextDirection.ltr,
-                      style: theme.textTheme.labelMedium?.copyWith(color: s.onSurfaceVariant),
+              Padding(
+                // The outer end padding is smaller so the close button sits near the corner.
+                padding: const EdgeInsetsDirectional.only(end: 12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (link != null) ...[
+                      const Gap(12),
+                      Center(child: _QrCode(link, size: qrSize)),
+                      const Gap(8),
+                      Text(
+                        share.scanHint,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                      ),
+                      const Gap(12),
+                      _CopyTile(
+                        label: share.link,
+                        value: _Value(link),
+                        copyText: link,
+                        action: Padding(
+                          padding: const EdgeInsetsDirectional.only(start: 8, end: 10),
+                          child: Icon(Icons.copy_rounded, size: 20, color: s.onSurfaceVariant),
+                        ),
+                      ),
+                      if (_canSendToTv && ref.watch(isAndroidTvProvider).valueOrNull == false) ...[
+                        const Gap(8),
+                        _SendToTv(link),
+                      ],
+                    ],
+                    if (qrConfig != null) ...[
+                      const Gap(12),
+                      Center(child: _QrCode(qrConfig, size: qrSize)),
+                      const Gap(8),
+                      Text(
+                        share.scanHint,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                      ),
+                    ],
+                    const Gap(16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                share.config,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleSmall,
+                              ),
+                              if (json != null)
+                                Text(
+                                  _formatSize(utf8.encode(json).length),
+                                  textDirection: TextDirection.ltr,
+                                  style: theme.textTheme.labelSmall?.copyWith(color: s.onSurfaceVariant),
+                                ),
+                            ],
+                          ),
+                        ),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: switch (config) {
+                            AsyncSnapshot(hasError: true) => const SizedBox.shrink(),
+                            AsyncSnapshot(:final data?) => _ConfigActions(json: data, name: name),
+                            _ => const SizedBox.square(
+                              dimension: 40,
+                              child: Padding(
+                                padding: EdgeInsets.all(10),
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ),
+                          },
+                        ),
+                      ],
                     ),
-                ],
-              ),
-              const Gap(4),
-              Text(
-                configHint ?? share.configHint,
-                style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
-              ),
-              const Gap(12),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                alignment: AlignmentDirectional.topCenter,
-                child: switch (config) {
-                  AsyncSnapshot(hasError: true) => Text(
-                    share.configFailed,
-                    style: theme.textTheme.bodyMedium?.copyWith(color: s.error),
-                  ),
-                  AsyncSnapshot(:final data?) => _ConfigActions(json: data, name: name),
-                  _ => const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 30),
-                    child: LinearProgressIndicator(borderRadius: BorderRadius.all(Radius.circular(4))),
-                  ),
-                },
-              ),
-              const Gap(8),
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+                    const Gap(4),
+                    Text(
+                      configHint ?? share.configHint,
+                      style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                    ),
+                    if (config.hasError) ...[
+                      const Gap(8),
+                      Text(share.configFailed, style: theme.textTheme.bodyMedium?.copyWith(color: s.error)),
+                    ],
+                    if (json != null && json.length > maxClipboardChars) ...[
+                      const Gap(8),
+                      Row(
+                        children: [
+                          Icon(Icons.info_outline_rounded, size: 16, color: s.onSurfaceVariant),
+                          const Gap(6),
+                          Expanded(
+                            child: Text(
+                              share.tooLargeToCopy,
+                              style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
@@ -305,8 +336,8 @@ class _SendToTv extends HookConsumerWidget {
 
     return FilledButton.tonalIcon(
       style: FilledButton.styleFrom(
-        minimumSize: const Size.fromHeight(48),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        minimumSize: const Size.fromHeight(40),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       onPressed: sending.value ? null : send,
       icon: sending.value
@@ -317,8 +348,8 @@ class _SendToTv extends HookConsumerWidget {
   }
 }
 
-/// The configuration's actions, side by side: copy (when it fits the clipboard), share (where the
-/// platform has a share sheet for files) and save.
+/// The configuration's actions as icon buttons, side by side: copy (when it fits the clipboard),
+/// share (where the platform has a share sheet for files) and save.
 class _ConfigActions extends HookConsumerWidget {
   const _ConfigActions({required this.json, required this.name});
 
@@ -337,7 +368,6 @@ class _ConfigActions extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider).requireValue;
     final share = t.pages.profiles.share;
-    final theme = Theme.of(context);
     final copied = _useCopiedFlag();
     final fits = json.length <= ShareProfileDialog.maxClipboardChars;
     final notifications = ref.read(inAppNotificationControllerProvider);
@@ -377,90 +407,37 @@ class _ConfigActions extends HookConsumerWidget {
       }
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            if (fits) ...[
-              Expanded(
-                child: _ActionTile(
-                  icon: copied.value ? Icons.check_rounded : Icons.content_copy_rounded,
-                  label: _CopiedSwap(label: share.copy, copied: copied.value, alignment: Alignment.center),
-                  onTap: copy,
-                ),
+        if (fits)
+          IconButton.filledTonal(
+            visualDensity: VisualDensity.compact,
+            onPressed: copy,
+            tooltip: copied.value ? t.dialogs.qrCode.copied : share.copy,
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                copied.value ? Icons.check_rounded : Icons.content_copy_rounded,
+                key: ValueKey(copied.value),
+                size: 20,
               ),
-              const Gap(8),
-            ],
-            if (_canShareFiles) ...[
-              Expanded(
-                child: _ActionTile(icon: Icons.share_rounded, label: Text(share.shareFile), onTap: shareFile),
-              ),
-              const Gap(8),
-            ],
-            Expanded(
-              child: _ActionTile(icon: Icons.save_alt_rounded, label: Text(share.saveFile), onTap: save),
             ),
-          ],
-        ),
-        if (!fits) ...[
-          const Gap(10),
-          Row(
-            children: [
-              Icon(Icons.info_outline_rounded, size: 16, color: theme.colorScheme.onSurfaceVariant),
-              const Gap(6),
-              Expanded(
-                child: Text(
-                  share.tooLargeToCopy,
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                ),
-              ),
-            ],
           ),
-        ],
+        if (_canShareFiles)
+          IconButton.filledTonal(
+            visualDensity: VisualDensity.compact,
+            onPressed: shareFile,
+            tooltip: share.shareFile,
+            icon: const Icon(Icons.share_rounded, size: 20),
+          ),
+        IconButton.filledTonal(
+          visualDensity: VisualDensity.compact,
+          onPressed: save,
+          tooltip: share.saveFile,
+          icon: const Icon(Icons.save_alt_rounded, size: 20),
+        ),
       ],
-    );
-  }
-}
-
-/// A tonal square for one action: its icon over its label.
-class _ActionTile extends StatelessWidget {
-  const _ActionTile({required this.icon, required this.label, required this.onTap});
-
-  final IconData icon;
-  final Widget label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final s = theme.colorScheme;
-    return Material(
-      color: s.secondaryContainer,
-      borderRadius: BorderRadius.circular(16),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 6),
-          child: Column(
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: Icon(icon, key: ValueKey(icon), color: s.onSecondaryContainer),
-              ),
-              const Gap(6),
-              DefaultTextStyle.merge(
-                style: theme.textTheme.labelLarge?.copyWith(color: s.onSecondaryContainer),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                child: label,
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -1047,9 +1024,10 @@ Future<InternetAddress?> _findLanIp(WidgetRef ref) async {
 }
 
 class _QrCode extends StatelessWidget {
-  const _QrCode(this.data);
+  const _QrCode(this.data, {this.size = QrCodeDialogConst.qrBoxSize});
 
   final String data;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
@@ -1058,8 +1036,8 @@ class _QrCode extends StatelessWidget {
     final colors = ColorScheme.fromSeed(seedColor: Theme.of(context).colorScheme.primary);
 
     return Container(
-      width: QrCodeDialogConst.qrBoxSize,
-      height: QrCodeDialogConst.qrBoxSize,
+      width: size,
+      height: size,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
       child: Stack(
