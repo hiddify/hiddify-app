@@ -1,25 +1,21 @@
 name: iOS next build number
 description: >
-  The build number for the next TestFlight upload of a version: one more than the highest build App
-  Store Connect has for it, and never less than the given base. Signs in with an Apple ID and an
-  app-specific password (Transporter), no App Store Connect API key. macOS runners only.
+  The build number for the next TestFlight upload of a version: one more than the highest build
+  recorded for it, and never less than the given base. The TestFlight upload job records every
+  number App Store Connect took as a tag ios-build/<version>/<build>, so no App Store Connect
+  sign-in is needed: with an Apple ID, neither altool (its --build-status takes only an upload's
+  delivery ID) nor the GitHub runners (no Transporter app) can list a version's builds.
 
 inputs:
-  bundle-id:
-    description: The app's bundle ID.
-    required: true
   version:
     description: The version (CFBundleShortVersionString), without a pre-release suffix.
     required: true
   base:
     description: The lowest build number to use, normally pubspec's.
     required: true
-  apple-id:
-    description: Apple ID (email) with access to the app in App Store Connect.
-    required: true
-  app-password:
-    description: App-specific password of that Apple ID.
-    required: true
+  token:
+    description: Token that can read the repository's tags.
+    default: ${{ github.token }}
 
 outputs:
   build:
@@ -32,11 +28,20 @@ runs:
     - id: next
       shell: bash
       env:
-        APPLE_UPLOAD_APPLE_ID: ${{ inputs.apple-id }}
-        APPLE_UPLOAD_APP_PASSWORD: ${{ inputs.app-password }}
-        NEXT_BUILD_RAW_OUTPUT: ${{ runner.temp }}/transporter-status-all.txt
+        GH_TOKEN: ${{ inputs.token }}
+        VERSION: ${{ inputs.version }}
+        BASE: ${{ inputs.base }}
       run: |
         set -euo pipefail
-        build="$(python3 "$GITHUB_ACTION_PATH/next_build_number.py" "${{ inputs.bundle-id }}" "${{ inputs.version }}" "${{ inputs.base }}")"
+        [[ "$BASE" =~ ^[0-9]+$ ]] || { echo "::error::base '$BASE' is not a whole number"; exit 1; }
+        # matching-refs returns [] when there is no tag yet; an API error fails the step.
+        taken="$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/ios-build/$VERSION/" --jq '.[].ref' \
+          | sed -n "s|^refs/tags/ios-build/$VERSION/\([0-9][0-9]*\)$|\1|p" | sort -n)"
+        highest="$(tail -n 1 <<< "$taken")"
+        build="$BASE"
+        if [ -n "$highest" ] && [ $((highest + 1)) -gt "$build" ]; then
+          build=$((highest + 1))
+        fi
+        recorded="$(echo $taken | tr ' ' ',')"
+        echo "$VERSION: recorded builds ${recorded:-none} (base $BASE), next $build"
         echo "build=$build" >> "$GITHUB_OUTPUT"
-        echo "Next build number of ${{ inputs.version }}: $build"

@@ -305,15 +305,13 @@ jobs:
 
 
       # App Store Connect takes each build number of a version once, so a rebuild of the same version
-      # (a draft, a rerun) cannot reuse pubspec's. It gets one more than the highest build already
-      # uploaded for this version: a whole number one higher lets TestFlight give it to external
-      # testers without another review. The packet tunnel must carry the app's number.
+      # (a draft, a rerun) cannot reuse pubspec's. It gets one more than the highest build recorded
+      # for this version (the ios-build/<version>/<build> tags upload-to-testflight pushes): a whole
+      # number one higher lets TestFlight give it to external testers without another review. The
+      # packet tunnel must carry the app's number.
       - name: Read the iOS version
         id: ios-version
         if: matrix.platform == 'ios' && inputs.upload-artifact
-        env:
-          APPLE_UPLOAD_APPLE_ID: ${{ secrets.APPLE_UPLOAD_APPLE_ID }}
-          APPLE_UPLOAD_APP_PASSWORD: ${{ secrets.APPLE_UPLOAD_APP_PASSWORD }}
         run: |
           set -euo pipefail
           name="$(sed -n 's/^version: *\([^+ ]*\)+[0-9][0-9]* *$/\1/p' pubspec.yaml)"
@@ -322,29 +320,19 @@ jobs:
           # App Store Connect knows the version without a pre-release suffix (5.5.6, not 5.5.6.dev).
           echo "version=${name%%[-.][a-z]*}" >> "$GITHUB_OUTPUT"
           echo "base=$base" >> "$GITHUB_OUTPUT"
-          echo "bundle-id=$(sed -n 's/^BASE_BUNDLE_IDENTIFIER *= *//p' ios/Base.xcconfig)" >> "$GITHUB_OUTPUT"
-          if [ -z "$APPLE_UPLOAD_APPLE_ID" ] || [ -z "$APPLE_UPLOAD_APP_PASSWORD" ]; then
-            echo "::warning::No APPLE_UPLOAD_APPLE_ID / APPLE_UPLOAD_APP_PASSWORD: keeping pubspec's build number $base, which TestFlight rejects if it was uploaded already."
-            echo "signed-in=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "signed-in=true" >> "$GITHUB_OUTPUT"
-          fi
 
       - name: Find the next iOS build number
         id: ios-next
-        if: steps.ios-version.outputs.signed-in == 'true'
+        if: matrix.platform == 'ios' && inputs.upload-artifact
         uses: ./.github/actions/ios-next-build-number
         with:
-          bundle-id: ${{ steps.ios-version.outputs.bundle-id }}
           version: ${{ steps.ios-version.outputs.version }}
           base: ${{ steps.ios-version.outputs.base }}
-          apple-id: ${{ secrets.APPLE_UPLOAD_APPLE_ID }}
-          app-password: ${{ secrets.APPLE_UPLOAD_APP_PASSWORD }}
 
       - name: Give the iOS build the next build number
         if: matrix.platform == 'ios' && inputs.upload-artifact
         env:
-          BUILD: ${{ steps.ios-next.outputs.build || steps.ios-version.outputs.base }}
+          BUILD: ${{ steps.ios-next.outputs.build }}
         run: |
           set -euo pipefail
           build="$BUILD"
@@ -822,7 +810,8 @@ jobs:
     needs: [build]
     permissions:
       actions: read
-      contents: read
+      # Pushes the ios-build/<version>/<build> tags that record the build numbers App Store Connect took.
+      contents: write
     if: ${{ inputs.upload-artifact }}
     runs-on: macos-26
     timeout-minutes: 60
@@ -867,10 +856,14 @@ jobs:
           fi
 
       - name: Upload iOS IPA to TestFlight (Apple ID)
+        id: ios-upload-apple-id
         if: steps.ios.outputs.present == 'true' && env.UPLOAD_AUTH == 'apple-id'
-        run: bash .github/scripts/upload_testflight.sh ios out/Hiddify-iOS.ipa
+        run: |
+          set -o pipefail
+          bash .github/scripts/upload_testflight.sh ios out/Hiddify-iOS.ipa 2>&1 | tee "$RUNNER_TEMP/ios-upload.log"
 
       - name: Upload iOS IPA to TestFlight (API key)
+        id: ios-upload-api-key
         if: steps.ios.outputs.present == 'true' && env.UPLOAD_AUTH == 'api-key'
         uses: Apple-Actions/upload-testflight-build@v5
         with:
@@ -879,6 +872,35 @@ jobs:
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
+      # The next build of this version takes one more than the highest of these tags. A number App
+      # Store Connect refused as already uploaded (a build sent some other way) is recorded too, so
+      # the next run moves past it.
+      - name: Record the iOS build number
+        if: >-
+          !cancelled() && steps.ios.outputs.present == 'true' &&
+          (steps.ios-upload-apple-id.outcome == 'success' || steps.ios-upload-api-key.outcome == 'success' ||
+           steps.ios-upload-apple-id.outcome == 'failure')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UPLOADED: ${{ steps.ios-upload-apple-id.outcome == 'success' || steps.ios-upload-api-key.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          if [ "$UPLOADED" != "true" ] && ! grep -qiE "ITMS-4238|Redundant Binary Upload|already uploaded a build" "$RUNNER_TEMP/ios-upload.log" 2>/dev/null; then
+            echo "The upload failed for another reason; nothing to record."
+            exit 0
+          fi
+          unzip -p out/Hiddify-iOS.ipa 'Payload/*.app/Info.plist' > "$RUNNER_TEMP/Info.plist"
+          version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$RUNNER_TEMP/Info.plist")"
+          build="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$RUNNER_TEMP/Info.plist")"
+          tag="ios-build/$version/$build"
+          if gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA" >/dev/null 2>"$RUNNER_TEMP/tag.err"; then
+            echo "Recorded $tag"
+          elif grep -q "Reference already exists" "$RUNNER_TEMP/tag.err"; then
+            echo "$tag was recorded already"
+          else
+            cat "$RUNNER_TEMP/tag.err"; exit 1
+          fi
 
       - name: Download macOS App Store artifact
         continue-on-error: true

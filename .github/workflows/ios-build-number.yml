@@ -1,6 +1,5 @@
-# Shows the build number the next TestFlight upload of the iOS app gets, and the uploads App Store
-# Connect has, without building anything. Signs in with APPLE_UPLOAD_APPLE_ID and
-# APPLE_UPLOAD_APP_PASSWORD, the same Apple ID as the TestFlight upload.
+# Shows the build number the next TestFlight upload of the iOS app gets, from the
+# ios-build/<version>/<build> tags the TestFlight upload records, without building anything.
 name: iOS next build number
 
 on:
@@ -16,7 +15,7 @@ permissions:
 
 jobs:
   next-build-number:
-    runs-on: macos-26
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
@@ -27,10 +26,8 @@ jobs:
           set -euo pipefail
           name="$(sed -n 's/^version: *\([^+ ]*\)+[0-9][0-9]* *$/\1/p' pubspec.yaml)"
           base="$(sed -n 's/^version: *[^+]*+\([0-9][0-9]*\) *$/\1/p' pubspec.yaml)"
-          version="${INPUT_VERSION:-${name%%[-.][a-z]*}}"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "version=${INPUT_VERSION:-${name%%[-.][a-z]*}}" >> "$GITHUB_OUTPUT"
           echo "base=$base" >> "$GITHUB_OUTPUT"
-          echo "bundle-id=$(sed -n 's/^BASE_BUNDLE_IDENTIFIER *= *//p' ios/Base.xcconfig)" >> "$GITHUB_OUTPUT"
         env:
           INPUT_VERSION: ${{ inputs.version }}
 
@@ -38,23 +35,9 @@ jobs:
         id: next
         uses: ./.github/actions/ios-next-build-number
         with:
-          bundle-id: ${{ steps.pubspec.outputs.bundle-id }}
           version: ${{ steps.pubspec.outputs.version }}
           base: ${{ steps.pubspec.outputs.base }}
-          apple-id: ${{ secrets.APPLE_UPLOAD_APPLE_ID }}
-          app-password: ${{ secrets.APPLE_UPLOAD_APP_PASSWORD }}
 
       - name: Summary
         run: |
           echo "### iOS ${{ steps.pubspec.outputs.version }}: next build number ${{ steps.next.outputs.build }}" >> "$GITHUB_STEP_SUMMARY"
-
-      # Transporter's reply lists versions, build numbers and upload states, nothing secret; kept so
-      # the parser can be checked against it.
-      - name: Keep Transporter's reply
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: transporter-status-all
-          path: ${{ runner.temp }}/transporter-status-all.txt
-          if-no-files-found: ignore
-          retention-days: 7
