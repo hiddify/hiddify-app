@@ -102,6 +102,10 @@ class AddProfileOptions extends HookConsumerWidget {
     final isTv = ref.watch(isAndroidTvProvider).valueOrNull ?? false;
     // a TV has no camera to scan with, so it has the desktop's three buttons
     final threeButtons = PlatformUtils.isDesktop || isTv;
+    // A TV screen in landscape has room for the buttons and one panel below them: with the phone
+    // panel too, the free list got no height at all. So the free list takes the phone panel's
+    // place while it is on; the sheet keeps serving the phone page meanwhile.
+    final showPhonePanel = isTv && !freeSwitch;
     final isDesktop = PlatformUtils.isDesktop;
     final gapCount = threeButtons ? AddProfileModalConst.fixBtnsGapCountDesktop : AddProfileModalConst.fixBtnsGapCount;
     final itemCount = threeButtons
@@ -110,7 +114,7 @@ class AddProfileOptions extends HookConsumerWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final fixBtnsHeight = (constraints.maxWidth - AddProfileModalConst.fixBtnsGap * gapCount) / itemCount;
-        final phoneHeight = isTv ? PhoneImportPanel.heightOf(context) + AddProfileModalConst.fixBtnsGap : 0;
+        final phoneHeight = showPhonePanel ? PhoneImportPanel.heightOf(context) + AddProfileModalConst.fixBtnsGap : 0;
         final fullHeight = fixBtnsHeight + phoneHeight + AddProfileModalConst.navBarHeight + 32;
         final initial = !freeSwitch ? fullHeight : fullHeight + 180;
         var min = !freeSwitch ? fullHeight : fullHeight + 100;
@@ -135,7 +139,7 @@ class AddProfileOptions extends HookConsumerWidget {
             children: [
               const Gap(AddProfileModalConst.fixBtnsGap),
               FixBtns(height: fixBtnsHeight, canScan: !isTv),
-              if (isTv) ...[const Gap(AddProfileModalConst.fixBtnsGap), const PhoneImportPanel()],
+              if (showPhonePanel) ...[const Gap(AddProfileModalConst.fixBtnsGap), const PhoneImportPanel()],
               if (freeSwitch) Expanded(child: FreeBtns(scrollController: scrollController)) else const Spacer(),
               const NavBar(),
             ],
