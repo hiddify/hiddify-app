@@ -1,0 +1,42 @@
+name: iOS next build number
+description: >
+  The build number for the next TestFlight upload of a version: one more than the highest build App
+  Store Connect has for it, and never less than the given base. Signs in with an Apple ID and an
+  app-specific password (Transporter), no App Store Connect API key. macOS runners only.
+
+inputs:
+  bundle-id:
+    description: The app's bundle ID.
+    required: true
+  version:
+    description: The version (CFBundleShortVersionString), without a pre-release suffix.
+    required: true
+  base:
+    description: The lowest build number to use, normally pubspec's.
+    required: true
+  apple-id:
+    description: Apple ID (email) with access to the app in App Store Connect.
+    required: true
+  app-password:
+    description: App-specific password of that Apple ID.
+    required: true
+
+outputs:
+  build:
+    description: The next build number.
+    value: ${{ steps.next.outputs.build }}
+
+runs:
+  using: composite
+  steps:
+    - id: next
+      shell: bash
+      env:
+        APPLE_UPLOAD_APPLE_ID: ${{ inputs.apple-id }}
+        APPLE_UPLOAD_APP_PASSWORD: ${{ inputs.app-password }}
+        NEXT_BUILD_RAW_OUTPUT: ${{ runner.temp }}/transporter-status-all.txt
+      run: |
+        set -euo pipefail
+        build="$(python3 "$GITHUB_ACTION_PATH/next_build_number.py" "${{ inputs.bundle-id }}" "${{ inputs.version }}" "${{ inputs.base }}")"
+        echo "build=$build" >> "$GITHUB_OUTPUT"
+        echo "Next build number of ${{ inputs.version }}: $build"

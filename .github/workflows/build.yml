@@ -308,7 +308,8 @@ jobs:
       # (a draft, a rerun) cannot reuse pubspec's. It gets one more than the highest build already
       # uploaded for this version: a whole number one higher lets TestFlight give it to external
       # testers without another review. The packet tunnel must carry the app's number.
-      - name: Give the iOS build the next build number
+      - name: Read the iOS version
+        id: ios-version
         if: matrix.platform == 'ios' && inputs.upload-artifact
         env:
           APPLE_UPLOAD_APPLE_ID: ${{ secrets.APPLE_UPLOAD_APPLE_ID }}
@@ -319,14 +320,34 @@ jobs:
           base="$(sed -n 's/^version: *[^+]*+\([0-9][0-9]*\) *$/\1/p' pubspec.yaml)"
           test -n "$name" && test -n "$base"
           # App Store Connect knows the version without a pre-release suffix (5.5.6, not 5.5.6.dev).
-          version="${name%%[-.][a-z]*}"
-          bundle_id="$(sed -n 's/^BASE_BUNDLE_IDENTIFIER *= *//p' ios/Base.xcconfig)"
+          echo "version=${name%%[-.][a-z]*}" >> "$GITHUB_OUTPUT"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "bundle-id=$(sed -n 's/^BASE_BUNDLE_IDENTIFIER *= *//p' ios/Base.xcconfig)" >> "$GITHUB_OUTPUT"
           if [ -z "$APPLE_UPLOAD_APPLE_ID" ] || [ -z "$APPLE_UPLOAD_APP_PASSWORD" ]; then
             echo "::warning::No APPLE_UPLOAD_APPLE_ID / APPLE_UPLOAD_APP_PASSWORD: keeping pubspec's build number $base, which TestFlight rejects if it was uploaded already."
-            build="$base"
+            echo "signed-in=false" >> "$GITHUB_OUTPUT"
           else
-            build="$(python3 .github/scripts/next_ios_build_number.py "$bundle_id" "$version" "$base")"
+            echo "signed-in=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Find the next iOS build number
+        id: ios-next
+        if: steps.ios-version.outputs.signed-in == 'true'
+        uses: ./.github/actions/ios-next-build-number
+        with:
+          bundle-id: ${{ steps.ios-version.outputs.bundle-id }}
+          version: ${{ steps.ios-version.outputs.version }}
+          base: ${{ steps.ios-version.outputs.base }}
+          apple-id: ${{ secrets.APPLE_UPLOAD_APPLE_ID }}
+          app-password: ${{ secrets.APPLE_UPLOAD_APP_PASSWORD }}
+
+      - name: Give the iOS build the next build number
+        if: matrix.platform == 'ios' && inputs.upload-artifact
+        env:
+          BUILD: ${{ steps.ios-next.outputs.build || steps.ios-version.outputs.base }}
+        run: |
+          set -euo pipefail
+          build="$BUILD"
           perl -pi -e "s/^(version: *[^+]+)\+\d+ *\$/\${1}+$build/" pubspec.yaml
           perl -pi -e "s/CURRENT_PROJECT_VERSION = \d+;/CURRENT_PROJECT_VERSION = $build;/" ios/Runner.xcodeproj/project.pbxproj
           grep -n '^version:' pubspec.yaml
