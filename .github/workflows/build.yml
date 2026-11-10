@@ -637,7 +637,10 @@ jobs:
     # Always refresh the moving `draft` tag/release to this build's commit and assets.
     # On versioned tags this runs after upload-release so the two softprops jobs
     # never create releases / upload assets with the same token concurrently.
-    if: ${{ !cancelled() && inputs.upload-artifact && needs.build.result == 'success' && (needs.upload-release.result == 'success' || needs.upload-release.result == 'skipped') }}
+    # A failed platform build does not block it: the draft gets whatever the other
+    # platforms built (the "Check there is something to publish" step stops it when
+    # no build produced anything, so the old draft is not replaced by an empty one).
+    if: ${{ !cancelled() && inputs.upload-artifact && needs.build.result != 'skipped' && (needs.upload-release.result == 'success' || needs.upload-release.result == 'skipped') }}
     needs: [build, linux-bundle, upload-release]
     runs-on: ubuntu-latest
     permissions:
@@ -658,6 +661,16 @@ jobs:
       # The App Store build goes to TestFlight only: a user cannot install it from a download
       - name: Leave out the Mac App Store build
         run: rm -fv out/Hiddify-MacOS-AppStore.*
+
+      - name: Check there is something to publish
+        run: |
+          if [ -z "$(ls -A ./out 2>/dev/null)" ]; then
+            echo "::error::No build produced any artifact; keeping the previous draft release."
+            exit 1
+          fi
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "::warning::Some platform builds failed; the draft release only has the platforms that built."
+          fi
 
       - name: Display Files Structure
         run: ls -R
@@ -699,7 +712,7 @@ jobs:
           fail_on_unmatched_files: false
 
   virustotal-draft:
-    if: ${{ inputs.upload-artifact }}
+    if: ${{ !cancelled() && inputs.upload-artifact && needs.update-draft.result == 'success' }}
     needs: [update-draft]
     uses: ./.github/workflows/virustotal_scan.yml
     secrets: inherit
