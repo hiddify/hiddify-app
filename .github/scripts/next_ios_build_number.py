@@ -2,121 +2,98 @@
 """Print the build number for the next iOS upload of a version.
 
 TestFlight lets a later build of a version that is already approved reach external testers without
-waiting for review again, so every upload of a version gets the next whole number: one more than the
-highest build App Store Connect has for that version, and never less than pubspec's build number.
+waiting for review again, so every upload of a version gets the next whole number: the first build
+number from pubspec's upward that App Store Connect does not have yet for that version.
+
+It signs in with the same Apple ID and app-specific password as upload_testflight.sh. altool cannot
+list a version's builds, so it asks for the status of one build number at a time; the uploads of a
+version start at pubspec's number and go up by one, so the first number App Store Connect does not
+know is the next one.
 
 usage: next_ios_build_number.py <bundle id> <version> <pubspec build number>
-env:   APPSTORE_ISSUER_ID, APPSTORE_API_KEY_ID, APPSTORE_API_PRIVATE_KEY (the .p8 key's text)
+env:   APPLE_UPLOAD_APPLE_ID, APPLE_UPLOAD_APP_PASSWORD (altool finds the team from the app)
 
-Standard library and the openssl command only, so it runs on a bare runner.
+Standard library and xcrun altool only, so it runs on a bare macOS runner.
 """
 
-import base64
 import json
 import os
+import re
 import subprocess
 import sys
-import tempfile
-import time
 import urllib.parse
 import urllib.request
 
-API = "https://api.appstoreconnect.apple.com/v1"
+# More uploads of one version than this means something is wrong, not that the version is busy.
+MAX_PROBES = 100
+
+# altool's message when the Apple ID or the app-specific password is wrong.
+AUTH_ERROR_CODES = {1235, -22938}
 
 
-def b64url(data: bytes) -> str:
-    return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
+def app_apple_id(bundle_id: str) -> str:
+    """The app's numeric Apple ID, from the public store lookup: altool wants it, not the bundle ID."""
+    url = f"https://itunes.apple.com/lookup?{urllib.parse.urlencode({'bundleId': bundle_id})}"
+    with urllib.request.urlopen(url, timeout=60) as response:
+        results = json.load(response).get("results", [])
+    for result in results:
+        if result.get("bundleId") == bundle_id:
+            return str(result["trackId"])
+    raise SystemExit(f"The App Store has no app with the bundle ID {bundle_id}")
 
 
-def der_to_raw(der: bytes) -> bytes:
-    """openssl writes an ECDSA signature as DER; a JWT carries r and s as 32 bytes each."""
+def build_status(apple_id: str, version: str, build: int) -> tuple[bool, str]:
+    """Whether App Store Connect has this build of the version, and altool's output."""
+    args = [
+        "xcrun", "altool", "--build-status",
+        "--apple-id", apple_id,
+        "--bundle-version", str(build),
+        "--bundle-short-version-string", version,
+        "--platform", "ios",
+        "-u", os.environ["APPLE_UPLOAD_APPLE_ID"],
+        "-p", "@env:APPLE_UPLOAD_APP_PASSWORD",
+        "--output-format", "json",
+    ]
+    result = subprocess.run(args, capture_output=True, text=True)
+    output = (result.stdout + result.stderr).strip()
+    if result.returncode == 0:
+        return True, output
 
-    def read_int(offset: int) -> tuple[bytes, int]:
-        if der[offset] != 0x02:
-            raise ValueError("unexpected ECDSA signature encoding")
-        length = der[offset + 1]
-        value = der[offset + 2 : offset + 2 + length]
-        return value.lstrip(b"\0").rjust(32, b"\0"), offset + 2 + length
-
-    if der[0] != 0x30:
-        raise ValueError("unexpected ECDSA signature encoding")
-    offset = 3 if der[1] & 0x80 else 2
-    r, offset = read_int(offset)
-    s, _ = read_int(offset)
-    return r + s
-
-
-def private_key_pem() -> str:
-    key = os.environ["APPSTORE_API_PRIVATE_KEY"].strip()
-    if "BEGIN" not in key:
-        key = base64.b64decode(key).decode()
-    return key + "\n"
-
-
-def token() -> str:
-    header = {"alg": "ES256", "kid": os.environ["APPSTORE_API_KEY_ID"].strip(), "typ": "JWT"}
-    now = int(time.time())
-    payload = {
-        "iss": os.environ["APPSTORE_ISSUER_ID"].strip(),
-        "iat": now,
-        "exp": now + 600,
-        "aud": "appstoreconnect-v1",
-    }
-    signing_input = f"{b64url(json.dumps(header).encode())}.{b64url(json.dumps(payload).encode())}"
-    with tempfile.NamedTemporaryFile("w", suffix=".p8") as key_file:
-        key_file.write(private_key_pem())
-        key_file.flush()
-        der = subprocess.run(
-            ["openssl", "dgst", "-sha256", "-sign", key_file.name],
-            input=signing_input.encode(),
-            capture_output=True,
-            check=True,
-        ).stdout
-    return f"{signing_input}.{b64url(der_to_raw(der))}"
-
-
-def get(path: str, params: dict[str, str], auth: str) -> dict:
-    url = f"{API}/{path}?{urllib.parse.urlencode(params)}"
-    request = urllib.request.Request(url, headers={"Authorization": f"Bearer {auth}"})
-    with urllib.request.urlopen(request, timeout=60) as response:
-        return json.load(response)
+    codes = {int(c) for c in re.findall(r'(?:"code"\s*:\s*|\bCode=)(-?\d+)', output)}
+    if codes & AUTH_ERROR_CODES:
+        raise SystemExit(
+            f"altool could not sign in as {os.environ['APPLE_UPLOAD_APPLE_ID']}: check"
+            " APPLE_UPLOAD_APPLE_ID and APPLE_UPLOAD_APP_PASSWORD (an app-specific password from"
+            f" account.apple.com, not the account password).\n{output}"
+        )
+    # A build number App Store Connect has never seen; anything else is an error we must not read
+    # as "free", or the upload would fail later on a number that is already taken.
+    if re.search(r"not (be )?found|could not find|couldn't find|no build|does not exist", output, re.I):
+        return False, output
+    raise SystemExit(f"altool --build-status failed for {version} ({build}):\n{output}")
 
 
 def main() -> None:
     bundle_id, version, pubspec_build = sys.argv[1], sys.argv[2], int(sys.argv[3])
-    auth = token()
+    for name in ("APPLE_UPLOAD_APPLE_ID", "APPLE_UPLOAD_APP_PASSWORD"):
+        if not os.environ.get(name, "").strip():
+            raise SystemExit(f"{name} is not set")
 
-    apps = get("apps", {"filter[bundleId]": bundle_id, "fields[apps]": "bundleId"}, auth)["data"]
-    app = next((a for a in apps if a["attributes"]["bundleId"] == bundle_id), None)
-    if app is None:
-        raise SystemExit(f"App Store Connect has no app with the bundle ID {bundle_id}")
+    apple_id = app_apple_id(bundle_id)
+    print(f"{bundle_id} is app {apple_id}", file=sys.stderr)
 
-    builds = []
-    params = {
-        "filter[app]": app["id"],
-        "filter[preReleaseVersion.version]": version,
-        "filter[preReleaseVersion.platform]": "IOS",
-        "fields[builds]": "version",
-        "limit": "200",
-    }
-    page = get("builds", params, auth)
-    while True:
-        builds += [b["attributes"]["version"] for b in page["data"]]
-        next_url = page.get("links", {}).get("next")
-        if not next_url:
-            break
-        request = urllib.request.Request(next_url, headers={"Authorization": f"Bearer {auth}"})
-        with urllib.request.urlopen(request, timeout=60) as response:
-            page = json.load(response)
-
-    uploaded = [int(b) for b in builds if b.isdigit()]
-    highest = max(uploaded, default=None)
-    build = pubspec_build if highest is None else max(pubspec_build, highest + 1)
-    print(
-        f"{version}: uploaded builds {sorted(uploaded) or 'none'}, next {build}",
-        file=sys.stderr,
-    )
-    print(build)
+    uploaded = []
+    for build in range(pubspec_build, pubspec_build + MAX_PROBES):
+        exists, output = build_status(apple_id, version, build)
+        if not exists:
+            print(
+                f"{version}: uploaded builds {uploaded or 'none'} from {pubspec_build}, next {build}",
+                file=sys.stderr,
+            )
+            print(build)
+            return
+        uploaded.append(build)
+    raise SystemExit(f"{version} already has builds {pubspec_build} to {build}; raise pubspec's build number")
 
 
 if __name__ == "__main__":

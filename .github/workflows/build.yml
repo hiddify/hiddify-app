@@ -311,9 +311,8 @@ jobs:
       - name: Give the iOS build the next build number
         if: matrix.platform == 'ios' && inputs.upload-artifact
         env:
-          APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
-          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
-          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+          APPLE_UPLOAD_APPLE_ID: ${{ secrets.APPLE_UPLOAD_APPLE_ID }}
+          APPLE_UPLOAD_APP_PASSWORD: ${{ secrets.APPLE_UPLOAD_APP_PASSWORD }}
         run: |
           set -euo pipefail
           name="$(sed -n 's/^version: *\([^+ ]*\)+[0-9][0-9]* *$/\1/p' pubspec.yaml)"
@@ -322,8 +321,8 @@ jobs:
           # App Store Connect knows the version without a pre-release suffix (5.5.6, not 5.5.6.dev).
           version="${name%%[-.][a-z]*}"
           bundle_id="$(sed -n 's/^BASE_BUNDLE_IDENTIFIER *= *//p' ios/Base.xcconfig)"
-          if [ -z "$APPSTORE_ISSUER_ID" ] || [ -z "$APPSTORE_API_KEY_ID" ] || [ -z "$APPSTORE_API_PRIVATE_KEY" ]; then
-            echo "::warning::No App Store Connect API key: keeping pubspec's build number $base, which TestFlight rejects if it was uploaded already."
+          if [ -z "$APPLE_UPLOAD_APPLE_ID" ] || [ -z "$APPLE_UPLOAD_APP_PASSWORD" ]; then
+            echo "::warning::No APPLE_UPLOAD_APPLE_ID / APPLE_UPLOAD_APP_PASSWORD: keeping pubspec's build number $base, which TestFlight rejects if it was uploaded already."
             build="$base"
           else
             build="$(python3 .github/scripts/next_ios_build_number.py "$bundle_id" "$version" "$base")"
