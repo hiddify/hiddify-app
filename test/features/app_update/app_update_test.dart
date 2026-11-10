@@ -57,7 +57,7 @@ void main() {
           'Hiddify-Windows-Setup-x64.exe',
           'Hiddify-Windows-Setup-x64.Msix',
           'Hiddify-Windows-Portable-x64.zip',
-          'Hiddify-Linux-x64-AppImage.AppImage',
+          'Hiddify-Linux-x64.AppImage',
           'Hiddify-Debian-x64.deb',
           'Hiddify-MacOS.dmg',
           'Hiddify-MacOS-AppStore.dmg',
@@ -76,7 +76,7 @@ void main() {
 
     test('each desktop install takes its own format, never a store build', () {
       expect(asset(InstallKind.windowsSetup), 'Hiddify-Windows-Setup-x64.exe');
-      expect(asset(InstallKind.linuxAppImage), 'Hiddify-Linux-x64-AppImage.AppImage');
+      expect(asset(InstallKind.linuxAppImage), 'Hiddify-Linux-x64.AppImage');
       expect(asset(InstallKind.linuxDeb), 'Hiddify-Debian-x64.deb');
       expect(asset(InstallKind.macOS), 'Hiddify-MacOS.dmg');
     });
@@ -86,15 +86,15 @@ void main() {
         _release(
           'v5.6.0',
           assets: [
-            'Hiddify-Linux-x64-AppImage.AppImage',
+            'Hiddify-Linux-x64.AppImage',
             'Hiddify-Debian-x64.deb',
-            'Hiddify-Linux-arm64-AppImage.AppImage',
+            'Hiddify-Linux-arm64.AppImage',
             'Hiddify-Debian-arm64.deb',
           ],
         ),
       )!;
       String? arm(InstallKind kind, RemoteVersionEntity r) => kind.assetIn(r, arm64: true)?.name;
-      expect(arm(InstallKind.linuxAppImage, withArm), 'Hiddify-Linux-arm64-AppImage.AppImage');
+      expect(arm(InstallKind.linuxAppImage, withArm), 'Hiddify-Linux-arm64.AppImage');
       expect(arm(InstallKind.linuxDeb, withArm), 'Hiddify-Debian-arm64.deb');
       // a release without arm64 Linux files opens the release page instead of installing x64
       expect(arm(InstallKind.linuxAppImage, release), isNull);

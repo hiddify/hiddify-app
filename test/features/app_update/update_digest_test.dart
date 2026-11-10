@@ -18,7 +18,7 @@ const _payload = 'trusted update';
 const _sha256 = '3e815a6f9d8c44b0c2fc5d26f77545bb0d4378f1693d3dc425e654261f8780fc';
 
 String _assetName(InstallKind kind) =>
-    kind == InstallKind.androidApk ? 'Hiddify-Android-arm64.apk' : 'Hiddify-Linux-x64-AppImage.AppImage';
+    kind == InstallKind.androidApk ? 'Hiddify-Android-arm64.apk' : 'Hiddify-Linux-x64.AppImage';
 
 RemoteVersionEntity _release(InstallKind kind, Object? digest, {int size = 14}) => GithubReleaseParser.parse({
   'tag_name': 'v9.9.9',

@@ -33,28 +33,31 @@ from urllib.parse import quote
 # (OS group, filename, link label, badge color, badge logo) — only rows whose file exists
 # are emitted. The label's first word is the badge's left half, the rest its right half.
 ASSET_CATALOG: list[tuple[str, str, str, str, str]] = [
-    ("Android", "Hiddify-Android-universal.apk", "APK Universal", "044d29", "android"),
-    ("Android", "Hiddify-Android-arm64.apk", "APK ARMv8", "168039", "android"),
-    ("Android", "Hiddify-Android-arm7.apk", "APK ARMv7", "45bf55", "android"),
-    ("Android", "Hiddify-Android-x86_64.apk", "APK x64", "96ed89", "android"),
     # Attached by windows-store-sync.yml once the Microsoft Store has signed it.
     ("Windows", "Hiddify-Windows-Setup-x64.Msix", "MSIX x64", "0078d7", "windows"),
     ("Windows", "Hiddify-Windows-Setup-x64.exe", "Setup x64", "2d7d9a", "windows"),
     ("Windows", "Hiddify-Windows-Portable-x64.zip", "Portable x64", "67b7d1", "windows"),
+    ("Android", "Hiddify-Android-universal.apk", "APK Universal", "044d29", "android"),
+    ("Android", "Hiddify-Android-arm64.apk", "APK ARMv8", "168039", "android"),
+    ("Android", "Hiddify-Android-arm7.apk", "APK ARMv7", "45bf55", "android"),
+    ("Android", "Hiddify-Android-x86_64.apk", "APK x64", "96ed89", "android"),
     ("macOS (v10.15+)", "Hiddify-MacOS.dmg", "DMG Universal", "ea005e", "apple"),
     ("macOS (v10.15+)", "Hiddify-MacOS-Installer.pkg", "PKG Universal", "bc544b", "apple"),
     ("iOS", "Hiddify-iOS.ipa", "IPA iOS", "0a84ff", "apple"),
-    ("Linux", "Hiddify-Linux-x64-AppImage.AppImage", "AppImage x64", "f84e29", "linux"),
-    ("Linux", "Hiddify-Linux-x64-AppImage.tar.gz", "AppImage x64 (tar.gz)", "f84e29", "linux"),
-    ("Linux", "Hiddify-Debian-x64.deb", "DebPackage x64", "FF9966", "debian"),
-    ("Linux", "Hiddify-rpm-x64.rpm", "RpmPackage x64", "F1B42F", "redhat"),
-    ("Linux", "Hiddify-Linux-x64.tar.gz", "All-in-one x64 (install.sh)", "6e7781", "linux"),
-    ("Linux", "Hiddify-Linux-arm64-AppImage.AppImage", "AppImage ARM64", "f84e29", "linux"),
-    ("Linux", "Hiddify-Linux-arm64-AppImage.tar.gz", "AppImage ARM64 (tar.gz)", "f84e29", "linux"),
-    ("Linux", "Hiddify-Linux-arm64.tar.gz", "All-in-one ARM64 (install.sh)", "6e7781", "linux"),
-    ("Linux", "Hiddify-Debian-arm64.deb", "DebPackage ARM64", "FF9966", "debian"),
-    ("Linux", "Hiddify-rpm-arm64.rpm", "RpmPackage ARM64", "F1B42F", "redhat"),
+    ("Linux x64", "Hiddify-Linux-x64.AppImage", "AppImage x64", "f84e29", "linux"),
+    ("Linux x64", "Hiddify-Linux-x64.AppImage.tar.gz", "AppImage x64 (tar.gz)", "f84e29", "linux"),
+    ("Linux x64", "Hiddify-Debian-x64.deb", "DebPackage x64", "FF9966", "debian"),
+    ("Linux x64", "Hiddify-rpm-x64.rpm", "RpmPackage x64", "F1B42F", "redhat"),
+    ("Linux ARM64", "Hiddify-Linux-arm64.AppImage", "AppImage ARM64", "f84e29", "linux"),
+    ("Linux ARM64", "Hiddify-Linux-arm64.AppImage.tar.gz", "AppImage ARM64 (tar.gz)", "f84e29", "linux"),
+    ("Linux ARM64", "Hiddify-Debian-arm64.deb", "DebPackage ARM64", "FF9966", "debian"),
+    ("Linux ARM64", "Hiddify-rpm-arm64.rpm", "RpmPackage ARM64", "F1B42F", "redhat"),
 ]
+
+# The macOS and Linux installer (.github/scripts/make_installer.sh): one row with its command,
+# after the groups in FIRST_GROUPS. It finds the system and the CPU, so one command serves both.
+INSTALLER = "install.sh"
+FIRST_GROUPS = ("Windows", "Android")
 
 # Not sent to VirusTotal: it rejects the IPA upload (HTTP 409), and an iOS app cannot
 # run outside the App Store or a sideloading tool anyway.
@@ -162,10 +165,24 @@ def apply_vt_results(body: str, results: dict[str, dict | None]) -> str:
     return body
 
 
+def install_command(tag: str) -> str:
+    return f"bash <(curl -fsSL https://github.com/{REPO}/releases/download/{tag}/{INSTALLER})"
+
+
+def installer_row(tag: str) -> str:
+    """The installer command in a fenced block, so GitHub adds a copy button (Markdown inside an
+    HTML cell needs markdown=1 and the blank line before it)."""
+    return (
+        "<tr>\n  <td>Linux &amp; macOS<br>auto installer</td>\n"
+        f'  <td colspan="3" markdown=1>\n\n```\n{install_command(tag)}\n```\n</td>\n</tr>'
+    )
+
+
 def render_links(tag: str, assets: dict[str, "Path | str"], bust: str, old_body: str = "") -> str:
     """assets maps file name -> local Path (hashed here) or a known sha256 hex string.
 
     old_body: a published body whose VirusTotal badges are kept for unchanged files."""
+    installer_pending = find_asset(assets, INSTALLER) is not None
     rowspan_pending: dict[str, int] = {}
     for os_name, filename, *_ in ASSET_CATALOG:
         if find_asset(assets, filename) is None:
@@ -188,20 +205,24 @@ def render_links(tag: str, assets: dict[str, "Path | str"], bust: str, old_body:
         else:
             vt = vt_badge_img(digest, existing_vt_src(old_body, digest) or vt_badge_src(None))
 
+        if installer_pending and os_name not in FIRST_GROUPS:
+            rows.append(installer_row(tag))
+            installer_pending = False
+
         cells: list[str] = []
         first = os_emitted.get(os_name, 0) == 0
         os_emitted[os_name] = os_emitted.get(os_name, 0) + 1
         if first:
             span = rowspan_pending[os_name]
-            if span > 1:
-                cells.append(f'<td rowspan="{span}">{os_name}</td>')
-            else:
-                cells.append(f"<td>{os_name}</td>")
+            attr = f' rowspan="{span}"' if span > 1 else ""
+            cells.append(f"<td{attr}>{os_name}</td>")
         cells.append(f"<td>{download}</td>")
         cells.append(f"<td>{downloads}</td>")
         cells.append(f"<td>{vt}</td>")
         rows.append("<tr>\n  " + "\n  ".join(cells) + "\n</tr>")
 
+    if installer_pending:
+        rows.append(installer_row(tag))
     if not rows:
         return "_No release assets found in the build output._\n"
 

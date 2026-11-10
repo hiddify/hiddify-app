@@ -19,8 +19,9 @@ env:
   NDK_VERSION: r28c
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   TAG_NAME: "${{ inputs.tag-name }}"
-  TARGET_NAME_gz: "Hiddify-Linux-x64-AppImage.tar"
-  TARGET_NAME_AppImage: "Hiddify-Linux-x64-AppImage"
+  # Hiddify-Linux-x64.AppImage and Hiddify-Linux-x64.AppImage.tar.gz (x64 -> arm64 on arm64)
+  TARGET_NAME_gz: "Hiddify-Linux-x64.AppImage.tar"
+  TARGET_NAME_AppImage: "Hiddify-Linux-x64"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
   TARGET_NAME_rpm: "Hiddify-rpm-x64"
   TARGET_NAME_apk: "Hiddify-Android"
@@ -564,7 +565,7 @@ jobs:
           for EXT in $(echo ${{ matrix.targets }} | tr ',' '\n'); do
             KEY=TARGET_NAME_${EXT}
             FILENAME=${!KEY}
-            # arm64 Linux: Hiddify-Debian-x64 -> Hiddify-Debian-arm64, Hiddify-Linux-x64-AppImage -> ...-arm64-...
+            # arm64 Linux: Hiddify-Debian-x64 -> Hiddify-Debian-arm64, Hiddify-Linux-x64 -> Hiddify-Linux-arm64
             [[ "${{ matrix.aarch }}" == "arm64" ]] && FILENAME=${FILENAME//x64/arm64}
             echo "For $EXT ($KEY) filename is ${FILENAME}"
             mv dist/*/*.$EXT tmp_out/${FILENAME}.$EXT
@@ -616,32 +617,6 @@ jobs:
         run: |
           rm -f ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision || true
           rm -rf ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
-  # One Linux download per CPU: Hiddify-Linux-x64.tar.gz and Hiddify-Linux-arm64.tar.gz, each with
-  # that CPU's deb, rpm and AppImage and an install.sh that picks the system's package format
-  # (.github/scripts/make_linux_bundle.sh).
-  linux-bundle:
-    if: ${{ !cancelled() && inputs.upload-artifact }}
-    needs: [build]
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout
-        uses: actions/checkout@v6
-      - name: Download the Linux builds
-        uses: actions/download-artifact@v7
-        with:
-          pattern: "linux*"
-          merge-multiple: true
-          path: ./linux-builds/
-      - name: Pack Hiddify-Linux-x64.tar.gz and Hiddify-Linux-arm64.tar.gz
-        run: bash .github/scripts/make_linux_bundle.sh ./linux-builds ./out
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v6
-        with:
-          name: linux-bundle
-          path: ./out
-          retention-days: 1
-
   update-draft:
     # Always refresh the moving `draft` tag/release to this build's commit and assets.
     # On versioned tags this runs after upload-release so the two softprops jobs
@@ -650,7 +625,7 @@ jobs:
     # platforms built (the "Check there is something to publish" step stops it when
     # no build produced anything, so the old draft is not replaced by an empty one).
     if: ${{ !cancelled() && inputs.upload-artifact && needs.build.result != 'skipped' && (needs.upload-release.result == 'success' || needs.upload-release.result == 'skipped') }}
-    needs: [build, linux-bundle, upload-release]
+    needs: [build, upload-release]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -703,6 +678,8 @@ jobs:
           set -euo pipefail
           # Draft release download URLs always use the `draft` tag, even when this
           # workflow was also invoked for a versioned tag-name.
+          # The macOS and Linux installer of this release, with the SHA-256 of each file it installs
+          bash ./.github/scripts/make_installer.sh ./out draft
           cp ./.github/release_message.md release.md
           python3 ./.github/scripts/prepare_release_notes.py release.md ./out draft
 
@@ -732,7 +709,7 @@ jobs:
 
   upload-release:
     if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
-    needs: [build, linux-bundle]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -759,6 +736,8 @@ jobs:
       - name: prepare_release_message
         run: |
           set -euo pipefail
+          # The macOS and Linux installer of this release, with the SHA-256 of each file it installs
+          bash ./.github/scripts/make_installer.sh ./out "${{ env.TAG_NAME }}"
           cp ./.github/release_message.md release.md
           python3 ./.github/scripts/prepare_release_notes.py release.md ./out "${{ env.TAG_NAME }}"
 
