@@ -149,7 +149,14 @@
       "keepTop": {
         "picking": "Buscando los $keep más rápidos de $count…",
         "pickingBody": "Todos los proxies se prueban una vez; después solo los más rápidos siguen activos.",
+        "thenFastest": "Tras la prueba, solo los $keep más rápidos$where siguen activos.",
+        "thenWorking": "Tras la prueba, solo los que funcionan$where siguen activos.",
+        "thenAll": "Tras la prueba, solo los proxies$where siguen activos.",
+        "inRegions": " en $flags",
+        "pickingAnswering": "Probando los $count…",
+        "keptAnswering": "Funcionan $n proxies$where",
         "kept": "Funcionan los $n más rápidos",
+        "keptFastest": "Funcionan los $n más rápidos$where",
         "keptBody": "Otros $paused proxies están en pausa para ahorrar batería y datos.",
         "showAll": "Mostrar los $count",
         "big": "Hay $count proxies activos",
@@ -189,6 +196,17 @@
         "which": "Qué proxies",
         "shown": "Mostrados ($n)",
         "chosen": "Elegidos ($n)"
+      },
+      "single": {
+        "share": "Compartir",
+        "edit": "Editar",
+        "shareTitle": "Compartir proxy",
+        "configHint": "Solo este proxy y los proxies por los que se conecta. Hiddify lo importa como cualquier configuración.",
+        "editTitle": "Editar como perfil nuevo",
+        "editMsg": "“${name}” se copia en un perfil nuevo que puedes editar. El original no cambia, porque una suscripción reemplaza sus proxies en cada actualización.",
+        "editConfirm": "Copiar y editar",
+        "savedAsProfile": "Copiado al nuevo perfil “${name}”",
+        "failed": "No se pudo leer la configuración de este proxy"
       }
     },
     "profiles": {
@@ -241,6 +259,25 @@
       "failedToLoad": "Error al cargar",
       "updateSubscriptions": "Actualizar suscripciones",
       "share": {
+        "title": "Compartir perfil",
+        "scanHint": "Escanéalo con Hiddify en otro dispositivo para añadir este perfil",
+        "link": "Enlace de suscripción",
+        "config": "Configuración",
+        "configHint": "El JSON completo con el que funciona este perfil, con tus ajustes incluidos",
+        "configFailed": "No se pudo crear la configuración",
+        "copy": "Copiar",
+        "shareFile": "Compartir",
+        "saveFile": "Guardar",
+        "tooLargeToCopy": "Demasiado grande para el portapapeles: compártelo o guárdalo como archivo",
+        "toTv": {
+          "button": "Enviar al televisor",
+          "scanHint": "En el televisor, abre Hiddify y toca + para añadir un perfil, y escanea el código que aparece. Los dos dispositivos deben estar en la misma red Wi-Fi.",
+          "sent": "Enviado. Pulsa Importar en el televisor para añadirlo.",
+          "notTvCode": "Ese no es un código de Hiddify para televisor. En el televisor, toca + para añadir un perfil y mostrarlo.",
+          "expired": "El televisor ya no acepta enlaces con este código. Abre de nuevo la pantalla de añadir perfil en el televisor y escanea el código nuevo.",
+          "busy": "El televisor tiene demasiados enlaces en espera. Impórtalos o descártalos en el televisor y vuelve a intentarlo.",
+          "unreachable": "No se pudo conectar con el televisor. Comprueba que el teléfono y el televisor estén en la misma red Wi-Fi."
+        },
         "urlToClipboard": "Copiar URL",
         "showUrlQr": "Mostrar código QR",
         "jsonToClipboard": "Copiar JSON"
@@ -264,7 +301,29 @@
           "bulkPartial": "${success} actualizados\n${failed} fallidos: ${names}"
         },
         "delete": {
-          "success": "Perfil eliminado"
+          "success": "Perfil eliminado",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count perfil eliminado",
+            "other": "$count perfiles eliminados"
+          },
+          "bulkPartial": "${deleted} de ${total} perfiles eliminados"
+        }
+      },
+      "removeInactive": {
+        "action": "Eliminar suscripciones inactivas",
+        "title": "Eliminar suscripciones inactivas",
+        "hint": "Estas suscripciones ya no funcionan. Se eliminarán las marcadas; desmarca las que quieras conservar.",
+        "none": "No hay suscripciones inactivas",
+        "remove(plural, param=count)": {
+          "one": "Eliminar $count",
+          "other": "Eliminar $count"
+        },
+        "reason": {
+          "expired": "Caducada",
+          "expiredOn": "Caducó el ${date}",
+          "noTraffic": "Sin tráfico restante",
+          "updateFailing": "Las actualizaciones siguen fallando",
+          "updateFailingSince": "Las actualizaciones fallan desde el ${date}"
         }
       }
     },
@@ -304,7 +363,9 @@
       "fileSaveFailed": "No se pudo guardar el archivo",
       "coreLogLevel": "Nivel del núcleo",
       "coreLogLevelMsg": "Se aplica al volver a conectar",
-      "buffer": "Búfer"
+      "buffer": "Búfer",
+      "diagnostics": "Informe de diagnóstico",
+      "diagnosticsMsg": "Informes de fallos, registros y tus ajustes sin servidores ni contraseñas, en un solo zip"
     },
     "about": {
       "title": "Acerca de",
@@ -371,6 +432,9 @@
         "routeRule": {
           "add": "Añadir regla",
           "delete": "Eliminar regla",
+          "duplicate": "Duplicar regla",
+          "duplicated": "Copiada como regla nueva: edítala como quieras",
+          "copyAll": "Copiar todo",
           "options": {
             "import": {
               "clipboard": "Importar reglas desde el portapapeles",
@@ -401,6 +465,7 @@
             "validDomain": "“Dominio” válido como\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com or .ir",
             "validDomainSuffix": "“Sufijo de dominio” válido como\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "Una regla integrada no se puede cambiar. Duplícala y edita la copia.",
             "tileTitle(map)": {
               "name": "Nombre",
               "outbound": "Salida si coincide",
@@ -450,6 +515,12 @@
         "builtinRules": {
           "tag": "Integrada",
           "bypassLan": "Omitir LAN",
+          "systemDirect": {
+            "apple": "Servicios de Apple",
+            "microsoft": "Servicios de Microsoft",
+            "android": "Servicios de Android",
+            "linux": "Actualizaciones de Linux"
+          },
           "blockAds": "Bloquear anuncios y malware",
           "bypassRegion": "Omitir sitios de $region"
         },
@@ -543,11 +614,28 @@
           "consistentHashDescription": "Cada sitio usa siempre el mismo servidor",
           "stickySessionDescription": "Cada sitio mantiene un servidor aleatorio hasta que te vuelvas a conectar"
         },
+        "defaultProxy": {
+          "title": "Proxy predeterminado",
+          "lowest": "Menor ping",
+          "balance": "Equilibrar",
+          "first": "Primer proxy",
+          "lowestDescription": "Hasta que elijas un proxy, se usa el más rápido",
+          "balanceDescription": "Hasta que elijas un proxy, las conexiones se reparten entre todos",
+          "firstDescription": "Hasta que elijas un proxy, se usa el primero del perfil"
+        },
         "resolveDestination": "Resolver destino",
         "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "¿Por qué IPv6 está desactivado?",
+        "ipv6RouteTurnOnTitle": "¿Activar IPv6?",
+        "ipv6RouteTurnOn": "Activar",
+        "ipv6RouteHelp": "La mayoría de los proxies no tienen IPv6 en su salida.\n\nUna conexión que el proxy no puede llevar se corta justo después de abrirse, y los navegadores nunca la reintentan por IPv4, así que Google y YouTube no cargan.\n\nSi lo activas, cada proxy se comprueba una vez en su prueba de conexión. IPv6 se usa solo a través de un proxy que lo admite; todo lo demás va por IPv4, sin que lo notes.\n\nIPv6 siempre viaja dentro de la VPN, nunca fuera de ella.",
         "ipv6Modes": {
+          "ipv4Only": "Desactivado (solo IPv4)",
           "preferIpv4": "IPv4 primero",
-          "preferIpv6": "IPv6 primero"
+          "preferIpv6": "IPv6 primero",
+          "ipv4OnlyDescription": "Las apps usan solo IPv4. IPv6 se rechaza al instante.",
+          "preferIpv4Description": "Primero IPv4. IPv6 solo a través de un proxy comprobado que lo admite.",
+          "preferIpv6Description": "Primero IPv6, solo a través de un proxy comprobado que lo admite."
         }
       },
       "dns": {
@@ -571,7 +659,8 @@
         "serviceModes": {
           "proxy": "Solo servicio de proxy",
           "systemProxy": "Establecer proxy del sistema",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Router (toda la red)"
         },
         "shortServiceModes": {
           "proxy": "Proxy",
@@ -582,6 +671,7 @@
         "strictRoute": "Ruta estricta",
         "tunImplementation": "Implementación de TUN",
         "tunImplementations": {
+          "sing15": "Sing 15",
           "mixed": "Mixto",
           "system": "Sistema",
           "gvisor": "gVisor"
@@ -707,13 +797,37 @@
           "mtu": "MTU",
           "customized": "Personalizado",
           "scanner": {
-            "title": "Escáner"
+            "title": "Escáner",
+            "searchNoise": "Ruido de búsqueda",
+            "maxRtt": "RTT máx. (ms)",
+            "timeout": "Tiempo de espera de la sonda (ms)",
+            "count": "Direcciones a sondear",
+            "concurrency": "Sondas en paralelo",
+            "ports": "Puertos",
+            "cidrs": "Rangos"
           },
           "masque": {
-            "title": "MASQUE"
+            "title": "MASQUE",
+            "vhttp": "Versión de HTTP",
+            "serverName": "Nombre del servidor",
+            "useIpv6": "Preferir IPv6",
+            "udpTimeout": "Tiempo de espera UDP (s)",
+            "keepalive": "Keepalive UDP (s)",
+            "packetSize": "Tamaño inicial del paquete",
+            "reconnectDelay": "Retraso de reconexión (s)",
+            "tlsInsecure": "Omitir la verificación TLS",
+            "fragment": "Fragmentar TLS",
+            "fragmentDelay": "Retraso de respaldo de fragmentos (ms)",
+            "recordFragment": "Fragmentar registros TLS",
+            "ech": "Encrypted Client Hello",
+            "echConfig": "Configuración de ECH",
+            "echQueryServerName": "Nombre de consulta de ECH"
           },
           "awg": {
-            "title": "AmneziaWG"
+            "title": "AmneziaWG",
+            "jc": "Paquetes basura",
+            "jmin": "Tamaño mín. de basura",
+            "jmax": "Tamaño máx. de basura"
           }
         },
         "psiphon": {
@@ -859,10 +973,55 @@
     "adminBgService": {
       "vpnNeedsAdmin": {
         "title": "Se necesita permiso de administrador",
-        "msg": "El modo VPN necesita un permiso de administrador único para instalar el servicio en segundo plano de Hiddify. Después, puedes conectarte sin otra solicitud.",
-        "connectWithAdmin": "Conectar con permiso de administrador",
+        "vpnMode": "Modo VPN",
+        "allApps": "Todas las apps",
+        "recommended": "Recomendado",
+        "systemProxyMode": "Proxy del sistema",
+        "someApps": "Navegadores y la mayoría de las apps",
+        "switched": "Se cambió al modo de proxy del sistema. Puedes cambiarlo en Ajustes.",
         "waitingTitle": "Esperando el permiso de administrador",
         "waitingMsg": "Acepta la solicitud de administrador para continuar. Puedes detenerte y volver a intentarlo más tarde.",
+        "waitingWhere": "En la ventana que se abrió:",
+        "waitingWindows": "Haz clic en «Sí».",
+        "waitingMac": "Escribe la contraseña de tu Mac y confirma.",
+        "waitingLinux": "Escribe tu contraseña y confirma.",
+        "back": "Atrás",
+        "needsAdmin": "Requiere administrador, una vez",
+        "needsAdminAppImage": "Requiere administrador en cada inicio",
+        "noAdmin": "No requiere administrador",
+        "someAppsExcept": "Telegram y algunas apps quedan fuera",
+        "useVpn": "Usar modo VPN",
+        "useSystemProxy": "Usar proxy del sistema",
+        "helpTooltip": "¿Qué es esto?",
+        "helpWhatTitle": "Cómo funciona",
+        "helpProsTitle": "Ventajas",
+        "helpConsTitle": "Ten en cuenta",
+        "helpVpn": {
+          "what": "Hiddify añade una red virtual a tu ordenador y el tráfico de internet de cada app pasa por ella por sí solo: navegadores, Telegram, juegos, actualizaciones y el resto. No hay que configurar nada en cada app.",
+          "pros": [
+            "Todas las apps pasan por Hiddify, sin ajustes en cada una.",
+            "También funcionan las apps que ignoran el proxy, como Telegram y los juegos.",
+            "Las búsquedas de nombres (DNS) también pasan por Hiddify, así que se abren los sitios bloqueados de ese modo."
+          ],
+          "cons": [
+            "La primera vez, tu ordenador pide permiso de administrador para instalar el servicio en segundo plano de Hiddify. Después se conecta sin preguntar.",
+            "Desactiva otras apps de VPN mientras lo uses: dos a la vez se estorban."
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify cambia el ajuste de proxy de tu ordenador. Las apps que respetan ese ajuste, como los navegadores web, envían su tráfico por Hiddify; el resto se conecta directamente, como si Hiddify estuviera desactivado.",
+          "pros": [
+            "No requiere permiso de administrador.",
+            "Se activa y desactiva rápido, y Hiddify restaura el ajuste al desconectarte.",
+            "Funciona junto con otras herramientas de red de tu ordenador."
+          ],
+          "cons": [
+            "Las apps que ignoran el proxy del sistema, como Telegram, muchos juegos y algunas herramientas de actualización, no quedan protegidas.",
+            "Si dejan de funcionar, elige el modo VPN."
+          ]
+        },
+        "msg": "El modo VPN necesita un permiso de administrador único para instalar el servicio en segundo plano de Hiddify. Después, puedes conectarte sin otra solicitud.",
+        "connectWithAdmin": "Conectar con permiso de administrador",
         "stop": "Detener"
       },
       "proxyNeedsAdmin": {
@@ -924,7 +1083,8 @@
       "speed": "Velocidad",
       "server": "Servidor",
       "country": "País",
-      "tapToTest": "Toca para probar"
+      "tapToTest": "Toca para probar",
+      "error": "Por qué falló"
     },
     "windowClosing": {
       "askEachTime": "Preguntar cada vez",
@@ -946,16 +1106,34 @@
     "qrScanner": {
       "notFound": "No se encontró ningún código QR en esta imagen"
     },
+    "crashReport": {
+      "title": "Hiddify se cerró por un fallo la última vez",
+      "msg": "¿Enviar un informe a los desarrolladores para que lo arreglen? Contiene los detalles del fallo, los registros y tu configuración sin servidores, claves ni contraseñas, en un solo archivo zip que puedes revisar antes de enviarlo.",
+      "send": "Enviar informe"
+    },
     "keepTop": {
       "title": "Una suscripción grande",
-      "description": "Este perfil tiene $count proxies. Mantenerlos todos activos gasta batería, datos y memoria. Hiddify puede probarlos una vez, dejar activos los $keep más rápidos y pausar el resto.",
+      "subtitle": "$count proxies · mantenerlos todos activos gasta batería, datos y memoria",
       "hint": "Puedes volver a activarlos todos cuando quieras, al final de la lista de proxies.",
       "keeping": "Funcionan los $keep más rápidos, el resto en pausa",
       "all": "Funcionan los $count",
       "keep": "Mantener los $keep más rápidos",
       "useAll": "Usar los $count",
       "howMany": "Cuántos mantener activos",
-      "pickByHand": "Elegir los proxies tú mismo"
+      "pickByHand": "Elegir los proxies tú mismo",
+      "region": "Región",
+      "anyRegion": "Cualquier región",
+      "keepAnswering": "Mantener los que funcionan",
+      "keepingAnswering": "Solo siguen activos los que funcionan",
+      "answering": "Funcionan",
+      "everyOne": "Todos",
+      "quick": "Prueba rápida",
+      "quickHint": "Se detiene al encontrar los más rápidos",
+      "quickHelp": "¿Qué hace?",
+      "quickFirst": "Primero se prueban los más rápidos de la vez anterior",
+      "quickStop": "La prueba se detiene cuando el resto fue más lento antes",
+      "quickNew": "Los proxies nuevos y los que no se probaron en un día siempre se prueban",
+      "description": "Este perfil tiene $count proxies. Mantenerlos todos activos gasta batería, datos y memoria. Hiddify puede probarlos una vez, dejar activos los $keep más rápidos y pausar el resto."
     },
     "keepTags": {
       "title": "Elegir proxies",
@@ -1010,6 +1188,20 @@
       "portRange": "Usa un puerto entre 1024 y 65535",
       "passwordTooShort": "Al menos 4 caracteres",
       "edit": "Editar"
+    },
+    "dbNewerThanApp": {
+      "title": "Los datos guardados son de una versión más reciente",
+      "msg": "Tus perfiles y ajustes los guardó una versión más reciente de Hiddify y esta versión anterior no puede leerlos. Instala la última versión para conservarlos o bórralos para usar esta versión.",
+      "deleteData": "Borrar datos",
+      "deleteConfirm": "Se borran los datos guardados. Tus suscripciones y perfiles locales se vuelven a añadir cuando es posible; todo lo demás que guardó la versión más reciente se pierde.",
+      "downloadLatest": "Descargar la última versión"
+    },
+    "dbBroken": {
+      "title": "No se pueden abrir los datos guardados",
+      "msg": "Hiddify no pudo abrir sus perfiles guardados. Borra los datos guardados para empezar de nuevo: tus suscripciones y perfiles locales se vuelven a añadir cuando es posible, y tus ajustes se conservan.",
+      "wipeData": "Borrar datos",
+      "wipeConfirm": "Se borran los datos guardados y Hiddify empieza de nuevo. Los perfiles que aún se pueden leer se vuelven a añadir; el resto no se puede recuperar.",
+      "copyError": "Copiar error"
     }
   },
   "connection": {
