@@ -28,6 +28,7 @@ extension AppLocaleX on AppLocale {
     "ps" => "پښتو",
     "bn" => "বাংলা",
     "uz" => "Oʻzbekcha",
+    "az" => "Azərbaycan dili",
     _ => "Unknown",
   };
 }

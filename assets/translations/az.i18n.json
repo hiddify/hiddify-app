@@ -1,0 +1,1279 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "Başla",
+    "version": "Versiya",
+    "ok": "OK",
+    "cancel": "Ləğv et",
+    "kContinue": "Davam et",
+    "undo": "Geri al",
+    "showMore": "Daha çox göstər",
+    "showLess": "Daha az göstər",
+    "filter": "Filtr",
+    "all": "Hamısı",
+    "pause": "Dayandır",
+    "resume": "Davam et",
+    "clear": "Təmizlə",
+    "close": "Bağla",
+    "auto": "Avto",
+    "manually": "Əl ilə",
+    "name": "Ad",
+    "url": "URL",
+    "add": "Əlavə et",
+    "clipboard": "Mübadilə buferi",
+    "addToClipboard": "Buferə köçür",
+    "qrCode": "QR kod",
+    "free": "Pulsuz",
+    "warp": "WARP",
+    "fragment": "Fraqment",
+    "help": "Kömək",
+    "save": "Yadda saxla",
+    "update": "Yenilə",
+    "pin": "Sabitlə",
+    "unpin": "Sabitlənməni götür",
+    "share": "Paylaş",
+    "edit": "Redaktə et",
+    "delete": "Sil",
+    "discard": "At",
+    "import": "İdxal et",
+    "export": "İxrac et",
+    "later": "Sonra",
+    "ignore": "Nəzərə alma",
+    "quit": "Çıx",
+    "notSet": "Təyin edilməyib",
+    "hide": "Gizlət",
+    "exit": "Çıx",
+    "reset": "Sıfırla",
+    "done": "Hazırdır",
+    "decline": "Rədd et",
+    "agree": "Razıyam",
+    "empty": "Boş",
+    "unknown": "Naməlum",
+    "hidden": "Gizlidir",
+    "timeout": "Vaxt aşımı",
+    "sort": "Sırala",
+    "dashboard": "İdarə paneli",
+    "disable": "Söndür",
+    "psiphon": "Psiphon",
+    "profile": "Profil",
+    "configuration": "Konfiqurasiya",
+    "file": "Fayl",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n gün",
+        "other": "$n gün"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n saat",
+        "other": "$n saat"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "İcazə verilmədi"
+      },
+      "export": {
+        "clipboard": {
+          "success": "Buferə köçürüldü",
+          "failure": "Buferə köçürmək alınmadı",
+          "contentTooLarge": "Məzmun çox böyükdür. Əvəzində fayla ixrac edin."
+        },
+        "file": {
+          "success": "JSON faylı yaradıldı",
+          "failure": "Fayl yaratmaq alınmadı"
+        }
+      },
+      "import": {
+        "confirm": "İdxalı təsdiq et",
+        "success": "İdxal edildi",
+        "failure": "İdxal alınmadı"
+      },
+      "autoSave": {
+        "success": "Dəyişikliklər avtomatik yadda saxlanıldı"
+      }
+    }
+  },
+  "intro": {
+    "banner": "Məhdudiyyətsiz internet üçün lazım olan hər şey",
+    "termsAndPolicyCaution(rich)": "Davam etməklə siz ${tap(@:pages.about.termsAndConditions)} ilə razılaşırsınız",
+    "info(rich)": "Hiddify tərəfindən ❤️ ilə hazırlanıb. ${tap_source(Açıq mənbə)} və ${tap_license(Lisenziya)}"
+  },
+  "pages": {
+    "home": {
+      "title": "Ana səhifə",
+      "quickSettings": "Sürətli parametrlər"
+    },
+    "proxies": {
+      "title": "Proksilər",
+      "sort": "Proksiləri sırala",
+      "testDelay": "Gecikməni yoxla",
+      "empty": "Əlçatan proksi yoxdur",
+      "connectToSeeProxies": "Proksiləri görmək üçün qoşulun",
+      "loadFailed": "Proksiləri yükləmək alınmadı. Yenidən cəhd üçün toxunun.",
+      "activeProxy": "Aktiv proksi",
+      "unknownIp": "Naməlum IP",
+      "checkingIp": "IP yoxlanılır…",
+      "switchFailed": "Bu proksiyə keçmək alınmadı. Yenidən cəhd edin.",
+      "notResponding": "Cavab vermir",
+      "noneResponding": "Heç bir proksi cavab vermir",
+      "sortOptions": {
+        "unsorted": "Standart",
+        "name": "Əlifba sırası ilə",
+        "delay": "Gecikməyə görə",
+        "usage": "İstifadəyə görə",
+        "upload": "Yükləmə sürətinə görə",
+        "download": "Endirmə sürətinə görə"
+      },
+      "ipInfo": {
+        "address": "IP ünvanı",
+        "country": "Ölkə",
+        "organization": "Təşkilat"
+      },
+      "delay": {
+        "result": "Gecikmə: ${delay}ms",
+        "timeout": "Gecikmə testinin vaxtı bitdi",
+        "unavailable": "Əlçatan deyil",
+        "testing": "Gecikmə: yoxlanılır…"
+      },
+      "status": {
+        "connecting": "Qoşulur",
+        "registering": "Qeydiyyatdan keçir",
+        "failed": "Alınmadı",
+        "ready": "Hazırdır",
+        "searching": "Axtarılır",
+        "reconnecting": "Yenidən qoşulur"
+      },
+      "signalStyle": "Siqnal üslubu",
+      "keepTop": {
+        "picking": "$count proksidən ən sürətli $keep seçilir…",
+        "pickingBody": "Bütün proksilər bir dəfə yoxlanılır, sonra yalnız ən sürətliləri işləməyə davam edir.",
+        "thenFastest": "Testdən sonra yalnız ən sürətli $keep proksi$where işləməyə davam edəcək.",
+        "thenWorking": "Testdən sonra yalnız cavab verən proksilər$where işləməyə davam edəcək.",
+        "thenAll": "Testdən sonra yalnız bunlar$where işləməyə davam edəcək.",
+        "inRegions": " $flags üzrə",
+        "pickingAnswering": "Hamısı yoxlanılır: $count",
+        "keptAnswering": "Cavab verən $n proksi$where işləyir",
+        "kept": "Ən sürətli $n proksi işləyir",
+        "keptFastest": "Ən sürətli $n proksi$where işləyir",
+        "keptBody": "Batareya və trafikə qənaət üçün digər $paused proksi dayandırılıb.",
+        "showAll": "Hamısını göstər: $count",
+        "big": "$count proksi işləyir",
+        "bigBody": "Batareya və trafikə qənaət üçün yalnız ən sürətli $keep proksi işləsin.",
+        "keep": "Ən sürətli $keep proksini saxla",
+        "change": "Sayı dəyiş",
+        "chosen": "Seçdiyiniz $n proksi işləyir",
+        "choose": "Seç"
+      },
+      "upload": {
+        "test": "Yükləmə sürətini yoxla",
+        "failed": "Sürət testini başlatmaq alınmadı",
+        "hint": "Toxunun: yükləmə sürəti · Basıb saxlayın: endirmə sürəti",
+        "hintBoth": "Toxunun: hər iki sürət · Basıb saxlayın: endirmə sürəti"
+      },
+      "speedTest": {
+        "title": "Sürət testi",
+        "what": "Nə yoxlanılsın",
+        "download": "Endirmə",
+        "upload": "Yükləmə",
+        "amount": "Hər proksi üçün həcm",
+        "proxies": "Yoxlanılacaq proksilər",
+        "proxiesHint": "Pinqə görə ən sürətlilər",
+        "all": "Hamısı",
+        "fastest": "Ən sürətli $n",
+        "through": "Ən sürətli $count proksinin hər birindən $n MB",
+        "throughAll": "$count proksinin hər birindən $n MB",
+        "throughEach": "Hər proksidən $n MB",
+        "start": "Testi başlat",
+        "save": "Yadda saxla",
+        "testDownload": "Endirmə sürətini yoxla",
+        "both": "Hər ikisi",
+        "bothWays": "endirmə və yükləmə",
+        "amountHint": "çox olduqca daha dəqiq olur",
+        "clear": "Saxlanılmış nəticələri təmizlə",
+        "cleared": "Təmizlənib",
+        "which": "Hansı proksilər",
+        "shown": "Göstərilən ($n)",
+        "chosen": "Seçilən ($n)"
+      },
+      "single": {
+        "share": "Paylaş",
+        "edit": "Redaktə et",
+        "shareTitle": "Proksini paylaş",
+        "configHint": "Yalnız bu proksi və onun vasitəsilə qoşulduğu proksilər. Hiddify bunu hər hansı konfiqurasiya kimi idxal edir.",
+        "editTitle": "Yeni profil kimi redaktə et",
+        "editMsg": "“${name}” redaktə edə biləcəyiniz yeni profilə köçürülür. Abunəlik hər yenilənmədə proksilərini əvəz etdiyi üçün orijinal olduğu kimi qalır.",
+        "editConfirm": "Köçür və redaktə et",
+        "savedAsProfile": "“${name}” yeni profilinə köçürüldü",
+        "failed": "Bu proksinin konfiqurasiyasını oxumaq alınmadı"
+      }
+    },
+    "profiles": {
+      "title": "Profillər",
+      "add": "Profil əlavə et",
+      "fromPhone": {
+        "title": "Telefondan əlavə et",
+        "scan": "Bu kodu telefonunuzun kamerası ilə skan edin, abunəlik keçidini yapışdırın və göndərin.",
+        "sameNetwork": "Telefonunuz və bu televizor eyni Wi-Fi şəbəkəsində olmalıdır.",
+        "noNetwork": "Bu televizor yerli şəbəkədə deyil. Telefondan keçid əlavə etmək üçün onu Wi-Fi-a qoşun.",
+        "locked": "Çox sayda yanlış kod cəhd edildiyi üçün bu bloklandı. Yeni kod üçün bunu bağlayıb yenidən açın.",
+        "received": "Telefonunuzdan alındı",
+        "from": "Göndərən: $address",
+        "page": {
+          "title": "Televizorunuzdakı Hiddify-a göndərin",
+          "intro": "Pultla yazmadan, dörd sürətli addımda televizorunuza abunəlik əlavə edin.",
+          "steps": {
+            "network": {
+              "title": "Eyni Wi-Fi-a qoşulun",
+              "body": "Telefonunuz və televizor eyni Wi-Fi şəbəkəsində olmalıdır, əks halda bu səhifə televizora çata bilməz."
+            },
+            "copy": {
+              "title": "Keçidi köçürün",
+              "body": "Provayderinizdən abunəlik keçidini və ya hər hansı proksi keçidini və ya konfiqurasiyanı köçürün."
+            },
+            "paste": {
+              "title": "Bura yapışdırın",
+              "body": "Aşağıdakı xanaya toxunun, keçidi yapışdırın, sonra “Televizora göndər” düyməsinə toxunun."
+            },
+            "confirm": {
+              "title": "Televizorda təsdiq edin",
+              "body": "Keçid televizorda görünür. Pultla İdxal et düyməsini basın. Siz basana qədər heç nə əlavə olunmur."
+            }
+          },
+          "label": "Abunəlik keçidi",
+          "hint": "Abunəlik keçidini və ya konfiqurasiyanı yapışdırın",
+          "send": "Televizora göndər",
+          "sentTitle": "Televizora göndərildi",
+          "sent": "İndi əlavə etmək üçün televizorda İdxal et düyməsini basın. Aşağıdan başqa keçid də göndərə bilərsiniz.",
+          "empty": "Əvvəlcə keçidi yapışdırın.",
+          "footer": "Bu səhifə yalnız televizorda “Profil əlavə et” açıq olduqda və yalnız yerli şəbəkənizdə işləyir."
+        }
+      },
+      "update": "Profili yenilə",
+      "viewAllProfiles": "Bütün profillərə bax",
+      "activeProfileName": "Aktiv profilin adı: “${name}”",
+      "nonActiveProfileName": "“${name}” profilini aktiv et",
+      "freeSubNotFound": "Pulsuz abunəlik tapılmadı",
+      "freeSubNotFoundForRegion": "“${region}” üçün pulsuz abunəlik tapılmadı",
+      "failedToLoad": "Yükləmək alınmadı",
+      "updateSubscriptions": "Abunəlikləri yenilə",
+      "share": {
+        "title": "Profili paylaş",
+        "scanHint": "Bu profili əlavə etmək üçün başqa cihazda Hiddify ilə skan edin",
+        "link": "Abunəlik keçidi",
+        "config": "Konfiqurasiya",
+        "configHint": "Bu profilin işlədiyi tam JSON, parametrləriniz daxil olmaqla",
+        "configFailed": "Konfiqurasiyanı yaratmaq alınmadı",
+        "copy": "Köçür",
+        "shareFile": "Paylaş",
+        "saveFile": "Yadda saxla",
+        "tooLargeToCopy": "Buferə sığmayacaq qədər böyükdür: fayl kimi paylaşın və ya yadda saxlayın",
+        "toTv": {
+          "button": "Televizora göndər",
+          "scanHint": "Televizorda Hiddify-ı açın, profil əlavə etmək üçün + düyməsinə toxunun, sonra göstərilən kodu skan edin. Hər iki cihaz eyni Wi-Fi şəbəkəsində olmalıdır.",
+          "sent": "Göndərildi. Əlavə etmək üçün televizorda İdxal et düyməsini basın.",
+          "notTvCode": "Bu Hiddify televizor kodu deyil. Kodu göstərmək üçün televizorda profil əlavə etmək üçün + düyməsinə toxunun.",
+          "expired": "Televizor bu kod ilə artıq keçid qəbul etmir. Televizorda profil əlavə etmə ekranını yenidən açın və yeni kodu skan edin.",
+          "busy": "Televizorda çox keçid gözləyir. Onları televizorda idxal edin və ya atın, sonra yenidən cəhd edin.",
+          "unreachable": "Televizora çatmaq alınmadı. Telefonun və televizorun eyni Wi-Fi şəbəkəsində olduğuna əmin olun."
+        }
+      },
+      "msg": {
+        "save": {
+          "success": "Profil yadda saxlanıldı"
+        },
+        "invalidUrl": "Yanlış URL",
+        "add": {
+          "failure": "Profil əlavə etmək alınmadı"
+        },
+        "update": {
+          "success": "Profil yeniləndi",
+          "failure": "Profili yeniləmək alınmadı",
+          "failureNamed": "“${name}” profilini yeniləmək alınmadı",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profil yeniləndi",
+            "other": "$count profil yeniləndi"
+          },
+          "bulkPartial": "${success} yeniləndi\n${failed} alınmadı: ${names}"
+        },
+        "delete": {
+          "success": "Profil silindi",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profil silindi",
+            "other": "$count profil silindi"
+          },
+          "bulkPartial": "${total} profildən ${deleted} silindi"
+        }
+      },
+      "removeInactive": {
+        "action": "Aktiv olmayan abunəlikləri sil",
+        "title": "Aktiv olmayan abunəlikləri sil",
+        "hint": "Bu abunəliklər artıq işləmir. İşarələnənlər silinəcək; saxlamaq istədiklərinizin işarəsini götürün.",
+        "none": "Aktiv olmayan abunəlik yoxdur",
+        "remove(plural, param=count)": {
+          "one": "Sil: $count",
+          "other": "Sil: $count"
+        },
+        "reason": {
+          "expired": "Müddəti bitib",
+          "expiredOn": "Bitmə tarixi: ${date}",
+          "noTraffic": "Trafik qalmayıb",
+          "updateFailing": "Yenilənmələr alınmır",
+          "updateFailingSince": "Yenilənmələr ${date} tarixindən alınmır"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "Profil",
+      "lastUpdate": "Son yenilənmə",
+      "form": {
+        "nameHint": "Profilin adı",
+        "emptyName": "Ad tələb olunur",
+        "invalidUrl": "Yanlış URL",
+        "urlHint": "Tam konfiqurasiya URL-i",
+        "disableAutoUpdate": "Avtomatik yenilənməni söndür",
+        "autoUpdateInterval": "Avtomatik yenilənmə aralığı",
+        "loading": "Profil əlavə olunur…",
+        "adminPreference": "Administrator icazəsi",
+        "adminPreferenceAskEachTime": "Hər dəfə soruş",
+        "adminPreferencePreferAdmin": "Həmişə administrator icazəsindən istifadə et",
+        "adminPreferencePreferNoAdmin": "Həmişə administrator icazəsi olmadan davam et",
+        "adminPreferenceReset": "Administrator icazəsini hər dəfə soruş"
+      }
+    },
+    "logs": {
+      "title": "Jurnallar",
+      "category": "Kateqoriya",
+      "level": "Səviyyə",
+      "recentLogs": "Son jurnallar",
+      "recentLogsMsg": "Bu səhifədə gördükləriniz",
+      "errorLog": "Tətbiq və nüvə jurnalı",
+      "errorLogMsg": "Hər ikisinin xətaları, bütün işə salınmalar üzrə",
+      "coreLog": "Nüvə jurnalı",
+      "coreLogMsg": "Nüvənin qeyd etdiyi hər şey",
+      "coreCrash": "Nüvənin çökməsi",
+      "coreCrashMsg": "Nüvə axırıncı dəfə çökəndə nə edirdi",
+      "exportToFile": "Fayla ixrac et",
+      "linesMatch": "$count sətir uyğun gəlir",
+      "fileSaved": "Fayl yadda saxlanıldı",
+      "fileSaveFailed": "Faylı yadda saxlamaq alınmadı",
+      "coreLogLevel": "Nüvə səviyyəsi",
+      "coreLogLevelMsg": "Yenidən qoşulduqdan sonra qüvvəyə minir",
+      "buffer": "Bufer",
+      "diagnostics": "Diaqnostika hesabatı",
+      "diagnosticsMsg": "Çökmə hesabatları, jurnallar və serversiz, parolsuz parametrləriniz, bir zip faylında"
+    },
+    "about": {
+      "title": "Haqqında",
+      "notAvailableMsg": "Ən son versiyadan istifadə edirsiniz",
+      "checkForUpdate": "Yenilənməni yoxla",
+      "openWorkingDir": "İş qovluğunu aç",
+      "sourceCode": "Mənbə kodu",
+      "telegramChannel": "Telegram kanalı",
+      "termsAndConditions": "İstifadə şərtləri",
+      "privacyPolicy": "Məxfilik siyasəti"
+    },
+    "settings": {
+      "title": "Parametrlər",
+      "resetTunnel": "VPN profilini sıfırla",
+      "options": {
+        "import": {
+          "clipboard": "Parametrləri buferdən idxal et",
+          "file": "Parametrləri fayldan idxal et"
+        },
+        "export": {
+          "anonymousToClipboard": "Anonim parametrləri buferə köçür",
+          "anonymousToFile": "Anonim parametrləri fayla ixrac et",
+          "allToClipboard": "Bütün parametrləri buferə köçür",
+          "allToFile": "Bütün parametrləri fayla ixrac et"
+        },
+        "reset": "Parametrləri sıfırla"
+      },
+      "general": {
+        "title": "Ümumi",
+        "locale": "Dil",
+        "themeMode": "Tema rejimi",
+        "themeModes": {
+          "system": "Sistem standartı",
+          "dark": "Qaranlıq rejim",
+          "light": "İşıqlı rejim",
+          "black": "Qara rejim"
+        },
+        "enableAnalytics": "Analitikanı aktiv et",
+        "enableAnalyticsMsg": "Tətbiqin yaxşılaşmasına kömək üçün cihazınızdan analitika və çökmə hesabatları göndər",
+        "autoIpCheck": "Bağlantı IP-sini avtomatik yoxla",
+        "reduceAnimations": "Animasiyaları azalt",
+        "reduceAnimationsMsg": "Batareyaya qənaət üçün qoşulma düyməsini sabit saxla və təkrarlanan effektləri dayandır",
+        "dynamicNotification": "Sürəti bildirişdə göstər",
+        "hapticFeedback": "Titrəyişli əks-əlaqə",
+        "alwaysOnVpn": "Həmişə aktiv VPN",
+        "actionAtClosing": "Pəncərə bağlananda",
+        "autoStart": "Girişdə başlat",
+        "silentStart": "Yığılmış başlat",
+        "ignoreBatteryOptimizations": "Batareya optimallaşdırmasını söndür",
+        "ignoreBatteryOptimizationsMsg": "VPN-in ən yaxşı işləməsi üçün məhdudiyyətləri götür",
+        "memoryLimit": "Yaddaş limiti",
+        "memoryLimitMsg": "Yaddaş çatışmazlığı xətaları və ya tez-tez çökmələr yaşayırsınızsa aktiv edin",
+        "connectionTestUrl": "Bağlantı testi URL-i",
+        "urlTestInterval": "URL testi aralığı",
+        "clashApiPort": "Clash API portu",
+        "useSystemTlsEngine": "Mümkün olduqda sistemin TLS-indən istifadə et",
+        "useSystemTlsEngineMsg": "TLS barmaq izi olmayan bağlantılar bu cihazda yoxlamadan keçdikdən sonra macOS, iOS və ya Windows-un TLS-indən istifadə edir; əks halda Chrome kimi görünürlər.",
+        "uploadTestSize": "Yükləmə testinin həcmi",
+        "megabytes": "$n MB",
+        "speedTest": "Sürət testi"
+      },
+      "routing": {
+        "title": "Marşrutlaşdırma",
+        "routeRule": {
+          "add": "Qayda əlavə et",
+          "delete": "Qaydanı sil",
+          "duplicate": "Qaydanın surətini yarat",
+          "duplicated": "Yeni qayda kimi köçürüldü: istədiyiniz kimi redaktə edin",
+          "copyAll": "Hamısını köçür",
+          "options": {
+            "import": {
+              "clipboard": "Qaydaları buferdən idxal et",
+              "file": "Qaydaları fayldan idxal et"
+            },
+            "export": {
+              "clipboard": "Qaydaları buferə köçür",
+              "file": "Qaydaları fayla yadda saxla"
+            },
+            "reset": "Standart qaydalara sıfırla"
+          },
+          "rule": {
+            "title": "Qayda",
+            "onlyTunMode": "Yalnız TUN rejimində mövcuddur",
+            "notAvailableInThisPlatform": "Bu platformada mövcud deyil",
+            "canNotBeEmpty": "Boş ola bilməz",
+            "validUrlEx": "https://example.com",
+            "validUrl": "Düzgün “URL”, məsələn:\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe və ya google chrome və ya chrome",
+            "validProcessName": "Düzgün “Proses adı”, məsələn:\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "Düzgün “Proses yolu”, məsələn:\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 və ya 1:65000",
+            "validPortRange": "Düzgün “Port” və ya “Port aralığı”, məsələn:\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8, 10.0.0.0/24 və ya fd00::/8",
+            "validIpCidr": "Düzgün IP CIDR, məsələn:\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com və ya dl.google.com",
+            "validDomain": "Düzgün “Domen”, məsələn:\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com və ya .ir",
+            "validDomainSuffix": "Düzgün “Domen şəkilçisi”, məsələn:\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "Daxili qaydanı dəyişmək olmaz. Onun surətini yaradın və surəti redaktə edin.",
+            "tileTitle(map)": {
+              "name": "Ad",
+              "outbound": "Uyğun gəlsə çıxış",
+              "rule_set": "URLset",
+              "package_name": "Paket adları",
+              "process_name": "Proses adları",
+              "process_path": "Proses yolları",
+              "network": "Şəbəkələr",
+              "port_range": "Təyinat portları",
+              "source_port_range": "Mənbə portları",
+              "protocol": "Protokol",
+              "ip_cidr": "Təyinat IP CIDR",
+              "source_ip_cidr": "Mənbə IP CIDR",
+              "domain": "Domen",
+              "domain_suffixe": "Domen şəkilçisi",
+              "domain_keyword": "Domen açar sözü",
+              "domain_regex": "Domen regex"
+            },
+            "outbound(map)": {
+              "proxy": "Proksi",
+              "direct": "Birbaşa",
+              "direct_with_fragment": "Fraqmentlə birbaşa",
+              "block": "Blokla"
+            },
+            "network(map)": {
+              "all": "Hamısı",
+              "tcp": "TCP",
+              "udp": "UDP"
+            },
+            "protocol(map)": {
+              "": "Hamısı",
+              "tls": "TLS",
+              "http": "HTTP",
+              "quic": "QUIC",
+              "stun": "STUN",
+              "dns": "DNS",
+              "bittorrent": "BitTorrent"
+            }
+          },
+          "genericList": {
+            "addNew": "Yeni dəyər əlavə et",
+            "update": "Dəyəri yenilə",
+            "clearList": "Siyahını təmizlə",
+            "clearListMsg": "Bütün elementlər silinəcək"
+          }
+        },
+        "builtinRules": {
+          "tag": "Daxili qayda",
+          "bypassLan": "Yerli şəbəkəni yan keç",
+          "systemDirect": {
+            "apple": "Apple xidmətləri",
+            "microsoft": "Microsoft xidmətləri",
+            "android": "Android xidmətləri",
+            "linux": "Linux yenilənmələri"
+          },
+          "blockAds": "Reklamlar və zərərli proqramlar",
+          "bypassRegion": "$region saytları"
+        },
+        "appBasedRouting": {
+          "title": "Tətbiqə görə marşrutlaşdırma",
+          "hideSysApps": "Sistem tətbiqlərini gizlət",
+          "listTitle": {
+            "bypass": "Yan keçilən tətbiqlər",
+            "proxy": "Proksi ilə işləyən tətbiqlər"
+          },
+          "chooseApps": "Tətbiqləri seç",
+          "apps": {
+            "one": "tətbiq",
+            "other": "tətbiq"
+          },
+          "moreApps": {
+            "one": "+$n tətbiq",
+            "other": "+$n tətbiq"
+          },
+          "autoTag": "Avto",
+          "outsideVpn": "VPN-dən kənarda",
+          "ruleWontApply": "VPN-dən kənarda · qayda tətbiq olunmayacaq",
+          "notInstalled": "Quraşdırılmayıb",
+          "share": {
+            "invite": "Avtomatik seçimin yaxşılaşmasına kömək edin",
+            "removed": {
+              "one": "$n silindi",
+              "other": "$n silindi"
+            },
+            "added": {
+              "one": "$n əlavə edildi",
+              "other": "$n əlavə edildi"
+            },
+            "title": "Dəyişikliklərinizi paylaşın",
+            "where": "GitHub-da bu tətbiq adları ilə artıq doldurulmuş açıq məsələ səhifəsi açılır. Paylaşmaq üçün orada göndərin. GitHub hesabınız olmalıdır.",
+            "action": "GitHub-da davam et"
+          },
+          "options": {
+            "import": {
+              "clipboard": "Seçimi buferdən idxal et",
+              "file": "Seçimi fayldan idxal et",
+              "msg": "İdxal cari seçimlərinizi əvəz edir. Davam edilsin?"
+            },
+            "export": {
+              "clipboard": "Seçimi buferə köçür",
+              "file": "Seçimi fayla ixrac et"
+            },
+            "clearAllSelections": "Bütün seçimləri təmizlə"
+          },
+          "modes": {
+            "proxy": "Yalnız proksi",
+            "bypass": "Yan keç"
+          },
+          "autoSelection": {
+            "title": "$region üzrə avtomatik seçim",
+            "performNow": "İndi yenilə",
+            "updated": {
+              "zero": "Bu gün yenilənib",
+              "one": "$n gün əvvəl yenilənib",
+              "other": "$n gün əvvəl yenilənib"
+            },
+            "noList": "Bu region üçün siyahı yoxdur",
+            "loadFailed": "Siyahını yükləmək alınmadı",
+            "restore": {
+              "one": "$n avtomatik seçimi bərpa et",
+              "other": "$n avtomatik seçimi bərpa et"
+            },
+            "restored": {
+              "one": "$n avtomatik seçim bərpa edildi",
+              "other": "$n avtomatik seçim bərpa edildi"
+            }
+          }
+        },
+        "region": "Region",
+        "regions": {
+          "ir": "İran (ir)",
+          "cn": "Çin (cn)",
+          "ru": "Rusiya (ru)",
+          "af": "Əfqanıstan (af)",
+          "id": "İndoneziya (id)",
+          "tr": "Türkiyə (tr)",
+          "br": "Braziliya (br)",
+          "other": "Digər"
+        },
+        "balancerStrategy": {
+          "title": "Balanslaşdırıcı strategiyası",
+          "roundRobin": "Növbə ilə",
+          "consistentHash": "Sabit heş",
+          "stickySession": "Yapışqan sessiya",
+          "roundRobinDescription": "Hər bağlantı növbəti serverdən istifadə edir, ona görə saytlar IP-nizin dəyişdiyini görə bilər",
+          "consistentHashDescription": "Hər sayt həmişə eyni serverdən istifadə edir",
+          "stickySessionDescription": "Hər sayt siz yenidən qoşulana qədər təsadüfi bir serveri saxlayır"
+        },
+        "defaultProxy": {
+          "title": "Standart proksi",
+          "lowest": "Ən aşağı pinq",
+          "balance": "Balans",
+          "first": "İlk proksi",
+          "lowestDescription": "Siz proksi seçənə qədər ən sürətlisi istifadə olunur",
+          "balanceDescription": "Siz proksi seçənə qədər bağlantılar hamısı arasında bölüşdürülür",
+          "firstDescription": "Siz proksi seçənə qədər profilin ilk proksisi istifadə olunur"
+        },
+        "resolveDestination": "Təyinatı həll et",
+        "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "IPv6 niyə söndürülüb?",
+        "ipv6RouteTurnOnTitle": "IPv6 aktiv edilsin?",
+        "ipv6RouteTurnOn": "Aktiv et",
+        "ipv6RouteHelp": "Əksər proksilərin çıxışında IPv6 yoxdur.\n\nProksinin daşıya bilmədiyi bağlantı açılan kimi kəsilir, brauzerlər isə onu IPv4 ilə təkrar cəhd etmir, ona görə Google və YouTube yüklənmir.\n\nAktiv olduqda hər proksi bağlantı testi zamanı bir dəfə yoxlanılır. IPv6 yalnız onu daşıyan proksi vasitəsilə istifadə olunur; qalan hər şey hiss olunmadan IPv4 ilə gedir.\n\nIPv6 həmişə VPN-in daxilindən keçir, heç vaxt ondan yan keçmir.",
+        "ipv6Modes": {
+          "ipv4Only": "Söndürülüb (yalnız IPv4)",
+          "preferIpv4": "Aktiv, əvvəlcə IPv4",
+          "preferIpv6": "Aktiv, əvvəlcə IPv6",
+          "ipv4OnlyDescription": "Tətbiqlər yalnız IPv4 istifadə edir. IPv6 dərhal rədd edilir.",
+          "preferIpv4Description": "Əvvəlcə IPv4. IPv6 yalnız onu daşıdığı təsdiqlənmiş proksi vasitəsilə.",
+          "preferIpv6Description": "Əvvəlcə IPv6, yalnız onu daşıdığı təsdiqlənmiş proksi vasitəsilə."
+        }
+      },
+      "dns": {
+        "title": "DNS",
+        "remoteDns": "Uzaq DNS",
+        "remoteDnsDomainStrategy": "Uzaq DNS domen strategiyası",
+        "directDns": "Çıxış serveri resolver-i (birbaşa)",
+        "directDnsDomainStrategy": "Çıxış domen strategiyası",
+        "enableFakeDns": "Saxta DNS-i aktiv et",
+        "domainStrategy": {
+          "auto": "Avto",
+          "preferIpv6": "IPv6-ya üstünlük ver",
+          "preferIpv4": "IPv4-ə üstünlük ver",
+          "ipv4Only": "Yalnız IPv4",
+          "ipv6Only": "Yalnız IPv6"
+        }
+      },
+      "inbound": {
+        "title": "Giriş",
+        "serviceMode": "Xidmət rejimi",
+        "serviceModes": {
+          "proxy": "Yalnız proksi xidməti",
+          "systemProxy": "Sistem proksisini təyin et",
+          "tun": "VPN",
+          "router": "Router (bütün şəbəkə)"
+        },
+        "shortServiceModes": {
+          "proxy": "Proksi",
+          "systemProxy": "Sistem proksisi",
+          "tun": "VPN",
+          "router": "Router"
+        },
+        "strictRoute": "Sərt marşrut",
+        "tunImplementation": "TUN reallaşdırması",
+        "tunImplementations": {
+          "sing15": "Sing 15",
+          "mixed": "Qarışıq",
+          "system": "Sistem",
+          "gvisor": "gVisor"
+        },
+        "mixedPort": "Proksi portu (SOCKS5/4, HTTP)",
+        "tproxyPort": "Şəffaf proksi portu",
+        "directPort": "Birbaşa port",
+        "redirectPort": "Yönləndirmə portu",
+        "lanSharing": "Yerli şəbəkədə paylaş",
+        "connectionSharing": "Bağlantı paylaşımı",
+        "qrCode": "QR kod",
+        "closedInVpn": "VPN rejimində paylaşılmayıbsa bağlıdır",
+        "proxySecret": "Proksi sirri",
+        "noSecret": "Sirr yoxdur: porta çatan hər tətbiq və ya cihaz istifadə edə bilər",
+        "generateSecret": "Yenisini yarat",
+        "removeSecret": "Sirr silinsin?",
+        "removeSecretMsg": "Sirr olmadan bu cihazdakı hər tətbiq və paylaşım zamanı şəbəkədəki hər cihaz istifadəçi adı və parol olmadan proksidən istifadə edə bilər. Öz riskinizlə silin.",
+        "localProxy": "Yerli proksi",
+        "localProxyInVpn": "VPN rejimində açıq saxla",
+        "localProxyInVpnHint": "Tətbiqlər artıq VPN-dən istifadə edir; yalnız proksidən istifadə etmək üçün ayarlanmış tətbiqlər üçün",
+        "localProxyAuth": "Parol tələb et",
+        "localProxyAuthHint": "Brauzer kimi bəzi tətbiqlər SOCKS parolu göndərə bilmir",
+        "notAsSystemProxy": "Parol göndərə bilmədiyi üçün sistem proksisi kimi tələb olunmur",
+        "lanGroup": "Yerli şəbəkədə paylaşım",
+        "lanSharingPort": "Paylaşım portu",
+        "otherPorts": "Digər portlar",
+        "closedInVpnLocal": "VPN rejimində bağlıdır"
+      },
+      "tlsTricks": {
+        "title": "TLS hiylələri",
+        "enable": "Fraqmenti aktiv et",
+        "packets": "Fraqmentasiya paketləri",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
+        "size": "Fraqment ölçüsü",
+        "sleep": "Fraqment fasiləsi",
+        "mixedSniCase": {
+          "enable": "Qarışıq SNI registrini aktiv et"
+        },
+        "padding": {
+          "enable": "Doldurmanı aktiv et",
+          "size": "Doldurma ölçüsü"
+        }
+      },
+      "chain": {
+        "quick": {
+          "off": "Söndürülüb",
+          "extraSecurity": {
+            "title": "Əlavə təhlükəsizlik",
+            "subtitle": "Proksiyə etibar etmədikdə",
+            "ipBy": "IP-nizi $mode təyin edir",
+            "notTracked": "VPN provayderiniz trafikinizi görə bilməz",
+            "forPublic": "İctimai və anonim proksilər üçün yaxşıdır",
+            "slower": "Sürəti azalda bilər"
+          },
+          "unblocker": {
+            "title": "Proksi blokaçan",
+            "subtitle": "Proksini filtrdən keçirir",
+            "mayConnect": "Filtrlənmiş proksi qoşula bilər",
+            "personalOnly": "Yalnız şəxsi proksi üçün faydalıdır",
+            "notForPublic": "İctimai proksilər üçün uyğun deyil",
+            "slower": "Proksi bir az yavaşlayır"
+          }
+        },
+        "title": "Zəncir",
+        "subtitle": "Əlavə təhlükəsizlik və blokaçan",
+        "finalIp": "Son IP",
+        "levels": {
+          "app": {
+            "title": "Tətbiq",
+            "msg": "Başlanğıc nöqtəsi: Tətbiq trafikiniz zəncirə buradan daxil olur və son yan keçmə üçün hazırlıq məqsədilə növbəti qatlardan keçir"
+          },
+          "extraSecurity": {
+            "title": "Əlavə təhlükəsizlik",
+            "msg": "Əsas profiliniz etibarsız olsa belə, məlumatlarınızı məxfi saxlamaq üçün əlavə qoruma qatı əlavə edir"
+          },
+          "mainProfile": {
+            "title": "Əsas profil"
+          },
+          "unblocker": {
+            "title": "Blokaçan",
+            "msg": "Şəbəkə məhdudiyyətlərini yan keçməyə kömək edir. Köməkçi qoşularsa, əsas profiliniz hazırda bloklansa belə işləyə bilər."
+          },
+          "filtering": {
+            "title": "Filtrləmə",
+            "msg": "Son çıxış: Trafikiniz Əlavə təhlükəsizlik, Əsas profil və ya Blokaçan ola bilən aktiv qatlardan keçir. Onların təsirləri tətbiq olunduqdan sonra yerli şəbəkə filtrini yan keçmək üçün yönləndirilir."
+          }
+        },
+        "warp": {
+          "missingConfig": "WARP konfiqurasiyası yoxdur",
+          "licenseKey": "Lisenziya açarı",
+          "tunnel": "Tunel",
+          "cleanIp": "Təmiz IP",
+          "port": "Port",
+          "noise": {
+            "count": "Küy sayı",
+            "mode": "Küy rejimi",
+            "size": "Küy ölçüsü",
+            "delay": "Küy gecikməsi",
+            "modes": {
+              "standard": "Standart",
+              "random": "Təsadüfi",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "QUIC əl sıxması",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (VoIP zəngi)",
+              "stun": "STUN (video zəng)"
+            },
+            "title": "WireGuard küyü"
+          },
+          "endpoint": "Son nöqtə",
+          "endpointSources": {
+            "profile": "Cloudflare tərəfindən təyin edilib",
+            "scan": "Skan et",
+            "custom": "Fərdi"
+          },
+          "customServer": "Ünvan",
+          "mtu": "MTU",
+          "customized": "Fərdiləşdirilib",
+          "scanner": {
+            "title": "Skaner",
+            "searchNoise": "Axtarış küyü",
+            "maxRtt": "Maks. RTT (ms)",
+            "timeout": "Yoxlama vaxt aşımı (ms)",
+            "count": "Yoxlanılacaq ünvanlar",
+            "concurrency": "Paralel yoxlamalar",
+            "ports": "Portlar",
+            "cidrs": "Aralıqlar"
+          },
+          "masque": {
+            "title": "MASQUE",
+            "vhttp": "HTTP versiyası",
+            "serverName": "Server adı",
+            "useIpv6": "IPv6-ya üstünlük ver",
+            "udpTimeout": "UDP vaxt aşımı (san.)",
+            "keepalive": "UDP keepalive (san.)",
+            "packetSize": "İlkin paket ölçüsü",
+            "reconnectDelay": "Yenidən qoşulma gecikməsi (san.)",
+            "tlsInsecure": "TLS yoxlamasını keç",
+            "fragment": "TLS fraqmenti",
+            "fragmentDelay": "Fraqment ehtiyat gecikməsi (ms)",
+            "recordFragment": "TLS qeydlərini fraqmentlə",
+            "ech": "Şifrələnmiş Client Hello",
+            "echConfig": "ECH konfiqurasiyası",
+            "echQueryServerName": "ECH sorğu adı"
+          },
+          "awg": {
+            "title": "AmneziaWG",
+            "jc": "Lazımsız paketlər",
+            "jmin": "Min. lazımsız ölçü",
+            "jmax": "Maks. lazımsız ölçü"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "Server regionunu seç",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "Avstriya (at)",
+            "au": "Avstraliya (au)",
+            "be": "Belçika (be)",
+            "bg": "Bolqarıstan (bg)",
+            "ca": "Kanada (ca)",
+            "ch": "İsveçrə (ch)",
+            "cz": "Çexiya (cz)",
+            "de": "Almaniya (de)",
+            "dk": "Danimarka (dk)",
+            "ee": "Estoniya (ee)",
+            "es": "İspaniya (es)",
+            "fi": "Finlandiya (fi)",
+            "fr": "Fransa (fr)",
+            "gb": "Birləşmiş Krallıq (gb)",
+            "hr": "Xorvatiya (hr)",
+            "hu": "Macarıstan (hu)",
+            "ie": "İrlandiya (ie)",
+            "in": "Hindistan (in)",
+            "it": "İtaliya (it)",
+            "jp": "Yaponiya (jp)",
+            "lv": "Latviya (lv)",
+            "nl": "Niderland (nl)",
+            "no": "Norveç (no)",
+            "pl": "Polşa (pl)",
+            "pt": "Portuqaliya (pt)",
+            "ro": "Rumıniya (ro)",
+            "rs": "Serbiya (rs)",
+            "se": "İsveç (se)",
+            "sg": "Sinqapur (sg)",
+            "sk": "Slovakiya (sk)",
+            "us": "Amerika Birləşmiş Ştatları (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "Profili seç",
+          "conduitPairingId": "Conduit cütləşdirmə ID-si"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "Bağlantı",
+      "traffic": "Trafik",
+      "trafficLive": "Canlı trafik",
+      "trafficTotal": "Ümumi trafik",
+      "uplink": "Yükləmə kanalı",
+      "downlink": "Endirmə kanalı",
+      "speed": "Sürət",
+      "totalTransferred": "Ümumi ötürülən"
+    },
+    "subscriptionInfo": {
+      "upload": "Yükləmə",
+      "download": "Endirmə",
+      "total": "Ümumi trafik",
+      "expireDate": "Bitmə tarixi",
+      "expired": "Müddəti bitib",
+      "noTraffic": "Kvota bitib",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days gün qalıb",
+        "other": "$days gün qalıb"
+      },
+      "remainingUnlimited": "Limitsiz",
+      "remainingTrafficSemanticLabel": "Ümumi ${total} trafikdən ${consumed} istifadə olunub",
+      "remainingTraffic": "Qalan trafik",
+      "openWebPage": "Veb səhifəni aç",
+      "support": "Dəstək",
+      "openLinkTitle": "Bu keçid açılsın?",
+      "openLinkAction": "Aç"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "Sıralama",
+      "sort": {
+        "name": "Əlifba sırası ilə",
+        "lastUpdate": "Yaxınlarda yenilənənlər"
+      },
+      "direction": {
+        "newestFirst": "Əvvəlcə ən yenilər",
+        "oldestFirst": "Əvvəlcə ən köhnələr"
+      }
+    },
+    "warpLicense": {
+      "title": "Cloudflare WARP razılığı",
+      "description(rich)": "Cloudflare WARP pulsuz WireGuard VPN provayderidir. Bunu aktiv etməklə Cloudflare WARP-ın ${tos(İstifadə şərtləri)} və ${privacy(Məxfilik siyasəti)} ilə razılaşırsınız."
+    },
+    "psiphonLicense": {
+      "title": "Psiphon lisenziya razılaşması",
+      "description(rich)": "Psiphon-dan istifadə etməklə siz ${tos(İstifadə şərtləri)} ilə razılaşır və ${privacy(Məxfilik siyasəti)} ilə tanış olduğunuzu təsdiq edirsiniz. Davam etməzdən əvvəl onları diqqətlə oxuyun."
+    },
+    "newVersion": {
+      "title": "Yenilənmə mövcuddur",
+      "msg": "@:common.appTitle tətbiqinin yeni versiyası mövcuddur. İndi yenilənsin?",
+      "currentVersion": "Cari versiya",
+      "newVersion": "Yeni versiya",
+      "updateNow": "İndi yenilə",
+      "downloading": "Endirilir…",
+      "installing": "Quraşdırıcı başladılır…",
+      "allowInstall": "Açılan parametrlərdə Hiddify-a tətbiq quraşdırmağa icazə verin, sonra yenidən cəhd edin.",
+      "failed": "Yenilənməni quraşdırmaq alınmadı.",
+      "openPage": "Buraxılış səhifəsini aç",
+      "tryAgain": "Yenidən cəhd et"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "Bu, bütün konfiqurasiya parametrlərini idxal edilən dəyərlərlə əvəz edir. Davam edilsin?"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "Profili sil",
+          "msg": "Bu profil silinsin? Bunu geri qaytarmaq olmaz."
+        }
+      },
+      "appList": {
+        "import": {
+          "msg": "Bu, Yan keç və Yalnız proksi tətbiqlərinizi əvəz edir. Davam edilsin?"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "Qaydanı sil",
+          "msg": "“$rulename” qaydası silinsin? Bunu geri qaytarmaq olmaz."
+        }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "Profil əlavə edilsin?",
+        "message": "“${host}” saytından xarici keçid yeni profil əlavə etmək istəyir. İdxal edilsin?"
+      },
+      "importRouteRuleByDeepLinkWarning": {
+        "title": "Marşrut qaydası idxal edilsin?",
+        "message": "Marşrut qaydaları trafikinizin hara getdiyini müəyyən edir.\nYalnız etibar etdiyiniz mənbədən idxal edin."
+      }
+    },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Bütün tətbiqlər VPN vasitəsilə göndərilsin?",
+        "vpnMode": "VPN rejimi",
+        "allApps": "Bütün tətbiqlər",
+        "recommended": "Tövsiyə olunur",
+        "systemProxyMode": "Sistem proksisi",
+        "someApps": "Brauzerlər və əksər tətbiqlər",
+        "switched": "Sistem proksisi rejiminə keçildi. Bunu Parametrlərdə dəyişə bilərsiniz.",
+        "waitingTitle": "Administrator icazəsi gözlənilir",
+        "waitingMsg": "Hiddify VPN rejiminə icazə verməyinizi gözləyir.",
+        "waitingWhere": "Açılan pəncərədə:",
+        "waitingWindows": "“Bəli” düyməsinə klikləyin.",
+        "waitingMac": "Mac parolunuzu daxil edin və təsdiq edin.",
+        "waitingLinux": "Parolunuzu daxil edin və təsdiq edin.",
+        "back": "Geri",
+        "needsAdmin": "Administrator lazımdır, bir dəfə",
+        "needsAdminAppImage": "Hər başlanğıcda administrator lazımdır",
+        "noAdmin": "Administrator lazım deyil",
+        "someAppsExcept": "Telegram və bir neçə tətbiq istisna olunur",
+        "useVpn": "VPN rejimindən istifadə et",
+        "useSystemProxy": "Sistem proksisindən istifadə et",
+        "helpTooltip": "Bu nədir?",
+        "helpWhatTitle": "Necə işləyir",
+        "helpProsTitle": "Üstünlüklər",
+        "helpConsTitle": "Nəzərə alın",
+        "helpVpn": {
+          "what": "Hiddify kompüterinizə virtual şəbəkə əlavə edir və hər tətbiqin internet trafiki özü-özünə onun üzərindən keçir: brauzerlər, Telegram, oyunlar, yenilənmələr və digərləri. Hər tətbiqdə nəsə ayarlamaq lazım deyil.",
+          "pros": [
+            "Hər tətbiq Hiddify vasitəsilə işləyir, hər tətbiqdə parametr tələb olunmur.",
+            "Proksi parametrlərini nəzərə almayan Telegram və oyunlar kimi tətbiqlər də işləyir.",
+            "Ad sorğuları (DNS) da Hiddify vasitəsilə gedir, ona görə bu yolla bloklanan saytlar da açılır."
+          ],
+          "cons": [
+            "İlk dəfə kompüteriniz Hiddify-ın fon xidmətini quraşdırmaq üçün administrator icazəsi soruşur. Bundan sonra soruşmadan qoşulur.",
+            "İstifadə edərkən digər VPN tətbiqlərini söndürün: ikisi eyni vaxtda bir-birinə mane olur."
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify kompüterinizin proksi parametrini dəyişir. Veb brauzerlər kimi bu parametrə əməl edən tətbiqlər trafikini Hiddify vasitəsilə göndərir; qalanları Hiddify söndürülmüş kimi birbaşa qoşulur.",
+          "pros": [
+            "Administrator icazəsi lazım deyil.",
+            "Tez aktiv və deaktiv olunur, bağlantını kəsdiyiniz zaman Hiddify parametri əvvəlki vəziyyətinə qaytarır.",
+            "Kompüterinizdəki digər şəbəkə alətləri ilə yanaşı işləyir."
+          ],
+          "cons": [
+            "Telegram, bir çox oyun və bəzi yeniləmə alətləri kimi sistem proksisini nəzərə almayan tətbiqlər qorunmur.",
+            "Əgər işləməsələr, əvəzinə VPN rejimini seçin."
+          ]
+        }
+      },
+      "proxyNeedsAdmin": {
+        "title": "Administrator icazəsi tövsiyə olunur",
+        "msg": "Bu profildəki bəzi parametrlər administrator icazəsi ilə daha yaxşı işləyir. Administrator icazəsi ilə işlədə və ya onsuz davam edib bu bağlantı üçün həmin parametrləri söndürə bilərsiniz.",
+        "seeConfigs": "Konfiqurasiyaları göstər",
+        "hideConfigs": "Konfiqurasiyaları gizlət",
+        "neverAskAgain": "Bu profil üçün bir daha soruşma",
+        "runAsAdmin": "Administrator kimi işə sal",
+        "continueWithoutAdmin": "Administrator icazəsi olmadan davam et",
+        "elevationFailedTitle": "Administrator icazəsi alınmadı",
+        "elevationFailedMsg": "Administrator sorğusu rədd edildi və ya alınmadı. Yenidən cəhd edin və ya bu bağlantı üçün administrator icazəsi olmadan davam edin.",
+        "tryAgain": "Yenidən cəhd et"
+      }
+    },
+    "experimentalNotice": {
+      "title": "Eksperimental funksiyalar istifadə olunur",
+      "msg": "Bağlantı keyfiyyətinə təsir edə və gözlənilməz xətalara səbəb ola biləcək bəzi eksperimental funksiyaları aktiv etmisiniz. Bu parametrləri istədiyiniz vaxt Parametrlərdə dəyişə və ya sıfırlaya bilərsiniz.",
+      "disable": "Bir daha göstərmə"
+    },
+    "noActiveProfile": {
+      "title": "Profil seçin",
+      "msg": "Başlayaq. VPN serverinizin məlumatları ilə bağlantı profili əlavə edin.\n\nHələ serveriniz yoxdur? Problem deyil. Aşağıdakı bələdçi onu pulsuz necə qurmağı göstərir.",
+      "helpBtn": {
+        "label": "Necə olduğunu göstər",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "Əvvəlcə bu keçidi yoxlayın",
+      "cannotVerify": "Bu keçid təsdiqlənməyib",
+      "avoidIfUnsure": "Tam əmin deyilsinizsə, ödəniş etməyin və həssas məlumat paylaşmayın",
+      "ownResponsibility": "Öz riskinizlə davam edirsiniz",
+      "open": "Aç",
+      "openIn": "Aç (${seconds})"
+    },
+    "proxyInfo": {
+      "fullTag": "Tam teq",
+      "type": "Növ",
+      "status": "Vəziyyət",
+      "testTime": "Test vaxtı",
+      "testDelay": "Gecikmə testi",
+      "isSelected": "Seçilib",
+      "isGroup": "Qrup",
+      "isSecure": "Təhlükəsiz",
+      "port": "Port",
+      "host": "Host",
+      "ip": "IP",
+      "countryCode": "Ölkə kodu",
+      "region": "Region",
+      "city": "Şəhər",
+      "asn": "ASN",
+      "organization": "Təşkilat",
+      "location": "Yerləşmə",
+      "postalCode": "Poçt kodu",
+      "download": "Endirmə",
+      "upload": "Yükləmə",
+      "ping": "Pinq",
+      "speed": "Sürət",
+      "server": "Server",
+      "country": "Ölkə",
+      "tapToTest": "Yoxlamaq üçün toxunun",
+      "error": "Niyə alınmadı"
+    },
+    "windowClosing": {
+      "askEachTime": "Hər dəfə soruş",
+      "alertMessage": "Tətbiq gizlədilsin, yoxsa bağlansın?",
+      "remember": "Bu seçimi yadda saxla"
+    },
+    "qrCode": {
+      "copyFullLink": "Tam keçidi köçür",
+      "copied": "Köçürüldü",
+      "lanLine": "SOCKS5 · yalnız eyni şəbəkədə",
+      "noLocalNetwork": "Yerli şəbəkə tapılmadı",
+      "ip": "IP",
+      "port": "Port",
+      "username": "İstifadəçi adı",
+      "password": "Parol",
+      "showPassword": "Parolu göstər",
+      "hidePassword": "Parolu gizlət"
+    },
+    "qrScanner": {
+      "notFound": "Bu şəkildə QR kod tapılmadı"
+    },
+    "crashReport": {
+      "title": "Hiddify son dəfə çökdü",
+      "msg": "Bunun düzəldilməsi üçün tərtibatçılara hesabat göndərilsin? Hesabatda çökmə təfərrüatları, jurnallar və serverlər, açarlar və parollar silinmiş konfiqurasiyanız var; göndərməzdən əvvəl baxa biləcəyiniz bir zip faylıdır.",
+      "send": "Hesabatı göndər"
+    },
+    "keepTop": {
+      "title": "Böyük abunəlik",
+      "subtitle": "$count proksi · hamısını işlətmək batareya, trafik və yaddaş sərf edir",
+      "hint": "İstədiyiniz vaxt siyahının sonundan geri ala bilərsiniz.",
+      "keeping": "Ən sürətli $keep proksi işləyir, digərləri dayandırılır",
+      "all": "Hamısı işləyir: $count",
+      "keep": "Ən sürətli $keep proksini saxla",
+      "useAll": "Hamısından istifadə et: $count",
+      "howMany": "Neçəsi işləməyə davam etsin",
+      "pickByHand": "Proksiləri özünüz seçin",
+      "region": "Region",
+      "anyRegion": "İstənilən region",
+      "keepAnswering": "Cavab verənləri saxla",
+      "keepingAnswering": "Yalnız cavab verənlər işləyir",
+      "answering": "İşləyir",
+      "everyOne": "Hamısı",
+      "quick": "Sürətli test",
+      "quickHint": "Ən sürətlilər tapılan kimi dayanır",
+      "quickHelp": "Bu nə edir?",
+      "quickFirst": "Əvvəlcə keçən dəfəki ən sürətlilər yoxlanılır",
+      "quickStop": "Qalanlar əvvəl daha yavaş olubsa, test dayanır",
+      "quickNew": "Yeni proksilər və bir gündür yoxlanılmayanlar həmişə yoxlanılır"
+    },
+    "keepTags": {
+      "title": "Proksiləri seçin",
+      "hint": "Hər qoşulanda yalnız bunlar işləyir.",
+      "search": "Axtar",
+      "all": "Hamısını seç",
+      "none": "Təmizlə",
+      "run": "Bunlardan istifadə et: $n",
+      "sort": "Sırala",
+      "sortProfile": "Profil sırası",
+      "sortPing": "Pinq",
+      "sortDownload": "Endirmə",
+      "sortUpload": "Yükləmə",
+      "selectFastest": "Ən sürətli $n",
+      "statusChosen": "Seçilib",
+      "statusAnswering": "Cavab verir",
+      "statusPaused": "Dayandırılıb",
+      "paused": "$n proksi dayandırılıb: onların pinqi yoxdur və yoxlanıla bilmir.",
+      "wake": "Yoxlamaq üçün hamısını işə sal",
+      "offline": "Pinqlərini görmək və yoxlamaq üçün qoşulun.",
+      "offlineTitle": "Qoşulmayıb",
+      "shown": "$n göstərilir",
+      "noMatch": "Uyğun proksi yoxdur",
+      "chosenHint": "Seçmək üçün yuxarıdakı proksiyə toxunun",
+      "allShown": "Hamısı yuxarıdakı siyahıdadır",
+      "notShown": "Göstərilməyənlər:",
+      "protocol": "Protokol",
+      "country": "Region",
+      "anyProtocol": "İstənilən protokol",
+      "anyCountry": "İstənilən region",
+      "otherCountries": "Digərləri"
+    },
+    "localProxy": {
+      "steps": [
+        "Tətbiqin proksi parametrlərini açın",
+        "SOCKS5 və ya HTTP seçin",
+        "Aşağıdakı dəyərləri daxil edin · köçürmək üçün toxunun",
+        "Hiddify-ı qoşulu saxlayın"
+      ],
+      "hint": "Proksi rejimi · necə istifadə etməli",
+      "setPassword": "Parol təyin et",
+      "manual": "Əl ilə",
+      "dontShowAgain": "Bir daha göstərmə",
+      "thisDevice": "Bu cihaz",
+      "otherDevices": "Digər cihazlar",
+      "server": "Server",
+      "noPassword": "Parol təyin edilməyib",
+      "turnOnSharing": "Paylaşımı aktiv et",
+      "copyLink": "Keçidi köçür",
+      "telegramLink": "Telegram keçidi",
+      "fullLink": "Tam keçid",
+      "portRange": "1024 ilə 65535 arasında port istifadə edin",
+      "passwordTooShort": "Ən azı 4 simvol",
+      "edit": "Redaktə et"
+    },
+    "dbNewerThanApp": {
+      "title": "Saxlanılmış məlumatlar daha yeni versiyadandır",
+      "msg": "Profilləriniz və parametrləriniz Hiddify-ın daha yeni versiyası tərəfindən saxlanılıb və bu köhnə versiya onları oxuya bilmir. Onları saxlamaq üçün ən son versiyanı quraşdırın və ya bu versiyadan istifadə etmək üçün onları silin.",
+      "deleteData": "Məlumatları sil",
+      "deleteConfirm": "Saxlanılmış məlumatlar silinir. Abunəlikləriniz və yerli profilləriniz mümkün olduqda geri əlavə olunur; daha yeni versiyanın saxladığı qalan hər şey itirilir.",
+      "downloadLatest": "Ən son versiyanı endir"
+    },
+    "dbBroken": {
+      "title": "Saxlanılmış məlumatları açmaq olmur",
+      "msg": "Hiddify saxlanılmış profillərini aça bilmədi. Yenidən başlamaq üçün saxlanılmış məlumatları silin: abunəlikləriniz və yerli profilləriniz mümkün olduqda geri əlavə olunur, parametrləriniz saxlanılır.",
+      "wipeData": "Məlumatları sil",
+      "wipeConfirm": "Saxlanılmış məlumatlar silinir və Hiddify yenidən başlayır. Hələ də oxuna bilən profillər geri əlavə olunur; qalanlarını bərpa etmək mümkün deyil.",
+      "copyError": "Xətanı köçür"
+    }
+  },
+  "connection": {
+    "tapToConnect": "Qoşulmaq üçün toxunun",
+    "connect": "Qoşul",
+    "connecting": "Qoşulur…",
+    "waiting": "Azadlıq axtarılır…",
+    "noAvailableProxies": "Qoşulmaq alınmadı",
+    "hotReloading": "Dəyişikliklər tətbiq olunur…",
+    "connected": "Qoşuldu",
+    "disconnect": "Bağlantını kəs",
+    "disconnecting": "Bağlantı kəsilir…",
+    "failed": "Qoşulmaq mümkün olmadı",
+    "slow": "Həmişəkindən çox çəkir…",
+    "tapToRetry": "Yenidən cəhd üçün toxunun",
+    "errorDetails": "Xətanın təfərrüatları",
+    "reconnect": "Yenidən qoşul",
+    "reconnectMsg": "Dəyişiklikləri tətbiq etmək üçün yenidən qoşulur…",
+    "health": {
+      "title": "Bağlantı yoxlaması",
+      "allGood": "Trafikiniz keçir",
+      "pickDead": "Seçilmiş proksi cavab vermir",
+      "hopPending": "${chain} qoşulur…",
+      "hopFailed": "${chain} qoşula bilmədi",
+      "coreTesting": "Serverlər yoxlanılır…",
+      "coreNone": "Heç bir server cavab vermir",
+      "fastest": "Ən sürətli server",
+      "yourServer": "Seçilmiş proksi",
+      "notResponding": "Cavab vermir",
+      "testing": "Yoxlanılır…",
+      "useFastest": "Ən sürətliyə keç",
+      "hopReady": "Qoşuldu",
+      "hopConnecting": "Qoşulur…",
+      "hopBroken": "Qoşula bilmədi",
+      "hopNoReply": "Qoşuldu, amma cavab vermir",
+      "hopBlocked": "Seçilmiş proksinin cavab verməsini gözləyir",
+      "retry": "Yenidən yoxla",
+      "change": "Dəyiş",
+      "turnOff": "Söndür"
+    }
+  },
+  "errors": {
+    "unexpected": "Gözlənilməz xəta",
+    "connection": {
+      "unexpected": "Gözlənilməz bağlantı xətası",
+      "timeout": "Bağlantı vaxt aşımı",
+      "badResponse": "Yanlış server cavabı",
+      "connectionError": "Bağlantı xətası",
+      "badCertificate": "Yanlış sertifikat"
+    },
+    "profiles": {
+      "unexpected": "Gözlənilməz xəta",
+      "notFound": "Profil tapılmadı",
+      "invalidConfig": "Yanlış konfiqurasiya",
+      "invalidUrl": "Yanlış URL",
+      "canceledByUser": "İstifadəçi tərəfindən ləğv edildi"
+    },
+    "connectivity": {
+      "unexpected": "Gözlənilməz xəta",
+      "missingVpnPermission": "VPN icazəsi yoxdur",
+      "missingNotificationPermission": "Bildiriş icazəsi yoxdur",
+      "core": "Nüvə xətası"
+    },
+    "singbox": {
+      "serviceNotRunning": "Xidmət işləmir",
+      "missingPrivilege": "Səlahiyyət çatışmır",
+      "missingPrivilegeMsg": "VPN rejimi başlaya bilmir. Tətbiqi administrator kimi yenidən işə salın və ya xidmət rejimini dəyişin.",
+      "tunAddressInUse": "Başqa VPN aktivdir",
+      "tunAddressInUseMsg": "VPN rejimi başlaya bilmir. Digər VPN-i söndürün və ya xidmət rejimini dəyişin.",
+      "invalidConfigOptions": "Yanlış konfiqurasiya parametrləri",
+      "invalidConfig": "Yanlış konfiqurasiya"
+    },
+    "warp": {
+      "missingLicense": "WARP lisenziyası tələb olunur",
+      "missingLicenseMsg": "Bu profil WARP-dan istifadə edir. Davam etmək üçün WARP lisenziyasını qəbul edin."
+    },
+    "psiphon": {
+      "missingLicense": "Psiphon lisenziyası tələb olunur",
+      "missingLicenseMsg": "Bu profil Psiphon-dan istifadə edir. Davam etmək üçün Psiphon lisenziyasını qəbul edin."
+    }
+  }
+}
