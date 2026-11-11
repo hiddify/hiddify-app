@@ -30,6 +30,7 @@ extension AppLocaleX on AppLocale {
     "uz" => "Oʻzbekcha",
     "az" => "Azərbaycan dili",
     "kk" => "Қазақша",
+    "my" => "မြန်မာဘာသာ",
     _ => "Unknown",
   };
 }
