@@ -24,6 +24,7 @@ extension AppLocaleX on AppLocale {
     "zh_TW" => "中文 (台湾)",
     "be" => "Беларуская",
     "am" => "አማርኛ",
+    "ur" => "اردو",
     _ => "Unknown",
   };
 }
