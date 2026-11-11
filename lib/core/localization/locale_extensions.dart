@@ -18,6 +18,7 @@ extension AppLocaleX on AppLocale {
     "ko" => "한국어",
     "pt_BR" => "Portuguese (Brazil)",
     "ru" => "Русский",
+    "tk" => "Türkmençe",
     "tr" => "Türkçe",
     "zh" || "zh_CN" => "中文 (中国)",
     "zh_TW" => "中文 (台湾)",
