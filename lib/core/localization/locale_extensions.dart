@@ -35,6 +35,7 @@ extension AppLocaleX on AppLocale {
     "tg" => "Тоҷикӣ",
     "hy" => "Հայերեն",
     "uk" => "Українська",
+    "hi" => "हिन्दी",
     _ => "Unknown",
   };
 }
