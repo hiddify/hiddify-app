@@ -40,7 +40,7 @@ jobs:
       id-token: write
       attestations: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: ./.github/actions/setup-flutter
         with:
@@ -164,7 +164,7 @@ jobs:
 
       - name: Upload the artifact
         if: inputs.release
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: windows
           path: out

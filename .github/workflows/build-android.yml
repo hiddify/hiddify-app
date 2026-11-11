@@ -35,7 +35,7 @@ jobs:
       matrix:
         target: [apk, aab]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Free disk space
         run: |
@@ -45,13 +45,13 @@ jobs:
       # No Gradle cache: it had grown to 5 GB, and restoring it took 65-185 s of every build -
       # about what Gradle needs to download its dependencies again.
       - name: Set up Java
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: zulu
           java-version: 17
 
       - name: Set up the Android SDK
-        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3.2.2
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
         with:
           # default also installs the legacy 'tools' package, which no longer exists
           packages: platform-tools
@@ -110,7 +110,7 @@ jobs:
 
       - name: Upload the artifact
         if: inputs.release
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: android-${{ matrix.target }}
           path: out

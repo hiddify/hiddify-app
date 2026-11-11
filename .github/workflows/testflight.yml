@@ -34,7 +34,7 @@ jobs:
             echo "TestFlight upload authenticates with ${UPLOAD_AUTH}"
           fi
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: env.UPLOAD_AUTH == 'apple-id'
         with:
           sparse-checkout: .github/scripts
@@ -42,14 +42,14 @@ jobs:
       # A build that failed or was not made leaves no artifact: that upload is skipped.
       - name: Download the iOS artifact
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ios
           path: out
 
       - name: Download the Mac App Store artifact
         continue-on-error: true
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: macos-appstore
           path: out

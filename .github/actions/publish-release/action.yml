@@ -24,7 +24,7 @@ runs:
   using: composite
   steps:
     - name: Download the build artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         path: out
         merge-multiple: true
@@ -74,7 +74,7 @@ runs:
         python3 .github/scripts/prepare_release_notes.py "$RUNNER_TEMP/release.md" out "$TAG"
 
     - name: Publish the release
-      uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+      uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
       with:
         token: ${{ inputs.token }}
         tag_name: ${{ inputs.tag }}
