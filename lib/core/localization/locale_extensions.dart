@@ -37,6 +37,7 @@ extension AppLocaleX on AppLocale {
     "uk" => "Українська",
     "hi" => "हिन्दी",
     "de" => "Deutsch",
+    "it" => "Italiano",
     _ => "Unknown",
   };
 }
