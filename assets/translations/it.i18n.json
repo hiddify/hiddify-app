@@ -559,7 +559,7 @@
             "import": {
               "clipboard": "Importa la selezione dagli appunti",
               "file": "Importa la selezione da un file",
-              "msg": "L’importazione sostituisce le tue selezioni attuali. Continuare?"
+              "msg": "L’importazione sostituisce le tue selezioni attuali. Vuoi continuare?"
             },
             "export": {
               "clipboard": "Copia la selezione negli appunti",
@@ -623,7 +623,7 @@
         "resolveDestination": "Risolvi la destinazione",
         "ipv6Route": "IPv6",
         "ipv6RouteHelpTitle": "Perché IPv6 è disattivato?",
-        "ipv6RouteTurnOnTitle": "Attivare IPv6?",
+        "ipv6RouteTurnOnTitle": "Vuoi attivare IPv6?",
         "ipv6RouteTurnOn": "Attiva",
         "ipv6RouteHelp": "La maggior parte dei proxy non ha IPv6 in uscita.\n\nUna connessione che il proxy non può gestire cade subito dopo l’apertura, e i browser non la ritentano mai su IPv4, quindi Google e YouTube non si caricano.\n\nQuando è attivo, ogni proxy viene controllato una volta durante il test di connessione. IPv6 è usato solo tramite un proxy che lo gestisce; tutto il resto passa su IPv4, senza che te ne accorga.\n\nIPv6 passa sempre dentro la VPN, mai fuori.",
         "ipv6Modes": {
@@ -684,7 +684,7 @@
         "proxySecret": "Segreto del proxy",
         "noSecret": "Nessun segreto: qualsiasi app o dispositivo che raggiunge la porta può usarlo",
         "generateSecret": "Genera nuovo",
-        "removeSecret": "Rimuovere il segreto?",
+        "removeSecret": "Vuoi rimuovere il segreto?",
         "removeSecretMsg": "Senza un segreto, qualsiasi app su questo dispositivo, e qualsiasi dispositivo sulla rete durante la condivisione, può usare il proxy senza utente né password. Rimuovilo a tuo rischio.",
         "localProxy": "Proxy locale",
         "localProxyInVpn": "Tieni aperta in modalità VPN",
@@ -924,7 +924,7 @@
     },
     "newVersion": {
       "title": "Aggiornamento disponibile",
-      "msg": "Una nuova versione di @:common.appTitle è disponibile. Aggiornare ora?",
+      "msg": "Una nuova versione di @:common.appTitle è disponibile. Vuoi aggiornare ora?",
       "currentVersion": "Versione attuale",
       "newVersion": "Nuova versione",
       "updateNow": "Aggiorna ora",
@@ -938,32 +938,32 @@
     "confirmation": {
       "settings": {
         "import": {
-          "msg": "Questa operazione sovrascrive tutte le opzioni di configurazione con i valori importati. Continuare?"
+          "msg": "Questa operazione sovrascrive tutte le opzioni di configurazione con i valori importati. Vuoi continuare?"
         }
       },
       "profile": {
         "delete": {
           "title": "Elimina il profilo",
-          "msg": "Eliminare questo profilo? L’operazione non può essere annullata."
+          "msg": "Vuoi eliminare questo profilo? L’operazione non può essere annullata."
         }
       },
       "appList": {
         "import": {
-          "msg": "Questa operazione sostituisce le tue app escluse e quelle solo proxy. Continuare?"
+          "msg": "Questa operazione sostituisce le tue app escluse e quelle solo proxy. Vuoi continuare?"
         }
       },
       "routeRule": {
         "delete": {
           "title": "Elimina la regola",
-          "msg": "Eliminare la regola «$rulename»? L’operazione non può essere annullata."
+          "msg": "Vuoi eliminare la regola «$rulename»? L’operazione non può essere annullata."
         }
       },
       "addProfileByDeepLinkWarning": {
-        "title": "Aggiungere il profilo?",
-        "message": "Un link esterno da «${host}» vuole aggiungere un nuovo profilo. Importarlo?"
+        "title": "Vuoi aggiungere il profilo?",
+        "message": "Un link esterno da «${host}» vuole aggiungere un nuovo profilo. Vuoi importarlo?"
       },
       "importRouteRuleByDeepLinkWarning": {
-        "title": "Importare la regola di instradamento?",
+        "title": "Vuoi importare la regola di instradamento?",
         "message": "Le regole di instradamento decidono dove va il tuo traffico.\nImportale solo da una fonte di cui ti fidi."
       }
     },
@@ -1048,7 +1048,7 @@
       "title": "Controlla prima questo link",
       "cannotVerify": "Questo link non è verificato",
       "avoidIfUnsure": "Se non sei del tutto sicuro, non pagare e non condividere informazioni sensibili",
-      "ownResponsibility": "Continui a tuo rischio",
+      "ownResponsibility": "Continua a tuo rischio",
       "open": "Apri",
       "openIn": "Apri (${seconds})"
     },
