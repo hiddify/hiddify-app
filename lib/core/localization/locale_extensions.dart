@@ -27,6 +27,7 @@ extension AppLocaleX on AppLocale {
     "ur" => "اردو",
     "ps" => "پښتو",
     "bn" => "বাংলা",
+    "uz" => "Oʻzbekcha",
     _ => "Unknown",
   };
 }
