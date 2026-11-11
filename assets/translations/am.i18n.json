@@ -1,0 +1,1279 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "ጀምር",
+    "version": "ስሪት",
+    "ok": "እሺ",
+    "cancel": "ተው",
+    "kContinue": "ቀጥል",
+    "undo": "ቀልብስ",
+    "showMore": "ተጨማሪ አሳይ",
+    "showLess": "ያነሰ አሳይ",
+    "filter": "አጣራ",
+    "all": "ሁሉም",
+    "pause": "ላፍታ አቁም",
+    "resume": "ቀጥል",
+    "clear": "አጽዳ",
+    "close": "ዝጋ",
+    "auto": "በራስ-ሰር",
+    "manually": "በእጅ",
+    "name": "ስም",
+    "url": "URL",
+    "add": "ጨምር",
+    "clipboard": "ቅንጥብ ሰሌዳ",
+    "addToClipboard": "ወደ ቅንጥብ ሰሌዳ ቅዳ",
+    "qrCode": "QR ኮድ",
+    "free": "ነጻ",
+    "warp": "WARP",
+    "fragment": "ፍርስራሽ",
+    "help": "እገዛ",
+    "save": "አስቀምጥ",
+    "update": "አዘምን",
+    "pin": "ሰካ",
+    "unpin": "ንቀል",
+    "share": "አጋራ",
+    "edit": "አርትዕ",
+    "delete": "ሰርዝ",
+    "discard": "ጣል",
+    "import": "አስመጣ",
+    "export": "ላክ",
+    "later": "በኋላ",
+    "ignore": "ችላ በል",
+    "quit": "ውጣ",
+    "notSet": "አልተቀናበረም",
+    "hide": "ደብቅ",
+    "exit": "ውጣ",
+    "reset": "ዳግም አስጀምር",
+    "done": "ተጠናቋል",
+    "decline": "አልቀበልም",
+    "agree": "እስማማለሁ",
+    "empty": "ባዶ",
+    "unknown": "ያልታወቀ",
+    "hidden": "የተደበቀ",
+    "timeout": "ጊዜ አልፏል",
+    "sort": "ደርድር",
+    "dashboard": "ዳሽቦርድ",
+    "disable": "አጥፋ",
+    "psiphon": "Psiphon",
+    "profile": "መገለጫ",
+    "configuration": "ውቅር",
+    "file": "ፋይል",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n ቀን",
+        "other": "$n ቀናት"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n ሰዓት",
+        "other": "$n ሰዓታት"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "ፈቃድ ተከልክሏል"
+      },
+      "export": {
+        "clipboard": {
+          "success": "ወደ ቅንጥብ ሰሌዳ ተቀድቷል",
+          "failure": "ወደ ቅንጥብ ሰሌዳ መቅዳት አልተቻለም",
+          "contentTooLarge": "ይዘቱ በጣም ትልቅ ነው። በምትኩ ወደ ፋይል ይላኩ።"
+        },
+        "file": {
+          "success": "የJSON ፋይል ተፈጥሯል",
+          "failure": "ፋይሉን መፍጠር አልተቻለም"
+        }
+      },
+      "import": {
+        "confirm": "ማስመጣቱን ያረጋግጡ",
+        "success": "ተመጥቷል",
+        "failure": "ማስመጣት አልተቻለም"
+      },
+      "autoSave": {
+        "success": "ለውጦች በራስ-ሰር ተቀምጠዋል"
+      }
+    }
+  },
+  "intro": {
+    "banner": "ያለ ገደብ ኢንተርኔት ለማግኘት የሚያስፈልግዎ ሁሉ",
+    "termsAndPolicyCaution(rich)": "በመቀጠልዎ ${tap(@:pages.about.termsAndConditions)} ተስማምተዋል",
+    "info(rich)": "በHiddify በ❤️ ተሠርቷል። ${tap_source(ክፍት ምንጭ)} እና ${tap_license(ፈቃድ)}"
+  },
+  "pages": {
+    "home": {
+      "title": "መነሻ",
+      "quickSettings": "ፈጣን ቅንብሮች"
+    },
+    "proxies": {
+      "title": "ፕሮክሲዎች",
+      "sort": "ፕሮክሲዎችን ደርድር",
+      "testDelay": "መዘግየትን ሞክር",
+      "empty": "ምንም ፕሮክሲ የለም",
+      "connectToSeeProxies": "ፕሮክሲዎችን ለማየት ይገናኙ",
+      "loadFailed": "ፕሮክሲዎችን መጫን አልተቻለም። እንደገና ለመሞከር ይንኩ።",
+      "activeProxy": "ንቁ ፕሮክሲ",
+      "unknownIp": "ያልታወቀ IP",
+      "checkingIp": "IP በመፈተሽ ላይ…",
+      "switchFailed": "ወደዚህ ፕሮክሲ መቀየር አልተቻለም። እንደገና ይሞክሩ።",
+      "notResponding": "ምላሽ አይሰጥም",
+      "noneResponding": "ምንም ፕሮክሲ ምላሽ አይሰጥም",
+      "sortOptions": {
+        "unsorted": "ነባሪ",
+        "name": "በፊደል ተራ",
+        "delay": "በመዘግየት",
+        "usage": "በአጠቃቀም",
+        "upload": "በመጫን ፍጥነት",
+        "download": "በማውረድ ፍጥነት"
+      },
+      "ipInfo": {
+        "address": "የIP አድራሻ",
+        "country": "አገር",
+        "organization": "ድርጅት"
+      },
+      "delay": {
+        "result": "መዘግየት፦ ${delay}ms",
+        "timeout": "የመዘግየት ሙከራ ጊዜ አልፏል",
+        "unavailable": "አይገኝም",
+        "testing": "መዘግየት፦ በመሞከር ላይ…"
+      },
+      "status": {
+        "connecting": "በመገናኘት ላይ",
+        "registering": "በመመዝገብ ላይ",
+        "failed": "አልተሳካም",
+        "ready": "ዝግጁ",
+        "searching": "በመፈለግ ላይ",
+        "reconnecting": "እንደገና በመገናኘት ላይ"
+      },
+      "signalStyle": "የምልክት ዘይቤ",
+      "keepTop": {
+        "picking": "ከ$count ውስጥ $keep ፈጣኖችን በመፈለግ ላይ…",
+        "pickingBody": "ሁሉም ፕሮክሲዎች አንድ ጊዜ ይሞከራሉ፤ ከዚያ ፈጣኖቹ ብቻ መሥራታቸውን ይቀጥላሉ።",
+        "thenFastest": "ከሙከራው በኋላ$where ያሉ $keep ፈጣኖች ብቻ መሥራታቸውን ይቀጥላሉ።",
+        "thenWorking": "ከሙከራው በኋላ$where ያሉ የሚሠሩት ብቻ መሥራታቸውን ይቀጥላሉ።",
+        "thenAll": "ከሙከራው በኋላ$where ያሉት ብቻ መሥራታቸውን ይቀጥላሉ።",
+        "inRegions": " በ$flags",
+        "pickingAnswering": "ሁሉንም $count በመሞከር ላይ…",
+        "keptAnswering": "$where ያሉ $n የሚሠሩ ፕሮክሲዎች እየሠሩ ነው",
+        "kept": "$n ፈጣኖች እየሠሩ ነው",
+        "keptFastest": "$where ያሉ $n ፈጣኖች እየሠሩ ነው",
+        "keptBody": "ባትሪና ዳታ ለመቆጠብ ሌሎቹ $paused ፕሮክሲዎች ላፍታ ቆመዋል።",
+        "showAll": "ሁሉንም $count አሳይ",
+        "big": "$count ፕሮክሲዎች እየሠሩ ነው",
+        "bigBody": "ባትሪና ዳታ ለመቆጠብ $keep ፈጣኖቹ ብቻ እንዲሠሩ ያድርጉ።",
+        "keep": "$keep ፈጣኖችን አቆይ",
+        "change": "ብዛቱን ቀይር",
+        "chosen": "የመረጧቸው $n ፕሮክሲዎች እየሠሩ ነው",
+        "choose": "ምረጥ"
+      },
+      "upload": {
+        "test": "የመጫን ፍጥነትን ሞክር",
+        "failed": "የፍጥነት ሙከራውን መጀመር አልተቻለም",
+        "hint": "ንካ፦ የመጫን ፍጥነት · ተጭነህ ያዝ፦ የማውረድ ፍጥነት",
+        "hintBoth": "ንካ፦ ሁለቱም ፍጥነቶች · ተጭነህ ያዝ፦ የማውረድ ፍጥነት"
+      },
+      "speedTest": {
+        "title": "የፍጥነት ሙከራ",
+        "what": "ምን ይሞከር",
+        "download": "ማውረድ",
+        "upload": "መጫን",
+        "amount": "በእያንዳንዱ ፕሮክሲ መጠን",
+        "proxies": "የሚሞከሩ ፕሮክሲዎች",
+        "proxiesHint": "በፒንግ ፈጣኖቹ",
+        "all": "ሁሉም",
+        "fastest": "$n ፈጣኖች",
+        "through": "በ$count ፈጣኖች እያንዳንዱ በኩል $n MB",
+        "throughAll": "በ$count ፕሮክሲዎች እያንዳንዱ በኩል $n MB",
+        "throughEach": "በእያንዳንዱ ፕሮክሲ በኩል $n MB",
+        "start": "ሙከራ ጀምር",
+        "save": "አስቀምጥ",
+        "testDownload": "የማውረድ ፍጥነትን ሞክር",
+        "both": "ሁለቱንም",
+        "bothWays": "ማውረድና መጫን",
+        "amountHint": "ብዙ ሲሆን ይበልጥ ትክክለኛ ነው",
+        "clear": "የተቀመጡ ውጤቶችን አጽዳ",
+        "cleared": "ጸድቷል",
+        "which": "የትኞቹ ፕሮክሲዎች",
+        "shown": "የሚታዩ ($n)",
+        "chosen": "የተመረጡ ($n)"
+      },
+      "single": {
+        "share": "አጋራ",
+        "edit": "አርትዕ",
+        "shareTitle": "ፕሮክሲ አጋራ",
+        "configHint": "ይህ ፕሮክሲ ብቻውን እና የሚያልፍበት ማንኛውም ፕሮክሲ። Hiddify እንደ ማንኛውም ውቅር ያስመጣዋል።",
+        "editTitle": "እንደ አዲስ መገለጫ አርትዕ",
+        "editMsg": "«${name}» ወደ አዲስ መገለጫ ተቀድቶ ማርትዕ ይችላሉ። ምዝገባ በእያንዳንዱ ዝመና ፕሮክሲዎቹን ስለሚተካ ዋናው እንዳለ ይቆያል።",
+        "editConfirm": "ቅዳና አርትዕ",
+        "savedAsProfile": "ወደ አዲሱ መገለጫ «${name}» ተቀድቷል",
+        "failed": "የዚህን ፕሮክሲ ውቅር ማንበብ አልተቻለም"
+      }
+    },
+    "profiles": {
+      "title": "መገለጫዎች",
+      "add": "መገለጫ ጨምር",
+      "fromPhone": {
+        "title": "ከስልክዎ ይጨምሩ",
+        "scan": "ይህን ኮድ በስልክዎ ካሜራ ይቃኙ፣ የምዝገባ አገናኝ ይለጥፉና ይላኩ።",
+        "sameNetwork": "ስልክዎና ይህ ቲቪ በተመሳሳይ የWi-Fi አውታረ መረብ ላይ መሆን አለባቸው።",
+        "noNetwork": "ይህ ቲቪ ከአካባቢያዊ አውታረ መረብ ጋር አልተገናኘም። ከስልክዎ አገናኝ ለመጨመር ከWi-Fi ጋር ያገናኙት።",
+        "locked": "ብዙ የተሳሳቱ ኮዶች ስለተሞከሩ ይህ ተቆልፏል። ይህን ዘግተው ለአዲስ ኮድ እንደገና ይክፈቱት።",
+        "received": "ከስልክዎ ደርሷል",
+        "from": "ከ$address",
+        "page": {
+          "title": "በቲቪዎ ላይ ወዳለው Hiddify ይላኩ",
+          "intro": "በርቀት መቆጣጠሪያ ሳይጽፉ ምዝገባን በአራት ፈጣን ደረጃዎች ወደ ቲቪዎ ይጨምሩ።",
+          "steps": {
+            "network": {
+              "title": "ከተመሳሳይ Wi-Fi ጋር ይገናኙ",
+              "body": "ስልክዎና ቲቪው በተመሳሳይ የWi-Fi አውታረ መረብ ላይ መሆን አለባቸው፤ አለበለዚያ ይህ ገጽ ቲቪውን ሊደርስ አይችልም።"
+            },
+            "copy": {
+              "title": "አገናኝዎን ይቅዱ",
+              "body": "የምዝገባ አገናኙን ከአቅራቢዎ ወይም ማንኛውንም የፕሮክሲ አገናኝ ወይም ውቅር ይቅዱ።"
+            },
+            "paste": {
+              "title": "እዚህ ይለጥፉ",
+              "body": "ከታች ያለውን ሳጥን ይንኩ፣ አገናኙን ይለጥፉና «ወደ ቲቪ ላክ» የሚለውን ይንኩ።"
+            },
+            "confirm": {
+              "title": "በቲቪው ላይ ያረጋግጡ",
+              "body": "አገናኙ በቲቪው ላይ ይታያል። በርቀት መቆጣጠሪያው አስመጣ የሚለውን ይጫኑ። እስኪጫኑ ድረስ ምንም አይጨመርም።"
+            }
+          },
+          "label": "የምዝገባ አገናኝ",
+          "hint": "የምዝገባ አገናኝ ወይም ውቅር ይለጥፉ",
+          "send": "ወደ ቲቪ ላክ",
+          "sentTitle": "ወደ ቲቪዎ ተልኳል",
+          "sent": "አሁን ለመጨመር በቲቪው ላይ አስመጣ የሚለውን ይጫኑ። ከታች ሌላ አገናኝ መላክ ይችላሉ።",
+          "empty": "መጀመሪያ አገናኝ ይለጥፉ።",
+          "footer": "ይህ ገጽ የሚሠራው በቲቪው ላይ «መገለጫ ጨምር» ክፍት ሲሆንና በአካባቢያዊ አውታረ መረብዎ ላይ ብቻ ነው።"
+        }
+      },
+      "update": "መገለጫ አዘምን",
+      "viewAllProfiles": "ሁሉንም መገለጫዎች ይመልከቱ",
+      "activeProfileName": "የንቁ መገለጫ ስም፦ «${name}»",
+      "nonActiveProfileName": "«${name}»ን እንደ ንቁ መገለጫ ምረጥ",
+      "freeSubNotFound": "ምንም ነጻ ምዝገባ አልተገኘም",
+      "freeSubNotFoundForRegion": "ለ«${region}» ምንም ነጻ ምዝገባ አልተገኘም",
+      "failedToLoad": "መጫን አልተቻለም",
+      "updateSubscriptions": "ምዝገባዎችን አዘምን",
+      "share": {
+        "title": "መገለጫ አጋራ",
+        "scanHint": "ይህን መገለጫ ለመጨመር በሌላ መሣሪያ ላይ በHiddify ይቃኙት",
+        "link": "የምዝገባ አገናኝ",
+        "config": "ውቅር",
+        "configHint": "ይህ መገለጫ የሚሠራበት ሙሉ JSON፣ ቅንብሮችዎን ጨምሮ",
+        "configFailed": "ውቅሩን መገንባት አልተቻለም",
+        "copy": "ቅዳ",
+        "shareFile": "አጋራ",
+        "saveFile": "አስቀምጥ",
+        "tooLargeToCopy": "ለቅንጥብ ሰሌዳ በጣም ትልቅ ነው፤ እንደ ፋይል ያጋሩት ወይም ያስቀምጡት",
+        "toTv": {
+          "button": "ወደ ቲቪ ላክ",
+          "scanHint": "በቲቪው ላይ Hiddify ይክፈቱና መገለጫ ለመጨመር + ይንኩ፣ ከዚያ የሚያሳየውን ኮድ ይቃኙ። ሁለቱም መሣሪያዎች በተመሳሳይ Wi-Fi ላይ መሆን አለባቸው።",
+          "sent": "ተልኳል። ለመጨመር በቲቪው ላይ አስመጣ የሚለውን ይጫኑ።",
+          "notTvCode": "ይህ የHiddify ቲቪ ኮድ አይደለም። ለማሳየት በቲቪው ላይ መገለጫ ለመጨመር + ይንኩ።",
+          "expired": "ቲቪው በዚህ ኮድ አገናኞችን አይቀበልም። በቲቪው ላይ መገለጫ መጨመሪያ ገጹን እንደገና ከፍተው አዲሱን ኮድ ይቃኙ።",
+          "busy": "በቲቪው ላይ ብዙ አገናኞች እየጠበቁ ነው። በቲቪው ላይ ያስመጧቸው ወይም ይጣሏቸውና እንደገና ይሞክሩ።",
+          "unreachable": "ቲቪውን ማግኘት አልተቻለም። ስልኩና ቲቪው በተመሳሳይ የWi-Fi አውታረ መረብ ላይ መሆናቸውን ያረጋግጡ።"
+        }
+      },
+      "msg": {
+        "save": {
+          "success": "መገለጫ ተቀምጧል"
+        },
+        "invalidUrl": "ልክ ያልሆነ URL",
+        "add": {
+          "failure": "መገለጫ መጨመር አልተቻለም"
+        },
+        "update": {
+          "success": "መገለጫ ተዘምኗል",
+          "failure": "መገለጫን ማዘመን አልተቻለም",
+          "failureNamed": "«${name}»ን ማዘመን አልተቻለም",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count መገለጫ ተዘምኗል",
+            "other": "$count መገለጫዎች ተዘምነዋል"
+          },
+          "bulkPartial": "${success} ተዘምኗል\n${failed} አልተሳካም፦ ${names}"
+        },
+        "delete": {
+          "success": "መገለጫ ተሰርዟል",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count መገለጫ ተሰርዟል",
+            "other": "$count መገለጫዎች ተሰርዘዋል"
+          },
+          "bulkPartial": "ከ${total} መገለጫዎች ${deleted} ተሰርዘዋል"
+        }
+      },
+      "removeInactive": {
+        "action": "ንቁ ያልሆኑ ምዝገባዎችን አስወግድ",
+        "title": "ንቁ ያልሆኑ ምዝገባዎችን አስወግድ",
+        "hint": "እነዚህ ምዝገባዎች ከእንግዲህ አይሠሩም። ምልክት የተደረገባቸው ይሰረዛሉ፤ ማቆየት የሚፈልጉትን ምልክት ያንሱ።",
+        "none": "ንቁ ያልሆነ ምዝገባ የለም",
+        "remove(plural, param=count)": {
+          "one": "$count ሰርዝ",
+          "other": "$count ሰርዝ"
+        },
+        "reason": {
+          "expired": "ጊዜው አልፏል",
+          "expiredOn": "ጊዜው ያለፈው በ${date}",
+          "noTraffic": "ምንም ትራፊክ አልቀረም",
+          "updateFailing": "ዝመናዎች ደጋግመው ይወድቃሉ",
+          "updateFailingSince": "ዝመናዎች ከ${date} ጀምሮ እየወደቁ ነው"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "መገለጫ",
+      "lastUpdate": "የመጨረሻ ዝመና",
+      "form": {
+        "nameHint": "የመገለጫ ስም",
+        "emptyName": "ስም ያስፈልጋል",
+        "invalidUrl": "ልክ ያልሆነ URL",
+        "urlHint": "ሙሉ የውቅር URL",
+        "disableAutoUpdate": "በራስ-ሰር ማዘመንን አጥፋ",
+        "autoUpdateInterval": "በራስ-ሰር የማዘመን ክፍተት",
+        "loading": "መገለጫ በመጨመር ላይ…",
+        "adminPreference": "የአስተዳዳሪ ፈቃድ",
+        "adminPreferenceAskEachTime": "በየጊዜው ጠይቅ",
+        "adminPreferencePreferAdmin": "ሁልጊዜ የአስተዳዳሪ ፈቃድ ተጠቀም",
+        "adminPreferencePreferNoAdmin": "ሁልጊዜ ያለ አስተዳዳሪ ፈቃድ ቀጥል",
+        "adminPreferenceReset": "ስለ አስተዳዳሪ ፈቃድ በየጊዜው ጠይቅ"
+      }
+    },
+    "logs": {
+      "title": "መዝገቦች",
+      "category": "ምድብ",
+      "level": "ደረጃ",
+      "recentLogs": "የቅርብ ጊዜ መዝገቦች",
+      "recentLogsMsg": "በዚህ ገጽ ላይ የሚያዩት",
+      "errorLog": "የመተግበሪያና ኮር መዝገብ",
+      "errorLogMsg": "የሁለቱም ስህተቶች፣ ከተለያዩ ጊዜያት",
+      "coreLog": "የኮር መዝገብ",
+      "coreLogMsg": "ኮሩ የመዘገበው ሁሉ",
+      "coreCrash": "የኮር ብልሽት",
+      "coreCrashMsg": "ኮሩ ለመጨረሻ ጊዜ ሲበላሽ ምን እያደረገ እንደነበር",
+      "exportToFile": "ወደ ፋይል ላክ",
+      "linesMatch": "$count መስመሮች ይዛመዳሉ",
+      "fileSaved": "ፋይሉ ተቀምጧል",
+      "fileSaveFailed": "ፋይሉን ማስቀመጥ አልተቻለም",
+      "coreLogLevel": "የኮር ደረጃ",
+      "coreLogLevelMsg": "እንደገና ከተገናኙ በኋላ ተግባራዊ ይሆናል",
+      "buffer": "ማከማቻ",
+      "diagnostics": "የምርመራ ሪፖርት",
+      "diagnosticsMsg": "የብልሽት ሪፖርቶች፣ መዝገቦችና ቅንብሮችዎ ያለ አገልጋዮችና የይለፍ ቃላት፣ በአንድ ዚፕ"
+    },
+    "about": {
+      "title": "ስለ መተግበሪያው",
+      "notAvailableMsg": "የቅርብ ጊዜውን ስሪት እየተጠቀሙ ነው",
+      "checkForUpdate": "ዝመና ፈልግ",
+      "openWorkingDir": "የሥራ አቃፊን ክፈት",
+      "sourceCode": "ምንጭ ኮድ",
+      "telegramChannel": "የTelegram ቻናል",
+      "termsAndConditions": "ውሎችና ሁኔታዎች",
+      "privacyPolicy": "የግላዊነት ፖሊሲ"
+    },
+    "settings": {
+      "title": "ቅንብሮች",
+      "resetTunnel": "የVPN መገለጫን ዳግም አስጀምር",
+      "options": {
+        "import": {
+          "clipboard": "አማራጮችን ከቅንጥብ ሰሌዳ አስመጣ",
+          "file": "አማራጮችን ከፋይል አስመጣ"
+        },
+        "export": {
+          "anonymousToClipboard": "ስም-አልባ አማራጮችን ወደ ቅንጥብ ሰሌዳ ቅዳ",
+          "anonymousToFile": "ስም-አልባ አማራጮችን ወደ ፋይል ላክ",
+          "allToClipboard": "ሁሉንም አማራጮች ወደ ቅንጥብ ሰሌዳ ቅዳ",
+          "allToFile": "ሁሉንም አማራጮች ወደ ፋይል ላክ"
+        },
+        "reset": "አማራጮችን ዳግም አስጀምር"
+      },
+      "general": {
+        "title": "አጠቃላይ",
+        "locale": "ቋንቋ",
+        "themeMode": "የገጽታ ሁነታ",
+        "themeModes": {
+          "system": "የሲስተም ነባሪ",
+          "dark": "ጨለማ ሁነታ",
+          "light": "ብሩህ ሁነታ",
+          "black": "ጥቁር ሁነታ"
+        },
+        "enableAnalytics": "ትንታኔን አብራ",
+        "enableAnalyticsMsg": "መተግበሪያውን ለማሻሻል እንዲረዳ ትንታኔና የብልሽት ሪፖርቶችን ከመሣሪያዎ ይላኩ",
+        "autoIpCheck": "የግንኙነት IP በራስ-ሰር ፈትሽ",
+        "reduceAnimations": "እንቅስቃሴዎችን ቀንስ",
+        "reduceAnimationsMsg": "ባትሪ ለመቆጠብ የመገናኛ አዝራሩን ዝም ያድርጉና ተደጋጋሚ ውጤቶችን ያቁሙ",
+        "dynamicNotification": "ፍጥነትን በማሳወቂያ አሳይ",
+        "hapticFeedback": "የንዝረት ግብረ መልስ",
+        "alwaysOnVpn": "ሁልጊዜ የሚሠራ VPN",
+        "actionAtClosing": "መስኮቱን ሲዘጉ",
+        "autoStart": "ሲገቡ ጀምር",
+        "silentStart": "ተሸጉጦ ጀምር",
+        "ignoreBatteryOptimizations": "የባትሪ ማመቻቸትን አጥፋ",
+        "ignoreBatteryOptimizationsMsg": "ለተሻለ የVPN አፈጻጸም ገደቦችን ያስወግዱ",
+        "memoryLimit": "የማህደረ ትውስታ ገደብ",
+        "memoryLimitMsg": "የማህደረ ትውስታ እጥረት ስህተቶች ወይም ተደጋጋሚ የመተግበሪያ ብልሽቶች ካጋጠሙዎት ያብሩት",
+        "connectionTestUrl": "የግንኙነት መሞከሪያ URL",
+        "urlTestInterval": "የURL ሙከራ ክፍተት",
+        "clashApiPort": "የClash API ወደብ",
+        "useSystemTlsEngine": "ሲገኝ የሲስተሙን TLS ተጠቀም",
+        "useSystemTlsEngineMsg": "የTLS አሻራ የሌላቸው ግንኙነቶች በዚህ መሣሪያ ላይ ፍተሻ ካለፈ የmacOS፣ iOS ወይም Windows TLS ይጠቀማሉ፤ ካልሆነ እንደ Chrome ይመስላሉ።",
+        "uploadTestSize": "የመጫን ሙከራ መጠን",
+        "megabytes": "$n MB",
+        "speedTest": "የፍጥነት ሙከራ"
+      },
+      "routing": {
+        "title": "መስመር ማስያዝ",
+        "routeRule": {
+          "add": "ደንብ ጨምር",
+          "delete": "ደንብ ሰርዝ",
+          "duplicate": "ደንብ ድገም",
+          "duplicated": "እንደ አዲስ ደንብ ተቀድቷል፤ እንደፈለጉ ያርትዑት",
+          "copyAll": "ሁሉንም ቅዳ",
+          "options": {
+            "import": {
+              "clipboard": "ደንቦችን ከቅንጥብ ሰሌዳ አስመጣ",
+              "file": "ደንቦችን ከፋይል አስመጣ"
+            },
+            "export": {
+              "clipboard": "ደንቦችን ወደ ቅንጥብ ሰሌዳ ቅዳ",
+              "file": "ደንቦችን ወደ ፋይል አስቀምጥ"
+            },
+            "reset": "ወደ ነባሪ ደንቦች ዳግም አስጀምር"
+          },
+          "rule": {
+            "title": "ደንብ",
+            "onlyTunMode": "በTUN ሁነታ ብቻ ይገኛል",
+            "notAvailableInThisPlatform": "በዚህ መድረክ ላይ አይገኝም",
+            "canNotBeEmpty": "ባዶ መሆን አይችልም",
+            "validUrlEx": "https://example.com",
+            "validUrl": "ትክክለኛ «URL» እንደ\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe ወይም google chrome ወይም chrome",
+            "validProcessName": "ትክክለኛ «የሂደት ስም» እንደ\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "ትክክለኛ «የሂደት መንገድ» እንደ\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 ወይም 1:65000",
+            "validPortRange": "ትክክለኛ «ወደብ» ወይም «የወደብ ክልል» እንደ\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8፣ 10.0.0.0/24 ወይም fd00::/8",
+            "validIpCidr": "ትክክለኛ IP CIDR እንደ\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com ወይም dl.google.com",
+            "validDomain": "ትክክለኛ «ዶሜይን» እንደ\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com ወይም .ir",
+            "validDomainSuffix": "ትክክለኛ «የዶሜይን ቅጥያ» እንደ\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "አብሮ የተሰራ ደንብ ሊለወጥ አይችልም። ደንቡን ደግመው ቅጂውን ያርትዑ።",
+            "tileTitle(map)": {
+              "name": "ስም",
+              "outbound": "ሲዛመድ የሚወጣበት",
+              "rule_set": "URLset",
+              "package_name": "የጥቅል ስሞች",
+              "process_name": "የሂደት ስሞች",
+              "process_path": "የሂደት መንገዶች",
+              "network": "አውታረ መረቦች",
+              "port_range": "መድረሻ ወደቦች",
+              "source_port_range": "ምንጭ ወደቦች",
+              "protocol": "ፕሮቶኮል",
+              "ip_cidr": "መድረሻ IP CIDR",
+              "source_ip_cidr": "ምንጭ IP CIDR",
+              "domain": "ዶሜይን",
+              "domain_suffixe": "የዶሜይን ቅጥያ",
+              "domain_keyword": "የዶሜይን ቁልፍ ቃል",
+              "domain_regex": "የዶሜይን regex"
+            },
+            "outbound(map)": {
+              "proxy": "ፕሮክሲ",
+              "direct": "ቀጥታ",
+              "direct_with_fragment": "ቀጥታ ከፍርስራሽ ጋር",
+              "block": "አግድ"
+            },
+            "network(map)": {
+              "all": "ሁሉም",
+              "tcp": "TCP",
+              "udp": "UDP"
+            },
+            "protocol(map)": {
+              "": "ሁሉም",
+              "tls": "TLS",
+              "http": "HTTP",
+              "quic": "QUIC",
+              "stun": "STUN",
+              "dns": "DNS",
+              "bittorrent": "BitTorrent"
+            }
+          },
+          "genericList": {
+            "addNew": "አዲስ እሴት ጨምር",
+            "update": "እሴት አዘምን",
+            "clearList": "ዝርዝሩን አጽዳ",
+            "clearListMsg": "ሁሉም ንጥሎች ይሰረዛሉ"
+          }
+        },
+        "builtinRules": {
+          "tag": "አብሮ የተሰራ ደንብ",
+          "bypassLan": "LANን እለፍ",
+          "systemDirect": {
+            "apple": "የApple አገልግሎቶች",
+            "microsoft": "የMicrosoft አገልግሎቶች",
+            "android": "የAndroid አገልግሎቶች",
+            "linux": "የLinux ዝመናዎች"
+          },
+          "blockAds": "ማስታወቂያዎችና ማልዌር",
+          "bypassRegion": "በ$region ያሉ ድር ጣቢያዎች"
+        },
+        "appBasedRouting": {
+          "title": "በመተግበሪያ ላይ የተመሠረተ መስመር ማስያዝ",
+          "hideSysApps": "የሲስተም መተግበሪያዎችን ደብቅ",
+          "listTitle": {
+            "bypass": "የተላለፉ መተግበሪያዎች",
+            "proxy": "በፕሮክሲ የሚሄዱ መተግበሪያዎች"
+          },
+          "chooseApps": "መተግበሪያዎችን ምረጥ",
+          "apps": {
+            "one": "መተግበሪያ",
+            "other": "መተግበሪያዎች"
+          },
+          "moreApps": {
+            "one": "+$n መተግበሪያ",
+            "other": "+$n መተግበሪያዎች"
+          },
+          "autoTag": "በራስ-ሰር",
+          "outsideVpn": "ከVPN ውጭ",
+          "ruleWontApply": "ከVPN ውጭ · ደንቡ አይተገበርም",
+          "notInstalled": "አልተጫነም",
+          "share": {
+            "invite": "በራስ-ሰር ምርጫን ለማሻሻል ያግዙ",
+            "removed": {
+              "one": "$n ተወግዷል",
+              "other": "$n ተወግደዋል"
+            },
+            "added": {
+              "one": "$n ተጨምሯል",
+              "other": "$n ተጨምረዋል"
+            },
+            "title": "ለውጦችዎን ያጋሩ",
+            "where": "በእነዚህ የመተግበሪያ ስሞች አስቀድሞ የተሞላ ይፋዊ ጉዳይ በGitHub ላይ ይከፍታል። ለማጋራት እዚያ ያስገቡት። የGitHub መለያ ያስፈልግዎታል።",
+            "action": "በGitHub ላይ ቀጥል"
+          },
+          "options": {
+            "import": {
+              "clipboard": "ምርጫን ከቅንጥብ ሰሌዳ አስመጣ",
+              "file": "ምርጫን ከፋይል አስመጣ",
+              "msg": "ማስመጣት አሁን ያሉ ምርጫዎችዎን ይተካል። ይቀጥሉ?"
+            },
+            "export": {
+              "clipboard": "ምርጫን ወደ ቅንጥብ ሰሌዳ ቅዳ",
+              "file": "ምርጫን ወደ ፋይል ላክ"
+            },
+            "clearAllSelections": "ሁሉንም ምርጫዎች አጽዳ"
+          },
+          "modes": {
+            "proxy": "በፕሮክሲ ብቻ",
+            "bypass": "እለፍ"
+          },
+          "autoSelection": {
+            "title": "በ$region ላይ የተመሠረተ በራስ-ሰር ምርጫ",
+            "performNow": "አሁን አዘምን",
+            "updated": {
+              "zero": "ዛሬ ተዘምኗል",
+              "one": "ከ$n ቀን በፊት ተዘምኗል",
+              "other": "ከ$n ቀናት በፊት ተዘምኗል"
+            },
+            "noList": "ለዚህ ክልል ዝርዝር የለም",
+            "loadFailed": "ዝርዝሩን መጫን አልተቻለም",
+            "restore": {
+              "one": "$n በራስ-ሰር ምርጫን መልስ",
+              "other": "$n በራስ-ሰር ምርጫዎችን መልስ"
+            },
+            "restored": {
+              "one": "$n በራስ-ሰር ምርጫ ተመልሷል",
+              "other": "$n በራስ-ሰር ምርጫዎች ተመልሰዋል"
+            }
+          }
+        },
+        "region": "ክልል",
+        "regions": {
+          "ir": "ኢራን (ir)",
+          "cn": "ቻይና (cn)",
+          "ru": "ሩሲያ (ru)",
+          "af": "አፍጋኒስታን (af)",
+          "id": "ኢንዶኔዥያ (id)",
+          "tr": "ቱርኪዬ (tr)",
+          "br": "ብራዚል (br)",
+          "other": "ሌላ"
+        },
+        "balancerStrategy": {
+          "title": "የሚዛን አስተካካይ ስልት",
+          "roundRobin": "ተራ በተራ",
+          "consistentHash": "ወጥ ሃሽ",
+          "stickySession": "ተጣባቂ ክፍለ ጊዜ",
+          "roundRobinDescription": "እያንዳንዱ ግንኙነት ቀጣዩን አገልጋይ ይጠቀማል፣ ስለዚህ ድር ጣቢያዎች IPዎ ሲቀየር ሊያዩ ይችላሉ",
+          "consistentHashDescription": "እያንዳንዱ ድር ጣቢያ ሁልጊዜ ተመሳሳዩን አገልጋይ ይጠቀማል",
+          "stickySessionDescription": "እያንዳንዱ ድር ጣቢያ እስኪገናኙ ድረስ በዘፈቀደ የተመረጠ አገልጋይ ይዞ ይቆያል"
+        },
+        "defaultProxy": {
+          "title": "ነባሪ ፕሮክሲ",
+          "lowest": "ዝቅተኛ ፒንግ",
+          "balance": "ማመጣጠን",
+          "first": "የመጀመሪያው ፕሮክሲ",
+          "lowestDescription": "ፕሮክሲ እስኪመርጡ ድረስ ፈጣኑ ይጠቀማል",
+          "balanceDescription": "ፕሮክሲ እስኪመርጡ ድረስ ግንኙነቶች በሁሉም ላይ ይከፋፈላሉ",
+          "firstDescription": "ፕሮክሲ እስኪመርጡ ድረስ የመገለጫው የመጀመሪያ ፕሮክሲ ይጠቀማል"
+        },
+        "resolveDestination": "መድረሻን ፍታ",
+        "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "IPv6 ለምን ጠፍቷል?",
+        "ipv6RouteTurnOnTitle": "IPv6ን ያብሩ?",
+        "ipv6RouteTurnOn": "አብራ",
+        "ipv6RouteHelp": "አብዛኞቹ ፕሮክሲዎች በመውጫቸው ላይ IPv6 የላቸውም።\n\nፕሮክሲው ሊሸከመው የማይችለው ግንኙነት ከተከፈተ በኋላ ወዲያው ይሞታል፤ አሳሾችም በIPv4 አይሞክሩትም፣ ስለዚህ Google እና YouTube አይከፈቱም።\n\nሲበራ እያንዳንዱ ፕሮክሲ በግንኙነት ሙከራው አንድ ጊዜ ይፈተሻል። IPv6 የሚጠቀመው በሚሸከመው ፕሮክሲ በኩል ብቻ ነው፤ ሌላው ሁሉ ሳይታወቅ በIPv4 ይሄዳል።\n\nIPv6 ሁልጊዜ በVPN ውስጥ ይጓዛል፣ ከVPN ውጭ በጭራሽ።",
+        "ipv6Modes": {
+          "ipv4Only": "ጠፍቷል (IPv4 ብቻ)",
+          "preferIpv4": "በርቷል፣ IPv4 መጀመሪያ",
+          "preferIpv6": "በርቷል፣ IPv6 መጀመሪያ",
+          "ipv4OnlyDescription": "መተግበሪያዎች IPv4 ብቻ ይጠቀማሉ። IPv6 ወዲያው ውድቅ ይደረጋል።",
+          "preferIpv4Description": "IPv4 መጀመሪያ። IPv6 እንደሚሸከም በተረጋገጠ ፕሮክሲ በኩል ብቻ።",
+          "preferIpv6Description": "IPv6 መጀመሪያ፣ እንደሚሸከም በተረጋገጠ ፕሮክሲ በኩል ብቻ።"
+        }
+      },
+      "dns": {
+        "title": "DNS",
+        "remoteDns": "የርቀት DNS",
+        "remoteDnsDomainStrategy": "የርቀት DNS ዶሜይን ስልት",
+        "directDns": "የወጪ አገልጋይ መፍቻ (ቀጥታ)",
+        "directDnsDomainStrategy": "የወጪ ዶሜይን ስልት",
+        "enableFakeDns": "የሐሰት DNSን አብራ",
+        "domainStrategy": {
+          "auto": "በራስ-ሰር",
+          "preferIpv6": "IPv6ን ይመረጥ",
+          "preferIpv4": "IPv4ን ይመረጥ",
+          "ipv4Only": "IPv4 ብቻ",
+          "ipv6Only": "IPv6 ብቻ"
+        }
+      },
+      "inbound": {
+        "title": "ገቢ",
+        "serviceMode": "የአገልግሎት ሁነታ",
+        "serviceModes": {
+          "proxy": "የፕሮክሲ አገልግሎት ብቻ",
+          "systemProxy": "የሲስተም ፕሮክሲን አቀናብር",
+          "tun": "VPN",
+          "router": "ራውተር (መላው አውታረ መረብ)"
+        },
+        "shortServiceModes": {
+          "proxy": "ፕሮክሲ",
+          "systemProxy": "የሲስተም ፕሮክሲ",
+          "tun": "VPN",
+          "router": "ራውተር"
+        },
+        "strictRoute": "ጥብቅ መስመር",
+        "tunImplementation": "የTUN አተገባበር",
+        "tunImplementations": {
+          "sing15": "Sing 15",
+          "mixed": "የተቀላቀለ",
+          "system": "ሲስተም",
+          "gvisor": "gVisor"
+        },
+        "mixedPort": "የፕሮክሲ ወደብ (SOCKS5/4፣ HTTP)",
+        "tproxyPort": "የግልጽ ፕሮክሲ ወደብ",
+        "directPort": "ቀጥታ ወደብ",
+        "redirectPort": "የማዞሪያ ወደብ",
+        "lanSharing": "በአካባቢያዊ አውታረ መረብ ላይ አጋራ",
+        "connectionSharing": "ግንኙነት ማጋራት",
+        "qrCode": "QR ኮድ",
+        "closedInVpn": "በVPN ሁነታ ዝግ ነው፣ ካልተጋራ በስተቀር",
+        "proxySecret": "የፕሮክሲ ሚስጥር",
+        "noSecret": "ሚስጥር የለም፦ ወደቡን የሚደርስ ማንኛውም መተግበሪያ ወይም መሣሪያ ሊጠቀምበት ይችላል",
+        "generateSecret": "አዲስ ፍጠር",
+        "removeSecret": "ሚስጥሩ ይወገድ?",
+        "removeSecretMsg": "ያለ ሚስጥር በዚህ መሣሪያ ላይ ያለ ማንኛውም መተግበሪያ፣ እንዲሁም ሲያጋሩ በአውታረ መረቡ ላይ ያለ ማንኛውም መሣሪያ፣ ያለ ተጠቃሚ ስምና የይለፍ ቃል ፕሮክሲውን መጠቀም ይችላል። በራስዎ ኃላፊነት ያስወግዱት።",
+        "localProxy": "አካባቢያዊ ፕሮክሲ",
+        "localProxyInVpn": "በVPN ሁነታ ክፍት አድርገው ያቆዩ",
+        "localProxyInVpnHint": "መተግበሪያዎች አስቀድመው VPNን ይጠቀማሉ፤ ፕሮክሲ እንዲጠቀሙ ለተቀናበሩ መተግበሪያዎች ብቻ",
+        "localProxyAuth": "የይለፍ ቃል ጠይቅ",
+        "localProxyAuthHint": "እንደ አሳሾች ያሉ አንዳንድ መተግበሪያዎች የSOCKS የይለፍ ቃል መላክ አይችሉም",
+        "notAsSystemProxy": "መላክ ስለማይችል እንደ ሲስተም ፕሮክሲ አይጠየቅም",
+        "lanGroup": "በአካባቢያዊ አውታረ መረብ ማጋራት",
+        "lanSharingPort": "የማጋሪያ ወደብ",
+        "otherPorts": "ሌሎች ወደቦች",
+        "closedInVpnLocal": "በVPN ሁነታ ዝግ ነው"
+      },
+      "tlsTricks": {
+        "title": "የTLS ዘዴዎች",
+        "enable": "ፍርስራሽን አብራ",
+        "packets": "የመበጣጠስ ፓኬቶች",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
+        "size": "የፍርስራሽ መጠን",
+        "sleep": "የፍርስራሽ ዕረፍት",
+        "mixedSniCase": {
+          "enable": "የተቀላቀለ የSNI ፊደል አጣጣልን አብራ"
+        },
+        "padding": {
+          "enable": "ንጣፍን አብራ",
+          "size": "የንጣፍ መጠን"
+        }
+      },
+      "chain": {
+        "quick": {
+          "off": "ጠፍቷል",
+          "extraSecurity": {
+            "title": "ተጨማሪ ደህንነት",
+            "subtitle": "ፕሮክሲውን ካላመኑት",
+            "ipBy": "IPዎ የሚወሰነው በ$mode ነው",
+            "notTracked": "የVPN አቅራቢዎ ትራፊክዎን ማየት አይችልም",
+            "forPublic": "ለሕዝባዊና ስም-አልባ ፕሮክሲዎች ተስማሚ",
+            "slower": "ፍጥነትን ሊቀንስ ይችላል"
+          },
+          "unblocker": {
+            "title": "የፕሮክሲ መክፈቻ",
+            "subtitle": "ፕሮክሲውን ከማጣሪያ ያሳልፈዋል",
+            "mayConnect": "የተጣራ ፕሮክሲ ሊገናኝ ይችላል",
+            "personalOnly": "ለግል ፕሮክሲ ብቻ ይጠቅማል",
+            "notForPublic": "ለሕዝባዊ ፕሮክሲዎች አይመችም",
+            "slower": "ፕሮክሲው ትንሽ ይዘገያል"
+          }
+        },
+        "title": "ሰንሰለት",
+        "subtitle": "ተጨማሪ ደህንነትና መክፈቻ",
+        "finalIp": "የመጨረሻ IP",
+        "levels": {
+          "app": {
+            "title": "መተግበሪያ",
+            "msg": "መነሻ ነጥብ፦ የመተግበሪያዎ ትራፊክ እዚህ ወደ ሰንሰለቱ ገብቶ ለመጨረሻው ማለፍ ለመዘጋጀት በቀጣዮቹ ንብርብሮች ያልፋል"
+          },
+          "extraSecurity": {
+            "title": "ተጨማሪ ደህንነት",
+            "msg": "ዋናው መገለጫዎ የማይታመን ቢሆንም እንኳ ዳታዎን ግላዊ ለማድረግ ተጨማሪ ጋሻ ይጨምራል"
+          },
+          "mainProfile": {
+            "title": "ዋና መገለጫ"
+          },
+          "unblocker": {
+            "title": "መክፈቻ",
+            "msg": "የአውታረ መረብ ገደቦችን ለማለፍ ይረዳል። ረዳቱ ከተገናኘ ዋናው መገለጫዎ አሁን ቢታገድም መሥራት ይችላል።"
+          },
+          "filtering": {
+            "title": "ማጣራት",
+            "msg": "የመጨረሻ መውጫ፦ ትራፊክዎ ተጨማሪ ደህንነት፣ ዋና መገለጫ ወይም መክፈቻ ሊሆኑ በሚችሉ ንቁ ንብርብሮች ያልፋል። ውጤቶቻቸው ከተተገበሩ በኋላ የአካባቢያዊ አውታረ መረብ ማጣሪያን ለማለፍ ይመራል።"
+          }
+        },
+        "warp": {
+          "missingConfig": "የWARP ውቅር የለም",
+          "licenseKey": "የፈቃድ ቁልፍ",
+          "tunnel": "ዋሻ",
+          "cleanIp": "ንጹህ IP",
+          "port": "ወደብ",
+          "noise": {
+            "count": "የጫጫታ ብዛት",
+            "mode": "የጫጫታ ሁነታ",
+            "size": "የጫጫታ መጠን",
+            "delay": "የጫጫታ መዘግየት",
+            "modes": {
+              "standard": "መደበኛ",
+              "random": "ዘፈቀደ",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "QUIC የእጅ መጨባበጥ",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (የVoIP ጥሪ)",
+              "stun": "STUN (የቪዲዮ ጥሪ)"
+            },
+            "title": "የWireGuard ጫጫታ"
+          },
+          "endpoint": "ማብቂያ ነጥብ",
+          "endpointSources": {
+            "profile": "በCloudflare የተሰጠ",
+            "scan": "ቃኝ",
+            "custom": "ብጁ"
+          },
+          "customServer": "አድራሻ",
+          "mtu": "MTU",
+          "customized": "ተበጅቷል",
+          "scanner": {
+            "title": "ስካነር",
+            "searchNoise": "ጫጫታ ፈልግ",
+            "maxRtt": "ከፍተኛ RTT (ms)",
+            "timeout": "የምርመራ ጊዜ ገደብ (ms)",
+            "count": "የሚመረመሩ አድራሻዎች",
+            "concurrency": "ትይዩ ምርመራዎች",
+            "ports": "ወደቦች",
+            "cidrs": "ክልሎች"
+          },
+          "masque": {
+            "title": "MASQUE",
+            "vhttp": "የHTTP ስሪት",
+            "serverName": "የአገልጋይ ስም",
+            "useIpv6": "IPv6ን ይመረጥ",
+            "udpTimeout": "የUDP ጊዜ ገደብ (s)",
+            "keepalive": "የUDP keepalive (s)",
+            "packetSize": "የመጀመሪያ ፓኬት መጠን",
+            "reconnectDelay": "እንደገና የመገናኘት መዘግየት (s)",
+            "tlsInsecure": "የTLS ማረጋገጫን ዝለል",
+            "fragment": "TLSን አፈራርስ",
+            "fragmentDelay": "የፍርስራሽ ተለዋጭ መዘግየት (ms)",
+            "recordFragment": "የTLS መዝገቦችን አፈራርስ",
+            "ech": "የተመሰጠረ Client Hello",
+            "echConfig": "የECH ውቅር",
+            "echQueryServerName": "የECH መጠይቅ ስም"
+          },
+          "awg": {
+            "title": "AmneziaWG",
+            "jc": "የቆሻሻ ፓኬቶች",
+            "jmin": "ዝቅተኛ የቆሻሻ መጠን",
+            "jmax": "ከፍተኛ የቆሻሻ መጠን"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "የአገልጋይ ክልል ምረጥ",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "ኦስትሪያ (at)",
+            "au": "አውስትራሊያ (au)",
+            "be": "ቤልጂየም (be)",
+            "bg": "ቡልጋሪያ (bg)",
+            "ca": "ካናዳ (ca)",
+            "ch": "ስዊዘርላንድ (ch)",
+            "cz": "ቼክ ሪፐብሊክ (cz)",
+            "de": "ጀርመን (de)",
+            "dk": "ዴንማርክ (dk)",
+            "ee": "ኢስቶኒያ (ee)",
+            "es": "ስፔን (es)",
+            "fi": "ፊንላንድ (fi)",
+            "fr": "ፈረንሳይ (fr)",
+            "gb": "ዩናይትድ ኪንግደም (gb)",
+            "hr": "ክሮሽያ (hr)",
+            "hu": "ሃንጋሪ (hu)",
+            "ie": "አየርላንድ (ie)",
+            "in": "ህንድ (in)",
+            "it": "ጣሊያን (it)",
+            "jp": "ጃፓን (jp)",
+            "lv": "ላትቪያ (lv)",
+            "nl": "ኔዘርላንድስ (nl)",
+            "no": "ኖርዌይ (no)",
+            "pl": "ፖላንድ (pl)",
+            "pt": "ፖርቱጋል (pt)",
+            "ro": "ሮማኒያ (ro)",
+            "rs": "ሰርቢያ (rs)",
+            "se": "ስዊድን (se)",
+            "sg": "ሲንጋፖር (sg)",
+            "sk": "ስሎቫኪያ (sk)",
+            "us": "ዩናይትድ ስቴትስ (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "መገለጫ ምረጥ",
+          "conduitPairingId": "የConduit ማጣመሪያ መለያ"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "ግንኙነት",
+      "traffic": "ትራፊክ",
+      "trafficLive": "ቀጥታ ትራፊክ",
+      "trafficTotal": "ጠቅላላ ትራፊክ",
+      "uplink": "መጫኛ መስመር",
+      "downlink": "ማውረጃ መስመር",
+      "speed": "ፍጥነት",
+      "totalTransferred": "ጠቅላላ የተላለፈ"
+    },
+    "subscriptionInfo": {
+      "upload": "መጫን",
+      "download": "ማውረድ",
+      "total": "ጠቅላላ ትራፊክ",
+      "expireDate": "የሚያበቃበት ቀን",
+      "expired": "ጊዜው አልፏል",
+      "noTraffic": "ኮታው አልቋል",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days ቀን ቀርቷል",
+        "other": "$days ቀናት ቀርተዋል"
+      },
+      "remainingUnlimited": "ያልተገደበ",
+      "remainingTrafficSemanticLabel": "ከ${total} ትራፊክ ${consumed} ተጠቅመዋል",
+      "remainingTraffic": "የቀረ ትራፊክ",
+      "openWebPage": "ድረ ገጽ ክፈት",
+      "support": "ድጋፍ",
+      "openLinkTitle": "ይህን አገናኝ ይክፈቱ?",
+      "openLinkAction": "ክፈት"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "ደርድር በ",
+      "sort": {
+        "name": "በፊደል ተራ",
+        "lastUpdate": "በቅርብ የተዘመነ"
+      },
+      "direction": {
+        "newestFirst": "አዲሱ መጀመሪያ",
+        "oldestFirst": "አሮጌው መጀመሪያ"
+      }
+    },
+    "warpLicense": {
+      "title": "የCloudflare WARP ፈቃድ",
+      "description(rich)": "Cloudflare WARP ነጻ የWireGuard VPN አቅራቢ ነው። ይህን በማብራትዎ የCloudflare WARP ${tos(የአገልግሎት ውሎችን)} እና ${privacy(የግላዊነት ፖሊሲን)} ተስማምተዋል።"
+    },
+    "psiphonLicense": {
+      "title": "የPsiphon ፈቃድ ስምምነት",
+      "description(rich)": "Psiphonን በመጠቀምዎ ${tos(የአገልግሎት ውሎችን)} ተስማምተዋል፣ ${privacy(የግላዊነት ፖሊሲውንም)} እንደተቀበሉ ይቆጠራል። ከመቀጠልዎ በፊት በጥንቃቄ ያንብቧቸው።"
+    },
+    "newVersion": {
+      "title": "ዝመና አለ",
+      "msg": "አዲስ የ@:common.appTitle ስሪት አለ። አሁን ያዘምኑ?",
+      "currentVersion": "አሁን ያለው ስሪት",
+      "newVersion": "አዲስ ስሪት",
+      "updateNow": "አሁን አዘምን",
+      "downloading": "በማውረድ ላይ…",
+      "installing": "ጫኚውን በመጀመር ላይ…",
+      "allowInstall": "በተከፈተው ቅንብሮች ውስጥ Hiddify መተግበሪያዎችን እንዲጭን ይፍቀዱና እንደገና ይሞክሩ።",
+      "failed": "ዝመናውን መጫን አልተቻለም።",
+      "openPage": "የልቀት ገጹን ክፈት",
+      "tryAgain": "እንደገና ሞክር"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "ይህ ሁሉንም የውቅር አማራጮች በተመጡት እሴቶች ይተካል። ይቀጥሉ?"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "መገለጫ ሰርዝ",
+          "msg": "ይህ መገለጫ ይሰረዝ? ይህን መመለስ አይችሉም።"
+        }
+      },
+      "appList": {
+        "import": {
+          "msg": "ይህ የእርስዎን «እለፍ» እና «በፕሮክሲ ብቻ» መተግበሪያዎች ይተካል። ይቀጥሉ?"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "ደንብ ሰርዝ",
+          "msg": "«$rulename» ደንብ ይሰረዝ? ይህን መመለስ አይችሉም።"
+        }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "መገለጫ ይጨመር?",
+        "message": "ከ«${host}» የመጣ ውጫዊ አገናኝ አዲስ መገለጫ ሊጨምር ይፈልጋል። ይመጣ?"
+      },
+      "importRouteRuleByDeepLinkWarning": {
+        "title": "የመስመር ደንብ ይመጣ?",
+        "message": "የመስመር ደንቦች ትራፊክዎ ወዴት እንደሚሄድ ይወስናሉ።\nከሚያምኑት ምንጭ ብቻ ያስመጧቸው።"
+      }
+    },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "ሁሉም መተግበሪያዎች በVPN ይለፉ?",
+        "vpnMode": "የVPN ሁነታ",
+        "allApps": "ሁሉም መተግበሪያዎች",
+        "recommended": "የሚመከር",
+        "systemProxyMode": "የሲስተም ፕሮክሲ",
+        "someApps": "አሳሾችና አብዛኞቹ መተግበሪያዎች",
+        "switched": "ወደ የሲስተም ፕሮክሲ ሁነታ ተቀይሯል። በቅንብሮች ውስጥ መቀየር ይችላሉ።",
+        "waitingTitle": "የአስተዳዳሪ ፈቃድ በመጠበቅ ላይ",
+        "waitingMsg": "Hiddify የVPN ሁነታን እንዲፈቅዱ እየጠበቀ ነው።",
+        "waitingWhere": "በተከፈተው መስኮት ውስጥ፦",
+        "waitingWindows": "«አዎ» ን ጠቅ ያድርጉ።",
+        "waitingMac": "የMac የይለፍ ቃልዎን ያስገቡና ያረጋግጡ።",
+        "waitingLinux": "የይለፍ ቃልዎን ያስገቡና ያረጋግጡ።",
+        "back": "ተመለስ",
+        "needsAdmin": "አንድ ጊዜ አስተዳዳሪ ያስፈልጋል",
+        "needsAdminAppImage": "በእያንዳንዱ ጅምር አስተዳዳሪ ያስፈልጋል",
+        "noAdmin": "አስተዳዳሪ አያስፈልግም",
+        "someAppsExcept": "Telegram እና ጥቂት መተግበሪያዎች ይቀራሉ",
+        "useVpn": "የVPN ሁነታን ተጠቀም",
+        "useSystemProxy": "የሲስተም ፕሮክሲን ተጠቀም",
+        "helpTooltip": "ይህ ምንድን ነው?",
+        "helpWhatTitle": "እንዴት እንደሚሠራ",
+        "helpProsTitle": "ጥቅሞች",
+        "helpConsTitle": "ልብ ይበሉ",
+        "helpVpn": {
+          "what": "Hiddify በኮምፒውተርዎ ላይ ምናባዊ አውታረ መረብ ይጨምራል፤ የእያንዳንዱ መተግበሪያ የኢንተርኔት ትራፊክ በራሱ በእሱ በኩል ያልፋል፦ አሳሾች፣ Telegram፣ ጨዋታዎች፣ ዝመናዎችና ሌሎችም። በእያንዳንዱ መተግበሪያ ውስጥ ምንም ማቀናበር አያስፈልግም።",
+          "pros": [
+            "ሁሉም መተግበሪያዎች በHiddify ያልፋሉ፣ በእያንዳንዱ መተግበሪያ ውስጥ ምንም ቅንብር ሳያስፈልግ።",
+            "የፕሮክሲ ቅንብሮችን የማይቀበሉ እንደ Telegram እና ጨዋታዎች ያሉ መተግበሪያዎችም ይሠራሉ።",
+            "የስም ፍለጋዎችም (DNS) በHiddify በኩል ያልፋሉ፣ ስለዚህ በዚያ መንገድ የታገዱ ድር ጣቢያዎችም ይከፈታሉ።"
+          ],
+          "cons": [
+            "ለመጀመሪያ ጊዜ የHiddifyን የጀርባ አገልግሎት ለመጫን ኮምፒውተርዎ የአስተዳዳሪ ፈቃድ ይጠይቃል። ከዚያ በኋላ ሳይጠይቅ ይገናኛል።",
+            "በሚጠቀሙበት ጊዜ ሌሎች የVPN መተግበሪያዎችን ያጥፉ፦ ሁለቱ በአንድ ጊዜ እርስ በርስ ይጋጫሉ።"
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify የኮምፒውተርዎን የፕሮክሲ ቅንብር ይቀይራል። ያንን ቅንብር የሚከተሉ እንደ ድር አሳሾች ያሉ መተግበሪያዎች ትራፊካቸውን በHiddify በኩል ይልካሉ፤ የተቀሩት Hiddify እንደጠፋ ሁሉ በቀጥታ ይገናኛሉ።",
+          "pros": [
+            "የአስተዳዳሪ ፈቃድ አያስፈልግም።",
+            "ለማብራትና ለማጥፋት ፈጣን ነው፣ ሲያቋርጡም Hiddify ቅንብሩን ወደ ቀድሞው ይመልሳል።",
+            "በኮምፒውተርዎ ላይ ካሉ ሌሎች የአውታረ መረብ መሣሪያዎች ጋር አብሮ ይሠራል።"
+          ],
+          "cons": [
+            "የሲስተም ፕሮክሲን የማይቀበሉ እንደ Telegram፣ ብዙ ጨዋታዎችና አንዳንድ የማዘመኛ መሣሪያዎች ያሉ መተግበሪያዎች አይጠበቁም።",
+            "መሥራት ካቆሙ በምትኩ የVPN ሁነታን ይምረጡ።"
+          ]
+        }
+      },
+      "proxyNeedsAdmin": {
+        "title": "የአስተዳዳሪ ፈቃድ ይመከራል",
+        "msg": "በዚህ መገለጫ ውስጥ ያሉ አንዳንድ ቅንብሮች በአስተዳዳሪ ፈቃድ የተሻለ ይሠራሉ። በአስተዳዳሪ ፈቃድ ማሄድ ወይም ያለ እሱ መቀጠልና ለዚህ ግንኙነት እነዚያን ቅንብሮች ማጥፋት ይችላሉ።",
+        "seeConfigs": "ውቅሮችን አሳይ",
+        "hideConfigs": "ውቅሮችን ደብቅ",
+        "neverAskAgain": "ለዚህ መገለጫ እንደገና አትጠይቅ",
+        "runAsAdmin": "እንደ አስተዳዳሪ አሂድ",
+        "continueWithoutAdmin": "ያለ አስተዳዳሪ ፈቃድ ቀጥል",
+        "elevationFailedTitle": "የአስተዳዳሪ ፈቃድ ማግኘት አልተቻለም",
+        "elevationFailedMsg": "የአስተዳዳሪ ጥያቄው ተከልክሏል ወይም አልተሳካም። እንደገና ይሞክሩ፣ ወይም ለዚህ ግንኙነት ያለ አስተዳዳሪ ፈቃድ ይቀጥሉ።",
+        "tryAgain": "እንደገና ሞክር"
+      }
+    },
+    "experimentalNotice": {
+      "title": "የሙከራ ባህሪያት በጥቅም ላይ ናቸው",
+      "msg": "የግንኙነት ጥራትን ሊነኩና ያልተጠበቁ ስህተቶችን ሊያስከትሉ የሚችሉ አንዳንድ የሙከራ ባህሪያትን አብርተዋል። እነዚህን አማራጮች ሁልጊዜ በቅንብሮች ውስጥ መቀየር ወይም ዳግም ማስጀመር ይችላሉ።",
+      "disable": "ዳግም አታሳይ"
+    },
+    "noActiveProfile": {
+      "title": "መገለጫ ይምረጡ",
+      "msg": "እንጀምር። በVPN አገልጋይዎ ዝርዝሮች የግንኙነት መገለጫ ይጨምሩ።\n\nገና አገልጋይ የለዎትም? ችግር የለም። ከታች ያለው መመሪያ በነጻ እንዴት እንደሚያዘጋጁ ያሳያል።",
+      "helpBtn": {
+        "label": "እንዴት እንደሆነ አሳየኝ",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "መጀመሪያ ይህን አገናኝ ይፈትሹ",
+      "cannotVerify": "ይህ አገናኝ አልተረጋገጠም",
+      "avoidIfUnsure": "ሙሉ በሙሉ እርግጠኛ ካልሆኑ አይክፈሉ ወይም ሚስጥራዊ መረጃ አያጋሩ",
+      "ownResponsibility": "በራስዎ ኃላፊነት ይቀጥላሉ",
+      "open": "ክፈት",
+      "openIn": "ክፈት (${seconds})"
+    },
+    "proxyInfo": {
+      "fullTag": "ሙሉ መለያ",
+      "type": "ዓይነት",
+      "status": "ሁኔታ",
+      "testTime": "የሙከራ ጊዜ",
+      "testDelay": "የሙከራ መዘግየት",
+      "isSelected": "የተመረጠ",
+      "isGroup": "ቡድን",
+      "isSecure": "ደህንነቱ የተጠበቀ",
+      "port": "ወደብ",
+      "host": "አስተናጋጅ",
+      "ip": "IP",
+      "countryCode": "የአገር ኮድ",
+      "region": "ክልል",
+      "city": "ከተማ",
+      "asn": "ASN",
+      "organization": "ድርጅት",
+      "location": "አካባቢ",
+      "postalCode": "የፖስታ ኮድ",
+      "download": "ማውረድ",
+      "upload": "መጫን",
+      "ping": "ፒንግ",
+      "speed": "ፍጥነት",
+      "server": "አገልጋይ",
+      "country": "አገር",
+      "tapToTest": "ለመሞከር ይንኩ",
+      "error": "ለምን እንዳልተሳካ"
+    },
+    "windowClosing": {
+      "askEachTime": "በየጊዜው ጠይቅ",
+      "alertMessage": "መተግበሪያውን ይደብቁ ወይስ ይውጡ?",
+      "remember": "ይህን ምርጫ አስታውስ"
+    },
+    "qrCode": {
+      "copyFullLink": "ሙሉ አገናኝ ቅዳ",
+      "copied": "ተቀድቷል",
+      "lanLine": "SOCKS5 · በተመሳሳይ አውታረ መረብ ብቻ",
+      "noLocalNetwork": "አካባቢያዊ አውታረ መረብ አልተገኘም",
+      "ip": "IP",
+      "port": "ወደብ",
+      "username": "የተጠቃሚ ስም",
+      "password": "የይለፍ ቃል",
+      "showPassword": "የይለፍ ቃል አሳይ",
+      "hidePassword": "የይለፍ ቃል ደብቅ"
+    },
+    "qrScanner": {
+      "notFound": "በዚህ ምስል ውስጥ QR ኮድ አልተገኘም"
+    },
+    "crashReport": {
+      "title": "Hiddify ባለፈው ጊዜ ተበላሽቷል",
+      "msg": "ይህ እንዲስተካከል ሪፖርት ለገንቢዎች ይላክ? የብልሽቱን ዝርዝሮች፣ መዝገቦቹንና አገልጋዮች፣ ቁልፎችና የይለፍ ቃላት የተወገዱበትን ውቅርዎን ይዟል፤ ከመላክዎ በፊት ሊመለከቱት በሚችሉት በአንድ ዚፕ ፋይል ውስጥ።",
+      "send": "ሪፖርት ላክ"
+    },
+    "keepTop": {
+      "title": "ትልቅ ምዝገባ",
+      "subtitle": "$count ፕሮክሲዎች · ሁሉንም ማሄድ ባትሪ፣ ዳታና ማህደረ ትውስታ ያስወጣል",
+      "hint": "ከዝርዝሩ መጨረሻ በማንኛውም ጊዜ ይመልሱ።",
+      "keeping": "$keep ፈጣኖች ይሠራሉ፣ ሌሎቹ ላፍታ ይቆማሉ",
+      "all": "ሁሉም $count ይሠራሉ",
+      "keep": "$keep ፈጣኖችን አቆይ",
+      "useAll": "ሁሉንም $count ተጠቀም",
+      "howMany": "ስንቶቹ እንዲሠሩ ይቆዩ",
+      "pickByHand": "ፕሮክሲዎቹን ራስዎ ይምረጡ",
+      "region": "ክልል",
+      "anyRegion": "ማንኛውም ክልል",
+      "keepAnswering": "የሚሠሩትን አቆይ",
+      "keepingAnswering": "የሚሠሩት ብቻ ይሠራሉ",
+      "answering": "የሚሠራ",
+      "everyOne": "ሁሉም",
+      "quick": "ፈጣን ሙከራ",
+      "quickHint": "ፈጣኖቹ እንደተገኙ ይቆማል",
+      "quickHelp": "ምን ያደርጋል?",
+      "quickFirst": "ከባለፈው ጊዜ ፈጣኖቹ መጀመሪያ ይሞከራሉ",
+      "quickStop": "የቀሩት ከዚህ በፊት ቀርፋፋ ከነበሩ ሙከራው ይቆማል",
+      "quickNew": "አዳዲስ ፕሮክሲዎችና ለአንድ ቀን ያልተሞከሩት ሁልጊዜ ይሞከራሉ"
+    },
+    "keepTags": {
+      "title": "ፕሮክሲዎችን ምረጥ",
+      "hint": "በሚገናኙ ቁጥር እነዚህ ብቻ ይሠራሉ።",
+      "search": "ፈልግ",
+      "all": "ሁሉንም ምረጥ",
+      "none": "አጽዳ",
+      "run": "እነዚህን $n ተጠቀም",
+      "sort": "ደርድር",
+      "sortProfile": "የመገለጫ ቅደም ተከተል",
+      "sortPing": "ፒንግ",
+      "sortDownload": "ማውረድ",
+      "sortUpload": "መጫን",
+      "selectFastest": "$n ፈጣኖች",
+      "statusChosen": "የተመረጠ",
+      "statusAnswering": "ምላሽ ይሰጣል",
+      "statusPaused": "ላፍታ ቆሟል",
+      "paused": "$n ፕሮክሲዎች ላፍታ ቆመዋል፦ ፒንግ የላቸውም እና ሊሞከሩ አይችሉም።",
+      "wake": "ለመሞከር ሁሉንም አሂድ",
+      "offline": "ፒንጋቸውን ለማየትና ለመሞከር ይገናኙ።",
+      "offlineTitle": "አልተገናኘም",
+      "shown": "$n ይታያሉ",
+      "noMatch": "የሚዛመድ ፕሮክሲ የለም",
+      "chosenHint": "ለመምረጥ ከላይ ያለውን ፕሮክሲ ይንኩ",
+      "allShown": "ሁሉም ከላይ ባለው ዝርዝር ውስጥ አሉ",
+      "notShown": "የማይታዩ፦",
+      "protocol": "ፕሮቶኮል",
+      "country": "ክልል",
+      "anyProtocol": "ማንኛውም ፕሮቶኮል",
+      "anyCountry": "ማንኛውም ክልል",
+      "otherCountries": "ሌሎች"
+    },
+    "localProxy": {
+      "steps": [
+        "የመተግበሪያውን የፕሮክሲ ቅንብሮች ይክፈቱ",
+        "SOCKS5 ወይም HTTP ይምረጡ",
+        "ከታች ያሉትን እሴቶች ያስገቡ · ለመቅዳት ይንኩ",
+        "Hiddify እንደተገናኘ ያቆዩ"
+      ],
+      "hint": "የፕሮክሲ ሁነታ · እንዴት እንደሚጠቀሙ",
+      "setPassword": "የይለፍ ቃል አዘጋጅ",
+      "manual": "በእጅ",
+      "dontShowAgain": "ዳግም አታሳይ",
+      "thisDevice": "ይህ መሣሪያ",
+      "otherDevices": "ሌሎች መሣሪያዎች",
+      "server": "አገልጋይ",
+      "noPassword": "የይለፍ ቃል አልተዘጋጀም",
+      "turnOnSharing": "ማጋራትን አብራ",
+      "copyLink": "አገናኝ ቅዳ",
+      "telegramLink": "የTelegram አገናኝ",
+      "fullLink": "ሙሉ አገናኝ",
+      "portRange": "ከ1024 እስከ 65535 ያለ ወደብ ይጠቀሙ",
+      "passwordTooShort": "ቢያንስ 4 ቁምፊዎች",
+      "edit": "አርትዕ"
+    },
+    "dbNewerThanApp": {
+      "title": "የተቀመጠው ዳታ ከአዲስ ስሪት ነው",
+      "msg": "መገለጫዎችዎና ቅንብሮችዎ በአዲስ የHiddify ስሪት ተቀምጠዋል፣ ይህ የቆየ ስሪት ሊያነባቸው አይችልም። እነሱን ለማቆየት የቅርብ ጊዜውን ስሪት ይጫኑ፣ ወይም ይህን ስሪት ለመጠቀም ይሰርዟቸው።",
+      "deleteData": "ዳታን ደምስስ",
+      "deleteConfirm": "የተቀመጠው ዳታ ይደመሰሳል። ምዝገባዎችዎና አካባቢያዊ መገለጫዎችዎ በተቻለ መጠን ተመልሰው ይጨመራሉ፤ በአዲሱ ስሪት የተቀመጠ ሌላ ማንኛውም ነገር ይጠፋል።",
+      "downloadLatest": "የቅርብ ጊዜውን ስሪት አውርድ"
+    },
+    "dbBroken": {
+      "title": "የተቀመጠው ዳታ ሊከፈት አይችልም",
+      "msg": "Hiddify የተቀመጡ መገለጫዎቹን መክፈት አልቻለም። እንደገና ለመጀመር የተቀመጠውን ዳታ ይደምስሱ፦ ምዝገባዎችዎና አካባቢያዊ መገለጫዎችዎ በተቻለ መጠን ተመልሰው ይጨመራሉ፣ ቅንብሮችዎም ይቀመጣሉ።",
+      "wipeData": "ዳታን ደምስስ",
+      "wipeConfirm": "የተቀመጠው ዳታ ይደመሰሳል እና Hiddify እንደገና ይጀምራል። አሁንም ሊነበቡ የሚችሉ መገለጫዎች ተመልሰው ይጨመራሉ፤ የተቀሩት ሊመለሱ አይችሉም።",
+      "copyError": "ስህተቱን ቅዳ"
+    }
+  },
+  "connection": {
+    "tapToConnect": "ለመገናኘት ይንኩ",
+    "connect": "ይገናኙ",
+    "connecting": "በመገናኘት ላይ…",
+    "waiting": "ነጻነትን በመፈለግ ላይ…",
+    "noAvailableProxies": "ግንኙነት አልተሳካም",
+    "hotReloading": "ለውጦችን በመተግበር ላይ…",
+    "connected": "ተገናኝቷል",
+    "disconnect": "ያላቅቁ",
+    "disconnecting": "በማላቀቅ ላይ…",
+    "failed": "መገናኘት አልተቻለም",
+    "slow": "ከተለመደው በላይ እየወሰደ ነው…",
+    "tapToRetry": "እንደገና ለመሞከር ይንኩ",
+    "errorDetails": "የስህተት ዝርዝሮች",
+    "reconnect": "እንደገና ይገናኙ",
+    "reconnectMsg": "ለውጦችን ለመተግበር እንደገና በመገናኘት ላይ…",
+    "health": {
+      "title": "የግንኙነት ፍተሻ",
+      "allGood": "ትራፊክዎ ያልፋል",
+      "pickDead": "የተመረጠው ፕሮክሲ ምላሽ አይሰጥም",
+      "hopPending": "${chain} በመገናኘት ላይ ነው…",
+      "hopFailed": "${chain} መገናኘት አልቻለም",
+      "coreTesting": "አገልጋዮችን በመሞከር ላይ…",
+      "coreNone": "ከአገልጋዮቹ ምንም ምላሽ አይሰጥም",
+      "fastest": "ፈጣኑ አገልጋይ",
+      "yourServer": "የተመረጠ ፕሮክሲ",
+      "notResponding": "ምላሽ አይሰጥም",
+      "testing": "በመሞከር ላይ…",
+      "useFastest": "ወደ ፈጣኑ ቀይር",
+      "hopReady": "ተገናኝቷል",
+      "hopConnecting": "በመገናኘት ላይ…",
+      "hopBroken": "መገናኘት አልተቻለም",
+      "hopNoReply": "ተገናኝቷል፣ ግን ምላሽ አይሰጥም",
+      "hopBlocked": "የተመረጠው ፕሮክሲ ምላሽ እስኪሰጥ ይጠብቃል",
+      "retry": "እንደገና ሞክር",
+      "change": "ቀይር",
+      "turnOff": "አጥፋ"
+    }
+  },
+  "errors": {
+    "unexpected": "ያልተጠበቀ ስህተት",
+    "connection": {
+      "unexpected": "ያልተጠበቀ የግንኙነት ስህተት",
+      "timeout": "የግንኙነት ጊዜ አልፏል",
+      "badResponse": "ልክ ያልሆነ የአገልጋይ ምላሽ",
+      "connectionError": "የግንኙነት ስህተት",
+      "badCertificate": "ልክ ያልሆነ ሰርተፍኬት"
+    },
+    "profiles": {
+      "unexpected": "ያልተጠበቀ ስህተት",
+      "notFound": "መገለጫ አልተገኘም",
+      "invalidConfig": "ልክ ያልሆነ ውቅር",
+      "invalidUrl": "ልክ ያልሆነ URL",
+      "canceledByUser": "በተጠቃሚ ተሰርዟል"
+    },
+    "connectivity": {
+      "unexpected": "ያልተጠበቀ ውድቀት",
+      "missingVpnPermission": "የVPN ፈቃድ የለም",
+      "missingNotificationPermission": "የማሳወቂያ ፈቃድ የለም",
+      "core": "የኮር ስህተት"
+    },
+    "singbox": {
+      "serviceNotRunning": "አገልግሎቱ እየሠራ አይደለም",
+      "missingPrivilege": "ፈቃድ የለም",
+      "missingPrivilegeMsg": "የVPN ሁነታ መጀመር አይችልም። መተግበሪያውን እንደ አስተዳዳሪ እንደገና ያስጀምሩት ወይም የአገልግሎት ሁነታን ይቀይሩ።",
+      "tunAddressInUse": "ሌላ VPN ንቁ ነው",
+      "tunAddressInUseMsg": "የVPN ሁነታ መጀመር አይችልም። ሌላውን VPN ያጥፉ ወይም የአገልግሎት ሁነታን ይቀይሩ።",
+      "invalidConfigOptions": "ልክ ያልሆኑ የውቅር አማራጮች",
+      "invalidConfig": "ልክ ያልሆነ ውቅር"
+    },
+    "warp": {
+      "missingLicense": "የWARP ፈቃድ ያስፈልጋል",
+      "missingLicenseMsg": "ይህ መገለጫ WARP ይጠቀማል። ለመቀጠል የWARP ፈቃዱን ይቀበሉ።"
+    },
+    "psiphon": {
+      "missingLicense": "የPsiphon ፈቃድ ያስፈልጋል",
+      "missingLicenseMsg": "ይህ መገለጫ Psiphon ይጠቀማል። ለመቀጠል የPsiphon ፈቃዱን ይቀበሉ።"
+    }
+  }
+}

@@ -23,6 +23,7 @@ extension AppLocaleX on AppLocale {
     "zh" || "zh_CN" => "中文 (中国)",
     "zh_TW" => "中文 (台湾)",
     "be" => "Беларуская",
+    "am" => "አማርኛ",
     _ => "Unknown",
   };
 }
