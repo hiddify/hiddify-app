@@ -225,11 +225,17 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
   void _adoptProcess(CoreProcess process) {
     _process = process;
     unawaited(
-      process.exitCode.then((code) {
+      process.exitCode.then((code) async {
         if (!identical(_process, process) || process.stopping) return;
         _process = null;
-        loggy.error('core process exited unexpectedly ($code)');
-        onCoreProcessExited('The core stopped unexpectedly (exit code $code).');
+        // before the restart, which moves the crash output into the crash reports
+        final reason = await process.crashReason();
+        loggy.error('core process exited unexpectedly ($code)${reason == null ? '' : ': $reason'}');
+        onCoreProcessExited(
+          reason == null
+              ? 'The core stopped unexpectedly (exit code $code).'
+              : 'The core stopped unexpectedly (exit code $code): $reason',
+        );
         unawaited(_restartProcess(process));
       }),
     );

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:path/path.dart' as p;
 
@@ -29,7 +30,7 @@ class CoreProcessException implements Exception {
 /// this process holds the other end and never writes to it, so it closes when the UI exits, even
 /// when the UI crashes or is killed. The core also watches the UI's process id.
 class CoreProcess {
-  CoreProcess._(this._process, this.serverCertificatePem);
+  CoreProcess._(this._process, this.serverCertificatePem, this._crashFile, this._stderrTail);
 
   static const _readyPrefix = 'HIDDIFY_CORE_READY ';
   static const _errorPrefix = 'HIDDIFY_CORE_ERROR ';
@@ -40,6 +41,13 @@ class CoreProcess {
   static const _stopTimeout = Duration(seconds: 10);
 
   final Process _process;
+
+  /// Where the core writes a Go crash (hcore.Setup: `<working dir>/data/stderr<mode name>.log`). Once it
+  /// is set up its stderr goes to /dev/null or NUL, so this file is the only place a panic shows.
+  final File _crashFile;
+
+  /// The last lines of stderr, written before the core was set up.
+  final List<String> _stderrTail;
 
   /// The gRPC server certificate (PEM), empty without TLS.
   final String serverCertificatePem;
@@ -108,6 +116,9 @@ class CoreProcess {
     );
     _logger.info('core process ${process.pid} started: $executable');
 
+    // named by the mode's name, as Go prints the enum
+    final crashFile = File(p.join(workingDir, 'data', 'stderr${SetupMode.valueOf(mode)?.name ?? mode}.log'));
+    final stderrTail = <String>[];
     final ready = Completer<String>();
     // Both pipes are read to the end: a full pipe would block the core.
     process.stdout.transform(utf8.decoder).transform(const LineSplitter()).listen((line) {
@@ -119,24 +130,73 @@ class CoreProcess {
         _logger.debug('core: $line');
       }
     }, onError: (Object _) {});
-    process.stderr.transform(utf8.decoder).transform(const LineSplitter()).listen((line) {
-      if (line.isNotEmpty) _logger.debug('core: $line');
-    }, onError: (Object _) {});
+    final stderrDone = Completer<void>();
+    process.stderr
+        .transform(utf8.decoder)
+        .transform(const LineSplitter())
+        .listen(
+          (line) {
+            if (line.isEmpty) return;
+            _logger.debug('core: $line');
+            stderrTail.add(line);
+            if (stderrTail.length > _stderrTailLines) stderrTail.removeAt(0);
+          },
+          onError: (Object _) {},
+          onDone: stderrDone.complete,
+        );
     unawaited(
-      process.exitCode.then((code) {
-        if (!ready.isCompleted) {
-          ready.completeError(CoreProcessException('the core exited ($code) before it was ready'));
-        }
+      process.exitCode.then((code) async {
+        if (ready.isCompleted) return;
+        // the rest of stderr, which holds a crash, arrives after the exit
+        await stderrDone.future.timeout(const Duration(seconds: 1), onTimeout: () {});
+        final reason = await _crashReason(crashFile, stderrTail);
+        if (ready.isCompleted) return;
+        ready.completeError(
+          CoreProcessException('the core exited ($code) before it was ready${reason == null ? '' : ': $reason'}'),
+        );
       }),
     );
 
     try {
       final certificate = await ready.future.timeout(_readyTimeout);
-      return CoreProcess._(process, certificate.isEmpty ? '' : utf8.decode(base64.decode(certificate)));
+      return CoreProcess._(
+        process,
+        certificate.isEmpty ? '' : utf8.decode(base64.decode(certificate)),
+        crashFile,
+        stderrTail,
+      );
     } catch (_) {
       process.kill();
       rethrow;
     }
+  }
+
+  static const _stderrTailLines = 50;
+  static const _maxReasonLength = 300;
+
+  /// Why the core crashed, from its Go crash output: the `panic:` or `fatal error:` line, or null.
+  /// Read it right after the exit: a restarted core moves the file into its crash reports.
+  Future<String?> crashReason() => _crashReason(_crashFile, _stderrTail);
+
+  static Future<String?> _crashReason(File crashFile, List<String> stderrTail) async {
+    String? fromFile;
+    try {
+      if (await crashFile.exists()) fromFile = crashHeadline(await crashFile.readAsString());
+    } catch (e) {
+      _logger.debug('cannot read the core crash output: $e');
+    }
+    return fromFile ?? crashHeadline(stderrTail.join('\n'));
+  }
+
+  /// The line of a Go crash output that says what went wrong, shortened, or null when [output]
+  /// holds no crash.
+  static String? crashHeadline(String output) {
+    final lines = const LineSplitter().convert(output).map((line) => line.trim()).toList();
+    final line =
+        lines.where((line) => line.startsWith('panic: ') || line.startsWith('fatal error: ')).firstOrNull ??
+        lines.where((line) => RegExp('^SIG[A-Z]+: ').hasMatch(line)).firstOrNull;
+    if (line == null) return null;
+    return line.length > _maxReasonLength ? '${line.substring(0, _maxReasonLength)}…' : line;
   }
 
   /// Stops the core gracefully, so it can restore the system proxy, and kills it if it does not exit.
