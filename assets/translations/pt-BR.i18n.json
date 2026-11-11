@@ -576,7 +576,8 @@
         "shortServiceModes": {
           "proxy": "Proxy",
           "systemProxy": "Proxy do sistema",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Roteador"
         },
         "strictRoute": "Roteamento estrito",
         "tunImplementation": "Implementação de TUN",
@@ -630,6 +631,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "Desativado",
+          "extraSecurity": {
+            "title": "Segurança extra",
+            "subtitle": "Quando você não confia no proxy",
+            "ipBy": "Seu IP é definido por $mode",
+            "notTracked": "Seu provedor de VPN não consegue ver seu tráfego",
+            "forPublic": "Bom para proxies públicos e anônimos",
+            "slower": "Pode reduzir a velocidade"
+          },
+          "unblocker": {
+            "title": "Desbloqueador de proxy",
+            "subtitle": "Faz o proxy passar pela filtragem",
+            "mayConnect": "Um proxy filtrado pode conectar",
+            "personalOnly": "Útil apenas para um proxy pessoal",
+            "notForPublic": "Não é adequado para proxies públicos",
+            "slower": "O proxy fica um pouco mais lento"
+          }
+        },
         "title": "Cadeia",
         "subtitle": "Segurança extra & desbloqueador",
         "finalIp": "IP final",

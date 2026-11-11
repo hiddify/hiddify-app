@@ -575,7 +575,8 @@
         "shortServiceModes": {
           "proxy": "Proxy",
           "systemProxy": "Sistem proxy'si",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Yönlendirici"
         },
         "strictRoute": "Katı yönlendirme",
         "tunImplementation": "TUN uygulaması",
@@ -629,6 +630,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "Kapalı",
+          "extraSecurity": {
+            "title": "Ekstra güvenlik",
+            "subtitle": "Proxy'ye güvenmediğinizde",
+            "ipBy": "IP adresinizi $mode belirler",
+            "notTracked": "VPN sağlayıcınız trafiğinizi göremez",
+            "forPublic": "Herkese açık ve anonim proxy'ler için uygun",
+            "slower": "Hızı düşürebilir"
+          },
+          "unblocker": {
+            "title": "Proxy engel kaldırıcı",
+            "subtitle": "Proxy'nin filtrelemeyi aşmasını sağlar",
+            "mayConnect": "Filtrelenmiş bir proxy bağlanabilir",
+            "personalOnly": "Yalnızca kişisel bir proxy için yararlı",
+            "notForPublic": "Herkese açık proxy'ler için uygun değil",
+            "slower": "Proxy biraz yavaşlar"
+          }
+        },
         "title": "Zincir",
         "subtitle": "Ekstra güvenlik ve engel kaldırıcı",
         "finalIp": "Nihai IP",

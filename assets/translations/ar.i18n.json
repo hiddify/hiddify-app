@@ -607,7 +607,8 @@
         "shortServiceModes": {
           "proxy": "بروكسي",
           "systemProxy": "بروكسي النظام",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "راوتر"
         },
         "strictRoute": "توجيه صارم",
         "tunImplementation": "تنفيذ TUN",
@@ -661,6 +662,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "متوقف",
+          "extraSecurity": {
+            "title": "أمان إضافي",
+            "subtitle": "عندما لا تثق بالبروكسي",
+            "ipBy": "عنوان IP الخاص بك يحدده $mode",
+            "notTracked": "لا يستطيع مزوّد VPN الخاص بك رؤية حركة بياناتك",
+            "forPublic": "مناسب للبروكسيات العامة والمجهولة",
+            "slower": "قد يقلل السرعة"
+          },
+          "unblocker": {
+            "title": "أداة فك حظر البروكسي",
+            "subtitle": "يساعد البروكسي على تجاوز الحجب",
+            "mayConnect": "قد يتصل بروكسي محجوب",
+            "personalOnly": "مفيد فقط لبروكسي شخصي",
+            "notForPublic": "غير مناسب للبروكسيات العامة",
+            "slower": "يصبح البروكسي أبطأ قليلًا"
+          }
+        },
         "title": "سلسلة",
         "subtitle": "أمان إضافي وأداة فك حظر",
         "finalIp": "عنوان IP النهائي",
