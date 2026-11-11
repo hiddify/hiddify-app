@@ -26,6 +26,7 @@ extension AppLocaleX on AppLocale {
     "am" => "አማርኛ",
     "ur" => "اردو",
     "ps" => "پښتو",
+    "bn" => "বাংলা",
     _ => "Unknown",
   };
 }
