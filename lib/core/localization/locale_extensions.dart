@@ -16,6 +16,7 @@ extension AppLocaleX on AppLocale {
     "fr" => "Français",
     "id" => "Indonesian",
     "ko" => "한국어",
+    "nl" => "Nederlands",
     "pt_BR" => "Portuguese (Brazil)",
     "ru" => "Русский",
     "tk" => "Türkmençe",
