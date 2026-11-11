@@ -6,8 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hiddify/core/app_info/app_info_provider.dart';
+import 'package:hiddify/core/localization/fallback_localizations.dart';
 import 'package:hiddify/core/localization/locale_extensions.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -119,7 +119,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                   scaffoldMessengerKey: appScaffoldMessengerKey,
                   locale: locale.flutterLocale,
                   supportedLocales: AppLocaleUtils.supportedLocales,
-                  localizationsDelegates: GlobalMaterialLocalizations.delegates,
+                  localizationsDelegates: appLocalizationsDelegates,
                   debugShowCheckedModeBanner: false,
                   themeMode: themeMode.flutterThemeMode,
                   theme: theme.lightTheme(lightColorScheme),
@@ -194,7 +194,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   //                         routerConfig: router,
   //                         locale: locale.flutterLocale,
   //                         supportedLocales: AppLocaleUtils.supportedLocales,
-  //                         localizationsDelegates: GlobalMaterialLocalizations.delegates,
+  //                         localizationsDelegates: appLocalizationsDelegates,
   //                         debugShowCheckedModeBanner: false,
   //                         material: (context, platform) => MaterialAppRouterData(
   //                           theme: theme.lightTheme(lightColorScheme),
