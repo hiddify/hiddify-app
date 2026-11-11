@@ -29,6 +29,7 @@ extension AppLocaleX on AppLocale {
     "bn" => "বাংলা",
     "uz" => "Oʻzbekcha",
     "az" => "Azərbaycan dili",
+    "kk" => "Қазақша",
     _ => "Unknown",
   };
 }
