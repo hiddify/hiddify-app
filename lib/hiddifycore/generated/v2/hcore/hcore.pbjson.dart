@@ -323,6 +323,7 @@ const OutboundInfo$json = {
     {'1': 'download_speed_cached', '3': 24, '4': 1, '5': 8, '10': 'downloadSpeedCached'},
     {'1': 'error', '3': 25, '4': 1, '5': 9, '10': 'error'},
     {'1': 'sort_delay', '3': 26, '4': 1, '5': 5, '10': 'sortDelay'},
+    {'1': 'resting', '3': 27, '4': 1, '5': 8, '10': 'resting'},
   ],
   '8': [
     {'1': '_ipinfo'},
@@ -349,8 +350,9 @@ final $typed_data.Uint8List outboundInfoDescriptor = $convert.base64Decode(
     'INZG93bmxvYWRTcGVlZBIpChBkb3dubG9hZF90ZXN0aW5nGBYgASgIUg9kb3dubG9hZFRlc3Rp'
     'bmcSLgoTdXBsb2FkX3NwZWVkX2NhY2hlZBgXIAEoCFIRdXBsb2FkU3BlZWRDYWNoZWQSMgoVZG'
     '93bmxvYWRfc3BlZWRfY2FjaGVkGBggASgIUhNkb3dubG9hZFNwZWVkQ2FjaGVkEhQKBWVycm9y'
-    'GBkgASgJUgVlcnJvchIdCgpzb3J0X2RlbGF5GBogASgFUglzb3J0RGVsYXlCCQoHX2lwaW5mb0'
-    'IVChNfZ3JvdXBfc2VsZWN0ZWRfdGFnQh0KG19ncm91cF9zZWxlY3RlZF90YWdfZGlzcGxheQ==');
+    'GBkgASgJUgVlcnJvchIdCgpzb3J0X2RlbGF5GBogASgFUglzb3J0RGVsYXkSGAoHcmVzdGluZx'
+    'gbIAEoCFIHcmVzdGluZ0IJCgdfaXBpbmZvQhUKE19ncm91cF9zZWxlY3RlZF90YWdCHQobX2dy'
+    'b3VwX3NlbGVjdGVkX3RhZ19kaXNwbGF5');
 
 @$core.Deprecated('Use ipInfoDescriptor instead')
 const IpInfo$json = {
@@ -387,6 +389,7 @@ const OutboundGroup$json = {
     {'1': 'selectable', '3': 4, '4': 1, '5': 8, '10': 'selectable'},
     {'1': 'Is_expand', '3': 5, '4': 1, '5': 8, '10': 'IsExpand'},
     {'1': 'items', '3': 6, '4': 3, '5': 11, '6': '.hcore.OutboundInfo', '10': 'items'},
+    {'1': 'keep_top_picking', '3': 7, '4': 1, '5': 8, '10': 'keepTopPicking'},
   ],
 };
 
@@ -395,7 +398,8 @@ final $typed_data.Uint8List outboundGroupDescriptor = $convert.base64Decode(
     'Cg1PdXRib3VuZEdyb3VwEhAKA3RhZxgBIAEoCVIDdGFnEhIKBHR5cGUYAiABKAlSBHR5cGUSGg'
     'oIc2VsZWN0ZWQYAyABKAlSCHNlbGVjdGVkEh4KCnNlbGVjdGFibGUYBCABKAhSCnNlbGVjdGFi'
     'bGUSGwoJSXNfZXhwYW5kGAUgASgIUghJc0V4cGFuZBIpCgVpdGVtcxgGIAMoCzITLmhjb3JlLk'
-    '91dGJvdW5kSW5mb1IFaXRlbXM=');
+    '91dGJvdW5kSW5mb1IFaXRlbXMSKAoQa2VlcF90b3BfcGlja2luZxgHIAEoCFIOa2VlcFRvcFBp'
+    'Y2tpbmc=');
 
 @$core.Deprecated('Use outboundGroupListDescriptor instead')
 const OutboundGroupList$json = {
@@ -572,12 +576,13 @@ const UrlTestRequest$json = {
   '1': 'UrlTestRequest',
   '2': [
     {'1': 'tag', '3': 1, '4': 1, '5': 9, '10': 'tag'},
+    {'1': 'tags', '3': 2, '4': 3, '5': 9, '10': 'tags'},
   ],
 };
 
 /// Descriptor for `UrlTestRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List urlTestRequestDescriptor = $convert.base64Decode(
-    'Cg5VcmxUZXN0UmVxdWVzdBIQCgN0YWcYASABKAlSA3RhZw==');
+    'Cg5VcmxUZXN0UmVxdWVzdBIQCgN0YWcYASABKAlSA3RhZxISCgR0YWdzGAIgAygJUgR0YWdz');
 
 @$core.Deprecated('Use speedTestRequestDescriptor instead')
 const SpeedTestRequest$json = {

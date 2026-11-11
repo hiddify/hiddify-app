@@ -270,6 +270,46 @@ TextStyle? _nameStyle(BuildContext context, StepStatus status) => Theme.of(conte
   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: status == StepStatus.waiting ? .45 : 1),
 );
 
+// ---------- the speed of the proxy in use ----------
+
+/// How fast the proxy in use uploads and downloads: a tap measures the upload, a long press the
+/// download. A speed from an earlier run is never shown here, and a fresh one only for [_shownFor]
+/// after its test ends; the gauge then shows again.
+class _SpeedChip extends HookConsumerWidget {
+  const _SpeedChip(this.server, {super.key});
+  final OutboundInfo server;
+
+  static const _shownFor = Duration(seconds: 20);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final busy = server.uploadTesting || server.downloadTesting;
+    // a result shows only once this card saw its test run
+    final shown = useState(false);
+    final wasBusy = useRef(false);
+    useEffect(() {
+      Timer? timer;
+      if (busy) {
+        shown.value = true;
+      } else if (wasBusy.value) {
+        timer = Timer(_shownFor, () => shown.value = false);
+      }
+      wasBusy.value = busy;
+      return timer?.cancel;
+    }, [busy]);
+    int fresh(int value, bool cached) => shown.value && !cached ? value : 0;
+    final notifier = ref.read(activeProxyNotifierProvider.notifier);
+    return UploadSpeedChip(
+      speed: fresh(server.uploadSpeed.toInt(), server.uploadSpeedCached),
+      testing: server.uploadTesting,
+      onTest: notifier.uploadTest,
+      downloadSpeed: fresh(server.downloadSpeed.toInt(), server.downloadSpeedCached),
+      downloadTesting: server.downloadTesting,
+      onDownloadTest: notifier.downloadTest,
+    );
+  }
+}
+
 // ---------- the proxy row: how the server was picked, its name, IP and protocol ----------
 
 class _ProxyRow extends ConsumerWidget {
@@ -295,18 +335,7 @@ class _ProxyRow extends ConsumerWidget {
       onTap: () => context.goNamed('proxies'),
       // how fast the proxy in use uploads and downloads: a tap measures the upload, a long press the
       // download
-      end: connected
-          ? UploadSpeedChip(
-              speed: server.uploadSpeed.toInt(),
-              testing: server.uploadTesting,
-              cached: server.uploadSpeedCached,
-              onTest: () => ref.read(activeProxyNotifierProvider.notifier).uploadTest(),
-              downloadSpeed: server.downloadSpeed.toInt(),
-              downloadTesting: server.downloadTesting,
-              downloadCached: server.downloadSpeedCached,
-              onDownloadTest: () => ref.read(activeProxyNotifierProvider.notifier).downloadTest(),
-            )
-          : null,
+      end: connected ? _SpeedChip(server, key: ValueKey(server.tag)) : null,
       flag: InkWell(
         onTap: () async {
           await urlTest();

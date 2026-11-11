@@ -663,6 +663,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     $core.bool? downloadSpeedCached,
     $core.String? error,
     $core.int? sortDelay,
+    $core.bool? resting,
   }) {
     final $result = create();
     if (tag != null) {
@@ -743,6 +744,9 @@ class OutboundInfo extends $pb.GeneratedMessage {
     if (sortDelay != null) {
       $result.sortDelay = sortDelay;
     }
+    if (resting != null) {
+      $result.resting = resting;
+    }
     return $result;
   }
   OutboundInfo._() : super();
@@ -776,6 +780,7 @@ class OutboundInfo extends $pb.GeneratedMessage {
     ..aOB(24, _omitFieldNames ? '' : 'downloadSpeedCached')
     ..aOS(25, _omitFieldNames ? '' : 'error')
     ..a<$core.int>(26, _omitFieldNames ? '' : 'sortDelay', $pb.PbFieldType.O3)
+    ..aOB(27, _omitFieldNames ? '' : 'resting')
     ..hasRequiredFields = false
   ;
 
@@ -1037,6 +1042,15 @@ class OutboundInfo extends $pb.GeneratedMessage {
   $core.bool hasSortDelay() => $_has(25);
   @$pb.TagNumber(26)
   void clearSortDelay() => clearField(26);
+
+  @$pb.TagNumber(27)
+  $core.bool get resting => $_getBF(26);
+  @$pb.TagNumber(27)
+  set resting($core.bool v) { $_setBool(26, v); }
+  @$pb.TagNumber(27)
+  $core.bool hasResting() => $_has(26);
+  @$pb.TagNumber(27)
+  void clearResting() => clearField(27);
 }
 
 class IpInfo extends $pb.GeneratedMessage {
@@ -1223,6 +1237,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
     $core.bool? selectable,
     $core.bool? isExpand,
     $core.Iterable<OutboundInfo>? items,
+    $core.bool? keepTopPicking,
   }) {
     final $result = create();
     if (tag != null) {
@@ -1243,6 +1258,9 @@ class OutboundGroup extends $pb.GeneratedMessage {
     if (items != null) {
       $result.items.addAll(items);
     }
+    if (keepTopPicking != null) {
+      $result.keepTopPicking = keepTopPicking;
+    }
     return $result;
   }
   OutboundGroup._() : super();
@@ -1256,6 +1274,7 @@ class OutboundGroup extends $pb.GeneratedMessage {
     ..aOB(4, _omitFieldNames ? '' : 'selectable')
     ..aOB(5, _omitFieldNames ? '' : 'IsExpand', protoName: 'Is_expand')
     ..pc<OutboundInfo>(6, _omitFieldNames ? '' : 'items', $pb.PbFieldType.PM, subBuilder: OutboundInfo.create)
+    ..aOB(7, _omitFieldNames ? '' : 'keepTopPicking')
     ..hasRequiredFields = false
   ;
 
@@ -1327,6 +1346,15 @@ class OutboundGroup extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(6)
   $core.List<OutboundInfo> get items => $_getList(5);
+
+  @$pb.TagNumber(7)
+  $core.bool get keepTopPicking => $_getBF(6);
+  @$pb.TagNumber(7)
+  set keepTopPicking($core.bool v) { $_setBool(6, v); }
+  @$pb.TagNumber(7)
+  $core.bool hasKeepTopPicking() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearKeepTopPicking() => clearField(7);
 }
 
 class OutboundGroupList extends $pb.GeneratedMessage {
@@ -2120,10 +2148,14 @@ class SelectOutboundRequest extends $pb.GeneratedMessage {
 class UrlTestRequest extends $pb.GeneratedMessage {
   factory UrlTestRequest({
     $core.String? tag,
+    $core.Iterable<$core.String>? tags,
   }) {
     final $result = create();
     if (tag != null) {
       $result.tag = tag;
+    }
+    if (tags != null) {
+      $result.tags.addAll(tags);
     }
     return $result;
   }
@@ -2133,6 +2165,7 @@ class UrlTestRequest extends $pb.GeneratedMessage {
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'UrlTestRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'tag')
+    ..pPS(2, _omitFieldNames ? '' : 'tags')
     ..hasRequiredFields = false
   ;
 
@@ -2165,6 +2198,9 @@ class UrlTestRequest extends $pb.GeneratedMessage {
   $core.bool hasTag() => $_has(0);
   @$pb.TagNumber(1)
   void clearTag() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.String> get tags => $_getList(1);
 }
 
 class SpeedTestRequest extends $pb.GeneratedMessage {

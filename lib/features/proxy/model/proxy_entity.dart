@@ -180,8 +180,11 @@ extension OutboundInfoCard on OutboundInfo {
   /// replaces it; it may have changed since, so it does not count.
   bool get hasIp => ipinfo.ip.isNotEmpty && !ipinfo.fromCache;
 
-  /// What a proxies-page row shows: the core's [status] first, then for a ready proxy its ping.
-  ProxyRowState get rowState => switch (status) {
+  /// What a proxies-page row shows: at rest when keep top left it so, else the core's [status]
+  /// first, then for a ready proxy its ping.
+  ProxyRowState get rowState => resting ? ProxyRowState.resting : _runningState;
+
+  ProxyRowState get _runningState => switch (status) {
     Status.CONNECTING => ProxyRowState.connecting,
     Status.REGISTERING => ProxyRowState.registering,
     Status.SEARCHING => ProxyRowState.searching,
@@ -220,5 +223,6 @@ final _scannerEndpoint = RegExp(r'^(.*?) · 🔍 (\[[0-9a-fA-F:]+\]:\d+|\d+\.\d+
 final _statusMark = RegExp(r'\s+(⏳|⌛|🔍|❌|🔑)\s.*$');
 
 /// A proxies-page row's state. [untested] waits for its first ping; [pingFailed] is ready but its
-/// ping got no answer; [failed] is the core's FAILED, the proxy gave up.
-enum ProxyRowState { ready, untested, pingFailed, connecting, registering, searching, reconnecting, failed }
+/// ping got no answer; [failed] is the core's FAILED, the proxy gave up; [resting] is one keep top
+/// left at rest: not loaded and not tested until it is selected, tested or kept loaded.
+enum ProxyRowState { ready, untested, pingFailed, connecting, registering, searching, reconnecting, failed, resting }

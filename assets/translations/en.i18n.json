@@ -143,7 +143,8 @@
         "failed": "Failed",
         "ready": "Ready",
         "searching": "Searching",
-        "reconnecting": "Reconnecting"
+        "reconnecting": "Reconnecting",
+        "resting": "Paused"
       },
       "signalStyle": "Signal style",
       "keepTop": {
@@ -157,14 +158,27 @@
         "keptAnswering": "$n working proxies$where run",
         "kept": "The $n fastest are running",
         "keptFastest": "The $n fastest$where are running",
-        "keptBody": "$paused other proxies are paused, to save battery and data.",
+        "keptBody": "$paused other proxies are paused, to save memory, battery and data.",
         "showAll": "Show all $count",
         "big": "$count proxies are running",
         "bigBody": "Keep only the $keep fastest running, to save battery and data.",
         "keep": "Keep the $keep fastest",
-        "change": "Change how many",
+        "change": "Change",
         "chosen": "Your $n chosen proxies are running",
-        "choose": "Choose"
+        "choose": "Choose",
+        "restingShow": "Show the $n paused proxies",
+        "restingHide": "Hide the paused proxies",
+        "restingHint": "A paused proxy is not loaded. Tap one to use it: it is loaded and tested. Long press it to keep it loaded.",
+        "restingTitle": "$n proxies are taking a nap",
+        "restingWhy": "Only the fastest stay awake, so your device stays quick and saves battery and data. Tap any of them to wake it up.",
+        "fasterElsewhere": "$n proxies in other regions are faster",
+        "anyRegion": "Show all regions",
+        "running": "running",
+        "testing": "testing…",
+        "modeTop": "Top $keep",
+        "modeWorking": "Working only",
+        "modeChosen": "Your picks",
+        "onlyAnswer": "Top $keep · only $n answer"
       },
       "upload": {
         "test": "Test upload speed",
@@ -1078,7 +1092,9 @@
       "server": "Server",
       "country": "Country",
       "tapToTest": "Tap to test",
-      "error": "Why it failed"
+      "error": "Why it failed",
+      "keepLoaded": "Always keep this proxy loaded",
+      "keepLoadedBody": "It stays loaded and tested beside the fastest ones, whatever its ping."
     },
     "windowClosing": {
       "askEachTime": "Ask each time",

@@ -51,6 +51,7 @@ class ProfileParser with InfraLogger {
     'keep-top',
     'keep-top-quick',
     'keep-top-countries',
+    'keep-top-pinned',
     'keep-tags',
   ];
   static const allowedProfileHeaders = [
@@ -517,6 +518,9 @@ class ProfileParser with InfraLogger {
     return null;
   }
 
+  /// How many proxies run, the fastest, when neither the user nor the subscription says.
+  static const keepTopDefault = 5;
+
   /// A `keep-top` header: how many proxies to keep running, or -1 for all. Anything else is no
   /// header at all.
   static int? keepTopHeader(String? value) {
@@ -558,6 +562,7 @@ class ProfileParser with InfraLogger {
     // the user's choices only, never a subscription's
     headers.remove('keep-top-quick');
     headers.remove('keep-top-countries');
+    headers.remove('keep-top-pinned');
 
     // extra-security: exactly one documented mode. The app's own setting takes
     // precedence over the subscription; an unrecognised value is ignored.
@@ -577,10 +582,8 @@ class ProfileParser with InfraLogger {
       headers['tls-tricks'] = tricks;
     }
 
-    // keep-top: the user's choice, else the subscription's; -1 (or none) runs every proxy
-    if (userOverride?.keepTop ?? keepTopHeader(keepTopInput) case final keepTop?) {
-      headers['keep-top'] = keepTop;
-    }
+    // keep-top: the user's choice, else the subscription's, else the fastest few; -1 runs every proxy
+    headers['keep-top'] = userOverride?.keepTop ?? keepTopHeader(keepTopInput) ?? keepTopDefault;
     // keep-top-quick: picks the fastest without testing every proxy, unless the user turned it off
     if (userOverride?.keepTopQuick ?? true) {
       headers['keep-top-quick'] = true;
@@ -588,6 +591,10 @@ class ProfileParser with InfraLogger {
     // keep-top-countries: only proxies of these countries are kept
     if (userOverride?.keepTopCountries case final countries? when countries.isNotEmpty) {
       headers['keep-top-countries'] = countries;
+    }
+    // keep-top-pinned: the proxies the user keeps loaded, beside the fastest
+    if (userOverride?.keepTopPinned case final pinned? when pinned.isNotEmpty) {
+      headers['keep-top-pinned'] = pinned;
     }
     // keep-tags: the proxies the user chose run, and only them, while any is still in the profile
     if (userOverride?.keepTags case final tags? when tags.isNotEmpty) {

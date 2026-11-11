@@ -346,11 +346,26 @@ class ProxiesOverviewNotifier extends _$ProxiesOverviewNotifier with AppLogger {
   Future<void> speedTestAll() async {
     final group = state.valueOrNull;
     if (group == null) return;
-    final proxies = group.items.where((e) => !e.isGroup).toList();
+    // the ones keep top left at rest are not tested: a test would load each of them
+    final proxies = group.items.where((e) => !e.isGroup && !e.resting).toList();
     final limit = ref.read(ConfigOptions.uploadTestLimit);
     if (limit <= 0 || proxies.length <= limit) return speedTest(group.tag);
     for (final tag in fastestProxies(proxies, limit)) {
       await speedTest(tag);
+    }
+  }
+
+  /// Tests the proxies [tags], a few at a time: also the ones keep top left at rest, each loaded
+  /// for its test and left at rest after it.
+  Future<void> urlTestProxies(List<String> tags) async {
+    if (tags.isEmpty) return;
+    loggy.debug("testing ${tags.length} proxies");
+    if (state case AsyncData()) {
+      await ref.read(hapticServiceProvider.notifier).lightImpact();
+      await ref.read(proxyRepositoryProvider).urlTestProxies(tags).getOrElse((err) {
+        loggy.error("error testing proxies", err);
+        throw err;
+      }).run();
     }
   }
 
@@ -390,9 +405,17 @@ int compareBySpeeds(OutboundInfo a, OutboundInfo b, {required bool uploadFirst})
   return answers(x) ? x.compareTo(y) : 0;
 }
 
-/// The tags of the [count] proxies with the lowest ping that answered.
+/// The tags of the [count] proxies with the lowest ping that answered. A proxy not tested in this
+/// run, as one keep top left at rest, counts by the ping the core kept from the run before
+/// (sort_delay): left out, a test of "the fastest" only ever reached the proxies already in use.
 List<String> fastestProxies(List<OutboundInfo> proxies, int count) {
-  final answered = proxies.where((e) => e.urlTestDelay > 0 && e.urlTestDelay < 65000).toList()
-    ..sort((a, b) => a.urlTestDelay.compareTo(b.urlTestDelay));
+  bool valid(int delay) => delay > 0 && delay < 65000;
+  // 0: no answer known; one that failed in this run has none, whatever it did before
+  int delayOf(OutboundInfo e) =>
+      valid(e.urlTestDelay) ? e.urlTestDelay : (e.urlTestDelay == 0 && valid(e.sortDelay) ? e.sortDelay : 0);
+  final answered = [
+    for (final e in proxies)
+      if (delayOf(e) > 0) e,
+  ]..sort((a, b) => delayOf(a).compareTo(delayOf(b)));
   return answered.take(count).map((e) => e.tag).toList();
 }

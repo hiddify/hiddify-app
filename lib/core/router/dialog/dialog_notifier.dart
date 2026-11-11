@@ -218,7 +218,7 @@ class DialogNotifier extends _$DialogNotifier {
   /// The speed test of the proxy picker: of the [shown] proxies or the [chosen] ones; which, once
   /// saved and to start, or null when dismissed.
   Future<SpeedTestTarget?> showPickerSpeedTest({required int shown, required int chosen}) async {
-    return await _show<SpeedTestTarget?>(SpeedTestDialog(count: shown, chosen: chosen));
+    return await _show<SpeedTestTarget?>(SpeedTestDialog(count: shown, chosen: chosen, limited: false));
   }
 
   Future<void> showProxyInfo({required OutboundInfo outboundInfo}) async {

@@ -14,6 +14,9 @@ abstract interface class ProxyRepository {
   TaskEither<ProxyFailure, IpInfo> getCurrentIpInfo(CancelToken cancelToken, {String? customIpInfoUrl});
   TaskEither<ProxyFailure, Unit> selectProxy(String groupTag, String outboundTag);
   TaskEither<ProxyFailure, Unit> urlTest(String groupTag);
+
+  /// Tests the proxies [tags], a few at a time, also the ones keep top left at rest.
+  TaskEither<ProxyFailure, Unit> urlTestProxies(List<String> tags);
   TaskEither<ProxyFailure, Unit> uploadTest(String tag, int bytes);
   TaskEither<ProxyFailure, Unit> downloadTest(String tag, int bytes);
   TaskEither<ProxyFailure, Unit> clearSpeedTests();
@@ -53,6 +56,14 @@ class ProxyRepositoryImpl with ExceptionHandler, InfraLogger implements ProxyRep
   TaskEither<ProxyFailure, Unit> urlTest(String groupTag) {
     return exceptionHandler(
       () => singbox.urlTest(groupTag).mapLeft(ProxyUnexpectedFailure.new).run(),
+      ProxyUnexpectedFailure.new,
+    );
+  }
+
+  @override
+  TaskEither<ProxyFailure, Unit> urlTestProxies(List<String> tags) {
+    return exceptionHandler(
+      () => singbox.urlTest('', tags: tags).mapLeft(ProxyUnexpectedFailure.new).run(),
       ProxyUnexpectedFailure.new,
     );
   }

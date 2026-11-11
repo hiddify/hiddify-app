@@ -120,6 +120,10 @@ abstract class UserOverride with _$UserOverride {
     /// The countries keep top keeps proxies of (two-letter codes); null or empty for any.
     List<String>? keepTopCountries,
 
+    /// The tags of the profile's proxies keep top keeps loaded whatever their ping, beside the
+    /// fastest: the ones the user asked for in a proxy's details.
+    List<String>? keepTopPinned,
+
     /// The tags of the profile's proxies the user chose to run, and only them, whatever [keepTop]
     /// says, while any of them is still in the profile. Null until the user chose some.
     List<String>? keepTags,

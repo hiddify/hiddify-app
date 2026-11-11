@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/widget/unique_keys_layout.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
@@ -26,6 +28,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     required this.onTap,
     this.testable = true,
     this.showPing = true,
+    this.testing = false,
   });
 
   final OutboundInfo proxy;
@@ -38,6 +41,10 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
   /// Whether the ping shows: not for a proxy the core does not run, which no ping will reach.
   final bool showPing;
 
+  /// A ping asked for is on its way: the ping's place says so, also of a proxy at rest, whose
+  /// row otherwise does not move.
+  final bool testing;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -49,8 +56,8 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     final arrived = previousState != null && previousState != state;
     final previousHasIp = usePrevious(proxy.hasIp);
     final colors = _RowColors.of(context);
-    // the proxy gave up: the row fades, only the red word stays bright
-    final faded = state == ProxyRowState.failed;
+    // the proxy gave up, or rests: the row fades; of one that gave up the red word stays bright
+    final faded = state == ProxyRowState.failed || state == ProxyRowState.resting;
     // tested for its upload or download speed, or being tested: the speeds show under the ping
     // a proxy whose ping and both speeds failed shows the ping's cross alone
     final allFailed =
@@ -127,10 +134,12 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
                     layoutBuilder: uniqueKeysLayout(),
                     duration: const Duration(milliseconds: 250),
                     child: KeyedSubtree(
-                      key: ValueKey((state, style)),
-                      child: showPing
-                          ? _ping(context, state, style, colors, t, arrived: arrived)
-                          : const SizedBox.shrink(),
+                      key: ValueKey((state, style, testing)),
+                      child: !showPing
+                          ? const SizedBox.shrink()
+                          : testing
+                          ? _Signal(_Logo.loading(colors.accent))
+                          : _ping(context, state, style, colors, t, arrived: arrived),
                     ),
                   ),
                 ),
@@ -138,18 +147,22 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
             ),
             if (uploaded)
               // a tap tests the upload again, a long press the download
-              IgnorePointer(
-                ignoring: !testable,
-                child: UploadSpeedChip(
-                  speed: proxy.uploadSpeed.toInt(),
-                  testing: proxy.uploadTesting,
-                  cached: proxy.uploadSpeedCached,
-                  onTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag),
-                  downloadSpeed: proxy.downloadSpeed.toInt(),
-                  downloadTesting: proxy.downloadTesting,
-                  downloadCached: proxy.downloadSpeedCached,
-                  onDownloadTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).downloadTest(proxy.tag),
-                  dense: true,
+              // of a proxy at rest, as dim as its ping
+              Opacity(
+                opacity: state == ProxyRowState.resting ? .55 : 1,
+                child: IgnorePointer(
+                  ignoring: !testable,
+                  child: UploadSpeedChip(
+                    speed: proxy.uploadSpeed.toInt(),
+                    testing: proxy.uploadTesting,
+                    cached: proxy.uploadSpeedCached,
+                    onTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).uploadTest(proxy.tag),
+                    downloadSpeed: proxy.downloadSpeed.toInt(),
+                    downloadTesting: proxy.downloadTesting,
+                    downloadCached: proxy.downloadSpeedCached,
+                    onDownloadTest: () => ref.read(proxiesOverviewNotifierProvider.notifier).downloadTest(proxy.tag),
+                    dense: true,
+                  ),
                 ),
               ),
           ],
@@ -190,6 +203,22 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
             .scaleXY(begin: .5, end: 1, duration: 350.ms, curve: Curves.easeOutBack)
             .fadeIn(duration: 200.ms),
       ProxyRowState.untested => _Signal(_Logo.loading(colors.wait)),
+      // at rest: nothing is coming, so nothing moves. Its last ping stays, dim, under the pause
+      // mark: of this run, else of the one before; a tap on it tests it
+      ProxyRowState.resting => Tooltip(
+        message: t.pages.proxies.status.resting,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (ConnectionConst.isValidDelay(_lastDelay))
+              Opacity(opacity: .55, child: _PingNumber(_lastDelay, color: delayColor(context, _lastDelay)))
+            else if (delay >= ConnectionConst.maxDelay)
+              Opacity(opacity: .55, child: Icon(Icons.close_rounded, size: 16, color: colors.red)),
+            const Gap(6),
+            Icon(Icons.pause_circle_outline_rounded, size: 16, color: colors.wait),
+          ],
+        ),
+      ),
       ProxyRowState.connecting || ProxyRowState.registering => _Signal(_Logo.loading(colors.accent)),
       ProxyRowState.searching => _Searching(colors.accent),
       // number style: the last ping stays, faded, while the flag wears the badge
@@ -208,6 +237,10 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
             .fadeIn(duration: 200.ms),
     };
   }
+
+  /// The last ping known of the proxy: of this run, else the one the core kept from the run
+  /// before, which it sends only to sort by.
+  int get _lastDelay => ConnectionConst.isValidDelay(proxy.urlTestDelay) ? proxy.urlTestDelay : proxy.sortDelay;
 
   Color delayColor(BuildContext context, int delay) {
     if (Theme.of(context).brightness == Brightness.dark) {

@@ -8,20 +8,22 @@ import 'package:hiddify/features/profile/data/profile_parser.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
+import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 Map<String, dynamic> _override({Map<String, dynamic>? headers, UserOverride? userOverride}) =>
     jsonDecode(ProfileParser.profileOverride(populatedHeaders: headers, userOverride: userOverride))
         as Map<String, dynamic>;
 
-ProfileEntity _profile({String? header, int? keepTop}) => ProfileEntity.local(
+ProfileEntity _profile({String? header, int? keepTop, UserOverride? userOverride}) => ProfileEntity.local(
   id: 'id',
   active: true,
   name: 'name',
   lastUpdate: DateTime(2026),
   populatedHeaders: header == null ? null : {'keep-top': header},
-  userOverride: UserOverride(keepTop: keepTop),
+  userOverride: userOverride ?? UserOverride(keepTop: keepTop),
 );
 
 void main() {
@@ -55,11 +57,11 @@ void main() {
     }
   });
 
-  test('the core gets the user choice, else the header, else nothing', () {
+  test('the core gets the user choice, else the header, else the default', () {
     expect(_override(headers: {'keep-top': '10'})['keep-top'], 10);
     expect(_override(headers: {'keep-top': '-1'})['keep-top'], -1);
-    expect(_override(headers: {'keep-top': 'x'}).containsKey('keep-top'), isFalse);
-    expect(_override().containsKey('keep-top'), isFalse);
+    expect(_override(headers: {'keep-top': 'x'})['keep-top'], keepTopDefault);
+    expect(_override()['keep-top'], keepTopDefault);
     expect(_override(headers: {'keep-top': '10'}, userOverride: const UserOverride(keepTop: -1))['keep-top'], -1);
     expect(_override(userOverride: const UserOverride(keepTop: 10))['keep-top'], 10);
   });
@@ -87,14 +89,37 @@ void main() {
     expect(_override(headers: {'keep-top-countries': 'DE'}).containsKey('keep-top-countries'), isFalse);
   });
 
-  test('the user is asked only when nobody decided', () {
-    expect(_profile().keepTopDecided, isFalse);
-    expect(_profile().keepTop, -1);
-    expect(_profile(header: '5').keepTopDecided, isTrue);
-    expect(_profile(header: '5').keepTop, 5);
-    expect(_profile(header: '5', keepTop: -1).keepTop, -1);
-    expect(_profile(keepTop: 10).keepTopDecided, isTrue);
-    expect(_profile(header: 'x').keepTopDecided, isFalse);
+  test("the core gets the proxies the user keeps loaded, never a subscription's", () {
+    expect(
+      _override(userOverride: const UserOverride(keepTop: 5, keepTopPinned: ['a § 0', 'b § 1']))['keep-top-pinned'],
+      ['a § 0', 'b § 1'],
+    );
+    expect(_override(userOverride: const UserOverride(keepTop: 5)).containsKey('keep-top-pinned'), isFalse);
+    expect(_override(headers: {'keep-top-pinned': 'a'}).containsKey('keep-top-pinned'), isFalse);
+  });
+
+  test('a proxy keep top left at rest shows as resting, not as waiting for a ping', () {
+    expect(OutboundInfo(tag: 'a').rowState, ProxyRowState.untested);
+    expect(OutboundInfo(tag: 'a', resting: true).rowState, ProxyRowState.resting);
+    expect(OutboundInfo(tag: 'a', resting: true, urlTestDelay: 120).rowState, ProxyRowState.resting);
+  });
+
+  test('keep top is on with a count, the answering ones or countries, and not with chosen proxies', () {
+    expect(_profile().keepsTop, isTrue);
+    expect(_profile(userOverride: const UserOverride(keepTop: -1)).keepsTop, isFalse);
+    expect(_profile(userOverride: const UserOverride(keepTop: 5)).keepsTop, isTrue);
+    expect(_profile(userOverride: const UserOverride(keepTop: keepTopAnswering)).keepsTop, isTrue);
+    expect(_profile(userOverride: const UserOverride(keepTop: -1, keepTopCountries: ['DE'])).keepsTop, isTrue);
+    expect(_profile(userOverride: const UserOverride(keepTop: 5, keepTags: ['a'])).keepsTop, isFalse);
+  });
+
+  test('the fastest few run unless the user or the subscription says otherwise', () {
+    expect(_profile().keepTop, keepTopDefault);
+    expect(_profile(header: 'x').keepTop, keepTopDefault);
+    expect(_profile(header: '10').keepTop, 10);
+    expect(_profile(header: '-1').keepTop, -1);
+    expect(_profile(header: '10', keepTop: -1).keepTop, -1);
+    expect(_profile(keepTop: 10).keepTop, 10);
   });
 
   test('an old user override reads without a choice', () {
@@ -236,5 +261,28 @@ void main() {
     expect(mbps(.0004), '0.000');
     expect(mbps(3.25), '3.3');
     expect(mbps(42.9), '43');
+  });
+
+  test('proxies of other regions that answered faster than the running ones are counted', () {
+    OutboundInfo proxy(String tag, {int delay = 0, int sortDelay = 0, bool resting = false, String country = ''}) =>
+        OutboundInfo(
+          tag: tag,
+          urlTestDelay: delay,
+          sortDelay: sortDelay,
+          resting: resting,
+          ipinfo: IpInfo(countryCode: country),
+        );
+    final proxies = [
+      proxy('de1', delay: 200, country: 'DE'),
+      proxy('de2', delay: 300, country: 'DE'),
+      proxy('us1', sortDelay: 90, resting: true, country: 'US'),
+      proxy('🇫🇷 fr1', sortDelay: 150, resting: true),
+      proxy('nl1', sortDelay: 400, resting: true, country: 'NL'),
+      proxy('de3', sortDelay: 50, resting: true, country: 'DE'),
+      proxy('gb1', resting: true, country: 'GB'),
+    ];
+    expect(fasterOutsideRegions(proxies, ['DE']), 2);
+    expect(fasterOutsideRegions(proxies, []), 0);
+    expect(fasterOutsideRegions([proxy('de1', country: 'DE'), ...proxies.skip(2)], ['de']), 0);
   });
 }

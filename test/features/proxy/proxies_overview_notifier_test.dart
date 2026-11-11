@@ -34,6 +34,12 @@ class _Repository implements ProxyRepository {
       selectFails ? TaskEither.left(const ProxyFailure.unexpected()) : TaskEither.right(unit);
 
   @override
+  TaskEither<ProxyFailure, Unit> urlTestProxies(List<String> tags) {
+    tested.addAll(tags);
+    return TaskEither.right(unit);
+  }
+
+  @override
   TaskEither<ProxyFailure, Unit> urlTest(String groupTag) {
     tested.add(groupTag);
     return TaskEither.right(unit);
@@ -265,6 +271,16 @@ void main() {
     ];
     expect(fastestProxies(proxies, 2), ['fast', 'mid']);
     expect(fastestProxies(proxies, 10), ['fast', 'mid', 'slow']);
+  });
+
+  test('a proxy at rest, not tested in this run, counts by its ping of the run before', () {
+    final proxies = [
+      proxy('running', 120),
+      OutboundInfo(tag: 'resting', resting: true, sortDelay: 40),
+      OutboundInfo(tag: 'failed now', urlTestDelay: 65535, sortDelay: 30),
+      OutboundInfo(tag: 'never tested', resting: true),
+    ];
+    expect(fastestProxies(proxies, 10), ['resting', 'running']);
   });
 
   test('by upload speed: this run first, then the cached, then by download, then by ping', () {

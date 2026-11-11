@@ -15,11 +15,11 @@ import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_tile.dart';
 import 'package:hiddify/features/proxy/widget/upload_test_dialog.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:protobuf/protobuf.dart';
 
 /// How the picker's list is ordered.
 enum _Sort { profile, ping, download, upload }
@@ -29,6 +29,12 @@ enum _Status { answering, paused }
 
 /// The quick filters that narrow the list; each kind of filter counts with the others in place.
 enum _Facet { status, protocol, country }
+
+/// How many proxies the picker's speed test has the core test at a time, how long it waits for
+/// the core to say it tests one, and for the test to end.
+const _speedTestsAtOnce = 3;
+const _speedTestSeen = Duration(seconds: 4);
+const _speedTestWait = Duration(minutes: 2);
 
 /// How many "the fastest" are, to test or to choose.
 const _fastest = 10;
@@ -117,6 +123,23 @@ class KeepTagsDialog extends HookConsumerWidget {
     // the proxies that answer first: those are the ones worth choosing
     final statusFilter = useState(<_Status>{_Status.answering});
     final woke = useState(false);
+    // the proxies a ping was asked for, with the time of the result each had then: a row says it is
+    // being tested until a newer result is in
+    final pinging = useState(const <String, int>{});
+    final pingTimeout = useRef<Timer?>(null);
+    // the speed test under way: another one, or the picker closing, ends it
+    final speedRun = useRef(0);
+    useEffect(
+      () =>
+          () => speedRun.value++,
+      const [],
+    );
+    final liveNow = useRef(const <String, OutboundInfo>{});
+    useEffect(
+      () =>
+          () => pingTimeout.value?.cancel(),
+      const [],
+    );
     // the chosen proxies in the list whatever the other filters; off, those they hide go to the
     // tray at the bottom
     final showChosen = useState(true);
@@ -168,7 +191,13 @@ class KeepTagsDialog extends HookConsumerWidget {
     OutboundInfo info(String tag) =>
         live[tag] ??
         OutboundInfo(tag: tag, tagDisplay: tag.replaceFirst(RegExp('§.*'), '').trimRight(), type: protocols[tag]);
-    bool answers(OutboundInfo e) => e.urlTestDelay > 0 && e.urlTestDelay < 65000;
+    bool validDelay(int delay) => delay > 0 && delay < 65000;
+    // the ping known of a proxy: of this run, else, for one not tested in it, the one the core kept
+    // from the run before; 0 when it failed or was never tested
+    int delayOf(OutboundInfo e) => validDelay(e.urlTestDelay)
+        ? e.urlTestDelay
+        : (e.urlTestDelay == 0 && validDelay(e.sortDelay) ? e.sortDelay : 0);
+    bool answers(OutboundInfo e) => delayOf(e) > 0;
     bool paused(String tag) => connected && !live.containsKey(tag);
     bool hasStatus(String tag, _Status status) => switch (status) {
       // not connected, nothing answers yet: the filter would hide every proxy
@@ -211,7 +240,7 @@ class KeepTagsDialog extends HookConsumerWidget {
         shown.sort((a, b) {
           final (x, y) = (info(a), info(b));
           if (answers(x) != answers(y)) return answers(x) ? -1 : 1;
-          final delay = answers(x) ? x.urlTestDelay.compareTo(y.urlTestDelay) : 0;
+          final delay = answers(x) ? delayOf(x).compareTo(delayOf(y)) : 0;
           return delay != 0 ? delay : byOrder(a, b);
         });
       // by the one speed, then the other, then ping, as on the proxy page
@@ -251,18 +280,77 @@ class KeepTagsDialog extends HookConsumerWidget {
     final chosenLive = tags.where((tag) => selected.value.contains(tag) && live.containsKey(tag)).toList();
     final shownLive = shown.where(live.containsKey).toList();
 
-    /// Runs [run] on [targets]: every proxy that runs, together in the core; else one by one.
-    Future<void> runOn(List<String> targets, Future<void> Function(String tag) run) async {
-      final groupTag = group?.tag;
-      if (groupTag == null || targets.isEmpty) return;
-      if (targets.length == live.length) return run(groupTag);
-      for (final tag in targets) {
-        await run(tag);
+    // the speed test hands the core a few proxies at a time, and the next as each is done: the
+    // picker closed, or another test started, nothing more is asked for. All of them asked for at
+    // once kept the core testing, a hundred proxies on, long after the picker was gone, and a test
+    // of the proxy page waited behind them.
+    liveNow.value = live;
+    Future<void> speedTestTags(List<String> targets) async {
+      final run = ++speedRun.value;
+      final notifier = ref.read(proxiesOverviewNotifierProvider.notifier);
+      bool stopped() => speedRun.value != run;
+      bool testing(String tag) {
+        final proxy = liveNow.value[tag];
+        return proxy != null && (proxy.uploadTesting || proxy.downloadTesting);
+      }
+
+      final left = [...targets];
+      Future<void> worker() async {
+        while (left.isNotEmpty && !stopped()) {
+          final tag = left.removeAt(0);
+          await notifier.speedTest(tag);
+          // the core says it tests it a moment after it was asked, then that it is done
+          final asked = DateTime.now();
+          var seen = false;
+          while (!stopped()) {
+            await Future<void>.delayed(const Duration(milliseconds: 300));
+            final waited = DateTime.now().difference(asked);
+            if (testing(tag)) {
+              seen = true;
+            } else if (seen || waited > _speedTestSeen) {
+              break;
+            }
+            if (waited > _speedTestWait) break;
+          }
+        }
+      }
+
+      await Future.wait([for (var i = 0; i < _speedTestsAtOnce; i++) worker()]);
+    }
+
+    // a ping costs next to nothing: it runs at once on the proxies shown, the ones at rest too,
+    // which the core loads a few at a time for it
+    Future<void> pingTags(List<String> targets) async {
+      if (targets.isEmpty) return;
+      pinging.value = {for (final tag in targets) tag: live[tag]!.urlTestTime.seconds.toInt()};
+      // one that never answers, or was not tested, stops saying so
+      pingTimeout.value?.cancel();
+      pingTimeout.value = Timer(const Duration(seconds: 30), () => pinging.value = const {});
+      await ref.read(proxiesOverviewNotifierProvider.notifier).urlTestProxies(targets);
+    }
+
+    Future<void> ping() => pingTags(shownLive);
+
+    // "answering" is asked of every proxy: the ones with no ping of this run, which the other
+    // filters let through, are tested now, and join the list as they answer. One with a ping from
+    // the run before is listed meanwhile.
+    void flipStatus(_Status status) {
+      final turnedOn = !statusFilter.value.contains(status);
+      statusFilter.value = _flip(statusFilter.value, status);
+      if (status == _Status.answering && turnedOn && connected) {
+        unawaited(
+          pingTags([
+            for (final tag in tags)
+              if (live[tag]?.urlTestDelay == 0 && passes(tag, skip: _Facet.status)) tag,
+          ]),
+        );
       }
     }
 
-    // a ping costs next to nothing: it runs at once on the proxies shown
-    Future<void> ping() => runOn(shownLive, ref.read(proxiesOverviewNotifierProvider.notifier).urlTest);
+    bool beingPinged(String tag) => switch (pinging.value[tag]) {
+      final asked? => live[tag]?.urlTestTime.seconds.toInt() == asked,
+      _ => false,
+    };
 
     // a speed test sends megabytes through each: the speed test dialog says how much first
     Future<void> speedTest() async {
@@ -270,12 +358,9 @@ class KeepTagsDialog extends HookConsumerWidget {
           .read(dialogNotifierProvider.notifier)
           .showPickerSpeedTest(shown: shownLive.length, chosen: chosenLive.length);
       if (target == null) return;
-      final base = target == SpeedTestTarget.chosen ? chosenLive : shownLive;
-      final limit = ref.read(ConfigOptions.uploadTestLimit);
-      await runOn(
-        limit <= 0 || base.length <= limit ? base : fastestOf(base, limit),
-        ref.read(proxiesOverviewNotifierProvider.notifier).speedTest,
-      );
+      // every one of them, as its dialog said: the picker is where they are compared. One at rest
+      // is tested by its tag: the core loads it for the test and lets it rest again after it
+      await speedTestTags(target == SpeedTestTarget.chosen ? chosenLive : shownLive);
     }
 
     // the rows show both speeds: a sort needs not change what the speed test measures
@@ -406,7 +491,7 @@ class KeepTagsDialog extends HookConsumerWidget {
                       label: Text('$label · ${statusCounts[status]}'),
                       icon: icon,
                       selected: statusFilter.value.contains(status),
-                      onSelected: () => statusFilter.value = _flip(statusFilter.value, status),
+                      onSelected: () => flipStatus(status),
                     ),
                   if (protocolCounts.isNotEmpty)
                     _FacetButton(
@@ -510,6 +595,7 @@ class KeepTagsDialog extends HookConsumerWidget {
                                       checked: selected.value.contains(tag),
                                       paused: paused(tag),
                                       live: live.containsKey(tag),
+                                      testing: beingPinged(tag),
                                       onTap: () => toggle(tag),
                                     );
                                   },
@@ -704,12 +790,16 @@ class _PickRow extends StatelessWidget {
     required this.checked,
     required this.paused,
     required this.live,
+    this.testing = false,
     required this.onTap,
   });
 
   final OutboundInfo proxy;
   final bool checked;
   final bool paused;
+
+  /// A ping asked for is on its way.
+  final bool testing;
 
   /// The core runs it: its ping is or will be known.
   final bool live;
@@ -718,6 +808,18 @@ class _PickRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = Theme.of(context).colorScheme;
+    // every proxy is a choice here, also one keep top left at rest: it shows as any other, with
+    // the last ping known of it (of this run, else the one kept from the run before), not as paused
+    final last = proxy.urlTestDelay > 0 ? proxy.urlTestDelay : proxy.sortDelay;
+    // a speed measured before the core restarted is still what is known of the proxy: it stays
+    // as bright as a new one, where the proxy page fades it
+    final shown = proxy.resting || proxy.uploadSpeedCached || proxy.downloadSpeedCached
+        ? (proxy.deepCopy()
+            ..resting = false
+            ..urlTestDelay = proxy.resting ? last : proxy.urlTestDelay
+            ..uploadSpeedCached = false
+            ..downloadSpeedCached = false)
+        : proxy;
     return Stack(
       children: [
         AnimatedOpacity(
@@ -728,7 +830,15 @@ class _PickRow extends StatelessWidget {
             type: MaterialType.transparency,
             // a tap anywhere chooses it; the tests are the buttons', never a stray tap's
             // not running (paused, or not connected): no ping is coming, so none shows
-            child: ProxyTile(proxy, selected: checked, onTap: onTap, testable: false, showPing: live),
+            child: ProxyTile(
+              shown,
+              selected: checked,
+              onTap: onTap,
+              testable: false,
+              // one at rest with no ping known waits for none
+              showPing: live && !(proxy.resting && last == 0),
+              testing: testing,
+            ),
           ),
         ),
         // the check, on the flag's corner

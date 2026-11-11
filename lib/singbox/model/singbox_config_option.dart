@@ -54,6 +54,9 @@ class SingboxConfigOption with _$SingboxConfigOption {
     /// The countries keep top keeps proxies of (`keep-top-countries`); empty for any.
     @Default(<String>[]) List<String> keepTopCountries,
 
+    /// The profile's proxies keep top keeps loaded whatever their ping (`keep-top-pinned`).
+    @Default(<String>[]) List<String> keepTopPinned,
+
     /// The profile's proxies the user chose to run, and only them (`keep-tags`).
     @Default(<String>[]) List<String> keepTags,
     @IntervalInSecondsConverter() required Duration urlTestInterval,

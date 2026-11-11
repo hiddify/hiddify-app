@@ -1,6 +1,7 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -12,12 +13,49 @@ import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
 import 'package:hiddify/features/proxy/data/single_proxy_config.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/upload_speed.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// With keep top on for the active profile: whether this proxy stays loaded whatever its ping,
+/// beside the fastest. The core takes the change at once, without a restart.
+class _KeepLoaded extends HookConsumerWidget {
+  const _KeepLoaded(this.proxy);
+
+  final OutboundInfo proxy;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final profile = ref.watch(activeProfileProvider).valueOrNull;
+    final busy = useState(false);
+    if (profile == null || !profile.keepsTop) return const SizedBox.shrink();
+    final info = t.dialogs.proxyInfo;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: SwitchListTile.adaptive(
+        contentPadding: const EdgeInsetsDirectional.only(start: 4),
+        title: Text(info.keepLoaded),
+        subtitle: Text(info.keepLoadedBody),
+        value: profile.keepTopPinned.contains(proxy.tag),
+        onChanged: busy.value
+            ? null
+            : (keep) async {
+                busy.value = true;
+                try {
+                  await ref.read(keepTopNotifierProvider.notifier).setPinned(profile, proxy.tag, keep: keep);
+                } finally {
+                  if (context.mounted) busy.value = false;
+                }
+              },
+      ),
+    );
+  }
+}
 
 /// A proxy at a glance: who it is and where it leads, then its ping, upload and download speed,
 /// each tested on a tap. The values follow the core while the dialog is open.
@@ -52,7 +90,16 @@ class ProxyInfoDialog extends ConsumerWidget with PresLogger {
       title: _Header(proxy),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 440),
-        child: SingleChildScrollView(child: OutboundInfoWidget(outboundInfo: proxy)),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              OutboundInfoWidget(outboundInfo: proxy),
+              if (_canShare(proxy)) _KeepLoaded(proxy),
+            ],
+          ),
+        ),
       ),
       actions: [
         if (_canShare(proxy)) ...[

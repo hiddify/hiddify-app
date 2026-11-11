@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -10,6 +11,7 @@ import 'package:hiddify/features/proxy/keep_top/country_names.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_tags_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -293,12 +295,60 @@ class KeepTopAction extends ConsumerWidget {
   }
 }
 
-/// At the end of the proxy list, of a big profile: how many of its proxies run, and the buttons
-/// that run all of them, or only the fastest. [listed] is how many proxies the list has now.
+/// Under the proxies in use: the fold that shows, or hides, the [count] proxies keep top left at
+/// rest. They stay in the profile; a tap on one selects it, which loads it and tests it.
+class RestingProxiesHeader extends ConsumerWidget {
+  const RestingProxiesHeader({super.key, required this.count, required this.shown, required this.onToggle});
+
+  final int count;
+  final bool shown;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationsProvider).requireValue;
+    final theme = Theme.of(context);
+    final text = t.pages.proxies.keepTop;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextButton.icon(
+            onPressed: onToggle,
+            icon: Icon(shown ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 20),
+            label: Text(shown ? text.restingHide : text.restingShow(n: count)),
+          ),
+          if (shown)
+            Padding(
+              padding: const EdgeInsetsDirectional.only(start: 12, bottom: 4),
+              child: Text(
+                text.restingHint,
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// At the end of the proxies in use, of a big profile: how many of its proxies run, as one big
+/// figure over a bar, the facts about them as chips, and the button that changes how many run.
+/// The chips change what they say: the one of how many opens the counts, the one of where the
+/// countries.
+/// [listed] is how many proxies are in use now (the ones keep top left at rest are not),
+/// [picking] whether the core still looks for the fastest. With regions chosen, a line says when
+/// proxies of other regions answered faster, and offers to keep any region.
 class KeepTopFooter extends HookConsumerWidget {
-  const KeepTopFooter({super.key, required this.listed});
+  const KeepTopFooter({super.key, required this.listed, required this.picking, this.proxies = const []});
 
   final int listed;
+  final bool picking;
+
+  /// The profile's proxies as the core lists them, the paused ones too: they tell when proxies of
+  /// other regions are faster.
+  final List<OutboundInfo> proxies;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -306,6 +356,12 @@ class KeepTopFooter extends HookConsumerWidget {
     final theme = Theme.of(context);
     final s = theme.colorScheme;
     final busy = useState(false);
+    final countMenu = useMemoized(MenuController.new);
+    final regionMenu = useMemoized(MenuController.new);
+    // the profile's countries, read when their menu opens
+    final available = useState(const <(String, int)>[]);
+    // the countries ticked in the open menu: applied when it closes
+    final ticked = useState<Set<String>?>(null);
     final profile = ref.watch(activeProfileProvider).valueOrNull;
     if (profile == null) return const SizedBox.shrink();
     final total = ref.watch(profileProxyCountProvider(profile.id)).valueOrNull ?? 0;
@@ -329,150 +385,400 @@ class KeepTopFooter extends HookConsumerWidget {
 
     void choose() => apply((notifier) => notifier.choose(profile, total));
 
-    // the core runs them all until their first pings are in
-    final picking = keeping && !chosen && (answering ? listed >= total : listed > keepTop);
-    final running = keeping && !picking ? listed : total;
-    final text = t.pages.proxies.keepTop;
-    // what stays after the test: how many, or which, and where
-    final where = regions.isEmpty ? '' : text.inRegions(flags: regions.map(flagOf).join(' '));
-    final then = switch (keepTop) {
-      > 0 => text.thenFastest(keep: keepTop, where: where),
-      keepTopAnswering => text.thenWorking(where: where),
-      _ => text.thenAll(where: where),
-    };
-    final (String title, String body) = switch ((keeping, picking)) {
-      _ when chosen => (text.chosen(n: listed), text.keptBody(paused: max(0, total - listed))),
-      (true, true) when answering => (text.pickingAnswering(count: total), then),
-      (true, true) => (text.picking(keep: keepTop, count: total), then),
-      (true, false) when answering => (
-        text.keptAnswering(n: listed, where: where),
-        text.keptBody(paused: max(0, total - listed)),
-      ),
-      (true, false) => (text.keptFastest(n: listed, where: where), text.keptBody(paused: max(0, total - listed))),
-      _ => (text.big(count: total), text.bigBody(keep: keepTopDefault)),
-    };
-    // one button: the keep top dialog, where how many run, or which, is chosen
-    List<Widget> buttonsFor({required bool wide}) => [
-      FilledButton.tonalIcon(
-        style: FilledButton.styleFrom(
-          visualDensity: const VisualDensity(horizontal: -1, vertical: -2),
-          minimumSize: wide ? const Size(0, 40) : null,
-        ),
-        onPressed: busy.value ? null : choose,
-        icon: const Icon(Icons.filter_alt_rounded, size: 18),
-        label: Text(keeping ? text.change : t.dialogs.keepTop.howMany),
-      ),
-    ];
-
-    Widget dots = KeepTopDots(key: ValueKey((keeping, picking)), running: picking ? 0 : running, total: total);
-    if (picking && !MediaQuery.disableAnimationsOf(context)) {
-      // the first pings still come in
-      dots = dots
-          .animate(onPlay: (c) => c.repeat())
-          .shimmer(duration: 1400.ms, color: s.primary.withValues(alpha: .6), angle: .4);
+    Future<void> setRegions(Set<String> value) async {
+      if (!setEquals(value, regions.toSet())) {
+        await apply((notifier) => notifier.set(profile, keepTop, countries: value.toList()));
+      }
+      if (context.mounted) ticked.value = null;
     }
 
-    final header = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _Badge(picking: picking || busy.value, chosen: chosen),
-        const Gap(12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-              const Gap(2),
-              Text(body, style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant, height: 1.35)),
+    // the core goes through them a few at a time, and says while it does
+    final picking = keeping && !chosen && this.picking;
+    final running = keeping && !picking ? listed : total;
+    final paused = max(0, total - running);
+    // a count was asked for: the bar shows it behind the ones that run
+    final wanted = !chosen && keepTop > 0 ? min(keepTop, total) : 0;
+    // fewer than asked for: no more of them answer, of the regions when there are
+    final fewer = !picking && wanted > listed;
+    final text = t.pages.proxies.keepTop;
+    final warn = theme.brightness == Brightness.dark ? const Color(0xFFFFB74D) : const Color(0xFFB45309);
+
+    final enabled = !busy.value;
+    // which ones run: a tap opens the counts, or the proxies picked by hand
+    final Widget mode;
+    if (chosen) {
+      mode = _Fact(
+        icon: Icons.checklist_rounded,
+        label: text.modeChosen,
+        onTap: enabled ? () => apply((notifier) => notifier.pick(profile)) : null,
+      );
+    } else {
+      void toggle() => countMenu.isOpen ? countMenu.close() : countMenu.open();
+      final onTap = enabled ? toggle : null;
+      mode = MenuAnchor(
+        controller: countMenu,
+        alignmentOffset: const Offset(0, 6),
+        style: MenuStyle(
+          shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+          padding: const WidgetStatePropertyAll(EdgeInsets.zero),
+        ),
+        menuChildren: [
+          _CountPicker(
+            title: t.dialogs.keepTop.howMany,
+            counts: {..._keepCounts.where((c) => c < total), if (keepTop > 0 && keepTop < total) keepTop}.toList()
+              ..sort(),
+            extras: [
+              (value: keepTopAnswering, label: t.dialogs.keepTop.answering),
+              (value: -1, label: t.dialogs.keepTop.everyOne),
             ],
+            count: keepTop,
+            onCount: (n) {
+              countMenu.close();
+              if (n != keepTop) apply((notifier) => notifier.set(profile, n));
+            },
+          ),
+        ],
+        child: fewer
+            ? _Fact(
+                icon: Icons.error_outline_rounded,
+                label: text.onlyAnswer(keep: wanted, n: listed),
+                color: warn,
+                onTap: onTap,
+              )
+            : wanted > 0 && keeping
+            ? _Fact(
+                icon: Icons.bolt_rounded,
+                label: text.modeTop(keep: wanted),
+                onTap: onTap,
+              )
+            : answering
+            ? _Fact(icon: Icons.check_circle_outline_rounded, label: text.modeWorking, onTap: onTap)
+            : _Fact(icon: Icons.all_inclusive_rounded, label: t.dialogs.keepTop.everyOne, onTap: onTap),
+      );
+    }
+    final shownRegions = ticked.value ?? regions.toSet();
+    // the regions keep the slower ones: proxies elsewhere answered faster
+    final faster = chosen || picking ? 0 : fasterOutsideRegions(proxies, regions);
+    // each fact on a chip of its own: which ones run, where they are, how many rest
+    final facts = [
+      mode,
+      // where they are: a tap opens the countries; the ticked ones apply when the menu closes
+      if (!chosen)
+        _CountryPill(
+          controller: regionMenu,
+          available: available.value,
+          chosen: shownRegions,
+          onChanged: (value) {
+            ticked.value = value;
+            // "any region" closes the menu before it says so
+            if (!regionMenu.isOpen) setRegions(value);
+          },
+          onClose: () {
+            if (ticked.value case final value?) setRegions(value);
+          },
+          builder: (context, menu) => _Fact(
+            icon: Icons.public_rounded,
+            label: [t.dialogs.keepTop.region, ...shownRegions.map(flagOf)].join(' '),
+            emoji: true,
+            onTap: enabled
+                ? () async {
+                    if (menu.isOpen) return menu.close();
+                    available.value = await ref.read(keepTopNotifierProvider.notifier).countries(profile);
+                    menu.open();
+                  }
+                : null,
           ),
         ),
-        if (keeping) ...[
+    ];
+
+    const figures = [FontFeature.tabularFigures()];
+    final figure = Directionality(
+      // the count reads the same way in every language
+      textDirection: TextDirection.ltr,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          TweenAnimationBuilder<double>(
+            tween: Tween(end: running.toDouble()),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, _) => Text(
+              '${value.round()}',
+              style: theme.textTheme.displaySmall?.copyWith(
+                color: s.primary,
+                fontWeight: FontWeight.w800,
+                height: 1,
+                letterSpacing: -1,
+                fontFeatures: figures,
+              ),
+            ),
+          ),
+          if (running < total) ...[
+            const Gap(6),
+            Text(
+              '/ $total',
+              style: theme.textTheme.titleMedium?.copyWith(color: s.onSurfaceVariant, fontFeatures: figures),
+            ),
+          ],
           const Gap(8),
-          KeepTopCountPill(running: picking && !answering ? keepTop : listed, total: total),
+          Flexible(
+            child: Text(
+              picking ? text.testing : text.running,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textDirection: Directionality.of(context),
+              style: theme.textTheme.titleMedium?.copyWith(color: s.onSurface, fontWeight: FontWeight.w600),
+            ),
+          ),
         ],
-      ],
-    );
-    // the proxies at a glance, on a track of their own
-    final track = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-      decoration: BoxDecoration(color: s.onSurface.withValues(alpha: .04), borderRadius: BorderRadius.circular(14)),
-      child: FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerStart, child: dots),
+      ),
     );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // room for two columns: what runs on the start, what to do about it on the end
-        final wide = constraints.maxWidth >= _twoColumns;
-        return Center(
-          child: Container(
-            constraints: BoxConstraints(maxWidth: wide ? 860 : 520),
-            margin: const EdgeInsets.fromLTRB(12, 16, 12, 0),
-            padding: wide ? const EdgeInsets.all(16) : const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: LinearGradient(
-                begin: AlignmentDirectional.topStart,
-                end: AlignmentDirectional.bottomEnd,
-                colors: [
-                  Color.alphaBlend(s.primary.withValues(alpha: .12), s.surfaceContainerLow),
-                  s.surfaceContainerLow,
-                ],
-              ),
-              border: Border.all(color: s.primary.withValues(alpha: .16)),
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 640),
+        margin: const EdgeInsets.fromLTRB(12, 16, 12, 0),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            begin: AlignmentDirectional.topStart,
+            end: AlignmentDirectional.bottomEnd,
+            colors: [Color.alphaBlend(s.primary.withValues(alpha: .12), s.surfaceContainerLow), s.surfaceContainerLow],
+          ),
+          border: Border.all(color: s.primary.withValues(alpha: .16)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Align(alignment: AlignmentDirectional.centerStart, child: figure),
+                ),
+                const Gap(12),
+                FilledButton.tonalIcon(
+                  style: FilledButton.styleFrom(visualDensity: VisualDensity.comfortable),
+                  onPressed: busy.value ? null : choose,
+                  icon: const Icon(Icons.tune_rounded, size: 18),
+                  label: Text(keeping ? text.change : t.dialogs.keepTop.howMany),
+                ),
+              ],
             ),
-            child: wide
-                ? IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [header, const Gap(14), track],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: VerticalDivider(width: 1, color: s.primary.withValues(alpha: .14)),
-                        ),
-                        // the buttons one over the other, filling the column
-                        SizedBox(
-                          width: 240,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              for (final (i, button) in buttonsFor(wide: true).indexed) ...[
-                                if (i > 0) const Gap(8),
-                                button,
-                              ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      header,
-                      const Gap(14),
-                      track,
-                      const Gap(10),
-                      Row(mainAxisAlignment: MainAxisAlignment.end, children: buttonsFor(wide: false)),
-                    ],
-                  ),
-          ).animate().fadeIn(duration: 350.ms).slideY(begin: .06, duration: 350.ms, curve: Curves.easeOutCubic),
-        );
-      },
+            const Gap(14),
+            _RunBar(running: running, wanted: picking ? 0 : wanted, total: total, busy: picking || busy.value),
+            const Gap(12),
+            Wrap(spacing: 8, runSpacing: 8, children: facts),
+            if (faster > 0) ...[
+              const Gap(12),
+              _FasterElsewhere(n: faster, onAnyRegion: enabled ? () => setRegions(const {}) : null),
+            ],
+            if (paused > 0 && !picking) ...[const Gap(12), _RestingNote(paused: paused)],
+            if (!keeping) ...[
+              const Gap(10),
+              Text(
+                text.bigBody(keep: keepTopDefault),
+                style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant),
+              ),
+            ],
+          ],
+        ),
+      ).animate().fadeIn(duration: 350.ms).slideY(begin: .06, duration: 350.ms, curve: Curves.easeOutCubic),
     );
   }
 }
 
-/// From this wide, the footer lays out in two columns.
-const _twoColumns = 640.0;
+/// In the keep top card, with regions chosen: [n] proxies of other regions answered faster than
+/// the ones running, and a button that keeps the fastest of any region ([onAnyRegion]).
+class _FasterElsewhere extends ConsumerWidget {
+  const _FasterElsewhere({required this.n, required this.onAnyRegion});
+
+  final int n;
+  final VoidCallback? onAnyRegion;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final text = ref.watch(translationsProvider).requireValue.pages.proxies.keepTop;
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsetsDirectional.fromSTEB(12, 6, 6, 6),
+      decoration: BoxDecoration(
+        color: s.primary.withValues(alpha: .08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: s.primary.withValues(alpha: .2)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.bolt_rounded, size: 20, color: s.primary),
+          const Gap(8),
+          Expanded(
+            child: Text(text.fasterElsewhere(n: n), style: theme.textTheme.bodyMedium),
+          ),
+          const Gap(8),
+          TextButton(onPressed: onAnyRegion, child: Text(text.anyRegion)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Under the keep top card's chips: why [paused] proxies rest, in plain words, and that any of them
+/// wakes with a tap.
+class _RestingNote extends ConsumerWidget {
+  const _RestingNote({required this.paused});
+
+  final int paused;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final text = ref.watch(translationsProvider).requireValue.pages.proxies.keepTop;
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 14, 10),
+      decoration: BoxDecoration(
+        color: s.tertiary.withValues(alpha: .08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: s.tertiary.withValues(alpha: .18)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(color: s.tertiary.withValues(alpha: .16), shape: BoxShape.circle),
+            child: Icon(Icons.bedtime_rounded, size: 18, color: s.tertiary),
+          ),
+          const Gap(12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  text.restingTitle(n: paused),
+                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const Gap(2),
+                Text(
+                  text.restingWhy,
+                  style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant, height: 1.35),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The share of the proxies that run, as a bar: the ones asked for faint behind the ones that run.
+/// It moves on its own while they are being tested.
+class _RunBar extends StatelessWidget {
+  const _RunBar({required this.running, required this.wanted, required this.total, required this.busy});
+
+  final int running;
+  final int wanted;
+  final int total;
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    final track = s.onSurface.withValues(alpha: .08);
+    // a few of many still show
+    double share(int n) => n <= 0 || total <= 0 ? 0 : max(n / total, .025).clamp(0, 1).toDouble();
+    Widget part(int n, Color color) => TweenAnimationBuilder<double>(
+      tween: Tween(end: share(n)),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, _) => FractionallySizedBox(
+        alignment: AlignmentDirectional.centerStart,
+        widthFactor: value,
+        child: DecoratedBox(
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4)),
+        ),
+      ),
+    );
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: SizedBox(
+        height: 8,
+        child: busy
+            ? LinearProgressIndicator(backgroundColor: track, color: s.primary)
+            : Stack(
+                fit: StackFit.expand,
+                children: [
+                  ColoredBox(color: track),
+                  part(wanted, s.primary.withValues(alpha: .28)),
+                  part(running, s.primary),
+                ],
+              ),
+      ),
+    );
+  }
+}
+
+/// One fact about the proxies that run, as a small chip: an icon and a word or two. With [onTap]
+/// it is a button, and says so with an arrow at its end.
+class _Fact extends StatelessWidget {
+  const _Fact({required this.icon, required this.label, this.color, this.onTap, this.emoji = false});
+
+  final IconData icon;
+  final String label;
+
+  /// Its tint, when it says something is off.
+  final Color? color;
+  final VoidCallback? onTap;
+
+  /// The label is flags.
+  final bool emoji;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    final on = color ?? s.onSurfaceVariant;
+    final radius = BorderRadius.circular(10);
+    final chip = Material(
+      color: (color ?? s.onSurface).withValues(alpha: color == null ? .06 : .14),
+      borderRadius: radius,
+      child: InkWell(
+        borderRadius: radius,
+        onTap: onTap,
+        child: Padding(
+          padding: EdgeInsetsDirectional.fromSTEB(8, 5, onTap == null ? 10 : 4, 5),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 15, color: on),
+              const Gap(6),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: color ?? s.onSurface,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: emoji && PlatformUtils.isWindows ? FontFamily.emoji : null,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ),
+              if (onTap != null) Icon(Icons.arrow_drop_down_rounded, size: 18, color: on),
+            ],
+          ),
+        ),
+      ),
+    );
+    return chip;
+  }
+}
 
 /// The counts the keep top dialog offers, those below the profile's proxy count.
 const _keepCounts = [3, 5, 10, 20, 50, 100];
@@ -711,42 +1017,6 @@ class _CountBubble extends StatelessWidget {
   }
 }
 
-/// The funnel of keep top, in the accent's circle, or a checklist for the proxies the user chose; a
-/// ring turns around it while the fastest are being found.
-class _Badge extends StatelessWidget {
-  const _Badge({required this.picking, this.chosen = false});
-
-  final bool picking;
-  final bool chosen;
-
-  static const _size = 40.0;
-
-  @override
-  Widget build(BuildContext context) {
-    final s = Theme.of(context).colorScheme;
-    return SizedBox.square(
-      dimension: _size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(colors: [s.primary.withValues(alpha: .28), s.primary.withValues(alpha: .12)]),
-            ),
-          ),
-          Icon(chosen ? Icons.checklist_rounded : Icons.filter_alt_rounded, size: 22, color: s.primary),
-          if (picking)
-            SizedBox.square(
-              dimension: _size,
-              child: CircularProgressIndicator(strokeWidth: 2, color: s.primary, strokeCap: StrokeCap.round),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 /// How many run of how many, as the app's chips show a count.
 class KeepTopCountPill extends StatelessWidget {
   const KeepTopCountPill({super.key, required this.running, required this.total});
@@ -897,11 +1167,23 @@ class _QuickTestSwitch extends HookConsumerWidget {
 /// many proxies each has; any other can be found by typing, as the profile's are not all known
 /// before the proxies are tested.
 class _CountryPill extends HookConsumerWidget {
-  const _CountryPill({required this.available, required this.chosen, required this.onChanged});
+  const _CountryPill({
+    required this.available,
+    required this.chosen,
+    required this.onChanged,
+    this.controller,
+    this.onClose,
+    this.builder,
+  });
 
   final List<(String, int)> available;
   final Set<String> chosen;
   final ValueChanged<Set<String>> onChanged;
+  final MenuController? controller;
+  final VoidCallback? onClose;
+
+  /// What opens the menu, in place of the pill.
+  final Widget Function(BuildContext context, MenuController menu)? builder;
 
   /// The most countries listed for what is typed.
   static const _found = 30;
@@ -941,6 +1223,8 @@ class _CountryPill extends HookConsumerWidget {
     final flags = TextStyle(fontFamily: emoji);
 
     return MenuAnchor(
+      controller: controller,
+      onClose: onClose,
       alignmentOffset: const Offset(0, 4),
       // a short list, scrolled for the rest
       style: const MenuStyle(maximumSize: WidgetStatePropertyAll(Size(300, 380))),
@@ -980,21 +1264,23 @@ class _CountryPill extends HookConsumerWidget {
             child: Text('${flagOf(code)}  ${nameOf(code)}', style: flags),
           ),
       ],
-      builder: (context, controller, _) => FilterChip(
-        avatar: chosen.isEmpty ? const Icon(Icons.public_rounded, size: 16) : null,
-        label: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(chosen.isEmpty ? t.dialogs.keepTop.region : chosen.map(flagOf).join(' '), style: flags),
-            const Gap(2),
-            const Icon(Icons.arrow_drop_down_rounded, size: 18),
-          ],
-        ),
-        selected: chosen.isNotEmpty,
-        showCheckmark: false,
-        shape: const StadiumBorder(),
-        onSelected: (_) => controller.isOpen ? controller.close() : controller.open(),
-      ),
+      builder: (context, controller, _) => builder != null
+          ? builder!(context, controller)
+          : FilterChip(
+              avatar: chosen.isEmpty ? const Icon(Icons.public_rounded, size: 16) : null,
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(chosen.isEmpty ? t.dialogs.keepTop.region : chosen.map(flagOf).join(' '), style: flags),
+                  const Gap(2),
+                  const Icon(Icons.arrow_drop_down_rounded, size: 18),
+                ],
+              ),
+              selected: chosen.isNotEmpty,
+              showCheckmark: false,
+              shape: const StadiumBorder(),
+              onSelected: (_) => controller.isOpen ? controller.close() : controller.open(),
+            ),
     );
   }
 }

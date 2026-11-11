@@ -524,11 +524,13 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
-  TaskEither<String, Unit> urlTest(String tag) {
+  /// Tests [tag] (a proxy, or a group: the proxies it uses), or, when given, the proxies [tags]:
+  /// a few at a time, also the ones keep top left at rest.
+  TaskEither<String, Unit> urlTest(String tag, {List<String> tags = const []}) {
     return TaskEither(() async {
       loggy.debug("url test");
       try {
-        final res = await core.bgClient.urlTest(UrlTestRequest(tag: tag));
+        final res = await core.bgClient.urlTest(UrlTestRequest(tag: tag, tags: tags));
         if (res.code != ResponseCode.OK) return left("${res.code} ${res.message}");
 
         return right(unit);
