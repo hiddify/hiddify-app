@@ -31,6 +31,7 @@ extension AppLocaleX on AppLocale {
     "az" => "Azərbaycan dili",
     "kk" => "Қазақша",
     "my" => "မြန်မာဘာသာ",
+    "ky" => "Кыргызча",
     _ => "Unknown",
   };
 }
