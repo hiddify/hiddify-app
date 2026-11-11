@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/widgets/proxy_info_dialog.dart';
+import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
@@ -10,6 +12,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class _NoProxies extends ProxiesOverviewNotifier {
   @override
   Stream<OutboundGroup?> build() => Stream.value(null);
+}
+
+// no profile: the dialog reads the active one for keep top, which would open the database
+class _NoProfile extends ActiveProfile {
+  @override
+  Stream<ProfileEntity?> build() => Stream.value(null);
 }
 
 class _NoMainOutbounds extends MainOutboundsNotifier {
@@ -24,6 +32,7 @@ void main() {
         translationsProvider.overrideWith((ref) => AppLocale.en.build()),
         proxiesOverviewNotifierProvider.overrideWith(_NoProxies.new),
         mainOutboundsNotifierProvider.overrideWith(_NoMainOutbounds.new),
+        activeProfileProvider.overrideWith(_NoProfile.new),
       ],
     );
     addTearDown(container.dispose);
