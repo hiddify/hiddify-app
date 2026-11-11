@@ -32,6 +32,7 @@ extension AppLocaleX on AppLocale {
     "kk" => "Қазақша",
     "my" => "မြန်မာဘာသာ",
     "ky" => "Кыргызча",
+    "tg" => "Тоҷикӣ",
     _ => "Unknown",
   };
 }
