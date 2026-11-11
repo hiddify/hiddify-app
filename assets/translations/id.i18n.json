@@ -149,7 +149,14 @@
       "keepTop": {
         "picking": "Mencari $keep tercepat dari $count…",
         "pickingBody": "Semua proxy diuji sekali; lalu hanya yang tercepat tetap berjalan.",
+        "thenFastest": "Setelah tes, hanya $keep tercepat$where yang tetap berjalan.",
+        "thenWorking": "Setelah tes, hanya yang merespons$where yang tetap berjalan.",
+        "thenAll": "Setelah tes, semua yang ada$where tetap berjalan.",
+        "inRegions": " di $flags",
+        "pickingAnswering": "Menguji semua $count…",
+        "keptAnswering": "$n proxy yang merespons$where berjalan",
         "kept": "$n proxy tercepat sedang berjalan",
+        "keptFastest": "$n tercepat$where berjalan",
         "keptBody": "$paused proxy lainnya dijeda untuk menghemat baterai dan data.",
         "showAll": "Tampilkan semua $count",
         "big": "$count proxy sedang berjalan",
@@ -189,6 +196,17 @@
         "which": "Proksi mana",
         "shown": "Ditampilkan ($n)",
         "chosen": "Dipilih ($n)"
+      },
+      "single": {
+        "share": "Bagikan",
+        "edit": "Edit",
+        "shareTitle": "Bagikan proxy",
+        "configHint": "Hanya proxy ini, beserta proxy lain yang dilewatinya. Hiddify mengimpornya seperti konfigurasi lainnya.",
+        "editTitle": "Edit sebagai profil baru",
+        "editMsg": "“${name}” disalin ke profil baru yang bisa Anda edit. Aslinya tidak berubah, karena langganan mengganti proxy-nya setiap kali diperbarui.",
+        "editConfirm": "Salin dan edit",
+        "savedAsProfile": "Disalin ke profil baru “${name}”",
+        "failed": "Tidak dapat membaca konfigurasi proxy ini"
       }
     },
     "profiles": {
@@ -241,6 +259,25 @@
       "failedToLoad": "Gagal memuat",
       "updateSubscriptions": "Perbarui langganan",
       "share": {
+        "title": "Bagikan profil",
+        "scanHint": "Pindai dengan Hiddify di perangkat lain untuk menambahkan profil ini",
+        "link": "Tautan langganan",
+        "config": "Konfigurasi",
+        "configHint": "JSON lengkap yang dijalankan profil ini, termasuk pengaturan Anda",
+        "configFailed": "Tidak dapat membuat konfigurasi",
+        "copy": "Salin",
+        "shareFile": "Bagikan",
+        "saveFile": "Simpan",
+        "tooLargeToCopy": "Terlalu besar untuk papan klip: bagikan atau simpan sebagai berkas",
+        "toTv": {
+          "button": "Kirim ke TV",
+          "scanHint": "Di TV, buka Hiddify dan ketuk + untuk menambah profil, lalu pindai kode yang muncul. Kedua perangkat harus terhubung ke Wi-Fi yang sama.",
+          "sent": "Terkirim. Tekan Impor di TV untuk menambahkannya.",
+          "notTvCode": "Itu bukan kode TV Hiddify. Di TV, ketuk + untuk menambah profil agar kodenya muncul.",
+          "expired": "TV tidak lagi menerima tautan dengan kode ini. Buka lagi layar tambah profil di TV dan pindai kode yang baru.",
+          "busy": "Terlalu banyak tautan yang menunggu di TV. Impor atau buang tautan itu di TV, lalu coba lagi.",
+          "unreachable": "Tidak dapat menjangkau TV. Pastikan ponsel dan TV berada di jaringan Wi-Fi yang sama."
+        },
         "urlToClipboard": "Salin URL",
         "showUrlQr": "Tampilkan kode QR",
         "jsonToClipboard": "Salin JSON"
@@ -258,12 +295,35 @@
           "failure": "Gagal memperbarui profil",
           "failureNamed": "Gagal memperbarui “${name}”",
           "bulkSuccess(plural, param=count)": {
+            "one": "$count profil diperbarui",
             "other": "$count profil diperbarui"
           },
           "bulkPartial": "${success} diperbarui\n${failed} gagal: ${names}"
         },
         "delete": {
-          "success": "Profil dihapus"
+          "success": "Profil dihapus",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profil dihapus",
+            "other": "$count profil dihapus"
+          },
+          "bulkPartial": "${deleted} dari ${total} profil dihapus"
+        }
+      },
+      "removeInactive": {
+        "action": "Hapus langganan tidak aktif",
+        "title": "Hapus langganan tidak aktif",
+        "hint": "Langganan ini sudah tidak berfungsi. Yang dicentang akan dihapus; hapus centang pada yang ingin Anda simpan.",
+        "none": "Tidak ada langganan tidak aktif",
+        "remove(plural, param=count)": {
+          "one": "Hapus $count",
+          "other": "Hapus $count"
+        },
+        "reason": {
+          "expired": "Kedaluwarsa",
+          "expiredOn": "Kedaluwarsa pada ${date}",
+          "noTraffic": "Kuota habis",
+          "updateFailing": "Pembaruan terus gagal",
+          "updateFailingSince": "Pembaruan gagal sejak ${date}"
         }
       }
     },
@@ -303,7 +363,9 @@
       "fileSaveFailed": "Tidak dapat menyimpan berkas",
       "coreLogLevel": "Level inti",
       "coreLogLevelMsg": "Berlaku setelah menyambung ulang",
-      "buffer": "Bufer"
+      "buffer": "Bufer",
+      "diagnostics": "Laporan diagnostik",
+      "diagnosticsMsg": "Laporan kerusakan, log, dan pengaturan Anda tanpa server atau kata sandi, dalam satu file zip"
     },
     "about": {
       "title": "Tentang",
@@ -370,6 +432,9 @@
         "routeRule": {
           "add": "Tambah aturan",
           "delete": "Hapus aturan",
+          "duplicate": "Gandakan aturan",
+          "duplicated": "Disalin sebagai aturan baru: ubah sesuka Anda",
+          "copyAll": "Salin semua",
           "options": {
             "import": {
               "clipboard": "Impor aturan dari papan klip",
@@ -400,6 +465,7 @@
             "validDomain": "“Domain” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com atau .ir",
             "validDomainSuffix": "“Sufiks domain” yang valid seperti\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "Aturan bawaan tidak dapat diubah. Gandakan aturan itu lalu edit salinannya.",
             "tileTitle(map)": {
               "name": "Nama",
               "outbound": "Keluar jika cocok",
@@ -449,6 +515,12 @@
         "builtinRules": {
           "tag": "Bawaan",
           "bypassLan": "Lewati LAN",
+          "systemDirect": {
+            "apple": "Layanan Apple",
+            "microsoft": "Layanan Microsoft",
+            "android": "Layanan Android",
+            "linux": "Pembaruan Linux"
+          },
           "blockAds": "Blokir iklan dan malware",
           "bypassRegion": "Lewati situs di $region"
         },
@@ -542,11 +614,28 @@
           "consistentHashDescription": "Setiap situs selalu memakai server yang sama",
           "stickySessionDescription": "Setiap situs memakai server acak sampai Anda menyambung ulang"
         },
+        "defaultProxy": {
+          "title": "Proxy default",
+          "lowest": "Ping terendah",
+          "balance": "Seimbang",
+          "first": "Proxy pertama",
+          "lowestDescription": "Sebelum Anda memilih proxy, yang tercepat dipakai",
+          "balanceDescription": "Sebelum Anda memilih proxy, koneksi dibagi ke semuanya",
+          "firstDescription": "Sebelum Anda memilih proxy, proxy pertama di profil dipakai"
+        },
         "resolveDestination": "Resolusi tujuan",
         "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "Mengapa IPv6 nonaktif?",
+        "ipv6RouteTurnOnTitle": "Aktifkan IPv6?",
+        "ipv6RouteTurnOn": "Aktifkan",
+        "ipv6RouteHelp": "Sebagian besar proxy tidak punya IPv6 di sisi keluarnya.\n\nKoneksi yang tidak bisa dibawa proxy akan putus tepat setelah terbuka, dan peramban tidak pernah mencobanya lagi lewat IPv4, sehingga Google dan YouTube gagal dimuat.\n\nSaat aktif, setiap proxy diperiksa sekali saat tes koneksinya. IPv6 hanya dipakai lewat proxy yang mendukungnya; yang lain berjalan lewat IPv4 tanpa terasa.\n\nIPv6 selalu lewat di dalam VPN, tidak pernah di luarnya.",
         "ipv6Modes": {
+          "ipv4Only": "Nonaktif (hanya IPv4)",
           "preferIpv4": "IPv4 dulu",
-          "preferIpv6": "IPv6 dulu"
+          "preferIpv6": "IPv6 dulu",
+          "ipv4OnlyDescription": "Aplikasi hanya memakai IPv4. IPv6 langsung ditolak.",
+          "preferIpv4Description": "IPv4 dulu. IPv6 hanya lewat proxy yang terbukti mendukungnya.",
+          "preferIpv6Description": "IPv6 dulu, hanya lewat proxy yang terbukti mendukungnya."
         }
       },
       "dns": {
@@ -570,7 +659,8 @@
         "serviceModes": {
           "proxy": "Hanya layanan proxy",
           "systemProxy": "Atur proxy sistem",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Router (seluruh jaringan)"
         },
         "shortServiceModes": {
           "proxy": "Proxy",
@@ -581,6 +671,7 @@
         "strictRoute": "Rute ketat",
         "tunImplementation": "Implementasi TUN",
         "tunImplementations": {
+          "sing15": "Sing 15",
           "mixed": "Campuran",
           "system": "Sistem",
           "gvisor": "gVisor"
@@ -706,13 +797,37 @@
           "mtu": "MTU",
           "customized": "Disesuaikan",
           "scanner": {
-            "title": "Pemindai"
+            "title": "Pemindai",
+            "searchNoise": "Cari derau",
+            "maxRtt": "RTT maks (ms)",
+            "timeout": "Batas waktu uji (ms)",
+            "count": "Alamat yang diuji",
+            "concurrency": "Uji paralel",
+            "ports": "Port",
+            "cidrs": "Rentang"
           },
           "masque": {
-            "title": "MASQUE"
+            "title": "MASQUE",
+            "vhttp": "Versi HTTP",
+            "serverName": "Nama server",
+            "useIpv6": "Pilih IPv6",
+            "udpTimeout": "Batas waktu UDP (dtk)",
+            "keepalive": "Keepalive UDP (dtk)",
+            "packetSize": "Ukuran paket awal",
+            "reconnectDelay": "Jeda sambung ulang (dtk)",
+            "tlsInsecure": "Lewati verifikasi TLS",
+            "fragment": "Fragment TLS",
+            "fragmentDelay": "Jeda cadangan Fragment (ms)",
+            "recordFragment": "Fragment rekaman TLS",
+            "ech": "Encrypted Client Hello",
+            "echConfig": "Konfigurasi ECH",
+            "echQueryServerName": "Nama kueri ECH"
           },
           "awg": {
-            "title": "AmneziaWG"
+            "title": "AmneziaWG",
+            "jc": "Paket sampah",
+            "jmin": "Ukuran sampah min",
+            "jmax": "Ukuran sampah maks"
           }
         },
         "psiphon": {
@@ -778,6 +893,7 @@
       "expired": "Kedaluwarsa",
       "noTraffic": "Kuota habis",
       "remainingDuration(plural, param=days)": {
+        "one": "Sisa $days hari",
         "other": "Sisa $days hari"
       },
       "remainingUnlimited": "Tanpa batas",
@@ -857,10 +973,55 @@
     "adminBgService": {
       "vpnNeedsAdmin": {
         "title": "Izin administrator diperlukan",
-        "msg": "Mode VPN memerlukan izin administrator satu kali untuk memasang layanan latar belakang Hiddify. Setelah itu, Anda dapat terhubung tanpa permintaan lagi.",
-        "connectWithAdmin": "Hubungkan dengan izin administrator",
+        "vpnMode": "Mode VPN",
+        "allApps": "Semua aplikasi",
+        "recommended": "Disarankan",
+        "systemProxyMode": "Proxy sistem",
+        "someApps": "Peramban dan sebagian besar aplikasi",
+        "switched": "Beralih ke mode proxy sistem. Anda dapat mengubahnya di Pengaturan.",
         "waitingTitle": "Menunggu izin administrator",
         "waitingMsg": "Izinkan permintaan administrator untuk melanjutkan. Anda dapat berhenti dan mencoba lagi nanti.",
+        "waitingWhere": "Di jendela yang terbuka:",
+        "waitingWindows": "Klik “Yes”.",
+        "waitingMac": "Masukkan kata sandi Mac Anda dan konfirmasi.",
+        "waitingLinux": "Masukkan kata sandi Anda dan konfirmasi.",
+        "back": "Kembali",
+        "needsAdmin": "Perlu izin administrator, sekali saja",
+        "needsAdminAppImage": "Perlu izin administrator di setiap awal",
+        "noAdmin": "Tanpa izin administrator",
+        "someAppsExcept": "Telegram dan beberapa aplikasi tidak termasuk",
+        "useVpn": "Gunakan mode VPN",
+        "useSystemProxy": "Gunakan proxy sistem",
+        "helpTooltip": "Apa ini?",
+        "helpWhatTitle": "Cara kerjanya",
+        "helpProsTitle": "Kelebihan",
+        "helpConsTitle": "Perlu diingat",
+        "helpVpn": {
+          "what": "Hiddify menambahkan jaringan virtual ke komputer Anda, dan lalu lintas internet setiap aplikasi lewat di sana dengan sendirinya: peramban, Telegram, game, pembaruan, dan lainnya. Tidak ada yang perlu diatur di setiap aplikasi.",
+          "pros": [
+            "Setiap aplikasi lewat Hiddify, tanpa pengaturan di tiap aplikasi.",
+            "Aplikasi yang mengabaikan pengaturan proxy, seperti Telegram dan game, ikut berfungsi.",
+            "Pencarian nama (DNS) juga lewat Hiddify, jadi situs yang diblokir dengan cara itu ikut terbuka."
+          ],
+          "cons": [
+            "Pertama kali, komputer Anda meminta izin administrator untuk memasang layanan latar belakang Hiddify. Setelah itu, koneksi berjalan tanpa permintaan lagi.",
+            "Matikan aplikasi VPN lain saat Anda memakainya: dua sekaligus saling mengganggu."
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify mengubah pengaturan proxy komputer Anda. Aplikasi yang mengikuti pengaturan itu, seperti peramban web, mengirim lalu lintasnya lewat Hiddify; sisanya tersambung langsung, seolah Hiddify mati.",
+          "pros": [
+            "Tidak perlu izin administrator.",
+            "Cepat dinyalakan dan dimatikan, dan Hiddify mengembalikan pengaturan saat Anda memutuskan koneksi.",
+            "Berjalan berdampingan dengan alat jaringan lain di komputer Anda."
+          ],
+          "cons": [
+            "Aplikasi yang mengabaikan proxy sistem, seperti Telegram, banyak game, dan beberapa alat pembaruan, tidak terlindungi.",
+            "Jika tidak berfungsi, pilih mode VPN."
+          ]
+        },
+        "msg": "Mode VPN memerlukan izin administrator satu kali untuk memasang layanan latar belakang Hiddify. Setelah itu, Anda dapat terhubung tanpa permintaan lagi.",
+        "connectWithAdmin": "Hubungkan dengan izin administrator",
         "stop": "Berhenti"
       },
       "proxyNeedsAdmin": {
@@ -922,7 +1083,8 @@
       "speed": "Kecepatan",
       "server": "Server",
       "country": "Negara",
-      "tapToTest": "Ketuk untuk menguji"
+      "tapToTest": "Ketuk untuk menguji",
+      "error": "Penyebab kegagalan"
     },
     "windowClosing": {
       "askEachTime": "Tanyakan setiap kali",
@@ -944,16 +1106,34 @@
     "qrScanner": {
       "notFound": "Tidak ada kode QR di gambar ini"
     },
+    "crashReport": {
+      "title": "Hiddify mengalami crash terakhir kali",
+      "msg": "Kirim laporan ke pengembang agar masalah ini diperbaiki? Isinya detail crash, log, dan konfigurasi Anda dengan server, kunci, dan kata sandi dihapus, dalam satu file zip yang bisa Anda lihat sebelum dikirim.",
+      "send": "Kirim laporan"
+    },
     "keepTop": {
       "title": "Langganan besar",
-      "description": "Profil ini berisi $count proxy. Menjalankan semuanya menghabiskan baterai, data, dan memori. Hiddify dapat mengujinya sekali, menjalankan $keep yang tercepat, dan menjeda sisanya.",
+      "subtitle": "$count proxy · menjalankan semuanya menghabiskan baterai, data, dan memori",
       "hint": "Anda bisa menjalankan semuanya lagi kapan saja dari akhir daftar proxy.",
       "keeping": "$keep tercepat berjalan, sisanya dijeda",
       "all": "Semua $count berjalan",
       "keep": "Pertahankan $keep tercepat",
       "useAll": "Gunakan semua $count",
       "howMany": "Berapa yang tetap berjalan",
-      "pickByHand": "Pilih proksi sendiri"
+      "pickByHand": "Pilih proksi sendiri",
+      "region": "Wilayah",
+      "anyRegion": "Wilayah apa pun",
+      "keepAnswering": "Pertahankan yang merespons",
+      "keepingAnswering": "Hanya yang merespons berjalan",
+      "answering": "Merespons",
+      "everyOne": "Semua",
+      "quick": "Tes cepat",
+      "quickHint": "Berhenti setelah yang tercepat ditemukan",
+      "quickHelp": "Apa fungsinya?",
+      "quickFirst": "Yang tercepat sebelumnya diuji lebih dulu",
+      "quickStop": "Tes berhenti setelah sisanya sebelumnya lebih lambat",
+      "quickNew": "Proxy baru, dan yang belum dites selama sehari, selalu diuji",
+      "description": "Profil ini berisi $count proxy. Menjalankan semuanya menghabiskan baterai, data, dan memori. Hiddify dapat mengujinya sekali, menjalankan $keep yang tercepat, dan menjeda sisanya."
     },
     "keepTags": {
       "title": "Pilih proksi",
@@ -1008,6 +1188,20 @@
       "portRange": "Gunakan port 1024 sampai 65535",
       "passwordTooShort": "Minimal 4 karakter",
       "edit": "Edit"
+    },
+    "dbNewerThanApp": {
+      "title": "Data tersimpan berasal dari versi yang lebih baru",
+      "msg": "Profil dan pengaturan Anda disimpan oleh versi Hiddify yang lebih baru, dan versi lama ini tidak dapat membacanya. Pasang versi terbaru untuk menyimpannya, atau hapus untuk memakai versi ini.",
+      "deleteData": "Hapus data",
+      "deleteConfirm": "Data tersimpan dihapus. Langganan dan profil lokal Anda ditambahkan kembali jika memungkinkan; yang lain yang disimpan oleh versi lebih baru hilang.",
+      "downloadLatest": "Unduh versi terbaru"
+    },
+    "dbBroken": {
+      "title": "Data tersimpan tidak dapat dibuka",
+      "msg": "Hiddify tidak dapat membuka profil yang tersimpan. Hapus data tersimpan untuk memulai dari awal: langganan dan profil lokal Anda ditambahkan kembali jika memungkinkan, dan pengaturan Anda tetap disimpan.",
+      "wipeData": "Hapus data",
+      "wipeConfirm": "Data tersimpan dihapus dan Hiddify dimulai dari awal. Profil yang masih bisa dibaca ditambahkan kembali; sisanya tidak dapat dipulihkan.",
+      "copyError": "Salin kesalahan"
     }
   },
   "connection": {
