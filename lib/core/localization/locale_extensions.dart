@@ -41,4 +41,22 @@ extension AppLocaleX on AppLocale {
     "it" => "Italiano",
     _ => "Unknown",
   };
+
+  /// The country whose flag stands for the language in the language picker: for a language spoken
+  /// in several countries, the one it comes from or is most spoken in. Persian has Iran's, which
+  /// [IPCountryFlag] draws with the lion and sun.
+  String get flagCountryCode => switch (flutterLocale.toString()) {
+    "ar" => "sa",
+    "en" => "gb",
+    "es" => "es",
+    "fa" => "ir",
+    "fr" => "fr",
+    "id" => "id",
+    "pt_BR" => "br",
+    "ru" => "ru",
+    "tr" => "tr",
+    "zh" || "zh_CN" => "cn",
+    "zh_TW" => "tw",
+    _ => "",
+  };
 }
