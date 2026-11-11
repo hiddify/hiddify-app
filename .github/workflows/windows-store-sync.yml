@@ -33,6 +33,7 @@ jobs:
       MSSTORE_PRODUCT_ID: ${{ secrets.MSSTORE_PRODUCT_ID }}
       MSIX_NAME: Hiddify-Windows-Setup-x64.Msix
       MSIX_LABEL: Hiddify-Windows-Setup-x64.Msix (Store-signed)
+      INPUT_TAG: ${{ inputs.tag }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -43,7 +44,7 @@ jobs:
         shell: pwsh
         run: |
           if (-not $env:MSSTORE_PRODUCT_ID) { throw 'The MSSTORE_PRODUCT_ID secret is not set' }
-          $tag = '${{ inputs.tag }}'
+          $tag = $env:INPUT_TAG
           if (-not $tag) {
             # Newest prod (non-dev) release whose MSIX is not the Store-signed one yet.
             # Older ones are skipped: the Store only serves the version that is live now.

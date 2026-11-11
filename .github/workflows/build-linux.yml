@@ -1,0 +1,96 @@
+# Linux AppImage (also as .tar.gz), .deb and .rpm, for x64 and arm64.
+name: Build Linux
+
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: Upload the build as an artifact. Off, the job only checks that it builds.
+        type: boolean
+        required: true
+      channel:
+        description: dev or prod (the Makefile's CHANNEL).
+        type: string
+        required: true
+      upload-symbols:
+        description: Upload the debug symbols to Sentry.
+        type: boolean
+        default: false
+
+env:
+  CHANNEL: ${{ inputs.channel }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+jobs:
+  build:
+    name: ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    # A failed build does not stop the release of the other platforms.
+    continue-on-error: true
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # `platform` is the Makefile prefix and the artifact name. Both runners have the same
+          # Ubuntu, so both builds have the same glibc baseline.
+          - { arch: x64,   platform: linux,       runner: ubuntu-22.04 }
+          - { arch: arm64, platform: linux-arm64, runner: ubuntu-22.04-arm }
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          platform: ${{ matrix.platform }}
+          generated-code: true
+
+      - name: Build
+        run: make ${{ matrix.platform }}-release
+
+      # sentry_dart_plugin does not recognize the arm64 Linux runner ("Host platform not supported:
+      # linux ARM64") and falls back to sentry-cli on PATH: install the build it would have used.
+      - name: Install sentry-cli for arm64
+        if: inputs.release && inputs.upload-symbols && matrix.arch == 'arm64'
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o "$HOME/.local/bin/sentry-cli" \
+            https://github.com/getsentry/sentry-cli/releases/download/2.58.6/sentry-cli-Linux-aarch64
+          echo "79e60095ab461eac70c23ce750499bff5c6bffb95d364ccf38d3259557403987  $HOME/.local/bin/sentry-cli" | sha256sum -c -
+          chmod +x "$HOME/.local/bin/sentry-cli"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Upload debug symbols to Sentry
+        if: inputs.release && inputs.upload-symbols
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_DIST: general
+        run: |
+          dart pub global activate sentry_dart_plugin
+          dart run sentry_dart_plugin
+
+      # The names must match prepare_release_notes.py, make_installer.sh and the README.
+      - name: Collect the packages
+        env:
+          ARCH: ${{ matrix.arch }}
+        run: |
+          ls -R dist
+          mkdir out
+          mv dist/*/*.AppImage "out/Hiddify-Linux-$ARCH.AppImage"
+          mv dist/*/*.gz       "out/Hiddify-Linux-$ARCH.AppImage.tar.gz"
+          mv dist/*/*.deb      "out/Hiddify-Debian-$ARCH.deb"
+          mv dist/*/*.rpm      "out/Hiddify-rpm-$ARCH.rpm"
+
+      - name: Upload the artifact
+        if: inputs.release
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.platform }}
+          path: out
+          retention-days: 1
+          # The packages are compressed already.
+          compression-level: 0
+          if-no-files-found: error

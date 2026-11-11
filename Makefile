@@ -69,11 +69,18 @@ DISTRIBUTOR_ARGS=--skip-clean --build-target $(TARGET) --build-dart-define sentr
 get:	
 	flutter pub get
 
+# CI generates the code once (job `codegen` of .github/workflows/build.yml) and gives the result
+# to every build, which then runs with SKIP_CODEGEN=1.
+ifeq ($(SKIP_CODEGEN),1)
+gen translate:
+	@echo "$@ skipped: the generated code is already there (SKIP_CODEGEN=1)"
+else
 gen:
 	dart run build_runner build --delete-conflicting-outputs
 
 translate:
 	dart run slang
+endif
 
 
 

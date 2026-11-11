@@ -1,0 +1,174 @@
+# Windows Setup.exe, MSIX and portable zip.
+#
+# Code signing: a publicly trusted certificate is what keeps the Go/Flutter binaries off the
+# VirusTotal "trojan" heuristics. See docs/windows-code-signing.md for the secrets and the
+# backend choice (Azure Artifact Signing preferred, CA-issued PFX as fallback).
+name: Build Windows
+
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: Sign and package the build and upload it as an artifact. Off, the job only checks that it builds.
+        type: boolean
+        required: true
+      channel:
+        description: dev or prod (the Makefile's CHANNEL).
+        type: string
+        required: true
+      upload-symbols:
+        description: Upload the debug symbols to Sentry.
+        type: boolean
+        default: false
+
+env:
+  CHANNEL: ${{ inputs.channel }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  # The Makefile uses the POSIX rm of the runner instead of cmd's rmdir.
+  IS_GITHUB_ACTIONS: 1
+
+jobs:
+  build:
+    name: x64
+    runs-on: windows-latest
+    timeout-minutes: 60
+    # A failed build does not stop the release of the other platforms.
+    continue-on-error: true
+    permissions:
+      contents: read
+      # Azure Artifact Signing (azure/login OIDC) and actions/attest-build-provenance
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          platform: windows
+          generated-code: true
+
+      - name: Configure code signing
+        if: inputs.release
+        env:
+          AZURE_SIGNING_ENDPOINT: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          AZURE_SIGNING_CERT_PROFILE: ${{ secrets.AZURE_SIGNING_CERT_PROFILE }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          WINDOWS_SIGNING_PUBLISHER: ${{ secrets.WINDOWS_SIGNING_PUBLISHER }}
+          WINDOWS_SIGNING_KEY: ${{ secrets.WINDOWS_SIGNING_KEY }}
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          WINDOWS_SIGNING_SHA1: ${{ secrets.WINDOWS_SIGNING_SHA1 }}
+        run: |
+          & .\windows\scripts\configure_windows_signing.ps1
+
+      # WINDOWS_SIGN_BACKEND and AZURE_OIDC come from configure_windows_signing.ps1.
+      - name: Azure login (OIDC) for Artifact Signing
+        if: inputs.release && env.WINDOWS_SIGN_BACKEND == 'ArtifactSigning' && env.AZURE_OIDC == 'true'
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # The portable zip is a separate build (portable=true). fastforge runs the
+      # sign_release_tree.sh hook in it, so this step needs the signing credentials: the
+      # `&signing-env` block, which the other signing steps reuse as `*signing-env`.
+      - name: Build the portable zip
+        if: inputs.release
+        env: &signing-env
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: make windows-zip-release
+
+      # The non-portable Release tree. Without `release` this is the whole check; with it, the
+      # tree is Authenticode-signed *before* Inno/MSIX pack it, so the PE files an install drops
+      # are signed (reduces Sysmon/AV "unsigned dropper" noise).
+      - name: Build the Release tree
+        run: make windows-validate
+
+      - name: Sign the Release tree
+        if: inputs.release
+        env: *signing-env
+        run: |
+          & .\windows\scripts\sign_windows_artifacts.ps1 -Path build\windows\x64\runner\Release
+
+      # fastforge runs `flutter build windows` again before packing, which re-copies unsigned
+      # plugin DLLs; the Makefile passes a fastforge pre-package hook (WINDOWS_PACKAGE_HOOK) that
+      # signs the Release tree right before Inno/MSIX read it. The Inno compiler then signs
+      # Setup.exe and the uninstaller through the "hiddifysign" Sign Tool (HIDDIFY_INNO_SIGNTOOL).
+      - name: Package Setup.exe
+        if: inputs.release
+        env: *signing-env
+        run: make windows-exe-release
+
+      - name: Package the MSIX
+        if: inputs.release
+        env: *signing-env
+        run: make windows-msix-release
+
+      # Signs Setup.exe / MSIX and the PE files inside the portable zip. Skips files that already
+      # verify as signed (MSVC runtimes; pre-signed Release PE).
+      - name: Sign the packages
+        if: inputs.release
+        env: *signing-env
+        run: |
+          & .\windows\scripts\sign_windows_artifacts.ps1 -Path dist
+
+      # The names must match prepare_release_notes.py, windows-store-sync.yml and the README.
+      - name: Collect the packages
+        if: inputs.release
+        run: |
+          Get-ChildItem -Path dist -Recurse | Select-Object FullName
+          New-Item -ItemType Directory -Path out -Force | Out-Null
+          $names = [ordered]@{
+            exe  = 'Hiddify-Windows-Setup-x64.exe'
+            msix = 'Hiddify-Windows-Setup-x64.Msix'
+            zip  = 'Hiddify-Windows-Portable-x64.zip'
+          }
+          foreach ($ext in $names.Keys) {
+            $name = $names[$ext]
+            # Extension matching ignores case: dist may hold .Msix or .msix
+            $files = Get-ChildItem -Path dist -Recurse -File | Where-Object { $_.Extension -ieq ".$ext" }
+            if (-not $files) { Write-Warning "No *.$ext under dist for $name"; continue }
+            foreach ($file in $files) {
+              Write-Host "Moving $($file.FullName) -> out\$name"
+              Move-Item -Path $file.FullName -Destination (Join-Path out $name) -Force
+            }
+          }
+          Get-ChildItem -Path out
+
+      # SLSA build provenance for the Windows assets (verifiable with
+      # `gh attestation verify <file> --repo hiddify/hiddify-app`). Lets users and AV vendors
+      # confirm the files come from this public CI, which is what false-positive dispute forms
+      # ask for.
+      - name: Attest build provenance
+        if: inputs.release
+        continue-on-error: true
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: out/*
+
+      - name: Upload debug symbols to Sentry
+        if: inputs.release && inputs.upload-symbols
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_DIST: general
+        run: |
+          dart pub global activate sentry_dart_plugin
+          dart run sentry_dart_plugin
+
+      - name: Upload the artifact
+        if: inputs.release
+        uses: actions/upload-artifact@v6
+        with:
+          name: windows
+          path: out
+          retention-days: 1
+          # The packages are compressed already.
+          compression-level: 0
+          if-no-files-found: error

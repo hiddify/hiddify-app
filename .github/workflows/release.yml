@@ -1,4 +1,7 @@
+# A version tag: tests, builds every platform and publishes the GitHub release of the tag, the
+# `draft` release, TestFlight and the Google Play beta track. See build.yml.
 name: Release
+
 on:
   push:
     tags:
@@ -13,11 +16,12 @@ jobs:
   build-release:
     uses: ./.github/workflows/build.yml
     secrets: inherit
-    # Same grant as ci.yml: with the narrowed block below GITHUB_TOKEN got
-    # "Resource not accessible by integration" (403) from the create-release API
-    # on the v5.2.0 run. Jobs inside build.yml still restrict their own scopes.
+    # Same grant as ci.yml: with a narrowed block GITHUB_TOKEN got "Resource not accessible by
+    # integration" (403) from the create-release API on the v5.2.0 run. The jobs of build.yml
+    # ask for their own narrower scopes, except `release`.
     permissions: write-all
     with:
       upload-artifact: true
-      tag-name: "${{ github.ref_name }}"
-      channel: "${{ github.ref_type == 'tag' && endsWith(github.ref_name, 'dev') && 'dev' || github.ref_type != 'tag' && 'dev' || 'prod' }}"
+      tag-name: ${{ github.ref_name }}
+      # v5.5.6.dev is a dev build, v5.5.6 a prod one.
+      channel: ${{ endsWith(github.ref_name, 'dev') && 'dev' || 'prod' }}

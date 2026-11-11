@@ -1,776 +1,270 @@
+# Tests the app, builds it for every platform and, with `upload-artifact`, publishes the builds.
+# Called by ci.yml (manual run, publishes the `draft` release) and release.yml (version tag).
+#
+#             ┌─ test ─────────────────────────┐
+#             ├─ android  (build-android.yml)  │
+#   codegen ──┼─ linux    (build-linux.yml)    ├─► release ──► draft ──► virustotal-draft
+#             ├─ windows  (build-windows.yml)  │      ├─► google-play
+#             ├─ macos    (build-macos.yml)    │      └─► virustotal-release
+#             └─ ios      (build-ios.yml) ─────┴─► testflight (testflight.yml), prune-caches
+#                 (every publishing job waits for the tests and all five builds)
+#
+# - `codegen` runs build_runner and slang once; the tests and every build take its output (the
+#   `generated-code` artifact) instead of generating the code again.
+# - The builds run next to the tests. Nothing is published before the tests and every build
+#   are done, and nothing at all unless the tests pass.
+# - `release` (version tags only) publishes the GitHub release of the tag. It needs the iOS
+#   build; a failed build of another platform is left out of the release (those jobs have
+#   `continue-on-error`).
+# - `draft` always follows: it moves the `draft` tag and release to this commit, with
+#   whatever was built.
+#
+# Shared steps are in .github/actions: setup-flutter (Flutter SDK and version, make
+# install-deps and prepare), apple-signing, publish-release and ios-next-build-number.
 name: Build
+
 on:
   workflow_call:
     inputs:
       upload-artifact:
+        description: Sign the builds and publish them. Off, the run only checks that every platform builds.
         type: boolean
         default: true
       tag-name:
+        description: The version tag to release, or `draft` for the draft release only.
         type: string
-        default: "draft"
+        default: draft
       channel:
+        description: dev or prod (the Makefile's CHANNEL - which core and which main file).
         type: string
-        default: "dev"
-
-env:
-  IS_GITHUB_ACTIONS: 1
-  CHANNEL: "${{ inputs.channel }}"
-  FLUTTER_VERSION: '3.38.5'
-  NDK_VERSION: r28c
-  UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
-  TAG_NAME: "${{ inputs.tag-name }}"
-  # Hiddify-Linux-x64.AppImage and Hiddify-Linux-x64.AppImage.tar.gz (x64 -> arm64 on arm64)
-  TARGET_NAME_gz: "Hiddify-Linux-x64.AppImage.tar"
-  TARGET_NAME_AppImage: "Hiddify-Linux-x64"
-  TARGET_NAME_deb: "Hiddify-Debian-x64"
-  TARGET_NAME_rpm: "Hiddify-rpm-x64"
-  TARGET_NAME_apk: "Hiddify-Android"
-  TARGET_NAME_aab: "Hiddify-Android"
-  TARGET_NAME_exe: "Hiddify-Windows-Setup-x64"
-  # Must match prepare_release_notes.py / README asset names (Setup-x64.Msix).
-  TARGET_NAME_msix: "Hiddify-Windows-Setup-x64"
-  TARGET_NAME_zip: "Hiddify-Windows-Portable-x64"
-  TARGET_NAME_dmg: "Hiddify-MacOS"
-  TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
-  TARGET_NAME_macos_appstore_pkg: "Hiddify-MacOS-AppStore"
-  TARGET_NAME_macos_appstore_dmg: "Hiddify-MacOS-AppStore"
-  TARGET_NAME_ipa: "Hiddify-iOS"
-  
+        default: dev
 
 jobs:
-  test:
+  # The generated Dart code (*.g.dart, *.freezed.dart, ..., the translations) is the same on every
+  # platform, so it is made once here. The jobs below get it through setup-flutter.
+  codegen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
-    outputs:
-      draftBuildCode: ${{ steps.draftBuildCode.outputs.datetime }}
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: subosito/flutter-action@v2.21.0 #issue with 2.13
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
-          cache: true
 
-      - name: Validate iOS release configuration
+      - name: Validate the iOS release configuration
         run: python3 .github/scripts/validate_ios_release_config.py
 
-      - name: Prepare
-        run: make linux-amd64-prepare
+      - uses: ./.github/actions/setup-flutter
+        with:
+          platform: common
+          install-deps: false
 
-      - name: Analyze Dart and Flutter sources
+      # Everything the generators wrote: the files under lib/ and test/ that git does not track.
+      - name: Pack the generated code
+        run: |
+          set -euo pipefail
+          git ls-files --others -- lib test > "$RUNNER_TEMP/generated-files.txt"
+          echo "$(wc -l < "$RUNNER_TEMP/generated-files.txt") generated files"
+          test -s "$RUNNER_TEMP/generated-files.txt"
+          tar -czf generated-code.tar.gz -T "$RUNNER_TEMP/generated-files.txt"
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: generated-code
+          path: generated-code.tar.gz
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+
+  test:
+    needs: codegen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      CHANNEL: ${{ inputs.channel }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          platform: linux-amd64
+          install-deps: false
+          generated-code: true
+
+      - name: Analyze
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
       - name: Test
         run: flutter test
 
-      - name: make draftBuildCode
-        id: draftBuildCode
-        run: echo "::set-output name=datetime::$(date +'%d.%H.%M')"
+  # ---- Builds ----
 
-
-  build:
-    needs: test
-    permissions:
-      contents: read
-      # Azure Artifact Signing (azure/login OIDC) and actions/attest-build-provenance
-      id-token: write
-      attestations: write
-    continue-on-error: ${{ matrix.platform != 'ios' }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          # Quote multi-target lists: in YAML flow maps, commas start a new key
-          # (`targets: exe,msix,zip` was parsed as targets=exe only).
-          - { platform: android-apk,       os: ubuntu-latest,  targets: apk }
-          - { platform: android-aab,       os: ubuntu-latest,  targets: aab }
-          - { platform: windows,          os: windows-latest, aarch: amd64,     targets: "exe,msix,zip" }
-          - { platform: linux,            os: ubuntu-22.04,   aarch: amd64,     targets: "deb,rpm,gz,AppImage" }
-          # Native arm64 runner (same Ubuntu, so the same glibc baseline as x64). Its files are
-          # named like the x64 ones with x64 -> arm64 (see "Copy to out unix").
-          - { platform: linux-arm64,      os: ubuntu-22.04-arm, aarch: arm64,   targets: "deb,rpm,gz,AppImage" }
-          # - { platform: linux-amd64,      os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
-          # - { platform: linux-amd64-musl, os: ubuntu-22.04,   aarch: amd64,     targets: "deb,gz" }
-          # - { platform: linux-arm64-musl, os: ubuntu-24.04-arm, aarch: arm64,   targets: "deb,gz" }
-          - { platform: macos,            os: macos-26,       aarch: universal, targets: "dmg,pkg" }
-          - { platform: macos-appstore,   os: macos-26,       aarch: universal, targets: "pkg,dmg" }
-          - { platform: ios,              os: macos-26,       aarch: universal, filename: hiddify-ios, targets: ipa }
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: checkout
-        uses: actions/checkout@v6
-
-      # Explicit keychain password (not a repo secret): v6's auto-generated
-      # keychain-password output is often empty in the next step, which makes
-      # `security unlock-keychain` fail with "passphrase is not correct".
-      - name: Import Apple Codesign Certificates
-        id: apple-certs
-        if: ${{ inputs.upload-artifact && startsWith(matrix.os,'macos') }}
-        uses: apple-actions/import-codesign-certs@v6
-        with:
-          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
-          p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
-          keychain-password: hiddify-${{ github.run_id }}-${{ github.run_attempt }}
-
-      - name: Import Apple Mobile Provisioning Profile
-        if: ${{ inputs.upload-artifact && startsWith(matrix.os,'macos') }}
-        env:
-          KEYCHAIN_PASSWORD: hiddify-${{ github.run_id }}-${{ github.run_attempt }}
-        run: |
-          set -euo pipefail
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64 }}" | base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
-          ls ~/Library/MobileDevice/Provisioning\ Profiles
-          # Xcode 16+ also reads this folder.
-          mkdir -p ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles
-          cp ~/Library/MobileDevice/Provisioning\ Profiles/* ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles/
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" signing_temp.keychain
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" signing_temp.keychain
-          security find-identity -v -p codesigning
-          # Fail early: a broken APPLE_CERTIFICATE_P12 imports certs but no private keys.
-          identities="$(security find-identity -v -p codesigning | grep -c 'Apple Distribution' || true)"
-          if [[ "$identities" -lt 1 ]]; then
-            echo '::error::No Apple Distribution identity after importing APPLE_CERTIFICATE_P12. Re-export the .p12 from Keychain Access → My Certificates (must include the private key), base64 it, and update the secret.'
-            exit 1
-          fi
-
-      # - name: Setup Flutter for arm64
-      #   if: ${{ startsWith(matrix.platform,'linux-arm64') }}
-      #   uses: hurelhuyag/flutter-arm64-action@HEAD
-      #   with:
-      #     channel: 'stable'
-      #     flutter-version: ${{ env.FLUTTER_VERSION }}
-
-      # Flutter publishes no Linux arm64 SDK archive, so arm64 uses the SDK git checkout that
-      # `make linux-arm64-install-deps` makes in ~/develop/flutter (put on PATH in "Setup dependencies").
-      - name: Setup Flutter
-        if: matrix.platform != 'linux-arm64'
-        uses: subosito/flutter-action@v2.21.0 #issue with 2.13
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          # flutter-version-file: pubspec.yaml
-          channel: 'stable'
-          cache: true
-
-      # macOS tunnel xcframework comes from hiddify-lib-macos.tar.gz via `make macos-libs`
-      # (built in hiddify-core CI); no submodule / Go bind on the app runner.
-
-      - name: Configure macOS signing
-        if: matrix.platform == 'macos'
-        env:
-          MACOS_SIGNING_XCCONFIG: ${{ secrets.APPLE_MACOS_SIGNING_XCCONFIG }}
-          SIGN_RELEASE: ${{ inputs.upload-artifact }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          signing_config="$RUNNER_TEMP/hiddify-macos-signing.xcconfig"
-          # With a Developer ID the VPN runs in the packet tunnel system extension. Without one, the
-          # build is signed ad hoc and its VPN runs in the root helper the user installs.
-          if [[ "$SIGN_RELEASE" == 'true' && -n "$MACOS_SIGNING_XCCONFIG" ]]; then
-            printf '%s\n' "$MACOS_SIGNING_XCCONFIG" > "$signing_config"
-            echo 'MACOS_DEVELOPER_ID=true' >> "$GITHUB_ENV"
-          else
-            if [[ "$SIGN_RELEASE" == 'true' ]]; then
-              echo '::warning::APPLE_MACOS_SIGNING_XCCONFIG is not set, so the macOS release is built without a Developer ID.'
-            fi
-            cp macos/Runner/Configs/Unsigned.xcconfig "$signing_config"
-            echo 'MACOS_DEVELOPER_ID=false' >> "$GITHUB_ENV"
-          fi
-          echo "XCODE_XCCONFIG_FILE=$signing_config" >> "$GITHUB_ENV"
-
-      - name: Clean up disk space
-        if: startsWith(matrix.platform,'android')
-        run: |
-          df -h
-          sudo rm -rf /usr/share/dotnet
-          df -h
-          sudo rm -rf /opt/ghc
-          df -h
-          sudo rm -rf /opt/hostedtoolcache/CodeQL
-          df -h
-          rm -rf ~/.gradle/caches
-          df -h
-          sudo apt-get autoremove -y
-          df -h
-          sudo apt-get clean 
-          df -h
-          tree
-      
-      - name: Setup Java
-        if: startsWith(matrix.platform,'android')
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'zulu'
-          java-version: 17
-      # - name: Setup NDK
-      #   if: startsWith(matrix.platform,'android')
-      #   uses: nttld/setup-ndk@v1
-      #   id: setup-ndk
-      #   with:
-      #     ndk-version: ${{ env.NDK_VERSION }}
-      #     add-to-path: true
-      #     link-to-sdk: true
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        if: startsWith(matrix.platform,'android')
-        with:
-          # default also installs the legacy 'tools' package, which no longer exists
-          packages: platform-tools
-      # - name: Cache Android SDK
-      #   uses: actions/cache@v5
-      #   if: startsWith(matrix.platform,'android')
-      #   with:
-      #     path: |
-      #       /usr/local/lib/android/sdk
-      #     key: android-sdk-${{ runner.os }}-${{ env.NDK_VERSION }}
-      #     restore-keys: |
-      #       android-sdk-${{ runner.os }}-      
-      - name: Cache Gradle
-        uses: actions/cache@v5
-        if: startsWith(matrix.platform,'android')
-
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-                  
-      - name: Setup dependencies
-        run: |
-          make ${{ matrix.platform }}-install-deps
-          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
-
-      - name: Add arm64 Flutter to PATH
-        if: matrix.platform == 'linux-arm64'
-        run: |
-          echo "$HOME/develop/flutter/bin" >> $GITHUB_PATH
-          "$HOME/develop/flutter/bin/flutter" --version
-
-      - name: Setup Android Signing Properties
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'android') }}
-        run: |
-          echo "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 --decode > android/key.jks
-          echo "storeFile=$(pwd)/android/key.jks" > android/key.properties
-          echo "storePassword=${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}" >> android/key.properties
-          echo "keyPassword=${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}" >> android/key.properties
-
-      # Windows code signing. A publicly trusted certificate is what keeps the
-      # Go/Flutter binaries off the VirusTotal "trojan" heuristics; see
-      # docs/windows-code-signing.md for the secrets and the backend choice
-      # (Azure Artifact Signing preferred, CA-issued PFX as fallback).
-      - name: Configure Windows code signing
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
-        shell: pwsh
-        env:
-          AZURE_SIGNING_ENDPOINT: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
-          AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
-          AZURE_SIGNING_CERT_PROFILE: ${{ secrets.AZURE_SIGNING_CERT_PROFILE }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          WINDOWS_SIGNING_PUBLISHER: ${{ secrets.WINDOWS_SIGNING_PUBLISHER }}
-          WINDOWS_SIGNING_KEY: ${{ secrets.WINDOWS_SIGNING_KEY }}
-          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
-          WINDOWS_SIGNING_SHA1: ${{ secrets.WINDOWS_SIGNING_SHA1 }}
-        run: |
-          & .\windows\scripts\configure_windows_signing.ps1
-
-      - name: Azure login (OIDC) for Artifact Signing
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') && env.WINDOWS_SIGN_BACKEND == 'ArtifactSigning' && env.AZURE_OIDC == 'true' }}
-        uses: azure/login@v3
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      # - name: Temporary disable Permission Handler for windows due to its issue in permission
-      #   if: ${{ startsWith(matrix.platform,'windows') }}
-      #   run: |
-      #     (Get-Content -Path "pubspec.yaml") -notmatch "permission_handler" | Set-Content -Path "pubspec.yaml"
-      #     (Get-Content -Path "lib\features\profile\add\add_profile_modal.dart") -notmatch "qr_code_scanner_screen" | Set-Content -Path "lib\features\profile\add\add_profile_modal.dart"
-      #     (Get-Content -Path lib\features\profile\add\add_profile_modal.dart) -replace 'await QRCodeScannerScreen\(\).open\(context\);', 'null;' | Set-Content -Path lib\features\profile\add\add_profile_modal.dart
-      #     Remove-Item -Path "lib\features\common\qr_code_scanner_screen.dart"
-
-
-
-
-      - name: Prepare for ${{ matrix.platform }}
-        if: matrix.platform != 'macos-appstore' || inputs.upload-artifact
-        run: |
-          make ${{ matrix.platform }}-prepare
-
-
-      # App Store Connect takes each build number of a version once, so a rebuild of the same version
-      # (a draft, a rerun) cannot reuse pubspec's. It gets one more than the highest build recorded
-      # for this version (the ios-build/<version>/<build> tags upload-to-testflight pushes): a whole
-      # number one higher lets TestFlight give it to external testers without another review. The
-      # packet tunnel must carry the app's number.
-      - name: Read the iOS version
-        id: ios-version
-        if: matrix.platform == 'ios' && inputs.upload-artifact
-        run: |
-          set -euo pipefail
-          name="$(sed -n 's/^version: *\([^+ ]*\)+[0-9][0-9]* *$/\1/p' pubspec.yaml)"
-          base="$(sed -n 's/^version: *[^+]*+\([0-9][0-9]*\) *$/\1/p' pubspec.yaml)"
-          test -n "$name" && test -n "$base"
-          # App Store Connect knows the version without a pre-release suffix (5.5.6, not 5.5.6.dev).
-          echo "version=${name%%[-.][a-z]*}" >> "$GITHUB_OUTPUT"
-          echo "base=$base" >> "$GITHUB_OUTPUT"
-
-      - name: Find the next iOS build number
-        id: ios-next
-        if: matrix.platform == 'ios' && inputs.upload-artifact
-        uses: ./.github/actions/ios-next-build-number
-        with:
-          version: ${{ steps.ios-version.outputs.version }}
-          base: ${{ steps.ios-version.outputs.base }}
-
-      - name: Give the iOS build the next build number
-        if: matrix.platform == 'ios' && inputs.upload-artifact
-        env:
-          BUILD: ${{ steps.ios-next.outputs.build }}
-        run: |
-          set -euo pipefail
-          build="$BUILD"
-          perl -pi -e "s/^(version: *[^+]+)\+\d+ *\$/\${1}+$build/" pubspec.yaml
-          perl -pi -e "s/CURRENT_PROJECT_VERSION = \d+;/CURRENT_PROJECT_VERSION = $build;/" ios/Runner.xcodeproj/project.pbxproj
-          grep -n '^version:' pubspec.yaml
-          grep -c "CURRENT_PROJECT_VERSION = $build;" ios/Runner.xcodeproj/project.pbxproj
-          echo "iOS build number: $build"
-
-      - name: Build ${{ matrix.platform }}
-        if: matrix.platform != 'macos-appstore' && matrix.platform != 'windows' && (matrix.platform != 'ios' || inputs.upload-artifact)
-        env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: |
-          make ${{ matrix.platform }}-release
-
-      # Portable zip uses portable=true (separate build). Setup/MSIX need a non-portable
-      # Release tree that is Authenticode-signed *before* Inno/MSIX pack so dropped PE
-      # files during install are signed (reduces Sysmon/AV "unsigned dropper" noise).
-      - name: Build Windows portable zip
-        if: matrix.platform == 'windows' && inputs.upload-artifact
-        # fastforge runs the sign_release_tree.sh hook here, so the signing
-        # credentials must be in this step's environment too.
-        env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        run: make windows-zip-release
-
-      - name: Build Windows Setup/MSIX binaries
-        if: matrix.platform == 'windows' && inputs.upload-artifact
-        env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: make windows-validate
-
-      - name: Code Sign Windows Release tree
-        if: matrix.platform == 'windows' && inputs.upload-artifact
-        env:
-          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        shell: pwsh
-        run: |
-          & .\windows\scripts\sign_windows_artifacts.ps1 -Path build\windows\x64\runner\Release
-
-      - name: Package Windows Setup and MSIX
-        if: matrix.platform == 'windows' && inputs.upload-artifact
-        # fastforge runs `flutter build windows` again before packing, which re-copies
-        # unsigned plugin DLLs; the Makefile passes a fastforge pre-package hook
-        # (WINDOWS_PACKAGE_HOOK) that signs the Release tree right before Inno/MSIX
-        # read it. The Inno compiler then signs Setup.exe and the uninstaller through
-        # the "hiddifysign" Sign Tool (HIDDIFY_INNO_SIGNTOOL). Both need this env.
-        env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        shell: pwsh
-        run: |
-          make windows-exe-release
-          make windows-msix-release
-
-      - name: Build the Mac App Store version
-        if: matrix.platform == 'macos-appstore' && inputs.upload-artifact
-        env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        # Upload is a separate job so bad upload credentials still leave pkg/dmg artifacts.
-        run: make macos-appstore-release
-
-      - name: Validate iOS without code signing
-        if: matrix.platform == 'ios' && !inputs.upload-artifact
-        env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: make ios-validate
-
-      - name: Smoke test production app in iOS Simulator
-        if: matrix.platform == 'ios' && !inputs.upload-artifact
-        timeout-minutes: 30
-        env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: bash .github/scripts/smoke_test_ios_simulator.sh
-
-      - name: Validate Windows without code signing
-        if: matrix.platform == 'windows' && !inputs.upload-artifact
-        env:
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: make windows-validate
-
-      - name: Code Sign Windows packages
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
-        # Signs Setup.exe / MSIX and PE files inside the portable .zip.
-        # Skips files that already verify as signed (MSVC runtimes; pre-signed Release PE).
-        env:
-          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        shell: pwsh
-        run: |
-          & .\windows\scripts\sign_windows_artifacts.ps1 -Path dist
-
-      - name: Copy to out Windows
-        if: matrix.platform == 'windows' && inputs.upload-artifact
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path dist -Recurse | Select-Object FullName
-          New-Item -ItemType Directory -Path "out" -Force | Out-Null
-          $targets = "${{ matrix.targets }}".Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-          Write-Host "Windows copy targets: $($targets -join ', ')"
-          foreach ($ext in $targets) {
-            $key = "TARGET_NAME_$ext"
-            $targetName = [Environment]::GetEnvironmentVariable($key)
-            if (-not $targetName) { throw "Missing env $key for extension .$ext" }
-
-            # Case-insensitive match: dist may use .Msix / .msix / .zip / .exe
-            $files = Get-ChildItem -Path dist -Recurse -File | Where-Object {
-              $_.Extension.TrimStart('.').ToLowerInvariant() -eq $ext.ToLowerInvariant()
-            }
-            if (-not $files) {
-              Write-Warning "No *.$ext under dist for $targetName"
-              continue
-            }
-            foreach ($file in $files) {
-              # Preserve catalog casing for msix (Hiddify-Windows-Setup-x64.Msix).
-              $outExt = if ($ext -eq 'msix') { 'Msix' } else { $ext }
-              $destination = Join-Path -Path "out" -ChildPath "$targetName.$outExt"
-              Write-Host "Moving $($file.FullName) -> $destination"
-              Move-Item -Path $file.FullName -Destination $destination -Force
-            }
-          }
-          Get-ChildItem -Path out
-
-      # SLSA build provenance for the Windows assets (verifiable with
-      # `gh attestation verify <file> --repo hiddify/hiddify-app`). Lets users and
-      # AV vendors confirm the files come from this public CI, which is what
-      # false-positive dispute forms ask for.
-      - name: Attest build provenance (Windows)
-        if: matrix.platform == 'windows' && inputs.upload-artifact
-        continue-on-error: true
-        uses: actions/attest-build-provenance@v4
-        with:
-          subject-path: out/*
-
-      # sentry_dart_plugin does not recognize the arm64 Linux runner ("Host platform not supported:
-      # linux ARM64") and falls back to sentry-cli on PATH: install the build it would have used.
-      - name: Install sentry-cli for arm64 Linux
-        if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' && matrix.platform == 'linux-arm64' }}
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          curl -fL --retry 5 --retry-delay 5 --retry-all-errors -o "$HOME/.local/bin/sentry-cli" \
-            https://github.com/getsentry/sentry-cli/releases/download/2.58.6/sentry-cli-Linux-aarch64
-          echo "79e60095ab461eac70c23ce750499bff5c6bffb95d364ccf38d3259557403987  $HOME/.local/bin/sentry-cli" | sha256sum -c -
-          chmod +x "$HOME/.local/bin/sentry-cli"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Upload Debug Symbols
-        if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-          SENTRY_DIST: ${{ matrix.platform == 'android-aab' && 'google-play' || 'general' }}
-        run: |
-          dart pub global activate sentry_dart_plugin
-          dart run sentry_dart_plugin
-      
-      
-
-              
-      - name: Copy to out Android APK
-        if: matrix.platform == 'android-apk'
-        run: |
-          mkdir out
-          ls -R ./build/app/outputs
-          cp ./build/app/outputs/flutter-apk/*arm64-v8a*.apk out/${TARGET_NAME_apk}-arm64.apk || echo "no arm64 apk"
-          cp ./build/app/outputs/flutter-apk/*armeabi-v7a*.apk out/${TARGET_NAME_apk}-arm7.apk || echo "no arm7 apk"
-          cp ./build/app/outputs/flutter-apk/*x86_64*.apk out/${TARGET_NAME_apk}-x86_64.apk || echo "no x64 apk"
-          cp ./build/app/outputs/flutter-apk/app-release.apk out/${TARGET_NAME_apk}-universal.apk || echo "no universal apk"
-
-      - name: Copy to out Android AAB
-        if: matrix.platform == 'android-aab'
-        run: |
-          mkdir out
-          ls -R ./build/app/outputs
-          cp ./build/app/outputs/bundle/release/app-release.aab out/hiddify-android-market.aab || echo "no aab"
-
-      - name: Check the macOS app icon
-        if: startsWith(matrix.platform, 'macos') && inputs.upload-artifact
-        # AppIcon.icon (Icon Composer) needs Xcode 26; older Xcode builds the app without any icon.
-        run: |
-          app=build/macos/Build/Products/Release/Hiddify.app
-          xcodebuild -version
-          for f in Assets.car AppIcon.icns; do
-            [[ -s "$app/Contents/Resources/$f" ]] || { echo "::error::$app has no Contents/Resources/$f (app icon)"; exit 1; }
-          done
-          /usr/libexec/PlistBuddy -c "Print :CFBundleIconName" "$app/Contents/Info.plist"
-
-      - name: Copy to out macOS App Store
-        if: matrix.platform == 'macos-appstore' && inputs.upload-artifact
-        id: macos-appstore-out
-        run: |
-          ls -R dist/
-          mkdir -p out
-          pkg="$(find dist -name '*-macos-appstore.pkg' -type f | head -1)"
-          dmg="$(find dist -name '*-macos-appstore.dmg' -type f | head -1)"
-          if [[ -z "$pkg" ]]; then
-            echo '::error::macos-appstore pkg not found under dist/'
-            exit 1
-          fi
-          if [[ -z "$dmg" ]]; then
-            echo '::error::macos-appstore dmg not found under dist/'
-            exit 1
-          fi
-          cp "$pkg" "out/${TARGET_NAME_macos_appstore_pkg}.pkg"
-          cp "$dmg" "out/${TARGET_NAME_macos_appstore_dmg}.dmg"
-          ls -la out/
-
-      - name: Copy to out unix
-        if: startsWith(matrix.platform,'linux') || matrix.platform == 'macos' || (matrix.platform == 'ios' && inputs.upload-artifact)
-        run: |
-          ls -R dist/
-          mkdir out
-          mkdir tmp_out
-          
-          for EXT in $(echo ${{ matrix.targets }} | tr ',' '\n'); do
-            KEY=TARGET_NAME_${EXT}
-            FILENAME=${!KEY}
-            # arm64 Linux: Hiddify-Debian-x64 -> Hiddify-Debian-arm64, Hiddify-Linux-x64 -> Hiddify-Linux-arm64
-            [[ "${{ matrix.aarch }}" == "arm64" ]] && FILENAME=${FILENAME//x64/arm64}
-            echo "For $EXT ($KEY) filename is ${FILENAME}"
-            mv dist/*/*.$EXT tmp_out/${FILENAME}.$EXT
-            ls tmp_out
-            [[ "$EXT" != "gz" ]] && chmod +x tmp_out/${FILENAME}.$EXT || echo "Skipping chmod for gz"
-            if [[ "${{matrix.platform}}" == linux* ]];then
-              cp ./.github/help/linux/* tmp_out/
-            else
-              cp ./.github/help/mac-windows/* tmp_out/
-            fi
-            if [[ "${{matrix.platform}}" == 'ios' ]];then
-              echo mv tmp_out/${FILENAME}.$EXT out/
-              mv tmp_out/${FILENAME}.$EXT out/
-            else
-              cd tmp_out
-              # 7z a ${FILENAME}.zip ./
-              # mv ${FILENAME}.zip ../out/
-              # [[ $EXT == 'AppImage' ]]&& mv ${FILENAME}.$EXT ../out/ # added for appimage link
-              mv ${FILENAME}.$EXT ../out/
-              cd ..
-            fi
-          done
-
-      - name: Sign installer and notarize macOS packages
-        if: ${{ inputs.upload-artifact && matrix.platform == 'macos' && env.MACOS_DEVELOPER_ID == 'true' }}
-        env:
-          APPLE_MACOS_INSTALLER_SIGN_IDENTITY: ${{ secrets.APPLE_MACOS_INSTALLER_SIGN_IDENTITY }}
-          APPLE_NOTARIZATION_APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
-          APPLE_NOTARIZATION_TEAM_ID: ${{ secrets.APPLE_NOTARIZATION_TEAM_ID }}
-          APPLE_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
-        shell: bash
-        run: |
-          bash macos/scripts/notarize-release.sh "out/${TARGET_NAME_dmg}.dmg" "out/${TARGET_NAME_pkg}.pkg"
-      - name: Verify signed iOS IPA
-        if: ${{ inputs.upload-artifact && matrix.platform == 'ios' }}
-        run: python3 .github/scripts/verify_signed_ipa.py out/Hiddify-iOS.ipa
-
-      - name: Upload Artifact
-        if: env.UPLOAD_ARTIFACT == 'true'
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{matrix.platform}}
-          path: ./out
-          retention-days: 1
-
-      # Profiles only — leave signing_temp.keychain for import-codesign-certs post cleanup.
-      - name: Clean up provisioning profiles
-        if: ${{ always() && startsWith(matrix.os,'macos') }}
-        run: |
-          rm -f ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision || true
-          rm -rf ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
-  update-draft:
-    # Always refresh the moving `draft` tag/release to this build's commit and assets.
-    # On versioned tags this runs after upload-release so the two softprops jobs
-    # never create releases / upload assets with the same token concurrently.
-    # A failed platform build does not block it: the draft gets whatever the other
-    # platforms built (the "Check there is something to publish" step stops it when
-    # no build produced anything, so the old draft is not replaced by an empty one).
-    if: ${{ !cancelled() && inputs.upload-artifact && needs.build.result != 'skipped' && (needs.upload-release.result == 'success' || needs.upload-release.result == 'skipped') }}
-    needs: [build, upload-release]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Download Artifact
-        uses: actions/download-artifact@v7
-        with:
-          merge-multiple: true
-          pattern: "*"
-          path: ./out/
-
-      # The App Store build goes to TestFlight only: a user cannot install it from a download
-      - name: Leave out the Mac App Store build
-        run: rm -fv out/Hiddify-MacOS-AppStore.*
-
-      - name: Check there is something to publish
-        run: |
-          if [ -z "$(ls -A ./out 2>/dev/null)" ]; then
-            echo "::error::No build produced any artifact; keeping the previous draft release."
-            exit 1
-          fi
-          if [ "${{ needs.build.result }}" != "success" ]; then
-            echo "::warning::Some platform builds failed; the draft release only has the platforms that built."
-          fi
-
-      - name: Display Files Structure
-        run: ls -R
-        working-directory: ./out
-
-      - name: Remove old draft release and tag
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          # Drop the previous draft release + tag so the new upload can retag
-          # github.sha as `draft` (softprops alone will not move an existing tag).
-          if gh release view draft >/dev/null 2>&1; then
-            gh release delete draft --yes --cleanup-tag
-          elif git ls-remote --tags origin refs/tags/draft | grep -q .; then
-            git push origin :refs/tags/draft
-          fi
-
-      - name: prepare_release_message
-        run: |
-          set -euo pipefail
-          # Draft release download URLs always use the `draft` tag, even when this
-          # workflow was also invoked for a versioned tag-name.
-          # The macOS and Linux installer of this release, with the SHA-256 of each file it installs
-          bash ./.github/scripts/make_installer.sh ./out draft
-          cp ./.github/release_message.md release.md
-          python3 ./.github/scripts/prepare_release_notes.py release.md ./out draft
-
-      - name: Create draft release on current commit
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: ./out/*
-          name: draft
-          tag_name: draft
-          target_commitish: ${{ github.sha }}
-          body_path: ./release.md
-          prerelease: true
-          make_latest: false
-          fail_on_unmatched_files: false
-
-  virustotal-draft:
-    if: ${{ !cancelled() && inputs.upload-artifact && needs.update-draft.result == 'success' }}
-    needs: [update-draft]
-    uses: ./.github/workflows/virustotal_scan.yml
+  android:
+    needs: codegen
+    uses: ./.github/workflows/build-android.yml
     secrets: inherit
     permissions:
-      contents: write
-    with:
-      release_tag: draft
+      contents: read
+    # The same inputs for every platform (`*build-inputs` below).
+    with: &build-inputs
+      release: ${{ inputs.upload-artifact }}
+      channel: ${{ inputs.channel }}
+      # Debug symbols of the versions users get, not of drafts.
+      upload-symbols: ${{ inputs.tag-name != 'draft' }}
 
-  upload-release:
-    if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
-    needs: [build]
+  linux:
+    needs: codegen
+    uses: ./.github/workflows/build-linux.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    with: *build-inputs
+
+  windows:
+    needs: codegen
+    uses: ./.github/workflows/build-windows.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      # Azure Artifact Signing (OIDC) and the build provenance attestation
+      id-token: write
+      attestations: write
+    with: *build-inputs
+
+  macos:
+    needs: codegen
+    uses: ./.github/workflows/build-macos.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    with: *build-inputs
+
+  ios:
+    needs: codegen
+    uses: ./.github/workflows/build-ios.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    with: *build-inputs
+
+  # ---- Publishing ----
+
+  # The GitHub release of a version tag.
+  # No `permissions` here on purpose, so the job keeps the grant of the calling workflow: when
+  # that was narrowed to actions, contents, id-token and attestations, the create-release API
+  # answered 403 "Resource not accessible by integration" on the v5.2.0 run.
+  release:
+    if: inputs.upload-artifact && inputs.tag-name != 'draft'
+    needs: [codegen, test, android, linux, windows, macos, ios]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
-      - name: Download Artifact
-        uses: actions/download-artifact@v7
+      # The MSIX ships CI-signed; windows-store-sync.yml replaces it with the Store-signed
+      # copy once the version uploaded in Partner Center is live.
+      - uses: ./.github/actions/publish-release
         with:
-          merge-multiple: true
-          pattern: "*"
-          path: ./out/
+          tag: ${{ inputs.tag-name }}
 
-      - name: Display Files Structure
+  # The moving `draft` release: this commit and its builds. It runs after `release` so that the
+  # two never create releases and upload assets with the same token at the same time. A failed
+  # platform build does not block it: the draft gets whatever the other platforms built, and
+  # with no build at all the previous draft stays.
+  draft:
+    if: >-
+      !cancelled() && inputs.upload-artifact && needs.test.result == 'success' &&
+      (needs.release.result == 'success' || needs.release.result == 'skipped')
+    needs: [test, android, linux, windows, macos, ios, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Warn about failed builds
+        if: contains(needs.*.result, 'failure')
         run: |
-          ls -R ./out
-          ls -R ./.github/
-          ls -R ./.git/
-          mv out/hiddify-android-market.aab  hiddify-android-market.aab
-          # The App Store build goes to TestFlight only: a user cannot install it from a download
-          rm -fv out/Hiddify-MacOS-AppStore.*
-          # The MSIX ships CI-signed; windows-store-sync.yml replaces it with the
-          # Store-signed copy once the version uploaded in Partner Center is live.
+          echo "::warning::Some platform builds failed; the draft release only has the platforms that built."
 
-      - name: prepare_release_message
+      - uses: ./.github/actions/publish-release
+        with:
+          tag: draft
+          replace: true
+          attach-android-bundle: true
+
+  # Play Console problems must not fail the run; they are reported as a warning instead.
+  google-play:
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: android-aab
+
+      - name: Deploy to the Google Play beta track
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: app.hiddify.com
+          releaseName: ${{ inputs.tag-name }}
+          releaseFiles: hiddify-android-market.aab
+          track: beta
+
+  # Like the releases, it waits for every build, also those it does not upload.
+  testflight:
+    if: inputs.upload-artifact
+    needs: [codegen, test, android, linux, windows, macos, ios]
+    uses: ./.github/workflows/testflight.yml
+    secrets: inherit
+    permissions:
+      actions: read
+      # The ios-build/<version>/<build> tags
+      contents: write
+
+  # ---- Caches ----
+
+  # The jobs above cache the Flutter SDK and the pub packages (setup-flutter). Each job has
+  # restored or saved its caches by now, so a cache that nothing touched since this run started
+  # is an older one - of an earlier Flutter version or pubspec.lock - and is removed. Not after
+  # a failed or skipped job: its caches were not touched either.
+  prune-caches:
+    needs: [codegen, test, android, linux, windows, macos, ios]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: write
+    steps:
+      - name: Remove the caches this run did not use
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          # The macOS and Linux installer of this release, with the SHA-256 of each file it installs
-          bash ./.github/scripts/make_installer.sh ./out "${{ env.TAG_NAME }}"
-          cp ./.github/release_message.md release.md
-          python3 ./.github/scripts/prepare_release_notes.py release.md ./out "${{ env.TAG_NAME }}"
+          started="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT" --jq .run_started_at)"
+          echo "Run started at $started"
+          caches="$(gh cache list --limit 1000 --json id,key,ref,lastAccessedAt,sizeInBytes)"
+          echo "Kept:"
+          jq -r --arg started "$started" '.[] | select(.lastAccessedAt[0:19] >= $started[0:19])
+            | "  \(.key) (\(.ref), \(.sizeInBytes / 1048576 | floor) MB)"' <<< "$caches"
+          echo "Removed:"
+          jq -r --arg started "$started" '.[] | select(.lastAccessedAt[0:19] < $started[0:19])
+            | [.id, .key, .ref, .lastAccessedAt] | @tsv' <<< "$caches" \
+          | while IFS=$'\t' read -r id key ref accessed; do
+              gh cache delete "$id"
+              echo "  $key ($ref, last used $accessed)"
+            done
 
-      - name: Upload Release
-        uses: softprops/action-gh-release@v2
-        if: ${{ success() }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          # prerelease: ${{ env.CHANNEL == 'dev' }}
-          prerelease: true
-          tag_name: ${{ env.TAG_NAME }}
-          body_path: './release.md'
-          files: ./out/*
-
-      - name: Create service_account.json
-        run: echo '${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}' > service_account.json
-
-      - name: Deploy to Google Play Internal Testers
-        # Play Console problems must not block the GitHub release, VirusTotal
-        # scan or TestFlight; the step is reported as a warning instead.
-        continue-on-error: true
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJson: service_account.json
-          packageName: app.hiddify.com
-          releaseName: ${{ env.TAG_NAME }}
-          releaseFiles: ./hiddify-android-market.aab
-          track: 'beta'
+  # ---- VirusTotal badges in the release notes ----
 
   virustotal-release:
-    if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
-    needs: [upload-release]
+    needs: release
     uses: ./.github/workflows/virustotal_scan.yml
     secrets: inherit
     permissions:
@@ -778,170 +272,13 @@ jobs:
     with:
       release_tag: ${{ inputs.tag-name }}
 
-  # Needs only the build artifacts. Two ways to authenticate, chosen by which secrets
-  # are set:
-  #  - APPLE_UPLOAD_APPLE_ID + APPLE_UPLOAD_APP_PASSWORD: a dedicated Apple ID with an
-  #    app-specific password (.github/scripts/upload_testflight.sh). That user can be
-  #    limited to the Hiddify apps. Preferred when both are configured.
-  #  - APPSTORE_ISSUER_ID + APPSTORE_API_KEY_ID + APPSTORE_API_PRIVATE_KEY: an App
-  #    Store Connect Team API key, which reaches every app of the team.
-  upload-to-testflight:
-    needs: [build]
-    permissions:
-      actions: read
-      # Pushes the ios-build/<version>/<build> tags that record the build numbers App Store Connect took.
-      contents: write
-    if: ${{ inputs.upload-artifact }}
-    runs-on: macos-26
-    timeout-minutes: 60
-    env:
-      APPLE_UPLOAD_APPLE_ID: ${{ secrets.APPLE_UPLOAD_APPLE_ID }}
-      APPLE_UPLOAD_APP_PASSWORD: ${{ secrets.APPLE_UPLOAD_APP_PASSWORD }}
-      APPLE_UPLOAD_ASC_PROVIDER: ${{ secrets.APPLE_UPLOAD_ASC_PROVIDER }}
-      # apple-id | api-key | none
-      UPLOAD_AUTH: ${{ (secrets.APPLE_UPLOAD_APPLE_ID != '' && secrets.APPLE_UPLOAD_APP_PASSWORD != '') && 'apple-id' || (secrets.APPSTORE_ISSUER_ID != '' && secrets.APPSTORE_API_KEY_ID != '' && secrets.APPSTORE_API_PRIVATE_KEY != '') && 'api-key' || 'none' }}
-    steps:
-      - name: Explain skipped TestFlight upload
-        if: env.UPLOAD_AUTH == 'none'
-        run: echo "::notice::TestFlight upload skipped - set APPLE_UPLOAD_APPLE_ID + APPLE_UPLOAD_APP_PASSWORD, or the APPSTORE_* API key secrets."
-
-      - name: Show TestFlight authentication
-        if: env.UPLOAD_AUTH != 'none'
-        run: echo "TestFlight upload authenticates with ${UPLOAD_AUTH}"
-
-      - name: checkout
-        if: env.UPLOAD_AUTH == 'apple-id'
-        uses: actions/checkout@v6
-        with:
-          sparse-checkout: .github/scripts
-
-      - name: Download iOS artifact
-        continue-on-error: true
-        id: dl-ios
-        uses: actions/download-artifact@v7
-        with:
-          name: ios
-          path: ./out/
-
-      - name: Check iOS IPA
-        id: ios
-        run: |
-          if [[ -f out/Hiddify-iOS.ipa ]]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-            ls -la out/Hiddify-iOS.ipa
-          else
-            echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "No iOS IPA artifact; skipping TestFlight upload."
-          fi
-
-      - name: Upload iOS IPA to TestFlight (Apple ID)
-        id: ios-upload-apple-id
-        if: steps.ios.outputs.present == 'true' && env.UPLOAD_AUTH == 'apple-id'
-        run: |
-          set -o pipefail
-          bash .github/scripts/upload_testflight.sh ios out/Hiddify-iOS.ipa 2>&1 | tee "$RUNNER_TEMP/ios-upload.log"
-
-      - name: Upload iOS IPA to TestFlight (API key)
-        id: ios-upload-api-key
-        if: steps.ios.outputs.present == 'true' && env.UPLOAD_AUTH == 'api-key'
-        uses: Apple-Actions/upload-testflight-build@v5
-        with:
-          app-path: out/Hiddify-iOS.ipa
-          app-type: ios
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-
-      # The next build of this version takes one more than the highest of these tags. A number App
-      # Store Connect refused as already uploaded (a build sent some other way) is recorded too, so
-      # the next run moves past it.
-      - name: Record the iOS build number
-        if: >-
-          !cancelled() && steps.ios.outputs.present == 'true' &&
-          (steps.ios-upload-apple-id.outcome == 'success' || steps.ios-upload-api-key.outcome == 'success' ||
-           steps.ios-upload-apple-id.outcome == 'failure')
-        env:
-          GH_TOKEN: ${{ github.token }}
-          UPLOADED: ${{ steps.ios-upload-apple-id.outcome == 'success' || steps.ios-upload-api-key.outcome == 'success' }}
-        run: |
-          set -euo pipefail
-          if [ "$UPLOADED" != "true" ] && ! grep -qiE "ITMS-4238|Redundant Binary Upload|already uploaded a build" "$RUNNER_TEMP/ios-upload.log" 2>/dev/null; then
-            echo "The upload failed for another reason; nothing to record."
-            exit 0
-          fi
-          unzip -p out/Hiddify-iOS.ipa 'Payload/*.app/Info.plist' > "$RUNNER_TEMP/Info.plist"
-          version="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$RUNNER_TEMP/Info.plist")"
-          build="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$RUNNER_TEMP/Info.plist")"
-          tag="ios-build/$version/$build"
-          if gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA" >/dev/null 2>"$RUNNER_TEMP/tag.err"; then
-            echo "Recorded $tag"
-          elif grep -q "Reference already exists" "$RUNNER_TEMP/tag.err"; then
-            echo "$tag was recorded already"
-          else
-            cat "$RUNNER_TEMP/tag.err"; exit 1
-          fi
-
-      - name: Download macOS App Store artifact
-        continue-on-error: true
-        id: dl-macos
-        uses: actions/download-artifact@v7
-        with:
-          name: macos-appstore
-          path: ./out/
-
-      - name: Check macOS App Store pkg
-        id: macos
-        run: |
-          if [[ -f out/Hiddify-MacOS-AppStore.pkg ]]; then
-            echo "present=true" >> "$GITHUB_OUTPUT"
-            ls -la out/Hiddify-MacOS-AppStore.pkg
-          else
-            echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "No macOS App Store pkg artifact; skipping TestFlight upload."
-          fi
-
-      - name: Upload macOS App Store pkg to TestFlight (Apple ID)
-        if: steps.macos.outputs.present == 'true' && env.UPLOAD_AUTH == 'apple-id'
-        run: bash .github/scripts/upload_testflight.sh macos out/Hiddify-MacOS-AppStore.pkg
-
-      - name: Upload macOS App Store pkg to TestFlight (API key)
-        if: steps.macos.outputs.present == 'true' && env.UPLOAD_AUTH == 'api-key'
-        uses: Apple-Actions/upload-testflight-build@v5
-        with:
-          app-path: out/Hiddify-MacOS-AppStore.pkg
-          app-type: macos
-          backend: altool
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-
-  # Only the newest ios-build/<version>/<build> tag matters: the next iOS build of a new version
-  # starts from pubspec's number, and one of this version needs only the highest. After every
-  # upload run (draft or release) keep that tag and remove the rest. Runs after
-  # upload-to-testflight, so the number this run recorded is the one kept.
-  prune-ios-build-tags:
-    needs: [upload-to-testflight]
-    if: ${{ !cancelled() && inputs.upload-artifact }}
-    runs-on: ubuntu-latest
+  virustotal-draft:
+    # `draft` runs when `release` was skipped, which would skip this job too without a condition.
+    if: ${{ !cancelled() && needs.draft.result == 'success' }}
+    needs: draft
+    uses: ./.github/workflows/virustotal_scan.yml
+    secrets: inherit
     permissions:
       contents: write
-    steps:
-      - name: Keep only the newest ios-build tag
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          # "<version> <build>" per tag, highest version then highest build last
-          tags="$(gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/ios-build/" --jq '.[].ref' \
-            | sed -n 's|^refs/tags/ios-build/\([0-9][0-9.]*\)/\([0-9][0-9]*\)$|\1 \2|p' \
-            | sort -t' ' -k1,1V -k2,2n)"
-          if [ -z "$tags" ]; then
-            echo "No ios-build tags."
-            exit 0
-          fi
-          keep="$(tail -n 1 <<< "$tags")"
-          echo "Keeping ios-build/${keep% *}/${keep#* }"
-          head -n -1 <<< "$tags" | while read -r version build; do
-            gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/tags/ios-build/$version/$build" >/dev/null
-            echo "Removed ios-build/$version/$build"
-          done
+    with:
+      release_tag: draft

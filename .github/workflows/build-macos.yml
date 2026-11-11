@@ -1,0 +1,148 @@
+# macOS: the direct download (dmg and pkg, Developer ID signed and notarized) and, for a
+# release, the Mac App Store build that goes to TestFlight.
+#
+# The tunnel xcframework comes from hiddify-lib-macos.tar.gz via `make macos-libs` (built in
+# hiddify-core CI); no submodule / Go bind on the app runner.
+name: Build macOS
+
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: Sign the build and upload it as an artifact. Off, the job only checks that the direct download builds unsigned.
+        type: boolean
+        required: true
+      channel:
+        description: dev or prod (the Makefile's CHANNEL).
+        type: string
+        required: true
+      upload-symbols:
+        description: Upload the debug symbols to Sentry.
+        type: boolean
+        default: false
+
+env:
+  CHANNEL: ${{ inputs.channel }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+jobs:
+  build:
+    name: ${{ matrix.platform }}
+    runs-on: macos-26
+    timeout-minutes: 60
+    # A failed build does not stop the release of the other platforms.
+    continue-on-error: true
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # `platform` is the Makefile prefix and the artifact name. The App Store build needs the
+        # signing certificates, so it is built for a release only.
+        platform: ${{ fromJSON(inputs.release && '["macos", "macos-appstore"]' || '["macos"]') }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/apple-signing
+        if: inputs.release
+        with:
+          p12-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
+          profiles-targz-base64: ${{ secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64 }}
+
+      # With a Developer ID the VPN runs in the packet tunnel system extension. Without one, the
+      # build is signed ad hoc and its VPN runs in the root helper the user installs.
+      - name: Choose Developer ID or ad hoc signing
+        if: matrix.platform == 'macos'
+        env:
+          MACOS_SIGNING_XCCONFIG: ${{ secrets.APPLE_MACOS_SIGNING_XCCONFIG }}
+          SIGN_RELEASE: ${{ inputs.release }}
+        run: |
+          set -euo pipefail
+          signing_config="$RUNNER_TEMP/hiddify-macos-signing.xcconfig"
+          if [[ "$SIGN_RELEASE" == 'true' && -n "$MACOS_SIGNING_XCCONFIG" ]]; then
+            printf '%s\n' "$MACOS_SIGNING_XCCONFIG" > "$signing_config"
+            echo 'MACOS_DEVELOPER_ID=true' >> "$GITHUB_ENV"
+          else
+            if [[ "$SIGN_RELEASE" == 'true' ]]; then
+              echo '::warning::APPLE_MACOS_SIGNING_XCCONFIG is not set, so the macOS release is built without a Developer ID.'
+            fi
+            cp macos/Runner/Configs/Unsigned.xcconfig "$signing_config"
+            echo 'MACOS_DEVELOPER_ID=false' >> "$GITHUB_ENV"
+          fi
+          echo "XCODE_XCCONFIG_FILE=$signing_config" >> "$GITHUB_ENV"
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          platform: ${{ matrix.platform }}
+          generated-code: true
+
+      - name: Build
+        run: make ${{ matrix.platform }}-release
+
+      - name: Upload debug symbols to Sentry
+        if: inputs.release && inputs.upload-symbols
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_DIST: general
+        run: |
+          dart pub global activate sentry_dart_plugin
+          dart run sentry_dart_plugin
+
+      # AppIcon.icon (Icon Composer) needs Xcode 26; older Xcode builds the app without any icon.
+      - name: Check the app icon
+        if: inputs.release
+        run: |
+          app=build/macos/Build/Products/Release/Hiddify.app
+          xcodebuild -version
+          for f in Assets.car AppIcon.icns; do
+            [[ -s "$app/Contents/Resources/$f" ]] || { echo "::error::$app has no Contents/Resources/$f (app icon)"; exit 1; }
+          done
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIconName" "$app/Contents/Info.plist"
+
+      # The names must match prepare_release_notes.py, make_installer.sh and the README.
+      - name: Collect the packages
+        if: matrix.platform == 'macos'
+        run: |
+          ls -R dist
+          mkdir out
+          mv dist/*/*.dmg out/Hiddify-MacOS.dmg
+          mv dist/*/*.pkg out/Hiddify-MacOS-Installer.pkg
+
+      # The names must match testflight.yml.
+      - name: Collect the App Store packages
+        if: matrix.platform == 'macos-appstore'
+        run: |
+          ls -R dist
+          mkdir -p out
+          for ext in pkg dmg; do
+            file="$(find dist -name "*-macos-appstore.$ext" -type f | head -1)"
+            if [[ -z "$file" ]]; then
+              echo "::error::macos-appstore $ext not found under dist/"
+              exit 1
+            fi
+            cp "$file" "out/Hiddify-MacOS-AppStore.$ext"
+          done
+          ls -la out
+
+      - name: Sign the installer and notarize the packages
+        if: inputs.release && matrix.platform == 'macos' && env.MACOS_DEVELOPER_ID == 'true'
+        env:
+          APPLE_MACOS_INSTALLER_SIGN_IDENTITY: ${{ secrets.APPLE_MACOS_INSTALLER_SIGN_IDENTITY }}
+          APPLE_NOTARIZATION_APPLE_ID: ${{ secrets.APPLE_NOTARIZATION_APPLE_ID }}
+          APPLE_NOTARIZATION_TEAM_ID: ${{ secrets.APPLE_NOTARIZATION_TEAM_ID }}
+          APPLE_NOTARIZATION_PASSWORD: ${{ secrets.APPLE_NOTARIZATION_PASSWORD }}
+        run: bash macos/scripts/notarize-release.sh out/Hiddify-MacOS.dmg out/Hiddify-MacOS-Installer.pkg
+
+      - name: Upload the artifact
+        if: inputs.release
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.platform }}
+          path: out
+          retention-days: 1
+          # The packages are compressed already.
+          compression-level: 0
+          if-no-files-found: error

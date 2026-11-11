@@ -1,0 +1,92 @@
+name: Set up Flutter build
+description: >
+  Installs the Flutter SDK, then through the Makefile the build tools of one platform
+  (`make <platform>-install-deps`) and its packages, generated code and core libraries
+  (`make <platform>-prepare`). The Flutter version of every CI job is set here.
+
+inputs:
+  platform:
+    description: >
+      Makefile prefix of the platform: android-apk, android-aab, linux, linux-amd64, linux-arm64,
+      windows, macos, macos-appstore or ios. `common` gets the packages and generates the code
+      without any platform's core libraries.
+    required: true
+  flutter-version:
+    description: Flutter SDK version. Keep it in step with `environment.flutter` in pubspec.yaml.
+    default: 3.38.5
+  install-deps:
+    description: Run `make <platform>-install-deps`. Not needed to analyze and test.
+    default: 'true'
+  generated-code:
+    description: >
+      Take the generated code from the `generated-code` artifact of this run (job `codegen` of
+      build.yml) instead of running build_runner and slang again.
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    # Flutter publishes no Linux arm64 SDK archive, so arm64 uses the SDK git checkout that
+    # `make linux-arm64-install-deps` makes in ~/develop/flutter.
+    - name: Install Flutter
+      if: inputs.platform != 'linux-arm64'
+      uses: subosito/flutter-action@fd55f4c5af5b953cc57a2be44cb082c8f6635e8e # v2.21.0
+      with:
+        flutter-version: ${{ inputs.flutter-version }}
+        channel: stable
+        cache: true
+
+    # Windows runs make from PowerShell, as a developer does. A PowerShell step reports only its
+    # last command, so each make call there is a step of its own.
+    - name: Install build tools
+      if: inputs.install-deps == 'true' && runner.os != 'Windows'
+      shell: bash
+      env:
+        PLATFORM: ${{ inputs.platform }}
+        SKIP_CODEGEN: ${{ inputs.generated-code == 'true' && '1' || '' }}
+      run: |
+        make "$PLATFORM-install-deps"
+        echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+        if [[ "$PLATFORM" == linux-arm64 ]]; then
+          echo "$HOME/develop/flutter/bin" >> "$GITHUB_PATH"
+          "$HOME/develop/flutter/bin/flutter" --version
+        fi
+
+    - name: Install build tools (Windows)
+      if: inputs.install-deps == 'true' && runner.os == 'Windows'
+      shell: pwsh
+      env:
+        PLATFORM: ${{ inputs.platform }}
+        SKIP_CODEGEN: ${{ inputs.generated-code == 'true' && '1' || '' }}
+      run: make "${env:PLATFORM}-install-deps"
+
+    - name: Download the generated code
+      if: inputs.generated-code == 'true'
+      uses: actions/download-artifact@v7
+      with:
+        name: generated-code
+        path: .generated-code
+
+    # A relative path: GNU tar on Windows reads "D:\..." as a remote host.
+    - name: Unpack the generated code
+      if: inputs.generated-code == 'true'
+      shell: bash
+      run: |
+        tar -xzf .generated-code/generated-code.tar.gz
+        rm -rf .generated-code
+
+    - name: Get packages, generated code and core libraries
+      if: runner.os != 'Windows'
+      shell: bash
+      env:
+        PLATFORM: ${{ inputs.platform }}
+        SKIP_CODEGEN: ${{ inputs.generated-code == 'true' && '1' || '' }}
+      run: make "$PLATFORM-prepare"
+
+    - name: Get packages, generated code and core libraries (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      env:
+        PLATFORM: ${{ inputs.platform }}
+        SKIP_CODEGEN: ${{ inputs.generated-code == 'true' && '1' || '' }}
+      run: make "${env:PLATFORM}-prepare"

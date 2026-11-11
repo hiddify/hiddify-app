@@ -1,0 +1,86 @@
+name: Publish GitHub release
+description: >
+  Downloads the build artifacts of this run and publishes them as the GitHub pre-release of a
+  tag, with install.sh and the download table in the release notes. Needs the repository
+  checked out and a token with `contents: write`.
+
+inputs:
+  tag:
+    description: Tag of the release, for example v5.5.6 or draft.
+    required: true
+  replace:
+    description: >
+      Delete the release and the tag first, so that the tag moves to this commit (the moving
+      `draft` release). Without it an existing release of the tag is updated.
+    default: 'false'
+  attach-android-bundle:
+    description: Attach the Google Play bundle (hiddify-android-market.aab) to the release.
+    default: 'false'
+  token:
+    description: Token that can write releases and tags.
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Download the build artifacts
+      uses: actions/download-artifact@v7
+      with:
+        path: out
+        merge-multiple: true
+
+    - name: Leave out what is not for download
+      shell: bash
+      env:
+        ATTACH_ANDROID_BUNDLE: ${{ inputs.attach-android-bundle }}
+      run: |
+        # Not a build: the generated code the build jobs shared.
+        rm -f out/generated-code.tar.gz
+        # The Mac App Store build goes to TestFlight only: a user cannot install it from a download.
+        rm -fv out/Hiddify-MacOS-AppStore.*
+        if [[ "$ATTACH_ANDROID_BUNDLE" != 'true' ]]; then
+          rm -fv out/hiddify-android-market.aab
+        fi
+        if [[ -z "$(ls -A out 2>/dev/null)" ]]; then
+          echo "::error::No build produced any artifact; nothing to publish."
+          exit 1
+        fi
+        ls -l out
+
+    # The release action alone does not move an existing tag.
+    - name: Remove the previous release and tag
+      if: inputs.replace == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        TAG: ${{ inputs.tag }}
+      run: |
+        set -euo pipefail
+        if gh release view "$TAG" >/dev/null 2>&1; then
+          gh release delete "$TAG" --yes --cleanup-tag
+        elif git ls-remote --tags origin "refs/tags/$TAG" | grep -q .; then
+          git push origin ":refs/tags/$TAG"
+        fi
+
+    - name: Write install.sh and the release notes
+      shell: bash
+      env:
+        TAG: ${{ inputs.tag }}
+      run: |
+        set -euo pipefail
+        # The macOS and Linux installer of this release, with the SHA-256 of each file it installs
+        bash .github/scripts/make_installer.sh out "$TAG"
+        cp .github/release_message.md "$RUNNER_TEMP/release.md"
+        python3 .github/scripts/prepare_release_notes.py "$RUNNER_TEMP/release.md" out "$TAG"
+
+    - name: Publish the release
+      uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
+      with:
+        token: ${{ inputs.token }}
+        tag_name: ${{ inputs.tag }}
+        name: ${{ inputs.tag }}
+        target_commitish: ${{ github.sha }}
+        body_path: ${{ runner.temp }}/release.md
+        files: out/*
+        prerelease: true
+        make_latest: false

@@ -16,28 +16,19 @@ permissions:
 jobs:
   next-build-number:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-
-      - name: Read version from pubspec
-        id: pubspec
-        run: |
-          set -euo pipefail
-          name="$(sed -n 's/^version: *\([^+ ]*\)+[0-9][0-9]* *$/\1/p' pubspec.yaml)"
-          base="$(sed -n 's/^version: *[^+]*+\([0-9][0-9]*\) *$/\1/p' pubspec.yaml)"
-          echo "version=${INPUT_VERSION:-${name%%[-.][a-z]*}}" >> "$GITHUB_OUTPUT"
-          echo "base=$base" >> "$GITHUB_OUTPUT"
-        env:
-          INPUT_VERSION: ${{ inputs.version }}
 
       - name: Find the next build number
         id: next
         uses: ./.github/actions/ios-next-build-number
         with:
-          version: ${{ steps.pubspec.outputs.version }}
-          base: ${{ steps.pubspec.outputs.base }}
+          version: ${{ inputs.version }}
 
       - name: Summary
+        env:
+          VERSION: ${{ steps.next.outputs.version }}
+          BUILD: ${{ steps.next.outputs.build }}
         run: |
-          echo "### iOS ${{ steps.pubspec.outputs.version }}: next build number ${{ steps.next.outputs.build }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "### iOS $VERSION: next build number $BUILD" >> "$GITHUB_STEP_SUMMARY"

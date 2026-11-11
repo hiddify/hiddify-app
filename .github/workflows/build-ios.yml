@@ -1,0 +1,116 @@
+# iOS: for a release the signed IPA that goes to TestFlight; otherwise an unsigned build and a
+# smoke test in the simulator.
+name: Build iOS
+
+on:
+  workflow_call:
+    inputs:
+      release:
+        description: Sign the build and upload it as an artifact. Off, the job builds unsigned and smoke tests in the simulator.
+        type: boolean
+        required: true
+      channel:
+        description: dev or prod (the Makefile's CHANNEL).
+        type: string
+        required: true
+      upload-symbols:
+        description: Upload the debug symbols to Sentry.
+        type: boolean
+        default: false
+
+env:
+  CHANNEL: ${{ inputs.channel }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+jobs:
+  # Unlike the other platforms, a failed iOS build stops the release of a version tag.
+  build:
+    name: ipa
+    runs-on: macos-26
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: ./.github/actions/apple-signing
+        if: inputs.release
+        with:
+          p12-base64: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
+          profiles-targz-base64: ${{ secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64 }}
+
+      - uses: ./.github/actions/setup-flutter
+        with:
+          platform: ios
+          generated-code: true
+
+      # ---- Without `release`: check that it builds and starts ----
+
+      - name: Build without code signing
+        if: ${{ !inputs.release }}
+        run: make ios-validate
+
+      - name: Smoke test the production app in the simulator
+        if: ${{ !inputs.release }}
+        timeout-minutes: 30
+        run: bash .github/scripts/smoke_test_ios_simulator.sh
+
+      # ---- With `release`: the signed IPA ----
+
+      # App Store Connect takes each build number of a version once, so a rebuild of the same
+      # version (a draft, a rerun) cannot reuse pubspec's. It gets one more than the highest build
+      # recorded for this version (the ios-build/<version>/<build> tags testflight.yml pushes): a
+      # whole number one higher lets TestFlight give it to external testers without another
+      # review. The packet tunnel must carry the app's number.
+      - name: Find the next build number
+        id: next
+        if: inputs.release
+        uses: ./.github/actions/ios-next-build-number
+
+      - name: Give the build the next build number
+        if: inputs.release
+        env:
+          BUILD: ${{ steps.next.outputs.build }}
+        run: |
+          set -euo pipefail
+          perl -pi -e "s/^(version: *[^+]+)\+\d+ *\$/\${1}+$BUILD/" pubspec.yaml
+          perl -pi -e "s/CURRENT_PROJECT_VERSION = \d+;/CURRENT_PROJECT_VERSION = $BUILD;/" ios/Runner.xcodeproj/project.pbxproj
+          grep -n '^version:' pubspec.yaml
+          grep -c "CURRENT_PROJECT_VERSION = $BUILD;" ios/Runner.xcodeproj/project.pbxproj
+          echo "iOS build number: $BUILD"
+
+      - name: Build
+        if: inputs.release
+        run: make ios-release
+
+      - name: Upload debug symbols to Sentry
+        if: inputs.release && inputs.upload-symbols
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          SENTRY_DIST: general
+        run: |
+          dart pub global activate sentry_dart_plugin
+          dart run sentry_dart_plugin
+
+      # The name must match testflight.yml and prepare_release_notes.py.
+      - name: Collect and verify the signed IPA
+        if: inputs.release
+        run: |
+          ls -R dist
+          mkdir out
+          mv dist/*/*.ipa out/Hiddify-iOS.ipa
+          python3 .github/scripts/verify_signed_ipa.py out/Hiddify-iOS.ipa
+
+      - name: Upload the artifact
+        if: inputs.release
+        uses: actions/upload-artifact@v6
+        with:
+          name: ios
+          path: out
+          retention-days: 1
+          # The package is compressed already.
+          compression-level: 0
+          if-no-files-found: error

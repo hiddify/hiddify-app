@@ -8,16 +8,21 @@ description: >
 
 inputs:
   version:
-    description: The version (CFBundleShortVersionString), without a pre-release suffix.
-    required: true
+    description: >
+      The version (CFBundleShortVersionString), without a pre-release suffix. Empty: the version
+      of pubspec.yaml in the working directory.
+    default: ''
   base:
-    description: The lowest build number to use, normally pubspec's.
-    required: true
+    description: The lowest build number to use. Empty - the build number of pubspec.yaml.
+    default: ''
   token:
     description: Token that can read the repository's tags.
     default: ${{ github.token }}
 
 outputs:
+  version:
+    description: The version the build number is for.
+    value: ${{ steps.next.outputs.version }}
   build:
     description: The next build number.
     value: ${{ steps.next.outputs.build }}
@@ -33,6 +38,17 @@ runs:
         BASE: ${{ inputs.base }}
       run: |
         set -euo pipefail
+        if [[ -z "$VERSION" || -z "$BASE" ]]; then
+          name="$(sed -n 's/^version: *\([^+ ]*\)+[0-9][0-9]* *$/\1/p' pubspec.yaml)"
+          pubspec_build="$(sed -n 's/^version: *[^+]*+\([0-9][0-9]*\) *$/\1/p' pubspec.yaml)"
+          if [[ -z "$name" || -z "$pubspec_build" ]]; then
+            echo "::error::pubspec.yaml has no 'version: <name>+<build>' line"
+            exit 1
+          fi
+          # App Store Connect knows the version without a pre-release suffix (5.5.6, not 5.5.6.dev).
+          VERSION="${VERSION:-${name%%[-.][a-z]*}}"
+          BASE="${BASE:-$pubspec_build}"
+        fi
         [[ "$BASE" =~ ^[0-9]+$ ]] || { echo "::error::base '$BASE' is not a whole number"; exit 1; }
         # matching-refs returns [] when there is no tag yet; an API error fails the step.
         taken="$(gh api "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/ios-build/$VERSION/" --jq '.[].ref' \
@@ -44,4 +60,5 @@ runs:
         fi
         recorded="$(echo $taken | tr ' ' ',')"
         echo "$VERSION: recorded builds ${recorded:-none} (base $BASE), next $build"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
         echo "build=$build" >> "$GITHUB_OUTPUT"
