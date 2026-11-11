@@ -1,6 +1,7 @@
 import 'dart:ui' show DisplayFeature, DisplayFeatureState, DisplayFeatureType;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef AdaptiveMenuBuilder = Widget Function(BuildContext context, void Function() toggleVisibility, Widget? child);
@@ -74,11 +75,24 @@ class AdaptiveMenu extends HookConsumerWidget {
       return menuItems;
     }
 
+    // MenuAnchor keeps the menu inside the overlay it opens in, but not clear
+    // of the system bars, so near the bottom of the screen (a profile in the
+    // bottom sheet) its last item ended up under the Android navigation bar.
+    // The only obstructions its layout respects are display features (a
+    // foldable's hinge), so the bars are reported as such: the menu then opens
+    // above the anchor when it does not fit below, like at a hinge.
+    // Display features are in the coordinates of that overlay, which is not
+    // always the whole screen: a page of the home shell has its own, ending
+    // above the bottom navigation. So the bars are measured against it when
+    // the menu opens, once it has been laid out.
+    final systemBars = useState(const <DisplayFeature>[]);
+
     final menu = MenuAnchor(
       builder: (context, controller, child) => builder(context, () {
         if (controller.isOpen) {
           controller.close();
         } else {
+          systemBars.value = _systemBars(context);
           controller.open();
         }
       }, child),
@@ -86,29 +100,29 @@ class AdaptiveMenu extends HookConsumerWidget {
       child: child,
     );
 
-    // MenuAnchor positions the menu against the whole screen and ignores the
-    // system bars, so near the bottom of the screen (a profile in the bottom
-    // sheet) its last item ended up under the Android navigation bar. The only
-    // obstructions its layout respects are display features (a foldable's
-    // hinge), so report the status and navigation bars as such: the menu then
-    // opens above the anchor when it does not fit below, like at a hinge.
-    // The insets come from the view itself, since the sheet and the list the
-    // anchor sits in have already removed them from its MediaQuery.
-    final view = MediaQueryData.fromView(View.of(context));
-    final top = view.padding.top;
-    final bottom = view.padding.bottom + view.viewInsets.bottom;
-    if (top <= 0 && bottom <= 0) return menu;
+    // Always wrapped, so opening the menu does not change the tree above it.
     final mediaQuery = MediaQuery.of(context);
     return MediaQuery(
-      data: mediaQuery.copyWith(
-        displayFeatures: [
-          ...mediaQuery.displayFeatures,
-          if (top > 0) _systemBar(Rect.fromLTWH(0, 0, view.size.width, top)),
-          if (bottom > 0) _systemBar(Rect.fromLTWH(0, view.size.height - bottom, view.size.width, bottom)),
-        ],
-      ),
+      data: mediaQuery.copyWith(displayFeatures: [...mediaQuery.displayFeatures, ...systemBars.value]),
       child: menu,
     );
+  }
+
+  /// The parts of the status and navigation bars (and the keyboard) that cover the overlay the menu
+  /// opens in, in that overlay's coordinates. The insets come from the view itself, since the sheet
+  /// and the list the anchor sits in have already removed them from its MediaQuery.
+  static List<DisplayFeature> _systemBars(BuildContext context) {
+    final overlay = Overlay.maybeOf(context)?.context.findRenderObject();
+    if (overlay is! RenderBox || !overlay.hasSize) return const [];
+    final view = MediaQueryData.fromView(View.of(context));
+    final origin = overlay.localToGlobal(Offset.zero);
+    final size = overlay.size;
+    final top = view.padding.top - origin.dy;
+    final bottom = view.size.height - view.padding.bottom - view.viewInsets.bottom - origin.dy;
+    return [
+      if (top > 0) _systemBar(Rect.fromLTRB(0, 0, size.width, top)),
+      if (bottom < size.height) _systemBar(Rect.fromLTRB(0, bottom, size.width, size.height)),
+    ];
   }
 
   static DisplayFeature _systemBar(Rect bounds) =>

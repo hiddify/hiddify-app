@@ -88,12 +88,8 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                   const Gap(16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text(
-                      t.intro.banner,
-                      style: theme.textTheme.bodyLarge,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    // wraps: in most languages the line is longer than a phone is wide, and was cut with "…"
+                    child: Text(t.intro.banner, style: theme.textTheme.bodyLarge, textAlign: TextAlign.center),
                   ),
                   const Gap(24),
                   const LocalePrefTile(),

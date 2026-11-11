@@ -25,7 +25,7 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
   final String Function(T e) getTitle;
   final VoidCallback? onReset;
 
-  /// A picture at the end of an option's row, such as a flag; [showFlag] reads one from the title.
+  /// A picture before an option's title, such as a flag; [showFlag] reads one from the title.
   final Widget? Function(T e)? getSecondary;
 
   @override
@@ -43,9 +43,17 @@ class SettingPickerDialog<T> extends HookConsumerWidget with PresLogger {
               mainAxisSize: MainAxisSize.min,
               children: options.map((e) {
                 final title = getTitle(e);
+                final picture = getSecondary?.call(e) ?? (showFlag ? ChoicePreferenceWidget.flagByTitle(title) : null);
                 return RadioListTile<T>(
-                  title: Text(title),
-                  secondary: getSecondary?.call(e) ?? (showFlag ? ChoicePreferenceWidget.flagByTitle(title) : null),
+                  title: picture == null
+                      ? Text(title)
+                      : Row(
+                          children: [
+                            picture,
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(title)),
+                          ],
+                        ),
                   value: e,
                   // the remote starts on the current choice
                   autofocus: e == selected,

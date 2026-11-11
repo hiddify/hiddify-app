@@ -22,7 +22,6 @@ class LocalePrefTile extends ConsumerWidget {
       title: Text(t.pages.settings.general.locale),
       subtitle: Text(locale.localeName),
       leading: const Icon(Icons.translate_rounded),
-      // Persian wears the lion and sun, as Iran does in the region row below it
       trailing: _localeFlag(locale, size: 40),
       onTap: () async {
         final selectedLocale = await ref
@@ -50,8 +49,9 @@ final _localeOrder = [
   ...AppLocale.values.where((e) => e != AppLocale.en && e != AppLocale.fa),
 ];
 
+/// The language's flag (Persian's with the lion and sun); none for a language without one.
 Widget? _localeFlag(AppLocale locale, {double size = 32}) =>
-    locale == AppLocale.fa ? IPCountryFlag(countryCode: 'ir', size: size) : null;
+    locale.flagCountryCode.isEmpty ? null : IPCountryFlag(countryCode: locale.flagCountryCode, size: size);
 
 class EnableAnalyticsPrefTile extends ConsumerWidget {
   const EnableAnalyticsPrefTile({super.key, this.onChanged});

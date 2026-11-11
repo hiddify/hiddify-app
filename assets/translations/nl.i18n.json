@@ -1,0 +1,1279 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "Starten",
+    "version": "Versie",
+    "ok": "OK",
+    "cancel": "Annuleren",
+    "kContinue": "Doorgaan",
+    "undo": "Ongedaan maken",
+    "showMore": "Meer tonen",
+    "showLess": "Minder tonen",
+    "filter": "Filter",
+    "all": "Alles",
+    "pause": "Pauzeren",
+    "resume": "Hervatten",
+    "clear": "Wissen",
+    "close": "Sluiten",
+    "auto": "Automatisch",
+    "manually": "Handmatig",
+    "name": "Naam",
+    "url": "URL",
+    "add": "Toevoegen",
+    "clipboard": "Klembord",
+    "addToClipboard": "Kopiëren naar klembord",
+    "qrCode": "QR-code",
+    "free": "Gratis",
+    "warp": "WARP",
+    "fragment": "Fragment",
+    "help": "Help",
+    "save": "Opslaan",
+    "update": "Bijwerken",
+    "pin": "Vastzetten",
+    "unpin": "Losmaken",
+    "share": "Delen",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "discard": "Verwerpen",
+    "import": "Importeren",
+    "export": "Exporteren",
+    "later": "Later",
+    "ignore": "Negeren",
+    "quit": "Afsluiten",
+    "notSet": "Niet ingesteld",
+    "hide": "Verbergen",
+    "exit": "Afsluiten",
+    "reset": "Herstellen",
+    "done": "Klaar",
+    "decline": "Weigeren",
+    "agree": "Akkoord",
+    "empty": "Leeg",
+    "unknown": "Onbekend",
+    "hidden": "Verborgen",
+    "timeout": "Time-out",
+    "sort": "Sorteren",
+    "dashboard": "Dashboard",
+    "disable": "Uitschakelen",
+    "psiphon": "Psiphon",
+    "profile": "Profiel",
+    "configuration": "Configuratie",
+    "file": "Bestand",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n dag",
+        "other": "$n dagen"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n uur",
+        "other": "$n uur"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "Toestemming geweigerd"
+      },
+      "export": {
+        "clipboard": {
+          "success": "Gekopieerd naar klembord",
+          "failure": "Kopiëren naar klembord mislukt",
+          "contentTooLarge": "De inhoud is te groot. Exporteer in plaats daarvan naar een bestand."
+        },
+        "file": {
+          "success": "JSON-bestand gemaakt",
+          "failure": "Bestand maken mislukt"
+        }
+      },
+      "import": {
+        "confirm": "Import bevestigen",
+        "success": "Geïmporteerd",
+        "failure": "Importeren mislukt"
+      },
+      "autoSave": {
+        "success": "Wijzigingen automatisch opgeslagen"
+      }
+    }
+  },
+  "intro": {
+    "banner": "Alles wat je nodig hebt voor een onbeperkt internet",
+    "termsAndPolicyCaution(rich)": "Door door te gaan ga je akkoord met ${tap(@:pages.about.termsAndConditions)}",
+    "info(rich)": "Gemaakt met ❤️ door Hiddify. ${tap_source(Open source)} en ${tap_license(Licentie)}"
+  },
+  "pages": {
+    "home": {
+      "title": "Start",
+      "quickSettings": "Snelle instellingen"
+    },
+    "proxies": {
+      "title": "Proxy’s",
+      "sort": "Proxy’s sorteren",
+      "testDelay": "Vertraging testen",
+      "empty": "Geen proxy’s beschikbaar",
+      "connectToSeeProxies": "Maak verbinding om proxy’s te zien",
+      "loadFailed": "Proxy’s laden mislukt. Tik om het opnieuw te proberen.",
+      "activeProxy": "Actieve proxy",
+      "unknownIp": "Onbekend IP-adres",
+      "checkingIp": "IP-adres controleren…",
+      "switchFailed": "Overschakelen naar deze proxy is mislukt. Probeer het opnieuw.",
+      "notResponding": "Reageert niet",
+      "noneResponding": "Geen enkele proxy reageert",
+      "sortOptions": {
+        "unsorted": "Standaard",
+        "name": "Alfabetisch",
+        "delay": "Op vertraging",
+        "usage": "Op gebruik",
+        "upload": "Op uploadsnelheid",
+        "download": "Op downloadsnelheid"
+      },
+      "ipInfo": {
+        "address": "IP-adres",
+        "country": "Land",
+        "organization": "Organisatie"
+      },
+      "delay": {
+        "result": "Vertraging: ${delay}ms",
+        "timeout": "Time-out van vertragingstest",
+        "unavailable": "Niet beschikbaar",
+        "testing": "Vertraging: testen…"
+      },
+      "status": {
+        "connecting": "Verbinden",
+        "registering": "Registreren",
+        "failed": "Mislukt",
+        "ready": "Gereed",
+        "searching": "Zoeken",
+        "reconnecting": "Opnieuw verbinden"
+      },
+      "signalStyle": "Signaalstijl",
+      "keepTop": {
+        "picking": "De $keep snelste van $count zoeken…",
+        "pickingBody": "Alle proxy’s worden één keer getest. Daarna blijven alleen de snelste actief.",
+        "thenFastest": "Na de test blijven alleen de $keep snelste$where actief.",
+        "thenWorking": "Na de test blijven alleen de werkende$where actief.",
+        "thenAll": "Na de test blijven alleen de proxy’s$where actief.",
+        "inRegions": " in $flags",
+        "pickingAnswering": "Alle $count testen…",
+        "keptAnswering": "$n werkende proxy’s$where actief",
+        "kept": "De $n snelste zijn actief",
+        "keptFastest": "De $n snelste$where zijn actief",
+        "keptBody": "$paused andere proxy’s zijn gepauzeerd om batterij en data te besparen.",
+        "showAll": "Alle $count tonen",
+        "big": "$count proxy’s zijn actief",
+        "bigBody": "Houd alleen de $keep snelste actief om batterij en data te besparen.",
+        "keep": "De $keep snelste houden",
+        "change": "Aantal wijzigen",
+        "chosen": "Je $n gekozen proxy’s zijn actief",
+        "choose": "Kiezen"
+      },
+      "upload": {
+        "test": "Uploadsnelheid testen",
+        "failed": "De snelheidstest kon niet starten",
+        "hint": "Tikken: uploadsnelheid · Ingedrukt houden: downloadsnelheid",
+        "hintBoth": "Tikken: beide snelheden · Ingedrukt houden: downloadsnelheid"
+      },
+      "speedTest": {
+        "title": "Snelheidstest",
+        "what": "Wat testen",
+        "download": "Download",
+        "upload": "Upload",
+        "amount": "Hoeveelheid per proxy",
+        "proxies": "Te testen proxy’s",
+        "proxiesHint": "De snelste volgens ping",
+        "all": "Alle",
+        "fastest": "$n snelste",
+        "through": "$n MB via elk van de $count snelste",
+        "throughAll": "$n MB via elk van de $count proxy’s",
+        "throughEach": "$n MB via elke proxy",
+        "start": "Test starten",
+        "save": "Opslaan",
+        "testDownload": "Downloadsnelheid testen",
+        "both": "Beide",
+        "bothWays": "download en upload",
+        "amountHint": "meer is nauwkeuriger",
+        "clear": "Opgeslagen resultaten wissen",
+        "cleared": "Gewist",
+        "which": "Welke proxy’s",
+        "shown": "Getoond ($n)",
+        "chosen": "Gekozen ($n)"
+      },
+      "single": {
+        "share": "Delen",
+        "edit": "Bewerken",
+        "shareTitle": "Proxy delen",
+        "configHint": "Alleen deze proxy, en elke proxy waarlangs hij verbindt. Hiddify importeert hem zoals elke configuratie.",
+        "editTitle": "Bewerken als nieuw profiel",
+        "editMsg": "“${name}” wordt gekopieerd naar een nieuw profiel dat je kunt bewerken. Het origineel blijft ongewijzigd, omdat een abonnement bij elke update zijn proxy’s vervangt.",
+        "editConfirm": "Kopiëren en bewerken",
+        "savedAsProfile": "Gekopieerd naar het nieuwe profiel “${name}”",
+        "failed": "De configuratie van deze proxy kon niet worden gelezen"
+      }
+    },
+    "profiles": {
+      "title": "Profielen",
+      "add": "Profiel toevoegen",
+      "fromPhone": {
+        "title": "Toevoegen vanaf je telefoon",
+        "scan": "Scan deze code met de camera van je telefoon, plak een abonnementslink en verstuur die.",
+        "sameNetwork": "Je telefoon en deze tv moeten op hetzelfde wifi-netwerk zitten.",
+        "noNetwork": "Deze tv zit niet op een lokaal netwerk. Maak verbinding met wifi om een link vanaf je telefoon toe te voegen.",
+        "locked": "Er zijn te veel verkeerde codes geprobeerd, dus dit is vergrendeld. Sluit dit en open het opnieuw voor een nieuwe code.",
+        "received": "Ontvangen van je telefoon",
+        "from": "Van $address",
+        "page": {
+          "title": "Naar Hiddify op je tv sturen",
+          "intro": "Voeg in vier snelle stappen een abonnement toe aan je tv, zonder het met de afstandsbediening te typen.",
+          "steps": {
+            "network": {
+              "title": "Maak verbinding met hetzelfde wifi",
+              "body": "Je telefoon en de tv moeten op hetzelfde wifi-netwerk zitten, anders kan deze pagina de tv niet bereiken."
+            },
+            "copy": {
+              "title": "Kopieer je link",
+              "body": "Kopieer de abonnementslink van je aanbieder, of een andere proxylink of configuratie."
+            },
+            "paste": {
+              "title": "Plak hem hier",
+              "body": "Tik op het vak hieronder, plak de link en tik op “Naar tv sturen”."
+            },
+            "confirm": {
+              "title": "Bevestig op de tv",
+              "body": "De link verschijnt op de tv. Druk met de afstandsbediening op Importeren. Er wordt niets toegevoegd voordat je dat doet."
+            }
+          },
+          "label": "Abonnementslink",
+          "hint": "Plak een abonnementslink of configuratie",
+          "send": "Naar tv sturen",
+          "sentTitle": "Naar je tv gestuurd",
+          "sent": "Druk nu op de tv op Importeren om hem toe te voegen. Hieronder kun je nog een link sturen.",
+          "empty": "Plak eerst een link.",
+          "footer": "Deze pagina werkt alleen zolang “Profiel toevoegen” op de tv is geopend, en alleen op je lokale netwerk."
+        }
+      },
+      "update": "Profiel bijwerken",
+      "viewAllProfiles": "Alle profielen bekijken",
+      "activeProfileName": "Naam van actief profiel: “${name}”",
+      "nonActiveProfileName": "“${name}” kiezen als actief profiel",
+      "freeSubNotFound": "Geen gratis abonnement gevonden",
+      "freeSubNotFoundForRegion": "Geen gratis abonnement gevonden voor “${region}”",
+      "failedToLoad": "Laden mislukt",
+      "updateSubscriptions": "Abonnementen bijwerken",
+      "share": {
+        "title": "Profiel delen",
+        "scanHint": "Scan dit met Hiddify op een ander apparaat om dit profiel toe te voegen",
+        "link": "Abonnementslink",
+        "config": "Configuratie",
+        "configHint": "De volledige JSON waarmee dit profiel draait, inclusief je instellingen",
+        "configFailed": "De configuratie kon niet worden opgebouwd",
+        "copy": "Kopiëren",
+        "shareFile": "Delen",
+        "saveFile": "Opslaan",
+        "tooLargeToCopy": "Te groot voor het klembord: deel of bewaar het als bestand",
+        "toTv": {
+          "button": "Naar tv sturen",
+          "scanHint": "Open Hiddify op de tv en tik op + om een profiel toe te voegen. Scan dan de code die verschijnt. Beide apparaten moeten op hetzelfde wifi zitten.",
+          "sent": "Verstuurd. Druk op de tv op Importeren om het toe te voegen.",
+          "notTvCode": "Dat is geen Hiddify tv-code. Tik op de tv op + om een profiel toe te voegen en de code te tonen.",
+          "expired": "De tv accepteert geen links meer met deze code. Open het scherm voor het toevoegen van een profiel op de tv opnieuw en scan de nieuwe code.",
+          "busy": "Er staan te veel links te wachten op de tv. Importeer of verwerp ze op de tv en probeer het opnieuw.",
+          "unreachable": "De tv kon niet worden bereikt. Controleer of de telefoon en de tv op hetzelfde wifi-netwerk zitten."
+        }
+      },
+      "msg": {
+        "save": {
+          "success": "Profiel opgeslagen"
+        },
+        "invalidUrl": "Ongeldige URL",
+        "add": {
+          "failure": "Profiel toevoegen mislukt"
+        },
+        "update": {
+          "success": "Profiel bijgewerkt",
+          "failure": "Profiel bijwerken mislukt",
+          "failureNamed": "“${name}” bijwerken mislukt",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profiel bijgewerkt",
+            "other": "$count profielen bijgewerkt"
+          },
+          "bulkPartial": "${success} bijgewerkt\n${failed} mislukt: ${names}"
+        },
+        "delete": {
+          "success": "Profiel verwijderd",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profiel verwijderd",
+            "other": "$count profielen verwijderd"
+          },
+          "bulkPartial": "${deleted} van ${total} profielen verwijderd"
+        }
+      },
+      "removeInactive": {
+        "action": "Inactieve abonnementen verwijderen",
+        "title": "Inactieve abonnementen verwijderen",
+        "hint": "Deze abonnementen werken niet meer. De aangevinkte worden verwijderd. Vink weg wat je wilt houden.",
+        "none": "Geen inactieve abonnementen",
+        "remove(plural, param=count)": {
+          "one": "$count verwijderen",
+          "other": "$count verwijderen"
+        },
+        "reason": {
+          "expired": "Verlopen",
+          "expiredOn": "Verlopen op ${date}",
+          "noTraffic": "Geen verkeer meer over",
+          "updateFailing": "Updates blijven mislukken",
+          "updateFailingSince": "Updates mislukken sinds ${date}"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "Profiel",
+      "lastUpdate": "Laatste update",
+      "form": {
+        "nameHint": "Profielnaam",
+        "emptyName": "Naam is verplicht",
+        "invalidUrl": "Ongeldige URL",
+        "urlHint": "Volledige configuratie-URL",
+        "disableAutoUpdate": "Automatisch bijwerken uitschakelen",
+        "autoUpdateInterval": "Interval voor automatisch bijwerken",
+        "loading": "Profiel toevoegen…",
+        "adminPreference": "Beheerdersrechten",
+        "adminPreferenceAskEachTime": "Elke keer vragen",
+        "adminPreferencePreferAdmin": "Altijd beheerdersrechten gebruiken",
+        "adminPreferencePreferNoAdmin": "Altijd doorgaan zonder beheerdersrechten",
+        "adminPreferenceReset": "Elke keer vragen naar beheerdersrechten"
+      }
+    },
+    "logs": {
+      "title": "Logboeken",
+      "category": "Categorie",
+      "level": "Niveau",
+      "recentLogs": "Recente logboeken",
+      "recentLogsMsg": "Wat je op deze pagina ziet",
+      "errorLog": "Logboek van app en kern",
+      "errorLogMsg": "Fouten van beide, over meerdere sessies",
+      "coreLog": "Kernlogboek",
+      "coreLogMsg": "Alles wat de kern heeft vastgelegd",
+      "coreCrash": "Kerncrash",
+      "coreCrashMsg": "Wat de kern deed toen hij voor het laatst crashte",
+      "exportToFile": "Exporteren naar bestand",
+      "linesMatch": "$count regels komen overeen",
+      "fileSaved": "Bestand opgeslagen",
+      "fileSaveFailed": "Het bestand kon niet worden opgeslagen",
+      "coreLogLevel": "Kernniveau",
+      "coreLogLevelMsg": "Gaat in na opnieuw verbinden",
+      "buffer": "Buffer",
+      "diagnostics": "Diagnoserapport",
+      "diagnosticsMsg": "Crashrapporten, logboeken en je instellingen zonder servers of wachtwoorden, als één zipbestand"
+    },
+    "about": {
+      "title": "Over",
+      "notAvailableMsg": "Je gebruikt de nieuwste versie",
+      "checkForUpdate": "Op updates controleren",
+      "openWorkingDir": "Werkmap openen",
+      "sourceCode": "Broncode",
+      "telegramChannel": "Telegram-kanaal",
+      "termsAndConditions": "Algemene voorwaarden",
+      "privacyPolicy": "Privacybeleid"
+    },
+    "settings": {
+      "title": "Instellingen",
+      "resetTunnel": "VPN-profiel herstellen",
+      "options": {
+        "import": {
+          "clipboard": "Opties importeren van klembord",
+          "file": "Opties importeren uit bestand"
+        },
+        "export": {
+          "anonymousToClipboard": "Anonieme opties kopiëren naar klembord",
+          "anonymousToFile": "Anonieme opties exporteren naar bestand",
+          "allToClipboard": "Alle opties kopiëren naar klembord",
+          "allToFile": "Alle opties exporteren naar bestand"
+        },
+        "reset": "Opties herstellen"
+      },
+      "general": {
+        "title": "Algemeen",
+        "locale": "Taal",
+        "themeMode": "Thema",
+        "themeModes": {
+          "system": "Systeemstandaard",
+          "dark": "Donker",
+          "light": "Licht",
+          "black": "Zwart"
+        },
+        "enableAnalytics": "Analyses inschakelen",
+        "enableAnalyticsMsg": "Stuur analyses en crashrapporten van je apparaat om de app te helpen verbeteren",
+        "autoIpCheck": "IP-adres van de verbinding automatisch controleren",
+        "reduceAnimations": "Minder animaties",
+        "reduceAnimationsMsg": "Houd de verbindingsknop stil en stop herhalende effecten om batterij te besparen",
+        "dynamicNotification": "Snelheid tonen in melding",
+        "hapticFeedback": "Haptische feedback",
+        "alwaysOnVpn": "Altijd-aan-VPN",
+        "actionAtClosing": "Bij het sluiten van het venster",
+        "autoStart": "Starten bij inloggen",
+        "silentStart": "Geminimaliseerd starten",
+        "ignoreBatteryOptimizations": "Batterijoptimalisatie uitschakelen",
+        "ignoreBatteryOptimizationsMsg": "Beperkingen opheffen voor optimale VPN-prestaties",
+        "memoryLimit": "Geheugenlimiet",
+        "memoryLimitMsg": "Schakel dit in als je geheugenfouten krijgt of de app vaak crasht",
+        "connectionTestUrl": "URL voor verbindingstest",
+        "urlTestInterval": "Interval voor URL-test",
+        "clashApiPort": "Clash API-poort",
+        "useSystemTlsEngine": "TLS van het systeem gebruiken indien beschikbaar",
+        "useSystemTlsEngineMsg": "Verbindingen zonder TLS-vingerafdruk gebruiken de TLS van macOS, iOS of Windows zodra die op dit apparaat een controle doorstaat. Anders lijken ze op Chrome.",
+        "uploadTestSize": "Grootte van uploadtest",
+        "megabytes": "$n MB",
+        "speedTest": "Snelheidstest"
+      },
+      "routing": {
+        "title": "Routering",
+        "routeRule": {
+          "add": "Regel toevoegen",
+          "delete": "Regel verwijderen",
+          "duplicate": "Regel dupliceren",
+          "duplicated": "Gekopieerd als nieuwe regel: pas hem aan zoals je wilt",
+          "copyAll": "Alles kopiëren",
+          "options": {
+            "import": {
+              "clipboard": "Regels importeren van klembord",
+              "file": "Regels importeren uit bestand"
+            },
+            "export": {
+              "clipboard": "Regels kopiëren naar klembord",
+              "file": "Regels opslaan in bestand"
+            },
+            "reset": "Standaardregels herstellen"
+          },
+          "rule": {
+            "title": "Regel",
+            "onlyTunMode": "Alleen beschikbaar in TUN-modus",
+            "notAvailableInThisPlatform": "Niet beschikbaar op dit platform",
+            "canNotBeEmpty": "Mag niet leeg zijn",
+            "validUrlEx": "https://example.com",
+            "validUrl": "Geldige “URL”, zoals\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe of google chrome of chrome",
+            "validProcessName": "Geldige “Procesnaam”, zoals\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "Geldig “Procespad”, zoals\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 of 1:65000",
+            "validPortRange": "Geldige “Poort” of “Poortbereik”, zoals\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8, 10.0.0.0/24 of fd00::/8",
+            "validIpCidr": "Geldige IP-CIDR, zoals\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com of dl.google.com",
+            "validDomain": "Geldig “Domein”, zoals\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com of .ir",
+            "validDomainSuffix": "Geldig “Domeinachtervoegsel”, zoals\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "Een ingebouwde regel kan niet worden gewijzigd. Dupliceer hem en pas de kopie aan.",
+            "tileTitle(map)": {
+              "name": "Naam",
+              "outbound": "Uitgaand bij overeenkomst",
+              "rule_set": "URL-set",
+              "package_name": "Pakketnamen",
+              "process_name": "Procesnamen",
+              "process_path": "Procespaden",
+              "network": "Netwerken",
+              "port_range": "Doelpoorten",
+              "source_port_range": "Bronpoorten",
+              "protocol": "Protocol",
+              "ip_cidr": "IP-CIDR van bestemming",
+              "source_ip_cidr": "IP-CIDR van bron",
+              "domain": "Domein",
+              "domain_suffixe": "Domeinachtervoegsel",
+              "domain_keyword": "Domeintrefwoord",
+              "domain_regex": "Domein-regex"
+            },
+            "outbound(map)": {
+              "proxy": "Proxy",
+              "direct": "Direct",
+              "direct_with_fragment": "Direct met fragment",
+              "block": "Blokkeren"
+            },
+            "network(map)": {
+              "all": "Alle",
+              "tcp": "TCP",
+              "udp": "UDP"
+            },
+            "protocol(map)": {
+              "": "Alle",
+              "tls": "TLS",
+              "http": "HTTP",
+              "quic": "QUIC",
+              "stun": "STUN",
+              "dns": "DNS",
+              "bittorrent": "BitTorrent"
+            }
+          },
+          "genericList": {
+            "addNew": "Nieuwe waarde toevoegen",
+            "update": "Waarde bijwerken",
+            "clearList": "Lijst wissen",
+            "clearListMsg": "Alle items worden verwijderd"
+          }
+        },
+        "builtinRules": {
+          "tag": "Ingebouwde regel",
+          "bypassLan": "Lokaal netwerk omzeilen",
+          "systemDirect": {
+            "apple": "Apple-diensten",
+            "microsoft": "Microsoft-diensten",
+            "android": "Android-diensten",
+            "linux": "Linux-updates"
+          },
+          "blockAds": "Advertenties en malware",
+          "bypassRegion": "Sites in $region"
+        },
+        "appBasedRouting": {
+          "title": "Routering per app",
+          "hideSysApps": "Systeem-apps verbergen",
+          "listTitle": {
+            "bypass": "Omzeilde apps",
+            "proxy": "Apps via proxy"
+          },
+          "chooseApps": "Apps kiezen",
+          "apps": {
+            "one": "app",
+            "other": "apps"
+          },
+          "moreApps": {
+            "one": "+$n app",
+            "other": "+$n apps"
+          },
+          "autoTag": "Automatisch",
+          "outsideVpn": "Buiten de VPN",
+          "ruleWontApply": "Buiten de VPN · regel is niet van toepassing",
+          "notInstalled": "Niet geïnstalleerd",
+          "share": {
+            "invite": "Help de automatische selectie te verbeteren",
+            "removed": {
+              "one": "$n verwijderd",
+              "other": "$n verwijderd"
+            },
+            "added": {
+              "one": "$n toegevoegd",
+              "other": "$n toegevoegd"
+            },
+            "title": "Deel je wijzigingen",
+            "where": "Opent een openbaar issue op GitHub, al ingevuld met deze app-namen. Verstuur het daar om ze te delen. Je hebt een GitHub-account nodig.",
+            "action": "Doorgaan op GitHub"
+          },
+          "options": {
+            "import": {
+              "clipboard": "Selectie importeren van klembord",
+              "file": "Selectie importeren uit bestand",
+              "msg": "Importeren vervangt je huidige selecties. Doorgaan?"
+            },
+            "export": {
+              "clipboard": "Selectie kopiëren naar klembord",
+              "file": "Selectie exporteren naar bestand"
+            },
+            "clearAllSelections": "Alle selecties wissen"
+          },
+          "modes": {
+            "proxy": "Alleen via proxy",
+            "bypass": "Omzeilen"
+          },
+          "autoSelection": {
+            "title": "Automatische selectie op basis van $region",
+            "performNow": "Nu bijwerken",
+            "updated": {
+              "zero": "Vandaag bijgewerkt",
+              "one": "$n dag geleden bijgewerkt",
+              "other": "$n dagen geleden bijgewerkt"
+            },
+            "noList": "Geen lijst voor deze regio",
+            "loadFailed": "De lijst kon niet worden geladen",
+            "restore": {
+              "one": "$n automatische keuze herstellen",
+              "other": "$n automatische keuzes herstellen"
+            },
+            "restored": {
+              "one": "$n automatische keuze hersteld",
+              "other": "$n automatische keuzes hersteld"
+            }
+          }
+        },
+        "region": "Regio",
+        "regions": {
+          "ir": "Iran (ir)",
+          "cn": "China (cn)",
+          "ru": "Rusland (ru)",
+          "af": "Afghanistan (af)",
+          "id": "Indonesië (id)",
+          "tr": "Turkije (tr)",
+          "br": "Brazilië (br)",
+          "other": "Overig"
+        },
+        "balancerStrategy": {
+          "title": "Balanceerstrategie",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistente hash",
+          "stickySession": "Vaste sessie",
+          "roundRobinDescription": "Elke verbinding gebruikt de volgende server, dus sites kunnen je IP-adres zien veranderen",
+          "consistentHashDescription": "Elke site gebruikt altijd dezelfde server",
+          "stickySessionDescription": "Elke site houdt een willekeurige server tot je opnieuw verbindt"
+        },
+        "defaultProxy": {
+          "title": "Standaardproxy",
+          "lowest": "Laagste ping",
+          "balance": "Verdelen",
+          "first": "Eerste proxy",
+          "lowestDescription": "Tot je een proxy kiest, wordt de snelste gebruikt",
+          "balanceDescription": "Tot je een proxy kiest, worden verbindingen over alle proxy’s verdeeld",
+          "firstDescription": "Tot je een proxy kiest, wordt de eerste van het profiel gebruikt"
+        },
+        "resolveDestination": "Bestemming omzetten",
+        "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "Waarom staat IPv6 uit?",
+        "ipv6RouteTurnOnTitle": "IPv6 inschakelen?",
+        "ipv6RouteTurnOn": "Inschakelen",
+        "ipv6RouteHelp": "De meeste proxy’s hebben geen IPv6 aan hun uitgang.\n\nEen verbinding die de proxy niet kan doorgeven, stopt meteen na het openen. Browsers proberen het dan niet opnieuw via IPv4, waardoor Google en YouTube niet laden.\n\nAls dit aan staat, wordt elke proxy één keer gecontroleerd bij de verbindingstest. IPv6 wordt alleen gebruikt via een proxy die het doorgeeft. Al het andere gaat ongemerkt via IPv4.\n\nIPv6 loopt altijd binnen de VPN, nooit eromheen.",
+        "ipv6Modes": {
+          "ipv4Only": "Uit (alleen IPv4)",
+          "preferIpv4": "Aan, eerst IPv4",
+          "preferIpv6": "Aan, eerst IPv6",
+          "ipv4OnlyDescription": "Apps gebruiken alleen IPv4. IPv6 wordt direct geweigerd.",
+          "preferIpv4Description": "Eerst IPv4. IPv6 alleen via een proxy waarvan is bevestigd dat hij het doorgeeft.",
+          "preferIpv6Description": "Eerst IPv6, alleen via een proxy waarvan is bevestigd dat hij het doorgeeft."
+        }
+      },
+      "dns": {
+        "title": "DNS",
+        "remoteDns": "Externe DNS",
+        "remoteDnsDomainStrategy": "Domeinstrategie van externe DNS",
+        "directDns": "Resolver voor uitgaande server (direct)",
+        "directDnsDomainStrategy": "Uitgaande domeinstrategie",
+        "enableFakeDns": "Nep-DNS inschakelen",
+        "domainStrategy": {
+          "auto": "Automatisch",
+          "preferIpv6": "IPv6 verkiezen",
+          "preferIpv4": "IPv4 verkiezen",
+          "ipv4Only": "Alleen IPv4",
+          "ipv6Only": "Alleen IPv6"
+        }
+      },
+      "inbound": {
+        "title": "Inkomend",
+        "serviceMode": "Servicemodus",
+        "serviceModes": {
+          "proxy": "Alleen proxyservice",
+          "systemProxy": "Systeemproxy instellen",
+          "tun": "VPN",
+          "router": "Router (heel het netwerk)"
+        },
+        "shortServiceModes": {
+          "proxy": "Proxy",
+          "systemProxy": "Systeemproxy",
+          "tun": "VPN",
+          "router": "Router"
+        },
+        "strictRoute": "Strikte route",
+        "tunImplementation": "TUN-implementatie",
+        "tunImplementations": {
+          "sing15": "Sing 15",
+          "mixed": "Gemengd",
+          "system": "Systeem",
+          "gvisor": "gVisor"
+        },
+        "mixedPort": "Proxypoort (SOCKS5/4, HTTP)",
+        "tproxyPort": "Poort voor transparante proxy",
+        "directPort": "Directe poort",
+        "redirectPort": "Omleidingspoort",
+        "lanSharing": "Delen op lokaal netwerk",
+        "connectionSharing": "Verbinding delen",
+        "qrCode": "QR-code",
+        "closedInVpn": "gesloten in VPN-modus, tenzij gedeeld",
+        "proxySecret": "Proxygeheim",
+        "noSecret": "Geen geheim: elke app of elk apparaat dat de poort bereikt, kan hem gebruiken",
+        "generateSecret": "Nieuw genereren",
+        "removeSecret": "Het geheim verwijderen?",
+        "removeSecretMsg": "Zonder geheim kan elke app op dit apparaat, en elk apparaat op het netwerk tijdens het delen, de proxy gebruiken zonder gebruikersnaam of wachtwoord. Verwijder het op eigen risico.",
+        "localProxy": "Lokale proxy",
+        "localProxyInVpn": "Open houden in VPN-modus",
+        "localProxyInVpnHint": "Apps gebruiken de VPN al; alleen voor apps die de proxy gebruiken",
+        "localProxyAuth": "Wachtwoord vereisen",
+        "localProxyAuthHint": "Sommige apps, zoals browsers, kunnen geen SOCKS-wachtwoord versturen",
+        "notAsSystemProxy": "Niet gevraagd als systeemproxy, want die kan er geen versturen",
+        "lanGroup": "Delen op lokaal netwerk",
+        "lanSharingPort": "Poort voor delen",
+        "otherPorts": "Overige poorten",
+        "closedInVpnLocal": "gesloten in VPN-modus"
+      },
+      "tlsTricks": {
+        "title": "TLS-trucs",
+        "enable": "Fragment inschakelen",
+        "packets": "Fragmentatiepakketten",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
+        "size": "Fragmentgrootte",
+        "sleep": "Fragmentpauze",
+        "mixedSniCase": {
+          "enable": "Gemengde SNI-hoofdletters inschakelen"
+        },
+        "padding": {
+          "enable": "Padding inschakelen",
+          "size": "Paddinggrootte"
+        }
+      },
+      "chain": {
+        "quick": {
+          "off": "Uit",
+          "extraSecurity": {
+            "title": "Extra beveiliging",
+            "subtitle": "Als je de proxy niet vertrouwt",
+            "ipBy": "Je IP-adres wordt bepaald door $mode",
+            "notTracked": "Je VPN-aanbieder kan je verkeer niet zien",
+            "forPublic": "Goed voor openbare en anonieme proxy’s",
+            "slower": "Kan de snelheid verlagen"
+          },
+          "unblocker": {
+            "title": "Proxy-unblocker",
+            "subtitle": "Helpt de proxy langs filtering",
+            "mayConnect": "Een gefilterde proxy kan toch verbinden",
+            "personalOnly": "Alleen nuttig voor een persoonlijke proxy",
+            "notForPublic": "Niet geschikt voor openbare proxy’s",
+            "slower": "De proxy wordt iets langzamer"
+          }
+        },
+        "title": "Keten",
+        "subtitle": "Extra beveiliging en unblocker",
+        "finalIp": "Eind-IP",
+        "levels": {
+          "app": {
+            "title": "App",
+            "msg": "Startpunt: het verkeer van je app komt hier de keten in en gaat door de volgende lagen om de laatste omzeiling voor te bereiden"
+          },
+          "extraSecurity": {
+            "title": "Extra beveiliging",
+            "msg": "Voegt een extra schild toe om je gegevens privé te houden, zelfs als je hoofdprofiel niet te vertrouwen is"
+          },
+          "mainProfile": {
+            "title": "Hoofdprofiel"
+          },
+          "unblocker": {
+            "title": "Unblocker",
+            "msg": "Helpt netwerkbeperkingen te omzeilen. Als de helper verbindt, kan je hoofdprofiel nog steeds werken, ook als het nu geblokkeerd is."
+          },
+          "filtering": {
+            "title": "Filtering",
+            "msg": "Laatste uitgang: je verkeer gaat door de actieve lagen, zoals Extra beveiliging, Hoofdprofiel of Unblocker. Zodra hun effecten zijn toegepast, wordt het doorgestuurd om filtering op het lokale netwerk te omzeilen."
+          }
+        },
+        "warp": {
+          "missingConfig": "WARP-configuratie ontbreekt",
+          "licenseKey": "Licentiesleutel",
+          "tunnel": "Tunnel",
+          "cleanIp": "Schoon IP-adres",
+          "port": "Poort",
+          "noise": {
+            "count": "Aantal ruispakketten",
+            "mode": "Ruismodus",
+            "size": "Ruisgrootte",
+            "delay": "Ruisvertraging",
+            "modes": {
+              "standard": "Standaard",
+              "random": "Willekeurig",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "QUIC-handshake",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (VoIP-gesprek)",
+              "stun": "STUN (videogesprek)"
+            },
+            "title": "WireGuard-ruis"
+          },
+          "endpoint": "Eindpunt",
+          "endpointSources": {
+            "profile": "Toegewezen door Cloudflare",
+            "scan": "Scannen",
+            "custom": "Aangepast"
+          },
+          "customServer": "Adres",
+          "mtu": "MTU",
+          "customized": "Aangepast",
+          "scanner": {
+            "title": "Scanner",
+            "searchNoise": "Zoekruis",
+            "maxRtt": "Max. RTT (ms)",
+            "timeout": "Time-out van sonde (ms)",
+            "count": "Te testen adressen",
+            "concurrency": "Parallelle sondes",
+            "ports": "Poorten",
+            "cidrs": "Bereiken"
+          },
+          "masque": {
+            "title": "MASQUE",
+            "vhttp": "HTTP-versie",
+            "serverName": "Servernaam",
+            "useIpv6": "IPv6 verkiezen",
+            "udpTimeout": "UDP-time-out (s)",
+            "keepalive": "UDP-keepalive (s)",
+            "packetSize": "Beginpakketgrootte",
+            "reconnectDelay": "Vertraging voor opnieuw verbinden (s)",
+            "tlsInsecure": "TLS-verificatie overslaan",
+            "fragment": "TLS fragmenteren",
+            "fragmentDelay": "Terugvalvertraging voor fragment (ms)",
+            "recordFragment": "TLS-records fragmenteren",
+            "ech": "Encrypted Client Hello",
+            "echConfig": "ECH-configuratie",
+            "echQueryServerName": "ECH-querynaam"
+          },
+          "awg": {
+            "title": "AmneziaWG",
+            "jc": "Ruispakketten",
+            "jmin": "Min. ruisgrootte",
+            "jmax": "Max. ruisgrootte"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "Serverregio kiezen",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "Oostenrijk (at)",
+            "au": "Australië (au)",
+            "be": "België (be)",
+            "bg": "Bulgarije (bg)",
+            "ca": "Canada (ca)",
+            "ch": "Zwitserland (ch)",
+            "cz": "Tsjechië (cz)",
+            "de": "Duitsland (de)",
+            "dk": "Denemarken (dk)",
+            "ee": "Estland (ee)",
+            "es": "Spanje (es)",
+            "fi": "Finland (fi)",
+            "fr": "Frankrijk (fr)",
+            "gb": "Verenigd Koninkrijk (gb)",
+            "hr": "Kroatië (hr)",
+            "hu": "Hongarije (hu)",
+            "ie": "Ierland (ie)",
+            "in": "India (in)",
+            "it": "Italië (it)",
+            "jp": "Japan (jp)",
+            "lv": "Letland (lv)",
+            "nl": "Nederland (nl)",
+            "no": "Noorwegen (no)",
+            "pl": "Polen (pl)",
+            "pt": "Portugal (pt)",
+            "ro": "Roemenië (ro)",
+            "rs": "Servië (rs)",
+            "se": "Zweden (se)",
+            "sg": "Singapore (sg)",
+            "sk": "Slowakije (sk)",
+            "us": "Verenigde Staten (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "Profiel kiezen",
+          "conduitPairingId": "Koppelings-ID van Conduit"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "Verbinding",
+      "traffic": "Verkeer",
+      "trafficLive": "Live verkeer",
+      "trafficTotal": "Totaal verkeer",
+      "uplink": "Uplink",
+      "downlink": "Downlink",
+      "speed": "Snelheid",
+      "totalTransferred": "Totaal overgedragen"
+    },
+    "subscriptionInfo": {
+      "upload": "Upload",
+      "download": "Download",
+      "total": "Totaal verkeer",
+      "expireDate": "Vervaldatum",
+      "expired": "Verlopen",
+      "noTraffic": "Tegoed op",
+      "remainingDuration(plural, param=days)": {
+        "one": "Nog $days dag",
+        "other": "Nog $days dagen"
+      },
+      "remainingUnlimited": "Onbeperkt",
+      "remainingTrafficSemanticLabel": "${consumed} van ${total} verkeer verbruikt",
+      "remainingTraffic": "Resterend verkeer",
+      "openWebPage": "Webpagina openen",
+      "support": "Ondersteuning",
+      "openLinkTitle": "Deze link openen?",
+      "openLinkAction": "Openen"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "Sorteren op",
+      "sort": {
+        "name": "Alfabetisch",
+        "lastUpdate": "Recent bijgewerkt"
+      },
+      "direction": {
+        "newestFirst": "Nieuwste eerst",
+        "oldestFirst": "Oudste eerst"
+      }
+    },
+    "warpLicense": {
+      "title": "Toestemming voor Cloudflare WARP",
+      "description(rich)": "Cloudflare WARP is een gratis WireGuard-VPN-aanbieder. Door dit in te schakelen ga je akkoord met de ${tos(Servicevoorwaarden)} en het ${privacy(Privacybeleid)} van Cloudflare WARP."
+    },
+    "psiphonLicense": {
+      "title": "Licentieovereenkomst van Psiphon",
+      "description(rich)": "Door Psiphon te gebruiken ga je akkoord met de ${tos(Servicevoorwaarden)} en erken je het ${privacy(Privacybeleid)}. Lees ze zorgvuldig voordat je doorgaat."
+    },
+    "newVersion": {
+      "title": "Update beschikbaar",
+      "msg": "Er is een nieuwe versie van @:common.appTitle beschikbaar. Nu bijwerken?",
+      "currentVersion": "Huidige versie",
+      "newVersion": "Nieuwe versie",
+      "updateNow": "Nu bijwerken",
+      "downloading": "Downloaden…",
+      "installing": "Installatieprogramma starten…",
+      "allowInstall": "Sta Hiddify toe om apps te installeren in de instellingen die zijn geopend en probeer het opnieuw.",
+      "failed": "De update kon niet worden geïnstalleerd.",
+      "openPage": "De releasepagina openen",
+      "tryAgain": "Opnieuw proberen"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "Hiermee worden alle configuratieopties overschreven met de geïmporteerde waarden. Doorgaan?"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "Profiel verwijderen",
+          "msg": "Dit profiel verwijderen? Dit kan niet ongedaan worden gemaakt."
+        }
+      },
+      "appList": {
+        "import": {
+          "msg": "Hiermee worden je apps bij Omzeilen en Alleen via proxy vervangen. Doorgaan?"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "Regel verwijderen",
+          "msg": "De regel “$rulename” verwijderen? Dit kan niet ongedaan worden gemaakt."
+        }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "Profiel toevoegen?",
+        "message": "Een externe link van “${host}” wil een nieuw profiel toevoegen. Importeren?"
+      },
+      "importRouteRuleByDeepLinkWarning": {
+        "title": "Routeregel importeren?",
+        "message": "Routeregels bepalen waarheen je verkeer gaat.\nImporteer ze alleen uit een bron die je vertrouwt."
+      }
+    },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "Alle apps via de VPN laten lopen?",
+        "vpnMode": "VPN-modus",
+        "allApps": "Alle apps",
+        "recommended": "Aanbevolen",
+        "systemProxyMode": "Systeemproxy",
+        "someApps": "Browsers en de meeste apps",
+        "switched": "Overgeschakeld naar systeemproxymodus. Je kunt dit wijzigen in Instellingen.",
+        "waitingTitle": "Wachten op beheerdersrechten",
+        "waitingMsg": "Hiddify wacht tot je de VPN-modus toestaat.",
+        "waitingWhere": "In het venster dat is geopend:",
+        "waitingWindows": "Klik op “Ja”.",
+        "waitingMac": "Voer je Mac-wachtwoord in en bevestig.",
+        "waitingLinux": "Voer je wachtwoord in en bevestig.",
+        "back": "Terug",
+        "needsAdmin": "Beheerder nodig, eenmalig",
+        "needsAdminAppImage": "Beheerder nodig bij elke start",
+        "noAdmin": "Geen beheerder nodig",
+        "someAppsExcept": "Telegram en enkele andere apps blijven buiten beschouwing",
+        "useVpn": "VPN-modus gebruiken",
+        "useSystemProxy": "Systeemproxy gebruiken",
+        "helpTooltip": "Wat is dit?",
+        "helpWhatTitle": "Hoe het werkt",
+        "helpProsTitle": "Voordelen",
+        "helpConsTitle": "Let op",
+        "helpVpn": {
+          "what": "Hiddify voegt een virtueel netwerk toe aan je computer, en het internetverkeer van elke app loopt er vanzelf doorheen: browsers, Telegram, games, updates en de rest. In elke app hoeft niets te worden ingesteld.",
+          "pros": [
+            "Elke app loopt via Hiddify, zonder instellingen in elke app.",
+            "Apps die proxy-instellingen negeren, zoals Telegram en games, werken ook.",
+            "Het opzoeken van namen (DNS) loopt ook via Hiddify, dus sites die op die manier geblokkeerd zijn, gaan ook open."
+          ],
+          "cons": [
+            "De eerste keer vraagt je computer om beheerdersrechten, om de achtergrondservice van Hiddify te installeren. Daarna verbindt hij zonder te vragen.",
+            "Schakel andere VPN-apps uit terwijl je dit gebruikt: twee tegelijk zitten elkaar in de weg."
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify wijzigt de proxy-instelling van je computer. Apps die die instelling volgen, zoals webbrowsers, sturen hun verkeer via Hiddify. De rest verbindt direct, alsof Hiddify uit staat.",
+          "pros": [
+            "Geen beheerdersrechten nodig.",
+            "Snel in en uit te schakelen, en Hiddify zet de instelling terug als je de verbinding verbreekt.",
+            "Werkt naast andere netwerktools op je computer."
+          ],
+          "cons": [
+            "Apps die de systeemproxy negeren, zoals Telegram, veel games en sommige updatetools, zijn niet beschermd.",
+            "Als ze niet meer werken, kies dan in plaats daarvan de VPN-modus."
+          ]
+        }
+      },
+      "proxyNeedsAdmin": {
+        "title": "Beheerdersrechten aanbevolen",
+        "msg": "Sommige instellingen in dit profiel werken beter met beheerdersrechten. Je kunt met beheerdersrechten starten, of doorgaan zonder en die instellingen uitschakelen voor deze verbinding.",
+        "seeConfigs": "Configuraties tonen",
+        "hideConfigs": "Configuraties verbergen",
+        "neverAskAgain": "Niet meer vragen voor dit profiel",
+        "runAsAdmin": "Als beheerder uitvoeren",
+        "continueWithoutAdmin": "Doorgaan zonder beheerdersrechten",
+        "elevationFailedTitle": "Beheerdersrechten verkrijgen is mislukt",
+        "elevationFailedMsg": "De vraag om beheerdersrechten is geweigerd of mislukt. Probeer het opnieuw, of ga voor deze verbinding door zonder beheerdersrechten.",
+        "tryAgain": "Opnieuw proberen"
+      }
+    },
+    "experimentalNotice": {
+      "title": "Experimentele functies in gebruik",
+      "msg": "Je hebt enkele experimentele functies ingeschakeld die de verbindingskwaliteit kunnen beïnvloeden en onverwachte fouten kunnen veroorzaken. Je kunt deze opties altijd wijzigen of herstellen in Instellingen.",
+      "disable": "Niet meer tonen"
+    },
+    "noActiveProfile": {
+      "title": "Kies een profiel",
+      "msg": "Laten we beginnen. Voeg een verbindingsprofiel toe met de gegevens van je VPN-server.\n\nNog geen server? Geen probleem. In de gids hieronder zie je hoe je er gratis een instelt.",
+      "helpBtn": {
+        "label": "Laat zien hoe",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "Controleer eerst deze link",
+      "cannotVerify": "Deze link is niet geverifieerd",
+      "avoidIfUnsure": "Als je het niet helemaal zeker weet, betaal dan niet en deel geen gevoelige gegevens",
+      "ownResponsibility": "Je gaat door op eigen risico",
+      "open": "Openen",
+      "openIn": "Openen (${seconds})"
+    },
+    "proxyInfo": {
+      "fullTag": "Volledige tag",
+      "type": "Type",
+      "status": "Status",
+      "testTime": "Testtijd",
+      "testDelay": "Vertragingstest",
+      "isSelected": "Geselecteerd",
+      "isGroup": "Groep",
+      "isSecure": "Beveiligd",
+      "port": "Poort",
+      "host": "Host",
+      "ip": "IP",
+      "countryCode": "Landcode",
+      "region": "Regio",
+      "city": "Plaats",
+      "asn": "ASN",
+      "organization": "Organisatie",
+      "location": "Locatie",
+      "postalCode": "Postcode",
+      "download": "Download",
+      "upload": "Upload",
+      "ping": "Ping",
+      "speed": "Snelheid",
+      "server": "Server",
+      "country": "Land",
+      "tapToTest": "Tik om te testen",
+      "error": "Waarom het mislukte"
+    },
+    "windowClosing": {
+      "askEachTime": "Elke keer vragen",
+      "alertMessage": "De app verbergen of afsluiten?",
+      "remember": "Deze keuze onthouden"
+    },
+    "qrCode": {
+      "copyFullLink": "Volledige link kopiëren",
+      "copied": "Gekopieerd",
+      "lanLine": "SOCKS5 · alleen op hetzelfde netwerk",
+      "noLocalNetwork": "Geen lokaal netwerk gevonden",
+      "ip": "IP",
+      "port": "Poort",
+      "username": "Gebruikersnaam",
+      "password": "Wachtwoord",
+      "showPassword": "Wachtwoord tonen",
+      "hidePassword": "Wachtwoord verbergen"
+    },
+    "qrScanner": {
+      "notFound": "Geen QR-code gevonden in deze afbeelding"
+    },
+    "crashReport": {
+      "title": "Hiddify is de vorige keer gecrasht",
+      "msg": "Een rapport naar de ontwikkelaars sturen zodat dit wordt opgelost? Het bevat de crashgegevens, de logboeken en je configuratie zonder servers, sleutels en wachtwoorden, als één zipbestand dat je kunt bekijken voordat je het verstuurt.",
+      "send": "Rapport versturen"
+    },
+    "keepTop": {
+      "title": "Een groot abonnement",
+      "subtitle": "$count proxy’s · ze allemaal laten draaien kost batterij, data en geheugen",
+      "hint": "Altijd ongedaan te maken via het einde van de lijst.",
+      "keeping": "De $keep snelste draaien, de rest wordt gepauzeerd",
+      "all": "Alle $count draaien",
+      "keep": "De $keep snelste houden",
+      "useAll": "Alle $count gebruiken",
+      "howMany": "Hoeveel er moeten draaien",
+      "pickByHand": "Kies de proxy’s zelf",
+      "region": "Regio",
+      "anyRegion": "Elke regio",
+      "keepAnswering": "Werkende houden",
+      "keepingAnswering": "Alleen werkende draaien",
+      "answering": "Werkend",
+      "everyOne": "Alle",
+      "quick": "Snelle test",
+      "quickHint": "Stopt zodra de snelste zijn gevonden",
+      "quickHelp": "Wat doet dit?",
+      "quickFirst": "De snelste van de vorige keer worden eerst getest",
+      "quickStop": "Het testen stopt zodra de rest eerder langzamer was",
+      "quickNew": "Nieuwe proxy’s, en proxy’s die een dag niet zijn getest, worden altijd getest"
+    },
+    "keepTags": {
+      "title": "Proxy’s kiezen",
+      "hint": "Alleen deze draaien, elke keer dat je verbindt.",
+      "search": "Zoeken",
+      "all": "Alles selecteren",
+      "none": "Wissen",
+      "run": "Deze $n gebruiken",
+      "sort": "Sorteren",
+      "sortProfile": "Profielvolgorde",
+      "sortPing": "Ping",
+      "sortDownload": "Download",
+      "sortUpload": "Upload",
+      "selectFastest": "$n snelste",
+      "statusChosen": "Gekozen",
+      "statusAnswering": "Reageert",
+      "statusPaused": "Gepauzeerd",
+      "paused": "$n proxy’s zijn gepauzeerd: ze hebben geen ping en kunnen niet worden getest.",
+      "wake": "Alle laten draaien om te testen",
+      "offline": "Maak verbinding om hun ping te zien en ze te testen.",
+      "offlineTitle": "Niet verbonden",
+      "shown": "$n getoond",
+      "noMatch": "Geen proxy komt overeen",
+      "chosenHint": "Tik hierboven op een proxy om hem te kiezen",
+      "allShown": "Ze staan allemaal in de lijst hierboven",
+      "notShown": "Niet getoond:",
+      "protocol": "Protocol",
+      "country": "Regio",
+      "anyProtocol": "Elk protocol",
+      "anyCountry": "Elke regio",
+      "otherCountries": "Overige"
+    },
+    "localProxy": {
+      "steps": [
+        "Open de proxy-instellingen van de app",
+        "Kies SOCKS5 of HTTP",
+        "Vul de onderstaande waarden in · tik om te kopiëren",
+        "Houd Hiddify verbonden"
+      ],
+      "hint": "Proxymodus · zo gebruik je hem",
+      "setPassword": "Wachtwoord instellen",
+      "manual": "Handmatig",
+      "dontShowAgain": "Niet meer tonen",
+      "thisDevice": "Dit apparaat",
+      "otherDevices": "Andere apparaten",
+      "server": "Server",
+      "noPassword": "Geen wachtwoord ingesteld",
+      "turnOnSharing": "Delen inschakelen",
+      "copyLink": "Link kopiëren",
+      "telegramLink": "Telegram-link",
+      "fullLink": "Volledige link",
+      "portRange": "Gebruik een poort van 1024 tot 65535",
+      "passwordTooShort": "Minimaal 4 tekens",
+      "edit": "Bewerken"
+    },
+    "dbNewerThanApp": {
+      "title": "Opgeslagen gegevens zijn van een nieuwere versie",
+      "msg": "Je profielen en instellingen zijn opgeslagen door een nieuwere versie van Hiddify, en deze oudere versie kan ze niet lezen. Installeer de nieuwste versie om ze te behouden, of verwijder ze om deze versie te gebruiken.",
+      "deleteData": "Gegevens wissen",
+      "deleteConfirm": "De opgeslagen gegevens worden gewist. Je abonnementen en lokale profielen worden waar mogelijk opnieuw toegevoegd. Al het andere dat de nieuwere versie heeft opgeslagen, gaat verloren.",
+      "downloadLatest": "Nieuwste versie downloaden"
+    },
+    "dbBroken": {
+      "title": "Opgeslagen gegevens kunnen niet worden geopend",
+      "msg": "Hiddify kon de opgeslagen profielen niet openen. Wis de opgeslagen gegevens om opnieuw te beginnen: je abonnementen en lokale profielen worden waar mogelijk opnieuw toegevoegd, en je instellingen blijven behouden.",
+      "wipeData": "Gegevens wissen",
+      "wipeConfirm": "De opgeslagen gegevens worden gewist en Hiddify begint opnieuw. Profielen die nog gelezen kunnen worden, worden opnieuw toegevoegd. De rest kan niet worden hersteld.",
+      "copyError": "Fout kopiëren"
+    }
+  },
+  "connection": {
+    "tapToConnect": "Tik om te verbinden",
+    "connect": "Verbinden",
+    "connecting": "Verbinden…",
+    "waiting": "Op zoek naar vrijheid…",
+    "noAvailableProxies": "Verbinding mislukt",
+    "hotReloading": "Wijzigingen toepassen…",
+    "connected": "Verbonden",
+    "disconnect": "Verbinding verbreken",
+    "disconnecting": "Verbinding verbreken…",
+    "failed": "Verbinden is mislukt",
+    "slow": "Duurt langer dan normaal…",
+    "tapToRetry": "Tik om het opnieuw te proberen",
+    "errorDetails": "Foutdetails",
+    "reconnect": "Opnieuw verbinden",
+    "reconnectMsg": "Opnieuw verbinden om wijzigingen toe te passen…",
+    "health": {
+      "title": "Verbindingscontrole",
+      "allGood": "Je verkeer komt door",
+      "pickDead": "De geselecteerde proxy reageert niet",
+      "hopPending": "${chain} maakt verbinding…",
+      "hopFailed": "${chain} kon geen verbinding maken",
+      "coreTesting": "De servers testen…",
+      "coreNone": "Geen enkele server reageert",
+      "fastest": "Snelste server",
+      "yourServer": "Geselecteerde proxy",
+      "notResponding": "Reageert niet",
+      "testing": "Testen…",
+      "useFastest": "Overschakelen naar snelste",
+      "hopReady": "Verbonden",
+      "hopConnecting": "Verbinden…",
+      "hopBroken": "Kon geen verbinding maken",
+      "hopNoReply": "Verbonden, maar geen antwoord",
+      "hopBlocked": "Wacht tot de geselecteerde proxy reageert",
+      "retry": "Opnieuw testen",
+      "change": "Wijzigen",
+      "turnOff": "Uitschakelen"
+    }
+  },
+  "errors": {
+    "unexpected": "Onverwachte fout",
+    "connection": {
+      "unexpected": "Onverwachte verbindingsfout",
+      "timeout": "Time-out van verbinding",
+      "badResponse": "Ongeldig serverantwoord",
+      "connectionError": "Verbindingsfout",
+      "badCertificate": "Ongeldig certificaat"
+    },
+    "profiles": {
+      "unexpected": "Onverwachte fout",
+      "notFound": "Profiel niet gevonden",
+      "invalidConfig": "Ongeldige configuratie",
+      "invalidUrl": "Ongeldige URL",
+      "canceledByUser": "Geannuleerd door gebruiker"
+    },
+    "connectivity": {
+      "unexpected": "Onverwachte storing",
+      "missingVpnPermission": "VPN-toestemming ontbreekt",
+      "missingNotificationPermission": "Toestemming voor meldingen ontbreekt",
+      "core": "Kernfout"
+    },
+    "singbox": {
+      "serviceNotRunning": "De service draait niet",
+      "missingPrivilege": "Rechten ontbreken",
+      "missingPrivilegeMsg": "De VPN-modus kan niet starten. Start de app opnieuw als beheerder of wijzig de servicemodus.",
+      "tunAddressInUse": "Een andere VPN is actief",
+      "tunAddressInUseMsg": "De VPN-modus kan niet starten. Schakel de andere VPN uit of wijzig de servicemodus.",
+      "invalidConfigOptions": "Ongeldige configuratieopties",
+      "invalidConfig": "Ongeldige configuratie"
+    },
+    "warp": {
+      "missingLicense": "WARP-licentie vereist",
+      "missingLicenseMsg": "Dit profiel gebruikt WARP. Accepteer de WARP-licentie om door te gaan."
+    },
+    "psiphon": {
+      "missingLicense": "Psiphon-licentie vereist",
+      "missingLicenseMsg": "Dit profiel gebruikt Psiphon. Accepteer de Psiphon-licentie om door te gaan."
+    }
+  }
+}

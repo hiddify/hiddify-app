@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hiddify/core/db/db.dart';
+import 'package:hiddify/core/localization/fallback_localizations.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/utils/uri_utils.dart';
@@ -19,7 +19,7 @@ Future<void> askWipeDb(AppLocale locale, Translations t, Object error) {
       debugShowCheckedModeBanner: false,
       locale: locale.flutterLocale,
       supportedLocales: AppLocaleUtils.supportedLocales,
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      localizationsDelegates: appLocalizationsDelegates,
       theme: ThemeData(useMaterial3: true),
       darkTheme: ThemeData(useMaterial3: true, brightness: Brightness.dark),
       home: _Prompt(t: t, error: error, onWipe: wipeChosen.complete),

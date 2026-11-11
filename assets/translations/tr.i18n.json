@@ -149,7 +149,14 @@
       "keepTop": {
         "picking": "$count proxy içinden en hızlı $keep tanesi aranıyor…",
         "pickingBody": "Tüm proxy'ler bir kez test edilir; sonra yalnızca en hızlılar çalışmaya devam eder.",
+        "thenFastest": "Testten sonra yalnızca en hızlı $keep proxy$where çalışmaya devam eder.",
+        "thenWorking": "Testten sonra yalnızca çalışan proxy'ler$where çalışmaya devam eder.",
+        "thenAll": "Testten sonra tüm proxy'ler$where çalışmaya devam eder.",
+        "inRegions": " ($flags)",
+        "pickingAnswering": "$count proxy'nin hepsi test ediliyor…",
+        "keptAnswering": "$n çalışan proxy$where çalışıyor",
         "kept": "En hızlı $n tanesi çalışıyor",
+        "keptFastest": "En hızlı $n proxy$where çalışıyor",
         "keptBody": "Pil ve veri tasarrufu için diğer $paused proxy duraklatıldı.",
         "showAll": "$count tanesini de göster",
         "big": "$count proxy çalışıyor",
@@ -189,6 +196,17 @@
         "which": "Hangi proxy'ler",
         "shown": "Gösterilen ($n)",
         "chosen": "Seçilen ($n)"
+      },
+      "single": {
+        "share": "Paylaş",
+        "edit": "Düzenle",
+        "shareTitle": "Proxy'yi paylaş",
+        "configHint": "Yalnızca bu proxy ve üzerinden bağlandığı proxy'ler. Hiddify bunu her yapılandırma gibi içe aktarır.",
+        "editTitle": "Yeni profil olarak düzenle",
+        "editMsg": "“${name}” düzenleyebileceğiniz yeni bir profile kopyalanır. Abonelik her güncellemede proxy'lerini değiştirdiği için orijinal olduğu gibi kalır.",
+        "editConfirm": "Kopyala ve düzenle",
+        "savedAsProfile": "Yeni “${name}” profiline kopyalandı",
+        "failed": "Bu proxy'nin yapılandırması okunamadı"
       }
     },
     "profiles": {
@@ -241,9 +259,25 @@
       "failedToLoad": "Yüklenemedi",
       "updateSubscriptions": "Abonelikleri güncelle",
       "share": {
-        "urlToClipboard": "URL'yi kopyala",
-        "showUrlQr": "QR kodu göster",
-        "jsonToClipboard": "JSON'u kopyala"
+        "title": "Profili paylaş",
+        "scanHint": "Bu profili eklemek için başka bir cihazda Hiddify ile tarayın",
+        "link": "Abonelik bağlantısı",
+        "config": "Yapılandırma",
+        "configHint": "Bu profilin çalıştığı tam JSON, ayarlarınız dahil",
+        "configFailed": "Yapılandırma oluşturulamadı",
+        "copy": "Kopyala",
+        "shareFile": "Paylaş",
+        "saveFile": "Kaydet",
+        "tooLargeToCopy": "Pano için çok büyük: dosya olarak paylaşın veya kaydedin",
+        "toTv": {
+          "button": "TV'ye gönder",
+          "scanHint": "TV'de Hiddify'ı açın, profil eklemek için + düğmesine dokunun, sonra görünen kodu tarayın. İki cihaz da aynı Wi-Fi ağında olmalı.",
+          "sent": "Gönderildi. Eklemek için TV'de İçe aktar'a basın.",
+          "notTvCode": "Bu bir Hiddify TV kodu değil. Kodu göstermek için TV'de + düğmesine dokunarak profil ekleyin.",
+          "expired": "TV artık bu kodla bağlantı almıyor. TV'de profil ekleme ekranını yeniden açın ve yeni kodu tarayın.",
+          "busy": "TV'de çok fazla bağlantı bekliyor. Bunları TV'de içe aktarın veya silin, sonra tekrar deneyin.",
+          "unreachable": "TV'ye ulaşılamadı. Telefonun ve TV'nin aynı Wi-Fi ağında olduğundan emin olun."
+        }
       },
       "msg": {
         "save": {
@@ -258,12 +292,35 @@
           "failure": "Profil güncellenemedi",
           "failureNamed": "“${name}” güncellenemedi",
           "bulkSuccess(plural, param=count)": {
+            "one": "$count profil güncellendi",
             "other": "$count profil güncellendi"
           },
           "bulkPartial": "${success} güncellendi\n${failed} başarısız: ${names}"
         },
         "delete": {
-          "success": "Profil silindi"
+          "success": "Profil silindi",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count profil silindi",
+            "other": "$count profil silindi"
+          },
+          "bulkPartial": "${total} profilden ${deleted} tanesi silindi"
+        }
+      },
+      "removeInactive": {
+        "action": "Etkin olmayan abonelikleri kaldır",
+        "title": "Etkin olmayan abonelikleri kaldır",
+        "hint": "Bu abonelikler artık çalışmıyor. İşaretli olanlar silinir; tutmak istediklerinizin işaretini kaldırın.",
+        "none": "Etkin olmayan abonelik yok",
+        "remove(plural, param=count)": {
+          "one": "$count aboneliği sil",
+          "other": "$count aboneliği sil"
+        },
+        "reason": {
+          "expired": "Süresi doldu",
+          "expiredOn": "Bitiş: ${date}",
+          "noTraffic": "Kota doldu",
+          "updateFailing": "Güncellemeler sürekli başarısız",
+          "updateFailingSince": "Güncellemeler ${date} tarihinden beri başarısız"
         }
       }
     },
@@ -303,7 +360,9 @@
       "fileSaveFailed": "Dosya kaydedilemedi",
       "coreLogLevel": "Çekirdek seviyesi",
       "coreLogLevelMsg": "Yeniden bağlandıktan sonra geçerli olur",
-      "buffer": "Arabellek"
+      "buffer": "Arabellek",
+      "diagnostics": "Tanılama raporu",
+      "diagnosticsMsg": "Çökme raporları, loglar ve sunucusuz, parolasız ayarlarınız, tek bir zip dosyası olarak"
     },
     "about": {
       "title": "Hakkında",
@@ -370,6 +429,9 @@
         "routeRule": {
           "add": "Kural ekle",
           "delete": "Kuralı sil",
+          "duplicate": "Kuralı çoğalt",
+          "duplicated": "Yeni kural olarak kopyalandı: istediğiniz gibi düzenleyin",
+          "copyAll": "Tümünü kopyala",
           "options": {
             "import": {
               "clipboard": "Kuralları panodan içe aktar",
@@ -400,6 +462,7 @@
             "validDomain": "Geçerli “Alan adı”, örn.\n@:pages.settings.routing.routeRule.rule.validDomainEx",
             "validDomainSuffixEx": ".com veya .tr",
             "validDomainSuffix": "Geçerli “Alan adı son eki”, örn.\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "Yerleşik kural değiştirilemez. Kopyalayıp kopyayı düzenleyin.",
             "tileTitle(map)": {
               "name": "İsim",
               "outbound": "Eşleşirse giden",
@@ -449,6 +512,12 @@
         "builtinRules": {
           "tag": "Yerleşik",
           "bypassLan": "LAN'ı atla",
+          "systemDirect": {
+            "apple": "Apple hizmetleri",
+            "microsoft": "Microsoft hizmetleri",
+            "android": "Android hizmetleri",
+            "linux": "Linux güncellemeleri"
+          },
           "blockAds": "Reklam ve zararlı yazılımı engelle",
           "bypassRegion": "$region sitelerini atla"
         },
@@ -542,11 +611,28 @@
           "consistentHashDescription": "Her site her zaman aynı sunucuyu kullanır",
           "stickySessionDescription": "Her site, yeniden bağlanana kadar rastgele bir sunucuda kalır"
         },
+        "defaultProxy": {
+          "title": "Varsayılan proxy",
+          "lowest": "En düşük ping",
+          "balance": "Dengeli",
+          "first": "İlk proxy",
+          "lowestDescription": "Siz bir proxy seçene kadar en hızlısı kullanılır",
+          "balanceDescription": "Siz bir proxy seçene kadar bağlantılar hepsine dağıtılır",
+          "firstDescription": "Siz bir proxy seçene kadar profilin ilk proxy'si kullanılır"
+        },
         "resolveDestination": "Hedefi çözümle",
         "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "IPv6 neden kapalı?",
+        "ipv6RouteTurnOnTitle": "IPv6 açılsın mı?",
+        "ipv6RouteTurnOn": "Aç",
+        "ipv6RouteHelp": "Çoğu proxy'nin çıkışında IPv6 yoktur.\n\nProxy'nin taşıyamadığı bir bağlantı açıldıktan hemen sonra kopar ve tarayıcılar onu IPv4 ile yeniden denemez; bu yüzden Google ve YouTube yüklenmez.\n\nAçıkken her proxy, bağlantı testinde bir kez denetlenir. IPv6 yalnızca onu taşıyan bir proxy üzerinden kullanılır; geri kalan her şey fark edilmeden IPv4 ile gider.\n\nIPv6 her zaman VPN'in içinden geçer, hiçbir zaman dışından değil.",
         "ipv6Modes": {
+          "ipv4Only": "Kapalı (yalnızca IPv4)",
           "preferIpv4": "Önce IPv4",
-          "preferIpv6": "Önce IPv6"
+          "preferIpv6": "Önce IPv6",
+          "ipv4OnlyDescription": "Uygulamalar yalnızca IPv4 kullanır. IPv6 hemen reddedilir.",
+          "preferIpv4Description": "Önce IPv4. IPv6 yalnızca onu taşıdığı doğrulanmış bir proxy üzerinden.",
+          "preferIpv6Description": "Önce IPv6, yalnızca onu taşıdığı doğrulanmış bir proxy üzerinden."
         }
       },
       "dns": {
@@ -570,16 +656,19 @@
         "serviceModes": {
           "proxy": "Yalnızca proxy servisi",
           "systemProxy": "Sistem proxy'sini ayarla",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Yönlendirici (tüm ağ)"
         },
         "shortServiceModes": {
           "proxy": "Proxy",
           "systemProxy": "Sistem proxy'si",
-          "tun": "VPN"
+          "tun": "VPN",
+          "router": "Yönlendirici"
         },
         "strictRoute": "Katı yönlendirme",
         "tunImplementation": "TUN uygulaması",
         "tunImplementations": {
+          "sing15": "Sing 15",
           "mixed": "Karışık",
           "system": "Sistem",
           "gvisor": "gVisor"
@@ -629,6 +718,25 @@
         }
       },
       "chain": {
+        "quick": {
+          "off": "Kapalı",
+          "extraSecurity": {
+            "title": "Ekstra güvenlik",
+            "subtitle": "Proxy'ye güvenmediğinizde",
+            "ipBy": "IP adresinizi $mode belirler",
+            "notTracked": "VPN sağlayıcınız trafiğinizi göremez",
+            "forPublic": "Herkese açık ve anonim proxy'ler için uygun",
+            "slower": "Hızı düşürebilir"
+          },
+          "unblocker": {
+            "title": "Proxy engel kaldırıcı",
+            "subtitle": "Proxy'nin filtrelemeyi aşmasını sağlar",
+            "mayConnect": "Filtrelenmiş bir proxy bağlanabilir",
+            "personalOnly": "Yalnızca kişisel bir proxy için yararlı",
+            "notForPublic": "Herkese açık proxy'ler için uygun değil",
+            "slower": "Proxy biraz yavaşlar"
+          }
+        },
         "title": "Zincir",
         "subtitle": "Ekstra güvenlik ve engel kaldırıcı",
         "finalIp": "Nihai IP",
@@ -686,13 +794,37 @@
           "mtu": "MTU",
           "customized": "Özelleştirildi",
           "scanner": {
-            "title": "Tarayıcı"
+            "title": "Tarayıcı",
+            "searchNoise": "Arama gürültüsü",
+            "maxRtt": "Maks. RTT (ms)",
+            "timeout": "Yoklama zaman aşımı (ms)",
+            "count": "Yoklanacak adres sayısı",
+            "concurrency": "Paralel yoklama",
+            "ports": "Portlar",
+            "cidrs": "Aralıklar"
           },
           "masque": {
-            "title": "MASQUE"
+            "title": "MASQUE",
+            "vhttp": "HTTP sürümü",
+            "serverName": "Sunucu adı",
+            "useIpv6": "IPv6'yı tercih et",
+            "udpTimeout": "UDP zaman aşımı (sn)",
+            "keepalive": "UDP keepalive (sn)",
+            "packetSize": "İlk paket boyutu",
+            "reconnectDelay": "Yeniden bağlanma gecikmesi (sn)",
+            "tlsInsecure": "TLS doğrulamasını atla",
+            "fragment": "TLS'i parçala",
+            "fragmentDelay": "Fragment yedek gecikmesi (ms)",
+            "recordFragment": "TLS kayıtlarını parçala",
+            "ech": "Şifreli Client Hello",
+            "echConfig": "ECH yapılandırması",
+            "echQueryServerName": "ECH sorgu adı"
           },
           "awg": {
-            "title": "AmneziaWG"
+            "title": "AmneziaWG",
+            "jc": "Çöp paketler",
+            "jmin": "Min. çöp boyutu",
+            "jmax": "Maks. çöp boyutu"
           }
         },
         "psiphon": {
@@ -758,6 +890,7 @@
       "expired": "Süresi doldu",
       "noTraffic": "Kota doldu",
       "remainingDuration(plural, param=days)": {
+        "one": "$days gün kaldı",
         "other": "$days gün kaldı"
       },
       "remainingUnlimited": "Sınırsız",
@@ -837,11 +970,53 @@
     "adminBgService": {
       "vpnNeedsAdmin": {
         "title": "Yönetici izni gerekli",
-        "msg": "VPN modu, Hiddify arka plan hizmetini yüklemek için bir kerelik yönetici izni gerektirir. Bundan sonra başka bir istem olmadan bağlanabilirsiniz.",
-        "connectWithAdmin": "Yönetici izniyle bağlan",
+        "vpnMode": "VPN modu",
+        "allApps": "Tüm uygulamalar",
+        "recommended": "Önerilen",
+        "systemProxyMode": "Sistem proxy'si",
+        "someApps": "Tarayıcılar ve çoğu uygulama",
+        "switched": "Sistem proxy'si moduna geçildi. Bunu Ayarlar'dan değiştirebilirsiniz.",
         "waitingTitle": "Yönetici izni bekleniyor",
-        "waitingMsg": "Devam etmek için yönetici istemini onaylayın. Durdurup daha sonra tekrar deneyebilirsiniz.",
-        "stop": "Durdur"
+        "waitingMsg": "Hiddify, VPN modunu onaylamanızı bekliyor.",
+        "waitingWhere": "Açılan pencerede:",
+        "waitingWindows": "“Evet”e tıklayın.",
+        "waitingMac": "Mac parolanızı girin ve onaylayın.",
+        "waitingLinux": "Parolanızı girin ve onaylayın.",
+        "back": "Geri",
+        "needsAdmin": "Bir kez yönetici izni gerekir",
+        "needsAdminAppImage": "Her başlangıçta yönetici izni gerekir",
+        "noAdmin": "Yönetici izni gerekmez",
+        "someAppsExcept": "Telegram ve birkaç uygulama dışarıda kalır",
+        "useVpn": "VPN modunu kullan",
+        "useSystemProxy": "Sistem proxy'sini kullan",
+        "helpTooltip": "Bu nedir?",
+        "helpWhatTitle": "Nasıl çalışır",
+        "helpProsTitle": "Artıları",
+        "helpConsTitle": "Dikkat edin",
+        "helpVpn": {
+          "what": "Hiddify bilgisayarınıza sanal bir ağ ekler ve her uygulamanın internet trafiği kendiliğinden bunun üzerinden geçer: tarayıcılar, Telegram, oyunlar, güncellemeler ve diğerleri. Her uygulamada ayrıca bir şey ayarlamanız gerekmez.",
+          "pros": [
+            "Her uygulama Hiddify üzerinden geçer, uygulamalarda ayar yapmak gerekmez.",
+            "Telegram ve oyunlar gibi proxy ayarlarını yok sayan uygulamalar da çalışır.",
+            "Ad sorguları (DNS) de Hiddify üzerinden geçer, bu yüzden bu yolla engellenen siteler de açılır."
+          ],
+          "cons": [
+            "İlk seferde bilgisayarınız, Hiddify'ın arka plan hizmetini yüklemek için yönetici izni ister. Sonrasında sormadan bağlanır.",
+            "Kullanırken diğer VPN uygulamalarını kapatın: ikisi aynı anda birbirini engeller."
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify bilgisayarınızın proxy ayarını değiştirir. Web tarayıcıları gibi bu ayarı izleyen uygulamalar trafiğini Hiddify üzerinden gönderir; diğerleri Hiddify kapalıymış gibi doğrudan bağlanır.",
+          "pros": [
+            "Yönetici izni gerekmez.",
+            "Açıp kapatması hızlıdır ve bağlantıyı kestiğinizde Hiddify ayarı eski haline getirir.",
+            "Bilgisayarınızdaki diğer ağ araçlarıyla birlikte çalışır."
+          ],
+          "cons": [
+            "Telegram, birçok oyun ve bazı güncelleme araçları gibi sistem proxy'sini yok sayan uygulamalar korunmaz.",
+            "Çalışmazlarsa bunun yerine VPN modunu seçin."
+          ]
+        }
       },
       "proxyNeedsAdmin": {
         "title": "Yönetici izni önerilir",
@@ -902,7 +1077,8 @@
       "speed": "Hız",
       "server": "Sunucu",
       "country": "Ülke",
-      "tapToTest": "Test için dokunun"
+      "tapToTest": "Test için dokunun",
+      "error": "Neden başarısız oldu"
     },
     "windowClosing": {
       "askEachTime": "Her seferinde sor",
@@ -924,16 +1100,33 @@
     "qrScanner": {
       "notFound": "Bu görselde QR kod bulunamadı"
     },
+    "crashReport": {
+      "title": "Hiddify geçen sefer çöktü",
+      "msg": "Bunun düzeltilmesi için geliştiricilere rapor gönderilsin mi? Rapor, çökme ayrıntılarını, logları ve sunucuları, anahtarları ve parolaları çıkarılmış yapılandırmanızı içerir; göndermeden önce bakabileceğiniz tek bir zip dosyasıdır.",
+      "send": "Raporu gönder"
+    },
     "keepTop": {
       "title": "Büyük bir abonelik",
-      "description": "Bu profilde $count proxy var. Hepsini çalıştırmak pil, veri ve bellek harcar. Hiddify onları bir kez test edip en hızlı $keep tanesini çalışır bırakabilir, diğerlerini duraklatabilir.",
+      "subtitle": "$count proxy · hepsini çalıştırmak pil, veri ve bellek harcar",
       "hint": "İstediğiniz zaman proxy listesinin sonundan hepsini yeniden çalıştırabilirsiniz.",
       "keeping": "En hızlı $keep çalışır, diğerleri durur",
       "all": "$count tanesinin hepsi çalışır",
       "keep": "En hızlı $keep taneyi tut",
       "useAll": "$count tanesini de kullan",
       "howMany": "Kaç tanesi çalışsın",
-      "pickByHand": "Proxy'leri kendiniz seçin"
+      "pickByHand": "Proxy'leri kendiniz seçin",
+      "region": "Bölge",
+      "anyRegion": "Herhangi bir bölge",
+      "keepAnswering": "Çalışanları tut",
+      "keepingAnswering": "Yalnızca çalışanlar çalışır",
+      "answering": "Çalışan",
+      "everyOne": "Tümü",
+      "quick": "Hızlı test",
+      "quickHint": "En hızlılar bulunur bulunmaz durur",
+      "quickHelp": "Ne yapar?",
+      "quickFirst": "Önce geçen seferin en hızlıları test edilir",
+      "quickStop": "Kalanlar daha önce daha yavaş olduysa test durur",
+      "quickNew": "Yeni proxy'ler ve bir gündür test edilmeyenler her zaman test edilir"
     },
     "keepTags": {
       "title": "Proxy seç",
@@ -988,6 +1181,20 @@
       "portRange": "1024 ile 65535 arasında bir port kullanın",
       "passwordTooShort": "En az 4 karakter",
       "edit": "Düzenle"
+    },
+    "dbNewerThanApp": {
+      "title": "Kayıtlı veriler daha yeni bir sürümden",
+      "msg": "Profilleriniz ve ayarlarınız Hiddify'ın daha yeni bir sürümü tarafından kaydedildi ve bu eski sürüm bunları okuyamıyor. Korumak için en son sürümü yükleyin veya bu sürümü kullanmak için silin.",
+      "deleteData": "Verileri sil",
+      "deleteConfirm": "Kayıtlı veriler silinir. Abonelikleriniz ve yerel profilleriniz mümkün olduğunca geri eklenir; daha yeni sürümün kaydettiği diğer her şey kaybolur.",
+      "downloadLatest": "En son sürümü indir"
+    },
+    "dbBroken": {
+      "title": "Kayıtlı veriler açılamıyor",
+      "msg": "Hiddify kayıtlı profillerini açamadı. Baştan başlamak için kayıtlı verileri silin: abonelikleriniz ve yerel profilleriniz mümkün olduğunca geri eklenir, ayarlarınız korunur.",
+      "wipeData": "Verileri sil",
+      "wipeConfirm": "Kayıtlı veriler silinir ve Hiddify baştan başlar. Hâlâ okunabilen profiller geri eklenir; gerisi kurtarılamaz.",
+      "copyError": "Hatayı kopyala"
     }
   },
   "connection": {

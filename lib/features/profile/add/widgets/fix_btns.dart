@@ -24,74 +24,78 @@ class FixBtns extends ConsumerWidget {
     final t = ref.watch(translationsProvider).requireValue;
 
     final isDesktop = PlatformUtils.isDesktop;
-    return Row(
-      children: [
-        const Gap(AddProfileModalConst.fixBtnsGap),
-        FixBtn(
-          key: const ValueKey('add_from_clipboard_button'),
-          height: height,
-          title: t.common.clipboard,
-          icon: Icons.content_paste,
-          onTap: () async {
-            final cr = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
-            ref.read(addProfileNotifierProvider.notifier).addClipboard(cr);
-          },
-        ),
-        const Gap(AddProfileModalConst.fixBtnsGap),
-        FixBtn(
-          key: const ValueKey('add_from_file_button'),
-          height: height,
-          title: t.common.file,
-          icon: Icons.insert_drive_file,
-          onTap: () async {
-            final result = await FilePicker.platform.pickFiles(
-              type: FileType.custom,
-              allowedExtensions: ['txt', 'json', 'yaml', 'yml', 'conf', 'ovpn', 'zip'],
-            );
-            if (result == null) return;
-            final picked = result.files.single;
-            var bytes = picked.bytes;
-            if (bytes == null) {
-              final path = picked.path;
-              if (path == null) return;
-              final file = File(path);
-              if (!await file.exists()) return;
-              bytes = await file.readAsBytes();
-            }
-            final notifier = ref.read(addProfileNotifierProvider.notifier);
-            if (picked.extension?.toLowerCase() == 'zip') {
-              notifier.addArchive(bytes, name: picked.name.replaceFirst(RegExp(r'\.zip$', caseSensitive: false), ''));
-            } else {
-              notifier.addClipboard(decodeTextBytes(bytes));
-            }
-          },
-        ),
-        if (!isDesktop && canScan) ...[
+    // the buttons grow together when one needs more than its square
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
           const Gap(AddProfileModalConst.fixBtnsGap),
           FixBtn(
-            key: const ValueKey('add_by_qr_code_button'),
+            key: const ValueKey('add_from_clipboard_button'),
             height: height,
-            title: t.common.qrCode,
-            icon: Icons.qr_code_scanner,
+            title: t.common.clipboard,
+            icon: Icons.content_paste,
             onTap: () async {
-              final cr = await ref.read(dialogNotifierProvider.notifier).showQrScanner();
-              if (cr == null) return;
+              final cr = await Clipboard.getData(Clipboard.kTextPlain).then((value) => value?.text ?? '');
               ref.read(addProfileNotifierProvider.notifier).addClipboard(cr);
             },
           ),
+          const Gap(AddProfileModalConst.fixBtnsGap),
+          FixBtn(
+            key: const ValueKey('add_from_file_button'),
+            height: height,
+            title: t.common.file,
+            icon: Icons.insert_drive_file,
+            onTap: () async {
+              final result = await FilePicker.platform.pickFiles(
+                type: FileType.custom,
+                allowedExtensions: ['txt', 'json', 'yaml', 'yml', 'conf', 'ovpn', 'zip'],
+              );
+              if (result == null) return;
+              final picked = result.files.single;
+              var bytes = picked.bytes;
+              if (bytes == null) {
+                final path = picked.path;
+                if (path == null) return;
+                final file = File(path);
+                if (!await file.exists()) return;
+                bytes = await file.readAsBytes();
+              }
+              final notifier = ref.read(addProfileNotifierProvider.notifier);
+              if (picked.extension?.toLowerCase() == 'zip') {
+                notifier.addArchive(bytes, name: picked.name.replaceFirst(RegExp(r'\.zip$', caseSensitive: false), ''));
+              } else {
+                notifier.addClipboard(decodeTextBytes(bytes));
+              }
+            },
+          ),
+          if (!isDesktop && canScan) ...[
+            const Gap(AddProfileModalConst.fixBtnsGap),
+            FixBtn(
+              key: const ValueKey('add_by_qr_code_button'),
+              height: height,
+              title: t.common.qrCode,
+              icon: Icons.qr_code_scanner,
+              onTap: () async {
+                final cr = await ref.read(dialogNotifierProvider.notifier).showQrScanner();
+                if (cr == null) return;
+                ref.read(addProfileNotifierProvider.notifier).addClipboard(cr);
+              },
+            ),
+          ],
+          const Gap(AddProfileModalConst.fixBtnsGap),
+          FixBtn(
+            key: const ValueKey('add_manually_button'),
+            height: height,
+            title: t.common.manually,
+            icon: Icons.add,
+            onTap: () {
+              ref.read(addProfilePageNotifierProvider.notifier).goManual();
+            },
+          ),
+          const Gap(AddProfileModalConst.fixBtnsGap),
         ],
-        const Gap(AddProfileModalConst.fixBtnsGap),
-        FixBtn(
-          key: const ValueKey('add_manually_button'),
-          height: height,
-          title: t.common.manually,
-          icon: Icons.add,
-          onTap: () {
-            ref.read(addProfilePageNotifierProvider.notifier).goManual();
-          },
-        ),
-        const Gap(AddProfileModalConst.fixBtnsGap),
-      ],
+      ),
     );
   }
 }
