@@ -277,10 +277,7 @@
           "expired": "TV tidak lagi menerima tautan dengan kode ini. Buka lagi layar tambah profil di TV dan pindai kode yang baru.",
           "busy": "Terlalu banyak tautan yang menunggu di TV. Impor atau buang tautan itu di TV, lalu coba lagi.",
           "unreachable": "Tidak dapat menjangkau TV. Pastikan ponsel dan TV berada di jaringan Wi-Fi yang sama."
-        },
-        "urlToClipboard": "Salin URL",
-        "showUrlQr": "Tampilkan kode QR",
-        "jsonToClipboard": "Salin JSON"
+        }
       },
       "msg": {
         "save": {
@@ -980,7 +977,7 @@
         "someApps": "Peramban dan sebagian besar aplikasi",
         "switched": "Beralih ke mode proxy sistem. Anda dapat mengubahnya di Pengaturan.",
         "waitingTitle": "Menunggu izin administrator",
-        "waitingMsg": "Izinkan permintaan administrator untuk melanjutkan. Anda dapat berhenti dan mencoba lagi nanti.",
+        "waitingMsg": "Hiddify menunggu Anda mengizinkan mode VPN.",
         "waitingWhere": "Di jendela yang terbuka:",
         "waitingWindows": "Klik “Yes”.",
         "waitingMac": "Masukkan kata sandi Mac Anda dan konfirmasi.",
@@ -1019,10 +1016,7 @@
             "Aplikasi yang mengabaikan proxy sistem, seperti Telegram, banyak game, dan beberapa alat pembaruan, tidak terlindungi.",
             "Jika tidak berfungsi, pilih mode VPN."
           ]
-        },
-        "msg": "Mode VPN memerlukan izin administrator satu kali untuk memasang layanan latar belakang Hiddify. Setelah itu, Anda dapat terhubung tanpa permintaan lagi.",
-        "connectWithAdmin": "Hubungkan dengan izin administrator",
-        "stop": "Berhenti"
+        }
       },
       "proxyNeedsAdmin": {
         "title": "Izin administrator disarankan",
@@ -1132,8 +1126,7 @@
       "quickHelp": "Apa fungsinya?",
       "quickFirst": "Yang tercepat sebelumnya diuji lebih dulu",
       "quickStop": "Tes berhenti setelah sisanya sebelumnya lebih lambat",
-      "quickNew": "Proxy baru, dan yang belum dites selama sehari, selalu diuji",
-      "description": "Profil ini berisi $count proxy. Menjalankan semuanya menghabiskan baterai, data, dan memori. Hiddify dapat mengujinya sekali, menjalankan $keep yang tercepat, dan menjeda sisanya."
+      "quickNew": "Proxy baru, dan yang belum dites selama sehari, selalu diuji"
     },
     "keepTags": {
       "title": "Pilih proksi",

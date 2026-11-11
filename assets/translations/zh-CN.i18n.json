@@ -277,10 +277,7 @@
           "expired": "电视已不再接收此二维码的链接。请在电视上重新打开添加配置文件界面，并扫描新的二维码。",
           "busy": "电视上等待处理的链接太多。请先在电视上导入或放弃它们，然后重试。",
           "unreachable": "无法连接到电视。请确认手机和电视在同一个 Wi-Fi 网络中。"
-        },
-        "urlToClipboard": "复制 URL",
-        "showUrlQr": "显示二维码",
-        "jsonToClipboard": "复制 JSON"
+        }
       },
       "msg": {
         "save": {
@@ -980,7 +977,7 @@
         "someApps": "浏览器和大多数应用",
         "switched": "已切换到系统代理模式。您可以在设置中更改。",
         "waitingTitle": "正在等待管理员权限",
-        "waitingMsg": "请允许管理员权限请求以继续。你可以停止并稍后重试。",
+        "waitingMsg": "Hiddify 正在等待你允许 VPN 模式。",
         "waitingWhere": "在打开的窗口中：",
         "waitingWindows": "点击“是”。",
         "waitingMac": "输入您的 Mac 密码并确认。",
@@ -1019,10 +1016,7 @@
             "忽略系统代理的应用，如 Telegram、许多游戏和一些更新工具，不受保护。",
             "如果它们无法使用，请改用 VPN 模式。"
           ]
-        },
-        "msg": "VPN 模式需要一次性的管理员权限来安装 Hiddify 后台服务。之后无需再次授权即可连接。",
-        "connectWithAdmin": "使用管理员权限连接",
-        "stop": "停止"
+        }
       },
       "proxyNeedsAdmin": {
         "title": "建议使用管理员权限",
@@ -1132,8 +1126,7 @@
       "quickHelp": "它是做什么的？",
       "quickFirst": "上次最快的会先测试",
       "quickStop": "如果其余的以前较慢，测试会提前停止",
-      "quickNew": "新代理和一天未测试的代理总会被测试",
-      "description": "此配置包含 $count 个代理。全部运行会消耗电量、流量和内存。Hiddify 可以先测试一次,只保留最快的 $keep 个运行,暂停其余代理。"
+      "quickNew": "新代理和一天未测试的代理总会被测试"
     },
     "keepTags": {
       "title": "选择代理",

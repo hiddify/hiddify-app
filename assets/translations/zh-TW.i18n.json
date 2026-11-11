@@ -277,10 +277,7 @@
           "expired": "電視已不再接受此代碼的連結。請在電視上重新開啟新增設定檔畫面，並掃描新的代碼。",
           "busy": "電視上等待中的連結太多。請先在電視上匯入或捨棄，然後再試一次。",
           "unreachable": "無法連到電視。請確認手機和電視連線到同一個 Wi-Fi 網路。"
-        },
-        "urlToClipboard": "複製 URL",
-        "showUrlQr": "顯示 QR Code",
-        "jsonToClipboard": "複製 JSON"
+        }
       },
       "msg": {
         "save": {
@@ -980,7 +977,7 @@
         "someApps": "瀏覽器和大多數應用程式",
         "switched": "已切換為系統代理模式。您可以在設定中變更。",
         "waitingTitle": "正在等待管理員權限",
-        "waitingMsg": "請允許管理員權限要求以繼續。你可以停止並稍後重試。",
+        "waitingMsg": "Hiddify 正在等待你允許 VPN 模式。",
         "waitingWhere": "在開啟的視窗中：",
         "waitingWindows": "點一下「是」。",
         "waitingMac": "輸入您的 Mac 密碼並確認。",
@@ -1019,10 +1016,7 @@
             "會忽略系統代理的應用程式，例如 Telegram、許多遊戲和部分更新工具，不會受到保護。",
             "如果它們無法運作，請改用 VPN 模式。"
           ]
-        },
-        "msg": "VPN 模式需要一次性的管理員權限來安裝 Hiddify 背景服務。之後無需再次授權即可連線。",
-        "connectWithAdmin": "使用管理員權限連線",
-        "stop": "停止"
+        }
       },
       "proxyNeedsAdmin": {
         "title": "建議使用管理員權限",
@@ -1132,8 +1126,7 @@
       "quickHelp": "這是做什麼的？",
       "quickFirst": "先測試上次最快的",
       "quickStop": "當其餘的先前較慢時，就停止測試",
-      "quickNew": "新的代理，以及一天沒測試的代理，一律會測試",
-      "description": "此設定檔包含 $count 個代理。全部執行會消耗電量、流量和記憶體。Hiddify 可以先測試一次,只保留最快的 $keep 個執行,暫停其餘代理。"
+      "quickNew": "新的代理，以及一天沒測試的代理，一律會測試"
     },
     "keepTags": {
       "title": "選擇代理",

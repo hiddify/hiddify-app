@@ -277,10 +277,7 @@
           "expired": "TV artık bu kodla bağlantı almıyor. TV'de profil ekleme ekranını yeniden açın ve yeni kodu tarayın.",
           "busy": "TV'de çok fazla bağlantı bekliyor. Bunları TV'de içe aktarın veya silin, sonra tekrar deneyin.",
           "unreachable": "TV'ye ulaşılamadı. Telefonun ve TV'nin aynı Wi-Fi ağında olduğundan emin olun."
-        },
-        "urlToClipboard": "URL'yi kopyala",
-        "showUrlQr": "QR kodu göster",
-        "jsonToClipboard": "JSON'u kopyala"
+        }
       },
       "msg": {
         "save": {
@@ -980,7 +977,7 @@
         "someApps": "Tarayıcılar ve çoğu uygulama",
         "switched": "Sistem proxy'si moduna geçildi. Bunu Ayarlar'dan değiştirebilirsiniz.",
         "waitingTitle": "Yönetici izni bekleniyor",
-        "waitingMsg": "Devam etmek için yönetici istemini onaylayın. Durdurup daha sonra tekrar deneyebilirsiniz.",
+        "waitingMsg": "Hiddify, VPN modunu onaylamanızı bekliyor.",
         "waitingWhere": "Açılan pencerede:",
         "waitingWindows": "“Evet”e tıklayın.",
         "waitingMac": "Mac parolanızı girin ve onaylayın.",
@@ -1019,10 +1016,7 @@
             "Telegram, birçok oyun ve bazı güncelleme araçları gibi sistem proxy'sini yok sayan uygulamalar korunmaz.",
             "Çalışmazlarsa bunun yerine VPN modunu seçin."
           ]
-        },
-        "msg": "VPN modu, Hiddify arka plan hizmetini yüklemek için bir kerelik yönetici izni gerektirir. Bundan sonra başka bir istem olmadan bağlanabilirsiniz.",
-        "connectWithAdmin": "Yönetici izniyle bağlan",
-        "stop": "Durdur"
+        }
       },
       "proxyNeedsAdmin": {
         "title": "Yönetici izni önerilir",
@@ -1132,8 +1126,7 @@
       "quickHelp": "Ne yapar?",
       "quickFirst": "Önce geçen seferin en hızlıları test edilir",
       "quickStop": "Kalanlar daha önce daha yavaş olduysa test durur",
-      "quickNew": "Yeni proxy'ler ve bir gündür test edilmeyenler her zaman test edilir",
-      "description": "Bu profilde $count proxy var. Hepsini çalıştırmak pil, veri ve bellek harcar. Hiddify onları bir kez test edip en hızlı $keep tanesini çalışır bırakabilir, diğerlerini duraklatabilir."
+      "quickNew": "Yeni proxy'ler ve bir gündür test edilmeyenler her zaman test edilir"
     },
     "keepTags": {
       "title": "Proxy seç",

@@ -277,10 +277,7 @@
           "expired": "El televisor ya no acepta enlaces con este código. Abre de nuevo la pantalla de añadir perfil en el televisor y escanea el código nuevo.",
           "busy": "El televisor tiene demasiados enlaces en espera. Impórtalos o descártalos en el televisor y vuelve a intentarlo.",
           "unreachable": "No se pudo conectar con el televisor. Comprueba que el teléfono y el televisor estén en la misma red Wi-Fi."
-        },
-        "urlToClipboard": "Copiar URL",
-        "showUrlQr": "Mostrar código QR",
-        "jsonToClipboard": "Copiar JSON"
+        }
       },
       "msg": {
         "save": {
@@ -980,7 +977,7 @@
         "someApps": "Navegadores y la mayoría de las apps",
         "switched": "Se cambió al modo de proxy del sistema. Puedes cambiarlo en Ajustes.",
         "waitingTitle": "Esperando el permiso de administrador",
-        "waitingMsg": "Acepta la solicitud de administrador para continuar. Puedes detenerte y volver a intentarlo más tarde.",
+        "waitingMsg": "Hiddify está esperando que permitas el modo VPN.",
         "waitingWhere": "En la ventana que se abrió:",
         "waitingWindows": "Haz clic en «Sí».",
         "waitingMac": "Escribe la contraseña de tu Mac y confirma.",
@@ -1019,10 +1016,7 @@
             "Las apps que ignoran el proxy del sistema, como Telegram, muchos juegos y algunas herramientas de actualización, no quedan protegidas.",
             "Si dejan de funcionar, elige el modo VPN."
           ]
-        },
-        "msg": "El modo VPN necesita un permiso de administrador único para instalar el servicio en segundo plano de Hiddify. Después, puedes conectarte sin otra solicitud.",
-        "connectWithAdmin": "Conectar con permiso de administrador",
-        "stop": "Detener"
+        }
       },
       "proxyNeedsAdmin": {
         "title": "Se recomienda permiso de administrador",
@@ -1132,8 +1126,7 @@
       "quickHelp": "¿Qué hace?",
       "quickFirst": "Primero se prueban los más rápidos de la vez anterior",
       "quickStop": "La prueba se detiene cuando el resto fue más lento antes",
-      "quickNew": "Los proxies nuevos y los que no se probaron en un día siempre se prueban",
-      "description": "Este perfil tiene $count proxies. Mantenerlos todos activos gasta batería, datos y memoria. Hiddify puede probarlos una vez, dejar activos los $keep más rápidos y pausar el resto."
+      "quickNew": "Los proxies nuevos y los que no se probaron en un día siempre se prueban"
     },
     "keepTags": {
       "title": "Elegir proxies",
