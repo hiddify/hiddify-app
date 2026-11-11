@@ -33,6 +33,7 @@ extension AppLocaleX on AppLocale {
     "my" => "မြန်မာဘာသာ",
     "ky" => "Кыргызча",
     "tg" => "Тоҷикӣ",
+    "hy" => "Հայերեն",
     _ => "Unknown",
   };
 }
