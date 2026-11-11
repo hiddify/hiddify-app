@@ -1103,7 +1103,16 @@
     "crashReport": {
       "title": "Hiddify crashed last time",
       "msg": "Send a report to the developers so this gets fixed? It holds the crash details, the logs and your configuration with servers, keys and passwords removed, as one zip file you can look at before sending.",
-      "send": "Send report"
+      "sendHiddify": "Send to Hiddify",
+      "sendHiddifyMsg": "The app uploads the report itself",
+      "sendEmail": "Send by email",
+      "sendTelegram": "Send on Telegram",
+      "sent": "Report sent. Thank you!",
+      "sendFailed": "Could not send the report. Try email or Telegram instead.",
+      "subject": "Hiddify crash report",
+      "shareText": "Hiddify crash report, for $to",
+      "addressCopied": "$address copied: paste it as the recipient",
+      "attachHint": "Attach the saved file $file to your message"
     },
     "keepTop": {
       "title": "A big subscription",

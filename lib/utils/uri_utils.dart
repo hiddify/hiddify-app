@@ -29,14 +29,16 @@ abstract class UriUtils {
     }
   }
 
-  static Future<bool> tryShareFile(Uri uri, {String? mimeType}) async {
+  /// [subject] and [text] go with the file to the app the user picks: a mail app makes them
+  /// the message's subject and body.
+  static Future<bool> tryShareFile(Uri uri, {String? mimeType, String? subject, String? text}) async {
     try {
       loggy.debug("sharing [$uri]");
       // the file's own path: uri.path keeps the percent-encoding, so a name with a space or a
       // non-ASCII letter pointed at a file that does not exist
       final path = uri.scheme.isEmpty || uri.isScheme('file') ? uri.toFilePath() : uri.path;
       final file = XFile(path, mimeType: mimeType);
-      final result = await Share.shareXFiles([file], sharePositionOrigin: _shareOrigin());
+      final result = await Share.shareXFiles([file], subject: subject, text: text, sharePositionOrigin: _shareOrigin());
       loggy.debug("share result: ${result.raw}");
       return result.status == ShareResultStatus.success;
     } catch (e, stackTrace) {
