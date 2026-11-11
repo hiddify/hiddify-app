@@ -1,0 +1,1279 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "شروع کریں",
+    "version": "ورژن",
+    "ok": "ٹھیک ہے",
+    "cancel": "منسوخ کریں",
+    "kContinue": "جاری رکھیں",
+    "undo": "واپس کریں",
+    "showMore": "مزید دکھائیں",
+    "showLess": "کم دکھائیں",
+    "filter": "فلٹر",
+    "all": "سب",
+    "pause": "روکیں",
+    "resume": "دوبارہ شروع کریں",
+    "clear": "صاف کریں",
+    "close": "بند کریں",
+    "auto": "خودکار",
+    "manually": "دستی",
+    "name": "نام",
+    "url": "URL",
+    "add": "شامل کریں",
+    "clipboard": "کلپ بورڈ",
+    "addToClipboard": "کلپ بورڈ میں کاپی کریں",
+    "qrCode": "QR کوڈ",
+    "free": "مفت",
+    "warp": "WARP",
+    "fragment": "فریگمنٹ",
+    "help": "مدد",
+    "save": "محفوظ کریں",
+    "update": "اپ ڈیٹ",
+    "pin": "پن کریں",
+    "unpin": "پن ہٹائیں",
+    "share": "شیئر کریں",
+    "edit": "ترمیم کریں",
+    "delete": "حذف کریں",
+    "discard": "رد کریں",
+    "import": "امپورٹ کریں",
+    "export": "ایکسپورٹ کریں",
+    "later": "بعد میں",
+    "ignore": "نظر انداز کریں",
+    "quit": "باہر نکلیں",
+    "notSet": "سیٹ نہیں",
+    "hide": "چھپائیں",
+    "exit": "باہر نکلیں",
+    "reset": "ری سیٹ کریں",
+    "done": "مکمل",
+    "decline": "مسترد کریں",
+    "agree": "متفق ہوں",
+    "empty": "خالی",
+    "unknown": "نامعلوم",
+    "hidden": "پوشیدہ",
+    "timeout": "وقت ختم",
+    "sort": "ترتیب دیں",
+    "dashboard": "ڈیش بورڈ",
+    "disable": "بند کریں",
+    "psiphon": "Psiphon",
+    "profile": "پروفائل",
+    "configuration": "کنفیگریشن",
+    "file": "فائل",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n دن",
+        "other": "$n دن"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n گھنٹہ",
+        "other": "$n گھنٹے"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "اجازت نہیں ملی"
+      },
+      "export": {
+        "clipboard": {
+          "success": "کلپ بورڈ میں کاپی ہو گیا",
+          "failure": "کلپ بورڈ میں کاپی نہیں ہو سکا",
+          "contentTooLarge": "مواد بہت بڑا ہے۔ اسے فائل میں ایکسپورٹ کریں۔"
+        },
+        "file": {
+          "success": "JSON فائل بن گئی",
+          "failure": "فائل نہیں بن سکی"
+        }
+      },
+      "import": {
+        "confirm": "امپورٹ کی تصدیق کریں",
+        "success": "امپورٹ ہو گیا",
+        "failure": "امپورٹ نہیں ہو سکا"
+      },
+      "autoSave": {
+        "success": "تبدیلیاں خود بخود محفوظ ہو گئیں"
+      }
+    }
+  },
+  "intro": {
+    "banner": "بغیر پابندی کے انٹرنیٹ کے لیے آپ کی ضرورت کی ہر چیز",
+    "termsAndPolicyCaution(rich)": "جاری رکھنے سے آپ ${tap(@:pages.about.termsAndConditions)} سے اتفاق کرتے ہیں",
+    "info(rich)": "Hiddify کی طرف سے ❤️ کے ساتھ بنایا گیا۔ ${tap_source(اوپن سورس)} اور ${tap_license(لائسنس)}"
+  },
+  "pages": {
+    "home": {
+      "title": "ہوم",
+      "quickSettings": "فوری سیٹنگز"
+    },
+    "proxies": {
+      "title": "پراکسیز",
+      "sort": "پراکسیز ترتیب دیں",
+      "testDelay": "تاخیر جانچیں",
+      "empty": "کوئی پراکسی دستیاب نہیں",
+      "connectToSeeProxies": "پراکسیز دیکھنے کے لیے کنیکٹ کریں",
+      "loadFailed": "پراکسیز لوڈ نہیں ہو سکیں۔ دوبارہ کوشش کے لیے ٹیپ کریں۔",
+      "activeProxy": "فعال پراکسی",
+      "unknownIp": "نامعلوم IP",
+      "checkingIp": "IP جانچی جا رہی ہے…",
+      "switchFailed": "اس پراکسی پر نہیں جا سکے۔ دوبارہ کوشش کریں۔",
+      "notResponding": "جواب نہیں دے رہی",
+      "noneResponding": "کوئی پراکسی جواب نہیں دے رہی",
+      "sortOptions": {
+        "unsorted": "ڈیفالٹ",
+        "name": "نام کے مطابق",
+        "delay": "تاخیر کے مطابق",
+        "usage": "استعمال کے مطابق",
+        "upload": "اپ لوڈ رفتار کے مطابق",
+        "download": "ڈاؤن لوڈ رفتار کے مطابق"
+      },
+      "ipInfo": {
+        "address": "IP ایڈریس",
+        "country": "ملک",
+        "organization": "ادارہ"
+      },
+      "delay": {
+        "result": "تاخیر: ${delay}ms",
+        "timeout": "تاخیر کی جانچ کا وقت ختم ہو گیا",
+        "unavailable": "دستیاب نہیں",
+        "testing": "تاخیر: جانچ جاری ہے…"
+      },
+      "status": {
+        "connecting": "کنیکٹ ہو رہی ہے",
+        "registering": "رجسٹر ہو رہی ہے",
+        "failed": "ناکام",
+        "ready": "تیار",
+        "searching": "تلاش جاری ہے",
+        "reconnecting": "دوبارہ کنیکٹ ہو رہی ہے"
+      },
+      "signalStyle": "سگنل کا انداز",
+      "keepTop": {
+        "picking": "$count میں سے $keep تیز ترین چنی جا رہی ہیں…",
+        "pickingBody": "تمام پراکسیز کو ایک بار جانچا جاتا ہے، پھر صرف تیز ترین چلتی رہتی ہیں۔",
+        "thenFastest": "جانچ کے بعد صرف $keep تیز ترین$where چلتی رہیں گی۔",
+        "thenWorking": "جانچ کے بعد صرف کام کرنے والی$where چلتی رہیں گی۔",
+        "thenAll": "جانچ کے بعد صرف وہ$where چلتی رہیں گی۔",
+        "inRegions": " $flags میں",
+        "pickingAnswering": "تمام $count کی جانچ جاری ہے…",
+        "keptAnswering": "$n کام کرنے والی پراکسیز$where چل رہی ہیں",
+        "kept": "$n تیز ترین چل رہی ہیں",
+        "keptFastest": "$n تیز ترین$where چل رہی ہیں",
+        "keptBody": "بیٹری اور ڈیٹا بچانے کے لیے باقی $paused پراکسیز رکی ہوئی ہیں۔",
+        "showAll": "تمام $count دکھائیں",
+        "big": "$count پراکسیز چل رہی ہیں",
+        "bigBody": "بیٹری اور ڈیٹا بچانے کے لیے صرف $keep تیز ترین کو چلتا رکھیں۔",
+        "keep": "$keep تیز ترین رکھیں",
+        "change": "تعداد بدلیں",
+        "chosen": "آپ کی چنی ہوئی $n پراکسیز چل رہی ہیں",
+        "choose": "منتخب کریں"
+      },
+      "upload": {
+        "test": "اپ لوڈ رفتار جانچیں",
+        "failed": "رفتار کی جانچ شروع نہیں ہو سکی",
+        "hint": "ٹیپ: اپ لوڈ رفتار · دبائے رکھیں: ڈاؤن لوڈ رفتار",
+        "hintBoth": "ٹیپ: دونوں رفتاریں · دبائے رکھیں: ڈاؤن لوڈ رفتار"
+      },
+      "speedTest": {
+        "title": "رفتار کی جانچ",
+        "what": "کیا جانچنا ہے",
+        "download": "ڈاؤن لوڈ",
+        "upload": "اپ لوڈ",
+        "amount": "فی پراکسی مقدار",
+        "proxies": "جانچنے کی پراکسیز",
+        "proxiesHint": "پنگ کے لحاظ سے تیز ترین",
+        "all": "سب",
+        "fastest": "$n تیز ترین",
+        "through": "$count تیز ترین میں سے ہر ایک کے ذریعے $n MB",
+        "throughAll": "$count پراکسیز میں سے ہر ایک کے ذریعے $n MB",
+        "throughEach": "ہر پراکسی کے ذریعے $n MB",
+        "start": "جانچ شروع کریں",
+        "save": "محفوظ کریں",
+        "testDownload": "ڈاؤن لوڈ رفتار جانچیں",
+        "both": "دونوں",
+        "bothWays": "ڈاؤن اور اپ",
+        "amountHint": "زیادہ مقدار سے نتیجہ زیادہ درست ملتا ہے",
+        "clear": "محفوظ نتائج صاف کریں",
+        "cleared": "صاف ہو گئے",
+        "which": "کون سی پراکسیز",
+        "shown": "دکھائی گئی ($n)",
+        "chosen": "منتخب ($n)"
+      },
+      "single": {
+        "share": "شیئر کریں",
+        "edit": "ترمیم کریں",
+        "shareTitle": "پراکسی شیئر کریں",
+        "configHint": "صرف یہ پراکسی، اور وہ پراکسی جس کے ذریعے یہ جڑتی ہے۔ Hiddify اسے کسی بھی کنفیگ کی طرح امپورٹ کرتا ہے۔",
+        "editTitle": "نئے پروفائل کے طور پر ترمیم کریں",
+        "editMsg": "“${name}” کی ایک کاپی نئے پروفائل میں بنے گی جس میں آپ ترمیم کر سکتے ہیں۔ اصل جوں کا توں رہے گا، کیونکہ سبسکرپشن ہر اپ ڈیٹ پر اپنی پراکسیز بدل دیتی ہے۔",
+        "editConfirm": "کاپی کریں اور ترمیم کریں",
+        "savedAsProfile": "نئے پروفائل “${name}” میں کاپی ہو گئی",
+        "failed": "اس پراکسی کی کنفیگریشن نہیں پڑھی جا سکی"
+      }
+    },
+    "profiles": {
+      "title": "پروفائلز",
+      "add": "پروفائل شامل کریں",
+      "fromPhone": {
+        "title": "اپنے فون سے شامل کریں",
+        "scan": "اس کوڈ کو اپنے فون کے کیمرے سے اسکین کریں، سبسکرپشن لنک پیسٹ کریں اور بھیج دیں۔",
+        "sameNetwork": "آپ کا فون اور یہ ٹی وی ایک ہی Wi-Fi نیٹ ورک پر ہونے چاہییں۔",
+        "noNetwork": "یہ ٹی وی کسی مقامی نیٹ ورک پر نہیں ہے۔ فون سے لنک شامل کرنے کے لیے اسے Wi-Fi سے جوڑیں۔",
+        "locked": "بہت زیادہ غلط کوڈ آزمائے گئے، اس لیے یہ بند ہو گیا ہے۔ اسے بند کر کے نیا کوڈ لینے کے لیے دوبارہ کھولیں۔",
+        "received": "آپ کے فون سے موصول ہوا",
+        "from": "$address کی طرف سے",
+        "page": {
+          "title": "اپنے ٹی وی پر Hiddify کو بھیجیں",
+          "intro": "ریموٹ سے ٹائپ کیے بغیر چار آسان مراحل میں اپنے ٹی وی پر سبسکرپشن شامل کریں۔",
+          "steps": {
+            "network": {
+              "title": "ایک ہی Wi-Fi سے جڑیں",
+              "body": "آپ کا فون اور ٹی وی ایک ہی Wi-Fi نیٹ ورک پر ہونے چاہییں، ورنہ یہ صفحہ ٹی وی تک نہیں پہنچ سکتا۔"
+            },
+            "copy": {
+              "title": "اپنا لنک کاپی کریں",
+              "body": "اپنے فراہم کنندہ سے سبسکرپشن لنک کاپی کریں، یا کوئی بھی پراکسی لنک یا کنفیگ۔"
+            },
+            "paste": {
+              "title": "یہاں پیسٹ کریں",
+              "body": "نیچے والے خانے پر ٹیپ کریں، لنک پیسٹ کریں، پھر “ٹی وی پر بھیجیں” پر ٹیپ کریں۔"
+            },
+            "confirm": {
+              "title": "ٹی وی پر تصدیق کریں",
+              "body": "لنک ٹی وی پر نظر آئے گا۔ ریموٹ سے امپورٹ دبائیں۔ آپ کے دبانے تک کچھ شامل نہیں ہوتا۔"
+            }
+          },
+          "label": "سبسکرپشن لنک",
+          "hint": "سبسکرپشن لنک یا کنفیگ پیسٹ کریں",
+          "send": "ٹی وی پر بھیجیں",
+          "sentTitle": "آپ کے ٹی وی پر بھیج دیا گیا",
+          "sent": "اب اسے شامل کرنے کے لیے ٹی وی پر امپورٹ دبائیں۔ آپ نیچے سے دوسرا لنک بھی بھیج سکتے ہیں۔",
+          "empty": "پہلے لنک پیسٹ کریں۔",
+          "footer": "یہ صفحہ صرف اس وقت کام کرتا ہے جب ٹی وی پر “پروفائل شامل کریں” کھلا ہو، اور صرف آپ کے مقامی نیٹ ورک پر۔"
+        }
+      },
+      "update": "پروفائل اپ ڈیٹ کریں",
+      "viewAllProfiles": "تمام پروفائلز دیکھیں",
+      "activeProfileName": "فعال پروفائل کا نام: “${name}”",
+      "nonActiveProfileName": "“${name}” کو فعال پروفائل بنائیں",
+      "freeSubNotFound": "کوئی مفت سبسکرپشن نہیں ملی",
+      "freeSubNotFoundForRegion": "“${region}” کے لیے کوئی مفت سبسکرپشن نہیں ملی",
+      "failedToLoad": "لوڈ نہیں ہو سکا",
+      "updateSubscriptions": "سبسکرپشنز اپ ڈیٹ کریں",
+      "share": {
+        "title": "پروفائل شیئر کریں",
+        "scanHint": "یہ پروفائل شامل کرنے کے لیے اسے دوسرے آلے پر Hiddify سے اسکین کریں",
+        "link": "سبسکرپشن لنک",
+        "config": "کنفیگریشن",
+        "configHint": "مکمل JSON جس کے ساتھ یہ پروفائل چلتا ہے، آپ کی سیٹنگز سمیت",
+        "configFailed": "کنفیگریشن نہیں بن سکی",
+        "copy": "کاپی کریں",
+        "shareFile": "شیئر کریں",
+        "saveFile": "محفوظ کریں",
+        "tooLargeToCopy": "کلپ بورڈ کے لیے بہت بڑا ہے: اسے فائل کے طور پر شیئر یا محفوظ کریں",
+        "toTv": {
+          "button": "ٹی وی پر بھیجیں",
+          "scanHint": "ٹی وی پر Hiddify کھولیں اور پروفائل شامل کرنے کے لیے + پر ٹیپ کریں، پھر وہ کوڈ اسکین کریں جو نظر آئے۔ دونوں آلات ایک ہی Wi-Fi پر ہونے چاہییں۔",
+          "sent": "بھیج دیا گیا۔ اسے شامل کرنے کے لیے ٹی وی پر امپورٹ دبائیں۔",
+          "notTvCode": "یہ Hiddify ٹی وی کا کوڈ نہیں ہے۔ ٹی وی پر پروفائل شامل کرنے کے لیے + پر ٹیپ کریں تاکہ کوڈ نظر آئے۔",
+          "expired": "ٹی وی اب اس کوڈ پر لنک قبول نہیں کرتا۔ ٹی وی پر پروفائل شامل کرنے کی اسکرین دوبارہ کھولیں اور نیا کوڈ اسکین کریں۔",
+          "busy": "ٹی وی پر بہت سے لنک انتظار میں ہیں۔ انہیں ٹی وی پر امپورٹ یا رد کریں، پھر دوبارہ کوشش کریں۔",
+          "unreachable": "ٹی وی تک رسائی نہیں ہو سکی۔ یقینی بنائیں کہ فون اور ٹی وی ایک ہی Wi-Fi نیٹ ورک پر ہیں۔"
+        }
+      },
+      "msg": {
+        "save": {
+          "success": "پروفائل محفوظ ہو گیا"
+        },
+        "invalidUrl": "غلط URL",
+        "add": {
+          "failure": "پروفائل شامل نہیں ہو سکا"
+        },
+        "update": {
+          "success": "پروفائل اپ ڈیٹ ہو گیا",
+          "failure": "پروفائل اپ ڈیٹ نہیں ہو سکا",
+          "failureNamed": "“${name}” اپ ڈیٹ نہیں ہو سکا",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count پروفائل اپ ڈیٹ ہو گیا",
+            "other": "$count پروفائلز اپ ڈیٹ ہو گئے"
+          },
+          "bulkPartial": "${success} اپ ڈیٹ ہوئے\n${failed} ناکام: ${names}"
+        },
+        "delete": {
+          "success": "پروفائل حذف ہو گیا",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count پروفائل حذف ہو گیا",
+            "other": "$count پروفائلز حذف ہو گئے"
+          },
+          "bulkPartial": "${total} میں سے ${deleted} پروفائلز حذف ہوئے"
+        }
+      },
+      "removeInactive": {
+        "action": "غیر فعال سبسکرپشنز ہٹائیں",
+        "title": "غیر فعال سبسکرپشنز ہٹائیں",
+        "hint": "یہ سبسکرپشنز اب کام نہیں کرتیں۔ نشان زد حذف ہو جائیں گی؛ جنہیں رکھنا ہو ان کا نشان ہٹا دیں۔",
+        "none": "کوئی غیر فعال سبسکرپشن نہیں",
+        "remove(plural, param=count)": {
+          "one": "$count حذف کریں",
+          "other": "$count حذف کریں"
+        },
+        "reason": {
+          "expired": "میعاد ختم",
+          "expiredOn": "${date} کو میعاد ختم ہوئی",
+          "noTraffic": "ٹریفک ختم ہو گیا",
+          "updateFailing": "اپ ڈیٹ بار بار ناکام ہو رہی ہے",
+          "updateFailingSince": "${date} سے اپ ڈیٹ ناکام ہو رہی ہے"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "پروفائل",
+      "lastUpdate": "آخری اپ ڈیٹ",
+      "form": {
+        "nameHint": "پروفائل کا نام",
+        "emptyName": "نام ضروری ہے",
+        "invalidUrl": "غلط URL",
+        "urlHint": "مکمل کنفیگریشن URL",
+        "disableAutoUpdate": "خودکار اپ ڈیٹ بند کریں",
+        "autoUpdateInterval": "خودکار اپ ڈیٹ کا وقفہ",
+        "loading": "پروفائل شامل ہو رہا ہے…",
+        "adminPreference": "ایڈمنسٹریٹر کی اجازت",
+        "adminPreferenceAskEachTime": "ہر بار پوچھیں",
+        "adminPreferencePreferAdmin": "ہمیشہ ایڈمنسٹریٹر کی اجازت استعمال کریں",
+        "adminPreferencePreferNoAdmin": "ہمیشہ ایڈمنسٹریٹر کی اجازت کے بغیر جاری رکھیں",
+        "adminPreferenceReset": "ایڈمنسٹریٹر کی اجازت کے بارے میں ہر بار پوچھیں"
+      }
+    },
+    "logs": {
+      "title": "لاگز",
+      "category": "زمرہ",
+      "level": "سطح",
+      "recentLogs": "حالیہ لاگز",
+      "recentLogsMsg": "جو آپ اس صفحے پر دیکھ رہے ہیں",
+      "errorLog": "ایپ اور کور کا لاگ",
+      "errorLogMsg": "دونوں کی خرابیاں، تمام بار چلانے کی",
+      "coreLog": "کور کا لاگ",
+      "coreLogMsg": "جو کچھ کور نے ریکارڈ کیا",
+      "coreCrash": "کور کا کریش",
+      "coreCrashMsg": "آخری بار کریش ہوتے وقت کور کیا کر رہا تھا",
+      "exportToFile": "فائل میں ایکسپورٹ کریں",
+      "linesMatch": "$count سطریں مماثل ہیں",
+      "fileSaved": "فائل محفوظ ہو گئی",
+      "fileSaveFailed": "فائل محفوظ نہیں ہو سکی",
+      "coreLogLevel": "کور کی سطح",
+      "coreLogLevelMsg": "دوبارہ کنیکٹ ہونے کے بعد لاگو ہوگا",
+      "buffer": "بفر",
+      "diagnostics": "تشخیصی رپورٹ",
+      "diagnosticsMsg": "کریش رپورٹس، لاگز اور آپ کی سیٹنگز، بغیر سرورز اور پاس ورڈز کے، ایک زپ فائل میں"
+    },
+    "about": {
+      "title": "تعارف",
+      "notAvailableMsg": "آپ تازہ ترین ورژن استعمال کر رہے ہیں",
+      "checkForUpdate": "اپ ڈیٹ چیک کریں",
+      "openWorkingDir": "ورکنگ ڈائریکٹری کھولیں",
+      "sourceCode": "سورس کوڈ",
+      "telegramChannel": "Telegram چینل",
+      "termsAndConditions": "شرائط و ضوابط",
+      "privacyPolicy": "رازداری کی پالیسی"
+    },
+    "settings": {
+      "title": "سیٹنگز",
+      "resetTunnel": "VPN پروفائل ری سیٹ کریں",
+      "options": {
+        "import": {
+          "clipboard": "کلپ بورڈ سے آپشنز امپورٹ کریں",
+          "file": "فائل سے آپشنز امپورٹ کریں"
+        },
+        "export": {
+          "anonymousToClipboard": "گمنام آپشنز کلپ بورڈ میں کاپی کریں",
+          "anonymousToFile": "گمنام آپشنز فائل میں ایکسپورٹ کریں",
+          "allToClipboard": "تمام آپشنز کلپ بورڈ میں کاپی کریں",
+          "allToFile": "تمام آپشنز فائل میں ایکسپورٹ کریں"
+        },
+        "reset": "آپشنز ری سیٹ کریں"
+      },
+      "general": {
+        "title": "عمومی",
+        "locale": "زبان",
+        "themeMode": "تھیم موڈ",
+        "themeModes": {
+          "system": "سسٹم ڈیفالٹ",
+          "dark": "ڈارک موڈ",
+          "light": "لائٹ موڈ",
+          "black": "بلیک موڈ"
+        },
+        "enableAnalytics": "اینالیٹکس آن کریں",
+        "enableAnalyticsMsg": "ایپ کو بہتر بنانے میں مدد کے لیے اپنے آلے سے اینالیٹکس اور کریش رپورٹس بھیجیں",
+        "autoIpCheck": "کنکشن کی IP خود بخود جانچیں",
+        "reduceAnimations": "اینیمیشنز کم کریں",
+        "reduceAnimationsMsg": "بیٹری بچانے کے لیے کنیکٹ بٹن کو ساکن رکھیں اور بار بار چلنے والے اثرات روک دیں",
+        "dynamicNotification": "نوٹیفکیشن میں رفتار دکھائیں",
+        "hapticFeedback": "ہیپٹک فیڈ بیک",
+        "alwaysOnVpn": "ہمیشہ آن VPN",
+        "actionAtClosing": "ونڈو بند کرتے وقت",
+        "autoStart": "لاگ ان پر شروع کریں",
+        "silentStart": "چھوٹی ونڈو میں شروع کریں",
+        "ignoreBatteryOptimizations": "بیٹری آپٹیمائزیشن بند کریں",
+        "ignoreBatteryOptimizationsMsg": "VPN کی بہترین کارکردگی کے لیے پابندیاں ہٹائیں",
+        "memoryLimit": "میموری کی حد",
+        "memoryLimitMsg": "اگر میموری ختم ہونے کی خرابیاں آ رہی ہوں یا ایپ بار بار کریش ہو تو آن کریں",
+        "connectionTestUrl": "کنکشن ٹیسٹ URL",
+        "urlTestInterval": "URL ٹیسٹ کا وقفہ",
+        "clashApiPort": "Clash API پورٹ",
+        "useSystemTlsEngine": "دستیاب ہونے پر سسٹم کا TLS استعمال کریں",
+        "useSystemTlsEngineMsg": "TLS فنگر پرنٹ کے بغیر کنکشن macOS، iOS یا Windows کا TLS استعمال کرتے ہیں، بشرطیکہ وہ اس آلے پر جانچ میں پورا اترے؛ ورنہ وہ Chrome جیسے نظر آتے ہیں۔",
+        "uploadTestSize": "اپ لوڈ ٹیسٹ کا سائز",
+        "megabytes": "$n MB",
+        "speedTest": "رفتار کی جانچ"
+      },
+      "routing": {
+        "title": "روٹنگ",
+        "routeRule": {
+          "add": "اصول شامل کریں",
+          "delete": "اصول حذف کریں",
+          "duplicate": "اصول کی نقل بنائیں",
+          "duplicated": "نئے اصول کے طور پر کاپی ہو گیا: اپنی مرضی سے ترمیم کریں",
+          "copyAll": "سب کاپی کریں",
+          "options": {
+            "import": {
+              "clipboard": "کلپ بورڈ سے اصول امپورٹ کریں",
+              "file": "فائل سے اصول امپورٹ کریں"
+            },
+            "export": {
+              "clipboard": "اصول کلپ بورڈ میں کاپی کریں",
+              "file": "اصول فائل میں محفوظ کریں"
+            },
+            "reset": "ڈیفالٹ اصولوں پر واپس جائیں"
+          },
+          "rule": {
+            "title": "اصول",
+            "onlyTunMode": "صرف TUN موڈ میں دستیاب",
+            "notAvailableInThisPlatform": "اس پلیٹ فارم پر دستیاب نہیں",
+            "canNotBeEmpty": "خالی نہیں ہو سکتا",
+            "validUrlEx": "https://example.com",
+            "validUrl": "درست “URL” جیسے\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe or google chrome or chrome",
+            "validProcessName": "درست “پروسیس کا نام” جیسے\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "درست “پروسیس کا راستہ” جیسے\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 or 1:65000",
+            "validPortRange": "درست “پورٹ” یا “پورٹ رینج” جیسے\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8, 10.0.0.0/24, or fd00::/8",
+            "validIpCidr": "درست IP CIDR جیسے\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com or dl.google.com",
+            "validDomain": "درست “ڈومین” جیسے\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com or .ir",
+            "validDomainSuffix": "درست “ڈومین سفکس” جیسے\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "بلٹ اِن اصول کو بدلا نہیں جا سکتا۔ اس کی نقل بنائیں اور نقل میں ترمیم کریں۔",
+            "tileTitle(map)": {
+              "name": "نام",
+              "outbound": "مماثلت پر آؤٹ باؤنڈ",
+              "rule_set": "URLset",
+              "package_name": "پیکج کے نام",
+              "process_name": "پروسیس کے نام",
+              "process_path": "پروسیس کے راستے",
+              "network": "نیٹ ورکس",
+              "port_range": "منزل کے پورٹس",
+              "source_port_range": "ماخذ کے پورٹس",
+              "protocol": "پروٹوکول",
+              "ip_cidr": "منزل کی IP CIDR",
+              "source_ip_cidr": "ماخذ کی IP CIDR",
+              "domain": "ڈومین",
+              "domain_suffixe": "ڈومین سفکس",
+              "domain_keyword": "ڈومین کیورڈ",
+              "domain_regex": "ڈومین regex"
+            },
+            "outbound(map)": {
+              "proxy": "پراکسی",
+              "direct": "براہ راست",
+              "direct_with_fragment": "فریگمنٹ کے ساتھ براہ راست",
+              "block": "بلاک"
+            },
+            "network(map)": {
+              "all": "سب",
+              "tcp": "TCP",
+              "udp": "UDP"
+            },
+            "protocol(map)": {
+              "": "سب",
+              "tls": "TLS",
+              "http": "HTTP",
+              "quic": "QUIC",
+              "stun": "STUN",
+              "dns": "DNS",
+              "bittorrent": "BitTorrent"
+            }
+          },
+          "genericList": {
+            "addNew": "نئی قدر شامل کریں",
+            "update": "قدر اپ ڈیٹ کریں",
+            "clearList": "فہرست صاف کریں",
+            "clearListMsg": "تمام اندراجات حذف ہو جائیں گے"
+          }
+        },
+        "builtinRules": {
+          "tag": "بلٹ اِن اصول",
+          "bypassLan": "LAN کو بائی پاس کریں",
+          "systemDirect": {
+            "apple": "Apple کی سروسز",
+            "microsoft": "Microsoft کی سروسز",
+            "android": "Android کی سروسز",
+            "linux": "Linux اپ ڈیٹس"
+          },
+          "blockAds": "اشتہارات اور میل ویئر",
+          "bypassRegion": "$region کی سائٹس"
+        },
+        "appBasedRouting": {
+          "title": "ایپ کے مطابق روٹنگ",
+          "hideSysApps": "سسٹم ایپس چھپائیں",
+          "listTitle": {
+            "bypass": "بائی پاس کی گئی ایپس",
+            "proxy": "پراکسی کے ذریعے چلنے والی ایپس"
+          },
+          "chooseApps": "ایپس منتخب کریں",
+          "apps": {
+            "one": "ایپ",
+            "other": "ایپس"
+          },
+          "moreApps": {
+            "one": "+$n ایپ",
+            "other": "+$n ایپس"
+          },
+          "autoTag": "خودکار",
+          "outsideVpn": "VPN سے باہر",
+          "ruleWontApply": "VPN سے باہر · اصول لاگو نہیں ہوگا",
+          "notInstalled": "انسٹال نہیں ہے",
+          "share": {
+            "invite": "خودکار انتخاب بہتر بنانے میں مدد کریں",
+            "removed": {
+              "one": "$n ہٹائی گئی",
+              "other": "$n ہٹائی گئیں"
+            },
+            "added": {
+              "one": "$n شامل کی گئی",
+              "other": "$n شامل کی گئیں"
+            },
+            "title": "اپنی تبدیلیاں شیئر کریں",
+            "where": "GitHub پر ایک عوامی ایشو کھلتا ہے جس میں ان ایپس کے نام پہلے سے بھرے ہوتے ہیں۔ انہیں شیئر کرنے کے لیے وہاں جمع کرا دیں۔ آپ کے پاس GitHub اکاؤنٹ ہونا ضروری ہے۔",
+            "action": "GitHub پر جاری رکھیں"
+          },
+          "options": {
+            "import": {
+              "clipboard": "کلپ بورڈ سے انتخاب امپورٹ کریں",
+              "file": "فائل سے انتخاب امپورٹ کریں",
+              "msg": "امپورٹ کرنے سے آپ کے موجودہ انتخاب بدل جائیں گے۔ جاری رکھیں؟"
+            },
+            "export": {
+              "clipboard": "انتخاب کلپ بورڈ میں کاپی کریں",
+              "file": "انتخاب فائل میں ایکسپورٹ کریں"
+            },
+            "clearAllSelections": "تمام انتخاب صاف کریں"
+          },
+          "modes": {
+            "proxy": "صرف پراکسی",
+            "bypass": "بائی پاس"
+          },
+          "autoSelection": {
+            "title": "$region کی بنیاد پر خودکار انتخاب",
+            "performNow": "ابھی اپ ڈیٹ کریں",
+            "updated": {
+              "zero": "آج اپ ڈیٹ ہوا",
+              "one": "$n دن پہلے اپ ڈیٹ ہوا",
+              "other": "$n دن پہلے اپ ڈیٹ ہوا"
+            },
+            "noList": "اس علاقے کے لیے کوئی فہرست نہیں",
+            "loadFailed": "فہرست لوڈ نہیں ہو سکی",
+            "restore": {
+              "one": "$n خودکار انتخاب بحال کریں",
+              "other": "$n خودکار انتخاب بحال کریں"
+            },
+            "restored": {
+              "one": "$n خودکار انتخاب بحال ہو گیا",
+              "other": "$n خودکار انتخاب بحال ہو گئے"
+            }
+          }
+        },
+        "region": "علاقہ",
+        "regions": {
+          "ir": "ایران (ir)",
+          "cn": "چین (cn)",
+          "ru": "روس (ru)",
+          "af": "افغانستان (af)",
+          "id": "انڈونیشیا (id)",
+          "tr": "ترکیہ (tr)",
+          "br": "برازیل (br)",
+          "other": "دیگر"
+        },
+        "balancerStrategy": {
+          "title": "بیلنسر کی حکمت عملی",
+          "roundRobin": "راؤنڈ رابن",
+          "consistentHash": "کنسسٹنٹ ہیش",
+          "stickySession": "اسٹکی سیشن",
+          "roundRobinDescription": "ہر کنکشن اگلا سرور استعمال کرتا ہے، اس لیے سائٹس کو آپ کی IP بدلتی نظر آ سکتی ہے",
+          "consistentHashDescription": "ہر سائٹ ہمیشہ ایک ہی سرور استعمال کرتی ہے",
+          "stickySessionDescription": "دوبارہ کنیکٹ ہونے تک ہر سائٹ ایک بے ترتیب سرور پر قائم رہتی ہے"
+        },
+        "defaultProxy": {
+          "title": "ڈیفالٹ پراکسی",
+          "lowest": "کم ترین پنگ",
+          "balance": "متوازن",
+          "first": "پہلی پراکسی",
+          "lowestDescription": "جب تک آپ پراکسی نہ چنیں، تیز ترین استعمال ہوتی ہے",
+          "balanceDescription": "جب تک آپ پراکسی نہ چنیں، کنکشن سب پراکسیز میں بانٹے جاتے ہیں",
+          "firstDescription": "جب تک آپ پراکسی نہ چنیں، پروفائل کی پہلی پراکسی استعمال ہوتی ہے"
+        },
+        "resolveDestination": "منزل کا ایڈریس معلوم کریں",
+        "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "IPv6 بند کیوں ہے؟",
+        "ipv6RouteTurnOnTitle": "IPv6 آن کریں؟",
+        "ipv6RouteTurnOn": "آن کریں",
+        "ipv6RouteHelp": "زیادہ تر پراکسیز کے اخراجی راستے پر IPv6 نہیں ہوتا۔\n\nجو کنکشن پراکسی سنبھال نہ سکے وہ کھلتے ہی ٹوٹ جاتا ہے، اور براؤزر اسے IPv4 پر دوبارہ نہیں آزماتے، اس لیے Google اور YouTube لوڈ نہیں ہوتے۔\n\nآن ہونے پر ہر پراکسی کو اس کے کنکشن ٹیسٹ میں ایک بار جانچا جاتا ہے۔ IPv6 صرف اسی پراکسی سے استعمال ہوتا ہے جو اسے سنبھال سکے؛ باقی سب کچھ خاموشی سے IPv4 پر چلتا ہے۔\n\nIPv6 ہمیشہ VPN کے اندر سے گزرتا ہے، اس کے باہر سے کبھی نہیں۔",
+        "ipv6Modes": {
+          "ipv4Only": "بند (صرف IPv4)",
+          "preferIpv4": "آن، پہلے IPv4",
+          "preferIpv6": "آن، پہلے IPv6",
+          "ipv4OnlyDescription": "ایپس صرف IPv4 استعمال کرتی ہیں۔ IPv6 فوراً مسترد ہو جاتا ہے۔",
+          "preferIpv4Description": "پہلے IPv4۔ IPv6 صرف اس پراکسی سے جو اسے سنبھالنے کے لیے جانچی جا چکی ہو۔",
+          "preferIpv6Description": "پہلے IPv6، صرف اس پراکسی سے جو اسے سنبھالنے کے لیے جانچی جا چکی ہو۔"
+        }
+      },
+      "dns": {
+        "title": "DNS",
+        "remoteDns": "ریموٹ DNS",
+        "remoteDnsDomainStrategy": "ریموٹ DNS کی ڈومین حکمت عملی",
+        "directDns": "آؤٹ باؤنڈ سرور ریزولور (براہ راست)",
+        "directDnsDomainStrategy": "آؤٹ باؤنڈ ڈومین حکمت عملی",
+        "enableFakeDns": "فیک DNS آن کریں",
+        "domainStrategy": {
+          "auto": "خودکار",
+          "preferIpv6": "IPv6 کو ترجیح دیں",
+          "preferIpv4": "IPv4 کو ترجیح دیں",
+          "ipv4Only": "صرف IPv4",
+          "ipv6Only": "صرف IPv6"
+        }
+      },
+      "inbound": {
+        "title": "ان باؤنڈ",
+        "serviceMode": "سروس موڈ",
+        "serviceModes": {
+          "proxy": "صرف پراکسی سروس",
+          "systemProxy": "سسٹم پراکسی سیٹ کریں",
+          "tun": "VPN",
+          "router": "راؤٹر (پورا نیٹ ورک)"
+        },
+        "shortServiceModes": {
+          "proxy": "پراکسی",
+          "systemProxy": "سسٹم پراکسی",
+          "tun": "VPN",
+          "router": "راؤٹر"
+        },
+        "strictRoute": "سخت روٹ",
+        "tunImplementation": "TUN کا نفاذ",
+        "tunImplementations": {
+          "sing15": "Sing 15",
+          "mixed": "ملا جلا",
+          "system": "سسٹم",
+          "gvisor": "gVisor"
+        },
+        "mixedPort": "پراکسی پورٹ (SOCKS5/4, HTTP)",
+        "tproxyPort": "ٹرانسپیرنٹ پراکسی پورٹ",
+        "directPort": "ڈائریکٹ پورٹ",
+        "redirectPort": "ری ڈائریکٹ پورٹ",
+        "lanSharing": "مقامی نیٹ ورک پر شیئر کریں",
+        "connectionSharing": "کنکشن شیئرنگ",
+        "qrCode": "QR کوڈ",
+        "closedInVpn": "VPN موڈ میں بند، جب تک شیئر نہ کیا جائے",
+        "proxySecret": "پراکسی کا خفیہ کوڈ",
+        "noSecret": "کوئی خفیہ کوڈ نہیں: جو بھی ایپ یا آلہ پورٹ تک پہنچ سکے اسے استعمال کر سکتا ہے",
+        "generateSecret": "نیا بنائیں",
+        "removeSecret": "خفیہ کوڈ ہٹائیں؟",
+        "removeSecretMsg": "خفیہ کوڈ کے بغیر، اس آلے کی کوئی بھی ایپ، اور شیئرنگ کے دوران نیٹ ورک کا کوئی بھی آلہ، بغیر صارف نام یا پاس ورڈ کے پراکسی استعمال کر سکتا ہے۔ اپنی ذمہ داری پر ہٹائیں۔",
+        "localProxy": "لوکل پراکسی",
+        "localProxyInVpn": "VPN موڈ میں کھلی رکھیں",
+        "localProxyInVpnHint": "ایپس پہلے ہی VPN استعمال کرتی ہیں؛ صرف ان ایپس کے لیے جو پراکسی استعمال کرنے پر سیٹ ہوں",
+        "localProxyAuth": "پاس ورڈ لازمی کریں",
+        "localProxyAuthHint": "کچھ ایپس، جیسے براؤزر، SOCKS پاس ورڈ نہیں بھیج سکتیں",
+        "notAsSystemProxy": "سسٹم پراکسی کے طور پر نہیں مانگا جاتا، کیونکہ وہ پاس ورڈ نہیں بھیج سکتی",
+        "lanGroup": "مقامی نیٹ ورک پر شیئرنگ",
+        "lanSharingPort": "شیئرنگ پورٹ",
+        "otherPorts": "دیگر پورٹس",
+        "closedInVpnLocal": "VPN موڈ میں بند"
+      },
+      "tlsTricks": {
+        "title": "TLS ٹرکس",
+        "enable": "فریگمنٹ آن کریں",
+        "packets": "فریگمنٹیشن پیکٹس",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
+        "size": "فریگمنٹ کا سائز",
+        "sleep": "فریگمنٹ کا وقفہ",
+        "mixedSniCase": {
+          "enable": "ملا جلا SNI کیس آن کریں"
+        },
+        "padding": {
+          "enable": "پیڈنگ آن کریں",
+          "size": "پیڈنگ کا سائز"
+        }
+      },
+      "chain": {
+        "quick": {
+          "off": "بند",
+          "extraSecurity": {
+            "title": "اضافی سیکیورٹی",
+            "subtitle": "جب آپ کو پراکسی پر بھروسا نہ ہو",
+            "ipBy": "آپ کی IP $mode طے کرتا ہے",
+            "notTracked": "آپ کا VPN فراہم کنندہ آپ کا ٹریفک نہیں دیکھ سکتا",
+            "forPublic": "عوامی اور گمنام پراکسیز کے لیے موزوں",
+            "slower": "رفتار کم ہو سکتی ہے"
+          },
+          "unblocker": {
+            "title": "پراکسی ان بلاکر",
+            "subtitle": "پراکسی کو فلٹرنگ سے گزارتا ہے",
+            "mayConnect": "فلٹر شدہ پراکسی بھی کنیکٹ ہو سکتی ہے",
+            "personalOnly": "صرف ذاتی پراکسی کے لیے مفید",
+            "notForPublic": "عوامی پراکسیز کے لیے موزوں نہیں",
+            "slower": "پراکسی کچھ سست ہو جاتی ہے"
+          }
+        },
+        "title": "چین",
+        "subtitle": "اضافی سیکیورٹی اور ان بلاکر",
+        "finalIp": "حتمی IP",
+        "levels": {
+          "app": {
+            "title": "ایپ",
+            "msg": "نقطۂ آغاز: آپ کی ایپ کا ٹریفک یہاں سے چین میں داخل ہوتا ہے اور حتمی بائی پاس کی تیاری کے لیے اگلی تہوں سے گزرتا ہے"
+          },
+          "extraSecurity": {
+            "title": "اضافی سیکیورٹی",
+            "msg": "آپ کے ڈیٹا کو نجی رکھنے کے لیے ایک اضافی حفاظتی تہہ لگاتی ہے، چاہے آپ کا مرکزی پروفائل قابل اعتماد نہ ہو"
+          },
+          "mainProfile": {
+            "title": "مرکزی پروفائل"
+          },
+          "unblocker": {
+            "title": "ان بلاکر",
+            "msg": "نیٹ ورک کی پابندیوں سے بچنے میں مدد کرتا ہے۔ اگر مددگار کنیکٹ ہو جائے تو آپ کا مرکزی پروفائل بلاک ہونے کے باوجود کام کر سکتا ہے۔"
+          },
+          "filtering": {
+            "title": "فلٹرنگ",
+            "msg": "آخری اخراج: آپ کا ٹریفک فعال تہوں سے گزرتا ہے، جو اضافی سیکیورٹی، مرکزی پروفائل یا ان بلاکر ہو سکتی ہیں۔ ان کے اثرات لگنے کے بعد اسے مقامی نیٹ ورک کی فلٹرنگ سے بچنے کے لیے روانہ کر دیا جاتا ہے۔"
+          }
+        },
+        "warp": {
+          "missingConfig": "WARP کنفیگ موجود نہیں",
+          "licenseKey": "لائسنس کی",
+          "tunnel": "ٹنل",
+          "cleanIp": "صاف IP",
+          "port": "پورٹ",
+          "noise": {
+            "count": "نوائز کی تعداد",
+            "mode": "نوائز موڈ",
+            "size": "نوائز کا سائز",
+            "delay": "نوائز کی تاخیر",
+            "modes": {
+              "standard": "معیاری",
+              "random": "بے ترتیب",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "QUIC ہینڈ شیک",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (VoIP کال)",
+              "stun": "STUN (ویڈیو کال)"
+            },
+            "title": "WireGuard نوائز"
+          },
+          "endpoint": "اینڈ پوائنٹ",
+          "endpointSources": {
+            "profile": "Cloudflare کی طرف سے مقرر",
+            "scan": "اسکین",
+            "custom": "حسب ضرورت"
+          },
+          "customServer": "ایڈریس",
+          "mtu": "MTU",
+          "customized": "حسب ضرورت بنایا گیا",
+          "scanner": {
+            "title": "اسکینر",
+            "searchNoise": "نوائز تلاش کریں",
+            "maxRtt": "زیادہ سے زیادہ RTT (ms)",
+            "timeout": "پروب کا وقت (ms)",
+            "count": "جانچنے کے ایڈریس",
+            "concurrency": "متوازی پروبز",
+            "ports": "پورٹس",
+            "cidrs": "رینجز"
+          },
+          "masque": {
+            "title": "MASQUE",
+            "vhttp": "HTTP ورژن",
+            "serverName": "سرور کا نام",
+            "useIpv6": "IPv6 کو ترجیح دیں",
+            "udpTimeout": "UDP کا وقت (s)",
+            "keepalive": "UDP کیپ الائیو (s)",
+            "packetSize": "ابتدائی پیکٹ کا سائز",
+            "reconnectDelay": "دوبارہ کنیکٹ کی تاخیر (s)",
+            "tlsInsecure": "TLS کی تصدیق چھوڑ دیں",
+            "fragment": "TLS فریگمنٹ کریں",
+            "fragmentDelay": "فریگمنٹ فال بیک تاخیر (ms)",
+            "recordFragment": "TLS ریکارڈز فریگمنٹ کریں",
+            "ech": "Encrypted Client Hello",
+            "echConfig": "ECH کنفیگ",
+            "echQueryServerName": "ECH کوئری نام"
+          },
+          "awg": {
+            "title": "AmneziaWG",
+            "jc": "جنک پیکٹس",
+            "jmin": "جنک کا کم از کم سائز",
+            "jmax": "جنک کا زیادہ سے زیادہ سائز"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "سرور کا علاقہ منتخب کریں",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "آسٹریا (at)",
+            "au": "آسٹریلیا (au)",
+            "be": "بیلجیم (be)",
+            "bg": "بلغاریہ (bg)",
+            "ca": "کینیڈا (ca)",
+            "ch": "سوئٹزرلینڈ (ch)",
+            "cz": "چیک جمہوریہ (cz)",
+            "de": "جرمنی (de)",
+            "dk": "ڈنمارک (dk)",
+            "ee": "ایسٹونیا (ee)",
+            "es": "ہسپانیہ (es)",
+            "fi": "فن لینڈ (fi)",
+            "fr": "فرانس (fr)",
+            "gb": "برطانیہ (gb)",
+            "hr": "کروشیا (hr)",
+            "hu": "ہنگری (hu)",
+            "ie": "آئرلینڈ (ie)",
+            "in": "بھارت (in)",
+            "it": "اٹلی (it)",
+            "jp": "جاپان (jp)",
+            "lv": "لیٹویا (lv)",
+            "nl": "نیدرلینڈ (nl)",
+            "no": "ناروے (no)",
+            "pl": "پولینڈ (pl)",
+            "pt": "پرتگال (pt)",
+            "ro": "رومانیہ (ro)",
+            "rs": "سربیا (rs)",
+            "se": "سویڈن (se)",
+            "sg": "سنگاپور (sg)",
+            "sk": "سلوواکیہ (sk)",
+            "us": "ریاستہائے متحدہ (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "پروفائل منتخب کریں",
+          "conduitPairingId": "Conduit پیئرنگ ID"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "کنکشن",
+      "traffic": "ٹریفک",
+      "trafficLive": "لائیو ٹریفک",
+      "trafficTotal": "کل ٹریفک",
+      "uplink": "اپ لنک",
+      "downlink": "ڈاؤن لنک",
+      "speed": "رفتار",
+      "totalTransferred": "کل منتقل شدہ"
+    },
+    "subscriptionInfo": {
+      "upload": "اپ لوڈ",
+      "download": "ڈاؤن لوڈ",
+      "total": "کل ٹریفک",
+      "expireDate": "میعاد ختم ہونے کی تاریخ",
+      "expired": "میعاد ختم",
+      "noTraffic": "کوٹا ختم",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days دن باقی",
+        "other": "$days دن باقی"
+      },
+      "remainingUnlimited": "لامحدود",
+      "remainingTrafficSemanticLabel": "${total} میں سے ${consumed} ٹریفک استعمال ہو چکا",
+      "remainingTraffic": "باقی ٹریفک",
+      "openWebPage": "ویب صفحہ کھولیں",
+      "support": "معاونت",
+      "openLinkTitle": "یہ لنک کھولیں؟",
+      "openLinkAction": "کھولیں"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "ترتیب بلحاظ",
+      "sort": {
+        "name": "نام کے مطابق",
+        "lastUpdate": "حال ہی میں اپ ڈیٹ شدہ"
+      },
+      "direction": {
+        "newestFirst": "نئے پہلے",
+        "oldestFirst": "پرانے پہلے"
+      }
+    },
+    "warpLicense": {
+      "title": "Cloudflare WARP کی رضامندی",
+      "description(rich)": "Cloudflare WARP ایک مفت WireGuard VPN فراہم کنندہ ہے۔ اسے آن کر کے آپ Cloudflare WARP کی ${tos(سروس کی شرائط)} اور ${privacy(رازداری کی پالیسی)} سے اتفاق کرتے ہیں۔"
+    },
+    "psiphonLicense": {
+      "title": "Psiphon لائسنس معاہدہ",
+      "description(rich)": "Psiphon استعمال کر کے آپ ${tos(سروس کی شرائط)} سے اتفاق کرتے ہیں اور ${privacy(رازداری کی پالیسی)} کو تسلیم کرتے ہیں۔ جاری رکھنے سے پہلے انہیں غور سے پڑھ لیں۔"
+    },
+    "newVersion": {
+      "title": "اپ ڈیٹ دستیاب ہے",
+      "msg": "@:common.appTitle کا نیا ورژن دستیاب ہے۔ ابھی اپ ڈیٹ کریں؟",
+      "currentVersion": "موجودہ ورژن",
+      "newVersion": "نیا ورژن",
+      "updateNow": "ابھی اپ ڈیٹ کریں",
+      "downloading": "ڈاؤن لوڈ ہو رہا ہے…",
+      "installing": "انسٹالر شروع ہو رہا ہے…",
+      "allowInstall": "کھلنے والی سیٹنگز میں Hiddify کو ایپس انسٹال کرنے کی اجازت دیں، پھر دوبارہ کوشش کریں۔",
+      "failed": "اپ ڈیٹ انسٹال نہیں ہو سکی۔",
+      "openPage": "ریلیز کا صفحہ کھولیں",
+      "tryAgain": "دوبارہ کوشش کریں"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "اس سے تمام کنفیگریشن آپشنز امپورٹ کی گئی قدروں سے بدل جائیں گے۔ جاری رکھیں؟"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "پروفائل حذف کریں",
+          "msg": "یہ پروفائل حذف کریں؟ یہ عمل واپس نہیں ہو سکتا۔"
+        }
+      },
+      "appList": {
+        "import": {
+          "msg": "اس سے آپ کی بائی پاس اور صرف پراکسی والی ایپس بدل جائیں گی۔ جاری رکھیں؟"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "اصول حذف کریں",
+          "msg": "“$rulename” اصول حذف کریں؟ یہ عمل واپس نہیں ہو سکتا۔"
+        }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "پروفائل شامل کریں؟",
+        "message": "“${host}” کا ایک بیرونی لنک نیا پروفائل شامل کرنا چاہتا ہے۔ امپورٹ کریں؟"
+      },
+      "importRouteRuleByDeepLinkWarning": {
+        "title": "روٹ کا اصول امپورٹ کریں؟",
+        "message": "روٹ کے اصول طے کرتے ہیں کہ آپ کا ٹریفک کہاں جائے گا۔\nانہیں صرف قابل اعتماد ذریعے سے امپورٹ کریں۔"
+      }
+    },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "تمام ایپس کو VPN سے گزاریں؟",
+        "vpnMode": "VPN موڈ",
+        "allApps": "تمام ایپس",
+        "recommended": "تجویز کردہ",
+        "systemProxyMode": "سسٹم پراکسی",
+        "someApps": "براؤزرز اور زیادہ تر ایپس",
+        "switched": "سسٹم پراکسی موڈ پر منتقل ہو گیا۔ آپ اسے سیٹنگز میں بدل سکتے ہیں۔",
+        "waitingTitle": "ایڈمنسٹریٹر کی اجازت کا انتظار",
+        "waitingMsg": "Hiddify آپ کی طرف سے VPN موڈ کی اجازت کا منتظر ہے۔",
+        "waitingWhere": "کھلنے والی ونڈو میں:",
+        "waitingWindows": "“Yes” پر کلک کریں۔",
+        "waitingMac": "اپنے Mac کا پاس ورڈ درج کریں اور تصدیق کریں۔",
+        "waitingLinux": "اپنا پاس ورڈ درج کریں اور تصدیق کریں۔",
+        "back": "واپس",
+        "needsAdmin": "ایک بار ایڈمن درکار",
+        "needsAdminAppImage": "ہر شروعات پر ایڈمن درکار",
+        "noAdmin": "ایڈمن کی ضرورت نہیں",
+        "someAppsExcept": "Telegram اور چند ایپس شامل نہیں",
+        "useVpn": "VPN موڈ استعمال کریں",
+        "useSystemProxy": "سسٹم پراکسی استعمال کریں",
+        "helpTooltip": "یہ کیا ہے؟",
+        "helpWhatTitle": "یہ کیسے کام کرتا ہے",
+        "helpProsTitle": "خوبیاں",
+        "helpConsTitle": "یاد رکھیں",
+        "helpVpn": {
+          "what": "Hiddify آپ کے کمپیوٹر میں ایک ورچوئل نیٹ ورک شامل کرتا ہے، اور ہر ایپ کا انٹرنیٹ ٹریفک خود بخود اس سے گزرتا ہے: براؤزرز، Telegram، گیمز، اپ ڈیٹس اور باقی سب۔ ہر ایپ میں کچھ سیٹ نہیں کرنا پڑتا۔",
+          "pros": [
+            "ہر ایپ Hiddify سے گزرتی ہے، ہر ایپ میں کوئی سیٹنگ کیے بغیر۔",
+            "جو ایپس پراکسی سیٹنگز کو نظر انداز کرتی ہیں، جیسے Telegram اور گیمز، وہ بھی کام کرتی ہیں۔",
+            "ناموں کی تلاش (DNS) بھی Hiddify سے گزرتی ہے، اس لیے اس طرح بلاک سائٹس بھی کھل جاتی ہیں۔"
+          ],
+          "cons": [
+            "پہلی بار آپ کا کمپیوٹر Hiddify کی بیک گراؤنڈ سروس انسٹال کرنے کے لیے ایڈمنسٹریٹر کی اجازت مانگتا ہے۔ اس کے بعد یہ بغیر پوچھے کنیکٹ ہو جاتا ہے۔",
+            "اسے استعمال کرتے وقت دوسری VPN ایپس بند کر دیں: دو ایک ساتھ ایک دوسرے میں رکاوٹ بنتی ہیں۔"
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify آپ کے کمپیوٹر کی پراکسی سیٹنگ بدل دیتا ہے۔ جو ایپس اس سیٹنگ کو مانتی ہیں، جیسے ویب براؤزرز، وہ اپنا ٹریفک Hiddify سے گزارتی ہیں؛ باقی ایسے براہ راست کنیکٹ ہوتی ہیں جیسے Hiddify بند ہو۔",
+          "pros": [
+            "ایڈمنسٹریٹر کی اجازت درکار نہیں۔",
+            "آن اور آف کرنا آسان ہے، اور ڈسکنیکٹ کرنے پر Hiddify سیٹنگ واپس کر دیتا ہے۔",
+            "آپ کے کمپیوٹر پر موجود دوسرے نیٹ ورک ٹولز کے ساتھ چلتا ہے۔"
+          ],
+          "cons": [
+            "جو ایپس سسٹم پراکسی کو نظر انداز کرتی ہیں، جیسے Telegram، بہت سے گیمز اور کچھ اپ ڈیٹ ٹولز، وہ محفوظ نہیں ہوتیں۔",
+            "اگر وہ کام کرنا بند کر دیں تو اس کے بجائے VPN موڈ چنیں۔"
+          ]
+        }
+      },
+      "proxyNeedsAdmin": {
+        "title": "ایڈمنسٹریٹر کی اجازت تجویز کی جاتی ہے",
+        "msg": "اس پروفائل کی کچھ سیٹنگز ایڈمنسٹریٹر کی اجازت کے ساتھ بہتر کام کرتی ہیں۔ آپ ایڈمنسٹریٹر کی اجازت سے چلا سکتے ہیں، یا اس کے بغیر جاری رکھ کر اس کنکشن کے لیے وہ سیٹنگز بند کر سکتے ہیں۔",
+        "seeConfigs": "کنفیگریشنز دکھائیں",
+        "hideConfigs": "کنفیگریشنز چھپائیں",
+        "neverAskAgain": "اس پروفائل کے لیے دوبارہ نہ پوچھیں",
+        "runAsAdmin": "ایڈمنسٹریٹر کے طور پر چلائیں",
+        "continueWithoutAdmin": "ایڈمنسٹریٹر کی اجازت کے بغیر جاری رکھیں",
+        "elevationFailedTitle": "ایڈمنسٹریٹر کی اجازت نہیں مل سکی",
+        "elevationFailedMsg": "ایڈمنسٹریٹر کی درخواست مسترد ہو گئی یا ناکام رہی۔ دوبارہ کوشش کریں، یا اس کنکشن کے لیے ایڈمنسٹریٹر کی اجازت کے بغیر جاری رکھیں۔",
+        "tryAgain": "دوبارہ کوشش کریں"
+      }
+    },
+    "experimentalNotice": {
+      "title": "تجرباتی فیچرز استعمال میں ہیں",
+      "msg": "آپ نے کچھ تجرباتی فیچرز آن کیے ہیں جو کنکشن کے معیار کو متاثر کر سکتے ہیں اور غیر متوقع خرابیوں کا سبب بن سکتے ہیں۔ آپ ان آپشنز کو کسی بھی وقت سیٹنگز میں بدل یا ری سیٹ کر سکتے ہیں۔",
+      "disable": "دوبارہ نہ دکھائیں"
+    },
+    "noActiveProfile": {
+      "title": "پروفائل منتخب کریں",
+      "msg": "آئیے شروع کریں۔ اپنے VPN سرور کی تفصیلات کے ساتھ ایک کنکشن پروفائل شامل کریں۔\n\nابھی سرور نہیں ہے؟ کوئی بات نہیں۔ نیچے دی گئی گائیڈ دکھاتی ہے کہ مفت میں ایک کیسے بنایا جائے۔",
+      "helpBtn": {
+        "label": "مجھے طریقہ دکھائیں",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "پہلے یہ لنک جانچ لیں",
+      "cannotVerify": "یہ لنک تصدیق شدہ نہیں ہے",
+      "avoidIfUnsure": "اگر آپ کو پوری طرح یقین نہیں تو ادائیگی نہ کریں اور حساس معلومات شیئر نہ کریں",
+      "ownResponsibility": "آپ اپنی ذمہ داری پر جاری رکھ رہے ہیں",
+      "open": "کھولیں",
+      "openIn": "کھولیں (${seconds})"
+    },
+    "proxyInfo": {
+      "fullTag": "مکمل ٹیگ",
+      "type": "قسم",
+      "status": "حالت",
+      "testTime": "جانچ کا وقت",
+      "testDelay": "تاخیر کی جانچ",
+      "isSelected": "منتخب",
+      "isGroup": "گروپ",
+      "isSecure": "محفوظ",
+      "port": "پورٹ",
+      "host": "ہوسٹ",
+      "ip": "IP",
+      "countryCode": "ملک کا کوڈ",
+      "region": "علاقہ",
+      "city": "شہر",
+      "asn": "ASN",
+      "organization": "ادارہ",
+      "location": "مقام",
+      "postalCode": "پوسٹل کوڈ",
+      "download": "ڈاؤن لوڈ",
+      "upload": "اپ لوڈ",
+      "ping": "پنگ",
+      "speed": "رفتار",
+      "server": "سرور",
+      "country": "ملک",
+      "tapToTest": "جانچنے کے لیے ٹیپ کریں",
+      "error": "ناکامی کی وجہ"
+    },
+    "windowClosing": {
+      "askEachTime": "ہر بار پوچھیں",
+      "alertMessage": "ایپ چھپائیں یا بند کریں؟",
+      "remember": "یہ انتخاب یاد رکھیں"
+    },
+    "qrCode": {
+      "copyFullLink": "مکمل لنک کاپی کریں",
+      "copied": "کاپی ہو گیا",
+      "lanLine": "SOCKS5 · صرف اسی نیٹ ورک پر",
+      "noLocalNetwork": "کوئی مقامی نیٹ ورک نہیں ملا",
+      "ip": "IP",
+      "port": "پورٹ",
+      "username": "صارف نام",
+      "password": "پاس ورڈ",
+      "showPassword": "پاس ورڈ دکھائیں",
+      "hidePassword": "پاس ورڈ چھپائیں"
+    },
+    "qrScanner": {
+      "notFound": "اس تصویر میں کوئی QR کوڈ نہیں ملا"
+    },
+    "crashReport": {
+      "title": "Hiddify پچھلی بار کریش ہو گیا تھا",
+      "msg": "ڈویلپرز کو رپورٹ بھیجیں تاکہ یہ مسئلہ ٹھیک ہو سکے؟ اس میں کریش کی تفصیلات، لاگز اور آپ کی کنفیگریشن شامل ہے جس سے سرورز، کیز اور پاس ورڈز ہٹا دیے گئے ہیں، ایک زپ فائل کی صورت میں جسے آپ بھیجنے سے پہلے دیکھ سکتے ہیں۔",
+      "send": "رپورٹ بھیجیں"
+    },
+    "keepTop": {
+      "title": "ایک بڑی سبسکرپشن",
+      "subtitle": "$count پراکسیز · سب کو چلانے سے بیٹری، ڈیٹا اور میموری خرچ ہوتی ہے",
+      "hint": "فہرست کے آخر سے کسی بھی وقت واپس کریں۔",
+      "keeping": "$keep تیز ترین چلتی ہیں، باقی رک جاتی ہیں",
+      "all": "تمام $count چلتی ہیں",
+      "keep": "$keep تیز ترین رکھیں",
+      "useAll": "تمام $count استعمال کریں",
+      "howMany": "کتنی چلتی رکھنی ہیں",
+      "pickByHand": "پراکسیز خود منتخب کریں",
+      "region": "علاقہ",
+      "anyRegion": "کوئی بھی علاقہ",
+      "keepAnswering": "کام کرنے والی رکھیں",
+      "keepingAnswering": "صرف کام کرنے والی چلتی ہیں",
+      "answering": "کام کر رہی ہیں",
+      "everyOne": "سب",
+      "quick": "فوری جانچ",
+      "quickHint": "تیز ترین مل جانے پر رک جاتی ہے",
+      "quickHelp": "یہ کیا کرتا ہے؟",
+      "quickFirst": "پچھلی بار کی تیز ترین پہلے جانچی جاتی ہیں",
+      "quickStop": "جب باقی پہلے سست رہی ہوں تو جانچ رک جاتی ہے",
+      "quickNew": "نئی پراکسیز، اور جو ایک دن سے نہیں جانچی گئیں، ہمیشہ جانچی جاتی ہیں"
+    },
+    "keepTags": {
+      "title": "پراکسیز منتخب کریں",
+      "hint": "ہر بار کنیکٹ کرنے پر صرف یہی چلتی ہیں۔",
+      "search": "تلاش کریں",
+      "all": "سب منتخب کریں",
+      "none": "صاف کریں",
+      "run": "یہ $n استعمال کریں",
+      "sort": "ترتیب دیں",
+      "sortProfile": "پروفائل کی ترتیب",
+      "sortPing": "پنگ",
+      "sortDownload": "ڈاؤن لوڈ",
+      "sortUpload": "اپ لوڈ",
+      "selectFastest": "$n تیز ترین",
+      "statusChosen": "منتخب",
+      "statusAnswering": "جواب دے رہی ہے",
+      "statusPaused": "رکی ہوئی",
+      "paused": "$n پراکسیز رکی ہوئی ہیں: ان کا پنگ نہیں ہے اور انہیں جانچا نہیں جا سکتا۔",
+      "wake": "جانچنے کے لیے سب چلائیں",
+      "offline": "ان کا پنگ دیکھنے اور انہیں جانچنے کے لیے کنیکٹ کریں۔",
+      "offlineTitle": "کنیکٹ نہیں ہے",
+      "shown": "$n دکھائی گئیں",
+      "noMatch": "کوئی پراکسی مماثل نہیں",
+      "chosenHint": "منتخب کرنے کے لیے اوپر کی کسی پراکسی پر ٹیپ کریں",
+      "allShown": "سب اوپر کی فہرست میں ہیں",
+      "notShown": "نہیں دکھائی گئیں:",
+      "protocol": "پروٹوکول",
+      "country": "علاقہ",
+      "anyProtocol": "کوئی بھی پروٹوکول",
+      "anyCountry": "کوئی بھی علاقہ",
+      "otherCountries": "دیگر"
+    },
+    "localProxy": {
+      "steps": [
+        "ایپ کی پراکسی سیٹنگز کھولیں",
+        "SOCKS5 یا HTTP منتخب کریں",
+        "نیچے دی گئی قدریں درج کریں · کاپی کرنے کے لیے ٹیپ کریں",
+        "Hiddify کو کنیکٹ رکھیں"
+      ],
+      "hint": "پراکسی موڈ · استعمال کا طریقہ",
+      "setPassword": "پاس ورڈ سیٹ کریں",
+      "manual": "دستی",
+      "dontShowAgain": "دوبارہ نہ دکھائیں",
+      "thisDevice": "یہ آلہ",
+      "otherDevices": "دوسرے آلات",
+      "server": "سرور",
+      "noPassword": "کوئی پاس ورڈ سیٹ نہیں",
+      "turnOnSharing": "شیئرنگ آن کریں",
+      "copyLink": "لنک کاپی کریں",
+      "telegramLink": "Telegram لنک",
+      "fullLink": "مکمل لنک",
+      "portRange": "1024 سے 65535 تک کوئی پورٹ استعمال کریں",
+      "passwordTooShort": "کم از کم 4 حروف",
+      "edit": "ترمیم کریں"
+    },
+    "dbNewerThanApp": {
+      "title": "محفوظ ڈیٹا نئے ورژن کا ہے",
+      "msg": "آپ کے پروفائلز اور سیٹنگز Hiddify کے ایک نئے ورژن نے محفوظ کی تھیں، اور یہ پرانا ورژن انہیں پڑھ نہیں سکتا۔ انہیں رکھنے کے لیے تازہ ترین ورژن انسٹال کریں، یا اس ورژن کو استعمال کرنے کے لیے انہیں حذف کر دیں۔",
+      "deleteData": "ڈیٹا مٹائیں",
+      "deleteConfirm": "محفوظ ڈیٹا مٹا دیا جائے گا۔ آپ کی سبسکرپشنز اور مقامی پروفائلز جہاں ممکن ہو واپس شامل کر دیے جائیں گے؛ نئے ورژن کا محفوظ کیا ہوا باقی سب کچھ ضائع ہو جائے گا۔",
+      "downloadLatest": "تازہ ترین ورژن ڈاؤن لوڈ کریں"
+    },
+    "dbBroken": {
+      "title": "محفوظ ڈیٹا کھولا نہیں جا سکتا",
+      "msg": "Hiddify اپنے محفوظ پروفائلز نہیں کھول سکا۔ نئے سرے سے شروع کرنے کے لیے محفوظ ڈیٹا مٹا دیں: آپ کی سبسکرپشنز اور مقامی پروفائلز جہاں ممکن ہو واپس شامل کر دیے جائیں گے، اور آپ کی سیٹنگز برقرار رہیں گی۔",
+      "wipeData": "ڈیٹا مٹائیں",
+      "wipeConfirm": "محفوظ ڈیٹا مٹا دیا جائے گا اور Hiddify نئے سرے سے شروع ہوگا۔ جو پروفائلز اب بھی پڑھے جا سکتے ہیں وہ واپس شامل ہو جائیں گے؛ باقی بحال نہیں ہو سکیں گے۔",
+      "copyError": "خرابی کاپی کریں"
+    }
+  },
+  "connection": {
+    "tapToConnect": "کنیکٹ کرنے کے لیے ٹیپ کریں",
+    "connect": "کنیکٹ کریں",
+    "connecting": "کنیکٹ ہو رہا ہے…",
+    "waiting": "آزادی کی تلاش جاری ہے…",
+    "noAvailableProxies": "کنکشن ناکام ہو گیا",
+    "hotReloading": "تبدیلیاں لاگو ہو رہی ہیں…",
+    "connected": "کنیکٹ ہو گیا",
+    "disconnect": "منقطع کریں",
+    "disconnecting": "منقطع ہو رہا ہے…",
+    "failed": "کنیکٹ نہیں ہو سکا",
+    "slow": "معمول سے زیادہ وقت لگ رہا ہے…",
+    "tapToRetry": "دوبارہ کوشش کے لیے ٹیپ کریں",
+    "errorDetails": "خرابی کی تفصیلات",
+    "reconnect": "دوبارہ کنیکٹ کریں",
+    "reconnectMsg": "تبدیلیاں لاگو کرنے کے لیے دوبارہ کنیکٹ ہو رہا ہے…",
+    "health": {
+      "title": "کنکشن کی جانچ",
+      "allGood": "آپ کا ٹریفک گزر رہا ہے",
+      "pickDead": "منتخب پراکسی جواب نہیں دے رہی",
+      "hopPending": "${chain} کنیکٹ ہو رہا ہے…",
+      "hopFailed": "${chain} کنیکٹ نہیں ہو سکا",
+      "coreTesting": "سرورز کی جانچ جاری ہے…",
+      "coreNone": "کوئی بھی سرور جواب نہیں دے رہا",
+      "fastest": "تیز ترین سرور",
+      "yourServer": "منتخب پراکسی",
+      "notResponding": "جواب نہیں دے رہی",
+      "testing": "جانچ جاری ہے…",
+      "useFastest": "تیز ترین پر جائیں",
+      "hopReady": "کنیکٹ ہو گیا",
+      "hopConnecting": "کنیکٹ ہو رہا ہے…",
+      "hopBroken": "کنیکٹ نہیں ہو سکا",
+      "hopNoReply": "کنیکٹ ہے، لیکن جواب نہیں دیتا",
+      "hopBlocked": "منتخب پراکسی کے جواب کا انتظار ہے",
+      "retry": "دوبارہ جانچیں",
+      "change": "بدلیں",
+      "turnOff": "بند کریں"
+    }
+  },
+  "errors": {
+    "unexpected": "غیر متوقع خرابی",
+    "connection": {
+      "unexpected": "کنکشن کی غیر متوقع خرابی",
+      "timeout": "کنکشن کا وقت ختم ہو گیا",
+      "badResponse": "سرور کا غلط جواب",
+      "connectionError": "کنکشن کی خرابی",
+      "badCertificate": "غلط سرٹیفکیٹ"
+    },
+    "profiles": {
+      "unexpected": "غیر متوقع خرابی",
+      "notFound": "پروفائل نہیں ملا",
+      "invalidConfig": "غلط کنفیگریشن",
+      "invalidUrl": "غلط URL",
+      "canceledByUser": "صارف نے منسوخ کر دیا"
+    },
+    "connectivity": {
+      "unexpected": "غیر متوقع ناکامی",
+      "missingVpnPermission": "VPN کی اجازت موجود نہیں",
+      "missingNotificationPermission": "نوٹیفکیشن کی اجازت موجود نہیں",
+      "core": "کور کی خرابی"
+    },
+    "singbox": {
+      "serviceNotRunning": "سروس چل نہیں رہی",
+      "missingPrivilege": "استحقاق موجود نہیں",
+      "missingPrivilegeMsg": "VPN موڈ شروع نہیں ہو سکتا۔ ایپ کو ایڈمنسٹریٹر کے طور پر دوبارہ چلائیں یا سروس موڈ بدلیں۔",
+      "tunAddressInUse": "دوسرا VPN فعال ہے",
+      "tunAddressInUseMsg": "VPN موڈ شروع نہیں ہو سکتا۔ دوسرا VPN بند کریں یا سروس موڈ بدلیں۔",
+      "invalidConfigOptions": "غلط کنفیگریشن آپشنز",
+      "invalidConfig": "غلط کنفیگریشن"
+    },
+    "warp": {
+      "missingLicense": "WARP لائسنس درکار ہے",
+      "missingLicenseMsg": "یہ پروفائل WARP استعمال کرتا ہے۔ جاری رکھنے کے لیے WARP لائسنس قبول کریں۔"
+    },
+    "psiphon": {
+      "missingLicense": "Psiphon لائسنس درکار ہے",
+      "missingLicenseMsg": "یہ پروفائل Psiphon استعمال کرتا ہے۔ جاری رکھنے کے لیے Psiphon لائسنس قبول کریں۔"
+    }
+  }
+}

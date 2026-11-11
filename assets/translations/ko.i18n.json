@@ -1,0 +1,1279 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "시작",
+    "version": "버전",
+    "ok": "확인",
+    "cancel": "취소",
+    "kContinue": "계속",
+    "undo": "실행 취소",
+    "showMore": "더 보기",
+    "showLess": "간략히 보기",
+    "filter": "필터",
+    "all": "전체",
+    "pause": "일시 중지",
+    "resume": "재개",
+    "clear": "지우기",
+    "close": "닫기",
+    "auto": "자동",
+    "manually": "수동",
+    "name": "이름",
+    "url": "URL",
+    "add": "추가",
+    "clipboard": "클립보드",
+    "addToClipboard": "클립보드에 복사",
+    "qrCode": "QR 코드",
+    "free": "무료",
+    "warp": "WARP",
+    "fragment": "프래그먼트",
+    "help": "도움말",
+    "save": "저장",
+    "update": "업데이트",
+    "pin": "고정",
+    "unpin": "고정 해제",
+    "share": "공유",
+    "edit": "편집",
+    "delete": "삭제",
+    "discard": "버리기",
+    "import": "가져오기",
+    "export": "내보내기",
+    "later": "나중에",
+    "ignore": "무시",
+    "quit": "종료",
+    "notSet": "설정 안 됨",
+    "hide": "숨기기",
+    "exit": "종료",
+    "reset": "초기화",
+    "done": "완료",
+    "decline": "거부",
+    "agree": "동의",
+    "empty": "비어 있음",
+    "unknown": "알 수 없음",
+    "hidden": "숨겨짐",
+    "timeout": "시간 초과",
+    "sort": "정렬",
+    "dashboard": "대시보드",
+    "disable": "끄기",
+    "psiphon": "Psiphon",
+    "profile": "프로필",
+    "configuration": "구성",
+    "file": "파일",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n일",
+        "other": "$n일"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n시간",
+        "other": "$n시간"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "권한이 거부되었습니다"
+      },
+      "export": {
+        "clipboard": {
+          "success": "클립보드에 복사했습니다",
+          "failure": "클립보드에 복사하지 못했습니다",
+          "contentTooLarge": "내용이 너무 큽니다. 대신 파일로 내보내세요."
+        },
+        "file": {
+          "success": "JSON 파일을 만들었습니다",
+          "failure": "파일을 만들지 못했습니다"
+        }
+      },
+      "import": {
+        "confirm": "가져오기 확인",
+        "success": "가져왔습니다",
+        "failure": "가져오지 못했습니다"
+      },
+      "autoSave": {
+        "success": "변경 사항이 자동으로 저장되었습니다"
+      }
+    }
+  },
+  "intro": {
+    "banner": "제한 없는 인터넷에 필요한 모든 것",
+    "termsAndPolicyCaution(rich)": "계속하면 ${tap(@:pages.about.termsAndConditions)}에 동의하는 것입니다",
+    "info(rich)": "Hiddify가 ❤️를 담아 만들었습니다. ${tap_source(오픈 소스)} 및 ${tap_license(라이선스)}"
+  },
+  "pages": {
+    "home": {
+      "title": "홈",
+      "quickSettings": "빠른 설정"
+    },
+    "proxies": {
+      "title": "프록시",
+      "sort": "프록시 정렬",
+      "testDelay": "지연 시간 테스트",
+      "empty": "사용할 수 있는 프록시가 없습니다",
+      "connectToSeeProxies": "연결하면 프록시가 표시됩니다",
+      "loadFailed": "프록시를 불러오지 못했습니다. 탭하여 다시 시도하세요.",
+      "activeProxy": "활성 프록시",
+      "unknownIp": "알 수 없는 IP",
+      "checkingIp": "IP 확인 중…",
+      "switchFailed": "이 프록시로 전환하지 못했습니다. 다시 시도하세요.",
+      "notResponding": "응답 없음",
+      "noneResponding": "응답하는 프록시가 없습니다",
+      "sortOptions": {
+        "unsorted": "기본",
+        "name": "이름순",
+        "delay": "지연 시간순",
+        "usage": "사용량순",
+        "upload": "업로드 속도순",
+        "download": "다운로드 속도순"
+      },
+      "ipInfo": {
+        "address": "IP 주소",
+        "country": "국가",
+        "organization": "조직"
+      },
+      "delay": {
+        "result": "지연 시간: ${delay}ms",
+        "timeout": "지연 시간 테스트 시간 초과",
+        "unavailable": "사용 불가",
+        "testing": "지연 시간: 테스트 중…"
+      },
+      "status": {
+        "connecting": "연결 중",
+        "registering": "등록 중",
+        "failed": "실패",
+        "ready": "준비됨",
+        "searching": "검색 중",
+        "reconnecting": "다시 연결 중"
+      },
+      "signalStyle": "신호 표시 스타일",
+      "keepTop": {
+        "picking": "$count개 중 가장 빠른 $keep개를 찾는 중…",
+        "pickingBody": "모든 프록시를 한 번 테스트한 뒤 가장 빠른 것만 계속 실행합니다.",
+        "thenFastest": "테스트 후에는 $where가장 빠른 $keep개만 계속 실행합니다.",
+        "thenWorking": "테스트 후에는 $where작동하는 프록시만 계속 실행합니다.",
+        "thenAll": "테스트 후에는 $where프록시만 계속 실행합니다.",
+        "inRegions": "$flags 지역의 ",
+        "pickingAnswering": "$count개 모두 테스트 중…",
+        "keptAnswering": "$where작동하는 프록시 $n개가 실행 중입니다",
+        "kept": "가장 빠른 $n개가 실행 중입니다",
+        "keptFastest": "$where가장 빠른 $n개가 실행 중입니다",
+        "keptBody": "배터리와 데이터를 아끼기 위해 다른 프록시 $paused개는 일시 중지되었습니다.",
+        "showAll": "전체 $count개 보기",
+        "big": "프록시 $count개가 실행 중입니다",
+        "bigBody": "배터리와 데이터를 아끼기 위해 가장 빠른 $keep개만 실행하세요.",
+        "keep": "가장 빠른 $keep개만 유지",
+        "change": "개수 변경",
+        "chosen": "선택한 프록시 $n개가 실행 중입니다",
+        "choose": "선택"
+      },
+      "upload": {
+        "test": "업로드 속도 테스트",
+        "failed": "속도 테스트를 시작할 수 없습니다",
+        "hint": "탭: 업로드 속도 · 길게 누르기: 다운로드 속도",
+        "hintBoth": "탭: 두 속도 모두 · 길게 누르기: 다운로드 속도"
+      },
+      "speedTest": {
+        "title": "속도 테스트",
+        "what": "테스트 항목",
+        "download": "다운로드",
+        "upload": "업로드",
+        "amount": "프록시당 용량",
+        "proxies": "테스트할 프록시",
+        "proxiesHint": "핑 기준 가장 빠른 프록시",
+        "all": "전체",
+        "fastest": "가장 빠른 $n개",
+        "through": "가장 빠른 $count개에 각각 $n MB",
+        "throughAll": "프록시 $count개에 각각 $n MB",
+        "throughEach": "프록시마다 $n MB",
+        "start": "테스트 시작",
+        "save": "저장",
+        "testDownload": "다운로드 속도 테스트",
+        "both": "둘 다",
+        "bothWays": "다운로드 및 업로드",
+        "amountHint": "많을수록 더 정확합니다",
+        "clear": "저장된 결과 지우기",
+        "cleared": "지웠습니다",
+        "which": "테스트할 프록시",
+        "shown": "표시된 항목 ($n)",
+        "chosen": "선택한 항목 ($n)"
+      },
+      "single": {
+        "share": "공유",
+        "edit": "편집",
+        "shareTitle": "프록시 공유",
+        "configHint": "이 프록시와 이 프록시가 거쳐 가는 프록시만 포함합니다. Hiddify에서 다른 구성처럼 가져올 수 있습니다.",
+        "editTitle": "새 프로필로 편집",
+        "editMsg": "“${name}”을(를) 편집할 수 있는 새 프로필로 복사합니다. 구독은 업데이트할 때마다 프록시를 교체하므로 원본은 그대로 둡니다.",
+        "editConfirm": "복사해서 편집",
+        "savedAsProfile": "새 프로필 “${name}”(으)로 복사했습니다",
+        "failed": "이 프록시의 구성을 읽을 수 없습니다"
+      }
+    },
+    "profiles": {
+      "title": "프로필",
+      "add": "프로필 추가",
+      "fromPhone": {
+        "title": "휴대폰에서 추가",
+        "scan": "휴대폰 카메라로 이 코드를 스캔한 뒤 구독 링크를 붙여넣고 보내세요.",
+        "sameNetwork": "휴대폰과 이 TV가 같은 Wi-Fi 네트워크에 연결되어 있어야 합니다.",
+        "noNetwork": "이 TV가 로컬 네트워크에 연결되어 있지 않습니다. 휴대폰에서 링크를 추가하려면 Wi-Fi에 연결하세요.",
+        "locked": "잘못된 코드가 너무 많이 입력되어 잠겼습니다. 닫았다가 다시 열면 새 코드가 표시됩니다.",
+        "received": "휴대폰에서 받았습니다",
+        "from": "$address에서",
+        "page": {
+          "title": "TV의 Hiddify로 보내기",
+          "intro": "리모컨으로 입력할 필요 없이 네 단계로 TV에 구독을 추가하세요.",
+          "steps": {
+            "network": {
+              "title": "같은 Wi-Fi에 연결",
+              "body": "휴대폰과 TV가 같은 Wi-Fi 네트워크에 있어야 합니다. 그렇지 않으면 이 페이지에서 TV에 연결할 수 없습니다."
+            },
+            "copy": {
+              "title": "링크 복사",
+              "body": "제공자에게 받은 구독 링크나 프록시 링크, 구성을 복사하세요."
+            },
+            "paste": {
+              "title": "여기에 붙여넣기",
+              "body": "아래 상자를 탭하고 링크를 붙여넣은 뒤 “TV로 보내기”를 탭하세요."
+            },
+            "confirm": {
+              "title": "TV에서 확인",
+              "body": "TV에 링크가 표시됩니다. 리모컨으로 가져오기를 누르세요. 누르기 전에는 아무것도 추가되지 않습니다."
+            }
+          },
+          "label": "구독 링크",
+          "hint": "구독 링크나 구성을 붙여넣으세요",
+          "send": "TV로 보내기",
+          "sentTitle": "TV로 보냈습니다",
+          "sent": "이제 TV에서 가져오기를 눌러 추가하세요. 아래에서 다른 링크를 더 보낼 수 있습니다.",
+          "empty": "먼저 링크를 붙여넣으세요.",
+          "footer": "이 페이지는 TV에서 “프로필 추가”가 열려 있는 동안, 로컬 네트워크에서만 작동합니다."
+        }
+      },
+      "update": "프로필 업데이트",
+      "viewAllProfiles": "모든 프로필 보기",
+      "activeProfileName": "활성 프로필 이름: “${name}”",
+      "nonActiveProfileName": "“${name}”을(를) 활성 프로필로 선택",
+      "freeSubNotFound": "무료 구독을 찾을 수 없습니다",
+      "freeSubNotFoundForRegion": "“${region}”에 대한 무료 구독을 찾을 수 없습니다",
+      "failedToLoad": "불러오지 못했습니다",
+      "updateSubscriptions": "구독 업데이트",
+      "share": {
+        "title": "프로필 공유",
+        "scanHint": "다른 기기의 Hiddify로 스캔하면 이 프로필이 추가됩니다",
+        "link": "구독 링크",
+        "config": "구성",
+        "configHint": "이 프로필이 실행하는 전체 JSON(내 설정 포함)",
+        "configFailed": "구성을 만들 수 없습니다",
+        "copy": "복사",
+        "shareFile": "공유",
+        "saveFile": "저장",
+        "tooLargeToCopy": "클립보드에 넣기에는 너무 큽니다. 파일로 공유하거나 저장하세요",
+        "toTv": {
+          "button": "TV로 보내기",
+          "scanHint": "TV에서 Hiddify를 열고 +를 탭해 프로필 추가를 선택한 뒤 표시되는 코드를 스캔하세요. 두 기기가 같은 Wi-Fi에 있어야 합니다.",
+          "sent": "보냈습니다. TV에서 가져오기를 눌러 추가하세요.",
+          "notTvCode": "Hiddify TV 코드가 아닙니다. TV에서 +를 탭해 프로필 추가를 열면 코드가 표시됩니다.",
+          "expired": "이 코드로는 TV가 더 이상 링크를 받지 않습니다. TV에서 프로필 추가 화면을 다시 열고 새 코드를 스캔하세요.",
+          "busy": "TV에 대기 중인 링크가 너무 많습니다. TV에서 가져오거나 버린 뒤 다시 시도하세요.",
+          "unreachable": "TV에 연결할 수 없습니다. 휴대폰과 TV가 같은 Wi-Fi 네트워크에 있는지 확인하세요."
+        }
+      },
+      "msg": {
+        "save": {
+          "success": "프로필을 저장했습니다"
+        },
+        "invalidUrl": "잘못된 URL",
+        "add": {
+          "failure": "프로필을 추가하지 못했습니다"
+        },
+        "update": {
+          "success": "프로필을 업데이트했습니다",
+          "failure": "프로필을 업데이트하지 못했습니다",
+          "failureNamed": "“${name}”을(를) 업데이트하지 못했습니다",
+          "bulkSuccess(plural, param=count)": {
+            "one": "프로필 $count개를 업데이트했습니다",
+            "other": "프로필 $count개를 업데이트했습니다"
+          },
+          "bulkPartial": "${success}개 업데이트됨\n${failed}개 실패: ${names}"
+        },
+        "delete": {
+          "success": "프로필을 삭제했습니다",
+          "bulkSuccess(plural, param=count)": {
+            "one": "프로필 $count개를 삭제했습니다",
+            "other": "프로필 $count개를 삭제했습니다"
+          },
+          "bulkPartial": "프로필 ${total}개 중 ${deleted}개를 삭제했습니다"
+        }
+      },
+      "removeInactive": {
+        "action": "비활성 구독 제거",
+        "title": "비활성 구독 제거",
+        "hint": "이 구독들은 더 이상 작동하지 않습니다. 체크된 항목이 삭제됩니다. 유지하려면 체크를 해제하세요.",
+        "none": "비활성 구독이 없습니다",
+        "remove(plural, param=count)": {
+          "one": "$count개 삭제",
+          "other": "$count개 삭제"
+        },
+        "reason": {
+          "expired": "만료됨",
+          "expiredOn": "${date}에 만료됨",
+          "noTraffic": "남은 트래픽 없음",
+          "updateFailing": "업데이트가 계속 실패함",
+          "updateFailingSince": "${date}부터 업데이트 실패"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "프로필",
+      "lastUpdate": "마지막 업데이트",
+      "form": {
+        "nameHint": "프로필 이름",
+        "emptyName": "이름을 입력해야 합니다",
+        "invalidUrl": "잘못된 URL",
+        "urlHint": "전체 구성 URL",
+        "disableAutoUpdate": "자동 업데이트 끄기",
+        "autoUpdateInterval": "자동 업데이트 간격",
+        "loading": "프로필 추가 중…",
+        "adminPreference": "관리자 권한",
+        "adminPreferenceAskEachTime": "매번 묻기",
+        "adminPreferencePreferAdmin": "항상 관리자 권한 사용",
+        "adminPreferencePreferNoAdmin": "항상 관리자 권한 없이 계속",
+        "adminPreferenceReset": "관리자 권한을 매번 묻기"
+      }
+    },
+    "logs": {
+      "title": "로그",
+      "category": "분류",
+      "level": "수준",
+      "recentLogs": "최근 로그",
+      "recentLogsMsg": "이 페이지에 표시되는 내용",
+      "errorLog": "앱 및 코어 로그",
+      "errorLogMsg": "여러 실행에 걸친 앱과 코어의 오류",
+      "coreLog": "코어 로그",
+      "coreLogMsg": "코어가 기록한 모든 내용",
+      "coreCrash": "코어 충돌",
+      "coreCrashMsg": "코어가 마지막으로 충돌했을 때 하던 작업",
+      "exportToFile": "파일로 내보내기",
+      "linesMatch": "$count줄 일치",
+      "fileSaved": "파일을 저장했습니다",
+      "fileSaveFailed": "파일을 저장할 수 없습니다",
+      "coreLogLevel": "코어 수준",
+      "coreLogLevelMsg": "다시 연결한 뒤 적용됩니다",
+      "buffer": "버퍼",
+      "diagnostics": "진단 보고서",
+      "diagnosticsMsg": "충돌 보고서, 로그, 서버와 비밀번호를 제외한 설정을 하나의 zip으로"
+    },
+    "about": {
+      "title": "정보",
+      "notAvailableMsg": "최신 버전을 사용 중입니다",
+      "checkForUpdate": "업데이트 확인",
+      "openWorkingDir": "작업 폴더 열기",
+      "sourceCode": "소스 코드",
+      "telegramChannel": "Telegram 채널",
+      "termsAndConditions": "이용 약관",
+      "privacyPolicy": "개인정보 처리방침"
+    },
+    "settings": {
+      "title": "설정",
+      "resetTunnel": "VPN 프로필 초기화",
+      "options": {
+        "import": {
+          "clipboard": "클립보드에서 옵션 가져오기",
+          "file": "파일에서 옵션 가져오기"
+        },
+        "export": {
+          "anonymousToClipboard": "익명 옵션을 클립보드에 복사",
+          "anonymousToFile": "익명 옵션을 파일로 내보내기",
+          "allToClipboard": "모든 옵션을 클립보드에 복사",
+          "allToFile": "모든 옵션을 파일로 내보내기"
+        },
+        "reset": "옵션 초기화"
+      },
+      "general": {
+        "title": "일반",
+        "locale": "언어",
+        "themeMode": "테마 모드",
+        "themeModes": {
+          "system": "시스템 기본값",
+          "dark": "다크 모드",
+          "light": "라이트 모드",
+          "black": "블랙 모드"
+        },
+        "enableAnalytics": "분석 켜기",
+        "enableAnalyticsMsg": "앱 개선에 도움이 되도록 기기의 분석 데이터와 충돌 보고서를 보냅니다",
+        "autoIpCheck": "연결 IP 자동 확인",
+        "reduceAnimations": "애니메이션 줄이기",
+        "reduceAnimationsMsg": "배터리를 아끼기 위해 연결 버튼을 움직이지 않고 반복 효과를 멈춥니다",
+        "dynamicNotification": "알림에 속도 표시",
+        "hapticFeedback": "햅틱 피드백",
+        "alwaysOnVpn": "상시 VPN",
+        "actionAtClosing": "창을 닫을 때",
+        "autoStart": "로그인 시 시작",
+        "silentStart": "최소화된 상태로 시작",
+        "ignoreBatteryOptimizations": "배터리 최적화 끄기",
+        "ignoreBatteryOptimizationsMsg": "최적의 VPN 성능을 위해 제한을 해제합니다",
+        "memoryLimit": "메모리 제한",
+        "memoryLimitMsg": "메모리 부족 오류나 잦은 앱 충돌이 발생하면 켜세요",
+        "connectionTestUrl": "연결 테스트 URL",
+        "urlTestInterval": "URL 테스트 간격",
+        "clashApiPort": "Clash API 포트",
+        "useSystemTlsEngine": "가능하면 시스템 TLS 사용",
+        "useSystemTlsEngineMsg": "TLS 지문이 없는 연결은 이 기기에서 검사를 통과하면 macOS, iOS 또는 Windows의 TLS를 사용하고, 그렇지 않으면 Chrome처럼 보이게 합니다.",
+        "uploadTestSize": "업로드 테스트 크기",
+        "megabytes": "$n MB",
+        "speedTest": "속도 테스트"
+      },
+      "routing": {
+        "title": "라우팅",
+        "routeRule": {
+          "add": "규칙 추가",
+          "delete": "규칙 삭제",
+          "duplicate": "규칙 복제",
+          "duplicated": "새 규칙으로 복사했습니다. 원하는 대로 편집하세요",
+          "copyAll": "모두 복사",
+          "options": {
+            "import": {
+              "clipboard": "클립보드에서 규칙 가져오기",
+              "file": "파일에서 규칙 가져오기"
+            },
+            "export": {
+              "clipboard": "규칙을 클립보드에 복사",
+              "file": "규칙을 파일로 저장"
+            },
+            "reset": "기본 규칙으로 초기화"
+          },
+          "rule": {
+            "title": "규칙",
+            "onlyTunMode": "TUN 모드에서만 사용할 수 있습니다",
+            "notAvailableInThisPlatform": "이 플랫폼에서는 사용할 수 없습니다",
+            "canNotBeEmpty": "비워 둘 수 없습니다",
+            "validUrlEx": "https://example.com",
+            "validUrl": "다음과 같은 올바른 “URL”\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe 또는 google chrome 또는 chrome",
+            "validProcessName": "다음과 같은 올바른 “프로세스 이름”\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "다음과 같은 올바른 “프로세스 경로”\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 또는 1:65000",
+            "validPortRange": "다음과 같은 올바른 “포트” 또는 “포트 범위”\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8, 10.0.0.0/24 또는 fd00::/8",
+            "validIpCidr": "다음과 같은 올바른 IP CIDR\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com 또는 dl.google.com",
+            "validDomain": "다음과 같은 올바른 “도메인”\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com 또는 .ir",
+            "validDomainSuffix": "다음과 같은 올바른 “도메인 접미사”\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "기본 제공 규칙은 변경할 수 없습니다. 복제한 뒤 사본을 편집하세요.",
+            "tileTitle(map)": {
+              "name": "이름",
+              "outbound": "일치 시 아웃바운드",
+              "rule_set": "URL 세트",
+              "package_name": "패키지 이름",
+              "process_name": "프로세스 이름",
+              "process_path": "프로세스 경로",
+              "network": "네트워크",
+              "port_range": "대상 포트",
+              "source_port_range": "출발지 포트",
+              "protocol": "프로토콜",
+              "ip_cidr": "대상 IP CIDR",
+              "source_ip_cidr": "출발지 IP CIDR",
+              "domain": "도메인",
+              "domain_suffixe": "도메인 접미사",
+              "domain_keyword": "도메인 키워드",
+              "domain_regex": "도메인 정규식"
+            },
+            "outbound(map)": {
+              "proxy": "프록시",
+              "direct": "직접 연결",
+              "direct_with_fragment": "프래그먼트로 직접 연결",
+              "block": "차단"
+            },
+            "network(map)": {
+              "all": "전체",
+              "tcp": "TCP",
+              "udp": "UDP"
+            },
+            "protocol(map)": {
+              "": "전체",
+              "tls": "TLS",
+              "http": "HTTP",
+              "quic": "QUIC",
+              "stun": "STUN",
+              "dns": "DNS",
+              "bittorrent": "BitTorrent"
+            }
+          },
+          "genericList": {
+            "addNew": "새 값 추가",
+            "update": "값 업데이트",
+            "clearList": "목록 지우기",
+            "clearListMsg": "모든 항목이 삭제됩니다"
+          }
+        },
+        "builtinRules": {
+          "tag": "기본 제공 규칙",
+          "bypassLan": "LAN 직접 연결",
+          "systemDirect": {
+            "apple": "Apple 서비스",
+            "microsoft": "Microsoft 서비스",
+            "android": "Android 서비스",
+            "linux": "Linux 업데이트"
+          },
+          "blockAds": "광고 및 악성 코드",
+          "bypassRegion": "$region 사이트"
+        },
+        "appBasedRouting": {
+          "title": "앱별 라우팅",
+          "hideSysApps": "시스템 앱 숨기기",
+          "listTitle": {
+            "bypass": "VPN 제외 앱",
+            "proxy": "프록시 사용 앱"
+          },
+          "chooseApps": "앱 선택",
+          "apps": {
+            "one": "앱",
+            "other": "앱"
+          },
+          "moreApps": {
+            "one": "+$n개 앱",
+            "other": "+$n개 앱"
+          },
+          "autoTag": "자동",
+          "outsideVpn": "VPN 밖",
+          "ruleWontApply": "VPN 밖 · 규칙이 적용되지 않음",
+          "notInstalled": "설치되지 않음",
+          "share": {
+            "invite": "자동 선택 개선에 참여",
+            "removed": {
+              "one": "$n개 제거됨",
+              "other": "$n개 제거됨"
+            },
+            "added": {
+              "one": "$n개 추가됨",
+              "other": "$n개 추가됨"
+            },
+            "title": "변경 사항 공유",
+            "where": "이 앱 이름들이 미리 채워진 공개 이슈를 GitHub에 엽니다. 공유하려면 거기서 제출하세요. GitHub 계정이 필요합니다.",
+            "action": "GitHub에서 계속"
+          },
+          "options": {
+            "import": {
+              "clipboard": "클립보드에서 선택 항목 가져오기",
+              "file": "파일에서 선택 항목 가져오기",
+              "msg": "가져오면 현재 선택 항목이 교체됩니다. 계속할까요?"
+            },
+            "export": {
+              "clipboard": "선택 항목을 클립보드에 복사",
+              "file": "선택 항목을 파일로 내보내기"
+            },
+            "clearAllSelections": "모든 선택 지우기"
+          },
+          "modes": {
+            "proxy": "프록시만",
+            "bypass": "VPN 제외"
+          },
+          "autoSelection": {
+            "title": "$region 기준 자동 선택",
+            "performNow": "지금 업데이트",
+            "updated": {
+              "zero": "오늘 업데이트됨",
+              "one": "$n일 전 업데이트됨",
+              "other": "$n일 전 업데이트됨"
+            },
+            "noList": "이 지역에는 목록이 없습니다",
+            "loadFailed": "목록을 불러올 수 없습니다",
+            "restore": {
+              "one": "자동 선택 $n개 복원",
+              "other": "자동 선택 $n개 복원"
+            },
+            "restored": {
+              "one": "자동 선택 $n개를 복원했습니다",
+              "other": "자동 선택 $n개를 복원했습니다"
+            }
+          }
+        },
+        "region": "지역",
+        "regions": {
+          "ir": "이란 (ir)",
+          "cn": "중국 (cn)",
+          "ru": "러시아 (ru)",
+          "af": "아프가니스탄 (af)",
+          "id": "인도네시아 (id)",
+          "tr": "튀르키예 (tr)",
+          "br": "브라질 (br)",
+          "other": "기타"
+        },
+        "balancerStrategy": {
+          "title": "분산 방식",
+          "roundRobin": "라운드 로빈",
+          "consistentHash": "일관 해시",
+          "stickySession": "고정 세션",
+          "roundRobinDescription": "연결마다 다음 서버를 사용하므로 사이트에서 IP가 바뀌는 것을 볼 수 있습니다",
+          "consistentHashDescription": "각 사이트는 항상 같은 서버를 사용합니다",
+          "stickySessionDescription": "각 사이트는 다시 연결할 때까지 무작위로 정한 서버를 유지합니다"
+        },
+        "defaultProxy": {
+          "title": "기본 프록시",
+          "lowest": "가장 낮은 핑",
+          "balance": "분산",
+          "first": "첫 번째 프록시",
+          "lowestDescription": "프록시를 고르기 전까지 가장 빠른 프록시를 사용합니다",
+          "balanceDescription": "프록시를 고르기 전까지 연결을 모든 프록시에 분산합니다",
+          "firstDescription": "프록시를 고르기 전까지 프로필의 첫 번째 프록시를 사용합니다"
+        },
+        "resolveDestination": "대상 주소 확인",
+        "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "IPv6가 꺼져 있는 이유",
+        "ipv6RouteTurnOnTitle": "IPv6를 켤까요?",
+        "ipv6RouteTurnOn": "켜기",
+        "ipv6RouteHelp": "대부분의 프록시는 출구에 IPv6가 없습니다.\n\n프록시가 전달할 수 없는 연결은 열리자마자 끊기고, 브라우저는 IPv4로 다시 시도하지 않으므로 Google과 YouTube가 열리지 않습니다.\n\n켜면 연결 테스트 때 모든 프록시를 한 번 검사합니다. IPv6는 IPv6를 전달하는 프록시를 통해서만 사용되고, 나머지는 눈에 띄지 않게 IPv4로 처리됩니다.\n\nIPv6는 항상 VPN 안에서만 이동하며 VPN을 우회하지 않습니다.",
+        "ipv6Modes": {
+          "ipv4Only": "꺼짐 (IPv4만)",
+          "preferIpv4": "켜짐, IPv4 우선",
+          "preferIpv6": "켜짐, IPv6 우선",
+          "ipv4OnlyDescription": "앱이 IPv4만 사용합니다. IPv6는 즉시 거부됩니다.",
+          "preferIpv4Description": "IPv4를 먼저 사용합니다. IPv6는 전달이 확인된 프록시를 통해서만 사용합니다.",
+          "preferIpv6Description": "IPv6를 먼저 사용하되, 전달이 확인된 프록시를 통해서만 사용합니다."
+        }
+      },
+      "dns": {
+        "title": "DNS",
+        "remoteDns": "원격 DNS",
+        "remoteDnsDomainStrategy": "원격 DNS 도메인 전략",
+        "directDns": "아웃바운드 서버 리졸버 (직접 연결)",
+        "directDnsDomainStrategy": "아웃바운드 도메인 전략",
+        "enableFakeDns": "가짜 DNS 켜기",
+        "domainStrategy": {
+          "auto": "자동",
+          "preferIpv6": "IPv6 우선",
+          "preferIpv4": "IPv4 우선",
+          "ipv4Only": "IPv4만",
+          "ipv6Only": "IPv6만"
+        }
+      },
+      "inbound": {
+        "title": "인바운드",
+        "serviceMode": "서비스 모드",
+        "serviceModes": {
+          "proxy": "프록시 서비스만",
+          "systemProxy": "시스템 프록시 설정",
+          "tun": "VPN",
+          "router": "라우터 (전체 네트워크)"
+        },
+        "shortServiceModes": {
+          "proxy": "프록시",
+          "systemProxy": "시스템 프록시",
+          "tun": "VPN",
+          "router": "라우터"
+        },
+        "strictRoute": "엄격한 라우팅",
+        "tunImplementation": "TUN 구현",
+        "tunImplementations": {
+          "sing15": "Sing 15",
+          "mixed": "혼합",
+          "system": "시스템",
+          "gvisor": "gVisor"
+        },
+        "mixedPort": "프록시 포트 (SOCKS5/4, HTTP)",
+        "tproxyPort": "투명 프록시 포트",
+        "directPort": "직접 연결 포트",
+        "redirectPort": "리디렉션 포트",
+        "lanSharing": "로컬 네트워크에 공유",
+        "connectionSharing": "연결 공유",
+        "qrCode": "QR 코드",
+        "closedInVpn": "공유하지 않으면 VPN 모드에서 닫힘",
+        "proxySecret": "프록시 비밀 키",
+        "noSecret": "비밀 키 없음: 포트에 접근할 수 있는 모든 앱이나 기기가 사용할 수 있습니다",
+        "generateSecret": "새로 생성",
+        "removeSecret": "비밀 키를 제거할까요?",
+        "removeSecretMsg": "비밀 키가 없으면 이 기기의 모든 앱과, 공유 중에는 네트워크의 모든 기기가 사용자 이름이나 비밀번호 없이 프록시를 사용할 수 있습니다. 제거에 따른 위험은 본인 책임입니다.",
+        "localProxy": "로컬 프록시",
+        "localProxyInVpn": "VPN 모드에서도 열어 두기",
+        "localProxyInVpnHint": "앱은 이미 VPN을 사용합니다. 프록시를 사용하도록 설정한 앱에만 필요합니다",
+        "localProxyAuth": "비밀번호 요구",
+        "localProxyAuthHint": "브라우저 같은 일부 앱은 SOCKS 비밀번호를 보낼 수 없습니다",
+        "notAsSystemProxy": "시스템 프록시로는 비밀번호를 보낼 수 없으므로 요구하지 않습니다",
+        "lanGroup": "로컬 네트워크 공유",
+        "lanSharingPort": "공유 포트",
+        "otherPorts": "기타 포트",
+        "closedInVpnLocal": "VPN 모드에서 닫힘"
+      },
+      "tlsTricks": {
+        "title": "TLS 트릭",
+        "enable": "프래그먼트 켜기",
+        "packets": "프래그먼트 패킷",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
+        "size": "프래그먼트 크기",
+        "sleep": "프래그먼트 대기 시간",
+        "mixedSniCase": {
+          "enable": "SNI 대소문자 섞기 켜기"
+        },
+        "padding": {
+          "enable": "패딩 켜기",
+          "size": "패딩 크기"
+        }
+      },
+      "chain": {
+        "quick": {
+          "off": "꺼짐",
+          "extraSecurity": {
+            "title": "추가 보안",
+            "subtitle": "프록시를 신뢰할 수 없을 때",
+            "ipBy": "내 IP는 $mode에 따라 정해집니다",
+            "notTracked": "VPN 제공자가 내 트래픽을 볼 수 없습니다",
+            "forPublic": "공개 및 익명 프록시에 적합",
+            "slower": "속도가 느려질 수 있음"
+          },
+          "unblocker": {
+            "title": "프록시 차단 우회",
+            "subtitle": "필터링을 뚫고 프록시에 연결합니다",
+            "mayConnect": "차단된 프록시도 연결될 수 있음",
+            "personalOnly": "개인 프록시에만 유용함",
+            "notForPublic": "공개 프록시에는 맞지 않음",
+            "slower": "프록시가 조금 느려짐"
+          }
+        },
+        "title": "체인",
+        "subtitle": "추가 보안 및 차단 우회",
+        "finalIp": "최종 IP",
+        "levels": {
+          "app": {
+            "title": "앱",
+            "msg": "시작점: 앱 트래픽이 여기서 체인에 들어와 다음 단계들을 거치며 최종 우회를 준비합니다"
+          },
+          "extraSecurity": {
+            "title": "추가 보안",
+            "msg": "주 프로필을 신뢰할 수 없더라도 데이터를 비공개로 지키도록 보호막을 한 겹 더 추가합니다"
+          },
+          "mainProfile": {
+            "title": "주 프로필"
+          },
+          "unblocker": {
+            "title": "차단 우회",
+            "msg": "네트워크 제한을 우회하도록 돕습니다. 도우미가 연결되면 주 프로필이 현재 차단되어 있어도 작동할 수 있습니다."
+          },
+          "filtering": {
+            "title": "필터링",
+            "msg": "최종 출구: 트래픽이 활성화된 단계(추가 보안, 주 프로필, 차단 우회)를 거친 뒤 로컬 네트워크의 필터링을 우회하도록 라우팅됩니다."
+          }
+        },
+        "warp": {
+          "missingConfig": "WARP 구성 없음",
+          "licenseKey": "라이선스 키",
+          "tunnel": "터널",
+          "cleanIp": "클린 IP",
+          "port": "포트",
+          "noise": {
+            "count": "노이즈 개수",
+            "mode": "노이즈 모드",
+            "size": "노이즈 크기",
+            "delay": "노이즈 지연",
+            "modes": {
+              "standard": "표준",
+              "random": "무작위",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "QUIC 핸드셰이크",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (VoIP 통화)",
+              "stun": "STUN (영상 통화)"
+            },
+            "title": "WireGuard 노이즈"
+          },
+          "endpoint": "엔드포인트",
+          "endpointSources": {
+            "profile": "Cloudflare가 지정",
+            "scan": "스캔",
+            "custom": "사용자 지정"
+          },
+          "customServer": "주소",
+          "mtu": "MTU",
+          "customized": "사용자 지정됨",
+          "scanner": {
+            "title": "스캐너",
+            "searchNoise": "검색 노이즈",
+            "maxRtt": "최대 RTT (ms)",
+            "timeout": "탐색 시간 제한 (ms)",
+            "count": "탐색할 주소 수",
+            "concurrency": "동시 탐색 수",
+            "ports": "포트",
+            "cidrs": "범위"
+          },
+          "masque": {
+            "title": "MASQUE",
+            "vhttp": "HTTP 버전",
+            "serverName": "서버 이름",
+            "useIpv6": "IPv6 우선",
+            "udpTimeout": "UDP 시간 제한 (초)",
+            "keepalive": "UDP 킵얼라이브 (초)",
+            "packetSize": "초기 패킷 크기",
+            "reconnectDelay": "재연결 지연 (초)",
+            "tlsInsecure": "TLS 검증 건너뛰기",
+            "fragment": "TLS 프래그먼트",
+            "fragmentDelay": "프래그먼트 대체 지연 (ms)",
+            "recordFragment": "TLS 레코드 프래그먼트",
+            "ech": "암호화된 Client Hello (ECH)",
+            "echConfig": "ECH 구성",
+            "echQueryServerName": "ECH 조회 이름"
+          },
+          "awg": {
+            "title": "AmneziaWG",
+            "jc": "정크 패킷",
+            "jmin": "최소 정크 크기",
+            "jmax": "최대 정크 크기"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "서버 지역 선택",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "오스트리아 (at)",
+            "au": "호주 (au)",
+            "be": "벨기에 (be)",
+            "bg": "불가리아 (bg)",
+            "ca": "캐나다 (ca)",
+            "ch": "스위스 (ch)",
+            "cz": "체코 (cz)",
+            "de": "독일 (de)",
+            "dk": "덴마크 (dk)",
+            "ee": "에스토니아 (ee)",
+            "es": "스페인 (es)",
+            "fi": "핀란드 (fi)",
+            "fr": "프랑스 (fr)",
+            "gb": "영국 (gb)",
+            "hr": "크로아티아 (hr)",
+            "hu": "헝가리 (hu)",
+            "ie": "아일랜드 (ie)",
+            "in": "인도 (in)",
+            "it": "이탈리아 (it)",
+            "jp": "일본 (jp)",
+            "lv": "라트비아 (lv)",
+            "nl": "네덜란드 (nl)",
+            "no": "노르웨이 (no)",
+            "pl": "폴란드 (pl)",
+            "pt": "포르투갈 (pt)",
+            "ro": "루마니아 (ro)",
+            "rs": "세르비아 (rs)",
+            "se": "스웨덴 (se)",
+            "sg": "싱가포르 (sg)",
+            "sk": "슬로바키아 (sk)",
+            "us": "미국 (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "프로필 선택",
+          "conduitPairingId": "Conduit 페어링 ID"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "연결",
+      "traffic": "트래픽",
+      "trafficLive": "실시간 트래픽",
+      "trafficTotal": "총 트래픽",
+      "uplink": "업링크",
+      "downlink": "다운링크",
+      "speed": "속도",
+      "totalTransferred": "총 전송량"
+    },
+    "subscriptionInfo": {
+      "upload": "업로드",
+      "download": "다운로드",
+      "total": "총 트래픽",
+      "expireDate": "만료일",
+      "expired": "만료됨",
+      "noTraffic": "용량 소진",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days일 남음",
+        "other": "$days일 남음"
+      },
+      "remainingUnlimited": "무제한",
+      "remainingTrafficSemanticLabel": "트래픽 ${total} 중 ${consumed} 사용",
+      "remainingTraffic": "남은 트래픽",
+      "openWebPage": "웹 페이지 열기",
+      "support": "지원",
+      "openLinkTitle": "이 링크를 열까요?",
+      "openLinkAction": "열기"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "정렬 기준",
+      "sort": {
+        "name": "이름순",
+        "lastUpdate": "최근 업데이트순"
+      },
+      "direction": {
+        "newestFirst": "최신순",
+        "oldestFirst": "오래된순"
+      }
+    },
+    "warpLicense": {
+      "title": "Cloudflare WARP 동의",
+      "description(rich)": "Cloudflare WARP는 무료 WireGuard VPN 제공자입니다. 이 기능을 켜면 Cloudflare WARP의 ${tos(서비스 약관)}과 ${privacy(개인정보 처리방침)}에 동의하는 것입니다."
+    },
+    "psiphonLicense": {
+      "title": "Psiphon 라이선스 계약",
+      "description(rich)": "Psiphon을 사용하면 ${tos(서비스 약관)}에 동의하고 ${privacy(개인정보 처리방침)}을 확인한 것으로 간주됩니다. 계속하기 전에 주의 깊게 읽어 보세요."
+    },
+    "newVersion": {
+      "title": "업데이트 사용 가능",
+      "msg": "@:common.appTitle의 새 버전이 있습니다. 지금 업데이트할까요?",
+      "currentVersion": "현재 버전",
+      "newVersion": "새 버전",
+      "updateNow": "지금 업데이트",
+      "downloading": "다운로드 중…",
+      "installing": "설치 프로그램 시작 중…",
+      "allowInstall": "열린 설정 화면에서 Hiddify의 앱 설치를 허용한 뒤 다시 시도하세요.",
+      "failed": "업데이트를 설치할 수 없습니다.",
+      "openPage": "릴리스 페이지 열기",
+      "tryAgain": "다시 시도"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "모든 구성 옵션을 가져온 값으로 덮어씁니다. 계속할까요?"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "프로필 삭제",
+          "msg": "이 프로필을 삭제할까요? 되돌릴 수 없습니다."
+        }
+      },
+      "appList": {
+        "import": {
+          "msg": "VPN 제외 앱과 프록시만 앱 목록이 교체됩니다. 계속할까요?"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "규칙 삭제",
+          "msg": "“$rulename” 규칙을 삭제할까요? 되돌릴 수 없습니다."
+        }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "프로필을 추가할까요?",
+        "message": "“${host}”의 외부 링크가 새 프로필을 추가하려고 합니다. 가져올까요?"
+      },
+      "importRouteRuleByDeepLinkWarning": {
+        "title": "라우팅 규칙을 가져올까요?",
+        "message": "라우팅 규칙은 트래픽이 어디로 갈지 결정합니다.\n신뢰할 수 있는 출처에서만 가져오세요."
+      }
+    },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "모든 앱을 VPN으로 보낼까요?",
+        "vpnMode": "VPN 모드",
+        "allApps": "모든 앱",
+        "recommended": "권장",
+        "systemProxyMode": "시스템 프록시",
+        "someApps": "브라우저와 대부분의 앱",
+        "switched": "시스템 프록시 모드로 전환했습니다. 설정에서 변경할 수 있습니다.",
+        "waitingTitle": "관리자 권한을 기다리는 중",
+        "waitingMsg": "Hiddify가 VPN 모드 허용을 기다리고 있습니다.",
+        "waitingWhere": "열린 창에서:",
+        "waitingWindows": "“예”를 클릭하세요.",
+        "waitingMac": "Mac 비밀번호를 입력하고 확인하세요.",
+        "waitingLinux": "비밀번호를 입력하고 확인하세요.",
+        "back": "뒤로",
+        "needsAdmin": "관리자 권한 한 번 필요",
+        "needsAdminAppImage": "시작할 때마다 관리자 권한 필요",
+        "noAdmin": "관리자 권한 불필요",
+        "someAppsExcept": "Telegram과 일부 앱은 제외됨",
+        "useVpn": "VPN 모드 사용",
+        "useSystemProxy": "시스템 프록시 사용",
+        "helpTooltip": "이게 뭔가요?",
+        "helpWhatTitle": "작동 방식",
+        "helpProsTitle": "장점",
+        "helpConsTitle": "유의할 점",
+        "helpVpn": {
+          "what": "Hiddify가 컴퓨터에 가상 네트워크를 추가하고, 브라우저, Telegram, 게임, 업데이트 등 모든 앱의 인터넷 트래픽이 자동으로 이를 통과합니다. 앱마다 따로 설정할 필요가 없습니다.",
+          "pros": [
+            "모든 앱이 앱별 설정 없이 Hiddify를 거칩니다.",
+            "Telegram이나 게임처럼 프록시 설정을 무시하는 앱도 작동합니다.",
+            "이름 조회(DNS)도 Hiddify를 거치므로 그 방식으로 차단된 사이트도 열립니다."
+          ],
+          "cons": [
+            "처음 한 번은 Hiddify의 백그라운드 서비스를 설치하기 위해 컴퓨터가 관리자 권한을 요청합니다. 이후에는 묻지 않고 연결됩니다.",
+            "사용하는 동안 다른 VPN 앱은 끄세요. 둘을 동시에 켜면 서로 방해합니다."
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify가 컴퓨터의 프록시 설정을 변경합니다. 웹 브라우저처럼 이 설정을 따르는 앱은 트래픽을 Hiddify로 보내고, 나머지 앱은 Hiddify가 꺼진 것처럼 직접 연결합니다.",
+          "pros": [
+            "관리자 권한이 필요 없습니다.",
+            "빠르게 켜고 끌 수 있으며, 연결을 해제하면 Hiddify가 설정을 원래대로 되돌립니다.",
+            "컴퓨터의 다른 네트워크 도구와 함께 사용할 수 있습니다."
+          ],
+          "cons": [
+            "Telegram, 많은 게임, 일부 업데이트 도구처럼 시스템 프록시를 무시하는 앱은 보호되지 않습니다.",
+            "이런 앱이 작동하지 않으면 VPN 모드를 선택하세요."
+          ]
+        }
+      },
+      "proxyNeedsAdmin": {
+        "title": "관리자 권한 권장",
+        "msg": "이 프로필의 일부 설정은 관리자 권한이 있을 때 더 잘 작동합니다. 관리자 권한으로 실행하거나, 권한 없이 계속하고 이번 연결에서는 해당 설정을 끌 수 있습니다.",
+        "seeConfigs": "구성 표시",
+        "hideConfigs": "구성 숨기기",
+        "neverAskAgain": "이 프로필에 대해 다시 묻지 않기",
+        "runAsAdmin": "관리자 권한으로 실행",
+        "continueWithoutAdmin": "관리자 권한 없이 계속",
+        "elevationFailedTitle": "관리자 권한을 얻지 못했습니다",
+        "elevationFailedMsg": "관리자 권한 요청이 거부되었거나 실패했습니다. 다시 시도하거나 이번 연결은 관리자 권한 없이 계속하세요.",
+        "tryAgain": "다시 시도"
+      }
+    },
+    "experimentalNotice": {
+      "title": "실험적 기능 사용 중",
+      "msg": "연결 품질에 영향을 주거나 예기치 않은 오류를 일으킬 수 있는 실험적 기능을 켰습니다. 설정에서 언제든지 이 옵션을 변경하거나 초기화할 수 있습니다.",
+      "disable": "다시 표시하지 않기"
+    },
+    "noActiveProfile": {
+      "title": "프로필 선택",
+      "msg": "시작해 볼까요? VPN 서버 정보가 담긴 연결 프로필을 추가하세요.\n\n아직 서버가 없나요? 괜찮습니다. 아래 안내에서 무료로 서버를 만드는 방법을 볼 수 있습니다.",
+      "helpBtn": {
+        "label": "방법 보기",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "이 링크를 먼저 확인하세요",
+      "cannotVerify": "이 링크는 검증되지 않았습니다",
+      "avoidIfUnsure": "확실하지 않다면 결제하거나 민감한 정보를 공유하지 마세요",
+      "ownResponsibility": "계속하면 그에 따른 위험은 본인 책임입니다",
+      "open": "열기",
+      "openIn": "열기 (${seconds})"
+    },
+    "proxyInfo": {
+      "fullTag": "전체 태그",
+      "type": "유형",
+      "status": "상태",
+      "testTime": "테스트 시각",
+      "testDelay": "지연 시간 테스트",
+      "isSelected": "선택됨",
+      "isGroup": "그룹",
+      "isSecure": "보안 연결",
+      "port": "포트",
+      "host": "호스트",
+      "ip": "IP",
+      "countryCode": "국가 코드",
+      "region": "지역",
+      "city": "도시",
+      "asn": "ASN",
+      "organization": "조직",
+      "location": "위치",
+      "postalCode": "우편번호",
+      "download": "다운로드",
+      "upload": "업로드",
+      "ping": "핑",
+      "speed": "속도",
+      "server": "서버",
+      "country": "국가",
+      "tapToTest": "탭하여 테스트",
+      "error": "실패 이유"
+    },
+    "windowClosing": {
+      "askEachTime": "매번 묻기",
+      "alertMessage": "앱을 숨길까요, 종료할까요?",
+      "remember": "이 선택 기억하기"
+    },
+    "qrCode": {
+      "copyFullLink": "전체 링크 복사",
+      "copied": "복사했습니다",
+      "lanLine": "SOCKS5 · 같은 네트워크에서만",
+      "noLocalNetwork": "로컬 네트워크를 찾을 수 없습니다",
+      "ip": "IP",
+      "port": "포트",
+      "username": "사용자 이름",
+      "password": "비밀번호",
+      "showPassword": "비밀번호 표시",
+      "hidePassword": "비밀번호 숨기기"
+    },
+    "qrScanner": {
+      "notFound": "이 이미지에서 QR 코드를 찾을 수 없습니다"
+    },
+    "crashReport": {
+      "title": "지난번에 Hiddify가 충돌했습니다",
+      "msg": "문제를 해결할 수 있도록 개발자에게 보고서를 보낼까요? 충돌 세부 정보, 로그, 그리고 서버와 키, 비밀번호를 제거한 구성이 하나의 zip 파일에 담기며, 보내기 전에 확인할 수 있습니다.",
+      "send": "보고서 보내기"
+    },
+    "keepTop": {
+      "title": "큰 구독",
+      "subtitle": "프록시 $count개 · 모두 실행하면 배터리, 데이터, 메모리를 소모합니다",
+      "hint": "목록 끝에서 언제든지 되돌릴 수 있습니다.",
+      "keeping": "가장 빠른 $keep개만 실행하고 나머지는 일시 중지합니다",
+      "all": "$count개 모두 실행",
+      "keep": "가장 빠른 $keep개만 유지",
+      "useAll": "$count개 모두 사용",
+      "howMany": "계속 실행할 개수",
+      "pickByHand": "프록시 직접 선택",
+      "region": "지역",
+      "anyRegion": "모든 지역",
+      "keepAnswering": "작동하는 프록시 유지",
+      "keepingAnswering": "작동하는 프록시만 실행",
+      "answering": "작동 중",
+      "everyOne": "전체",
+      "quick": "빠른 테스트",
+      "quickHint": "가장 빠른 프록시를 찾으면 멈춥니다",
+      "quickHelp": "어떻게 작동하나요?",
+      "quickFirst": "지난번에 가장 빨랐던 프록시를 먼저 테스트합니다",
+      "quickStop": "나머지가 이전에 더 느렸다면 테스트를 멈춥니다",
+      "quickNew": "새 프록시와 하루 동안 테스트하지 않은 프록시는 항상 테스트합니다"
+    },
+    "keepTags": {
+      "title": "프록시 선택",
+      "hint": "연결할 때마다 이 프록시만 실행합니다.",
+      "search": "검색",
+      "all": "모두 선택",
+      "none": "지우기",
+      "run": "이 $n개 사용",
+      "sort": "정렬",
+      "sortProfile": "프로필 순서",
+      "sortPing": "핑",
+      "sortDownload": "다운로드",
+      "sortUpload": "업로드",
+      "selectFastest": "가장 빠른 $n개",
+      "statusChosen": "선택됨",
+      "statusAnswering": "응답 중",
+      "statusPaused": "일시 중지됨",
+      "paused": "프록시 $n개가 일시 중지되어 핑이 없고 테스트할 수 없습니다.",
+      "wake": "모두 실행하여 테스트",
+      "offline": "연결하면 핑을 보고 테스트할 수 있습니다.",
+      "offlineTitle": "연결되지 않음",
+      "shown": "$n개 표시됨",
+      "noMatch": "일치하는 프록시가 없습니다",
+      "chosenHint": "위에서 프록시를 탭하여 선택하세요",
+      "allShown": "모두 위 목록에 있습니다",
+      "notShown": "표시되지 않음:",
+      "protocol": "프로토콜",
+      "country": "지역",
+      "anyProtocol": "모든 프로토콜",
+      "anyCountry": "모든 지역",
+      "otherCountries": "기타"
+    },
+    "localProxy": {
+      "steps": [
+        "앱의 프록시 설정을 엽니다",
+        "SOCKS5 또는 HTTP를 선택합니다",
+        "아래 값을 입력합니다 · 탭하면 복사됩니다",
+        "Hiddify를 연결된 상태로 둡니다"
+      ],
+      "hint": "프록시 모드 · 사용 방법",
+      "setPassword": "비밀번호 설정",
+      "manual": "수동",
+      "dontShowAgain": "다시 표시하지 않기",
+      "thisDevice": "이 기기",
+      "otherDevices": "다른 기기",
+      "server": "서버",
+      "noPassword": "비밀번호가 설정되지 않음",
+      "turnOnSharing": "공유 켜기",
+      "copyLink": "링크 복사",
+      "telegramLink": "Telegram 링크",
+      "fullLink": "전체 링크",
+      "portRange": "1024부터 65535 사이의 포트를 사용하세요",
+      "passwordTooShort": "4자 이상 입력하세요",
+      "edit": "편집"
+    },
+    "dbNewerThanApp": {
+      "title": "저장된 데이터가 더 새로운 버전의 것입니다",
+      "msg": "프로필과 설정이 더 새로운 버전의 Hiddify로 저장되어 이 이전 버전에서는 읽을 수 없습니다. 최신 버전을 설치하여 유지하거나, 삭제하고 이 버전을 사용하세요.",
+      "deleteData": "데이터 지우기",
+      "deleteConfirm": "저장된 데이터를 지웁니다. 구독과 로컬 프로필은 가능한 경우 다시 추가되지만, 새 버전에서 저장한 다른 내용은 사라집니다.",
+      "downloadLatest": "최신 버전 다운로드"
+    },
+    "dbBroken": {
+      "title": "저장된 데이터를 열 수 없습니다",
+      "msg": "Hiddify가 저장된 프로필을 열지 못했습니다. 저장된 데이터를 지우고 다시 시작하세요. 구독과 로컬 프로필은 가능한 경우 다시 추가되고, 설정은 유지됩니다.",
+      "wipeData": "데이터 지우기",
+      "wipeConfirm": "저장된 데이터를 지우고 Hiddify를 다시 시작합니다. 아직 읽을 수 있는 프로필은 다시 추가되지만, 나머지는 복구할 수 없습니다.",
+      "copyError": "오류 복사"
+    }
+  },
+  "connection": {
+    "tapToConnect": "탭하여 연결",
+    "connect": "연결",
+    "connecting": "연결 중…",
+    "waiting": "자유를 찾는 중…",
+    "noAvailableProxies": "연결 실패",
+    "hotReloading": "변경 사항 적용 중…",
+    "connected": "연결됨",
+    "disconnect": "연결 해제",
+    "disconnecting": "연결 해제 중…",
+    "failed": "연결할 수 없습니다",
+    "slow": "평소보다 오래 걸리고 있습니다…",
+    "tapToRetry": "탭하여 다시 시도",
+    "errorDetails": "오류 세부 정보",
+    "reconnect": "다시 연결",
+    "reconnectMsg": "변경 사항을 적용하기 위해 다시 연결하는 중…",
+    "health": {
+      "title": "연결 확인",
+      "allGood": "트래픽이 정상적으로 전달됩니다",
+      "pickDead": "선택한 프록시가 응답하지 않습니다",
+      "hopPending": "${chain} 연결 중…",
+      "hopFailed": "${chain}에 연결할 수 없습니다",
+      "coreTesting": "서버 테스트 중…",
+      "coreNone": "응답하는 서버가 없습니다",
+      "fastest": "가장 빠른 서버",
+      "yourServer": "선택한 프록시",
+      "notResponding": "응답 없음",
+      "testing": "테스트 중…",
+      "useFastest": "가장 빠른 서버로 전환",
+      "hopReady": "연결됨",
+      "hopConnecting": "연결 중…",
+      "hopBroken": "연결할 수 없음",
+      "hopNoReply": "연결되었지만 응답이 없음",
+      "hopBlocked": "선택한 프록시의 응답을 기다리는 중",
+      "retry": "다시 테스트",
+      "change": "변경",
+      "turnOff": "끄기"
+    }
+  },
+  "errors": {
+    "unexpected": "예기치 않은 오류",
+    "connection": {
+      "unexpected": "예기치 않은 연결 오류",
+      "timeout": "연결 시간 초과",
+      "badResponse": "잘못된 서버 응답",
+      "connectionError": "연결 오류",
+      "badCertificate": "잘못된 인증서"
+    },
+    "profiles": {
+      "unexpected": "예기치 않은 오류",
+      "notFound": "프로필을 찾을 수 없습니다",
+      "invalidConfig": "잘못된 구성",
+      "invalidUrl": "잘못된 URL",
+      "canceledByUser": "사용자가 취소함"
+    },
+    "connectivity": {
+      "unexpected": "예기치 않은 실패",
+      "missingVpnPermission": "VPN 권한 없음",
+      "missingNotificationPermission": "알림 권한 없음",
+      "core": "코어 오류"
+    },
+    "singbox": {
+      "serviceNotRunning": "서비스가 실행 중이 아닙니다",
+      "missingPrivilege": "권한 부족",
+      "missingPrivilegeMsg": "VPN 모드를 시작할 수 없습니다. 앱을 관리자 권한으로 다시 실행하거나 서비스 모드를 변경하세요.",
+      "tunAddressInUse": "다른 VPN이 활성화되어 있습니다",
+      "tunAddressInUseMsg": "VPN 모드를 시작할 수 없습니다. 다른 VPN을 끄거나 서비스 모드를 변경하세요.",
+      "invalidConfigOptions": "잘못된 구성 옵션",
+      "invalidConfig": "잘못된 구성"
+    },
+    "warp": {
+      "missingLicense": "WARP 라이선스 필요",
+      "missingLicenseMsg": "이 프로필은 WARP를 사용합니다. 계속하려면 WARP 라이선스에 동의하세요."
+    },
+    "psiphon": {
+      "missingLicense": "Psiphon 라이선스 필요",
+      "missingLicenseMsg": "이 프로필은 Psiphon을 사용합니다. 계속하려면 Psiphon 라이선스에 동의하세요."
+    }
+  }
+}

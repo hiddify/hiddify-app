@@ -1,0 +1,1279 @@
+{
+  "common": {
+    "appTitle": "Hiddify",
+    "start": "پیل",
+    "version": "نسخه",
+    "ok": "سمه ده",
+    "cancel": "لغوه کول",
+    "kContinue": "دوام",
+    "undo": "بیرته کول",
+    "showMore": "نور وښيئ",
+    "showLess": "لږ وښيئ",
+    "filter": "فلټر",
+    "all": "ټول",
+    "pause": "ځنډول",
+    "resume": "بیا پیلول",
+    "clear": "پاکول",
+    "close": "بندول",
+    "auto": "اتومات",
+    "manually": "لاسي",
+    "name": "نوم",
+    "url": "URL",
+    "add": "زیاتول",
+    "clipboard": "کلیپبورډ",
+    "addToClipboard": "کلیپبورډ ته کاپي کول",
+    "qrCode": "QR کوډ",
+    "free": "وړیا",
+    "warp": "WARP",
+    "fragment": "Fragment",
+    "help": "مرسته",
+    "save": "خوندي کول",
+    "update": "تازه کول",
+    "pin": "ټنګول",
+    "unpin": "ټنګ لرې کول",
+    "share": "شریکول",
+    "edit": "سمول",
+    "delete": "حذف کول",
+    "discard": "ردول",
+    "import": "واردول",
+    "export": "صادرول",
+    "later": "وروسته",
+    "ignore": "پرېښودل",
+    "quit": "وتل",
+    "notSet": "نه دی تنظیم شوی",
+    "hide": "پټول",
+    "exit": "وتل",
+    "reset": "بیا تنظیمول",
+    "done": "بشپړ شو",
+    "decline": "نه منل",
+    "agree": "منل",
+    "empty": "تش",
+    "unknown": "نامعلوم",
+    "hidden": "پټ",
+    "timeout": "د وخت پای",
+    "sort": "ترتیبول",
+    "dashboard": "ډشبورډ",
+    "disable": "بندول",
+    "psiphon": "Psiphon",
+    "profile": "پروفایل",
+    "configuration": "ترتیب",
+    "file": "فایل",
+    "interval": {
+      "day": {
+        "zero": "",
+        "one": "$n ورځ",
+        "other": "$n ورځې"
+      },
+      "hour": {
+        "zero": "",
+        "one": "$n ساعت",
+        "other": "$n ساعته"
+      }
+    },
+    "msg": {
+      "permission": {
+        "denied": "اجازه ورنه کړل شوه"
+      },
+      "export": {
+        "clipboard": {
+          "success": "کلیپبورډ ته کاپي شو",
+          "failure": "کلیپبورډ ته کاپي نه شو",
+          "contentTooLarge": "منځپانګه ډېره لویه ده. پر ځای یې فایل ته صادر کړئ."
+        },
+        "file": {
+          "success": "د JSON فایل جوړ شو",
+          "failure": "فایل جوړ نه شو"
+        }
+      },
+      "import": {
+        "confirm": "د واردولو تایید",
+        "success": "وارد شو",
+        "failure": "وارد نه شو"
+      },
+      "autoSave": {
+        "success": "بدلونونه په اتومات ډول خوندي شول"
+      }
+    }
+  },
+  "intro": {
+    "banner": "هر څه چې د بې بندیزه انټرنیټ لپاره درکار دي",
+    "termsAndPolicyCaution(rich)": "د دوام په ورکولو سره تاسو ${tap(@:pages.about.termsAndConditions)} منئ",
+    "info(rich)": "د Hiddify په لاس د ❤️ سره جوړ شوی. ${tap_source(خلاص سرچینه)} او ${tap_license(جواز)}"
+  },
+  "pages": {
+    "home": {
+      "title": "کور",
+      "quickSettings": "چټک تنظیمات"
+    },
+    "proxies": {
+      "title": "پروکسي",
+      "sort": "پروکسي ترتیبول",
+      "testDelay": "د ځنډ ازموینه",
+      "empty": "هېڅ پروکسي نشته",
+      "connectToSeeProxies": "د پروکسيو د لیدلو لپاره وصل شئ",
+      "loadFailed": "پروکسي نه شوې پرانیستل. د بیا هڅې لپاره کیکاږئ.",
+      "activeProxy": "فعاله پروکسي",
+      "unknownIp": "نامعلوم IP",
+      "checkingIp": "IP چک کېږي…",
+      "switchFailed": "دې پروکسي ته نه شو بدل. بیا هڅه وکړئ.",
+      "notResponding": "ځواب نه ورکوي",
+      "noneResponding": "هېڅ پروکسي ځواب نه ورکوي",
+      "sortOptions": {
+        "unsorted": "اصلي",
+        "name": "د نوم له مخې",
+        "delay": "د ځنډ له مخې",
+        "usage": "د کارونې له مخې",
+        "upload": "د پورته کولو سرعت له مخې",
+        "download": "د ښکته کولو سرعت له مخې"
+      },
+      "ipInfo": {
+        "address": "د IP پته",
+        "country": "هیواد",
+        "organization": "اداره"
+      },
+      "delay": {
+        "result": "ځنډ: ${delay}ms",
+        "timeout": "د ځنډ ازموینې وخت پای ته ورسېد",
+        "unavailable": "نشته",
+        "testing": "ځنډ: ازمویل کېږي…"
+      },
+      "status": {
+        "connecting": "وصلېږي",
+        "registering": "ثبتېږي",
+        "failed": "ناکام شو",
+        "ready": "چمتو",
+        "searching": "لټول کېږي",
+        "reconnecting": "بیا وصلېږي"
+      },
+      "signalStyle": "د سیګنال بڼه",
+      "keepTop": {
+        "picking": "د $count له منځه $keep ګړندۍ پروکسي موندل کېږي…",
+        "pickingBody": "ټولې پروکسي یو ځل ازمویل کېږي؛ بیا یوازې ګړندۍ پاتې چلېږي.",
+        "thenFastest": "له ازموینې وروسته، یوازې $keep ګړندۍ$where چلېږي.",
+        "thenWorking": "له ازموینې وروسته، یوازې کاري پروکسي$where چلېږي.",
+        "thenAll": "له ازموینې وروسته، یوازې هغه پروکسي$where چلېږي.",
+        "inRegions": " په $flags کې",
+        "pickingAnswering": "ټولې $count ازمویل کېږي…",
+        "keptAnswering": "$n کاري پروکسي$where چلېږي",
+        "kept": "$n ګړندۍ پروکسي چلېږي",
+        "keptFastest": "$n ګړندۍ پروکسي$where چلېږي",
+        "keptBody": "$paused نورې پروکسي ځنډول شوې دي، د بیټرۍ او ډېټا د ساتلو لپاره.",
+        "showAll": "ټولې $count وښيئ",
+        "big": "$count پروکسي چلېږي",
+        "bigBody": "یوازې $keep ګړندۍ پروکسي چالان وساتئ، د بیټرۍ او ډېټا د ساتلو لپاره.",
+        "keep": "$keep ګړندۍ وساتئ",
+        "change": "شمېر بدل کړئ",
+        "chosen": "ستاسو $n ټاکل شوې پروکسي چلېږي",
+        "choose": "ټاکل"
+      },
+      "upload": {
+        "test": "د پورته کولو سرعت ازمویل",
+        "failed": "د سرعت ازموینه نه شوه پیل",
+        "hint": "کیکاږئ: د پورته کولو سرعت · ونیسئ: د ښکته کولو سرعت",
+        "hintBoth": "کیکاږئ: دواړه سرعتونه · ونیسئ: د ښکته کولو سرعت"
+      },
+      "speedTest": {
+        "title": "د سرعت ازموینه",
+        "what": "څه ازمویل شي",
+        "download": "ښکته کول",
+        "upload": "پورته کول",
+        "amount": "د هرې پروکسي لپاره اندازه",
+        "proxies": "د ازموینې پروکسي",
+        "proxiesHint": "د پینګ له مخې ګړندۍ",
+        "all": "ټولې",
+        "fastest": "$n ګړندۍ",
+        "through": "$n MB د $count ګړندیو پروکسيو له لارې هرې ته",
+        "throughAll": "$n MB د $count پروکسيو له لارې هرې ته",
+        "throughEach": "$n MB د هرې پروکسي له لارې",
+        "start": "ازموینه پیل کړئ",
+        "save": "خوندي کول",
+        "testDownload": "د ښکته کولو سرعت ازمویل",
+        "both": "دواړه",
+        "bothWays": "ښکته او پورته",
+        "amountHint": "څومره چې ډېر وي، هومره دقیق وي",
+        "clear": "خوندي پایلې پاکول",
+        "cleared": "پاک شول",
+        "which": "کومې پروکسي",
+        "shown": "ښودل شوي ($n)",
+        "chosen": "ټاکل شوي ($n)"
+      },
+      "single": {
+        "share": "شریکول",
+        "edit": "سمول",
+        "shareTitle": "پروکسي شریکول",
+        "configHint": "یوازې همدا پروکسي، او هغه پروکسي چې دا ورڅخه تېرېږي. Hiddify یې د هر ترتیب په څېر وارد کوي.",
+        "editTitle": "د نوي پروفایل په توګه سمول",
+        "editMsg": "“${name}” نوي پروفایل ته کاپي کېږي چې تاسو یې سمولی شئ. اصلي پروفایل ګوښه پاتې کېږي، ځکه چې اشتراک په هر تازه کېدو کې خپلې پروکسي بدلوي.",
+        "editConfirm": "کاپي کړئ او سم کړئ",
+        "savedAsProfile": "نوي پروفایل “${name}” ته کاپي شو",
+        "failed": "د دې پروکسي ترتیب نه شو لوستل کېدای"
+      }
+    },
+    "profiles": {
+      "title": "پروفایلونه",
+      "add": "پروفایل زیاتول",
+      "fromPhone": {
+        "title": "له خپل موبایل څخه زیاتول",
+        "scan": "دا کوډ د خپل موبایل په کامره سکین کړئ، د اشتراک لینک پیسټ کړئ، او ولېږئ.",
+        "sameNetwork": "ستاسو موبایل او دا تلویزیون باید په یوه Wi-Fi شبکه کې وي.",
+        "noNetwork": "دا تلویزیون په محلي شبکه کې نه دی. د موبایل لینک د زیاتولو لپاره یې له Wi-Fi سره وصل کړئ.",
+        "locked": "ډېر ناسم کوډونه هڅه شوي، نو دا بند شو. دا ور وتړئ او د نوي کوډ لپاره بیا یې پرانیزئ.",
+        "received": "له موبایل څخه ترلاسه شو",
+        "from": "له $address څخه",
+        "page": {
+          "title": "په خپل تلویزیون کې Hiddify ته لېږل",
+          "intro": "د ریموټ په لاس لیکلو پرته، په څلورو چټکو ګامونو کې خپل تلویزیون ته اشتراک زیات کړئ.",
+          "steps": {
+            "network": {
+              "title": "له همدې Wi-Fi سره وصل شئ",
+              "body": "ستاسو موبایل او تلویزیون باید په یوه Wi-Fi شبکه کې وي، که نه دا پاڼه تلویزیون ته نه رسېږي."
+            },
+            "copy": {
+              "title": "خپل لینک کاپي کړئ",
+              "body": "د خپل خدمت وړاندې کوونکي اشتراک لینک، یا کوم بل پروکسي لینک یا ترتیب کاپي کړئ."
+            },
+            "paste": {
+              "title": "دلته یې پیسټ کړئ",
+              "body": "لاندې بکس ته کیکاږئ، لینک پیسټ کړئ، بیا “تلویزیون ته لېږل” ته کیکاږئ."
+            },
+            "confirm": {
+              "title": "په تلویزیون کې تایید کړئ",
+              "body": "لینک په تلویزیون کې ښکاري. په ریموټ سره واردول ټک کړئ. تر هغه چې دا ونه کړئ، هېڅ نه زیاتېږي."
+            }
+          },
+          "label": "د اشتراک لینک",
+          "hint": "د اشتراک لینک یا ترتیب پیسټ کړئ",
+          "send": "تلویزیون ته لېږل",
+          "sentTitle": "ستاسو تلویزیون ته ولېږل شو",
+          "sent": "اوس د زیاتولو لپاره په تلویزیون کې واردول ټک کړئ. لاندې بل لینک هم لېږلی شئ.",
+          "empty": "لومړی یو لینک پیسټ کړئ.",
+          "footer": "دا پاڼه یوازې هغه وخت کار کوي چې په تلویزیون کې “پروفایل زیاتول” خلاص وي، او یوازې ستاسو په محلي شبکه کې."
+        }
+      },
+      "update": "پروفایل تازه کول",
+      "viewAllProfiles": "ټول پروفایلونه وګورئ",
+      "activeProfileName": "د فعال پروفایل نوم: “${name}”",
+      "nonActiveProfileName": "“${name}” د فعال پروفایل په توګه وټاکئ",
+      "freeSubNotFound": "هېڅ وړیا اشتراک ونه موندل شو",
+      "freeSubNotFoundForRegion": "د “${region}” لپاره هېڅ وړیا اشتراک ونه موندل شو",
+      "failedToLoad": "نه شو پرانیستل",
+      "updateSubscriptions": "اشتراکونه تازه کول",
+      "share": {
+        "title": "پروفایل شریکول",
+        "scanHint": "دا پروفایل د زیاتولو لپاره یې په بل وسیله کې د Hiddify په مرسته سکین کړئ",
+        "link": "د اشتراک لینک",
+        "config": "ترتیب",
+        "configHint": "بشپړ JSON چې دا پروفایل ورسره چلېږي، ستاسو تنظیمات پکې شامل",
+        "configFailed": "ترتیب نه شو جوړ",
+        "copy": "کاپي کول",
+        "shareFile": "شریکول",
+        "saveFile": "خوندي کول",
+        "tooLargeToCopy": "کلیپبورډ ته ډېر لوی دی: د فایل په توګه یې شریک یا خوندي کړئ",
+        "toTv": {
+          "button": "تلویزیون ته لېږل",
+          "scanHint": "په تلویزیون کې Hiddify پرانیزئ او د پروفایل زیاتولو لپاره + ته کیکاږئ، بیا هغه کوډ سکین کړئ چې ښکاري. دواړه وسیلې باید په یوه Wi-Fi کې وي.",
+          "sent": "ولېږل شو. د زیاتولو لپاره په تلویزیون کې واردول ټک کړئ.",
+          "notTvCode": "دا د Hiddify تلویزیون کوډ نه دی. په تلویزیون کې د کوډ د ښودلو لپاره د پروفایل زیاتولو + ته کیکاږئ.",
+          "expired": "تلویزیون په دې کوډ نور لینکونه نه مني. په تلویزیون کې د پروفایل زیاتولو پاڼه بیا پرانیزئ او نوی کوډ سکین کړئ.",
+          "busy": "تلویزیون ډېر لینکونه په تمه لري. په تلویزیون کې یې وارد یا رد کړئ، بیا هڅه وکړئ.",
+          "unreachable": "تلویزیون ته نه شو رسېدلی. ډاډ ترلاسه کړئ چې موبایل او تلویزیون په یوه Wi-Fi شبکه کې دي."
+        }
+      },
+      "msg": {
+        "save": {
+          "success": "پروفایل خوندي شو"
+        },
+        "invalidUrl": "ناسم URL",
+        "add": {
+          "failure": "پروفایل نه شو زیات"
+        },
+        "update": {
+          "success": "پروفایل تازه شو",
+          "failure": "پروفایل نه شو تازه",
+          "failureNamed": "“${name}” نه شو تازه",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count پروفایل تازه شو",
+            "other": "$count پروفایلونه تازه شول"
+          },
+          "bulkPartial": "${success} تازه شول\n${failed} ناکام شول: ${names}"
+        },
+        "delete": {
+          "success": "پروفایل حذف شو",
+          "bulkSuccess(plural, param=count)": {
+            "one": "$count پروفایل حذف شو",
+            "other": "$count پروفایلونه حذف شول"
+          },
+          "bulkPartial": "له ${total} پروفایلونو ${deleted} حذف شول"
+        }
+      },
+      "removeInactive": {
+        "action": "غیرفعال اشتراکونه لرې کول",
+        "title": "غیرفعال اشتراکونه لرې کول",
+        "hint": "دا اشتراکونه نور کار نه کوي. نښه شوي حذف کېږي؛ هغه چې غواړئ وساتل شي، نښه یې لرې کړئ.",
+        "none": "هېڅ غیرفعال اشتراک نشته",
+        "remove(plural, param=count)": {
+          "one": "$count حذف کول",
+          "other": "$count حذف کول"
+        },
+        "reason": {
+          "expired": "پای ته رسېدلی",
+          "expiredOn": "په ${date} پای ته ورسېد",
+          "noTraffic": "ترافیک پاتې نه دی",
+          "updateFailing": "تازه کېدل ناکامېږي",
+          "updateFailingSince": "تازه کېدل له ${date} راهیسې ناکامېږي"
+        }
+      }
+    },
+    "profileDetails": {
+      "title": "پروفایل",
+      "lastUpdate": "وروستی تازه کېدل",
+      "form": {
+        "nameHint": "د پروفایل نوم",
+        "emptyName": "نوم اړین دی",
+        "invalidUrl": "ناسم URL",
+        "urlHint": "د ترتیب بشپړ URL",
+        "disableAutoUpdate": "اتومات تازه کېدل بندول",
+        "autoUpdateInterval": "د اتومات تازه کېدو موده",
+        "loading": "پروفایل زیاتېږي…",
+        "adminPreference": "د مدیر اجازه",
+        "adminPreferenceAskEachTime": "هر ځل وپوښتئ",
+        "adminPreferencePreferAdmin": "تل د مدیر اجازه وکاروئ",
+        "adminPreferencePreferNoAdmin": "تل د مدیر له اجازې پرته دوام ورکړئ",
+        "adminPreferenceReset": "د مدیر اجازې په اړه هر ځل وپوښتئ"
+      }
+    },
+    "logs": {
+      "title": "لاګونه",
+      "category": "کټګورۍ",
+      "level": "کچه",
+      "recentLogs": "وروستي لاګونه",
+      "recentLogsMsg": "هغه څه چې په دې پاڼه کې ګورئ",
+      "errorLog": "د اپ او کور لاګ",
+      "errorLogMsg": "د دواړو تېروتنې، د څو چلولو په اوږدو کې",
+      "coreLog": "د کور لاګ",
+      "coreLogMsg": "هر څه چې کور ثبت کړي",
+      "coreCrash": "د کور کریش",
+      "coreCrashMsg": "هغه څه چې کور د وروستي کریش پر مهال کول",
+      "exportToFile": "فایل ته صادرول",
+      "linesMatch": "$count کربنې سمون لري",
+      "fileSaved": "فایل خوندي شو",
+      "fileSaveFailed": "فایل نه شو خوندي",
+      "coreLogLevel": "د کور کچه",
+      "coreLogLevelMsg": "له بیا وصلېدو وروسته اغېز کوي",
+      "buffer": "بفر",
+      "diagnostics": "د تشخیص راپور",
+      "diagnosticsMsg": "د کریش راپورونه، لاګونه او ستاسو تنظیمات د سرورونو یا پټنوملو پرته، په یوه zip کې"
+    },
+    "about": {
+      "title": "په اړه",
+      "notAvailableMsg": "تاسو وروستی نسخه کاروئ",
+      "checkForUpdate": "د تازه کېدو چک کول",
+      "openWorkingDir": "د کار ډایرکتورۍ پرانیستل",
+      "sourceCode": "سرچینه کوډ",
+      "telegramChannel": "د Telegram چینل",
+      "termsAndConditions": "شرایط او مقررات",
+      "privacyPolicy": "د محرمیت تګلاره"
+    },
+    "settings": {
+      "title": "تنظیمات",
+      "resetTunnel": "د VPN پروفایل بیا تنظیمول",
+      "options": {
+        "import": {
+          "clipboard": "له کلیپبورډ څخه انتخابونه واردول",
+          "file": "له فایل څخه انتخابونه واردول"
+        },
+        "export": {
+          "anonymousToClipboard": "بې نومه انتخابونه کلیپبورډ ته کاپي کول",
+          "anonymousToFile": "بې نومه انتخابونه فایل ته صادرول",
+          "allToClipboard": "ټول انتخابونه کلیپبورډ ته کاپي کول",
+          "allToFile": "ټول انتخابونه فایل ته صادرول"
+        },
+        "reset": "انتخابونه بیا تنظیمول"
+      },
+      "general": {
+        "title": "عمومي",
+        "locale": "ژبه",
+        "themeMode": "د بڼې حالت",
+        "themeModes": {
+          "system": "د سیستم اصلي",
+          "dark": "تیاره حالت",
+          "light": "روښانه حالت",
+          "black": "تور حالت"
+        },
+        "enableAnalytics": "تحلیلونه چالانول",
+        "enableAnalyticsMsg": "د اپ د ښه کولو لپاره د خپلې وسیلې تحلیلونه او د کریش راپورونه ولېږئ",
+        "autoIpCheck": "د اتصال IP په اتومات ډول چک کول",
+        "reduceAnimations": "انیمېشنونه کمول",
+        "reduceAnimationsMsg": "د وصلېدو تڼۍ ثابته وساتئ او تکرارېدونکي اغېزې ودروئ، د بیټرۍ د ساتلو لپاره",
+        "dynamicNotification": "په خبرتیا کې سرعت ښودل",
+        "hapticFeedback": "د لړزې ځواب",
+        "alwaysOnVpn": "تل چالان VPN",
+        "actionAtClosing": "د کړکۍ د بندولو پر مهال",
+        "autoStart": "د ننوتلو پر مهال پیلول",
+        "silentStart": "کوچنی شوی پیلول",
+        "ignoreBatteryOptimizations": "د بیټرۍ ښه کول بندول",
+        "ignoreBatteryOptimizationsMsg": "د VPN د غوره کار لپاره بندیزونه لرې کړئ",
+        "memoryLimit": "د حافظې حد",
+        "memoryLimitMsg": "که د حافظې د ختمېدو تېروتنې یا د اپ ډېر کریشونه لرئ، چالان یې کړئ",
+        "connectionTestUrl": "د اتصال د ازموینې URL",
+        "urlTestInterval": "د URL د ازموینې موده",
+        "clashApiPort": "د Clash API پورټ",
+        "useSystemTlsEngine": "د سیستم TLS کارول، چې شتون ولري",
+        "useSystemTlsEngineMsg": "هغه اتصالونه چې د TLS ګوتلاس نه لري، د macOS، iOS یا Windows TLS کاروي، کله چې په دې وسیله کې چک تېر کړي؛ که نه د Chrome په څېر ښکاري.",
+        "uploadTestSize": "د پورته کولو د ازموینې اندازه",
+        "megabytes": "$n MB",
+        "speedTest": "د سرعت ازموینه"
+      },
+      "routing": {
+        "title": "لارښوونه",
+        "routeRule": {
+          "add": "قاعده زیاتول",
+          "delete": "قاعده حذف کول",
+          "duplicate": "قاعده دوهم ځل جوړول",
+          "duplicated": "د نوې قاعدې په توګه کاپي شو: لکه څنګه چې غواړئ، سمه یې کړئ",
+          "copyAll": "ټول کاپي کول",
+          "options": {
+            "import": {
+              "clipboard": "له کلیپبورډ څخه قاعدې واردول",
+              "file": "له فایل څخه قاعدې واردول"
+            },
+            "export": {
+              "clipboard": "قاعدې کلیپبورډ ته کاپي کول",
+              "file": "قاعدې فایل ته خوندي کول"
+            },
+            "reset": "اصلي قاعدو ته بیرته کول"
+          },
+          "rule": {
+            "title": "قاعده",
+            "onlyTunMode": "یوازې په TUN حالت کې شتون لري",
+            "notAvailableInThisPlatform": "پر دې پلټفارم نشته",
+            "canNotBeEmpty": "نه شي تش کېدای",
+            "validUrlEx": "https://example.com",
+            "validUrl": "سم “URL” لکه\n@:pages.settings.routing.routeRule.rule.validUrlEx",
+            "validProcessNameEx": "Chrome.exe or google chrome or chrome",
+            "validProcessName": "سم “د پروسې نوم” لکه\n@:pages.settings.routing.routeRule.rule.validProcessNameEx",
+            "validProcessPathEx": "C:\\Pro...\\chrome.exe\n/App.../Google Chrome\n/usr/lib.../chrome",
+            "validProcessPath": "سمه “د پروسې لار” لکه\n@:pages.settings.routing.routeRule.rule.validProcessPathEx",
+            "validPortRangeEx": "80 or 1:65000",
+            "validPortRange": "سم “پورټ” یا “د پورټ پراخوالی” لکه\n@:pages.settings.routing.routeRule.rule.validPortRangeEx",
+            "validIpCidrEx": "8.8.8.8, 10.0.0.0/24, or fd00::/8",
+            "validIpCidr": "سم IP CIDR لکه\n@:pages.settings.routing.routeRule.rule.validIpCidrEx",
+            "validDomainEx": "Google.com or dl.google.com",
+            "validDomain": "سم “ډومین” لکه\n@:pages.settings.routing.routeRule.rule.validDomainEx",
+            "validDomainSuffixEx": ".com or .ir",
+            "validDomainSuffix": "سم “د ډومین پایله” لکه\n@:pages.settings.routing.routeRule.rule.validDomainSuffixEx",
+            "builtinReadOnly": "جوړه شوې قاعده نه شي بدلېدای. کاپي یې جوړه کړئ او کاپي سمه کړئ.",
+            "tileTitle(map)": {
+              "name": "نوم",
+              "outbound": "که سمون ولري، بهرنۍ لار",
+              "rule_set": "URLset",
+              "package_name": "د کڅوړې نومونه",
+              "process_name": "د پروسو نومونه",
+              "process_path": "د پروسو لارې",
+              "network": "شبکې",
+              "port_range": "د ځای پورټونه",
+              "source_port_range": "د سرچینې پورټونه",
+              "protocol": "پروتوکول",
+              "ip_cidr": "د ځای IP CIDR",
+              "source_ip_cidr": "د سرچینې IP CIDR",
+              "domain": "ډومین",
+              "domain_suffixe": "د ډومین پایله",
+              "domain_keyword": "د ډومین کلیمه",
+              "domain_regex": "د ډومین regex"
+            },
+            "outbound(map)": {
+              "proxy": "پروکسي",
+              "direct": "مستقیم",
+              "direct_with_fragment": "مستقیم د fragment سره",
+              "block": "بندول"
+            },
+            "network(map)": {
+              "all": "ټول",
+              "tcp": "TCP",
+              "udp": "UDP"
+            },
+            "protocol(map)": {
+              "": "ټول",
+              "tls": "TLS",
+              "http": "HTTP",
+              "quic": "QUIC",
+              "stun": "STUN",
+              "dns": "DNS",
+              "bittorrent": "BitTorrent"
+            }
+          },
+          "genericList": {
+            "addNew": "نوې ارزښت زیاتول",
+            "update": "ارزښت تازه کول",
+            "clearList": "لیست پاکول",
+            "clearListMsg": "ټول توکي حذف کېږي"
+          }
+        },
+        "builtinRules": {
+          "tag": "جوړه شوې قاعده",
+          "bypassLan": "LAN څخه تېرېدل",
+          "systemDirect": {
+            "apple": "د Apple خدمتونه",
+            "microsoft": "د Microsoft خدمتونه",
+            "android": "د Android خدمتونه",
+            "linux": "د Linux تازه کېدنې"
+          },
+          "blockAds": "اعلانونه او زیانمن سافټویر",
+          "bypassRegion": "په $region کې سایټونه"
+        },
+        "appBasedRouting": {
+          "title": "د اپ پر بنسټ لارښوونه",
+          "hideSysApps": "د سیستم اپونه پټول",
+          "listTitle": {
+            "bypass": "تېر شوي اپونه",
+            "proxy": "د پروکسي اپونه"
+          },
+          "chooseApps": "اپونه وټاکئ",
+          "apps": {
+            "one": "اپ",
+            "other": "اپونه"
+          },
+          "moreApps": {
+            "one": "+$n اپ",
+            "other": "+$n اپونه"
+          },
+          "autoTag": "اتومات",
+          "outsideVpn": "د VPN بهر",
+          "ruleWontApply": "د VPN بهر · قاعده نه پلې کېږي",
+          "notInstalled": "نصب شوی نه دی",
+          "share": {
+            "invite": "د اتومات انتخاب په ښه کولو کې مرسته وکړئ",
+            "removed": {
+              "one": "$n لرې شو",
+              "other": "$n لرې شول"
+            },
+            "added": {
+              "one": "$n زیات شو",
+              "other": "$n زیات شول"
+            },
+            "title": "خپل بدلونونه شریک کړئ",
+            "where": "په GitHub کې یوه عامه مسله پرانیزي، چې دمخه د دې اپ نومونو سره ډکه شوې ده. د شریکولو لپاره یې هلته ولېږئ. تاسو ته د GitHub حساب پکار دی.",
+            "action": "په GitHub کې دوام ورکړئ"
+          },
+          "options": {
+            "import": {
+              "clipboard": "له کلیپبورډ څخه انتخاب واردول",
+              "file": "له فایل څخه انتخاب واردول",
+              "msg": "واردول ستاسو اوسني انتخابونه بدلوي. دوام ورکړو؟"
+            },
+            "export": {
+              "clipboard": "انتخاب کلیپبورډ ته کاپي کول",
+              "file": "انتخاب فایل ته صادرول"
+            },
+            "clearAllSelections": "ټول انتخابونه پاکول"
+          },
+          "modes": {
+            "proxy": "یوازې پروکسي",
+            "bypass": "تېرېدل"
+          },
+          "autoSelection": {
+            "title": "د $region پر بنسټ اتومات انتخاب",
+            "performNow": "اوس تازه کړئ",
+            "updated": {
+              "zero": "نن تازه شو",
+              "one": "$n ورځ مخکې تازه شو",
+              "other": "$n ورځې مخکې تازه شو"
+            },
+            "noList": "د دې سیمې لپاره لیست نشته",
+            "loadFailed": "لیست نه شو پرانیستل",
+            "restore": {
+              "one": "$n اتومات انتخاب بیرته کړئ",
+              "other": "$n اتومات انتخابونه بیرته کړئ"
+            },
+            "restored": {
+              "one": "$n اتومات انتخاب بیرته شو",
+              "other": "$n اتومات انتخابونه بیرته شول"
+            }
+          }
+        },
+        "region": "سیمه",
+        "regions": {
+          "ir": "ایران (ir)",
+          "cn": "چین (cn)",
+          "ru": "روسیه (ru)",
+          "af": "افغانستان (af)",
+          "id": "اندونیزیا (id)",
+          "tr": "ترکیه (tr)",
+          "br": "برازیل (br)",
+          "other": "نور"
+        },
+        "balancerStrategy": {
+          "title": "د بیلانسر ستراتیژي",
+          "roundRobin": "Round robin",
+          "consistentHash": "Consistent hash",
+          "stickySession": "Sticky session",
+          "roundRobinDescription": "هر اتصال بل سرور کاروي، نو سایټونه کېدای شي ستاسو د IP بدلون وويني",
+          "consistentHashDescription": "هر سایټ تل همدا یو سرور کاروي",
+          "stickySessionDescription": "هر سایټ تر بیا وصلېدو پورې یو تصادفي سرور ساتي"
+        },
+        "defaultProxy": {
+          "title": "اصلي پروکسي",
+          "lowest": "تر ټولو ټیټ پینګ",
+          "balance": "توازن",
+          "first": "لومړۍ پروکسي",
+          "lowestDescription": "تر هغه چې پروکسي ونه ټاکئ، تر ټولو ګړندۍ کارول کېږي",
+          "balanceDescription": "تر هغه چې پروکسي ونه ټاکئ، اتصالونه پر ټولو وېشل کېږي",
+          "firstDescription": "تر هغه چې پروکسي ونه ټاکئ، د پروفایل لومړۍ پروکسي کارول کېږي"
+        },
+        "resolveDestination": "د ځای حل کول",
+        "ipv6Route": "IPv6",
+        "ipv6RouteHelpTitle": "IPv6 ولې بند دی؟",
+        "ipv6RouteTurnOnTitle": "IPv6 چالان کړو؟",
+        "ipv6RouteTurnOn": "چالانول",
+        "ipv6RouteHelp": "ډېری پروکسي په وتلو کې IPv6 نه لري.\n\nهغه اتصال چې پروکسي یې نه شي وړلی، د پرانیستلو سمدستي وروسته مري، او براوزرونه یې هېڅکله پر IPv4 بیا نه هڅوي، نو Google او YouTube نه پرانیستل کېږي.\n\nکله چې چالان وي، هره پروکسي په خپل د اتصال ازموینه کې یو ځل چک کېږي. IPv6 یوازې د هغې پروکسي له لارې کارول کېږي چې یې وړلی شي؛ پاتې ټول پر IPv4 په پټه تېرېږي.\n\nIPv6 تل د VPN دننه ځي، هېڅکله یې له بهر نه.",
+        "ipv6Modes": {
+          "ipv4Only": "بند (یوازې IPv4)",
+          "preferIpv4": "چالان، لومړی IPv4",
+          "preferIpv6": "چالان، لومړی IPv6",
+          "ipv4OnlyDescription": "اپونه یوازې IPv4 کاروي. IPv6 سمدستي رد کېږي.",
+          "preferIpv4Description": "لومړی IPv4. IPv6 یوازې د هغې پروکسي له لارې چې د وړلو ډاډ یې شوی وي.",
+          "preferIpv6Description": "لومړی IPv6، یوازې د هغې پروکسي له لارې چې د وړلو ډاډ یې شوی وي."
+        }
+      },
+      "dns": {
+        "title": "DNS",
+        "remoteDns": "لرې DNS",
+        "remoteDnsDomainStrategy": "د لرې DNS د ډومین ستراتیژي",
+        "directDns": "د بهرني سرور حل کوونکی (مستقیم)",
+        "directDnsDomainStrategy": "د بهرني ډومین ستراتیژي",
+        "enableFakeDns": "جعلي DNS چالانول",
+        "domainStrategy": {
+          "auto": "اتومات",
+          "preferIpv6": "IPv6 غوره کول",
+          "preferIpv4": "IPv4 غوره کول",
+          "ipv4Only": "یوازې IPv4",
+          "ipv6Only": "یوازې IPv6"
+        }
+      },
+      "inbound": {
+        "title": "راتلونکی",
+        "serviceMode": "د خدمت حالت",
+        "serviceModes": {
+          "proxy": "یوازې د پروکسي خدمت",
+          "systemProxy": "د سیستم پروکسي تنظیمول",
+          "tun": "VPN",
+          "router": "روټر (ټوله شبکه)"
+        },
+        "shortServiceModes": {
+          "proxy": "پروکسي",
+          "systemProxy": "د سیستم پروکسي",
+          "tun": "VPN",
+          "router": "روټر"
+        },
+        "strictRoute": "سخته لار",
+        "tunImplementation": "د TUN پلي کول",
+        "tunImplementations": {
+          "sing15": "Sing 15",
+          "mixed": "ګډ",
+          "system": "سیستم",
+          "gvisor": "gVisor"
+        },
+        "mixedPort": "د پروکسي پورټ (SOCKS5/4، HTTP)",
+        "tproxyPort": "د شفافې پروکسي پورټ",
+        "directPort": "مستقیم پورټ",
+        "redirectPort": "د لیږد پورټ",
+        "lanSharing": "په محلي شبکه کې شریکول",
+        "connectionSharing": "د اتصال شریکول",
+        "qrCode": "QR کوډ",
+        "closedInVpn": "په VPN حالت کې بند دی، پرته لدې چې شریک شي",
+        "proxySecret": "د پروکسي راز",
+        "noSecret": "راز نشته: هر اپ یا وسیله چې پورټ ته ورسېږي کارولی یې شي",
+        "generateSecret": "نوی جوړول",
+        "removeSecret": "راز لرې کړو؟",
+        "removeSecretMsg": "پرته له رازه، په دې وسیله کې هر اپ، او په شبکه کې هره وسیله، د شریکولو پر مهال، پروکسي پرته له کارن نوم یا پټنوم کارولی شي. په خپل خطر یې لرې کړئ.",
+        "localProxy": "محلي پروکسي",
+        "localProxyInVpn": "په VPN حالت کې خلاصه ساتل",
+        "localProxyInVpnHint": "اپونه لا دمخه VPN کاروي؛ یوازې د هغو اپونو لپاره چې پروکسي کاروي",
+        "localProxyAuth": "پټنوم غوښتل",
+        "localProxyAuthHint": "ځینې اپونه، لکه براوزرونه، د SOCKS پټنوم نه شي لېږلی",
+        "notAsSystemProxy": "د سیستم پروکسي په توګه نه غوښتل کېږي، ځکه چې نه شي لېږلی",
+        "lanGroup": "د محلي شبکې شریکول",
+        "lanSharingPort": "د شریکولو پورټ",
+        "otherPorts": "نور پورټونه",
+        "closedInVpnLocal": "په VPN حالت کې بند دی"
+      },
+      "tlsTricks": {
+        "title": "د TLS چلونه",
+        "enable": "Fragment چالانول",
+        "packets": "د ټوټه کولو کڅوړې",
+        "packetsTlsHello": "TLS Hello",
+        "packets1_1": "1-1",
+        "packets1_2": "1-2",
+        "packets1_3": "1-3",
+        "packets1_4": "1-4",
+        "packets1_5": "1-5",
+        "size": "د Fragment اندازه",
+        "sleep": "د Fragment ځنډ",
+        "mixedSniCase": {
+          "enable": "ګډ SNI توری چالانول"
+        },
+        "padding": {
+          "enable": "Padding چالانول",
+          "size": "د Padding اندازه"
+        }
+      },
+      "chain": {
+        "quick": {
+          "off": "بند",
+          "extraSecurity": {
+            "title": "اضافي امنیت",
+            "subtitle": "کله چې پر پروکسي باور نه لرئ",
+            "ipBy": "ستاسو IP د $mode په لاس ټاکل کېږي",
+            "notTracked": "ستاسو د VPN وړاندې کوونکی ستاسو ترافیک نه شي لیدلی",
+            "forPublic": "د عامو او ناپېژندلو پروکسيو لپاره ښه",
+            "slower": "کېدای شي سرعت کم کړي"
+          },
+          "unblocker": {
+            "title": "د پروکسي خلاصوونکی",
+            "subtitle": "پروکسي له فلټر څخه تېروي",
+            "mayConnect": "فلټر شوې پروکسي کېدای شي وصل شي",
+            "personalOnly": "یوازې د شخصي پروکسي لپاره ګټور دی",
+            "notForPublic": "د عامو پروکسيو لپاره مناسب نه دی",
+            "slower": "پروکسي لږ ورو کېږي"
+          }
+        },
+        "title": "زنځیر",
+        "subtitle": "اضافي امنیت او خلاصوونکی",
+        "finalIp": "وروستی IP",
+        "levels": {
+          "app": {
+            "title": "اپ",
+            "msg": "پیل ټکی: ستاسو د اپ ترافیک دلته زنځیر ته ننوځي او د وروستي تېرېدو د چمتو کولو لپاره له راتلونکو طبقو تېرېږي"
+          },
+          "extraSecurity": {
+            "title": "اضافي امنیت",
+            "msg": "ستاسو ډېټا د خصوصي ساتلو لپاره اضافي ډال زیاتوي، حتی که ستاسو اصلي پروفایل د باور وړ نه وي"
+          },
+          "mainProfile": {
+            "title": "اصلي پروفایل"
+          },
+          "unblocker": {
+            "title": "خلاصوونکی",
+            "msg": "د شبکې له بندیزونو د تېرېدو کې مرسته کوي. که مرستندوی وصل شي، ستاسو اصلي پروفایل لا هم کار کولی شي، حتی که اوس بند وي."
+          },
+          "filtering": {
+            "title": "فلټرول",
+            "msg": "وروستی وتل: ستاسو ترافیک له فعالو طبقو تېرېږي، چې کېدای شي اضافي امنیت، اصلي پروفایل یا خلاصوونکی وي. کله چې د هغوی اغېز ولګېږي، د محلي شبکې له فلټر څخه د تېرېدو لپاره لارښوونه کېږي."
+          }
+        },
+        "warp": {
+          "missingConfig": "د WARP ترتیب نشته",
+          "licenseKey": "د جواز کیلي",
+          "tunnel": "تونل",
+          "cleanIp": "پاک IP",
+          "port": "پورټ",
+          "noise": {
+            "count": "د Noise شمېر",
+            "mode": "د Noise حالت",
+            "size": "د Noise اندازه",
+            "delay": "د Noise ځنډ",
+            "modes": {
+              "standard": "معیاري",
+              "random": "تصادفي",
+              "quic": "QUIC (HTTPS)",
+              "quicMimic": "د QUIC لاسپیل",
+              "dns": "DNS (google.com)",
+              "dnsCloudflare": "DNS (cloudflare.com)",
+              "sip": "SIP (د VoIP زنګ)",
+              "stun": "STUN (د ویډیو زنګ)"
+            },
+            "title": "د WireGuard Noise"
+          },
+          "endpoint": "پای ټکی",
+          "endpointSources": {
+            "profile": "د Cloudflare له خوا ټاکل شوی",
+            "scan": "سکین",
+            "custom": "دودیز"
+          },
+          "customServer": "پته",
+          "mtu": "MTU",
+          "customized": "دودیز شوی",
+          "scanner": {
+            "title": "سکینر",
+            "searchNoise": "د Noise لټون",
+            "maxRtt": "اعظمي RTT (ms)",
+            "timeout": "د پلټنې وخت پای (ms)",
+            "count": "د پلټلو پتې",
+            "concurrency": "موازي پلټنې",
+            "ports": "پورټونه",
+            "cidrs": "پراخوالي"
+          },
+          "masque": {
+            "title": "MASQUE",
+            "vhttp": "د HTTP نسخه",
+            "serverName": "د سرور نوم",
+            "useIpv6": "IPv6 غوره کول",
+            "udpTimeout": "د UDP وخت پای (s)",
+            "keepalive": "د UDP keepalive (s)",
+            "packetSize": "د لومړۍ کڅوړې اندازه",
+            "reconnectDelay": "د بیا وصلېدو ځنډ (s)",
+            "tlsInsecure": "د TLS تایید پرېښودل",
+            "fragment": "TLS Fragment",
+            "fragmentDelay": "د Fragment د بدیل ځنډ (ms)",
+            "recordFragment": "د TLS ریکارډونو Fragment",
+            "ech": "Encrypted Client Hello",
+            "echConfig": "د ECH ترتیب",
+            "echQueryServerName": "د ECH د پوښتنې نوم"
+          },
+          "awg": {
+            "title": "AmneziaWG",
+            "jc": "فضول کڅوړې",
+            "jmin": "د فضول کڅوړې لږترلږه اندازه",
+            "jmax": "د فضول کڅوړې اعظمي اندازه"
+          }
+        },
+        "psiphon": {
+          "selectServerRegion": "د سرور سیمه وټاکئ",
+          "regions": {
+            "auto": "@:common.auto",
+            "at": "اتریش (at)",
+            "au": "آسټرالیا (au)",
+            "be": "بلجیم (be)",
+            "bg": "بلغاریا (bg)",
+            "ca": "کاناډا (ca)",
+            "ch": "سویس (ch)",
+            "cz": "چک جمهوریت (cz)",
+            "de": "آلمان (de)",
+            "dk": "ډنمارک (dk)",
+            "ee": "اسټونیا (ee)",
+            "es": "هسپانیه (es)",
+            "fi": "فنلینډ (fi)",
+            "fr": "فرانسه (fr)",
+            "gb": "برتانیه (gb)",
+            "hr": "کروواتیا (hr)",
+            "hu": "مجارستان (hu)",
+            "ie": "آیرلینډ (ie)",
+            "in": "هندوستان (in)",
+            "it": "ایټالیا (it)",
+            "jp": "جاپان (jp)",
+            "lv": "لیتویا (lv)",
+            "nl": "هالنډ (nl)",
+            "no": "ناروې (no)",
+            "pl": "پولنډ (pl)",
+            "pt": "پورتګال (pt)",
+            "ro": "رومانیا (ro)",
+            "rs": "سربیا (rs)",
+            "se": "سویډن (se)",
+            "sg": "سنګاپور (sg)",
+            "sk": "سلوواکیا (sk)",
+            "us": "متحده ایالات (us)"
+          }
+        },
+        "profile": {
+          "selectProfile": "پروفایل وټاکئ",
+          "conduitPairingId": "د Conduit د جوړې ID"
+        }
+      }
+    }
+  },
+  "components": {
+    "stats": {
+      "connection": "اتصال",
+      "traffic": "ترافیک",
+      "trafficLive": "ژوندی ترافیک",
+      "trafficTotal": "ټول ترافیک",
+      "uplink": "پورته لینک",
+      "downlink": "ښکته لینک",
+      "speed": "سرعت",
+      "totalTransferred": "ټول لېږدول شوي"
+    },
+    "subscriptionInfo": {
+      "upload": "پورته کول",
+      "download": "ښکته کول",
+      "total": "ټول ترافیک",
+      "expireDate": "د پای نېټه",
+      "expired": "پای ته رسېدلی",
+      "noTraffic": "کوټه ختمه شوې",
+      "remainingDuration(plural, param=days)": {
+        "one": "$days ورځ پاتې ده",
+        "other": "$days ورځې پاتې دي"
+      },
+      "remainingUnlimited": "بې حده",
+      "remainingTrafficSemanticLabel": "له ${total} ترافیک څخه ${consumed} مصرف شوی",
+      "remainingTraffic": "پاتې ترافیک",
+      "openWebPage": "ویب پاڼه پرانیستل",
+      "support": "ملاتړ",
+      "openLinkTitle": "دا لینک پرانیستل؟",
+      "openLinkAction": "پرانیستل"
+    }
+  },
+  "dialogs": {
+    "sortProfiles": {
+      "title": "ترتیب د",
+      "sort": {
+        "name": "د نوم له مخې",
+        "lastUpdate": "وروستی تازه شوی"
+      },
+      "direction": {
+        "newestFirst": "نوی لومړی",
+        "oldestFirst": "زوړ لومړی"
+      }
+    },
+    "warpLicense": {
+      "title": "د Cloudflare WARP منل",
+      "description(rich)": "Cloudflare WARP یو وړیا WireGuard VPN وړاندې کوونکی دی. دا په چالانولو سره تاسو د Cloudflare WARP ${tos(د خدمت شرایط)} او ${privacy(د محرمیت تګلاره)} منئ."
+    },
+    "psiphonLicense": {
+      "title": "د Psiphon د جواز موافقه",
+      "description(rich)": "د Psiphon په کارولو سره، تاسو ${tos(د خدمت شرایط)} منئ او ${privacy(د محرمیت تګلاره)} ومنئ. د دوام دمخه یې په ځیرکتیا ولولئ."
+    },
+    "newVersion": {
+      "title": "تازه نسخه شتون لري",
+      "msg": "د @:common.appTitle نوې نسخه شتون لري. اوس یې تازه کړو؟",
+      "currentVersion": "اوسنۍ نسخه",
+      "newVersion": "نوې نسخه",
+      "updateNow": "اوس تازه کړئ",
+      "downloading": "ښکته کېږي…",
+      "installing": "نصبوونکی پیلېږي…",
+      "allowInstall": "په پرانیستل شویو تنظیماتو کې Hiddify ته د اپونو د نصبولو اجازه ورکړئ، بیا هڅه وکړئ.",
+      "failed": "تازه کېدل نه شو نصب.",
+      "openPage": "د خپرېدو پاڼه پرانیستل",
+      "tryAgain": "بیا هڅه وکړئ"
+    },
+    "confirmation": {
+      "settings": {
+        "import": {
+          "msg": "دا ټول د ترتیب انتخابونه د واردو شویو ارزښتونو سره بدلوي. دوام ورکړو؟"
+        }
+      },
+      "profile": {
+        "delete": {
+          "title": "پروفایل حذف کول",
+          "msg": "دا پروفایل حذف کړو؟ دا بیرته نه شي کېدای."
+        }
+      },
+      "appList": {
+        "import": {
+          "msg": "دا ستاسو تېر شوي اپونه او یوازې پروکسي اپونه بدلوي. دوام ورکړو؟"
+        }
+      },
+      "routeRule": {
+        "delete": {
+          "title": "قاعده حذف کول",
+          "msg": "د “$rulename” قاعده حذف کړو؟ دا بیرته نه شي کېدای."
+        }
+      },
+      "addProfileByDeepLinkWarning": {
+        "title": "پروفایل زیات کړو؟",
+        "message": "د “${host}” یو بهرنی لینک غواړي نوی پروفایل زیات کړي. وارد یې کړو؟"
+      },
+      "importRouteRuleByDeepLinkWarning": {
+        "title": "د لارښوونې قاعده وارده کړو؟",
+        "message": "د لارښوونې قاعدې ټاکي چې ستاسو ترافیک چیرته ځي.\nیوازې له باوري سرچینې یې وارد کړئ."
+      }
+    },
+    "adminBgService": {
+      "vpnNeedsAdmin": {
+        "title": "ټول اپونه د VPN له لارې ولېږو؟",
+        "vpnMode": "د VPN حالت",
+        "allApps": "ټول اپونه",
+        "recommended": "سپارښتنه شوې",
+        "systemProxyMode": "د سیستم پروکسي",
+        "someApps": "براوزرونه او ډېری اپونه",
+        "switched": "د سیستم پروکسي حالت ته بدل شو. په تنظیماتو کې یې بدلولی شئ.",
+        "waitingTitle": "د مدیر د اجازې په تمه",
+        "waitingMsg": "Hiddify په تمه دی چې تاسو د VPN حالت ته اجازه ورکړئ.",
+        "waitingWhere": "په هغې کړکۍ کې چې پرانیستل شوه:",
+        "waitingWindows": "“هو” ته کیکاږئ.",
+        "waitingMac": "د خپل Mac پټنوم ولیکئ او تایید کړئ.",
+        "waitingLinux": "خپل پټنوم ولیکئ او تایید کړئ.",
+        "back": "شاته",
+        "needsAdmin": "مدیر ته اړتیا، یو ځل",
+        "needsAdminAppImage": "په هر پیل کې مدیر ته اړتیا",
+        "noAdmin": "مدیر ته اړتیا نشته",
+        "someAppsExcept": "Telegram او څو نور اپونه پرېښودل شوي",
+        "useVpn": "د VPN حالت کارول",
+        "useSystemProxy": "د سیستم پروکسي کارول",
+        "helpTooltip": "دا څه شی دی؟",
+        "helpWhatTitle": "څنګه کار کوي",
+        "helpProsTitle": "ښې خواوې",
+        "helpConsTitle": "په یاد ولرئ",
+        "helpVpn": {
+          "what": "Hiddify ستاسو کمپیوټر ته یوه مجازي شبکه زیاتوي، او د هر اپ د انټرنیټ ترافیک پخپله له همدې لارې ځي: براوزرونه، Telegram، لوبې، تازه کېدنې او نور. په هر اپ کې هېڅ نه باید تنظیم شي.",
+          "pros": [
+            "هر اپ د Hiddify له لارې ځي، په هر اپ کې د تنظیماتو پرته.",
+            "هغه اپونه چې د پروکسي تنظیمات نه مني، لکه Telegram او لوبې، هم کار کوي.",
+            "د نومونو لټون (DNS) هم د Hiddify له لارې ځي، نو هغه سایټونه چې په دې ډول بند دي هم پرانیستل کېږي."
+          ],
+          "cons": [
+            "لومړی ځل، ستاسو کمپیوټر د مدیر اجازه غواړي، د Hiddify د شالید خدمت نصبولو لپاره. له هغه وروسته پرته له پوښتنې وصلېږي.",
+            "د کارولو پر مهال نور VPN اپونه بند کړئ: دوه یو ځل یو بل ته خنډ جوړوي."
+          ]
+        },
+        "helpSystemProxy": {
+          "what": "Hiddify ستاسو د کمپیوټر د پروکسي تنظیم بدلوي. هغه اپونه چې دا تنظیم مني، لکه ویب براوزرونه، خپل ترافیک د Hiddify له لارې لېږي؛ پاتې مستقیم وصلېږي، لکه چې Hiddify بند وي.",
+          "pros": [
+            "د مدیر اجازې ته اړتیا نشته.",
+            "چټک چالانېږي او بندېږي، او Hiddify د قطع کولو پر مهال تنظیم بیرته ځای کوي.",
+            "ستاسو په کمپیوټر کې د نورو شبکې وسیلو سره یو ځای کار کوي."
+          ],
+          "cons": [
+            "هغه اپونه چې د سیستم پروکسي نه مني، لکه Telegram، ډېرې لوبې او ځینې د تازه کېدو وسیلې، نه ساتل کېږي.",
+            "که کار ونه کړي، پر ځای یې د VPN حالت وټاکئ."
+          ]
+        }
+      },
+      "proxyNeedsAdmin": {
+        "title": "د مدیر اجازه سپارښتنه کېږي",
+        "msg": "په دې پروفایل کې ځینې تنظیمات د مدیر له اجازې سره ښه کار کوي. تاسو کولی شئ د مدیر په اجازه یې وچلوئ، یا پرته له هغې دوام ورکړئ او د دې اتصال لپاره هغه تنظیمات بند کړئ.",
+        "seeConfigs": "ترتیبونه وښيئ",
+        "hideConfigs": "ترتیبونه پټ کړئ",
+        "neverAskAgain": "د دې پروفایل لپاره بیا مه پوښتئ",
+        "runAsAdmin": "د مدیر په توګه چلول",
+        "continueWithoutAdmin": "د مدیر له اجازې پرته دوام",
+        "elevationFailedTitle": "د مدیر اجازه نه شوه ترلاسه",
+        "elevationFailedMsg": "د مدیر غوښتنه رد شوه یا ناکامه شوه. بیا هڅه وکړئ، یا د دې اتصال لپاره د مدیر له اجازې پرته دوام ورکړئ.",
+        "tryAgain": "بیا هڅه وکړئ"
+      }
+    },
+    "experimentalNotice": {
+      "title": "تجربوي ځانګړتیاوې کارول کېږي",
+      "msg": "تاسو ځینې تجربوي ځانګړتیاوې چالان کړې چې کېدای شي د اتصال کیفیت ته زیان ورسوي او ناڅاپي تېروتنې رامنځته کړي. تاسو تل کولی شئ دا انتخابونه په تنظیماتو کې بدل یا بیا تنظیم کړئ.",
+      "disable": "بیا مه ښيئ"
+    },
+    "noActiveProfile": {
+      "title": "پروفایل وټاکئ",
+      "msg": "راځئ پیل وکړو. د خپل VPN سرور جزئیاتو سره د اتصال پروفایل زیات کړئ.\n\nتر اوسه سرور نه لرئ؟ ستونزه نشته. لاندې لارښود ښيي چې څنګه یې وړیا جوړ کړئ.",
+      "helpBtn": {
+        "label": "راته وښيه څنګه",
+        "url": "https://hiddify.com/manager/"
+      }
+    },
+    "unknownDomainsWarning": {
+      "title": "لومړی دا لینک وګورئ",
+      "cannotVerify": "دا لینک تایید شوی نه دی",
+      "avoidIfUnsure": "که ډاډه نه یئ، پیسې مه ورکوئ او حساس معلومات مه شریکوئ",
+      "ownResponsibility": "تاسو په خپل خطر دوام کوئ",
+      "open": "پرانیستل",
+      "openIn": "پرانیستل (${seconds})"
+    },
+    "proxyInfo": {
+      "fullTag": "بشپړ ټګ",
+      "type": "ډول",
+      "status": "حالت",
+      "testTime": "د ازموینې وخت",
+      "testDelay": "د ځنډ ازموینه",
+      "isSelected": "ټاکل شوی",
+      "isGroup": "ډله",
+      "isSecure": "خوندي",
+      "port": "پورټ",
+      "host": "کوربه",
+      "ip": "IP",
+      "countryCode": "د هیواد کوډ",
+      "region": "سیمه",
+      "city": "ښار",
+      "asn": "ASN",
+      "organization": "اداره",
+      "location": "موقعیت",
+      "postalCode": "پوستي کوډ",
+      "download": "ښکته کول",
+      "upload": "پورته کول",
+      "ping": "پینګ",
+      "speed": "سرعت",
+      "server": "سرور",
+      "country": "هیواد",
+      "tapToTest": "د ازموینې لپاره کیکاږئ",
+      "error": "ولې ناکام شو"
+    },
+    "windowClosing": {
+      "askEachTime": "هر ځل وپوښتئ",
+      "alertMessage": "اپ پټ کړو که ووځو؟",
+      "remember": "دا انتخاب په یاد ولرئ"
+    },
+    "qrCode": {
+      "copyFullLink": "بشپړ لینک کاپي کول",
+      "copied": "کاپي شو",
+      "lanLine": "SOCKS5 · یوازې په همدې شبکه کې",
+      "noLocalNetwork": "محلي شبکه ونه موندل شوه",
+      "ip": "IP",
+      "port": "پورټ",
+      "username": "کارن نوم",
+      "password": "پټنوم",
+      "showPassword": "پټنوم ښودل",
+      "hidePassword": "پټنوم پټول"
+    },
+    "qrScanner": {
+      "notFound": "په دې انځور کې QR کوډ ونه موندل شو"
+    },
+    "crashReport": {
+      "title": "Hiddify وروستی ځل کریش شو",
+      "msg": "یو راپور جوړوونکو ته ولېږو چې دا سم شي؟ دا د کریش جزئیات، لاګونه او ستاسو ترتیب لري، چې سرورونه، کیلي او پټنومونه یې لرې شوي، د یوې zip فایل په توګه چې له لېږلو دمخه یې کتلی شئ.",
+      "send": "راپور لېږل"
+    },
+    "keepTop": {
+      "title": "لوی اشتراک",
+      "subtitle": "$count پروکسي · د ټولو چلول بیټرۍ، ډېټا او حافظه مصرفوي",
+      "hint": "هر وخت یې د لیست له پای څخه بیرته کولی شئ.",
+      "keeping": "$keep ګړندۍ چلېږي، نورې ځنډول کېږي",
+      "all": "ټولې $count چلېږي",
+      "keep": "$keep ګړندۍ وساتئ",
+      "useAll": "ټولې $count وکاروئ",
+      "howMany": "څو چالان وساتل شي",
+      "pickByHand": "پروکسي پخپله وټاکئ",
+      "region": "سیمه",
+      "anyRegion": "هره سیمه",
+      "keepAnswering": "کاري پروکسي وساتئ",
+      "keepingAnswering": "یوازې کاري پروکسي چلېږي",
+      "answering": "کاري",
+      "everyOne": "ټولې",
+      "quick": "چټکه ازموینه",
+      "quickHint": "کله چې ګړندۍ ومونده شي، ودرېږي",
+      "quickHelp": "دا څه کوي؟",
+      "quickFirst": "هغه ګړندۍ چې تېر ځل وې، لومړی ازمویل کېږي",
+      "quickStop": "ازموینه ودرېږي کله چې پاتې مخکې ورې وې",
+      "quickNew": "نوې پروکسي، او هغه چې یوه ورځ ازمویل شوې نه وي، تل ازمویل کېږي"
+    },
+    "keepTags": {
+      "title": "پروکسي وټاکئ",
+      "hint": "یوازې دا چلېږي، هر ځل چې وصل شئ.",
+      "search": "لټون",
+      "all": "ټول ټاکل",
+      "none": "پاکول",
+      "run": "دا $n وکاروئ",
+      "sort": "ترتیبول",
+      "sortProfile": "د پروفایل ترتیب",
+      "sortPing": "پینګ",
+      "sortDownload": "ښکته کول",
+      "sortUpload": "پورته کول",
+      "selectFastest": "$n ګړندۍ",
+      "statusChosen": "ټاکل شوې",
+      "statusAnswering": "ځواب ورکوي",
+      "statusPaused": "ځنډول شوې",
+      "paused": "$n پروکسي ځنډول شوې دي: پینګ نه لري او نه شي ازمویل کېدای.",
+      "wake": "د ازموینې لپاره ټولې چلول",
+      "offline": "د پینګ لیدو او ازمویلو لپاره وصل شئ.",
+      "offlineTitle": "وصل شوی نه دی",
+      "shown": "$n ښودل شوې",
+      "noMatch": "هېڅ پروکسي سمون نه لري",
+      "chosenHint": "د ټاکلو لپاره پورته پروکسي ته کیکاږئ",
+      "allShown": "ټولې په پورتني لیست کې دي",
+      "notShown": "نه ښودل شوې:",
+      "protocol": "پروتوکول",
+      "country": "سیمه",
+      "anyProtocol": "هر پروتوکول",
+      "anyCountry": "هره سیمه",
+      "otherCountries": "نورې"
+    },
+    "localProxy": {
+      "steps": [
+        "د اپ د پروکسي تنظیمات پرانیزئ",
+        "SOCKS5 یا HTTP وټاکئ",
+        "لاندې ارزښتونه ولیکئ · د کاپي کولو لپاره کیکاږئ",
+        "Hiddify وصل وساتئ"
+      ],
+      "hint": "د پروکسي حالت · څنګه کارول",
+      "setPassword": "پټنوم ټاکل",
+      "manual": "لاسي",
+      "dontShowAgain": "بیا مه ښيئ",
+      "thisDevice": "دا وسیله",
+      "otherDevices": "نورې وسیلې",
+      "server": "سرور",
+      "noPassword": "پټنوم نه دی ټاکل شوی",
+      "turnOnSharing": "شریکول چالانول",
+      "copyLink": "لینک کاپي کول",
+      "telegramLink": "د Telegram لینک",
+      "fullLink": "بشپړ لینک",
+      "portRange": "له 1024 څخه تر 65535 پورې پورټ وکاروئ",
+      "passwordTooShort": "لږترلږه 4 توري",
+      "edit": "سمول"
+    },
+    "dbNewerThanApp": {
+      "title": "خوندي شوې ډېټا له نوې نسخې ده",
+      "msg": "ستاسو پروفایلونه او تنظیمات د Hiddify د نوې نسخې په لاس خوندي شوي، او دا زړه نسخه یې نه شي لوستلی. د ساتلو لپاره وروستۍ نسخه نصب کړئ، یا یې حذف کړئ چې دا نسخه وکاروئ.",
+      "deleteData": "ډېټا پاکول",
+      "deleteConfirm": "خوندي ډېټا پاکېږي. ستاسو اشتراکونه او محلي پروفایلونه چیرته چې شونې وي بیرته زیاتېږي؛ هر بل څه چې نوې نسخې خوندي کړي وو، له لاسه ځي.",
+      "downloadLatest": "وروستۍ نسخه ښکته کړئ"
+    },
+    "dbBroken": {
+      "title": "خوندي ډېټا نه شي پرانیستل کېدای",
+      "msg": "Hiddify خپل خوندي پروفایلونه ونه شو پرانیستلی. د بیا پیل لپاره خوندي ډېټا پاکه کړئ: ستاسو اشتراکونه او محلي پروفایلونه چیرته چې شونې وي بیرته زیاتېږي، او ستاسو تنظیمات پاتې کېږي.",
+      "wipeData": "ډېټا پاکول",
+      "wipeConfirm": "خوندي ډېټا پاکېږي او Hiddify بیا پیلېږي. هغه پروفایلونه چې لا هم لوستل کېدای شي بیرته زیاتېږي؛ پاتې بیرته نه شي ترلاسه کېدای.",
+      "copyError": "تېروتنه کاپي کول"
+    }
+  },
+  "connection": {
+    "tapToConnect": "د وصلېدو لپاره کیکاږئ",
+    "connect": "وصل کړئ",
+    "connecting": "وصلېږي…",
+    "waiting": "د ازادۍ لټون کېږي…",
+    "noAvailableProxies": "اتصال ناکام شو",
+    "hotReloading": "بدلونونه پلي کېږي…",
+    "connected": "وصل شو",
+    "disconnect": "قطع کړئ",
+    "disconnecting": "قطع کېږي…",
+    "failed": "وصل نه شو",
+    "slow": "د معمول په پرتله ډېر وخت نیسي…",
+    "tapToRetry": "د بیا هڅې لپاره کیکاږئ",
+    "errorDetails": "د تېروتنې جزئیات",
+    "reconnect": "بیا وصل کړئ",
+    "reconnectMsg": "د بدلونونو د پلي کولو لپاره بیا وصلېږي…",
+    "health": {
+      "title": "د اتصال چک",
+      "allGood": "ستاسو ترافیک تېرېږي",
+      "pickDead": "ټاکل شوې پروکسي ځواب نه ورکوي",
+      "hopPending": "${chain} وصلېږي…",
+      "hopFailed": "${chain} وصل نه شو",
+      "coreTesting": "سرورونه ازمویل کېږي…",
+      "coreNone": "هېڅ سرور ځواب نه ورکوي",
+      "fastest": "تر ټولو ګړندی سرور",
+      "yourServer": "ټاکل شوې پروکسي",
+      "notResponding": "ځواب نه ورکوي",
+      "testing": "ازمویل کېږي…",
+      "useFastest": "ګړندي ته بدلول",
+      "hopReady": "وصل شو",
+      "hopConnecting": "وصلېږي…",
+      "hopBroken": "وصل نه شو",
+      "hopNoReply": "وصل شو، خو ځواب نه ورکوي",
+      "hopBlocked": "د ټاکل شوې پروکسي د ځواب په تمه",
+      "retry": "بیا ازمویل",
+      "change": "بدلول",
+      "turnOff": "بندول"
+    }
+  },
+  "errors": {
+    "unexpected": "ناڅاپي تېروتنه",
+    "connection": {
+      "unexpected": "ناڅاپي د اتصال تېروتنه",
+      "timeout": "د اتصال وخت پای ته ورسېد",
+      "badResponse": "د سرور ناسم ځواب",
+      "connectionError": "د اتصال تېروتنه",
+      "badCertificate": "ناسم سند"
+    },
+    "profiles": {
+      "unexpected": "ناڅاپي تېروتنه",
+      "notFound": "پروفایل ونه موندل شو",
+      "invalidConfig": "ناسم ترتیب",
+      "invalidUrl": "ناسم URL",
+      "canceledByUser": "د کارن له خوا لغوه شو"
+    },
+    "connectivity": {
+      "unexpected": "ناڅاپي ناکامي",
+      "missingVpnPermission": "د VPN اجازه نشته",
+      "missingNotificationPermission": "د خبرتیا اجازه نشته",
+      "core": "د کور تېروتنه"
+    },
+    "singbox": {
+      "serviceNotRunning": "خدمت نه چلېږي",
+      "missingPrivilege": "امتیاز نشته",
+      "missingPrivilegeMsg": "د VPN حالت نه شي پیلېدای. اپ د مدیر په توګه بیا پیل کړئ یا د خدمت حالت بدل کړئ.",
+      "tunAddressInUse": "بل VPN فعال دی",
+      "tunAddressInUseMsg": "د VPN حالت نه شي پیلېدای. بل VPN بند کړئ یا د خدمت حالت بدل کړئ.",
+      "invalidConfigOptions": "د ترتیب ناسم انتخابونه",
+      "invalidConfig": "ناسم ترتیب"
+    },
+    "warp": {
+      "missingLicense": "د WARP جواز اړین دی",
+      "missingLicenseMsg": "دا پروفایل WARP کاروي. د دوام لپاره د WARP جواز ومنئ."
+    },
+    "psiphon": {
+      "missingLicense": "د Psiphon جواز اړین دی",
+      "missingLicenseMsg": "دا پروفایل Psiphon کاروي. د دوام لپاره د Psiphon جواز ومنئ."
+    }
+  }
+}
