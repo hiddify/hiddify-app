@@ -34,6 +34,7 @@ extension AppLocaleX on AppLocale {
     "ky" => "Кыргызча",
     "tg" => "Тоҷикӣ",
     "hy" => "Հայերեն",
+    "uk" => "Українська",
     _ => "Unknown",
   };
 }
