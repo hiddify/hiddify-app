@@ -103,7 +103,13 @@ class BoxService(
                     Intent(Application.application, Settings.serviceClass())
                 }
             }
-            ContextCompat.startForegroundService(Application.application, intent)
+            // Android 12+ refuses a foreground start from the background with an exception; the
+            // callers (boot receiver, tile, shortcut) have nobody to report it to.
+            try {
+                ContextCompat.startForegroundService(Application.application, intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "cannot start the service", e)
+            }
         }
 
         fun stop() {
@@ -348,8 +354,22 @@ class BoxService(
     @OptIn(DelicateCoroutinesApi::class)
     @Suppress("SameReturnValue")
     internal fun onStartCommand(): Int {
-        // Already up or starting: ignore duplicate start intents.
-        if (status.value == Status.Started || status.value == Status.Starting) {
+        // Already up, and in the foreground: ignore duplicate start intents.
+        if (status.value == Status.Started) {
+            return Service.START_NOT_STICKY
+        }
+        // Every start comes through startForegroundService, and Android kills the app ("did not
+        // then call Service.startForeground()") when the service stops, or 10 seconds pass,
+        // before startForeground is called. So go to the foreground here, on the main thread,
+        // before anything slow (loading the core at boot) and before the returns below: a start
+        // that arrives while a stop is still closing the core used to return without it, and
+        // the stop's stopSelf() then crashed the app.
+        try {
+            notification.show(activeProfileName, R.string.status_starting)
+        } catch (e: Exception) {
+            Log.e(TAG, "cannot go to the foreground", e)
+        }
+        if (status.value == Status.Starting) {
             return Service.START_NOT_STICKY
         }
         // A stop is still tearing down Mobile/VPN; wait then start so reconnect
@@ -361,12 +381,7 @@ class BoxService(
                     delay(200)
                     i++
                 }
-                if (status.value == Status.Stopped) {
-                    ContextCompat.startForegroundService(
-                        Application.application,
-                        Intent(Application.application, Settings.serviceClass()),
-                    )
-                }
+                if (status.value == Status.Stopped) start()
             }
             return Service.START_NOT_STICKY
         }
