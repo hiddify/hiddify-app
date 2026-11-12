@@ -168,7 +168,7 @@
         "choose": "Choose",
         "restingShow": "Show the $n sleeping proxies",
         "restingHide": "Hide the sleeping proxies",
-        "restingHint": "A sleeping proxy is not loaded. Tap one to wake it: it is loaded and tested. Long press it to keep it awake.",
+        "restingHint": "A sleeping proxy is not loaded. Tap one to wake it: it is loaded and tested. Long press it to pin it.",
         "restingTitle": "$n proxies are taking a nap",
         "restingWhy": "Only the fastest stay awake, so your device stays quick and saves battery and data. Tap any of them to wake it up.",
         "fasterElsewhere": "$n proxies in other regions are faster",
@@ -1093,7 +1093,7 @@
       "country": "Country",
       "tapToTest": "Tap to test",
       "error": "Why it failed",
-      "keepLoaded": "Always keep this proxy loaded",
+      "keepLoaded": "Pin proxy",
       "keepLoadedBody": "It stays loaded and tested beside the fastest ones, whatever its ping."
     },
     "windowClosing": {

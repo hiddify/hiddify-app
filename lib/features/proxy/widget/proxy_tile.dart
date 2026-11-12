@@ -8,7 +8,9 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/widget/unique_keys_layout.dart';
+import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/ip_widget.dart';
+import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/model/proxy_entity.dart';
 import 'package:hiddify/features/proxy/overview/proxies_overview_notifier.dart';
 import 'package:hiddify/features/proxy/widget/proxy_type_label.dart';
@@ -69,6 +71,13 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
     final uploaded =
         !allFailed &&
         (proxy.uploadTesting || proxy.uploadSpeed != 0 || proxy.downloadTesting || proxy.downloadSpeed != 0);
+    // the user asked to keep this proxy loaded whatever its ping: the flag wears a pin
+    final pinned = ref.watch(
+      activeProfileProvider.select((profile) {
+        final p = profile.valueOrNull;
+        return p != null && p.keepsTop && p.keepTopPinned.contains(proxy.tag);
+      }),
+    );
     final word = switch (state) {
       ProxyRowState.connecting => t.pages.proxies.status.connecting,
       ProxyRowState.registering => t.pages.proxies.status.registering,
@@ -86,13 +95,25 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
       ),
       leading: Padding(
         padding: const EdgeInsetsDirectional.only(end: 8),
-        child: Opacity(
-          opacity: faded ? _fadedAlpha : 1,
-          child: _FlagSlot(
-            proxy,
-            reconnectingBadge: state == ProxyRowState.reconnecting && style == ProxyPingStyle.number,
-            popIn: previousHasIp == false,
-          ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Opacity(
+              opacity: faded ? _fadedAlpha : 1,
+              child: _FlagSlot(
+                proxy,
+                reconnectingBadge: state == ProxyRowState.reconnecting && style == ProxyPingStyle.number,
+                popIn: previousHasIp == false,
+              ),
+            ),
+            // the top corner, bright on a faded row; the reconnecting sync takes the bottom one
+            if (pinned)
+              PositionedDirectional(
+                start: -3,
+                top: -3,
+                child: Tooltip(message: t.dialogs.proxyInfo.keepLoaded, child: const _PinBadge()),
+              ),
+          ],
         ),
       ),
       // the state word stays whole; a long type gives way first
@@ -358,6 +379,28 @@ class _Badge extends StatelessWidget {
         border: Border.all(color: bg, width: 1.5),
       ),
       child: icon == null ? _spinning(glyph) : glyph,
+    );
+  }
+}
+
+/// The pin of a proxy the user keeps loaded whatever its ping: a filled circle in the primary color,
+/// ringed in the surface color so it stands off any flag.
+class _PinBadge extends StatelessWidget {
+  const _PinBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Theme.of(context).colorScheme;
+    return Container(
+      width: 18,
+      height: 18,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: s.primary,
+        shape: BoxShape.circle,
+        border: Border.all(color: s.surface, width: 2),
+      ),
+      child: Icon(Icons.push_pin_rounded, size: 11, color: s.onPrimary),
     );
   }
 }
