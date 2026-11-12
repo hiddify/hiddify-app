@@ -13,6 +13,7 @@ on:
 
 jobs:
   upload:
+    name: testflight-upload
     runs-on: macos-26
     timeout-minutes: 60
     permissions:
@@ -141,6 +142,7 @@ jobs:
   # upload keep that tag and remove the rest. Runs after `upload`, so the number this run
   # recorded is the one kept.
   prune-ios-build-tags:
+    name: testflight-prune-build-tags
     needs: upload
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest

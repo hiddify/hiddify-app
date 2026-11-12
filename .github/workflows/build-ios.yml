@@ -25,7 +25,7 @@ env:
 jobs:
   # Unlike the other platforms, a failed iOS build stops the release of a version tag.
   build:
-    name: ipa
+    name: ios-ipa
     runs-on: macos-26
     timeout-minutes: 60
     permissions:
