@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <!-- The window behind the Hiddify logo until Flutter draws its first frame: the app's
+         background (the surface of its color scheme), so the hand-over does not flash -->
+    <color name="splash_background">#FBF8FF</color>
 </resources>
