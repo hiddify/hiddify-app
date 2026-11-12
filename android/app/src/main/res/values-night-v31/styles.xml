@@ -2,6 +2,9 @@
 <resources>
     <!-- Theme applied to the Android Window while the process is starting when the OS's Dark Mode setting is off -->
     <style name="LaunchTheme" parent="@android:style/Theme.Black.NoTitleBar">
+        <!-- after the system splash the activity's window keeps this background until Flutter's
+             first frame (the switch to NormalTheme does not repaint it): the logo, not a blank window -->
+        <item name="android:windowBackground">@drawable/splash_window</item>
         <item name="android:forceDarkAllowed">false</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">false</item>
