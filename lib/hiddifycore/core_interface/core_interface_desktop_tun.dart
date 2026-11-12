@@ -242,7 +242,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
         throw const AdminPermissionRefused();
       }
       if (event.progress == EnsureAdminBgServiceProgress.ENSURE_ADMIN_BG_FAILED_OTHER) {
-        throw StateError(
+        throw VpnServiceFailure(
           (event.message.isNotEmpty)
               ? event.message
               : 'Could not start the VPN service. Allow the administrator prompt and try again.',

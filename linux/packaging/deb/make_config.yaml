@@ -8,6 +8,9 @@ priority: optional
 section: x11
 installed_size: 6604
 essential: false
+# VPN mode asks for the administrator password once, through pkexec (policykit-1 on older releases)
+dependencies:
+  - pkexec | policykit-1
 icon: assets/images/source/ic_launcher_border.png
 
 # Post-installation tasks:

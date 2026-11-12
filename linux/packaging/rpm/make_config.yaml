@@ -24,6 +24,8 @@ generic_name: Hiddify
 # Everything else (GTK 3, glibc) is part of any desktop install.
 requires:
   - libayatana-appindicator-gtk3
+  # VPN mode asks for the administrator password once, through pkexec
+  - polkit
 
 categories:
   - Network

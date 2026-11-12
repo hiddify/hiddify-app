@@ -39,17 +39,27 @@ class AppImageService {
     return List.generate(64, (_) => characters[random.nextInt(characters.length)]).join();
   }
 
-  /// Asks for administrator rights (pkexec) and starts the service; returns once it serves.
+  /// Asks for administrator rights (pkexec, or sudo with a password dialog where pkexec is missing) and
+  /// starts the service; returns once it serves.
   static Future<AppImageService> start(String appImage, int ownerPid) async {
-    final process = await Process.start('pkexec', [
-      appImage,
-      'HiddifyCli',
-      'core-service',
-      '--listen',
-      '127.0.0.1:$port',
-      '--owner-pid',
-      '$ownerPid',
-    ]);
+    final args = [appImage, 'HiddifyCli', 'core-service', '--listen', '127.0.0.1:$port', '--owner-pid', '$ownerPid'];
+    final Process process;
+    var viaSudo = false;
+    Directory? askpassDir;
+    if (_which('pkexec') != null) {
+      process = await Process.start('pkexec', args);
+    } else {
+      if (_which('sudo') == null) throw VpnServiceFailure.noAdminPrompt;
+      viaSudo = true;
+      final askpass = _sudoAskpass();
+      if (askpass == null) {
+        // no dialog to type the password into: only works when sudo needs none
+        process = await Process.start('sudo', ['-n', ...args]);
+      } else {
+        askpassDir = askpass.ownDir;
+        process = await Process.start('sudo', ['-A', ...args], environment: {'SUDO_ASKPASS': askpass.path});
+      }
+    }
     final service = AppImageService._(process, _newSecret());
     process.stdin.writeln(service.secret);
     await process.stdin.flush();
@@ -76,10 +86,15 @@ class AppImageService {
         // pkexec: 126 when the user dismissed the prompt, 127 both when authorization failed and when
         // the program could not run (hiddify-app#2461); only its stderr tells the two apart
         final detail = stderr.toString().trim();
+        final refused = viaSudo
+            ? code == 1 && _sudoRefusals.any(detail.contains)
+            : code == 126 || (code == 127 && detail.isEmpty);
         ready.completeError(
-          code == 126 || (code == 127 && detail.isEmpty)
+          viaSudo && detail.contains('a password is required')
+              ? VpnServiceFailure.noAdminPrompt
+              : refused
               ? const AdminPermissionRefused()
-              : StateError('The VPN service did not start ($code): $detail'),
+              : VpnServiceFailure('The VPN service did not start ($code): $detail'),
         );
       }),
     );
@@ -88,9 +103,57 @@ class AppImageService {
     } catch (_) {
       process.kill();
       rethrow;
+    } finally {
+      // the dialog has been answered: the script is not needed any more
+      try {
+        askpassDir?.deleteSync(recursive: true);
+      } catch (_) {}
     }
     _logger.info('AppImage VPN service ${process.pid} started');
     return service;
+  }
+
+  // sudo exits 1 both when the dialog was cancelled or the password was wrong, and when the program failed
+  static const _sudoRefusals = ['no password was provided', 'incorrect password'];
+
+  // Password dialogs that print the password, as sudo -A wants (hiddify-core admin_bgservice_elevate_linux.go)
+  static const _askpassDialogs = [
+    ('zenity', '--password --title="Hiddify: administrator password for VPN mode"'),
+    ('kdialog', '--title=Hiddify --password="Administrator password for VPN mode"'),
+    ('qarma', '--password --title="Hiddify: administrator password for VPN mode"'),
+    ('ksshaskpass', r'"$@"'),
+    ('lxqt-openssh-askpass', r'"$@"'),
+    ('ssh-askpass', r'"$@"'),
+    ('/usr/libexec/openssh/gnome-ssh-askpass', r'"$@"'),
+    ('/usr/lib/openssh/gnome-ssh-askpass', r'"$@"'),
+    ('/usr/lib/ssh/x11-ssh-askpass', r'"$@"'),
+  ];
+
+  static String? _which(String program) {
+    if (program.startsWith('/')) return File(program).existsSync() ? program : null;
+    for (final dir in (Platform.environment['PATH'] ?? '/usr/bin:/bin').split(':')) {
+      if (dir.isEmpty) continue;
+      final path = '$dir/$program';
+      if (File(path).existsSync()) return path;
+    }
+    return null;
+  }
+
+  /// A program for SUDO_ASKPASS: the user's own, or a small script around the first password dialog found,
+  /// with the folder made for it (deleted once the dialog has been answered).
+  static ({String path, Directory? ownDir})? _sudoAskpass() {
+    final own = Platform.environment['SUDO_ASKPASS'];
+    if (own != null && own.isNotEmpty && File(own).existsSync()) return (path: own, ownDir: null);
+    for (final (program, args) in _askpassDialogs) {
+      final path = _which(program);
+      if (path == null) continue;
+      final dir = Directory.systemTemp.createTempSync('hiddify-askpass-');
+      final script = File('${dir.path}/askpass')
+        ..writeAsStringSync("#!/bin/sh\nexec '${path.replaceAll("'", r"'\''")}' $args\n");
+      Process.runSync('chmod', ['700', dir.path, script.path]);
+      return (path: script.path, ownDir: dir);
+    }
+    return null;
   }
 
   /// Stops the service: its engine restores what it changed, then it exits.
