@@ -142,6 +142,7 @@ You can improve existing languages or contribute new ones either by editing the 
 We would like to express our sincere appreciation to the contributors of the following projects, whose robust foundation and innovative features have significantly enhanced the success and functionality of this project.
 
 - [Sing-box](https://github.com/SagerNet/sing-box)
+- [XRay](https://github.com/xtls/xray-core)
 - [Sing-box for Android](https://github.com/SagerNet/sing-box-for-android)
 - [Sing-box for Apple](https://github.com/SagerNet/sing-box-for-apple)
 - [Clash](https://github.com/Dreamacro/clash)
