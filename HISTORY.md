@@ -5,6 +5,21 @@
 
 #### Other
 
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Update README.md. 
+
+* Add XRay project to contributors list in README. 
+
+* Update README with compatibility and features. 
+  _Added compatibility note for latest Xray-core and sing-box along with a list of supported protocols and features._
+
+* Merge pull request #2524 from 4n0nymou3/4n0nymou3-patch-1. 
+  _Fix typos and wording in free_configs; remove 𝕏 from Anonymous profile_
+
+* Free_configs. 
+  _fix(profiles): fix typos and wording in free_configs_
+
 * Ci: name each build job after its platform (android-apk, linux-x64, windows-x64, ...) 
 
 * Ci(android): drafts and dev builds to open testing, releases to production unsent. 
