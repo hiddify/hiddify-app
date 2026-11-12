@@ -32,7 +32,15 @@ abstract interface class ProfileRepository {
     ProfilesSort sort = ProfilesSort.lastUpdate,
     SortMode sortMode = SortMode.ascending,
   });
-  TaskEither<ProfileFailure, Unit> upsertRemote(String url, {UserOverride? userOverride, CancelToken? cancelToken});
+
+  /// Adds the profile at [url], or updates it when one with that URL exists. With [activate] (the user adding a
+  /// profile, not an update), an existing one becomes the active profile, as a new one does.
+  TaskEither<ProfileFailure, Unit> upsertRemote(
+    String url, {
+    UserOverride? userOverride,
+    CancelToken? cancelToken,
+    bool activate = false,
+  });
 
   /// Adds [content] as a local profile; returns its id.
   TaskEither<ProfileFailure, String> addLocal(String content, {UserOverride? userOverride});
@@ -157,11 +165,21 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
   }
 
   @override
-  TaskEither<ProfileFailure, Unit> upsertRemote(String url, {UserOverride? userOverride, CancelToken? cancelToken}) =>
-      TaskEither.tryCatch(
-        () async => await _profileDataSource.getByUrl(url).then((profEntry) => profEntry?.toEntity()),
-        ProfileFailure.unexpected,
-      ).flatMap((profEntity) {
+  TaskEither<ProfileFailure, Unit> upsertRemote(
+    String url, {
+    UserOverride? userOverride,
+    CancelToken? cancelToken,
+    bool activate = false,
+  }) =>
+      TaskEither.tryCatch(() async {
+        final profEntity = await _profileDataSource.getByUrl(url).then((profEntry) => profEntry?.toEntity());
+        // adding a profile that is already there selects it, before the update, which may fail on a server that
+        // is down: the profile is there either way
+        if (activate && profEntity != null && !profEntity.active) {
+          await _profileDataSource.edit(profEntity.id, const ProfileEntriesCompanion(active: Value(true)));
+        }
+        return profEntity;
+      }, ProfileFailure.unexpected).flatMap((profEntity) {
         // if profile is null, generate id
         final id = profEntity?.id ?? const Uuid().v4();
         final file = _profilePathResolver.file(id);

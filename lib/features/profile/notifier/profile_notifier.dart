@@ -74,6 +74,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
           rs.url,
           userOverride: rs.name.isNotEmpty ? UserOverride(name: rs.name) : null,
           cancelToken: _cancelToken = CancelToken(),
+          activate: true,
         );
       } else {
         loggy.debug("adding profile, content");
@@ -122,7 +123,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
     if (state.isLoading) return;
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final task = _profilesRepo.upsertRemote(url, userOverride: userOverride);
+      final task = _profilesRepo.upsertRemote(url, userOverride: userOverride, activate: true);
       return await task
           .match(
             (err) {

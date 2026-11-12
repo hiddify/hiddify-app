@@ -68,8 +68,11 @@ class _FakeDataSource implements ProfileDataSource {
   @override
   Future<void> insert(ProfileEntriesCompanion entry) async {}
 
+  /// The edits made, in order.
+  final edits = <(String, ProfileEntriesCompanion)>[];
+
   @override
-  Future<void> edit(String id, ProfileEntriesCompanion entry) async {}
+  Future<void> edit(String id, ProfileEntriesCompanion entry) async => edits.add((id, entry));
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -164,6 +167,38 @@ void main() {
       expect(result.isRight(), true);
       expect(repo.tempFileSeen, true);
       expect(leftTempFiles(), isEmpty);
+    });
+  });
+
+  group("adding a profile that is already there", () {
+    /// Whether [source] was told to make [id] the active profile.
+    bool activated(_FakeDataSource source, String id) =>
+        source.edits.any((edit) => edit.$1 == id && edit.$2.active == const Value(true));
+
+    test("selects it", () async {
+      final source = _FakeDataSource(remoteEntry.copyWith(active: false));
+      final result = await _Repo(source, paths).upsertRemote(remoteEntry.url!, activate: true).run();
+      expect(result.isRight(), true);
+      expect(activated(source, remoteEntry.id), true);
+    });
+
+    test("selects it even when its update fails", () async {
+      final source = _FakeDataSource(remoteEntry.copyWith(active: false));
+      final result = await _Repo(source, paths, valid: false).upsertRemote(remoteEntry.url!, activate: true).run();
+      expect(result.isLeft(), true);
+      expect(activated(source, remoteEntry.id), true);
+    });
+
+    test("an update does not select it", () async {
+      final source = _FakeDataSource(remoteEntry.copyWith(active: false));
+      await _Repo(source, paths).upsertRemote(remoteEntry.url!).run();
+      expect(activated(source, remoteEntry.id), false);
+    });
+
+    test("the active one is left as it is", () async {
+      final source = _FakeDataSource(remoteEntry.copyWith(active: true));
+      await _Repo(source, paths).upsertRemote(remoteEntry.url!, activate: true).run();
+      expect(activated(source, remoteEntry.id), false);
     });
   });
 
