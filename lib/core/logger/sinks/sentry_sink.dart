@@ -48,10 +48,7 @@ Future<void> _toSentry(LogRecord record) async {
   if (!canLogEvent(record.error)) return;
 
   if (record.level >= _minEventLevel) {
-    await Sentry.captureEvent(
-      record.toSentryEvent(),
-      stackTrace: record.stackTrace,
-    );
+    await Sentry.captureEvent(record.toSentryEvent(), stackTrace: record.stackTrace);
   }
 
   if (record.level >= _minBreadcrumbLevel) {

@@ -36,11 +36,7 @@ class Logger {
     final library = details.library ?? 'unknown library';
     final context = details.context == null ? '' : ' ${details.context}';
 
-    app.error(
-      'Flutter error in $library$context: ${details.exceptionAsString()}',
-      details.exception,
-      details.stack,
-    );
+    app.error('Flutter error in $library$context: ${details.exceptionAsString()}', details.exception, details.stack);
   }
 
   /// Errors that never touched a widget — an unawaited future, a timer, a
