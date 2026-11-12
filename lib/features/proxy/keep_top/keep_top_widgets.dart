@@ -284,7 +284,7 @@ class KeepTopAction extends ConsumerWidget {
     final total = ref.watch(profileProxyCountProvider(profile.id)).valueOrNull ?? 0;
     final keepTop = profile.keepTop;
     final keeping = profile.keepTags.isNotEmpty || keepTop == keepTopAnswering || (keepTop > 0 && total > keepTop);
-    if (!keeping && total <= bigProfileProxies) return const SizedBox.shrink();
+    if (!keeping && !profile.offersKeepTop(total)) return const SizedBox.shrink();
     return IconButton(
       tooltip: t.dialogs.keepTop.howMany,
       isSelected: keeping,
@@ -372,7 +372,7 @@ class KeepTopFooter extends HookConsumerWidget {
     // every one that answers, of the regions when there are: the count is known after the test
     final answering = keepTop == keepTopAnswering || (keepTop <= 0 && regions.isNotEmpty);
     final keeping = chosen || answering || (keepTop > 0 && total > keepTop);
-    if (!keeping && total <= bigProfileProxies) return const SizedBox.shrink();
+    if (!keeping && !profile.offersKeepTop(total)) return const SizedBox.shrink();
 
     Future<void> apply(Future<void> Function(KeepTopNotifier notifier) change) async {
       busy.value = true;

@@ -203,8 +203,8 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
             .scaleXY(begin: .5, end: 1, duration: 350.ms, curve: Curves.easeOutBack)
             .fadeIn(duration: 200.ms),
       ProxyRowState.untested => _Signal(_Logo.loading(colors.wait)),
-      // at rest: nothing is coming, so nothing moves. Its last ping stays, dim, under the pause
-      // mark: of this run, else of the one before; a tap on it tests it
+      // asleep: nothing is coming, so nothing moves. Its last ping stays, dim, beside the moon
+      // icon: of this run, else of the one before; a tap on it wakes and tests it
       ProxyRowState.resting => Tooltip(
         message: t.pages.proxies.status.resting,
         child: Row(
@@ -215,7 +215,7 @@ class ProxyTile extends HookConsumerWidget with PresLogger {
             else if (delay >= ConnectionConst.maxDelay)
               Opacity(opacity: .55, child: Icon(Icons.close_rounded, size: 16, color: colors.red)),
             const Gap(6),
-            Icon(Icons.pause_circle_outline_rounded, size: 16, color: colors.wait),
+            Icon(Icons.bedtime_outlined, size: 16, color: colors.wait),
           ],
         ),
       ),

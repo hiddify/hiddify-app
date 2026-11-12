@@ -485,7 +485,7 @@ class KeepTagsDialog extends HookConsumerWidget {
                   ),
                   for (final (status, label, icon) in [
                     if (connected) (_Status.answering, text.statusAnswering, Icons.signal_cellular_alt_rounded),
-                    if (pausedCount > 0) (_Status.paused, text.statusPaused, Icons.pause_circle_outline_rounded),
+                    if (pausedCount > 0) (_Status.paused, text.statusPaused, Icons.bedtime_outlined),
                   ])
                     _Chip(
                       label: Text('$label · ${statusCounts[status]}'),
@@ -555,11 +555,11 @@ class KeepTagsDialog extends HookConsumerWidget {
                 const _ConnectCard()
               else if (pausedCount > 0 && !woke.value)
                 _Banner(
-                  icon: Icons.pause_circle_outline_rounded,
+                  icon: Icons.bedtime_outlined,
                   text: text.paused(n: pausedCount),
                   action: TextButton.icon(
                     onPressed: wake,
-                    icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                    icon: const Icon(Icons.wb_sunny_outlined, size: 18),
                     label: Text(text.wake),
                   ),
                 ),

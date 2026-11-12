@@ -128,6 +128,11 @@ extension KeepTopProfile on ProfileEntity {
   /// The proxies the user asked to keep loaded, whatever their ping, beside the fastest.
   List<String> get keepTopPinned => userOverride?.keepTopPinned ?? const [];
 
+  /// Whether the proxy list offers keep top for its [total] proxies: a big profile, or one whose
+  /// keep top was chosen, by the user or the subscription, even "all", so it can be changed back.
+  bool offersKeepTop(int total) =>
+      total > bigProfileProxies || userOverride?.keepTop != null || keepTags.isNotEmpty || keepTopHeader != null;
+
   /// Keep top leaves some of the profile's proxies at rest: a count, the answering ones, or the
   /// ones of some countries.
   bool get keepsTop =>
