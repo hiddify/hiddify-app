@@ -1,4 +1,5 @@
-# Uploads the iOS IPA and the Mac App Store pkg of this run to TestFlight.
+# Uploads the iOS IPA and the Mac App Store pkg of this run, or of an earlier one (store-upload.yml),
+# to TestFlight. The two uploads are independent: one failing does not skip the other.
 #
 # Two ways to authenticate, chosen by which secrets are set:
 #  - APPLE_UPLOAD_APPLE_ID + APPLE_UPLOAD_APP_PASSWORD: a dedicated Apple ID with an
@@ -10,6 +11,19 @@ name: TestFlight
 
 on:
   workflow_call:
+    inputs:
+      run-id:
+        description: The run whose ios and macos-appstore artifacts to upload. Empty - this run.
+        type: string
+        default: ''
+      ios:
+        description: Upload the iOS IPA.
+        type: boolean
+        default: true
+      macos:
+        description: Upload the Mac App Store pkg.
+        type: boolean
+        default: true
 
 jobs:
   upload:
@@ -42,18 +56,24 @@ jobs:
 
       # A build that failed or was not made leaves no artifact: that upload is skipped.
       - name: Download the iOS artifact
+        if: inputs.ios
         continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           name: ios
           path: out
+          run-id: ${{ inputs.run-id || github.run_id }}
+          github-token: ${{ github.token }}
 
       - name: Download the Mac App Store artifact
+        if: inputs.macos
         continue-on-error: true
         uses: actions/download-artifact@v7
         with:
           name: macos-appstore
           path: out
+          run-id: ${{ inputs.run-id || github.run_id }}
+          github-token: ${{ github.token }}
 
       - name: Check which builds are there
         id: found
@@ -122,12 +142,13 @@ jobs:
 
       # ---- macOS ----
 
+      # !cancelled(): a failed iOS upload does not skip the Mac one
       - name: Upload the Mac App Store pkg (Apple ID)
-        if: steps.found.outputs.macos == 'true' && env.UPLOAD_AUTH == 'apple-id'
+        if: ${{ !cancelled() && steps.found.outputs.macos == 'true' && env.UPLOAD_AUTH == 'apple-id' }}
         run: bash .github/scripts/upload_testflight.sh macos out/Hiddify-MacOS-AppStore.pkg
 
       - name: Upload the Mac App Store pkg (API key)
-        if: steps.found.outputs.macos == 'true' && env.UPLOAD_AUTH == 'api-key'
+        if: ${{ !cancelled() && steps.found.outputs.macos == 'true' && env.UPLOAD_AUTH == 'api-key' }}
         uses: Apple-Actions/upload-testflight-build@665328adbecbc3ad929d3da710696d928b8a7ba9 # v5.9.0
         with:
           app-path: out/Hiddify-MacOS-AppStore.pkg

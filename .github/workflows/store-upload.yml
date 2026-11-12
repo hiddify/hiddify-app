@@ -1,0 +1,76 @@
+# Uploads the builds of an earlier Release or CI run to the stores again, without building: for a
+# store upload that failed while the builds are still there (their artifacts are kept for a day).
+name: Store upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      run-id:
+        description: The run whose builds to upload (the number in its URL, .../actions/runs/<id>).
+        type: string
+        required: true
+      google-play:
+        description: Google Play (the Android bundle)
+        type: boolean
+        default: true
+      testflight-macos:
+        description: TestFlight, the Mac App Store pkg
+        type: boolean
+        default: true
+      testflight-ios:
+        description: TestFlight, the iOS IPA
+        type: boolean
+        default: false
+
+jobs:
+  # The tag and channel the run built, as release.yml and ci.yml passed them to build.yml.
+  find:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+    outputs:
+      tag-name: ${{ steps.run.outputs.tag-name }}
+      channel: ${{ steps.run.outputs.channel }}
+    steps:
+      - id: run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.run-id }}
+        run: |
+          set -euo pipefail
+          read -r workflow ref < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq '"\(.path) \(.head_branch)"')
+          case "$workflow" in
+            .github/workflows/release.yml)
+              tag="$ref"
+              if [[ "$ref" == *dev ]]; then channel=dev; else channel=prod; fi ;;
+            *) tag=draft; channel=dev ;;
+          esac
+          echo "Run $RUN_ID: $workflow on $ref - tag $tag, channel $channel"
+          echo "tag-name=$tag" >> "$GITHUB_OUTPUT"
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+
+  google-play:
+    if: inputs.google-play
+    needs: find
+    uses: ./.github/workflows/google-play.yml
+    secrets: inherit
+    permissions:
+      actions: read
+      contents: write
+    with:
+      tag-name: ${{ needs.find.outputs.tag-name }}
+      channel: ${{ needs.find.outputs.channel }}
+      run-id: ${{ inputs.run-id }}
+
+  testflight:
+    if: inputs.testflight-ios || inputs.testflight-macos
+    uses: ./.github/workflows/testflight.yml
+    secrets: inherit
+    permissions:
+      actions: read
+      contents: write
+    with:
+      run-id: ${{ inputs.run-id }}
+      ios: ${{ inputs.testflight-ios }}
+      macos: ${{ inputs.testflight-macos }}
