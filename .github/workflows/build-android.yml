@@ -23,7 +23,7 @@ env:
 
 jobs:
   build:
-    name: ${{ matrix.target }}
+    name: android-${{ matrix.target }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     # A failed build does not stop the release of the other platforms.
@@ -75,6 +75,28 @@ jobs:
             storePassword "$STORE_PASSWORD" \
             keyPassword "$KEY_PASSWORD" \
             keyAlias "$KEY_ALIAS" > android/key.properties
+
+      # Google Play takes each version code once, and every build of a version (each draft, the .dev
+      # tag, the release) has pubspec's. The bundle gets one more than the highest code recorded
+      # (the android-build/<code> tag build.yml's google-play job pushes), never less than
+      # pubspec's; the APKs keep pubspec's.
+      - name: Give the Play bundle the next version code
+        if: inputs.release && matrix.target == 'aab'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          base="$(sed -n 's/^version: *[^+]*+\([0-9][0-9]*\) *$/\1/p' pubspec.yaml)"
+          [ -n "$base" ] || { echo "::error::pubspec.yaml has no 'version: <name>+<build>' line"; exit 1; }
+          highest="$(gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/android-build/" --jq '.[].ref' \
+            | sed -n 's|^refs/tags/android-build/\([0-9][0-9]*\)$|\1|p' | sort -n | tail -n 1)"
+          code="$base"
+          if [ -n "$highest" ] && [ $((highest + 1)) -gt "$code" ]; then
+            code=$((highest + 1))
+          fi
+          perl -pi -e "s/^(version: *[^+]+)\+\d+ *\$/\${1}+$code/" pubspec.yaml
+          grep -n '^version:' pubspec.yaml
+          echo "Play version code: $code (pubspec $base, highest recorded ${highest:-none})"
 
       - name: Build
         run: make android-${{ matrix.target }}-release

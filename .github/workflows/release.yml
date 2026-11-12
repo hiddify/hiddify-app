@@ -1,5 +1,5 @@
 # A version tag: tests, builds every platform and publishes the GitHub release of the tag, the
-# `draft` release, TestFlight and the Google Play beta track. See build.yml.
+# `draft` release, TestFlight and Google Play (open testing for .dev tags, production for releases). See build.yml.
 name: Release
 
 on:
