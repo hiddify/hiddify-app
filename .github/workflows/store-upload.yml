@@ -1,5 +1,7 @@
 # Uploads the builds of an earlier Release or CI run to the stores again, without building: for a
 # store upload that failed while the builds are still there (their artifacts are kept for a day).
+# Google Play takes a version code once, also from an upload it then refused to publish: with
+# rebuild-play-bundle the bundle is built again from the run's commit, with the next code.
 name: Store upload
 
 on:
@@ -21,6 +23,10 @@ on:
         description: TestFlight, the iOS IPA
         type: boolean
         default: false
+      rebuild-play-bundle:
+        description: Build the Play bundle again (Play has seen its version code already)
+        type: boolean
+        default: false
 
 jobs:
   # The tag and channel the run built, as release.yml and ci.yml passed them to build.yml.
@@ -32,6 +38,7 @@ jobs:
     outputs:
       tag-name: ${{ steps.run.outputs.tag-name }}
       channel: ${{ steps.run.outputs.channel }}
+      sha: ${{ steps.run.outputs.sha }}
     steps:
       - id: run
         env:
@@ -39,7 +46,7 @@ jobs:
           RUN_ID: ${{ inputs.run-id }}
         run: |
           set -euo pipefail
-          read -r workflow ref < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq '"\(.path) \(.head_branch)"')
+          read -r workflow ref sha < <(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RUN_ID" --jq '"\(.path) \(.head_branch) \(.head_sha)"')
           case "$workflow" in
             .github/workflows/release.yml)
               tag="$ref"
@@ -49,10 +56,27 @@ jobs:
           echo "Run $RUN_ID: $workflow on $ref - tag $tag, channel $channel"
           echo "tag-name=$tag" >> "$GITHUB_OUTPUT"
           echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+  # Only the Play bundle, from the run's commit; its version code is the next free one.
+  android:
+    if: inputs.google-play && inputs.rebuild-play-bundle
+    needs: find
+    uses: ./.github/workflows/build-android.yml
+    secrets: inherit
+    permissions:
+      contents: read
+    with:
+      release: true
+      channel: ${{ needs.find.outputs.channel }}
+      upload-symbols: ${{ needs.find.outputs.tag-name != 'draft' }}
+      targets: '["aab"]'
+      ref: ${{ needs.find.outputs.sha }}
+      generated-code: false
 
   google-play:
-    if: inputs.google-play
-    needs: find
+    if: ${{ !cancelled() && inputs.google-play && needs.find.result == 'success' && needs.android.result != 'failure' }}
+    needs: [find, android]
     uses: ./.github/workflows/google-play.yml
     secrets: inherit
     permissions:
@@ -61,7 +85,8 @@ jobs:
     with:
       tag-name: ${{ needs.find.outputs.tag-name }}
       channel: ${{ needs.find.outputs.channel }}
-      run-id: ${{ inputs.run-id }}
+      # the rebuilt bundle is in this run
+      run-id: ${{ inputs.rebuild-play-bundle && github.run_id || inputs.run-id }}
 
   testflight:
     if: inputs.testflight-ios || inputs.testflight-macos

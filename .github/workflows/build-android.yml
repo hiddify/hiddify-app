@@ -16,6 +16,18 @@ on:
         description: Upload the debug symbols to Sentry.
         type: boolean
         default: false
+      targets:
+        description: What to build, a JSON list of apk and aab.
+        type: string
+        default: '["apk", "aab"]'
+      ref:
+        description: The commit to build. Empty - the one of this run.
+        type: string
+        default: ''
+      generated-code:
+        description: Take the generated code from this run's `generated-code` artifact (build.yml's codegen). Off, it is generated here.
+        type: boolean
+        default: true
 
 env:
   CHANNEL: ${{ inputs.channel }}
@@ -33,9 +45,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [apk, aab]
+        target: ${{ fromJSON(inputs.targets) }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
 
       - name: Free disk space
         run: |
@@ -59,7 +73,7 @@ jobs:
       - uses: ./.github/actions/setup-flutter
         with:
           platform: android-${{ matrix.target }}
-          generated-code: true
+          generated-code: ${{ inputs.generated-code }}
 
       - name: Set up the signing key
         if: inputs.release
