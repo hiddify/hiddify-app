@@ -2,9 +2,9 @@ import 'dart:math';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -25,8 +25,8 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
 
     final proxies = ref.watch(proxiesOverviewNotifierProvider);
     final sortBy = ref.watch(proxiesSortNotifierProvider);
-    // the proxies keep top left at rest are folded away under the list until asked for
-    final showResting = useState(false);
+    // the proxies keep top left at rest, under the list: shown at first, then folded or not as the user left them
+    final showResting = ref.watch(Preferences.showSleepingProxies);
 
     // final selectActiveProxyMutation = useMutation(
     //   initialOnFailure: (error) => CustomToast.error(t.presentShortError(error)).show(context),
@@ -149,11 +149,11 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                         SliverToBoxAdapter(
                           child: RestingProxiesHeader(
                             count: resting.length,
-                            shown: showResting.value,
-                            onToggle: () => showResting.value = !showResting.value,
+                            shown: showResting,
+                            onToggle: () => ref.read(Preferences.showSleepingProxies.notifier).update(!showResting),
                           ),
                         ),
-                        if (showResting.value) grid(resting),
+                        if (showResting) grid(resting),
                       ],
                       // room for the buttons over the list's end
                       const SliverPadding(padding: EdgeInsets.only(bottom: 140)),

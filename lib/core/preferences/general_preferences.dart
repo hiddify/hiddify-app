@@ -54,6 +54,10 @@ abstract class Preferences {
 
   static final windowMaximized = PreferencesNotifier.create<bool, bool>("window_maximized", false);
 
+  /// Whether the proxy list shows the sleeping proxies keep top leaves at rest: open at first, then as the
+  /// user left it.
+  static final showSleepingProxies = PreferencesNotifier.create<bool, bool>("show_sleeping_proxies", true);
+
   /// The newest crash report the user was offered, by name, so each crash is offered once.
   static final lastSeenCrashReport = PreferencesNotifier.create<String, String>("last_seen_crash_report", "");
 
