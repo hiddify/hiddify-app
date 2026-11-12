@@ -1,9 +1,561 @@
 # Changelog
 
 
-## (unreleased)
+## 5.9.0 (2026-11-12)
 
 #### Other
+
+* Ci: name each build job after its platform (android-apk, linux-x64, windows-x64, ...) 
+
+* Ci(android): drafts and dev builds to open testing, releases to production unsent. 
+  _A draft or a .dev tag goes to Google Play open testing and is sent for review,
+replacing a dev build still in review. A release tag goes to production,
+saved but not sent for review, or to closed testing while another release is
+in review. The upload is a script now (.github/scripts/google_play_upload.py):
+the action could not choose what happens to changes in review.
+
+Play takes each version code once, and every build of a version had
+pubspec's. As for iOS, the bundle gets one more than the highest code
+recorded as an android-build/<code> tag, never less than pubspec's; the APKs
+keep pubspec's._
+
+* Style: format the logger, trusted links and preferences utils. 
+
+* Fix(android): the splash goes straight to the first screen, without a blank gap. 
+  _Android 12 and later showed the default window background after the system
+splash, and the splash was removed over the router's blank loading page. The
+launch theme now has the splash as its window background there too, and the
+splash stays until the first frame of the real routes (or 5 seconds at most)._
+
+* Feat(proxy): show the sleeping proxies at first, then as the user left them. 
+  _The sleeping proxies keep top leaves at rest were always folded away when the
+page opened. They are shown at first, and folding or unfolding them is saved._
+
+* Fix(linux): VPN mode without pkexec, and the packages depend on it. 
+  _The deb and rpm packages now pull pkexec (pkexec | policykit-1, polkit), so
+VPN mode can ask for the administrator password on a minimal desktop. The
+AppImage, which starts its service itself, falls back to sudo with the
+desktop's password dialog, or passwordless sudo, when pkexec is missing, and
+says what to install when neither works, instead of "Bad state: ... exec:
+pkexec: executable file not found"._
+
+* Chore(core): bump hiddify-core for VPN mode without pkexec. 
+
+* Feat(android): the Hiddify logo, not a black screen, while the app starts. 
+  _Flutter swaps the launch theme for NormalTheme as soon as the activity
+starts, and NormalTheme's window was plain black (dark) or white until
+Flutter drew its first frame. The app also holds that frame until it has
+started, so an Android TV or a slow phone showed a black screen for the
+whole engine load. Both themes now show the logo on the app's own
+background (the surface of its light or dark color scheme) until the
+first frame covers it, and the Android 12 splash uses the same color, so
+nothing flashes at the hand-over. pubspec's flutter_native_splash colors
+match, for when the splash is generated again._
+
+* Feat(proxy): a pin on the flag of a proxy kept loaded, and call it "Pin proxy" 
+  _A proxy the user keeps loaded whatever its ping (keep top) now wears a
+pin badge on the top corner of its flag in the proxy list. It is drawn
+over the row's fade, in the primary color ringed in the surface color,
+so it shows on any flag and on a sleeping row; the reconnecting badge
+keeps the bottom corner. The setting in the proxy dialog is named "Pin
+proxy", and the sleeping proxies' hint says a long press pins one._
+
+* Fix(profile): adding a profile that is already there selects it. 
+  _Adding a subscription whose URL was already saved (a link, a QR code,
+the clipboard or the manual form) only updated that profile and left
+another one active, so nothing seemed to happen. Adding it now makes it
+the active profile, as adding a new one does, before the update, which
+may fail on a server that is down. Updating a profile, by hand or in the
+background, still leaves the active profile as it is.
+
+Tested: the repository tests for a profile added again (selected, also
+when its update fails; not selected by an update; the active one left
+alone) fail without the change and pass with it._
+
+* Fix(keep-top): keep the filter and card after choosing All; say asleep, not paused. 
+  _A profile of 20 proxies or fewer lost its keep-top card and filter button once
+the user chose All, so there was no way back to Working or a count. They now
+show whenever keep top was chosen by the user or the subscription.
+
+Paused proxies are now asleep: a moon replaces the pause icon, a sun the wake
+button, and the English and Persian texts follow._
+
+* Chore(core): bump hiddify-core for the WireGuard close and idle UDP fixes. 
+
+* Chore(core): bump hiddify-core for the replace forks on their upstreams. 
+
+* Fix(android): no Go memory limit by default outside iOS (#2521) 
+  _Since the core was given the device's memory, the default "Memory
+limit" held the Go runtime to 3/4 of the Java heap class on Android
+(about 192 MB on a flagship). Near it the GC runs all the time and the
+connection lags, messengers most, with nothing in the logs. Only the
+iOS Network Extension needs the limit; the default is now off on every
+other platform, on the Flutter side and on the Android service's own
+read of the setting. A choice the user made is kept._
+
+* Fix(desktop): show why the core crashed, not only its exit code. 
+  _When the core process exits unexpectedly, read its Go crash output
+(<working dir>/data/stderr<mode>.log, or stderr before it is set up) and
+add the panic or fatal error line to the message (#2517). The file is
+read before the restart moves it into the crash reports.
+
+Bumps hiddify-core for the crash output on Windows._
+
+* Fix(i18n): a flag for every language added since the language flags. 
+  _Amharic, Azerbaijani, Belarusian, Bengali, German, Hindi, Armenian,
+Italian, Kazakh, Korean, Kyrgyz, Burmese, Dutch, Pashto, Tajik, Turkmen,
+Ukrainian, Urdu and Uzbek had no flag in the language picker._
+
+* Test(proxy-info): run the dialog without an active profile. 
+  _The dialog reads the active profile for its keep-loaded switch, which
+opened the database in the test and left a timer pending._
+
+* Merge remote-tracking branch 'hiddify-app/main' into feat/crash-report-send-options. 
+
+* Merge pull request #2515 from Hiddify-Official/feat/language-flags. 
+  _feat(settings): show a flag before every language_
+
+* Feat(settings): show a flag before every language. 
+  _Only Persian had a flag in the language picker, after its name. Every
+language now shows its country's flag, from the bundled circle_flags SVGs
+so it is sharp and the same on every platform; Persian keeps the lion and
+sun. In the setting pickers the picture (the language's flag, a region's
+flag) now comes before the option's name instead of at the row's end._
+
+* Merge pull request #2510 from Hiddify-Official/fix/add-profile-buttons-overflow. 
+  _fix(profile): let the add buttons grow instead of overflowing_
+
+* Fix(profile): let the add buttons grow instead of overflowing. 
+  _The four add buttons were squares of a fixed height, so a language with
+taller letters, such as Chinese, overflowed them by a few pixels. They now
+have a minimum height and grow together.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 3f09ba246cc6d31f104030499d594fefa31af3ce)_
+
+* Merge pull request #2508 from Hiddify-Official/feat/more-languages. 
+  _feat(i18n): add 19 languages_
+
+* Fix(i18n): address the user as tu throughout the Italian translation. 
+  _Confirmation questions were in the impersonal infinitive and one warning used
+the formal form of the verb. They now speak to the user as tu, like the rest
+of the file._
+
+* Feat(i18n): add Dutch (nl) 
+  _Dutch translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker._
+
+* Feat(i18n): add Italian (it) 
+  _Italian translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 804b6d5c0c4df6b2286fc9a9ea8e3cb391d15bb3)_
+
+* Feat(i18n): add German (de) 
+  _German translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit a8a6ded0a9869bd9c682a4edbbc1e73c0d436b2f)_
+
+* Feat(i18n): add Hindi (hi) 
+  _Hindi translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 6bb005ee8bccd0240701b10ff11b4a316e941e26)_
+
+* Feat(i18n): add Ukrainian (uk) 
+  _Ukrainian translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 7113b183660253ef6c0516485188afbeb5f41001)_
+
+* Feat(i18n): add Armenian (hy) 
+  _Armenian translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 864aea97244bfcf3da26b9760ee38d1c3ab02632)_
+
+* Feat(i18n): add Tajik (tg) 
+  _Tajik translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 538efea30f6f7586ebe7893f198a2898858c22ee)_
+
+* Feat(i18n): add Kyrgyz (ky) 
+  _Kyrgyz translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 22300d6320faaa4402c53a3059c0b205b198414a)_
+
+* Feat(i18n): add Burmese (my) 
+  _Burmese translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 079c81743d4dd3f0a3dfd919e1c17f6e19f03bb7)_
+
+* Feat(i18n): add Kazakh (kk) 
+  _Kazakh translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 6bf9b40d537cb77e864afd83f3c3453db802dc71)_
+
+* Feat(i18n): add Azerbaijani (az) 
+  _Azerbaijani translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit c20cc48b91a68b6bac085b5d5062070ec6608180)_
+
+* Feat(i18n): add Uzbek (uz) 
+  _Uzbek translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 6d141bd17e452fc1a99b4d4dfede0ae9a2b0ffd3)_
+
+* Feat(i18n): add Bengali (bn) 
+  _Bengali translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit d3aec4bd105ed8799a060531619cc1f64559cc67)_
+
+* Feat(i18n): add Pashto (ps) 
+  _Pashto translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit b9a142a332bc4f08ef4792915ac4f9429b61411b)_
+
+* Feat(i18n): add Urdu (ur) 
+  _Urdu translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 88cb89700b5cf10ff587a84f7d9e8afe5e0d4120)_
+
+* Feat(i18n): add Amharic (am) 
+  _Amharic translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 25f43700160a559cc975557306516f3625dd297e)_
+
+* Feat(i18n): add Belarusian (be) 
+  _Belarusian translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 95e27a78f994131c4ecdb39d286fe36f0814488e)_
+
+* Fix(i18n): show Flutter's own texts in English for languages it lacks. 
+  _Material widgets failed to build in a language Flutter has no texts for,
+such as Turkmen. The delegates now fall back to English for those texts.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit ce1eb9f611be60231964f0a9cdb2b3732344a426)_
+
+* Feat(i18n): add Turkmen (tk) 
+  _Turkmen translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+(cherry picked from commit 9d9158d02617049025815b13ed704657bee3245f)_
+
+* Feat(i18n): add Korean (ko) 
+  _Korean translation of every string, with Hiddify kept as a name, and the
+language listed under its own name in the language picker.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+(cherry picked from commit 070e207d5e76ae9a2dfc06296575ec7028a83015)_
+
+* Merge pull request #2509 from Hiddify-Official/fix/complete-older-translations. 
+  _fix(i18n): complete the missing translations of nine languages_
+
+* Fix(i18n): update an outdated message and drop stale keys in the older locales. 
+  _The VPN mode waiting message no longer matched the English text and lacked the
+Hiddify name, and the Russian update message ended its link with a full stop.
+Keys that the English file no longer has are removed._
+
+* Feat(i18n): complete the Traditional Chinese translation. 
+  _Translate the strings the Traditional Chinese locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Simplified Chinese translation. 
+  _Translate the strings the Simplified Chinese locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Turkish translation. 
+  _Translate the strings the Turkish locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Russian translation. 
+  _Translate the strings the Russian locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Brazilian Portuguese translation. 
+  _Translate the strings the Brazilian Portuguese locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Indonesian translation. 
+  _Translate the strings the Indonesian locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the French translation. 
+  _Translate the strings the French locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Spanish translation. 
+  _Translate the strings the Spanish locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Feat(i18n): complete the Arabic translation. 
+  _Translate the strings the Arabic locale was missing, so that none of them
+shows in English. Existing translations are unchanged._
+
+* Merge pull request #2511 from Hiddify-Official/fix/intro-slogan-wrap. 
+  _fix(intro): wrap the slogan instead of cutting it with an ellipsis_
+
+* Fix(intro): wrap the slogan instead of cutting it with an ellipsis. 
+  _In most languages the slogan is longer than a phone is wide, and it was cut
+with an ellipsis after one line. It now wraps and is centered._
+
+* Merge pull request #2514 from Hiddify-Official/fix/home-no-overscroll. 
+  _fix(home): keep the home page still under the finger_
+
+* Fix(home): keep the home page still under the finger. 
+  _Dragging the home page moved the profile tile and the connect button: the
+page bounced on iOS and stretched on Android although it fits the screen.
+Use clamping physics and no overscroll indicator, so it moves only when it
+does not fit (a small screen or a large font)._
+
+* Merge pull request #2504 from Hiddify-Official/fix/quick-settings-translations. 
+  _fix(settings): translate the quick settings chain toggles_
+
+* Fix(settings): translate the quick settings chain toggles. 
+  _The Extra security and Proxy unblocker rows of the quick settings, their
+Off label and the Router mode label existed only in English and Persian,
+so the other nine languages showed them in English._
+
+* Merge pull request #2505 from Hiddify-Official/feat/compact-share-sheet. 
+  _feat(profile): fit the share dialog on a phone screen without scrolling_
+
+* Feat(profile): fit the share dialog on a phone screen without scrolling. 
+  _Close moves to an X in the header, the configuration's copy, share and
+save become icon buttons on its heading row, and the QR code shrinks on
+short screens._
+
+* Merge pull request #2513 from Hiddify-Official/fix/menu-in-nested-overlay. 
+  _fix(ui): open menus above the home bottom bar when they don't fit below_
+
+* Fix(ui): open menus above the home page's bottom bar when they do not fit below. 
+  _Since afd915c9 the status and navigation bars are reported to MenuAnchor
+as display features in screen coordinates. A page of the home shell has
+its own overlay, ending above the bottom navigation, so the navigation
+bar fell below that overlay and the area it left looked taller than the
+page: the balance strategy menu opened downward and was cut off by the
+bottom navigation. Measure the bars against the menu's overlay when the
+menu opens instead._
+
+* Chore(core): bump hiddify-core for keep top in the monitor and parked outbounds. 
+
+* Feat(keep-top): run the 5 fastest by default, explain the paused ones. 
+  _Keep top now applies to every profile: the user's choice, else the
+subscription's keep-top header, else the 5 fastest. The user changes it
+from the card at the end of the proxy list; no dialog is shown on import.
+
+The card says in plain words why the other proxies are paused, and with
+regions chosen, when proxies of other regions answered faster, with a
+button to keep any region. A proxy can be kept loaded from its details,
+whatever its ping.
+
+The home card no longer shows a speed cached from an earlier run, and a
+fresh result fades back to the gauge 20 seconds after its test ends._
+
+* Fix(android): the service goes to the foreground as soon as it is started. 
+  _A start that arrived while a stop was still closing the core returned
+without calling startForeground, and the stop's stopSelf() then crashed
+the app with "Context.startForegroundService() did not then call
+Service.startForeground()". A normal start called it only after the core
+library was loaded on a background thread, which can miss Android's
+deadline on a slow or busy device.
+
+onStartCommand now calls startForeground itself, on the main thread,
+before anything else. A foreground start that Android refuses from the
+boot receiver, the tile or the shortcut is logged instead of crashing.
+
+Refs #2500_
+
+* Ci: split the build workflow into per-platform workflows and shared actions. 
+  _build.yml was one 950-line matrix job with a condition on nearly every step.
+It is now the orchestrator: codegen, test, one reusable workflow per platform
+(build-android/linux/windows/macos/ios.yml), then the publishing jobs and
+testflight.yml. The steps they share are composite actions: setup-flutter
+(Flutter SDK and version, make install-deps and prepare), apple-signing,
+publish-release (used by the version and the draft release) and
+ios-next-build-number, which now reads pubspec.yaml itself.
+
+Faster runs:
+- build_runner and slang run once, in the codegen job; the tests and every
+  build download the generated code and run make with SKIP_CODEGEN=1.
+- The builds run next to the tests instead of after them. Publishing waits
+  for the tests and every build.
+- The Mac App Store job is not started when nothing is signed.
+- Artifacts are uploaded uncompressed; the draft release no longer clones
+  the full history.
+- No Gradle cache: restoring its 5 GB took 65-185 s of every Android build.
+- prune-caches removes every cache the run did not use.
+
+Fixes:
+- Setup.exe and the MSIX are packaged in separate steps: one PowerShell step
+  reported only the last make, which hid a failed Setup.exe build.
+- A missing Play bundle no longer stops the GitHub release; Google Play is
+  its own job.
+- winget.yml used winget-releaser@2, a ref that does not exist.
+
+Hardening: secrets reach scripts through env instead of being pasted into
+them, third-party actions are pinned to commits and updated by Dependabot,
+every job has a timeout and its own permissions (except release, which keeps
+the caller's grant because of the 403 on v5.2.0)._
+
+* Feat(crash-report): send the report to Hiddify, by email or on Telegram. 
+  _The dialog after a crash had one button, which opened the share sheet (a save dialog on desktop)
+and left the user to find where to send the zip. It now offers:
+
+- Send to Hiddify: the app uploads the zip to Sentry, as the attachment of one event. The user
+  asked for this report, so it goes with analytics off too: Sentry is started for the event and
+  closed again. A build without a DSN does not show the option.
+- Send by email, to bug@hiddify.com, and Send on Telegram, to t.me/hiddify_board. Neither link can
+  carry a file, so the user attaches it: a phone opens the share sheet with the destination in
+  the text (and the mail address in the clipboard); a desktop saves the zip, then opens the mail
+  app or the group.
+
+The logs page's diagnostics report still saves or shares the zip._
+
+* Ci(ios): keep only the newest ios-build tag after each upload run. 
+  _Only the highest ios-build/<version>/<build> tag decides the next iOS
+build number, so after every draft or release run that uploads, remove
+the others._
+
+* Feat(release): one install.sh for macOS and Linux that verifies the download. 
+  _Replaces the Linux all-in-one tarballs (Hiddify-Linux-<cpu>.tar.gz and their install.sh) with an
+installer attached to each release:
+
+    bash <(curl -fsSL https://github.com/hiddify/hiddify-app/releases/download/<tag>/install.sh)
+
+CI fills the template linux/packaging/install.sh with the tag and the SHA-256 of each file it can
+install (.github/scripts/make_installer.sh). The installer finds the system and the CPU, offers
+only the formats this system can install and the release has (asking only when there is more than
+one), downloads that file and refuses it when its SHA-256 differs.
+
+- macOS: Hiddify.app from the disk image into /Applications, without the quarantine flag; a
+  running Hiddify is asked to quit first.
+- Debian/Ubuntu: the .deb or the AppImage; Fedora/RHEL/openSUSE: the .rpm or the AppImage; other
+  systems: the AppImage in ~/.local/bin, with FUSE, GTK 3 and the tray library it needs.
+
+The AppImage files are now Hiddify-Linux-<cpu>.AppImage and Hiddify-Linux-<cpu>.AppImage.tar.gz,
+and the in-app updater looks for the new name. The release table shows Windows and Android first,
+then the installer command in a copyable block, and Linux x64 and Linux ARM64 in rows of their own._
+
+* Fix(ci): record the iOS build numbers in tags instead of asking Apple. 
+  _With an Apple ID no tool on the GitHub runners can list a version's
+builds: altool --build-status takes only an upload's delivery ID in every
+Xcode the runner has, and Transporter is not installed. The TestFlight
+job now tags every build number App Store Connect took as
+ios-build/<version>/<build>, including a number it refused as already
+uploaded, and the next iOS build of that version takes one more than the
+highest tag._
+
+* Fix(ci): read the iOS uploads with Transporter to find the next build number. 
+  _Since Xcode 26.6, altool --build-status only takes the delivery ID of an
+upload, so it can no longer tell whether a build number of a version is
+taken. Transporter's statusAll mode still lists every upload of the app
+with an Apple ID and an app-specific password. Move the lookup into the
+ios-next-build-number action and add a workflow that only runs it, to see
+the next number and Transporter's reply without building._
+
+* Ci(release): update the draft release even when one platform build fails. 
+  _update-draft required every matrix build to succeed, so one failed
+platform (e.g. iOS) left the draft release stale. It now publishes the
+platforms that built, refuses to replace the draft when nothing built,
+and virustotal-draft follows update-draft's own result._
+
+* Fix(ci): find the next iOS build number with the Apple ID login. 
+  _The App Store Connect API key was rejected (HTTP 401), so the iOS build
+stopped before building. Ask altool, signed in with APPLE_UPLOAD_APPLE_ID
+and APPLE_UPLOAD_APP_PASSWORD like the TestFlight upload, for each build
+number of the version from pubspec's upward and take the first one App
+Store Connect does not have. The app's numeric ID comes from the public
+store lookup of its bundle ID._
+
+* Feat(desktop): VPN mode by default, with a clear choice when it needs administrator permission. 
+  _VPN mode is now the default service mode on every platform. On Windows, Linux
+and macOS outside the App Store, the first VPN connect asks for administrator
+permission; the dialog before that prompt now offers both modes side by side,
+in plain words: VPN mode (all apps, needs admin once, recommended) and system
+proxy (browsers and most apps, no admin). Each has a help button with a full
+explanation. Picking system proxy saves it as the mode and goes on with the
+same connect.
+
+While the system prompt is up, a waiting dialog shows the step to take there
+(click Yes on Windows, enter the password on macOS and Linux). Back, or
+refusing or dismissing that prompt, returns to the choice instead of an error:
+the core's permission-denied result, pkexec's dismissal and Stop now raise
+AdminPermissionRefused. The waiting dialog appears in VPN mode only._
+
+* Feat(release): enhance asset catalog with badge color and logo support. 
+
+* Fix(db): recover from a database that can not be opened (#2078) 
+  _The v4 to v5 migration renamed test_url onto profile_override even when an
+older app had lowered the version of a database that already had it, so the
+upgrade failed with "duplicate column name: profile_override". It now checks
+each column first, like the other steps, and a test lowers a current database
+to every older version and upgrades it again.
+
+Any database error at startup now shows a prompt with the error and a Wipe
+data button, instead of a black window. Wiping reads the profile and per-app
+proxy rows from the old file without migrating it, keeps a copy as
+db.broken.sqlite, and adds them back to a fresh database under the same ids,
+so remote and local profiles find their configs again. Configs without a
+readable row come back as local profiles. The newer-version prompt wipes the
+same way._
+
+* Fix(profile): update debug log message when adding a remote profile. 
+
+* Feat(share): send a profile's subscription link from a phone to a TV. 
+  _The Share profile dialog on Android and iOS phones gets a Send to TV button. It
+scans the code the TV shows in its add profile sheet and posts the link to that
+page, where the TV user imports it. Only a code shaped like the TV's (a local
+address, a port and a 6 digit path) is ever sent to, so other codes never count
+against the TV's lock. The scanner can now show a hint under the camera view._
+
+* Fix(profile): fix free config issue on TV screens to improve layout. 
+
+* Fix(qr): scanning a QR code from an image no longer crashes on Android 10+ 
+  _file_picker compressed the picked image into the public Pictures folder, which the app may not
+write to. The image is now read as it is._
+
+* Fix(android): the app no longer crashes when Android starts it without its Application class. 
+  _For an Auto Backup or a restore, Android runs the process with the plain android.app.Application,
+so Application.application and the Go context were never set. Every component now sets them up
+first._
+
+* Fix(android): listing installed apps no longer crashes when an app disappears during the scan. 
+  _Moves from the VB10 fork of installed_apps 1.5.2 to installed_apps 2.2.1, which reads every
+app's details in one pass and reports errors instead of crashing its worker thread._
+
+* Fix(android): the notification no longer crashes when it starts before the core's certificate exists. 
+
+* Feat(build): add script to determine next iOS build number for App Store Connect. 
 
 * Chore(deps): update tray_manager to 0.5.3. 
   _Same API, no Flutter or Dart change. On Windows the tray icon comes back
