@@ -13,15 +13,17 @@ import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/theme/app_theme.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
+import 'package:hiddify/core/utils/low_battery.dart';
 import 'package:hiddify/core/widget/ambient_motion.dart';
-import 'package:hiddify/features/app/widget/animation_cpu_guard.dart';
 import 'package:hiddify/features/app_based_routing/overview/app_based_routing_notifier.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
+import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
 import 'package:hiddify/features/crash_report/notifier/crash_report_notifier.dart';
 import 'package:hiddify/features/profile/notifier/profiles_update_notifier.dart';
@@ -58,7 +60,6 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     setupStateListener(ref);
-    useAnimationCpuGuard(ref);
     final router = ref.watch(goRouterNotiferProvider);
     final locale = ref.watch(localePreferencesProvider);
     final themeMode = ref.watch(themePreferencesProvider);
@@ -102,19 +103,32 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     // and paused already stop the frames. A window without focus, or a minimized
     // one on Wayland (GTK is not told it was minimized, so it is only inactive),
     // keeps updating as usual: connection state, proxies and logs still change.
-    // Only the endless decoration (the light around the connect button) stops
-    // there, through [ambientMotion]. On a phone inactive is a moment under the
-    // notification shade or a system dialog, still on screen.
+    // Only the endless decoration (the light around the connect button, the
+    // chain icons) stops there, through [ambientMotion]; reduce animations
+    // stops it everywhere. On a phone inactive is a moment under the
+    // notification shade or a system dialog, still on screen. Where it may run,
+    // it runs for a while after it starts and after each change of the
+    // connection, then stands still (see [allowAmbientMotion]).
     final lifecycle = useAppLifecycleState();
     final animate = switch (lifecycle) {
       null || AppLifecycleState.resumed || AppLifecycleState.inactive => true,
       AppLifecycleState.hidden || AppLifecycleState.paused || AppLifecycleState.detached => false,
     };
-    final decorate = animate && !(lifecycle == AppLifecycleState.inactive && PlatformUtils.isDesktop);
+    final reduceAnimations = ref.watch(Preferences.reduceAnimations);
+    // a low battery, or battery saver, stops it too
+    final lowBattery = useLowBattery();
+    final decorate =
+        animate &&
+        !reduceAnimations &&
+        !lowBattery &&
+        !(lifecycle == AppLifecycleState.inactive && PlatformUtils.isDesktop);
     useEffect(() {
-      ambientMotion.value = decorate;
+      allowAmbientMotion(decorate);
       return null;
     }, [decorate]);
+    ref.listen(connectionNotifierProvider, (previous, next) {
+      if (previous?.valueOrNull != next.valueOrNull) wakeAmbientMotion();
+    });
     return TickerMode(
       enabled: animate,
       child: WindowWrapper(

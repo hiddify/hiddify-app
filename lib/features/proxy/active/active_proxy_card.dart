@@ -10,6 +10,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
+import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/core/widget/unique_keys_layout.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
@@ -810,14 +811,24 @@ class _Bone extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(color: s.onSurface.withValues(alpha: .12), borderRadius: BorderRadius.circular(radius)),
     );
-    if (MediaQuery.disableAnimationsOf(context)) return bone;
-    return RepaintBoundary(
-      // both loops repaint the bone alone, not the card round it
-      child: bone
-          .animate(onPlay: (c) => c.repeat())
-          .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
-          .animate(onPlay: (c) => c.repeat(reverse: true))
-          .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut),
+    // on the ambient clock: a lookup that never answers keeps it for a long time
+    return AmbientLoop(
+      period: 1300.ms,
+      still: (_) => bone,
+      // the loop repaints the bone alone, not the card round it
+      builder: (context, phase) => RepaintBoundary(
+        child: ValueListenableBuilder<double>(
+          valueListenable: phase,
+          // it fades in and out every 1.8 s, under the sweep every 1.3 s
+          builder: (context, _, child) {
+            final breath = AmbientClock.now % 1.8 / 1.8;
+            return Opacity(opacity: .55 + .45 * Curves.easeInOut.transform(1 - (2 * breath - 1).abs()), child: child);
+          },
+          child: bone
+              .animate(adapter: ValueNotifierAdapter(phase))
+              .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6),
+        ),
+      ),
     );
   }
 }

@@ -295,7 +295,7 @@ class _ConnectionButton extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final still = MediaQuery.disableAnimationsOf(context);
+    final reduced = MediaQuery.disableAnimationsOf(context);
     final scale = _scaleFor(MediaQuery.sizeOf(context).height);
     final clock = useMemoized(() => Stopwatch()..start());
     double now() => clock.elapsedMicroseconds / 1e6;
@@ -336,7 +336,7 @@ class _ConnectionButton extends HookWidget {
     target.value = EclipseTraffic(down: EclipseTraffic.level(download), up: EclipseTraffic.level(upload));
     final traffic = useRef(const EclipseTraffic());
 
-    // Timer (not useSingleTickerProvider): that hook only allows one createTicker
+    // A timer, the AmbientClock's (not useSingleTickerProvider): that hook only allows one createTicker
     // for the State's life, so look/still changes crashed after disconnect→connect.
     // A timer does not stop with its tickers, so it stops itself while the button cannot be
     // seen: under another tab, sheet or route, or with the app not visible. TickerMode says
@@ -346,6 +346,9 @@ class _ConnectionButton extends HookWidget {
     final tickerOn = useValueListenable(TickerMode.getNotifier(context));
     final ambient = useValueListenable(ambientMotion);
     final ticking = tickerOn && ambient;
+    // with reduce animations, and once the endless motion has stopped (10 s after it started, or
+    // the window without focus), the light is a still glow that only steps with the traffic
+    final still = reduced || !ambient;
     // A phone that cannot draw a frame in the 33 ms before the next one drops frames in bursts.
     // Measured, not guessed from the model: such a phone gets a steady 20 or 15 fps of the same
     // frames. A phone that keeps up sees nothing of this.
@@ -361,11 +364,12 @@ class _ConnectionButton extends HookWidget {
     final interval = calm ? _settledIntervals[level] : load.interval;
     final time = useValueNotifier(0.0);
     useEffect(() {
-      // with reduce animations nothing ticks: the light is a still glow that only steps with the traffic
+      // still, nothing ticks
       if (still || !ticking) return null;
       load.watch();
       var last = now();
-      final timer = Timer.periodic(interval, (_) {
+      // on the clock every endless decoration shares, so they all draw in the same frames
+      final unsubscribe = AmbientClock.subscribe(interval, () {
         final at = now();
         // the light rises with the traffic in about a second, and fades more slowly, so the
         // stats reloading for a moment (coming back from the background) barely dims it
@@ -380,7 +384,7 @@ class _ConnectionButton extends HookWidget {
         if (!idle) time.value = at;
       });
       return () {
-        timer.cancel();
+        unsubscribe();
         load.unwatch();
       };
     }, [still, ticking, interval]);
@@ -613,22 +617,37 @@ class _ChainBadge extends StatelessWidget {
         ],
       ),
     );
+    // the loops build from a copy: `glyph` itself becomes the result, and a builder that read it
+    // would build itself over and over
+    final plain = glyph;
     glyph = switch (status) {
-      _ when MediaQuery.disableAnimationsOf(context) => glyph,
+      _ when MediaQuery.disableAnimationsOf(context) => plain,
+      // the loops below never end: they run on the ambient clock, with the button's light, and stop
+      // with it
       // once up, a light sweeps across it now and then
-      StepStatus.connected =>
-        glyph
-            .animate(onPlay: (c) => c.repeat())
+      StepStatus.connected => AmbientLoop(
+        period: 3700.ms,
+        still: (_) => plain,
+        builder: (context, phase) => plain
+            .animate(adapter: ValueNotifierAdapter(phase))
             .shimmer(delay: 2500.ms, duration: 1200.ms, color: Colors.white.withValues(alpha: .7)),
+      ),
       // on its way: the door opening says so; the shield breathes
-      StepStatus.connecting || StepStatus.slow when _type == ChainType.unblocker => glyph,
-      StepStatus.connecting || StepStatus.slow =>
-        glyph
-            .animate(onPlay: (c) => c.repeat(reverse: true))
-            .scaleXY(begin: .92, end: 1.04, duration: 900.ms, curve: Curves.easeInOut),
+      StepStatus.connecting || StepStatus.slow when _type == ChainType.unblocker => plain,
+      StepStatus.connecting || StepStatus.slow => AmbientLoop(
+        period: 1800.ms,
+        still: (_) => plain,
+        builder: (context, phase) => ValueListenableBuilder<double>(
+          valueListenable: phase,
+          // in and out again, 0.9 s each way
+          builder: (context, v, child) =>
+              Transform.scale(scale: .92 + .12 * Curves.easeInOut.transform(1 - (2 * v - 1).abs()), child: child),
+          child: plain,
+        ),
+      ),
       // failed: one short shake to catch the eye
-      StepStatus.failed => glyph.animate().shake(hz: 4, rotation: .06, duration: 500.ms),
-      StepStatus.waiting => glyph,
+      StepStatus.failed => plain.animate().shake(hz: 4, rotation: .06, duration: 500.ms),
+      StepStatus.waiting => plain,
     };
     return Semantics(
       button: true,

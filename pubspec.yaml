@@ -126,6 +126,7 @@ dependencies:
   # Used for registering custom schemes in the Windows registry
   win32: ^5.12.0
   humanizer: ^3.0.1
+  battery_plus: ^7.1.2
 
 dev_dependencies:
   flutter_test:

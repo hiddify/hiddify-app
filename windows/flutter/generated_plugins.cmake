@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
+  battery_plus
   dynamic_color
   screen_retriever_windows
   sentry_flutter

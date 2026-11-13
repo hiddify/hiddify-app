@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -52,31 +53,27 @@ class _OrbitShield extends StatelessWidget {
   final Color light;
 
   @override
-  Widget build(BuildContext context) => MediaQuery.disableAnimationsOf(context)
-      ? Icon(Icons.shield_rounded, size: 17, color: main)
-      : Animate(
-          onPlay: (c) => c.repeat(),
-          effects: [
-            CustomEffect(
-              duration: 8000.ms,
-              builder: (context, v, child) {
-                Widget half({required bool front}) => CustomPaint(
-                  size: const Size.square(22),
-                  painter: _OrbitPainter(angle: v * 2 * pi, front: front, light: light),
-                );
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    half(front: false),
-                    Icon(Icons.shield_rounded, size: 17, color: main),
-                    half(front: true),
-                  ],
-                );
-              },
-            ),
-          ],
-          child: const SizedBox.square(dimension: 22),
+  Widget build(BuildContext context) => AmbientLoop(
+    period: 8000.ms,
+    still: (context) => Icon(Icons.shield_rounded, size: 17, color: main),
+    builder: (context, phase) => ValueListenableBuilder<double>(
+      valueListenable: phase,
+      builder: (context, v, _) {
+        Widget half({required bool front}) => CustomPaint(
+          size: const Size.square(22),
+          painter: _OrbitPainter(angle: v * 2 * pi, front: front, light: light),
         );
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            half(front: false),
+            Icon(Icons.shield_rounded, size: 17, color: main),
+            half(front: true),
+          ],
+        );
+      },
+    ),
+  );
 }
 
 /// One half of the orbit, the one behind the shield or the one in front of it: the ring and the
@@ -157,24 +154,21 @@ class PassingDoor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!animate || MediaQuery.disableAnimationsOf(context)) {
-      return CustomPaint(
-        size: Size.square(size),
-        painter: _DoorPainter(t: null, color: color),
-      );
-    }
-    return Animate(
-      onPlay: (c) => c.repeat(),
-      effects: [
-        CustomEffect(
-          duration: _run.ms,
-          builder: (context, v, child) => CustomPaint(
-            size: Size.square(size),
-            painter: _DoorPainter(t: v * _run / 1000, color: color),
-          ),
+    Widget shut(BuildContext context) => CustomPaint(
+      size: Size.square(size),
+      painter: _DoorPainter(t: null, color: color),
+    );
+    if (!animate) return shut(context);
+    return AmbientLoop(
+      period: _run.ms,
+      still: shut,
+      builder: (context, phase) => ValueListenableBuilder<double>(
+        valueListenable: phase,
+        builder: (context, v, _) => CustomPaint(
+          size: Size.square(size),
+          painter: _DoorPainter(t: v * _run / 1000, color: color),
         ),
-      ],
-      child: SizedBox.square(dimension: size),
+      ),
     );
   }
 }
