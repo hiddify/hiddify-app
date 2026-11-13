@@ -84,7 +84,9 @@ Source: "{{SOURCE_DIR}}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdir
 [Icons]
 Name: "{autoprograms}\{{DISPLAY_NAME}}"; Filename: "{app}\{{EXECUTABLE_NAME}}"
 Name: "{autodesktop}\{{DISPLAY_NAME}}"; Filename: "{app}\{{EXECUTABLE_NAME}}"; Tasks: desktopicon
-Name: "{userstartup}\{{DISPLAY_NAME}}"; Filename: "{app}\{{EXECUTABLE_NAME}}"; WorkingDir: "{app}"; Tasks: launchAtStartup
+; --autostart: when the app's own autostart entry launched a copy first, this one exits without
+; showing that copy's window, which would undo a silent start.
+Name: "{userstartup}\{{DISPLAY_NAME}}"; Filename: "{app}\{{EXECUTABLE_NAME}}"; Parameters: "--autostart"; WorkingDir: "{app}"; Tasks: launchAtStartup
 [Registry]
 ; A "Run as administrator" compatibility layer left on the app's path by an older install (or set
 ; by hand) makes CreateProcess refuse the app with error 740, so the launch at the end of Setup

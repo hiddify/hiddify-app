@@ -16,12 +16,29 @@ class AutoStartNotifier extends _$AutoStartNotifier with InfraLogger {
   Future<bool> build() async {
     if (!PlatformUtils.isDesktop) return false;
     final appInfo = ref.watch(appInfoProvider).requireValue;
+    // Must equal identity_name in windows/packaging/msix/make_config.yaml.
+    const packageName = "Hiddify.App.Win";
+    final isWindowsRegistry = Platform.isWindows && !Platform.resolvedExecutable.contains('WindowsApps');
+    // An entry written by an older version has neither quotes nor --autostart: rewrite it, or
+    // the switch shows off while Windows still launches it, and that launch shows the window.
+    var legacyEntry = false;
+    if (isWindowsRegistry) {
+      launchAtStartup.setup(appName: appInfo.name, appPath: Platform.resolvedExecutable);
+      legacyEntry = await launchAtStartup.isEnabled();
+    }
     launchAtStartup.setup(
       appName: appInfo.name,
-      appPath: Platform.resolvedExecutable,
-      // Must equal identity_name in windows/packaging/msix/make_config.yaml.
-      packageName: "Hiddify.App.Win",
+      // Quoted, as the Run key holds a command line and the path usually has a space in it.
+      appPath: isWindowsRegistry ? '"${Platform.resolvedExecutable}"' : Platform.resolvedExecutable,
+      packageName: packageName,
+      // A second copy launched with it at login leaves the running app's window as it is
+      // (windows/runner/main.cpp), so a silent start stays in the tray.
+      args: Platform.isWindows ? const ['--autostart'] : const [],
     );
+    if (legacyEntry) {
+      loggy.info("rewriting the auto start entry of an older version");
+      await launchAtStartup.enable();
+    }
     final isEnabled = await launchAtStartup.isEnabled();
     loggy.info("auto start is [${isEnabled ? "Enabled" : "Disabled"}]");
     _startTimer();
