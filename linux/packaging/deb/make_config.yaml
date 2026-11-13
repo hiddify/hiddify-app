@@ -13,26 +13,45 @@ dependencies:
   - pkexec | policykit-1
 icon: assets/images/source/ic_launcher_border.png
 
-# Post-installation tasks:
-# 1. Inject StartupWMClass into the system .desktop file for correct icon association
-# 2. Remove conflicting hiddify.desktop files from users' .local directories (cleanup AppImage artifacts)
-# 3. Update the desktop database to apply changes immediately
-postinstall_scripts:
-  - echo "Setting up Hiddify..."
-  - sudo sed -i '/^\[Desktop Entry\]/a StartupWMClass=app.hiddify.com' "/usr/share/applications/hiddify.desktop"
-  - echo "Search and remove hiddify.desktop from .local"
-  - for user_dir in /home/*; do if [ -f "$user_dir/.local/share/applications/hiddify.desktop" ]; then rm -f "$user_dir/.local/share/applications/hiddify.desktop"; echo "Found and removed hiddify.desktop from $user_dir .local"; fi; done
-  - update-desktop-database /usr/share/applications
-  - echo "Hiddify is ready to use :)"
+# Matches the GTK application id (linux/CMakeLists.txt), so the window gets the launcher's icon
+startup_wm_class: app.hiddify.com
 
-# Post-uninstallation tasks:
-# 1. Iterate through all user directories to remove Hiddify configuration and data
-# 2. Clean up root user data to ensure a clean removal
+# fastforge puts its own /usr/bin/hiddify symlink lines before these, outside any case.
+# dpkg runs postinst on every configure (install, upgrade, dpkg-reconfigure), so this only does
+# what is safe to repeat: it drops the per-user launchers the AppImage wrote (marked
+# X-AppImage-Name), which would hide the system one, and leaves every other user file alone.
+postinstall_scripts:
+  - |
+    case "$1" in
+      configure)
+        for desktop in /home/*/.local/share/applications/hiddify.desktop /root/.local/share/applications/hiddify.desktop; do
+          if [ -f "$desktop" ] && grep -q '^X-AppImage-Name=' "$desktop"; then
+            rm -f "$desktop"
+          fi
+        done
+        if command -v update-desktop-database >/dev/null 2>&1; then
+          update-desktop-database -q /usr/share/applications || true
+        fi
+        ;;
+    esac
+
+# dpkg also runs postrm with "upgrade" on every update, so user data (profiles, settings) is
+# removed only on purge. The app keeps it in ~/.local/share/app.hiddify.com, or in
+# ~/.local/share/hiddify when an older version made that one first (path_provider's fallback).
 postuninstall_scripts:
-  - echo "Removing Hiddify user data..."
-  - for user_dir in /home/*; do if [ -d "$user_dir/.local/share/hiddify" ]; then rm -rf "$user_dir/.local/share/hiddify"; echo "Removed data from $user_dir"; fi; done
-  - rm -rf /root/.local/share/hiddify
-  - echo "Hiddify data cleanup complete."
+  - |
+    case "$1" in
+      purge)
+        for data_home in /home/*/.local/share /root/.local/share; do
+          rm -rf "$data_home/app.hiddify.com" "$data_home/hiddify"
+        done
+        ;;
+      remove)
+        if command -v update-desktop-database >/dev/null 2>&1; then
+          update-desktop-database -q /usr/share/applications || true
+        fi
+        ;;
+    esac
 
 keywords:
   - Hiddify
