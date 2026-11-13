@@ -341,7 +341,11 @@ class _ConnectionButton extends HookWidget {
     // A timer does not stop with its tickers, so it stops itself while the button cannot be
     // seen: under another tab, sheet or route, or with the app not visible. TickerMode says
     // both; App turns it off for the whole app when the app is not visible.
-    final ticking = useValueListenable(TickerMode.getNotifier(context)) && useValueListenable(ambientMotion);
+    // both hooks run on every build: `a && b` would skip the second while TickerMode is off and
+    // shift every hook after it, so returning to home threw and showed a grey box
+    final tickerOn = useValueListenable(TickerMode.getNotifier(context));
+    final ambient = useValueListenable(ambientMotion);
+    final ticking = tickerOn && ambient;
     // A phone that cannot draw a frame in the 33 ms before the next one drops frames in bursts.
     // Measured, not guessed from the model: such a phone gets a steady 20 or 15 fps of the same
     // frames. A phone that keeps up sees nothing of this.
