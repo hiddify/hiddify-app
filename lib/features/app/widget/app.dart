@@ -19,6 +19,7 @@ import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
 import 'package:hiddify/core/theme/app_theme.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
+import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/features/app_based_routing/overview/app_based_routing_notifier.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
@@ -98,15 +99,22 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     }, [activeBreakpoint]);
     // Animations stop while the app cannot be seen: they kept a CPU core busy
     // and drained laptop batteries with the window in the background. Hidden
-    // and paused already stop the frames, but on Wayland a minimized window is
-    // only inactive (GTK is not told it was minimized), as is a window without
-    // focus, so on desktop inactive stops them too. On a phone inactive is a
-    // moment under the notification shade or a system dialog, still on screen.
-    final animate = switch (useAppLifecycleState()) {
-      null || AppLifecycleState.resumed => true,
-      AppLifecycleState.inactive => !PlatformUtils.isDesktop,
+    // and paused already stop the frames. A window without focus, or a minimized
+    // one on Wayland (GTK is not told it was minimized, so it is only inactive),
+    // keeps updating as usual: connection state, proxies and logs still change.
+    // Only the endless decoration (the light around the connect button) stops
+    // there, through [ambientMotion]. On a phone inactive is a moment under the
+    // notification shade or a system dialog, still on screen.
+    final lifecycle = useAppLifecycleState();
+    final animate = switch (lifecycle) {
+      null || AppLifecycleState.resumed || AppLifecycleState.inactive => true,
       AppLifecycleState.hidden || AppLifecycleState.paused || AppLifecycleState.detached => false,
     };
+    final decorate = animate && !(lifecycle == AppLifecycleState.inactive && PlatformUtils.isDesktop);
+    useEffect(() {
+      ambientMotion.value = decorate;
+      return null;
+    }, [decorate]);
     return TickerMode(
       enabled: animate,
       child: WindowWrapper(

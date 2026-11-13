@@ -9,6 +9,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
+import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
 import 'package:hiddify/core/widget/frame_load.dart';
 import 'package:hiddify/core/widget/unique_keys_layout.dart';
@@ -332,7 +333,7 @@ class _ConnectionButton extends HookWidget {
     // A timer does not stop with its tickers, so it stops itself while the button cannot be
     // seen: under another tab, sheet or route, or with the app not visible. TickerMode says
     // both; App turns it off for the whole app when the app is not visible.
-    final ticking = useValueListenable(TickerMode.getNotifier(context));
+    final ticking = useValueListenable(TickerMode.getNotifier(context)) && useValueListenable(ambientMotion);
     // A phone that cannot draw a frame in the 33 ms before the next one drops frames in bursts.
     // Measured, not guessed from the model: such a phone gets a steady 20 or 15 fps of the same
     // frames. A phone that keeps up sees nothing of this.
