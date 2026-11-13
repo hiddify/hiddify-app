@@ -130,7 +130,13 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
         () => container.read(connectionNotifierProvider.notifier).restoreConnectionOnStartup(),
         timeout: 5000,
       );
-      await _safeInit("system tray", () => container.read(systemTrayNotifierProvider.future), timeout: 1000);
+      // nothing at start waits for the tray: it rebuilds on every connection change, and a
+      // connection restored just above keeps it rebuilding for a while (it used to time out here)
+      container.listen(systemTrayNotifierProvider, (_, next) {
+        if (next case AsyncError(:final error, :final stackTrace)) {
+          Logger.bootstrap.error("[system tray] error", error, stackTrace);
+        }
+      }, fireImmediately: true);
     }
 
     if (PlatformUtils.isAndroid) {
