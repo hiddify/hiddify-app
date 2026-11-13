@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 /// [wakeAmbientMotion], then stands still: an endless loop costs a frame many times a second for
 /// as long as the app stays connected, which even a fast laptop shows in its CPU use.
 ///
-/// Never while a desktop window has no focus, while reduce animations is on, or while the battery
+/// Never while a desktop window has no focus, or while the battery
 /// is low or saving power. Desktop windows without focus keep updating (connection state, proxies,
 /// logs), so TickerMode stays on for them; only these loops stop.
 final ValueNotifier<bool> ambientMotion = ValueNotifier(false);
@@ -20,8 +20,12 @@ const ambientFor = Duration(seconds: 10);
 bool _ambientAllowed = false;
 Timer? _ambientSleep;
 
-/// Whether endless decoration may run at all: the app is seen (a desktop window has focus), reduce
-/// animations is off, the battery is fine. Becoming allowed starts it for [ambientFor].
+/// Whether endless decoration may run at all (see [allowAmbientMotion]), though it may have stopped
+/// for now.
+bool get ambientMotionAllowed => _ambientAllowed;
+
+/// Whether endless decoration may run at all: the app is seen (a desktop window has focus), the
+/// battery is fine. Becoming allowed starts it for [ambientFor].
 void allowAmbientMotion(bool allowed) {
   if (allowed == _ambientAllowed) return;
   _ambientAllowed = allowed;

@@ -24,6 +24,8 @@ on:
 env:
   CHANNEL: ${{ inputs.channel }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+  # an age public key (age1…): reports sent to Hiddify are encrypted to it, see docs/diagnostics-encryption.md
+  DIAGNOSTICS_PUBLIC_KEY: ${{ vars.DIAGNOSTICS_PUBLIC_KEY || secrets.DIAGNOSTICS_PUBLIC_KEY }}
 
 jobs:
   build:

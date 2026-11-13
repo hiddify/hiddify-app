@@ -376,7 +376,8 @@
       "coreLogLevelMsg": "Takes effect after reconnecting",
       "buffer": "Buffer",
       "diagnostics": "Diagnostics report",
-      "diagnosticsMsg": "Crash reports, logs and your settings without servers or passwords, as one zip"
+      "diagnosticsMsg": "Send or save crash reports, logs, connection state and your settings without servers or passwords",
+      "fullReport": "Full report"
     },
     "about": {
       "title": "About",
@@ -386,7 +387,9 @@
       "sourceCode": "Source code",
       "telegramChannel": "Telegram channel",
       "termsAndConditions": "Terms and conditions",
-      "privacyPolicy": "Privacy policy"
+      "privacyPolicy": "Privacy policy",
+      "reportProblem": "Report a problem",
+      "reportProblemMsg": "Send the logs and app state to the developers"
     },
     "settings": {
       "title": "Settings",
@@ -418,7 +421,7 @@
         "enableAnalyticsMsg": "Send analytics and crash reports from your device to help improve the app",
         "autoIpCheck": "Automatically check connection IP",
         "reduceAnimations": "Reduce animations",
-        "reduceAnimationsMsg": "Keep the connect button still and stop repeating effects, to save battery",
+        "reduceAnimationsMsg": "Keep the light around the connect button still while connected, to save battery",
         "dynamicNotification": "Display speed in notification",
         "hapticFeedback": "Haptic feedback",
         "alwaysOnVpn": "Always-on VPN",
@@ -1121,14 +1124,50 @@
       "msg": "Send a report to the developers so this gets fixed? It holds the crash details, the logs and your configuration with servers, keys and passwords removed, as one zip file you can look at before sending.",
       "sendHiddify": "Send to Hiddify",
       "sendHiddifyMsg": "The app uploads the report itself",
+      "sendHiddifyEncryptedMsg": "The app encrypts and uploads it itself",
       "sendEmail": "Send by email",
       "sendTelegram": "Send on Telegram",
       "sent": "Report sent. Thank you!",
       "sendFailed": "Could not send the report. Try email or Telegram instead.",
       "subject": "Hiddify crash report",
-      "shareText": "Hiddify crash report, for $to",
-      "addressCopied": "$address copied: paste it as the recipient",
-      "attachHint": "Attach the saved file $file to your message"
+      "problemTitle": "Report a problem",
+      "problemMsg": "Tell the developers what went wrong. The report holds the logs, the app and connection state and your settings with servers, keys and passwords removed, as one zip file you can look at before sending.",
+      "description": "What happened? (optional)",
+      "descriptionHint": "What you did, what you expected, what you saw instead",
+      "saveFile": "Save the file",
+      "saveFileMsg": "Look at it, or send it yourself",
+      "problemSubject": "Hiddify problem report",
+      "back": "Back",
+      "chooseHow": "How do you want to send it?",
+      "sendGithub": "Open a GitHub issue",
+      "sendGithubMsg": "Public: anyone can see it",
+      "steps": {
+        "prepare": "Prepare the report",
+        "preparing": "Collecting logs and settings…",
+        "prepareFailed": "Could not prepare the report. Go back and try again.",
+        "upload": "Upload it to Hiddify",
+        "uploading": "Uploading…",
+        "save": "Save the report",
+        "saveDesktopMsg": "Choose where to keep it",
+        "saveMobileMsg": "In the menu, pick Save to Files or Downloads",
+        "openBot": "Open the support bot and tap Start",
+        "openBotButton": "Open bot",
+        "openMail": "Open your mail app",
+        "openMailMsg": "A new message to $address with the subject filled in",
+        "openMailButton": "Open mail",
+        "attachSend": "Attach the report to the new message and send it",
+        "githubPublic": "GitHub issues are public: anyone can read the issue and download the file. Use Telegram or email to keep it private.",
+        "openGithub": "Open a new GitHub issue",
+        "openGithubMsg": "Sign in to GitHub. Your description, platform, version and system are filled in.",
+        "openGithubButton": "Open GitHub",
+        "dropInIssue": "Attach the report and press Create",
+        "telegramPrivate": "Private: only the Hiddify support team sees the report.",
+        "emailPrivate": "Private: only the Hiddify team reads the report.",
+        "attachInChat": "Attach the report in the bot chat and send it",
+        "attachHow": "Drag the file in, or use the paperclip",
+        "dropInIssueHow": "Drag the file into Additional Context, or tap the bar under that box",
+        "hiddifyEncrypted": "Encrypted on this device: only the Hiddify team can open it."
+      }
     },
     "keepTop": {
       "title": "A big subscription",
@@ -1220,6 +1259,11 @@
       "wipeData": "Wipe data",
       "wipeConfirm": "The saved data is wiped and Hiddify starts again. Profiles that can still be read are added back; the rest can't be recovered.",
       "copyError": "Copy error"
+    },
+    "telegramChannel": {
+      "title": "Join Hiddify on Telegram",
+      "msg": "Follow the official Hiddify channel for news, new releases and tips to stay connected.",
+      "join": "Join channel"
     }
   },
   "connection": {

@@ -404,7 +404,7 @@
         "enableAnalyticsMsg": "从您的设备发送分析数据和崩溃报告，帮助改进应用",
         "autoIpCheck": "自动检查连接 IP",
         "reduceAnimations": "减少动画",
-        "reduceAnimationsMsg": "连接按钮保持静止并停止循环效果，以节省电量",
+        "reduceAnimationsMsg": "已连接时，连接按钮周围的光效保持静止，以节省电量",
         "dynamicNotification": "在通知中显示速度",
         "hapticFeedback": "触觉反馈",
         "alwaysOnVpn": "始终开启 VPN",
@@ -1195,6 +1195,11 @@
       "wipeData": "清除数据",
       "wipeConfirm": "已保存的数据将被清除，Hiddify 会重新开始。仍可读取的配置文件会重新添加；其余的无法恢复。",
       "copyError": "复制错误"
+    },
+    "telegramChannel": {
+      "title": "加入 Hiddify Telegram 频道",
+      "msg": "关注 Hiddify 官方频道，获取新闻、新版本和保持连接的技巧。",
+      "join": "加入频道"
     }
   },
   "connection": {

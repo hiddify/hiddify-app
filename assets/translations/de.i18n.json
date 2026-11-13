@@ -404,7 +404,7 @@
         "enableAnalyticsMsg": "Analyse- und Absturzberichte von Ihrem Gerät senden, um die App zu verbessern",
         "autoIpCheck": "IP der Verbindung automatisch prüfen",
         "reduceAnimations": "Animationen reduzieren",
-        "reduceAnimationsMsg": "Die Verbindungstaste ruhig halten und sich wiederholende Effekte stoppen, um Akku zu sparen",
+        "reduceAnimationsMsg": "Das Licht um die Verbindungstaste bleibt bei bestehender Verbindung ruhig, um Akku zu sparen",
         "dynamicNotification": "Geschwindigkeit in der Benachrichtigung anzeigen",
         "hapticFeedback": "Haptisches Feedback",
         "alwaysOnVpn": "Always-on-VPN",

@@ -109,6 +109,14 @@ class AboutPage extends HookConsumerWidget {
               ...conditionalTiles,
               if (conditionalTiles.isNotEmpty) const Divider(),
               ListTile(
+                title: Text(t.pages.about.reportProblem),
+                subtitle: Text(t.pages.about.reportProblemMsg),
+                trailing: const Icon(FluentIcons.chat_warning_24_regular),
+                onTap: () async {
+                  await ref.read(dialogNotifierProvider.notifier).showReportProblem();
+                },
+              ),
+              ListTile(
                 title: Text(t.pages.about.sourceCode),
                 trailing: const Icon(FluentIcons.open_24_regular),
                 onTap: () async {

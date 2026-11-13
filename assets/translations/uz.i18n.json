@@ -404,7 +404,7 @@
         "enableAnalyticsMsg": "Ilovani yaxshilashga yordam berish uchun qurilmangizdan analitika va ishdan chiqish hisobotlarini yuborish",
         "autoIpCheck": "Ulanish IP manzilini avtomatik tekshirish",
         "reduceAnimations": "Animatsiyalarni kamaytirish",
-        "reduceAnimationsMsg": "Batareyani tejash uchun ulanish tugmasini harakatsiz qoldirish va takrorlanuvchi effektlarni to‘xtatish",
+        "reduceAnimationsMsg": "Batareyani tejash uchun ulangan paytda ulanish tugmasi atrofidagi yorug‘likni harakatsiz qoldirish",
         "dynamicNotification": "Bildirishnomada tezlikni ko‘rsatish",
         "hapticFeedback": "Tebranish bilan javob",
         "alwaysOnVpn": "Doim yoqilgan VPN",

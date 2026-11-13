@@ -136,11 +136,12 @@ class ConnectionButton extends HookConsumerWidget {
         _ => Assets.images.disconnectNorouz,
       },
       useImage: today.day >= 19 && today.day <= 23 && today.month == 3,
+      // reduce animations stills only the light flowing round the button while connected; the
+      // radar, the connecting and disconnecting waves keep moving. The system's reduce motion
+      // stills the whole button.
+      reduceFlow: ref.watch(Preferences.reduceAnimations),
     );
-    // reduce animations stills the connect button alone; the rest of the app follows the system's
-    // reduce motion, which the button follows too
-    if (!ref.watch(Preferences.reduceAnimations)) return button;
-    return MediaQuery(data: MediaQuery.of(context).copyWith(disableAnimations: true), child: button);
+    return button;
   }
 
   /// Coming back from the background, the app sets the core up again, and for a moment the status
@@ -223,6 +224,7 @@ class _ConnectionButton extends HookWidget {
     required this.buttonColor,
     required this.image,
     required this.useImage,
+    required this.reduceFlow,
   });
 
   final _Look look;
@@ -252,6 +254,11 @@ class _ConnectionButton extends HookWidget {
   final Color buttonColor;
   final AssetGenImage image;
   final bool useImage;
+
+  /// Reduce animations: while connected, the light round the button is a still glow that only
+  /// steps with the traffic, and the logo stops breathing once it has settled. The other looks
+  /// keep their motion.
+  final bool reduceFlow;
 
   static const _size = 148.0;
 
@@ -344,11 +351,21 @@ class _ConnectionButton extends HookWidget {
     // both hooks run on every build: `a && b` would skip the second while TickerMode is off and
     // shift every hook after it, so returning to home threw and showed a grey box
     final tickerOn = useValueListenable(TickerMode.getNotifier(context));
-    final ambient = useValueListenable(ambientMotion);
+    // a new look plays its motion even after the endless motion has stopped: the chain hop coming
+    // up after a long wait changes the look but not the connection. The wake comes after the frame,
+    // since it rebuilds everything else that moves; this frame already moves where it may
+    final lookChanged = usePrevious(eclipseLook) != eclipseLook;
+    useEffect(() {
+      WidgetsBinding.instance.addPostFrameCallback((_) => wakeAmbientMotion());
+      return null;
+    }, [eclipseLook]);
+    final ambient = useValueListenable(ambientMotion) || (lookChanged && ambientMotionAllowed);
     final ticking = tickerOn && ambient;
     // with reduce animations, and once the endless motion has stopped (10 s after it started, or
     // the window without focus), the light is a still glow that only steps with the traffic
     final still = reduced || !ambient;
+    // reduce animations: connected shows the still glow, after its own connect motion has played
+    final flowStill = reduceFlow && eclipseLook == EclipseLook.connected;
     // A phone that cannot draw a frame in the 33 ms before the next one drops frames in bursts.
     // Measured, not guessed from the model: such a phone gets a steady 20 or 15 fps of the same
     // frames. A phone that keeps up sees nothing of this.
@@ -360,12 +377,14 @@ class _ConnectionButton extends HookWidget {
     // changes between looks keep 30. Each frame of the light costs the most of anything on the
     // page, so this is a third less of it for as long as the app stays connected.
     final settled = useValueNotifier(false);
-    final calm = useValueListenable(settled);
+    // settled belongs to the look before until the next tick: a new look is never calm, or going
+    // from a long wait to connected stopped the clock on the connect motion's first frame
+    final calm = useValueListenable(settled) && now() - change.value.at > _settleAfter;
     final interval = calm ? _settledIntervals[level] : load.interval;
     final time = useValueNotifier(0.0);
     useEffect(() {
-      // still, nothing ticks
-      if (still || !ticking) return null;
+      // still, nothing ticks; nor once connected has settled with the flowing light reduced
+      if (still || !ticking || (flowStill && calm)) return null;
       load.watch();
       var last = now();
       // on the clock every endless decoration shares, so they all draw in the same frames
@@ -387,7 +406,7 @@ class _ConnectionButton extends HookWidget {
         unsubscribe();
         load.unwatch();
       };
-    }, [still, ticking, interval]);
+    }, [still, ticking, interval, flowStill && calm]);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -438,12 +457,12 @@ class _ConnectionButton extends HookWidget {
                                     ),
                                     radius: _size / 2,
                                     // in steps, so it repaints only when the traffic changes a lot
-                                    traffic: still ? _stepped(target.value) : traffic.value,
+                                    traffic: still || flowStill ? _stepped(target.value) : traffic.value,
                                     dark: theme.brightness == Brightness.dark,
                                     drawLogo: !useImage,
                                     logoOpacity: look == _Look.loading ? .38 : 1,
                                     pixelRatio: MediaQuery.devicePixelRatioOf(context),
-                                    simple: still,
+                                    simple: still || flowStill,
                                   ),
                                 );
                               },

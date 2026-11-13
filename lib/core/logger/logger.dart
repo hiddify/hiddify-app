@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:hiddify/core/logger/crash/app_crash_store.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 
 // Re-exported so every file that already imports this one also gets the short
@@ -36,7 +37,9 @@ class Logger {
     final library = details.library ?? 'unknown library';
     final context = details.context == null ? '' : ' ${details.context}';
 
-    app.error('Flutter error in $library$context: ${details.exceptionAsString()}', details.exception, details.stack);
+    final message = 'Flutter error in $library$context: ${details.exceptionAsString()}';
+    app.error(message, details.exception, details.stack);
+    recordAppCrash('dart', _crashText(message, details.stack));
   }
 
   /// Errors that never touched a widget — an unawaited future, a timer, a
@@ -46,6 +49,11 @@ class Logger {
   /// killed.
   static bool logPlatformDispatcherError(Object error, StackTrace stackTrace) {
     app.error('PlatformDispatcherError: $error', error, stackTrace);
+    recordAppCrash('dart', _crashText('Uncaught ${error.runtimeType}: $error', stackTrace));
     return true;
   }
+
+  /// What a report shows of an error: its first line is the headline, the stack follows in full.
+  static String _crashText(String message, StackTrace? stack) =>
+      '$message\n\ntime: ${DateTime.now().toUtc().toIso8601String()}\n\n${stack ?? '(no stack trace)'}\n';
 }

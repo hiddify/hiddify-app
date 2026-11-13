@@ -12,6 +12,7 @@ import 'package:hiddify/core/db/provider/db_providers.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/logger/crash/app_crash_store.dart';
 import 'package:hiddify/core/logger/logger.dart';
 import 'package:hiddify/core/logger/logger_setup.dart';
 import 'package:hiddify/core/model/environment.dart';
@@ -28,7 +29,6 @@ import 'package:hiddify/features/log/data/log_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/features/settings/data/config_option_repository.dart';
 import 'package:hiddify/features/system_tray/notifier/system_tray_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/hiddifycore/hiddify_core_service_provider.dart';
@@ -55,6 +55,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   await _init("directories", () => container.read(appDirectoriesProvider.future));
   // phase 2 — the folders exist, so app.log can be opened
   logAddFile(container.read(logPathResolverProvider).appFile().path);
+  openAppCrashStore(container.read(appDirectoriesProvider).requireValue.workingDir.path);
 
   final appInfo = await _init("app info", () => container.read(appInfoProvider.future));
   await _init("preferences", () => container.read(sharedPreferencesProvider.future));
@@ -78,10 +79,6 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     }
   });
 
-  // The log level decides this now. There is no second debug switch to keep in
-  // sync, and the core reaches the same conclusion from the same value.
-  final debug = kDebugMode || container.read(ConfigOptions.logLevel).isVerbose;
-
   if (PlatformUtils.isDesktop) {
     await _init("window controller", () => container.read(windowNotifierProvider.future));
 
@@ -94,9 +91,10 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     }
     await _init("auto start service", () => container.read(autoStartNotifierProvider.future));
   }
-  // phase 3 — a log file is worth its cost on desktop, or while debugging.
-  // On a phone in release it only burns storage nobody reads.
-  await _init("logging", () async => logFinish(keepFile: debug || PlatformUtils.isDesktop));
+  // phase 3 — the file is kept everywhere: after a crash, it is the only log
+  // of the run that crashed, and the report sends it. Only errors reach it,
+  // and it is cut back when it grows.
+  await _init("logging", () async => logFinish(keepFile: true));
 
   // marks where this run begins, since the file now spans several
   logMarkRun(appInfo.format());

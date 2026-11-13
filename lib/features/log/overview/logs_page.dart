@@ -7,6 +7,7 @@ import 'package:hiddify/core/logger/ring/log_ring.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
+import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/log/model/log_level.dart' as engine;
 import 'package:hiddify/features/log/overview/logs_overview_notifier.dart';
@@ -24,7 +25,7 @@ const _bottomSlack = 24.0;
 ///
 /// Window width, not the bar's own — that is how the rest of the app states a
 /// breakpoint, and the bar is narrower than the window by the nav rail.
-const _oneRowMinWindowWidth = 700.0;
+const _oneRowMinWindowWidth = 820.0;
 
 class LogsPage extends ConsumerStatefulWidget {
   const LogsPage({super.key});
@@ -142,6 +143,18 @@ class _LogsPageState extends ConsumerState<LogsPage> with PresLogger {
             search: _search,
             onSearch: notifier.filterText,
             showCoreLevel: true,
+            // one tap to the developers: these logs with everything else that explains them
+            action: FilledButton.tonalIcon(
+              onPressed: () => ref.read(dialogNotifierProvider.notifier).showReportProblem(),
+              icon: const Icon(FluentIcons.chat_warning_20_regular, size: 16),
+              label: Text(t.pages.logs.fullReport),
+              style: FilledButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                textStyle: Theme.of(context).textTheme.labelMedium,
+              ),
+            ),
           ),
         ],
       ),
@@ -246,6 +259,7 @@ class LogFilterBar extends ConsumerWidget {
     this.search,
     this.onSearch,
     this.showCoreLevel = false,
+    this.action,
   });
 
   final LogCategory? category;
@@ -261,6 +275,9 @@ class LogFilterBar extends ConsumerWidget {
   /// Also left out by the share sheet: it decides what to send from what has
   /// already been recorded, and cannot change what the core records.
   final bool showCoreLevel;
+
+  /// Shown between the search field and the chips: the page's way to the full report.
+  final Widget? action;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -304,6 +321,7 @@ class LogFilterBar extends ConsumerWidget {
               children: [
                 Expanded(child: _search(theme, t)),
                 const SizedBox(width: 8),
+                if (action case final action?) ...[action, const SizedBox(width: 8)],
                 ...chips,
               ],
             )
@@ -312,7 +330,14 @@ class LogFilterBar extends ConsumerWidget {
               children: [
                 _search(theme, t),
                 const SizedBox(height: 8),
-                Wrap(crossAxisAlignment: WrapCrossAlignment.center, runSpacing: 6, children: chips),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  runSpacing: 6,
+                  children: [
+                    if (action case final action?) ...[action, const SizedBox(width: 6)],
+                    ...chips,
+                  ],
+                ),
               ],
             ),
     );

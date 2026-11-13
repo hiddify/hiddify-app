@@ -38,6 +38,10 @@ import 'package:upgrader/upgrader.dart';
 bool _debugAccessibility = false;
 bool isOnPauseCalled = false;
 
+const _telegramOfferDelay = Duration(minutes: 2);
+const _telegramFirstOfferAfter = Duration(days: 3);
+const _telegramOfferEvery = Duration(days: 30);
+
 class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   const App({super.key});
 
@@ -88,7 +92,26 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
               canIgnore: true,
             );
       });
-      return updateCheck.cancel;
+      // the Telegram channel is offered a few days after the first use, then once a month,
+      // some minutes into a run so it does not meet the update or crash report dialogs
+      final telegramOffer = Timer(_telegramOfferDelay, () async {
+        if (!ref.read(Preferences.introCompleted)) return;
+        final now = DateTime.now();
+        final firstUsed = ref.read(Preferences.firstUsedAt);
+        if (firstUsed == null) {
+          await ref.read(Preferences.firstUsedAt.notifier).update(now);
+          return;
+        }
+        if (now.difference(firstUsed) < _telegramFirstOfferAfter) return;
+        final offered = ref.read(Preferences.telegramChannelOfferedAt);
+        if (offered != null && now.difference(offered) < _telegramOfferEvery) return;
+        await ref.read(Preferences.telegramChannelOfferedAt.notifier).update(now);
+        await ref.read(dialogNotifierProvider.notifier).showTelegramChannel();
+      });
+      return () {
+        updateCheck.cancel();
+        telegramOffer.cancel();
+      };
     }, const []);
 
     // updating ActiveBreakpointNotifier value
@@ -104,8 +127,9 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     // one on Wayland (GTK is not told it was minimized, so it is only inactive),
     // keeps updating as usual: connection state, proxies and logs still change.
     // Only the endless decoration (the light around the connect button, the
-    // chain icons) stops there, through [ambientMotion]; reduce animations
-    // stops it everywhere. On a phone inactive is a moment under the
+    // chain icons) stops there, through [ambientMotion]. Reduce animations
+    // does not stop it: it only stills the connect button's flowing light
+    // (see ConnectionButton). On a phone inactive is a moment under the
     // notification shade or a system dialog, still on screen. Where it may run,
     // it runs for a while after it starts and after each change of the
     // connection, then stands still (see [allowAmbientMotion]).
@@ -114,12 +138,10 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
       null || AppLifecycleState.resumed || AppLifecycleState.inactive => true,
       AppLifecycleState.hidden || AppLifecycleState.paused || AppLifecycleState.detached => false,
     };
-    final reduceAnimations = ref.watch(Preferences.reduceAnimations);
     // a low battery, or battery saver, stops it too
     final lowBattery = useLowBattery();
     final decorate =
         animate &&
-        !reduceAnimations &&
         !lowBattery &&
         !(lifecycle == AppLifecycleState.inactive && PlatformUtils.isDesktop);
     useEffect(() {

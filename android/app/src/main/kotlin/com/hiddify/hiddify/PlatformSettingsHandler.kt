@@ -48,6 +48,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             GetPackagesIcon("get_package_icon"),
             IsTelevision("is_television"),
             SupportedAbis("supported_abis"),
+            OsVersion("os_version"),
             InstallApk("install_apk"),
             CanInstallApks("can_install_apks"),
         }
@@ -202,6 +203,11 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
 
             Trigger.SupportedAbis.method -> {
                 result.runCatching { success(Build.SUPPORTED_ABIS.toList()) }
+            }
+
+            // the release a person knows ("14"): Dart's operatingSystemVersion is the build id
+            Trigger.OsVersion.method -> {
+                result.runCatching { success(Build.VERSION.RELEASE) }
             }
 
             // Whether this app may start the system installer, without opening its settings page.

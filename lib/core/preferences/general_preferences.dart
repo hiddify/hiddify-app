@@ -126,6 +126,22 @@ abstract class Preferences {
 
   static final storeReviewedByUser = PreferencesNotifier.create<bool, bool>("store_reviewed_by_user", false);
 
+  /// When this install first ran past the intro, so the Telegram channel is offered only after a while of use.
+  static final firstUsedAt = PreferencesNotifier.create<DateTime?, String?>(
+    "first_used_at",
+    null,
+    mapFrom: (value) => value == null ? null : DateTime.tryParse(value),
+    mapTo: (value) => value?.toIso8601String(),
+  );
+
+  /// When the Telegram channel was last offered: it is offered again a month later.
+  static final telegramChannelOfferedAt = PreferencesNotifier.create<DateTime?, String?>(
+    "telegram_channel_offered_at",
+    null,
+    mapFrom: (value) => value == null ? null : DateTime.tryParse(value),
+    mapTo: (value) => value?.toIso8601String(),
+  );
+
   static final actionAtClose = PreferencesNotifier.create<ActionsAtClosing, String>(
     "action_at_close",
     ActionsAtClosing.ask,

@@ -404,7 +404,7 @@
         "enableAnalyticsMsg": "Tətbiqin yaxşılaşmasına kömək üçün cihazınızdan analitika və çökmə hesabatları göndər",
         "autoIpCheck": "Bağlantı IP-sini avtomatik yoxla",
         "reduceAnimations": "Animasiyaları azalt",
-        "reduceAnimationsMsg": "Batareyaya qənaət üçün qoşulma düyməsini sabit saxla və təkrarlanan effektləri dayandır",
+        "reduceAnimationsMsg": "Batareyaya qənaət üçün qoşulu olarkən qoşulma düyməsinin ətrafındakı işığı sabit saxla",
         "dynamicNotification": "Sürəti bildirişdə göstər",
         "hapticFeedback": "Titrəyişli əks-əlaqə",
         "alwaysOnVpn": "Həmişə aktiv VPN",

@@ -20,20 +20,14 @@ body:
       options:
         - label: I searched and no similar issues were found
           required: true
-  - type: dropdown
+  # a text field, not a dropdown: the app's problem report fills it from the issue link, which
+  # GitHub does for text fields only
+  - type: input
     id: platform
     attributes:
       label: Platform/OS
       description: What platform are you seeing the problem on?
-      multiple: true
-      options:
-        - Android
-        - Windows
-        - macOS
-        - Linux
-        - Android TV
-        - iOS
-        - HiddifyCli (Core)
+      placeholder: "Android, Android TV, Windows, macOS, Linux, iOS or HiddifyCli (Core)"
     validations:
       required: true
   - type: input

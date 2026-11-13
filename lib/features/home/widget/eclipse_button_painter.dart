@@ -113,8 +113,9 @@ class EclipseButtonPainter extends CustomPainter {
   /// The screen's device pixels per logical pixel; the glow is drawn at half of it.
   final double pixelRatio;
 
-  /// Reduce animations: the light round the button is only two still soft glows sized by the
-  /// traffic, without rays, flares, sparks or blur, and the logo keeps still.
+  /// Reduce animations (connected only) or the system's reduce motion: the light round the button
+  /// is only two still soft glows sized by the traffic, without rays, flares, sparks or blur, and
+  /// the logo keeps still.
   final bool simple;
 
   static const _fade = .35;

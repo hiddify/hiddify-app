@@ -404,7 +404,7 @@
         "enableAnalyticsMsg": "앱 개선에 도움이 되도록 기기의 분석 데이터와 충돌 보고서를 보냅니다",
         "autoIpCheck": "연결 IP 자동 확인",
         "reduceAnimations": "애니메이션 줄이기",
-        "reduceAnimationsMsg": "배터리를 아끼기 위해 연결 버튼을 움직이지 않고 반복 효과를 멈춥니다",
+        "reduceAnimationsMsg": "배터리를 아끼기 위해 연결된 동안 연결 버튼 주위의 빛을 멈춥니다",
         "dynamicNotification": "알림에 속도 표시",
         "hapticFeedback": "햅틱 피드백",
         "alwaysOnVpn": "상시 VPN",

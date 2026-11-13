@@ -404,7 +404,7 @@
         "enableAnalyticsMsg": "መተግበሪያውን ለማሻሻል እንዲረዳ ትንታኔና የብልሽት ሪፖርቶችን ከመሣሪያዎ ይላኩ",
         "autoIpCheck": "የግንኙነት IP በራስ-ሰር ፈትሽ",
         "reduceAnimations": "እንቅስቃሴዎችን ቀንስ",
-        "reduceAnimationsMsg": "ባትሪ ለመቆጠብ የመገናኛ አዝራሩን ዝም ያድርጉና ተደጋጋሚ ውጤቶችን ያቁሙ",
+        "reduceAnimationsMsg": "ባትሪ ለመቆጠብ ሲገናኙ በመገናኛ አዝራሩ ዙሪያ ያለውን ብርሃን ዝም ያድርጉ",
         "dynamicNotification": "ፍጥነትን በማሳወቂያ አሳይ",
         "hapticFeedback": "የንዝረት ግብረ መልስ",
         "alwaysOnVpn": "ሁልጊዜ የሚሠራ VPN",

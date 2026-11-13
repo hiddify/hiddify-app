@@ -39,6 +39,7 @@ class Application : Application() {
             if (initialized) return
             val app = context.applicationContext as android.app.Application
             application = app
+            AppCrashRecorder.install(app)
             Seq.setContext(app)
             app.registerReceiver(AppChangeReceiver(), IntentFilter().apply {
                 addAction(Intent.ACTION_PACKAGE_ADDED)
