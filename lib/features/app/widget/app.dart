@@ -20,6 +20,7 @@ import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.
 import 'package:hiddify/core/theme/app_theme.dart';
 import 'package:hiddify/core/theme/theme_preferences.dart';
 import 'package:hiddify/core/widget/ambient_motion.dart';
+import 'package:hiddify/features/app/widget/animation_cpu_guard.dart';
 import 'package:hiddify/features/app_based_routing/overview/app_based_routing_notifier.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/connection/widget/connection_wrapper.dart';
@@ -58,6 +59,7 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     setupStateListener(ref);
+    useAnimationCpuGuard(ref);
     final router = ref.watch(goRouterNotiferProvider);
     final locale = ref.watch(localePreferencesProvider);
     final themeMode = ref.watch(themePreferencesProvider);
