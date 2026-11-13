@@ -20,7 +20,7 @@
 Hiddify 应用是一款免费、开源、无广告的代理和 VPN 客户端，支持 **Android、iOS、Windows、macOS 和 Linux**。它基于 [sing-box](https://github.com/SagerNet/sing-box) 构建，几乎支持所有协议和订阅格式，因此可以搭配任何代理面板使用，包括 [Hiddify Manager](https://github.com/hiddify/Hiddify-Manager)。
 
 <div align=center>
-<img width=90% alt="Hiddify app" src="https://github.com/hiddify/hiddify-app/assets/125398461/ffe5346d-3404-470f-b5e0-4364e23743d2">
+<img width=90% alt="Hiddify app" src="docs/demo-en.webp">
 </div>
 
 ## 🚀 主要特性

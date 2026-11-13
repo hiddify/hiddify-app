@@ -20,7 +20,7 @@
 Hiddify アプリは、**Android、iOS、Windows、macOS、Linux** に対応した、無料でオープンソース、広告なしのプロキシ / VPN クライアントです。[sing-box](https://github.com/SagerNet/sing-box) をベースにしており、ほぼすべてのプロトコルとサブスクリプション形式に対応しているため、[Hiddify Manager](https://github.com/hiddify/Hiddify-Manager) をはじめ、どのプロキシパネルとも組み合わせて使えます。
 
 <div align=center>
-<img width=90% alt="Hiddify app" src="https://github.com/hiddify/hiddify-app/assets/125398461/ffe5346d-3404-470f-b5e0-4364e23743d2">
+<img width=90% alt="Hiddify app" src="docs/demo-en.webp">
 </div>
 
 ## 🚀 主な機能

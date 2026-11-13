@@ -20,7 +20,7 @@
 The Hiddify app is a free, open-source and ad-free proxy and VPN client for **Android, iOS, Windows, macOS and Linux**. It is built on [sing-box](https://github.com/SagerNet/sing-box) and works with almost every protocol and subscription format, so you can use it with any proxy panel, including [Hiddify Manager](https://github.com/hiddify/Hiddify-Manager).
 
 <div align=center>
-<img width=90% alt="Hiddify app" src="https://github.com/hiddify/hiddify-app/assets/125398461/ffe5346d-3404-470f-b5e0-4364e23743d2">
+<img width=90% alt="Hiddify app" src="docs/demo-en.webp">
 </div>
 
 ## 🚀 Main features

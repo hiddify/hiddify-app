@@ -20,7 +20,7 @@
 Приложение Hiddify — бесплатный прокси- и VPN-клиент для **Android, iOS, Windows, macOS и Linux** с открытым исходным кодом и без рекламы. Оно основано на [sing-box](https://github.com/SagerNet/sing-box) и поддерживает почти все протоколы и форматы подписок, поэтому работает с любой панелью управления прокси, включая [Hiddify Manager](https://github.com/hiddify/Hiddify-Manager).
 
 <div align=center>
-<img width=90% alt="Hiddify app" src="https://github.com/hiddify/hiddify-app/assets/125398461/1b592bf9-b19f-4592-b02d-a3fa6216d257">
+<img width=90% alt="Hiddify app" src="docs/demo-en.webp">
 </div>
 
 ## 🚀 Основные возможности

@@ -22,7 +22,7 @@
 اپ هیدیفای یک برنامه رایگان، متن‌باز و بدون تبلیغ برای اتصال به پروکسی و VPN است که روی **اندروید، iOS، ویندوز، مک و لینوکس** کار می‌کند. این برنامه بر پایه [sing-box](https://github.com/SagerNet/sing-box) ساخته شده و تقریبا همه پروتکل‌ها و فرمت‌های لینک اشتراک را پشتیبانی می‌کند؛ پس با هر پنلی، از جمله [هیدیفای‌منیجر](https://github.com/hiddify/Hiddify-Manager)، کار می‌کند.
 
 <div align=center>
-<img width=90% alt="Hiddify app" src="https://github.com/hiddify/hiddify-app/assets/125398461/cfdc4b0e-0a26-42f5-90ef-1d8587d2afd2">
+<img width=90% alt="Hiddify app" src="docs/demo-fa.webp">
 </div>
 
 ## 🚀 امکانات اصلی
