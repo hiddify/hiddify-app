@@ -38,6 +38,9 @@ enum Release {
     if (Release.values.firstOrNullWhere((e) => e.key == defined) case final release?) return release;
     if (kIsWeb) return general;
     if (Platform.isIOS) return appStore;
+    // only the Mac App Store build runs sandboxed: it never updates itself nor asks for root,
+    // even when built without the define
+    if (Platform.isMacOS && Platform.environment.containsKey('APP_SANDBOX_CONTAINER_ID')) return appStore;
     if (Platform.isWindows && isMsix(Platform.resolvedExecutable)) return microsoftStore;
     return general;
   }

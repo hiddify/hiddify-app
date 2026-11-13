@@ -221,6 +221,11 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             Trigger.InstallApk.method -> {
                 result.runCatching {
                     val context = activity ?: Application.application
+                    // a copy Google Play installed is updated by Google Play only
+                    if (installedFromPlay(context)) {
+                        success("store")
+                        return@runCatching
+                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
                         !context.packageManager.canRequestPackageInstalls()
                     ) {
@@ -251,4 +256,14 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             else -> result.notImplemented()
         }
     }
+
+    private fun installedFromPlay(context: Context): Boolean = runCatching {
+        val installer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION")
+            context.packageManager.getInstallerPackageName(context.packageName)
+        }
+        installer == "com.android.vending"
+    }.getOrDefault(false)
 }

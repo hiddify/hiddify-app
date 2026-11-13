@@ -191,6 +191,7 @@ class AppUpdater extends _$AppUpdater with AppLogger {
     switch (kind) {
       case InstallKind.androidApk:
         final started = await _platform.invokeMethod<String>('install_apk', file.path);
+        if (started == 'store') throw StateError("Google Play installed this copy; it updates it.");
         if (started == 'permission') {
           state = AppUpdaterNeedsPermission(file);
           _waitForPermission(file);
