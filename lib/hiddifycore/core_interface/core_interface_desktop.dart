@@ -129,11 +129,109 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
   static const _maxRestarts = 3;
   static const _restartWindow = Duration(minutes: 1);
 
+  /// Windows and Linux: the app's own work (profiles, settings, the VPN service, the system proxy)
+  /// runs in the library loaded into this process, and only a proxy-mode connection runs in the
+  /// core's process (see [startEngine]), as a VPN runs in the VPN service. Without it (macOS) the
+  /// core's process is the app's core, kept out of this process for App Nap.
+  @protected
+  bool get libraryForFrontend => false;
+
+  // The proxy engine's process (Windows, Linux), started for a proxy-mode connection only.
+  static CoreProcess? _engine;
+  static ClientChannel? _engineChannel;
+  static CoreClient? _engineClient;
+  static Future<CoreProcess> Function()? _startEngineProcess;
+  static GrpcClientIdentity? _engineIdentity;
+
+  /// The port the engine's process listens on, beside the library's.
+  int get enginePort => port + 1;
+
   @override
-  Future<String> setup(Directories directories, bool debug, int mode) {
+  Future<String> setup(Directories directories, bool debug, int mode) async {
     final executable = CoreProcess.executablePath();
-    if (executable != null) return _setupProcess(executable, directories, debug, mode);
+    if (executable == null) return _setupLibrary(directories, debug, mode);
+    if (!libraryForFrontend) return _setupProcess(executable, directories, debug, mode);
+    final error = await _prepareEngine(executable, directories, debug, mode);
+    if (error.isNotEmpty) return error;
     return _setupLibrary(directories, debug, mode);
+  }
+
+  /// Makes ready what [startEngine] needs: the engine trusts the client certificate it finds in
+  /// the base folder when it starts, as the core's process does.
+  Future<String> _prepareEngine(String executable, Directories directories, bool debug, int mode) async {
+    final useMtls = _isMtlsMode(mode);
+    try {
+      _engineIdentity = useMtls
+          ? await GrpcClientIdentity.loadOrCreate(Directory(p.join(directories.baseDir.path, 'grpc')))
+          : null;
+    } catch (e, st) {
+      loggy.error('mTLS identity failed', e, st);
+      return 'mTLS setup failed: $e';
+    }
+    _startEngineProcess = () => _startProcessRetrying(
+      executable: executable,
+      baseDir: directories.baseDir.path,
+      workingDir: directories.workingDir.path,
+      tempDir: directories.tempDir.path,
+      listen: '127.0.0.1:$enginePort',
+      mode: useMtls ? SetupMode.GRPC_NORMAL.value : SetupMode.GRPC_NORMAL_INSECURE.value,
+      secret: secret,
+      debug: debug,
+    );
+    return '';
+  }
+
+  /// The engine's client while its process runs, else null.
+  CoreClient? get engineClient => _engine == null ? null : _engineClient;
+
+  /// Starts the proxy engine's process, or returns the one that runs. Null without a launcher (or
+  /// without [libraryForFrontend]): the core this app set up runs the engine then.
+  Future<CoreClient?> startEngine() async {
+    final running = engineClient;
+    if (running != null) return running;
+    final start = _startEngineProcess;
+    if (start == null) return null;
+    final process = await start();
+    final identity = _engineIdentity;
+    final channel = ClientChannel(
+      '127.0.0.1',
+      port: enginePort,
+      options: ChannelOptions(
+        credentials: identity == null ? const ChannelCredentials.insecure() : _processCredentials(process, identity),
+      ),
+    );
+    _engine = process;
+    _engineChannel = channel;
+    _engineClient = CoreClient(channel);
+    unawaited(
+      process.exitCode.then((code) async {
+        if (!identical(_engine, process) || process.stopping) return;
+        final reason = await process.crashReason();
+        _forgetEngine();
+        loggy.error('engine process exited unexpectedly ($code)${reason == null ? '' : ': $reason'}');
+        onCoreProcessExited(
+          reason == null
+              ? 'The core stopped unexpectedly (exit code $code).'
+              : 'The core stopped unexpectedly (exit code $code): $reason',
+        );
+      }),
+    );
+    return _engineClient;
+  }
+
+  /// Stops the engine's process, which restores the system proxy it set as it exits.
+  Future<void> stopEngine() async {
+    final process = _engine;
+    final channel = _engineChannel;
+    _forgetEngine();
+    if (channel != null) unawaited(channel.shutdown().catchError((Object _) {}));
+    await process?.stop();
+  }
+
+  void _forgetEngine() {
+    _engine = null;
+    _engineChannel = null;
+    _engineClient = null;
   }
 
   Future<String> _setupProcess(String executable, Directories directories, bool debug, int mode) async {
@@ -267,7 +365,8 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
     }
   }
 
-  /// Called when the core's process ends without being asked to. It is started again.
+  /// Called when the core's process ends without being asked to. The app's core is started again;
+  /// the proxy engine is not, its connection has ended.
   @protected
   void onCoreProcessExited(String message) {}
 
@@ -280,7 +379,8 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
     final process = _process;
     _process = null;
     _startProcess = null;
-    await process?.stop();
+    _startEngineProcess = null;
+    await Future.wait([stopEngine(), if (process != null) process.stop()]);
   }
 
   Future<String> _setupLibrary(Directories directories, bool debug, int mode) async {

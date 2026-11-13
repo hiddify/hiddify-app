@@ -65,6 +65,9 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   bool get _isAppImage => Platform.isLinux && (Platform.environment['APPIMAGE'] ?? '').isNotEmpty;
 
   @override
+  bool get libraryForFrontend => true;
+
+  @override
   bool get managesLifecycle => true;
   @override
   bool get persistsAfterAppExit => false;
@@ -102,7 +105,11 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   @override
   void onCoreProcessExited(String message) {
     // In VPN mode the engine runs in the service; only a proxy-mode connection went with the core.
-    if (_usingAdminBg || _status.value is CoreStopped) return;
+    if (_usingAdminBg) return;
+    // the engine's process ended without restoring the system proxy it set
+    unawaited(_clearEngineLeftovers());
+    if (_status.value is CoreStopped) return;
+    _useBgClient(fgClient);
     _status.add(CoreStatus.stopped(alert: CoreAlert.startFailed, message: message));
   }
 
@@ -112,10 +119,11 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     // When admin_bgservice will own TUN, fg must not enable TUN; full settings go in Ensure.
     final adminOwnsTun = useAdminBgService || (options.enableTun && !await _isPrivileged());
     final forFg = adminOwnsTun ? options.copyWith(enableTun: false) : options;
-    final response = await fgClient.changeHiddifySettings(
-      ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(forFg.toJson())),
-    );
-    _checkResponse(response);
+    final request = ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(forFg.toJson()));
+    _checkResponse(await fgClient.changeHiddifySettings(request));
+    // a connection in the engine's process hot reloads there, with these settings
+    final engine = engineClient;
+    if (engine != null && !_usingAdminBg) _checkResponse(await engine.changeHiddifySettings(request));
   }
 
   Future<NeedAdminBgServiceResponse> needAdminBgService({
@@ -143,11 +151,12 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     final wantAdminBg = useAdminBgService || options.enableTun;
     if (!wantAdminBg) {
       _usingAdminBg = false;
-      _useBgClient(fgClient);
+      final engine = await _engineWith(options);
+      _useBgClient(engine);
       // the stop above may still be under way in the core
       _checkResponse(
         await startOnceStopped(
-          fgClient,
+          engine,
           StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
         ),
       );
@@ -160,15 +169,11 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       _status.add(const CoreStatus.starting());
       try {
         _usingAdminBg = false;
-        _useBgClient(fgClient);
-        _checkResponse(
-          await fgClient.changeHiddifySettings(
-            ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
-          ),
-        );
+        final engine = await _engineWith(options);
+        _useBgClient(engine);
         _checkResponse(
           await startOnceStopped(
-            fgClient,
+            engine,
             StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
           ),
         );
@@ -204,6 +209,19 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       await _abandonVpnStart(error);
       rethrow;
     }
+  }
+
+  /// The core a connection outside the VPN service runs in: the engine's own process, which has
+  /// the app's rights (an elevated app's, for a TUN), given the connection's settings. Without a
+  /// launcher, the core this app set up.
+  Future<CoreClient> _engineWith(SingboxConfigOption options) async {
+    final engine = await startEngine() ?? fgClient;
+    _checkResponse(
+      await engine.changeHiddifySettings(
+        ChangeHiddifySettingsRequest(hiddifySettingsJson: jsonEncode(options.toJson())),
+      ),
+    );
+    return engine;
   }
 
   Future<void> _ensureAdminBgAndAttach({
@@ -462,6 +480,19 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     return true;
   }
 
+  /// Asks the library in this process to undo what the engine's process left (the system proxy its
+  /// inbound set) once that process has ended: a disable without an address does it (hiddify-core
+  /// cleanupStoppedEngine). The library runs as the user, as the engine did.
+  Future<void> _clearEngineLeftovers() async {
+    try {
+      await fgClient
+          .setSystemProxyEnabled(SetSystemProxyEnabledRequest(isEnabled: false))
+          .timeout(const Duration(seconds: 5));
+    } catch (error) {
+      loggy.warning('clearing what the engine left failed: $error');
+    }
+  }
+
   Future<void> _restoreServiceSystemProxy() async {
     if (!_serviceSystemProxy) return;
     _serviceSystemProxy = false;
@@ -564,11 +595,19 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
         }
       }());
     }
+    // the engine's process ends with its connection; without one, the core this app set up ran it
+    final engine = engineClient;
     try {
       // Bounded: a stalled channel must fail the stop, not leave the next connect stuck on connecting.
-      _checkResponse(await fgClient.stop(Empty()).timeout(const Duration(seconds: 5)), allowStopped: true);
+      _checkResponse(await (engine ?? fgClient).stop(Empty()).timeout(const Duration(seconds: 5)), allowStopped: true);
     } catch (error) {
-      loggy.warning('stopping the in-process core failed: $error');
+      loggy.warning('stopping the core failed: $error');
+    }
+    if (engine != null) {
+      await stopEngine();
+      // the engine restores the system proxy as it exits; one killed when it did not exit in time
+      // could not
+      await _clearEngineLeftovers();
     }
     _status.add(const CoreStatus.stopped());
     return true;
@@ -576,7 +615,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
 
   @override
   Future<bool> isBgClientAvailable() async {
-    if (!_usingAdminBg) return true;
+    if (!_usingAdminBg) return identical(bgClient, fgClient) || engineClient != null;
     if (_isAppImage) return _appImageService?.running ?? false;
     try {
       final socket = await Socket.connect('127.0.0.1', _servicePortInUse, timeout: const Duration(milliseconds: 200));
@@ -600,7 +639,10 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     final service = _appImageService;
     _appImageService = null;
     await service?.stop();
+    // the library in this process set it for the VPN service; it goes with this process
+    await _restoreServiceSystemProxy();
     await super.shutdown();
+    await _clearEngineLeftovers();
   }
 
   @override
