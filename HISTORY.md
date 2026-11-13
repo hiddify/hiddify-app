@@ -1,7 +1,86 @@
 # Changelog
 
 
-## 5.9.1 (2026-11-13)
+## 5.9.2 (2026-11-13)
+
+#### Other
+
+* Feat(crash-report): report a problem from the app, with every log and the crash itself. 
+  _A report can be sent from About and from the Logs page as well as after a crash:
+to Hiddify, the Telegram issues bot, email or a GitHub issue, or saved. Each way
+shows its steps in order, and the report holds the app log, the core log and its
+stderr, the app's own crashes and the core's, the app and connection state and
+the settings without secrets.
+
+- After a crash the exception is shown and filled in: the GitHub issue's title
+  and log field, the mail body, the Sentry event. App crashes are recorded too:
+  Dart errors everywhere, Java/Kotlin crashes, native crashes and ANRs on Android.
+- The Telegram link starts hiddify_issues_bot with the platform or Linux distro,
+  its version, the build, the package mode, the report type and the language.
+- A build with DIAGNOSTICS_PUBLIC_KEY encrypts the report it uploads to Sentry
+  with age, so only the private key opens it.
+- The Telegram channel is offered after a few days of use, and reduce animations
+  stills only the light round the connect button._
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Docs: animated README demo (MacBook + iPhone) and a script to rebuild it. 
+  _docs/readme-demo/make_demo.py builds docs/demo-<lang>.webp from two
+recordings of the app (desktop window and phone layout): a MacBook and an
+iPhone 6.1" running Hiddify, going from "Tap to connect" through Extra
+security to "Connected" with the live-traffic glow. Right-to-left
+languages get a mirrored layout. docs/readme-demo/README.md explains how
+to record new inputs for each release._
+
+* Fix(update): store copies never update themselves, even built without the release define. 
+  _A copy Google Play installed refuses to start the APK installer, and a sandboxed
+macOS run counts as the Mac App Store build, which never updates itself nor asks
+for root._
+
+* Fix(update): the Android update installs once the user allows it, without downloading again. 
+  _Back from the install-unknown-apps settings with the permission given, the
+installer starts with the APK already downloaded. Try again reuses it too, and a
+verified download left in the cache is not fetched again. A cancelled installer
+no longer leaves the dialog stuck on installing._
+
+* Perf(ui): endless animations run 10 seconds, on one clock, and never on a low battery. 
+  _While connected, the chain icon on the home card (the extra security shield's orbiting light, the
+unblocker's door) and the chain badge's shine each asked for a frame at every screen refresh, and
+followed only the system's reduce motion: neither the reduce animations setting nor an unfocused
+window stopped them. The app drew 76 frames a second for as long as it stayed connected, a fifth
+of a core even on a fast laptop, and on a computer without a graphics card all of it on the CPU.
+
+- Every endless decoration (the connect button's light, the shield's orbit, the door, the badge's
+  shine and breathing, the loading shimmers) steps on one shared timer, at the button's rate (30
+  fps or less), so they draw in the same frames.
+- With reduce animations off, it runs for 10 seconds when it may start (the window gets focus,
+  the app comes back, the setting is turned off, the battery recovers) and after each change of
+  the connection, then stands still; the button shows the still glow that steps with the traffic.
+- It never runs while a desktop window has no focus, with reduce animations on, or with battery
+  saver on or the battery at 20% or less on battery power (battery_plus; it adds no permission).
+- The CPU guard that turned reduce animations on for good after a costly connect is removed: the
+  10 seconds bound the cost instead._
+
+* Fix(crash-report): a report Sentry did not take says so and points to email or Telegram. 
+  _On Android, iOS and macOS the report went to the native Sentry SDK, which only queues it and
+uploads later, so a rate limit (429), no connection or a failed upload still showed "Report sent".
+The report now goes over HTTP from Dart with a client of its own on every platform, and only a 200
+counts as sent; a 429, any other status, a network error or a 3 minute timeout shows the toast
+that suggests email or Telegram. A zip over Sentry's 20 MB attachment limit, which Sentry dropped
+without a word while the event still went, is not sent and shows the same toast.
+
+The report no longer starts the app's Sentry when analytics is off: its own client is closed
+right after._
+
+* Fix(home): returning to home no longer flashes a grey box. 
+  _The connect button read TickerMode and the ambient motion with `a && b` of two hooks. With home
+under another page TickerMode is off, so the second hook was skipped and every hook after it
+shifted; each return to home threw "Type mismatch between hooks" and release builds drew a grey
+box in place of the page. Both hooks now run on every build._
+
+
+
+## v5.9.1 (2026-11-13)
 
 #### Other
 
