@@ -6,6 +6,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/bottom_sheets/bottom_sheets_notifier.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
@@ -87,7 +88,7 @@ class ConnectionButton extends HookConsumerWidget {
 
     const buttonTheme = ConnectionButtonTheme.light;
     final today = DateTime.now();
-    return _ConnectionButton(
+    final button = _ConnectionButton(
       look: look,
       onTap: onTap,
       onErrorDetails: failure == null
@@ -136,6 +137,10 @@ class ConnectionButton extends HookConsumerWidget {
       },
       useImage: today.day >= 19 && today.day <= 23 && today.month == 3,
     );
+    // reduce animations stills the connect button alone; the rest of the app follows the system's
+    // reduce motion, which the button follows too
+    if (!ref.watch(Preferences.reduceAnimations)) return button;
+    return MediaQuery(data: MediaQuery.of(context).copyWith(disableAnimations: true), child: button);
   }
 
   /// Coming back from the background, the app sets the core up again, and for a moment the status
@@ -271,6 +276,9 @@ class _ConnectionButton extends HookWidget {
   /// ripple, the error's shake. What follows only drifts.
   static const _settleAfter = 3.0;
 
+  static EclipseTraffic _stepped(EclipseTraffic t) =>
+      EclipseTraffic(down: (t.down * 4).round() / 4, up: (t.up * 4).round() / 4);
+
   static double _scaleFor(double height) =>
       _smallest + (1 - _smallest) * ((height - _smallFrom) / (_fullFrom - _smallFrom)).clamp(0.0, 1.0);
 
@@ -349,6 +357,7 @@ class _ConnectionButton extends HookWidget {
     final interval = calm ? _settledIntervals[level] : load.interval;
     final time = useValueNotifier(0.0);
     useEffect(() {
+      // with reduce animations nothing ticks: the light is a still glow that only steps with the traffic
       if (still || !ticking) return null;
       load.watch();
       var last = now();
@@ -420,11 +429,13 @@ class _ConnectionButton extends HookWidget {
                                       previousColor: c.previousColor,
                                     ),
                                     radius: _size / 2,
-                                    traffic: traffic.value,
+                                    // in steps, so it repaints only when the traffic changes a lot
+                                    traffic: still ? _stepped(target.value) : traffic.value,
                                     dark: theme.brightness == Brightness.dark,
                                     drawLogo: !useImage,
                                     logoOpacity: look == _Look.loading ? .38 : 1,
                                     pixelRatio: MediaQuery.devicePixelRatioOf(context),
+                                    simple: still,
                                   ),
                                 );
                               },

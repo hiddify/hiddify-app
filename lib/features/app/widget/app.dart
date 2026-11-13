@@ -13,7 +13,6 @@ import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
-import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
 import 'package:hiddify/core/router/go_router/helper/active_breakpoint_notifier.dart';
@@ -65,7 +64,6 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     final themeMode = ref.watch(themePreferencesProvider);
     final theme = AppTheme(themeMode, locale.preferredFontFamily);
     final upgrader = ref.watch(upgraderProvider);
-    final reduceAnimations = ref.watch(Preferences.reduceAnimations);
     final activeBreakpoint = Breakpoint(context).activeBreakpoint;
 
     ref.listen(foregroundProfilesUpdateNotifierProvider, (_, _) {});
@@ -137,13 +135,6 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                   title: Constants.appName,
                   builder: (context, child) {
                     final theme = Theme.of(context);
-                    // the setting adds to the system's reduce motion, which the animations here follow
-                    if (reduceAnimations) {
-                      child = MediaQuery(
-                        data: MediaQuery.of(context).copyWith(disableAnimations: true),
-                        child: child ?? const SizedBox(),
-                      );
-                    }
                     child = SnackBarHost(
                       child: upgrader == null
                           ? child ?? const SizedBox()

@@ -95,6 +95,7 @@ class EclipseButtonPainter extends CustomPainter {
     this.drawLogo = true,
     this.logoOpacity = 1,
     this.pixelRatio = 1,
+    this.simple = false,
     super.repaint,
   });
 
@@ -111,6 +112,10 @@ class EclipseButtonPainter extends CustomPainter {
 
   /// The screen's device pixels per logical pixel; the glow is drawn at half of it.
   final double pixelRatio;
+
+  /// Reduce animations: the light round the button is only two still soft glows sized by the
+  /// traffic, without rays, flares, sparks or blur, and the logo keeps still.
+  final bool simple;
 
   static const _fade = .35;
 
@@ -149,7 +154,8 @@ class EclipseButtonPainter extends CustomPainter {
       old.radius != radius ||
       old.drawLogo != drawLogo ||
       old.logoOpacity != logoOpacity ||
-      old.pixelRatio != pixelRatio;
+      old.pixelRatio != pixelRatio ||
+      old.simple != simple;
 }
 
 void _paintLook(_Ctx x) {
@@ -272,28 +278,12 @@ void _connected(_Ctx x) {
   final downColor = x.p.dark ? const Color(0xFFFFB020) : const Color(0xFFF59E0B);
   final upColor = x.p.dark ? const Color(0xFF3F7BFF) : const Color(0xFF2563EB);
 
-  // the sun's yellow close to the button, the plasma's blue further out and on top, so the two
-  // stay apart instead of mixing to grey
-  // the download's rays and flares have the same blur and blend, so they share one blurred image
-  final downRays = _corona(x, color: downColor, level: down, reach: .6, rays: 32, seed: 10, plasma: false);
-  final downFlares = _flares(x, color: downColor, level: down, seed: 60, reach: .75, additive: true);
-  _glow(x, 4, _blendOf(x, additive: true), [?downRays, ?downFlares]);
-  _sparks(x, color: downColor, level: down, seed: 60, reach: .75, additive: true);
-  final upRays = _corona(
-    x,
-    color: upColor,
-    level: up,
-    reach: .95,
-    rays: 52,
-    seed: 40,
-    plasma: true,
-    additive: false,
-    hollow: 1,
-  );
-  _glow(x, 2.5, _blendOf(x, additive: false), [?upRays]);
-  final upFlares = _flares(x, color: upColor, level: up, seed: 80, reach: 1.05, additive: false);
-  _glow(x, 4, _blendOf(x, additive: false), [?upFlares]);
-  _sparks(x, color: upColor, level: up, seed: 80, reach: 1.05, additive: false);
+  if (x.p.simple) {
+    _simpleGlow(x, color: downColor, level: down, reach: .6, blend: _blendOf(x, additive: true));
+    _simpleGlow(x, color: upColor, level: up, reach: .95, hollow: 1, blend: _blendOf(x, additive: false));
+  } else {
+    _flowingLight(x, down: down, up: up, downColor: downColor, upColor: upColor);
+  }
 
   x.ripple(s, x.col, duration: 1.4);
   x.disc();
@@ -302,17 +292,18 @@ void _connected(_Ctx x) {
   x.ring(x.r - .5, _alpha(Color.lerp(downColor, upColor, up / (down + up + 1e-6))!, .55 * math.max(down, up)), 1.6);
 
   // the bars settle with a spring, then breathe in a slow wave, a little taller with more traffic,
-  // and the dot floats
+  // and the dot floats; with reduce animations they stand still
   final alive = _easeInOut((s - 1.2) / 1.2);
+  final motion = x.p.simple ? 0.0 : alive;
   final h = [for (var b = 0; b < 3; b++) .75 + .25 * _spring(s * 1.1 - b * .12)];
-  double breathe(int bar) => 1 - alive * (.035 * _osc(x.f.time, 3.2, -bar * .12) - .03 * t.total);
+  double breathe(int bar) => 1 - motion * (.035 * _osc(x.f.time, 3.2, -bar * .12) - .03 * t.total);
   final stem = h[2] * breathe(2);
   x.logo(
     parts: [
       _Part(scaleY: h[0] * breathe(0)),
       _Part(scaleY: h[1] * breathe(1)),
       _Part(scaleY: stem),
-      _Part(dy: (1 - stem) * 35.2 - 1.2 * alive * _osc(x.f.time, 2.6)),
+      _Part(dy: (1 - stem) * 35.2 - 1.2 * motion * _osc(x.f.time, 2.6)),
     ],
   );
   x.star(x.toPx(const Offset(67, -2)), 6 * _bump((s - .5) / .9));
@@ -351,6 +342,70 @@ void _connected(_Ctx x) {
         ).createShader(band),
     );
   });
+}
+
+/// The full light: rays, flares and sparks, blurred offscreen.
+void _flowingLight(
+  _Ctx x, {
+  required double down,
+  required double up,
+  required Color downColor,
+  required Color upColor,
+}) {
+  // the sun's yellow close to the button, the plasma's blue further out and on top, so the two
+  // stay apart instead of mixing to grey
+  // the download's rays and flares have the same blur and blend, so they share one blurred image
+  final downRays = _corona(x, color: downColor, level: down, reach: .6, rays: 32, seed: 10, plasma: false);
+  final downFlares = _flares(x, color: downColor, level: down, seed: 60, reach: .75, additive: true);
+  _glow(x, 4, _blendOf(x, additive: true), [?downRays, ?downFlares]);
+  _sparks(x, color: downColor, level: down, seed: 60, reach: .75, additive: true);
+  final upRays = _corona(
+    x,
+    color: upColor,
+    level: up,
+    reach: .95,
+    rays: 52,
+    seed: 40,
+    plasma: true,
+    additive: false,
+    hollow: 1,
+  );
+  _glow(x, 2.5, _blendOf(x, additive: false), [?upRays]);
+  final upFlares = _flares(x, color: upColor, level: up, seed: 80, reach: 1.05, additive: false);
+  _glow(x, 4, _blendOf(x, additive: false), [?upFlares]);
+  _sparks(x, color: upColor, level: up, seed: 80, reach: 1.05, additive: false);
+}
+
+/// A soft glow of [color] round the button, one gradient, reaching further and brighter as [level]
+/// rises; [hollow] moves it out into a ring. The cheap stand-in for a corona and its flares.
+void _simpleGlow(
+  _Ctx x, {
+  required Color color,
+  required double level,
+  required double reach,
+  required BlendMode blend,
+  double hollow = 0,
+}) {
+  if (level <= .01) return;
+  final outer = x.r * (1.04 + reach * level);
+  final edge = x.r / outer * .98;
+  final peak = edge + (1 - edge) * (.35 * hollow);
+  final strength = level * .9;
+  x.c.drawCircle(
+    x.center,
+    outer,
+    Paint()
+      ..blendMode = blend
+      ..shader = RadialGradient(
+        colors: [
+          _alpha(color, .45 * strength * (1 - hollow)),
+          _alpha(color, .4 * strength),
+          _alpha(color, .14 * strength),
+          _alpha(color, 0),
+        ],
+        stops: [edge, peak, peak + (1 - peak) * .4, 1],
+      ).createShader(Rect.fromCircle(center: x.center, radius: outer)),
+  );
 }
 
 /// Sharp strokes that [_glow] blurs, and the area they stay in.
