@@ -49,6 +49,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
             IsTelevision("is_television"),
             SupportedAbis("supported_abis"),
             InstallApk("install_apk"),
+            CanInstallApks("can_install_apks"),
         }
     }
 
@@ -201,6 +202,17 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
 
             Trigger.SupportedAbis.method -> {
                 result.runCatching { success(Build.SUPPORTED_ABIS.toList()) }
+            }
+
+            // Whether this app may start the system installer, without opening its settings page.
+            Trigger.CanInstallApks.method -> {
+                result.runCatching {
+                    val context = activity ?: Application.application
+                    success(
+                        Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
+                            context.packageManager.canRequestPackageInstalls()
+                    )
+                }
             }
 
             // An update the app downloaded: the system installer asks the user to confirm it. Until
