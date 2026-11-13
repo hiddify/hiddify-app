@@ -20,10 +20,11 @@ keywords:
 
 generic_name: Hiddify
 
-# Runtime libraries the bundle links that a minimal Fedora/RHEL install may lack (the tray icon).
-# Everything else (GTK 3, glibc) is part of any desktop install.
+# The libraries the bundle links (the tray icon's libayatana-appindicator3.so.1 among them) are
+# not listed here: rpmbuild adds them itself as soname requirements, which every distribution
+# resolves to its own package. A package name would not: Fedora calls the tray library
+# libayatana-appindicator-gtk3, openSUSE libayatana-appindicator3-1.
 requires:
-  - libayatana-appindicator-gtk3
   # VPN mode asks for the administrator password once, through pkexec
   - polkit
 
