@@ -10,16 +10,7 @@
         "fa": "وارپ کلادفلر یک ارائه‌دهنده‌ی رایگان وی‌پی‌ان مبتنی بر وایرگارد است. با فعال کردن این گزینه، با [شرایط خدمات](https://www.cloudflare.com/application/terms/) و [خط‌مشی رازداری](https://www.cloudflare.com/application/privacypolicy/) کلادفلر موافقت می‌کنید."
     }
   },
-  {
-    "region": ["ir"],
-    "title": {"en": "Anonymous Serverless", "fa": "انانیموس سرورلس"},
-    "sublink": "https://raw.githubusercontent.com/4n0nymou3/multi-proxy-config-fetcher/refs/heads/main/configs/hiddify/Anonymous_Serverless.jsonc",
-    "tags": { "en": ["Serverless"], "fa": ["سرورلس"] },
-    "consent": {
-      "en": "This profile contains Serverless configurations that use the latest features of the Hiddify core to connect directly to websites and services, without any intermediary server. They work only for services that are not blocked at the IP level.\nThe profile may include several variants; if one does not work on your network, try another.\nThere is no guarantee that these configurations will work properly, and it is recommended to use them only in emergencies.",
-      "fa": "این پروفایل شامل کانفیگ‌های سرورلس است که با استفاده از جدیدترین قابلیت‌های هسته‌ی هیدیفای، بدون هیچ سرور واسطه‌ای و به‌صورت مستقیم به وب‌سایت‌ها و سرویس‌ها وصل می‌شوند. این کانفیگ‌ها فقط برای سرویس‌هایی کار می‌کنند که در سطح IP مسدود نشده باشند.\nاین پروفایل ممکن است چند نسخه داشته باشد؛ اگر یکی روی شبکه‌ی شما کار نکرد، نسخه‌ی دیگر را امتحان کنید.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ‌ها وجود ندارد و توصیه می‌شود فقط در مواقع اضطراری از آن‌ها استفاده کنید."
-    }
-  },
+
   {
     "region": ["ir"],
     "title": {"en": "Patterniha", "fa": "پترنیها"},
@@ -48,6 +39,16 @@
     "consent": {
       "en": "This profile collects publicly published configurations with their owners' consent, then tests and verifies them to support the free flow of information.\nTo enhance security, Hiddify applies a WARP-based security layer to these configurations to reduce the risk of unauthorized access to your information.\nThere is no guarantee that these configurations will work properly, and it is recommended to use them only in emergencies.",
       "fa": "این پروفایل کانفیگ‌های عمومی و منتشرشده را با رضایت صاحبانشان جمع‌آوری، تست و بررسی می‌کند تا به جریان آزاد اطلاعات کمک کند.\nبرای افزایش امنیت، هیدیفای یک لایه‌ی امنیتی مبتنی بر وارپ روی این کانفیگ‌ها اعمال می‌کند تا خطر دسترسی غیرمجاز به اطلاعات شما کاهش یابد.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ‌ها وجود ندارد و توصیه می‌شود فقط در مواقع اضطراری از آن‌ها استفاده کنید."
+    }
+  },
+  {
+    "region": ["ir"],
+    "title": {"en": "Anonymous Serverless", "fa": "انانیموس سرورلس"},
+    "sublink": "https://raw.githubusercontent.com/4n0nymou3/multi-proxy-config-fetcher/refs/heads/main/configs/hiddify/Anonymous_Serverless.jsonc",
+    "tags": { "en": ["Serverless"], "fa": ["سرورلس"] },
+    "consent": {
+      "en": "This profile contains Serverless configurations that use the latest features of the Hiddify core to connect directly to websites and services, without any intermediary server. They work only for services that are not blocked at the IP level.\nThe profile may include several variants; if one does not work on your network, try another.\nThere is no guarantee that these configurations will work properly, and it is recommended to use them only in emergencies.",
+      "fa": "این پروفایل شامل کانفیگ‌های سرورلس است که با استفاده از جدیدترین قابلیت‌های هسته‌ی هیدیفای، بدون هیچ سرور واسطه‌ای و به‌صورت مستقیم به وب‌سایت‌ها و سرویس‌ها وصل می‌شوند. این کانفیگ‌ها فقط برای سرویس‌هایی کار می‌کنند که در سطح IP مسدود نشده باشند.\nاین پروفایل ممکن است چند نسخه داشته باشد؛ اگر یکی روی شبکه‌ی شما کار نکرد، نسخه‌ی دیگر را امتحان کنید.\nهیچ ضمانتی برای عملکرد مناسب این کانفیگ‌ها وجود ندارد و توصیه می‌شود فقط در مواقع اضطراری از آن‌ها استفاده کنید."
     }
   }
 ]
