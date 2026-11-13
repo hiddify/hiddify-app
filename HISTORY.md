@@ -1,7 +1,158 @@
 # Changelog
 
 
-## 5.9.0 (2026-11-12)
+## 5.9.1 (2026-11-13)
+
+#### Other
+
+* Build: bump hiddify-core to 5.9.1. 
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Docs: new laptop and phone demo image of Hiddify app 5 in the README. 
+
+* Docs: restore the laptop and phone demo image in the README. 
+
+* Docs: refresh README in all languages. 
+  _Rewrite the README (English and every translation) for the current
+release: new feature list, fixed download links and file names,
+up-to-date install requirements and protocols, new screenshots from
+hiddify.com, a per-language tutorials banner linking to hiddify.com,
+and a working YouTube badge._
+
+* Fix(i18n): improve the Russian translation and update project.inlang. 
+  _Takes the changes from #2527 by Hollicsh: the new keepTop, proxy pin and
+crash report strings, the formal "Вы", and a project.inlang that lists the
+existing locale files and their real path.
+
+On top of that: the missing comma that made ru.i18n.json invalid, em dashes
+kept, one "sleep" term to match the English, "Лучшие $keep", the restingHint
+meaning, and "отчёт" spelled one way._
+
+* Merge pull request #2538 from 4n0nymou3/4n0nymou3-patch-1. 
+
+* Update free_configs. 
+
+* Free_configs. 
+  _Add Serverless_
+
+* Fix(windows): a launch at login keeps the app in the tray. 
+  _The Run key, the Startup folder shortcut and the MSIX startup task can each start the app at
+login. A second launch shows the running copy's window, as a launch by hand should, which undid a
+silent start. Every autostart entry now passes --autostart, and a launch with it leaves when a
+Hiddify window already exists. The Run key's command line is quoted (the path usually has a
+space), and an entry an older version wrote, without quotes or --autostart, is rewritten._
+
+* Fix(home): reduce animations stills only the connect button. 
+  _The setting turned off every animation in the app. It now stills the connect button alone; the
+rest of the app follows the system's reduce motion, as before the setting.
+
+With the setting on, the connected button shows a still glow in place of the light's rays, flares
+and sparks: one soft gradient for download and one for upload, sized by the traffic in steps, so
+it repaints only when the traffic changes a lot and no timer runs._
+
+* Build: bump hiddify-core. 
+  _The VPN service installs over a running one, the UAC prompt shows for a downloaded HiddifyAdmin,
+a stopped engine's system proxy is cleared, HiddifyCoreEngine.exe, and WireGuard clients no
+longer raise the Windows firewall prompt._
+
+* Feat(desktop): reduce animations when drawing them costs too much CPU. 
+  _The light around the connect button is drawn on the CPU where there is no graphics card, and kept
+the app at 25% of a VM's CPU while the core used none. For 10 seconds after each connect the app
+measures its own CPU time (GetProcessTimes on Windows, getrusage on Linux and macOS); above 10%
+of the machine it turns on the reduce animations setting, as the user would in the settings._
+
+* Refactor(windows): the engine is HiddifyCoreEngine.exe beside the app. 
+  _It was core\Hiddify.exe, in a subfolder because it had the app's own file name, so taskkill
+/im Hiddify.exe ended both. The installer removes the old core folder on upgrade._
+
+* Feat(desktop): the app's core is the library in the app; only proxies run in the engine. 
+  _On Windows and Linux the core ran in a process of its own for everything: profiles, settings,
+installing the VPN service, the system proxy, and the proxy-mode connection. A VPN runs in the
+service, so that process only sat beside it.
+
+The app now loads hiddify-core as a library for its own work, and starts the core's process (the
+engine) only for a connection outside the service: proxy mode, or a TUN when the app itself runs
+as administrator. The engine gets the connection's settings, and changed settings while it runs;
+it ends with the connection. When it stops or crashes the library clears the system proxy it set,
+and on quit the app stops it and restores the system proxy it set for the service. macOS keeps
+its core process (App Nap).
+
+Tested on Windows 11: at start only the app runs, with the library loaded; VPN mode connects,
+disconnects and connects again with no engine; proxy mode starts the engine and sets the system
+proxy, and a disconnect ends it with the proxy off; killing the engine while connected leaves the
+proxy off and reports the failure._
+
+* Fix(desktop): the window shows the Hiddify logo while the app loads, not a white page. 
+
+* Fix(desktop): startup no longer waits for the system tray. 
+  _The tray rebuilds on every connection change, and a connection restored at
+startup kept it rebuilding past the 1 s limit: every start logged
+"[system tray] error initializing" (a timeout) and showed the window up to
+1 s later. The tray now starts alongside, and only its real errors are logged._
+
+* Fix(android): the strip under the bottom bar is the page color, not black. 
+  _With 3-button navigation, and with gestures on One UI (Galaxy S25 Ultra),
+Android paints a navigation bar background over the bottom of the page in
+the window's navigation bar color. Since 2d35bd0e stopped setting that
+color the strip was dark or black. The overlay style sets it to the page
+background again, as before 5.9.0.
+
+Fixes #2532_
+
+* Fix(linux): the .deb keeps user data on upgrade and removes it only on purge. 
+  _dpkg runs postrm with "upgrade" on every update, and the script deleted
+~/.local/share/hiddify unconditionally, so each upgrade wiped profiles and
+settings. It now deletes user data only on purge, and covers
+~/.local/share/app.hiddify.com too, where the app keeps it today.
+
+postinst is safe to repeat: StartupWMClass comes from the packager's
+startup_wm_class instead of a sudo sed, and only the launchers the AppImage
+wrote (X-AppImage-Name) are removed from users' ~/.local.
+
+Fixes #2535_
+
+* Fix(android): an always-on VPN start runs the core. 
+  _Android starts the VPN service by itself for always-on VPN, at boot or
+after the process was killed. The service started the core only when the
+saved flag said so, and a connect from the app clears it, so the service
+came up without the core and the app stayed on Connecting.
+
+Fixes #2534_
+
+* Fix(linux): the RPM requires the tray library by soname, not by Fedora's package name. 
+  _openSUSE ships libayatana-appindicator3.so.1 as libayatana-appindicator3-1, so the
+explicit libayatana-appindicator-gtk3 requirement left zypper unable to install the
+package. rpmbuild already adds the soname requirement, which every distribution resolves.
+
+Fixes #2537_
+
+* Fix(desktop): an unfocused window keeps updating; only the connect button's light stops. 
+  _Losing focus on desktop turned off every ticker, so state changes froze mid-transition. TickerMode now stays on there and the endless light around the connect button pauses through ambientMotion. Hidden and paused still stop everything. Also bumps hiddify-core for the Windows console-window and process-name fixes._
+
+* Ci(stores): rebuild the Play bundle with the next version code when Play has seen it. 
+  _Play takes a version code once, also from an upload it then did not publish:
+re-uploading the 5.9.0 bundle failed with "Version code 50900 has already been
+used". Store upload can now build the Play bundle again from the run's commit
+(build-android.yml takes a commit, the targets, and generates the code itself),
+and the bundle gets the next recorded code._
+
+* Ci(stores): a release to Play as a draft, the Mac upload after a failed iOS one, re-uploads without building. 
+  _Play refused to save the 5.9.0 production release unsent: this app's changes
+are sent for review automatically, so changesNotSentForReview must not be set.
+The release is then a draft on production, neither reviewed nor rolled out.
+
+The Mac App Store upload was skipped because the iOS upload before it failed
+(the IPA was uploaded already by the run whose tag could not be recorded);
+the two uploads are independent now.
+
+The Play upload is a reusable workflow (google-play.yml), and it and
+testflight.yml can take the artifacts of an earlier run: store-upload.yml
+uploads a run's builds to the stores again without building them._
+
+
+
+## v5.9.0 (2026-11-12)
 
 #### Other
 
