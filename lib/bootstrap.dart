@@ -152,7 +152,7 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   runApp(
     UncontrolledProviderScope(
       container: container,
-      child: SentryUserInteractionWidget(child: const App()),
+      child: NativeSplash.cover(SentryUserInteractionWidget(child: const App())),
     ),
   );
 
