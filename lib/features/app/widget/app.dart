@@ -155,8 +155,12 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
                       return AccessibilityTools(checkFontOverflows: true, child: child);
                     }
                     return AnnotatedRegion<SystemUiOverlayStyle>(
-                      // Icons only: the bars are transparent and the page draws behind them.
+                      // The page draws behind the bars, but with 3-button navigation, and with
+                      // gestures on One UI, Android paints a navigation bar background over the
+                      // page's bottom in this color. Without it that strip is dark or black
+                      // (#2532).
                       value: SystemUiOverlayStyle(
+                        systemNavigationBarColor: theme.scaffoldBackgroundColor,
                         statusBarIconBrightness: theme.brightness == Brightness.dark
                             ? Brightness.light
                             : Brightness.dark,
