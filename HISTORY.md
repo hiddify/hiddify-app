@@ -1,7 +1,185 @@
 # Changelog
 
 
-## 5.9.2 (2026-11-13)
+## 5.9.5 (2026-11-14)
+
+#### Other
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Merge pull request #2553 from Hollicsh/main. 
+  _Update RU locale_
+
+* Update ru.i18n.json. 
+
+* Update ru.i18n.json. 
+
+* Feat(release): the release notes start with a Change Logs section. 
+  _prepare_release_notes.py fills it from .github/release_changelog.md and
+leaves it out when that file is empty; the app's update dialog reads it._
+
+* Feat(update): the update dialog shows the release's change log. 
+  _The "Change Logs" section of the GitHub release notes (also "Changelog",
+"What's new", "Highlights" or "تغییرات") is shown under the versions,
+as Markdown in a scrolling box, without remote images._
+
+* Fix(connection-button): a light that stops keeps its shape. 
+  _Where the button's motion is off (reduce animations, the window
+without focus, a connection that has settled), the connected button
+showed two flat rings instead of its light. It now keeps the real
+light, the same rays, flares and sparks, standing still where it
+stopped, and goes on from there when it moves again: the light runs on
+a clock of its own that only advances while it moves, so it no longer
+jumps to another sky each time. A light that stands still is drawn
+once and kept, and is drawn again only when the traffic steps._
+
+* Perf(connection-button): it is rebuilt only when the speeds change. 
+  _The button watched the core's whole status for the two speeds its
+light follows. The status comes every second and something in it
+always changed, so the button was rebuilt every second. It now follows
+the download and upload speeds only._
+
+* Perf(stats): the sidebar is rebuilt only when its numbers change. 
+  _The core's status comes every second and something in it always
+changed (memory, goroutines, connections), so the sidebar's speed and
+traffic panel was rebuilt every second. It now follows only the four
+numbers it shows._
+
+* Perf(tray): the tray is set only when what it shows changed. 
+  _The tray notifier ran at every change of the active proxy, which during
+a test is every second, and each run loaded and sent the icon, the
+tooltip, the badge and the whole menu to the system again, though they
+were the same.
+
+It now watches only the ping it shows, and sets the badge, the icon,
+the tooltip and the menu only when they differ from what is shown. An
+icon that could not be set is tried again._
+
+* Perf(proxies): the list stays still while keep top picks. 
+  _During a pick over hundreds of proxies a row changes every moment: a
+ping arrives, a test begins or ends, a flag is found. Each change
+popped, cross-faded or shimmered, the card's numbers and bar animated
+toward every new value, and the page drew 13 to 20 frames a second for
+the whole pick, each about 5 ms of CPU.
+
+While a group is being picked its rows are quiet: values change in
+place, nothing pops, fades or loops, and the card's count and bar jump
+to their values. The loops that remain run on the shared ambient clock.
+The Proxies page now draws about 5 frames a second during a pick, and
+the app's CPU there went from 6.5% to 2% (median, on a release-like
+build)._
+
+* Feat(crash-report): a short first page, and the report shows what it hides. 
+  _The first page was a paragraph nobody reads. It is now one line and the description field.
+
+What keeps the report private is shown where the file is made: while it is built, the card
+ticks off "Removing IPs, domains and keys", then "Encrypting logs", and both stay checked once
+it is ready. A build without a key says so: the last step turns into an amber "Logs are not
+encrypted" warning. The file appears after at least a second, so the steps can be seen.
+
+- The "Report a problem" intro is translated in every language; most only had English.
+- The old line under the file about encryption is removed: the steps replace it.
+
+New strings are translated in every language._
+
+* Fix(update): the Android installer no longer hangs on "Starting the installer..." when it fails. 
+  _A failure to start the system installer (none on the ROM, a file it could not share), or to
+ask whether APKs may be installed, is now answered with an error instead of no answer at all._
+
+* Feat(crash-report): one send page, Telegram recommended, and a local-only way. 
+  _Every way of sending made the same zip and asked for the same save; only the last steps
+differed, yet each was its own page reached from a list. The dialog now has two pages: what
+happened, then the report and where it goes. The zip is built once, on Continue, in a card
+at the top. Tiles pick where it goes, Telegram first with a Recommended pill, and only the
+steps under them change; a save already done stays done.
+
+- Hiddify uploads on its button, no longer as soon as it is picked.
+- GitHub no longer shows a warning.
+- Local only replaces Save the file: save the report, or, when it is encrypted, an
+  unencrypted copy to look inside.
+- The dialog keeps one width: sized by its content, it grew with the file name and changed
+  width between pages. The file name is smaller.
+
+New strings are translated in every language; the ones of the old list are removed._
+
+* Fix(ios): profiles no longer stop connecting after iOS frees storage. 
+  _The profiles' configs were kept in the app group's Library/Caches, which
+iOS empties when storage runs low. Every connect then failed to open the
+config and the app stayed on Connecting until it was reinstalled.
+
+The working directory moves to Library/Application Support (out of the
+backup, as before); the app and the packet tunnel move the old one there
+on first launch. A config that is gone anyway is downloaded again for a
+remote profile, and a local one fails with a message instead of hanging.
+
+Fixes #2548_
+
+* Fix(update): a store build never joins the beta channel. 
+  _A dev build turned on Beta updates whatever its release, so a dev App Store, Play or
+Microsoft Store build carried a channel it cannot use: the store delivers its updates, and
+the About page already hides the switch there. Only a build that checks its own updates
+joins it now._
+
+* Fix(connection-button): keep the wave moving while connecting takes long. 
+  _The connecting, searching and disconnecting looks ran on the ambient
+clock, which stops 10 s after its last wake. A start that took longer,
+or coming back to home after that, froze the logo half way and the
+button looked stuck. Busy looks now move for as long as they last.
+
+Fixes hiddify/hiddify-app#2555_
+
+* Perf(proxies): rows stop shimmering once their test is done. 
+  _A row whose flag was only cached from the last run, or that had no IP yet,
+shimmered on its own ticker for as long as the page stayed open, even with
+its ping in or at rest: about 22 frames a second and a steady slice of a
+core while idle. They now shimmer only while the row is still being tested,
+and the spinners and shimmers repaint their icon alone, not the row._
+
+* Feat(keep-top): show how many proxies work, fail and are left to test. 
+  _While the test runs, the big figure counts the proxies left to test and the
+bar fills with the working and failing ones. Beside the figure, a quiet tally
+says how many answer and how many do not._
+
+* Feat(connection-check): turn the chain on or off from its row in the sheet. 
+  _The chain's row stays while the chain is off, greyed with a switch, and tapping it
+toggles the chain. With the chain off the summary no longer waits for a hop._
+
+* Fix(crash-report): offer a desktop core crash as soon as the core is back, not at the next start. 
+
+* Feat(crash-report): reports encrypted by the core, readable where they can be. 
+  _Every way of sending (Hiddify, Telegram, email, GitHub) carries the same
+hiddify-report-<time>.zip, made and encrypted by the core: the generic part
+(metadata.json, goroutines, crash reports, the app's exceptions) is readable,
+the config and the logs are in sensitive.encrypted.age, which only the
+Hiddify team opens. Save the file offers it encrypted or unencrypted, the only
+way the sensitive part leaves the app in the clear.
+
+The key lives in the core, so the app's age code, the cryptography package
+and the diagnostics_public_key define in the Makefile and the workflows are
+gone; the core answers whether a report is encrypted. The app sends its
+exceptions as generic files and the rest as extra files, asks the background
+core for its zip unencrypted (it goes inside the encrypted part), no longer
+sends the time zone, and reports the window settings' values.
+
+docs/diagnostics-encryption.md has the layout, the key setup and how to open
+a report._
+
+* Feat(update): a beta channel; GitHub pre-releases go only to beta users. 
+  _A release still marked a pre-release on GitHub was offered to every user, since only a
+suffix in the tag made a release a pre-release. Now either does, and only users who turn
+on Beta updates (About) get pre-releases. A dev build (a .dev tag or the draft release)
+turns it on once per build, so it keeps updating to the next beta._
+
+* Feat(telegram): a livelier channel invite that opens the Telegram app first. 
+  _The dialog gets a Telegram-blue header with a floating plane over soft rings and the
+channel's handle, then the message and one clear join button.
+
+Joining opens tg:// in the Telegram app and falls back to t.me when no app takes it;
+the About page link does the same._
+
+
+
+## v5.9.2 (2026-11-13)
 
 #### Other
 
