@@ -949,6 +949,7 @@
       "msg": "A new version of @:common.appTitle is available. Update now?",
       "currentVersion": "Current version",
       "newVersion": "New version",
+      "changelog": "What's new",
       "updateNow": "Update now",
       "downloading": "Downloading…",
       "installing": "Starting the installer…",

@@ -9,8 +9,10 @@ Map<String, dynamic> _release(
   bool draft = false,
   bool prerelease = false,
   List<String> assets = const [],
+  String? body,
 }) => {
   'tag_name': tag,
+  'body': ?body,
   'draft': draft,
   'prerelease': prerelease,
   'html_url': 'https://github.com/hiddify/hiddify-app/releases/tag/$tag',
@@ -50,6 +52,44 @@ void main() {
     test('that is no version, or a draft, is no release', () {
       expect(GithubReleaseParser.parse(_release('draft')), isNull);
       expect(GithubReleaseParser.parse(_release('v5.4.0', draft: true)), isNull);
+    });
+  });
+
+  group('the change log of a release', () {
+    const table = '## Downloads\n\n<!-- ASSETS:BEGIN -->\n<table>\n<tr><td>x</td></tr>\n</table>\n<!-- ASSETS:END -->';
+
+    test('is the Change Logs section, without the rest of the notes', () {
+      final release = GithubReleaseParser.parse(
+        _release(
+          'v5.6.0',
+          body:
+              '# Change Logs\n\n- **WARP** connects faster\n<!-- note -->\n- fixed a crash\n\n'
+              '### Android\n- TV\n\n'
+              '# Download\n\n$table\n\n**List of all changes:** [ChangeLog](https://x)',
+        ),
+      )!;
+      expect(release.changelog, '- **WARP** connects faster\n\n- fixed a crash\n\n### Android\n- TV');
+    });
+
+    test('ends at a rule or the download table', () {
+      expect(GithubReleaseParser.changelog('## Changelog\r\n- a\r\n---\nmore'), '- a');
+      expect(GithubReleaseParser.changelog("## What's new:\n- b\n$table"), '- b');
+      expect(
+        GithubReleaseParser.changelog('# Change Logs\n- c\n### iOS\n- d\n## Downloads\n**Download**'),
+        '- c\n### iOS\n- d',
+      );
+    });
+
+    test('is null when the notes have none or it is empty', () {
+      expect(GithubReleaseParser.parse(_release('v5.6.0'))!.changelog, isNull);
+      expect(GithubReleaseParser.changelog('**Download**\n\n$table'), isNull);
+      expect(GithubReleaseParser.changelog('# Change Logs\n\n<!-- none -->\n# Downloads\n$table'), isNull);
+    });
+
+    test('a long one is cut at a line', () {
+      final long = GithubReleaseParser.changelog('# Change Logs\n${List.filled(500, '- a change').join('\n')}')!;
+      expect(long.length, lessThan(GithubReleaseParser.maxChangelogLength + 10));
+      expect(long, endsWith('- a change\n\n…'));
     });
   });
 

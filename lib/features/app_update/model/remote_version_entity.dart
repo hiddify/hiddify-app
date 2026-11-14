@@ -16,6 +16,9 @@ class RemoteVersionEntity with _$RemoteVersionEntity {
     required DateTime publishedAt,
     required Environment flavor,
     @Default(<ReleaseAsset>[]) List<ReleaseAsset> assets,
+
+    /// The "Change Logs" section of the release notes, in Markdown; null when they have none.
+    String? changelog,
   }) = _RemoteVersionEntity;
 
   String get presentVersion => flavor == Environment.prod ? version : "$version ${flavor.name}";

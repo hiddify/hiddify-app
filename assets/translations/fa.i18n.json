@@ -949,6 +949,7 @@
       "msg": "نسخه جدیدی از @:common.appTitle در دسترس است. هم‌اکنون به‌روزرسانی شود؟",
       "currentVersion": "نسخه فعلی",
       "newVersion": "نسخه جدید",
+      "changelog": "تغییرات",
       "updateNow": "اکنون به‌روزرسانی کن",
       "downloading": "در حال دریافت…",
       "installing": "در حال اجرای نصب‌کننده…",
