@@ -127,7 +127,10 @@ class AboutPage extends HookConsumerWidget {
                 title: Text(t.pages.about.telegramChannel),
                 trailing: const Icon(FluentIcons.open_24_regular),
                 onTap: () async {
-                  await UriUtils.tryLaunch(Uri.parse(Constants.telegramChannelUrl));
+                  await UriUtils.tryLaunchAppOrWeb(
+                    Uri.parse(Constants.telegramChannelAppUrl),
+                    Uri.parse(Constants.telegramChannelUrl),
+                  );
                 },
               ),
               ListTile(

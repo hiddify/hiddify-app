@@ -29,6 +29,23 @@ abstract class UriUtils {
     }
   }
 
+  /// Opens [appUri] (such as `tg://`) in its app, and [webUri] when no app takes it.
+  /// Android and iOS are asked to open the app link directly: iOS answers "can launch" only
+  /// for schemes listed in Info.plist, and Android only for apps in the manifest's queries,
+  /// while opening it just fails when no app is there. Desktops check first: Windows opens
+  /// a "find an app" prompt for a scheme nothing handles instead of failing.
+  static Future<bool> tryLaunchAppOrWeb(Uri appUri, Uri webUri) async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS || await canLaunchUrl(appUri)) {
+        loggy.debug("launching [$appUri]");
+        if (await launchUrl(appUri, mode: LaunchMode.externalNonBrowserApplication)) return true;
+      }
+    } catch (e, stackTrace) {
+      loggy.debug("no app for [$appUri], opening [$webUri]", e, stackTrace);
+    }
+    return tryLaunch(webUri);
+  }
+
   /// [subject] and [text] go with the file to the app the user picks: a mail app makes them
   /// the message's subject and body.
   static Future<bool> tryShareFile(Uri uri, {String? mimeType, String? subject, String? text}) async {

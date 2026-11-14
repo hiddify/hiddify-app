@@ -9,6 +9,10 @@ abstract class Constants {
   static const githubReleasesApiUrl = "https://api.github.com/repos/hiddify/hiddify-app/releases";
   static const githubLatestReleaseUrl = "https://github.com/hiddify/hiddify-app/releases/latest";
   static const telegramChannelUrl = "https://t.me/hiddify";
+  static const telegramChannelHandle = "@hiddify";
+
+  /// Opens the channel in the Telegram app; [telegramChannelUrl] when the app is not there.
+  static const telegramChannelAppUrl = "tg://resolve?domain=hiddify";
   static const bugReportEmail = "bug@hiddify.com";
 
   /// The bot that turns a report into an issue; the app starts it with the device's details
