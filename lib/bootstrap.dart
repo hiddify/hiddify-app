@@ -80,8 +80,9 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
   });
 
   // A dev build (a .dev tag or the draft release) is a beta: it joins the beta channel, so that
-  // it updates to the next beta rather than waiting for a stable release
-  if (env == Environment.dev) {
+  // it updates to the next beta rather than waiting for a stable release. A store build has no
+  // beta channel: the store delivers its updates (TestFlight is the App Store's beta)
+  if (env == Environment.dev && appInfo.release.allowCustomUpdateChecker) {
     final build = "${appInfo.version}+${appInfo.buildNumber}";
     if (container.read(Preferences.betaUpdatesJoinedBy) != build) {
       await container.read(Preferences.betaUpdatesJoinedBy.notifier).update(build);
