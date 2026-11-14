@@ -218,7 +218,7 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                         Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
                             context.packageManager.canRequestPackageInstalls()
                     )
-                }
+                }.onFailure { result.error("can_install_apks", it.message, null) }
             }
 
             // An update the app downloaded: the system installer asks the user to confirm it. Until
@@ -256,7 +256,9 @@ class PlatformSettingsHandler : FlutterPlugin, MethodChannel.MethodCallHandler, 
                             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
                     success("started")
-                }
+                    // a failure is answered too: unanswered, the update stayed on "Starting the
+                    // installer..." for good (no installer on the ROM, a file it could not share)
+                }.onFailure { result.error("install_apk", it.message ?: it.toString(), null) }
             }
 
             else -> result.notImplemented()
