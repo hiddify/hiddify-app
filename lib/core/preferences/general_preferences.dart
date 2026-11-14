@@ -118,6 +118,14 @@ abstract class Preferences {
 
   static final autoCheckIp = PreferencesNotifier.create<bool, bool>("auto_check_ip", true);
 
+  /// The beta channel: updates to pre-releases (a .dev tag, or one still a pre-release on GitHub)
+  /// too, not only to stable releases.
+  static final betaUpdates = PreferencesNotifier.create<bool, bool>("beta_updates", false);
+
+  /// The dev build (version+build) that last joined the beta channel on its own, so that a dev
+  /// build joins it once and the user can still leave it.
+  static final betaUpdatesJoinedBy = PreferencesNotifier.create<String, String>("beta_updates_joined_by", "");
+
   /// Keeps the connect button still and stops the decorative loops, as the system's own reduce
   /// motion setting does: less CPU, and so battery, on a laptop or an old phone.
   static final reduceAnimations = PreferencesNotifier.create<bool, bool>("reduce_animations", false);

@@ -79,6 +79,16 @@ Future<void> lazyBootstrap(WidgetsBinding widgetsBinding, Environment env) async
     }
   });
 
+  // A dev build (a .dev tag or the draft release) is a beta: it joins the beta channel, so that
+  // it updates to the next beta rather than waiting for a stable release
+  if (env == Environment.dev) {
+    final build = "${appInfo.version}+${appInfo.buildNumber}";
+    if (container.read(Preferences.betaUpdatesJoinedBy) != build) {
+      await container.read(Preferences.betaUpdatesJoinedBy.notifier).update(build);
+      await container.read(Preferences.betaUpdates.notifier).update(true);
+    }
+  }
+
   if (PlatformUtils.isDesktop) {
     await _init("window controller", () => container.read(windowNotifierProvider.future));
 

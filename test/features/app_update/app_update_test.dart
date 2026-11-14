@@ -4,11 +4,15 @@ import 'package:hiddify/features/app_update/data/github_release_parser.dart';
 import 'package:hiddify/features/app_update/model/install_kind.dart';
 import 'package:hiddify/features/app_update/model/remote_version_entity.dart';
 
-Map<String, dynamic> _release(String tag, {bool draft = false, List<String> assets = const []}) => {
+Map<String, dynamic> _release(
+  String tag, {
+  bool draft = false,
+  bool prerelease = false,
+  List<String> assets = const [],
+}) => {
   'tag_name': tag,
   'draft': draft,
-  // the release workflow marks every release a pre-release on GitHub
-  'prerelease': true,
+  'prerelease': prerelease,
   'html_url': 'https://github.com/hiddify/hiddify-app/releases/tag/$tag',
   'published_at': '2026-11-01T22:42:47Z',
   'assets': [
@@ -23,12 +27,16 @@ Map<String, dynamic> _release(String tag, {bool draft = false, List<String> asse
 
 void main() {
   group('a release tag', () {
-    test('names its version; the GitHub pre-release flag does not make it one', () {
+    test('names its version', () {
       final release = GithubReleaseParser.parse(_release('v5.4.0', assets: ['Hiddify-MacOS.dmg']))!;
       expect(release.version, '5.4.0');
       expect(release.preRelease, isFalse);
       expect(release.flavor, Environment.prod);
       expect(release.asset('Hiddify-MacOS.dmg')!.size, 42);
+    });
+
+    test('still a pre-release on GitHub is one, whatever its tag', () {
+      expect(GithubReleaseParser.parse(_release('v5.9.2', prerelease: true))!.preRelease, isTrue);
     });
 
     test('with a suffix is a pre-release, .dev a dev build', () {

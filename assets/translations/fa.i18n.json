@@ -383,6 +383,8 @@
       "title": "درباره",
       "notAvailableMsg": "شما در حال استفاده از آخرین نسخه هستید",
       "checkForUpdate": "بررسی برای به‌روزرسانی",
+      "betaUpdates": "به‌روزرسانی‌های بتا",
+      "betaUpdatesMsg": "نسخه‌های جدید را پیش از انتشار برای همه دریافت کنید",
       "openWorkingDir": "باز کردن پوشه کاری",
       "sourceCode": "کد منبع",
       "telegramChannel": "کانال تلگرام",

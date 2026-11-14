@@ -28,9 +28,9 @@ abstract class GithubReleaseParser {
       version: match.group(1)!,
       buildNumber: match.group(3) ?? '',
       releaseTag: fullTag,
-      // GitHub's flag is set on every release the workflow uploads, stable or not: the tag says
-      // which a release is
-      preRelease: suffix.isNotEmpty,
+      // the release workflow uploads every release as a GitHub pre-release and it is promoted to
+      // a full release once tested: until then only beta users get it, as they get a .dev tag
+      preRelease: suffix.isNotEmpty || json['prerelease'] == true,
       url: json['html_url'] as String,
       publishedAt: DateTime.parse(json['published_at'] as String),
       flavor: flavor,

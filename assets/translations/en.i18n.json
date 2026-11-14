@@ -383,6 +383,8 @@
       "title": "About",
       "notAvailableMsg": "You’re using the latest version",
       "checkForUpdate": "Check for update",
+      "betaUpdates": "Beta updates",
+      "betaUpdatesMsg": "Get new versions before they are released to everyone",
       "openWorkingDir": "Open working directory",
       "sourceCode": "Source code",
       "telegramChannel": "Telegram channel",

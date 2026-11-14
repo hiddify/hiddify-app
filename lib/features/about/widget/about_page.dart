@@ -8,6 +8,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
@@ -50,6 +51,13 @@ class AboutPage extends HookConsumerWidget {
           onTap: () async {
             await ref.read(appUpdateNotifierProvider.notifier).check();
           },
+        ),
+      if (appInfo.release.allowCustomUpdateChecker)
+        SwitchListTile.adaptive(
+          title: Text(t.pages.about.betaUpdates),
+          subtitle: Text(t.pages.about.betaUpdatesMsg),
+          value: ref.watch(Preferences.betaUpdates),
+          onChanged: ref.read(Preferences.betaUpdates.notifier).update,
         ),
       if (PlatformUtils.isDesktop)
         ListTile(
