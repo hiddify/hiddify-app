@@ -9,9 +9,6 @@ enum Environment {
 
   static const sentryDSN = String.fromEnvironment("sentry_dsn");
 
-  /// An age X25519 public key (`age1…`) the diagnostics a user sends to Hiddify are encrypted to,
-  /// from DIAGNOSTICS_PUBLIC_KEY in the build environment; empty when the build has none.
-  static const diagnosticsPublicKey = String.fromEnvironment("diagnostics_public_key");
   // This environment variable is set in the 'windows-release-zip' command
   static const isPortable = bool.fromEnvironment("portable");
 }

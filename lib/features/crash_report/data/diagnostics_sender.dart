@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:hiddify/core/app_info/app_info_provider.dart';
 import 'package:hiddify/core/model/app_info_entity.dart';
 import 'package:hiddify/core/model/environment.dart';
-import 'package:hiddify/features/crash_report/data/age_encryption.dart';
+import 'package:hiddify/features/crash_report/data/diagnostics_exporter.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -28,16 +27,8 @@ class DiagnosticsSender {
 
   final AppInfoEntity? Function() _appInfo;
 
-  /// Whether a build can upload at all: one without a DSN (a debug or a local build) cannot, and
-  /// neither can one whose public key is not an age key: a report promised to be encrypted is
-  /// never sent in the clear.
-  static bool get available =>
-      Environment.sentryDSN.isNotEmpty && (!encrypted || AgeEncryption.isRecipient(Environment.diagnosticsPublicKey));
-
-  /// Whether the report is encrypted before it leaves the device, so only the holder of the
-  /// private key opens it, not anyone with access to Sentry. Set at build time from
-  /// DIAGNOSTICS_PUBLIC_KEY.
-  static bool get encrypted => Environment.diagnosticsPublicKey.isNotEmpty;
+  /// Whether a build can upload at all: one without a DSN (a debug or a local build) cannot.
+  static bool get available => Environment.sentryDSN.isNotEmpty;
 
   /// Sentry's own limit for one attachment; a larger one is left out of the event without a word,
   /// so such a report is not sent at all and the user is pointed at email or Telegram instead.
@@ -48,23 +39,22 @@ class DiagnosticsSender {
   static const _timeout = Duration(minutes: 3);
 
   /// Whether Sentry took the report: false on a rate limit, any other answer than 200, no
-  /// connection, a timeout, or a zip too large to attach. What the user wrote, [description], is
-  /// also on the event itself, so it reads without opening the zip, unless the report is
-  /// [encrypted]: then it is only in the zip. So is [crashText], the exception a crash ended with.
-  Future<bool> send(File zip, {String? crashName, String? description, String? crashText}) async {
+  /// connection, a timeout, or a zip too large to attach. [report] is what the core made: when its
+  /// sensitive part is encrypted, so only the Hiddify team opens it and not anyone with access to
+  /// Sentry, what the user wrote and the crash stay in it and off the event. What the user wrote, [description], is also on the event itself, so it reads
+  /// without opening the zip, unless the report is encrypted: then it is only in the zip. So is
+  /// [crashText], the exception a crash ended with.
+  Future<bool> send(DiagnosticsReport report, {String? crashName, String? description, String? crashText}) async {
     if (!available) {
-      _log.warning('no Sentry DSN or no valid diagnostics public key in this build, the report cannot be uploaded');
+      _log.warning('no Sentry DSN in this build, the report cannot be uploaded');
       return false;
     }
-    var name = zip.uri.pathSegments.last;
+    final name = report.file.uri.pathSegments.last;
+    final encrypted = report.encrypted;
     final SentryClient client;
     final Uint8List content;
     try {
-      var bytes = await zip.readAsBytes();
-      if (encrypted) {
-        bytes = await AgeEncryption.encrypt(bytes, Environment.diagnosticsPublicKey);
-        name = '$name.age';
-      }
+      final bytes = await report.file.readAsBytes();
       if (bytes.length > maxSize) {
         _log.warning('report $name is ${bytes.length} bytes, over the $maxSize Sentry takes, not sent');
         return false;
@@ -102,13 +92,7 @@ class DiagnosticsSender {
                 },
               },
             ),
-            hint: Hint.withAttachment(
-              SentryAttachment.fromUint8List(
-                content,
-                name,
-                contentType: encrypted ? 'application/octet-stream' : 'application/zip',
-              ),
-            ),
+            hint: Hint.withAttachment(SentryAttachment.fromUint8List(content, name, contentType: 'application/zip')),
           )
           .timeout(_timeout);
       if (id == const SentryId.empty()) {

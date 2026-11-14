@@ -1123,17 +1123,16 @@
     },
     "crashReport": {
       "title": "Hiddify crashed last time",
-      "msg": "Send a report to the developers so this gets fixed? It holds the crash details, the logs and your configuration with servers, keys and passwords removed, as one zip file you can look at before sending.",
+      "msg": "Send a report to the developers so this gets fixed? The app version, your system and your settings without passwords stay readable. The crash details, the logs and your configuration, with servers, keys and passwords removed, are encrypted so only the Hiddify team can open them.",
       "sendHiddify": "Send to Hiddify",
       "sendHiddifyMsg": "The app uploads the report itself",
-      "sendHiddifyEncryptedMsg": "The app encrypts and uploads it itself",
       "sendEmail": "Send by email",
       "sendTelegram": "Send on Telegram",
       "sent": "Report sent. Thank you!",
       "sendFailed": "Could not send the report. Try email or Telegram instead.",
       "subject": "Hiddify crash report",
       "problemTitle": "Report a problem",
-      "problemMsg": "Tell the developers what went wrong. The report holds the logs, the app and connection state and your settings with servers, keys and passwords removed, as one zip file you can look at before sending.",
+      "problemMsg": "Tell the developers what went wrong. The app version, your system and your settings without passwords stay readable. The logs, the app and connection state and your configuration, with servers, keys and passwords removed, are encrypted so only the Hiddify team can open them.",
       "description": "What happened? (optional)",
       "descriptionHint": "What you did, what you expected, what you saw instead",
       "saveFile": "Save the file",
@@ -1168,7 +1167,12 @@
         "attachInChat": "Attach the report in the bot chat and send it",
         "attachHow": "Drag the file in, or use the paperclip",
         "dropInIssueHow": "Drag the file into Additional Context, or tap the bar under that box",
-        "hiddifyEncrypted": "Encrypted on this device: only the Hiddify team can open it."
+        "hiddifyEncrypted": "Logs and configuration are encrypted on this device: only the Hiddify team can open them.",
+        "encrypted": "Logs and configuration are encrypted on this device: only the Hiddify team can open them. The app version and system stay readable.",
+        "githubEncrypted": "The issue is public. Logs and configuration in the report are encrypted: only the Hiddify team can open them. The app version, system and what you write in the issue are public.",
+        "saveEncryptedOrNot": "Encrypted, to send it on: logs and configuration only the Hiddify team can open. Unencrypted, to look inside it yourself.",
+        "saveEncrypted": "Encrypted",
+        "saveUnencrypted": "Unencrypted"
       }
     },
     "keepTop": {

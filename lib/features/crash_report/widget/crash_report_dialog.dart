@@ -39,7 +39,9 @@ enum ReportChannel {
   /// as a public issue on [Constants.bugReportGithubIssueUrl]
   github,
 
-  /// saved on desktop, or handed to the share sheet on a phone, for the user to send anywhere
+  /// saved on desktop, or handed to the share sheet on a phone, for the user to send anywhere:
+  /// encrypted, or in the clear for the user to look at. The only way the sensitive part leaves
+  /// the app unencrypted.
   file,
 }
 
@@ -81,10 +83,14 @@ class ReportProblemDialog extends ConsumerWidget {
   }
 }
 
-/// One thing the user does to send the report. A step with an [action] gets a button and a check
-/// once its action reports it done; one without is the instruction that finishes the way.
+/// A button of a step. [run] answers whether it got done: a save dialog closed without saving
+/// leaves the step to do again.
+typedef _Action = ({String label, IconData icon, Future<bool> Function() run});
+
+/// One thing the user does to send the report. A step with [actions] gets their buttons and a
+/// check once one of them reports it done; one without is the instruction that finishes the way.
 class _Step {
-  const _Step(this.title, {this.detail, this.file, this.action, this.actionLabel, this.actionIcon});
+  const _Step(this.title, {this.detail, this.file, this.actions = const []});
 
   final String title;
   final String? detail;
@@ -92,10 +98,7 @@ class _Step {
   /// The zip's name, shown on a line of its own: it is long and would break a sentence apart.
   final String? file;
 
-  /// Whether it got done: a save dialog closed without saving leaves the step to do again.
-  final Future<bool> Function()? action;
-  final String? actionLabel;
-  final IconData? actionIcon;
+  final List<_Action> actions;
 }
 
 enum _Upload { sending, sent, failed }
@@ -127,7 +130,14 @@ class _ReportDialog extends ConsumerStatefulWidget {
 class _ReportDialogState extends ConsumerState<_ReportDialog> {
   final _description = TextEditingController();
   ReportChannel? _channel;
-  File? _file;
+
+  /// What leaves the device, as the core made it: the generic metadata to read, the sensitive part
+  /// encrypted to the build's key (in the clear in a build without one).
+  DiagnosticsReport? _report;
+
+  /// The same report with the sensitive part in the clear, for [ReportChannel.file] only: the
+  /// user saves it to look inside.
+  File? _unencrypted;
   Object? _error;
   _Upload? _upload;
   final _done = <int>{};
@@ -159,27 +169,38 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
     final generation = ++_generation;
     setState(() {
       _channel = channel;
-      _file = null;
+      _report = null;
+      _unencrypted = null;
       _error = null;
       _upload = null;
       _done.clear();
     });
-    final File file;
+    final DiagnosticsReport report;
+    File? unencrypted;
     try {
-      file = await ref.read(diagnosticsExporterProvider).export(description: _description.text);
+      final exporter = ref.read(diagnosticsExporterProvider);
+      // the core encrypts the sensitive part to its own key; one whose key is not an age key
+      // throws here, and nothing is sent in the clear
+      report = await exporter.export(description: _description.text);
+      if (channel == ReportChannel.file && report.encrypted) {
+        unencrypted = (await exporter.export(description: _description.text, unencrypted: true)).file;
+      }
     } catch (e, stack) {
-      _log.error('exporting the diagnostics failed: $e', e, stack);
+      _log.error('preparing the diagnostics failed: $e', e, stack);
       if (mounted && generation == _generation) setState(() => _error = e);
       return;
     }
     if (!mounted || generation != _generation) return;
-    setState(() => _file = file);
+    setState(() {
+      _report = report;
+      _unencrypted = unencrypted;
+    });
 
     if (channel == ReportChannel.hiddify) {
       setState(() => _upload = _Upload.sending);
       final sent = await ref
           .read(diagnosticsSenderProvider)
-          .send(file, crashName: widget.crashName, description: _description.text, crashText: widget.crash?.text);
+          .send(report, crashName: widget.crashName, description: _description.text, crashText: widget.crash?.text);
       if (mounted && generation == _generation) setState(() => _upload = sent ? _Upload.sent : _Upload.failed);
     }
   }
@@ -240,12 +261,7 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
         ),
         Text(r.chooseHow, style: Theme.of(context).textTheme.titleSmall),
         if (DiagnosticsSender.available)
-          option(
-            ReportChannel.hiddify,
-            FluentIcons.cloud_arrow_up_20_regular,
-            r.sendHiddify,
-            DiagnosticsSender.encrypted ? r.sendHiddifyEncryptedMsg : r.sendHiddifyMsg,
-          ),
+          option(ReportChannel.hiddify, FluentIcons.cloud_arrow_up_20_regular, r.sendHiddify, r.sendHiddifyMsg),
         option(
           ReportChannel.telegram,
           FluentIcons.send_20_regular,
@@ -263,11 +279,12 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
     final r = t.dialogs.crashReport;
     final theme = Theme.of(context);
     final steps = _steps(t, channel);
+    final encrypted = _report?.encrypted ?? false;
     // the first step with a button that is not done yet; the zip comes first of all. Steps go in
     // order: a later button waits for this one, a done one can be run again.
-    final active = _file == null
+    final active = _report == null
         ? -1
-        : steps.indexed.where((e) => e.$2.action != null && !_done.contains(e.$1)).firstOrNull?.$1 ?? -1;
+        : steps.indexed.where((e) => e.$2.actions.isNotEmpty && !_done.contains(e.$1)).firstOrNull?.$1 ?? -1;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -280,13 +297,21 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
           ReportChannel.github => r.sendGithub,
           ReportChannel.file => r.saveFile,
         }, style: theme.textTheme.titleMedium),
+        // what the report is known to be once the core made it: until then, GitHub warns
         if (switch (channel) {
+              ReportChannel.github when encrypted => (
+                FluentIcons.lock_closed_20_regular,
+                r.steps.githubEncrypted,
+                false,
+              ),
               ReportChannel.github => (FluentIcons.warning_20_regular, r.steps.githubPublic, true),
-              ReportChannel.hiddify when DiagnosticsSender.encrypted => (
+              ReportChannel.hiddify when encrypted => (
                 FluentIcons.lock_closed_20_regular,
                 r.steps.hiddifyEncrypted,
                 false,
               ),
+              ReportChannel.telegram ||
+              ReportChannel.email when encrypted => (FluentIcons.lock_closed_20_regular, r.steps.encrypted, false),
               ReportChannel.telegram => (FluentIcons.lock_closed_20_regular, r.steps.telegramPrivate, false),
               ReportChannel.email => (FluentIcons.lock_closed_20_regular, r.steps.emailPrivate, false),
               _ => null,
@@ -301,17 +326,17 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
           title: r.steps.prepare,
           detail: _error != null
               ? r.steps.prepareFailed
-              : _file == null
+              : _report == null
               ? r.steps.preparing
               : null,
-          file: _file?.uri.pathSegments.last,
+          file: _report?.file.uri.pathSegments.last,
           state: _error != null
               ? _StepState.failed
-              : _file == null
+              : _report == null
               ? _StepState.working
               : _StepState.done,
         ),
-        if (channel == ReportChannel.hiddify && _file != null)
+        if (channel == ReportChannel.hiddify && _report != null)
           _StepTile(
             number: 2,
             title: r.steps.upload,
@@ -334,22 +359,26 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
             file: step.file,
             state: _done.contains(index)
                 ? _StepState.done
-                : index == active || (step.action == null && active == -1 && _file != null)
+                : index == active || (step.actions.isEmpty && active == -1 && _report != null)
                 ? _StepState.active
                 : _StepState.waiting,
-            action: step.action == null || _file == null
-                ? null
-                : (
-                    label: step.actionLabel!,
-                    icon: step.actionIcon!,
-                    primary: index == active,
-                    run: index == active || _done.contains(index)
-                        ? () async {
-                            final done = await step.action!();
-                            if (done && mounted) setState(() => _done.add(index));
-                          }
-                        : null,
-                  ),
+            actions: _report == null
+                ? const []
+                : [
+                    for (final (i, action) in step.actions.indexed)
+                      (
+                        label: action.label,
+                        icon: action.icon,
+                        // the first button is the one to press; the others are there if wanted
+                        primary: index == active && i == 0,
+                        run: index == active || _done.contains(index)
+                            ? () async {
+                                final done = await action.run();
+                                if (done && mounted) setState(() => _done.add(index));
+                              }
+                            : null,
+                      ),
+                  ],
           ),
       ],
     );
@@ -361,31 +390,39 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
     final s = t.dialogs.crashReport.steps;
     final notifications = ref.read(inAppNotificationControllerProvider);
     final desktop = PlatformUtils.isDesktop;
-    final file = _file;
-    final name = file?.uri.pathSegments.last ?? '';
+    final report = _report;
+    final name = report?.file.uri.pathSegments.last ?? '';
     final crash = widget.crashName != null;
     final subject = crash ? t.dialogs.crashReport.subject : t.dialogs.crashReport.problemSubject;
 
-    Future<bool> save() async => file != null && await saveFileAs(file, t: t, notifications: notifications);
+    Future<bool> save(File? file) async => file != null && await saveFileAs(file, t: t, notifications: notifications);
+    final saveLabel = desktop ? t.common.save : t.common.share;
+    final saveIcon = desktop ? FluentIcons.arrow_download_20_regular : FluentIcons.share_20_regular;
 
     // every way goes the same: the zip is kept somewhere, the place it goes to opens, and the
     // user attaches it there. Neither a mailto: nor a Telegram or GitHub link can carry a file.
     _Step open(String title, String detail, String label, IconData icon, FutureOr<Uri> uri) => _Step(
       title,
       detail: detail,
-      action: () async => UriUtils.tryLaunch(await uri),
-      actionLabel: label,
-      actionIcon: icon,
+      actions: [(label: label, icon: icon, run: () async => UriUtils.tryLaunch(await uri))],
     );
 
     return [
-      if (channel != ReportChannel.hiddify)
+      // saving for oneself: encrypted to send on later, or in the clear to look at
+      if (channel == ReportChannel.file && _unencrypted != null)
+        _Step(
+          s.save,
+          detail: s.saveEncryptedOrNot,
+          actions: [
+            (label: s.saveEncrypted, icon: FluentIcons.lock_closed_20_regular, run: () => save(report?.file)),
+            (label: s.saveUnencrypted, icon: FluentIcons.lock_open_20_regular, run: () => save(_unencrypted)),
+          ],
+        )
+      else if (channel != ReportChannel.hiddify)
         _Step(
           s.save,
           detail: desktop ? s.saveDesktopMsg : s.saveMobileMsg,
-          action: save,
-          actionLabel: desktop ? t.common.save : t.common.share,
-          actionIcon: desktop ? FluentIcons.arrow_download_20_regular : FluentIcons.share_20_regular,
+          actions: [(label: saveLabel, icon: saveIcon, run: () => save(report?.file))],
         ),
       ...switch (channel) {
         ReportChannel.hiddify || ReportChannel.file => const <_Step>[],
@@ -460,7 +497,7 @@ class _StepTile extends StatelessWidget {
     required this.state,
     this.detail,
     this.file,
-    this.action,
+    this.actions = const [],
   });
 
   final int number;
@@ -470,7 +507,7 @@ class _StepTile extends StatelessWidget {
   final _StepState state;
 
   /// [run] is null while an earlier step is still to do: the button shows, disabled.
-  final ({String label, IconData icon, bool primary, Future<void> Function()? run})? action;
+  final List<({String label, IconData icon, bool primary, Future<void> Function()? run})> actions;
 
   @override
   Widget build(BuildContext context) {
@@ -506,7 +543,6 @@ class _StepTile extends StatelessWidget {
       ),
     };
 
-    final action = this.action;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -536,20 +572,27 @@ class _StepTile extends StatelessWidget {
                     ),
                   ),
                 if (file case final file?) ...[const SizedBox(height: 6), _FileChip(name: file)],
-                if (action != null) ...[
+                if (actions.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  if (action.primary)
-                    FilledButton.icon(
-                      onPressed: action.run,
-                      icon: Icon(action.icon, size: 18),
-                      label: Text(action.label),
-                    )
-                  else
-                    OutlinedButton.icon(
-                      onPressed: action.run,
-                      icon: Icon(action.icon, size: 18),
-                      label: Text(action.label),
-                    ),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final action in actions)
+                        if (action.primary)
+                          FilledButton.icon(
+                            onPressed: action.run,
+                            icon: Icon(action.icon, size: 18),
+                            label: Text(action.label),
+                          )
+                        else
+                          OutlinedButton.icon(
+                            onPressed: action.run,
+                            icon: Icon(action.icon, size: 18),
+                            label: Text(action.label),
+                          ),
+                    ],
+                  ),
                 ],
               ],
             ),

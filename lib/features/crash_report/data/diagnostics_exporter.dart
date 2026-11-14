@@ -26,6 +26,10 @@ const _maxAppCrashSize = 128 * 1024;
 
 final diagnosticsExporterProvider = Provider<DiagnosticsExporter>(DiagnosticsExporter.new);
 
+/// A report the core wrote ([DiagnosticsExporter.export]), and whether its sensitive part (config,
+/// logs, crashes) is encrypted to the key built into the core, so only the Hiddify team opens it.
+typedef DiagnosticsReport = ({File file, bool encrypted});
+
 /// Builds the zip the user sends after a crash or to report a problem: the app's own core gathers
 /// its crash, OOM and power reports, stderr and core log files, the previous run's goroutine
 /// snapshots and the sanitized config, and the app adds what the user wrote, what only the app
@@ -36,9 +40,15 @@ class DiagnosticsExporter {
 
   final Ref _ref;
 
-  Future<File> export({String? description}) async {
+  /// The report, made and encrypted by the core (hiddify-core/v2/hcore/diagnostics.go): its
+  /// generic metadata readable, its sensitive part encrypted when the core has a key, unless
+  /// [unencrypted] asks for it in the clear, for the user to look at.
+  Future<DiagnosticsReport> export({String? description, bool unencrypted = false}) async {
     final core = _ref.read(hiddifyCoreServiceProvider).core;
+    // extraFiles go in the encrypted part; genericFiles stay readable: stack traces of the app's
+    // own code, nothing of the user's
     final extraFiles = <String, List<int>>{};
+    final genericFiles = <String, List<int>>{};
 
     final text = description?.trim() ?? '';
     if (text.isNotEmpty) {
@@ -70,7 +80,7 @@ class DiagnosticsExporter {
     final crashes = appCrashFiles(_ref.read(appDirectoriesProvider).requireValue.workingDir).reversed;
     for (final crash in crashes.take(_maxAppCrashes)) {
       try {
-        extraFiles['app-crash-${crash.uri.pathSegments.last}'] = _tail(await crash.readAsBytes(), _maxAppCrashSize);
+        genericFiles['app-crash-${crash.uri.pathSegments.last}'] = _tail(await crash.readAsBytes(), _maxAppCrashSize);
       } catch (e) {
         _log.info('the app crash ${crash.path} could not be read: $e');
       }
@@ -81,10 +91,13 @@ class DiagnosticsExporter {
       final options = CallOptions(timeout: const Duration(seconds: 5));
       try {
         final response = await core.bgClient.exportDiagnostics(
-          ExportDiagnosticsRequest(inline: true),
+          // in the clear: it goes inside this report's sensitive part, which is encrypted itself
+          ExportDiagnosticsRequest(inline: true, unencrypted: true),
           options: options,
         );
-        final room = _maxRequestSize - extraFiles.values.fold(0, (sum, content) => sum + content.length);
+        final room =
+            _maxRequestSize -
+            [...extraFiles.values, ...genericFiles.values].fold(0, (sum, content) => sum + content.length);
         if (response.content.length <= _maxBackgroundZipSize && response.content.length <= room) {
           extraFiles['background-core.zip'] = response.content;
         } else {
@@ -95,9 +108,11 @@ class DiagnosticsExporter {
       }
     }
 
-    final response = await core.fgClient.exportDiagnostics(ExportDiagnosticsRequest(extraFiles: extraFiles));
-    _log.info('diagnostics written to ${response.path}');
-    return File(response.path);
+    final response = await core.fgClient.exportDiagnostics(
+      ExportDiagnosticsRequest(extraFiles: extraFiles, genericFiles: genericFiles, unencrypted: unencrypted),
+    );
+    _log.info('diagnostics written to ${response.path}, encrypted: ${response.encrypted}');
+    return (file: File(response.path), encrypted: response.encrypted);
   }
 
   /// The newest [max] bytes: the end of a log is what led up to the problem.

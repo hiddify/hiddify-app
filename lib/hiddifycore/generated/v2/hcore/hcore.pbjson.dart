@@ -705,8 +705,10 @@ const ExportDiagnosticsRequest$json = {
     {'1': 'destination_path', '3': 1, '4': 1, '5': 9, '10': 'destinationPath'},
     {'1': 'extra_files', '3': 2, '4': 3, '5': 11, '6': '.hcore.ExportDiagnosticsRequest.ExtraFilesEntry', '10': 'extraFiles'},
     {'1': 'inline', '3': 3, '4': 1, '5': 8, '10': 'inline'},
+    {'1': 'unencrypted', '3': 4, '4': 1, '5': 8, '10': 'unencrypted'},
+    {'1': 'generic_files', '3': 5, '4': 3, '5': 11, '6': '.hcore.ExportDiagnosticsRequest.GenericFilesEntry', '10': 'genericFiles'},
   ],
-  '3': [ExportDiagnosticsRequest_ExtraFilesEntry$json],
+  '3': [ExportDiagnosticsRequest_ExtraFilesEntry$json, ExportDiagnosticsRequest_GenericFilesEntry$json],
 };
 
 @$core.Deprecated('Use exportDiagnosticsRequestDescriptor instead')
@@ -719,13 +721,26 @@ const ExportDiagnosticsRequest_ExtraFilesEntry$json = {
   '7': {'7': true},
 };
 
+@$core.Deprecated('Use exportDiagnosticsRequestDescriptor instead')
+const ExportDiagnosticsRequest_GenericFilesEntry$json = {
+  '1': 'GenericFilesEntry',
+  '2': [
+    {'1': 'key', '3': 1, '4': 1, '5': 9, '10': 'key'},
+    {'1': 'value', '3': 2, '4': 1, '5': 12, '10': 'value'},
+  ],
+  '7': {'7': true},
+};
+
 /// Descriptor for `ExportDiagnosticsRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List exportDiagnosticsRequestDescriptor = $convert.base64Decode(
     'ChhFeHBvcnREaWFnbm9zdGljc1JlcXVlc3QSKQoQZGVzdGluYXRpb25fcGF0aBgBIAEoCVIPZG'
     'VzdGluYXRpb25QYXRoElAKC2V4dHJhX2ZpbGVzGAIgAygLMi8uaGNvcmUuRXhwb3J0RGlhZ25v'
     'c3RpY3NSZXF1ZXN0LkV4dHJhRmlsZXNFbnRyeVIKZXh0cmFGaWxlcxIWCgZpbmxpbmUYAyABKA'
-    'hSBmlubGluZRo9Cg9FeHRyYUZpbGVzRW50cnkSEAoDa2V5GAEgASgJUgNrZXkSFAoFdmFsdWUY'
-    'AiABKAxSBXZhbHVlOgI4AQ==');
+    'hSBmlubGluZRIgCgt1bmVuY3J5cHRlZBgEIAEoCFILdW5lbmNyeXB0ZWQSVgoNZ2VuZXJpY19m'
+    'aWxlcxgFIAMoCzIxLmhjb3JlLkV4cG9ydERpYWdub3N0aWNzUmVxdWVzdC5HZW5lcmljRmlsZX'
+    'NFbnRyeVIMZ2VuZXJpY0ZpbGVzGj0KD0V4dHJhRmlsZXNFbnRyeRIQCgNrZXkYASABKAlSA2tl'
+    'eRIUCgV2YWx1ZRgCIAEoDFIFdmFsdWU6AjgBGj8KEUdlbmVyaWNGaWxlc0VudHJ5EhAKA2tleR'
+    'gBIAEoCVIDa2V5EhQKBXZhbHVlGAIgASgMUgV2YWx1ZToCOAE=');
 
 @$core.Deprecated('Use exportDiagnosticsResponseDescriptor instead')
 const ExportDiagnosticsResponse$json = {
@@ -733,13 +748,14 @@ const ExportDiagnosticsResponse$json = {
   '2': [
     {'1': 'path', '3': 1, '4': 1, '5': 9, '10': 'path'},
     {'1': 'content', '3': 2, '4': 1, '5': 12, '10': 'content'},
+    {'1': 'encrypted', '3': 3, '4': 1, '5': 8, '10': 'encrypted'},
   ],
 };
 
 /// Descriptor for `ExportDiagnosticsResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List exportDiagnosticsResponseDescriptor = $convert.base64Decode(
     'ChlFeHBvcnREaWFnbm9zdGljc1Jlc3BvbnNlEhIKBHBhdGgYASABKAlSBHBhdGgSGAoHY29udG'
-    'VudBgCIAEoDFIHY29udGVudA==');
+    'VudBgCIAEoDFIHY29udGVudBIcCgllbmNyeXB0ZWQYAyABKAhSCWVuY3J5cHRlZA==');
 
 @$core.Deprecated('Use lANIPResponseDescriptor instead')
 const LANIPResponse$json = {
