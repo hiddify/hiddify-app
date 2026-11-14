@@ -1105,8 +1105,12 @@
       "email": "E-posta",
       "localOnly": "Yalnızca yerel",
       "localOnlyMsg": "Hiçbir şey gönderilmez: saklayın, içine bakın ya da sonra kendiniz gönderin.",
+      "scrubSecrets": "IP'ler, alan adları ve anahtarlar kaldırılıyor",
+      "encryptingLogs": "Günlükler şifreleniyor",
+      "notEncrypted": "Günlükler şifrelenmedi",
       "title": "Hiddify geçen sefer çöktü",
-      "msg": "Bunun düzeltilmesi için geliştiricilere rapor gönderilsin mi? Rapor, çökme ayrıntılarını, logları ve sunucuları, anahtarları ve parolaları çıkarılmış yapılandırmanızı içerir; göndermeden önce bakabileceğiniz tek bir zip dosyasıdır.",
+      "msg": "Düzeltebilmemiz için rapor gönderin. Günlükler de eklenir.",
+      "problemMsg": "Neyin ters gittiğini anlatın. Günlükler de eklenir.",
       "send": "Raporu gönder",
       "steps": {
         "ready": "Rapor hazır",

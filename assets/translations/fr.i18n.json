@@ -1105,8 +1105,12 @@
       "email": "E-mail",
       "localOnly": "Local uniquement",
       "localOnlyMsg": "Rien n’est envoyé : gardez-le, regardez dedans ou envoyez-le vous-même plus tard.",
+      "scrubSecrets": "Retrait des IP, domaines et clés",
+      "encryptingLogs": "Chiffrement des journaux",
+      "notEncrypted": "Les journaux ne sont pas chiffrés",
       "title": "Hiddify a planté la dernière fois",
-      "msg": "Envoyer un rapport aux développeurs pour corriger le problème ? Il contient les détails du plantage, les journaux et votre configuration sans serveurs, clés ni mots de passe, dans un seul fichier zip que vous pouvez consulter avant l'envoi.",
+      "msg": "Envoyez un rapport pour qu'on corrige ça. Les journaux sont joints.",
+      "problemMsg": "Dites-nous ce qui n'a pas marché. Les journaux sont joints.",
       "send": "Envoyer le rapport",
       "steps": {
         "ready": "Rapport prêt",

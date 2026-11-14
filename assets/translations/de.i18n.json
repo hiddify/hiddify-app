@@ -1105,8 +1105,12 @@
       "email": "E-Mail",
       "localOnly": "Nur lokal",
       "localOnlyMsg": "Nichts wird gesendet: aufbewahren, hineinsehen oder später selbst senden.",
+      "scrubSecrets": "IPs, Domains und Schlüssel werden entfernt",
+      "encryptingLogs": "Logs werden verschlüsselt",
+      "notEncrypted": "Logs sind nicht verschlüsselt",
       "title": "Hiddify ist beim letzten Mal abgestürzt",
-      "msg": "Einen Bericht an die Entwickler senden, damit das behoben wird? Er enthält die Absturzdetails, die Protokolle und Ihre Konfiguration ohne Server, Schlüssel und Passwörter, als eine ZIP-Datei, die Sie vor dem Senden ansehen können.",
+      "msg": "Sende einen Bericht, damit wir es beheben. Die Logs kommen mit.",
+      "problemMsg": "Sag uns, was schiefging. Die Logs kommen mit.",
       "send": "Bericht senden",
       "steps": {
         "ready": "Bericht bereit",

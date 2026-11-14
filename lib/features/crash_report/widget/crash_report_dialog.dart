@@ -171,7 +171,10 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
     try {
       // the core encrypts the sensitive part to its own key; one whose key is not an age key
       // throws here, and nothing is sent in the clear
-      final report = await ref.read(diagnosticsExporterProvider).export(description: _description.text);
+      final export = ref.read(diagnosticsExporterProvider).export(description: _description.text);
+      // the scrubbing steps play out before the file appears, however fast the core is
+      await Future.wait([export, Future<void>.delayed(_ScrubChecklist.minDuration)]);
+      final report = await export;
       if (mounted && generation == _generation) setState(() => _report = report);
     } catch (e, stack) {
       _log.error('preparing the diagnostics failed: $e', e, stack);
@@ -282,7 +285,10 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.msg),
+        Text(
+          widget.msg,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        ),
         if (widget.crash case final crash?) ...[const SizedBox(height: 12), _CrashBox(crash)],
         const SizedBox(height: 16),
         TextField(
@@ -430,11 +436,15 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
                   if (report != null) ...[
                     const SizedBox(height: 8),
                     _FileChip(name: report.file.uri.pathSegments.last),
-                    if (report.encrypted) ...[
-                      const SizedBox(height: 8),
-                      _Hint(icon: FluentIcons.lock_closed_16_regular, text: s.hiddifyEncrypted),
-                    ],
                   ],
+                  if (!failed)
+                    _ScrubChecklist(
+                      key: ValueKey(_generation),
+                      done: report != null,
+                      encrypted: report?.encrypted ?? true,
+                      steps: [r.scrubSecrets, r.encryptingLogs],
+                      notEncrypted: r.notEncrypted,
+                    ),
                 ],
               ),
             ),
@@ -823,6 +833,170 @@ class _DestinationTile extends StatelessWidget {
                   ),
                 ),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// What the core does to the report before it leaves the device, shown while it does it: each
+/// step ticks off in turn, the last one waits for the file, and they stay checked once it is made.
+class _ScrubChecklist extends StatefulWidget {
+  const _ScrubChecklist({
+    super.key,
+    required this.done,
+    required this.encrypted,
+    required this.steps,
+    required this.notEncrypted,
+  });
+
+  static const _step = Duration(milliseconds: 800);
+
+  /// How long the report is held back so the first step can tick off before the last.
+  static Duration get minDuration => _step + const Duration(milliseconds: 120);
+
+  final bool done;
+
+  /// Whether the sensitive part was encrypted: a build without a key only removes.
+  final bool encrypted;
+
+  /// The last one is the encryption: a warning instead once a build without a key made the file.
+  final List<String> steps;
+
+  /// The last step's label when the file came out unencrypted.
+  final String notEncrypted;
+
+  @override
+  State<_ScrubChecklist> createState() => _ScrubChecklistState();
+}
+
+class _ScrubChecklistState extends State<_ScrubChecklist> {
+  /// How many steps are done: the one at this index is in progress.
+  var _ticked = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(_ScrubChecklist._step, (_) => _tick());
+  }
+
+  void _tick() {
+    final last = widget.steps.length - 1;
+    if (_ticked < last) {
+      setState(() => _ticked++);
+    } else if (widget.done) {
+      _timer?.cancel();
+      setState(() => _ticked = widget.steps.length);
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final last = widget.steps.length - 1;
+    return AnimatedSize(
+      duration: _motion,
+      curve: Curves.easeOutCubic,
+      alignment: AlignmentDirectional.topStart,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final (i, label) in widget.steps.indexed)
+              _ScrubStep(
+                label: i == last && i < _ticked && !widget.encrypted ? widget.notEncrypted : label,
+                state: i == last && i < _ticked && !widget.encrypted
+                    ? _StepState.failed
+                    : i < _ticked
+                    ? _StepState.done
+                    : i == _ticked
+                    ? _StepState.working
+                    : _StepState.waiting,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ScrubStep extends StatelessWidget {
+  const _ScrubStep({required this.label, required this.state});
+
+  /// The theme has no warning color: amber, darker on a light background to stay readable.
+  static Color _warning(ThemeData theme) =>
+      theme.brightness == Brightness.dark ? Colors.amber.shade300 : Colors.orange.shade800;
+
+  final String label;
+  final _StepState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final Widget mark = switch (state) {
+      _StepState.done => Icon(
+        FluentIcons.checkmark_circle_16_filled,
+        key: const ValueKey('done'),
+        size: 16,
+        color: colors.tertiary,
+      ),
+      _StepState.working => SizedBox.square(
+        key: const ValueKey('working'),
+        dimension: 16,
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: CircularProgressIndicator(strokeWidth: 1.8, color: colors.tertiary),
+        ),
+      ),
+      _StepState.failed => Icon(
+        FluentIcons.warning_16_filled,
+        key: const ValueKey('warning'),
+        size: 16,
+        color: _warning(theme),
+      ),
+      _ => Icon(FluentIcons.circle_16_regular, key: const ValueKey('waiting'), size: 16, color: colors.outline),
+    };
+    return AnimatedOpacity(
+      duration: _motion,
+      opacity: state == _StepState.waiting ? .45 : 1,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 220),
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                child: FadeTransition(opacity: animation, child: child),
+              ),
+              child: mark,
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: AnimatedDefaultTextStyle(
+                duration: _motion,
+                style: theme.textTheme.bodySmall!.copyWith(
+                  color: switch (state) {
+                    _StepState.failed => _warning(theme),
+                    _StepState.working => colors.onSurface,
+                    _ => colors.onSurfaceVariant,
+                  },
+                  fontWeight: state == _StepState.working || state == _StepState.failed
+                      ? FontWeight.w600
+                      : FontWeight.w400,
+                ),
+                child: Text(label),
+              ),
+            ),
           ],
         ),
       ),

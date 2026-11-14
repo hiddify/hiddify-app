@@ -1105,8 +1105,12 @@
       "email": "Email",
       "localOnly": "Faqat mahalliy",
       "localOnlyMsg": "Hech narsa yuborilmaydi: saqlang, ichini ko‘ring yoki keyinroq o‘zingiz yuboring.",
+      "scrubSecrets": "IP, domen va kalitlar olib tashlanmoqda",
+      "encryptingLogs": "Loglar shifrlanmoqda",
+      "notEncrypted": "Loglar shifrlanmagan",
       "title": "Hiddify oxirgi safar ishdan chiqdi",
-      "msg": "Buni tuzatish uchun dasturchilarga hisobot yuborilsinmi? Unda ishdan chiqish tafsilotlari, jurnallar va serverlar, kalitlar hamda parollari olib tashlangan konfiguratsiyangiz bor. U bitta zip fayl bo‘lib, yuborishdan oldin ko‘rib chiqishingiz mumkin.",
+      "msg": "Tuzatishimiz uchun hisobot yuboring. Loglar ham qoʻshiladi.",
+      "problemMsg": "Nima notoʻgʻri ketganini ayting. Loglar ham qoʻshiladi.",
       "send": "Hisobotni yuborish",
       "steps": {
         "ready": "Hisobot tayyor",

@@ -1105,8 +1105,12 @@
       "email": "Email",
       "localOnly": "Hanya lokal",
       "localOnlyMsg": "Tidak ada yang dikirim: simpan, lihat isinya, atau kirim sendiri nanti.",
+      "scrubSecrets": "Menghapus IP, domain, dan kunci",
+      "encryptingLogs": "Mengenkripsi log",
+      "notEncrypted": "Log tidak terenkripsi",
       "title": "Hiddify mengalami crash terakhir kali",
-      "msg": "Kirim laporan ke pengembang agar masalah ini diperbaiki? Isinya detail crash, log, dan konfigurasi Anda dengan server, kunci, dan kata sandi dihapus, dalam satu file zip yang bisa Anda lihat sebelum dikirim.",
+      "msg": "Kirim laporan agar kami bisa memperbaikinya. Log ikut terkirim.",
+      "problemMsg": "Ceritakan apa yang salah. Log ikut terkirim.",
       "send": "Kirim laporan",
       "steps": {
         "ready": "Laporan siap",

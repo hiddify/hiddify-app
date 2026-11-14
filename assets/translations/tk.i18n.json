@@ -1105,8 +1105,12 @@
       "email": "E-poçta",
       "localOnly": "Diňe ýerli",
       "localOnlyMsg": "Hiç zat iberilmeýär: saklaň, içine serediň ýa-da soňra özüňiz iberiň.",
+      "scrubSecrets": "IP, domenler we açarlar aýrylýar",
+      "encryptingLogs": "Loglar şifrlenýär",
+      "notEncrypted": "Loglar şifrlenmedik",
       "title": "Hiddify soňky gezek çöküpdi",
-      "msg": "Bu düzedilsin diýip, işläp düzüjilere hasabat iberilsinmi? Onda çökme jikme-jiklikleri, žurnallar we serwerleri, açarlary we paroly aýrylan konfigurasiýaňyz bar, iberilmezden öň göz aýlap boljak bir zip faýlda.",
+      "msg": "Düzetmegimiz üçin hasabat iberiň. Loglar hem goşulýar.",
+      "problemMsg": "Näme ýalňyş gidenini aýdyň. Loglar hem goşulýar.",
       "send": "Hasabaty iber",
       "steps": {
         "ready": "Hasabat taýýar",

@@ -1105,8 +1105,12 @@
       "email": "Email",
       "localOnly": "Solo locale",
       "localOnlyMsg": "Non viene inviato nulla: conservalo, guardaci dentro o invialo tu più tardi.",
+      "scrubSecrets": "Rimozione di IP, domini e chiavi",
+      "encryptingLogs": "Cifratura dei log",
+      "notEncrypted": "I log non sono cifrati",
       "title": "Hiddify si è arrestato l’ultima volta",
-      "msg": "Inviare un rapporto agli sviluppatori per risolvere il problema? Contiene i dettagli dell’arresto, i log e la tua configurazione senza server, chiavi e password, in un unico file zip che puoi controllare prima di inviare.",
+      "msg": "Invia un report così lo sistemiamo. I log sono inclusi.",
+      "problemMsg": "Dicci cosa è andato storto. I log sono inclusi.",
       "send": "Invia il rapporto",
       "steps": {
         "ready": "Rapporto pronto",

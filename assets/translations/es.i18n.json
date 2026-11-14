@@ -1105,8 +1105,12 @@
       "email": "Correo",
       "localOnly": "Solo local",
       "localOnlyMsg": "No se envía nada: guárdalo, míralo por dentro o envíalo tú más tarde.",
+      "scrubSecrets": "Quitando IP, dominios y claves",
+      "encryptingLogs": "Cifrando los registros",
+      "notEncrypted": "Los registros no están cifrados",
       "title": "Hiddify se cerró por un fallo la última vez",
-      "msg": "¿Enviar un informe a los desarrolladores para que lo arreglen? Contiene los detalles del fallo, los registros y tu configuración sin servidores, claves ni contraseñas, en un solo archivo zip que puedes revisar antes de enviarlo.",
+      "msg": "Envía un informe para que lo arreglemos. Los registros van incluidos.",
+      "problemMsg": "Cuéntanos qué falló. Los registros van incluidos.",
       "send": "Enviar informe",
       "steps": {
         "ready": "Informe listo",

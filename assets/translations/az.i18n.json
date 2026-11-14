@@ -1105,8 +1105,12 @@
       "email": "E-poçt",
       "localOnly": "Yalnız yerli",
       "localOnlyMsg": "Heç nə göndərilmir: saxlayın, içinə baxın və ya sonra özünüz göndərin.",
+      "scrubSecrets": "IP, domen və açarlar silinir",
+      "encryptingLogs": "Loglar şifrələnir",
+      "notEncrypted": "Loglar şifrələnməyib",
       "title": "Hiddify son dəfə çökdü",
-      "msg": "Bunun düzəldilməsi üçün tərtibatçılara hesabat göndərilsin? Hesabatda çökmə təfərrüatları, jurnallar və serverlər, açarlar və parollar silinmiş konfiqurasiyanız var; göndərməzdən əvvəl baxa biləcəyiniz bir zip faylıdır.",
+      "msg": "Düzəltməyimiz üçün hesabat göndərin. Loglar da əlavə olunur.",
+      "problemMsg": "Nəyin səhv getdiyini yazın. Loglar da əlavə olunur.",
       "send": "Hesabatı göndər",
       "steps": {
         "ready": "Hesabat hazırdır",
