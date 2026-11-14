@@ -313,7 +313,10 @@ class _Looping extends HookWidget {
       controller.repeat();
       return null;
     }, [controller]);
-    return AnimatedBuilder(animation: controller, builder: (_, _) => builder(controller.value));
+    // each frame repaints the little icon alone, not its row
+    return RepaintBoundary(
+      child: AnimatedBuilder(animation: controller, builder: (_, _) => builder(controller.value)),
+    );
   }
 }
 
@@ -501,7 +504,18 @@ class _FlagSlot extends StatelessWidget {
     final flag = IPCountryFlag(countryCode: ip.countryCode, organization: ip.org, size: size);
     final state = proxy.rowState;
     final gaveUp = state == ProxyRowState.pingFailed || state == ProxyRowState.failed;
-    final still = MediaQuery.disableAnimationsOf(context);
+    // the shimmer says a result is on its way: only while the row is still being tested. A row
+    // with its ping, failed or at rest keeps its faded flag or bone still; each shimmer cost a frame
+    // twenty times a second for as long as the page stayed open
+    final waiting = switch (state) {
+      ProxyRowState.untested ||
+      ProxyRowState.connecting ||
+      ProxyRowState.registering ||
+      ProxyRowState.searching ||
+      ProxyRowState.reconnecting => true,
+      _ => false,
+    };
+    final still = !waiting || MediaQuery.disableAnimationsOf(context);
 
     final (Object key, Widget child) = switch (proxy) {
       _ when reconnectingBadge && ip.countryCode.isNotEmpty => (
@@ -544,19 +558,23 @@ class _FlagSlot extends StatelessWidget {
       _ when ip.ip.isNotEmpty && still => ('cached', Opacity(opacity: .35, child: flag)),
       _ when ip.ip.isNotEmpty => (
         'cached',
-        Opacity(opacity: .35, child: flag)
-            .animate(onPlay: (c) => c.repeat())
-            .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .5), angle: .6),
+        RepaintBoundary(
+          child: Opacity(opacity: .35, child: flag)
+              .animate(onPlay: (c) => c.repeat())
+              .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .5), angle: .6),
+        ),
       ),
       _ when gaveUp => ('empty', _square(s.onSurface.withValues(alpha: .07))),
       _ when still => ('bone', _square(s.onSurface.withValues(alpha: .12))),
       _ => (
         'bone',
-        _square(s.onSurface.withValues(alpha: .12))
-            .animate(onPlay: (c) => c.repeat())
-            .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
-            .animate(onPlay: (c) => c.repeat(reverse: true))
-            .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut),
+        RepaintBoundary(
+          child: _square(s.onSurface.withValues(alpha: .12))
+              .animate(onPlay: (c) => c.repeat())
+              .shimmer(duration: 1300.ms, color: s.primary.withValues(alpha: .45), angle: .6)
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .fade(begin: .55, end: 1, duration: 900.ms, curve: Curves.easeInOut),
+        ),
       ),
     };
     return SizedBox.square(
