@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
@@ -24,14 +25,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final _log = appLogger('ReportDialog');
 
-/// How a report reaches the developers.
+/// Where a report goes. Telegram, email and GitHub go the same way up to the last steps: the zip is saved,
+/// then the place it goes to opens and the user attaches it there.
 enum ReportChannel {
+  /// by the user's Telegram, to the issues bot, started with this device's details
+  /// ([telegramReportLinkFor]): the recommended way, the team can answer there
+  telegram,
+
   /// uploaded by the app, to Sentry
   hiddify,
-
-  /// by the user's Telegram, to the issues bot, started with this device's details
-  /// ([telegramReportLinkFor])
-  telegram,
 
   /// by the user's mail app, to [Constants.bugReportEmail]
   email,
@@ -39,10 +41,9 @@ enum ReportChannel {
   /// as a public issue on [Constants.bugReportGithubIssueUrl]
   github,
 
-  /// saved on desktop, or handed to the share sheet on a phone, for the user to send anywhere:
-  /// encrypted, or in the clear for the user to look at. The only way the sensitive part leaves
-  /// the app unencrypted.
-  file,
+  /// kept on this device: encrypted, or in the clear for the user to look at. The only way the
+  /// sensitive part leaves the app unencrypted.
+  local,
 }
 
 /// Shown on the first run after a crash: send the diagnostics zip, or not now. Either way it is
@@ -83,29 +84,17 @@ class ReportProblemDialog extends ConsumerWidget {
   }
 }
 
-/// A button of a step. [run] answers whether it got done: a save dialog closed without saving
-/// leaves the step to do again.
-typedef _Action = ({String label, IconData icon, Future<bool> Function() run});
-
-/// One thing the user does to send the report. A step with [actions] gets their buttons and a
-/// check once one of them reports it done; one without is the instruction that finishes the way.
-class _Step {
-  const _Step(this.title, {this.detail, this.file, this.actions = const []});
-
-  final String title;
-  final String? detail;
-
-  /// The zip's name, shown on a line of its own: it is long and would break a sentence apart.
-  final String? file;
-
-  final List<_Action> actions;
-}
-
 enum _Upload { sending, sent, failed }
 
-/// Two pages: what happened and which way to send it, then the numbered steps of that way. The
-/// zip is built as soon as a way is picked, so it is ready by the time the user reaches a step
-/// that needs it; the upload to Hiddify needs no step from the user at all.
+/// The dialog's width on a screen with room for it.
+const _dialogWidth = 480.0;
+
+/// How long the dialog takes to move between its states: pages, destinations, a step done.
+const _motion = Duration(milliseconds: 280);
+
+/// Two pages: what happened, then the report and where it goes. The zip is built once, on
+/// Continue. Every destination shares the card and the save; picking another only changes the
+/// steps under them, and a save already done stays done.
 class _ReportDialog extends ConsumerStatefulWidget {
   const _ReportDialog({
     required this.icon,
@@ -129,20 +118,24 @@ class _ReportDialog extends ConsumerStatefulWidget {
 
 class _ReportDialogState extends ConsumerState<_ReportDialog> {
   final _description = TextEditingController();
-  ReportChannel? _channel;
+
+  /// On the second page: the report is being made, or is made.
+  var _sending = false;
+  var _channel = ReportChannel.telegram;
 
   /// What leaves the device, as the core made it: the generic metadata to read, the sensitive part
   /// encrypted to the build's key (in the clear in a build without one).
   DiagnosticsReport? _report;
-
-  /// The same report with the sensitive part in the clear, for [ReportChannel.file] only: the
-  /// user saves it to look inside.
-  File? _unencrypted;
   Object? _error;
   _Upload? _upload;
-  final _done = <int>{};
 
-  /// Each pick builds its own zip: one built for an earlier pick may lack an edited description.
+  /// The zip is kept where the user can attach it: the first step of every manual destination.
+  var _saved = false;
+
+  /// The destinations whose bot, mail app or issue page the user opened.
+  final _opened = <ReportChannel>{};
+
+  /// Each Continue builds its own zip: one built before Back may lack an edited description.
   int _generation = 0;
 
   /// The issues bot's link, started with this device's details; a platform call is behind it.
@@ -165,81 +158,125 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
     super.dispose();
   }
 
-  Future<void> _choose(ReportChannel channel) async {
+  Future<void> _prepare() async {
     final generation = ++_generation;
     setState(() {
-      _channel = channel;
+      _sending = true;
       _report = null;
-      _unencrypted = null;
       _error = null;
       _upload = null;
-      _done.clear();
+      _saved = false;
+      _opened.clear();
     });
-    final DiagnosticsReport report;
-    File? unencrypted;
     try {
-      final exporter = ref.read(diagnosticsExporterProvider);
       // the core encrypts the sensitive part to its own key; one whose key is not an age key
       // throws here, and nothing is sent in the clear
-      report = await exporter.export(description: _description.text);
-      if (channel == ReportChannel.file && report.encrypted) {
-        unencrypted = (await exporter.export(description: _description.text, unencrypted: true)).file;
-      }
+      final report = await ref.read(diagnosticsExporterProvider).export(description: _description.text);
+      if (mounted && generation == _generation) setState(() => _report = report);
     } catch (e, stack) {
       _log.error('preparing the diagnostics failed: $e', e, stack);
       if (mounted && generation == _generation) setState(() => _error = e);
-      return;
-    }
-    if (!mounted || generation != _generation) return;
-    setState(() {
-      _report = report;
-      _unencrypted = unencrypted;
-    });
-
-    if (channel == ReportChannel.hiddify) {
-      setState(() => _upload = _Upload.sending);
-      final sent = await ref
-          .read(diagnosticsSenderProvider)
-          .send(report, crashName: widget.crashName, description: _description.text, crashText: widget.crash?.text);
-      if (mounted && generation == _generation) setState(() => _upload = sent ? _Upload.sent : _Upload.failed);
     }
   }
 
   void _back() => setState(() {
     _generation++;
-    _channel = null;
+    _sending = false;
   });
+
+  Future<void> _uploadToHiddify() async {
+    final report = _report;
+    if (report == null) return;
+    final generation = _generation;
+    setState(() => _upload = _Upload.sending);
+    final sent = await ref
+        .read(diagnosticsSenderProvider)
+        .send(report, crashName: widget.crashName, description: _description.text, crashText: widget.crash?.text);
+    if (mounted && generation == _generation) setState(() => _upload = sent ? _Upload.sent : _Upload.failed);
+  }
+
+  Future<void> _save(Translations t) async {
+    final report = _report;
+    if (report == null) return;
+    final saved = await saveFileAs(report.file, t: t, notifications: ref.read(inAppNotificationControllerProvider));
+    if (saved && mounted) setState(() => _saved = true);
+  }
+
+  /// The same report with the sensitive part in the clear, made only when asked for: to look
+  /// inside it. It never leaves the device by the app.
+  Future<void> _saveUnencrypted(Translations t) async {
+    try {
+      final copy = await ref
+          .read(diagnosticsExporterProvider)
+          .export(description: _description.text, unencrypted: true);
+      await saveFileAs(copy.file, t: t, notifications: ref.read(inAppNotificationControllerProvider));
+    } catch (e, stack) {
+      _log.error('preparing the unencrypted copy failed: $e', e, stack);
+    }
+  }
+
+  Future<void> _open(ReportChannel channel, Translations t) async {
+    final uri = switch (channel) {
+      ReportChannel.telegram => await _telegramLink,
+      ReportChannel.email => Uri(
+        scheme: 'mailto',
+        path: Constants.bugReportEmail,
+        query:
+            'subject=${Uri.encodeComponent(widget.crashName != null ? t.dialogs.crashReport.subject : t.dialogs.crashReport.problemSubject)}'
+            '&body=${Uri.encodeComponent(_mailBody())}',
+      ),
+      _ => _githubIssue(),
+    };
+    if (await UriUtils.tryLaunch(uri) && mounted) setState(() => _opened.add(channel));
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(translationsProvider).requireValue;
-    final channel = _channel;
+    final sent = _upload == _Upload.sent;
     return AlertDialog(
       icon: Icon(widget.icon),
       title: Text(widget.title),
-      content: ConstrainedBox(
-        constraints: AlertDialogConst.boxConstraints,
-        child: SingleChildScrollView(child: channel == null ? _chooser(t) : _stepsView(t, channel)),
+      // one width for both pages and every destination: sized by its content, the dialog grew
+      // with the file name and jumped between pages. A narrow screen still narrows it.
+      content: SizedBox(
+        width: _dialogWidth,
+        child: SingleChildScrollView(
+          child: AnimatedSize(
+            duration: _motion,
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: AnimatedSwitcher(
+              duration: _motion,
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              layoutBuilder: _topStack,
+              transitionBuilder: _fadeSlide,
+              child: _sending
+                  ? KeyedSubtree(key: const ValueKey('send'), child: _sendPage(t))
+                  : KeyedSubtree(key: const ValueKey('write'), child: _writePage(t)),
+            ),
+          ),
+        ),
       ),
-      actions: channel == null
-          ? [TextButton(onPressed: () => context.pop(), child: Text(widget.dismiss))]
+      actions: !_sending
+          ? [
+              TextButton(onPressed: () => context.pop(), child: Text(widget.dismiss)),
+              FilledButton.icon(
+                onPressed: _prepare,
+                iconAlignment: IconAlignment.end,
+                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                label: Text(t.common.kContinue),
+              ),
+            ]
           : [
-              if (_upload != _Upload.sent) TextButton(onPressed: _back, child: Text(t.dialogs.crashReport.back)),
+              if (!sent) TextButton(onPressed: _back, child: Text(t.dialogs.crashReport.back)),
               FilledButton(onPressed: () => context.pop(), child: Text(t.common.done)),
             ],
     );
   }
 
-  Widget _chooser(Translations t) {
-    Widget option(ReportChannel channel, IconData icon, String title, String subtitle) => ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(icon),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: const Icon(FluentIcons.chevron_right_20_regular),
-      onTap: () => _choose(channel),
-    );
-
+  Widget _writePage(Translations t) {
     final r = t.dialogs.crashReport;
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -247,216 +284,346 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
       children: [
         Text(widget.msg),
         if (widget.crash case final crash?) ...[const SizedBox(height: 12), _CrashBox(crash)],
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         TextField(
           controller: _description,
-          minLines: 2,
-          maxLines: 5,
+          minLines: 3,
+          maxLines: 6,
           maxLength: 2000,
+          textInputAction: TextInputAction.newline,
           decoration: InputDecoration(
-            border: const OutlineInputBorder(),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
             labelText: r.description,
             hintText: r.descriptionHint,
+            alignLabelWithHint: true,
+            // the limit is far: a counter from the first letter is noise
+            counterText: '',
           ),
         ),
-        Text(r.chooseHow, style: Theme.of(context).textTheme.titleSmall),
-        if (DiagnosticsSender.available)
-          option(ReportChannel.hiddify, FluentIcons.cloud_arrow_up_20_regular, r.sendHiddify, r.sendHiddifyMsg),
-        option(
-          ReportChannel.telegram,
-          FluentIcons.send_20_regular,
-          r.sendTelegram,
-          _ltr(Constants.bugReportTelegramName),
-        ),
-        option(ReportChannel.email, FluentIcons.mail_20_regular, r.sendEmail, _ltr(Constants.bugReportEmail)),
-        option(ReportChannel.github, FluentIcons.code_20_regular, r.sendGithub, r.sendGithubMsg),
-        option(ReportChannel.file, FluentIcons.folder_zip_20_regular, r.saveFile, r.saveFileMsg),
       ],
     );
   }
 
-  Widget _stepsView(Translations t, ReportChannel channel) {
+  Widget _sendPage(Translations t) {
     final r = t.dialogs.crashReport;
-    final theme = Theme.of(context);
-    final steps = _steps(t, channel);
-    final encrypted = _report?.encrypted ?? false;
-    // the first step with a button that is not done yet; the zip comes first of all. Steps go in
-    // order: a later button waits for this one, a done one can be run again.
-    final active = _report == null
-        ? -1
-        : steps.indexed.where((e) => e.$2.actions.isNotEmpty && !_done.contains(e.$1)).firstOrNull?.$1 ?? -1;
-
+    final uploading = _upload == _Upload.sending || _upload == _Upload.sent;
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(switch (channel) {
-          ReportChannel.hiddify => r.sendHiddify,
-          ReportChannel.telegram => r.sendTelegram,
-          ReportChannel.email => r.sendEmail,
-          ReportChannel.github => r.sendGithub,
-          ReportChannel.file => r.saveFile,
-        }, style: theme.textTheme.titleMedium),
-        // what the report is known to be once the core made it: until then, GitHub warns
-        if (switch (channel) {
-              ReportChannel.github when encrypted => (
-                FluentIcons.lock_closed_20_regular,
-                r.steps.githubEncrypted,
-                false,
-              ),
-              ReportChannel.github => (FluentIcons.warning_20_regular, r.steps.githubPublic, true),
-              ReportChannel.hiddify when encrypted => (
-                FluentIcons.lock_closed_20_regular,
-                r.steps.hiddifyEncrypted,
-                false,
-              ),
-              ReportChannel.telegram ||
-              ReportChannel.email when encrypted => (FluentIcons.lock_closed_20_regular, r.steps.encrypted, false),
-              ReportChannel.telegram => (FluentIcons.lock_closed_20_regular, r.steps.telegramPrivate, false),
-              ReportChannel.email => (FluentIcons.lock_closed_20_regular, r.steps.emailPrivate, false),
-              _ => null,
-            }
-            case (final icon, final text, final warning)) ...[
-          const SizedBox(height: 8),
-          _Notice(icon: icon, text: text, warning: warning),
-        ],
-        const SizedBox(height: 12),
-        _StepTile(
-          number: 1,
-          title: r.steps.prepare,
-          detail: _error != null
-              ? r.steps.prepareFailed
-              : _report == null
-              ? r.steps.preparing
-              : null,
-          file: _report?.file.uri.pathSegments.last,
-          state: _error != null
-              ? _StepState.failed
-              : _report == null
-              ? _StepState.working
-              : _StepState.done,
+        _reportCard(t),
+        const SizedBox(height: 20),
+        Text(r.chooseHow, style: Theme.of(context).textTheme.titleSmall),
+        const SizedBox(height: 18),
+        _DestinationPicker(
+          selected: _channel,
+          recommended: ReportChannel.telegram,
+          recommendedLabel: r.recommended,
+          // a report on its way to Hiddify stays there
+          onChanged: uploading ? null : (channel) => setState(() => _channel = channel),
+          options: [
+            (channel: ReportChannel.telegram, icon: FluentIcons.send_24_regular, label: 'Telegram'),
+            if (DiagnosticsSender.available)
+              (channel: ReportChannel.hiddify, icon: FluentIcons.cloud_arrow_up_24_regular, label: 'Hiddify'),
+            (channel: ReportChannel.email, icon: FluentIcons.mail_24_regular, label: r.email),
+            (channel: ReportChannel.github, icon: FluentIcons.code_24_regular, label: 'GitHub'),
+            (channel: ReportChannel.local, icon: FluentIcons.phone_laptop_24_regular, label: r.localOnly),
+          ],
         ),
-        if (channel == ReportChannel.hiddify && _report != null)
-          _StepTile(
-            number: 2,
-            title: r.steps.upload,
-            detail: switch (_upload) {
-              _Upload.sent => r.sent,
-              _Upload.failed => r.sendFailed,
-              _ => r.steps.uploading,
-            },
-            state: switch (_upload) {
-              _Upload.sent => _StepState.done,
-              _Upload.failed => _StepState.failed,
-              _ => _StepState.working,
-            },
+        const SizedBox(height: 16),
+        AnimatedSwitcher(
+          duration: _motion,
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          layoutBuilder: _topStack,
+          transitionBuilder: _fadeSlide,
+          child: KeyedSubtree(
+            key: ValueKey(_channel),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (_privacy(t) case final privacy?) ...[privacy, const SizedBox(height: 8)],
+                ...switch (_channel) {
+                  ReportChannel.hiddify => [_hiddifySteps(t)],
+                  ReportChannel.local => [_localSteps(t)],
+                  _ => _manualSteps(t),
+                },
+              ],
+            ),
           ),
-        for (final (index, step) in steps.indexed)
-          _StepTile(
-            number: index + 2,
-            title: step.title,
-            detail: step.detail,
-            file: step.file,
-            state: _done.contains(index)
-                ? _StepState.done
-                : index == active || (step.actions.isEmpty && active == -1 && _report != null)
-                ? _StepState.active
-                : _StepState.waiting,
-            actions: _report == null
-                ? const []
-                : [
-                    for (final (i, action) in step.actions.indexed)
-                      (
-                        label: action.label,
-                        icon: action.icon,
-                        // the first button is the one to press; the others are there if wanted
-                        primary: index == active && i == 0,
-                        run: index == active || _done.contains(index)
-                            ? () async {
-                                final done = await action.run();
-                                if (done && mounted) setState(() => _done.add(index));
-                              }
-                            : null,
-                      ),
+        ),
+      ],
+    );
+  }
+
+  /// The report itself: being made, made with its name, or failed. It is the same for every
+  /// destination, so it stands above them.
+  Widget _reportCard(Translations t) {
+    final r = t.dialogs.crashReport;
+    final s = r.steps;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final report = _report;
+    final failed = _error != null;
+
+    final Widget badge = failed
+        ? CircleAvatar(
+            radius: 22,
+            backgroundColor: colors.errorContainer,
+            child: Icon(FluentIcons.error_circle_24_regular, color: colors.onErrorContainer),
+          )
+        : report == null
+        ? SizedBox.square(
+            dimension: 44,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: CircularProgressIndicator(strokeWidth: 2.5, color: colors.primary),
+            ),
+          )
+        : CircleAvatar(
+            radius: 22,
+            backgroundColor: colors.primary,
+            child: Icon(FluentIcons.folder_zip_24_regular, color: colors.onPrimary),
+          );
+
+    return AnimatedContainer(
+      duration: _motion,
+      curve: Curves.easeOutCubic,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: (failed ? colors.error : colors.outlineVariant).withValues(alpha: .6)),
+        gradient: LinearGradient(
+          begin: AlignmentDirectional.topStart,
+          end: AlignmentDirectional.bottomEnd,
+          colors: failed
+              ? [colors.errorContainer.withValues(alpha: .35), colors.surfaceContainerHigh]
+              : [colors.primaryContainer.withValues(alpha: report == null ? .25 : .55), colors.surfaceContainerHigh],
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnimatedSwitcher(
+            duration: _motion,
+            child: KeyedSubtree(key: ValueKey((failed, report == null)), child: badge),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    failed
+                        ? s.prepareFailed
+                        : report == null
+                        ? s.preparing
+                        : s.ready,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: failed ? colors.error : null,
+                    ),
+                  ),
+                  if (report != null) ...[
+                    const SizedBox(height: 8),
+                    _FileChip(name: report.file.uri.pathSegments.last),
+                    if (report.encrypted) ...[
+                      const SizedBox(height: 8),
+                      _Hint(icon: FluentIcons.lock_closed_16_regular, text: s.hiddifyEncrypted),
+                    ],
                   ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+    );
+  }
+
+  /// Who sees the report this way, in a quiet line.
+  Widget? _privacy(Translations t) {
+    final r = t.dialogs.crashReport;
+    final s = r.steps;
+    return switch (_channel) {
+      ReportChannel.telegram => _Hint(icon: FluentIcons.lock_closed_16_regular, text: s.telegramPrivate),
+      ReportChannel.hiddify => _Hint(icon: FluentIcons.lock_closed_16_regular, text: r.sendHiddifyMsg),
+      ReportChannel.email => _Hint(icon: FluentIcons.lock_closed_16_regular, text: s.emailPrivate),
+      ReportChannel.local => _Hint(icon: FluentIcons.shield_checkmark_16_regular, text: r.localOnlyMsg),
+      ReportChannel.github => null,
+    };
+  }
+
+  /// Kept on this device: the report as it would be sent, and, when that one is encrypted, a copy
+  /// in the clear to look inside.
+  Widget _localSteps(Translations t) {
+    final s = t.dialogs.crashReport.steps;
+    final desktop = PlatformUtils.isDesktop;
+    final report = _report;
+    final encrypted = report?.encrypted ?? false;
+    return _StepTile(
+      number: 1,
+      title: s.save,
+      detail: desktop ? s.saveDesktopMsg : s.saveMobileMsg,
+      state: _saved
+          ? _StepState.done
+          : report != null
+          ? _StepState.active
+          : _StepState.waiting,
+      actions: [
+        (
+          label: desktop ? t.common.save : t.common.share,
+          icon: encrypted
+              ? FluentIcons.lock_closed_20_regular
+              : desktop
+              ? FluentIcons.arrow_download_20_regular
+              : FluentIcons.share_20_regular,
+          primary: report != null && !_saved,
+          run: report == null ? null : () => _save(t),
+        ),
+        if (encrypted)
+          (
+            label: s.saveUnencryptedCopy,
+            icon: FluentIcons.lock_open_20_regular,
+            primary: false,
+            run: () => _saveUnencrypted(t),
           ),
       ],
     );
   }
 
-  /// The steps after the zip is ready, for [channel] on this kind of device. A phone has no save
-  /// dialog: its share sheet saves the file, or hands it to the mail app or Telegram.
-  List<_Step> _steps(Translations t, ReportChannel channel) {
-    final s = t.dialogs.crashReport.steps;
-    final notifications = ref.read(inAppNotificationControllerProvider);
-    final desktop = PlatformUtils.isDesktop;
-    final report = _report;
-    final name = report?.file.uri.pathSegments.last ?? '';
-    final crash = widget.crashName != null;
-    final subject = crash ? t.dialogs.crashReport.subject : t.dialogs.crashReport.problemSubject;
+  /// One button, and the app does the rest.
+  Widget _hiddifySteps(Translations t) {
+    final r = t.dialogs.crashReport;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
-    Future<bool> save(File? file) async => file != null && await saveFileAs(file, t: t, notifications: notifications);
-    final saveLabel = desktop ? t.common.save : t.common.share;
-    final saveIcon = desktop ? FluentIcons.arrow_download_20_regular : FluentIcons.share_20_regular;
+    if (_upload == _Upload.sent) {
+      return Container(
+        margin: const EdgeInsets.only(top: 8),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+        decoration: BoxDecoration(color: colors.primaryContainer, borderRadius: BorderRadius.circular(20)),
+        child: Column(
+          children: [
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: .4, end: 1),
+              duration: const Duration(milliseconds: 450),
+              curve: Curves.elasticOut,
+              builder: (_, scale, child) => Transform.scale(scale: scale, child: child),
+              child: Icon(FluentIcons.checkmark_circle_48_filled, size: 48, color: colors.primary),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              r.sent,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleSmall?.copyWith(color: colors.onPrimaryContainer),
+            ),
+          ],
+        ),
+      );
+    }
 
-    // every way goes the same: the zip is kept somewhere, the place it goes to opens, and the
-    // user attaches it there. Neither a mailto: nor a Telegram or GitHub link can carry a file.
-    _Step open(String title, String detail, String label, IconData icon, FutureOr<Uri> uri) => _Step(
-      title,
-      detail: detail,
-      actions: [(label: label, icon: icon, run: () async => UriUtils.tryLaunch(await uri))],
+    final uploading = _upload == _Upload.sending;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (_upload == _Upload.failed) ...[
+          const SizedBox(height: 4),
+          _Notice(icon: FluentIcons.warning_16_regular, text: r.sendFailed, warning: true),
+        ],
+        const SizedBox(height: 12),
+        FilledButton.icon(
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          ),
+          onPressed: _report == null || uploading ? null : _uploadToHiddify,
+          icon: uploading
+              ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : const Icon(FluentIcons.cloud_arrow_up_24_regular, size: 20),
+          label: Text(uploading ? r.steps.uploading : r.sendHiddify),
+        ),
+      ],
     );
+  }
+
+  /// Save, open, attach: the same three steps for Telegram, email and GitHub, and only the last
+  /// two say where. A phone has no save dialog: its share sheet saves the file.
+  List<Widget> _manualSteps(Translations t) {
+    final s = t.dialogs.crashReport.steps;
+    final desktop = PlatformUtils.isDesktop;
+    final ready = _report != null;
+    final channel = _channel;
+    final opened = _opened.contains(channel);
+
+    final (openTitle, openDetail, openLabel, openIcon, attachTitle, attachHow) = switch (channel) {
+      ReportChannel.telegram => (
+        s.openBot,
+        _ltr(Constants.bugReportTelegramName),
+        s.openBotButton,
+        FluentIcons.send_20_regular,
+        s.attachInChat,
+        s.attachHow,
+      ),
+      ReportChannel.email => (
+        s.openMail,
+        s.openMailMsg(address: _ltr(Constants.bugReportEmail)),
+        s.openMailButton,
+        FluentIcons.mail_20_regular,
+        s.attachSend,
+        s.attachHow,
+      ),
+      _ => (
+        s.openGithub,
+        s.openGithubMsg,
+        s.openGithubButton,
+        FluentIcons.open_20_regular,
+        s.dropInIssue,
+        s.dropInIssueHow,
+      ),
+    };
+
+    _StepState state({required bool done, required bool reachable}) => done
+        ? _StepState.done
+        : reachable
+        ? _StepState.active
+        : _StepState.waiting;
 
     return [
-      // saving for oneself: encrypted to send on later, or in the clear to look at
-      if (channel == ReportChannel.file && _unencrypted != null)
-        _Step(
-          s.save,
-          detail: s.saveEncryptedOrNot,
-          actions: [
-            (label: s.saveEncrypted, icon: FluentIcons.lock_closed_20_regular, run: () => save(report?.file)),
-            (label: s.saveUnencrypted, icon: FluentIcons.lock_open_20_regular, run: () => save(_unencrypted)),
-          ],
-        )
-      else if (channel != ReportChannel.hiddify)
-        _Step(
-          s.save,
-          detail: desktop ? s.saveDesktopMsg : s.saveMobileMsg,
-          actions: [(label: saveLabel, icon: saveIcon, run: () => save(report?.file))],
-        ),
-      ...switch (channel) {
-        ReportChannel.hiddify || ReportChannel.file => const <_Step>[],
-        ReportChannel.telegram => [
-          open(
-            s.openBot,
-            _ltr(Constants.bugReportTelegramName),
-            s.openBotButton,
-            FluentIcons.send_20_regular,
-            _telegramLink,
+      _StepTile(
+        number: 1,
+        title: s.save,
+        detail: desktop ? s.saveDesktopMsg : s.saveMobileMsg,
+        state: state(done: _saved, reachable: ready),
+        actions: [
+          (
+            label: desktop ? t.common.save : t.common.share,
+            icon: desktop ? FluentIcons.arrow_download_20_regular : FluentIcons.share_20_regular,
+            primary: ready && !_saved,
+            run: ready ? () => _save(t) : null,
           ),
-          _Step(s.attachInChat, detail: s.attachHow, file: name),
         ],
-        ReportChannel.email => [
-          open(
-            s.openMail,
-            s.openMailMsg(address: _ltr(Constants.bugReportEmail)),
-            s.openMailButton,
-            FluentIcons.mail_20_regular,
-            Uri(
-              scheme: 'mailto',
-              path: Constants.bugReportEmail,
-              query:
-                  'subject=${Uri.encodeComponent(subject)}'
-                  '&body=${Uri.encodeComponent(_mailBody())}',
-            ),
-          ),
-          _Step(s.attachSend, detail: s.attachHow, file: name),
+      ),
+      _StepTile(
+        number: 2,
+        title: openTitle,
+        detail: openDetail,
+        state: state(done: opened, reachable: _saved),
+        actions: [
+          (label: openLabel, icon: openIcon, primary: _saved && !opened, run: _saved ? () => _open(channel, t) : null),
         ],
-        ReportChannel.github => [
-          open(s.openGithub, s.openGithubMsg, s.openGithubButton, FluentIcons.open_20_regular, _githubIssue()),
-          _Step(s.dropInIssue, detail: s.dropInIssueHow, file: name),
-        ],
-      },
+      ),
+      _StepTile(
+        number: 3,
+        title: attachTitle,
+        detail: attachHow,
+        file: _report?.file.uri.pathSegments.last,
+        state: _saved && opened ? _StepState.active : _StepState.waiting,
+      ),
     ];
   }
 
@@ -486,6 +653,208 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
     platform: _githubPlatform,
     os: Platform.operatingSystemVersion,
   );
+}
+
+/// The old page under the new one, both from the top: the dialog grows or shrinks from there.
+Widget _topStack(Widget? current, List<Widget> previous) =>
+    Stack(alignment: Alignment.topCenter, children: [...previous, if (current != null) current]);
+
+Widget _fadeSlide(Widget child, Animation<double> animation) => FadeTransition(
+  opacity: animation,
+  child: SlideTransition(
+    position: Tween(begin: const Offset(0, .04), end: Offset.zero).animate(animation),
+    child: child,
+  ),
+);
+
+/// Where the report goes, as tiles: one row when there is room, three a row on a phone. The recommended
+/// one wears a pill across its top edge.
+class _DestinationPicker extends StatelessWidget {
+  const _DestinationPicker({
+    required this.options,
+    required this.selected,
+    required this.recommended,
+    required this.recommendedLabel,
+    this.onChanged,
+  });
+
+  final List<({ReportChannel channel, IconData icon, String label})> options;
+  final ReportChannel selected;
+  final ReportChannel recommended;
+  final String recommendedLabel;
+  final ValueChanged<ReportChannel>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    // the dialog sizes its content by its intrinsic width, which a LayoutBuilder cannot give:
+    // the screen decides instead
+    final perRow = MediaQuery.sizeOf(context).width >= 600 ? options.length : 3;
+    const gap = 10.0;
+    final rows = [for (var i = 0; i < options.length; i += perRow) options.sublist(i, min(i + perRow, options.length))];
+    return Column(
+      children: [
+        for (final (index, row) in rows.indexed) ...[
+          if (index > 0) const SizedBox(height: gap + 8),
+          Row(
+            children: [
+              for (final (i, option) in row.indexed) ...[
+                if (i > 0) const SizedBox(width: gap),
+                Expanded(
+                  child: _DestinationTile(
+                    icon: option.icon,
+                    label: option.label,
+                    selected: option.channel == selected,
+                    badge: option.channel == recommended ? recommendedLabel : null,
+                    onTap: onChanged == null ? null : () => onChanged!(option.channel),
+                  ),
+                ),
+              ],
+              // a short last row keeps the tiles the size of the others
+              for (var i = row.length; i < perRow; i++) ...[const SizedBox(width: gap), const Spacer()],
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _DestinationTile extends StatelessWidget {
+  const _DestinationTile({required this.icon, required this.label, required this.selected, this.badge, this.onTap});
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final String? badge;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final radius = BorderRadius.circular(18);
+    final enabled = onTap != null || selected;
+
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: Opacity(
+        opacity: enabled ? 1 : .45,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.topCenter,
+          children: [
+            AnimatedContainer(
+              duration: _motion,
+              curve: Curves.easeOutCubic,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                color: selected ? colors.primaryContainer : colors.surfaceContainerLow,
+                border: Border.all(color: selected ? colors.primary : colors.outlineVariant, width: selected ? 2 : 1),
+                boxShadow: selected
+                    ? [
+                        BoxShadow(
+                          color: colors.primary.withValues(alpha: .22),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : const [],
+              ),
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  borderRadius: radius,
+                  onTap: onTap,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 18, 8, 12),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedScale(
+                          scale: selected ? 1.12 : 1,
+                          duration: _motion,
+                          curve: Curves.easeOutBack,
+                          child: Icon(icon, size: 26, color: selected ? colors.primary : colors.onSurfaceVariant),
+                        ),
+                        const SizedBox(height: 8),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            label,
+                            maxLines: 1,
+                            style: theme.textTheme.labelLarge?.copyWith(
+                              color: selected ? colors.onPrimaryContainer : colors.onSurface,
+                              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (badge case final badge?)
+              Positioned(
+                top: -10,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(99),
+                    color: colors.primary,
+                    // a ring of the dialog's own color lifts the pill off the tile's border
+                    border: Border.all(color: colors.surfaceContainerHigh, width: 2),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.auto_awesome_rounded, size: 11, color: colors.onPrimary),
+                      const SizedBox(width: 4),
+                      Text(
+                        badge,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.onPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A quiet line of what the user should know: who sees the report, what is encrypted.
+class _Hint extends StatelessWidget {
+  const _Hint({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.onSurfaceVariant;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 1),
+          child: Icon(icon, size: 16, color: color),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(text, style: theme.textTheme.bodySmall?.copyWith(color: color)),
+        ),
+      ],
+    );
+  }
 }
 
 enum _StepState { waiting, active, working, done, failed }
@@ -645,13 +1014,13 @@ class _FileChip extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(color: colors.surfaceContainerHighest, borderRadius: BorderRadius.circular(6)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(FluentIcons.folder_zip_16_regular, size: 16, color: colors.onSurfaceVariant),
-          const SizedBox(width: 6),
+          Icon(FluentIcons.folder_zip_16_regular, size: 14, color: colors.onSurfaceVariant),
+          const SizedBox(width: 5),
           Flexible(
             child: Text(
               name,
@@ -660,7 +1029,10 @@ class _FileChip extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               // a file name reads left to right in a right-to-left language too
               textDirection: TextDirection.ltr,
-              style: _mono(theme.textTheme.labelMedium),
+              // small: a monospace name is wide, and it should fit the card whole
+              style: _mono(
+                theme.textTheme.labelSmall,
+              )?.copyWith(fontSize: 10, letterSpacing: -.2, height: 1.2, color: colors.onSurfaceVariant),
             ),
           ),
         ],

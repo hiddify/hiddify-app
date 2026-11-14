@@ -1101,9 +1101,17 @@
       "notFound": "Geen QR-code gevonden in deze afbeelding"
     },
     "crashReport": {
+      "recommended": "Aanbevolen",
+      "email": "E-mail",
+      "localOnly": "Alleen lokaal",
+      "localOnlyMsg": "Er wordt niets verzonden: bewaar het, kijk erin of stuur het later zelf.",
       "title": "Hiddify is de vorige keer gecrasht",
       "msg": "Een rapport naar de ontwikkelaars sturen zodat dit wordt opgelost? Het bevat de crashgegevens, de logboeken en je configuratie zonder servers, sleutels en wachtwoorden, als één zipbestand dat je kunt bekijken voordat je het verstuurt.",
-      "send": "Rapport versturen"
+      "send": "Rapport versturen",
+      "steps": {
+        "ready": "Rapport klaar",
+        "saveUnencryptedCopy": "Onversleutelde kopie opslaan"
+      }
     },
     "keepTop": {
       "title": "Een groot abonnement",

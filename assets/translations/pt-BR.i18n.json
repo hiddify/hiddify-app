@@ -1101,9 +1101,17 @@
       "notFound": "Nenhum código QR encontrado nesta imagem"
     },
     "crashReport": {
+      "recommended": "Recomendado",
+      "email": "E-mail",
+      "localOnly": "Somente local",
+      "localOnlyMsg": "Nada é enviado: guarde, veja o conteúdo ou envie você mesmo depois.",
       "title": "O Hiddify fechou inesperadamente da última vez",
       "msg": "Enviar um relatório aos desenvolvedores para corrigir isso? Ele contém os detalhes da falha, os logs e sua configuração sem servidores, chaves e senhas, em um único arquivo zip que você pode ver antes de enviar.",
-      "send": "Enviar relatório"
+      "send": "Enviar relatório",
+      "steps": {
+        "ready": "Relatório pronto",
+        "saveUnencryptedCopy": "Salvar uma cópia sem criptografia"
+      }
     },
     "keepTop": {
       "title": "Uma assinatura grande",

@@ -1101,9 +1101,17 @@
       "notFound": "In diesem Bild wurde kein QR-Code gefunden"
     },
     "crashReport": {
+      "recommended": "Empfohlen",
+      "email": "E-Mail",
+      "localOnly": "Nur lokal",
+      "localOnlyMsg": "Nichts wird gesendet: aufbewahren, hineinsehen oder später selbst senden.",
       "title": "Hiddify ist beim letzten Mal abgestürzt",
       "msg": "Einen Bericht an die Entwickler senden, damit das behoben wird? Er enthält die Absturzdetails, die Protokolle und Ihre Konfiguration ohne Server, Schlüssel und Passwörter, als eine ZIP-Datei, die Sie vor dem Senden ansehen können.",
-      "send": "Bericht senden"
+      "send": "Bericht senden",
+      "steps": {
+        "ready": "Bericht bereit",
+        "saveUnencryptedCopy": "Unverschlüsselte Kopie speichern"
+      }
     },
     "keepTop": {
       "title": "Ein großes Abo",

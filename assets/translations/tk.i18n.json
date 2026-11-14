@@ -1101,9 +1101,17 @@
       "notFound": "Bu suratda QR kod tapylmady"
     },
     "crashReport": {
+      "recommended": "Maslahat berilýär",
+      "email": "E-poçta",
+      "localOnly": "Diňe ýerli",
+      "localOnlyMsg": "Hiç zat iberilmeýär: saklaň, içine serediň ýa-da soňra özüňiz iberiň.",
       "title": "Hiddify soňky gezek çöküpdi",
       "msg": "Bu düzedilsin diýip, işläp düzüjilere hasabat iberilsinmi? Onda çökme jikme-jiklikleri, žurnallar we serwerleri, açarlary we paroly aýrylan konfigurasiýaňyz bar, iberilmezden öň göz aýlap boljak bir zip faýlda.",
-      "send": "Hasabaty iber"
+      "send": "Hasabaty iber",
+      "steps": {
+        "ready": "Hasabat taýýar",
+        "saveUnencryptedCopy": "Şifrlenmedik nusgany sakla"
+      }
     },
     "keepTop": {
       "title": "Uly abunalyk",

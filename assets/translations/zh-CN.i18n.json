@@ -1101,9 +1101,17 @@
       "notFound": "此图片中未找到二维码"
     },
     "crashReport": {
+      "recommended": "推荐",
+      "email": "邮件",
+      "localOnly": "仅本地",
+      "localOnlyMsg": "不会发送任何内容：保存、查看内容，或稍后自行发送。",
       "title": "Hiddify 上次崩溃了",
       "msg": "要把报告发送给开发者以便修复吗？报告包含崩溃详情、日志，以及已移除服务器、密钥和密码的配置，打包为一个 zip 文件，发送前您可以先查看。",
-      "send": "发送报告"
+      "send": "发送报告",
+      "steps": {
+        "ready": "报告已就绪",
+        "saveUnencryptedCopy": "保存未加密副本"
+      }
     },
     "keepTop": {
       "title": "大型订阅",

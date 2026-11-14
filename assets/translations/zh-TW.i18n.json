@@ -1101,9 +1101,17 @@
       "notFound": "此圖片中找不到 QR Code"
     },
     "crashReport": {
+      "recommended": "推薦",
+      "email": "電子郵件",
+      "localOnly": "僅限本機",
+      "localOnlyMsg": "不會傳送任何內容：保存、查看內容，或稍後自行傳送。",
       "title": "Hiddify 上次當機了",
       "msg": "要傳送報告給開發人員以便修正嗎？報告包含當機詳細資料、日誌，以及已移除伺服器、金鑰和密碼的設定，打包為一個 zip 檔案，傳送前您可以先查看。",
-      "send": "傳送報告"
+      "send": "傳送報告",
+      "steps": {
+        "ready": "報告已就緒",
+        "saveUnencryptedCopy": "儲存未加密副本"
+      }
     },
     "keepTop": {
       "title": "大型訂閱",

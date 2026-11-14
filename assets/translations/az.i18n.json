@@ -1101,9 +1101,17 @@
       "notFound": "Bu şəkildə QR kod tapılmadı"
     },
     "crashReport": {
+      "recommended": "Tövsiyə olunur",
+      "email": "E-poçt",
+      "localOnly": "Yalnız yerli",
+      "localOnlyMsg": "Heç nə göndərilmir: saxlayın, içinə baxın və ya sonra özünüz göndərin.",
       "title": "Hiddify son dəfə çökdü",
       "msg": "Bunun düzəldilməsi üçün tərtibatçılara hesabat göndərilsin? Hesabatda çökmə təfərrüatları, jurnallar və serverlər, açarlar və parollar silinmiş konfiqurasiyanız var; göndərməzdən əvvəl baxa biləcəyiniz bir zip faylıdır.",
-      "send": "Hesabatı göndər"
+      "send": "Hesabatı göndər",
+      "steps": {
+        "ready": "Hesabat hazırdır",
+        "saveUnencryptedCopy": "Şifrələnməmiş nüsxəni saxla"
+      }
     },
     "keepTop": {
       "title": "Böyük abunəlik",

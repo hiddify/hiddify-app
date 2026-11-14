@@ -11,7 +11,7 @@ needed to open it.
 
 ## What is in a report
 
-Every way of sending carries the same `hiddify-report-<time>.zip`:
+Every way of sending carries the same zip, numbered across reports (`hiddify-001.zip`, `hiddify-002.zip`, …):
 
 ```text
 diagnostics-<time>/
@@ -36,10 +36,10 @@ the user's description) go in the sensitive part, `GenericFiles` (its exceptions
 traces) stay readable. The text is scrubbed of
 addresses, links and secrets before it is encrypted.
 
-**Save the file** is the only way to get the sensitive part in the clear: it has two buttons,
-**Encrypted** (the same file the other ways send) and **Unencrypted**
-(`hiddify-report-<time>-unencrypted.zip`, with `sensitive/` as a plain folder) for the user to look
-inside.
+**Local only** is the only way to get the sensitive part in the clear: it has two buttons,
+**Save** (the same file the other ways send) and **Save an unencrypted copy**
+(`hiddify-001-unencrypted.zip`, the report's own number, with `sensitive/` as a plain folder) for
+the user to look inside.
 
 ## Set up once
 
@@ -76,7 +76,7 @@ encrypted (`ExportDiagnosticsResponse.encrypted`).
 Unzip the report, then decrypt its sensitive part:
 
 ```sh
-unzip hiddify-report-2026-11-14T09-06-05.zip
+unzip hiddify-001.zip
 age -d -i hiddify-diagnostics.key diagnostics-*/sensitive.encrypted.age > sensitive.zip
 unzip sensitive.zip -d sensitive
 ```

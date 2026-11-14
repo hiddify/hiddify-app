@@ -1101,9 +1101,17 @@
       "notFound": "Tidak ada kode QR di gambar ini"
     },
     "crashReport": {
+      "recommended": "Disarankan",
+      "email": "Email",
+      "localOnly": "Hanya lokal",
+      "localOnlyMsg": "Tidak ada yang dikirim: simpan, lihat isinya, atau kirim sendiri nanti.",
       "title": "Hiddify mengalami crash terakhir kali",
       "msg": "Kirim laporan ke pengembang agar masalah ini diperbaiki? Isinya detail crash, log, dan konfigurasi Anda dengan server, kunci, dan kata sandi dihapus, dalam satu file zip yang bisa Anda lihat sebelum dikirim.",
-      "send": "Kirim laporan"
+      "send": "Kirim laporan",
+      "steps": {
+        "ready": "Laporan siap",
+        "saveUnencryptedCopy": "Simpan salinan tanpa enkripsi"
+      }
     },
     "keepTop": {
       "title": "Langganan besar",

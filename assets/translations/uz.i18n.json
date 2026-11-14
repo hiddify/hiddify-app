@@ -1101,9 +1101,17 @@
       "notFound": "Bu rasmda QR kod topilmadi"
     },
     "crashReport": {
+      "recommended": "Tavsiya etiladi",
+      "email": "Email",
+      "localOnly": "Faqat mahalliy",
+      "localOnlyMsg": "Hech narsa yuborilmaydi: saqlang, ichini ko‘ring yoki keyinroq o‘zingiz yuboring.",
       "title": "Hiddify oxirgi safar ishdan chiqdi",
       "msg": "Buni tuzatish uchun dasturchilarga hisobot yuborilsinmi? Unda ishdan chiqish tafsilotlari, jurnallar va serverlar, kalitlar hamda parollari olib tashlangan konfiguratsiyangiz bor. U bitta zip fayl bo‘lib, yuborishdan oldin ko‘rib chiqishingiz mumkin.",
-      "send": "Hisobotni yuborish"
+      "send": "Hisobotni yuborish",
+      "steps": {
+        "ready": "Hisobot tayyor",
+        "saveUnencryptedCopy": "Shifrlanmagan nusxani saqlash"
+      }
     },
     "keepTop": {
       "title": "Katta obuna",

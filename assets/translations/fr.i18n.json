@@ -1101,9 +1101,17 @@
       "notFound": "Aucun code QR trouvé dans cette image"
     },
     "crashReport": {
+      "recommended": "Recommandé",
+      "email": "E-mail",
+      "localOnly": "Local uniquement",
+      "localOnlyMsg": "Rien n’est envoyé : gardez-le, regardez dedans ou envoyez-le vous-même plus tard.",
       "title": "Hiddify a planté la dernière fois",
       "msg": "Envoyer un rapport aux développeurs pour corriger le problème ? Il contient les détails du plantage, les journaux et votre configuration sans serveurs, clés ni mots de passe, dans un seul fichier zip que vous pouvez consulter avant l'envoi.",
-      "send": "Envoyer le rapport"
+      "send": "Envoyer le rapport",
+      "steps": {
+        "ready": "Rapport prêt",
+        "saveUnencryptedCopy": "Enregistrer une copie non chiffrée"
+      }
     },
     "keepTop": {
       "title": "Un gros abonnement",
