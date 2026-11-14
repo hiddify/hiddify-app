@@ -76,8 +76,14 @@ class ConnectionButton extends HookConsumerWidget {
       AsyncValue(valueOrNull: Disconnected(connectionFailure: final failure?)) => failure,
       _ => null,
     };
-    // the speeds the button's light follows while connected
-    final stats = ref.watch(statsNotifierProvider).valueOrNull;
+    // the speeds the button's light follows while connected, and only them: the core's status
+    // comes every second and something in it always changed
+    final (download, upload) = ref.watch(
+      statsNotifierProvider.select((stats) {
+        final s = stats.valueOrNull;
+        return s == null ? (0, 0) : (s.downlink.toInt(), s.uplink.toInt());
+      }),
+    );
 
     // Connected means some server answers; the user's pick or the chain hop can still be down.
     final health = ref.watch(connectionHealthProvider);
@@ -95,8 +101,8 @@ class ConnectionButton extends HookConsumerWidget {
           ? null
           : () => ref.read(dialogNotifierProvider.notifier).showCustomAlertFromErr(failure.present(t)),
       errorDetailsLabel: t.connection.errorDetails,
-      download: stats?.downlink.toInt() ?? 0,
-      upload: stats?.uplink.toInt() ?? 0,
+      download: download,
+      upload: upload,
       label: switch (look) {
         _Look.loading => "",
         _Look.disconnected => t.connection.tapToConnect,
