@@ -359,7 +359,12 @@ class _ConnectionButton extends HookWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) => wakeAmbientMotion());
       return null;
     }, [eclipseLook]);
-    final ambient = useValueListenable(ambientMotion) || (lookChanged && ambientMotionAllowed);
+    final ambientOn = useValueListenable(ambientMotion);
+    // connecting, searching and disconnecting say the app is busy: they keep moving for as long as
+    // they last, not only while the endless decoration runs. A start that took longer than its 10 s
+    // froze the wave half way, and the button looked stuck until the core gave up or connected
+    final busy = const {EclipseLook.starting, EclipseLook.waiting, EclipseLook.stopping}.contains(eclipseLook);
+    final ambient = busy || ambientOn || (lookChanged && ambientMotionAllowed);
     final ticking = tickerOn && ambient;
     // with reduce animations, and once the endless motion has stopped (10 s after it started, or
     // the window without focus), the light is a still glow that only steps with the traffic
