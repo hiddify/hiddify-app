@@ -507,7 +507,9 @@ class KeepTopFooter extends HookConsumerWidget {
         children: [
           TweenAnimationBuilder<double>(
             tween: Tween(end: shown.toDouble()),
-            duration: const Duration(milliseconds: 500),
+            // while the test runs the count changes every second: it snaps, since a tween would
+            // keep the page drawing frames half of the time
+            duration: picking ? Duration.zero : const Duration(milliseconds: 500),
             curve: Curves.easeOutCubic,
             builder: (context, value, _) => Text(
               '${value.round()}',
@@ -586,7 +588,9 @@ class KeepTopFooter extends HookConsumerWidget {
               running: running,
               wanted: picking ? 0 : wanted,
               total: total,
-              busy: busy.value || (picking && tested.working + tested.failing == 0),
+              // a pick shows how far it got, from nothing: the bar that slides to and fro is for a
+              // change the user just asked for, which is over in a moment
+              busy: busy.value,
               tested: picking ? (working: tested.working, failing: tested.failing, good: good) : null,
             ),
             const Gap(12),
@@ -725,17 +729,12 @@ class _TestTally extends ConsumerWidget {
           ),
         ),
         const Gap(7),
-        TweenAnimationBuilder<double>(
-          tween: Tween(end: n.toDouble()),
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeOutCubic,
-          builder: (context, value, _) => Text(
-            '${value.round()}',
-            style: theme.textTheme.titleSmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w800,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
+        Text(
+          '$n',
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.w800,
+            fontFeatures: const [FontFeature.tabularFigures()],
           ),
         ),
         const Gap(4),
@@ -772,7 +771,8 @@ class _RunBar extends StatelessWidget {
     double share(int n) => n <= 0 || total <= 0 ? 0 : max(n / total, .025).clamp(0, 1).toDouble();
     Widget part(int n, Color color) => TweenAnimationBuilder<double>(
       tween: Tween(end: share(n)),
-      duration: const Duration(milliseconds: 500),
+      // the test's progress snaps: it moves every second
+      duration: tested != null ? Duration.zero : const Duration(milliseconds: 500),
       curve: Curves.easeOutCubic,
       builder: (context, value, _) => FractionallySizedBox(
         alignment: AlignmentDirectional.centerStart,

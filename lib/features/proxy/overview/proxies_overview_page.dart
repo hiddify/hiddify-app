@@ -122,6 +122,9 @@ class ProxiesOverviewPage extends HookConsumerWidget with PresLogger {
                         // a row keeps its own proxy when the list re-sorts, so a pop plays only on arrival
                         key: ValueKey(proxy.tag),
                         selected: group.selected == proxy.tag,
+                        // a pick goes through hundreds of proxies, a row or two change every second:
+                        // their values change in place, nothing pops or loops
+                        quiet: group.keepTopPicking,
                         // selecting one at rest loads it and tests it
                         onTap: () async {
                           await ref.read(proxiesOverviewNotifierProvider.notifier).changeProxy(group.tag, proxy.tag);
