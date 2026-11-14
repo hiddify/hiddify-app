@@ -86,6 +86,22 @@ Future<List<ProfileProxy>> readProfileProxies(File file) async {
   });
 }
 
+/// How many of [proxies] (groups left out) the test has answered so far: [working] got a ping,
+/// [failing] got none or the core gave up on them. The ones not tested yet are in neither.
+({int working, int failing}) testedCounts(Iterable<OutboundInfo> proxies) {
+  var working = 0;
+  var failing = 0;
+  for (final p in proxies) {
+    if (p.isGroup) continue;
+    if (ConnectionConst.isValidDelay(p.urlTestDelay)) {
+      working++;
+    } else if (p.status == Status.FAILED || p.urlTestDelay >= ConnectionConst.maxDelay) {
+      failing++;
+    }
+  }
+  return (working: working, failing: failing);
+}
+
 /// How many of [proxies] that keep top paused for being outside [regions] answered faster than
 /// the fastest one running: by their ping, else the one cached from the last run. 0 without
 /// [regions], or before any running one answered.

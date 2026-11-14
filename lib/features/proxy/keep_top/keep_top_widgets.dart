@@ -459,7 +459,12 @@ class KeepTopFooter extends HookConsumerWidget {
     final shownRegions = ticked.value ?? regions.toSet();
     // the regions keep the slower ones: proxies elsewhere answered faster
     final faster = chosen || picking ? 0 : fasterOutsideRegions(proxies, regions);
-    // each fact on a chip of its own: which ones run, where they are, how many rest
+    // what the test found so far: how many answer, how many do not
+    final tested = testedCounts(proxies);
+    // the big figure: while testing, how many are left to test; then how many run
+    final shown = picking ? max(0, total - tested.working - tested.failing) : running;
+    final good = theme.brightness == Brightness.dark ? const Color(0xFF81C784) : const Color(0xFF2E7D32);
+    // each fact on a chip of its own: which ones run, and where they are
     final facts = [
       mode,
       // where they are: a tap opens the countries; the ticked ones apply when the menu closes
@@ -501,7 +506,7 @@ class KeepTopFooter extends HookConsumerWidget {
         textBaseline: TextBaseline.alphabetic,
         children: [
           TweenAnimationBuilder<double>(
-            tween: Tween(end: running.toDouble()),
+            tween: Tween(end: shown.toDouble()),
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeOutCubic,
             builder: (context, value, _) => Text(
@@ -515,7 +520,7 @@ class KeepTopFooter extends HookConsumerWidget {
               ),
             ),
           ),
-          if (running < total) ...[
+          if (shown < total) ...[
             const Gap(6),
             Text(
               '/ $total',
@@ -525,7 +530,7 @@ class KeepTopFooter extends HookConsumerWidget {
           const Gap(8),
           Flexible(
             child: Text(
-              picking ? text.testing : text.running,
+              picking ? text.untested : text.running,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textDirection: Directionality.of(context),
@@ -556,7 +561,16 @@ class KeepTopFooter extends HookConsumerWidget {
             Row(
               children: [
                 Expanded(
-                  child: Align(alignment: AlignmentDirectional.centerStart, child: figure),
+                  child: Wrap(
+                    spacing: 16,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      figure,
+                      if (picking || tested.working + tested.failing > 0)
+                        _TestTally(working: tested.working, failing: tested.failing, good: good),
+                    ],
+                  ),
                 ),
                 const Gap(12),
                 FilledButton.tonalIcon(
@@ -568,7 +582,13 @@ class KeepTopFooter extends HookConsumerWidget {
               ],
             ),
             const Gap(14),
-            _RunBar(running: running, wanted: picking ? 0 : wanted, total: total, busy: picking || busy.value),
+            _RunBar(
+              running: running,
+              wanted: picking ? 0 : wanted,
+              total: total,
+              busy: busy.value || (picking && tested.working + tested.failing == 0),
+              tested: picking ? (working: tested.working, failing: tested.failing, good: good) : null,
+            ),
             const Gap(12),
             Wrap(spacing: 8, runSpacing: 8, children: facts),
             if (faster > 0) ...[
@@ -678,13 +698,71 @@ class _RestingNote extends ConsumerWidget {
 
 /// The share of the proxies that run, as a bar: the ones asked for faint behind the ones that run.
 /// It moves on its own while they are being tested.
+/// In the keep top card, by the big figure: what the test found, as two quiet figures, each after
+/// a glowing dot: how many proxies answer, in [good], and how many do not. Not a button.
+class _TestTally extends ConsumerWidget {
+  const _TestTally({required this.working, required this.failing, required this.good});
+
+  final int working;
+  final int failing;
+  final Color good;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final text = ref.watch(translationsProvider).requireValue.pages.proxies.keepTop;
+    final theme = Theme.of(context);
+    final s = theme.colorScheme;
+    Widget one(int n, String label, Color color) => Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            boxShadow: [BoxShadow(color: color.withValues(alpha: .6), blurRadius: 6, spreadRadius: .5)],
+          ),
+        ),
+        const Gap(7),
+        TweenAnimationBuilder<double>(
+          tween: Tween(end: n.toDouble()),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+          builder: (context, value, _) => Text(
+            '${value.round()}',
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w800,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ),
+        const Gap(4),
+        Text(label, style: theme.textTheme.bodySmall?.copyWith(color: s.onSurfaceVariant)),
+      ],
+    );
+    return Semantics(
+      container: true,
+      child: Wrap(
+        spacing: 14,
+        runSpacing: 4,
+        children: [one(working, text.working, good), if (failing > 0) one(failing, text.failing, s.error)],
+      ),
+    );
+  }
+}
+
 class _RunBar extends StatelessWidget {
-  const _RunBar({required this.running, required this.wanted, required this.total, required this.busy});
+  const _RunBar({required this.running, required this.wanted, required this.total, required this.busy, this.tested});
 
   final int running;
   final int wanted;
   final int total;
   final bool busy;
+
+  /// While the test runs: how far it got, the working ones in [good] then the failing ones.
+  final ({int working, int failing, Color good})? tested;
 
   @override
   Widget build(BuildContext context) {
@@ -714,8 +792,14 @@ class _RunBar extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   ColoredBox(color: track),
-                  part(wanted, s.primary.withValues(alpha: .28)),
-                  part(running, s.primary),
+                  if (tested case final tested?) ...[
+                    // the failing ones after the working ones: one bar of how far the test got
+                    part(tested.working + tested.failing, s.error.withValues(alpha: .55)),
+                    part(tested.working, tested.good),
+                  ] else ...[
+                    part(wanted, s.primary.withValues(alpha: .28)),
+                    part(running, s.primary),
+                  ],
                 ],
               ),
       ),

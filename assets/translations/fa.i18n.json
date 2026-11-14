@@ -175,10 +175,13 @@
         "anyRegion": "نمایش همه مناطق",
         "running": "روشن",
         "testing": "در حال سنجش…",
+        "untested": "مانده تا تست…",
         "modeTop": "$keep تای سریع‌تر",
         "modeWorking": "فقط سالم‌ها",
         "modeChosen": "انتخاب شما",
-        "onlyAnswer": "$keep تای سریع‌تر · فقط $n تا پاسخ می‌دهند"
+        "onlyAnswer": "$keep تای سریع‌تر · فقط $n تا پاسخ می‌دهند",
+        "working": "سالم",
+        "failing": "خراب"
       },
       "upload": {
         "test": "سنجش سرعت آپلود",

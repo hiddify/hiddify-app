@@ -175,10 +175,13 @@
         "anyRegion": "Show all regions",
         "running": "running",
         "testing": "testing…",
+        "untested": "left to test…",
         "modeTop": "Top $keep",
         "modeWorking": "Working only",
         "modeChosen": "Your picks",
-        "onlyAnswer": "Top $keep · only $n answer"
+        "onlyAnswer": "Top $keep · only $n answer",
+        "working": "working",
+        "failing": "not working"
       },
       "upload": {
         "test": "Test upload speed",
