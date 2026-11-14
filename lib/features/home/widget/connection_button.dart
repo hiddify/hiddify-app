@@ -261,9 +261,9 @@ class _ConnectionButton extends HookWidget {
   final AssetGenImage image;
   final bool useImage;
 
-  /// Reduce animations: while connected, the light round the button is a still glow that only
-  /// steps with the traffic, and the logo stops breathing once it has settled. The other looks
-  /// keep their motion.
+  /// Reduce animations: while connected, the light round the button stands still, as it was when
+  /// it stopped, and only steps with the traffic; the logo stops breathing once it has settled.
+  /// The other looks keep their motion.
   final bool reduceFlow;
 
   static const _size = 148.0;
@@ -373,9 +373,9 @@ class _ConnectionButton extends HookWidget {
     final ambient = busy || ambientOn || (lookChanged && ambientMotionAllowed);
     final ticking = tickerOn && ambient;
     // with reduce animations, and once the endless motion has stopped (10 s after it started, or
-    // the window without focus), the light is a still glow that only steps with the traffic
+    // the window without focus), the light stands still, as it was, and only steps with the traffic
     final still = reduced || !ambient;
-    // reduce animations: connected shows the still glow, after its own connect motion has played
+    // reduce animations: connected shows the still light, after its own connect motion has played
     final flowStill = reduceFlow && eclipseLook == EclipseLook.connected;
     // A phone that cannot draw a frame in the 33 ms before the next one drops frames in bursts.
     // Measured, not guessed from the model: such a phone gets a steady 20 or 15 fps of the same
@@ -392,10 +392,14 @@ class _ConnectionButton extends HookWidget {
     // from a long wait to connected stopped the clock on the connect motion's first frame
     final calm = useValueListenable(settled) && now() - change.value.at > _settleAfter;
     final interval = calm ? _settledIntervals[level] : load.interval;
+    // The light's own clock: it runs only while the light moves. A light that stops stays as it
+    // was, the same rays and flares where they were, and goes on from there when it moves again;
+    // on the wall clock it would jump to another sky each time.
     final time = useValueNotifier(0.0);
+    // still, nothing ticks; nor once connected has settled with the flowing light reduced
+    final moving = !still && ticking && !(flowStill && calm);
     useEffect(() {
-      // still, nothing ticks; nor once connected has settled with the flowing light reduced
-      if (still || !ticking || (flowStill && calm)) return null;
+      if (!moving) return null;
       load.watch();
       var last = now();
       // on the clock every endless decoration shares, so they all draw in the same frames
@@ -407,17 +411,18 @@ class _ConnectionButton extends HookWidget {
             from + (to - from) * (1 - math.exp(-(at - last) / (to > from ? .8 : 2.5)));
         final t = traffic.value;
         traffic.value = EclipseTraffic(down: follow(t.down, target.value.down), up: follow(t.up, target.value.up));
+        final passed = at - last;
         last = at;
         final since = at - change.value.at;
         settled.value = since > _settleAfter;
         final idle = change.value.look == EclipseLook.idle && since > 1;
-        if (!idle) time.value = at;
+        if (!idle) time.value += passed;
       });
       return () {
         unsubscribe();
         load.unwatch();
       };
-    }, [still, ticking, interval, flowStill && calm]);
+    }, [moving, interval]);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -456,13 +461,14 @@ class _ConnectionButton extends HookWidget {
                                 final c = change.value;
                                 return CustomPaint(
                                   isComplex: true,
-                                  willChange: true,
+                                  // a light that stands still is kept as it was drawn
+                                  willChange: moving,
                                   painter: EclipseButtonPainter(
                                     frame: EclipseFrame(
                                       look: c.look,
                                       previous: c.previous,
                                       since: still ? 10 : now() - c.at,
-                                      time: still ? 0 : now(),
+                                      time: t,
                                       color: c.color,
                                       previousColor: c.previousColor,
                                     ),
