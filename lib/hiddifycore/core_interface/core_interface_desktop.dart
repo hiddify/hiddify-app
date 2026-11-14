@@ -128,6 +128,10 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
   // A core that keeps crashing is not started again more often than this.
   static const _maxRestarts = 3;
   static const _restartWindow = Duration(minutes: 1);
+  static final _crashes = StreamController<void>.broadcast();
+
+  @override
+  Stream<void> get coreCrashes => _crashes.stream;
 
   /// Windows and Linux: the app's own work (profiles, settings, the VPN service, the system proxy)
   /// runs in the library loaded into this process, and only a proxy-mode connection runs in the
@@ -214,6 +218,8 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
               ? 'The core stopped unexpectedly (exit code $code).'
               : 'The core stopped unexpectedly (exit code $code): $reason',
         );
+        // the app's core still runs and lists the engine's crash output (its live stderr file)
+        _crashes.add(null);
       }),
     );
     return _engineClient;
@@ -360,6 +366,8 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
       }
       loggy.info('core process restarted');
       onCoreProcessRestarted();
+      // the restarted core has archived the crash into its crash reports, and answers for them
+      _crashes.add(null);
     } catch (e) {
       loggy.error('core process failed to restart', e);
     }

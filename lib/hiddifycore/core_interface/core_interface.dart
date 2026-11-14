@@ -31,6 +31,10 @@ class CoreInterface {
   Stream<CoreStatus>? get managedStatus => null;
   Stream<void>? get clientChanges => null;
 
+  /// An event each time a core process the app started crashed while the app runs (desktop), once
+  /// its crash output can be listed: the crash report is offered then, not only at the next start.
+  Stream<void> get coreCrashes => const Stream.empty();
+
   Future<void> setOptions(SingboxConfigOption options) async {}
   Future<void> dispose() async {}
 
