@@ -7,7 +7,9 @@ Usage:
   prepare_release_notes.py <body.md> --vt-results <results.json>
 
 The first form fills <!-- ASSET_LINKS --> in the template with rows only for files
-that exist under assets-dir. The second form rewrites only the download table of an
+that exist under assets-dir, and <!-- CHANGELOG --> with .github/release_changelog.md: the
+"Change Logs" section heads the notes, and the app's update dialog shows it. Without that file,
+or with an empty one, the section is left out. The second form rewrites only the download table of an
 already published body (between the ASSETS markers), taking names and sha256 digests
 from the GitHub API release JSON, so nothing needs to be downloaded and manual edits
 to the rest of the notes survive. A VirusTotal badge already in that body is kept.
@@ -64,6 +66,9 @@ FIRST_GROUPS = ("Windows", "Android")
 NO_VT_SCAN = {"Hiddify-iOS.ipa"}
 
 ASSET_MARKER = "<!-- ASSET_LINKS -->"
+CHANGELOG_MARKER = "<!-- CHANGELOG -->"
+# Written by hand for each release; github_release_parser.dart reads the section back.
+CHANGELOG_FILE = Path(__file__).resolve().parents[1] / "release_changelog.md"
 TABLE_BEGIN = "<!-- ASSETS:BEGIN -->"
 TABLE_END = "<!-- ASSETS:END -->"
 REPO = "hiddify/hiddify-app"
@@ -163,6 +168,20 @@ def apply_vt_results(body: str, results: dict[str, dict | None]) -> str:
     for sha256, result in results.items():
         body = vt_badge_pattern(sha256).sub(lambda _: vt_badge_img(sha256, vt_badge_src(result)), body)
     return body
+
+
+def fill_changelog(text: str, changelog_path: Path = CHANGELOG_FILE) -> str:
+    """Put the change log at its marker, or drop the marker and its heading when there is none."""
+    if CHANGELOG_MARKER not in text:
+        return text
+    changelog = changelog_path.read_text() if changelog_path.is_file() else ""
+    changelog = re.sub(r"<!--.*?-->", "", changelog, flags=re.DOTALL).strip()
+    if changelog:
+        # the rule ends the section for the app as well, before the download part
+        return text.replace(CHANGELOG_MARKER, f"{changelog}\n\n---")
+    heading = re.compile(r"^#{1,6}[^\n]*\n\s*" + re.escape(CHANGELOG_MARKER) + r"\s*", re.MULTILINE)
+    text, dropped = heading.subn("", text, count=1)
+    return text if dropped else text.replace(CHANGELOG_MARKER, "")
 
 
 def install_command(tag: str) -> str:
@@ -315,6 +334,7 @@ def main() -> int:
 
     text = notes_path.read_text()
     text = text.replace("RELEASE_TAG", tag)
+    text = fill_changelog(text)
     links = render_links(tag, assets, bust)
     # Strip the template's own comments first; the ASSETS markers are added after
     # and stay in the body so the table can be rewritten later.
