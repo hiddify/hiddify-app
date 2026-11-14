@@ -102,6 +102,7 @@ open class ExtensionProvider: NEPacketTunnelProvider {
     }
 
     private func createRequiredDirectories() throws {
+        FilePath.prepareWorkingDirectory()
         for directory in [FilePath.sharedDirectory, FilePath.workingDirectory, FilePath.cacheDirectory] {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
         }

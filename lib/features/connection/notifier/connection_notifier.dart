@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/haptic/haptic_service.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
@@ -10,6 +11,9 @@ import 'package:hiddify/features/connection/data/connection_repository.dart';
 import 'package:hiddify/features/connection/model/connection_failure.dart';
 import 'package:hiddify/features/connection/model/connection_status.dart';
 import 'package:hiddify/features/connection/model/startup_connection.dart';
+import 'package:hiddify/features/profile/data/profile_data_providers.dart';
+import 'package:hiddify/features/profile/data/profile_path_resolver.dart';
+import 'package:hiddify/features/profile/data/profile_repository.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
@@ -236,13 +240,20 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     final t = ref.read(translationsProvider).requireValue;
     final startedByUser = ref.read(Preferences.startedByUser.notifier);
     final window = showWindowOnFailure ? ref.read(windowNotifierProvider.notifier) : null;
+    final paths = ref.read(profilePathResolverProvider);
+    final profiles = ref.read(profileRepositoryProvider.future);
+    final disableMemoryLimit = ref.read(Preferences.disableMemoryLimit);
     // The core reports Starting only once the config is built, about a second
     // later; the app is connecting from here on.
     state = const AsyncData(Connecting());
     ConnectionFailure? failure;
-    await _connectionRepo.connect(activeProfile, ref.read(Preferences.disableMemoryLimit)).mapLeft((
-      ConnectionFailure err,
-    ) async {
+    final connect = _ensureConfig(
+      activeProfile,
+      paths,
+      profiles,
+      t,
+    ).flatMap((_) => _connectionRepo.connect(activeProfile, disableMemoryLimit));
+    await connect.mapLeft((ConnectionFailure err) async {
       if (epoch != _connectEpoch) return;
       failure = err;
       if (!reportFailure) {
@@ -266,6 +277,27 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     }).run();
     return failure;
   }
+
+  /// The profile's config, downloaded again when it is gone and the profile is remote. iOS deleted
+  /// the configs with Library/Caches, where they were kept, and the core then failed to open the
+  /// file while the app stayed connecting (#2548); a local profile has no other copy, so it fails
+  /// with a message that says so.
+  TaskEither<ConnectionFailure, Unit> _ensureConfig(
+    ProfileEntity profile,
+    ProfilePathResolver paths,
+    Future<ProfileRepository> profiles,
+    Translations t,
+  ) => TaskEither(() async {
+    final file = paths.file(profile.id);
+    if (await file.exists()) return right(unit);
+    loggy.warning("the config of profile [${profile.id}] is missing");
+    if (profile is RemoteProfileEntity) {
+      final updated = await (await profiles).upsertRemote(profile.url).run();
+      if (updated.isRight() && await file.exists()) return right(unit);
+      loggy.warning("could not download the missing config again", updated.getLeft().toNullable());
+    }
+    return left(ConnectionFailure.invalidConfig(t.errors.singbox.missingConfig));
+  });
 
   Future<void> _disconnect() async {
     // Free a stuck connect lock so the next tap can start again.
