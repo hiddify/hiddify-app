@@ -25,6 +25,33 @@ class IntroPage extends HookConsumerWidget with PresLogger {
 
   static bool locationInfoLoaded = false;
 
+  /// The user picked the region on this screen: neither the time zone nor the language changes it after that.
+  static bool _regionChosenByUser = false;
+
+  @visibleForTesting
+  static void resetForTest() {
+    locationInfoLoaded = false;
+    _regionChosenByUser = false;
+  }
+
+  /// The region a language points to, or null for a language spoken in no listed region.
+  /// Persian keeps Afghanistan when that is already the region.
+  static Region? regionForLocale(AppLocale locale, Region current) => switch (locale) {
+    AppLocale.fa => current == Region.af ? Region.af : Region.ir,
+    AppLocale.ps => Region.af,
+    AppLocale.zhCn => Region.cn,
+    AppLocale.ru => Region.ru,
+    AppLocale.id => Region.id,
+    AppLocale.tr => Region.tr,
+    AppLocale.ptBr => Region.br,
+    _ => null,
+  };
+
+  Future<void> _setRegion(WidgetRef ref, Region region) async {
+    await ref.read(ConfigOptions.region.notifier).update(region);
+    await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
+  }
+
   // for focus management
   KeyEventResult _handleKeyEvent(KeyEvent event, String key) {
     if (KeyboardConst.activate.contains(event.logicalKey) && event is KeyDownEvent) {
@@ -92,7 +119,14 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     child: Text(t.intro.banner, style: theme.textTheme.bodyLarge, textAlign: TextAlign.center),
                   ),
                   const Gap(24),
-                  const LocalePrefTile(),
+                  LocalePrefTile(
+                    // the language sets the region, even one guessed from the time zone, until the user picks one
+                    onChanged: (locale) async {
+                      if (_regionChosenByUser) return;
+                      final region = regionForLocale(locale, ref.read(ConfigOptions.region));
+                      if (region != null) await _setRegion(ref, region);
+                    },
+                  ),
                   ChoicePreferenceWidget(
                     selected: ref.watch(ConfigOptions.region),
                     preferences: ref.watch(ConfigOptions.region.notifier),
@@ -101,8 +135,11 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                     showFlag: true,
                     icon: Icons.place_rounded,
                     presentChoice: (value) => value.present(t),
-                    onChanged: (val) async {
-                      await ref.read(ConfigOptions.directDnsAddress.notifier).reset();
+                    // with autoUpdate on, onChanged was never called and the direct DNS kept the old region's
+                    autoUpdate: false,
+                    onChanged: (region) async {
+                      _regionChosenByUser = true;
+                      await _setRegion(ref, region);
                     },
                   ),
                   const EnableAnalyticsPrefTile(),
@@ -207,8 +244,8 @@ class IntroPage extends HookConsumerWidget with PresLogger {
       final countryCode = RegionDetector.detect();
       final regionLocale = _getRegionLocale(countryCode);
       loggy.debug('Timezone Region: ${regionLocale.region} Locale: ${regionLocale.locale}');
-      await ref.read(ConfigOptions.region.notifier).update(regionLocale.region);
-      await ref.watch(ConfigOptions.directDnsAddress.notifier).reset();
+      if (_regionChosenByUser) return;
+      await _setRegion(ref, regionLocale.region);
       await ref.read(localePreferencesProvider.notifier).changeLocale(regionLocale.locale);
       return;
     } catch (e) {
@@ -228,7 +265,9 @@ class IntroPage extends HookConsumerWidget with PresLogger {
         final regionLocale = _getRegionLocale(jsonData['country_code']?.toString() ?? "");
 
         loggy.debug('Region: ${regionLocale.region} Locale: ${regionLocale.locale}');
-        await ref.read(ConfigOptions.region.notifier).update(regionLocale.region);
+        // the answer can come seconds later, after the user picked a region
+        if (_regionChosenByUser) return;
+        await _setRegion(ref, regionLocale.region);
         await ref.read(localePreferencesProvider.notifier).changeLocale(regionLocale.locale);
       } else {
         loggy.warning('Request failed with status: ${response.statusCode}');
