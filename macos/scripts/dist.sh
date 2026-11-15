@@ -15,7 +15,7 @@ set -euo pipefail
 #                                  APPSTORE_ISSUER_ID and either APPSTORE_API_PRIVATE_KEY or
 #                                  ~/.appstoreconnect/private_keys/AuthKey_<id>.p8, from the environment
 #                                  or AppStore.local.env.
-# Other arguments go to fastforge. SENTRY_DSN and DIAGNOSTICS_PUBLIC_KEY, when set, are compiled in.
+# Other arguments go to fastforge. SENTRY_DSN, when set, is compiled in.
 
 task_root="$(cd "$(dirname "$0")/../.." && pwd)"
 task_mode="${1:-}"
@@ -54,7 +54,7 @@ case "$task_mode" in
       echo 'error: Import the "3rd Party Mac Developer Installer" certificate, or set APPLE_MAS_INSTALLER_SIGN_IDENTITY.' >&2
       exit 1
     fi
-    "${FLUTTER:-flutter}" build macos --release --dart-define release=app-store --dart-define "sentry_dsn=${SENTRY_DSN:-}" --dart-define "commit=$(git -C "$task_root" rev-parse --short=7 HEAD 2>/dev/null)" --dart-define "diagnostics_public_key=${DIAGNOSTICS_PUBLIC_KEY:-}"
+    "${FLUTTER:-flutter}" build macos --release --dart-define release=app-store --dart-define "sentry_dsn=${SENTRY_DSN:-}" --dart-define "commit=$(git -C "$task_root" rev-parse --short=7 HEAD 2>/dev/null)"
     mkdir -p "$task_out"
     task_pkg="$task_out/hiddify-$task_version-macos-appstore.pkg"
     task_dmg="$task_out/hiddify-$task_version-macos-appstore.dmg"

@@ -53,9 +53,12 @@ the user to look inside.
    Keep `hiddify-diagnostics.key` private and backed up: a report encrypted to it can not be
    opened without it.
 
-2. Put the public key (`age1…`) in `hiddify-core/v2/hcore/diagnostics_key.go`, as
-   `diagnosticsPublicKey`. A build can also set it without changing the file:
-   `-ldflags "-X github.com/hiddify/hiddify-core/v2/hcore.diagnosticsPublicKey=age1…"`.
+2. Put the public key (`age1…`) in the hiddify-core repository's `DIAGNOSTICS_PUBLIC_KEY` Actions
+   secret. The core's Makefile links it in (`-X …/hcore.diagnosticsPublicKey`) when the variable is
+   set, and stops the build when it is not an age key; `build.yml` passes the secret to every core
+   build, the standalone binaries too. A local build gets it the same way:
+   `make macos DIAGNOSTICS_PUBLIC_KEY=age1…`. Without it, `diagnosticsPublicKey`
+   (`v2/hcore/diagnostics_key.go`) is empty and reports are in the clear.
 
 The app build needs nothing: it asks the core for the report and the core answers whether it is
 encrypted (`ExportDiagnosticsResponse.encrypted`).
