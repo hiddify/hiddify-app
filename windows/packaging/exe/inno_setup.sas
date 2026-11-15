@@ -41,13 +41,21 @@ SignTool=hiddifysign
 SignedUninstaller=yes
 #endif
 
+; Translations Inno Setup 6.7 ships only as "unofficial" (not in compiler:Languages) are
+; kept in windows/packaging/exe/languages. fastforge writes this script under dist\<version>\,
+; so the folder is found from SETUP_ICON_FILE, the one path it passes as absolute
+; (<repo>\windows\runner\resources\app_icon.ico).
+#define HiddifyLanguagesDir AddBackslash(ExtractFileDir("{{SETUP_ICON_FILE}}")) + "..\..\packaging\exe\languages\"
+
 [Languages]
 {% for locale in LOCALES %}
 {% if locale == 'en' %}Name: "english"; MessagesFile: "compiler:Default.isl"{% endif %}
+{% if locale == 'ar' %}Name: "arabic"; MessagesFile: "compiler:Languages\\Arabic.isl"{% endif %}
+{% if locale == 'fa' %}Name: "farsi"; MessagesFile: "{#HiddifyLanguagesDir}Farsi.isl"{% endif %}
 {% if locale == 'hy' %}Name: "armenian"; MessagesFile: "compiler:Languages\\Armenian.isl"{% endif %}
 {% if locale == 'bg' %}Name: "bulgarian"; MessagesFile: "compiler:Languages\\Bulgarian.isl"{% endif %}
 {% if locale == 'ca' %}Name: "catalan"; MessagesFile: "compiler:Languages\\Catalan.isl"{% endif %}
-{% if locale == 'zh' %}Name: "chinesesimplified"; MessagesFile: "compiler:Languages\\ChineseSimplified.isl"{% endif %}
+{% if locale == 'zh' %}Name: "chinesesimplified"; MessagesFile: "{#HiddifyLanguagesDir}ChineseSimplified.isl"{% endif %}
 {% if locale == 'co' %}Name: "corsican"; MessagesFile: "compiler:Languages\\Corsican.isl"{% endif %}
 {% if locale == 'cs' %}Name: "czech"; MessagesFile: "compiler:Languages\\Czech.isl"{% endif %}
 {% if locale == 'da' %}Name: "danish"; MessagesFile: "compiler:Languages\\Danish.isl"{% endif %}
