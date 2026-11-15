@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
@@ -11,6 +12,22 @@ import 'package:hiddify/features/profile/add/widgets/widgets.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+/// The file types a profile can be imported from.
+const profileFileExtensions = ['txt', 'json', 'yaml', 'yml', 'conf', 'ovpn', 'zip'];
+
+/// Opens the file picker for a profile file.
+///
+/// Android filters by MIME type, and file_picker drops every extension Android has no MIME
+/// type for, such as conf and ovpn, which grays out WireGuard and OpenVPN files. There the
+/// picker shows all files; the import reads the content, not the name.
+Future<FilePickerResult?> pickProfileFile({TargetPlatform? platform}) {
+  final filterByExtension = (platform ?? defaultTargetPlatform) != TargetPlatform.android;
+  return FilePicker.platform.pickFiles(
+    type: filterByExtension ? FileType.custom : FileType.any,
+    allowedExtensions: filterByExtension ? profileFileExtensions : null,
+  );
+}
 
 class FixBtns extends ConsumerWidget {
   const FixBtns({super.key, required this.height, this.canScan = true});
@@ -47,10 +64,7 @@ class FixBtns extends ConsumerWidget {
             title: t.common.file,
             icon: Icons.insert_drive_file,
             onTap: () async {
-              final result = await FilePicker.platform.pickFiles(
-                type: FileType.custom,
-                allowedExtensions: ['txt', 'json', 'yaml', 'yml', 'conf', 'ovpn', 'zip'],
-              );
+              final result = await pickProfileFile();
               if (result == null) return;
               final picked = result.files.single;
               var bytes = picked.bytes;
