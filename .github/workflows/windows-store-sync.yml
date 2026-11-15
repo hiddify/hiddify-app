@@ -87,11 +87,16 @@ jobs:
         shell: pwsh
         run: |
           $tag = '${{ steps.target.outputs.tag }}'
+          # gh prints UTF-8; without this pwsh decodes it with the console code page and the
+          # non-ASCII text of the notes would come back garbled.
+          [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
           # "file#label" sets the display label that marks the asset as Store-signed.
           gh release upload $tag "store/$($env:MSIX_NAME)#$($env:MSIX_LABEL)" --clobber
           if ($LASTEXITCODE) { throw 'gh release upload failed' }
           gh api "repos/${{ github.repository }}/releases/tags/$tag" > release.json
+          if ($LASTEXITCODE) { throw 'gh api failed' }
           gh release view $tag --json body -q .body > body.md
+          if ($LASTEXITCODE) { throw 'gh release view failed' }
           python .github/scripts/prepare_release_notes.py body.md --release-json release.json $tag
           if ($LASTEXITCODE) { throw 'prepare_release_notes.py failed' }
           gh release edit $tag --notes-file body.md

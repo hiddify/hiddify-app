@@ -174,7 +174,7 @@ def fill_changelog(text: str, changelog_path: Path = CHANGELOG_FILE) -> str:
     """Put the change log at its marker, or drop the marker and its heading when there is none."""
     if CHANGELOG_MARKER not in text:
         return text
-    changelog = changelog_path.read_text() if changelog_path.is_file() else ""
+    changelog = changelog_path.read_text(encoding="utf-8") if changelog_path.is_file() else ""
     changelog = re.sub(r"<!--.*?-->", "", changelog, flags=re.DOTALL).strip()
     if changelog:
         # the rule ends the section for the app as well, before the download part
@@ -264,7 +264,7 @@ def wrap_table(links: str) -> str:
 
 def assets_from_release_json(path: Path) -> dict[str, str]:
     """name -> sha256 from `gh api repos/{repo}/releases/tags/{tag}` output."""
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     assets: dict[str, str] = {}
     for asset in data.get("assets", []):
         digest = asset.get("digest") or ""
@@ -292,19 +292,19 @@ def main() -> int:
     if len(args) >= 3 and args[1] == "--release-json":
         notes_path, release_json, tag = Path(args[0]), Path(args[2]), (args[3] if len(args) > 3 else "")
         if not tag:
-            tag = json.loads(release_json.read_text())["tag_name"]
+            tag = json.loads(release_json.read_text(encoding="utf-8"))["tag_name"]
         assets = assets_from_release_json(release_json)
-        body = notes_path.read_text()
+        body = notes_path.read_text(encoding="utf-8")
         links = render_links(tag, assets, cache_bust(), old_body=body)
-        notes_path.write_text(replace_table(body, links).strip() + "\n")
+        notes_path.write_text(replace_table(body, links).strip() + "\n", encoding="utf-8")
         present = sum(1 for _, name, *_ in ASSET_CATALOG if find_asset(assets, name))
         print(f"rewrote download table with {present} rows for tag {tag}")
         return 0
 
     if len(args) == 3 and args[1] == "--vt-results":
         notes_path, results_path = Path(args[0]), Path(args[2])
-        results = json.loads(results_path.read_text())
-        notes_path.write_text(apply_vt_results(notes_path.read_text(), results))
+        results = json.loads(results_path.read_text(encoding="utf-8"))
+        notes_path.write_text(apply_vt_results(notes_path.read_text(encoding="utf-8"), results), encoding="utf-8")
         print(f"wrote VirusTotal results for {len(results)} files")
         return 0
 
@@ -332,7 +332,7 @@ def main() -> int:
     bust = cache_bust()
     print(f"badge cache-bust v={bust}")
 
-    text = notes_path.read_text()
+    text = notes_path.read_text(encoding="utf-8")
     text = text.replace("RELEASE_TAG", tag)
     text = fill_changelog(text)
     links = render_links(tag, assets, bust)
@@ -344,7 +344,7 @@ def main() -> int:
     else:
         text = text.rstrip() + "\n\n## Downloads\n\n" + wrap_table(links)
 
-    notes_path.write_text(text.strip() + "\n")
+    notes_path.write_text(text.strip() + "\n", encoding="utf-8")
     present = sum(1 for _, name, *_ in ASSET_CATALOG if find_asset(assets, name))
     print(f"wrote {present} download rows for tag {tag}")
     return 0
