@@ -84,6 +84,8 @@ Name: "launchAtStartup"; Description: "{cm:AutoStartProgram,{{DISPLAY_NAME}}}"; 
 [InstallDelete]
 ; Before 5.9.1 the core ran from core\Hiddify.exe; it is HiddifyCoreEngine.exe beside the app now.
 Type: filesandordirs; Name: "{app}\core"
+; The console launcher was HiddifyCli.exe before HiddifyCore.exe (a core that still ships it puts it back).
+Type: files; Name: "{app}\HiddifyCli.exe"
 
 [Files]
 Source: "{{SOURCE_DIR}}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

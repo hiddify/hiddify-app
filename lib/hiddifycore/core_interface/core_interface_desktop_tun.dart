@@ -78,7 +78,11 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
 
   String get _cliPath {
     final dir = p.dirname(Platform.resolvedExecutable);
-    return p.join(dir, Platform.isWindows ? 'HiddifyCli.exe' : 'HiddifyCli');
+    if (!Platform.isWindows) return p.join(dir, 'HiddifyCli');
+    // Windows' console launcher is HiddifyCore.exe; cores before it shipped HiddifyCli.exe.
+    final cli = p.join(dir, 'HiddifyCore.exe');
+    if (File(cli).existsSync()) return cli;
+    return p.join(dir, 'HiddifyCli.exe');
   }
 
   String get _dataDir {
