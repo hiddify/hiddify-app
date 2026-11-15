@@ -1,13 +1,19 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hiddify/core/widget/frame_load.dart';
 
-/// Whether purely decorative, endless motion runs now: the light around the connect button, the
-/// chain icons' orbiting light and passing door, the chain badge's shine, the loading shimmer.
+/// Whether purely decorative, endless motion runs now: the chain icons' orbiting light and passing
+/// door, the chain badge's shine, the loading shimmer.
 ///
 /// It runs for [ambientFor] after it may start (see [allowAmbientMotion]) and after each
 /// [wakeAmbientMotion], then stands still: an endless loop costs a frame many times a second for
 /// as long as the app stays connected, which even a fast laptop shows in its CPU use.
+///
+/// The light around the connect button does not stop with it: it moves for as long as the
+/// decoration may run at all ([ambientMotionAllowed]). A light that froze where it was, and then
+/// jumped with the traffic once a second, looked as if the app had hung.
 ///
 /// Never while a desktop window has no focus, or while the battery
 /// is low or saving power. Desktop windows without focus keep updating (connection state, proxies,
@@ -17,18 +23,18 @@ final ValueNotifier<bool> ambientMotion = ValueNotifier(false);
 /// How long the endless decoration runs each time it starts.
 const ambientFor = Duration(seconds: 10);
 
-bool _ambientAllowed = false;
+final _ambientAllowed = ValueNotifier(false);
 Timer? _ambientSleep;
 
-/// Whether endless decoration may run at all (see [allowAmbientMotion]), though it may have stopped
-/// for now.
-bool get ambientMotionAllowed => _ambientAllowed;
+/// Whether endless decoration may run at all (see [allowAmbientMotion]), though [ambientMotion]
+/// may have stopped for now.
+ValueListenable<bool> get ambientMotionAllowed => _ambientAllowed;
 
 /// Whether endless decoration may run at all: the app is seen (a desktop window has focus), the
 /// battery is fine. Becoming allowed starts it for [ambientFor].
 void allowAmbientMotion(bool allowed) {
-  if (allowed == _ambientAllowed) return;
-  _ambientAllowed = allowed;
+  if (allowed == _ambientAllowed.value) return;
+  _ambientAllowed.value = allowed;
   if (allowed) {
     wakeAmbientMotion();
   } else {
@@ -41,7 +47,7 @@ void allowAmbientMotion(bool allowed) {
 /// Runs the endless decoration again for [ambientFor], where it may run: something it shows has
 /// changed (the connection).
 void wakeAmbientMotion() {
-  if (!_ambientAllowed) return;
+  if (!_ambientAllowed.value) return;
   ambientMotion.value = true;
   _ambientSleep?.cancel();
   _ambientSleep = Timer(ambientFor, () {
@@ -57,19 +63,32 @@ void wakeAmbientMotion() {
 /// laptop's app at a fifth of a core. They all move slowly, so they now share this timer and step
 /// together, at the fastest rate one of them asks for (the connect button's light, 30 fps or less),
 /// and draw in the same frames.
+///
+/// It steps no faster than the device affords its frames ([FrameLoad]). Drawing without a graphics
+/// card, a frame costs tens of milliseconds of CPU whatever changed in it, most of it to put the
+/// whole window on the screen: there the clock steps less often, down to 10 times a second, which
+/// the slow motion still shows smoothly. A device that keeps up never sees this.
 abstract final class AmbientClock {
   /// The rate a decoration asks for: its motion is slow enough for 20 fps.
   static const decoration = Duration(milliseconds: 50);
+
+  /// The rate a change asks for while it plays, such as the connect button going to another look.
+  static const lively = Duration(milliseconds: 33);
 
   static final _clock = Stopwatch()..start();
   static final _ticks = <({Duration interval, void Function() onTick})>[];
   static Timer? _timer;
   static Duration? _interval;
 
+  /// The rates the frames can be afforded at, fastest first; measured while the clock runs.
+  static final _load = FrameLoad(const [lively, decoration, Duration(milliseconds: 66), Duration(milliseconds: 100)]);
+  static var _measuring = false;
+
   /// Seconds since the app started; what every loop takes its phase from, so they keep in step.
   static double get now => _clock.elapsedMicroseconds / 1e6;
 
-  /// Calls [onTick] at [interval] or faster, until the returned function is called.
+  /// Calls [onTick] at [interval] or faster, until the returned function is called. It is called
+  /// less often than [interval] where the device cannot afford the frames.
   static VoidCallback subscribe(Duration interval, VoidCallback onTick) {
     final tick = (interval: interval, onTick: onTick);
     _ticks.add(tick);
@@ -85,6 +104,9 @@ abstract final class AmbientClock {
     for (final t in _ticks) {
       if (fastest == null || t.interval < fastest) fastest = t.interval;
     }
+    _measure(fastest != null);
+    // no faster than the device affords the frames
+    if (fastest != null && _load.interval > fastest) fastest = _load.interval;
     if (fastest == _interval) return;
     _timer?.cancel();
     _timer = null;
@@ -95,6 +117,19 @@ abstract final class AmbientClock {
         t.onTick();
       }
     });
+  }
+
+  /// Measures what the frames cost while something moves, and follows it.
+  static void _measure(bool on) {
+    if (on == _measuring) return;
+    _measuring = on;
+    if (on) {
+      _load.watch();
+      _load.level.addListener(_retime);
+    } else {
+      _load.level.removeListener(_retime);
+      _load.unwatch();
+    }
   }
 }
 

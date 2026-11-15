@@ -12,7 +12,6 @@ import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/theme/theme_extensions.dart';
 import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/core/widget/animated_text.dart';
-import 'package:hiddify/core/widget/frame_load.dart';
 import 'package:hiddify/core/widget/unique_keys_layout.dart';
 import 'package:hiddify/features/chain/model/chain_enum.dart';
 import 'package:hiddify/features/chain/overview/chain_mode_icon.dart';
@@ -278,16 +277,10 @@ class _ConnectionButton extends HookWidget {
   static const _smallFrom = 640.0;
   static const _smallest = .65;
 
-  /// The frame intervals once a look has settled, one per [FrameLoad] level.
-  static const _settledIntervals = [
-    Duration(milliseconds: 50),
-    Duration(milliseconds: 66),
-    Duration(milliseconds: 100),
-  ];
-
   /// Seconds after a look begins until its own motion is over: the connected look's spring and
-  /// ripple, the error's shake. What follows only drifts.
-  static const _settleAfter = 3.0;
+  /// ripple, the error's shake. What follows only drifts. A button that waits for a tap has only
+  /// its colour to ease into, and nothing moves in it after.
+  static double _settleAfter(EclipseLook look) => look == EclipseLook.idle ? 1 : 3;
 
   static EclipseTraffic _stepped(EclipseTraffic t) =>
       EclipseTraffic(down: (t.down * 4).round() / 4, up: (t.up * 4).round() / 4);
@@ -345,9 +338,8 @@ class _ConnectionButton extends HookWidget {
     }
 
     // the speeds arrive once a second; the light follows them smoothly
-    final target = useRef(const EclipseTraffic());
-    target.value = EclipseTraffic(down: EclipseTraffic.level(download), up: EclipseTraffic.level(upload));
-    final traffic = useRef(const EclipseTraffic());
+    final target = EclipseTraffic(down: EclipseTraffic.level(download), up: EclipseTraffic.level(upload));
+    final light = useMemoized(_LightMotion.new);
 
     // A timer, the AmbientClock's (not useSingleTickerProvider): that hook only allows one createTicker
     // for the State's life, so look/still changes crashed after disconnect→connect.
@@ -357,71 +349,50 @@ class _ConnectionButton extends HookWidget {
     // both hooks run on every build: `a && b` would skip the second while TickerMode is off and
     // shift every hook after it, so returning to home threw and showed a grey box
     final tickerOn = useValueListenable(TickerMode.getNotifier(context));
-    // a new look plays its motion even after the endless motion has stopped: the chain hop coming
-    // up after a long wait changes the look but not the connection. The wake comes after the frame,
-    // since it rebuilds everything else that moves; this frame already moves where it may
-    final lookChanged = usePrevious(eclipseLook) != eclipseLook;
+    // a new look wakes the endless decoration round the button, the chain badge's shine: the chain
+    // hop coming up after a long wait changes the look but not the connection. The wake comes
+    // after the frame, since it rebuilds everything else that moves
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) => wakeAmbientMotion());
       return null;
     }, [eclipseLook]);
-    final ambientOn = useValueListenable(ambientMotion);
+    // The light moves for as long as the endless decoration may run at all, not only for the
+    // while it runs after a change: a light that froze where it was, and then jumped with the
+    // traffic once a second, looked as if the app had hung.
+    final allowed = useValueListenable(ambientMotionAllowed);
     // connecting, searching and disconnecting say the app is busy: they keep moving for as long as
-    // they last, not only while the endless decoration runs. A start that took longer than its 10 s
-    // froze the wave half way, and the button looked stuck until the core gave up or connected
+    // they last, also where the endless decoration may not run. A wave that froze half way looked
+    // stuck until the core gave up or connected
     final busy = const {EclipseLook.starting, EclipseLook.waiting, EclipseLook.stopping}.contains(eclipseLook);
-    final ambient = busy || ambientOn || (lookChanged && ambientMotionAllowed);
+    final ambient = busy || allowed;
     final ticking = tickerOn && ambient;
-    // with reduce animations, and once the endless motion has stopped (10 s after it started, or
-    // the window without focus), the light stands still, as it was, and only steps with the traffic
+    // with reduce animations, and where the endless motion may not run (the window without focus,
+    // a low battery), the light stands still, as it was, and only steps with the traffic
     final still = reduced || !ambient;
     // reduce animations: connected shows the still light, after its own connect motion has played
     final flowStill = reduceFlow && eclipseLook == EclipseLook.connected;
-    // A phone that cannot draw a frame in the 33 ms before the next one drops frames in bursts.
-    // Measured, not guessed from the model: such a phone gets a steady 20 or 15 fps of the same
-    // frames. A phone that keeps up sees nothing of this.
-    final load = useMemoized(
-      () => FrameLoad(const [Duration(milliseconds: 33), Duration(milliseconds: 50), Duration(milliseconds: 66)]),
-    );
-    final level = useValueListenable(load.level);
     // Once a look has settled, the light and the breathing move slowly enough for 20 fps; the
-    // changes between looks keep 30. Each frame of the light costs the most of anything on the
-    // page, so this is a third less of it for as long as the app stays connected.
+    // changes between looks keep 30. What a frame costs is mostly the frame itself, the whole
+    // window drawn again, so this is a third less of it for as long as the app stays connected.
+    // Where the device cannot afford that many frames, the clock steps less often for both.
     final settled = useValueNotifier(false);
     // settled belongs to the look before until the next tick: a new look is never calm, or going
     // from a long wait to connected stopped the clock on the connect motion's first frame
-    final calm = useValueListenable(settled) && now() - change.value.at > _settleAfter;
-    final interval = calm ? _settledIntervals[level] : load.interval;
-    // The light's own clock: it runs only while the light moves. A light that stops stays as it
-    // was, the same rays and flares where they were, and goes on from there when it moves again;
-    // on the wall clock it would jump to another sky each time.
-    final time = useValueNotifier(0.0);
-    // still, nothing ticks; nor once connected has settled with the flowing light reduced
-    final moving = !still && ticking && !(flowStill && calm);
+    final calm = useValueListenable(settled) && now() - change.value.at > _settleAfter(eclipseLook);
+    final interval = calm ? AmbientClock.decoration : AmbientClock.lively;
+    // still, nothing ticks; nor once connected has settled with the flowing light reduced, nor in
+    // a button that waits for a tap
+    final moving = !still && ticking && !(flowStill && calm) && !(eclipseLook == EclipseLook.idle && calm);
+    // counts the frames asked for: all it says is that the button is to be drawn again
+    final frame = useValueNotifier(0);
     useEffect(() {
       if (!moving) return null;
-      load.watch();
-      var last = now();
       // on the clock every endless decoration shares, so they all draw in the same frames
-      final unsubscribe = AmbientClock.subscribe(interval, () {
-        final at = now();
-        // the light rises with the traffic in about a second, and fades more slowly, so the
-        // stats reloading for a moment (coming back from the background) barely dims it
-        double follow(double from, double to) =>
-            from + (to - from) * (1 - math.exp(-(at - last) / (to > from ? .8 : 2.5)));
-        final t = traffic.value;
-        traffic.value = EclipseTraffic(down: follow(t.down, target.value.down), up: follow(t.up, target.value.up));
-        final passed = at - last;
-        last = at;
-        final since = at - change.value.at;
-        settled.value = since > _settleAfter;
-        final idle = change.value.look == EclipseLook.idle && since > 1;
-        if (!idle) time.value += passed;
+      return AmbientClock.subscribe(interval, () {
+        final c = change.value;
+        settled.value = now() - c.at > _settleAfter(c.look);
+        frame.value++;
       });
-      return () {
-        unsubscribe();
-        load.unwatch();
-      };
     }, [moving, interval]);
 
     return Column(
@@ -456,9 +427,19 @@ class _ConnectionButton extends HookWidget {
                         child: IgnorePointer(
                           child: RepaintBoundary(
                             child: ValueListenableBuilder(
-                              valueListenable: time,
-                              builder: (context, t, _) {
+                              valueListenable: frame,
+                              builder: (context, _, _) {
                                 final c = change.value;
+                                // What the frame shows is worked out here, for the moment it is
+                                // drawn at, not for the moment the timer asked for it: the two
+                                // are up to a screen refresh apart, by a different part of one
+                                // each time, and the motion went on unevenly.
+                                final at = now();
+                                if (moving) {
+                                  light.advance(at, target, flowing: c.look != EclipseLook.idle || at - c.at <= 1);
+                                } else {
+                                  light.pause();
+                                }
                                 return CustomPaint(
                                   isComplex: true,
                                   // a light that stands still is kept as it was drawn
@@ -467,14 +448,14 @@ class _ConnectionButton extends HookWidget {
                                     frame: EclipseFrame(
                                       look: c.look,
                                       previous: c.previous,
-                                      since: still ? 10 : now() - c.at,
-                                      time: t,
+                                      since: still ? 10 : at - c.at,
+                                      time: light.time,
                                       color: c.color,
                                       previousColor: c.previousColor,
                                     ),
                                     radius: _size / 2,
                                     // in steps, so it repaints only when the traffic changes a lot
-                                    traffic: still || flowStill ? _stepped(target.value) : traffic.value,
+                                    traffic: still || flowStill ? _stepped(target) : light.traffic,
                                     dark: theme.brightness == Brightness.dark,
                                     drawLogo: !useImage,
                                     logoOpacity: look == _Look.loading ? .38 : 1,
@@ -570,6 +551,37 @@ class _ConnectionButton extends HookWidget {
       ],
     );
   }
+}
+
+/// The light's own clock and the traffic it shows, which go on only while the light moves.
+class _LightMotion {
+  /// Seconds the light has moved. A light that stops stays as it was, the same rays and flares
+  /// where they were, and goes on from there when it moves again; on the wall clock it would jump
+  /// to another sky each time.
+  double time = 0;
+
+  /// What the light shows of the traffic. The speeds arrive once a second, and it follows them
+  /// smoothly.
+  EclipseTraffic traffic = const EclipseTraffic();
+
+  /// When it last went on, on the button's clock; null while it stands still.
+  double? _last;
+
+  /// Brings both up to [now], following [target]. The clock runs on only while the light is
+  /// [flowing].
+  void advance(double now, EclipseTraffic target, {required bool flowing}) {
+    final passed = now - (_last ?? now);
+    _last = now;
+    if (passed <= 0) return;
+    // the light rises with the traffic in about a second, and fades more slowly, so the stats
+    // reloading for a moment (coming back from the background) barely dims it
+    double follow(double from, double to) => from + (to - from) * (1 - math.exp(-passed / (to > from ? .8 : 2.5)));
+    traffic = EclipseTraffic(down: follow(traffic.down, target.down), up: follow(traffic.up, target.up));
+    if (flowing) time += passed;
+  }
+
+  /// Stands still from here on, until the next [advance].
+  void pause() => _last = null;
 }
 
 /// The chain hop on the button: its glyph alone, outlined in the button's face color so it reads

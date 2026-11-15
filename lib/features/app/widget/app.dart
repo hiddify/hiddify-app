@@ -132,7 +132,8 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     // (see ConnectionButton). On a phone inactive is a moment under the
     // notification shade or a system dialog, still on screen. Where it may run,
     // it runs for a while after it starts and after each change of the
-    // connection, then stands still (see [allowAmbientMotion]).
+    // connection, then stands still (see [allowAmbientMotion]); the connect
+    // button's light keeps moving.
     final lifecycle = useAppLifecycleState();
     final animate = switch (lifecycle) {
       null || AppLifecycleState.resumed || AppLifecycleState.inactive => true,
