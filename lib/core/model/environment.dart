@@ -9,6 +9,10 @@ enum Environment {
 
   static const sentryDSN = String.fromEnvironment("sentry_dsn");
 
+  // The commit this build was made from, 7 characters (the Makefile sets it); empty in a build
+  // made without it, such as `flutter run`
+  static const commit = String.fromEnvironment("commit");
+
   // This environment variable is set in the 'windows-release-zip' command
   static const isPortable = bool.fromEnvironment("portable");
 }

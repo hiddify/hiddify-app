@@ -57,6 +57,7 @@ Future<Map<String, Object?>> _app(Ref ref) async {
     'name': info.name,
     'version': info.version,
     'build': info.buildNumber,
+    'commit': Environment.commit.isEmpty ? 'unknown' : Environment.commit,
     'release': info.release.key,
     'environment': info.environment.name,
     'portable': Environment.isPortable,

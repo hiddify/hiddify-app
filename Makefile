@@ -61,8 +61,10 @@ else
 	TARGET=lib/main.dart
 endif
 
-BUILD_ARGS=--dart-define sentry_dsn=$(SENTRY_DSN)
-DISTRIBUTOR_ARGS=--skip-clean --build-target $(TARGET) --build-dart-define sentry_dsn=$(SENTRY_DSN)
+# the app's commit, 7 characters as git abbreviates it, for the diagnostics report (app_diagnostics.dart)
+APP_COMMIT:=$(shell git rev-parse --short=7 HEAD 2>/dev/null)
+BUILD_ARGS=--dart-define sentry_dsn=$(SENTRY_DSN) --dart-define commit=$(APP_COMMIT)
+DISTRIBUTOR_ARGS=--skip-clean --build-target $(TARGET) --build-dart-define sentry_dsn=$(SENTRY_DSN) --build-dart-define commit=$(APP_COMMIT)
 
 
 
@@ -280,7 +282,7 @@ android-apk-release:
 	  --skip-clean \
 	  --build-target=$(TARGET) \
 	  --build-target-platform=android-arm,android-arm64,android-x64 \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN)
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT)
 	ls -R build/app/outputs
 
 android-aab-release:
@@ -289,7 +291,7 @@ android-aab-release:
 	  --targets aab \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT) \
 	  --build-dart-define=release=google-play
 
 # fastforge runs `flutter build windows` itself before packing, which re-copies fresh
@@ -312,7 +314,7 @@ windows-zip-release:
 	  --targets zip \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT) \
 	  --build-dart-define=portable=true \
 	  $(WINDOWS_PACKAGE_HOOK)
 # 	repacking needs Windows' own tar.exe: GNU tar from Git Bash ignores -a for .zip and writes a plain tar
@@ -340,7 +342,7 @@ windows-exe-release:
 	  --targets exe \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT) \
 	  $(WINDOWS_PACKAGE_HOOK)
 
 windows-msix-release:
@@ -349,7 +351,7 @@ windows-msix-release:
 	  --targets msix \
 	  --skip-clean \
 	  --build-target=$(TARGET) \
-	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) \
+	  --build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT) \
 	  $(WINDOWS_PACKAGE_HOOK)
 
 linux-release: linux-deb-release linux-rpm-release linux-appimage-release
@@ -366,7 +368,7 @@ linux-deb-release:
 	--targets deb \
 	--skip-clean \
 	--build-target=$(TARGET) \
-	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT)
 
 # Fedora, RHEL, openSUSE. The bundle's libsentry links the build host's (Ubuntu's) libcurl, whose
 # symbols carry the CURL_OPENSSL_4 version that Fedora's libcurl lacks: rpmbuild would require it
@@ -381,7 +383,7 @@ linux-rpm-release:
 	--targets rpm \
 	--skip-clean \
 	--build-target=$(TARGET) \
-	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT)
 
 
 # ==============================================================================
@@ -419,7 +421,7 @@ linux-appimage-release:
 	--targets appimage \
 	--skip-clean \
 	--build-target=$(TARGET) \
-	--build-dart-define=sentry_dsn=$(SENTRY_DSN)
+	--build-dart-define=sentry_dsn=$(SENTRY_DSN) --build-dart-define=commit=$(APP_COMMIT)
 	@$(YELLOW)Post-processing AppImage$(DONE)
 	bash linux/packaging/appimage/repackage.sh dist
 	@$(GREEN)Successful$(DONE)
