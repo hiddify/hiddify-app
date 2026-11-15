@@ -15,14 +15,20 @@ abstract class UriUtils {
     return tryShareFile(uri);
   }
 
+  /// Android and iOS open [uri] without asking first: Android answers "can launch" only for apps
+  /// in the manifest's queries, so a browser, Telegram or a mail app looked absent and nothing
+  /// opened; iOS answers it only for schemes in Info.plist (`mailto` is not). Opening just fails
+  /// when no app takes it. Desktops check first, as in [tryLaunchAppOrWeb].
   static Future<bool> tryLaunch(Uri uri) async {
     try {
       loggy.debug("launching [$uri]");
-      if (!await canLaunchUrl(uri)) {
+      if (!Platform.isAndroid && !Platform.isIOS && !await canLaunchUrl(uri)) {
         loggy.warning("can't launch [$uri]");
         return false;
       }
-      return launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) loggy.warning("no app opened [$uri]");
+      return launched;
     } catch (e, stackTrace) {
       loggy.warning("error launching [$uri]", e, stackTrace);
       return false;
