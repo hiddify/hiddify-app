@@ -1,7 +1,141 @@
 # Changelog
 
 
-## 5.9.6 (2026-11-14)
+## 5.9.8 (2026-11-15)
+
+#### Other
+
+* Fix(a11y): screen readers can reach the desktop sidebar. 
+  _Every page route draws a modal barrier whose BlockSemantics drops all
+semantics painted before it, up to the nearest container. The sidebar
+rail is painted before the page in the same Row, so it vanished from
+the semantics tree and NVDA could not read any of its items. Give the
+pages their own semantics container (flutter/flutter#135656).
+
+Fixes #2097_
+
+* Fix(windows): the app runs the core's console launcher as HiddifyCore.exe. 
+  _hiddify-core renames HiddifyCli.exe to HiddifyCore.exe. The app installs whichever one the core
+ships, under its own name, because the core's DLL looks for it by that name, and uses
+HiddifyCore.exe when it is there. Setup removes a HiddifyCli.exe left by an older version.
+
+Refs hiddify/hiddify-core#176_
+
+* Fix(intro): choosing a language on the first-start screen sets its region. 
+  _Only the time-zone guess set the region, so picking Persian left it at Other.
+The language now sets its region (Persian keeps Afghanistan), even over the
+guess; a region the user picks stays. Picking a region also resets the direct
+DNS again.
+
+Fixes #2581_
+
+* Fix(windows): the installer can be set up in Persian, Arabic and Chinese. 
+  _Arabic was listed in make_config.yaml but had no line in the Inno script, so it was
+dropped; Persian and Chinese were not listed. Farsi and ChineseSimplified are only
+unofficial translations in Inno Setup 6.7, so their .isl files are kept in the repo.
+English is listed first, as the fallback when Windows' language matches none.
+
+Fixes #2578_
+
+* Fix(vpn): the administrator wait shows again, and no polkit agent reads plainly. 
+  _startManaged stops the last connection first, and that stop cleared the
+waiting dialog and the administrator choice the connect had just set, so
+the dialog never showed while Windows or Linux asked for the password.
+The AppImage, without a polkit agent, says to start Hiddify from the
+applications menu instead of pkexec's error.
+
+Fixes #2582_
+
+* Merge branch 'main' of https://github.com/hiddify/hiddify-app. 
+
+* Merge pull request #2565 from Hollicsh/main. 
+  _Update RU locale_
+
+* Update ru.i18n.json. 
+
+* Fix(windows): the app exits when a setup or the session end asks it to. 
+  _A setup run over an open app closes it through the Restart Manager, which sends
+WM_ENDSESSION and waits. The app ignored it and stayed in the tray, so the setup
+waited until the app was killed, or the user closed it by hand. The app now
+exits as from the tray's Exit, and quits anyway after 5 s.
+
+Fixes #2573_
+
+* Fix(ui): nothing animates while the app cannot be seen. 
+  _Flutter draws no frame while the app is hidden or in the background,
+and what stopped the animations waited for a build: they stopped only
+once the app came back. Meanwhile the clock of the endless decoration
+went on ticking 20 to 30 times a second, on a phone in the background
+and wherever a desktop window was hidden without first losing the
+focus.
+
+Whether the app can be seen now changes as soon as the lifecycle does,
+and a desktop window hidden in the tray, started hidden or minimized
+counts as not seen at once, whatever the engine reports. A window that
+gets the focus back counts as seen again, however it came back. While
+the app cannot be seen the clock has no timer, tickers are off, and the
+proxy card's alternating label and the chain hints stand still.
+
+On a desktop the light also stands still while the window has no focus
+by the window's own focus events, not only by the lifecycle: on Windows
+the lifecycle does not always report it._
+
+* Fix(connection-button): the light keeps moving, as often as the device affords. 
+  _The light round the connect button stopped 10 seconds after each change
+and then jumped with the traffic once a second, which looked as if the
+app had hung. It now moves for as long as the endless decoration may
+run at all: the app seen, the desktop window focused, the battery fine.
+The other endless decoration (the chain icons, the badge's shine, the
+shimmers) still stops after 10 seconds.
+
+Each frame shows the moment it is drawn at, not the moment the timer
+asked for it, so the motion goes on evenly.
+
+The clock every endless decoration shares steps no faster than the
+device affords its frames. A frame costs too much when its build or
+raster takes most of the interval, or, on a desktop, when the app's CPU
+time for it is more than a fifth of the interval: drawing without a
+graphics card, putting the window on the screen costs most of a frame
+and the frame's timings do not show it. There it steps less often, down
+to 10 times a second; a device that keeps up never sees this. The CPU
+time helper removed with the CPU guard comes back for it._
+
+* Perf(connection-button): the light is drawn without blurring anything. 
+  _Each frame of the connected light drew its rays and flares sharp into
+three offscreen layers, blurred them and scaled them back up: most of
+what the button cost, with a graphics card and far more without one.
+
+The light, the button's shadow and its bevel are now meshes of
+triangles that carry the softness already: each soft stroke is a strip
+textured with the cross-section of a blurred stroke, worked out once,
+and each glow is rings of corners that shade from one to the next. A
+frame of the full light is a few draw calls. It looks the same, within
+a third of a step of 255 on average in light and dark.
+
+Measured: 1.7 ms of CPU a frame instead of 3.2 on a Mac with Metal;
+18 fps instead of 4 to 6 on an Android emulator without a GPU._
+
+* Fix(tray): the Windows tray menu can be used from the keyboard. 
+  _Windows sends keys to a tray menu only when its owner is the foreground
+window. tray_manager 0.5 activates the window only when asked, so a menu
+opened with Win+B and Shift+F10 left the focus on the taskbar and the
+arrow keys closed it.
+
+Fixes #2570_
+
+* Docs(crash report): the diagnostics key comes from the core's CI secret. 
+  _docs/diagnostics-encryption.md says to set the hiddify-core DIAGNOSTICS_PUBLIC_KEY secret, which
+the core's build links in; dist.sh no longer passes the diagnostics_public_key define, which
+nothing has read since the core encrypts reports._
+
+* Feat(crash report): the diagnostics report names the app's commit. 
+  _The release builds pass the commit, 7 characters as git abbreviates it, as the commit dart-define;
+app-info.json and the report's metadata.json show it as app.commit, "unknown" in a build made
+without it._
+
+
+
+## v5.9.5 (2026-11-14)
 
 #### Other
 
