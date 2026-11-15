@@ -64,7 +64,9 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
     // further taps are ignored with no error. Proxy/stats notifiers already watch the signal.
 
     yield* _connectionRepo.watchConnectionStatus().doOnData((event) {
-      if (event case Disconnected(connectionFailure: final _?) when PlatformUtils.isDesktop) {
+      // A failed startup attempt is retried (see _restoreWithRetries): the user still wants to be
+      // connected, and clearing it here made the first retry give up as if they had disconnected.
+      if (event case Disconnected(connectionFailure: final _?) when PlatformUtils.isDesktop && !_restoring) {
         Future.microtask(() => ref.read(Preferences.startedByUser.notifier).update(false));
       }
       // One call for every status buried failures at info, next to the ordinary
@@ -119,6 +121,18 @@ class ConnectionNotifier extends _$ConnectionNotifier with AppLogger {
   /// is shown, with the window brought up first: an autostart launch runs in the tray, where
   /// the error dialog would go unseen. A user disconnect or a tunnel already up ends the retries.
   Future<void> _restoreWithRetries() async {
+    _restoring = true;
+    try {
+      await _tryRestore();
+    } finally {
+      _restoring = false;
+    }
+  }
+
+  /// Set while the startup connect is being retried.
+  bool _restoring = false;
+
+  Future<void> _tryRestore() async {
     for (var attempt = 1; attempt <= startupConnectAttempts; attempt++) {
       if (attempt > 1) {
         await Future<void>.delayed(startupConnectRetryDelay(attempt));
