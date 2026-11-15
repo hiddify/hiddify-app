@@ -146,7 +146,12 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
   Future<void> startManaged(String path, String name, bool disableMemoryLimit) async {
     final options = _options;
     if (options == null) throw StateError('Apply connection options before starting the core.');
+    // this connect's choices, made just before it, outlive the stop of the last connection: without
+    // them the waiting dialog never showed while the system asked for the password (hiddify-app#2582)
+    final adminBgChosen = useAdminBgService;
+    final wrap = wrapAdminElevation;
     await stop();
+    useAdminBgService = adminBgChosen;
 
     final wantAdminBg = useAdminBgService || options.enableTun;
     if (!wantAdminBg) {
@@ -195,17 +200,14 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
               disableMemoryLimit: disableMemoryLimit,
             )
           : _ensureAdminBgAndAttach(path: path, name: name, options: options, disableMemoryLimit: disableMemoryLimit);
-      final wrap = wrapAdminElevation;
       if (wrap != null) {
         final ok = await wrap(ensure);
-        wrapAdminElevation = null;
         if (!ok) throw const AdminPermissionRefused();
       } else {
         await ensure;
       }
       _status.add(const CoreStatus.started());
     } catch (error) {
-      wrapAdminElevation = null;
       await _abandonVpnStart(error);
       rethrow;
     }

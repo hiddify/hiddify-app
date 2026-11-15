@@ -92,6 +92,8 @@ class AppImageService {
         ready.completeError(
           viaSudo && detail.contains('a password is required')
               ? VpnServiceFailure.noAdminPrompt
+              : !viaSudo && detail.contains('textual authentication agent')
+              ? VpnServiceFailure.noAdminAgent
               : refused
               ? const AdminPermissionRefused()
               : VpnServiceFailure('The VPN service did not start ($code): $detail'),

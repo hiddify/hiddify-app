@@ -21,6 +21,13 @@ class VpnServiceFailure implements Exception {
     'install the pkexec package (polkit) and try again, or use system proxy mode.',
   );
 
+  /// pkexec found no polkit agent to show its prompt: the app was started from a terminal or over SSH,
+  /// or the desktop runs none (hiddify-app#2582).
+  static const noAdminAgent = VpnServiceFailure(
+    'Could not ask for the administrator password: no authentication agent is running, as when Hiddify '
+    'is started from a terminal or over SSH. Start Hiddify from the applications menu and try again.',
+  );
+
   @override
   String toString() => message;
 }
