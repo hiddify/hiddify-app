@@ -230,7 +230,13 @@ class SystemTrayNotifier extends _$SystemTrayNotifier with TrayListener, AppLogg
 
   @override
   Future<void> onTrayIconRightMouseDown() async {
-    await trayManager.popUpContextMenu();
+    // Windows sends keys to a tray menu only when its owner is the foreground window. Without
+    // that, a menu opened from the keyboard (Win+B, then Shift+F10 or the menu key) left the
+    // focus on the taskbar: the arrow keys moved between tray icons and closed the menu, and a
+    // click elsewhere did not close it (#2570). tray_manager 0.5 activates the window only when
+    // asked; later versions always do, but need a newer Flutter.
+    // ignore: deprecated_member_use
+    await trayManager.popUpContextMenu(bringAppToFront: PlatformUtils.isWindows);
   }
 }
 
