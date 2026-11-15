@@ -62,6 +62,10 @@ HICON CreateStatusOverlayIcon(UINT32 fill_argb) {
   return icon;
 }
 
+constexpr UINT_PTR kEndSessionTimer = 0x4844;  // "HD"
+// Dart's exit waits up to 2 s for the connection to stop; the core stops within a few more.
+constexpr UINT kEndSessionTimeoutMs = 5000;
+
 }  // namespace
 
 FlutterWindow::FlutterWindow(const flutter::DartProject& project)
@@ -96,6 +100,10 @@ bool FlutterWindow::OnCreate() {
   RegisterPlugins(flutter_controller_->engine());
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
   RegisterDesktopStatusChannel();
+  session_channel_ =
+      std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
+          flutter_controller_->engine()->messenger(), "com.hiddify.app/session",
+          &flutter::StandardMethodCodec::GetInstance());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
     // this->Show(); window_manager hidden at launch
@@ -194,8 +202,23 @@ void FlutterWindow::SetTaskbarStatusOverlay(const std::string& status) {
   taskbar->Release();
 }
 
+void FlutterWindow::EndSession(HWND hwnd) {
+  if (ending_session_) {
+    return;
+  }
+  ending_session_ = true;
+  // Dart stops the connection and the core and removes the tray icon, then quits. Should it not
+  // finish in time, the app quits anyway: the core then stops by itself when the app is gone,
+  // restoring the system proxy.
+  if (session_channel_) {
+    session_channel_->InvokeMethod("endSession", nullptr);
+  }
+  SetTimer(hwnd, kEndSessionTimer, kEndSessionTimeoutMs, nullptr);
+}
+
 void FlutterWindow::OnDestroy() {
   SetTaskbarStatusOverlay("none");
+  session_channel_ = nullptr;
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }
@@ -207,6 +230,26 @@ LRESULT
 FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
                               WPARAM const wparam,
                               LPARAM const lparam) noexcept {
+  switch (message) {
+    // A setup run while the app is open closes it through the Restart Manager
+    // (CloseApplications=force), which sends WM_QUERYENDSESSION and WM_ENDSESSION with
+    // ENDSESSION_CLOSEAPP, as Windows does at logoff, and then waits for the app to exit. An app
+    // that stays open, hidden in the tray, holds up the setup until the Restart Manager kills it,
+    // or makes the user close it by hand (hiddify-app#2573).
+    case WM_ENDSESSION:
+      if (wparam) {
+        EndSession(hwnd);
+      }
+      return 0;
+    case WM_TIMER:
+      if (wparam == kEndSessionTimer) {
+        KillTimer(hwnd, kEndSessionTimer);
+        PostQuitMessage(0);
+        return 0;
+      }
+      break;
+  }
+
   // Give Flutter, including plugins, an opportunity to handle window messages.
   if (flutter_controller_) {
     std::optional<LRESULT> result =

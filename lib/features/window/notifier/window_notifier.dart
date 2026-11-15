@@ -1,7 +1,6 @@
 import 'dart:io';
-import 'dart:ui';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
@@ -32,6 +31,15 @@ class WindowNotifier extends _$WindowNotifier with AppLogger {
     // }
 
     await windowManager.ensureInitialized();
+    if (Platform.isWindows) {
+      // Windows ends the session, or a setup closes the app to update it (hiddify-app#2573): the
+      // window is often hidden in the tray, and the setup waits for the app to exit.
+      const MethodChannel('com.hiddify.app/session').setMethodCallHandler((call) async {
+        if (call.method != 'endSession') return;
+        loggy.info("windows ends the session, exiting");
+        await exit();
+      });
+    }
     await initWindowState();
   }
 

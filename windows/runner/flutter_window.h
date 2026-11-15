@@ -29,6 +29,12 @@ class FlutterWindow : public Win32Window {
   void RegisterDesktopStatusChannel();
   // status: "none" | "ok" | "error"
   void SetTaskbarStatusOverlay(const std::string& status);
+  // Windows ends the session, or a setup closes the app through the Restart Manager.
+  void EndSession(HWND hwnd);
+
+  // Tells Dart the session ends ("endSession"), so the app exits as from the tray's Exit.
+  std::unique_ptr<flutter::MethodChannel<flutter::EncodableValue>> session_channel_;
+  bool ending_session_ = false;
 
   // The project to run.
   flutter::DartProject project_;
