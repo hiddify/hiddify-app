@@ -20,6 +20,40 @@ import 'package:hiddify/core/widget/frame_load.dart';
 /// logs), so TickerMode stays on for them; only these loops stop.
 final ValueNotifier<bool> ambientMotion = ValueNotifier(false);
 
+/// Whether the app can be seen at all: it is not hidden or in the background, and on a desktop its
+/// window is not hidden in the tray or minimized. While it cannot, nothing moves: the
+/// [AmbientClock] stops, and App turns tickers off.
+///
+/// It changes as soon as the app is hidden. Flutter draws no frame while the app is hidden or in
+/// the background, so whatever waits for a build to stop its timers only stopped them when the
+/// app came back: the clock went on ticking 20 to 30 times a second for nothing.
+ValueListenable<bool> get appSeen => _appSeen;
+final _appSeen = ValueNotifier(true);
+var _lifecycleSeen = true;
+var _windowHidden = false;
+
+/// Follows the app's lifecycle: hidden, paused and detached cannot be seen. A desktop window
+/// that has the focus again is shown, however it was brought back (the tray, the dock, a second
+/// launch).
+void seeLifecycle(AppLifecycleState? state) {
+  _lifecycleSeen = switch (state) {
+    null || AppLifecycleState.resumed || AppLifecycleState.inactive => true,
+    AppLifecycleState.hidden || AppLifecycleState.paused || AppLifecycleState.detached => false,
+  };
+  if (state == AppLifecycleState.resumed) _windowHidden = false;
+  _appSeen.value = _lifecycleSeen && !_windowHidden;
+}
+
+/// A desktop window hidden in the tray or minimized cannot be seen, whatever the engine reports.
+void seeWindow({required bool hidden}) {
+  _windowHidden = hidden;
+  _appSeen.value = _lifecycleSeen && !_windowHidden;
+}
+
+/// Whether the desktop window has the focus, as the window reports it: on Windows the lifecycle
+/// does not always say so. Without it the light stands still.
+final ValueNotifier<bool> windowFocused = ValueNotifier(true);
+
 /// How long the endless decoration runs each time it starts.
 const ambientFor = Duration(seconds: 10);
 
@@ -88,7 +122,8 @@ abstract final class AmbientClock {
   static double get now => _clock.elapsedMicroseconds / 1e6;
 
   /// Calls [onTick] at [interval] or faster, until the returned function is called. It is called
-  /// less often than [interval] where the device cannot afford the frames.
+  /// less often than [interval] where the device cannot afford the frames, and not at all while
+  /// the app cannot be seen ([appSeen]).
   static VoidCallback subscribe(Duration interval, VoidCallback onTick) {
     final tick = (interval: interval, onTick: onTick);
     _ticks.add(tick);
@@ -99,10 +134,18 @@ abstract final class AmbientClock {
     };
   }
 
+  static var _following = false;
+
   static void _retime() {
+    if (!_following) {
+      _following = true;
+      _appSeen.addListener(_retime);
+    }
     Duration? fastest;
-    for (final t in _ticks) {
-      if (fastest == null || t.interval < fastest) fastest = t.interval;
+    if (_appSeen.value) {
+      for (final t in _ticks) {
+        if (fastest == null || t.interval < fastest) fastest = t.interval;
+      }
     }
     _measure(fastest != null);
     // no faster than the device affords the frames

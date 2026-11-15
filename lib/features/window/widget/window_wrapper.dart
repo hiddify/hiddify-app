@@ -5,6 +5,7 @@ import 'package:hiddify/core/preferences/actions_at_closing.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/router/dialog/dialog_notifier.dart';
 import 'package:hiddify/core/router/go_router/go_router_notifier.dart';
+import 'package:hiddify/core/widget/ambient_motion.dart';
 import 'package:hiddify/features/window/notifier/window_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:hiddify/utils/platform_utils.dart';
@@ -93,6 +94,18 @@ class _WindowWrapperState extends ConsumerState<WindowWrapper> with WindowListen
 
   @override
   void onWindowFocus() {
+    // a window with the focus is shown, however it came back
+    seeWindow(hidden: false);
+    windowFocused.value = true;
     setState(() {});
   }
+
+  @override
+  void onWindowBlur() => windowFocused.value = false;
+
+  @override
+  void onWindowMinimize() => seeWindow(hidden: true);
+
+  @override
+  void onWindowRestore() => seeWindow(hidden: false);
 }

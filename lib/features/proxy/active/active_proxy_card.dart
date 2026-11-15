@@ -253,7 +253,9 @@ class _Alternating extends HookWidget {
   Widget build(BuildContext context) {
     final showFirst = useState(true);
     useEffect(() {
-      final timer = Timer.periodic(_period, (_) => showFirst.value = !showFirst.value);
+      final timer = Timer.periodic(_period, (_) {
+        if (appSeen.value) showFirst.value = !showFirst.value;
+      });
       return timer.cancel;
     }, const []);
     return AnimatedSwitcher(

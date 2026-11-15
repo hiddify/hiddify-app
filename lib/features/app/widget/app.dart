@@ -135,16 +135,18 @@ class App extends HookConsumerWidget with WidgetsBindingObserver, PresLogger {
     // connection, then stands still (see [allowAmbientMotion]); the connect
     // button's light keeps moving.
     final lifecycle = useAppLifecycleState();
-    final animate = switch (lifecycle) {
-      null || AppLifecycleState.resumed || AppLifecycleState.inactive => true,
-      AppLifecycleState.hidden || AppLifecycleState.paused || AppLifecycleState.detached => false,
-    };
+    // as soon as it changes: a hidden app draws no frame, so a build would come only once it is back
+    useEffect(() {
+      seeLifecycle(WidgetsBinding.instance.lifecycleState);
+      final listener = AppLifecycleListener(onStateChange: seeLifecycle);
+      return listener.dispose;
+    }, const []);
+    final animate = useValueListenable(appSeen);
+    final focused = useValueListenable(windowFocused);
     // a low battery, or battery saver, stops it too
     final lowBattery = useLowBattery();
     final decorate =
-        animate &&
-        !lowBattery &&
-        !(lifecycle == AppLifecycleState.inactive && PlatformUtils.isDesktop);
+        animate && !lowBattery && !(PlatformUtils.isDesktop && (lifecycle == AppLifecycleState.inactive || !focused));
     useEffect(() {
       allowAmbientMotion(decorate);
       return null;
