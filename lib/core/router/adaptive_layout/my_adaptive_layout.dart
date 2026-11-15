@@ -114,7 +114,14 @@ class MyAdaptiveLayout extends HookConsumerWidget {
                               : null,
                         ),
                       ),
-                      Expanded(child: navigationShell),
+                      // Keeps the rail visible to screen readers (#2097).
+                      //
+                      // Every page route draws a modal barrier, and its
+                      // BlockSemantics drops all the semantics painted before
+                      // it, up to the nearest container. Without this boundary
+                      // that reached the rail, so NVDA saw no sidebar at all
+                      // (flutter/flutter#135656).
+                      Expanded(child: Semantics(container: true, child: navigationShell)),
                     ],
                   ),
             bottomNavigationBar: isMobileBreakpoint
