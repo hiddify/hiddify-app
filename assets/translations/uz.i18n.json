@@ -1180,6 +1180,7 @@
       ],
       "hint": "Proksi rejimi · qanday foydalanish",
       "setPassword": "Parol o‘rnatish",
+      "removePassword": "Parolni olib tashlash",
       "manual": "Qo‘lda",
       "dontShowAgain": "Qayta ko‘rsatilmasin",
       "thisDevice": "Shu qurilma",

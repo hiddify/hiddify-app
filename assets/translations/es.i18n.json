@@ -1180,6 +1180,7 @@
       ],
       "hint": "Modo proxy · cómo usarlo",
       "setPassword": "Poner contraseña",
+      "removePassword": "Quitar contraseña",
       "manual": "Manual",
       "dontShowAgain": "No volver a mostrar",
       "thisDevice": "Este dispositivo",

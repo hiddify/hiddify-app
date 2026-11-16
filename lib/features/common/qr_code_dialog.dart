@@ -597,6 +597,8 @@ class LocalProxyDialog extends ConsumerWidget {
           onPortSaved: ref.read(ConfigOptions.mixedPort.notifier).update,
           password: asked.isEmpty ? null : asked,
           onSetPassword: setPassword,
+          // the local port need not ask: the secret stays for the local network's port
+          onRemovePassword: () => ref.read(ConfigOptions.localProxyAuth.notifier).update(false),
         ),
       ],
     );
@@ -697,7 +699,8 @@ class _CopyLinkButton extends HookConsumerWidget {
 
 /// The copyable values of a proxy: [host] (null while it is looked up) and [port], then the user
 /// and [password], or, while no password is asked ([password] null), a warning with [onSetPassword].
-/// The port and the password are edited in place; the password is seen only while edited.
+/// The port and the password are edited in place; the password is seen only while edited. While it
+/// is edited, [onRemovePassword], when given, stops asking for it.
 class _ProxyFields extends HookConsumerWidget {
   const _ProxyFields({
     required this.hostLabel,
@@ -706,6 +709,7 @@ class _ProxyFields extends HookConsumerWidget {
     required this.onPortSaved,
     required this.password,
     required this.onSetPassword,
+    this.onRemovePassword,
   });
 
   final String hostLabel;
@@ -714,6 +718,7 @@ class _ProxyFields extends HookConsumerWidget {
   final Future<void> Function(int) onPortSaved;
   final String? password;
   final VoidCallback onSetPassword;
+  final Future<void> Function()? onRemovePassword;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -744,6 +749,16 @@ class _ProxyFields extends HookConsumerWidget {
         editing.value = null;
       },
       onCancel: () => editing.value = null,
+      remove: switch ((field, onRemovePassword)) {
+        (_Field.password, final remove?) => (
+          label: text.removePassword,
+          onRemove: () async {
+            await remove();
+            editing.value = null;
+          },
+        ),
+        _ => null,
+      },
     );
     Widget edit(_Field field) => _TileIcon(text.edit, Icons.edit_outlined, () => editing.value = field);
 
@@ -840,6 +855,7 @@ class _FieldEditor extends HookWidget {
     required this.onSave,
     required this.onCancel,
     this.mono = false,
+    this.remove,
   });
 
   final String label;
@@ -848,6 +864,9 @@ class _FieldEditor extends HookWidget {
   final ValueChanged<String> onSave;
   final VoidCallback onCancel;
   final bool mono;
+
+  /// An action under the field that clears the value instead of saving one.
+  final ({String label, VoidCallback onRemove})? remove;
 
   @override
   Widget build(BuildContext context) {
@@ -865,7 +884,7 @@ class _FieldEditor extends HookWidget {
       borderSide: BorderSide(color: error != null ? theme.colorScheme.error : theme.colorScheme.primary, width: 2),
     );
     final style = theme.textTheme.bodyLarge;
-    return TextField(
+    final field = TextField(
       controller: controller,
       autofocus: true,
       textDirection: TextDirection.ltr,
@@ -902,6 +921,23 @@ class _FieldEditor extends HookWidget {
           ],
         ),
       ),
+    );
+    final remove = this.remove;
+    if (remove == null) return field;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        field,
+        TextButton.icon(
+          style: TextButton.styleFrom(
+            foregroundColor: theme.colorScheme.error,
+            visualDensity: VisualDensity.compact,
+          ),
+          onPressed: remove.onRemove,
+          icon: const Icon(Icons.lock_open_rounded, size: 18),
+          label: Text(remove.label),
+        ),
+      ],
     );
   }
 }

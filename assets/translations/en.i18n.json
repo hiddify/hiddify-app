@@ -1236,6 +1236,7 @@
       ],
       "hint": "Proxy mode · how to use",
       "setPassword": "Set password",
+      "removePassword": "Remove password",
       "manual": "Manual",
       "dontShowAgain": "Don't show again",
       "thisDevice": "This device",

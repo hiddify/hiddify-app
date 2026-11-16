@@ -1180,6 +1180,7 @@
       ],
       "hint": "Proxy modu · nasıl kullanılır",
       "setPassword": "Parola belirle",
+      "removePassword": "Parolayı kaldır",
       "manual": "Manuel",
       "dontShowAgain": "Bir daha gösterme",
       "thisDevice": "Bu cihaz",

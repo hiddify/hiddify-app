@@ -1180,6 +1180,7 @@
       ],
       "hint": "프록시 모드 · 사용 방법",
       "setPassword": "비밀번호 설정",
+      "removePassword": "비밀번호 제거",
       "manual": "수동",
       "dontShowAgain": "다시 표시하지 않기",
       "thisDevice": "이 기기",

@@ -1215,6 +1215,7 @@
       ],
       "hint": "وضع الوكيل · طريقة الاستخدام",
       "setPassword": "تعيين كلمة سر",
+      "removePassword": "إزالة كلمة السر",
       "manual": "يدوي",
       "dontShowAgain": "لا تعرض هذا مجددًا",
       "thisDevice": "هذا الجهاز",

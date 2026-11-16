@@ -1180,6 +1180,7 @@
       ],
       "hint": "代理模式 · 使用说明",
       "setPassword": "设置密码",
+      "removePassword": "移除密码",
       "manual": "手动",
       "dontShowAgain": "不再显示",
       "thisDevice": "本设备",

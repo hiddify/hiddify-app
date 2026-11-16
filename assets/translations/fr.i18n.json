@@ -1180,6 +1180,7 @@
       ],
       "hint": "Mode proxy · mode d'emploi",
       "setPassword": "Définir un mot de passe",
+      "removePassword": "Supprimer le mot de passe",
       "manual": "Manuel",
       "dontShowAgain": "Ne plus afficher",
       "thisDevice": "Cet appareil",
