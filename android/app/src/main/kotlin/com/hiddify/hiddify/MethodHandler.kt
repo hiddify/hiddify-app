@@ -13,6 +13,7 @@ import com.hiddify.core.libbox.Libbox
 import com.hiddify.core.mobile.Mobile
 import com.hiddify.core.mobile.SetupOptions
 import com.hiddify.hiddify.bg.Bugs
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -54,15 +55,13 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
         when (call.method) {
             Trigger.GetGrpcServerPublicKey.method -> {
                 GlobalScope.launch {
-                    result.runCatching {
-                        result.success(Mobile.getServerPublicKey())
-                    }
+                    result.answer(call.method) { Mobile.getServerPublicKey() }
                 }
             }
 
             Trigger.Setup.method -> {
                 GlobalScope.launch {
-                    result.runCatching {
+                    result.answer(call.method) {
                         val args = call.arguments as Map<*, *>
                         Settings.baseDir = args["baseDir"] as String
                         Settings.workingDir = args["workingDir"] as String
@@ -71,28 +70,22 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         val mode = args["mode"] as Int
                         val grpcPort = args["grpcPort"] as Int
                         Log.d("debugmode","${Settings.debugMode}")
-                        runCatching {
-                            Mobile.setup(
-                                SetupOptions().also {
-                                    it.basePath = Settings.baseDir
-                                    it.workingDir = Settings.workingDir
-                                    it.tempDir = Settings.tempDir
-                                    it.fixAndroidStack = Bugs.fixAndroidStack
-                                    it.mode=mode.toLong()
-                                    it.listen= "127.0.0.1:" + grpcPort
-                                    it.secret=""
-                                    it.debug = Settings.debugMode
-                                    DeviceMemory.applyTo(it)
-                                }, BoxService.activePlatformInterface)
+                        Mobile.setup(
+                            SetupOptions().also {
+                                it.basePath = Settings.baseDir
+                                it.workingDir = Settings.workingDir
+                                it.tempDir = Settings.tempDir
+                                it.fixAndroidStack = Bugs.fixAndroidStack
+                                it.mode=mode.toLong()
+                                it.listen= "127.0.0.1:" + grpcPort
+                                it.secret=""
+                                it.debug = Settings.debugMode
+                                DeviceMemory.applyTo(it)
+                            }, BoxService.activePlatformInterface)
 
 //                            Libbox.setup(Settings.baseDir, Settings.workingDir, Settings.tempDir, false)
-                            Libbox.redirectStderr(File(Settings.workingDir, "stderr2.log").path)
-
-                            success("")
-                        }.onFailure {
-                            error(it)
-                        }
-
+                        Libbox.redirectStderr(File(Settings.workingDir, "stderr2.log").path)
+                        ""
                     }
                 }
             }
@@ -100,7 +93,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
 
             Trigger.Start.method -> {
                 scope.launch {
-                    result.runCatching {
+                    result.answer(call.method) {
                         val args = call.arguments as Map<*, *>
                         Settings.activeConfigPath = args["path"] as String? ?: ""
                         Settings.activeProfileName = args["name"] as String? ?: ""
@@ -134,14 +127,14 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
 
                         // Answers after the permission dialogs, so the caller's wait for the
                         // service starts only once it can start.
-                        success(mainActivity.startService())
+                        mainActivity.startService()
                     }
                 }
             }
 
             Trigger.Stop.method -> {
                 scope.launch {
-                    result.runCatching {
+                    result.answer(call.method) {
                         val mainActivity = MainActivity.instance
                         when (mainActivity.serviceStatus.value) {
                             Status.Stopped, null -> Log.w(TAG, "service is not running")
@@ -162,7 +155,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                                 }
                             }
                         }
-                        success(true)
+                        true
                     }
                 }
             }
@@ -197,4 +190,24 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             else -> result.notImplemented()
         }
     }
+}
+
+/**
+ * Answers the call with what [block] returns, or with an error when it throws: every call gets
+ * exactly one answer. The handlers used to run in `result.runCatching { ... success(...) }`, which
+ * swallowed a failure without answering, and the Dart side awaited the call for ever. (In setup,
+ * `onFailure { error(it) }` was Kotlin's `error()`, which throws, not `Result.error`.)
+ */
+private suspend fun MethodChannel.Result.answer(method: String, block: suspend () -> Any?) {
+    val value = try {
+        block()
+    } catch (e: CancellationException) {
+        error(method, "cancelled", null)
+        throw e
+    } catch (e: Throwable) {
+        Log.w(MethodHandler.TAG, "$method failed", e)
+        error(method, e.message ?: e.toString(), null)
+        return
+    }
+    success(value)
 }

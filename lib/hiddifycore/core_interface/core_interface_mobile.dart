@@ -81,14 +81,20 @@ class CoreInterfaceMobile extends CoreInterface with InfraLogger {
 
     // Start the core first — the server certificate only exists after setup.
     if (!await isPortOpen('127.0.0.1', portFront)) {
-      final setupResult = await methodChannel.invokeMethod<dynamic>('setup', {
-        'baseDir': directories.baseDir.path,
-        'workingDir': directories.workingDir.path,
-        'tempDir': directories.tempDir.path,
-        'grpcPort': portFront,
-        'mode': mode,
-        'debug': debug,
-      });
+      final dynamic setupResult;
+      try {
+        setupResult = await methodChannel.invokeMethod<dynamic>('setup', {
+          'baseDir': directories.baseDir.path,
+          'workingDir': directories.workingDir.path,
+          'tempDir': directories.tempDir.path,
+          'grpcPort': portFront,
+          'mode': mode,
+          'debug': debug,
+        });
+      } on PlatformException catch (e) {
+        // the native setup answers a failure (the core could not be set up) with an error
+        return 'core setup failed: ${e.message}';
+      }
       _applyNativeStatusPayload(setupResult);
       if (!await waitUntilPort(portFront, true, null)) {
         return 'failed to start foreground gRPC';
