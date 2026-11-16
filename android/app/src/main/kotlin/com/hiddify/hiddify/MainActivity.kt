@@ -12,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import com.hiddify.hiddify.bg.ServiceConnection
@@ -169,6 +170,24 @@ class MainActivity : FlutterFragmentActivity(), ServiceConnection.Callback {
     override fun onDestroy() {
         connection.disconnect()
         super.onDestroy()
+    }
+
+    /**
+     * The app picked in a share sheet opens in its own task. Without this the system starts it
+     * in Hiddify's task, on top of this activity: after sharing a log to Telegram, the Hiddify
+     * icon and its recents card brought back Telegram's share screen instead of Hiddify.
+     * share_plus starts the sheet from here and has no option for it, so the flag is added to
+     * the intent inside every chooser this activity starts (startActivity comes through here).
+     */
+    @Suppress("OVERRIDE_DEPRECATION", "DEPRECATION")
+    override fun startActivityForResult(intent: Intent, requestCode: Int, options: Bundle?) {
+        if (intent.action == Intent.ACTION_CHOOSER) {
+            IntentCompat.getParcelableExtra(intent, Intent.EXTRA_INTENT, Intent::class.java)?.let { target ->
+                target.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                intent.putExtra(Intent.EXTRA_INTENT, target)
+            }
+        }
+        super.startActivityForResult(intent, requestCode, options)
     }
 
     @SuppressLint("NewApi")
