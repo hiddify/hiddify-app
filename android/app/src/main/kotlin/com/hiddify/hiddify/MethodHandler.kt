@@ -5,6 +5,7 @@ import com.hiddify.hiddify.bg.BoxService
 //import com.hiddify.hiddify.bg.BoxService.Companion.workingDir
 import com.hiddify.hiddify.constant.Status
 import com.hiddify.hiddify.utils.DeviceMemory
+import com.hiddify.hiddify.utils.answer
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -13,7 +14,6 @@ import com.hiddify.core.libbox.Libbox
 import com.hiddify.core.mobile.Mobile
 import com.hiddify.core.mobile.SetupOptions
 import com.hiddify.hiddify.bg.Bugs
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -192,22 +192,3 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
     }
 }
 
-/**
- * Answers the call with what [block] returns, or with an error when it throws: every call gets
- * exactly one answer. The handlers used to run in `result.runCatching { ... success(...) }`, which
- * swallowed a failure without answering, and the Dart side awaited the call for ever. (In setup,
- * `onFailure { error(it) }` was Kotlin's `error()`, which throws, not `Result.error`.)
- */
-private suspend fun MethodChannel.Result.answer(method: String, block: suspend () -> Any?) {
-    val value = try {
-        block()
-    } catch (e: CancellationException) {
-        error(method, "cancelled", null)
-        throw e
-    } catch (e: Throwable) {
-        Log.w(MethodHandler.TAG, "$method failed", e)
-        error(method, e.message ?: e.toString(), null)
-        return
-    }
-    success(value)
-}
