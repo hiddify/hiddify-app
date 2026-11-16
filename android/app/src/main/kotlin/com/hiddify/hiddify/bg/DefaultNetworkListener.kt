@@ -51,8 +51,13 @@ object DefaultNetworkListener {
                     }
 
                     is NetworkMessage.Get -> {
-                        check(listeners.isNotEmpty()) { "Getting network without any listeners is not supported" }
-                        if (network == null) {
+                        if (listeners.isEmpty()) {
+                            // answered with the error: thrown here, it ended this actor for the
+                            // rest of the process, and the uncaught exception the process with it
+                            message.response.completeExceptionally(
+                                IllegalStateException("Getting network without any listeners is not supported"),
+                            )
+                        } else if (network == null) {
                             pendingRequests += message
                         } else {
                             message.response.complete(
