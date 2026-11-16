@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Relatório pronto",
         "saveUnencryptedCopy": "Salvar uma cópia sem criptografia"
+      },
+      "trace": {
+        "offerTitle": "Pegue o problema no flagra",
+        "offerMsg": "Ative os logs detalhados, faça o problema acontecer de novo e depois envie. Assim achamos a causa bem mais rápido.",
+        "step1": "Os logs detalhados ficam ativos por $minutes minutos",
+        "step1Msg": "Depois eles desligam sozinhos",
+        "step2": "Conecte de novo e faça o problema acontecer",
+        "step2Msg": "Faça exatamente o que você fez quando deu errado",
+        "step2Connected": "O Hiddify se reconecta sozinho para começar a registrar. Agora repita o que deu errado antes.",
+        "step3": "Volte aqui e envie seu relatório",
+        "step3Msg": "Abra de novo “Relatar um problema” e descreva o que você viu",
+        "privacy": "IPs, domínios e chaves são removidos antes de qualquer coisa sair do seu dispositivo. Os logs voltam ao normal após $minutes minutos.",
+        "start": "Ativar logs detalhados",
+        "skip": "Pular",
+        "gotIt": "Entendi",
+        "connect": "Conectar",
+        "onTitle": "Logs detalhados ativados",
+        "onMsg": "Vá fazer o problema acontecer. Volte aqui quando tiver visto.",
+        "bannerTitle": "Logs detalhados · faltam $time",
+        "bannerMsg": "Descreva o que aconteceu e toque em Continuar",
+        "stop": "Parar",
+        "ended": "Os logs detalhados terminaram. Envie o relatório em “Relatar um problema”."
       }
     },
     "keepTop": {

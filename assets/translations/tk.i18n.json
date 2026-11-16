@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Hasabat taýýar",
         "saveUnencryptedCopy": "Şifrlenmedik nusgany sakla"
+      },
+      "trace": {
+        "offerTitle": "Meseläni şol pursatda tutuň",
+        "offerMsg": "Jikme-jik loglary açyň, meseläni ýene bir gezek gaýtalaň, soňra iberiň. Şeýdip sebäbini has çalt taparys.",
+        "step1": "Jikme-jik loglar $minutes minutlyk açylýar",
+        "step1Msg": "Soňra özi öçýär",
+        "step2": "Täzeden baglanyň we meseläni gaýtalaň",
+        "step2Msg": "Ýalňyşlyk bolanda näme eden bolsaňyz, şony ediň",
+        "step2Connected": "Ýazgyny başlamak üçin Hiddify özi täzeden baglanýar. Indi öň ýalňyş giden hereketi gaýtalaň.",
+        "step3": "Şu ýere gaýdyp geliň we hasabaty iberiň",
+        "step3Msg": "“Mesele barada habar ber” bölümini ýene açyň we näme görendigiňizi ýazyň",
+        "privacy": "Enjamyňyzdan bir zat çykmazdan öň IP, domenler we açarlar aýrylýar. $minutes minutdan soň loglar adaty ýagdaýa gaýdýar.",
+        "start": "Jikme-jik loglary aç",
+        "skip": "Geç",
+        "gotIt": "Düşnükli",
+        "connect": "Baglan",
+        "onTitle": "Jikme-jik loglar açyk",
+        "onMsg": "Meseläni gaýtalaň. Ony göreniňizde şu ýere gaýdyp geliň.",
+        "bannerTitle": "Jikme-jik loglar · $time galdy",
+        "bannerMsg": "Näme bolandygyny ýazyň we “Dowam et” düwmesine basyň",
+        "stop": "Togtat",
+        "ended": "Jikme-jik loglar gutardy. Hasabaty “Mesele barada habar ber” arkaly iberiň."
       }
     },
     "keepTop": {

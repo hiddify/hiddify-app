@@ -11,11 +11,14 @@ import 'package:hiddify/core/localization/locale_preferences.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/notification/in_app_notification_controller.dart';
+import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/crash_report/data/crash_excerpt.dart';
 import 'package:hiddify/features/crash_report/data/diagnostics_exporter.dart';
 import 'package:hiddify/features/crash_report/data/diagnostics_sender.dart';
 import 'package:hiddify/features/crash_report/data/telegram_report_link.dart';
 import 'package:hiddify/features/crash_report/notifier/crash_report_notifier.dart';
+import 'package:hiddify/features/crash_report/notifier/trace_session_notifier.dart';
+import 'package:hiddify/features/crash_report/widget/trace_session_view.dart';
 import 'package:hiddify/features/log/overview/logs_modals.dart';
 import 'package:hiddify/features/profile/add/phone_import/phone_import_notifier.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
@@ -68,7 +71,8 @@ class CrashReportDialog extends ConsumerWidget {
 }
 
 /// Opened by the user from About or Logs when something does not work: the same report as after a
-/// crash, with what they write about it.
+/// crash, with what they write about it. It first offers detailed logging for a few minutes, so the
+/// problem is caught in the act; a crash report has its crash already and skips that.
 class ReportProblemDialog extends ConsumerWidget {
   const ReportProblemDialog({super.key});
 
@@ -80,6 +84,7 @@ class ReportProblemDialog extends ConsumerWidget {
       title: t.dialogs.crashReport.problemTitle,
       msg: t.dialogs.crashReport.problemMsg,
       dismiss: t.common.cancel,
+      offerTrace: true,
     );
   }
 }
@@ -103,6 +108,7 @@ class _ReportDialog extends ConsumerStatefulWidget {
     required this.dismiss,
     this.crashName,
     this.crash,
+    this.offerTrace = false,
   });
 
   final IconData icon;
@@ -112,12 +118,21 @@ class _ReportDialog extends ConsumerStatefulWidget {
   final String? crashName;
   final CrashExcerpt? crash;
 
+  /// Opens on the detailed logging offer, unless it is already on: then the user came back to send.
+  final bool offerTrace;
+
   @override
   ConsumerState<_ReportDialog> createState() => _ReportDialogState();
 }
 
 class _ReportDialogState extends ConsumerState<_ReportDialog> {
   final _description = TextEditingController();
+
+  /// On the first page: detailed logging, offered or counting down.
+  late var _offer = widget.offerTrace && ref.read(traceSessionProvider) == null;
+
+  /// Kept for dispose, where ref can no longer be read.
+  late final _trace = ref.read(traceSessionProvider.notifier);
 
   /// On the second page: the report is being made, or is made.
   var _sending = false;
@@ -154,6 +169,8 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
 
   @override
   void dispose() {
+    // the detailed logs are in the report now: no reason to keep the core on trace
+    if (_report != null && _trace.active) unawaited(_trace.stop());
     _description.dispose();
     super.dispose();
   }
@@ -237,6 +254,7 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
   Widget build(BuildContext context) {
     final t = ref.watch(translationsProvider).requireValue;
     final sent = _upload == _Upload.sent;
+    final traceUntil = ref.watch(traceSessionProvider);
     return AlertDialog(
       icon: Icon(widget.icon),
       title: Text(widget.title),
@@ -255,14 +273,30 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
               switchOutCurve: Curves.easeInCubic,
               layoutBuilder: _topStack,
               transitionBuilder: _fadeSlide,
-              child: _sending
+              child: _offer
+                  ? KeyedSubtree(key: const ValueKey('trace'), child: _tracePage(t, traceUntil))
+                  : _sending
                   ? KeyedSubtree(key: const ValueKey('send'), child: _sendPage(t))
-                  : KeyedSubtree(key: const ValueKey('write'), child: _writePage(t)),
+                  : KeyedSubtree(key: const ValueKey('write'), child: _writePage(t, traceUntil)),
             ),
           ),
         ),
       ),
-      actions: !_sending
+      actions: _offer
+          ? traceUntil == null
+                ? [
+                    TextButton(
+                      onPressed: () => setState(() => _offer = false),
+                      child: Text(t.dialogs.crashReport.trace.skip),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () => ref.read(traceSessionProvider.notifier).start(),
+                      icon: const Icon(FluentIcons.record_20_filled, size: 18),
+                      label: Text(t.dialogs.crashReport.trace.start),
+                    ),
+                  ]
+                : [FilledButton(onPressed: () => context.pop(), child: Text(t.dialogs.crashReport.trace.gotIt))]
+          : !_sending
           ? [
               TextButton(onPressed: () => context.pop(), child: Text(widget.dismiss)),
               FilledButton.icon(
@@ -279,12 +313,30 @@ class _ReportDialogState extends ConsumerState<_ReportDialog> {
     );
   }
 
-  Widget _writePage(Translations t) {
+  Widget _tracePage(Translations t, DateTime? until) {
+    final status = ref.watch(connectionNotifierProvider).valueOrNull;
+    return TraceSessionView(
+      t: t,
+      until: until,
+      disconnected: status?.isDisconnected ?? true,
+      onConnect: () {
+        // the dialog steps aside so the user sees the connection come up and can make the problem happen
+        unawaited(ref.read(connectionNotifierProvider.notifier).toggleConnection());
+        context.pop();
+      },
+    );
+  }
+
+  Widget _writePage(Translations t, DateTime? traceUntil) {
     final r = t.dialogs.crashReport;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (widget.offerTrace && traceUntil != null) ...[
+          TraceSessionBanner(t: t, until: traceUntil, onStop: () => ref.read(traceSessionProvider.notifier).stop()),
+          const SizedBox(height: 14),
+        ],
         Text(
           widget.msg,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),

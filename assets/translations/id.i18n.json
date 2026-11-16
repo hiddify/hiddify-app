@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Laporan siap",
         "saveUnencryptedCopy": "Simpan salinan tanpa enkripsi"
+      },
+      "trace": {
+        "offerTitle": "Tangkap masalahnya saat terjadi",
+        "offerMsg": "Nyalakan log terperinci, buat masalahnya terjadi sekali lagi, lalu kirim. Dengan begini kami menemukan penyebabnya jauh lebih cepat.",
+        "step1": "Log terperinci menyala selama $minutes menit",
+        "step1Msg": "Setelah itu mati sendiri",
+        "step2": "Sambungkan lagi dan buat masalahnya terjadi",
+        "step2Msg": "Lakukan persis yang Anda lakukan saat masalah muncul",
+        "step2Connected": "Hiddify menyambung ulang sendiri untuk mulai mencatat. Sekarang ulangi hal yang tadi bermasalah.",
+        "step3": "Kembali ke sini dan kirim laporan Anda",
+        "step3Msg": "Buka lagi “Laporkan masalah”, lalu jelaskan apa yang Anda lihat",
+        "privacy": "IP, domain, dan kunci dihapus sebelum apa pun keluar dari perangkat Anda. Log kembali normal setelah $minutes menit.",
+        "start": "Mulai log terperinci",
+        "skip": "Lewati",
+        "gotIt": "Mengerti",
+        "connect": "Sambungkan",
+        "onTitle": "Log terperinci menyala",
+        "onMsg": "Buat masalahnya terjadi. Kembali ke sini setelah Anda melihatnya.",
+        "bannerTitle": "Log terperinci · sisa $time",
+        "bannerMsg": "Jelaskan apa yang terjadi lalu tekan Lanjutkan",
+        "stop": "Hentikan",
+        "ended": "Log terperinci selesai. Kirim laporan lewat “Laporkan masalah”."
       }
     },
     "keepTop": {

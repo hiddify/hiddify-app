@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Rapor hazır",
         "saveUnencryptedCopy": "Şifrelenmemiş kopyayı kaydet"
+      },
+      "trace": {
+        "offerTitle": "Sorunu iş üstünde yakalayın",
+        "offerMsg": "Ayrıntılı günlükleri açın, sorunu bir kez daha yaşayın, sonra gönderin. Böylece nedeni çok daha hızlı buluruz.",
+        "step1": "Ayrıntılı günlükler $minutes dakikalığına açılır",
+        "step1Msg": "Sonra kendiliğinden kapanır",
+        "step2": "Yeniden bağlanın ve sorunu tekrarlayın",
+        "step2Msg": "Sorun çıktığında ne yaptıysanız aynısını yapın",
+        "step2Connected": "Hiddify kayda başlamak için kendiliğinden yeniden bağlanır. Şimdi daha önce ters giden şeyi tekrarlayın.",
+        "step3": "Buraya dönün ve raporunuzu gönderin",
+        "step3Msg": "“Sorun bildir”i yeniden açın ve ne gördüğünüzü anlatın",
+        "privacy": "Cihazınızdan bir şey çıkmadan önce IP'ler, alan adları ve anahtarlar kaldırılır. $minutes dakika sonra günlükler normale döner.",
+        "start": "Ayrıntılı günlükleri başlat",
+        "skip": "Atla",
+        "gotIt": "Anladım",
+        "connect": "Bağlan",
+        "onTitle": "Ayrıntılı günlükler açık",
+        "onMsg": "Gidip sorunu tekrarlayın. Gördüğünüzde buraya dönün.",
+        "bannerTitle": "Ayrıntılı günlükler · $time kaldı",
+        "bannerMsg": "Ne olduğunu anlatın ve Devam et'e basın",
+        "stop": "Durdur",
+        "ended": "Ayrıntılı günlükler bitti. Raporu “Sorun bildir” üzerinden gönderin."
       }
     },
     "keepTop": {

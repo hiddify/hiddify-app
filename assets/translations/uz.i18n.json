@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Hisobot tayyor",
         "saveUnencryptedCopy": "Shifrlanmagan nusxani saqlash"
+      },
+      "trace": {
+        "offerTitle": "Muammoni ayni paytida ushlang",
+        "offerMsg": "Batafsil loglarni yoqing, muammoni yana bir bor takrorlang, keyin yuboring. Shunda sababini ancha tez topamiz.",
+        "step1": "Batafsil loglar $minutes daqiqaga yoqiladi",
+        "step1Msg": "Keyin oʻzi oʻchadi",
+        "step2": "Qayta ulaning va muammoni takrorlang",
+        "step2Msg": "Xato boʻlgan paytdagidek aynan shuni qiling",
+        "step2Connected": "Yozishni boshlash uchun Hiddify oʻzi qayta ulanadi. Endi avval xato boʻlgan amalni takrorlang.",
+        "step3": "Bu yerga qaytib, hisobotni yuboring",
+        "step3Msg": "«Muammo haqida xabar berish»ni yana oching va nimani koʻrganingizni yozing",
+        "privacy": "Qurilmangizdan biror narsa chiqishidan oldin IP, domen va kalitlar olib tashlanadi. $minutes daqiqadan soʻng loglar odatiy holatga qaytadi.",
+        "start": "Batafsil loglarni yoqish",
+        "skip": "Oʻtkazib yuborish",
+        "gotIt": "Tushunarli",
+        "connect": "Ulanish",
+        "onTitle": "Batafsil loglar yoqilgan",
+        "onMsg": "Muammoni takrorlang. Uni koʻrgach, bu yerga qayting.",
+        "bannerTitle": "Batafsil loglar · $time qoldi",
+        "bannerMsg": "Nima boʻlganini yozing va «Davom etish»ni bosing",
+        "stop": "Toʻxtatish",
+        "ended": "Batafsil loglar tugadi. Hisobotni «Muammo haqida xabar berish» orqali yuboring."
       }
     },
     "keepTop": {

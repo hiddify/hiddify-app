@@ -1171,6 +1171,28 @@
         "dropInIssueHow": "Drag the file into Additional Context, or tap the bar under that box",
         "ready": "Report ready",
         "saveUnencryptedCopy": "Save an unencrypted copy"
+      },
+      "trace": {
+        "offerTitle": "Catch the problem in the act",
+        "offerMsg": "Turn on detailed logging, make the problem happen once more, then send. We find the cause much faster this way.",
+        "step1": "Detailed logging turns on for $minutes minutes",
+        "step1Msg": "It turns itself off after that",
+        "step2": "Connect again and make the problem happen",
+        "step2Msg": "Do exactly what you did when it went wrong",
+        "step2Connected": "Hiddify reconnects by itself to start logging. Now do what went wrong before.",
+        "step3": "Come back here and send your report",
+        "step3Msg": "Report a problem again, then describe what you saw",
+        "privacy": "IPs, domains and keys are removed before anything leaves your device. Logging returns to normal after $minutes minutes.",
+        "start": "Start detailed logging",
+        "skip": "Skip",
+        "gotIt": "Got it",
+        "connect": "Connect",
+        "onTitle": "Detailed logging is on",
+        "onMsg": "Go make the problem happen. Come back here when you've seen it.",
+        "bannerTitle": "Detailed logging · $time left",
+        "bannerMsg": "Describe what happened and press Continue",
+        "stop": "Stop",
+        "ended": "Detailed logging ended. Send it from Report a problem."
       }
     },
     "keepTop": {

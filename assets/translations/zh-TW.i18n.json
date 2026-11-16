@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "報告已就緒",
         "saveUnencryptedCopy": "儲存未加密副本"
+      },
+      "trace": {
+        "offerTitle": "當場抓住問題",
+        "offerMsg": "開啟詳細日誌，再讓問題發生一次，然後傳送。這樣我們能更快找到原因。",
+        "step1": "詳細日誌將開啟 $minutes 分鐘",
+        "step1Msg": "之後會自動關閉",
+        "step2": "重新連線並讓問題再次發生",
+        "step2Msg": "完全照出問題時的操作再做一次",
+        "step2Connected": "Hiddify 會自動重新連線以開始記錄。現在重複之前出問題的操作。",
+        "step3": "回到這裡傳送報告",
+        "step3Msg": "再次開啟「回報問題」，描述你看到的情況",
+        "privacy": "任何內容離開你的裝置前，IP、網域和金鑰都會被移除。$minutes 分鐘後日誌恢復正常。",
+        "start": "開始詳細日誌",
+        "skip": "略過",
+        "gotIt": "知道了",
+        "connect": "連線",
+        "onTitle": "詳細日誌已開啟",
+        "onMsg": "去讓問題發生吧。看到後回到這裡。",
+        "bannerTitle": "詳細日誌 · 剩餘 $time",
+        "bannerMsg": "描述發生了什麼，然後點擊繼續",
+        "stop": "停止",
+        "ended": "詳細日誌已結束。請從「回報問題」傳送報告。"
       }
     },
     "keepTop": {

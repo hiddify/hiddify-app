@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "报告已就绪",
         "saveUnencryptedCopy": "保存未加密副本"
+      },
+      "trace": {
+        "offerTitle": "当场抓住问题",
+        "offerMsg": "打开详细日志，再让问题出现一次，然后发送。这样我们能更快找到原因。",
+        "step1": "详细日志将开启 $minutes 分钟",
+        "step1Msg": "之后会自动关闭",
+        "step2": "重新连接并让问题再次出现",
+        "step2Msg": "完全照出问题时的操作再做一遍",
+        "step2Connected": "Hiddify 会自动重新连接以开始记录。现在重复之前出问题的操作。",
+        "step3": "回到这里发送报告",
+        "step3Msg": "再次打开“报告问题”，描述你看到的情况",
+        "privacy": "任何内容离开你的设备前，IP、域名和密钥都会被移除。$minutes 分钟后日志恢复正常。",
+        "start": "开始详细日志",
+        "skip": "跳过",
+        "gotIt": "知道了",
+        "connect": "连接",
+        "onTitle": "详细日志已开启",
+        "onMsg": "去让问题出现吧。看到后回到这里。",
+        "bannerTitle": "详细日志 · 剩余 $time",
+        "bannerMsg": "描述发生了什么，然后点击继续",
+        "stop": "停止",
+        "ended": "详细日志已结束。请从“报告问题”发送报告。"
       }
     },
     "keepTop": {

@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Rapporto pronto",
         "saveUnencryptedCopy": "Salva una copia non cifrata"
+      },
+      "trace": {
+        "offerTitle": "Cogli il problema sul fatto",
+        "offerMsg": "Attiva i log dettagliati, fai ripresentare il problema, poi invia. Così troviamo la causa molto prima.",
+        "step1": "I log dettagliati restano attivi per $minutes minuti",
+        "step1Msg": "Poi si disattivano da soli",
+        "step2": "Connettiti di nuovo e fai ripresentare il problema",
+        "step2Msg": "Fai esattamente quello che facevi quando è andato storto",
+        "step2Connected": "Hiddify si riconnette da solo per iniziare a registrare. Ora rifai ciò che prima non andava.",
+        "step3": "Torna qui e invia il rapporto",
+        "step3Msg": "Apri di nuovo «Segnala un problema» e descrivi cosa hai visto",
+        "privacy": "IP, domini e chiavi vengono rimossi prima che qualcosa lasci il dispositivo. I log tornano normali dopo $minutes minuti.",
+        "start": "Avvia i log dettagliati",
+        "skip": "Salta",
+        "gotIt": "Ho capito",
+        "connect": "Connetti",
+        "onTitle": "Log dettagliati attivi",
+        "onMsg": "Vai a far ripresentare il problema. Torna qui quando l’hai visto.",
+        "bannerTitle": "Log dettagliati · ancora $time",
+        "bannerMsg": "Descrivi cosa è successo e premi Continua",
+        "stop": "Interrompi",
+        "ended": "Log dettagliati terminati. Invia il rapporto da «Segnala un problema»."
       }
     },
     "keepTop": {

@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Hesabat hazırdır",
         "saveUnencryptedCopy": "Şifrələnməmiş nüsxəni saxla"
+      },
+      "trace": {
+        "offerTitle": "Problemi elə anında tutun",
+        "offerMsg": "Ətraflı logları açın, problemi bir daha təkrarlayın, sonra göndərin. Belə səbəbi daha tez tapırıq.",
+        "step1": "Ətraflı loglar $minutes dəqiqəlik açılır",
+        "step1Msg": "Sonra özü sönür",
+        "step2": "Yenidən qoşulun və problemi təkrarlayın",
+        "step2Msg": "Problem olanda nə etmişdinizsə, eynisini edin",
+        "step2Connected": "Yazmağa başlamaq üçün Hiddify özü yenidən qoşulur. İndi əvvəl problem yaradan addımı təkrarlayın.",
+        "step3": "Bura qayıdın və hesabatı göndərin",
+        "step3Msg": "“Problem bildir” bölməsini yenidən açın və nə gördüyünüzü yazın",
+        "privacy": "Cihazınızdan nəsə çıxmamış IP, domen və açarlar silinir. $minutes dəqiqədən sonra loglar adi rejimə qayıdır.",
+        "start": "Ətraflı logları aç",
+        "skip": "Keç",
+        "gotIt": "Aydındır",
+        "connect": "Qoşul",
+        "onTitle": "Ətraflı loglar açıqdır",
+        "onMsg": "Problemi təkrarlayın. Onu görəndə bura qayıdın.",
+        "bannerTitle": "Ətraflı loglar · $time qaldı",
+        "bannerMsg": "Nə baş verdiyini yazın və “Davam et” düyməsini basın",
+        "stop": "Dayandır",
+        "ended": "Ətraflı loglar bitdi. Hesabatı “Problem bildir” bölməsindən göndərin."
       }
     },
     "keepTop": {

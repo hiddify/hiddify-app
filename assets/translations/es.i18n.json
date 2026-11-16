@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Informe listo",
         "saveUnencryptedCopy": "Guardar una copia sin cifrar"
+      },
+      "trace": {
+        "offerTitle": "Pilla el problema en el acto",
+        "offerMsg": "Activa los registros detallados, haz que el problema vuelva a ocurrir y luego envía. Así encontramos la causa mucho antes.",
+        "step1": "Los registros detallados se activan durante $minutes minutos",
+        "step1Msg": "Después se desactivan solos",
+        "step2": "Conecta de nuevo y haz que ocurra el problema",
+        "step2Msg": "Haz exactamente lo que hiciste cuando falló",
+        "step2Connected": "Hiddify se reconecta solo para empezar a registrar. Ahora repite lo que falló antes.",
+        "step3": "Vuelve aquí y envía tu informe",
+        "step3Msg": "Abre de nuevo «Informar de un problema» y describe lo que viste",
+        "privacy": "Las IP, dominios y claves se quitan antes de que nada salga de tu dispositivo. Los registros vuelven a la normalidad tras $minutes minutos.",
+        "start": "Activar registros detallados",
+        "skip": "Omitir",
+        "gotIt": "Entendido",
+        "connect": "Conectar",
+        "onTitle": "Registros detallados activados",
+        "onMsg": "Ve y haz que ocurra el problema. Vuelve aquí cuando lo hayas visto.",
+        "bannerTitle": "Registros detallados · quedan $time",
+        "bannerMsg": "Describe lo que pasó y pulsa Continuar",
+        "stop": "Detener",
+        "ended": "Los registros detallados terminaron. Envía el informe desde «Informar de un problema»."
       }
     },
     "keepTop": {

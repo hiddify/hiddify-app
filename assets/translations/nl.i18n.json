@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Rapport klaar",
         "saveUnencryptedCopy": "Onversleutelde kopie opslaan"
+      },
+      "trace": {
+        "offerTitle": "Betrap het probleem op heterdaad",
+        "offerMsg": "Zet uitgebreide logs aan, laat het probleem nog een keer gebeuren en stuur dan. Zo vinden we de oorzaak veel sneller.",
+        "step1": "Uitgebreide logs staan $minutes minuten aan",
+        "step1Msg": "Daarna gaan ze vanzelf uit",
+        "step2": "Verbind opnieuw en laat het probleem gebeuren",
+        "step2Msg": "Doe precies wat je deed toen het misging",
+        "step2Connected": "Hiddify verbindt zelf opnieuw om te gaan loggen. Doe nu wat eerder misging.",
+        "step3": "Kom hier terug en stuur je rapport",
+        "step3Msg": "Open opnieuw ‘Probleem melden’ en beschrijf wat je zag",
+        "privacy": "IP's, domeinen en sleutels worden verwijderd voordat er iets je apparaat verlaat. Na $minutes minuten wordt er weer normaal gelogd.",
+        "start": "Uitgebreide logs starten",
+        "skip": "Overslaan",
+        "gotIt": "Begrepen",
+        "connect": "Verbinden",
+        "onTitle": "Uitgebreide logs staan aan",
+        "onMsg": "Laat het probleem nu gebeuren. Kom hier terug als je het hebt gezien.",
+        "bannerTitle": "Uitgebreide logs · nog $time",
+        "bannerMsg": "Beschrijf wat er gebeurde en druk op Doorgaan",
+        "stop": "Stoppen",
+        "ended": "Uitgebreide logs gestopt. Stuur het rapport via ‘Probleem melden’."
       }
     },
     "keepTop": {

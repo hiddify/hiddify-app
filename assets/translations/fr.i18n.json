@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Rapport prêt",
         "saveUnencryptedCopy": "Enregistrer une copie non chiffrée"
+      },
+      "trace": {
+        "offerTitle": "Prendre le problème sur le fait",
+        "offerMsg": "Activez les journaux détaillés, refaites apparaître le problème, puis envoyez. Nous trouverons la cause bien plus vite.",
+        "step1": "Les journaux détaillés s’activent pour $minutes minutes",
+        "step1Msg": "Ils se désactivent tout seuls ensuite",
+        "step2": "Connectez-vous à nouveau et reproduisez le problème",
+        "step2Msg": "Faites exactement ce que vous faisiez quand ça a mal tourné",
+        "step2Connected": "Hiddify se reconnecte tout seul pour enregistrer. Refaites maintenant ce qui n’a pas marché.",
+        "step3": "Revenez ici et envoyez votre rapport",
+        "step3Msg": "Ouvrez à nouveau « Signaler un problème » et décrivez ce que vous avez vu",
+        "privacy": "Les IP, domaines et clés sont retirés avant que quoi que ce soit ne quitte votre appareil. Les journaux redeviennent normaux après $minutes minutes.",
+        "start": "Activer les journaux détaillés",
+        "skip": "Passer",
+        "gotIt": "Compris",
+        "connect": "Connecter",
+        "onTitle": "Journaux détaillés activés",
+        "onMsg": "Allez reproduire le problème. Revenez ici une fois que vous l’avez vu.",
+        "bannerTitle": "Journaux détaillés · encore $time",
+        "bannerMsg": "Décrivez ce qui s’est passé et appuyez sur Continuer",
+        "stop": "Arrêter",
+        "ended": "Journaux détaillés terminés. Envoyez le rapport via « Signaler un problème »."
       }
     },
     "keepTop": {

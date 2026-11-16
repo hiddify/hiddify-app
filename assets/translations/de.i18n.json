@@ -1115,6 +1115,28 @@
       "steps": {
         "ready": "Bericht bereit",
         "saveUnencryptedCopy": "Unverschlüsselte Kopie speichern"
+      },
+      "trace": {
+        "offerTitle": "Das Problem auf frischer Tat ertappen",
+        "offerMsg": "Schalte ausführliche Logs ein, lass das Problem noch einmal auftreten und sende dann. So finden wir die Ursache viel schneller.",
+        "step1": "Ausführliche Logs laufen $minutes Minuten lang",
+        "step1Msg": "Danach schalten sie sich selbst ab",
+        "step2": "Verbinde dich erneut und lass das Problem auftreten",
+        "step2Msg": "Mach genau das, was du gemacht hast, als es schiefging",
+        "step2Connected": "Hiddify verbindet sich selbst neu, um mitzuloggen. Mach jetzt, was vorher schiefging.",
+        "step3": "Komm hierher zurück und sende deinen Bericht",
+        "step3Msg": "Öffne erneut „Problem melden“ und beschreibe, was du gesehen hast",
+        "privacy": "IPs, Domains und Schlüssel werden entfernt, bevor etwas dein Gerät verlässt. Nach $minutes Minuten wird wieder normal geloggt.",
+        "start": "Ausführliche Logs starten",
+        "skip": "Überspringen",
+        "gotIt": "Verstanden",
+        "connect": "Verbinden",
+        "onTitle": "Ausführliche Logs sind an",
+        "onMsg": "Lass das Problem jetzt auftreten. Komm zurück, wenn du es gesehen hast.",
+        "bannerTitle": "Ausführliche Logs · noch $time",
+        "bannerMsg": "Beschreibe, was passiert ist, und drücke auf Weiter",
+        "stop": "Stoppen",
+        "ended": "Ausführliche Logs beendet. Sende den Bericht über „Problem melden“."
       }
     },
     "keepTop": {
