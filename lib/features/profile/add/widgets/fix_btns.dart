@@ -18,11 +18,15 @@ const profileFileExtensions = ['txt', 'json', 'yaml', 'yml', 'conf', 'ovpn', 'zi
 
 /// Opens the file picker for a profile file.
 ///
-/// Android filters by MIME type, and file_picker drops every extension Android has no MIME
-/// type for, such as conf and ovpn, which grays out WireGuard and OpenVPN files. There the
-/// picker shows all files; the import reads the content, not the name.
+/// On Android and iOS file_picker turns each extension into a system file type (a MIME type,
+/// a UTI) and drops the ones the system has none for, such as conf and ovpn, which grays out
+/// WireGuard and OpenVPN files. There the picker shows all files; the import reads the
+/// content, not the name.
 Future<FilePickerResult?> pickProfileFile({TargetPlatform? platform}) {
-  final filterByExtension = (platform ?? defaultTargetPlatform) != TargetPlatform.android;
+  final filterByExtension = switch (platform ?? defaultTargetPlatform) {
+    TargetPlatform.android || TargetPlatform.iOS => false,
+    _ => true,
+  };
   return FilePicker.platform.pickFiles(
     type: filterByExtension ? FileType.custom : FileType.any,
     allowedExtensions: filterByExtension ? profileFileExtensions : null,
