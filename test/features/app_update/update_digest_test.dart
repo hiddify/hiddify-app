@@ -158,6 +158,7 @@ class _DownloadClient extends DioHttpClient {
     ({String username, String password})? credentials,
     bool proxyOnly = false,
     ProgressCallback? onReceiveProgress,
+    bool retry = true,
   }) async {
     downloads++;
     final bytes = utf8.encode(payload);

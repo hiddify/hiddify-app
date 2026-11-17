@@ -13,7 +13,7 @@ void main() {
   });
 
   test('a failing profile counts from when its update fell due after the last success', () {
-    final lastSuccess = DateTime(2026, 10, 1);
+    final lastSuccess = DateTime(2026, 10);
     expect(
       ForegroundProfilesUpdateNotifier.failingSince(lastSuccess, const Duration(hours: 12)),
       DateTime(2026, 10, 1, 12),
