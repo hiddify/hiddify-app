@@ -143,7 +143,8 @@
         "failed": "Başarısız",
         "ready": "Hazır",
         "searching": "Aranıyor",
-        "reconnecting": "Yeniden bağlanıyor"
+        "reconnecting": "Yeniden bağlanıyor",
+        "resting": "Uyuyor"
       },
       "signalStyle": "Sinyal stili",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "En hızlı $keep taneyi tut",
         "change": "Sayıyı değiştir",
         "chosen": "Seçtiğiniz $n proxy çalışıyor",
-        "choose": "Seç"
+        "choose": "Seç",
+        "restingShow": "Uyuyan $n proxy'yi göster",
+        "restingHide": "Uyuyan proxy'leri gizle",
+        "restingHint": "Uyuyan proxy yüklenmemiştir. Uyandırmak için birine dokunun: yüklenir ve test edilir. Sabitlemek için uzun basın.",
+        "restingTitle": "$n proxy şekerleme yapıyor",
+        "restingWhy": "Yalnızca en hızlılar uyanık kalır; böylece cihazınız hızlı kalır, pil ve veri tasarrufu sağlanır. Uyandırmak için herhangi birine dokunun.",
+        "fasterElsewhere": "Diğer bölgelerdeki $n proxy daha hızlı",
+        "anyRegion": "Tüm bölgeleri göster",
+        "running": "çalışıyor",
+        "testing": "test ediliyor…",
+        "untested": "test edilecek…",
+        "modeTop": "İlk $keep",
+        "modeWorking": "Yalnızca çalışanlar",
+        "modeChosen": "Seçimleriniz",
+        "onlyAnswer": "İlk $keep · yalnızca $n yanıt veriyor",
+        "working": "çalışıyor",
+        "failing": "çalışmıyor"
       },
       "upload": {
         "test": "Yükleme hızını test et",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "Otomatik güncellemeyi kapat",
         "autoUpdateInterval": "Otomatik güncelleme aralığı",
         "loading": "Profil ekleniyor…",
+        "retrying": "${failed}. deneme başarısız oldu: ${reason}",
+        "retryingNext": "Yeniden deneniyor (${next}/${of})…",
         "adminPreference": "Yönetici izni",
         "adminPreferenceAskEachTime": "Her seferinde sor",
         "adminPreferencePreferAdmin": "Her zaman yönetici izni kullan",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "Yeniden bağlandıktan sonra geçerli olur",
       "buffer": "Arabellek",
       "diagnostics": "Tanılama raporu",
-      "diagnosticsMsg": "Çökme raporları, loglar ve sunucusuz, parolasız ayarlarınız, tek bir zip dosyası olarak"
+      "diagnosticsMsg": "Çökme raporları, loglar ve sunucusuz, parolasız ayarlarınız, tek bir zip dosyası olarak",
+      "fullReport": "Tam rapor"
     },
     "about": {
       "title": "Hakkında",
       "notAvailableMsg": "En son sürümü kullanıyorsunuz",
       "checkForUpdate": "Güncellemeleri kontrol et",
+      "betaUpdates": "Beta güncellemeleri",
+      "betaUpdatesMsg": "Yeni sürümleri herkese sunulmadan önce edinin",
       "openWorkingDir": "Çalışma dizinini aç",
       "sourceCode": "Kaynak kodu",
       "telegramChannel": "Telegram kanalı",
       "termsAndConditions": "Şartlar ve koşullar",
-      "privacyPolicy": "Gizlilik politikası"
+      "privacyPolicy": "Gizlilik politikası",
+      "reportProblem": "Sorun bildir",
+      "reportProblemMsg": "Logları ve uygulama durumunu geliştiricilere gönderin"
     },
     "settings": {
       "title": "Ayarlar",
@@ -927,6 +951,7 @@
       "msg": "@:common.appTitle'ın yeni bir sürümü mevcut. Şimdi güncellensin mi?",
       "currentVersion": "Mevcut sürüm",
       "newVersion": "Yeni sürüm",
+      "changelog": "Yenilikler",
       "updateNow": "Şimdi güncelle",
       "downloading": "İndiriliyor…",
       "installing": "Yükleyici başlatılıyor…",
@@ -1078,7 +1103,9 @@
       "server": "Sunucu",
       "country": "Ülke",
       "tapToTest": "Test için dokunun",
-      "error": "Neden başarısız oldu"
+      "error": "Neden başarısız oldu",
+      "keepLoaded": "Proxy'yi sabitle",
+      "keepLoadedBody": "Pingi ne olursa olsun, en hızlıların yanında yüklü ve test edilmiş kalır."
     },
     "windowClosing": {
       "askEachTime": "Her seferinde sor",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "Günlükler şifrelenmedi",
       "title": "Hiddify geçen sefer çöktü",
       "msg": "Düzeltebilmemiz için rapor gönderin. Günlükler de eklenir.",
+      "sendHiddify": "Hiddify'a gönder",
+      "sendHiddifyMsg": "Uygulama raporu kendisi yükler",
+      "sent": "Rapor gönderildi. Teşekkürler!",
+      "sendFailed": "Rapor gönderilemedi. Bunun yerine e-posta veya Telegram'ı deneyin.",
+      "subject": "Hiddify çökme raporu",
+      "problemTitle": "Sorun bildir",
       "problemMsg": "Neyin ters gittiğini anlatın. Günlükler de eklenir.",
-      "send": "Raporu gönder",
+      "description": "Ne oldu? (isteğe bağlı)",
+      "descriptionHint": "Ne yaptınız, ne bekliyordunuz, bunun yerine ne gördünüz",
+      "problemSubject": "Hiddify sorun raporu",
+      "back": "Geri",
+      "chooseHow": "Nasıl göndermek istersiniz?",
       "steps": {
+        "preparing": "Günlükler ve ayarlar toplanıyor…",
+        "prepareFailed": "Rapor hazırlanamadı. Geri dönüp tekrar deneyin.",
+        "uploading": "Yükleniyor…",
+        "save": "Raporu kaydedin",
+        "saveDesktopMsg": "Nerede saklayacağınızı seçin",
+        "saveMobileMsg": "Menüden Save to Files veya Downloads'u seçin",
+        "openBot": "Destek botunu açıp Start'a dokunun",
+        "openBotButton": "Botu aç",
+        "openMail": "E-posta uygulamanızı açın",
+        "openMailMsg": "Konusu doldurulmuş, $address adresine yeni bir ileti",
+        "openMailButton": "E-postayı aç",
+        "attachSend": "Raporu yeni iletiye ekleyip gönderin",
+        "openGithub": "Yeni bir GitHub issue açın",
+        "openGithubMsg": "GitHub'da oturum açın. Açıklamanız, platform, sürüm ve sisteminiz doldurulmuş durumda.",
+        "openGithubButton": "GitHub'ı aç",
+        "dropInIssue": "Raporu ekleyip Create'e basın",
+        "telegramPrivate": "Gizli: raporu yalnızca Hiddify destek ekibi görür.",
+        "emailPrivate": "Gizli: raporu yalnızca Hiddify ekibi okur.",
+        "attachInChat": "Raporu bot sohbetine ekleyip gönderin",
+        "attachHow": "Dosyayı içeri sürükleyin ya da ataş simgesini kullanın",
+        "dropInIssueHow": "Dosyayı Additional Context alanına sürükleyin ya da o kutunun altındaki çubuğa dokunun",
         "ready": "Rapor hazır",
         "saveUnencryptedCopy": "Şifrelenmemiş kopyayı kaydet"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "Ne olduğunu anlatın ve Devam et'e basın",
         "stop": "Durdur",
         "ended": "Ayrıntılı günlükler bitti. Raporu “Sorun bildir” üzerinden gönderin."
-      }
+      },
+      "send": "Raporu gönder"
     },
     "keepTop": {
       "title": "Büyük bir abonelik",
@@ -1292,6 +1351,140 @@
       "invalidUrl": "Geçersiz URL",
       "canceledByUser": "Kullanıcı tarafından iptal edildi"
     },
+    "download": {
+      "details": "Ayrıntılar",
+      "errorCode": "Hata kodu",
+      "technicalDetails": "Teknik ayrıntılar",
+      "whatToTry": "Deneyebilecekleriniz",
+      "copyDetails": "Ayrıntıları kopyala",
+      "side": {
+        "provider": "VPN sağlayıcının sunucusu",
+        "subscription": "Aboneliğiniz",
+        "network": "Bağlantınız",
+        "unknown": "Bilinmeyen neden"
+      },
+      "path": {
+        "title": "Nerede durdu",
+        "device": "Cihazınız",
+        "internet": "İnternet",
+        "provider": "VPN sağlayıcı"
+      },
+      "serverError": {
+        "title": "VPN sağlayıcının sunucusunda bir sorun var",
+        "why": "VPN sağlayıcınızın sunucusu bir hatayla yanıt verdi (kod $code). Cihazınızda ve uygulamada sorun yok.",
+        "tips": [
+          "Birkaç dakika sonra tekrar deneyin",
+          "Sorun devam ederse VPN sağlayıcınızla iletişime geçin"
+        ]
+      },
+      "notFound": {
+        "title": "Abonelik bulunamadı",
+        "why": "Bu bağlantıda abonelik yok.",
+        "tips": [
+          "Bağlantının tamamını kopyaladığınızdan emin olun",
+          "VPN sağlayıcınızdan yeni bir bağlantı isteyin: abonelik kaldırılmış olabilir"
+        ]
+      },
+      "denied": {
+        "title": "VPN sağlayıcı bu bağlantıyı reddetti",
+        "why": "VPN sağlayıcının sunucusu bu aboneliği kabul etmedi.",
+        "tips": [
+          "Aboneliğinizin süresi dolmuş, kapatılmış veya verisi bitmiş olabilir",
+          "Kontrol etmek veya yenilemek için VPN sağlayıcınızla iletişime geçin"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Çok fazla deneme",
+        "why": "VPN sağlayıcının sunucusu sizden çok fazla istek alıyor.",
+        "tips": [
+          "Birkaç dakika bekleyip tekrar deneyin"
+        ]
+      },
+      "badStatus": {
+        "title": "Sunucu bir hatayla yanıt verdi",
+        "why": "VPN sağlayıcının sunucusu beklenmeyen bir hatayla yanıt verdi (kod $code).",
+        "tips": [
+          "Bağlantıyı kontrol edin",
+          "VPN sağlayıcınızla iletişime geçin"
+        ]
+      },
+      "tooLarge": {
+        "title": "Abonelik çok büyük",
+        "why": "Sunucu, uygulamanın okuyabileceğinden fazla veri gönderdi.",
+        "tips": [
+          "Bunun bir abonelik bağlantısı olduğundan emin olun",
+          "VPN sağlayıcınızla iletişime geçin"
+        ]
+      },
+      "noInternet": {
+        "title": "İnternet bağlantısı yok",
+        "why": "Cihazınız internete bağlı değil.",
+        "tips": [
+          "Wi-Fi veya mobil verinizi kontrol edin",
+          "Uçak modunun kapalı olduğundan emin olun"
+        ]
+      },
+      "dns": {
+        "title": "Sunucu adresi bulunamadı",
+        "why": "Sunucunun adı bulunamadı.",
+        "tips": [
+          "Bağlantıda yazım hatası olup olmadığını kontrol edin",
+          "Ağınız bu adresi engelliyor olabilir: başka bir ağ deneyin, örneğin Wi-Fi yerine mobil veri",
+          "VPN sağlayıcınızdan başka bir bağlantı isteyin"
+        ]
+      },
+      "certificate": {
+        "title": "Sunucunun sertifikasına güvenilmiyor",
+        "why": "Sunucunun güvenlik sertifikası geçerli değil veya ağınızdaki bir şey bağlantıyı araya girerek dinliyor.",
+        "tips": [
+          "Cihazınızın tarih ve saatinin doğru olduğundan emin olun",
+          "Başka bir ağ deneyin",
+          "VPN sağlayıcınızla iletişime geçin"
+        ]
+      },
+      "reset": {
+        "title": "Bağlantı kesildi, muhtemelen engellendi",
+        "why": "Sunucuyla bağlantı kurulurken kesildi. Bu genellikle ağınızın veya internet sağlayıcınızın bu sunucuyu engellediği anlamına gelir.",
+        "tips": [
+          "Ağınız bu adresi engelliyor olabilir: başka bir ağ deneyin, örneğin Wi-Fi yerine mobil veri",
+          "VPN sağlayıcınızdan başka bir bağlantı isteyin"
+        ]
+      },
+      "tls": {
+        "title": "Güvenli bağlantı kurulamadı",
+        "why": "Sunucuyla güvenli bir bağlantı kurulamadı. Ağınız bunu engelliyor olabilir.",
+        "tips": [
+          "Başka bir ağ deneyin",
+          "VPN sağlayıcınızdan başka bir bağlantı isteyin"
+        ]
+      },
+      "refused": {
+        "title": "Sunucu bağlantıyı reddetti",
+        "why": "Sunucu bağlantı kabul etmiyor. Kapalı olabilir veya bağlantı yanlış olabilir.",
+        "tips": [
+          "Daha sonra tekrar deneyin",
+          "Bağlantıyı kontrol edin",
+          "VPN sağlayıcınızla iletişime geçin"
+        ]
+      },
+      "timeout": {
+        "title": "Sunucu yanıt vermedi",
+        "why": "Sunucu zamanında yanıt vermedi. Kapalı olabilir veya ağınız onu engelliyor olabilir.",
+        "tips": [
+          "Tekrar deneyin",
+          "Ağınız bu adresi engelliyor olabilir: başka bir ağ deneyin, örneğin Wi-Fi yerine mobil veri",
+          "VPN sağlayıcınızla iletişime geçin"
+        ]
+      },
+      "unknown": {
+        "title": "Abonelik indirilemedi",
+        "why": "Abonelik indirilirken bir sorun oluştu.",
+        "tips": [
+          "İnternet bağlantınızı ve bağlantıyı kontrol edip tekrar deneyin",
+          "Hâlâ başarısız olursa ayrıntıları kopyalayıp VPN sağlayıcınıza gönderin"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "Beklenmeyen hata",
       "missingVpnPermission": "VPN izni eksik",
@@ -1305,7 +1498,8 @@
       "tunAddressInUse": "Başka bir VPN etkin",
       "tunAddressInUseMsg": "VPN modu başlatılamıyor. Diğer VPN'i kapatın veya servis modunu değiştirin.",
       "invalidConfigOptions": "Geçersiz yapılandırma seçenekleri",
-      "invalidConfig": "Geçersiz yapılandırma"
+      "invalidConfig": "Geçersiz yapılandırma",
+      "missingConfig": "Bu profilin yapılandırması eksik. Profili güncelleyin veya yeniden ekleyin."
     },
     "warp": {
       "missingLicense": "WARP lisansı gerekli",

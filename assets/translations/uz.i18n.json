@@ -143,7 +143,8 @@
         "failed": "Muvaffaqiyatsiz",
         "ready": "Tayyor",
         "searching": "Qidirilmoqda",
-        "reconnecting": "Qayta ulanmoqda"
+        "reconnecting": "Qayta ulanmoqda",
+        "resting": "Uxlayapti"
       },
       "signalStyle": "Signal uslubi",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "Eng tez $keep tasini qoldirish",
         "change": "Sonini o‘zgartirish",
         "chosen": "Siz tanlagan $n ta proksi ishlamoqda",
-        "choose": "Tanlash"
+        "choose": "Tanlash",
+        "restingShow": "Uxlayotgan $n ta proksini ko‘rsatish",
+        "restingHide": "Uxlayotgan proksilarni yashirish",
+        "restingHint": "Uxlayotgan proksi yuklanmagan. Uyg‘otish uchun bosing: u yuklanadi va tekshiriladi. Mahkamlash uchun uzoq bosib turing.",
+        "restingTitle": "$n ta proksi mudrayapti",
+        "restingWhy": "Faqat eng tezlari uyg‘oq qoladi, shunda qurilmangiz tez ishlaydi, batareya va trafik tejaladi. Uyg‘otish uchun istalganini bosing.",
+        "fasterElsewhere": "Boshqa hududlardagi $n ta proksi tezroq",
+        "anyRegion": "Barcha hududlarni ko‘rsatish",
+        "running": "ishlayapti",
+        "testing": "tekshirilmoqda…",
+        "untested": "tekshirilishi kerak…",
+        "modeTop": "Eng tez $keep ta",
+        "modeWorking": "Faqat ishlaydiganlar",
+        "modeChosen": "Siz tanlaganlar",
+        "onlyAnswer": "Eng tez $keep ta · faqat $n tasi javob beradi",
+        "working": "ishlaydi",
+        "failing": "ishlamaydi"
       },
       "upload": {
         "test": "Yuborish tezligini tekshirish",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "Avtomatik yangilashni o‘chirib qo‘yish",
         "autoUpdateInterval": "Avtomatik yangilash oralig‘i",
         "loading": "Profil qo‘shilmoqda…",
+        "retrying": "${failed}-urinish amalga oshmadi: ${reason}",
+        "retryingNext": "Qayta urinilmoqda (${next}/${of})…",
         "adminPreference": "Administrator ruxsati",
         "adminPreferenceAskEachTime": "Har safar so‘rash",
         "adminPreferencePreferAdmin": "Doim administrator ruxsatidan foydalanish",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "Qayta ulangandan keyin kuchga kiradi",
       "buffer": "Bufer",
       "diagnostics": "Diagnostika hisoboti",
-      "diagnosticsMsg": "Ishdan chiqish hisobotlari, jurnallar va serverlar hamda parollarsiz sozlamalaringiz, bitta zip faylda"
+      "diagnosticsMsg": "Ishdan chiqish hisobotlari, jurnallar va serverlar hamda parollarsiz sozlamalaringiz, bitta zip faylda",
+      "fullReport": "To‘liq hisobot"
     },
     "about": {
       "title": "Ilova haqida",
       "notAvailableMsg": "Siz eng so‘nggi versiyadan foydalanyapsiz",
       "checkForUpdate": "Yangilanishni tekshirish",
+      "betaUpdates": "Beta yangilanishlar",
+      "betaUpdatesMsg": "Yangi versiyalarni hamma uchun chiqarilishidan oldin oling",
       "openWorkingDir": "Ishchi jildni ochish",
       "sourceCode": "Manba kodi",
       "telegramChannel": "Telegram kanali",
       "termsAndConditions": "Foydalanish shartlari",
-      "privacyPolicy": "Maxfiylik siyosati"
+      "privacyPolicy": "Maxfiylik siyosati",
+      "reportProblem": "Muammo haqida xabar berish",
+      "reportProblemMsg": "Jurnallar va ilova holatini dasturchilarga yuboring"
     },
     "settings": {
       "title": "Sozlamalar",
@@ -927,6 +951,7 @@
       "msg": "@:common.appTitle ilovasining yangi versiyasi mavjud. Hozir yangilaysizmi?",
       "currentVersion": "Joriy versiya",
       "newVersion": "Yangi versiya",
+      "changelog": "Yangiliklar",
       "updateNow": "Hozir yangilash",
       "downloading": "Yuklab olinmoqda…",
       "installing": "O‘rnatuvchi ishga tushmoqda…",
@@ -1078,7 +1103,9 @@
       "server": "Server",
       "country": "Davlat",
       "tapToTest": "Tekshirish uchun bosing",
-      "error": "Nega muvaffaqiyatsiz bo‘ldi"
+      "error": "Nega muvaffaqiyatsiz bo‘ldi",
+      "keepLoaded": "Proksini mahkamlash",
+      "keepLoadedBody": "Pingi qanday bo‘lishidan qat’i nazar, u eng tezlar yonida yuklangan va tekshirilgan holda qoladi."
     },
     "windowClosing": {
       "askEachTime": "Har safar so‘rash",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "Loglar shifrlanmagan",
       "title": "Hiddify oxirgi safar ishdan chiqdi",
       "msg": "Tuzatishimiz uchun hisobot yuboring. Loglar ham qoʻshiladi.",
+      "sendHiddify": "Hiddify'ga yuborish",
+      "sendHiddifyMsg": "Ilova hisobotni oʻzi yuklaydi",
+      "sent": "Hisobot yuborildi. Rahmat!",
+      "sendFailed": "Hisobotni yuborib boʻlmadi. Uning oʻrniga email yoki Telegram'ni sinab koʻring.",
+      "subject": "Hiddify ishdan chiqish hisoboti",
+      "problemTitle": "Muammo haqida xabar berish",
       "problemMsg": "Nima notoʻgʻri ketganini ayting. Loglar ham qoʻshiladi.",
-      "send": "Hisobotni yuborish",
+      "description": "Nima boʻldi? (ixtiyoriy)",
+      "descriptionHint": "Nima qildingiz, nimani kutgandingiz, uning oʻrniga nimani koʻrdingiz",
+      "problemSubject": "Hiddify muammo hisoboti",
+      "back": "Orqaga",
+      "chooseHow": "Qanday yubormoqchisiz?",
       "steps": {
+        "preparing": "Loglar va sozlamalar yigʻilmoqda…",
+        "prepareFailed": "Hisobotni tayyorlab boʻlmadi. Orqaga qaytib, qayta urinib koʻring.",
+        "uploading": "Yuklanmoqda…",
+        "save": "Hisobotni saqlang",
+        "saveDesktopMsg": "Qayerda saqlashni tanlang",
+        "saveMobileMsg": "Menyudan Save to Files yoki Downloads ni tanlang",
+        "openBot": "Yordam botini ochib, Start ni bosing",
+        "openBotButton": "Botni ochish",
+        "openMail": "Email ilovangizni oching",
+        "openMailMsg": "Mavzusi toʻldirilgan, $address manziliga yangi xat",
+        "openMailButton": "Emailni ochish",
+        "attachSend": "Hisobotni yangi xatga biriktirib, yuboring",
+        "openGithub": "GitHub'da yangi issue oching",
+        "openGithubMsg": "GitHub'ga kiring. Tavsifingiz, platforma, versiya va tizim maʼlumotlari toʻldirilgan.",
+        "openGithubButton": "GitHub'ni ochish",
+        "dropInIssue": "Hisobotni biriktirib, Create ni bosing",
+        "telegramPrivate": "Maxfiy: hisobotni faqat Hiddify yordam jamoasi koʻradi.",
+        "emailPrivate": "Maxfiy: hisobotni faqat Hiddify jamoasi oʻqiydi.",
+        "attachInChat": "Hisobotni bot chatiga biriktirib, yuboring",
+        "attachHow": "Faylni ichiga torting yoki skrepka belgisidan foydalaning",
+        "dropInIssueHow": "Faylni Additional Context maydoniga torting yoki shu maydon ostidagi chiziqni bosing",
         "ready": "Hisobot tayyor",
         "saveUnencryptedCopy": "Shifrlanmagan nusxani saqlash"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "Nima boʻlganini yozing va «Davom etish»ni bosing",
         "stop": "Toʻxtatish",
         "ended": "Batafsil loglar tugadi. Hisobotni «Muammo haqida xabar berish» orqali yuboring."
-      }
+      },
+      "send": "Hisobotni yuborish"
     },
     "keepTop": {
       "title": "Katta obuna",
@@ -1230,6 +1289,11 @@
       "wipeData": "Ma’lumotlarni tozalash",
       "wipeConfirm": "Saqlangan ma’lumotlar tozalanadi va Hiddify qaytadan boshlanadi. O‘qib bo‘ladigan profillar qayta qo‘shiladi; qolganini tiklab bo‘lmaydi.",
       "copyError": "Xatoni nusxalash"
+    },
+    "telegramChannel": {
+      "title": "Telegram’da Hiddify’ga qo‘shiling",
+      "msg": "Yangiliklar, yangi versiyalar va aloqada qolish bo‘yicha maslahatlar uchun Hiddify’ning rasmiy kanaliga obuna bo‘ling.",
+      "join": "Kanalga qo‘shilish"
     }
   },
   "connection": {
@@ -1287,6 +1351,140 @@
       "invalidUrl": "URL noto‘g‘ri",
       "canceledByUser": "Foydalanuvchi bekor qildi"
     },
+    "download": {
+      "details": "Tafsilotlar",
+      "errorCode": "Xato kodi",
+      "technicalDetails": "Texnik tafsilotlar",
+      "whatToTry": "Nimalarni sinab ko‘rish mumkin",
+      "copyDetails": "Tafsilotlarni nusxalash",
+      "side": {
+        "provider": "VPN provayder serveri",
+        "subscription": "Obunangiz",
+        "network": "Ulanishingiz",
+        "unknown": "Sabab noma’lum"
+      },
+      "path": {
+        "title": "Qayerda to‘xtadi",
+        "device": "Qurilmangiz",
+        "internet": "Internet",
+        "provider": "VPN provayder"
+      },
+      "serverError": {
+        "title": "VPN provayder serverida muammo bor",
+        "why": "VPN provayderingiz serveri xato bilan javob berdi (kod $code). Qurilmangiz va ilova joyida.",
+        "tips": [
+          "Bir necha daqiqadan keyin qayta urinib ko‘ring",
+          "Takrorlansa, VPN provayderingizga murojaat qiling"
+        ]
+      },
+      "notFound": {
+        "title": "Obuna topilmadi",
+        "why": "Bu havolada obuna yo‘q.",
+        "tips": [
+          "Havolani to‘liq nusxalaganingizni tekshiring",
+          "VPN provayderingizdan yangi havola so‘rang: obuna o‘chirilgan bo‘lishi mumkin"
+        ]
+      },
+      "denied": {
+        "title": "VPN provayder bu havolani rad etdi",
+        "why": "VPN provayder serveri bu obunani qabul qilmadi.",
+        "tips": [
+          "Obunangiz muddati tugagan, o‘chirilgan yoki trafigi tugagan bo‘lishi mumkin",
+          "Tekshirish yoki yangilash uchun VPN provayderingizga murojaat qiling"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Juda ko‘p urinish",
+        "why": "VPN provayder serveri sizdan juda ko‘p so‘rov olyapti.",
+        "tips": [
+          "Bir necha daqiqa kuting, so‘ng qayta urinib ko‘ring"
+        ]
+      },
+      "badStatus": {
+        "title": "Server xato bilan javob berdi",
+        "why": "VPN provayder serveri kutilmagan xato bilan javob berdi (kod $code).",
+        "tips": [
+          "Havolani tekshiring",
+          "VPN provayderingizga murojaat qiling"
+        ]
+      },
+      "tooLarge": {
+        "title": "Obuna juda katta",
+        "why": "Server ilova o‘qiy oladigandan ko‘proq ma’lumot yubordi.",
+        "tips": [
+          "Bu obuna havolasi ekanini tekshiring",
+          "VPN provayderingiz bilan bog‘laning"
+        ]
+      },
+      "noInternet": {
+        "title": "Internet aloqasi yo‘q",
+        "why": "Qurilmangiz internetga ulanmagan.",
+        "tips": [
+          "Wi-Fi yoki mobil internetni tekshiring",
+          "Parvoz rejimi o‘chiq ekanini tekshiring"
+        ]
+      },
+      "dns": {
+        "title": "Server manzili topilmadi",
+        "why": "Server nomi topilmadi.",
+        "tips": [
+          "Havolada xatolar yo‘qligini tekshiring",
+          "Tarmog‘ingiz bu manzilni bloklayotgan bo‘lishi mumkin: boshqa tarmoqni sinab ko‘ring, masalan, Wi-Fi o‘rniga mobil internet",
+          "VPN provayderingizdan boshqa havola so‘rang"
+        ]
+      },
+      "certificate": {
+        "title": "Server sertifikatiga ishonib bo‘lmaydi",
+        "why": "Serverning xavfsizlik sertifikati yaroqsiz yoki tarmog‘ingizdagi nimadir ulanishni to‘sib qo‘ymoqda.",
+        "tips": [
+          "Qurilmangizdagi sana va vaqt to‘g‘riligini tekshiring",
+          "Boshqa tarmoqni sinab ko‘ring",
+          "VPN provayderingiz bilan bog‘laning"
+        ]
+      },
+      "reset": {
+        "title": "Ulanish uzildi, ehtimol filtrlangan",
+        "why": "Server bilan ulanish o‘rnatilayotganda uzildi. Bu odatda tarmog‘ingiz yoki internet provayderingiz bu serverni filtrlayotganini bildiradi.",
+        "tips": [
+          "Tarmog‘ingiz bu manzilni bloklayotgan bo‘lishi mumkin: boshqa tarmoqni sinab ko‘ring, masalan, Wi-Fi o‘rniga mobil internet",
+          "VPN provayderingizdan boshqa havola so‘rang"
+        ]
+      },
+      "tls": {
+        "title": "Xavfsiz ulanish o‘rnatilmadi",
+        "why": "Server bilan xavfsiz ulanish o‘rnatib bo‘lmadi. Tarmog‘ingiz uni filtrlayotgan bo‘lishi mumkin.",
+        "tips": [
+          "Boshqa tarmoqni sinab ko‘ring",
+          "VPN provayderingizdan boshqa havola so‘rang"
+        ]
+      },
+      "refused": {
+        "title": "Server ulanishni rad etdi",
+        "why": "Server ulanishlarni qabul qilmayapti. U o‘chiq bo‘lishi yoki havola noto‘g‘ri bo‘lishi mumkin.",
+        "tips": [
+          "Keyinroq qayta urinib ko‘ring",
+          "Havolani tekshiring",
+          "VPN provayderingiz bilan bog‘laning"
+        ]
+      },
+      "timeout": {
+        "title": "Server javob bermadi",
+        "why": "Server o‘z vaqtida javob bermadi. U o‘chiq bo‘lishi yoki tarmog‘ingiz uni bloklayotgan bo‘lishi mumkin.",
+        "tips": [
+          "Qayta urinib ko‘ring",
+          "Tarmog‘ingiz bu manzilni bloklayotgan bo‘lishi mumkin: boshqa tarmoqni sinab ko‘ring, masalan, Wi-Fi o‘rniga mobil internet",
+          "VPN provayderingiz bilan bog‘laning"
+        ]
+      },
+      "unknown": {
+        "title": "Obunani yuklab bo‘lmadi",
+        "why": "Obunani yuklashda xatolik yuz berdi.",
+        "tips": [
+          "Internet aloqasi va havolani tekshirib, qayta urinib ko‘ring",
+          "Baribir bo‘lmasa, tafsilotlarni nusxalab VPN provayderingizga yuboring"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "Kutilmagan nosozlik",
       "missingVpnPermission": "VPN ruxsati yo‘q",
@@ -1300,7 +1498,8 @@
       "tunAddressInUse": "Boshqa VPN faol",
       "tunAddressInUseMsg": "VPN rejimi ishga tushmadi. Boshqa VPN’ni o‘chiring yoki xizmat rejimini o‘zgartiring.",
       "invalidConfigOptions": "Konfiguratsiya sozlamalari noto‘g‘ri",
-      "invalidConfig": "Konfiguratsiya noto‘g‘ri"
+      "invalidConfig": "Konfiguratsiya noto‘g‘ri",
+      "missingConfig": "Bu profilning konfiguratsiyasi topilmadi. Profilni yangilang yoki qayta qo‘shing."
     },
     "warp": {
       "missingLicense": "WARP litsenziyasi kerak",

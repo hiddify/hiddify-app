@@ -143,7 +143,8 @@
         "failed": "실패",
         "ready": "준비됨",
         "searching": "검색 중",
-        "reconnecting": "다시 연결 중"
+        "reconnecting": "다시 연결 중",
+        "resting": "잠든 상태"
       },
       "signalStyle": "신호 표시 스타일",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "가장 빠른 $keep개만 유지",
         "change": "개수 변경",
         "chosen": "선택한 프록시 $n개가 실행 중입니다",
-        "choose": "선택"
+        "choose": "선택",
+        "restingShow": "잠든 프록시 ${n}개 보기",
+        "restingHide": "잠든 프록시 숨기기",
+        "restingHint": "잠든 프록시는 로드되지 않습니다. 탭하면 깨워서 로드하고 테스트합니다. 길게 누르면 고정됩니다.",
+        "restingTitle": "프록시 ${n}개가 낮잠 중이에요",
+        "restingWhy": "가장 빠른 프록시만 깨어 있어서 기기가 빠르게 유지되고 배터리와 데이터도 절약됩니다. 아무 프록시나 탭하면 깨울 수 있어요.",
+        "fasterElsewhere": "다른 지역의 프록시 ${n}개가 더 빠릅니다",
+        "anyRegion": "모든 지역 보기",
+        "running": "실행 중",
+        "testing": "테스트 중…",
+        "untested": "테스트 대기 중…",
+        "modeTop": "상위 ${keep}개",
+        "modeWorking": "작동하는 것만",
+        "modeChosen": "내가 고른 것",
+        "onlyAnswer": "상위 ${keep}개 · ${n}개만 응답",
+        "working": "작동 중",
+        "failing": "작동 안 함"
       },
       "upload": {
         "test": "업로드 속도 테스트",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "자동 업데이트 끄기",
         "autoUpdateInterval": "자동 업데이트 간격",
         "loading": "프로필 추가 중…",
+        "retrying": "${failed}번째 시도가 실패했습니다: ${reason}",
+        "retryingNext": "다시 시도하는 중 (${next}/${of})…",
         "adminPreference": "관리자 권한",
         "adminPreferenceAskEachTime": "매번 묻기",
         "adminPreferencePreferAdmin": "항상 관리자 권한 사용",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "다시 연결한 뒤 적용됩니다",
       "buffer": "버퍼",
       "diagnostics": "진단 보고서",
-      "diagnosticsMsg": "충돌 보고서, 로그, 서버와 비밀번호를 제외한 설정을 하나의 zip으로"
+      "diagnosticsMsg": "충돌 보고서, 로그, 서버와 비밀번호를 제외한 설정을 하나의 zip으로",
+      "fullReport": "전체 보고서"
     },
     "about": {
       "title": "정보",
       "notAvailableMsg": "최신 버전을 사용 중입니다",
       "checkForUpdate": "업데이트 확인",
+      "betaUpdates": "베타 업데이트",
+      "betaUpdatesMsg": "모든 사용자에게 출시되기 전에 새 버전을 받아 보세요",
       "openWorkingDir": "작업 폴더 열기",
       "sourceCode": "소스 코드",
       "telegramChannel": "Telegram 채널",
       "termsAndConditions": "이용 약관",
-      "privacyPolicy": "개인정보 처리방침"
+      "privacyPolicy": "개인정보 처리방침",
+      "reportProblem": "문제 신고",
+      "reportProblemMsg": "로그와 앱 상태를 개발자에게 보내세요"
     },
     "settings": {
       "title": "설정",
@@ -927,6 +951,7 @@
       "msg": "@:common.appTitle의 새 버전이 있습니다. 지금 업데이트할까요?",
       "currentVersion": "현재 버전",
       "newVersion": "새 버전",
+      "changelog": "새로운 기능",
       "updateNow": "지금 업데이트",
       "downloading": "다운로드 중…",
       "installing": "설치 프로그램 시작 중…",
@@ -1078,7 +1103,9 @@
       "server": "서버",
       "country": "국가",
       "tapToTest": "탭하여 테스트",
-      "error": "실패 이유"
+      "error": "실패 이유",
+      "keepLoaded": "프록시 고정",
+      "keepLoadedBody": "핑과 상관없이 가장 빠른 프록시와 함께 로드된 채 테스트됩니다."
     },
     "windowClosing": {
       "askEachTime": "매번 묻기",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "로그가 암호화되지 않았습니다",
       "title": "지난번에 Hiddify가 충돌했습니다",
       "msg": "고칠 수 있도록 보고서를 보내 주세요. 로그가 함께 전송됩니다.",
+      "sendHiddify": "Hiddify로 보내기",
+      "sendHiddifyMsg": "앱이 보고서를 직접 업로드합니다",
+      "sent": "보고서를 보냈습니다. 감사합니다!",
+      "sendFailed": "보고서를 보내지 못했습니다. 대신 이메일이나 Telegram을 이용해 보세요.",
+      "subject": "Hiddify 충돌 보고서",
+      "problemTitle": "문제 신고",
       "problemMsg": "무엇이 잘못됐는지 알려 주세요. 로그가 함께 전송됩니다.",
-      "send": "보고서 보내기",
+      "description": "무슨 일이 있었나요? (선택)",
+      "descriptionHint": "무엇을 했는지, 무엇을 기대했는지, 대신 무엇을 봤는지",
+      "problemSubject": "Hiddify 문제 보고서",
+      "back": "뒤로",
+      "chooseHow": "어떻게 보내시겠어요?",
       "steps": {
+        "preparing": "로그와 설정을 수집하는 중…",
+        "prepareFailed": "보고서를 준비하지 못했습니다. 뒤로 가서 다시 시도해 주세요.",
+        "uploading": "업로드 중…",
+        "save": "보고서 저장",
+        "saveDesktopMsg": "보관할 위치를 선택하세요",
+        "saveMobileMsg": "메뉴에서 Save to Files 또는 Downloads를 선택하세요",
+        "openBot": "지원 봇을 열고 Start를 누르세요",
+        "openBotButton": "봇 열기",
+        "openMail": "메일 앱을 여세요",
+        "openMailMsg": "제목이 입력된 $address 앞 새 메시지",
+        "openMailButton": "메일 열기",
+        "attachSend": "새 메시지에 보고서를 첨부해서 보내세요",
+        "openGithub": "새 GitHub issue를 여세요",
+        "openGithubMsg": "GitHub에 로그인하세요. 설명, 플랫폼, 버전, 시스템 정보가 미리 입력되어 있습니다.",
+        "openGithubButton": "GitHub 열기",
+        "dropInIssue": "보고서를 첨부하고 Create를 누르세요",
+        "telegramPrivate": "비공개: Hiddify 지원팀만 보고서를 봅니다.",
+        "emailPrivate": "비공개: Hiddify 팀만 보고서를 읽습니다.",
+        "attachInChat": "봇 채팅에 보고서를 첨부해서 보내세요",
+        "attachHow": "파일을 끌어다 놓거나 클립 아이콘을 사용하세요",
+        "dropInIssueHow": "파일을 Additional Context에 끌어다 놓거나 그 입력란 아래의 막대를 누르세요",
         "ready": "보고서 준비됨",
         "saveUnencryptedCopy": "암호화되지 않은 사본 저장"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "무슨 일이 있었는지 적고 계속을 누르세요",
         "stop": "중지",
         "ended": "상세 로그가 끝났습니다. ‘문제 신고’에서 보고서를 보내 주세요."
-      }
+      },
+      "send": "보고서 보내기"
     },
     "keepTop": {
       "title": "큰 구독",
@@ -1230,6 +1289,11 @@
       "wipeData": "데이터 지우기",
       "wipeConfirm": "저장된 데이터를 지우고 Hiddify를 다시 시작합니다. 아직 읽을 수 있는 프로필은 다시 추가되지만, 나머지는 복구할 수 없습니다.",
       "copyError": "오류 복사"
+    },
+    "telegramChannel": {
+      "title": "Telegram에서 Hiddify에 참여하세요",
+      "msg": "소식, 새 릴리스, 연결을 유지하는 팁을 받으려면 Hiddify 공식 채널을 팔로우하세요.",
+      "join": "채널 참여"
     }
   },
   "connection": {
@@ -1287,6 +1351,140 @@
       "invalidUrl": "잘못된 URL",
       "canceledByUser": "사용자가 취소함"
     },
+    "download": {
+      "details": "세부 정보",
+      "errorCode": "오류 코드",
+      "technicalDetails": "기술 세부 정보",
+      "whatToTry": "시도해 볼 수 있는 방법",
+      "copyDetails": "세부 정보 복사",
+      "side": {
+        "provider": "VPN 제공자의 서버",
+        "subscription": "내 구독",
+        "network": "내 연결",
+        "unknown": "원인 불명"
+      },
+      "path": {
+        "title": "어디서 멈췄나요",
+        "device": "내 기기",
+        "internet": "인터넷",
+        "provider": "VPN 제공자"
+      },
+      "serverError": {
+        "title": "VPN 제공자의 서버에 문제가 있습니다",
+        "why": "VPN 제공자의 서버가 오류로 응답했습니다(코드 $code). 기기와 앱은 정상입니다.",
+        "tips": [
+          "몇 분 뒤에 다시 시도하세요",
+          "계속 발생하면 VPN 제공자에게 문의하세요"
+        ]
+      },
+      "notFound": {
+        "title": "구독을 찾을 수 없습니다",
+        "why": "이 링크에는 구독이 없습니다.",
+        "tips": [
+          "링크 전체를 복사했는지 확인하세요",
+          "VPN 제공자에게 새 링크를 요청하세요. 구독이 삭제되었을 수 있습니다"
+        ]
+      },
+      "denied": {
+        "title": "VPN 제공자가 이 링크를 거부했습니다",
+        "why": "VPN 제공자의 서버가 이 구독을 받아들이지 않았습니다.",
+        "tips": [
+          "구독이 만료되었거나, 꺼졌거나, 데이터를 모두 썼을 수 있습니다",
+          "확인하거나 갱신하려면 VPN 제공자에게 문의하세요"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "시도 횟수가 너무 많습니다",
+        "why": "VPN 제공자의 서버가 내 요청을 너무 많이 받고 있습니다.",
+        "tips": [
+          "몇 분 기다린 뒤 다시 시도하세요"
+        ]
+      },
+      "badStatus": {
+        "title": "서버가 오류로 응답했습니다",
+        "why": "VPN 제공자의 서버가 예상치 못한 오류로 응답했습니다(코드 $code).",
+        "tips": [
+          "링크를 확인하세요",
+          "VPN 제공자에게 문의하세요"
+        ]
+      },
+      "tooLarge": {
+        "title": "구독 파일이 너무 큽니다",
+        "why": "서버가 앱이 읽을 수 있는 양보다 많은 데이터를 보냈습니다.",
+        "tips": [
+          "구독 링크가 맞는지 확인하세요",
+          "VPN 제공자에 문의하세요"
+        ]
+      },
+      "noInternet": {
+        "title": "인터넷에 연결되어 있지 않습니다",
+        "why": "기기가 인터넷에 연결되어 있지 않습니다.",
+        "tips": [
+          "Wi-Fi 또는 모바일 데이터를 확인하세요",
+          "비행기 모드가 꺼져 있는지 확인하세요"
+        ]
+      },
+      "dns": {
+        "title": "서버 주소를 찾을 수 없습니다",
+        "why": "서버 이름을 찾을 수 없습니다.",
+        "tips": [
+          "링크에 오타가 없는지 확인하세요",
+          "네트워크가 이 주소를 차단하고 있을 수 있습니다. Wi-Fi 대신 모바일 데이터처럼 다른 네트워크를 사용해 보세요",
+          "VPN 제공자에 다른 링크를 요청하세요"
+        ]
+      },
+      "certificate": {
+        "title": "서버 인증서를 신뢰할 수 없습니다",
+        "why": "서버의 보안 인증서가 유효하지 않거나, 네트워크의 무언가가 연결을 가로채고 있습니다.",
+        "tips": [
+          "기기의 날짜와 시간이 올바른지 확인하세요",
+          "다른 네트워크를 사용해 보세요",
+          "VPN 제공자에 문의하세요"
+        ]
+      },
+      "reset": {
+        "title": "연결이 끊어짐, 차단되었을 수 있음",
+        "why": "연결을 설정하는 중에 서버와의 연결이 끊어졌습니다. 보통 네트워크나 인터넷 제공업체가 이 서버를 차단하고 있다는 뜻입니다.",
+        "tips": [
+          "네트워크가 이 주소를 차단하고 있을 수 있습니다. Wi-Fi 대신 모바일 데이터처럼 다른 네트워크를 사용해 보세요",
+          "VPN 제공자에 다른 링크를 요청하세요"
+        ]
+      },
+      "tls": {
+        "title": "보안 연결 실패",
+        "why": "서버와 보안 연결을 설정할 수 없습니다. 네트워크가 차단하고 있을 수 있습니다.",
+        "tips": [
+          "다른 네트워크를 사용해 보세요",
+          "VPN 제공자에 다른 링크를 요청하세요"
+        ]
+      },
+      "refused": {
+        "title": "서버가 연결을 거부했습니다",
+        "why": "서버가 연결을 받지 않습니다. 서버가 꺼져 있거나 링크가 잘못되었을 수 있습니다.",
+        "tips": [
+          "나중에 다시 시도하세요",
+          "링크를 확인하세요",
+          "VPN 제공자에 문의하세요"
+        ]
+      },
+      "timeout": {
+        "title": "서버가 응답하지 않았습니다",
+        "why": "서버가 제때 응답하지 않았습니다. 서버가 꺼져 있거나 네트워크가 차단하고 있을 수 있습니다.",
+        "tips": [
+          "다시 시도하세요",
+          "네트워크가 이 주소를 차단하고 있을 수 있습니다. Wi-Fi 대신 모바일 데이터처럼 다른 네트워크를 사용해 보세요",
+          "VPN 제공자에 문의하세요"
+        ]
+      },
+      "unknown": {
+        "title": "구독을 다운로드할 수 없습니다",
+        "why": "구독을 다운로드하는 중에 문제가 발생했습니다.",
+        "tips": [
+          "인터넷 연결과 링크를 확인한 뒤 다시 시도하세요",
+          "계속 실패하면 세부 정보를 복사해 VPN 제공자에 보내세요"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "예기치 않은 실패",
       "missingVpnPermission": "VPN 권한 없음",
@@ -1300,7 +1498,8 @@
       "tunAddressInUse": "다른 VPN이 활성화되어 있습니다",
       "tunAddressInUseMsg": "VPN 모드를 시작할 수 없습니다. 다른 VPN을 끄거나 서비스 모드를 변경하세요.",
       "invalidConfigOptions": "잘못된 구성 옵션",
-      "invalidConfig": "잘못된 구성"
+      "invalidConfig": "잘못된 구성",
+      "missingConfig": "이 프로필의 구성이 없습니다. 프로필을 업데이트하거나 다시 추가하세요."
     },
     "warp": {
       "missingLicense": "WARP 라이선스 필요",

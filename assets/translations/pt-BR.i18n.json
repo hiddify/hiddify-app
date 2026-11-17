@@ -143,7 +143,8 @@
         "failed": "Falhou",
         "ready": "Pronto",
         "searching": "Procurando",
-        "reconnecting": "Reconectando"
+        "reconnecting": "Reconectando",
+        "resting": "Dormindo"
       },
       "signalStyle": "Estilo de sinal",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "Manter os $keep mais rápidos",
         "change": "Mudar quantos",
         "chosen": "Seus $n proxies escolhidos estão rodando",
-        "choose": "Escolher"
+        "choose": "Escolher",
+        "restingShow": "Mostrar os $n proxies dormindo",
+        "restingHide": "Ocultar os proxies dormindo",
+        "restingHint": "Um proxy dormindo não está carregado. Toque em um para acordá-lo: ele é carregado e testado. Mantenha pressionado para fixá-lo.",
+        "restingTitle": "$n proxies estão tirando uma soneca",
+        "restingWhy": "Só os mais rápidos ficam acordados, para o seu dispositivo continuar ágil e economizar bateria e dados. Toque em qualquer um para acordá-lo.",
+        "fasterElsewhere": "$n proxies de outras regiões são mais rápidos",
+        "anyRegion": "Mostrar todas as regiões",
+        "running": "em execução",
+        "testing": "testando…",
+        "untested": "falta testar…",
+        "modeTop": "Top $keep",
+        "modeWorking": "Só os que funcionam",
+        "modeChosen": "Suas escolhas",
+        "onlyAnswer": "Top $keep · só $n respondem",
+        "working": "funcionando",
+        "failing": "não funciona"
       },
       "upload": {
         "test": "Testar velocidade de envio",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "Desativar atualização automática",
         "autoUpdateInterval": "Intervalo de atualização automática",
         "loading": "Adicionando perfil…",
+        "retrying": "A tentativa ${failed} não funcionou: ${reason}",
+        "retryingNext": "Tentando novamente (${next} de ${of})…",
         "adminPreference": "Permissão de administrador",
         "adminPreferenceAskEachTime": "Perguntar sempre",
         "adminPreferencePreferAdmin": "Sempre usar a permissão de administrador",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "Entra em vigor após reconectar",
       "buffer": "Buffer",
       "diagnostics": "Relatório de diagnóstico",
-      "diagnosticsMsg": "Relatórios de falha, logs e suas configurações, sem servidores nem senhas, em um único zip"
+      "diagnosticsMsg": "Relatórios de falha, logs e suas configurações, sem servidores nem senhas, em um único zip",
+      "fullReport": "Relatório completo"
     },
     "about": {
       "title": "Sobre",
       "notAvailableMsg": "Você está usando a versão mais recente",
       "checkForUpdate": "Verificar atualizações",
+      "betaUpdates": "Atualizações beta",
+      "betaUpdatesMsg": "Receba as novas versões antes de serem lançadas para todos",
       "openWorkingDir": "Abrir diretório de trabalho",
       "sourceCode": "Código-fonte",
       "telegramChannel": "Canal do Telegram",
       "termsAndConditions": "Termos e condições",
-      "privacyPolicy": "Política de privacidade"
+      "privacyPolicy": "Política de privacidade",
+      "reportProblem": "Relatar um problema",
+      "reportProblemMsg": "Envie os registros e o estado do app para os desenvolvedores"
     },
     "settings": {
       "title": "Configurações",
@@ -927,6 +951,7 @@
       "msg": "Uma nova versão do @:common.appTitle está disponível. Atualizar agora?",
       "currentVersion": "Versão atual",
       "newVersion": "Nova versão",
+      "changelog": "Novidades",
       "updateNow": "Atualizar agora",
       "downloading": "Baixando…",
       "installing": "Iniciando o instalador…",
@@ -1078,7 +1103,9 @@
       "server": "Servidor",
       "country": "País",
       "tapToTest": "Toque para testar",
-      "error": "Por que falhou"
+      "error": "Por que falhou",
+      "keepLoaded": "Fixar proxy",
+      "keepLoadedBody": "Ele continua carregado e testado junto com os mais rápidos, qualquer que seja o ping."
     },
     "windowClosing": {
       "askEachTime": "Perguntar sempre",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "Os logs não estão criptografados",
       "title": "O Hiddify fechou inesperadamente da última vez",
       "msg": "Envie um relatório para corrigirmos. Os logs vão junto.",
+      "sendHiddify": "Enviar para o Hiddify",
+      "sendHiddifyMsg": "O app envia o relatório sozinho",
+      "sent": "Relatório enviado. Obrigado!",
+      "sendFailed": "Não foi possível enviar o relatório. Tente por e-mail ou Telegram.",
+      "subject": "Relatório de falha do Hiddify",
+      "problemTitle": "Relatar um problema",
       "problemMsg": "Conte o que deu errado. Os logs vão junto.",
-      "send": "Enviar relatório",
+      "description": "O que aconteceu? (opcional)",
+      "descriptionHint": "O que você fez, o que esperava e o que viu em vez disso",
+      "problemSubject": "Relatório de problema do Hiddify",
+      "back": "Voltar",
+      "chooseHow": "Como você quer enviar?",
       "steps": {
+        "preparing": "Coletando logs e configurações…",
+        "prepareFailed": "Não foi possível preparar o relatório. Volte e tente de novo.",
+        "uploading": "Enviando…",
+        "save": "Salve o relatório",
+        "saveDesktopMsg": "Escolha onde guardá-lo",
+        "saveMobileMsg": "No menu, escolha Save to Files ou Downloads",
+        "openBot": "Abra o bot de suporte e toque em Start",
+        "openBotButton": "Abrir bot",
+        "openMail": "Abra seu app de e-mail",
+        "openMailMsg": "Uma nova mensagem para $address com o assunto já preenchido",
+        "openMailButton": "Abrir e-mail",
+        "attachSend": "Anexe o relatório à nova mensagem e envie",
+        "openGithub": "Abra uma nova issue no GitHub",
+        "openGithubMsg": "Entre no GitHub. Sua descrição, plataforma, versão e sistema já estão preenchidos.",
+        "openGithubButton": "Abrir GitHub",
+        "dropInIssue": "Anexe o relatório e pressione Create",
+        "telegramPrivate": "Privado: só a equipe de suporte do Hiddify vê o relatório.",
+        "emailPrivate": "Privado: só a equipe do Hiddify lê o relatório.",
+        "attachInChat": "Anexe o relatório no chat do bot e envie",
+        "attachHow": "Arraste o arquivo para dentro ou use o clipe",
+        "dropInIssueHow": "Arraste o arquivo para Additional Context ou toque na barra abaixo dessa caixa",
         "ready": "Relatório pronto",
         "saveUnencryptedCopy": "Salvar uma cópia sem criptografia"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "Descreva o que aconteceu e toque em Continuar",
         "stop": "Parar",
         "ended": "Os logs detalhados terminaram. Envie o relatório em “Relatar um problema”."
-      }
+      },
+      "send": "Enviar relatório"
     },
     "keepTop": {
       "title": "Uma assinatura grande",
@@ -1230,6 +1289,11 @@
       "wipeData": "Apagar dados",
       "wipeConfirm": "Os dados salvos serão apagados e o Hiddify começa de novo. Os perfis que ainda puderem ser lidos são adicionados de volta; o resto não pode ser recuperado.",
       "copyError": "Copiar erro"
+    },
+    "telegramChannel": {
+      "title": "Entre no Hiddify no Telegram",
+      "msg": "Siga o canal oficial do Hiddify para ver notícias, novas versões e dicas para continuar conectado.",
+      "join": "Entrar no canal"
     }
   },
   "connection": {
@@ -1287,6 +1351,140 @@
       "invalidUrl": "URL inválida",
       "canceledByUser": "Cancelado pelo usuário"
     },
+    "download": {
+      "details": "Detalhes",
+      "errorCode": "Código do erro",
+      "technicalDetails": "Detalhes técnicos",
+      "whatToTry": "O que você pode tentar",
+      "copyDetails": "Copiar detalhes",
+      "side": {
+        "provider": "Servidor do provedor de VPN",
+        "subscription": "Sua assinatura",
+        "network": "Sua conexão",
+        "unknown": "Causa desconhecida"
+      },
+      "path": {
+        "title": "Onde parou",
+        "device": "Seu dispositivo",
+        "internet": "Internet",
+        "provider": "Provedor de VPN"
+      },
+      "serverError": {
+        "title": "O servidor do provedor de VPN está com problema",
+        "why": "O servidor do seu provedor de VPN respondeu com um erro (código $code). Seu dispositivo e o app estão bem.",
+        "tips": [
+          "Tente de novo em alguns minutos",
+          "Se continuar acontecendo, fale com seu provedor de VPN"
+        ]
+      },
+      "notFound": {
+        "title": "Assinatura não encontrada",
+        "why": "Não há nenhuma assinatura neste link.",
+        "tips": [
+          "Confira se você copiou o link inteiro",
+          "Peça um novo link ao seu provedor de VPN: a assinatura pode ter sido removida"
+        ]
+      },
+      "denied": {
+        "title": "O provedor de VPN recusou este link",
+        "why": "O servidor do provedor de VPN não aceitou esta assinatura.",
+        "tips": [
+          "Sua assinatura pode ter vencido, sido desativada ou ficado sem dados",
+          "Fale com seu provedor de VPN para verificar ou renovar"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Tentativas demais",
+        "why": "O servidor do provedor de VPN está recebendo solicitações demais de você.",
+        "tips": [
+          "Espere alguns minutos e tente de novo"
+        ]
+      },
+      "badStatus": {
+        "title": "O servidor respondeu com um erro",
+        "why": "O servidor do provedor de VPN respondeu com um erro inesperado (código $code).",
+        "tips": [
+          "Confira o link",
+          "Fale com seu provedor de VPN"
+        ]
+      },
+      "tooLarge": {
+        "title": "A assinatura é grande demais",
+        "why": "O servidor enviou mais dados do que o app consegue ler.",
+        "tips": [
+          "Verifique se este é um link de assinatura",
+          "Entre em contato com seu provedor de VPN"
+        ]
+      },
+      "noInternet": {
+        "title": "Sem conexão com a internet",
+        "why": "Seu dispositivo não está conectado à internet.",
+        "tips": [
+          "Verifique seu Wi-Fi ou dados móveis",
+          "Confirme que o modo avião está desativado"
+        ]
+      },
+      "dns": {
+        "title": "Endereço do servidor não encontrado",
+        "why": "O nome do servidor não pôde ser encontrado.",
+        "tips": [
+          "Verifique se o link tem erros de digitação",
+          "Sua rede pode estar bloqueando este endereço: tente outra rede, como dados móveis em vez de Wi-Fi",
+          "Peça outro link ao seu provedor de VPN"
+        ]
+      },
+      "certificate": {
+        "title": "O certificado do servidor não é confiável",
+        "why": "O certificado de segurança do servidor não é válido, ou algo na sua rede está interceptando a conexão.",
+        "tips": [
+          "Verifique se a data e a hora do seu dispositivo estão corretas",
+          "Tente outra rede",
+          "Entre em contato com seu provedor de VPN"
+        ]
+      },
+      "reset": {
+        "title": "Conexão interrompida, possivelmente filtrada",
+        "why": "A conexão com o servidor foi interrompida durante o estabelecimento. Isso geralmente significa que sua rede ou provedor de internet está filtrando este servidor.",
+        "tips": [
+          "Sua rede pode estar bloqueando este endereço: tente outra rede, como dados móveis em vez de Wi-Fi",
+          "Peça outro link ao seu provedor de VPN"
+        ]
+      },
+      "tls": {
+        "title": "Falha na conexão segura",
+        "why": "Não foi possível estabelecer uma conexão segura com o servidor. Sua rede pode estar filtrando.",
+        "tips": [
+          "Tente outra rede",
+          "Peça outro link ao seu provedor de VPN"
+        ]
+      },
+      "refused": {
+        "title": "O servidor recusou a conexão",
+        "why": "O servidor não está aceitando conexões. Ele pode estar fora do ar, ou o link pode estar errado.",
+        "tips": [
+          "Tente novamente mais tarde",
+          "Verifique o link",
+          "Entre em contato com seu provedor de VPN"
+        ]
+      },
+      "timeout": {
+        "title": "O servidor não respondeu",
+        "why": "O servidor não respondeu a tempo. Ele pode estar fora do ar, ou sua rede pode estar bloqueando.",
+        "tips": [
+          "Tente novamente",
+          "Sua rede pode estar bloqueando este endereço: tente outra rede, como dados móveis em vez de Wi-Fi",
+          "Entre em contato com seu provedor de VPN"
+        ]
+      },
+      "unknown": {
+        "title": "Não foi possível baixar a assinatura",
+        "why": "Algo deu errado ao baixar a assinatura.",
+        "tips": [
+          "Verifique sua conexão com a internet e o link, e tente novamente",
+          "Se continuar falhando, copie os detalhes e envie ao seu provedor de VPN"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "Falha inesperada",
       "missingVpnPermission": "Permissão de VPN ausente",
@@ -1300,7 +1498,8 @@
       "tunAddressInUse": "Outra VPN está ativa",
       "tunAddressInUseMsg": "O modo VPN não pode iniciar. Desative a outra VPN ou altere o modo de serviço.",
       "invalidConfigOptions": "Opções de configuração inválidas",
-      "invalidConfig": "Configuração inválida"
+      "invalidConfig": "Configuração inválida",
+      "missingConfig": "A configuração deste perfil está ausente. Atualize o perfil ou adicione-o novamente."
     },
     "warp": {
       "missingLicense": "Licença do WARP ausente",

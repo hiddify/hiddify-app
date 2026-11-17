@@ -143,7 +143,8 @@
         "failed": "Mislukt",
         "ready": "Gereed",
         "searching": "Zoeken",
-        "reconnecting": "Opnieuw verbinden"
+        "reconnecting": "Opnieuw verbinden",
+        "resting": "Slaapt"
       },
       "signalStyle": "Signaalstijl",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "De $keep snelste houden",
         "change": "Aantal wijzigen",
         "chosen": "Je $n gekozen proxy’s zijn actief",
-        "choose": "Kiezen"
+        "choose": "Kiezen",
+        "restingShow": "De $n slapende proxy’s tonen",
+        "restingHide": "De slapende proxy’s verbergen",
+        "restingHint": "Een slapende proxy is niet geladen. Tik op een proxy om hem wakker te maken: hij wordt geladen en getest. Houd hem ingedrukt om hem vast te zetten.",
+        "restingTitle": "$n proxy’s doen een dutje",
+        "restingWhy": "Alleen de snelste blijven wakker, zodat je apparaat snel blijft en batterij en data bespaart. Tik op een proxy om hem wakker te maken.",
+        "fasterElsewhere": "$n proxy’s in andere regio’s zijn sneller",
+        "anyRegion": "Alle regio’s tonen",
+        "running": "actief",
+        "testing": "testen…",
+        "untested": "nog te testen…",
+        "modeTop": "Top $keep",
+        "modeWorking": "Alleen werkende",
+        "modeChosen": "Jouw keuzes",
+        "onlyAnswer": "Top $keep · slechts $n reageren",
+        "working": "werkt",
+        "failing": "werkt niet"
       },
       "upload": {
         "test": "Uploadsnelheid testen",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "Automatisch bijwerken uitschakelen",
         "autoUpdateInterval": "Interval voor automatisch bijwerken",
         "loading": "Profiel toevoegen…",
+        "retrying": "Poging ${failed} is mislukt: ${reason}",
+        "retryingNext": "Opnieuw proberen (${next} van ${of})…",
         "adminPreference": "Beheerdersrechten",
         "adminPreferenceAskEachTime": "Elke keer vragen",
         "adminPreferencePreferAdmin": "Altijd beheerdersrechten gebruiken",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "Gaat in na opnieuw verbinden",
       "buffer": "Buffer",
       "diagnostics": "Diagnoserapport",
-      "diagnosticsMsg": "Crashrapporten, logboeken en je instellingen zonder servers of wachtwoorden, als één zipbestand"
+      "diagnosticsMsg": "Crashrapporten, logboeken en je instellingen zonder servers of wachtwoorden, als één zipbestand",
+      "fullReport": "Volledig rapport"
     },
     "about": {
       "title": "Over",
       "notAvailableMsg": "Je gebruikt de nieuwste versie",
       "checkForUpdate": "Op updates controleren",
+      "betaUpdates": "Bètaupdates",
+      "betaUpdatesMsg": "Krijg nieuwe versies voordat ze voor iedereen uitkomen",
       "openWorkingDir": "Werkmap openen",
       "sourceCode": "Broncode",
       "telegramChannel": "Telegram-kanaal",
       "termsAndConditions": "Algemene voorwaarden",
-      "privacyPolicy": "Privacybeleid"
+      "privacyPolicy": "Privacybeleid",
+      "reportProblem": "Een probleem melden",
+      "reportProblemMsg": "Stuur de logboeken en de status van de app naar de ontwikkelaars"
     },
     "settings": {
       "title": "Instellingen",
@@ -927,6 +951,7 @@
       "msg": "Er is een nieuwe versie van @:common.appTitle beschikbaar. Nu bijwerken?",
       "currentVersion": "Huidige versie",
       "newVersion": "Nieuwe versie",
+      "changelog": "Wat is er nieuw",
       "updateNow": "Nu bijwerken",
       "downloading": "Downloaden…",
       "installing": "Installatieprogramma starten…",
@@ -1078,7 +1103,9 @@
       "server": "Server",
       "country": "Land",
       "tapToTest": "Tik om te testen",
-      "error": "Waarom het mislukte"
+      "error": "Waarom het mislukte",
+      "keepLoaded": "Proxy vastzetten",
+      "keepLoadedBody": "Hij blijft geladen en getest naast de snelste, wat zijn ping ook is."
     },
     "windowClosing": {
       "askEachTime": "Elke keer vragen",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "Logs zijn niet versleuteld",
       "title": "Hiddify is de vorige keer gecrasht",
       "msg": "Stuur een rapport zodat we het oplossen. De logs gaan mee.",
+      "sendHiddify": "Naar Hiddify sturen",
+      "sendHiddifyMsg": "De app uploadt het rapport zelf",
+      "sent": "Rapport verstuurd. Bedankt!",
+      "sendFailed": "Het rapport kon niet worden verstuurd. Probeer het via e-mail of Telegram.",
+      "subject": "Hiddify-crashrapport",
+      "problemTitle": "Een probleem melden",
       "problemMsg": "Vertel wat er misging. De logs gaan mee.",
-      "send": "Rapport versturen",
+      "description": "Wat is er gebeurd? (optioneel)",
+      "descriptionHint": "Wat je deed, wat je verwachtte en wat je in plaats daarvan zag",
+      "problemSubject": "Hiddify-probleemrapport",
+      "back": "Terug",
+      "chooseHow": "Hoe wil je het versturen?",
       "steps": {
+        "preparing": "Logs en instellingen verzamelen…",
+        "prepareFailed": "Het rapport kon niet worden voorbereid. Ga terug en probeer het opnieuw.",
+        "uploading": "Uploaden…",
+        "save": "Sla het rapport op",
+        "saveDesktopMsg": "Kies waar je het wilt bewaren",
+        "saveMobileMsg": "Kies in het menu Save to Files of Downloads",
+        "openBot": "Open de support-bot en tik op Start",
+        "openBotButton": "Bot openen",
+        "openMail": "Open je mail-app",
+        "openMailMsg": "Een nieuw bericht aan $address met het onderwerp al ingevuld",
+        "openMailButton": "Mail openen",
+        "attachSend": "Voeg het rapport toe aan het nieuwe bericht en verstuur het",
+        "openGithub": "Open een nieuw GitHub-issue",
+        "openGithubMsg": "Log in bij GitHub. Je beschrijving, platform, versie en systeem zijn al ingevuld.",
+        "openGithubButton": "GitHub openen",
+        "dropInIssue": "Voeg het rapport toe en druk op Create",
+        "telegramPrivate": "Privé: alleen het Hiddify-supportteam ziet het rapport.",
+        "emailPrivate": "Privé: alleen het Hiddify-team leest het rapport.",
+        "attachInChat": "Voeg het rapport toe in de botchat en verstuur het",
+        "attachHow": "Sleep het bestand erin, of gebruik de paperclip",
+        "dropInIssueHow": "Sleep het bestand naar Additional Context, of tik op de balk onder dat vak",
         "ready": "Rapport klaar",
         "saveUnencryptedCopy": "Onversleutelde kopie opslaan"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "Beschrijf wat er gebeurde en druk op Doorgaan",
         "stop": "Stoppen",
         "ended": "Uitgebreide logs gestopt. Stuur het rapport via ‘Probleem melden’."
-      }
+      },
+      "send": "Rapport versturen"
     },
     "keepTop": {
       "title": "Een groot abonnement",
@@ -1230,6 +1289,11 @@
       "wipeData": "Gegevens wissen",
       "wipeConfirm": "De opgeslagen gegevens worden gewist en Hiddify begint opnieuw. Profielen die nog gelezen kunnen worden, worden opnieuw toegevoegd. De rest kan niet worden hersteld.",
       "copyError": "Fout kopiëren"
+    },
+    "telegramChannel": {
+      "title": "Word lid van Hiddify op Telegram",
+      "msg": "Volg het officiële Hiddify-kanaal voor nieuws, nieuwe versies en tips om verbonden te blijven.",
+      "join": "Kanaal joinen"
     }
   },
   "connection": {
@@ -1287,6 +1351,140 @@
       "invalidUrl": "Ongeldige URL",
       "canceledByUser": "Geannuleerd door gebruiker"
     },
+    "download": {
+      "details": "Details",
+      "errorCode": "Foutcode",
+      "technicalDetails": "Technische details",
+      "whatToTry": "Wat je kunt proberen",
+      "copyDetails": "Details kopiëren",
+      "side": {
+        "provider": "Server van de VPN-aanbieder",
+        "subscription": "Je abonnement",
+        "network": "Je verbinding",
+        "unknown": "Onbekende oorzaak"
+      },
+      "path": {
+        "title": "Waar het stopte",
+        "device": "Je apparaat",
+        "internet": "Internet",
+        "provider": "VPN-aanbieder"
+      },
+      "serverError": {
+        "title": "De server van de VPN-aanbieder heeft een probleem",
+        "why": "De server van je VPN-aanbieder antwoordde met een fout (code $code). Je apparaat en de app zijn in orde.",
+        "tips": [
+          "Probeer het over een paar minuten opnieuw",
+          "Als het blijft gebeuren, neem dan contact op met je VPN-aanbieder"
+        ]
+      },
+      "notFound": {
+        "title": "Abonnement niet gevonden",
+        "why": "Er is geen abonnement op deze link.",
+        "tips": [
+          "Controleer of je de hele link hebt gekopieerd",
+          "Vraag je VPN-aanbieder om een nieuwe link: het abonnement is misschien verwijderd"
+        ]
+      },
+      "denied": {
+        "title": "De VPN-aanbieder weigerde deze link",
+        "why": "De server van de VPN-aanbieder heeft dit abonnement niet geaccepteerd.",
+        "tips": [
+          "Je abonnement is misschien verlopen, uitgezet of heeft geen data meer",
+          "Neem contact op met je VPN-aanbieder om het te controleren of te verlengen"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Te veel pogingen",
+        "why": "De server van de VPN-aanbieder krijgt te veel verzoeken van jou.",
+        "tips": [
+          "Wacht een paar minuten en probeer het dan opnieuw"
+        ]
+      },
+      "badStatus": {
+        "title": "De server antwoordde met een fout",
+        "why": "De server van de VPN-aanbieder antwoordde met een onverwachte fout (code $code).",
+        "tips": [
+          "Controleer de link",
+          "Neem contact op met je VPN-aanbieder"
+        ]
+      },
+      "tooLarge": {
+        "title": "Het abonnement is te groot",
+        "why": "De server stuurde meer gegevens dan de app kan lezen.",
+        "tips": [
+          "Controleer of dit een abonnementslink is",
+          "Neem contact op met je VPN-aanbieder"
+        ]
+      },
+      "noInternet": {
+        "title": "Geen internetverbinding",
+        "why": "Je apparaat is niet met internet verbonden.",
+        "tips": [
+          "Controleer je wifi of mobiele data",
+          "Zorg dat de vliegtuigmodus uit staat"
+        ]
+      },
+      "dns": {
+        "title": "Serveradres niet gevonden",
+        "why": "De naam van de server kon niet worden gevonden.",
+        "tips": [
+          "Controleer de link op typfouten",
+          "Je netwerk blokkeert dit adres mogelijk: probeer een ander netwerk, bijvoorbeeld mobiele data in plaats van wifi",
+          "Vraag je VPN-aanbieder om een andere link"
+        ]
+      },
+      "certificate": {
+        "title": "Het certificaat van de server wordt niet vertrouwd",
+        "why": "Het beveiligingscertificaat van de server is ongeldig, of iets in je netwerk onderschept de verbinding.",
+        "tips": [
+          "Controleer of de datum en tijd van je apparaat kloppen",
+          "Probeer een ander netwerk",
+          "Neem contact op met je VPN-aanbieder"
+        ]
+      },
+      "reset": {
+        "title": "Verbinding verbroken, mogelijk gefilterd",
+        "why": "De verbinding met de server werd verbroken tijdens het opzetten. Meestal betekent dit dat je netwerk of internetprovider deze server filtert.",
+        "tips": [
+          "Je netwerk blokkeert dit adres mogelijk: probeer een ander netwerk, bijvoorbeeld mobiele data in plaats van wifi",
+          "Vraag je VPN-aanbieder om een andere link"
+        ]
+      },
+      "tls": {
+        "title": "Beveiligde verbinding mislukt",
+        "why": "Er kon geen beveiligde verbinding met de server worden opgezet. Je netwerk filtert deze mogelijk.",
+        "tips": [
+          "Probeer een ander netwerk",
+          "Vraag je VPN-aanbieder om een andere link"
+        ]
+      },
+      "refused": {
+        "title": "De server weigerde de verbinding",
+        "why": "De server accepteert geen verbindingen. Hij is mogelijk uit de lucht, of de link is onjuist.",
+        "tips": [
+          "Probeer het later opnieuw",
+          "Controleer de link",
+          "Neem contact op met je VPN-aanbieder"
+        ]
+      },
+      "timeout": {
+        "title": "De server reageerde niet",
+        "why": "De server reageerde niet op tijd. Hij is mogelijk uit de lucht, of je netwerk blokkeert hem.",
+        "tips": [
+          "Probeer het opnieuw",
+          "Je netwerk blokkeert dit adres mogelijk: probeer een ander netwerk, bijvoorbeeld mobiele data in plaats van wifi",
+          "Neem contact op met je VPN-aanbieder"
+        ]
+      },
+      "unknown": {
+        "title": "Abonnement downloaden mislukt",
+        "why": "Er ging iets mis bij het downloaden van het abonnement.",
+        "tips": [
+          "Controleer je internetverbinding en de link en probeer het opnieuw",
+          "Als het blijft mislukken, kopieer dan de details en stuur ze naar je VPN-aanbieder"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "Onverwachte storing",
       "missingVpnPermission": "VPN-toestemming ontbreekt",
@@ -1300,7 +1498,8 @@
       "tunAddressInUse": "Een andere VPN is actief",
       "tunAddressInUseMsg": "De VPN-modus kan niet starten. Schakel de andere VPN uit of wijzig de servicemodus.",
       "invalidConfigOptions": "Ongeldige configuratieopties",
-      "invalidConfig": "Ongeldige configuratie"
+      "invalidConfig": "Ongeldige configuratie",
+      "missingConfig": "De configuratie van dit profiel ontbreekt. Werk het profiel bij of voeg het opnieuw toe."
     },
     "warp": {
       "missingLicense": "WARP-licentie vereist",

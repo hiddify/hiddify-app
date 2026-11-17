@@ -143,7 +143,8 @@
         "failed": "失敗",
         "ready": "就緒",
         "searching": "正在搜尋",
-        "reconnecting": "正在重新連線"
+        "reconnecting": "正在重新連線",
+        "resting": "休眠中"
       },
       "signalStyle": "訊號樣式",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "保留最快的 $keep 個",
         "change": "變更數量",
         "chosen": "你選擇的 $n 個代理正在執行",
-        "choose": "選擇"
+        "choose": "選擇",
+        "restingShow": "顯示 $n 個休眠代理",
+        "restingHide": "隱藏休眠代理",
+        "restingHint": "休眠的代理不會被載入。點一下即可喚醒：它會被載入並測試。長按可將其固定。",
+        "restingTitle": "$n 個代理正在小憩",
+        "restingWhy": "只有最快的代理保持喚醒，這樣您的裝置更流暢，也更省電省流量。點一下任一個即可喚醒。",
+        "fasterElsewhere": "其他地區有 $n 個代理更快",
+        "anyRegion": "顯示所有地區",
+        "running": "執行中",
+        "testing": "測試中…",
+        "untested": "待測試…",
+        "modeTop": "最快的 $keep 個",
+        "modeWorking": "僅可用的",
+        "modeChosen": "您的選擇",
+        "onlyAnswer": "最快的 $keep 個 · 僅 $n 個有回應",
+        "working": "可用",
+        "failing": "不可用"
       },
       "upload": {
         "test": "測試上傳速度",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "關閉自動更新",
         "autoUpdateInterval": "自動更新間隔",
         "loading": "正在新增設定檔…",
+        "retrying": "第 ${failed} 次嘗試失敗：${reason}",
+        "retryingNext": "正在重試（第 ${next} 次，共 ${of} 次）…",
         "adminPreference": "管理員權限",
         "adminPreferenceAskEachTime": "每次詢問",
         "adminPreferencePreferAdmin": "一律使用管理員權限",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "重新連線後生效",
       "buffer": "緩衝區",
       "diagnostics": "診斷報告",
-      "diagnosticsMsg": "當機報告、日誌和您的設定（不含伺服器和密碼），打包為一個 zip"
+      "diagnosticsMsg": "當機報告、日誌和您的設定（不含伺服器和密碼），打包為一個 zip",
+      "fullReport": "完整報告"
     },
     "about": {
       "title": "關於",
       "notAvailableMsg": "您正在使用最新版本",
       "checkForUpdate": "檢查更新",
+      "betaUpdates": "測試版更新",
+      "betaUpdatesMsg": "在新版本向所有人發布之前搶先取得",
       "openWorkingDir": "開啟工作目錄",
       "sourceCode": "原始碼",
       "telegramChannel": "Telegram 頻道",
       "termsAndConditions": "條款與條件",
-      "privacyPolicy": "隱私權政策"
+      "privacyPolicy": "隱私權政策",
+      "reportProblem": "回報問題",
+      "reportProblemMsg": "將日誌和應用程式狀態傳送給開發者"
     },
     "settings": {
       "title": "設定",
@@ -927,6 +951,7 @@
       "msg": "@:common.appTitle 的新版本已發布。立即更新嗎？",
       "currentVersion": "目前版本",
       "newVersion": "新版本",
+      "changelog": "更新內容",
       "updateNow": "立即更新",
       "downloading": "正在下載…",
       "installing": "正在啟動安裝程式…",
@@ -1078,7 +1103,9 @@
       "server": "伺服器",
       "country": "國家",
       "tapToTest": "點擊測試",
-      "error": "失敗原因"
+      "error": "失敗原因",
+      "keepLoaded": "固定代理",
+      "keepLoadedBody": "無論延遲多高，它都會和最快的代理一起保持載入並接受測試。"
     },
     "windowClosing": {
       "askEachTime": "每次詢問",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "日誌未加密",
       "title": "Hiddify 上次當機了",
       "msg": "傳送報告，幫我們修正問題。日誌會一併附上。",
+      "sendHiddify": "傳送給 Hiddify",
+      "sendHiddifyMsg": "應用程式會自行上傳報告",
+      "sent": "報告已傳送。謝謝！",
+      "sendFailed": "無法傳送報告。請改用電子郵件或 Telegram。",
+      "subject": "Hiddify 當機報告",
+      "problemTitle": "回報問題",
       "problemMsg": "告訴我們哪裡出了問題。日誌會一併附上。",
-      "send": "傳送報告",
+      "description": "發生了什麼事？（選填）",
+      "descriptionHint": "你做了什麼、期望什麼、實際看到了什麼",
+      "problemSubject": "Hiddify 問題報告",
+      "back": "返回",
+      "chooseHow": "你想怎麼傳送？",
       "steps": {
+        "preparing": "正在收集日誌和設定…",
+        "prepareFailed": "無法準備報告。請返回後重試。",
+        "uploading": "正在上傳…",
+        "save": "儲存報告",
+        "saveDesktopMsg": "選擇儲存位置",
+        "saveMobileMsg": "在選單中選擇 Save to Files 或 Downloads",
+        "openBot": "開啟支援機器人並點一下 Start",
+        "openBotButton": "開啟機器人",
+        "openMail": "開啟你的郵件應用程式",
+        "openMailMsg": "一封寄給 $address 的新郵件，主旨已填好",
+        "openMailButton": "開啟郵件",
+        "attachSend": "把報告附加到新郵件並寄出",
+        "openGithub": "建立新的 GitHub issue",
+        "openGithubMsg": "登入 GitHub。你的描述、平台、版本和系統資訊已填好。",
+        "openGithubButton": "開啟 GitHub",
+        "dropInIssue": "附上報告並按下 Create",
+        "telegramPrivate": "私密：只有 Hiddify 支援團隊能看到報告。",
+        "emailPrivate": "私密：只有 Hiddify 團隊會閱讀報告。",
+        "attachInChat": "在機器人聊天中附上報告並傳送",
+        "attachHow": "把檔案拖進來，或使用迴紋針",
+        "dropInIssueHow": "把檔案拖到 Additional Context，或點一下該欄位下方的列",
         "ready": "報告已就緒",
         "saveUnencryptedCopy": "儲存未加密副本"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "描述發生了什麼，然後點擊繼續",
         "stop": "停止",
         "ended": "詳細日誌已結束。請從「回報問題」傳送報告。"
-      }
+      },
+      "send": "傳送報告"
     },
     "keepTop": {
       "title": "大型訂閱",
@@ -1292,6 +1351,140 @@
       "invalidUrl": "URL 無效",
       "canceledByUser": "使用者已取消"
     },
+    "download": {
+      "details": "詳細資訊",
+      "errorCode": "錯誤代碼",
+      "technicalDetails": "技術詳細資訊",
+      "whatToTry": "您可以嘗試",
+      "copyDetails": "複製詳細資訊",
+      "side": {
+        "provider": "VPN 供應商的伺服器",
+        "subscription": "您的訂閱",
+        "network": "您的連線",
+        "unknown": "原因不明"
+      },
+      "path": {
+        "title": "在哪裡中斷",
+        "device": "您的裝置",
+        "internet": "網際網路",
+        "provider": "VPN 供應商"
+      },
+      "serverError": {
+        "title": "VPN 供應商的伺服器發生問題",
+        "why": "您的 VPN 供應商的伺服器回傳了錯誤（代碼 $code）。您的裝置和應用程式沒有問題。",
+        "tips": [
+          "幾分鐘後再試一次",
+          "如果問題持續，請聯絡您的 VPN 供應商"
+        ]
+      },
+      "notFound": {
+        "title": "找不到訂閱",
+        "why": "此連結中沒有訂閱。",
+        "tips": [
+          "檢查您是否複製了完整的連結",
+          "向您的 VPN 供應商索取新連結：訂閱可能已被刪除"
+        ]
+      },
+      "denied": {
+        "title": "VPN 供應商拒絕了此連結",
+        "why": "VPN 供應商的伺服器不接受此訂閱。",
+        "tips": [
+          "您的訂閱可能已過期、被關閉或流量已用完",
+          "請聯絡您的 VPN 供應商檢查或續訂"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "嘗試次數過多",
+        "why": "VPN 供應商的伺服器收到了您發出的過多請求。",
+        "tips": [
+          "等待幾分鐘後再試"
+        ]
+      },
+      "badStatus": {
+        "title": "伺服器回傳了錯誤",
+        "why": "VPN 供應商的伺服器回傳了意外錯誤（代碼 $code）。",
+        "tips": [
+          "檢查連結",
+          "聯絡您的 VPN 供應商"
+        ]
+      },
+      "tooLarge": {
+        "title": "訂閱檔案過大",
+        "why": "伺服器傳送的資料超出了應用程式能讀取的範圍。",
+        "tips": [
+          "請確認這是訂閱連結",
+          "請聯絡你的 VPN 供應商"
+        ]
+      },
+      "noInternet": {
+        "title": "沒有網路連線",
+        "why": "你的裝置未連接到網際網路。",
+        "tips": [
+          "請檢查 Wi-Fi 或行動數據",
+          "請確認飛航模式已關閉"
+        ]
+      },
+      "dns": {
+        "title": "找不到伺服器位址",
+        "why": "找不到伺服器的名稱。",
+        "tips": [
+          "請檢查連結是否有拼寫錯誤",
+          "你的網路可能封鎖了此位址：請換一個網路試試，例如用行動數據取代 Wi-Fi",
+          "請向你的 VPN 供應商索取另一個連結"
+        ]
+      },
+      "certificate": {
+        "title": "伺服器憑證不受信任",
+        "why": "伺服器的安全憑證無效，或你網路中的某些裝置正在攔截連線。",
+        "tips": [
+          "請檢查裝置的日期和時間是否正確",
+          "請換一個網路試試",
+          "請聯絡你的 VPN 供應商"
+        ]
+      },
+      "reset": {
+        "title": "連線中斷，可能被封鎖",
+        "why": "與伺服器建立連線時連線被中斷。這通常表示你的網路或網路業者封鎖了此伺服器。",
+        "tips": [
+          "你的網路可能封鎖了此位址：請換一個網路試試，例如用行動數據取代 Wi-Fi",
+          "請向你的 VPN 供應商索取另一個連結"
+        ]
+      },
+      "tls": {
+        "title": "安全連線失敗",
+        "why": "無法與伺服器建立安全連線。你的網路可能封鎖了它。",
+        "tips": [
+          "請換一個網路試試",
+          "請向你的 VPN 供應商索取另一個連結"
+        ]
+      },
+      "refused": {
+        "title": "伺服器拒絕了連線",
+        "why": "伺服器不接受連線。它可能已當機，或連結有誤。",
+        "tips": [
+          "請稍後再試",
+          "請檢查連結",
+          "請聯絡你的 VPN 供應商"
+        ]
+      },
+      "timeout": {
+        "title": "伺服器沒有回應",
+        "why": "伺服器未及時回應。它可能已當機，或你的網路正在封鎖它。",
+        "tips": [
+          "請再試一次",
+          "你的網路可能封鎖了此位址：請換一個網路試試，例如用行動數據取代 Wi-Fi",
+          "請聯絡你的 VPN 供應商"
+        ]
+      },
+      "unknown": {
+        "title": "無法下載訂閱",
+        "why": "下載訂閱時發生問題。",
+        "tips": [
+          "請檢查網路連線和連結，然後再試一次",
+          "如果仍然失敗，請複製詳細資訊並傳送給你的 VPN 供應商"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "意外失敗",
       "missingVpnPermission": "缺少 VPN 權限",
@@ -1305,7 +1498,8 @@
       "tunAddressInUse": "另一個 VPN 正在執行",
       "tunAddressInUseMsg": "VPN 模式無法啟動。請關閉另一個 VPN，或更改服務模式。",
       "invalidConfigOptions": "設定選項無效",
-      "invalidConfig": "設定無效"
+      "invalidConfig": "設定無效",
+      "missingConfig": "此設定檔的設定遺失。請更新設定檔，或重新新增。"
     },
     "warp": {
       "missingLicense": "WARP 授權缺失",

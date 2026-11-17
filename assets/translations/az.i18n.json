@@ -143,7 +143,8 @@
         "failed": "Alınmadı",
         "ready": "Hazırdır",
         "searching": "Axtarılır",
-        "reconnecting": "Yenidən qoşulur"
+        "reconnecting": "Yenidən qoşulur",
+        "resting": "Yuxuda"
       },
       "signalStyle": "Siqnal üslubu",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "Ən sürətli $keep proksini saxla",
         "change": "Sayı dəyiş",
         "chosen": "Seçdiyiniz $n proksi işləyir",
-        "choose": "Seç"
+        "choose": "Seç",
+        "restingShow": "$n yatan proksini göstər",
+        "restingHide": "Yatan proksiləri gizlət",
+        "restingHint": "Yatan proksi yüklənməyib. Oyatmaq üçün toxunun: yüklənir və yoxlanılır. Sancmaq üçün uzun basın.",
+        "restingTitle": "$n proksi yatıb",
+        "restingWhy": "Yalnız ən sürətlilər oyaq qalır, beləliklə cihazınız sürətli qalır, batareya və data qənaət olunur. İstədiyinizi oyatmaq üçün toxunun.",
+        "fasterElsewhere": "Digər bölgələrdəki $n proksi daha sürətlidir",
+        "anyRegion": "Bütün bölgələri göstər",
+        "running": "işləyir",
+        "testing": "yoxlanılır…",
+        "untested": "yoxlanılmağı gözləyir…",
+        "modeTop": "Ən sürətli $keep",
+        "modeWorking": "Yalnız işləyənlər",
+        "modeChosen": "Seçdikləriniz",
+        "onlyAnswer": "Ən sürətli $keep · yalnız $n cavab verir",
+        "working": "işləyir",
+        "failing": "işləmir"
       },
       "upload": {
         "test": "Yükləmə sürətini yoxla",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "Avtomatik yenilənməni söndür",
         "autoUpdateInterval": "Avtomatik yenilənmə aralığı",
         "loading": "Profil əlavə olunur…",
+        "retrying": "${failed}-ci cəhd alınmadı: ${reason}",
+        "retryingNext": "Yenidən cəhd edilir (${next}/${of})…",
         "adminPreference": "Administrator icazəsi",
         "adminPreferenceAskEachTime": "Hər dəfə soruş",
         "adminPreferencePreferAdmin": "Həmişə administrator icazəsindən istifadə et",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "Yenidən qoşulduqdan sonra qüvvəyə minir",
       "buffer": "Bufer",
       "diagnostics": "Diaqnostika hesabatı",
-      "diagnosticsMsg": "Çökmə hesabatları, jurnallar və serversiz, parolsuz parametrləriniz, bir zip faylında"
+      "diagnosticsMsg": "Çökmə hesabatları, jurnallar və serversiz, parolsuz parametrləriniz, bir zip faylında",
+      "fullReport": "Tam hesabat"
     },
     "about": {
       "title": "Haqqında",
       "notAvailableMsg": "Ən son versiyadan istifadə edirsiniz",
       "checkForUpdate": "Yenilənməni yoxla",
+      "betaUpdates": "Beta yenilənmələri",
+      "betaUpdatesMsg": "Yeni versiyaları hamı üçün buraxılmazdan əvvəl əldə edin",
       "openWorkingDir": "İş qovluğunu aç",
       "sourceCode": "Mənbə kodu",
       "telegramChannel": "Telegram kanalı",
       "termsAndConditions": "İstifadə şərtləri",
-      "privacyPolicy": "Məxfilik siyasəti"
+      "privacyPolicy": "Məxfilik siyasəti",
+      "reportProblem": "Problem barədə məlumat ver",
+      "reportProblemMsg": "Jurnalları və tətbiqin vəziyyətini tərtibatçılara göndərin"
     },
     "settings": {
       "title": "Parametrlər",
@@ -927,6 +951,7 @@
       "msg": "@:common.appTitle tətbiqinin yeni versiyası mövcuddur. İndi yenilənsin?",
       "currentVersion": "Cari versiya",
       "newVersion": "Yeni versiya",
+      "changelog": "Yeniliklər",
       "updateNow": "İndi yenilə",
       "downloading": "Endirilir…",
       "installing": "Quraşdırıcı başladılır…",
@@ -1078,7 +1103,9 @@
       "server": "Server",
       "country": "Ölkə",
       "tapToTest": "Yoxlamaq üçün toxunun",
-      "error": "Niyə alınmadı"
+      "error": "Niyə alınmadı",
+      "keepLoaded": "Proksini sanc",
+      "keepLoadedBody": "Pinqindən asılı olmayaraq ən sürətlilərin yanında yüklənmiş və yoxlanılmış qalır."
     },
     "windowClosing": {
       "askEachTime": "Hər dəfə soruş",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "Loglar şifrələnməyib",
       "title": "Hiddify son dəfə çökdü",
       "msg": "Düzəltməyimiz üçün hesabat göndərin. Loglar da əlavə olunur.",
+      "sendHiddify": "Hiddify-a göndər",
+      "sendHiddifyMsg": "Tətbiq hesabatı özü yükləyir",
+      "sent": "Hesabat göndərildi. Təşəkkür edirik!",
+      "sendFailed": "Hesabatı göndərmək alınmadı. Əvəzində e-poçt və ya Telegram sınayın.",
+      "subject": "Hiddify qəza hesabatı",
+      "problemTitle": "Problem barədə bildir",
       "problemMsg": "Nəyin səhv getdiyini yazın. Loglar da əlavə olunur.",
-      "send": "Hesabatı göndər",
+      "description": "Nə baş verdi? (istəyə bağlı)",
+      "descriptionHint": "Nə etdiniz, nə gözləyirdiniz, əvəzinə nə gördünüz",
+      "problemSubject": "Hiddify problem hesabatı",
+      "back": "Geri",
+      "chooseHow": "Necə göndərmək istəyirsiniz?",
       "steps": {
+        "preparing": "Loglar və ayarlar toplanır…",
+        "prepareFailed": "Hesabatı hazırlamaq alınmadı. Geri qayıdıb yenidən cəhd edin.",
+        "uploading": "Yüklənir…",
+        "save": "Hesabatı saxlayın",
+        "saveDesktopMsg": "Harada saxlanacağını seçin",
+        "saveMobileMsg": "Menyuda Save to Files və ya Downloads seçin",
+        "openBot": "Dəstək botunu açıb Start düyməsinə toxunun",
+        "openBotButton": "Botu aç",
+        "openMail": "E-poçt tətbiqinizi açın",
+        "openMailMsg": "$address ünvanına mövzusu doldurulmuş yeni məktub",
+        "openMailButton": "E-poçtu aç",
+        "attachSend": "Hesabatı yeni məktuba əlavə edib göndərin",
+        "openGithub": "Yeni GitHub issue açın",
+        "openGithubMsg": "GitHub-a daxil olun. Təsvir, platforma, versiya və sistem məlumatları doldurulub.",
+        "openGithubButton": "GitHub-ı aç",
+        "dropInIssue": "Hesabatı əlavə edib Create düyməsini basın",
+        "telegramPrivate": "Məxfi: hesabatı yalnız Hiddify dəstək komandası görür.",
+        "emailPrivate": "Məxfi: hesabatı yalnız Hiddify komandası oxuyur.",
+        "attachInChat": "Hesabatı bot çatına əlavə edib göndərin",
+        "attachHow": "Faylı içəri sürüşdürün və ya skrepka işarəsindən istifadə edin",
+        "dropInIssueHow": "Faylı Additional Context xanasına sürüşdürün və ya həmin xananın altındakı zolağa toxunun",
         "ready": "Hesabat hazırdır",
         "saveUnencryptedCopy": "Şifrələnməmiş nüsxəni saxla"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "Nə baş verdiyini yazın və “Davam et” düyməsini basın",
         "stop": "Dayandır",
         "ended": "Ətraflı loglar bitdi. Hesabatı “Problem bildir” bölməsindən göndərin."
-      }
+      },
+      "send": "Hesabatı göndər"
     },
     "keepTop": {
       "title": "Böyük abunəlik",
@@ -1230,6 +1289,11 @@
       "wipeData": "Məlumatları sil",
       "wipeConfirm": "Saxlanılmış məlumatlar silinir və Hiddify yenidən başlayır. Hələ də oxuna bilən profillər geri əlavə olunur; qalanlarını bərpa etmək mümkün deyil.",
       "copyError": "Xətanı köçür"
+    },
+    "telegramChannel": {
+      "title": "Hiddify ilə Telegram-da birləşin",
+      "msg": "Xəbərlər, yeni buraxılışlar və bağlı qalmaq üçün məsləhətlər üçün Hiddify-ın rəsmi kanalını izləyin.",
+      "join": "Kanala qoşul"
     }
   },
   "connection": {
@@ -1287,6 +1351,140 @@
       "invalidUrl": "Yanlış URL",
       "canceledByUser": "İstifadəçi tərəfindən ləğv edildi"
     },
+    "download": {
+      "details": "Təfərrüatlar",
+      "errorCode": "Xəta kodu",
+      "technicalDetails": "Texniki təfərrüatlar",
+      "whatToTry": "Nə cəhd edə bilərsiniz",
+      "copyDetails": "Təfərrüatları kopyala",
+      "side": {
+        "provider": "VPN provayderin serveri",
+        "subscription": "Abunəliyiniz",
+        "network": "Bağlantınız",
+        "unknown": "Naməlum səbəb"
+      },
+      "path": {
+        "title": "Harada dayandı",
+        "device": "Cihazınız",
+        "internet": "İnternet",
+        "provider": "VPN provayder"
+      },
+      "serverError": {
+        "title": "VPN provayderin serverində problem var",
+        "why": "VPN provayderinizin serveri xəta ilə cavab verdi (kod $code). Cihazınız və tətbiqlə bağlı problem yoxdur.",
+        "tips": [
+          "Bir neçə dəqiqə sonra yenidən cəhd edin",
+          "Təkrarlanarsa, VPN provayderinizlə əlaqə saxlayın"
+        ]
+      },
+      "notFound": {
+        "title": "Abunəlik tapılmadı",
+        "why": "Bu keçiddə abunəlik yoxdur.",
+        "tips": [
+          "Keçidin hamısını kopyaladığınızı yoxlayın",
+          "VPN provayderinizdən yeni keçid istəyin: abunəlik silinmiş ola bilər"
+        ]
+      },
+      "denied": {
+        "title": "VPN provayder bu keçidi rədd etdi",
+        "why": "VPN provayderin serveri bu abunəliyi qəbul etmədi.",
+        "tips": [
+          "Abunəliyinizin vaxtı bitmiş, söndürülmüş və ya trafiki tükənmiş ola bilər",
+          "Yoxlamaq və ya yeniləmək üçün VPN provayderinizlə əlaqə saxlayın"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Çox cəhd",
+        "why": "VPN provayderin serveri sizdən çox sorğu alır.",
+        "tips": [
+          "Bir neçə dəqiqə gözləyin, sonra yenidən cəhd edin"
+        ]
+      },
+      "badStatus": {
+        "title": "Server xəta ilə cavab verdi",
+        "why": "VPN provayderin serveri gözlənilməz xəta ilə cavab verdi (kod $code).",
+        "tips": [
+          "Keçidi yoxlayın",
+          "VPN provayderinizlə əlaqə saxlayın"
+        ]
+      },
+      "tooLarge": {
+        "title": "Abunəlik çox böyükdür",
+        "why": "Server tətbiqin oxuya biləcəyindən çox məlumat göndərdi.",
+        "tips": [
+          "Bunun abunəlik keçidi olduğunu yoxlayın",
+          "VPN provayderinizlə əlaqə saxlayın"
+        ]
+      },
+      "noInternet": {
+        "title": "İnternet bağlantısı yoxdur",
+        "why": "Cihazınız internetə qoşulmayıb.",
+        "tips": [
+          "Wi-Fi və ya mobil interneti yoxlayın",
+          "Təyyarə rejiminin söndürüldüyünə əmin olun"
+        ]
+      },
+      "dns": {
+        "title": "Serverin ünvanı tapılmadı",
+        "why": "Serverin adı tapılmadı.",
+        "tips": [
+          "Keçiddə yazı səhvlərini yoxlayın",
+          "Şəbəkəniz bu ünvanı bloklayır ola bilər: başqa şəbəkə sınayın, məsələn, Wi-Fi əvəzinə mobil internet",
+          "VPN provayderinizdən başqa keçid istəyin"
+        ]
+      },
+      "certificate": {
+        "title": "Serverin sertifikatına etibar edilmir",
+        "why": "Serverin təhlükəsizlik sertifikatı etibarsızdır və ya şəbəkənizdə nəsə bağlantını ələ keçirir.",
+        "tips": [
+          "Cihazınızın tarix və saatının düzgün olduğunu yoxlayın",
+          "Başqa şəbəkə sınayın",
+          "VPN provayderinizlə əlaqə saxlayın"
+        ]
+      },
+      "reset": {
+        "title": "Bağlantı kəsildi, ola bilsin filtrlənir",
+        "why": "Server ilə bağlantı qurularkən kəsildi. Bu, adətən şəbəkənizin və ya internet provayderinizin bu serveri filtrlədiyini bildirir.",
+        "tips": [
+          "Şəbəkəniz bu ünvanı bloklayır ola bilər: başqa şəbəkə sınayın, məsələn, Wi-Fi əvəzinə mobil internet",
+          "VPN provayderinizdən başqa keçid istəyin"
+        ]
+      },
+      "tls": {
+        "title": "Təhlükəsiz bağlantı alınmadı",
+        "why": "Server ilə təhlükəsiz bağlantı qurmaq mümkün olmadı. Şəbəkəniz onu filtrləyə bilər.",
+        "tips": [
+          "Başqa şəbəkə sınayın",
+          "VPN provayderinizdən başqa keçid istəyin"
+        ]
+      },
+      "refused": {
+        "title": "Server bağlantını rədd etdi",
+        "why": "Server bağlantı qəbul etmir. O, sönmüş ola bilər və ya keçid yanlışdır.",
+        "tips": [
+          "Bir az sonra yenidən cəhd edin",
+          "Keçidi yoxlayın",
+          "VPN provayderinizlə əlaqə saxlayın"
+        ]
+      },
+      "timeout": {
+        "title": "Server cavab vermədi",
+        "why": "Server vaxtında cavab vermədi. O, sönmüş ola bilər və ya şəbəkəniz onu bloklayır.",
+        "tips": [
+          "Yenidən cəhd edin",
+          "Şəbəkəniz bu ünvanı bloklayır ola bilər: başqa şəbəkə sınayın, məsələn, Wi-Fi əvəzinə mobil internet",
+          "VPN provayderinizlə əlaqə saxlayın"
+        ]
+      },
+      "unknown": {
+        "title": "Abunəliyi yükləmək mümkün olmadı",
+        "why": "Abunəlik yüklənərkən xəta baş verdi.",
+        "tips": [
+          "İnternet bağlantınızı və keçidi yoxlayıb yenidən cəhd edin",
+          "Yenə alınmasa, təfərrüatları kopyalayıb VPN provayderinizə göndərin"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "Gözlənilməz xəta",
       "missingVpnPermission": "VPN icazəsi yoxdur",
@@ -1300,7 +1498,8 @@
       "tunAddressInUse": "Başqa VPN aktivdir",
       "tunAddressInUseMsg": "VPN rejimi başlaya bilmir. Digər VPN-i söndürün və ya xidmət rejimini dəyişin.",
       "invalidConfigOptions": "Yanlış konfiqurasiya parametrləri",
-      "invalidConfig": "Yanlış konfiqurasiya"
+      "invalidConfig": "Yanlış konfiqurasiya",
+      "missingConfig": "Bu profilin konfiqurasiyası tapılmadı. Profili yeniləyin və ya yenidən əlavə edin."
     },
     "warp": {
       "missingLicense": "WARP lisenziyası tələb olunur",

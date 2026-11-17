@@ -143,7 +143,8 @@
         "failed": "Gagal",
         "ready": "Siap",
         "searching": "Mencari",
-        "reconnecting": "Menghubungkan ulang"
+        "reconnecting": "Menghubungkan ulang",
+        "resting": "Tidur"
       },
       "signalStyle": "Gaya sinyal",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "Pertahankan $keep tercepat",
         "change": "Ubah jumlah",
         "chosen": "$n proksi pilihan Anda sedang berjalan",
-        "choose": "Pilih"
+        "choose": "Pilih",
+        "restingShow": "Tampilkan $n proxy yang tidur",
+        "restingHide": "Sembunyikan proxy yang tidur",
+        "restingHint": "Proxy yang tidur tidak dimuat. Ketuk satu untuk membangunkannya: proxy dimuat dan diuji. Tekan lama untuk menyematkannya.",
+        "restingTitle": "$n proxy sedang tidur sebentar",
+        "restingWhy": "Hanya yang tercepat yang tetap aktif, agar perangkat Anda tetap cepat serta hemat baterai dan data. Ketuk salah satunya untuk membangunkannya.",
+        "fasterElsewhere": "$n proxy di wilayah lain lebih cepat",
+        "anyRegion": "Tampilkan semua wilayah",
+        "running": "berjalan",
+        "testing": "menguji…",
+        "untested": "belum diuji…",
+        "modeTop": "$keep teratas",
+        "modeWorking": "Hanya yang berfungsi",
+        "modeChosen": "Pilihan Anda",
+        "onlyAnswer": "$keep teratas · hanya $n yang merespons",
+        "working": "berfungsi",
+        "failing": "tidak berfungsi"
       },
       "upload": {
         "test": "Uji kecepatan unggah",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "Nonaktifkan pembaruan otomatis",
         "autoUpdateInterval": "Interval pembaruan otomatis",
         "loading": "Menambahkan profil…",
+        "retrying": "Percobaan ${failed} gagal: ${reason}",
+        "retryingNext": "Mencoba lagi (${next} dari ${of})…",
         "adminPreference": "Izin administrator",
         "adminPreferenceAskEachTime": "Tanya setiap kali",
         "adminPreferencePreferAdmin": "Selalu gunakan izin administrator",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "Berlaku setelah menyambung ulang",
       "buffer": "Bufer",
       "diagnostics": "Laporan diagnostik",
-      "diagnosticsMsg": "Laporan kerusakan, log, dan pengaturan Anda tanpa server atau kata sandi, dalam satu file zip"
+      "diagnosticsMsg": "Laporan kerusakan, log, dan pengaturan Anda tanpa server atau kata sandi, dalam satu file zip",
+      "fullReport": "Laporan lengkap"
     },
     "about": {
       "title": "Tentang",
       "notAvailableMsg": "Anda menggunakan versi terbaru",
       "checkForUpdate": "Periksa pembaruan",
+      "betaUpdates": "Pembaruan beta",
+      "betaUpdatesMsg": "Dapatkan versi baru sebelum dirilis untuk semua orang",
       "openWorkingDir": "Buka direktori kerja",
       "sourceCode": "Kode sumber",
       "telegramChannel": "Saluran Telegram",
       "termsAndConditions": "Syarat dan ketentuan",
-      "privacyPolicy": "Kebijakan privasi"
+      "privacyPolicy": "Kebijakan privasi",
+      "reportProblem": "Laporkan masalah",
+      "reportProblemMsg": "Kirim log dan status aplikasi ke pengembang"
     },
     "settings": {
       "title": "Pengaturan",
@@ -927,6 +951,7 @@
       "msg": "Versi baru @:common.appTitle tersedia. Perbarui sekarang?",
       "currentVersion": "Versi saat ini",
       "newVersion": "Versi baru",
+      "changelog": "Yang baru",
       "updateNow": "Perbarui sekarang",
       "downloading": "Mengunduh…",
       "installing": "Memulai pemasang…",
@@ -1078,7 +1103,9 @@
       "server": "Server",
       "country": "Negara",
       "tapToTest": "Ketuk untuk menguji",
-      "error": "Penyebab kegagalan"
+      "error": "Penyebab kegagalan",
+      "keepLoaded": "Sematkan proxy",
+      "keepLoadedBody": "Proxy tetap dimuat dan diuji bersama yang tercepat, berapa pun pingnya."
     },
     "windowClosing": {
       "askEachTime": "Tanyakan setiap kali",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "Log tidak terenkripsi",
       "title": "Hiddify mengalami crash terakhir kali",
       "msg": "Kirim laporan agar kami bisa memperbaikinya. Log ikut terkirim.",
+      "sendHiddify": "Kirim ke Hiddify",
+      "sendHiddifyMsg": "Aplikasi mengunggah laporan sendiri",
+      "sent": "Laporan terkirim. Terima kasih!",
+      "sendFailed": "Laporan tidak bisa dikirim. Coba lewat email atau Telegram.",
+      "subject": "Laporan crash Hiddify",
+      "problemTitle": "Laporkan masalah",
       "problemMsg": "Ceritakan apa yang salah. Log ikut terkirim.",
-      "send": "Kirim laporan",
+      "description": "Apa yang terjadi? (opsional)",
+      "descriptionHint": "Apa yang Anda lakukan, apa yang Anda harapkan, dan apa yang malah Anda lihat",
+      "problemSubject": "Laporan masalah Hiddify",
+      "back": "Kembali",
+      "chooseHow": "Bagaimana Anda ingin mengirimnya?",
       "steps": {
+        "preparing": "Mengumpulkan log dan pengaturan…",
+        "prepareFailed": "Laporan tidak bisa disiapkan. Kembali dan coba lagi.",
+        "uploading": "Mengunggah…",
+        "save": "Simpan laporan",
+        "saveDesktopMsg": "Pilih tempat menyimpannya",
+        "saveMobileMsg": "Di menu, pilih Save to Files atau Downloads",
+        "openBot": "Buka bot dukungan dan ketuk Start",
+        "openBotButton": "Buka bot",
+        "openMail": "Buka aplikasi email Anda",
+        "openMailMsg": "Pesan baru ke $address dengan subjek yang sudah terisi",
+        "openMailButton": "Buka email",
+        "attachSend": "Lampirkan laporan ke pesan baru lalu kirim",
+        "openGithub": "Buka issue GitHub baru",
+        "openGithubMsg": "Masuk ke GitHub. Deskripsi, platform, versi, dan sistem Anda sudah terisi.",
+        "openGithubButton": "Buka GitHub",
+        "dropInIssue": "Lampirkan laporan lalu tekan Create",
+        "telegramPrivate": "Privat: hanya tim dukungan Hiddify yang melihat laporan.",
+        "emailPrivate": "Privat: hanya tim Hiddify yang membaca laporan.",
+        "attachInChat": "Lampirkan laporan di chat bot lalu kirim",
+        "attachHow": "Seret file ke dalam, atau gunakan ikon klip kertas",
+        "dropInIssueHow": "Seret file ke Additional Context, atau ketuk bilah di bawah kotak itu",
         "ready": "Laporan siap",
         "saveUnencryptedCopy": "Simpan salinan tanpa enkripsi"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "Jelaskan apa yang terjadi lalu tekan Lanjutkan",
         "stop": "Hentikan",
         "ended": "Log terperinci selesai. Kirim laporan lewat “Laporkan masalah”."
-      }
+      },
+      "send": "Kirim laporan"
     },
     "keepTop": {
       "title": "Langganan besar",
@@ -1230,6 +1289,11 @@
       "wipeData": "Hapus data",
       "wipeConfirm": "Data tersimpan dihapus dan Hiddify dimulai dari awal. Profil yang masih bisa dibaca ditambahkan kembali; sisanya tidak dapat dipulihkan.",
       "copyError": "Salin kesalahan"
+    },
+    "telegramChannel": {
+      "title": "Gabung dengan Hiddify di Telegram",
+      "msg": "Ikuti kanal resmi Hiddify untuk berita, rilis baru, dan tips agar tetap terhubung.",
+      "join": "Gabung kanal"
     }
   },
   "connection": {
@@ -1287,6 +1351,140 @@
       "invalidUrl": "URL tidak valid",
       "canceledByUser": "Dibatalkan oleh pengguna"
     },
+    "download": {
+      "details": "Detail",
+      "errorCode": "Kode kesalahan",
+      "technicalDetails": "Detail teknis",
+      "whatToTry": "Yang bisa Anda coba",
+      "copyDetails": "Salin detail",
+      "side": {
+        "provider": "Server penyedia VPN",
+        "subscription": "Langganan Anda",
+        "network": "Koneksi Anda",
+        "unknown": "Penyebab tidak diketahui"
+      },
+      "path": {
+        "title": "Berhenti di mana",
+        "device": "Perangkat Anda",
+        "internet": "Internet",
+        "provider": "Penyedia VPN"
+      },
+      "serverError": {
+        "title": "Server penyedia VPN bermasalah",
+        "why": "Server penyedia VPN Anda menjawab dengan kesalahan (kode $code). Perangkat dan aplikasi Anda baik-baik saja.",
+        "tips": [
+          "Coba lagi beberapa menit lagi",
+          "Jika terus terjadi, hubungi penyedia VPN Anda"
+        ]
+      },
+      "notFound": {
+        "title": "Langganan tidak ditemukan",
+        "why": "Tidak ada langganan di tautan ini.",
+        "tips": [
+          "Pastikan Anda menyalin seluruh tautan",
+          "Minta tautan baru ke penyedia VPN Anda: langganan mungkin sudah dihapus"
+        ]
+      },
+      "denied": {
+        "title": "Penyedia VPN menolak tautan ini",
+        "why": "Server penyedia VPN tidak menerima langganan ini.",
+        "tips": [
+          "Langganan Anda mungkin sudah kedaluwarsa, dimatikan, atau kuotanya habis",
+          "Hubungi penyedia VPN Anda untuk memeriksa atau memperpanjangnya"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Terlalu banyak percobaan",
+        "why": "Server penyedia VPN menerima terlalu banyak permintaan dari Anda.",
+        "tips": [
+          "Tunggu beberapa menit, lalu coba lagi"
+        ]
+      },
+      "badStatus": {
+        "title": "Server menjawab dengan kesalahan",
+        "why": "Server penyedia VPN menjawab dengan kesalahan tak terduga (kode $code).",
+        "tips": [
+          "Periksa tautan",
+          "Hubungi penyedia VPN Anda"
+        ]
+      },
+      "tooLarge": {
+        "title": "Langganan terlalu besar",
+        "why": "Server mengirim data lebih banyak daripada yang bisa dibaca aplikasi.",
+        "tips": [
+          "Pastikan ini adalah tautan langganan",
+          "Hubungi penyedia VPN Anda"
+        ]
+      },
+      "noInternet": {
+        "title": "Tidak ada koneksi internet",
+        "why": "Perangkat Anda tidak terhubung ke internet.",
+        "tips": [
+          "Periksa Wi-Fi atau data seluler Anda",
+          "Pastikan mode pesawat dimatikan"
+        ]
+      },
+      "dns": {
+        "title": "Alamat server tidak ditemukan",
+        "why": "Nama server tidak dapat ditemukan.",
+        "tips": [
+          "Periksa tautan dari kesalahan ketik",
+          "Jaringan Anda mungkin memblokir alamat ini: coba jaringan lain, misalnya data seluler, bukan Wi-Fi",
+          "Minta tautan lain dari penyedia VPN Anda"
+        ]
+      },
+      "certificate": {
+        "title": "Sertifikat server tidak tepercaya",
+        "why": "Sertifikat keamanan server tidak valid, atau ada sesuatu di jaringan Anda yang mencegat koneksi.",
+        "tips": [
+          "Pastikan tanggal dan waktu perangkat Anda benar",
+          "Coba jaringan lain",
+          "Hubungi penyedia VPN Anda"
+        ]
+      },
+      "reset": {
+        "title": "Koneksi terputus, mungkin difilter",
+        "why": "Koneksi ke server terputus saat sedang dibuat. Ini biasanya berarti jaringan atau penyedia internet Anda memfilter server ini.",
+        "tips": [
+          "Jaringan Anda mungkin memblokir alamat ini: coba jaringan lain, misalnya data seluler, bukan Wi-Fi",
+          "Minta tautan lain dari penyedia VPN Anda"
+        ]
+      },
+      "tls": {
+        "title": "Koneksi aman gagal",
+        "why": "Koneksi aman ke server tidak dapat dibuat. Jaringan Anda mungkin memfilternya.",
+        "tips": [
+          "Coba jaringan lain",
+          "Minta tautan lain dari penyedia VPN Anda"
+        ]
+      },
+      "refused": {
+        "title": "Server menolak koneksi",
+        "why": "Server tidak menerima koneksi. Mungkin server sedang mati, atau tautannya salah.",
+        "tips": [
+          "Coba lagi nanti",
+          "Periksa tautannya",
+          "Hubungi penyedia VPN Anda"
+        ]
+      },
+      "timeout": {
+        "title": "Server tidak menjawab",
+        "why": "Server tidak menjawab tepat waktu. Mungkin server sedang mati, atau jaringan Anda memblokirnya.",
+        "tips": [
+          "Coba lagi",
+          "Jaringan Anda mungkin memblokir alamat ini: coba jaringan lain, misalnya data seluler, bukan Wi-Fi",
+          "Hubungi penyedia VPN Anda"
+        ]
+      },
+      "unknown": {
+        "title": "Tidak dapat mengunduh langganan",
+        "why": "Terjadi kesalahan saat mengunduh langganan.",
+        "tips": [
+          "Periksa koneksi internet dan tautannya, lalu coba lagi",
+          "Jika terus gagal, salin detailnya dan kirimkan ke penyedia VPN Anda"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "Kegagalan tak terduga",
       "missingVpnPermission": "Izin VPN hilang",
@@ -1300,7 +1498,8 @@
       "tunAddressInUse": "VPN lain sedang aktif",
       "tunAddressInUseMsg": "Mode VPN tidak dapat dimulai. Matikan VPN lain atau ubah mode layanan.",
       "invalidConfigOptions": "Opsi konfigurasi tidak valid",
-      "invalidConfig": "Konfigurasi tidak valid"
+      "invalidConfig": "Konfigurasi tidak valid",
+      "missingConfig": "Konfigurasi profil ini tidak ditemukan. Perbarui profil, atau tambahkan lagi."
     },
     "warp": {
       "missingLicense": "Lisensi WARP hilang",

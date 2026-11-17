@@ -143,7 +143,8 @@
         "failed": "失败",
         "ready": "就绪",
         "searching": "正在搜索",
-        "reconnecting": "正在重新连接"
+        "reconnecting": "正在重新连接",
+        "resting": "休眠中"
       },
       "signalStyle": "信号样式",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "保留最快的 $keep 个",
         "change": "更改数量",
         "chosen": "你选择的 $n 个代理正在运行",
-        "choose": "选择"
+        "choose": "选择",
+        "restingShow": "显示 $n 个休眠代理",
+        "restingHide": "隐藏休眠代理",
+        "restingHint": "休眠的代理不会被加载。点按即可唤醒：它会被加载并测试。长按可将其固定。",
+        "restingTitle": "$n 个代理正在小憩",
+        "restingWhy": "只有最快的代理保持唤醒，这样您的设备更流畅，也更省电省流量。点按任意一个即可唤醒。",
+        "fasterElsewhere": "其他地区有 $n 个代理更快",
+        "anyRegion": "显示所有地区",
+        "running": "运行中",
+        "testing": "测试中…",
+        "untested": "待测试…",
+        "modeTop": "最快的 $keep 个",
+        "modeWorking": "仅可用的",
+        "modeChosen": "您的选择",
+        "onlyAnswer": "最快的 $keep 个 · 仅 $n 个有响应",
+        "working": "可用",
+        "failing": "不可用"
       },
       "upload": {
         "test": "测试上传速度",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "关闭自动更新",
         "autoUpdateInterval": "自动更新间隔",
         "loading": "正在添加配置文件…",
+        "retrying": "第 ${failed} 次尝试失败：${reason}",
+        "retryingNext": "正在重试（第 ${next} 次，共 ${of} 次）…",
         "adminPreference": "管理员权限",
         "adminPreferenceAskEachTime": "每次询问",
         "adminPreferencePreferAdmin": "始终使用管理员权限",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "重新连接后生效",
       "buffer": "缓冲区",
       "diagnostics": "诊断报告",
-      "diagnosticsMsg": "崩溃报告、日志和不含服务器与密码的设置，打包为一个 zip"
+      "diagnosticsMsg": "崩溃报告、日志和不含服务器与密码的设置，打包为一个 zip",
+      "fullReport": "完整报告"
     },
     "about": {
       "title": "关于",
       "notAvailableMsg": "您正在使用最新版本",
       "checkForUpdate": "检查更新",
+      "betaUpdates": "测试版更新",
+      "betaUpdatesMsg": "在新版本向所有人发布之前抢先获取",
       "openWorkingDir": "打开工作目录",
       "sourceCode": "源代码",
       "telegramChannel": "Telegram 频道",
       "termsAndConditions": "条款与条件",
-      "privacyPolicy": "隐私政策"
+      "privacyPolicy": "隐私政策",
+      "reportProblem": "报告问题",
+      "reportProblemMsg": "将日志和应用状态发送给开发者"
     },
     "settings": {
       "title": "设置",
@@ -927,6 +951,7 @@
       "msg": "@:common.appTitle 的新版本已发布。现在更新吗？",
       "currentVersion": "当前版本",
       "newVersion": "新版本",
+      "changelog": "更新内容",
       "updateNow": "立即更新",
       "downloading": "正在下载…",
       "installing": "正在启动安装程序…",
@@ -1078,7 +1103,9 @@
       "server": "服务器",
       "country": "国家",
       "tapToTest": "点击测试",
-      "error": "失败原因"
+      "error": "失败原因",
+      "keepLoaded": "固定代理",
+      "keepLoadedBody": "无论延迟多高，它都会和最快的代理一起保持加载并接受测试。"
     },
     "windowClosing": {
       "askEachTime": "每次询问",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "日志未加密",
       "title": "Hiddify 上次崩溃了",
       "msg": "发送报告，帮我们修复问题。日志会一并附上。",
+      "sendHiddify": "发送给 Hiddify",
+      "sendHiddifyMsg": "应用会自行上传报告",
+      "sent": "报告已发送。谢谢！",
+      "sendFailed": "无法发送报告。请改用邮件或 Telegram。",
+      "subject": "Hiddify 崩溃报告",
+      "problemTitle": "报告问题",
       "problemMsg": "告诉我们哪里出了问题。日志会一并附上。",
-      "send": "发送报告",
+      "description": "发生了什么？（可选）",
+      "descriptionHint": "你做了什么、期望什么、实际看到了什么",
+      "problemSubject": "Hiddify 问题报告",
+      "back": "返回",
+      "chooseHow": "你想怎么发送？",
       "steps": {
+        "preparing": "正在收集日志和设置…",
+        "prepareFailed": "无法准备报告。请返回后重试。",
+        "uploading": "正在上传…",
+        "save": "保存报告",
+        "saveDesktopMsg": "选择保存位置",
+        "saveMobileMsg": "在菜单中选择 Save to Files 或 Downloads",
+        "openBot": "打开支持机器人并点按 Start",
+        "openBotButton": "打开机器人",
+        "openMail": "打开你的邮件应用",
+        "openMailMsg": "一封发给 $address 的新邮件，主题已填好",
+        "openMailButton": "打开邮件",
+        "attachSend": "把报告附到新邮件上并发送",
+        "openGithub": "新建一个 GitHub issue",
+        "openGithubMsg": "登录 GitHub。你的描述、平台、版本和系统信息已填好。",
+        "openGithubButton": "打开 GitHub",
+        "dropInIssue": "附上报告并点击 Create",
+        "telegramPrivate": "私密：只有 Hiddify 支持团队能看到报告。",
+        "emailPrivate": "私密：只有 Hiddify 团队会阅读报告。",
+        "attachInChat": "在机器人聊天中附上报告并发送",
+        "attachHow": "把文件拖进来，或使用回形针",
+        "dropInIssueHow": "把文件拖到 Additional Context，或点按该框下方的栏",
         "ready": "报告已就绪",
         "saveUnencryptedCopy": "保存未加密副本"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "描述发生了什么，然后点击继续",
         "stop": "停止",
         "ended": "详细日志已结束。请从“报告问题”发送报告。"
-      }
+      },
+      "send": "发送报告"
     },
     "keepTop": {
       "title": "大型订阅",
@@ -1292,6 +1351,140 @@
       "invalidUrl": "URL 无效",
       "canceledByUser": "用户已取消"
     },
+    "download": {
+      "details": "详情",
+      "errorCode": "错误代码",
+      "technicalDetails": "技术详情",
+      "whatToTry": "您可以尝试",
+      "copyDetails": "复制详情",
+      "side": {
+        "provider": "VPN 提供商的服务器",
+        "subscription": "您的订阅",
+        "network": "您的连接",
+        "unknown": "原因不明"
+      },
+      "path": {
+        "title": "在哪里中断",
+        "device": "您的设备",
+        "internet": "互联网",
+        "provider": "VPN 提供商"
+      },
+      "serverError": {
+        "title": "VPN 提供商的服务器出了问题",
+        "why": "您的 VPN 提供商的服务器返回了错误（代码 $code）。您的设备和应用没有问题。",
+        "tips": [
+          "几分钟后再试一次",
+          "如果问题持续，请联系您的 VPN 提供商"
+        ]
+      },
+      "notFound": {
+        "title": "未找到订阅",
+        "why": "此链接中没有订阅。",
+        "tips": [
+          "检查您是否复制了完整的链接",
+          "向您的 VPN 提供商索取新链接：订阅可能已被删除"
+        ]
+      },
+      "denied": {
+        "title": "VPN 提供商拒绝了此链接",
+        "why": "VPN 提供商的服务器不接受此订阅。",
+        "tips": [
+          "您的订阅可能已过期、被关闭或流量已用完",
+          "请联系您的 VPN 提供商检查或续订"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "尝试次数过多",
+        "why": "VPN 提供商的服务器收到了您发出的过多请求。",
+        "tips": [
+          "等待几分钟后再试"
+        ]
+      },
+      "badStatus": {
+        "title": "服务器返回了错误",
+        "why": "VPN 提供商的服务器返回了意外错误（代码 $code）。",
+        "tips": [
+          "检查链接",
+          "联系您的 VPN 提供商"
+        ]
+      },
+      "tooLarge": {
+        "title": "订阅文件过大",
+        "why": "服务器发送的数据超出了应用能读取的范围。",
+        "tips": [
+          "请确认这是订阅链接",
+          "请联系你的 VPN 提供商"
+        ]
+      },
+      "noInternet": {
+        "title": "没有网络连接",
+        "why": "你的设备未连接到互联网。",
+        "tips": [
+          "请检查 Wi-Fi 或移动数据",
+          "请确认飞行模式已关闭"
+        ]
+      },
+      "dns": {
+        "title": "找不到服务器地址",
+        "why": "找不到服务器的名称。",
+        "tips": [
+          "请检查链接是否有拼写错误",
+          "你的网络可能封锁了此地址：请换一个网络试试，例如用移动数据代替 Wi-Fi",
+          "请向你的 VPN 提供商索取另一个链接"
+        ]
+      },
+      "certificate": {
+        "title": "服务器证书不受信任",
+        "why": "服务器的安全证书无效，或你网络中的某些设备正在拦截连接。",
+        "tips": [
+          "请检查设备的日期和时间是否正确",
+          "请换一个网络试试",
+          "请联系你的 VPN 提供商"
+        ]
+      },
+      "reset": {
+        "title": "连接中断，可能被封锁",
+        "why": "与服务器建立连接时连接被中断。这通常意味着你的网络或网络运营商封锁了此服务器。",
+        "tips": [
+          "你的网络可能封锁了此地址：请换一个网络试试，例如用移动数据代替 Wi-Fi",
+          "请向你的 VPN 提供商索取另一个链接"
+        ]
+      },
+      "tls": {
+        "title": "安全连接失败",
+        "why": "无法与服务器建立安全连接。你的网络可能封锁了它。",
+        "tips": [
+          "请换一个网络试试",
+          "请向你的 VPN 提供商索取另一个链接"
+        ]
+      },
+      "refused": {
+        "title": "服务器拒绝了连接",
+        "why": "服务器不接受连接。它可能已宕机，或链接有误。",
+        "tips": [
+          "请稍后重试",
+          "请检查链接",
+          "请联系你的 VPN 提供商"
+        ]
+      },
+      "timeout": {
+        "title": "服务器没有响应",
+        "why": "服务器未及时响应。它可能已宕机，或你的网络正在封锁它。",
+        "tips": [
+          "请重试",
+          "你的网络可能封锁了此地址：请换一个网络试试，例如用移动数据代替 Wi-Fi",
+          "请联系你的 VPN 提供商"
+        ]
+      },
+      "unknown": {
+        "title": "无法下载订阅",
+        "why": "下载订阅时出了问题。",
+        "tips": [
+          "请检查网络连接和链接，然后重试",
+          "如果仍然失败，请复制详细信息并发送给你的 VPN 提供商"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "意外失败",
       "missingVpnPermission": "缺少 VPN 权限",
@@ -1305,7 +1498,8 @@
       "tunAddressInUse": "另一个 VPN 正在运行",
       "tunAddressInUseMsg": "VPN 模式无法启动。请关闭另一个 VPN，或更改服务模式。",
       "invalidConfigOptions": "配置选项无效",
-      "invalidConfig": "配置无效"
+      "invalidConfig": "配置无效",
+      "missingConfig": "此配置文件的配置缺失。请更新配置文件，或重新添加。"
     },
     "warp": {
       "missingLicense": "WARP 许可证缺失",

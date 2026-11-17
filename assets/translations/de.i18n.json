@@ -143,7 +143,8 @@
         "failed": "Fehlgeschlagen",
         "ready": "Bereit",
         "searching": "Suche läuft",
-        "reconnecting": "Neuverbindung läuft"
+        "reconnecting": "Neuverbindung läuft",
+        "resting": "Schläft"
       },
       "signalStyle": "Signalstil",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "Die $keep schnellsten behalten",
         "change": "Anzahl ändern",
         "chosen": "Ihre $n ausgewählten Proxys laufen",
-        "choose": "Auswählen"
+        "choose": "Auswählen",
+        "restingShow": "Die $n schlafenden Proxys anzeigen",
+        "restingHide": "Die schlafenden Proxys ausblenden",
+        "restingHint": "Ein schlafender Proxy ist nicht geladen. Tippen Sie auf einen, um ihn zu wecken: Er wird geladen und getestet. Halten Sie ihn gedrückt, um ihn anzuheften.",
+        "restingTitle": "$n Proxys machen ein Nickerchen",
+        "restingWhy": "Nur die schnellsten bleiben wach, damit Ihr Gerät schnell bleibt und Akku und Daten spart. Tippen Sie auf einen beliebigen, um ihn aufzuwecken.",
+        "fasterElsewhere": "$n Proxys in anderen Regionen sind schneller",
+        "anyRegion": "Alle Regionen anzeigen",
+        "running": "läuft",
+        "testing": "wird getestet …",
+        "untested": "noch zu testen …",
+        "modeTop": "Top $keep",
+        "modeWorking": "Nur funktionierende",
+        "modeChosen": "Ihre Auswahl",
+        "onlyAnswer": "Top $keep · nur $n antworten",
+        "working": "funktioniert",
+        "failing": "funktioniert nicht"
       },
       "upload": {
         "test": "Upload-Geschwindigkeit testen",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "Automatische Aktualisierung ausschalten",
         "autoUpdateInterval": "Intervall der automatischen Aktualisierung",
         "loading": "Profil wird hinzugefügt …",
+        "retrying": "Versuch ${failed} hat nicht geklappt: ${reason}",
+        "retryingNext": "Neuer Versuch (${next} von ${of})…",
         "adminPreference": "Administratorberechtigung",
         "adminPreferenceAskEachTime": "Jedes Mal fragen",
         "adminPreferencePreferAdmin": "Immer mit Administratorberechtigung",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "Wird nach dem erneuten Verbinden wirksam",
       "buffer": "Puffer",
       "diagnostics": "Diagnosebericht",
-      "diagnosticsMsg": "Absturzberichte, Protokolle und Ihre Einstellungen ohne Server oder Passwörter, als eine ZIP-Datei"
+      "diagnosticsMsg": "Absturzberichte, Protokolle und Ihre Einstellungen ohne Server oder Passwörter, als eine ZIP-Datei",
+      "fullReport": "Vollständiger Bericht"
     },
     "about": {
       "title": "Info",
       "notAvailableMsg": "Sie verwenden die neueste Version",
       "checkForUpdate": "Nach Updates suchen",
+      "betaUpdates": "Beta-Updates",
+      "betaUpdatesMsg": "Erhalten Sie neue Versionen, bevor sie für alle veröffentlicht werden",
       "openWorkingDir": "Arbeitsverzeichnis öffnen",
       "sourceCode": "Quellcode",
       "telegramChannel": "Telegram-Kanal",
       "termsAndConditions": "Nutzungsbedingungen",
-      "privacyPolicy": "Datenschutzerklärung"
+      "privacyPolicy": "Datenschutzerklärung",
+      "reportProblem": "Problem melden",
+      "reportProblemMsg": "Senden Sie die Protokolle und den App-Status an die Entwickler"
     },
     "settings": {
       "title": "Einstellungen",
@@ -927,6 +951,7 @@
       "msg": "Eine neue Version von @:common.appTitle ist verfügbar. Jetzt aktualisieren?",
       "currentVersion": "Aktuelle Version",
       "newVersion": "Neue Version",
+      "changelog": "Neuigkeiten",
       "updateNow": "Jetzt aktualisieren",
       "downloading": "Wird heruntergeladen …",
       "installing": "Installationsprogramm wird gestartet …",
@@ -1078,7 +1103,9 @@
       "server": "Server",
       "country": "Land",
       "tapToTest": "Zum Testen tippen",
-      "error": "Warum es fehlgeschlagen ist"
+      "error": "Warum es fehlgeschlagen ist",
+      "keepLoaded": "Proxy anheften",
+      "keepLoadedBody": "Er bleibt neben den schnellsten geladen und getestet, egal wie hoch sein Ping ist."
     },
     "windowClosing": {
       "askEachTime": "Jedes Mal fragen",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "Logs sind nicht verschlüsselt",
       "title": "Hiddify ist beim letzten Mal abgestürzt",
       "msg": "Sende einen Bericht, damit wir es beheben. Die Logs kommen mit.",
+      "sendHiddify": "An Hiddify senden",
+      "sendHiddifyMsg": "Die App lädt den Bericht selbst hoch",
+      "sent": "Bericht gesendet. Danke!",
+      "sendFailed": "Der Bericht konnte nicht gesendet werden. Versuchen Sie es stattdessen per E-Mail oder Telegram.",
+      "subject": "Hiddify-Absturzbericht",
+      "problemTitle": "Problem melden",
       "problemMsg": "Sag uns, was schiefging. Die Logs kommen mit.",
-      "send": "Bericht senden",
+      "description": "Was ist passiert? (optional)",
+      "descriptionHint": "Was Sie getan haben, was Sie erwartet haben, was Sie stattdessen gesehen haben",
+      "problemSubject": "Hiddify-Problembericht",
+      "back": "Zurück",
+      "chooseHow": "Wie möchten Sie ihn senden?",
       "steps": {
+        "preparing": "Logs und Einstellungen werden gesammelt…",
+        "prepareFailed": "Der Bericht konnte nicht vorbereitet werden. Gehen Sie zurück und versuchen Sie es erneut.",
+        "uploading": "Wird hochgeladen…",
+        "save": "Bericht speichern",
+        "saveDesktopMsg": "Wählen Sie, wo er abgelegt werden soll",
+        "saveMobileMsg": "Wählen Sie im Menü Save to Files oder Downloads",
+        "openBot": "Öffnen Sie den Support-Bot und tippen Sie auf Start",
+        "openBotButton": "Bot öffnen",
+        "openMail": "Öffnen Sie Ihre Mail-App",
+        "openMailMsg": "Eine neue Nachricht an $address mit ausgefülltem Betreff",
+        "openMailButton": "Mail öffnen",
+        "attachSend": "Hängen Sie den Bericht an die neue Nachricht an und senden Sie sie ab",
+        "openGithub": "Öffnen Sie ein neues GitHub-Issue",
+        "openGithubMsg": "Melden Sie sich bei GitHub an. Ihre Beschreibung, Plattform, Version und Ihr System sind bereits ausgefüllt.",
+        "openGithubButton": "GitHub öffnen",
+        "dropInIssue": "Hängen Sie den Bericht an und drücken Sie Create",
+        "telegramPrivate": "Privat: Nur das Hiddify-Support-Team sieht den Bericht.",
+        "emailPrivate": "Privat: Nur das Hiddify-Team liest den Bericht.",
+        "attachInChat": "Hängen Sie den Bericht im Bot-Chat an und senden Sie ihn ab",
+        "attachHow": "Ziehen Sie die Datei hinein oder nutzen Sie die Büroklammer",
+        "dropInIssueHow": "Ziehen Sie die Datei in Additional Context oder tippen Sie auf die Leiste unter diesem Feld",
         "ready": "Bericht bereit",
         "saveUnencryptedCopy": "Unverschlüsselte Kopie speichern"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "Beschreibe, was passiert ist, und drücke auf Weiter",
         "stop": "Stoppen",
         "ended": "Ausführliche Logs beendet. Sende den Bericht über „Problem melden“."
-      }
+      },
+      "send": "Bericht senden"
     },
     "keepTop": {
       "title": "Ein großes Abo",
@@ -1230,6 +1289,11 @@
       "wipeData": "Daten löschen",
       "wipeConfirm": "Die gespeicherten Daten werden gelöscht und Hiddify startet neu. Profile, die sich noch lesen lassen, werden wieder hinzugefügt. Der Rest kann nicht wiederhergestellt werden.",
       "copyError": "Fehler kopieren"
+    },
+    "telegramChannel": {
+      "title": "Hiddify auf Telegram beitreten",
+      "msg": "Folgen Sie dem offiziellen Hiddify-Kanal für Neuigkeiten, neue Versionen und Tipps, um verbunden zu bleiben.",
+      "join": "Kanal beitreten"
     }
   },
   "connection": {
@@ -1287,6 +1351,140 @@
       "invalidUrl": "Ungültige URL",
       "canceledByUser": "Vom Benutzer abgebrochen"
     },
+    "download": {
+      "details": "Details",
+      "errorCode": "Fehlercode",
+      "technicalDetails": "Technische Details",
+      "whatToTry": "Das können Sie versuchen",
+      "copyDetails": "Details kopieren",
+      "side": {
+        "provider": "Server des VPN-Anbieters",
+        "subscription": "Ihr Abo",
+        "network": "Ihre Verbindung",
+        "unknown": "Unbekannte Ursache"
+      },
+      "path": {
+        "title": "Wo es hängen blieb",
+        "device": "Ihr Gerät",
+        "internet": "Internet",
+        "provider": "VPN-Anbieter"
+      },
+      "serverError": {
+        "title": "Der Server des VPN-Anbieters hat ein Problem",
+        "why": "Der Server Ihres VPN-Anbieters hat mit einem Fehler geantwortet (Code $code). Ihr Gerät und die App sind in Ordnung.",
+        "tips": [
+          "Versuchen Sie es in ein paar Minuten erneut",
+          "Wenn es weiter passiert, wenden Sie sich an Ihren VPN-Anbieter"
+        ]
+      },
+      "notFound": {
+        "title": "Abo nicht gefunden",
+        "why": "Unter diesem Link gibt es kein Abo.",
+        "tips": [
+          "Prüfen Sie, ob Sie den ganzen Link kopiert haben",
+          "Fragen Sie Ihren VPN-Anbieter nach einem neuen Link: Das Abo wurde vielleicht entfernt"
+        ]
+      },
+      "denied": {
+        "title": "Der VPN-Anbieter hat diesen Link abgelehnt",
+        "why": "Der Server des VPN-Anbieters hat dieses Abo nicht akzeptiert.",
+        "tips": [
+          "Ihr Abo ist vielleicht abgelaufen, deaktiviert oder das Datenvolumen ist aufgebraucht",
+          "Wenden Sie sich an Ihren VPN-Anbieter, um es zu prüfen oder zu verlängern"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Zu viele Versuche",
+        "why": "Der Server des VPN-Anbieters erhält zu viele Anfragen von Ihnen.",
+        "tips": [
+          "Warten Sie ein paar Minuten und versuchen Sie es dann erneut"
+        ]
+      },
+      "badStatus": {
+        "title": "Der Server hat mit einem Fehler geantwortet",
+        "why": "Der Server des VPN-Anbieters hat mit einem unerwarteten Fehler geantwortet (Code $code).",
+        "tips": [
+          "Prüfen Sie den Link",
+          "Wenden Sie sich an Ihren VPN-Anbieter"
+        ]
+      },
+      "tooLarge": {
+        "title": "Das Abo ist zu groß",
+        "why": "Der Server hat mehr Daten gesendet, als die App lesen kann.",
+        "tips": [
+          "Prüfen Sie, ob das ein Abo-Link ist",
+          "Kontaktieren Sie Ihren VPN-Anbieter"
+        ]
+      },
+      "noInternet": {
+        "title": "Keine Internetverbindung",
+        "why": "Ihr Gerät ist nicht mit dem Internet verbunden.",
+        "tips": [
+          "Prüfen Sie WLAN oder mobile Daten",
+          "Stellen Sie sicher, dass der Flugmodus aus ist"
+        ]
+      },
+      "dns": {
+        "title": "Serveradresse nicht gefunden",
+        "why": "Der Name des Servers konnte nicht gefunden werden.",
+        "tips": [
+          "Prüfen Sie den Link auf Tippfehler",
+          "Ihr Netzwerk blockiert diese Adresse möglicherweise: Versuchen Sie ein anderes Netzwerk, zum Beispiel mobile Daten statt WLAN",
+          "Bitten Sie Ihren VPN-Anbieter um einen anderen Link"
+        ]
+      },
+      "certificate": {
+        "title": "Dem Zertifikat des Servers wird nicht vertraut",
+        "why": "Das Sicherheitszertifikat des Servers ist ungültig, oder etwas in Ihrem Netzwerk fängt die Verbindung ab.",
+        "tips": [
+          "Prüfen Sie, ob Datum und Uhrzeit Ihres Geräts stimmen",
+          "Versuchen Sie ein anderes Netzwerk",
+          "Kontaktieren Sie Ihren VPN-Anbieter"
+        ]
+      },
+      "reset": {
+        "title": "Verbindung unterbrochen, möglicherweise gefiltert",
+        "why": "Die Verbindung zum Server wurde beim Aufbau unterbrochen. Meist bedeutet das, dass Ihr Netzwerk oder Internetanbieter diesen Server filtert.",
+        "tips": [
+          "Ihr Netzwerk blockiert diese Adresse möglicherweise: Versuchen Sie ein anderes Netzwerk, zum Beispiel mobile Daten statt WLAN",
+          "Bitten Sie Ihren VPN-Anbieter um einen anderen Link"
+        ]
+      },
+      "tls": {
+        "title": "Sichere Verbindung fehlgeschlagen",
+        "why": "Eine sichere Verbindung zum Server konnte nicht aufgebaut werden. Möglicherweise filtert Ihr Netzwerk sie.",
+        "tips": [
+          "Versuchen Sie ein anderes Netzwerk",
+          "Bitten Sie Ihren VPN-Anbieter um einen anderen Link"
+        ]
+      },
+      "refused": {
+        "title": "Der Server hat die Verbindung abgelehnt",
+        "why": "Der Server nimmt keine Verbindungen an. Er ist möglicherweise ausgefallen, oder der Link ist falsch.",
+        "tips": [
+          "Versuchen Sie es später erneut",
+          "Prüfen Sie den Link",
+          "Kontaktieren Sie Ihren VPN-Anbieter"
+        ]
+      },
+      "timeout": {
+        "title": "Der Server hat nicht geantwortet",
+        "why": "Der Server hat nicht rechtzeitig geantwortet. Er ist möglicherweise ausgefallen, oder Ihr Netzwerk blockiert ihn.",
+        "tips": [
+          "Versuchen Sie es erneut",
+          "Ihr Netzwerk blockiert diese Adresse möglicherweise: Versuchen Sie ein anderes Netzwerk, zum Beispiel mobile Daten statt WLAN",
+          "Kontaktieren Sie Ihren VPN-Anbieter"
+        ]
+      },
+      "unknown": {
+        "title": "Abo konnte nicht heruntergeladen werden",
+        "why": "Beim Herunterladen des Abos ist etwas schiefgelaufen.",
+        "tips": [
+          "Prüfen Sie Ihre Internetverbindung und den Link und versuchen Sie es erneut",
+          "Wenn es weiter fehlschlägt, kopieren Sie die Details und senden Sie sie an Ihren VPN-Anbieter"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "Unerwarteter Fehler",
       "missingVpnPermission": "VPN-Berechtigung fehlt",
@@ -1300,7 +1498,8 @@
       "tunAddressInUse": "Ein anderes VPN ist aktiv",
       "tunAddressInUseMsg": "Der VPN-Modus kann nicht starten. Schalten Sie das andere VPN aus oder ändern Sie den Dienstmodus.",
       "invalidConfigOptions": "Ungültige Konfigurationsoptionen",
-      "invalidConfig": "Ungültige Konfiguration"
+      "invalidConfig": "Ungültige Konfiguration",
+      "missingConfig": "Die Konfiguration dieses Profils fehlt. Aktualisieren Sie das Profil oder fügen Sie es erneut hinzu."
     },
     "warp": {
       "missingLicense": "WARP-Lizenz erforderlich",

@@ -143,7 +143,8 @@
         "failed": "Şowsuz",
         "ready": "Taýýar",
         "searching": "Gözlenýär",
-        "reconnecting": "Gaýtadan baglanylýar"
+        "reconnecting": "Gaýtadan baglanylýar",
+        "resting": "Uklaýar"
       },
       "signalStyle": "Signal görnüşi",
       "keepTop": {
@@ -164,7 +165,23 @@
         "keep": "Iň çalt $keep sanysyny saklaň",
         "change": "Sanyny üýtget",
         "chosen": "Saýlan $n proksiňiz işleýär",
-        "choose": "Saýla"
+        "choose": "Saýla",
+        "restingShow": "$n uklaýan proksini görkez",
+        "restingHide": "Uklaýan proksileri gizle",
+        "restingHint": "Uklaýan proksi ýüklenmedik. Oýarmak üçin ony basyň: ol ýüklenýär we barlanýar. Berkitmek üçin uzak basyň.",
+        "restingTitle": "$n proksi dynç alýar",
+        "restingWhy": "Diňe iň çaltlary oýa galýar, şeýdip enjamyňyz çalt galýar, batareýa we data tygşytlanýar. Islän proksiňizi oýarmak üçin basyň.",
+        "fasterElsewhere": "Beýleki sebitlerdäki $n proksi has çalt",
+        "anyRegion": "Ähli sebitleri görkez",
+        "running": "işleýär",
+        "testing": "barlanýar…",
+        "untested": "barlanmaly…",
+        "modeTop": "Iň çalt $keep",
+        "modeWorking": "Diňe işleýänler",
+        "modeChosen": "Siziň saýlanlaryňyz",
+        "onlyAnswer": "Iň çalt $keep · diňe $n jogap berýär",
+        "working": "işleýär",
+        "failing": "işlemeýär"
       },
       "upload": {
         "test": "Ýükläp bermek tizligini barla",
@@ -335,6 +352,8 @@
         "disableAutoUpdate": "Awto täzelemäni öçür",
         "autoUpdateInterval": "Awto täzeleme aralygy",
         "loading": "Profil goşulýar…",
+        "retrying": "${failed}-nji synanşyk bolmady: ${reason}",
+        "retryingNext": "Ýene-de synanşylýar (${next}/${of})…",
         "adminPreference": "Administrator rugsady",
         "adminPreferenceAskEachTime": "Her gezek soramak",
         "adminPreferencePreferAdmin": "Hemişe administrator rugsadyny ulanmak",
@@ -362,17 +381,22 @@
       "coreLogLevelMsg": "Gaýtadan baglanyşandan soň güýje girýär",
       "buffer": "Bufer",
       "diagnostics": "Diagnostika hasabaty",
-      "diagnosticsMsg": "Çökme hasabatlary, žurnallar we serwersiz, parollarsyz sazlamalaryňyz, bir zip faýlda"
+      "diagnosticsMsg": "Çökme hasabatlary, žurnallar we serwersiz, parollarsyz sazlamalaryňyz, bir zip faýlda",
+      "fullReport": "Doly hasabat"
     },
     "about": {
       "title": "Programma barada",
       "notAvailableMsg": "Siz iň soňky wersiýany ulanýarsyňyz",
       "checkForUpdate": "Täzelenmäni barla",
+      "betaUpdates": "Beta täzelenmeler",
+      "betaUpdatesMsg": "Täze wersiýalary hemmeler üçin çykmanka alyň",
       "openWorkingDir": "Iş bukjasyny aç",
       "sourceCode": "Çeşme kody",
       "telegramChannel": "Telegram kanaly",
       "termsAndConditions": "Ulanyş şertleri",
-      "privacyPolicy": "Gizlinlik syýasaty"
+      "privacyPolicy": "Gizlinlik syýasaty",
+      "reportProblem": "Problema barada habar ber",
+      "reportProblemMsg": "Žurnallary we programmanyň ýagdaýyny ösdürijilere iberiň"
     },
     "settings": {
       "title": "Sazlamalar",
@@ -927,6 +951,7 @@
       "msg": "@:common.appTitle-iň täze wersiýasy bar. Indi täzelensinmi?",
       "currentVersion": "Häzirki wersiýa",
       "newVersion": "Täze wersiýa",
+      "changelog": "Täzelikler",
       "updateNow": "Indi täzele",
       "downloading": "Ýüklenýär…",
       "installing": "Gurnaýjy başlanýar…",
@@ -1078,7 +1103,9 @@
       "server": "Serwer",
       "country": "Ýurt",
       "tapToTest": "Barlamak üçin basyň",
-      "error": "Näme üçin şowsuz boldy"
+      "error": "Näme üçin şowsuz boldy",
+      "keepLoaded": "Proksini berkit",
+      "keepLoadedBody": "Pingi nähili bolsa-da, iň çaltlaryň ýanynda ýüklenen we barlanan bolup galýar."
     },
     "windowClosing": {
       "askEachTime": "Her gezek soramak",
@@ -1110,9 +1137,40 @@
       "notEncrypted": "Loglar şifrlenmedik",
       "title": "Hiddify soňky gezek çöküpdi",
       "msg": "Düzetmegimiz üçin hasabat iberiň. Loglar hem goşulýar.",
+      "sendHiddify": "Hiddify-a iber",
+      "sendHiddifyMsg": "Programma hasabaty özi ýükleýär",
+      "sent": "Hasabat iberildi. Sag boluň!",
+      "sendFailed": "Hasabaty ibermek başartmady. Onuň ýerine e-poçta ýa-da Telegram synap görüň.",
+      "subject": "Hiddify döwülme hasabaty",
+      "problemTitle": "Meseläni habar ber",
       "problemMsg": "Näme ýalňyş gidenini aýdyň. Loglar hem goşulýar.",
-      "send": "Hasabaty iber",
+      "description": "Näme boldy? (hökman däl)",
+      "descriptionHint": "Näme etdiňiz, näme garaşdyňyz, onuň ýerine näme gördüňiz",
+      "problemSubject": "Hiddify mesele hasabaty",
+      "back": "Yza",
+      "chooseHow": "Nädip ibermek isleýärsiňiz?",
       "steps": {
+        "preparing": "Loglar we sazlamalar ýygnalýar…",
+        "prepareFailed": "Hasabaty taýýarlamak başartmady. Yza dolanyp, täzeden synap görüň.",
+        "uploading": "Ýüklenýär…",
+        "save": "Hasabaty ýazdyryp saklaň",
+        "saveDesktopMsg": "Nirede saklajakdygyňyzy saýlaň",
+        "saveMobileMsg": "Menýuda Save to Files ýa-da Downloads saýlaň",
+        "openBot": "Goldaw botuny açyp, Start düwmesine basyň",
+        "openBotButton": "Boty aç",
+        "openMail": "E-poçta programmaňyzy açyň",
+        "openMailMsg": "Temasy doldurylan $address salgysyna täze hat",
+        "openMailButton": "E-poçtany aç",
+        "attachSend": "Hasabaty täze hata goşup iberiň",
+        "openGithub": "Täze GitHub issue açyň",
+        "openGithubMsg": "GitHub-a giriň. Düşündirişiňiz, platforma, wersiýa we ulgam maglumatlary doldurylan.",
+        "openGithubButton": "GitHub-y aç",
+        "dropInIssue": "Hasabaty goşup, Create düwmesine basyň",
+        "telegramPrivate": "Hususy: hasabaty diňe Hiddify goldaw topary görýär.",
+        "emailPrivate": "Hususy: hasabaty diňe Hiddify topary okaýar.",
+        "attachInChat": "Hasabaty bot bilen çatda goşup iberiň",
+        "attachHow": "Faýly içine süýräň ýa-da ilgeç nyşanyny ulanyň",
+        "dropInIssueHow": "Faýly Additional Context meýdanyna süýräň ýa-da şol meýdanyň aşagyndaky zolaga basyň",
         "ready": "Hasabat taýýar",
         "saveUnencryptedCopy": "Şifrlenmedik nusgany sakla"
       },
@@ -1137,7 +1195,8 @@
         "bannerMsg": "Näme bolandygyny ýazyň we “Dowam et” düwmesine basyň",
         "stop": "Togtat",
         "ended": "Jikme-jik loglar gutardy. Hasabaty “Mesele barada habar ber” arkaly iberiň."
-      }
+      },
+      "send": "Hasabaty iber"
     },
     "keepTop": {
       "title": "Uly abunalyk",
@@ -1230,6 +1289,11 @@
       "wipeData": "Maglumatlary arassala",
       "wipeConfirm": "Saklanan maglumatlar arassalanýar we Hiddify täzeden başlaýar. Henizem okalyp bilinýän profiller yzyna goşulýar; galanlaryny dikeldip bolmaýar.",
       "copyError": "Säwligi göçür"
+    },
+    "telegramChannel": {
+      "title": "Telegram-da Hiddify bilen birleşiň",
+      "msg": "Habarlar, täze çykarylyşlar we baglanyşykda galmak üçin maslahatlar üçin Hiddify-yň resmi kanalyna ýazylyň.",
+      "join": "Kanala goşul"
     }
   },
   "connection": {
@@ -1287,6 +1351,140 @@
       "invalidUrl": "Nädogry URL",
       "canceledByUser": "Ulanyjy tarapyndan ýatyryldy"
     },
+    "download": {
+      "details": "Jikme-jiklikler",
+      "errorCode": "Ýalňyşlyk kody",
+      "technicalDetails": "Tehniki jikme-jiklikler",
+      "whatToTry": "Nämäni synap görüp bolar",
+      "copyDetails": "Jikme-jiklikleri göçür",
+      "side": {
+        "provider": "VPN üpjün edijisiniň serweri",
+        "subscription": "Abunalygyňyz",
+        "network": "Birikmäňiz",
+        "unknown": "Sebäbi näbelli"
+      },
+      "path": {
+        "title": "Nirede durdy",
+        "device": "Enjamyňyz",
+        "internet": "Internet",
+        "provider": "VPN üpjün ediji"
+      },
+      "serverError": {
+        "title": "VPN üpjün edijisiniň serwerinde näsazlyk bar",
+        "why": "VPN üpjün edijiňiziň serweri ýalňyşlyk bilen jogap berdi (kod $code). Enjamyňyz we programma ýagşy.",
+        "tips": [
+          "Birnäçe minutdan täzeden synanyşyň",
+          "Gaýtalanaýsa, VPN üpjün edijiňiz bilen habarlaşyň"
+        ]
+      },
+      "notFound": {
+        "title": "Abunalyk tapylmady",
+        "why": "Bu baglanyşykda abunalyk ýok.",
+        "tips": [
+          "Baglanyşygyň hemmesini göçürendigiňizi barlaň",
+          "VPN üpjün edijiňizden täze baglanyşyk soraň: abunalyk aýrylan bolmagy mümkin"
+        ]
+      },
+      "denied": {
+        "title": "VPN üpjün ediji bu baglanyşygy ret etdi",
+        "why": "VPN üpjün edijisiniň serweri bu abunalygy kabul etmedi.",
+        "tips": [
+          "Abunalygyňyzyň möhleti gutarandyr, öçürilendir ýa-da trafigi gutarandyr",
+          "Barlamak ýa-da uzaltmak üçin VPN üpjün edijiňiz bilen habarlaşyň"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Gaty köp synanyşyk",
+        "why": "VPN üpjün edijisiniň serweri sizden gaty köp haýyş alýar.",
+        "tips": [
+          "Birnäçe minut garaşyň, soň täzeden synanyşyň"
+        ]
+      },
+      "badStatus": {
+        "title": "Serwer ýalňyşlyk bilen jogap berdi",
+        "why": "VPN üpjün edijisiniň serweri garaşylmadyk ýalňyşlyk bilen jogap berdi (kod $code).",
+        "tips": [
+          "Baglanyşygy barlaň",
+          "VPN üpjün edijiňiz bilen habarlaşyň"
+        ]
+      },
+      "tooLarge": {
+        "title": "Abunalyk gaty uly",
+        "why": "Serwer programmanyň okap biläýjeginden köp maglumat iberdi.",
+        "tips": [
+          "Munuň abunalyk baglanyşygydygyny barlaň",
+          "VPNüpjünedijiňiz bilen habarlaşyň"
+        ]
+      },
+      "noInternet": {
+        "title": "Internet baglanyşygy ýok",
+        "why": "Enjamyňyz internete birikdirilmedik.",
+        "tips": [
+          "Wi-Fi ýa-da mobil interneti barlaň",
+          "Uçar režiminiň öçürilendigine göz ýetiriň"
+        ]
+      },
+      "dns": {
+        "title": "Serweriň salgysy tapylmady",
+        "why": "Serweriň ady tapylmady.",
+        "tips": [
+          "Baglanyşykda ýalňyşlyk bar-ýokdugyny barlaň",
+          "Ulgamyňyz bu salgyny petiklän bolmagy mümkin: başga ulgam synap görüň, meselem, Wi-Fi ýerine mobil internet",
+          "VPNüpjünedijiňizden başga baglanyşyk soraň"
+        ]
+      },
+      "certificate": {
+        "title": "Serweriň sertifikatyna ynanylmaýar",
+        "why": "Serweriň howpsuzlyk sertifikaty ýaramsyz ýa-da ulgamyňyzdaky bir zat birikmäni saklaýar.",
+        "tips": [
+          "Enjamyňyzyň senesiniň we wagtynyň dogrudygyny barlaň",
+          "Başga ulgam synap görüň",
+          "VPNüpjünedijiňiz bilen habarlaşyň"
+        ]
+      },
+      "reset": {
+        "title": "Birikme kesildi, belki süzgüçlenýär",
+        "why": "Serwere birikme guralanda kesildi. Bu adatça ulgamyňyzyň ýa-da internet üpjünçiňiziň bu serweri süzýändigini aňladýar.",
+        "tips": [
+          "Ulgamyňyz bu salgyny petiklän bolmagy mümkin: başga ulgam synap görüň, meselem, Wi-Fi ýerine mobil internet",
+          "VPNüpjünedijiňizden başga baglanyşyk soraň"
+        ]
+      },
+      "tls": {
+        "title": "Howpsuz birikme başa barmady",
+        "why": "Serwer bilen howpsuz birikme gurup bolmady. Ulgamyňyz ony süzýän bolmagy mümkin.",
+        "tips": [
+          "Başga ulgam synap görüň",
+          "VPNüpjünedijiňizden başga baglanyşyk soraň"
+        ]
+      },
+      "refused": {
+        "title": "Serwer birikmäni ret etdi",
+        "why": "Serwer birikmeleri kabul etmeýär. Ol öçük bolmagy ýa-da baglanyşyk ýalňyş bolmagy mümkin.",
+        "tips": [
+          "Soňrak ýene bir gezek synap görüň",
+          "Baglanyşygy barlaň",
+          "VPNüpjünedijiňiz bilen habarlaşyň"
+        ]
+      },
+      "timeout": {
+        "title": "Serwer jogap bermedi",
+        "why": "Serwer wagtynda jogap bermedi. Ol öçük bolmagy ýa-da ulgamyňyz ony petikleýän bolmagy mümkin.",
+        "tips": [
+          "Ýene bir gezek synap görüň",
+          "Ulgamyňyz bu salgyny petiklän bolmagy mümkin: başga ulgam synap görüň, meselem, Wi-Fi ýerine mobil internet",
+          "VPNüpjünedijiňiz bilen habarlaşyň"
+        ]
+      },
+      "unknown": {
+        "title": "Abunalygy ýükläp bolmady",
+        "why": "Abunalygy ýükläninde bir zat nädogry boldy.",
+        "tips": [
+          "Internet baglanyşygyňyzy we baglanyşygy barlap, ýene synap görüň",
+          "Ýene-de bolmasa, jikme-jiklikleri göçürip VPNüpjünedijiňize iberiň"
+        ]
+      }
+    },
     "connectivity": {
       "unexpected": "Garaşylmadyk şowsuzlyk",
       "missingVpnPermission": "VPN rugsady ýok",
@@ -1300,7 +1498,8 @@
       "tunAddressInUse": "Başga VPN işjeň",
       "tunAddressInUseMsg": "VPN rejimi başlap bilmeýär. Beýleki VPN-i öçüriň ýa-da hyzmat rejimini üýtgediň.",
       "invalidConfigOptions": "Nädogry konfigurasiýa sazlamalary",
-      "invalidConfig": "Nädogry konfigurasiýa"
+      "invalidConfig": "Nädogry konfigurasiýa",
+      "missingConfig": "Bu profiliň konfigurasiýasy ýok. Profili täzeläň ýa-da täzeden goşuň."
     },
     "warp": {
       "missingLicense": "WARP ygtyýarnamasy gerek",
