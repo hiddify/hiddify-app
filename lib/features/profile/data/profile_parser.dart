@@ -8,8 +8,10 @@ import 'package:hiddify/core/db/db.dart';
 import 'package:hiddify/core/http_client/dio_http_client.dart';
 import 'package:hiddify/core/model/optional_range.dart';
 import 'package:hiddify/features/profile/data/profile_data_mapper.dart';
+import 'package:hiddify/features/profile/model/download_problem.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/singbox/model/singbox_proxy_type.dart';
 import 'package:hiddify/utils/utils.dart';
@@ -30,6 +32,12 @@ import 'package:meta/meta.dart';
 /// Note: the url-based steps (fragment, filename) apply to remote profiles only,
 /// since local profiles have no url. Every step treats a whitespace-only result
 /// as blank, so it falls through to the next step.
+
+/// Downloads a URL in the core with the user agent given; [cancel] completing stops it.
+typedef CoreFetch = Future<FetchUrlResponse> Function(String url, String userAgent, {required Future<void> cancel});
+
+/// Told that a download attempt failed with [failure] and attempt [next] of [of] begins.
+typedef DownloadRetryCallback = void Function(ProfileDownloadFailure failure, int next, int of);
 
 /// The longest update interval a subscription can ask for, in hours: a year.
 const maxUpdateIntervalHours = 24 * 365;
@@ -71,8 +79,11 @@ class ProfileParser with InfraLogger {
   ];
 
   final DioHttpClient _httpClient;
+  final CoreFetch? _coreFetch;
 
-  ProfileParser({required DioHttpClient httpClient}) : _httpClient = httpClient;
+  ProfileParser({required DioHttpClient httpClient, CoreFetch? coreFetch})
+    : _httpClient = httpClient,
+      _coreFetch = coreFetch;
   TaskEither<ProfileFailure, ProfileEntriesCompanion> addLocal({
     required String id,
     required String content,
@@ -104,7 +115,8 @@ class ProfileParser with InfraLogger {
     required String tempFilePath,
     required UserOverride? userOverride,
     CancelToken? cancelToken,
-  }) => _downloadProfile(url, tempFilePath, cancelToken).flatMap(
+    DownloadRetryCallback? onRetry,
+  }) => _downloadProfile(url, tempFilePath, cancelToken, onRetry).flatMap(
     (remoteHeaders) =>
         TaskEither.fromEither(
           populateHeaders(content: File(tempFilePath).readAsStringSync(), remoteHeaders: remoteHeaders),
@@ -132,7 +144,8 @@ class ProfileParser with InfraLogger {
     required RemoteProfileEntity rp,
     required String tempFilePath,
     CancelToken? cancelToken,
-  }) => _downloadProfile(rp.url, tempFilePath, cancelToken).flatMap(
+    DownloadRetryCallback? onRetry,
+  }) => _downloadProfile(rp.url, tempFilePath, cancelToken, onRetry).flatMap(
     (remoteHeaders) =>
         TaskEither.fromEither(
           populateHeaders(content: File(tempFilePath).readAsStringSync(), remoteHeaders: remoteHeaders),
@@ -158,26 +171,87 @@ class ProfileParser with InfraLogger {
       )
       .flatMap((profEntity) => Either.tryCatch(() => profEntity.toUpdateEntry(), ProfileFailure.unexpected));
 
+  /// The attempts at a download whose failure may pass, such as a timeout; one that will not, such as a
+  /// 404, is not tried again.
+  static const downloadAttempts = 2;
+  static const _retryDelay = Duration(seconds: 1);
+
+  /// Downloads the subscription, trying again once after a failure that may pass; [onRetry] is told
+  /// before the next attempt, for the user to see why it takes longer.
   TaskEither<ProfileFailure, Map<String, dynamic>> _downloadProfile(
     String url,
     String tempFilePath,
     CancelToken? cancelToken,
+    DownloadRetryCallback? onRetry,
   ) => TaskEither.tryCatch(() async {
-    // if (url.startsWith("http://"))
-    //   throw const ProfileFailure.invalidUrl('HTTP is not supported. Please use HTTPS for secure connection.');
-
-    final rs = await _httpClient.download(url.trim(), tempFilePath, cancelToken: cancelToken).catchError((err) {
-      if (CancelToken.isCancel(err as DioException)) {
-        throw const ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
+    final token = cancelToken ?? CancelToken();
+    for (var attempt = 1; ; attempt++) {
+      try {
+        return await _downloadOnce(url, tempFilePath, token);
+      } on ProfileDownloadFailure catch (failure) {
+        if (attempt >= downloadAttempts || !failure.problem.mayPass) rethrow;
+        onRetry?.call(failure, attempt + 1, downloadAttempts);
+        await Future.any([Future<void>.delayed(_retryDelay), token.whenCancel]);
+        if (token.isCancelled) throw _cancelled;
       }
-      throw err;
-    });
-    // fixing headers before return
-    return rs.headers.map.map((key, value) {
-      if (value.length == 1) return MapEntry(key, value.first);
-      return MapEntry(key, value);
-    });
+    }
   }, (err, st) => err is ProfileFailure ? err : ProfileFailure.unexpected(err, st));
+
+  static const _cancelled = ProfileFailure.cancelByUser('HTTP request for getting profile content canceled by user.');
+
+  /// One attempt: downloads the subscription in the core first, with the TLS handshake of Chrome, which some
+  /// networks let through when they drop Dart's; when that fails, downloads it here, once, without
+  /// retries, so a dead link fails in seconds. When both fail, the failure says why in the words of
+  /// the one that tells the most (an answer from the server before a network problem), with what
+  /// each one met as its detail.
+  Future<Map<String, dynamic>> _downloadOnce(String url, String tempFilePath, CancelToken token) async {
+    final link = url.trim();
+    final problems = <(DownloadProblem, int?)>[];
+    final details = <String>[];
+
+    if (_coreFetch case final coreFetch?) {
+      try {
+        final rs = await coreFetch(link, _httpClient.userAgent, cancel: token.whenCancel.then((_) {}));
+        if (DownloadProblem.ofCore(rs) case final problem?) {
+          final hasStatus = rs.error == FetchUrlError.FETCH_URL_ERROR_NONE;
+          problems.add((problem, hasStatus ? rs.statusCode : null));
+          details.add('core: ${hasStatus ? 'HTTP ${rs.statusCode}' : rs.errorDetail}');
+        } else {
+          await File(tempFilePath).writeAsBytes(rs.body, flush: true);
+          return _flattenHeaders({
+            for (final header in rs.headers)
+              header.name: [
+                for (final h in rs.headers)
+                  if (h.name == header.name) h.value,
+              ],
+          });
+        }
+      } catch (err) {
+        if (token.isCancelled) throw _cancelled;
+        // the core could not be asked: this says nothing about the server
+        details.add('core: unavailable');
+        loggy.debug('core download of the profile failed: $err');
+      }
+      loggy.debug('core download of the profile failed, downloading it here: ${details.last}');
+    }
+
+    try {
+      final rs = await _httpClient.download(link, tempFilePath, cancelToken: token, retry: false);
+      return _flattenHeaders(rs.headers.map);
+    } on DioException catch (err) {
+      if (CancelToken.isCancel(err)) throw _cancelled;
+      problems.add((DownloadProblem.ofDio(err), err.response?.statusCode));
+      details.add('app: ${DownloadProblem.detailOfDio(err)}');
+    }
+    final problem = DownloadProblem.mostTelling(problems.map((p) => p.$1));
+    final statusCode = problems.firstWhere((p) => p.$1 == problem).$2;
+    loggy.warning('profile download failed: ${problem.name}; ${details.join('; ')}');
+    throw ProfileFailure.download(problem, statusCode: statusCode, detail: details.join('\n'));
+  }
+
+  /// A header with one value as a string, with more as a list.
+  static Map<String, dynamic> _flattenHeaders(Map<String, List<String>> headers) =>
+      headers.map((key, value) => MapEntry(key, value.length == 1 ? value.first : value));
 
   /// Replaces every subscription link line in [text] with the content it points to.
   ///

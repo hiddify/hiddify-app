@@ -83,6 +83,11 @@ class HiddifyCoreService with InfraLogger {
     });
   }
 
+  /// Downloads [url] in the core, with the TLS handshake of Chrome; cancel the returned call to
+  /// stop it. A status other than 2xx is a response, not an error.
+  ResponseFuture<FetchUrlResponse> fetchUrl(String url, {required String userAgent, required Duration timeout}) =>
+      core.fgClient.fetchUrl(FetchUrlRequest(url: url, userAgent: userAgent, timeoutMs: timeout.inMilliseconds));
+
   TaskEither<String, String> generateFullConfigByPath(String path) {
     return TaskEither(() async {
       final response = await core.fgClient.parse(ParseRequest(configPath: path, debug: false));

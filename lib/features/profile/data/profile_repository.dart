@@ -34,12 +34,14 @@ abstract interface class ProfileRepository {
   });
 
   /// Adds the profile at [url], or updates it when one with that URL exists. With [activate] (the user adding a
-  /// profile, not an update), an existing one becomes the active profile, as a new one does.
+  /// profile, not an update), an existing one becomes the active profile, as a new one does. [onRetry] is told when
+  /// a failed download is tried again.
   TaskEither<ProfileFailure, Unit> upsertRemote(
     String url, {
     UserOverride? userOverride,
     CancelToken? cancelToken,
     bool activate = false,
+    DownloadRetryCallback? onRetry,
   });
 
   /// Adds [content] as a local profile; returns its id.
@@ -170,6 +172,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
     UserOverride? userOverride,
     CancelToken? cancelToken,
     bool activate = false,
+    DownloadRetryCallback? onRetry,
   }) =>
       TaskEither.tryCatch(() async {
         final profEntity = await _profileDataSource.getByUrl(url).then((profEntry) => profEntry?.toEntity());
@@ -191,7 +194,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
             profEntity = profEntity.copyWith(userOverride: userOverride);
           }
           task = _profileParser
-              .updateRemote(rp: profEntity, tempFilePath: tempFile.path, cancelToken: cancelToken)
+              .updateRemote(rp: profEntity, tempFilePath: tempFile.path, cancelToken: cancelToken, onRetry: onRetry)
               .flatMap(
                 (profEntity) =>
                     validateConfig(
@@ -215,6 +218,7 @@ class ProfileRepositoryImpl with ExceptionHandler, InfraLogger implements Profil
                 tempFilePath: tempFile.path,
                 userOverride: userOverride,
                 cancelToken: cancelToken,
+                onRetry: onRetry,
               )
               .flatMap(
                 (profEntity) =>

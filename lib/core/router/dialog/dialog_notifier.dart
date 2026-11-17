@@ -28,8 +28,10 @@ import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/common/qr_code_scanner_screen.dart';
 import 'package:hiddify/features/crash_report/widget/crash_report_dialog.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
+import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/overview/profiles_notifier.dart';
 import 'package:hiddify/features/profile/overview/remove_inactive_profiles_dialog.dart';
+import 'package:hiddify/features/profile/widget/download_failure_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_tags_dialog.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top.dart';
 import 'package:hiddify/features/proxy/keep_top/keep_top_widgets.dart';
@@ -339,6 +341,11 @@ class DialogNotifier extends _$DialogNotifier {
 
   Future<void> showCustomAlertFromErr(({String type, String? message}) err) async {
     return await _show<void>(CustomAlertDialog.fromErr(err));
+  }
+
+  /// Why a subscription could not be downloaded, in plain words; [action] is what failed.
+  Future<void> showDownloadFailure(ProfileDownloadFailure failure, {String? action}) async {
+    return await _show<void>(DownloadFailureDialog(failure: failure, action: action));
   }
 
   /// Mode B: VPN needs elevated admin_bgservice.

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hiddify/core/db/provider/db_providers.dart';
 import 'package:hiddify/core/directories/directories_provider.dart';
 import 'package:hiddify/core/http_client/http_client_provider.dart';
@@ -37,5 +39,13 @@ ProfilePathResolver profilePathResolver(Ref ref) {
 
 @Riverpod(keepAlive: true)
 ProfileParser profileParser(Ref ref) {
-  return ProfileParser(httpClient: ref.watch(httpClientProvider));
+  final core = ref.watch(hiddifyCoreServiceProvider);
+  return ProfileParser(
+    httpClient: ref.watch(httpClientProvider),
+    coreFetch: (url, userAgent, {required cancel}) {
+      final call = core.fetchUrl(url, userAgent: userAgent, timeout: const Duration(seconds: 30));
+      unawaited(cancel.then((_) => call.cancel()));
+      return call;
+    },
+  );
 }

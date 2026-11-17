@@ -352,6 +352,8 @@
         "disableAutoUpdate": "Turn off auto update",
         "autoUpdateInterval": "Auto update interval",
         "loading": "Adding profile…",
+        "retrying": "Attempt ${failed} didn’t work: ${reason}",
+        "retryingNext": "Trying again (${next} of ${of})…",
         "adminPreference": "Administrator permission",
         "adminPreferenceAskEachTime": "Ask each time",
         "adminPreferencePreferAdmin": "Always use administrator permission",
@@ -1347,6 +1349,140 @@
       "invalidConfig": "Invalid configuration",
       "invalidUrl": "Invalid URL",
       "canceledByUser": "Canceled by user"
+    },
+    "download": {
+      "details": "Details",
+      "errorCode": "Error code",
+      "technicalDetails": "Technical details",
+      "whatToTry": "What you can try",
+      "copyDetails": "Copy details",
+      "side": {
+        "provider": "VPN provider’s server",
+        "subscription": "Your subscription",
+        "network": "Your connection",
+        "unknown": "Unknown cause"
+      },
+      "path": {
+        "title": "Where it stopped",
+        "device": "Your device",
+        "internet": "Internet",
+        "provider": "VPN provider"
+      },
+      "serverError": {
+        "title": "The VPN provider’s server has a problem",
+        "why": "Your VPN provider’s server answered with an error (code $code). Your device and the app are fine.",
+        "tips": [
+          "Try again in a few minutes",
+          "If it keeps happening, contact your VPN provider"
+        ]
+      },
+      "notFound": {
+        "title": "Subscription not found",
+        "why": "There’s no subscription at this link.",
+        "tips": [
+          "Check that you copied the whole link",
+          "Ask your VPN provider for a new link: the subscription may have been removed"
+        ]
+      },
+      "denied": {
+        "title": "The VPN provider refused this link",
+        "why": "The VPN provider’s server didn’t accept this subscription.",
+        "tips": [
+          "Your subscription may have expired, been turned off, or used up its data",
+          "Contact your VPN provider to check or renew it"
+        ]
+      },
+      "tooManyRequests": {
+        "title": "Too many tries",
+        "why": "The VPN provider’s server is getting too many requests from you.",
+        "tips": [
+          "Wait a few minutes, then try again"
+        ]
+      },
+      "badStatus": {
+        "title": "The server answered with an error",
+        "why": "The VPN provider’s server answered with an unexpected error (code $code).",
+        "tips": [
+          "Check the link",
+          "Contact your VPN provider"
+        ]
+      },
+      "tooLarge": {
+        "title": "The subscription is too large",
+        "why": "The server sent more data than the app can read.",
+        "tips": [
+          "Check that this is a subscription link",
+          "Contact your VPN provider"
+        ]
+      },
+      "noInternet": {
+        "title": "No internet connection",
+        "why": "Your device isn’t connected to the internet.",
+        "tips": [
+          "Check your Wi-Fi or mobile data",
+          "Make sure airplane mode is off"
+        ]
+      },
+      "dns": {
+        "title": "Server address not found",
+        "why": "The server’s name couldn’t be found.",
+        "tips": [
+          "Check the link for typos",
+          "Your network may be blocking this address: try another network, such as mobile data instead of Wi-Fi",
+          "Ask your VPN provider for another link"
+        ]
+      },
+      "certificate": {
+        "title": "The server’s certificate isn’t trusted",
+        "why": "The server’s security certificate isn’t valid, or something on your network is intercepting the connection.",
+        "tips": [
+          "Check that your device’s date and time are right",
+          "Try another network",
+          "Contact your VPN provider"
+        ]
+      },
+      "reset": {
+        "title": "Connection cut, possibly filtered",
+        "why": "The connection to the server was cut while it was being set up. This usually means your network or internet provider is filtering this server.",
+        "tips": [
+          "Try another network, such as mobile data instead of Wi-Fi",
+          "Ask your VPN provider for another link"
+        ]
+      },
+      "tls": {
+        "title": "Secure connection failed",
+        "why": "A secure connection to the server couldn’t be set up. Your network may be filtering it.",
+        "tips": [
+          "Try another network",
+          "Ask your VPN provider for another link"
+        ]
+      },
+      "refused": {
+        "title": "The server refused the connection",
+        "why": "The server isn’t accepting connections. It may be down, or the link may be wrong.",
+        "tips": [
+          "Try again later",
+          "Check the link",
+          "Contact your VPN provider"
+        ]
+      },
+      "timeout": {
+        "title": "The server didn’t answer",
+        "why": "The server didn’t answer in time. It may be down, or your network may be blocking it.",
+        "tips": [
+          "Try again",
+          "Try another network, such as mobile data instead of Wi-Fi",
+          "Contact your VPN provider"
+        ]
+      },
+      "unknown": {
+        "title": "Couldn’t download the subscription",
+        "why": "Something went wrong while downloading the subscription.",
+        "tips": [
+          "Check your internet connection and the link, then try again",
+          "If it keeps failing, copy the details and send them to your VPN provider"
+        ]
+      }
     },
     "connectivity": {
       "unexpected": "Unexpected failure",

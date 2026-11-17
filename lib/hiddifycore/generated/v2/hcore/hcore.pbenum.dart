@@ -226,5 +226,37 @@ class EnsureAdminBgServiceProgress extends $pb.ProtobufEnum {
   const EnsureAdminBgServiceProgress._($core.int v, $core.String n) : super(v, n);
 }
 
+/// Why a download got no answer from the server, for the app to tell the user what to try.
+class FetchUrlError extends $pb.ProtobufEnum {
+  static const FetchUrlError FETCH_URL_ERROR_NONE = FetchUrlError._(0, _omitEnumNames ? '' : 'FETCH_URL_ERROR_NONE');
+  static const FetchUrlError FETCH_URL_ERROR_TIMEOUT = FetchUrlError._(1, _omitEnumNames ? '' : 'FETCH_URL_ERROR_TIMEOUT');
+  static const FetchUrlError FETCH_URL_ERROR_DNS = FetchUrlError._(2, _omitEnumNames ? '' : 'FETCH_URL_ERROR_DNS');
+  static const FetchUrlError FETCH_URL_ERROR_REFUSED = FetchUrlError._(3, _omitEnumNames ? '' : 'FETCH_URL_ERROR_REFUSED');
+  static const FetchUrlError FETCH_URL_ERROR_RESET = FetchUrlError._(4, _omitEnumNames ? '' : 'FETCH_URL_ERROR_RESET');
+  static const FetchUrlError FETCH_URL_ERROR_UNREACHABLE = FetchUrlError._(5, _omitEnumNames ? '' : 'FETCH_URL_ERROR_UNREACHABLE');
+  static const FetchUrlError FETCH_URL_ERROR_TLS = FetchUrlError._(6, _omitEnumNames ? '' : 'FETCH_URL_ERROR_TLS');
+  static const FetchUrlError FETCH_URL_ERROR_CERTIFICATE = FetchUrlError._(7, _omitEnumNames ? '' : 'FETCH_URL_ERROR_CERTIFICATE');
+  static const FetchUrlError FETCH_URL_ERROR_OTHER = FetchUrlError._(8, _omitEnumNames ? '' : 'FETCH_URL_ERROR_OTHER');
+  static const FetchUrlError FETCH_URL_ERROR_TOO_LARGE = FetchUrlError._(9, _omitEnumNames ? '' : 'FETCH_URL_ERROR_TOO_LARGE');
+
+  static const $core.List<FetchUrlError> values = <FetchUrlError> [
+    FETCH_URL_ERROR_NONE,
+    FETCH_URL_ERROR_TIMEOUT,
+    FETCH_URL_ERROR_DNS,
+    FETCH_URL_ERROR_REFUSED,
+    FETCH_URL_ERROR_RESET,
+    FETCH_URL_ERROR_UNREACHABLE,
+    FETCH_URL_ERROR_TLS,
+    FETCH_URL_ERROR_CERTIFICATE,
+    FETCH_URL_ERROR_OTHER,
+    FETCH_URL_ERROR_TOO_LARGE,
+  ];
+
+  static final $core.Map<$core.int, FetchUrlError> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static FetchUrlError? valueOf($core.int value) => _byValue[value];
+
+  const FetchUrlError._($core.int v, $core.String n) : super(v, n);
+}
+
 
 const _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');

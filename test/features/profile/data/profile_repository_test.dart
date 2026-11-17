@@ -30,6 +30,7 @@ class _FakeParser implements ProfileParser {
     required String tempFilePath,
     required UserOverride? userOverride,
     CancelToken? cancelToken,
+    DownloadRetryCallback? onRetry,
   }) => _download(tempFilePath);
 
   @override
@@ -37,6 +38,7 @@ class _FakeParser implements ProfileParser {
     required RemoteProfileEntity rp,
     required String tempFilePath,
     CancelToken? cancelToken,
+    DownloadRetryCallback? onRetry,
   }) => _download(tempFilePath);
 
   @override

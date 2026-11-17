@@ -25,6 +25,30 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'profile_notifier.g.dart';
 
+/// The failure dialog of an add or an update: a download that failed explains itself in its own
+/// dialog, with its problem as the title.
+void showProfileFailure(Ref ref, TranslationsEn t, Object error, {required String action}) {
+  final dialogs = ref.read(dialogNotifierProvider.notifier);
+  if (error is ProfileDownloadFailure) {
+    dialogs.showDownloadFailure(error, action: action);
+  } else {
+    dialogs.showCustomAlertFromErr(t.presentError(error, action: action));
+  }
+}
+
+/// A download attempt that failed while the next one runs, for the add profile sheet to show why
+/// it takes longer; null while no attempt failed.
+typedef ProfileDownloadRetry = ({ProfileDownloadFailure failure, int next, int of});
+
+@riverpod
+class AddProfileRetry extends _$AddProfileRetry {
+  @override
+  ProfileDownloadRetry? build() => null;
+
+  // ignore: use_setters_to_change_properties
+  void set(ProfileDownloadRetry? retry) => state = retry;
+}
+
 @riverpod
 class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
   @override
@@ -35,6 +59,8 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
       _cancelToken?.cancel();
     });
     listenSelf((previous, next) {
+      // a failed attempt is shown only while the add it belongs to runs
+      if (previous?.isLoading != next.isLoading) ref.read(addProfileRetryProvider.notifier).set(null);
       final t = ref.read(translationsProvider).requireValue;
       final notification = ref.read(inAppNotificationControllerProvider);
       switch (next) {
@@ -46,9 +72,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
           } else if (error case ProfileCancelByUserFailure()) {
             return;
           } else {
-            ref
-                .read(dialogNotifierProvider.notifier)
-                .showCustomAlertFromErr(t.presentError(error, action: t.pages.profiles.msg.add.failure));
+            showProfileFailure(ref, t, error, action: t.pages.profiles.msg.add.failure);
           }
       }
     });
@@ -60,6 +84,10 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
 
   ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
   CancelToken? _cancelToken;
+
+  /// Shows the failed attempt in the sheet until the next one ends.
+  void _onRetry(ProfileDownloadFailure failure, int next, int of) =>
+      ref.read(addProfileRetryProvider.notifier).set((failure: failure, next: next, of: of));
 
   Future<void> addClipboard(String rawInput) async {
     if (state.isLoading) return;
@@ -75,6 +103,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
           userOverride: rs.name.isNotEmpty ? UserOverride(name: rs.name) : null,
           cancelToken: _cancelToken = CancelToken(),
           activate: true,
+          onRetry: _onRetry,
         );
       } else {
         loggy.debug("adding profile, content");
@@ -123,7 +152,7 @@ class AddProfileNotifier extends _$AddProfileNotifier with AppLogger {
     if (state.isLoading) return;
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final task = _profilesRepo.upsertRemote(url, userOverride: userOverride, activate: true);
+      final task = _profilesRepo.upsertRemote(url, userOverride: userOverride, activate: true, onRetry: _onRetry);
       return await task
           .match(
             (err) {
@@ -185,9 +214,7 @@ class UpdateProfileNotifier extends _$UpdateProfileNotifier with AppLogger {
     // summarized in one aggregate toast by ForegroundProfilesUpdateNotifier.
     if (state case AsyncError(:final error) when !isBulk) {
       final t = ref.read(translationsProvider).requireValue;
-      ref
-          .read(dialogNotifierProvider.notifier)
-          .showCustomAlertFromErr(t.presentError(error, action: t.pages.profiles.msg.update.failure));
+      showProfileFailure(ref, t, error, action: t.pages.profiles.msg.update.failure);
     }
 
     // Hold the success/failure result for 2s so the leading can flash an icon,

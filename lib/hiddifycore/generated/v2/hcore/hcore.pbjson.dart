@@ -188,6 +188,32 @@ final $typed_data.Uint8List ensureAdminBgServiceProgressDescriptor = $convert.ba
     '9CR19GQUlMRURfUEVSTUlTU0lPTl9ERU5JRUQQAxIgChxFTlNVUkVfQURNSU5fQkdfRkFJTEVE'
     'X09USEVSEAQ=');
 
+@$core.Deprecated('Use fetchUrlErrorDescriptor instead')
+const FetchUrlError$json = {
+  '1': 'FetchUrlError',
+  '2': [
+    {'1': 'FETCH_URL_ERROR_NONE', '2': 0},
+    {'1': 'FETCH_URL_ERROR_TIMEOUT', '2': 1},
+    {'1': 'FETCH_URL_ERROR_DNS', '2': 2},
+    {'1': 'FETCH_URL_ERROR_REFUSED', '2': 3},
+    {'1': 'FETCH_URL_ERROR_RESET', '2': 4},
+    {'1': 'FETCH_URL_ERROR_UNREACHABLE', '2': 5},
+    {'1': 'FETCH_URL_ERROR_TLS', '2': 6},
+    {'1': 'FETCH_URL_ERROR_CERTIFICATE', '2': 7},
+    {'1': 'FETCH_URL_ERROR_OTHER', '2': 8},
+    {'1': 'FETCH_URL_ERROR_TOO_LARGE', '2': 9},
+  ],
+};
+
+/// Descriptor for `FetchUrlError`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List fetchUrlErrorDescriptor = $convert.base64Decode(
+    'Cg1GZXRjaFVybEVycm9yEhgKFEZFVENIX1VSTF9FUlJPUl9OT05FEAASGwoXRkVUQ0hfVVJMX0'
+    'VSUk9SX1RJTUVPVVQQARIXChNGRVRDSF9VUkxfRVJST1JfRE5TEAISGwoXRkVUQ0hfVVJMX0VS'
+    'Uk9SX1JFRlVTRUQQAxIZChVGRVRDSF9VUkxfRVJST1JfUkVTRVQQBBIfChtGRVRDSF9VUkxfRV'
+    'JST1JfVU5SRUFDSEFCTEUQBRIXChNGRVRDSF9VUkxfRVJST1JfVExTEAYSHwobRkVUQ0hfVVJM'
+    'X0VSUk9SX0NFUlRJRklDQVRFEAcSGQoVRkVUQ0hfVVJMX0VSUk9SX09USEVSEAgSHQoZRkVUQ0'
+    'hfVVJMX0VSUk9SX1RPT19MQVJHRRAJ');
+
 @$core.Deprecated('Use coreInfoResponseDescriptor instead')
 const CoreInfoResponse$json = {
   '1': 'CoreInfoResponse',
@@ -884,4 +910,51 @@ final $typed_data.Uint8List ensureAdminBgServiceEventDescriptor = $convert.base6
     'ChlFbnN1cmVBZG1pbkJnU2VydmljZUV2ZW50Ej8KCHByb2dyZXNzGAEgASgOMiMuaGNvcmUuRW'
     '5zdXJlQWRtaW5CZ1NlcnZpY2VQcm9ncmVzc1IIcHJvZ3Jlc3MSGAoHbWVzc2FnZRgCIAEoCVIH'
     'bWVzc2FnZRIhCgxzZXJ2aWNlX3BvcnQYAyABKA1SC3NlcnZpY2VQb3J0');
+
+@$core.Deprecated('Use fetchUrlRequestDescriptor instead')
+const FetchUrlRequest$json = {
+  '1': 'FetchUrlRequest',
+  '2': [
+    {'1': 'url', '3': 1, '4': 1, '5': 9, '10': 'url'},
+    {'1': 'user_agent', '3': 2, '4': 1, '5': 9, '10': 'userAgent'},
+    {'1': 'timeout_ms', '3': 3, '4': 1, '5': 5, '10': 'timeoutMs'},
+  ],
+};
+
+/// Descriptor for `FetchUrlRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List fetchUrlRequestDescriptor = $convert.base64Decode(
+    'Cg9GZXRjaFVybFJlcXVlc3QSEAoDdXJsGAEgASgJUgN1cmwSHQoKdXNlcl9hZ2VudBgCIAEoCV'
+    'IJdXNlckFnZW50Eh0KCnRpbWVvdXRfbXMYAyABKAVSCXRpbWVvdXRNcw==');
+
+@$core.Deprecated('Use httpHeaderDescriptor instead')
+const HttpHeader$json = {
+  '1': 'HttpHeader',
+  '2': [
+    {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'value', '3': 2, '4': 1, '5': 9, '10': 'value'},
+  ],
+};
+
+/// Descriptor for `HttpHeader`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List httpHeaderDescriptor = $convert.base64Decode(
+    'CgpIdHRwSGVhZGVyEhIKBG5hbWUYASABKAlSBG5hbWUSFAoFdmFsdWUYAiABKAlSBXZhbHVl');
+
+@$core.Deprecated('Use fetchUrlResponseDescriptor instead')
+const FetchUrlResponse$json = {
+  '1': 'FetchUrlResponse',
+  '2': [
+    {'1': 'status_code', '3': 1, '4': 1, '5': 5, '10': 'statusCode'},
+    {'1': 'headers', '3': 2, '4': 3, '5': 11, '6': '.hcore.HttpHeader', '10': 'headers'},
+    {'1': 'body', '3': 3, '4': 1, '5': 12, '10': 'body'},
+    {'1': 'error', '3': 4, '4': 1, '5': 14, '6': '.hcore.FetchUrlError', '10': 'error'},
+    {'1': 'error_detail', '3': 5, '4': 1, '5': 9, '10': 'errorDetail'},
+  ],
+};
+
+/// Descriptor for `FetchUrlResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List fetchUrlResponseDescriptor = $convert.base64Decode(
+    'ChBGZXRjaFVybFJlc3BvbnNlEh8KC3N0YXR1c19jb2RlGAEgASgFUgpzdGF0dXNDb2RlEisKB2'
+    'hlYWRlcnMYAiADKAsyES5oY29yZS5IdHRwSGVhZGVyUgdoZWFkZXJzEhIKBGJvZHkYAyABKAxS'
+    'BGJvZHkSKgoFZXJyb3IYBCABKA4yFC5oY29yZS5GZXRjaFVybEVycm9yUgVlcnJvchIhCgxlcn'
+    'Jvcl9kZXRhaWwYBSABKAlSC2Vycm9yRGV0YWls');
 

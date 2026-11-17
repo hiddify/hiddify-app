@@ -3482,6 +3482,255 @@ class EnsureAdminBgServiceEvent extends $pb.GeneratedMessage {
   void clearServicePort() => clearField(3);
 }
 
+class FetchUrlRequest extends $pb.GeneratedMessage {
+  factory FetchUrlRequest({
+    $core.String? url,
+    $core.String? userAgent,
+    $core.int? timeoutMs,
+  }) {
+    final $result = create();
+    if (url != null) {
+      $result.url = url;
+    }
+    if (userAgent != null) {
+      $result.userAgent = userAgent;
+    }
+    if (timeoutMs != null) {
+      $result.timeoutMs = timeoutMs;
+    }
+    return $result;
+  }
+  FetchUrlRequest._() : super();
+  factory FetchUrlRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FetchUrlRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FetchUrlRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'url')
+    ..aOS(2, _omitFieldNames ? '' : 'userAgent')
+    ..a<$core.int>(3, _omitFieldNames ? '' : 'timeoutMs', $pb.PbFieldType.O3)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FetchUrlRequest clone() => FetchUrlRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FetchUrlRequest copyWith(void Function(FetchUrlRequest) updates) => super.copyWith((message) => updates(message as FetchUrlRequest)) as FetchUrlRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static FetchUrlRequest create() => FetchUrlRequest._();
+  FetchUrlRequest createEmptyInstance() => create();
+  static $pb.PbList<FetchUrlRequest> createRepeated() => $pb.PbList<FetchUrlRequest>();
+  @$core.pragma('dart2js:noInline')
+  static FetchUrlRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FetchUrlRequest>(create);
+  static FetchUrlRequest? _defaultInstance;
+
+  /// http or https
+  @$pb.TagNumber(1)
+  $core.String get url => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set url($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasUrl() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearUrl() => clearField(1);
+
+  /// Sent as is: servers pick the format of a subscription by it.
+  @$pb.TagNumber(2)
+  $core.String get userAgent => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set userAgent($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasUserAgent() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearUserAgent() => clearField(2);
+
+  /// For the whole download, redirects included; 0 for the default (30 s).
+  @$pb.TagNumber(3)
+  $core.int get timeoutMs => $_getIZ(2);
+  @$pb.TagNumber(3)
+  set timeoutMs($core.int v) { $_setSignedInt32(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasTimeoutMs() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearTimeoutMs() => clearField(3);
+}
+
+class HttpHeader extends $pb.GeneratedMessage {
+  factory HttpHeader({
+    $core.String? name,
+    $core.String? value,
+  }) {
+    final $result = create();
+    if (name != null) {
+      $result.name = name;
+    }
+    if (value != null) {
+      $result.value = value;
+    }
+    return $result;
+  }
+  HttpHeader._() : super();
+  factory HttpHeader.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory HttpHeader.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'HttpHeader', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'name')
+    ..aOS(2, _omitFieldNames ? '' : 'value')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  HttpHeader clone() => HttpHeader()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  HttpHeader copyWith(void Function(HttpHeader) updates) => super.copyWith((message) => updates(message as HttpHeader)) as HttpHeader;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static HttpHeader create() => HttpHeader._();
+  HttpHeader createEmptyInstance() => create();
+  static $pb.PbList<HttpHeader> createRepeated() => $pb.PbList<HttpHeader>();
+  @$core.pragma('dart2js:noInline')
+  static HttpHeader getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<HttpHeader>(create);
+  static HttpHeader? _defaultInstance;
+
+  /// lower case
+  @$pb.TagNumber(1)
+  $core.String get name => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set name($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get value => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set value($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasValue() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearValue() => clearField(2);
+}
+
+class FetchUrlResponse extends $pb.GeneratedMessage {
+  factory FetchUrlResponse({
+    $core.int? statusCode,
+    $core.Iterable<HttpHeader>? headers,
+    $core.List<$core.int>? body,
+    FetchUrlError? error,
+    $core.String? errorDetail,
+  }) {
+    final $result = create();
+    if (statusCode != null) {
+      $result.statusCode = statusCode;
+    }
+    if (headers != null) {
+      $result.headers.addAll(headers);
+    }
+    if (body != null) {
+      $result.body = body;
+    }
+    if (error != null) {
+      $result.error = error;
+    }
+    if (errorDetail != null) {
+      $result.errorDetail = errorDetail;
+    }
+    return $result;
+  }
+  FetchUrlResponse._() : super();
+  factory FetchUrlResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory FetchUrlResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FetchUrlResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'hcore'), createEmptyInstance: create)
+    ..a<$core.int>(1, _omitFieldNames ? '' : 'statusCode', $pb.PbFieldType.O3)
+    ..pc<HttpHeader>(2, _omitFieldNames ? '' : 'headers', $pb.PbFieldType.PM, subBuilder: HttpHeader.create)
+    ..a<$core.List<$core.int>>(3, _omitFieldNames ? '' : 'body', $pb.PbFieldType.OY)
+    ..e<FetchUrlError>(4, _omitFieldNames ? '' : 'error', $pb.PbFieldType.OE, defaultOrMaker: FetchUrlError.FETCH_URL_ERROR_NONE, valueOf: FetchUrlError.valueOf, enumValues: FetchUrlError.values)
+    ..aOS(5, _omitFieldNames ? '' : 'errorDetail')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  FetchUrlResponse clone() => FetchUrlResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  FetchUrlResponse copyWith(void Function(FetchUrlResponse) updates) => super.copyWith((message) => updates(message as FetchUrlResponse)) as FetchUrlResponse;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static FetchUrlResponse create() => FetchUrlResponse._();
+  FetchUrlResponse createEmptyInstance() => create();
+  static $pb.PbList<FetchUrlResponse> createRepeated() => $pb.PbList<FetchUrlResponse>();
+  @$core.pragma('dart2js:noInline')
+  static FetchUrlResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FetchUrlResponse>(create);
+  static FetchUrlResponse? _defaultInstance;
+
+  /// 0 when there is an error
+  @$pb.TagNumber(1)
+  $core.int get statusCode => $_getIZ(0);
+  @$pb.TagNumber(1)
+  set statusCode($core.int v) { $_setSignedInt32(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasStatusCode() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearStatusCode() => clearField(1);
+
+  /// One entry per value: a header sent twice comes twice.
+  @$pb.TagNumber(2)
+  $core.List<HttpHeader> get headers => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get body => $_getN(2);
+  @$pb.TagNumber(3)
+  set body($core.List<$core.int> v) { $_setBytes(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasBody() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearBody() => clearField(3);
+
+  @$pb.TagNumber(4)
+  FetchUrlError get error => $_getN(3);
+  @$pb.TagNumber(4)
+  set error(FetchUrlError v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasError() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearError() => clearField(4);
+
+  /// the error in technical words, without the URL (it carries the user's token)
+  @$pb.TagNumber(5)
+  $core.String get errorDetail => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set errorDetail($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasErrorDetail() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearErrorDetail() => clearField(5);
+}
+
 
 const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');
 const _omitMessageNames = $core.bool.fromEnvironment('protobuf.omit_message_names');
