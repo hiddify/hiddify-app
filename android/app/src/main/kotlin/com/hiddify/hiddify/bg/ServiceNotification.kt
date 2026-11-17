@@ -139,7 +139,11 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         }
     }
 
-    suspend fun start() {
+    /** Whether the core's server, set up by the service, serves mTLS: the polling client's mode. */
+    private var mutualTls = false
+
+    suspend fun start(mutualTls: Boolean) {
+        this.mutualTls = mutualTls
         if (!checkPermission()) return
         startPolling()
         withContext(Dispatchers.Main) { registerReceiver() }
@@ -187,7 +191,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
             while (isActive) {
                 try {
                     val client = coreClient
-                        ?: GrpcClientProvider.grpcClient.create(CoreClient::class).also { coreClient = it }
+                        ?: GrpcClientProvider.grpcClient(mutualTls).create(CoreClient::class).also { coreClient = it }
                     val info = client.GetSystemInfo().executeBlocking(Empty())
                     if (!isActive) break // stopped while the call was in flight
                     update(previous, info, showSpeed)

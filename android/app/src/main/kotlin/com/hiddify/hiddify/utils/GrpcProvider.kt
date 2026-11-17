@@ -44,20 +44,22 @@ object GrpcClientProvider {
     private fun identityDirectory() = File(Settings.baseDir, IDENTITY_DIR)
 
     /**
-     * Built on every call: the server certificate exists only once the core is set up, and the
-     * client identity is made by Flutter before it starts the service.
+     * A client for the server the service set up, in the mode it set it up with ([mutualTls] when
+     * that was mode 2). Not decided again from the identity files: when they appeared after the
+     * server was set up (the app writes its identity before its own setup, while a service started
+     * by the tile or always-on already ran a plain server), the client spoke TLS to a plaintext
+     * server, and the core had no server certificate to trust.
      */
-    val grpcClient: GrpcClient
-        get() = buildClient()
+    fun grpcClient(mutualTls: Boolean): GrpcClient = buildClient(mutualTls)
 
-    private fun buildClient(): GrpcClient {
+    private fun buildClient(mutualTls: Boolean): GrpcClient {
         val port = Settings.grpcServiceModePort
         val builder = OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
 
-        if (!usesMutualTls) {
+        if (!mutualTls) {
             val client = builder.protocols(listOf(Protocol.H2_PRIOR_KNOWLEDGE)).build()
             return GrpcClient.Builder().client(client).baseUrl("http://127.0.0.1:$port").build()
         }

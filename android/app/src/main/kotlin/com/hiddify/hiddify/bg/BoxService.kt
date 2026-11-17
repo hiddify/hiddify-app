@@ -231,7 +231,7 @@ class BoxService(
                 status.value = Status.Started
                 notification.show(activeProfileName, R.string.status_started)
             }
-            notification.start()
+            notification.start(mutualTls = grpcSetupMode == 2L)
             return null
         } catch (e: Exception) {
             if (e is CancellationException) throw e
