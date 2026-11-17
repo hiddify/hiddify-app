@@ -1,7 +1,16 @@
 # Changelog
 
 
-## 5.9.9 (2026-11-17)
+## 5.9.11 (2026-11-17)
+
+#### Other
+
+* Feat(chain): the unblocker icon at rest shows its door open with the traffic waiting. 
+  _Shut and empty, it was a bare line._
+
+
+
+## v5.9.9 (2026-11-17)
 
 #### Other
 
