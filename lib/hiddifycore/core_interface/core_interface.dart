@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:hiddify/core/model/directories.dart';
+import 'package:hiddify/hiddifycore/generated/v2/hcommon/common.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore_service.pbgrpc.dart';
 import 'package:hiddify/singbox/model/core_status.dart';
@@ -19,6 +22,60 @@ Future<CoreInfoResponse> startOnceStopped(
       return response;
     }
     await Future<void>.delayed(const Duration(milliseconds: 150));
+  }
+}
+
+/// Starts the core through [client] (see [startOnceStopped]) and returns how the start ended. The
+/// core answers Start as soon as it has queued it, and a start that fails afterwards (its port in
+/// use, a config the engine refuses) is reported only on its status stream: STARTING, then STOPPED
+/// with the reason. Taken from the answer alone, such a start was a connect that worked, with no
+/// core behind it. The answer is returned when it is already the outcome (a refusal, or already
+/// started); otherwise the status that ends the start, within [timeout].
+Future<CoreInfoResponse> startAndConfirm(
+  CoreClient client,
+  StartRequest request, {
+  Duration patience = const Duration(seconds: 10),
+  Duration timeout = const Duration(minutes: 2),
+}) async {
+  final outcome = Completer<CoreInfoResponse>();
+  var starting = false;
+  // listened to before the start: its STARTING and its outcome may come before Start's answer
+  final statuses = client
+      .coreInfoListener(Empty())
+      .listen(
+        (info) {
+          if (outcome.isCompleted) return;
+          switch (info.coreState) {
+            case CoreStates.STARTING:
+              starting = true;
+            case CoreStates.STARTED || CoreStates.WAITING || CoreStates.NO_AVAILABLE_PROXIES:
+              outcome.complete(info);
+            // a STOPPED before STARTING is the state before this start (a new listener is told it);
+            // one after it ends the start, with the reason, or as not started when it has none
+            case CoreStates.STOPPED when starting:
+              outcome.complete(
+                info.messageType == MessageType.EMPTY
+                    ? CoreInfoResponse(
+                        coreState: CoreStates.STOPPED,
+                        messageType: MessageType.INSTANCE_NOT_STARTED,
+                        message: info.message.isEmpty ? 'the core stopped while it started' : info.message,
+                      )
+                    : info,
+              );
+            default:
+          }
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          if (!outcome.isCompleted) outcome.completeError(error, stackTrace);
+        },
+        cancelOnError: true,
+      );
+  try {
+    final response = await startOnceStopped(client, request, patience: patience);
+    if (response.messageType != MessageType.EMPTY) return response;
+    return await outcome.future.timeout(timeout);
+  } finally {
+    unawaited(statuses.cancel());
   }
 }
 

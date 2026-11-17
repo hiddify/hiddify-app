@@ -163,8 +163,9 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       final engine = await _engineWith(options);
       _useBgClient(engine);
       // the stop above may still be under way in the core
+      // the start's outcome, not only its answer: see startAndConfirm
       _checkResponse(
-        await startOnceStopped(
+        await startAndConfirm(
           engine,
           StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
         ),
@@ -181,7 +182,7 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
         final engine = await _engineWith(options);
         _useBgClient(engine);
         _checkResponse(
-          await startOnceStopped(
+          await startAndConfirm(
             engine,
             StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
           ),

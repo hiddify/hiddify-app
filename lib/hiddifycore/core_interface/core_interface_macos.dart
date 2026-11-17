@@ -273,8 +273,9 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
       } else {
         _usingVPN = false;
         bgClient = fgClient;
-        // the quiet stop above may still be under way in the core
-        final response = await startOnceStopped(
+        // the quiet stop above may still be under way in the core; the outcome, not only the
+        // answer, see startAndConfirm
+        final response = await startAndConfirm(
           fgClient,
           StartRequest(configPath: path, configName: name, disableMemoryLimit: disableMemoryLimit),
         );
