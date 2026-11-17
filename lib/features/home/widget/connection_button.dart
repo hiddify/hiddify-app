@@ -610,8 +610,8 @@ class _ChainBadge extends StatelessWidget {
   };
 
   Widget _glyphWidget(StepStatus status) => switch ((_type, status)) {
-    // the traffic keeps getting through on its way and once up, as on the proxy card; shut while it
-    // waits or fails
+    // the traffic keeps getting through on its way and once up, as on the proxy card; still, the
+    // door open and the dots lined up, while it waits or fails
     (ChainType.unblocker, _) => PassingDoor(
       size: _glyphSize,
       color: Colors.white,
