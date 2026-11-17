@@ -372,8 +372,9 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
       // VPN down with the process
       if (status.message == 'stopped') await _serviceLost('The VPN service restarted, and the VPN stopped with it.');
     } catch (error) {
-      // one miss may be a reload holding the service; two in a row is a service that is gone
-      if (++_serviceMisses >= 2) await _serviceLost('The VPN service stopped unexpectedly.');
+      // the service answers its status at once, even during a reload: two misses in a row is a
+      // service that is gone, or hung with its engine maybe still routing, which is stopped
+      if (++_serviceMisses >= 2) await _serviceLost('The VPN service stopped unexpectedly.', stopEngine: true);
     } finally {
       _checkingService = false;
     }
@@ -381,7 +382,10 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
 
   /// Reports a VPN whose service is gone, as a failure; the service undoes the routing its engine
   /// left when it starts again (hiddify-core CleanupLeftovers).
-  Future<void> _serviceLost(String message) async {
+  ///
+  /// With [stopEngine] the service did not answer at all: if it is only hung, its engine may still
+  /// route the traffic through a TUN the app no longer follows, so it is asked to stop it as well.
+  Future<void> _serviceLost(String message, {bool stopEngine = false}) async {
     // a stop or a restart under way changed the status: the loss is theirs to report
     if (!_usingAdminBg || _status.value is! CoreStarted) return;
     _unwatchService();
@@ -390,6 +394,13 @@ class CoreInterfaceDesktopTun extends CoreInterfaceDesktop {
     _usingAdminBg = false;
     _useBgClient(fgClient);
     await _restoreServiceSystemProxy();
+    if (stopEngine) {
+      try {
+        await _stopServiceEngine(lost);
+      } catch (error) {
+        loggy.debug('stopping the engine of a lost VPN service: $error');
+      }
+    }
     if (lost != null) unawaited(lost.shutdown().catchError((_) {}));
     loggy.warning(message);
     _status.add(CoreStatus.stopped(alert: CoreAlert.startFailed, message: message));
