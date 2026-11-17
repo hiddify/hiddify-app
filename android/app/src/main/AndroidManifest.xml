@@ -121,7 +121,6 @@
 
         <service
             android:name=".bg.TileService"
-            android:directBootAware="true"
             android:exported="true"
             android:icon="@drawable/ic_stat_logo"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
