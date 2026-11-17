@@ -423,7 +423,8 @@ class _TimelineStep extends StatelessWidget {
         child: AnimatedSwitcher(
           duration: _motion,
           transitionBuilder: (child, animation) => ScaleTransition(
-            scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+            // drive, not CurvedAnimation, which listens to the parent until it is disposed
+            scale: animation.drive(CurveTween(curve: Curves.easeOutBack)),
             child: child,
           ),
           child: state == _Step.done

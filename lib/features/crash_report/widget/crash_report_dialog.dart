@@ -1027,7 +1027,9 @@ class _ScrubStep extends StatelessWidget {
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
               transitionBuilder: (child, animation) => ScaleTransition(
-                scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                // drive, not CurvedAnimation: that one listens to the parent until it is disposed,
+                // and a transition builder makes one on every rebuild
+                scale: animation.drive(CurveTween(curve: Curves.easeOutBack)),
                 child: FadeTransition(opacity: animation, child: child),
               ),
               child: mark,
