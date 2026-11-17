@@ -22,6 +22,11 @@ class SingboxConfigOption with _$SingboxConfigOption {
     @Default(true) bool useSystemTlsEngine,
     required bool executeConfigAsIs,
     required LogLevel logLevel,
+
+    /// The end of [logLevel], when it is for a while (a trace session from Report a problem): the
+    /// core goes back to [logLevelAfter] then by itself, also when the app is not running.
+    DateTime? logLevelUntil,
+    LogLevel? logLevelAfter,
     required bool resolveDestination,
     required IPv6Mode ipv6Mode,
     required String remoteDnsAddress,

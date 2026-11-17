@@ -45,7 +45,8 @@ class TraceSessionNotifier extends Notifier<DateTime?> {
   bool get active => state != null;
 
   /// Turns trace on for [duration]. A running core picks it up by reconnecting by itself
-  /// (ConfigOptionNotifier), a stopped one on the next connect.
+  /// (ConfigOptionNotifier), a stopped one on the next connect. The core is told the end too
+  /// (ConfigOptions.singboxConfigOptions), and goes back by itself when the app is not running then.
   Future<void> start() async {
     final level = ref.read(ConfigOptions.logLevel);
     // a second start keeps the level from before the first
@@ -53,10 +54,14 @@ class TraceSessionNotifier extends Notifier<DateTime?> {
     final until = DateTime.now().add(duration);
     await _prefs.setString(_untilKey, until.toIso8601String());
     _schedule(until);
+    // the end first, then the level: the core's options change once, with both
     state = until;
     _log.info('trace logging on until $until (was ${level.name})');
     if (level != LogLevel.trace) await ref.read(ConfigOptions.logLevel.notifier).update(LogLevel.trace);
   }
+
+  /// The level the session goes back to, while one runs.
+  LogLevel? get levelBefore => LogLevel.values.asNameMap()[_prefs.getString(_levelBeforeKey) ?? ''];
 
   /// Ends it now: the report is made, or the user stopped it.
   Future<void> stop() => _end(notify: false);
@@ -69,15 +74,16 @@ class TraceSessionNotifier extends Notifier<DateTime?> {
   Future<void> _end({required bool notify}) async {
     _timer?.cancel();
     _timer = null;
-    final before = LogLevel.values.asNameMap()[_prefs.getString(_levelBeforeKey) ?? ''] ?? LogLevel.warn;
-    await _prefs.remove(_untilKey);
-    await _prefs.remove(_levelBeforeKey);
+    final before = levelBefore ?? LogLevel.warn;
     final wasActive = state != null;
-    state = null;
-    // a level the user picked by hand meanwhile is theirs to keep
+    // the level first, then the end: the core's options change once, with both; a level the user
+    // picked by hand meanwhile is theirs to keep
     if (ref.read(ConfigOptions.logLevel) == LogLevel.trace && before != LogLevel.trace) {
       await ref.read(ConfigOptions.logLevel.notifier).update(before);
     }
+    await _prefs.remove(_untilKey);
+    await _prefs.remove(_levelBeforeKey);
+    state = null;
     _log.info('trace logging off, back to ${before.name}');
     if (notify && wasActive) {
       final t = ref.read(translationsProvider).valueOrNull;
