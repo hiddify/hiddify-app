@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hiddify/hiddifycore/core_interface/core_process.dart';
 
@@ -38,6 +40,25 @@ github.com/sagernet/sing-box/route.(*Router).Start(...)
       final headline = CoreProcess.crashHeadline('panic: ${'x' * 1000}')!;
       expect(headline.length, lessThan(310));
       expect(headline, endsWith('…'));
+    });
+  });
+
+  group('CoreProcess.crashReasonOf', () {
+    late Directory directory;
+    setUp(() async => directory = await Directory.systemTemp.createTemp('hiddify-crash-'));
+    tearDown(() => directory.delete(recursive: true));
+
+    // a core that dies before its setup re-creates the file left the earlier crash's panic in it
+    test("an earlier run's crash file is not this run's reason", () async {
+      final file = File('${directory.path}/stderrGRPC_NORMAL.log')..writeAsStringSync('panic: an earlier crash');
+      await file.setLastModified(DateTime.now().subtract(const Duration(hours: 1)));
+      expect(await CoreProcess.crashReasonOf(file, ['fatal error: this run'], DateTime.now()), 'fatal error: this run');
+    });
+
+    test("this run's crash file is its reason", () async {
+      final startedAt = DateTime.now().subtract(const Duration(seconds: 5));
+      final file = File('${directory.path}/stderrGRPC_NORMAL.log')..writeAsStringSync('panic: this run');
+      expect(await CoreProcess.crashReasonOf(file, const [], startedAt), 'panic: this run');
     });
   });
 }

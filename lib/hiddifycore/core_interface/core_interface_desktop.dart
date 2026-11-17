@@ -211,6 +211,9 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
       process.exitCode.then((code) async {
         if (!identical(_engine, process) || process.stopping) return;
         final reason = await process.crashReason();
+        // looked at again after the wait: a stop and a new engine in between are not this exit,
+        // and forgetting would drop the new engine
+        if (!identical(_engine, process) || process.stopping) return;
         _forgetEngine();
         loggy.error('engine process exited unexpectedly ($code)${reason == null ? '' : ': $reason'}');
         onCoreProcessExited(
@@ -328,6 +331,7 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
 
   void _adoptProcess(CoreProcess process) {
     _process = process;
+    _processGivenUp = false;
     unawaited(
       process.exitCode.then((code) async {
         if (!identical(_process, process) || process.stopping) return;
@@ -353,7 +357,8 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
     final now = DateTime.now();
     _restarts.removeWhere((time) => now.difference(time) > _restartWindow);
     if (_restarts.length >= _maxRestarts) {
-      loggy.error('the core keeps crashing; not starting it again');
+      loggy.error('the core keeps crashing; not starting it again until the next setup');
+      _processGivenUp = true;
       return;
     }
     _restarts.add(now);
@@ -370,8 +375,16 @@ class CoreInterfaceDesktop extends CoreInterface with InfraLogger {
       _crashes.add(null);
     } catch (e) {
       loggy.error('core process failed to restart', e);
+      _processGivenUp = true;
     }
   }
+
+  bool _processGivenUp = false;
+
+  /// Whether the app's core process crashed and was not started again (it kept crashing, or its
+  /// restart failed): the next setup starts it.
+  @protected
+  bool get coreProcessGivenUp => _processGivenUp;
 
   /// Called when the core's process ends without being asked to. The app's core is started again;
   /// the proxy engine is not, its connection has ended.

@@ -83,7 +83,14 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
 
   @override
   Future<String> setup(Directories directories, bool debug, int mode) async {
-    if (_nativeSubscription != null) return '';
+    if (_nativeSubscription != null) {
+      // set up already; a core process that was given up on after its crashes is started again
+      // here, or every call failed until the app was relaunched
+      if (!coreProcessGivenUp) return '';
+      final error = await super.setup(directories, debug, mode);
+      if (error.isEmpty) _listenForeground();
+      return error;
+    }
     final workingDirectory = directories.workingDir.absolute;
     final error = await super.setup(directories, debug, mode);
     if (error.isNotEmpty) return error;
@@ -102,10 +109,20 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   @override
   void onCoreProcessRestarted() => _listenForeground();
 
+  /// The app's core crashed. Without a VPN its connection went with it: that is a failed
+  /// connection, with the crash's reason; before, only a stream error said so, as a plain stop.
+  @override
+  void onCoreProcessExited(String message) {
+    if (_usingVPN || _status.isClosed) return;
+    if (_status.valueOrNull is CoreStopped) return;
+    _status.add(CoreStatus.stopped(alert: CoreAlert.startFailed, message: message));
+  }
+
   /// Follows the app core's status while no VPN runs (proxy modes).
   void _listenForeground() {
     unawaited(_foregroundSubscription?.cancel());
-    _foregroundSubscription = fgClient
+    late final StreamSubscription<CoreInfoResponse> subscription;
+    _foregroundSubscription = subscription = fgClient
         .coreInfoListener(Empty())
         .cancelOnUnsubscribe
         .listen(
@@ -118,8 +135,14 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
               );
             }
           },
+          // the stream ends with the core's process (onCoreProcessExited reports that) or with
+          // its channel, which reconnects: neither is a stop of the core, and the listener is
+          // armed again
           onError: (Object error) {
-            if (!_usingVPN) _status.add(CoreStatus.stopped(message: error.toString()));
+            loggy.debug('foreground status stream ended: $error');
+            Future<void>.delayed(const Duration(seconds: 1), () {
+              if (identical(_foregroundSubscription, subscription)) _listenForeground();
+            });
           },
         );
   }
@@ -471,7 +494,9 @@ class CoreInterfaceMacOS extends CoreInterfaceDesktop {
   @override
   Future<void> dispose() async {
     await _nativeSubscription?.cancel();
-    await _foregroundSubscription?.cancel();
+    final foreground = _foregroundSubscription;
+    _foregroundSubscription = null; // a pending re-arm (see _listenForeground) sees it gone
+    await foreground?.cancel();
     await _extensionChannel?.shutdown();
     await _clientChanges.close();
     await _status.close();

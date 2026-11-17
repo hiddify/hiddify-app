@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:hiddify/hiddifycore/generated/v2/hcore/hcore.pb.dart';
 import 'package:hiddify/utils/custom_loggers.dart';
 import 'package:path/path.dart' as p;
@@ -30,7 +31,7 @@ class CoreProcessException implements Exception {
 /// this process holds the other end and never writes to it, so it closes when the UI exits, even
 /// when the UI crashes or is killed. The core also watches the UI's process id.
 class CoreProcess {
-  CoreProcess._(this._process, this.serverCertificatePem, this._crashFile, this._stderrTail);
+  CoreProcess._(this._process, this.serverCertificatePem, this._crashFile, this._stderrTail, this._startedAt);
 
   static const _readyPrefix = 'HIDDIFY_CORE_READY ';
   static const _errorPrefix = 'HIDDIFY_CORE_ERROR ';
@@ -45,6 +46,9 @@ class CoreProcess {
   /// Where the core writes a Go crash (hcore.Setup: `<working dir>/data/stderr<mode name>.log`). Once it
   /// is set up its stderr goes to /dev/null or NUL, so this file is the only place a panic shows.
   final File _crashFile;
+
+  /// When the process was started: a crash file older than that is an earlier run's.
+  final DateTime _startedAt;
 
   /// The last lines of stderr, written before the core was set up.
   final List<String> _stderrTail;
@@ -90,6 +94,7 @@ class CoreProcess {
     required String secret,
     required bool debug,
   }) async {
+    final startedAt = DateTime.now();
     final process = await Process.start(
       executable,
       [
@@ -149,7 +154,7 @@ class CoreProcess {
         if (ready.isCompleted) return;
         // the rest of stderr, which holds a crash, arrives after the exit
         await stderrDone.future.timeout(const Duration(seconds: 1), onTimeout: () {});
-        final reason = await _crashReason(crashFile, stderrTail);
+        final reason = await crashReasonOf(crashFile, stderrTail, startedAt);
         if (ready.isCompleted) return;
         ready.completeError(
           CoreProcessException('the core exited ($code) before it was ready${reason == null ? '' : ': $reason'}'),
@@ -164,6 +169,7 @@ class CoreProcess {
         certificate.isEmpty ? '' : utf8.decode(base64.decode(certificate)),
         crashFile,
         stderrTail,
+        startedAt,
       );
     } catch (_) {
       process.kill();
@@ -176,12 +182,18 @@ class CoreProcess {
 
   /// Why the core crashed, from its Go crash output: the `panic:` or `fatal error:` line, or null.
   /// Read it right after the exit: a restarted core moves the file into its crash reports.
-  Future<String?> crashReason() => _crashReason(_crashFile, _stderrTail);
+  Future<String?> crashReason() => crashReasonOf(_crashFile, _stderrTail, _startedAt);
 
-  static Future<String?> _crashReason(File crashFile, List<String> stderrTail) async {
+  /// The file is this run's only when it was written after [startedAt]: a core that dies before its
+  /// setup re-creates it showed the panic of an earlier crash as its own.
+  @visibleForTesting
+  static Future<String?> crashReasonOf(File crashFile, List<String> stderrTail, DateTime startedAt) async {
     String? fromFile;
     try {
-      if (await crashFile.exists()) fromFile = crashHeadline(await crashFile.readAsString());
+      if (await crashFile.exists() &&
+          !(await crashFile.lastModified()).isBefore(startedAt.subtract(const Duration(seconds: 1)))) {
+        fromFile = crashHeadline(await crashFile.readAsString());
+      }
     } catch (e) {
       _logger.debug('cannot read the core crash output: $e');
     }
