@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and below (android:fullBackupContent). The core's gRPC identity stays out of
+     backups: the app's client certificate and key (files/grpc) and the core's server certificate
+     and key, in its settings store (data/AppSettings.db in the working directory). They are made
+     again on the device a backup is restored to. Keep in step with data_extraction_rules.xml. -->
+<full-backup-content>
+    <exclude domain="file" path="grpc/" />
+    <exclude domain="external" path="data/AppSettings.db/" />
+    <exclude domain="root" path="app_flutter/data/AppSettings.db/" />
+</full-backup-content>
