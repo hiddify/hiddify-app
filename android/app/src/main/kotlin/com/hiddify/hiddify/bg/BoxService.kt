@@ -31,6 +31,7 @@ import com.hiddify.core.mobile.SetupOptions
 import go.Seq
 import com.hiddify.core.libbox.Libbox
 import com.hiddify.core.mobile.Mobile
+import com.hiddify.core.mobile.CoreStoppedListener
 
 
 import com.hiddify.core.libbox.CommandServer
@@ -223,6 +224,7 @@ class BoxService(
                     platformInterface,
                 )
                 // the core trusts the client certificate stored in the base folder by itself
+                Mobile.setCoreStoppedListener(coreStoppedListener)
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Log.e(TAG, "Mobile.setup failed", e)
@@ -305,6 +307,28 @@ class BoxService(
         }
     }
 
+    /**
+     * Told by the core when it stops by itself (a start, stop or reload that failed), on a thread
+     * of the core's. Only the app saw that, on the core's status stream: with the app closed (a
+     * start by always-on, the tile, the shortcut, or the app gone since), the service stayed up,
+     * with its TUN and nothing behind it.
+     */
+    private val coreStoppedListener = object : CoreStoppedListener {
+        override fun onCoreStopped(messageType: Int, message: String?) {
+            GlobalScope.launch(Dispatchers.Main) { coreStopped(message) }
+        }
+    }
+
+    /** The core stopped by itself: the service goes down with it, and tells why. Main thread. */
+    private fun coreStopped(message: String?) {
+        // a start still running reports its own failure; a stop under way is already going down
+        if (status.value != Status.Started) return
+        Log.w(TAG, "the core stopped by itself: $message")
+        status.value = Status.Stopping
+        notification.close()
+        GlobalScope.launch(Dispatchers.IO) { teardown(StartFailure(Alert.StartService, message)) }
+    }
+
     /** The start in progress; a stop cancels it and waits for it before it tears down. */
     private var startJob: Job? = null
 
@@ -341,6 +365,7 @@ class BoxService(
             fileDescriptor = null
         }
         if (activePlatformInterface === platformInterface) activePlatformInterface = null
+        Mobile.setCoreStoppedListener(null) // its own close is not a stop to report
         // Close the mode we actually started. Old code always closed 4 (insecure), so
         // mTLS background (mode 2) left :17079 listening and reconnect failed with
         // "background service did not stop".
