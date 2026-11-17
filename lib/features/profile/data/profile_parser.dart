@@ -31,6 +31,9 @@ import 'package:meta/meta.dart';
 /// since local profiles have no url. Every step treats a whitespace-only result
 /// as blank, so it falls through to the next step.
 
+/// The longest update interval a subscription can ask for, in hours: a year.
+const maxUpdateIntervalHours = 24 * 365;
+
 class ProfileParser with InfraLogger {
   // Synthetic sentinel assigned to `total` for "unlimited" traffic (subscription-userinfo total=0 or
   // missing). It MUST stay above the 10 TB "unlimited" threshold the UI uses to decide whether to show
@@ -411,9 +414,10 @@ class ProfileParser with InfraLogger {
         if (headers['profile-update-interval'] case final String updateIntervalStr
             when options == null && !isAutoUpdateDisable) {
           // Convention: a positive integer number of hours. Ignore anything else
-          // (a decimal, garbage, or <= 0) instead of failing the whole parse.
+          // (a decimal, garbage, or <= 0) instead of failing the whole parse. At most a year: a
+          // larger number overflowed the Duration into a wrong, even negative, interval.
           if (int.tryParse(updateIntervalStr.trim()) case final hours? when hours > 0) {
-            options = ProfileOptions(updateInterval: Duration(hours: hours));
+            options = ProfileOptions(updateInterval: Duration(hours: hours.clamp(1, maxUpdateIntervalHours)));
           }
         }
 

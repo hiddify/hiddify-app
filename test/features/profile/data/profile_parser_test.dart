@@ -572,6 +572,15 @@ void main() {
       );
     });
 
+    // a number of hours past what a Duration holds made a wrong, even negative, interval
+    test("a huge interval is held to a year", () {
+      expectRemote(
+        parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "999999999999999"}),
+        (rp) =>
+            expect(rp.options, equals(const ProfileOptions(updateInterval: Duration(hours: maxUpdateIntervalHours)))),
+      );
+    });
+
     test("zero or negative is ignored", () {
       expectRemote(
         parseRemoteWithHeaders({"profile-title": "p", "profile-update-interval": "0"}),
